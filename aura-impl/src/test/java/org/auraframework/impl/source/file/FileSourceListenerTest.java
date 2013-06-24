@@ -18,29 +18,20 @@ package org.auraframework.impl.source.file;
 
 import org.apache.commons.vfs2.FileChangeEvent;
 import org.apache.commons.vfs2.FileObject;
-import org.auraframework.impl.DefinitionServiceImpl;
-import org.auraframework.service.DefinitionService;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.system.SourceListener;
-import org.auraframework.test.ServiceLocatorMocker;
 import org.auraframework.test.UnitTestCase;
-import org.auraframework.util.ServiceLoader;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
 
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * Unit tests for {@link FileSourceListener}
  */
 public class FileSourceListenerTest extends UnitTestCase {
 
-    @Mock private FileSourceLoader loader1;
-    @Mock private FileSourceLoader loader2;
     @Mock private FileChangeEvent createEvent;
     @Mock private FileChangeEvent deleteEvent;
     @Mock private FileChangeEvent changeEvent;
@@ -50,7 +41,7 @@ public class FileSourceListenerTest extends UnitTestCase {
     @Mock private FileObject changeFile;
     @Mock private FileObject invalidFile;
 
-    @Mock private DefinitionServiceImpl definitionService;
+    @Captor private ArgumentCaptor<DefDescriptor<?>> defDescriptorCaptor;
 
     private FileSourceListener listener = new FileSourceListener();
 
@@ -63,45 +54,56 @@ public class FileSourceListenerTest extends UnitTestCase {
         when(changeEvent.getFile()).thenReturn(changeFile);
         when(invalidEvent.getFile()).thenReturn(invalidFile);
 
-        when(createFile.toString()).thenReturn("/some/awesome/dir/newfile");
-        when(deleteFile.toString()).thenReturn("/some/awesome/dir/deletefile");
-        when(changeFile.toString()).thenReturn("/some/cool/dir/changedfile");
-        when(invalidFile.toString()).thenReturn("/some/invalid/dir/wrongfile");
+        when(createFile.toString()).thenReturn("/some/awesome/ui/inputSearch/inputSearch.cmp");
+        when(deleteFile.toString()).thenReturn("/some/awesome/ui/inputSearch/inputSearchController.js");
+        when(changeFile.toString()).thenReturn("/some/awesome/ui/inputSearch/inputSearch.css");
+        when(invalidFile.toString()).thenReturn("/some/awesome/ui/inputSearchModel.java");
 
-        listener.addLoader("/some/awesome/dir", loader1);
-        listener.addLoader("/some/cool/dir", loader2);
+        listener = spy(listener);
+
+
     }
 
     public void testCreateEvent() throws Exception {
         listener.fileCreated(createEvent);
-        //verify(loader1).notifySourceChanges(createEvent, SourceListener.SourceMonitorEvent.created);
+        verify(listener, atLeastOnce()).onSourceChanged(defDescriptorCaptor.capture(), eq(SourceListener.SourceMonitorEvent.created));
+
+        DefDescriptor<?> dd = defDescriptorCaptor.getValue();
+
+        assertEquals("ui", dd.getNamespace());
+        assertEquals("inputSearch", dd.getName());
+        assertEquals(DefDescriptor.DefType.COMPONENT, dd.getDefType());
+        assertEquals("markup", dd.getPrefix());
     }
 
     public void testDeleteEvent() throws Exception {
         listener.fileDeleted(deleteEvent);
-        //verify(loader1).notifySourceChanges(deleteEvent, SourceListener.SourceMonitorEvent.deleted);
+        verify(listener, atLeastOnce()).onSourceChanged(defDescriptorCaptor.capture(), eq(SourceListener.SourceMonitorEvent.deleted));
+
+        DefDescriptor<?> dd = defDescriptorCaptor.getValue();
+
+        assertEquals("ui", dd.getNamespace());
+        assertEquals("inputSearch", dd.getName());
+        assertEquals(DefDescriptor.DefType.CONTROLLER, dd.getDefType());
+        assertEquals("js", dd.getPrefix());
     }
 
     public void testChangeEvent() throws Exception {
         listener.fileChanged(changeEvent);
-        //verify(loader2).notifySourceChanges(changeEvent, SourceListener.SourceMonitorEvent.changed);
+        verify(listener, atLeastOnce()).onSourceChanged(defDescriptorCaptor.capture(), eq(SourceListener.SourceMonitorEvent.changed));
+
+        DefDescriptor<?> dd = defDescriptorCaptor.getValue();
+
+        assertEquals("ui", dd.getNamespace());
+        assertEquals("inputSearch", dd.getName());
+        assertEquals(DefDescriptor.DefType.STYLE, dd.getDefType());
+        assertEquals("css", dd.getPrefix());
     }
 
-    public void testInvalidateAll() throws Exception {
+    public void testNullDefDescriptor() throws Exception {
+        listener.fileChanged(invalidEvent);
+        verify(listener, atLeastOnce()).onSourceChanged(defDescriptorCaptor.capture(), eq(SourceListener.SourceMonitorEvent.changed));
 
-        try {
-
-            ServiceLocatorMocker.mockServiceLocator();
-            ServiceLoader slm = ServiceLocatorMocker.getMockedServiceLocator();
-            when(slm.get(DefinitionService.class)).thenReturn(definitionService);
-
-            listener.fileChanged(invalidEvent);
-            verify(definitionService, atLeastOnce()).onSourceChanged(null, SourceListener.SourceMonitorEvent.changed);
-
-        } finally {
-
-            ServiceLocatorMocker.unmockServiceLocator();
-        }
-
+        assertNull(defDescriptorCaptor.getValue());
     }
 }

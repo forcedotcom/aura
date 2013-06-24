@@ -18,12 +18,8 @@ package org.auraframework.impl.source.file;
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.vfs2.FileChangeEvent;
-import org.apache.commons.vfs2.FileObject;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
@@ -34,16 +30,9 @@ import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.util.AuraImplFiles;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.system.Source;
-import org.auraframework.system.SourceListener;
 import org.auraframework.throwable.AuraRuntimeException;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
-
-import static org.mockito.Mockito.*;
 
 public class FileSourceLoaderTest extends AuraImplTestCase {
-
-    @Captor private ArgumentCaptor<DefDescriptor<?>> DefDescriptorCaptor;
 
     public FileSourceLoaderTest(String name) {
         super(name);
@@ -168,51 +157,4 @@ public class FileSourceLoaderTest extends AuraImplTestCase {
         found = loader.find(new DescriptorFilter("markup://test:doesntexist"));
         assertEquals("Should not have found any components", 0, found.size());
     }
-
-    public void testNotifySourceChanges() throws Exception {
-
-        FileChangeEvent validChangeEvent = mock(FileChangeEvent.class);
-        FileObject validChangeFile = mock(FileObject.class);
-
-        when(validChangeEvent.getFile()).thenReturn(validChangeFile);
-
-        when(validChangeFile.toString()).thenReturn(AuraImplFiles.TestComponents.getPath() + "/gvpTest/labelProvider/labelProvider.cmp");
-
-        FileSourceLoader loader = new FileSourceLoader(AuraImplFiles.TestComponents.asFile());
-        loader = spy(loader);
-
-        // verifies found DD
-        loader.notifySourceChanges(validChangeEvent, SourceListener.SourceMonitorEvent.changed);
-        verify(loader, times(2)).onSourceChanged(DefDescriptorCaptor.capture(), eq(SourceListener.SourceMonitorEvent.changed));
-
-        List<DefDescriptor<?>> capturedDefDescriptors = DefDescriptorCaptor.getAllValues();
-        List<String> qualifiedNames = new ArrayList<String>();
-        for( DefDescriptor defs : capturedDefDescriptors ) {
-            qualifiedNames.add(defs.getQualifiedName());
-        }
-        assertEquals(2, qualifiedNames.size());
-        assertTrue(qualifiedNames.contains("markup://gvpTest:labelProvider"));
-        assertTrue(qualifiedNames.contains("js://gvpTest.labelProvider"));
-
-    }
-
-    public void testInvalidNotifySourceChanges() throws Exception {
-
-        FileChangeEvent invalidChangeEvent = mock(FileChangeEvent.class);
-        FileObject invalidChangeFile = mock(FileObject.class);
-
-        when(invalidChangeEvent.getFile()).thenReturn(invalidChangeFile);
-        when(invalidChangeFile.toString()).thenReturn(AuraImplFiles.TestComponents.getPath() + "/foo/bar/bar.cmp");
-
-        FileSourceLoader loader = new FileSourceLoader(AuraImplFiles.TestComponents.asFile());
-        loader = spy(loader);
-
-        //verifies no DDs found, flush it all with null
-        loader.notifySourceChanges(invalidChangeEvent, SourceListener.SourceMonitorEvent.created);
-        verify(loader, atLeastOnce()).onSourceChanged(DefDescriptorCaptor.capture(), eq(SourceListener.SourceMonitorEvent.created));
-
-        assertNull(DefDescriptorCaptor.getValue());
-
-    }
-
 }

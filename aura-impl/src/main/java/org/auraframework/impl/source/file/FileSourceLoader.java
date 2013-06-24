@@ -24,14 +24,12 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.vfs2.FileChangeEvent;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileSystemManager;
 import org.apache.commons.vfs2.VFS;
 import org.apache.commons.vfs2.impl.DefaultFileMonitor;
 import org.apache.log4j.Logger;
-import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
@@ -39,7 +37,6 @@ import org.auraframework.def.DescriptorFilter;
 import org.auraframework.impl.source.BaseSourceLoader;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Parser.Format;
-import org.auraframework.system.SourceListener;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.IOUtil;
 
@@ -66,13 +63,13 @@ public class FileSourceLoader extends BaseSourceLoader {
     private static FileSystemManager fileMonitorManager;
     private static DefaultFileMonitor fileMonitor;
     private static Set<String> monitoredDirs = new HashSet<String>();
-    private static final FileSourceListener fileListener = new FileSourceListener();
 
     static {
         try {
             // set up source file monitoring
             fileMonitorManager = VFS.getManager();
-            fileMonitor = new DefaultFileMonitor(fileListener);
+            fileMonitor = new DefaultFileMonitor(
+                    new FileSourceListener());
 
             // monitor the base and all child directories
             fileMonitor.start();
@@ -107,10 +104,10 @@ public class FileSourceLoader extends BaseSourceLoader {
      * Add a root directory to monitor for changes
      * Synchronized due to updating single static monitor.
      * This should be called rarely (only on encountering a new namespace) and have no performance impact
-     * 
+     *
      * @param dirName - name of a root directory to monitor
      */
-    private synchronized void registerDirMonitor(String dirName)
+    private static synchronized void registerDirMonitor(String dirName)
     {
         if (fileMonitorManager == null || fileMonitor == null)
             return;
@@ -122,7 +119,6 @@ public class FileSourceLoader extends BaseSourceLoader {
             logger.info("Added file monitor for directory " + dirName);
             fileMonitor.setRecursive(true);
             fileMonitor.addFile(listendir);
-            fileListener.addLoader(listendir.toString(), this);
         } catch (Exception ex) {
             // eat error - monitoring simply won't happen for requested dir, but should never occur
         }
@@ -168,7 +164,7 @@ public class FileSourceLoader extends BaseSourceLoader {
      * Returns a list of the namespaces for which this SourceLoader is
      * authoritative. The names of all subdirectories of the base are included.
      * Empty folders will be skipped.
-     * 
+     *
      * @return List of names of namespaces that this SourceLoader handles.
      */
     @Override
@@ -218,10 +214,10 @@ public class FileSourceLoader extends BaseSourceLoader {
 
     /**
      * Find the set of files that match the filter.
-     * 
+     *
      * This will recursively walk a set of directories to find all files that
      * matche the filter, in any directory.
-     * 
+     *
      * @param file the base directory to search.
      * @param files the set of files to return (can be null, in which case we
      *            walk, but do not return anything)
@@ -243,7 +239,7 @@ public class FileSourceLoader extends BaseSourceLoader {
 
     /**
      * Should we move it to an util class?
-     * 
+     *
      * @param file
      * @return
      */
@@ -262,77 +258,6 @@ public class FileSourceLoader extends BaseSourceLoader {
         }
 
         return file;
-    }
-
-    /**
-     * Finds matching DefDescriptors from path of file that changed. If matches found, clear those descriptors.
-     * Otherwise, clear all cache by passing nul into
-     * {@link org.auraframework.impl.DefinitionServiceImpl#onSourceChanged}
-     *
-     * @param event file change event
-     * @param smEvent file event
-     */
-    public void notifySourceChanges(FileChangeEvent event, SourceListener.SourceMonitorEvent smEvent) {
-
-        String filePath = event.getFile().toString();
-
-        Set<DefDescriptor<?>> matches = find(filePath);
-        if ( matches.size() > 0 ) {
-            for ( DefDescriptor<?> def : matches ) {
-                logger.debug("Invalidating: " + def.getQualifiedName());
-                onSourceChanged(def, smEvent);
-            }
-        } else {
-            logger.debug("No DefDescriptors found. Invalidating all cache.");
-            onSourceChanged(null, smEvent);
-        }
-
-    }
-
-    /**
-     * Used to allow method call validation and matching in tests.
-     *
-     * @param defDescriptor definition descriptor
-     * @param smEvent file change event
-     */
-    public void onSourceChanged(DefDescriptor<?> defDescriptor, SourceListener.SourceMonitorEvent smEvent) {
-        Aura.getDefinitionService().onSourceChanged(defDescriptor, smEvent);
-    }
-
-    /**
-     * Creates {@link DescriptorFilter} to find matches based on file path
-     *
-     * @param filePath path of file
-     * @return set of descriptors
-     */
-    public Set<DefDescriptor<?>> find(String filePath) {
-        DescriptorFilter filter = getDescripterFilter(filePath);
-        return find(filter);
-    }
-
-    /**
-     * Creates {@link DescriptorFilter} from path of file
-     *
-     * @param filePath path of file
-     * @return definition filter
-     */
-    private DescriptorFilter getDescripterFilter(String filePath) {
-        String matchFormat = "%s://%s";
-        String prefix = "*";
-        String name;
-        filePath = filePath.replaceAll("\\\\", "/");
-
-        if (filePath.endsWith(".java")) {
-            // broad attempt to get anything matching class name of java file
-            // this will end up clearing all cache on java file changes
-            // because no java:// descriptors will be found.
-            name = "*" + filePath.substring(filePath.lastIndexOf("/") + 1, filePath.lastIndexOf("."));
-        } else {
-            String paths[] = filePath.split("/");
-            name = paths[paths.length - 3] + ":" + paths[paths.length - 2];
-        }
-
-        return new DescriptorFilter(String.format(matchFormat, prefix, name));
     }
 
     private static class SourceFileFilter implements FileFilter {
@@ -357,7 +282,7 @@ public class FileSourceLoader extends BaseSourceLoader {
 
     /**
      * This is a twisted filter that actually does the work as it progresses.
-     * 
+     *
      * We need to do this because we don't know a-priory what the types are, and
      * rather than redo all of that work, we can simply do what we need to here.
      */
@@ -368,7 +293,7 @@ public class FileSourceLoader extends BaseSourceLoader {
 
         /**
          * The constructor.
-         * 
+         *
          * @param dset the set of descriptors to be filled.
          * @param dm the matcher to check the descriptors.
          */
@@ -380,10 +305,10 @@ public class FileSourceLoader extends BaseSourceLoader {
 
         /**
          * Sets the namespace for this instance.
-         * 
+         *
          * This must be called before this is used as a filter, otherwise it
          * will fail with a null pointer exception.
-         * 
+         *
          * @param namespace The namespace.
          */
         public void setNamespace(String namespace) {
@@ -392,7 +317,7 @@ public class FileSourceLoader extends BaseSourceLoader {
 
         /**
          * Internal routine to get the deftype associated with a file.
-         * 
+         *
          * @return the def type, or null if there is none.
          */
         private DefType getDefType(String name) {

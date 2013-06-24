@@ -1,0 +1,4 @@
+<!-- I want to use theme variables in my CSS -->
+<aura:component>
+  <themeTest:header> Hello World </themeTest:header>
+</aura:component>

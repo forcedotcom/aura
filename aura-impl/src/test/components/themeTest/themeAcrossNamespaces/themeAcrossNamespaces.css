@@ -1,0 +1,5 @@
+.THIS {
+  margin: theme('themeTest2.baseTheme.buttonMargin');
+  font-family: theme('themeTest2.baseTheme.textFont');
+  background: theme('themeTest2.baseTheme.buttonBackground');
+}

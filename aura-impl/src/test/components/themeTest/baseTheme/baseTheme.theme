@@ -3,4 +3,5 @@
   <aura:attribute name="margin" default="10px" />
   <aura:attribute name="lineHeight" default="5" type="Integer" />
   <aura:attribute name="spacious" default="false" type="Boolean" />
+  <aura:attribute name="bgcolor" default="green" />
 </aura:theme>

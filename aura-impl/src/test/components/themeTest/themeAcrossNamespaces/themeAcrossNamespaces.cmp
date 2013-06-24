@@ -1,0 +1,5 @@
+<!-- I want to use theme variables across namepaces -->
+<aura:component>
+  <aura:attribute name="label" type="String" />
+  <input type="submit" value="{!v.label}" />
+</aura:component>

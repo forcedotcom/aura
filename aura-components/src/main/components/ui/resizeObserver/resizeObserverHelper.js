@@ -66,7 +66,7 @@
             	
             	//$A.log("ui:resizeObserver.update()", component);
             	
-                a.run();
+                a.runDeprecated();
             }
         }
     },

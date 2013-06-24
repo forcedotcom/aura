@@ -55,7 +55,7 @@ var BaseValue = {
                 if(clientAction.unwrap){
                     clientAction = clientAction.unwrap();
                 }
-                clientAction.run(event);
+                clientAction.runDeprecated(event);
             } else {
                 aura.assert(false, "no client action by name " + actionRef.getValue());
             }

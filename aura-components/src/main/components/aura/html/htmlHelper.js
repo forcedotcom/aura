@@ -211,7 +211,7 @@
 
         $A.run(function () {
                 var action = $A.expressionService.get(valueProvider, valueExpression);
-                action.run(event);
+                action.runDeprecated(event);
             })
     },
 

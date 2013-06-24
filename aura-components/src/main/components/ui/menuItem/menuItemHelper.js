@@ -168,7 +168,7 @@
             }
             var nextFocusCmp = menuItems.getValue(nextIndex);
             var action = nextFocusCmp.get("c.setFocus");
-            action.run();
+            action.runDeprecated();
         }
     },
     
@@ -188,7 +188,7 @@
             }
             var previousFocusCmp = menuItems.getValue(previousIndex);
             var action = previousFocusCmp.get("c.setFocus");
-            action.run();
+            action.runDeprecated();
         }
     },
     
@@ -202,7 +202,7 @@
                 var menuTriggerCmp = dropdownHelper.getTriggerComponent(dropdownCmp);
                 if (menuTriggerCmp) {
                     var action =  menuTriggerCmp.get("c.focus");
-                    action.run();
+                    action.runDeprecated();
                 }
             }
         }
@@ -233,7 +233,7 @@
                 var text = c.get("v.label");
                 if(text.toLowerCase().indexOf(matchText) === 0) {
                     var action = c.get("c.setFocus");
-                    action.run();
+                    action.runDeprecated();
                     break;
                 }
             }

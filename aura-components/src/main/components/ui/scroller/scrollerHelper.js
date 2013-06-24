@@ -117,7 +117,7 @@
 						onScrollStart : function(e) {
 							var action = component.get("v.onScrollStart");
 							if (action) {
-								action.run(e);
+								action.runDeprecated(e);
 							}
 						},
 
@@ -134,7 +134,7 @@
 							
 							var action = component.get("v.onScrollMove");
 							if (action) {
-								action.run(e);
+								action.runDeprecated(e);
 							}
 						},
 
@@ -143,7 +143,7 @@
 								if ($A.util.hasClass(pullDownEl, 'pullFlip')) {
 									$A.util.swapClass(pullDownEl, 'pullFlip', 'pullLoading');
 									setTimeout(function() {
-										pullToRefreshAction.run();
+										pullToRefreshAction.runDeprecated();
 									}, 1);
 
 								}
@@ -152,7 +152,7 @@
 							if (component.isValid()) {
 								var action = component.get("v.onScrollEnd");
 								if (action) {
-									action.run(e);
+									action.runDeprecated(e);
 								}
 							}
 						},

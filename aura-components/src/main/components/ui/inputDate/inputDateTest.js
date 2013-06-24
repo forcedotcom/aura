@@ -50,7 +50,7 @@
 	testInvalidFormat:{
 	attributes : {displayDatePicker:'true', format: 'KKKKKK'},
 	test: function(cmp){			
-	        cmp.find("datePicker").get('c.selectToday').run();
+	        cmp.find("datePicker").get('c.selectToday').runDeprecated();
 	        var inputDateStr = cmp.find("inputText").getElement().value;
 	        var dt           = moment().format('KKKKKK');
     		aura.test.assertEquals(dt, inputDateStr, "Dates are not the same and they should be");
@@ -107,7 +107,7 @@
 	testToday:{
 	attributes : {displayDatePicker:'true'},
 	test: function(cmp){
-	        cmp.find("datePicker").get('c.selectToday').run();
+	        cmp.find("datePicker").get('c.selectToday').runDeprecated();
 	        var inputDateStr = cmp.find("inputText").getElement().value;
 	        var dt           = moment().format('MMM DD, YYYY');
     		aura.test.assertEquals(dt, inputDateStr, "Dates are not the same and they should be");
@@ -120,7 +120,7 @@
 	testTodayDifferentFormat:{
 	attributes : {displayDatePicker:'true', format: 'DD/MM/YYYY'},
 	test: function(cmp){
-	        cmp.find("datePicker").get('c.selectToday').run();
+	        cmp.find("datePicker").get('c.selectToday').runDeprecated();
 	        var inputDateStr = cmp.find("inputText").getElement().value;
 	        var dt           = moment().format('DD/MM/YYYY');
     		aura.test.assertEquals(dt, inputDateStr, "Dates are not the same and they should be");

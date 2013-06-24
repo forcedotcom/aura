@@ -372,7 +372,7 @@ var ComponentPriv = (function(){ // Scoping priv
                 if(clientAction.unwrap){
                     clientAction = clientAction.unwrap();
                 }
-                clientAction.run(event);
+                clientAction.runDeprecated(event);
             } else {
                 aura.assert(false, "no client action by name " + actionRef.getValue());
             }
@@ -449,7 +449,7 @@ var ComponentPriv = (function(){ // Scoping priv
 
             var clientAction = expressionService.get(cmp, actionRef);
             if (clientAction) {
-                clientAction.run(event);
+                clientAction.runDeprecated(event);
             } else {
                 aura.assert(false, "no client action by name " + actionRef.getValue());
             }

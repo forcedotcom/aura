@@ -23,7 +23,7 @@
     testConfig_PreloadedDef:{
         test: function(cmp){
             $A.run(function(){
-                cmp.get("c.createCmpWithPreloadedDef").run();
+                cmp.get("c.createCmpWithPreloadedDef").runDeprecated();
             });
 
             var body = cmp.get('v.body');
@@ -39,7 +39,7 @@
     testConfig_FetchNewDefFromServer:{
         test: function(cmp){
             $A.run(function(){
-                cmp.get("c.createCmpByFetchingDefFromServer").run();
+                cmp.get("c.createCmpByFetchingDefFromServer").runDeprecated();
             });
 
             $A.test.addWaitFor(true, $A.test.allActionsComplete, function(){
@@ -59,7 +59,7 @@
     testConfig_FetchBadComponent:{
         test: function(cmp){
             $A.run(function(){
-                cmp.get("c.createComponentWithCompilationProblems").run();
+                cmp.get("c.createComponentWithCompilationProblems").runDeprecated();
             });
 
             $A.test.addWaitFor(true, $A.test.allActionsComplete, function(){
@@ -76,7 +76,7 @@
     testConfig_NonExistingComponent:{
         test: function(cmp){
             $A.run(function(){
-                cmp.get("c.createNonExistingComponent").run();
+                cmp.get("c.createNonExistingComponent").runDeprecated();
             });
 
             $A.test.addWaitFor(true, $A.test.allActionsComplete, function(){
@@ -95,7 +95,7 @@
     testConfig_ComponentWithSimpleAttributes:{
         test: function(cmp){
             $A.run(function(){
-                cmp.get("c.createCmpWithSimpleAttributes").run();
+                cmp.get("c.createCmpWithSimpleAttributes").runDeprecated();
             });
 
             var body = cmp.get('v.body');
@@ -115,7 +115,7 @@
     testConfig_ComponentWithComplexAttributes:{
         test: function(cmp){
             $A.run(function(){
-                cmp.get("c.createCmpWithComplexAttributes").run();
+                cmp.get("c.createCmpWithComplexAttributes").runDeprecated();
             });
             
             $A.test.addWaitFor(true, $A.test.allActionsComplete, function(){
@@ -133,7 +133,7 @@
     testConfig_ComponentWithServerDependecies:{
         test:function(cmp){
             $A.run(function(){
-                cmp.get("c.createCmpWithServerDependecies").run();
+                cmp.get("c.createCmpWithServerDependecies").runDeprecated();
             });
 
             $A.test.addWaitFor(true, $A.test.allActionsComplete, function(){
@@ -152,7 +152,7 @@
     testConfig_AbstractComponent:{
         test: function(cmp){
             $A.run(function(){
-                cmp.get("c.createAbstractComponent").run();
+                cmp.get("c.createAbstractComponent").runDeprecated();
             });
 
             $A.test.addWaitFor(true, $A.test.allActionsComplete, function(){
@@ -172,7 +172,7 @@
         test:[function(cmp){
             var helper = cmp.getDef().getHelper();
             $A.run(function(){
-                cmp.get("c.createComponentWithLazyFacets").run();
+                cmp.get("c.createComponentWithLazyFacets").runDeprecated();
             });
             
             $A.test.addWaitFor(
@@ -210,7 +210,7 @@
         test:function(cmp){
             aura.test.setTestTimeout(15000)
             $A.run(function(){
-                cmp.get("c.createComponentExclusively").run();
+                cmp.get("c.createComponentExclusively").runDeprecated();
             });
 
             $A.test.addWaitFor(true, $A.test.allActionsComplete, function(){
@@ -229,7 +229,7 @@
         test: function(cmp){
             $A.test.setTestTimeout(50000);
             $A.run(function(){
-                cmp.get("c.createComponentAndVerifyAction").run();
+                cmp.get("c.createComponentAndVerifyAction").runDeprecated();
             });
 
             $A.test.addWaitFor(true, $A.test.allActionsComplete, function(){

@@ -20,7 +20,7 @@
     testValueProviderForPreloadedDef:{
         test:function(cmp){
             $A.run(function(){
-                cmp.get('c.createCmpWithPreloadedDef').run();
+                cmp.get('c.createCmpWithPreloadedDef').runDeprecated();
             });
 
             var body = cmp.get('v.body');
@@ -42,7 +42,7 @@
     testPassThroughValueAsValueProvider:{
         test:function(cmp){
             $A.run(function(){
-                cmp.get('c.createCmpWithPassthroughValue').run();
+                cmp.get('c.createCmpWithPassthroughValue').runDeprecated();
             });
 
             //Verify that local ID can be used to find the component
@@ -64,7 +64,7 @@
         attributes:{numberAttribute:999},
         test: function(cmp){
             $A.run(function(){
-                cmp.get('c.createCmpByFetchingDefFromServer').run();
+                cmp.get('c.createCmpByFetchingDefFromServer').runDeprecated();
             });
 
             $A.test.addWaitFor(true, $A.test.allActionsComplete, function(){
@@ -89,7 +89,7 @@
         test:function(cmp){
             try{
                 $A.run(function(){
-                    cmp.get('c.createCmpWithEmptyValueProvider').run();
+                    cmp.get('c.createCmpWithEmptyValueProvider').runDeprecated();
                 });
                 
                 //Look at the c.createCmpWithEmptyValueProvider, it is providing {} as attribute value provider
@@ -110,7 +110,7 @@
             
             try{
                 $A.run(function(){
-                    cmp.get('c.createCmpWithUndefinedValueProvider').run();
+                    cmp.get('c.createCmpWithUndefinedValueProvider').runDeprecated();
                 });
                 //Look at the c.createCmpWithUndefinedValueProvider, it is providing undefined as attribute value provider
                 $A.test.fail("Should have failed to resolve value provider for new component.");
@@ -128,7 +128,7 @@
     testNewComponentWithoutDependenceOnAVP:{
         test:function(cmp){
             $A.run(function(){
-                cmp.get('c.createCmpWithNoRequirementForAVP').run();
+                cmp.get('c.createCmpWithNoRequirementForAVP').runDeprecated();
             });
 
             var body = cmp.get('v.body');

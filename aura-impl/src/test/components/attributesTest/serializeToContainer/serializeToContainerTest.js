@@ -18,7 +18,7 @@
         test : [function(cmp) {
             // try to create a new component needing server trip
             $A.run(function(){
-                cmp.get("c.newComponent").run()
+                cmp.get("c.newComponent").runDeprecated()
             });
             $A.test.addWaitFor(true, $A.test.allActionsComplete);
         }, function(cmp) {
@@ -32,7 +32,7 @@
 
             // try to create another new component which doesn't need a server trip now
             $A.run(function(){
-                cmp.get("c.newComponent").run()
+                cmp.get("c.newComponent").runDeprecated()
             });
             $A.test.addWaitFor(true, $A.test.allActionsComplete);
             var newercmp = cmp.find("target").get("v.body")[0];

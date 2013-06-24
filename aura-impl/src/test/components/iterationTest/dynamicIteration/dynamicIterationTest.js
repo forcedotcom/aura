@@ -38,7 +38,7 @@
             $A.test.assertEquals("8:iii", $A.test.getText(children[2]));
 
             // set to another ArrayValue
-            cmp.get("c.setCapitalItems").run();
+            cmp.get("c.setCapitalItems").runDeprecated();
             this.assertNodesDeleted(children);
             children = $A.test.getNonCommentNodes(container.childNodes);
             $A.test.assertEquals(3, children.length);
@@ -47,7 +47,7 @@
             $A.test.assertEquals("8:IIIII", $A.test.getText(children[2]));
 
             // then set to empty ArrayValue
-            cmp.get("c.setOriginalItems").run();
+            cmp.get("c.setOriginalItems").runDeprecated();
             this.assertNodesDeleted(children);
             children = $A.test.getNonCommentNodes(container.childNodes);
             $A.test.assertEquals(0, children.length);
@@ -69,7 +69,7 @@
 
             cmp.getAttributes().getValue("toChange").setValue(10);
             cmp.getAttributes().getValue("newValue").setValue("really?");
-            cmp.get("c.changeOneValue").run();
+            cmp.get("c.changeOneValue").runDeprecated();
 
             var newchildren = $A.test.getNonCommentNodes(container.childNodes);
             $A.test.assertEquals(3, newchildren.length);
@@ -97,7 +97,7 @@
 
             cmp.getAttributes().getValue("toChange").setValue(10);
             cmp.getAttributes().getValue("newValue").setValue("really?");
-            cmp.get("c.insertOneValue").run();
+            cmp.get("c.insertOneValue").runDeprecated();
 
             var newchildren = $A.test.getNonCommentNodes(container.childNodes);
             $A.test.assertEquals(3, newchildren.length);
@@ -123,7 +123,7 @@
             $A.test.assertEquals("11:lll", $A.test.getText(children[2]));
 
             cmp.getAttributes().getValue("toChange").setValue(10);
-            cmp.get("c.deleteOneValue").run();
+            cmp.get("c.deleteOneValue").runDeprecated();
 
             var newchildren = $A.test.getNonCommentNodes(container.childNodes);
             $A.test.assertEquals(3, newchildren.length);

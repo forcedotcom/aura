@@ -521,7 +521,7 @@ var AuraClientService = function() {
             // FIXME: W-1652118 This should not differentiate, both of these should get pushed.
             //
             if (action.getDef().isClientAction()) {
-                action.run();
+                action.runDeprecated();
             } 
             
             

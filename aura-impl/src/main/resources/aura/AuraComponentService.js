@@ -247,7 +247,7 @@ var AuraComponentService = function(){
                 action.setExclusive();
             }
 
-            action.runAfter(action);
+            $A.enqueueAction(action);
         },
 
         /**

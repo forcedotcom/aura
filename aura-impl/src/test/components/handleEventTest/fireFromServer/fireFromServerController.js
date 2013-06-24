@@ -54,7 +54,7 @@
 	causeInfiniteEvenLoop:function(cmp){
 		$A.log("Processing application event fired from server.")
 		var a = cmp.get('c.infiniteEventCycle');
-		a.run();
+		a.runDeprecated();
 	},
 	infiniteEventCycle:function(cmp){
 		$A.log("Call server action that attaches event.")
@@ -96,7 +96,7 @@
 		var evtParam = evt.getParam('pandaAttr');
 		cmp.find("events").getElement().innerHTML += evtParam;
 		var a = cmp.get('c.chainLink');
-		a.run();
+		a.runDeprecated();
 	},
 	chainLink:function(cmp){
 		var a = cmp.get('c.getChainLink');

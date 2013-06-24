@@ -25,7 +25,7 @@
             $A.test.assertEquals("private", cmp.get("v.noneDefault"), "NONE default should not have been overridden from server");
 
             // try to create a new local component
-            cmp.get("c.newComponent").run();
+            cmp.get("c.newComponent").runDeprecated();
             var newcmp = cmp.find("target").get("v.body")[0];
             $A.test.assertEquals("double", newcmp.get("v.both"));
             $A.test.assertEquals("single", newcmp.get("v.server"));

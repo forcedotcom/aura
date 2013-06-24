@@ -267,7 +267,7 @@ var priv = {
 
                             if (!action.isAbortable() || that.newestAbortableGroup === actionGroupNumber) {
                                 if (needUpdate) {
-                                    action.complete($A.getContext());
+                                    action.finishAction($A.getContext());
                                 } 
                                 if (action.isRefreshAction()) {
                                     action.fireRefreshEvent("refreshEnd");
@@ -382,7 +382,7 @@ var priv = {
                     for ( var n = 0; n < actionsToComplete.length; n++) {
                         var info = actionsToComplete[n];
                         info.action.updateFromResponse(info.response);
-                        info.action.complete($A.getContext());
+                        info.action.finishAction($A.getContext());
                     }
 
                     clientService.fireDoneWaiting();

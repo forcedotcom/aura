@@ -190,8 +190,8 @@ var AuraClientService = function() {
                                 storage.get(key, function(actionResponse) {
                                     if (actionResponse) {
                                         storage.log("AuraClientService.loadComponent(): bootstrap request was INCOMPLETE using stored action response.", [action, actionResponse]);
-
-                                            action.complete(actionResponse);
+                                        action.updateFromResponse(actionResponse);
+                                        action.finishAction($A.getContext());
                                     } else {
                                         $A.error("Unable to load application.");
                                     }
@@ -478,7 +478,7 @@ var AuraClientService = function() {
             });
 
             action.updateFromResponse(actionResult);
-            action.complete($A.getContext());
+            action.finishAction($A.getContext());
         },
 
         /**

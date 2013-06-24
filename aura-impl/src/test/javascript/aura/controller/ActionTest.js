@@ -893,12 +893,8 @@ Test.Aura.Controller.ActionTest = function() {
 	}
 
 	[ Fixture ]
-	function Complete() {
-		/**
-		 * Action.complete() is a very large function and would be easier to test if it was broken up into smaller
-		 * sections. CallsActionCallbackIfCmpIsValid is a happy path test to make sure the Action callback is called
-		 * when there are is no originalResponse, no storage, and is not in an error state.
-		 */
+	function FinishAction() {
+
 		[ Fact ]
 		function CallsActionCallbackIfCmpIsValid() {
 			// Arrange
@@ -927,7 +923,7 @@ Test.Aura.Controller.ActionTest = function() {
 			var actual = false;
 
 			// Act
-			target.complete({
+			target.finishAction({
 				setCurrentAction : function() {
 				}
 			});
@@ -942,7 +938,7 @@ Test.Aura.Controller.ActionTest = function() {
 			target.completeGroups = Stubs.GetMethod(null);
 
 			var error = Record.Exception(function() {
-				target.complete({
+				target.finishAction({
 					setCurrentAction : function() {
 					}
 				});
@@ -962,7 +958,7 @@ Test.Aura.Controller.ActionTest = function() {
 			target.components = "something";
 
 			var error = Record.Exception(function() {
-				target.complete({
+				target.finishAction({
 					setCurrentAction : function() {
 					},
 					joinComponentConfigs : function() {

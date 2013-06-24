@@ -102,60 +102,61 @@ Event.prototype.fire = function() {
         aura.assert(false, "event has already been fired, silly");
     }
     var stackname = this.eventDef.getDescriptor().getQualifiedName();
-    $A.services.client.pushStack(stackname);
+    var that = this;
 
-    this.fired = true;
-    var handlers;
-    if (this.eventName) {
-        //component
-        var cmp = this.source;
-        while (cmp && cmp.getDef().getEventDef(this.eventName)){
-            var dispatcher = cmp.getEventDispatcher();
-            if (dispatcher) {
-                handlers = dispatcher[this.eventName];
-                if (handlers) {
-                    for (var i = 0; i < handlers.length; i++) {
-                        handlers[i](this);
-                    }
-                }
-            }
-
-            // A handler might have destroyed the component and we need to stop walking the super chain
-            cmp = cmp.isValid() ? cmp.getSuper() : null;
-        }
-    } else {
-        //application or value
-        var def = this.eventDef;
-
-        //Values may pass in a null eventDispatcher if no one is listening.
-        if(this.eventDispatcher){
-            while (def) {
-                var qname = def.getDescriptor().getQualifiedName();
-                handlers = this.eventDispatcher[qname];
-                if(handlers){
-                    if($A.util.isArray(handlers)){
-                        //Value handlers on components use arrays, not objects
-                        for(var k=0;k<handlers.length;k++){
-                            handlers[k](this);
-                        }
-                    }else{
-                        for (var key in handlers){
-                            var cmpHandlers = handlers[key];
-                            for(var j = 0;j < cmpHandlers.length; j++){
-                                var handler = cmpHandlers[j];
-                                handler(this);
+    $A.run(function() {
+            that.fired = true;
+            var handlers;
+            if (that.eventName) {
+                //component
+                var cmp = that.source;
+                while (cmp && cmp.getDef().getEventDef(that.eventName)){
+                    var dispatcher = cmp.getEventDispatcher();
+                    if (dispatcher) {
+                        handlers = dispatcher[that.eventName];
+                        if (handlers) {
+                            for (var i = 0; i < handlers.length; i++) {
+                                handlers[i](that);
                             }
                         }
                     }
-                }
 
-                def = def.getSuperDef();
+                    // A handler might have destroyed the component and we need to stop walking the super chain
+                    cmp = cmp.isValid() ? cmp.getSuper() : null;
+                }
+            } else {
+                //application or value
+                var def = that.eventDef;
+
+                //Values may pass in a null eventDispatcher if no one is listening.
+                if(that.eventDispatcher){
+                    while (def) {
+                        var qname = def.getDescriptor().getQualifiedName();
+                        handlers = that.eventDispatcher[qname];
+                        if(handlers){
+                            if($A.util.isArray(handlers)){
+                                //Value handlers on components use arrays, not objects
+                                for(var k=0;k<handlers.length;k++){
+                                    handlers[k](that);
+                                }
+                            }else{
+                                for (var key in handlers){
+                                    var cmpHandlers = handlers[key];
+                                    for(var j = 0;j < cmpHandlers.length; j++){
+                                        var handler = cmpHandlers[j];
+                                        handler(that);
+                                    }
+                                }
+                            }
+                        }
+
+                        def = def.getSuperDef();
+                    }
+                }
             }
-        }
-    }
-    $A.services.client.popStack(stackname);
+        }, stackname);
     
-	//#if {"excludeModes" : ["PRODUCTION"]}
+    //#if {"excludeModes" : ["PRODUCTION"]}
     // if we have a debug component send event info to the tool
     var auraDebugCmp = $A.util.getDebugToolComponent();
     if(!$A.util.isUndefinedOrNull(auraDebugCmp)) {
@@ -164,15 +165,15 @@ Event.prototype.fire = function() {
     	
     	// event params
     	var outputParams = function(eventParams) {
-    		var outParams = "";
-	    	if (!$A.util.isUndefinedOrNull(eventParams)) {
-	    		for (var p in eventParams) {
-	    			if (!$A.util.isUndefinedOrNull(p)) {
-	    				outParams += p + ": " + eventParams[p] + ", ";
-	    			}
-	    		}
-	    	}
-    		return " Params={ " + outParams + "}";
+            var outParams = "";
+            if (!$A.util.isUndefinedOrNull(eventParams)) {
+                for (var p in eventParams) {
+                    if (!$A.util.isUndefinedOrNull(p)) {
+                        outParams += p + ": " + eventParams[p] + ", ";
+                    }
+                }
+            }
+            return " Params={ " + outParams + "}";
     	}
     	
     	// output to debug tool
@@ -184,16 +185,15 @@ Event.prototype.fire = function() {
     	// listening to aura:systemError and auraStorage:modified events on debug
     	// tool in the child window. Need to fire those events in the window.
     	if ($A.util.isUndefinedOrNull(window.opener)) { // this is the parent window
-    		 	if (outputName.indexOf("aura:systemError") != -1) {
-				    var debugWindowEvent = $A.util.getDebugToolsAuraInstance().get("e.aura:systemError");
-					debugWindowEvent.setParams(this.getParams());
-					debugWindowEvent.fire();
-			    }
-			    
-			    if (outputName.indexOf("auraStorage:modified") != -1) {
-				    var debugWindowEvent = $A.util.getDebugToolsAuraInstance().get("e.auraStorage:modified");
-					debugWindowEvent.fire();
-			    }
+            if (outputName.indexOf("aura:systemError") != -1) {
+                var debugWindowEvent = $A.util.getDebugToolsAuraInstance().get("e.aura:systemError");
+                debugWindowEvent.setParams(this.getParams());
+                debugWindowEvent.fire();
+            }
+            if (outputName.indexOf("auraStorage:modified") != -1) {
+                var debugWindowEvent = $A.util.getDebugToolsAuraInstance().get("e.auraStorage:modified");
+                debugWindowEvent.fire();
+            }
     	}
     }
     //#end

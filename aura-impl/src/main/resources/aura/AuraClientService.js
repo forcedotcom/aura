@@ -160,51 +160,52 @@ var AuraClientService = function() {
          * @private
          */
         loadComponent : function(descriptor, attributes, callback, defType) {
+            var that = this;
             this.runAfterInitDefs(function() {
-                var desc = new DefDescriptor(descriptor);
-                var tag = desc.getNamespace() + ":" + desc.getName();
+                $A.run(function() {
+                    var desc = new DefDescriptor(descriptor);
+                    var tag = desc.getNamespace() + ":" + desc.getName();
 
-                var method = defType === "APPLICATION" ? "getApplication" : "getComponent";
-                var action = $A.get("c.aura://ComponentController." + method);
+                    var method = defType === "APPLICATION" ? "getApplication" : "getComponent";
+                    var action = $A.get("c.aura://ComponentController." + method);
 
-                action.setStorable({
-                	"ignoreExisting" : true
-            	});
+                    action.setStorable({
+                            "ignoreExisting" : true
+                    });
 
-                action.setParams({
-                    name : tag,
-                    attributes : attributes
-                });
+                    action.setParams({
+                        name : tag,
+                        attributes : attributes
+                    });
 
-                action.setCallback(this, function(a) {
-                	var state = a.getState();
-                    if (state === "SUCCESS") {
-                        callback(a.getReturnValue());
-                    } else if (state === "INCOMPLETE"){
-                    	// Use a stored response if one exists
-                        var storage = Action.prototype.getStorage();
-                        if (storage) {
-                            var key = action.getStorageKey();
-                            storage.get(key, function(actionResponse) {
-                            	if (actionResponse) {
-                                    storage.log("AuraClientService.loadComponent(): bootstrap request was INCOMPLETE using stored action response.", [action, actionResponse]);
+                    action.setCallback(that, function(a) {
+                        var state = a.getState();
+                        if (state === "SUCCESS") {
+                            callback(a.getReturnValue());
+                        } else if (state === "INCOMPLETE"){
+                            // Use a stored response if one exists
+                            var storage = Action.prototype.getStorage();
+                            if (storage) {
+                                var key = action.getStorageKey();
+                                storage.get(key, function(actionResponse) {
+                                    if (actionResponse) {
+                                        storage.log("AuraClientService.loadComponent(): bootstrap request was INCOMPLETE using stored action response.", [action, actionResponse]);
 
-                            		action.complete(actionResponse);
-                            	} else {
-                                    $A.error("Unable to load application.");
-                            	}
-                            });
+                                            action.complete(actionResponse);
+                                    } else {
+                                        $A.error("Unable to load application.");
+                                    }
+                                });
+                            }
+                        } else {
+                            $A.error(a.getError()[0].message);
                         }
-                    } else {
-                        $A.error(a.getError()[0].message);
-                    }
 
-                    $A.measure("Completed Component Callback", "Sending XHR " + $A.getContext().getNum());
-                });
+                        $A.measure("Completed Component Callback", "Sending XHR " + $A.getContext().getNum());
+                    });
 
-                clientService.pushStack("loadComponent");
-                clientService.enqueueAction(action);
-                clientService.popStack("loadComponent");
+                    clientService.enqueueAction(action);
+                }, "loadComponent");
             });
         },
 

@@ -19,7 +19,8 @@
 
   <aura:set attribute="title" value="Abortable Actions"/>
     
-    <p>If a user clicks the same button multiple times or clicks multiple buttons in quick succession, it can cause strange display effects as the multiple responses return from the server. You can avoid this by marking a server-side action as abortable by using the <code>setAbortable()</code> method on the <code>Action</code> object in JavaScript. For example:</p>
+    <p>If a user clicks the same button multiple times or clicks multiple buttons in quick succession, it can cause strange display effects as the multiple responses return from the server.
+    You can avoid this by marking a server-side action as abortable by using the <code>setAbortable()</code> method on the <code>Action</code> object in JavaScript. For example:</p>
 
 <auradocs:codeblock>
     var a = component.get("c.serverEcho");
@@ -27,11 +28,16 @@
     a.setParams({ firstName : component.get("v.firstName") });
 </auradocs:codeblock>
 
-    <p>Let's dig into action processing to understand more. We also refer to server-side action calls as action instances. The framework batches actions into a message before sending it to the server. A message is essentially a wrapper around a list of action instances.</p>
+    <p>Let's dig into action processing to understand more. We also refer to server-side action calls as action instances.
+    The framework batches actions into a message before sending it to the server. A message is essentially a wrapper around a list of action instances.</p>
 
-    <p>Event processing can generate a tree of events if an event handler fires more events. The framework processes the event tree and every action that needs to be executed on the server is added to a queue. When the tree of events and all the handlers (client-side actions) are processed, the queue is flushed. If there are multiple abortable actions in the queue, only the last abortable action is added to the request message to the server. The earlier abortable action instances are discarded. The only callback executed when the server returns a response is the callback for the last abortable action. If none of the actions are abortable, all callbacks will be executed.</p>
-
-    <p>Let's look at an example. If event processing adds three abortable action instances to the client queue: <code>["c.doSomething", "c.doSomethingElse", "c.doSomething"]</code>, only the last <code>c.doSomething</code> action call is executed and the other two action calls are aborted. It doesn't matter if action instances have different action names or parameters; only the last abortable action is called.</p>    
+    <p>Event processing can generate a tree of events if an event handler fires more events.
+    The framework processes the event tree and every action that needs to be executed on the server is added to a queue.
+    When the tree of events and all the handlers (client-side actions) are processed, the queue is flushed.
+    
+    If there is an abortable action in a set of actions to be performed during a transaction, then all of the other abortable actions that were queued up but not executed are aborted and their state is set to aborted.
+    You can check to see if an action was aborted by checking the state. The only callback executed when the server returns a response is the callback for the abortable action that was executed.
+    If none of the actions are abortable, all callbacks will be executed.</p>
 
     <p><b>See also:</b><br/>    
        <auradocs:topicLink topic="serverSideControllers">Server-Side Controllers</auradocs:topicLink><br/>

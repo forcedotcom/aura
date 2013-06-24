@@ -29,7 +29,7 @@ import com.phloc.css.decl.CSSExpressionMemberTermURI;
 import com.phloc.css.decl.ICSSExpressionMember;
 
 /**
- * Add cache-busters to urls.(Temporarily also encloses all values in double quotes, see notes below).
+ * Add cache-busters to urls.
  */
 public class ReworkImageUrls implements Rework<CSSDeclaration> {
 
@@ -74,16 +74,6 @@ public class ReworkImageUrls implements Rework<CSSDeclaration> {
             if (url.startsWith("/") && shouldAddCacheBuster()) {
                 url = AuraBaseServlet.addCacheBuster(url);
             }
-
-            // we have to enclose the url in double quotes. Ideally the quotes (single, double, or lack thereof) should
-            // be preserved from the source. That should be fixed with this bug:
-            // https://code.google.com/p/phloc-css/issues/detail?id=7. When/if the bug is fixed this code can probably
-            // go away.
-
-            // first escape any double quotes
-            url = url.replace("\"", "\\\"");
-            // then wrap in double quotes
-            url = "\"" + url + "\"";
 
             return new CSSExpressionMemberTermURI(url);
         }

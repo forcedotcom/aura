@@ -1,1 +1,1 @@
-@font-face{font-family:Gentium;src:url(http://example.com/fonts/Gentium.ttf);}
+@font-face{font-family:Gentium;src:url(http://example.com/fonts/Gentium.ttf);}@font-face{font-family:MyHelvetica;src:local("Helvetica Neue Bold"),local("HelveticaNeue-Bold"),url(MgOpenModernaBold.ttf);}@font-face{src:url(data:application/x-font-woff;charset=utf-8;base64,BASE64JUNK) format('woff');}

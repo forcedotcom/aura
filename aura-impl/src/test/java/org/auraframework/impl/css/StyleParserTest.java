@@ -226,6 +226,16 @@ public class StyleParserTest extends AuraImplTestCase {
         StyleDef style = descriptor.getDef();
         goldFileText(style.getCode());
     }
+    
+    /**
+     * Test SVG data uris
+     */
+    public void testSvgUrl() throws Exception {
+        DefDescriptor<StyleDef> descriptor = DefDescriptorImpl.getInstance("test.testStyleNamespaceSvgUrl",
+                StyleDef.class);
+        StyleDef style = descriptor.getDef();
+        goldFileText(style.getCode());
+    }
 
     /**
      * Tests for invalid values as part of browser conditionals.

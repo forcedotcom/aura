@@ -16,7 +16,7 @@
 
 -->
 <aura:component extensible="true" support="GA" description="An image that is rendered as an HTML &lt;img&gt; element.">
-	<aura:attribute name="imageType" type="String" description="The type of image. Accepted values: informational or decorative" />
+	<aura:attribute name="imageType" type="String" default="informational" description="The type of image. Accepted values: informational or decorative" />
     <aura:attribute name="src" type="String" default="/auraFW/resources/aura/s.gif" description="The absolute or relative URL of the image."/>
     <aura:attribute name="class" type="String" description="The CSS style used to display the image."/>
     <aura:attribute name="href" type="String" description="The URL that the image directs to when clicked."/>

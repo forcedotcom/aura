@@ -78,8 +78,12 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         return cmpDesc;
     }
 
+    /**
+     * Trigger a server action and wait for the browser to begin refreshing.
+     */
     private void triggerServerAction() {
-        auraUITestingUtil.getRawEval("document._waitingForReload = true; return true;");
+        // Careful. Android doesn't like more than one statement.
+        auraUITestingUtil.getRawEval("document._waitingForReload = true;");
         auraUITestingUtil.findDomElement(By.cssSelector("button")).click();
         waitForCondition("return !document._waitingForReload");
         waitForAuraFrameworkReady();

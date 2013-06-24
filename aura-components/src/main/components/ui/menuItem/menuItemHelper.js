@@ -40,6 +40,24 @@
         return null;
     },
     
+    findMenuListDiv: function(menuComponent) {
+         // find ui:menuList component
+         var listCmp = menuComponent;
+         var listCmpDes = listCmp.getDef().getDescriptor();
+         var ns = listCmpDes.getNamespace();
+         var name = listCmpDes.getName();
+         while (listCmp && listCmp.isInstanceOf("ui:menuList")) {
+             if ("ui:menuList" == (ns + ":" + name)) {
+                 return listCmp.find("menu");
+             }
+             listCmp = listCmp.getSuper();
+             listCmpDes = listCmp.getDef().getDescriptor();
+             ns = listCmpDes.getNamespace();
+             name = listCmpDes.getName();
+         }
+         return null;
+    },
+    
     /**
      * Override
      *
@@ -73,9 +91,10 @@
      */
     handleEsckeydown: function(component, event) {
     	var parent = this.getParentComponent(component);
-        if (parent) {
-            if (parent.get("v.visible") === true) {
-                parent.setValue("v.visible", false);
+    	var concreteParentCmp = parent.getConcreteComponent();
+        if (concreteParentCmp) {
+            if (concreteParentCmp.get("v.visible") === true) {
+                concreteParentCmp.setValue("v.visible", false);
                 if (component.get("v.disabled") === true) {
                     // for disabled menu item, no Aura event gets fired, so we have to directly deal with DOM.
                     var devCmp = parent.find("menu");
@@ -108,9 +127,10 @@
      */
     handleTabkeydown: function(component, event) {
         var parent = this.getParentComponent(component);
-        if (parent) {
-            if (parent.get("v.visible") === true) {
-                parent.setValue("v.visible", false);
+        var concreteParentCmp = parent.getConcreteComponent();
+        if (concreteParentCmp) {
+            if (concreteParentCmp.get("v.visible") === true) {
+                concreteParentCmp.setValue("v.visible", false);
                 if (component.get("v.disabled") === true) {
                     // for disabled menu item, no Aura event gets fired, so we have to directly deal with DOM.
                     var devCmp = parent.find("menu");

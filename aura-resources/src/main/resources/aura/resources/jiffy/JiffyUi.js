@@ -1,3 +1,18 @@
+/*
+ * Copyright (C) 2013 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 /* This section was adapted from the Jiffy Firebug Extension by Bill Scott */
 Jiffy.ui = function() {
     /*************/
@@ -17,6 +32,11 @@ Jiffy.ui = function() {
     var RT = JiffyConstants.REFERENCE_TIME;
     var MARK = JiffyConstants.MARK_NAME;
 
+    function shouldDisplay() {
+        // don't display if we are inside of a frame
+        return window.self === window.top;
+    }
+
     /**
      *  Translates Jiffy's measures into a JSON object with additional aggregate info
      *
@@ -31,19 +51,19 @@ Jiffy.ui = function() {
 
         // each entry in measures has the name of its corresponding mark
         for(var i=0; i<measures.length; i++) {
-            var measure = measures[i];
-            // either we've seen this mark before, or create a new one
-            marks[measure[MARK]] = marks[measure[MARK]] || {et: 0, m: []};
-            // push this measure on the mark's measure array
-            marks[measure[MARK]].m.push(measure);
-            // aggregate the mark's total elapsed time
-            marks[measure[MARK]][ET] += measure[ET];
-        }
-
-        if (measures.length > 0) {
-            totalElapsed = measures[measures.length-1][JiffyConstants.REFERENCE_TIME] + measures[measures.length-1][JiffyConstants.ELAPSED_TIME] - Jiffy.getStartTime();
-        } else {
-            totalElapsed = 0;
+            var measure = measures[i],
+                markPrefix  = measure[MARK].substring(0,3);
+            if (markPrefix != "rt." && markPrefix != "nt_" && markPrefix != "dom") {
+               // either we've seen this mark before, or create a new one
+               marks[measure[MARK]] = marks[measure[MARK]] || {et: 0, m: []};
+               // push this measure on the mark's measure array
+               marks[measure[MARK]].m.push(measure);
+               // aggregate the mark's total elapsed time
+               marks[measure[MARK]][ET] += measure[ET];
+               if (measure[MARK] == "t_page") {
+                   totalElapsed = measure[ET];
+                  }
+               }
         }
 
         return marks;
@@ -61,7 +81,7 @@ Jiffy.ui = function() {
     function generateStatsTable(marks) {
         var innerHtml = ['<table width="100%" border="0" cellpadding="0" cellspacing="0" class="measures"><tbody>'];
 
-        var startTime = Jiffy.getStartTime();
+        var startTime = Jiffy.startTime;
         var oddRow = true;
 
         var curMark, markEt, measures;
@@ -130,14 +150,25 @@ Jiffy.ui = function() {
     /************/
     return {
 
-        onLoad : function() {
-            setTimeout(function() {
-                Jiffy.ui.renderStats(rootContainer);
-                Jiffy.registerListener(JiffyConstants.MEASURE_NAME, function(measure) {
+        onLoad : (function() {
+            // don't show the ui if we are inside of a frame
+            if (!shouldDisplay()) {
+                return;
+            }
+
+            var measuresLength = Jiffy.getMeasures().length;
+            function renderHelper() {
+                if (measuresLength != Jiffy.getMeasures().length) {
+                    measuresLength = Jiffy.getMeasures().length;
                     Jiffy.ui.renderStats(rootContainer);
-                });
-            }, 1000);
-        },
+                }
+                setTimeout(renderHelper, 1000);
+            }
+            return function() {
+                Jiffy.ui.renderStats(rootContainer);
+                renderHelper();
+            };
+        })(),
 
         // Render the Jiffy UI to this container instead of the default one.
         appendTo: function(parent) {
@@ -211,6 +242,16 @@ Jiffy.ui = function() {
 
             window.location.reload();
 
+        },
+
+        disableJiffy: function() {
+            var expiredDate = new Date(new Date().getTime() - 1000000);
+
+            // Delete Cookie enablement cookie and set it explicitly disabled.
+            Jiffy.util.setCookie("enableJiffy", "", expiredDate);
+            Jiffy.util.setCookie("disableJiffy", "1");
+
+            window.location.reload();
         },
 
         // toggles placing marks respective to PageStart time on the timeline
@@ -302,6 +343,11 @@ Jiffy.ui = function() {
             clearButton.value = "Clear";
             clearButton.onclick = Jiffy.ui.clearStats;
 
+            var disableButton = document.createElement("input");
+            disableButton.type = "button";
+            disableButton.value = "Disable Jiffy";
+            disableButton.onclick = Jiffy.ui.disableJiffy;
+
             var toggleLogLevelSelect = document.createElement("select");
                 toggleLogLevelSelect.onchange = toggleLogLevelSelect.onclick = Jiffy.ui.changeLogLevel;
 
@@ -324,6 +370,7 @@ Jiffy.ui = function() {
             buttonBar.appendChild(showHideButton);
             buttonBar.appendChild(timelineButton);
             buttonBar.appendChild(clearButton);
+            buttonBar.appendChild(disableButton);
             buttonBar.appendChild(toggleLogLevelSelect);
 
             return container;

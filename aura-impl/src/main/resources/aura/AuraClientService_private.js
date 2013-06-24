@@ -423,7 +423,7 @@ var priv = {
         var storage = Action.prototype.getStorage();
         for ( var i = 0; i < actions.length; i++) {
             var action = actions[i];
-            $A.assert(action.getDef().isServerAction(), "RunAfter() cannot be called on a client action. Use run() on a client action instead.");
+            $A.assert(action.getDef().isServerAction(), "RunAfter() cannot be called on a client action. Use runDeprecated() on a client action instead.");
 
             // For cacheable actions check the storage service to see if we
             // already have a viable cached action response we can complete

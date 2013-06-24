@@ -20,7 +20,7 @@
 	testAttachingSingleEventInServerAction : {
 		test : function(cmp) {
 			var action = cmp.get('c.attachOneEvent');
-			action.run();
+			action.runDeprecated();
 			$A.eventService.finishFiring();
 			$A.test.addWaitFor(false, $A.test.isActionPending,
 							function() {
@@ -45,7 +45,7 @@
 	testAttachingMultipleEventsInServerAction : {
 		test : function(cmp) {
 			var action = cmp.get('c.attachMultipleEvents');
-			action.run();
+			action.runDeprecated();
 			$A.eventService.finishFiring();
 			$A.test.addWaitFor(false, $A.test.isActionPending,
 							function() {
@@ -68,7 +68,7 @@
 	testAttachingSameEventWithDifferentAttributes:{
 		test : function(cmp){
 			var action = cmp.get('c.attachDupEvent');
-			action.run();
+			action.runDeprecated();
 			$A.eventService.finishFiring();
 			$A.test.addWaitFor(false, $A.test.isActionPending,
 							function() {
@@ -96,7 +96,7 @@
 	testEventHandlerChaining:{
 		test:function(cmp){
 			var action = cmp.get('c.attachEventChain');
-			action.run();
+			action.runDeprecated();
 			$A.eventService.finishFiring();
 			$A.test.addWaitFor(false, $A.test.isActionPending,
 					function() {

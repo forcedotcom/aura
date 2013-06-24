@@ -58,7 +58,7 @@
     testInvalidTimeZone:{
 	attributes : {displayDatePicker:'true', timezone: 'dummy'},
 	test: function(cmp){
-	        cmp.find("datePicker").get('c.selectToday').run();
+	        cmp.find("datePicker").get('c.selectToday').runDeprecated();
 	        aura.test.addWaitFor(true, function(){return cmp.find("inputText").getElement().value.length > 0;},function(){
 	        	var inputDateStr  = cmp.find("inputText").getElement().value;
 		        var dt            = moment().format('MMM DD, YYYY') + " 12:00:00 AM";
@@ -86,7 +86,7 @@
     testEmptyStringTimeZone:{
 	attributes : {displayDatePicker:'true', timezone: ''},
 	test: function(cmp){
-	        cmp.find("datePicker").get('c.selectToday').run();
+	        cmp.find("datePicker").get('c.selectToday').runDeprecated();
 	        aura.test.addWaitFor(true, function(){return cmp.find("inputText").getElement().value.length > 0;},function(){
 	        	var inputDateStr  = cmp.find("inputText").getElement().value;
 	        	var dt            = moment().format('MMM DD, YYYY') + " 12:00:00 AM";
@@ -166,7 +166,7 @@
     testTodayInGMT:{
 	attributes : {displayDatePicker:'true', timezone: 'GMT'},
 	test: function(cmp){				
-	        cmp.find("datePicker").get('c.selectToday').run();
+	        cmp.find("datePicker").get('c.selectToday').runDeprecated();
 	        var inputDateStr  = cmp.find("inputText").getElement().value;
 	        var dt            = moment().format('MMM DD, YYYY') + " 12:00:00 AM";
     		aura.test.assertEquals(dt, inputDateStr, "Dates are not the same and they should be");
@@ -179,7 +179,7 @@
     testTodayInLosAngeles:{
 	attributes : {displayDatePicker:'true'},
 	test: function(cmp){
-	        cmp.find("datePicker").get('c.selectToday').run();
+	        cmp.find("datePicker").get('c.selectToday').runDeprecated();
 	        aura.test.addWaitFor(true, function(){return cmp.find("inputText").getElement().value.length > 0;},function(){
 	        	var inputDateStr  = cmp.find("inputText").getElement().value;
 	        	var dt            = moment().format('MMM DD, YYYY') + " 12:00:00 AM";
@@ -194,7 +194,7 @@
     testTodayInNewYork:{
 	attributes : {displayDatePicker:'true', timezone: 'America/New_York'},
 	test: function(cmp){
-	        cmp.find("datePicker").get('c.selectToday').run();	        
+	        cmp.find("datePicker").get('c.selectToday').runDeprecated();	        
 	        aura.test.addWaitFor(true, function(){return cmp.find("inputText").getElement().value.length > 0;},function(){
 	        	var inputDateStr  = cmp.find("inputText").getElement().value;
 	        	var dt            = moment().format('MMM DD, YYYY') + " 12:00:00 AM";

@@ -53,7 +53,7 @@
 					var on = aura.util.on;
 					on(element,"click", function(e){
 						if (e.ctrlKey || e.metaKey) {
-							cmp.get('c.open').run(name);
+							cmp.get('c.open').runDeprecated(name);
 							s.textDecoration = 'none';
 							s.fontWeight = 'normal';
 						}

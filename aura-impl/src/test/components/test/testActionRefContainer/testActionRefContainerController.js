@@ -22,6 +22,6 @@
     runSand: function(cmp, event) {
         var ref = cmp.get("v.myActionRef");
         var action = ref.unwrap();
-        action.run();
+        action.runDeprecated();
     }
 }

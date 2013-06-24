@@ -204,7 +204,7 @@ public class MockingUtilTest extends WebDriverTestCase {
         auraTestingUtil.addSourceAutoCleanup(clientControllerDefDescriptor, "{clicked:function(component){"
                 + "var a = component.get('c.lookInside');a.setCallback(component,"
                 + "function(action){component.find('result').getElement().innerHTML=action.getReturnValue();});"
-                + "this.runAfter(a);}}");
+                + "$A.enqueueAction(a);}}");
         // sanity without mocks
         open(cmpDefDescriptor);
         assertEquals("", getText(By.cssSelector("div.result")));
@@ -227,7 +227,7 @@ public class MockingUtilTest extends WebDriverTestCase {
         auraTestingUtil.addSourceAutoCleanup(clientControllerDefDescriptor, "{clicked:function(component){"
                 + "var a = component.get('c.lookInside');a.setCallback(component,"
                 + "function(action){component.find('result').getElement().innerHTML=action.getReturnValue();});"
-                + "this.runAfter(a);}}");
+                + "$A.enqueueAction(a);}}");
         open(cmpDefDescriptor);
         findDomElement(By.cssSelector("button")).click();
         waitForElementTextPresent(findDomElement(By.cssSelector("div.result")), "not so interesting");

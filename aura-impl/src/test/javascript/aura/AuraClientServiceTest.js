@@ -46,6 +46,7 @@ Test.Aura.AuraClientServiceTest = function() {
 	function EnqueueAction() {
 		[ Fact ]
 		function ClientActionRunsImmediately() {
+                    // FIXME!!!! this is going to change shortly!!!
 			// Arrange
 			var target;
 			var actual = false;
@@ -74,7 +75,7 @@ Test.Aura.AuraClientServiceTest = function() {
 						}
 					};
 				},
-				run : function() {
+				runDeprecated : function() {
 					actual = true;
 				},
 				auraType : "Action"

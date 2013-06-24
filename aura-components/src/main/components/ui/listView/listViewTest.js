@@ -23,7 +23,7 @@
                 });
 
                 mockWhile(function () {
-                    component.get("c.clickHandler").run();
+                    component.get("c.clickHandler").runDeprecated();
                 })
 
                 aura.test.assertTrue(actual);
@@ -37,7 +37,7 @@
                 });
 
                 mockWhile(function () {
-                    component.get("c.clickHandler").run();
+                    component.get("c.clickHandler").runDeprecated();
                 })
 
                 aura.test.assertEquals(expected, actual);
@@ -51,7 +51,7 @@
                 });
 
                 mockWhile(function () {
-                    component.get("c.clickHandler").run();
+                    component.get("c.clickHandler").runDeprecated();
                 })
 
                 aura.test.assertEquals(expected, actual);
@@ -65,7 +65,7 @@
                 });
 
                 mockWhile(function () {
-                    component.get("c.clickHandler").run(expected);
+                    component.get("c.clickHandler").runDeprecated(expected);
                 })
 
                 aura.test.assertEquals(expected, actual);
@@ -82,7 +82,7 @@
                 });
 
                 mockWhile(function () {
-                    component.get("c.dblclickHandler").run();
+                    component.get("c.dblclickHandler").runDeprecated();
                 })
 
                 aura.test.assertTrue(actual);
@@ -96,7 +96,7 @@
                 });
 
                 mockWhile(function () {
-                    component.get("c.dblclickHandler").run();
+                    component.get("c.dblclickHandler").runDeprecated();
                 })
 
                 aura.test.assertEquals(expected, actual);
@@ -110,7 +110,7 @@
                 });
 
                 mockWhile(function () {
-                    component.get("c.dblclickHandler").run();
+                    component.get("c.dblclickHandler").runDeprecated();
                 })
 
                 aura.test.assertEquals(expected, actual);
@@ -124,7 +124,7 @@
                 });
 
                 mockWhile(function () {
-                    component.get("c.dblclickHandler").run(expected);
+                    component.get("c.dblclickHandler").runDeprecated(expected);
                 })
 
                 aura.test.assertEquals(expected, actual);
@@ -141,7 +141,7 @@
                 });
 
                 mockWhile(function () {
-                    component.get("c.keydownHandler").run();
+                    component.get("c.keydownHandler").runDeprecated();
                 })
 
                 aura.test.assertTrue(actual);
@@ -155,7 +155,7 @@
                 });
 
                 mockWhile(function () {
-                    component.get("c.keydownHandler").run();
+                    component.get("c.keydownHandler").runDeprecated();
                 })
 
                 aura.test.assertEquals(expected, actual);
@@ -169,7 +169,7 @@
                 });
 
                 mockWhile(function () {
-                    component.get("c.keydownHandler").run();
+                    component.get("c.keydownHandler").runDeprecated();
                 })
 
                 aura.test.assertEquals(expected, actual);
@@ -183,7 +183,7 @@
                 });
 
                 mockWhile(function () {
-                    component.get("c.keydownHandler").run(expected);
+                    component.get("c.keydownHandler").runDeprecated(expected);
                 })
 
                 aura.test.assertEquals(expected, actual);
@@ -200,7 +200,7 @@
                 });
 
                 mockWhile(function () {
-                    component.get("c.keyupHandler").run();
+                    component.get("c.keyupHandler").runDeprecated();
                 })
 
                 aura.test.assertTrue(actual);
@@ -214,7 +214,7 @@
                 });
 
                 mockWhile(function () {
-                    component.get("c.keyupHandler").run();
+                    component.get("c.keyupHandler").runDeprecated();
                 })
 
                 aura.test.assertEquals(expected, actual);
@@ -228,7 +228,7 @@
                 });
 
                 mockWhile(function () {
-                    component.get("c.keyupHandler").run();
+                    component.get("c.keyupHandler").runDeprecated();
                 })
 
                 aura.test.assertEquals(expected, actual);
@@ -242,7 +242,7 @@
                 });
 
                 mockWhile(function () {
-                    component.get("c.keyupHandler").run(expected);
+                    component.get("c.keyupHandler").runDeprecated(expected);
                 })
 
                 aura.test.assertEquals(expected, actual);
@@ -259,7 +259,7 @@
                 });
 
                 mockWhile(function () {
-                    component.get("c.keypressHandler").run();
+                    component.get("c.keypressHandler").runDeprecated();
                 })
 
                 aura.test.assertTrue(actual);
@@ -273,7 +273,7 @@
                 });
 
                 mockWhile(function () {
-                    component.get("c.keypressHandler").run();
+                    component.get("c.keypressHandler").runDeprecated();
                 })
 
                 aura.test.assertEquals(expected, actual);
@@ -287,7 +287,7 @@
                 });
 
                 mockWhile(function () {
-                    component.get("c.keypressHandler").run();
+                    component.get("c.keypressHandler").runDeprecated();
                 })
 
                 aura.test.assertEquals(expected, actual);
@@ -301,7 +301,7 @@
                 });
 
                 mockWhile(function () {
-                    component.get("c.keypressHandler").run(expected);
+                    component.get("c.keypressHandler").runDeprecated(expected);
                 })
 
                 aura.test.assertEquals(expected, actual);
@@ -318,7 +318,7 @@
                 });
 
                 mockWhile(function () {
-                    component.get("c.mousedownHandler").run();
+                    component.get("c.mousedownHandler").runDeprecated();
                 })
 
                 aura.test.assertTrue(actual);
@@ -332,7 +332,7 @@
                 });
 
                 mockWhile(function () {
-                    component.get("c.mousedownHandler").run();
+                    component.get("c.mousedownHandler").runDeprecated();
                 })
 
                 aura.test.assertEquals(expected, actual);
@@ -346,7 +346,7 @@
                 });
 
                 mockWhile(function () {
-                    component.get("c.mousedownHandler").run();
+                    component.get("c.mousedownHandler").runDeprecated();
                 })
 
                 aura.test.assertEquals(expected, actual);
@@ -360,7 +360,7 @@
                 });
 
                 mockWhile(function () {
-                    component.get("c.mousedownHandler").run(expected);
+                    component.get("c.mousedownHandler").runDeprecated(expected);
                 })
 
                 aura.test.assertEquals(expected, actual);
@@ -377,7 +377,7 @@
                 });
 
                 mockWhile(function () {
-                    component.get("c.mouseoverHandler").run();
+                    component.get("c.mouseoverHandler").runDeprecated();
                 })
 
                 aura.test.assertTrue(actual);
@@ -391,7 +391,7 @@
                 });
 
                 mockWhile(function () {
-                    component.get("c.mouseoverHandler").run();
+                    component.get("c.mouseoverHandler").runDeprecated();
                 })
 
                 aura.test.assertEquals(expected, actual);
@@ -405,7 +405,7 @@
                 });
 
                 mockWhile(function () {
-                    component.get("c.mouseoverHandler").run();
+                    component.get("c.mouseoverHandler").runDeprecated();
                 })
 
                 aura.test.assertEquals(expected, actual);
@@ -419,7 +419,7 @@
                 });
 
                 mockWhile(function () {
-                    component.get("c.mouseoverHandler").run(expected);
+                    component.get("c.mouseoverHandler").runDeprecated(expected);
                 })
 
                 aura.test.assertEquals(expected, actual);
@@ -436,7 +436,7 @@
                 });
 
                 mockWhile(function () {
-                    component.get("c.mouseoutHandler").run();
+                    component.get("c.mouseoutHandler").runDeprecated();
                 })
 
                 aura.test.assertTrue(actual);
@@ -450,7 +450,7 @@
                 });
 
                 mockWhile(function () {
-                    component.get("c.mouseoutHandler").run();
+                    component.get("c.mouseoutHandler").runDeprecated();
                 })
 
                 aura.test.assertEquals(expected, actual);
@@ -464,7 +464,7 @@
                 });
 
                 mockWhile(function () {
-                    component.get("c.mouseoutHandler").run();
+                    component.get("c.mouseoutHandler").runDeprecated();
                 })
 
                 aura.test.assertEquals(expected, actual);
@@ -478,7 +478,7 @@
                 });
 
                 mockWhile(function () {
-                    component.get("c.mouseoutHandler").run(expected);
+                    component.get("c.mouseoutHandler").runDeprecated(expected);
                 })
 
                 aura.test.assertEquals(expected, actual);
@@ -495,7 +495,7 @@
                 });
 
                 mockWhile(function () {
-                    component.get("c.mouseupHandler").run();
+                    component.get("c.mouseupHandler").runDeprecated();
                 })
 
                 aura.test.assertTrue(actual);
@@ -509,7 +509,7 @@
                 });
 
                 mockWhile(function () {
-                    component.get("c.mouseupHandler").run();
+                    component.get("c.mouseupHandler").runDeprecated();
                 })
 
                 aura.test.assertEquals(expected, actual);
@@ -523,7 +523,7 @@
                 });
 
                 mockWhile(function () {
-                    component.get("c.mouseupHandler").run();
+                    component.get("c.mouseupHandler").runDeprecated();
                 })
 
                 aura.test.assertEquals(expected, actual);
@@ -537,7 +537,7 @@
                 });
 
                 mockWhile(function () {
-                    component.get("c.mouseupHandler").run(expected);
+                    component.get("c.mouseupHandler").runDeprecated(expected);
                 })
 
                 aura.test.assertEquals(expected, actual);
@@ -554,7 +554,7 @@
                 });
 
                 mockWhile(function () {
-                    component.get("c.touchstartHandler").run();
+                    component.get("c.touchstartHandler").runDeprecated();
                 })
 
                 aura.test.assertTrue(actual);
@@ -568,7 +568,7 @@
                 });
 
                 mockWhile(function () {
-                    component.get("c.touchstartHandler").run();
+                    component.get("c.touchstartHandler").runDeprecated();
                 })
 
                 aura.test.assertEquals(expected, actual);
@@ -582,7 +582,7 @@
                 });
 
                 mockWhile(function () {
-                    component.get("c.touchstartHandler").run();
+                    component.get("c.touchstartHandler").runDeprecated();
                 })
 
                 aura.test.assertEquals(expected, actual);
@@ -596,7 +596,7 @@
                 });
 
                 mockWhile(function () {
-                    component.get("c.touchstartHandler").run(expected);
+                    component.get("c.touchstartHandler").runDeprecated(expected);
                 })
 
                 aura.test.assertEquals(expected, actual);
@@ -613,7 +613,7 @@
                 });
 
                 mockWhile(function () {
-                    component.get("c.touchmoveHandler").run();
+                    component.get("c.touchmoveHandler").runDeprecated();
                 })
 
                 aura.test.assertTrue(actual);
@@ -627,7 +627,7 @@
                 });
 
                 mockWhile(function () {
-                    component.get("c.touchmoveHandler").run();
+                    component.get("c.touchmoveHandler").runDeprecated();
                 })
 
                 aura.test.assertEquals(expected, actual);
@@ -641,7 +641,7 @@
                 });
 
                 mockWhile(function () {
-                    component.get("c.touchmoveHandler").run();
+                    component.get("c.touchmoveHandler").runDeprecated();
                 })
 
                 aura.test.assertEquals(expected, actual);
@@ -655,7 +655,7 @@
                 });
 
                 mockWhile(function () {
-                    component.get("c.touchmoveHandler").run(expected);
+                    component.get("c.touchmoveHandler").runDeprecated(expected);
                 })
 
                 aura.test.assertEquals(expected, actual);
@@ -672,7 +672,7 @@
                 });
 
                 mockWhile(function () {
-                    component.get("c.touchendHandler").run();
+                    component.get("c.touchendHandler").runDeprecated();
                 })
 
                 aura.test.assertTrue(actual);
@@ -686,7 +686,7 @@
                 });
 
                 mockWhile(function () {
-                    component.get("c.touchendHandler").run();
+                    component.get("c.touchendHandler").runDeprecated();
                 })
 
                 aura.test.assertEquals(expected, actual);
@@ -700,7 +700,7 @@
                 });
 
                 mockWhile(function () {
-                    component.get("c.touchendHandler").run();
+                    component.get("c.touchendHandler").runDeprecated();
                 })
 
                 aura.test.assertEquals(expected, actual);
@@ -714,7 +714,7 @@
                 });
 
                 mockWhile(function () {
-                    component.get("c.touchendHandler").run(expected);
+                    component.get("c.touchendHandler").runDeprecated(expected);
                 })
 
                 aura.test.assertEquals(expected, actual);

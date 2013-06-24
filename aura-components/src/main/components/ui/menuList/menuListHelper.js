@@ -28,12 +28,12 @@
             if (visible === true) {
                 var action = p.get("c.handleMenuExpand");
                 if (action) {
-                    action.run();
+                    action.runDeprecated();
                 }
             } else {
                 var action = p.get("c.handleMenuCollapse");
                 if (action) {
-                    action.run();
+                    action.runDeprecated();
                 }
             }
         }
@@ -98,7 +98,7 @@
         if (menuItem) {
             var action = menuItem.get("c.setFocus");
             if (action) {
-                action.run();
+                action.runDeprecated();
             }
         }
     },

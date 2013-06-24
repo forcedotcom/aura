@@ -16,7 +16,7 @@
 ({
     getLocallyCreatedComponent:function(cmp){
         $A.run(function(){
-            cmp.get('c.createComponent').run();
+            cmp.get('c.createComponent').runDeprecated();
         });
         var body = cmp.get('v.body');
         $A.test.assertEquals(1, body.length);

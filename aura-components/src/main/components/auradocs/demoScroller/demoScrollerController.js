@@ -15,12 +15,11 @@
  */
 ({
     replaceBodyContent : function(component, event){
-      //Update the content
+        //Update the content
         var value = component.find("content").setValue("v.value", "new content");
         var scroller = component.find("pullToRefresh");
         
-      //Call the refresh action on ui:scroller
-        scroller.get("c.refresh").run();
-        $A.services.event.finishFiring(event);
+        //Call the refresh action on ui:scroller
+        $A.run(function() { scroller.get("c.refresh").runDeprecated(); });
     }
 })

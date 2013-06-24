@@ -13,6 +13,6 @@
                 a.getReturnValue()
             );
         });
-        a.runAfter(a);
+        $A.enqueueAction(a);
     }
 })

@@ -66,7 +66,7 @@
              */
             $A.test.assertEquals("1:1.1", cmp.getGlobalId(), "Invalid GlobalId for root component");
             var a = cmp.get("c.getRoster");
-            a.run();
+            a.runDeprecated();
             $A.eventService.finishFiring();
             $A.test.addWaitFor(false, $A.test.isActionPending,
                 function(){
@@ -82,7 +82,7 @@
              * Individual Actions to get Team
              */
             var a = cmp.get("c.getTeam");
-            a.run();
+            a.runDeprecated();
             $A.eventService.finishFiring();
             $A.test.addWaitFor(false, $A.test.isActionPending,
                 function(){
@@ -149,7 +149,7 @@
              */
             $A.test.assertEquals("1:1.1", cmp.getGlobalId(), "Invalid GlobalId for root component");
             var a = cmp.get("c.getRosterFromStorage");
-            a.run();
+            a.runDeprecated();
             $A.eventService.finishFiring();
             $A.test.addWaitFor(false, $A.test.isActionPending,
                 function(){

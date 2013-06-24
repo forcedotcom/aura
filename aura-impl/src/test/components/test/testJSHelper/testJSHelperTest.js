@@ -90,7 +90,7 @@
         test : function(component){
             //This property is set in an action
             //Which proves that the helper made it into the action signature as expected
-            component.get("c.myAction").run();
+            component.get("c.myAction").runDeprecated();
             $A.test.assertNotNull(component.myActionHelper);
             $A.test.assertEquals("func A", component.myActionHelper.a());
         }

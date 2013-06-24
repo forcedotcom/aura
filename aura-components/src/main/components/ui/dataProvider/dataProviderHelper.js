@@ -22,6 +22,6 @@
     },
 	
     invokeProvide:function(component){
-        component.getConcreteComponent().get("c.provide").run();
+        component.getConcreteComponent().get("c.provide").runDeprecated();
     }
 })

@@ -60,8 +60,5 @@
     any milestone, and a release candidate or milestone with a higher number
     is newer than others with lower numbers.</p>
 
-    <p>Although it will rarely be important, you can use
-    <ui:outputURL value="http://jenkins.auraframework.org/view/All/job/lumen_doc/javadoc/org/auraframework/adapter/ConfigAdapter.html#getAuraVersion()" label="getAuraVersion">
-    <tt>ConfigAdapter.getAuraVersion()</tt></ui:outputURL> to
-    see what version of Aura is running your code.</p>
+    <p>Although it will rarely be important, you can use the Java <code>ConfigAdapter.getAuraVersion()</code> method to see what version of Aura is running your code.</p>
 </aura:component>

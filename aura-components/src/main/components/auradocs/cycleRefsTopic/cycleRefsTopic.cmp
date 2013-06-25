@@ -128,10 +128,6 @@
                 </tr>
             </tbody>
     </table>
-
-    <p><b>See also:</b><br/>
-    <a href="http://jenkins.auraframework.org/view/All/job/lumen_doc/javadoc/index.html?org/auraframework/Aura.html" target="_blank">Javadoc</a>
-     </p>
 </aura:component>
 
 

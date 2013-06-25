@@ -239,7 +239,7 @@ Action.prototype.runDeprecated = function(evt) {
     var finished = false;
     try {
         var helper = this.cmp.getDef().getHelper();
-        this.meth.call(this, this.cmp, evt, helper);
+        this.returnValue = this.meth.call(this, this.cmp, evt, helper);
         finished = true;
     } catch (e) {
         $A.log("Action failed: " + this.cmp.getDef().getDescriptor().getQualifiedName() + " -> " + this.getDef().getName(), e);
@@ -353,8 +353,7 @@ Action.prototype.updateFromResponse = function(response) {
         }
         this.error = newErrors;
     } else if (this.originalResponse && this.state === "SUCCESS") {
-        // Compare the refresh response with the original response and only
-        // complete the action if they differ
+        // Compare the refresh response with the original response and return false if they are equal (no update)
         var originalValue = $A.util.json.encode(this.originalResponse["returnValue"]);
         var refreshedValue = $A.util.json.encode(response["returnValue"]);
         if (refreshedValue === originalValue) {
@@ -371,7 +370,7 @@ Action.prototype.updateFromResponse = function(response) {
 /**
  * Gets a storable response from this action.
  *
- * WARNING: Use after complete() since getStored() modifies <code>this.components</code>.
+ * WARNING: Use after finishAction() since getStored() modifies <code>this.components</code>.
  *
  * @param {String} storageName the name of the storage to use.
  */
@@ -401,13 +400,13 @@ Action.prototype.getStored = function(storageName) {
 };
 
 /**
- * Returns a response function if the Action is complete.
- * <p>For example, <code>this.complete({ returnValue: cmp.get("c.getAction") });</code> runs getAction after the current Action is complete.</p>
+ * Calls callbacks and fires events upon completion of the action.
+ *
  * @private
  * @param {Object}
- *            response
+ *            context the context for pushing and popping the current action.
  */
-Action.prototype.complete = function(context) {
+Action.prototype.finishAction = function(context) {
     var previous = context.setCurrentAction(this);
     try {
         // Add in any Action scoped components /or partial configs
@@ -583,7 +582,7 @@ Action.prototype.abort = function() {
  */
 Action.prototype.incomplete = function(context) {
     this.state = "INCOMPLETE";
-    this.complete(context);
+    this.finishAction(context);
     this.state = "NEW";
 };
 

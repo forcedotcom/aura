@@ -15,6 +15,9 @@
  */
 package org.auraframework.impl.source.file;
 
+import java.util.EnumMap;
+import java.util.Map;
+
 import org.apache.commons.vfs2.FileChangeEvent;
 import org.apache.commons.vfs2.FileListener;
 import org.apache.log4j.Logger;
@@ -24,17 +27,15 @@ import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.SourceListener;
 import org.auraframework.system.SourceListener.SourceMonitorEvent;
 
-import java.util.EnumMap;
-import java.util.Map;
-
 /**
- * Used by {@link FileSourceLoader} to monitor and notify when file has changed.
- * When a file does change, it notifies its loader to clear cache of specific descriptor.
+ * Used by {@link FileSourceLoader} to monitor and notify when file has changed. When a file does change, it notifies
+ * its listener to clear cache of specific descriptor.
  */
 public class FileSourceListener implements FileListener {
 
     private static final Logger logger = Logger.getLogger(FileSourceListener.class);
-    private static final EnumMap<DefDescriptor.DefType, String> extensions = new EnumMap<DefDescriptor.DefType, String>(DefDescriptor.DefType.class);
+    private static final EnumMap<DefDescriptor.DefType, String> extensions = new EnumMap<DefDescriptor.DefType, String>(
+            DefDescriptor.DefType.class);
 
     static {
         extensions.put(DefDescriptor.DefType.APPLICATION, ".app");

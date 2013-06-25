@@ -16,7 +16,10 @@
 package org.auraframework.impl.system;
 
 import java.io.File;
+import java.lang.ref.WeakReference;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -27,10 +30,14 @@ import org.auraframework.Aura;
 import org.auraframework.adapter.RegistryAdapter;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
+import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
+import org.auraframework.def.LayoutsDef;
+import org.auraframework.def.NamespaceDef;
+import org.auraframework.def.RendererDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.AuraImpl;
 import org.auraframework.impl.AuraImplTestCase;
@@ -43,8 +50,8 @@ import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.DefRegistry;
-import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.system.Source;
+import org.auraframework.system.SourceListener;
 import org.auraframework.test.annotation.UnAdaptableTest;
 import org.auraframework.test.util.AuraPrivateAccessor;
 import org.auraframework.throwable.NoAccessException;
@@ -122,8 +129,8 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
     private void assertCompiledDef(Definition def) throws QuickFixException {
         Mockito.verify(def, Mockito.times(1)).validateDefinition();
         Mockito.verify(def, Mockito.times(1)).validateReferences();
-        //Mockito.verify(def, Mockito.times(1)).markValid();
-        //assertEquals("definition not valid: " + def, true, def.isValid());
+        Mockito.verify(def, Mockito.times(1)).markValid();
+        assertEquals("definition not valid: " + def, true, def.isValid());
     }
 
     private void assertIdenticalDependencies(DefDescriptor<?> desc1, DefDescriptor<?> desc2) throws Exception {
@@ -733,11 +740,11 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         }
         contextService.startContext(Mode.DEV, Format.JSON, Access.AUTHENTICATED);
 
-        MasterDefRegistry mdr = contextService.getCurrentContext().getDefRegistry();
+        MasterDefRegistryImpl mdr = getDefRegistry(false);
         DefDescriptor<ComponentDef> cmpDesc = Aura.getDefinitionService().getDefDescriptor("test:deleteMeAfterTest",
                 ComponentDef.class);
 
-        // Make sure it's actually in the CachingDefRegistry caches
+        // Make sure it's actually in the caches
         mdr.exists(cmpDesc);
 
         // Get the UID before adding the file since getUid() messes with caches
@@ -753,13 +760,18 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         BuilderService builderService = Aura.getBuilderService();
         ComponentDef def = builderService.getComponentDefBuilder().setDescriptor(cmpDesc).build();
         Aura.getDefinitionService().save(def);
+
+        // Make sure we actually have something to clear from the cache before verifying it's not in there.
+        if (!isInDefsCache(cmpDesc, mdr)) {
+            fail("Test setup failure: def not added to MasterDefRegistry cache");
+        }
         assertNotCached(cmpDesc, mdr, uid);
     }
 
     /**
      * Wait for MasterDefRegistry and CachingDefRegistry caches to be cleared after a source change.
      */
-    private void assertNotCached(DefDescriptor<ComponentDef> cmpDesc, MasterDefRegistry mdr, String uid)
+    private void assertNotCached(DefDescriptor<ComponentDef> cmpDesc, MasterDefRegistryImpl mdr, String uid)
             throws Exception {
         long startTime = System.nanoTime();
         long timeoutInMilliseconds = 10000;
@@ -778,13 +790,117 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
      * Return true if DefDescriptor has been removed from MasterDefRegistry static cache. This does not take into
      * account the non-static local cache.
      */
-    private boolean isMdrCacheCleared(DefDescriptor<ComponentDef> cmpDesc, MasterDefRegistry mdr, String uid)
+    private boolean isMdrCacheCleared(DefDescriptor<ComponentDef> cmpDesc, MasterDefRegistryImpl mdr, String uid)
             throws Exception {
         Object dependencies = AuraPrivateAccessor.get(MasterDefRegistryImpl.class, "depsCache");
         String key = AuraPrivateAccessor.invoke(mdr, "makeGlobalKey", uid, cmpDesc);
         Object cacheReturn = ((Cache<?, ?>) dependencies).getIfPresent(key);
 
-        if (cacheReturn == null) {
+        if (cacheReturn == null && !isInDefsCache(cmpDesc, mdr)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Verify caches are cleared after a source change to a component file. In this case only the component def itself
+     * should be cleared from the cache.
+     */
+    public void testInvalidateCacheCmpFile() throws Exception {
+        MasterDefRegistryImpl mdr = getDefRegistry(false);
+
+        Map<DefType, DefDescriptor<?>> defs = addDefsToCaches(mdr);
+        DefDescriptor<?> cmpDef = defs.get(DefType.COMPONENT);
+        MasterDefRegistryImpl.notifyDependentSourceChange(Collections.<WeakReference<SourceListener>> emptySet(),
+                cmpDef, SourceListener.SourceMonitorEvent.changed);
+
+        assertFalse("ComponentDef not cleared from cache", isInDefsCache(defs.get(DefType.COMPONENT), mdr));
+        assertTrue("ControllerDef in same bundle as cmp should not be cleared from cache",
+                isInDefsCache(defs.get(DefType.CONTROLLER), mdr));
+        assertTrue("NamespaceDef should not be cleared from cache", isInDefsCache(defs.get(DefType.NAMESPACE), mdr));
+    }
+
+    /**
+     * Verify caches are cleared after a source change to a namespace def file. In this case all items in the cache with
+     * the same namespace as the def should be cleared.
+     */
+    public void testInvalidateCacheNamespaceFile() throws Exception {
+        MasterDefRegistryImpl mdr = getDefRegistry(false);
+
+        Map<DefType, DefDescriptor<?>> defs = addDefsToCaches(mdr);
+        DefDescriptor<?> namespaceDef = defs.get(DefType.NAMESPACE);
+        MasterDefRegistryImpl.notifyDependentSourceChange(Collections.<WeakReference<SourceListener>> emptySet(),
+                namespaceDef, SourceListener.SourceMonitorEvent.changed);
+
+        assertFalse("NamespaceDef not cleared from cache", isInDefsCache(defs.get(DefType.NAMESPACE), mdr));
+        assertFalse("ComponentDef in same namespace as changed namespaceDef not cleared from cache",
+                isInDefsCache(defs.get(DefType.COMPONENT), mdr));
+        assertFalse("ControllerDef in same namespace as changed namespaceDef not cleared from cache",
+                isInDefsCache(defs.get(DefType.CONTROLLER), mdr));
+        assertTrue("ControllerDef in different namespace as changed namespaceDef should not be cleared from cache",
+                isInDefsCache(defs.get(DefType.RENDERER), mdr));
+    }
+
+    /**
+     * Verify caches are cleared after a source change to a Layouts def file. In this case all items in the layouts
+     * bundle should be cleared.
+     */
+    public void testInvalidateCacheLayoutsFile() throws Exception {
+        MasterDefRegistryImpl mdr = getDefRegistry(false);
+
+        Map<DefType, DefDescriptor<?>> defs = addDefsToCaches(mdr);
+        DefDescriptor<?> layoutsDef = defs.get(DefType.LAYOUTS);
+        MasterDefRegistryImpl.notifyDependentSourceChange(Collections.<WeakReference<SourceListener>> emptySet(),
+                layoutsDef, SourceListener.SourceMonitorEvent.changed);
+
+        assertFalse("LayoutsDef not cleared from cache", isInDefsCache(defs.get(DefType.LAYOUTS), mdr));
+        assertFalse("ApplicationDef in same bundle as LayoutsDef not cleared from cache",
+                isInDefsCache(defs.get(DefType.APPLICATION), mdr));
+        assertTrue("NamespaceDef should not be cleared from cache on LayoutsDef source change",
+                isInDefsCache(defs.get(DefType.NAMESPACE), mdr));
+        assertTrue("Cmp in same namespace but different bundle as Layouts def should not be cleared from cache",
+                isInDefsCache(defs.get(DefType.COMPONENT), mdr));
+    }
+
+    /**
+     * Create a set of DefDescriptors and add them to the MDR caches by calling getDef() on them.
+     * 
+     * @return List of DefDescriptors that have been added to the mdr caches.
+     */
+    private Map<DefType, DefDescriptor<?>> addDefsToCaches(MasterDefRegistryImpl mdr) throws Exception {
+        DefDescriptor<NamespaceDef> namespaceDef = DefDescriptorImpl.getInstance("test", NamespaceDef.class);
+        DefDescriptor<ComponentDef> cmpDef = DefDescriptorImpl.getInstance("test:test_button",
+                ComponentDef.class);
+        DefDescriptor<ControllerDef> cmpControllerDef = DefDescriptorImpl.getInstance(
+                "js://test.test_button", ControllerDef.class);
+        DefDescriptor<RendererDef> otherNamespaceDef = DefDescriptorImpl.getInstance(
+                "js://gvpTest.labelProvider", RendererDef.class);
+        DefDescriptor<ApplicationDef> appInLayoutsBundleDef = DefDescriptorImpl.getInstance("test:layouts",
+                ApplicationDef.class);
+        DefDescriptor<LayoutsDef> layoutsDef = DefDescriptorImpl.getInstance("test:layouts",
+                LayoutsDef.class);
+
+        Map<DefType, DefDescriptor<?>> map = new HashMap<DefType, DefDescriptor<?>>();
+        map.put(DefType.NAMESPACE, namespaceDef);
+        map.put(DefType.COMPONENT, cmpDef);
+        map.put(DefType.CONTROLLER, cmpControllerDef);
+        map.put(DefType.RENDERER, otherNamespaceDef);
+        map.put(DefType.APPLICATION, appInLayoutsBundleDef);
+        map.put(DefType.LAYOUTS, layoutsDef);
+
+        for (DefType defType : map.keySet()) {
+            DefDescriptor<?> dd = map.get(defType);
+            dd.getDef();
+        }
+
+        return map;
+    }
+
+    private boolean isInDefsCache(DefDescriptor<?> dd, MasterDefRegistryImpl mdr) throws Exception {
+        Object dependencies = AuraPrivateAccessor.get(MasterDefRegistryImpl.class, "defsCache");
+        Object cacheReturn = ((Cache<?, ?>) dependencies).getIfPresent(dd);
+
+        if (cacheReturn != null) {
             return true;
         }
         return false;

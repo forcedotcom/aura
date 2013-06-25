@@ -30,6 +30,7 @@
 
     <ui:inputText aura:id="inputHost" value="{!v.host}"/>
     <ui:button aura:id="button" label="test connection" press="{!c.testConnection}"/><br/>
+    <ui:button aura:id="setConnectedFalseButton" label="set connected false" press="{!c.setConnectedFalse}"/><br/>
     <ui:outputUrl aura:id="defaultlink" label="default layout" value="#default"/><br/>
     <ui:outputUrl aura:id="actionlink" label="action layout" value="#action"/><br/>
 

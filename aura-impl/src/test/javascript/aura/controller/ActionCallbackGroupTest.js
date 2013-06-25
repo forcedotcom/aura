@@ -65,6 +65,18 @@ Test.Aura.Controller.ActionCallbackGroupTest = function() {
 		}
 
 		[ Fact ]
+		function NoErrorIfCallbackUndefined() {
+			// because it would normally try to execute the callback if actions was empty
+			new ActionCallbackGroup([], null);
+		}
+
+		[ Fact ]
+		function NoErrorIfCallbackNull() {
+			// because it would normally try to execute the callback if actions was empty
+			new ActionCallbackGroup([], null, null);
+		}
+
+		[ Fact ]
 		function ExecutesCallbackWithProvidedScope() {
 			var scope = {};
 			var callback = function() {
@@ -272,6 +284,26 @@ Test.Aura.Controller.ActionCallbackGroupTest = function() {
 				},
 				ReturnValue : null
 			} ], stubbedCallback.Calls);
+		}
+
+		[ Fact ]
+		function NoErrorIfCallbackUndefined() {
+			// because it would normally try to execute the callback if last action was completed
+			var action = new MockAction();
+			var stubbedCallback = Stubs.GetMethod("param", null);
+			var group = new ActionCallbackGroup([ action ], null);
+
+			group.completeAction(action);
+		}
+
+		[ Fact ]
+		function NoErrorIfCallbackNull() {
+			// because it would normally try to execute the callback if last action was completed
+			var action = new MockAction();
+			var stubbedCallback = Stubs.GetMethod("param", null);
+			var group = new ActionCallbackGroup([ action ], null, null);
+
+			group.completeAction(action);
 		}
 
 		[ Fact ]

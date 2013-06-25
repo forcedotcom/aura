@@ -138,26 +138,6 @@ Test.Aura.Controller.ActionTest = function() {
 			// Assert
 			Assert.Equal(expected, actual);
 		}
-
-		[ Fact ]
-		function IncrementsActionIdAfterUse() {
-			// Arrange
-			var expected = targetNextActionId + 1;
-			var target;
-			var actual;
-
-			// Act
-			mockContext(function() {
-				mockActionId(function() {
-					target = new Action();
-					target.getId();
-					actual = target.nextActionId;
-				});
-			});
-
-			// Assert
-			Assert.Equal(expected, actual);
-		}
 	}
 
 	[ Fixture ]
@@ -226,9 +206,7 @@ Test.Aura.Controller.ActionTest = function() {
 	function SetParams() {
 		[ Fact ]
 		function MapsKeyInParamDefsToConfig() {
-			// Arrange
 			var expected = "expected";
-			var key = "key";
 			var paramDefs = {
 				key : 1
 			};
@@ -237,30 +215,77 @@ Test.Aura.Controller.ActionTest = function() {
 				key : expected
 			};
 
-			// Act
 			target.setParams(config);
-			var actual = target.params[key];
 
-			// Assert
-			Assert.Equal(actual, expected);
+			Assert.Equal({
+				key : expected
+			}, target.params);
+		}
+
+		[ Fact ]
+		function ClearsPreviouslySetParamsIfMissingFromConfig() {
+			var paramDefs = {
+				key1 : 1,
+				key2 : 2
+			};
+			var config = {
+				key2 : "new"
+			};
+			var target = new Action(null, null, paramDefs);
+			target.params["key1"] = "existing";
+
+			target.setParams(config);
+
+			Assert.Equal({
+				key1 : undefined,
+				key2 : "new"
+			}, target.params);
+		}
+
+		[ Fact ]
+		function DoesNotSetParamsWithoutDefs() {
+			var paramDefs = {
+				key1 : 1,
+				key2 : 2
+			};
+			var config = {
+				key1 : "new",
+				key3 : "ignored"
+			};
+			var target = new Action(null, null, paramDefs);
+
+			target.setParams(config);
+
+			Assert.Equal({
+				key1 : "new",
+				key2 : undefined
+			}, target.params);
 		}
 	}
 
 	[ Fixture ]
 	function GetParam() {
 		[ Fact ]
-		function ReturnsValueFromParamsObject() {
-			// Arrange
+		function ReturnsValueFromParamsIfKeyFound() {
 			var expected = "expected";
 			var paramsKey = "key";
 			var target = new Action();
 			target.params[paramsKey] = expected;
 
-			// Act
 			var actual = target.getParam(paramsKey);
 
-			// Assert
 			Assert.Equal(expected, actual);
+		}
+
+		[ Fact ]
+		function ReturnsUndefinedIfKeyNotFound() {
+			var paramsKey = "key";
+			var target = new Action();
+			target.params = {};
+
+			var actual = target.getParam(paramsKey);
+
+			Assert.Undefined(actual);
 		}
 	}
 
@@ -322,8 +347,12 @@ Test.Aura.Controller.ActionTest = function() {
 			});
 
 			// Assert
-			Assert.Equal(expectedScope, target.callbacks[name]["s"]);
-			Assert.Equal(expectedCallback, target.callbacks[name]["fn"]);
+			Assert.Equal({
+				"SUCCESS" : {
+					s : expectedScope,
+					fn : expectedCallback
+				}
+			}, target.callbacks);
 		}
 
 		[ Fact ]
@@ -349,6 +378,10 @@ Test.Aura.Controller.ActionTest = function() {
 			var expectedScope = "expectedScope";
 			var expectedCallback = "expectedCallback";
 			var callbackNames = [ "SUCCESS", "ERROR", "ABORTED", "INCOMPLETE" ];
+			var expected = {
+				s : expectedScope,
+				fn : expectedCallback
+			};
 			var target = new Action();
 
 			// Act
@@ -357,10 +390,12 @@ Test.Aura.Controller.ActionTest = function() {
 			});
 
 			// Assert
-			for ( var i = 0; i < callbackNames.length; i++) {
-				Assert.Equal(expectedScope, target.callbacks[callbackNames[i]]["s"]);
-				Assert.Equal(expectedCallback, target.callbacks[callbackNames[i]]["fn"]);
-			}
+			Assert.Equal({
+				"SUCCESS" : expected,
+				"ERROR" : expected,
+				"ABORTED" : expected,
+				"INCOMPLETE" : expected
+			}, target.callbacks);
 		}
 
 		[ Fact ]
@@ -1341,33 +1376,40 @@ Test.Aura.Controller.ActionTest = function() {
 		});
 		[ Fact ]
 		function ReturnsTrueIfStorageSet() {
-			// Arrange
 			var target = new Action();
 			target.storage = {};
 			var actual = null;
 
-			// Act
 			mockContext(function() {
 				actual = target.isFromStorage();
 			});
 
-			// Assert
 			Assert.True(actual);
 		}
 
 		[ Fact ]
 		function ReturnsFalseIfStorageNotSet() {
-			// Arrange
 			var target = new Action();
 			delete target.storage;
 			var actual = null;
 
-			// Act
 			mockContext(function() {
 				actual = target.isFromStorage();
 			});
 
-			// Assert
+			Assert.False(actual);
+		}
+
+		[ Fact ]
+		function ReturnsFalseIfStorageNull() {
+			var target = new Action();
+			target.storage = null;
+			var actual = null;
+
+			mockContext(function() {
+				actual = target.isFromStorage();
+			});
+
 			Assert.False(actual);
 		}
 	}

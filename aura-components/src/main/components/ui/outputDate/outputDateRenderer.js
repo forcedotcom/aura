@@ -15,12 +15,16 @@
  */
 ({
     afterRender: function(component, helper) {
-        helper.formatDate(component);
+        var concreteCmp = component.getConcreteComponent();
+        var _helper = concreteCmp.getDef().getHelper();
+        _helper.formatDate(concreteCmp);
         return this.superAfterRender();
     },
     
     rerender: function(component, helper) {
-        helper.formatDate(component);
+        var concreteCmp = component.getConcreteComponent();
+        var _helper = concreteCmp.getDef().getHelper();
+        _helper.formatDate(concreteCmp);
         return this.superRerender();
     }
 })

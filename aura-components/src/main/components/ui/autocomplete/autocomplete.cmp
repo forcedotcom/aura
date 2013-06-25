@@ -41,7 +41,7 @@
         </aura:set>
     </aura:if>
     
-    <ui:autocompleteList aura:id="list" 
+    <ui:autocompleteList aura:id="list" class="{!v.class}" 
         dataProvider="{!v.dataProvider}" 
         itemVar="{!v.optionVar}" 
         itemTemplate="{!v.listOption}"

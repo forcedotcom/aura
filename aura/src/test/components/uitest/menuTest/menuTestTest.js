@@ -209,6 +209,10 @@
 			trigger.get("e.click").fire();
 			$A.test.addWaitForWithFailureMessage(true, function(){return $A.util.hasClass(menuList.getElement(),"visible")}, "Menu Should be visible");
 		},function(cmp){
+			//check if expand event got fired - test case for W-1647658
+			$A.test.assertTrue(cmp.get('v.expandEventFired'),"Expand event did not get fired");
+			$A.test.assertFalse(cmp.get('v.collapseEventFired'),"Collapse event should not be fired");
+        	
 			topPropertyValue = $A.util.style.getCSSProperty(menuListElement,'top');
 			//default value
 			$A.test.assertTrue(parseInt(topPropertyValue) >=0 || topPropertyValue=="auto", "CSS property of MenuList should be auto or a positive value");
@@ -218,6 +222,10 @@
 			trigger.get("e.click").fire();
 			$A.test.addWaitForWithFailureMessage(false, function(){return $A.util.hasClass(menuList.getElement(),"visible")}, "Menu Should not be visible");
 		}, function(cmp){
+			//check if collapse event got fired - test case for W-1647658
+			$A.test.assertTrue(cmp.get('v.collapseEventFired'),"Collapse event did not get fired");
+			$A.test.assertFalse(cmp.get('v.expandEventFired'),"Expand event should not be fired");
+        	
 			//open the menu
 			trigger.get("e.click").fire();
 			$A.test.addWaitForWithFailureMessage(true, function(){return $A.util.hasClass(menuList.getElement(),"visible")}, "Menu Should be visible after changing height of item1");

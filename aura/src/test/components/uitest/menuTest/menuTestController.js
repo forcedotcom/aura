@@ -81,5 +81,13 @@
         }
         var resultCmp = cmp.find("radioIterationResult");
         resultCmp.setValue("v.value", values.join(","));
-    }
+    },
+    menuCollapse: function(cmp){
+    	 cmp.getValue("v.collapseEventFired").setValue(true);
+    	 cmp.getValue("v.expandEventFired").setValue(false);
+    },
+    menuExpand: function(cmp){
+   	 cmp.getValue("v.expandEventFired").setValue(true);
+   	 cmp.getValue("v.collapseEventFired").setValue(false);
+   }
 })

@@ -60,6 +60,24 @@
         return false;
     },
     
+    findMenuListDiv: function(menuComponent) {
+         // find ui:menuList component
+         var listCmp = menuComponent;
+         var listCmpDes = listCmp.getDef().getDescriptor();
+         var ns = listCmpDes.getNamespace();
+         var name = listCmpDes.getName();
+         while (listCmp && listCmp.isInstanceOf("ui:menuList")) {
+             if ("ui:menuList" == (ns + ":" + name)) {
+                 return listCmp.find("menu");
+             }
+             listCmp = listCmp.getSuper();
+             listCmpDes = listCmp.getDef().getDescriptor();
+             ns = listCmpDes.getNamespace();
+             name = listCmpDes.getName();
+         }
+         return null;
+    },
+    
     getOnClickStartFunction: function(component) {
         if ($A.util.isUndefined(component._onClickStartFunc)) {
             var helper = this;
@@ -116,8 +134,8 @@
                 if (!helper.isElementInComponent(menuComponent, event.target) && 
                         !helper.isElementInComponent(triggerComponent, event.target)) {
                     // Collapse the menu
-                    menuComponent.setValue("v.visible", false);
-                    var divCmp = menuComponent.find("menu");
+                    menuComponent.setValue("v.visible", false); 
+                    var divCmp = helper.findMenuListDiv(menuComponent);
                     if (divCmp) {
                         var elem = divCmp.getElement();
                         $A.util.removeClass(elem, "visible");

@@ -43,7 +43,7 @@
 
     <p>In JavaScript, you can determine if a component implements an interface by using <code>myCmp.isInstanceOf("mynamespace:myinterface")</code>.</p>
 
-    <p>In Java, use the <code>isInstanceOf()</code> method in <ui:outputURL value="http://jenkins.auraframework.org/view/All/job/lumen_doc/javadoc/index.html?org/auraframework/def/ComponentDef.html" label="ComponenentDef">ComponentDef</ui:outputURL> or <ui:outputURL value="http://jenkins.auraframework.org/view/All/job/lumen_doc/javadoc/index.html?org/auraframework/def/ApplicationDef.html" label="ApplicationDef">ApplicationDef</ui:outputURL>.</p>
+    <p>In Java, use the <code>isInstanceOf()</code> method in the <code>ComponentDef</code> or <code>ApplicationDef</code> interfaces.</p>
 
     <p><b>See also:</b><br/>
         <auradocs:topicLink topic="tagAuraSet">aura:set</auradocs:topicLink><br/>

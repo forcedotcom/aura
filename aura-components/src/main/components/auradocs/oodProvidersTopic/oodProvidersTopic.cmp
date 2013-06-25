@@ -34,7 +34,7 @@
         <li>Implement either the <code>ComponentDescriptorProvider</code> or <code>ComponentConfigProvider</code> interface</li>
     </ul>
 
-    <auradocs:info>Current code hasn’t been refactored to use the interfaces. The older method of creating a provider doesn’t use interfaces and uses a static <code>provide()</code> method to return the concrete component. For an example, see  <ui:outputURL value="https://github.com/forcedotcom/aura-beta/blob/master/aura-impl/java/src/aura/component/ui/InputOptionProvider.java" label="InputOptionProvider">InputOptionProvider</ui:outputURL>. Use the provider interfaces when you are creating a new provider.
+    <auradocs:info>The current code hasn’t been refactored to use the interfaces. The older method of creating a provider doesn’t use interfaces and uses a static <code>provide()</code> method to return the concrete component. For an example, see <code>InputOptionProvider.java</code>. Use the provider interfaces when you are creating a new provider.
     </auradocs:info>
 
     <p>At runtime, a provider has access to a shell of the abstract component or interface, including any attribute values that have been set. The model isn't constructed yet so you can't access it. The <code>provide()</code> method can examine the attribute values that are set on the component, and return a descriptor of the non-abstract component type that should be used.</p>
@@ -44,7 +44,7 @@
 
     <h2>ComponentDescriptorProvider</h2>
 
-    <p>Use the <ui:outputURL value="http://jenkins.auraframework.org/view/All/job/lumen_doc/javadoc/index.html?org/auraframework/def/ComponentDescriptorProvider.html" label="ComponentDescriptorProvider">ComponentDescriptorProvider</ui:outputURL> interface to return a <ui:outputURL value="http://jenkins.auraframework.org/view/All/job/lumen_doc/javadoc/index.html?org/auraframework/def/DefDescriptor.html" label="DefDescriptor">DefDescriptor</ui:outputURL> describing the concrete component to use when you don’t need to set attributes for the component. For example:</p>
+    <p>Use the <code>ComponentDescriptorProvider</code> interface to return a <code>DefDescriptor</code> describing the concrete component to use when you don’t need to set attributes for the component. For example:</p>
 
 <auradocs:codeblock>
 <![CDATA[
@@ -63,7 +63,7 @@ public class SampleDescProvider implements ComponentDescriptorProvider {
 
     <h2>ComponentConfigProvider</h2>
 
-    <p>Use the <ui:outputURL value="http://jenkins.auraframework.org/view/All/job/lumen_doc/javadoc/index.html?org/auraframework/def/ComponentConfigProvider.html" label="ComponentConfigProvider">ComponentConfigProvider</ui:outputURL> interface to return a <a href="http://jenkins.auraframework.org/view/All/job/lumen_doc/javadoc/index.html?org/auraframework/instance/ComponentConfig.html" target="_new">ComponentConfig</a>, which describes the concrete component to use in a DefDescriptor and enables you to set attributes for the component. For example:</p>
+    <p>Use the <code>ComponentConfigProvider</code> interface to return a <code>ComponentConfig</code>, which describes the concrete component to use in a DefDescriptor and enables you to set attributes for the component. For example:</p>
 
 <auradocs:codeblock>
 <![CDATA[

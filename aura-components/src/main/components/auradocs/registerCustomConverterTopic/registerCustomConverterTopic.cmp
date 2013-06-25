@@ -267,7 +267,6 @@ public class MyCustomTypeList2ConverterConfig {
 </auradocs:codeblock><br/>
 
 <p><b>See also:</b><br/>    
-    <a href="http://jenkins.auraframework.org/view/All/job/lumen_doc/javadoc/org/auraframework/util/type/Converter.html" target="_new">Converter Interface</a><br/>
     <auradocs:topicLink topic="serverSideControllers">Server-Side Controllers</auradocs:topicLink><br/>    
     <auradocs:topicLink topic="attrTypesOverview">Supported aura:attribute Types</auradocs:topicLink>
  </p>  

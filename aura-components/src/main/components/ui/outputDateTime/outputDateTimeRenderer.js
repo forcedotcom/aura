@@ -18,7 +18,7 @@
         var ret = this.superAfterRender();
         var concreteCmp = component.getConcreteComponent();
         var _helper = concreteCmp.getDef().getHelper();
-        _helper.formatDateTime(component);
+        _helper.formatDateTime(concreteCmp);
         return ret; 
     },
     
@@ -26,8 +26,7 @@
         var ret = this.superRerender();
         var concreteCmp = component.getConcreteComponent();
         var _helper = concreteCmp.getDef().getHelper();
-        _helper.formatDateTime(component);
+        _helper.formatDateTime(concreteCmp);
         return ret;
-        
     }
 })

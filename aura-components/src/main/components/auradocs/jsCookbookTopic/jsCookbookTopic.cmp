@@ -18,6 +18,6 @@
 <aura:component extends="auradocs:topicPanel">
 <aura:set attribute="title" value="JavaScript Cookbook"/>
 
-<p>This section includes code snippets and samples that can be used in various JavaScript files. It's a work in progress. Stay tuned for more code soon.</p>
+<p>This section includes code snippets and samples that can be used in various JavaScript files.</p>
 
 </aura:component>

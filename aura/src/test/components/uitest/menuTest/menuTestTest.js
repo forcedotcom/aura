@@ -186,15 +186,14 @@
 	 * General Test to verify focus on menu item using AURA API  
 	 */
     testFocusOnMenuItem:{
-		test: [function(cmp) {
+    	test:function(cmp){
 				trigger = cmp.find("trigger");
 				trigger.get("e.click").fire();
 				var menuItem3 = cmp.find("actionItem3");
 				menuItem3.get("e.mouseover").fire();
 				$A.test.addWaitForWithFailureMessage(menuItem3.get('v.label'), function(){return $A.test.getActiveElementText()}, "Focus should be on item 3");
 			}
-	    ]
-    },
+	},
     
     /**
      * Test menu is positioned above if there is no space left at the bottom.
@@ -234,5 +233,18 @@
 			$A.test.assertTrue(parseInt(topPropertyValue) < 0, "Menu is not position properly");
 		}
 	]
+   },
+   
+   /**
+	 * Test case for W-1636495
+	 * Test to verify menuTrigger expands menuList since ui:menuList is extensible
+	 */
+   testMenuExpandWhenExtendFromMenuList:{
+	   test:function(cmp){
+				trigger = cmp.find("triggerLink");
+				menuList = cmp.find("extendMenuList");
+				trigger.get("e.click").fire();
+				$A.test.addWaitForWithFailureMessage(true, function(){return $A.util.hasClass(menuList.getElement(),"visible")}, "Menu Should be visible when you extend from menuList");
+			}
    }
 })

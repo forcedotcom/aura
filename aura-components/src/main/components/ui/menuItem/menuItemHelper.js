@@ -40,24 +40,6 @@
         return null;
     },
     
-    findMenuListDiv: function(menuComponent) {
-         // find ui:menuList component
-         var listCmp = menuComponent;
-         var listCmpDes = listCmp.getDef().getDescriptor();
-         var ns = listCmpDes.getNamespace();
-         var name = listCmpDes.getName();
-         while (listCmp && listCmp.isInstanceOf("ui:menuList")) {
-             if ("ui:menuList" == (ns + ":" + name)) {
-                 return listCmp.find("menu");
-             }
-             listCmp = listCmp.getSuper();
-             listCmpDes = listCmp.getDef().getDescriptor();
-             ns = listCmpDes.getNamespace();
-             name = listCmpDes.getName();
-         }
-         return null;
-    },
-    
     /**
      * Override
      *

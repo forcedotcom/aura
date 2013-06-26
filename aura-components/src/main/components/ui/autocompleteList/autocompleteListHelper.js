@@ -79,7 +79,7 @@
                 if (listElems) {
                     var ret = true;
                     for (var i = 0; ret; i++) {
-                        ret = listElems[j];
+                        ret = listElems[i];
                         if (ret && helper.isHTMLElement(ret) && $A.util.contains(ret, event.target)) {
                             clickOutside = false;
                             break;

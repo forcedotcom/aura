@@ -18,18 +18,13 @@
 <aura:component extends="auradocs:topicPanel">
     <aura:set attribute="title" value="Aura Demo"/>
 
-
-
     <p>We built a simple app on the Aura framework to demonstrate its capabilities. Aura Note is a note-taking app showcasing the simplicity of building apps on Aura.</p>
 
     <p>
-        <ui:outputURL value="https://github.com/forcedotcom/lumen-note" label="Get the source">Get the source</ui:outputURL> |
+        <ui:outputURL value="https://github.com/forcedotcom" label="Get the source">Get the source</ui:outputURL> |
         <ui:outputURL value="http://notes.auraframework.org/auranote/notes.app" label="Visit the demo">Visit the demo</ui:outputURL>
     </p>
-
-    <!-- TODO: remove this before open source -->
-    <auradocs:info><b>Note</b>: To get the source, follow the instructions on <ui:outputURL value="https://sites.google.com/a/salesforce.com/user-interface/lumen/git-setup-instructions#TOC-Getting-up-and-running-the-first-time" label="this Google Sites page">this Google Sites page</ui:outputURL> to request access to the private repo. If you get a <code>404</code> error after you've been granted access, make sure that you're logged in to GitHub. The <code>lumen-note</code> repo will be public and renamed to <code>aura-note</code> after the framework is open sourced.</auradocs:info>
-    
+   
     <p><ui:image src="/auraFW/resources/aura/images/auraNoteDemo.png" alt="Aura Note App" /></p>
 
 </aura:component>

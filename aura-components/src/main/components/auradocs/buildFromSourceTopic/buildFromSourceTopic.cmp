@@ -25,8 +25,8 @@
     <h2>Prerequisites</h2>
         <ol>
 
-            <li><ui:outputURL value="http://www.oracle.com/technetwork/java/javase/downloads/" label="JDK 1.6">JDK 1.6</ui:outputURL></li>
-            <li><ui:outputURL value="http://maven.apache.org/download.html" label="Maven 3">Maven 3</ui:outputURL></li>
+            <li><ui:outputURL value="http://www.oracle.com/technetwork/java/javase/downloads/" label="Java Development Kit (JDK) 1.6">Java Development Kit (JDK) 1.6</ui:outputURL></li>
+            <li><ui:outputURL value="http://maven.apache.org/download.html" label="Apache Maven 3">Apache Maven 3</ui:outputURL></li>
         </ol>
 
 
@@ -44,8 +44,6 @@
     <h2>Step 2: Get and Build Aura Source</h2>
 
     <ol>
-        <!-- TODO: remove this before open source -->
-        <li>Follow the instructions on <ui:outputURL value="https://sites.google.com/a/salesforce.com/user-interface/lumen/git-setup-instructions#TOC-Getting-up-and-running-the-first-time" label="git instructions">this Google Sites page</ui:outputURL> to request access to the private repo. If you get a <code>404</code> error after you've been granted access, make sure that you're logged in to GitHub. The <code>lumen-beta</code> repo will be public and renamed to something Aura-specific after the framework is open sourced.</li>
         <li>On the command line, navigate to the directory where you want to keep the Aura source code.</li>
         <li>Run the following commands to clone the source with <code>git</code> and build it with Maven:<br/>
         <auradocs:codeblock>
@@ -69,7 +67,7 @@ mvn install
         <li>Select Maven Integration for Eclipse and click <b>Next</b>.</li>
         <li>Import the Aura source by clicking <b>File > Import > Maven > Existing Maven Projects</b>.</li>
         <li>Click <b>Next</b>.</li>
-        <li>In the <b>Root Directory</b> field, browse to the <code>lumen-beta</code> directory that you cloned.</li>
+        <li>In the <b>Root Directory</b> field, browse to the directory that you cloned.</li>
         <li>Click <b>Next</b>.</li>
         <li>Click <b>Finish</b>.</li>
     </ol>
@@ -93,7 +91,7 @@ mvn install
         <li>Click <b>Debug</b>.</li>
     </ol>
 
-    <p>In the Console window, you should see a message that the Jetty server started. In a browser, navigate to <ui:outputURL value="http://localhost:9090/" label="localhost">http://localhost:9090/</ui:outputURL> to access the server.</p>
+    <p>In the Console window, you should see a message that the Jetty server started. In a browser, navigate to http://localhost:9090/ to access the server.</p>
 
     <p><b>See also:</b><br/>
     <auradocs:topicLink topic="auraPlugin">Install the Aura Assist Eclipse Plugin</auradocs:topicLink> <br/>

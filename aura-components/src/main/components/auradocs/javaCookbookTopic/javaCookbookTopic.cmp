@@ -18,6 +18,6 @@
 <aura:component extends="auradocs:topicPanel">
 <aura:set attribute="title" value="Java Cookbook"/>
 
-<p>This section includes code snippets and samples that can be used in Java classes. It's a work in progress. Stay tuned for more code soon.</p>
+<p>This section includes code snippets and samples that can be used in Java classes.</p>
 
 </aura:component>

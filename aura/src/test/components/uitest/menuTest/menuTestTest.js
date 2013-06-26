@@ -244,7 +244,7 @@
 				trigger = cmp.find("triggerLink");
 				menuList = cmp.find("extendMenuList");
 				trigger.get("e.click").fire();
-				$A.test.addWaitForWithFailureMessage(true, function(){return $A.util.hasClass(menuList.getElement(),"visible")}, "Menu Should be be visible when you extend from menuList");
+				$A.test.addWaitForWithFailureMessage(true, function(){return $A.util.hasClass(menuList.getElement(),"visible")}, "Menu Should be visible when you extend from menuList");
 			}
    }
 })

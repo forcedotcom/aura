@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:input" implements="ui:inputBaseOption" extensible="true" support="GA" description="An HTML input element of type checkbox.">
+<aura:component extends="ui:input" implements="ui:inputBaseOption" extensible="true" support="GA" description="A checkbox whose state is controlled by the checked and disabled attributes. Its behavior can be configured using events such as click and change.">
         
     <aura:renderif isTrue="{!v.body.length == 0}">
        <input aura:id="checkbox" id="{!v.domId}" class="{!v.class}" name="{!v.name}" type="checkbox" value="{!v.text}" checked="{!v.value == true}" disabled="{!v.disabled}"/>

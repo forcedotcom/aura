@@ -351,11 +351,11 @@ var AuraDevToolService = function() {
         accessbilityAide:{
             /**
              * Goes up the tree (until it reaches the body tag) and finds whether the initial tag param is in another sent up tag
-             * @param  tag       - The starting tag that we are going to use to go up the tree
-             * @param  nameOfTag - Name of the tag that we should find should the the starting tags parent
+             * @param   tag       - The starting tag that we are going to use to go up the tree
+             * @param   nameOfTag - Name of the tag that we should find should the the starting tags parent
              * @returns boolean   - Signifies whether or not the tag we want was found or not (found: true, else: false)
-             */
-            checkForParentMatchesTag : function(tag, parentTag){
+             */          
+            checkParentMatchesTag : function(tag, parentTag){
         	while(tag.tagName !== null && tag.tagName !== "BODY"){
 	        	 if(tag.tagName.toUpperCase() === parentTag){
 	        	       return true;
@@ -365,54 +365,120 @@ var AuraDevToolService = function() {
 	        return false;
             },
             /**
-             * Function that goes through all labels and looks for a matching tag, returning true when found
-             * @param labels    - All the labels that we want to go through
-             * @param attribute - The attribute that is being sought (for, id, title, etc)
-             * @param val       - the val that the attribute should be set to
-             * @returns boolen   - Signifies whether or not the tag we want was found or not (found: true, else: false)
+             * Keeps track of total number of errors in seen
              */
-            checkLabelForAttrb : function(labels, attribute, val){
+            errorCount : 0,
+            /**
+             * Function that goes through all labels and turns the for attribute into a key
+             * @param   labels    - All the labels that we want to go through
+             * @param   attribute - The attribute that is being sought (for, id, title, etc)
+             * @returns dictionary  - Mapping of for atrib value to booleans
+             */
+            getDictFromTags : function(labels, attribute){
         	var atrib = null;
+        	var dict = {};
+        	if($A.util.isUndefinedOrNull(labels)){
+        	   return dict; 
+        	}
         	
                 for(var j =0; j<labels.length; j++){
                     atrib = labels[j].getAttribute(attribute);
-            	    if(!aura.util.isUndefinedOrNull(atrib) && atrib === val){
-            	       return true;
+            	    if(!aura.util.isUndefinedOrNull(atrib)){
+            	       dict[atrib] = true;
             	    }
                  }
-                 return false;
+                 return dict;
             },
             
-            inputLabelAid : function(lbls, inputTags){
+            /**
+             * Function that goes through all Image tags, makes sure it is set, then checks the alt tag
+             * @param   imgErrorMsg                - Default error message telling user why they should set alt tag
+             * @param   infoMsg                    - Error message for Informational tag
+             * @param   decoMsg                    - Error message for Decorative tag
+             * @param   imgTypeNotDefinedMsg       - Error message for imageType attribute not set
+             * @returns String                   - String concatenation of all error messages
+             */
+            findAllImgTags:function (imgErrorMsg, infoMsg, decoMsg, imgTypeNotDefinedMsg){
+        	 var accessAideFuncs = aura.devToolService.accessbilityAide;
+        	
+        	 var allImgTags = document.getElementsByTagName("img");
+        	 var data_aura_rendered_by = "";
+        	 var imgTypeNotDefinedErrorArray = [];
+        	 var informationErrorArray = [];
+        	 var decorationalErrorArray  = [];
+        	 var errorMsg = "No component information Available";
+        	 var nonAuraImg = [];
+        	 var imgType = "";
+        	 var alt = "";
+        	
+        	 for(var index = 0; index < allImgTags.length; index++){
+        	     data_aura_rendered_by = allImgTags[index].getAttribute("data-aura-rendered-by");
+        	     
+        	    // Will more than likely have a rendered by value but double checking 
+         	    if(data_aura_rendered_by === null || data_aura_rendered_by === "" ){
+         		nonAuraImg.push(allImgTags[index]);
+         	    }
+         	    else{
+         		imgType = $A.getCmp(data_aura_rendered_by).getAttributes().getValueProvider().get('v.imageType');	
+         		alt     = $A.getCmp(data_aura_rendered_by).getAttributes().getValueProvider().get('v.alt');
+ 
+         		//ImageType is currently set to null, if it is still null it is an error
+         		if($A.util.isUndefinedOrNull(imgType)){
+         		   imgTypeNotDefinedErrorArray.push(allImgTags[index]);
+         		}
+         		else if((imgType === "informational" || $A.util.isUndefinedOrNull(imgType)) && ($A.util.isUndefinedOrNull(alt) || alt === "")){
+         			informationErrorArray.push(allImgTags[index]);
+         		}
+         		else if(imgType === "decorative" && (!$A.util.isUndefinedOrNull(alt) && alt !== "")){
+         			 decorationalErrorArray.push(allImgTags[index]);
+         		}
+         	    }
+        	 }
+        	 
+        	 errorMsg = accessAideFuncs.formatOutput(errorMsg, nonAuraImg);
+        	 errorMsg = errorMsg + accessAideFuncs.formatOutput(imgErrorMsg+imgTypeNotDefinedMsg, imgTypeNotDefinedErrorArray);
+        	 errorMsg = errorMsg + accessAideFuncs.formatOutput(imgErrorMsg+infoMsg, informationErrorArray);
+        	 errorMsg = errorMsg + accessAideFuncs.formatOutput(imgErrorMsg+decoMsg, decorationalErrorArray);
+        	 
+        	 return errorMsg;       	
+            },
+            /**
+             * Function that goes through all labels and check for either the for attribute and the label id, or if a parent tag is a label
+             * @param   lbls       - All of the labels to
+             * @param   inputTags  - The attribute that is being sought (for, id, title, etc)
+             * @returns array     - All errornous tags
+             */
+            inputLabelAide : function(lbls, inputTags){
         	var errorArray = [];
 	        var lblIsPres = true;
+	        var inputTag = null;
   	        var accessAideFuncs = aura.devToolService.accessbilityAide;
   	        
+  	        var lblDict = accessAideFuncs.getDictFromTags(lbls, "for");
+  	        
   	        for (var index = 0; index < inputTags.length; index++){
-  	            lblIsPres = (accessAideFuncs.checkLabelForAttrb(lbls, "for" ,inputTags[index].id)) || (accessAideFuncs.checkForParentMatchesTag(inputTags[index], "LABEL"));
+  	            inputTag = inputTags[index];
+  	            lblIsPres = ((inputTag.id in lblDict) || (accessAideFuncs.checkParentMatchesTag(inputTag, "LABEL")));
   	            if(!lblIsPres){
-  	        	errorArray.push(inputTags[index]);
+  	        	errorArray.push(inputTag);
   	            }
   	        }
   	        return errorArray;
             },
             /**
              * Function that goes finds all given tags and makes sure that they all have an attribute set
-             * Note: This and the above function are very similar. The main difference is that this function is making sure that if a specific value 
-             *       shows up, it is counted as an error
-             * @param  tagName   - Name of the tag to find all instances of 
-             * @param  attribute - The attribute that is being sought (for, id, title, etc)
-             * @param  errorVal  - Value that this attribute should not be set to
-             * @returns array     - All errornous tags
+             * @param   tagName   - Name of the tag to find all instances of 
+             * @param   attribute - The attribute that is being sought (for, id, title, etc)
+             * @param   errorVal  - Value that this attribute should not be set to
+             * @returns array    - All errornous tags
              */
-            checkForAttrib : function(tagName, attribute, errorVal){
-        	var tags = document.getElementsByTagName(tagName);
+            checkForAttrib : function(tags, attribute, errorVal){
 	        var errorArray = [];
 	        var atrib ="";
 	        
 	        for(var i=0; i<tags.length; i++){
 	                atrib = tags[i].getAttribute(attribute);
-	        	if(aura.util.isUndefinedOrNull(atrib) || (atrib === errorVal && taName.toLowerCase() !== "IMG")){
+	        	if(aura.util.isUndefinedOrNull(atrib) || atrib === errorVal){
 	        	    errorArray.push(tags[i]);
 	        	}
 	        }
@@ -421,25 +487,30 @@ var AuraDevToolService = function() {
             
             /**
              * This method grabs all attributes of a tag and turns them into strings 
-             * @param  attribs - All of the attributes in a tag
-             * @returns string  - String value of all of the tag attributes
+             * @param   attribs - All of the attributes in a tag
+             * @returns string - String value of all of the tag attributes
              */
             attribStringVal : function(attribs){
+        	
+        	if($A.util.isUndefinedOrNull(attribs)){
+        	    return "No data found";
+        	}
+        	
         	var strAttrib ="";
         	var attrib=null;
-        	
+        	    
         	for(var i = 0; i<attribs.length; i++){
         	    attrib = attribs.item(i);
-        	    strAttrib = strAttrib + " " +attrib.nodeName+ "=\""+attrib.nodeValue+"\""; 
+        	    strAttrib = strAttrib + " " +attrib.nodeName+ "=\""+attrib.value+"\""; 
         	}
         	return strAttrib;
             },
             
             /**
              * Method grabs everything from the given array and prints out the error and the tag(s) that are the issue
-             * @param tagError - The error message for the given tag
-             * @param errArray - The array of errors
-             * @returns String  - Either the empty string or a string representation of the error
+             * @param   tagError - The error message for the given tag
+             * @param   errArray - The array of errors
+             * @returns String - Either the empty string or a string representation of the error
              */
             formatOutput : function(tagError, errArray){
         	if(errArray.length === 0){
@@ -448,18 +519,19 @@ var AuraDevToolService = function() {
         	
         	var len = errArray.length;
         	var data_aura_rendered_by = "";
-        	var errStr = "\nTotal Errors: "+len+"\nIssue: "+tagError+"\n";
+        	var errStr = "\nIssue: "+tagError+"\n";
         	var nodeName = "";
         	var cmp = "";
         	var accessAideFuncs = aura.devToolService.accessbilityAide;
-        	
+        	accessAideFuncs.errorCount = len + accessAideFuncs.errorCount; 
         	for(var i = 0; i<len; i++){
         	    nodeName = errArray[i].nodeName.toLowerCase();
         	    data_aura_rendered_by = errArray[i].getAttribute("data-aura-rendered-by");
         	    
         	    //Make sure it has a rendered by value
         	    if(data_aura_rendered_by === null || data_aura_rendered_by === "" ){
-        		cmp = "No component information Available, did you forget to use an Aura based component?";
+        		nodeName = errArray[i].nodeName.toLowerCase();
+        		cmp = "No Aura information available";
         	    }
         	    else{
         		//Making sure that the cmp is rendered by Aura and a normal HTML tag
@@ -490,20 +562,20 @@ var AuraDevToolService = function() {
         	     checkIFrameHasTitle : function(){
         		var iFrameTitleMsg = "Each frame and iframe element must have non-empty title attribute. Refer to http://www.w3.org/TR/UNDERSTANDING-WCAG20/ensure-compat.html.";
         		var accessAideFuncs = aura.devToolService.accessbilityAide;
-        		
-        		return accessAideFuncs.formatOutput(iFrameTitleMsg,accessAideFuncs.checkForAttrib("iframe","title", ""));
+        		var iframe = document.getElementsByTagName("iframe");
+        		return accessAideFuncs.formatOutput(iFrameTitleMsg,accessAideFuncs.checkForAttrib(iframe,"title", ""));
         	    },
         	    /**
                      * Grabs all images tags and makes sure they have titles
                      * @returns Sring - Returns a string representation of the errors
-                     * 
-                     * Temporarily disabling this until code collab goes through
                      */
         	    checkImageTagForAlt : function(){
-        		var imgAltMsg = "IMG tag must have alt attribute. Refer to http://www.w3.org/TR/UNDERSTANDING-WCAG20/text-equiv.html.";
+        		var imgError = "IMG tag must have alt attribute. Refer to http://www.w3.org/TR/UNDERSTANDING-WCAG20/text-equiv.html.";
+        		var infoMsg = "\nNote: If the image type is informational, then the alt must be set";
+                	var decoMsg = "\nNote: If the image type is decorative,  then the alt must be the empty string";
+                	var imgTypeNotDefinedMsg  = "\nNote: ImageType Attribute must be set to either decorative or informational";
         		var accessAideFuncs = aura.devToolService.accessbilityAide;
-        		
-       		        return "";//accessAideFuncs.formatOutput(imgAltMsg, accessAideFuncs.checkForAttrib("img","alt",""));
+       		        return accessAideFuncs.findAllImgTags(imgError,infoMsg,decoMsg,imgTypeNotDefinedMsg);
         	    },
         	    /**
                      * Goes through all of the fieldsets tags and makes sure that each on has a legend
@@ -538,7 +610,7 @@ var AuraDevToolService = function() {
          		 for(var i =0; i<inputTags.length; i++){ 
         		     inputTag = inputTags[i];
         		     if(inputTag.getAttribute('type').toLowerCase() == "radio"){
-        		          if(!accessAideFuncs.checkForParentMatchesTag(inputTag, "FIELDSET")){
+        		          if(!accessAideFuncs.checkParentMatchesTag(inputTag, "FIELDSET")){
         		              errorArray.push(inputTag);
         		          }
         		     }
@@ -551,7 +623,7 @@ var AuraDevToolService = function() {
                      * @returns Sring - Returns a string representation of the errors
                      */
         	    checkInputHasLabel : function() {
-        		var inputLabelMsg   = "A label element must be directly before or after the input controls, and the for attribute of label must match the id attribute of the input controls. Refer to http://www.w3.org/TR/UNDERSTANDING-WCAG20/minimize-error.html.";
+        		var inputLabelMsg   = "A label element must be directly before/after the input controls, and the for attribute of label must match the id attribute of the input controls, OR the label should be wrapped around an input. Refer to http://www.w3.org/TR/UNDERSTANDING-WCAG20/minimize-error.html.";
         		var accessAideFuncs = aura.devToolService.accessbilityAide;
         		var inputTextTags   = document.getElementsByTagName('input');
          		var textAreaTags    = document.getElementsByTagName('textarea');
@@ -559,21 +631,26 @@ var AuraDevToolService = function() {
                         var lbls = document.getElementsByTagName("LABEL");  
                         var errorArray = [];
                         
-                        errorArray = errorArray.concat(accessAideFuncs.inputLabelAid(lbls, inputTextTags));
-                        errorArray = errorArray.concat(accessAideFuncs.inputLabelAid(lbls, textAreaTags));
-                        errorArray = errorArray.concat(accessAideFuncs.inputLabelAid(lbls, selectTags));
+                        errorArray = errorArray.concat(accessAideFuncs.inputLabelAide(lbls, inputTextTags));
+                        errorArray = errorArray.concat(accessAideFuncs.inputLabelAide(lbls, textAreaTags));
+                        errorArray = errorArray.concat(accessAideFuncs.inputLabelAide(lbls, selectTags));
                                   	        
         	        return accessAideFuncs.formatOutput(inputLabelMsg, errorArray);
         	    }
         },
+        /**
+         * Calls all functions in VerifyAccessibility and stores the result in a string
+         * @returns Sring - Returns a a concatenated string representation of all errors or the empty string
+         */
         checkAccessibility : function(){
             var functions = aura.devToolService.verifyAccessibility;
-            var result = [];
+            var result = "";
+            aura.devToolService.accessbilityAide.errorCount = 0;
             
             for(var funcNames in functions){
-        	result.push(functions[funcNames]());
+        	result = result + functions[funcNames]();
             }
-            return result.join("");
+            return "Total Number of Errors found: "+aura.devToolService.accessbilityAide.errorCount+result;
         },
         help : function(){
             var ret = [];

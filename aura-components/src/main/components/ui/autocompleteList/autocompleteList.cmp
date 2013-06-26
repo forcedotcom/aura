@@ -16,15 +16,15 @@
 
 -->
 <aura:component extends="ui:abstractList" support="proto"
-    provider="java://org.auraframework.component.ui.ListProvider, js://ui.list" description="This component is used in ui:autocomplete to provide a list of options to the input component.">
+    provider="java://org.auraframework.component.ui.ListProvider, js://ui.list" description="This component is used in ui:autocomplete to provide a list of options to the input component.To customize the list option behavior, use the selectListOption, listHighlight, and updateActiveOption events.">
     
     <aura:attribute name="elementsToIgnoreClicking" type="Object" description="The DOM elements to ignore when we handle clicking outside."/>
     <aura:attribute name="keyword" type="String" description="The keyword used to match list options."/>
     <aura:attribute name="theme" type="String" default="default" description="Theme to apply to this component."/>
     
-    <aura:registerEvent name="listHighlight" type="ui:listHighlight" description="The event fired when an option is highlighted."/>
-    <aura:registerEvent name="selectListOption" type="ui:selectListOption" description="The event fired when the list of options are displayed."/>
-    <aura:registerEvent name="updateActiveOption" type="ui:updateActiveOption" description="The event fired a new option is highlighted."/>
+    <aura:registerEvent name="listHighlight" type="ui:listHighlight" description="The event fired when a list option is highlighted."/>
+    <aura:registerEvent name="selectListOption" type="ui:selectListOption" description="The event fired when a list option is selected."/>
+    <aura:registerEvent name="updateActiveOption" type="ui:updateActiveOption" description="The event fired when a new option is highlighted."/>
     
     <aura:handler name="change" value="{!v.visible}" action="{!c.visibleChange}"/>
     <aura:handler name="listHighlight" action="{!c.handleListHighlight}"/>

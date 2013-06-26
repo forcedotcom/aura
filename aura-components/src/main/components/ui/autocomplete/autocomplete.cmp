@@ -27,9 +27,9 @@
     <aura:attribute name="footer" type="Aura.Component[]" description="A facet below the rendered list, for use as a list footer"/>
     
     <aura:registerEvent name="inputChange" type="ui:inputChange" description="The event fired when the input value changes."/>
-    <aura:registerEvent name="selectListOption" type="ui:selectListOption" description="The event fired when the list of options are displayed."/>
+    <aura:registerEvent name="selectListOption" type="ui:selectListOption" description="The event fired when a list option is displayed."/>
     
-    <aura:registerEvent name="matchText" type="ui:matchText" description="The event fired when a match occurs."/>
+    <aura:registerEvent name="matchText" type="ui:matchText" description="The event fired when a text match occurs."/>
     <aura:handler name="matchText" action="{!c.matchText}"/>
     
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>

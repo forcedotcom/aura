@@ -72,10 +72,19 @@
 				{!v.errorComponent}
 		    </div>
 		    
-		    <aura:set attribute="else">
-		    	{!v.body}
-		    	{!v.errorComponent}
-		    </aura:set>
+		<aura:set attribute="else">
+				<aura:if isTrue="{!v.label != null &amp;&amp; v.labelPosition == 'hidden'}">
+					<div>		    	
+						{!v.body}
+						<ui:label label="{!v.label}" class="{!v.labelClass + ' uiLabel-' + v.labelPosition}" for="{!v.domId}" labelDisplay="false"/>
+						{!v.errorComponent}
+					</div>
+				<aura:set attribute="else">
+					{!v.body}
+					{!v.errorComponent}
+			    </aura:set>
+			    </aura:if>
+		</aura:set>
 	    </aura:if>
 			 
 	</aura:set>

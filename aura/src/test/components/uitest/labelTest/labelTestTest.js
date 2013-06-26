@@ -168,5 +168,20 @@
             //check if label has display = block css property
             $A.test.assertEquals("block", $A.test.getStyle(label,'display'), "Css property for label with positon bottom should be display=block");
         }
+    },
+    
+    /**
+     * Test label with bottom position
+     * Test case for W-1728057
+     */
+    testLabelWithHiddenPosition: {
+    	test: function(component){
+    		var div = component.find("hiddenPosition").getElement();
+    		var label = div.getElementsByTagName('label')[0];
+    		var input = div.getElementsByTagName('textarea')[0];
+    		var labelId = this.getLabelIdValue(label);
+    		var inputId = this.getInputIdValue(input);
+    		$A.test.assertEquals(labelId, inputId, "Global Id for label and input in bottom positon should be the same");
+        }
     }
 })

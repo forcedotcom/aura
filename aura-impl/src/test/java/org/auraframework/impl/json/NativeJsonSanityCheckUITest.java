@@ -47,6 +47,7 @@ public class NativeJsonSanityCheckUITest extends WebDriverTestCase {
         // PRODDEBUG and PROD, both will force usage of Native Json
         open("/test/testJSRenderer.cmp", Mode.PRODDEBUG);
         WebElement outputDiv = getDriver().findElement(By.cssSelector("div.button"));
+        waitForElementPresent("Button element never appeared with JS renderer", outputDiv);
         assertEquals("Failed to render a component using JS renderer.", "testJSRenderer", outputDiv.getText());
     }
 
@@ -59,6 +60,7 @@ public class NativeJsonSanityCheckUITest extends WebDriverTestCase {
     public void testNativeJsonUsageInJSHelperDef() throws Exception {
         open("/test/testJSRendererUsingHelper.cmp", Mode.PRODDEBUG);
         WebElement outputDiv = getDriver().findElement(By.cssSelector("div[class~='button']"));
+        waitForElementPresent("Button element never appeared with JS helper", outputDiv);
         assertEquals("Failed to render a component using JS Helper.", "testJSRendererUsingJSHelper",
                 outputDiv.getText());
     }
@@ -71,6 +73,7 @@ public class NativeJsonSanityCheckUITest extends WebDriverTestCase {
     public void testNativeJsonUsageInControllerDef() throws Exception {
         open("/test/test_CompoundCntrlr.cmp", Mode.PRODDEBUG);
         final WebElement button = getDriver().findElement(By.cssSelector("div[class~='test_locator']"));
+        waitForElementPresent("Button element never appeared with JS helper", button);
         assertEquals("Something wrong with test initialization.", "Button", button.getText());
         button.click();
         WebDriverWait wait = new WebDriverWait(getDriver(), 5);

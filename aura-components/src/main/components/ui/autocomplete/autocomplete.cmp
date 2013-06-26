@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:input" support="proto">
+<aura:component extends="ui:input" support="proto" description="This component suggests a list of values from the data provider as you type in input components such as ui:inputText and ui:inputTextArea. To set the list options, use the ui:autocompleteOption component in the listOption attribute. The behaviors for a text match, input change, and option display can be customized using the matchText, inputChange, and selectListOption events respectively.">
     <aura:attribute name="dataProvider" type="Aura.Component[]" required="true" description="A list of data provider components"/>
     <aura:attribute name="inputClass" type="String" description="The css class for input component."/>
     <aura:attribute name="inputType" type="String" default="inputText" description="The type of input component. We support inputText and inputTextArea for now."/>
@@ -26,10 +26,10 @@
     <aura:attribute name="header" type="Aura.Component[]" description="A facet above the rendered list, for use as a list header"/>
     <aura:attribute name="footer" type="Aura.Component[]" description="A facet below the rendered list, for use as a list footer"/>
     
-    <aura:registerEvent name="inputChange" type="ui:inputChange"/>
-    <aura:registerEvent name="selectListOption" type="ui:selectListOption"/>
+    <aura:registerEvent name="inputChange" type="ui:inputChange" description="The event fired when the input value changes."/>
+    <aura:registerEvent name="selectListOption" type="ui:selectListOption" description="The event fired when a list option is displayed."/>
     
-    <aura:registerEvent name="matchText" type="ui:matchText"/>
+    <aura:registerEvent name="matchText" type="ui:matchText" description="The event fired when a text match occurs."/>
     <aura:handler name="matchText" action="{!c.matchText}"/>
     
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>

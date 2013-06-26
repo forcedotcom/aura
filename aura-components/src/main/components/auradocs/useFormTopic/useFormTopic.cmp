@@ -39,6 +39,10 @@
     <p>We recommend using labels with your input components. See <auradocs:topicLink topic="label">Using Labels</auradocs:topicLink> for more information.</p>
     <auradocs:info>See the list of attributes and events for <code>ui:input</code> in the <auradocs:defLink descriptor ="ui:input">ui:input</auradocs:defLink> component reference.</auradocs:info>
    
+   <h3>Autocomplete</h3>
+   <p>To provide users with a list of suggested values as they type, use the <code>ui:autocomplete</code> component. The <code>ui:inputTextForAutocomplete</code> and <code>ui:inputTextAreaForAutocomplete</code> components support the <code>ui:autocomplete</code> component. </p>
+   <auradocs:info>See the <auradocs:defLink descriptor="ui:autocomplete" defType="component">ui:autocompleteList</auradocs:defLink> component reference.</auradocs:info>
+   
     <h3>Getting Selections from a List</h3>
      <p>Use <code>ui:inputSelect</code> to create a list of options, which is a wrapper for an HTML <code>select</code> element. You can allow multiple selections by setting the <code>multiple</code> attribute to true.
     Group options using <code>ui:inputSelectOptionGroup</code>. Each option is represented by <code>ui:inputSelectOption</code>.

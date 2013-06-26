@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:input" implements="ui:inputDateComponent" extensible="true" support="BETA" description="An input field for entering a date as specified by the format attribute."> 
+<aura:component extends="ui:input" implements="ui:inputDateComponent" extensible="true" support="BETA" description="An input field for entering a date as specified by the format attribute. To display the date picker, set displayDatePicker=&quot;true&quot;."> 
     <aura:attribute name="placeholder" type="String" description="The hint for the date input format."/>
     <aura:set attribute="updateOn" value="blur"/>
         

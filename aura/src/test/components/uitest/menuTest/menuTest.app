@@ -265,4 +265,17 @@
         <ui:outputText value='&#60;/ui:menu&#62;'/>      
     </div>
 </div>
+<div style="display:inline-block;width:50%;vertical-align:top;">
+		<h2>Extending MenuList Example</h2>
+		<ui:menu aura:id="uiMenu" class="extendPositionMenu">
+			<ui:menuTriggerLink class="triggerLink" aura:id="triggerLink" label="Pick your favorite soccer club"/>
+			<uitest:extendMenuList aura:id="extendMenuList" class="extendMenuList">
+				<ui:actionMenuItem class="extendList1" aura:id="extendList1" label="Bayern München"/>
+				<ui:actionMenuItem class="extendList2" aura:id="extendList2" label="FC Barcelona" disabled="true"/>
+				<ui:actionMenuItem class="extendList3" aura:id="extendList3" label="Inter Milan"/>
+				<ui:actionMenuItem class="extendList4" aura:id="extendList4" label="Manchester United"/>
+				</uitest:extendMenuList>
+		</ui:menu> 
+</div>
+<hr/>
 </aura:application>

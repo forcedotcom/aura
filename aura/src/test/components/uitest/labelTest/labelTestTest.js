@@ -171,7 +171,7 @@
     },
     
     /**
-     * Test label with bottom position
+     * Test label with hidden position
      * Test case for W-1728057
      */
     testLabelWithHiddenPosition: {
@@ -181,7 +181,8 @@
     		var input = div.getElementsByTagName('textarea')[0];
     		var labelId = this.getLabelIdValue(label);
     		var inputId = this.getInputIdValue(input);
-    		$A.test.assertEquals(labelId, inputId, "Global Id for label and input in bottom positon should be the same");
+    		$A.test.assertEquals(labelId, inputId, "Global Id for label and textarea in hidden positon should be the same");
+    		$A.test.assertEquals("assistiveText", label.children[0].className, "Class Name for Label should be assistiveText");
         }
     }
 })

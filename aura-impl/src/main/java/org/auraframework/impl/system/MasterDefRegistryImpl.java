@@ -133,13 +133,16 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     }
 
     private final static Cache<DefDescriptor<?>, Boolean> existsCache = CacheBuilder.newBuilder()
-            .initialCapacity(DEFINITION_CACHE_SIZE).maximumSize(DEFINITION_CACHE_SIZE).recordStats().softValues().build();
+            .initialCapacity(DEFINITION_CACHE_SIZE).maximumSize(DEFINITION_CACHE_SIZE).recordStats().softValues()
+            .build();
 
     private final static Cache<DefDescriptor<?>, Optional<? extends Definition>> defsCache = CacheBuilder.newBuilder()
-            .initialCapacity(DEFINITION_CACHE_SIZE).maximumSize(DEFINITION_CACHE_SIZE).recordStats().softValues().build();
+            .initialCapacity(DEFINITION_CACHE_SIZE).maximumSize(DEFINITION_CACHE_SIZE).recordStats().softValues()
+            .build();
 
     private final static Cache<String, DependencyEntry> depsCache = CacheBuilder.newBuilder()
-            .initialCapacity(DEPENDENCY_CACHE_SIZE).maximumSize(DEPENDENCY_CACHE_SIZE).recordStats().softValues().build();
+            .initialCapacity(DEPENDENCY_CACHE_SIZE).maximumSize(DEPENDENCY_CACHE_SIZE).recordStats().softValues()
+            .build();
 
     private final static Cache<String, String> stringsCache = CacheBuilder.newBuilder()
             .initialCapacity(STRING_CACHE_SIZE).maximumSize(STRING_CACHE_SIZE).recordStats().softValues().build();
@@ -365,9 +368,8 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     /**
      * Fill a compiling def for a descriptor.
      * 
-     * This makes sure that we can get a registry for a given def, then tries to get the
-     * def from the global cache, if that fails, it retrieves from the registry, and marks
-     * the def as locally built.
+     * This makes sure that we can get a registry for a given def, then tries to get the def from the global cache, if
+     * that fails, it retrieves from the registry, and marks the def as locally built.
      * 
      * @param compiling the current compiling def (if there is one).
      * @throws QuickFixException if validateDefinition caused a quickfix.
@@ -786,12 +788,12 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     /**
      * Typesafe helper for getDef.
      * 
-     * This adds new definitions (unvalidated) to the list passed in. Definitions that were previously built
-     * are simply added to the local cache.
+     * This adds new definitions (unvalidated) to the list passed in. Definitions that were previously built are simply
+     * added to the local cache.
      * 
-     * The quick fix exception case is actually a race condition where we previously had a set of depenendencies,
-     * and something changed, making our set inconsistent. There are no guarantees that during a change all
-     * MDRs will have a correct set of definitions.
+     * The quick fix exception case is actually a race condition where we previously had a set of depenendencies, and
+     * something changed, making our set inconsistent. There are no guarantees that during a change all MDRs will have a
+     * correct set of definitions.
      * 
      * @param context The aura context for the compiling def.
      * @param descriptor the descriptor for which we need a definition.
@@ -1244,7 +1246,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                 invalidateScope(descriptor, true, false);
             }
 
-            if(descriptor.getDefType() == DefType.LAYOUTS) {
+            if (descriptor.getDefType() == DefType.LAYOUTS) {
                 invalidateScope(descriptor, true, true);
             }
         }
@@ -1259,8 +1261,8 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             boolean sameNamespace = namespace.equals(dd.getNamespace());
             boolean sameName = name.equals(dd.getName());
             boolean shouldClear = (clearNamespace && clearName) ?
-                (clearNamespace && sameNamespace) && (clearName && sameName) :
-                (clearNamespace && sameNamespace) || (clearName && sameName) ;
+                    (clearNamespace && sameNamespace) && (clearName && sameName) :
+                    (clearNamespace && sameNamespace) || (clearName && sameName);
 
             if (shouldClear) {
                 defsCache.invalidate(dd);

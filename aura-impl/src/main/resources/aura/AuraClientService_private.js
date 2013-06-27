@@ -175,7 +175,8 @@ var priv = {
             try {
                 aura.util.json.decodeString(resp["defaultHandler"])();
             } catch (e) {
-                aura.error("Error in defaultHandler for event: " + descriptor, e);
+            	//W-1728079 : verify & remove this comment when error() take two parameters in the future
+            	aura.error("Error in defaultHandler for event: " + descriptor, e);
             }
         }
     },

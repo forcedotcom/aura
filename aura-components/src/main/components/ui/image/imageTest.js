@@ -79,7 +79,8 @@
             $A.test.assertEquals('Company', imgElement.alt, "Expected to see alt text on image element.");
         }
     },
-  //Disable until 7/2, when imageController.js throws errors again
+ 
+ //Disable until 7/2, when imageController.js throws errors again
     _testInformationImageTypeWithoutAltText:{
     	exceptionsAllowedDuringInit : ["\"alt\" attribute should not be empty for informational image"],
     	attributes : {imageType:'informational'},

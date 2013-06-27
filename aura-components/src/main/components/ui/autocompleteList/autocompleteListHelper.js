@@ -232,13 +232,14 @@
     
     matchText: function(component) {
         var keyword = component.get("v.keyword");
+        var propertyToMatch = component.get("v.propertyToMatch");
         var items = component.get("v.items");
         var regex;
         try {
             regex = new RegExp(keyword, "i");
             for (var j = 0; j < items.length; j++) {
                 items[j].keyword = keyword;
-                var label = items[j].label;
+                var label = items[j][propertyToMatch];
                 var searchResult = regex.exec(label);
                 if (searchResult && searchResult[0].length > 0) { // Has a match
                     items[j].visible = true;
@@ -253,10 +254,7 @@
             }
         }
         component.setValue("v.items", items);
-        var visible = component.get("v.visible");
-        if (visible === true) {
-            this.toggleListVisibility(component, items);
-        }
+        this.toggleListVisibility(component, items);
     },
     
     setFocusToNextItem: function(component, event) {

@@ -23,7 +23,7 @@
 		<aura:attribute name="height" type="Integer" description="Height of the carousel in pixels" />
 		
 		<aura:attribute name="pageIndicatorPosition" type="String" default="top" description="Position of the page indicator. Acceptable values are 'top' and 'bottom'. " />
-		<aura:attribute name="continuousFlow" type="Boolean" default="false" description="Determines whether to flow continuously between pages or not." />		
+		<aura:attribute name="continuousFlow" type="Boolean" default="false" description="Set to true if the carousel pages should flow continuously. The default is false." />		
 		<aura:attribute name="defaultPage" type="Integer" description="Default page to display. Setting this will override the 'isDefault' attribute in the ui:carouselPage component." />
 		
 		<aura:attribute name="pageModels" type="Object[]" description="The model used to create a carousel page." />

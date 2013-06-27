@@ -76,7 +76,7 @@ FunctionCallValue.prototype.getValue = function(vp){
         ret = valueFactory.create(result, this.def, this.cmp);
     }
 
-    if (dirty) {
+    if (dirty && ret.makeDirty) {
         ret.makeDirty();
     }
 

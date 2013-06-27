@@ -47,8 +47,8 @@
         <li>On the command line, navigate to the directory where you want to keep the Aura source code.</li>
         <li>Run the following commands to clone the source with <code>git</code> and build it with Maven:<br/>
         <auradocs:codeblock>
-git clone git@github.com:forcedotcom/lumen-beta.git
-cd lumen-beta
+git clone git@github.com:forcedotcom/aura.git
+cd aura
 mvn install
         </auradocs:codeblock>
         </li>

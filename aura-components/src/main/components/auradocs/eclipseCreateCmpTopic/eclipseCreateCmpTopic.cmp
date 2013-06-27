@@ -50,7 +50,7 @@
                 <li> Save the file.</li>
 
             <li>View the component in a browser by navigating to
-            <code>http://localhost:8080/helloWorldEclipse/hello.cmp</code>.</li>
+            <code>http://localhost:8080/helloWorldEclipse/hello.cmp</code>. If the component is not displayed, make sure that the web server is running.</li>
             <p><ui:image src="/auraFW/resources/aura/images/eclipseBrowseComponent.png" alt="hello.cmp" /></p>
             </ol>
 

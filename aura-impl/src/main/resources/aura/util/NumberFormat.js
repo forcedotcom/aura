@@ -63,7 +63,7 @@ function NumberFormat(format, symbols) {
         var c = posPattern.charAt(i);
         switch (parsePhase) {
         case 0:
-            if (c === "#" || c === NumberFormat.ZERO) {
+            if (c === "#" || c === NumberFormat.ZERO || c === "." || c === ",") {
                 // on to the pattern phase
                 parsePhase = 1;
                 prefixEnd = i;
@@ -127,6 +127,9 @@ function NumberFormat(format, symbols) {
         }
     }
 
+    if (group === 0) {
+        this.parseError("grouping cannot be 0");
+    }
     this.groupingDigits = group;
     this.minFractionDigits = decimal ? zeros : 0;
     this.maxFractionDigits = this.minFractionDigits + rightNumbers;
@@ -161,7 +164,7 @@ function NumberFormat(format, symbols) {
 NumberFormat.ZERO = "0";
 
 NumberFormat.prototype.parseError = function(s) {
-    throw new Error("Invalid patter: " + this.originalFormat + "\n" + s);
+    throw new Error("Invalid pattern: " + this.originalFormat + "\n" + s);
 };
 
 /* 

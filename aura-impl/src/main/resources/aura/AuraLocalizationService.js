@@ -15,7 +15,8 @@
  */
 /*jslint sub: true */
 /**
- * @namespace The Aura Localization Service, accessible using $A.localizationService. Manages localization of date and time using Moment.js and WallTime.js.  
+ * @namespace The Aura Localization service Service, accessible using $A.localizationService. Provides utility methods
+ * for localizing data or getting formatters for numbers, currencies, dates, etc.
  * @constructor
  */
 var AuraLocalizationService = function AuraLocalizationService() {
@@ -28,32 +29,36 @@ var AuraLocalizationService = function AuraLocalizationService() {
         },
 
         formatNumber : function(number) {
-            return this.getNumberFormat().format(number);
-        },
-        
-        formatPercent : function(number) {
-            return this.getPercentFormat().format(number);
-        },
-        
-        formatCurrency : function(number) {
-            return this.getCurrencyFormat().format(number);
+            return this.getDefaultNumberFormat().format(number);
         },
 
-        getNumberFormat : function() {
+        formatPercent : function(number) {
+            return this.getDefaultPercentFormat().format(number);
+        },
+
+        formatCurrency : function(number) {
+            return this.getDefaultCurrencyFormat().format(number);
+        },
+
+        getNumberFormat : function(format, symbols) {
+            return new NumberFormat(format, symbols);
+        },
+
+        getDefaultNumberFormat : function() {
             if (!numberFormat) {
                 numberFormat = new NumberFormat($A.get("$Locale.numberFormat"));
             }
             return numberFormat;
         },
 
-        getPercentFormat : function() {
+        getDefaultPercentFormat : function() {
             if (!percentFormat) {
                 percentFormat = new NumberFormat($A.get("$Locale.percentFormat"));
             }
             return percentFormat;
         },
 
-        getCurrencyFormat : function() {
+        getDefaultCurrencyFormat : function() {
             if (!currencyFormat) {
                 currencyFormat = new NumberFormat($A.get("$Locale.currencyFormat"));
             }
@@ -391,7 +396,7 @@ var AuraLocalizationService = function AuraLocalizationService() {
         isAfter : function(date1, date2, unit) {
             return moment(date1)["isAfter"](date2, unit);
         },
-        
+
         /**
          * Checks if date1 is before date2.
          * @param {String|Number|Date} date1 A date format that the JavaScript Date object can parse
@@ -432,8 +437,8 @@ var AuraLocalizationService = function AuraLocalizationService() {
         parseDateTime : function(dateTimeString, targetFormat, locale) {
             if (!dateTimeString) {
                 return null;
-            }
-            
+        }
+
             var mDate = moment(dateTimeString, localizationService.getNormalizedFormat(targetFormat), localizationService.getNormalizedLangLocale(locale));
             if (mDate["isValid"]()) {
                 return mDate["toDate"]();

@@ -15,6 +15,9 @@
  */
 /*jslint sub: true */
 exp(localizationService,
+    "formatNumber", localizationService.formatNumber,
+    "getNumberFormat", localizationService.getNumberFormat,
+    "getDefaultNumberFormat", localizationService.getDefaultNumberFormat,
   "displayDuration", localizationService.displayDuration,
   "displayDurationInDays", localizationService.displayDurationInDays,
   "displayDurationInHours", localizationService.displayDurationInHours,

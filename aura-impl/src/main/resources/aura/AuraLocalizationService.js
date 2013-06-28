@@ -19,13 +19,47 @@
  * @constructor
  */
 var AuraLocalizationService = function AuraLocalizationService() {
+    var numberFormat, percentFormat, currencyFormat;
     // moment.js and walltime-js must be loaded before we can use date/time related APIs
     var localizationService = {
         cache : {
             format : {},
             langLocale : {}
         },
+
+        formatNumber : function(number) {
+            return this.getNumberFormat().format(number);
+        },
         
+        formatPercent : function(number) {
+            return this.getPercentFormat().format(number);
+        },
+        
+        formatCurrency : function(number) {
+            return this.getCurrencyFormat().format(number);
+        },
+
+        getNumberFormat : function() {
+            if (!numberFormat) {
+                numberFormat = new NumberFormat($A.get("$Locale.numberFormat"));
+            }
+            return numberFormat;
+        },
+
+        getPercentFormat : function() {
+            if (!percentFormat) {
+                percentFormat = new NumberFormat($A.get("$Locale.percentFormat"));
+            }
+            return percentFormat;
+        },
+
+        getCurrencyFormat : function() {
+            if (!currencyFormat) {
+                currencyFormat = new NumberFormat($A.get("$Locale.currencyFormat"));
+            }
+            return ccurrencyFormatf;
+        },
+
         /**
          * Displays a length of time.
          * @param {Duration} d The duration object returned by localizationService.duration
@@ -37,7 +71,7 @@ var AuraLocalizationService = function AuraLocalizationService() {
         displayDuration : function(d, noSuffix) {
             return d["humanize"](noSuffix);
         },
-        
+
         /**
          * Displays a length of time in days.
          * @param {Duration} d The duration object returned by localizationService.duration
@@ -48,7 +82,7 @@ var AuraLocalizationService = function AuraLocalizationService() {
         displayDurationInDays : function(d) {
             return d["asDays"]();
         },
-        
+
         /**
          * Displays a length of time in hours.
          * @param {Duration} d The duration object returned by localizationService.duration
@@ -59,7 +93,7 @@ var AuraLocalizationService = function AuraLocalizationService() {
         displayDurationInHours : function(d) {
             return d["asHours"]();
         },
-        
+
         /**
          * Displays a length of time in milliseconds.
          * @param {Duration} d The duration object returned by localizationService.duration
@@ -70,7 +104,7 @@ var AuraLocalizationService = function AuraLocalizationService() {
         displayDurationInMilliseconds : function(d) {
             return d["asMilliseconds"]();
         },
-        
+
         /**
          * Displays a length of time in minutes.
          * @param {Duration} d The duration object returned by localizationService.duration
@@ -81,7 +115,7 @@ var AuraLocalizationService = function AuraLocalizationService() {
         displayDurationInMinutes : function(d) {
             return d["asMinutes"]();
         },
-        
+
         /**
          * Displays a length of time in months.
          * @param {Duration} d The duration object returned by localizationService.duration
@@ -277,7 +311,7 @@ var AuraLocalizationService = function AuraLocalizationService() {
         formatCurrency : function(amount, formatter) {
 
         },
-        
+
         /**
          * Gets the number of hours in a duration.
          * @param {Duration} d The duration object returned by localizationService.duration
@@ -513,7 +547,7 @@ var AuraLocalizationService = function AuraLocalizationService() {
             }
             return mDate["format"](localizationService.getNormalizedFormat(format));
         },
-        
+
         /**
          * Normalize a Java format string to make it compatible with moment.js
          *
@@ -529,7 +563,7 @@ var AuraLocalizationService = function AuraLocalizationService() {
             }
             return format;
         },
-        
+
         /**
          * Normalize the input Java locale string to moment.js compatible one.
          *
@@ -556,7 +590,7 @@ var AuraLocalizationService = function AuraLocalizationService() {
                 if (!$A.util.isEmpty(langLocale)) {
                     lang.push(langLocale.toLowerCase());
                 }
-        
+
                 var ret = lang[0];
                 if (lang[1]) {
                     var langAndCountry = lang[0] + "-" + lang[1];
@@ -571,7 +605,7 @@ var AuraLocalizationService = function AuraLocalizationService() {
             }
             return localizationService.cache.langLocale[langLocale];
         },
-        
+
         /**
          * retrieve timezone info from server.
          *
@@ -600,7 +634,7 @@ var AuraLocalizationService = function AuraLocalizationService() {
             });
             $A.enqueueAction(a);
         },
-        
+
        /** 
         * @private
         */
@@ -614,14 +648,14 @@ var AuraLocalizationService = function AuraLocalizationService() {
                 timezone = $A.getGlobalValueProviders().get("$Locale.timezone");
                 if (timezone == "GMT" || timezone == "UTC") {
                     return d;
-                }
+        }
                 try {
                     ret = WallTime["WallTimeToUTC"](timezone, d);
                 } catch (ee) {}
             }
             return ret;
         },
-        
+
        /** 
         * @private
         */

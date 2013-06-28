@@ -48,7 +48,7 @@ public class LocaleValueProvider implements GlobalValueProvider {
     public static String TIME_FORMAT = "timeformat";
     public static String TIME_ZONE = "timezone";
     public static String TIME_ZONE_FILE_NAME = "timezoneFileName";
-    public static String CURRENCY_CODE = "currency_code";
+    public static String CURRENCY_CODE = "currencyCode";
 
     // symbols
     public static String DECIMAL = "decimal";

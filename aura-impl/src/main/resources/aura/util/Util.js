@@ -31,6 +31,7 @@ $A.ns.Util = function() {
     this.style = new Style();
     this["style"] = this.style;
     this["Bitset"] = Bitset;
+    this["NumberFormat"] = NumberFormat;
     this.objToString = Object.prototype.toString;
     this.trashedComponentQueue = [];
     this.dataAttributeCache = {};
@@ -111,6 +112,15 @@ $A.ns.Util.prototype.isString = function(obj){
  */
 $A.ns.Util.prototype.isNumber = function(obj){
     return typeof obj === 'number';
+};
+
+/**
+ * Checks if the object is a finite number (not NaN or Infinity or -Infinity)
+ * @param {Object} obj The object to check for.
+ * @returns {Boolean} True if the object is a finite number, or false otherwise.
+ */
+$A.ns.Util.prototype.isFiniteNumber = function(obj){
+    return this.isNumber(obj) && isFinite(obj);
 };
 
 /**

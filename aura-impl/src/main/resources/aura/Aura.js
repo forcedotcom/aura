@@ -57,6 +57,7 @@ var clientService;
 // #include aura.util.Transport
 // #include aura.util.Style
 // #include aura.util.Bitset
+//#include aura.util.NumberFormat
 // #include aura.context.AuraContext
 // #include aura.value.BaseValue
 // #include aura.value.AttributeValue

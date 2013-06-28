@@ -28,6 +28,9 @@ import static org.auraframework.impl.util.BrowserConsts.PLATFORM_MAC_68K;
 import static org.auraframework.impl.util.BrowserConsts.PLATFORM_MAC_OSX;
 import static org.auraframework.impl.util.BrowserConsts.PLATFORM_MAC_PPC;
 import static org.auraframework.impl.util.BrowserConsts.PLATFORM_WIN;
+import static org.auraframework.impl.util.BrowserConsts.PLATFORM_WINPH_7;
+import static org.auraframework.impl.util.BrowserConsts.PLATFORM_WINPH_7_5;
+import static org.auraframework.impl.util.BrowserConsts.PLATFORM_WINPH_8;
 import static org.auraframework.impl.util.BrowserConsts.PLATFORM_WIN_MAX;
 import static org.auraframework.impl.util.BrowserConsts.PLATFORM_WIN_NT;
 import static org.auraframework.impl.util.UserAgent.ANDROID_WEBKIT;
@@ -41,7 +44,7 @@ public class BrowserInfo {
     /**
      * Form factors for browser client devices.
      * 
-     * @see Browser#getFormFactor()
+     * @see BrowserInfo#getFormFactor()
      */
     public enum FormFactor {
         DESKTOP, TABLET, PHONE
@@ -56,6 +59,7 @@ public class BrowserInfo {
     private int platformType;
     private boolean isIPad;
     private boolean isIPhone;
+    private boolean isWindowsPhone;
 
     public static final String TOUCH_CONTAINER = "SalesforceTouchContainer";
 
@@ -91,6 +95,10 @@ public class BrowserInfo {
         return isAndroid;
     }
 
+    public boolean isWindowsPhone() {
+        return isWindowsPhone;
+    }
+
     public String getFormFactor() {
         return formFactor;
     }
@@ -102,6 +110,7 @@ public class BrowserInfo {
         isAndroid = false;
         isIPad = false;
         isIPhone = false;
+        isWindowsPhone = false;
         formFactor = "";
         platformType = 0;
         browserType = 0;
@@ -118,16 +127,17 @@ public class BrowserInfo {
         isAndroid = isPlatformAndroid();
         isIPad = isPlatformIPad();
         isIPhone = isPlatformIPhone();
+        isWindowsPhone = isPlatformWindowsPhone();
         formFactor = getHardwareFormFactor().toString();
         ;
     }
 
     /**
-     * See if this user agent String is for a known mobile client. This is a
-     * comprehensive check for hundreds of possible mobile clients.
+     * See if this user agent String is for a known mobile client. This is a comprehensive check for hundreds of
+     * possible mobile clients.
      * 
-     * @see Browser#isBrowserMobile() if a quicker test of all supported and
-     *      many common unsupported clients is sufficient
+     * @see BrowserInfo#isBrowserMobile() if a quicker test of all supported and many common unsupported clients is
+     *      sufficient
      * 
      * @param userAgent the string to test
      * @return true if mobile
@@ -155,14 +165,11 @@ public class BrowserInfo {
     }
 
     /*
-     * Browser checks The pre-182 checks (isBrowserXXX()) match against both the
-     * old 4 digit browserTypes and the new 8 digit ones too. The parseBrowser()
-     * method will always return the new type from 182 onward, but 4 digit ones
-     * may be in the DB or a cookie, or be hard-coded in various places. The
-     * 182+ checks (isBrowser(XXX)) will check and match against only new 8
-     * digit browserTypes. Please use these for any new functionality, as they
-     * require much less upkeep and rework as new browsers come out and they
-     * keep the API list shorter.
+     * Browser checks The pre-182 checks (isBrowserXXX()) match against both the old 4 digit browserTypes and the new 8
+     * digit ones too. The parseBrowser() method will always return the new type from 182 onward, but 4 digit ones may
+     * be in the DB or a cookie, or be hard-coded in various places. The 182+ checks (isBrowser(XXX)) will check and
+     * match against only new 8 digit browserTypes. Please use these for any new functionality, as they require much
+     * less upkeep and rework as new browsers come out and they keep the API list shorter.
      */
 
     /**
@@ -193,7 +200,7 @@ public class BrowserInfo {
      * Check does this browser type match the given UserAgent and version.
      * 
      * For example this would check if you are using Firefox 12:
-     * <code>new Browser(useragentstring).isBrowser(UserAgent.FIREFOX, 12)</code>
+     * <code>new BrowserInfo(useragentstring).isBrowser(UserAgent.FIREFOX, 12)</code>
      * 
      * @param agent the agent to check against this browser type
      * @param majorVersion the version to check against this browser type
@@ -208,12 +215,11 @@ public class BrowserInfo {
      * Check does this browser type match the given UserAgent and version.
      * 
      * For example this would check if you are using Firefox 8 or higher:
-     * <code>new Browser(useragentstring).isBrowser(UserAgent.FIREFOX, 8, true)</code>
+     * <code>new BrowserInfo(useragentstring).isBrowser(UserAgent.FIREFOX, 8, true)</code>
      * 
      * @param agent the agent to check against this browser type
      * @param majorVersion the version to check against this browser type
-     * @param atLeast whether the check should be equal (false), or equal or
-     *            greater than (true)
+     * @param atLeast whether the check should be equal (false), or equal or greater than (true)
      * @return true if a match for agent and version
      */
     public boolean isBrowser(UserAgent agent, int majorVersion, boolean atLeast) {
@@ -224,11 +230,11 @@ public class BrowserInfo {
     }
 
     /**
-     * Determines if this browser type is a match for the UserAgent, and if the
-     * browser version refers to a version in the given range.
+     * Determines if this browser type is a match for the UserAgent, and if the browser version refers to a version in
+     * the given range.
      * 
      * For example this would check if you are using Firefox 10, 11, or 12:
-     * <code>new Browser(useragentstring).isBrowser(UserAgent.FIREFOX, 10, 12)</code>
+     * <code>new BrowserInfo(useragentstring).isBrowser(UserAgent.FIREFOX, 10, 12)</code>
      * 
      * @param agent the agent to check against this browser type
      * @param int minVer the minimum version to compare against
@@ -244,17 +250,14 @@ public class BrowserInfo {
     }
 
     /**
-     * This checks if we want to treat the browser as a Webkit browser. This
-     * mostly maps to &quot;Does it have 'AppleWebkit' in the user agent?&quot;
-     * but there can be exceptions to that to form the correct behavior for
+     * This checks if we want to treat the browser as a Webkit browser. This mostly maps to &quot;Does it have
+     * 'AppleWebkit' in the user agent?&quot; but there can be exceptions to that to form the correct behavior for
      * supported clients.
      * 
-     * Before 182 this returned true for Safari, Chrome, and Chromeframe and
-     * some other common desktop and mobile Webkit clients, but false for many
-     * Android Webkit mobile browsers.
+     * Before 182 this returned true for Safari, Chrome, and Chromeframe and some other common desktop and mobile Webkit
+     * clients, but false for many Android Webkit mobile browsers.
      * 
-     * As of 182 Android Webkit browsers will return true, just like IOS Webkit
-     * ones.
+     * As of 182 Android Webkit browsers will return true, just like IOS Webkit ones.
      * 
      * @return true if the browser is Webkit, false otherwise
      */
@@ -266,15 +269,12 @@ public class BrowserInfo {
     /* Platform checks */
 
     /*
-     * Please use caution when adding new platform methods - each user agent can
-     * only map to 1 platform currently. This causes problems with our use
-     * patterns. Some examples: If Linux, Mac and Windows are platforms, why not
-     * IOS? Because we need to track iPad and iPhone separately. What about iPad
-     * Mini? Is that a new platform or the same as iPad? What about iPod Touch?
-     * Same OS, screen, events and browser as iPhone, but different platform? So
-     * Android is a Platform...what about the difference between Android phones
-     * and tablets? What about Netbooks that have notebook- like screens and
-     * capabilities but run Android?
+     * Please use caution when adding new platform methods - each user agent can only map to 1 platform currently. This
+     * causes problems with our use patterns. Some examples: If Linux, Mac and Windows are platforms, why not IOS?
+     * Because we need to track iPad and iPhone separately. What about iPad Mini? Is that a new platform or the same as
+     * iPad? What about iPod Touch? Same OS, screen, events and browser as iPhone, but different platform? So Android is
+     * a Platform...what about the difference between Android phones and tablets? What about Netbooks that have
+     * notebook- like screens and capabilities but run Android?
      */
 
     /**
@@ -283,8 +283,8 @@ public class BrowserInfo {
      * @return true if a Mac, false otherwise
      */
     public boolean isPlatformMac(int platformType) {
-        return (platformType == PLATFORM_MAC_OSX || platformType == PLATFORM_MAC_PPC
-                || platformType == PLATFORM_MAC_68K || platformType == PLATFORM_MAC);
+        return platformType == PLATFORM_MAC_OSX || platformType == PLATFORM_MAC_PPC
+                || platformType == PLATFORM_MAC_68K || platformType == PLATFORM_MAC;
     }
 
     /**
@@ -303,6 +303,12 @@ public class BrowserInfo {
      */
     public boolean isPlatformIPad() {
         return this.platformType == PLATFORM_IPAD;
+    }
+
+    public boolean isPlatformWindowsPhone() {
+        return this.platformType == PLATFORM_WINPH_7
+                || this.platformType == PLATFORM_WINPH_7_5
+                || this.platformType == PLATFORM_WINPH_8;
     }
 
     /**
@@ -327,8 +333,7 @@ public class BrowserInfo {
     }
 
     /**
-     * Checks if this is an iPhone, iPad, Android or other mobile client running
-     * Webkit.
+     * Checks if this is an iPhone, iPad, Android or other mobile client running Webkit.
      * 
      * @return true if a match, false otherwise
      */
@@ -372,25 +377,19 @@ public class BrowserInfo {
     /* Mobile related checks */
 
     /**
-     * Identifies if a browser is advertising itself as being mobile in its user
-     * agent String. This will return true if keywords such as mobile, phone,
-     * tablet, or touch are present, of it the browser is one that is only
-     * available as a mobile version, such as Blackberry.
+     * Identifies if a browser is advertising itself as being mobile in its user agent String. This will return true if
+     * keywords such as mobile, phone, tablet, or touch are present, of it the browser is one that is only available as
+     * a mobile version, such as Blackberry.
      * 
-     * This will detect all supported mobile clients and many common unsupported
-     * ones.
+     * This will detect all supported mobile clients and many common unsupported ones.
      * 
-     * This does not necessarily indicate that the user should get our mobile or
-     * Touch UI, as some mobile browsers are very limited in compatibility or
-     * resolution so they should get nothing or plain text; and others are
-     * netbooks or tablets with keyboards that may as well be laptops for all
-     * they can do.
+     * This does not necessarily indicate that the user should get our mobile or Touch UI, as some mobile browsers are
+     * very limited in compatibility or resolution so they should get nothing or plain text; and others are netbooks or
+     * tablets with keyboards that may as well be laptops for all they can do.
      * 
-     * @see Browser#isMobileClient(String) for a more comprehensive but slower
-     *      check of known user agents
+     * @see BrowserInfo#isMobileClient(String) for a more comprehensive but slower check of known user agents
      * 
-     * @return true if we think this is a mobile browser, false if desktop
-     *         browser
+     * @return true if we think this is a mobile browser, false if desktop browser
      */
     public boolean isBrowserMobile() {
         // in the 182+ code, it's a simple check
@@ -400,69 +399,65 @@ public class BrowserInfo {
             return (this.browserType % 10 != 0);
         } else {
             // pre 182 we itemize across known mobile stuff
-            return (isPlatformIPhone() || isPlatformIPad() || isPlatformAndroid() || isBrowser(UserAgent.OTHER_MOBILE));
+            return isPlatformIPhone() || isPlatformIPad() || isPlatformAndroid() || isPlatformWindowsPhone()
+                    || isBrowser(UserAgent.OTHER_MOBILE);
         }
     }
 
     /**
-     * See if this Browser is a known mobile client. This is a comprehensive
-     * check for hundreds of possible mobile clients.
+     * See if this Browser is a known mobile client. This is a comprehensive check for hundreds of possible mobile
+     * clients.
      * 
-     * @see Browser#isBrowserMobile() if a quicker test of all supported and
-     *      many common unsupported clients is sufficient
+     * @see BrowserInfo#isBrowserMobile() if a quicker test of all supported and many common unsupported clients is
+     *      sufficient
      * 
      * @return true if mobile
      */
     public boolean isMobileClient() {
-        // TODO: see if this can be replaced by Browser.isBrowserMobile()
+        // TODO: see if this can be replaced by BrowserInfo.isBrowserMobile()
         // It is easier to maintain with no third party dependencies and ~7x
         // faster.
         return isMobileClient(userAgentString);
     }
 
     /**
-     * Tries to infer from the user agent string if the client is a smart phone
-     * (iphone, droid, blackberry, et al). This can return true for some tablets
-     * and other mobile devices.
+     * Tries to infer from the user agent string if the client is a smart phone (iphone, droid, blackberry, et al). This
+     * can return true for some tablets and other mobile devices.
      * 
      * @return true if it is a phone, false if anything else
      */
     public boolean isSmartPhoneClient() {
         return this.isPlatformIPhone() || this.isPlatformMobileWebkit() || this.isPlatformAndroid()
-                || this.isPlatformAndroid22OrGreater() || this.isBrowser(UserAgent.OTHER_MOBILE);
+                || this.isPlatformAndroid22OrGreater() || this.isPlatformWindowsPhone()
+                || this.isBrowser(UserAgent.OTHER_MOBILE);
     }
 
     /**
      * Infers from the user agent string if the client is a tablet.
      * 
-     * Note: As of 182 this is actually &quot;Is it an iPad or an Android 2.2 or
-     * higher tablet?&quot;
+     * Note: As of 182 this is actually &quot;Is it an iPad or an Android 2.2 or higher tablet?&quot;
      * 
-     * This definition will likely expand as new tablets with other operating
-     * systems are released.
+     * This definition will likely expand as new tablets with other operating systems are released.
      * 
      * @return true if it is, false if anything else
      */
     public boolean isTabletClient() {
         /*
-         * TODO: What about these? - Windows RT (not detected) - Kindle
-         * (rejected because it is a mobile clients) - Opera Mini/Mobile on
-         * Android (rejected because they are mobile clients)
+         * TODO: What about these? - Windows RT (not detected) - Kindle (rejected because it is a mobile clients) -
+         * Opera Mini/Mobile on Android (rejected because they are mobile clients)
          */
         boolean isAndroidTablet = this.isPlatformAndroid22OrGreater() && !this.isMobileClient();
         return this.isPlatformIPad() || isAndroidTablet;
     }
 
     /**
-     * Returns the {@link FormFactor} for this instance, usually based on the
-     * user agent String passed in to the constructor of this Browser.
+     * Returns the {@link FormFactor} for this instance, usually based on the user agent String passed in to the
+     * constructor of this Browser.
      * 
-     * Be cautious with assumptions based on the return value. For example: -
-     * Phones may not always have lower resolutions than tablets, - Tablets may
-     * sometimes have cellular capabilities, - Phones may sometimes have
-     * cellular disabled, - Some desktops and laptops now come with touch
-     * screens - Windows may some day be the most popular tablet OS. - Some
-     * tablets can dock and become desktops
+     * Be cautious with assumptions based on the return value. For example: - Phones may not always have lower
+     * resolutions than tablets, - Tablets may sometimes have cellular capabilities, - Phones may sometimes have
+     * cellular disabled, - Some desktops and laptops now come with touch screens - Windows may some day be the most
+     * popular tablet OS. - Some tablets can dock and become desktops
      * 
      * @return a FormFactor value
      */

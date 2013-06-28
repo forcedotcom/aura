@@ -115,21 +115,17 @@ public class BrowserUserAgent {
     public static final String HEADER = "user-agent";
 
     /**
-     * User agent strings have way too many possible characters. This is a white
-     * list of all desired characters - basically everything printable except
-     * for the backslash.
+     * User agent strings have way too many possible characters. This is a white list of all desired characters -
+     * basically everything printable except for the backslash.
      */
     public static final Pattern USER_AGENT_WHITELIST = Pattern.compile("[\\x20-\\x7E&&[^\\x5C]]*");
 
     /*
-     * These regular expressions to detect Mobile Browsers based on the
-     * User-Agent header were found at http://detectmobilebrowser.com/ we should
-     * probably refresh them occasionally (last updated May 8, 2012) Also
-     * updated to recognize iPad's which for some reason were not part of the
-     * current version. This is apparently because that site is ONLY for mobile
-     * phones and mini tablets not larger tablets. It seems a fuzzy line though.
-     * For example Kindle e-ink is identified as 'mobile' but Kindle Fire is
-     * not.
+     * These regular expressions to detect Mobile Browsers based on the User-Agent header were found at
+     * http://detectmobilebrowser.com/ we should probably refresh them occasionally (last updated May 8, 2012) Also
+     * updated to recognize iPad's which for some reason were not part of the current version. This is apparently
+     * because that site is ONLY for mobile phones and mini tablets not larger tablets. It seems a fuzzy line though.
+     * For example Kindle e-ink is identified as 'mobile' but Kindle Fire is not.
      */
     private static final String mobileRegexp1 = ".*(android.+mobile|apexmobile|avantgo|bada\\/|blackberry|blazer|compal|elaine|"
             + "fennec|hiptop|iemobile|ip(hone|od|ad)|iris|kindle|lge |maemo|midp|mmp|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\\/|"
@@ -165,8 +161,8 @@ public class BrowserUserAgent {
     /**
      * Parse user agent strings to determine browser.
      * 
-     * Only supported browsers are expected to be correctly detected. Most
-     * unsupported browsers will return <code>BROWSER_UNKNOWN</code>.
+     * Only supported browsers are expected to be correctly detected. Most unsupported browsers will return
+     * <code>BROWSER_UNKNOWN</code>.
      * 
      * @param userAgent the user agent String to parse
      * 
@@ -209,8 +205,8 @@ public class BrowserUserAgent {
     /**
      * Parse user agent string to determine platform (OS).
      * 
-     * Only supported platforms are expected to be correctly detected. Most
-     * unsupported platforms will return <code>PLATFORM_UNKNOWN</code>.
+     * Only supported platforms are expected to be correctly detected. Most unsupported platforms will return
+     * <code>PLATFORM_UNKNOWN</code>.
      * 
      * @param userAgent the user agent String to parse
      * 
@@ -226,12 +222,8 @@ public class BrowserUserAgent {
             return PLATFORM_RIM;
         } else if (ua.contains(PALM) || ua.contains(BLAZER)) {
             return PLATFORM_PALM;
-        } else if (ua.contains(SYMBIAN) || ua.contains(EPOC) || ua.contains(NOKIA)) { // epoc
-                                                                                      // is
-                                                                                      // old
-                                                                                      // name
-                                                                                      // for
-                                                                                      // symbian
+        } else if (ua.contains(SYMBIAN) || ua.contains(EPOC) || (ua.contains(NOKIA) && !ua.contains(WIN))) {
+            // epoc is old name for symbian
             return PLATFORM_SYMBIAN;
         } else if (ua.contains(ANDROID)) {
             try {
@@ -322,8 +314,7 @@ public class BrowserUserAgent {
     }
 
     /**
-     * Sanitize a given user agent String, removing potentially dangerous or
-     * unusable characters.
+     * Sanitize a given user agent String, removing potentially dangerous or unusable characters.
      * 
      * @param userAgent
      * 

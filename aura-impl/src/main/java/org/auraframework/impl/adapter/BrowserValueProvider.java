@@ -44,13 +44,14 @@ public class BrowserValueProvider implements GlobalValueProvider {
     public static final String IS_IPHONE = "isIPhone";
     public static final String IS_IPAD = "isIPad";
     public static final String IS_IOS = "isIOS";
+    public static final String IS_WINDOWS_PHONE = "isWindowsPhone";
 
     private Map<String, Object> browserDetails;
 
     protected Map<String, Object> parse() {
         AuraContext context = Aura.getContextService().getCurrentContext();
         Map<String, Object> m = Maps.newHashMapWithExpectedSize(32);
-        String ua = context != null ? context.getClient().getUserAgent() : null; 
+        String ua = context != null ? context.getClient().getUserAgent() : null;
         BrowserInfo b = new BrowserInfo(ua);
         m.put(IS_TABLET, b.isTablet());
         m.put(IS_PHONE, b.isPhone());
@@ -59,6 +60,7 @@ public class BrowserValueProvider implements GlobalValueProvider {
         m.put(IS_IPHONE, b.isIPhone());
         m.put(IS_IPAD, b.isIPad());
         m.put(IS_IOS, b.isIOS());
+        m.put(IS_WINDOWS_PHONE, b.isWindowsPhone());
 
         return m;
     }

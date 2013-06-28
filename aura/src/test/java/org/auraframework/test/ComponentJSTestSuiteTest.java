@@ -173,7 +173,8 @@ public class ComponentJSTestSuiteTest extends TestSuite {
     public static class ComponentTestCase extends WebDriverTestCase {
         private ComponentTestCase(ComponentTestSuite suite, TestCaseDef caseDef) {
             super("testRun");
-            this.name = String.format("%s$%s", suite.descriptor.getQualifiedName(), caseDef.getName());
+            this.name = String.format("%s$%s", suite.descriptor.getQualifiedName().replaceAll("://", "_"),
+                    caseDef.getName());
             this.suite = suite;
             this.caseDef = caseDef;
             for (String browser : caseDef.getBrowsers()) {

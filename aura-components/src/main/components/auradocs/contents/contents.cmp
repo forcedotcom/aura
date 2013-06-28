@@ -146,6 +146,7 @@
                 </auradocs:contentsNode>
                 <auradocs:contentsNode text="JavaScript Cookbook" >
                     <auradocs:contentsNode text="Introduction" id="jsCookbook" />
+                    <auradocs:contentsNode text="Dynamically Creating Components (Asynchronous)" id="dynamicCmpAsync" />
                     <auradocs:contentsNode text="Dynamically Creating Components" id="dynamicCmp" />
                     <auradocs:contentsNode text="Finding Components by ID" id="findById" />
                     <auradocs:contentsNode text="Dynamically Showing or Hiding Markup" id="hideMarkup" />

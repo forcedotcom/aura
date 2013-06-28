@@ -187,7 +187,12 @@ public class InputTextUITest extends WebDriverTestCase {
 
         assertModelValue(value);
         input.click();
-        value = assertModelValue(value + eventName);
+        String expected = value + eventName;
+        // When we click the input on Firefox the cursor is at the beginning of the text.
+        if (checkBrowserType("FIREFOX")) {
+            expected = eventName + value;
+        }
+        assertModelValue(expected);
         assertDomEventSet();
     }
 

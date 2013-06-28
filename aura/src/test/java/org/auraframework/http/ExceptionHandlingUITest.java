@@ -25,6 +25,7 @@ import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.WebDriverTestCase;
+import org.auraframework.test.WebDriverUtil.BrowserType;
 import org.auraframework.test.annotation.ThreadHostileTest;
 import org.auraframework.test.annotation.UnAdaptableTest;
 import org.openqa.selenium.By;
@@ -34,8 +35,7 @@ import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 /**
- * What should you see when something goes wrong. {@link ThreadHostile} due to
- * setProdConfig and friends.
+ * What should you see when something goes wrong. {@link ThreadHostile} due to setProdConfig and friends.
  * 
  * @since 0.0.262
  */
@@ -49,6 +49,7 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
     private static final String baseAppTag = "<aura:application %s securityProvider='java://org.auraframework.components.security.SecurityProviderAlwaysAllows'>%s</aura:application>";
 
     private static final String errorBoxPath = "//div[@class='auraMsgMask auraForcedErrorBox']//div[@id='auraErrorMessage']";
+
     private void setProdConfig() throws Exception {
         ServletConfigController.setProductionConfig(true);
         Aura.getContextService().endContext();
@@ -67,9 +68,8 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
     }
 
     /**
-     * Due to duplicate div#auraErrorMessage on exceptions from server
-     * rendering, use different CSS selector to check exception message.
-     * W-1308475 - Never'd removal/change of duplicate div#auraErrorMessage
+     * Due to duplicate div#auraErrorMessage on exceptions from server rendering, use different CSS selector to check
+     * exception message. W-1308475 - Never'd removal/change of duplicate div#auraErrorMessage
      */
     private void assertNoStacktraceServerRendering() throws Exception {
         WebElement elem = findDomElement(By
@@ -87,9 +87,8 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
     }
 
     /**
-     * Due to duplicate div#auraErrorMessage on exceptions from server
-     * rendering, use different CSS selector to check exception message.
-     * W-1308475 - Never'd removal/change of duplicate div#auraErrorMessage
+     * Due to duplicate div#auraErrorMessage on exceptions from server rendering, use different CSS selector to check
+     * exception message. W-1308475 - Never'd removal/change of duplicate div#auraErrorMessage
      */
     private void assertStacktraceServerRendering(String messageStartsWith, String... causeStartsWith) throws Exception {
         WebElement elem = findDomElement(By
@@ -125,8 +124,7 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
     }
 
     /**
-     * Generic error message displayed in PRODUCTION if component provider
-     * instantiation throws.
+     * Generic error message displayed in PRODUCTION if component provider instantiation throws.
      */
     public void testProdCmpProviderThrowsDuringInstantiation() throws Exception {
         setProdConfig();
@@ -138,8 +136,7 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
     }
 
     /**
-     * Stacktrace displayed in non-PRODUCTION if component provider
-     * instantiation throws.
+     * Stacktrace displayed in non-PRODUCTION if component provider instantiation throws.
      */
     public void testCmpProviderThrowsDuringInstantiation() throws Exception {
         setProdContextWithoutConfig();
@@ -153,8 +150,7 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
     }
 
     /**
-     * Generic error message displayed in PRODUCTION if application provider
-     * instantiation throws.
+     * Generic error message displayed in PRODUCTION if application provider instantiation throws.
      */
     public void testProdAppProviderThrowsDuringInstantiation() throws Exception {
         setProdConfig();
@@ -164,8 +160,7 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
     }
 
     /**
-     * Stacktrace displayed in non-PRODUCTION if application provider
-     * instantiation throws.
+     * Stacktrace displayed in non-PRODUCTION if application provider instantiation throws.
      */
     public void testAppProviderThrowsDuringInstantiation() throws Exception {
         setProdContextWithoutConfig();
@@ -175,8 +170,7 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
     }
 
     /**
-     * Generic error message displayed in PRODUCTION if component provider
-     * instantiation throws.
+     * Generic error message displayed in PRODUCTION if component provider instantiation throws.
      */
     public void testProdCmpProviderThrowsDuringProvide() throws Exception {
         setProdConfig();
@@ -188,8 +182,7 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
     }
 
     /**
-     * Stacktrace displayed in non-PRODUCTION if component provider
-     * instantiation throws.
+     * Stacktrace displayed in non-PRODUCTION if component provider instantiation throws.
      */
     public void testCmpProviderThrowsDuringProvide() throws Exception {
         setProdContextWithoutConfig();
@@ -201,8 +194,7 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
     }
 
     /**
-     * Generic error message displayed in PRODUCTION if component model
-     * instantiation throws.
+     * Generic error message displayed in PRODUCTION if component model instantiation throws.
      */
     public void testProdCmpModelThrowsDuringInstantiation() throws Exception {
         setProdConfig();
@@ -213,9 +205,11 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
     }
 
     /**
-     * Stacktrace displayed in non-PRODUCTION if component model instantiation
-     * throws.
+     * Stacktrace displayed in non-PRODUCTION if component model instantiation throws.
      */
+    // WebDriver bug in 2.33. WebElement.getText() does not return text not directly visible on Firefox.
+    // See: https://code.google.com/p/selenium/issues/detail?id=5773
+    @ExcludeBrowsers({ BrowserType.FIREFOX })
     public void testCmpModelThrowsDuringInstantiation() throws Exception {
         setProdContextWithoutConfig();
         DefDescriptor<?> cdd = addSourceAutoCleanup(ComponentDef.class,
@@ -227,8 +221,7 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
     }
 
     /**
-     * Generic error message displayed in PRODUCTION if component renderer
-     * instantiation throws.
+     * Generic error message displayed in PRODUCTION if component renderer instantiation throws.
      */
     public void testProdCmpRendererThrowsDuringInstantiation() throws Exception {
         setProdConfig();
@@ -240,8 +233,7 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
     }
 
     /**
-     * Stacktrace displayed in non-PRODUCTION if component renderer
-     * instantiation throws.
+     * Stacktrace displayed in non-PRODUCTION if component renderer instantiation throws.
      */
     public void testCmpRendererThrowsDuringInstantiation() throws Exception {
         setProdContextWithoutConfig();
@@ -255,8 +247,7 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
     }
 
     /**
-     * Generic error message displayed in PRODUCTION if component renderer
-     * throws.
+     * Generic error message displayed in PRODUCTION if component renderer throws.
      */
     public void testProdCmpRendererThrowsDuringRender() throws Exception {
         setProdConfig();
@@ -286,8 +277,7 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
     }
 
     /**
-     * Parse error stack trace for application includes filename along with
-     * row,col
+     * Parse error stack trace for application includes filename along with row,col
      */
     public void testAppThrowsWithFileName() throws Exception {
         setProdContextWithoutConfig();
@@ -320,7 +310,7 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
         // make a client-side change to the page
         findDomElement(By.cssSelector(".update")).click();
         waitForElementText(findDomElement(By.cssSelector(".uiOutputText")), "modified", true, 3000);
-        assertTrue("Page was not changed after client action", 
+        assertTrue("Page was not changed after client action",
                 auraUITestingUtil.getBooleanEval("return !!document.__PageModifiedTestFlag"));
 
         // make server POST call with outdated lastmod

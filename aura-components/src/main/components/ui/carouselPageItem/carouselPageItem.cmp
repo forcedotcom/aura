@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:interactive"  extensible="true" support="BETA" description="A carousel item in a ui:carouselPage component.">
+<aura:component extends="ui:interactive"  extensible="true" support="BETA" description="A carousel item in a ui:carouselPage component. By default, a carousel item is displayed with a placeholder icon and label and is half the width of the carousel.">
     
     <aura:attribute name="label" type="String" description="The text displayed on the page item." />
     <aura:attribute name="class" type="String" description="The CSS class used for the page item." />

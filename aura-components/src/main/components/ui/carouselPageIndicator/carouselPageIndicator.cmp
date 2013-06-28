@@ -15,16 +15,16 @@
     limitations under the License.
 
 -->
-<aura:component  extensible="true"  description="A page indicator in a ui:carousel component.">
+<aura:component  extensible="true"  description="A container for ui:carouselPageIndicatorItem components. This component is not displayed if the carousel uses a continuous flow.">
     
     <!--TODO: need to pass in only pageCount once aura:iteration component supports integer iteration -->
     <aura:attribute name="pageComponents" type="Aura.Component[]" description="The page components in the carousel"/>
 
     <aura:attribute name="currentPage" type="Integer" description="The current page of the pager." />
 
-    <aura:registerevent name="pagerClicked" type="ui:pagerClicked" />
-    <aura:registerevent name="pagerKeyed" type="ui:pagerKeyed" />
-    <aura:registerevent name="pageSelected" type="ui:carouselPageEvent" />
+    <aura:registerevent name="pagerClicked" type="ui:pagerClicked" description="The event fired when the page indicator is clicked." />
+    <aura:registerevent name="pagerKeyed" type="ui:pagerKeyed" description="The event fired when the page indicator is keyed." />
+    <aura:registerevent name="pageSelected" type="ui:carouselPageEvent" description="The event fired when the carousel page is selected." />
              
     <aura:handler name="pageSelected" action="{!c.onPageSelected}" />
     

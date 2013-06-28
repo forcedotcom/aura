@@ -23,7 +23,7 @@
     <auradocs:info>The following code uses the <code>newComponentAsync()</code> method, which replaces <code>newComponent()</code> and <code>newComponentDeprecated()</code>. </auradocs:info>
     
     <h2>Code</h2>
-    <p>This sample code creates a new <code>ui:button</code> component and append it to the body.</p>
+    <p>This sample code creates a new <code>ui:button</code> component and appends it to the body.</p>
     <auradocs:codeblock>
     createButton : function(cmp) {
     $A.componentService.newComponentAsync(
@@ -35,14 +35,14 @@
                 "componentDef": "markup://ui:button",
                 "attributes": {
                     "values": { label: "Submit" }
-                    
             }
         });
     }
     </auradocs:codeblock>
     <p><code>$A.componentService.newComponentAsync()</code> is equivalent to <code>$A.newCmpAsync()</code>. This method supports both client-side and server-side component creation.
-    If no server-side dependencies are found, this method is run synchronously.
-    <code>$A.componentService.newComponentAsync()</code> takes in a callback scope, denoted by <code>this</code>. 
-    It also takes in an optional <code>callback</code> function and a required <code>config</code> object, which provides the component descriptor and attributes.
-    See the <ui:outputURL label="JavaScript API reference" value="#reference?topic=api:AuraComponentService"/> for a full list of arguments.</p>
+    If no server-side dependencies are found, this method is run synchronously.</p>
+    <p><code>$A.componentService.newComponentAsync()</code> takes in a callback scope, denoted by <code>this</code>. 
+    It also takes in a required <code>callback</code> function that returns your newly created component, and a required <code>config</code> object, which provides the component descriptor and attributes.
+    </p>
+    <auradocs:info>See the <ui:outputURL label="JavaScript API reference" value="#reference?topic=api:AuraComponentService"/> for a full list of arguments.</auradocs:info>
 </aura:component>

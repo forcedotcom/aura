@@ -126,5 +126,31 @@
         test: function(component){
             aura.test.assertEquals('1234567890123456789012345678901234567890.12', $A.test.getText(component.find('span').getElement()), "Unexpected value.");
         }
+    },
+
+    /**
+     * Verify that when the value changes it is rerendered
+     */
+    testUpdateValue: {
+        attributes : {value : 22.7, format : '##,#0,00.00#####'},
+        test: function(component){
+            aura.test.assertEquals('0,22.70', $A.test.getText(component.find('span').getElement()), "Value not formatted correctly");
+            component.getValue("v.value").setValue(49322);
+            $A.rerender(component);
+            aura.test.assertEquals('4,93,22.00', $A.test.getText(component.find('span').getElement()), "Value not updated after changed");
+        }
+    },
+
+    /**
+     * Verify that when the format changes it is rerendered
+     */
+    testUpdateFormat: {
+        attributes : {value : 22.7, format : '##,#0,00.00#####'},
+        test: function(component){
+            aura.test.assertEquals('0,22.70', $A.test.getText(component.find('span').getElement()), "Value not formatted correctly");
+            component.getValue("v.format").setValue("meh #.#");
+            $A.rerender(component);
+            aura.test.assertEquals('meh 22.7', $A.test.getText(component.find('span').getElement()), "Value not updated after format changed");
+        }
     }
 })

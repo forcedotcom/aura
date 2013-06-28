@@ -28,7 +28,7 @@
      */
     testValue: {
         attributes : {value : 'Hello World!'},
-        test: function(component){
+        test: function(component){        	
             aura.test.assertEquals('Hello World!', $A.test.getText(component.find("span").getElement()), "Value attribute not correct");
         }
     },
@@ -88,7 +88,7 @@
         browsers: ["-IE7", "-IE8"],
         attributes: {value: '\n'},
         test: function(component){
-            aura.test.assertEquals('\n', component.find("span").getElement().textContent, "Failed to trim spaces");
+            aura.test.assertEquals('', component.find("span").getElement().textContent, "Failed to trim spaces");
         }
     },
     /**
@@ -100,7 +100,7 @@
         browsers: ["-IE7", "-IE8"],
         attributes: {value: '\n1\n2\n'},
         test: function(component){
-            aura.test.assertEquals('\n1\n2\n', component.find("span").getElement().textContent, "Failed to trim spaces");
+            aura.test.assertEquals('12', component.find("span").getElement().textContent, "Failed to trim spaces");
         }
     },
     /**
@@ -111,8 +111,8 @@
     testCarriageReturnLineFeeds:{
         browsers: ["-IE7", "-IE8"],
         attributes: {value: '\r\na\r\nb\r\n'},
-        test: function(component){
-            aura.test.assertEquals('\r\na\r\nb\r\n', component.find("span").getElement().textContent, "Failed to trim spaces");
+        test: function(component){        	
+            aura.test.assertEquals('ab', component.find("span").getElement().textContent, "Failed to trim spaces");
         }
     }
 })

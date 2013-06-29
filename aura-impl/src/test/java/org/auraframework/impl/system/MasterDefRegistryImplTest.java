@@ -745,7 +745,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
                 ComponentDef.class);
 
         // Make sure it's actually in the caches
-        mdr.exists(cmpDesc);
+        mdr.getDef(cmpDesc);
 
         // Get the UID before adding the file since getUid() messes with caches
         String uid = mdr.getUid(null, cmpDesc);

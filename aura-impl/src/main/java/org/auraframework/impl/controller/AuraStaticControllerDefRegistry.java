@@ -43,6 +43,7 @@ public class AuraStaticControllerDefRegistry extends StaticDefRegistryImpl<Contr
 
     public static final String COMPONENT_CONTROLLER = "aura://ComponentController";
     public static final String LABEL_CONTROLLER = "aura://LabelController";
+    public static final String TIMEZONEINFO_CONTROLLER = "aura://TimeZoneInfoController";
 
     private static final Set<String> prefixes = Sets.newHashSet(PREFIX);
     private static final Set<DefType> defTypes = Sets.immutableEnumSet(DefType.CONTROLLER);
@@ -64,6 +65,10 @@ public class AuraStaticControllerDefRegistry extends StaticDefRegistryImpl<Contr
         // Add Label Controller
         builder = getControllerBuilder(LabelController.class, LABEL_CONTROLLER);
         // FIXME="need an md5";
+        ret.put(builder.getDescriptor(), builder.build());
+        
+        // Add TimeZoneInfo Controller
+        builder = getControllerBuilder(TimeZoneInfoController.class, TIMEZONEINFO_CONTROLLER);
         ret.put(builder.getDescriptor(), builder.build());
 
         return ret;

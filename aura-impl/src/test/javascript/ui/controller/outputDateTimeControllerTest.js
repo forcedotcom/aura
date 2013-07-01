@@ -16,7 +16,7 @@
 
 Function.RegisterNamespace("Test.Ui.OutputDateTime");
 
-[Fixture]
+[Fixture, Skip]
 Test.Ui.OutputDateTime.ControllerTest = function(){
 	var targetController;	
 	

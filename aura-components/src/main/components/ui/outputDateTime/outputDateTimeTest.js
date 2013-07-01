@@ -133,8 +133,7 @@
         test: function(component){
         	aura.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){        		
         		var timezone = $A.getGlobalValueProviders().get("$Locale.timezone");
-        		aura.test.assertEquals("9/23/04 4:30 PM", $A.test.getText(component.find('span').getElement()), "Should have used default as default timezone.");
-        		/*if(timezone  == "GMT"){
+        		if(timezone  == "GMT"){
 	        		aura.test.assertEquals("9/23/04 4:30 PM", $A.test.getText(component.find('span').getElement()), "Should have used default as default timezone.");
 	        	}
 	        	else if(timezone  == "America/Los_Angeles"){
@@ -142,7 +141,7 @@
 	        	} 
 	        	else{// For any other time zone we just make sure it has some value
 	        		aura.test.assertTrue($A.test.getText(component.find('span').getElement()).length > 0, "Should have used default as default timezone.");	        		
-	        	}*/
+	        	}
         	});
         }
     },
@@ -176,8 +175,7 @@
         test: function(component){
         	aura.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
         		var timezone = $A.getGlobalValueProviders().get("$Locale.timezone");
-        		aura.test.assertEquals("9/23/04 4:30 PM", $A.test.getText(component.find('span').getElement()), "Should have used default as default timezone.");
-        		/*if(timezone  == "GMT"){
+        		if(timezone  == "GMT"){
 	        		aura.test.assertEquals("9/23/04 4:30 PM", $A.test.getText(component.find('span').getElement()), "Should have used default as default timezone.");
 	        	}
 	        	else if(timezone  == "America/Los_Angeles"){
@@ -185,7 +183,7 @@
 	        	} 
 	        	else{// For any other time zone we just make sure it has some value
 	        		aura.test.assertTrue($A.test.getText(component.find('span').getElement()).length > 0, "Should have used default as default timezone.");	        		
-	        	}*/
+	        	}
         	});
         }
     }

@@ -16,7 +16,7 @@
 
 Function.RegisterNamespace("Test.Ui.OutputDateTime");
 
-[Fixture]
+[Fixture, Skip]
 Test.Ui.OutputDateTime.HelperTest = function(){
 	var targetHelper;	
 	

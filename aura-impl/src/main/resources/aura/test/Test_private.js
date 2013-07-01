@@ -22,7 +22,7 @@ var priv = {
         waits : [],
         cleanups : [],
         completed : {}, // A map of action name to boolean for 'named' actions that have been queued
-        complete : -1, // -1:uninitialized, 0:complete, 1:tearing down, 2:running, 3+:waiting
+        inProgress : -1, // -1:uninitialized, 0:complete, 1:tearing down, 2:running, 3+:waiting
         errors : [],
         preErrors : [],
         preWarnings : [],
@@ -137,10 +137,10 @@ function logError(msg, e){
  */
 function run(name, code, count){
     // check if test has already started running, since frame loads from layouts may trigger multiple runs
-    if(priv.complete >= 0){
+    if(priv.inProgress >= 0){
         return;
     }
-    priv.complete = 2;
+    priv.inProgress = 2;
     priv.timeoutTime = new Date().getTime() + 5000 * count;
     if(!count){
         count = 1;
@@ -155,8 +155,8 @@ function run(name, code, count){
         var i;
 
         // check if already tearing down
-        if(priv.complete > 1){
-            priv.complete = 1;
+        if(priv.inProgress > 1){
+            priv.inProgress = 1;
         }else {
             return;
         }
@@ -171,10 +171,10 @@ function run(name, code, count){
             if(suite["tearDown"]){
                 suite["tearDown"].call(suite, cmp);
             }
-            setTimeout(function(){priv.complete--;}, 100);
+            setTimeout(function(){priv.inProgress--;}, 100);
         }catch(e){
             logError("Error during tearDown", e);
-            priv.complete = 0;
+            priv.inProgress = 0;
         }
     };
 
@@ -194,7 +194,7 @@ function run(name, code, count){
     var continueWhenReady = function() {
         var i;
 
-        if(priv.complete < 2){
+        if(priv.inProgress < 2){
             return;
         }
         if(priv.errors.length > 0){
@@ -202,7 +202,7 @@ function run(name, code, count){
             return;
         }
         try{
-            if((priv.complete > 1) && (new Date().getTime() > priv.timeoutTime)){
+            if((priv.inProgress > 1) && (new Date().getTime() > priv.timeoutTime)){
                 if(priv.waits.length > 0){
                     var texp = priv.waits[0].expected;
                     if($A.util.isFunction(texp)){
@@ -223,7 +223,7 @@ function run(name, code, count){
                     throw new Error("Test timed out");
                 }
             }
-            if(priv.complete > 2){
+            if(priv.inProgress > 2){
                 setTimeout(continueWhenReady, 200);
             }else{
                 if(priv.waits.length > 0){

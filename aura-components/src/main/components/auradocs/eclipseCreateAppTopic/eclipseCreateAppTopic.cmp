@@ -25,11 +25,9 @@
 
     <h2>Prerequisites</h2>
         <ol>
-
-            <li><ui:outputURL value="http://www.oracle.com/technetwork/java/javase/downloads/" label="JDK 1.6">JDK 1.6</ui:outputURL></li>
-            <li><ui:outputURL value="http://maven.apache.org/download.html" label="_Maven 3">Maven 3</ui:outputURL></li>
-            <li><ui:outputURL value="http://www.eclipse.org/downloads/" label="Eclipse 3.7">Eclipse 3.7</ui:outputURL>, and the <ui:outputURL value="http://www.eclipse.org/m2e/download/" label="m2eclipse">m2eclipse plugin</ui:outputURL>. Choose the Eclipse distribution for Java EE Developers. This includes JavaScript editing and other Web UI tools.</li>
-
+            <li><ui:outputURL value="http://www.oracle.com/technetwork/java/javase/downloads/" label="Java Development Kit (JDK) 1.6">Java Development Kit (JDK) 1.6</ui:outputURL></li>
+            <li><ui:outputURL value="http://maven.apache.org/download.html" label="Apache Maven 3">Apache Maven 3</ui:outputURL></li>
+            <li><ui:outputURL value="http://www.eclipse.org/downloads/" label="Eclipse 3.7">Eclipse 3.7</ui:outputURL>, and <ui:outputURL value="http://www.eclipse.org/m2e/download/" label="m2eclipse">m2eclipse plugin</ui:outputURL>. Choose the Eclipse distribution for Java EE Developers. This includes JavaScript editing and other Web UI tools.</li>
         </ol>
 
     <h2>Step 1: Specify the Remote Archetype</h2>
@@ -84,9 +82,7 @@
              You will be directed to <code>http://localhost:8080/helloWorldEclipse/helloWorldEclipse.app</code>.</li>
             <li>Validate that your app is working by looking for "hello web" in the browser page.</li>
         </ol>
-
-    <p>Next: <auradocs:topicLink topic="auraPlugin">install the Aura Assist Eclipse plugin</auradocs:topicLink>.</p>
-
+        
     <p><b>See also:</b><br/>
     <auradocs:topicLink topic="faqBrowsers">Which browsers does Aura support?</auradocs:topicLink> <br/>
 

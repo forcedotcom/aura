@@ -40,19 +40,7 @@ var priv = {
 
         // failure to communicate with server
         if (priv.isDisconnectedOrCancelled(response)) {
-            if (priv.isDisconnected) {
-                return null;
-            }
-
-            e = $A.get("e.aura:connectionLost");
-            if (e) {
-                priv.isDisconnected = true;
-                e.fire();
-            } else {
-                // looks like no definitions loaded yet
-                alert("Connection lost");
-            }
-
+            priv.setConnectedFalse();
             return null;
         }
 
@@ -187,7 +175,8 @@ var priv = {
             try {
                 aura.util.json.decodeString(resp["defaultHandler"])();
             } catch (e) {
-                aura.error("Error in defaultHandler for event: " + descriptor, e);
+            	//W-1728079 : verify & remove this comment when error() take two parameters in the future
+            	aura.error("Error in defaultHandler for event: " + descriptor, e);
             }
         }
     },
@@ -218,6 +207,7 @@ var priv = {
     actionCallback : function(response, actionGroups, num) {
         var responseMessage = this.checkAndDecodeResponse(response);
         var queue = this.requestQueue;
+        var that = this;
         var i;
 
         var errors = [];
@@ -225,106 +215,106 @@ var priv = {
             $A.error("Action callback called on non-empty stack "+this.auraStack);
             this.auraStack = [];
         }
-        $A.clientService.pushStack("actionCallback");
-        if (responseMessage) {
-            var token = responseMessage["token"];
-            if (token) {
-                priv.token = token;
-            }
+        $A.run(function() {
+                if (responseMessage) {
+                    var token = responseMessage["token"];
+                    if (token) {
+                        priv.token = token;
+                    }
 
-            var ctx = responseMessage["context"];
-            $A.getContext().join(ctx);
+                    var ctx = responseMessage["context"];
+                    $A.getContext().join(ctx);
 
-            //Look for any Client side event exceptions
-            var events = responseMessage["events"];
-            if (events) {
-                for ( var en = 0, len = events.length; en < len; en++) {
-                    $A.clientService.parseAndFireEvent(events[en]);
-                }
-            }
-
-            var actionResponses = responseMessage["actions"];
-            //Process each action and its response
-            for ( var r = 0; r < actionResponses.length; r++) {
-                var actionResponse = actionResponses[r];
-
-                var actionGroupNumber;
-                var action;
-                if (actionResponse["storable"] === true) {
-                    // Create a client side action instance to go with the
-                    // server created action response
-                    var descriptor = actionResponse["action"];
-                    var actionDef = $A.services.component.getActionDef({
-                        descriptor : descriptor
-                    });
-                    action = actionDef.newInstance();
-
-                    action.setStorable();
-                    action.setParams(actionResponse["params"]);
-
-                    actionGroupNumber = this.newestAbortableGroup;
-                } else {
-                    var groupAndAction = this.findGroupAndAction(actionGroups, actionResponse.id);
-                    aura.assert(groupAndAction, "Unable to find action for action response " + actionResponse.id);
-
-                    actionGroupNumber = groupAndAction.group.number;
-                    action = groupAndAction.action;
-                }
-
-                try {
-                    var storage = action.getStorage();
-                    var toStore;
-                    var needUpdate = action.updateFromResponse(actionResponse);
-
-                    if (!action.isAbortable() || this.newestAbortableGroup === actionGroupNumber) {
-                        if (needUpdate) {
-                            action.complete($A.getContext());
-                        } 
-                        if (action.isRefreshAction()) {
-                            action.fireRefreshEvent("refreshEnd");
+                    //Look for any Client side event exceptions
+                    var events = responseMessage["events"];
+                    if (events) {
+                        for ( var en = 0, len = events.length; en < len; en++) {
+                            $A.clientService.parseAndFireEvent(events[en]);
                         }
-                    } else {
-                        action.abort();
                     }
-                    toStore = action.getStored();
-                    if (storage && toStore) {
-                        storage.put(action.getStorageKey(), toStore);
-                    }
-                } catch (e) {
-                    errors.push(e);
-                }
-            }
 
-            for (i = 0; i < actionGroups.length; i++) {
-                actionGroup = actionGroups[i];
-                actionGroup.status = "done";
-            }
-        } else if (priv.isDisconnectedOrCancelled(response) && !priv.isUnloading) {
-            for ( var n = 0; n < actionGroups.length; n++) {
-                actionGroup = actionGroups[n];
-                actions = actionGroup.actions;
-                for ( var m = 0; m < actions.length; m++) {
-                    try {
-                        action = actions[m];
-                        if (!action.isAbortable() || this.newestAbortableGroup === actionGroup.number) {
-                            action.incomplete($A.getContext());
+                    var actionResponses = responseMessage["actions"];
+                    //Process each action and its response
+                    for ( var r = 0; r < actionResponses.length; r++) {
+                        var actionResponse = actionResponses[r];
+
+                        var actionGroupNumber;
+                        var action;
+                        if (actionResponse["storable"] === true) {
+                            // Create a client side action instance to go with the
+                            // server created action response
+                            var descriptor = actionResponse["action"];
+                            var actionDef = $A.services.component.getActionDef({
+                                descriptor : descriptor
+                            });
+                            action = actionDef.newInstance();
+
+                            action.setStorable();
+                            action.setParams(actionResponse["params"]);
+
+                            actionGroupNumber = that.newestAbortableGroup;
                         } else {
-                            action.abort();
+                            var groupAndAction = that.findGroupAndAction(actionGroups, actionResponse.id);
+                            aura.assert(groupAndAction, "Unable to find action for action response "+actionResponse.id);
+
+                            actionGroupNumber = groupAndAction.group.number;
+                            action = groupAndAction.action;
                         }
-                    } catch (e2) {
-                        errors.push(e2);
+
+                        try {
+                            var storage = action.getStorage();
+                            var toStore;
+                            var needUpdate = action.updateFromResponse(actionResponse);
+
+                            if (!action.isAbortable() || that.newestAbortableGroup === actionGroupNumber) {
+                                if (needUpdate) {
+                                    action.finishAction($A.getContext());
+                                } 
+                                if (action.isRefreshAction()) {
+                                    action.fireRefreshEvent("refreshEnd");
+                                }
+                            } else {
+                                action.abort();
+                            }
+                            toStore = action.getStored();
+                            if (storage && toStore) {
+                                storage.put(action.getStorageKey(), toStore);
+                            }
+                        } catch (e) {
+                            errors.push(e);
+                        }
+                    }
+
+                    for (i = 0; i < actionGroups.length; i++) {
+                        actionGroup = actionGroups[i];
+                        actionGroup.status = "done";
+                    }
+                } else if (priv.isDisconnectedOrCancelled(response) && !priv.isUnloading) {
+                    for ( var n = 0; n < actionGroups.length; n++) {
+                        actionGroup = actionGroups[n];
+                        actions = actionGroup.actions;
+                        for ( var m = 0; m < actions.length; m++) {
+                            try {
+                                action = actions[m];
+                                if (!action.isAbortable() || that.newestAbortableGroup === actionGroup.number) {
+                                    action.incomplete($A.getContext());
+                                } else {
+                                    action.abort();
+                                }
+                            } catch (e2) {
+                                errors.push(e2);
+                            }
+                        }
+                        actionGroup.status = "done";
                     }
                 }
-                actionGroup.status = "done";
-            }
-        }
-        if (errors.length > 0) {
-            for(i=0;i<errors.length;i++){
-                // should this be $A.error?
-                aura.log("Javascript error", errors[i]);
-            }
-        }
-        $A.clientService.popStack("actionCallback");
+                if (errors.length > 0) {
+                    for(i=0;i<errors.length;i++){
+                        // should this be $A.error?
+                        aura.log("Javascript error", errors[i]);
+                    }
+                }
+            }, "actionCallback");
 
         this.inRequest = false;
         priv.fireDoneWaiting();
@@ -339,7 +329,6 @@ var priv = {
         }
 
         this.requestQueue = queue;
-        var that = this;
         $A.endMark("Completed Action Callback - XHR " + num);
 
         //#if {"modes" : ["PTEST"]}
@@ -351,14 +340,7 @@ var priv = {
             // the detail, so skip this for next time
             // a bit of a hack to capture the getDetail action as well
             if (queueCopy[0].actions[0].getDef().name.indexOf("Overview") == -1 && (queueCopy[0].actions[0].getDef().name.indexOf("List") == -1 || queueCopy[0].actions[0].getDef().name.indexOf("RelatedList") !== -1)) {
-                // end the previously started transaction
-                $A.endTransaction($A.getContext().getTransaction());
-                // set the transaction using #hashtag from the URL and the
-                // concatenated action names as the unique ID
-                var tokenJson = $A.historyService.get();
-                $A.updateTransaction("txn_" + $A.getContext().getTransaction(), "txn_" + tokenJson["token"] + $A.getContext().getTransactionName());
-                // update the vars and set the beaconData to piggyback on the next XHR call
-                $A.setBeaconData($A.toJson());
+                $A.clientService.unregisterTransaction();
             }
         }
         //#end
@@ -401,7 +383,7 @@ var priv = {
                     for ( var n = 0; n < actionsToComplete.length; n++) {
                         var info = actionsToComplete[n];
                         info.action.updateFromResponse(info.response);
-                        info.action.complete($A.getContext());
+                        info.action.finishAction($A.getContext());
                     }
 
                     clientService.fireDoneWaiting();
@@ -423,7 +405,7 @@ var priv = {
         var storage = Action.prototype.getStorage();
         for ( var i = 0; i < actions.length; i++) {
             var action = actions[i];
-            $A.assert(action.getDef().isServerAction(), "RunAfter() cannot be called on a client action. Use run() on a client action instead.");
+            $A.assert(action.getDef().isServerAction(), "RunAfter() cannot be called on a client action. Use runDeprecated() on a client action instead.");
 
             // For cacheable actions check the storage service to see if we
             // already have a viable cached action response we can complete
@@ -743,6 +725,20 @@ var priv = {
             return true;
         }
         return false;
+    },
+
+    setConnectedFalse: function() {
+        if (priv.isDisconnected) {
+            return;
+        }
+        e = $A.get("e.aura:connectionLost");
+        if (e) {
+            priv.isDisconnected = true;
+            e.fire();
+        } else {
+            // looks like no definitions loaded yet
+            alert("Connection lost");
+        }
     }
 };
 

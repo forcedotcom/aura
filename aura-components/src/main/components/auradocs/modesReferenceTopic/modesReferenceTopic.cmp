@@ -19,7 +19,7 @@
 
     <aura:set attribute="title" value="Modes Reference"/>
 
-    <p>This section lists all the modes that Aura supports. The list of modes in Aura is defined in <ui:outputURL value="http://jenkins.auraframework.org/view/All/job/lumen_doc/javadoc/index.html?org/auraframework/system/AuraContext.html" label="AuraContext">AuraContext</ui:outputURL>.</p>
+    <p>This section lists all the modes that Aura supports. The list of modes in Aura is defined in the <code>AuraContext</code> Java interface.</p>
 
     <p>Every request in Aura is associated with a context. After initial loading of an app, each subsequent request is an XHR POST that contains your Aura context configuration, which includes the mode to run in, the name of the app, and the namespaces that already have preloaded metadata on the client.</p>
 

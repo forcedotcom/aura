@@ -374,10 +374,10 @@ public class Json {
      * @param value
      * @return
      */
-    private Integer addReference(Object value) {
+    private Integer addReference(ReferenceType rt, Object value) {
         int ret = ++lastRefId;
-        equalityMap.put(value, ret);
-        identityMap.put(value, ret);
+        Map<Object, Integer> m = rt == ReferenceType.IDENTITY ? identityMap : equalityMap;
+        m.put(value, ret);
         return ret;
     }
 
@@ -623,7 +623,7 @@ public class Json {
                 writeMapEntry(REF_INDICATOR, refId);
                 writeMapEnd();
             } else {
-                refId = addReference(value);
+                refId = addReference(rt, value);
                 // Now manually output this 2-element map to avoid loop
                 writeMapBegin();
                 writeMapEntry(ID_INDICATOR, refId);

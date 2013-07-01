@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component implements="ui:visible, ui:pagingInterface" extensible="true" abstract="true" support="proto">
+<aura:component implements="ui:visible, ui:pagingInterface" extensible="true" abstract="true" support="proto" description="An abstract component which provides a basic layout for the ui:list component.">
     <aura:attribute name="contentRole" type="String" description="Defines the role attribute of the list content."/>  
     <aura:attribute name="itemTemplate" type="Aura.ComponentDefRef[]" required="true" description="A ComponentDefRef to use as the template for each generated row in the list."/>
     <aura:attribute name="items" type="Object[]" description="An array of arbitrary map objects representing the rows of data in the list."/>

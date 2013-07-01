@@ -70,7 +70,7 @@
     runIt : function(cmp) {
         var a = cmp.get("c.otherFunction");
         //Set parameters or do something else
-        a.run();
+        $A.enqueueAction(a);
     }
     </auradocs:codeblock>
      <p>You can also move the common call to a helper file. See <auradocs:topicLink topic="helper">Helpers</auradocs:topicLink> for more information.</p>

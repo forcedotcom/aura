@@ -76,7 +76,7 @@ runActionAtServerAndStore:function(cmp, evt, helper){
     
     // Run server-side action
     $A.enqueueAction(a);
-},
+};
 </auradocs:codeblock><br/>
 
 <p>You can also check whether an action response originates from storage by calling <code>isFromStorage</code> on the action object in the callback function of the JavaScript controller.</p> 

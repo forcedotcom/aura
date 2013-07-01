@@ -73,9 +73,10 @@
      */
     handleEsckeydown: function(component, event) {
     	var parent = this.getParentComponent(component);
-        if (parent) {
-            if (parent.get("v.visible") === true) {
-                parent.setValue("v.visible", false);
+    	var concreteParentCmp = parent.getConcreteComponent();
+        if (concreteParentCmp) {
+            if (concreteParentCmp.get("v.visible") === true) {
+                concreteParentCmp.setValue("v.visible", false);
                 if (component.get("v.disabled") === true) {
                     // for disabled menu item, no Aura event gets fired, so we have to directly deal with DOM.
                     var devCmp = parent.find("menu");
@@ -108,9 +109,10 @@
      */
     handleTabkeydown: function(component, event) {
         var parent = this.getParentComponent(component);
-        if (parent) {
-            if (parent.get("v.visible") === true) {
-                parent.setValue("v.visible", false);
+        var concreteParentCmp = parent.getConcreteComponent();
+        if (concreteParentCmp) {
+            if (concreteParentCmp.get("v.visible") === true) {
+                concreteParentCmp.setValue("v.visible", false);
                 if (component.get("v.disabled") === true) {
                     // for disabled menu item, no Aura event gets fired, so we have to directly deal with DOM.
                     var devCmp = parent.find("menu");
@@ -168,7 +170,7 @@
             }
             var nextFocusCmp = menuItems.getValue(nextIndex);
             var action = nextFocusCmp.get("c.setFocus");
-            action.run();
+            action.runDeprecated();
         }
     },
     
@@ -188,7 +190,7 @@
             }
             var previousFocusCmp = menuItems.getValue(previousIndex);
             var action = previousFocusCmp.get("c.setFocus");
-            action.run();
+            action.runDeprecated();
         }
     },
     
@@ -202,7 +204,7 @@
                 var menuTriggerCmp = dropdownHelper.getTriggerComponent(dropdownCmp);
                 if (menuTriggerCmp) {
                     var action =  menuTriggerCmp.get("c.focus");
-                    action.run();
+                    action.runDeprecated();
                 }
             }
         }
@@ -233,7 +235,7 @@
                 var text = c.get("v.label");
                 if(text.toLowerCase().indexOf(matchText) === 0) {
                     var action = c.get("c.setFocus");
-                    action.run();
+                    action.runDeprecated();
                     break;
                 }
             }

@@ -21,6 +21,7 @@
  */
 var AuraClientService = function() {
     // #include aura.AuraClientService_private
+	// #include aura.controller.ActionCallbackGroup
     // #include aura.controller.ActionQueue
 
     var clientService = {
@@ -159,51 +160,52 @@ var AuraClientService = function() {
          * @private
          */
         loadComponent : function(descriptor, attributes, callback, defType) {
+            var that = this;
             this.runAfterInitDefs(function() {
-                var desc = new DefDescriptor(descriptor);
-                var tag = desc.getNamespace() + ":" + desc.getName();
+                $A.run(function() {
+                    var desc = new DefDescriptor(descriptor);
+                    var tag = desc.getNamespace() + ":" + desc.getName();
 
-                var method = defType === "APPLICATION" ? "getApplication" : "getComponent";
-                var action = $A.get("c.aura://ComponentController." + method);
+                    var method = defType === "APPLICATION" ? "getApplication" : "getComponent";
+                    var action = $A.get("c.aura://ComponentController." + method);
 
-                action.setStorable({
-                	"ignoreExisting" : true
-            	});
+                    action.setStorable({
+                            "ignoreExisting" : true
+                    });
 
-                action.setParams({
-                    name : tag,
-                    attributes : attributes
-                });
+                    action.setParams({
+                        name : tag,
+                        attributes : attributes
+                    });
 
-                action.setCallback(this, function(a) {
-                	var state = a.getState();
-                    if (state === "SUCCESS") {
-                        callback(a.getReturnValue());
-                    } else if (state === "INCOMPLETE"){
-                    	// Use a stored response if one exists
-                        var storage = Action.prototype.getStorage();
-                        if (storage) {
-                            var key = action.getStorageKey();
-                            storage.get(key, function(actionResponse) {
-                            	if (actionResponse) {
-                                    storage.log("AuraClientService.loadComponent(): bootstrap request was INCOMPLETE using stored action response.", [action, actionResponse]);
-
-                            		action.complete(actionResponse);
-                            	} else {
-                                    $A.error("Unable to load application.");
-                            	}
-                            });
+                    action.setCallback(that, function(a) {
+                        var state = a.getState();
+                        if (state === "SUCCESS") {
+                            callback(a.getReturnValue());
+                        } else if (state === "INCOMPLETE"){
+                            // Use a stored response if one exists
+                            var storage = Action.prototype.getStorage();
+                            if (storage) {
+                                var key = action.getStorageKey();
+                                storage.get(key, function(actionResponse) {
+                                    if (actionResponse) {
+                                        storage.log("AuraClientService.loadComponent(): bootstrap request was INCOMPLETE using stored action response.", [action, actionResponse]);
+                                        action.updateFromResponse(actionResponse);
+                                        action.finishAction($A.getContext());
+                                    } else {
+                                        $A.error("Unable to load application.");
+                                    }
+                                });
+                            }
+                        } else {
+                            $A.error(a.getError()[0].message);
                         }
-                    } else {
-                        $A.error(a.getError()[0].message);
-                    }
 
-                    $A.measure("Completed Component Callback", "Sending XHR " + $A.getContext().getNum());
-                });
+                        $A.measure("Completed Component Callback", "Sending XHR " + $A.getContext().getNum());
+                    });
 
-                clientService.pushStack("loadComponent");
-                clientService.enqueueAction(action);
-                clientService.popStack("loadComponent");
+                    clientService.enqueueAction(action);
+                }, "loadComponent");
             });
         },
 
@@ -239,16 +241,6 @@ var AuraClientService = function() {
          * @param name the name of the item to push.
          */
         pushStack : function(name) {
-            //#if {"modes" : ["PTEST"]}
-            // to only profile the transactions and not the initial page load
-            if (name == "onclick") {
-                // clear out existing timers
-                $A.removeStats();
-                $A.getContext().clearTransactionName();
-                // start a Jiffy transaction
-                $A.startTransaction($A.getContext().incrementTransaction());
-            }
-            //#end
             priv.auraStack.push(name);
         },
         
@@ -486,7 +478,7 @@ var AuraClientService = function() {
             });
 
             action.updateFromResponse(actionResult);
-            action.complete($A.getContext());
+            action.finishAction($A.getContext());
         },
 
         /**
@@ -497,6 +489,14 @@ var AuraClientService = function() {
          */
         isConnected : function() {
             return !priv.isDisconnected;
+        },
+
+        /**
+         * Inform Aura that the the environment is offline. One source of data
+         * is native code. Immediate and future communication with the server may fail.
+         */
+        setConnectedFalse : function() {
+            priv.setConnectedFalse();
         },
 
         /**
@@ -519,11 +519,46 @@ var AuraClientService = function() {
             // FIXME: W-1652118 This should not differentiate, both of these should get pushed.
             //
             if (action.getDef().isClientAction()) {
-                action.run();
+                action.runDeprecated();
             } 
             
             
             clientService.actionQueue.enqueue(action);
+        },
+
+        /**
+         * Register a new transaction.This clears out the previously set times (of previous transaction),
+         * clears the transactionName
+         * and triggers a new transaction.
+         *
+         * @private
+         */
+        registerTransaction: function() {
+            //#if {"modes" : ["PTEST"]}
+            // to only profile the transactions and not the initial page load
+            // clear out existing timers
+            $A.removeStats();
+            $A.getContext().clearTransactionName();
+            // start a Jiffy transaction
+            $A.startTransaction($A.getContext().incrementTransaction());
+            //#end
+        },
+
+        /**
+         * Unregister an existing transaction. This ends the current transaction and
+         * updates the transaction name to include all actions.
+         * It also sets the beaconData to piggyback on the next XHR call.
+         *
+         * @private
+         */
+        unregisterTransaction: function() {
+            // end the previously started transaction
+            $A.endTransaction($A.getContext().getTransaction());
+            // set the transaction using #hashtag from the URL and the
+            // concatenated action names as the unique ID
+            $A.updateTransaction("txn_" + $A.getContext().getTransaction(), "txn_" + $A.historyService.get()["token"] + $A.getContext().getTransactionName());
+            // update the vars and set the beaconData to piggyback on the next XHR call
+            $A.setBeaconData($A.toJson());
         },
         
         /**

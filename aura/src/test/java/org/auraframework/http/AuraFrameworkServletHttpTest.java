@@ -46,6 +46,7 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
     public final String sampleJavascriptResourcePath = "/auraFW/javascript/aura_dev.js";
     public final String sampleBinaryResourcePathWithNonce = "/auraFW/resources/%s/aura/auraIdeLogo.png";
     public final String sampleTextResourcePathWithNonce = "/auraFW/resources/%s/aura/resetCSS.css";
+    public static final String PRODUCTION_PROPERTY = "aura.production";
     private final long timeWindowExpiry = 600000; // ten minute expiration test window
 
     public AuraFrameworkServletHttpTest(String name) {
@@ -369,6 +370,34 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
         response = perform(get);
 
         checkExpired(response, "text/javascript");
+        get.releaseConnection();
+    }
+
+    public void testExistingMinifiedResource() throws Exception {
+
+        getMockConfigAdapter().setIsProduction(true);
+
+        HttpGet get = obtainGetMethod("/auraFW/resources/moment/moment.js");
+        HttpResponse httpResponse = perform(get);
+        String response = getResponseBody(httpResponse);
+
+        checkExpired(httpResponse, "text/javascript");
+        assertTrue(response.contains("(function(e){"));
+
+        get.releaseConnection();
+    }
+
+    public void testNonExistentMinifiedResource() throws Exception {
+
+        getMockConfigAdapter().setIsProduction(true);
+
+        HttpGet get = obtainGetMethod("/auraFW/resources/codemirror/js/codemirror.js");
+        HttpResponse httpResponse = perform(get);
+        String response = getResponseBody(httpResponse);
+
+        checkExpired(httpResponse, "text/javascript");
+        assertTrue(response.contains("function setDefaults("));
+
         get.releaseConnection();
     }
 }

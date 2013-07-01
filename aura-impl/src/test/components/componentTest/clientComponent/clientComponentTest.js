@@ -20,7 +20,7 @@
 
                 var a = cmp.get("c.showOutputCmp");
                 $A.run(function() {
-                    a.run();
+                    a.runDeprecated();
                 });
 
                 $A.test.addWaitFor(
@@ -40,7 +40,7 @@
             function (cmp) {
                 var a = cmp.get("c.addOutputCurrency");
                 $A.run(function() {
-                    a.run();
+                    a.runDeprecated();
                 });
 
                 $A.test.addWaitFor(

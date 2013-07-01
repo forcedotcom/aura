@@ -15,85 +15,97 @@
  */
 package org.auraframework.impl.source.file;
 
+import java.util.EnumMap;
+import java.util.Map;
+
 import org.apache.commons.vfs2.FileChangeEvent;
 import org.apache.commons.vfs2.FileListener;
 import org.apache.log4j.Logger;
 import org.auraframework.Aura;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.SourceListener;
 import org.auraframework.system.SourceListener.SourceMonitorEvent;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
- * Used by {@link FileSourceLoader} to monitor and notify when file has changed.
- * When a file does change, it notifies its loader to clear cache of specific descriptor.
+ * Used by {@link FileSourceLoader} to monitor and notify when file has changed. When a file does change, it notifies
+ * its listener to clear cache of specific descriptor.
  */
 public class FileSourceListener implements FileListener {
 
     private static final Logger logger = Logger.getLogger(FileSourceListener.class);
-    // static to keep track of all loaders using FileSourceListener
-    private static final Map<String, FileSourceLoader> loaderMap = new HashMap<String, FileSourceLoader>();
+    private static final EnumMap<DefDescriptor.DefType, String> extensions = new EnumMap<DefDescriptor.DefType, String>(
+            DefDescriptor.DefType.class);
 
-    public void addLoader(String directory, FileSourceLoader loader) {
-        loaderMap.put(directory, loader);
+    static {
+        extensions.put(DefDescriptor.DefType.APPLICATION, ".app");
+        extensions.put(DefDescriptor.DefType.COMPONENT, ".cmp");
+        extensions.put(DefDescriptor.DefType.EVENT, ".evt");
+        extensions.put(DefDescriptor.DefType.INTERFACE, ".intf");
+        extensions.put(DefDescriptor.DefType.STYLE, ".css");
+        extensions.put(DefDescriptor.DefType.LAYOUTS, "Layouts.xml");
+        extensions.put(DefDescriptor.DefType.NAMESPACE, ".xml");
+        extensions.put(DefDescriptor.DefType.TESTSUITE, "Test.js");
+        extensions.put(DefDescriptor.DefType.CONTROLLER, "Controller.js");
+        extensions.put(DefDescriptor.DefType.RENDERER, "Renderer.js");
+        extensions.put(DefDescriptor.DefType.PROVIDER, "Provider.js");
+        extensions.put(DefDescriptor.DefType.HELPER, "Helper.js");
+        extensions.put(DefDescriptor.DefType.MODEL, "Model.js");
     }
 
     @Override
     public void fileCreated(FileChangeEvent event) throws Exception {
-        callLoaderOrInvalidateAll(event, SourceMonitorEvent.created);
+        notifySourceChanges(event, SourceMonitorEvent.created);
     }
 
     @Override
     public void fileDeleted(FileChangeEvent event) throws Exception {
-        callLoaderOrInvalidateAll(event, SourceMonitorEvent.deleted);
+        notifySourceChanges(event, SourceMonitorEvent.deleted);
     }
 
     @Override
     public void fileChanged(FileChangeEvent event) throws Exception {
-        callLoaderOrInvalidateAll(event, SourceMonitorEvent.changed);
+        notifySourceChanges(event, SourceMonitorEvent.changed);
     }
 
-    /**
-     * Calls loader of particular changed file to notify change.
-     * In unlikely case loader is not found, we clear all cache by passing null DefDescriptor
-     *
-     * @param event file change event
-     * @param sEvent event name
-     */
-    private void callLoaderOrInvalidateAll(
-            FileChangeEvent event,
-            SourceListener.SourceMonitorEvent sEvent) {
-
-//        String filePath = event.getFile().toString();
-//        FileSourceLoader loader = null;
-//
-//        logger.info("File changed: " + filePath);
-//
-//        for (String dir : loaderMap.keySet()) {
-//            if (filePath.startsWith(dir)) {
-//                loader = loaderMap.get(dir);
-//                break;
-//            }
-//        }
-//
-//        if (loader != null) {
-//            loader.notifySourceChanges(event, sEvent);
-//        } else {
-//            logger.debug("No loader found. Invalidating all cache.");
-//            notifyInvalidateAll(sEvent);
-//        }
-    	
-    	// Reverting to clearing all cache so that work on SFDC can continue.
-    	logger.info("File changed: " + event.getFile().toString());
-    	notifyInvalidateAll(sEvent);
+    public void onSourceChanged(DefDescriptor<?> defDescriptor, SourceListener.SourceMonitorEvent smEvent) {
+        Aura.getDefinitionService().onSourceChanged(defDescriptor, smEvent);
     }
 
-    /**
-     * Uses {@link org.auraframework.impl.DefinitionServiceImpl} to clear all cache
-     * @param sEvent event name
-     */
-    private void notifyInvalidateAll(SourceListener.SourceMonitorEvent sEvent) {
-        Aura.getDefinitionService().onSourceChanged(null, sEvent);
+    private void notifySourceChanges(FileChangeEvent event, SourceListener.SourceMonitorEvent smEvent) {
+
+        String filePath = event.getFile().toString();
+        logger.info("File changes: " + filePath);
+
+        DefDescriptor<?> defDescriptor = getDefDescriptor(filePath);
+        onSourceChanged(defDescriptor, smEvent);
+    }
+
+    private DefDescriptor<?> getDefDescriptor(String filePath) {
+        DefDescriptor<?> defDescriptor = null;
+        filePath = filePath.replaceAll("\\\\", "/");
+        for (Map.Entry<DefDescriptor.DefType, String> entry : extensions.entrySet()) {
+            String ext = entry.getValue();
+            if (filePath.endsWith(ext)) {
+                DefDescriptor.DefType defType = entry.getKey();
+                String paths[] = filePath.split("/");
+                String namespace = paths[paths.length - 3];
+                String name = paths[paths.length - 2];
+                String extension = filePath.substring(filePath.lastIndexOf("."));
+
+                String qname;
+                if (defType == DefDescriptor.DefType.STYLE) {
+                    qname = String.format("css://%s.%s", namespace, name);
+                } else if (extension.equalsIgnoreCase(".js")) {
+                    qname = String.format("js://%s.%s", namespace, name);
+                } else {
+                    qname = String.format("markup://%s:%s", namespace, name);
+                }
+
+                defDescriptor = DefDescriptorImpl.getInstance(qname, defType.getPrimaryInterface());
+                break;
+            }
+        }
+        return defDescriptor;
     }
 }

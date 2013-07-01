@@ -373,6 +373,27 @@ ArrayValue.prototype.destroy = function(async) {
 };
 
 /**
+ * Recursively destroys all values in the array
+ */
+ArrayValue.prototype.destroyContents = function(async) {
+    
+    function destroyElements(a, async) {
+        var array = a.dirty ? a.newArray : a.array;
+        while (array.length > 0) {
+            var v = array.pop();
+            if (v !== undefined) {
+                v.destroy(async);
+            }
+        }
+    }
+
+    destroyElements(this, async);
+    this.makeDirty();
+};
+
+
+
+/**
  * Returns this type as a String.
  */
 ArrayValue.prototype.toString = function(){

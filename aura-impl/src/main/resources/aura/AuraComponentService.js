@@ -86,9 +86,8 @@ var AuraComponentService = function(){
         },
 
         /**
-         * Creates a new component on the client or server and initializes it. For example <code>$A.services.component.newComponentDeprecated("ui:inputText")</code>
-         * creates a <code>ui:inputText</code> component.
-         * <p>See Also: <a href="#help?topic=dynamicCmp">Dynamically Creating Components</a></p>
+         * Deprecated. Replaced by newComponentAsync().
+         * newComponent() calls newComponentDeprecated().
          * @param {Object} config
          * 				Use config to pass in your component definition and attributes. Supports lazy or exclusive loading by passing in "load": "LAZY" or "load": "EXCLUSIVE"
          * @param {Object} attributeValueProvider
@@ -103,6 +102,7 @@ var AuraComponentService = function(){
 
         
         /**
+         * Deprecated. Replaced by newComponentAsync().
          * Creates a new component on the client or server and initializes it. For example <code>$A.services.component.newComponentDeprecated("ui:inputText")</code>
          * creates a <code>ui:inputText</code> component.
          * <p>See Also: <a href="#help?topic=dynamicCmp">Dynamically Creating Components</a></p>
@@ -170,17 +170,21 @@ var AuraComponentService = function(){
 
         
         /**
-         * Asynchronous version of newComponent. Calls your provided callback with the completed component
-         * regardless of whether we must make a round trip to server, or can create locally.
+         * Asynchronous version of newComponent(). Creates a new component and
+         * calls your provided callback with the completed component regardless of any server-side dependencies.
          *
-         * @param callbackScope - the "this" context for the callback (null for global)
-         * @param callback - the callback to use once the component is successfully created
-         * @param config
-         * @param [attributeValueProvider]
+         * @param {Object} callbackScope The "this" context for the callback (null for global)
+         * @param {Function} callback 
+         * 						The callback to use once the component is successfully created
+         * @param {Object} config
+         * 						Required. The componentDef descriptor and attributes for the new component
+         * @param {Object} attributeValueProvider
+         * 						The value provider for the attributes
          * @param [localCreation]
          * @param [doForce]
-         * @return {*}
+         * @return {Component} The new component
          * @public
+         * @memberOf AuraComponentService
          */
         newComponentAsync: function(callbackScope, callback, config, attributeValueProvider, localCreation, doForce){
             $A.assert(config, "config is required in ComponentService.newComponentAsync(config)");
@@ -247,7 +251,7 @@ var AuraComponentService = function(){
                 action.setExclusive();
             }
 
-            action.runAfter(action);
+            $A.enqueueAction(action);
         },
 
         /**

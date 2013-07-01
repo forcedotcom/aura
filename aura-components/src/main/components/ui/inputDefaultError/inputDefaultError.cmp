@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extensible="true" implements="ui:visible" description="The default implementation of field-level errors. Iterates over the value and displays the message.">
+<aura:component extensible="true" implements="ui:visible" description="The default implementation of field-level errors, which iterates over the value and displays the message. Error messages can be added using addErrors(). To update ui:inputDefaultError, fire the updateError event.">
     <aura:attribute name="value" type="String[]" description="The list of error messages to be displayed."/>
     <ul class="{!v.class}">
         <aura:iteration items="{!v.value}" var="message">

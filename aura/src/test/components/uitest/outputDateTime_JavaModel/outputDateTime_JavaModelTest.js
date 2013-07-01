@@ -29,12 +29,36 @@
     /**
      * Verify that timezone can be 'overriden' using timezone attribute.
      */
-    testCalendarValueWithTimeZoneOverride:{
+    testCalendarISOValueWithTimeZoneOverride:{
         test:function(cmp){
             var testCmp = cmp.find('ISOStringFromJavaWithTZOverride');
             aura.test.assertNotNull(testCmp);
             aura.test.addWaitFor(true, function(){return $A.test.getText(testCmp.find('span').getElement()).length > 0;},function(){
                 aura.test.assertEquals('2004-10-23 09:30:00', $A.test.getText(testCmp.find('span').getElement()), "Failed to display DateTime from Java model");
+            });
+        }
+    },
+
+    /**
+     * Verify that outputDateTime can accept Calendar object from java model and display it.  
+     */
+    testCalendarValueFromJavaModel:{
+        test:function(cmp){
+            var testCmp = cmp.find('calendarFromJava');
+            aura.test.assertNotNull(testCmp);
+            aura.test.assertEquals('Oct 23, 2004 4:30:00 PM', testCmp.find('span').getElement().textContent, "Failed to display DateTime from Java model");
+        }
+    },
+
+    /**
+     * Verify that timezone can be 'overriden' using timezone attribute.
+     */
+    testCalendarValueWithTimeZoneOverride:{
+        test:function(cmp){
+            var testCmp = cmp.find('calendarFromJavaWithTZOverride');
+            aura.test.assertNotNull(testCmp);
+            aura.test.addWaitFor(true, function(){return testCmp.find('span').getElement().textContent.length > 0;},function(){
+                aura.test.assertEquals('2005-07-04 09:30:00', testCmp.find('span').getElement().textContent, "Failed to display DateTime from Java model");
             });
         }
     }

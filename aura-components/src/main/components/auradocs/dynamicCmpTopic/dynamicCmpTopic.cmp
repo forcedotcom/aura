@@ -20,7 +20,8 @@
 
     <h2>Goal</h2>
     <p>You want to create a component dynamically from your client-side controller action or helper. </p>
-   
+   	<auradocs:warning>The following code uses the <code>newComponentDeprecated()</code> method, previously known as <code>newComponent()</code>. Both of these methods are deprecated and have been replaced by <code>newComponentAsync()</code>. 
+   	See <auradocs:topicLink topic="dynamicCmpAsync">Dynamically Creating Components (Asynchronous)</auradocs:topicLink> for more information.</auradocs:warning>
     <h2>Code</h2>
     <p>This sample code adds a component to a <code>div</code> element. The new component is created in a server-side action and returned to the client as part of the callback.
     If you are creating components with server-side dependencies, create your components on the server and instantiate it on the client. This restriction also applies to components that contain other components with any server-side dependencies.</p>
@@ -41,7 +42,9 @@
 	    //Destroy existing components and replace it with the new component
 	    body.destroy();
 	    body.setValue(child);
-    })
+    });
+    
+    $A.enqueueAction(action);
     </auradocs:codeblock>
 	<p>The <code>newComponentDeprecated()</code> method enables you to create components on the server or on the client.
     <code>action.getReturnValue()</code> returns a component with its definition and attributes from a server-side controller.
@@ -100,8 +103,7 @@
     Additionally, we don't recommend destroying components in cases where it may result in orphaned components. For example, if you create a component on the server that is comprised of several sub-components, you may run into issues if you keep a subset of the child components and destroy others. 
     If the components depend on the local ID of one of the destroyed components, you are likely to get an error. Destroy the remaining components when are finish using them to avoid memory leaks.</p>
 
-    <auradocs:info><code>newLocalComponent()</code> is deprecated and has been replaced by <code>newComponentDeprecated()</code>. See the <a href="#reference?topic=api:AuraComponentService">JavaScript API reference</a> for a full list of methods.</auradocs:info>
-	  
+    
     <p><b>See also:</b><br/>
       <auradocs:topicLink topic="helloActions">Client-Side Controllers</auradocs:topicLink><br/>
       <auradocs:topicLink topic="serverSideControllers">Server-Side Controllers</auradocs:topicLink><br/>

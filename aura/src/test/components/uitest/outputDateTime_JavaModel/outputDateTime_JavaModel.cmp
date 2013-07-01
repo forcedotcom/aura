@@ -19,5 +19,8 @@
     <ui:outputDateTime value='{!m.dateTimeISOString}' aura:id='ISOStringFromJava' format='MM/dd/yyyy HH:mm:ss Z' timezone='GMT'/>
     <br/>
     <ui:outputDateTime value='{!m.dateTimeISOString}' timezone='America/Phoenix' format='yyyy-MM-dd hh:mm:ss' aura:id='ISOStringFromJavaWithTZOverride' />
-
+    <br/>
+    <ui:outputDateTime value='{!m.calendar}' aura:id='calendarFromJava'/>
+    <br/>
+    <ui:outputDateTime value='{!m.calendarWithTimeZone}' timezone='America/Phoenix' format='yyyy-MM-dd hh:mm:ss' aura:id='calendarFromJavaWithTZOverride' />
 </aura:component>

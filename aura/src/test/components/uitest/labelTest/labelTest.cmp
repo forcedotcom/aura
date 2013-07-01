@@ -172,4 +172,7 @@
       
    <ui:inputPercent label="inputPercent" labelPosition="bottom" value="42"/>
    <ui:inputCurrency  label="inputCurrency" labelPosition="bottom" value="42"/>
+<hr />
+<h1>label with hidden position</h1>
+<ui:inputTextArea label="inputTextArea" labelPosition="hidden" value="I'm an inputTextArea" aura:id="hiddenPosition"/><br/> 	
 </aura:component>

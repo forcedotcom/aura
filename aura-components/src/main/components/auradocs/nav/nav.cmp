@@ -26,6 +26,6 @@
             <li aura:id="demos"><auradocs:navLink location="demos">Demos</auradocs:navLink></li>
         </ul>
         <div class="fuelGauge"><auraStorage:fuelGauge storageName="actions"/></div>
-        <ui:image class="spinner"/>
+        <ui:image class="spinner" imageType="decorative"/>
     </nav>
 </aura:component>

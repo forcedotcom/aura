@@ -186,15 +186,14 @@
 	 * General Test to verify focus on menu item using AURA API  
 	 */
     testFocusOnMenuItem:{
-		test: [function(cmp) {
+    	test:function(cmp){
 				trigger = cmp.find("trigger");
 				trigger.get("e.click").fire();
 				var menuItem3 = cmp.find("actionItem3");
 				menuItem3.get("e.mouseover").fire();
 				$A.test.addWaitForWithFailureMessage(menuItem3.get('v.label'), function(){return $A.test.getActiveElementText()}, "Focus should be on item 3");
 			}
-	    ]
-    },
+	},
     
     /**
      * Test menu is positioned above if there is no space left at the bottom.
@@ -209,6 +208,10 @@
 			trigger.get("e.click").fire();
 			$A.test.addWaitForWithFailureMessage(true, function(){return $A.util.hasClass(menuList.getElement(),"visible")}, "Menu Should be visible");
 		},function(cmp){
+			//check if expand event got fired - test case for W-1647658
+			$A.test.assertTrue(cmp.get('v.expandEventFired'),"Expand event did not get fired");
+			$A.test.assertFalse(cmp.get('v.collapseEventFired'),"Collapse event should not be fired");
+        	
 			topPropertyValue = $A.util.style.getCSSProperty(menuListElement,'top');
 			//default value
 			$A.test.assertTrue(parseInt(topPropertyValue) >=0 || topPropertyValue=="auto", "CSS property of MenuList should be auto or a positive value");
@@ -218,6 +221,10 @@
 			trigger.get("e.click").fire();
 			$A.test.addWaitForWithFailureMessage(false, function(){return $A.util.hasClass(menuList.getElement(),"visible")}, "Menu Should not be visible");
 		}, function(cmp){
+			//check if collapse event got fired - test case for W-1647658
+			$A.test.assertTrue(cmp.get('v.collapseEventFired'),"Collapse event did not get fired");
+			$A.test.assertFalse(cmp.get('v.expandEventFired'),"Expand event should not be fired");
+        	
 			//open the menu
 			trigger.get("e.click").fire();
 			$A.test.addWaitForWithFailureMessage(true, function(){return $A.util.hasClass(menuList.getElement(),"visible")}, "Menu Should be visible after changing height of item1");
@@ -226,5 +233,18 @@
 			$A.test.assertTrue(parseInt(topPropertyValue) < 0, "Menu is not position properly");
 		}
 	]
+   },
+   
+   /**
+	 * Test case for W-1636495
+	 * Test to verify menuTrigger expands menuList since ui:menuList is extensible
+	 */
+   testMenuExpandWhenExtendFromMenuList:{
+	   test:function(cmp){
+				trigger = cmp.find("triggerLink");
+				menuList = cmp.find("extendMenuList");
+				trigger.get("e.click").fire();
+				$A.test.addWaitForWithFailureMessage(true, function(){return $A.util.hasClass(menuList.getElement(),"visible")}, "Menu Should be visible when you extend from menuList");
+			}
    }
 })

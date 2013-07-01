@@ -25,7 +25,7 @@
                 };
                 var actual = null;
 
-                component.get("c.changeHandler").run(domEvent);
+                component.get("c.changeHandler").runDeprecated(domEvent);
 
                 aura.test.assertTrue(actual);
             },
@@ -37,7 +37,7 @@
                 var actual = false;
 
                 mockWhile(function(){
-                    component.get("c.changeHandler").run(domEvent);
+                    component.get("c.changeHandler").runDeprecated(domEvent);
                 });
 
                 aura.test.assertTrue(actual);
@@ -51,7 +51,7 @@
                 var actual = false;
 
                 mockWhile(function(){
-                    component.get("c.changeHandler").run(domEvent);
+                    component.get("c.changeHandler").runDeprecated(domEvent);
                 });
 
                 aura.test.assertEquals(expected, actual);
@@ -65,7 +65,7 @@
                 });
 
                 mockWhile(function(){
-                    component.get("c.changeHandler").run(domEvent);
+                    component.get("c.changeHandler").runDeprecated(domEvent);
                 });
 
                 aura.test.assertEquals(expected, actual);
@@ -79,7 +79,7 @@
                 var actual = null;
 
                 mockWhile(function(){
-                    component.get("c.changeHandler").run(domEvent);
+                    component.get("c.changeHandler").runDeprecated(domEvent);
                 });
 
                 aura.test.assertEquals(expected, actual);
@@ -93,7 +93,7 @@
                 var actual = null;
 
                 mockWhile(function(){
-                    component.get("c.changeHandler").run(domEvent);
+                    component.get("c.changeHandler").runDeprecated(domEvent);
                 });
 
                 aura.test.assertEquals(expected, actual);
@@ -107,7 +107,7 @@
                 var actual = null;
 
                 mockWhile(function(){
-                    component.get("c.changeHandler").run(domEvent);
+                    component.get("c.changeHandler").runDeprecated(domEvent);
                 });
 
                 aura.test.assertEquals(expected, actual);

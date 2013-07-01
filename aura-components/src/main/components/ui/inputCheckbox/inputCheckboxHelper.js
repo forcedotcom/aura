@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 ({
-    doUpdate: function(component) {
-        var el = component.getElement();
-        component.setValue("v.value", el.checked);
+	getDomElementValue: function(element) {
+        return element.checked;
     }
 })

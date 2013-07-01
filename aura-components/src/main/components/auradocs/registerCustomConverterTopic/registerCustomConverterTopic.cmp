@@ -157,7 +157,7 @@ custom : function(c) {
     var a = c.get("c.accept");
     a.setParams({myObjs:["x","y","z"]});
     $A.enqueueAction(a);
-},
+}
 </auradocs:codeblock><br/>
 
 <p>This is how the <code>accept</code> method looks in the server-side controller. Notice the parameter of the <code>accept</code> method is of type <code>List&lt;MyCustomType></code>. This is the target type of the conversion.</p>  
@@ -267,7 +267,6 @@ public class MyCustomTypeList2ConverterConfig {
 </auradocs:codeblock><br/>
 
 <p><b>See also:</b><br/>    
-    <a href="http://jenkins.auraframework.org/view/All/job/lumen_doc/javadoc/org/auraframework/util/type/Converter.html" target="_new">Converter Interface</a><br/>
     <auradocs:topicLink topic="serverSideControllers">Server-Side Controllers</auradocs:topicLink><br/>    
     <auradocs:topicLink topic="attrTypesOverview">Supported aura:attribute Types</auradocs:topicLink>
  </p>  

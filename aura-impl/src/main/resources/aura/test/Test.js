@@ -295,12 +295,12 @@ var Test = function(){
          *             be queued behind prior requests.
          */
         callServerAction : function(action, doImmediate){
-            if(priv.complete === 0){
+            if(priv.inProgress === 0){
                 return;
             }
-            //Increment Complete to indicate that a asynchronous call is going to be initiated, selenium will
-            //wait till complete comes down to 0 which indicates all asynchronous calls were complete
-            priv.complete++;
+            //Increment 'inProgress' to indicate that a asynchronous call is going to be initiated, selenium will
+            //wait till 'inProgress' comes down to 0 which indicates all asynchronous calls were complete
+            priv.inProgress++;
             var actions = $A.util.isArray(action) ? action : [action];
             var cmp = $A.getRoot();
             try{
@@ -322,7 +322,7 @@ var Test = function(){
                                     logError("Error during action", serverActions[i]["error"][j]);
                                 }
                             }
-                            priv.complete--;
+                            priv.inProgress--;
                         },
                         "params" : {
                             "message": $A.util.json.encode({"actions" : actions}),
@@ -337,13 +337,13 @@ var Test = function(){
                         for(var i=0;i<msg["errors"].length;i++){
                             logError("Error during action", msg["errors"][i]);
                         }
-                        priv.complete--;
+                        priv.inProgress--;
                     });
                 }
             }catch(e){
                 // If trying to runAction() fails with an error, catch that error, signal that the attempt to run
                 // server action was complete and throw error.
-                priv.complete--;
+                priv.inProgress--;
                 throw e;
             }
         },
@@ -361,7 +361,7 @@ var Test = function(){
          *             conditionFunction
          */
         runAfterIf : function(conditionFunction, callback, intervalInMs){
-            if(priv.complete === 0){
+            if(priv.inProgress === 0){
                 return;
             }
             try{
@@ -370,13 +370,13 @@ var Test = function(){
                        callback();
                     }
                 }else{
-                    priv.complete++;
+                    priv.inProgress++;
                     if(!intervalInMs){
                         intervalInMs = 500;
                     }
                     setTimeout(function(){
                             aura.test.runAfterIf(conditionFunction, callback);
-                            priv.complete--;
+                            priv.inProgress--;
                         },intervalInMs);
                     return;
                 }
@@ -401,7 +401,7 @@ var Test = function(){
          *             Returns true if the test has completed, or false otherwise.
          */
         isComplete : function(){
-            return priv.complete === 0;
+            return priv.inProgress === 0;
         },
 
         /**

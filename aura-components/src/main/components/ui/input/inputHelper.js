@@ -120,9 +120,10 @@
      */
     getInputElement : function(component) {
     	var element;
+
     	if (component.get('v.label')) {
     		var el = component.getElement();
-    		element = el.getElementsByTagName('input')[0] ||  el.getElementsByTagName('select')[0] || element;    		
+    		element = el.getElementsByTagName('input')[0] ||  el.getElementsByTagName('select')[0] || element;
     	} else {
     		element = component.getElement();
     	}

@@ -17,8 +17,8 @@
     handleClick : function(component, event, helper) {
         var parent = component.getValue("v.parent");
         if (parent && !parent.isEmpty()) {
-            p = parent.getValue(0);
-            p.setValue("v.visible", false);
+            var p = parent.getValue(0);
+            p.getConcreteComponent().setValue("v.visible", false);
             helper.fireSelectEvent(component, event);
         } 
     }

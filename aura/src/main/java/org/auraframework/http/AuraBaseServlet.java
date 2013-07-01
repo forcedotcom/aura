@@ -112,18 +112,37 @@ public abstract class AuraBaseServlet extends HttpServlet {
         Aura.getConfigAdapter().validateCSRFToken(token);
     }
 
+    /**
+     * Tell the browser to not cache.
+     *
+     * This sets several headers to try to ensure that the page will not be cached.
+     * Not sure if last modified matters -goliver
+     *
+     * @param response the HTTP response to which we will add headers.
+     */
     public static void setNoCache(HttpServletResponse response) {
+        long past = System.currentTimeMillis() - LONG_EXPIRE;
         response.setHeader(HttpHeaders.CACHE_CONTROL, "no-cache, no-store");
         response.setHeader(HttpHeaders.PRAGMA, "no-cache");
-        response.setDateHeader(HttpHeaders.EXPIRES, System.currentTimeMillis() - LONG_EXPIRE);
-        response.setDateHeader(HttpHeaders.LAST_MODIFIED, System.currentTimeMillis() - LONG_EXPIRE);
+        response.setDateHeader(HttpHeaders.EXPIRES, past);
+        response.setDateHeader(HttpHeaders.LAST_MODIFIED, past);
     }
 
+    /**
+     * Set a long cache timeout.
+     *
+     * This sets several headers to try to ensure that the page will be cached for a reasonable
+     * length of time. Of note is the last-modified header, which is set to a day ago so that
+     * browsers consider it to be safe.
+     *
+     * @param response the HTTP response to which we will add headers.
+     */
     public static void setLongCache(HttpServletResponse response) {
+        long now = System.currentTimeMillis();
         response.setHeader(HttpHeaders.VARY, "Accept-Encoding");
         response.setHeader(HttpHeaders.CACHE_CONTROL, String.format("max-age=%s, public", LONG_EXPIRE / 1000));
-        response.setDateHeader(HttpHeaders.EXPIRES, System.currentTimeMillis() + LONG_EXPIRE);
-        response.setDateHeader(HttpHeaders.LAST_MODIFIED, System.currentTimeMillis() + LONG_EXPIRE);
+        response.setDateHeader(HttpHeaders.EXPIRES, now + LONG_EXPIRE);
+        response.setDateHeader(HttpHeaders.LAST_MODIFIED, now - SHORT_EXPIRE);
     }
 
     public static String addCacheBuster(String url) {

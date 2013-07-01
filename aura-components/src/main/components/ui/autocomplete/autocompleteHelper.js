@@ -28,10 +28,10 @@
     handleKeyAction: function(component, event) {
         var keyCode = event.getParam("keyCode");
         var domEvent = event.getParam("domEvent");
-        if (keyCode === 39 || keyCode === 40) {  // right or down arrow key
+        if (keyCode === 40) {  // down arrow key
             domEvent.preventDefault();
             this.setFocusToFirstItem(component, event);
-        } else if (keyCode === 37 || keyCode === 38) {  // left or up arrow key
+        } else if (keyCode === 38) {  // up arrow key
             domEvent.preventDefault();
             this.setFocusToLastItem(component, event);
         } else if (keyCode === 27) {  // Esc key

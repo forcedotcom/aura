@@ -24,8 +24,8 @@
     
     rerender: function(component, helper) {
         var currentlyVisible = false;
-        var concreteCmp = component.getConcreteComponent();
-        var divCmp = concreteCmp.find("menu");
+        //var concreteCmp = component.getConcreteComponent();
+        var divCmp = component.find("menu");
         if (divCmp) {
             var elem = divCmp.getElement();
             if (elem) {

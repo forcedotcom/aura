@@ -189,7 +189,7 @@
                 $A.test.callServerAction(clientAction);
                 $A.test.fail("Should not be able to chain a client action.");
             }catch(e){
-                $A.test.assertTrue(e.message.indexOf("Assertion Failed!: RunAfter() cannot be called on a client action. Use run() on a client action instead.")==0, e.message);
+                $A.test.assertTrue(e.message.indexOf("Assertion Failed!: RunAfter() cannot be called on a client action. Use runDeprecated() on a client action instead.")==0, e.message);
             }
         }
     }

@@ -19,11 +19,15 @@
     <aura:attribute name="iconClass" type="String" description="The CSS style used to display the icon or image."/>
     <aura:attribute name="title" type="String" default="" description="The text to display as a tooltip when the mouse pointer hovers over his component."/>
     <aura:attribute name="value" type="String" required="true" description="The text displayed when this component is rendered."/>
-    <aura:attribute name="target" type="String" description="The target destination where this rendered component is displayed. Possible values: _blank, _parent, _self, _top"/>
+    <aura:attribute name="target" type="String" description="The target destination where this rendered component is displayed. Possible values: _blank, _parent, _self, _top"/>   
+    <aura:attribute name="alt" type="String" description="The alternate text description for image (used when there is no label)"/>
+    
     <aura:registerevent name="linkClick" type="ui:linkClick" description="The event fired when the user clicks the link."/>
     <a aura:id="link" class="{!v.class}" dir="{!v.dir}" href="{!v.value}" title="{!v.title}" onclick="{!c.click}" target="{!v.target}">
         <aura:if isTrue="{!and(v.iconClass != null, v.iconClass != '')}">
-            <img src="/auraFW/resources/aura/s.gif" class="{!v.iconClass}"/>
+            <ui:image src="/auraFW/resources/aura/s.gif" class="{!v.iconClass}" 
+            	alt="{!and(v.label != null, v.label != '') ? '' : v.alt}"
+            	imageType="{!and(v.label != null, v.label != '') ? 'decorative' : 'informational'}" />
         </aura:if>
     {!v.label}
     </a>

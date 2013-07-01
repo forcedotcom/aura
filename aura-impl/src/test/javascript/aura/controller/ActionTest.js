@@ -893,12 +893,8 @@ Test.Aura.Controller.ActionTest = function() {
 	}
 
 	[ Fixture ]
-	function Complete() {
-		/**
-		 * Action.complete() is a very large function and would be easier to test if it was broken up into smaller
-		 * sections. CallsActionCallbackIfCmpIsValid is a happy path test to make sure the Action callback is called
-		 * when there are is no originalResponse, no storage, and is not in an error state.
-		 */
+	function FinishAction() {
+
 		[ Fact ]
 		function CallsActionCallbackIfCmpIsValid() {
 			// Arrange
@@ -927,13 +923,55 @@ Test.Aura.Controller.ActionTest = function() {
 			var actual = false;
 
 			// Act
-			target.complete({
+			target.finishAction({
 				setCurrentAction : function() {
 				}
 			});
 
 			// Assert
 			Assert.True(actual);
+		}
+
+		[ Fact ]
+		function CallsCompleteGroups() {
+			var target = new Action();
+			target.completeGroups = Stubs.GetMethod(null);
+
+			var error = Record.Exception(function() {
+				target.finishAction({
+					setCurrentAction : function() {
+					}
+				});
+			})
+
+			Assert.Equal([ {
+				Arguments : {},
+				ReturnValue : null
+			} ], target.completeGroups.Calls);
+			Assert.Null(error);
+		}
+
+		[ Fact ]
+		function CallsCompleteGroupsEvenOnErrors() {
+			var target = new Action();
+			target.completeGroups = Stubs.GetMethod(null);
+			target.components = "something";
+
+			var error = Record.Exception(function() {
+				target.finishAction({
+					setCurrentAction : function() {
+					},
+					joinComponentConfigs : function() {
+						throw new Error("intentional");
+					}
+				});
+			});
+
+			Assert.Equal([ {
+				Arguments : {},
+				ReturnValue : null
+			} ], target.completeGroups.Calls);
+			Assert.Equal("intentional", error);
 		}
 	}
 
@@ -1427,6 +1465,10 @@ Test.Aura.Controller.ActionTest = function() {
 		}
 	}
 
+	// [Fixture]
+	// function GetRefreshAction(){
+	// }
+
 	[ Fixture ]
 	function SanitizeStoredResponse() {
 		[ Fact ]
@@ -1620,6 +1662,132 @@ Test.Aura.Controller.ActionTest = function() {
 
 			// Assert
 			Assert.Equal(expected, actual);
+		}
+	}
+
+	[ Fixture ]
+	function AddCallbackGroup() {
+		var MockGroup = function() {
+			this.completeAction = Stubs.GetMethod("action", null);
+		}
+
+		[Fact]
+		function AddsGroupIfNew() {
+			var expected = "expected";
+			var target = new Action();
+			target.state = "NEW";
+
+			target.addCallbackGroup(expected);
+			var actual = target.groups;
+
+			Assert.Equal([ expected ], actual);
+		}
+
+		[ Fact ]
+		function DoesNotAddGroupIfNotNew() {
+			var expected = [];
+			var target = new Action();
+			target.state = "new";
+			var group = new MockGroup();
+
+			target.addCallbackGroup(group);
+			var actual = target.groups;
+
+			Assert.Equal(expected, actual);
+		}
+
+		[ Fact ]
+		function CallsCompleteActionOnGroupIfNotNew() {
+			var target = new Action();
+			target.state = "new";
+			var group = new MockGroup();
+
+			target.addCallbackGroup(group);
+
+			Assert.Equal([ {
+				Arguments : {
+					action : target
+				},
+				ReturnValue : null
+			} ], group.completeAction.Calls);
+		}
+
+		[ Fact ]
+		function DoesNotCallCompleteActionOnGroupIfNew() {
+			var target = new Action();
+			target.state = "NEW";
+			var group = new MockGroup();
+
+			target.addCallbackGroup(group);
+
+			Assert.Equal(0, group.completeAction.Calls.length);
+		}
+	}
+
+	[ Fixture ]
+	function CompleteGroups() {
+		var MockGroup = function() {
+			this.completeAction = Stubs.GetMethod("action", null);
+		}
+
+		[Fact]
+		function SetsGroupsEmpty() {
+			var target = new Action();
+			var group1 = new MockGroup();
+			var group2 = new MockGroup();
+			target.groups = [ group1, group2 ];
+
+			target.completeGroups();
+
+			Assert.Equal([], target.groups);
+		}
+
+		[ Fact ]
+		function CallsCompleteActionOnEachGroup() {
+			var target = new Action();
+			var group1 = new MockGroup();
+			var group2 = new MockGroup();
+			target.groups = [ group1, group2 ];
+
+			target.completeGroups();
+
+			Assert.Equal([ {
+				Arguments : {
+					action : target
+				},
+				ReturnValue : null
+			} ], group1.completeAction.Calls);
+			Assert.Equal([ {
+				Arguments : {
+					action : target
+				},
+				ReturnValue : null
+			} ], group2.completeAction.Calls);
+		}
+	}
+
+	[ Fixture ]
+	function Abort() {
+		[ Fact ]
+		function SetsStateToAborted() {
+			var target = new Action();
+
+			target.abort();
+
+			Assert.Equal("ABORTED", target.state);
+		}
+
+		[ Fact ]
+		function CallsCompleteGroups() {
+			var target = new Action();
+			target.completeGroups = Stubs.GetMethod(null);
+
+			target.abort();
+
+			Assert.Equal([ {
+				Arguments : {},
+				ReturnValue : null
+			} ], target.completeGroups.Calls);
 		}
 	}
 }

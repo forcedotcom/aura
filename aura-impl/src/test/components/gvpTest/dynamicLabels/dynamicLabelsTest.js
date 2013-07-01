@@ -7,7 +7,7 @@
     test:function(cmp){
         var gvp = $A.getGlobalValueProviders();
         var a = cmp.get('c.getComponentWithLabelInBody');
-        $A.run(function(cmp){a.run(a)});
+        $A.run(function(cmp){a.runDeprecated(a)});
         $A.test.addWaitFor(
                     true,
                     $A.test.allActionsComplete,
@@ -51,7 +51,7 @@
       function(cmp){
         var gvp = $A.getGlobalValueProviders();
         var a = cmp.get('c.getComponentWithLabelInBody');
-        $A.run(function(cmp){a.run(a)});
+        $A.run(function(cmp){a.runDeprecated(a)});
         $A.test.addWaitFor(
                     true,
                     $A.test.allActionsComplete,

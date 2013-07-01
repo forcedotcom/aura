@@ -15,12 +15,14 @@
  */
 ({
     afterRender: function(component, helper) {
-        helper.matchText(component);
         this.superAfterRender();
     },
     
     rerender: function(component, helper) {
-        helper.matchText(component);
+        var items = component.getValue("v.items");
+        if (items.isDirty()) {
+            helper.matchText(component, true);
+        }
         this.superRerender();
     },
     

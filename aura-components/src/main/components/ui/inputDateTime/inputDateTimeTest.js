@@ -58,7 +58,7 @@
     testInvalidTimeZone:{
 	attributes : {displayDatePicker:'true', timezone: 'dummy'},
 	test: function(cmp){
-	        cmp.find("datePicker").get('c.selectToday').run();
+	        cmp.find("datePicker").get('c.selectToday').runDeprecated();
 	        aura.test.addWaitFor(true, function(){return cmp.find("inputText").getElement().value.length > 0;},function(){
 	        	var inputDateStr  = cmp.find("inputText").getElement().value;
 		        var dt            = moment().format('MMM DD, YYYY') + " 12:00:00 AM";
@@ -69,13 +69,23 @@
     
     /**
      * Verify behavior when 'timezone' attribute is assigned a garbage value.
-     */
+     */    
     testInvalidTimeZoneUsingValue:{
 	attributes : {value:'2004-09-23T16:30:00.000Z', displayDatePicker:'true', timezone: 'dummy'},
 	test: function(cmp){	        
 	        aura.test.addWaitFor(true, function(){return cmp.find("inputText").getElement().value.length > 0;},function(){
-	        	var inputDateStr  = cmp.find("inputText").getElement().value;		        
-	    		aura.test.assertEquals("Sep 23, 2004 4:30:00 PM", inputDateStr, "Should have used default timezone.");	        	
+	        	var inputDateStr  = cmp.find("inputText").getElement().value;
+	        	aura.test.assertEquals("Sep 23, 2004 4:30:00 PM", inputDateStr, "Should have used default timezone.");
+	        	/*var timezone = $A.getGlobalValueProviders().get("$Locale.timezone");
+	        	if(timezone  == "GMT"){
+	    			aura.test.assertEquals("Sep 23, 2004 4:30:00 PM", inputDateStr, "Should have used default timezone.");
+	        	}
+	        	else if(timezone  == "America/Los_Angeles"){
+	    			aura.test.assertEquals("Sep 23, 2004 9:30:00 AM", inputDateStr, "Should have used default timezone.");
+	        	} 
+	        	else{// For any other time zone we just make sure it has some value
+	        		aura.test.assertTrue(inputDateStr.length > 0, "Should have used default timezone.");
+	        	}*/
 	        });	        
         }
     },   
@@ -86,7 +96,7 @@
     testEmptyStringTimeZone:{
 	attributes : {displayDatePicker:'true', timezone: ''},
 	test: function(cmp){
-	        cmp.find("datePicker").get('c.selectToday').run();
+	        cmp.find("datePicker").get('c.selectToday').runDeprecated();
 	        aura.test.addWaitFor(true, function(){return cmp.find("inputText").getElement().value.length > 0;},function(){
 	        	var inputDateStr  = cmp.find("inputText").getElement().value;
 	        	var dt            = moment().format('MMM DD, YYYY') + " 12:00:00 AM";
@@ -99,7 +109,7 @@
      * Verify behavior when 'langLocale' is not provided.
      */
     testDefaultLangLocale:{
-	attributes : {value:'2004-09-23T16:30:00.000Z', displayDatePicker:'true'},
+	attributes : {value:'2004-09-23T16:30:00.000Z', displayDatePicker:'true', timezone: 'GMT'},
 	test: function(cmp){	        
 	        aura.test.addWaitFor(true, function(){return cmp.find("inputText").getElement().value.length > 0;},function(){
 	        	var inputDateStr  = cmp.find("inputText").getElement().value;		        
@@ -112,7 +122,7 @@
      * Verify behavior when 'langLocale' is assigned a empty string.
      */
     testEmptyStringLangLocale:{
-	attributes : {value:'2004-09-23T16:30:00.000Z', displayDatePicker:'true', langLocale: ''},
+	attributes : {value:'2004-09-23T16:30:00.000Z', displayDatePicker:'true', langLocale: '', timezone: 'GMT'},
 	test: function(cmp){	        
 	        aura.test.addWaitFor(true, function(){return cmp.find("inputText").getElement().value.length > 0;},function(){
 	        	var inputDateStr  = cmp.find("inputText").getElement().value;		        
@@ -125,7 +135,7 @@
      * Verify behavior when 'langLocale' is assigned garbage.
      */
     testInvalidLangLocale:{
- 	attributes : {value:'2004-09-23T16:30:00.000Z', displayDatePicker:'true', langLocale: 'xx'},	
+ 	attributes : {value:'2004-09-23T16:30:00.000Z', displayDatePicker:'true', langLocale: 'xx', timezone: 'GMT'},	
 	test: function(cmp){	        
 	        aura.test.addWaitFor(true, function(){return cmp.find("inputText").getElement().value.length > 0;},function(){
 	        	var inputDateStr  = cmp.find("inputText").getElement().value;		        
@@ -138,7 +148,7 @@
      * Verify behavior when 'format' attribute is assigned an empty string.
      */
     testEmptyFormat:{
-        attributes: {value : '2004-09-23T16:30:00.000Z', format: ''},
+        attributes: {value : '2004-09-23T16:30:00.000Z', format: '', timezone: 'GMT'},
         test:function(cmp){
         	aura.test.addWaitFor(true, function(){return cmp.find("inputText").getElement().value.length > 0;},function(){
         		var inputDateStr  = cmp.find("inputText").getElement().value;
@@ -166,7 +176,7 @@
     testTodayInGMT:{
 	attributes : {displayDatePicker:'true', timezone: 'GMT'},
 	test: function(cmp){				
-	        cmp.find("datePicker").get('c.selectToday').run();
+	        cmp.find("datePicker").get('c.selectToday').runDeprecated();
 	        var inputDateStr  = cmp.find("inputText").getElement().value;
 	        var dt            = moment().format('MMM DD, YYYY') + " 12:00:00 AM";
     		aura.test.assertEquals(dt, inputDateStr, "Dates are not the same and they should be");
@@ -179,7 +189,7 @@
     testTodayInLosAngeles:{
 	attributes : {displayDatePicker:'true'},
 	test: function(cmp){
-	        cmp.find("datePicker").get('c.selectToday').run();
+	        cmp.find("datePicker").get('c.selectToday').runDeprecated();
 	        aura.test.addWaitFor(true, function(){return cmp.find("inputText").getElement().value.length > 0;},function(){
 	        	var inputDateStr  = cmp.find("inputText").getElement().value;
 	        	var dt            = moment().format('MMM DD, YYYY') + " 12:00:00 AM";
@@ -194,7 +204,7 @@
     testTodayInNewYork:{
 	attributes : {displayDatePicker:'true', timezone: 'America/New_York'},
 	test: function(cmp){
-	        cmp.find("datePicker").get('c.selectToday').run();	        
+	        cmp.find("datePicker").get('c.selectToday').runDeprecated();	        
 	        aura.test.addWaitFor(true, function(){return cmp.find("inputText").getElement().value.length > 0;},function(){
 	        	var inputDateStr  = cmp.find("inputText").getElement().value;
 	        	var dt            = moment().format('MMM DD, YYYY') + " 12:00:00 AM";
@@ -249,7 +259,7 @@
      * Verify a value in other language.
      */
 	testLanguage:{
-	attributes : {value:'2004-09-23T16:30:00.000Z', displayDatePicker:'true', langLocale: 'fr'},
+	attributes : {value:'2004-09-23T16:30:00.000Z', displayDatePicker:'true', timezone: 'GMT', langLocale: 'fr'},
 	test: function(cmp){			
 			aura.test.addWaitFor(true, function(){return cmp.find("inputText").getElement().value.length > 0;},function(){
 	        	var inputDateStr  = cmp.find("inputText").getElement().value;		        

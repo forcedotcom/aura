@@ -37,11 +37,11 @@
     <aura:attribute name="priv_continuousFlow" type="Boolean" description="Indicates carousel can flow continuously or not." />
     <aura:attribute name="priv_snap" type="String" description="PRIVATE - Scroller snap option."/>
         
-    <aura:registerevent name="pageSelected" type="ui:carouselPageEvent"/>
-    <aura:registerevent name="update" type="ui:carouselPageEvent"/>
-    <aura:registerevent name="show" type="ui:carouselPageEvent"/>
-    <aura:registerevent name="hide" type="ui:carouselPageEvent"/>
-    <aura:registerevent name="updateSize" type="ui:carouselPageEvent"/>
+    <aura:registerevent name="pageSelected" type="ui:carouselPageEvent" description="The event fired when the carousel page is selected."/>
+    <aura:registerevent name="update" type="ui:carouselPageEvent" description="The event fired when the carousel page is updated."/>
+    <aura:registerevent name="show" type="ui:carouselPageEvent" description="The event fired when the carousel page is displayed."/>
+    <aura:registerevent name="hide" type="ui:carouselPageEvent" description="The event fired when the carousel page is hidden."/>
+    <aura:registerevent name="updateSize" type="ui:carouselPageEvent" description="The event fired when the carousel page is resized."/>
     
     <aura:handler name="pageSelected" action="{!c.onPageSelected}" /> 
     <aura:handler name="update" action="{!c.onPageUpdate}" /> 

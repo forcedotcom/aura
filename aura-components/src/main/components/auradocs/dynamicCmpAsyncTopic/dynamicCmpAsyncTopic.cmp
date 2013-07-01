@@ -1,0 +1,48 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="Dynamically Creating Components (Asynchronous)"/>
+
+    <h2>Goal</h2>
+    <p>You want to create a component dynamically from your client-side controller action or helper. </p>
+    <auradocs:info>The following code uses the <code>newComponentAsync()</code> method, which replaces <code>newComponent()</code> and <code>newComponentDeprecated()</code>. </auradocs:info>
+    
+    <h2>Code</h2>
+    <p>This sample code creates a new <code>ui:button</code> component and appends it to the body.</p>
+    <auradocs:codeblock>
+    createButton : function(cmp) {
+    $A.componentService.newComponentAsync(
+            this,
+            function(newcmp){
+            	cmp.getValue("v.body").push(newcmp);
+            },
+            {
+                "componentDef": "markup://ui:button",
+                "attributes": {
+                    "values": { label: "Submit" }
+            }
+        });
+    }
+    </auradocs:codeblock>
+    <p><code>$A.componentService.newComponentAsync()</code> is equivalent to <code>$A.newCmpAsync()</code>. This method supports both client-side and server-side component creation.
+    If no server-side dependencies are found, this method is run synchronously.</p>
+    <p><code>$A.componentService.newComponentAsync()</code> takes in a callback scope, denoted by <code>this</code>. 
+    It also takes in a required <code>callback</code> function that returns your newly created component, and a required <code>config</code> object, which provides the component descriptor and attributes.
+    </p>
+    <auradocs:info>See the <ui:outputURL label="JavaScript API reference" value="#reference?topic=api:AuraComponentService"/> for a full list of arguments.</auradocs:info>
+</aura:component>

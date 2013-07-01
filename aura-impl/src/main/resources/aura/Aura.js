@@ -81,7 +81,6 @@ var clientService;
 // #include aura.layouts.LayoutDef
 // #include aura.controller.ActionDef
 // #include aura.controller.Action
-// #include aura.controller.ActionCallbackGroup
 // #include aura.attribute.AttributeDef
 // #include aura.attribute.AttributeSet
 // #include aura.attribute.AttributeDefSet
@@ -670,18 +669,24 @@ $A.ns.Aura.prototype.unwrap = function(val) {
  *
  * from JavaScript outside of controllers, renderers, providers.
  * @param {Function} func The function to run.
+ * @param {String} name an optional name for the stack.
  * @public
  */
-$A.ns.Aura.prototype.run = function(func) {
+$A.ns.Aura.prototype.run = function(func, name) {
     $A.assert(func && $A.util.isFunction(func), "The parameter 'func' for $A.run() must be a function!");
-
-    $A.services.client.pushStack("$A.run()");
-    try {
-        var ret = func();
-    } finally {
-        $A.services.client.popStack("$A.run()");
+    if (name === undefined) {
+        name = "$A.run()";
     }
-    return ret;
+
+    $A.services.client.pushStack(name);
+    try {
+        return func();
+    } catch (e) {
+        $A.error(e);
+    } finally {
+        $A.services.client.popStack(name);
+    }
+    return undefined;
 };
 
 /**

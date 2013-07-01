@@ -212,8 +212,10 @@ Action.prototype.wrapCallback = function(scope, callback) {
 };
 
 /**
- * Deprecated. Runs client-side Actions.
- * For server-side Actions, use <code>runAfter()</code> instead.
+ * Deprecated. Runs client-side Actions, use <code>$A.enqueueAction(action)</code> (which is asynchronous) instead.
+ *
+ * If you must have inline execution, you can temporarily use runDeprecated.
+ *
  * @param {Event}
  *            evt The event that calls the Action.
  */
@@ -222,17 +224,22 @@ Action.prototype.run = function(evt) {
 };
 
 /**
- * Called by run().
+ * Run an action immediately.
+ *
+ * This function should only be used for old code that requires inline execution of actions.
+ * Note that the code then must know if the action is client side or server side, since server side
+ * actions cannot be executed inline.
+ *
  * @param {Event}
  *            evt The event that calls the Action.
  */
 Action.prototype.runDeprecated = function(evt) {
-    $A.assert(this.def.isClientAction(), "Run() cannot be called on a server action. Use runAfter() on a server action instead.");
+    $A.assert(this.def.isClientAction(), "Run() cannot be called on a server action. Use $A.enqueueAction() on a server action instead.");
     this.state = "RUNNING";
     var finished = false;
     try {
         var helper = this.cmp.getDef().getHelper();
-        this.meth.call(this, this.cmp, evt, helper);
+        this.returnValue = this.meth.call(this, this.cmp, evt, helper);
         finished = true;
     } catch (e) {
         $A.log("Action failed: " + this.cmp.getDef().getDescriptor().getQualifiedName() + " -> " + this.getDef().getName(), e);
@@ -292,7 +299,7 @@ Action.prototype.setBackground = function() {
  * Adds the server-side action to the queue. For server-side Actions only.
  * For client-side Action, use <code>run()</code>
  * instead.
- * <p>For example,  <code>this.runAfter(serverAction);</code> runs serverAction after a callback.</p>
+ * <p>For example,  <code>$A.enqueueAction(serverAction);</code> runs serverAction after a callback.</p>
  *
  * @param {Action}
  *            action The action to run after the function.
@@ -346,8 +353,7 @@ Action.prototype.updateFromResponse = function(response) {
         }
         this.error = newErrors;
     } else if (this.originalResponse && this.state === "SUCCESS") {
-        // Compare the refresh response with the original response and only
-        // complete the action if they differ
+        // Compare the refresh response with the original response and return false if they are equal (no update)
         var originalValue = $A.util.json.encode(this.originalResponse["returnValue"]);
         var refreshedValue = $A.util.json.encode(response["returnValue"]);
         if (refreshedValue === originalValue) {
@@ -364,7 +370,7 @@ Action.prototype.updateFromResponse = function(response) {
 /**
  * Gets a storable response from this action.
  *
- * WARNING: Use after complete() since getStored() modifies <code>this.components</code>.
+ * WARNING: Use after finishAction() since getStored() modifies <code>this.components</code>.
  *
  * @param {String} storageName the name of the storage to use.
  */
@@ -394,13 +400,13 @@ Action.prototype.getStored = function(storageName) {
 };
 
 /**
- * Returns a response function if the Action is complete.
- * <p>For example, <code>this.complete({ returnValue: cmp.get("c.getAction") });</code> runs getAction after the current Action is complete.</p>
+ * Calls callbacks and fires events upon completion of the action.
+ *
  * @private
  * @param {Object}
- *            response
+ *            context the context for pushing and popping the current action.
  */
-Action.prototype.complete = function(context) {
+Action.prototype.finishAction = function(context) {
     var previous = context.setCurrentAction(this);
     try {
         // Add in any Action scoped components /or partial configs
@@ -576,7 +582,7 @@ Action.prototype.abort = function() {
  */
 Action.prototype.incomplete = function(context) {
     this.state = "INCOMPLETE";
-    this.complete(context);
+    this.finishAction(context);
     this.state = "NEW";
 };
 

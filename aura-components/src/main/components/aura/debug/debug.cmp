@@ -39,7 +39,7 @@
 	    	<ui:tab aura:id="errorsTab" title="Errors"><pre>{!v.errorsData}</pre></ui:tab>
 	    	<ui:tab aura:id="warningsTab" title="Warnings"><pre>{!v.warningsData}</pre></ui:tab>
         	<ui:tab aura:id="cmpTab" title="Components" activated="{!c.cmpStats}">
-        		<a onclick="{!c.cmpStats}"><ui:image src="/auraFW/resources/aura/images/refresh.png"/></a>
+        		<a onclick="{!c.cmpStats}"><ui:image src="/auraFW/resources/aura/images/refresh.png" imageType="decorative"/></a>
         		<pre>{!v.cmpData}</pre>
         	</ui:tab>
         	<ui:tab aura:id="eventTab" title="Events"><pre>{!v.eventData}</pre></ui:tab>

@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component abstract="true" extends="ui:input" implements="ui:inputBaseOption" provider="java://org.auraframework.component.ui.InputOptionProvider" support="GA" description="The input option with type checkbox, radio, or selectOption.">
+<aura:component abstract="true" extends="ui:input" implements="ui:inputBaseOption" provider="java://org.auraframework.component.ui.InputOptionProvider" support="GA" description="An abstract component for input options with type checkbox, radio, or selectOption.">
     <!-- Support "checkbox", "radio" and "selectOption" -->
     <aura:attribute name="type" type="String" default="selectOption" description="The input type. Default value is &#8220;selectOption&#8221;. Possible values: checkbox, radio, selectOption."/>
     {!v.body}

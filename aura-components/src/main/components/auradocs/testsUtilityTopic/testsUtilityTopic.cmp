@@ -48,7 +48,7 @@
                 <td>Returns errors as JSON encoded strings. If no errors are found, return an empty string.</td>
             </tr>
             <tr>
-                <td><code>aura.test.getOuterHTML(node)</code></td>
+                <td><code>aura.test.getOuterHtml(node)</code></td>
                 <td>Returns the outer HTML of an element.</td>
             </tr>
             <tr>

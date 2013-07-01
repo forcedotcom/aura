@@ -16,11 +16,13 @@
 
 -->
 <aura:application model="java://org.auraframework.component.ui.MenuTestModel">
+<aura:attribute name="expandEventFired" type="boolean" default="false"/>
+<aura:attribute name="collapseEventFired" type="boolean" default="false"/>
 <div style="display:inline-block;width:50%;vertical-align:top;">
         <h2>Check Menu Position Test</h2>
         <ui:menu aura:id="uiMenu" class="checkPositionMenu">
             <ui:menuTriggerLink class="triggercheckPosition" aura:id="triggercheckPosition" label="Please pick your favorite soccer club"/>
-            <ui:menuList class="checkPosition" aura:id="checkPosition">
+            <ui:menuList class="checkPosition" aura:id="checkPosition" menuCollapse="{!c.menuCollapse}" menuExpand="{!c.menuExpand}">
                 <ui:actionMenuItem class="checkPositionItem1" aura:id="checkPositionItem1" label="Bayern München" click="{!c.updateTriggerLabel}"/>
                 <ui:actionMenuItem class="checkPositionItem2" aura:id="checkPositionItem2" label="FC Barcelona" click="{!c.updateTriggerLabel}" disabled="true"/>
                 <ui:actionMenuItem class="checkPositionItem3" aura:id="checkPositionItem3" label="Inter Milan" click="{!c.updateTriggerLabel}"/>
@@ -263,4 +265,17 @@
         <ui:outputText value='&#60;/ui:menu&#62;'/>      
     </div>
 </div>
+<div style="display:inline-block;width:50%;vertical-align:top;">
+		<h2>Extending MenuList Example</h2>
+		<ui:menu aura:id="uiMenu" class="extendPositionMenu">
+			<ui:menuTriggerLink class="triggerLink" aura:id="triggerLink" label="Pick your favorite soccer club"/>
+			<uitest:extendMenuList aura:id="extendMenuList" class="extendMenuList">
+				<ui:actionMenuItem class="extendList1" aura:id="extendList1" label="Bayern München"/>
+				<ui:actionMenuItem class="extendList2" aura:id="extendList2" label="FC Barcelona" disabled="true"/>
+				<ui:actionMenuItem class="extendList3" aura:id="extendList3" label="Inter Milan"/>
+				<ui:actionMenuItem class="extendList4" aura:id="extendList4" label="Manchester United"/>
+				</uitest:extendMenuList>
+		</ui:menu> 
+</div>
+<hr/>
 </aura:application>

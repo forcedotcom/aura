@@ -16,7 +16,7 @@
 
 -->
 <aura:component extensible="true" abstract="true" extends="ui:interactive"
-    description="An HTML input element that gets user input for processing." support="GA">
+    description="An abstract class that is extended by input components such as ui:inputCheckbox and ui:inputText." support="GA">
     <aura:attribute name="required" type="Boolean" default="false" description="Specifies whether the input is required. Default value is &quot;false&quot;."/>
     <aura:attribute name="updateOn" type="String" default="change" description="Updates the component's value binding if the updateOn attribute is set to the handled event. Default value is &quot;change&quot;."/>
     <aura:attribute name="value" type="String" description="The value currently in the input field."/>
@@ -40,7 +40,7 @@
     <aura:handler name="updateError" action="{!c.updateDefaultError}"/>
     <aura:handler name="init" value="{!this}" action="{!c.init}" />	
     <aura:attribute name="domId" type="String" description="DOM id of the input element. By default, this attribute resolved to the globalId of the component to avoid id collision." />
-    
+
     <aura:attribute name="requiredIndicator" type="Object[]" description="A component that displays the indicator for the required field.">    	 
 		<span class="{!v.requiredIndicatorClass}">*</span>    	 
     </aura:attribute>    
@@ -72,10 +72,19 @@
 				{!v.errorComponent}
 		    </div>
 		    
-		    <aura:set attribute="else">
-		    	{!v.body}
-		    	{!v.errorComponent}
-		    </aura:set>
+		<aura:set attribute="else">
+				<aura:if isTrue="{!v.label != null &amp;&amp; v.labelPosition == 'hidden'}">
+					<div>		    	
+						{!v.body}
+						<ui:label label="{!v.label}" class="{!v.labelClass + ' uiLabel-' + v.labelPosition}" for="{!v.domId}" labelDisplay="false"/>
+						{!v.errorComponent}
+					</div>
+				<aura:set attribute="else">
+					{!v.body}
+					{!v.errorComponent}
+			    </aura:set>
+			    </aura:if>
+		</aura:set>
 	    </aura:if>
 			 
 	</aura:set>

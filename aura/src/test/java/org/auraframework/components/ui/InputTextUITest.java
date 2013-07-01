@@ -187,7 +187,12 @@ public class InputTextUITest extends WebDriverTestCase {
 
         assertModelValue(value);
         input.click();
-        value = assertModelValue(value + eventName);
+        String expected = value + eventName;
+        // When we click the input on Firefox the cursor is at the beginning of the text.
+        if (checkBrowserType("FIREFOX")) {
+            expected = eventName + value;
+        }
+        assertModelValue(expected);
         assertDomEventSet();
     }
 
@@ -274,28 +279,28 @@ public class InputTextUITest extends WebDriverTestCase {
         actions.contextClick(input).perform();
         assertEquals("Right click not performed ", "2", outputValue.getText());
     }
-    
+
     /**
      * Test Case for W-1689213
-     * @throws Exception
      */
     public void testInputTextWithLabel() throws Exception {
         open(TEST_CMP);
         WebElement div = findDomElement(By.id("inputwithLabel"));
         WebElement input = div.findElement(By.tagName("input"));
         WebElement outputDiv = findDomElement(By.id("output"));
-        
+
         String inputAuraId = "inputwithLabel";
-        String valueExpression = auraUITestingUtil.getValueFromCmpRootExpression(inputAuraId,"v.value");
+        String valueExpression = auraUITestingUtil.getValueFromCmpRootExpression(inputAuraId, "v.value");
         String defExpectedValue = (String) auraUITestingUtil.getEval(valueExpression);
         assertEquals("Default value should be the same", inputAuraId, defExpectedValue);
-        
-        String inputText = "UpdatedText";
+
+        // AndroidDriver likes to type things in all caps so modify input to accommodate.
+        String inputText = "UPDATEDTEXT";
         input.clear();
         input.click();
         input.sendKeys(inputText);
         outputDiv.click(); // to simulate tab behavior for touch browsers
-        String expectedValue = (String) auraUITestingUtil.getEval(valueExpression);
-        assertEquals("Value of Input text shoud be updated", inputText, expectedValue);
+        String actualText = (String) auraUITestingUtil.getEval(valueExpression);
+        assertEquals("Value of Input text shoud be updated", inputText, actualText);
     }
 }

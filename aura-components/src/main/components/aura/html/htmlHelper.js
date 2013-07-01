@@ -193,10 +193,10 @@
         var ownerComponent = $A.componentService.getRenderingComponentForElement(element);
         var attributes = ownerComponent.getAttributes();
         var valueProvider = attributes.getValueProvider();
-        
+
         var htmlAttributes = attributes.getValue("HTMLAttributes");
         var valueExpression = htmlAttributes.getValue(eventName);
-        
+
         if (eventName === "ontouchend") {
         	// Validate that either onclick or ontouchend is wired up to an action never both simultaneously
             var onclickExpression = htmlAttributes.getValue("onclick");
@@ -209,9 +209,16 @@
             }
         }
 
+        //start a new transaction
+
+        if(eventName == "onclick") {
+            $A.services.client._initTransaction();
+        }
+
+
         $A.run(function () {
                 var action = $A.expressionService.get(valueProvider, valueExpression);
-                action.run(event);
+                action.runDeprecated(event);
             })
     },
 
@@ -247,7 +254,7 @@
             if (ve && ve.isExpression) {
             	if (ve.isExpression()) {
 	                value = $A.expressionService.getValue(valueProvider, ve);
-	
+
 	                // get the actual value from the Value object (if it's not null)
 	                if (value && value.auraType === "Value") {
 	                    if (aura.util.arrayIndexOf(this.SPECIAL_BOOLEANS, name.toLowerCase()) > -1) {
@@ -261,7 +268,7 @@
                     value = ve.getValue();
             	}
             } else{
-            	value = ve; 
+            	value = ve;
             }
 
             var isHash = value && value.indexOf && value.indexOf("#") === 0;
@@ -302,7 +309,7 @@
                     ret.removeAttribute(casedName);
                 } else {
                     ret.setAttribute(casedName, name);
-                    
+
                     // Support for IE's weird handling of checked
                     if (casedName === "checked"){
                     	ret.setAttribute("defaultChecked", true);
@@ -324,7 +331,7 @@
             }
         }
     },
-    
+
     isInputNullValue: function(tagName, attributeName, value) {
         if (tagName && attributeName) {
             return tagName.toLowerCase() === "input" && attributeName.toLowerCase() === "value" && value === null;

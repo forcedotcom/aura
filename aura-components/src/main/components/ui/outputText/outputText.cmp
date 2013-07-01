@@ -17,5 +17,6 @@
 -->
 <aura:component extends="ui:output" extensible="true" support="GA" description="Displays text as specified by the value attribute.">
     <aura:attribute name="value" type="String" required="true" description="The text displayed when this component is rendered."/>
-    <span class="{!v.class}" dir="{!v.dir}" aura:id="span">{!v.value}</span>
+     
+    <span class="{!v.class}" dir="{!v.dir}" aura:id="span"><!--value will be rendered here--></span>
 </aura:component>

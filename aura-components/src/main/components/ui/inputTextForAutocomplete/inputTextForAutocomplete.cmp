@@ -16,7 +16,7 @@
 
 -->
 <aura:component extends="ui:inputText" extensible="true" support="proto"
-    description="This component is used as input text in autocomplete.">
+    description="This component is used as input text in a ui:autocomplete component.">
     <input aura:id="txt"
            id="{!v.domId}"
            class="{!v.class}"

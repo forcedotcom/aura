@@ -18,5 +18,5 @@
 <aura:component support="BETA" description="Detects a window resize or orientation change event and runs the updateSize controller method. Ensures the order of component composition.">
     <aura:attribute name="onresize" type="Aura.Action" description="The action that is run on resize."/>
     <aura:handler event="ui:updateSize" action="{!c.updateSize}" description="The event fired when a component is resized."/>
-    <aura:handler event="aura:doneWaiting" action="{!c.updateSize}"/>
+    <aura:handler event="aura:doneWaiting" action="{!c.updateSize}" description="The event fired when the client is done waiting for a response to a server request."/>
 </aura:component>

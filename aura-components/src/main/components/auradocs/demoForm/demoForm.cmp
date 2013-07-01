@@ -28,7 +28,8 @@
         <ui:inputURL label="ui:inputURL" value="http://"/>
         <ui:outputURL label="ui:outputURL demo" value="/auradocs" /><br /><br />
         <p>Click the ui:inputDate field to get today's date or use the date picker to select a date.</p>
-        <ui:inputDate label="ui:inputDate" value="{!v.myDate}" mouseup="{!c.getDate}" displayDatePicker="true" />
+        <ui:label for="dateInput" label="ui:inputDate" />
+        <ui:inputDate aura:id="dateInput" value="{!v.myDate}" mouseup="{!c.getDate}" displayDatePicker="true" labelPosition="top" />
         <ui:inputTime label="ui:inputTime" value="10:00"/>
         <ui:inputNumber label="ui:inputNumber" value="42"/>
         <ui:inputTextArea label="ui:inputTextArea" cols="10" value="This is a String." />

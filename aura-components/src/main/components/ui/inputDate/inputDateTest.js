@@ -105,7 +105,7 @@
      * Verify behavior of Today() with default 'format' value.
      */
 	testToday:{
-	attributes : {displayDatePicker:'true'},
+	attributes : {displayDatePicker:'true', format:'MMM dd, yyyy'},
 	test: function(cmp){
 	        cmp.find("datePicker").get('c.selectToday').runDeprecated();
 	        var inputDateStr = cmp.find("inputText").getElement().value;

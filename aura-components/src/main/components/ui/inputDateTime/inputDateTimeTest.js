@@ -56,7 +56,7 @@
      * Verify behavior when 'timezone' attribute is assigned a garbage value.
      */
     testInvalidTimeZone:{
-	attributes : {displayDatePicker:'true', timezone: 'dummy'},
+	attributes : {displayDatePicker:'true', timezone: 'dummy', format:'MMM dd, yyyy h:mm:ss a'},
 	test: function(cmp){
 	        cmp.find("datePicker").get('c.selectToday').runDeprecated();
 	        aura.test.addWaitFor(true, function(){return cmp.find("inputText").getElement().value.length > 0;},function(){
@@ -94,7 +94,7 @@
      * Verify behavior when 'timezone' is assigned a empty string.
      */
     testEmptyStringTimeZone:{
-	attributes : {displayDatePicker:'true', timezone: ''},
+	attributes : {displayDatePicker:'true', timezone: '', format:'MMM dd, yyyy h:mm:ss a'},
 	test: function(cmp){
 	        cmp.find("datePicker").get('c.selectToday').runDeprecated();
 	        aura.test.addWaitFor(true, function(){return cmp.find("inputText").getElement().value.length > 0;},function(){
@@ -174,7 +174,7 @@
      * Verify Today in default time zone.
      */
     testTodayInGMT:{
-	attributes : {displayDatePicker:'true', timezone: 'GMT'},
+	attributes : {displayDatePicker:'true', timezone: 'GMT', format:'MMM dd, yyyy h:mm:ss a'},
 	test: function(cmp){				
 	        cmp.find("datePicker").get('c.selectToday').runDeprecated();
 	        var inputDateStr  = cmp.find("inputText").getElement().value;
@@ -187,7 +187,7 @@
      * Verify Today in LA time zone.
      */
     testTodayInLosAngeles:{
-	attributes : {displayDatePicker:'true'},
+	attributes : {displayDatePicker:'true', format:'MMM dd, yyyy h:mm:ss a'},
 	test: function(cmp){
 	        cmp.find("datePicker").get('c.selectToday').runDeprecated();
 	        aura.test.addWaitFor(true, function(){return cmp.find("inputText").getElement().value.length > 0;},function(){
@@ -202,7 +202,7 @@
      * Verify Today in NY time zone.
      */
     testTodayInNewYork:{
-	attributes : {displayDatePicker:'true', timezone: 'America/New_York'},
+	attributes : {displayDatePicker:'true', timezone: 'America/New_York', format:'MMM dd, yyyy h:mm:ss a'},
 	test: function(cmp){
 	        cmp.find("datePicker").get('c.selectToday').runDeprecated();	        
 	        aura.test.addWaitFor(true, function(){return cmp.find("inputText").getElement().value.length > 0;},function(){

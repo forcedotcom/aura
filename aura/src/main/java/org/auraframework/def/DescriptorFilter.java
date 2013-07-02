@@ -160,6 +160,8 @@ public class DescriptorFilter implements Comparable<DescriptorFilter> {
 
     @Override
     public boolean equals(Object arg0) {
+        if(arg0 == null) return false;
+        if (this == arg0) return true;
         if (!(arg0 instanceof DescriptorFilter)) { // tests null also
             return false;
         }

@@ -16,3 +16,6 @@
 .preloadTestTest_SpecialCharacter:after {
 content: '•'
 }
+.preloadTestTest_SpecialCharacter:before {
+content: 'AuraResourceServletTest-testWriteCssWithoutDupes'
+}

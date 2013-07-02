@@ -16,7 +16,7 @@
 
 -->
 <aura:component extends="ui:abstractList" support="proto"
-    provider="java://org.auraframework.component.ui.ListProvider, js://ui.list">
+    provider="java://org.auraframework.component.ui.ListProvider, js://ui.list" description="A list component that iterates over and displays the items in the ui:dataProvider component.">
 	<ul class="{!v.class}">
 	<aura:iteration items="{!v.items}" var="{!v.itemVar}" body="{!v.itemTemplate}">
 		

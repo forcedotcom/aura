@@ -21,7 +21,7 @@
     <aura:attribute name="_activeDialog" type="Object" description="PRIVATE ATTRIBUTE | DO NOT SET -- Reference to the currently active (i.e., open) ui:dialog component."/>
 
     <!-- events -->
-    <aura:handler event="ui:openDialog" action="{!c.openDialog}"/>
-    <aura:handler event="ui:closeDialog" action="{!c.closeDialog}"/>
+    <aura:handler event="ui:openDialog" action="{!c.openDialog}" description="Activates a single ui:dialog component"/>
+    <aura:handler event="ui:closeDialog" action="{!c.closeDialog}" description="Deactivates a single ui:dialog component."/>
 
 </aura:component>

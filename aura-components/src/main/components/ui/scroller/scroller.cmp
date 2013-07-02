@@ -37,8 +37,8 @@
     <aura:attribute name="pullToRefreshSubtitle" type="String" description="The text to display in the top cell when the user pulls the scroller area to refresh the content."/>
     <aura:attribute name="stopEventPropagation" type="Boolean" default="false" description="Disables DOM event propagation. (This probably isn't something you want to enable.)"/>
 
-    <aura:registerEvent name="refreshed" type="ui:scrollerRefreshed"/>
-	<aura:handler event="aura:locationChange" action="{!c.locationChange}"/>
+    <aura:registerEvent name="refreshed" type="ui:scrollerRefreshed" description="The event fired when the scroller is refreshed."/>
+	<aura:handler event="aura:locationChange" action="{!c.locationChange}" description="The event fired when a location change occurs."/>
     
     <ui:resizeObserver onresize="{!c.refresh}"/>
 

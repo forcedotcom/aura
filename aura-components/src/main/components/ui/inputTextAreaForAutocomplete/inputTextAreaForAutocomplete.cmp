@@ -16,7 +16,7 @@
 
 -->
 <aura:component extends="ui:inputTextArea" extensible="true" support="proto"
-    description="This component is used as input text area in autocomplete.">
+    description="This component is used as input text area in a ui:autocomplete component.">
     <textarea aura:id="textAreaElem"
         id="{!v.domId}"
         class="{!v.class+(v.resizable?'':' noresize')}"

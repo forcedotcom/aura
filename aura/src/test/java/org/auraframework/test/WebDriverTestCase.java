@@ -697,6 +697,16 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
             }
         }, timeoutInSecs);
     }
+    
+    public void waitForAutoCompleteListVisible(final WebElement list, final boolean isVisible) {
+		auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
+            @Override
+            public Boolean apply(WebDriver d) {
+                boolean isInvisible = hasCssClass(list, "invisible");
+                return isVisible != isInvisible;
+            }
+        }, timeoutInSecs);
+    }
 
     /**
      * Find first matching element in the DOM.

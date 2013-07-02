@@ -62,13 +62,13 @@ public class CarouselUITest extends WebDriverTestCase {
         WebElement navElement = getNavigationItemSelected(carousel);
         navElement.click();
         assertEquals("Navigation bar element should be in focus.",
-                navElement.getAttribute(AURA_RENDERED_BY_ID), getUniqueIdOfFocusedElement());
+                navElement.getAttribute(AURA_RENDERED_BY_ID), auraUITestingUtil.getUniqueIdOfFocusedElement());
 
         // tab into carousel page
         auraUITestingUtil.pressTab(navElement);
         WebElement element1 = getMDMPageElement(page, 1);
         assertEquals("Should be focused on the first element on the carousel page.",
-                element1.getAttribute(AURA_RENDERED_BY_ID), getUniqueIdOfFocusedElement());
+                element1.getAttribute(AURA_RENDERED_BY_ID), auraUITestingUtil.getUniqueIdOfFocusedElement());
     }
 
     /**
@@ -88,12 +88,12 @@ public class CarouselUITest extends WebDriverTestCase {
         // tab to next element
         auraUITestingUtil.pressTab(element1);
         assertEquals("Should be focused on the second element on the carousel page.",
-                element2.getAttribute(AURA_RENDERED_BY_ID), getUniqueIdOfFocusedElement());
+                element2.getAttribute(AURA_RENDERED_BY_ID), auraUITestingUtil.getUniqueIdOfFocusedElement());
 
         // tab to previous element
         shiftTab().perform();
         assertEquals("Shift+Tab to previous element. Should be focused on the first element on the carousel page.",
-                element1.getAttribute(AURA_RENDERED_BY_ID), getUniqueIdOfFocusedElement());
+                element1.getAttribute(AURA_RENDERED_BY_ID), auraUITestingUtil.getUniqueIdOfFocusedElement());
     }
 
     /**
@@ -113,7 +113,7 @@ public class CarouselUITest extends WebDriverTestCase {
         // tab back to navigation bar
         shiftTab().perform();
         assertEquals("Shift+Tab to navigation bar. Should be focused on the navigation bar item.",
-                navElement.getAttribute(AURA_RENDERED_BY_ID), getUniqueIdOfFocusedElement());
+                navElement.getAttribute(AURA_RENDERED_BY_ID), auraUITestingUtil.getUniqueIdOfFocusedElement());
     }
 
     /**
@@ -133,7 +133,7 @@ public class CarouselUITest extends WebDriverTestCase {
         navItem.click();
         auraUITestingUtil.pressTab(navItem);
         assertEquals("Should be focused on the next carousel page.",
-                expectedFocus.getAttribute(AURA_RENDERED_BY_ID), getUniqueIdOfFocusedElement());
+                expectedFocus.getAttribute(AURA_RENDERED_BY_ID), auraUITestingUtil.getUniqueIdOfFocusedElement());
 
     }
 
@@ -153,7 +153,7 @@ public class CarouselUITest extends WebDriverTestCase {
         navItem.click();
         shiftTab().perform();
         assertEquals("Should be focused on the previous carousel",
-                expectedFocus.getAttribute(AURA_RENDERED_BY_ID), getUniqueIdOfFocusedElement());
+                expectedFocus.getAttribute(AURA_RENDERED_BY_ID), auraUITestingUtil.getUniqueIdOfFocusedElement());
     }
 
     /**
@@ -277,7 +277,4 @@ public class CarouselUITest extends WebDriverTestCase {
         return pageItems.get(--entityNum).findElement(By.tagName("a")); // return tab-able element
     }
 
-    private String getUniqueIdOfFocusedElement() {
-        return (String) auraUITestingUtil.getEval(ACTIVE_ELEMENT_UNIQUE_ID);
-    }
 }

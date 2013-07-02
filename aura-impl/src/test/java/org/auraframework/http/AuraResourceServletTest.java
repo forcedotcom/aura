@@ -16,6 +16,8 @@
 package org.auraframework.http;
 
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -209,5 +211,34 @@ public class AuraResourceServletTest extends AuraTestCase {
         if (text.indexOf(dupeCheck) != text.lastIndexOf(dupeCheck)) {
             fail("found duplicated code in: " + text);
         }
+    }
+    
+    /**
+     * Sanity check to make sure that app.css does not have duplicate copy of component CSS.
+     * Component CSS was being added twice, once because they were part of preload namespace 
+     * and a second time because of component dependency. This test mocks such duplication.  
+     * W-1588568
+     */
+    public void testWriteCssWithoutDupes() throws Exception{
+        Aura.getContextService().startContext(AuraContext.Mode.DEV, AuraContext.Format.CSS,
+                AuraContext.Access.AUTHENTICATED);
+        AuraContext ctx =  Aura.getContextService().getCurrentContext();
+        //First reference to preloadTest
+        ctx.addPreload("preloadTest");
+        //preloadTest:test_SimpleApplication has the second explicit reference to preloadTest as a preload namespace
+        DefDescriptor<ApplicationDef> appDesc = Aura.getDefinitionService().getDefDescriptor("preloadTest:test_SimpleApplication", ApplicationDef.class);
+        ctx.setApplicationDescriptor(appDesc);
+        
+        StringBuilder output = new StringBuilder();
+        AuraResourceServlet.writeCss(output);
+        
+        //A snippet of component css
+        String cssPiece = "AuraResourceServletTest-testWriteCssWithoutDupes";
+        Pattern pattern = Pattern.compile(cssPiece);
+        System.out.println(output.toString());
+        Matcher matcher = pattern.matcher(output.toString());
+        int count = 0;
+        while(matcher.find() && count<3) count++;
+        assertEquals("Component CSS repeated", 1, count);
     }
 }

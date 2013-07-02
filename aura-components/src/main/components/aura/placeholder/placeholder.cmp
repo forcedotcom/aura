@@ -16,7 +16,7 @@
 
 -->
 <aura:component >
-    <aura:attribute name="body" type="Aura.Component[]">
+    <aura:attribute name="body" type="Aura.Component[]" description="A placeholder spinner component used when waiting for a server-side dependency, such as when lazy-loading a component.">
         <div class="spin"/>
     </aura:attribute>
     <aura:attribute name="refDescriptor" type="java://org.auraframework.def.DefDescriptor"/>

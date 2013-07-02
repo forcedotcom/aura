@@ -20,8 +20,8 @@
         abstract="true" description="A generic list data provider">
     
     <!-- these belong on the dataProviderInterface, but were not working there... -->    
-	<aura:registerEvent name="provide" type="ui:dataProvide"/>
-	<aura:registerEvent name="onchange" type="ui:dataChanged"/>
+	<aura:registerEvent name="provide" type="ui:dataProvide" description="The event fired when the list is intialized."/>
+	<aura:registerEvent name="onchange" type="ui:dataChanged" description="The event fired when the list data changes."/>
 
     {!v.body}
 </aura:component>

@@ -13,8 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@def BODY_MARGIN  10px;
-@def BODY_PADDING  10px;
 
 .testStyleTest {
     margin-left: 6px;
@@ -41,8 +39,6 @@
 
 .THIS .div4 {
     border: 1px solid;
-    margin: add(BODY_MARGIN,
-                BODY_PADDING);
 }
 
 .THIS .div5 {

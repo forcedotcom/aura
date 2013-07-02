@@ -24,7 +24,7 @@ public class StyleParserUITest extends WebDriverTestCase {
 
     /**
      * Verify css from template is properly injected and present on loaded DOM.
-     *
+     * 
      * Automation for W-1538820.
      */
     public void testStyleCssInjectedIntoDom() throws Exception {
@@ -32,8 +32,8 @@ public class StyleParserUITest extends WebDriverTestCase {
 
         String pageSource = getDriver().getPageSource();
         String sourceNoWhitespace = pageSource.replaceAll("\\s", "");
-        String expectedCssOnDom = "body{background-color:#ffff99;}.templateRule{border:1pxdottedblack;"
-                + "font-style:italic;font-family:monospace;}span{word-spacing:20px;}";
+        String expectedCssOnDom = "body{background-color:#FF9}.templateRule{border:1pxdottedblack;"
+                + "font-style:italic;font-family:monospace}span{word-spacing:20px}";
         assertTrue("Loaded app does not have template css present.", sourceNoWhitespace.contains(expectedCssOnDom));
     }
 }

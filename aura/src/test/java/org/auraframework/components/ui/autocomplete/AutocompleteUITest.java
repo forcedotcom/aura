@@ -15,8 +15,6 @@
  */
 package org.auraframework.components.ui.autocomplete;
 
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -61,6 +59,10 @@ public class AutocompleteUITest extends WebDriverTestCase {
 		super(name);
 	}
 	
+	/**
+	 * Initial load of the autocomplete component. Verify data is loaded and
+	 * the list is not visible.
+	 */
 	public void testAutoCompleteComponentInitialRender() throws Exception {
 		open(URL);
         WebDriver driver = getDriver();
@@ -70,20 +72,34 @@ public class AutocompleteUITest extends WebDriverTestCase {
         assertEquals("Autocomplete has the incorrect number of options", 10, options.size());
 	}
 	
+	/**
+	 * Matching multiple items verifying list is visible and matched items
+	 * present.
+	 */
 	public void testAutoCompleteComponentRenderOnMatch() throws Exception {
 		doTestMatch(AUTOCOMPLETE_COMPONENT.get("Generic"), "o", null, 10, 
 				OptionType.AUTOCOMPLETE_OPTION);
 	}
 	
+	/**
+	 * Able to select an item from autocomplete list.
+	 */
 	public void testAutoCompleteSelectOption() throws Exception {
 		doTestSelectOption(AUTOCOMPLETE_COMPONENT.get("Generic"), OptionType.AUTOCOMPLETE_OPTION);
 	}
 	
+	/**
+	 * Matching single items verifying list is visible and single matched 
+	 * items present.
+	 */
 	public void testAutoCompleteSingleMatch() throws Exception {
 		doTestMatch(AUTOCOMPLETE_COMPONENT.get("Generic"), "hello world2", "hello world2", 1, 
 				OptionType.AUTOCOMPLETE_OPTION);
 	}
 	
+	/**
+	 * Autocomplete list with no data renderes correctly.
+	 */
 	public void testAutoCompleteWithZeroItems() throws Exception {
 		open(URL);
         WebDriver driver = getDriver();
@@ -92,6 +108,9 @@ public class AutocompleteUITest extends WebDriverTestCase {
         assertEquals("Autocomplete with no data should not have any options", 0, options.size());
 	}
 	
+	/**
+	 * Tabing through input field and list items functions properly.
+	 */
 	public void testAutoCompleteTabing() throws Exception {
 		open(URL);
         WebDriver driver = getDriver();
@@ -115,6 +134,9 @@ public class AutocompleteUITest extends WebDriverTestCase {
         
 	}
 	
+	/**
+	 * Using arrow keys to cycle through list items functions properly.
+	 */
 	public void testAutoCompleteArrowKeys() throws Exception {
 		open(URL);
         WebDriver driver = getDriver();
@@ -131,24 +153,42 @@ public class AutocompleteUITest extends WebDriverTestCase {
         		nextElement.getAttribute("data-aura-rendered-by"), auraUITestingUtil.getUniqueIdOfFocusedElement());       
 	}
 	
+	/**
+	 * For a component using a custom template match multiple items and verify 
+	 * list is visible and matched items present.
+	 */
 	public void testAutoCompleteCustomTemplateComponentRenderOnMatch() throws Exception {
 		doTestMatch(AUTOCOMPLETE_COMPONENT.get("CustomTemplate"), "o", null, 10, 
 				OptionType.AUTOCOMPLETE_CUSTOM_TEMPLATE_OPTION);
 	}
 	
+	/**
+	 * For a component using a custom template able to select item in list.
+	 */
 	public void testAutoCompleteCustomTemplateComponentSelectOption() throws Exception {
 		doTestSelectOption(AUTOCOMPLETE_COMPONENT.get("CustomTemplate"), OptionType.AUTOCOMPLETE_CUSTOM_TEMPLATE_OPTION);
 	}
 	
+	/**
+	 * For a component extending autocompleteOption able to match multiple 
+	 * items, also verify list is visible and matched items present.
+	 */
 	public void testAutoCompleteCustomOptionComponentRenderOnMatch() throws Exception {
 		doTestMatch(AUTOCOMPLETE_COMPONENT.get("OptionExtention"), "o", null, 10, 
 				OptionType.AUTOCOMPLETE_CUSTOM_OPTION);
 	}
 	
+	/**
+	 * For component extending autocompleteOption able to select item in list.
+	 */
 	public void testAutoCompleteCustomOptionComponentSelectOption() throws Exception {
 		doTestSelectOption(AUTOCOMPLETE_COMPONENT.get("OptionExtention"), OptionType.AUTOCOMPLETE_CUSTOM_OPTION);
 	}
 	
+	/**
+	 * For a component extending autocompleteOption able to match single 
+	 * item, also verify list is visible and matched items present.
+	 */
 	public void testAutoCompleteSingleMatchUsingCustomTemplate() throws Exception {
 		doTestMatch(AUTOCOMPLETE_COMPONENT.get("CustomTemplate"), "hello world2", "hello world2", 1, 
 				OptionType.AUTOCOMPLETE_CUSTOM_TEMPLATE_OPTION);

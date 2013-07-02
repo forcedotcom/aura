@@ -4,6 +4,7 @@
      * Any subsequent requests to these labels using Global Value Providers(GVP) should return the label.
      */
     testNewLabelsInDynamicComponent:{
+    testLabels : ["UnAdaptableTest"],
     test:function(cmp){
         var gvp = $A.getGlobalValueProviders();
         var a = cmp.get('c.getComponentWithLabelInBody');

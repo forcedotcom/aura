@@ -15,6 +15,6 @@
     limitations under the License.
 
 -->
-<aura:component support="GA" description="Represents a label">
+<aura:component support="GA" description="Represents a label that accepts a dynamic value.">
     <aura:attribute name="value" type="String" description="The text to display on the label. The value attribute can hold a string value or a $Label provider expression to reference a label value defined elsewhere, such as {!$Label.Object.title}. You can use one or more numbered parameters, such as {0} and {1}, to substitute their values from items in this component's body. An item can be a component, or an expression like {!$Label.Object.title}, {!500}, or {!'abc'}. The parameters can be used in the value attribute directly or in the label definition of the label referenced by the value attribute." />
 </aura:component>

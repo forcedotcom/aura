@@ -21,7 +21,7 @@
          renderer="js://aura.component, java://org.auraframework.renderer.ComponentRenderer"
          implements="aura:rootComponent"
          support="GA"
-                description="The root of the component hierarchy.">
+                description="The root of the component hierarchy. Provides a default rendering implementation.">
     <!-- we need to include all of the aura events, because many don't have direct references -->
     <aura:dependency resource="markup://aura" type="EVENT" />
     <aura:dependency resource="markup://aura:placeholder" />

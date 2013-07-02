@@ -112,6 +112,15 @@ ArrayValue.prototype.clear = function() {
 };
 
 /**
+ * Promises that I am the true owner of my children and that I should be responsible for cleaning
+ * up lost references.
+ */
+ArrayValue.prototype.setIsOwner = function(isOwner) {
+    this.isOwner = isOwner;
+};
+
+
+/**
  * Sets the array to newArray.
  *
  * @param newArray The new array. This can be an array of literal JavaScript values or an array of value objects.
@@ -142,6 +151,20 @@ ArrayValue.prototype.setValue = function(newArray, skipChange) {
     }
 };
 
+
+/**
+ * Recursively destroys all values in the array
+ */
+ArrayValue.prototype.destroyOrphans = function(array, async) {
+    
+     while (array.length > 0) {
+         var v = array.pop();
+         if (v && v.destroy) {
+             v.destroy(async);
+         }
+    }
+};
+
 /**
  * Commits changes to the array.
  * If there is no uncommitted value, nothing will happen.  isDirty() will return false
@@ -151,6 +174,10 @@ ArrayValue.prototype.setValue = function(newArray, skipChange) {
  */
 ArrayValue.prototype.commit = function(clean) {
     if (this.isDirty()) {
+        if (this.array && this.isOwner) {
+            this.destroyOrphans(this.array,true);
+        }
+            
         this.array = this.newArray;
         this.rollback(clean);
     }
@@ -370,25 +397,6 @@ ArrayValue.prototype.destroy = function(async) {
     }
 
     delete this.handlers;
-};
-
-/**
- * Recursively destroys all values in the array
- */
-ArrayValue.prototype.destroyContents = function(async) {
-    
-    function destroyElements(a, async) {
-        var array = a.dirty ? a.newArray : a.array;
-        while (array.length > 0) {
-            var v = array.pop();
-            if (v !== undefined) {
-                v.destroy(async);
-            }
-        }
-    }
-
-    destroyElements(this, async);
-    this.makeDirty();
 };
 
 

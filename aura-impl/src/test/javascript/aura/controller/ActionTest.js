@@ -735,6 +735,17 @@ Test.Aura.Controller.ActionTest = function() {
 			// Assert
 			Assert.True(actual);
 		}
+
+		[ Fact ]
+		function CannotSetBackgroundToFalse() {
+			var target = new Action();
+			target.background = true;
+
+			target.setBackground(false);
+			var actual = target.background;
+
+			Assert.True(actual);
+		}
 	}
 
 	[ Fixture ]

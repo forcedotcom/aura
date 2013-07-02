@@ -520,10 +520,9 @@ var AuraClientService = function() {
             //
             if (action.getDef().isClientAction()) {
                 action.runDeprecated();
-            } 
-            
-            
-            clientService.actionQueue.enqueue(action);
+            } else {
+                clientService.actionQueue.enqueue(action);
+            }
         },
 
         /**

@@ -214,9 +214,15 @@ Action.prototype.wrapCallback = function(scope, callback) {
 };
 
 /**
- * Deprecated. Use <code>$A.enqueueAction(action)</code> (which is asynchronous) instead.
+ * Deprecated.
+ * Note: This method is deprecated and should not be used. Instead, use the 
+ * <code>enqueueAction</code> method on the Aura type. For example, 
+ * <code>$A.enqueueAction(action)</code>.
+ * 
+ * The deprecated run method runs client-side actions. Do not use it for
+ * running server-side actions.
  *
- * If you must have inline execution, you can temporarily use runDeprecated.
+ * If you must have synchronous execution, you can temporarily use runDeprecated.
  *
  * @deprecated
  * @param {Event}
@@ -240,17 +246,13 @@ Action.prototype.run = function(evt) {
 Action.prototype.runDeprecated = function(evt) {
     $A.assert(this.def.isClientAction(), "run() cannot be called on a server action. Use $A.enqueueAction() on a server action instead.");
     this.state = "RUNNING";
-    var finished = false;
     try {
         var helper = this.cmp.getDef().getHelper();
         this.returnValue = this.meth.call(this, this.cmp, evt, helper);
-        finished = true;
+        this.state = "SUCCESS";
     } catch (e) {
+        this.state = "FAILURE";
         $A.log("Action failed: " + this.cmp.getDef().getDescriptor().getQualifiedName() + " -> " + this.getDef().getName(), e);
-    } finally {
-        if (!finished) {
-            this.state = "FAILURE";
-        }
     }
 };
 
@@ -300,11 +302,20 @@ Action.prototype.setBackground = function() {
 };
 
 /**
- * Deprecated. Use the asynchronous <code>$A.enqueueAction(serverAction)</code> call instead.
+ * Deprecated.
+ * Note: This method is deprecated and should not be used. Instead, use the 
+ * <code>enqueueAction</code> method on the Aura type. For example, 
+ * <code>$A.enqueueAction(action)</code>.
+ * 
+ * The deprecated <code>runAfter</code> method adds a specified server-side action 
+ * to the action queue. It is for server-side actions only. For example, 
+ * <code>this.runAfter(serverAction);</code> sends the action to the server
+ * and runs the callback when the server action completes (if the action 
+ * was not aborted).
  *
  * @deprecated
  * @param {Action}
- *            action The action to run after the function.
+ *            action The action to run.
  */
 Action.prototype.runAfter = function(action) {
     $A.assert(action.def.isServerAction(), "RunAfter() cannot be called on a client action. Use run() on a client action instead.");

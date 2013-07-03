@@ -51,7 +51,7 @@
         <tr class="{!t.status + ' ' + t.isHidden}">
         <td >
         <aura:renderIf isTrue="{!t.jsConsole != ''}">
-                 <ui:outputUrl title="Run in JS Console" value="{!t.jsConsole}" iconClass="jsConsoleIcon" target="_blank"/>
+                 <ui:outputUrl alt="Run in JS Console" title="Run in JS Console" value="{!t.jsConsole}" iconClass="jsConsoleIcon" target="_blank"/>
         </aura:renderIf>
        </td>
        <td>

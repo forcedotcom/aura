@@ -48,8 +48,20 @@ import com.google.common.collect.Lists;
  * (case-insensitive).
  */
 public class AuraIntegrationTests extends TestSuite {
-    public static final boolean RANDOM_ORDER = Boolean.parseBoolean(System.getProperty("testShuffle", "false"));
+    public static final boolean TEST_SHUFFLE = Boolean.parseBoolean(System.getProperty("testShuffle", "false"));
+    public static final int TEST_ITERATIONS;
+    private static final Logger logger = Logger.getLogger(AuraIntegrationTests.class.getName());
+
     private final String nameFragment;
+
+    static {
+        int numIterations = 0;
+        try {
+            numIterations = Integer.parseInt(System.getProperty("testIterations"));
+        } catch (Throwable t) {
+        }
+        TEST_ITERATIONS = Math.max(1, numIterations);
+    }
 
     public static TestSuite suite() {
         return new AuraIntegrationTests();
@@ -69,7 +81,6 @@ public class AuraIntegrationTests extends TestSuite {
      */
     @Override
     public void run(final TestResult masterResult) {
-        Logger logger = Logger.getLogger(getClass().getName());
         logger.info("Building test inventories");
         if (nameFragment != null) {
             logger.info("Filtering by test names containing: " + nameFragment);
@@ -88,23 +99,10 @@ public class AuraIntegrationTests extends TestSuite {
             }
         }
 
-        if (RANDOM_ORDER) {
-            logger.info("Randomizing test execution order");
-            Collections.shuffle(queue);
-            Collections.shuffle(hostileQueue);
-        }
         ExecutorService executor = Executors.newFixedThreadPool(TestExecutor.NUM_THREADS);
         try {
-            logger.info(String.format("Executing parallelizable tests with %s threads", TestExecutor.NUM_THREADS));
-            long start = System.currentTimeMillis();
-            executor.invokeAll(queue);
-            logger.info(String.format("Completed %s tests in %s ms", queue.size(), System.currentTimeMillis() - start));
-
-            logger.info("Executing thread hostile tests");
-            start = System.currentTimeMillis();
-            executor.invokeAll(hostileQueue);
-            logger.info(String.format("Completed %s thread hostile tests in %s ms", hostileQueue.size(),
-                    System.currentTimeMillis() - start));
+            executeIterations(executor, queue, "parallelizable");
+            executeIterations(executor, hostileQueue, "thread hostile");
         } catch (InterruptedException e) {
             throw new AuraRuntimeException("TEST RUN INTERRUPTED", e);
         } finally {
@@ -115,6 +113,21 @@ public class AuraIntegrationTests extends TestSuite {
                 provider.release();
             }
         }
+    }
+
+    private void executeIterations(ExecutorService executor, List<Callable<TestResult>> tests, String testType)
+            throws InterruptedException {
+        logger.info(String.format("Executing %s tests with %s thread(s), %s iteration(s), %s", testType,
+                TestExecutor.NUM_THREADS, TEST_ITERATIONS, TEST_SHUFFLE ? "random order" : "in order"));
+        long start = System.currentTimeMillis();
+        for (int i = 0; i < TEST_ITERATIONS; i++) {
+            if (TEST_SHUFFLE) {
+                Collections.shuffle(tests);
+            }
+            executor.invokeAll(tests);
+        }
+        logger.info(String.format("Completed %s tests in %s ms", tests.size() * TEST_ITERATIONS,
+                System.currentTimeMillis() - start));
     }
 
     private void queueTest(final Test test, final TestResult result, Collection<Callable<TestResult>> queue,

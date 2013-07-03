@@ -26,8 +26,6 @@ import org.openqa.selenium.support.ui.Select;
 public class InputMultiSelectUITest extends WebDriverTestCase {
     private final String[] URL = new String[] { "/uitest/inputMultiSelectTest.cmp",
             "/uitest/inputMultiSelectNestedOptionsTest.cmp" };
-    private Select inputSelect;
-    private WebElement selectElement;
     private WebElement submit;
     private WebElement output;
 
@@ -37,13 +35,18 @@ public class InputMultiSelectUITest extends WebDriverTestCase {
 
     private void openTestPage(int i) throws Exception {
         open(URL[i]);
-
-        selectElement = findDomElement(By.xpath("//select[1]"));
-        inputSelect = new Select(selectElement);
         submit = findDomElement(By.xpath("//button"));
         output = findDomElement(By.xpath("//span[@class='uiOutputText']"));
     }
 
+    private WebElement getSelectElement() {
+        return findDomElement(By.xpath("//select[1]"));
+    }
+    
+    private Select getInputSelect() {
+        return new Select(getSelectElement());
+    }
+    
     private void selectOption(String optionLabel) {
         selectDeselectOption(optionLabel, true);
     }
@@ -54,10 +57,10 @@ public class InputMultiSelectUITest extends WebDriverTestCase {
 
     private void selectDeselectOption(String optionLabel, boolean isSelect) {
         if (isSelect) {
-            inputSelect.selectByVisibleText(optionLabel);
+            getInputSelect().selectByVisibleText(optionLabel);
             verifyOptionSelected(optionLabel);
         } else {
-            inputSelect.deselectByVisibleText(optionLabel);
+            getInputSelect().deselectByVisibleText(optionLabel);
             verifyOptionDeselected(optionLabel);
         }
     }
@@ -71,7 +74,7 @@ public class InputMultiSelectUITest extends WebDriverTestCase {
     }
 
     private void verifyOptionSelectDeselct(String optionLabel, boolean isSelected) {
-        List<WebElement> options = inputSelect.getOptions();
+        List<WebElement> options = getInputSelect().getOptions();
         Boolean found = false;
         for (WebElement option : options) {
             if (optionLabel.equals(option.getText())) {
@@ -195,12 +198,12 @@ public class InputMultiSelectUITest extends WebDriverTestCase {
      */
     private void focusSelectElement() {
         if (BrowserType.IE10.equals(getBrowserType())) {
-            List<WebElement> selectedOptions = inputSelect.getAllSelectedOptions();
-            selectElement.click();
+            List<WebElement> selectedOptions = getInputSelect().getAllSelectedOptions();
+            getSelectElement().click();
 
-            inputSelect.deselectAll();
+            getInputSelect().deselectAll();
             for (int i = 0; i < selectedOptions.size(); i++) {
-                inputSelect.selectByVisibleText(selectedOptions.get(i).getText());
+                getInputSelect().selectByVisibleText(selectedOptions.get(i).getText());
             }
         }
     }

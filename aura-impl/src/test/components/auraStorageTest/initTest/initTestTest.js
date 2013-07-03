@@ -554,7 +554,7 @@
                         param1 : 999
                     });
                 abortable1.setStorable();
-                $A.test.assertTrue(abortable1.isAbortable(), "Storable actions should be abortable by default.")
+                $A.test.assertTrue(abortable1.isAbortable(), "Storable actions should be abortable by default.");
 
                 var abortable2 = cmp.get("c.string");
                 abortable2.setParams({
@@ -572,21 +572,26 @@
                 a.setParams({
                         testName : "testSetStorableAPI"
                     });
-                a.setCallback(cmp, function(a) {
-                        $A.clientService.runActions([ abortable1 ], cmp, function() {
-                                cmp._testCounter--;
-                        });
-                        $A.clientService.runActions([ abortable2 ], cmp, function() {
-                                cmp._testCounter--;
-                        });
-                    })
                 $A.run(function() { $A.enqueueAction(a); });
+                $A.test.runAfterIf(function() { return "SUCCESS" === a.getState(); }, function() {
+                        $A.test.blockRequests();
+                        $A.run(function() {
+                                $A.clientService.runActions([ abortable1 ], cmp, function() {
+                                        cmp._testCounter--;
+                                    });
+                            });
+                        $A.run(function() {
+                                $A.clientService.runActions([ abortable2 ], cmp, function() {
+                                        cmp._testCounter--;
+                                });
+                            });
+                        $A.test.releaseRequests();
+                    });
                 $A.test.runAfterIf(function() {
                     return cmp._testCounter == 0;
                 }, function() {
                     $A.test.assertEquals("ABORTED", abortable1.getState(), "Action was not aborted");
-                    $A.test.assertEquals("SUCCESS", abortable2.getState(),
-                        "Last abortable group did not complete.");
+                    $A.test.assertEquals("SUCCESS", abortable2.getState(), "Last abortable group did not complete.");
                     var now = new Date().getTime();
                     // wait for the timer to tick over
                     $A.test.addWaitFor(true, function() { return now < new Date().getTime(); }, function(){});
@@ -604,7 +609,7 @@
                         return abortedAction.getState()
                     }, function() {
                         $A.test.assertFalse(abortedAction.isFromStorage(),
-                            "Aborted actions should not be stored in cache");
+                            "Actions aborted before being sent to server should not be stored in cache");
                         $A.test.assertEquals(0, abortedAction.getReturnValue()[0],
                             "Wrong counter value seen in response");
                         $A.test.assertEquals(999, abortedAction.getReturnValue()[1]);

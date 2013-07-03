@@ -621,23 +621,28 @@ var ComponentPriv = (function(){ // Scoping priv
         return value?value.toString():value;
       };
 
-      ComponentPriv.prototype.outputMapValue = function(value, avp, serialized, depth) {
+    ComponentPriv.prototype.outputMapValue = function(value, avp, serialized, depth) {
         var ret = {};
         var that = this;
         value.each(function(key, val) {
-          try {
-            ret[key] = that.output(val ? val.unwrap() : null, avp, serialized, depth);
-          } catch (e) {
+            var str = (val && val.auraType)?val.toString():null;
+
             try {
-              ret[key] = that.output(val.getValue(avp), avp, serialized, depth);
-            } catch (e2) {
-              ret[key] = that.output(val, avp, serialized, depth);
+                if (str === "PropertyReferenceValue" || (str === "FunctionCallValue" && avp)) {
+                    ret[key] = that.output(val.getValue(avp), avp, serialized, depth);
+                } else if (val && val.auraType && val.auraType === "Value") {
+                    ret[key] = that.output(val.unwrap(), avp, serialized, depth);
+                } else {
+                    ret[key] = that.output(val, avp, serialized, depth);
+                }
+            } catch (e) {
+                ret[key] = "Error";
+                $A.warning("Error in chrome plugin support", e);
             }
-          }
         });
         ret["__proto__"] = null;
         return ret;
-      };
+    };
 
       ComponentPriv.prototype.outputArrayValue = function(value, avp, serialized, depth) {
         var ary = value.getArray();

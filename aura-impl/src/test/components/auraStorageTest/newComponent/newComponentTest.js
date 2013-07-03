@@ -39,8 +39,7 @@
             var c = cmp.get("c.resetCounter");
             $A.test.assertEquals("7." + $A.getContext().getNum(), c.getId(),
                 "Action Numbering gone wild - Server Action(3)");
-            $A.enqueueAction(c);
-            $A.eventService.finishFiring();
+            $A.test.enqueueAction(c);
             $A.test.addWaitFor(false, $A.test.isActionPending,
                 function(){
                     //After a action request was sent to server, context will increment its counter.
@@ -82,8 +81,7 @@
              * Individual Actions to get Team
              */
             var a = cmp.get("c.getTeam");
-            a.runDeprecated();
-            $A.eventService.finishFiring();
+            $A.run(function() {a.runDeprecated();});
             $A.test.addWaitFor(false, $A.test.isActionPending,
                 function(){
                     //Verify the new auraStorage:teamFacet component fetched by server action
@@ -118,19 +116,20 @@
                 });
             var a = cmp.get("c.resetCounter");
             a.setParams({ testName: "testActionScopedGlobalID" }),
-            a.setExclusive();
-            a.setCallback(cmp,function(a){
-                    $A.clientService.runActions([action1], cmp, function(){cmp._testCounter--;});
-                    $A.clientService.runActions([action2], cmp, function(){cmp._testCounter--;});
+            $A.test.enqueueAction(a);
+            $A.test.runAfterIf(function() { return a.getState() === "SUCCESS"; },
+                function() {
+                    $A.test.blockRequests();
+                    $A.test.runActionsAsTransaction([action1], cmp, function(){cmp._testCounter--;});
+                    $A.test.runActionsAsTransaction([action2], cmp, function(){cmp._testCounter--;});
+                    $A.test.releaseRequests();
                 });
-            $A.enqueueAction(a);
-            $A.eventService.finishFiring();
             cmp.test = this;
             $A.test.runAfterIf(function() {
                     return cmp._testCounter == 0;
                 }, function(){
                     var teamActionNum = cmp.test.getActionNumberFromPage(cmp)[0];
-                            cmp.test.verifyTeamFacet(cmp, teamActionNum);
+                    cmp.test.verifyTeamFacet(cmp, teamActionNum);
                 });
         } ]
     },
@@ -149,8 +148,7 @@
              */
             $A.test.assertEquals("1:1.1", cmp.getGlobalId(), "Invalid GlobalId for root component");
             var a = cmp.get("c.getRosterFromStorage");
-            a.runDeprecated();
-            $A.eventService.finishFiring();
+            $A.run(function() {a.runDeprecated();});
             $A.test.addWaitFor(false, $A.test.isActionPending,
                 function(){
                     //Verify result of first action
@@ -180,8 +178,7 @@
                 });
             a.setParams({ testName: cmp._testName });
             a.setStorable();
-            $A.enqueueAction(a);
-            $A.eventService.finishFiring();
+            $A.test.enqueueAction(a);
             cmp.test = this;
             $A.test.addWaitFor("SUCCESS", function(){return a.getState()},
                 function(){

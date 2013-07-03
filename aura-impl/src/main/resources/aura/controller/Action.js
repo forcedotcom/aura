@@ -39,6 +39,7 @@ var Action = function Action(def, method, paramDefs, background, cmp) {
     this.background = background;
     this.cmp = cmp;
     this.params = {};
+    this.responseState = null;
     this.state = "NEW";
     this.callbacks = {};
     this.events = [];
@@ -47,6 +48,7 @@ var Action = function Action(def, method, paramDefs, background, cmp) {
     this.actionId = Action.prototype.nextActionId++;
     this.id = undefined;
     this.originalResponse = undefined;
+    this.storable = false;
 };
 
 Action.prototype.nextActionId = 1;
@@ -319,6 +321,7 @@ Action.prototype.runAfter = function(action) {
 Action.prototype.updateFromResponse = function(response) {
     this.sanitizeStoredResponse(response);
     this.state = response["state"];
+    this.responseState = response["state"];
     this.returnValue = response["returnValue"];
     this.error = response["error"];
     this.storage = response["storage"];
@@ -375,7 +378,7 @@ Action.prototype.updateFromResponse = function(response) {
  * @param {String} storageName the name of the storage to use.
  */
 Action.prototype.getStored = function(storageName) {
-    if (this.storable && this.getState() === "SUCCESS") {
+    if (this.storable && this.responseState === "SUCCESS") {
         // Rewrite any embedded ComponentDef from object to descriptor only
         for ( var globalId in this.components) {
             var c = this.components[globalId];
@@ -502,8 +505,10 @@ Action.prototype.setStorable = function(config) {
     this.storable = true;
     this.storableConfig = config;
 
-    // Storable actions must also be abortable (idempotent, replayable and
-    // non-mutating)
+    //
+    // Storable actions must also be abortable (idempotent, replayable and non-mutating)
+    // Careful with this, as it will cause side effects if there are other abortable actions
+    //
     this.setAbortable();
 };
 

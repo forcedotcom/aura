@@ -5,7 +5,7 @@
             testName: _testName
         }),
         a.setExclusive();
-        $A.enqueueAction(a);
+        $A.run(function() {$A.enqueueAction(a);});
     },
     executeAction:function(cmp, actionName, actionParam, additionalProperties){
         var a = cmp.get(actionName);

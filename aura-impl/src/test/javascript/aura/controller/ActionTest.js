@@ -859,6 +859,7 @@ Test.Aura.Controller.ActionTest = function() {
 			target.storable = true;
 			target.returnValue = "NONE";
 			target.state = "FAILURE";
+			target.responseState = "FAILURE";
 
 			// Act
 			var stored = target.getStored("bogus");
@@ -874,6 +875,7 @@ Test.Aura.Controller.ActionTest = function() {
 			target.storable = false;
 			target.returnValue = "NONE";
 			target.state = "SUCCESS";
+			target.responseState = "SUCCESS";
 
 			// Act
 			var stored = target.getStored("bogus");
@@ -889,6 +891,7 @@ Test.Aura.Controller.ActionTest = function() {
 			target.storable = true;
 			target.returnValue = "NONE";
 			target.state = "SUCCESS";
+			target.responseState = "SUCCESS";
 			target.components = {};
 
 			// Act

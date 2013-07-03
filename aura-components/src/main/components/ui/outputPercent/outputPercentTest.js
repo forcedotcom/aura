@@ -75,7 +75,7 @@
     },
 
     /**
-     * Verify that when the value changes it is rerendered
+     * Verify that when the value changes it is rerendered with the new value
      */
     testUpdateValue: {
         attributes : {value : .227},
@@ -88,7 +88,7 @@
     },
 
     /**
-     * Verify that when the format changes it is rerendered
+     * Verify that when the format changes it is rerendered using the new format
      */
     testUpdateFormat: {
         attributes : {value : .227, format : '#0.#%'},

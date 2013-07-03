@@ -28,7 +28,7 @@ function NumberFormat(format, symbols) {
                                currency: $A.get("$Locale.currency")};
     // default values for any format
     this.hasCurrency = false;
-    this.multiplier = 1;
+    this.multiplier = 0;
     this.minDigits = 1;
     this.groupingDigits = -1;
     this.minFractionDigits = 0;
@@ -43,7 +43,7 @@ function NumberFormat(format, symbols) {
     var prefixEnd = 0;
     var suffixStart = format.length;
     var zeros = 0;
-    var leftNumbers = 0;
+    var leftNumber = false;
     var rightNumbers = 0;
     var group = -1;
     var decimal = false;
@@ -79,7 +79,7 @@ function NumberFormat(format, symbols) {
                 if (zeros > 0 || decimal) {
                     rightNumbers++;
                 } else {
-                    leftNumbers++;
+                    leftNumber = true;
                 }
                 if (group >= 0 && !decimal) {
                     // saw a group but not a decimal
@@ -97,7 +97,7 @@ function NumberFormat(format, symbols) {
                 }
                 break;
             case ",":
-                if (leftNumbers === 0) {
+                if (!leftNumber && !zeros) {
                     this.parseError("there must be a number before the grouping separator");
                 }
                 if (decimal) {
@@ -131,9 +131,15 @@ function NumberFormat(format, symbols) {
         this.parseError("grouping cannot be 0");
     }
     this.groupingDigits = group;
-    this.minFractionDigits = decimal ? zeros : 0;
-    this.maxFractionDigits = this.minFractionDigits + rightNumbers;
-    if (this.minDigits === this.minFractionDigit === 0) {
+    if (!decimal) {
+        this.minDigits = zeros;
+        this.minFractionDigits = 0;
+        this.maxFractionDigits = 0;
+    } else {
+        this.minFractionDigits = zeros;
+        this.maxFractionDigits = this.minFractionDigits + rightNumbers;
+    }
+    if (this.minDigits === this.minFractionDigits === 0) {
         this.minDigits = 1;
     }
     var innerPattern = posPattern;
@@ -177,17 +183,17 @@ NumberFormat.prototype.checkForSpecialChar = function(c) {
         this.hasCurrency = true;
         break;
     case "%":
-        mult = 100;
+        mult = 2;
         break;
     case "‰":
-        mult = 1000;
+        mult = 3;
         break;
     case "‱":
-        mult = 10000;
+        mult = 4;
         break;
     }
     if (mult) {
-        if (this.multiplier !== 1) {
+        if (this.multiplier !== 0) {
             this.parseError("too many percentage symbols");
         } else {
             this.multiplier = mult;
@@ -215,81 +221,123 @@ NumberFormat.prototype.replaceCurrency = function(str) {
 };
 
 /**
- * format a number into a string
+ * Format a number into a string. Also can take in a string of the format "#.#" for formatting numbers
+ * requiring greater than double precision.
  */
 NumberFormat.prototype.format = function(number) {
-    if (!$A.util.isFiniteNumber(number)) {
-        throw new Error("Unable to format " + number);
-    }
-    var negative = number < 0;
-    var numToFormat = Math.abs(number);
-    if (this.multiplier !== 1) {
-        numToFormat *= this.multiplier;
-    }
-    // round it off
-    if (this.maxFractionDigits > 0) {
-        var roundMult = Math.pow(10, this.maxFractionDigits);
-        numToFormat *= roundMult;
-        numToFormat = Math.round(numToFormat);
-        numToFormat /= roundMult;
+    var ns;
+    if ($A.util.isString(number)) {
+        ns = number;
     } else {
-        numToFormat = Math.round(numToFormat);
+        if (!$A.util.isFiniteNumber(number)) {
+            throw new Error("Unable to format " + number);
+        }
+        // convert to string
+        ns = String(number);
+    }
+    var charArray = ns.split("");
+
+    // check if its negative
+    var negative = false;
+    if (charArray[0] === "-") {
+        negative = true;
+        charArray.shift();
+    }
+    // find the decimal place and remove it
+    var decimalPos = $A.util.arrayIndexOf(charArray, ".");
+    if (decimalPos === -1) {
+        decimalPos = charArray.length;
+    } else {
+        charArray.splice(decimalPos, 1);
+    }
+    // apply multiplier
+    decimalPos += this.multiplier;
+    while (decimalPos > charArray.length) {
+        charArray.push(NumberFormat.ZERO);
+    }
+
+    // strip leading zeros off for numbers like 000.01
+    while (charArray[0] === NumberFormat.ZERO) {
+        charArray.shift();
+        decimalPos--;
+    }
+
+    // round if needed using HALF_UP
+    if (this.maxFractionDigits < charArray.length - decimalPos) {
+        var rounderIndex = decimalPos + this.maxFractionDigits;
+        var round = charArray[rounderIndex] >= "5";
+        charArray = charArray.slice(0, rounderIndex);
+        while (round && rounderIndex > 0) {
+            var c = charArray[--rounderIndex];
+            if (c !== "9") {
+                charArray[rounderIndex] = String.fromCharCode(c.charCodeAt(0) + 1);
+                // done rounding
+                round = false;
+            } else {
+                charArray[rounderIndex] = NumberFormat.ZERO;
+            }
+        }
+        // might need an extra 1 at the beginning
+        if (round) {
+            charArray.unshift("1");
+            decimalPos++;
+        }
     }
     
-    var ns = String(numToFormat);
     var prefix = this.prefix;
     var suffix = this.suffix;
     if (negative && this.hasNegativePattern) {
         prefix = this.negativePrefix;
         suffix = this.negativeSuffix;
     }
-    var str = prefix ? prefix : "";
+    var result = [];
+    if (prefix) {
+        result.push(prefix);
+    }
     if (negative && !this.hasNegativePattern) {
         // if there is no negative pattern, append '-' for negative numbers
-        str += "-";
-    }
-    // format the integral part
-    var decimalPos = ns.indexOf(".");
-    var intPart = ns;
-    var fracPart = "";
-    if (decimalPos !== -1) {
-        intPart = ns.substr(0, decimalPos);
-        fracPart = ns.substr(decimalPos + 1);
-    }
-
-    while (intPart.length < this.minDigits) {
-        // too short, add 0s
-        intPart = NumberFormat.ZERO.concat(intPart);
+        result.push("-");
     }
     
-    if (this.groupingDigits <= 0 || intPart.length <= this.groupingDigits) {
+    var zeroPad = this.minDigits - decimalPos;
+
+    for (var i = 0; i < zeroPad; i++) {
+        // too short, add 0s
+        charArray.unshift(NumberFormat.ZERO);
+        decimalPos++;
+    }
+    
+    // format the integral part
+    if (this.groupingDigits <= 0 || decimalPos <= this.groupingDigits) {
         // no need for grouping
-        str += intPart;
+        result = result.concat(charArray.slice(0, decimalPos));
     } else {
-        var dist = intPart.length % this.groupingDigits || this.groupingDigits;
-        str += intPart.substr(0, dist);
-        intPart = intPart.substr(dist);
+        var dist = decimalPos % this.groupingDigits || this.groupingDigits;
+        result = result.concat(charArray.slice(0, dist));
+        var intPart = charArray.slice(dist, decimalPos);
         while (intPart.length > 0) {
-            str += this.symbols.groupingSeparator;
-            str += intPart.substr(0, this.groupingDigits);
-            intPart = intPart.substr(this.groupingDigits);
+            result.push(this.symbols.groupingSeparator);
+            result = result.concat(intPart.splice(0, this.groupingDigits));
         }
     }
 
-    if (fracPart.length > 0 || this.minFractionDigits > 0) {
-        str += this.symbols.decimalSeparator;
-    }
-    if (fracPart.length > 0) {
-        str += fracPart;
-    }
-    for (var i = fracPart.length; i < this.minFractionDigits; i++) {
-        str += NumberFormat.ZERO;
-    }
-    if (suffix) {
-        str += suffix;
+    // format the fractional part
+    var fracLength = charArray.length - decimalPos;
+    if (fracLength > 0 || this.minFractionDigits > 0) {
+        result.push(this.symbols.decimalSeparator);
+        if (fracLength > 0) {
+            result = result.concat(charArray.slice(decimalPos));
+        }
+        for (i = fracLength; i < this.minFractionDigits; i++) {
+            result.push(NumberFormat.ZERO);
+        }
     }
     
-    return str;
+    if (suffix) {
+        result.push(suffix);
+    }
+    
+    return result.join("");
 };
 
 //#include aura.util.NumberFormat_export

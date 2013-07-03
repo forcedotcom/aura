@@ -45,7 +45,6 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
     public final String sampleJavascriptResourcePath = "/auraFW/javascript/aura_dev.js";
     public final String sampleBinaryResourcePathWithNonce = "/auraFW/resources/%s/aura/auraIdeLogo.png";
     public final String sampleTextResourcePathWithNonce = "/auraFW/resources/%s/aura/resetCSS.css";
-    public static final String PRODUCTION_PROPERTY = "aura.production";
     private final long timeWindowExpiry = 600000; // ten minute expiration test window
 
     public AuraFrameworkServletHttpTest(String name) {

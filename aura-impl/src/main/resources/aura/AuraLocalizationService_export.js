@@ -15,9 +15,9 @@
  */
 /*jslint sub: true */
 exp(localizationService,
-    "formatNumber", localizationService.formatNumber,
-    "getNumberFormat", localizationService.getNumberFormat,
-    "getDefaultNumberFormat", localizationService.getDefaultNumberFormat,
+        "formatNumber", localizationService.formatNumber,
+        "getNumberFormat", localizationService.getNumberFormat,
+        "getDefaultNumberFormat", localizationService.getDefaultNumberFormat,
         "formatPercent", localizationService.formatPercent,
         "getDefaultPercentFormat", localizationService.getDefaultPercentFormat,
         "formatCurrency", localizationService.formatCurrency,

@@ -15,19 +15,8 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:inputTextArea" extensible="true" support="proto"
-    description="This component is used as input text area in a ui:autocomplete component.">
-    <textarea aura:id="textAreaElem"
-        id="{!v.domId}"
-        class="{!v.class+(v.resizable?'':' noresize')}"
-        cols="{!v.cols}"
-        rows="{!v.rows}"
-        disabled="{!v.disabled}"
-        readonly="{!v.readonly}"
-        placeholder="{!v.placeholder}"
-        role="combobox"
-        aria-autocomplete="list"
-        aria-expanded="false"
-        aria-haspopup="true"
-        aria-activedescendant=""/>
-</aura:component>
+<aura:interface support="beta">
+    <aura:attribute name="highlighted" type="Boolean" default="false" description="Indicate this component is highlighted or not."/>
+    <aura:attribute name="keyword" type="String" description="The keyword to match."/>
+    <aura:attribute name="visible" type="Boolean" default="true" description="Controls the visibility of the component."/>
+</aura:interface>

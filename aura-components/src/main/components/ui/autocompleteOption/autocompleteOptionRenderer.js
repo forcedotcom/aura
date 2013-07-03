@@ -15,6 +15,7 @@
  */
 ({
     afterRender: function(component, helper) {
+        helper.addOptionDomEvents(component);
         var ret = this.superAfterRender();
         var concreteCmp = component.getConcreteComponent();
         var _helper = concreteCmp.getDef().getHelper();
@@ -23,6 +24,7 @@
     },
 
     rerender: function(component, helper) {
+        helper.addOptionDomEvents(component);
         this.superRerender();
         var concreteCmp = component.getConcreteComponent();
         var _helper = concreteCmp.getDef().getHelper();

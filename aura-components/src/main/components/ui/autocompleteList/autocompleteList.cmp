@@ -16,7 +16,7 @@
 
 -->
 <aura:component extends="ui:abstractList" support="proto"
-    provider="java://org.auraframework.component.ui.ListProvider, js://ui.list" description="This component is used in ui:autocomplete to provide a list of options to the input component.To customize the list option behavior, use the selectListOption, listHighlight, and updateActiveOption events.">
+    provider="java://org.auraframework.component.ui.ListProvider, js://ui.list" description="This component is used in ui:autocomplete to provide a list of options to the input component.To customize the list option behavior, use the selectListOption, listHighlight, and updateAriaAttributes events.">
     
     <aura:attribute name="elementsToIgnoreClicking" type="Object" description="The DOM elements to ignore when we handle clicking outside."/>
     <aura:attribute name="keyword" type="String" description="The keyword used to match list options."/>
@@ -24,17 +24,18 @@
     <aura:attribute name="theme" type="String" default="default" description="Theme to apply to this component."/>
     
     <aura:registerEvent name="listHighlight" type="ui:listHighlight" description="The event fired when a list option is highlighted."/>
+    <aura:registerEvent name="matchText" type="ui:matchText" description="The event fired when a text match occurs."/>
+    <aura:registerEvent name="pressOnHighlighted" type="ui:press" description="The event fired when a highlighted option is pressed."/>
     <aura:registerEvent name="selectListOption" type="ui:selectListOption" description="The event fired when a list option is selected."/>
-    <aura:registerEvent name="updateActiveOption" type="ui:updateActiveOption" description="The event fired when a new option is highlighted."/>
+    <aura:registerEvent name="updateAriaAttributes" type="ui:updateAriaAttributes" description="The event fired when a new option is highlighted."/>
     
     <aura:handler name="change" value="{!v.visible}" action="{!c.visibleChange}"/>
     <aura:handler name="listHighlight" action="{!c.handleListHighlight}"/>
-    <aura:handler name="mouseover" action="{!c.handleMouseover}"/>
+    <aura:handler name="matchText" action="{!c.matchText}"/>
+    <aura:handler name="pressOnHighlighted" action="{!c.handlePressOnHighlighted}"/>
 
     <ul aura:id="list" class="{!v.class+' '+v.theme+(v.visible == true ? ' visible':'')}" role="presentation" 
-        onclick="{!c.handleClick}"
-        onmouseover="{!c.handleMouseover}"
-        onkeydown="{!c.handleKeydown}">
+        onclick="{!c.handleClick}">
         <aura:iteration aura:id="iter" items="{!v.items}" var="{!v.itemVar}" body="{!v.itemTemplate}"/>
     </ul>
 </aura:component>

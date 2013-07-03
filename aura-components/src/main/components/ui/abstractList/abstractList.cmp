@@ -15,8 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component implements="ui:visible, ui:pagingInterface" extensible="true" abstract="true" support="proto" description="An abstract component which provides a basic layout for the ui:list component.">
-    <aura:attribute name="contentRole" type="String" description="Defines the role attribute of the list content."/>  
+<aura:component implements="ui:visible, ui:pagingInterface" extensible="true" abstract="true" support="proto" description="An abstract component which provides a basic layout for the ui:list component.">  
     <aura:attribute name="itemTemplate" type="Aura.ComponentDefRef[]" required="true" description="A ComponentDefRef to use as the template for each generated row in the list."/>
     <aura:attribute name="items" type="Object[]" description="An array of arbitrary map objects representing the rows of data in the list."/>
     <aura:attribute name="itemVar" type="String" required="true" description="The name by which to refer to the current data object inside of the template for each row."/>
@@ -29,7 +28,7 @@
     <div class="{!v.class + (v.visible == false ? ' invisible' : '')}" role="{!v.role}">
         {!v.header}
         
-        <div class="listContent" role="{!v.contentRole}">
+        <div class="listContent">
             {!v.body}
             <div class="loadingIndicator">
                 <div class="background"></div>

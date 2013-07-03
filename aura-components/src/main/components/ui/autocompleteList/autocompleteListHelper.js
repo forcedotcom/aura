@@ -14,6 +14,21 @@
  * limitations under the License.
  */
 ({
+    /**
+     * Find out the current highlighted option.
+     * @return the index of the highlighted component; -1 if no opton is highlighted now.
+     */
+    findHighlightedOptionIndex: function(iters) {
+        for (var i = 0; i < iters.getLength(); i++) {
+            var optionCmp = iters.getValue(i);
+            if (optionCmp.get("v.visible") === true && optionCmp.get("v.highlighted") === true) {
+                return i;
+                break;
+            }
+        }
+        return -1;
+    },
+    
     getEventSourceComponent: function(component, event) {
         var element = event.target || event.srcElement;
         var htmlCmp = $A.componentService.getRenderingComponentForElement(element);
@@ -22,7 +37,7 @@
     
     getNextVisibleOption: function(iters, k) {
         var next = -1;
-        var start = k >= iters.getLength() -1 ? 0 : k + 1;
+        var start = k >= iters.getLength() - 1 ? 0 : k + 1;
         for (var i = start; i < iters.getLength(); i++) {
             var optionCmp = iters.getValue(i);
             if (optionCmp.get("v.visible") === true) {
@@ -197,18 +212,38 @@
         var iterCmp = component.find("iter");
         if (iterCmp) {
             var iters = iterCmp.getValue("v.realbody");
+            var highlightedIndex = this.findHighlightedOptionIndex(iters);
             var index = event.getParam("activeIndex");
-            if (index < 0) { // focus on the last visible option
-                activeIndex = this.getPrevVisibleOption(iters, iters.getLength());
-            } else { // focus on the first visible option
-                activeIndex = this.getNextVisibleOption(iters, -1);
+            if (index < 0) { // highlight previous visible option
+                activeIndex = highlightedIndex < 0 ? this.getPrevVisibleOption(iters, iters.getLength())
+                                                   : this.getPrevVisibleOption(iters, highlightedIndex);
+            } else { // highlight next visible option
+                activeIndex = highlightedIndex < 0 ? this.getNextVisibleOption(iters, -1)
+                                                   : this.getNextVisibleOption(iters, highlightedIndex);
             }
-            if (activeIndex >= 0 && activeIndex < iters.getLength()) {
-                var focusEvent = iters.getValue(activeIndex).get("e.focus");
-                if (focusEvent) {
-                    focusEvent.fire();
+            if (activeIndex >= 0 && activeIndex < iters.getLength() && activeIndex != highlightedIndex) {
+                if (highlightedIndex >= 0) {
+                    iters.getValue(highlightedIndex).setValue("v.highlighted", false);
                 }
-                this.updateActiveElement(component)
+                var highlightedCmp = iters.getValue(activeIndex);
+                highlightedCmp.setValue("v.highlighted", true);
+                this.updateAriaAttributes(component, highlightedCmp);
+            }
+        }
+    },
+    
+    handlePressOnHighlighted: function(component, event) {
+        var iterCmp = component.find("iter");
+        if (iterCmp) {
+            var iters = iterCmp.getValue("v.realbody");
+            var highlightedIndex = this.findHighlightedOptionIndex(iters);
+            if (highlightedIndex >= 0) {
+                var targetCmp = iters.getValue(highlightedIndex);
+                var selectEvt = component.get("e.selectListOption");
+                selectEvt.setParams({
+                    option: targetCmp
+                });
+                selectEvt.fire();
             }
         }
     },
@@ -257,54 +292,6 @@
         this.toggleListVisibility(component, items);
     },
     
-    setFocusToNextItem: function(component, event) {
-        var targetCmp = this.getEventSourceComponent(component, event); 
-        var iterCmp = component.find("iter");
-        if (iterCmp) {
-            var iters = iterCmp.getValue("v.realbody");
-            var nextIndex = 0;
-            for (var k = 0; k < iters.getLength(); k++) {
-                var iter = iters.getValue(k);
-                if (iter.getGlobalId() == targetCmp.getGlobalId()) {
-                    nextIndex = this.getNextVisibleOption(iters, k);
-                    break;
-                }
-            }
-            if (nextIndex >= 0 && nextIndex < iters.getLength()) {
-                var optionComponent = iters.getValue(nextIndex);
-                var focusEvent = optionComponent.get("e.focus");
-                if (focusEvent) {
-                    focusEvent.fire();
-                }
-            }
-            this.updateActiveElement(component);
-        }
-    },
-    
-    setFocusToPreviousItem: function(component) {
-        var targetCmp = this.getEventSourceComponent(component, event); 
-        var iterCmp = component.find("iter");
-        if (iterCmp) {
-            var iters = iterCmp.getValue("v.realbody");
-            var prevIndex = 0;
-            for (var k = 0; k < iters.getLength(); k++) {
-                var iter = iters.getValue(k);
-                if (iter.getGlobalId() == targetCmp.getGlobalId()) {
-                    prevIndex = this.getPrevVisibleOption(iters, k);
-                    break;
-                }
-            }
-            if (prevIndex >= 0 && prevIndex < iters.getLength()) {
-                var optionComponent = iters.getValue(prevIndex);
-                var focusEvent = optionComponent.get("e.focus");
-                if (focusEvent) {
-                    focusEvent.fire();
-                }
-                this.updateActiveElement(component);
-            }
-        }
-    },
-    
     toggleListVisibility: function(component, items) {
         var hasVisibleOption = false;
         for (var i = 0; i < items.length; i++) {
@@ -316,14 +303,18 @@
         component.setValue("v.visible", hasVisibleOption);
     },
     
-    updateActiveElement: function(component) {
-        var elem = document.activeElement;
-        var updateActiveEvt = component.get("e.updateActiveOption");
-        if (elem && updateActiveEvt) {
-            updateActiveEvt.setParams({
-                id: elem.id
+    updateAriaAttributes: function(component, highlightedCmp) {
+        var optionCmp = highlightedCmp.find("option");
+        var elem = optionCmp ? optionCmp.getElement() : null;
+        var updateAriaEvt = component.get("e.updateAriaAttributes");
+        if (elem && updateAriaEvt) {
+            var obj = {
+                "aria-activedescendant": elem.id
+            };
+            updateAriaEvt.setParams({
+                attrs: obj
             })
-            updateActiveEvt.fire();
+            updateAriaEvt.fire();
         }
     }
 })

@@ -15,16 +15,19 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:interactive" extensible="true" support="beta" description="This component represents list options in an ui:autocomplete component. The options are displayed when an input keyword matches an item in the data provider.">
+<aura:component extends="ui:interactive" extensible="true" support="beta"
+    implements="ui:autocompleteOptionTemplate" 
+    description="This component represents list options in an ui:autocomplete component. The options are displayed when an input keyword matches an item in the data provider.">
+    
     <aura:attribute name="displayText" type="String" description="The displayed text string for this option."/>
-    <aura:attribute name="keyword" type="String" description="The keyword to match."/>
     <aura:attribute name="label" type="String" required="true" description="The text displayed on the component. This attribute's value is used to do matching."/>
     <aura:attribute name="theme" type="String" default="default" description="Theme to apply to this component."/>
     
-    <aura:handler name="focus" action="{!c.handleFocus}"/>
+    <aura:handler name="mouseover" action="{!c.handleMouseover}"/>
+    <aura:handler name="mouseout" action="{!c.handleMouseout}"/>
     
     <aura:renderIf isTrue="{!v.body.length == 0}">
-        <li class="{!v.class + ' ' + v.theme + (v.visible == false ? ' invisible' : '')}" role="presentation">
+        <li role="presentation" class="{!v.class + ' ' + v.theme + (v.visible == false ? ' invisible' : '') + (v.highlighted == false ? '' : ' highlighted')}">
             <a id="{!globalId}" class="{!v.class}" aura:id="option" href="Javascript:void(0);" role="option">{!v.displayText}</a>
         </li>
         <aura:set attribute="else">

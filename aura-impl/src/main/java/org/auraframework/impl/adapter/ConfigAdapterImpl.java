@@ -30,6 +30,8 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.TimeZone;
 
+import org.apache.log4j.Logger;
+
 import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.impl.javascript.AuraJavascriptGroup;
@@ -65,12 +67,10 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     private static String getDefaultCacheDir() {
         File tmpDir = new File(System.getProperty("java.io.tmpdir"));
         return new File(tmpDir, "auraResourceCache").getAbsolutePath();
-
     }
 
     protected ConfigAdapterImpl(String resourceCacheDir) {
-        // can this initialization move to some sort of common initialization
-        // dealy?
+        // can this initialization move to some sort of common initialization dealy?
         try {
             this.resourceLoader = new ResourceLoader(resourceCacheDir, true);
         } catch (MalformedURLException e) {
@@ -87,23 +87,21 @@ public class ConfigAdapterImpl implements ConfigAdapter {
             }
             tempGroup.postProcess();
         } catch (IOException x) {
-            // js source wasn't found, we must be in jar land, just let the
-            // files be accessed from there... however, we do want a hash.
-            // Question: hypothetically, could we have a hybrid with a subset
-            // of files as files, and the rest in jars? This wouldn't be
-            // accounted for here.
+            /*
+             * js source wasn't found, we must be in jar land, just let the files be accessed from there... however, we
+             * do want a hash. Question: hypothetically, could we have a hybrid with a subset of files as files, and the
+             * rest in jars? This wouldn't be accounted for here.
+             */
             tempGroup = new AuraJavascriptResourceGroup();
         }
         jsGroup = tempGroup;
         Properties props = (jsGroup == null) ? loadProperties() : null;
         if (props == null) {
-            // If we don't get the framework version from properties, the
-            // default is a development build:
+            // If we don't get the framework version from properties, the default is a development build:
             auraVersionString = "development";
             buildTimestamp = System.currentTimeMillis();
         } else {
-            // If we do get our version info from properties, then try to do
-            // that.
+            // If we do get our version info from properties, then try to do that.
             auraVersionString = props.getProperty(VERSION_PROPERTY);
             if (auraVersionString == null || auraVersionString.isEmpty()) {
                 throw new AuraError("Unable to read build version from version.prop file");
@@ -146,15 +144,19 @@ public class ConfigAdapterImpl implements ConfigAdapter {
 
     @Override
     public synchronized void regenerateAuraJS() {
-        // If we're missing source, jsGroup will be an AuraResourceGroup and isStale() is always
-        // false. If we're in production, we're using the resources too. But if we have source,
-        // regenerate from it if it's changed:
+        /*
+         * If we're missing source, jsGroup will be an AuraResourceGroup and isStale() is always false. If we're in
+         * production, we're using the resources too. But if we have source, regenerate from it if it's changed:
+         */
         if (!isProduction() && jsGroup != null && (jsGroup.isStale() || lastGenerationHadCompilationErrors)) {
             try {
+                Logger logger = Logger.getLogger(ConfigAdapterImpl.class);
+                logger.info("Regenerating framework javascript");
                 File dest = AuraImplFiles.AuraResourceJavascriptDirectory.asFile();
                 File resourceDest = AuraImplFiles.AuraResourceJavascriptClassDirectory.asFile();
                 jsGroup.regenerate(dest);
                 // now we have to copy the new files to the resource directory
+                logger.info("Copying regenerated files to " + resourceDest);
                 File[] destFiles = dest.listFiles(JS_ONLY);
                 if (destFiles != null && destFiles.length > 0) {
                     resourceDest.mkdirs(); // If we got this far without this directory, just create it.
@@ -269,8 +271,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
         simpleDateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
         try {
             if (MAVEN_TIMESTAMP_PROPERTY.equals(timestamp)) {
-                // We're in an Eclipse-only or similar environment: Maven didn't
-                // filter version.prop
+                // We're in an Eclipse-only or similar environment: Maven didn't filter version.prop
                 return System.currentTimeMillis();
             }
             return simpleDateFormat.parse(timestamp).getTime();

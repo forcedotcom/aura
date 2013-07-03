@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 import org.auraframework.impl.javascript.AuraJavascriptGroup;
 import org.auraframework.impl.javascript.AuraJavascriptResourceGroup;
@@ -29,6 +30,8 @@ import org.auraframework.impl.util.AuraImplFiles;
  */
 public class GenerateJavascript {
     public static void main(String[] args) throws IOException {
+        Logger logger = Logger.getLogger(GenerateJavascript.class.getName());
+        logger.info("Generating framework javascript");
         AuraJavascriptGroup js = new AuraJavascriptGroup();
         // generate the js into this package, this one right here I say.
         File dest = AuraImplFiles.AuraResourceJavascriptDirectory.asFile();
@@ -37,10 +40,13 @@ public class GenerateJavascript {
         } else if (!dest.isDirectory()) {
             throw new IOException(dest.getPath() + " is supposed to be a directory");
         }
+        logger.info("Parsing framework javascript");
         js.parse();
+        logger.info("Generating scripts to " + dest);
         js.generate(dest, false);
 
         // Store the precomputed hash into a file.
+        logger.info("Saving framework version to filesystem");
         Properties props = new Properties();
         props.setProperty(AuraJavascriptResourceGroup.UUID_PROPERTY, js.getGroupHash().toString());
         props.setProperty(AuraJavascriptResourceGroup.LASTMOD_PROPERTY, Long.toString(js.getLastMod()));

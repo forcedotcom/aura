@@ -20,7 +20,6 @@ import java.util.List;
 import org.auraframework.test.WebDriverTestCase;
 import org.auraframework.test.WebDriverUtil.BrowserType;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 
@@ -31,20 +30,18 @@ public class InputMultiSelectUITest extends WebDriverTestCase {
     private WebElement selectElement;
     private WebElement submit;
     private WebElement output;
-    private WebDriver d;
 
     public InputMultiSelectUITest(String name) {
         super(name);
     }
 
     private void openTestPage(int i) throws Exception {
-        d = getDriver();
         open(URL[i]);
 
-        selectElement = d.findElement(By.xpath("//select[1]"));
+        selectElement = findDomElement(By.xpath("//select[1]"));
         inputSelect = new Select(selectElement);
-        submit = d.findElement(By.xpath("//button"));
-        output = d.findElement(By.xpath("//span[@class='uiOutputText']"));
+        submit = findDomElement(By.xpath("//button"));
+        output = findDomElement(By.xpath("//span[@class='uiOutputText']"));
     }
 
     private void selectOption(String optionLabel) {

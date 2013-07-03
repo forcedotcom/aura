@@ -185,7 +185,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
     /**
      * for Chrome and Safari/IPAD/IPHONE Opening uncached app that had a prior cache error will have limited caching
      */
-    @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
+    @TargetBrowsers({ BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
     public void testCacheErrorWithEmptyCache() throws Exception {
         openNoAura("/aura/application.app"); // just need a domain page to set cookie from
         Date expiry = new Date(System.currentTimeMillis() + 60000);

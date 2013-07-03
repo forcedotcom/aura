@@ -48,7 +48,6 @@ import com.google.common.collect.Sets;
  * 
  * @since 0.0.178
  */
-@ThreadHostileTest
 public class SecurityProviderHttpTest extends AuraHttpTestCase {
     public SecurityProviderHttpTest(String name) {
         super(name);
@@ -115,12 +114,6 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
         }
     }
 
-    @Override
-    public void tearDown() throws Exception {
-        ServletConfigController.setProductionConfig(false);
-        super.tearDown();
-    }
-
     /**
      * Allow GET application in DEV mode, with default security provider.
      */
@@ -181,6 +174,7 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
     /**
      * Deny GET application in PROD config, with security provider that throws a Throwable.
      */
+    @ThreadHostileTest("PRODUCTION")
     public void testGetProdConfigAppWithThrows() throws Exception {
         ServletConfigController.setProductionConfig(true);
         HttpGet get = buildGetRequest(DefType.APPLICATION,
@@ -200,6 +194,7 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
      * Deny GET component in PROD mode, with app with security provider that throws a Throwable. No error info in
      * response.
      */
+    @ThreadHostileTest("PRODUCTION")
     public void testGetProdConfigCmpWithThrows() throws Exception {
         ServletConfigController.setProductionConfig(true);
         DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(
@@ -220,6 +215,7 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
     /**
      * Deny GET application in PROD config, with default security provider.
      */
+    @ThreadHostileTest("PRODUCTION")
     @UnAdaptableTest
     public void testGetProdConfigAppWithDefault() throws Exception {
         ServletConfigController.setProductionConfig(true);
@@ -229,6 +225,7 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
     /**
      * Deny GET component in PROD mode, without app descriptor.
      */
+    @ThreadHostileTest("PRODUCTION")
     @UnAdaptableTest
     public void testGetProdConfigCmpWithoutApp() throws Exception {
         ServletConfigController.setProductionConfig(true);
@@ -257,6 +254,7 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
     /**
      * Deny GET application in PROD mode, with security provider that denies access, but trying other app.
      */
+    @ThreadHostileTest("PRODUCTION")
     public void testGetProdConfigAppWithDeniesAndOther() throws Exception {
         ServletConfigController.setProductionConfig(true);
         DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(
@@ -270,6 +268,7 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
     /**
      * Allow GET application in PROD mode, with security provider that allows access, but trying other app.
      */
+    @ThreadHostileTest("PRODUCTION")
     public void testGetProdConfigAppWithAllowsAndOther() throws Exception {
         ServletConfigController.setProductionConfig(true);
         DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(
@@ -283,6 +282,7 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
     /**
      * Deny GET component in PROD mode, with app with default security provider.
      */
+    @ThreadHostileTest("PRODUCTION")
     @UnAdaptableTest
     public void testGetProdConfigCmpWithDefault() throws Exception {
         ServletConfigController.setProductionConfig(true);
@@ -305,6 +305,7 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
     /**
      * Deny GET component in PROD mode, with app with security provider that denies access.
      */
+    @ThreadHostileTest("PRODUCTION")
     public void testGetProdConfigCmpWithDenies() throws Exception {
         ServletConfigController.setProductionConfig(true);
         DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(
@@ -316,6 +317,7 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
     /**
      * Deny GET component in PROD mode, with unknown app descriptor.
      */
+    @ThreadHostileTest("PRODUCTION")
     public void testGetProdConfigCmpWithUnknownApp() throws Exception {
         ServletConfigController.setProductionConfig(true);
         verifyGetError(DefType.COMPONENT, "", "{'app':'some:garbage'}", null);
@@ -516,6 +518,7 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
     /**
      * Deny POST action in PROD mode, with app with security provider that throws a Throwable.
      */
+    @ThreadHostileTest("PRODUCTION")
     @SuppressWarnings("unchecked")
     public void testPostProdConfigActionWithAppThrows() throws Exception {
         ServletConfigController.setProductionConfig(true);
@@ -539,6 +542,7 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
     /**
      * Deny POST action in PROD mode, with unknown app descriptor.
      */
+    @ThreadHostileTest("PRODUCTION")
     public void testPostProdConfigActionWithUnknownApp() throws Exception {
         ServletConfigController.setProductionConfig(true);
         verifyPostAccessDenied(Mode.PROD, "java://test.controller.JavaController/ACTION$noArgs", "some:garbage");

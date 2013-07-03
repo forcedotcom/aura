@@ -23,7 +23,6 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.params.CoreProtocolPNames;
 import org.auraframework.Aura;
 import org.auraframework.http.AuraBaseServlet;
 import org.auraframework.system.AuraContext.Format;
@@ -86,7 +85,7 @@ public class AuraFormatsHttpTest extends AuraHttpTestCase {
             params.put("aura.token", getCsrfToken());
         }
         params.put("aura.context", String.format("{\"mode\":\"FTEST\",\"fwuid\":\"%s\"}",
-            Aura.getConfigAdapter().getAuraFrameworkNonce()));
+                Aura.getConfigAdapter().getAuraFrameworkNonce()));
         params.put("aura.format", "JSON");
         HttpPost post = obtainPostMethod("/aura", params);
         requestAndAssertContentType(post,
@@ -94,8 +93,7 @@ public class AuraFormatsHttpTest extends AuraHttpTestCase {
     }
 
     /**
-     * Basic sanity testing for all Valid Formats that can be specified for
-     * AuraServlet.
+     * Basic sanity testing for all Valid Formats that can be specified for AuraServlet.
      * 
      * @throws Exception
      */
@@ -141,8 +139,7 @@ public class AuraFormatsHttpTest extends AuraHttpTestCase {
     }
 
     /**
-     * Sanity testing for all valid formats that can be specified for
-     * AuraResourceServlet.
+     * Sanity testing for all valid formats that can be specified for AuraResourceServlet.
      */
     public void testResponseHeadersFromAuraResourceServlet() throws Exception {
         String url;
@@ -153,7 +150,7 @@ public class AuraFormatsHttpTest extends AuraHttpTestCase {
                 // Valid preload namespace
                 modeAndPreload = "{'mode':'DEV','preloads':['preloadTest']}";
                 url = "/l/" + AuraTextUtil.urlencode(modeAndPreload) + "/app.json?aura.token=+"
-                        + servletConfig.getCsrfToken();
+                        + getTestServletConfig().getCsrfToken();
                 getOnAuraResourceServlet(format, url);
 
                 // Cause exception by not specifying CSRF token
@@ -195,7 +192,7 @@ public class AuraFormatsHttpTest extends AuraHttpTestCase {
             case MANIFEST:
                 String appManifestUrl = "{'mode':'DEV','app':'appCache:testApp'}";
                 url = "/l/" + AuraTextUtil.urlencode(appManifestUrl) + "/app.manifest";
-                System.setProperty(CoreProtocolPNames.USER_AGENT, UserAgent.GOOGLE_CHROME.getUserAgentString());
+                setHttpUserAgent(UserAgent.GOOGLE_CHROME.getUserAgentString());
                 getOnAuraResourceServlet(format, url);
                 break;
             default:

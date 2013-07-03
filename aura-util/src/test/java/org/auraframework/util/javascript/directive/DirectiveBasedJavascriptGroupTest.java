@@ -24,7 +24,6 @@ import java.io.Writer;
 import java.util.EnumSet;
 
 import org.auraframework.test.UnitTestCase;
-import org.auraframework.test.annotation.ThreadHostileTest;
 
 import com.google.common.collect.ImmutableList;
 
@@ -33,7 +32,6 @@ import com.google.common.collect.ImmutableList;
  * {@link DirectiveBasedJavascriptGroup}. Javascript files can be grouped in modules. This helps in keeping the
  * javascript modularized.
  */
-@ThreadHostileTest
 public class DirectiveBasedJavascriptGroupTest extends UnitTestCase {
     public DirectiveBasedJavascriptGroupTest(String name) {
         super(name);
@@ -96,7 +94,7 @@ public class DirectiveBasedJavascriptGroupTest extends UnitTestCase {
 
     /**
      * Use the javascript processor to generate javascript files in 5 modes. Gold file the five modes and also verify
-     * that the file was not created in the 6th mode. TODO: investigate why this test is {@link ThreadHostileTest}.
+     * that the file was not created in the 6th mode.
      */
     public void testJavascriptGeneration() throws Exception {
         File file = getResourceFile("/testdata/javascript/testAllKindsOfDirectiveGenerate.js");

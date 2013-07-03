@@ -20,9 +20,11 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.test.WebDriverTestCase;
 import org.auraframework.test.WebDriverUtil.BrowserType;
 import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 
 /**
  * UI tests for inputText Component
@@ -45,10 +47,9 @@ public class InputTextUITest extends WebDriverTestCase {
                 + "</aura:component>";
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class, baseTag.replaceAll("%s", event));
         open(String.format("/%s/%s.cmp", cmpDesc.getNamespace(), cmpDesc.getName()));
-        WebDriver d = getDriver();
         String value = getCurrentModelValue();
         WebElement input = auraUITestingUtil.findElementAndTypeEventNameInIt(event);
-        WebElement outputDiv = d.findElement(By.id("output"));
+        WebElement outputDiv = findDomElement(By.id("output"));
         assertModelValue(value); // value shouldn't be updated yet
         input.click();
         outputDiv.click();// to simulate tab behavior for touch browsers
@@ -60,8 +61,7 @@ public class InputTextUITest extends WebDriverTestCase {
     // Change event not picked up on IOS devices
     public void testUpdateOnAttributeForNonIosAndroidDevice() throws Exception {
         open(TEST_CMP);
-        WebDriver d = getDriver();
-        WebElement outputDiv = d.findElement(By.id("output"));
+        WebElement outputDiv = findDomElement(By.id("output"));
         String eventName = "change";
         auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
         outputDiv.click();
@@ -72,8 +72,7 @@ public class InputTextUITest extends WebDriverTestCase {
     public void testUpdateOnAttribute() throws Exception {
         open(TEST_CMP);
         String value = getCurrentModelValue();
-        WebDriver d = getDriver();
-        WebElement outputDiv = d.findElement(By.id("output"));
+        WebElement outputDiv = findDomElement(By.id("output"));
         String eventName = "blur";
         WebElement input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
         assertModelValue(value); // value shouldn't be updated yet
@@ -121,7 +120,7 @@ public class InputTextUITest extends WebDriverTestCase {
         WebDriver d = getDriver();
         Actions a = new Actions(d);
 
-        WebElement outputDiv = d.findElement(By.id("output"));
+        WebElement outputDiv = findDomElement(By.id("output"));
 
         String eventName = "dblclick";
         WebElement input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
@@ -181,7 +180,7 @@ public class InputTextUITest extends WebDriverTestCase {
 
         String locatorTemplate = "#%s > input.uiInputText.uiInput";
         String locator = String.format(locatorTemplate, eventName);
-        WebElement input = getDriver().findElement(By.cssSelector(locator));
+        WebElement input = findDomElement(By.cssSelector(locator));
         input.click();
         input.sendKeys(eventName);
 
@@ -189,7 +188,7 @@ public class InputTextUITest extends WebDriverTestCase {
         input.click();
         String expected = value + eventName;
         // When we click the input on Firefox the cursor is at the beginning of the text.
-        if (checkBrowserType("FIREFOX")) {
+        if (BrowserType.FIREFOX.equals(getBrowserType())) {
             expected = eventName + value;
         }
         assertModelValue(expected);
@@ -216,10 +215,23 @@ public class InputTextUITest extends WebDriverTestCase {
         assertEquals("Expected untruncated text", inputText, input.getAttribute("value"));
     }
 
-    private String assertModelValue(String expectedValue) {
-        String value = getCurrentModelValue();
-        assertEquals("Model value is not what we expected", expectedValue, value);
-        return value;
+    private String assertModelValue(final String expectedValue) {
+        try {
+            return auraUITestingUtil.waitUntil(new ExpectedCondition<String>() {
+                @Override
+                public String apply(WebDriver d) {
+                    String actual = getCurrentModelValue();
+                    if (expectedValue.equals(actual)) {
+                        return actual;
+                    } else {
+                        return null;
+                    }
+                }
+            }, timeoutInSecs);
+        } catch (TimeoutException e) {
+            fail("Model value is not what we expected");
+            return null;
+        }
     }
 
     private String getCurrentModelValue() {
@@ -242,7 +254,7 @@ public class InputTextUITest extends WebDriverTestCase {
         DefDescriptor<ComponentDef> inputTextNullValue = addSourceAutoCleanup(ComponentDef.class, cmpSource);
         open(String.format("/%s/%s.cmp", inputTextNullValue.getNamespace(), inputTextNullValue.getName()));
 
-        WebElement input = getDriver().findElement(By.tagName("input"));
+        WebElement input = findDomElement(By.tagName("input"));
         assertEquals("Value of input is incorrect", "", input.getText());
     }
 
@@ -270,7 +282,8 @@ public class InputTextUITest extends WebDriverTestCase {
         WebElement outputValue = findDomElement(By.cssSelector(".outputValue"));
 
         // IE < 9 uses values 1, 2, 4 for left, right, middle click (respectively)
-        String expectedVal = (checkBrowserType("IE7") || checkBrowserType("IE8")) ? "1" : "0";
+        String expectedVal = (BrowserType.IE7.equals(getBrowserType()) || BrowserType.IE8.equals(getBrowserType())) ? "1"
+                : "0";
         input.click();
         assertEquals("Left click not performed ", expectedVal, outputValue.getText());
 

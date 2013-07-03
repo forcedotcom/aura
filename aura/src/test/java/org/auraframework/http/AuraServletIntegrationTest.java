@@ -38,7 +38,6 @@ import org.auraframework.test.util.AuraPrivateAccessor;
  * 
  * @since 0.0.2.48
  */
-@ThreadHostileTest
 public class AuraServletIntegrationTest extends IntegrationTestCase {
     public AuraServletIntegrationTest(String name) {
         super(name);
@@ -178,6 +177,7 @@ public class AuraServletIntegrationTest extends IntegrationTestCase {
     }
 
     @UnAdaptableTest
+    @ThreadHostileTest("invalidates caches")
     public void testGetLastModDevUpdateFrameworkJS() throws Exception {
         DefDescriptor<ApplicationDef> appDesc = Aura.getDefinitionService().getDefDescriptor(
                 "updateTest:updateWithoutPreload", ApplicationDef.class);
@@ -186,6 +186,7 @@ public class AuraServletIntegrationTest extends IntegrationTestCase {
     }
 
     @UnAdaptableTest
+    @ThreadHostileTest("invalidates caches")
     public void testGetLastModDevUpdateCss() throws Exception {
         DefDescriptor<ApplicationDef> appDesc = Aura.getDefinitionService().getDefDescriptor(
                 "updateTest:updateWithoutPreload", ApplicationDef.class);
@@ -210,6 +211,7 @@ public class AuraServletIntegrationTest extends IntegrationTestCase {
     }
 
     @UnAdaptableTest
+    @ThreadHostileTest("invalidates caches")
     public void testGetLastModDevUpdateDependentCss() throws Exception {
         DefDescriptor<ApplicationDef> appDesc = Aura.getDefinitionService().getDefDescriptor(
                 "updateTest:updateWithoutPreload", ApplicationDef.class);
@@ -257,6 +259,7 @@ public class AuraServletIntegrationTest extends IntegrationTestCase {
     }
 
     @UnAdaptableTest
+    @ThreadHostileTest("invalidates caches")
     public void testGetLastModDevUpdatePreloadedCss() throws Exception {
         DefDescriptor<ApplicationDef> appDesc = Aura.getDefinitionService().getDefDescriptor(
                 "updateTest:updateWithPreload", ApplicationDef.class);
@@ -269,6 +272,7 @@ public class AuraServletIntegrationTest extends IntegrationTestCase {
     }
 
     @UnAdaptableTest
+    @ThreadHostileTest("invalidates caches")
     public void testGetLastModProdUpdateFrameworkJS() throws Exception {
         DefDescriptor<ApplicationDef> appDesc = Aura.getDefinitionService().getDefDescriptor(
                 "updateTest:updateWithPreload", ApplicationDef.class);
@@ -277,6 +281,7 @@ public class AuraServletIntegrationTest extends IntegrationTestCase {
     }
 
     @UnAdaptableTest
+    @ThreadHostileTest("invalidates caches")
     public void testGetLastModProdUpdateDependentCss() throws Exception {
         DefDescriptor<ApplicationDef> appDesc = Aura.getDefinitionService().getDefDescriptor(
                 "updateTest:updateWithPreload", ApplicationDef.class);
@@ -318,6 +323,7 @@ public class AuraServletIntegrationTest extends IntegrationTestCase {
     /**
      * Get a URL when context has preloads.
      */
+    @ThreadHostileTest("preload sensitive")
     public void testGetManifestWithPreloads() throws Exception {
         DefDescriptor<ApplicationDef> desc = Aura.getDefinitionService().getDefDescriptor(
                 "appPreloadTest:appCacheNoPreload", ApplicationDef.class);

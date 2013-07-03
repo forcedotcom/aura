@@ -121,13 +121,13 @@ public class StyleDefImplTest extends AuraImplTestCase {
      * StyleDef must have a dependency on a NamespaceDef.
      */
     public void testAppendDependenciesHasNamespaceDef() throws Exception {
-        String name = String.format("%s.someStyle", auraTestingUtil.getNonce(getName()));
+        String name = String.format("%s.someStyle", getAuraTestingUtil().getNonce(getName()));
         DefDescriptor<StyleDef> styleDesc = Aura.getDefinitionService().getDefDescriptor(name, StyleDef.class);
-        auraTestingUtil.addSourceAutoCleanup(styleDesc, ".THIS {}");
+        addSourceAutoCleanup(styleDesc, ".THIS {}");
 
         DefDescriptor<NamespaceDef> namespaceDesc = Aura.getDefinitionService().getDefDescriptor(
                 String.format("%s://%s", DefDescriptor.MARKUP_PREFIX, styleDesc.getNamespace()), NamespaceDef.class);
-        auraTestingUtil.addSourceAutoCleanup(namespaceDesc, "<aura:namespace></aura:namespace>");
+        addSourceAutoCleanup(namespaceDesc, "<aura:namespace></aura:namespace>");
 
         // need to restart context because old context will not have the new
         // namespace registered

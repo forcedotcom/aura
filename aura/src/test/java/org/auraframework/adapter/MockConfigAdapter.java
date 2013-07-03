@@ -24,6 +24,8 @@ import org.auraframework.test.MockBean;
  * @since 0.0.178
  */
 public interface MockConfigAdapter extends ConfigAdapter, MockBean {
+    void setIsClientAppcacheEnabled(boolean isClientAppcacheEnabled);
+
     void setIsProduction(boolean isProduction);
 
     void setIsAuraJSStatic(boolean isAuraJSStatic);

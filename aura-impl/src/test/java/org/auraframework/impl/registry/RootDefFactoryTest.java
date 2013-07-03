@@ -40,7 +40,7 @@ public class RootDefFactoryTest extends AuraImplTestCase {
      * Test find(String) using regex's.
      */
     public void testFindRegex() throws Exception {
-        String namespace = "testFindRegex" + auraTestingUtil.getNonce();
+        String namespace = "testFindRegex" + getAuraTestingUtil().getNonce();
         DefDescriptor<ApplicationDef> houseboat = addSourceAutoCleanup(ApplicationDef.class, baseContents,
                 String.format("%s:houseboat", namespace));
         addSourceAutoCleanup(ApplicationDef.class, baseContents, String.format("%s:houseparty", namespace));

@@ -28,11 +28,10 @@ import java.lang.annotation.Target;
  * Such tests are discouraged, and this annotation should be considered a
  * stop-gap measure towards fixing these broken tests.
  * <p>
- * TODO(W-1386881): Add support in TestSetRunnerController to use this as a
- * Method annotation as well.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.TYPE })
+@Target({ ElementType.TYPE, ElementType.METHOD })
 @Inherited
 public @interface ThreadHostileTest {
+    String value() default ""; 
 }

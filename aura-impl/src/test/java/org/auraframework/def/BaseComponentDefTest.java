@@ -149,7 +149,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
     }
 
     public void testEquals() throws Exception {
-        String desc = auraTestingUtil.getNonce("test:cmp");
+        String desc = getAuraTestingUtil().getNonce("test:cmp");
         Location location = vendor.makeLocation("filename1", 5, 5, 0);
         BaseComponentDef bcd1 = vendor.makeBaseComponentDefWithNulls(getDefClass(),
                 desc, null, null, null, location, null, null, null, null, null, null, null, false, false);
@@ -160,7 +160,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
 
     public void testEqualsWithDifferentObjects() throws Exception {
         BaseComponentDef bcd = vendor.makeBaseComponentDefWithNulls(getDefClass(),
-                auraTestingUtil.getNonce("test:cmp"), null, null, null, null, null, null, null, null, null, null,
+                getAuraTestingUtil().getNonce("test:cmp"), null, null, null, null, null, null, null, null, null, null,
                 null, false, false);
         assertFalse("A BaseComponentDef shouldn't equal a ComponentDefRef",
                 bcd.equals(vendor.makeComponentDefRef()));
@@ -169,7 +169,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
     public void testEqualsWithDifferentController() throws Exception {
         DefDescriptor<ControllerDef> controllerDesc = DefDescriptorImpl.getInstance("java://foo.bar2",
                 ControllerDef.class);
-        String desc = auraTestingUtil.getNonce("test:cmp");
+        String desc = getAuraTestingUtil().getNonce("test:cmp");
         Location location = vendor.makeLocation("filename1", 5, 5, 0);
         BaseComponentDef bcd1 = vendor.makeBaseComponentDefWithNulls(getDefClass(),
                 desc, null, null, null, location, null, null, null, null, null, null, null, false, false);
@@ -180,7 +180,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
 
     public void testEqualsWithDifferentParents() throws Exception {
         DefDescriptor<T> parentDesc = DefDescriptorImpl.getInstance("fake:componentParent2", getDefClass());
-        String desc = auraTestingUtil.getNonce("test:cmp");
+        String desc = getAuraTestingUtil().getNonce("test:cmp");
         Location location = vendor.makeLocation("filename1", 5, 5, 0);
         BaseComponentDef bcd1 = vendor.makeBaseComponentDefWithNulls(getDefClass(),
                 desc, null, null, null, location, null, null, null, null, null, null, null, false, false);
@@ -193,7 +193,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         DefDescriptor<EventDef> eventDefDescriptor = DefDescriptorImpl.getInstance("fake:event2", EventDef.class);
         Map<String, RegisterEventDef> eventDefs = ImmutableMap.of("fakey2",
                 (RegisterEventDef) vendor.makeRegisterEventDef(eventDefDescriptor, false, null));
-        String desc = auraTestingUtil.getNonce("test:cmp");
+        String desc = getAuraTestingUtil().getNonce("test:cmp");
         Location location = vendor.makeLocation("filename1", 5, 5, 0);
         BaseComponentDef bcd1 = vendor.makeBaseComponentDefWithNulls(getDefClass(),
                 desc, null, null, null, location, null, null, null, null, null, null, null, false, false);
@@ -289,30 +289,30 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
 
         DefDescriptor<ModelDef> modelDesc = DefDescriptorImpl.getAssociateDescriptor(cmpDesc, ModelDef.class,
                 DefDescriptor.JAVASCRIPT_PREFIX);
-        auraTestingUtil.addSourceAutoCleanup(modelDesc, "{obj:{}}");
+        addSourceAutoCleanup(modelDesc, "{obj:{}}");
         DefDescriptor<ControllerDef> controllerDesc = DefDescriptorImpl.getAssociateDescriptor(cmpDesc,
                 ControllerDef.class,
                 DefDescriptor.JAVASCRIPT_PREFIX);
-        auraTestingUtil.addSourceAutoCleanup(controllerDesc, "{hi:function(){}}");
+        addSourceAutoCleanup(controllerDesc, "{hi:function(){}}");
 
         DefDescriptor<RendererDef> renderDesc = DefDescriptorImpl.getAssociateDescriptor(cmpDesc, RendererDef.class,
                 DefDescriptor.JAVASCRIPT_PREFIX);
-        auraTestingUtil.addSourceAutoCleanup(renderDesc, "({render:function(c){return this.superRender();}})");
+        addSourceAutoCleanup(renderDesc, "({render:function(c){return this.superRender();}})");
 
         DefDescriptor<HelperDef> helperDesc = DefDescriptorImpl.getAssociateDescriptor(cmpDesc, HelperDef.class,
                 DefDescriptor.JAVASCRIPT_PREFIX);
-        auraTestingUtil.addSourceAutoCleanup(helperDesc, "({help:function(){}})");
+        addSourceAutoCleanup(helperDesc, "({help:function(){}})");
 
         DefDescriptor<StyleDef> styleDesc = Aura.getDefinitionService()
                 .getDefDescriptor(cmpDesc, DefDescriptor.CSS_PREFIX,
                         StyleDef.class);
         String className = cmpDesc.getNamespace()
                 + StringUtils.capitalize(cmpDesc.getName());
-        auraTestingUtil.addSourceAutoCleanup(styleDesc,
+        addSourceAutoCleanup(styleDesc,
                 String.format(".%s {font-style:italic;}", className));
         DefDescriptor<NamespaceDef> namespaceDesc = Aura.getDefinitionService().getDefDescriptor(
                 String.format("%s://%s", DefDescriptor.MARKUP_PREFIX, styleDesc.getNamespace()), NamespaceDef.class);
-        auraTestingUtil.addSourceAutoCleanup(namespaceDesc, "<aura:namespace/>");
+        addSourceAutoCleanup(namespaceDesc, "<aura:namespace/>");
 
         Set<DefDescriptor<?>> dependencies = new HashSet<DefDescriptor<?>>();
         cmpDesc.getDef().appendDependencies(dependencies);
@@ -376,7 +376,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
                 String.format(baseTag, "model='java://org.auraframework.impl.java.model.TestModel'", ""));
         DefDescriptor<ModelDef> modelDesc = DefDescriptorImpl.getAssociateDescriptor(compDesc, ModelDef.class,
                 DefDescriptor.JAVASCRIPT_PREFIX);
-        auraTestingUtil.addSourceAutoCleanup(modelDesc, "{obj:{}}");
+        addSourceAutoCleanup(modelDesc, "{obj:{}}");
         try {
             compDesc.getDef();
             fail("Should not be able to load component with explicit and implicit models");
@@ -474,7 +474,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         DefDescriptor<T> compDesc = addSourceAutoCleanup(getDefClass(), String.format(baseTag, "", ""));
         DefDescriptor<ModelDef> modelDesc = DefDescriptorImpl.getAssociateDescriptor(compDesc, ModelDef.class,
                 DefDescriptor.JAVASCRIPT_PREFIX);
-        auraTestingUtil.addSourceAutoCleanup(modelDesc, "{obj:{}}");
+        addSourceAutoCleanup(modelDesc, "{obj:{}}");
         DefDescriptor<ModelDef> dd = compDesc.getDef().getLocalModelDefDescriptor();
         assertNotNull(dd);
         assertEquals(modelDesc.getQualifiedName(), dd.getQualifiedName());
@@ -531,7 +531,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         DefDescriptor<ModelDef> grandParentModelDesc = DefDescriptorImpl.getAssociateDescriptor(grandParentDesc,
                 ModelDef.class,
                 DefDescriptor.JAVASCRIPT_PREFIX);
-        auraTestingUtil.addSourceAutoCleanup(grandParentModelDesc, "{obj:{}}");
+        addSourceAutoCleanup(grandParentModelDesc, "{obj:{}}");
 
         DefDescriptor<T> parentDesc = addSourceAutoCleanup(
                 getDefClass(),
@@ -610,7 +610,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         DefDescriptor<T> compDesc = addSourceAutoCleanup(getDefClass(), String.format(baseTag, "", ""));
         DefDescriptor<ModelDef> modelDesc = DefDescriptorImpl.getAssociateDescriptor(compDesc, ModelDef.class,
                 DefDescriptor.JAVASCRIPT_PREFIX);
-        auraTestingUtil.addSourceAutoCleanup(modelDesc, "{obj:{}}");
+        addSourceAutoCleanup(modelDesc, "{obj:{}}");
 
         ModelDef d = compDesc.getDef().getModelDef();
         assertNotNull(d);
@@ -625,7 +625,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
                 String.format(baseTag, "model='java://org.auraframework.impl.java.model.TestModel'", ""));
         DefDescriptor<ModelDef> modelDesc = DefDescriptorImpl.getAssociateDescriptor(compDesc, ModelDef.class,
                 DefDescriptor.JAVASCRIPT_PREFIX);
-        auraTestingUtil.addSourceAutoCleanup(modelDesc, "{obj:{}}");
+        addSourceAutoCleanup(modelDesc, "{obj:{}}");
 
         ModelDef d = compDesc.getDef().getModelDef();
         assertNotNull(d);
@@ -722,7 +722,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         DefDescriptor<T> cmpDesc = addSourceAutoCleanup(getDefClass(), String.format(baseTag, "", ""));
         DefDescriptor<RendererDef> renderDesc = DefDescriptorImpl.getAssociateDescriptor(cmpDesc, RendererDef.class,
                 DefDescriptor.JAVASCRIPT_PREFIX);
-        auraTestingUtil.addSourceAutoCleanup(renderDesc, "({render:function(c){return this.superRender();}})");
+        addSourceAutoCleanup(renderDesc, "({render:function(c){return this.superRender();}})");
         DefDescriptor<RendererDef> dd = cmpDesc.getDef().getRendererDescriptor();
         assertNotNull(dd);
         assertEquals(renderDesc, dd);
@@ -738,7 +738,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
                         ""));
         DefDescriptor<RendererDef> renderDesc = DefDescriptorImpl.getAssociateDescriptor(cmpDesc, RendererDef.class,
                 DefDescriptor.JAVASCRIPT_PREFIX);
-        auraTestingUtil.addSourceAutoCleanup(renderDesc, "({render:function(c){return this.superRender();}})");
+        addSourceAutoCleanup(renderDesc, "({render:function(c){return this.superRender();}})");
         DefDescriptor<RendererDef> dd = cmpDesc.getDef().getRendererDescriptor();
         assertNotNull(dd);
         assertEquals("java://org.auraframework.impl.renderer.sampleJavaRenderers.TestOverridingRenderer",
@@ -752,7 +752,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         DefDescriptor<ComponentDef> otherDesc = addSourceAutoCleanup(ComponentDef.class, "<aura:component/>");
         DefDescriptor<RendererDef> renderDesc = DefDescriptorImpl.getAssociateDescriptor(otherDesc, RendererDef.class,
                 DefDescriptor.JAVASCRIPT_PREFIX);
-        auraTestingUtil.addSourceAutoCleanup(renderDesc, "({render:function(c){return this.superRender();}})");
+        addSourceAutoCleanup(renderDesc, "({render:function(c){return this.superRender();}})");
         DefDescriptor<T> cmpDesc = addSourceAutoCleanup(
                 getDefClass(),
                 String.format(
@@ -784,7 +784,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         DefDescriptor<ComponentDef> otherDesc = addSourceAutoCleanup(ComponentDef.class, "<aura:component/>");
         DefDescriptor<RendererDef> renderDesc = DefDescriptorImpl.getAssociateDescriptor(otherDesc, RendererDef.class,
                 DefDescriptor.JAVASCRIPT_PREFIX);
-        auraTestingUtil.addSourceAutoCleanup(renderDesc, "({render:function(c){return this.superRender();}})");
+        addSourceAutoCleanup(renderDesc, "({render:function(c){return this.superRender();}})");
         RendererDef dd = define(baseTag, String.format("renderer='%s'", renderDesc.getQualifiedName()), "")
                 .getLocalRendererDef();
         assertNull(dd);
@@ -797,7 +797,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         DefDescriptor<T> cmpDesc = addSourceAutoCleanup(getDefClass(), String.format(baseTag, "", ""));
         DefDescriptor<RendererDef> renderDesc = DefDescriptorImpl.getAssociateDescriptor(cmpDesc, RendererDef.class,
                 DefDescriptor.JAVASCRIPT_PREFIX);
-        auraTestingUtil.addSourceAutoCleanup(renderDesc, "({render:function(c){return this.superRender();}})");
+        addSourceAutoCleanup(renderDesc, "({render:function(c){return this.superRender();}})");
         RendererDef dd = cmpDesc.getDef().getLocalRendererDef();
         assertNull(dd);
     }
@@ -809,7 +809,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         DefDescriptor<ComponentDef> otherDesc = addSourceAutoCleanup(ComponentDef.class, "<aura:component/>");
         DefDescriptor<RendererDef> renderDesc = DefDescriptorImpl.getAssociateDescriptor(otherDesc, RendererDef.class,
                 DefDescriptor.JAVASCRIPT_PREFIX);
-        auraTestingUtil.addSourceAutoCleanup(renderDesc, "({render:function(c){return this.superRender();}})");
+        addSourceAutoCleanup(renderDesc, "({render:function(c){return this.superRender();}})");
         DefDescriptor<T> cmpDesc = addSourceAutoCleanup(
                 getDefClass(),
                 String.format(
@@ -1172,7 +1172,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         T baseComponentDef = define(baseTag, "abstract='true'", "");
         DefDescriptor<ProviderDef> providerDesc = Aura.getDefinitionService().getDefDescriptor(
                 baseComponentDef.getDescriptor(), DefDescriptor.JAVASCRIPT_PREFIX, ProviderDef.class);
-        auraTestingUtil.addSourceAutoCleanup(providerDesc,
+        addSourceAutoCleanup(providerDesc,
                 "({provide:function Provider(component){return 'aura:text';}})");
         assertFalse("Abstract Component with client provider should not have any server dependencies.",
                 definitionService.getDefinition(baseComponentDef.getDescriptor()).hasLocalDependencies());
@@ -1222,7 +1222,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
 
     public void testExtendsSelf() {
         DefDescriptor<T> extendsSelf = addSourceAutoCleanup(getDefClass(), "");
-        Source<T> source = auraTestingUtil.getSource(extendsSelf);
+        Source<T> source = getSource(extendsSelf);
         source.addOrUpdate(String.format(baseTag,
                 "extensible='true' extends='" + extendsSelf.getDescriptorName() + "'", ""));
         DefType defType = DefType.getDefType(this.getDefClass());
@@ -1408,7 +1408,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
 
     public void testGetLocation() throws Exception {
         BaseComponentDef bcd = vendor.makeBaseComponentDefWithNulls(getDefClass(),
-                auraTestingUtil.getNonce("test:cmp"), null, null, null,
+                getAuraTestingUtil().getNonce("test:cmp"), null, null, null,
                 vendor.makeLocation("filename1", 5, 5, 0), null, null,
                 null, null, null, null, null, false, false);
         assertEquals(
@@ -1581,7 +1581,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
      */
     public void testValidateDefinitionNonExtensibleAbstract() throws Exception {
         BaseComponentDef bcd = vendor.makeBaseComponentDefWithNulls(getDefClass(),
-                auraTestingUtil.getNonce("test:cmp"), null, null, null, null, null,
+                getAuraTestingUtil().getNonce("test:cmp"), null, null, null, null, null,
                 null, null, null, null, null, null, true, false);
         try {
             bcd.validateDefinition();
@@ -1597,7 +1597,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
      */
     public void testValidateReferencesWithNonExistentParent() throws Exception {
         BaseComponentDef bcd = vendor.makeBaseComponentDefWithNulls(getDefClass(),
-                auraTestingUtil.getNonce("test:cmp"), null, null, null, null, null,
+                getAuraTestingUtil().getNonce("test:cmp"), null, null, null, null, null,
                 null, DefDescriptorImpl.getInstance("test:nonExistentComponentParent", getDefClass()), null, null,
                 null, null, false, false);
         try {
@@ -1618,7 +1618,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
     public void testValidateReferencesWithNonExtensibleParent() throws Exception {
         DefDescriptor<T> parentDesc = addSourceAutoCleanup(getDefClass(), String.format(baseTag, "", ""));
         BaseComponentDef bcd = vendor.makeBaseComponentDefWithNulls(getDefClass(),
-                auraTestingUtil.getNonce("test:cmp"), null, null, null, null, null,
+                getAuraTestingUtil().getNonce("test:cmp"), null, null, null, null, null,
                 null, parentDesc, null, null, null, null, false, false);
         try {
             bcd.validateReferences();
@@ -1640,7 +1640,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
                 HashSet<DefDescriptor<InterfaceDef>>();
         interfaces.add(vendor.makeInterfaceDefDescriptor("say:what"));
         BaseComponentDef bcd = vendor.makeBaseComponentDefWithNulls(getDefClass(),
-                auraTestingUtil.getNonce("test:cmp"), null, null, null, null, null,
+                getAuraTestingUtil().getNonce("test:cmp"), null, null, null, null, null,
                 null, null, interfaces, null, null, null, false, false);
         try {
             bcd.validateReferences();
@@ -1669,7 +1669,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         DefDescriptor<T> compDesc = addSourceAutoCleanup(getDefClass(), String.format(baseTag, "", ""));
         DefDescriptor<HelperDef> helperDesc = DefDescriptorImpl.getAssociateDescriptor(compDesc, HelperDef.class,
                 DefDescriptor.JAVASCRIPT_PREFIX);
-        auraTestingUtil.addSourceAutoCleanup(helperDesc, "({help:function(){}})");
+        addSourceAutoCleanup(helperDesc, "({help:function(){}})");
 
         HelperDef d = compDesc.getDef().getHelperDef();
         assertNotNull(d);
@@ -1695,7 +1695,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
                 String.format(baseTag, String.format("helper='%s'", helperDesc), ""));
         DefDescriptor<HelperDef> implicitDesc = DefDescriptorImpl.getAssociateDescriptor(compDesc, HelperDef.class,
                 DefDescriptor.JAVASCRIPT_PREFIX);
-        auraTestingUtil.addSourceAutoCleanup(implicitDesc, "({help:function(){}})");
+        addSourceAutoCleanup(implicitDesc, "({help:function(){}})");
 
         HelperDef d = compDesc.getDef().getHelperDef();
         assertNotNull(d);

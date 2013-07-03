@@ -72,7 +72,7 @@ public class AttributeDefRefTest extends AuraImplTestCase {
      */
     public void testParseValueSimple() throws Exception {
         AuraContext context = Aura.getContextService().getCurrentContext();
-        String typeName = auraTestingUtil.getNonce("customType");
+        String typeName = getAuraTestingUtil().getNonce("customType");
         DefDescriptor<TypeDef> typeDesc = DefDescriptorImpl.getInstance(typeName, TypeDef.class);
         TypeDef mockType = Mockito.mock(TypeDef.class);
         Mockito.doReturn(typeDesc).when(mockType).getDescriptor();

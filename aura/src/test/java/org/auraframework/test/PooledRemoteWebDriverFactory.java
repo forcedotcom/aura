@@ -40,9 +40,9 @@ import com.google.common.collect.Maps;
  * @since 0.0.178
  */
 public class PooledRemoteWebDriverFactory extends RemoteWebDriverFactory {
-    private final Map<DesiredCapabilities, List<PooledRemoteWebDriver>> pools = Maps.newHashMap();
+    private final Map<DesiredCapabilities, List<PooledRemoteWebDriver>> pools = Maps.newConcurrentMap();
 
-    public PooledRemoteWebDriverFactory(URL serverUrl) throws Exception {
+    public PooledRemoteWebDriverFactory(URL serverUrl) {
         super(serverUrl);
     }
 
@@ -126,11 +126,8 @@ public class PooledRemoteWebDriverFactory extends RemoteWebDriverFactory {
             }
         }
 
-        public void reallyQuit() {
+        private void superQuit() {
             super.quit();
-            synchronized (PooledRemoteWebDriverFactory.this) {
-                pool.remove(this);
-            }
         }
     }
 
@@ -165,8 +162,9 @@ public class PooledRemoteWebDriverFactory extends RemoteWebDriverFactory {
     public synchronized void release() {
         for (List<PooledRemoteWebDriver> pool : pools.values()) {
             for (PooledRemoteWebDriver driver : pool) {
-                driver.reallyQuit();
+                driver.superQuit();
             }
+            pool.clear();
         }
     }
 }

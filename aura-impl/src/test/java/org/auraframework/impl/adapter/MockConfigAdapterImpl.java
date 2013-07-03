@@ -25,17 +25,27 @@ import org.auraframework.adapter.MockConfigAdapter;
  */
 public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConfigAdapter {
 
+    private Boolean isClientAppcacheEnabled = null;
     private Boolean isProduction = null;
     private Boolean isAuraJSStatic = null;
     private Boolean validateCss = null;
-    public MockConfigAdapterImpl() {
-    }
 
     @Override
     public void reset() {
+        isClientAppcacheEnabled = null;
         isProduction = null;
         isAuraJSStatic = null;
         validateCss = null;
+    }
+
+    @Override
+    public void setIsClientAppcacheEnabled(boolean isClientAppcacheEnabled) {
+        this.isClientAppcacheEnabled = isClientAppcacheEnabled;
+    }
+
+    @Override
+    public boolean isClientAppcacheEnabled() {
+        return (isClientAppcacheEnabled == null) ? super.isClientAppcacheEnabled() : isClientAppcacheEnabled;
     }
 
     @Override

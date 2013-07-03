@@ -85,6 +85,10 @@
         <td>isTablet</td>
         <td>Indicates whether the browser is running on an iPad or a tablet with Android 2.2 or later (<code>true</code>) or not (<code>false</code>).</td>
     </tr>
+    <tr>
+        <td>isWindowsPhone</td>
+        <td>Indicates whether the browser is running on a Windows phone (<code>true</code>) or not (<code>false</code>). Note that this only detects Windows phones and does not detect tablets or other touch-enabled Windows 8 devices.</td>
+    </tr>
 </tbody>
 </table>
  

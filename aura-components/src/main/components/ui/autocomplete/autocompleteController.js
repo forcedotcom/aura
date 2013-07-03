@@ -53,17 +53,13 @@
         optionSelectEvt.fire();
     },
     
-    handleUpdateActiveOption: function(component, event, helper) {
-        helper.updateActiveOption(component, event);
-    },
-    
     matchText: function(component, event, helper) {
         var listCmp = component.find("list");
         listCmp.setValue("v.keyword", event.getParam("keyword"));
-        listCmp.setValue("v.visible", true);
+        listCmp.get("e.matchText").fire();
     },
     
-    updateActiveOption: function(component, event, helper) {
-        helper.updateActiveOption(component, event);
+    updateAriaAttributes: function(component, event, helper) {
+        helper.updateAriaAttributes(component, event);
     }
 })

@@ -17,11 +17,6 @@
     display: none;
 }
 
-.THIS.default .data-match {
-    border-radius: 2px;
-    background-color: #B5DAEE;
-}
-
 .THIS a {
     color: #ccc;
     display:block;
@@ -30,12 +25,19 @@
     text-decoration:none;
 }
 
-.THIS a:focus,
-.THIS a:active {
-    background-color:#CFEEF8;
-    border-radius:8px;
+.THIS.highlighted a {
+    background-color:#0683C5;
     color:#015BA7;
     outline:none;
     text-decoration:underline;
     padding:3px 9px;
+}
+
+.THIS a.mouseovered {
+    background-color: #A9D0F5;
+}
+
+.THIS.default .data-match {
+    border-radius: 2px;
+    background-color: #B5DAEE;
 }

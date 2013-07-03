@@ -16,5 +16,5 @@
 
 -->
 <aura:event type="COMPONENT" description="Indicate that an element or component gains focus.">
-    <aura:attribute name="id" type="String" description="The id of the active element/component id."/>
+    <aura:attribute name="attrs" type="Object" description="An object including all updated attributes."/>
 </aura:event>

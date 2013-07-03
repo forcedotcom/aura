@@ -29,6 +29,7 @@
            size="{!v.size}"
            role="combobox"
            aria-autocomplete="list"
+           aria-expanded="false"
            aria-haspopup="true"
            aria-activedescendant=""/>
 </aura:component>

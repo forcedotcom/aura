@@ -14,6 +14,15 @@
  * limitations under the License.
  */
 ({
+    addOptionDomEvents : function(component) {
+        var events = ["mouseover", "mouseout"];
+        for (var i=0, len=events.length; i < len; i++) {
+            if (!component.hasEventHandler(events[i])) {
+                this.addDomHandler(component, events[i]);
+            }           
+        }
+    },
+    
     displayText: function(component, keyword) {
         var concreteCmp = component.getConcreteComponent();
         var keyword = concreteCmp.get("v.keyword");
@@ -46,19 +55,27 @@
         }
     },
     
+    handleMouseover: function(component) {
+        var optionCmp = component.find("option");
+        var elem = optionCmp ? optionCmp.getElement() : null;
+        if (elem) {
+            $A.util.addClass(elem, "mouseovered");
+        }
+    },
+    
+    handleMouseout: function(component) {
+        var optionCmp = component.find("option");
+        var elem = optionCmp ? optionCmp.getElement() : null;
+        if (elem) {
+            $A.util.removeClass(elem, "mouseovered");
+        }
+    },
+    
     htmlEscape: function(str) {
         return String(str).replace(/&/g, '&amp;')
             .replace(new RegExp('"', "g"), '&quot;')
             .replace(new RegExp("'", "g"), '&#39;')
             .replace(/</g, '&lt;')
             .replace(/>/g, '&gt;');
-    },
-    
-    setFocus: function(component) {
-        var optionCmp = component.find("option");
-        var elem = optionCmp.getElement();
-        if (elem && elem.focus) {
-            elem.focus();
-        }
     }
 })

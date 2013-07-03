@@ -50,8 +50,8 @@
         footer="{!v.footer}"
         theme="{!v.theme}"
         visible="false"
-        contentRole="listBox"
+        role="listbox"
         propertyToMatch="{!v.propertyToMatch}"
         selectListOption="{!c.handleSelectOption}"
-        updateActiveOption="{!c.updateActiveOption}"/>
+        updateAriaAttributes="{!c.updateAriaAttributes}"/>
 </aura:component>

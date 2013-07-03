@@ -16,8 +16,16 @@
 ({  
     hideList: function(component) {
         var list = component.find("list");
-        if (list) {
+        if (list && list.get("v.visible") === true) {
             list.setValue("v.visible", false);
+        }
+    },
+    
+    handleEnterkey: function(component, event) {
+        var list = component.find("list");
+        if (list.get("v.visible") === true) {
+            var pEvent = list.get("e.pressOnHighlighted");
+            pEvent.fire();
         }
     },
     
@@ -30,15 +38,17 @@
         var domEvent = event.getParam("domEvent");
         if (keyCode === 40) {  // down arrow key
             domEvent.preventDefault();
-            this.setFocusToFirstItem(component, event);
+            this.highlightNextItem(component, event);
         } else if (keyCode === 38) {  // up arrow key
             domEvent.preventDefault();
-            this.setFocusToLastItem(component, event);
+            this.highlightPrevItem(component, event);
         } else if (keyCode === 27) {  // Esc key
             domEvent.stopPropagation();
             this.handleEsckey(component, event);
-        } else if (event.keyCode === 9) {  // tab key: dismiss the list
+        } else if (keyCode === 9) {  // tab key: dismiss the list
             this.handleTabkey(component, event);
+        } else if (keyCode === 13) {  // enter key: select the highlighted list option
+            this.handleEnterkey(component, event);
         }
     },
     
@@ -46,22 +56,26 @@
         this.hideList(component);
     },
     
-    setFocusToFirstItem: function(component, event) {
+    highlightNextItem: function(component, event) {
         var list = component.find("list");
-        var focusEvent = list.get("e.listHighlight");
-        focusEvent.setParams({
-            activeIndex: 0
-        });
-        focusEvent.fire();
+        if (list.get("v.visible") === true) {
+            var highlightEvent = list.get("e.listHighlight");
+            highlightEvent.setParams({
+                activeIndex: 0
+            });
+            highlightEvent.fire();
+        }
     },
     
-    setFocusToLastItem: function(component) {
+    highlightPrevItem: function(component) {
         var list = component.find("list");
-        var focusEvent = list.get("e.listHighlight");
-        focusEvent.setParams({
-            activeIndex: -1
-        });
-        focusEvent.fire();
+        if (list.get("v.visible") === true) {
+            var highlightEvent = list.get("e.listHighlight");
+            highlightEvent.setParams({
+                activeIndex: -1
+            });
+            highlightEvent.fire();
+        }
     },
     
     /**
@@ -77,12 +91,16 @@
         }
     },
     
-    updateActiveOption: function(component, event) {
+    updateAriaAttributes: function(component, event) {
         var inputCmp = component.find("input");
         var elem = inputCmp ? inputCmp.getElement() : null;
         if (elem) {
-            var id = event.getParam("id");
-            elem.setAttribute("aria-activedescendant", id);
+            var attrs = event.getParam("attrs");
+            for (var key in attrs) {
+                if (attrs.hasOwnProperty(key)) {
+                    elem.setAttribute(key, attrs[key]);
+                }
+            }
         }
     }
 })

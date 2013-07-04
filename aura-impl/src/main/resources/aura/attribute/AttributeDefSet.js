@@ -158,8 +158,13 @@ AttributeDefSet.prototype.createAttribute = function(config, def, component, val
                     }
                 } else {
                     if (noInstantiate && !forceInstantiate) {
-                        v["valueProvider"] = valueProvider;
-                        valueConfig.push(new SimpleValue(v, def, component));
+                        // make a shallow clone of the cdr with the proper value provider set 
+                        var cdr = {};
+                        cdr["componentDef"] = v["componentDef"];
+                        cdr["localId"] = v["localId"];
+                        cdr["attributes"] = v["attributes"];
+                        cdr["valueProvider"] = valueProvider;
+                        valueConfig.push(new SimpleValue(cdr, def, component));
                     } else {
                         valueConfig.push(componentService.newComponentDeprecated(v, valueProvider, localCreation, true));
                     }

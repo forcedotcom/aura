@@ -533,7 +533,9 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
         newParams.add(new BasicNameValuePair("aura.test", getQualifiedName()));
         url = url + "?" + URLEncodedUtils.format(newParams, "UTF-8") + hash;
 
+        auraUITestingUtil.getRawEval("document._waitingForReload = true;");
         openRaw(url);
+        waitForCondition("return !document._waitingForReload");
         if (waitForInit) {
             auraUITestingUtil.waitForAuraInit(getExceptionsAllowedDuringInit());
         }

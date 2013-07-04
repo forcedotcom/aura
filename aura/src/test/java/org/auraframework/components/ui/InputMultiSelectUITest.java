@@ -26,8 +26,10 @@ import org.openqa.selenium.support.ui.Select;
 public class InputMultiSelectUITest extends WebDriverTestCase {
     private final String[] URL = new String[] { "/uitest/inputMultiSelectTest.cmp",
             "/uitest/inputMultiSelectNestedOptionsTest.cmp" };
-    private WebElement submit;
-    private WebElement output;
+    private By outputLocator = By.xpath("//span[@class='uiOutputText']");
+    private By selectLocator = By.xpath("//select[1]");
+    private By submitLocator = By.xpath("//button");
+    private String optionLocatorString = "//select[1]/option[text()='%s']";
 
     public InputMultiSelectUITest(String name) {
         super(name);
@@ -35,18 +37,12 @@ public class InputMultiSelectUITest extends WebDriverTestCase {
 
     private void openTestPage(int i) throws Exception {
         open(URL[i]);
-        submit = findDomElement(By.xpath("//button"));
-        output = findDomElement(By.xpath("//span[@class='uiOutputText']"));
     }
 
-    private WebElement getSelectElement() {
-        return findDomElement(By.xpath("//select[1]"));
-    }
-    
     private Select getInputSelect() {
-        return new Select(getSelectElement());
+        return new Select(findDomElement(selectLocator));
     }
-    
+
     private void selectOption(String optionLabel) {
         selectDeselectOption(optionLabel, true);
     }
@@ -74,20 +70,11 @@ public class InputMultiSelectUITest extends WebDriverTestCase {
     }
 
     private void verifyOptionSelectDeselct(String optionLabel, boolean isSelected) {
-        List<WebElement> options = getInputSelect().getOptions();
-        Boolean found = false;
-        for (WebElement option : options) {
-            if (optionLabel.equals(option.getText())) {
-                found = true;
-                if (isSelected) {
-                    assertTrue("Option '" + optionLabel + "' should be selected", option.isSelected());
-                } else {
-                    assertFalse("Option '" + optionLabel + "' should be deselected", option.isSelected());
-                }
-            }
-        }
-        if (!found && isSelected) {
-            fail("Option '" + optionLabel + "' is not found in list");
+        WebElement option = findDomElement(By.xpath(String.format(optionLocatorString, optionLabel)));
+        if (isSelected) {
+            assertTrue("Option '" + optionLabel + "' should be selected", option.isSelected());
+        } else {
+            assertFalse("Option '" + optionLabel + "' should be deselected", option.isSelected());
         }
     }
 
@@ -104,8 +91,8 @@ public class InputMultiSelectUITest extends WebDriverTestCase {
             verifyOptionDeselected("Option2");
             verifyOptionDeselected("Option3");
 
-            submit.click();
-            waitForElementTextPresent(output, "option1");
+            findDomElement(submitLocator).click();
+            auraUITestingUtil.waitForElementText(outputLocator, "option1", true);
             verifyOptionSelected("Option1");
             verifyOptionDeselected("Option2");
             verifyOptionDeselected("Option3");
@@ -116,8 +103,8 @@ public class InputMultiSelectUITest extends WebDriverTestCase {
             selectOption("Option3");
             verifyOptionDeselected("Option2");
 
-            submit.click();
-            waitForElementTextPresent(output, "option3");
+            findDomElement(submitLocator).click();
+            auraUITestingUtil.waitForElementText(outputLocator, "option3", true);
             verifyOptionSelected("Option3");
             verifyOptionDeselected("Option1");
             verifyOptionDeselected("Option2");
@@ -137,8 +124,8 @@ public class InputMultiSelectUITest extends WebDriverTestCase {
             selectOption("Option2");
             verifyOptionDeselected("Option3");
 
-            submit.click();
-            waitForElementTextPresent(output, "option1;option2");
+            findDomElement(submitLocator).click();
+            auraUITestingUtil.waitForElementText(outputLocator, "option1;option2", true);
             verifyOptionSelected("Option1");
             verifyOptionSelected("Option2");
             verifyOptionDeselected("Option3");
@@ -150,8 +137,8 @@ public class InputMultiSelectUITest extends WebDriverTestCase {
             deselectOption("Option2");
             verifyOptionSelected("Option1");
 
-            submit.click();
-            waitForElementTextPresent(output, "option1");
+            findDomElement(submitLocator).click();
+            auraUITestingUtil.waitForElementText(outputLocator, "option1", true);
             verifyOptionSelected("Option1");
             verifyOptionDeselected("Option2");
         }
@@ -170,8 +157,8 @@ public class InputMultiSelectUITest extends WebDriverTestCase {
             selectOption("Option2");
             selectOption("Option3");
 
-            submit.click();
-            waitForElementTextPresent(output, "option1;option2;option3");
+            findDomElement(submitLocator).click();
+            auraUITestingUtil.waitForElementText(outputLocator, "option1;option2;option3", true);
             verifyOptionSelected("Option1");
             verifyOptionSelected("Option2");
             verifyOptionSelected("Option3");
@@ -184,8 +171,8 @@ public class InputMultiSelectUITest extends WebDriverTestCase {
             verifyOptionDeselected("Option2");
             verifyOptionDeselected("Option3");
 
-            submit.click();
-            waitForElementTextPresent(output, "");
+            findDomElement(submitLocator).click();
+            auraUITestingUtil.waitForElementText(outputLocator, "", true);
             verifyOptionDeselected("Option1");
             verifyOptionDeselected("Option2");
             verifyOptionDeselected("Option3");
@@ -199,7 +186,7 @@ public class InputMultiSelectUITest extends WebDriverTestCase {
     private void focusSelectElement() {
         if (BrowserType.IE10.equals(getBrowserType())) {
             List<WebElement> selectedOptions = getInputSelect().getAllSelectedOptions();
-            getSelectElement().click();
+            findDomElement(selectLocator).click();
 
             getInputSelect().deselectAll();
             for (int i = 0; i < selectedOptions.size(); i++) {

@@ -46,6 +46,13 @@ Test.Components.Ui.Carousel.CarouselHelperTest=function(){
 			
 			var targetComponent = {			 
 				get : function(expression) {return false;},
+				find : function(expression) {					 
+					return {
+						getElement : function() {
+							return null;
+						}
+					}
+				},
 				getValue : function(expression) {
 					if (expression === "v.pageComponents") {
 						return {
@@ -98,6 +105,13 @@ Test.Components.Ui.Carousel.CarouselHelperTest=function(){
 			
 			var targetComponent = {				 
 				get : function(expression) {return false;},
+				find : function(expression) {					 
+					return {
+						getElement : function() {
+							return null;
+						}
+					}
+				},
 				getValue : function(expression) {
 					if (expression === "v.pageComponents") {
 						return {

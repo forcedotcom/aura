@@ -17,10 +17,5 @@
 -->
 <aura:component extends="ui:output" implements="ui:outputDateComponent" extensible="true" support="GA" description="Displays a date in the default or specified format based on the user's locale.">
     <aura:attribute name="value" type="String" required="true" description="The output value of the date. It should be a date string in ISO-8601 format (YYYY-MM-DD)."/>
-    
-    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
-    <aura:handler name="change" value="{!v.format}" action="{!c.formatChange}"/>
-    <aura:handler name="change" value="{!v.langLocale}" action="{!c.langLocaleChange}"/>
-    
     <span aura:id="span" class="{!v.class}"></span>
 </aura:component>

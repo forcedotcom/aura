@@ -61,7 +61,7 @@
 	        cmp.find("datePicker").get('c.selectToday').runDeprecated();
 	        aura.test.addWaitFor(true, function(){return cmp.find("inputText").getElement().value.length > 0;},function(){
 	        	var inputDateStr  = cmp.find("inputText").getElement().value;
-		        var dt            = moment().format('MMM DD, YYYY') + " 12:00:00 AM";
+		        var dt            = $A.localizationService.formatDateTime(new Date(), 'MMM DD, YYYY') + " 12:00:00 AM";
 	    		aura.test.assertEquals(dt, inputDateStr, "Should have used default timezone.");	        	
 	        });	        
         }
@@ -75,8 +75,7 @@
 	test: function(cmp){	        
 	        aura.test.addWaitFor(true, function(){return cmp.find("inputText").getElement().value.length > 0;},function(){
 	        	var inputDateStr  = cmp.find("inputText").getElement().value;
-	        	aura.test.assertEquals("Sep 23, 2004 4:30:00 PM", inputDateStr, "Should have used default timezone.");
-	        	/*var timezone = $A.getGlobalValueProviders().get("$Locale.timezone");
+	        	var timezone = $A.getGlobalValueProviders().get("$Locale.timezone");
 	        	if(timezone  == "GMT"){
 	    			aura.test.assertEquals("Sep 23, 2004 4:30:00 PM", inputDateStr, "Should have used default timezone.");
 	        	}
@@ -85,7 +84,7 @@
 	        	} 
 	        	else{// For any other time zone we just make sure it has some value
 	        		aura.test.assertTrue(inputDateStr.length > 0, "Should have used default timezone.");
-	        	}*/
+	        	}
 	        });	        
         }
     },   
@@ -99,7 +98,7 @@
 	        cmp.find("datePicker").get('c.selectToday').runDeprecated();
 	        aura.test.addWaitFor(true, function(){return cmp.find("inputText").getElement().value.length > 0;},function(){
 	        	var inputDateStr  = cmp.find("inputText").getElement().value;
-	        	var dt            = moment().format('MMM DD, YYYY') + " 12:00:00 AM";
+	        	var dt            = $A.localizationService.formatDateTime(new Date(), 'MMM DD, YYYY') + " 12:00:00 AM";
 	    		aura.test.assertEquals(dt, inputDateStr, "Should have used default timezone.");	        	
 	        });	
         }
@@ -178,7 +177,7 @@
 	test: function(cmp){				
 	        cmp.find("datePicker").get('c.selectToday').runDeprecated();
 	        var inputDateStr  = cmp.find("inputText").getElement().value;
-	        var dt            = moment().format('MMM DD, YYYY') + " 12:00:00 AM";
+	        var dt            = $A.localizationService.formatDateTime(new Date(), 'MMM DD, YYYY') + " 12:00:00 AM";
     		aura.test.assertEquals(dt, inputDateStr, "Dates are not the same and they should be");
         }
     },
@@ -192,7 +191,7 @@
 	        cmp.find("datePicker").get('c.selectToday').runDeprecated();
 	        aura.test.addWaitFor(true, function(){return cmp.find("inputText").getElement().value.length > 0;},function(){
 	        	var inputDateStr  = cmp.find("inputText").getElement().value;
-	        	var dt            = moment().format('MMM DD, YYYY') + " 12:00:00 AM";
+	        	var dt            = $A.localizationService.formatDateTime(new Date(), 'MMM DD, YYYY') + " 12:00:00 AM";
 	    		aura.test.assertEquals(dt, inputDateStr, "Dates are not the same and they should be");	        	
 	        });			
         }
@@ -207,7 +206,7 @@
 	        cmp.find("datePicker").get('c.selectToday').runDeprecated();	        
 	        aura.test.addWaitFor(true, function(){return cmp.find("inputText").getElement().value.length > 0;},function(){
 	        	var inputDateStr  = cmp.find("inputText").getElement().value;
-	        	var dt            = moment().format('MMM DD, YYYY') + " 12:00:00 AM";
+	        	var dt            = $A.localizationService.formatDateTime(new Date(), 'MMM DD, YYYY') + " 12:00:00 AM";
 	    		aura.test.assertEquals(dt, inputDateStr, "Dates are not the same and they should be");	        	
 	        });	        	        
         }

@@ -45,6 +45,7 @@ public class LocaleValueProvider implements GlobalValueProvider {
     
     public static String DATE_FORMAT = "dateformat";
     public static String DATETIME_FORMAT = "datetimeformat";
+    public static String TIME_FORMAT = "timeformat";
     public static String TIME_ZONE = "timezone";
     public static String TIME_ZONE_FILE_NAME = "timezoneFileName";
     public static String CURRENCY_CODE = "currency_code";
@@ -56,6 +57,7 @@ public class LocaleValueProvider implements GlobalValueProvider {
     
     public static String DEFAULT_DATE_FORMAT = "yyyy-MM-dd";
     public static String DEFAULT_DATETIME_FORMAT = "yyyy-MM-dd HH:mm";
+    public static String DEFAULT_TIME_FORMAT = "HH:mm";
     
     private final Map<String, Object> data;
 
@@ -74,14 +76,20 @@ public class LocaleValueProvider implements GlobalValueProvider {
         
         DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.DEFAULT, dateLocale);
         DateFormat datetimeFormat = DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.DEFAULT, dateLocale);
+        DateFormat timeFormat = DateFormat.getTimeInstance(DateFormat.DEFAULT, dateLocale);
         try {
             SimpleDateFormat sdf = (SimpleDateFormat)dateFormat;
-            SimpleDateFormat sdtf = (SimpleDateFormat)datetimeFormat;
             builder.put(DATE_FORMAT, sdf.toPattern());
+            
+            SimpleDateFormat sdtf = (SimpleDateFormat)datetimeFormat;
             builder.put(DATETIME_FORMAT, sdtf.toPattern());
+            
+            SimpleDateFormat stf = (SimpleDateFormat)timeFormat;
+            builder.put(TIME_FORMAT, stf.toPattern());
         } catch (ClassCastException cce) {
             builder.put(DATE_FORMAT, DEFAULT_DATE_FORMAT);
             builder.put(DATETIME_FORMAT, DEFAULT_DATETIME_FORMAT);
+            builder.put(TIME_FORMAT, DEFAULT_TIME_FORMAT);
         }
                 
         builder.put(TIME_ZONE, al.getTimeZone().getID());

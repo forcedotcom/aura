@@ -20,8 +20,6 @@
     <aura:set attribute="updateOn" value="blur"/>
         
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
-    <aura:handler name="change" value="{!v.format}" action="{!c.formatChange}"/>
-    <aura:handler name="change" value="{!v.langLocale}" action="{!c.langLocaleChange}"/>
     
     <input aura:id="inputText" id="{!v.domId}" class="{!v.class}" type="text" placeholder="{!v.placeholder}"/>
     <aura:if isTrue="{!v.displayDatePicker}">

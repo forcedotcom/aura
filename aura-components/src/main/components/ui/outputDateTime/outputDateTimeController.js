@@ -33,13 +33,5 @@
             timezone = $A.getGlobalValueProviders().get("$Locale.timezone");
         }
         component.setValue("v.timezone", timezone);
-    },
-    
-    formatChange: function(component, event, helper) {
-        helper.normalizeFormat(component);
-    },
-    
-    langLocaleChange: function(component, event, helper) {
-        helper.normalizeLangLocale(component);
     }
 })

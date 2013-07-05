@@ -1,6 +1,7 @@
-markup://test:layoutNoLayout : DS_GqPTMD3ysuuBrc9D_nw
+markup://test:layoutNoLayout : K695PPbdDS8dXw2XS8HQjA
 aura://ComponentController : null
 aura://LabelController : null
+aura://TimeZoneInfoController : null
 css://aura.placeholder : kvkyys3VNLeU066RaKQMbA
 java://org.auraframework.renderer.ComponentRenderer : null
 java://org.auraframework.renderer.ExpressionRenderer : null

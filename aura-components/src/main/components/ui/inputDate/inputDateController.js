@@ -15,45 +15,26 @@
  */
 ({
     doInit: function(component, event, helper) {
-        // Set default attribute value
-        var format = component.get("v.format");
+        // Set placeholder
+        var concreteCmp = component.getConcreteComponent();
+        var format = concreteCmp.get("v.format");
         if (!format) {
             format = $A.getGlobalValueProviders().get("$Locale.dateformat");
         }
-        component.setValue("v.format", format);
-        component.setValue("v.placeholder", format);
-        
-        var langLocale = component.get("v.langLocale");
-        if (!langLocale) {
-            langLocale = $A.getGlobalValueProviders().get("$Locale.langLocale");
-        }
-        component.setValue("v.langLocale", langLocale);
-        
-        var value = component.get("v.value");
-        if (value) {
-            var mDate = moment.utc(value, "YYYY-MM-DD");
-            if (mDate.isValid()) {
-                component.setValue("v.value", mDate.format("YYYY-MM-DD"));
-            }
-        }
+        concreteCmp.setValue("v.placeholder", format);
     },
     
-    formatChange: function(component, event, helper) {
-        helper.normalizeFormat(component);
-    },
-    
-    langLocaleChange: function(component, event, helper) {
-        helper.normalizeLangLocale(component);
-    },
-    
-    openDatePicker: function(cmp, event, helper) {
-        helper.displayDatePicker(cmp);
+    openDatePicker: function(component, event, helper) {
+        var concreteCmp = component.getConcreteComponent();
+        var _helper = concreteCmp.getDef().getHelper();
+        _helper.displayDatePicker(concreteCmp);
     },
     
     setValue: function(component, event, helper) {
         var dateValue = event.getParam("value");
         if (dateValue) {
-            component.setValue("v.value", dateValue);
+            var concreteCmp = component.getConcreteComponent();
+            concreteCmp.setValue("v.value", dateValue);
         }
     }
 })

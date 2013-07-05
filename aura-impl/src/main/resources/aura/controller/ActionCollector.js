@@ -29,14 +29,11 @@
  *            actions the set of actions to process
  * @param {Function}
  *            finishedCallback the callback for when the actions are collected.
- * @param {Scalar}
- *            abortableId The abortable transaction ID that this is associated with.
  */
 $A.ns.ActionCollector = function ActionCollector(actions, finishedCallback) {
     this.actionsToSend = [];
     this.actionsToComplete = [];
     this.actionsRefreshed = [];
-    this.actionsRequested = {};
     this.actionsFinished = {};
     this.finishedCallback = finishedCallback;
     this.collectorId = $A.ns.ActionCollector.prototype.counter++;
@@ -67,9 +64,6 @@ $A.ns.ActionCollector.prototype.process = function() {
     for ( i = 0; i < this.actionsRequested.length; i++) {
         action = this.actionsRequested[i];
         $A.assert(action.getDef().isServerAction(), "Client side action leaked through to server call.");
-        if (action === undefined) {
-            continue;
-        }
         //
         // For cacheable actions check the storage service to see if we already have a viable cached action
         // response we can complete immediately. In this case, we get a callback, so we create a callback
@@ -185,7 +179,7 @@ $A.ns.ActionCollector.prototype.findActionAndClear = function(id) {
 /**
  * Collect an action.
  *
- * This routine collects an action (with response if form storage).
+ * This routine collects an action (with response if from storage).
  * Once we have collected all of the actions together, we make sure that we refresh any stored responses
  * that need a refresh, and call the callback provided on construction.
  *
@@ -217,9 +211,9 @@ $A.ns.ActionCollector.prototype.collectAction = function(action, response) {
 /**
  * Finish collection.
  *
- * This routine collects an action (with response if form storage).
- * Once we have collected all of the actions together, we make sure that we refresh any stored responses
- * that need a refresh, and call the callback provided on construction.
+ * This routine is called when all actions have been processed, either directly or through storage.
+ * It completes the actions with stored responses, and calls the callback given in the constructor.
+ * The refresh is handled here because it needs access to so much internal state.
  *
  * @private
  */

@@ -16,9 +16,7 @@
 
 -->
 <aura:component support="PROTO" extensible="true"
-  description="Outputs debug information. To enable the debug tool, append ?aura.debugtool=true to the URL.
-  To see additional statistics on the Components tab, append ?aura.mode=STATS to the URL.
-  You must disable popup blockers for the debug tool to work.">
+  description="The Aura debug tool opens a separate browser window and outputs debug information about an Aura component. The debug tool has the following tabs: Errors, Warnings, Components, Events, Storage, Accessibility, and Console. To launch the Aura Debug tool, add the query string aura.debugtool=true after the URL of the Aura component file that you are viewing in your browser. For example: http://localhost:8080/auranote/noteList.cmp?aura.debugtool=true. To display additional statistics in the Components tab, append the query string aura.mode=STATS to the URL. For example: http://localhost:8080/auranote/noteList.cmp?aura.debugtool=true&amp;aura.mode=STATS. You must disable the popup blocking feature of your web browser to use the debug tool.">
 	
 	<aura:attribute name="errorsData" type="String" default=""/>
 	<aura:attribute name="warningsData" type="String" default=""/>

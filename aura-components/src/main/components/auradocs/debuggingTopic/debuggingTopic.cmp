@@ -1,0 +1,49 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+<aura:set attribute="title" value="Debugging"/>
+
+<p>To help debug your client-side Aura code, you can use the <code>log()</code> and <code>warning()</code> methods to write output to the JavaScript console of your web browser. For instructions on how to open the JavaScript console, refer to the instructions for your web browser.</p>
+
+<h2>Log Messages</h2>
+
+<p>Use the <code>$A.log(string, [error])</code> method to output a log message to the JavaScript console. The first parameter is the string to log and the optional second parameter is an error object whose messages should be logged. For example, <code>$A.log("This is a log message");</code> will output "This is a log message" to the JavaScript console. If you put <code>$A.log("The name of the action is: " + this.getDef().getName());</code> inside an action called "openNote" in a client-side controller, then the log message "The name of the action is: openNote" will be output to the JavaScript console. The output is also sent to the Aura Debug Tool.</p>
+
+<h2>Warning Messages</h2>
+
+<p>Use the <code>$A.warning(string)</code> method to write a log message to the JavaScript console. As a parameter, it takes the message to display. For example, <code>$A.warning("This is a warning message.");</code> will output "This is a warning message." to the JavaScript console. A stack trace will also be displayed in the JavaScript console. The output is also sent to the Aura Debug Tool.</p>
+
+<h2>Aura Debug Tool</h2>
+
+<auradocs:info>You must disable the popup blocking feature of your web browser to use the debug tool.</auradocs:info>
+
+<p>The Aura debug tool opens a separate browser window and outputs debug information about an Aura component. The debug tool has the following tabs: Errors, Warnings, Components, Events, Storage, Accessibility, and Console.</p>
+
+<p>To launch the Aura Debug tool, add the query string <code>aura.debugtool=true</code> after the URL of the Aura component file that you are viewing in your browser. For example:</p>
+
+<auradocs:codeblock>http://localhost:8080/auranote/noteList.cmp?aura.debugtool=true</auradocs:codeblock>
+
+<p>To display additional statistics in the Components tab, append the query string <code>aura.mode=STATS</code> to the URL. For example:</p>
+
+<auradocs:codeblock>http://localhost:8080/auranote/noteList.cmp?aura.debugtool=true&amp;aura.mode=STATS</auradocs:codeblock>
+
+<p><b>See also:</b><br/>
+    <auradocs:topicLink topic="modesReference">Modes Reference</auradocs:topicLink>
+    <auradocs:topicLink topic="docTests">Testing Components</auradocs:topicLink>
+</p>
+</aura:component>

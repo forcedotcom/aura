@@ -124,9 +124,8 @@
                     <auradocs:contentsNode text="Validating Fields" id="error"/>
                     <auradocs:contentsNode text="Throwing Errors" id="jsThrowError" />
                 </auradocs:contentsNode>
-                <auradocs:contentsNode text="Services">
-                    <auradocs:contentsNode text="Services" id="services"/>
-                </auradocs:contentsNode>
+                <auradocs:contentsNode text="Services" id="services"/>
+                <auradocs:contentsNode text="Debugging" id="debugging"/>
                 <auradocs:contentsNode text="Component Tests" >
                     <auradocs:contentsNode text="Introduction" id="docTests" />
                     <auradocs:contentsNode text="Assertions" id="testsAssert" />

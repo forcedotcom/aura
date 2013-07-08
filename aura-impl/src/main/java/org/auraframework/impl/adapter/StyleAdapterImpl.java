@@ -51,9 +51,9 @@ public class StyleAdapterImpl implements StyleAdapter {
     }
 
     /**
-     * Finds the current app from the context, if present.
+     * Finds the theme overrides from the current app from the context, if present.
      * 
-     * @return The current app, or null if not set (or if the current "app" is a component)
+     * @return The overrides from the current app, or null if not set (or if the current "app" is a component)
      */
     private static ThemeOverrideMap overrides() throws QuickFixException {
         AuraContext context = Aura.getContextService().getCurrentContext();

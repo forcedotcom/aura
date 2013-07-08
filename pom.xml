@@ -703,7 +703,7 @@
                         <threadCount>2</threadCount>
                         <perCoreThreadCount>true</perCoreThreadCount>
                         <runOrder>random</runOrder>
-                        <argLine>-Djava.io.tmpdir=${java.io.tmpdir} -Xmx3G</argLine>
+                        <argLine>-Djava.io.tmpdir=${java.io.tmpdir}</argLine>
                         <systemPropertyVariables>
                             <config>${config}</config>
                             <aura.home>${aura.home}</aura.home>

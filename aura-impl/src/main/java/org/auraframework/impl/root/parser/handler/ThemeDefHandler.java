@@ -16,23 +16,30 @@
 package org.auraframework.impl.root.parser.handler;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.Set;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.auraframework.Aura;
 import org.auraframework.builder.RootDefinitionBuilder;
 import org.auraframework.def.AttributeDef;
+import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.ThemeDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.root.AttributeDefImpl;
 import org.auraframework.impl.root.theme.ThemeDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.instance.Component;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Source;
+import org.auraframework.throwable.AuraError;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -83,7 +90,7 @@ public class ThemeDefHandler extends RootTagHandler<ThemeDef> {
         // extends
         String parent = getAttributeValue(ATTRIBUTE_EXTENDS);
         if (parent != null) {
-            builder.extendsDescriptor = DefDescriptorImpl.getInstance(parent.trim(), ThemeDef.class);
+            builder.setExtendsDescriptor(DefDescriptorImpl.getInstance(parent.trim(), ThemeDef.class));
         }
     }
 
@@ -127,6 +134,14 @@ public class ThemeDefHandler extends RootTagHandler<ThemeDef> {
 
     @Override
     public void writeElement(ThemeDef def, Appendable out) throws IOException {
-        throw new UnsupportedOperationException(); // ?
+        try {
+            Map<String, Object> attributes = ImmutableMap.<String, Object> of("def", def);
+            DefinitionService defService = Aura.getDefinitionService();
+            DefDescriptor<ComponentDef> tmplDesc = defService.getDefDescriptor("auradev:saveTheme", ComponentDef.class);
+            Component tmpl = Aura.getInstanceService().getInstance(tmplDesc, attributes);
+            Aura.getRenderingService().render(tmpl, out);
+        } catch (QuickFixException x) {
+            throw new AuraError(x);
+        }
     }
 }

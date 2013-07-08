@@ -324,7 +324,7 @@ public class ThemeDefImpl extends RootDefinitionImpl<ThemeDef> implements ThemeD
     /**
      * Used to build instances of {@link ThemeDef}s.
      */
-    public static class Builder extends RootDefinitionImpl.Builder<ThemeDef> {
+    public static class Builder extends RootDefinitionImpl.Builder<ThemeDef> implements ThemeDefBuilder {
         public DefDescriptor<ThemeDef> extendsDescriptor;
         public Map<DefDescriptor<AttributeDef>, AttributeDefRef> overrides;
         public HashSet<PropertyReference> expressionRefs;
@@ -334,10 +334,11 @@ public class ThemeDefImpl extends RootDefinitionImpl<ThemeDef> implements ThemeD
         }
 
         @Override
-        public ThemeDefImpl build() {
-            return new ThemeDefImpl(this);
+        public void setExtendsDescriptor(DefDescriptor<ThemeDef> extendsDescriptor) {
+            this.extendsDescriptor = extendsDescriptor;
         }
 
+        @Override
         public void addOverride(AttributeDefRef ref) {
             if (overrides == null) {
                 overrides = Maps.newHashMap();
@@ -350,6 +351,12 @@ public class ThemeDefImpl extends RootDefinitionImpl<ThemeDef> implements ThemeD
                 expressionRefs = Sets.newHashSet();
             }
             expressionRefs.addAll(refs);
+		}
+
+        @Override
+        public ThemeDefImpl build() {
+            return new ThemeDefImpl(this);
         }
+
     }
 }

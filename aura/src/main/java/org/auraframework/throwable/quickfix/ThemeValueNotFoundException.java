@@ -23,19 +23,17 @@ import org.auraframework.system.Location;
 
 /**
  * Exceptions used when a variable (attribute) isn't found in a {@link ThemeDef}.
- * 
- * TODONM add quickfix action.
  */
 public class ThemeValueNotFoundException extends AuraValidationException {
     private static final String MSG = "The attribute \"%s\" was not found on the %s %s";
     private static final long serialVersionUID = -2571041901012359701L;
 
-    public ThemeValueNotFoundException(String variable, DefDescriptor<ThemeDef> descriptor) {
-        this(variable, descriptor, null);
+    public ThemeValueNotFoundException(String name, DefDescriptor<ThemeDef> descriptor) {
+        this(name, descriptor, null);
     }
 
-    public ThemeValueNotFoundException(String variable, DefDescriptor<ThemeDef> descriptor, Location location) {
-        super(getMessage(checkNotNull(variable), descriptor), location);
+    public ThemeValueNotFoundException(String name, DefDescriptor<ThemeDef> descriptor, Location location) {
+        super(getMessage(checkNotNull(name), descriptor), location, new CreateThemeAttributeQuickFix(descriptor, name));
     }
 
     private static String getMessage(String variable, DefDescriptor<ThemeDef> descriptor) {

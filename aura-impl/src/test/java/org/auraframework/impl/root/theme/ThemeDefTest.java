@@ -125,7 +125,7 @@ public class ThemeDefTest extends AuraImplTestCase {
     /** cannot extend itself */
     public void testCantExtendItself() throws Exception {
         DefDescriptor<ThemeDef> extendsSelf = addSourceAutoCleanup(ThemeDef.class, "");
-        StringSource<?> source = (StringSource<?>) auraTestingUtil.getSource(extendsSelf);
+        StringSource<?> source = (StringSource<?>) getAuraTestingUtil().getSource(extendsSelf);
         String contents = "<aura:theme extends='%s'> </aura:theme>";
         source.addOrUpdate(String.format(contents, extendsSelf.getDescriptorName()));
         try {
@@ -142,11 +142,11 @@ public class ThemeDefTest extends AuraImplTestCase {
         DefDescriptor<ThemeDef> circular1 = addSourceAutoCleanup(ThemeDef.class, "");
         DefDescriptor<ThemeDef> circular2 = addSourceAutoCleanup(ThemeDef.class, "");
 
-        StringSource<?> source = (StringSource<?>) auraTestingUtil.getSource(circular1);
+        StringSource<?> source = (StringSource<?>) getAuraTestingUtil().getSource(circular1);
         String contents = "<aura:theme extends='%s'><aura:attribute name='attr' default='1'/></aura:theme>";
         source.addOrUpdate(String.format(contents, circular2.getDescriptorName()));
 
-        source = (StringSource<?>) auraTestingUtil.getSource(circular2);
+        source = (StringSource<?>) getAuraTestingUtil().getSource(circular2);
         contents = "<aura:theme extends='%s'> </aura:theme>";
         source.addOrUpdate(String.format(contents, circular1.getDescriptorName()));
 

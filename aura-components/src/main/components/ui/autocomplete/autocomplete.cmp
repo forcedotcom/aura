@@ -21,6 +21,7 @@
     <aura:attribute name="inputType" type="String" default="inputText" description="The type of input component. We support inputText and inputTextArea for now."/>
     <aura:attribute name="listOption" type="Aura.ComponentDefRef[]" required="true" description="A ComponentDefRef to use as the template for each generated option in the list."/>
     <aura:attribute name="optionVar" type="String" required="true" description="The name by which to refer to the current data object inside of the template for each option."/>
+    <aura:attribute name="placeholder" type="String" default="" description="Text that is displayed when the input field is empty, to prompt the user for a valid entry."/>
     <aura:attribute name="propertyToMatch" type="String" default="label" description="The property name in the data object which is used to match typing in the input field."/>
     <aura:attribute name="theme" type="String" default="default" description="Theme to apply to this component."/>
     
@@ -36,9 +37,9 @@
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
     
     <aura:if isTrue="{!v.inputType == 'inputTextArea'}">
-        <ui:inputTextAreaForAutocomplete aura:id="input" class="{!v.inputClass+' '+v.theme}"/>
+        <ui:inputTextAreaForAutocomplete aura:id="input" class="{!v.inputClass+' '+v.theme}" placeholder="{!v.placeholder}"/>
         <aura:set attribute="else">
-            <ui:inputTextForAutocomplete aura:id="input" class="{!v.inputClass+' '+v.theme}"/>
+            <ui:inputTextForAutocomplete aura:id="input" class="{!v.inputClass+' '+v.theme}" placeholder="{!v.placeholder}"/>
         </aura:set>
     </aura:if>
     

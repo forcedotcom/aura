@@ -30,8 +30,8 @@ var AuraLocalizationService = function AuraLocalizationService() {
          * Displays a length of time.
          * @param {Duration} d The duration object returned by localizationService.duration
          * @param {String} unit The unit of measurement of time
-         * @param {Boolean} noSuffix 
-         * @return {String} duration object
+         * @param {Boolean} noSuffix Set to true if the token should be displayed without a suffix
+         * @return {String} A duration object
          * @memberOf AuraLocalizationService
          * @public
          */
@@ -119,7 +119,7 @@ var AuraLocalizationService = function AuraLocalizationService() {
          * Creates an object representing a length of time.
          * @param {Number|Object} num The length of milliseconds/unit
          * @param {String} unit The unit of measurement of time
-         * @return {Object} duration object
+         * @return {Object} A duration object
          * @memberOf AuraLocalizationService
          * @public
          */
@@ -129,9 +129,9 @@ var AuraLocalizationService = function AuraLocalizationService() {
         
         /**
          * Converts the passed in Date by setting it to the end of a unit of time.
-         * @param {String|Number|Date} date it could be anything that JS Date object can parse
-         * @param {String} unit year, month, week, day, hour, minute or second
-         * @return {Date}
+         * @param {String|Number|Date} date A format that the JavaScript Date object can parse
+         * @param {String} unit The unit of time in year, month, week, day, hour, minute or second
+         * @return {Date} A JavaScript Date object
          * @memberOf AuraLocalizationService
          * @public
          */
@@ -141,10 +141,10 @@ var AuraLocalizationService = function AuraLocalizationService() {
         
         /**
          * Formats a date.
-         * @param {String|Number|Date} date the date to be formatted. It could be anything that JS Date object can parse.
-         * @param {String} formatString a Java format string. The default is from LocaleValueProvider.
-         * @param {String} locale a Java locale string. The default is from LocaleValueProvider.
-         * @return a formatted and localized date string
+         * @param {String|Number|Date} date The date format that the JavaScript Date object can parse.
+         * @param {String} formatString A Java format string. The default is from LocaleValueProvider.
+         * @param {String} locale A Java locale string. The default is from LocaleValueProvider.
+         * @return A formatted and localized date string
          * @memberOf AuraLocalizationService
          * @public
          */ 
@@ -163,10 +163,10 @@ var AuraLocalizationService = function AuraLocalizationService() {
         
         /**
          * Formats a date in UTC.
-         * @param {String|Number|Date} date The date to be formatted. It could be anything that JS Date object can parse
-         * @param {String} formatString A Java format string. The default is from LocaleValueProvider
-         * @param {String} locale A Java locale string. The default is from LocaleValueProvider
-         * @return a formatted and localized date string
+         * @param {String|Number|Date} date The date format that JS Date object can parse.
+         * @param {String} formatString A Java format string. The default is from LocaleValueProvider.
+         * @param {String} locale A Java locale string. The default is from LocaleValueProvider.
+         * @return A formatted and localized date string
          * @memberOf AuraLocalizationService
          * @public
          */
@@ -185,10 +185,10 @@ var AuraLocalizationService = function AuraLocalizationService() {
         
         /**
          * Formats a datetime.
-         * @param {String|Number|Date} date the datetime to be formatted. It could be anything that JS Date object can parse.
-         * @param {String} formatString a Java format string. The default is from LocaleValueProvider.
-         * @param {String} locale a Java locale string. The default is from LocaleValueProvider.
-         * @return a formatted and localized datetime string
+         * @param {String|Number|Date} date The datetime format that the JavaScript Date object can parse.
+         * @param {String} formatString A Java format string. The default is from LocaleValueProvider.
+         * @param {String} locale A Java locale string. The default is from LocaleValueProvider.
+         * @return A formatted and localized datetime string
          * @memberOf AuraLocalizationService
          * @public
          */
@@ -207,10 +207,10 @@ var AuraLocalizationService = function AuraLocalizationService() {
         
         /**
          * Formats a datetime in UTC.
-         * @param {String|Number|Date} date the datetime to be formatted. It could be anything that JS Date object can parse.
-         * @param {String} formatString a Java format string. The default is from LocaleValueProvider.
-         * @param {String} locale a Java locale string. The default is from LocaleValueProvider.
-         * @return a formatted and localized datetime string
+         * @param {String|Number|Date} date The datetime format that the JavaScript Date object can parse.
+         * @param {String} formatString A Java format string. The default is from LocaleValueProvider.
+         * @param {String} locale A Java locale string. The default is from LocaleValueProvider.
+         * @return A formatted and localized datetime string
          * @public
          */
         formatDateTimeUTC : function(date, formatString, locale) {
@@ -228,10 +228,10 @@ var AuraLocalizationService = function AuraLocalizationService() {
 
         /**
          * Formats a time.
-         * @param {String|Number|Date} date the time to be formatted. It could be anything that JS Date object can parse
-         * @param {String} formatString a Java format string. The default is from LocaleValueProvider
-         * @param {String} locale a Java locale string. The default is from LocaleValueProvider
-         * @return a formatted and localized time string
+         * @param {String|Number|Date} date The time format that JavaScript Date object can parse
+         * @param {String} formatString A Java format string. The default is from LocaleValueProvider.
+         * @param {String} locale A Java locale string. The default is from LocaleValueProvider.
+         * @return A formatted and localized time string
          * @memberOf AuraLocalizationService
          * @public
          */
@@ -250,9 +250,9 @@ var AuraLocalizationService = function AuraLocalizationService() {
         
         /**
          * Formats a time in UTC.
-         * @param {String|Number|Date} date The time to be formatted. It could be anything that JS Date object can parse
-         * @param {String} formatString A Java format string. The default is from LocaleValueProvider
-         * @param {String} locale A Java locale string. The default is from LocaleValueProvider
+         * @param {String|Number|Date} date The time format that JavaScript Date object can parse.
+         * @param {String} formatString A Java format string. The default is from LocaleValueProvider.
+         * @param {String} locale A Java locale string. The default is from LocaleValueProvider.
          * @return a formatted and localized time string
          * @memberOf AuraLocalizationService
          * @public
@@ -346,8 +346,8 @@ var AuraLocalizationService = function AuraLocalizationService() {
         
         /**
          * Checks if date1 is after date2.
-         * @param {String|Number|Date} date1 It could be anything that JS Date object can parse
-         * @param {String|Number|Date} date2 It could be anything that JS Date object can parse
+         * @param {String|Number|Date} date1 A date format that the JavaScript Date object can parse
+         * @param {String|Number|Date} date2 A date format that the JavaScript Date object can parse
          * @param {String} unit The unit to limit the granularity, that is, year, month, week, day, hour, minute and second.
          *                 By default it uses millisecond
          * @return {Boolean}
@@ -360,10 +360,10 @@ var AuraLocalizationService = function AuraLocalizationService() {
         
         /**
          * Checks if date1 is before date2.
-         * @param {String|Number|Date} date1 It could be anything that JS Date object can parse
-         * @param {String|Number|Date} date2 It could be anything that JS Date object can parse
-         * @param {String} unit the unit to limit the granularity, that is, year, month, week, day, hour, minute and second.
-         *                 By default it uses millisecond
+         * @param {String|Number|Date} date1 A date format that the JavaScript Date object can parse
+         * @param {String|Number|Date} date2 A date format that the JavaScript Date object can parse
+         * @param {String} unit The unit to limit the granularity, that is, year, month, week, day, hour, minute and second.
+         *                 By default, millisecond is used.
          * @return {Boolean}
          * @memberOf AuraLocalizationService
          * @public
@@ -374,10 +374,10 @@ var AuraLocalizationService = function AuraLocalizationService() {
         
         /**
          * Checks if date1 is the same as date2.
-         * @param {String|Number|Date} date1 It could be anything that JS Date object can parse
-         * @param {String|Number|Date} date2 It could be anything that JS Date object can parse
+         * @param {String|Number|Date} date1 A date format that the JavaScript Date object can parse
+         * @param {String|Number|Date} date2 A date format that the JavaScript Date object can parse
          * @param {String} unit The unit to limit the granularity, that is, year, month, week, day, hour, minute and second.
-         *                 By default it uses millisecond
+         *                 By default, millisecond is used.
          * @return {Boolean}
          * @memberOf AuraLocalizationService
          * @public
@@ -388,9 +388,9 @@ var AuraLocalizationService = function AuraLocalizationService() {
 
         /**
          * Parses a string to a JavaScript Date.
-         * @param {String} dateTimeString The datetime string to be parsed
-         * @param {String} targetFormat A Java format string which is used to parse datetime. The default is from LocaleValueProvider
-         * @param {String} locale A Java locale string used to parse datetime. The default is from LocaleValueProvider
+         * @param {String} dateTimeString The datetime string to be parsed.
+         * @param {String} targetFormat A Java format string which is used to parse datetime. The default is from LocaleValueProvider.
+         * @param {String} locale A Java locale string used to parse datetime. The default is from LocaleValueProvider.
          * @return A JavaScript Date object
          * @memberOf AuraLocalizationService
          * @public
@@ -409,9 +409,9 @@ var AuraLocalizationService = function AuraLocalizationService() {
         /**
          * Parses a string to a JavaScript Date in UTC.
          * @param {String} dateTimeString The datetime string to be parsed
-         * @param {String} targetFormat A Java format string which is used to parse datetime. The default is from LocaleValueProvider
-         * @param {String} locale A Java locale string used to parse datetime. The default is from LocaleValueProvider
-         * @return a JavaScript Date object
+         * @param {String} targetFormat A Java format string which is used to parse datetime. The default is from LocaleValueProvider.
+         * @param {String} locale A Java locale string used to parse datetime. The default is from LocaleValueProvider.
+         * @return {Date} A JavaScript Date object
          * @memberOf AuraLocalizationService
          * @public
          */
@@ -431,7 +431,7 @@ var AuraLocalizationService = function AuraLocalizationService() {
          * Converts the passed in Date by setting it to the start of a unit of time.
          * @param {String|Number|Date} date It could be anything that JS Date object can parse.
          * @param {String} unit Year, month, week, day, hour, minute or second
-         * @return {Date}
+         * @return {Date} A JavaScript Date object
          * @memberOf AuraLocalizationService
          * @public
          */

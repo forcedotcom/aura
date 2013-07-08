@@ -158,9 +158,9 @@ public class ThemeValueProviderTest extends AuraImplTestCase {
 
     /** utility */
     public static ThemeValueProvider overridden() {
-        ThemeOverrideMap map = new ThemeOverrideMapImpl();
-        map.addOverride(ThemeDefImpl.descriptor("themeTest:baseTheme"), ThemeDefImpl.descriptor("themeTest:childTheme"));
+        DefDescriptor<ThemeDef> base = ThemeDefImpl.descriptor("themeTest:baseTheme");
+        DefDescriptor<ThemeDef> child = ThemeDefImpl.descriptor("themeTest:childTheme");
+        ThemeOverrideMap map = new ThemeOverrideMapImpl(ImmutableMap.of(base, child));
         return new ThemeValueProviderImpl(map, null);
     }
-
 }

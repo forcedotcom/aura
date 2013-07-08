@@ -15,43 +15,75 @@
  */
 package org.auraframework.impl.css.parser;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.auraframework.css.parser.ThemeOverrideMap;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.ThemeDef;
+import org.auraframework.system.Location;
+import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 
 /**
  * Implementation of {@link ThemeOverrideMap}.
- * 
- * TODONM write unit tests once extensions are available.
  */
 public class ThemeOverrideMapImpl implements ThemeOverrideMap {
-    private final Map<DefDescriptor<ThemeDef>, DefDescriptor<ThemeDef>> overrides = Maps.newHashMap();
+    private static final String MSG = "'%s' must be a direct or indirect extension of '%s' in order to override it.";
 
-    @Override
-    public ThemeOverrideMap addOverride(DefDescriptor<ThemeDef> original, DefDescriptor<ThemeDef> override) {
-        checkNotNull(original, "original cannot be null.");
-        checkNotNull(override, "override cannot be null.");
+    private final Map<DefDescriptor<ThemeDef>, DefDescriptor<ThemeDef>> overrides;
+    private final Location location;
 
-        // TODONM verify that the override is an extension of the original when extension works.
-        overrides.put(original, override);
-        return this;
+    /**
+     * Creates a new {@link ThemeOverrideMap} with the given overrides.
+     */
+    public ThemeOverrideMapImpl(Map<DefDescriptor<ThemeDef>, DefDescriptor<ThemeDef>> overrides) {
+        this(overrides, null);
+    }
+
+    /**
+     * Creates a new {@link ThemeOverrideMap} with the given overrides.
+     * 
+     * @param location The location of where the overrides are defined, to be used for error reporting.
+     */
+    public ThemeOverrideMapImpl(Map<DefDescriptor<ThemeDef>, DefDescriptor<ThemeDef>> overrides, Location location) {
+        this.overrides = ImmutableMap.copyOf(overrides);
+        this.location = location;
     }
 
     @Override
     public Map<DefDescriptor<ThemeDef>, DefDescriptor<ThemeDef>> map() {
-        return ImmutableMap.copyOf(overrides);
+        return overrides;
     }
 
     @Override
     public Optional<DefDescriptor<ThemeDef>> getOverride(DefDescriptor<ThemeDef> original) {
         return Optional.fromNullable(overrides.get(original));
     }
+
+    @Override
+    public void validate() throws QuickFixException {
+        for (Entry<DefDescriptor<ThemeDef>, DefDescriptor<ThemeDef>> entry : overrides.entrySet()) {
+            validate(entry.getKey(), entry.getValue());
+        }
+    }
+
+    private void validate(DefDescriptor<ThemeDef> original, DefDescriptor<ThemeDef> override) throws QuickFixException {
+        DefDescriptor<ThemeDef> descriptor = override.getDef().getExtendsDescriptor();
+
+        // walk up the inheritance chain until we confirm that it extends the original.
+        while (descriptor != null) {
+            if (descriptor.equals(original)) {
+                return;
+            }
+            descriptor = descriptor.getDef().getExtendsDescriptor();
+        }
+
+        // it doesn't override,so throw an exception
+        throw new AuraRuntimeException(String.format(MSG, override, original), location);
+    }
+
 }

@@ -19,6 +19,8 @@ import java.util.Map;
 
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.ThemeDef;
+import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.base.Optional;
 
@@ -31,26 +33,25 @@ import com.google.common.base.Optional;
  * requested of the original theme can be fulfilled by the overriding one.
  */
 public interface ThemeOverrideMap {
-
     /**
-     * Specifies an override for a {@link ThemeDef}. The override must be an extension of the original.
-     * 
-     * @param original The {@link ThemeDef} to override.
-     * @param override Override the original with this one.
-     * @return this, for chaining.
-     */
-    ThemeOverrideMap addOverride(DefDescriptor<ThemeDef> original, DefDescriptor<ThemeDef> override);
-
-    /**
-     * Gets a <b>copy</b> of the theme overrides map.
+     * Gets the theme overrides map.
      */
     Map<DefDescriptor<ThemeDef>, DefDescriptor<ThemeDef>> map();
 
     /**
-     * Get the override for a particular {@link ThemeDef} descriptor.
+     * Gets the override for a particular {@link ThemeDef} descriptor.
      * 
      * @param original Get the override of this {@link ThemeDef} descriptor.
      * @return The override if specified, or {@link Optional#absent()} if there is no override.
      */
     Optional<DefDescriptor<ThemeDef>> getOverride(DefDescriptor<ThemeDef> original);
+
+    /**
+     * Performs validation of the items in the map. This will ensure that each override actually (directly or
+     * indirectly) inherits from the original.
+     * 
+     * @throws QuickFixException if a {@link DefDescriptor} isn't present.
+     * @throws AuraRuntimeException if validation fails.
+     */
+    void validate() throws QuickFixException;
 }

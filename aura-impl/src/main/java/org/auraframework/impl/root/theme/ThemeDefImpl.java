@@ -26,6 +26,7 @@ import java.util.Set;
 
 import org.auraframework.Aura;
 import org.auraframework.css.parser.ThemeValueProvider;
+import org.auraframework.builder.ThemeDefBuilder;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.AttributeDefRef;
 import org.auraframework.def.DefDescriptor;
@@ -351,7 +352,7 @@ public class ThemeDefImpl extends RootDefinitionImpl<ThemeDef> implements ThemeD
                 expressionRefs = Sets.newHashSet();
             }
             expressionRefs.addAll(refs);
-		}
+        }
 
         @Override
         public ThemeDefImpl build() {

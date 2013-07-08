@@ -18,6 +18,8 @@ package org.auraframework.impl.root.theme;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
+import org.auraframework.Aura;
+import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
 import org.auraframework.impl.AuraImplTestCase;
@@ -99,6 +101,15 @@ public class ThemeResolutionTest extends AuraImplTestCase {
         } catch (StyleParserException e) {
             assertThat(e.getMessage().contains("Cannot mix"), is(true));
         }
+    }
+
+    /** application-level theme overrides work as expected */
+    public void testThemeOverrides() throws Exception {
+        String appLoc = "themeTest:overrideApp";
+        DefDescriptor<ApplicationDef> app = DefDescriptorImpl.getInstance(appLoc, ApplicationDef.class);
+        Aura.getContextService().getCurrentContext().setApplicationDescriptor(app);
+        DefDescriptor<StyleDef> style = get("themeTest.overrideApp");
+        gold(style);
     }
 
     private DefDescriptor<StyleDef> get(String locator) {

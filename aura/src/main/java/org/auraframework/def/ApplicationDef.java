@@ -17,6 +17,7 @@ package org.auraframework.def;
 
 import java.util.List;
 
+import org.auraframework.css.parser.ThemeOverrideMap;
 import org.auraframework.system.AuraContext.Access;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
@@ -38,7 +39,13 @@ public interface ApplicationDef extends BaseComponentDef {
     DefDescriptor<SecurityProviderDef> getSecurityProviderDefDescriptor() throws QuickFixException;
 
     Boolean isAppcacheEnabled() throws QuickFixException;
+
     List<String> getAdditionalAppCacheURLs() throws QuickFixException;
 
     Boolean isOnePageApp() throws QuickFixException;
+
+    /**
+     * Gets the map of overridden {@link ThemeDef}s, or null if not specified.
+     */
+    ThemeOverrideMap getThemeOverrides();
 }

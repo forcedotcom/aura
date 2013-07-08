@@ -87,6 +87,7 @@ var AuraLocalizationService = function AuraLocalizationService() {
          * Displays a length of time in months.
          * @param {Duration} d The duration object returned by localizationService.duration
          * @return {Number} The length of time in months.
+         * @memberOf AuraLocalizationService
          * @public
          */
         displayDurationInMonths : function(d) {

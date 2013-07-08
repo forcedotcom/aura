@@ -14,8 +14,15 @@
  * limitations under the License.
  */
 ({
-    handleFocus: function(component, event, helper) {
+    handleMouseover: function(component, event, helper) {
         var concreteCmp = component.getConcreteComponent();
-        helper.setFocus(concreteCmp, event);
-    }    
+        var _helper = concreteCmp.getDef().getHelper();
+        _helper.handleMouseover(concreteCmp);
+    },
+    
+    handleMouseout: function(component, event, helper) {
+        var concreteCmp = component.getConcreteComponent();
+        var _helper = concreteCmp.getDef().getHelper();
+        _helper.handleMouseout(concreteCmp);
+    }   
 })

@@ -39,13 +39,12 @@ import org.auraframework.util.json.JsonReader;
 
 /**
  * Test class to verify that clientside cache is invalidated by Aura Servlet.
- * ThreadHostile due to reliance on getLastMod.
  * 
  * @hierarchy Aura.Caching
  * @priority high
  * @userStorySyncIdOrName a07B0000000Dj10
  */
-@ThreadHostileTest
+@ThreadHostileTest("relies on getLastMod")
 public class AuraServletCacheInvalidationHttpTest extends AuraHttpTestCase {
 
     public AuraServletCacheInvalidationHttpTest(String name) {

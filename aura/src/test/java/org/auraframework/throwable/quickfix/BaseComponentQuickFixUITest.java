@@ -27,10 +27,12 @@ import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.WebDriverTestCase;
+import org.auraframework.test.annotation.ThreadHostileTest;
 
 /**
  * Tests for creating new markup bundles when you attempt to load a component that doesn't exist in the browser.
  */
+@ThreadHostileTest("BaseComponentQuickFixWidget.deleteFiles")
 public abstract class BaseComponentQuickFixUITest extends WebDriverTestCase {
     protected String typeSuffix;
     protected String capType;

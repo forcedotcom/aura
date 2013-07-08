@@ -16,12 +16,12 @@
 package org.auraframework.impl.adapter.format.html;
 
 import org.auraframework.Aura;
+import org.auraframework.controller.java.ServletConfigController;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.NamespaceDef;
 import org.auraframework.def.StyleDef;
-import org.auraframework.http.AuraServlet;
 import org.auraframework.system.AuraContext;
 import org.auraframework.test.annotation.ThreadHostileTest;
 import org.auraframework.util.AuraTextUtil;
@@ -31,7 +31,6 @@ import org.auraframework.util.AuraTextUtil;
  * 
  * @since 0.0.224
  */
-@ThreadHostileTest
 public class ApplicationDefHTMLFormatAdapterTest extends BaseComponentDefHTMLFormatAdapterTest<ApplicationDef> {
 
     public ApplicationDefHTMLFormatAdapterTest(String name) {
@@ -46,27 +45,20 @@ public class ApplicationDefHTMLFormatAdapterTest extends BaseComponentDefHTMLFor
     /**
      * Manifest is not appended to <html> if system config is set to disable appcache (aura.noappcache = true).
      */
+    @ThreadHostileTest("disables AppCache")
     public void testWriteManifestWithConfigDisabled() throws Exception {
         AuraContext context = Aura.getContextService().getCurrentContext();
-        String oldConfig = System.setProperty(AuraServlet.DISABLE_APPCACHE_PROPERTY, "true");
-        try {
-            context.clearPreloads();
-            context.addPreload("aura");
-            DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class,
-                    "<aura:application useAppcache='true' render='client'></aura:application>");
-            context.setApplicationDescriptor(desc);
-            String body = doWrite(desc.getDef());
-            int start = body.indexOf("<html ");
-            String tag = body.substring(start, body.indexOf('>', start) + 1);
-            if (tag.contains(" manifest=")) {
-                fail("Should not have included a manifest attribute with config disabled:\n" + body);
-            }
-        } finally {
-            if (oldConfig == null) {
-                System.clearProperty(AuraServlet.DISABLE_APPCACHE_PROPERTY);
-            } else {
-                System.setProperty(AuraServlet.DISABLE_APPCACHE_PROPERTY, oldConfig);
-            }
+        ServletConfigController.setAppCacheDisabled(true);
+        context.clearPreloads();
+        context.addPreload("aura");
+        DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class,
+                "<aura:application useAppcache='true' render='client'></aura:application>");
+        context.setApplicationDescriptor(desc);
+        String body = doWrite(desc.getDef());
+        int start = body.indexOf("<html ");
+        String tag = body.substring(start, body.indexOf('>', start) + 1);
+        if (tag.contains(" manifest=")) {
+            fail("Should not have included a manifest attribute with config disabled:\n" + body);
         }
     }
 
@@ -150,15 +142,16 @@ public class ApplicationDefHTMLFormatAdapterTest extends BaseComponentDefHTMLFor
      * 
      * @throws Exception
      */
+    @ThreadHostileTest("NamespaceDef modification affects namespace")
     public void testCommentsInTemplateCssNotInjectedToPage() throws Exception {
         String css = "/*" + "*Multi line comment" + "*/\n" + "body{" + "background-color: #ededed;"
                 + "font-size: 13px;" + "/**Inline comment*/\n" + "line-height: 1.3" + "}";
         DefDescriptor<StyleDef> styleDef = Aura.getDefinitionService().getDefDescriptor(
                 "templateCss://string.thing" + System.currentTimeMillis() + "template", StyleDef.class);
-        auraTestingUtil.addSourceAutoCleanup(styleDef, css);
+        addSourceAutoCleanup(styleDef, css);
         DefDescriptor<NamespaceDef> namespaceDesc = Aura.getDefinitionService().getDefDescriptor(
                 String.format("%s://%s", DefDescriptor.MARKUP_PREFIX, styleDef.getNamespace()), NamespaceDef.class);
-        auraTestingUtil.addSourceAutoCleanup(namespaceDesc, "<aura:namespace></aura:namespace>");
+        addSourceAutoCleanup(namespaceDesc, "<aura:namespace></aura:namespace>");
         String templateCss = String.format("%s://%s.%s", DefDescriptor.TEMPLATE_CSS_PREFIX, styleDef.getNamespace(),
                 styleDef.getName());
         String templateMarkup = String.format(baseComponentTag, "style='" + templateCss

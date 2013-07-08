@@ -735,6 +735,17 @@ Test.Aura.Controller.ActionTest = function() {
 			// Assert
 			Assert.True(actual);
 		}
+
+		[ Fact ]
+		function CannotSetBackgroundToFalse() {
+			var target = new Action();
+			target.background = true;
+
+			target.setBackground(false);
+			var actual = target.background;
+
+			Assert.True(actual);
+		}
 	}
 
 	[ Fixture ]
@@ -848,6 +859,7 @@ Test.Aura.Controller.ActionTest = function() {
 			target.storable = true;
 			target.returnValue = "NONE";
 			target.state = "FAILURE";
+			target.responseState = "FAILURE";
 
 			// Act
 			var stored = target.getStored("bogus");
@@ -863,6 +875,7 @@ Test.Aura.Controller.ActionTest = function() {
 			target.storable = false;
 			target.returnValue = "NONE";
 			target.state = "SUCCESS";
+			target.responseState = "SUCCESS";
 
 			// Act
 			var stored = target.getStored("bogus");
@@ -878,6 +891,7 @@ Test.Aura.Controller.ActionTest = function() {
 			target.storable = true;
 			target.returnValue = "NONE";
 			target.state = "SUCCESS";
+			target.responseState = "SUCCESS";
 			target.components = {};
 
 			// Act

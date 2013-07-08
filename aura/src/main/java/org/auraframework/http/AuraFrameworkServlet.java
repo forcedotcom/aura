@@ -33,7 +33,6 @@ import org.auraframework.util.resource.ResourceLoader;
 public class AuraFrameworkServlet extends AuraBaseServlet {
 
     private static final long serialVersionUID = 6034969764380397480L;
-    private static final long lastModified = System.currentTimeMillis();
     private static final ResourceLoader resourceLoader = Aura.getConfigAdapter().getResourceLoader();
     private final static StringParam fwUIDParam = new StringParam(AURA_PREFIX + "fwuid", 0, false);
     private static final String MINIFIED_FILE_SUFFIX = ".min";
@@ -206,7 +205,6 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
                 response.setCharacterEncoding(AuraBaseServlet.UTF_ENCODING);
             }
 
-            response.setDateHeader("Last-Modified", lastModified);
             response.setBufferSize(10240);// 10kb
 
             boolean js = JAVASCRIPT_CONTENT_TYPE.equals(mimeType);
@@ -224,12 +222,12 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
                 // TODO: if we want to have things not included in the fw uid use the fw-uid nonce,
                 // we need to adjust to drop the matchedUid.
                 //
-                response.setDateHeader("Expires", System.currentTimeMillis() + AuraBaseServlet.LONG_EXPIRE);
+                setLongCache(response);
             } else {
                 //
                 // By default we use short expire. (1 day)
                 //
-                response.setDateHeader("Expires", System.currentTimeMillis() + AuraBaseServlet.SHORT_EXPIRE);
+                setShortCache(response);
             }
 
             IOUtil.copyStream(in, response.getOutputStream());

@@ -28,7 +28,6 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.params.CoreProtocolPNames;
 import org.apache.http.util.EntityUtils;
 import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
@@ -182,8 +181,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
     }
 
     /**
-     * nocache in the request will redirect to the input url (minus the protocol
-     * and host)
+     * nocache in the request will redirect to the input url (minus the protocol and host)
      */
     public void testNoCache() throws Exception {
         assertNoCacheRequest(String.format("/aura?aura.tag&nocache=%s", URLEncoder.encode(
@@ -235,7 +233,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
 
         // A component and AuraBaseServlet.isManifestEnabled() is false because
         // UserAgent is not "AppleWebKit" based
-        System.setProperty(CoreProtocolPNames.USER_AGENT, UserAgent.EMPTY.getUserAgentString());
+        setHttpUserAgent(UserAgent.EMPTY.getUserAgentString());
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
                 "<aura:component ></aura:component>");
         // Expect the get request to be set for long cache
@@ -243,7 +241,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
     }
 
     public void testHTMLTemplateCachingWhenAppCacheIsEnable() throws Exception {
-        System.setProperty(CoreProtocolPNames.USER_AGENT, UserAgent.GOOGLE_CHROME.getUserAgentString());
+        setHttpUserAgent(UserAgent.GOOGLE_CHROME.getUserAgentString());
 
         // An application with isOnePageApp set to true and useAppcache set to
         // true
@@ -269,9 +267,9 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
     /**
      * Wiggle factor.
      * 
-     * This is intended to allow for variance between the local date and the server date, along with
-     * any latency that might occur. Currently it is set to 1 hour, which should be more than enough
-     * to account for offsets, but short enough so that we don't really care.
+     * This is intended to allow for variance between the local date and the server date, along with any latency that
+     * might occur. Currently it is set to 1 hour, which should be more than enough to account for offsets, but short
+     * enough so that we don't really care.
      */
     private final static long WIGGLE_FACTOR = (1000L * 60 * 60 * 1);
 
@@ -308,8 +306,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
     /**
      * Submit a request and check that the 'no cache' is set correctly.
      * 
-     * We are very generous with the expires time here, as we really don't care other than to have it
-     * well in the past.
+     * We are very generous with the expires time here, as we really don't care other than to have it well in the past.
      * 
      * @param url the url path.
      */
@@ -336,11 +333,9 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
     }
 
     /**
-     * Verify the Script tag to fetch the Aura Framework JS has nonce. The
-     * initial get request for an application gets a template as response. Part
-     * of the template response should be a script tag which fetches the Aura FW
-     * JS. The URL for the js file should have nonce indicating the last mod of
-     * the JS group.
+     * Verify the Script tag to fetch the Aura Framework JS has nonce. The initial get request for an application gets a
+     * template as response. Part of the template response should be a script tag which fetches the Aura FW JS. The URL
+     * for the js file should have nonce indicating the last mod of the JS group.
      * 
      * @throws Exception
      */

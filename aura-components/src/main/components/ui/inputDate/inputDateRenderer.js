@@ -15,12 +15,16 @@
  */
 ({
     afterRender: function(component, helper) {
-        helper.displayValue(component);
+        var concreteCmp = component.getConcreteComponent();
+        var _helper = concreteCmp.getDef().getHelper();
+        _helper.displayValue(concreteCmp);
         return this.superAfterRender();
 	},
 	
 	rerender: function(component, helper) {
-        helper.displayValue(component);
+        var concreteCmp = component.getConcreteComponent();
+        var _helper = concreteCmp.getDef().getHelper();
+        _helper.displayValue(concreteCmp);
         return this.superRerender();
     }
 })

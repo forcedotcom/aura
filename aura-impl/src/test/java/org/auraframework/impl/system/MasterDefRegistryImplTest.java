@@ -163,7 +163,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
     }
 
     public void testFindRegex() throws Exception {
-        String namespace = "testFindRegex" + auraTestingUtil.getNonce();
+        String namespace = "testFindRegex" + getAuraTestingUtil().getNonce();
         DefDescriptor<ApplicationDef> houseboat = addSourceAutoCleanup(ApplicationDef.class,
                 String.format(baseApplicationTag, "", ""), String.format("%s:houseboat", namespace));
         addSourceAutoCleanup(ApplicationDef.class, String.format(baseApplicationTag, "", ""),
@@ -195,7 +195,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
     }
 
     public void testStringCache() throws Exception {
-        String namespace = "testStringCache" + auraTestingUtil.getNonce();
+        String namespace = "testStringCache" + getAuraTestingUtil().getNonce();
         DefDescriptor<ApplicationDef> houseboat = addSourceAutoCleanup(ApplicationDef.class,
                 String.format(baseApplicationTag, "", ""), String.format("%s:houseboat", namespace));
         MasterDefRegistryImpl masterDefReg = getDefRegistry(false);
@@ -206,7 +206,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
     }
 
     public void testGetUidClientOutOfSync() throws Exception {
-        String namespace = "testStringCache" + auraTestingUtil.getNonce();
+        String namespace = "testStringCache" + getAuraTestingUtil().getNonce();
         String namePrefix = String.format("%s:houseboat", namespace);
         DefDescriptor<ApplicationDef> houseboat = addSourceAutoCleanup(ApplicationDef.class,
                 String.format(baseApplicationTag, "", ""), namePrefix);
@@ -341,34 +341,24 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
     }
 
     public void testGetUidCachedForRemovedDefinition() throws Exception {
-        DefDescriptor<ComponentDef> cmpDesc = StringSourceLoader.getInstance()
-                .addSource(ComponentDef.class, "<aura:component/>", null).getDescriptor();
-        DefDescriptor<ComponentDef> rmDesc = cmpDesc;
-        try {
-            MasterDefRegistryImpl registry = getDefRegistry(false);
-            String uid = registry.getUid(null, cmpDesc);
+        DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class, "<aura:component/>", null);
+        MasterDefRegistryImpl registry = getDefRegistry(false);
+        String uid = registry.getUid(null, cmpDesc);
 
-            // UID cached for current registry
-            StringSourceLoader.getInstance().removeSource(cmpDesc);
-            rmDesc = null;
-            String uidNew = registry.getUid(null, cmpDesc);
-            assertEquals("UID not cached", uid, uidNew);
+        // UID cached for current registry
+        getAuraTestingUtil().removeSource(cmpDesc);
+        String uidNew = registry.getUid(null, cmpDesc);
+        assertEquals("UID not cached", uid, uidNew);
 
-            // UID not cached for new registry
-            MasterDefRegistryImpl registryNext = getDefRegistry(false);
-            String uidNext = registryNext.getUid(null, cmpDesc);
-            assertNull("UID cached in new registry", uidNext);
-        } finally {
-            if (rmDesc != null) {
-                StringSourceLoader.getInstance().removeSource(cmpDesc);
-            }
-        }
+        // UID not cached for new registry
+        MasterDefRegistryImpl registryNext = getDefRegistry(false);
+        String uidNext = registryNext.getUid(null, cmpDesc);
+        assertNull("UID cached in new registry", uidNext);
     }
 
     public void testGetUidForQuickFixException() throws Exception {
-        DefDescriptor<ComponentDef> cmpDesc = StringSourceLoader.getInstance()
-                .addSource(ComponentDef.class, "<aura:component><unknown:component/></aura:component>", null)
-                .getDescriptor();
+        DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
+                "<aura:component><unknown:component/></aura:component>", null);
         MasterDefRegistryImpl registry = getDefRegistry(true);
         try {
             registry.getUid(null, cmpDesc);
@@ -392,8 +382,8 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
     }
 
     public void testGetUidForNonQuickFixException() throws Exception {
-        DefDescriptor<ComponentDef> cmpDesc = StringSourceLoader.getInstance()
-                .addSource(ComponentDef.class, "<aura:component invalidAttribute=''/>", null).getDescriptor();
+        DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
+                "<aura:component invalidAttribute=''/>", null);
         MasterDefRegistryImpl registry = getDefRegistry(true);
         try {
             registry.getUid(null, cmpDesc);
@@ -536,29 +526,20 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
     }
 
     public void testGetDefCachedForRemovedDefinition() throws Exception {
-        DefDescriptor<ComponentDef> cmpDesc = StringSourceLoader.getInstance()
-                .addSource(ComponentDef.class, "<aura:component/>", null).getDescriptor();
-        DefDescriptor<ComponentDef> rmDesc = cmpDesc;
-        try {
-            MasterDefRegistryImpl registry = getDefRegistry(false);
-            ComponentDef def = registry.getDef(cmpDesc);
-            assertNotNull(def);
+        DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class, "<aura:component/>", null);
+        MasterDefRegistryImpl registry = getDefRegistry(false);
+        ComponentDef def = registry.getDef(cmpDesc);
+        assertNotNull(def);
 
-            // Definition cached for current registry
-            StringSourceLoader.getInstance().removeSource(cmpDesc);
-            rmDesc = null;
-            ComponentDef defNew = registry.getDef(cmpDesc);
-            assertNotNull(defNew);
+        // Definition cached for current registry
+        getAuraTestingUtil().removeSource(cmpDesc);
+        ComponentDef defNew = registry.getDef(cmpDesc);
+        assertNotNull(defNew);
 
-            // Definition not cached for new registry
-            MasterDefRegistryImpl registryNext = getDefRegistry(false);
-            ComponentDef defNext = registryNext.getDef(cmpDesc);
-            assertNull(defNext);
-        } finally {
-            if (rmDesc != null) {
-                StringSourceLoader.getInstance().removeSource(cmpDesc);
-            }
-        }
+        // Definition not cached for new registry
+        MasterDefRegistryImpl registryNext = getDefRegistry(false);
+        ComponentDef defNext = registryNext.getDef(cmpDesc);
+        assertNull(defNext);
     }
 
     /**

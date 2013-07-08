@@ -47,6 +47,8 @@ public class BrowserValueProviderTest extends AuraImplTestCase {
                 BrowserValueProvider.IS_IPHONE, null);
         final PropertyReference isIOS = new PropertyReferenceImpl(
                 BrowserValueProvider.IS_IOS, null);
+        final PropertyReference isWindowsPhone = new PropertyReferenceImpl(
+                BrowserValueProvider.IS_WINDOWS_PHONE, null);
     }
 
     public void testValidate() throws Exception {
@@ -58,6 +60,7 @@ public class BrowserValueProviderTest extends AuraImplTestCase {
         bvp.validate(BrowserProperty.isIPad);
         bvp.validate(BrowserProperty.isIPhone);
         bvp.validate(BrowserProperty.isIOS);
+        bvp.validate(BrowserProperty.isWindowsPhone);
 
         PropertyReference property = new PropertyReferenceImpl("hah", null);
         try {
@@ -99,7 +102,7 @@ public class BrowserValueProviderTest extends AuraImplTestCase {
 
     private void assertBrowserProperties(UserAgent userAgent, boolean isTablet,
             boolean isPhone, boolean isAndroid, String formFactor,
-            boolean isIPad, boolean isIPhone, boolean isIOS) throws Exception {
+            boolean isIPad, boolean isIPhone, boolean isIOS, boolean isWindowsPhone) throws Exception {
         AuraContext context = Aura.getContextService().getCurrentContext();
         context.setClient(new Client(userAgent == null ? null : userAgent
                 .getUserAgentString()));
@@ -111,54 +114,36 @@ public class BrowserValueProviderTest extends AuraImplTestCase {
         assertBrowserProperty(bvp, BrowserProperty.isIPad, isIPad);
         assertBrowserProperty(bvp, BrowserProperty.isIPhone, isIPhone);
         assertBrowserProperty(bvp, BrowserProperty.isIOS, isIOS);
+        assertBrowserProperty(bvp, BrowserProperty.isWindowsPhone, isWindowsPhone);
     }
 
     // sample some user agents
     public void testGetValue() throws Exception {
-        assertBrowserProperties(null, false, false, false, "DESKTOP", false,
-                false, false);
-        assertBrowserProperties(UserAgent.EMPTY, false, false, false,
-                "DESKTOP", false, false, false);
-        assertBrowserProperties(UserAgent.GOOGLE_CHROME, false, false, false,
-                "DESKTOP", false, false, false);
-        assertBrowserProperties(UserAgent.IE7, false, false, false, "DESKTOP",
-                false, false, false);
-        assertBrowserProperties(UserAgent.IE8, false, false, false, "DESKTOP",
-                false, false, false);
-        assertBrowserProperties(UserAgent.IE9, false, false, false, "DESKTOP",
-                false, false, false);
-        assertBrowserProperties(UserAgent.IE10, false, false, false, "DESKTOP",
-                false, false, false);
-        assertBrowserProperties(UserAgent.FIREFOX, false, false, false,
-                "DESKTOP", false, false, false);
-        assertBrowserProperties(UserAgent.SAFARI5_MAC, false, false, false,
-                "DESKTOP", false, false, false);
-        assertBrowserProperties(UserAgent.OPERA12, false, false, false,
-                "DESKTOP", false, false, false);
-        assertBrowserProperties(UserAgent.OPERA12_MOBILE, false, true, true,
-                "PHONE", false, false, false);
-        assertBrowserProperties(UserAgent.IPHONE4, false, true, false, "PHONE",
-                false, true, true);
-        assertBrowserProperties(UserAgent.IPOD, false, true, false, "PHONE",
-                false, true, true);
-        assertBrowserProperties(UserAgent.IPAD, true, false, false, "TABLET",
-                true, false, true);
-        assertBrowserProperties(UserAgent.ANDROID1_6, false, true, true,
-                "PHONE", false, false, false);
-        assertBrowserProperties(UserAgent.ANDROID2_3, false, true, true,
-                "PHONE", false, false, false);
-        assertBrowserProperties(UserAgent.KINDLE_FIRE, false, false, false,
-                "DESKTOP", false, false, false);
-        assertBrowserProperties(UserAgent.PLAYBOOK, false, false, false,
-                "DESKTOP", false, false, false);
-        assertBrowserProperties(UserAgent.NOKIA_N95, false, false, false,
-                "DESKTOP", false, false, false);
+        assertBrowserProperties(null, false, false, false, "DESKTOP", false, false, false, false);
+        assertBrowserProperties(UserAgent.EMPTY, false, false, false, "DESKTOP", false, false, false, false);
+        assertBrowserProperties(UserAgent.GOOGLE_CHROME, false, false, false, "DESKTOP", false, false, false, false);
+        assertBrowserProperties(UserAgent.IE7, false, false, false, "DESKTOP", false, false, false, false);
+        assertBrowserProperties(UserAgent.IE8, false, false, false, "DESKTOP", false, false, false, false);
+        assertBrowserProperties(UserAgent.IE9, false, false, false, "DESKTOP", false, false, false, false);
+        assertBrowserProperties(UserAgent.IE10, false, false, false, "DESKTOP", false, false, false, false);
+        assertBrowserProperties(UserAgent.FIREFOX, false, false, false, "DESKTOP", false, false, false, false);
+        assertBrowserProperties(UserAgent.SAFARI5_MAC, false, false, false, "DESKTOP", false, false, false, false);
+        assertBrowserProperties(UserAgent.OPERA12, false, false, false, "DESKTOP", false, false, false, false);
+        assertBrowserProperties(UserAgent.OPERA12_MOBILE, false, true, true, "PHONE", false, false, false, false);
+        assertBrowserProperties(UserAgent.IPHONE4, false, true, false, "PHONE", false, true, true, false);
+        assertBrowserProperties(UserAgent.IPOD, false, true, false, "PHONE", false, true, true, false);
+        assertBrowserProperties(UserAgent.IPAD, true, false, false, "TABLET", true, false, true, false);
+        assertBrowserProperties(UserAgent.ANDROID1_6, false, true, true, "PHONE", false, false, false, false);
+        assertBrowserProperties(UserAgent.ANDROID2_3, false, true, true, "PHONE", false, false, false, false);
+        assertBrowserProperties(UserAgent.KINDLE_FIRE, false, false, false, "DESKTOP", false, false, false, false);
+        assertBrowserProperties(UserAgent.PLAYBOOK, false, false, false, "DESKTOP", false, false, false, false);
+        assertBrowserProperties(UserAgent.NOKIA_N95, false, false, false, "DESKTOP", false, false, false, false);
+        assertBrowserProperties(UserAgent.NOKIA_920, false, true, false, "PHONE", false, false, false, true);
     }
 
     public void testGetValueUndefinedProperty() throws Exception {
         BrowserValueProvider bvp = new BrowserValueProvider();
         assertEquals(null,
-                bvp.getValue(new PropertyReferenceImpl("isBlackberry", null))); // undefined
-                                                                                // property
+                bvp.getValue(new PropertyReferenceImpl("isBlackberry", null))); // undefined property
     }
 }

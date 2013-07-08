@@ -145,6 +145,23 @@ public abstract class AuraBaseServlet extends HttpServlet {
         response.setDateHeader(HttpHeaders.LAST_MODIFIED, now - SHORT_EXPIRE);
     }
 
+    /**
+     * Set a 'short' cache timeout.
+     *
+     * This sets several headers to try to ensure that the page will be cached for a shortish
+     * length of time. Of note is the last-modified header, which is set to a day ago so that
+     * browsers consider it to be safe.
+     *
+     * @param response the HTTP response to which we will add headers.
+     */
+    public static void setShortCache(HttpServletResponse response) {
+        long now = System.currentTimeMillis();
+        response.setHeader(HttpHeaders.VARY, "Accept-Encoding");
+        response.setHeader(HttpHeaders.CACHE_CONTROL, String.format("max-age=%s, public", SHORT_EXPIRE / 1000));
+        response.setDateHeader(HttpHeaders.EXPIRES, now + SHORT_EXPIRE);
+        response.setDateHeader(HttpHeaders.LAST_MODIFIED, now - SHORT_EXPIRE);
+    }
+
     public static String addCacheBuster(String url) {
         // This method should be moved to HttpUtil class in the future
         String uri = url;

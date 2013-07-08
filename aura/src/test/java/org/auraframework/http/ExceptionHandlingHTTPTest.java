@@ -31,17 +31,19 @@ public class ExceptionHandlingHTTPTest extends AuraHttpTestCase {
     @SuppressWarnings("unchecked")
     public void testExceptionLineColNums() throws Exception {
         // Verify -1,-1 aren't line/col numbers in stacktrace if Location doesn't provide them
-        ServerAction a = ServerAction.run(
+        ServerAction a = new ServerAction(
                 "java://org.auraframework.impl.java.controller.JavaTestController/ACTION$throwExceptionNoLineNums",
                 null);
+        a.run();
         Map<String, Object> error = (Map<String, Object>) a.getErrors().get(0);
         String message = (String) error.get("message");
         assertFalse("Location should not put out -1,-1 as the line/column", message.contains("-1,-1"));
 
         // Verify correct line/column numbers present in stacktrace when Location provides them
-        a = ServerAction.run(
+        a = new ServerAction(
                 "java://org.auraframework.impl.java.controller.JavaTestController/ACTION$throwExceptionWithLineNums",
                 null);
+        a.run();
         error = (Map<String, Object>) a.getErrors().get(0);
         message = (String) error.get("message");
         assertTrue("Location does not have correct line/column numbers", message.contains("4444,55555"));

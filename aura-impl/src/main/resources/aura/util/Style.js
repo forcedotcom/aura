@@ -47,6 +47,9 @@ Style.prototype.apply = function(styleText) {
     if(styleElement.styleSheet){
         //IE
        styleElement.styleSheet.cssText = styleText;
+    } else if (styleElement.textContent !== undefined) {
+        //webkit & ff
+        styleElement.textContent = styleText;
     } else if (styleElement.innerText !== undefined) {
         //webkit
         styleElement.innerText = styleText;

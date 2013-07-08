@@ -14,18 +14,64 @@
  * limitations under the License.
  */
 /*jslint sub: true */
+
+$A.ns.FlightCounter = function(max) {
+    this.lastStart = 0;
+    this.started = 0;
+    this.startCount = 0;
+    this.inFlight = 0;
+    this.sent = 0;
+    this.finished = 0;
+    this.max = max;
+};
+
+$A.ns.FlightCounter.prototype.idle = function() {
+    return this.started === 0 && this.inFlight === 0;
+};
+
+$A.ns.FlightCounter.prototype.start = function() {
+    if (this.started + this.inFlight < this.max) {
+        this.started += 1;
+        this.startCount += 1;
+        //this.lastStart = now;
+        return true;
+    }
+    return false;
+};
+
+$A.ns.FlightCounter.prototype.cancel = function() {
+    $A.assert(this.started > 0, "broken inFlight counter");
+    this.started -= 1;
+};
+
+$A.ns.FlightCounter.prototype.send = function() {
+    $A.assert(this.started > 0, "broken inFlight counter");
+    this.started -= 1;
+    this.sent += 1;
+    this.inFlight += 1;
+};
+
+$A.ns.FlightCounter.prototype.finish = function() {
+    $A.assert(this.inFlight > 0, "broken inFlight counter");
+    this.inFlight -= 1;
+    this.finished += 1;
+};
+
 var priv = {
     token : null,
     auraStack : [],
     host : "",
-    requestQueue : [],
-    inRequest : false,
     loadEventQueue : [],
     appcacheDownloadingEventFired : false,
     isOutdated : false,
     isUnloading : false,
     initDefsObservers : [],
     isDisconnected : false,
+
+    foreground : new $A.ns.FlightCounter(1),
+    background : new $A.ns.FlightCounter(1),
+    actionQueue : new ActionQueue(),
+
 
     /**
      * Take a json (hopefully) response and decode it. If the input is invalid JSON, we try to handle it gracefully.
@@ -185,29 +231,68 @@ var priv = {
         priv.fireLoadEvent("e.aura:doneWaiting");
     },
 
-    findGroupAndAction : function(actionGroups, actionId) {
-        for ( var i = 0; i < actionGroups.length; i++) {
-            actionGroup = actionGroups[i];
+    /**
+     * Process a single action/response.
+     *
+     * Note that it does this inside an $A.run to provide protection against error returns,
+     * and to notify the user if an error occurs.
+     *
+     * @param {Action}
+     *         action the action.
+     * @param {Boolean}
+     *          noAbort if false abortable actions will be aborted.
+     * @param {Object}
+     *          actionResponse the server response.
+     */
+    singleAction : function(action, noAbort, actionResponse) {
+        var key = action.getStorageKey();
+        var that = this;
 
-            var actions = actionGroup.actions;
-            for ( var j = 0; j < actions.length; j++) {
-                action = actions[j];
-                if (actionId === action.getId()) {
-                    return {
-                        group : actionGroup,
-                        action : action
-                    };
+        $A.run(function() {
+                var storage, toStore, needUpdate;
+
+                needUpdate = action.updateFromResponse(actionResponse);
+
+                if (noAbort || !action.isAbortable()) {
+                    if (needUpdate) {
+                        action.finishAction($A.getContext());
+                    } 
+                    if (action.isRefreshAction()) {
+                        action.fireRefreshEvent("refreshEnd");
+                    }
+                } else {
+                    action.abort();
                 }
-            }
-        }
-
-        return null;
+                storage = action.getStorage();
+                if (storage) {
+                    toStore = action.getStored(storage.getName());
+                    if (toStore) {
+                        storage.put(key, toStore);
+                    }
+                }
+            }, key);
     },
 
-    actionCallback : function(response, actionGroups, num) {
+    /**
+     * Callback for an XHR for a set of actions.
+     *
+     * This function does all of the processing for a set of actions that come back from the server.
+     * It correctly deals with the case of interrupted communications, and handles aborts.
+     *
+     * @param {Object}
+     *          response the response from the server.
+     * @param {ActionCollector}
+     *          the collector for the actions.
+     * @param {FlightCounter}
+     *          the in flight counter under which the actions were run
+     * @param {Scalar}
+     *          the abortableId associated with the set of actions.
+     */
+    actionCallback : function(response, collector, flightCounter, abortableId) {
         var responseMessage = this.checkAndDecodeResponse(response);
-        var queue = this.requestQueue;
         var that = this;
+        var firstAction = undefined;
+        var noAbort = (abortableId === this.actionQueue.getLastAbortableTransactionId());
         var i;
 
         var errors = [];
@@ -216,14 +301,19 @@ var priv = {
             this.auraStack = [];
         }
         $A.run(function() {
+                var action, actionResponses;
+
+                //
+                // pre-decrement so that we correctly send the next response right after this.
+                //
+                flightCounter.finish();
                 if (responseMessage) {
                     var token = responseMessage["token"];
                     if (token) {
                         priv.token = token;
                     }
 
-                    var ctx = responseMessage["context"];
-                    $A.getContext().join(ctx);
+                    $A.getContext().join(responseMessage["context"]);
 
                     //Look for any Client side event exceptions
                     var events = responseMessage["events"];
@@ -233,293 +323,151 @@ var priv = {
                         }
                     }
 
-                    var actionResponses = responseMessage["actions"];
+                    actionResponses = responseMessage["actions"];
+
                     //Process each action and its response
                     for ( var r = 0; r < actionResponses.length; r++) {
                         var actionResponse = actionResponses[r];
+                        action = collector.findActionAndClear(actionResponse["id"]);
 
-                        var actionGroupNumber;
-                        var action;
-                        if (actionResponse["storable"] === true) {
-                            // Create a client side action instance to go with the
-                            // server created action response
-                            var descriptor = actionResponse["action"];
-                            var actionDef = $A.services.component.getActionDef({
-                                descriptor : descriptor
-                            });
-                            action = actionDef.newInstance();
-
-                            action.setStorable();
-                            action.setParams(actionResponse["params"]);
-
-                            actionGroupNumber = that.newestAbortableGroup;
-                        } else {
-                            var groupAndAction = that.findGroupAndAction(actionGroups, actionResponse.id);
-                            aura.assert(groupAndAction, "Unable to find action for action response "+actionResponse.id);
-
-                            actionGroupNumber = groupAndAction.group.number;
-                            action = groupAndAction.action;
-                        }
-
-                        try {
-                            var storage = action.getStorage();
-                            var toStore;
-                            var needUpdate = action.updateFromResponse(actionResponse);
-
-                            if (!action.isAbortable() || that.newestAbortableGroup === actionGroupNumber) {
-                                if (needUpdate) {
-                                    action.finishAction($A.getContext());
-                                } 
-                                if (action.isRefreshAction()) {
-                                    action.fireRefreshEvent("refreshEnd");
-                                }
+                        if (action === null) {
+                            if (actionResponse["storable"]) {
+                                //
+                                // Hmm, we got a missing action. We allow this in the case that we have
+                                // a storable action from the server (i.e. we are faking an action from the
+                                // server to store data on the client. This is only used in priming, and is
+                                // more than a bit of a hack.
+                                //
+                                // Create a client side action instance to go with the server created action response
+                                //
+                                var descriptor = actionResponse["action"];
+                                var actionDef = $A.services.component.getActionDef({ descriptor : descriptor });
+                                action = actionDef.newInstance();
+                                action.setStorable();
+                                action.setParams(actionResponse["params"]);
+                                action.setAbortable(false);
                             } else {
-                                action.abort();
+                                aura.assert(action, "Unable to find action for action response "+actionResponse["id"]);
                             }
-                            toStore = action.getStored();
-                            if (storage && toStore) {
-                                storage.put(action.getStorageKey(), toStore);
-                            }
-                        } catch (e) {
-                            errors.push(e);
                         }
-                    }
-
-                    for (i = 0; i < actionGroups.length; i++) {
-                        actionGroup = actionGroups[i];
-                        actionGroup.status = "done";
+                        if (firstAction === undefined) {
+                            firstAction = action;
+                        }
+                        that.singleAction(action, noAbort, actionResponse);
                     }
                 } else if (priv.isDisconnectedOrCancelled(response) && !priv.isUnloading) {
-                    for ( var n = 0; n < actionGroups.length; n++) {
-                        actionGroup = actionGroups[n];
-                        actions = actionGroup.actions;
-                        for ( var m = 0; m < actions.length; m++) {
-                            try {
-                                action = actions[m];
-                                if (!action.isAbortable() || that.newestAbortableGroup === actionGroup.number) {
-                                    action.incomplete($A.getContext());
-                                } else {
-                                    action.abort();
-                                }
-                            } catch (e2) {
-                                errors.push(e2);
-                            }
-                        }
-                        actionGroup.status = "done";
-                    }
-                }
-                if (errors.length > 0) {
-                    for(i=0;i<errors.length;i++){
-                        // should this be $A.error?
-                        aura.log("Javascript error", errors[i]);
-                    }
-                }
-            }, "actionCallback");
+                    var actions = collector.getActionsToSend();
 
-        this.inRequest = false;
-        priv.fireDoneWaiting();
-        var queueCopy = queue;
-        queue = [];
-
-        for ( var p = 0; p < queueCopy.length; p++) {
-            actionGroup = queueCopy[p];
-            if (actionGroup.status !== "done") {
-                queue.push(actionGroup);
-            }
-        }
-
-        this.requestQueue = queue;
-        $A.endMark("Completed Action Callback - XHR " + num);
-
-        //#if {"modes" : ["PTEST"]}
-        // if there are no more actions for a particular transaction and if
-        // onLoad has already been fired
-        if (queueCopy.length == 1 && $A.getContext().getTransaction() !== 0) {
-            // if the current action is a list, a subsequent action follows to
-            // fetch
-            // the detail, so skip this for next time
-            // a bit of a hack to capture the getDetail action as well
-            if (queueCopy[0].actions[0].getDef().name.indexOf("Overview") == -1 && (queueCopy[0].actions[0].getDef().name.indexOf("List") == -1 || queueCopy[0].actions[0].getDef().name.indexOf("RelatedList") !== -1)) {
-                $A.clientService.unregisterTransaction();
-            }
-        }
-        //#end
-        setTimeout(function() {
-            that.doRequest();
-        }, 1);
-    },
-
-    actionGroupCounter : 0,
-
-    /**
-     * Serialize requests to the aura server from this client. AuraContext.num needs to be synchronized across all
-     * requests, and pending a better fix, this works around that issue.
-     */
-    request : function(actions, exclusive) {
-        $A.mark("AuraClientService.request");
-        $A.mark("Action Request Prepared");
-        var actionGroup = this.actionGroupCounter++;
-        $A.mark("Action Group " + actionGroup + " enqueued");
-
-        var fireDoneWaiting = false;
-        var actionsToSend = [];
-        var actionsToComplete = [];
-
-        // Aura Storage.get() requires an async/callback invocation flow
-        var clientService = this;
-        var actionsToCollect = actions.length;
-        var actionCollected = function() {
-            if (--actionsToCollect <= 0) {
-                // We're done waiting for pending async operations to complete,
-                // let's light this candle!
-                if (fireDoneWaiting) {
-                    setTimeout(function() {
-                        priv.fireDoneWaiting();
-                    }, 1);
-                }
-
-                if (actionsToComplete.length > 0) {
-                    var that = this;
-                    for ( var n = 0; n < actionsToComplete.length; n++) {
-                        var info = actionsToComplete[n];
-                        info.action.updateFromResponse(info.response);
-                        info.action.finishAction($A.getContext());
-                    }
-
-                    clientService.fireDoneWaiting();
-                }
-
-                if (actionsToSend.length > 0) {
-                    // clientService.requestQueue reference is mutable
-                    clientService.requestQueue.push({
-                        actions : actionsToSend,
-                        number : actionGroup,
-                        exclusive : exclusive
-                    });
-                    $A.endMark("Action Group " + actionGroup + " enqueued");
-                    clientService.doRequest();
-                }
-            }
-        };
-
-        var storage = Action.prototype.getStorage();
-        for ( var i = 0; i < actions.length; i++) {
-            var action = actions[i];
-            $A.assert(action.getDef().isServerAction(), "RunAfter() cannot be called on a client action. Use runDeprecated() on a client action instead.");
-
-            // For cacheable actions check the storage service to see if we
-            // already have a viable cached action response we can complete
-            // immediately
-            if (action.isStorable() && storage) {
-                var key = action.getStorageKey();
-
-                storage.get(key, this.createResultCallback(action, actionGroup, actionsToComplete, actionsToSend, actionCollected));
-            } else {
-                this.collectAction(action, actionGroup, actionsToSend, actionCollected);
-            }
-        }
-    },
-
-    createResultCallback : function(action, actionGroup, actionsToComplete, actionsToSend, actionCollected) {
-        var that = this;
-        return function(response) {
-            if (response) {
-                actionsToComplete.push({
-                    action : action,
-                    response : response
-                });
-
-                var refresh = action.getRefreshAction(response);
-                if ($A.util.isUndefinedOrNull(refresh)) {
-                    actionCollected();
-                } else {
-                    action.fireRefreshEvent("refreshBegin");
-                    that.collectAction(refresh, actionGroup, actionsToSend, actionCollected);
-                }
-            } else {
-                that.collectAction(action, actionGroup, actionsToSend, actionCollected);
-            }
-        };
-    },
-
-    collectAction : function(action, actionGroup, actionsToSend, actionCollectedCallback) {
-        if (action.isAbortable()) {
-            this.newestAbortableGroup = actionGroup;
-        }
-
-        if (action.isExclusive()) {
-            action.setExclusive(false);
-            this.request([ action ], true);
-        } else {
-            actionsToSend.push(action);
-        }
-
-        actionCollectedCallback();
-    },
-
-    doRequest : function() {
-        var queue = this.requestQueue;
-        if (!this.inRequest && queue.length > 0) {
-            this.inRequest = true;
-            var num = aura.getContext().incrementNum();
-
-            var actionsToRequest = [];
-            var actionGroups = [];
-
-            for ( var j = 0; j < queue.length; j++) {
-                var actionGroup = queue[j];
-
-                var status = actionGroup.status;
-                if (status !== "requested" && status !== "done") {
-                    actionGroups.splice(0, 0, actionGroup);
-                    var actions = actionGroup.actions;
-                    var requestedActions = [];
-                    var hasActionsToRequest = false;
                     for ( var m = 0; m < actions.length; m++) {
-                        var action = actions[m];
-                        if (!action.isAbortable() || this.newestAbortableGroup === actionGroup.number) {
-                            hasActionsToRequest = true;
-                            requestedActions.push(action);
-                            // Chained actions are transported and executed by
-                            // custom code
-                            if (!action.isChained()) {
-                             //#if {"modes" : ["PTEST"]}
-                                $A.getContext().updateTransactionName(action.getDef().name);
-                             //#end
-                                actionsToRequest.push(action);
-                            }
+                        action = actions[m];
+                        if (firstAction === undefined) {
+                            firstAction = action;
+                        }
+                        if (noAbort || !action.isAbortable()) {
+                            action.incomplete($A.getContext());
                         } else {
                             action.abort();
                         }
                     }
-                    actionGroup.actions = requestedActions;
-
-                    actionGroup.status = hasActionsToRequest ? "done" : "requested";
-                    if (actionGroup.exclusive === true) {
-                        break;
-                    }
                 }
+                priv.fireDoneWaiting();
+            }, "actionCallback");
+
+        $A.endMark("Completed Action Callback - XHR " + collector.getNum());
+
+        //#if {"modes" : ["PTEST"]}
+        // if there are no more actions for a particular transaction and if
+        // onLoad has already been fired
+        if (firstAction && $A.getContext().getTransaction() !== 0) {
+            // if the current action is a list, a subsequent action follows to
+            // fetch
+            // the detail, so skip this for next time
+            // a bit of a hack to capture the getDetail action as well
+            if (firstAction.getDef().name.indexOf("Overview") == -1
+                && (firstAction.getDef().name.indexOf("List") == -1
+                    || firstAction.getDef().name.indexOf("RelatedList") !== -1)) {
+                $A.clientService.unregisterTransaction();
             }
+        }
+        //#end
+    },
+
+    /**
+     * Start a request sequence for a set of actions and an 'in-flight' counter.
+     *
+     * This routine will usually send off a request to the server, and will always walk through
+     * the steps to do so. If no request is sent to the server, it is because the request was
+     * either a storable action without needing refresh, or all abortable actions that will be
+     * aborted (not sure if that is even possible).
+     *
+     * This function should never be called unless flightCounter.start() was called and returned
+     * true (meaning there is capacity in the channel).
+     *
+     * @param {Array}
+     *          actions the list of actions to process.
+     * @param {FlightCounter}
+     *          the flight counter under which the actions should be run.
+     */
+    request : function(actions, flightCounter) {
+        $A.mark("AuraClientService.request");
+        $A.mark("Action Request Prepared");
+        var that = this;
+        //
+        // NOTE: this is done here, before the callback to avoid a race condition of someone else queueing up
+        // an abortable action while we are off waiting for storage.
+        //
+        var abortableId = this.actionQueue.getLastAbortableTransactionId();
+        var collector = new $A.ns.ActionCollector(actions,
+            function() { that.finishRequest(collector, flightCounter, abortableId); });
+        collector.process();
+        $A.mark("Action Group " + collector.getCollectorId() + " enqueued");
+    },
+
+    /**
+     * The last step before sending to the server.
+     *
+     * This routine does the actual XHR request to the server, using the collected actions to
+     * do so. In the event that there are no actions to send, it simply completes the request.
+     */
+    finishRequest : function(collector, flightCounter, abortableId) {
+        var actionsToSend = collector.getActionsToSend();
+        var actionsToComplete = collector.getActionsToComplete();
+
+        if (actionsToComplete.length > 0) {
+            for ( var n = 0; n < actionsToComplete.length; n++) {
+                var info = actionsToComplete[n];
+                info.action.updateFromResponse(info.response);
+                info.action.finishAction($A.getContext());
+            }
+            this.fireDoneWaiting();
+        }
+
+        if (actionsToSend.length > 0) {
+            collector.setNum(aura.getContext().incrementNum());
+
+            // clientService.requestQueue reference is mutable
+            flightCounter.send();
             var requestConfig = {
                 "url" : priv.host + "/aura",
                 "method" : "POST",
                 "scope" : this,
                 "callback" : function(response) {
-                    this.actionCallback(response, actionGroups, num);
+                    this.actionCallback(response, collector, flightCounter, abortableId);
                 },
                 "params" : {
                     "message" : aura.util.json.encode({
-                        "actions" : actionsToRequest
+                        "actions" : actionsToSend
                     }),
                     "aura.token" : priv.token,
                     "aura.context" : $A.getContext().encodeForServer(),
-                    "aura.num" : num
+                    "aura.num" : collector.getNum()
                     //#if {"modes" : ["PTEST"]}
                     ,
                     "beaconData" : $A.getBeaconData()
                    //#end
                 }
             };
+            $A.endMark("Action Group " + collector.getCollectorId() + " enqueued");
 
             // clear the beaconData
             //#if {"modes" : ["PTEST"]}
@@ -531,6 +479,9 @@ var priv = {
             setTimeout(function() {
                 $A.get("e.aura:waiting").fire();
             }, 1);
+        } else {
+            // We didn't send a request, so clean up the in-flight counter.
+            flightCounter.cancel();
         }
     },
 

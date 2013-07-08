@@ -53,7 +53,6 @@ import org.auraframework.util.AuraUITestingUtil;
 import org.auraframework.util.AuraUtil;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -123,8 +122,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
      * Setup specific to a test run against a particular browser. Run once per test case, per browser.
      */
     public void perBrowserSetUp() {
-        // re-initialize driver pointer here because test analysis might need it
-        // after perBrowserTearDown
+        // re-initialize driver pointer here because test analysis might need it after perBrowserTearDown
         currentDriver = null;
         // W-1475510: instantiating it inorder to expose certain Util methods.
         auraUITestingUtil = new AuraUITestingUtil(this.getDriver());
@@ -188,8 +186,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
                 }
             }
         }
-        // Aggregate results across browser runs, if more than one failure was
-        // encountered
+        // Aggregate results across browser runs, if more than one failure was encountered
         if (!failures.isEmpty()) {
             if (failures.size() == 1) {
                 throw failures.get(0);
@@ -247,9 +244,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
         if (isClient) {
             open(openPath);
         } else {
-            //
             // when using server side rendering, we need to not wait for aura
-            //
             openNoAura(openPath);
         }
     }
@@ -372,6 +367,10 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
         return null;
     }
 
+    protected BrowserType getBrowserType() {
+        return currentBrowserType;
+    }
+
     /**
      * Find all the browsers the current test case should be executed in. Test cases can be annotated with multiple
      * target browsers. If the testcase does not have an annotation, the class level annotation is used.
@@ -452,7 +451,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
     }
 
     private URI getAbsoluteURI(String url) throws MalformedURLException, URISyntaxException {
-        return servletConfig.getBaseUrl().toURI().resolve(url);
+        return getTestServletConfig().getBaseUrl().toURI().resolve(url);
     }
 
     /**
@@ -534,7 +533,9 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
         newParams.add(new BasicNameValuePair("aura.test", getQualifiedName()));
         url = url + "?" + URLEncodedUtils.format(newParams, "UTF-8") + hash;
 
+        auraUITestingUtil.getRawEval("document._waitingForReload = true;");
         openRaw(url);
+        waitForCondition("return !document._waitingForReload");
         if (waitForInit) {
             auraUITestingUtil.waitForAuraInit(getExceptionsAllowedDuringInit());
         }
@@ -567,11 +568,6 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
      */
     public void waitForCondition(final String javascript) {
         waitForCondition(javascript, timeoutInSecs);
-    }
-
-    public boolean checkBrowserType(String browserName)
-    {
-        return currentBrowserType.toString().equals(browserName);
     }
 
     /**
@@ -706,26 +702,14 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
      * Find first matching element in the DOM.
      */
     protected WebElement findDomElement(By locator) {
-        final WebElement element = getDriver().findElement(locator);
-        auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
-            @Override
-            public Boolean apply(WebDriver d) {
-                return auraUITestingUtil.getBooleanEval("return arguments[0].ownerDocument === document", element);
-            }
-        });
-        return element;
+        return auraUITestingUtil.findDomElement(locator);
     }
 
     /**
      * Return true if there is at least one element matching the locator.
      */
     public boolean isElementPresent(By locator) {
-        try {
-            findDomElement(locator);
-        } catch (NoSuchElementException e) {
-            return false;
-        }
-        return true;
+        return getDriver().findElements(locator).size() > 0;
     }
 
     /**

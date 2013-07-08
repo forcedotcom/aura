@@ -16,6 +16,7 @@
 package org.auraframework.util;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 
 /**
@@ -57,6 +58,13 @@ public enum AuraFiles {
                 } catch (Throwable t) {
                     // must be built with non-standard structure
                 }
+            }
+        } else {
+            try {
+                // try to clean up any provided path
+                path = new File(path).getCanonicalPath();
+            } catch (IOException e) {
+                throw new Error("Invalid aura.home: " + path, e);
             }
         }
         return path;

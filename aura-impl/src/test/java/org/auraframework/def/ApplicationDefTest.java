@@ -26,10 +26,6 @@ import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-/**
- * ThreadHostile for at least MultipleAppCache
- */
-@ThreadHostileTest
 public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
 
     public ApplicationDefTest(String name) {
@@ -114,8 +110,7 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
     }
 
     /**
-     * App will inherit useAppcache='false' from aura:application if attribute
-     * not specified
+     * App will inherit useAppcache='false' from aura:application if attribute not specified
      */
     public void testIsAppCacheEnabledInherited() throws Exception {
         DefDescriptor<ApplicationDef> parentDesc = addSourceAutoCleanup(ApplicationDef.class,
@@ -159,8 +154,7 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
     }
 
     /**
-     * App's useAppcache attribute value is true, but application has no
-     * preloads
+     * App's useAppcache attribute value is true, but application has no preloads
      */
     public void testIsAppCacheEnabledWithoutPreload() throws Exception {
         DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class,
@@ -171,12 +165,9 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
 
     /**
      * Test app cache with more than one app.
-     * 
-     * This test is marked unadaptable because it can load things outside the
-     * context of Aura (should be fixed by preloads, and re-enabled). TODO:
-     * re-enable after W-1166679
      */
     @UnAdaptableTest
+    @ThreadHostileTest("preloads namespace")
     public void testMultipleAppCache() throws Exception {
         String appFormat = "<aura:application securityProvider='java://org.auraframework.components.security.SecurityProviderAlwaysAllows' useAppCache='true' preload='%s'>\n    <%s:%s />\n</aura:application>";
         String componentText = "<aura:component>the body</aura:component>";
@@ -206,11 +197,11 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
         Aura.getContextService().endContext();
 
         DefDescriptor<ComponentDef> newCompDesc = addSourceAutoCleanup(ComponentDef.class, componentText);
-        ((StringSource<?>) auraTestingUtil.getSource(newCompDesc)).setLastModified(later);
+        ((StringSource<?>) getSource(newCompDesc)).setLastModified(later);
         appText = String.format(appFormat, newCompDesc.getNamespace(), newCompDesc.getNamespace(),
                 newCompDesc.getName());
         DefDescriptor<ApplicationDef> newerAppDesc = addSourceAutoCleanup(ApplicationDef.class, appText);
-        ((StringSource<?>) auraTestingUtil.getSource(newerAppDesc)).setLastModified(later);
+        ((StringSource<?>) getSource(newerAppDesc)).setLastModified(later);
 
         // Start a newerApp context in DEV mode so that we can update the
         // lastMod cache.
@@ -247,8 +238,7 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
     }
 
     /**
-     * Enable preloading in the current context and all the preloads from the
-     * given definition.
+     * Enable preloading in the current context and all the preloads from the given definition.
      * 
      * @param applicationDef
      * @throws QuickFixException
@@ -268,9 +258,8 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
     }
 
     /**
-     * Additional test cases which are specific to Applications. Test Case: When
-     * a component has a layout.xml specified, do not auto render serverside.
-     * Automation for W-911562
+     * Additional test cases which are specific to Applications. Test Case: When a component has a layout.xml specified,
+     * do not auto render serverside. Automation for W-911562
      */
     public void testIsLocallyRenderable_extra() throws Exception {
         ApplicationDef appdef = Aura.getDefinitionService().getDefinition("test:test_Layouts", ApplicationDef.class);
@@ -294,8 +283,8 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
     }
 
     /**
-     * Verify the isOnePageApp() API on ApplicationDef Applications who have the
-     * isOnePageApp attribute set, will have the template cached.
+     * Verify the isOnePageApp() API on ApplicationDef Applications who have the isOnePageApp attribute set, will have
+     * the template cached.
      * 
      * @throws Exception
      */

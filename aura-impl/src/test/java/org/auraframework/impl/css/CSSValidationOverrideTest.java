@@ -21,6 +21,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.css.parser.StyleParser;
+import org.auraframework.test.annotation.ThreadHostileTest;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.throwable.quickfix.StyleParserException;
 
@@ -40,13 +41,13 @@ public class CSSValidationOverrideTest extends AuraImplTestCase {
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        DefDescriptor<ComponentDef> cmp = auraTestingUtil.addSourceAutoCleanup(ComponentDef.class,
+        DefDescriptor<ComponentDef> cmp = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "", ""));
         assertNotNull(cmp.getDef());
         styleDefDesc = Aura.getDefinitionService().getDefDescriptor(
                 String.format("%s://%s.%s", DefDescriptor.CSS_PREFIX, cmp.getNamespace(), cmp.getName()),
                 StyleDef.class);
-        auraTestingUtil.addSourceAutoCleanup(styleDefDesc,
+        addSourceAutoCleanup(styleDefDesc,
                 ".xyErrorText {" +
                         "color: #808080;" +
                         "padding-bottom: 5px;" +
@@ -67,6 +68,7 @@ public class CSSValidationOverrideTest extends AuraImplTestCase {
     /**
      * Override the validateCss flag on configAdapter and make sure validations are skipped
      */
+    @ThreadHostileTest("disables CSS validation")
     public void testOverrideCSSValidation() {
         getMockConfigAdapter().setValidateCss(false);
         assertFalse("Expected CSS validation to be overriden.", Aura.getConfigAdapter().validateCss());
@@ -75,7 +77,7 @@ public class CSSValidationOverrideTest extends AuraImplTestCase {
 
     private void getInvalidStyleDef(boolean expectException) {
         try {
-            StyleParser.getInstance().parse(styleDefDesc, auraTestingUtil.getSource(styleDefDesc));
+            StyleParser.getInstance().parse(styleDefDesc, getSource(styleDefDesc));
             if (expectException)
                 fail("Expected CSS validation to be turned on and catch the invalid CSS");
         } catch (StyleParserException expected) {

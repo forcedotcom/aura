@@ -16,6 +16,7 @@
 package org.auraframework.component.aura;
 
 import org.auraframework.test.WebDriverTestCase;
+import org.auraframework.test.annotation.ThreadHostileTest;
 import org.auraframework.test.annotation.UnAdaptableTest;
 import org.auraframework.test.controller.TestLoggingAdapterController;
 
@@ -41,7 +42,8 @@ public class LabelValueProviderUITest extends WebDriverTestCase {
      *
      * @throws Exception
      */
-    @UnAdaptableTest
+    @ThreadHostileTest("TestLoggingAdapter not thread-safe")
+    @UnAdaptableTest("Missing TestLoggingAdapter impl")
     public void testEfficientActionRequests() throws Exception {
         TestLoggingAdapterController.beginCapture();
         open(URL);

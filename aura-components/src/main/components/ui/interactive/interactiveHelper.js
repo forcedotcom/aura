@@ -45,12 +45,20 @@
         var htmlCmp = $A.componentService.getRenderingComponentForElement(element);
         var component = htmlCmp.getAttributes().getComponentValueProvider().getConcreteComponent();
         var helper = component.getDef().getHelper();
+        
+        if (!helper) {
+            return;
+        }
 
         // extended components can do some event processing before the Aura event gets fired
-        helper.preEventFiring(component, event);
+        if (helper.preEventFiring) {
+            helper.preEventFiring(component, event);
+        }
 
         // fire the equivalent Aura event
-        helper.fireEvent(component, event, helper);
+        if (helper.fireEvent) {
+            helper.fireEvent(component, event, helper);
+        }
     },
 
     /**

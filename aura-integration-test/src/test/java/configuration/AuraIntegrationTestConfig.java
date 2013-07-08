@@ -30,48 +30,56 @@ import org.auraframework.util.ServiceLoaderImpl.AuraConfiguration;
 import org.auraframework.util.ServiceLoaderImpl.Impl;
 import org.openqa.selenium.net.PortProber;
 
-/**
- */
 @AuraConfiguration
 public class AuraIntegrationTestConfig {
+    private static TestServletConfig testServletConfig = null;
+    private static WebDriverProvider webDriverProvider = null;
+
     @Impl
-    public static TestServletConfig auraJettyServletTestInfo() throws Exception {
-        return new JettyTestServletConfig();
+    public synchronized static TestServletConfig auraJettyServletTestInfo() throws Exception {
+        if (testServletConfig == null) {
+            testServletConfig = new JettyTestServletConfig();
+        }
+        return testServletConfig;
     }
 
     @Impl
-    public static WebDriverProvider auraWebDriverProvider() throws Exception {
-        URL serverUrl;
-        boolean runningOnSauceLabs = SauceUtil.areTestsRunningOnSauce();
-        try {
-            String hubUrlString = System.getProperty(WebDriverProvider.WEBDRIVER_SERVER_PROPERTY);
-            if ((hubUrlString != null) && !hubUrlString.equals("")) {
-                if (runningOnSauceLabs) {
-                    serverUrl = SauceUtil.getSauceServerUrl();
+    public synchronized static WebDriverProvider auraWebDriverProvider() throws Exception {
+        if (webDriverProvider == null) {
+            URL serverUrl;
+            boolean runningOnSauceLabs = SauceUtil.areTestsRunningOnSauce();
+            try {
+                String hubUrlString = System.getProperty(WebDriverProvider.WEBDRIVER_SERVER_PROPERTY);
+                if ((hubUrlString != null) && !hubUrlString.equals("")) {
+                    if (runningOnSauceLabs) {
+                        serverUrl = SauceUtil.getSauceServerUrl();
+                    } else {
+                        serverUrl = new URL(hubUrlString);
+                    }
                 } else {
-                    serverUrl = new URL(hubUrlString);
+
+                    int serverPort = PortProber.findFreePort();
+
+                    // quiet the verbose grid logging
+                    Logger selLog = Logger.getLogger("org.openqa");
+                    selLog.setLevel(Level.SEVERE);
+
+                    SeleniumServerLauncher.start("localhost", serverPort);
+                    serverUrl = new URL(String.format("http://localhost:%s/wd/hub", serverPort));
+                    System.setProperty(WebDriverProvider.WEBDRIVER_SERVER_PROPERTY, serverUrl.toString());
                 }
-            } else {
-
-                int serverPort = PortProber.findFreePort();
-
-                // quiet the verbose grid logging
-                Logger selLog = Logger.getLogger("org.openqa");
-                selLog.setLevel(Level.SEVERE);
-
-                SeleniumServerLauncher.start("localhost", serverPort);
-                serverUrl = new URL(String.format("http://localhost:%s/wd/hub", serverPort));
-                System.setProperty(WebDriverProvider.WEBDRIVER_SERVER_PROPERTY, serverUrl.toString());
+                Logger.getLogger(AuraIntegrationTestConfig.class.getName()).info("Selenium server url: " + serverUrl);
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new Error(e);
             }
-            Logger.getLogger(AuraIntegrationTestConfig.class.getName()).info("Selenium server url: " + serverUrl);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new Error(e);
+            if (!runningOnSauceLabs
+                    && Boolean.parseBoolean(System.getProperty(WebDriverProvider.REUSE_BROWSER_PROPERTY))) {
+                webDriverProvider = new PooledRemoteWebDriverFactory(serverUrl);
+            } else {
+                webDriverProvider = new RemoteWebDriverFactory(serverUrl);
+            }
         }
-        if (!runningOnSauceLabs && Boolean.parseBoolean(System.getProperty(WebDriverProvider.REUSE_BROWSER_PROPERTY))) {
-            return new PooledRemoteWebDriverFactory(serverUrl);
-        } else {
-            return new RemoteWebDriverFactory(serverUrl);
-        }
+        return webDriverProvider;
     }
 }

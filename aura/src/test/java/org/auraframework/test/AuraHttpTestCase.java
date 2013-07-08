@@ -16,7 +16,6 @@
 package org.auraframework.test;
 
 import java.io.IOException;
-
 import java.net.URI;
 import java.util.List;
 
@@ -27,57 +26,31 @@ import org.apache.http.client.protocol.ClientContext;
 import org.apache.http.cookie.Cookie;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.cookie.BasicClientCookie;
-import org.apache.http.params.CoreProtocolPNames;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.auraframework.Aura;
-
 import org.auraframework.def.ApplicationDef;
-
 import org.auraframework.service.ContextService;
-
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.test.annotation.ThreadHostileTest;
-
 import org.auraframework.throwable.AuraRuntimeException;
 
 /**
  * Base class with some helper methods specific to Aura.
  */
-@ThreadHostileTest
 public abstract class AuraHttpTestCase extends IntegrationTestCase {
     public AuraHttpTestCase(String name) {
         super(name);
     }
 
-    private String originalUserAgent;
-
-    @Override
-    public void setUp() throws Exception {
-        super.setUp();
-        originalUserAgent = System.getProperty(CoreProtocolPNames.USER_AGENT);
-    }
-
-    @Override
-    public void tearDown() throws Exception {
-        if (originalUserAgent == null) {
-            System.clearProperty(CoreProtocolPNames.USER_AGENT);
-        } else {
-            System.setProperty(CoreProtocolPNames.USER_AGENT, originalUserAgent);
-        }
-        super.tearDown();
-    }
-
     /**
-     * Given a URL to post a GET request, this method compares the actual status
-     * code of the response with an expected status code.
+     * Given a URL to post a GET request, this method compares the actual status code of the response with an expected
+     * status code.
      * 
-     * @param msg Error message that should be displayed if the actual response
-     *            does not match the expected response
+     * @param msg Error message that should be displayed if the actual response does not match the expected response
      * @param url URL to be used to execute the GET request
      * @param statusCode expected status code of response
      * @throws Exception
@@ -92,11 +65,12 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
     }
 
     protected String getHost() throws Exception {
-        return servletConfig.getBaseUrl().getHost();
+        return getTestServletConfig().getBaseUrl().getHost();
     }
 
     /**
      * Clear cookies from httpclient cookie store
+     * 
      * @throws Exception
      */
     protected void clearCookies() throws Exception {
@@ -105,7 +79,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
 
     /**
      * Adds cookie with name and value
-     *
+     * 
      * @param name cookie name
      * @param value cookie value
      * @throws Exception
@@ -117,6 +91,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
 
     /**
      * Adds cookie to httpclient cookie store
+     * 
      * @param domain cookie domain
      * @param name cookie name
      * @param value cookie value
@@ -130,6 +105,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
 
     /**
      * Adds cookie to httpclient cookie store
+     * 
      * @param cookie cookie
      * @throws Exception
      */
@@ -139,6 +115,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
 
     /**
      * Creates HttpContext with httpclient cookie store. Allows cookies to be part of specific request method.
+     * 
      * @return http context
      * @throws Exception
      */
@@ -151,6 +128,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
 
     /**
      * Checks there is no cookie in httpclient cookie store
+     * 
      * @param domain cookie domain
      * @param name cookie name
      * @param path cookie path
@@ -167,6 +145,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
 
     /**
      * Checks for cookie
+     * 
      * @param domain cookie domain
      * @param name cookie name
      * @param value cookie value
@@ -175,7 +154,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
      */
     protected void assertCookie(String domain, String name, String path, String value) throws Exception {
         Cookie expected = makeCookie(domain, name, value, path);
-        for (Cookie cookie :getCookies()) {
+        for (Cookie cookie : getCookies()) {
             if (expected.equals(cookie)) {
                 assertEquals("Wrong cookie value!", expected.getValue(), cookie.getValue());
                 return;
@@ -186,6 +165,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
 
     /**
      * Creates cookie with only provided name and value
+     * 
      * @param name cookie name
      * @param value cookie value
      * @return
@@ -197,6 +177,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
 
     /**
      * Creates cookie
+     * 
      * @param domain cookie domain
      * @param name cookie name
      * @param value cookie value
@@ -212,6 +193,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
 
     /**
      * Gets all cookies in httpclient cookie store
+     * 
      * @return cookies
      * @throws Exception
      */
@@ -221,6 +203,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
 
     /**
      * Gets httpclient cookie store
+     * 
      * @return cookie store
      * @throws Exception
      */
@@ -235,15 +218,14 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
         ContextService contextService = Aura.getContextService();
         String ctxtString;
         AuraContext ctxt = contextService.startContext(Mode.DEV, format, Access.AUTHENTICATED,
-                                    Aura.getDefinitionService().getDefDescriptor("auratest:test_SimpleServerRenderedPage",
-                                                                                 ApplicationDef.class));
+                Aura.getDefinitionService().getDefDescriptor("auratest:test_SimpleServerRenderedPage",
+                        ApplicationDef.class));
         ctxt.addPreload("preloadTest");
         ctxt.setFrameworkUID(Aura.getConfigAdapter().getAuraFrameworkNonce());
         ctxtString = getSerializedAuraContextWithModifiedUID(ctxt, modified);
         contextService.endContext();
         return ctxtString;
     }
-
 
     protected String getSerializedAuraContext(AuraContext ctx) throws Exception {
         StringBuilder sb = new StringBuilder();

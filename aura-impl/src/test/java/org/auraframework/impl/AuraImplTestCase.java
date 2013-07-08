@@ -24,7 +24,6 @@ import javax.xml.stream.XMLStreamWriter;
 import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.Definition;
 import org.auraframework.def.ModelDef;
 import org.auraframework.impl.java.model.JavaModelDef;
 import org.auraframework.impl.test.util.AuraImplUnitTestingUtil;
@@ -34,20 +33,18 @@ import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.system.Source;
 import org.auraframework.test.AuraTestCase;
 import org.auraframework.util.json.JsonSerializationContext;
 
 /**
- * Base class for Aura unit tests that establishes a AuraTestContext that looks
- * up components in the aura-test/components/ directory.
+ * Base class for Aura unit tests that establishes a AuraTestContext that looks up components in the
+ * aura-test/components/ directory.
  */
 
 public abstract class AuraImplTestCase extends AuraTestCase {
     private final XMLOutputFactory xmlOutputFactory = XMLOutputFactory.newInstance();
 
     protected final AuraImplUnitTestingUtil vendor = new AuraImplUnitTestingUtil();
-    protected final AuraTestingUtilImpl auraTestingUtil;
     protected final DefinitionService definitionService = Aura.getDefinitionService();
     private boolean shouldSetupContext = true;
 
@@ -61,38 +58,14 @@ public abstract class AuraImplTestCase extends AuraTestCase {
     public AuraImplTestCase(String name, boolean setupContext) {
         super(name);
         shouldSetupContext = setupContext;
-        auraTestingUtil = new AuraTestingUtilImpl();
     }
 
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        auraTestingUtil.setUp();
         if (shouldSetupContext) {
             Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Access.AUTHENTICATED);
         }
-    }
-
-    @Override
-    public void tearDown() throws Exception {
-        auraTestingUtil.tearDown();
-        if (shouldSetupContext) {
-            Aura.getContextService().endContext();
-        }
-        super.tearDown();
-    }
-
-    protected <T extends Definition> DefDescriptor<T> addSourceAutoCleanup(Class<T> defClass, String contents,
-            String namePrefix) {
-        return auraTestingUtil.addSourceAutoCleanup(defClass, contents, namePrefix);
-    }
-
-    protected <T extends Definition> DefDescriptor<T> addSourceAutoCleanup(Class<T> defClass, String contents) {
-        return auraTestingUtil.addSourceAutoCleanup(defClass, contents);
-    }
-
-    protected <T extends Definition> Source<T> getSource(DefDescriptor<T> descriptor) {
-        return auraTestingUtil.getSource(descriptor);
     }
 
     protected FakeRegistry createFakeRegistry() {
@@ -109,11 +82,9 @@ public abstract class AuraImplTestCase extends AuraTestCase {
     }
 
     /**
-     * Convenience method to create an instance of a JavaModel given the
-     * qualified name.
+     * Convenience method to create an instance of a JavaModel given the qualified name.
      * 
-     * @param qualifiedName For example:
-     *            java://org.auraframework.impl.java.model.TestModel
+     * @param qualifiedName For example: java://org.auraframework.impl.java.model.TestModel
      * @return
      * @throws Exception
      */

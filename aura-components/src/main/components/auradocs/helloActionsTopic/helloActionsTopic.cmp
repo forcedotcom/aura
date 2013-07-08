@@ -19,17 +19,13 @@
 
     <aura:set attribute="title" value="Client-Side Controllers"/>
 
-    <p>A client-side controller is a JavaScript file containing all the component's actions, which are used to handle events within the component.</p>
-
-    <p>The syntax of a client-side controller file is just a simple JavaScript object that defines action functions. Each action function takes in two parameters: the component to which the controller belongs, and the event that the action is handling.</p>
-
-    <p>The contents of an action can be any valid JavaScript.  There's nothing stopping you from writing <code>alert()</code> statements here except the ridicule of your peers.  However, it's typically more useful to actually update the UI.</p>
+    <p>A client-side controller is used to handle events within a component. It is a JavaScript file that defines the action functions for all of the component's actions. Each action function takes in two parameters: the component to which the controller belongs and the event that the action is handling.</p>
 
     <h2>Creating a Client-Side Controller </h2>
 
-    <p>A client-side controller file is part of the component bundle and is auto-wired if you follow the naming convention, <code>&lt;componentName&gt;Controller.js</code>.</p>
+    <p>A client-side controller file is part of the component bundle. It is auto-wired if you follow the naming convention, <code>&lt;componentName&gt;Controller.js</code>.</p>
 
-    <p>To reuse a client-side controller from another component, you can use the <code>controller</code> system attribute in <code>aura:component</code> instead. For example, this component uses the auto-wired client-side controller for <code>auradocs.sampleComponent</code> in <code>auradocs/sampleComponent/sampleComponentController.js</code>.</p>
+    <p>Alternatively, to reuse a client-side controller from another component, use the <code>controller</code> system attribute in <code>aura:component</code> instead. For example, this component uses the auto-wired client-side controller for <code>auradocs.sampleComponent</code> in <code>auradocs/sampleComponent/sampleComponentController.js</code>.</p>
 
 <auradocs:codeblock><![CDATA[
 <aura:component
@@ -65,7 +61,7 @@
     <auradocs:info>For more information on Aura's JavaScript API, see JavaScript API in the <auradocs:navLink location="reference">Reference tab</auradocs:navLink>.</auradocs:info>
 
     <h3>Invoking Another Action in the Controller</h3>
-    <p>To call an action method from another method, get a reference to the other action.</p>
+    <p>To call an action method from another method, get a reference to the other action. Then, use <code>$A.enqueueAction(a)</code> to add the action to the queue of actions to be executed. Client-side actions are not executed immediately. They are queued and run later, similar to how server-side actions are executed. You don’t get the return result immediately; the client action is enqueued and its return values are available in the callback. Previously, client-side actions were immediate. That old behavior is available temporarily, for migration purposes, by using the <code>action.runDeprecated()</code> method.</p>
     <auradocs:codeblock>
     runIt : function(cmp) {
         var a = cmp.get("c.otherFunction");
@@ -73,11 +69,15 @@
         $A.enqueueAction(a);
     }
     </auradocs:codeblock>
-     <p>You can also move the common call to a helper file. See <auradocs:topicLink topic="helper">Helpers</auradocs:topicLink> for more information.</p>
+    <p>You can also move the common call to a helper file. See <auradocs:topicLink topic="helper">Helpers</auradocs:topicLink> for more information.</p>
+    
+    <h2>Background Actions</h2>
+    <p>To mark a long running, lower priority client-side action as a background action, get an instance of that action object in JavaScript and call the <code>setBackground()</code> method. Client-side actions don’t need to make a server round trip so they are usually completed very quickly and setting them to background will not have much of an impact on performance. When the client-side actions in the queue are executed, the foreground actions are executed first and then the background actions are executed.</p>
 
     <p><b>See also:</b><br/>
     <auradocs:topicLink topic="eventsOverview">Event Handling Lifecycle</auradocs:topicLink><br/>
-    <auradocs:topicLink topic="initHandler">Invoking Actions on Component Initialization</auradocs:topicLink>
+    <auradocs:topicLink topic="initHandler">Invoking Actions on Component Initialization</auradocs:topicLink><br/>
+    <auradocs:topicLink topic="serverSideControllers">Server-Side Controllers</auradocs:topicLink>
     </p>
 
 </aura:component>

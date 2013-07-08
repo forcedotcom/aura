@@ -15,6 +15,6 @@
     limitations under the License.
 
 -->
-<aura:event type="COMPONENT" description="Indicate that an element or component gains focus.">
-    <aura:attribute name="id" type="String" description="The id of the active element/component id."/>
-</aura:event>
+<aura:component extends="ui:outputDate">
+	<aura:set attribute="value" value="2004-09-23"/>		
+</aura:component>

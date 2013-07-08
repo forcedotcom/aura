@@ -20,7 +20,9 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Scanner;
+import java.util.concurrent.Callable;
 
 import javax.annotation.concurrent.GuardedBy;
 
@@ -40,9 +42,9 @@ import com.google.common.collect.Maps;
  * @since 0.0.178
  */
 public class PooledRemoteWebDriverFactory extends RemoteWebDriverFactory {
-    private final Map<DesiredCapabilities, List<PooledRemoteWebDriver>> pools = Maps.newHashMap();
+    private final Map<DesiredCapabilities, Queue<PooledRemoteWebDriver>> pools = Maps.newConcurrentMap();
 
-    public PooledRemoteWebDriverFactory(URL serverUrl) throws Exception {
+    public PooledRemoteWebDriverFactory(URL serverUrl) {
         super(serverUrl);
     }
 
@@ -92,6 +94,7 @@ public class PooledRemoteWebDriverFactory extends RemoteWebDriverFactory {
 
         @Override
         public void close() {
+            // don't close the final window; otherwise, we can't reuse it
             if (getWindowHandles().size() > 1) {
                 super.close();
             }
@@ -111,7 +114,7 @@ public class PooledRemoteWebDriverFactory extends RemoteWebDriverFactory {
         @Override
         public void quit() {
             dismissAlerts();
-            // close all windows except one
+            // close up to 10 windows, except the final window
             for (int i = 0; (getWindowHandles().size() > 1) && (i < 10); i--) {
                 super.close();
                 dismissAlerts();
@@ -126,28 +129,20 @@ public class PooledRemoteWebDriverFactory extends RemoteWebDriverFactory {
             }
         }
 
-        public void reallyQuit() {
+        private void superQuit() {
             super.quit();
-            synchronized (PooledRemoteWebDriverFactory.this) {
-                pool.remove(this);
-            }
         }
     }
 
     @Override
-    public synchronized WebDriver get(DesiredCapabilities capabilities) {
-        if (pools == null) {
-            return new RemoteWebDriver(serverUrl, capabilities);
-        }
-
+    public synchronized WebDriver get(final DesiredCapabilities capabilities) {
+        // default to use a pooled instance unless the test explicitly requests a brand new instance
         Object reuseBrowser = capabilities.getCapability(WebDriverProvider.REUSE_BROWSER_PROPERTY);
-        // default to use a pooled instance unless the test explicitly requests
-        // a brand new instance
         if ((reuseBrowser != null) && (reuseBrowser.equals(false))) {
-            return new RemoteWebDriver(serverUrl, capabilities);
+            return super.get(capabilities);
         }
 
-        List<PooledRemoteWebDriver> pool = pools.get(capabilities);
+        Queue<PooledRemoteWebDriver> pool = pools.get(capabilities);
 
         if (pool == null) {
             pool = new LinkedList<PooledRemoteWebDriver>();
@@ -155,17 +150,25 @@ public class PooledRemoteWebDriverFactory extends RemoteWebDriverFactory {
         }
 
         if (pool.size() > 0) {
-            return pool.remove(0);
+            return pool.poll();
         } else {
-            return new PooledRemoteWebDriver(pool, serverUrl, capabilities);
+            final Queue<PooledRemoteWebDriver> thisPool = pool;
+            return retry(new Callable<WebDriver>() {
+                @Override
+                public WebDriver call() throws Exception {
+                    return new PooledRemoteWebDriver(thisPool, serverUrl, capabilities);
+                }
+            }, MAX_GET_RETRIES, "Failed to get a new PooledRemoteWebDriver");
         }
     }
 
     @Override
     public synchronized void release() {
-        for (List<PooledRemoteWebDriver> pool : pools.values()) {
-            for (PooledRemoteWebDriver driver : pool) {
-                driver.reallyQuit();
+        for (Queue<PooledRemoteWebDriver> pool : pools.values()) {
+            PooledRemoteWebDriver driver = pool.poll();
+            while (driver != null) {
+                driver.superQuit();
+                driver = pool.poll();
             }
         }
     }

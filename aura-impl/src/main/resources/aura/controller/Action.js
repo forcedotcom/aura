@@ -39,6 +39,7 @@ var Action = function Action(def, method, paramDefs, background, cmp) {
     this.background = background;
     this.cmp = cmp;
     this.params = {};
+    this.responseState = null;
     this.state = "NEW";
     this.callbacks = {};
     this.events = [];
@@ -47,6 +48,7 @@ var Action = function Action(def, method, paramDefs, background, cmp) {
     this.actionId = Action.prototype.nextActionId++;
     this.id = undefined;
     this.originalResponse = undefined;
+    this.storable = false;
 };
 
 Action.prototype.nextActionId = 1;
@@ -212,10 +214,11 @@ Action.prototype.wrapCallback = function(scope, callback) {
 };
 
 /**
- * Deprecated. Runs client-side Actions, use <code>$A.enqueueAction(action)</code> (which is asynchronous) instead.
+ * Deprecated. Use <code>$A.enqueueAction(action)</code> (which is asynchronous) instead.
  *
  * If you must have inline execution, you can temporarily use runDeprecated.
  *
+ * @deprecated
  * @param {Event}
  *            evt The event that calls the Action.
  */
@@ -224,17 +227,18 @@ Action.prototype.run = function(evt) {
 };
 
 /**
- * Run an action immediately.
+ * Deprecated. Run an action immediately.
  *
  * This function should only be used for old code that requires inline execution of actions.
  * Note that the code then must know if the action is client side or server side, since server side
  * actions cannot be executed inline.
  *
+ * @deprecated
  * @param {Event}
  *            evt The event that calls the Action.
  */
 Action.prototype.runDeprecated = function(evt) {
-    $A.assert(this.def.isClientAction(), "Run() cannot be called on a server action. Use $A.enqueueAction() on a server action instead.");
+    $A.assert(this.def.isClientAction(), "run() cannot be called on a server action. Use $A.enqueueAction() on a server action instead.");
     this.state = "RUNNING";
     var finished = false;
     try {
@@ -296,11 +300,9 @@ Action.prototype.setBackground = function() {
 };
 
 /**
- * Adds the server-side action to the queue. For server-side Actions only.
- * For client-side Action, use <code>run()</code>
- * instead.
- * <p>For example,  <code>$A.enqueueAction(serverAction);</code> runs serverAction after a callback.</p>
+ * Deprecated. Use the asynchronous <code>$A.enqueueAction(serverAction)</code> call instead.
  *
+ * @deprecated
  * @param {Action}
  *            action The action to run after the function.
  */
@@ -319,6 +321,7 @@ Action.prototype.runAfter = function(action) {
 Action.prototype.updateFromResponse = function(response) {
     this.sanitizeStoredResponse(response);
     this.state = response["state"];
+    this.responseState = response["state"];
     this.returnValue = response["returnValue"];
     this.error = response["error"];
     this.storage = response["storage"];
@@ -375,7 +378,7 @@ Action.prototype.updateFromResponse = function(response) {
  * @param {String} storageName the name of the storage to use.
  */
 Action.prototype.getStored = function(storageName) {
-    if (this.storable && this.getState() === "SUCCESS") {
+    if (this.storable && this.responseState === "SUCCESS") {
         // Rewrite any embedded ComponentDef from object to descriptor only
         for ( var globalId in this.components) {
             var c = this.components[globalId];
@@ -502,8 +505,10 @@ Action.prototype.setStorable = function(config) {
     this.storable = true;
     this.storableConfig = config;
 
-    // Storable actions must also be abortable (idempotent, replayable and
-    // non-mutating)
+    //
+    // Storable actions must also be abortable (idempotent, replayable and non-mutating)
+    // Careful with this, as it will cause side effects if there are other abortable actions
+    //
     this.setAbortable();
 };
 

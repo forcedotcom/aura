@@ -217,7 +217,6 @@ public class StringSourceLoader implements SourceLoader {
 
         // notify source listeners of change
         Aura.getDefinitionService().onSourceChanged(descriptor, SourceMonitorEvent.deleted);
-
     }
 
     /**

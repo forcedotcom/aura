@@ -62,7 +62,7 @@ public class JavascriptModelDefTest extends AuraImplTestCase {
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class, "<aura:component/>");
         DefDescriptor<ModelDef> modelDesc = DefDescriptorImpl.getAssociateDescriptor(cmpDesc, ModelDef.class,
                 DefDescriptor.JAVASCRIPT_PREFIX);
-        auraTestingUtil.addSourceAutoCleanup(modelDesc, "{\"badType\":function(){}}");
+        addSourceAutoCleanup(modelDesc, "{\"badType\":function(){}}");
         try {
             cmpDesc.getDef();
             fail("Bad value in javascript model should throw Exception");
@@ -80,7 +80,7 @@ public class JavascriptModelDefTest extends AuraImplTestCase {
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class, "<aura:component/>");
         DefDescriptor<ModelDef> modelDesc = DefDescriptorImpl.getAssociateDescriptor(cmpDesc, ModelDef.class,
                 DefDescriptor.JAVASCRIPT_PREFIX);
-        auraTestingUtil.addSourceAutoCleanup(modelDesc, "{\"nullType\":null}");
+        addSourceAutoCleanup(modelDesc, "{\"nullType\":null}");
         try {
             cmpDesc.getDef();
             fail("Null value in javascript model should throw Exception");

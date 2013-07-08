@@ -19,9 +19,11 @@
 
   <aura:set attribute="title" value="Server-Side Controllers"/>
 
-  <p>You can use client-side and server-side controllers in Aura. An event is always wired to a client-side controller action, which can in turn call a server-side controller action. For example, a client-side controller might handle an event and call a server-side controller action to persist data to a database.</p>
+  <p>You can use client-side and server-side controllers in Aura. An event is always wired to a client-side controller action, which can in turn call a server-side controller action. For example, a client-side controller might handle an event and call a server-side controller action to persist data to a database. For an in-depth example of a server-side controller that interacts with a database, see the <code>NoteViewController</code> class in the Aura Note sample app.</p>
 
-  <p>You can create a server-side controller in Java. All methods on server-side controllers must be static since Aura doesn’t create a controller instance per component instance. Instead, all instances of a given component share one static controller. This means that any state stored on the controller is shared across all instances of a component definition. This is unlikely to be what you want.</p>
+  <p>Server-side actions need to make a round trip, from the client to the server and back again, so they are usually completed more slowly than client-side actions. Use <code>$A.enqueueAction(action)</code> to add client-side or server-side controller actions to the queue of actions to be executed. All actions that are enqueued this way will be run at the end of the event loop. The actions are asynchronous and have callbacks. The <code>run</code> and <code>runAfter</code> methods are deprecated.</p>
+
+  <p>You can create a server-side controller in Java. All methods on server-side controllers must be static because Aura doesn’t create a controller instance per component instance. Instead, all instances of a given component share one static controller. This means that any state stored on the controller is shared across all instances of a component definition. This is unlikely to be what you want.</p>
 
   <p>In contrast, one model instance is created for each component instance. This means that models are the appropriate place to store state that is specific to one instance of a component.</p>
 
@@ -32,6 +34,8 @@
   <p>The <code>press</code> attribute wires the button to the <code>handlePress</code> action of the client-side controller by using <code>c.handlePress</code>. The client-side action name must match everything after the <code>c.</code></p>
 
   <p>In the client-side controller, we again use the value provider of <code>c</code> to invoke a server-side controller action. The <code>cmp.get("c.doSomething")</code> call indicates that we are calling the <code>doSomething</code> method in the server-side controller. The method name in the server-side controller must match everything after the <code>c.</code> in the client-side call.</p>
+  
+  <p>The action queue contains both client-side and server-side actions.</p> 
 
   <h2>Calling a Server-Side Action</h2>
 
@@ -73,7 +77,9 @@
     }
 }
 </auradocs:codeblock>
-   
+
+  <p>To create a single callback that tells you if an entire group of actions has completed, use the <code>actionGroupCallback</code> method.</p>
+
     <h2>Wiring Up a Server-Side Controller</h2>
     
     <p>The component must include a controller attribute that wires it to the server-side Java controller. For example:</p>
@@ -102,7 +108,7 @@
 
   <h3>Java Annotations</h3>
 
-  <p>These annotations are available in server-side controllers.</p>
+  <p>These Java annotations are available in server-side controllers.</p>
 
   <table class="table table-bordered table-striped">
     <thead>
@@ -129,18 +135,27 @@
         <p>The <code>@Key</code> annotation means that you don’t have to create an overloaded version of the method if you want to call it with different numbers of arguments. Aura simply passes in <code>null</code> for any unspecified arguments.</p>
         </td>
       </tr>
+      <tr>
+        <td><code>@BackgroundAction</code></td>
+        <td>Marks the action as a background action.</td>
+      </tr>
     </tbody>
   </table>
 
-  <h2>Learn More</h2>
+  <h2>Background Actions</h2>
+  
+  <p>An action can be marked as a background action. This can improve performance when using low priority, long-running actions such as those that access another web service. Each background action is sent in its own request so each request is responded to immediately after that particular action is finished. When the server-side actions in the queue are executed, the foreground actions are executed first and then the background actions are executed. Aura throttles foreground and background actions separately. This means that the number of long-running background server-side actions running at a time can be controlled and they will not slow down quicker actions like page updates. Note that throttling is done automatically, it is not user controlled. </p>
 
-  <p>For a more in-depth example of a server-side controller that interacts with a database, see the <a href="https://github.com/forcedotcom/aura-note/blob/master/src/main/java/org/auraframework/demo/notes/controllers/NoteViewController.java" target="_new">NoteViewController class</a> in the Aura Note sample app. (Log in to GitHub if you get a 404 error.)</p>
+  <p>To set an action as a background action, get an instance of that action object in JavaScript and call the <code>setBackground()</code> method. Alternatively, <code>$A.enqueueAction()</code> has a parameter that can be used to set an action to be a background action. If that parameter is supplied and it is true, the action will be set as background when it is enqueued and you don’t need to also call the <code>setBackground()</code> method on the action. To mark a server-side action as a background action in Java, use the <code>@BackgroundAction</code> annotation at the method level on the controller. When an action is instantiated from an <code>actiondef</code>, the action’s <code>isBackground</code> property is set to true automatically.</p>
+
+  <p>When <code>isBackground</code> is set to true for an action, the action can not be set back to a foreground action. In other words, calling <code>setBackground</code> to set it to false will have no effect.</p>
 
   <p><b>See also:</b><br/>
       <auradocs:topicLink topic="models">Models</auradocs:topicLink><br/>
       <auradocs:topicLink topic="abortableActions">Abortable Actions</auradocs:topicLink><br/>
       <auradocs:topicLink topic="storableServerSideActions">Storable Server-Side Actions</auradocs:topicLink><br/>
-      <auradocs:topicLink topic="testsMockAction">Mocking Java Actions</auradocs:topicLink>
+      <auradocs:topicLink topic="testsMockAction">Mocking Java Actions</auradocs:topicLink><br/>
+      <auradocs:topicLink topic="helloActions">Client-Side Actions</auradocs:topicLink>
     </p>
 
 </aura:component>

@@ -87,6 +87,8 @@ exp(p,
     "getExternalAction", p.getExternalAction,
     "blockRequests", p.blockRequests,
     "releaseRequests", p.releaseRequests,
+    "enqueueAction", p.enqueueAction,
+    "runActionsAsTransaction", p.runActionsAsTransaction,
 
     // events
     "addEventHandler", p.addEventHandler,

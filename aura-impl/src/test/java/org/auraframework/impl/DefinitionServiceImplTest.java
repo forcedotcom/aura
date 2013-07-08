@@ -29,7 +29,6 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.TypeDef;
 import org.auraframework.impl.context.AuraRegistryProviderImpl;
-import org.auraframework.impl.source.StringSourceLoader;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.DefFactoryImpl;
 import org.auraframework.impl.system.DefinitionImpl;
@@ -40,7 +39,6 @@ import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.DefRegistry;
 import org.auraframework.system.SourceLoader;
-import org.auraframework.test.annotation.ThreadHostileTest;
 import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
@@ -48,12 +46,10 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
 /**
- * Tests for DefinitionServiceImpl. ThreadHostile due to testGetLastMod ThreadHostile at least since
- * {@link #testFindRegex()} requires exclusive control of the {@link StringSourceLoader}.
+ * Tests for DefinitionServiceImpl.
  * 
  * @see org.auraframework.impl.registry.RootDefFactoryTest
  */
-@ThreadHostileTest
 public class DefinitionServiceImplTest extends AuraImplTestCase {
     public DefinitionServiceImplTest(String name) {
         super(name, false);
@@ -288,7 +284,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
 
         String baseContents = "<aura:application></aura:application>";
 
-        String nonce = auraTestingUtil.getNonce();
+        String nonce = getAuraTestingUtil().getNonce();
         DefDescriptor<ApplicationDef> houseboat = addSourceAutoCleanup(ApplicationDef.class, baseContents,
                 String.format("house%sboat", nonce));
         addSourceAutoCleanup(ApplicationDef.class, baseContents, String.format("house%sparty", nonce));

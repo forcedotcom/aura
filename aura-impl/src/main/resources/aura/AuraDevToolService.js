@@ -650,6 +650,11 @@ var AuraDevToolService = function() {
             for(var funcNames in functions){
         	result = result + functions[funcNames]();
             }
+            
+            if(aura.devToolService.accessbilityAide.errorCount === 0){
+        	return "";
+            }
+            
             return "Total Number of Errors found: "+aura.devToolService.accessbilityAide.errorCount+result;
         },
         help : function(){

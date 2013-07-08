@@ -24,6 +24,7 @@ import org.auraframework.adapter.MockConfigAdapter;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.Definition;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.LoggingService;
 import org.auraframework.system.AuraContext;
@@ -35,12 +36,13 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 /**
  * Base class for unit tests referencing the Aura framework.
  * 
- * 
  * @since 0.0.178
  */
 public abstract class AuraTestCase extends UnitTestCase {
     protected final static String baseApplicationTag = "<aura:application %s>%s</aura:application>";
     protected final static String baseComponentTag = "<aura:component %s>%s</aura:component>";
+
+    private AuraTestingUtil auraTestingUtil;
 
     public AuraTestCase(String name) {
         super(name);
@@ -74,6 +76,9 @@ public abstract class AuraTestCase extends UnitTestCase {
         if (testContextAdapter != null) {
             testContextAdapter.release();
         }
+        if (auraTestingUtil != null) {
+            auraTestingUtil.tearDown();
+        }
         super.tearDown();
     }
 
@@ -91,6 +96,23 @@ public abstract class AuraTestCase extends UnitTestCase {
 
     public String getQualifiedName() {
         return getClass().getCanonicalName() + "." + getName();
+    }
+
+    protected <T extends Definition> DefDescriptor<T> addSourceAutoCleanup(Class<T> defClass, String contents,
+            String namePrefix) {
+        return getAuraTestingUtil().addSourceAutoCleanup(defClass, contents, namePrefix);
+    }
+
+    protected <T extends Definition> DefDescriptor<T> addSourceAutoCleanup(Class<T> defClass, String contents) {
+        return getAuraTestingUtil().addSourceAutoCleanup(defClass, contents);
+    }
+
+    protected <T extends Definition> DefDescriptor<T> addSourceAutoCleanup(DefDescriptor<T> descriptor, String contents) {
+        return getAuraTestingUtil().addSourceAutoCleanup(descriptor, contents);
+    }
+
+    protected <T extends Definition> Source<T> getSource(DefDescriptor<T> descriptor) {
+        return getAuraTestingUtil().getSource(descriptor);
     }
 
     /**
@@ -186,6 +208,22 @@ public abstract class AuraTestCase extends UnitTestCase {
         assertTrue("Unexpected message: " + e.getMessage() + "!=" + message, e.getMessage().startsWith(message));
     }
 
+    protected AuraTestingUtil getAuraTestingUtil() {
+        if (auraTestingUtil == null) {
+            auraTestingUtil = new AuraTestingUtil();
+        }
+        return auraTestingUtil;
+    }
+
+    protected DefDescriptor<ControllerDef> getClientController(BaseComponentDef def) throws Exception {
+        for (DefDescriptor<ControllerDef> cd : def.getControllerDefDescriptors()) {
+            if ("js".equals(cd.getPrefix())) {
+                return cd;
+            }
+        }
+        return null;
+    }
+
     /**
      * Check to ensure that an exception message starts with a given message, ignore location.
      */
@@ -210,14 +248,4 @@ public abstract class AuraTestCase extends UnitTestCase {
             assertLocation(e, filePath);
         }
     }
-
-    protected DefDescriptor<ControllerDef> getClientController(BaseComponentDef def) throws Exception {
-        for (DefDescriptor<ControllerDef> cd : def.getControllerDefDescriptors()) {
-            if ("js".equals(cd.getPrefix())) {
-                return cd;
-            }
-        }
-        return null;
-    }
-
 }

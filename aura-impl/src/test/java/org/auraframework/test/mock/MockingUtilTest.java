@@ -76,7 +76,7 @@ public class MockingUtilTest extends WebDriverTestCase {
         }
         DefDescriptor<ModelDef> modelDefDescriptor = Aura.getDefinitionService()
                 .getDefDescriptor("java://org.auraframework.impl.java.model.TestJavaModel", ModelDef.class);
-        DefDescriptor<ApplicationDef> appDescriptor = auraTestingUtil.addSourceAutoCleanup(ApplicationDef.class,
+        DefDescriptor<ApplicationDef> appDescriptor = addSourceAutoCleanup(ApplicationDef.class,
                 String.format(baseApplicationTag, String.format("model='%s'", modelDefDescriptor.getQualifiedName()),
                         "{!m.string}<aura:iteration items='{!m.stringList}' var='i'>{!i}</aura:iteration>"));
         // sanity without mocks
@@ -90,7 +90,7 @@ public class MockingUtilTest extends WebDriverTestCase {
         }
         DefDescriptor<ModelDef> modelDefDescriptor = Aura.getDefinitionService().getDefDescriptor(
                 "java://org.auraframework.impl.java.model.TestJavaModel", ModelDef.class);
-        DefDescriptor<ApplicationDef> appDescriptor = auraTestingUtil.addSourceAutoCleanup(
+        DefDescriptor<ApplicationDef> appDescriptor = addSourceAutoCleanup(
                 ApplicationDef.class,
                 String.format(baseApplicationTag, String.format("model='%s'", modelDefDescriptor.getQualifiedName()),
                         "{!m.string}<aura:iteration items='{!m.stringList}' var='i'>{!i}</aura:iteration>"));
@@ -106,7 +106,7 @@ public class MockingUtilTest extends WebDriverTestCase {
         }
         DefDescriptor<ModelDef> modelDefDescriptor = Aura.getDefinitionService().getDefDescriptor(
                 "java://org.auraframework.impl.java.model.TestJavaModel", ModelDef.class);
-        DefDescriptor<ApplicationDef> appDescriptor = auraTestingUtil.addSourceAutoCleanup(
+        DefDescriptor<ApplicationDef> appDescriptor = addSourceAutoCleanup(
                 ApplicationDef.class,
                 String.format(baseApplicationTag, String.format("model='%s'", modelDefDescriptor.getQualifiedName()),
                         "{!m.string}<aura:iteration items='{!m.stringList}' var='i'>{!i}</aura:iteration>"));
@@ -125,7 +125,7 @@ public class MockingUtilTest extends WebDriverTestCase {
         }
         DefDescriptor<ModelDef> modelDefDescriptor = Aura.getDefinitionService().getDefDescriptor(
                 "java://org.auraframework.impl.java.model.TestJavaModel", ModelDef.class);
-        DefDescriptor<ApplicationDef> appDescriptor = auraTestingUtil.addSourceAutoCleanup(
+        DefDescriptor<ApplicationDef> appDescriptor = addSourceAutoCleanup(
                 ApplicationDef.class,
                 String.format(baseApplicationTag, String.format("model='%s'", modelDefDescriptor.getQualifiedName()),
                         "{!m.string}<aura:iteration items='{!m.stringList}' var='i'>{!i}</aura:iteration>"));
@@ -146,7 +146,7 @@ public class MockingUtilTest extends WebDriverTestCase {
         open(appDescriptor);
         assertEquals("age", getText(By.cssSelector("body")));
         // get url with nonce
-        String newurl = getUrl(appDescriptor) + "?randomnum=" + auraTestingUtil.getNonce();
+        String newurl = getUrl(appDescriptor) + "?randomnum=" + getAuraTestingUtil().getNonce();
         open(newurl);
         assertEquals("beauty", getText(By.cssSelector("body")));
         try {
@@ -161,7 +161,7 @@ public class MockingUtilTest extends WebDriverTestCase {
     public void testMockServerProvider() throws Exception {
         DefDescriptor<ProviderDef> providerDefDescriptor = Aura.getDefinitionService().getDefDescriptor(
                 "java://org.auraframework.impl.java.provider.TestComponentConfigProvider", ProviderDef.class);
-        DefDescriptor<ComponentDef> cmpDefDescriptor = auraTestingUtil.addSourceAutoCleanup(ComponentDef.class, String
+        DefDescriptor<ComponentDef> cmpDefDescriptor = addSourceAutoCleanup(ComponentDef.class, String
                 .format(baseComponentTag, String.format("provider='%s'", providerDefDescriptor.getQualifiedName()),
                         "<aura:attribute name='echo' type='String'/>{!v.echo}"));
         String url = String.format("/%s/%s.cmp", cmpDefDescriptor.getNamespace(), cmpDefDescriptor.getName());
@@ -193,7 +193,7 @@ public class MockingUtilTest extends WebDriverTestCase {
         }
         DefDescriptor<ControllerDef> controllerDefDescriptor = Aura.getDefinitionService().getDefDescriptor(
                 String.format("java://%s", this.getClass().getCanonicalName()), ControllerDef.class);
-        DefDescriptor<ComponentDef> cmpDefDescriptor = auraTestingUtil.addSourceAutoCleanup(
+        DefDescriptor<ComponentDef> cmpDefDescriptor = addSourceAutoCleanup(
                 ComponentDef.class,
                 String.format(baseComponentTag,
                         String.format("controller='%s'", controllerDefDescriptor.getQualifiedName()),
@@ -201,7 +201,7 @@ public class MockingUtilTest extends WebDriverTestCase {
         DefDescriptor<ControllerDef> clientControllerDefDescriptor = Aura.getDefinitionService().getDefDescriptor(
                 String.format("js://%s.%s", cmpDefDescriptor.getNamespace(), cmpDefDescriptor.getName()),
                 ControllerDef.class);
-        auraTestingUtil.addSourceAutoCleanup(clientControllerDefDescriptor, "{clicked:function(component){"
+        addSourceAutoCleanup(clientControllerDefDescriptor, "{clicked:function(component){"
                 + "var a = component.get('c.lookInside');a.setCallback(component,"
                 + "function(action){component.find('result').getElement().innerHTML=action.getReturnValue();});"
                 + "$A.enqueueAction(a);}}");
@@ -218,13 +218,13 @@ public class MockingUtilTest extends WebDriverTestCase {
         }
         DefDescriptor<ControllerDef> controllerDefDescriptor = Aura.getDefinitionService().getDefDescriptor(
                 String.format("java://%s", this.getClass().getCanonicalName()), ControllerDef.class);
-        DefDescriptor<ComponentDef> cmpDefDescriptor = auraTestingUtil.addSourceAutoCleanup(ComponentDef.class, String
+        DefDescriptor<ComponentDef> cmpDefDescriptor = addSourceAutoCleanup(ComponentDef.class, String
                 .format(baseComponentTag, String.format("controller='%s'", controllerDefDescriptor.getQualifiedName()),
                         "<ui:button press='{!c.clicked}' label='act'/><div class='result' aura:id='result'></div>"));
         DefDescriptor<ControllerDef> clientControllerDefDescriptor = Aura.getDefinitionService().getDefDescriptor(
                 String.format("js://%s.%s", cmpDefDescriptor.getNamespace(), cmpDefDescriptor.getName()),
                 ControllerDef.class);
-        auraTestingUtil.addSourceAutoCleanup(clientControllerDefDescriptor, "{clicked:function(component){"
+        addSourceAutoCleanup(clientControllerDefDescriptor, "{clicked:function(component){"
                 + "var a = component.get('c.lookInside');a.setCallback(component,"
                 + "function(action){component.find('result').getElement().innerHTML=action.getReturnValue();});"
                 + "$A.enqueueAction(a);}}");

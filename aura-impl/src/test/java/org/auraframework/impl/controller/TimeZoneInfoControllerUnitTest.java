@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.component.ui;
+package org.auraframework.impl.controller;
 
 import static org.mockito.Mockito.when;
 
-import org.auraframework.component.ui.TimeZoneInfoController.TimeZoneInfo;
+import org.auraframework.impl.controller.TimeZoneInfoController;
+import org.auraframework.impl.controller.TimeZoneInfoController.TimeZoneInfo;
 import org.auraframework.test.UnitTestCase;
 import org.mockito.Mock;
 

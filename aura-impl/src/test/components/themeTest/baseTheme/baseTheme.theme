@@ -1,4 +1,6 @@
 <aura:theme>
   <aura:attribute name="color" default="red" />
   <aura:attribute name="margin" default="10px" />
+  <aura:attribute name="lineHeight" default="5" type="Integer" />
+  <aura:attribute name="spacious" default="false" type="Boolean" />
 </aura:theme>

@@ -52,9 +52,14 @@ public class ThemeResolutionTest extends AuraImplTestCase {
         gold(get("themeTest.overridden"));
     }
 
-    /** fully qualified where the variable value is unquoted */
+    /** fully qualified where the variable value is double quoted */
     public void testQualifiedDoubleQuoted() throws Exception {
         gold(get("themeTest.doubleQuoted"));
+    }
+
+    /** fully qualified where the variable value is unquoted */
+    public void testQualifiedUnquoted() throws Exception {
+        gold(get("themeTest.unquoted"));
     }
 
     /** using the 't' alternative function name */
@@ -113,6 +118,11 @@ public class ThemeResolutionTest extends AuraImplTestCase {
     /** if the variable value is an empty string then the declaration should be removed */
     public void testDeclarationRemoval() throws Exception {
         gold(get("themeTest.emptyStringValue"));
+    }
+
+    /** test expressions */
+    public void testExpression() throws Exception {
+        gold(get("themeTest.withExpression"));
     }
 
     private DefDescriptor<StyleDef> get(String locator) {

@@ -19,6 +19,7 @@ import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Set;
 import java.util.Stack;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.auraframework.Aura;
@@ -85,6 +86,8 @@ public class CSSParser extends DefaultCSSVisitor {
     private static final String ELSEIF_REPLACEMENT = "@media (" + CONDITIONAL_ELSEIF + ":$1){";
     private static final Pattern ELSE_PATTERN = Pattern.compile("@else[\\s\\{]*");
     private static final String ELSE_REPLACEMENT = "@media (" + CONDITIONAL_ELSE + "){";
+    private static final Pattern THEME_PATTERN = Pattern.compile("(:\\s*(?:t|theme)\\s*)\\(([^\\)]+)\\)");
+    private static final Pattern QUOTED_PATTERN = Pattern.compile("(?:^\"[^\"]*\"$)|(?:^'[^']*'$)");
     private static final Set<String> CUSTOM_FEATURES = ImmutableSet.of(CONDITIONAL_IF, CONDITIONAL_ELSEIF,
             CONDITIONAL_ELSE);
 
@@ -182,9 +185,35 @@ public class CSSParser extends DefaultCSSVisitor {
     }
 
     private String preProcess(String contents) {
+        // replace conditionals
         contents = IF_PATTERN.matcher(contents).replaceAll(IF_REPLACEMENT);
         contents = ELSEIF_PATTERN.matcher(contents).replaceAll(ELSEIF_REPLACEMENT);
         contents = ELSE_PATTERN.matcher(contents).replaceAll(ELSE_REPLACEMENT);
+
+        // wrap the arguments of theme functions in quotes.
+        // this bit of ugly code allows for theme values to be unquoted in the source.
+        final Matcher themeMatcher = THEME_PATTERN.matcher(contents);
+        boolean matched = themeMatcher.find();
+        if (matched) {
+            final Matcher quotedMatcher = QUOTED_PATTERN.matcher("");
+            final StringBuffer newContents = new StringBuffer();
+            final StringBuilder tmp = new StringBuilder(32);
+            do {
+                String arguments = themeMatcher.group(2);
+                if (!quotedMatcher.reset(arguments).matches()) {
+                    tmp.setLength(0);
+                    tmp.append(themeMatcher.group(1)) // append the colon, function name, and whitespace
+                            .append("(\"") // append opening bracket plus quotation mark
+                            .append(themeMatcher.group(2)) // append arguments
+                            .append("\")"); // append closing quote and parenthesis
+                    themeMatcher.appendReplacement(newContents, tmp.toString());
+                }
+                matched = themeMatcher.find();
+            } while (matched);
+            themeMatcher.appendTail(newContents);
+            contents = newContents.toString();
+        }
+
         return contents;
     }
 

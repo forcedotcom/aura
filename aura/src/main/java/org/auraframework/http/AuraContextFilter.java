@@ -55,8 +55,8 @@ import org.auraframework.test.TestContextAdapter;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.JsonReader;
 
-/**
- */
+import com.google.common.collect.Maps;
+
 public class AuraContextFilter implements Filter {
     private static final boolean isProduction = Aura.getConfigAdapter().isProduction();
 
@@ -205,6 +205,7 @@ public class AuraContextFilter implements Filter {
         @SuppressWarnings("unchecked")
         Map<String, String> loaded = (Map<String, String>) loadedEntry;
         DefinitionService definitionService = Aura.getDefinitionService();
+        Map<DefDescriptor<?>,String> clientLoaded = Maps.newHashMap();
 
         for (Map.Entry<String, String> entry : loaded.entrySet()) {
             String uid = entry.getValue();
@@ -226,11 +227,12 @@ public class AuraContextFilter implements Filter {
                         DefDescriptor<?> ld = null;
 
                         ld = definitionService.getDefDescriptor(defStr, type.getPrimaryInterface());
-                        context.addLoaded(ld, uid);
+                        clientLoaded.put(ld, uid);
                     }
                 }
             }
         }
+        context.setClientLoaded(clientLoaded);
     }
 
     @SuppressWarnings("unchecked")

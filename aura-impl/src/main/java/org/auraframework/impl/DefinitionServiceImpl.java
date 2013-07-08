@@ -236,56 +236,51 @@ public class DefinitionServiceImpl implements DefinitionService {
         // to sanitize the list in opposite directions. No need to be
         // exact (hard to test though).
         //
-        try {
-            for (Map.Entry<DefDescriptor<?>, String> entry : entries) {
-                DefDescriptor<?> descriptor = entry.getKey();
-                String uid = entry.getValue();
-                if (uid == null) {
-                    loaded.add(descriptor);
-                } else if (loaded.contains(descriptor)) {
-                    context.dropLoaded(descriptor);
-                } else {
-                    // validate the uid.
-                    String tuid = null;
-                    QuickFixException qfe = null;
+        for (Map.Entry<DefDescriptor<?>, String> entry : entries) {
+            DefDescriptor<?> descriptor = entry.getKey();
+            String uid = entry.getValue();
+            if (uid == null) {
+                loaded.add(descriptor);
+            } else if (loaded.contains(descriptor)) {
+                context.dropLoaded(descriptor);
+            } else {
+                // validate the uid.
+                String tuid = null;
+                QuickFixException qfe = null;
 
-                    try {
-                        tuid = mdr.getUid(uid, descriptor);
-                    } catch (QuickFixException broke) {
-                        //
-                        // See note above. This is how we enforce precedence of ClientOutOfSyncException
-                        //
-                        qfe = broke;
-                    }
-                    if (!uid.equals(tuid)) {
-                        throw new ClientOutOfSyncException(descriptor + ": mismatched UIDs " + uid + " != " + tuid);
-                    }
-                    if (qfe != null) {
-                        throw qfe;
-                    }
-                    if (!descriptor.equals(loading)) {
-                        loaded.addAll(mdr.getDependencies(uid));
-                    }
+                try {
+                    tuid = mdr.getUid(uid, descriptor);
+                } catch (QuickFixException broke) {
+                    //
+                    // See note above. This is how we enforce precedence of ClientOutOfSyncException
+                    //
+                    qfe = broke;
+                }
+                if (!uid.equals(tuid)) {
+                    throw new ClientOutOfSyncException(descriptor + ": mismatched UIDs " + uid + " != " + tuid);
+                }
+                if (qfe != null) {
+                    throw qfe;
+                }
+                if (!descriptor.equals(loading)) {
+                    loaded.addAll(mdr.getDependencies(uid));
                 }
             }
-            //
-            // Now make sure that our current definition is somewhere there
-            // If this fails, we will throw an exception, and all will be
-            // well.
-            //
-            if (loading != null && !context.getLoaded().containsKey(loading)) {
-                String uid = mdr.getUid(null, loading);
-
-                if (uid == null) {
-                    throw new DefinitionNotFoundException(loading, null);
-                } else {
-                    context.addLoaded(loading, uid);
-                }
-            }
-        } finally {
-
         }
-        return;
+        //
+        // Now make sure that our current definition is somewhere there
+        // If this fails, we will throw an exception, and all will be
+        // well.
+        //
+        if (loading != null && !context.getLoaded().containsKey(loading)) {
+            String uid = mdr.getUid(null, loading);
+
+            if (uid == null) {
+                throw new DefinitionNotFoundException(loading, null);
+            } else {
+                context.addLoaded(loading, uid);
+            }
+        }
     }
 
     @Override

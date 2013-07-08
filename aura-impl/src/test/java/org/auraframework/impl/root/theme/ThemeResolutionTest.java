@@ -39,38 +39,32 @@ public class ThemeResolutionTest extends AuraImplTestCase {
 
     /** fully qualified references */
     public void testQualifiedSimple() throws Exception {
-        DefDescriptor<StyleDef> style = get("themeTest.simple");
-        gold(style);
+        gold(get("themeTest.simple"));
     }
 
     /** fully qualified where the variable value is inherited */
     public void testQualifiedInherited() throws Exception {
-        DefDescriptor<StyleDef> style = get("themeTest.inherited");
-        gold(style);
+        gold(get("themeTest.inherited"));
     }
 
     /** fully qualified where the variable value is overridden */
     public void testQualifiedOverridden() throws Exception {
-        DefDescriptor<StyleDef> style = get("themeTest.overridden");
-        gold(style);
+        gold(get("themeTest.overridden"));
     }
 
     /** fully qualified where the variable value is unquoted */
     public void testQualifiedDoubleQuoted() throws Exception {
-        DefDescriptor<StyleDef> style = get("themeTest.doubleQuoted");
-        gold(style);
+        gold(get("themeTest.doubleQuoted"));
     }
 
     /** using the 't' alternative function name */
     public void testShorthand() throws Exception {
-        DefDescriptor<StyleDef> style = get("themeTest.shorthand");
-        gold(style);
+        gold(get("themeTest.shorthand"));
     }
 
     /** using multiple themes functions in one declaration value */
     public void testMultipleThemeFunctions() throws Exception {
-        DefDescriptor<StyleDef> style = get("themeTest.multiple");
-        gold(style);
+        gold(get("themeTest.multiple"));
     }
 
     /** errors when the theme does not exist */
@@ -108,8 +102,12 @@ public class ThemeResolutionTest extends AuraImplTestCase {
         String appLoc = "themeTest:overrideApp";
         DefDescriptor<ApplicationDef> app = DefDescriptorImpl.getInstance(appLoc, ApplicationDef.class);
         Aura.getContextService().getCurrentContext().setApplicationDescriptor(app);
-        DefDescriptor<StyleDef> style = get("themeTest.overrideApp");
-        gold(style);
+        gold(get("themeTest.overrideApp"));
+    }
+
+    /** aliases work as expected */
+    public void testAliases() throws Exception {
+        gold(get("themeTest.componentWithAliases"));
     }
 
     private DefDescriptor<StyleDef> get(String locator) {

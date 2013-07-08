@@ -15,11 +15,16 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.ThemeDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.component.ComponentDefImpl;
 import org.auraframework.impl.root.parser.XMLParser;
@@ -27,6 +32,7 @@ import org.auraframework.impl.source.StringSource;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.quickfix.QuickFixException;
 
 public class ComponentDefHandlerTest extends AuraImplTestCase {
     XMLStreamReader xmlReader;
@@ -109,5 +115,21 @@ public class ComponentDefHandlerTest extends AuraImplTestCase {
         } catch (AuraRuntimeException expected) {
         }
 
+    }
+
+    public void testThemeAlias() throws QuickFixException {
+        DefDescriptor<ThemeDef> theme = addSourceAutoCleanup(ThemeDef.class, "<aura:theme/>");
+        DefDescriptor<ComponentDef> cmp = addSourceAutoCleanup(ComponentDef.class,
+                String.format("<aura:component themeAlias=\"var=%s\"></aura:component>", theme.getDescriptorName()));
+        assertThat(cmp.getDef().getThemeAliases().get("var"), equalTo(theme));
+    }
+
+    public void testMalformedThemeAlias() {
+        try {
+            addSourceAutoCleanup(ComponentDef.class,
+                    "<aura:component themeAlias=\"test:fakeTheme\"></aura:component>");
+        } catch (AuraRuntimeException e) {
+            assertThat(e.getMessage().contains("Invalid themeAlias format"), is(true));
+        }
     }
 }

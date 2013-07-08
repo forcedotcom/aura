@@ -19,7 +19,11 @@ import java.util.Map;
 
 import org.auraframework.css.parser.ThemeOverrideMap;
 import org.auraframework.css.parser.ThemeValueProvider;
+import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.ThemeDef;
+import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
  * Adapter for CSS/Style stuff.
@@ -28,7 +32,7 @@ public interface StyleAdapter extends AuraAdapter {
     /**
      * Gets a {@link ThemeValueProvider}, used for resolving {@link ThemeDef} variables.
      */
-    public ThemeValueProvider getThemeValueProvider();
+    ThemeValueProvider getThemeValueProvider();
 
     /**
      * Gets a {@link ThemeValueProvider}, used for resolving {@link ThemeDef} variables.
@@ -36,5 +40,18 @@ public interface StyleAdapter extends AuraAdapter {
      * @param overrides Overridden {@link ThemeDef}s.
      * @param aliases Named aliases to {@link ThemeDef} descriptors.
      */
-    public ThemeValueProvider getThemeValueProvider(ThemeOverrideMap overrides, Map<String, String> aliases);
+    ThemeValueProvider getThemeValueProvider(ThemeOverrideMap overrides, Map<String, DefDescriptor<ThemeDef>> aliases);
+
+    /**
+     * Gets a {@link ThemeValueProvider}, used for resolving {@link ThemeDef} variables.
+     * 
+     * <p>
+     * This will assume overrides from the current context's application (if present), and aliases from the
+     * {@link ComponentDef} or {@link ApplicationDef} associated with the given descriptorName.
+     * 
+     * @param descriptorName Descriptor name of the application or component, e.g., namespace:name.
+     * 
+     * @throws QuickFixException
+     */
+    ThemeValueProvider getThemeValueProvider(String descriptorName) throws QuickFixException;
 }

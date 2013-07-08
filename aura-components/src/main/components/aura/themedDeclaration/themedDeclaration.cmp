@@ -16,6 +16,8 @@
 
 -->
 <aura:component renderer="java://org.auraframework.components.aura.ThemedDeclarationRenderer">
+    <aura:attribute name="namespace" type="String" required="true"/>
+    <aura:attribute name="name" type="String" required="true"/>
     <aura:attribute name="property" type="String" required="true"/>
     <aura:attribute name="references" type="List" required="true"/>
     <aura:attribute name="location" type="java://org.auraframework.system.Location"/>

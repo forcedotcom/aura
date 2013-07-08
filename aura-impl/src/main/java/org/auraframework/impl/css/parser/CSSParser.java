@@ -107,16 +107,19 @@ public class CSSParser extends DefaultCSSVisitor {
     private final ReworkThemeFunction themeFunction;
 
     /**
-     * @param namespace
+     * @param namespace Namespace of the {@link StyleDef} being parsed.
+     * @param name Name of the {@link StyleDef} being parsed.
+     * @param validateNamespace Whether to validate that the CSS is properly scoped with the correct classnames.
      * @param contents the actual css
      */
-    public CSSParser(String namespace, boolean validateNamespace, String componentClass, String contents,
-            Set<String> allowedConditions, String filename) {
+    public CSSParser(String namespace, String name, boolean validateNamespace,
+            String componentClass, String contents, Set<String> allowedConditions, String filename) {
         this.filename = filename;
         this.componentClass = componentClass;
         this.contents = preProcess(contents);
         this.allowedConditions = allowedConditions;
-        this.themeFunction = new ReworkThemeFunction(filename);
+
+        this.themeFunction = new ReworkThemeFunction(namespace, name, filename);
 
         this.selectorRework = ImmutableList.<Rework<CSSSelector>> of(
                 new ReworkClassName(componentClass, validateNamespace));

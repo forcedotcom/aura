@@ -20,6 +20,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.util.Map;
 import java.util.Set;
 
+import org.auraframework.Aura;
 import org.auraframework.css.parser.ThemeOverrideMap;
 import org.auraframework.css.parser.ThemeValueProvider;
 import org.auraframework.def.DefDescriptor;
@@ -27,7 +28,7 @@ import org.auraframework.def.ThemeDef;
 import org.auraframework.expression.Expression;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.AuraImpl;
-import org.auraframework.impl.root.theme.ThemeDefImpl;
+import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.system.Location;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.AuraValidationException;
@@ -36,7 +37,6 @@ import org.auraframework.throwable.quickfix.ThemeValueNotFoundException;
 
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
 
 /**
@@ -50,7 +50,7 @@ public class ThemeValueProviderImpl implements ThemeValueProvider {
     private static final String BAD_ALIAS = "No alias named '%s' found";
 
     private final Optional<ThemeOverrideMap> overrides;
-    private final Map<String, String> aliases;
+    private final Map<String, DefDescriptor<ThemeDef>> aliases;
 
     /**
      * Creates a {@link ThemeValueProvider} with no overrides or alias support.
@@ -65,9 +65,9 @@ public class ThemeValueProviderImpl implements ThemeValueProvider {
      * @param overrides Enabled theme overrides.
      * @param aliases Theme aliases. Should map from single word to a descriptor name (including the colon).
      */
-    public ThemeValueProviderImpl(ThemeOverrideMap overrides, Map<String, String> aliases) {
+    public ThemeValueProviderImpl(ThemeOverrideMap overrides, Map<String, DefDescriptor<ThemeDef>> aliases) {
         this.overrides = Optional.fromNullable(overrides);
-        this.aliases = (aliases == null) ? ImmutableMap.<String, String> of() : ImmutableMap.copyOf(aliases);
+        this.aliases = AuraUtil.immutableMap(aliases);
     }
 
     @Override
@@ -97,19 +97,31 @@ public class ThemeValueProviderImpl implements ThemeValueProvider {
 
     @Override
     public DefDescriptor<ThemeDef> getDescriptor(PropertyReference reference) {
+        return getDescriptor(reference, false);
+    }
+
+    /**
+     * Gets the descriptor in the given reference.
+     * 
+     * @param reference Get the descriptor in this reference.
+     * @param qualifiedOnly If false, an exception will be thrown for unknown aliases. Otherwise this will return null
+     *            for unknown aliases.
+     */
+    private DefDescriptor<ThemeDef> getDescriptor(PropertyReference reference, boolean qualifiedOnly) {
         checkNotNull(reference, "reference cannot be null");
 
         if (reference.size() == 2) {
             // aliased reference
-            String actual = aliases.get(reference.getRoot());
-            if (actual == null) {
+            DefDescriptor<ThemeDef> aliased = aliases.get(reference.getRoot());
+            if (aliased == null && !qualifiedOnly) {
                 throw new AuraRuntimeException(String.format(BAD_ALIAS, reference.getRoot()));
             }
-            return ThemeDefImpl.descriptor(actual);
+            return aliased;
         } else if (reference.size() == 3) {
             // fully qualified
             PropertyReference sub = reference.getSub(0, 2);
-            return ThemeDefImpl.descriptor(String.format("%s:%s", sub.getRoot(), sub.getLeaf()));
+            String descName = String.format("%s:%s", sub.getRoot(), sub.getLeaf());
+            return Aura.getDefinitionService().getDefDescriptor(descName, ThemeDef.class);
         }
 
         throw new AuraRuntimeException(String.format(MALFORMED, reference));
@@ -117,6 +129,12 @@ public class ThemeValueProviderImpl implements ThemeValueProvider {
 
     @Override
     public Set<DefDescriptor<ThemeDef>> getDescriptors(String reference, Location location) throws QuickFixException {
+        return getDescriptors(reference, location, false);
+    }
+
+    @Override
+    public Set<DefDescriptor<ThemeDef>> getDescriptors(String reference, Location location, boolean qualifiedOnly)
+            throws QuickFixException {
         checkNotNull(reference, "reference cannot be null");
         reference = formatReference(reference, location);
 
@@ -128,7 +146,10 @@ public class ThemeValueProviderImpl implements ThemeValueProvider {
 
         // resolve each reference to the theme def descriptor
         for (PropertyReference propRef : propRefs) {
-            descriptors.add(getDescriptor(propRef));
+            DefDescriptor<ThemeDef> descriptor = getDescriptor(propRef, qualifiedOnly);
+            if (descriptor != null) {
+                descriptors.add(descriptor);
+            }
         }
 
         return descriptors;

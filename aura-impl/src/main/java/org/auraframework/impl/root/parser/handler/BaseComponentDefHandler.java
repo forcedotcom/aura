@@ -38,6 +38,7 @@ import org.auraframework.def.ProviderDef;
 import org.auraframework.def.RendererDef;
 import org.auraframework.def.StyleDef;
 import org.auraframework.def.TestSuiteDef;
+import org.auraframework.def.ThemeDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.root.AttributeDefImpl;
 import org.auraframework.impl.root.AttributeDefRefImpl;
@@ -50,6 +51,7 @@ import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.Source;
 import org.auraframework.system.SubDefDescriptor;
+import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
@@ -77,6 +79,7 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef>
     private static final String ATTRIBUTE_MODEL = "model";
     private static final String ATTRIBUTE_CONTROLLER = "controller";
     private static final String ATTRIBUTE_WHITESPACE = "whitespace";
+    private static final String ATTRIBUTE_THEME_ALIAS = "themeAlias";
 
     protected final static Set<String> ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>()
             .add(ATTRIBUTE_RENDER, ATTRIBUTE_TEMPLATE, ATTRIBUTE_PROVIDER,
@@ -84,8 +87,10 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef>
                     ATTRIBUTE_ISTEMPLATE, ATTRIBUTE_IMPLEMENTS,
                     ATTRIBUTE_EXTENDS, ATTRIBUTE_STYLE, ATTRIBUTE_HELPER,
                     ATTRIBUTE_RENDERER, ATTRIBUTE_MODEL, ATTRIBUTE_CONTROLLER,
-                    ATTRIBUTE_WHITESPACE)
+                    ATTRIBUTE_WHITESPACE, ATTRIBUTE_THEME_ALIAS)
             .addAll(RootTagHandler.ALLOWED_ATTRIBUTES).build();
+
+    private static final String ALIAS_FORMAT = "Invalid themeAlias format '%s'. Try rewriting like alias=foo:bar";
 
     private int innerCount = 0;
     private final List<ComponentDefRef> body = Lists.newArrayList();
@@ -109,6 +114,7 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef>
         builder.controllerDescriptors = Lists.newArrayList();
         builder.facets = Lists.newArrayList();
         builder.expressionRefs = Sets.newHashSet();
+        builder.themeAliases = Maps.newHashMap();
     }
 
     @Override
@@ -359,6 +365,27 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef>
                 : WhitespaceBehavior.valueOf(whitespaceVal.toUpperCase());
 
         builder.isTemplate = getBooleanAttributeValue(ATTRIBUTE_ISTEMPLATE);
+
+        // theme aliases
+        String aliasNames = getAttributeValue(ATTRIBUTE_THEME_ALIAS);
+        if (!AuraTextUtil.isNullEmptyOrWhitespace(aliasNames)) {
+            for (String aliasString : AuraTextUtil.splitSimple(",", aliasNames)) {
+
+                List<String> parts = AuraTextUtil.splitSimple("=", aliasString);
+                if (parts.size() != 2) {
+                    throw new AuraRuntimeException(String.format(ALIAS_FORMAT, aliasString), getLocation());
+                }
+
+                String alias = parts.get(0);
+                String desc = parts.get(1);
+
+                if (AuraTextUtil.isEmptyOrWhitespace(alias) || AuraTextUtil.isEmptyOrWhitespace(desc)) {
+                    throw new AuraRuntimeException(String.format(ALIAS_FORMAT, aliasString), getLocation());
+                }
+
+                builder.addThemeAlias(alias, DefDescriptorImpl.getInstance(desc, ThemeDef.class));
+            }
+        }
     }
 
     public void setRender(String val) {

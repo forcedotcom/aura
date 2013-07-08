@@ -28,7 +28,6 @@ import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.NamespaceDef;
 import org.auraframework.def.StyleDef;
-import org.auraframework.impl.css.parser.ThemeValueProviderImpl;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.instance.Component;
 import org.auraframework.system.AuraContext;
@@ -46,7 +45,6 @@ import com.google.common.collect.Maps;
 public class StyleDefImpl extends DefinitionImpl<StyleDef> implements StyleDef {
 
     private static final long serialVersionUID = 7140896215068458158L;
-    private static final ThemeValueProvider themeProvider = new ThemeValueProviderImpl();
 
     private final String className;
     private final List<ComponentDefRef> components;
@@ -71,14 +69,15 @@ public class StyleDefImpl extends DefinitionImpl<StyleDef> implements StyleDef {
 
     @Override
     public void appendDependencies(Set<DefDescriptor<?>> dependencies) throws QuickFixException {
-        dependencies.add(Aura.getDefinitionService().getDefDescriptor(descriptor.getNamespace(),
-                NamespaceDef.class));
+        dependencies.add(Aura.getDefinitionService().getDefDescriptor(descriptor.getNamespace(), NamespaceDef.class));
 
         // dependencies from theme variables in the css file
-        for (String reference : themeReferences) {
-            dependencies.addAll(themeProvider.getDescriptors(reference, getLocation()));
+        if (!themeReferences.isEmpty()) {
+            ThemeValueProvider vp = Aura.getStyleAdapter().getThemeValueProvider();
+            for (String reference : themeReferences) {
+                dependencies.addAll(vp.getDescriptors(reference, getLocation(), true));
+            }
         }
-
     }
 
     @Override
@@ -86,8 +85,12 @@ public class StyleDefImpl extends DefinitionImpl<StyleDef> implements StyleDef {
         super.validateReferences();
 
         // references to themedefs
-        for (String reference : themeReferences) {
-            themeProvider.getValue(reference, getLocation());
+        if (!themeReferences.isEmpty()) {
+            String descriptorName = String.format("%s:%s", descriptor.getNamespace(), descriptor.getName());
+            ThemeValueProvider vp = Aura.getStyleAdapter().getThemeValueProvider(descriptorName);
+            for (String reference : themeReferences) {
+                vp.getValue(reference, getLocation()); // get value will validate it's a valid variable
+            }
         }
     }
 

@@ -110,6 +110,11 @@ public class ThemeResolutionTest extends AuraImplTestCase {
         gold(get("themeTest.componentWithAliases"));
     }
 
+    /** if the variable value is an empty string then the declaration should be removed */
+    public void testDeclarationRemoval() throws Exception {
+        gold(get("themeTest.emptyStringValue"));
+    }
+
     private DefDescriptor<StyleDef> get(String locator) {
         return DefDescriptorImpl.getInstance(locator, StyleDef.class);
     }

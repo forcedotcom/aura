@@ -349,8 +349,8 @@ var AuraLocalizationService = function AuraLocalizationService() {
          * @param {String|Number|Date} date1 A date format that the JavaScript Date object can parse
          * @param {String|Number|Date} date2 A date format that the JavaScript Date object can parse
          * @param {String} unit The unit to limit the granularity, that is, year, month, week, day, hour, minute and second.
-         *                 By default it uses millisecond
-         * @return {Boolean}
+         *                 By default, millisecond is used.
+         * @return {Boolean} Returns true if date1 is after date2, or false otherwise.
          * @memberOf AuraLocalizationService
          * @public
          */ 
@@ -364,7 +364,7 @@ var AuraLocalizationService = function AuraLocalizationService() {
          * @param {String|Number|Date} date2 A date format that the JavaScript Date object can parse
          * @param {String} unit The unit to limit the granularity, that is, year, month, week, day, hour, minute and second.
          *                 By default, millisecond is used.
-         * @return {Boolean}
+         * @return {Boolean} Returns true if date1 is before date2, or false otherwise.
          * @memberOf AuraLocalizationService
          * @public
          */
@@ -378,7 +378,7 @@ var AuraLocalizationService = function AuraLocalizationService() {
          * @param {String|Number|Date} date2 A date format that the JavaScript Date object can parse
          * @param {String} unit The unit to limit the granularity, that is, year, month, week, day, hour, minute and second.
          *                 By default, millisecond is used.
-         * @return {Boolean}
+         * @return {Boolean} Returns true if date1 is the same as date2, or false otherwise.
          * @memberOf AuraLocalizationService
          * @public
          */
@@ -391,7 +391,7 @@ var AuraLocalizationService = function AuraLocalizationService() {
          * @param {String} dateTimeString The datetime string to be parsed.
          * @param {String} targetFormat A Java format string which is used to parse datetime. The default is from LocaleValueProvider.
          * @param {String} locale A Java locale string used to parse datetime. The default is from LocaleValueProvider.
-         * @return A JavaScript Date object
+         * @return {Date} A JavaScript Date object
          * @memberOf AuraLocalizationService
          * @public
          */

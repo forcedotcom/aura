@@ -39,6 +39,7 @@ import org.auraframework.impl.AuraImpl;
 import org.auraframework.impl.css.parser.ThemeOverrideMapImpl;
 import org.auraframework.impl.root.component.BaseComponentDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.impl.util.TextTokenizer;
 import org.auraframework.instance.Action;
 import org.auraframework.system.AuraContext;
@@ -48,6 +49,7 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
+import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -83,6 +85,8 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
         } else {
             this.themeOverrides = null;
         }
+
+        this.hashCode = AuraUtil.hashCode(super.hashCode(), themeOverrides);
     }
 
     public static class Builder extends BaseComponentDefImpl.Builder<ApplicationDef> implements ApplicationDefBuilder {
@@ -313,11 +317,29 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
         return themeOverrides;
     }
 
+    @Override
+    public int hashCode() {
+        return hashCode;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof ApplicationDefImpl) {
+            ApplicationDefImpl other = (ApplicationDefImpl) obj;
+
+            return super.equals(obj)
+                    && Objects.equal(this.themeOverrides, other.themeOverrides);
+        }
+
+        return false;
+    }
+
     private final DefDescriptor<EventDef> locationChangeEventDescriptor;
     private final DefDescriptor<LayoutsDef> layoutsDefDescriptor;
     private final Access access;
     private final DefDescriptor<SecurityProviderDef> securityProviderDescriptor;
     private final ThemeOverrideMap themeOverrides;
+    private final int hashCode;
 
     private final Boolean isAppcacheEnabled;
     private final String additionalAppCacheURLs;
@@ -325,4 +347,5 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
     private final Boolean isOnePageApp;
 
     private static final long serialVersionUID = 9044177107921912717L;
+
 }

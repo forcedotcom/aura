@@ -1,0 +1,8 @@
+<aura:theme extends="themeTest:crossReferencingParentTheme">
+  <aura:attribute name="red" default="#ff0000" />
+  <aura:attribute name="errorColor" default="{!this.red}" />
+
+  <aura:attribute name="spacing" default="{!themeTest.baseTheme.margin}" />
+
+  <aura:set attribute="position" value="{!themeTest.utilTheme.absolute}" />
+</aura:theme>

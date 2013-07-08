@@ -15,6 +15,7 @@
  */
 package org.auraframework.def;
 
+import org.auraframework.expression.PropertyReference;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.base.Optional;
@@ -30,13 +31,16 @@ public interface ThemeDef extends RootDefinition {
     DefDescriptor<ThemeDef> getDescriptor();
 
     /**
-     * Gets the value of a variable.
+     * Gets the value of a variable (attribute).
      * 
-     * @param name Name of the variable/attribute.
-     * @throws QuickFixException if a parent descriptor does not exist
-     * @returns The variable value, or {@link Optional#absent()} if no variable exists for the given name.
+     * @param name Name of the variable (attribute).
+     * 
+     * @returns The value of the attribute. This may be a simple String literal, or if an expression was used then it
+     *          could be a {@link PropertyReference}.
+     * 
+     * @throws QuickFixException if a parent descriptor does not exist.
      */
-    Optional<String> variable(String name) throws QuickFixException;
+    Optional<Object> variable(String name) throws QuickFixException;
 
     /**
      * Gets the descriptor of the {@link ThemeDef} this one extends, or null if not specified.

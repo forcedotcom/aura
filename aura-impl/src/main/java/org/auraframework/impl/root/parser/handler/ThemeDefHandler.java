@@ -25,6 +25,7 @@ import org.auraframework.builder.RootDefinitionBuilder;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.ThemeDef;
+import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.root.AttributeDefImpl;
 import org.auraframework.impl.root.theme.ThemeDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
@@ -34,14 +35,13 @@ import org.auraframework.util.AuraTextUtil;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 /**
  * Handler for aura:theme tags.
  * 
  * <p>
  * Themes only contain {@link AttributeDef}s as content.
- * 
- * @author nmcwilliams
  */
 public class ThemeDefHandler extends RootTagHandler<ThemeDef> {
 
@@ -63,6 +63,7 @@ public class ThemeDefHandler extends RootTagHandler<ThemeDef> {
         builder.setOwnHash(source.getHash());
         builder.extendsDescriptor = null;
         builder.overrides = Maps.newHashMap();
+        builder.expressionRefs = Sets.newHashSet();
     }
 
     @Override
@@ -110,6 +111,11 @@ public class ThemeDefHandler extends RootTagHandler<ThemeDef> {
     @Override
     public String getHandledTag() {
         return TAG;
+    }
+
+    @Override
+    public void addExpressionReferences(Set<PropertyReference> propRefs) {
+        builder.addAllExpressionRefs(propRefs);
     }
 
     @Override

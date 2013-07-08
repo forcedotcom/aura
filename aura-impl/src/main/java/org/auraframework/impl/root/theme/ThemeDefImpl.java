@@ -16,18 +16,24 @@
 package org.auraframework.impl.root.theme;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.auraframework.Aura;
+import org.auraframework.css.parser.ThemeValueProvider;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.AttributeDefRef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.RegisterEventDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.def.ThemeDef;
+import org.auraframework.expression.PropertyReference;
+import org.auraframework.impl.expression.PropertyReferenceImpl;
 import org.auraframework.impl.root.RootDefinitionImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.util.AuraUtil;
@@ -40,6 +46,7 @@ import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 /**
  * Implementation for {@link ThemeDef}.
@@ -55,20 +62,22 @@ public class ThemeDefImpl extends RootDefinitionImpl<ThemeDef> implements ThemeD
     private static final long serialVersionUID = -7900230831915100535L;
 
     private final int hashCode;
+    private final Set<PropertyReference> expressionRefs;
     private final DefDescriptor<ThemeDef> extendsDescriptor;
-    public final Map<DefDescriptor<AttributeDef>, AttributeDefRef> overrides;
+    private final Map<DefDescriptor<AttributeDef>, AttributeDefRef> overrides;
 
     public ThemeDefImpl(Builder builder) {
         super(builder);
         this.extendsDescriptor = builder.extendsDescriptor;
         this.overrides = AuraUtil.immutableMap(builder.overrides);
+        this.expressionRefs = AuraUtil.immutableSet(builder.expressionRefs);
         this.hashCode = AuraUtil.hashCode(super.hashCode(), extendsDescriptor, overrides);
     }
 
     @Override
-    public Optional<String> variable(String name) throws QuickFixException {
+    public Optional<Object> variable(String name) throws QuickFixException {
         // first check overrides
-        Optional<String> found = asOverridden(name);
+        Optional<Object> found = asOverridden(name);
 
         // if not there check own attributes
         if (!found.isPresent()) {
@@ -83,18 +92,55 @@ public class ThemeDefImpl extends RootDefinitionImpl<ThemeDef> implements ThemeD
         return found;
     }
 
-    private Optional<String> asOverridden(String name) {
-        AttributeDefRef ref = overrides.get(DefDescriptorImpl.getInstance(name, AttributeDef.class));
-        return ref == null ? Optional.<String> absent() : Optional.of(ref.getValue().toString());
+    private Optional<Object> asOverridden(String name) {
+        DefDescriptor<AttributeDef> desc = Aura.getDefinitionService().getDefDescriptor(name, AttributeDef.class);
+        AttributeDefRef attributeDefRef = overrides.get(desc);
+        if (attributeDefRef == null) {
+            return Optional.absent();
+        } else {
+            return Optional.of(updateReferenceToThis(attributeDefRef.getValue()));
+        }
     }
 
-    private Optional<String> fromSelf(String name) {
-        AttributeDef attr = attributeDefs.get(DefDescriptorImpl.getInstance(name, AttributeDef.class));
-        return attr == null ? Optional.<String> absent() : Optional.of(attr.getDefaultValue().getValue().toString());
+    private Optional<Object> fromSelf(String name) {
+        DefDescriptor<AttributeDef> desc = Aura.getDefinitionService().getDefDescriptor(name, AttributeDef.class);
+        AttributeDef attributeDef = attributeDefs.get(desc);
+        if (attributeDef == null) {
+            return Optional.absent();
+        } else {
+            return Optional.of(updateReferenceToThis(attributeDef.getDefaultValue().getValue()));
+        }
     }
 
-    private Optional<String> fromParent(String name) throws QuickFixException {
-        return extendsDescriptor == null ? Optional.<String> absent() : extendsDescriptor.getDef().variable(name);
+    private Optional<Object> fromParent(String name) throws QuickFixException {
+        return extendsDescriptor == null ? Optional.absent() : extendsDescriptor.getDef().variable(name);
+    }
+
+    /**
+     * If this object is a {@link PropertyReference} (e.g., was an expression) then replace "this" with the actual
+     * descriptor. In other words, in something like <code>default="{!this.margin}"</code>, "this", gets turned into
+     * "theNamespace.theThemeName".
+     * 
+     * @return If not applicable then the exact same object, otherwise an updated {@link PropertyReference}.
+     */
+    private Object updateReferenceToThis(Object value) {
+        if (!(value instanceof PropertyReference)) {
+            return value;
+        }
+
+        PropertyReference ref = (PropertyReference) value;
+
+        if (!ref.getRoot().equals("this")) {
+            return value;
+        }
+
+        // construct a new property reference with "this" replaced with the namespace and theme name
+        String updated = String.format("%s.%s.%s",
+                getDescriptor().getNamespace(),
+                getDescriptor().getName(),
+                ref.getLeaf());
+
+        return new PropertyReferenceImpl(updated, ref.getLocation());
     }
 
     @Override
@@ -173,13 +219,36 @@ public class ThemeDefImpl extends RootDefinitionImpl<ThemeDef> implements ThemeD
                 }
             }
         }
+
+        // validate cross references (from expressions)
+        ThemeValueProvider themeProvider = Aura.getStyleAdapter().getThemeValueProvider();
+        for (PropertyReference ref : expressionRefs) {
+            if (ref.getRoot().equals("this")) {
+                continue;
+            }
+
+            themeProvider.getDescriptor(ref).getDef().validateReferences();
+            themeProvider.getValue(ref); // will validate variable
+        }
     }
 
     @Override
     public void appendDependencies(Set<DefDescriptor<?>> dependencies) throws QuickFixException {
         super.appendDependencies(dependencies);
+
+        // extends
         if (extendsDescriptor != null) {
             dependencies.add(extendsDescriptor);
+        }
+
+        // dependencies cross references (from expressions)
+        ThemeValueProvider themeProvider = Aura.getStyleAdapter().getThemeValueProvider();
+        for (PropertyReference ref : expressionRefs) {
+            if (ref.getRoot().equals("this")) {
+                continue;
+            }
+
+            dependencies.add(themeProvider.getDescriptor(ref));
         }
     }
 
@@ -257,7 +326,8 @@ public class ThemeDefImpl extends RootDefinitionImpl<ThemeDef> implements ThemeD
      */
     public static class Builder extends RootDefinitionImpl.Builder<ThemeDef> {
         public DefDescriptor<ThemeDef> extendsDescriptor;
-        public Map<DefDescriptor<AttributeDef>, AttributeDefRef> overrides = Maps.newHashMap();
+        public Map<DefDescriptor<AttributeDef>, AttributeDefRef> overrides;
+        public HashSet<PropertyReference> expressionRefs;
 
         public Builder() {
             super(ThemeDef.class);
@@ -269,7 +339,17 @@ public class ThemeDefImpl extends RootDefinitionImpl<ThemeDef> implements ThemeD
         }
 
         public void addOverride(AttributeDefRef ref) {
+            if (overrides == null) {
+                overrides = Maps.newHashMap();
+            }
             overrides.put(ref.getDescriptor(), ref);
+        }
+
+        public void addAllExpressionRefs(Collection<PropertyReference> refs) {
+            if (expressionRefs == null) {
+                expressionRefs = Sets.newHashSet();
+            }
+            expressionRefs.addAll(refs);
         }
     }
 }

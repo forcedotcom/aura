@@ -131,6 +131,21 @@ public class ThemeValueProviderTest extends AuraImplTestCase {
         assertThat(Iterables.get(dds, 1, null), is(expected2));
     }
 
+    public void testCrossReferenceSelf() throws QuickFixException {
+        String val = provider().getValue("themeTest.crossReferencingTheme.errorColor", null).toString();
+        assertThat(val, is("#ff0000"));
+    }
+
+    public void testCrossReferenceOther() throws QuickFixException {
+        String val = provider().getValue("themeTest.crossReferencingTheme.spacing", null).toString();
+        assertThat(val, is("10px"));
+    }
+
+    public void testCrossReferenceInAuraSet() throws QuickFixException {
+        String val = provider().getValue("themeTest.crossReferencingTheme.position", null).toString();
+        assertThat(val, is("absolute"));
+    }
+
     /** utility */
     private static ThemeValueProvider provider() {
         return new ThemeValueProviderImpl();

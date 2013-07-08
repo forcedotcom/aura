@@ -67,20 +67,6 @@ Test.Aura.AuraClientServiceTest = function() {
     function EnqueueAction() {
 
         [ Fact ]
-        function RunsClientAction() {
-            var action = new MockAction();
-            action.getDef = Stubs.GetMethod({
-                isClientAction : Stubs.GetMethod(true)
-            });
-
-            mockGlobal(function() {
-                new AuraClientService().enqueueAction(action);
-            });
-
-            Assert.Equal(1, action.runDeprecated.Calls.length);
-        }
-
-        [ Fact ]
         function DoesNotRunServerAction() {
             var action = new MockAction();
 
@@ -110,7 +96,6 @@ Test.Aura.AuraClientServiceTest = function() {
             } ], target.priv.actionQueue.enqueue.Calls);
         }
 
-        /* FIXME: W-1652118 we currently run client actions immediately rather than queueing them
         [ Fact ]
         function QueuesClientAction() {
             var action = new MockAction();
@@ -132,7 +117,6 @@ Test.Aura.AuraClientServiceTest = function() {
                 ReturnValue : undefined
             } ], target.priv.actionQueue.enqueue.Calls);
         }
-        */
         
         [ Fact ]
         function AbortableActionsAreCleared() {
@@ -207,12 +191,12 @@ Test.Aura.AuraClientServiceTest = function() {
             Assert.Equal(6, target.priv.actionQueue.actions.length);
             Assert.Equal(0, numAbortedIncorrectly);
             Assert.Equal(2, numAbortedCorrectly);
-            Assert.False(target.priv.actionQueue.actions[0].isAbortable(), "First actions should not be abortable");
-            Assert.False(target.priv.actionQueue.actions[1].isAbortable(), "Second actions should not be abortable");
-            Assert.False(target.priv.actionQueue.actions[2].isAbortable(), "Third actions should not be abortable");
-            Assert.True(target.priv.actionQueue.actions[3].isAbortable(), "Fourth actions should be abortable");
-            Assert.True(target.priv.actionQueue.actions[4].isAbortable(), "Fifth actions should be abortable");
-            Assert.False(target.priv.actionQueue.actions[5].isAbortable(), "Sixth actions should not be abortable");
+            Assert.False(target.priv.actionQueue.actions[0].isAbortable(), "First action should not be abortable");
+            Assert.False(target.priv.actionQueue.actions[1].isAbortable(), "Second action should not be abortable");
+            Assert.False(target.priv.actionQueue.actions[2].isAbortable(), "Third action should not be abortable");
+            Assert.True(target.priv.actionQueue.actions[3].isAbortable(), "Fourth action should be abortable");
+            Assert.True(target.priv.actionQueue.actions[4].isAbortable(), "Fifth action should be abortable");
+            Assert.False(target.priv.actionQueue.actions[5].isAbortable(), "Sixth action should not be abortable");
         }
 
         [ Fact ]
@@ -331,6 +315,9 @@ Test.Aura.AuraClientServiceTest = function() {
                 target = new AuraClientService();
             });
             target.priv.actionQueue = {
+                getClientActions : function() {
+                    return [ ];
+                },
                 getServerActions : function() {
                     return [ "action" ];
                 },
@@ -355,6 +342,9 @@ Test.Aura.AuraClientServiceTest = function() {
                 target = new AuraClientService();
             });
             target.priv.actionQueue = {
+                getClientActions : function() {
+                    return [ ];
+                },
                 getServerActions : function() {
                     return [ ];
                 },
@@ -379,6 +369,9 @@ Test.Aura.AuraClientServiceTest = function() {
                 target = new AuraClientService();
             });
             target.priv.actionQueue = {
+                getClientActions : function() {
+                    return [ ];
+                },
                 getServerActions : function() {
                     return [];
                 },
@@ -404,6 +397,9 @@ Test.Aura.AuraClientServiceTest = function() {
             });
             target.priv.request = Stubs.GetMethod("actions", "flightCounter", undefined);
             target.priv.actionQueue = {
+                getClientActions : function() {
+                    return [ ];
+                },
                 getServerActions : function() {
                     return [ action ];
                 },
@@ -435,6 +431,9 @@ Test.Aura.AuraClientServiceTest = function() {
             target.priv.request = function() {
             };
             target.priv.actionQueue = {
+                getClientActions : function() {
+                    return [ ];
+                },
                 getServerActions : function() {
                     return [ action ];
                 },
@@ -460,6 +459,9 @@ Test.Aura.AuraClientServiceTest = function() {
             });
             target.priv.request = Stubs.GetMethod("actions", "flightCounter", undefined);
             target.priv.actionQueue = {
+                getClientActions : function() {
+                    return [ ];
+                },
                 getServerActions : function() {
                     return [];
                 },
@@ -492,6 +494,9 @@ Test.Aura.AuraClientServiceTest = function() {
             target.priv.request = function() {
             };
             target.priv.actionQueue = {
+                getClientActions : function() {
+                    return [ ];
+                },
                 getServerActions : function() {
                     return [];
                 },
@@ -518,6 +523,9 @@ Test.Aura.AuraClientServiceTest = function() {
             });
             target.priv.request = Stubs.GetMethod("actions", "flightCounter", undefined);
             target.priv.actionQueue = {
+                getClientActions : function() {
+                    return [ ];
+                },
                 getServerActions : function() {
                     return [ actionServer ];
                 },

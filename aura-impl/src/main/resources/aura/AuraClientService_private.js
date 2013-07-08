@@ -391,6 +391,21 @@ var priv = {
         }
         //#end
     },
+    
+    /**
+     * Execute the list of client actions synchronously.  Populate state and return values
+     * and execute the action callbacks.  This method does not interact with the inFlight
+     * counter and does no throttling.  All actions will be run as it is assumed
+     * abortable actions have already been pruned.
+     */
+    runClientActions : function(actions) {
+        var action;
+        for (var i = 0; i < actions.length; i++) {
+            action = actions[i];
+            action.runDeprecated();
+            action.finishAction();
+        }
+    },
 
     /**
      * Start a request sequence for a set of actions and an 'in-flight' counter.

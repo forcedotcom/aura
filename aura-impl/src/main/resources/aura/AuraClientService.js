@@ -532,14 +532,7 @@ var AuraClientService = function() {
                 action.setBackground();
             }
             
-            //
-            // FIXME: W-1652118 This should not differentiate, both of these should get pushed.
-            //
-            if (action.getDef().isClientAction()) {
-                action.runDeprecated();
-            } else {
-                priv.actionQueue.enqueue(action);
-            }
+            priv.actionQueue.enqueue(action);
         },
 
         /**
@@ -588,14 +581,20 @@ var AuraClientService = function() {
             var actions;
             var backgroundIdx;
             var backgroundAction;
-            var requestSent = false;
+            var processedActions = false;
             var action;
 
+            actions = priv.actionQueue.getClientActions();
+            if(actions.length > 0) {
+                priv.runClientActions(actions);
+                processedActions = true;
+            }
+            
             if (priv.foreground.start()) {
                 actions = priv.actionQueue.getServerActions();
                 if (actions.length > 0) {
                     priv.request(actions, priv.foreground);
-                    requestSent = true;
+                    processedActions = true;
                 } else {
                     priv.foreground.cancel();
                 }
@@ -605,12 +604,12 @@ var AuraClientService = function() {
                 action = priv.actionQueue.getNextBackgroundAction();
                 if (action !== null) {
                     priv.request([action], priv.background);
-                    requestSent = true;
+                    processedActions = true;
                 } else {
                     priv.background.cancel();
                 }
             }
-            return requestSent;
+            return processedActions;
         }
 
         //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}

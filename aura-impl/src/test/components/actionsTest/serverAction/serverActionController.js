@@ -35,8 +35,5 @@
 		});
 		
 		$A.enqueueAction(serverAction);
-	},
-	clientSideAction : function(component) {
-	    //foo
 	}
 })

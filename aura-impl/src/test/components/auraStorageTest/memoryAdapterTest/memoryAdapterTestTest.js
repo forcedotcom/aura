@@ -258,10 +258,7 @@
                 });
                 $A.test.assertStartsWith("MemoryStorageAdapter.setItem() cannot store an item over the maxSize", $A.test.getAuraErrorMessage(),
                 "$A.error failed to display msg testSetItemOverMaxSize");
-                //
-                //FIXME W-1688412: this actually get's stored.
-                //
-                //$A.test.assertEquals(0, this.adapter.getSize());
+                $A.test.assertEquals(0, this.adapter.getSize());
             }
 	}
 })

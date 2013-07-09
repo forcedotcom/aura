@@ -736,4 +736,8 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
                 .keyUp(Keys.SHIFT);
         return builder.build();
     }
+
+    protected void assertClassesSame(String message, String expected, String actual) {
+        auraUITestingUtil.assertClassesSame(message, expected, actual);
+    }
 }

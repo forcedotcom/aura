@@ -400,7 +400,7 @@ public class InputDateUITest extends WebDriverTestCase {
 
         // Want to get a NoSuchElementExpection when looking for the class
         // if visible exists, that means that the calendar did not close
-        element = findDomElement(By.cssSelector("div[class*='uiDatePicker uiInputDate uiInput']"));
+        element = findDomElement(By.cssSelector("div[class*='uiDatePicker uiInput uiInputDate']"));
 
         escButtonClosedCal = !element.getAttribute("class").contains("visible");
 

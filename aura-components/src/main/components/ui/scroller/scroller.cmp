@@ -27,6 +27,7 @@
     <aura:attribute name="width" type="String" description="The width of the scroll area in pixels (px) or percentage (%). Default value is &quot;100px&quot;."/>
     <aura:attribute name="class" type="String" description="A CSS style to be attached to the scroll area. This style is added in addition to base styles output by the component."/>
     <aura:attribute name="scrollContentClass" type="String" description="A CSS style to be attached to the scroll content area. This style is added in addition to base styles output by the component."/>
+	<aura:attribute name="onBeforeScrollStart" type="Aura.Action" description="The action invoked before the user starts scrolling."/>	
     <aura:attribute name="onScrollStart" type="Aura.Action" description="The action invoked when the user starts scrolling."/>
     <aura:attribute name="onScrollEnd" type="Aura.Action" description="The action invoked when the user stops scrolling."/>
     <aura:attribute name="onScrollMove" type="Aura.Action" description="The action invoked when the user is scrolling."/>

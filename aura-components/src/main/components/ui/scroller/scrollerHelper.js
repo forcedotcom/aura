@@ -112,6 +112,11 @@
 							if (component.getValue("v.stopEventPropagation").getBooleanValue()) {
 								e.stopPropagation();
 							}
+							
+							var action = component.get("v.onBeforeScrollStart");
+							if (action) {
+								action.runDeprecated(e);
+							}
 						},
 
 						onScrollStart : function(e) {
@@ -638,6 +643,9 @@
 				_start : function(e) {
 					var that = this, point = hasTouch ? e.touches[0] : e, matrix, x, y, c1, c2;
 					
+					if (that.options.onBeforeScrollStart)
+						that.options.onBeforeScrollStart.call(that, e);
+					
 					if (!that.enabled)
 						return;
 
@@ -646,9 +654,6 @@
 		                return;
 		            }
 					
-					if (that.options.onBeforeScrollStart)
-						that.options.onBeforeScrollStart.call(that, e);
-
 					if (that.options.useTransition || that.options.zoom)
 						that._transitionTime(0);
 
@@ -712,13 +717,9 @@
 					if (that.options.onScrollStart)
 						that.options.onScrollStart.call(that, e);
 
-					if (!e.isEventHandledByScroller) {
-						//bind the following events only to the first scroller that handles the start_ev when scrollers are nested
-						that._bind(MOVE_EV, window);
-						that._bind(END_EV, window);
-						that._bind(CANCEL_EV, window);
-						e.isEventHandledByScroller = true;
-					}
+					that._bind(MOVE_EV, window);
+					that._bind(END_EV, window);
+					that._bind(CANCEL_EV, window);
 				},
 
 				_move : function(e) {
@@ -734,6 +735,10 @@
 
 					if (that.options.onBeforeScrollMove)
 						that.options.onBeforeScrollMove.call(that, e);
+					
+					if (e.defaultPrevented) {
+						return;
+					}
 
 					// Zoom
 					if (that.options.zoom && hasTouch && e.touches.length > 1) {
@@ -809,7 +814,6 @@
 				},
 
 				_end : function(e) {
-					delete e.isEventHandledByScroller;
 					
 					if (hasTouch && e.touches.length !== 0)
 						return;

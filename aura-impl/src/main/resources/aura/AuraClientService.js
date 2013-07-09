@@ -61,7 +61,7 @@ var AuraClientService = function() {
                 // not on in dev modes to preserve stacktrace in debug tools
                 //#if {"modes" : ["PRODUCTION"]}
             } catch (e) {
-                $A.error(e);
+                $A.error("Error during init", e);
                 throw e;
             }
             //#end

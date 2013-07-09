@@ -69,6 +69,33 @@
                     "$A.error failed to display escaped html markup as error text");
         }]
     },
+    testAuraErrorEdgeCases : {
+        test: [function(cmp) {
+                $A.test.expectAuraError("Unknown Error");
+                $A.error({"message":"hah!"});
+                var message = $A.util.getElement("auraErrorMessage");
+                $A.test.assertNotNull(message, "Aura error message box did is not present after $A.error()");
+                $A.test.assertStartsWith("Unknown Error : hah!", $A.test.getAuraErrorMessage());
+        }, function(cmp) {
+                $A.test.expectAuraError("a");
+                $A.error("a", "b");
+                var message = $A.util.getElement("auraErrorMessage");
+                $A.test.assertNotNull(message, "Aura error message box did is not present after $A.error()");
+                $A.test.assertStartsWith("Internal Error: Unrecognized parameter", $A.test.getAuraErrorMessage());
+        }, function(cmp) {
+                $A.test.expectAuraError("Unknown Error");
+                $A.error(new Error("foo"));
+                var message = $A.util.getElement("auraErrorMessage");
+                $A.test.assertNotNull(message, "Aura error message box did is not present after $A.error()");
+                $A.test.assertStartsWith("Unknown Error : foo", $A.test.getAuraErrorMessage());
+        }, function(cmp) {
+                $A.test.expectAuraError("Unknown Error");
+                $A.error(new Error());
+                var message = $A.util.getElement("auraErrorMessage");
+                $A.test.assertNotNull(message, "Aura error message box did is not present after $A.error()");
+                $A.test.assertStartsWith("Unknown Error", $A.test.getAuraErrorMessage());
+        } ]
+    },
     testAuraErrorStackTrace : {
         test : function(cmp) {
                 $A.test.expectAuraError("Verifying stack trace present");

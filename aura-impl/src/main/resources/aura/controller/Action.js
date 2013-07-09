@@ -32,7 +32,7 @@
  * @param {Object}
  *            cmp The component associated with the Action.
  */
-var Action = function Action(def, method, paramDefs, background, cmp) {
+function Action(def, method, paramDefs, background, cmp) {
     this.def = def;
     this.meth = method;
     this.paramDefs = paramDefs;
@@ -49,7 +49,7 @@ var Action = function Action(def, method, paramDefs, background, cmp) {
     this.id = undefined;
     this.originalResponse = undefined;
     this.storable = false;
-};
+}
 
 Action.prototype.nextActionId = 1;
 Action.prototype.auraType = "Action";

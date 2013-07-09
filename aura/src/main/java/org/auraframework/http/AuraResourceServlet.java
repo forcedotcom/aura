@@ -21,6 +21,7 @@ import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
 import java.net.URI;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -32,6 +33,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.google.common.base.Functions;
+import com.google.common.collect.ImmutableSortedMap;
+import com.google.common.collect.Ordering;
 import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
@@ -108,6 +112,16 @@ public class AuraResourceServlet extends AuraBaseServlet {
      */
     private static <P extends Definition, D extends P> void addDefinitions(Class<D> preloadType,
             List<DescriptorFilter> filters, TempFilter extraFilter, Set<P> defs) throws QuickFixException {
+        Set<DefDescriptor<P>> defDescriptors = Sets.newHashSet();
+        addDefDescriptors(preloadType, filters, extraFilter, defDescriptors);
+        for (DefDescriptor<P> defDescriptor : defDescriptors) {
+            defs.add(defDescriptor.getDef());
+        }
+    }
+
+    private static <P extends Definition, D extends P> void addDefDescriptors(Class<D> preloadType,
+            List<DescriptorFilter> filters, TempFilter extraFilter, Set<DefDescriptor<P>> defDescriptors)
+            throws QuickFixException {
         DefinitionService definitionService = Aura.getDefinitionService();
 
         for (DescriptorFilter filter : filters) {
@@ -117,10 +131,9 @@ public class AuraResourceServlet extends AuraBaseServlet {
                 if (preloadType.isAssignableFrom(descriptor.getDefType().getPrimaryInterface())
                         && (extraFilter == null || extraFilter.apply(descriptor))) {
                     @SuppressWarnings("unchecked")
-                    DefDescriptor<? extends D> dd = (DefDescriptor<? extends D>) descriptor;
-                    P def = dd.getDef();
-                    if (def != null) {
-                        defs.add(def);
+                    DefDescriptor<P> dd = (DefDescriptor<P>) descriptor;
+                    if (dd.getDef() != null) {
+                        defDescriptors.add(dd);
                     }
                 }
             }
@@ -370,11 +383,10 @@ public class AuraResourceServlet extends AuraBaseServlet {
      * 
      * This writes out CSS for the preloads + app to the response. Note that currently it only writes out the preloads
      * because of the missing capability to do the apps will get fixed by W-1166679
-     * 
-     * @param request the request
-     * @param response the response
+     *
+     * @param out the appendable
      * @throws IOException if unable to write to the response
-     * @throws QuickFixWxception if the definitions could not be compiled.
+     * @throws QuickFixException if the definitions could not be compiled.
      */
     public static void writeCss(Appendable out) throws IOException, QuickFixException {
         AuraContext context = Aura.getContextService().getCurrentContext();
@@ -397,14 +409,17 @@ public class AuraResourceServlet extends AuraBaseServlet {
                 }
             }
             if (nsCss == null) {
-                Set<StyleDef> nddefs = Sets.newHashSet();
+                Set<DefDescriptor<StyleDef>> styleDefDescriptors = Sets.newHashSet();
                 List<DescriptorFilter> shortlist = Lists.newArrayList();
 
                 shortlist.add(filter);
-                addDefinitions(StyleDef.class, shortlist, NTF, nddefs);
+                addDefDescriptors(StyleDef.class, shortlist, NTF, styleDefDescriptors);
+
+                Set<StyleDef> orderedStyleDefs = orderStyles(styleDefDescriptors, context);
+
                 sb.setLength(0);
                 Appendable tmp = mode.isTestMode() ? out : sb;
-                Aura.getSerializationService().writeCollection(nddefs, StyleDef.class, tmp, "CSS");
+                Aura.getSerializationService().writeCollection(orderedStyleDefs, StyleDef.class, tmp, "CSS");
                 if (!mode.isTestMode()) {
                     nsCss = sb.toString();
                     cssCache.put(key, new SoftReference<String>(nsCss));
@@ -415,6 +430,84 @@ public class AuraResourceServlet extends AuraBaseServlet {
                 out.append(nsCss);
             }
         }
+    }
+
+    /**
+     * Orders StyleDefs with supers (ancestors) first then alphabetical
+     * TODO: refactor when we use CSS by dependency instead of preloads
+     *
+     * @param styleDefDescriptors style def descriptors
+     * @param context aura context
+     * @return set of ordered style defs
+     * @throws QuickFixException
+     */
+    private static Set<StyleDef> orderStyles(Set<DefDescriptor<StyleDef>> styleDefDescriptors, AuraContext context)
+            throws QuickFixException {
+        DefDescriptor<? extends BaseComponentDef> appDesc = context.getApplicationDescriptor();
+        String uid = context.getUid(appDesc);
+        Map<DefDescriptor<?>, Integer> dependencyMap = context.getDefRegistry().getDependenciesMap(uid);
+
+        /**
+         * Because we're using CSS from the entire namespace (preloads) we need to add style def descriptors of parent
+         * components that's not in the dependencies map. This will then be sorted by frequency then alphabetically.
+         *
+         * This can be a set and sort done on the dependencyMap when we load CSS by dependency instead of namespace.
+         */
+        Map<DefDescriptor<StyleDef>, Integer> styles = Maps.newHashMap();
+
+        /**
+         * The loops and checks within are used to return an ordered list of all styles of a namespace sorted by
+         * frequency (number of descendants) then alphabetically. Very inefficient and redundant on different namespaces
+         * because they use the same dependencyMap.
+         *
+         * Note: DefDescriptor<StyleDef> has its parent component's frequency in dependencyMap.
+         */
+        if (dependencyMap != null) {
+            for (Map.Entry<DefDescriptor<?>, Integer> dependencyEntry : dependencyMap.entrySet()) {
+                DefDescriptor<?> defDescriptor = dependencyEntry.getKey();
+                if (defDescriptor.getDefType() == DefType.STYLE) {
+                    DefDescriptor<StyleDef> styleDD = (DefDescriptor<StyleDef>) defDescriptor;
+                    /**
+                     * Because we're loading and caching CSS by preloads, we check whether this style def
+                     * descriptor is in the set of filtered descriptors by preloads
+                     *
+                     * Remove this when we load CSS based on dependencies instead of preloads
+                     */
+                    if (styleDefDescriptors.contains(defDescriptor)) {
+                        styles.put(styleDD, dependencyEntry.getValue());
+                    }
+                }
+            }
+        }
+
+        // Add namespace StyleDefs that are not in the dependencyMap so that we can sort afterwards
+        for (DefDescriptor<StyleDef> style : styleDefDescriptors) {
+            if (!styles.containsKey(style)) {
+                // frequency is 1 because it most likely doesn't have any descendants
+                styles.put(style, 1);
+            }
+        }
+
+        /**
+         * Dependency map includes frequency (calculated by its number of descendants). We sort by this frequency to
+         * order the CSS by ancestors first then alphabetical.
+         *
+         * Comparing DefDescriptor is cleaner than comparing Definition
+         */
+        Comparator frequencyComparator = Ordering.natural().reverse().onResultOf(Functions.forMap(styles))
+                .compound(Ordering.natural());
+        Map<DefDescriptor<StyleDef>, Integer> sorted = ImmutableSortedMap.copyOf(styles, frequencyComparator);
+
+        // We ultimately want StyleDefs so here they are
+        Set<StyleDef> styleDefs = Sets.newLinkedHashSet();
+        for (DefDescriptor<StyleDef> sdd : sorted.keySet()) {
+            StyleDef def = sdd.getDef();
+            if (def != null) {
+                styleDefs.add(def);
+            }
+        }
+
+        return styleDefs;
     }
 
     /**

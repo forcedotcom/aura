@@ -455,6 +455,17 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         }
     }
 
+    @Override
+    public void appendSupers(Set<DefDescriptor<?>> supers) throws QuickFixException {
+        if (getExtendsDescriptor() != null) {
+            supers.add(getExtendsDescriptor());
+        }
+
+        for (DefDescriptor<InterfaceDef> interfaze : getInterfaces()) {
+            supers.add(interfaze);
+        }
+    }
+
     /**
      * This is used to validate by the compiler to validate EventDefRefs.
      * 
@@ -547,6 +558,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         }
     }
 
+    @Override
     public StyleDef getStyleDef() throws QuickFixException {
         return styleDescriptor == null ? null : styleDescriptor.getDef();
     }

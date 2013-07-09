@@ -148,7 +148,6 @@ public interface MasterDefRegistry {
      * Get the last mod time for set of descriptors.
      * 
      * @param uid the UID for the definition (must have called {@link #getUid(String, DefDescriptor<?>)}).
-     * @param descriptor the descriptor.
      */
     <T extends Definition> long getLastMod(String uid);
 
@@ -156,9 +155,15 @@ public interface MasterDefRegistry {
      * Get the dependencies for a descriptor.
      * 
      * @param uid the UID for the definition (must have called {@link #getUid(String, DefDescriptor<?>)}).
-     * @param descriptor the descriptor.
      */
     <T extends Definition> Set<DefDescriptor<?>> getDependencies(String uid);
+
+    /**
+     * Get the dependencies map for an UID.
+     *
+     * @param uid the UID for the definition (must have called {@link #getUid(String, DefDescriptor<?>)}).
+     */
+    <T extends Definition> Map<DefDescriptor<?>, Integer> getDependenciesMap(String uid);
 
     /**
      * Get a named string from the cache for a def.

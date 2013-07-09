@@ -254,6 +254,10 @@ public class AuraImplUnitTestingUtil {
             public Visibility getVisibility() {
                 return Visibility.PUBLIC;
             }
+
+            @Override
+            public void appendSupers(Set<DefDescriptor<?>> supers) throws QuickFixException {
+            }
         };
     }
 

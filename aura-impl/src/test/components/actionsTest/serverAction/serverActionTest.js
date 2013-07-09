@@ -21,17 +21,5 @@
             stillBG.setBackground(false);
             $A.test.assertTrue(stillBG.isBackground(), "stillBG action should not have had isBackground set to false");
         }
-    },
-    testClientActionIsBackground : {
-    	test : function(component) {
-    		var clientSideAction = component.get("c.clientSideAction");
-            $A.test.assertFalse(clientSideAction.isBackground(), "clientSideAction should have had isBackground === false");
-            
-            clientSideAction.setBackground(true);
-            $A.test.assertTrue(clientSideAction.isBackground(), "clientSideAction should have had isBackground === true after calling setBackground(true)");
-    		
-            var clientSideAction = component.get("c.clientSideAction");
-            $A.test.assertFalse(clientSideAction.isBackground(), "a freshly created clientSideAction should have had isBackground === false");
-    	}
     }
 })

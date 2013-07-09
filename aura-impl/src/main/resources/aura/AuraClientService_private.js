@@ -403,7 +403,7 @@ var priv = {
         for (var i = 0; i < actions.length; i++) {
             action = actions[i];
             action.runDeprecated();
-            action.finishAction();
+            action.finishAction($A.getContext());
         }
     },
 

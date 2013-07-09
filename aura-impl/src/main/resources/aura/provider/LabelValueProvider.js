@@ -82,7 +82,7 @@ $A.ns.LabelValueProvider.prototype.requestServerLabel = function(section, name, 
                     returnValues[i].setValue(a.getReturnValue());
                 }
             } else {
-                $A.log("Error getting label: " + expression.getValue());
+                $A.log("Error getting label: " + section + "." +name);
             }
 
             var callbacks = queue.getCallbacks();

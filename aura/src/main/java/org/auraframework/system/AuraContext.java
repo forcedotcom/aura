@@ -286,6 +286,20 @@ public interface AuraContext {
     DefDescriptor<?> getPreloading();
 
     /**
+     * Set the incoming loaded descriptors.
+     *
+     * @param clientLoaded the set of loaded descriptors from the client.
+     */
+    void setClientLoaded(Map<DefDescriptor<?>,String> clientLoaded);
+
+    /**
+     * Get the set of descriptors loaded on the client, and sent in the request.
+     *
+     * @return a map of descriptor to UID, unmodifiable.
+     */
+    Map<DefDescriptor<?>,String> getClientLoaded();
+
+    /**
      * Add a loaded descriptor+UID pair.
      *
      * This routine will remember a descriptor in the set of loaded

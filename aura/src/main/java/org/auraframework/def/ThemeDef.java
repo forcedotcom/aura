@@ -22,8 +22,6 @@ import com.google.common.base.Optional;
 /**
  * {@link ThemeDef}s are top-level tags that contain a set of attributes. They provide the information necessary to
  * perform theme variable substitution in stylesheets.
- * 
- * @author nmcwilliams
  */
 public interface ThemeDef extends RootDefinition {
     @Override

@@ -27,6 +27,7 @@ import org.auraframework.Aura;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.AttributeDefRef;
 import org.auraframework.def.BaseComponentDef;
+import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.ModelDef;
@@ -193,6 +194,17 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
                 this.valueProviders.putAll(valueProviders);
             }
             this.valueProviders.put(ValueProviderType.VIEW.getPrefix(), attributeSet);
+            
+            //
+            // def can be null if a definition not found exception was thrown for that
+            // definition. Odd.
+            //
+            if (def != null) {
+                ControllerDef cd = def.getControllerDef();
+                if (cd != null) {
+                    this.valueProviders.put(ValueProviderType.CONTROLLER.getPrefix(), cd);
+                }
+            }
 
             loggingService.incrementNum(LoggingService.CMP_COUNT);
         } finally {
@@ -454,21 +466,8 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
     protected I concreteComponent;
     protected boolean remoteProvider = false;
     private final Map<String, List<String>> index = Maps.newLinkedHashMap();
-    private final Map<String, Object> valueProviders = new LinkedHashMap<String, Object>(); // FIXME
-                                                                                            // -
-                                                                                            // the
-                                                                                            // keys
-                                                                                            // should
-                                                                                            // be
-                                                                                            // ValueProviders,
-                                                                                            // but
-                                                                                            // first
-                                                                                            // we
-                                                                                            // need
-                                                                                            // to
-                                                                                            // wrap
-                                                                                            // non-m/v/c
-                                                                                            // providers.
+    // FIXME - the keys should be ValueProviders, but first we need to wrap non-m/v/c providers.
+    private final Map<String, Object> valueProviders = new LinkedHashMap<String, Object>();
     protected boolean hasLocalDependencies = false;
     protected boolean hasProvidedAttributes;
 }

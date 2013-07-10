@@ -118,7 +118,79 @@
 <ui:carousel aura:id="carouselDefaultOverride" width="450" height="450" title="Im A Carousel" defaultPage="3">
 	<aura:set attribute="pageComponents">
  		<ui:carouselPage title="Im Page 1">
- 			<ui:outputText aura:id="cdo-p1-output" value="page 1"/>
+ 			<ui:scroller>
+ 				<ui:outputText aura:id="cdo-p1-output" value="page 1"/>
+ 				<br/>
+ 				<div> long page with tons of content that it goes below page length</div>
+ 				<br/>
+ 				<div>Give me a second I,</div>
+				<div>I need to get my story straight</div>
+				<div>My friends are in the bathroom gettlocaling higher than the Empire State</div>
+				<div>My lover she’s waiting for me just across the bar</div>
+				<div>My seat’s been taken by some sunglasses asking 'bout a scar, and</div>
+				<div>I know I gave it to you months ago</div>
+				<div>I know you’re trying to forget</div>
+				<div>But between the drinks and subtle things</div>
+				<div>The holes in my apologies, you know</div>
+				<div>I’m trying hard to take it back</div>
+				<div>So if by the time the bar closes</div>
+				<div>And you feel like falling down</div>
+				<div>I’ll carry you home</div>
+				<br/>
+				<div>Tonight</div>
+				<div>We are young</div>
+				<div>So let’s set the world on fire</div>
+				<div>We can burn brighter than the sun</div>
+				<br/>
+				<div>Tonight</div>
+				<div>We are young</div>
+				<div>So let’s set the world on fire</div>
+				<div>We can burn brighter than the sun</div>
+				<br/>
+				<div>Now I know that I’m not</div>
+				<div>All that you got</div>
+				<div>I guess that I, I just thought</div>
+				<div>Maybe we could find new ways to fall apart</div>
+				<div>But our friends are back</div>
+				<div>So let’s raise a toast</div>
+				<div>‘Cause I found someone to carry me home</div>
+				<br/>
+				<div>Tonight</div>
+				<div>We are young</div>
+				<div>So let’s set the world on fire</div>
+				<div>We can burn brighter than the sun</div>
+				<br/>
+				<div>Tonight</div>
+				<div>We are young</div>
+				<div>So let’s set the world on fire</div>
+				<div>We can burn brighter than the sun</div>
+				<br/>
+				<div>Carry me home tonight (Nananananana)</div>
+				<div>Just carry me home tonight (Nananananana)</div>
+				<div>Carry me home tonight (Nananananana)</div>
+				<div>Just carry me home tonight (Nananananana)</div>
+				<br/>
+				<div>The moon is on my side (Nananananana)</div>
+				<div>I have no reason to run (Nananananana)</div>
+				<div>So will someone come and carry me home tonight (Nananananana)</div>
+				<div>The angels never arrived (Nananananana)</div>
+				<div>But I can hear the choir (Nananananana)</div>
+				<div>So will someone come and carry me home (Nananananana)</div>
+				<br/>
+				<div>Tonight</div>
+				<div>We are young</div>
+				<div>So let’s set the world on fire</div>
+				<div>We can burn brighter than the sun</div>
+				<br/>
+				<div>Tonight</div>
+				<div>We are young</div>
+				<div>So let’s set the world on fire</div>
+				<div>We can burn brighter than the sun</div>
+				<br/>
+				<div>So if by the time the bar closes</div>
+				<div>And you feel like falling down</div>
+				<div>I’ll carry you home tonight</div>
+ 			</ui:scroller>
  		</ui:carouselPage>
  		<ui:carouselPage title="Im Page 2" isDefault="{!true}">
  			<ui:outputText aura:id="cdo-p2-output" value="page 2"/>

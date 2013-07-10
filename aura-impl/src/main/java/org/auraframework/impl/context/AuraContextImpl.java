@@ -66,7 +66,7 @@ public class AuraContextImpl implements AuraContext {
             List<String> gid0split = AuraTextUtil.splitSimple(":", gid0, 2);
             List<String> gid1split = AuraTextUtil.splitSimple(":", gid1, 2);
             return (Integer.parseInt(gid0split.get(gid0split.size() - 1))
-            - Integer.parseInt(gid1split.get(gid1split.size() - 1)));
+                - Integer.parseInt(gid1split.get(gid1split.size() - 1)));
         }
     }
 
@@ -82,6 +82,8 @@ public class AuraContextImpl implements AuraContext {
         private Serializer(boolean forClient, boolean serializeLastMod) {
             this.forClient = forClient;
         }
+
+        public static final String DELETED = "deleted";
 
         @Override
         public void serialize(Json json, AuraContext ctx) throws IOException {
@@ -106,17 +108,19 @@ public class AuraContextImpl implements AuraContext {
                 }
                 json.writeMapEntry("requestedLocales", locales);
             }
-            //
-            // We really should handle sending more than this, but, well, we don't
-            // for the moment. This is part of the larger problem of figuring out
-            // what the client has... and here, we want to keep track of the UID
-            // as well. We could do this with a set of defs, and an overall UID,
-            // but we don't have that set yet.
-            //
-            Map<String, String> loadedStrings = Maps.newHashMap();
-            for (Map.Entry<DefDescriptor<?>, String> entry : ctx.getLoaded().entrySet()) {
+            Map<String,String> loadedStrings = Maps.newHashMap();
+            Map<DefDescriptor<?>, String> clientLoaded = Maps.newHashMap();
+            clientLoaded.putAll(ctx.getClientLoaded());
+            for (Map.Entry<DefDescriptor<?>,String> entry : ctx.getLoaded().entrySet()) {
                 loadedStrings.put(String.format("%s@%s", entry.getKey().getDefType().toString(),
-                        entry.getKey().getQualifiedName()), entry.getValue());
+                                                entry.getKey().getQualifiedName()), entry.getValue());
+                clientLoaded.remove(entry.getKey());
+            }
+            if (forClient) {
+                for (DefDescriptor<?> deleted : clientLoaded.keySet()) {
+                    loadedStrings.put(String.format("%s@%s", deleted.getDefType().toString(),
+                                deleted.getQualifiedName()), DELETED);
+                }
             }
             if (loadedStrings.size() > 0) {
                 json.writeMapKey("loaded");
@@ -218,6 +222,7 @@ public class AuraContextImpl implements AuraContext {
     private final Map<ValueProviderType, GlobalValueProvider> globalProviders;
 
     private final Map<DefDescriptor<?>, String> loaded = Maps.newLinkedHashMap();
+    private final Map<DefDescriptor<?>, String> clientLoaded = Maps.newLinkedHashMap();
 
     private final Map<String, BaseComponent<?, ?>> componentRegistry = Maps.newLinkedHashMap();
 
@@ -273,7 +278,7 @@ public class AuraContextImpl implements AuraContext {
         this.isDebugToolEnabled = isDebugToolEnabled;
     }
 
-	@Override
+    @Override
     public void addPreload(String preload) {
         preloadedNamespaces.add(preload);
     }
@@ -450,12 +455,9 @@ public class AuraContextImpl implements AuraContext {
     @Override
     public void setApplicationDescriptor(DefDescriptor<? extends BaseComponentDef> appDesc) {
         //
-        // This logic is twisted, but not unreasonable. If someone is setting an
-        // application,
-        // we use it, otherwise, if it is a Component, we only override
-        // components, leaving
-        // applications intact. Since components are only legal for dev mode,
-        // this shouldn't
+        // This logic is twisted, but not unreasonable. If someone is setting an application,
+        // we use it, otherwise, if it is a Component, we only override components, leaving
+        // applications intact. Since components are only legal for dev mode, this shouldn't
         // affect much. In fact, most use cases, this.appDesc will be null.
         //
         if ((appDesc != null && appDesc.getDefType().equals(DefType.APPLICATION)) || this.appDesc == null
@@ -547,26 +549,30 @@ public class AuraContextImpl implements AuraContext {
     }
 
     @Override
+    public void setClientLoaded(Map<DefDescriptor<?>, String> clientLoaded) {
+        loaded.putAll(clientLoaded);
+        clientLoaded.putAll(clientLoaded);
+    }
+
+    @Override
     public void addLoaded(DefDescriptor<?> descriptor, String uid) {
         loaded.put(descriptor, uid);
     }
 
-    public static final String DELETED = "deleted";
 
     @Override
     public void dropLoaded(DefDescriptor<?> descriptor) {
-        loaded.put(descriptor, DELETED);
+        loaded.remove(descriptor);
+    }
+
+    @Override
+    public Map<DefDescriptor<?>, String> getClientLoaded() {
+        return Collections.unmodifiableMap(clientLoaded);
     }
 
     @Override
     public Map<DefDescriptor<?>, String> getLoaded() {
-        Map<DefDescriptor<?>, String> safeLoaded = Maps.newHashMapWithExpectedSize(loaded.size());
-        for (Map.Entry<DefDescriptor<?>, String> entry : loaded.entrySet()) {
-            if (!DELETED.equals(entry.getValue())) {
-                safeLoaded.put(entry.getKey(), entry.getValue());
-            }
-        }
-        return Collections.unmodifiableMap(safeLoaded);
+        return Collections.unmodifiableMap(loaded);
     }
 
     @Override
@@ -581,11 +587,7 @@ public class AuraContextImpl implements AuraContext {
 
     @Override
     public String getUid(DefDescriptor<?> descriptor) {
-        String val = loaded.get(descriptor);
-        if (DELETED.equals(val)) {
-            return null;
-        }
-        return val;
+        return loaded.get(descriptor);
     }
 
     @Override
@@ -598,8 +600,8 @@ public class AuraContextImpl implements AuraContext {
         return fwUID;
     }
 
-	@Override
-	public boolean getIsDebugToolEnabled() {
-		return isDebugToolEnabled;
-	}
+    @Override
+    public boolean getIsDebugToolEnabled() {
+            return isDebugToolEnabled;
+    }
 }

@@ -1,20 +1,17 @@
 ({
     render: function(component){
         $A.mark("Rendering time for performanceTest:iterateBasicData");
-        $A.mark("Rerender time for performanceTest:iterateBasicData");
         return this.superRender();
     },
 
     afterRender: function(component){
-        var ret = this.superAfterRender();
+        this.superAfterRender();
         $A.endMark("Rendering time for performanceTest:iterateBasicData");
-        return ret;
     },
 
     rerender: function(component){
-        $A.mark("performanceTest:iterateBasicData Rerender Time");
-        var ret = this.superRerender();
+        $A.mark("Rerender time for performanceTest:iterateBasicData");
+        this.superRerender();
         $A.endMark("Rerender time for performanceTest:iterateBasicData");
-        return ret;
     }
 })

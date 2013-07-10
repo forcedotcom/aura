@@ -367,7 +367,9 @@
  	getNavigationIndicators : function(carousel) {
  		$A.test.assertFalse($A.util.isUndefinedOrNull(carousel), 
     		"Carousel not given. Is the name of the carousel correct?");
-    	return carousel.get("v.indicators")[0].find("indicatorItems");
+ 		var helper = carousel.getDef().getHelper();
+ 		var indicatorCmp = helper.getPageIndicatorsComponent(carousel);
+    	return indicatorCmp.find("indicatorItems");
  	},
  	
  	/** 

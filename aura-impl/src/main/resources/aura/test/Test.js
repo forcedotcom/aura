@@ -180,8 +180,8 @@ var Test = function(){
         /**
          * enqueue an action, ensuring that it is safely inside an aura call.
          */
-        enqueueAction: function(action) {
-            $A.run(function() { $A.enqueueAction(action); });
+        enqueueAction: function(action, background) {
+            $A.run(function() { $A.enqueueAction(action, background); });
         },
 
         /**

@@ -17,7 +17,7 @@
 {
 	updateSize: function(cmp, width, height) {
 		var width = width || cmp.get('v.priv_width'),
-			height = cmp.get('v.priv_height');			
+			height = height || cmp.get('v.priv_height');			
 		
 		var style = [width ? ('width:' + width + 'px;') : '', height ? ('height:' + height + 'px;') : ''].join('');
 

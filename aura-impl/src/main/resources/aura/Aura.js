@@ -530,37 +530,43 @@ $A.ns.Aura.prototype.finishInit = function(doNotCallJiffyOnLoad) {
  * }
  * </code>
  * @public
+ * @param {String} msg The error message to be displayed to the user.
  * @param {Error} e The error message or error object to be displayed to the user.
  */
-$A.ns.Aura.prototype.error = function(e) {
-    var msg = null;
-    var logMsg = null;
+$A.ns.Aura.prototype.error = function(msg, e){
+    var logMsg = msg || "";
+    var dispMsg;
 
-    if ($A.util.isString(e)) {
-        logMsg = e;
-        msg = e;
-        e = null;
+    if (!$A.util.isString(msg)) {
+        e = msg;
+        logMsg = "";
+        msg = "Unknown Error";
+    }
+    if (!e) {
+        e = undefined;
     } else if (!$A.util.isObject(e) && !$A.util.isError(e)) {
-        logMsg = "Unrecognized parameter to aura.error";
-        msg = "Internal Error";
-    } else {
-        logMsg = null;
-        if (!$A.util.isUndefinedOrNull(e.message)) {
-            msg = e.message;
-        } else {
-            msg = "Unknown Error";
-        }
+        logMsg = "Internal Error: Unrecognized parameter to aura.error";
+    }
+    if (!logMsg.length) {
+        logMsg = "Unknown Error";
+    }
+    dispMsg = logMsg;
+    if (e && !$A.util.isUndefinedOrNull(e.message)) {
+        dispMsg = dispMsg+" : "+e.message;
     }
     //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
     var stack = this.getStackTrace(e);
     $A.logInternal("Error", logMsg, e, stack);
     if ($A.util.isObject(e)) {
         for(var k in e) {
+            if (k === "stack" || k === "message") {
+                continue;
+            }
             try {
                 var val = e[k];
 
                 if ($A.util.isString(val)) {
-                    msg = msg + '\n' + val;
+                    dispMsg = dispMsg + '\n' + val;
                 }
             } catch (e2) {
                 // Ignore serialization errors
@@ -568,11 +574,14 @@ $A.ns.Aura.prototype.error = function(e) {
         }
     }
     if (stack) {
-        msg = msg+"\n"+stack.join("\n");
+        dispMsg = dispMsg+"\n"+stack.join("\n");
     }
     //#end
-    $A.message(msg);
+    $A.message(dispMsg);
     if ($A.test) {
+        //
+        // Note that this sends the original message through to the test
+        //
         $A.test.auraError(msg);
     }
     if (!$A.initialized) {
@@ -682,7 +691,7 @@ $A.ns.Aura.prototype.run = function(func, name) {
     try {
         return func();
     } catch (e) {
-        $A.error(e);
+        $A.error("Error while running "+name, e);
     } finally {
         $A.services.client.popStack(name);
     }

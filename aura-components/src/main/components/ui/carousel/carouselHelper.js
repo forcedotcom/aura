@@ -20,6 +20,8 @@
 	SCROLL_START_THRESHOLD : 10,
 	//indicates only the selected page is visible or not
     SHOW_SELECTED_PAGE_ONLY : true,
+    //navContainer height, hardcode for now so it does require updating the size dynamically which causes reflow
+    NAV_CONTAINER_HEIGHT : 58,
    	
 	init : function(cmp) {		
 		this.initSize(cmp);
@@ -29,20 +31,18 @@
 	initSize : function(cmp) {
 		var width = cmp.get('v.width'),
 			height = cmp.get('v.height'),
-			carouselStyle = width ? ('width:' + width + 'px;') : '';
-			
+			pageStyle = carouselStyle = width ? ('width:' + width + 'px;') : '';			
 		
 		cmp._width = width;
 		cmp._height = height;
 				
 		if (height) {			
 			carouselStyle += 'height:' + height + 'px;';
-		} else {
-			carouselStyle += 'height:100%';			
-			cmp.getValue('v.priv_scrollContentClass').setValue('full-height');
+			pageStyle += 'height:' + (height - this.NAV_CONTAINER_HEIGHT) + 'px';
 		}
 		
 		cmp.getAttributes().setValue('priv_carouselStyle', carouselStyle);
+		cmp.getAttributes().setValue('priv_pageStyle', pageStyle);
 	},
 	
 	initScroller: function(cmp) {		
@@ -69,7 +69,8 @@
 			pageCmps = this.getPageComponents(cmp),			
 			isContinuousFlow = cmp.get('v.continuousFlow'), 
 			isVisible = isContinuousFlow || !this.SHOW_SELECTED_PAGE_ONLY,
-			page, snap = this.getSnap(cmp),			
+			page, snap = this.getSnap(cmp),	
+			pageHeight = this.getPageSize(cmp).height,
 			pages = [];	
 		
 		//reset current page;
@@ -78,7 +79,8 @@
 		if (pageCmps && pageCmps.length > 0) {
 			//TODO: need a better solution to handle iteration inside the pageComponents
 			if (pageCmps[0].isInstanceOf('aura:iteration')) {				
-				pageCmps = pageCmps[0].get('v.realBody');
+				//pageCmps = pageCmps[0].get('v.realBody');
+				pageCmps = this.getPageComponentsFromIteration(pageCmps[0]); 				
 			}
 			
 			for ( var i = 0; i < pageCmps.length; i++) {
@@ -89,9 +91,9 @@
 					page.getValue('v.pageIndex').setValue(i + 1);
 					page.getValue('v.parent').setValue([cmp]);
 					page.getValue('v.priv_width').setValue(cmp._width);
+					page.getValue('v.priv_height').setValue(pageHeight);
 					page.getValue('v.priv_visible').setValue(isVisible);
-					page.getValue('v.priv_snap').setValue(snap);
-					//page.getValue('v.priv_height').setValue(cmp._height);
+					page.getValue('v.priv_snap').setValue(snap);					
 					page.getValue('v.priv_continuousFlow').setValue(isContinuousFlow);
 					pages.push(page);
 				}
@@ -111,7 +113,7 @@
 			            	'parent' : [cmp],
 			            	'priv_snap' : snap,
 			            	'priv_width' : cmp._width,
-			            	//'priv_height' : cmp._height,
+			            	'priv_height' : pageHeight,
 			            	'priv_continuousFlow' : isContinuousFlow}}
 			        },null,true);
 				 pages.push(component);
@@ -130,6 +132,21 @@
 			indCmp.addHandler('pagerClicked', cmp, 'c.pagerClicked');
 			indCmp.addHandler('pagerKeyed', cmp, 'c.pagerKeyed');			 
 		}		 
+	},
+	
+	getPageComponentsFromIteration : function(iterCmp) {
+		var realBody = iterCmp.get('v.realBody'),
+			pageCmps = [];
+		
+		for (var i=0; i< realBody.length; i++) {
+			if (realBody[i].isInstanceOf('aura:iteration')) {
+				pageCmps = pageCmps.concat(this.getPageComponentsFromIteration(realBody[i])); 
+			} else if (realBody[i].isInstanceOf("ui:carouselPage")) {
+				pageCmps.push(realBody[i]);
+			}		
+		}
+		
+		return pageCmps;
 	},
 		
 	/**
@@ -150,33 +167,84 @@
 			origHeight = cmp.get('v.height');
 	
 		var pages = this.getPageComponents(cmp);
-		//need to update each page width if carousel width is not explicitly set
-		if (pages && pages.length > 0 && !origWidth) {				
-			var parentSize = this._getParentSize(cmp.getElement()), 
-				style = ['width:', parentSize.width, 'px;', origHeight ? 'height:' + origHeight : ''].join('');
-			
-			cmp.getValue('v.priv_carouselStyle').setValue(style);
-			cmp.getValue('v.priv_scrollerWidth').setValue(parentSize.width * pages.length + 'px');
-			
-			for (var i=0; i< pages.length; i++) {
-				var e = pages[i].get('e.updateSize');
-				e.setParams({pageSize: parentSize});
-				e.fire();					
-			}
+		//need to update size width if carousel width and height is not explicitly set
+		if (pages.length > 0 && !(origWidth  && origHeight)) {
+			var carouselSize = this.getCarouselSize(cmp, origWidth, origHeight);
+			 	
+			this.updateCarouselSize(cmp, pages, carouselSize);
+			this.updatePageSize(cmp, pages, origWidth, origHeight, carouselSize);			
 		}
 	},
 	
+	updateCarouselSize: function(cmp, pages, carouselSize) {	
+		cmp.getValue('v.priv_carouselStyle').setValue(this._getStyleString(carouselSize.width, carouselSize.height));		
+		cmp.getValue('v.priv_scrollerWidth').setValue(carouselSize.width * pages.length + 'px'); 
+	},
 	
-	_getParentSize: function(el) {		 		
-		var width, height,
-			parent = el.parentNode;
+	updatePageSize: function(cmp, pages, origWidth, origHeight, carouselSize) {
+		var height,
+			width;
 		
-		if (parent) {
-			width = parent.offsetWidth;
-			height = parent.offsetHeight;			
+		 
+		var navContainerHeight,
+			navContainer = cmp.find('navContainer');
+		
+		if (navContainer) {
+			navContainerHeight = navContainer.getElement().offsetHeight;
+		}					
+		height = carouselSize.height - navContainerHeight;
+		 
+		cmp.getValue('v.priv_pageStyle').setValue(this._getStyleString(carouselSize.width, height));
+		
+		if (!origWidth) {
+			for (var i=0; i< pages.length; i++) {
+				var e = pages[i].get('e.updateSize');
+				//page width always same as carousel width	
+				e.setParams({pageSize: {width:carouselSize.width, height:height}})
+				e.fire(); 
+			}
+		} 
+	},
+	
+	_getStyleString: function(width, height) {
+		var style = width ? 'width:' + width + 'px;' : '';
+			style += height ? 'height:' + height + 'px;' : '';
+		
+		return style ? style : null;		
+	},
+	
+	getCarouselSize: function(cmp, origWidth, origHeight) {		 		
+		var width, 
+			height,
+			navContainerHeight = 0,			 
+			windowSize = $A.util.getWindowSize(),
+			el = cmp.getElement();
+		
+		var navContainer = cmp.find('navContainer');
+		if (navContainer) {
+			navContainerHeight = navContainer.getElement().offsetHeight;
+		}		
+		
+		width = origWidth ? origWidth : el ? el.offsetWidth : windowSize.width;
+		height = origHeight ? this.getPageSize(cmp).height + navContainerHeight : el ? el.offsetHeight : windowSize.height;			
+		
+		return {width: width, height: height};
+	},
+	
+	getPageSize: function(cmp) {
+		var width = cmp.get('v.width'),
+			height = cmp.get('v.height');
+			
+		if (height) {
+			height = height - this.NAV_CONTAINER_HEIGHT;
+		} else {
+			var el = cmp.find('pageContainer').getElement();
+			if (el) {
+				height = el.offsetHeight;
+			}
 		}
-		
-		return {width: width, height: height}
+		 
+		return {width: width, height: height};
 	},
 		 
 	
@@ -236,12 +304,18 @@
 		if (!this.SHOW_SELECTED_PAGE_ONLY) {
 			return;
 		}
-		
+					
 		var scroller = this.getScroller(cmp),
 			nextPage,			
 			prevSelectedPage = cmp.get('v.priv_currentPage');
 		
-		if (scroller.absDistX > this.SCROLL_START_THRESHOLD && !cmp._isScrollStartProcessed) {			
+		
+		if (evt.isEventHandledByChildCarousel && (scroller.dirX == 1 || scroller.dirX == -1)) {			
+			//nested scroller and swiping horizontal
+			scroller.disable();
+			delete evt.isEventHandledByChildCarousel;
+		} else	if (scroller.absDistX > this.SCROLL_START_THRESHOLD && !cmp._isScrollStartProcessed) {
+			
 			if (scroller.dirX == 1) {
 				//scrolling to right
 				//scroller page starts with 0;
@@ -253,9 +327,13 @@
 					
 			cmp._isScrollStartProcessed = true;
 			var pages = this.getPageComponents(cmp);			
-			if (nextPage > 0 && nextPage < pages.length) {			
+			if (nextPage > 0 && nextPage <= pages.length) {			
 				this.showPage(this.getPageComponentFromIndex(cmp, nextPage), nextPage);
 			}
+		}
+		
+		if (!evt.isEventHandledByChildCarousel) {
+			evt.isEventHandledByChildCarousel = true;
 		}
 	},
 	
@@ -267,7 +345,7 @@
 			//scroller page starts with 0
 			currentPageX = scroller.currPageX + 1,			
 			prevSelectedPage = cmp.get('v.priv_currentPage');
-		
+				
 		cmp._isScrollStartProcessed = false;
 
 		if (prevSelectedPage == currentPageX) {
@@ -400,7 +478,7 @@
 		 
 		
 	getPageComponents:function(cmp) {
-		return cmp.get('v.pageComponents');
+		return cmp.get('v.pageComponents') || [];
 	},
 	
 	getPageModels:function(cmp) {
@@ -427,7 +505,9 @@
 	},
 	
 	getPageIndicatorsComponent : function(cmp) {
-		var indicators = cmp.get('v.indicators');
+		var navContainer = cmp.find('navContainer');
+		var indicators = navContainer ? navContainer.get('v.body') : null;
+		
 		return cmp.get('v.continuousFlow') != true && indicators ? indicators[0] : null;
 	},
 	 

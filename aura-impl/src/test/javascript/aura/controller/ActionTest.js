@@ -546,9 +546,9 @@ Test.Aura.Controller.ActionTest = function() {
 		}
 
 		[ Fact ]
-		function SetsStateToRunning() {
+		function SetsStateToSuccess() {
 			// Arrange
-			var expectedState = "RUNNING";
+			var expectedState = "SUCCESS";
 			var mockAssert = Mocks.GetMock(Object.Global(), "$A", {
 				assert : function(param) {
 				}

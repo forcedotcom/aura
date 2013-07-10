@@ -13,16 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.test.logging;
 
+package org.auraframework.impl.context;
 import java.util.List;
 import java.util.Map;
 
-import org.auraframework.impl.context.LoggingContextImpl;
+import org.auraframework.impl.LoggingAdapterImpl;
 import org.auraframework.system.LoggingContext;
 import org.auraframework.test.adapter.TestLoggingAdapter;
-
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 /**
  * Hook into logger so we can do some basic request monitoring in tests, as
@@ -31,27 +31,34 @@ import com.google.common.collect.Lists;
  * 
  * @since 0.0.224
  */
-public class TestLoggingAdapterImpl implements TestLoggingAdapter {
+public class TestLoggingAdapterImpl extends LoggingAdapterImpl implements TestLoggingAdapter 
+{
     private static ThreadLocal<LoggingContext> currentContext = new ThreadLocal<LoggingContext>();
     private final List<Map<String, Object>> logs = Lists.newLinkedList();
-    private boolean isCapturing = false;
-
+    private boolean isCapturing=false;
+    
     @Override
     public LoggingContext establish() {
-        LoggingContext lc = new TestLoggingContextImpl();
-        currentContext.set(lc);
-        return lc;
+    		TestLoggingContext lc = new TestLoggingContext();
+    		currentContext.set(lc);
+        	return lc;
     }
 
     @Override
     public boolean isEstablished() {
-        return currentContext.get() != null;
+        return (currentContext.get() != null);
     }
 
     @Override
     public void release() {
-        currentContext.set(null);
+    	currentContext.set(null);
+    	super.release();
     }
+    
+    @Override
+    public List<Map<String, Object>> getLogs() {
+        return logs;
+    } 
 
     @Override
     public LoggingContext getLoggingContext() {
@@ -69,22 +76,20 @@ public class TestLoggingAdapterImpl implements TestLoggingAdapter {
     }
 
     @Override
-    public List<Map<String, Object>> getLogs() {
-        return logs;
-    }
-
-    @Override
     public void clear() {
         logs.clear();
     }
 
-    private class TestLoggingContextImpl extends LoggingContextImpl {
+    public class TestLoggingContext extends LoggingContextImpl {
+        
         @Override
         protected void log(Map<String, Object> valueMap) {
             if (isCapturing) {
-                logs.add(valueMap);
+                logs.add(Maps.newHashMap(valueMap));
             }
-            super.log(valueMap);
+            super.log(valueMap);//keep logging-adapter informed
         }
+
     }
+
 }

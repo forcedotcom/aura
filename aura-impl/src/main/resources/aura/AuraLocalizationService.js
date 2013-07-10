@@ -62,7 +62,7 @@ var AuraLocalizationService = function AuraLocalizationService() {
             if (!currencyFormat) {
                 currencyFormat = new NumberFormat($A.get("$Locale.currencyFormat"));
             }
-            return ccurrencyFormatf;
+            return currencyFormat;
         },
 
         /**

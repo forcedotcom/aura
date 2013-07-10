@@ -50,9 +50,9 @@
     },
 
     testDecimalValue: {
-        attributes : {value : 0.00000000009, interval: 0.00000000001},
+        attributes : {value : 10.3249},
         test : function(component){
-            $A.test.assertEquals(0.00000000009, component.get("v.value"), "value does not equal expected");
+            $A.test.assertEquals(10.3249, component.get("v.value"), "value does not equal expected");
         }
     },
 
@@ -71,9 +71,9 @@
     },
 
     testSmallValue: {
-        attributes : {value : 0.00000000005, interval : 0.00000000001},
+        attributes : {value : 0.000005},
         test : function(component){
-            $A.test.assertEquals(0.00000000005, component.get("v.value"), "value does not equal expected");
+            $A.test.assertEquals(0.000005, component.get("v.value"), "value does not equal expected");
         }
     },
 

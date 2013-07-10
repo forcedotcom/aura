@@ -51,6 +51,10 @@
     {!v.extraScriptTags}
     {!v.auraScriptTags}
     
+    <script src="/auraFW/resources/moment/moment.js"></script>
+    <script src="{!'/auraFW/resources/walltime-js/olson/walltime-data_' + $Locale.timezoneFileName + '.js'}"></script>
+    <script src="/auraFW/resources/walltime-js/walltime.js"></script>
+    
     <script>
    	$A.initConfig({!v.auraInit}, true, true, true);
     </script>

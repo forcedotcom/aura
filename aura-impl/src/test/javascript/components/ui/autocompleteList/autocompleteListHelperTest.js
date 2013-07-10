@@ -43,6 +43,8 @@ Test.Components.Ui.AutocompleteList.AutocompleteListHelperTest=function(){
 						return testItems;
 					} else if (expression === "v.visible") {
 						return true;
+					} else if (expression === "v.propertyToMatch") {
+						return "label";
 					}
 				},
 				setValue : function(expression, value) {
@@ -84,6 +86,8 @@ Test.Components.Ui.AutocompleteList.AutocompleteListHelperTest=function(){
 						return testItems;
 					} else if (expression === "v.visible") {
 						return true;
+					} else if (expression === "v.propertyToMatch") {
+						return "label";
 					}
 				},
 				setValue : function(expression, value) {
@@ -125,6 +129,8 @@ Test.Components.Ui.AutocompleteList.AutocompleteListHelperTest=function(){
 						return testItems;
 					} else if (expression === "v.visible") {
 						return true;
+					} else if (expression === "v.propertyToMatch") {
+						return "label";
 					}
 				},
 				setValue : function(expression, value) {
@@ -164,6 +170,51 @@ Test.Components.Ui.AutocompleteList.AutocompleteListHelperTest=function(){
 						return testItems;
 					} else if (expression === "v.visible") {
 						return true;
+					} else if (expression === "v.propertyToMatch") {
+						return "label";
+					}
+				},
+				setValue : function(expression, value) {
+					if (expression === "v.items") {
+						actual = value;	
+					}
+				}
+			}
+			
+			var mockHelperMethods = Mocks.GetMocks(targetHelper, {
+				toggleListVisibility : function(cmp, value){}
+			});
+			
+			var actual = null;
+			
+			// Act
+			mockHelperMethods(function(){
+				targetHelper.matchText(targetComponent);
+			});
+			
+			// Assert
+			Assert.Equal(expected,actual);
+		}
+		
+		[Fact]
+		function MatchTextWithDifferentPropertyToMatch(){
+			// Arrange
+			var testItems = [{custom: "match me 1", label : "target one", keyword : "", visible : "false"},
+				{custom: "match me 2", label : "target two", keyword : "", visible : "false"}];
+				
+			var expected = [{custom: "match me 1", label : "target one", keyword : "1", visible : "true"},
+				{custom: "match me 2", label : "target two", keyword : "1", visible : "false"}];
+			
+			var targetComponent = {			 
+				get : function(expression) {
+					if (expression === "v.keyword") {
+						return "1";
+					} else if (expression === "v.items") {
+						return testItems;
+					} else if (expression === "v.visible") {
+						return true;
+					} else if (expression === "v.propertyToMatch") {
+						return "custom";
 					}
 				},
 				setValue : function(expression, value) {

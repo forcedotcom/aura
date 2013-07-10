@@ -309,14 +309,6 @@ var AuraLocalizationService = function AuraLocalizationService() {
             }
         },
 
-        formatNumber : function(number, formatter) {
-
-        },
-
-        formatCurrency : function(amount, formatter) {
-
-        },
-
         /**
          * Gets the number of hours in a duration.
          * @param {Duration} d The duration object returned by localizationService.duration

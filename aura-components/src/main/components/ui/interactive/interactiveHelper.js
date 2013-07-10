@@ -17,10 +17,12 @@
     /**
      * Adds an event handler for every DOM event for which this input has a Aura-equivalent handler
      */
-    addDomEvents : function(component) {
+    addDomEvents : function(component) {    	
         var events = this.getHandledDOMEvents(component);
+        //work around for bug W-1744442
+        var helper = component.getConcreteComponent().getDef().getHelper() || this;
         for (var event in events) {
-            this.addDomHandler(component, event);
+            helper.addDomHandler(component, event);
         }
     },
 

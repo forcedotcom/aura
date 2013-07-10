@@ -13,11 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-({
-    /**
+({  
+	/**
+	 * @Override
+	 */
+	addDomHandler : function(component, event) {		
+        var el = this.getInputElement(component);
+        $A.util.on(el, event, this.domEventHandler);		   
+	},
+	
+	/**
      * Adds an event handler for input specific DOM event for which this input has a Aura-equivalent handler
      */
-    addInputDomEvents : function(component) {
+    addInputDomEvents : function(component) {    	
         var events = ["input", "change", "paste", "copy", "cut"];
         
         for (var i=0, len=events.length; i < len; i++) {
@@ -105,7 +113,7 @@
     /**
      * handle the value update.
      */
-    handleUpdate : function(component, event) {        
+    handleUpdate : function(component, event) {    	
         var helper = component.getDef().getHelper();
         var updateOn = helper.getUpdateOn(component);
 
@@ -119,9 +127,10 @@
      * Returns the input dom element in the component. If there are multiple input elements, only the first one is return.
      */
     getInputElement : function(component) {
-    	var element;
+    	var element,
+    		label = component.get('v.label');
 
-    	if (component.get('v.label')) {
+    	if (label && label.length > 0) {
     		var el = component.getElement();
     		element = el.getElementsByTagName('input')[0] ||  el.getElementsByTagName('select')[0] ||  el.getElementsByTagName('textarea')[0] || element;
     	} else {

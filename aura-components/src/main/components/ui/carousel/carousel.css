@@ -20,15 +20,7 @@
 	background: #2e4153;
 	display: block;		
  }
- 
- .THIS .visually-hidden {
- 	position: absolute !important;
-	height: 1px;
-	width: 1px;
-	overflow: hidden;
-	clip: rect(1px 1px 1px 1px);
-	clip: rect(1px, 1px, 1px, 1px);	
- }
+  
   
  .THIS .carousel-nav-container { 	
  	position: relative;
@@ -37,13 +29,14 @@
 	width: 100%;
 	text-align: center;	
  }
-  
+
  .THIS .carousel-pages {
  	position: relative;
  	clear: both;	
 	overflow: hidden;
 	white-space: nowrap;	 	
  }
+   
  
  .THIS .carousel-pages .page-list { 
  	list-style: none;

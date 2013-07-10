@@ -54,12 +54,16 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
             return;
         }
         String fwUid = fwUIDParam.get(request);
-        String currentFwUid = Aura.getConfigAdapter().getAuraFrameworkNonce();
 
         long ifModifiedSince = request.getDateHeader(HttpHeaders.IF_MODIFIED_SINCE);
         InputStream in = null;
         try {
+            //
+            // Careful with race conditions here, we should only call regenerateAuraJS
+            // _before_ we get the nonce.
+            //
             Aura.getConfigAdapter().regenerateAuraJS();
+            String currentFwUid = Aura.getConfigAdapter().getAuraFrameworkNonce();
 
             // process path (not in a function because can't use non-synced
             // member vars in servlet)

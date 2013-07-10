@@ -21,7 +21,11 @@
 	onPageComponentsChanged: function(cmp, evt, helper) {		
     	helper.initPages(cmp); 
     },
-  
+    
+    onBeforeScrollStart : function(cmp, evt, helper) {    	
+    	var scroller = helper.getScroller(cmp);
+    	scroller.enable();
+    }, 
     
     /**
      * Handle scrollStart event coming from scroller

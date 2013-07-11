@@ -29,6 +29,8 @@ Test.Components.Ui.AutocompleteList.AutocompleteListHelperTest=function(){
     	[Fact]
 		function MatchTextWithExactlyOneMatch(){
 			// Arrange
+			var actual = null;
+			
 			var testItems = [{label : "target one", keyword : "", visible : "false"},
 				{label : "target two", keyword : "", visible : "false"}];
 				
@@ -58,8 +60,6 @@ Test.Components.Ui.AutocompleteList.AutocompleteListHelperTest=function(){
 				toggleListVisibility : function(cmp, value){}
 			});
 			
-			var actual = null;
-			
 			// Act
 			mockHelperMethods(function(){
 				targetHelper.matchText(targetComponent);
@@ -72,6 +72,8 @@ Test.Components.Ui.AutocompleteList.AutocompleteListHelperTest=function(){
     	[Fact]
 		function MatchTextWithMultipleMatches(){
 			// Arrange
+			var actual = null;
+			
 			var testItems = [{label : "target one", keyword : "", visible : "false"},
 				{label : "target two", keyword : "", visible : "false"}];
 				
@@ -101,8 +103,6 @@ Test.Components.Ui.AutocompleteList.AutocompleteListHelperTest=function(){
 				toggleListVisibility : function(cmp, value){}
 			});
 			
-			var actual = null;
-			
 			// Act
 			mockHelperMethods(function(){
 				targetHelper.matchText(targetComponent);
@@ -115,6 +115,8 @@ Test.Components.Ui.AutocompleteList.AutocompleteListHelperTest=function(){
 		[Fact]
 		function MatchTextWithZeroMatches(){
 			// Arrange
+			var actual = null;
+			
 			var testItems = [{label : "target one", keyword : "", visible : "false"},
 				{label : "target two", keyword : "", visible : "false"}];
 				
@@ -144,8 +146,6 @@ Test.Components.Ui.AutocompleteList.AutocompleteListHelperTest=function(){
 				toggleListVisibility : function(cmp, value){}
 			});
 			
-			var actual = null;
-			
 			// Act
 			mockHelperMethods(function(){
 				targetHelper.matchText(targetComponent);
@@ -158,8 +158,8 @@ Test.Components.Ui.AutocompleteList.AutocompleteListHelperTest=function(){
 		[Fact]
 		function MatchTextWithZeroItemsToSearch(){
 			// Arrange
+			var actual = null;
 			var testItems = [];
-				
 			var expected = [];
 			
 			var targetComponent = {			 
@@ -185,8 +185,6 @@ Test.Components.Ui.AutocompleteList.AutocompleteListHelperTest=function(){
 				toggleListVisibility : function(cmp, value){}
 			});
 			
-			var actual = null;
-			
 			// Act
 			mockHelperMethods(function(){
 				targetHelper.matchText(targetComponent);
@@ -199,6 +197,8 @@ Test.Components.Ui.AutocompleteList.AutocompleteListHelperTest=function(){
 		[Fact]
 		function MatchTextWithDifferentPropertyToMatch(){
 			// Arrange
+			var actual = null;
+			
 			var testItems = [{custom: "match me 1", label : "target one", keyword : "", visible : "false"},
 				{custom: "match me 2", label : "target two", keyword : "", visible : "false"}];
 				
@@ -227,8 +227,6 @@ Test.Components.Ui.AutocompleteList.AutocompleteListHelperTest=function(){
 			var mockHelperMethods = Mocks.GetMocks(targetHelper, {
 				toggleListVisibility : function(cmp, value){}
 			});
-			
-			var actual = null;
 			
 			// Act
 			mockHelperMethods(function(){

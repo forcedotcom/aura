@@ -31,10 +31,8 @@ import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.parser.handler.XMLHandler.InvalidSystemAttributeException;
 import org.auraframework.impl.source.StringSource;
 import org.auraframework.impl.system.DefDescriptorImpl;
-import org.auraframework.impl.test.util.AuraImplUnitTestingUtil;
 import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.system.Source;
-import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.AuraUnhandledException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
@@ -75,70 +73,71 @@ public class ThemeDefTest extends AuraImplTestCase {
         Source<ThemeDef> src = reg.getSource(vendor.getThemeDefDescriptor());
         assertNotNull(src);
     }
-        
+
     public void testEmptyTheme() throws QuickFixException {
-    	String emptyTheme = "<aura:theme />";
-    	ThemeDef emptyThemeDef = source(emptyTheme);	// should parse without error
-    	source(emptyTheme);
-    	Map<DefDescriptor<AttributeDef>, AttributeDef> attributes = emptyThemeDef.getAttributeDefs();
-    	assertTrue(attributes.toString().equals("{}"));
-    	String description = emptyThemeDef.getDescription();
-    	assertNull("Description should be null", description);
-    	String name = emptyThemeDef.getName();
-    	assertNotNull("Name must be initialized", name);
-    	assertTrue(true);
+        String emptyTheme = "<aura:theme />";
+        ThemeDef emptyThemeDef = source(emptyTheme); // should parse without error
+        source(emptyTheme);
+        Map<DefDescriptor<AttributeDef>, AttributeDef> attributes = emptyThemeDef.getAttributeDefs();
+        assertTrue(attributes.toString().equals("{}"));
+        String description = emptyThemeDef.getDescription();
+        assertNull("Description should be null", description);
+        String name = emptyThemeDef.getName();
+        assertNotNull("Name must be initialized", name);
+        assertTrue(true);
     }
-    
+
     /** 2 themes with same markup should not be equal **/
     public void testThemeEquivalence() throws QuickFixException {
-    	ThemeDef theme1 = source(sample);
-    	ThemeDef theme2 = source(sample);
-    	assertFalse(theme1.equals(theme2));
+        ThemeDef theme1 = source(sample);
+        ThemeDef theme2 = source(sample);
+        assertFalse(theme1.equals(theme2));
     }
-    
+
     /** Theme with bad markup should fail gracefully **/
     public void testThemeWithBadMarkup() {
-    	try {
-    		String badMarkup = "<aura:theme>" +
-    				"<aura:attribute name='one' default='1' />";
-        	source(badMarkup);
-        	fail("Bad markup should be caught");
-    	} catch(AuraUnhandledException e) {
-    		// expected flow, do nothing
-    	} catch (QuickFixException e) {
-			fail("AuraUnhandledException should be thrown");
-		}
+        try {
+            String badMarkup = "<aura:theme>" +
+                    "<aura:attribute name='one' default='1' />";
+            source(badMarkup);
+            fail("Bad markup should be caught");
+        } catch (AuraUnhandledException e) {
+            // expected flow, do nothing
+        } catch (QuickFixException e) {
+            fail("AuraUnhandledException should be thrown");
+        }
     }
-    
+
     public void testThemeBadMarkupAttributeNesting() {
-    	try {
-	    	String badMarkup = "<aura:theme>" +
-					"<aura:attribute name='one' default='1'>" +
-					"	<aura:attribute name='two' default='2' />" +
-					"</aura:attribute>" +
-					"</aura:theme>";
-	    	source(badMarkup);
-	    	fail("Invalid nesting of attributes should be caught");
-    	} catch(InvalidSystemAttributeException e) {
-    		// do nothing, expected flow
-    	} catch(QuickFixException e) {
-    		fail("QuickFixException is not the expected exception");
-    	}
+        try {
+            String badMarkup = "<aura:theme>" +
+                    "<aura:attribute name='one' default='1'>" +
+                    "	<aura:attribute name='two' default='2' />" +
+                    "</aura:attribute>" +
+                    "</aura:theme>";
+            source(badMarkup);
+            fail("Invalid nesting of attributes should be caught");
+        } catch (InvalidSystemAttributeException e) {
+            // do nothing, expected flow
+        } catch (QuickFixException e) {
+            fail("QuickFixException is not the expected exception");
+        }
     }
-    
+
     /**
      * Aura:theme only supports the extends attribute.
-     * @throws QuickFixException 
+     * 
+     * @throws QuickFixException
      */
     public void testUnsupportedAttributes() {
-	    try {
-	    	String badTheme = "<aura:theme fakeattrib='fakeattribvalue' />";
-	    	source(badTheme);
-	    } catch(InvalidSystemAttributeException e) {
-			// do nothing, expected flow
-		} catch(QuickFixException e) {
-			fail("QuickFixException is not the expected exception");
-		}
+        try {
+            String badTheme = "<aura:theme fakeattrib='fakeattribvalue' />";
+            source(badTheme);
+        } catch (InvalidSystemAttributeException e) {
+            // do nothing, expected flow
+        } catch (QuickFixException e) {
+            fail("QuickFixException is not the expected exception");
+        }
     }
 
     /** attributes are correctly parsed */
@@ -238,6 +237,7 @@ public class ThemeDefTest extends AuraImplTestCase {
             ThemeDef def = circular2.getDef();
             def.variable("attr");
             def.getAttributeDefs(); // recursive
+            fail("expected to throw InvalidDefinitionException");
         } catch (InvalidDefinitionException e) {
             expectMessage(e, "refer back to itself");
         }

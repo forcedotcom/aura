@@ -124,10 +124,12 @@ public class ComponentDefHandlerTest extends AuraImplTestCase {
         assertThat(cmp.getDef().getThemeAliases().get("var"), equalTo(theme));
     }
 
-    public void testMalformedThemeAlias() {
+    public void testMalformedThemeAlias() throws QuickFixException {
+        DefDescriptor<ComponentDef> dd = addSourceAutoCleanup(ComponentDef.class,
+                "<aura:component themeAlias=\"test:fakeTheme\"></aura:component>");
         try {
-            addSourceAutoCleanup(ComponentDef.class,
-                    "<aura:component themeAlias=\"test:fakeTheme\"></aura:component>");
+            dd.getDef();
+            fail("Expected to throw AuraRuntimeException.");
         } catch (AuraRuntimeException e) {
             assertThat(e.getMessage().contains("Invalid themeAlias format"), is(true));
         }

@@ -63,7 +63,7 @@ public class CreateThemeAttributeQuickFix extends AuraQuickFix {
         Source<?> source = Aura.getContextService().getCurrentContext().getDefRegistry().getSource(desc);
 
         if ("".equals(name)) {
-            throw new AuraRuntimeException("Cannot leave the field blank");
+            throw new AuraRuntimeException("Cannot leave the name field blank");
         }
 
         if ((AuraTextUtil.validateAttributeName(name)) != true) {

@@ -33,6 +33,7 @@ import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.base.Optional;
 
@@ -125,10 +126,12 @@ public class ApplicationDefHandlerTest extends AuraImplTestCase {
         assertThat(override.get(), equalTo(child));
     }
 
-    public void testMalformedThemeOverrideString() {
+    public void testMalformedThemeOverrideString() throws QuickFixException {
+        DefDescriptor<ApplicationDef> dd = addSourceAutoCleanup(ApplicationDef.class,
+                "<aura:application themeOverrides=\"test:fakeTheme\"></aura:application>");
         try {
-            addSourceAutoCleanup(ApplicationDef.class,
-                    "<aura:application themeOverrides=\"test:fakeTheme\"></aura:application>");
+            dd.getDef();
+            fail("expected to throw AuraRuntimeException.");
         } catch (AuraRuntimeException e) {
             assertThat(e.getMessage().contains("Invalid themeOverrides format"), is(true));
         }

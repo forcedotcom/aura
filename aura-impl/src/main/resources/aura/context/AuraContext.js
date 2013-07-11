@@ -45,7 +45,6 @@ function AuraContext(config) {
     this.test = config["test"];
 
     this.joinComponentConfigs(config["components"]);
-
     this.globalValueProviders = new $A.ns.GlobalValueProviders(config["globalValueProviders"]);
 }
 
@@ -137,6 +136,7 @@ AuraContext.prototype.join = function(otherContext) {
         throw new Error("framework mismatch");
     }
     this.globalValueProviders.join(otherContext["globalValueProviders"]);
+    $A.localizationService.init();
     this.joinComponentConfigs(otherContext["components"]);
     this.joinLoaded(otherContext["loaded"]);
 };

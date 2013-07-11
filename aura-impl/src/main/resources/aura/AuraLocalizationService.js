@@ -29,7 +29,6 @@ var AuraLocalizationService = function AuraLocalizationService() {
         /**
          * Displays a length of time.
          * @param {Duration} d The duration object returned by localizationService.duration
-         * @param {String} unit The unit of measurement of time
          * @param {Boolean} noSuffix Set to true if the token should be displayed without a suffix
          * @return {String} A duration object
          * @memberOf AuraLocalizationService
@@ -641,6 +640,18 @@ var AuraLocalizationService = function AuraLocalizationService() {
                 } catch (ee) {}
             }
             return ret;
+        },
+        
+        /**
+         * Initialize localization service.
+         * @private
+         */
+        init : function() {
+            // Set global default language locale
+            var defaultLangLocale = $A.getGlobalValueProviders().get("$Locale.langLocale");
+            if (defaultLangLocale) {
+                moment.lang(localizationService.getNormalizedLangLocale(defaultLangLocale));
+            }
         }
     };
     //#include aura.AuraLocalizationService_export

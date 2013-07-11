@@ -37,5 +37,6 @@ exp(p,
     "getAppHandlerDefs", p.getAppHandlerDefs,
     "getCmpHandlerDefs", p.getCmpHandlerDefs,
     "isInstanceOf", p.isInstanceOf,
-    "getAllEvents", p.getAllEvents
+    "getAllEvents", p.getAllEvents,
+    "getStyleClassName", p.getStyleClassName
 );

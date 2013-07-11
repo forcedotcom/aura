@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.THIS.datePicker-openIcon {
+.THIS + .datePicker-openIcon {
     position: relative;
     top: 1px;
     left: -22px;

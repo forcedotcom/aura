@@ -61,74 +61,80 @@ public class ThemeDefHandlerTest extends AuraImplTestCase {
         DefDescriptor<AttributeDef> attr = DefDescriptorImpl.getInstance("test", AttributeDef.class);
         assertTrue("didn't find expected attribute", attrs.containsKey(attr));
         assertEquals("incorrect value for attribute", "abc", attrs.get(attr).getDefaultValue().getValue());
-        assertEquals("Didn't find correct name for String type", "String", attrs.get(attr).getTypeDef().getDescriptor().getName());
-        assertEquals("Didn't find correct qualified name for String type", "aura://String", attrs.get(attr).getTypeDef().getDescriptor().getQualifiedName());
-        assertEquals("Didn't find correct descriptor name for String type", "String", attrs.get(attr).getTypeDef().getDescriptor().getDescriptorName());
+        assertEquals("Didn't find correct name for String type", "String", attrs.get(attr).getTypeDef().getDescriptor()
+                .getName());
+        assertEquals("Didn't find correct qualified name for String type", "aura://String", attrs.get(attr)
+                .getTypeDef().getDescriptor().getQualifiedName());
+        assertEquals("Didn't find correct descriptor name for String type", "String", attrs.get(attr).getTypeDef()
+                .getDescriptor().getDescriptorName());
     }
-    
-    /** 
-     * Non String type should be parsed without error 
-     * Note this is different behavior from regular aura:attribute where type is a required attribute.
+
+    /**
+     * Non String type should be parsed without error Note this is different behavior from regular aura:attribute where
+     * type is a required attribute.
      * **/
     public void testTypeNonString() throws QuickFixException {
-    	String src="<aura:theme>" +
-    				"<aura:attribute name='test' default='1' type='Integer' />" + 
-    			"</aura:theme>";
-    	try {
-    		ThemeDef def = source(src);
-    		AttributeDef aDef = def.getAttributeDef("test");
-    		assertEquals("Default value should be an Integer of value 1", 1, Integer.parseInt(aDef.getDefaultValue().getValue().toString()));
-    	} catch (Exception e) {
-    		fail("Theme should be parsed but failed with exception " + e.getStackTrace());
-    	}
+        String src = "<aura:theme>" +
+                "<aura:attribute name='test' default='1' type='Integer' />" +
+                "</aura:theme>";
+        try {
+            ThemeDef def = source(src);
+            AttributeDef aDef = def.getAttributeDef("test");
+            assertEquals("Default value should be an Integer of value 1", 1,
+                    Integer.parseInt(aDef.getDefaultValue().getValue().toString()));
+        } catch (Exception e) {
+            fail("Theme should be parsed but failed with exception " + e.getStackTrace());
+        }
     }
-    
+
     /**
      * Type is specified as "". "" is disallowed and the definition does not parse.
-     * @throws QuickFixException 
+     * 
+     * @throws QuickFixException
      */
     public void testEmptyType() throws QuickFixException {
-    	String src="<aura:theme>" +
-				"<aura:attribute name='test' default='1' type='' />" + 
-			"</aura:theme>";
-		try {
-			ThemeDef def = source(src);
-			fail("Empty value for type is disallowed and the definition does not parse");
-		} catch (AuraRuntimeException e) {
-			// do nothing, expected flow
-		}
+        String src = "<aura:theme>" +
+                "<aura:attribute name='test' default='1' type='' />" +
+                "</aura:theme>";
+        try {
+            source(src);
+            fail("Empty value for type is disallowed and the definition does not parse");
+        } catch (AuraRuntimeException e) {
+            // do nothing, expected flow
+        }
     }
-    
+
     /**
      * Tests type that is unsupported.
-     * @throws QuickFixException 
+     * 
+     * @throws QuickFixException
      */
     public void testInvalidType() throws QuickFixException {
-    	String src="<aura:theme>" +
-				"<aura:attribute name='test' default='1' type='An Unsupported Type' />" + 
-			"</aura:theme>";
-		try {
-			ThemeDef def = source(src);
-			fail("Unsupported value for type should cause the definition to fail parsing.");
-		} catch (AuraRuntimeException e) {
-			// do nothing, expected flow
-		}
+        String src = "<aura:theme>" +
+                "<aura:attribute name='test' default='1' type='An Unsupported Type' />" +
+                "</aura:theme>";
+        try {
+            source(src);
+            fail("Unsupported value for type should cause the definition to fail parsing.");
+        } catch (AuraRuntimeException e) {
+            // do nothing, expected flow
+        }
     }
-    
+
     /**
-     * When there is a mismatch between value of default and expected type, parsing should fail.
-     * Eg. Type is Integer but value for default is of type String.
+     * When there is a mismatch between value of default and expected type, parsing should fail. Eg. Type is Integer but
+     * value for default is of type String.
      */
     public void testDefaultTypeMismatch() {
-    	String src="<aura:theme>" +
-				"<aura:attribute name='test' default='abc' type='Integer' />" + 
-			"</aura:theme>";
-		try {
-			ThemeDef def = source(src);
-			fail("Theme shouldn't parse when there exists a mismatch between default value and default type");
-		} catch (AuraException e) {
-			// do nothing, expected flow
-		}
+        String src = "<aura:theme>" +
+                "<aura:attribute name='test' default='abc' type='Integer' />" +
+                "</aura:theme>";
+        try {
+            source(src);
+            fail("Theme shouldn't parse when there exists a mismatch between default value and default type");
+        } catch (AuraException e) {
+            // do nothing, expected flow
+        }
     }
 
     public void testInvalidChild() throws Exception {

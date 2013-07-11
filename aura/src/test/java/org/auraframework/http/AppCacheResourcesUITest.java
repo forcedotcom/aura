@@ -60,7 +60,6 @@ import com.google.common.collect.Lists;
  */
 @FreshBrowserInstance
 @ThreadHostileTest("TestLoggingAdapter not thread-safe")
-@UnAdaptableTest("Missing TestLoggingAdapter impl")
 public class AppCacheResourcesUITest extends WebDriverTestCase {
 
     private final static String COOKIE_NAME = "%s_%s_%s_lm";
@@ -125,7 +124,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
     /**
      * Opening cached app will only query server for the manifest and the component load.
      */
-    @TargetBrowsers({ BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
+    @TargetBrowsers({ BrowserType.GOOGLECHROME,  BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
     @TestLabels("auraSanity")
     public void testNoChanges() throws Exception {
         List<Request> logs = loadMonitorAndValidateApp(TOKEN, TOKEN, "", TOKEN);
@@ -143,7 +142,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
     /**
      * Opening cached app that had a prior cache error will reload the app.
      */
-    @TargetBrowsers({ BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
+    @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
     @TestLabels("auraSanity")
     public void testCacheError() throws Exception {
         List<Request> logs = loadMonitorAndValidateApp(TOKEN, TOKEN, "", TOKEN);
@@ -182,10 +181,11 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         assertFalse("Manifest cookie was not changed " + cookie.getValue(), "error".equals(cookie.getValue()));
     }
 
+
     /**
      * for Chrome and Safari/IPAD/IPHONE Opening uncached app that had a prior cache error will have limited caching
      */
-    @TargetBrowsers({ BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
+    @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
     public void testCacheErrorWithEmptyCache() throws Exception {
         openNoAura("/aura/application.app"); // just need a domain page to set cookie from
         Date expiry = new Date(System.currentTimeMillis() + 60000);
@@ -211,7 +211,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
     /**
      * Manifest request limit exceeded for the time period should result in reset.
      */
-    @TargetBrowsers({ BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
+    @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
     public void testManifestRequestLimitExceeded() throws Exception {
         List<Request> logs = loadMonitorAndValidateApp(TOKEN, TOKEN, "", TOKEN);
         assertRequests(getExpectedInitialRequests(), logs);
@@ -278,7 +278,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
     /**
      * Opening cached app after namespace controller change will trigger cache update.
      */
-    @TargetBrowsers({ BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
+    @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
     public void testComponentJsChange() throws Exception {
         List<Request> logs = loadMonitorAndValidateApp(TOKEN, TOKEN, "", TOKEN);
         assertRequests(getExpectedInitialRequests(), logs);
@@ -307,7 +307,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
     /**
      * Opening cached app after component markup change will trigger cache update.
      */
-    @TargetBrowsers({ BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
+    @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
     public void testComponentMarkupChange() throws Exception {
         List<Request> logs = loadMonitorAndValidateApp(TOKEN, TOKEN, "", TOKEN);
         assertRequests(getExpectedInitialRequests(), logs);
@@ -383,11 +383,12 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         }
 
         failed = unexpectedRequests.size() > 0 || missingRequests.size() > 0;
-
+        
+        
         System.out.println(">>> assertRequests: ");
         System.out.println("EXPECTED:");
         for (Request r : expected) {
-            System.out.println("E: " + r);
+            System.out.println("E: " + r + ",fudge:"+r.fudge);
         }
         System.out.println("ACTUAL:");
         for (Request r : actual) {
@@ -445,6 +446,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
                     }
                 });
         List<Request> logs = endMonitoring();
+        
         elem.click();
         WebElement output = findDomElement(By.cssSelector("div.attroutput"));
         assertEquals("Unexpected alert text",
@@ -563,7 +565,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
              */
             return ImmutableList.of(new Request(2, "/aura", namespace + ":" + appName, null, "HTML", 200), new Request(
                     2, "/auraResource", null, null, "manifest", 200), new Request("/auraResource", null, null, "css",
-                    200), new Request("/auraResource", null, null, "js", 200));
+                    200), new Request(2,"/auraResource", null, null, "js", 200));
         case SAFARI:
         case IPHONE:
         case IPAD:

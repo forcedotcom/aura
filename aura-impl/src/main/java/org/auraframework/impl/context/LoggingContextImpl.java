@@ -40,7 +40,7 @@ import com.google.common.collect.Sets;
 
 public class LoggingContextImpl implements LoggingContext {
 
-    private static final Logger logger = Logger.getLogger("LoggingContextImpl");
+    protected static final Logger logger = Logger.getLogger("LoggingContextImpl");
     private static final LoadingCache<String, Counter> counters = CacheBuilder.newBuilder()
             .build(new CounterComputer());
     private static final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
@@ -129,7 +129,6 @@ public class LoggingContextImpl implements LoggingContext {
      */
     @Override
     public void log() {
-
         Set<String> names = Sets.newHashSet();
 
         for (Map.Entry<String, Timer> entry : timers.entrySet()) {
@@ -169,7 +168,6 @@ public class LoggingContextImpl implements LoggingContext {
                 entry.getValue().setValue(0);
             }
         }
-
         log(loggingValues);
     }
 
@@ -180,14 +178,11 @@ public class LoggingContextImpl implements LoggingContext {
         StringBuilder buffer = new StringBuilder();
 
         for (Map.Entry<String, Object> entry : valueMap.entrySet()) {
-            // System.out.print(entry.getKey() + ": " +
-            // entry.getValue().toString() + ";");
             if (entry.getValue() != null) {
                 buffer.append(entry.getKey() + ": " + entry.getValue().toString() + ";");
             }
         }
         logger.info(buffer);
-        // System.out.println();
     }
 
     /**

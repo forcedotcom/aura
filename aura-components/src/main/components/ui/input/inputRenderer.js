@@ -29,7 +29,7 @@
 	
 	afterRender: function(component, helper) {
         this.superAfterRender();
-		
+		helper.addInputClass(component);
         helper.addInputDomEvents(component);
     },
     

@@ -127,10 +127,9 @@
      * Returns the input dom element in the component. If there are multiple input elements, only the first one is return.
      */
     getInputElement : function(component) {
-    	var element,
-    		label = component.get('v.label');
+    	var element;    		
 
-    	if (label && label.length > 0) {
+    	if (this.hasLabel(component)) {
     		var el = component.getElement();
     		element = el.getElementsByTagName('input')[0] ||  el.getElementsByTagName('select')[0] ||  el.getElementsByTagName('textarea')[0] || element;
     	} else {
@@ -157,9 +156,12 @@
     /**
      * Dismiss the error messages and restore the component to the normal state.
      */
-    validate : function(component, valueProvider) {
-        valueProvider.removeClass("inputError");
+    validate : function(component, valueProvider) {        
+        var inputEl = this.getInputElement(component);
         var errorCmp = component.get("v.errorComponent")[0];
+        
+        $A.util.removeClass(inputEl, "inputError");
+        
         if (errorCmp && errorCmp.getValue("v.value.length").getValue() > 0) {
             errorCmp.setValue("v.value", []);
         }
@@ -168,10 +170,13 @@
     /**
      * Show up the the error messages and put the component in the error state.
      */
-    invalidate : function(component, valueProvider, value) {
-        valueProvider.addClass("inputError");
+    invalidate : function(component, valueProvider, value) {        
+        var inputEl = this.getInputElement(component);
         var m = [];
         var valueErr = value.getErrors();
+        
+        $A.util.addClass(inputEl, "inputError");
+        
         for (var i = 0; i < valueErr.length; i++) {
             m.push(valueErr[i].message);
         }
@@ -253,5 +258,17 @@
         	parentCmp.getAttributes().setValue(attr.key, attr.value);
         	parentCmp = parentCmp.getSuper();
         } 
+    },
+    
+    addInputClass: function(cmp) {    	
+    	if (this.hasLabel(cmp)) {
+    		var inputEl = this.getInputElement(cmp);
+    		$A.util.addClass(inputEl, cmp.getConcreteComponent().getDef().getStyleClassName());
+    	}
+    },
+    
+    hasLabel: function(cmp) {
+    	var label = cmp.get('v.label');    	
+    	return label && label.length > 0;
     }
 })

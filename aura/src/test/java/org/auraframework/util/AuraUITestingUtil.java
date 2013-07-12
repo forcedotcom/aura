@@ -15,6 +15,7 @@
  */
 package org.auraframework.util;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -471,7 +472,38 @@ public class AuraUITestingUtil {
             }
         });
     }
+    /**
+     * Method of exposing accessibility tool to be exposed for testing purposes
+     * 
+     * @return ArrayList - either 0,1, or 2. 
+     *                            Position 0: Indicates there were no errors
+     *                            Position 1: Indicates that there were errors
+     *                            Position 2: Indicates that something unexpected happened.
+     */
+    public ArrayList<String> doAccessibilityCheck(){
+        String jsString = "return ((window.$A != null || window.$A !=undefined) && (!$A.util.isUndefinedOrNull($A.devToolService)))? "+
+                            "window.$A.devToolService.checkAccessibility() : \"Aura is not Present\"";
+        
+        String result = (String) getEval(jsString);
 
+        ArrayList<String> resultList = new ArrayList<String>();
+        String output = "";
+        
+        //No errors
+        if(result.equals("") || result.equals("Total Number of Errors found: 0")){
+            output = "0";
+        }
+        else if(result.contains("Total Number of Errors found")){
+            output = "1";
+        }
+        else{
+            output = "2";
+        }
+        
+        resultList.add(output);
+        resultList.add(result);
+        return resultList;        
+    }
     public void assertAccessible() {
         getEval("$A.test.assertAccessible()");
 

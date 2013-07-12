@@ -1,0 +1,88 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component  model="java://org.auraframework.impl.java.model.TestJavaModel">
+<aura:attribute name="isDomEventSet" type="boolean" default="false"/>
+
+<div id="blur">
+<ui:inputText aura:id="blur" label="blur" class="blur" value="{!m.String}" updateOn="blur" blur="{!c.checkDomEventSet}"/>
+</div>
+
+<div id="change">
+<ui:inputText aura:id="change" label="change" class="change" value="{!m.String}" updateOn="change"/>
+</div>
+
+<div id="click">
+<ui:inputText aura:id="click" label="click" class="click" value="{!m.String}" updateOn="click" click="{!c.checkDomEventSet}"/>
+</div>
+
+<div id="dblclick">
+<ui:inputText aura:id="dblclick" label="dblclick" class="dblclick" value="{!m.String}" updateOn="dblclick" dblclick="{!c.checkDomEventSet}"/>
+</div>
+
+<div id="focus">
+<ui:inputText aura:id="focus" label="focus" class="focus" value="{!m.String}" updateOn="focus" focus="{!c.checkDomEventSet}"/>
+</div>
+
+<div id="mousedown">
+<ui:inputText aura:id="mousedown" label="mousedown" class="mousedown" value="{!m.String}" updateOn="mousedown" mousedown="{!c.checkDomEventSet}"/>
+</div>
+
+<div id="mousemove">
+<ui:inputText aura:id="mousemove" label="mousemove" class="mousemove" value="{!m.String}" updateOn="mousemove" mousemove="{!c.checkDomEventSet}"/>
+</div>
+
+<div id="mouseout">
+<ui:inputText aura:id="mouseout" label="mouseout" class="mouseout" value="{!m.String}" updateOn="mouseout" mouseout="{!c.checkDomEventSet}"/>
+</div>
+
+<div id="mouseover">
+<ui:inputText aura:id="mouseover" label="mouseover" class="mouseover" value="{!m.String}" updateOn="mouseover" mouseover="{!c.checkDomEventSet}"/>
+</div>
+
+<div id="mouseup">
+<ui:inputText aura:id="mouseup" label="mouseup" class="mouseup" value="{!m.String}" updateOn="mouseup" mouseup="{!c.checkDomEventSet}"/>
+</div>
+
+<div id="keydown">
+<ui:inputText aura:id="keydown" label="keydown" class="keydown" value="{!m.String}" updateOn="keydown" keydown="{!c.checkDomEventSet}"/>
+</div>
+
+<div id="keypress">
+<ui:inputText aura:id="keypress" label="keypress" class="keypress" value="{!m.String}" updateOn="keypress" keypress="{!c.checkDomEventSet}"/>
+</div>
+
+<div id="keyup">
+<ui:inputText aura:id="keyup" label="keyup" class="keyup" value="{!m.String}" updateOn="keyup" keyup="{!c.checkDomEventSet}"/>
+</div>
+
+<div id="select">
+<ui:inputText aura:id="select" label="select" class="select" value="{!m.String}" updateOn="select"/>
+</div>
+
+<div id="empty">
+<ui:inputText aura:id="empty" label="" class="empty" value="{!m.String}" updateOn="blur" blur="{!c.checkDomEventSet}"/>
+</div>
+
+<div id="output">
+output: <ui:outputText value="{!m.String}"/>
+</div>
+<div id="inspectBaseEvent"> 
+<ui:inputText aura:id="keyup" label="inspectBaseEvent" class="keyup" value="{!m.String}" updateOn="keyup" keypress="{!c.inspectKeyEvent}" mousedown="{!c.inspectMouseEvent}"/><br/> 
+outputValue: <ui:outputText aura:id="outputValue" class="outputValue" value=""/> <br/><br/>
+</div>
+</aura:component>

@@ -57,7 +57,7 @@ public class AuraUITestingUtil {
     }
 
     public WebElement findElementAndTypeEventNameInIt(String event) {
-        String locatorTemplate = "#%s > input.uiInputText.uiInput";
+        String locatorTemplate = "input[class*='%s']";
         String locator = String.format(locatorTemplate, event);
         WebElement input = findDomElement(By.cssSelector(locator));
         input.click(); // IE7 need to bring focus
@@ -320,21 +320,35 @@ public class AuraUITestingUtil {
      * @return
      */
     public WebElement findDomElement(final By locator) {
+    	List<WebElement> elements = findDomElements(locator);
+    	if (elements != null) {
+    		return elements.get(0);
+    	}
+    	return null;
+    }
+    
+    /**
+     * Find matching elements in the DOM.
+     * @param locator
+     * @return
+     */
+    public List<WebElement> findDomElements(final By locator) {
         WebDriverWait wait = new WebDriverWait(driver, timeoutInSecs);
-        return wait.until(new ExpectedCondition<WebElement>() {
-            private WebElement element = null;
+        return wait.until(new ExpectedCondition<List<WebElement>>() {
+            private List<WebElement> elements = null;
 
             @Override
-            public WebElement apply(WebDriver d) {
-                if (element == null) {
-                    element = driver.findElement(locator);
+            public List<WebElement> apply(WebDriver d) {
+                if (elements == null) {
+                    elements = driver.findElements(locator);
                 }
                 try {
-                    if (getBooleanEval("return arguments[0].ownerDocument === document", element)) {
-                        return element;
+                	if (elements.size() > 0 && 
+                			getBooleanEval("return arguments[0].ownerDocument === document", elements.get(0))) {
+                        return elements;
                     }
                 } catch (StaleElementReferenceException e) {
-                    element = null;
+                    elements = null;
                 }
                 return null;
             }

@@ -44,25 +44,18 @@ import com.google.common.collect.Sets;
  * Unit tests for {@link ThemeDef}.
  */
 public class ThemeDefTest extends AuraImplTestCase {
-    private static final String sample = "<aura:theme>" +
-            "<aura:attribute name='one' default='1'/>" +
-            "<aura:attribute name='two' default='2'/>" +
-            "</aura:theme>";
+    private static final String sample = "<aura:theme>" + "<aura:attribute name='one' default='1'/>"
+            + "<aura:attribute name='two' default='2'/>" + "</aura:theme>";
 
-    private static final String sampleChild = "<aura:theme extends='%s'>" +
-            "<aura:attribute name='one' default='1'/>" +
-            "<aura:attribute name='two' default='2'/>" +
-            "</aura:theme>";
+    private static final String sampleChild = "<aura:theme extends='%s'>" + "<aura:attribute name='one' default='1'/>"
+            + "<aura:attribute name='two' default='2'/>" + "</aura:theme>";
 
-    private static final String sampleOverridden = "<aura:theme extends='%s'>" +
-            "<aura:attribute name='one' default='1'/>" +
-            "<aura:attribute name='two' default='2'/>" +
-            "<aura:set attribute='color' value='newcolor'/>" +
-            "</aura:theme>";
+    private static final String sampleOverridden = "<aura:theme extends='%s'>"
+            + "<aura:attribute name='one' default='1'/>" + "<aura:attribute name='two' default='2'/>"
+            + "<aura:set attribute='color' value='newcolor'/>" + "</aura:theme>";
 
-    private static final String sampleRedefined = "<aura:theme extends='%s'>" +
-            "<aura:attribute name='color' default='newcolor'/>" +
-            "</aura:theme>";
+    private static final String sampleRedefined = "<aura:theme extends='%s'>"
+            + "<aura:attribute name='color' default='newcolor'/>" + "</aura:theme>";
 
     public ThemeDefTest(String name) {
         super(name);
@@ -77,14 +70,12 @@ public class ThemeDefTest extends AuraImplTestCase {
     public void testEmptyTheme() throws QuickFixException {
         String emptyTheme = "<aura:theme />";
         ThemeDef emptyThemeDef = source(emptyTheme); // should parse without error
-        source(emptyTheme);
         Map<DefDescriptor<AttributeDef>, AttributeDef> attributes = emptyThemeDef.getAttributeDefs();
-        assertTrue(attributes.toString().equals("{}"));
+        assertTrue(attributes.isEmpty());
         String description = emptyThemeDef.getDescription();
         assertNull("Description should be null", description);
         String name = emptyThemeDef.getName();
         assertNotNull("Name must be initialized", name);
-        assertTrue(true);
     }
 
     /** 2 themes with same markup should not be equal **/
@@ -97,30 +88,26 @@ public class ThemeDefTest extends AuraImplTestCase {
     /** Theme with bad markup should fail gracefully **/
     public void testThemeWithBadMarkup() {
         try {
-            String badMarkup = "<aura:theme>" +
-                    "<aura:attribute name='one' default='1' />";
+            String badMarkup = "<aura:theme>" + "<aura:attribute name='one' default='1' />";
             source(badMarkup);
             fail("Bad markup should be caught");
-        } catch (AuraUnhandledException e) {
-            // expected flow, do nothing
-        } catch (QuickFixException e) {
-            fail("AuraUnhandledException should be thrown");
+        } catch (Exception e) {
+            assertTrue("Exception must be " + AuraUnhandledException.class.getSimpleName(),
+                    e instanceof AuraUnhandledException);
+            expectMessage(e, "XML document structures must start and end within the same entity");
         }
     }
 
     public void testThemeBadMarkupAttributeNesting() {
         try {
-            String badMarkup = "<aura:theme>" +
-                    "<aura:attribute name='one' default='1'>" +
-                    "	<aura:attribute name='two' default='2' />" +
-                    "</aura:attribute>" +
-                    "</aura:theme>";
+            String badMarkup = "<aura:theme>" + "<aura:attribute name='one' default='1'>"
+                    + "	<aura:attribute name='two' default='2' />" + "</aura:attribute>" + "</aura:theme>";
             source(badMarkup);
             fail("Invalid nesting of attributes should be caught");
-        } catch (InvalidSystemAttributeException e) {
-            // do nothing, expected flow
-        } catch (QuickFixException e) {
-            fail("QuickFixException is not the expected exception");
+        } catch (Exception e) {
+            assertTrue("Exception must be " + InvalidSystemAttributeException.class.getSimpleName(),
+                    e instanceof InvalidSystemAttributeException);
+            expectMessage(e, "Invalid attribute \"name\"");
         }
     }
 
@@ -133,10 +120,12 @@ public class ThemeDefTest extends AuraImplTestCase {
         try {
             String badTheme = "<aura:theme fakeattrib='fakeattribvalue' />";
             source(badTheme);
-        } catch (InvalidSystemAttributeException e) {
-            // do nothing, expected flow
-        } catch (QuickFixException e) {
-            fail("QuickFixException is not the expected exception");
+            fail("Unsupported attributes should not be allowed");
+        } catch (Exception e) {
+            assertTrue("Exception must be " + InvalidSystemAttributeException.class.getSimpleName(),
+                    e instanceof InvalidSystemAttributeException);
+            expectMessage(e, "Invalid attribute \"fakeattrib\"");
+
         }
     }
 
@@ -208,7 +197,7 @@ public class ThemeDefTest extends AuraImplTestCase {
     /** cannot extend itself */
     public void testCantExtendItself() throws Exception {
         DefDescriptor<ThemeDef> extendsSelf = addSourceAutoCleanup(ThemeDef.class, "");
-        StringSource<?> source = (StringSource<?>) getAuraTestingUtil().getSource(extendsSelf);
+        StringSource<?> source = (StringSource<?>)getAuraTestingUtil().getSource(extendsSelf);
         String contents = "<aura:theme extends='%s'> </aura:theme>";
         source.addOrUpdate(String.format(contents, extendsSelf.getDescriptorName()));
         try {
@@ -225,11 +214,11 @@ public class ThemeDefTest extends AuraImplTestCase {
         DefDescriptor<ThemeDef> circular1 = addSourceAutoCleanup(ThemeDef.class, "");
         DefDescriptor<ThemeDef> circular2 = addSourceAutoCleanup(ThemeDef.class, "");
 
-        StringSource<?> source = (StringSource<?>) getAuraTestingUtil().getSource(circular1);
+        StringSource<?> source = (StringSource<?>)getAuraTestingUtil().getSource(circular1);
         String contents = "<aura:theme extends='%s'><aura:attribute name='attr' default='1'/></aura:theme>";
         source.addOrUpdate(String.format(contents, circular2.getDescriptorName()));
 
-        source = (StringSource<?>) getAuraTestingUtil().getSource(circular2);
+        source = (StringSource<?>)getAuraTestingUtil().getSource(circular2);
         contents = "<aura:theme extends='%s'> </aura:theme>";
         source.addOrUpdate(String.format(contents, circular1.getDescriptorName()));
 

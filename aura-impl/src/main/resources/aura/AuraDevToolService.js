@@ -350,6 +350,25 @@ var AuraDevToolService = function() {
         },
         accessbilityAide:{
             /**
+             * Helper function that will return true if the two values equal each other
+             * @param   attribute  - Contents of the attribute that we want to look at
+             * @param   val        - What we want to compare the attribute to
+             * @returns boolean    - Signifies whether or not they are equal
+             */    
+            doesContain : function(attribute, val){
+        	return attribute === val;
+            },
+            /**
+             * Helper function that tells us whether something is in the dict or not
+             * @param   attribute  - Contents of the attribute that we want to look at
+             * @param   dict       - list of items that attribute should be equal to
+             * @returns boolean    - returns true if attribute value is not dict
+             */    
+            doesNotContain : function(attribute, dict){
+        	return !(attribute in dict);
+            },
+            
+            /**
              * Goes up the tree (until it reaches the body tag) and finds whether the initial tag param is in another sent up tag
              * @param   tag       - The starting tag that we are going to use to go up the tree
              * @param   nameOfTag - Name of the tag that we should find should the the starting tags parent
@@ -465,20 +484,22 @@ var AuraDevToolService = function() {
   	        }
   	        return errorArray;
             },
+            
             /**
              * Function that goes finds all given tags and makes sure that they all have an attribute set
-             * @param   tagName   - Name of the tag to find all instances of 
+             * @param   tags   - Name of the tag to find all instances of 
              * @param   attribute - The attribute that is being sought (for, id, title, etc)
              * @param   errorVal  - Value that this attribute should not be set to
+             * @param   evalFunc  - Function to evaluate whether or not attribute is valid
              * @returns array    - All errornous tags
              */
-            checkForAttrib : function(tags, attribute, errorVal){
+            checkForAttrib : function(tags, attribute, errorVal, evalFunc){
 	        var errorArray = [];
 	        var atrib ="";
 	        
 	        for(var i=0; i<tags.length; i++){
 	                atrib = tags[i].getAttribute(attribute);
-	        	if(aura.util.isUndefinedOrNull(atrib) || atrib === errorVal){
+	        	if(aura.util.isUndefinedOrNull(atrib) || evalFunc(atrib.toLowerCase(), errorVal)){
 	        	    errorArray.push(tags[i]);
 	        	}
 	        }
@@ -519,9 +540,13 @@ var AuraDevToolService = function() {
         	
         	var len = errArray.length;
         	var data_aura_rendered_by = "";
-        	var errStr = "\nIssue: "+tagError+"\n";
+        	var compThatRenderedCmp = "";
+        	var cmpInfo = "";
+        	var cmpDesc = "";
         	var nodeName = "";
         	var cmp = "";
+        	var errStr = "\nIssue: "+tagError+"\n";
+
         	var accessAideFuncs = aura.devToolService.accessbilityAide;
         	accessAideFuncs.errorCount = len + accessAideFuncs.errorCount; 
         	for(var i = 0; i<len; i++){
@@ -529,45 +554,88 @@ var AuraDevToolService = function() {
         	    data_aura_rendered_by = errArray[i].getAttribute("data-aura-rendered-by");
         	    
         	    //Make sure it has a rendered by value
-        	    if(data_aura_rendered_by === null || data_aura_rendered_by === "" ){
+        	    if(aura.util.isUndefinedOrNull(data_aura_rendered_by) || data_aura_rendered_by === "" ){
         		nodeName = errArray[i].nodeName.toLowerCase();
-        		cmp = "No Aura information available";
+        		cmpInfo = "No Aura information available";
+        		compThatRenderedCmp = cmpInfo;
         	    }
         	    else{
         		//Making sure that the cmp is rendered by Aura and a normal HTML tag
         		//Making sure to grab the correct $A. Depending if you are using the debuggertool or not, $A will be different
-        		var cmpDesc = $A.getCmp(data_aura_rendered_by);
+        		cmp = $A.getCmp(data_aura_rendered_by);
         		
         		if(!aura.util.isUndefinedOrNull(cmpDesc)){
         		    //If he component exists grab it descriptor
-        		    cmpDesc = cmpDesc.getAttributes().getValueProvider().getDef().getDescriptor();
+        		    cmpDesc = cmp.getAttributes().getValueProvider().getDef().getDescriptor();
         		    //Grab the namespace and name so that it is not viewed as a hyperlink
-        		    cmp = cmpDesc.getNamespace()+":"+cmpDesc.getName();
+        		    cmpInfo = cmpDesc.getNamespace()+":"+cmpDesc.getName();
+        		    
+        		  //Grabbing the erroneous components value provider
+        		  cmpDesc = cmp.getAttributes().getValueProvider().getAttributes().getValueProvider();
+        		    
+        		  //Making sure we are not at the app level
+        		  if(!aura.util.isUndefinedOrNull(cmpDesc)){
+        		      cmpDesc = cmpDesc.getDef().getDescriptor();
+        		      compThatRenderedCmp = cmpDesc.getNamespace()+":"+cmpDesc.getName();
+        		  }
+        		  else{
+        		       //If the component does not have a valueprovider than we are at the app level
+        		       compThatRenderedCmp = cmpInfo;
+        		  }  
         		}
         		else{
-        		    cmp = "There was an error finding this component. Please rerender or fix the issue";
+        		    cmpInfo = "There was an error finding this component. Please rerender or fix the issue";
         		}
         	    }
         	    
-        	    errStr = errStr+"Component markup: //"+cmp+"\nRendered Tag:   <"+nodeName+""+accessAideFuncs.attribStringVal(errArray[i].attributes)+">...</"+nodeName+">\n";     	    
+        	    errStr = errStr+"Component markup: //"+cmpInfo+"\nFound in: //"+compThatRenderedCmp+"\nRendered Tag:   <"+nodeName+""+accessAideFuncs.attribStringVal(errArray[i].attributes)+">...</"+nodeName+">\n";     	    
         	}
                 return errStr;
-            }
+            },
+            checkHeadHasCorrectTitle : function(hdErrMsg, hd){
+        	    var title = hd.getElementsByTagName("title")[0];
+        	    var errArray = [];
+        	    if($A.util.isUndefinedOrNull(title) || $A.test.getText(title) === ""){
+        		errArray.push(hd);  
+        	    }
+        	    return errArray;
+        	}
+           
         },
         verifyAccessibility : {
+                /**
+                 * Function that will find all ths and make sure that they have scope in them, and that they are equal to row, col, rowgroup, colgroup
+                 * @returns String - Returns a string representation of the errors
+                 */
+                  checkHeadTitle : function(){
+        		var hdErrMsg = "Head element must include non-empty title element. Refer to http://www.w3.org/TR/UNDERSTANDING-WCAG20/navigation-mechanisms.html.";
+        		var accessAideFuncs = $A.devToolService.accessbilityAide;
+        		var hd = document.getElementsByTagName("head")[0];
+        		return accessAideFuncs.formatOutput(hdErrMsg, accessAideFuncs.checkHeadHasCorrectTitle(hdErrMsg, hd));
+        	     },
+                    /**
+                     * Function that will find all ths and make sure that they have scope in them, and that they are equal to row, col, rowgroup, colgroup
+                     * @returns String - Returns a string representation of the errors
+                     */
+            	     checkThHasScope : function(){
+            		var thScopeMsg = "Table header must have scope attribute. Refer to http://www.w3.org/TR/UNDERSTANDING-WCAG20/content-structure-separation.html.";
+        		var accessAideFuncs = aura.devToolService.accessbilityAide;
+        		var ths = document.getElementsByTagName("th");
+        		return accessAideFuncs.formatOutput(thScopeMsg,accessAideFuncs.checkForAttrib(ths,"scope", {'row': false, 'col': false, 'rowgroup': false, 'colgroup' : false}, accessAideFuncs.doesNotContain));
+            	     },
                      /**
                       * Function that will find all IFrames and make sure that they have titles in them
-                      * @returns Sring - Returns a string representation of the errors
+                      * @returns String - Returns a string representation of the errors
                       */
         	     checkIFrameHasTitle : function(){
         		var iFrameTitleMsg = "Each frame and iframe element must have non-empty title attribute. Refer to http://www.w3.org/TR/UNDERSTANDING-WCAG20/ensure-compat.html.";
         		var accessAideFuncs = aura.devToolService.accessbilityAide;
         		var iframe = document.getElementsByTagName("iframe");
-        		return accessAideFuncs.formatOutput(iFrameTitleMsg,accessAideFuncs.checkForAttrib(iframe,"title", ""));
+        		return accessAideFuncs.formatOutput(iFrameTitleMsg,accessAideFuncs.checkForAttrib(iframe, "title", "", accessAideFuncs.doesContain));
         	    },
         	    /**
                      * Grabs all images tags and makes sure they have titles
-                     * @returns Sring - Returns a string representation of the errors
+                     * @returns String - Returns a string representation of the errors
                      */
         	    checkImageTagForAlt : function(){
         		var imgError = "IMG tag must have alt attribute. Refer to http://www.w3.org/TR/UNDERSTANDING-WCAG20/text-equiv.html.";
@@ -579,7 +647,7 @@ var AuraDevToolService = function() {
         	    },
         	    /**
                      * Goes through all of the fieldsets tags and makes sure that each on has a legend
-                     * @returns Sring - Returns a string representation of the errors
+                     * @returns String - Returns a string representation of the errors
                      */
         	    checkFieldSetForLegend : function(){
         		var fieldsetLegnedMsg = "Fieldset element must include legend element. Refer to http://www.w3.org/TR/UNDERSTANDING-WCAG20/minimize-error.html.";
@@ -598,7 +666,7 @@ var AuraDevToolService = function() {
         	    }, 
         	    /**
                      * Gets all radio buttons, then traverses up the tree to find if they are in a fieldset
-                     * @returns Sring - Returns a string representation of the errors
+                     * @returns String - Returns a string representation of the errors
                      */
         	    checkRadioButtonsInFieldSet : function(){
         		 var radioButtonFieldSetMsg = "Radio button and checkbox should group by fieldset and legend elements. Refer to http://www.w3.org/TR/UNDERSTANDING-WCAG20/content-structure-separation.html.";
@@ -620,7 +688,7 @@ var AuraDevToolService = function() {
         	    },
         	    /**
                      * Verifys that all inputs have a label
-                     * @returns Sring - Returns a string representation of the errors
+                     * @returns String - Returns a string representation of the errors
                      */
         	    checkInputHasLabel : function() {
         		var inputLabelMsg   = "A label element must be directly before/after the input controls, and the for attribute of label must match the id attribute of the input controls, OR the label should be wrapped around an input. Refer to http://www.w3.org/TR/UNDERSTANDING-WCAG20/minimize-error.html.";
@@ -640,7 +708,7 @@ var AuraDevToolService = function() {
         },
         /**
          * Calls all functions in VerifyAccessibility and stores the result in a string
-         * @returns Sring - Returns a a concatenated string representation of all errors or the empty string
+         * @returns String - Returns a a concatenated string representation of all errors or the empty string
          */
         checkAccessibility : function(){
             var functions = aura.devToolService.verifyAccessibility;

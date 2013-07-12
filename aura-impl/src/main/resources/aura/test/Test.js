@@ -547,7 +547,7 @@ var Test = function(){
         assertAccessible : function() {
             var res = aura.devToolService.checkAccessibility();
             if (res !== "") {
-                throw new Error(res);
+        	throw new Error(res);
             }
         },
          /**

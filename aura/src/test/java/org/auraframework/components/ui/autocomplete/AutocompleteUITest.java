@@ -115,23 +115,17 @@ public class AutocompleteUITest extends WebDriverTestCase {
 		open(URL);
         WebDriver driver = getDriver();
         WebElement input = getAutoCompleteInput(driver, AUTOCOMPLETE_COMPONENT.get("Generic"));
+        WebElement nextInput = getAutoCompleteInput(driver, AUTOCOMPLETE_COMPONENT.get("Empty"));
         
         input.sendKeys("o");
         WebElement list = getAutoCompleteList(driver, AUTOCOMPLETE_COMPONENT.get("Generic"));
         waitForAutoCompleteListVisible(list, true);
         
-        // close autocomplete list
-        input.sendKeys(Keys.TAB + "" + Keys.TAB);
+        input.sendKeys(Keys.TAB);
         list = getAutoCompleteList(driver, AUTOCOMPLETE_COMPONENT.get("Generic"));
         waitForAutoCompleteListVisible(list, false);
         assertEquals("Focus should be back on the input",
-        		input.getAttribute("data-aura-rendered-by"), auraUITestingUtil.getUniqueIdOfFocusedElement());
-        
-        input.sendKeys(Keys.TAB);
-        WebElement nextInput = getAutoCompleteInput(driver, AUTOCOMPLETE_COMPONENT.get("Empty"));
-        assertEquals("Focus should be on the next input",
         		nextInput.getAttribute("data-aura-rendered-by"), auraUITestingUtil.getUniqueIdOfFocusedElement());
-        
 	}
 	
 	/**
@@ -147,10 +141,10 @@ public class AutocompleteUITest extends WebDriverTestCase {
         waitForAutoCompleteListVisible(list, true);
         
         // go to second option in list.
-        input.sendKeys(Keys.ARROW_DOWN + "" +  Keys.ARROW_DOWN);
-        WebElement nextElement = getInnerElementOfAutoCompleteOptionInList(list, 2);
-        assertEquals("Element that should be in focus is second option in list",
-        		nextElement.getAttribute("data-aura-rendered-by"), auraUITestingUtil.getUniqueIdOfFocusedElement());       
+        input.sendKeys(Keys.ARROW_DOWN + "" +  Keys.ARROW_DOWN + "" + Keys.ENTER);
+        list = getAutoCompleteList(driver, AUTOCOMPLETE_COMPONENT.get("Generic"));
+        waitForAutoCompleteListVisible(list, false);
+        assertEquals("Wrong option was selected", "hello world2", input.getAttribute("value"));       
 	}
 	
 	/**
@@ -226,7 +220,7 @@ public class AutocompleteUITest extends WebDriverTestCase {
         WebElement list = getAutoCompleteList(driver, autoCompleteCmpNum);
         WebElement element = getInnerElementOfAutoCompleteOptionInList(list, 3, optionType);
         element.click();
-        list = getAutoCompleteList(driver, autoCompleteCmpNum);
+        //list = getAutoCompleteList(driver, autoCompleteCmpNum);
         assertEquals("Wrong option was selected", "hello world3", input.getAttribute("value"));
 	}
 	
@@ -275,11 +269,7 @@ public class AutocompleteUITest extends WebDriverTestCase {
 		}
 		return matched;
 	}
-	
-	private WebElement getInnerElementOfAutoCompleteOptionInList(WebElement l, int optionNumber) {
-		return getInnerElementOfAutoCompleteOptionInList(l, optionNumber, OptionType.AUTOCOMPLETE_OPTION);
-	}
-	
+		
 	private WebElement getInnerElementOfAutoCompleteOptionInList(WebElement l, int optionNumber, OptionType optionType) {
 		List<WebElement> options = getAutoCompleteListOptions(l, optionType);
         WebElement option = options.get(optionNumber-1);

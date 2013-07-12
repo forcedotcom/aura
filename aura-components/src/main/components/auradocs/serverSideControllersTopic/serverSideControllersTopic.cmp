@@ -56,7 +56,7 @@
         // Create a callback that is executed after the server-side action returns
         a.setCallback(this, function(action) {
             if (action.getState() === "ERROR") {
-                alert("Server Error: " + action.getError()[0].message));
+                alert("Server Error: " + action.getError()[0].message);
             }
             else {
               // Alert the user with the value returned from the server

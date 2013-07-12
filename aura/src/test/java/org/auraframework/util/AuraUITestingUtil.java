@@ -476,4 +476,8 @@ public class AuraUITestingUtil {
         getEval("$A.test.assertAccessible()");
 
     }
+    
+    public String getUniqueIdOfFocusedElement() {
+    	return (String) getEval("return $A.test.getActiveElement().getAttribute('data-aura-rendered-by')");
+    }
 }

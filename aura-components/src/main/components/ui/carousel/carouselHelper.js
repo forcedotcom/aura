@@ -353,6 +353,10 @@
 			return;
 		}		
 		
+		if (cmp.get('v.fireSlideChangedEvent')) {
+			$A.getEvt("ui:slideChangedEvent").fire();
+		}
+		
 		this.pageSelected(cmp, currentPageX);	 
 	},
 	

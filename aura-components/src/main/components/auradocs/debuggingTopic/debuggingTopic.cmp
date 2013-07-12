@@ -43,7 +43,7 @@
 <auradocs:codeblock>http://localhost:8080/auranote/noteList.cmp?aura.debugtool=true&amp;aura.mode=STATS</auradocs:codeblock>
 
 <p><b>See also:</b><br/>
-    <auradocs:topicLink topic="modesReference">Modes Reference</auradocs:topicLink>
+    <auradocs:topicLink topic="modesReference">Modes Reference</auradocs:topicLink><br/>
     <auradocs:topicLink topic="docTests">Testing Components</auradocs:topicLink>
 </p>
 </aura:component>

@@ -26,8 +26,8 @@ import org.auraframework.def.ThemeDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.parser.handler.ThemeDefHandler;
 import org.auraframework.impl.system.DefDescriptorImpl;
-import org.auraframework.throwable.AuraException;
 import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.quickfix.InvalidExpressionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
@@ -72,19 +72,13 @@ public class ThemeDefHandlerTest extends AuraImplTestCase {
     /**
      * Non String type should be parsed without error Note this is different behavior from regular aura:attribute where
      * type is a required attribute.
-     * **/
+     **/
     public void testTypeNonString() throws QuickFixException {
-        String src = "<aura:theme>" +
-                "<aura:attribute name='test' default='1' type='Integer' />" +
-                "</aura:theme>";
-        try {
-            ThemeDef def = source(src);
-            AttributeDef aDef = def.getAttributeDef("test");
-            assertEquals("Default value should be an Integer of value 1", 1,
-                    Integer.parseInt(aDef.getDefaultValue().getValue().toString()));
-        } catch (Exception e) {
-            fail("Theme should be parsed but failed with exception " + e.getStackTrace());
-        }
+        String src = "<aura:theme>" + "<aura:attribute name='test' default='1' type='Integer' />" + "</aura:theme>";
+        ThemeDef def = source(src);
+        AttributeDef aDef = def.getAttributeDef("test");
+        assertEquals("Default value should be an Integer of value 1", 1,
+                Integer.parseInt(aDef.getDefaultValue().getValue().toString()));
     }
 
     /**
@@ -93,14 +87,12 @@ public class ThemeDefHandlerTest extends AuraImplTestCase {
      * @throws QuickFixException
      */
     public void testEmptyType() throws QuickFixException {
-        String src = "<aura:theme>" +
-                "<aura:attribute name='test' default='1' type='' />" +
-                "</aura:theme>";
+        String src = "<aura:theme>" + "<aura:attribute name='test' default='1' type='' />" + "</aura:theme>";
         try {
             source(src);
             fail("Empty value for type is disallowed and the definition does not parse");
-        } catch (AuraRuntimeException e) {
-            // do nothing, expected flow
+        } catch (Exception e) {
+            checkExceptionStart(e, AuraRuntimeException.class, "QualifiedName is required for descriptors");
         }
     }
 
@@ -110,14 +102,13 @@ public class ThemeDefHandlerTest extends AuraImplTestCase {
      * @throws QuickFixException
      */
     public void testInvalidType() throws QuickFixException {
-        String src = "<aura:theme>" +
-                "<aura:attribute name='test' default='1' type='An Unsupported Type' />" +
-                "</aura:theme>";
+        String src = "<aura:theme>" + "<aura:attribute name='test' default='1' type='An Unsupported Type' />"
+                + "</aura:theme>";
         try {
             source(src);
             fail("Unsupported value for type should cause the definition to fail parsing.");
-        } catch (AuraRuntimeException e) {
-            // do nothing, expected flow
+        } catch (Exception e) {
+            checkExceptionStart(e, AuraRuntimeException.class, "Invalid Descriptor Format: An Unsupported Type");
         }
     }
 
@@ -126,14 +117,12 @@ public class ThemeDefHandlerTest extends AuraImplTestCase {
      * value for default is of type String.
      */
     public void testDefaultTypeMismatch() {
-        String src = "<aura:theme>" +
-                "<aura:attribute name='test' default='abc' type='Integer' />" +
-                "</aura:theme>";
+        String src = "<aura:theme>" + "<aura:attribute name='test' default='abc' type='Integer' />" + "</aura:theme>";
         try {
             source(src);
             fail("Theme shouldn't parse when there exists a mismatch between default value and default type");
-        } catch (AuraException e) {
-            // do nothing, expected flow
+        } catch (Exception e) {
+            checkExceptionStart(e, InvalidExpressionException.class, "For input string: \"abc\"");
         }
     }
 
@@ -141,16 +130,14 @@ public class ThemeDefHandlerTest extends AuraImplTestCase {
         try {
             source("<aura:theme><aura:foo/></aura:theme>");
             fail("Should have thrown AuraException aura:foo isn't a valid child tag for aura:theme");
-        } catch (AuraRuntimeException e) {
-        }
+        } catch (AuraRuntimeException e) {}
     }
 
     public void testWithTextBetweenTag() throws Exception {
         try {
             source("<aura:theme>Test</aura:theme>");
             fail("Should have thrown AuraException because text is between aura:theme tags");
-        } catch (AuraRuntimeException e) {
-        }
+        } catch (AuraRuntimeException e) {}
     }
 
     public void testExtends() throws Exception {

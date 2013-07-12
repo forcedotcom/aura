@@ -277,4 +277,13 @@ public final class TestComponent implements ComponentDef {
     public Visibility getVisibility() {
         return Visibility.PUBLIC;
     }
+
+    @Override
+    public void appendSupers(Set<DefDescriptor<?>> supers) throws QuickFixException {
+    }
+
+    @Override
+    public StyleDef getStyleDef() throws QuickFixException {
+        return null;
+    }
 }

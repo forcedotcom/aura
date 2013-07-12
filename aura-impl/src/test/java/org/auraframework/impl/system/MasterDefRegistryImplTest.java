@@ -38,7 +38,6 @@ import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.LayoutsDef;
 import org.auraframework.def.NamespaceDef;
 import org.auraframework.def.RendererDef;
-import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.AuraImpl;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.parser.handler.XMLHandler.InvalidSystemAttributeException;
@@ -447,7 +446,8 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
     public void testCompileDefLocalDef() throws Exception {
         // build a mock def
         String descName = String.format("%s:ghost", System.nanoTime());
-        Definition def = Mockito.mock(RootDefinition.class);
+        ComponentDef def = Mockito.mock(ComponentDef.class);
+
         Mockito.doReturn(DefDescriptorImpl.getInstance(descName, ComponentDef.class)).when(def).getDescriptor();
 
         // spy on MDR's registries to spy on defs

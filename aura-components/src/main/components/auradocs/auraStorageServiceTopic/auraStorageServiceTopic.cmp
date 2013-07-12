@@ -29,7 +29,7 @@
 <p>(Not persistent but secure) Provides access to the JavaScript main memory space for caching data. The stored cache persists only per browser page. Browsing to a new page resets the cache. Also, MemoryAdapter provides cache management capabilities. If the memory size limit has been reached, MemoryAdapter removes the least recently used data from the cache to shrink the cache size.</p>
 
 <h4>WebSQL</h4>
-<p>(Persistent but not secure) Provides access to a client-side SQL database using SQLite. It's available for Chrome and Safari browsers only.<!-- TODO: add Android to list when W-1700767 is closed --></p>
+<p>(Persistent but not secure) Provides access to a client-side SQL database using SQLite. Web SQL storage is available for Chrome and Safari browsers only.<!-- TODO: add Android to list when W-1700767 is closed --></p>
 
 <h3>Storage Adapter Selection</h3>
 <p>Aura Storage Service selects a storage adapter on your behalf that matches the  persistent and secure options you specify when initializing the service. For example, if you request a persistent and secure storage service, Aura Storage Service will return the SmartStore storage.</p>

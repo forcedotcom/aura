@@ -145,8 +145,8 @@ public class DialogUITest extends WebDriverTestCase {
 
         String classOfActiveElem = "input[class*='" + auraUITestingUtil.getEval(CLASSNAME) + "']";
         WebElement element = driver.findElement(By.cssSelector(classOfActiveElem));
-        assertEquals("Did not move to next checkbox", element.getAttribute("class"),
-                "checkbox1 uiInputCheckbox uiInput");
+        Boolean obj = (Boolean)auraUITestingUtil.getEval("return $A.util.hasClass(arguments[0],\"checkbox1\")", element);
+        assertTrue("Did not move to next checkbox", obj.booleanValue());
         element.click();
 
         classOfActiveElem = "button[title*='" + CONFIRM_STR + "']";

@@ -84,10 +84,6 @@
         <ol>
             <li>On the command line, navigate to the directory for your new app.<br/>
             <code>cd helloWorld</code></li>
-            <!-- TODO re-enable this step when archetype fixed - temporary workaround
-            <li>Download the latest version of each of the dependent artifacts for your project.<br/>
-            <code>mvn versions:use-latest-versions -DallowSnapshots=true -DgenerateBackupPoms=false</code></li>
-            -->
             <li>Start the Jetty server on port 8080.<br/>
             <code>mvn jetty:run</code><br/>
             To use another port, append: <code> -Djetty.port=portNumber</code>. For example, <code>mvn jetty:run -Djetty.port=9877</code>.</li>

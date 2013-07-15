@@ -42,7 +42,6 @@ public class CarouselUITest extends WebDriverTestCase {
     private final String NAVIGATION_ITEM_SELECTED_SELECTOR = "a[class*='uiCarouselPageIndicatorItem'][class*='carousel-nav-item-selected']";
     private final String CAROUSEL_PAGE_SELECTOR = "section[class*='uiCarouselPage']";
     private final String CAROUSEL_PAGE_ITEM_SELECTOR = "li[class*='uiCarouselPageItem']";
-    private final String ACTIVE_ELEMENT_UNIQUE_ID = "return $A.test.getActiveElement().getAttribute('data-aura-rendered-by')";
     private final String AURA_RENDERED_BY_ID = "data-aura-rendered-by";
 
     public CarouselUITest(String name) {

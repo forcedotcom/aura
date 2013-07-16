@@ -31,13 +31,11 @@ StyleDef.prototype.auraType = "StyleDef";
  * Applies style to element. If this StyleDef's style has not been added to the DOM, add it to the DOM.
  */
 StyleDef.prototype.apply = function(){
-    if(!$A.getContext().isPreloaded(this.descriptor.getNamespace().toLowerCase())){
-        var element = this.element;
-        var code = this.code;
-        if (!element && code) {
-            element = aura.util.style.apply(code);
-            this.element = element;
-        }
+    var element = this.element;
+    var code = this.code;
+    if (!element && code) {
+        element = aura.util.style.apply(code);
+        this.element = element;
     }
     delete this.code;
 };

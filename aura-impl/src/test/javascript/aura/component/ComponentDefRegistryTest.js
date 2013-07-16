@@ -17,11 +17,11 @@ Function.RegisterNamespace("Test.Aura.Component");
 
 [Fixture]
 Test.Aura.Component.ComponentDefRegistryTest = function() {
-	Mocks.GetMock(Object.Global(), "window", {})(function() {
-		// #import aura.component.ComponentDefRegistry
-	});
+    Mocks.GetMock(Object.Global(), "window", {})(function() {
+            // #import aura.component.ComponentDefRegistry
+    });
 
-	[Fixture]
+    [Fixture]
     function AuraType() {
 	[Fact]
 	function HasCorrectAuraType() {
@@ -149,6 +149,41 @@ Test.Aura.Component.ComponentDefRegistryTest = function() {
 	    endMark : function() {
 	    }
 	});
+        var mockComponentDef = Mocks.GetMock(Object.Global(), "$A", {
+                ns : {
+                    ComponentDef: function(config) {
+                        var def = {};
+                        def["config"] = config;
+                        var toString = function() {
+                            return config["descriptor"]
+                        };
+                        def["getDescriptor"] = function() {
+                            return {
+                                "toString" : toString
+                            };
+                        }
+                        return def;
+                    }
+                },
+                util : {
+                    isString : function() {
+                        return true;
+                    },
+                    isUndefinedOrNull : function(obj) {
+                        return obj === undefined || obj === null;
+                    }
+                },
+                assert : function(condition, message){
+                        if(!condition){
+                            var error = new Error(message);
+                            throw error;
+                        }
+                },
+                mark : function() {
+                },
+                endMark : function() {
+                }
+            });
 	[Fact]
 	function ThrowsIfConfigParamUndefined() {
 	    // Arrange
@@ -224,20 +259,6 @@ Test.Aura.Component.ComponentDefRegistryTest = function() {
 	    Assert.Equal(expected, actual);
 	}
 
-	var mockComponentDef = Mocks.GetMock(Object.Global(), "ComponentDef",
-		function(config) {
-		    var def = {};
-		    def["config"] = config;
-		    var toString = function() {
-			return config["descriptor"]
-		    };
-		    def["getDescriptor"] = function() {
-			return {
-			    "toString" : toString
-			};
-		    }
-		    return def;
-		});
 	[Fact]
 	function RegistersConfigAsNewDefIfDoesntExist() {
 	    // Arrange
@@ -252,11 +273,9 @@ Test.Aura.Component.ComponentDefRegistryTest = function() {
 
 	    // Act
 	    // Should register the given config
-	    mockAuraUtil(function() {
-		mockComponentDef(function() {
-		    registeredDef = target.getDef(newConfig);
-		})
-	    });
+            mockComponentDef(function() {
+                registeredDef = target.getDef(newConfig);
+            });
 	    var registeredConfig = registeredDef["config"];
 	    
 	    // Assert
@@ -277,11 +296,9 @@ Test.Aura.Component.ComponentDefRegistryTest = function() {
 
 	    // Act
 	    // Should register the given config
-	    mockAuraUtil(function() {
-		mockComponentDef(function() {
-		    registeredDef = target.getDef(newConfig);
-		})
-	    });
+            mockComponentDef(function() {
+                registeredDef = target.getDef(newConfig);
+            });
 	    // Re-fetch def
 	    mockAuraUtil(function() {
 		actualDef = target.getDef("markup://foo:bar");
@@ -316,10 +333,8 @@ Test.Aura.Component.ComponentDefRegistryTest = function() {
 		"config" : newConfig
 	    }
 	    // Act
-	    mockAuraUtil(function() {
-		mockComponentDef(function() {
-		    target.getDef(newConfig);
-		})
+            mockComponentDef(function() {
+                target.getDef(newConfig);
 	    });
 
 	    // Assert
@@ -352,10 +367,8 @@ Test.Aura.Component.ComponentDefRegistryTest = function() {
 	    };
 
 	    // Act
-	    mockAuraUtil(function() {
-		mockComponentDef(function() {
-		    actualDef = target.getDef(newConfig);
-		})
+            mockComponentDef(function() {
+                actualDef = target.getDef(newConfig);
 	    });
 
 	    // Assert

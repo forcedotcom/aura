@@ -75,7 +75,7 @@ ComponentDefRegistry.prototype.getDef = function(config, noInit) {
             $A.endMark("ComponentDefRegistry.localStorageCache");
         }
 
-        ret = new ComponentDef(config);
+        ret = new $A.ns.ComponentDef(config);
         this.componentDefs[ret.getDescriptor().toString()] = ret;
 
         if (useLocalStorage) {

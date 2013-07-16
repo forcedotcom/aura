@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.collect.Lists;
+
 import junit.framework.Assert;
 
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -511,5 +513,21 @@ public class AuraUITestingUtil {
     
     public String getUniqueIdOfFocusedElement() {
     	return (String) getEval("return $A.test.getActiveElement().getAttribute('data-aura-rendered-by')");
+    }
+
+    public void assertClassesSame(String message, String expectedClasses, String actualClasses) {
+        List<String> expected = AuraTextUtil.splitSimpleAndTrim(" ", expectedClasses, 3);
+        List<String> actual = AuraTextUtil.splitSimpleAndTrim(" ", actualClasses, 3);
+        List<String> extra = Lists.newArrayList();
+
+        for (String x : actual) {
+            if (expected.contains(x)) {
+                expected.remove(x);
+            } else {
+                extra.add(x);
+            }
+        }
+        Assert.assertTrue(message+": Mismatched classes extra = "+extra+", missing="+expected,
+            extra.size() == 0 && expected.size() == 0);
     }
 }

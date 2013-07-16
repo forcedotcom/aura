@@ -673,6 +673,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             AuraContext context = Aura.getContextService().getCurrentContext();
             Mode mode = context.getMode();
             boolean preloaded = context.isPreloaded(getDescriptor());
+            boolean preloading = context.isPreloading();
 
             json.writeMapBegin();
             json.writeMapEntry("descriptor", getDescriptor());
@@ -692,6 +693,9 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
                 json.writeMapEntry("controllerDef", getControllerDef());
                 json.writeMapEntry("modelDef", getModelDef());
                 json.writeMapEntry("superDef", getSuperDef());
+                if (preloading) {
+                    json.writeMapEntry("isCSSPreloaded", preloading);
+                }
 
                 Collection<AttributeDef> attrDefs = getAttributeDefs().values();
                 if (!attrDefs.isEmpty()) {

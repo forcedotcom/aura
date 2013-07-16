@@ -381,13 +381,10 @@
      */
     testGroupBy:{
         test:[function(cmp){      	
-			var preLoads = $A.test.objectKeys($A.getContext().getPreloads());
-			if (preLoads.length > 2) {				
-				var whereClause = "nameSpace == '" + preLoads[0] + "' || nameSpace == '" + preLoads[1] + "'";
-				var result = $A.getQueryStatement().from('componentDef').field('nameSpace','getDescriptor().getNamespace()').where(whereClause).groupBy('nameSpace').query()
-				
-	            $A.test.assertEquals(2, result.groupCount);				
-			}			
+            var whereClause = "nameSpace == 'aura'";
+            var result = $A.getQueryStatement().from('componentDef').field('nameSpace','getDescriptor().getNamespace()').where(whereClause).groupBy('nameSpace').query()
+                            
+            $A.test.assertEquals(1, result.groupCount);
         },
         function(cmp){        	
         //1. null, undefined and blank as group by clause

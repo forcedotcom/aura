@@ -1,0 +1,4 @@
+<aura:component extends="ui:menuTrigger">
+    <aura:attribute name="label" type="String" default="Trigger" description="The text to display as a tooltip."/>
+    {!v.label}
+</aura:component>

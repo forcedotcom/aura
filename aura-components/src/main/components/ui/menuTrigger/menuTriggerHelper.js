@@ -25,6 +25,7 @@
     
     preEventFiring: function(component, event) {
         var concreteCmp = component.getConcreteComponent();
+        
         if (event.type === "keydown") {
             if (event.keyCode === 32) {  // space key
                 event.preventDefault();

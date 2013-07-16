@@ -26,6 +26,7 @@ import java.net.MalformedURLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TimeZone;
@@ -40,10 +41,13 @@ import org.auraframework.impl.util.AuraImplFiles;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.AuraError;
 import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.util.AuraLocale;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.IOUtil;
 import org.auraframework.util.javascript.JavascriptGroup;
 import org.auraframework.util.resource.ResourceLoader;
+
+import com.google.common.collect.Lists;
 
 public class ConfigAdapterImpl implements ConfigAdapter {
 
@@ -129,17 +133,20 @@ public class ConfigAdapterImpl implements ConfigAdapter {
 
     @Override
     public String getJiffyCSSURL() {
-        return "/auraFW/resources/jiffy/Jiffy.css";
+        String contextPath = Aura.getContextService().getCurrentContext().getContextPath();
+        return String.format("%s/auraFW/resources/jiffy/Jiffy.css", contextPath);
     }
 
     @Override
     public String getJiffyJSURL() {
-        return "/auraFW/resources/jiffy/Jiffy.js";
+        String contextPath = Aura.getContextService().getCurrentContext().getContextPath();
+        return String.format("%s/auraFW/resources/jiffy/Jiffy.js", contextPath);
     }
 
     @Override
     public String getJiffyUIJSURL() {
-        return "/auraFW/resources/jiffy/JiffyUi.js";
+        String contextPath = Aura.getContextService().getCurrentContext().getContextPath();
+        return String.format("%s/auraFW/resources/jiffy/JiffyUi.js", contextPath);
     }
 
     @Override
@@ -178,12 +185,35 @@ public class ConfigAdapterImpl implements ConfigAdapter {
             }
         }
     }
+    
+    @Override
+    public String getMomentJSURL() {
+        String contextPath = Aura.getContextService().getCurrentContext().getContextPath();
+        String nonce = getAuraFrameworkNonce();
+        return String.format("%s/auraFW/resources/%s/moment/moment.js?aura.fwuid=%s", contextPath, nonce, nonce);
+    }
+    
+    @Override
+    public List<String> getWalltimeJSURLs() {
+        String nonce = getAuraFrameworkNonce();
+        AuraLocale al = Aura.getLocalizationAdapter().getAuraLocale();
+        String locale = al.getTimeZone().getID().replace("/", "-");
+        String contextPath = Aura.getContextService().getCurrentContext().getContextPath();
+
+        List<String> urls = Lists.newLinkedList();
+        urls.add(String.format("%s/auraFW/resources/%s/walltime-js/walltime.js?aura.fwuid=%s", contextPath, nonce, nonce));
+        if (!"GMT".equals(locale)) {
+            urls.add(String.format("%s/auraFW/resources/%s/walltime-js/olson/walltime-data_%s.js?aura.fwuid=%s", contextPath, nonce, locale, nonce));
+        }
+        return urls;
+    }
 
     @Override
     public String getAuraJSURL() {
+        String contextPath = Aura.getContextService().getCurrentContext().getContextPath();
         String suffix = Aura.getContextService().getCurrentContext().getMode().getJavascriptMode().getSuffix();
         String nonce = getAuraFrameworkNonce();
-        return String.format("/auraFW/javascript/%s/aura_%s.js?aura.fwuid=%s", nonce, suffix, nonce);
+        return String.format("%s/auraFW/javascript/%s/aura_%s.js?aura.fwuid=%s", contextPath, nonce, suffix, nonce);
     }
 
     @Override

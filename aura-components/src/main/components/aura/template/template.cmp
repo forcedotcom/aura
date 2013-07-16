@@ -276,10 +276,6 @@
             }
             </script>
             
-            <script src="/auraFW/resources/moment/moment.js"></script>
-            <script src="{!'/auraFW/resources/walltime-js/olson/walltime-data_' + $Locale.timezoneFileName + '.js'}"></script>
-            <script src="/auraFW/resources/walltime-js/walltime.js"></script>
-            
             {!v.auraInitBlock}
 
             {!v.auraNamespacesScriptTags}

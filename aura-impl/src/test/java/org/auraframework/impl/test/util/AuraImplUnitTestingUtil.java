@@ -276,7 +276,11 @@ public class AuraImplUnitTestingUtil {
 
 				return Visibility.PUBLIC;
 			}
-		};
+
+            @Override
+            public void appendSupers(Set<DefDescriptor<?>> supers) throws QuickFixException {
+            }
+        };
 	}
 
 	public DefDescriptor<EventDef> getEventDefDescriptor() {

@@ -156,7 +156,7 @@
     /**
      * Dismiss the error messages and restore the component to the normal state.
      */
-    validate : function(component, valueProvider) {        
+    validate : function(component, valueProvider) {
         var inputEl = this.getInputElement(component);
         var errorCmp = component.get("v.errorComponent")[0];
         
@@ -170,7 +170,7 @@
     /**
      * Show up the the error messages and put the component in the error state.
      */
-    invalidate : function(component, valueProvider, value) {        
+    invalidate : function(component, valueProvider, value) {
         var inputEl = this.getInputElement(component);
         var m = [];
         var valueErr = value.getErrors();
@@ -270,5 +270,9 @@
     hasLabel: function(cmp) {
     	var label = cmp.get('v.label');    	
     	return label && label.length > 0;
+    },
+
+    formatValue: function(cmp) {
+        return cmp.get("v.value");
     }
 })

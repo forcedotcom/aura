@@ -23,7 +23,6 @@ exp(p,
     "getGlobalValueProviders", p.getGlobalValueProviders
     //#if {"excludeModes" : ["PRODUCTION"]}
         ,
-        "getPreloads", p.getPreloads,
         "getNum", p.getNum,
         "getLoaded", p.getLoaded
 

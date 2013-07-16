@@ -16,18 +16,24 @@
 package org.auraframework.impl.java.controller;
 
 import java.io.IOException;
+import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
 import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.instance.Component;
 import org.auraframework.system.Annotations.AuraEnabled;
+import org.auraframework.system.Annotations.BackgroundAction;
 import org.auraframework.system.Annotations.Controller;
 import org.auraframework.system.Annotations.Key;
+import org.auraframework.test.TestContextAdapter;
+import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonSerializable;
 
@@ -37,28 +43,128 @@ import com.google.common.collect.Maps;
 @Controller
 public class AuraStorageTestController {
     public static ConcurrentHashMap<String, Integer> staticCounter = new ConcurrentHashMap<String, Integer>();
-    static ConcurrentHashMap<String, CountDownLatch> pending = new ConcurrentHashMap<String, CountDownLatch>();
+    private static Map<String, Map<String, Semaphore>> pending = new ConcurrentHashMap<String, Map<String, Semaphore>>();
+    private static Map<String, List<Object>> buffer = Maps.newHashMap();
+    private static Map<String, Semaphore> executorLocks = new ConcurrentHashMap<String, Semaphore>();
 
-    @AuraEnabled
-    public static void block(@Key("testName") String testName){
-        pending.putIfAbsent(testName, new CountDownLatch(1));
+    private enum Command {
+        RESET, WAIT, RESUME, APPEND, READ, STAMP, SLEEP;
     }
 
     @AuraEnabled
-    public static void resume(@Key("testName") String testName){
-        CountDownLatch lock = pending.get(testName);
-        lock.countDown();
-        pending.remove(testName);
+    public static List<Object> execute(@Key("commands") String commands) throws Exception {
+        String testName = Aura.get(TestContextAdapter.class).getTestContext().getName();
+        List<Object> result = Lists.newLinkedList();
+        getExecutorLock(testName);
+        try {
+            for (String command : commands.split(";")) {
+                String args[] = command.trim().split(" ", 2);
+                String cmdArg = args.length > 1 ? args[1].trim() : "";
+                Command cmd = Command.valueOf(args[0].trim().toUpperCase());
+                switch (cmd) {
+                case RESET:
+                    /*
+                     * When releasing blocked threads, those threads may continue running a set of commands that may
+                     * create, remove, or update more semaphores. So, release blocked threads, clean up dangling
+                     * semaphores, and repeat until all semaphores are gone.
+                     */
+                    for (Map<String, Semaphore> sems = pending.get(testName); sems != null && !sems.isEmpty(); sems = pending
+                            .get(testName)) {
+                        for (Iterator<Entry<String, Semaphore>> iterator = sems.entrySet().iterator(); iterator
+                                .hasNext();) {
+                            Semaphore current = iterator.next().getValue();
+                            if (current.hasQueuedThreads()) {
+                                current.release();
+                            } else {
+                                iterator.remove();
+                            }
+                        }
+                        releaseExecutorLock(testName);
+                        Thread.yield();
+                        getExecutorLock(testName);
+                    }
+                    buffer.remove(testName);
+                    break;
+                case WAIT:
+                    Semaphore sem = getSemaphore(testName, cmdArg, true);
+                    releaseExecutorLock(testName);
+                    try {
+                        if (!sem.tryAcquire(30, TimeUnit.SECONDS)) {
+                            throw new AuraRuntimeException("Timed out waiting to acquire " + testName + ":" + cmdArg);
+                        }
+                    } finally {
+                        getExecutorLock(testName);
+                        if (!sem.hasQueuedThreads()) {
+                            removeSemaphore(testName, cmdArg);
+                        }
+                    }
+                    break;
+                case RESUME:
+                    getSemaphore(testName, cmdArg, true).release();
+                    break;
+                case APPEND:
+                    getBuffer(testName).add(cmdArg);
+                    break;
+                case READ:
+                    List<Object> temp = buffer.remove(testName);
+                    if (temp != null) {
+                        result.addAll(temp);
+                    }
+                    break;
+                case STAMP:
+                    getBuffer(testName).add(new Date().getTime());
+                    break;
+                case SLEEP:
+                    long millis = 500;
+                    try {
+                        millis = Long.parseLong(cmdArg);
+                    } catch (Throwable t) {
+                    }
+                    try {
+                        releaseExecutorLock(testName);
+                        Thread.sleep(millis);
+                    } finally {
+                        getExecutorLock(testName);
+
+                    }
+                    break;
+                }
+            }
+            return result;
+        } finally {
+            releaseExecutorLock(testName);
+        }
     }
+
     @AuraEnabled
-    public static Record fetchDataRecord(@Key("testName") String testName) throws Exception{
+    @BackgroundAction
+    public static List<Object> executeBackground(@Key("commands") String commands) throws Exception {
+        return execute(commands);
+    }
+
+    @AuraEnabled
+    public static void block(@Key("testName") String testName) {
+        getSemaphore(testName, null, true);
+    }
+
+    @AuraEnabled
+    public static void resume(@Key("testName") String testName) {
+        getSemaphore(testName, null, false).release();
+        removeSemaphore(testName, null);
+    }
+
+    @AuraEnabled
+    public static Record fetchDataRecord(@Key("testName") String testName) throws Exception {
         staticCounter.putIfAbsent(testName, 0);
         AuraStorageTestController.Record r = new AuraStorageTestController.Record(staticCounter.get(testName),
-        "StorageController");
+                "StorageController");
         staticCounter.put(testName, new Integer(staticCounter.get(testName).intValue() + 1));
-        CountDownLatch lock = pending.get(testName);
-        if(lock!=null)
-            lock.await(15, TimeUnit.SECONDS);
+        Semaphore lock = getSemaphore(testName, null, false);
+        if (lock != null) {
+            if (!lock.tryAcquire(15, TimeUnit.SECONDS)) {
+                return null;
+            }
+        }
         return r;
     }
 
@@ -71,12 +177,12 @@ public class AuraStorageTestController {
     public static void resetCounter(@Key("testName") String testName) {
         if (testName != null) {
             staticCounter.remove(testName);
-            pending.remove(testName);
+            removeSemaphore(testName, null);
             return;
         } else {
             for (String s : staticCounter.keySet()) {
                 staticCounter.remove(s);
-                pending.remove(s);
+                removeSemaphore(s, null);
             }
         }
     }
@@ -147,7 +253,7 @@ public class AuraStorageTestController {
             attr.put("name", "Giants");
             attr.put("city", "San Francisco");
             Component cmp = Aura.getInstanceService()
-            .getInstance("auraStorageTest:teamFacet", ComponentDef.class, attr);
+                    .getInstance("auraStorageTest:teamFacet", ComponentDef.class, attr);
             ret.add(cmp);
         } else {
             Map<String, Object> attr = Maps.newHashMap();
@@ -165,4 +271,85 @@ public class AuraStorageTestController {
         return ret;
     }
 
+    private static void getExecutorLock(String key) {
+        Semaphore sem;
+        synchronized (executorLocks) {
+            sem = executorLocks.get(key);
+            if (sem == null) {
+                sem = new Semaphore(1, true);
+                executorLocks.put(key, sem);
+            }
+        }
+        sem.acquireUninterruptibly();
+    }
+
+    private static void releaseExecutorLock(String key) {
+        synchronized (executorLocks) {
+            Semaphore sem = executorLocks.get(key);
+            if (sem == null) {
+                return;
+            }
+            sem.release();
+            if (!sem.hasQueuedThreads()) {
+                executorLocks.remove(key);
+            }
+        }
+    }
+
+    private static Semaphore getSemaphore(String key, String subKey, boolean create) {
+        if (key == null) {
+            key = Aura.get(TestContextAdapter.class).getTestContext().getName();
+        }
+        synchronized (pending) {
+            Map<String, Semaphore> subSet = pending.get(key);
+            if (subSet == null) {
+                if (!create) {
+                    return null;
+                }
+                subSet = new ConcurrentHashMap<String, Semaphore>();
+                pending.put(key, subSet);
+            }
+
+            if (subKey == null) {
+                subKey = "";
+            }
+            Semaphore sem = subSet.get(subKey);
+            if (sem == null) {
+                if (!create) {
+                    return null;
+                }
+                sem = new Semaphore(0, true);
+                subSet.put(subKey, sem);
+            }
+            return sem;
+        }
+    }
+
+    private static void removeSemaphore(String key, String subKey) {
+        if (key == null) {
+            key = Aura.get(TestContextAdapter.class).getTestContext().getName();
+        }
+        synchronized (pending) {
+            Map<String, Semaphore> subSet = pending.get(key);
+            if (subSet == null) {
+                return;
+            }
+            if (subKey == null) {
+                subKey = "";
+            }
+            subSet.remove(subKey);
+            if (subSet.isEmpty()) {
+                pending.remove(key);
+            }
+        }
+    }
+
+    private synchronized static List<Object> getBuffer(String key) {
+        List<Object> list = buffer.get(key);
+        if (list == null) {
+            list = Lists.newLinkedList();
+            buffer.put(key, list);
+        }
+        return list;
+    }
 }

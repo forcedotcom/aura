@@ -22,7 +22,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedSet;
+import java.util.SortedMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
@@ -32,11 +32,13 @@ import org.apache.log4j.Logger;
 import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
+import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.SecurityProviderDef;
+import org.auraframework.def.StyleDef;
 import org.auraframework.impl.root.DependencyDefImpl;
 import org.auraframework.service.LoggingService;
 import org.auraframework.system.AuraContext;
@@ -97,12 +99,12 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     private static class DependencyEntry {
         public final String uid;
         public final long lastModTime;
-        public final SortedSet<DefDescriptor<?>> dependencies;
+        public final SortedMap<DefDescriptor<?>, Integer> dependencies;
         public final QuickFixException qfe;
 
-        public DependencyEntry(String uid, SortedSet<DefDescriptor<?>> dependencies, long lastModTime) {
+        public DependencyEntry(String uid, SortedMap<DefDescriptor<?>, Integer> dependencies, long lastModTime) {
             this.uid = uid;
-            this.dependencies = Collections.unmodifiableSortedSet(dependencies);
+            this.dependencies = Collections.unmodifiableSortedMap(dependencies);
             this.lastModTime = lastModTime;
             this.qfe = null;
         }
@@ -712,7 +714,8 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             //
             // de = getDE(uid, key);
             // if (de == null) {
-            de = new DependencyEntry(uid, Sets.newTreeSet(dds.keySet()), lmt);
+
+            de = new DependencyEntry(uid, createFrequencyMap(dds), lmt);
             depsCache.put(makeGlobalKey(de.uid, descriptor), de);
             // See localDependencies comment
             localDependencies.put(de.uid, de);
@@ -725,6 +728,65 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             throw qfe;
         } finally {
             compilingDescriptor = lastCompiling;
+        }
+    }
+
+    /**
+     * Returns map of dependencies as key and frequency (based on number of descendants) as value
+     *
+     * @param dds definition map
+     * @return sorted map
+     * @throws QuickFixException
+     */
+    private SortedMap<DefDescriptor<?>, Integer> createFrequencyMap(Map<DefDescriptor<? extends Definition>, Definition> dds)
+            throws QuickFixException {
+        SortedMap<DefDescriptor<?>, Integer> frequencyMap = Maps.newTreeMap();
+        for (Map.Entry<DefDescriptor<?>, Definition> entry : dds.entrySet()) {
+            DefDescriptor<?> defDescriptor = entry.getKey();
+            // for each component we want to calculate its frequency
+            if (defDescriptor.getDefType() == DefType.COMPONENT) {
+                ComponentDef componentDef = (ComponentDef) entry.getValue();
+                Set<DefDescriptor<?>> supers = Sets.newLinkedHashSet();
+                componentDef.appendSupers(supers);
+                for (DefDescriptor<?> sup : supers) {
+                    addComponentFrequency(dds, frequencyMap, sup);
+                }
+            }
+            addComponentFrequency(dds, frequencyMap, defDescriptor);
+        }
+
+        return frequencyMap;
+    }
+
+    /**
+     * Adds frequency to particular component based on their descendants. All other types just get 1 as its frequency.
+     * Adds component's frequency to its style to make ordering CSS easier.
+     *
+     * @param defMap dependencies definition map
+     * @param frequencyMap dependencies frequency map
+     * @param descriptor descriptor to add
+     */
+    private void addComponentFrequency(Map<DefDescriptor<? extends Definition>, Definition> defMap,
+                                       Map<DefDescriptor<?>, Integer> frequencyMap,
+                                       DefDescriptor<?> descriptor) {
+        Integer freq = frequencyMap.get(descriptor);
+        // give supers addition freq to ensure supers are before descendants when sorted
+        // for instances where component is extended only once
+        freq = (freq == null) ? 1 : freq + 1;
+        frequencyMap.put(descriptor, freq);
+
+        if (descriptor.getDefType() == DefType.COMPONENT) {
+            ComponentDef def = (ComponentDef) defMap.get(descriptor);
+            // let's put the component frequency on its style to make ordering CSS easier for app.css
+            DefDescriptor<StyleDef> styleDefDescriptor = def.getStyleDescriptor();
+            if (styleDefDescriptor != null) {
+                frequencyMap.put(styleDefDescriptor, freq);
+            }
+            DefDescriptor<ComponentDef> parentDescriptor = def.getExtendsDescriptor();
+            if (parentDescriptor != null) {
+                // get its ancestor as well to clearly indicate lineage in the frequency.
+                addComponentFrequency(defMap, frequencyMap, parentDescriptor);
+            }
         }
     }
 
@@ -778,6 +840,16 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
     @Override
     public <T extends Definition> Set<DefDescriptor<?>> getDependencies(String uid) {
+        DependencyEntry de = localDependencies.get(uid);
+
+        if (de != null) {
+            return Sets.newTreeSet(de.dependencies.keySet());
+        }
+        return null;
+    }
+
+    @Override
+    public <T extends Definition> Map<DefDescriptor<?>, Integer> getDependenciesMap(String uid) {
         DependencyEntry de = localDependencies.get(uid);
 
         if (de != null) {
@@ -846,7 +918,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             DependencyEntry de = getDE(null, descriptor);
             if (de == null) {
                 for (DependencyEntry det : localDependencies.values()) {
-                    if (det.dependencies != null && det.dependencies.contains(descriptor)) {
+                    if (det.dependencies != null && det.dependencies.containsKey(descriptor)) {
                         de = det;
                         break;
                     }
@@ -871,7 +943,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             List<CompilingDef<?>> compiled = Lists.newArrayList();
             AuraContext context = Aura.getContextService().getCurrentContext();
             validateHelper(context, descriptor, compiled);
-            for (DefDescriptor<?> dd : de.dependencies) {
+            for (DefDescriptor<?> dd : de.dependencies.keySet()) {
                 validateHelper(context, dd, compiled);
             }
             finishValidation(context, compiled);

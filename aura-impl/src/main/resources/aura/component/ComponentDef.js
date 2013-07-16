@@ -19,7 +19,7 @@
  * @constructor
  * @protected
  */
-function ComponentDef(config){
+$A.ns.ComponentDef = function ComponentDef(config){
     var descriptor = new DefDescriptor(config["descriptor"]);
     this.descriptor = descriptor;
     if(config["hasServerDeps"]){
@@ -49,10 +49,14 @@ function ComponentDef(config){
     this.isAbs = !!config["isAbstract"];
     if (config["layouts"]) {
         this.layouts = new LayoutsDef(config["layouts"]);
+    } else {
+        this.layouts = null;
     }
 
     if (config["locationChangeEventDef"]) {
         this.locationChangeEventDef = eventService.getEventDef(config["locationChangeEventDef"]);
+    } else {
+        this.locationChangeEventDef = null;
     }
 
     var registerEventDefs = {};
@@ -107,29 +111,24 @@ function ComponentDef(config){
     var providerDef = config["providerDef"];
     if (providerDef) {
         this.providerDef = componentService.getProviderDef(descriptor, providerDef);
+    } else {
+        this.providerDef = null;
     }
 
-    if (appHandlerDefs){
-        this.appHandlerDefs = appHandlerDefs;
-    }
+    this.appHandlerDefs = appHandlerDefs || null;
+    this.cmpHandlerDefs = cmpHandlerDefs || null;
+    this.valueHandlerDefs = valueHandlerDefs || null;
+    this.isCSSPreloaded = config["isCSSPreloaded"] || false;
+};
 
-    if (cmpHandlerDefs){
-        this.cmpHandlerDefs = cmpHandlerDefs;
-    }
-
-    if (valueHandlerDefs){
-        this.valueHandlerDefs = valueHandlerDefs;
-    }
-}
-
-ComponentDef.prototype.auraType = "ComponentDef";
+$A.ns.ComponentDef.prototype.auraType = "ComponentDef";
 
 /**
  * Gets the Component Descriptor. Returns a DefDescriptor object.
  * A DefDescriptor object contains a prefix, namespace, and name.
  * @returns {DefDescriptor}
  */
-ComponentDef.prototype.getDescriptor = function(){
+$A.ns.ComponentDef.prototype.getDescriptor = function(){
     return this.descriptor;
 };
 
@@ -137,7 +136,7 @@ ComponentDef.prototype.getDescriptor = function(){
  * Checks whether the Component is abstract. Returns true if the component is abstract.
  * @returns {Boolean} True if component is abstract, or false otherwise.
  */
-ComponentDef.prototype.isAbstract = function(){
+$A.ns.ComponentDef.prototype.isAbstract = function(){
     return this.isAbs;
 };
 
@@ -145,7 +144,7 @@ ComponentDef.prototype.isAbstract = function(){
  * @return the ComponentDef for the immediate super type,
  * or null if none exists (should only be null for aura:component)
  */
-ComponentDef.prototype.getSuperDef = function() {
+$A.ns.ComponentDef.prototype.getSuperDef = function() {
     return this.superDef;
 };
 
@@ -153,7 +152,7 @@ ComponentDef.prototype.getSuperDef = function() {
  * Returns a HelperDef object.
  * @returns {HelperDef}
  */
-ComponentDef.prototype.getHelperDef = function() {
+$A.ns.ComponentDef.prototype.getHelperDef = function() {
     return this.helperDef;
 };
 
@@ -161,7 +160,7 @@ ComponentDef.prototype.getHelperDef = function() {
  * Gets the Helper instance
  * @returns {Helper}
  */
-ComponentDef.prototype.getHelper = function() {
+$A.ns.ComponentDef.prototype.getHelper = function() {
     var def = this.getHelperDef();
     if(def){
         return def.getFunctions();
@@ -173,7 +172,7 @@ ComponentDef.prototype.getHelper = function() {
  * Returns a RendererDef object.
  * @returns {RendererDef}
  */
-ComponentDef.prototype.getRendererDef = function(){
+$A.ns.ComponentDef.prototype.getRendererDef = function(){
     return this.rendererDef;
 };
 
@@ -181,14 +180,14 @@ ComponentDef.prototype.getRendererDef = function(){
  * Checks whether the component has remote dependencies. Returns true if remote dependencies are found.
  * @returns {Boolean} True if remote dependencies exist, or false otherwise.
  */
-ComponentDef.prototype.hasRemoteDependencies = function(){
+$A.ns.ComponentDef.prototype.hasRemoteDependencies = function(){
     return this.hasRemoteDeps;
 };
 
 /**
  * @private
  */
-ComponentDef.prototype.getRenderingDetails = function() {
+$A.ns.ComponentDef.prototype.getRenderingDetails = function() {
     return this.renderingDetails;
 };
 
@@ -196,7 +195,7 @@ ComponentDef.prototype.getRenderingDetails = function() {
  * Returns a ProviderDef object associated with this ComponentDef.
  * @returns {ProviderDef}
  */
-ComponentDef.prototype.getProviderDef = function(){
+$A.ns.ComponentDef.prototype.getProviderDef = function(){
     return this.providerDef;
 };
 
@@ -204,7 +203,7 @@ ComponentDef.prototype.getProviderDef = function(){
  * Gets all the StyleDef objects, including inherited ones, for this ComponentDef.
  * @returns {StyleDef}
  */
-ComponentDef.prototype.getAllStyleDefs = function() {
+$A.ns.ComponentDef.prototype.getAllStyleDefs = function() {
     return this.allStyleDefs;
 };
 
@@ -215,9 +214,9 @@ ComponentDef.prototype.getAllStyleDefs = function() {
  * This string can be applied directly to DOM elements rendered by Components of this type.
  * @returns {String} The style class name
  */
-ComponentDef.prototype.getStyleClassName = function(){
+$A.ns.ComponentDef.prototype.getStyleClassName = function(){
     var className = this.styleClassName;
-    if(className === undefined){
+    if (!className) {
         className = "";
         var styleDefs = this.getAllStyleDefs();
         if(styleDefs){
@@ -238,7 +237,7 @@ ComponentDef.prototype.getStyleClassName = function(){
  * Gets the style definition. Returns a StyleDef object.
  * @returns {StyleDef}
  */
-ComponentDef.prototype.getStyleDef = function(){
+$A.ns.ComponentDef.prototype.getStyleDef = function(){
     return this.styleDef;
 };
 
@@ -246,7 +245,7 @@ ComponentDef.prototype.getStyleDef = function(){
  * Gets all the attribute definitions. Returns an AttributeDef object.
  * @returns {AttributeDef}
  */
-ComponentDef.prototype.getAttributeDefs = function() {
+$A.ns.ComponentDef.prototype.getAttributeDefs = function() {
     return this.attributeDefs;
 };
 
@@ -254,7 +253,7 @@ ComponentDef.prototype.getAttributeDefs = function() {
  * Gets the component facets. A facet is any attribute of type Aura.Component[].
  * @returns {Object}
  */
-ComponentDef.prototype.getFacets = function() {
+$A.ns.ComponentDef.prototype.getFacets = function() {
     return this.facets;
 };
 
@@ -262,7 +261,7 @@ ComponentDef.prototype.getFacets = function() {
  * Gets the controller definition. Returns a ControllerDef object.
  * @returns {ControllerDef}
  */
-ComponentDef.prototype.getControllerDef = function() {
+$A.ns.ComponentDef.prototype.getControllerDef = function() {
     return this.controllerDef;
 };
 
@@ -270,7 +269,7 @@ ComponentDef.prototype.getControllerDef = function() {
  * Gets the model definition. Returns a ModelDef object.
  * @returns {ModelDef}
  */
-ComponentDef.prototype.getModelDef = function() {
+$A.ns.ComponentDef.prototype.getModelDef = function() {
     return this.modelDef;
 };
 
@@ -279,7 +278,7 @@ ComponentDef.prototype.getModelDef = function() {
  * @param {String} The name of the event definition.
  * @returns{Object}
  */
-ComponentDef.prototype.getEventDef = function(name, includeValueEvents) {
+$A.ns.ComponentDef.prototype.getEventDef = function(name, includeValueEvents) {
     var ret = this.registerEventDefs[name];
     if(!ret && includeValueEvents){
         ret = BaseValue.getEventDef(name);
@@ -298,7 +297,7 @@ ComponentDef.prototype.getEventDef = function(name, includeValueEvents) {
  * @return {String} null, or the component fired event name.
  * @protected
  */
-ComponentDef.prototype.getEventNameByDescriptor = function(descriptor) {
+$A.ns.ComponentDef.prototype.getEventNameByDescriptor = function(descriptor) {
     for (var name in this.registerEventDefs) {
         if (this.registerEventDefs[name] && this.registerEventDefs[name].descriptor
                 && this.registerEventDefs[name].descriptor.qualifiedName === descriptor) {
@@ -312,7 +311,7 @@ ComponentDef.prototype.getEventNameByDescriptor = function(descriptor) {
  * Gets all events associated with the Component.
  * @returns {Object}
  */
-ComponentDef.prototype.getAllEvents = function() {
+$A.ns.ComponentDef.prototype.getAllEvents = function() {
     return this.allEvents;
 };
 
@@ -320,7 +319,7 @@ ComponentDef.prototype.getAllEvents = function() {
  * Gets the application handler definitions.
  * @returns {Object}
  */
-ComponentDef.prototype.getAppHandlerDefs = function(){
+$A.ns.ComponentDef.prototype.getAppHandlerDefs = function(){
     return this.appHandlerDefs;
 };
 
@@ -328,7 +327,7 @@ ComponentDef.prototype.getAppHandlerDefs = function(){
  * Gets the component handler definitions.
  * @returns {Object}
  */
-ComponentDef.prototype.getCmpHandlerDefs = function(){
+$A.ns.ComponentDef.prototype.getCmpHandlerDefs = function(){
     return this.cmpHandlerDefs;
 };
 
@@ -336,7 +335,7 @@ ComponentDef.prototype.getCmpHandlerDefs = function(){
  * Gets the value of the handler definitions.
  * @returns {Object}
  */
-ComponentDef.prototype.getValueHandlerDefs = function(){
+$A.ns.ComponentDef.prototype.getValueHandlerDefs = function(){
     return this.valueHandlerDefs;
 };
 
@@ -344,7 +343,7 @@ ComponentDef.prototype.getValueHandlerDefs = function(){
  *Converts a ComponentDef to type String.
  *@returns {String}
  */
-ComponentDef.prototype.toString = function(){
+$A.ns.ComponentDef.prototype.toString = function(){
     return this.getDescriptor().getQualifiedName();
 };
 
@@ -353,7 +352,7 @@ ComponentDef.prototype.toString = function(){
  * @param {String} name The name of the component (or interface), with a format of <namespace>:<componentName> (e.g., ui:button).
  * @returns {Boolean} True if the Component is an instance, or false otherwise.
  */
-ComponentDef.prototype.isInstanceOf = function(name){
+$A.ns.ComponentDef.prototype.isInstanceOf = function(name){
     var thisName = this.descriptor.getNamespace() +":"+this.descriptor.getName();
     if(thisName === name || this.implementsDirectly(name)){
         return true;
@@ -364,14 +363,14 @@ ComponentDef.prototype.isInstanceOf = function(name){
     return false;
 };
 
-ComponentDef.prototype.implementsDirectly = function(type){
+$A.ns.ComponentDef.prototype.implementsDirectly = function(type){
     return !$A.util.isUndefined(this.interfaces[type]);
 };
 
 /**
  * Gets the location change event. Returns the qualified name of the event. E.g. "markup://aura:locationChange"
  */
-ComponentDef.prototype.getLocationChangeEvent = function() {
+$A.ns.ComponentDef.prototype.getLocationChangeEvent = function() {
     var evt = this.locationChangeEventDef;
     if (evt) {
         return evt.getDescriptor().getQualifiedName();
@@ -379,14 +378,14 @@ ComponentDef.prototype.getLocationChangeEvent = function() {
     return "markup://aura:locationChange";
 };
 
-ComponentDef.prototype.getLayouts = function(){
+$A.ns.ComponentDef.prototype.getLayouts = function(){
     return this.layouts;
 };
 
 /**
  * @private
  */
-ComponentDef.prototype.initSuperDef = function(config){
+$A.ns.ComponentDef.prototype.initSuperDef = function(config){
     if (config) {
         return $A.componentService.getDef(config);
     }
@@ -395,16 +394,17 @@ ComponentDef.prototype.initSuperDef = function(config){
 
 /**
  * Setup the style defs and renderer details.
+ *
+ * Note that the style defs are in reverse order so that they get applied in forward order.
+ *
  * @private
  */
-ComponentDef.prototype.initRenderer = function() {
+$A.ns.ComponentDef.prototype.initRenderer = function() {
     var rd = {
         distance: 0,
         rendererDef: this.rendererDef
     };
-    if (this.styleDef) {
-        this.allStyleDefs = [this.styleDef];
-    }
+    this.allStyleDefs = [];
     var s = this.superDef;
     if (s) {
         if (!this.rendererDef) {
@@ -415,12 +415,11 @@ ComponentDef.prototype.initRenderer = function() {
         }
         var superStyles = s.getAllStyleDefs();
         if (superStyles) {
-            if (this.allStyleDefs) {
-                this.allStyleDefs = this.allStyleDefs.concat(superStyles);
-            } else {
-                this.allStyleDefs = superStyles;
-            }
+            this.allStyleDefs = this.allStyleDefs.concat(superStyles);
         }
+    }
+    if (this.styleDef && !this.isCSSPreloaded) {
+        this.allStyleDefs.push(this.styleDef);
     }
     this.renderingDetails = rd;
 };

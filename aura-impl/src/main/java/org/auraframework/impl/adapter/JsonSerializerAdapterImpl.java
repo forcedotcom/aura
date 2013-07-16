@@ -16,6 +16,7 @@
 package org.auraframework.impl.adapter;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.Map;
 
 import org.auraframework.Aura;
@@ -46,6 +47,7 @@ public class JsonSerializerAdapterImpl implements JsonSerializerAdapter {
         m.putAll(JsonSerializers.MAPPY_FASTY);
         m.put(AuraContextImpl.class.getName(), AuraContextImpl.FULL_SERIALIZER);
         m.put(JavaAction.class.getName(), Action.SERIALIZER);
+        m.put(BigDecimal.class.getName(), JsonSerializers.BIGDECIMAL);
         return m;
     }
 

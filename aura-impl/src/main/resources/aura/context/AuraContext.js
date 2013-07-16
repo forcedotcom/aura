@@ -29,10 +29,6 @@ function AuraContext(config) {
     }
     this.lastmod = config["lastmod"];
     this.fwuid = config["fwuid"];
-    this.preloadLookup = {};
-    for ( var j = 0; j < this.preloads.length; j++) {
-        this.preloadLookup[this.preloads[j]] = true;
-    }
     this.num = 0;
     // To keep track of re-rendering service call
     this.renderNum = 0;
@@ -45,7 +41,6 @@ function AuraContext(config) {
     this.test = config["test"];
 
     this.joinComponentConfigs(config["components"]);
-
     this.globalValueProviders = new $A.ns.GlobalValueProviders(config["globalValueProviders"]);
 }
 
@@ -66,20 +61,6 @@ AuraContext.prototype.getMode = function() {
  */
 AuraContext.prototype.getGlobalValueProviders = function() {
     return this.globalValueProviders;
-};
-
-/**
- * @private
- */
-AuraContext.prototype.isPreloaded = function(ns) {
-    return this.preloadLookup[ns] === true;
-};
-
-/**
- * @private
- */
-AuraContext.prototype.getPreloads = function() {
-    return this.preloadLookup;
 };
 
 /**
@@ -137,6 +118,7 @@ AuraContext.prototype.join = function(otherContext) {
         throw new Error("framework mismatch");
     }
     this.globalValueProviders.join(otherContext["globalValueProviders"]);
+    $A.localizationService.init();
     this.joinComponentConfigs(otherContext["components"]);
     this.joinLoaded(otherContext["loaded"]);
 };

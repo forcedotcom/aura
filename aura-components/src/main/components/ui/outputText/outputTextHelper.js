@@ -19,18 +19,28 @@
 		if (!containerEl) {
 			return;
 		}
-		
+	
 		if (typeof textValue == 'number') {
 			containerEl.appendChild(document.createTextNode(textValue));
 		} else	if (typeof textValue == 'string' && textValue.length > 0) {			
-			textValue = textValue.replace(/(\r\n|\r)/g, '\n');							
-			var parts = textValue.split('\n');
-			if (parts.length == 1) {
-				containerEl.appendChild(document.createTextNode(parts[0]));
+			textValue = textValue.replace(/(\r\n|\r|(\\r\\n)|\\r|\\n)/g, '\n');
+			//workaround for closure compiles "*" into unicode in some context;
+			var wildCard = '*';
+			var regex = new RegExp("[^\\n]." + wildCard + "|\\n", "g");			
+			var parts = textValue.match(regex);
+			
+			if (textValue === '\n') {
+				containerEl.appendChild(document.createElement('br'));
+			} else if (!parts || parts.length == 1) {
+				containerEl.appendChild(document.createTextNode(textValue));
 			} else {
-				for (var i=0; i< parts.length; i++) {
-					containerEl.appendChild(document.createTextNode(parts[i]));
-					containerEl.appendChild(document.createElement('br'))
+				var len = parts.length;
+				for (var i=0; i< len; i++) {
+					if (parts[i] === '\n') {
+						containerEl.appendChild(document.createElement('br'));
+					} else {
+						containerEl.appendChild(document.createTextNode(parts[i]));
+					}					
 				}
 			}			
 		} else {

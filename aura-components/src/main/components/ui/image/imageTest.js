@@ -15,8 +15,7 @@
  */
 //@since 0.0.61
 ({
-  //Disable until 7/2, when imageController.js throws errors again
-    _testDefaultAttributes:{
+    testDefaultAttributes:{
 	exceptionsAllowedDuringInit : ["\"alt\" attribute should not be empty for informational image"], 	
         test:function(cmp){
             var errorMessage = "component: 1:1.1 \"alt\" attribute should not be empty for informational image";
@@ -79,9 +78,7 @@
             $A.test.assertEquals('Company', imgElement.alt, "Expected to see alt text on image element.");
         }
     },
- 
- //Disable until 7/2, when imageController.js throws errors again
-    _testInformationImageTypeWithoutAltText:{
+    testInformationImageTypeWithoutAltText:{
     	exceptionsAllowedDuringInit : ["\"alt\" attribute should not be empty for informational image"],
     	attributes : {imageType:'informational'},
         test: function(cmp){
@@ -93,9 +90,7 @@
                                "Expected '" + errorMessage+"', Got:'"+screenError+"'");
         }
     },
-    
-    //Disable until 7/2, when imageController.js throws errors again
-    _testDecorativeImageTypeWithAltText:{
+    testDecorativeImageTypeWithAltText:{
     	exceptionsAllowedDuringInit : ["\"alt\" attribute should be empty for decorative image"],
     	attributes : {imageType:'decorative', alt:'Company'},
         test: function(cmp){

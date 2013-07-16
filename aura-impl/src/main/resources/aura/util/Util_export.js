@@ -21,6 +21,8 @@ exp(p,
     "isObject", p.isObject,
     "isError", p.isError,
     "isFunction", p.isFunction,
+    "isNumber", p.isNumber,
+    "isFiniteNumber", p.isFiniteNumber,
     "isString", p.isString,
     "isUndefined", p.isUndefined,
     "isUndefinedOrNull", p.isUndefinedOrNull,
@@ -54,7 +56,8 @@ exp(p,
     "squash", p.squash,
     "getWindowSize", p.getWindowSize,
     "isComponent", p.isComponent,
-    "isValue", p.isValue
+    "isValue", p.isValue,
+    "instanceOf", p.instanceOf
     //#if {"excludeModes" : ["PRODUCTION"]}
     ,
     "getDebugToolComponent", p.getDebugToolComponent,

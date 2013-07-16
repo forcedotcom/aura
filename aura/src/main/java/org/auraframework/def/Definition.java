@@ -123,4 +123,9 @@ public interface Definition extends JsonSerializable, Serializable {
      * dependencies for the same parent definition).
      */
     String getOwnHash();
+
+    /**
+     * Adds supers of this definition to the list
+     */
+    void appendSupers(Set<DefDescriptor<?>> supers) throws QuickFixException;
 }

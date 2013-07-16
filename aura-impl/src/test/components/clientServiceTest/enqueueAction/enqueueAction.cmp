@@ -1,0 +1,12 @@
+<aura:component render="client" controller="java://org.auraframework.impl.java.controller.AuraStorageTestController">
+    <auraStorage:init debugLoggingEnabled="true"
+                      name="actions" secure="true" persistent="false"
+                      clearStorageOnInit="true"
+                      defaultExpiration="50" 
+                      defaultAutoRefreshInterval="0" />
+
+    <aura:attribute name="log" type="List" default=""/>
+    <aura:iteration items="{!v.log}" var="i">
+        <div>{!i}</div>
+    </aura:iteration>
+</aura:component>

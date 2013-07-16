@@ -373,9 +373,14 @@ var AuraClientService = function() {
          * @param {function}
          *            callback The callback function to run
          * @memberOf AuraClientService
-         * @private
+         * @public
          */
         runActions : function(actions, scope, callback) {
+        	$A.assert($A.util.isArray(actions), "runActions expects a list of actions, but instead got: " + actions);
+        	if (!$A.util.isUndefined(callback)) {
+				$A.assert($A.util.isFunction(callback),
+						"runActions expects the callback to be a function, but instead got: " + callback);
+			}
             var group = new ActionCallbackGroup(actions, scope, callback);
             var i;
             if (priv.foreground.start()) {

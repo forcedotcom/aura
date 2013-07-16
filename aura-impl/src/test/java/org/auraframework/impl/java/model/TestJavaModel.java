@@ -15,14 +15,19 @@
  */
 package org.auraframework.impl.java.model;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import org.auraframework.Aura;
 import org.auraframework.components.ui.InputOption;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Model;
+import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.date.*;
+import org.auraframework.util.json.Json;
+import org.auraframework.util.json.JsonSerializable;
 
 import com.google.common.collect.Maps;
 
@@ -35,7 +40,10 @@ public class TestJavaModel {
     static ArrayList<InputOption> inputOptions = new ArrayList<InputOption>();
     static ArrayList<InputOption> moreInputOptions = new ArrayList<InputOption>();
     static HashMap<String, ArrayList<InputOption>> optionMap = new LinkedHashMap<String, ArrayList<InputOption>>();
-
+    static List<Item> items;
+    static List<Item> itemsEmpty = new ArrayList<Item>();
+    static List<Item> itemsLarge;
+    
     static {
         inputOptions.add(new InputOption("Option1", "Opt1", false, "option1"));
         inputOptions.add(new InputOption("Option2", "Opt2", true, "option2"));
@@ -64,6 +72,43 @@ public class TestJavaModel {
             categoryOption.add(new InputOption("", "", false, "opt3-sub2"));
         }
         return categoryOption;
+    }
+    
+    static {
+    	items = new ArrayList<Item>(10);
+    	for (int i = 1; i <= 10; i++) {
+            items.add(new Item("hello world" + i, "id" + i));
+        }
+    	itemsLarge = new ArrayList<Item>(50);
+    	for (int i = 1; i <= 50; i++) {
+    		itemsLarge.add(new Item("some one " + i, "id" + i));
+        }
+    }
+    
+    public static class Item implements JsonSerializable {
+        private String label;
+        private String value;
+        
+        public Item(String label, String value) {
+            this.label = label;
+            this.value = value;
+        }
+        
+        public String getLabel() {
+            return this.label;
+        }
+        
+        public String getValue() {
+            return this.value;
+        }
+        
+        @Override
+        public void serialize(Json json) throws IOException {
+            json.writeMapBegin();
+            json.writeMapEntry("label", this.label);
+            json.writeMapEntry("value", this.value);
+            json.writeMapEnd();
+        }
     }
     
     @AuraEnabled
@@ -427,6 +472,19 @@ public class TestJavaModel {
         Map<String,String> items= Maps.newHashMap();
         items.put("fruit", "apple");
         items.put("animal", "bear");
+        return items;
+    }
+    
+    @AuraEnabled
+    public List<Item> getItems() throws QuickFixException {
+    	String dataType = (String)Aura.getContextService().getCurrentContext().getCurrentComponent().getAttributes().getValue("dataType");
+    	if (dataType == null) {
+    		return items;
+    	} else if (dataType.equals("largeList")) {
+    		return itemsLarge;
+    	} else if (dataType.equals("emptyList")) {
+    		return itemsEmpty;
+    	}
         return items;
     }
 }

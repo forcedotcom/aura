@@ -16,4 +16,5 @@
 
 -->
 <aura:component extends="ui:inputNumber" extensible="true" support="GA" description="An input field for entering a percentage.">
+    <aura:attribute name="valueScale" type="Integer" default="0" description="Displays the result output, multiplying the value attribute with (10^valueScale) * 100%."/>
 </aura:component>

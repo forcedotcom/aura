@@ -280,6 +280,15 @@ public final class TestComponent implements ComponentDef {
     }
 
     @Override
+    public void appendSupers(Set<DefDescriptor<?>> supers) throws QuickFixException {
+    }
+
+    @Override
+    public StyleDef getStyleDef() throws QuickFixException {
+        return null;
+    }
+
+	@Override
     public Map<String, DefDescriptor<ThemeDef>> getThemeAliases() {
         return null;
     }

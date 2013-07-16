@@ -125,6 +125,19 @@
 	        var dt           = moment().format('DD/MM/YYYY');
     		aura.test.assertEquals(dt, inputDateStr, "Dates are not the same and they should be");
         }
-    }	
+    },
+    
+    /**
+     * Test input date picker with label set.
+     */
+    testDatePickerWithLabel:{
+    	attributes: {displayDatePicker: 'true', label: 'my date cmp'},
+    	test: function(cmp){
+    		var datePickerOpener = cmp.find("datePickerOpener");
+    		aura.test.assertNotNull(datePickerOpener, "datePickerOpener anchor not present");
+    		var datePicker = cmp.find("datePicker");
+    		aura.test.assertNotNull(datePicker, "datePicker not present");
+    	}
+    }
         
 })

@@ -103,4 +103,8 @@ public abstract class MockDefinition<D extends Definition> implements Definition
     public Visibility getVisibility() {
         return Visibility.PUBLIC;
     }
+
+    @Override
+    public void appendSupers(Set<DefDescriptor<?>> supers) throws QuickFixException {
+    }
 }

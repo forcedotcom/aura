@@ -32,6 +32,7 @@ import org.openqa.selenium.support.ui.ExpectedCondition;
 public class InputTextUITest extends WebDriverTestCase {
 
     public static final String TEST_CMP = "/uitest/inputtextupdateontest.cmp";
+    public static final String TEST_CMP_WITH_LABELS = "/uitest/inputtextupdateonwithlabeltest.cmp";
 
     public InputTextUITest(String name) {
         super(name);
@@ -42,7 +43,7 @@ public class InputTextUITest extends WebDriverTestCase {
         String event = "blur";
         String baseTag = "<aura:component  model=\"java://org.auraframework.impl.java.model.TestJavaModel\"> "
                 + "<div id=\"%s\">" + event + ":"
-                + "<ui:inputText aura:id=\"%s\" value=\"{!m.String}\" updateOn=\"%s\"/>" + "</div>"
+                + "<ui:inputText aura:id=\"%s\" class=\"%s\" value=\"{!m.String}\" updateOn=\"%s\"/>" + "</div>"
                 + "<div id=\"output\">" + "output: <ui:outputText value=\"{!m.String}\"/>" + "</div>"
                 + "</aura:component>";
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class, baseTag.replaceAll("%s", event));
@@ -60,7 +61,18 @@ public class InputTextUITest extends WebDriverTestCase {
             BrowserType.IPHONE })
     // Change event not picked up on IOS devices
     public void testUpdateOnAttributeForNonIosAndroidDevice() throws Exception {
-        open(TEST_CMP);
+    	doTestUpdateOnAttributeForNonIosAndroidDevice(TEST_CMP);
+    }
+    
+    @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.SAFARI,
+        BrowserType.IPHONE })
+	// Change event not picked up on IOS devices
+	public void testUpdateOnAttributeWithLabelsForNonIosAndroidDevice() throws Exception {
+    	doTestUpdateOnAttributeForNonIosAndroidDevice(TEST_CMP_WITH_LABELS);
+    }
+    
+    public void doTestUpdateOnAttributeForNonIosAndroidDevice(String url) throws Exception {
+        open(url);
         WebElement outputDiv = findDomElement(By.id("output"));
         String eventName = "change";
         auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
@@ -70,7 +82,16 @@ public class InputTextUITest extends WebDriverTestCase {
 
     @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET })
     public void testUpdateOnAttribute() throws Exception {
-        open(TEST_CMP);
+    	doTestUpdateOnAttribute(TEST_CMP);
+    }
+    
+    @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET })
+    public void testUpdateOnAttributeWithLabels() throws Exception {
+    	doTestUpdateOnAttribute(TEST_CMP_WITH_LABELS);
+    }
+    
+    public void doTestUpdateOnAttribute(String url) throws Exception {
+        open(url);
         String value = getCurrentModelValue();
         WebElement outputDiv = findDomElement(By.id("output"));
         String eventName = "blur";
@@ -115,7 +136,17 @@ public class InputTextUITest extends WebDriverTestCase {
 
     @TargetBrowsers({ BrowserType.GOOGLECHROME })
     public void testUpdateOnAttributeWithCertainEventsChrome() throws Exception {
-        open(TEST_CMP);
+    	doTestUpdateOnAttributeWithCertainEventsChrome(TEST_CMP);
+    }
+    
+    @TargetBrowsers({ BrowserType.GOOGLECHROME })
+    public void testUpdateOnAttributeWithLabelsWithCertainEventsChrome() throws Exception {
+    	doTestUpdateOnAttributeWithCertainEventsChrome(TEST_CMP_WITH_LABELS);
+    }
+    
+    @TargetBrowsers({ BrowserType.GOOGLECHROME })
+    public void doTestUpdateOnAttributeWithCertainEventsChrome(String url) throws Exception {
+        open(url);
         String value = getCurrentModelValue();
         WebDriver d = getDriver();
         Actions a = new Actions(d);
@@ -174,11 +205,18 @@ public class InputTextUITest extends WebDriverTestCase {
      * Android driver sends a mousedown event when clearing the text field.
      */
     public void testUpdateOnAttributeWithCertainEventsAllBrowsers() throws Exception {
-        open(TEST_CMP);
+    	doTestUpdateOnAttributeWithCertainEventsAllBrowsers(TEST_CMP);
+    }
+    public void testUpdateOnAttributeWithLabelsWithCertainEventsAllBrowsers() throws Exception {
+    	doTestUpdateOnAttributeWithCertainEventsAllBrowsers(TEST_CMP_WITH_LABELS);
+    }
+    
+    public void doTestUpdateOnAttributeWithCertainEventsAllBrowsers(String url) throws Exception {
+        open(url);
         String value = getCurrentModelValue();
         String eventName = "mousedown";
 
-        String locatorTemplate = "#%s > input.uiInputText.uiInput";
+        String locatorTemplate = "input[class*='%s']";
         String locator = String.format(locatorTemplate, eventName);
         WebElement input = findDomElement(By.cssSelector(locator));
         input.click();
@@ -261,7 +299,7 @@ public class InputTextUITest extends WebDriverTestCase {
     public void testBaseKeyboardEventValue() throws Exception {
         open(TEST_CMP);
         String inputText = "z";
-        WebElement input = findDomElement(By.cssSelector(".keyup"));
+        WebElement input = findDomElement(By.cssSelector(".keyup2"));
         WebElement outputValue = findDomElement(By.cssSelector(".outputValue"));
         input.click();
         input.sendKeys(inputText);
@@ -278,7 +316,7 @@ public class InputTextUITest extends WebDriverTestCase {
             BrowserType.ANDROID_TABLET })
     public void testBaseMouseClickEventValue() throws Exception {
         open(TEST_CMP);
-        WebElement input = findDomElement(By.cssSelector(".keyup"));
+        WebElement input = findDomElement(By.cssSelector(".keyup2"));
         WebElement outputValue = findDomElement(By.cssSelector(".outputValue"));
 
         // IE < 9 uses values 1, 2, 4 for left, right, middle click (respectively)
@@ -315,5 +353,18 @@ public class InputTextUITest extends WebDriverTestCase {
         outputDiv.click(); // to simulate tab behavior for touch browsers
         String actualText = (String) auraUITestingUtil.getEval(valueExpression);
         assertEquals("Value of Input text shoud be updated", inputText, actualText);
+    }
+    
+    @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET })
+    public void testInputTextWithEmptyLabel() throws Exception {
+        open(TEST_CMP_WITH_LABELS);
+        String value = getCurrentModelValue();
+        WebElement outputDiv = findDomElement(By.id("output"));
+        WebElement input = auraUITestingUtil.findElementAndTypeEventNameInIt("empty");
+        assertModelValue(value); // value shouldn't be updated yet
+        input.click();
+        outputDiv.click(); // to simulate tab behavior for touch browsers
+        assertModelValue("empty"); // value should have been updated
+        assertDomEventSet();
     }
 }

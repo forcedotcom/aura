@@ -15,10 +15,13 @@
  */
 package org.auraframework.util;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import com.google.common.collect.Lists;
 
 import junit.framework.Assert;
 
@@ -54,7 +57,7 @@ public class AuraUITestingUtil {
     }
 
     public WebElement findElementAndTypeEventNameInIt(String event) {
-        String locatorTemplate = "#%s > input.uiInputText.uiInput";
+        String locatorTemplate = "input[class*='%s']";
         String locator = String.format(locatorTemplate, event);
         WebElement input = findDomElement(By.cssSelector(locator));
         input.click(); // IE7 need to bring focus
@@ -317,21 +320,35 @@ public class AuraUITestingUtil {
      * @return
      */
     public WebElement findDomElement(final By locator) {
+    	List<WebElement> elements = findDomElements(locator);
+    	if (elements != null) {
+    		return elements.get(0);
+    	}
+    	return null;
+    }
+    
+    /**
+     * Find matching elements in the DOM.
+     * @param locator
+     * @return
+     */
+    public List<WebElement> findDomElements(final By locator) {
         WebDriverWait wait = new WebDriverWait(driver, timeoutInSecs);
-        return wait.until(new ExpectedCondition<WebElement>() {
-            private WebElement element = null;
+        return wait.until(new ExpectedCondition<List<WebElement>>() {
+            private List<WebElement> elements = null;
 
             @Override
-            public WebElement apply(WebDriver d) {
-                if (element == null) {
-                    element = driver.findElement(locator);
+            public List<WebElement> apply(WebDriver d) {
+                if (elements == null) {
+                    elements = driver.findElements(locator);
                 }
                 try {
-                    if (getBooleanEval("return arguments[0].ownerDocument === document", element)) {
-                        return element;
+                	if (elements.size() > 0 && 
+                			getBooleanEval("return arguments[0].ownerDocument === document", elements.get(0))) {
+                        return elements;
                     }
                 } catch (StaleElementReferenceException e) {
-                    element = null;
+                    elements = null;
                 }
                 return null;
             }
@@ -471,9 +488,60 @@ public class AuraUITestingUtil {
             }
         });
     }
+    /**
+     * Method of exposing accessibility tool to be exposed for testing purposes
+     * 
+     * @return ArrayList - either 0,1, or 2. 
+     *                            Position 0: Indicates there were no errors
+     *                            Position 1: Indicates that there were errors
+     *                            Position 2: Indicates that something unexpected happened.
+     */
+    public ArrayList<String> doAccessibilityCheck(){
+        String jsString = "return ((window.$A != null || window.$A !=undefined) && (!$A.util.isUndefinedOrNull($A.devToolService)))? "+
+                            "window.$A.devToolService.checkAccessibility() : \"Aura is not Present\"";
+        
+        String result = (String) getEval(jsString);
 
+        ArrayList<String> resultList = new ArrayList<String>();
+        String output = "";
+        
+        //No errors
+        if(result.equals("") || result.equals("Total Number of Errors found: 0")){
+            output = "0";
+        }
+        else if(result.contains("Total Number of Errors found")){
+            output = "1";
+        }
+        else{
+            output = "2";
+        }
+        
+        resultList.add(output);
+        resultList.add(result);
+        return resultList;        
+    }
     public void assertAccessible() {
         getEval("$A.test.assertAccessible()");
 
+    }
+    
+    public String getUniqueIdOfFocusedElement() {
+    	return (String) getEval("return $A.test.getActiveElement().getAttribute('data-aura-rendered-by')");
+    }
+
+    public void assertClassesSame(String message, String expectedClasses, String actualClasses) {
+        List<String> expected = AuraTextUtil.splitSimpleAndTrim(" ", expectedClasses, 3);
+        List<String> actual = AuraTextUtil.splitSimpleAndTrim(" ", actualClasses, 3);
+        List<String> extra = Lists.newArrayList();
+
+        for (String x : actual) {
+            if (expected.contains(x)) {
+                expected.remove(x);
+            } else {
+                extra.add(x);
+            }
+        }
+        Assert.assertTrue(message+": Mismatched classes extra = "+extra+", missing="+expected,
+            extra.size() == 0 && expected.size() == 0);
     }
 }

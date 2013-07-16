@@ -35,7 +35,7 @@
 
     <p>All top-level elements in a component have a special <code>THIS</code> CSS class added to them. This, effectively, adds namespacing to CSS and helps prevent one component's CSS from blowing away another component's styling. Aura throws an error if a CSS file doesn't follow this convention.</p>
 
-    <p>Let's look at a sample <code>helloHTML.cmp</code> component. The CSS is in <code>helloHTML.css</code> and you can see it in the <code>css://style</code> tab. If you need a CSS refresher, see <ui:outputURL value="http://reference.sitepoint.com/css">http://reference.sitepoint.com/css</ui:outputURL>.</p>
+    <p>Let's look at a sample <code>helloHTML.cmp</code> component. The CSS is in <code>helloHTML.css</code> and you can see it in the <code>css://style</code> tab. If you need a CSS refresher, see <ui:outputURL value="http://reference.sitepoint.com/css" label="http://reference.sitepoint.com/css"/>.</p>
 
     <p>The top-level elements match the <code>THIS</code> class and render with a grey background.</p>
 

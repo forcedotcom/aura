@@ -25,7 +25,7 @@
     <aura:registerevent name="linkClick" type="ui:linkClick" description="The event fired when the user clicks the link."/>
     <a aura:id="link" class="{!v.class}" dir="{!v.dir}" href="{!v.value}" title="{!v.title}" onclick="{!c.click}" target="{!v.target}">
         <aura:if isTrue="{!and(v.iconClass != null, v.iconClass != '')}">
-            <ui:image src="/auraFW/resources/aura/s.gif" class="{!v.iconClass}" 
+            <ui:image aura:id="icon" src="/auraFW/resources/aura/s.gif" class="{!v.iconClass}" 
             	alt="{!and(v.label != null, v.label != '') ? '' : v.alt}"
             	imageType="{!and(v.label != null, v.label != '') ? 'decorative' : 'informational'}" />
         </aura:if>

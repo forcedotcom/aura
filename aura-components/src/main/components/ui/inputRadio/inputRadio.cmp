@@ -16,6 +16,7 @@
 
 -->
 <aura:component extends="ui:input" implements="ui:inputBaseOption" extensible="true" support="BETA" description="The radio button used in the input.">
+    <aura:attribute name="disabled" type="Boolean" default="false" description="Specifies whether this radio button should be displayed in a disabled state. Disabled radio buttons can't be clicked. Default value is &quot;false&quot;."/>
      
     <input aura:id="radio" 
     	   id="{!v.domId}"
@@ -23,5 +24,6 @@
     	   name="{!v.name}"
     	   type="radio"
     	   value="{!v.text}"
-    	   checked="{!v.value}"/>
+    	   checked="{!v.value}"
+    	   disabled="{!v.disabled}"/>
 </aura:component>

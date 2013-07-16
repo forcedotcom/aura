@@ -56,7 +56,7 @@
         // Create a callback that is executed after the server-side action returns
         a.setCallback(this, function(action) {
             if (action.getState() === "ERROR") {
-                alert("Server Error: " + action.getError()[0].message));
+                alert("Server Error: " + action.getError()[0].message);
             }
             else {
               // Alert the user with the value returned from the server
@@ -77,8 +77,6 @@
     }
 }
 </auradocs:codeblock>
-
-  <p>To create a single callback that tells you if an entire group of actions has completed, use the <code>actionGroupCallback</code> method.</p>
 
     <h2>Wiring Up a Server-Side Controller</h2>
     
@@ -144,7 +142,7 @@
 
   <h2>Background Actions</h2>
   
-  <p>An action can be marked as a background action. This can improve performance when using low priority, long-running actions such as those that access another web service. Each background action is sent in its own request so each request is responded to immediately after that particular action is finished. When the server-side actions in the queue are executed, the foreground actions are executed first and then the background actions are executed. Aura throttles foreground and background actions separately. This means that the number of long-running background server-side actions running at a time can be controlled and they will not slow down quicker actions like page updates. Note that throttling is done automatically, it is not user controlled. </p>
+  <p>An action can be marked as a background action. This can improve performance when using low priority, long-running actions such as those that access another web service. Each background action is sent in its own request so each request is responded to immediately after that particular action is finished. When the server-side actions in the queue are executed, the foreground actions are executed first and then the background actions are executed. Background actions run in parallel with foreground actions. Aura throttles foreground and background actions separately. This means that the number of long-running background server-side actions running at a time can be controlled. Throttling is done automatically, it is not user controlled. Even with seperate throttling, background actions might affect performance in some conditions such as if the browser is doing many fetches from servers.</p>
 
   <p>To set an action as a background action, get an instance of that action object in JavaScript and call the <code>setBackground()</code> method. Alternatively, <code>$A.enqueueAction()</code> has a parameter that can be used to set an action to be a background action. If that parameter is supplied and it is true, the action will be set as background when it is enqueued and you don’t need to also call the <code>setBackground()</code> method on the action. To mark a server-side action as a background action in Java, use the <code>@BackgroundAction</code> annotation at the method level on the controller. When an action is instantiated from an <code>actiondef</code>, the action’s <code>isBackground</code> property is set to true automatically.</p>
 

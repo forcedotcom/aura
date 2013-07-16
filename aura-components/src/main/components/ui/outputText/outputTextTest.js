@@ -88,7 +88,21 @@
         browsers: ["-IE7", "-IE8"],
         attributes: {value: '\n'},
         test: function(component){
-            aura.test.assertEquals('', component.find("span").getElement().textContent, "Failed to trim spaces");
+            aura.test.assertEquals('', component.find("span").getElement().textContent, "Failed to convert \r\n\ and \n into <br>");
+        }
+    },
+    /**
+     * Output text with CarriageReturn.
+     * IE7 IE8 Excluded: textContent doesn't work https://github.com/forcedotcom/lumen-beta/commit/25650a7343a41b5fd613c23ad0ec400098657f6f
+     * and $A.test.\u200bgetText() won't trim the space
+     */
+    testCarriageReturn:{
+        browsers: ["-IE7", "-IE8"],
+        attributes: {value: '\r\n'},
+        test: function(component){
+        	var tags = component.find("span").getElement().innerHTML;
+			tags = tags.replace(/<!---->/g, '');
+            aura.test.assertEquals('<br>', tags, "Failed to convert \r\n\ and \n into <br>");
         }
     },
     /**
@@ -100,7 +114,7 @@
         browsers: ["-IE7", "-IE8"],
         attributes: {value: '\n1\n2\n'},
         test: function(component){
-            aura.test.assertEquals('12', component.find("span").getElement().textContent, "Failed to trim spaces");
+            aura.test.assertEquals('12', component.find("span").getElement().textContent, "Failed to convert \r\n\ and \n into <br>");
         }
     },
     /**
@@ -111,8 +125,10 @@
     testCarriageReturnLineFeeds:{
         browsers: ["-IE7", "-IE8"],
         attributes: {value: '\r\na\r\nb\r\n'},
-        test: function(component){        	
-            aura.test.assertEquals('ab', component.find("span").getElement().textContent, "Failed to trim spaces");
+        test: function(component){ 
+        	var tags = component.find("span").getElement().innerHTML;
+			tags = tags.replace(/<!---->/g, '');			
+            aura.test.assertEquals('<br>a<br>b<br>', tags, "Failed to convert \r\n\ and \n into <br>");
         }
     }
 })

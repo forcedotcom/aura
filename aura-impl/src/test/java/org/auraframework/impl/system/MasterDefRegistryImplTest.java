@@ -38,7 +38,6 @@ import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.LayoutsDef;
 import org.auraframework.def.NamespaceDef;
 import org.auraframework.def.RendererDef;
-import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.AuraImpl;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.parser.handler.XMLHandler.InvalidSystemAttributeException;
@@ -52,6 +51,7 @@ import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.DefRegistry;
 import org.auraframework.system.Source;
 import org.auraframework.system.SourceListener;
+import org.auraframework.test.annotation.ThreadHostileTest;
 import org.auraframework.test.annotation.UnAdaptableTest;
 import org.auraframework.test.util.AuraPrivateAccessor;
 import org.auraframework.throwable.NoAccessException;
@@ -447,7 +447,8 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
     public void testCompileDefLocalDef() throws Exception {
         // build a mock def
         String descName = String.format("%s:ghost", System.nanoTime());
-        Definition def = Mockito.mock(RootDefinition.class);
+        ComponentDef def = Mockito.mock(ComponentDef.class);
+
         Mockito.doReturn(DefDescriptorImpl.getInstance(descName, ComponentDef.class)).when(def).getDescriptor();
 
         // spy on MDR's registries to spy on defs
@@ -713,6 +714,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
      */
     // TODO(W-1589052): UnAdaptable since breaks when trying to write/delete files from jars
     @UnAdaptableTest
+    @ThreadHostileTest("changes test namespace")
     public void testSourceChangeClearsCachesInDevMode() throws Exception {
         // Make sure we're in Dev mode.
         ContextService contextService = Aura.getContextService();
@@ -787,6 +789,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
      * Verify caches are cleared after a source change to a component file. In this case only the component def itself
      * should be cleared from the cache.
      */
+    @ThreadHostileTest("requires cache to remain stable")
     public void testInvalidateCacheCmpFile() throws Exception {
         MasterDefRegistryImpl mdr = getDefRegistry(false);
 
@@ -805,6 +808,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
      * Verify caches are cleared after a source change to a namespace def file. In this case all items in the cache with
      * the same namespace as the def should be cleared.
      */
+    @ThreadHostileTest("requires cache to remain stable")
     public void testInvalidateCacheNamespaceFile() throws Exception {
         MasterDefRegistryImpl mdr = getDefRegistry(false);
 
@@ -826,6 +830,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
      * Verify caches are cleared after a source change to a Layouts def file. In this case all items in the layouts
      * bundle should be cleared.
      */
+    @ThreadHostileTest("requires cache to remain stable")
     public void testInvalidateCacheLayoutsFile() throws Exception {
         MasterDefRegistryImpl mdr = getDefRegistry(false);
 

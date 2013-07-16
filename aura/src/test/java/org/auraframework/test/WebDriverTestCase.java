@@ -534,13 +534,30 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
         url = url + "?" + URLEncodedUtils.format(newParams, "UTF-8") + hash;
 
         auraUITestingUtil.getRawEval("document._waitingForReload = true;");
-        openRaw(url);
-        waitForCondition("return !document._waitingForReload");
-        if (waitForInit) {
-            auraUITestingUtil.waitForAuraInit(getExceptionsAllowedDuringInit());
+        try{
+        	openAndWait(url,waitForInit);
         }
+        catch(TimeoutException e){
+        	//Adding hack to avoid timeout issue for ie7 and ie8 
+        	//seems like IE7 and IE8 test fails for the first time when we run the test in new vm session
+        	if(currentBrowserType == BrowserType.IE7 || currentBrowserType == BrowserType.IE8){
+        		openAndWait(url,waitForInit);
+        	}
+        	else{
+        		throw e;
+        	}
+        } 
     }
 
+    private void openAndWait(String url, boolean waitForInit) throws MalformedURLException, URISyntaxException{
+    	auraUITestingUtil.getRawEval("document._waitingForReload = true;");
+		openRaw(url);
+		waitForCondition("return !document._waitingForReload");
+		if (waitForInit) {
+			auraUITestingUtil.waitForAuraInit(getExceptionsAllowedDuringInit());
+		}
+    }
+    
     public void waitForAuraFrameworkReady() {
         auraUITestingUtil.waitForAuraFrameworkReady(getExceptionsAllowedDuringInit());
     }
@@ -697,12 +714,29 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
             }
         }, timeoutInSecs);
     }
+    
+    public void waitForAutoCompleteListVisible(final WebElement list, final boolean isVisible) {
+		auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
+            @Override
+            public Boolean apply(WebDriver d) {
+                boolean isInvisible = hasCssClass(list, "invisible");
+                return isVisible != isInvisible;
+            }
+        }, timeoutInSecs);
+    }
 
     /**
      * Find first matching element in the DOM.
      */
     protected WebElement findDomElement(By locator) {
         return auraUITestingUtil.findDomElement(locator);
+    }
+    
+    /**
+     * Find list of matching element in the DOM.
+     */
+    protected List<WebElement> findDomElements(By locator) {
+        return auraUITestingUtil.findDomElements(locator);
     }
 
     /**
@@ -725,5 +759,9 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
                 .sendKeys(Keys.TAB)
                 .keyUp(Keys.SHIFT);
         return builder.build();
+    }
+
+    protected void assertClassesSame(String message, String expected, String actual) {
+        auraUITestingUtil.assertClassesSame(message, expected, actual);
     }
 }

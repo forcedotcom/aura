@@ -65,8 +65,7 @@ public class DialogUITest extends WebDriverTestCase {
     public void clickOnElementOrPressEnter(WebElement elm) {
         if (BrowserType.SAFARI.equals(getBrowserType())) {
             elm.click();
-        }
-        else {
+        } else {
             auraUITestingUtil.pressEnter(elm);
         }
     }
@@ -87,8 +86,7 @@ public class DialogUITest extends WebDriverTestCase {
     /*
      * Function that will check that the modal dialog box does not close when clicked outside the box
      */
-    private boolean tryToCloseBlockingDialog(WebElement elem)
-    {
+    private boolean tryToCloseBlockingDialog(WebElement elem) {
         try {
             elem.click();
         } catch (Exception e) {
@@ -145,8 +143,8 @@ public class DialogUITest extends WebDriverTestCase {
 
         String classOfActiveElem = "input[class*='" + auraUITestingUtil.getEval(CLASSNAME) + "']";
         WebElement element = driver.findElement(By.cssSelector(classOfActiveElem));
-        assertEquals("Did not move to next checkbox", element.getAttribute("class"),
-                "checkbox1 uiInputCheckbox uiInput");
+        Boolean obj = (Boolean)auraUITestingUtil.getEval("return $A.util.hasClass(arguments[0],\"checkbox1\")", element);
+        assertTrue("Did not move to next checkbox", obj.booleanValue());
         element.click();
 
         classOfActiveElem = "button[title*='" + CONFIRM_STR + "']";
@@ -190,8 +188,8 @@ public class DialogUITest extends WebDriverTestCase {
         String classOfActiveElem = "button[class*='" + auraUITestingUtil.getEval(CLASSNAME) + "']";
         element = driver.findElement(By.cssSelector(classOfActiveElem));
 
-        assertEquals("Hitting tab did not go to item that called the dialog box", LAUNCH_DIALOG,
-                element.getAttribute("className"));
+        assertClassesSame("Hitting tab did not go to item that called the dialog box",
+            LAUNCH_DIALOG, element.getAttribute("className"));
     }
 
     @ExcludeBrowsers({ BrowserType.IE7, BrowserType.SAFARI, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET,
@@ -201,7 +199,6 @@ public class DialogUITest extends WebDriverTestCase {
 
         WebDriver driver = getDriver();
         openDialogBox(driver);
-        ;
 
         // getting Cancel Button
         WebElement element = moveToNextActiveElement(driver);
@@ -214,8 +211,8 @@ public class DialogUITest extends WebDriverTestCase {
 
         // Make sure focus is back on the ok button
         element = driver.findElement(By.cssSelector("button[class*='" + auraUITestingUtil.getEval(CLASSNAME) + "']"));
-        assertEquals("Focus did not return to the element that called the dialog box", LAUNCH_DIALOG,
-                element.getAttribute("className"));
+        assertClassesSame("Hitting tab did not go to item that called the dialog box",
+            LAUNCH_DIALOG, element.getAttribute("className"));
     }
 
     // Checking that the Escape button should not submit with submiting
@@ -293,8 +290,8 @@ public class DialogUITest extends WebDriverTestCase {
         classOfActiveElem = "button[class*='" + auraUITestingUtil.getEval(CLASSNAME) + "']";
         element = driver.findElement(By.cssSelector(classOfActiveElem));
 
-        assertEquals("Hitting tab did not go to item that called the dialog box", LAUNCH_DIALOG,
-                element.getAttribute("className"));
+        assertClassesSame("Hitting tab did not go to item that called the dialog box",
+            LAUNCH_DIALOG, element.getAttribute("className"));
     }
 
     /***********************************************************************************************

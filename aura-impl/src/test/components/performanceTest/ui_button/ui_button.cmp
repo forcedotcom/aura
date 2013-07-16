@@ -1,0 +1,3 @@
+<aura:component>
+  	<ui:button aura:id="button1" label="per component test for ui:button" press="{!c.changeLabel}"></ui:button>
+</aura:component> 

@@ -14,23 +14,7 @@
  * limitations under the License.
  */
 ({
-    doUpdate: function(component, value) {
-        if (value) {
-            value = value.replace(/%+$/g, '');
-        }
-        component.setValue("v.value", value);
-    },
-
-    getNumber: function(cmp) {
-        var num = cmp.get("v.value");
-        var scale = cmp.get("v.valueScale");
-        if (num && scale) {
-            num *= Math.pow(10, scale);
-        }
-        return num;
-    },
-
     getDefaultFormatter: function(cmp) {
-        return $A.localizationService.getDefaultPercentFormat();
+        return $A.localizationService.getDefaultCurrencyFormat();
     }
 })

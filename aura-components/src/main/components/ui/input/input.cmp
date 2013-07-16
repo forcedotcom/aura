@@ -40,6 +40,7 @@
     <aura:handler name="updateError" action="{!c.updateDefaultError}"/>
     <aura:handler name="init" value="{!this}" action="{!c.init}" />	
     <aura:attribute name="domId" type="String" description="DOM id of the input element. By default, this attribute resolved to the globalId of the component to avoid id collision." />
+    <aura:attribute name="doFormat" type="Boolean" default="false" description="Specifies whether the value needs to be formatted before being rendered, usually for the purpose of localization."/>
 
     <aura:attribute name="requiredIndicator" type="Object[]" description="A component that displays the indicator for the required field.">    	 
 		<span class="{!'required ' + v.requiredIndicatorClass}">*</span>    	 

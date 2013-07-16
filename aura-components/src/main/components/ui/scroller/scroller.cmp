@@ -45,7 +45,7 @@
 
     <div aura:id="scrollWrapper" class="{!v.class + ' scrollWrapper'}">
         <div aura:id="scrollContent" class="{!v.scrollContentClass}">
-            <aura:renderif isTrue="{!v.onPullToRefresh != null}">
+            <aura:if isTrue="{!v.onPullToRefresh != null}">
                 <div aura:id="pullDown" class="pullToRefresh pullDown">
                     <span class="pullDownIcon"></span>
                     <div>
@@ -55,7 +55,7 @@
                         <span class="subtitle">{!v.pullToRefreshSubtitle}</span>
                     </div>
                 </div>
-            </aura:renderif>
+            </aura:if>
             {!v.body}
         </div>
     </div>

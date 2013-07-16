@@ -1040,6 +1040,53 @@ $A.ns.Util.prototype.destroyAsync = function(cmp) {
 };
 
 /**
+ * Declares a "child" type to be derived from a "parent" type.  This replicates
+ * the parent prototype entry into the child prototype (i.e. method
+ * inheritance), and sets a "superclass" attribute used by Util.instanceOf.
+ * 
+ * Call this after declaring the child constructor function, but before setting
+ * child methods onto the prototype, so that the child methods can override the
+ * inherited ones.
+ */
+$A.ns.Util.derivePrototype = function(child, parent) {
+    for (var method in parent.prototype) {
+        if (method !== "constructor") {
+            child.prototype[method] = parent.prototype[method];
+        }
+    }
+    child.prototype.superclass = parent.prototype;
+};
+
+/**
+ * Returns whether "instance" is, directly or indirectly, an instance of
+ * "type."  An object is indirectly an instance if derivePrototypeFrom was
+ * used to make the child type derive from the parent type.
+ * 
+ * We don't use the builtin "instanceof" because Javascript doesn't understand
+ * type inheritance, and to fake it out you would need child.prototype to be
+ * an instance of parent; having "unbound" instances is ugly at best and may
+ * need to be invalid objects at worst, so no.  But this is the cost of that.
+ */
+$A.ns.Util.prototype.instanceOf = function(instance, constructor) {
+    if (instance === null || instance === undefined) {
+        return false;
+    }
+    if (instance instanceof constructor) {
+        return true;
+    }
+    if (instance.superclass) {
+        var superCtor = instance.superclass.constructor;
+        while (superCtor) {
+            if (superCtor === constructor) {
+                return true;
+            }
+            superCtor = superCtor.superclass ? superCtor.constructor : undefined;
+        }
+    }
+    return false;
+};
+
+/**
  * Destroys any components currently in the trashcan.
  * @private
  */

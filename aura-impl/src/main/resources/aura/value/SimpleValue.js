@@ -60,11 +60,7 @@ function SimpleValue(config, def, component) {
 }
 
 // Copy the AttributeValue.prototype, so its methods are available:
-for (var method in $A.ns.AttributeValue.prototype) {
-    if (method != "constructor") {
-        SimpleValue.prototype[method] = $A.ns.AttributeValue.prototype[method];
-    }
-}
+$A.ns.Util.derivePrototype(SimpleValue, $A.ns.AttributeValue);
 
 SimpleValue.prototype.auraType = "Value";
 
@@ -91,7 +87,7 @@ SimpleValue.prototype.unwrap = function() {
  *  and throws an error if it's not a SimpleValue.
  */
 SimpleValue.prototype.merge = function(sv, overwrite) {
-    if (!(sv instanceof SimpleValue)) {
+    if (!$A.util.instanceOf(sv, SimpleValue)) {
         throw new Error("Cannot merge a " + (typeof sv) + " into a SimpleValue");
     }
     if (overwrite) {

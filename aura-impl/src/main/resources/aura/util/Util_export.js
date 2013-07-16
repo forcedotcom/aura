@@ -54,7 +54,8 @@ exp(p,
     "squash", p.squash,
     "getWindowSize", p.getWindowSize,
     "isComponent", p.isComponent,
-    "isValue", p.isValue
+    "isValue", p.isValue,
+    "instanceOf", p.instanceOf
     //#if {"excludeModes" : ["PRODUCTION"]}
     ,
     "getDebugToolComponent", p.getDebugToolComponent,

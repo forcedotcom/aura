@@ -32,6 +32,31 @@
         }
     },
     
+    testDerivedTypes:{
+        test: function(cmp) {
+            var valueObj = cmp.getAttributes().getValue('strAttribute');
+            var mval = $A.expressionService.create(null,
+                     {"string":"something","integer":23,"boolean":true});
+            // Because the types aren't exported, getting the constructors is a bit awkward:
+            var simpleValue = valueObj.constructor;
+            var mapValue = mval.constructor;
+            var attributeValue;  // This is the tricky one, since it's obfuscated!
+            for (var key in valueObj) {
+                if (!valueObj.hasOwnProperty(key) && typeof(valueObj[key]) === "object" && valueObj[key].constructor) {
+                    attributeValue = valueObj[key].constructor;
+                    break;
+                }
+            }
+            $A.test.assertTrue($A.util.instanceOf(valueObj, simpleValue),
+                     "$A.util.instanceOf says strAttribute is not a SimpleValue");
+            debugger;
+            $A.test.assertTrue($A.util.instanceOf(valueObj, attributeValue),
+                    "$A.util.instanceOf says strAttribute is not an AttributeValue");
+            $A.test.assertFalse($A.util.instanceOf(valueObj, mapValue),
+                    "$A.util.instanceOf says strAttribute is a MapValue");
+        }
+    },
+    
     testErrorFunctionsOnSimpleValueObject:{
         attributes:{intAttribute:3},
         test:function(cmp){

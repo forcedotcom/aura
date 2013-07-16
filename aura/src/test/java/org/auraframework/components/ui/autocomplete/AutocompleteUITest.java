@@ -15,18 +15,12 @@
  */
 package org.auraframework.components.ui.autocomplete;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-import org.auraframework.test.WebDriverTestCase;
+import org.auraframework.test.*;
 import org.auraframework.test.WebDriverTestCase.ExcludeBrowsers;
 import org.auraframework.test.WebDriverUtil.BrowserType;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 
 /** UI test to test autocomplete component. 
  * Excluding IE7 and IE8 because component uses html5 specific tags
@@ -84,7 +78,7 @@ public class AutocompleteUITest extends WebDriverTestCase {
 	/**
 	 * Able to select an item from autocomplete list.
 	 */
-	public void testAutoCompleteSelectOption() throws Exception {
+	public void _testAutoCompleteSelectOption() throws Exception {
 		doTestSelectOption(AUTOCOMPLETE_COMPONENT.get("Generic"), OptionType.AUTOCOMPLETE_OPTION);
 	}
 	
@@ -159,7 +153,7 @@ public class AutocompleteUITest extends WebDriverTestCase {
 	/**
 	 * For a component using a custom template able to select item in list.
 	 */
-	public void testAutoCompleteCustomTemplateComponentSelectOption() throws Exception {
+	public void _testAutoCompleteCustomTemplateComponentSelectOption() throws Exception {
 		doTestSelectOption(AUTOCOMPLETE_COMPONENT.get("CustomTemplate"), OptionType.AUTOCOMPLETE_CUSTOM_TEMPLATE_OPTION);
 	}
 	
@@ -175,7 +169,7 @@ public class AutocompleteUITest extends WebDriverTestCase {
 	/**
 	 * For component extending autocompleteOption able to select item in list.
 	 */
-	public void testAutoCompleteCustomOptionComponentSelectOption() throws Exception {
+	public void _testAutoCompleteCustomOptionComponentSelectOption() throws Exception {
 		doTestSelectOption(AUTOCOMPLETE_COMPONENT.get("OptionExtention"), OptionType.AUTOCOMPLETE_CUSTOM_OPTION);
 	}
 	

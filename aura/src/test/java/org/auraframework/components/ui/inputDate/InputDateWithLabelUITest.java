@@ -15,10 +15,11 @@
  */
 package org.auraframework.components.ui.inputDate;
 
-public class InputDateUITest extends BaseInputDateUITester {
+public class InputDateWithLabelUITest extends BaseInputDateUITester {
 
-    public InputDateUITest(String name) {
+    public InputDateWithLabelUITest(String name) {
         super(name);
-        URL = "/uitest/datePickerTest.cmp";
+        URL = "/uitest/datePickerWithLabelTest.cmp";
     }
+
 }

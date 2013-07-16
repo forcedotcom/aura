@@ -22,7 +22,7 @@
 <aura:attribute name="showClear" type="boolean" default="{!false}"/>
 
 <div id="search">
-<ui:inputSearch aura:id="searchCmp" updateOn="search" search="{!c.doSearch}" value="{!v.value}" showClear="{!v.showClear}"/>
+<ui:inputSearch aura:id="searchCmp" class="search" updateOn="search" search="{!c.doSearch}" value="{!v.value}" showClear="{!v.showClear}"/>
 </div>
 
 </aura:component>

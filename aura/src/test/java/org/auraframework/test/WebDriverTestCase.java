@@ -714,6 +714,13 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
     protected WebElement findDomElement(By locator) {
         return auraUITestingUtil.findDomElement(locator);
     }
+    
+    /**
+     * Find list of matching element in the DOM.
+     */
+    protected List<WebElement> findDomElements(By locator) {
+        return auraUITestingUtil.findDomElements(locator);
+    }
 
     /**
      * Return true if there is at least one element matching the locator.

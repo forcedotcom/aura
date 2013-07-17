@@ -19,16 +19,11 @@ import java.util.Collection;
 import java.util.Map;
 
 import org.auraframework.Aura;
-import org.auraframework.def.AttributeDefRef;
-import org.auraframework.def.ComponentDef;
-import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.*;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.ProviderDef;
 import org.auraframework.def.RootDefinition;
-import org.auraframework.instance.BaseComponent;
-import org.auraframework.instance.Component;
-import org.auraframework.instance.ComponentConfig;
-import org.auraframework.instance.ValueProvider;
+import org.auraframework.instance.*;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
@@ -117,12 +112,18 @@ public final class ComponentImpl extends BaseComponentImpl<ComponentDef, Compone
                                 throw new AuraRuntimeException(String.format("%s cannot be instantiated directly.",
                                         descriptor));
                             }
+                            // new component may have its own controllerdef so add that one
+                            ControllerDef cd = c.getControllerDef();
+                            if (cd != null) {
+                                this.valueProviders.put(ValueProviderType.CONTROLLER.getPrefix(), cd);
+                            }
                         } catch (DefinitionNotFoundException dnfe) {
                             throw new AuraRuntimeException(String.format("%s did not provide a valid component",
                                     providerDef.getDescriptor()));
                         }
 
                         attributeSet.setRootDefDescriptor(descriptor);
+                        
 
                         Map<String, Object> providedAttributes = config.getAttributes();
                         if (providedAttributes != null) {

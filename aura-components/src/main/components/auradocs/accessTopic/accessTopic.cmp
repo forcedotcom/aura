@@ -32,18 +32,20 @@
 	<tbody>
 	<tr>
             <td>Buttons</td>
-            <td>Use the <code>ui:button</code> component in preference to the <code>&lt;button&gt;</code> tag. 
+            <td>The <code>ui:button</code> component supports labels and images. If you want to use an image on a <code>ui:button</code> component,
+            you can use the <code>label</code> attribute and set <code>labelDisplay="false"</code> to hide the label from view.
             Example: <auradocs:codeblock>&lt;ui:button label="Attach a File" iconImgSrc="clip.png" labelDisplay="false" /&gt;</auradocs:codeblock></td>
         </tr>
         <tr>
-            <td>Drop-down lists</td>
-            <td>Use the <code>ui:inputSelect</code> component in preference to the <code>&lt;select&gt;</code> tag. 
-                See <auradocs:topicLink topic="useForm">Getting User Input</auradocs:topicLink> for more information.</td>           
+        	<td>Carousels</td>
+        	<td>The <code>ui:carousel</code> component displays a list of items horizontally where users can swipe through the list or click through the page indicators.
+        	Note that the carousel will not be accessible if <code>visible="false"</code> on the <code>ui:carouselPageIndicatorItem</code> as this setting hides the page indicators from view. 
+        	Similarly, setting <code>continuousFlow="true"</code> on <code>ui:carousel</code> hides the page indicators from view.</td>
         </tr>
 	    <tr>
 	       <td>Forms and fields</td>
-	       <td>Use the <code>ui:input</code> and <code>ui:output</code> components, which provide extensive <auradocs:topicLink topic="label">label</auradocs:topicLink> support.
-	       For example, use <code>ui:inputTextarea</code> in preference to the <code>&lt;textarea&gt;</code> tag for multi-line text input. 
+	       <td>Use the input components that extend <code>ui:input</code>, providing extensive <auradocs:topicLink topic="label">label</auradocs:topicLink> support.
+	       For example, use <code>ui:inputTextarea</code> in preference to the <code>&lt;textarea&gt;</code> tag for multi-line text input or the <code>ui:inputSelect</code> component in preference to the <code>&lt;select&gt;</code> tag. 
 	       See <auradocs:topicLink topic="useForm">Getting User Input</auradocs:topicLink> for more information.</td> 
         </tr>
         <tr>
@@ -53,27 +55,28 @@
 &lt;ui:inputText label="Contact Name" labelPosition="top" aria-describedby="contact" /&gt;
 &lt;ui:outputText aura:id="contact" value="This is an example of a help text" /&gt;
 </auradocs:codeblock> 
+			<p>Use the <code>aria-live</code> attribute on the <code>ui:message</code> component to convey audio notifications. </p>
             For information on field-level errors, see <auradocs:topicLink topic="error">Validating Fields</auradocs:topicLink>.</td>
         </tr>
         <tr>
            <td>Images</td>
-           <td>Use the <code>ui:image</code> component and include alternative text with informational images. 
+           <td>Use the <code>ui:image</code> component and include alternative text with informational images. Set the <code>alt</code> attribute when the <code>imageType="informational"</code> with a meaningful description.
                See <auradocs:topicLink topic="img">Images</auradocs:topicLink> for more information.</td>
         </tr>
         <tr>
-            <td>Links</td>
-            <td>Use the <code>ui:outputURL</code> component in preference to the <code>&lt;a&gt;</code> tag.
-            Example: <auradocs:codeblock>&lt;ui:outputURL value="www.google.com" label="search" /&gt;</auradocs:codeblock></td>
+        	<td>Labels</td>
+        	<td>Labels provide the user the essence of what the component does. You can either use the <code>label</code> attribute on a component that extends <code>ui:input</code> or use the <code>ui:label</code> component and bind it to the corresponding input component.
+        	See <auradocs:topicLink topic="label">Label</auradocs:topicLink> for more information.</td>
         </tr>
         <tr>
-            <td>Tables</td>
-            <td>Use the <code>ui:dataTable</code> component in preference to the <code>&lt;table&gt;</code> tag.
-            See <auradocs:defLink defType="component" descriptor="ui:dataTable">ui:dataTable</auradocs:defLink> for more information.</td>
+        	<td>Menus</td>
+        	<td>Use the <code>ui:menu</code> component and nest a <code>ui:menuTriggerLink</code> component to create a menu that triggers a list item. See <auradocs:topicLink topic="useMenu">Menu</auradocs:topicLink> for more information.</td>
         </tr>
     </tbody>
     </table>
     <p>
     <b>See Also:</b><br/>
+    <auradocs:topicLink topic="accessIntro">Aura and Accessibility</auradocs:topicLink><br />
     <auradocs:topicLink topic="helloWorld">Components Overview</auradocs:topicLink><br />
     <auradocs:topicLink topic="helloActions">Client-Side Controllers</auradocs:topicLink>
     </p>

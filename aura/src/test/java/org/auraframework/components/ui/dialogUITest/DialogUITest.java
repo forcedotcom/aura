@@ -21,7 +21,6 @@ import java.net.URISyntaxException;
 
 import org.auraframework.test.WebDriverTestCase;
 import org.auraframework.test.WebDriverUtil.BrowserType;
-
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
@@ -137,8 +136,6 @@ public class DialogUITest extends WebDriverTestCase {
     @ExcludeBrowsers({ BrowserType.IE7, BrowserType.IE8, BrowserType.SAFARI, BrowserType.ANDROID_PHONE,
             BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
     public void testDialogNonModalCheckBoxes() throws MalformedURLException, URISyntaxException {
-        String classname;
-
         open(URL_NON_MODAL_WITH_CHECKBOXES);
 
         WebDriver driver = getDriver();

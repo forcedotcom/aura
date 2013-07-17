@@ -14,6 +14,18 @@
  * limitations under the License.
  */
 ({  
+    fireInputChangeEvent: function(component, event) {
+        var inputCmp = event.getSource();
+        var value = inputCmp.getElement().value;
+        var inputChangeEvt = component.get("e.inputChange");
+        if (inputChangeEvt) {
+            inputChangeEvt.setParams({
+                value: value
+            });
+            inputChangeEvt.fire();
+        }
+    },
+    
     hideList: function(component) {
         var list = component.find("list");
         if (list && list.get("v.visible") === true) {

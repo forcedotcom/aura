@@ -21,6 +21,14 @@
             inputCmp.addHandler("keydown", component, "c.handleKeyAction");
             inputCmp.addHandler("focus", component, "c.handleFocus");
         }
+        // This calls a function (callback) in a delayed manner and it can be cancelled.
+        component._delay = (function(){
+            var timer = 0;
+            return function(callback, ms){
+                clearTimeout (timer);
+                timer = setTimeout(callback, ms);
+            };
+        })();
     },
     
     handleFocus: function(component, event, helper) {
@@ -32,13 +40,13 @@
     },
     
     handleInputChange: function(component, event, helper) {
-        var inputCmp = event.getSource();
-        var value = inputCmp.getElement().value;
-        var inputChangeEvt = component.get("e.inputChange");
-        inputChangeEvt.setParams({
-            value: value
-        });
-        inputChangeEvt.fire();
+        if (component._delay) {
+            component._delay(function() {
+                helper.fireInputChangeEvent(component, event);
+            }, 300);
+        } else {
+            helper.fireInputChangeEvent(component, event);
+        }
     },
     
     handleKeyAction: function(component, event, helper) {

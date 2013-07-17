@@ -16,13 +16,11 @@
 package org.auraframework.impl.java.model;
 
 import java.io.IOException;
-import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
 import org.auraframework.Aura;
-import org.auraframework.component.auradev.TestDataProviderController.Item;
 import org.auraframework.components.ui.InputOption;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Model;

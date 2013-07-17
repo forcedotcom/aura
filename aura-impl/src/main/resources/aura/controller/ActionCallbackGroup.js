@@ -44,7 +44,7 @@ var ActionCallbackGroup = function ActionCallbackGroup(actions, scope, callback)
 	// without accidentally triggering early.
 	//
 	this.hold = false;
-	if (this.actions.length === 0) {
+	if (this.callback && this.actions.length === 0) {
 		this.callback.call(this.scope || window, {
 			"errors" : []
 		});
@@ -63,7 +63,7 @@ ActionCallbackGroup.prototype.completeAction = function(action) {
 	var aidx = this.actions.indexOf(action);
 	if (aidx != -1) {
 		this.actions.splice(aidx, 1);
-		if (this.actions.length === 0 && !this.hold) {
+		if (this.callback && this.actions.length === 0 && !this.hold) {
 			this.callback.call(this.scope || window, {
 				"errors" : []
 			});

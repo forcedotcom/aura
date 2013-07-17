@@ -404,6 +404,7 @@ var AuraLocalizationService = function AuraLocalizationService() {
             if (mDate["isValid"]()) {
                 return mDate["toDate"]();
             }
+            return null;
         },
         
         /**
@@ -416,7 +417,7 @@ var AuraLocalizationService = function AuraLocalizationService() {
          * @public
          */
         parseDateTimeUTC : function(dateTimeString, targetFormat, locale) {
-            if (!dateTimeString && !targetFormat) {
+            if (!dateTimeString) {
                 return null;
             }
             

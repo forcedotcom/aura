@@ -527,7 +527,7 @@
 			this.waitForLog(cmp, 2, "background:true:" + cmp._initialValue);
 
 			// both callbacks with refreshed value executed
-			// ordering of actions is guaranteed, but ordering of callback handling is not
+			// ordering is not guaranteed
 			$A.test.addWaitFor(true, function() {
 				var logs = cmp.getAttributes().getValue("log");
 				var val1 = logs.getValue(3);
@@ -543,29 +543,7 @@
 				val1 = val1.unwrap().substring(0, len);
 				val2 = val2.unwrap().substring(0, len);
 
-				if ((val1 == expected1 && val2 == expected2) || (val1 == expected2 && val2 == expected1)) {
-					cmp._initialValue = val2.substring(len);
-					return true;
-				}
-				return false;
-			});
-		}, function(cmp) {
-			var that = this;
-			$A.run(function() {
-				// check last stored value was last action returned
-				var a = that.getAction(cmp, "c.execute", "STAMP;SLEEP 1000;READ;", function(a) {
-					that.log(cmp, "check:" + a.isFromStorage() + ":" + a.getReturnValue());
-				});
-				a.setStorable();
-				$A.enqueueAction(a);
-			});
-			// check stored value
-			this.waitForLog(cmp, 5, "check:true:" + cmp._initialValue);
-			// here's the refresh
-			var expected = "check:false:";
-			$A.test.addWaitFor(expected, function() {
-				var val = cmp.getAttributes().getValue("log").getValue(6);
-				return val && val.unwrap().substring(0, expected.length);
+				return ((val1 == expected1 && val2 == expected2) || (val1 == expected2 && val2 == expected1));
 			});
 		} ]
 	},
@@ -619,8 +597,9 @@
 	},
 
 	/*
-	 * currently failing because the aborted in-flight action is still resulting in the storage of the returned value
+	 * W-1755876: currently failing because the aborted in-flight action is still resulting in the storage of the returned value
 	 * (seen as the replay value in the following storable call)
+	 * 
 	 */
 	_testAbortInFlightStorable : {
 		test : [ function(cmp) {

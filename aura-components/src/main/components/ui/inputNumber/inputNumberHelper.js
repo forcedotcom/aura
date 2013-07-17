@@ -15,7 +15,6 @@
  */
 ({
     formatValue: function(cmp) {
-        debugger;
         // number fields only format the initial value
         this.setAttribute(cmp, {key: 'doFormat', value: false});
         var f = cmp.get("v.format");

@@ -1,0 +1,4 @@
+<aura:theme>
+  <aura:attribute name="margin" default="" />
+  <aura:attribute name="padding" default="" />
+</aura:theme>

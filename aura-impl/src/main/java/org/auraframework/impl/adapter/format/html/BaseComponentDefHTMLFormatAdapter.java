@@ -36,7 +36,6 @@ import org.auraframework.service.InstanceService;
 import org.auraframework.service.RenderingService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.system.Client;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.javascript.Literal;
@@ -71,8 +70,7 @@ public abstract class BaseComponentDefHTMLFormatAdapter<T extends BaseComponentD
 
             DefDescriptor<StyleDef> styleDefDesc = templateDef.getStyleDescriptor();
             if (styleDefDesc != null) {
-                Client.Type type = context.getClient().getType();
-                attributes.put("auraInlineStyle", styleDefDesc.getDef().getCode(type));
+                attributes.put("auraInlineStyle", styleDefDesc.getDef().getCode());
             }
 
             String contextPath = context.getContextPath();
@@ -106,12 +104,12 @@ public abstract class BaseComponentDefHTMLFormatAdapter<T extends BaseComponentD
                 attributes.put("auraNamespacesScriptTags", sb.toString());
 
                 if(!Aura.getContextService().getCurrentContext().getMode().equals(Mode.PROD) &&
-                		Aura.getContextService().getCurrentContext().getIsDebugToolEnabled()) {
-                	attributes.put("auraInitBlock", "<script>var debugWindow=window.open('/aura/debug.cmp','Aura Debug Tool','width=900,height=305,scrollbars=0,location=0,toolbar=0,menubar=0');$A.util.setDebugToolWindow(debugWindow);</script>");
-                	
-                
+                        Aura.getContextService().getCurrentContext().getIsDebugToolEnabled()) {
+                    attributes.put("auraInitBlock", "<script>var debugWindow=window.open('/aura/debug.cmp','Aura Debug Tool','width=900,height=305,scrollbars=0,location=0,toolbar=0,menubar=0');$A.util.setDebugToolWindow(debugWindow);</script>");
+
+
                 }
-                
+
                 Map<String, Object> auraInit = Maps.newHashMap();
                 if (componentAttributes != null && !componentAttributes.isEmpty()) {
                     auraInit.put("attributes", componentAttributes);

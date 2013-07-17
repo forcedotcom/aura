@@ -63,6 +63,10 @@
             <name>Args4J public repository</name>
             <url>http://repo.jfrog.org/artifactory/libs-releases/</url>
         </repository>
+        <repository>
+	      <id>phloc.com</id>
+	      <url>http://repo.phloc.com/maven2</url>
+	    </repository>
     </repositories>
     <pluginRepositories>
         <pluginRepository>
@@ -252,6 +256,11 @@
                 <version>1.1.1</version>
             </dependency>
             <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>2.2</version>
+            </dependency>
+            <dependency>
                 <groupId>cglib</groupId>
                 <artifactId>cglib</artifactId>
                 <version>2.2.2</version>
@@ -324,11 +333,6 @@
                 <version>2.2.2</version>
             </dependency>
             <dependency>
-                <groupId>org.auraframework.external</groupId>
-                <artifactId>closure-stylesheets</artifactId>
-                <version>20130429sfdc</version>
-            </dependency>
-            <dependency>
                 <groupId>joda-time</groupId>
                 <artifactId>joda-time</artifactId>
                 <version>2.1</version>
@@ -363,6 +367,11 @@
                 <artifactId>rhino</artifactId>
                 <version>1.7R4</version>
             </dependency>
+            <dependency>
+		      <groupId>com.phloc</groupId>
+		      <artifactId>phloc-css</artifactId>
+		      <version>3.5.5</version>
+		    </dependency>
         </dependencies>
     </dependencyManagement>
     <build>
@@ -619,6 +628,7 @@
                                             <include name="**/*.evt" />
                                             <include name="**/*.app" />
                                             <include name="**/*.css" />
+                                            <include name="**/*.theme" />
                                             <include name="**/*Test.js" />
                                         </fileset>
                                     </path>
@@ -644,6 +654,7 @@
                                             <include name="**/*.evt" />
                                             <include name="**/*.app" />
                                             <include name="**/*.css" />
+                                            <include name="**/*.theme" />
                                             <include name="**/*Test.js" />
                                         </fileset>
                                     </path>

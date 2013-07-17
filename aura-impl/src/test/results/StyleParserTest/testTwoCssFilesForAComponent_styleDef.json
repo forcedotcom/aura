@@ -2,7 +2,7 @@
   "serId":1,
   "value":{
     "descriptor":"css://test.testTwoCSSFiles",
-    "code":".testTestTwoCSSFiles .requiredLegend {\n  color: #000000;\n  font-weight: normal;\n  float: right;\n}\n",
+    "code":".testTestTwoCSSFiles .requiredLegend{color:#000;font-weight:normal;float:right}",
     "className":"testTestTwoCSSFiles"
   }
 }

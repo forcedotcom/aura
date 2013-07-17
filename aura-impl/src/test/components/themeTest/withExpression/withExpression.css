@@ -1,0 +1,7 @@
+.THIS {
+  margin: theme("'5px ' + themeTest.baseTheme.margin");
+  margin: theme("themeTest.baseTheme.margin + ' 5px'");
+  margin: theme("themeTest.baseTheme.margin + ' 5px ' + themeTest.baseTheme.margin");
+  padding: theme("themeTest.baseTheme.spacious == true ? '30px' : '5px'");
+  line-height: theme('themeTest.baseTheme.lineHeight * 2');
+}

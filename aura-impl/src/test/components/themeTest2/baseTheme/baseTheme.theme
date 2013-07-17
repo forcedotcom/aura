@@ -1,0 +1,5 @@
+<aura:theme>
+  <aura:attribute name="textFont" default="Arial, sans-serif" />
+  <aura:attribute name="buttonBackground" default="#bbbbbb" />
+  <aura:attribute name="buttonMargin" default="10px" />
+</aura:theme>

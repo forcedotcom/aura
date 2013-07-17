@@ -25,6 +25,7 @@ import org.auraframework.adapter.LocalizationAdapter;
 import org.auraframework.adapter.LoggingAdapter;
 import org.auraframework.adapter.PrefixDefaultsAdapter;
 import org.auraframework.adapter.RegistryAdapter;
+import org.auraframework.adapter.StyleAdapter;
 import org.auraframework.impl.BuilderServiceImpl;
 import org.auraframework.impl.ClientServiceImpl;
 import org.auraframework.impl.ContextAdapterImpl;
@@ -41,6 +42,7 @@ import org.auraframework.impl.ServerServiceImpl;
 import org.auraframework.impl.adapter.ConfigAdapterImpl;
 import org.auraframework.impl.adapter.GlobalValueProviderAdapterImpl;
 import org.auraframework.impl.adapter.JsonSerializerAdapterImpl;
+import org.auraframework.impl.adapter.StyleAdapterImpl;
 import org.auraframework.impl.adapter.format.css.StyleDefCSSFormatAdapter;
 import org.auraframework.impl.adapter.format.css.ThrowableCSSFormatAdapter;
 import org.auraframework.impl.adapter.format.html.ApplicationDefHTMLFormatAdapter;
@@ -97,9 +99,8 @@ import org.auraframework.util.ServiceLoaderImpl.Impl;
 import org.auraframework.util.ServiceLoaderImpl.PrimaryImpl;
 
 /**
- * AuraConfig This is the spring configuration for the aura module.Provide
- * access to lower level modules (like sfdc) by defining runtime implementations
- * here. This class will be loaded by common.provider.ProviderFactory.
+ * AuraConfig This is the spring configuration for the aura module.Provide access to lower level modules (like sfdc) by
+ * defining runtime implementations here. This class will be loaded by common.provider.ProviderFactory.
  */
 @AuraConfiguration
 public class AuraImplConfig {
@@ -383,5 +384,10 @@ public class AuraImplConfig {
     @PrimaryImpl
     public static IntegrationService integrationService() {
         return new IntegrationServiceImpl();
+    }
+
+    @Impl
+    public static StyleAdapter themeValueAdapter() {
+        return new StyleAdapterImpl();
     }
 }

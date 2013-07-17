@@ -1,0 +1,4 @@
+<aura:theme>
+  <aura:attribute name="marginTB" default="5px" />
+  <aura:attribute name="marginLR" default="8%" />
+</aura:theme>

@@ -32,7 +32,6 @@ import org.auraframework.instance.Component;
 import org.auraframework.service.InstanceService;
 import org.auraframework.service.RenderingService;
 import org.auraframework.system.AuraContext;
-import org.auraframework.system.Client;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.javascript.Literal;
@@ -68,8 +67,7 @@ public class ApplicationDefEmbeddedHTMLFormatAdapter extends EmbeddedHTMLFormatA
             writeHtmlScripts(AuraServlet.getScripts(), sb);
             DefDescriptor<StyleDef> styleDefDesc = templateDef.getStyleDescriptor();
             if (styleDefDesc != null) {
-                Client.Type type = context.getClient().getType();
-                attributes.put("auraInlineStyle", styleDefDesc.getDef().getCode(type));
+                attributes.put("auraInlineStyle", styleDefDesc.getDef().getCode());
             }
 
             attributes.put("auraScriptTags", sb.toString());

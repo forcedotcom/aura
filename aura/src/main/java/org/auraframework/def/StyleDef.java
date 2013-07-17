@@ -15,9 +15,6 @@
  */
 package org.auraframework.def;
 
-import java.util.Set;
-
-import org.auraframework.system.Client;
 
 /**
  */
@@ -28,10 +25,4 @@ public interface StyleDef extends Definition {
     String getCode();
 
     String getClassName();
-
-    Set<String> getImageURLs();
-
-    Set<String> getValidImageURLs();
-
-    String getCode(Client.Type type);
 }

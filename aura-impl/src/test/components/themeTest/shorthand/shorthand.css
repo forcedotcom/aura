@@ -1,0 +1,4 @@
+.THIS {
+    color: t('themeTest.baseTheme.color');
+    margin: t('themeTest.baseTheme.margin');
+}

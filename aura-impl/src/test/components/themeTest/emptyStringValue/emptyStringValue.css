@@ -1,0 +1,4 @@
+.THIS {
+  color: red;
+  margin: theme("themeTest.emptyStringTheme.margin");
+}

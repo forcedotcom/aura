@@ -31,7 +31,6 @@ import org.auraframework.throwable.quickfix.StyleParserException;
 import org.auraframework.util.AuraTextUtil;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.common.css.compiler.ast.GssParserException;
 
 /**
  */
@@ -40,7 +39,7 @@ public class StyleParser implements Parser {
     private static StyleParser instance = new StyleParser(true);
     private static StyleParser nonValidatingInstance = new StyleParser(false);
 
-    private static Set<String> allowedConditions;
+    public static Set<String> allowedConditions;
 
     // build list of conditional permutations and allowed conditionals
     static {
@@ -65,6 +64,14 @@ public class StyleParser implements Parser {
         this.doValidation = doValidation;
     }
 
+    public boolean shouldValidate(String name) {
+        if (name.toLowerCase().endsWith("template")) {
+            return false;
+        }
+        return doValidation;
+
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public <D extends Definition> D parse(DefDescriptor<D> descriptor, Source<?> source) throws StyleParserException,
@@ -76,32 +83,14 @@ public class StyleParser implements Parser {
             builder.setDescriptor((DefDescriptor<StyleDef>) descriptor);
             builder.setLocation(source.getSystemId(), source.getLastModified());
             builder.setClassName(className);
-            CSSParser parser;
-
-            if (descriptor.getName().toLowerCase().endsWith("template")) {
-                parser = new CSSParser(descriptor.getNamespace(), false, className, source.getContents(),
-                        allowedConditions);
-            } else {
-                parser = new CSSParser(descriptor.getNamespace(), doValidation, className,
-                        source.getContents(), allowedConditions);
-            }
-
-            StyleParserResultHolder resultHolder;
-            try {
-                resultHolder = parser.parse();
-            } catch (GssParserException e) {
-                throw new StyleParserException(e.getMessage(), builder.getLocation());
-            }
-
-            // scram if we found errors
-            if (parser.hasErrors()) {
-                throw new StyleParserException(parser.getErrorMessage(), builder.getLocation());
-            }
-
-            builder.setCode(resultHolder.getDefaultCss());
-            builder.setCode(resultHolder.getBrowserCssMap());
-            builder.setImageURLs(resultHolder.getImageURLs());
             builder.setOwnHash(source.getHash());
+
+            CSSParser parser = new CSSParser(descriptor.getNamespace(), descriptor.getName(),
+                    shouldValidate(descriptor.getName()), className, source.getContents(), allowedConditions,
+                    source.getSystemId());
+
+            builder.setComponents(parser.parse());
+            builder.setThemeReferences(parser.getThemeReferences());
 
             return (D) builder.build();
         }

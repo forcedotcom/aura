@@ -891,4 +891,62 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         }
         return false;
     }
+
+    /**
+     * Verify frequency counts on a component and it's descendant.
+     * 
+     * Automation for W-1526909.
+     */
+    public void testComponentFrequencySingleDecendent() throws Exception {
+        DefDescriptor<ComponentDef> superCmp = addSourceAutoCleanup(ComponentDef.class,
+                "<aura:component extensible=\"true\"/>", "testComponentFrequency");
+        DefDescriptor<ComponentDef> cmp = addSourceAutoCleanup(ComponentDef.class,
+                String.format("<aura:component extends=\"%s\"/>", superCmp.getDescriptorName()),
+                "testComponentFrequency");
+
+        MasterDefRegistryImpl mdr = getDefRegistry(false);
+        String uid = mdr.getUid(null, cmp);
+        Map<DefDescriptor<?>, Integer> depMap = mdr.getDependenciesMap(uid);
+
+        assertEquals("cmp with no descendents should have a frequency of 1", 1, depMap.get(cmp).intValue());
+        assertTrue("Super should have a higher frequency count than descendant", depMap.get(superCmp) > depMap.get(cmp));
+    }
+
+    /**
+     * Verify frequency counts for a more complicated dependency tree. Frequency counts should be reflective of how many
+     * descendants a component has. Components with no descendants (not extended) should have a frequency of 1, and the
+     * more a component is extended the higher frequency it will have.
+     * 
+     * Automation for W-1526909.
+     */
+    public void testComponentFrequencyMultipleDecendents() throws Exception {
+        DefDescriptor<ComponentDef> superSuperCmp = addSourceAutoCleanup(ComponentDef.class,
+                "<aura:component extensible=\"true\"/>", "testComponentFrequency");
+        DefDescriptor<ComponentDef> superCmp = addSourceAutoCleanup(
+                ComponentDef.class,
+                String.format("<aura:component extends=\"%s\" extensible=\"true\"/>", superSuperCmp.getDescriptorName()),
+                "testComponentFrequency");
+        DefDescriptor<ComponentDef> cmpA = addSourceAutoCleanup(ComponentDef.class,
+                String.format("<aura:component extends=\"%s\"/>", superCmp.getDescriptorName()),
+                "testComponentFrequency");
+        DefDescriptor<ComponentDef> cmpB = addSourceAutoCleanup(ComponentDef.class,
+                String.format("<aura:component extends=\"%s\"/>", superCmp.getDescriptorName()),
+                "testComponentFrequency");
+        DefDescriptor<ComponentDef> masterCmp = addSourceAutoCleanup(
+                ComponentDef.class,
+                String.format("<aura:component><%s/><%s/></aura:component>", cmpA.getDescriptorName(),
+                        cmpB.getDescriptorName()),
+                "testComponentFrequency");
+
+        MasterDefRegistryImpl mdr = getDefRegistry(false);
+        String uid = mdr.getUid(null, masterCmp);
+        Map<DefDescriptor<?>, Integer> depMap = mdr.getDependenciesMap(uid);
+
+        assertEquals("cmpA with no descendents should have a frequency of 1", 1, depMap.get(cmpA).intValue());
+        assertEquals("cmpB with no descendents should have a frequency of 1", 1, depMap.get(cmpB).intValue());
+        assertEquals("masterCmp with no descendents should have a frequency of 1", 1, depMap.get(masterCmp).intValue());
+        assertTrue("Descendent (superCmp) should have lower frequency than super",
+                depMap.get(superSuperCmp) > depMap.get(superCmp));
+        assertTrue("Descendent (cmpA) should have lower frequency than super", depMap.get(superCmp) > depMap.get(cmpA));
+    }
 }

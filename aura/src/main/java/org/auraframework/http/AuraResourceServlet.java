@@ -33,9 +33,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.google.common.base.Functions;
-import com.google.common.collect.ImmutableSortedMap;
-import com.google.common.collect.Ordering;
 import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
@@ -60,8 +57,11 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.javascript.JavascriptProcessingError;
 import org.auraframework.util.javascript.JavascriptWriter;
 
+import com.google.common.base.Functions;
+import com.google.common.collect.ImmutableSortedMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
 
 /**
@@ -383,7 +383,7 @@ public class AuraResourceServlet extends AuraBaseServlet {
      * 
      * This writes out CSS for the preloads + app to the response. Note that currently it only writes out the preloads
      * because of the missing capability to do the apps will get fixed by W-1166679
-     *
+     * 
      * @param out the appendable
      * @throws IOException if unable to write to the response
      * @throws QuickFixException if the definitions could not be compiled.
@@ -434,8 +434,9 @@ public class AuraResourceServlet extends AuraBaseServlet {
 
     /**
      * Orders StyleDefs with supers (ancestors) first then alphabetical
+     * 
      * TODO: refactor when we use CSS by dependency instead of preloads
-     *
+     * 
      * @param styleDefDescriptors style def descriptors
      * @param context aura context
      * @return set of ordered style defs
@@ -450,7 +451,7 @@ public class AuraResourceServlet extends AuraBaseServlet {
         /**
          * Because we're using CSS from the entire namespace (preloads) we need to add style def descriptors of parent
          * components that's not in the dependencies map. This will then be sorted by frequency then alphabetically.
-         *
+         * 
          * This can be a set and sort done on the dependencyMap when we load CSS by dependency instead of namespace.
          */
         Map<DefDescriptor<StyleDef>, Integer> styles = Maps.newHashMap();
@@ -459,18 +460,19 @@ public class AuraResourceServlet extends AuraBaseServlet {
          * The loops and checks within are used to return an ordered list of all styles of a namespace sorted by
          * frequency (number of descendants) then alphabetically. Very inefficient and redundant on different namespaces
          * because they use the same dependencyMap.
-         *
+         * 
          * Note: DefDescriptor<StyleDef> has its parent component's frequency in dependencyMap.
          */
         if (dependencyMap != null) {
             for (Map.Entry<DefDescriptor<?>, Integer> dependencyEntry : dependencyMap.entrySet()) {
                 DefDescriptor<?> defDescriptor = dependencyEntry.getKey();
                 if (defDescriptor.getDefType() == DefType.STYLE) {
+                    @SuppressWarnings("unchecked")
                     DefDescriptor<StyleDef> styleDD = (DefDescriptor<StyleDef>) defDescriptor;
                     /**
-                     * Because we're loading and caching CSS by preloads, we check whether this style def
-                     * descriptor is in the set of filtered descriptors by preloads
-                     *
+                     * Because we're loading and caching CSS by preloads, we check whether this style def descriptor is
+                     * in the set of filtered descriptors by preloads
+                     * 
                      * Remove this when we load CSS based on dependencies instead of preloads
                      */
                     if (styleDefDescriptors.contains(defDescriptor)) {
@@ -491,7 +493,7 @@ public class AuraResourceServlet extends AuraBaseServlet {
         /**
          * Dependency map includes frequency (calculated by its number of descendants). We sort by this frequency to
          * order the CSS by ancestors first then alphabetical.
-         *
+         * 
          * Comparing DefDescriptor is cleaner than comparing Definition
          */
         Comparator frequencyComparator = Ordering.natural().reverse().onResultOf(Functions.forMap(styles))

@@ -186,11 +186,11 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
     }
 
     /**
-     * Verify super CSS is before CSS of components extending it.
-     * ui:input before ui:inputText before ui:inputNumber before ui:inputPercent
-     *
+     * Verify super CSS is before CSS of components extending it. ui:input before ui:inputText before ui:inputNumber
+     * before ui:inputPercent
+     * 
      * This test needs to be refactored if/when empty CSS declarations are removed.
-     *
+     * 
      * @throws Exception
      */
     public void testCSSOrder() throws Exception {
@@ -211,5 +211,11 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
                 response.indexOf(".uiInputText") < response.indexOf(".uiInputNumber"));
         assertTrue("ui:inputNumber CSS should be before ui:inputPercent",
                 response.indexOf(".uiInputNumber") < response.indexOf(".uiInputPercent"));
+        // Verify CSS sorts alphabetically when frequency (# of dependents) the same (inputPercent, inputRange, and
+        // inputFile all have 0 dependents).
+        assertTrue("ui:inputPercent CSS should be before ui:inputRange",
+                response.indexOf(".uiInputPercent") < response.indexOf(".uiInputRange"));
+        assertTrue("ui:inputFile CSS should be before ui:inputPercent",
+                response.indexOf(".uiInputFile") < response.indexOf(".uiInputPercent"));
     }
 }

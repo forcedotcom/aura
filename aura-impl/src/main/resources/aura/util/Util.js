@@ -905,31 +905,6 @@ $A.ns.Util.prototype.getDataAttribute = function(element, key) {
 };
 
 /**
- * Get the text content of a DOM node. Tries <code>innerText</code> followed by
- * <code>textContext</code>, followed by <code>nodeValue</code> to take browser differences into account.
- * @param {Node} node           The node to get the text content from
- */
-$A.ns.Util.prototype.getText = function(node) {
-    var t;
-    //text nodes
-    if(node.nodeType === 3){
-    	t = node.nodeValue;
-    } else {
-    	// chrome, safari, IE have this
-        t = node.innerText;
-
-	// FF & chrome with visibility set to false
-        if (node.textContent !== undefined) {
-            if($A.util.isUndefinedOrNull(t) || t === ""){
-                t = node.textContent;
-            }
-        }
-    }
-    return t;
-
-};
-
-/**
  * @description
  * Sets a custom data attribute value from a DOM element.
  * For more information on custom data attributes, see http://html5doctor.com/html5-custom-data-attributes/
@@ -1277,6 +1252,35 @@ $A.ns.Util.prototype.getUrl = function(){
 		return opener.location.href;
 	}
 };
+/**
+ * Get the text content of a DOM node. Tries <code>innerText</code> followed by
+ * <code>textContext</code>, followed by <code>nodeValue</code> to take browser differences into account.
+ * @param {Node} node           The node to get the text content from
+ */
+$A.ns.Util.prototype.getText = function(node) {
+    var t;
+    //text nodes
+    if(node.nodeType === 3){
+    	t = node.nodeValue;
+    } else {
+    	// chrome, safari, IE have this
+        t = node.innerText;
+
+	// FF & chrome with visibility set to false
+        if (node.textContent !== undefined) {
+            if($A.util.isUndefinedOrNull(t) || t === ""){
+                t = node.textContent;
+            }
+        }
+    }
+    return t;
+
+};
+
+
+
+
+
 //#end
 
 //#include aura.util.Util_export

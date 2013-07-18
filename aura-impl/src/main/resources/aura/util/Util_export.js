@@ -57,7 +57,10 @@ exp(p,
     "getWindowSize", p.getWindowSize,
     "isComponent", p.isComponent,
     "isValue", p.isValue,
-    "instanceOf", p.instanceOf
+    "instanceOf", p.instanceOf,
+    "getText", p.getText
+    
+    
     //#if {"excludeModes" : ["PRODUCTION"]}
     ,
     "getDebugToolComponent", p.getDebugToolComponent,

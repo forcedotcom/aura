@@ -417,7 +417,7 @@ public class BaseInputDateUITester extends WebDriverTestCase {
         // Getting the calendar Icon
         WebElement element = findDomElement(By.cssSelector(DATE_INPUT_BOX_SEL));
         element.click();
-        element.sendKeys(TEST_DATE_TO_USE);
+        element.sendKeys("2013-10-01");
 
         element = findDomElement(By.cssSelector(DATE_ICON_SEL));
         element.click();
@@ -427,12 +427,12 @@ public class BaseInputDateUITester extends WebDriverTestCase {
         element = findDomElement(By.cssSelector("a[class*='" + classOfActiveElem + "']"));
 
         // Loop through 355 days
-        element = loopThroughKeys(element, driver, "" + Keys.ARROW_RIGHT, 355, ARIA_SELECTED_SEL, "Arrow-Right ");
+        element = loopThroughKeys(element, driver, "" + Keys.ARROW_RIGHT, 151, ARIA_SELECTED_SEL, "Arrow-Right ");
 
         element.sendKeys(Keys.SPACE);
 
         element = findDomElement(By.cssSelector(DATE_INPUT_BOX_SEL));
-        assertEquals("Dates do not match up", "2014-04-05", element.getAttribute("value"));
+        assertEquals("Dates do not match up", "2014-03-01", element.getAttribute("value"));
     }
 
     // Testing functionality of arrows being used one after the other

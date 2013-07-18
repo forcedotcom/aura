@@ -39,16 +39,16 @@ public class LocaleValueProvider implements GlobalValueProvider {
     public static String VARIANT = "variant";
     public static String LANGUAGE_LOCALE = "langLocale";
     
-    public static String NUMBER_FORMAT = "numberformat";
-    public static String PERCENT_FORMAT = "percentformat";
-    public static String CURRENCY_FORMAT = "currencyformat";
+    public static String NUMBER_FORMAT = "numberFormat";
+    public static String PERCENT_FORMAT = "percentFormat";
+    public static String CURRENCY_FORMAT = "currencyFormat";
     
-    public static String DATE_FORMAT = "dateformat";
-    public static String DATETIME_FORMAT = "datetimeformat";
-    public static String TIME_FORMAT = "timeformat";
+    public static String DATE_FORMAT = "dateFormat";
+    public static String DATETIME_FORMAT = "datetimeFormat";
+    public static String TIME_FORMAT = "timeFormat";
     public static String TIME_ZONE = "timezone";
     public static String TIME_ZONE_FILE_NAME = "timezoneFileName";
-    public static String CURRENCY_CODE = "currency_code";
+    public static String CURRENCY_CODE = "currencyCode";
 
     // symbols
     public static String DECIMAL = "decimal";

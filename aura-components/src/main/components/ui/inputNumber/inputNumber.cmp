@@ -20,7 +20,10 @@
     <aura:attribute name="max" type="Decimal" default="99999999999999" description="Specifies the maximum value allowed. Setting this higher than the default value can result in rounding of the value in some clients. Works with HTML5 only."/>
     <aura:attribute name="min" type="Decimal" default="-99999999999999" description="Specifies the minimum value allowed. Setting this lower than the default value can result in rounding of the value in some clients. Works with HTML5 only."/>
     <aura:attribute name="step" type="Decimal" default="1" description="Specifies the legal intervals. Decimals are allowed, but for maximum client compatibility, only set this to positive integers. Works with HTML5 only."/>
-       
+    <aura:attribute name="format" type="String" description="The format of the number. For example, format=&ldquo;.00&rdquo; displays the number followed by two decimal places. If not specified, the Locale default format will be used."/>
+    
+    <aura:set attribute="doFormat" value="true"/>
+
     <aura:renderif isTrue="{!v.body.length == 0}">
        <input type="{!v.type}" 
        		  id="{!v.domId}"

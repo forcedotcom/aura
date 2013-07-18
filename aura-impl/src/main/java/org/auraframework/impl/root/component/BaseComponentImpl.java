@@ -396,6 +396,9 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
         BaseComponent<?, ?> oldComponent = context.setCurrentComponent(this);
         try {
             String prefix = expr.getRoot();
+            if ("c".equals(prefix)) {
+                prefix.toString();
+            }
             PropertyReference stem = expr.getStem();
 
             Object root = valueProviders.get(prefix);
@@ -467,7 +470,7 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
     protected boolean remoteProvider = false;
     private final Map<String, List<String>> index = Maps.newLinkedHashMap();
     // FIXME - the keys should be ValueProviders, but first we need to wrap non-m/v/c providers.
-    private final Map<String, Object> valueProviders = new LinkedHashMap<String, Object>();
+    protected final Map<String, Object> valueProviders = new LinkedHashMap<String, Object>();
     protected boolean hasLocalDependencies = false;
     protected boolean hasProvidedAttributes;
 }

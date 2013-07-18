@@ -24,6 +24,15 @@
         }
     },
     /**
+     * Positive test case: Assign Negative value for attribute 'value' and special negative format
+     */
+    testNegativeValueWithNegativeFormat:{
+        attributes: {value : -123.936, format:"#.0#;(#.0#)"},
+        test: function(component){
+            aura.test.assertEquals('(123.94)', $A.test.getText(component.find('span').getElement()), "Negative values not displayed correctly.");
+        }
+    },
+    /**
      * Positive test case: Assign Positive value for attribute 'value'.
      */
     testValue: {
@@ -82,6 +91,24 @@
         }
     },
     /**
+     * Verify Rounding up of lots of 9s
+     */
+    testRoundingLotsOfNines: {
+        attributes : {value : 999999.9, format : '#,##0'},
+        test: function(component){
+            aura.test.assertEquals('1,000,000', $A.test.getText(component.find('span').getElement()), "Nines were not rounded up correctly");
+        }
+    },
+    /**
+     * Verify Rounding up of lots of 9s with extra zero padding
+     */
+    testRoundingLotsOfNinesAndZeroPadding: {
+        attributes : {value : 999999.9, format : '00000000'},
+        test: function(component){
+            aura.test.assertEquals('01000000', $A.test.getText(component.find('span').getElement()), "Nines were not round up correctly");
+        }
+    },
+    /**
      * Verify Rounding up of decimal part of value.
      */
     testFormat2DecimalPlaces_RoundUp: {
@@ -118,13 +145,39 @@
         }
     },
     /**
-     * Test big value.
+     * Test big value that is too large for a js number and is represented instead by a string
      */
     //W-952715
     testBigDecimal:{
         attributes : {value : '1234567890123456789012345678901234567890.12', format : '.00'},
         test: function(component){
             aura.test.assertEquals('1234567890123456789012345678901234567890.12', $A.test.getText(component.find('span').getElement()), "Unexpected value.");
+        }
+    },
+
+    /**
+     * Verify that when the value changes it is rerendered with the new value
+     */
+    testUpdateValue: {
+        attributes : {value : 22.7, format : '##,#0,00.00#####'},
+        test: function(component){
+            aura.test.assertEquals('0,22.70', $A.test.getText(component.find('span').getElement()), "Value not formatted correctly");
+            component.getValue("v.value").setValue(49322);
+            $A.rerender(component);
+            aura.test.assertEquals('4,93,22.00', $A.test.getText(component.find('span').getElement()), "Value not updated after changed");
+        }
+    },
+
+    /**
+     * Verify that when the format changes it is rerendered using the new format
+     */
+    testUpdateFormat: {
+        attributes : {value : 22.7, format : '##,#0,00.00#####'},
+        test: function(component){
+            aura.test.assertEquals('0,22.70', $A.test.getText(component.find('span').getElement()), "Value not formatted correctly");
+            component.getValue("v.format").setValue("meh #.#");
+            $A.rerender(component);
+            aura.test.assertEquals('meh 22.7', $A.test.getText(component.find('span').getElement()), "Value not updated after format changed");
         }
     }
 })

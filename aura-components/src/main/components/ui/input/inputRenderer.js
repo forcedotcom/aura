@@ -30,11 +30,23 @@
 	afterRender: function(component, helper) {
         this.superAfterRender();
 		helper.addInputClass(component);
-        helper.addInputDomEvents(component);
+        var concreteCmp = component.getConcreteComponent();
+        var concreteHelper = concreteCmp.getDef().getHelper();
+        concreteHelper.addInputDomEvents(component);
+        if (component.get("v.doFormat")) {
+            var el = concreteHelper.getInputElement(concreteCmp);
+            el.value = concreteHelper.formatValue(concreteCmp);
+        }
     },
     
     rerender: function(component, helper) {
         helper.handleErrors(component);
+        if (component.get("v.doFormat")) {
+            var concreteCmp = component.getConcreteComponent();
+            var concreteHelper = concreteCmp.getDef().getHelper();
+            var el = concreteHelper.getInputElement(concreteCmp);
+            el.value = concreteHelper.formatValue(concreteCmp);
+        }
         this.superRerender();
     }
 })

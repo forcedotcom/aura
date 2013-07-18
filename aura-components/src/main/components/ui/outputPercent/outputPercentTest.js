@@ -15,14 +15,14 @@
  */
 ({
     testPositiveValue: {
-        attributes : {value : 1.145, format : '0000.0'},
+        attributes : {value : 1.145, format : '0000.0%'},
         test: function(component){
             aura.test.assertEquals('0114.5%', $A.test.getText(component.find('span').getElement()), "Percentage not correct");
         }
     },
 
     testNegativeValue: {
-        attributes : {value : -0.14, format : '.000'},
+        attributes : {value : -0.14, format : '.000%'},
         test: function(component){
             aura.test.assertEquals('-14.000%', $A.test.getText(component.find('span').getElement()), "Percentage not correct");
         }
@@ -37,9 +37,9 @@
     },
 
     testUnassignedFormat: {
-        attributes : {value : 0.006},
+        attributes : {value : 0.01},
         test: function(component){
-            aura.test.assertEquals('0.006%', $A.test.getText(component.find('span').getElement()), "Expected default format to be used");
+            aura.test.assertEquals('1%', $A.test.getText(component.find('span').getElement()), "Expected default format to be used");
         }
     },
 
@@ -51,16 +51,52 @@
     },
 
     testRounding: {
-        attributes : {value : 0.14566, format: '0.00'},
+        attributes : {value : 0.14566, format: '0.00%'},
         test: function(component){
             aura.test.assertEquals('14.57%', $A.test.getText(component.find('span').getElement()), "Rounding not correct");
         }
     },
 
     testPrecision: {
-        attributes : {value : .05, format : '.0'},
+        attributes : {value : .05, format : '.0%'},
         test: function(component){
             aura.test.assertEquals('5.0%', $A.test.getText(component.find('span').getElement()), "Percentage not correct");
+        }
+    },
+
+    /**
+     * Verify that the scale is applied
+     */
+    testScale: {
+        attributes : {value : 22.7, valueScale: -2},
+        test: function(component){
+            aura.test.assertEquals('23%', $A.test.getText(component.find('span').getElement()), "Value not formatted correctly");
+        }
+    },
+
+    /**
+     * Verify that when the value changes it is rerendered with the new value
+     */
+    testUpdateValue: {
+        attributes : {value : .227},
+        test: function(component){
+            aura.test.assertEquals('23%', $A.test.getText(component.find('span').getElement()), "Value not formatted correctly");
+            component.getValue("v.value").setValue(965.21);
+            $A.rerender(component);
+            aura.test.assertEquals('96,521%', $A.test.getText(component.find('span').getElement()), "Value not updated after changed");
+        }
+    },
+
+    /**
+     * Verify that when the format changes it is rerendered using the new format
+     */
+    testUpdateFormat: {
+        attributes : {value : .227, format : '#0.#%'},
+        test: function(component){
+            aura.test.assertEquals('22.7%', $A.test.getText(component.find('span').getElement()), "Value not formatted correctly");
+            component.getValue("v.format").setValue("000.00 %");
+            $A.rerender(component);
+            aura.test.assertEquals('022.70 %', $A.test.getText(component.find('span').getElement()), "Value not updated after format changed");
         }
     },
 

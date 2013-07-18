@@ -55,6 +55,7 @@ public class JsonSerializers {
     public static final DateOnlySerializer DATEONLY = new DateOnlySerializer();
     public static final CalendarSerializer CALENDAR = new CalendarSerializer();
     public static final OldSerializer OLD = new OldSerializer();
+    public static final BigDecimalSerializer BIGDECIMAL = new BigDecimalSerializer();
 
     /**
      * two maps full of standard class to serializer mappings
@@ -219,4 +220,20 @@ public class JsonSerializers {
 
     }
 
+    /**
+     * Numbers in JS are only double precision, BigDecimals can overflow and so will be serialized as strings when too large
+     */
+    public static class BigDecimalSerializer extends NoneSerializer<BigDecimal> {
+        public static int MAX_PRECISION = 15;
+        
+        @Override
+        public void serialize(Json json, BigDecimal bd) throws IOException {
+            if (bd.precision() > MAX_PRECISION) {
+                json.writeString(bd);
+            } else {
+                json.writeLiteral(bd);
+            }
+        }
+
+    }
 }

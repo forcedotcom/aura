@@ -15,17 +15,56 @@
  */
 /*jslint sub: true */
 /**
- * @namespace The Aura Localization Service, accessible using $A.localizationService. Manages localization of date and time using Moment.js and WallTime.js.  
+ * @namespace The Aura Localization service Service, accessible using $A.localizationService. Provides utility methods
+ * for localizing data or getting formatters for numbers, currencies, dates, etc.
  * @constructor
  */
 var AuraLocalizationService = function AuraLocalizationService() {
+    var numberFormat, percentFormat, currencyFormat;
     // moment.js and walltime-js must be loaded before we can use date/time related APIs
     var localizationService = {
         cache : {
             format : {},
             langLocale : {}
         },
-        
+
+        formatNumber : function(number) {
+            return this.getDefaultNumberFormat().format(number);
+        },
+
+        formatPercent : function(number) {
+            return this.getDefaultPercentFormat().format(number);
+        },
+
+        formatCurrency : function(number) {
+            return this.getDefaultCurrencyFormat().format(number);
+        },
+
+        getNumberFormat : function(format, symbols) {
+            return new NumberFormat(format, symbols);
+        },
+
+        getDefaultNumberFormat : function() {
+            if (!numberFormat) {
+                numberFormat = new NumberFormat($A.get("$Locale.numberFormat"));
+            }
+            return numberFormat;
+        },
+
+        getDefaultPercentFormat : function() {
+            if (!percentFormat) {
+                percentFormat = new NumberFormat($A.get("$Locale.percentFormat"));
+            }
+            return percentFormat;
+        },
+
+        getDefaultCurrencyFormat : function() {
+            if (!currencyFormat) {
+                currencyFormat = new NumberFormat($A.get("$Locale.currencyFormat"));
+            }
+            return currencyFormat;
+        },
+
         /**
          * Displays a length of time.
          * @param {Duration} d The duration object returned by localizationService.duration
@@ -37,7 +76,7 @@ var AuraLocalizationService = function AuraLocalizationService() {
         displayDuration : function(d, noSuffix) {
             return d["humanize"](noSuffix);
         },
-        
+
         /**
          * Displays a length of time in days.
          * @param {Duration} d The duration object returned by localizationService.duration
@@ -48,7 +87,7 @@ var AuraLocalizationService = function AuraLocalizationService() {
         displayDurationInDays : function(d) {
             return d["asDays"]();
         },
-        
+
         /**
          * Displays a length of time in hours.
          * @param {Duration} d The duration object returned by localizationService.duration
@@ -59,7 +98,7 @@ var AuraLocalizationService = function AuraLocalizationService() {
         displayDurationInHours : function(d) {
             return d["asHours"]();
         },
-        
+
         /**
          * Displays a length of time in milliseconds.
          * @param {Duration} d The duration object returned by localizationService.duration
@@ -70,7 +109,7 @@ var AuraLocalizationService = function AuraLocalizationService() {
         displayDurationInMilliseconds : function(d) {
             return d["asMilliseconds"]();
         },
-        
+
         /**
          * Displays a length of time in minutes.
          * @param {Duration} d The duration object returned by localizationService.duration
@@ -81,7 +120,7 @@ var AuraLocalizationService = function AuraLocalizationService() {
         displayDurationInMinutes : function(d) {
             return d["asMinutes"]();
         },
-        
+
         /**
          * Displays a length of time in months.
          * @param {Duration} d The duration object returned by localizationService.duration
@@ -270,14 +309,6 @@ var AuraLocalizationService = function AuraLocalizationService() {
             }
         },
 
-        formatNumber : function(number, formatter) {
-
-        },
-
-        formatCurrency : function(amount, formatter) {
-
-        },
-        
         /**
          * Gets the number of hours in a duration.
          * @param {Duration} d The duration object returned by localizationService.duration
@@ -357,7 +388,7 @@ var AuraLocalizationService = function AuraLocalizationService() {
         isAfter : function(date1, date2, unit) {
             return moment(date1)["isAfter"](date2, unit);
         },
-        
+
         /**
          * Checks if date1 is before date2.
          * @param {String|Number|Date} date1 A date format that the JavaScript Date object can parse
@@ -398,8 +429,8 @@ var AuraLocalizationService = function AuraLocalizationService() {
         parseDateTime : function(dateTimeString, targetFormat, locale) {
             if (!dateTimeString) {
                 return null;
-            }
-            
+        }
+
             var mDate = moment(dateTimeString, localizationService.getNormalizedFormat(targetFormat), localizationService.getNormalizedLangLocale(locale));
             if (mDate["isValid"]()) {
                 return mDate["toDate"]();
@@ -513,7 +544,7 @@ var AuraLocalizationService = function AuraLocalizationService() {
             }
             return mDate["format"](localizationService.getNormalizedFormat(format));
         },
-        
+
         /**
          * Normalize a Java format string to make it compatible with moment.js
          *
@@ -529,7 +560,7 @@ var AuraLocalizationService = function AuraLocalizationService() {
             }
             return format;
         },
-        
+
         /**
          * Normalize the input Java locale string to moment.js compatible one.
          *
@@ -556,7 +587,7 @@ var AuraLocalizationService = function AuraLocalizationService() {
                 if (!$A.util.isEmpty(langLocale)) {
                     lang.push(langLocale.toLowerCase());
                 }
-        
+
                 var ret = lang[0];
                 if (lang[1]) {
                     var langAndCountry = lang[0] + "-" + lang[1];
@@ -571,7 +602,7 @@ var AuraLocalizationService = function AuraLocalizationService() {
             }
             return localizationService.cache.langLocale[langLocale];
         },
-        
+
         /**
          * retrieve timezone info from server.
          *
@@ -600,7 +631,7 @@ var AuraLocalizationService = function AuraLocalizationService() {
             });
             $A.enqueueAction(a);
         },
-        
+
        /** 
         * @private
         */
@@ -614,14 +645,14 @@ var AuraLocalizationService = function AuraLocalizationService() {
                 timezone = $A.getGlobalValueProviders().get("$Locale.timezone");
                 if (timezone == "GMT" || timezone == "UTC") {
                     return d;
-                }
+        }
                 try {
                     ret = WallTime["WallTimeToUTC"](timezone, d);
                 } catch (ee) {}
             }
             return ret;
         },
-        
+
        /** 
         * @private
         */

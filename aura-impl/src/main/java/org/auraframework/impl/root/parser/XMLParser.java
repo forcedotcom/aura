@@ -53,7 +53,12 @@ public class XMLParser implements Parser {
         xmlInputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, true);
         xmlInputFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
         xmlInputFactory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, false);
-        xmlInputFactory.setProperty("reuse-instance", false);
+        try {
+            xmlInputFactory.setProperty("reuse-instance", false);
+        } catch (IllegalArgumentException e) {
+            //See W-1737863.  This property is specific to SJSXP and not supported or needed by Woodstox
+            //The exception here is a no-op.
+        }
     }
 
     public static XMLParser getInstance() {

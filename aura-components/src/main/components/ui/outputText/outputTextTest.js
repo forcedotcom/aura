@@ -65,10 +65,10 @@
     // W-1075402 https://gus.soma.salesforce.com/a07B0000000GCEAIA4
     _testTrimmingSpaces:{
         attributes: {value: '   '},
-        test: function(component){        	
+        test: function(component){
             aura.test.assertEquals('', $A.test.getText(component.find("span").getElement()), "Failed to trim spaces");
         }
-    },    
+    },
     /**
      * Verify prefix and suffix trimming of space.
      */
@@ -100,7 +100,9 @@
         browsers: ["-IE7", "-IE8"],
         attributes: {value: '\r\n'},
         test: function(component){
-            aura.test.assertEquals('', component.find("span").getElement().textContent, "Failed to convert \r\n\ and \n into <br>");
+        	var tags = component.find("span").getElement().innerHTML;
+			tags = tags.replace(/<!---->/g, '');
+            aura.test.assertEquals('<br>', tags, "Failed to convert \r\n\ and \n into <br>");
         }
     },
     /**
@@ -123,8 +125,10 @@
     testCarriageReturnLineFeeds:{
         browsers: ["-IE7", "-IE8"],
         attributes: {value: '\r\na\r\nb\r\n'},
-        test: function(component){        	
-            aura.test.assertEquals('ab', component.find("span").getElement().textContent, "Failed to convert \r\n\ and \n into <br>");
+        test: function(component){ 
+        	var tags = component.find("span").getElement().innerHTML;
+			tags = tags.replace(/<!---->/g, '');			
+            aura.test.assertEquals('<br>a<br>b<br>', tags, "Failed to convert \r\n\ and \n into <br>");
         }
     }
 })

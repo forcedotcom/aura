@@ -247,11 +247,10 @@
             $A.test.assertEquals("MapValue", setval.toString());
             $A.test.assertEquals(0, this.calculateSize(setval));
             $A.test.assertEquals(false, setval.isDirty());
-
             setval.setValue({y:"just because","z":{"end":"now"}, "never":["a","b"]});
             $A.test.assertEquals("MapValue", setval.toString(), "expected a MapValue");
             $A.test.assertEquals(true, setval.isDirty(), "wrong dirty flag");
-            $A.test.assertEquals(3, this.calculateSize(setval), "expected 2 wrapped values");
+            $A.test.assertEquals(3, this.calculateSize(setval), "expected 3 wrapped values");
 
             var val = setval.getValue("y");
             $A.test.assertEquals("SimpleValue", val.toString(), "first value not wrapped");
@@ -267,6 +266,23 @@
             $A.test.assertEquals(2, this.calculateSize(val), "wrong length for third value");
             $A.test.assertEquals("a", val.get(0), "wrong first value in wrapped third value");
             $A.test.assertEquals("b", val.get(1), "wrong second value in wrapped third value");
+
+            setval.setValue({x: ["a", "b"], y: "foo"});
+            // Old 'never' key's value should have been untouched
+            $A.test.assertFalse(val.isDirty(), "old key wrongly dirtied");
+            $A.test.assertEquals(2, this.calculateSize(val), "old key wrongly emptied");
+            val = setval.getValue("y");
+            $A.test.assertTrue(val.isDirty(), "recycled key from setValue should be dirty");
+            val = setval.getValue("x");
+            $A.test.assertFalse(val.isDirty(), "new key from setValue shouldn't be dirty");
+
+            // Test with destroy and type change
+            setval.setValue({y: {b: 3}}, true);
+            $A.test.assertEquals(0, val.getLength(), "Failed to destroy orphaned subvalue");
+            val = setval.getValue("y");
+            $A.test.assertEquals("MapValue", val.toString());
+            $A.test.assertEquals(3, val.getValue("b").getValue());
+            $A.test.assertTrue(val.isDirty());
         }
     },
 

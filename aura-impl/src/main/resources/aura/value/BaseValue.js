@@ -159,5 +159,24 @@ var BaseValue = {
                 delete handlers[globalId];
             }
         }
+    },
+    
+    /** Figures the type to contain a value */
+    typeFor: function(v) {
+        if (v === undefined || v === null) {
+            return 'SimpleValue';
+        }
+    	if (v.auraType && v.auraType === "Value") {
+    		return v.toString();
+    	} else {
+    		if (v instanceof Array) {
+    			return 'ArrayValue';
+    		} else if (v instanceof Object) {
+    			return 'MapValue';
+    		} else {
+    			return 'SimpleValue';
+    		}
+    	}
+
     }
 };

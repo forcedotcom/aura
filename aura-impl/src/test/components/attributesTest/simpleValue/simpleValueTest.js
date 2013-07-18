@@ -49,7 +49,6 @@
             }
             $A.test.assertTrue($A.util.instanceOf(valueObj, simpleValue),
                      "$A.util.instanceOf says strAttribute is not a SimpleValue");
-            debugger;
             $A.test.assertTrue($A.util.instanceOf(valueObj, attributeValue),
                     "$A.util.instanceOf says strAttribute is not an AttributeValue");
             $A.test.assertFalse($A.util.instanceOf(valueObj, mapValue),

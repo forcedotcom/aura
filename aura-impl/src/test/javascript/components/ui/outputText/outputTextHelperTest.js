@@ -47,15 +47,15 @@ Test.Ui.OutputText.HelperTest = function(){
 		[Fact]
         function testNullElement(){
         	// Arrange
-        	var expected = '';
+        	var expected = undefined;
 			
             // Act
 			mockDocument(function(){
-				targetHelper.appendTextElements('1234', null);
+				actual = targetHelper.appendTextElements('1234', null);
 			});
 
             // Assert
-            Assert.Equal('', actual);            
+            Assert.Equal(expected, actual);            
         }
 		
         [Fact]
@@ -89,7 +89,7 @@ Test.Ui.OutputText.HelperTest = function(){
             // Assert
             Assert.Equal(expected, actual);            
         }
-        /*
+        
         [Fact]
         function testTextWithNewLineInbetween(){
         	// Arrange
@@ -185,7 +185,7 @@ Test.Ui.OutputText.HelperTest = function(){
             // Assert
             Assert.Equal(expected, actual);            
         }
-        */
+        
         
         [Fact]
         function testBoolean(){

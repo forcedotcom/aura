@@ -736,7 +736,7 @@
 					if (that.options.onBeforeScrollMove)
 						that.options.onBeforeScrollMove.call(that, e);
 					
-					if (e.defaultPrevented) {
+					if (!e.ignorePreventDefault && e.defaultPrevented) {
 						return;
 					}
 

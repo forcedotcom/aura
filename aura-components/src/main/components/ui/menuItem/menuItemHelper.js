@@ -132,7 +132,7 @@
     setDisabled : function(component) {
     	var concreteCmp = component.getConcreteComponent();
         var linkCmp = concreteCmp.find("link");
-        var elem = linkCmp.getElement();
+        var elem = linkCmp ? linkCmp.getElement() : null;
         if (elem) {
             var disabled = concreteCmp.get("v.disabled");
             if (disabled === true) {
@@ -148,7 +148,7 @@
     setFocus: function(component) {
         var concreteCmp = component.getConcreteComponent();
         var linkCmp = concreteCmp.find("link");
-        var elem = linkCmp.getElement();
+        var elem = linkCmp ? linkCmp.getElement() : null;
         if (elem && elem.focus) {
             elem.focus();
         }

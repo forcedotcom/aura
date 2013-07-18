@@ -99,7 +99,7 @@ public class BrowserLocaleHttpTest extends AuraHttpTestCase {
         getValueByLocale("de-DE", "123.456.789,00 €", urlAuraParameters);
         getValueByLocale("en-GB", "£1,234,567.89", urlAuraParameters);
     }
-
+    
     public void testOutputCurrencyCmpWithInvalidLocale() throws Exception {
         try {
             Double unlocalizedValue = 1234567.89;

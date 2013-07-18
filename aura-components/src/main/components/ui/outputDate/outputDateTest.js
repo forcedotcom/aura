@@ -115,6 +115,19 @@
     },
     
     /**
+     * Verify behavior when 'langLocale' attribute is changed and component is rerendered.
+     */
+    testChangeLangLocale: {
+        attributes: {value : '2004-09-23', format: 'MMM d, yyyy', langLocale: 'en'},
+        test: function(component){
+            aura.test.assertEquals("Sep 23, 2004", $A.test.getText(component.find('span').getElement()), "Dates are not the same and they should be");
+            component.getValue("v.langLocale").setValue("fr");
+            $A.rerender(component);
+            aura.test.assertEquals("sept. 23, 2004", $A.test.getText(component.find('span').getElement()), "Dates are not the same and they should be");
+      }
+    },
+    
+    /**
      * Verify behavior when 'langLocale' attribute is assigned an empty string.
      */
     testEmptyLangLocale:{

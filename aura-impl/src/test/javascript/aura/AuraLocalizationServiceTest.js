@@ -2050,4 +2050,5 @@ Test.Aura.AuraLocalizationServiceTest = function(){
             Assert.Equal(expected, actual);
         }
     }
+
 }

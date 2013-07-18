@@ -21,8 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.google.common.collect.Lists;
-
 import junit.framework.Assert;
 
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -39,6 +37,7 @@ import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 
 /**
  * A place to put common UI testing specific helper methods
@@ -148,6 +147,12 @@ public class AuraUITestingUtil {
         Object status;
         status = getEval(javascript, args);
 
+        // Special case for weird behavior with ios-driver returning 'ok' instead of true or false. Appears to be an
+        // ios-driver bug. Return false so we can retry executing the js instead of erroring out.
+        if (status instanceof String && status.equals("ok")) {
+            return false;
+        }
+
         if (status == null) {
             Assert.fail("Got a null status for " + javascript + "(" + args + ")");
         }
@@ -175,7 +180,7 @@ public class AuraUITestingUtil {
          * javascript errors here, but on passing cases this should behave the same functionally. See W-1481593.
          */
         if (driver instanceof RemoteWebDriver
-                && ((RemoteWebDriver) driver).getCapabilities().getBrowserName().equals("android")) {
+                && "android".equals(((RemoteWebDriver) driver).getCapabilities().getBrowserName())) {
             return getRawEval(javascript, args);
         }
 
@@ -320,15 +325,16 @@ public class AuraUITestingUtil {
      * @return
      */
     public WebElement findDomElement(final By locator) {
-    	List<WebElement> elements = findDomElements(locator);
-    	if (elements != null) {
-    		return elements.get(0);
-    	}
-    	return null;
+        List<WebElement> elements = findDomElements(locator);
+        if (elements != null) {
+            return elements.get(0);
+        }
+        return null;
     }
-    
+
     /**
      * Find matching elements in the DOM.
+     * 
      * @param locator
      * @return
      */
@@ -343,8 +349,8 @@ public class AuraUITestingUtil {
                     elements = driver.findElements(locator);
                 }
                 try {
-                	if (elements.size() > 0 && 
-                			getBooleanEval("return arguments[0].ownerDocument === document", elements.get(0))) {
+                    if (elements.size() > 0 &&
+                            getBooleanEval("return arguments[0].ownerDocument === document", elements.get(0))) {
                         return elements;
                     }
                 } catch (StaleElementReferenceException e) {
@@ -407,7 +413,7 @@ public class AuraUITestingUtil {
         waitUntil(new ExpectedCondition<Boolean>() {
             @Override
             public Boolean apply(WebDriver d) {
-                return (Boolean) getRawEval("return document.readyState === 'complete'");
+                return getBooleanEval("return document.readyState === 'complete'");
             }
         });
     }
@@ -419,7 +425,7 @@ public class AuraUITestingUtil {
      */
     public void waitForAuraFrameworkReady(final Set<String> expectedErrors) {
         // Umbrella check for any framework load error.
-        if (!(Boolean) getRawEval("return !!window.$A")) {
+        if (!getBooleanEval("return !!window.$A")) {
             Assert.fail("Initialization error: document loaded without $A. Perhaps the initial GET failed.");
         }
 
@@ -488,45 +494,45 @@ public class AuraUITestingUtil {
             }
         });
     }
+
     /**
      * Method of exposing accessibility tool to be exposed for testing purposes
      * 
-     * @return ArrayList - either 0,1, or 2. 
+     * @return ArrayList - either 0,1, or 2.
      *                            Position 0: Indicates there were no errors
      *                            Position 1: Indicates that there were errors
      *                            Position 2: Indicates that something unexpected happened.
      */
-    public ArrayList<String> doAccessibilityCheck(){
-        String jsString = "return ((window.$A != null || window.$A !=undefined) && (!$A.util.isUndefinedOrNull($A.devToolService)))? "+
-                            "window.$A.devToolService.checkAccessibility() : \"Aura is not Present\"";
-        
+    public ArrayList<String> doAccessibilityCheck() {
+        String jsString = "return ((window.$A != null || window.$A !=undefined) && (!$A.util.isUndefinedOrNull($A.devToolService)))? "
+                + "window.$A.devToolService.checkAccessibility() : \"Aura is not Present\"";
+
         String result = (String) getEval(jsString);
 
         ArrayList<String> resultList = new ArrayList<String>();
         String output = "";
-        
-        //No errors
-        if(result.equals("") || result.equals("Total Number of Errors found: 0")){
+
+        // No errors
+        if (result.equals("") || result.equals("Total Number of Errors found: 0")) {
             output = "0";
-        }
-        else if(result.contains("Total Number of Errors found")){
+        } else if (result.contains("Total Number of Errors found")) {
             output = "1";
-        }
-        else{
+        } else {
             output = "2";
         }
-        
+
         resultList.add(output);
         resultList.add(result);
-        return resultList;        
+        return resultList;
     }
+
     public void assertAccessible() {
         getEval("$A.test.assertAccessible()");
 
     }
-    
+
     public String getUniqueIdOfFocusedElement() {
-    	return (String) getEval("return $A.test.getActiveElement().getAttribute('data-aura-rendered-by')");
+        return (String) getEval("return $A.test.getActiveElement().getAttribute('data-aura-rendered-by')");
     }
 
     public void assertClassesSame(String message, String expectedClasses, String actualClasses) {
@@ -541,7 +547,7 @@ public class AuraUITestingUtil {
                 extra.add(x);
             }
         }
-        Assert.assertTrue(message+": Mismatched classes extra = "+extra+", missing="+expected,
-            extra.size() == 0 && expected.size() == 0);
+        Assert.assertTrue(message + ": Mismatched classes extra = " + extra + ", missing=" + expected,
+                extra.size() == 0 && expected.size() == 0);
     }
 }

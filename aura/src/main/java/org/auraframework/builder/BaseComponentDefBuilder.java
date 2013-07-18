@@ -20,10 +20,12 @@ import org.auraframework.def.BaseComponentDef.RenderType;
 import org.auraframework.def.BaseComponentDef.WhitespaceBehavior;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ControllerDef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.ModelDef;
 import org.auraframework.def.RendererDef;
 import org.auraframework.def.StyleDef;
+import org.auraframework.def.ThemeDef;
 
 /**
  */
@@ -51,4 +53,6 @@ public interface BaseComponentDefBuilder<T extends BaseComponentDef> extends Roo
     BaseComponentDefBuilder<T> setWhitespaceBehavior(WhitespaceBehavior whitespaceBehavior);
 
     BaseComponentDefBuilder<T> setFacet(String key, Object value);
+
+    BaseComponentDefBuilder<T> addThemeAlias(String alias, DefDescriptor<ThemeDef> descriptor);
 }

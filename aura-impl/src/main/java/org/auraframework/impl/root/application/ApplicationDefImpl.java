@@ -18,10 +18,13 @@ package org.auraframework.impl.root.application;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.auraframework.Aura;
 import org.auraframework.builder.ApplicationDefBuilder;
+import org.auraframework.css.parser.ThemeOverrideMap;
 import org.auraframework.def.ActionDef;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ControllerDef;
@@ -29,11 +32,14 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.LayoutsDef;
 import org.auraframework.def.SecurityProviderDef;
+import org.auraframework.def.ThemeDef;
 import org.auraframework.expression.Expression;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.AuraImpl;
+import org.auraframework.impl.css.parser.ThemeOverrideMapImpl;
 import org.auraframework.impl.root.component.BaseComponentDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.impl.util.TextTokenizer;
 import org.auraframework.instance.Action;
 import org.auraframework.system.AuraContext;
@@ -43,12 +49,13 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
+import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 /**
- * The definition of an Application. Holds all information about a given type of
- * application. ApplicationDefs are immutable singletons per type of
- * Application. Once they are created, they can only be replaced, never changed.
+ * The definition of an Application. Holds all information about a given type of application. ApplicationDefs are
+ * immutable singletons per type of Application. Once they are created, they can only be replaced, never changed.
  */
 public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> implements ApplicationDef {
 
@@ -72,6 +79,14 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
         this.isAppcacheEnabled = builder.isAppcacheEnabled;
         this.additionalAppCacheURLs = builder.additionalAppCacheURLs;
         this.isOnePageApp = builder.isOnePageApp;
+
+        if (builder.themeOverrides != null && !builder.themeOverrides.isEmpty()) {
+            this.themeOverrides = new ThemeOverrideMapImpl(builder.themeOverrides, getLocation());
+        } else {
+            this.themeOverrides = null;
+        }
+
+        this.hashCode = AuraUtil.hashCode(super.hashCode(), themeOverrides);
     }
 
     public static class Builder extends BaseComponentDefImpl.Builder<ApplicationDef> implements ApplicationDefBuilder {
@@ -83,6 +98,7 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
         public Boolean isOnePageApp;
         public DefDescriptor<SecurityProviderDef> securityProviderDescriptor;
         public String additionalAppCacheURLs;
+        public Map<DefDescriptor<ThemeDef>, DefDescriptor<ThemeDef>> themeOverrides;
 
         public Builder() {
             super(ApplicationDef.class);
@@ -113,6 +129,15 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
             } else {
                 this.securityProviderDescriptor = null;
             }
+            return this;
+        }
+
+        @Override
+        public ApplicationDefBuilder addThemeOverride(DefDescriptor<ThemeDef> original, DefDescriptor<ThemeDef> override) {
+            if (themeOverrides == null) {
+                themeOverrides = Maps.newHashMap();
+            }
+            themeOverrides.put(original, override);
             return this;
         }
     }
@@ -174,6 +199,13 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
         if (layoutsDefDescriptor != null) {
             dependencies.add(layoutsDefDescriptor);
         }
+
+        if (themeOverrides != null) {
+            for (Entry<DefDescriptor<ThemeDef>, DefDescriptor<ThemeDef>> entry : themeOverrides.map().entrySet()) {
+                dependencies.add(entry.getKey());
+                dependencies.add(entry.getValue());
+            }
+        }
     }
 
     @Override
@@ -191,12 +223,14 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
         List<String> urls = Collections.emptyList();
 
         if (additionalAppCacheURLs != null) {
-            Expression expression = AuraImpl.getExpressionAdapter().buildExpression(TextTokenizer.unwrap(additionalAppCacheURLs), null);
+            Expression expression = AuraImpl.getExpressionAdapter().buildExpression(
+                    TextTokenizer.unwrap(additionalAppCacheURLs), null);
             if (!(expression instanceof PropertyReference)) {
-                throw new AuraRuntimeException("Value of 'additionalAppCacheURLs' attribute must be a reference to a server Action");
+                throw new AuraRuntimeException(
+                        "Value of 'additionalAppCacheURLs' attribute must be a reference to a server Action");
             }
 
-            PropertyReference ref = (PropertyReference)expression;
+            PropertyReference ref = (PropertyReference) expression;
             ref = ref.getStem();
 
             ControllerDef controllerDef = getControllerDef();
@@ -246,6 +280,15 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
         }
         // Will throw quickfix exception if not found.
         securityProviderDesc.getDef();
+
+        // theme overrides
+        if (themeOverrides != null) {
+            themeOverrides.validate();
+            for (Entry<DefDescriptor<ThemeDef>, DefDescriptor<ThemeDef>> entry : themeOverrides.map().entrySet()) {
+                entry.getKey().getDef().validateReferences();
+                entry.getValue().getDef().validateReferences();
+            }
+        }
     }
 
     @Override
@@ -269,11 +312,34 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
         return securityProviderDescriptor;
     }
 
+    @Override
+    public ThemeOverrideMap getThemeOverrides() {
+        return themeOverrides;
+    }
+
+    @Override
+    public int hashCode() {
+        return hashCode;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof ApplicationDefImpl) {
+            ApplicationDefImpl other = (ApplicationDefImpl) obj;
+
+            return super.equals(obj)
+                    && Objects.equal(this.themeOverrides, other.themeOverrides);
+        }
+
+        return false;
+    }
 
     private final DefDescriptor<EventDef> locationChangeEventDescriptor;
     private final DefDescriptor<LayoutsDef> layoutsDefDescriptor;
     private final Access access;
     private final DefDescriptor<SecurityProviderDef> securityProviderDescriptor;
+    private final ThemeOverrideMap themeOverrides;
+    private final int hashCode;
 
     private final Boolean isAppcacheEnabled;
     private final String additionalAppCacheURLs;
@@ -281,4 +347,5 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
     private final Boolean isOnePageApp;
 
     private static final long serialVersionUID = 9044177107921912717L;
+
 }

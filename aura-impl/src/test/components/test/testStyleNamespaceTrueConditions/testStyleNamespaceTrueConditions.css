@@ -72,28 +72,6 @@
 /**
  * Miscellaneous rules
  */
-@if (WEBKIT) {
-	@if (IE6) {
-    	.THIS .stackOrder {
-    		z-index: 100;
-    	}
-  	} 
-  	@elseif (IE7) {
-    	.THIS .stackOrder {
-    		z-index: 200;
-    	}
-  	}
-  	@elseif (IE8) {
-    	.THIS .stackOrder {
-    		z-index: 300;
-    	}
-  	} 
-  	@else {
-    	.THIS .stackOrder {
-    		z-index: 400;
-    	}
-  	}
-}
 
 
 @if (WEBKIT) {

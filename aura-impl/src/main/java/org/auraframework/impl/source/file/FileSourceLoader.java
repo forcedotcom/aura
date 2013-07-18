@@ -85,6 +85,7 @@ public class FileSourceLoader extends BaseSourceLoader {
         filters.put(DefType.STYLE, new SourceFileFilter(DefType.STYLE));
         filters.put(DefType.LAYOUTS, new SourceFileFilter(DefType.LAYOUTS));
         filters.put(DefType.NAMESPACE, new SourceFileFilter(DefType.NAMESPACE));
+        filters.put(DefType.THEME, new SourceFileFilter(DefType.THEME));
     }
 
     public FileSourceLoader(File base) {
@@ -101,9 +102,8 @@ public class FileSourceLoader extends BaseSourceLoader {
     }
 
     /**
-     * Add a root directory to monitor for changes
-     * Synchronized due to updating single static monitor.
-     * This should be called rarely (only on encountering a new namespace) and have no performance impact
+     * Add a root directory to monitor for changes Synchronized due to updating single static monitor. This should be
+     * called rarely (only on encountering a new namespace) and have no performance impact
      *
      * @param dirName - name of a root directory to monitor
      */
@@ -161,9 +161,8 @@ public class FileSourceLoader extends BaseSourceLoader {
     }
 
     /**
-     * Returns a list of the namespaces for which this SourceLoader is
-     * authoritative. The names of all subdirectories of the base are included.
-     * Empty folders will be skipped.
+     * Returns a list of the namespaces for which this SourceLoader is authoritative. The names of all subdirectories of
+     * the base are included. Empty folders will be skipped.
      *
      * @return List of names of namespaces that this SourceLoader handles.
      */
@@ -215,12 +214,10 @@ public class FileSourceLoader extends BaseSourceLoader {
     /**
      * Find the set of files that match the filter.
      *
-     * This will recursively walk a set of directories to find all files that
-     * matche the filter, in any directory.
+     * This will recursively walk a set of directories to find all files that matche the filter, in any directory.
      *
      * @param file the base directory to search.
-     * @param files the set of files to return (can be null, in which case we
-     *            walk, but do not return anything)
+     * @param files the set of files to return (can be null, in which case we walk, but do not return anything)
      * @param filter the filter to call on each file/directory.
      */
     protected static void findFiles(File file, Set<File> files, FileFilter filter) {
@@ -283,8 +280,8 @@ public class FileSourceLoader extends BaseSourceLoader {
     /**
      * This is a twisted filter that actually does the work as it progresses.
      *
-     * We need to do this because we don't know a-priory what the types are, and
-     * rather than redo all of that work, we can simply do what we need to here.
+     * We need to do this because we don't know a-priory what the types are, and rather than redo all of that work, we
+     * can simply do what we need to here.
      */
     private static class AnyTypeFilter implements FileFilter {
         private final DescriptorFilter dm;
@@ -306,8 +303,7 @@ public class FileSourceLoader extends BaseSourceLoader {
         /**
          * Sets the namespace for this instance.
          *
-         * This must be called before this is used as a filter, otherwise it
-         * will fail with a null pointer exception.
+         * This must be called before this is used as a filter, otherwise it will fail with a null pointer exception.
          *
          * @param namespace The namespace.
          */

@@ -28,8 +28,7 @@ import org.auraframework.util.AuraTextUtil;
 import com.google.common.collect.ImmutableSet;
 
 /**
- * Abstract superclass to {@link SourceLoader} implementations, providing common
- * descriptor and filename utilities.ß
+ * Abstract superclass to {@link SourceLoader} implementations, providing common descriptor and filename utilities.
  */
 public abstract class BaseSourceLoader implements SourceLoader {
 
@@ -45,6 +44,7 @@ public abstract class BaseSourceLoader implements SourceLoader {
         extensions.put(DefType.STYLE, ".css");
         extensions.put(DefType.LAYOUTS, "Layouts.xml");
         extensions.put(DefType.NAMESPACE, ".xml");
+        extensions.put(DefType.THEME, ".theme");
         extensions.put(DefType.TESTSUITE, "Test.js");
     }
 

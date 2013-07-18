@@ -38,8 +38,9 @@ import org.auraframework.def.ModelDef;
 import org.auraframework.def.NamespaceDef;
 import org.auraframework.def.ProviderDef;
 import org.auraframework.def.RendererDef;
-import org.auraframework.def.TestSuiteDef;
 import org.auraframework.def.StyleDef;
+import org.auraframework.def.TestSuiteDef;
+import org.auraframework.def.ThemeDef;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.system.Source;
 import org.auraframework.system.SourceListener.SourceMonitorEvent;
@@ -302,7 +303,8 @@ public class StringSourceLoader implements SourceLoader {
         PROVIDER(ProviderDef.class, Format.JS, DefDescriptor.JAVASCRIPT_PREFIX, "."),
         RENDERER(RendererDef.class, Format.JS, DefDescriptor.JAVASCRIPT_PREFIX, "."),
         STYLE(StyleDef.class, Format.CSS, DefDescriptor.CSS_PREFIX, "."),
-        TESTSUITE(TestSuiteDef.class, Format.JS, DefDescriptor.JAVASCRIPT_PREFIX, ".");
+        TESTSUITE(TestSuiteDef.class, Format.JS, DefDescriptor.JAVASCRIPT_PREFIX, "."),
+        THEME(ThemeDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":");
 
         private static Map<Class<? extends Definition>, DescriptorInfo> infoMap;
 

@@ -15,6 +15,9 @@
  */
 package org.auraframework.def;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -326,6 +329,15 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         if (!expected.containsAll(dependencies)) {
             fail(String.format("extra dependencies - EXPECTED: %s, ACTUAL: %s", expected, dependencies));
         }
+    }
+
+    public void testThemeAliasDependencies() throws QuickFixException {
+        DefDescriptor<ThemeDef> theme = addSourceAutoCleanup(ThemeDef.class, "<aura:theme/>");
+        DefDescriptor<ComponentDef> cmp = addSourceAutoCleanup(ComponentDef.class,
+                String.format("<aura:component themeAlias=\"var=%s\"></aura:component>", theme.getDescriptorName()));
+        Set<DefDescriptor<?>> dependencies = Sets.newHashSet();
+        cmp.getDef().appendDependencies(dependencies);
+        assertThat(dependencies.contains(theme), is(true));
     }
 
     /**

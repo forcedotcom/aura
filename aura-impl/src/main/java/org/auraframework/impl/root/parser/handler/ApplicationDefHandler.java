@@ -28,6 +28,7 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.LayoutsDef;
+import org.auraframework.def.ThemeDef;
 import org.auraframework.impl.root.DependencyDefImpl;
 import org.auraframework.impl.root.application.ApplicationDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
@@ -36,6 +37,7 @@ import org.auraframework.service.DefinitionService;
 import org.auraframework.service.InstanceService;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraError;
+import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
@@ -56,6 +58,7 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
             XMLStreamReader xmlReader) {
         super(applicationDefDescriptor, source, xmlReader);
         appBuilder = (ApplicationDefImpl.Builder) builder;
+        appBuilder.themeOverrides = Maps.newHashMap();
     }
 
     @Override
@@ -75,7 +78,7 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
 
     /**
      * Allows embedded script tags by default in applications
-     *
+     * 
      * @return - return true if your instance should allow embedded script tags in HTML
      */
     @Override
@@ -140,6 +143,32 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
         } else {
             appBuilder.isOnePageApp = false;
         }
+
+        // theme overrides
+        String themeOverrideNames = getAttributeValue(ATTRIBUTE_THEME_OVERRIDES);
+        if (!AuraTextUtil.isNullEmptyOrWhitespace(themeOverrideNames)) {
+
+            DefinitionService defService = Aura.getDefinitionService();
+
+            for (String overrideString : AuraTextUtil.splitSimple(",", themeOverrideNames)) {
+                List<String> parts = AuraTextUtil.splitSimple("=", overrideString);
+                if (parts.size() != 2) {
+                    throw new AuraRuntimeException(String.format(THEME_FORMAT, overrideString), getLocation());
+                }
+
+                String original = parts.get(0);
+                String override = parts.get(1);
+
+                if (AuraTextUtil.isEmptyOrWhitespace(original) || AuraTextUtil.isEmptyOrWhitespace(override)) {
+                    throw new AuraRuntimeException(String.format(THEME_FORMAT, overrideString), getLocation());
+                }
+
+                DefDescriptor<ThemeDef> originalDescriptor = defService.getDefDescriptor(original, ThemeDef.class);
+                DefDescriptor<ThemeDef> overrideDescriptor = defService.getDefDescriptor(override, ThemeDef.class);
+
+                appBuilder.addThemeOverride(originalDescriptor, overrideDescriptor);
+            }
+        }
     }
 
     @Override
@@ -158,7 +187,6 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
         }
     }
 
-
     private static final String ATTRIBUTE_PRELOAD = "preload";
     private static final String ATTRIBUTE_LAYOUTS = "layouts";
     private static final String ATTRIBUTE_LOCATION_CHANGE_EVENT = "locationChangeEvent";
@@ -167,9 +195,13 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
     private static final String ATTRIBUTE_APPCACHE_ENABLED = "useAppcache";
     private static final String ATTRIBUTE_ADDITIONAL_APPCACHE_URLS = "additionalAppCacheURLs";
     private static final String ATTRIBUTE_IS_ONE_PAGE_APP = "isOnePageApp";
+    private static final String ATTRIBUTE_THEME_OVERRIDES = "themeOverrides";
+
+    private static final String THEME_FORMAT = "Invalid themeOverrides format '%s'. Try rewriting like theme1=theme2";
 
     private final static Set<String> ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>()
             .add(ATTRIBUTE_PRELOAD, ATTRIBUTE_LAYOUTS, ATTRIBUTE_LOCATION_CHANGE_EVENT, ATTRIBUTE_PRELOAD,
-                    ATTRIBUTE_ACCESS, ATTRIBUTE_SECURITY_PROVIDER, ATTRIBUTE_APPCACHE_ENABLED, ATTRIBUTE_ADDITIONAL_APPCACHE_URLS,
-                    ATTRIBUTE_IS_ONE_PAGE_APP).addAll(BaseComponentDefHandler.ALLOWED_ATTRIBUTES).build();
+                    ATTRIBUTE_ACCESS, ATTRIBUTE_SECURITY_PROVIDER, ATTRIBUTE_APPCACHE_ENABLED,
+                    ATTRIBUTE_ADDITIONAL_APPCACHE_URLS, ATTRIBUTE_IS_ONE_PAGE_APP, ATTRIBUTE_THEME_OVERRIDES)
+            .addAll(BaseComponentDefHandler.ALLOWED_ATTRIBUTES).build();
 }

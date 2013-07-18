@@ -35,7 +35,6 @@ import org.auraframework.service.InstanceService;
 import org.auraframework.service.RenderingService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.system.Client;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.javascript.Literal;
@@ -69,8 +68,7 @@ public abstract class BaseComponentHTMLFormatAdapter<T extends BaseComponent<?, 
             writeHtmlScripts(AuraServlet.getScripts(), sb);
             DefDescriptor<StyleDef> styleDefDesc = templateDef.getStyleDescriptor();
             if (styleDefDesc != null) {
-                Client.Type type = context.getClient().getType();
-                attributes.put("auraInlineStyle", styleDefDesc.getDef().getCode(type));
+                attributes.put("auraInlineStyle", styleDefDesc.getDef().getCode());
             }
 
             String contextPath = context.getContextPath();

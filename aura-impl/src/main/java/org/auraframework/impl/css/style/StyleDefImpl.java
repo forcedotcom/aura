@@ -16,21 +16,28 @@
 package org.auraframework.impl.css.style;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.auraframework.Aura;
 import org.auraframework.builder.StyleDefBuilder;
+import org.auraframework.css.parser.ThemeValueProvider;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.NamespaceDef;
 import org.auraframework.def.StyleDef;
-import org.auraframework.http.AuraResourceServlet;
 import org.auraframework.impl.system.DefinitionImpl;
+import org.auraframework.instance.Component;
 import org.auraframework.system.AuraContext;
-import org.auraframework.system.Client;
+import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Maps;
 
 /**
  * FIXME - barely implemented #W-690042
@@ -38,35 +45,67 @@ import org.auraframework.util.json.Json;
 public class StyleDefImpl extends DefinitionImpl<StyleDef> implements StyleDef {
 
     private static final long serialVersionUID = 7140896215068458158L;
-    private final String code;
-    private final Map<Client.Type, String> browserCode;
+
     private final String className;
-    private final Set<String> imageURLs;
-    private final Set<String> validImageURLs;
+    private final List<ComponentDefRef> components;
+    private final Set<String> themeReferences;
 
     protected StyleDefImpl(Builder builder) {
         super(builder);
-        this.code = builder.code;
-        // TODO: guava will have ImmutableEnumMap in v14
-        this.browserCode = builder.browserCode;
         this.className = builder.className;
-        if (builder.imageURLs == null) {
-            this.imageURLs = Collections.emptySet();
+
+        if (builder.components == null) {
+            this.components = ImmutableList.of();
         } else {
-            this.imageURLs = builder.imageURLs;
+            this.components = builder.components;
         }
-        this.validImageURLs = validateImageURLs(builder.imageURLs);
+
+        if (builder.themeReferences == null) {
+            this.themeReferences = ImmutableSet.of();
+        } else {
+            this.themeReferences = builder.themeReferences;
+        }
     }
 
     @Override
-    public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
-        dependencies.add(Aura.getDefinitionService().getDefDescriptor(descriptor.getNamespace(),
-                NamespaceDef.class));
+    public void appendDependencies(Set<DefDescriptor<?>> dependencies) throws QuickFixException {
+        dependencies.add(Aura.getDefinitionService().getDefDescriptor(descriptor.getNamespace(), NamespaceDef.class));
+
+        // dependencies from theme variables in the css file
+        if (!themeReferences.isEmpty()) {
+            ThemeValueProvider vp = Aura.getStyleAdapter().getThemeValueProvider();
+            for (String reference : themeReferences) {
+                dependencies.addAll(vp.getDescriptors(reference, getLocation(), true));
+            }
+        }
+    }
+
+    @Override
+    public void validateReferences() throws QuickFixException {
+        super.validateReferences();
+
+        // references to themedefs
+        if (!themeReferences.isEmpty()) {
+            String descriptorName = String.format("%s:%s", descriptor.getNamespace(), descriptor.getName());
+            ThemeValueProvider vp = Aura.getStyleAdapter().getThemeValueProvider(descriptorName);
+            for (String reference : themeReferences) {
+                vp.getValue(reference, getLocation()); // get value will validate it's a valid variable
+            }
+        }
     }
 
     @Override
     public String getCode() {
-        return code;
+        Map<String, Object> attributes = Maps.newHashMap();
+        attributes.put("body", components);
+        try {
+            Component cmp = Aura.getInstanceService().getInstance("aura:styleDef", ComponentDef.class, attributes);
+            StringBuilder sb = new StringBuilder();
+            Aura.getRenderingService().render(cmp, sb);
+            return sb.toString();
+        } catch (Exception e) {
+            throw new AuraRuntimeException(e);
+        }
     }
 
     @Override
@@ -76,16 +115,19 @@ public class StyleDefImpl extends DefinitionImpl<StyleDef> implements StyleDef {
         json.writeMapBegin();
         json.writeMapEntry("descriptor", descriptor);
         if (!preloaded) {
-            Client.Type type = context.getClient().getType();
             // Note that if this starts to depend on anything beside the name of
-            // the type,
-            // StyleDefCSSFormatAdapter needs to know to restructure its cache
+            // the type, StyleDefCSSFormatAdapter needs to know to restructure its cache
             // keys
-            String out = getCode(type);
+            String out = getCode();
             json.writeMapEntry("code", out);
         }
         json.writeMapEntry("className", className);
         json.writeMapEnd();
+    }
+
+    @Override
+    public String getClassName() {
+        return className;
     }
 
     public static class Builder extends DefinitionImpl.BuilderImpl<StyleDef> implements StyleDefBuilder {
@@ -94,20 +136,13 @@ public class StyleDefImpl extends DefinitionImpl<StyleDef> implements StyleDef {
             super(StyleDef.class);
         }
 
-        private String code;
         private String className;
-        private Set<String> imageURLs;
-        private Map<Client.Type, String> browserCode;
+        private List<ComponentDefRef> components;
+        private Set<String> themeReferences;
 
         @Override
         public StyleDef build() {
             return new StyleDefImpl(this);
-        }
-
-        @Override
-        public StyleDefBuilder setImageURLs(Set<String> imageURLs) {
-            this.imageURLs = imageURLs;
-            return this;
         }
 
         @Override
@@ -117,52 +152,16 @@ public class StyleDefImpl extends DefinitionImpl<StyleDef> implements StyleDef {
         }
 
         @Override
-        public StyleDefBuilder setCode(String code) {
-            this.code = code;
+        public StyleDefBuilder setComponents(List<ComponentDefRef> components) {
+            this.components = components;
             return this;
         }
 
         @Override
-        public StyleDefBuilder setCode(Map<Client.Type, String> browserCode) {
-            this.browserCode = browserCode;
+        public StyleDefBuilder setThemeReferences(Set<String> themeReferences) {
+            this.themeReferences = themeReferences;
             return this;
         }
-    }
 
-    @Override
-    public String getClassName() {
-        return className;
-    }
-
-    @Override
-    public Set<String> getImageURLs() {
-        return imageURLs;
-    }
-
-    @Override
-    public Set<String> getValidImageURLs() {
-        return validImageURLs;
-    }
-
-    @Override
-    public String getCode(Client.Type type) {
-        if (this.browserCode != null && this.browserCode.containsKey(type)) {
-            return this.browserCode.get(type);
-        } else {
-            return this.code;
-        }
-    }
-
-    private Set<String> validateImageURLs(Set<String> images) {
-        if (images != null) {
-            Set<String> validSet = new HashSet<String>(images.size());
-            for (String imgURL : images) {
-                if (AuraResourceServlet.isResourceLocallyAvailable(imgURL)) {
-                    validSet.add(imgURL);
-                }
-            }
-            return validSet;
-        }
-        return Collections.emptySet();
     }
 }

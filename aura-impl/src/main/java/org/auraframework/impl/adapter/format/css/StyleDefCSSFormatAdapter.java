@@ -24,9 +24,7 @@ import javax.annotation.concurrent.ThreadSafe;
 
 import org.auraframework.Aura;
 import org.auraframework.def.StyleDef;
-import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.system.Client;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
@@ -44,12 +42,10 @@ public class StyleDefCSSFormatAdapter extends CSSFormatAdapter<StyleDef> {
 
     @Override
     public void writeCollection(Collection<? extends StyleDef> values, Appendable out) throws IOException,
-            QuickFixException {
+    QuickFixException {
         Mode mode = Aura.getContextService().getCurrentContext().getMode();
         boolean compress = !(mode.isDevMode() || mode.isTestMode());
-        AuraContext context = Aura.getContextService().getCurrentContext();
         StringBuilder sb = new StringBuilder();
-        Client.Type type = context.getClient().getType();
         Appendable accum;
 
         if (compress) {
@@ -60,7 +56,7 @@ public class StyleDefCSSFormatAdapter extends CSSFormatAdapter<StyleDef> {
         }
         for (StyleDef def : values) {
             if (def != null) {
-                accum.append(def.getCode(type));
+                accum.append(def.getCode());
             }
         }
         if (compress) {

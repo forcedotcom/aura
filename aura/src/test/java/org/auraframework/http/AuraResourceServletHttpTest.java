@@ -21,7 +21,6 @@ import java.util.Calendar;
 
 import org.apache.http.Header;
 import org.apache.http.HttpHeaders;
-
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpGet;
@@ -33,9 +32,8 @@ import org.auraframework.test.annotation.UnAdaptableTest;
 import org.auraframework.util.AuraTextUtil;
 
 /**
- * Automation to verify the functioning of AuraResourceServlet.
- * AuraResourceServlet is used to preload definitions of components in a given
- * namespace. It is also used to load CSS
+ * Automation to verify the functioning of AuraResourceServlet. AuraResourceServlet is used to preload definitions of
+ * components in a given namespace. It is also used to load CSS
  * 
  * 
  * 
@@ -47,9 +45,8 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
     }
 
     /**
-     * Verify that special characters in CSS file are serialized down to the
-     * client. To make sure they are not replaced with a '?' Automation for
-     * W-1071128
+     * Verify that special characters in CSS file are serialized down to the client. To make sure they are not replaced
+     * with a '?' Automation for W-1071128
      * 
      * @throws Exception
      */
@@ -66,21 +63,16 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
 
         assertEquals(HttpStatus.SC_OK, statusCode);
 
-        char expected = '•';
-        String token = "content: '";
+        String expected = Arrays.toString("•".getBytes());
+        String token = "content:'";
         int start = response.indexOf(token) + token.length();
-
-        // Google closure-stylesheets now encodes unicode characters with the
-        // CSS unicode syntax '\FFFFFF'
-        // as a result, this character is now converted to '\2022' so to verify
-        // it's present, convert it to a char and compare
-        char actual = (char) Integer.parseInt(response.substring(start + 1, response.indexOf('\'', start)), 16);
+        String actual = Arrays.toString(response.substring(start, response.indexOf('\'', start)).getBytes());
         assertEquals(String.format("Failed to see the special character in the CSS file (%s)", url), expected, actual);
     }
 
     /**
-     * Verify that special characters in component mark up are serialized as
-     * part of component definition. Automation for W-1071128
+     * Verify that special characters in component mark up are serialized as part of component definition. Automation
+     * for W-1071128
      * 
      * @throws Exception
      */
@@ -116,7 +108,7 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
         Calendar stamp = Calendar.getInstance();
         stamp.add(Calendar.HOUR, -1);
 
-        Header[] headers = new Header[]{ new BasicHeader(HttpHeaders.IF_MODIFIED_SINCE,
+        Header[] headers = new Header[] { new BasicHeader(HttpHeaders.IF_MODIFIED_SINCE,
                 new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz").format(stamp.getTime())) };
 
         HttpGet get = obtainGetMethod(url, headers);
@@ -140,7 +132,7 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
         Calendar stamp = Calendar.getInstance();
         stamp.add(Calendar.HOUR, -1);
 
-        Header[] headers = new Header[]{ new BasicHeader(HttpHeaders.IF_MODIFIED_SINCE,
+        Header[] headers = new Header[] { new BasicHeader(HttpHeaders.IF_MODIFIED_SINCE,
                 new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz").format(stamp.getTime())) };
 
         HttpGet get = obtainGetMethod(url, headers);
@@ -154,8 +146,7 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
     }
 
     /**
-     * GET with If-Modified-Since header 45 days from now, will return 304 with
-     * empty body.
+     * GET with If-Modified-Since header 45 days from now, will return 304 with empty body.
      */
     @TestLabels("auraSanity")
     public void testGetWithIfModifiedSinceNew() throws Exception {
@@ -163,7 +154,7 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
         Calendar stamp = Calendar.getInstance();
         stamp.add(Calendar.DAY_OF_YEAR, 45);
 
-        Header[] headers = new Header[]{ new BasicHeader(HttpHeaders.IF_MODIFIED_SINCE,
+        Header[] headers = new Header[] { new BasicHeader(HttpHeaders.IF_MODIFIED_SINCE,
                 new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz").format(stamp.getTime())) };
 
         HttpGet get = obtainGetMethod(url, headers);
@@ -177,8 +168,7 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
     }
 
     /**
-     * GET without If-Modified-Since header from an hour ago, will return the
-     * expected resource.
+     * GET without If-Modified-Since header from an hour ago, will return the expected resource.
      */
     @TestLabels("auraSanity")
     public void testGetWithoutIfModifiedSince() throws Exception {

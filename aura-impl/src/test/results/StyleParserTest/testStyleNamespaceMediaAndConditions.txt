@@ -1,0 +1,1 @@
+.testTestStyleNamespaceMediaAndConditions .color{background-color:red}@media screen and (max-width:320px){.testTestStyleNamespaceMediaAndConditions{margin:auto}}.testTestStyleNamespaceMediaAndConditions .color{color:yellow}

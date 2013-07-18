@@ -15,20 +15,24 @@
  */
 package org.auraframework.impl.css.style;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
 import java.util.Set;
 
 import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.NamespaceDef;
 import org.auraframework.def.StyleDef;
+import org.auraframework.def.ThemeDef;
 import org.auraframework.impl.AuraImplTestCase;
+import org.auraframework.impl.root.theme.ThemeDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.test.annotation.UnAdaptableTest;
+import org.auraframework.throwable.quickfix.QuickFixException;
 
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 
 /**
@@ -39,82 +43,6 @@ import com.google.common.collect.Sets;
 public class StyleDefImplTest extends AuraImplTestCase {
     public StyleDefImplTest(String name) {
         super(name);
-    }
-
-    private void assertUrls(Set<String> expected, Set<String> actual) throws Exception {
-        StringBuilder errorMsg = new StringBuilder();
-        if (!actual.containsAll(expected)) {
-            Set<String> missing = Sets.newHashSet(expected);
-            missing.removeAll(actual);
-            errorMsg.append("Missing urls in style: ").append(missing).append('\n');
-        }
-        if (!expected.containsAll(actual)) {
-            Set<String> extras = Sets.newHashSet(actual);
-            extras.removeAll(expected);
-            errorMsg.append("Unexpected urls in style: ").append(extras).append('\n');
-        }
-        if (errorMsg.length() > 0) {
-            fail(errorMsg.toString());
-        }
-    }
-
-    /**
-     * StyleDef without urls.
-     */
-    // TODO: wait for W-1618450 to be resolved
-    public void _testCssWithoutUrls() throws Exception {
-        DefDescriptor<StyleDef> descriptor = DefDescriptorImpl.getInstance("appCache.testApp", StyleDef.class);
-        StyleDef style = descriptor.getDef();
-        assertTrue("Unexpected urls found for style", style.getImageURLs().isEmpty());
-        assertTrue("Unexpected valid urls found for style", style.getValidImageURLs().isEmpty());
-    }
-
-    /**
-     * StyleDef without valid urls. Valid urls are relative and are accessible by HEAD request.
-     */
-    @UnAdaptableTest
-    // Errors for invalid URLs differ, so the unit test result varies from
-    // standalone
-    // TODO: wait for W-1618450 to be resolved
-    public void _testCssWithoutValidUrls() throws Exception {
-        if (Aura.getContextService().isEstablished()) {
-            Aura.getContextService().endContext();
-        }
-        Aura.getContextService().startContext(Mode.DEV, Format.HTML, Access.AUTHENTICATED);
-        DefDescriptor<StyleDef> descriptor = DefDescriptorImpl.getInstance("appCache.unsupportedUrls", StyleDef.class);
-        StyleDef style = descriptor.getDef();
-        assertUrls(ImmutableSet.of("/auraFW/resources/qa/images/imaginary.png", "http://www.facebook.com/ipo.jpg",
-                "http://dummy.salesforce.com/invalidhost", "//dummy.salesforce.com/noprotocol", "http:///nohost",
-                "/auraFW/resources/qa/images/auralogo.png?unrooted"), style.getImageURLs());
-        assertTrue("Unexpected valid urls found for style", style.getValidImageURLs().isEmpty());
-    }
-
-    /**
-     * StyleDef with valid urls. Valid urls are relative and are accessible by HEAD request.
-     */
-    // Cannot run this as a unit test since validating urls involves making a
-    // http connection. See
-    // AppCacheManifestHttpTest for a test that validates that only the valid
-    // URLs are cached.
-    // TODO: wait for W-1618450 to be resolved
-    public void _testCssWithValidUrls() throws Exception {
-        DefDescriptor<StyleDef> descriptor = DefDescriptorImpl.getInstance("appCache.nopreload", StyleDef.class);
-        StyleDef style = descriptor.getDef();
-        assertUrls(ImmutableSet.of("/auraFW/resources/qa/images/s.gif", "/auraFW/resources/qa/images/auralogo.png",
-                " /auraFW/resources/qa/images/auralogo.png?wsstart",
-                "/auraFW/resources/qa/images/auralogo.png?wsend   ", "/auraFW/resources/qa/images/auralogo.png?wsboth",
-                "'/auraFW/resources/qa/images/auralogo.png?singlequotes'",
-                "\"/auraFW/resources/qa/images/auralogo.png?doublequotes\"", "/auraFW/resources/aura/bootstrap.css"),
-                style.getValidImageURLs());
-        assertUrls(ImmutableSet.of("/auraFW/resources/qa/images/imaginary.png", "http://www.facebook.com/ipo.jpg",
-                "http://dummy.salesforce.com/invalidhost", "//dummy.salesforce.com/noprotocol", "http:///nohost",
-                "qa/images/auralogo.png?unrooted", "/auraFW/resources/qa/images/s.gif",
-                "/auraFW/resources/qa/images/auralogo.png)", " /auraFW/resources/qa/images/auralogo.png?wsstart",
-                "/auraFW/resources/qa/images/auralogo.png?wsend   ", "/auraFW/resources/qa/images/auralogo.png?wsboth",
-                "'/auraFW/resources/qa/images/auralogo.png?singlequotes'",
-                "\"/auraFW/resources/qa/images/auralogo.png?doublequotes\"",
-                "/auraFW/resources/qa/images/auralogo.png?myvar", "/auraFW/resources/qa/images/auralogo.png?myurl",
-                "/auraFW/resources/aura/bootstrap.css"), style.getImageURLs());
     }
 
     /**
@@ -141,5 +69,14 @@ public class StyleDefImplTest extends AuraImplTestCase {
         DefDescriptor<NamespaceDef> nsDesc = Aura.getDefinitionService().getDefDescriptor(styleDesc.getNamespace(),
                 NamespaceDef.class);
         assertTrue("NamespaceDef missing from StyleDef dependencies", deps.contains(nsDesc));
+    }
+
+    public void testThemeDependencies() throws QuickFixException {
+        StyleDef def = DefDescriptorImpl.getInstance("themeTest.simple", StyleDef.class).getDef();
+        DefDescriptor<ThemeDef> expected = ThemeDefImpl.descriptor("themeTest:baseTheme");
+
+        Set<DefDescriptor<?>> dependencies = Sets.newHashSet();
+        def.appendDependencies(dependencies);
+        assertThat(dependencies.contains(expected), is(true));
     }
 }

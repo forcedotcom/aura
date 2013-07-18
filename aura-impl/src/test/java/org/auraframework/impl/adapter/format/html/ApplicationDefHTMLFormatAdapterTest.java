@@ -145,7 +145,7 @@ public class ApplicationDefHTMLFormatAdapterTest extends BaseComponentDefHTMLFor
     @ThreadHostileTest("NamespaceDef modification affects namespace")
     public void testCommentsInTemplateCssNotInjectedToPage() throws Exception {
         String css = "/*" + "*Multi line comment" + "*/\n" + "body{" + "background-color: #ededed;"
-                + "font-size: 13px;" + "/**Inline comment*/\n" + "line-height: 1.3;" + "}";
+                + "font-size: 13px;" + "/**Inline comment*/\n" + "line-height: 1.3" + "}";
         DefDescriptor<StyleDef> styleDef = Aura.getDefinitionService().getDefDescriptor(
                 "templateCss://string.thing" + System.currentTimeMillis() + "template", StyleDef.class);
         addSourceAutoCleanup(styleDef, css);
@@ -165,8 +165,7 @@ public class ApplicationDefHTMLFormatAdapterTest extends BaseComponentDefHTMLFor
         assertNotNull(body);
         assertFalse("Comments were not stripped out from template CSS", body.contains("Multi line comment"));
         assertFalse("Inline comments were not stripped our from template CSS", body.contains("Inline comment"));
-        assertTrue("Expected template css not found in serialized response.", body.contains("<style>body {\n"
-                + "  background-color: #ededed;\n" + "  font-size: 13px;\n" + "  line-height: 1.3;\n" + "}\n"
-                + "</style>"));
+        assertTrue("Expected template css not found in serialized response.",
+                body.contains("<style>body{background-color:#ededed;font-size:13px;line-height:1.3}</style>"));
     }
 }

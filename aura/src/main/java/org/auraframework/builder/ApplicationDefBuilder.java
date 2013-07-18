@@ -16,7 +16,9 @@
 package org.auraframework.builder;
 
 import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.LayoutsDef;
+import org.auraframework.def.ThemeDef;
 
 /**
  */
@@ -27,5 +29,7 @@ public interface ApplicationDefBuilder extends BaseComponentDefBuilder<Applicati
     ApplicationDefBuilder setLayouts(LayoutsDef layouts);
 
     ApplicationDefBuilder setSecurityProviderDescriptor(String securityProvider);
+
+    ApplicationDefBuilder addThemeOverride(DefDescriptor<ThemeDef> original, DefDescriptor<ThemeDef> override);
 
 }

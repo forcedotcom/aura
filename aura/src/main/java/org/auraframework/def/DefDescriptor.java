@@ -29,136 +29,142 @@ import org.auraframework.util.json.JsonSerializable;
  * dependencies, descriptors are comparable by their qualified name
  * (case-insensitively).
  * 
- * @param <T> the more specific subtype of definition being described, e.g.
+ * @param <T>
+ *            the more specific subtype of definition being described, e.g.
  *            {@link ComponentDef}, {@link EventDef}, etc.
  */
-public interface DefDescriptor<T extends Definition> extends JsonSerializable, Serializable,
-        Comparable<DefDescriptor<?>> {
+public interface DefDescriptor<T extends Definition> extends JsonSerializable,
+		Serializable, Comparable<DefDescriptor<?>> {
 
-    public static final String MARKUP_PREFIX = "markup";
-    public static final String CSS_PREFIX = "css";
-    public static final String TEMPLATE_CSS_PREFIX = "templateCss";
-    public static final String JAVASCRIPT_PREFIX = "js";
-    public static final String COMPOUND_PREFIX = "compound";
-    public static final String JAVA_PREFIX = "java";
+	public static final String MARKUP_PREFIX = "markup";
+	public static final String CSS_PREFIX = "css";
+	public static final String TEMPLATE_CSS_PREFIX = "templateCss";
+	public static final String JAVASCRIPT_PREFIX = "js";
+	public static final String COMPOUND_PREFIX = "compound";
+	public static final String JAVA_PREFIX = "java";
 
-    public static enum DefType {
-        ATTRIBUTE(AttributeDef.class), //
-        APPLICATION(ApplicationDef.class), //
-        COMPONENT(ComponentDef.class), //
-        EVENT(EventDef.class), //
-        HELPER(HelperDef.class), //
-        INTERFACE(InterfaceDef.class), //
-        CONTROLLER(ControllerDef.class), //
-        MODEL(ModelDef.class), //
-        RENDERER(RendererDef.class), //
-        SECURITY_PROVIDER(SecurityProviderDef.class), //
-        ACTION(ActionDef.class), //
-        TYPE(TypeDef.class), //
-        STYLE(StyleDef.class), //
-        DOCUMENTATION(DocumentationDef.class), //
-        TESTSUITE(TestSuiteDef.class), //
-        TESTCASE(TestCaseDef.class), //
-        PROVIDER(ProviderDef.class), //
-        LAYOUTS(LayoutsDef.class), //
-        LAYOUT(LayoutDef.class), //
-        LAYOUT_ITEM(LayoutItemDef.class),
-        NAMESPACE(NamespaceDef.class);
+	public static enum DefType {
+		ATTRIBUTE(AttributeDef.class), //
+		APPLICATION(ApplicationDef.class), //
+		COMPONENT(ComponentDef.class), //
+		EVENT(EventDef.class), //
+		HELPER(HelperDef.class), //
+		INTERFACE(InterfaceDef.class), //
+		CONTROLLER(ControllerDef.class), //
+		MODEL(ModelDef.class), //
+		RENDERER(RendererDef.class), //
+		SECURITY_PROVIDER(SecurityProviderDef.class), //
+		ACTION(ActionDef.class), //
+		TYPE(TypeDef.class), //
+		STYLE(StyleDef.class), //
+		THEME(ThemeDef.class), //
+		DOCUMENTATION(DocumentationDef.class), //
+		TESTSUITE(TestSuiteDef.class), //
+		TESTCASE(TestCaseDef.class), //
+		PROVIDER(ProviderDef.class), //
+		LAYOUTS(LayoutsDef.class), //
+		LAYOUT(LayoutDef.class), //
+		LAYOUT_ITEM(LayoutItemDef.class), //
+		NAMESPACE(NamespaceDef.class);
 
-        private static Map<Class<? extends Definition>, DefType> defTypeMap;
+		private static Map<Class<? extends Definition>, DefType> defTypeMap;
 
-        private final Class<? extends Definition> clz;
+		private final Class<? extends Definition> clz;
 
-        private DefType(Class<? extends Definition> clz) {
-            this.clz = clz;
+		private DefType(Class<? extends Definition> clz) {
+			this.clz = clz;
 
-            mapDefType(clz, this);
-        }
+			mapDefType(clz, this);
+		}
 
-        private static void mapDefType(Class<? extends Definition> clz, DefType defType) {
-            if (defTypeMap == null) {
-                defTypeMap = new HashMap<Class<? extends Definition>, DefType>();
-            }
+		private static void mapDefType(Class<? extends Definition> clz,
+				DefType defType) {
+			if (defTypeMap == null) {
+				defTypeMap = new HashMap<Class<? extends Definition>, DefType>();
+			}
 
-            defTypeMap.put(clz, defType);
-        }
+			defTypeMap.put(clz, defType);
+		}
 
-        public Class<? extends Definition> getPrimaryInterface() {
-            return clz;
-        }
+		public Class<? extends Definition> getPrimaryInterface() {
+			return clz;
+		}
 
-        public static boolean hasDefType(Class<?> primaryInterface) {
-            return defTypeMap.containsKey(primaryInterface);
-        }
+		public static boolean hasDefType(Class<?> primaryInterface) {
+			return defTypeMap.containsKey(primaryInterface);
+		}
 
-        public static DefType getDefType(Class<? extends Definition> primaryInterface) {
-            DefType ret = defTypeMap.get(primaryInterface);
-            if (ret == null) {
-                String message = String.format(
-                        "Unsupported Java Interface %s specified for DefDescriptor. Valid types are : %s",
-                        primaryInterface.getName(), defTypeMap.keySet().toString());
-                throw new AuraRuntimeException(message);
-            }
-            return ret;
-        }
-    }
+		public static DefType getDefType(
+				Class<? extends Definition> primaryInterface) {
+			DefType ret = defTypeMap.get(primaryInterface);
+			if (ret == null) {
+				String message = String
+						.format("Unsupported Java Interface %s specified for DefDescriptor. Valid types are : %s",
+								primaryInterface.getName(), defTypeMap.keySet()
+										.toString());
+				throw new AuraRuntimeException(message);
+			}
+			return ret;
+		}
+	}
 
-    /**
-     * @return The name of this descriptor
-     */
-    String getName();
+	/**
+	 * @return The name of this descriptor
+	 */
+	String getName();
 
-    /**
-     * @return The pseudo-protocol, namespace, and name of this descriptor
-     */
-    String getQualifiedName();
+	/**
+	 * @return The pseudo-protocol, namespace, and name of this descriptor
+	 */
+	String getQualifiedName();
 
-    /**
-     * @return the namespace and name portion of this descriptor for cases where
-     *         the prefix/protocol is already known.
-     */
-    String getDescriptorName();
+	/**
+	 * @return the namespace and name portion of this descriptor for cases where
+	 *         the prefix/protocol is already known.
+	 */
+	String getDescriptorName();
 
-    /**
-     * @return The prefix/protocol of this descriptor
-     */
-    String getPrefix();
+	/**
+	 * @return The prefix/protocol of this descriptor
+	 */
+	String getPrefix();
 
-    /**
-     * @return the namespace, if this descriptor has one
-     */
-    String getNamespace();
+	/**
+	 * @return the namespace, if this descriptor has one
+	 */
+	String getNamespace();
 
-    /**
-     * @return The portion of a name occurring within any generic delimiters,
-     *         such as < >, including said delimiters
-     */
-    String getNameParameters();
+	/**
+	 * @return The portion of a name occurring within any generic delimiters,
+	 *         such as < >, including said delimiters
+	 */
+	String getNameParameters();
 
-    /**
-     * @return isParameterized - identifies if additional processing is
-     *         warranted to consider generic collections should be considered
-     */
-    boolean isParameterized();
+	/**
+	 * @return isParameterized - identifies if additional processing is
+	 *         warranted to consider generic collections should be considered
+	 */
+	boolean isParameterized();
 
-    /**
-     * @return The type of this definition, which can be used to branch and
-     *         parse serialized representations
-     */
-    DefType getDefType();
+	/**
+	 * @return The type of this definition, which can be used to branch and
+	 *         parse serialized representations
+	 */
+	DefType getDefType();
 
-    /**
-     * Gets the actual definition described by this descriptor, compiling it if
-     * necessary, from Aura's definition service.
-     * 
-     * @return the definition (compiles it if necessary)
-     * @throws QuickFixException if the definition is not found
-     */
-    T getDef() throws QuickFixException;
+	/**
+	 * Gets the actual definition described by this descriptor, compiling it if
+	 * necessary, from Aura's definition service.
+	 * 
+	 * @return the definition (compiles it if necessary)
+	 * @throws QuickFixException
+	 *             if the definition is not found
+	 */
+	T getDef() throws QuickFixException;
 
-    /**
-     * @return true if the definition represented by this descriptor exists at
-     *         all. does not compile the definition
-     */
-    boolean exists();
+	/**
+	 * @return true if the definition represented by this descriptor exists at
+	 *         all. does not compile the definition
+	 */
+	boolean exists();
 }

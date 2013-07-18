@@ -175,7 +175,7 @@ var AuraLocalizationService = function AuraLocalizationService() {
          * @public
          */
         endOf : function(date, unit) {
-            return (moment(date)["endOf"](unit)).toDate();
+            return moment(date)["endOf"](unit)["toDate"]();
         },
         
         /**
@@ -479,7 +479,7 @@ var AuraLocalizationService = function AuraLocalizationService() {
          * @public
          */
         startOf : function(date, unit) {
-            return (moment(date)["startOf"](unit)).toDate();
+            return moment(date)["startOf"](unit)["toDate"]();
         },
         
         /**

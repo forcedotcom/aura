@@ -19,7 +19,7 @@
 <pre>
 [language={!$Locale.language}]
 [timezone={!$Locale.timezone}]
-[numberformat={!$Locale.numberformat}]
-[currencyformat={!$Locale.currencyformat}]
+[numberformat={!$Locale.numberFormat}]
+[currencyformat={!$Locale.currencyFormat}]
 </pre>
 </aura:component>

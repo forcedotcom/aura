@@ -189,7 +189,7 @@ var AuraLocalizationService = function AuraLocalizationService() {
          */ 
         formatDate : function(date, formatString, locale) {
             var mDate = moment(date);
-            if (mDate["isValid"]()) {
+            if (mDate && mDate["isValid"]()) {
                 var format = formatString;
                 if (!format) { // use default format
                     format = $A.getGlobalValueProviders().get("$Locale.dateformat");
@@ -211,7 +211,7 @@ var AuraLocalizationService = function AuraLocalizationService() {
          */
         formatDateUTC : function(date, formatString, locale) {
             var mDate = moment["utc"](date);
-            if (mDate["isValid"]()) {
+            if (mDate && mDate["isValid"]()) {
                 var format = formatString;
                 if (!format) { // use default format
                     format = $A.getGlobalValueProviders().get("$Locale.dateformat");
@@ -233,7 +233,7 @@ var AuraLocalizationService = function AuraLocalizationService() {
          */
         formatDateTime : function(date, formatString, locale) {
             var mDate = moment(date);
-            if (mDate["isValid"]()) {
+            if (mDate && mDate["isValid"]()) {
                 var format = formatString;
                 if (!format) { // use default format
                     format = $A.getGlobalValueProviders().get("$Locale.datetimeformat");
@@ -254,7 +254,7 @@ var AuraLocalizationService = function AuraLocalizationService() {
          */
         formatDateTimeUTC : function(date, formatString, locale) {
             var mDate = moment["utc"](date);
-            if (mDate["isValid"]()) {
+            if (mDate && mDate["isValid"]()) {
                 var format = formatString;
                 if (!format) { // use default format
                     format = $A.getGlobalValueProviders().get("$Locale.datetimeformat");
@@ -276,7 +276,7 @@ var AuraLocalizationService = function AuraLocalizationService() {
          */
         formatTime : function(date, formatString, locale) {
             var mDate = moment(date);
-            if (mDate["isValid"]()) {
+            if (mDate && mDate["isValid"]()) {
                 var format = formatString;
                 if (!format) { // use default format
                     format = $A.getGlobalValueProviders().get("$Locale.timeformat");
@@ -298,7 +298,7 @@ var AuraLocalizationService = function AuraLocalizationService() {
          */
         formatTimeUTC : function(date, formatString, locale) {
             var mDate = moment["utc"](date);
-            if (mDate["isValid"]()) {
+            if (mDate && mDate["isValid"]()) {
                 var format = formatString;
                 if (!format) { // use default format
                     format = $A.getGlobalValueProviders().get("$Locale.timeformat");
@@ -307,6 +307,17 @@ var AuraLocalizationService = function AuraLocalizationService() {
             } else {
                 throw {message: "Invalid time value"};
             }
+        },
+        
+        /**
+         * Gets the number of days in a duration.
+         * @param {Duration} d The duration object returned by localizationService.duration
+         * @return {Number} The number of days in d.
+         * @memberOf AuraLocalizationService
+         * @public
+         */
+        getDaysInDuration : function(d) {
+            return d["days"]();
         },
 
         /**
@@ -432,7 +443,7 @@ var AuraLocalizationService = function AuraLocalizationService() {
         }
 
             var mDate = moment(dateTimeString, localizationService.getNormalizedFormat(targetFormat), localizationService.getNormalizedLangLocale(locale));
-            if (mDate["isValid"]()) {
+            if (mDate && mDate["isValid"]()) {
                 return mDate["toDate"]();
             }
             return null;
@@ -453,7 +464,7 @@ var AuraLocalizationService = function AuraLocalizationService() {
             }
             
             var mDate = moment["utc"](dateTimeString, localizationService.getNormalizedFormat(targetFormat), localizationService.getNormalizedLangLocale(locale));
-            if (mDate["isValid"]()) {
+            if (mDate && mDate["isValid"]()) {
                 return mDate["toDate"]();
             }
             return null;

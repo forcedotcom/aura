@@ -212,9 +212,9 @@ public class AutocompleteUITest extends WebDriverTestCase {
         
         input.sendKeys("o");
         WebElement list = getAutoCompleteList(driver, autoCompleteCmpNum);
+        waitForAutoCompleteListVisible(list, true);
         WebElement element = getInnerElementOfAutoCompleteOptionInList(list, 3, optionType);
         element.click();
-        //list = getAutoCompleteList(driver, autoCompleteCmpNum);
         assertEquals("Wrong option was selected", "hello world3", input.getAttribute("value"));
 	}
 	

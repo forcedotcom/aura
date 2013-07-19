@@ -17,63 +17,117 @@
 -->
 <aura:component extends="auradocs:topicPanel">
     <aura:set attribute="title" value="Accessibility Considerations" />
-    <p>Accessible software can be used with assistive technology such as screen readers that announce textual elements in the software. 
-    Aura components support accessibility and we recommend that you use them in preference to HTML tags when possible. Using the components is also recommended
-    because they offer robust event handling.
-    Aura's accessibility guidelines are as follows:
+    <p>Accessible software and assistive technology enable users with disabilities to use and interact with the products you build. 
+    We recommend that you follow the <ui:outputURL label="WCAG Guidelines" value="http://www.w3.org/TR/WCAG/" target="_blank" /> for accessibility when developing with Aura. 
+
+This guide explains the accessibility features of Aura components in the <code>ui</code> namespace. We recommend that you use them and take advantage of their accessibility features.
     </p>
-    <table class="table table-bordered table-striped">
-	<thead>
-	    <tr>
-	        <th>Element</th>  
-	        <th>Recommendation</th>      
-	    </tr>
-	</thead>
-	<tbody>
-	<tr>
-            <td>Buttons</td>
-            <td>The <code>ui:button</code> component supports labels and images. If you want to use an image on a <code>ui:button</code> component,
-            you can use the <code>label</code> attribute and set <code>labelDisplay="false"</code> to hide the label from view.
-            Example: <auradocs:codeblock>&lt;ui:button label="Attach a File" iconImgSrc="clip.png" labelDisplay="false" /&gt;</auradocs:codeblock></td>
-        </tr>
-        <tr>
-        	<td>Carousels</td>
-        	<td>The <code>ui:carousel</code> component displays a list of items horizontally where users can swipe through the list or click through the page indicators.
-        	Note that the carousel will not be accessible if <code>visible="false"</code> on the <code>ui:carouselPageIndicatorItem</code> as this setting hides the page indicators from view. 
-        	Similarly, setting <code>continuousFlow="true"</code> on <code>ui:carousel</code> hides the page indicators from view.</td>
-        </tr>
-	    <tr>
-	       <td>Forms and fields</td>
-	       <td>Use the input components that extend <code>ui:input</code>, providing extensive <auradocs:topicLink topic="label">label</auradocs:topicLink> support.
-	       For example, use <code>ui:inputTextarea</code> in preference to the <code>&lt;textarea&gt;</code> tag for multi-line text input or the <code>ui:inputSelect</code> component in preference to the <code>&lt;select&gt;</code> tag. 
-	       See <auradocs:topicLink topic="useForm">Getting User Input</auradocs:topicLink> for more information.</td> 
-        </tr>
-        <tr>
-            <td>Help and error messages</td>
-            <td>Use the <code>aria-describedby</code> attribute to associate the help text or error message with a particular field. Example: 
+    
+    <h3>Buttons</h3>
+    <p>Buttons are sometimes designed to appear with just an image, without any text. To create an accessible button, use <code>ui:button</code> and set a textual label using the <code>label</code> attribute. 
+    To hide the label from view, set <code>labelDisplay="false"</code>. The text is available to assistive technologies, but not be visible on screen.</p>
+	<ui:button label="Search" iconImgSrc="/auraFW/resources/aura/images/search.png"/>
+	<auradocs:codeblock>&lt;ui:button label="Search" iconImgSrc="/auraFW/resources/aura/images/search.png"/&gt;</auradocs:codeblock>
+	<ui:button label="Search" iconImgSrc="/auraFW/resources/aura/images/search.png" labelDisplay="false"/>
+	<auradocs:codeblock>&lt;ui:button label="Search" iconImgSrc="/auraFW/resources/aura/images/search.png" labelDisplay="false"/&gt;</auradocs:codeblock>
+	
+	<h3>Carousels</h3>
+	<p>The <code>ui:carousel</code> component displays a list of items horizontally where users can swipe through the list or click through the page indicators.
+       Note that the carousel will not be accessible if <code>visible="false"</code> on the <code>ui:carouselPageIndicatorItem</code> as this setting hides the page indicators from view. 
+       Similarly, setting <code>continuousFlow="true"</code> on <code>ui:carousel</code> hides the page indicators from view.
+       See <auradocs:topicLink topic="carousel">Carousel</auradocs:topicLink> for more information.
+	</p>
+	
+	<h3>Forms and Fields</h3>
+	<p>Use the input components that extend <code>ui:input</code>, except when <code>type="file"</code>. For example, use <code>ui:inputTextarea</code> in preference to the <code>&lt;textarea&gt;</code> tag for multi-line text input or the <code>ui:inputSelect</code> component in preference to the <code>&lt;select&gt;</code> tag.
+	 Set the <code>label</code> attribute with a meaningful description of the input component. See <b>Labels</b> below. 
+	   See <auradocs:topicLink topic="useForm">Getting User Input</auradocs:topicLink> for more information.
+	</p>
+	<h3>Help and Error Messages</h3>
+	<p>Use the <code>aria-describedby</code> attribute to associate the help text or error message with a particular field.</p>
+	<p> 
+	<ui:inputText label="Contact Name" labelPosition="top" aria-describedby="contact"/>
+	<ui:outputText aura:id="contact" value="This is an example of a help text"/>
+	</p>
+	<p>
 <auradocs:codeblock>
 &lt;ui:inputText label="Contact Name" labelPosition="top" aria-describedby="contact" /&gt;
-&lt;ui:outputText aura:id="contact" value="This is an example of a help text" /&gt;
+&lt;ui:outputText aura:id="contact" value="This is an example of a help text." /&gt;
 </auradocs:codeblock> 
-			<p>Use the <code>aria-live</code> attribute on the <code>ui:message</code> component to convey audio notifications. </p>
-            For information on field-level errors, see <auradocs:topicLink topic="error">Validating Fields</auradocs:topicLink>.</td>
-        </tr>
-        <tr>
-           <td>Images</td>
-           <td>Use the <code>ui:image</code> component and include alternative text with informational images. Set the <code>alt</code> attribute when the <code>imageType="informational"</code> with a meaningful description.
-               See <auradocs:topicLink topic="img">Images</auradocs:topicLink> for more information.</td>
-        </tr>
-        <tr>
-        	<td>Labels</td>
-        	<td>Labels provide the user the essence of what the component does. You can either use the <code>label</code> attribute on a component that extends <code>ui:input</code> or use the <code>ui:label</code> component and bind it to the corresponding input component.
-        	See <auradocs:topicLink topic="label">Label</auradocs:topicLink> for more information.</td>
-        </tr>
-        <tr>
-        	<td>Menus</td>
-        	<td>Use the <code>ui:menu</code> component and nest a <code>ui:menuTriggerLink</code> component to create a menu that triggers a list item. See <auradocs:topicLink topic="useMenu">Menu</auradocs:topicLink> for more information.</td>
-        </tr>
-    </tbody>
-    </table>
+	</p>
+	<p>
+	To convey audio notifications, use the <code>ui:message</code> component, which has <code>aria-live="assertive"</code> set on the component by default.
+	 <ui:message title="Error" severity="error" closable="true">
+      This is an error message with an assertive aria-live setting.
+ 	 </ui:message>
+<auradocs:codeblock>
+ &lt;ui:message title="Error" severity="error" closable="true"&gt;
+      This is an error message.
+  &lt;/ui:message&gt;
+</auradocs:codeblock> 
+	</p>
+    <p> For information on field-level errors, see <auradocs:topicLink topic="error">Validating Fields</auradocs:topicLink>.</p>
+    
+    <h3>Images</h3>
+    <p>Use the <code>ui:image</code> component and include alternative text with informational images. Set the <code>alt</code> attribute when the <code>imageType="informational"</code> with a meaningful description.
+       When displaying an informational icon font or image via CSS, use the <code>assistiveText</code> class.
+       
+       <auradocs:codeblock>
+       &lt;a class="like"&gt;
+         &lt;span class="assistiveText"&gt;Like&lt;/span&gt;
+       &lt;/a&gt;
+       </auradocs:codeblock>
+
+       See <auradocs:topicLink topic="img">Images</auradocs:topicLink> for more information.
+    </p>
+    
+    <h3>Labels</h3>
+    <p>Labels provide the user the essence of what the component does. You can either use the <code>label</code> attribute on a component that extends <code>ui:input</code> or use the <code>ui:label</code> component and bind it to the corresponding input component.
+    When using a placeholder in an input component, set the <code>label</code> attribute for accessibility.
+    <ui:inputText label="Search" labelPosition="hidden" placeholder="Search" />
+<auradocs:codeblock>
+&lt;ui:inputText label="Search" labelPosition="hidden" placeholder="Search" /&gt;
+</auradocs:codeblock>
+    To bind a label to its corresponding input component, you can set <code>labelDisplay="false"</code> to hide it from view but make the component accessible.
+<auradocs:codeblock>
+&lt;ui:label labelDisplay="false" for="myInput" label="My Input Text" /&gt;
+&lt;ui:inputText aura:id="myInput" value="Put your input here." />
+</auradocs:codeblock>
+       See <auradocs:topicLink topic="label">Label</auradocs:topicLink> for more information.
+    </p>
+
+	<h3>Menus</h3>
+	<p>Use the <code>ui:menu</code> component and nest a <code>ui:menuTriggerLink</code> component to create a menu that triggers a list item. 
+	<ui:menu>
+            <ui:menuTriggerLink aura:id="trigger" label="Select a color"/>
+             <ui:menuList>
+                <ui:actionMenuItem class="actionItem1" aura:id="actionItem1" label="Red" />
+                <ui:actionMenuItem class="actionItem2" aura:id="actionItem2" label="Blue" />
+                <ui:actionMenuItem class="actionItem2" aura:id="actionItem2" label="Green" />
+			</ui:menuList>
+	</ui:menu>
+	<auradocs:codeblock>
+	&lt;ui:menu>
+            &lt;ui:menuTriggerLink aura:id="trigger" label="Select a color"/>
+             &lt;ui:menuList>
+                &lt;ui:actionMenuItem class="actionItem1" aura:id="actionItem1" label="Red" click="<aura:text value="{!"/>c.doSomething}" />
+                &lt;ui:actionMenuItem class="actionItem2" aura:id="actionItem2" label="Blue" click="<aura:text value="{!"/>c.doSomething}" />
+                &lt;ui:actionMenuItem class="actionItem2" aura:id="actionItem2" label="Green" click="<aura:text value="{!"/>c.doSomething}" />
+			&lt;/ui:menuList>
+	&lt;/ui:menu>
+	
+	</auradocs:codeblock>
+	
+	See <auradocs:topicLink topic="useMenu">Menu</auradocs:topicLink> for more information.
+	</p>
+	
+	<h3>Events</h3>
+	<p>Events such as <code>onlick</code> can be used on these elements: <code>&lt;a&gt;</code>, <code>&lt;button&gt;</code>, <code>&lt;input&gt;</code> in an Aura component, and should not be used on <code>&lt;div&gt;</code> and <code>&lt;span&gt;</code> tags.
+	For a non-actionable element, wrap <code>&lt;a&gt;</code> around it and add <code>onclick</code>.
+<auradocs:codeblock>
+&lt;a onclick="<aura:text value="{!"/>c.doSomething}"&gt;<aura:text value="{!"/>v.body}&lt;/a&gt;	
+</auradocs:codeblock>
+     </p>   
     <p>
     <b>See Also:</b><br/>
     <auradocs:topicLink topic="accessIntro">Aura and Accessibility</auradocs:topicLink><br />

@@ -28,6 +28,13 @@
 		<li><auradocs:defLink descriptor="ui:menu" defType="component" /></li>
 	</ul>
 	</p>
+	<h3>Accessibility Testing</h3>
+	<p>Testing your app for accessibility ensures that the app is accessible by users of varying abilities. For apps developed on Android devices,
+	use <ui:outputURL value="http://developer.android.com/tools/testing/testing_accessibility.html#testing-talkback" label="Talkback" target="_blank"/> and <ui:outputURL value="http://developer.android.com/tools/testing/testing_accessibility.html#testing-ebt" label="Explore by Touch" target="_blank"/>. 
+	For iOS devices, use <ui:outputURL label="VoiceOver" value="https://developer.apple.com/library/ios/#technotes/TestingAccessibilityOfiOSApps/TestAccessibilityonYourDevicewithVoiceOver" target="_blank"/> to test for accessibility.
+	For desktop devices, use <ui:outputURL value="http://wave.webaim.org/toolbar/" label="Wave Toolbar"/> to check for accessibility errors and recommendations for your apps.
+	</p>
+	
 	<p>
     <b>See Also:</b><br/>
     <auradocs:topicLink topic="access">Accessibility Considerations</auradocs:topicLink><br />

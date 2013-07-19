@@ -532,7 +532,7 @@ $A.ns.Aura.prototype.finishInit = function(doNotCallJiffyOnLoad) {
  * </code>
  * @public
  * @param {String} msg The error message to be displayed to the user.
- * @param {Error} e The error message or error object to be displayed to the user.
+ * @param {Error} [e] The error object to be displayed to the user.
  */
 $A.ns.Aura.prototype.error = function(msg, e){
     var logMsg = msg || "";
@@ -558,16 +558,23 @@ $A.ns.Aura.prototype.error = function(msg, e){
     //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
     var stack = this.getStackTrace(e);
     $A.logInternal("Error", logMsg, e, stack);
-    if ($A.util.isObject(e)) {
+    //
+    // Error obejcts in older versions of IE are represented as maps with multiple entries containing the error message
+    // string. Checking that the object here is not an Error obeject prevents the error message from being displayed
+    // multiple times.
+    //
+    if ($A.util.isObject(e) && !$A.util.isError(e)) {
         for(var k in e) {
-            if (k === "stack" || k === "message") {
-                continue;
-            }
             try {
                 var val = e[k];
 
                 if ($A.util.isString(val)) {
-                    dispMsg = dispMsg + '\n' + val;
+                    if (dispMsg === "Unknown Error") {
+                        dispMsg = val;
+                    } else {
+                        dispMsg = dispMsg + '\n' + val;
+                    }
+                    msg = dispMsg;
                 }
             } catch (e2) {
                 // Ignore serialization errors
@@ -581,7 +588,7 @@ $A.ns.Aura.prototype.error = function(msg, e){
     $A.message(dispMsg);
     if ($A.test) {
         //
-        // Note that this sends the original message through to the test
+        // Note that this sends the only the error message string (no stack) through to the test
         //
         $A.test.auraError(msg);
     }
@@ -913,16 +920,13 @@ $A.ns.Aura.prototype.getStackTrace = function(e, remove) {
     if (!remove) {
         remove = 0;
     }
-    if (!e || (!e.stack && !e.get_stack)) {
+    if (!e || !e.stack) {
         try {
             throw new Error("foo");
         } catch (f) {
             e = f;
             remove += 2;
         }
-    }
-    if (e && e.get_stack) {
-        stack = e.get_stack();
     }
     if (e && e.stack) {
         stack = e.stack;

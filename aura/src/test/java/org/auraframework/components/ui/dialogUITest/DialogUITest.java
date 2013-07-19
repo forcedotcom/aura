@@ -321,9 +321,6 @@ public class DialogUITest extends WebDriverTestCase {
         open(URL_MODAL);
         WebDriver driver = getDriver();
 
-        // Open dialog box, press ok to check that it submitted data.
-        mobileBrowserAide(driver, "button[title*='" + CONFIRM_STR + "']", "The ok button did not submit data",
-                SUBMITTED);
         // Does the same for close window button, except it checks to make sure that it did not submit
         mobileBrowserAide(driver, "button[title*='" + CLOSE_STR + "']",
                 "The close window button should not have submitted data", NOT_SUBMITTED);

@@ -58,11 +58,14 @@ exp(p,
     "isComponent", p.isComponent,
     "isValue", p.isValue,
     "instanceOf", p.instanceOf
+    
+    
     //#if {"excludeModes" : ["PRODUCTION"]}
     ,
     "getDebugToolComponent", p.getDebugToolComponent,
     "setDebugToolWindow", p.setDebugToolWindow,
     "getDebugToolsAuraInstance",  p.getDebugToolsAuraInstance,
-    "getUrl", p.getUrl
+    "getUrl", p.getUrl,
+    "getText", p.getText
     //#end
 );

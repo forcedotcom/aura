@@ -595,7 +595,7 @@ var AuraDevToolService = function() {
             checkHeadHasCorrectTitle : function(hdErrMsg, hd){
         	    var title = hd.getElementsByTagName("title")[0];
         	    var errArray = [];
-        	    if($A.util.isUndefinedOrNull(title) || $A.test.getText(title) === ""){
+        	    if($A.util.isUndefinedOrNull(title) || $A.util.getText(title) === ""){
         		errArray.push(hd);  
         	    }
         	    return errArray;

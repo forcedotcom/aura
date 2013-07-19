@@ -874,22 +874,7 @@ var Test = function(){
          * 				The text content of the specified DOM node
          */
         getText : function(node) {
-            var t;
-            //text nodes
-            if(node.nodeType === 3){
-            	t = node.nodeValue;
-            } else {
-            	// chrome, safari, IE have this
-                t = node.innerText;
-
-		// FF & chrome with visibility set to false
-                if (node.textContent !== undefined) {
-                    if($A.util.isUndefinedOrNull(t) || t === ""){
-                        t = node.textContent;
-                    }
-                }
-            }
-            return t;
+            return $A.util.getText(node);
         },
 
         /**

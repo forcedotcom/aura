@@ -15,6 +15,7 @@
  */
 package org.auraframework.adapter;
 
+import java.util.List;
 import java.util.Set;
 
 import org.auraframework.system.AuraContext.Mode;
@@ -40,6 +41,10 @@ public interface ConfigAdapter extends AuraAdapter {
     String getJiffyUIJSURL();
 
     String getJiffyCSSURL();
+    
+    String getMomentJSURL();
+    
+    List<String> getWalltimeJSURLs();
 
     String getCSRFToken();
 

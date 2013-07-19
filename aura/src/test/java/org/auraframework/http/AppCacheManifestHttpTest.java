@@ -146,7 +146,7 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
             HttpResponse response = perform(get);
             int statusCode = getStatusCode(response);
             get.releaseConnection();
-            assertEquals(HttpStatus.SC_OK, statusCode);
+            assertEquals("Unexpected response code for link [" + link + "]", HttpStatus.SC_OK, statusCode);
         }
     }
 

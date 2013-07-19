@@ -733,12 +733,13 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
     /**
      * Returns map of dependencies as key and frequency (based on number of descendants) as value
-     *
+     * 
      * @param dds definition map
      * @return sorted map
      * @throws QuickFixException
      */
-    private SortedMap<DefDescriptor<?>, Integer> createFrequencyMap(Map<DefDescriptor<? extends Definition>, Definition> dds)
+    private SortedMap<DefDescriptor<?>, Integer> createFrequencyMap(
+            Map<DefDescriptor<? extends Definition>, Definition> dds)
             throws QuickFixException {
         SortedMap<DefDescriptor<?>, Integer> frequencyMap = Maps.newTreeMap();
         for (Map.Entry<DefDescriptor<?>, Definition> entry : dds.entrySet()) {
@@ -749,6 +750,8 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                 Set<DefDescriptor<?>> supers = Sets.newLinkedHashSet();
                 componentDef.appendSupers(supers);
                 for (DefDescriptor<?> sup : supers) {
+                    // give supers addition freq to ensure supers are before descendants when sorted
+                    // for instances where component is extended only once
                     addComponentFrequency(dds, frequencyMap, sup);
                 }
             }
@@ -761,17 +764,15 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     /**
      * Adds frequency to particular component based on their descendants. All other types just get 1 as its frequency.
      * Adds component's frequency to its style to make ordering CSS easier.
-     *
+     * 
      * @param defMap dependencies definition map
      * @param frequencyMap dependencies frequency map
      * @param descriptor descriptor to add
      */
     private void addComponentFrequency(Map<DefDescriptor<? extends Definition>, Definition> defMap,
-                                       Map<DefDescriptor<?>, Integer> frequencyMap,
-                                       DefDescriptor<?> descriptor) {
+            Map<DefDescriptor<?>, Integer> frequencyMap,
+            DefDescriptor<?> descriptor) {
         Integer freq = frequencyMap.get(descriptor);
-        // give supers addition freq to ensure supers are before descendants when sorted
-        // for instances where component is extended only once
         freq = (freq == null) ? 1 : freq + 1;
         frequencyMap.put(descriptor, freq);
 

@@ -20,7 +20,7 @@
 	SCROLL_START_THRESHOLD : 10,
 	//indicates only the selected page is visible or not
     SHOW_SELECTED_PAGE_ONLY : true,
-    //navContainer height, hardcode for now so it does require updating the size dynamically which causes reflow
+    //navContainer height, hardcode for now so it does not require updating the size dynamically if width and height is set
     NAV_CONTAINER_HEIGHT : 58,
    	
 	init : function(cmp) {		
@@ -28,21 +28,10 @@
 		this.initPages(cmp);		
 	},
 				
-	initSize : function(cmp) {
-		var width = cmp.get('v.width'),
-			height = cmp.get('v.height'),
-			pageStyle = carouselStyle = width ? ('width:' + width + 'px;') : '';			
-		
-		cmp._width = width;
-		cmp._height = height;
-				
-		if (height) {			
-			carouselStyle += 'height:' + height + 'px;';
-			pageStyle += 'height:' + (height - this.NAV_CONTAINER_HEIGHT) + 'px';
-		}
-		
-		cmp.getAttributes().setValue('priv_carouselStyle', carouselStyle);
-		cmp.getAttributes().setValue('priv_pageStyle', pageStyle);
+	initSize : function(cmp) {				
+		var carouselSize = this.getCarouselSize(cmp);
+		cmp._width = carouselSize.width;
+		cmp.getAttributes().setValue('priv_carouselStyle', this.getSizeStyle(carouselSize.width, carouselSize.height));
 	},
 	
 	initScroller: function(cmp) {		
@@ -154,7 +143,8 @@
 	 * This event is always fired after the carousel is rendered
 	 */
 	refresh: function(cmp, evt) {
-		if (cmp.isRendered()) {		    	
+		if (cmp.isRendered()) {
+			this._setContainerDeltaX(cmp); 
 			this.updateSize(cmp);
 	    } 
 	},
@@ -169,93 +159,87 @@
 		var pages = this.getPageComponents(cmp);
 		//need to update size width if carousel width and height is not explicitly set
 		if (pages.length > 0 && !(origWidth  && origHeight)) {
-			var carouselSize = this.getCarouselSize(cmp, origWidth, origHeight);
+			var carouselSize = this.getCarouselSize(cmp);
 			 	
 			this.updateCarouselSize(cmp, pages, carouselSize);
-			this.updatePageSize(cmp, pages, origWidth, origHeight, carouselSize);			
+			this.updatePageSize(cmp, pages, carouselSize);
+			this._setContainerDeltaX(cmp);
 		}
 	},
 	
-	updateCarouselSize: function(cmp, pages, carouselSize) {	
-		cmp.getValue('v.priv_carouselStyle').setValue(this._getStyleString(carouselSize.width, carouselSize.height));		
+	updateCarouselSize: function(cmp, pages, carouselSize) {		
+		cmp.getValue('v.priv_carouselStyle').setValue(this.getSizeStyle(carouselSize.width, carouselSize.height));		
 		cmp.getValue('v.priv_scrollerWidth').setValue(carouselSize.width * pages.length + 'px'); 
 	},
 	
-	updatePageSize: function(cmp, pages, origWidth, origHeight, carouselSize) {
-		var height,
-			width;
+	updatePageSize: function(cmp, pages, carouselSize) {		 
+		var pageSize = this.getPageSize(cmp);		
 		
-		 
-		var navContainerHeight,
-			navContainer = cmp.find('navContainer');
-		
-		if (navContainer) {
-			navContainerHeight = navContainer.getElement().offsetHeight;
-		}					
-		height = carouselSize.height - navContainerHeight;
-		 
-		cmp.getValue('v.priv_pageStyle').setValue(this._getStyleString(carouselSize.width, height));
-		
-		if (!origWidth) {
-			for (var i=0; i< pages.length; i++) {
-				var e = pages[i].get('e.updateSize');
-				//page width always same as carousel width	
-				e.setParams({pageSize: {width:carouselSize.width, height:height}})
-				e.fire(); 
-			}
-		} 
+		for (var i=0; i< pages.length; i++) {
+			var e = pages[i].get('e.updateSize');
+			//page width always same as carousel width	
+			e.setParams({pageSize: {width: carouselSize.width, height: pageSize.height}});
+			e.fire(); 
+		}		 
 	},
 	
-	_getStyleString: function(width, height) {
+	getSizeStyle: function(width, height) {
 		var style = width ? 'width:' + width + 'px;' : '';
-			style += height ? 'height:' + height + 'px;' : '';
+			
+		style += height ? 'height:' + height + 'px;' : '';
 		
 		return style ? style : null;		
 	},
 	
-	getCarouselSize: function(cmp, origWidth, origHeight) {		 		
-		var width, 
-			height,
-			navContainerHeight = 0,			 
-			windowSize = $A.util.getWindowSize(),
-			el = cmp.getElement();
-		
-		var navContainer = cmp.find('navContainer');
-		if (navContainer) {
-			navContainerHeight = navContainer.getElement().offsetHeight;
-		}		
-		
-		width = origWidth ? origWidth : el ? el.offsetWidth : windowSize.width;
-		height = origHeight ? this.getPageSize(cmp).height + navContainerHeight : el ? el.offsetHeight : windowSize.height;			
+	getCarouselSize: function(cmp) {		
+		var width = cmp.get('v.width'),
+			height = cmp.get('v.height');	 
+			
+		if (!width) {
+			var el = cmp.getElement();	
+			if (el) {
+				width = el.offsetWidth + this._getContainerDeltaX(cmp);
+			}
+		}
 		
 		return {width: width, height: height};
 	},
 	
 	getPageSize: function(cmp) {
 		var width = cmp.get('v.width'),
-			height = cmp.get('v.height');
-			
-		if (height) {
-			height = height - this.NAV_CONTAINER_HEIGHT;
-		} else {
-			var el = cmp.find('pageContainer').getElement();
-			if (el) {
-				height = el.offsetHeight;
-			}
+			height = cmp.get('v.height'),
+			navContainer = cmp.find('navContainer');
+	
+		if (navContainer && height) {
+			var el = navContainer.getElement();
+			height = el ? height - el.offsetHeight : height - this.NAV_CONTAINER_HEIGHT;
 		}
-		 
+				 
 		return {width: width, height: height};
 	},
-		 
+	
+	_setContainerDeltaX: function(cmp) {
+		cmp._newDeltaX = cmp.getElement().parentNode.offsetWidth;
+		if (!cmp._oldDeltaX) {			
+			cmp._containerDeltaX = 0;
+		} else {
+			cmp._containerDeltaX =  cmp._newDeltaX - cmp._oldDeltaX;			 
+		}
+		cmp._oldDeltaX = cmp._newDeltaX;
+	},
+	
+	_getContainerDeltaX: function(cmp) {
+		return cmp._containerDeltaX || 0;		
+	},		 
 	
 	/**
 	 * Update page content
 	 */
-	updatePage: function(cmp, pageIndex, pageContentCmp) {
+	updatePage: function(cmp, pageIndex, pageContentCmp) {		
 		var pageCmp = this.getPageComponentFromIndex(cmp, pageIndex);
 		var e = pageCmp.get('e.update');
 		e.setParams({pageComponent: pageContentCmp});
-		e.fire();		
+		e.fire();
 	},
 	
 	handlePagerClicked : function(cmp, pageIndex) {

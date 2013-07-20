@@ -103,6 +103,11 @@ $A.ns.ComponentDef = function ComponentDef(config){
         }
     }
 
+    this.appHandlerDefs = appHandlerDefs || null;
+    this.cmpHandlerDefs = cmpHandlerDefs || null;
+    this.valueHandlerDefs = valueHandlerDefs || null;
+    this.isCSSPreloaded = config["isCSSPreloaded"] || false;
+
     this.attributeDefs = new AttributeDefSet(this, config["attributeDefs"]);
     this.rendererDef = componentService.getRendererDef(descriptor, config["rendererDef"]);
     this.initRenderer();
@@ -114,11 +119,6 @@ $A.ns.ComponentDef = function ComponentDef(config){
     } else {
         this.providerDef = null;
     }
-
-    this.appHandlerDefs = appHandlerDefs || null;
-    this.cmpHandlerDefs = cmpHandlerDefs || null;
-    this.valueHandlerDefs = valueHandlerDefs || null;
-    this.isCSSPreloaded = config["isCSSPreloaded"] || false;
 };
 
 $A.ns.ComponentDef.prototype.auraType = "ComponentDef";
@@ -224,7 +224,10 @@ $A.ns.ComponentDef.prototype.getStyleClassName = function(){
             for ( var t = 0; t < styleDefLen; t++) {
                 var styleDef = styleDefs[t];
                 className = className + styleDef.getClassName() + " ";
-                styleDef.apply();
+                // Preloaded CSS should already be included in app.css
+                if (!this.isCSSPreloaded) {
+                    styleDef.apply();
+                }
             }
 
         }
@@ -418,7 +421,7 @@ $A.ns.ComponentDef.prototype.initRenderer = function() {
             this.allStyleDefs = this.allStyleDefs.concat(superStyles);
         }
     }
-    if (this.styleDef && !this.isCSSPreloaded) {
+    if (this.styleDef) {
         this.allStyleDefs.push(this.styleDef);
     }
     this.renderingDetails = rd;

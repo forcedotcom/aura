@@ -80,6 +80,18 @@
 								+ (parseInt(pullDownElInfo.paddingBottom) || 0) + (parseInt(pullDownElInfo.marginTop) || 0)
 								+ (parseInt(pullDownElInfo.marginBottom) || 0)
 					}
+					
+					var pullToLoadMoreAction = component.get("v.onPullToLoadMore");
+					var pullUpOffset = 0;
+					if (pullToLoadMoreAction) {
+						var pullUpEl = component.find("pullUp").getElement();
+						// pullUpEl.offsetHeight is unreliable, so calculating
+						// by hand from the computed styles
+						var pullUpElInfo = getComputedStyle(pullUpEl);
+						pullUpOffset = (parseInt(pullUpElInfo.height) || 0) + (parseInt(pullUpElInfo.paddingTop) || 0)
+								+ (parseInt(pullUpElInfo.paddingBottom) || 0) + (parseInt(pullUpElInfo.marginTop) || 0)
+								+ (parseInt(pullUpElInfo.marginBottom) || 0)
+					}
 
 					if ($A.util.isUndefined(window.iScroll)) {
 						this.initIScroll();
@@ -143,6 +155,18 @@
 								}
 							}
 							
+							if (pullToLoadMoreAction) {
+								var threshold = this.totalScrollY + 5;
+								
+								if (this.y < threshold && $A.util.hasClass(pullUpEl, 'pullDown')) {
+									$A.util.swapClass(pullUpEl, 'pullDown', 'pullFlip');
+									this.maxScrollY = this.totalScrollY;
+								} else if (this.y > threshold && $A.util.hasClass(pullUpEl, 'pullFlip')) {
+									$A.util.swapClass(pullUpEl, 'pullFlip', 'pullDown');
+									this.maxScrollY = this.totalScrollYWithoutPullUp;
+								}
+							}							
+							
 							var action = component.get("v.onScrollMove");
 							if (action) {
 								action.runDeprecated(e);
@@ -155,6 +179,16 @@
 									$A.util.swapClass(pullDownEl, 'pullFlip', 'pullLoading');
 									setTimeout(function() {
 										pullToRefreshAction.runDeprecated();
+									}, 1);
+
+								}
+							}
+							
+							if (pullToLoadMoreAction) {
+								if ($A.util.hasClass(pullUpEl, 'pullFlip')) {
+									$A.util.swapClass(pullUpEl, 'pullFlip', 'pullLoading');
+									setTimeout(function() {
+										pullToLoadMoreAction.runDeprecated();
 									}, 1);
 
 								}
@@ -176,6 +210,21 @@
 									$A.util.swapClass(pullDownEl, 'pullLoading', 'pullDown');
 								}, 50);
 							}
+							
+							if (pullToLoadMoreAction) {
+								// keep the "loading" styling as it animates up
+								// then replace with the "pull down" styling
+								setTimeout(function() {
+									$A.util.swapClass(pullUpEl, 'pullLoading', 'pullDown');
+								}, 50);
+							}
+							
+							// totalScrollY includes the pullToLoadMore section and is for our own reference.
+							// maxScrollY is actually used by iScroll to determine when to bounce back.
+							this.totalScrollY = this.maxScrollY;
+							this.totalScrollYWithoutPullUp = this.totalScrollY + pullUpOffset;
+							this.maxScrollY = this.totalScrollYWithoutPullUp;
+							
 						}
 					});
 

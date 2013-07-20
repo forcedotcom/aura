@@ -28,8 +28,13 @@
         helper.triggerDataProvider(component);
     },
     
-    handleDataChange: function(component, event, helper) {  
-        component.getConcreteComponent().getValue("v.items").setValue(event.getParam("data"));
+    handleDataChange: function(component, event, helper) {
+    	var newData = event.getParam("data");
+        var items = component.getConcreteComponent().getValue("v.items");
+        
+        for (var i=0, len=newData.length; i<len; i++) {
+        	items.push(newData[i]);
+        }
         
         helper.showLoading(component, false);
     },
@@ -38,5 +43,18 @@
         helper.init(component);
         
         helper.triggerDataProvider(component);
+    },
+    
+    refresh: function(component, event, helper) {
+    	component.getConcreteComponent().getValue("v.currentPage").setValue(1, true);
+    
+    	var items = component.getConcreteComponent().getValue("v.items");
+    	items.clear();
+    	
+    	helper.triggerDataProvider(component);
+    },
+    
+    triggerDataProvider: function(component, event, helper) {
+    	helper.triggerDataProvider(component);
     }
 })

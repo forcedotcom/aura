@@ -57,6 +57,9 @@
 		var enabled = attributes.getValue("enabled").getBooleanValue();
 		var scroller = component.find("scrollWrapper").getElement();
 		if (scroller) {
+			
+			this.initWidth(component);
+			
 			if (enabled) {
 				if ($A.util.isUndefined(component._scroller)) {
 					var snap = attributes.get("snap");
@@ -215,6 +218,13 @@
 					$A.util.on(images[n], "load", imageLoadTimeoutCallback);
 				}
 			}
+		}
+	},
+	
+	initWidth : function(component) {
+		var width = component.get("v.width");
+		if (width) {
+			component.find("scrollContent").getElement().style.width = width;
 		}
 	},
 

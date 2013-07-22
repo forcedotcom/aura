@@ -18,5 +18,7 @@
 <aura:component >
     <ui:outputDateTime value="2004-09-23T16:30:00.000Z" aura:id="myOutputDateTimeComp" /> <br/>
     <ui:outputDate value="2004-09-23" aura:id="myOutputDateComp" /> <br/>
-    <ui:outputText value="4:30:00 PM" aura:id="myOutputTextComp" />    
+    <ui:outputText value="4:30:00 PM" aura:id="myOutputTextComp" /> <br/> 
+    <ui:outputNumber value="3.14159" format=".00" aura:id="myOutputNumberComp" /> <br/>
+    <ui:outputPercent value="0.14566" format=".00%" aura:id="myOutputPercentComp" /> 
 </aura:component>

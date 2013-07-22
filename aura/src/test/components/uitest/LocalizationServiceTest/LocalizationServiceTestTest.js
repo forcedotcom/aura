@@ -13,8 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-({
-
+({	
 	testDisplayDuration:{
         test:function(component){
         	var num = 1095957000000;
@@ -555,5 +554,30 @@
 	    		
 	        });	
         }
+    },
+    
+    testFormatNumber:{
+        test:function(component){
+        	var testCmp = component.find('myOutputNumberComp');
+            aura.test.assertNotNull(testCmp);
+        	aura.test.assertEquals('3.14', $A.test.getText(testCmp.find('span').getElement()), "Decimal part of value was not rounded up based on format.");        			
+	        aura.test.assertEquals("3.142", $A.localizationService.formatNumber(3.14159), "Both values should be same.");
+	        aura.test.assertEquals("3.146", $A.localizationService.formatNumber(3.14559), "Both values should be same.");
+	        aura.test.assertEquals("-3.142", $A.localizationService.formatNumber(-3.14159), "Both values should be same.");
+	        aura.test.assertEquals("-3.146", $A.localizationService.formatNumber(-3.14559), "Both values should be same.");
+        }        
+    },
+    
+    testFormatPercent:{
+        test:function(component){
+        	var testCmp = component.find('myOutputPercentComp');
+            aura.test.assertNotNull(testCmp);
+        	aura.test.assertEquals('14.57%', $A.test.getText(testCmp.find('span').getElement()), "Decimal part of value was not rounded up based on format.");        			
+	        aura.test.assertEquals("15%", $A.localizationService.formatPercent(0.14566), "Both values should be same.");
+	        aura.test.assertEquals("315%", $A.localizationService.formatPercent(3.14559), "Both values should be same.");
+	        aura.test.assertEquals("314%", $A.localizationService.formatPercent(3.14119), "Both values should be same.");
+	        aura.test.assertEquals("-315%", $A.localizationService.formatPercent(-3.14559), "Both values should be same.");
+	        aura.test.assertEquals("-314%", $A.localizationService.formatPercent(-3.14119), "Both values should be same.");
+        }        
     }
 })

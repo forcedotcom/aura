@@ -1,0 +1,3 @@
+<aura:component>
+  	 <ui:inputText aura:id="textI" label="Per Component Perf Test For ui:inputText" value="text input"/>
+</aura:component> 

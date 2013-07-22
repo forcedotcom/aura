@@ -1,0 +1,4 @@
+<aura:component>
+   <aura:attribute name="myDate" type="Date" default="2013-02-28"/>
+   <ui:inputDate aura:id="dateInput" value="{!v.myDate}" displayDatePicker="true" /> 
+</aura:component>

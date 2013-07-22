@@ -1,0 +1,4 @@
+<aura:component>
+	<aura:attribute name="label" type="String" default="tiger"/>
+	<ui:button label="{!v.label}" aura:id="{!v.label}"/>
+</aura:component>

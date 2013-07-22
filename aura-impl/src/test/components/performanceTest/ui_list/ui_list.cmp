@@ -1,0 +1,10 @@
+<aura:component>
+	<ui:list aura:id="list1" itemVar="list">
+		<aura:set attribute="itemTemplate">
+			<performanceTest:ui_list_template label="{!list}"/>
+		</aura:set>
+		<aura:set attribute="dataProvider">
+			<performanceTest:myDataProvider/>
+		</aura:set>
+	</ui:list>
+</aura:component>

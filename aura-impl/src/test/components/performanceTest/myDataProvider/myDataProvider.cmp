@@ -1,0 +1,6 @@
+
+<aura:component extends="ui:dataProvider"
+	description="A test data provider to test per-component perf test."
+	model="java://org.auraframework.impl.java.model.TestJavaModel"> 
+	 <aura:handler name="provide" action="{!c.provide}"/>
+</aura:component>

@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:abstractList" implements="force:scrollerEmbeddable" support="proto"
+<aura:component extends="ui:abstractList" implements="ui:scrollerEmbeddable" support="proto"
     provider="java://org.auraframework.component.ui.ListProvider, js://ui.list" description="A list component that iterates over and displays the items in the ui:dataProvider component.">
     
     <aura:handler name="showMore" action="{!c.showMore}"/>

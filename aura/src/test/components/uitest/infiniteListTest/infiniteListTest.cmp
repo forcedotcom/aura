@@ -1,4 +1,4 @@
-<aura:component implements="ui:pagingInterface, force:scrollerEmbeddable">
+<aura:component implements="ui:pagingInterface, ui:scrollerEmbeddable">
     <aura:handler name="showMore" action="{!c.showMore}"/>
     <aura:handler name="refresh" action="{!c.refresh}"/>
 	

@@ -1,0 +1,11 @@
+<!--
+  ~ Copyright, 1999-2013, salesforce.com
+  ~ All Rights Reserved
+  ~ Company Confidential
+  -->
+
+<aura:interface support="BETA"
+                description="Interface to indicate that a component has a ui:refresh component event handler.">
+    <aura:attribute name="canRefresh" type="Boolean" description="Can this component refresh?"/>
+    <aura:registerEvent name="refresh" type="ui:refresh"/>
+</aura:interface>

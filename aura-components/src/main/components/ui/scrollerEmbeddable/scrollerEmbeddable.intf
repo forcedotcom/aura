@@ -1,0 +1,10 @@
+<!--
+  ~ Copyright, 1999-2013, salesforce.com
+  ~ All Rights Reserved
+  ~ Company Confidential
+  -->
+
+<aura:interface support="BETA" extends="ui:handlesShowMore,ui:handlesRefresh"
+                description="Interface for components that are placed in the body of a ui:scroller that want to handle 'Pull to Refresh' and 'Load More' functionality provided by the scroller.">
+
+</aura:interface>

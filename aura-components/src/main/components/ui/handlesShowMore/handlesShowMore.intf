@@ -1,0 +1,11 @@
+<!--
+  ~ Copyright, 1999-2013, salesforce.com
+  ~ All Rights Reserved
+  ~ Company Confidential
+  -->
+
+<aura:interface support="BETA"
+                description="Interface to indicate that a component has a ui:showMore component event handler.">
+    <aura:attribute name="canShowMore" type="Boolean" description="Can this component show more if the event was fired?"/>
+    <aura:registerEvent name="showMore" type="ui:showMore"/>
+</aura:interface>

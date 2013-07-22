@@ -67,6 +67,7 @@
 					var vScroll = attributes.getValue("vscroll").getBooleanValue();
 					var showScrollbars = attributes.getValue("showscrollbars").getBooleanValue();
 					var useTransform = attributes.getValue("useTransform").getBooleanValue();
+                    var checkDOMChanges = attributes.getValue("checkDOMChanges").getBooleanValue();
 
 					var pullToRefreshAction = component.get("v.onPullToRefresh");
 					var pullDownOffset = 0;
@@ -105,6 +106,8 @@
 						topOffset : pullDownOffset,
 
 						lockDirection : true,
+
+                        checkDOMChanges : checkDOMChanges, 
 
 						onBeforeScrollStart : function(e) {
 							var target = e.target.nodeName.toLowerCase();

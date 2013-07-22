@@ -37,6 +37,7 @@
     <aura:attribute name="pullToRefreshUpdating" type="String" default="Loading..." description="The text to display while the scroller component is updating after the user pulls to refresh the scroller. Default value is &quot;Loading...&quot;."/>
     <aura:attribute name="pullToRefreshSubtitle" type="String" description="The text to display in the top cell when the user pulls the scroller area to refresh the content."/>
     <aura:attribute name="stopEventPropagation" type="Boolean" default="false" description="Disables DOM event propagation. (This probably isn't something you want to enable.)"/>
+    <aura:attribute name="checkDOMChanges" type="Boolean" default="false" description="Refresh the scroller after DOM changes."/>
 
     <aura:registerEvent name="refreshed" type="ui:scrollerRefreshed" description="The event fired when the scroller is refreshed."/>
 	<aura:handler event="aura:locationChange" action="{!c.locationChange}" description="The event fired when a location change occurs."/>

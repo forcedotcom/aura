@@ -19,10 +19,17 @@
 		var width = width || cmp.get('v.priv_width'),
 			height = height || cmp.get('v.priv_height');			
 		
-		var style = [width ? ('width:' + width + 'px;') : '', height ? ('height:' + height + 'px;') : ''].join('');
-
-		if (style.length > 0) {
-			cmp.getValue('v.priv_pageStyle').setValue(style);
+		var el = cmp.getElement();
+		
+		if (!el) {
+			return;
+		}
+		
+		if ($A.util.isNumber(width)) {
+			el.style.width = width + 'px';
+		}
+		if ($A.util.isNumber(height)) {
+			el.style.height = height + 'px';
 		}
 	},
 	

@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{		
+{
 	afterRender: function(cmp, helper) {
-		this.superAfterRender();
 		//update size in case carousel width is not specified
 		helper.updateSize(cmp);
+		this.superAfterRender();
+		helper.selectDefaultPage(cmp);
 	},
 	
 	rerender: function(cmp, helper) { 

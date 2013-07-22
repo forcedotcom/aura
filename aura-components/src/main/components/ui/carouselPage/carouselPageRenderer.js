@@ -15,9 +15,13 @@
  */
 
 {
-	render: function(cmp, helper) {
-		helper.updateSize(cmp);
+	render: function(cmp, helper) {		
 		helper.setVisibility(cmp);
 		return this.superRender();
+	},
+	
+	afterRender: function(cmp, helper) {		
+		helper.updateSize(cmp);
+		this.superAfterRender();
 	}
 }

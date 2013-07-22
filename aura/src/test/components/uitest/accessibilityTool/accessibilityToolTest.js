@@ -33,20 +33,38 @@
 		$A.test.assertEquals(expected, actual , "Unexpected return from CheckAccessibility, should not return errornous string. output: \n"+output);
 	}
     },
+    testRadioIsInFieldSetError:{
+	attributes : {caseToRender : 'RadioErrors'},
+	test: function(cmp){
+		var expected = "Total Number of Errors found: 4";;
+		var output    = $A.devToolService.checkAccessibility();
+		var actual   =  output.split("\n")[0];
+		$A.test.assertEquals(expected, actual , "Unexpected return from CheckAccessibility, should not return errornous string. output: \n"+output);
+	}
+    },
     
+    testRadioIsInFieldSetNoError:{
+	attributes : {caseToRender : 'NoRadioErrors'},
+	test: function(cmp){
+		var expected = "";
+		var output    = $A.devToolService.checkAccessibility();
+		var actual   =  output.split("\n")[0];
+		$A.test.assertEquals(expected, actual , "Unexpected return from CheckAccessibility, should not return errornous string. output: \n"+output);
+	}
+    },
     //Full tests
     testCheckAccessibility:{
 	test: function(cmp){
-		var expected = "Total Number of Errors found: 11";
+		var expected = "Total Number of Errors found: 10";
 		var actual   =  $A.devToolService.checkAccessibility().split("\n")[0];
 		$A.test.assertEquals(expected, actual , "Unexpected return from CheckAccessibility, should not return errornous string");
 	}
     },
    
     testAssertAccessible:{
-	exceptionsAllowedDuringInit : ["Total Number of Errors found: 11"],
+	exceptionsAllowedDuringInit : ["Total Number of Errors found: 10"],
 	test: function(cmp){
-	    var expected = "Total Number of Errors found: 11";
+	    var expected = "Total Number of Errors found: 10";
 	    var actual   =  "";
 	    try{
 	         $A.test.assertAccessible();

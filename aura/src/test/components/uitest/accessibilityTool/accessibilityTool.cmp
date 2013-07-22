@@ -90,13 +90,33 @@
             </table>
         </a>
     </aura:if>
+    <aura:if isTrue="{!v.caseToRender == 'NoRadioErrors'}">
+       <fieldset class="field_set">
+            <legend>More Options</legend>
+            <ui:inputCheckbox label="Radio1" name="Group1"/>
+            <ui:inputCheckbox label="Radio2" name="Group1"/>
+            <ui:inputCheckbox label="Radio3" name="Group1"/>
+            <ui:inputCheckbox label="Radio4" name="Group1"/>
+            <ui:inputRadio label="Radio5" name="Group1"/>
+            <ui:inputRadio label="Radio6" name="Group1"/>
+            <ui:inputRadio label="Radio7" name="Group2"/>
+        </fieldset>
+        <ui:inputCheckbox label="Radio8" name="Group3"/>
+        <ui:inputRadio label="Radio9" name="Group4"/>
+    </aura:if>
+   <aura:if isTrue="{!v.caseToRender == 'RadioErrors'}">
+       <fieldset class="field_set">
+            <legend>More Options</legend>
+            <ui:inputCheckbox label="Radio1" name="Group1"/>
+            <ui:inputCheckbox label="Radio2" name="Group1"/>
+            <ui:inputCheckbox label="Radio3" name="Group1"/>
+            <ui:inputCheckbox label="Radio4" name="Group1"/>  
+        </fieldset>
+        <ui:inputRadio    label="Radio5" name="Group1"/>
+        <ui:inputRadio    label="Radio6" name="Group1"/>
+        <ui:inputRadio    label="Radio7" name="Group2"/>
+        <ui:inputRadio    label="Radio8" name="Group2"/>
+        <ui:inputCheckbox label="Radio9" name="Group3"/>
+        <ui:inputRadio    label="Radio10" name="Group4"/>
+    </aura:if>
 </aura:component>
-
-
-
-
-
-
-
-
-

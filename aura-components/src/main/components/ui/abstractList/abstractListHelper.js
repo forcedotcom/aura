@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 ({
+	handleDataChange: function(component, event) {
+		component.getConcreteComponent().getValue("v.items").setValue(event.getParam("data"));
+	},
+
     init: function(component) {
         this.initDataProvider(component);
         this.initPagers(component);

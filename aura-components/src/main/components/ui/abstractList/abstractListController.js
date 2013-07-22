@@ -29,14 +29,12 @@
     },
     
     handleDataChange: function(component, event, helper) {
-    	var newData = event.getParam("data");
-        var items = component.getConcreteComponent().getValue("v.items");
-        
-        for (var i=0, len=newData.length; i<len; i++) {
-        	items.push(newData[i]);
-        }
-        
-        helper.showLoading(component, false);
+    	component = component.getConcreteComponent();
+    	helper = component.getDef().getHelper();
+    
+    	helper.handleDataChange(component, event);
+    	
+    	helper.showLoading(component, false);
     },
     
     init: function(component, event, helper) {

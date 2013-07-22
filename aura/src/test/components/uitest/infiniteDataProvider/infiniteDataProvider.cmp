@@ -1,0 +1,5 @@
+<aura:component extends="ui:dataProvider" controller="java://ui.aura.components.uitest.InfiniteDataProviderController">
+    
+	<aura:handler name="provide" action="{!c.provide}"/>
+
+</aura:component>

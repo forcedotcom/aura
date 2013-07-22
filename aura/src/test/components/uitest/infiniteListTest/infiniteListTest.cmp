@@ -1,0 +1,14 @@
+<aura:component implements="ui:pagingInterface, force:scrollerEmbeddable">
+    <aura:handler name="showMore" action="{!c.showMore}"/>
+    <aura:handler name="refresh" action="{!c.refresh}"/>
+	
+	<ui:infiniteList aura:id="list" itemVar="row" currentPage="{!v.currentPage}" pageSize="{!v.pageSize}" totalItems="{!v.totalItems}">
+		<aura:set attribute="dataProvider">
+			<uitest:infiniteDataProvider currentPage="{!v.currentPage}" pageSize="{!v.pageSize}" totalItems="{!v.totalItems}"/>		
+		</aura:set>
+		
+		<aura:set attribute="itemTemplate">
+			<div style="border: 1px solid black">{!row.index} : {!row.char}</div>
+		</aura:set>
+	</ui:infiniteList>
+</aura:component>

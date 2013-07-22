@@ -1,0 +1,12 @@
+<aura:component>
+    <ui:menu>
+        <ui:menuTriggerLink class="radioMenuLabel" aura:id="radioMenuLabel" label="Select a team"/>
+        <ui:menuList class="radioMenu" aura:id="radioMenu">
+             <ui:radioMenuItem class="radioItem1" aura:id="radioItem1" label="San Francisco" click="{!c.getRadioMenuSelected}"/>
+             <ui:radioMenuItem class="radioItem2" aura:id="radioItem2" label="LA Dodgers" click="{!c.getRadioMenuSelected}" />
+             <ui:radioMenuItem class="radioItem3" aura:id="radioItem3" label="Arizona" click="{!c.getRadioMenuSelected}" />
+             <ui:radioMenuItem class="radioItem4" aura:id="radioItem4" label="Diego" disabled="true" click="{!c.getRadioMenuSelected}" />
+             <ui:radioMenuItem class="radioItem5" aura:id="radioItem5" label="Colorado" click="{!c.getRadioMenuSelected}"/>
+        </ui:menuList>
+    </ui:menu>
+</aura:component>

@@ -1,0 +1,12 @@
+
+<aura:component>
+        <ui:menu>
+            <ui:menuTriggerLink aura:id="trigger" label="Select your favorite team"/>
+             <ui:menuList class="actionMenu" aura:id="actionMenu">
+                <ui:actionMenuItem class="actionItem1" aura:id="actionItem1" label="Bayern Munich" click="{!c.updateTriggerLabel}"/>
+                <ui:actionMenuItem class="actionItem2" aura:id="actionItem2" label="FC Barcelona" click="{!c.updateTriggerLabel}" disabled="true"/>
+                <ui:actionMenuItem class="actionItem3" aura:id="actionItem3" label="Inter Milan" click="{!c.updateTriggerLabel}"/>
+                <ui:actionMenuItem class="actionItem4" aura:id="actionItem4" label="Manchester United" click="{!c.updateTriggerLabel}"/>
+            </ui:menuList>
+        </ui:menu>
+</aura:component>

@@ -1,0 +1,11 @@
+<aura:component>
+        <ui:menu>
+            <ui:menuTriggerLink class="checkboxMenuLabel" aura:id="checkboxMenuLabel" label="Select your favorite teams"/>
+           <ui:menuList aura:id="checkboxMenu" class="checkboxMenu">
+                <ui:checkboxMenuItem class="checkboxItem1" aura:id="checkboxItem1" label="San Francisco 49ers"/>
+                <ui:checkboxMenuItem class="checkboxItem2" aura:id="checkboxItem2" label="Seattle Seahawks"  />
+                <ui:checkboxMenuItem class="checkboxItem3" aura:id="checkboxItem3" label="St. Louis Rams" />
+                <ui:checkboxMenuItem class="checkboxItem4" aura:id="checkboxItem4" label="Arizona Cardinals" disabled="true" selected="true" />
+            </ui:menuList>
+        </ui:menu>
+</aura:component>

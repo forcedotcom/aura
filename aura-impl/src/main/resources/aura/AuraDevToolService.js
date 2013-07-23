@@ -625,8 +625,51 @@ var AuraDevToolService = function() {
     	        	    }
     	        	}
     	        	return errArray;
-                }
-           
+                },
+                /**
+                 * Method grabs everything from the given array and finds all tags that are erroneous
+                 * @param   inputTags - radio and checkbox inputs
+                 * @returns array     - Array of all errors that have been found 
+                 */
+                radioButtonAide : function(inputTags){
+                   	 var errorArray = [];
+              		 var inputTag = null;
+              		 var inputType = "";
+              		 var rcName = "";
+              		 var dict = {};
+              		 var tmpArray = [];
+              		 var accessAideFuncs = aura.devToolService.accessbilityAide;
+              		 
+               		 for(var i =0; i<inputTags.length; i++){ 
+              		     inputTag = inputTags[i];
+              		     inputType = inputTag.getAttribute('type').toLowerCase();
+              		     if(inputType === "radio" || inputType === "checkbox"){
+              			 rcName = inputTag.getAttribute('name');
+              			 if($A.util.isUndefinedOrNull(rcName)){
+              			     continue;
+              			 }
+              			 
+              			 if(!(rcName in dict) ){
+              			     dict[""+rcName] = [];
+              			 }
+              			 
+              			 dict[rcName].push(inputTag);
+              		     }
+              		 }
+               		 
+               		 for(rcName in dict){
+               		    tmpArray = dict[rcName];
+               		    if(tmpArray.length >= 2){
+               			for(var index = 0; index<tmpArray.length; index++){ 
+                   		    if(!accessAideFuncs.checkParentMatchesTag(tmpArray[index], "FIELDSET")){
+                   			 errorArray.push(tmpArray[index]);
+                   	            }
+                   		} 
+               		     } 
+               		 }
+               		 
+               		 return errorArray;
+                 }
         },
         verifyAccessibility : {
                /**
@@ -710,19 +753,7 @@ var AuraDevToolService = function() {
         		 var radioButtonFieldSetMsg = "Radio button and checkbox should group by fieldset and legend elements. Refer to http://www.w3.org/TR/UNDERSTANDING-WCAG20/content-structure-separation.html.";
         		 var accessAideFuncs = aura.devToolService.accessbilityAide;
         		 var inputTags = document.getElementsByTagName('input');
-        		 var errorArray = [];
-        		 var inputTag = null;
-        		 
-         		 for(var i =0; i<inputTags.length; i++){ 
-        		     inputTag = inputTags[i];
-        		     if(inputTag.getAttribute('type').toLowerCase() == "radio"){
-        		          if(!accessAideFuncs.checkParentMatchesTag(inputTag, "FIELDSET")){
-        		              errorArray.push(inputTag);
-        		          }
-        		     }
-        		  }
-
-        	         return accessAideFuncs.formatOutput(radioButtonFieldSetMsg, errorArray);
+        		 return accessAideFuncs.formatOutput(radioButtonFieldSetMsg, accessAideFuncs.radioButtonAide(inputTags));
         	    },
         	    /**
                      * Verifys that all inputs have a label

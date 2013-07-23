@@ -38,11 +38,28 @@ This guide explains the accessibility features of Aura components in the <code>u
        See <auradocs:topicLink topic="carousel">Carousel</auradocs:topicLink> for more information.
 	</p>
 	
-	<h3>Forms and Fields</h3>
-	<p>Use the input components that extend <code>ui:input</code>, except when <code>type="file"</code>. For example, use <code>ui:inputTextarea</code> in preference to the <code>&lt;textarea&gt;</code> tag for multi-line text input or the <code>ui:inputSelect</code> component in preference to the <code>&lt;select&gt;</code> tag.
-	 Set the <code>label</code> attribute with a meaningful description of the input component. See <b>Labels</b> below. 
-	   See <auradocs:topicLink topic="useForm">Getting User Input</auradocs:topicLink> for more information.
+	<h3>Forms, Fields, and Labels</h3>
+	<p>Aura's input components are designed to make it easy to assign labels to form fields. Labels build a programmatic relationship between a form field and its textual label. 
+	You can assign a label in two ways. Use the <code>label</code> attribute on a component that extends <code>ui:input</code> or use the <code>ui:label</code> component and bind it to the corresponding input component.
+    When using a placeholder in an input component, set the <code>label</code> attribute for accessibility.
+    </p>
+    <p>Use the input components that extend <code>ui:input</code>, except when <code>type="file"</code>. For example, use <code>ui:inputTextarea</code> in preference to the <code>&lt;textarea&gt;</code> tag for multi-line text input or the <code>ui:inputSelect</code> component in preference to the <code>&lt;select&gt;</code> tag.
 	</p>
+	
+    <ui:inputText label="Search" labelPosition="hidden" placeholder="Search" />
+<auradocs:codeblock>
+&lt;ui:inputText label="Search" labelPosition="hidden" placeholder="Search" /&gt;
+</auradocs:codeblock>
+	<p>
+    Designs often include form elements with placeholder text, but no visible label. A label is required for accessibility and can be hidden visually.
+    Set <code>labelDisplay="false"</code> to hide it from view but make the component accessible.
+<auradocs:codeblock>
+&lt;ui:label labelDisplay="false" for="myInput" label="My Input Text" /&gt;
+&lt;ui:inputText aura:id="myInput" value="Put your input here." />
+</auradocs:codeblock>
+       See <auradocs:topicLink topic="useForm">Getting User Input</auradocs:topicLink> and <auradocs:topicLink topic="label">Label</auradocs:topicLink> for more information.
+    </p>
+	
 	<h3>Help and Error Messages</h3>
 	<p>Use the <code>aria-describedby</code> attribute to associate the help text or error message with a particular field.</p>
 	<p> 
@@ -56,7 +73,7 @@ This guide explains the accessibility features of Aura components in the <code>u
 </auradocs:codeblock> 
 	</p>
 	<p>
-	To convey audio notifications, use the <code>ui:message</code> component, which has <code>aria-live="assertive"</code> set on the component by default.
+	To convey audio notifications, use the <code>ui:message</code> component, which has <code>aria-live="assertive"</code> and <code>role="alert"</code> set on the component by default.
 	 <ui:message title="Error" severity="error" closable="true">
       This is an error message with an assertive aria-live setting.
  	 </ui:message>
@@ -69,8 +86,14 @@ This guide explains the accessibility features of Aura components in the <code>u
     <p> For information on field-level errors, see <auradocs:topicLink topic="error">Validating Fields</auradocs:topicLink>.</p>
     
     <h3>Images</h3>
-    <p>Use the <code>ui:image</code> component and include alternative text with informational images. Set the <code>alt</code> attribute when the <code>imageType="informational"</code> with a meaningful description.
-       When displaying an informational icon font or image via CSS, use the <code>assistiveText</code> class.
+    <p>For an image to be accessible, set an appropriate alternative text attribute. If your image is informational, or actionable as part of a hyperlink, set the <code>alt</code> attribute to a descriptive alternative text.
+    	If the image is purely decorative, set <code>imageType="decorative"</code>. This generates a null <code>alt</code> attribute in the <code>img</code> tag.
+
+<auradocs:codeblock>
+&lt;ui:image src="s.gif" imageType="informational" alt="Open Menu">
+&lt;ui:image src="s.gif" imageType="decorative">
+</auradocs:codeblock>
+       When displaying an informational or actionable image via CSS, include the <code>assistiveText</code> class to provide an appropriate alternative text.
        
        <auradocs:codeblock>
        &lt;a class="like"&gt;
@@ -80,49 +103,10 @@ This guide explains the accessibility features of Aura components in the <code>u
 
        See <auradocs:topicLink topic="img">Images</auradocs:topicLink> for more information.
     </p>
-    
-    <h3>Labels</h3>
-    <p>Labels provide the user the essence of what the component does. You can either use the <code>label</code> attribute on a component that extends <code>ui:input</code> or use the <code>ui:label</code> component and bind it to the corresponding input component.
-    When using a placeholder in an input component, set the <code>label</code> attribute for accessibility.
-    <ui:inputText label="Search" labelPosition="hidden" placeholder="Search" />
-<auradocs:codeblock>
-&lt;ui:inputText label="Search" labelPosition="hidden" placeholder="Search" /&gt;
-</auradocs:codeblock>
-    To bind a label to its corresponding input component, you can set <code>labelDisplay="false"</code> to hide it from view but make the component accessible.
-<auradocs:codeblock>
-&lt;ui:label labelDisplay="false" for="myInput" label="My Input Text" /&gt;
-&lt;ui:inputText aura:id="myInput" value="Put your input here." />
-</auradocs:codeblock>
-       See <auradocs:topicLink topic="label">Label</auradocs:topicLink> for more information.
-    </p>
-
-	<h3>Menus</h3>
-	<p>Use the <code>ui:menu</code> component and nest a <code>ui:menuTriggerLink</code> component to create a menu that triggers a list item. 
-	<ui:menu>
-            <ui:menuTriggerLink aura:id="trigger" label="Select a color"/>
-             <ui:menuList>
-                <ui:actionMenuItem class="actionItem1" aura:id="actionItem1" label="Red" />
-                <ui:actionMenuItem class="actionItem2" aura:id="actionItem2" label="Blue" />
-                <ui:actionMenuItem class="actionItem2" aura:id="actionItem2" label="Green" />
-			</ui:menuList>
-	</ui:menu>
-	<auradocs:codeblock>
-	&lt;ui:menu>
-            &lt;ui:menuTriggerLink aura:id="trigger" label="Select a color"/>
-             &lt;ui:menuList>
-                &lt;ui:actionMenuItem class="actionItem1" aura:id="actionItem1" label="Red" click="<aura:text value="{!"/>c.doSomething}" />
-                &lt;ui:actionMenuItem class="actionItem2" aura:id="actionItem2" label="Blue" click="<aura:text value="{!"/>c.doSomething}" />
-                &lt;ui:actionMenuItem class="actionItem2" aura:id="actionItem2" label="Green" click="<aura:text value="{!"/>c.doSomething}" />
-			&lt;/ui:menuList>
-	&lt;/ui:menu>
-	
-	</auradocs:codeblock>
-	
-	See <auradocs:topicLink topic="useMenu">Menu</auradocs:topicLink> for more information.
-	</p>
 	
 	<h3>Events</h3>
-	<p>Events such as <code>onlick</code> can be used on these elements: <code>&lt;a&gt;</code>, <code>&lt;button&gt;</code>, <code>&lt;input&gt;</code> in an Aura component, and should not be used on <code>&lt;div&gt;</code> and <code>&lt;span&gt;</code> tags.
+	<p>Although you can attach an <code>onclick</code> event to any type of element, for accessibility, consider only applying this event to elements that are actionable in HTML by default, such as
+	 <code>&lt;a&gt;</code>, <code>&lt;button&gt;</code>, <code>&lt;input&gt;</code> in an Aura component. They should not be used on <code>&lt;div&gt;</code> and <code>&lt;span&gt;</code> tags for accessibility.
 	For a non-actionable element, wrap <code>&lt;a&gt;</code> around it and add <code>onclick</code>.
 <auradocs:codeblock>
 &lt;a onclick="<aura:text value="{!"/>c.doSomething}"&gt;<aura:text value="{!"/>v.body}&lt;/a&gt;	

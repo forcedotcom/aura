@@ -66,6 +66,8 @@
     /**
      * Fire the equivalent Aura event for DOM one.
      * This can be overridden by extended component
+     * 
+     * @param event must be a DOM event
      */
      fireEvent : function (component, event, helper) {
         var e = component.getEvent(event.type);
@@ -105,6 +107,8 @@
     /**
      * This method is intended to be overridden by extended components to do event related stuff before the event gets fired.
      * For example, input component uses this method to update its value if the event is the "updateOn" event.
+     * 
+     * @param event must be a DOM event
      */
     preEventFiring : function(component, event){
     },

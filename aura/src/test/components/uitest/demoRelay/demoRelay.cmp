@@ -1,0 +1,23 @@
+<aura:component>
+		<h4>Menu Trigger extended with ui:outputURL</h4>    
+      <ui:menu >
+            <uitest:demoMenuTrigger aura:id="trigger" label="Select your favorite team" />
+             <ui:menuList class="actionMenu" aura:id="actionMenu">
+                <ui:actionMenuItem class="actionItem1" aura:id="actionItem1" label="Something 1" click="{!c.updateTriggerLabel}"/>
+                <ui:actionMenuItem class="actionItem2" aura:id="actionItem2" label="Something 2" click="{!c.updateTriggerLabel}"/>
+                <ui:actionMenuItem class="actionItem3" aura:id="actionItem3" label="Something 3" click="{!c.updateTriggerLabel}"/>
+               <!--some menu items-->
+            </ui:menuList>
+        </ui:menu>
+        <br />
+        <h4>Menu Trigger extended with simple text</h4>
+        <ui:menu>
+        	<uitest:demoMenuTriggerDefault aura:id="trigger-default" label="Select another team" />
+        	<ui:menuList class="actionMenu" aura:id="actionMenu2">
+        		<ui:actionMenuItem class="actionItem4" aura:id="actionItem4" label="Something 4" click="{!c.updateTriggerLabel}"/>
+                <ui:actionMenuItem class="actionItem5" aura:id="actionItem5" label="Something 5" click="{!c.updateTriggerLabel}"/>
+                <ui:actionMenuItem class="actionItem6" aura:id="actionItem6" label="Something 6" click="{!c.updateTriggerLabel}"/>
+                <!--some menu items-->
+        	</ui:menuList>
+        </ui:menu>
+</aura:component>      

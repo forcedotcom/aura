@@ -14,6 +14,18 @@
  * limitations under the License.
  */
 ({
+	showLoadingIndicator: function (cmp) {
+        var evt = cmp.getAttributes().get("spinner")[0].getEvent("toggle");
+        evt.setParams({"isVisible": true});
+        evt.fire();
+    },
+
+    hideLoadingIndicator: function (cmp) {
+        var evt = cmp.getAttributes().get("spinner")[0].getEvent("toggle");
+        evt.setParams({"isVisible": false});
+        evt.fire();
+    },
+	
 	onInit : function(cmp, evt, helper) {
 		helper.init(cmp);
 	},

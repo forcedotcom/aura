@@ -551,6 +551,18 @@
 	getSnap : function(cmp) {
 		var id = cmp.getGlobalId().replace('.', '_').replace(':', '-');
 		return cmp.get('v.continuousFlow') != true ? 'section.snap-class-' + id + '' : null;
-	}
+	},
+	
+	showLoadingIndicator: function (cmp) {
+        var evt = cmp.getAttributes().get("spinner")[0].getEvent("toggle");
+        evt.setParams({"isVisible": true});
+        evt.fire();
+    },
+
+    hideLoadingIndicator: function (cmp) {
+        var evt = cmp.getAttributes().get("spinner")[0].getEvent("toggle");
+        evt.setParams({"isVisible": false});
+        evt.fire();
+    }
 	
 })

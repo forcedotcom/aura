@@ -23,6 +23,12 @@
     
     <aura:attribute name="header" type="Aura.Component[]" description="A facet above the rendered list, for use as a list header"/>
     <aura:attribute name="footer" type="Aura.Component[]" description="A facet below the rendered list, for use as a list footer"/>
+    
+    <aura:registerEvent name="triggerDataProvider" type="ui:dataProvide"/>
+    <aura:handler name="triggerDataProvider" action="{!c.triggerDataProvider}"/>
+    
+    <aura:registerEvent name="refresh" type="ui:refresh"/>
+    <aura:handler name="refresh" action="{!c.refresh}"/>
 
     <aura:handler name="init" action="{!c.init}" value="{!this}"/>
     <div class="{!v.class + (v.visible == false ? ' invisible' : '')}" role="{!v.role}">

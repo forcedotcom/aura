@@ -28,15 +28,31 @@
         helper.triggerDataProvider(component);
     },
     
-    handleDataChange: function(component, event, helper) {  
-        component.getConcreteComponent().getValue("v.items").setValue(event.getParam("data"));
-        
-        helper.showLoading(component, false);
+    handleDataChange: function(component, event, helper) {
+    	component = component.getConcreteComponent();
+    	helper = component.getDef().getHelper();
+    
+    	helper.handleDataChange(component, event);
+    	
+    	helper.showLoading(component, false);
     },
     
     init: function(component, event, helper) {
         helper.init(component);
         
         helper.triggerDataProvider(component);
+    },
+    
+    refresh: function(component, event, helper) {
+    	component.getConcreteComponent().getValue("v.currentPage").setValue(1, true);
+    
+    	var items = component.getConcreteComponent().getValue("v.items");
+    	items.clear();
+    	
+    	helper.triggerDataProvider(component);
+    },
+    
+    triggerDataProvider: function(component, event, helper) {
+    	helper.triggerDataProvider(component);
     }
 })

@@ -40,17 +40,14 @@
 	},
 
 	getAction : function(cmp, actionName, commands, callback, background, abortable) {
-		console.log(commands);
 		var a = $A.test.getAction(cmp, actionName, {
 			"commands" : commands
 		}, callback);
 		if (background) {
 			a.setBackground();
-			console.log("background: " + a.isBackground());
 		}
 		if (abortable) {
 			a.setAbortable();
-			console.log("abortable: " + a.isAbortable());
 		}
 		return a;
 	},

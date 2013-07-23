@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 ({
+	/**
+	 * Test max value. 
+	 */
     testMax: {
         attributes : {max : 9876.54321},
         test : function(component){
@@ -21,6 +24,9 @@
         }
     },
 
+    /**
+     * Test min value.
+     */
     testMin: {
         attributes : {min : 0.0003},
         test : function(component){
@@ -28,6 +34,9 @@
         }
     },
 
+    /**
+     * Test step. 
+     */
     testStep: {
         attributes : {step : 1.23},
         test : function(component){
@@ -35,6 +44,9 @@
         }
     },
 
+    /**
+     * Test disabled. 
+     */
     testDisabled: {
         attributes : {disabled : true},
         test : function(component){
@@ -42,6 +54,9 @@
         }
     },
 
+    /**
+     * Test value. 
+     */
     testValue: {
         attributes : {value : 567},
         test : function(component){
@@ -49,6 +64,9 @@
         }
     },
 
+    /**
+     * Test decimal value. 
+     */
     testDecimalValue: {
         attributes : {value : 10.3249},
         test : function(component){
@@ -56,6 +74,9 @@
         }
     },
 
+    /**
+     * Test integer value 
+     */
     testIntValue: {
         attributes : {value : 100},
         test : function(component){
@@ -63,6 +84,9 @@
         }
     },
 
+    /**
+     * Test negative value. 
+     */
     testNegativeValue: {
         attributes : {value : -5},
         test : function(component){
@@ -70,6 +94,9 @@
         }
     },
 
+    /**
+     * Test small decimal value. 
+     */
     testSmallValue: {
         attributes : {value : 0.000005},
         test : function(component){
@@ -77,6 +104,9 @@
         }
     },
 
+    /**
+     * Test large number 
+     */
     testLargeValue: {
         attributes : {value : 99999999999999},
         test : function(component){
@@ -84,6 +114,9 @@
         }
     },
 
+    /**
+     * Test zero value. 
+     */
     testZeroValue: {
         attributes : {value : 0},
         test : function(component){
@@ -91,10 +124,61 @@
         }
     },
 
+    /**
+     * Test when value is empty string 
+     */
     testEmptyValue: {
         attributes : {value : ""},
         test : function(component){
             $A.test.assertEquals(undefined, component.get("v.value"), "value does not equal expected");
         }
+    },
+    
+    /**
+     * Test number formated correctly. 
+     */
+    testNumberFormat: {
+    	attributes : {value : 123, format : "#,#"},
+    	test : function(component){
+    		var value = component.getElement().value;
+    		$A.test.assertEquals(123, component.get("v.value"), "Cmp value does not equal expected");
+    		$A.test.assertEquals("1,2,3", value, "Element value does not equal expected");
+    	}
+    },
+    
+    /**
+     * Test number formated correctly when format is empty. 
+     */
+    testNumberFormatEmptyString: {
+    	attributes : {value : 123, format : ""},
+    	test : function(component){
+    		var value = component.getElement().value;
+    		$A.test.assertEquals(123, component.get("v.value"), "Cmp value does not equal expected");
+    		$A.test.assertEquals("123", value, "Element value does not equal expected");
+    	}
+    },
+    
+    /**
+     * Test number formated correctly when format is invalid. 
+     */
+    testNumberFormatInvalidFormat: {
+    	attributes : {value : 123, format : "#.#,0"},
+    	test : function(component){
+    		var value = component.getElement().value;
+    		$A.test.assertEquals(123, component.get("v.value"), "Cmp value does not equal expected");
+    		$A.test.assertEquals("Invalid format attribute", value, "Element value does not equal expected");
+    	}
+    },
+    
+    /**
+     * Test number formated correctly when format is not of a recognizable type. 
+     */
+    testNumberFormatUnrecognizedFormat: {
+    	attributes : {value : 123, format : "xyz"},
+    	test : function(component){
+    		var value = component.getElement().value;
+    		$A.test.assertEquals(123, component.get("v.value"), "Cmp value does not equal expected");
+    		$A.test.assertEquals("123", value, "Element value does not equal expected");
+    	}
     }
 })

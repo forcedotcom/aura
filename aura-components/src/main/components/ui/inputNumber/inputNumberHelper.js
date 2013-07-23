@@ -15,7 +15,7 @@
  */
 ({
     formatValue: function(cmp) {
-        // number fields only format the initial value
+    	// number fields only format the initial value
         this.setAttribute(cmp, {key: 'doFormat', value: false});
         var f = cmp.get("v.format");
         var num = this.getNumber(cmp);
@@ -26,10 +26,9 @@
                     nf = $A.localizationService.getNumberFormat(f);
                 } catch (e) {
                     return "Invalid format attribute";
-                    $A.log(e);
                 }
-                if (nf) {
-                    return nf.format(num);
+                if (nf && nf.format) {
+                	return nf.format(num);
                 }
             } else {
                 return this.getDefaultFormatter().format(num);

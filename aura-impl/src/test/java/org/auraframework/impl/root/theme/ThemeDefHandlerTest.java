@@ -15,9 +15,6 @@
  */
 package org.auraframework.impl.root.theme;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertThat;
-
 import java.util.Map;
 
 import org.auraframework.def.AttributeDef;
@@ -130,21 +127,23 @@ public class ThemeDefHandlerTest extends AuraImplTestCase {
         try {
             source("<aura:theme><aura:foo/></aura:theme>");
             fail("Should have thrown AuraException aura:foo isn't a valid child tag for aura:theme");
-        } catch (AuraRuntimeException e) {}
+        } catch (AuraRuntimeException e) {
+        }
     }
 
     public void testWithTextBetweenTag() throws Exception {
         try {
             source("<aura:theme>Test</aura:theme>");
             fail("Should have thrown AuraException because text is between aura:theme tags");
-        } catch (AuraRuntimeException e) {}
+        } catch (AuraRuntimeException e) {
+        }
     }
 
     public void testExtends() throws Exception {
         DefDescriptor<ThemeDef> desc = vendor.getThemeDefDescriptor();
         String src = "<aura:theme extends=\"%s\"></aura:theme>";
         ThemeDef def = source(String.format(src, desc.getDescriptorName()));
-        assertThat(def.getExtendsDescriptor(), equalTo(desc));
+        assertEquals(def.getExtendsDescriptor(), desc);
     }
 
     /** utility */

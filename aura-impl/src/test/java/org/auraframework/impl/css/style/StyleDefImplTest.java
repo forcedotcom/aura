@@ -15,9 +15,6 @@
  */
 package org.auraframework.impl.css.style;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-
 import java.util.Set;
 
 import org.auraframework.Aura;
@@ -77,6 +74,6 @@ public class StyleDefImplTest extends AuraImplTestCase {
 
         Set<DefDescriptor<?>> dependencies = Sets.newHashSet();
         def.appendDependencies(dependencies);
-        assertThat(dependencies.contains(expected), is(true));
+        assertTrue(dependencies.contains(expected));
     }
 }

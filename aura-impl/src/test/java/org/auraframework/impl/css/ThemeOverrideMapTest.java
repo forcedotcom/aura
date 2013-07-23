@@ -15,10 +15,6 @@
  */
 package org.auraframework.impl.css;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-
 import org.auraframework.css.parser.ThemeOverrideMap;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.ThemeDef;
@@ -45,7 +41,7 @@ public class ThemeOverrideMapTest extends AuraImplTestCase {
     public void testPutAndGet() throws QuickFixException {
         DefDescriptor<ThemeDef> child = child();
         ThemeOverrideMap map = map(child.getDef().getExtendsDescriptor(), child);
-        assertThat(map.getOverride(child.getDef().getExtendsDescriptor()).get(), equalTo(child));
+        assertEquals(map.getOverride(child.getDef().getExtendsDescriptor()).get(), child);
     }
 
     public void testValidateSuccess() throws QuickFixException {
@@ -58,7 +54,7 @@ public class ThemeOverrideMapTest extends AuraImplTestCase {
             map(root(), root()).validate();
             fail("expected of theme override validation to fail.");
         } catch (AuraRuntimeException e) {
-            assertThat(e.getMessage().contains("in order to override it"), is(true));
+            assertTrue(e.getMessage().contains("in order to override it"));
         }
     }
 

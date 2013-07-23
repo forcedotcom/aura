@@ -15,11 +15,6 @@
  */
 package org.auraframework.impl.root.theme;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertThat;
-
 import java.util.Map;
 import java.util.Set;
 
@@ -133,13 +128,13 @@ public class ThemeDefTest extends AuraImplTestCase {
     public void testAttributes() throws Exception {
         Map<DefDescriptor<AttributeDef>, AttributeDef> attributes = source(sample).getAttributeDefs();
 
-        assertThat(attributes.size(), is(2));
+        assertEquals(attributes.size(), 2);
 
         DefDescriptor<AttributeDef> color = DefDescriptorImpl.getInstance("one", AttributeDef.class);
         DefDescriptor<AttributeDef> margin = DefDescriptorImpl.getInstance("two", AttributeDef.class);
 
-        assertThat(attributes.get(color), notNullValue());
-        assertThat(attributes.get(margin), notNullValue());
+        assertNotNull(attributes.get(color));
+        assertNotNull(attributes.get(margin));
     }
 
     /** default value must be specified on every inner attribute */
@@ -176,7 +171,7 @@ public class ThemeDefTest extends AuraImplTestCase {
         String src = "<aura:theme extends=\"%s\"></aura:theme>";
         sourceWithParent(src).appendDependencies(dependencies);
 
-        assertThat(dependencies.contains(vendor.getThemeDefDescriptor()), is(true));
+        assertTrue(dependencies.contains(vendor.getThemeDefDescriptor()));
     }
 
     /** adds cross referenced themes as dependencies */
@@ -191,13 +186,13 @@ public class ThemeDefTest extends AuraImplTestCase {
         ThemeDef def2 = source(String.format(src2, descriptor.getNamespace(), descriptor.getName()));
 
         def2.appendDependencies(dependencies);
-        assertThat(dependencies.contains(descriptor), is(true));
+        assertTrue(dependencies.contains(descriptor));
     }
 
     /** cannot extend itself */
     public void testCantExtendItself() throws Exception {
         DefDescriptor<ThemeDef> extendsSelf = addSourceAutoCleanup(ThemeDef.class, "");
-        StringSource<?> source = (StringSource<?>)getAuraTestingUtil().getSource(extendsSelf);
+        StringSource<?> source = (StringSource<?>) getAuraTestingUtil().getSource(extendsSelf);
         String contents = "<aura:theme extends='%s'> </aura:theme>";
         source.addOrUpdate(String.format(contents, extendsSelf.getDescriptorName()));
         try {
@@ -214,11 +209,11 @@ public class ThemeDefTest extends AuraImplTestCase {
         DefDescriptor<ThemeDef> circular1 = addSourceAutoCleanup(ThemeDef.class, "");
         DefDescriptor<ThemeDef> circular2 = addSourceAutoCleanup(ThemeDef.class, "");
 
-        StringSource<?> source = (StringSource<?>)getAuraTestingUtil().getSource(circular1);
+        StringSource<?> source = (StringSource<?>) getAuraTestingUtil().getSource(circular1);
         String contents = "<aura:theme extends='%s'><aura:attribute name='attr' default='1'/></aura:theme>";
         source.addOrUpdate(String.format(contents, circular2.getDescriptorName()));
 
-        source = (StringSource<?>)getAuraTestingUtil().getSource(circular2);
+        source = (StringSource<?>) getAuraTestingUtil().getSource(circular2);
         contents = "<aura:theme extends='%s'> </aura:theme>";
         source.addOrUpdate(String.format(contents, circular1.getDescriptorName()));
 
@@ -255,29 +250,29 @@ public class ThemeDefTest extends AuraImplTestCase {
 
     /** ensure variable function works */
     public void testVariablePresent() throws Exception {
-        assertThat(source(sample).variable("one").get().toString(), equalTo("1"));
+        assertEquals(source(sample).variable("one").get().toString(), "1");
     }
 
     /** ensure variable function works */
     public void testVariableAbsent() throws Exception {
-        assertThat(source(sample).variable("notthere").isPresent(), is(false));
+        assertFalse(source(sample).variable("notthere").isPresent());
     }
 
     /** correctly gets variable defined on a parent */
     public void testVariableFromParent() throws QuickFixException {
-        assertThat(sourceWithParent(sampleChild).variable("color").get().toString(), equalTo("#ffcc00"));
+        assertEquals(sourceWithParent(sampleChild).variable("color").get().toString(), "#ffcc00");
     }
 
     /** correctly uses overridden variable value */
     public void testVariableIsOverridden() throws Exception {
-        assertThat(sourceWithParent(sampleOverridden).variable("color").get().toString(), equalTo("newcolor"));
+        assertEquals(sourceWithParent(sampleOverridden).variable("color").get().toString(), "newcolor");
     }
 
     /** redefine an attribute on the child that exists already on a parent */
     public void testRedefinedAttributed() throws Exception {
         // redefining a variable is highly unrecommended. aura:set should be used instead.
         // however, there isn't a good place to test for this so it's still expected to work.
-        assertThat(sourceWithParent(sampleRedefined).variable("color").get().toString(), equalTo("newcolor"));
+        assertEquals(sourceWithParent(sampleRedefined).variable("color").get().toString(), "newcolor");
     }
 
     /** utility */
@@ -293,6 +288,6 @@ public class ThemeDefTest extends AuraImplTestCase {
 
     /** utility */
     private void expectMessage(Exception e, String string) {
-        assertThat(e.getMessage().contains(string), is(true));
+        assertTrue(e.getMessage().contains(string));
     }
 }

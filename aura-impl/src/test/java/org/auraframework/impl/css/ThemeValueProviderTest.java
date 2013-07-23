@@ -15,9 +15,6 @@
  */
 package org.auraframework.impl.css;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-
 import java.util.Set;
 
 import org.auraframework.css.parser.ThemeOverrideMap;
@@ -48,7 +45,7 @@ public class ThemeValueProviderTest extends AuraImplTestCase {
 
     /** check that qualified references resolve */
     public void testQualified() throws QuickFixException {
-        assertThat(provider().getValue("test.fakeTheme.color", null).toString(), is(COLOR));
+        assertEquals(provider().getValue("test.fakeTheme.color", null).toString(), COLOR);
     }
 
     /** should get an error when reference a nonexistent theme */
@@ -57,13 +54,13 @@ public class ThemeValueProviderTest extends AuraImplTestCase {
             provider().getValue("does.not.exist", null);
             fail("Did not expect to find the theme definition.");
         } catch (DefinitionNotFoundException e) {
-            assertThat(e.getMessage().contains("No THEME"), is(true));
+            assertTrue(e.getMessage().contains("No THEME"));
         }
     }
 
     /** check that aliased references work */
     public void testAliased() throws QuickFixException {
-        assertThat(aliased().getValue("var.color", null).toString(), is(COLOR));
+        assertEquals(aliased().getValue("var.color", null).toString(), COLOR);
     }
 
     /** check that you get an error when the alias is not defined */
@@ -72,13 +69,13 @@ public class ThemeValueProviderTest extends AuraImplTestCase {
             aliased().getValue("abc.color", null);
             fail("expected to get exception");
         } catch (AuraRuntimeException e) {
-            assertThat(e.getMessage().contains("No alias"), is(true));
+            assertTrue(e.getMessage().contains("No alias"));
         }
     }
 
     /** confirm that we get the value from an overridden theme instead of the original */
     public void testOverridden() throws QuickFixException {
-        assertThat(overridden().getValue("themeTest.baseTheme.color", null).toString(), is("yellow"));
+        assertEquals(overridden().getValue("themeTest.baseTheme.color", null).toString(), "yellow");
     }
 
     /** check that we get an error if the variable doesn't exist */
@@ -87,7 +84,7 @@ public class ThemeValueProviderTest extends AuraImplTestCase {
             provider().getValue("test.fakeTheme.idontexist", null);
             fail("expected to get exception");
         } catch (ThemeValueNotFoundException e) {
-            assertThat(e.getMessage().contains("idontexist"), is(true));
+            assertTrue(e.getMessage().contains("idontexist"));
         }
 
     }
@@ -98,7 +95,7 @@ public class ThemeValueProviderTest extends AuraImplTestCase {
             provider().getValue("one.two.three.four", null);
             fail("expected to get exception");
         } catch (AuraRuntimeException e) {
-            assertThat(e.getMessage().contains("Expected exactly 2 or 3"), is(true));
+            assertTrue(e.getMessage().contains("Expected exactly 2 or 3"));
         }
     }
 
@@ -108,7 +105,7 @@ public class ThemeValueProviderTest extends AuraImplTestCase {
             provider().getValue("one", null);
             fail("expected to get exception");
         } catch (AuraRuntimeException e) {
-            assertThat(e.getMessage().contains("Expected exactly 2 or 3"), is(true));
+            assertTrue(e.getMessage().contains("Expected exactly 2 or 3"));
         }
     }
 
@@ -116,42 +113,42 @@ public class ThemeValueProviderTest extends AuraImplTestCase {
     public void testGetDescriptorSingle() throws QuickFixException {
         Set<DefDescriptor<ThemeDef>> dds = provider().getDescriptors("test.fakeTheme.color", null);
         DefDescriptor<ThemeDef> expected = ThemeDefImpl.descriptor("test:fakeTheme");
-        assertThat(Iterables.getOnlyElement(dds), is(expected));
+        assertEquals(Iterables.getOnlyElement(dds), expected);
     }
 
     /** check that we get the correct descriptors when there are multiple */
     public void testGetDescriptorMultiple() throws QuickFixException {
         String nonsensical = "test.fakeTheme.color + themeTest.baseTheme.color";
         Set<DefDescriptor<ThemeDef>> dds = provider().getDescriptors(nonsensical, null);
-        assertThat(dds.size(), is(2));
+        assertEquals(dds.size(), 2);
 
         DefDescriptor<ThemeDef> expected = ThemeDefImpl.descriptor("test:fakeTheme");
         DefDescriptor<ThemeDef> expected2 = ThemeDefImpl.descriptor("themeTest:baseTheme");
-        assertThat(Iterables.get(dds, 0, null), is(expected));
-        assertThat(Iterables.get(dds, 1, null), is(expected2));
+        assertEquals(Iterables.get(dds, 0, null), expected);
+        assertEquals(Iterables.get(dds, 1, null), expected2);
     }
 
     /** check that get qualified descriptors only will not throw an exception on aliases */
     public void testGetDescriptorsIgnoreAliases() throws QuickFixException {
         String nonsensical = "var.color";
         Set<DefDescriptor<ThemeDef>> dds = provider().getDescriptors(nonsensical, null, true);
-        assertThat(dds.isEmpty(), is(true));
+        assertTrue(dds.isEmpty());
         // and also no exceptions
     }
 
     public void testCrossReferenceSelf() throws QuickFixException {
         String val = provider().getValue("themeTest.crossReferencingTheme.errorColor", null).toString();
-        assertThat(val, is("#ff0000"));
+        assertEquals(val, "#ff0000");
     }
 
     public void testCrossReferenceOther() throws QuickFixException {
         String val = provider().getValue("themeTest.crossReferencingTheme.spacing", null).toString();
-        assertThat(val, is("10px"));
+        assertEquals(val, "10px");
     }
 
     public void testCrossReferenceInAuraSet() throws QuickFixException {
         String val = provider().getValue("themeTest.crossReferencingTheme.position", null).toString();
-        assertThat(val, is("absolute"));
+        assertEquals(val, "absolute");
     }
 
     /** utility */

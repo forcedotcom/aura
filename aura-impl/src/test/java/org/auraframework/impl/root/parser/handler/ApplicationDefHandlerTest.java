@@ -15,10 +15,6 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 
@@ -123,7 +119,7 @@ public class ApplicationDefHandlerTest extends AuraImplTestCase {
         DefDescriptor<ApplicationDef> app = addSourceAutoCleanup(ApplicationDef.class, src);
 
         Optional<DefDescriptor<ThemeDef>> override = app.getDef().getThemeOverrides().getOverride(parent);
-        assertThat(override.get(), equalTo(child));
+        assertEquals(override.get(), child);
     }
 
     public void testMalformedThemeOverrideString() throws QuickFixException {
@@ -133,7 +129,7 @@ public class ApplicationDefHandlerTest extends AuraImplTestCase {
             dd.getDef();
             fail("expected to throw AuraRuntimeException.");
         } catch (AuraRuntimeException e) {
-            assertThat(e.getMessage().contains("Invalid themeOverrides format"), is(true));
+            assertTrue(e.getMessage().contains("Invalid themeOverrides format"));
         }
     }
 

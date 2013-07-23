@@ -15,9 +15,6 @@
  */
 package org.auraframework.impl.root.theme;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-
 import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.DefDescriptor;
@@ -78,7 +75,7 @@ public class ThemeResolutionTest extends AuraImplTestCase {
             get("themeTest.badTheme").getDef().getCode();
             fail("expected to get exception");
         } catch (DefinitionNotFoundException e) {
-            assertThat(e.getMessage().contains("No THEME"), is(true));
+            assertTrue(e.getMessage().contains("No THEME"));
         }
     }
 
@@ -88,7 +85,7 @@ public class ThemeResolutionTest extends AuraImplTestCase {
             get("themeTest.badVariable").getDef().getCode();
             fail("expected to get exception");
         } catch (ThemeValueNotFoundException e) {
-            assertThat(e.getMessage().contains("was not found on the THEME"), is(true));
+            assertTrue(e.getMessage().contains("was not found on the THEME"));
         }
     }
 
@@ -98,7 +95,7 @@ public class ThemeResolutionTest extends AuraImplTestCase {
             get("themeTest.invalidMixing").getDef().getCode();
             fail("expected to get exception");
         } catch (StyleParserException e) {
-            assertThat(e.getMessage().contains("Cannot mix"), is(true));
+            assertTrue(e.getMessage().contains("Cannot mix"));
         }
     }
 

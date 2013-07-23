@@ -84,6 +84,22 @@
     },
     
     /**
+     * Verify behavior when 'langLocale' attribute is changed and component is rerendered.
+     */
+    testChangeLangLocale:{
+    	attributes: {value : '2004-09-23T16:30:00.000Z', format: 'M/dd/yy h:mm A', langLocale: 'zh_CN', timezone: 'Asia/Shanghai'},
+        test: function(component){
+            aura.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
+                aura.test.assertEquals("9/24/04 12:30 上午", $A.test.getText(component.find('span').getElement()), "Incorrect formatted datetime string.");                
+                component.getValue("v.langLocale").setValue("en");
+                $A.rerender(component);                                
+                aura.test.assertEquals("9/24/04 12:30 AM", $A.test.getText(component.find('span').getElement()), "Incorrect formatted datetime string.");
+            });                        
+
+        }
+    },
+    
+    /**
      * Verify behavior when 'langLocale' is not provided.
      */
     testDefaultLangLocale:{
@@ -95,7 +111,7 @@
 	    		aura.test.assertEquals(dt, outputDateStr, "Should have used Default langLocale.");	        	
 	        });	
         }
-    },
+    },        
     
     /**
      * Verify behavior when 'langLocale' is assigned a empty string.

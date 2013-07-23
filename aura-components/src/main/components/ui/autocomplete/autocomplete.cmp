@@ -28,8 +28,12 @@
     <aura:attribute name="header" type="Aura.Component[]" description="A facet above the rendered list, for use as a list header"/>
     <aura:attribute name="footer" type="Aura.Component[]" description="A facet below the rendered list, for use as a list footer"/>
     
+    <aura:registerEvent name="matchDone" type="ui:matchDone" description="The event fired when the matching is done."/>
     <aura:registerEvent name="inputChange" type="ui:inputChange" description="The event fired when the input value changes."/>
     <aura:registerEvent name="selectListOption" type="ui:selectListOption" description="The event fired when a list option is displayed."/>
+    
+    <aura:registerEvent name="fetchData" type="ui:fetchData" description="The event indicates we need to fetch data through a data provider."/>
+    <aura:handler name="fetchData" action="{!c.fetchData}"/>
     
     <aura:registerEvent name="matchText" type="ui:matchText" description="The event fired when a text match occurs."/>
     <aura:handler name="matchText" action="{!c.matchText}"/>
@@ -53,6 +57,7 @@
         visible="false"
         role="listbox"
         propertyToMatch="{!v.propertyToMatch}"
+        matchDone="{!c.handleMatchDone}"
         selectListOption="{!c.handleSelectOption}"
         updateAriaAttributes="{!c.updateAriaAttributes}"/>
 </aura:component>

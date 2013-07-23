@@ -23,6 +23,7 @@
     <aura:attribute name="propertyToMatch" type="String" default="label" description="The property name in the data object which is used to match typing in the input field."/>
     <aura:attribute name="theme" type="String" default="default" description="Theme to apply to this component."/>
     
+    <aura:registerEvent name="matchDone" type="ui:matchDone" description="The event fired when the matching is done."/>
     <aura:registerEvent name="listHighlight" type="ui:listHighlight" description="The event fired when a list option is highlighted."/>
     <aura:registerEvent name="matchText" type="ui:matchText" description="The event fired when a text match occurs."/>
     <aura:registerEvent name="pressOnHighlighted" type="ui:press" description="The event fired when a highlighted option is pressed."/>

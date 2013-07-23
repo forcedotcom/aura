@@ -17,6 +17,7 @@
 -->
 <aura:application>
     <ui:autocomplete aura:id="autoComplete" optionVar="row" 
+        matchDone="{!c.handleMatchDone}"
         inputChange="{!c.handleInputChange}" 
         selectListOption="{!c.handleSelectOption}">
         <aura:set attribute="dataProvider">

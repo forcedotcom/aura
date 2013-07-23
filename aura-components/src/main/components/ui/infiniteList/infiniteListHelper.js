@@ -21,5 +21,6 @@
         for (var i=0, len=newData.length; i<len; i++) {
         	items.push(newData[i]);
         }
+        this.showLoading(component, false);
 	}
 })

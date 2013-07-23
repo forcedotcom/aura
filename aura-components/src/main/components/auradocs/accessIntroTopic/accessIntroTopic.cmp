@@ -1,0 +1,42 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+	<aura:set attribute="title" value="Aura and Accessibility" />
+
+	<p>Aura components are created with accessibility in mind. A sample of components and that are built based on the <ui:outputURL label="WAI-ARIA 1.0 Authoring Practices" target="_blank" value="http://www.w3.org/TR/wai-aria-practices/" /> are as follows.
+	This guideline applies to components that extend these components. 
+	<ul>
+		<li><auradocs:defLink descriptor="ui:autocomplete" defType="component" /></li>
+		<li><auradocs:defLink descriptor="ui:carousel" defType="component" /></li>
+		<li><auradocs:defLink descriptor="ui:datePicker" defType="component" /></li>
+		<li><auradocs:defLink descriptor="ui:dialog" defType="component" /></li>
+		<li><auradocs:defLink descriptor="ui:menu" defType="component" /></li>
+	</ul>
+	</p>
+	<h3>Accessibility Testing</h3>
+	<p>Testing your app for accessibility ensures that the app is accessible by users of varying abilities. For apps developed on Android devices,
+	use <ui:outputURL value="http://developer.android.com/tools/testing/testing_accessibility.html#testing-talkback" label="Talkback" target="_blank"/> and <ui:outputURL value="http://developer.android.com/tools/testing/testing_accessibility.html#testing-ebt" label="Explore by Touch" target="_blank"/>. 
+	For iOS devices, use <ui:outputURL label="VoiceOver" value="https://developer.apple.com/library/ios/#technotes/TestingAccessibilityOfiOSApps/TestAccessibilityonYourDevicewithVoiceOver" target="_blank"/> to test for accessibility.
+	For desktop devices, use <ui:outputURL value="http://wave.webaim.org/toolbar/" label="Wave Toolbar"/> to check for accessibility errors and recommendations for your apps.
+	</p>
+	
+	<p>
+    <b>See Also:</b><br/>
+    <auradocs:topicLink topic="access">Accessibility Considerations</auradocs:topicLink><br />
+    </p>
+</aura:component>

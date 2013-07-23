@@ -1189,7 +1189,8 @@ var Test = function(){
                 component.addHandler(eventName, {
                     getValue : function() {
                         return {
-                            run : handler
+                            run : handler,
+                            runDeprecated : handler
                         };
                     }
                 }, 'TESTHANDLER'); // expression is irrelevant

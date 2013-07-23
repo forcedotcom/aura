@@ -89,7 +89,7 @@
 
 
 <br/><br/>Carousel2<br/><br/>
-<ui:carousel aura:id="carousel2" width="450" height="450">
+<ui:carousel aura:id="carousel2" >
 	<aura:set attribute="pageComponents">
  		<ui:carouselPage>
  			<p>Press button to rerender this carousel with a new carousel that has 100 pages.<br/>

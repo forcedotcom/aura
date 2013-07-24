@@ -25,7 +25,7 @@
             rubberbandingBecauseMissingRefresh.find('scrollContent').getElement().appendChild(child);
 
             var errors = $A.componentService.getDef('markup://ui:scroller').getHelper().validateScrollers();
-            $A.test.assertEquals(2, errors.length);
+            $A.test.assertEquals(2, errors.length, this.getErrorMsgs(errors));
 
             $A.test.assertTrue(errors[0].indexOf('Scroller instance was not created') > -1);
             $A.test.assertTrue(errors[1].indexOf('Rubberbanding detected: actual content height does not match cached height') > -1);
@@ -55,7 +55,7 @@
 
         function(component) {
             var errors = $A.componentService.getDef('markup://ui:scroller').getHelper().validateScrollers();
-            $A.test.assertEquals(1, errors.length);
+            $A.test.assertEquals(1, errors.length, this.getErrorMsgs(errors));
             $A.test.assertTrue(errors[0].indexOf('Scroller instance was not created') > -1);
         }]
     },
@@ -68,5 +68,15 @@
             var scroller = component.find("pullToRefresh");
             $A.test.assertTrue(scroller._scroller.options.topOffset > 0, "Scroller should have a top offset");
         }
+    },
+    
+    getErrorMsgs : function(errorsArray) {
+    	var errMsgs = "";
+        if (errorsArray) {
+        	for (var i=0; i<errorsArray.length; i++) {
+        		errMsgs+="ERROR["+i+"]"+errorsArray[i]+"\n";
+        	}
+        }
+        return errMsgs;
     }
 })

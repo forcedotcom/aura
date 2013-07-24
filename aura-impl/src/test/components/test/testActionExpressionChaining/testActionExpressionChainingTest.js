@@ -31,22 +31,21 @@
 
     /*
      * Html action can be passed as component attribute.
-     * IPAD IPHONE excluded: no way to click on a div element through javascript. https://github.com/forcedotcom/lumen-beta/commit/8e96f59e46cc2d9266b79c346332e838a1c2b06f
      */
     testAfterRenderTopLevelHtmlElement: {
+        // Can't click html element on iOS: https://code.google.com/p/selenium/issues/detail?id=3353
         browsers: ["-IPAD","-IPHONE"],
         test: function(component){
             var fixture = component.find("fixture");
             var div = fixture.find("theDiv");
 
-			if(div.getElement().click){
-				div.getElement().click();
-			}
-			else if(document.createEvent){
-            	var evt = document.createEvent("Events");
-            	evt.initEvent("click",true,true);
-            	div.getElement().dispatchEvent(evt);
-			}
+            if(div.getElement().click){
+                div.getElement().click();
+            } else if(document.createEvent){
+                var evt = document.createEvent("Events");
+                evt.initEvent("click",true,true);
+                div.getElement().dispatchEvent(evt);
+            }
             var results = component.find("resultsGoHere");
             $A.test.assertEquals("Chained press action ran", results.getElement().innerHTML);
         }
@@ -70,23 +69,22 @@
 
     /*
      * Html action can be passed as component attribute function.
-     * IPAD IPHONE excluded: no way to click on a div element through javascript. https://github.com/forcedotcom/lumen-beta/commit/8e96f59e46cc2d9266b79c346332e838a1c2b06f
      */
     testAfterRenderTopLevelHtmlElementFunctionEvaluation: {
+        // Can't click html element on iOS: https://code.google.com/p/selenium/issues/detail?id=3353
         browsers: ["-IPAD","-IPHONE"],
         attributes: { push:true },
         test: function(component){
             var fixture = component.find("function");
             var div = fixture.find("theDiv");
 
-			if(div.getElement().click){
-				div.getElement().click();
-			}
-			else if(document.createEvent){
-            	var evt = document.createEvent("Events");
-            	evt.initEvent("click",true,true);
-            	div.getElement().dispatchEvent(evt);
-			}
+            if(div.getElement().click){
+                div.getElement().click();
+            } else if(document.createEvent){
+                var evt = document.createEvent("Events");
+                evt.initEvent("click",true,true);
+                div.getElement().dispatchEvent(evt);
+            }
             var results = component.find("resultsGoHere");
             $A.test.assertEquals("Chained push action ran", results.getElement().innerHTML);
         }

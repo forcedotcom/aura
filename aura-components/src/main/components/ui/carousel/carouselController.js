@@ -22,11 +22,6 @@
     	helper.initPages(cmp); 
     },
     
-    onBeforeScrollStart : function(cmp, evt, helper) {    	
-    	var scroller = helper.getScroller(cmp);
-    	scroller.enable();
-    }, 
-    
     /**
      * Handle scrollStart event coming from scroller
      */
@@ -55,6 +50,21 @@
      */      
 	refresh: function(cmp, evt, helper) {	
         helper.refresh(cmp, evt);
+    },
+    
+
+    onRefreshCurrentPage: function(cmp, evt, helper) {
+    	var curPage = cmp.get('v.priv_currentPage');
+    	var pages = helper.getPageComponents(cmp);
+    	
+    	if (curPage > 0 && curPage <= pages.length) {
+	    	var e = cmp.get('e.loadPage'),
+	    		pageCmp = helper.getPageComponentFromIndex(cmp, curPage),
+	    		pageModel = helper.getPageModelFromIndex(cmp, curPage);
+	    	
+			e.setParams({pageModel: pageModel, pageComponent: pageCmp, pageIndex: curPage});    			
+			e.fire();
+    	}
     },
     
     /**

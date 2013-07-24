@@ -48,12 +48,6 @@
 			cmp.getValue("v.priv_ariaExpanded").setValue(true);
 			$A.util.addClass(cmp.getElement(), selectedItemCss);
 			$A.util.removeClass(cmp.getElement(), hiddenCssClass);
-							
-			if (parent && parent[0]) {
-				var e = parent[0].get('e.loadPage');    			
-				e.setParams({pageModel: pageModel, pageIndex: curPage});    			
-				e.fire();			
-			}
 		} else {
 			cmp.getValue('v.isSelected').setValue(false);
 			cmp.getValue("v.priv_ariaExpanded").setValue(false);

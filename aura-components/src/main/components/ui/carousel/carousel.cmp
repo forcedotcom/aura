@@ -29,8 +29,8 @@
 		<aura:attribute name="pageModels" type="Object[]" description="The model used to create a carousel page." />
 		<aura:attribute name="pageComponents" type="Aura.Component[]" description="Carousel page components that is rendered as carousel pages." />
 		
-		<aura:attribute name="fireSlideChangedEvent" type="Boolean" default="false" description="Set to true to fire the &quot;slideChangeEvent&quot; application event after change to a different carousel page." />
-
+		<aura:attribute name="onPageChange" type="Aura.Action" description="The action invoked when the carousel changes to a different page." />
+		
 		<aura:attribute name="priv_currentPage" type="Integer" description="PRIVATE - the currently selected page index." />
 		<aura:attribute name="priv_carouselStyle" type="String" description="PRIVATE - inline style of the carousel container." />				 	
 		<aura:attribute name="priv_scrollerWidth" type="String" description="PRIVATE - the scroller width in pixels." />
@@ -42,12 +42,14 @@
     	<aura:registerevent name="pageSelected" type="ui:carouselPageEvent" description="The event fired when the page is selected."/>
     	<aura:registerevent name="loadPage" type="ui:carouselPageEvent" description="The event fired when the page is loaded." />    	
 		<aura:registerevent name="scrollEnd" type="ui:scrollEnd" description="The event fired when the end of the scroller is reached." />
-		
+		<aura:registerevent name="refreshCurrentPage" type="ui:carouselPageEvent" description="Fire this event to refresh the current carousel page." />
+				
     	<aura:handler name="selectDefaultPage" action="{!c.selectDefaultPage}" />
     	<aura:handler name="pageSelected" action="{!c.pageSelected}" />    
 		<aura:handler name="init" value="{!this}" action="{!c.onInit}" />
 		<aura:handler name="change" value="{!v.pageComponents}" action="{!c.onPageComponentsChanged}" />
-		 			
+		<aura:handler name="refreshCurrentPage" action="{!c.onRefreshCurrentPage}" />
+						 			
 		<ui:resizeObserver onresize="{!c.refresh}"/>
  				
 		<article class="{!v.class}" style="{!v.priv_carouselStyle}" role="article">
@@ -65,13 +67,13 @@
 			    		width="{!v.priv_scrollerWidth}"
 			    	 	class="scroll-container"			    	 	
 			    	   	hScroll="true"
-			    	   	vScroll="false"
-			    	   	onBeforeScrollStart="{!c.onBeforeScrollStart}"			    	   				    	   
+			    	   	vScroll="false"			    	   				    	   				    	   
 			    	   	onScrollMove="{!c.onScrollMove}"
 			    	   	onScrollEnd="{!c.onScrollEnd}"
 			    	   	refreshed="{!c.onScrollerRefreshed}"
 			    	   	snap="{!v.priv_snap}"
-			    	   	scrollContentClass="{!v.priv_scrollContentClass}" >
+			    	   	scrollContentClass="{!v.priv_scrollContentClass}"
+			    	   	bindEventsToScroller="true">
 			    	   	
 							{!v.pageComponents}
 						 

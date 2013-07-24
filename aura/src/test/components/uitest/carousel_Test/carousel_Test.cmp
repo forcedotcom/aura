@@ -16,13 +16,9 @@
 
 -->    	
 <aura:component>
-
-<aura:attribute name="slideChangedEventCount" type="Integer" default="0"/>
-
-<aura:handler event="ui:slideChangedEvent" action="{!c.slideChangeEventListener}"/>
 		
 <div> 	
- 	<ui:carousel aura:id="carousel1" width="450" height="450" class="myclass" fireSlideChangedEvent="{!true}">
+ 	<ui:carousel aura:id="carousel1" width="450" height="450" class="myclass">
  		<aura:set attribute="pageComponents">
 	 		<ui:carouselPage aura:id="c1-p1">
 	 			<ui:carouselPageItem label="New Post 1" class="entity-post" />

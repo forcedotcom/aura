@@ -60,11 +60,5 @@
 			pages.push(page);
  		}
  		carousel.getValue("v.pageComponents").setValue(pages);
- 	},
- 	
- 	slideChangeEventListener : function(cmp, event) {
- 		var count = cmp.getValue("v.slideChangedEventCount").getValue();
- 		count += 1;
- 		cmp.setValue("v.slideChangedEventCount", count);
  	}
  }

@@ -16,8 +16,8 @@
 
 -->
 <aura:component>
-    <aura:attribute name="clickEvent" type="Boolean" default="false" />
     <aura:attribute name="focusEvent" type="Boolean" default="false" />
+    <aura:attribute name="blurEvent" type="Boolean" default="false" />
 
-    <input type="text" aura:id="input" onfocus="{!c.focus}" onclick="{!c.click}"/>
+    <input type="text" aura:id="input" onfocus="{!c.focus}" onblur="{!c.blur}" />
 </aura:component>

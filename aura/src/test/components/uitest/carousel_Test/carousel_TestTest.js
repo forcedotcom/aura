@@ -326,25 +326,6 @@
         }]
     },
     
-    /**
-     * Test firing of the fireSlideChangedEvent.
-     */
-    testFireSlideChangeEvent : {
-    	browsers: ["-IE7","-IE8"],
-    	test : [function(cmp) {
-    		var count = cmp.getValue("v.slideChangedEventCount").getValue();
-    		// count should be 2 because of initial load of carousel 1
- 			$A.test.assertEquals(1, count, "Initial slideChangedEvent incorrect");
- 			
- 			// go to 1st page
- 			this.goToPageOnCarousel(cmp, "carousel1", 1, "c1-p1");
- 		}, function(cmp) {
- 			// verify
- 			var count = cmp.getValue("v.slideChangedEventCount").getValue();
- 			$A.test.assertEquals(2, count, "slideChangedEvent was not fired");
- 		}]
-    },
-    
     goToPageOnCarousel : function(cmp, carouselName, pageNumber, pageId) {
     	pageNumber--;
     	var carousel = cmp.find(carouselName);

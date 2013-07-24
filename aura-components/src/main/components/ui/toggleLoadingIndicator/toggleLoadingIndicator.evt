@@ -16,5 +16,5 @@
 
 -->
 <aura:event type="COMPONENT" support="BETA" description="Change the visibility of a ui:spinner component.">
-   <aura:attribute name="isVisible" type="Boolean" required="true" description="Hide/show the spinner"/>
+    <aura:attribute name="isVisible" type="Boolean" required="true" description="Hide/show the spinner"/>
 </aura:event>

@@ -553,16 +553,29 @@
 		return cmp.get('v.continuousFlow') != true ? 'section.snap-class-' + id + '' : null;
 	},
 	
+	/**
+	 * Spinner controls
+	 */
 	showLoadingIndicator: function (cmp) {
-        var evt = cmp.getAttributes().get("spinner")[0].getEvent("toggle");
-        evt.setParams({"isVisible": true});
-        evt.fire();
+		var spinner = cmp.getAttributes().get("spinner")[0];
+		if (!$A.util.isUndefinedOrNull(spinner)) {
+			var evt = spinner.getEvent("toggle");
+			if (!$A.util.isUndefinedOrNull(evt)) {
+				evt.setParams({"isVisible": true});
+		        evt.fire();
+			}
+		}
     },
 
     hideLoadingIndicator: function (cmp) {
-        var evt = cmp.getAttributes().get("spinner")[0].getEvent("toggle");
-        evt.setParams({"isVisible": false});
-        evt.fire();
+    	var spinner = cmp.getAttributes().get("spinner")[0];
+    	if (!$A.util.isUndefinedOrNull(spinner)) {
+    		var evt = spinner.getEvent("toggle");
+    		if (!$A.util.isUndefinedOrNull(evt)) {
+				evt.setParams({"isVisible": false});
+		        evt.fire();
+			}
+    	}
     }
 	
 })

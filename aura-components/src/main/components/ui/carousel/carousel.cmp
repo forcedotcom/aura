@@ -30,7 +30,7 @@
 		<aura:attribute name="pageComponents" type="Aura.Component[]" description="Carousel page components that is rendered as carousel pages." />
 		
 		<aura:attribute name="onPageChange" type="Aura.Action" description="The action invoked when the carousel changes to a different page." />
-		<aura:attribute name="spinner" type="Aura.Component[]" description="Spinner component used during asynchronous loading." />
+		<aura:attribute name="spinner" type="Aura.Component[]" description="Spinner component used during asynchronous loading. Must fire and handle a 'toggle' event with an isVisible attribute." />
 
 		<aura:attribute name="priv_currentPage" type="Integer" description="PRIVATE - the currently selected page index." />
 		<aura:attribute name="priv_carouselStyle" type="String" description="PRIVATE - inline style of the carousel container." />				 	
@@ -50,9 +50,9 @@
 		<aura:handler name="init" value="{!this}" action="{!c.onInit}" />
 		<aura:handler name="change" value="{!v.pageComponents}" action="{!c.onPageComponentsChanged}" />
 		<aura:handler name="refreshCurrentPage" action="{!c.onRefreshCurrentPage}" />
-						 			
+		
 		<ui:resizeObserver onresize="{!c.refresh}"/>
- 				
+					
 		<article class="{!v.class}" style="{!v.priv_carouselStyle}" role="article">
 		 
 				<h2 class="assistiveText">{!v.title}</h2>
@@ -62,14 +62,10 @@
 	        			<ui:carouselPageIndicator />        		 
 					</nav>					
 				</aura:if>			
-				
-				<ui:button label="Show" press="{!c.showLoadingIndicator}" />
-				<ui:button label="Hide" press="{!c.hideLoadingIndicator}" />
-								   	        
+			   	
+			   	{!v.spinner}
+			   	        
 		    	<div aura:id="pageContainer" class="carousel-pages">
-		    		<div class="spinner-container">
-		    			{!v.spinner}
-		    		</div>
 			    	<ui:scroller aura:id="scroller"			    		
 			    		width="{!v.priv_scrollerWidth}"
 			    	 	class="scroll-container"			    	 	
@@ -84,15 +80,14 @@
 			    	   	
 							{!v.pageComponents}
 						 
-					</ui:scroller>
+					</ui:scroller>					
 				</div>
-			 
-				
+			 	
 				<aura:if isTrue="{!v.continuousFlow != true &amp;&amp; v.pageIndicatorPosition == 'bottom'}" >
 					<nav aura:id="navContainer" class="{!'carousel-nav-container carousel-nav-position-' + v.pageIndicatorPosition}" role="tablist">        		 
 	        			<ui:carouselPageIndicator />      		 
 					</nav>	
-				</aura:if>					          
+				</aura:if>		          
 		</article>		
 				 
 </aura:component>

@@ -16,7 +16,8 @@
 
 -->
 <aura:component render="client">
+    <aura:attribute default="0" type="Integer" name="count"></aura:attribute>
     <span>
-        rerender count: <span aura:id="count">0</span>
+        rerender count: <span aura:id="count">{!v.count}</span>
     </span>
 </aura:component>

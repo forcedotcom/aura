@@ -174,6 +174,8 @@ Test.Aura.AuraClientServiceTest = function() {
 			});
 			target.processActions = function() {
 			};
+			target.unregisterTransaction = function() {
+			}
 			// Act
 			mockGlobal(function() {
 				target.pushStack("AbortableActionsAreCleared.1");

@@ -29,6 +29,7 @@ import org.openqa.selenium.*;
 public class AutocompleteUITest extends WebDriverTestCase {
 	private final String URL = "/uitest/autoComplete_Test.cmp";
 	private final String INPUT_SELECTOR = "input[class*='uiInput']";
+	private final String OUTPUT_SELECTOR = "span[class*='uiOutputText']";
 	private final String AUTOCOMPLETE_LIST_SELECTOR = "div[class*='uiAutocompleteList']";
 	private final String AUTOCOMPLETE_OPTION_SELECTOR = "li[class*='uiAutocompleteOption']";
 	private final String AUTOCOMPLETE_CUSTOM_TEMPLATE_OPTION_SELECTOR = "div[class*='uitestAutoComplete_CustomTemplate']";

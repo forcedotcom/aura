@@ -68,6 +68,7 @@
 					var showScrollbars = attributes.getValue("showscrollbars").getBooleanValue();
 					var useTransform = attributes.getValue("useTransform").getBooleanValue();
                     var checkDOMChanges = attributes.getValue("checkDOMChanges").getBooleanValue();
+                    var bindEventsToScroller = attributes.getValue("bindEventsToScroller").getBooleanValue();
 
 					var pullToRefreshAction = component.get("v.onPullToRefresh");
 					var pullDownOffset = 0;
@@ -99,6 +100,32 @@
 
 					this.trackActiveInstance(component);
 					
+					iScroll.prototype._getEventTarget = function(type, el) {
+						var target;
+						
+						if (type === this.RESIZE_EV || type === this.END_EV) {
+							target = window;
+						} else if (bindEventsToScroller) {
+							target = this.scroller;
+						} else {
+							target = el || this.scroller;
+						}
+						
+						return target;
+					};
+					
+					//START override iScroll to have the option to bind the events to the scroller itself					
+					iScroll.prototype._bind = function(type, el, bubble) {						
+						var target = this._getEventTarget(type, el);						
+						target.addEventListener(type, this, !!bubble);
+					};
+					
+					iScroll.prototype._unbind = function(type, el, bubble) {
+						var target = this._getEventTarget(type, el);						
+						target.removeEventListener(type, this, !!bubble);						 
+					};
+					//END 
+					
 					component._scroller = new iScroll(scroller, {
 						hScroll : hScroll,
 						hScrollbar : hScroll && !snap && showScrollbars,
@@ -119,8 +146,9 @@
 
 						lockDirection : true,
 
-                        checkDOMChanges : checkDOMChanges, 
-
+                        checkDOMChanges : checkDOMChanges,
+                        bindEventsToScroller : bindEventsToScroller,
+                        
 						onBeforeScrollStart : function(e) {
 							var target = e.target.nodeName.toLowerCase();
 							if ("input" != target && "textarea" != target && "select" != target) {
@@ -547,7 +575,7 @@
 					case MOVE_EV:
 						that._move(e);
 						break;
-					case END_EV:
+					case END_EV:	
 					case CANCEL_EV:
 						that._end(e);
 						break;
@@ -876,7 +904,7 @@
 				},
 
 				_end : function(e) {
-					
+				
 					if (hasTouch && e.touches.length !== 0)
 						return;
 

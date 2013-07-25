@@ -20,6 +20,8 @@
 	SCROLL_START_THRESHOLD : 10,
 	//indicates only the selected page is visible or not
     SHOW_SELECTED_PAGE_ONLY : true,
+    //Minimum distance to swipe to find out the intended swipe direction
+    DISTANCE_THRESHOLD : 5,    
     //navContainer height, hardcode for now so it does not require updating the size dynamically if width and height is set
     NAV_CONTAINER_HEIGHT : 58,
    	
@@ -122,6 +124,52 @@
 			indCmp.addHandler('pagerKeyed', cmp, 'c.pagerKeyed');			 
 		}		 
 	},
+	
+	attachEvents : function(cmp) {
+		var el = cmp.getElement();
+		if (el) {
+			var helper = this;
+			var hasTouch = 'ontouchstart' in window;
+			if (hasTouch) {
+				$A.util.on(el, 'touchstart', function(e) {helper.onStart(cmp, e);});
+				$A.util.on(el, 'touchmove', function(e) {helper.onMove(cmp, e);});
+				$A.util.on(el, 'touchend', function(e) {helper.onEnd(cmp, e);});				
+			} else {
+				$A.util.on(el, 'mousedown', function(e) {helper.onStart(cmp, e);});
+				$A.util.on(el, 'mousemove', function(e) {helper.onMove(cmp, e);});
+				$A.util.on(el, 'mouseup', function(e) {helper.onEnd(cmp, e);});
+			}
+		}
+	},
+	
+	onStart: function(cmp, evt) {
+		var point = evt.touches && evt.touches.length == 1 ? evt.touches[0] : evt;	
+		cmp._swipe = { 
+			startx: point.pageX, 
+			starty: point.pageY
+		}
+		
+	},
+	
+	onMove: function(cmp, evt) {
+		var swipe = cmp._swipe;
+		if (swipe) {
+			var point = evt.changedTouches && evt.changedTouches.length == 1 ? evt.changedTouches[0] : evt;	
+	        var dx = point.pageX - swipe.startx,
+	            dy = point.pageY - swipe.starty,
+	            y = Math.abs(dy),
+	            x = Math.abs(dx);
+	
+	        if (x > this.DISTANCE_THRESHOLD && x > y) {					
+	    		//swiping horizontally					
+				evt.stopPropagation();     
+	        }			
+		}
+	},
+	
+	onEnd : function(cmp, evt) {		
+		delete cmp._swipe;
+	},	
 	
 	getPageComponentsFromIteration : function(iterCmp) {
 		var realBody = iterCmp.get('v.realBody'),
@@ -280,7 +328,7 @@
             if (evt.preventDefault) evt.preventDefault();
         }
 	},
-	
+		 
 	/**
 	 * Handle scrollStart event 
 	 */
@@ -292,13 +340,8 @@
 		var scroller = this.getScroller(cmp),
 			nextPage,			
 			prevSelectedPage = cmp.get('v.priv_currentPage');
-		
-		
-		if (evt.isEventHandledByChildCarousel && (scroller.dirX == 1 || scroller.dirX == -1)) {			
-			//nested scroller and swiping horizontal
-			scroller.disable();
-			delete evt.isEventHandledByChildCarousel;
-		} else	if (scroller.absDistX > this.SCROLL_START_THRESHOLD && !cmp._isScrollStartProcessed) {
+	 		
+		if (scroller.absDistX > this.SCROLL_START_THRESHOLD && !cmp._isScrollStartProcessed) {
 			
 			if (scroller.dirX == 1) {
 				//scrolling to right
@@ -315,16 +358,12 @@
 				this.showPage(this.getPageComponentFromIndex(cmp, nextPage), nextPage);
 			}
 		}
-		
-		if (!evt.isEventHandledByChildCarousel) {
-			evt.isEventHandledByChildCarousel = true;
-		}
 	},
 	
 	/**
 	 * Handle scroll event 
 	 */
-	handleScrollEnd: function(cmp, evt) {		
+	handleScrollEnd: function(cmp, evt) {
 		var scroller = this.getScroller(cmp),
 			//scroller page starts with 0
 			currentPageX = scroller.currPageX + 1,			
@@ -337,9 +376,10 @@
 			return;
 		}		
 		
-		if (cmp.get('v.fireSlideChangedEvent')) {
-			$A.getEvt("ui:slideChangedEvent").fire();
-		}
+		var action = cmp.get("v.onPageChange");
+		if (action) {
+			action.runDeprecated(cmp);
+		}		
 		
 		this.pageSelected(cmp, currentPageX);	 
 	},
@@ -373,7 +413,12 @@
 
 			cmp.getAttributes().setValue('priv_currentPage', pageIndex);			
 			this.firePageSelectedEventToPage(prePageCmp, pageIndex);
-			this.firePageSelectedEventToPage(curPageCmp, pageIndex);			
+			this.firePageSelectedEventToPage(curPageCmp, pageIndex);
+			
+			var e = cmp.get('e.loadPage');    			
+			e.setParams({pageModel: this.getPageModelFromIndex(cmp, pageIndex), pageIndex: pageIndex});    			
+			e.fire();	
+			
 			this.firePageSelectedEventToPageIndicator(cmp, curPageCmp, pageIndex);
 			
 			this.hideAllUnselectedPages(cmp, pageIndex);

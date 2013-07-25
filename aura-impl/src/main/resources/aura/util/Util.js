@@ -574,11 +574,15 @@ $A.ns.Util.prototype.createTimeoutCallback = function(callback, toleranceMillis)
 $A.ns.Util.prototype.on = (function() {
     if (window["addEventListener"]) {
         return function(element, eventName, handler, useCapture, timeout) {
+        	var originalHandler = handler;
+        	
             if (timeout) {
                 handler = this.createTimeoutCallback(handler, timeout);
             }
 
             if(element){
+                originalHandler.registeredAuraHandler = handler;
+            	
                 element["addEventListener"](eventName, handler, useCapture);
             }
         };
@@ -595,6 +599,8 @@ $A.ns.Util.prototype.on = (function() {
             if (!element){
             	return;
             }
+            
+        	var originalHandler = handler;
 
             // Eliminate registration of duplicate handlers on older browsers
             var handlerCache = element["handlerCache"];
@@ -631,6 +637,8 @@ $A.ns.Util.prototype.on = (function() {
                 handler.call(element, event || window.event);
                 event.currentTarget = event.target = event.which = event.preventDefault = event.stopPropagation = null;
             };
+            
+            originalHandler.registeredAuraHandler = newHandler;
 
             element["attachEvent"]('on' + eventName, newHandler, false);
         };
@@ -647,7 +655,11 @@ $A.ns.Util.prototype.on = (function() {
  * @returns {void}
  */
 $A.ns.Util.prototype.removeOn = function(element, eventName, listener, useCapture) {
-    if (window["removeEventListener"]) {
+	if (listener.registeredAuraHandler) {
+		listener = listener.registeredAuraHandler;
+	}
+
+	if (window["removeEventListener"]) {
         element.removeEventListener(eventName, listener, useCapture);
     } else if (window["detachEvent"]) {
         element.detachEvent("on" + eventName, listener);

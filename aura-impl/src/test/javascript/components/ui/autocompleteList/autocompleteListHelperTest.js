@@ -57,7 +57,9 @@ Test.Components.Ui.AutocompleteList.AutocompleteListHelperTest=function(){
 			}
 			
 			var mockHelperMethods = Mocks.GetMocks(targetHelper, {
-				toggleListVisibility : function(cmp, value){}
+				toggleListVisibility : function(cmp, value){},
+				showLoading : function(cmp, value){},
+				fireMatchDoneEvent : function(cmp, value){}
 			});
 			
 			// Act
@@ -100,7 +102,9 @@ Test.Components.Ui.AutocompleteList.AutocompleteListHelperTest=function(){
 			}
 			
 			var mockHelperMethods = Mocks.GetMocks(targetHelper, {
-				toggleListVisibility : function(cmp, value){}
+				toggleListVisibility : function(cmp, value){},
+				showLoading : function(cmp, value){},
+				fireMatchDoneEvent : function(cmp, value){}
 			});
 			
 			// Act
@@ -143,7 +147,9 @@ Test.Components.Ui.AutocompleteList.AutocompleteListHelperTest=function(){
 			}
 			
 			var mockHelperMethods = Mocks.GetMocks(targetHelper, {
-				toggleListVisibility : function(cmp, value){}
+				toggleListVisibility : function(cmp, value){},
+				showLoading : function(cmp, value){},
+				fireMatchDoneEvent : function(cmp, value){}
 			});
 			
 			// Act
@@ -182,7 +188,9 @@ Test.Components.Ui.AutocompleteList.AutocompleteListHelperTest=function(){
 			}
 			
 			var mockHelperMethods = Mocks.GetMocks(targetHelper, {
-				toggleListVisibility : function(cmp, value){}
+				toggleListVisibility : function(cmp, value){},
+				showLoading : function(cmp, value){},
+				fireMatchDoneEvent : function(cmp, value){}
 			});
 			
 			// Act
@@ -225,7 +233,9 @@ Test.Components.Ui.AutocompleteList.AutocompleteListHelperTest=function(){
 			}
 			
 			var mockHelperMethods = Mocks.GetMocks(targetHelper, {
-				toggleListVisibility : function(cmp, value){}
+				toggleListVisibility : function(cmp, value){},
+				showLoading : function(cmp, value){},
+				fireMatchDoneEvent : function(cmp, value){}
 			});
 			
 			// Act

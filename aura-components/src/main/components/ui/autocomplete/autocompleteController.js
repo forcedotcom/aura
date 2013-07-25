@@ -31,6 +31,10 @@
         })();
     },
     
+    fetchData: function(component, event, helper) {
+        helper.fetchData(component, event);
+    },
+    
     handleFocus: function(component, event, helper) {
         var inputCmp = event.getSource();
         var elem = inputCmp ? inputCmp.getElement() : null;
@@ -53,6 +57,16 @@
         helper.handleKeyAction(component, event);
     },
     
+    handleMatchDone: function(component, event, helper) {
+        var evt = component.get("e.matchDone");
+        if (evt) {
+            evt.setParams({
+                size: event.getParam("size")
+            });
+            evt.fire();
+        }
+    },
+    
     handleSelectOption: function(component, event, helper) {
         var optionSelectEvt = component.get("e.selectListOption");
         optionSelectEvt.setParams({
@@ -63,8 +77,10 @@
     
     matchText: function(component, event, helper) {
         var listCmp = component.find("list");
-        listCmp.setValue("v.keyword", event.getParam("keyword"));
-        listCmp.get("e.matchText").fire();
+        if (listCmp) {
+            listCmp.setValue("v.keyword", event.getParam("keyword"));
+            listCmp.get("e.matchText").fire();
+        }
     },
     
     updateAriaAttributes: function(component, event, helper) {

@@ -29,6 +29,25 @@
         return -1;
     },
     
+    /**
+     * Notify that the matching is done.
+     */
+    fireMatchDoneEvent: function(component, items) {
+        var size = 0;
+        for (var i = 0; i < items.length; i++) {
+            if (items[i].visible === true) {
+                size++;
+            }
+        }
+        var evt = component.get("e.matchDone");
+        if (evt) {
+            evt.setParams({
+                size: size
+            });
+            evt.fire();
+        }
+    },
+    
     getEventSourceComponent: function(component, event) {
         var element = event.target || event.srcElement;
         var htmlCmp = $A.componentService.getRenderingComponentForElement(element);
@@ -187,6 +206,12 @@
         return prev;
     },
     
+    handleDataChange: function(component, event) {
+        var concreteCmp = component.getConcreteComponent();
+        concreteCmp.getValue("v.items").setValue(event.getParam("data"));
+        this.matchText(concreteCmp); 
+    },
+    
     handleEsckeydown: function(component, event) {
         component.setValue("v.visible", false);
     },
@@ -289,7 +314,9 @@
             }
         }
         component.setValue("v.items", items);
+        this.fireMatchDoneEvent(component, items);
         this.toggleListVisibility(component, items);
+        this.showLoading(component, false);
     },
     
     toggleListVisibility: function(component, items) {

@@ -33,8 +33,6 @@
     	helper = component.getDef().getHelper();
     
     	helper.handleDataChange(component, event);
-    	
-    	helper.showLoading(component, false);
     },
     
     init: function(component, event, helper) {

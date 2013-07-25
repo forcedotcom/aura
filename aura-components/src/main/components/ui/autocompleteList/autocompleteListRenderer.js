@@ -14,18 +14,6 @@
  * limitations under the License.
  */
 ({
-    afterRender: function(component, helper) {
-        this.superAfterRender();
-    },
-    
-    rerender: function(component, helper) {
-        var items = component.getValue("v.items");
-        if (items.isDirty()) {
-            helper.matchText(component, true);
-        }
-        this.superRerender();
-    },
-    
     unrender: function(component, helper) {
         if (helper.getOnClickEventProp.cache && 
             helper.getOnClickEventProp.cache.onClickStartEvent && 

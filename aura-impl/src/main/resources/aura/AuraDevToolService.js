@@ -445,7 +445,7 @@ var AuraDevToolService = function() {
          		if($A.util.isUndefinedOrNull(imgType)){
          		   imgTypeNotDefinedErrorArray.push(allImgTags[index]);
          		}
-         		else if((imgType === "informational" || $A.util.isUndefinedOrNull(imgType)) && ($A.util.isUndefinedOrNull(alt) || alt === "")){
+         		else if((imgType === "informational" || $A.util.isUndefinedOrNull(imgType)) && ($A.util.isUndefinedOrNull(alt) || alt === "" )){
          			informationErrorArray.push(allImgTags[index]);
          		}
          		else if(imgType === "decorative" && (!$A.util.isUndefinedOrNull(alt) && alt !== "")){
@@ -554,7 +554,7 @@ var AuraDevToolService = function() {
         	    data_aura_rendered_by = errArray[i].getAttribute("data-aura-rendered-by");
         	    
         	    //Make sure it has a rendered by value
-        	    if(aura.util.isUndefinedOrNull(data_aura_rendered_by) || data_aura_rendered_by === "" ){
+        	    if($A.util.isUndefinedOrNull(data_aura_rendered_by) || data_aura_rendered_by === "" ){
         		nodeName = errArray[i].nodeName.toLowerCase();
         		cmpInfo = "No Aura information available";
         		compThatRenderedCmp = cmpInfo;
@@ -563,18 +563,20 @@ var AuraDevToolService = function() {
         		//Making sure that the cmp is rendered by Aura and a normal HTML tag
         		//Making sure to grab the correct $A. Depending if you are using the debuggertool or not, $A will be different
         		cmp = $A.getCmp(data_aura_rendered_by);
-        		
-        		if(!aura.util.isUndefinedOrNull(cmpDesc)){
+
+        		if(!$A.util.isUndefinedOrNull(cmp) && !$A.util.isUndefinedOrNull(cmp.getAttributes()) ){
         		    //If he component exists grab it descriptor
         		    cmpDesc = cmp.getAttributes().getValueProvider().getDef().getDescriptor();
+        		
         		    //Grab the namespace and name so that it is not viewed as a hyperlink
         		    cmpInfo = cmpDesc.getNamespace()+":"+cmpDesc.getName();
-        		    
-        		  //Grabbing the erroneous components value provider
-        		  cmpDesc = cmp.getAttributes().getValueProvider().getAttributes().getValueProvider();
+
+        		    //Grabbing the erroneous components value provider
+            		     cmpDesc = cmp.getAttributes().getValueProvider();
         		    
         		  //Making sure we are not at the app level
-        		  if(!aura.util.isUndefinedOrNull(cmpDesc)){
+        		  if(!$A.util.isUndefinedOrNull(cmpDesc) && !$A.util.isUndefinedOrNull(cmpDesc.getAttributes()) && !$A.util.isUndefinedOrNull(cmpDesc.getAttributes().getValueProvider())){      		      
+        		      cmpDesc = cmpDesc.getAttributes().getValueProvider();
         		      cmpDesc = cmpDesc.getDef().getDescriptor();
         		      compThatRenderedCmp = cmpDesc.getNamespace()+":"+cmpDesc.getName();
         		  }
@@ -584,7 +586,8 @@ var AuraDevToolService = function() {
         		  }  
         		}
         		else{
-        		    cmpInfo = "There was an error finding this component. Please rerender or fix the issue";
+        		    cmpInfo = "This item does not have a data-aura-rendered-by attribute.";
+        		    compThatRenderedCmp = cmpInfo;
         		}
         	    }
         	    
@@ -605,6 +608,24 @@ var AuraDevToolService = function() {
         	    }
         	    return errArray;
         	},
+        	/**
+                 * Method looks at the given anchors img (if it exists) and checks to see if it has an img atrib
+                 * @param   anchor  - The anchor in question
+                 * @returns Boolean - Returns whether a valid img alt was found
+                 */
+        	anchrDoesNotHaveImgWithAlt : function(anchor){
+        	    var imgs = anchor.getElementsByTagName("img");
+        	    var alt = "";
+        	    
+        	    for(var i =0; i<imgs.length; i++){
+        		alt = imgs[i].getAttribute("alt");
+        		if(!$A.util.isUndefinedOrNull(alt) && alt.replace(/[\s\t\r\n]/g,'') !== ""){
+        		   return false;    
+        		}
+        	    }
+        	    return true;
+        	},
+        	
                 /**
                  * Method looks at the given arrays for anchor statements that are the empty string
                  * @param   anchors - The anchor tags in the document
@@ -614,13 +635,14 @@ var AuraDevToolService = function() {
     	        	var errArray = [];
     	        	var anchor = null;
     	        	var text = "";
+    	        	var accessAideFuncs = $A.devToolService.accessbilityAide;
     	        	for(var index = 0; index<anchors.length; index++){
     	        	    anchor = anchors[index];
     	        	    
     	        	    //Text should not be undefined or null at any point since $A.test.getText will always return something
     	        	    text = $A.util.getText(anchor).replace(/[\s\t\r\n]/g,'');
     	        	    
-    	        	    if(text === ""){
+    	        	    if(text === "" && accessAideFuncs.anchrDoesNotHaveImgWithAlt(anchor)){
     	        		errArray.push(anchor);
     	        	    }
     	        	}

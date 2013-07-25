@@ -24,7 +24,6 @@
         if ($A.util.isNumber(num) || $A.util.isString(num)) {
             var hasFormat = !$A.util.isEmpty(f);
             if (hasFormat || currencySymbol) {
-                debugger;
                 var nf;
                 try {
                     var symbols;

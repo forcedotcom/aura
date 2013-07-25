@@ -18,8 +18,6 @@
 <aura:component extends="ui:output" extensible="true" support="GA" description="Displays the currency in the default or specified format, such as with specific currency code or decimal places.">
     <aura:attribute name="value" type="Decimal" required="true" description="The output value of the currency, which is defined as type Decimal."/>
     <aura:attribute name="format" type="String" description="The format of the number. For example, format=&ldquo;.00&rdquo; displays the number followed by two decimal places. If not specified, the Locale default format will be used."/>
-    <!-- fractionDigits is the number of digits to the right of the decimal place, the max value supported is 340-->
-    <aura:attribute name="fractionDigits" type="Integer" default="2" description="The maximum number of digits to the right of the decimal place. Default value is &#8220;2&#8221;. The maximum number allowed is 340."/>
     <!-- An ISO 4217 code, eg. "USD" -->
     <aura:attribute name="currencyCode" type="String" description="The currency code specified as a String."/>
     <aura:attribute name="currencySymbol" type="String" description="The currency symbol specified as a String."/>

@@ -131,17 +131,6 @@
         }
     },
     /**
-     * Positive test case: Verify the default values of 'FractionDigits' attributes
-     */
-    testDefaultIntegerFractionDigits:{
-        attributes : {value : '12345678909876543.444'},
-        test: function(component){
-            aura.test.assertEquals(2, component.getValue('v.fractionDigits').getValue(), "Expected fractionDigits attribute to be 2");
-            aura.test.assertEquals('$12,345,678,909,876,543.44', $A.test.getText(component.find('span').getElement()), "Failed to use default value of fractionDigits attribute.");
-        }
-
-    },
-    /**
      * Positive test case: Assign fractionDigits value of 4 and provide a integer value. Verifying padding to match precision.
      */
     testFractionDigitsPad: {

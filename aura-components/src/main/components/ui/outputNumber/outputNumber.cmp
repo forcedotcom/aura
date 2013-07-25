@@ -18,6 +18,5 @@
 <aura:component extends="ui:output" extensible="true" support="GA" description="Displays the number in the default or specified format. Supports up to 18 digits before the decimal place.">
     <aura:attribute name="value" type="Decimal" required="true" description="The number displayed when this component is rendered."/>
     <aura:attribute name="format" type="String" description="The format of the number. For example, format=&ldquo;.00&rdquo; displays the number followed by two decimal places. If not specified, the Locale default format will be used."/>
-    <aura:attribute name="grouping" type="Boolean" description="If no format is specified, whether or not to separate thousands groups." default="true"/>
     <span aura:id="span" class="{!v.class}"/>
 </aura:component>

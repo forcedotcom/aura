@@ -269,7 +269,7 @@
     
     hasLabel: function(cmp) {
     	var label = cmp.get('v.label');    	
-    	return label && label.length > 0;
+    	return !!(label && label.length > 0);
     },
 
     formatValue: function(cmp) {

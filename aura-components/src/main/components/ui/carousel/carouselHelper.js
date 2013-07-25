@@ -555,26 +555,26 @@
 	
 	/**
 	 * Spinner controls
+	 * 
+	 * If no spinner was specified, uses the default spinner
 	 */
 	showLoadingIndicator: function (cmp) {
-		var spinner = cmp.getAttributes().get("spinner")[0];
-		if (!$A.util.isUndefinedOrNull(spinner)) {
-			var evt = spinner.getEvent("toggle");
-			if (!$A.util.isUndefinedOrNull(evt)) {
-				evt.setParams({"isVisible": true});
-		        evt.fire();
-			}
+		var spinners = cmp.getAttributes().get("spinner");
+		var evt = (spinners.length > 0 ? spinners[0].getEvent("toggle") : cmp.getAttributes().get("priv_default_spinner")[0].getEvent("toggle"));
+
+		if (!$A.util.isUndefinedOrNull(evt)) {
+			evt.setParams({"isVisible": true});
+	        evt.fire();
 		}
     },
 
     hideLoadingIndicator: function (cmp) {
-    	var spinner = cmp.getAttributes().get("spinner")[0];
-		if (!$A.util.isUndefinedOrNull(spinner)) {
-			var evt = spinner.getEvent("toggle");
-			if (!$A.util.isUndefinedOrNull(evt)) {
-				evt.setParams({"isVisible": false});
-		        evt.fire();
-			}
+    	var spinners = cmp.getAttributes().get("spinner");
+		var evt = (spinners.length > 0 ? spinners[0].getEvent("toggle") : cmp.getAttributes().get("priv_default_spinner")[0].getEvent("toggle"));
+
+		if (!$A.util.isUndefinedOrNull(evt)) {
+			evt.setParams({"isVisible": false});
+	        evt.fire();
 		}
     }
 })

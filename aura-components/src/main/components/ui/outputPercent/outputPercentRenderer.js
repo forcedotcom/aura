@@ -53,7 +53,7 @@
             if ($A.util.isNumber(val) || $A.util.isString(val)) {
                 var scale = cmp.get("v.valueScale");
                 if (scale) {
-                    num *= Math.pow(10, scale);
+                    val *= Math.pow(10, scale);
                 }
                 if (!$A.util.isEmpty(f)) {
                     var nf;

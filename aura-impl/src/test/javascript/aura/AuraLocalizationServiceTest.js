@@ -42,6 +42,12 @@ Test.Aura.AuraLocalizationServiceTest = function(){
 	var targetTimeFormat = "hh:mm:ss";
 	var targetLocale = "en";	
 	var targetTimezone = "PST";
+	var targetNumber = 101;
+	var targetPercent = '10%';
+	var targetCurrency = '$100';
+	var targetNumberFormat = "nFormat";
+	var targetPercentFormat = "pFormat";
+	var targetCurrencyFormat = "cFormat";
 	
 	var mockUtil = Mocks.GetMock(Object.Global(), "$A", {                                
 		getGlobalValueProviders:function() {   
@@ -53,6 +59,11 @@ Test.Aura.AuraLocalizationServiceTest = function(){
 					if(value == "$Locale.timezone") return targetTimezone;					
 				}
 			};            		            
+        },
+        get:function(value){
+        	if(value == "$Locale.numberFormat") return targetNumberFormat;
+			if(value == "$Locale.percentFormat") return targetPercentFormat;
+			if(value == "$Locale.currencyFormat") return targetCurrencyFormat;
         }
     });
 	
@@ -2004,7 +2015,7 @@ Test.Aura.AuraLocalizationServiceTest = function(){
                                      	         	                	
             // Act  	    
             mockUtil(function(){            	
-    			targetService.init();            	
+    			targetService.init();      
             });
 
             // Assert
@@ -2050,4 +2061,168 @@ Test.Aura.AuraLocalizationServiceTest = function(){
             Assert.Equal(expected, actual);
         }
     }
+    	
+    [Fixture]
+    function formatNumbers(){
+    			
+    	[Fact]
+        function formatNumber(){    		
+            // Arrange    		    		
+            var expected = targetNumber;
+            var actual;                        
+            
+            var mockGetDefaultNumberFormat = Mocks.GetMock(targetService, "getDefaultNumberFormat", function(){		    	
+            	return {
+            		format: function(number){
+            			if(number == targetNumber) return targetNumber;
+            		}
+            	};
+			});	
+                                     	         	                	
+            // Act  	    
+            mockGetDefaultNumberFormat(function(){
+            	actual = targetService.formatNumber(targetNumber);
+            });
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }    
+             
+    	[Fact]
+        function formatPercent(){    		
+            // Arrange    		    		
+            var expected = targetPercent;
+            var actual;                        
+            
+            var mockGetDefaultPercentFormat = Mocks.GetMock(targetService, "getDefaultPercentFormat", function(){		    	
+            	return {
+            		format: function(number){
+            			if(number == targetPercent) return targetPercent;
+            		}
+            	};
+			});	
+                                     	         	                	
+            // Act  	    
+            mockGetDefaultPercentFormat(function(){
+            	actual = targetService.formatPercent(targetPercent);
+            });
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }    
+    			
+    	[Fact]
+        function formatCurrency(){    		
+            // Arrange    		    		
+            var expected = targetCurrency;
+            var actual;                        
+            
+            var mockGetDefaultCurrencyFormat = Mocks.GetMock(targetService, "getDefaultCurrencyFormat", function(){		    	
+            	return {
+            		format: function(number){
+            			if(number == targetCurrency) return targetCurrency;
+            		}
+            	};
+			});	
+                                     	         	                	
+            // Act  	    
+            mockGetDefaultCurrencyFormat(function(){
+            	actual = targetService.formatCurrency(targetCurrency);
+            });
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }    
+    }
+    
+    [Fixture]
+    function getNumberFormat(){
+    			
+    	[Fact]
+        function getNumberFormat(){    		
+            // Arrange    		    		
+    		var actual;                                  
+            var targetSymbols = '###';
+    		var mockNumberFormat = {};    		    		                                    
+            
+            var mockNumberFormatConstructor = Mocks.GetMock(Object.Global(), "NumberFormat", function(format, symbols){				
+        		if(format == targetNumberFormat && symbols == targetSymbols) return mockNumberFormat;        		
+        	});	
+                                                 	         	                
+            // Act  	    
+            mockNumberFormatConstructor(function(){
+            	actual = targetService.getNumberFormat(targetNumberFormat, targetSymbols);
+            });
+
+            // Assert
+            Assert.Equal(mockNumberFormat, actual);
+        }
+    }
+    
+    [Fixture]
+    function getDefaultFormats(){
+    			
+    	[Fact]
+        function getNumberFormat(){    		
+            // Arrange    		    		
+    		var actual;                                              
+    		var mockNumberFormat = {};    		    		                                    
+            
+            var mockNumberFormatConstructor = Mocks.GetMock(Object.Global(), "NumberFormat", function(val){				
+        		if(val == targetNumberFormat) return mockNumberFormat;        		
+        	});	                        
+                                                 	         	                
+            // Act
+            mockUtil(function(){
+            	mockNumberFormatConstructor(function(){            	
+            		actual = targetService.getDefaultNumberFormat();
+            	});
+            });
+
+            // Assert
+            Assert.Equal(mockNumberFormat, actual);
+        }
+    	
+    	[Fact]
+        function getDefaultPercentFormat(){    		
+            // Arrange    		    		
+    		var actual;                                              
+    		var mockNumberFormat = {};    		    		                                    
+            
+            var mockNumberFormatConstructor = Mocks.GetMock(Object.Global(), "NumberFormat", function(val){				
+        		if(val == targetPercentFormat) return mockNumberFormat;        		
+        	});	                        
+                                                 	         	                
+            // Act
+            mockUtil(function(){
+            	mockNumberFormatConstructor(function(){            	
+            		actual = targetService.getDefaultPercentFormat();
+            	});
+            });
+
+            // Assert
+            Assert.Equal(mockNumberFormat, actual);
+        }
+    	
+    	[Fact]
+        function getDefaultCurrencyFormat(){    		
+            // Arrange    		    		
+    		var actual;                                              
+    		var mockNumberFormat = {};    		    		                                    
+            
+            var mockNumberFormatConstructor = Mocks.GetMock(Object.Global(), "NumberFormat", function(val){				
+        		if(val == targetCurrencyFormat) return mockNumberFormat;        		
+        	});	                        
+                                                 	         	                
+            // Act
+            mockUtil(function(){
+            	mockNumberFormatConstructor(function(){            	
+            		actual = targetService.getDefaultCurrencyFormat();
+            	});
+            });
+
+            // Assert
+            Assert.Equal(mockNumberFormat, actual);
+        }
+    }        
 }

@@ -14,6 +14,43 @@
  * limitations under the License.
  */
 ({
+    testHeadersCorrectOrder:{
+	attributes : {caseToRender : 'headersCorrectOrder'},
+	test: function(cmp){
+		var expected = "";
+		var output    = $A.devToolService.checkAccessibility();
+		var actual   =  output.split("\n")[0];
+		$A.test.assertEquals(expected, actual , "Unexpected return from CheckAccessibility, should not return errornous string. output: \n"+output);
+	}
+    },
+    
+    testHeadersWrongOrder:{
+	attributes : {caseToRender : 'headersWrongOrder'},
+	test: function(cmp){
+		var expected = "Total Number of Errors found: 2";
+		var output    = $A.devToolService.checkAccessibility();
+		var actual   =  output.split("\n")[0];
+		$A.test.assertEquals(expected, actual , "Unexpected return from CheckAccessibility, should not return errornous string. output: \n"+output);
+	}
+    },
+    testHeadersWrongOrderWrapAround:{
+	attributes : {caseToRender : 'headersWrongOrderWrapAround'},
+	test: function(cmp){
+		var expected = "Total Number of Errors found: 2";
+		var output    = $A.devToolService.checkAccessibility();
+		var actual   =  output.split("\n")[0];
+		$A.test.assertEquals(expected, actual , "Unexpected return from CheckAccessibility, should not return errornous string. output: \n"+output);
+	}
+    },
+    testHeadersWrongOrderReverse:{
+	attributes : {caseToRender : 'headersWrongOrderReverse'},
+	test: function(cmp){
+		var expected = "";
+		var output    = $A.devToolService.checkAccessibility();
+		var actual   =  output.split("\n")[0];
+		$A.test.assertEquals(expected, actual , "Unexpected return from CheckAccessibility, should not return errornous string. output: \n"+output);
+	}
+    },
     testAnchorWithInnerText:{
 	attributes : {caseToRender : 'anchorWInnerText'},
 	test: function(cmp){
@@ -30,7 +67,6 @@
 		var expected = "Total Number of Errors found: 1";
 		var output    = $A.devToolService.checkAccessibility();
 		var actual   =  output.split("\n")[0];
-		debugger;
 		$A.test.assertEquals(expected, actual , "Unexpected return from CheckAccessibility, should not return errornous string. output: \n"+output);
 	}
     },
@@ -96,5 +132,5 @@
 	            
 	        }
 	}
-    },
+    }
 })

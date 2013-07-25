@@ -691,9 +691,81 @@ var AuraDevToolService = function() {
                		 }
                		 
                		 return errorArray;
+                 },
+                 /**
+                  * Method that takes in a list of h#, the tag that show follow directly after, and all possible items that can be found.
+                  * It will start start searching through siblings of h# to find invalid-nested tags and return an error array with them if found
+                  * @param   tags     - Array of all h# tags to look at
+                  * @param   nextTag  - String representation of the very next tag that we should see. 
+                  * 			i.e. if tags contains all h1 tags, nextTag should be "h2"
+                  * @param   allHdrs  - Dictionary of all possible h# we can see.
+                  * 		       i.e. if tags is a list of all h1 tags in the document, then allHdrs will be a dictionary
+                  * 		       of h2-h6. 
+                  * @returns Array    - Array of all the errors
+                  */
+                 findNextHeader : function(tags, nextTag, allHdrs){
+                     var errorArray = [];
+                     var children = [];
+                     var child = null;
+                     var currTag;
+                     var startLooking = false;
+
+                     for(var index = 0; index< tags.length; index++){
+                 	children = tags[index].parentNode.children;
+                 	currTag = "";
+                 	startLooking = false;
+
+                 	if($A.util.isUndefinedOrNull(children)){
+                 	    continue;
+                 	}
+                 	            	
+                 	for(var childIndex = 0; childIndex < children.length; childIndex++){
+                 	    child = children[childIndex];
+                 	    
+                 	    if(tags[index] === child){
+                 		startLooking = true;
+                 	    }
+                 	    
+                 	    if(startLooking){
+                 		currTag = child.tagName.toLowerCase();
+                 		if(currTag in allHdrs){
+                 		    if(currTag !== nextTag){
+                 			errorArray.push(child);
+                 		    }
+                 		    break;
+                 		}
+                 	    }
+                 	}
+                     }
+                     
+                     return errorArray;
                  }
         },
         verifyAccessibility : {
+            /**
+             * Function that will find all nested Headers and make sure that they have in 1 lvl difference
+             * @returns String - Returns a string representation of the errors
+             */
+            checkNestedHeaders : function(){
+                   var headerErrMsg = "Headings are properly nested and increased by 1 level at a time. e.g., h1 followed by h2, h2 followed by h2 or h3. Refer to http://www.w3.org/TR/WCAG20-TECHS/G141.html.";
+                   var errArray = [];
+                   var accessAideFuncs = $A.devToolService.accessbilityAide;
+                   var hdrs1 = document.getElementsByTagName("h1");
+                   var hdrs2 = document.getElementsByTagName("h2");
+                   var hdrs3 = document.getElementsByTagName("h3");
+                   var hdrs4 = document.getElementsByTagName("h4");
+                   var hdrs5 = document.getElementsByTagName("h5");
+                   var hdrs6 = document.getElementsByTagName("h6");
+
+                   errArray = errArray.concat(accessAideFuncs.findNextHeader(hdrs1, "h2", {"h2":"", "h3":"", "h4":"", "h5":"", "h6":""}));
+                   errArray = errArray.concat(accessAideFuncs.findNextHeader(hdrs2, "h3", {"h3":"", "h4":"", "h5":"", "h6":""}));
+                   errArray = errArray.concat(accessAideFuncs.findNextHeader(hdrs3, "h4", {"h4":"", "h5":"", "h6":""}));
+                   errArray = errArray.concat(accessAideFuncs.findNextHeader(hdrs4, "h5", {"h5":"", "h6":""}));
+                   errArray = errArray.concat(accessAideFuncs.findNextHeader(hdrs5, "h6", {"h6":""}));
+
+                   return accessAideFuncs.formatOutput(headerErrMsg, errArray);
+               
+             },
                /**
                 * Function that will find all anchors and make sure that they have text in them
                 * @returns String - Returns a string representation of the errors

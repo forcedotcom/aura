@@ -129,4 +129,33 @@
         <ui:inputCheckbox label="Radio9" name="Group3"/>
         <ui:inputRadio    label="Radio10" name="Group4"/>
     </aura:if>
+    <aura:if isTrue="{!v.caseToRender == 'headersCorrectOrder'}">
+          <h1>1stHeader</h1>
+          <h2>2ndHeader</h2>
+          <h3>3rdHeader</h3>
+          <h4>4thHeader</h4>
+          <h5>5thHeader</h5>
+          <h6>6thHeader</h6>      
+    </aura:if>
+    <aura:if isTrue="{!v.caseToRender == 'headersWrongOrder'}">
+          <h1>1stHeader</h1>
+          <h3>3rdHeader</h3>
+          <h5>5thHeader</h5>
+          
+    </aura:if>    
+    <aura:if isTrue="{!v.caseToRender == 'headersWrongOrderReverse'}">
+          <h6>6thHeader</h6>
+          <h5>5thHeader</h5>
+          <h4>4thHeader</h4>
+          <h3>3rdHeader</h3>
+          <h2>2ndHeader</h2>
+          <h1>1stHeader</h1>      
+    </aura:if>
+    <aura:if isTrue="{!v.caseToRender == 'headersWrongOrderWrapAround'}">
+          <h1>1stHeader</h1>
+          <h3>3rdHeader</h3>
+          <h5>5thHeader</h5>
+          <h6>6thHeader</h6>
+          <h4>4thHeader</h4>      
+    </aura:if>
 </aura:component>

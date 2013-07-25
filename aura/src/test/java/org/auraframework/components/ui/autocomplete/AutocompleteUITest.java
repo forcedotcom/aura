@@ -115,7 +115,7 @@ public class AutocompleteUITest extends WebDriverTestCase {
         WebElement list = getAutoCompleteList(driver, AUTOCOMPLETE_COMPONENT.get("Generic"));
         waitForAutoCompleteListVisible(list, true);
         
-        input.sendKeys(Keys.TAB);
+        auraUITestingUtil.pressTab(input);
         list = getAutoCompleteList(driver, AUTOCOMPLETE_COMPONENT.get("Generic"));
         waitForAutoCompleteListVisible(list, false);
         assertEquals("Focus should be back on the input",
@@ -135,7 +135,8 @@ public class AutocompleteUITest extends WebDriverTestCase {
         waitForAutoCompleteListVisible(list, true);
         
         // go to second option in list.
-        input.sendKeys(Keys.ARROW_DOWN + "" +  Keys.ARROW_DOWN + "" + Keys.ENTER);
+        input.sendKeys(Keys.ARROW_DOWN + "" +  Keys.ARROW_DOWN + "");
+        auraUITestingUtil.pressEnter(input);
         list = getAutoCompleteList(driver, AUTOCOMPLETE_COMPONENT.get("Generic"));
         waitForAutoCompleteListVisible(list, false);
         assertEquals("Wrong option was selected", "hello world2", input.getAttribute("value"));       

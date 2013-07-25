@@ -20,15 +20,13 @@
     <aura:attribute name="Labels_Records" type="String" default="Records per page: "   description="The text to display in the label before the pageSize input."/>
 
     <div class="{!v.class+' pagerContainer pagerPageSize'+(v.totalItems==0?' empty':'')}">
-        <label>{!v.Labels_Records}
-		    <ui:inputSelect value="{!v.pageSize}" change="{!c.changePageSize}">
-			    <ui:inputSelectOption label="10" text="10"/>
-			    <ui:inputSelectOption label="25" text="25"/>
-			    <ui:inputSelectOption label="50" text="50"/>
-		    	<ui:inputSelectOption label="100" text="100"/>
-		    	<ui:inputSelectOption label="200" text="200"/>
-			</ui:inputSelect>    
-        </label>
+	    <ui:inputSelect label="{!v.Labels_Records}" value="{!v.pageSize}" change="{!c.changePageSize}">
+		    <ui:inputSelectOption label="10" text="10"/>
+		    <ui:inputSelectOption label="25" text="25"/>
+		    <ui:inputSelectOption label="50" text="50"/>
+	    	<ui:inputSelectOption label="100" text="100"/>
+	    	<ui:inputSelectOption label="200" text="200"/>
+		</ui:inputSelect>    
     </div>
     
     

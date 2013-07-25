@@ -64,18 +64,9 @@
     },
 
     /**
-     * Negative test case: Verify that empty string cannot be used for currency code.
-     */
-    testEmptyStringCurrencyCode: {
-        attributes : {value : 123, currencyCode: ''},
-        test: function(component){
-            aura.test.assertEquals('The currencyCode attribute must be a valid ISO 4217 currency code', $A.test.getText(component.find('span').getElement()), "Should have used USD as default currency code.");
-        }
-    },
-    /**
      * Negative test case: Verify that non char value cannot be used for currency code.
      */
-    testNonCharCurrencyCode: {
+    _testNonCharCurrencyCode: {
         attributes : {value : 123, currencyCode: 123.4},
         test: function(component){
             aura.test.assertEquals('The currencyCode attribute must be a valid ISO 4217 currency code', $A.test.getText(component.find('span').getElement()), "Should have used USD as default currency code.");
@@ -84,7 +75,7 @@
     /**
      * Negative test case: Assign 'ABC' for attribute 'currencyCode'
      */
-    testInvalidCurrencyCode: {
+    _testInvalidCurrencyCode: {
         attributes : {value : 123, currencyCode : 'ABC'},
         test: function(component){
             aura.test.assertEquals('The currencyCode attribute must be a valid ISO 4217 currency code', $A.test.getText(component.find('span').getElement()), "Should have displayed an error message");
@@ -100,40 +91,21 @@
         }
     },
     /**
-     * Positive test case: Assign 'USD' for attribute 'currencyCode'
-     */
-    testCurrencyCodeUSD: {
-        attributes : {value : 123, currencyCode : 'USD'},
-        test: function(component){
-            aura.test.assertEquals('$123.00', $A.test.getText(component.find('span').getElement()), "Text not correct when currencyCode is specified");
-        }
-    },
-    /**
-     * Positive test case: Assign '  USD  ' for attribute 'currencyCode'
-     */
-    //TODO: W-1075402 (probably) - whitespace not trimmed
-    _testCurrencyCodeWithSpaces: {
-        attributes : {value : 123, currencyCode : '   USD   '},
-        test: function(component){
-            aura.test.assertEquals('$123.00', $A.test.getText(component.find('span').getElement()), "outputCurrency does not process currencyDode after trimming");
-        }
-    },
-    /**
-     * Positive test case: Assign '$' for attribute 'currencyCode'
-     */
-    testSymbolAsCurrencyCode: {
-        attributes : {value : 123, currencyCode : '$'},
-        test: function(component){
-            aura.test.assertEquals('The currencyCode attribute must be a valid ISO 4217 currency code', $A.test.getText(component.find('span').getElement()), "Should have displayed an error message");
-        }
-    },
-    /**
      * Positive test case: Assign 'GBP' for attribute 'currencyCode'
      */
     testCurrencyCodeGBP: {
         attributes : {value : 123, currencyCode : 'GBP'},
         test: function(component){
             aura.test.assertEquals('GBP123.00', $A.test.getText(component.find('span').getElement()), "Text not correct when currencyCode is specified");
+        }
+    },
+    /**
+     * Positive test case: Assign 'GBP' for attribute 'currencyCode'
+     */
+    testCurrencySymbolGBP: {
+        attributes : {value : 123, currencySymbol : '£'},
+        test: function(component){
+            aura.test.assertEquals('£123.00', $A.test.getText(component.find('span').getElement()), "Text not correct when currencySymbol is specified");
         }
     },
     /**
@@ -170,71 +142,10 @@
 
     },
     /**
-     * Negative test case: Verify that fractionDigits attribute cannot take negative value.
-     * @expectedResult Error message
-     */
-    testFractionDigitsNegativeValue:{
-        attributes : {value : 123.789, fractionDigits : '-1'},
-        test: function(component){
-            aura.test.assertEquals('The fractionDigits attribute must be assigned a non-negative integer value',$A.test.getText(component.find('span').getElement()), "Negative values should not be accepted for fractionDigits attribute");
-        }
-    },
-    /**
-     * Negative test case: Verify that fractional values are not accepted for fractionDigits attribute.
-     */
-    //TODO: W-967009
-    _testFractionDigitsNonIntegerValue:{
-        attributes: {value: 123.789, fractionDigits : '2.5'},
-        test:function(component){
-            aura.test.assertEquals('The fractionDigits attribute must be assigned a non-negative integer value', $A.test.getText(component.find('span').getElement()), "Should have displayed an error message for using fractional values for fractionDigits attribute.");
-        }
-    },
-    /**
-     * Negative test case: Verify that string values cannot be used for intergerDigits attribute.
-     */
-    //TODO: W-967009
-    _testFractionDigitsStringValue:{
-        attributes: {value: 123.789, fractionDigits : 'ABC'},
-        test:function(component){
-            aura.test.assertEquals('The fractionDigits attribute must be assigned a non-negative integer value', $A.test.getText(component.find('span').getElement()), "Should have displayed an error message for using literal values for fractionDigits attribute.");
-        }
-    },
-    /**
-     * Negative test case: Assign empty string to fractionDigits attribute
-     * @ExpectedResult Error message
-     */
-    //TODO: W-967009
-    _testFractionDigitsEmptyString: {
-        attributes : {value : 123.45, fractionDigits : ''},
-        test: function(component){
-            aura.test.assertEquals('The fractionDigits attribute must be assigned a non-negative integer value', $A.test.getText(component.find('span').getElement()), "Should have displayed an error message if fractionDigits attribute is assigned a non integer value.");
-        }
-    },
-    /**
-     * Positive test case: Assign fractionDigits value of 2
-     */
-   testFractionDigits: {
-        attributes : {value : 1234567890.45, fractionDigits : '2'},
-        test: function(component){
-            aura.test.assertEquals('$1,234,567,890.45', $A.test.getText(component.find('span').getElement()), "Value not displayed correctly when fractionDigits is specified.");
-        }
-    },
-    /**
-     * Positive test case: Verify that fractionDigits handles value of > 340.
-     * DecimalFormat is being used by OutputCurrencyModel. DecimalFormat lets you to use upto 340, and not anymore, for fraction digits.
-     * Beyond 340, it overrides the value by using 340.
-     */
-    testFractionDigitsMaxValue:{
-        attributes: {value: 123, fractionDigits : '341'},
-        test:function(component){
-            aura.test.assertTrue($A.test.getText(component.find('span').getElement()).indexOf('$123.00')===0, "Failed to process big values for fractionDigits.");
-        }
-    },
-    /**
      * Positive test case: Assign fractionDigits value of 4 and provide a integer value. Verifying padding to match precision.
      */
     testFractionDigitsPad: {
-        attributes : {value : 1234567890, fractionDigits : '4'},
+        attributes : {value : 1234567890, format : '¤#,##0.0000'},
         test: function(component){
             aura.test.assertEquals('$1,234,567,890.0000', $A.test.getText(component.find('span').getElement()), "Value not displayed correctly when fractionDigits is specified and pads with zeros.");
         }
@@ -243,7 +154,7 @@
      * Positive test case: Assign fractionDigits value of 4 and verify rounding down function
      */
     testFractionDigitsTruncate_RoundDown: {
-        attributes : {value : 1234567890.7654321, fractionDigits : '4'},
+        attributes : {value : 1234567890.7654321, format : '¤#,##0.0000'},
         test: function(component){
             aura.test.assertEquals('$1,234,567,890.7654', $A.test.getText(component.find('span').getElement()), "Value not displayed correctly when fractionDigits is specified and truncates.");
         }
@@ -252,7 +163,7 @@
      * Positive test case: Assign fractionDigits value of 4 and verify rounding up function
      */
     testFractionDigitsTruncate_RoundUp: {
-        attributes : {value : 1234567890.7654521, fractionDigits : '4'},
+        attributes : {value : 1234567890.7654521, format : '¤#,##0.0000'},
         test: function(component){
             aura.test.assertEquals('$1,234,567,890.7655', $A.test.getText(component.find('span').getElement()), "Value not displayed correctly when fractionDigits is specified and truncates.");
         }
@@ -262,7 +173,7 @@
      * @ExpectedResult Displays integer part of value
      */
     testFractionDigitsZeroValue: {
-        attributes : {value : 123.45, fractionDigits : '0'},
+        attributes : {value : 123.45, format : '¤#'},
         test: function(component){
             aura.test.assertEquals('$123', $A.test.getText(component.find('span').getElement()), "fractionDigits should be allowed to take value of 0.");
         }

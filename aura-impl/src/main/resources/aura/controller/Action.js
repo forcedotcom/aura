@@ -646,16 +646,6 @@ Action.prototype.toJSON = function() {
 };
 
 /**
- * Marks the current action as aborted.
- * 
- * @private
- */
-Action.prototype.abort = function() {
-	this.state = "ABORTED";
-	this.completeGroups();
-};
-
-/**
  * Mark the current action as incomplete.
  * 
  * @private

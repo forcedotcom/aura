@@ -507,7 +507,6 @@ public abstract class AuraBaseServlet extends HttpServlet {
 
     public static List<String> getBaseScripts() throws QuickFixException {
         AuraContext context = Aura.getContextService().getCurrentContext();
-        String contextPath = context.getContextPath();
         Mode mode = context.getMode();
 
         ConfigAdapter config = Aura.getConfigAdapter();

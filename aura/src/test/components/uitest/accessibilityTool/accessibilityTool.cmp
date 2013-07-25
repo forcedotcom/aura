@@ -90,6 +90,16 @@
             </table>
         </a>
     </aura:if>
+    <aura:if isTrue="{!v.caseToRender == 'anchorInOutputURLInfo'}">
+         <a href="javascript:void(0);" title="" dir="ltr" class="uiOutputURL">
+            <img class="/auraFW/resources/aura/s.gif uiImage" alt="heloo" src="/auraFW/resources/aura/s.gif" />
+        </a>
+    </aura:if>
+     <aura:if isTrue="{!v.caseToRender == 'anchorInOutputURLDeco'}">
+         <a href="javascript:void(0);" title="" dir="ltr" class="uiOutputURL">
+            <img class="/auraFW/resources/aura/s.gif uiImage" src="/auraFW/resources/aura/s.gif" />
+        </a>
+    </aura:if>
     <aura:if isTrue="{!v.caseToRender == 'NoRadioErrors'}">
        <fieldset class="field_set">
             <legend>More Options</legend>

@@ -176,19 +176,15 @@
                         cmp._label === "__MISSING LABEL__ PropertyFile - val FooBar not found in section Related_Lists",
                     "$Label.Related_Lists.FooBar should have error value"
                 );
-            },
-            //Non function callback
-            function (cmp) {
-                var fixMeLabel = "FIXME - LocalizationAdapter.getLabel() needs implemenation!";
-                var gvp = $A.getGlobalValueProviders();
-                var label = gvp.get("$Label.Related_Lists.FooBar", undefined, "Mary Poppins");
-                $A.test.assertEquals(fixMeLabel, label);
-                $A.test.assertEquals(fixMeLabel,
-                    gvp.get("$Label.Related_Lists.FooBar", undefined, undefined));
-
             }
         ]
+    },
+    
+    testGetWithNonFunctionCallback: {
+    	test : function (cmp) {
+            var gvp = $A.getGlobalValueProviders();
+            $A.test.addWaitFor("Today + Overdue", function(){return gvp.get("$Label.Related_Lists.task_mode_today_overdue",undefined,"Mary Poppins")});
+            $A.test.addWaitFor("Today + Overdue", function(){return gvp.get("$Label.Related_Lists.task_mode_today_overdue",undefined,"undefined")});
+    	}
     }
-
-
 })

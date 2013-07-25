@@ -51,18 +51,18 @@ public class LocalizationAdapterImpl implements LocalizationAdapter {
         labels.put("task_mode_today", todayLabels);
 
         todayLabels = new HashMap<String, String>();
-        todayLabels.put("ar", "اليوم1");
-        todayLabels.put("cs", "Dnes1");
-        todayLabels.put("de", "Heute1");
-        todayLabels.put("en", "Today1");
-        todayLabels.put("en_US", "Today1");
-        todayLabels.put("es", "Hoy1");
-        todayLabels.put("fr", "aujourd'hui1");
-        todayLabels.put("ja", "今日1");
-        todayLabels.put("ko", "오늘1");
-        todayLabels.put("zh_CN", "今天1");
-        todayLabels.put("zh_TW", "今天1");
-        labels.put("task_mode_today1", todayLabels);
+        todayLabels.put("ar", "اليوم + المتأخرة");
+        todayLabels.put("cs", "Dnes + splatnosti");
+        todayLabels.put("de", "Heute + Überfällig");
+        todayLabels.put("en", "Today + Overdue");
+        todayLabels.put("en_US", "Today + Overdue");
+        todayLabels.put("es", "Hoy + Atrasado");
+        todayLabels.put("fr", "aujourd'hui1 + retard");
+        todayLabels.put("ja", "今日+延滞");
+        todayLabels.put("ko", "오늘 + 연체");
+        todayLabels.put("zh_CN", "今天+逾期");
+        todayLabels.put("zh_TW", "今天+逾期");
+        labels.put("task_mode_today_overdue", todayLabels);
     }
 
     public LocalizationAdapterImpl() {

@@ -98,7 +98,7 @@ $A.ns.LabelValueProvider.prototype.requestServerLabel = function(section, name, 
 
         if (!isComponent) {
             // forces immediate lookup if not data-bound to component
-            $A.eventService.finishFiring();
+        	$A.run(function() {}, "LabelValueProvider.requestServerLabel");
         }
 
         queue.setRequested();

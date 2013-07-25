@@ -4,7 +4,6 @@
      * Any subsequent requests to these labels using Global Value Providers(GVP) should return the label.
      */
     testNewLabelsInDynamicComponent:{
-    testLabels : ["UnAdaptableTest"],
     test:function(cmp){
         var gvp = $A.getGlobalValueProviders();
         var a = cmp.get('c.getComponentWithLabelInBody');
@@ -15,7 +14,7 @@
                     function(){
                         $A.test.assertEquals("Today", gvp.get("$Label.Related_Lists.task_mode_today"),
                             "Failed to add Labels from dynamically created components");
-                        $A.test.assertEquals("Today1", gvp.get("$Label.Related_Lists.task_mode_today1"),
+                        $A.test.assertEquals("Today + Overdue", gvp.get("$Label.Related_Lists.task_mode_today_overdue"),
                                "Failed to add all labels from dynamically created components");
                         $A.test.assertFalse($A.test.isActionPending(),
                             "Subsequent requests for existing label should not cause server roundtrip");
@@ -61,7 +60,7 @@
                         $A.test.assertEquals("Today", gvp.get("$Label.Related_Lists.task_mode_today"),
                             "Failed to fetch label");
                         //New label should have been merged into LabelValueProvider
-                        $A.test.assertEquals("Today1", gvp.get("$Label.Related_Lists.task_mode_today1"),
+                        $A.test.addWaitForWithFailureMessage("Today + Overdue", function(){return gvp.get("$Label.Related_Lists.task_mode_today_overdue")},
                                "Failed to merge labels from dynamically created components");
                     }
                 );

@@ -18,5 +18,5 @@
 <!--GVP -> Global Value Providers related tests-->
 <aura:component render="client">
     <ui:outputText aura:id="LabelAsAttribute" class="{!$Label.Related_Lists.task_mode_today}" value="LabelAsAttribute"/>
-    <div aura:id="LabelAsExpressionComponent">{!$Label.Related_Lists.task_mode_today1}</div>
+    <div aura:id="LabelAsExpressionComponent">{!$Label.Related_Lists.task_mode_today_overdue}</div>
 </aura:component>

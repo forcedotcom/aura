@@ -18,7 +18,7 @@
 		helper.init(cmp);
 	},
 	
-	onPageComponentsChanged: function(cmp, evt, helper) {
+	onPageComponentsChanged: function(cmp, evt, helper) {		
     	helper.initPages(cmp); 
     },
     
@@ -32,7 +32,7 @@
     /**
      * Handle scrollEnd event coming from scroller
      */
-    onScrollEnd : function(cmp, evt, helper) {
+    onScrollEnd : function(cmp, evt, helper) {  	
     	helper.handleScrollEnd(cmp, evt);
     },
     
@@ -48,7 +48,7 @@
     /**
      * Handle window resize event
      */      
-	refresh: function(cmp, evt, helper) {
+	refresh: function(cmp, evt, helper) {	
         helper.refresh(cmp, evt);
     },
     
@@ -70,7 +70,7 @@
     /**
      * Handle clicking event from page indicator
      */
-    pagerClicked: function (cmp, evt, helper) {
+    pagerClicked: function (cmp, evt, helper) {    	
         var pageIndex = evt.getParam("pageIndex");
         
         helper.handlePagerClicked(cmp, pageIndex);

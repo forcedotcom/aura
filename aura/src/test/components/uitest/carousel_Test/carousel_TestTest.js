@@ -326,6 +326,24 @@
         }]
     },
     
+    /**
+     * Test page change action is called when action is provided and page is changed
+     */
+    testCustomPageChangeAction : {
+ 		browsers: ["-IE7","-IE8"],
+ 		test : [function(cmp){
+            cmp.getValue("v.isPageChangeActionCalled").setValue("false");
+ 		}, function(cmp){
+ 			this.goToPageOnCarousel(cmp, "pgChangeAction", 2, "cpca-p2");
+ 		}, function(cmp){
+ 			// verify parent carousel is on the correct page
+            var carousel = cmp.find("pgChangeAction");
+            var isPageChangeActionCalled = cmp.getValue("v.isPageChangeActionCalled").getBooleanValue();
+            $A.test.assertTrue(isPageChangeActionCalled, "Expected custom page change action to be called");
+            carousel.getValue("v.isPageChangeActionCalled").setValue("false");
+        }]
+    },
+    
     goToPageOnCarousel : function(cmp, carouselName, pageNumber, pageId) {
     	pageNumber--;
     	var carousel = cmp.find(carouselName);

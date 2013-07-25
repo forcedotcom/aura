@@ -381,7 +381,7 @@ var ComponentPriv = (function(){ // Scoping priv
 
     ComponentPriv.prototype.getEventDispatcher = function(cmp) {
         if (!this.eventDispatcher && cmp) {
-            dispatcher = {};
+            var dispatcher = {};
 
             dispatcher.getValue = function(key){
                 return cmp.getEvent(key);

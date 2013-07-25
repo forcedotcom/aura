@@ -52,5 +52,25 @@
     
     handleSelectOptionCustomOption: function(cmp, event, helper) {
     	helper.handleSelectOption(cmp, event, "autoCompleteCustomOption");
+    },
+
+    handleInputChangeAutoCompleteMatchDone: function(cmp, event, helper) {
+    	helper.handleMatchDone(cmp, event, "autoComplete");
+    },
+    
+    handleInputChangeNoDataMatchDone: function(cmp, event, helper) {
+    	helper.handleMatchDone(cmp, event, "autoCompleteNoData");
+    },
+    
+    handleInputChangeLargeListMatchDone: function(cmp, event, helper) {
+    	helper.handleMatchDone(cmp, event, "autoCompleteLargeList");
+    },
+    
+    handleInputChangeCustomTemplateMatchDone: function(cmp, event, helper) {
+    	helper.handleMatchDone(cmp, event, "autoCompleteCustomTemplate");
+    },
+    
+    handleInputChangeCustomOptionMatchDone: function(cmp, event, helper) {
+    	helper.handleMatchDone(cmp, event, "autoCompleteCustomOption");
     }
 })

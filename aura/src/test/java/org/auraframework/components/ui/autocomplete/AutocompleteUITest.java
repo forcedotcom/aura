@@ -64,6 +64,8 @@ public class AutocompleteUITest extends WebDriverTestCase {
         assertTrue("AutocompleteList should be invisible on initial load", hasCssClass(list, "invisible"));
         List<WebElement> options = getAutoCompleteListOptions(list);
         assertEquals("Autocomplete has the incorrect number of options", 10, options.size());
+        String matchCount = getAutoCompleteMatchCount(driver, AUTOCOMPLETE_COMPONENT.get("Generic"));
+        assertEquals("Match Done should not be fired yet", "", matchCount);
 	}
 	
 	/**
@@ -200,6 +202,8 @@ public class AutocompleteUITest extends WebDriverTestCase {
         	matched = getMatchedOptionsInListThatUsesCustomOptions(list, optionType);
         }
         assertEquals("Incorrect number of matched options", expectedMatched, matched.size());
+        String matchCount = getAutoCompleteMatchCount(driver, autoCompleteCmpNum);
+        assertEquals("Total count for match items after Matchdone event fired is not correct", expectedMatched+"", matchCount);
         
         if (target != null) {
         	assertEquals("Wrong option matched", target, matched.get(0).getAttribute("innerHTML"));
@@ -227,6 +231,17 @@ public class AutocompleteUITest extends WebDriverTestCase {
 	private WebElement getAutoCompleteList(WebDriver d, int listNumber) {
 		List<WebElement> lists = d.findElements(By.cssSelector(AUTOCOMPLETE_LIST_SELECTOR));
 		return lists.get(listNumber-1);
+	}
+	
+	/**
+	 * Returns the count of the total items match
+	 * @param d
+	 * @param outputNumber
+	 * @return
+	 */
+	private String getAutoCompleteMatchCount(WebDriver d, int outputNumber) {
+		List<WebElement> outputs = d.findElements(By.cssSelector(OUTPUT_SELECTOR));
+		return outputs.get(outputNumber-1).getText();
 	}
 	
 	private List<WebElement> getAutoCompleteListOptions(WebElement l) {

@@ -274,6 +274,12 @@ var AuraClientService = function() {
             if (priv.auraStack.length === 0) {
                 var tmppush = "$A.clientServices.popStack";
                 priv.auraStack.push(tmppush);
+
+                // #if {"modes" : ["PTEST"]}
+                if (!priv.existingTransactionId) {
+                    priv.requestCounts[priv.actionQueue.getTransactionId()] = 0;
+                }
+                // #end
                 clientService.processActions();
                 done = !$A["finishedInit"];
                 while (!done && count <= 15) {
@@ -289,6 +295,14 @@ var AuraClientService = function() {
                 if (lastName !== tmppush) {
                     $A.error("Broken stack: popped "+tmppush+" expected "+lastName+", stack = "+priv.auraStack);
                 }
+                // #if {"modes" : ["PTEST"]}
+                if (!priv.existingTransactionId && (priv.requestCounts[priv.actionQueue.getTransactionId()] === 0)) {
+                    //no server side actions to wait for.
+                    delete priv.requestCounts[priv.actionQueue.getTransactionId()];
+                   // clientService.unregisterTransaction();
+                }
+                // #end
+                
                 priv.auraStack = [];
                 priv.actionQueue.incrementNextTransactionId();
             }
@@ -376,11 +390,11 @@ var AuraClientService = function() {
          * @public
          */
         runActions : function(actions, scope, callback) {
-        	$A.assert($A.util.isArray(actions), "runActions expects a list of actions, but instead got: " + actions);
-        	if (!$A.util.isUndefined(callback)) {
-				$A.assert($A.util.isFunction(callback),
-						"runActions expects the callback to be a function, but instead got: " + callback);
-			}
+            $A.assert($A.util.isArray(actions), "runActions expects a list of actions, but instead got: " + actions);
+            if (!$A.util.isUndefined(callback)) {
+                $A.assert($A.util.isFunction(callback),
+                        "runActions expects the callback to be a function, but instead got: " + callback);
+            }
             var group = new ActionCallbackGroup(actions, scope, callback);
             var i;
             if (priv.foreground.start()) {

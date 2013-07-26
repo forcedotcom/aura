@@ -16,6 +16,7 @@
 
 -->    	
 <aura:component>
+	<aura:attribute name="isPageChangeActionCalled" type="Boolean" default="{!false}"/>
 		
 <div> 	
  	<ui:carousel aura:id="carousel1" width="450" height="450" class="myclass">
@@ -278,6 +279,23 @@
  		</ui:carouselPage>
  		<ui:carouselPage>
  			<ui:outputText aura:id="ccf-p3-output" value="page 3"/>
+ 		</ui:carouselPage>
+	</aura:set>
+</ui:carousel>
+
+
+<br/><br/>Page Change Custom Action<br/><br/>
+<ui:carousel aura:id="pgChangeAction" width="450" height="450" onPageChange="{!c.changePageAction}">
+	<aura:set attribute="pageComponents">
+ 		<ui:carouselPage aura:id="cpca-p1">
+ 			<ui:outputText aura:id="cpca-p1-output" value="page 1"/><br/>
+ 			<ui:button aura:id="btnForceRefresh" press="{!c.forceRefresh}" label="refresh"/>
+ 		</ui:carouselPage>
+ 		<ui:carouselPage aura:id="cpca-p2">
+ 			<ui:outputText aura:id="cpca-p2-output" value="page 2"/>
+ 		</ui:carouselPage>
+ 		<ui:carouselPage aura:id="cpca-p3">
+ 			<ui:outputText aura:id="cpca-p3-output" value="page 3"/>
  		</ui:carouselPage>
 	</aura:set>
 </ui:carousel>

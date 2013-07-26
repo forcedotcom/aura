@@ -657,7 +657,7 @@
         // AM / PM
         case 'a' : // fall through to A
         case 'A' :
-            config._isPm = (parseAmpm(input, config._l) === 'pm'); // @SFDC
+            config._isPm = (parseAmpm(input, config._l) === 'pm'); //SFDC
             break;
         // 24 HOUR
         case 'H' : // fall through to hh
@@ -713,7 +713,7 @@
     
     /**
      * function to parse localized am/pm
-     * @SFDC
+     * SFDC
      */
     function parseAmpm(input, lang) {
         if (!lang) {
@@ -2072,7 +2072,7 @@ moment.lang('eo', {
         LLL : "D-\\an \\de MMMM, YYYY LT",
         LLLL : "dddd, \\l\\a D-\\an \\d\\e MMMM, YYYY LT"
     },
-    ampm: { //@SFDC
+    ampm: { //SFDC
         am: "a.t.m.",
         pm: "p.t.m."
     },
@@ -2902,7 +2902,7 @@ moment.lang('ja', {
         LLL : "YYYY年M月D日LT",
         LLLL : "YYYY年M月D日LT dddd"
     },
-    ampm: { //@SFDC
+    ampm: { //SFDC
         am: "午前",
         pm: "午後"
     },
@@ -2956,7 +2956,7 @@ moment.lang('ko', {
         LLL : "YYYY년 MMMM D일 LT",
         LLLL : "YYYY년 MMMM D일 dddd LT"
     },
-    ampm: { //@SFDC
+    ampm: { //SFDC
         am: "오전",
         pm: "오후"
     },
@@ -3827,7 +3827,7 @@ moment.lang('th', {
         LLL : "D MMMM YYYY เวลา LT",
         LLLL : "วันddddที่ D MMMM YYYY เวลา LT"
     },
-    ampm: { //@SFDC
+    ampm: { //SFDC
         am: "ก่อนเที่ยง",
         pm: "หลังเที่ยง"
     },
@@ -4187,7 +4187,7 @@ moment.lang('zh-cn', {
         lll : "YYYY年MMMD日LT",
         llll : "YYYY年MMMD日ddddLT"
     },
-    ampm: { //@SFDC
+    ampm: { //SFDC
         am: "上午",
         pm: "下午"
     },
@@ -4205,7 +4205,7 @@ moment.lang('zh-cn', {
             return "晚上";
         }
     */
-        if (hour < 12) { //@SFDC
+        if (hour < 12) { //SFDC
             return "上午";
         } else {
             return "下午";
@@ -4258,7 +4258,7 @@ moment.lang('zh-tw', {
         lll : "YYYY年MMMD日LT",
         llll : "YYYY年MMMD日ddddLT"
     },
-    ampm: { //@SFDC
+    ampm: { //SFDC
         am: "上午",
         pm: "下午"
     },
@@ -4276,7 +4276,7 @@ moment.lang('zh-tw', {
             return "晚上";
         }
     */
-        if (hour < 12) { //@SFDC
+        if (hour < 12) { //SFDC
             return "上午";
         } else {
             return "下午";

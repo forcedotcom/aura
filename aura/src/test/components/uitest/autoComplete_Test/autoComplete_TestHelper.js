@@ -39,5 +39,11 @@
         } 
         input.setValue("v.value", value);
         list.setValue("v.visible", false);
-    }
+    },
+    
+    handleMatchDone: function(cmp, event, autoCompleteCmpName) {
+    	var input = cmp.find(autoCompleteCmpName + "MatchSize");
+    	input.setValue("v.value", event.getParam("size"));
+        console.log("For " + autoCompleteCmpName + " There are " + event.getParam("size") + " matched options.");
+    },
 })

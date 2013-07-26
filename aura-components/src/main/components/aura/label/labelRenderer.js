@@ -31,21 +31,7 @@
                 if (child.getDef().getDescriptor().getQualifiedName() === "markup://aura:text") {
                     continue;
                 }
-                if (child.getDef().getDescriptor().getQualifiedName() === "markup://aura:expression") {
-                    var expValue = child.getAttributes().getRawValue("value");
-                    if (expValue == undefined || expValue == null) {
-                        items.push(document.createTextNode(""));
-                    } else {
-                        items.push(document.createTextNode(expValue));
-                    }
-                } else {
-                    var comElems = $A.render(child);
-                    if (comElems == undefined || comElems == null) {
-                        items.push(document.createTextNode(""));
-                    } else {
-                        items.push(comElems);
-                    }
-                }
+                items.push($A.render(child));
             }
 
             if (items.length > 0) { // we have something to replace
@@ -84,7 +70,15 @@
         return document.createTextNode(base);
     },
 
-    rerender: function LabelRenderer(component, helper){
-        // NOOP We just need to insure that the default rerenderer does not kick in
+    rerender: function LabelRenderer(component){
+        var body = component.getValue("v.body");
+        if (!body.isEmpty()) { // render the body content to components
+            for (var i = 0; i < body.getLength(); i++) {
+                var child = body.get(i);
+                if (child.isRendered()) {
+                    $A.rerender(child);
+                }
+            }
+        }
     }
 })

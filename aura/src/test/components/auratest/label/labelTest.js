@@ -208,5 +208,20 @@
 //            aura.test.assertEquals("{0} updated", $A.test.getText(component.find("bodyText").getElement()), "value not expected for text node substitution after rerender");
 //            aura.test.assertEquals("test updated", $A.test.getText(component.find("bodyWithText").getElement()), "value not expected for substitution with text after rerender");
         }
+    },
+
+    /**
+     * Test updating substitutions and rerendering
+     */
+    testUpdateSubstitution: {
+        attributes : {
+            value: "blah {0} meh",
+            string: "-"
+        },
+        test: function(component){
+            aura.test.assertEquals("blah - meh", $A.test.getText(component.find("bodyWithString").getElement()), "value not expected for text node substitution");
+            $A.run(function(){ component.getAttributes().setValue("string", "60"); });
+            aura.test.assertEquals("blah 60 meh", $A.test.getText(component.find("bodyWithString").getElement()), "value not expected for text node substitution");
+        }
     }
 })

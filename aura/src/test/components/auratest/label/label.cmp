@@ -35,4 +35,5 @@
     <div aura:id="bodyWithNull"><aura:label value="{!v.value}">{!v.noll}{!v.string}</aura:label></div>
     <div aura:id="bodyText"><aura:label value="{!v.value}">inner</aura:label></div>
     <div aura:id="bodyWithText"><aura:label value="{!v.value}">inner{!v.string}space</aura:label></div>
+    <div aura:id="bodyWithString"><aura:label value="{!v.value}">{!v.string}</aura:label></div>
 </aura:component>

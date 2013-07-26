@@ -450,6 +450,25 @@ var AuraLocalizationService = function AuraLocalizationService() {
         },
         
         /**
+         * Parses a date time string in an ISO-8601 format.
+         * @param {String} dateTimeString The datetime string in an ISO-8601 format
+         * @return {Date} A JavaScript Date object
+         * @memberOf AuraLocalizationService
+         * @public
+         */
+        parseDateTimeISO8601 : function(dateTimeString, targetFormat, locale) {
+            if (!dateTimeString) {
+                return null;
+            }
+            
+            var mDate = moment(dateTimeString);
+            if (mDate && mDate["isValid"]()) {
+                return mDate["toDate"]();
+            }
+            return null;
+        },
+        
+        /**
          * Parses a string to a JavaScript Date in UTC.
          * @param {String} dateTimeString The datetime string to be parsed
          * @param {String} targetFormat A Java format string which is used to parse datetime. The default is from LocaleValueProvider.

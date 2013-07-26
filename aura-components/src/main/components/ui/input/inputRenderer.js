@@ -47,6 +47,7 @@
             var el = concreteHelper.getInputElement(concreteCmp);
             el.value = concreteHelper.formatValue(concreteCmp);
         }
+        helper.addInputClass(component);
         this.superRerender();
     }
 })

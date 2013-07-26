@@ -73,6 +73,7 @@
                     <auradocs:contentsNode text="Dialog and Message" id="useMessage"/>
                     <auradocs:contentsNode text="Tabs and Scroller" id="useTabs"/>
                     <auradocs:contentsNode text="Images" id="img"/>
+                    <auradocs:contentsNode text="Spinners" id="spinner"/>
                 </auradocs:contentsNode>                
             </auradocs:contentsNode>
             <auradocs:contentsNode text="Expressions" >

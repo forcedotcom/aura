@@ -188,19 +188,19 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     
     @Override
     public String getMomentJSURL() {
+    	String nonce = Aura.getContextService().getCurrentContext().getFrameworkUID();
         String contextPath = Aura.getContextService().getCurrentContext().getContextPath();
-        String nonce = getAuraFrameworkNonce();
         return String.format("%s/auraFW/resources/%s/moment/moment.js?aura.fwuid=%s", contextPath, nonce, nonce);
     }
     
     @Override
     public List<String> getWalltimeJSURLs() {
-        String nonce = getAuraFrameworkNonce();
         AuraLocale al = Aura.getLocalizationAdapter().getAuraLocale();
         String locale = al.getTimeZone().getID().replace("/", "-");
         String contextPath = Aura.getContextService().getCurrentContext().getContextPath();
 
         List<String> urls = Lists.newLinkedList();
+    	String nonce = Aura.getContextService().getCurrentContext().getFrameworkUID();
         urls.add(String.format("%s/auraFW/resources/%s/walltime-js/walltime.js?aura.fwuid=%s", contextPath, nonce, nonce));
         if (!"GMT".equals(locale)) {
             urls.add(String.format("%s/auraFW/resources/%s/walltime-js/olson/walltime-data_%s.js?aura.fwuid=%s", contextPath, nonce, locale, nonce));
@@ -212,7 +212,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     public String getAuraJSURL() {
         String contextPath = Aura.getContextService().getCurrentContext().getContextPath();
         String suffix = Aura.getContextService().getCurrentContext().getMode().getJavascriptMode().getSuffix();
-        String nonce = getAuraFrameworkNonce();
+    	String nonce = Aura.getContextService().getCurrentContext().getFrameworkUID();
         return String.format("%s/auraFW/javascript/%s/aura_%s.js?aura.fwuid=%s", contextPath, nonce, suffix, nonce);
     }
 

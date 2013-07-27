@@ -392,10 +392,11 @@ MapValue.prototype.put = function(k, v){
  */
 MapValue.prototype.remove = function(k, doDestroy) {
 	if (this.value.hasOwnProperty(k)) {
+		var val = this.value[k];
 		if (doDestroy) {
-			this.value[k].destroy();
-		} else {
-			this.value[k].destroyHandlers();
+			val.destroy();
+		} else if (val.destroyHandlers) {
+			val.destroyHandlers();
 		}
 		delete this.value[k];
 		delete this.keys[k.toLowerCase()];

@@ -24,6 +24,8 @@
     </p>
     
     <auradocs:example descriptor="auradocs:demoSpinner" />
+    <p>Note that <code>cmp.get("e.toggle")</code> is used to get the toggle event, while <code>isVisible</code> is a parameter on the <code>toggle</code> event. 
+    Call <code>fire()</code> on the event to toggle the spinner, as shown by <code>evt.fire();</code> in the controller action. </p>
      <auradocs:info>See the <auradocs:defLink descriptor ="ui:spinner">ui:spinner</auradocs:defLink> component reference for more information.</auradocs:info>
     
 </aura:component>

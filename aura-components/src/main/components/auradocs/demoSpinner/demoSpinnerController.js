@@ -16,18 +16,14 @@
 ({
     toggleSpinner: function(cmp, event) {
         var spinner = cmp.find('spinner');
+        var evt = spinner.get("e.toggle");
         
     if(!$A.util.hasClass(spinner.getElement(), 'hideEl')){
-    	var evt = spinner.get("e.toggle");
-		evt.setParams({ isVisible : false });
-		evt.fire();
-		return true;
-     }
-		
-    if($A.util.hasClass(spinner.getElement(), 'hideEl')){
-		var hideEvt = spinner.get("e.toggle");
-		hideEvt.setParams({ isVisible : true });
-		hideEvt.fire();
+        evt.setParams({ isVisible : false });
+     }		
+    else {
+        evt.setParams({ isVisible : true });
 	}
+    evt.fire();
     }
 })

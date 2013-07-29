@@ -15,9 +15,9 @@
     limitations under the License.
 
 -->
-<aura:component description="Loading spinner to be used as a component body while the real component body is being loaded" support="BETA">
-    <aura:attribute name="isVisible" type="Boolean" default="true"/>
-    <aura:registerEvent name="toggle" type="ui:toggleLoadingIndicator"/>
+<aura:component description="A spinner that is displayed when the component body is loading." support="BETA">
+    <aura:attribute name="isVisible" type="Boolean" default="true" description="Set to false to hide the spinner."/>
+    <aura:registerEvent name="toggle" type="ui:toggleLoadingIndicator" description="The event fired when the spinner is toggled."/>
     <aura:handler name="toggle" action="{!c.toggleSpinner}"/>
 
     <div aura:id='spinner' role="alert" class="{!v.class + ' spinner ' + (v.isVisible == true ? '': 'hideEl')}">

@@ -19,13 +19,13 @@
     <aura:set attribute="title" value="Propagating an Event" />
     
     <h2>Goal</h2>
-    You want to propogate an event to a component that is being extended.
+    You want to propagate an event to a component that is being extended.
     
     <h2>Code</h2>
-    <p>Let's say that you are extending <code>ui:menuTrigger</code> component and using an icon or background image. To propagate the click event on the image,
+    <p>Let's say that you are extending the <code>ui:menuTrigger</code> component and using an icon or background image. To propagate the click event on the image from the sub-component,
     you must propagate the Aura event and refire it in <code>ui:menuTrigger</code>.</p>
  
-    <p>The following sample code shows how <code>uitest:demoMenuTrigger</code> extends <code>ui:menuTrigger</code> and use a controller action which propogates the event to <code>ui:menuTrigger</code>.
+    <p>The following sample code shows how <code>uitest:demoMenuTrigger</code> extends <code>ui:menuTrigger</code> and uses a controller action that propogates the event to <code>ui:menuTrigger</code>.
     In the <code>relay</code> controller action, <code>preEventFiring</code> is an action on <code>ui:menuTrigger</code> that captures the event that triggers the menu and toggles it.</p>
 	<auradocs:example descriptor="uitest:demoMenuTrigger"/>
 	

@@ -32,6 +32,21 @@
         }
     },
     
+    testSimpleValueIsValid: {
+        test:function(cmp){
+            var valueObj = cmp.getAttributes().getValue('strAttribute');
+            $A.test.assertTruthy(valueObj.isValid());
+        }
+    },
+    
+    testSimpleValueSetUnValid: {
+        test:function(cmp){
+            var valueObj = cmp.getAttributes().getValue('strAttribute');
+            valueObj.setValid(false);
+            $A.test.assertTruthy(!valueObj.isValid());
+        }
+    },
+    
     testDerivedTypes:{
         test: function(cmp) {
             var valueObj = cmp.getAttributes().getValue('strAttribute');

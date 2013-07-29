@@ -19,10 +19,10 @@
     <aura:set attribute="title" value="Propagating an Event" />
     
     <h2>Goal</h2>
-    You want to propagate an event to a component that is being extended.
+    You want to propagate an event to a component that is being extended or bubble up events from a child component to its parent components.
     
     <h2>Code</h2>
-    <p>Let's say that you are extending the <code>ui:menuTrigger</code> component and using an icon or background image. To propagate the click event on the image from the sub-component,
+    <p>Let's say that you are extending the <code>ui:menuTrigger</code> component and using an icon or background image. To propagate the click event on the image from the  child component,
     you must propagate the Aura event and refire it in <code>ui:menuTrigger</code>.</p>
  
     <p>The following sample code shows how <code>uitest:demoMenuTrigger</code> extends <code>ui:menuTrigger</code> and uses a controller action that propogates the event to <code>ui:menuTrigger</code>.
@@ -31,6 +31,9 @@
 	
 	<p>The following sample code shows an implementation of <code>uitest:demoMenuTrigger</code>.</p>
 	<auradocs:example descriptor="uitest:demoRelay"/>
+	
+	<p>In <code>uitest:demoMenuTrigger</code>, we captured the <code>click</code> DOM event from the Aura event and propagated it to the parent components. By doing so,
+	we can then handle the event the same way as how <code>ui:interactive</code>, which <code>ui:menuTrigger</code> extends, handles native DOM events.</p>
 	
      <p><b>See also:</b><br/>
       <auradocs:topicLink topic="helloActions">Client-Side Controllers</auradocs:topicLink>

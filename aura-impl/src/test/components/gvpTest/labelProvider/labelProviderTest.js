@@ -22,7 +22,7 @@
                     var sv2 = cmp.get("v.simplevalue2.value");
 
                     $A.test.assertTrue(
-                        sv2 === "FIXME - LocalizationAdapter.getLabel() needs implemenation!" ||
+                        sv2 === "FIXME - LocalizationAdapter.getLabel() needs implementation!" ||
                         sv2 === "[DOESNT.EXIST]",
                         "Failed to get expected error message");
                 }
@@ -41,7 +41,7 @@
                     var sv3 = cmp.get("v.simplevalue3.value");
 
                     $A.test.assertTrue(
-                        sv3 === "FIXME - LocalizationAdapter.getLabel() needs implemenation!" ||
+                        sv3 === "FIXME - LocalizationAdapter.getLabel() needs implementation!" ||
                         sv3 === "__MISSING LABEL__ PropertyFile - val DOESNTEXIST not found in section Related_Lists",
                         "Failed to get expected error message");
                 }
@@ -154,7 +154,7 @@
                     "Failed to run call back after fetching label from server",
                     function () {
                         $A.test.assertTrue(
-                            cmp._label === "FIXME - LocalizationAdapter.getLabel() needs implemenation!" ||
+                            cmp._label === "FIXME - LocalizationAdapter.getLabel() needs implementation!" ||
                             cmp._label === "__MISSING LABEL__ PropertyFile - val FooBar not found in section Related_Lists",
                             "$Label.Related_Lists.FooBar should have error value"
                         );
@@ -172,7 +172,7 @@
                 //No need to wait for unlike previous case, call backs are immediate as value is available at client
                 $A.test.assertTrue(cmp._callBack);
                 $A.test.assertTrue(
-                    cmp._label === "FIXME - LocalizationAdapter.getLabel() needs implemenation!" ||
+                    cmp._label === "FIXME - LocalizationAdapter.getLabel() needs implementation!" ||
                         cmp._label === "__MISSING LABEL__ PropertyFile - val FooBar not found in section Related_Lists",
                     "$Label.Related_Lists.FooBar should have error value"
                 );

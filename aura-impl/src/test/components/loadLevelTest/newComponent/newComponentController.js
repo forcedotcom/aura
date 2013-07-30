@@ -33,6 +33,19 @@
                                                    }
                                                  });
     },
+    /**
+     * Create a component with localId set in config.
+     */
+    createCmpWithLocalId : function(cmp, evt, helper){
+        helper.createComponentAndPushToBody(cmp, {componentDef: "markup://aura:text",
+                                                   localId: "merp",
+                                                   attributes:{
+                                                       values:{ truncate:6,
+                                                                value:"TextComponent"
+                                                       }
+                                                   }
+                                                 });
+    },
     createCmpWithComplexAttributes: function(cmp, evt, helper){
         helper.createComponentAndPushToBody(cmp, 
         		{componentDef: "markup://loadLevelTest:displayStringArray",

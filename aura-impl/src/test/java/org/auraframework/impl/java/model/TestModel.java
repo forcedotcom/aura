@@ -15,6 +15,9 @@
  */
 package org.auraframework.impl.java.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Model;
 
@@ -30,5 +33,14 @@ public class TestModel {
     @AuraEnabled
     public String getReadOnlyThing() {
         return "readonly";
+    }
+    
+    @AuraEnabled
+    public List<String> getStringList() {
+        ArrayList<String> sl = new ArrayList<String>();
+        sl.add("one");
+        sl.add("two");
+        sl.add("three");
+        return sl;
     }
 }

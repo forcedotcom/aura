@@ -15,12 +15,11 @@
  */
 ({
     provide : function IterationProvider(component, localCreation) {
-        var realbody = component.getDef().getHelper().createRealBody(component, !localCreation);
-
-        return {
-            attributes: {
-                "realbody": realbody
-            }
-        };
+        
+        var realbody = [];
+        if (!localCreation) {
+            var realbody = component.getDef().getHelper().createRealBodyServer(component, !localCreation);
+        }
+        return { attributes: { "realbody":realbody } };
     }
 })

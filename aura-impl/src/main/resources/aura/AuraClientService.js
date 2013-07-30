@@ -495,6 +495,9 @@ var AuraClientService = function() {
                                 return {
                                     run : function(event) {
                                         window[functionName](event);
+                                    },
+                                    runDeprecated : function(event) {
+                                        window[functionName](event);
                                     }
                                 };
                             }

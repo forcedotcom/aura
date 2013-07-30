@@ -1,0 +1,102 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component model="java://org.auraframework.docs.SizeModel">
+
+    <aura:attribute name="myDate" type="Date" default="" />
+    <aura:attribute name="sizes" type="List" description="A list of aura.components.ui.InputOption."/>
+    <aura:attribute name="invalidEmail" type="Boolean" default="false"/>
+    <aura:attribute name="invalidPW" type="Boolean" default="false"/>
+    <aura:attribute name="invalidURL" type="Boolean" default="false"/>
+    <aura:attribute name="filled" type="Boolean" default="false"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <div class="form">
+      
+        <div class="row">
+            <ui:inputText label="First Name" class="formInput" aura:id="inFName" value="" placeholder="Jane"/>
+        </div>
+        <div class="row">
+            <ui:inputText label="Last Name" class="formInput" aura:id="inLName" value="" placeholder="Doe"/>
+        </div>
+        <div class="row">
+            <ui:inputEmail label="E-mail" class="formInput" aura:id="inEmail" value="" placeholder="example@example.com"/>
+        </div>
+        <div class="row">
+            <ui:inputSecret label="Password" class="formInput" aura:id="inPW" value="" placeholder="at least 6 chars"/>
+        </div>
+        <div class="row">
+            <ui:inputURL label="Website" class="formInput" aura:id="inURL" value="" placeholder="http://www.salesforce.com"/>
+        </div>
+        <div class="row">
+            <ui:label class="formLabel" label="D.O.B." for="inDOB"/>
+            <ui:inputDate class="formInput" aura:id="inDOB" value="1990-01-01" displayDatePicker="true"/>
+        </div>
+        <div class="row">
+            <ui:inputSelect label="Size" aura:id="inSize" options="{!m.sizes}"/>
+        </div>
+        <div class="row">
+            <ui:label class="formLabel" label="Appointment Time" for="inAppt"/>
+            <ui:inputDateTime class="formInput" aura:id="inAppt" value="{!v.myDate}" displayDatePicker="true"/>
+        </div>
+        <div id="buttonRow">
+            <ui:button aura:id="outputButton" buttonTitle="Click to see what you put into the fields" class="inBut" label="Confirm" press="{!c.getInput}"/>
+        </div>
+        
+		<aura:renderIf isTrue="{!v.invalidEmail}">
+			<ui:message title="Invalid E-mail" severity="error" closable="false" visible="true"/>
+		</aura:renderIf>           
+        
+		<aura:renderIf isTrue="{!v.invalidURL}">
+	        <ui:message title="Invalid URL" severity="error" closable="false" visible="true">
+	            The website should begin with http:// or https://.
+	        </ui:message>
+		</aura:renderIf>           
+	    
+		<aura:renderIf isTrue="{!v.invalidPW}">
+            <ui:message title="Invalid password" severity="error" closable="false" visible="true">
+                Your password should be at least 6 alphanumeric characters long.
+            </ui:message>
+        </aura:renderIf>
+        
+        <aura:renderIf isTrue="{!!v.filled}">
+            <ui:message title="Empty fields" severity="warning" closable="false" visible="true">
+                Please fill out all the fields.
+            </ui:message>
+        </aura:renderIf>
+        
+        <aura:renderIf isTrue="{!!v.invalidEmail &amp;&amp; !v.invalidURL &amp;&amp; !v.invalidPW &amp;&amp; v.filled}">
+         	<ui:block class="output">
+	        	<ui:message title="Success" severity="confirm" closable="true"/>
+	            Name: <ui:outputText aura:id="outName" value="" class="outText"/><br/>
+	            Email: <ui:outputEmail label="" aura:id="outEmail" value="Email" class="outText"/><br/>
+	            Password: <ui:outputText aura:id="outPW" value="" class="outText"/><br/>
+	            Website: <ui:outputURL label="Invalid URL" aura:id="outURL" value="" class="outText"/><br/>
+	            D.O.B.: <ui:outputDate aura:id="outDOB" value="" class="outText"/><br/>
+	            Size: <ui:outputText aura:id="outSize" value="" class="outText"/><br/>
+	            Appointment Time: <ui:outputDateTime aura:id="outAppt" value="" class="outText"/>
+	        </ui:block>
+        </aura:renderIf>           
+        
+
+        
+       
+    </div>
+ 
+    
+</aura:component>

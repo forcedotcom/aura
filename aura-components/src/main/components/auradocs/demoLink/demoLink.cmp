@@ -16,10 +16,6 @@
 
 -->
 <aura:component>
-    <aura:registerEvent name="search" type="ui:searchEvent" />
-    <aura:handler name="search" action="{!c.handleSearch}" />
-	<aura:attribute name="tree" type="Aura.Component" />
-	
-	<div id="searchDiv"><ui:inputSearch search="{!c.handleSearch}" aura:id="searchBox" class="searchBox" placeholder="Search" /></div>
-	{!v.body}
+    <aura:attribute name="demo" type="String" required="true"/>
+    <a href="{!'#demo?demo='+v.demo}">{!v.body}</a>
 </aura:component>

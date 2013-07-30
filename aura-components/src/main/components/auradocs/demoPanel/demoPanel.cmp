@@ -15,11 +15,13 @@
     limitations under the License.
 
 -->
-<aura:component>
-    <aura:registerEvent name="search" type="ui:searchEvent" />
-    <aura:handler name="search" action="{!c.handleSearch}" />
-	<aura:attribute name="tree" type="Aura.Component" />
-	
-	<div id="searchDiv"><ui:inputSearch search="{!c.handleSearch}" aura:id="searchBox" class="searchBox" placeholder="Search" /></div>
-	{!v.body}
+<aura:component abstract="true" extends="auradocs:defLayout" provider="java://org.auraframework.docs.DemoPanelProvider, js://auradocs.demoPanel">
+    <aura:attribute name="demo" type="String" />
+    <aura:attribute name="example" type="Aura.Component[]" />
+    <aura:set attribute="description">
+        <aura:if isTrue="{!v.example.length > 0}">
+            <div class="example">{!v.example}</div>
+        </aura:if>
+    </aura:set>
+    <article>{!v.body}</article>
 </aura:component>

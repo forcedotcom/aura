@@ -18,14 +18,14 @@
 <aura:component>
     <aura:handler event="auradocs:locationChange" action="{!c.handleLocationChange}" />
     <nav role="navigation" class="navbar">
-        <h1 class="logo"> <a href="#"><ui:image src="/auraFW/resources/aura/images/aura.png" imageType="informational" alt="Aura" /></a><small>documentation</small></h1>
+        <div class="logo"> <a href="#"><ui:image src="/auraFW/resources/aura/images/aura.png" imageType="informational" alt="Aura" /></a><small>documentation</small></div>
         <ul class="navList">
             <!--<li><a href="#">About</a></li>-->
             <li aura:id="help"><auradocs:navLink location="help">Help</auradocs:navLink></li>
             <li aura:id="reference"><auradocs:navLink location="reference">Reference</auradocs:navLink></li>
             <li aura:id="demos"><auradocs:navLink location="demos">Demos</auradocs:navLink></li>
         </ul>
-        <div class="fuelGauge"><auraStorage:fuelGauge storageName="actions"/></div>
+  <div class="fuelGauge"><auraStorage:fuelGauge storageName="actions"/></div>
         <ui:image class="spinner" imageType="decorative"/>
     </nav>
 </aura:component>

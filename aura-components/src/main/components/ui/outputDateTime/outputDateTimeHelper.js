@@ -36,7 +36,7 @@
         
         var format = concreteCmp.get("v.format");;
         var langLocale = concreteCmp.get("v.langLocale");
-        var d = $A.localizationService.parseDateTimeISO8601(value);
+        var d = new Date(value);
         var timezone = concreteCmp.get("v.timezone");
         $A.localizationService.UTCToWallTime(d, timezone, function(walltime) {
             try {

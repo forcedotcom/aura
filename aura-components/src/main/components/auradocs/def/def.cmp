@@ -50,7 +50,7 @@
             <ui:stamp severity="{!m.support=='PROTO'?'important':m.support=='DEPRECATED'?'inverse':m.support=='BETA'?'warning':m.support=='GA'?'success':''}">{!m.support}</ui:stamp>
         </aura:if>
     </aura:set>
-    <ui:tabset class="subtabs">
+    <ui:tabSet class="subtabs">
         <ui:tab title="overview">
             <aura:if isTrue="{!m.attributes.length > 0}">
                 <auradocs:defMemberList title="Attributes" list="{!m.attributes}"/>
@@ -76,6 +76,6 @@
         <ui:tab title="dependencies">
             <auradocs:defDependencies descriptor="{!v.descriptor}" defType="{!v.defType}"/>
         </ui:tab>
-    </ui:tabset>
+    </ui:tabSet>
 
 </aura:component>

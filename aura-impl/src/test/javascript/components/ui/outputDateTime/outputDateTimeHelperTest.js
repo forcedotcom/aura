@@ -195,7 +195,7 @@ Test.Ui.OutputDateTime.HelperTest = function(){
 					UTCToWallTime: function(dateObj,timezone, callback ) { callback(dateObj); },
 					formatDateTimeUTC: function(walltime, format, langLocale) { return "Date"+format+langLocale; },
                     parseDateTimeISO8601: function(datetimeString) { return new Date(datetimeString); },
-                    translateToOtherCalendar: function(date) { return date; }           	
+                    translateToOtherCalendar: function(date) { return date; }
 	            }
 	        });												
 			 
@@ -269,8 +269,12 @@ Test.Ui.OutputDateTime.HelperTest = function(){
 				localizationService: {   
 					UTCToWallTime: function(dateObj,timezone, callback) { callback(dateObj); },			
 					formatDateTimeUTC: function(walltime, format, langLocale) { throw {message: expected}; },
+<<<<<<< HEAD
 					parseDateTimeISO8601: function(datetimeString) { return new Date(datetimeString); },
                     translateToOtherCalendar: function(date) { return date; }           	
+=======
+					parseDateTimeISO8601: function(datetimeString) { return new Date(datetimeString); }	            	
+>>>>>>> 11377d9... Fix outputDateTime in IE8
 	            }
 	        });												
 			 

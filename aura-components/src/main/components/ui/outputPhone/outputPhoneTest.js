@@ -20,7 +20,7 @@
     testEmptyValue:{
         attributes : {value: ''},
         test: function(component){
-            aura.test.assertEquals('', $A.test.getText(component.find('link').getElement()), "When value is initialized to an empty string, nothing should be shown.");
+        aura.test.assertTrue($A.util.isUndefinedOrNull(component.find('link').getElement()), "When value is initialized to an empty string, componenet should not have DOM elements.");
         }
     },
 
@@ -30,7 +30,7 @@
     testValue: {
         attributes : {value : '+1 (415) 867-5309'},
         test: function(component){
-        	aura.test.assertEquals('+1 (415) 867-5309', $A.test.getText(component.find('link').getElement()), "Visible phone number not correct");
+            aura.test.assertEquals('+1 (415) 867-5309', $A.test.getText(component.find('link').getElement()), "Visible phone number not correct");
             aura.test.assertTrue(aura.test.contains(unescape(component.find('link').getElement().href),'tel:+1(415)867-5309'), "Link not correct");
         }
     },
@@ -87,9 +87,9 @@
      * outputPhone with leading and trailing whitespaces
      */
     testValueWithWhitespaces: {
-    	attributes : {value : '   555-1234   '},
+        attributes : {value : '   555-1234   '},
         test: function(component){
-        	var link = component.find('link').getElement();
+            var link = component.find('link').getElement();
             aura.test.assertTrue(aura.test.contains($A.test.getText(link), '555-1234'), "Visible phone number not correct");
             aura.test.assertEquals('tel:555-1234', link.href, "Link not correct");
         }

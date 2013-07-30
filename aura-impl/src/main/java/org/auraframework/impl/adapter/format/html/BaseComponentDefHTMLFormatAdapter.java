@@ -62,8 +62,6 @@ public abstract class BaseComponentDefHTMLFormatAdapter<T extends BaseComponentD
             StringBuilder sb = new StringBuilder();
             writeHtmlStyles(AuraServlet.getStyles(), sb);
             attributes.put("auraStyleTags", sb.toString());
-            sb.setLength(0);
-            writeHtmlScripts(AuraServlet.getScripts(), sb);
             AuraContext context = Aura.getContextService().getCurrentContext();
 
             attributes.put("lastMod", Long.toString(AuraBaseServlet.getLastMod()));

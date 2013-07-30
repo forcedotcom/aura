@@ -19,6 +19,10 @@
     <ui:tree>
         <ui:treeNode title="Apps" expanded="true">
             <ui:treeNode title="Aura Notes" href="http://notes.auraframework.org/auranote/notes.app"/>
+            <auradocs:demosNode text="Submit Form" id="submitForm"/>
+            <auradocs:demosNode text="Events" id="events"/>
+            <auradocs:demosNode text="To-do List" id="todo"/>
         </ui:treeNode>
+        
     </ui:tree>
 </aura:component>

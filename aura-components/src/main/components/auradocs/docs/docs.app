@@ -19,7 +19,7 @@
     template="auradocs:template"
     controller="java://org.auraframework.docs.DocsController"
     securityProvider="java://org.auraframework.docs.DocsSecurityProvider"
-    useAppcache="true"
+    useAppcache="false"
     preload="auradocs,aurastorage"
     locationChangeEvent="auradocs:locationChange"
     implements="auraStorage:refreshObserver">
@@ -28,12 +28,12 @@
     <aura:handler event="aura:doneWaiting" action="{!c.doneWaiting}"/>
     <aura:handler name="refreshBegin" action="{!c.refreshBegin}"/>
     <aura:handler name="refreshEnd" action="{!c.refreshEnd}"/>
-	
-    <auradocs:nav aura:id="navbar"/>
+		
+    <header><auradocs:nav aura:id="navbar"/></header>
 
     <div class="container" aura:id="container">
         <aside aura:id="sidebar" class="sidebar"></aside>
         <article aura:id="content" class="content"></article>
+        <footer>Copyright &copy; 2013 salesforce.com, inc.</footer>
     </div>
-    <footer>Copyright &copy; 2013 salesforce.com, inc.</footer>
 </aura:application>

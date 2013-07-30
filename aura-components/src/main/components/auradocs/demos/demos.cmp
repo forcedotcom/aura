@@ -15,6 +15,6 @@
     limitations under the License.
 
 -->
-<aura:component>
-    TODO: aurawww:demos
+<aura:component extends="auradocs:demoPanel">
+    <aura:set attribute="title" value="Introduction to Demos"/>
 </aura:component>

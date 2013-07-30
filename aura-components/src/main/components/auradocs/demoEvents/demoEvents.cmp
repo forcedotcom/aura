@@ -1,0 +1,32 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component>
+	<ui:block>
+	    <aura:set attribute="left">
+	    	<ui:inputTextArea class="box" aura:id="boxy" value="Aura is the bomb dot com" type="textarea" labelPosition="top" 
+	    	mousedown="{!c.inspMouseDown}" mouseup="{!c.inspMouseUp}" focus="{!c.inspFocus}" blur="{!c.inspBlur}"
+	    	dblclick="{!c.inspDblClick}" mouseout="{!c.inspMouseout}" mouseover="{!c.inspMouseover}" 
+	    	keypress="{!c.inspKey}" select="{!c.inspSelect}" cut="{!c.inspCut}" copy="{!c.inspCopy}" paste="{!c.inspPaste}"/>
+    	</aura:set>
+	    <aura:set attribute="right">
+	    	<ui:label label="Events" for="outputValue" class="eventsLabel"/>
+	    	<ui:button aura:id="clearButton" buttonTitle="Clear" class="clearButton" label="Clear" press="{!c.clearEvents}"/>
+	    	<ui:outputText aura:id="outputValue" class="outputValue" value=""/>
+    	</aura:set>	    
+    </ui:block>
+</aura:component>

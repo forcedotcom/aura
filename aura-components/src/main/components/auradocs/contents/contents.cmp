@@ -73,7 +73,6 @@
                     <auradocs:contentsNode text="Dialog and Message" id="useMessage"/>
                     <auradocs:contentsNode text="Tabs and Scroller" id="useTabs"/>
                     <auradocs:contentsNode text="Images" id="img"/>
-                    <auradocs:contentsNode text="Spinners" id="spinner"/>
                 </auradocs:contentsNode>                
             </auradocs:contentsNode>
             <auradocs:contentsNode text="Expressions" >
@@ -156,7 +155,6 @@
                     <auradocs:contentsNode text="Dynamically Adding Event Handlers" id="dynamicHandler" />
                     <auradocs:contentsNode text="Dynamically Constructing Labels" id="dynamicLabel" />
                     <auradocs:contentsNode text="Modifying Components from External JavaScript" id="jsModCmpExternal" />
-                    <auradocs:contentsNode text="Propagating an Event" id="evtRelay" />
                 </auradocs:contentsNode>
             </auradocs:contentsNode>
 

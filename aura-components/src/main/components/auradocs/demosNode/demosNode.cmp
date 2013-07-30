@@ -15,11 +15,10 @@
     limitations under the License.
 
 -->
-<aura:component>
-    <aura:registerEvent name="search" type="ui:searchEvent" />
-    <aura:handler name="search" action="{!c.handleSearch}" />
-	<aura:attribute name="tree" type="Aura.Component" />
-	
-	<div id="searchDiv"><ui:inputSearch search="{!c.handleSearch}" aura:id="searchBox" class="searchBox" placeholder="Search" /></div>
-	{!v.body}
+<aura:component extends="ui:treeNode">
+    <aura:attribute name="text" type="String"/>
+    <aura:attribute name="id" type="String"/>
+    <aura:attribute name="class" type="String"/>
+    <aura:set attribute="href" value="{!v.id !=null ? ('#demos?demo=' + v.id) : null}" />
+    <aura:set attribute="title" value="{!v.text}" />
 </aura:component>

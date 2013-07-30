@@ -13,103 +13,103 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.THIS{
-	position: fixed;
-	top:0;
-	left:0;
-	right:0;
-	height: 65px;
-	display: inline-block;
-	padding:0;
-	margin: 0;
+.THIS {
 	/*background-color: #424951;*/
-    background-color: #fafafa;
-    background-image: -moz-linear-gradient(top, #495058, #444);
-    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#495058), to(#444));
-    background-image: -webkit-linear-gradient(top, #495058, #444);
-    background-image: -o-linear-gradient(top, #495058, #444);
-    background-image: linear-gradient(to bottom, #495058, #444);
-    background-repeat: repeat-x;
-	font-family: "runda", sans-serif;
-	min-width: 500px;
-	padding-bottom: 2px;
+	background-color: #fafafa;
+	background-image: -moz-linear-gradient(top, #495058, #444);
+	background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#495058),
+		to(#444));
+	background-image: -webkit-linear-gradient(top, #495058, #444);
+	background-image: -o-linear-gradient(top, #495058, #444);
+	background-image: linear-gradient(to bottom, #495058, #444);
+	background-repeat: repeat-x;
+	display: block;
+	font-family: Helvetica, Arial, sans-serif;
+	height: 70px;
+	margin-bottom: 0;
+	padding: 0;
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	z-index: 1030;
 }
 
-.THIS .logo{
+.THIS .logo {
 	position: absolute;
-	left: 50px;
-	bottom: 0;
+	bottom: 15px;
+	left: 30px;
 	width: auto;
 }
 
-.THIS .logo a{
+.THIS .logo a {
+	color: #000;
 	font-size: 24px;
 	font-weight: bold;
-	color: #000;
 }
 
-.THIS .logo small{
+.THIS .logo small {
 	color: #90AD5E;
-	font-size: 12px;
-	text-transform: uppercase;
 	display: block;
+	font-size: 12px;
+	line-height: 0.5em;
+	text-transform: uppercase;
 }
 
 .THIS .navList {
-	position: absolute;
-	top: 0;
-	right: 50px;
-	bottom: 5px;
 	list-style: none;
 	margin: 0;
+	position: absolute;
+	top: 4px;
+	right: 20px;
 }
 
 .THIS h1 {
+	line-height: .9;
 	margin: 0;
-    line-height: .9;
 }
 
-.THIS li{
-	display: inline-block;	
-	padding: 20px 30px;
+.THIS li {
+	box-sizing: border-box;
+	display: inline-block;
+	height: 44px;
+	margin: 10px auto;
+	padding: 15px 25px;
 	-moz-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
-	box-sizing: border-box;
-	height: 44px;
-	margin: 12px auto 12px auto;
 }
 
-.THIS li > a{
+.THIS li>a {
 	color: #fff;
-	font-size: 14px;
+	font-size: 105%;
 	padding-bottom: 5px;
 }
 
 .THIS li[active=true] {
 	background-color: #000;
-    border-radius: 8px;
+	border-radius: 8px;
 }
 
-.THIS .spinner{
-	position: absolute;
-	right: 10px;
-	top: 14px;
-	width: 32px;
-	height: 32px;
+.THIS .spinner {
 	background-image: url(/auraFW/resources/aura/images/spinner.png);
-	display: none;
+	display:  none;
+	height: 30px;
+	position: absolute;
+	right: 6px;
+	top: 19px;
+	width: 30px;
 }
 
-.THIS.waiting .spinner{
-	display: block;	
+.THIS.waiting .spinner {
+	display: block;
 	-webkit-animation-iteration-count: infinite;
 	-webkit-animation-name: spinner;
 	-webkit-animation-duration: 1s;
 	-webkit-animation-timing-function: linear;
 	animation-iteration-count: infinite;
-    animation-name: spinner;
-    animation-duration: .3s;
-    animation-timing-function: linear;
+	animation-name: spinner;
+	animation-duration: .3s;
+	animation-timing-function: linear;
 }
 
 @-webkit-keyframes spinner {
@@ -121,11 +121,10 @@
     from {transform:rotate(0deg);}
     to {transform: rotate(360deg);}
 }
-
 .THIS .fuelGauge {
-    position: absolute;
-    right: 400px;
-    top: 23px;
+	position: absolute;
+	right: 400px;
+	top: 23px;
 }
 
 .THIS.refreshing .fuelGauge {

@@ -13,24 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.THIS.searchBox {
-    position: absolute;
-    left: 20px;
-    right: 20px;
-    top: 20px;
-    height: 20px;
-    max-width: 200px;
-    background-color: white;
+.THIS#searchDiv {
+	margin-top: 15px;
+	position: relative;
+	text-align: center;
+}
+
+.THIS .searchBox {
+	background-color: white;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	height: 25px;
+	width: 250px;
 }
 
 .THIS.uiTree {
-    position: absolute;
-    left: 20px;
-    right: 20px;
-    top: 40px;
-    bottom: 20px;
 	color: #999;
+	margin: 15px;
 	padding: 0;
+	position: relative;
 }
 
 .THIS.uiTree li {
@@ -38,26 +40,30 @@
 }
 
 .THIS.uiTree li label {
-	color: #999;
-	font-weight: bold;
-	text-transform: uppercase;
-	font-size: 12px;
 	background: none;
+	color: #444;
+	font-weight: bold;
+	font-size: 12px;
 	padding: 0;
 }
 
 .THIS.uiTree li input+ol {
 	background: none;
+	margin: -0.938em 0 0 -65px;
+}
+
+.THIS.uiTree li input:checked+ol {
+	padding: 1.25em 0 0 80px;
 }
 
 .THIS.uiTree li.file a {
 	background: none;
-	font-weight: normal;
-	color: #fff;
-	padding: 0;
+	color: #111;
 	display: block;
+	font-weight: normal;
+	padding: 0;
 }
 
 .THIS.uiTree li.file[active=true] a {
-	color: orange;
+	color: #ff6500;
 }

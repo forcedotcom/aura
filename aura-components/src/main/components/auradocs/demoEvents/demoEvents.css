@@ -13,30 +13,53 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.THIS .uiTabset.subtabs {
-	height: 600px;
+.THIS.uiBlock {
+	font-size: 16px;
+	text-align: left;
+	width: 580px;
 }
 
-.THIS .uiTabset .tabLabels {
-	background: none;
+.THIS .box {
+	background-color: #ccc;
+	color: #000;
+	font-family: sans-serif;
+	font-size: 16px;
+	height: 350px;
+	width: 350px;
 }
 
-.THIS .uiTabset .uiTab .auradocsRefTab{
-	border: 1px solid #cecece;
-	border-radius: 0;
-	box-shadow: inset 1px 0 1px #fff;
+.THIS .eventsLabel {
+	border-bottom: 1px solid #bdbdbd;
+	font-size: 20px;
+	font-weight: bold;
+	vertical-align: bottom;
 }
 
-.THIS .uiTabset .uiTab:first-child  .auradocsRefTab:first-child{
-	border-radius: 5px 0 0 5px;
-	box-shadow: none;
+.THIS .clearButton {
+	font-weight: normal;
+	margin-top: 2px;
+	margin-left: 16px;
+	padding: 2px;
 }
 
-.THIS .uiTabset .uiTab:last-child .auradocsRefTab:last-child{
-	border-radius: 0 5px 5px 0;
+.THIS .bRight {
+	height: 400px;
+	overflow-y: auto;
+	width: 200px;
 }
 
-.THIS .uiTabset .uiTab .tabBody .auradocsRefTab{
-	border: none;
-	top: 50px;
+.THIS .redText {
+	color: #f00;
+}
+
+.THIS .blueText {
+	color: #0c0;
+}
+
+.THIS .boldText {
+	font-weight: bold;
+}
+
+.THIS .whitebg {
+	background-color: #fff;
 }

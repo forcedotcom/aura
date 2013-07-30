@@ -128,9 +128,6 @@ ArrayValue.prototype.setIsOwner = function(isOwner) {
 ArrayValue.prototype.setValue = function(newArray, skipChange) {
     this.fireEvents = false;
 
-    if (this.array === undefined) {
-        this.array = [];
-    }
     this.newArray = [];
     this.makeDirty();
 
@@ -139,17 +136,12 @@ ArrayValue.prototype.setValue = function(newArray, skipChange) {
             newArray = newArray.getArray();
         }
 
-        if (!aura.util.isArray(newArray)) {
-            newArray = [ newArray ];
-        }
-        for (var i = 0; i < newArray.length; i++) {
-           this.push(newArray[i]);
-           if (i < this.array.length) {
-               // Values at old indeces are dirty, since they may have changed.
-               if (this.newArray[i].makeDirty) {
-                   this.newArray[i].makeDirty();
-               }
-           }
+        if (aura.util.isArray(newArray)) {
+            for (var i = 0; i < newArray.length; i++) {
+                this.push(newArray[i]);
+            }
+        } else {
+            this.push(newArray);
         }
     }
 

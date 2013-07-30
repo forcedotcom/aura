@@ -87,18 +87,14 @@ MapValue.prototype.getValue = function(k){
  * do as the constructor and create a map based on a model, you would need to first
  * construct a MapValue, then call this.
  *
- * Where the "old" value had a key also in the "new" value, those key-overlaps will
- * be marked dirty.  Where the "old" value had no key, the new subvalue is clean.
- * Old keys' values where the key is NOT in the new value may still be
- * live (via getValue(k)), so they are not destroyed, but any handlers
- * are removed.
- *
  * @param {Object} newMap The new map.
- * @param {boolean} doDestroy whether to destroy orphaned old entries
  */
-MapValue.prototype.setValue = function(newMap, doDestroy) {
+MapValue.prototype.setValue = function(newMap) {
+    this.value = {};
+    this.keys = {};
+    this.makeDirty();
     if ($A.util.isUndefinedOrNull(newMap) || (newMap.isDefined && !newMap.isDefined())) {
-        newMap = {};  // Clear the old value
+        return;
     }
     if (!$A.util.isObject(newMap)) {
         $A.assert(false, "newMap must be an object");
@@ -112,34 +108,24 @@ MapValue.prototype.setValue = function(newMap, doDestroy) {
             copyKeys = newMap.keys;
         } else if (type === 'SimpleValue') {
             if (newMap.unwrap() === null) {
-                copyMap = {};  // Clear the map
-            } else {
-                // bad.
-                $A.assert(false, "Defined simplevalue cannot be passed to MapValue.setValue");
                 return;
             }
+            // bad.
+            $A.assert(false, "Defined simplevalue cannot be passed to MapValue.setValue");
+            return;
         } else if (type === 'ArrayValue') {
             // bad.
             $A.assert(false, "Defined ArrayValue cannot be passed to MapValue.setValue");
             return;
         }
     }
-    this.makeDirty();
-    // Removed handlers from any to-be-unused keys
-    var k;
-    for (k in this.value) {
-    	if (!copyMap.hasOwnProperty(k)) {
-    		this.remove(k, doDestroy);
-    	}
-    }
-    // Put new values into place:
-    for (k in copyMap) {
+    for (var k in copyMap) {
         var key = k;
 
         if (copyKeys && copyKeys[k]) {
             key = copyKeys[k];
         }
-        this.put(key, copyMap[k]);
+        this.add(key, copyMap);
     }
 };
 
@@ -359,48 +345,13 @@ MapValue.prototype.put = function(k, v){
     var value = this.value[key];
 
     if (value) {
-    	var oldType = BaseValue.typeFor(value);
-    	var newType = BaseValue.typeFor(v);
-    	if (oldType === newType) {
-            value.setValue(v);
-    	} else {
-    	    // Replace with a correctly typed, dirty value, copying any handlers.
-    	    // (Although you probably deserve what you get if you change types
-    	    // and have handlers that expect to make sense of it!)
-    	    var old = value;
-    	    value = valueFactory.create(v, null, this.owner);
-    	    value.name = old.name;
-    	    value.handlers = old.handlers;
-    	    old.handlers = {};
-    	    old.destroy();
-    	    if (value.makeDirty) {
-                value.makeDirty();
-            }
-    	    this.value[key] = value;
-    	}
+        value.setValue(v);
     } else {
         var config = {};
         config[k] = v;
         this.add(k, config);
     }
     this.makeDirty();
-};
-
-/**
- * Removes an entry from the map.
- * @private
- */
-MapValue.prototype.remove = function(k, doDestroy) {
-	if (this.value.hasOwnProperty(k)) {
-		var val = this.value[k];
-		if (doDestroy) {
-			val.destroy();
-		} else if (val.destroyHandlers) {
-			val.destroyHandlers();
-		}
-		delete this.value[k];
-		delete this.keys[k.toLowerCase()];
-	}
 };
 
 /**

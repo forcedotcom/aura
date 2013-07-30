@@ -116,29 +116,6 @@
         }
     },
 
-    /** Tests dirtiness and typechanging setValue */
-    testSetValueDirtiness: {
-    	test: function(component) {
-            var aval = $A.expressionService.create(null, [1, 2]);
-            aval.setValue(["a", {a: 3}, [4, 5, 6]]);
-            $A.test.assertEquals(3, aval.getLength());
-            $A.test.assertTrue(aval.getValue(0).isDirty());
-            $A.test.assertEquals("a", aval.get(0), "bad first value");
-            var mid = aval.getValue(1);
-            $A.test.assertTrue(mid.isDirty());
-            $A.test.assertEquals(3, mid.getValue("a").getValue(), "bad second value, may not type changed");
-            var tail = aval.getValue(2);
-            $A.test.assertFalse(tail.isDirty());
-            $A.test.assertEquals(3, tail.getLength(), "bad third value");
-            
-            // Test shrinking
-            aval.setValue(["c", "d"]);
-            $A.test.assertEquals(2, aval.getLength());
-            $A.test.assertTrue(aval.getValue(0).isDirty());
-            $A.test.assertTrue(aval.getValue(1).isDirty());
-    	}
-    },
-
     /**
      * Setting array value to SimpleValue should wrap the value in a new ArrayValue.
      */

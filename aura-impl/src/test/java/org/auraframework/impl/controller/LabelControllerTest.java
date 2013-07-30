@@ -40,7 +40,7 @@ public class LabelControllerTest extends AuraImplTestCase {
     DefDescriptor<ControllerDef> labelCntrDesc = DefDescriptorImpl.getInstance(
             "java://org.auraframework.impl.controller.LabelController", ControllerDef.class);
     String getLabelDesc = "java://org.auraframework.impl.controller.LabelController/ACTION$getLabel";
-    String placeholder = "FIXME - LocalizationAdapter.getLabel() needs implemenation!";
+    String placeholder = "FIXME - LocalizationAdapter.getLabel() needs implementation!";
     
     public LabelControllerTest(String name){
         super(name);

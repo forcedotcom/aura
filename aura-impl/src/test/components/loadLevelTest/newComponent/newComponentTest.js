@@ -376,4 +376,20 @@
             });
         }
     },
+    // TODO(W-1766834): setting 'localId' param of config causes error
+    _testConfig_SetLocalId:{
+        test: function(cmp){
+            debugger;
+            $A.run(function(){
+                cmp.get("c.createCmpWithLocalId").runDeprecated();
+            });
+
+            var body = cmp.get('v.body');
+            $A.test.assertEquals(1,body.length);
+            $A.test.assertEquals("markup://aura:text",body[0].getDef().getDescriptor().getQualifiedName());
+            $A.test.assertEquals("TextComponent",body[0].get('v.value'));
+            $A.test.assertEquals(6,body[0].get('v.truncate'));
+            $A.test.assertEquals("Tex...",$A.test.getText(body[0].getElement()));
+        }
+    },
 })

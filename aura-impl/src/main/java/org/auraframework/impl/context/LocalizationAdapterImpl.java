@@ -72,7 +72,7 @@ public class LocalizationAdapterImpl implements LocalizationAdapter {
     public String getLabel(String section, String name, Object... params) {
         Map<String, String> label = labels.get(name);
         if (label == null) {
-            return "FIXME - LocalizationAdapter.getLabel() needs implemenation!";
+            return "FIXME - LocalizationAdapter.getLabel() needs implementation!";
         }
         return label.get(this.getAuraLocale().getLanguageLocale().toString());
     }

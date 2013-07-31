@@ -18,5 +18,20 @@
         var oldBody = cmp.getAttributes().getValue("body");
         oldBody.destroy();
         oldBody.setValue("new content");
+    },
+    
+    scrollToTop : function(cmp, event, helper) {
+    	var scrollEvt = cmp.find("scrollToYTest").getEvent("scrollTo");  	
+    	helper.handleScrollTo(scrollEvt, "top", 500);
+    },
+    
+    scrollToBottom : function(cmp, event, helper) {
+    	var scrollEvt = cmp.find("scrollToYTest").getEvent("scrollTo");
+    	helper.handleScrollTo(scrollEvt, "bottom", 500);
+    },
+    
+    scrollDown : function(cmp, event, helper) {
+    	var scrollEvt = cmp.find("scrollToYTest").getEvent("scrollBy");
+    	helper.handleScrollBy(scrollEvt, 15, 15, 500);
     }
 })

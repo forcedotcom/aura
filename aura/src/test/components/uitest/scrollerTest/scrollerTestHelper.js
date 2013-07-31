@@ -14,20 +14,21 @@
  * limitations under the License.
  */
 ({
-    refresh: function(component, event, helper) {
-        helper.refresh(component);
+    handleScrollTo : function(scrollEvt, dest, time, x, y) {
+    	scrollEvt.setParams({
+    		destination : dest,
+    		xcoord : x,
+    		ycoord : y,
+    		time : time
+    	});
+    	scrollEvt.fire();
     },
     
-    locationChange: function(component, event) {
-		var scroller = component._scroller;
-		if (!$A.util.isUndefined(scroller)) {
-			scroller.unbindTransientHandlers();
-		}    	
-    },
-    scrollTo: function(component, event, helper) {
-    	helper.handleScrollTo(component, event);
-    },
-    scrollBy: function(component, event, helper) {
-    	helper.handleScrollBy(component, event);
+    handleScrollBy : function(scrollEvt, deltaX, deltaY, time) {
+    	scrollEvt.setParams({
+    		deltaX : deltaX,
+    		deltaY : deltaY,
+    		time : time
+    	})
     }
 })

@@ -15,6 +15,15 @@
  */
 ({
     /*
+     * test to verify controller-def is added to value provider on the serverside
+     */
+    testActionAttribute: {
+        test: function(component){
+            aura.test.assertNotNull($A.test.getElementByClass("itIsTrue"), "controllerdef is not added to valueprovider");
+            }
+    },
+
+    /*
      * Action can be passed as component attribute.
      */
     testAfterRenderTopLevel: {

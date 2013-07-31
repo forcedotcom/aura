@@ -15,9 +15,16 @@
     limitations under the License.
 
 -->
+<!-- this component is for testActionExpressionChaining.cmp, cannot load by itself -->
 <aura:component>
     <aura:attribute name="press" type="Aura.Action" required="true"/>
-
     <ui:button aura:id="theButton" label="Press Me" press="{!v.press}"/>
     <div aura:id="theDiv" onclick="{!v.press}">Click Me</div>
+    
+    <div aura:id="testGetValueOnController">
+        <aura:if isTrue="{!v.press != null}">
+            <span class="itIsTrue">controllerdef is added to valueprovider</span>
+        </aura:if>
+    </div>
+    
 </aura:component>

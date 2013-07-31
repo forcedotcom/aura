@@ -456,7 +456,7 @@ var AuraLocalizationService = function AuraLocalizationService() {
          * @memberOf AuraLocalizationService
          * @public
          */
-        parseDateTimeISO8601 : function(dateTimeString, targetFormat, locale) {
+        parseDateTimeISO8601 : function(dateTimeString) {
             if (!dateTimeString) {
                 return null;
             }

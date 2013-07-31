@@ -114,6 +114,7 @@
         var items = atts.getValue("items");
         var varName = atts.get("var");
         var indexVar = atts.get("indexVar");
+
         //
         // The collector for the components.
         // Note that we put the count of items in our count, and
@@ -123,14 +124,14 @@
         //
         var bodyCollector = {
             realBodyList:[],
-            count:items.getLength(),
+            count: (items && items.getLength) ? items.getLength() : 0, // items length if it exists else zero
             callback: callback,
             cmp: cmp,
             offset:0
         };
 
         cmp._currentBodyCollector = bodyCollector;
-        if (items && !items.isLiteral() && !items.isEmpty()) {
+        if (items && items.getLength && !items.isLiteral() && !items.isEmpty()) {
             var realstart = 0;
             var realend = items.getLength();
             var start = atts.getValue("start");

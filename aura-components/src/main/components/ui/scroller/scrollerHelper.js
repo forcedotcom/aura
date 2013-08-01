@@ -56,6 +56,7 @@
 		var attributes = component.getAttributes();
 		var enabled = attributes.getValue("enabled").getBooleanValue();
 		var scroller = component.find("scrollWrapper").getElement();
+		
 		if (scroller) {
 			
 			this.initWidth(component);
@@ -71,8 +72,9 @@
                     var bindEventsToScroller = attributes.getValue("bindEventsToScroller").getBooleanValue();
 
 					var pullToRefreshAction = component.get("v.onPullToRefresh");
+					var canRefresh = component.get("v.canRefresh");
 					var pullDownOffset = 0;
-					if (pullToRefreshAction) {
+					if (pullToRefreshAction && canRefresh) {
 						var pullDownEl = component.find("pullDown").getElement();
 						// pullDownEl.offsetHeight is unreliable, so calculating
 						// by hand from the computed styles
@@ -82,9 +84,11 @@
 								+ (parseInt(pullDownElInfo.marginBottom) || 0)
 					}
 					
-					var pullToLoadMoreAction = component.get("v.onPullToLoadMore");
+					var pullToShowMoreAction = component.get("v.onPullToShowMore");
+					var canShowMore = component.get("v.canShowMore");
 					var pullUpOffset = 0;
-					if (pullToLoadMoreAction) {
+					if (pullToShowMoreAction && canShowMore) {
+						var shim = component.find("shim").getElement();
 						var pullUpEl = component.find("pullUp").getElement();
 						// pullUpEl.offsetHeight is unreliable, so calculating
 						// by hand from the computed styles
@@ -173,7 +177,7 @@
 						},
 
 						onScrollMove : function(e) {
-							if (pullToRefreshAction) {
+							if (pullToRefreshAction && canRefresh) {
 								if (this.y > 5 && $A.util.hasClass(pullDownEl, 'pullDown')) {
 									$A.util.swapClass(pullDownEl, 'pullDown', 'pullFlip');
 									this.minScrollY = 0;
@@ -183,7 +187,7 @@
 								}
 							}
 							
-							if (pullToLoadMoreAction) {
+							if (pullToShowMoreAction && canShowMore) {
 								var threshold = this.totalScrollY + 5;
 								
 								if (this.y < threshold && $A.util.hasClass(pullUpEl, 'pullDown')) {
@@ -202,7 +206,7 @@
 						},
 
 						onScrollEnd : function(e) {
-							if (pullToRefreshAction) {
+							if (pullToRefreshAction && canRefresh) {
 								if ($A.util.hasClass(pullDownEl, 'pullFlip')) {
 									$A.util.swapClass(pullDownEl, 'pullFlip', 'pullLoading');
 									setTimeout(function() {
@@ -212,11 +216,11 @@
 								}
 							}
 							
-							if (pullToLoadMoreAction) {
+							if (pullToShowMoreAction && canShowMore) {
 								if ($A.util.hasClass(pullUpEl, 'pullFlip')) {
 									$A.util.swapClass(pullUpEl, 'pullFlip', 'pullLoading');
 									setTimeout(function() {
-										pullToLoadMoreAction.runDeprecated();
+										pullToShowMoreAction.runDeprecated();
 									}, 1);
 
 								}
@@ -231,7 +235,7 @@
 						},
 
 						onRefresh : function() {
-							if (pullToRefreshAction) {
+							if (pullToRefreshAction && canRefresh) {
 								// keep the "loading" styling as it animates up
 								// then replace with the "pull down" styling
 								setTimeout(function() {
@@ -239,15 +243,26 @@
 								}, 50);
 							}
 							
-							if (pullToLoadMoreAction) {
+							if (pullToShowMoreAction && canShowMore) {
 								// keep the "loading" styling as it animates up
 								// then replace with the "pull down" styling
 								setTimeout(function() {
 									$A.util.swapClass(pullUpEl, 'pullLoading', 'pullDown');
 								}, 50);
+							
+								// TODO: this could be probably be more efficient
+								var oldShim = shim.offsetHeight;
+								shim.style.height = "0"
+								var leftoverSpace = scroller.offsetHeight - (scroller.children[0].offsetHeight - pullUpOffset - pullDownOffset);
+								
+								if (leftoverSpace > 0) {
+									shim.style.height = leftoverSpace + "px";
+								} else {
+									this.maxScrollY += oldShim;
+								}
 							}
 							
-							// totalScrollY includes the pullToLoadMore section and is for our own reference.
+							// totalScrollY includes the shim and pullToShowMore divs and is for our own reference.
 							// maxScrollY is actually used by iScroll to determine when to bounce back.
 							this.totalScrollY = this.maxScrollY;
 							this.totalScrollYWithoutPullUp = this.totalScrollY + pullUpOffset;

@@ -21,7 +21,9 @@
 	//indicates only the selected page is visible or not
     SHOW_SELECTED_PAGE_ONLY : true,
     //Minimum distance to swipe to find out the intended swipe direction
-    DISTANCE_THRESHOLD : 5,    
+    DISTANCE_THRESHOLD : 5,
+    //Direction
+    HORIZONTAL : 1,   
     //navContainer height, hardcode for now so it does not require updating the size dynamically if width and height is set
     NAV_CONTAINER_HEIGHT : 58,
    	
@@ -132,44 +134,58 @@
 			var hasTouch = 'ontouchstart' in window;
 			if (hasTouch) {
 				$A.util.on(el, 'touchstart', function(e) {helper.onStart(cmp, e);});
-				$A.util.on(el, 'touchmove', function(e) {helper.onMove(cmp, e);});
-				$A.util.on(el, 'touchend', function(e) {helper.onEnd(cmp, e);});				
+				$A.util.on(el, 'touchmove', function(e) {helper.onMove(cmp, e);});								
 			} else {
 				$A.util.on(el, 'mousedown', function(e) {helper.onStart(cmp, e);});
-				$A.util.on(el, 'mousemove', function(e) {helper.onMove(cmp, e);});
-				$A.util.on(el, 'mouseup', function(e) {helper.onEnd(cmp, e);});
+				$A.util.on(el, 'mousemove', function(e) {helper.onMove(cmp, e);});								
 			}
+			$A.util.on(el, 'click', function(e){helper.onClick(cmp, e)}, true); //useCapture
 		}
 	},
 	
 	onStart: function(cmp, evt) {
 		var point = evt.touches && evt.touches.length == 1 ? evt.touches[0] : evt;	
-		cmp._swipe = { 
+		cmp._startPos = { 
 			startx: point.pageX, 
 			starty: point.pageY
-		}
-		
+		}		
 	},
 	
 	onMove: function(cmp, evt) {
-		var swipe = cmp._swipe;
-		if (swipe) {
-			var point = evt.changedTouches && evt.changedTouches.length == 1 ? evt.changedTouches[0] : evt;	
-	        var dx = point.pageX - swipe.startx,
-	            dy = point.pageY - swipe.starty,
-	            y = Math.abs(dy),
-	            x = Math.abs(dx);
-	
-	        if (x > this.DISTANCE_THRESHOLD && x > y) {					
-	    		//swiping horizontally					
-				evt.stopPropagation();     
-	        }			
+		if (cmp._startPos && this.hasMoved(cmp, evt, this.HORIZONTAL)) {
+    		//swiping horizontally, stop event from bubbling up to prevent parent scroller from moving
+			evt.stopPropagation();
 		}
 	},
+		
+	onClick : function(cmp, evt) {		
+		if (this.hasMoved(cmp, evt)) {			
+			$A.util.squash(evt, true);
+		}
+		delete cmp._startPos;
+	},
 	
-	onEnd : function(cmp, evt) {		
-		delete cmp._swipe;
-	},	
+	/**
+	 * Check whether the mouse/touch past the boundary since it started
+	 */
+	hasMoved : function(cmp, evt, direction) {
+		var startPos = cmp._startPos
+		if (!startPos) {
+			return false;
+		}
+		
+		var point = evt.changedTouches && evt.changedTouches.length == 1 ? evt.changedTouches[0] : evt;	
+        var dx = point.pageX - startPos.startx,
+            dy = point.pageY - startPos.starty,
+            y = Math.abs(dy),
+            x = Math.abs(dx);
+
+        if (direction == this.HORIZONTAL) {
+        	return x > this.DISTANCE_THRESHOLD && x > y;
+        } else {		
+        	return x > this.DISTANCE_THRESHOLD || y > this.DISTANCE_THRESHOLD; 
+        }
+	},
 	
 	getPageComponentsFromIteration : function(iterCmp) {
 		var realBody = iterCmp.get('v.realBody'),

@@ -140,7 +140,7 @@
 					iScroll.prototype._getEventTarget = function(type, el) {
 						var target;
 						
-						if (type === this.RESIZE_EV || type === this.END_EV) {
+						if (type === this.RESIZE_EV) {
 							target = window;
 						} else if (bindEventsToScroller) {
 							target = this.scroller;
@@ -153,7 +153,7 @@
 
 					//START override iScroll to have the option to bind the events to the scroller itself					
 					iScroll.prototype._bind = function(type, el, bubble) {						
-						var target = this._getEventTarget(type, el);						
+						var target = this._getEventTarget(type, el);
 						target.addEventListener(type, this, !!bubble);
 					};
 					
@@ -497,6 +497,11 @@
 				that.wrapper = typeof el == 'object' ? el : doc.getElementById(el);
 				that.wrapper.style.overflow = 'hidden';
 				that.scroller = that.wrapper.children[0];
+				that.RESIZE_EV = RESIZE_EV;
+				that.START_EV = START_EV;
+				that.MOVE_EV = MOVE_EV;
+				that.END_EV = END_EV;
+				that.CANCEL_EV = CANCEL_EV;
 
 				// Default options
 				that.options = {

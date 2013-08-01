@@ -172,6 +172,56 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
     }
 
     /**
+     * Verify use of integration service to inject a component and initialize events with javascript function handlers. 
+     */
+    public void testComponentWithRegisteredEvents()throws Exception{
+        String bodyMarkup = "<aura:attribute name='attr' type='String' default='Oranges'/> "
+                +"<aura:registerevent name='press' type='ui:press'/>" +
+                "<aura:registerevent name='change' type='ui:change'/>" +
+                "<div class='dataFromAttribute' aura:id='dataFromAttribute'>{!v.attr}</div>" + 
+                "<div class='click_t' onclick='{!c.clickHndlr}'>Click Me</div>" +
+                "<input class='change_t' onchange='{!c.changeHndlr}' type='text'/>";
+        DefDescriptor<ComponentDef> cmpToInject = addSourceAutoCleanup(ComponentDef.class,
+                String.format(AuraImplTestCase.baseComponentTag, "", bodyMarkup));
+        DefDescriptor<ControllerDef> jsControllerdesc = Aura.getDefinitionService()
+                .getDefDescriptor(
+                        String.format("%s://%s.%s", DefDescriptor.JAVASCRIPT_PREFIX, cmpToInject.getNamespace(),
+                                cmpToInject.getName()), ControllerDef.class);
+        addSourceAutoCleanup(jsControllerdesc, 
+                "{" + 
+                        "clickHndlr:function(cmp, evt){var e = cmp.getEvent('press');e.setParams({'domEvent': event});e.fire();}," +
+                        "changeHndlr:function(cmp, evt){var e = cmp.getEvent('change');e.fire();}"+
+        		"}");
+        
+        DefDescriptor<ComponentDef> customStub = addSourceAutoCleanup(
+                ComponentDef.class,
+                getIntegrationStubMarkup(
+                        "java://org.auraframework.impl.renderer.sampleJavaRenderers.RendererForAISWithCustomJScript",
+                        true, true,
+                        true));
+        Map<String, Object> attributes = Maps.newHashMap();
+        attributes.put("attr", "Apples");
+        attributes.put("press", "clickHandler__t");
+        attributes.put("change", "changeHandler__t");
+        openIntegrationStub(customStub, cmpToInject, attributes);
+        
+        WebElement attrValue = findDomElement(By.cssSelector("div.dataFromAttribute"));
+        assertEquals("Failed to see data from model of injected component", "Apples", attrValue.getText());
+        
+        WebElement clickNode = findDomElement(By.cssSelector("div.click_t"));
+        clickNode.click();
+        assertTrue("", auraUITestingUtil.getBooleanEval("return document._clickHandlerCalled"));
+        assertEquals("press", auraUITestingUtil.getEval("return document.__clickEvent.getName()"));
+        
+        WebElement textNode = findDomElement(By.cssSelector("input.change_t"));
+        textNode.sendKeys("YeeHa!");
+        clickNode.click(); //This will take the focus out of input element and trigger the onchange handler
+        waitForCondition("return !!document._changeHandlerCalled");
+        assertEquals("Custom JS Code", auraUITestingUtil.getEval("return document._changeHandlerCalled"));
+        assertEquals("change", auraUITestingUtil.getEval("return document.__changeEvent.getName()"));
+    }
+    
+    /**
      * Verify use of integration service to inject a component and initialize a Aura.Component[] type attribute.
      * 
      * @throws Exception

@@ -23,9 +23,10 @@
  */
 function NumberFormat(format, symbols) {
     this.originalFormat = format;
-    this.symbols = symbols || {decimalSeparator: $A.get("$Locale.decimal"),
-                               groupingSeparator: $A.get("$Locale.grouping"),
-                               currency: $A.get("$Locale.currency")};
+    this.symbols = symbols || {"decimalSeparator": $A.get("$Locale.decimal"),
+                               "groupingSeparator": $A.get("$Locale.grouping"),
+                               "currency": $A.get("$Locale.currency"),
+                               "currencyCode": $A.get("$Locale.currencyCode")};
     // default values for any format
     this.hasCurrency = false;
     this.multiplier = 0;
@@ -215,7 +216,7 @@ NumberFormat.prototype.replaceCurrencies = function() {
 
 NumberFormat.prototype.replaceCurrency = function(str) {
     if (str) {
-        return str.replace(/¤¤/g, this.symbols.currencyCode).replace(/¤/g, this.symbols.currency);
+        return str.replace(/¤¤/g, this.symbols["currencyCode"]).replace(/¤/g, this.symbols["currency"]);
     }
     return str;
 };
@@ -316,7 +317,7 @@ NumberFormat.prototype.format = function(number) {
         result = result.concat(charArray.slice(0, dist));
         var intPart = charArray.slice(dist, decimalPos);
         while (intPart.length > 0) {
-            result.push(this.symbols.groupingSeparator);
+            result.push(this.symbols["groupingSeparator"]);
             result = result.concat(intPart.splice(0, this.groupingDigits));
         }
     }
@@ -324,7 +325,7 @@ NumberFormat.prototype.format = function(number) {
     // format the fractional part
     var fracLength = charArray.length - decimalPos;
     if (fracLength > 0 || this.minFractionDigits > 0) {
-        result.push(this.symbols.decimalSeparator);
+        result.push(this.symbols["decimalSeparator"]);
         if (fracLength > 0) {
             result = result.concat(charArray.slice(decimalPos));
         }

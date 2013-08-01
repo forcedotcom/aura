@@ -14,20 +14,89 @@
  * limitations under the License.
  */
 ({
-    render : function(cmp){
-        var ret = this.superRender();
-        var span = cmp.getSuper().find("span");
-        if (span) {
-            var element = span.getElement();
-            var value = element.textContent;
-            if (!isNaN(value)) {
-                var symbol = cmp.getAttributes().getValue("symbol").getValue();
-                var a = [];
-                a.push(symbol);
-                a.push(value);
-                element.textContent = a.join('');
+    render: function outputNumberRender(cmp, helper) {
+        var span = this.superRender()[0];
+        var f = cmp.get("v.format");
+        var num = cmp.get("v.value");
+        var currencyCode = cmp.get("v.currencyCode");
+        var currencySymbol = cmp.get("v.currencySymbol") || currencyCode;
+        var formatted;
+        if ($A.util.isNumber(num) || $A.util.isString(num)) {
+            var hasFormat = !$A.util.isEmpty(f);
+            if (hasFormat || currencySymbol) {
+                var nf;
+                try {
+                    var symbols;
+                    if (currencySymbol) {
+                        symbols = {
+                            currencyCode: currencyCode,
+                            currency: currencySymbol,
+                            decimalSeparator: $A.get("$Locale.decimal"),
+                            groupingSeparator: $A.get("$Locale.grouping")
+                        };
+                    }
+                    if (!hasFormat) {
+                        f = $A.get("$Locale.currencyFormat");
+                    }
+                    nf = $A.localizationService.getNumberFormat(f, symbols);
+                } catch (e) {
+                    formatted = "Invalid format attribute";
+                    $A.log(e);
+                }
+                if (nf) {
+                    formatted = nf.format(num);
+                }
+            } else {
+                formatted = $A.localizationService.formatCurrency(num);
             }
+            span.innerText = formatted;
         }
-        return ret;
+        return span;
+    },
+
+    rerender: function outputNumberRerenderer(cmp, helper) {
+        if ($A.util.isUndefinedOrNull(this.symbols.currency)) {
+            this.symbols.currency = this.symbols.currencyCode;
+        }
+        var val = cmp.getValue("v.value");
+        var f = cmp.getValue("v.format");
+        var currencyCode = cmp.get("v.currencyCode");
+        var currencySymbol = cmp.get("v.currencySymbol") || currencyCode;
+        if (val.isDirty() || f.isDirty()) {
+            var formatted = '';
+            f = f.unwrap();
+            val = val.unwrap();
+            if ($A.util.isNumber(val) || $A.util.isString(val)) {
+                var hasFormat = !$A.util.isEmpty(f);
+                if (hasFormat || currencySymbol) {
+                    var nf;
+                    try {
+                        var symbols;
+                        if (currencySymbol) {
+                            symbols = {
+                                currencyCode: currencyCode,
+                                currency: currencySymbol,
+                                decimalSeparator: $A.get("$Locale.decimal"),
+                                groupingSeparator: $A.get("$Locale.grouping")
+                            };
+                        }
+                        if (!hasFormat) {
+                            f = $A.get("$Locale.currencyFormat");
+                        }
+                        nf = $A.localizationService.getNumberFormat(f, symbols);
+                    } catch (e) {
+                        formatted = "Invalid format attribute";
+                        $A.log(e);
+                    }
+                    if (nf) {
+                        formatted = nf.format(val);
+                    }
+                } else {
+                    formatted = $A.localizationService.formatCurrency(val);
+                }
+            }
+            var span = cmp.find("span");
+            span.getElement().innerText = formatted;
+        }
     }
 })

@@ -15,24 +15,13 @@
  */
 package org.auraframework.impl.adapter;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
-import java.util.TimeZone;
+import java.util.*;
 
 import org.apache.log4j.Logger;
-
 import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.impl.javascript.AuraJavascriptGroup;
@@ -41,9 +30,7 @@ import org.auraframework.impl.util.AuraImplFiles;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.AuraError;
 import org.auraframework.throwable.AuraRuntimeException;
-import org.auraframework.util.AuraLocale;
-import org.auraframework.util.AuraTextUtil;
-import org.auraframework.util.IOUtil;
+import org.auraframework.util.*;
 import org.auraframework.util.javascript.JavascriptGroup;
 import org.auraframework.util.resource.ResourceLoader;
 
@@ -201,10 +188,10 @@ public class ConfigAdapterImpl implements ConfigAdapter {
 
         List<String> urls = Lists.newLinkedList();
     	String nonce = Aura.getContextService().getCurrentContext().getFrameworkUID();
-        urls.add(String.format("%s/auraFW/resources/%s/walltime-js/walltime.js?aura.fwuid=%s", contextPath, nonce, nonce));
         if (!"GMT".equals(locale)) {
             urls.add(String.format("%s/auraFW/resources/%s/walltime-js/olson/walltime-data_%s.js?aura.fwuid=%s", contextPath, nonce, locale, nonce));
         }
+        urls.add(String.format("%s/auraFW/resources/%s/walltime-js/walltime.js?aura.fwuid=%s", contextPath, nonce, nonce));
         return urls;
     }
 

@@ -27,11 +27,9 @@
 <aura:attribute name="body" type="Aura.ComponentDefRef[]" required="true" description="Template to use when creating components for each iteration."/>
 <aura:attribute name="realbody" type="Aura.Component[]" description="Internal use only. Any value set will be ignored."/>
 
-<aura:handler name="init" value="{!this}" action="{!c.firstRender}"/>
 <aura:handler name="change" value="{!v.items}" action="{!c.itemsChange}"/>
 <aura:handler name="change" value="{!v.start}" action="{!c.rangeChange}"/>
 <aura:handler name="change" value="{!v.end}" action="{!c.rangeChange}"/>
-
 
 <!--
 <aura:attribute name="page" type="Integer"/>

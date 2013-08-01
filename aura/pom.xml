@@ -64,6 +64,10 @@
     <build>
         <resources>
             <resource>
+                <directory>src/resources/META-INF</directory>
+                <targetPath>META-INF</targetPath>
+            </resource>
+            <resource>
                 <directory>src/main/http/WEB-INF</directory>
                 <targetPath>aura/http/WEB-INF</targetPath>
             </resource>

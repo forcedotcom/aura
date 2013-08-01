@@ -78,20 +78,12 @@ public abstract class AuraBaseServlet extends HttpServlet {
     public static final String JAVASCRIPT_CONTENT_TYPE = "text/javascript";
     public static final String MANIFEST_CONTENT_TYPE = "text/cache-manifest";
     public static final String CSS_CONTENT_TYPE = "text/css";
-    protected static MimetypesFileTypeMap mimeTypesMap;
+    protected static MimetypesFileTypeMap mimeTypesMap = new MimetypesFileTypeMap();
     public static final String OUTDATED_MESSAGE = "OUTDATED";
     protected final static StringParam csrfToken = new StringParam(AURA_PREFIX + "token", 0, true);
     private static SourceNotifier sourceNotifier = new SourceNotifier();
 
     static {
-        mimeTypesMap = new MimetypesFileTypeMap();
-        // the default MIME map is apparently circa 1992, so add some types we
-        // might need
-        mimeTypesMap.addMimeTypes(AuraBaseServlet.JAVASCRIPT_CONTENT_TYPE + " js");
-        mimeTypesMap.addMimeTypes("text/css css");
-        mimeTypesMap.addMimeTypes("audio/mpeg mp3 mpeg3");
-        mimeTypesMap.addMimeTypes("image/png png");
-        mimeTypesMap.addMimeTypes("video/mpeg mpeg mpg mpe mpv vbs mpegv");
         Aura.getDefinitionService().subscribeToChangeNotification(sourceNotifier);
     }
 

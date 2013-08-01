@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.auraframework</groupId>
         <artifactId>aura-framework</artifactId>
-        <version>0.225-SNAPSHOT</version>
+        <version>0.226-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -63,6 +63,10 @@
     </properties>
     <build>
         <resources>
+            <resource>
+                <directory>src/resources/META-INF</directory>
+                <targetPath>META-INF</targetPath>
+            </resource>
             <resource>
                 <directory>src/main/http/WEB-INF</directory>
                 <targetPath>aura/http/WEB-INF</targetPath>

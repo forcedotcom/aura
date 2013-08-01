@@ -23,9 +23,5 @@
         if (v === cmp.getValue("v.items")) {
             helper.rerenderEverything(cmp);
         }
-    },
-
-    firstRender: function(cmp, evt, helper) {
-        helper.rerenderEverything(cmp);
     }
 })

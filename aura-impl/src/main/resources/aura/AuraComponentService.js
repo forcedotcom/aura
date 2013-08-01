@@ -207,7 +207,7 @@ var AuraComponentService = function(){
             };
 
             if ( !def || (def && def.hasRemoteDependencies()) ) {
-                that.requestComponent(callbackScope, callback, config, attributeValueProvider);
+                that.requestComponent(callbackScope, callback, config);
             } else {
                 var newComp = that.newComponentDeprecated(config, attributeValueProvider, localCreation, doForce);
                 callback.call(callbackScope, newComp);
@@ -221,75 +221,36 @@ var AuraComponentService = function(){
          * @param callback
          * @private
          */
-        requestComponent: function(callbackScope, callback, config, avp) {
+        requestComponent: function(callbackScope, callback, config) {
+
             var action = $A.get("c.aura://ComponentController.getComponent");
-            var attributes = config["attributes"] ?
+            var attributeValues = config["attributes"] ?
             		(config["attributes"]["values"] ? config["attributes"]["values"] : config["attributes"])
             		: null;
-            var atts = {};
-            var key;
-
-            var compServ = $A.services.component;
-
-            //
-            // Note to self, these attributes are _not_ Aura Values. They are instead either
-            // a literal string or a (generic object) map.
-            //
-            for (key in attributes) {
-                var value = attributes[key];
-                if (value.hasOwnProperty("value")) {
-                    value = value["value"];
-                }
-                // no def or component here, because we don't have one.
-                var auraValue = valueFactory.create(value);
-                if(!auraValue.isExpression() ){
-                    atts[key] = auraValue.unwrap();
-                } else {
-                    var resolved = $A.expressionService.get(avp, auraValue);
-                    if (resolved) {
-                        // If we got a value, use that.
-                        atts[key] = resolved;
-                    } else {
-                        // try to give the server a version it can use.
-                        atts[key] = auraValue.getValue();
-                    }
-                }
-            }
+            action.setParams({
+                "name" : config["componentDef"]["descriptor"],
+                "attributes" : attributeValues
+            });
 
             action.setCallback(this, function(a){
                 var newComp;
-                if(a.getState() === "SUCCESS"){
-                    var returnedConfig = a.getReturnValue();
-                    if (!returnedConfig["attributes"]) {
-                        returnedConfig["attributes"] = {};
-                    }
-                    var merging = returnedConfig["attributes"];
-                    if (merging.hasOwnProperty("values")) {
-                        merging = merging["values"];
-                    }
-                    for (var mkey in attributes) {
-                        var value = attributes[mkey];
-                        merging[mkey] = value;
-                    }
-                    newComp = $A.newCmpDeprecated(a.getReturnValue(), avp, false);
-                }else{
-                    var errors = a.getError();
-
+                if(a.getState() === "ERROR"){
                     newComp = $A.newCmpDeprecated("markup://aura:text");
-                    if (errors) {
-                        newComp.getValue("v.value").setValue(errors[0].message);
-                    } else {
-                        newComp.getValue("v.value").setValue('unknown error');
-                    }
+                    newComp.getValue("v.value").setValue(a.getError()[0].message);
+                }else{
+                    newComp = $A.newCmpDeprecated(a.getReturnValue());
+                    newComp.getAttributes().mergeValues(attributeValues, true);
                 }
+
                 if ( $A.util.isFunction(callback) ) {
                     callback.call(callbackScope, newComp);
                 }
             });
-            action.setParams({
-                "name" : config["componentDef"]["descriptor"],
-                "attributes" : atts
-            });
+
+            if (config.load === "EXCLUSIVE") {
+                action.setExclusive();
+            }
+
             $A.enqueueAction(action);
         },
 

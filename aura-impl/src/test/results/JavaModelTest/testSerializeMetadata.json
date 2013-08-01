@@ -16,13 +16,6 @@
           "name":"readOnlyThing",
           "type":"java://java.lang.String"
         }
-      },
-      {
-        "serId":4,
-        "value":{
-          "name":"stringList",
-          "type":"java://java.util.List"
-        }
       }
     ]
   }

@@ -35,28 +35,6 @@
             });
         }
 
-//        //
-//        // Note to self, these attributes are _not_ Aura Values. They are instead either
-//        // a literal string or a (generic object) map.
-//        //
-//        for (key in attributes) { 
-//            var value = attributes[key]["value"];
-//            // no def or component here, because we don't have one. 
-//            var auraValue = valueFactory.create(value);
-//            if(auraValue.isLiteral()){
-//                atts[key] = value.unwrap();
-//            } else {
-//                var resolved = $A.expressionService.get(avp, auraValue);
-//                if (resolved) {
-//                    // If we got a value, use that.
-//                    atts[key] = resolved;
-//                } else {
-//                    // try to give the server a version it can use.
-//                    atts[key] = auraValue.getValue();
-//                }
-//            }
-//        }
-        
         action.setCallback(this, function(a){
             var newBody;
             if(a.getState() === "ERROR"){

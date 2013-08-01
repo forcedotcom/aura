@@ -1,9 +1,4 @@
 {
   "firstThing":"firstThingDefault",
-  "readOnlyThing":"readonly",
-  "stringList":[
-    "one",
-    "two",
-    "three"
-  ]
+  "readOnlyThing":"readonly"
 }

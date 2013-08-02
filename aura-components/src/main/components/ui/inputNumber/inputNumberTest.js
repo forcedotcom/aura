@@ -14,6 +14,18 @@
  * limitations under the License.
  */
 ({
+    /**
+     * Test when value is not assigned.
+     */
+    testUnassigned: {
+    	attributes : {testCmpName : "UnsetNumber"},
+        test : function(component) {
+            var attr = component.getValue("v.value");
+            $A.test.assertEquals('SimpleValue', attr.toString());
+            $A.test.assertEquals(undefined, attr.getValue());
+        }
+    },
+
 	/**
 	 * Test max value. 
 	 */

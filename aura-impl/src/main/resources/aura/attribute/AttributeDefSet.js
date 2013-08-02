@@ -59,7 +59,7 @@ AttributeDefSet.prototype.createInstances = function(config, component, suppress
                  * called "descriptor", like DefModel.java in the IDE
                  * TODO: better way to distinguish real AttDefRefs from random junk
                  */
-                if (value && value["descriptor"] && value["value"] !== undefined) {
+                if (value && value["descriptor"]) {
                     value = value["value"];
                 }
             }

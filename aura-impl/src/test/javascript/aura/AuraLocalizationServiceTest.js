@@ -925,12 +925,13 @@ Test.Aura.AuraLocalizationServiceTest = function(){
     function parseDateTime(){
     	
     	var mockMomentConstr = Mocks.GetMock(Object.Global(), "moment", function(dateTimeString, format, locale){						
-    		if(dateTimeString == mockDateTime && format == targetDateTimeFormat && locale == targetLocale) return mockDateTime;		
+    		if(dateTimeString == mockDateTime && format == targetDateTimeFormat && locale == targetLocale) return mockDateTime;
+    		if(dateTimeString == "null") return null;
     		return mockInvalidDate;
     	});	
     	    	    			
     	[Fact]
-        function InvalidDateTimeString(){    		
+        function InvalidDateTime(){    		
             // Arrange    		
             var expected = null;                        
             var actual;                          	         	                	
@@ -964,7 +965,7 @@ Test.Aura.AuraLocalizationServiceTest = function(){
         }
     	
     	[Fact]
-        function InValidDateTime(){    		
+        function InValidLocale(){    		
             // Arrange    		
             var expected = null;                        
             var actual;                                   	        		        	        
@@ -980,7 +981,26 @@ Test.Aura.AuraLocalizationServiceTest = function(){
 
             // Assert
             Assert.Equal(expected, actual);
-        }    	    	
+        }    
+    	
+    	[Fact]
+        function NullDateTime(){    		
+            // Arrange    		
+            var expected = null;                        
+            var actual;                          	         	                	
+
+            // Act  
+            mockMomentConstr(function(){	  
+            	mockGetNormalizedFormat(function(){
+            		mockGetNormalizedLangLocale(function(){
+            			actual = targetService.parseDateTime("null", targetDateTimeFormat, targetLocale);
+            		});
+            	});
+            });
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }    
     	
     	[Fact]
         function ValidDateTime(){    		
@@ -1003,28 +1023,80 @@ Test.Aura.AuraLocalizationServiceTest = function(){
     }
     
     [Fixture]
+    function parseDateTimeISO8601(){
+    	
+    	var mockMomentConstr = Mocks.GetMock(Object.Global(), "moment", function(dateTimeString){						
+    		if(dateTimeString == mockDateTime) return mockDateTime;		
+    		if(dateTimeString == "null") return null;
+    		return mockInvalidDate;
+    	});	    	    	 
+    	    	    			
+    	[Fact]
+        function InvalidDateTime(){    		
+            // Arrange    		
+            var expected = null;                        
+            var actual;                          	         	                	
+
+            // Act  
+            mockMomentConstr(function(){	     
+            	actual = targetService.parseDateTimeISO8601("");            	
+            });
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }  
+    	
+    	[Fact]
+        function NullDateTime(){    		
+            // Arrange    		
+            var expected = null;                        
+            var actual;                          	         	                	
+
+            // Act  
+            mockMomentConstr(function(){	     
+            	actual = targetService.parseDateTimeISO8601("null");            	
+            });
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }   
+    	
+    	[Fact]
+        function ValidDateTime(){    		
+            // Arrange    		
+            var expected = targetDateTime;                        
+            var actual;                      	                	        	        	        	
+
+            // Act          	
+            mockMomentConstr(function(){	
+    			actual = targetService.parseDateTimeISO8601(targetDateTime);
+    		});           
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }    	    	    	
+    }
+    
+    [Fixture]
     function parseDateTimeUTC(){
     	
     	var mockMoment = Mocks.GetMock(Object.Global(), "moment", {				
     		utc:function(dateTimeString, format, locale){
-    			if(dateTimeString == mockDateTime && format == targetDateTimeFormat && locale == targetLocale) return mockDateTime;		
+    			if(dateTimeString == mockDateTime && format == targetDateTimeFormat && locale == targetLocale) return mockDateTime;
+    			if(dateTimeString == "null") return null;
         		return mockInvalidDate;
     		}
     	});	
     	    			
     	[Fact]
-        function InvalidDateTimeString(){    		
+        function InvalidDateTime(){    		
             // Arrange    		
             var expected = null;                        
             var actual;                          	         	                	
 
             // Act  
             mockMoment(function(){	 
-            	mockGetNormalizedFormat(function(){
-            		mockGetNormalizedLangLocale(function(){            
-        				actual = targetService.parseDateTimeUTC("", targetDateTimeFormat, targetLocale);    
-            		});
-            	});
+				actual = targetService.parseDateTimeUTC("", targetDateTimeFormat, targetLocale);    
             });
 
             // Assert
@@ -1051,7 +1123,7 @@ Test.Aura.AuraLocalizationServiceTest = function(){
         }        	    	
     	
     	[Fact]
-        function InValidDateTime(){    		
+        function InValidLocale(){    		
             // Arrange    		
             var expected = null;                        
             var actual;                                   	        		        	        
@@ -1068,6 +1140,25 @@ Test.Aura.AuraLocalizationServiceTest = function(){
             // Assert
             Assert.Equal(expected, actual);
         }    	
+    	
+    	[Fact]
+        function NullDateTime(){    		
+            // Arrange    		
+            var expected = null;                        
+            var actual;                          	         	                	
+
+            // Act  
+            mockMoment(function(){	 
+            	mockGetNormalizedFormat(function(){
+            		mockGetNormalizedLangLocale(function(){            
+        				actual = targetService.parseDateTimeUTC("null", targetDateTimeFormat, targetLocale);    
+            		});
+            	});
+            });
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }    
     	
     	[Fact]
         function ValidDateTime(){    		

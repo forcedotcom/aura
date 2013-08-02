@@ -38,7 +38,7 @@
             } else {
                 formatted = $A.localizationService.formatPercent(num);
             }
-            span.innerText = formatted;
+            span.textContent = span.innerText = formatted;
         }
         return span;
     },
@@ -71,7 +71,7 @@
                 }
             }
             var span = cmp.find("span");
-            span.getElement().innerText = formatted;
+            span.getElement().textContent = span.getElement().innerText = formatted;
         }
     }
 })

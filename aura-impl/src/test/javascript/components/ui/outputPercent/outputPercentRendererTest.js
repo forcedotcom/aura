@@ -44,7 +44,8 @@ Test.Ui.OutputPercent.RendererTest = function(){
 		};
     	
     	var spanElement={
-			innerText:''					
+			innerText:'',
+			textContent:''
 		};
     	
     	var mockSuper = Mocks.GetMock(targetRenderer, "superRender", function() {                                
@@ -74,6 +75,7 @@ Test.Ui.OutputPercent.RendererTest = function(){
             // Assert
             Assert.Equal(message, '');
             Assert.Equal(expected, actual.innerText);
+            Assert.Equal(expected, actual.textContent);
         }
                 
         [Fact]
@@ -111,6 +113,7 @@ Test.Ui.OutputPercent.RendererTest = function(){
             // Assert
             Assert.Equal(message, '');
             Assert.Equal(expected, actual.innerText);
+            Assert.Equal(expected, actual.textContent);
         }
         
         [Fact]
@@ -140,6 +143,7 @@ Test.Ui.OutputPercent.RendererTest = function(){
             // Assert
             Assert.Equal(message, '');
             Assert.Equal(expected, actual.innerText);
+            Assert.Equal(expected, actual.textContent);
         }
         
         [Fact]
@@ -175,6 +179,7 @@ Test.Ui.OutputPercent.RendererTest = function(){
             // Assert
             Assert.Equal(message, '');
             Assert.Equal(expected, actual.innerText);
+            Assert.Equal(expected, actual.textContent);
         }
         
         [Fact]
@@ -213,6 +218,7 @@ Test.Ui.OutputPercent.RendererTest = function(){
             // Assert
             Assert.Equal(message, 'Error');
             Assert.Equal(expected, actual.innerText);
+            Assert.Equal(expected, actual.textContent);
         }
     }
     
@@ -232,7 +238,8 @@ Test.Ui.OutputPercent.RendererTest = function(){
     	};   
     	    	
     	var targetElement={
-			innerText:''    		
+			innerText:'',
+			textContent:''
 		};
     	
     	var spanElement={
@@ -280,6 +287,7 @@ Test.Ui.OutputPercent.RendererTest = function(){
             // Assert
             Assert.Equal(message, '');
             Assert.Equal(expected, targetElement.innerText);
+            Assert.Equal(expected, targetElement.textContent);
         }    	
     	
         [Fact]
@@ -303,6 +311,7 @@ Test.Ui.OutputPercent.RendererTest = function(){
             // Assert
             Assert.Equal(message, '');
             Assert.Equal(expected, targetElement.innerText);
+            Assert.Equal(expected, targetElement.textContent);
         }
                 
         [Fact]
@@ -343,6 +352,7 @@ Test.Ui.OutputPercent.RendererTest = function(){
             // Assert
             Assert.Equal(message, '');
             Assert.Equal(expected, targetElement.innerText);
+            Assert.Equal(expected, targetElement.textContent);
         }
         
         [Fact]
@@ -370,6 +380,7 @@ Test.Ui.OutputPercent.RendererTest = function(){
             // Assert
             Assert.Equal(message, '');
             Assert.Equal(expected, targetElement.innerText);
+            Assert.Equal(expected, targetElement.textContent);
         }
         
         [Fact]
@@ -403,6 +414,7 @@ Test.Ui.OutputPercent.RendererTest = function(){
             // Assert
             Assert.Equal(message, '');
             Assert.Equal(expected, targetElement.innerText);
+            Assert.Equal(expected, targetElement.textContent);
         }
         
         [Fact]
@@ -439,6 +451,7 @@ Test.Ui.OutputPercent.RendererTest = function(){
             // Assert
             Assert.Equal(message, 'Error');
             Assert.Equal(expected, targetElement.innerText);
+            Assert.Equal(expected, targetElement.textContent);
         }
     }
 }

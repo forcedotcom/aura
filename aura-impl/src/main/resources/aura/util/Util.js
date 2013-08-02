@@ -1090,7 +1090,7 @@ $A.ns.Util.derivePrototype = function(child, parent) {
  * need to be invalid objects at worst, so no.  But this is the cost of that.
  */
 $A.ns.Util.prototype.instanceOf = function(instance, constructor) {
-    if (instance === null || instance === undefined) {
+    if (instance === null || instance === undefined || constructor === null || constructor === undefined) {
         return false;
     }
     if (instance instanceof constructor) {

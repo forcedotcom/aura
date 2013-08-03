@@ -16,7 +16,7 @@
 ({
 	handleDataChange: function(component, event) {
 		component.getConcreteComponent().getValue("v.items").setValue(event.getParam("data"));
-        helper.showLoading(component, false);
+        this.showLoading(component, false);
 	},
 
     init: function(component) {

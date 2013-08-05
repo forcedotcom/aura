@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component model="java://org.auraframework.docs.EditorPanelModel">
+<aura:component extensible="true" model="java://org.auraframework.docs.EditorPanelModel">
     <aura:attribute name="title" type="String" required="true"/>
     <aura:attribute name="descriptor" type="String" required="true"/>
     <aura:attribute name="defType" type="String" default="Component"/>

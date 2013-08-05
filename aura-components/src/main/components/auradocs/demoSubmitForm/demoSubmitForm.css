@@ -16,7 +16,7 @@
 .THIS.form {
 	font-family: "Helvetica", "Helvetica Neue", Arial, sans-serif;
 	font-size: 16px;
-	margin: 30px;
+	padding-top: 20px;
 	width: 400px;
 }
 
@@ -25,7 +25,6 @@
 	margin-right: 15px;
 	text-align: right;
 	width: 140px;
-	text-align: right;
 }
 
 .THIS.form .formInput {
@@ -35,7 +34,7 @@
 	-khtml-border-radius: 5px; /* for old Konqueror browsers */
 	border: 1px solid #9e9e9e;
 	font-family: "Helvetica", "Helvetica Neue", Arial, sans-serif;
-	font-size : 16px;
+	font-size: 16px;
 	padding: 3px;
 	width: 225px;
 	font-size: 16px;
@@ -70,9 +69,9 @@
 
 /* fix for css conflict with tables */
 .THIS table th,.THIS table td {
-    padding: 0;
-    line-height: 100%;
-    text-align: center;
-    vertical-align: top;
-    border: none;
+	padding: 0;
+	line-height: 100%;
+	text-align: center;
+	vertical-align: top;
+	border: none;
 }

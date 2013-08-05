@@ -15,11 +15,15 @@
     limitations under the License.
 
 -->
-<aura:component model="java://org.auraframework.docs.TopicExampleModel" extensible="true">
+<aura:component extends="auradocs:example">
     <aura:attribute name="descriptor" type="String" required="true"/>
-    <aura:attribute name="defType" type="String" default="Component"/>
-
-    <aura:forEach items="{!m.defs}" var="def">
-        <auradocs:editorPanel title="{!def.name+' source'}" descriptor="{!def.descriptor}" defType="{!def.defType}"/>
-    </aura:forEach>
+    <ui:tabset class="displayTab">
+        <auradocs:stretchTab title="Demo">
+            <form action="javascript:void(null);" onsubmit="{!c.updateLocation}">
+                <input type="hidden" aura:id="locationBar"/>
+            </form>
+            <iframe aura:id="frame" class="frame" frameBorder="0" src="about:blank"/>
+        </auradocs:stretchTab>
+        <auradocs:demoExmapleDefs descriptor="{!v.descriptor}" defType="component"/>
+    </ui:tabset>
 </aura:component>

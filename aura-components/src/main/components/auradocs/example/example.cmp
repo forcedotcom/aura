@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component>
+<aura:component extensible="true">
     <aura:attribute name="descriptor" type="String" required="true"/>
     <ui:tabset class="displayTab">
         <ui:tab title="Output">

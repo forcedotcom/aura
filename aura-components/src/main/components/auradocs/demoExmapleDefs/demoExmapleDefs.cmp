@@ -15,11 +15,11 @@
     limitations under the License.
 
 -->
-<aura:component model="java://org.auraframework.docs.TopicExampleModel" extensible="true">
+<aura:component extends="auradocs:topicExample">
     <aura:attribute name="descriptor" type="String" required="true"/>
     <aura:attribute name="defType" type="String" default="Component"/>
 
     <aura:forEach items="{!m.defs}" var="def">
-        <auradocs:editorPanel title="{!def.name+' source'}" descriptor="{!def.descriptor}" defType="{!def.defType}"/>
+        <auradocs:stretchEditorPanel title="{!def.name+' source'}" descriptor="{!def.descriptor}" defType="{!def.defType}"/>
     </aura:forEach>
 </aura:component>

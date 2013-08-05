@@ -16,17 +16,13 @@
 
 -->
 <aura:component model="java://org.auraframework.docs.TodoModel">
-
 	<ui:block aura:id="todosBlock" class="todosBlock">
-        <ui:inputText aura:id="newTodo" class="newTodo" updateOn="keyup" value="" placeholder="new to-do" keypress="{!c.createNewTodo}"/>
-        <ui:button aura:id="clearDone" buttonTitle="Clear done" class="clearDone" label="Clear done" press="{!c.clearDone}"/>
-        
+		<ui:inputText aura:id="newTodo" class="newTodo" updateOn="keyup" value="" placeholder="new to-do" keypress="{!c.createNewTodo}"/>
+		<ui:button aura:id="clearDone" buttonTitle="Clear done" class="clearDone" label="Clear done" press="{!c.clearDone}"/>
 		<aura:iteration items="{!m.items}" var="todo" indexVar="index">
 			<div>
-			    <ui:inputCheckbox label="{!todo.label}" value="{!todo.selected}" click="{!c.crossout}" class="line" labelPosition="right"/>
-                <!-- <ui:button class="del" buttonTitle="Delete" label="x"/> -->
-	        </div>
+				<ui:inputCheckbox label="{!todo.label}" value="{!todo.selected}" click="{!c.crossout}" class="line" labelPosition="right"/>
+			</div>
 		</aura:iteration>
 	</ui:block>
-	
 </aura:component>

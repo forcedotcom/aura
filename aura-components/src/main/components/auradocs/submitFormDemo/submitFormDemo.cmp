@@ -17,5 +17,5 @@
 -->
 <aura:component extends="auradocs:demoPanel">
     <aura:set attribute="title" value="Sample Submit Form"/>
-    <auradocs:demoSubmitForm/>
+    <auradocs:demoExample descriptor="auradocs:demoSubmitForm"/>
 </aura:component>

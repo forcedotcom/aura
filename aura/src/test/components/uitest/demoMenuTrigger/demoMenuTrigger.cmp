@@ -1,4 +1,5 @@
 <aura:component extends="ui:menuTrigger">
     <aura:attribute name="label" type="String" default="Trigger" description="The text to display as a tooltip."/>
     <ui:outputURL value="javascript:void(0)" iconClass="iconClassLink" linkClick="{!c.relay}" label="{!v.label}" alt="{!v.label}" class="{!v.class}" />
+    <!-- JK: this doesn't seem to do anything... remove this test or fix it -->
 </aura:component>

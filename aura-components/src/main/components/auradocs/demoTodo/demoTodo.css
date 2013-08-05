@@ -13,6 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+.THIS {
+	padding-top: 20px;
+}
+
 .THIS .todosBlock {
 	font-family: "Helvetica", "Helvetica Neue", Arial, sans-serif;
 	font-size: 18px;
@@ -56,10 +60,11 @@
 	box-shadow: none;
 	text-shadow: none;
 }
+
 .THIS .clearDone:hover {
-    background: #ccc;
-    border: 0;
-    -webkit-box-shadow: none;
-    box-shadow: none;
-    text-shadow: none;
+	background: #ccc;
+	border: 0;
+	-webkit-box-shadow: none;
+	box-shadow: none;
+	text-shadow: none;
 }

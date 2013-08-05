@@ -63,7 +63,7 @@
                 <auradocs:contentsNode text="Component Body and Facets" id="helloFacets"/>
                 <auradocs:contentsNode text="Lazy Loading a Component" id="lazyload"/>
                 <auradocs:contentsNode text="Aura UI Components">
-                	<auradocs:contentsNode text="Aura and Accessibility" id="accessIntro"/>
+                    <auradocs:contentsNode text="Aura and Accessibility" id="accessIntro"/>
                     <auradocs:contentsNode text="Accessibility Considerations" id="access"/>
                     <auradocs:contentsNode text="Positioning" id="useLayout"/>
                     <auradocs:contentsNode text="Getting User Input" id="useForm"/>
@@ -133,12 +133,12 @@
                     <auradocs:contentsNode text="Assertions" id="testsAssert" />
                     <auradocs:contentsNode text="Utility Functions" id="testsUtility" />
                     <auradocs:contentsNode text="Sample Test Cases" id="testsCases" />
-	                <auradocs:contentsNode text="Mocking Java Classes in JavaScript Tests" >
-	                    <auradocs:contentsNode text="Introduction" id="testsMockJava" />
-	                    <auradocs:contentsNode text="Mocking Java Models" id="testsMockModel" />
-	                    <auradocs:contentsNode text="Mocking Java Providers" id="testsMockProvider" />
-	                    <auradocs:contentsNode text="Mocking Java Actions" id="testsMockAction" />
-	                </auradocs:contentsNode>
+                    <auradocs:contentsNode text="Mocking Java Classes in JavaScript Tests" >
+                        <auradocs:contentsNode text="Introduction" id="testsMockJava" />
+                        <auradocs:contentsNode text="Mocking Java Models" id="testsMockModel" />
+                        <auradocs:contentsNode text="Mocking Java Providers" id="testsMockProvider" />
+                        <auradocs:contentsNode text="Mocking Java Actions" id="testsMockAction" />
+                    </auradocs:contentsNode>
                 </auradocs:contentsNode>
                 <auradocs:contentsNode text="Value Objects" >
                     <auradocs:contentsNode text="Introduction" id="valueObjects" />

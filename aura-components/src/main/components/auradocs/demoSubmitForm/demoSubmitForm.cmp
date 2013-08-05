@@ -16,14 +16,12 @@
 
 -->
 <aura:component model="java://org.auraframework.docs.SizeModel">
-
     <aura:attribute name="myDate" type="Date" default="" />
     <aura:attribute name="sizes" type="List" description="A list of aura.components.ui.InputOption."/>
     <aura:attribute name="invalidEmail" type="Boolean" default="false"/>
     <aura:attribute name="invalidPW" type="Boolean" default="false"/>
     <aura:attribute name="invalidURL" type="Boolean" default="false"/>
-    <aura:attribute name="filled" type="Boolean" default="false"/>
-    
+    <aura:attribute name="filled" type="Boolean" default="false"/>  
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
     
     <div class="form">
@@ -91,12 +89,6 @@
 	            Size: <ui:outputText aura:id="outSize" value="" class="outText"/><br/>
 	            Appointment Time: <ui:outputDateTime aura:id="outAppt" value="" class="outText"/>
 	        </ui:block>
-        </aura:renderIf>           
-        
-
-        
-       
+        </aura:renderIf>                 
     </div>
- 
-    
 </aura:component>

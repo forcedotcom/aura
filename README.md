@@ -95,6 +95,7 @@ The following output confirms that your template has been generated successfully
        `http://localhost:8080/helloWorld/helloWorld.app`       
 You should see a simple greeting in your browser.
 4. To stop the Jetty server and free up the port when you are finished, press `CTRL+C` on the command line.
+    
     **Note**: the helloWorld/pom.xml file has a `<dependencies>` section, which lists the `<version>` of each Aura 
 artifact in your project. They define the version of Aura that your project is using and each artifact 
 <dependency> should use the same version.

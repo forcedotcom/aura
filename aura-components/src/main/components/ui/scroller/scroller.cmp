@@ -62,7 +62,7 @@
     <ui:resizeObserver onresize="{!c.refresh}"/>
     <div aura:id="scrollWrapper" class="{!v.class + ' scrollWrapper'}">
         <div aura:id="scrollContent" class="{!v.scrollContentClass}">
-            <aura:if isTrue="{!v.onPullToRefresh != null &amp;&amp; v.canRefresh}">
+            <aura:renderIf isTrue="{!v.onPullToRefresh != null &amp;&amp; v.canRefresh}">
                 <div aura:id="pullDown" class="pullToRefresh pullDown">
                     <span class="pullDownIcon"></span>
                     <div>
@@ -72,11 +72,11 @@
                         <span class="subtitle">{!v.pullToRefreshSubtitle}</span>
                     </div>
                 </div>
-            </aura:if>
+            </aura:renderIf>
 
             {!v.body}
             
-            <aura:if isTrue="{!v.onPullToShowMore != null &amp;&amp; v.canShowMore}">
+            <aura:renderIf isTrue="{!v.onPullToShowMore != null &amp;&amp; v.canShowMore}">
             	<div aura:id="shim"></div>
             	
                 <div aura:id="pullUp" class="pullToRefresh pullDown">
@@ -88,7 +88,8 @@
                         <span class="subtitle">{!v.pullToShowMoreSubtitle}</span>
                     </div>
                 </div>
-            </aura:if>           
+            </aura:renderIf>
+
         </div>
     </div>
 </aura:component>

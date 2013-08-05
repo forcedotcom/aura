@@ -1,0 +1,45 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:demoPanel">
+    <aura:set attribute="title" value="ui:menu"/>
+    <ui:vbox>
+    	<aura:set attribute="north">
+    	<p><code>ui:menu</code> is a menu component that can contain a link which triggers the menu, <code>ui:menuTriggerLink</code>, and list items. You can wire up list items to actions in a client-side controller so that selection of the item triggers an action.
+	    List items in the menu can be initialized from the menu's model. You can build your own list items by extending <code>ui:menuItem</code>.
+	   </p>
+    	<p>The following demo shows how to use the list item components, which trigger an action on a client-side controller.</p>
+    		<auradocs:example descriptor="auradocs:demoMenu" />
+    	<p>The following demo shows how to use ui:menu to display menu items from a model and retrieve the selected items via the <code>menuItems</code> attribute, which is a list of items set using <code>ArrayList&lt;MenuItem></code>.</p>
+    		<auradocs:example descriptor="auradocs:demoMenuMeta" />
+    	</aura:set>
+    	<aura:set attribute="south">
+	    
+    <p>You can nest <code>ui:menuList</code> in a <code>ui:menu</code> component. A <code>ui:menuList</code> component can include these list item components:
+    <ul>
+        <li><code>ui:actionMenuItem</code> - an item that triggers a client-side controller action</li>
+        <li><code>ui:checkboxMenuItem</code> - an item that supports multiple selection and can trigger a client-side controller action</li>
+        <li><code>ui:radioMenuItem</code> - an item that supports single selection and can trigger a client-side controller action</li>
+        <li><code>ui:menuItemSeparator</code> - a seperator for menu items</li>
+    </ul>
+    </p>
+    <auradocs:info>See the <auradocs:defLink descriptor ="ui:menu">ui:menu</auradocs:defLink> component reference.</auradocs:info>
+    <p>The dropdown menu and its menu items are hidden by default. You can change this by setting the <code>visible</code> attribute on the <code>ui:menuList</code> component to <code>true</code>.
+     The menu items are shown only when you click the <code>ui:menuTriggerLink</code> component.</p>
+	    </aura:set>
+    </ui:vbox>
+</aura:component>

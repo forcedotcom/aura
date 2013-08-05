@@ -18,7 +18,7 @@
 <aura:component extends="auradocs:topicPanel">
     <aura:set attribute="title" value="The Basics"/>
 
-    <p>This section introduces you to the fundamental building blocks of Aura. Read on and learn how everything fits together.</p>
+    <p>This section introduces you to the fundamental building blocks of Aura. Read on and learn how everything fits together, or <ui:outputURL value="/auradocs#demos" label="dive into the demos" />.</p>
 
     <auradocs:basicsOverview/>
 

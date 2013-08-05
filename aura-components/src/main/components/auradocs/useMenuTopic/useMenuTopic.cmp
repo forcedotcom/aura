@@ -41,40 +41,6 @@
      <p>To access selected values using a controller action, pass in the event to your controller, as demonstrated in the <code>getMenuSelected</code> controller action. You can use
     <code>cmp.find("myMenu").getValue("v.childMenuItems")</code> to retrieve the values. <code>childMenuItems</code> is a read-only attribute on the <code>ui:menu</code> component that contains the child menu items.</p>
 
-    <h4>Keyboard Accessibility</h4>
-
-    <p>To access the menu items using your keyboard, you can press these keys.</p>
-
-    <table class="table table-bordered table-striped">
-        <thead>
-            <tr>
-                <th>Key</th>
-                <th>Description</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>Tab</td>
-                <td>Focus on the menu and its items</td>
-            </tr>
-            <tr>
-                 <td>Spacebar or Enter</td>
-                 <td>Toggle the menu</td>
-            </tr>
-            <tr>
-                <td>Spacebar or Enter</td>
-                <td>Select a menu item</td>
-            </tr>
-            <tr>
-                <td>Esc</td>
-                <td>Escape the menu</td>
-            </tr>
-           <tr>
-                <td>Alphanumeric Character</td>
-                <td>Navigate using the first letter of list items</td>
-            </tr>
-        </tbody>
-    </table>
     
     <h2>Navigation Menu</h2>
 	To display a horizontal menu, use <code>ui:toolbar</code>. This component renders as an HTML <code>menu</code> element, and can contain input elements such as <code>ui:button</code>.

@@ -1,0 +1,41 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:demoPanel">
+    <aura:set attribute="title" value="ui:input"/>
+    <ui:vbox>
+    	<aura:set attribute="north">
+    	<p> <code>ui:input</code> is an extensible component that gets user input for processing. 
+    	Child components that extends <code>ui:input</code>, such as <code>ui:inputText</code> and <code>ui:inputNumber</code>, inherit its attributes and events.</p>
+   		
+		<p>The demo below shows commonly used components that extend <code>ui:input</code>.
+		For example, the <code>ui:inputText</code> demo calls a client-side controller action to return the input value in a <code>ui:outputText</code> component.
+			</p>
+    		<auradocs:example descriptor="auradocs:demoSubmitForm" />
+    	<p><code>ui:inputDate</code> binds an attribute value using <code>value="<aura:text value="{!"/>v.myDate}"</code>. You can also include a date picker with <code>ui:inputDate</code> and <code>ui:inputDateTime</code> by setting <code>displayDatePicker="true"</code>.</p>
+    	</aura:set>
+    	<aura:set attribute="south">
+    	<p>When working with <code>ui:inputSelect</code> to create a list of options, you can allow multiple selections by setting the <code>multiple</code> attribute to <code>true</code>.
+    	Group options using <code>ui:inputSelectOptionGroup</code> and in each group, nest each option with <code>ui:inputSelectOption</code>. 
+    	Alternatively, display a list of options from a model by using the format <code>&lt;ui:inputSelect options="<aura:text value="{!"/>m.selectOptions}" /></code> and creating the list of options in the model using <code>ArrayList&lt;InputOption></code>.
+    	</p>	
+	    <auradocs:example descriptor="auradocs:demoSelect" />		
+    	 <auradocs:info>See the <auradocs:defLink descriptor ="ui:input">ui:input</auradocs:defLink> component reference.</auradocs:info>
+	
+    	  </aura:set>
+    </ui:vbox>
+</aura:component>

@@ -16,10 +16,17 @@
  .THIS {    
     display: block;
     width: 100%;
-    height: 100%;
+    height: 400px;
     color: #a9bdd0;
 }
 
+ .THIS .uiCarouselPage {
+ 	min-height: 400px;
+ }
+ 
+ .THIS .carousel-page {
+ 	min-height: 400px;
+ }
  
 .THIS .entity {
     margin-right: auto;

@@ -1,0 +1,31 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="Localization" />
+
+    <p>Aura provides client-side localization support on components such as <code>ui:outputDate</code> and <code>ui:outputDateTime</code>.
+    The components retrieve the browser's locale information and display the date and time accordingly. The following demo shows how you can override the default <code>langLocale</code> and <code>timezone</code> attributes. The output displays the time in the format <code>hh:mm</code> by default.</p>
+    <auradocs:example descriptor="auradocs:demoLangLocale" />
+    <p>Additionally, you can use the global value provider, <code>$Locale</code>, to obtain a browser's locale information. By default, Aura uses the browser's locale, but it can be configured to use others through the global value provider.
+    See <auradocs:topicLink topic="globalValueProviders">Global Value Providers</auradocs:topicLink> for more information.</p>
+    
+   <p>
+    <b>See Also:</b><br/>
+    <ui:outputURL value="/auradocs#demos?demo=input" label="Inherited Component Attributes" />
+    </p>
+ </aura:component>

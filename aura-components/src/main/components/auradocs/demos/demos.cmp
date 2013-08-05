@@ -16,5 +16,39 @@
 
 -->
 <aura:component extends="auradocs:demoPanel">
-    <aura:set attribute="title" value="Introduction to Demos"/>
+    <aura:set attribute="title" value="Aura Demos"/>
+    <p>Here you can find a sample note-taking app, Aura Note, and a collection of components.	
+    Start from the sidebar to view the demos.</p>
+    <p>For a full list of components, see the <ui:outputURL value="/auradocs#reference" label="component reference"/>.</p>
+    <ui:vbox>
+    	<aura:set attribute="north">
+    	<h4>Components and Apps</h4>
+    		Aura lets you kick-start your development with out-of-the-box components. Components use markup that looks similar to HTML. 
+<auradocs:codeblock>&lt;aura:component>
+  Hello World
+&lt;/aura:component>
+</auradocs:codeblock>
+		You can extend Aura components to customize the design and behavior. <br/>
+    	<ui:button label="Read more" labelDisplay="false">
+    		<aura:label value="{0}">
+    			<ui:outputURL value="/auradocs#help?topic=helloWorld" label="Read more" />
+    		</aura:label>
+    	</ui:button>
+    	</aura:set>
+    	<aura:set attribute="south">
+    	<h4>Component Markup</h4>
+    		Aura markup represents the view and defines the component's public shape via attributes and events. 
+<auradocs:codeblock>&lt;ui:button aura:id="buttonA"
+    	    press="<aura:text value="{!"/>c.runThis}" 
+            label="Run Action"/>
+</auradocs:codeblock>
+		Components have models and controllers to represent the data set and logic respectively.<br/>
+		    	<ui:button label="Read more" labelDisplay="false">
+    		<aura:label value="{0}">
+    			<ui:outputURL value="/auradocs#help?topic=helloAttributes" label="Read more" />
+    		</aura:label>
+    	</ui:button>
+    	</aura:set>
+    </ui:vbox>
+ 
 </aura:component>

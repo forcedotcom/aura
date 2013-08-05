@@ -18,10 +18,22 @@
 <aura:component extends="auradocs:sidebar">
     <ui:tree>
         <ui:treeNode title="Apps" expanded="true">
-            <ui:treeNode title="Aura Notes" href="http://notes.auraframework.org/auranote/notes.app"/>
+            <ui:treeNode title="Aura Note" href="http://notes.auraframework.org/auranote/notes.app"/>
             <auradocs:demosNode text="Submit Form" id="submitForm"/>
             <auradocs:demosNode text="Events" id="events"/>
             <auradocs:demosNode text="To-do List" id="todo"/>
+        </ui:treeNode>
+        <ui:treeNode title="Components" expanded="true">
+        	<auradocs:demosNode text="ui:block" id="block"/>
+        	<auradocs:demosNode text="ui:carousel" id="carousel"/>
+        	<auradocs:demosNode text="ui:dialog" id="dialog"/>
+        	<auradocs:demosNode text="ui:input" id="input"/>
+        	<auradocs:demosNode text="ui:menu" id="menu"/>
+        	<auradocs:demosNode text="ui:message" id="message"/>
+        	<auradocs:demosNode text="ui:spinner" id="spinner"/>
+        	<auradocs:demosNode text="ui:vbox" id="vbox"/>
+        	<auradocs:demosNode text="ui:scroller" id="scroller"/>
+        	<auradocs:demosNode text="ui:toolbar" id="toolbar"/>
         </ui:treeNode>
     </ui:tree>
 </aura:component>

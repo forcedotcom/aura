@@ -57,7 +57,7 @@ This guide explains the accessibility features of Aura components in the <code>u
 &lt;ui:label labelDisplay="false" for="myInput" label="My Input Text" /&gt;
 &lt;ui:inputText aura:id="myInput" value="Put your input here." />
 </auradocs:codeblock>
-       See <auradocs:topicLink topic="useForm">Getting User Input</auradocs:topicLink> and <auradocs:topicLink topic="label">Label</auradocs:topicLink> for more information.
+       See <ui:outputURL value="/auradocs#demos?demo=input" label="ui:input"/> and <auradocs:topicLink topic="label">Label</auradocs:topicLink> for more information.
     </p>
 	
 	<h3>Help and Error Messages</h3>

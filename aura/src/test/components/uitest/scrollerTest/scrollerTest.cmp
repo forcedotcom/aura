@@ -115,7 +115,7 @@
     <ui:button label="ScrollRelative" press="{!c.scrollDown}" />
     <div class="test">
     	
-        <ui:scroller aura:id="scrollToYTest" onPullToRefresh="{!c.replaceBodyContent}" onPullToLoadMore="{!c.replaceBodyContent}">
+        <ui:scroller aura:id="scrollToYTest" onPullToRefresh="{!c.replaceBodyContent}" onPullToShowMore="{!c.replaceBodyContent}">
             I let it fall, my heart
             And as it fell, you rose to claim it
             It was dark and I was over

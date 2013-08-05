@@ -53,11 +53,11 @@ You need:
     Define value for property 'version': 1.0-SNAPSHOT
     Define value for property 'package': org.myGroup
 </code></pre>
-    *Note*: The artifactId is also the name of the project as it appears in the Package
+    **Note**: The artifactId is also the name of the project as it appears in the Package
 Explorer. It can only contain alphanumeric characters.
 6. When prompted to confirm properties configuration, enter `Y`.
 The following output confirms that your template has been generated successfully.
-
+<pre><code>
     [INFO] ----------------------------------------------------------------------------
     [INFO] Using following parameters for creating project from Archetype: aura-archetype:0.0.1-SNAPSHOT
     [INFO] ----------------------------------------------------------------------------
@@ -78,17 +78,18 @@ The following output confirms that your template has been generated successfully
     [INFO] Finished at: Tue Jul 16 14:39:07 PST 2013
     [INFO] Final Memory: 10M/180M
     [INFO] ------------------------------------------------------------------------
-  
+</code></pre>
+
 ### Step 2: Build and Run Your Project
    
 1. On the command line, navigate to the directory for your new app.
+
     cd helloWorld 
 
 2. Start the Jetty server on port 8080.
-    
-    mvn jetty:run
 
-To use another port, append: `-Djetty.port=portNumber. For example, mvn jetty:run -Djetty.port=9877`.
+    mvn jetty:run
+    To use another port, append: `-Djetty.port=portNumber. For example, mvn jetty:run -Djetty.port=9877`.
 3. Test your app in a browser.
        http://localhost:8080/helloWorld/helloWorld.app       
 You should see a simple greeting in your browser.

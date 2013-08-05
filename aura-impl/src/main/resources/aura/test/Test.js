@@ -659,7 +659,10 @@ var Test = function(){
          * 				The message that is returned if arg1 is undefined
          */
         assertDefined: function(arg1, assertMessage) {
-            $A.test.assertNotEquals(undefined, arg1, "Value is undefined");
+            if (!assertMessage) {
+                assertMessage = "Value is undefined";
+            }
+            $A.test.assertNotEquals(undefined, arg1, assertMessage);
         },
 
         /**

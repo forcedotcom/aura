@@ -29,6 +29,7 @@
     		deltaX : deltaX,
     		deltaY : deltaY,
     		time : time
-    	})
+    	});
+    	scrollEvt.fire();
     }
 })

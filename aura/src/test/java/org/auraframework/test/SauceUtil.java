@@ -35,13 +35,15 @@ public final class SauceUtil {
 
     private static final boolean TUNNEL_SELENIUM_COMMANDS_THROUGH_SAUCE_CONNECT = false;
     static final String SAUCELABS_SERVER_URL = "saucelabs.com";
-    private static final String SAUCE_USERNAME = System.getProperty("sauce.username", "lumen");
+    private static final String SAUCE_USERNAME = System.getProperty("sauce.username", "[saunce.username undefined]");
     private static final String SAUCE_ACCESS_KEY = System.getProperty("sauce.access.key",
-            "4df61bdf-1696-4f73-b869-ead4c7603dca");
+            "[sauce.access.key undefined]");
     private static final String SAUCE_WEB_DRIVER_URL = "http://" + SAUCE_USERNAME + ':' + SAUCE_ACCESS_KEY
             + "@saucelabs.com:4444/wd/hub";
-    private static final String SAUCE_CONNECT_URL = "http://" + SAUCE_USERNAME + ':' + SAUCE_ACCESS_KEY
-            + "@rsalvador-wsl.internal.salesforce.com:4445/wd/hub";
+    private static final String SAUCE_CONNECT_HOST = System.getProperty("sauce.connect.host",
+            "[sauce.connect.host undefined]");
+    private static final String SAUCE_CONNECT_URL = "http://" + SAUCE_USERNAME + ':' + SAUCE_ACCESS_KEY + "@"
+            + SAUCE_CONNECT_HOST + "/wd/hub";
     static final String SAUCE_ONDEMAND_HOST = "ondemand.saucelabs.com";
     static final int SAUCE_ONDEMAND_PORT = 80;
 
@@ -56,8 +58,8 @@ public final class SauceUtil {
 
     /**
      * @param test
-     * @param browserType String identifying browser and version (same String as
-     *            the one used by SeleniumTest.BrowserType)
+     * @param browserType String identifying browser and version (same String as the one used by
+     *            SeleniumTest.BrowserType)
      * @return Capabilities for the browserType as required by SauceLabs
      */
     public static DesiredCapabilities getCapabilities(BrowserType browserType, TestCase test) {
@@ -117,8 +119,7 @@ public final class SauceUtil {
     }
 
     /**
-     * @return link to public (no login required) job in SauceLabs or null if it
-     *         cannot be calculated
+     * @return link to public (no login required) job in SauceLabs or null if it cannot be calculated
      */
     public static String getLinkToPublicJobInSauce(WebDriver driver) {
         if (!(driver instanceof RemoteWebDriver)) {

@@ -39,16 +39,13 @@ You need:
 ### Step 1: Generate a Template from the Aura Archetype
 
 1. Open a command line window.
-
 2. Navigate to the directory where you want to create your project template and run:
 
-    mvn archetype:generate -DarchetypeCatalog=http://maven.auraframework.org/libs-release-local/archetype-catalog.xml
+    `mvn archetype:generate -DarchetypeCatalog=http://maven.auraframework.org/libs-release-local/archetype-catalog.xml`
        
 3. When prompted to choose an archetype, enter `1`.
-
 4. Select the latest archetype version, or press enter for the default version.
        The archetype is downloaded to your machine.
-       
 5. Enter these values:
 
     Define value for property 'groupId': org.myGroup
@@ -58,9 +55,7 @@ You need:
 
 Note: The artifactId is also the name of the project as it appears in the Package
 Explorer. It can only contain alphanumeric characters.
-             
 6. When prompted to confirm properties configuration, enter `Y`.
- 
 The following output confirms that your template has been generated successfully.
 
     [INFO] ----------------------------------------------------------------------------
@@ -95,13 +90,11 @@ The following output confirms that your template has been generated successfully
     mvn jetty:run
     
 To use another port, append: `-Djetty.port=portNumber. For example, mvn jetty:run -Djetty.port=9877`.
-
 3. Test your app in a browser.
 
        http://localhost:8080/helloWorld/helloWorld.app
        
 You should see a simple greeting in your browser.
-
 4. To stop the Jetty server and free up the port when you are finished, press `CTRL+C` on the command line.
 
 Note: the helloWorld/pom.xml file has a `<dependencies>` section, which lists the `<version>` of each Aura 

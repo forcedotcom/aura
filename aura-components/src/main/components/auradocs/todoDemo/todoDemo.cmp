@@ -17,5 +17,5 @@
 -->
 <aura:component extends="auradocs:demoPanel">
     <aura:set attribute="title" value="Aura To-Do"/>
-    <auradocs:demoTodo/>
+    <auradocs:demoExample descriptor="auradocs:demoTodo" />
 </aura:component>

@@ -65,5 +65,6 @@
 }
 
 .THIS.uiTree li.file[active=true] a {
-	color: #ff6500;
+	color: #dc595c;
+	font-weight: bold;
 }

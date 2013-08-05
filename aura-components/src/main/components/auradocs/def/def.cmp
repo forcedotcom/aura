@@ -51,7 +51,7 @@
         </aura:if>
     </aura:set>
     <ui:tabSet class="subtabs">
-        <ui:tab title="overview">
+        <auradocs:stretchTab title="overview">
             <aura:if isTrue="{!m.attributes.length > 0}">
                 <auradocs:defMemberList title="Attributes" list="{!m.attributes}"/>
             </aura:if>
@@ -61,21 +61,19 @@
             </aura:if>
 
             <aura:if isTrue="{!m.events.length > 0}">
-                <auradocs:defMemberList title="Events" list="{!m.events}"/>
+                <auradocs:defMemberList title="Events" list="{!m.events}"/>d
             </aura:if>
-        </ui:tab>
+        </auradocs:stretchTab>
 
-        <!--<ui:tab title="examples" scroll="false">examples</ui:tab>-->
-
-        <auradocs:editorPanel title="source" descriptor="{!v.descriptor}" defType="{!v.defType}"/>
+        <auradocs:stretchEditorPanel title="source" descriptor="{!v.descriptor}" defType="{!v.defType}"/>
 
         <aura:forEach items="{!m.defs}" var="def">
-            <auradocs:editorPanel title="{!def.name}" descriptor="{!def.descriptor}" defType="{!def.defType}"/>
+            <auradocs:stretchEditorPanel title="{!def.name}" descriptor="{!def.descriptor}" defType="{!def.defType}"/>
         </aura:forEach>
 
-        <ui:tab title="dependencies">
+        <auradocs:stretchTab title="dependencies">
             <auradocs:defDependencies descriptor="{!v.descriptor}" defType="{!v.defType}"/>
-        </ui:tab>
+        </auradocs:stretchTab>
     </ui:tabSet>
 
 </aura:component>

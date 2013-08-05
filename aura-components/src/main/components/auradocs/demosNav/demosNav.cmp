@@ -23,6 +23,5 @@
             <auradocs:demosNode text="Events" id="events"/>
             <auradocs:demosNode text="To-do List" id="todo"/>
         </ui:treeNode>
-        
     </ui:tree>
 </aura:component>

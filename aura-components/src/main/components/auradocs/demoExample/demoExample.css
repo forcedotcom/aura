@@ -13,21 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-body {
-	background-color: #fff;
-	font-size: 13px;
-	line-height: 1.3;
-	overflow-y: hidden;
-	overflow-x: auto;
-	/* 
-     * workaround for webkit rendering fonts as antialiased instead of
-     * http://code.google.com/p/chromium/issues/detail?id=156858
-     * subpixel-antialiased during animations.
-	 */
-	-webkit-font-smoothing: antialiased;
+.THIS div.tabBody {
+	bottom: auto;
 }
 
-a {
-	text-decoration: none;
-	color: #304a62;
+.THIS div.tabBody iframe {
+	min-height: 530px;
 }

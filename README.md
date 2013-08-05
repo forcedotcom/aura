@@ -47,14 +47,16 @@ You need:
 4. Select the latest archetype version, or press enter for the default version.
        The archetype is downloaded to your machine.
 5. Enter these values:
-
+<pre><code>
     Define value for property 'groupId': org.myGroup
     Define value for property 'artifactId': helloWorld
     Define value for property 'version': 1.0-SNAPSHOT
     Define value for property 'package': org.myGroup
+</code></pre>
 
 Note: The artifactId is also the name of the project as it appears in the Package
 Explorer. It can only contain alphanumeric characters.
+
 6. When prompted to confirm properties configuration, enter `Y`.
 The following output confirms that your template has been generated successfully.
 
@@ -82,22 +84,15 @@ The following output confirms that your template has been generated successfully
 ### Step 2: Build and Run Your Project
    
 1. On the command line, navigate to the directory for your new app.
-
-    cd helloWorld
-       
+    cd helloWorld       
 2. Start the Jetty server on port 8080.
-
-    mvn jetty:run
-    
+    mvn jetty:run    
 To use another port, append: `-Djetty.port=portNumber. For example, mvn jetty:run -Djetty.port=9877`.
 3. Test your app in a browser.
-
-       http://localhost:8080/helloWorld/helloWorld.app
-       
+       http://localhost:8080/helloWorld/helloWorld.app       
 You should see a simple greeting in your browser.
 4. To stop the Jetty server and free up the port when you are finished, press `CTRL+C` on the command line.
-
-Note: the helloWorld/pom.xml file has a `<dependencies>` section, which lists the `<version>` of each Aura 
+    *Note*: the helloWorld/pom.xml file has a `<dependencies>` section, which lists the `<version>` of each Aura 
 artifact in your project. They define the version of Aura that your project is using and each artifact 
 <dependency> should use the same version.
 

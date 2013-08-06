@@ -39,7 +39,7 @@
 	margin: 0;
 	position: absolute;
 	top: 4px;
-	right: 30px;
+	right: 40px;
 }
 
 .THIS h1 {
@@ -69,42 +69,25 @@
 	padding-bottom: 5px;
 }
 
-.THIS li[active=true] {
+.THIS li[active=true]  {
 	background-color: #dc595c;
 	border-radius: 8px;
 }
 
 .THIS .spinner {
-	background-image: url(/auraFW/resources/aura/images/spinner.png);
-	display:  none;
-	height: 30px;
+	background-image: url(/auraFW/resources/aura/images/docsspinner.gif);
+	display: none;
+	height: 32px;
 	position: absolute;
-	right: 6px;
-	top: 19px;
-	width: 30px;
+	right: 4px;
+	top: 20px;
+	width: 32px;
 }
 
 .THIS.waiting .spinner {
 	display: block;
-	-webkit-animation-iteration-count: infinite;
-	-webkit-animation-name: spinner;
-	-webkit-animation-duration: 1s;
-	-webkit-animation-timing-function: linear;
-	animation-iteration-count: infinite;
-	animation-name: spinner;
-	animation-duration: .3s;
-	animation-timing-function: linear;
 }
 
-@-webkit-keyframes spinner {
-    from { -webkit-transform:rotate(0deg);}
-    to {-webkit-transform: rotate(360deg);}
-}
-
-@keyframes spinner {
-    from {transform:rotate(0deg);}
-    to {transform: rotate(360deg);}
-}
 .THIS .fuelGauge {
 	position: absolute;
 	right: 400px;

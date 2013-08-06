@@ -250,16 +250,18 @@
 									$A.util.swapClass(pullUpEl, 'pullLoading', 'pullDown');
 								}, 50);
 							
-								// TODO: this could be probably be more efficient
+								// TODO: this could be possibly be more efficient
 								var oldShim = shim.offsetHeight;
 								shim.style.height = "0"
-								var leftoverSpace = scroller.offsetHeight - (scroller.children[0].offsetHeight - pullUpOffset - pullDownOffset);
+								var actualContentHeight = scroller.children[0].offsetHeight
+								
+								var leftoverSpace = scroller.offsetHeight - (actualContentHeight - pullUpOffset - pullDownOffset);
 								
 								if (leftoverSpace > 0) {
 									shim.style.height = leftoverSpace + "px";
-								} else {
-									this.maxScrollY += oldShim;
 								}
+								
+								this.maxScrollY += oldShim;
 							}
 							
 							// totalScrollY includes the shim and pullToShowMore divs and is for our own reference.

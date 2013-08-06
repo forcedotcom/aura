@@ -17,6 +17,7 @@
 -->
 <aura:component extends="auradocs:sidebar">
     <ui:tree>
+        <ui:treeNode title="Introduction" href="#demos"/>
         <ui:treeNode title="Apps" expanded="true">
             <ui:treeNode title="Aura Note" href="http://notes.auraframework.org/auranote/notes.app"/>
             <auradocs:demosNode text="Submit Form" id="submitForm"/>

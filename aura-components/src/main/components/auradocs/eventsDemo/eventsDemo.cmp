@@ -17,5 +17,8 @@
 -->
 <aura:component extends="auradocs:demoPanel">
     <aura:set attribute="title" value="Events using ui:inputTextArea"/>
+    <auradocs:info class="info" closable="true" label="For more info">
+        For more information about this demo, see <ui:outputURL value="#help?topic=helloActions" label="Events: Client-Side Controllers"/>    
+    </auradocs:info>
     <auradocs:demoExample descriptor="auradocs:demoEvents"/>
 </aura:component>

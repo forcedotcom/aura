@@ -16,6 +16,9 @@
 
 -->
 <aura:component extends="auradocs:demoPanel">
-    <aura:set attribute="title" value="Sample Submit Form"/>
+    <aura:set attribute="title" value="Submit Form"/>
+    <auradocs:info class="info" closable="true" label="For more info">
+        For more information about this demo, see <ui:outputURL value="#demos?demo=input" label="Demos: ui:input"/>    
+    </auradocs:info>
     <auradocs:demoExample descriptor="auradocs:demoSubmitForm"/>
 </aura:component>

@@ -17,5 +17,8 @@
 -->
 <aura:component extends="auradocs:demoPanel">
     <aura:set attribute="title" value="Aura To-Do"/>
+    <auradocs:info class="info" closable="true" label="For more info">
+        For more information about this demo, see <ui:outputURL value="#help?topic=tagIteration" label="aura:iteration"/>    
+    </auradocs:info>
     <auradocs:demoExample descriptor="auradocs:demoTodo" />
 </aura:component>

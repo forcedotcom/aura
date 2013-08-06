@@ -5,8 +5,11 @@
     </head>
     <body>
     <nav>
-       <h1><a href="#"><img src="/auraFW/resources/aura/images/logo.png"></a></h1>
+       <a href="#"><img src="/auraFW/resources/aura/images/logo.png"></a>
     </nav>
+    <header>
+    A UI framework for scalable web apps
+    </header>
         <ul>
             <li><a href="/auradocs">Aura Documentation</a></li>
             <li><a href="http://notes.lumenframework.org/auranote/notes.app">Aura Note</a></li>

@@ -14,18 +14,29 @@
  * limitations under the License.
  */
  
+@import url(https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,900,300italic);
+
 html, body {
 	padding:0;
 	margin: 0;
+	font-family: 'Source Sans Pro', sans-serif;
 }
 
 nav {
  	background-color: #304A62;
  	width: 100%;
- 	margin-bottom: 50px;
+ 	margin-bottom: 25px;
+ }
+ 
+ header {
+ 	font-size: 28px;
+ 	font-weight: 400;
+ 	padding-left: 20px;
+ 	padding-bottom: 50px;
  }
  
 ul li {
+	letter-spacing: 0.1em;
 	list-style: none;
 	color: #fff;
 	background-color: #de565d;

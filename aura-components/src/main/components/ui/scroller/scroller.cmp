@@ -32,20 +32,23 @@
     <aura:attribute name="onScrollEnd" type="Aura.Action" description="The action invoked when the user stops scrolling."/>
     <aura:attribute name="onScrollMove" type="Aura.Action" description="The action invoked when the user is scrolling."/>
     
-    <aura:attribute name="onPullToLoadMore" type="Aura.Action" description="The action invoked when the user pulls from the bottom to load more.  ((ACCESSIBILITY?)) The spacebar or Enter key also triggers a refresh."/>
-    <aura:attribute name="pullToLoadMorePull" type="String" default="Pull up to load more..." description="The text to display in the bottom cell before the user pulls to load more content. Default value is &quot;Pull up to load more...&quot;."/>
-    <aura:attribute name="pullToLoadMoreRelease" type="String" default="Release to load more..." description="The text to display in the revealed area below the scroller contents when the user pulls to load more content into the scroller area, but has not yet released the pull. Default value is &quot;Release to load more...&quot;."/>
-    <aura:attribute name="pullToLoadMoreUpdating" type="String" default="Loading..." description="The text to display while the scroller component is updating after the user pulls to load more content into the scroller. Default value is &quot;Loading...&quot;."/>
-    <aura:attribute name="pullToLoadMoreSubtitle" type="String" description="The text to display in the bottom cell when the user pulls the scroller area to load more content."/>
+    <aura:attribute name="onPullToShowMore" type="Aura.Action" description="The action invoked when the user pulls from the bottom to load more.  The spacebar or Enter key also triggers a refresh."/>
+    <aura:attribute name="pullToShowMorePull" type="String" default="Pull up to show more..." description="The text to display in the bottom cell before the user pulls to show more content. Default value is &quot;Pull up to show more...&quot;."/>
+    <aura:attribute name="pullToShowMoreRelease" type="String" default="Release to show more..." description="The text to display in the revealed area below the scroller contents when the user pulls to show more content in the scroller area, but has not yet released the pull. Default value is &quot;Release to show more...&quot;."/>
+    <aura:attribute name="pullToShowMoreUpdating" type="String" default="Loading..." description="The text to display while the scroller component is updating after the user pulls to show more content in the scroller. Default value is &quot;Loading...&quot;."/>
+    <aura:attribute name="pullToShowMoreSubtitle" type="String" description="The text to display in the bottom cell when the user pulls the scroller area to show more content."/>
+    <aura:attribute name="canShowMore" type="Boolean" default="true" description="Whether this scroller can be invoked to show more content. Defaults to true."/>
     
     <aura:attribute name="onPullToRefresh" type="Aura.Action" description="The action invoked when the user pulls to refresh the scroller area.  The spacebar or Enter key also triggers a refresh."/>
     <aura:attribute name="pullToRefreshPull" type="String" default="Pull down to refresh..." description="The text to display in the top cell before the user pulls to refresh the page. Default value is &quot;Pull down to refresh...&quot;."/>
     <aura:attribute name="pullToRefreshRelease" type="String" default="Release to refresh..." description="The text to display in the revealed area above the scroller contents when the user pulls to refresh the scroller area, but has not yet released the pull. Default value is &quot;Release to refresh...&quot;."/>
     <aura:attribute name="pullToRefreshUpdating" type="String" default="Loading..." description="The text to display while the scroller component is updating after the user pulls to refresh the scroller. Default value is &quot;Loading...&quot;."/>
     <aura:attribute name="pullToRefreshSubtitle" type="String" description="The text to display in the top cell when the user pulls the scroller area to refresh the content."/>
+    <aura:attribute name="canRefresh" type="Boolean" default="true" description="Whether this scroller can be invoked to refresh its content. Defaults to true."/>
+    
     <aura:attribute name="stopEventPropagation" type="Boolean" default="false" description="Disables DOM event propagation. (This probably isn't something you want to enable.)"/>
     <aura:attribute name="checkDOMChanges" type="Boolean" default="false" description="Refresh the scroller after DOM changes."/>
-    <aura:attribute name="bindEventsToScroller" type="Boolean" default="true" description="Set to true to bind the mouse or touch events to the scroller DOM element, otherwise, bind to the window object."/>
+    <aura:attribute name="bindEventsToScroller" type="Boolean" default="false" description="Set to true to bind the mouse or touch events to the scroller DOM element, otherwise, bind to the window object."/>
 
     <aura:registerEvent name="refreshed" type="ui:scrollerRefreshed" description="The event fired when the scroller is refreshed."/>
 	<aura:handler event="aura:locationChange" action="{!c.locationChange}" description="The event fired when a location change occurs."/>
@@ -54,7 +57,7 @@
 
     <div aura:id="scrollWrapper" class="{!v.class + ' scrollWrapper'}">
         <div aura:id="scrollContent" class="{!v.scrollContentClass}">
-            <aura:if isTrue="{!v.onPullToRefresh != null}">
+            <aura:if isTrue="{!v.onPullToRefresh != null &amp;&amp; v.canRefresh}">
                 <div aura:id="pullDown" class="pullToRefresh pullDown">
                     <span class="pullDownIcon"></span>
                     <div>
@@ -65,15 +68,19 @@
                     </div>
                 </div>
             </aura:if>
+
             {!v.body}
-            <aura:if isTrue="{!v.onPullToLoadMore != null}">
+            
+            <aura:if isTrue="{!v.onPullToShowMore != null &amp;&amp; v.canShowMore}">
+            	<div aura:id="shim"></div>
+            	
                 <div aura:id="pullUp" class="pullToRefresh pullDown">
                     <span class="pullDownIcon"></span>
                     <div>
-                        <div class="label pullLabel"><a onclick="{!v.onPullToLoadMore}" href="javascript:void('scroller')">{!v.pullToLoadMorePull}</a></div>
-                        <div class="label releaseLabel">{!v.pullToLoadMoreRelease}</div>
-                        <div class="label loadingLabel">{!v.pullToLoadMoreUpdating}</div>
-                        <span class="subtitle">{!v.pullToLoadMoreSubtitle}</span>
+                        <div class="label pullLabel"><a onclick="{!v.onPullToShowMore}" href="javascript:void('scroller')">{!v.pullToShowMorePull}</a></div>
+                        <div class="label releaseLabel">{!v.pullToShowMoreRelease}</div>
+                        <div class="label loadingLabel">{!v.pullToShowMoreUpdating}</div>
+                        <span class="subtitle">{!v.pullToShowMoreSubtitle}</span>
                     </div>
                 </div>
             </aura:if>

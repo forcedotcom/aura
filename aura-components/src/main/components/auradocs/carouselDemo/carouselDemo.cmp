@@ -20,15 +20,16 @@
     <ui:vbox>
     	<aura:set attribute="north">
 	      <p><code>ui:carousel</code> is a carousel component that displays a list of items horizontally, enabling you to swipe through the list one item at a time. It provides page indicators as an alternate method for navigating through the items.</p>
-	      <auradocs:example descriptor="auradocs:demoCarousel" />
+	      <p>
+		    You can use <code>ui:carouselPage</code> and <code>ui:carouselPageItem</code> components in a <code>ui:carousel</code> to create carousel pages and group items on a page.
+		    To add carousel pages, use <code>&lt;aura:set attribute="pageComponents"&gt;</code> in the <code>ui:carousel</code> component and nest the <code>ui:carouselPage</code> components in the <code>aura:set</code> tag.</p>
+		    For a continuous horizontal flow, use the <code>continuousFlow="true"</code> attribute in <code>ui:carousel</code>.
+		    <p>If multiple carousels are used, specify the <code>width</code> and <code>height</code> attributes for each carousel. Additionally, ensure that the child carousel has a smaller dimension than its parent carousel. If the <code>width</code> and <code>height</code> attributes are not specified, these values default to the screen length and height.</p>
+	    <auradocs:info>See the <auradocs:defLink descriptor="ui:carousel">ui:carousel</auradocs:defLink> component reference for more information.</auradocs:info>
+	   
     	</aura:set>
     	<aura:set attribute="south">
-	    <p>
-	    You can use <code>ui:carouselPage</code> and <code>ui:carouselPageItem</code> components in a <code>ui:carousel</code> to create carousel pages and group items on a page.
-	    To add carousel pages, use <code>&lt;aura:set attribute="pageComponents"&gt;</code> in the <code>ui:carousel</code> component and nest the <code>ui:carouselPage</code> components in the <code>aura:set</code> tag.</p>
-	    For a continuous horizontal flow, use the <code>continuousFlow="true"</code> attribute in <code>ui:carousel</code>.
-	    <p>If multiple carousels are used, specify the <code>width</code> and <code>height</code> attributes for each carousel. Additionally, ensure that the child carousel has a smaller dimension than its parent carousel. If the <code>width</code> and <code>height</code> attributes are not specified, these values default to the screen length and height.</p>
-    <auradocs:info>See the <auradocs:defLink descriptor="ui:carousel">ui:carousel</auradocs:defLink> component reference for more information.</auradocs:info>
+    	 <auradocs:demoExample descriptor="auradocs:demoCarousel" />
 	    </aura:set>
     </ui:vbox>
 </aura:component>

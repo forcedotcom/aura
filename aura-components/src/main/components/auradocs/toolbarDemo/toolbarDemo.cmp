@@ -19,13 +19,14 @@
     <aura:set attribute="title" value="ui:toolbar"/>
     <ui:vbox>
     	<aura:set attribute="north">
-	    	<p><code>ui:toolbar</code> represents a horizontal menu.</p>
-			<auradocs:example descriptor="auradocs:demoToolbar" />
+	    	<p><code>ui:toolbar</code> represents a horizontal menu. This component renders as an HTML <code>menu</code> element, and can contain input elements such as <code>ui:button</code>.
+			Note that the HTML <code>menu</code> tag is currently not supported for all browsers.
+	    	<auradocs:info>See the <auradocs:defLink descriptor ="ui:toolbar">ui:toolbar</auradocs:defLink> component reference.</auradocs:info></p>
+			
 		</aura:set>
 		<aura:set attribute="south">
-			This component renders as an HTML <code>menu</code> element, and can contain input elements such as <code>ui:button</code>.
-			Note that the HTML <code>menu</code> tag is currently not supported for all browsers.
-	    	<auradocs:info>See the <auradocs:defLink descriptor ="ui:toolbar">ui:toolbar</auradocs:defLink> component reference.</auradocs:info>
+		<auradocs:demoExample descriptor="auradocs:demoToolbar" />
+			
 	    </aura:set>
     </ui:vbox>
 </aura:component>

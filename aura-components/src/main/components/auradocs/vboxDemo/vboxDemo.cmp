@@ -19,18 +19,15 @@
     <aura:set attribute="title" value="ui:vbox"/>
     <ui:vbox>
     	<aura:set attribute="north">
-    	<p><code>ui:vbox</code> creates a vertical box area on an app page.</p>
-    		    
-    	 <auradocs:example descriptor="auradocs:demoVbox" />
+    	<p><code>ui:vbox</code> creates a vertical box area on an app page. It contains the <code>north</code> and <code>south</code> attributes for your content,
+    and nests the <code>body</code> element in the middle. The <code>north</code> and <code>south</code> attributes are optional.
+    </p> 		
+    	 <auradocs:info>See the <auradocs:defLink descriptor ="ui:vbox">ui:vbox</auradocs:defLink> component reference.</auradocs:info>
+
     	</aura:set>
     	<aura:set attribute="south">
-    	 <p><code>ui:vbox</code>  contains the <code>north</code> and <code>south</code> attributes for your content,
-    and nests the <code>body</code> element in the middle.
-    The <code>north</code> and <code>south</code> attributes are optional.
-    </p>
-	    		
-    	 <auradocs:info>See the <auradocs:defLink descriptor ="ui:vbox">ui:vbox</auradocs:defLink> component reference.</auradocs:info>
-	
+    	 <auradocs:demoExample descriptor="auradocs:demoVbox" />
+    	 
     	  </aura:set>
     </ui:vbox>
 </aura:component>

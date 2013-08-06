@@ -20,12 +20,13 @@
     <ui:vbox>
     	<aura:set attribute="north">
     	<p><code>ui:scroller</code> creates a scrollable view, which supports scroll bars and pull-to-refresh behaviors.</p>
-    	<auradocs:example descriptor="auradocs:demoScroller" />  
-    	</aura:set>
-    	<aura:set attribute="south">
     	<p>You can set the width, and enable or disable both vertical and horizontal scrolling.
 		Shorter content leads to elastic scrolling. The demo shows both the default scrolling and pull-to-refresh behavior, with an action method to handle the pull-to-refresh event.</p>
 		<auradocs:info>See the <auradocs:defLink descriptor ="ui:scroller">ui:scroller</auradocs:defLink> component reference.</auradocs:info>
-   		</aura:set>
+   		
+    	</aura:set>
+    	<aura:set attribute="south">
+    	<auradocs:demoExample descriptor="auradocs:demoScroller" />  
+    	</aura:set>
     </ui:vbox>
 </aura:component>

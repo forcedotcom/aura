@@ -1,0 +1,31 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:demoPanel">
+    <aura:set attribute="title" value="ui:menu"/>
+    <ui:vbox>
+    	<aura:set attribute="north">
+    	  	<p>The following demo shows how you can use <code>ui:menu</code> to display menu items from a model and retrieve the selected items via the <code>menuItems</code> attribute, which is a list of items set using <code>ArrayList&lt;MenuItem></code>.</p>
+		    <p>The dropdown menu and its menu items are hidden by default. You can change this by setting the <code>visible</code> attribute on the <code>ui:menuList</code> component to <code>true</code>.
+		     The menu items are shown only when you click the <code>ui:menuTriggerLink</code> component.</p>
+		     <auradocs:info>See the <auradocs:defLink descriptor ="ui:menu">ui:menu</auradocs:defLink> component reference.</auradocs:info>   		
+    	</aura:set>
+    	<aura:set attribute="south">
+	    	<auradocs:demoExample descriptor="auradocs:demoMenuMeta" /> 
+	    </aura:set>
+    </ui:vbox>
+</aura:component>

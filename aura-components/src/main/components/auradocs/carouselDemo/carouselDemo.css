@@ -13,20 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.auradocsDemoScroller .scrollArea {
-	height: 200px;
-	width: 200px;
-	border: solid 1px grey;
-	margin: 8px;
-	overflow: hidden;
-	line-height: 20px
-}
-
-.THIS .uiBlock {
-	width: 500px;
-}
-
-.THIS .bRight {
-	float: left;
-}
-
+ .THIS .uiCarouselPage {
+ 	min-height: 400px;
+ }
+ 
+ .THIS .carousel-page {
+ 	min-height: 400px;
+ }

@@ -18,7 +18,7 @@
 <aura:component>
 	<ui:block>
 	    <aura:set attribute="left">
-	    	<ui:inputTextArea class="box" aura:id="boxy" value="Aura is the bomb dot com" type="textarea" labelPosition="top" 
+	    	<ui:inputTextArea class="box" aura:id="boxy" value="Work your magic here" type="textarea" labelPosition="top" 
 	    	mousedown="{!c.inspMouseDown}" mouseup="{!c.inspMouseUp}" focus="{!c.inspFocus}" blur="{!c.inspBlur}"
 	    	dblclick="{!c.inspDblClick}" mouseout="{!c.inspMouseout}" mouseover="{!c.inspMouseover}" 
 	    	keypress="{!c.inspKey}" select="{!c.inspSelect}" cut="{!c.inspCut}" copy="{!c.inspCopy}" paste="{!c.inspPaste}"/>

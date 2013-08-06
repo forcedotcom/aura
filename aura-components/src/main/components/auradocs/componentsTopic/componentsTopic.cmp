@@ -18,7 +18,7 @@
 <aura:component extends="auradocs:topicPanel">
     <aura:set attribute="title" value="Components"/>
 
-    <p>Aura includes out-of-the-box components that can simplify your job by taking care of some of the plumbing that you would otherwise have to create yourself. You can use these components or extend them to build more complex components. See the <b>Components</b> folder in the <auradocs:navLink location="reference">Reference tab</auradocs:navLink> for all the components that come out-of-the-box with Aura. The <code>UI</code> folder includes many components that are common on Web pages.</p>
+    <p>Aura includes out-of-the-box components that can simplify your job by taking care of some of the plumbing that you would otherwise have to create yourself. You can use these components or extend them to build more complex components. See the <b>Components</b> folder in the <auradocs:navLink location="reference">Reference tab</auradocs:navLink> for all the components that come out-of-the-box with Aura or take a look at the <auradocs:navLink location="demos">demos</auradocs:navLink>. The <code>UI</code> folder includes many components that are common on Web pages.</p>
     
     <p>This section covers the basics of how you can build your own components, including component markup, component attributes, and component composition.</p>
 

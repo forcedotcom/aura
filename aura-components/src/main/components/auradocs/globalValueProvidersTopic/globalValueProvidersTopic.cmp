@@ -172,7 +172,7 @@
 <p><b>Example</b></p>
 <p>This example shows how to get some <code>$Locale</code> attributes.</p>
 <auradocs:example descriptor="auradocs:demoLocale" />
-<p>Aura also provides localization support for input and output components. See <auradocs:topicLink topic="useForm">Getting User Input</auradocs:topicLink> for more information.</p> 
+<p>Aura also provides localization support for input and output components. See <auradocs:topicLink topic="localization">Localization</auradocs:topicLink> for more information.</p> 
 <p><b>See also:</b><br/>   
     <auradocs:topicLink topic="labelParametersTopic">Setting Label Parameters</auradocs:topicLink><br/>
     <auradocs:topicLink topic="dynamicLabel">Dynamically Constructing Labels</auradocs:topicLink>   

@@ -13,20 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.auradocsDemoScroller .scrollArea {
-	height: 200px;
-	width: 200px;
-	border: solid 1px grey;
-	margin: 8px;
-	overflow: hidden;
-	line-height: 20px
+ .THIS.uiBlock {
+	text-align: left;
+	width: 800px;
+	line-height: 20px;
 }
 
-.THIS .uiBlock {
-	width: 500px;
+.THIS .bBody {
+	clear:left;
 }
 
+.THIS .auradocsCodeblock {
+	width: 70%;
+}
+.THIS .bLeft {
+	width: 380px;
+}
 .THIS .bRight {
+	width:400px;
 	float: left;
 }
 
+.THIS .uiButton {
+	width: auto;
+}

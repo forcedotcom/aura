@@ -18,7 +18,7 @@
 <aura:component>
 <div style="margin:20px;">
     <div style="display:inline-block;width:50%;vertical-align:top;">
-        <h2><code>ui:actionMenuItem</code></h2>
+        <code>ui:actionMenuItem</code>
         <ui:menu>
             <ui:menuTriggerLink aura:id="trigger" label="Select your favorite team"/>
              <ui:menuList class="actionMenu" aura:id="actionMenu">
@@ -29,15 +29,13 @@
             </ui:menuList>
         </ui:menu>
      </div>
-     <div style="display:inline-block;width:50%;">
-          <p>Clicking the menu triggers an action in the client-side controller, which updates the label.</p>
-     </div>
+    
 </div>
 <hr/>
 <p/>
 <div style="margin:20px;">
     <div style="display:inline-block;width:50%;vertical-align:top;">
-        <h2><code>ui:checkboxMenuItem</code></h2>
+        <code>ui:checkboxMenuItem</code>
         <ui:menu>
             <ui:menuTriggerLink class="checkboxMenuLabel" aura:id="checkboxMenuLabel" label="Select your favorite teams"/>
            <ui:menuList aura:id="checkboxMenu" class="checkboxMenu">
@@ -50,15 +48,12 @@
         <p><ui:button class="checkboxButton" aura:id="checkboxButton" press="{!c.getMenuSelected}" label="Check the selected menu items"/></p>
          <p><ui:outputText class="result" aura:id="result" value="Which items get selected"/></p>
       </div>
-      <div style="display:inline-block;width:50%;">
-          <p>Multiple checkbox menu items can be selected.</p>
-        </div>
 </div>
 <hr/>
 <p/>
 <div style="margin:20px;">
     <div style="display:inline-block;width:50%;vertical-align:top;">
-        <h2><code>ui:radioMenuItem</code></h2>
+        <code>ui:radioMenuItem</code>
         <ui:menu>
             <ui:menuTriggerLink class="radioMenuLabel" aura:id="radioMenuLabel" label="Select a team"/>
             <ui:menuList class="radioMenu" aura:id="radioMenu">
@@ -72,15 +67,12 @@
        <p><ui:button class="radioButton" aura:id="radioButton" press="{!c.getRadioMenuSelected}" label="Check the selected menu items"/></p>
         <p><ui:outputText class="radioResult" aura:id="radioResult" value="Which items get selected"/> </p>
        </div>
-        <div style="display:inline-block;width:50%;">
-            <p>Radio menu items allow an individual selection only.</p>
-        </div>
 </div>
 <hr/>
 <p/>
 <div style="margin:20px;">
     <div style="display:inline-block;width:50%;vertical-align:top;">
-        <h2>Combination menu items</h2>
+        Combination menu items
         <ui:menu>
             <ui:menuTriggerLink aura:id="mytrigger" label="Select teams"/>
             <ui:menuList>
@@ -102,8 +94,5 @@
             </ui:menuList>
         </ui:menu>
       </div>
-      <div style="display:inline-block;width:50%;">
-         <p>Menu items can be combined in a <code>ui:menuList</code> component.</p>
-        </div>
 </div>
 </aura:component>

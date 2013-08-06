@@ -1,0 +1,31 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:demoPanel">
+    <aura:set attribute="title" value="ui:message"/>
+    <ui:vbox>
+    	<aura:set attribute="north">
+    	<p><code>ui:message</code> represents a message of varying severity levels.</p>
+    		<auradocs:example descriptor="auradocs:demoMessage" />
+    	</aura:set>
+    	<aura:set attribute="south">
+    	<p>The <code>severity</code> attribute indicates a message's severity level and determines the style to use when displaying the message. 
+	If the <code>closable</code> attribute is set to true, the message is hidden when the &times; symbol is pressed. Additionally, you can wire an action to the <code>ui:message</code> component using the <code>actionable</code> attribute.</p>    
+	<auradocs:info>See the <auradocs:defLink descriptor ="ui:message">ui:message</auradocs:defLink> component reference.</auradocs:info>
+	    </aura:set>
+    </ui:vbox>
+</aura:component>

@@ -1,0 +1,42 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:demoPanel">
+    <aura:set attribute="title" value="ui:dialog"/>
+    <ui:vbox>
+    	<aura:set attribute="north">
+    	<p><code>ui:dialog</code> represents overlay and modal dialogs. This demo shows an overlay dialog.</p>
+	      <auradocs:example descriptor="auradocs:demoDialog" />
+	    <p>Set <code>clickOutToClose="false"</code> to prevent the dialog from being closed when you click outside of the dialog area.
+    Note that you can use the <code>ui:openDialog</code> and <code>ui:closeDialog</code> application events to handle the opening and closing of your dialogs. Take a look at the js://controller source tab to see how you can implement these events.</p>
+    <auradocs:info>See  <auradocs:defLink descriptor="ui:openDialog" defType="event">ui:openDialog</auradocs:defLink> and <auradocs:defLink descriptor="ui:closeDialog" defType="event">ui:closeDialog</auradocs:defLink> for supported parameters.</auradocs:info>
+    
+    	<p>This demo shows a modal dialog, which is set using <code>isModal="true"</code>.</p>
+    		 <auradocs:example descriptor="auradocs:demoModal" />
+    	<p>You can use the default buttons by placing the <code>ui:dialogButtons</code> component in the <code>&lt;aura:set attribute="buttons"&gt;</code> tag, as shown in the Component source tab.
+    Refer to the <auradocs:defLink descriptor="ui:dialogButtons">ui:dialogButtons</auradocs:defLink> component reference to see the actions wired to the default buttons.</p>
+    	</aura:set>
+    	<aura:set attribute="south">
+    	 <p>Setting <code>&lt;ui:dialogButtons defaultButtons="both"&gt;</code> provides default 'OK' and 'Cancel' buttons, 
+    but you can provide your own buttons using <code>ui:button</code> components.</p>
+    <p><code>ui:dialog</code> requires a <code>ui:dialogManager</code> component, which handles the opening and closing of your dialogs. Use only one instance of <code>ui:dialogManager</code> in a component to support multiple dialogs.  
+    </p>
+    <auradocs:info>See the <auradocs:defLink descriptor="ui:dialog">ui:dialog</auradocs:defLink> and <auradocs:defLink descriptor="ui:dialogButtons">ui:dialogButtons</auradocs:defLink> component reference.</auradocs:info>
+    
+	    </aura:set>
+    </ui:vbox>
+</aura:component>

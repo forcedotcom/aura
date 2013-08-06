@@ -76,6 +76,9 @@
             <ui:message title="Empty fields" severity="warning" closable="false" visible="true">
                 Please fill out all the fields.
             </ui:message>
+            <ui:message title="Learn more" severity="info" closable="true" visible="true">
+                For more information about this form, see <ui:outputURL value="/auradocs#demos?demo=input" label="ui:input"/>
+            </ui:message>
         </aura:renderIf>
         
         <aura:renderIf isTrue="{!!v.invalidEmail &amp;&amp; !v.invalidURL &amp;&amp; !v.invalidPW &amp;&amp; v.filled}">

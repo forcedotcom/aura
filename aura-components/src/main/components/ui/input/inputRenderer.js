@@ -34,8 +34,11 @@
         var concreteHelper = concreteCmp.getDef().getHelper();
         concreteHelper.addInputDomEvents(component);
         if (component.get("v.doFormat")) {
-            var el = concreteHelper.getInputElement(concreteCmp);
-            el.value = concreteHelper.formatValue(concreteCmp);
+            var value = concreteCmp.get("v.value");
+            if (!$A.util.isEmpty(value)) {
+                var el = concreteHelper.getInputElement(concreteCmp);
+                el.value = concreteHelper.formatValue(concreteCmp);
+            }
         }
     },
     
@@ -44,8 +47,11 @@
         if (component.get("v.doFormat")) {
             var concreteCmp = component.getConcreteComponent();
             var concreteHelper = concreteCmp.getDef().getHelper();
-            var el = concreteHelper.getInputElement(concreteCmp);
-            el.value = concreteHelper.formatValue(concreteCmp);
+            var value = concreteCmp.get("v.value");
+            if (!$A.util.isEmpty(value)) {
+                var el = concreteHelper.getInputElement(concreteCmp);
+                el.value = concreteHelper.formatValue(concreteCmp);
+            }
         }
         helper.addInputClass(component);
         this.superRerender();

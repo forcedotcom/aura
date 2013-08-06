@@ -47,7 +47,7 @@
 
             <tr>
                 <td><code>model</code></td>
-                <td>The Java model class used to initial data for the app. The format is <code>java://&lt;package.class&gt;</code>.</td>
+                <td>The Java model class used to initialize data for the app. The format is <code>java://&lt;package.class&gt;</code>.</td>
             </tr>
 
             <tr>

@@ -279,7 +279,7 @@
     
     testExpiry:{
     	//iOS has a size limit of how much a WebSql Db can take up. We have a fixed size implementation in WebSqlAdapter: W-1766465
-    	browsers:["-IPAD", "-IPHONE"],
+    	browsers:["GOOGLECHROME", "SAFARI", "ANDROID_PHONE", "ANDROID_TABLET"],
 		test:[function(cmp){
 		    $A.test.setTestTimeout(30000);
 		    //defaultExpiration of 5 seconds

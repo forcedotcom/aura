@@ -36,10 +36,10 @@ nav {
  }
  
 ul li {
+	border-bottom: 1px solid #e3e3e3;
 	letter-spacing: 0.1em;
 	list-style: none;
-	color: #fff;
-	background-color: #de565d;
+	background-color: #fbf0f0;
 	padding: 15px 20px 15px 20px;
 	border-radius: 4px;
 	-webkit-border-radius: 4px;
@@ -55,10 +55,9 @@ ul li {
 
 a {
 	text-decoration: none;
-	color: #fff;
+	color: #333;
 	text-transform: uppercase;
 	font-family: 'Arial', sans-serif;
-
 }
 
 ul li:hover {

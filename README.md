@@ -86,22 +86,22 @@ The following output confirms that your template has been generated successfully
 
     `cd helloWorld` 
     
-1.2 For just a bit you'll need to edit the pom.xml file in the current directory, find the <repositories> section and add this to it - and yes we're working on fixing this right now:
+2. For just a bit you'll need to edit the pom.xml file in the current directory, find the <repositories> section and add this to it - and yes we're working on fixing this right now:
 
 	<repository>
 		<id>phloc.com</id>
 	  	<url>http://repo.phloc.com/maven2</url>
   	</repository>    
 
-2. Start the Jetty server on port 8080.
+3. Start the Jetty server on port 8080.
 
     `mvn jetty:run`
     
     To use another port, append: `-Djetty.port=portNumber. For example, mvn jetty:run -Djetty.port=9877`.
-3. Test your app in a browser.
+4. Test your app in a browser.
        `http://localhost:8080/helloWorld/helloWorld.app`       
 You should see a simple greeting in your browser.
-4. To stop the Jetty server and free up the port when you are finished, press `CTRL+C` on the command line.
+5. To stop the Jetty server and free up the port when you are finished, press `CTRL+C` on the command line.
     
     **Note**: the helloWorld/pom.xml file has a `<dependencies>` section, which lists the `<version>` of each Aura 
 artifact in your project. They define the version of Aura that your project is using and each artifact 

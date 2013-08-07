@@ -29,9 +29,6 @@ Aura also supports a powerful expression language, embedded testing, performance
 The easiest way to get up and running is from the command line, but you can easily use Aura
 with your favorite IDE too.
 
-### We're putting the final touches on the release so this quick start isn't working right now.
-Come back soon to try it out.
-
 ### Prerequisites
 
 You need:
@@ -41,13 +38,10 @@ You need:
 
 ### Step 1: Generate a Template from the Aura Archetype
 
-### We're putting the final touches on the release so this quick start isn't working right now.
-Come back soon to try it out.
-
 1. Open a command line window.
 2. Navigate to the directory where you want to create your project template and run:
 
-    mvn archetype:generate -DarchetypeCatalog=http://repo.auraframework.org/libs-release-local/archetype-catalog.xml
+    mvn archetype:generate -DarchetypeCatalog=http://repo.auraframework.org/libs-snapshot-local/archetype-catalog.xml
        
 3. When prompted to choose an archetype, enter `1`.
 4. Select the latest archetype version, or press enter for the default version.

@@ -42,32 +42,7 @@
         <createChecksum>true</createChecksum>
         <selenium.version>2.33.0</selenium.version>
     </properties>
-    <repositories>
-        <repository>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-            <id>central</id>
-            <name>libs-release</name>
-            <url>http://maven.auraframework.org/libs-release</url>
-        </repository>
-        <repository>
-            <snapshots />
-            <id>jenkins-build-artifacts</id>
-            <name>jenkins-build-artifacts</name>
-            <url>http://maven.auraframework.org/jenkins-build-artifacts</url>
-        </repository>
-        <repository>
-            <snapshots />
-            <id>snapshots</id>
-            <name>libs-snapshot</name>
-            <url>http://maven.auraframework.org/libs-snapshot</url>
-        </repository>
-        <repository>
-            <id>ext-release</id>
-            <name>Releases of external dependencies</name>
-            <url>http://maven.auraframework.org/ext-release-local</url>
-        </repository>
+    <repositories>      
         <repository>
             <id>jsdoctk1</id>
             <url>http://jsdoctk-plugin.googlecode.com/svn/repo</url>
@@ -83,20 +58,6 @@
 	    </repository>
     </repositories>
     <pluginRepositories>
-        <pluginRepository>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-            <id>central</id>
-            <name>plugins-release</name>
-            <url>http://maven.auraframework.org/plugins-release</url>
-        </pluginRepository>
-        <pluginRepository>
-            <snapshots />
-            <id>snapshots</id>
-            <name>plugins-snapshot</name>
-            <url>http://maven.auraframework.org/plugins-snapshot</url>
-        </pluginRepository>
         <pluginRepository>
             <id>jsdoctk2</id>
             <url>http://jsdoctk-plugin.googlecode.com/svn/repo</url>

@@ -19,7 +19,7 @@
         var f = cmp.get("v.format");
         var num = cmp.get("v.value");
         var formatted;
-        if ($A.util.isNumber(num) || $A.util.isString(num)) {
+        if (($A.util.isNumber(num) || $A.util.isString(num)) && !$A.util.isEmpty(num)) {
             var scale = cmp.get("v.valueScale");
             if (scale) {
                 num *= Math.pow(10, scale);
@@ -50,7 +50,7 @@
             var formatted = '';
             f = f.unwrap();
             val = val.unwrap();
-            if ($A.util.isNumber(val) || $A.util.isString(val)) {
+            if (($A.util.isNumber(val) || $A.util.isString(val)) && !$A.util.isEmpty(val)) {
                 var scale = cmp.get("v.valueScale");
                 if (scale) {
                     val *= Math.pow(10, scale);

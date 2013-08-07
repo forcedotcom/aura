@@ -142,7 +142,7 @@
 						
 						if (type === this.RESIZE_EV) {
 							target = window;
-						} else if (bindEventsToScroller) {
+						} else if (this.options.bindEventsToScroller) {
 							target = this.scroller;
 						} else {
 							target = el || this.scroller;

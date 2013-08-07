@@ -802,7 +802,7 @@
 					$A.run(function() {
 						// release in-flight actions
 						$A.enqueueAction(that.getAction(cmp, "c.executeBackground",
-								"RESUME run1;SLEEP 100;APPEND back2;READ;", function(a) {
+								"RESUME run1;SLEEP 500;APPEND back2;READ;", function(a) {
 									that.log(cmp, "back2:" + a.getReturnValue());
 								}));
 					});

@@ -463,6 +463,23 @@
         }
     },
     
+    testToISOString:{
+        test:function(component){
+            var testCmp = component.find('myOutputDateTimeComp');
+            aura.test.assertNotNull(testCmp);
+			aura.test.addWaitFor(true, function(){return $A.test.getText(testCmp.find('span').getElement()).length > 0;},function(){
+	        	var outputDateStr = $A.test.getText(testCmp.find('span').getElement());
+	        	var dateObj = new Date(2004,8,23,4,30,00);
+				var dt1 = $A.localizationService.toISOString(dateObj);				
+				var dt2 = $A.localizationService.formatDateTimeUTC(outputDateStr, "YYYY-MM-DDThh:mm:ss.SSS", 'en');
+	    		aura.test.assertEquals('2004-09-23T11:30:00.000Z', dt1, "Both dates should be same.");	    		
+	    		aura.test.assertEquals('2004-09-23T11:30:00.000', dt2, "Both dates should be same.");
+	    		aura.test.assertEquals('', $A.localizationService.toISOString(''), "Expect ''.");
+	    		aura.test.assertEquals(null, $A.localizationService.toISOString(null), "Expect null.");
+	        });	
+        }
+    },
+    
     testParseDateTimeISO8601:{
         test:function(component){
             var testCmp = component.find('myOutputDateTimeComp');

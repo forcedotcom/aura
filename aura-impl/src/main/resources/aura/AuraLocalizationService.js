@@ -518,7 +518,8 @@ var AuraLocalizationService = function AuraLocalizationService() {
                          + localizationService.pad(date.getUTCDate()) + 'T'
                          + localizationService.pad(date.getUTCHours()) + ':'
                          + localizationService.pad(date.getUTCMinutes()) + ':'
-                         + localizationService.pad(date.getUTCSeconds()) + 'Z';
+                         + localizationService.pad(date.getUTCSeconds()) + '.'
+                         + localizationService.doublePad(date.getUTCMilliseconds()) + 'Z';
                 }
             } else {
                 return date;
@@ -746,6 +747,14 @@ var AuraLocalizationService = function AuraLocalizationService() {
          */
         pad : function(n) { 
             return n < 10 ? '0' + n : n;
+        },
+        
+        /**
+         * Append zero in front if necessary to standardize a number with three digits. For example, "99" becomes "099".
+         * @private
+         */
+        doublePad : function(n) {         	            
+        	return n < 10 ? '00' + n : n  < 100 ? '0' + n : n;
         }
     };
     //#include aura.AuraLocalizationService_export

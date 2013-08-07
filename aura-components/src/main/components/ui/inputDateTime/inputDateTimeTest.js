@@ -266,6 +266,20 @@
 	    		aura.test.assertEquals(dt, inputDateStr, "Dates are not the same and they should be");	        	
 	        });				        
         }
+    },
+    
+    /**
+     * Verify a value when 'format' has milliseconds.
+     */
+    testMillisecondInFormat:{
+	attributes : {value:'2004-09-23T16:30:00.000Z', displayDatePicker:'true', format:'MM-dd-yyyy HH:mm:ss.SSS', timezone: 'GMT', langLocale: 'en'},
+	test: function(cmp){			
+			aura.test.addWaitFor(true, function(){return cmp.find("inputText").getElement().value.length > 0;},function(){
+	        	var inputDateStr  = cmp.find("inputText").getElement().value;		        
+		        var dt            = '09-23-2004 16:30:00.000';
+	    		aura.test.assertEquals(dt, inputDateStr, "Dates are not the same and they should be");	        	
+	        });				        
+        }
     }
 
 })

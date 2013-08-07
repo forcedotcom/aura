@@ -85,6 +85,13 @@ The following output confirms that your template has been generated successfully
 1. On the command line, navigate to the directory for your new app.
 
     `cd helloWorld` 
+    
+1.2 For just a bit you'll need to edit the pom.xml file in the current directory, find the <repositories> section and add this to it - and yes we're working on fixing this right now:
+
+	<repository>
+		<id>phloc.com</id>
+	  	<url>http://repo.phloc.com/maven2</url>
+  	</repository>    
 
 2. Start the Jetty server on port 8080.
 

@@ -86,14 +86,12 @@ The following output confirms that your template has been generated successfully
     `cd helloWorld` 
     
 2. For just a bit you'll need to edit the pom.xml file in the current directory, find the <repositories> section and add this to it - and yes we're working on fixing this right now:
-
 <pre><code>
     &lt;repository>
         &lt;id>phloc.com&lt;/id>
         &lt;url>http://repo.phloc.com/maven2&lt;/url>
     &lt;/repository>    
 </code></pre>
-
 3. Start the Jetty server on port 8080.
 
     `mvn jetty:run`

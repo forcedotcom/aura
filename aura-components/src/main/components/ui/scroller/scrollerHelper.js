@@ -51,6 +51,36 @@
 			component._refreshing = false;
 		}
 	},
+	
+	handleScrollTo : function(component, event) {
+		var scroller = component._scroller,
+			scrollWrapper = component.find("scrollWrapper").getElement(),
+			scrollContent = component.find("scrollContent").getElement(),
+			offset;
+		
+		switch (event.getParam("destination")) {
+		case "top" :
+			offset = component.find("pullDown").getElement();
+			scroller.scrollTo(0, 0 - offset.clientHeight, event.getParam("time"));
+			break;
+		case "bottom" :
+			offset = component.find("pullUp").getElement();
+			scroller.scrollTo(0, 0 - (scrollContent.clientHeight - scrollWrapper.clientHeight - offset.clientHeight), event.getParam("time"));
+			break;
+		case "left" :
+			scroller.scrollTo(0, 0, event.getParam("time"));
+			break;
+		case "right" :	
+			scroller.scrollTo(0 - (scrollContent.clientWidth - scrollWrapper.clientWidth), 0, event.getParam("time"));
+			break;
+		case "custom" :
+			scroller.scrollTo(event.getParam("xcoord"), event.getParam("ycoord"), event.getParam("time"));
+		}
+	},
+	
+	handleScrollBy : function(component, event) {
+		component._scroller.scrollTo(event.getParam("deltaX"), event.getParam("deltaY"), event.getParam("time"), true);
+	},
 
 	init : function(component) {
 		var attributes = component.getAttributes();

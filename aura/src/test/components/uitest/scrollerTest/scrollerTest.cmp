@@ -109,4 +109,41 @@
             </ui:inputTextArea>
         </ui:scroller>
     </div>
+       
+    <ui:button label="ScrollToTop" press="{!c.scrollToTop}" />
+    <ui:button label="ScrollToBottom" press="{!c.scrollToBottom}" />
+    <ui:button label="ScrollRelative" press="{!c.scrollDown}" />
+    <div class="test">
+    	
+        <ui:scroller aura:id="scrollToYTest" onPullToRefresh="{!c.replaceBodyContent}" onPullToShowMore="{!c.replaceBodyContent}">
+            I let it fall, my heart
+            And as it fell, you rose to claim it
+            It was dark and I was over
+            Until you kissed my lips and you saved me
+            My hands, they were strong, but my knees were far too weak
+            To stand in your arms without falling to your feet
+
+            But there's a side to you that I never knew, never knew
+            All the things you'd say, they were never true, never true
+            And the games you'd play, you would always win, always win
+
+            But I set fire to the rain
+            Watched it pour as I touched your face
+            Well, it burned while I cried
+            'Cause I heard it screaming out your name, your name
+
+            When laying with you I could stay there
+            Close my eyes, feel you here forever
+            You and me together, nothing is better
+
+            'Cause there's a side to you that I never knew, never knew
+            All the things you'd say, they were never true, never true
+            And the games you's play, you would always win, always win
+
+            But I set fire to the rain
+            Watched it pour as I touched your face
+            <ui:button label="ScrollToTop" press="{!c.scrollToTop}"/>
+        </ui:scroller>
+    </div>
+
 </aura:component>

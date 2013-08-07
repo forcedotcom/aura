@@ -103,8 +103,7 @@ public final class ComponentImpl extends BaseComponentImpl<ComponentDef, Compone
 
                         try {
                             if (descriptor.getDefType() != DefType.COMPONENT) {
-                                throw new AuraRuntimeException(String.format("%s did not provide a valid component",
-                                        providerDef.getDescriptor()));
+                                throw new AuraRuntimeException(String.format("%s is not a component", descriptor));
                             }
 
                             ComponentDef c = descriptor.getDef();
@@ -119,7 +118,7 @@ public final class ComponentImpl extends BaseComponentImpl<ComponentDef, Compone
                             }
                         } catch (DefinitionNotFoundException dnfe) {
                             throw new AuraRuntimeException(String.format("%s did not provide a valid component",
-                                    providerDef.getDescriptor()));
+                                    providerDef.getDescriptor()), dnfe);
                         }
 
                         attributeSet.setRootDefDescriptor(descriptor);

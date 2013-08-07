@@ -121,8 +121,7 @@ public class JavaProviderDefTest extends AuraImplTestCase {
             Aura.getInstanceService().getInstance("test:test_Provider_Concrete", ComponentDef.class, attributes);
             fail("expected exception for bad provider return");
         } catch (Exception e) {
-            checkExceptionFull(e, AuraRuntimeException.class,
-                    "java://org.auraframework.impl.java.provider.ConcreteProvider did not provide a valid component");
+            checkExceptionFull(e, AuraRuntimeException.class, "markup://test:fakeApplication is not a component");
         }
     }
 

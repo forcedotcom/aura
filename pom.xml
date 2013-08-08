@@ -56,6 +56,24 @@
 	      <id>phloc.com</id>
 	      <url>http://repo.phloc.com/maven2</url>
 	    </repository>
+	    
+	    <repository>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <id>maven.auraframework.org-releases</id>
+            <url>http://maven.auraframework.org/libs-release</url>
+        </repository>
+        <repository>
+            <snapshots />
+            <id>maven.auraframework.org-jenkins-build-artifacts</id>
+            <url>http://maven.auraframework.org/jenkins-build-artifacts</url>
+        </repository>
+        <repository>
+            <snapshots />
+            <id>maven.auraframework.org-releases-snapshots</id>
+            <url>http://maven.auraframework.org/libs-snapshot</url>
+        </repository>
     </repositories>
     <pluginRepositories>
         <pluginRepository>

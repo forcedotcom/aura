@@ -57,8 +57,8 @@ public class AuraArchetypeSimpleTestMANUAL extends IntegrationTestCase {
 
     private final static String ARCHETYPE_VERSION = "1.2.001";
     private final static String END_BUILD = "BUILD SUCCESS";
-    private final static String archRepo = "http://maven.auraframework.org/repo";
-    private final static String archCatalog = "http://maven.auraframework.org/libs-release-local/archetype-catalog.xml";
+    private final static String archRepo = "http://repo.auraframework.org/repo";
+    private final static String archCatalog = "http://repo.auraframework.org/libs-release-local/archetype-catalog.xml";
     private final MavenArtifact archetype;
     private final MavenArtifact project;
     private final String projectPackage;

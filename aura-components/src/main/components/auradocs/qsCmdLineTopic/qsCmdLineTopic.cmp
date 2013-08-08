@@ -38,7 +38,7 @@
         <ol>
             <li>Open a command line window.</li>
             <li>Navigate to the directory where you want to create your project template and run:<br/>
-            <code>mvn archetype:generate -DarchetypeCatalog=http://maven.auraframework.org/libs-release-local/archetype-catalog.xml</code></li>
+            <code>mvn archetype:generate -DarchetypeCatalog=http://repo.auraframework.org/libs-release-local/archetype-catalog.xml</code></li>
             <li>When prompted to choose an archetype, enter <code>1</code>.</li>
             <li>Select the latest archetype version, or press enter for the default version.
     <p>The archetype is downloaded to your machine.</p></li>

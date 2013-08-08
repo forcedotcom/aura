@@ -41,7 +41,7 @@ You need:
 1. Open a command line window.
 2. Navigate to the directory where you want to create your project template and run:
 
-    `mvn archetype:generate -DarchetypeCatalog=http://repo.auraframework.org/libs-snapshot-local/archetype-catalog.xml`
+    `mvn archetype:generate -DarchetypeCatalog=http://repo.auraframework.org/libs-release-local/archetype-catalog.xml`
        
 3. When prompted to choose an archetype, enter `1`.
 4. Select the latest archetype version, or press enter for the default version.
@@ -85,22 +85,15 @@ The following output confirms that your template has been generated successfully
 
     `cd helloWorld` 
     
-2. For just a bit you'll need to edit the pom.xml file in the current directory, find the <repositories> section and add this to it - and yes we're working on fixing this right now:
-<pre><code>
-    &lt;repository>
-        &lt;id>phloc.com&lt;/id>
-        &lt;url>http://repo.phloc.com/maven2&lt;/url>
-    &lt;/repository>    
-</code></pre>
-3. Start the Jetty server on port 8080.
+2. Start the Jetty server on port 8080.
 
     `mvn jetty:run`
     
     To use another port, append: `-Djetty.port=portNumber. For example, mvn jetty:run -Djetty.port=9877`.
-4. Test your app in a browser.
+3. Test your app in a browser.
        `http://localhost:8080/helloWorld/helloWorld.app`       
 You should see a simple greeting in your browser.
-5. To stop the Jetty server and free up the port when you are finished, press `CTRL+C` on the command line.
+4. To stop the Jetty server and free up the port when you are finished, press `CTRL+C` on the command line.
     
     **Note**: the helloWorld/pom.xml file has a `<dependencies>` section, which lists the `<version>` of each Aura 
 artifact in your project. They define the version of Aura that your project is using and each artifact 

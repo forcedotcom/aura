@@ -502,6 +502,30 @@ var AuraLocalizationService = function AuraLocalizationService() {
         },
         
         /**
+         * Most of modern browsers support this method on Date object. But that is not the case for IE8 and older.
+         * @param {Date} date a Date object
+         * @return {String} An ISO8601 string to represent passed in Date object.
+         * @memberOf AuraLocalizationService
+         * @public
+         */
+        toISOString : function(date) {
+            if (date && (date instanceof Date)) {
+                if (date.toISOString) {
+                    return date.toISOString();
+                } else {
+                    return date.getUTCFullYear() + '-'
+                         + localizationService.pad(date.getUTCMonth() + 1) + '-'
+                         + localizationService.pad(date.getUTCDate()) + 'T'
+                         + localizationService.pad(date.getUTCHours()) + ':'
+                         + localizationService.pad(date.getUTCMinutes()) + ':'
+                         + localizationService.pad(date.getUTCSeconds()) + 'Z';
+                }
+            } else {
+                return date;
+            }
+        },
+        
+        /**
          * Converts a datetime from UTC to a specified timezone.
          * @param {Date} date A JavaScript Date object
          * @param {String} timezone A time zone id based on the java.util.TimeZone class, for example, America/Los_Angeles
@@ -714,6 +738,14 @@ var AuraLocalizationService = function AuraLocalizationService() {
             if (defaultLangLocale) {
                 moment.lang(localizationService.getNormalizedLangLocale(defaultLangLocale));
             }
+        },
+        
+        /**
+         * Append zero in front if necessary to standardize a number with two digits. For example, "9" becomes "09".
+         * @private
+         */
+        pad : function(n) { 
+            return n < 10 ? '0' + n : n;
         }
     };
     //#include aura.AuraLocalizationService_export

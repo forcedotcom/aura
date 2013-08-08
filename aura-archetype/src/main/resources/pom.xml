@@ -33,6 +33,10 @@
             <name>Args4J public repository</name>
             <url>http://repo.jfrog.org/artifactory/libs-releases/</url>
         </repository>
+        <repository>
+	      <id>phloc.com</id>
+	      <url>http://repo.phloc.com/maven2</url>
+	    </repository>
     </repositories>
     <pluginRepositories>
         <pluginRepository>

@@ -74,6 +74,13 @@
             <id>maven.auraframework.org-releases-snapshots</id>
             <url>http://maven.auraframework.org/libs-snapshot</url>
         </repository>
+        
+        <repository>
+            <snapshots />
+            <id>repo.auraframework.org-chromedriver</id>
+            <url>http://repo.auraframework.org/chromedriver</url>
+        </repository>
+        
     </repositories>
     <pluginRepositories>
         <pluginRepository>

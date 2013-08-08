@@ -108,5 +108,5 @@ You should see a simple greeting in your browser.
 artifact in your project. They define the version of Aura that your project is using and each artifact 
 <dependency> should use the same version.
 
-To find out more about Aura, start up your Jetty server and type `http://localhost:9090/auradocs` into your browser
+To find out more about Aura, start up your Jetty server and type `http://localhost:8080/auradocs/docs.app` into your browser
 to access the documentation.

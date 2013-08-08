@@ -15,31 +15,15 @@
         </snapshots>
         <id>central</id>
         <name>libs-release</name>
-        <url>http://maven.auraframework.org/libs-release</url>
+        <url>http://repo.auraframework.org/libs-release</url>
       </repository>
       <repository>
         <snapshots />
         <id>snapshots</id>
         <name>libs-snapshot</name>
-        <url>http://maven.auraframework.org/libs-snapshot</url>
+        <url>http://repo.auraframework.org/libs-snapshot</url>
       </repository>
     </repositories>
-    <pluginRepositories>
-      <pluginRepository>
-        <snapshots>
-          <enabled>false</enabled>
-        </snapshots>
-        <id>central</id>
-        <name>plugins-release</name>
-        <url>http://maven.auraframework.org/plugins-release</url>
-      </pluginRepository>
-      <pluginRepository>
-        <snapshots />
-        <id>snapshots</id>
-        <name>plugins-snapshot</name>
-        <url>http://maven.auraframework.org/plugins-snapshot</url>
-      </pluginRepository>
-    </pluginRepositories>
     <dependencies>
         <dependency>
             <groupId>org.auraframework</groupId>

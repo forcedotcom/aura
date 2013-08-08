@@ -13,18 +13,13 @@
         <repository>
             <id>libs</id>
             <name>Aura releases</name>
-            <url>http://maven.auraframework.org/libs-release</url>
+            <url>http://repo.auraframework.org/libs-release</url>
         </repository>
         <repository>
             <snapshots />
             <id>snapshots</id>
             <name>Aura snapshots</name>
-            <url>http://maven.auraframework.org/libs-snapshot</url>
-        </repository>
-        <repository>
-            <id>external-libs</id>
-            <name>External libraries</name>
-            <url>http://maven.auraframework.org/ext-release-local</url>
+            <url>http://repo.auraframework.org/libs-snapshot</url>
         </repository>
         <repository>
             <!-- args4j 2.0.17, used by closure-stylesheets, isn't in the
@@ -38,22 +33,6 @@
 	      <url>http://repo.phloc.com/maven2</url>
 	    </repository>
     </repositories>
-    <pluginRepositories>
-        <pluginRepository>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-            <id>plugins</id>
-            <name>plugins-release</name>
-            <url>http://maven.auraframework.org/plugins-release</url>
-        </pluginRepository>
-        <pluginRepository>
-            <snapshots />
-            <id>snapshots</id>
-            <name>plugins-snapshot</name>
-            <url>http://maven.auraframework.org/plugins-snapshot</url>
-        </pluginRepository>
-    </pluginRepositories>
     <dependencies>
         <dependency>
             <groupId>org.auraframework</groupId>

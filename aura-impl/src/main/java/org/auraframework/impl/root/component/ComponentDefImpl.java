@@ -55,7 +55,7 @@ public class ComponentDefImpl extends BaseComponentDefImpl<ComponentDef> impleme
     }
 
     @Override
-    protected DefDescriptor<ComponentDef> getDefaultExtendsDescriptor() {
+    public DefDescriptor<ComponentDef> getDefaultExtendsDescriptor() {
         return ComponentDefImpl.PROTOTYPE_COMPONENT;
     }
 

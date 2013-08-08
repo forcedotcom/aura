@@ -367,7 +367,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
             checkExceptionStart(e, null, "No COMPONENT named markup://unknown:component found");
         }
         Mockito.verify(registry, Mockito.times(1)).compileDef(Mockito.eq(cmpDesc),
-                Mockito.<Map<DefDescriptor<?>, Definition>> any());
+                Mockito.<Map<DefDescriptor<? extends Definition>, Definition>> any());
 
         // another request for getUid will not re-compile
         Mockito.reset(registry);
@@ -378,7 +378,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
             checkExceptionStart(e, null, "No COMPONENT named markup://unknown:component found");
         }
         Mockito.verify(registry, Mockito.times(0)).compileDef(Mockito.eq(cmpDesc),
-                Mockito.<Map<DefDescriptor<?>, Definition>> any());
+                Mockito.<Map<DefDescriptor<? extends Definition>, Definition>> any());
     }
 
     public void testGetUidForNonQuickFixException() throws Exception {
@@ -403,7 +403,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
                     String.format("%s:1,38: Invalid attribute \"invalidAttribute\"", cmpDesc.getQualifiedName()));
         }
         Mockito.verify(registry, Mockito.times(1)).compileDef(Mockito.eq(cmpDesc),
-                Mockito.<Map<DefDescriptor<?>, Definition>> any());
+                Mockito.<Map<DefDescriptor<? extends Definition>, Definition>> any());
     }
 
     public void testCompileDef() throws Exception {
@@ -426,7 +426,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         ComponentDef def = registry.getDef(cmpDesc);
         assertNotNull(def);
         Mockito.verify(registry, Mockito.times(1)).compileDef(Mockito.eq(cmpDesc),
-                Mockito.<Map<DefDescriptor<?>, Definition>> any());
+                Mockito.<Map<DefDescriptor<? extends Definition>, Definition>> any());
         assertCompiledDef(def);
 
         // check all dependencies
@@ -461,7 +461,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         String uid = registry.getUid(null, def.getDescriptor());
         assertNotNull(uid);
         Mockito.verify(registry, Mockito.times(1)).compileDef(Mockito.eq(def.getDescriptor()),
-                Mockito.<Map<DefDescriptor<?>, Definition>> any());
+                Mockito.<Map<DefDescriptor<? extends Definition>, Definition>> any());
         Mockito.doReturn(true).when(def).isValid();
         assertCompiledDef(def);
 
@@ -483,19 +483,19 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         MasterDefRegistryImpl registry = getDefRegistry(true);
         registry.getDef(cmpDesc);
         Mockito.verify(registry, Mockito.times(1)).compileDef(Mockito.eq(cmpDesc),
-                Mockito.<Map<DefDescriptor<?>, Definition>> any());
+                Mockito.<Map<DefDescriptor<? extends Definition>, Definition>> any());
 
         // another getDef on same registry should not re-compile the def
         Mockito.reset(registry);
         assertNotNull(registry.getDef(cmpDesc));
         Mockito.verify(registry, Mockito.times(0)).compileDef(Mockito.eq(cmpDesc),
-                Mockito.<Map<DefDescriptor<?>, Definition>> any());
+                Mockito.<Map<DefDescriptor<? extends Definition>, Definition>> any());
 
         // another getDef on other registry instance should re-compile the def
         registry = getDefRegistry(true);
         assertNotNull(registry.getDef(cmpDesc));
         Mockito.verify(registry, Mockito.times(1)).compileDef(Mockito.eq(cmpDesc),
-                Mockito.<Map<DefDescriptor<?>, Definition>> any());
+                Mockito.<Map<DefDescriptor<? extends Definition>, Definition>> any());
     }
 
     public void testGetDefDescriptorNull() throws Exception {
@@ -890,63 +890,5 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
             return true;
         }
         return false;
-    }
-
-    /**
-     * Verify frequency counts on a component and it's descendant.
-     * 
-     * Automation for W-1526909.
-     */
-    public void testComponentFrequencySingleDecendent() throws Exception {
-        DefDescriptor<ComponentDef> superCmp = addSourceAutoCleanup(ComponentDef.class,
-                "<aura:component extensible=\"true\"/>", "testComponentFrequency");
-        DefDescriptor<ComponentDef> cmp = addSourceAutoCleanup(ComponentDef.class,
-                String.format("<aura:component extends=\"%s\"/>", superCmp.getDescriptorName()),
-                "testComponentFrequency");
-
-        MasterDefRegistryImpl mdr = getDefRegistry(false);
-        String uid = mdr.getUid(null, cmp);
-        Map<DefDescriptor<?>, Integer> depMap = mdr.getDependenciesMap(uid);
-
-        assertEquals("cmp with no descendents should have a frequency of 1", 1, depMap.get(cmp).intValue());
-        assertTrue("Super should have a higher frequency count than descendant", depMap.get(superCmp) > depMap.get(cmp));
-    }
-
-    /**
-     * Verify frequency counts for a more complicated dependency tree. Frequency counts should be reflective of how many
-     * descendants a component has. Components with no descendants (not extended) should have a frequency of 1, and the
-     * more a component is extended the higher frequency it will have.
-     * 
-     * Automation for W-1526909.
-     */
-    public void testComponentFrequencyMultipleDecendents() throws Exception {
-        DefDescriptor<ComponentDef> superSuperCmp = addSourceAutoCleanup(ComponentDef.class,
-                "<aura:component extensible=\"true\"/>", "testComponentFrequency");
-        DefDescriptor<ComponentDef> superCmp = addSourceAutoCleanup(
-                ComponentDef.class,
-                String.format("<aura:component extends=\"%s\" extensible=\"true\"/>", superSuperCmp.getDescriptorName()),
-                "testComponentFrequency");
-        DefDescriptor<ComponentDef> cmpA = addSourceAutoCleanup(ComponentDef.class,
-                String.format("<aura:component extends=\"%s\"/>", superCmp.getDescriptorName()),
-                "testComponentFrequency");
-        DefDescriptor<ComponentDef> cmpB = addSourceAutoCleanup(ComponentDef.class,
-                String.format("<aura:component extends=\"%s\"/>", superCmp.getDescriptorName()),
-                "testComponentFrequency");
-        DefDescriptor<ComponentDef> masterCmp = addSourceAutoCleanup(
-                ComponentDef.class,
-                String.format("<aura:component><%s/><%s/></aura:component>", cmpA.getDescriptorName(),
-                        cmpB.getDescriptorName()),
-                "testComponentFrequency");
-
-        MasterDefRegistryImpl mdr = getDefRegistry(false);
-        String uid = mdr.getUid(null, masterCmp);
-        Map<DefDescriptor<?>, Integer> depMap = mdr.getDependenciesMap(uid);
-
-        assertEquals("cmpA with no descendents should have a frequency of 1", 1, depMap.get(cmpA).intValue());
-        assertEquals("cmpB with no descendents should have a frequency of 1", 1, depMap.get(cmpB).intValue());
-        assertEquals("masterCmp with no descendents should have a frequency of 1", 1, depMap.get(masterCmp).intValue());
-        assertTrue("Descendent (superCmp) should have lower frequency than super",
-                depMap.get(superSuperCmp) > depMap.get(superCmp));
-        assertTrue("Descendent (cmpA) should have lower frequency than super", depMap.get(superCmp) > depMap.get(cmpA));
     }
 }

@@ -159,13 +159,6 @@ public interface MasterDefRegistry {
     <T extends Definition> Set<DefDescriptor<?>> getDependencies(String uid);
 
     /**
-     * Get the dependencies map for an UID.
-     *
-     * @param uid the UID for the definition (must have called {@link #getUid(String, DefDescriptor<?>)}).
-     */
-    <T extends Definition> Map<DefDescriptor<?>, Integer> getDependenciesMap(String uid);
-
-    /**
      * Get a named string from the cache for a def.
      * 
      * @param uid the UID for the definition (must have called {@link #getUid(String, DefDescriptor<?>)}).

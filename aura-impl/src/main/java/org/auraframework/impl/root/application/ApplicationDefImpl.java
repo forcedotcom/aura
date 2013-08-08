@@ -143,7 +143,7 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
     }
 
     @Override
-    protected DefDescriptor<ApplicationDef> getDefaultExtendsDescriptor() {
+    public DefDescriptor<ApplicationDef> getDefaultExtendsDescriptor() {
         return ApplicationDefImpl.PROTOTYPE_APPLICATION;
     }
 

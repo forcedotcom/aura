@@ -23,6 +23,7 @@ import java.util.Set;
 
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.AttributeDefRef;
+import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
@@ -290,6 +291,11 @@ public final class TestComponent implements ComponentDef {
 
 	@Override
     public Map<String, DefDescriptor<ThemeDef>> getThemeAliases() {
+        return null;
+    }
+
+    @Override
+    public DefDescriptor<? extends BaseComponentDef> getDefaultExtendsDescriptor() {
         return null;
     }
 }

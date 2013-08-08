@@ -184,38 +184,4 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
         assertEquals(HttpStatus.SC_OK, statusCode);
         assertNotNull(response);
     }
-
-    /**
-     * Verify super CSS is before CSS of components extending it. ui:input before ui:inputText before ui:inputNumber
-     * before ui:inputPercent
-     * 
-     * This test needs to be refactored if/when empty CSS declarations are removed.
-     * 
-     * @throws Exception
-     */
-    public void testCSSOrder() throws Exception {
-        String modeAndContext = getSimpleContext(Format.CSS, false);
-        String url = "/l/" + AuraTextUtil.urlencode(modeAndContext) + "/app.css";
-
-        HttpGet get = obtainGetMethod(url);
-        HttpResponse httpResponse = perform(get);
-        int statusCode = getStatusCode(httpResponse);
-        String response = getResponseBody(httpResponse);
-        get.releaseConnection();
-
-        assertEquals(HttpStatus.SC_OK, statusCode);
-
-        assertTrue("ui:input CSS should be before ui:inputText",
-                response.indexOf(".uiInput") < response.indexOf(".uiInputText"));
-        assertTrue("ui:inputText CSS should be before ui:inputNumber",
-                response.indexOf(".uiInputText") < response.indexOf(".uiInputNumber"));
-        assertTrue("ui:inputNumber CSS should be before ui:inputPercent",
-                response.indexOf(".uiInputNumber") < response.indexOf(".uiInputPercent"));
-        // Verify CSS sorts alphabetically when frequency (# of dependents) the same (inputPercent, inputRange, and
-        // inputFile all have 0 dependents).
-        assertTrue("ui:inputPercent CSS should be before ui:inputRange",
-                response.indexOf(".uiInputPercent") < response.indexOf(".uiInputRange"));
-        assertTrue("ui:inputFile CSS should be before ui:inputPercent",
-                response.indexOf(".uiInputFile") < response.indexOf(".uiInputPercent"));
-    }
 }

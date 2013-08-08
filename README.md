@@ -85,15 +85,13 @@ The following output confirms that your template has been generated successfully
 
     `cd helloWorld` 
     
-2. For just a bit you'll need to edit the pom.xml file in the current directory, find the <repositories> section and add this to it - and yes we're working on fixing this right now:
-
+2. As a temporary fix, you'll need to edit the `pom.xml` file in the current directory. Find the `<repositories>` section and add this to it - and yes, we're working on fixing this right now:
 <pre><code>
     &lt;repository>
         &lt;id>libs-external&lt;/id>
         &lt;url>http://repo.auraframework.org/libs-release&lt;/url>
     &lt;/repository>    
 </code></pre>
-
 3. Start the Jetty server on port 8080.
 
     `mvn jetty:run`
@@ -104,7 +102,7 @@ The following output confirms that your template has been generated successfully
 You should see a simple greeting in your browser.
 5. To stop the Jetty server and free up the port when you are finished, press `CTRL+C` on the command line.
     
-    **Note**: the helloWorld/pom.xml file has a `<dependencies>` section, which lists the `<version>` of each Aura 
+    **Note**: the `helloWorld/pom.xml` file has a `<dependencies>` section, which lists the `<version>` of each Aura 
 artifact in your project. They define the version of Aura that your project is using and each artifact 
 <dependency> should use the same version.
 

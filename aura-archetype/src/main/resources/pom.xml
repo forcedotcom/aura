@@ -25,7 +25,7 @@
 	      <url>http://repo.phloc.com/maven2</url>
 	    </repository>
     </repositories>
-   
+
     <dependencies>
         <dependency>
             <groupId>org.auraframework</groupId>

@@ -37,7 +37,7 @@
             On Linux or Windows: Click <b>Window</b> &gt; <b>Preferences</b> &gt; <b>Maven</b> &gt; <b>Archetypes</b> &gt; <b>Add Remote Catalog...</b><br/>
             On Mac: Click <b>Eclipse</b> &gt; <b>Preferences</b> &gt; <b>Maven</b> &gt; <b>Archetypes</b> &gt; <b>Add Remote Catalog...</b></li>
             <li>In the Remote Archetype Catalog window, enter these values:<br/>
-            <b>Catalog File</b>: <code>http://maven.auraframework.org/libs-release-local/archetype-catalog.xml</code><br/>
+            <b>Catalog File</b>: <code>http://repo.auraframework.org/libs-release-local/archetype-catalog.xml</code><br/>
             <b>Description</b>: Aura Archetype
             </li>
             <li>Click <b>OK</b>.</li>

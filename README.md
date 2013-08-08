@@ -41,7 +41,7 @@ You need:
 1. Open a command line window.
 2. Navigate to the directory where you want to create your project template and run:
 
-    mvn archetype:generate -DarchetypeCatalog=http://repo.auraframework.org/libs-snapshot-local/archetype-catalog.xml
+    `mvn archetype:generate -DarchetypeCatalog=http://repo.auraframework.org/libs-snapshot-local/archetype-catalog.xml`
        
 3. When prompted to choose an archetype, enter `1`.
 4. Select the latest archetype version, or press enter for the default version.
@@ -53,8 +53,7 @@ You need:
     Define value for property 'version': 1.0-SNAPSHOT
     Define value for property 'package': org.myGroup
 </code></pre>
-    **Note**: The artifactId is also the name of the project as it appears in the Package
-Explorer. It can only contain alphanumeric characters.
+    **Note**: The artifactId can only contain alphanumeric characters.
 6. When prompted to confirm properties configuration, enter `Y`.
 The following output confirms that your template has been generated successfully.
 <pre><code>
@@ -87,12 +86,12 @@ The following output confirms that your template has been generated successfully
     `cd helloWorld` 
     
 2. For just a bit you'll need to edit the pom.xml file in the current directory, find the <repositories> section and add this to it - and yes we're working on fixing this right now:
-
-	<repository>
-		<id>phloc.com</id>
-	  	<url>http://repo.phloc.com/maven2</url>
-  	</repository>    
-
+<pre><code>
+    &lt;repository>
+        &lt;id>phloc.com&lt;/id>
+        &lt;url>http://repo.phloc.com/maven2&lt;/url>
+    &lt;/repository>    
+</code></pre>
 3. Start the Jetty server on port 8080.
 
     `mvn jetty:run`

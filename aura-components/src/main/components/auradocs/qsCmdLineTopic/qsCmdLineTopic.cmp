@@ -19,8 +19,10 @@
 
     <aura:set attribute="title" value="Create an Aura App from the Command Line"/>
 
-    <p>You can generate a basic Aura app quickly using the command line.</p>
+    <p>You can generate a basic Aura app quickly using the command line. For details, see the <code>README.md</code> file in the <a href="https://github.com/forcedotcom/aura" target="_new">Aura repo</a>.</p>
 
+<!-- README.md has these details. It's being tweaked as we work out public access so comment this out until the doc site is up
+  When uncommenting, take out spaces in "- -" everywhere below
  <p>Many of the commands in this quick start trigger downloads of additional Maven dependencies. If you have never used Maven before or if you are going through this quick start
     on a new machine or with a new user account, this can be slow initially. However, once the dependent artifacts are downloaded, they are cached in a local repository and subsequent commands
     execute more quickly. See <ui:outputURL value="http://maven.apache.org/guides/introduction/introduction-to-archetypes.html" label="Introduction to Maven archetypes">Introduction to Maven archetypes</ui:outputURL>. </p>
@@ -56,9 +58,9 @@
     <p>The following output confirms that your template has been generated successfully.</p>
 
         <auradocs:codeblock>
-[INFO] ----------------------------------------------------------------------------
+[INFO] - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 [INFO] Using following parameters for creating project from Archetype: aura-archetype:0.0.1-SNAPSHOT
-[INFO] ----------------------------------------------------------------------------
+[INFO] - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 [INFO] Parameter: groupId, Value: org.myGroup
 [INFO] Parameter: artifactId, Value: helloWorld
 [INFO] Parameter: version, Value: 1.0-SNAPSHOT
@@ -69,13 +71,13 @@
 [INFO] Parameter: groupId, Value: org.myGroup
 [INFO] Parameter: artifactId, Value: foo
 [INFO] project created from Archetype in dir: /home/&lt;project-path&gt;
-[INFO] ------------------------------------------------------------------------
+[INFO] - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 [INFO] BUILD SUCCESS
-[INFO] ------------------------------------------------------------------------
+[INFO] - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 [INFO] Total time: 33.656s
-[INFO] Finished at: Mon Feb 27 14:39:07 PST 2012
+[INFO] Finished at: Tue Jul 16 14:39:07 PST 2013
 [INFO] Final Memory: 10M/180M
-[INFO] ------------------------------------------------------------------------
+[INFO] - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         </auradocs:codeblock>
 
 
@@ -96,6 +98,7 @@
         <p>Note that the <code>helloWorld/pom.xml</code> file has a <code>&lt;dependencies&gt;</code> section, which lists the <code>&lt;version&gt;</code> of each Aura artifact in your project. They define the version of Aura that your project is using and each artifact <code>&lt;dependency&gt;</code> should use the same version.</p>
 
         <p>You created a simple app from the command line. You are probably more used to working with an IDE. The <auradocs:topicLink topic="eclipseCreateApp">Eclipse quick start</auradocs:topicLink> shows you how to create a similar app with an IDE. It also introduces the concept of modular and reusable components, which is one of the main advantages of using Aura.</p>
+-->        
 
 <p><b>See also:</b><br/>
             <auradocs:topicLink topic="qsNextSteps">Next Steps</auradocs:topicLink><br/>

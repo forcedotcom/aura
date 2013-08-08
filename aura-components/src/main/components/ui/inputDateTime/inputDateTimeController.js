@@ -65,7 +65,7 @@
                 
         var timezone = component.get("v.timezone");
         $A.localizationService.WallTimeToUTC(d, timezone, function(utcDate) {
-            component.setValue("v.value", utcDate.toISOString());
+            component.setValue("v.value", $A.localizationService.toISOString(utcDate));
         });
     }
 })

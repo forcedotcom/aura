@@ -25,6 +25,14 @@
         }
     },
     
+    getFormat: function(component) {
+        return component.get("v.format");
+    },
+
+    getTimeZone: function(component) {
+        return component.get("v.timezone");
+    },
+    
     formatDateTime: function(component) {
         var concreteCmp = component.getConcreteComponent();
         var _helper = concreteCmp.getDef().getHelper();
@@ -34,10 +42,10 @@
             return;
         }
         
-        var format = concreteCmp.get("v.format");;
+        var format = _helper.getFormat(concreteCmp);
         var langLocale = concreteCmp.get("v.langLocale");
-        var d = new Date(value);
-        var timezone = concreteCmp.get("v.timezone");
+        var d = $A.localizationService.parseDateTimeISO8601(value);
+        var timezone = _helper.getTimeZone(concreteCmp);
         $A.localizationService.UTCToWallTime(d, timezone, function(walltime) {
             try {
                 var displayValue = $A.localizationService.formatDateTimeUTC(walltime, format, langLocale);

@@ -27,6 +27,7 @@ function MapValue(config, def, component){
     this.value = {};
     this.keys = {};
     this.owner = component;
+
     var k;
     // attributes can come through here but have no way of knowing the member keys
     // models have getMembers
@@ -90,6 +91,7 @@ MapValue.prototype.getValue = function(k){
  * @param {Object} newMap The new map.
  */
 MapValue.prototype.setValue = function(newMap) {
+    var oldMap = this.value;  // Held to test for dirty replaced subobjects
     this.value = {};
     this.keys = {};
     this.makeDirty();
@@ -125,7 +127,7 @@ MapValue.prototype.setValue = function(newMap) {
         if (copyKeys && copyKeys[k]) {
             key = copyKeys[k];
         }
-        this.add(key, copyMap);
+        this.add(key, copyMap, k in oldMap);
     }
 };
 
@@ -303,10 +305,12 @@ MapValue.prototype.unwrap = function(){
  * wraps the value in a simple or map value and adds to this map.
  *
  * The use of config allows null or undefined to be passed in as the value.
+ * The subDirty flag can be used to force the new subkey to be dirty; an
+ * added key is normally clean.
  *
  * @private
  */
-MapValue.prototype.add = function(k, config) {
+MapValue.prototype.add = function(k, config, subDirty) {
     var key = k.toLowerCase();
     var v = config[k];
 
@@ -318,6 +322,9 @@ MapValue.prototype.add = function(k, config) {
     }
 
     this.makeDirty();
+    if (value.makeDirty && subDirty) {
+        value.makeDirty();
+    }
 
     var handlers = this.handlers;
     if (handlers) {
@@ -394,7 +401,9 @@ MapValue.prototype.destroyHandlers = function(globalId){
     var keys = this.keys;
     for(var k in values){
         var v = values[k];
-        v.destroyHandlers(globalId);
+        if (v.destroyHandlers) {
+            v.destroyHandlers(globalId);
+        }
     }
 };
 

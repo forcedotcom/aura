@@ -42,7 +42,7 @@
 <p><b>See also:</b><br/>
     <auradocs:topicLink topic="cycleOverview">Component Request Lifecycle</auradocs:topicLink><br/>
     <auradocs:topicLink topic="oodIntro">Object-Oriented Development</auradocs:topicLink><br/>
-    <auradocs:topicLink topic="javadoc">Javadoc</auradocs:topicLink>
+    <!-- need publicly available version <auradocs:topicLink topic="javadoc">Javadoc</auradocs:topicLink> -->
 </p>
 
 </aura:component>

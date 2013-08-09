@@ -17,7 +17,7 @@
 -->
 <aura:component>
     <ul>
-        <li>Browse the <auradocs:topicLink topic="javadoc">Javadoc</auradocs:topicLink></li>
+        <!-- need publicly available version <li>Browse the <auradocs:topicLink topic="javadoc">Javadoc</auradocs:topicLink></li> -->
         <li>Learn how to use <auradocs:topicLink topic="appOverview">system tags</auradocs:topicLink></li>
         <li>See the list of <auradocs:topicLink topic="htmlTags">supported HTML tags</auradocs:topicLink></li>
         <li>See the list of <auradocs:topicLink topic="attrTypesOverview">supported <code>aura:attribute</code> types</auradocs:topicLink></li>

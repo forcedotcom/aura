@@ -19,7 +19,7 @@
 
     <aura:set attribute="title" value="Create an Aura App from the Command Line"/>
 
-    <p>You can generate a basic Aura app quickly using the command line. For details, see the <code>README.md</code> file in the <a href="https://github.com/forcedotcom/aura" target="_new">Aura repo</a>.</p>
+    <p>You can generate a basic Aura app quickly using the command line. For details, see the <code>README.md</code> file in the <a href="https://github.com/forcedotcom/aura" target="_blank">Aura repo</a>.</p>
 
 <!-- README.md has these details. It's being tweaked as we work out public access so comment this out until the doc site is up
   When uncommenting, take out spaces in "- -" everywhere below

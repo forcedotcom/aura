@@ -61,7 +61,7 @@
             </aura:if>
 
             <aura:if isTrue="{!m.events.length > 0}">
-                <auradocs:defMemberList title="Events" list="{!m.events}"/>d
+                <auradocs:defMemberList title="Events" list="{!m.events}"/>
             </aura:if>
         </auradocs:stretchTab>
 

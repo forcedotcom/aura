@@ -24,5 +24,5 @@
 
 <h2>Sample App</h2>
 
-    <p>We built a simple app on the Aura framework to demonstrate its capabilities. Aura Note is a note-taking app showcasing the simplicity of building apps on Aura.  <ui:outputURL value="https://github.com/forcedotcom/aura-note" label="Get the source."></p>
+    <p>We built a simple app on the Aura framework to demonstrate its capabilities. Aura Note is a note-taking app showcasing the simplicity of building apps on Aura.  <ui:outputURL value="https://github.com/forcedotcom/aura-note" label="Get the source."/></p>
 </aura:component>

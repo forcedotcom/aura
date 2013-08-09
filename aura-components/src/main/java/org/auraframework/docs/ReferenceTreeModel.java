@@ -60,9 +60,11 @@ public class ReferenceTreeModel {
             tree.add(new TreeNode(null, "Tests", makeTreeNodes("js", TestSuiteDef.class), false));
 
             tree.add(new TreeNode(null, "JavaScript API", new ApiContentsModel().getNodes(), false));
+            /* Javadoc not publicly accessible
             tree.add(new TreeNode(
-                    "http://jenkins.auraframework.org/view/All/job/lumen_doc/javadoc/index.html?org/auraframework/Aura.html",
+                    "http://javadoc.auraframework.org/",
                     "Java API"));
+            */
 
             return tree;
         } catch (QuickFixException e) {

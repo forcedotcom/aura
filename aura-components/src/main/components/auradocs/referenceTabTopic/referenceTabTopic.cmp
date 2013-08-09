@@ -24,7 +24,7 @@
 
     <p>Click <b>JavaScript API</b> to see the publicly accessible method for each JavaScript object.</p>
 
-    <p>Click <b>Java API</b> to see the Javadoc for all the Java classes.</p>
+    <!-- need publicly available version <p>Click <b>Java API</b> to see the Javadoc for all the Java classes.</p> -->
 
     <h2>Definitions</h2>
 

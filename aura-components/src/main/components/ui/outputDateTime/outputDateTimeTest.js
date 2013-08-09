@@ -202,6 +202,18 @@
 	        	}
         	});
         }
+    },
+    
+    /**
+     * Verify behavior when 'format' has milliseconds..
+     */
+    testMillisecondInFormat: {
+        attributes: {value : '2004-09-23T16:30:00.000Z', format: 'MM-dd-yyyy HH:mm:ss.SSS', langLocale: 'en', timezone: 'GMT'},
+        test: function(component){
+        	aura.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
+        		aura.test.assertEquals("09-23-2004 16:30:00.000", $A.test.getText(component.find('span').getElement()), "Incorrect date/time format in display.");
+        	});
+      }
     }
 
 })

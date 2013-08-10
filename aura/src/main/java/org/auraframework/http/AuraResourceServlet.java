@@ -25,14 +25,15 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
 import java.util.concurrent.ConcurrentHashMap;
-
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.mutable.MutableInt;
 import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
@@ -446,25 +447,24 @@ public class AuraResourceServlet extends AuraBaseServlet {
             throws QuickFixException {
         DefDescriptor<? extends BaseComponentDef> appDesc = context.getApplicationDescriptor();
         String uid = context.getUid(appDesc);
-        Map<DefDescriptor<?>, Integer> dependencyMap = context.getDefRegistry().getDependenciesMap(uid);
+        Set<DefDescriptor<?>> dependencies = context.getDefRegistry().getDependencies(uid);
+        Map<DefDescriptor<?>, MutableInt> styleFrequencyMap = createStyleFrequencyMap(dependencies);
 
         /**
          * Because we're using CSS from the entire namespace (preloads) we need to add style def descriptors of parent
          * components that's not in the dependencies map. This will then be sorted by frequency then alphabetically.
          * 
-         * This can be a set and sort done on the dependencyMap when we load CSS by dependency instead of namespace.
+         * This can be a set and sort done on the styleFrequencyMap when we load CSS by dependency instead of namespace.
          */
         Map<DefDescriptor<StyleDef>, Integer> styles = Maps.newHashMap();
 
         /**
          * The loops and checks within are used to return an ordered list of all styles of a namespace sorted by
          * frequency (number of descendants) then alphabetically. Very inefficient and redundant on different namespaces
-         * because they use the same dependencyMap.
-         * 
-         * Note: DefDescriptor<StyleDef> has its parent component's frequency in dependencyMap.
+         * because they use the same dependencies.
          */
-        if (dependencyMap != null) {
-            for (Map.Entry<DefDescriptor<?>, Integer> dependencyEntry : dependencyMap.entrySet()) {
+        if (styleFrequencyMap != null) {
+            for (Map.Entry<DefDescriptor<?>, MutableInt> dependencyEntry : styleFrequencyMap.entrySet()) {
                 DefDescriptor<?> defDescriptor = dependencyEntry.getKey();
                 if (defDescriptor.getDefType() == DefType.STYLE) {
                     @SuppressWarnings("unchecked")
@@ -476,13 +476,13 @@ public class AuraResourceServlet extends AuraBaseServlet {
                      * Remove this when we load CSS based on dependencies instead of preloads
                      */
                     if (styleDefDescriptors.contains(defDescriptor)) {
-                        styles.put(styleDD, dependencyEntry.getValue());
+                        styles.put(styleDD, dependencyEntry.getValue().getValue());
                     }
                 }
             }
         }
 
-        // Add namespace StyleDefs that are not in the dependencyMap so that we can sort afterwards
+        // Add namespace StyleDefs that are not in the dependencies so that we can sort afterwards
         for (DefDescriptor<StyleDef> style : styleDefDescriptors) {
             if (!styles.containsKey(style)) {
                 // frequency is 1 because it most likely doesn't have any descendants
@@ -491,14 +491,14 @@ public class AuraResourceServlet extends AuraBaseServlet {
         }
 
         /**
-         * Dependency map includes frequency (calculated by its number of descendants). We sort by this frequency to
+         * style map includes frequency (calculated by its number of descendants). We sort by this frequency to
          * order the CSS by ancestors first then alphabetical.
          * 
          * Comparing DefDescriptor is cleaner than comparing Definition
          */
         Comparator frequencyComparator = Ordering.natural().reverse().onResultOf(Functions.forMap(styles))
                 .compound(Ordering.natural());
-        Map<DefDescriptor<StyleDef>, Integer> sorted = ImmutableSortedMap.copyOf(styles, frequencyComparator);
+        SortedMap<DefDescriptor<StyleDef>, Integer> sorted = ImmutableSortedMap.copyOf(styles, frequencyComparator);
 
         // We ultimately want StyleDefs so here they are
         Set<StyleDef> styleDefs = Sets.newLinkedHashSet();
@@ -510,6 +510,57 @@ public class AuraResourceServlet extends AuraBaseServlet {
         }
 
         return styleDefs;
+    }
+
+    /**
+     * Returns map of styles as key and frequency (based on number of descendants) as value
+     *
+     * @param dependencies definition map
+     * @return sorted map
+     * @throws QuickFixException
+     */
+    private static Map<DefDescriptor<?>, MutableInt> createStyleFrequencyMap(
+            Set<DefDescriptor<?>> dependencies)
+            throws QuickFixException {
+        Map<DefDescriptor<?>, MutableInt> frequencyMap = Maps.newHashMap();
+        for (DefDescriptor<?> defDescriptor : dependencies) {
+            // for each component we want to calculate its frequency
+            if (defDescriptor.getDefType() == DefType.COMPONENT) {
+                addStyleFrequency(frequencyMap, defDescriptor);
+            }
+        }
+
+        return frequencyMap;
+    }
+
+    /**
+     * Adds frequency to particular style based on their component's descendants. All other types just get 1 as its frequency.
+     * Adds component's frequency to its style to make ordering CSS easier.
+     *
+     * @param frequencyMap dependencies frequency map
+     * @param descriptor descriptor to add
+     */
+    private static void addStyleFrequency(Map<DefDescriptor<?>, MutableInt> frequencyMap,
+                                          DefDescriptor<?> descriptor) throws QuickFixException {
+        ComponentDef def = (ComponentDef) descriptor.getDef();
+        DefDescriptor<StyleDef> styleDefDescriptor = def.getStyleDescriptor();
+        if (styleDefDescriptor != null) {
+            // we only need the style of the component
+            MutableInt freq = frequencyMap.get(styleDefDescriptor);
+            if (freq == null) {
+                frequencyMap.put(styleDefDescriptor, new MutableInt(1));
+            } else {
+                freq.increment();
+            }
+        }
+
+        DefDescriptor<ComponentDef> superDescriptor =  def.getExtendsDescriptor();
+        // only when extends component is not the base aura:​component which is the default extends
+        if (superDescriptor != null && !superDescriptor.equals(def.getDefaultExtendsDescriptor())) {
+            // give supers addition freq to ensure supers are before descendants when sorted
+            // for instances where component is extended only once
+            addStyleFrequency(frequencyMap, superDescriptor);
+        }
     }
 
     /**

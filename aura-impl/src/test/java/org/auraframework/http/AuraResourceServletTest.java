@@ -228,6 +228,7 @@ public class AuraResourceServletTest extends AuraTestCase {
         //preloadTest:test_SimpleApplication has the second explicit reference to preloadTest as a preload namespace
         DefDescriptor<ApplicationDef> appDesc = Aura.getDefinitionService().getDefDescriptor("preloadTest:test_SimpleApplication", ApplicationDef.class);
         ctx.setApplicationDescriptor(appDesc);
+        Aura.getDefinitionService().updateLoaded(appDesc, false);
         
         StringBuilder output = new StringBuilder();
         AuraResourceServlet.writeCss(output);
@@ -235,10 +236,45 @@ public class AuraResourceServletTest extends AuraTestCase {
         //A snippet of component css
         String cssPiece = "AuraResourceServletTest-testWriteCssWithoutDupes";
         Pattern pattern = Pattern.compile(cssPiece);
-        System.out.println(output.toString());
         Matcher matcher = pattern.matcher(output.toString());
         int count = 0;
         while(matcher.find() && count<3) count++;
         assertEquals("Component CSS repeated", 1, count);
+    }
+
+    /**
+     * Verify super CSS is before CSS of components extending it. ui:input before ui:inputText before ui:inputNumber
+     * before ui:inputPercent
+     *
+     * This test needs to be refactored if/when empty CSS declarations are removed.
+     *
+     * @throws Exception
+     */
+    public void testCSSOrder() throws Exception {
+        Aura.getContextService().startContext(AuraContext.Mode.DEV, AuraContext.Format.CSS,
+                AuraContext.Access.AUTHENTICATED);
+        AuraContext ctx =  Aura.getContextService().getCurrentContext();
+        DefDescriptor<ApplicationDef> appDesc = Aura.getDefinitionService().getDefDescriptor("auratest:test_SimpleServerRenderedPage", ApplicationDef.class);
+        ctx.setApplicationDescriptor(appDesc);
+        Aura.getDefinitionService().updateLoaded(appDesc, false);
+
+        StringBuilder output = new StringBuilder();
+        AuraResourceServlet.writeCss(output);
+
+        String css = output.toString();
+
+        assertTrue("ui:input CSS should be before ui:inputText",
+                css.indexOf(".uiInput") < css.indexOf(".uiInputText"));
+        assertTrue("ui:inputText CSS should be before ui:inputNumber",
+                css.indexOf(".uiInputText") < css.indexOf(".uiInputNumber"));
+        assertTrue("ui:inputNumber CSS should be before ui:inputPercent",
+                css.indexOf(".uiInputNumber") < css.indexOf(".uiInputPercent"));
+        // Verify CSS sorts alphabetically when frequency (# of dependents) the same (inputPercent, inputRange, and
+        // inputFile all have 0 dependents).
+        assertTrue("ui:inputPercent CSS should be before ui:inputRange",
+                css.indexOf(".uiInputPercent") < css.indexOf(".uiInputRange"));
+        assertTrue("ui:inputFile CSS should be before ui:inputPercent",
+                css.indexOf(".uiInputFile") < css.indexOf(".uiInputPercent"));
+
     }
 }

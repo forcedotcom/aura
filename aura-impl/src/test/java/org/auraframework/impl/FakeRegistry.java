@@ -122,8 +122,4 @@ public class FakeRegistry implements MasterDefRegistry {
     public <T extends Definition> void putCachedString(String uid, DefDescriptor<?> descriptor, String key, String value) {
     }
 
-    @Override
-    public <T extends Definition> Map<DefDescriptor<?>, Integer> getDependenciesMap(String uid) {
-        return null;
-    }
 }

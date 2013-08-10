@@ -112,4 +112,6 @@ public interface BaseComponentDef extends RootDefinition {
 
     WhitespaceBehavior getWhitespaceBehavior();
 
+    DefDescriptor<? extends BaseComponentDef> getDefaultExtendsDescriptor();
+
 }

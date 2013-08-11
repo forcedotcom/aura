@@ -653,7 +653,6 @@ Action.prototype.toJSON = function() {
 Action.prototype.incomplete = function(context) {
 	this.state = "INCOMPLETE";
 	this.finishAction(context);
-	this.state = "NEW";
 };
 
 /**

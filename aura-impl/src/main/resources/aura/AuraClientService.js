@@ -175,8 +175,15 @@ var AuraClientService = function() {
                     var action = $A.get("c.aura://ComponentController." + method);
 
                     action.setStorable({
-                            "ignoreExisting" : true
+                        "ignoreExisting" : true
                     });
+                    //
+                    // No, really, do not abort this. The setStorable above defaults this
+                    // to be abortable, but, even though nothing should ever trigger an action
+                    // that could be abortable here (we haven't loaded the app yet, so it shouldn't
+                    // be possible), we want to avoid any confusion.
+                    //
+                    action.setAbortable(false);
 
                     action.setParams({
                         name : tag,
@@ -203,7 +210,17 @@ var AuraClientService = function() {
                                 });
                             }
                         } else {
-                            $A.error(a.getError()[0].message);
+                            //
+                            // This can be either error or aborted, and we really should only
+                            // see error.
+                            //
+                            var errors = a.getError();
+
+                            if (errors && errors[0] && errors[0].message) {
+                                $A.error(a.getError()[0].message);
+                            } else {
+                                $A.error("Unable to load component, action state = "+state);
+                            }
                         }
 
                         $A.measure("Completed Component Callback", "Sending XHR " + $A.getContext().getNum());

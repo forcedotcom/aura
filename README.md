@@ -106,5 +106,15 @@ You should see a simple greeting in your browser.
 artifact in your project. They define the version of Aura that your project is using and each artifact 
 <dependency> should use the same version.
 
-To find out more about Aura, start up your Jetty server and type `http://localhost:8080/auradocs/docs.app` into your browser
+## Next Steps
+
+Now that you've created your first app, you might be wondering where do I go from here? There is much more to learn about Aura. Here are a few ideas for next steps.
+
+### Read the Documentation
+
+Start up your Jetty server and type `http://localhost:8080/auradocs/docs.app` into your browser
 to access the documentation.
+
+### Explore the Aura Note Sample App
+
+Explore the capabilities of the Aura framework through the [Aura Note sample app](https://github.com/forcedotcom/aura-note). Aura Note is a note-taking app showcasing the simplicity of building apps on Aura.

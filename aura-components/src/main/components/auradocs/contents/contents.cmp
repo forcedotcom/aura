@@ -182,6 +182,7 @@
                     <auradocs:contentsNode text="Introduction" id="serverSideControllers" />
                     <auradocs:contentsNode text="Abortable Actions" id="abortableActions" />                                                
                     <auradocs:contentsNode text="Storable Server-Side Actions" id="storableServerSideActions" />
+                    <auradocs:contentsNode text="Serializing Exceptions" id="serializeExceptions" />
                 </auradocs:contentsNode> 
                 <auradocs:contentsNode text="Server-Side Renderers" id="renderersServerSide" />
                  <auradocs:contentsNode text="Server-Side Providers" id="oodProviders" />

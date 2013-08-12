@@ -155,4 +155,36 @@ public class LocalizationAppUITest extends WebDriverTestCase {
         assertEquals("InputDdate component rendered with wrong value", "1.2235", elementInput.getAttribute("value"));
         assertEquals("outputDdate component rendered with wrong value", "122%", elementoutput.getText());        
     }
+    
+    // Checking functionality of the inputCurrency/outputCurrency components
+    @ExcludeBrowsers({ BrowserType.IE9, BrowserType.IE10, BrowserType.SAFARI, BrowserType.ANDROID_PHONE,
+            BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
+    public void testCurrencyComponents() throws Exception {
+        open(URL);        
+        
+        //initial load
+        WebElement elementInput = findDomElement(By.cssSelector("span[id='MyCurrency'] > input[class~='uiInputNumber']"));
+        WebElement elementoutput = findDomElement(By.cssSelector("span[class~='uiOutputCurrency']"));
+        assertEquals("InputDdate component rendered with wrong value", "$123,456.79", elementInput.getAttribute("value"));
+        assertEquals("outputDdate component rendered with wrong value", "$123,456.79", elementoutput.getText());
+
+        //Tab out
+        elementInput.click();
+        elementInput.clear();
+        elementInput.sendKeys("123456");
+        auraUITestingUtil.pressTab(elementInput);
+        
+        assertEquals("InputDdate component rendered with wrong value", "123456", elementInput.getAttribute("value"));
+        assertEquals("outputDdate component rendered with wrong value", "$123,456.00", elementoutput.getText());
+        
+        //Submit click
+        elementInput.click();
+        elementInput.clear();
+        elementInput.sendKeys("123.456");
+        WebElement elementButton = findDomElement(By.cssSelector("button[title~='Currency']"));
+        elementButton.click();
+                        
+        assertEquals("InputDdate component rendered with wrong value", "123.456", elementInput.getAttribute("value"));
+        assertEquals("outputDdate component rendered with wrong value", "$123.46", elementoutput.getText());        
+    }
 }

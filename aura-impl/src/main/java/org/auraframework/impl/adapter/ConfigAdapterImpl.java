@@ -27,6 +27,8 @@ import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.impl.javascript.AuraJavascriptGroup;
 import org.auraframework.impl.javascript.AuraJavascriptResourceGroup;
 import org.auraframework.impl.util.AuraImplFiles;
+import org.auraframework.impl.util.BrowserInfo;
+import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.AuraError;
 import org.auraframework.throwable.AuraRuntimeException;
@@ -191,8 +193,24 @@ public class ConfigAdapterImpl implements ConfigAdapter {
         if (!"GMT".equals(locale)) {
             urls.add(String.format("%s/auraFW/resources/%s/walltime-js/olson/walltime-data_%s.js?aura.fwuid=%s", contextPath, nonce, locale, nonce));
         }
+        
         urls.add(String.format("%s/auraFW/resources/%s/walltime-js/walltime.js?aura.fwuid=%s", contextPath, nonce, nonce));
         return urls;
+    }
+
+    @Override
+    public String getHTML5ShivURL() {
+    	String ret = null;
+    	AuraContext context = Aura.getContextService().getCurrentContext();
+    	String ua = context != null ? context.getClient().getUserAgent() : null;
+        BrowserInfo b = new BrowserInfo(ua);
+        if (b.isIE7() || b.isIE8()) {
+            String nonce = context.getFrameworkUID();
+            String contextPath = context.getContextPath();
+            ret = String.format("%s/auraFW/resources/%s/html5shiv/html5shiv.js?aura.fwuid=%s", contextPath, nonce, nonce);
+        }
+
+        return ret;
     }
 
     @Override

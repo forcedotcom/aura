@@ -65,4 +65,6 @@ public interface ConfigAdapter extends AuraAdapter {
     boolean isAuraJSStatic();
 
     boolean validateCss();
+
+	String getHTML5ShivURL();
 }

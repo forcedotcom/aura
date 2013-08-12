@@ -505,6 +505,11 @@ public abstract class AuraBaseServlet extends HttpServlet {
 
         List<String> ret = Lists.newArrayList();
 
+        String html5ShivURL = config.getHTML5ShivURL();
+        if (html5ShivURL != null) {
+        	ret.add(html5ShivURL);
+        }
+        
         switch (mode) {
         case PTEST:
             ret.add(config.getJiffyJSURL());
@@ -515,6 +520,7 @@ public abstract class AuraBaseServlet extends HttpServlet {
             break;
         default:
         }
+        
         ret.add(config.getMomentJSURL());
         ret.addAll(config.getWalltimeJSURLs());
 

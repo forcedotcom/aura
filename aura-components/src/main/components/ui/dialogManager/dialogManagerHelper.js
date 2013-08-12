@@ -329,9 +329,14 @@
                 // if not a modal, then just hide the dialog immediately
                 $A.util.addClass(outer, "hidden");
             }
+            
             // apply proper element focus if necessary
             if (config.oldFocus) {
-                config.oldFocus.focus();
+            	try {
+            		config.oldFocus.focus();
+            	} catch (e) {
+            		// Ignore these - invalid element or in IE7/8 trying to set focus to an invisible element
+            	}
             }
         }
 

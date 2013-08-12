@@ -176,5 +176,83 @@
         test: function(component){
             aura.test.assertEquals('$1,234,567,890,123,456,789,012,345,678,901,234,567,890.12', $A.test.getText(component.find('span').getElement()), "Unexpected value.");
         }
+    },
+    
+    /**
+     * Verify that when the value changes it is rerendered with the new value
+     */
+    testUpdateValue: {
+        attributes : {value : 1234567890, format : '¤#,##0.0000'},
+        test: function(component){
+            aura.test.assertEquals('$1,234,567,890.0000', $A.test.getText(component.find('span').getElement()), "Value not formatted correctly");
+            component.getValue("v.value").setValue(1234567890.1234);
+            $A.rerender(component);
+            aura.test.assertEquals('$1,234,567,890.1234', $A.test.getText(component.find('span').getElement()), "Value not updated after changed");
+        }
+    },
+    
+    /**
+     * Verify that when the value doesn't change it is rerendered with the same value
+     */
+    testUpdateValueWithSame: {
+        attributes : {value : 1234567890, format : '¤#,##0.0000'},
+        test: function(component){
+        	aura.test.assertEquals('$1,234,567,890.0000', $A.test.getText(component.find('span').getElement()), "Value not formatted correctly");
+            component.getValue("v.value").setValue(1234567890);
+            $A.rerender(component);
+            aura.test.assertEquals('$1,234,567,890.0000', $A.test.getText(component.find('span').getElement()), "Value not updated after changed");
+        }
+    },
+
+    /**
+     * Verify that when the format changes it is rerendered using the new format
+     */
+    testUpdateFormat: {
+        attributes : {value : 1234567890, format : '¤#,##0.0000'},
+        test: function(component){
+            aura.test.assertEquals('$1,234,567,890.0000', $A.test.getText(component.find('span').getElement()), "Value not formatted correctly");
+            component.getValue("v.format").setValue("¤#,##0.00");
+            $A.rerender(component);
+            aura.test.assertEquals('$1,234,567,890.00', $A.test.getText(component.find('span').getElement()), "Value not updated after format changed");
+        }
+    },
+    
+    /**
+     * Verify that when the format doesn't change it is rerendered using the same format
+     */
+    testUpdateFormatWithSame: {
+        attributes : {value : 1234567890, format : '¤#,##0.0000'},
+        test: function(component){
+        	aura.test.assertEquals('$1,234,567,890.0000', $A.test.getText(component.find('span').getElement()), "Value not formatted correctly");
+            component.getValue("v.format").setValue("¤#,##0.0000");
+            $A.rerender(component);
+            aura.test.assertEquals('$1,234,567,890.0000', $A.test.getText(component.find('span').getElement()), "Value not updated after format changed");
+        }
+    },
+    
+    /**
+     * Verify that when the currencySymbol changes it is rerendered with the new currencySymbol
+     */
+    testUpdateCurrencySymbol: {
+        attributes : {value : 1234567890, currencySymbol : '$'},
+        test: function(component){
+            aura.test.assertEquals('$1,234,567,890.00', $A.test.getText(component.find('span').getElement()), "Value not formatted correctly");
+            component.getValue("v.currencySymbol").setValue('£');
+            $A.rerender(component);
+            aura.test.assertEquals('£1,234,567,890.00', $A.test.getText(component.find('span').getElement()), "Value not updated after changed");
+        }
+    },
+    
+    /**
+     * Verify that when the currencyCode changes it is rerendered with the new currencyCode
+     */
+    testUpdateCurrencyCode: {
+        attributes : {value : 1234567890, currencyCode : 'USD'},
+        test: function(component){
+            aura.test.assertEquals('USD1,234,567,890.00', $A.test.getText(component.find('span').getElement()), "Value not formatted correctly");
+            component.getValue("v.currencyCode").setValue('GBP');
+            $A.rerender(component);
+            aura.test.assertEquals('GBP1,234,567,890.00', $A.test.getText(component.find('span').getElement()), "Value not updated after changed");
+        }
     }
 })

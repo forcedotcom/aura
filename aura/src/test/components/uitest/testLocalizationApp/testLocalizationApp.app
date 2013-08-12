@@ -46,4 +46,10 @@
     your Percent value is: <ui:outputPercent aura:id="outPercent" value="{!m.percent}"/> <br/>
     <br/>
 
+	<div>Input Currency</div>
+    enter Currency: <span id="MyCurrency"><ui:inputCurrency aura:id="inCurrency" value="{!m.currency}"/></span> <br/>
+    <ui:button buttonTitle="Currency" label="submit" press="{!c.submit}"/> <br/>
+    your Currency value is: <ui:outputCurrency aura:id="outCurrency" value="{!m.currency}"/> <br/>
+    <br/>
+
 </aura:application>

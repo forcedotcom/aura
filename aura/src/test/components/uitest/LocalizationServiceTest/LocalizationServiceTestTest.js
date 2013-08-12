@@ -611,5 +611,18 @@
 	        aura.test.assertEquals("-315%", $A.localizationService.formatPercent(-3.14559), "Both values should be same.");
 	        aura.test.assertEquals("-314%", $A.localizationService.formatPercent(-3.14119), "Both values should be same.");
         }        
+    },
+
+	testFormatCurrency:{
+        test:function(component){
+        	var testCmp = component.find('myOutputCurrencyComp');
+            aura.test.assertNotNull(testCmp);
+        	aura.test.assertEquals('$1,234,567,890.00', $A.test.getText(testCmp.find('span').getElement()), "Decimal part of value was not rounded up based on format.");        			
+	        aura.test.assertEquals("($1,234,567,890.00)", $A.localizationService.formatCurrency(-1234567890), "Both values should be same.");
+	        aura.test.assertEquals("$1,234,567,890.32", $A.localizationService.formatCurrency(1234567890.321), "Both values should be same.");
+	        aura.test.assertEquals("$1,234,567,890.33", $A.localizationService.formatCurrency(1234567890.326), "Both values should be same.");
+
+        }        
     }
+
 })

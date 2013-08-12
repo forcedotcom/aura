@@ -49,23 +49,22 @@
             } else {
                 formatted = $A.localizationService.formatCurrency(num);
             }
-            span.innerText = formatted;
+            span.textContent = span.innerText = formatted;
         }
         return span;
     },
 
     rerender: function outputNumberRerenderer(cmp, helper) {
-        if ($A.util.isUndefinedOrNull(this.symbols.currency)) {
-            this.symbols.currency = this.symbols.currencyCode;
-        }
         var val = cmp.getValue("v.value");
         var f = cmp.getValue("v.format");
-        var currencyCode = cmp.get("v.currencyCode");
-        var currencySymbol = cmp.get("v.currencySymbol") || currencyCode;
-        if (val.isDirty() || f.isDirty()) {
+        var currencyCode = cmp.getValue("v.currencyCode");
+        var currencySymbol = cmp.getValue("v.currencySymbol");
+        if (val.isDirty() || f.isDirty() || currencyCode.isDirty() || currencySymbol.isDirty()) {
             var formatted = '';
             f = f.unwrap();
             val = val.unwrap();
+            currencyCode = currencyCode.unwrap();
+            currencySymbol = currencySymbol.unwrap() || currencyCode;
             if ($A.util.isNumber(val) || $A.util.isString(val)) {
                 var hasFormat = !$A.util.isEmpty(f);
                 if (hasFormat || currencySymbol) {
@@ -96,7 +95,7 @@
                 }
             }
             var span = cmp.find("span");
-            span.getElement().innerText = formatted;
+            span.getElement().textContent = span.getElement().innerText = formatted;
         }
     }
 })

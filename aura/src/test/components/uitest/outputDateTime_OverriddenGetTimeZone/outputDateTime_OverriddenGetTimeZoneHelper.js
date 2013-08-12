@@ -14,8 +14,15 @@
  * limitations under the License.
  */
 ({        	
-    formatDateTime: function(component) {        
-        var _helper = component.getDef().getHelper();
-        _helper.displayDateTime(component.getSuper(), "23-9-2005 4:30 PM");	 
-	}
+    getTimeZone: function(component) {
+        return 'America/New_York';
+    },
+
+	displayDateTime: function(component, displayValue) {
+        var outputCmp = component.getSuper().find("span");
+        var elem = outputCmp ? outputCmp.getElement() : null;
+        if (elem) {
+            elem.textContent = elem.innerText = displayValue;
+        }
+    }
 })

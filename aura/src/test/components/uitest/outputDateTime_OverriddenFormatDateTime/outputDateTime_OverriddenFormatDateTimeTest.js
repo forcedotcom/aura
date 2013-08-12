@@ -17,7 +17,7 @@
     testFormatDateTime:{
         test:function(cmp){
             aura.test.addWaitFor(true, function(){return $A.test.getText(cmp.getSuper().find('span').getElement()).length > 0;},function(){
-                aura.test.assertEquals("23-9-2004 4:30 PM", $A.test.getText(cmp.getSuper().find('span').getElement()), "Value should be the one specified in the overridden method");
+                aura.test.assertEquals("23-9-2005 4:30 PM", $A.test.getText(cmp.getSuper().find('span').getElement()), "Value should be the one specified in the overridden method");
             });
         }
     }

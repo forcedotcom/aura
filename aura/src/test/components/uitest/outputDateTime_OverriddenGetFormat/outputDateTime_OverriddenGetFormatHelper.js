@@ -14,8 +14,17 @@
  * limitations under the License.
  */
 ({        	
-    formatDateTime: function(component) {        
-        var _helper = component.getDef().getHelper();
-        _helper.displayDateTime(component.getSuper(), "23-9-2005 4:30 PM");	 
-	}
+
+    getFormat: function(component) {
+        return 'Z ss:mm:HH MM dd yyyy';
+    },
+
+	displayDateTime: function(component, displayValue) {
+        var outputCmp = component.getSuper().find("span");
+        var elem = outputCmp ? outputCmp.getElement() : null;
+        if (elem) {
+            elem.textContent = elem.innerText = displayValue;
+        }
+    }
+
 })

@@ -594,12 +594,14 @@ var AuraClientService = function() {
          */
         registerTransaction: function() {
             //#if {"modes" : ["PTEST"]}
-            // to only profile the transactions and not the initial page load
-            // clear out existing timers
-            $A.removeStats();
-            $A.getContext().clearTransactionName();
-            // start a Jiffy transaction
-            $A.startTransaction($A.getContext().incrementTransaction());
+            if (!$A.hasActiveTransaction($A.getContext().getTransaction())) {
+                // to only profile the transactions and not the initial page load
+                // clear out existing timers
+                $A.removeStats();
+                $A.getContext().clearTransactionName();
+                // start a Jiffy transaction
+                $A.startTransaction($A.getContext().incrementTransaction());
+            }
             //#end
         },
 

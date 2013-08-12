@@ -37,8 +37,8 @@ public class LocalizationAppUITest extends WebDriverTestCase {
         //initial load
         WebElement elementInput = findDomElement(By.cssSelector("input[class~='uiInputDate']"));
         WebElement elementoutput = findDomElement(By.cssSelector("span[class~='uiOutputDate']"));
-        assertEquals("InputDdate component rendered with wrong value", "Sep 23, 2004", elementInput.getAttribute("value"));
-        assertEquals("outputDdate component rendered with wrong value", "Sep 23, 2004", elementoutput.getText());
+        assertEquals("InputDate component rendered with wrong value", "Sep 23, 2004", elementInput.getAttribute("value"));
+        assertEquals("outputDate component rendered with wrong value", "Sep 23, 2004", elementoutput.getText());
 
         //Tab out
         elementInput.click();
@@ -46,8 +46,8 @@ public class LocalizationAppUITest extends WebDriverTestCase {
         elementInput.sendKeys("Sep 23, 2005");
         auraUITestingUtil.pressTab(elementInput);
         
-        assertEquals("InputDdate component rendered with wrong value", "Sep 23, 2005", elementInput.getAttribute("value"));
-        assertEquals("outputDdate component rendered with wrong value", "Sep 23, 2005", elementoutput.getText());
+        assertEquals("InputDate component rendered with wrong value", "Sep 23, 2005", elementInput.getAttribute("value"));
+        assertEquals("outputDate component rendered with wrong value", "Sep 23, 2005", elementoutput.getText());
         
         //Submit click
         elementInput.click();
@@ -56,8 +56,8 @@ public class LocalizationAppUITest extends WebDriverTestCase {
         WebElement elementButton = findDomElement(By.cssSelector("button[title~='Date']"));
         elementButton.click();
                         
-        assertEquals("InputDdate component rendered with wrong value", "Sep 23, 2006", elementInput.getAttribute("value"));
-        assertEquals("outputDdate component rendered with wrong value", "Sep 23, 2006", elementoutput.getText());        
+        assertEquals("InputDate component rendered with wrong value", "Sep 23, 2006", elementInput.getAttribute("value"));
+        assertEquals("outputDate component rendered with wrong value", "Sep 23, 2006", elementoutput.getText());        
     }
     
     // Checking functionality of the inputDateTime/outputDateTime components
@@ -69,8 +69,8 @@ public class LocalizationAppUITest extends WebDriverTestCase {
         //initial load
         WebElement elementInput = findDomElement(By.cssSelector("input[class~='uiInputDateTime']"));
         WebElement elementoutput = findDomElement(By.cssSelector("span[class~='uiOutputDateTime']"));
-        assertEquals("InputDdate component rendered with wrong value", "Oct 23, 2004 4:30:00 PM", elementInput.getAttribute("value"));
-        assertEquals("outputDdate component rendered with wrong value", "Oct 23, 2004 4:30:00 PM", elementoutput.getText());
+        assertEquals("InputDateTime component rendered with wrong value", "Oct 23, 2004 4:30:00 PM", elementInput.getAttribute("value"));
+        assertEquals("outputDateTime component rendered with wrong value", "Oct 23, 2004 4:30:00 PM", elementoutput.getText());
 
         //Tab out
         elementInput.click();
@@ -78,8 +78,8 @@ public class LocalizationAppUITest extends WebDriverTestCase {
         elementInput.sendKeys("Oct 23, 2005 9:30:00 AM");
         auraUITestingUtil.pressTab(elementInput);
         
-        assertEquals("InputDdate component rendered with wrong value", "Oct 23, 2005 4:30:00 PM", elementInput.getAttribute("value"));
-        assertEquals("outputDdate component rendered with wrong value", "Oct 23, 2005 4:30:00 PM", elementoutput.getText());
+        assertEquals("InputDateTime component rendered with wrong value", "Oct 23, 2005 4:30:00 PM", elementInput.getAttribute("value"));
+        assertEquals("outputDateTime component rendered with wrong value", "Oct 23, 2005 4:30:00 PM", elementoutput.getText());
         
         //Submit click
         elementInput.click();
@@ -88,8 +88,8 @@ public class LocalizationAppUITest extends WebDriverTestCase {
         WebElement elementButton = findDomElement(By.cssSelector("button[title~='DateTime']"));
         elementButton.click();
                         
-        assertEquals("InputDdate component rendered with wrong value", "Oct 23, 2006 4:30:00 PM", elementInput.getAttribute("value"));
-        assertEquals("outputDdate component rendered with wrong value", "Oct 23, 2006 4:30:00 PM", elementoutput.getText());        
+        assertEquals("InputDateTime component rendered with wrong value", "Oct 23, 2006 4:30:00 PM", elementInput.getAttribute("value"));
+        assertEquals("outputDateTime component rendered with wrong value", "Oct 23, 2006 4:30:00 PM", elementoutput.getText());        
     }
     
     // Checking functionality of the inputNumber/outputNumber components
@@ -101,8 +101,8 @@ public class LocalizationAppUITest extends WebDriverTestCase {
         //initial load
         WebElement elementInput = findDomElement(By.cssSelector("input[class~='uiInputNumber']"));
         WebElement elementoutput = findDomElement(By.cssSelector("span[class~='uiOutputNumber']"));
-        assertEquals("InputDdate component rendered with wrong value", "411", elementInput.getAttribute("value"));
-        assertEquals("outputDdate component rendered with wrong value", "411", elementoutput.getText());
+        assertEquals("InputNumber component rendered with wrong value", "411", elementInput.getAttribute("value"));
+        assertEquals("outputNumber component rendered with wrong value", "411", elementoutput.getText());
 
         //Tab out
         elementInput.click();
@@ -110,8 +110,8 @@ public class LocalizationAppUITest extends WebDriverTestCase {
         elementInput.sendKeys("511");
         auraUITestingUtil.pressTab(elementInput);
         
-        assertEquals("InputDdate component rendered with wrong value", "511", elementInput.getAttribute("value"));
-        assertEquals("outputDdate component rendered with wrong value", "511", elementoutput.getText());
+        assertEquals("InputNumber component rendered with wrong value", "511", elementInput.getAttribute("value"));
+        assertEquals("outputNumber component rendered with wrong value", "511", elementoutput.getText());
         
         //Submit click
         elementInput.click();
@@ -120,8 +120,8 @@ public class LocalizationAppUITest extends WebDriverTestCase {
         WebElement elementButton = findDomElement(By.cssSelector("button[title~='Number']"));
         elementButton.click();
                         
-        assertEquals("InputDdate component rendered with wrong value", "611", elementInput.getAttribute("value"));
-        assertEquals("outputDdate component rendered with wrong value", "611", elementoutput.getText());        
+        assertEquals("InputNumber component rendered with wrong value", "611", elementInput.getAttribute("value"));
+        assertEquals("outputNumber component rendered with wrong value", "611", elementoutput.getText());        
     }
     
     // Checking functionality of the inputPercent/outputPercent components
@@ -133,8 +133,8 @@ public class LocalizationAppUITest extends WebDriverTestCase {
         //initial load
         WebElement elementInput = findDomElement(By.cssSelector("input[class~='uiInputPercent']"));
         WebElement elementoutput = findDomElement(By.cssSelector("span[class~='uiOutputPercent']"));
-        assertEquals("InputDdate component rendered with wrong value", "1,235%", elementInput.getAttribute("value"));
-        assertEquals("outputDdate component rendered with wrong value", "1,235%", elementoutput.getText());
+        assertEquals("InputPercent component rendered with wrong value", "1,235%", elementInput.getAttribute("value"));
+        assertEquals("outputPercent component rendered with wrong value", "1,235%", elementoutput.getText());
 
         //Tab out
         elementInput.click();
@@ -142,8 +142,8 @@ public class LocalizationAppUITest extends WebDriverTestCase {
         elementInput.sendKeys(".2235");
         auraUITestingUtil.pressTab(elementInput);
         
-        assertEquals("InputDdate component rendered with wrong value", ".2235", elementInput.getAttribute("value"));
-        assertEquals("outputDdate component rendered with wrong value", "22%", elementoutput.getText());
+        assertEquals("InputPercent component rendered with wrong value", ".2235", elementInput.getAttribute("value"));
+        assertEquals("outputPercent component rendered with wrong value", "22%", elementoutput.getText());
         
         //Submit click
         elementInput.click();
@@ -152,8 +152,8 @@ public class LocalizationAppUITest extends WebDriverTestCase {
         WebElement elementButton = findDomElement(By.cssSelector("button[title~='Percent']"));
         elementButton.click();
                         
-        assertEquals("InputDdate component rendered with wrong value", "1.2235", elementInput.getAttribute("value"));
-        assertEquals("outputDdate component rendered with wrong value", "122%", elementoutput.getText());        
+        assertEquals("InputPercent component rendered with wrong value", "1.2235", elementInput.getAttribute("value"));
+        assertEquals("outputPercent component rendered with wrong value", "122%", elementoutput.getText());        
     }
     
     // Checking functionality of the inputCurrency/outputCurrency components
@@ -165,8 +165,8 @@ public class LocalizationAppUITest extends WebDriverTestCase {
         //initial load
         WebElement elementInput = findDomElement(By.cssSelector("span[id='MyCurrency'] > input[class~='uiInputNumber']"));
         WebElement elementoutput = findDomElement(By.cssSelector("span[class~='uiOutputCurrency']"));
-        assertEquals("InputDdate component rendered with wrong value", "$123,456.79", elementInput.getAttribute("value"));
-        assertEquals("outputDdate component rendered with wrong value", "$123,456.79", elementoutput.getText());
+        assertEquals("InputCurrency component rendered with wrong value", "$123,456.79", elementInput.getAttribute("value"));
+        assertEquals("outputCurrency component rendered with wrong value", "$123,456.79", elementoutput.getText());
 
         //Tab out
         elementInput.click();
@@ -174,8 +174,8 @@ public class LocalizationAppUITest extends WebDriverTestCase {
         elementInput.sendKeys("123456");
         auraUITestingUtil.pressTab(elementInput);
         
-        assertEquals("InputDdate component rendered with wrong value", "123456", elementInput.getAttribute("value"));
-        assertEquals("outputDdate component rendered with wrong value", "$123,456.00", elementoutput.getText());
+        assertEquals("InputCurrency component rendered with wrong value", "123456", elementInput.getAttribute("value"));
+        assertEquals("outputCurrency component rendered with wrong value", "$123,456.00", elementoutput.getText());
         
         //Submit click
         elementInput.click();
@@ -184,7 +184,7 @@ public class LocalizationAppUITest extends WebDriverTestCase {
         WebElement elementButton = findDomElement(By.cssSelector("button[title~='Currency']"));
         elementButton.click();
                         
-        assertEquals("InputDdate component rendered with wrong value", "123.456", elementInput.getAttribute("value"));
-        assertEquals("outputDdate component rendered with wrong value", "$123.46", elementoutput.getText());        
+        assertEquals("InputCurrency component rendered with wrong value", "123.456", elementInput.getAttribute("value"));
+        assertEquals("outputCurrency component rendered with wrong value", "$123.46", elementoutput.getText());        
     }
 }

@@ -13,67 +13,52 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- .THIS {    
-    display: block;
-    width: 100%;
-    height: 400px;
-    color: #a9bdd0;
+.THIS {
+	display: block;
+	width: 100%;
+	color: #a9bdd0;
 }
 
- .THIS .uiCarouselPage {
- 	min-height: 400px;
- }
- 
- .THIS .carousel-page {
- 	min-height: 400px;
- }
- 
 .THIS .entity {
-    margin-right: auto;
-    margin-left: auto;
-    position: relative;
-    top: 32px;
+	margin-right: auto;
+	margin-left: auto;
+	position: relative;
+	top: 32px;
 }
 
-.THIS .entity-post {
-    background-color: #1396b1;
-    border-color: #0e6f83;
+.THIS .blue {
+	background-color: #1396b1;
+	border-color: #0e6f83;
 }
 
-.THIS .entity-task {
-    background-color: #30ae63;
-    border-color: #25864c;
+.THIS .green {
+	background-color: #30ae63;
+	border-color: #25864c;
 }
 
-.THIS .entity-opportunity {
-    background-color: #edbd1f;
-    border-color: #c99e10;
+.THIS .yellow {
+	background-color: #edbd1f;
+	border-color: #c99e10;
 }
 
 .THIS .entity-poll {
-    background-color: #4377bf;
-    border-color: #355f9a;
+	background-color: #4377bf;
+	border-color: #355f9a;
 }
 
-.THIS .entity-thanks {
-    background-color: #cd575c;
-    border-color: #ba373d;
+.THIS .red {
+	background-color: #cd575c;
+	border-color: #ba373d;
 }
-
-.THIS .entity-file {
-    background-color: #a79272;
-    border-color: #8e7958;
-}
-
 
 .THIS .entity-label {
-    position: relative;
-    top: 44px;
+	position: relative;
+	top: 44px;
 }
 
 .THIS .entity.entity-mdp {
-    display: block;
-    width: 56px;
-    height: 56px;
-    border: 0;
+	display: block;
+	width: 56px;
+	height: 56px;
+	border: 0;
 }

@@ -18,25 +18,25 @@
 	    	
 <aura:component>
 <div>   
-    <ui:carousel width="250" height="300">
-    <aura:set attribute="pageComponents">
-        <ui:carouselPage>
-            <ui:carouselPageItem label="New Post" class="entity-post" />
-			<ui:carouselPageItem label="New Task" class="entity-task" />
-			<ui:carouselPageItem label="New Opportunity " class="entity-opportunity" />	
-			<ui:carouselPageItem label="Thank Someone" class="entity-thanks" />
-        </ui:carouselPage>
-        <ui:carouselPage isDefault="true">
-			<ui:carouselPageItem label="New Post 2" class="entity-post" />
-			<ui:carouselPageItem label="Task 2" class="entity-task" />
-			<ui:carouselPageItem label="New Opportunity 2" class="entity-opportunity" />	
-			<ui:carouselPageItem label="Thank Someone 2" class="entity-thanks" />
-        </ui:carouselPage>
-        <ui:carouselPage>
-            <h1>{!m.header}</h1>
-            <p>{!m.str}</p>
-        </ui:carouselPage>
-    </aura:set>
+    <ui:carousel width="300">
+	    <aura:set attribute="pageComponents">
+	        <ui:carouselPage>
+	            <ui:carouselPageItem label="New Item" class="blue" />
+				<ui:carouselPageItem label="Search" class="green" />
+				<ui:carouselPageItem label="View All" class="yellow" />	
+				<ui:carouselPageItem label="Settings" class="red" />
+	        </ui:carouselPage>
+	        <ui:carouselPage isDefault="true">
+                <ui:carouselPageItem label="Find Item" class="blue" />
+                <ui:carouselPageItem label="Batch Delete" class="green" />
+                <ui:carouselPageItem label="Account" class="yellow" /> 
+                <ui:carouselPageItem label="Settings" class="red" />
+	        </ui:carouselPage>
+	        <ui:carouselPage>
+	            <h1>{!m.header}</h1>
+	            <p>{!m.str}</p>
+	        </ui:carouselPage>
+	    </aura:set>
     </ui:carousel>
 </div> 	
 

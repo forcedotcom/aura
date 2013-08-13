@@ -139,8 +139,8 @@ Test.Ui.OutputDateTime.HelperTest = function(){
         
         [Fact]
         function DateValue(){
-        	// Arrange
-        	var expectedDate = "Thu Sep 23 2004";
+        	// Arrange        	
+        	var expectedDate = "Date";
         	var expectedFormat = "YYYY-MM-DD 00:00";
         	var expectedLang = "en";        	
         	var actual;	
@@ -185,7 +185,7 @@ Test.Ui.OutputDateTime.HelperTest = function(){
 			var mockContext = Mocks.GetMock(Object.Global(), "$A", {                                
 				localizationService: {   
 					UTCToWallTime: function(dateObj,timezone, callback ) { callback(dateObj); },
-					formatDateTimeUTC: function(walltime, format, langLocale) { return walltime.toString()+format+langLocale; },
+					formatDateTimeUTC: function(walltime, format, langLocale) { return "Date"+format+langLocale; },
 					parseDateTimeISO8601: function(datetimeString) { return new Date(datetimeString); }            	
 	            }
 	        });												

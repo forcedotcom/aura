@@ -93,8 +93,10 @@ mvn install
 
     <p>In the Console window, you should see a message that the Jetty server started. In a browser, navigate to http://localhost:9090/ to access the server.</p>
 
+<!--
     <p><b>See also:</b><br/>
     <auradocs:topicLink topic="auraPlugin">Install the Aura Assist Eclipse Plugin</auradocs:topicLink> <br/>
     </p>
+-->    
 
 </aura:component>

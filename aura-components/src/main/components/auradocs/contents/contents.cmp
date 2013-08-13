@@ -38,7 +38,7 @@
                 <auradocs:contentsNode text="Introduction" id="qsIntro" />
                 <auradocs:contentsNode text="Quick Start: Command Line" id="qsCmdLine" />
                 <auradocs:contentsNode text="Quick Start: Eclipse">
-                    <auradocs:contentsNode text="Install the Aura Assist Eclipse Plugin" id="auraPlugin" />
+                    <!--<auradocs:contentsNode text="Install the Aura Assist Eclipse Plugin" id="auraPlugin" />-->
                     <auradocs:contentsNode text="Create an Aura App in Eclipse" id="eclipseCreateApp" />
                     <auradocs:contentsNode text="Add a Component" id="eclipseCreateCmp" />
                 </auradocs:contentsNode>

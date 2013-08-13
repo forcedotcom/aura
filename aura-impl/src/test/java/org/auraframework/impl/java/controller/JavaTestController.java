@@ -266,4 +266,8 @@ public class JavaTestController {
         AuraRuntimeException e = new AuraRuntimeException("throwExceptionNoLineNums", loc);
         throw e;
     }
+    
+    @AuraEnabled
+    public static void dummy() {
+    }
 }

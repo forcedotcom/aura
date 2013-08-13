@@ -13,24 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-({
-    doUpdate: function(component, value) {
-        if (value) {
-            value = value.replace(/%+$/g, '');
-        }
-        component.setValue("v.value", value);
+({        	
+
+    getFormat: function(component) {
+        return 'Z ss:mm:HH MM dd yyyy';
     },
 
-    getNumber: function(cmp) {
-        var num = cmp.get("v.value");
-        var scale = cmp.get("v.valueScale");
-        if ($A.util.isFiniteNumber(num) && scale) {
-            num *= Math.pow(10, scale);
+	displayDateTime: function(component, displayValue) {
+        var outputCmp = component.getSuper().find("span");
+        var elem = outputCmp ? outputCmp.getElement() : null;
+        if (elem) {
+            elem.textContent = elem.innerText = displayValue;
         }
-        return num;
-    },
-
-    getDefaultFormatter: function(cmp) {
-        return $A.localizationService.getDefaultPercentFormat();
     }
+
 })

@@ -16,6 +16,6 @@
 ({        	
     formatDateTime: function(component) {        
         var _helper = component.getDef().getHelper();
-        _helper.displayDateTime(component.getSuper(), "23-9-2004 4:30 PM");	 
+        _helper.displayDateTime(component.getSuper(), "23-9-2005 4:30 PM");	 
 	}
 })

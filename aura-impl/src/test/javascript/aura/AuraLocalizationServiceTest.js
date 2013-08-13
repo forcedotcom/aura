@@ -1226,8 +1226,14 @@ Test.Aura.AuraLocalizationServiceTest = function(){
     	[Fact]
         function DateObjectWithToISOString(){    		
             // Arrange       		
-    		var dt = new Date(2004,8,23,9,30,00,123);
-    		var expected = "2004-09-23T16:30:00.123Z";   
+    		var dt = new Date(2004,10,23,12,30,59,123);
+    		var expected = dt.getUTCFullYear() + "-" + 
+    					(dt.getUTCMonth() + 1) + "-" + 
+    					dt.getUTCDate() + "T" +
+    					(dt.getUTCHours() < 10 ? '0' + dt.getUTCHours() : dt.getUTCHours()) + ':' +
+    					dt.getUTCMinutes() + ':' +
+    					dt.getUTCSeconds() + '.' +
+    					dt.getUTCMilliseconds() + 'Z';   
             var actual;                        
                                      	         	                	
             // Act  
@@ -1240,9 +1246,15 @@ Test.Aura.AuraLocalizationServiceTest = function(){
     	[Fact]
         function DateObjectWithoutToISOString(){    		
             // Arrange       		
-    		var dt = new Date(2004,8,23,9,30,00,12);
+    		var dt = new Date(2004,10,23,12,30,59,123);
     		dt.toISOString = null;
-    		var expected = "2004-09-23T16:30:00.012Z";   
+    		var expected = dt.getUTCFullYear() + "-" + 
+    					(dt.getUTCMonth() + 1) + "-" + 
+    					dt.getUTCDate() + "T" +
+    					(dt.getUTCHours() < 10 ? '0' + dt.getUTCHours() : dt.getUTCHours()) + ':' +
+    					dt.getUTCMinutes() + ':' +
+    					dt.getUTCSeconds() + '.' +
+    					dt.getUTCMilliseconds() + 'Z';    		    		
             var actual;                        
                                      	         	                	
             // Act  

@@ -14,23 +14,12 @@
  * limitations under the License.
  */
 ({
-    doUpdate: function(component, value) {
-        if (value) {
-            value = value.replace(/%+$/g, '');
+    testFormatDateTime:{
+		attributes: {value : '2004-09-23T16:30:00.000Z'},
+        test:function(cmp){
+            aura.test.addWaitFor(true, function(){return $A.test.getText(cmp.getSuper().find('span').getElement()).length > 0;},function(){
+                aura.test.assertEquals("+00:00 00:30:16 09 23 2004", $A.test.getText(cmp.getSuper().find('span').getElement()), "Format should be the one specified in the overridden method");
+            });
         }
-        component.setValue("v.value", value);
-    },
-
-    getNumber: function(cmp) {
-        var num = cmp.get("v.value");
-        var scale = cmp.get("v.valueScale");
-        if ($A.util.isFiniteNumber(num) && scale) {
-            num *= Math.pow(10, scale);
-        }
-        return num;
-    },
-
-    getDefaultFormatter: function(cmp) {
-        return $A.localizationService.getDefaultPercentFormat();
     }
 })

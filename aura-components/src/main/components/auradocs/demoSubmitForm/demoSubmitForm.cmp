@@ -27,19 +27,19 @@
     <div class="form">
       
         <div class="row">
-            <ui:inputText label="First Name" class="formInput" aura:id="inFName" value="" placeholder="Jane"/>
+            <ui:inputText label="First Name" class="formInput" aura:id="inFName" placeholder="Jane"/>
         </div>
         <div class="row">
-            <ui:inputText label="Last Name" class="formInput" aura:id="inLName" value="" placeholder="Doe"/>
+            <ui:inputText label="Last Name" class="formInput" aura:id="inLName" placeholder="Doe"/>
         </div>
         <div class="row">
-            <ui:inputEmail label="E-mail" class="formInput" aura:id="inEmail" value="" placeholder="example@example.com"/>
+            <ui:inputEmail label="E-mail" class="formInput" aura:id="inEmail" placeholder="example@example.com"/>
         </div>
         <div class="row">
-            <ui:inputSecret label="Password" class="formInput" aura:id="inPW" value="" placeholder="at least 6 chars"/>
+            <ui:inputSecret label="Password" class="formInput" aura:id="inPW" placeholder="at least 6 chars"/>
         </div>
         <div class="row">
-            <ui:inputURL label="Website" class="formInput" aura:id="inURL" value="" placeholder="http://www.salesforce.com"/>
+            <ui:inputURL label="Website" class="formInput" aura:id="inURL" placeholder="http://www.salesforce.com"/>
         </div>
         <div class="row">
             <ui:label class="formLabel" label="D.O.B." for="inDOB"/>

@@ -1,0 +1,117 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="Text Fields"/>
+  
+		    <p>A text field can contain alphanumerical characters and special characters.  They inherit the functionalities and events from <code>ui:inputText</code> and <code>ui:input</code>, including <code>placeholder</code> and <code>size</code>
+		     and common keyboard and mouse events. If you want to render the output from these field components, use the respective <code>ui:output</code> components. For example, to render the output for the <code>ui:inputPhone</code> component,
+			   use <code>ui:outputPhone</code>.
+			</p>
+
+	<p>Text fields are represented by the following components.</p>
+	
+	  <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Field Type</th>
+                <th>Description</th>
+                <th>Related Components</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Email</td>
+                <td>An input field for entering an email address.</td>
+                <td><auradocs:defLink defType="component" descriptor="ui:inputEmail"/><br/>        
+                    <auradocs:defLink defType="component" descriptor="ui:outputEmail"/><br/>
+                    
+                </td>
+            </tr>
+            <tr>
+                <td>Phone</td>
+                <td>An input field for entering a phone number.</td>
+                <td><auradocs:defLink defType="component" descriptor="ui:inputPhone"/><br/>
+                <auradocs:defLink defType="component" descriptor="ui:outputPhone"/>
+                </td>
+            </tr>
+            <tr>
+                <td>Search</td>
+                <td>An input field for entering a search term.</td>
+                <td><auradocs:defLink defType="component" descriptor="ui:inputSearch"/>
+                </td>
+            </tr>
+            
+             <tr>
+                <td>Text</td>
+                <td>An input field for entering a single-line text.</td>
+                <td><auradocs:defLink defType="component" descriptor="ui:inputText"/><br/>
+                <auradocs:defLink defType="component" descriptor="ui:outputText"/>
+                </td>
+             </tr>
+             <tr>
+                <td>Text Area</td>
+                <td>An input field for entering multiple-line text.</td>
+                <td><auradocs:defLink defType="component" descriptor="ui:inputTextArea"/><br/>
+                <auradocs:defLink defType="component" descriptor="ui:outputTextArea"/>
+                </td>
+             </tr>
+             <tr>
+                <td>URL</td>
+                <td>An input field for entering a URL.</td>
+                <td><auradocs:defLink defType="component" descriptor="ui:inputURL"/><br/>
+                <auradocs:defLink defType="component" descriptor="ui:outputURL"/>
+                </td>
+             </tr>
+        </tbody>
+    </table>
+
+	<h4>Using the Text Fields</h4>
+	<p>The following code is a basic set up of an email field.</p>
+	<auradocs:codeblock>&lt;ui:label label="Email" for="emailField"/>
+&lt;ui:inputEmail placeholder="abc@email.com"/></auradocs:codeblock>
+	<p><code>ui:label</code> provides a text label for the corresponding field. For more information on using labels, see <auradocs:topicLink topic="label">Label</auradocs:topicLink>.
+	</p>
+	
+	<h4>Providing Auto-complete Suggestions in Text Fields</h4>
+	<p>Auto-complete is available with the <code>ui:autocomplete</code> component, which uses a text or text area of its own.
+	To use a text area, set the <code>inputType="inputTextArea"</code>. The default is <code>inputText</code>.</p>
+	<p>For an example, see <ui:outputURL value="https://github.com/forcedotcom/aura/tree/master/aura-components/src/main/components/auradev/autocompleteExample" label="autocompleteExample.app"/>.</p>
+	<h4>Styling Your Text Fields</h4>
+	<p>You can style the appearance of your text field and output. In the CSS file of your component, add the corresponding class selectors.</p>
+	<p>The following class selectors provide styles to the string rendering of the text. For example, to style the <code>ui:inputPhone</code> component, use <code>.THIS .uiInputPhone</code>.</p>
+	
+	<auradocs:codeblock>.THIS .uiInputEmail { //CSS declaration }
+.THIS .uiInputPhone { //CSS declaration }
+.THIS .uiInputSearch { //CSS declaration }
+.THIS .uiInputText { //CSS declaration }
+.THIS .uiInputTextArea { //CSS declaration }
+.THIS .uiInputURL { //CSS declaration }</auradocs:codeblock>
+	
+	<p>The following code provide styles to the given text field.</p>
+	<auradocs:codeblock>&lt;!--Text field with class attribute-->
+&lt;ui:inputEmail class="emailField"/>
+
+&lt;!--Style for date and time field-->
+.THIS .emailField { //CSS declaration }
+	</auradocs:codeblock>
+	<p>For more information on styling components, see <auradocs:topicLink topic="helloHTML">Applying HTML and CSS</auradocs:topicLink>.</p>
+	
+</aura:component>
+
+
+    

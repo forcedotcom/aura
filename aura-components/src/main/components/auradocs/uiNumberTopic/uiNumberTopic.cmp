@@ -1,0 +1,116 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="Number Fields"/>
+    
+    <ui:block>
+    	<aura:set attribute="left">
+		    <p>Number fields can contain a numerical value. Client-side formatting, localization, and HTML5 support are available. 
+		    They inherit the functionalities and events from <code>ui:inputNumber</code>, including <code>min</code> and <code>max</code> Decimal attributes and common keyboard and mouse events.
+		   If you want to render the output from these field components, use the respective <code>ui:output</code> components. For example, to render the output for the <code>ui:inputCurrency</code> component,
+		   use <code>ui:outputCurrency</code>.
+			</p>
+		</aura:set>
+	</ui:block>
+	<p>Number fields are represented by the following components.</p>
+    
+     <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Field Type</th>
+                <th>Description</th>
+                <th>Related Components</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Number</td>
+                <td>An input field for entering a numerical value.</td>
+                <td><auradocs:defLink defType="component" descriptor="ui:inputNumber"/><br/>
+                    <auradocs:defLink defType="component" descriptor="ui:outputNumber"/>
+                </td>
+            </tr>
+            <tr>
+                <td>Currency</td>
+                <td>An input field for entering a numerical currency value.</td>
+                <td><auradocs:defLink defType="component" descriptor="ui:inputCurrency"/><br/>
+                	<auradocs:defLink defType="component" descriptor="ui:outputCurrency"/><br/>
+                </td>
+            </tr>
+            <tr>
+                <td>Percentage</td>
+                <td>An input field for entering a numerical percentage value.</td>
+                <td><auradocs:defLink defType="component" descriptor="ui:inputPercent"/><br/>
+                	<auradocs:defLink defType="component" descriptor="ui:outputPercent"/>
+                </td>
+            </tr>          
+             <tr>
+                <td>Range</td>
+                <td>A slider for numerical input.</td>
+                <td><auradocs:defLink defType="component" descriptor="ui:inputRange"/>
+                </td>
+             </tr>
+        </tbody>
+    </table>
+
+	<h4>Using the Number Fields</h4>
+	<p>The following code is a basic set up of a percentage number field, which displays <code>50%</code> in the field.</p>
+	<auradocs:codeblock>&lt;ui:label label="Discount" for="discountField"/>
+&lt;ui:inputPercent aura:id="discountField" value="0.5"/></auradocs:codeblock>
+	<p>The following code is a basic set up of a range input, with the <code>min</code> and <code>max</code> attributes.</p>
+	<auradocs:codeblock>&lt;ui:label label="Quantity" for="qtyField"/>
+&lt;ui:inputRange aura:id="qtyField" min="1" max="10"/></auradocs:codeblock>
+	<p><code>ui:label</code> provides a text label for the corresponding field. For more information on using labels, see <auradocs:topicLink topic="label">Label</auradocs:topicLink>.
+	</p>
+	<h4>Formatting and Localizing the Number Fields</h4>
+	<p>The <code>format</code> attribute determines the format of the number input. The Locale default format is used if none is provided.
+	The following code is a basic set up of a number field, which displays <code>10,000.00</code> based on the provided <code>format</code> attribute.</p>
+<auradocs:codeblock>&lt;ui:label label="Cost" for="costField"/>
+&lt;ui:inputNumber aura:id="costField" format="##,#0,000.00#" value="10000"/></auradocs:codeblock>
+	
+	<p>The following code is a basic set up of a percentage field with client-side formatting, which displays <code>14.000%</code> based on the provided <code>format</code> attribute.</p>
+	<auradocs:codeblock>&lt;ui:label label="Growth" for="pField"/>
+&lt;ui:outputPercent aura:id="pField" value="0.14" format=".000%"/></auradocs:codeblock>
+	
+	<p>The following code is a basic set up of a currency field with localization, which displays <code>£10.00</code> based on the provided <code>currencySymbol</code> and <code>format</code> attributes.
+	You can also set the <code>currencyCode</code> attribute with an ISO 4217 currency code, such as <code>USD</code> or <code>GBP</code>.</p>
+	<auradocs:codeblock>&lt;ui:outputCurrency value="10" currencySymbol="£" format="¤.00" /></auradocs:codeblock>
+
+	<p>For more information on client-side localization, see <auradocs:topicLink topic="localization">Localization</auradocs:topicLink>.</p>
+	<h4>Styling Your Number Fields</h4>
+	<p>You can style the appearance of your number field and output. In the CSS file of your component, add the corresponding class selectors.
+	The following class selectors provide styles to the string rendering of the numbers. For example, to style the <code>ui:inputCurrency</code> component, use <code>.THIS .uiInputCurrency</code>.</p>
+	
+	<auradocs:codeblock>.THIS .uiInputNumber { //CSS declaration }
+.THIS .uiInputCurrency { //CSS declaration }
+.THIS .uiInputPercentage { //CSS declaration }
+.THIS .uiInputRange { //CSS declaration }</auradocs:codeblock>
+
+	<p>The following code provide styles to the given number field.</p>
+	<auradocs:codeblock>&lt;!--Number field with class attribute-->
+&lt;ui:inputNumber aura:id="numField" class="num"  value="100"/>
+
+&lt;!--Style for date and time field-->
+.THIS .num { //CSS declaration }
+	</auradocs:codeblock>
+	<p>For more information on styling components, see <auradocs:topicLink topic="helloHTML">Applying HTML and CSS</auradocs:topicLink>.</p>
+	
+</aura:component>
+
+
+    

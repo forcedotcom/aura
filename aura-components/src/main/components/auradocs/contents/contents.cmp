@@ -95,6 +95,15 @@
 
         <auradocs:contentsNode text="Creating Apps">
             <auradocs:contentsNode text="Overview" id="createApps"/>
+            <auradocs:contentsNode text="User Interface">
+            	<auradocs:contentsNode text="Overview" id="overviewUI"/>
+            	<auradocs:contentsNode text="Input Components" id="input"/>
+            	<auradocs:contentsNode text="Buttons" id="uiButton"/>
+            	<auradocs:contentsNode text="Date and Time Fields" id="uiField"/>
+            	<auradocs:contentsNode text="Number Fields" id="uiNumber"/>
+            	<auradocs:contentsNode text="Text Fields" id="uiText"/>
+            	<auradocs:contentsNode text="Checkboxes" id="uiCheckbox"/>
+            </auradocs:contentsNode>
             <auradocs:contentsNode text="Designing App UI" id="designAppLayout"/>
             <auradocs:contentsNode text="Creating App Templates" id="createAppTemplate"/>
             <auradocs:contentsNode text="Adding App Components" id="addAppComponents"/>

@@ -22,14 +22,42 @@
 <p>The advantage of using Aura Storage Service instead of other caching infrastructures, such as Apple local storage for iOS devices, is that Aura Storage Service offers several types of storage through adapters. Storage can be persistent and secure. With persistent storage, cached data is preserved between user sessions in the browser. With secure storage, cached data is encrypted.</p>
 
 <h3>Available Storage Adapters</h3>
+
+<table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Storage Adapter Name</th>
+                    <th>Persistent</th>
+                    <th>Secure</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>SmartStore</td>
+                    <td><code>true</code></td>
+                    <td><code>true</code></td>
+                </tr>
+                <tr>
+                    <td>WebSQL</td>
+                    <td><code>true</code></td>
+                    <td><code>false</code></td>
+                </tr>
+                <tr>
+                    <td>MemoryAdapter</td>
+                    <td><code>false</code></td>
+                    <td><code>true</code></td>
+                </tr>
+            </tbody>
+    </table>
+
 <h4>SmartStore</h4>
 <p>(Persistent and secure) The SmartStore caching service is provided by the Salesforce Mobile SDK and is available only if you have installed the Salesforce Mobile SDK. The Salesforce Mobile SDK enables developing mobile applications that integrate with Salesforce. You can use SmartStore with these mobile applications for caching data. </p>
 
+<h4>WebSQL</h4>
+<p>(Persistent but not secure) Provides access to a client-side SQL database.</p>
+
 <h4>MemoryAdapter</h4>
 <p>(Not persistent but secure) Provides access to the JavaScript main memory space for caching data. The stored cache persists only per browser page. Browsing to a new page resets the cache. Also, MemoryAdapter provides cache management capabilities. If the memory size limit has been reached, MemoryAdapter removes the least recently used data from the cache to shrink the cache size.</p>
-
-<h4>WebSQL</h4>
-<p>(Persistent but not secure) Provides access to a client-side SQL database using SQLite. Web SQL storage is available for Chrome and Safari browsers only.<!-- TODO: add Android to list when W-1700767 is closed --></p>
 
 <h3>Storage Adapter Selection</h3>
 <p>Aura Storage Service selects a storage adapter on your behalf that matches the  persistent and secure options you specify when initializing the service. For example, if you request a persistent and secure storage service, Aura Storage Service will return the SmartStore storage.</p>
@@ -45,7 +73,7 @@
 
 <h3>Initializing and Using Storage</h3>
 
-<p>To use storage, you must initialize it first and specify a name and, optionally, other properties. If you don't specify the optional properties, the Aura Storage Service uses default values set by the <code>initStorage()</code> JavaScript API of <auradocs:topicLink topic="api:AuraStorageService">AuraStorageService</auradocs:topicLink>.</p>
+<p>To use storage, you must initialize it first and specify a name and, optionally, other properties. If you don't specify the optional properties, the Aura Storage Service uses default values set by the <code>initStorage()</code> JavaScript API of <a href="#reference?topic=api:AuraStorageService">AuraStorageService</a>.</p>
 
 <h4>Initializing Storage Using Aura Markup</h4>
 <p>You can initialize storage for your component using markup in one of two ways: by using a template or by adding the markup in the component body.</p>
@@ -85,23 +113,21 @@
 </auradocs:codeblock><br/>
 
 <h4>Initializing Storage Using JavaScript API</h4>
-<p>Alternatively, you can initialize storage using the JavaScript API. This example shows how to initialize Aura Storage Service using <code>initStorage()</code> in a JavaScript client-side controller.</p>
+<p>Alternatively, you can initialize storage on-the-fly using the JavaScript API. This example shows how to initialize Aura Storage Service using <code>initStorage()</code> in a JavaScript client-side controller.</p>
 
 <auradocs:codeblock>
-var storage = $A.storageService.initStorage({ 
-    "name": "MyStorage", 
-    "persistent": true,
-    "secure": true,
-    "maxSize":512,
-    "defaultExpiration":600,
-    "defaultAutoRefreshInterval":600,
-    "debugLoggingEnabled":true,
-    "clearStorageOnInit":true
-});
+var storage = $A.storageService.initStorage("MyStorage",    // name
+                                            true,           // persistent
+                                            true,           // secure
+                                            512,            // maxSize
+                                            600,            // defaultExpiration
+                                            600,            // defaultAutoRefreshInterval
+                                            true,           // debugLoggingEnabled
+                                            true);          // clearStorageOnInit
 </auradocs:codeblock><br/>
 
 <h4>Using Aura Storage</h4>
-<p>After you've initialized your custom storage, you can add and retrieve items from your storage. To do so, use the JavaScript <code>put</code> and <code>get</code> API of <auradocs:topicLink topic="api:AuraStorage">AuraStorage</auradocs:topicLink>.</p>
+<p>After you've initialized your custom storage, you can add and retrieve items from your storage. To do so, use the JavaScript <code>put</code> and <code>get</code> API of <a href="#reference?topic=api:AuraStorage">AuraStorage</a>.</p>
 
 <auradocs:info>The Aura-provided actions storage for server-side actions automatically adds and retrieves items from storage and doesn't require you to call <code>put</code> and <code>get</code> explicitly.</auradocs:info>
 
@@ -113,11 +139,11 @@ storage.put("score", value1);
 storage.put("name", "joe smith"); 
 </auradocs:codeblock><br/>
 
-<p>After the items are stored, you can retrieve them, as follows.</p>
+<p>You can retrieve stored items by using the <code>get</code> method. The parameters  of the <code>get</code> method are the key of the value to retrieve and a callback function. The callback function is called asynchronously and has the item that was fetched from the storage as its parameter.</p> 
 
 <auradocs:codeblock>
-var myScore = storage.get("score");
-var fullName = storage.get("name"); 
+storage.get("score", function(item) { var myRetrievedScore = item; });
+storage.get("name", function(item) { console.log(item); }); 
 </auradocs:codeblock><br/>  
 
 <p>You can obtain any initialized named storage by calling <code>getStorage()</code> and by passing it the storage name. For example:</p>
@@ -126,7 +152,12 @@ var fullName = storage.get("name");
 var storage = $A.storageService.getStorage("MyStorage");
 </auradocs:codeblock><br/>
 
-<p>There are other methods you can call on the storage object. For example, you can get the current cache size and clear the storage, as follows.</p>
+<auradocs:info>The getName() method returns the type of storage selected, not the name of the storage.</auradocs:info>
+
+<p>There are other methods you can call on the storage object. For a detailed description of the JavaScript API for <code>AuraStorageService</code>, see
+<a href="#reference?topic=api:AuraStorageService">AuraStorageService</a> and for <code>AuraStorage</code>, see <a href="#reference?topic=api:AuraStorage">AuraStorage</a>.</p>
+    
+<p>For example, you can get the current cache size and clear the storage, as follows.</p>
 
 <auradocs:codeblock>
 // Get cache size
@@ -134,10 +165,6 @@ var size = $A.storageService.getStorage("MyStorage").getSize();
 // Clear the cache
 $A.storageService.getStorage("MyStorage").clear();
 </auradocs:codeblock><br/>
-
-<p>For a detailed description of the JavaScript API for <code>AuraStorageService</code> and <code>AuraStorage</code>, see 
-    <auradocs:topicLink topic="api:AuraStorageService">AuraStorageService</auradocs:topicLink> and 
-    <auradocs:topicLink topic="api:AuraStorage">AuraStorage</auradocs:topicLink>.</p>
     
 <p><b>See also:</b><br/>    
     <auradocs:topicLink topic="serverSideControllers">Server-Side Controllers</auradocs:topicLink><br/>

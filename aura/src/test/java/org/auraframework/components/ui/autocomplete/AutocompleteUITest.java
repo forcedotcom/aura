@@ -108,6 +108,9 @@ public class AutocompleteUITest extends WebDriverTestCase {
 	/**
 	 * Tabing through input field and list items functions properly.
 	 */
+	// Excluding firefox as well because tabing in firefox works differently have a separate test for this.
+	// TODO : Bug W-1780786
+	@ExcludeBrowsers({ BrowserType.IE7, BrowserType.IE8, BrowserType.FIREFOX})
 	public void testAutoCompleteTabing() throws Exception {
 		open(URL);
         WebDriver driver = getDriver();
@@ -121,7 +124,7 @@ public class AutocompleteUITest extends WebDriverTestCase {
         auraUITestingUtil.pressTab(input);
         list = getAutoCompleteList(driver, AUTOCOMPLETE_COMPONENT.get("Generic"));
         waitForAutoCompleteListVisible(list, false);
-        assertEquals("Focus should be back on the input",
+        assertEquals("Focus should be on the next input",
         		nextInput.getAttribute("data-aura-rendered-by"), auraUITestingUtil.getUniqueIdOfFocusedElement());
 	}
 	

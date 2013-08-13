@@ -5,8 +5,8 @@ devices, while providing a scalable long-lived lifecycle to support building app
 engineered for growth. It supports partitioned multi-tier component development 
 that bridges the client and server.
  
-To find out more about Aura, see the instructions at the end of this README for 
-accessing the documentation on your localhost after you build the project. 
+To find out more about Aura please see http://documentation.auraframework.org/auradocs or see the instructions at the end of this README for 
+accessing the documentation on your localhost after you build the project.
 
 ## How Do I Develop with Aura?
 

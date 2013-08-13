@@ -24,7 +24,7 @@
     getNumber: function(cmp) {
         var num = cmp.get("v.value");
         var scale = cmp.get("v.valueScale");
-        if (num && scale) {
+        if ($A.util.isFiniteNumber(num) && scale) {
             num *= Math.pow(10, scale);
         }
         return num;

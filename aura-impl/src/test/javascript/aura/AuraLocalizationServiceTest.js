@@ -1222,6 +1222,7 @@ Test.Aura.AuraLocalizationServiceTest = function(){
             Assert.Equal(expected, actual);
         }
     	
+    	/* Disabled until W-1785931 is fixed 
     	[Fact]
         function DateObjectWithToISOString(){    		
             // Arrange       		
@@ -1234,7 +1235,7 @@ Test.Aura.AuraLocalizationServiceTest = function(){
 
             // Assert
             Assert.Equal(expected, actual);
-        }   
+        }
     	
     	[Fact]
         function DateObjectWithoutToISOString(){    		
@@ -1249,7 +1250,7 @@ Test.Aura.AuraLocalizationServiceTest = function(){
 
             // Assert
             Assert.Equal(expected, actual);
-        }   
+        }*/
     }    
     
     [Fixture]

@@ -108,9 +108,12 @@ public class AutocompleteUITest extends WebDriverTestCase {
 	/**
 	 * Tabing through input field and list items functions properly.
 	 */
+	// Excluding mobile devices since they dont have tabbing functionality
 	// Excluding firefox as well because tabing in firefox works differently have a separate test for this.
 	// TODO : Bug W-1780786
-	@ExcludeBrowsers({ BrowserType.IE7, BrowserType.IE8, BrowserType.FIREFOX})
+	@ExcludeBrowsers({ BrowserType.IE7, BrowserType.IE8, BrowserType.FIREFOX,
+	    BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, 
+	    BrowserType.IPAD, BrowserType.IPHONE, BrowserType.IPADCONTAINER})
 	public void testAutoCompleteTabing() throws Exception {
 		open(URL);
         WebDriver driver = getDriver();
@@ -131,6 +134,10 @@ public class AutocompleteUITest extends WebDriverTestCase {
 	/**
 	 * Using arrow keys to cycle through list items functions properly.
 	 */
+	// Excluding mobile devices since they dont have arrow key functionality
+	@ExcludeBrowsers({ BrowserType.IE7, BrowserType.IE8, 
+	    BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, 
+	    BrowserType.IPAD, BrowserType.IPHONE, BrowserType.IPADCONTAINER})
 	public void testAutoCompleteArrowKeys() throws Exception {
 		open(URL);
         WebDriver driver = getDriver();

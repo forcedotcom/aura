@@ -27,7 +27,10 @@
 			<ui:button iconImgSrc="/auraFW/resources/aura/images/search.png" label="Find" labelDisplay="false"/>
 			<ui:button label="Find" iconImgSrc="/auraFW/resources/aura/images/search.png"/>
 		</aura:set>
-		
+		<aura:set attribute="right">
+		<b>Key Component</b><br/>
+		<auradocs:defLink defType="component" descriptor="ui:button"/>
+		</aura:set>
 	</ui:block>
 	<h4>Text-only Button</h4>
 	<auradocs:codeblock>&lt;ui:button label="Find" /></auradocs:codeblock>
@@ -49,7 +52,7 @@
 	<auradocs:codeblock>.THIS.uiButton {
     //CSS declaration
 }</auradocs:codeblock>
-	<p>To override the styling for all components the entire app, in the CSS file of your app, add the following class selector.</p>
+	<p>To override the styling for all components in the app, in the CSS file of your app, add the following class selector.</p>
 	
 	<auradocs:codeblock>.THIS .uiButton {
     //CSS declaration

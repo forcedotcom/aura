@@ -1,0 +1,79 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="Field-level Errors"/>
+
+	<ui:block>
+		<aura:set attribute="left">
+		    <p>Field-level errors are displayed when a validation error occurs on the field after a user input.
+		    You can create an error using <code>ui:inputDefaultError</code>, which provides basic events such as <code>click</code> and <code>mouseover</code>.
+		    For more information on validating fields, see <auradocs:topicLink topic="error">Validating Fields</auradocs:topicLink>.</p>
+		    <p>Alternatively, you can use <code>ui:message</code> for field-level errors. 
+		    </p>
+		</aura:set>
+		<aura:set attribute="right">
+		<b>Key Component</b><br/>
+		<auradocs:defLink defType="component" descriptor="ui:message"/>
+		</aura:set>
+	</ui:block>
+	<p>Here are a few basic ways to set up a field-level error using <code>ui:message</code>.
+	   The error message is persistent by default but you can set <code>closable="true"</code> if you want the user to be able to close it. 
+	</p>
+	<h4>Visible</h4>
+	<auradocs:codeblock>&lt;ui:message title="Invalid password" severity="error" closable="true">
+     Your password should be at least 6 alphanumeric characters long.
+&lt;/ui:message></auradocs:codeblock>
+
+	<h4>Visible on error condition</h4>
+	<auradocs:codeblock>&lt;!--The ui:message component-->
+    &lt;aura:renderIf isTrue="<aura:text value="{!"/>v.invalidPW}">
+    &lt;ui:message title="Invalid password" severity="error" closable="true">
+        Your password should be at least 6 alphanumeric characters long.
+    &lt;/ui:message>
+    &lt;/aura:renderIf></auradocs:codeblock>
+     
+     <auradocs:codeblock>&lt;!--The client-side controller action-->
+     var pw = cmp.find("inPW").get("v.value");
+     if (pw.length >= 6) {
+      outPW.getValue("v.value").setValue(pw);
+      cmp.getValue("v.invalidPW").setValue(false);
+    } else {
+      cmp.getValue("v.invalidPW").setValue(true);
+    }</auradocs:codeblock>
+	<p><code>aura:renderIf</code> conditionally renders the body if the <code>isTrue</code> attribute evaluates to true. 
+	For more information on <code>aura:renderIf</code>, see <auradocs:defLink descriptor="aura:renderIf" defType="component"/>.
+	See the <ui:outputURL value="/auradocs#demos?demo=submitForm" label="Submit form"/> demo for a full implementation of <code>ui:message</code> as a field-level error.</p>
+	
+    <h3>Working with Events</h3>
+    <p>Common events for <code>ui:message</code> include the <code>click</code> and <code>mouseover</code> events. For example, <code>click="<aura:text value="{!"/>c.revalidate}"</code>
+    calls the client-side controller action with the fuction name, <code>revalidate</code>, when a user clicks on the error message.</p>
+	<p>For more information on client-side controllers, see <auradocs:topicLink topic="helloActions">Client-Side Controllers</auradocs:topicLink>.</p>
+	
+	<h3>Styling Your Field-level Errors</h3>
+	<p>The <code>ui:message</code> component is customizable with regular CSS styling. The following CSS sample replaces the default border. This component can be used with varying severity levels, which uses different styles.
+	   To compare the severity levels and styles, see the <ui:outputURL value="/auradocs#demos?demo=message" label="ui:message demo"/>.
+	</p>
+	<auradocs:codeblock>.THIS.uiMessage {
+    border: 1px solid #888;
+ }</auradocs:codeblock>
+	<p>Alternatively, use the <code>class</code> attribute to specify your own CSS class. For more information on styling components, see <auradocs:topicLink topic="helloHTML">Applying HTML and CSS</auradocs:topicLink>.</p>
+	
+</aura:component>
+
+
+    

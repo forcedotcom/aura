@@ -13,27 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.THIS input[type="checkbox"] {
-	display: none;
+.THIS .uiBlock .bLeft {
+	width: 80%;
 }
-
-.THIS .check span {
-	margin: 20px;
-}
-
-.THIS input[type="checkbox"]+label {
-	display: inline-block;
-	width: 20px;
-	height: 20px;
-	vertical-align: middle;
-	background: url('/auraFW/resources/aura/images/checkbox.png') top left;
-	    cursor: pointer;
-}
-
-.THIS input[type="checkbox"]:checked+label {
- 	background:url('/auraFW/resources/aura/images/checkbox.png') bottom left;
- }
- 
- .THIS .uiBlock .bLeft {
- 	width: 80%;
- }

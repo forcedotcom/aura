@@ -1,0 +1,76 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="Radio Buttons"/>
+
+	<ui:block>
+		<aura:set attribute="left">
+		    <p>Radio buttons are clickable and actionable, and they can only be individually selected when presented in a group.
+		    You can create a radio button with <code>ui:inputRadio</code>, which inherits the behavior and events from <code>ui:input</code>.
+		    The <code>value</code> and <code>disabled</code> attributes control the state of a radio button, and events such as <code>click</code> and <code>change</code> determine its behavior.
+		    Events must be used separately on each radio button.</p>
+		    <p>If you want to use radio buttons in a menu, use <code>ui:radioMenuItem</code> instead.
+		    </p>
+		</aura:set>
+		<aura:set attribute="right">
+		<b>Key Component</b><br/>
+		<auradocs:defLink defType="component" descriptor="ui:inputRadio"/>
+		</aura:set>
+	</ui:block>
+	<p>Here are several basic ways to set up a radio button.</p>
+	<h4>Selected</h4>
+	To select the radio button, set <code>value="true"</code>. Alternatively, <code>value</code> can take in a value from a model.
+	<auradocs:codeblock>&lt;ui:inputRadio value="true" label="Select?" labelPosition="right" /></auradocs:codeblock>
+	<auradocs:codeblock>&lt;!--Initializing with a model--><br/>&lt;ui:inputRadio aura:id="inRadio" value="<aura:text value="{!"/>m.selected}"/><br/>
+&lt;!--The model-->
+public Boolean getSelected() {
+    return true;
+}</auradocs:codeblock>
+	<p>The model is in a Java class specified by the <code>model</code> attribute on the <code>aura:component</code> tag.
+	For more information on working with server-side models, see <auradocs:topicLink topic="model">Java Models</auradocs:topicLink>.</p>
+	
+	<h4>Disabled State</h4>
+	<auradocs:codeblock>&lt;ui:inputRadio disabled="true" /></auradocs:codeblock>
+    
+    <h3>Working with Events</h3>
+    <p>Common events for <code>ui:inputRadio</code> include the <code>click</code> and <code>change</code> events. For example, <code>click="<aura:text value="{!"/>c.showItem}"</code>
+    calls the client-side controller action with the fuction name, <code>showItem</code>.</p>
+    <p>The following code updates the CSS class of a component when the radio button is clicked.</p>
+    <auradocs:codeblock>
+    &lt;!--The radio button-->
+    &lt;ui:inputRadio click="<aura:text value="{!"/>c.showItem}" label="Show Item" labelPosition="right"/>
+    
+    &lt;!--The controller action-->
+    showItem : function(cmp, event){
+    var elem = cmp.find('componentID');
+    $A.util.toggleClass(elem, "cssClass");
+  }
+    </auradocs:codeblock>
+    
+	<p>For more information on client-side controllers, see <auradocs:topicLink topic="helloActions">Client-Side Controllers</auradocs:topicLink>.</p>
+	
+	<h3>Styling Your Radio Buttons</h3>
+	<p>The <code>ui:inputRadio</code> component is customizable with regular CSS styling.
+	See <auradocs:topicLink topic="uiCheckbox">Checkboxes</auradocs:topicLink> for a similar way to style an input component.
+	</p>
+	<p>For more information on styling components, see <auradocs:topicLink topic="helloHTML">Applying HTML and CSS</auradocs:topicLink>.</p>
+	
+</aura:component>
+
+
+    

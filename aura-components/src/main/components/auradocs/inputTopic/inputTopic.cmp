@@ -16,7 +16,7 @@
 
 -->
 <aura:component extends="auradocs:topicPanel">
-    <aura:set attribute="title" value="Input Components"/>
+    <aura:set attribute="title" value="Input Components Overview"/>
     
     <ui:block>
     	<aura:set attribute="left">
@@ -34,19 +34,17 @@
 	
 	<h4>Using the Input Components</h4>
 	<p>To use Aura's input component in your own component, add them to your <code>.cmp</code> or <code>.app</code> file. The following code is a basic set up of a text field and button.</p>
-	<auradocs:codeblock>
-    &lt;ui:inputText label="Name" aura:id="name" value="" placeholder="First, Last"/>
-    &lt;ui:outputText aura:id="nameOutput" value=""/>
-    &lt;ui:button aura:id="outputButton" label="Submit" press="<aura:text value="{!"/>c.getInput}"/>
-     </auradocs:codeblock>
+	
+	<auradocs:codeblock>&lt;ui:inputText label="Name" aura:id="name" value="" placeholder="First, Last"/>
+&lt;ui:outputText aura:id="nameOutput" value=""/>
+&lt;ui:button aura:id="outputButton" label="Submit" press="<aura:text value="{!"/>c.getInput}"/></auradocs:codeblock>
+    
     <p>The <code>ui:outputText</code> component acts as a placeholder for the output value of its corresponding <code>ui:inputText</code> component. The value in the <code>ui:outputText</code> component can be set with the following client-side controller action. </p>
-    <auradocs:codeblock>
-    getInput : function(cmp, event) {
+    <auradocs:codeblock>getInput : function(cmp, event) {
       var fullName = cmp.find("name").get("v.value");
       var outName = cmp.find("nameOutput");
       outName.getValue("v.value").setValue(fullName);
-    }
-    </auradocs:codeblock>
+    }</auradocs:codeblock>
     
 	<p>For an example, see the <ui:outputURL value="/auradocs#demos?demo=submitForm" label="Submit Form"/> demo.</p>
 
@@ -73,18 +71,20 @@
                 </td>
             </tr>
             <tr>
-                <td>Field-level error</td>
+                <td><auradocs:topicLink topic="uiError">Field-level error</auradocs:topicLink></td>
                 <td>An error text that is displayed when a field-level error occurs.</td>
-                <td><auradocs:defLink defType="component" descriptor="ui:inputDefaultError"/></td>
+                <td><auradocs:defLink defType="component" descriptor="ui:inputDefaultError"/><br/>
+                	<auradocs:defLink defType="component" descriptor="ui:message"/>
+                </td>
             </tr>
             <tr>
-                <td>Radio button</td>
+                <td><auradocs:topicLink topic="uiRadio">Radio button</auradocs:topicLink></td>
                 <td>A selectable option that supports only a single selection.</td>
                 <td><auradocs:defLink defType="component" descriptor="ui:inputRadio"/>
                 </td>
             </tr>
             <tr>
-                <td>Select list</td>
+                <td><auradocs:topicLink topic="uiSelect">Select list</auradocs:topicLink></td>
                 <td>A list of options for single or multiple selection.</td>
                 <td><auradocs:defLink defType="component" descriptor="ui:inputSelect"/><br/><auradocs:defLink defType="component" descriptor="ui:inputSelectOption"/><br/>
                 <auradocs:defLink defType="component" descriptor="ui:inputSelectOptionGroup"/><br/>

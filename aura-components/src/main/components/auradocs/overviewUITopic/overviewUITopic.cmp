@@ -23,57 +23,10 @@
     common user interface events like keyboard and mouse interactions. Each component can be styled and extended accordingly.</p>
     <ui:image src="/auraFW/resources/aura/images/auraCmp.png" alt="Component hierarchy for UI components" /> 
 	
-	<h4>Setting up a Component</h4>
-	<p>To declare your component, use the <code>aura:component</code> tag. Each component you create can contain other custom components or those from the <code>aura</code> or <code>ui</code> namespaces.
-	Aura components can contain HTML markup so you can use tags such as <code>&lt;div></code> and <code>&lt;span></code> where applicable. HTML5 tags are also supported.
-	</p>
-	<auradocs:codeblock>&lt;aura:component>
-	&lt;div class="container">
-		&lt;!--Other HTML tags or Aura components here-->
-	&lt;/div>
-&lt;/aura:component>
-	</auradocs:codeblock>
-	<p>The <code>aura:component</code> tag has the following optional attributes.</p>
-	
-	<table class="table table-bordered table-striped">
-        <thead>
-            <tr>
-                <th>Attribute</th>
-                <th>Type</th>
-                <th>Description</th>
-            </tr>
-        </thead>
-        <tbody>
-        	<tr>
-                <td><code>abstract</code></td>
-                <td>Boolean</td>
-                <td>Set to <code>true</code> if the component is abstract, or <code>false</code> otherwise.</td>
-            </tr>
-            <tr>
-                <td><code>description</code></td>
-                <td>String</td>
-                <td>A description of the component.</td>
-            </tr>
-            <tr>
-                <td><code>extensible</code></td>
-                <td>Boolean</td>
-                <td>Set to <code>true</code> if the component can be extended, or <code>false</code> otherwise.</td>
-            </tr>
-            <tr>
-            	<td><code>implements</code></td>
-            	<td>String</td>
-            	<td>The comma-separated interfaces that the component implements.</td>
-            </tr>
-            <tr>
-                <td><code>support</code></td>
-                <td>String</td>
-                <td>The support level for the component. Valid options are <code>PROTO</code>, <code>DEPRECATED</code>, <code>BETA</code>, or <code>GA</code>.</td>
-            </tr>
-        </tbody>
-    </table>
 	  
  <p>
     <b>See Also:</b><br/>
+    <auradocs:topicLink topic="input">Input Components</auradocs:topicLink><br/>
     <auradocs:topicLink topic="helloWorld">Components Overview</auradocs:topicLink><br/>
     <auradocs:topicLink topic="compBundle">Component Bundles</auradocs:topicLink>
     </p>

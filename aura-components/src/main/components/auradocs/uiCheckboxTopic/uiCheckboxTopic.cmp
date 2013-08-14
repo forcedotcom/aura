@@ -17,41 +17,49 @@
 -->
 <aura:component extends="auradocs:topicPanel">
     <aura:set attribute="title" value="Checkboxes"/>
-
+	
+	<ui:block>
+	<aura:set attribute="left">
     <p>Checkboxes are clickable and actionable, and they can be presented in a group for multiple selection.
-    You can create a checkbox with <code>ui:inputCheckbox</code>, which inherits the functionalities and events from <code>ui:input</code>.
-    The <code>checked</code> and <code>disabled</code> attributes control the state of a checkbox, and events such as <code>click</code> and <code>change</code> determine its behavior.
+    You can create a checkbox with <code>ui:inputCheckbox</code>, which inherits the behavior and events from <code>ui:input</code>.
+    The <code>value</code> and <code>disabled</code> attributes control the state of a checkbox, and events such as <code>click</code> and <code>change</code> determine its behavior.
     Events must be used separately on each checkbox.
     </p>
-
 	<p>Here are several basic ways to set up a checkbox.</p>
+	</aura:set>
+		<aura:set attribute="right">
+		<b>Key Component</b><br/>
+		<auradocs:defLink defType="component" descriptor="ui:inputCheckbox"/>
+		</aura:set>
+	</ui:block>
 	<h4>Checked</h4>
 	To select the checkbox, set <code>value="true"</code>. Alternatively, <code>value</code> can take in a value from a model.
 	<auradocs:codeblock>&lt;ui:inputCheckbox value="true"/></auradocs:codeblock>
-	<auradocs:codeblock>&lt;!--Initializing with a model--><br/>&lt;ui:inputCheckbox aura:id="inCheckbox" value="<aura:text value="{!"/>m.checked}"/>
+	<auradocs:codeblock>&lt;!--Initializing the component--><br/>&lt;ui:inputCheckbox aura:id="inCheckbox" value="<aura:text value="{!"/>m.checked}"/>
 	
 &lt;!--The model-->
 public Boolean getChecked() {
     return true;
 }</auradocs:codeblock>
+	<p>The model is in a Java class specified by the <code>model</code> attribute on the <code>aura:component</code> tag.
+	For more information on working with server-side models, see <auradocs:topicLink topic="model">Java Models</auradocs:topicLink>.</p>
 	
 	<h4>Disabled State</h4>
 	<auradocs:codeblock>&lt;ui:inputCheckbox disabled="true" /></auradocs:codeblock>
     
-    <h3>Working with Checkbox Events</h3>
+    <h3>Working with Events</h3>
     <p>Common events for <code>ui:inputCheckbox</code> include the <code>click</code> and <code>change</code> events. For example, <code>click="<aura:text value="{!"/>c.done}"</code>
     calls the client-side controller action with the fuction name, <code>done</code>.</p>
     <p>The following code crosses out the checkbox item. See the <ui:outputURL value="/auradocs#demos?demo=todo" label="Todo demo"/> for a full implementation.</p>
     <auradocs:codeblock>
     &lt;!--The checkbox-->
-    &lt;ui:inputCheckbox label="Cross this out" click="{!c.crossout}" class="line" labelPosition="right"/>
+    &lt;ui:inputCheckbox label="Cross this out" click="<aura:text value="{!"/>c.crossout}" class="line" labelPosition="right"/>
     
     &lt;!--The controller action-->
     crossout : function(cmp, event){
-    var elem = event.getSource().getElement();
-    $A.util.toggleClass(elem, "done");
-  }
-    </auradocs:codeblock>
+        var elem = event.getSource().getElement();
+        $A.util.toggleClass(elem, "done");
+     }</auradocs:codeblock>
     
 	<p>For more information on client-side controllers, see <auradocs:topicLink topic="helloActions">Client-Side Controllers</auradocs:topicLink>.</p>
 	

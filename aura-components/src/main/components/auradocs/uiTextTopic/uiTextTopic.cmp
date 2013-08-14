@@ -90,17 +90,17 @@
 	<h4>Providing Auto-complete Suggestions in Text Fields</h4>
 	<p>Auto-complete is available with the <code>ui:autocomplete</code> component, which uses a text or text area of its own.
 	To use a text area, set the <code>inputType="inputTextArea"</code>. The default is <code>inputText</code>.</p>
-	<p>For an example, see <ui:outputURL value="https://github.com/forcedotcom/aura/tree/master/aura-components/src/main/components/auradev/autocompleteExample" label="autocompleteExample.app"/>.</p>
+	<p>For an example, see <code>/aura-components/src/main/components/auradev/autocompleteExample</code> in the GitHub repo.</p>
 	<h4>Styling Your Text Fields</h4>
 	<p>You can style the appearance of your text field and output. In the CSS file of your component, add the corresponding class selectors.</p>
 	<p>The following class selectors provide styles to the string rendering of the text. For example, to style the <code>ui:inputPhone</code> component, use <code>.THIS .uiInputPhone</code>.</p>
 	
-	<auradocs:codeblock>.THIS .uiInputEmail { //CSS declaration }
-.THIS .uiInputPhone { //CSS declaration }
-.THIS .uiInputSearch { //CSS declaration }
-.THIS .uiInputText { //CSS declaration }
-.THIS .uiInputTextArea { //CSS declaration }
-.THIS .uiInputURL { //CSS declaration }</auradocs:codeblock>
+	<auradocs:codeblock>.THIS.uiInputEmail { //CSS declaration }
+.THIS.uiInputPhone { //CSS declaration }
+.THIS.uiInputSearch { //CSS declaration }
+.THIS.uiInputText { //CSS declaration }
+.THIS.uiInputTextArea { //CSS declaration }
+.THIS.uiInputURL { //CSS declaration }</auradocs:codeblock>
 	
 	<p>The following code provide styles to the given text field.</p>
 	<auradocs:codeblock>&lt;!--Text field with class attribute-->

@@ -19,7 +19,7 @@
     <aura:set attribute="title" value="Date and Time Fields"/>
     
 	    <p>Date and time fields provide client-side localization and date picker support. HTML5 support is also available.
-	     They inherit the functionalities and events from <code>ui:input</code> and <code>ui:inputDateComponent</code>, including <code>min</code> and <code>max</code> date attributes and common keyboard and mouse events.
+	     They inherit the behavior and events from <code>ui:input</code> and <code>ui:inputDateComponent</code>, including <code>min</code> and <code>max</code> date attributes and common keyboard and mouse events.
 		   If you want to render the output from these field components, use the respective <code>ui:output</code> components. For example, to render the output for the <code>ui:inputDate</code> component,
 		   use <code>ui:outputDate</code>.
 		</p>
@@ -82,10 +82,10 @@
 	 <h4>Styling Your Date and Time Fields</h4>
 	 You can style the appearance of your date and time field and output. In the CSS file of your component, add the corresponding class selectors.
 	<p>The following class selectors provide styles to the string rendering of the date and time.</p>
-	<auradocs:codeblock>.THIS .uiInputDate { //CSS declaration }
-.THIS .uiInputDateTime { //CSS declaration }
-.THIS .uiOutputDate { //CSS declaration }
-.THIS .uiOutputDateTime { //CSS declaration }
+	<auradocs:codeblock>.THIS.uiInputDate { //CSS declaration }
+.THIS.uiInputDateTime { //CSS declaration }
+.THIS.uiOutputDate { //CSS declaration }
+.THIS.uiOutputDateTime { //CSS declaration }
 </auradocs:codeblock>
 	<p>The following code provide styles to the given date and time field.</p>
 	<auradocs:codeblock>&lt;!--Date and time field with class attribute-->

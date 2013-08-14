@@ -25,6 +25,7 @@
 		    For more information on validating fields, see <auradocs:topicLink topic="error">Validating Fields</auradocs:topicLink>.</p>
 		    <p>Alternatively, you can use <code>ui:message</code> for field-level errors. 
 		    </p>
+		    <ui:image src="/auraFW/resources/aura/images/uiMessage.png" alt="Field-level error" />
 		</aura:set>
 		<aura:set attribute="right">
 		<b>Key Component</b><br/>

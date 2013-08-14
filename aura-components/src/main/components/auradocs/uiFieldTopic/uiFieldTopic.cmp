@@ -23,6 +23,7 @@
 		   If you want to render the output from these field components, use the respective <code>ui:output</code> components. For example, to render the output for the <code>ui:inputDate</code> component,
 		   use <code>ui:outputDate</code>.
 		</p>
+		<ui:image src="/auraFW/resources/aura/images/uiDate.png" alt="Date and time fields with date picker"/>
 
 	<p>Date and Time fields are represented by the following components.</p>
 	

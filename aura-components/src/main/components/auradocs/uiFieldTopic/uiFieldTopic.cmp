@@ -1,0 +1,104 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="Date and Time Fields"/>
+    
+	    <p>Date and time fields provide client-side localization and date picker support. HTML5 support is also available.
+	     They inherit the behavior and events from <code>ui:input</code> and <code>ui:inputDateComponent</code>, including <code>min</code> and <code>max</code> date attributes and common keyboard and mouse events.
+		   If you want to render the output from these field components, use the respective <code>ui:output</code> components. For example, to render the output for the <code>ui:inputDate</code> component,
+		   use <code>ui:outputDate</code>.
+		</p>
+		<ui:image src="/auraFW/resources/aura/images/uiDate.png" alt="Date and time fields with date picker"/>
+
+	<p>Date and Time fields are represented by the following components.</p>
+	
+	  <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Field Type</th>
+                <th>Description</th>
+                <th>Related Components</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Date</td>
+                <td>An input field for entering a date of type <code>text</code>.</td>
+                <td><auradocs:defLink defType="component" descriptor="ui:inputDate"/><br/>        
+                    <auradocs:defLink defType="component" descriptor="ui:outputDate"/><br/>
+                    
+                </td>
+            </tr>
+            <tr>
+                <td>Date (HTML5)</td>
+                <td>An input field for entering a date of type <code>date</code>.</td>
+                <td><auradocs:defLink defType="component" descriptor="ui:inputHtmlDate"/>
+                </td>
+            </tr>
+            <tr>
+                <td>Date and Time</td>
+                <td>An input field for entering a date and time  of type <code>text</code>.</td>
+                <td><auradocs:defLink defType="component" descriptor="ui:inputDateTime"/><br/>
+              		<auradocs:defLink defType="component" descriptor="ui:outputDateTime"/>
+                </td>
+            </tr>
+            
+             <tr>
+                <td>Date and Time (HTML5)</td>
+                <td>An input field for entering a date and time of type <code>date</code>.</td>
+                <td><auradocs:defLink defType="component" descriptor="ui:inputHtmlDateTime"/>
+                </td>
+             </tr>
+             
+        </tbody>
+    </table>
+    <h4>Using the Date and Time Fields</h4>
+    <p>The following code is a basic set up of a date field with a date picker.</p>
+    <auradocs:codeblock>&lt;ui:label label="Birthday" for="dateField"/>
+&lt;ui:inputDate aura:id="dateField" value="2000-01-01" displayDatePicker="true"/>
+    </auradocs:codeblock>
+    
+    <p><code>ui:label</code> provides a text label for the corresponding field. For more information on using labels, see <auradocs:topicLink topic="label">Label</auradocs:topicLink>.
+	</p>
+	
+	<h4>Localizing the Date and Time</h4>
+	 <p>The following code is a basic set up of a date and time field with client-side localization, which renders as  <ui:outputDateTime langLocale="de" timezone="Europe/Berlin" value="2013-05-08"/>.</p>
+	 <auradocs:codeblock>&lt;ui:outputDateTime langLocale="de" timezone="Europe/Berlin" value="2013-05-08"/></auradocs:codeblock>
+	 <p>For more information on client-side localization, see <auradocs:topicLink topic="localization">Localization</auradocs:topicLink>.</p>
+	 <h4>Styling Your Date and Time Fields</h4>
+	 You can style the appearance of your date and time field and output. In the CSS file of your component, add the corresponding class selectors.
+	<p>The following class selectors provide styles to the string rendering of the date and time.</p>
+	<auradocs:codeblock>.THIS.uiInputDate { //CSS declaration }
+.THIS.uiInputDateTime { //CSS declaration }
+.THIS.uiOutputDate { //CSS declaration }
+.THIS.uiOutputDateTime { //CSS declaration }
+</auradocs:codeblock>
+	<p>The following code provide styles to the given date and time field.</p>
+	<auradocs:codeblock>&lt;!--Date and time field with class attribute-->
+&lt;ui:inputDateTime class="dateField" value="2013-05-08"/>
+
+&lt;!--Style for date and time field-->
+.THIS .dateField { //CSS declaration }
+	</auradocs:codeblock>
+	
+	<p>For more information on styling components, see <auradocs:topicLink topic="helloHTML">Applying HTML and CSS</auradocs:topicLink>.</p>
+	
+</aura:component>
+
+
+    

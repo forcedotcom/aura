@@ -1,0 +1,142 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="Input Components Overview"/>
+    
+    <ui:block>
+    	<aura:set attribute="left">
+    <p>Users interact with your app through input elements to select or make an input. Aura provides a range of input elements such as text fields, buttons, checkboxes, and so on.
+    
+    </p>
+    </aura:set>
+    
+    <ui:image src="/auraFW/resources/aura/images/input.png" alt="Common input controls" /> 
+	
+	</ui:block>
+	<p><code>ui:input</code> provides child components, such as <code>ui:inputText</code> and <code>ui:inputRadio</code>, which correspond to common input elements. Each of these components support various input events,
+	simplifying event handling for user interface events. For an example, see the <ui:outputURL value="/auradocs#demos?demo=events" label="Events"/> demo.
+	</p>
+	
+	<h4>Using the Input Components</h4>
+	<p>To use Aura's input component in your own component, add them to your <code>.cmp</code> or <code>.app</code> file. The following code is a basic set up of a text field and button.</p>
+	
+	<auradocs:codeblock>&lt;ui:inputText label="Name" aura:id="name" value="" placeholder="First, Last"/>
+&lt;ui:outputText aura:id="nameOutput" value=""/>
+&lt;ui:button aura:id="outputButton" label="Submit" press="<aura:text value="{!"/>c.getInput}"/></auradocs:codeblock>
+    
+    <p>The <code>ui:outputText</code> component acts as a placeholder for the output value of its corresponding <code>ui:inputText</code> component. The value in the <code>ui:outputText</code> component can be set with the following client-side controller action. </p>
+    <auradocs:codeblock>getInput : function(cmp, event) {
+      var fullName = cmp.find("name").get("v.value");
+      var outName = cmp.find("nameOutput");
+      outName.getValue("v.value").setValue(fullName);
+    }</auradocs:codeblock>
+    
+	<p>For an example, see the <ui:outputURL value="/auradocs#demos?demo=submitForm" label="Submit Form"/> demo.</p>
+
+	<p>These are the input components that Aura provides out-of-the-box.</p>
+ 		<table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Input Type</th>
+                <th>Description</th>
+                <th>Related Components</th>
+            </tr>
+        </thead>
+        <tbody>
+        	<tr>
+                <td><auradocs:topicLink topic="uiButton">Button</auradocs:topicLink></td>
+                <td>An actionable button that can be pressed or clicked.</td>
+                <td><auradocs:defLink defType="component" descriptor="ui:button"/></td>
+            </tr>
+            <tr>
+                <td><auradocs:topicLink topic="uiCheckbox">Checkbox</auradocs:topicLink></td>
+                <td>A selectable option that supports multiple selections. </td>
+                <td><auradocs:defLink defType="component" descriptor="ui:inputCheckbox"/><br/>
+                	<auradocs:defLink defType="component" descriptor="ui:outputCheckbox"/>
+                </td>
+            </tr>
+            <tr>
+                <td><auradocs:topicLink topic="uiError">Field-level error</auradocs:topicLink></td>
+                <td>An error text that is displayed when a field-level error occurs.</td>
+                <td><auradocs:defLink defType="component" descriptor="ui:inputDefaultError"/><br/>
+                	<auradocs:defLink defType="component" descriptor="ui:message"/>
+                </td>
+            </tr>
+            <tr>
+                <td><auradocs:topicLink topic="uiRadio">Radio button</auradocs:topicLink></td>
+                <td>A selectable option that supports only a single selection.</td>
+                <td><auradocs:defLink defType="component" descriptor="ui:inputRadio"/>
+                </td>
+            </tr>
+            <tr>
+                <td><auradocs:topicLink topic="uiSelect">Select list</auradocs:topicLink></td>
+                <td>A list of options for single or multiple selection.</td>
+                <td><auradocs:defLink defType="component" descriptor="ui:inputSelect"/><br/><auradocs:defLink defType="component" descriptor="ui:inputSelectOption"/><br/>
+                <auradocs:defLink defType="component" descriptor="ui:inputSelectOptionGroup"/><br/>
+                <auradocs:defLink defType="component" descriptor="ui:outputSelect"/>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <p>These are the common field components you can use with Aura. Check the links to learn about their corresponding child components for specific usages.</p>
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Field Type</th>
+                <th>Description</th>
+                <th>Related Components</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><auradocs:topicLink topic="uiField">Date and Time</auradocs:topicLink></td>
+                <td>An input field for entering date and time.</td>
+                <td><auradocs:defLink defType="component" descriptor="ui:inputDate"/><br/>
+                    <auradocs:defLink defType="component" descriptor="ui:inputDateTime"/><br/>
+                    <auradocs:defLink defType="component" descriptor="ui:outputDate"/><br/>
+                    <auradocs:defLink defType="component" descriptor="ui:outputDateTime"/>
+                </td>
+            </tr>
+            <tr>
+                <td><auradocs:topicLink topic="uiNumber">Number</auradocs:topicLink></td>
+                <td>An input field for entering a numerical value.</td>
+                <td><auradocs:defLink defType="component" descriptor="ui:inputNumber"/><br/>
+                <auradocs:defLink defType="component" descriptor="ui:outputNumber"/>
+                </td>
+            </tr>
+            <tr>
+                <td><auradocs:topicLink topic="uiText">Text</auradocs:topicLink></td>
+                <td>An input field for entering single line of text.</td>
+                <td><auradocs:defLink defType="component" descriptor="ui:inputText"/><br/>
+                <auradocs:defLink defType="component" descriptor="ui:outputText"/>
+                </td>
+            </tr>
+             <tr>
+                <td><auradocs:topicLink topic="uiText">Text Area</auradocs:topicLink></td>
+                <td>An input field for entering multiple lines of text.</td>
+                <td><auradocs:defLink defType="component" descriptor="ui:inputTextArea"/><br/>
+                <auradocs:defLink defType="component" descriptor="ui:outputTextArea"/>
+                </td>
+             </tr>
+             
+        </tbody>
+    </table>
+</aura:component>
+
+
+    

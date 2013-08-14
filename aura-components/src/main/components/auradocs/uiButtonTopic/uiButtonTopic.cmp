@@ -1,0 +1,66 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="Buttons"/>
+    
+    <ui:block>
+    	<aura:set attribute="left">
+		    <p>A button is clickable and actionable, providing a textual label, an image, or both.</p>
+		    <p>You can create a button in three different ways:</p>
+			
+			<ui:button label="Find" />
+			<ui:button iconImgSrc="/auraFW/resources/aura/images/search.png" label="Find" labelDisplay="false"/>
+			<ui:button label="Find" iconImgSrc="/auraFW/resources/aura/images/search.png"/>
+		</aura:set>
+		<aura:set attribute="right">
+		<b>Key Component</b><br/>
+		<auradocs:defLink defType="component" descriptor="ui:button"/>
+		</aura:set>
+	</ui:block>
+	<h4>Text-only Button</h4>
+	<auradocs:codeblock>&lt;ui:button label="Find" /></auradocs:codeblock>
+	
+	<h4>Image-only Button</h4>
+	<auradocs:codeblock>&lt;ui:button iconImgSrc="/auraFW/resources/aura/images/search.png" label="Find" labelDisplay="false"/></auradocs:codeblock>
+    
+    <h4>Button with Text and Image</h4>
+    <auradocs:codeblock>&lt;ui:button label="Find" iconImgSrc="/auraFW/resources/aura/images/search.png"/></auradocs:codeblock>
+    
+    <h3>Working with Click Events</h3>
+    <p>The <code>press</code> attribute on the <code>ui:button</code> component handles the click event. For example, <code>press="<aura:text value="{!"/>c.findSomething}"</code>
+    calls the client-side controller action with the fuction name, <code>findSomething</code>.</p> 
+	<p>For more information on client-side controllers, see <auradocs:topicLink topic="helloActions">Client-Side Controllers</auradocs:topicLink>.</p>
+
+	<h3>Styling Your Buttons</h3>
+	The <code>ui:button</code> component is customizable with regular CSS styling. In the CSS file of your component, add the following class selector.
+
+	<auradocs:codeblock>.THIS.uiButton {
+    //CSS declaration
+}</auradocs:codeblock>
+	<p>To override the styling for all components in the app, in the CSS file of your app, add the following class selector.</p>
+	
+	<auradocs:codeblock>.THIS .uiButton {
+    //CSS declaration
+}</auradocs:codeblock>
+
+	<p>For more information on styling components, see <auradocs:topicLink topic="helloHTML">Applying HTML and CSS</auradocs:topicLink>.</p>
+	
+</aura:component>
+
+
+    

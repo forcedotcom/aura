@@ -1,0 +1,81 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="Drop-down Lists"/>
+
+	<ui:block>
+		<aura:set attribute="left">
+		    <p>Drop-down lists display a dropdown menu with available options. Both single and multiple selection are supported.
+		    You can create a drop-down list using <code>ui:inputSelect</code>, which inherits the behavior and events from <code>ui:input</code>.
+		  	
+		    </p>
+		</aura:set>
+		<aura:set attribute="right">
+		<b>Key Components</b><br/>
+		<auradocs:defLink defType="component" descriptor="ui:inputSelect"/><br/><auradocs:defLink defType="component" descriptor="ui:inputSelectOption"/><br/><auradocs:defLink defType="component" descriptor="ui:inputSelectOptionGroup"/>
+		</aura:set>
+	</ui:block>
+	<p>Here are a few basic ways to set up a drop-down list.
+	   Note that the default selected value is specified by <code>value="true"</code>.</p>
+	<p>For multiple selections, the default number of options displayed can be specified by the <code>size</code> attribute.
+	</p>
+	<h4>Single Selection</h4>
+	<auradocs:codeblock>&lt;ui:inputSelect>
+    &lt;ui:inputSelectOptionGroup label="Group 1">
+        &lt;ui:inputSelectOption text="Red"/>
+        &lt;ui:inputSelectOption text="Green" value="true"/>
+        &lt;ui:inputSelectOption text="Blue"/>
+    &lt;/ui:inputSelectOptionGroup>
+    &lt;ui:inputSelectOptionGroup label="Group 2">
+        &lt;ui:inputSelectOption text="Cyan"/>
+        &lt;ui:inputSelectOption text="Magenta"/>
+        &lt;ui:inputSelectOption text="Yellow"/>
+    &lt;/ui:inputSelectOptionGroup>
+&lt;/ui:inputSelect></auradocs:codeblock>
+
+	<h4>Multiple Selection</h4>
+	<auradocs:codeblock>&lt;ui:inputSelect multiple="true" size="5">
+    &lt;ui:inputSelectOptionGroup label="Group 1">
+        &lt;ui:inputSelectOption text="Red"/>
+        &lt;ui:inputSelectOption text="Green" value="true"/>
+        &lt;ui:inputSelectOption text="Blue"/>
+    &lt;/ui:inputSelectOptionGroup>
+    &lt;ui:inputSelectOptionGroup label="Group 2">
+        &lt;ui:inputSelectOption text="Cyan"/>
+        &lt;ui:inputSelectOption text="Magenta"/>
+        &lt;ui:inputSelectOption text="Yellow"/>
+    &lt;/ui:inputSelectOptionGroup>
+&lt;/ui:inputSelect></auradocs:codeblock> 
+     
+    <h3>Working with Events</h3>
+    <p>Common events for <code>ui:inputSelect</code> include the <code>change</code> and <code>click</code> events. For example, <code>change="<aura:text value="{!"/>c.onSelectChange}"</code>
+    calls the client-side controller action with the fuction name, <code>onSelectChange</code>, when a user changes a selection. For a demo on drop-down lists, see the <ui:outputURL value="/auradocs#demos?demo=input" label="ui:input demo"/>.</p>
+	<p>For more information on client-side controllers, see <auradocs:topicLink topic="helloActions">Client-Side Controllers</auradocs:topicLink>.</p>
+	
+	<h3>Styling Your Field-level Errors</h3>
+	<p>The <code>ui:message</code> component is customizable with regular CSS styling. The following CSS sample adds a fixed width to the drop-down menu.
+	</p>
+	<auradocs:codeblock>.THIS.uiInputSelect {
+    width: 200px;
+}</auradocs:codeblock>
+	<p>Alternatively, use the <code>class</code> attribute to specify your own CSS class. For more information on styling components, see <auradocs:topicLink topic="helloHTML">Applying HTML and CSS</auradocs:topicLink>.</p>
+	
+</aura:component>
+
+
+    

@@ -1,0 +1,102 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="Checkboxes"/>
+	
+	<ui:block>
+	<aura:set attribute="left">
+    <p>Checkboxes are clickable and actionable, and they can be presented in a group for multiple selection.
+    You can create a checkbox with <code>ui:inputCheckbox</code>, which inherits the behavior and events from <code>ui:input</code>.
+    The <code>value</code> and <code>disabled</code> attributes control the state of a checkbox, and events such as <code>click</code> and <code>change</code> determine its behavior.
+    Events must be used separately on each checkbox.
+    </p>
+	<p>Here are several basic ways to set up a checkbox.</p>
+	</aura:set>
+		<aura:set attribute="right">
+		<b>Key Component</b><br/>
+		<auradocs:defLink defType="component" descriptor="ui:inputCheckbox"/>
+		</aura:set>
+	</ui:block>
+	<h4>Checked</h4>
+	To select the checkbox, set <code>value="true"</code>. Alternatively, <code>value</code> can take in a value from a model.
+	<auradocs:codeblock>&lt;ui:inputCheckbox value="true"/></auradocs:codeblock>
+	<auradocs:codeblock>&lt;!--Initializing the component--><br/>&lt;ui:inputCheckbox aura:id="inCheckbox" value="<aura:text value="{!"/>m.checked}"/>
+	
+&lt;!--The model-->
+public Boolean getChecked() {
+    return true;
+}</auradocs:codeblock>
+	<p>The model is in a Java class specified by the <code>model</code> attribute on the <code>aura:component</code> tag.
+	For more information on working with server-side models, see <auradocs:topicLink topic="model">Java Models</auradocs:topicLink>.</p>
+	
+	<h4>Disabled State</h4>
+	<auradocs:codeblock>&lt;ui:inputCheckbox disabled="true" /></auradocs:codeblock>
+    
+    <h3>Working with Events</h3>
+    <p>Common events for <code>ui:inputCheckbox</code> include the <code>click</code> and <code>change</code> events. For example, <code>click="<aura:text value="{!"/>c.done}"</code>
+    calls the client-side controller action with the fuction name, <code>done</code>.</p>
+    <p>The following code crosses out the checkbox item. See the <ui:outputURL value="/auradocs#demos?demo=todo" label="Todo demo"/> for a full implementation.</p>
+    <auradocs:codeblock>
+    &lt;!--The checkbox-->
+    &lt;ui:inputCheckbox label="Cross this out" click="<aura:text value="{!"/>c.crossout}" class="line" labelPosition="right"/>
+    
+    &lt;!--The controller action-->
+    crossout : function(cmp, event){
+        var elem = event.getSource().getElement();
+        $A.util.toggleClass(elem, "done");
+     }</auradocs:codeblock>
+    
+	<p>For more information on client-side controllers, see <auradocs:topicLink topic="helloActions">Client-Side Controllers</auradocs:topicLink>.</p>
+	
+	<h3>Styling Your Checkboxes</h3>
+	<p>The <code>ui:inputCheckbox</code> component is customizable with regular CSS styling.
+	The image <ui:image src="/auraFW/resources/aura/images/checkbox.png" alt="checkbox image"/> is used in the following checkbox.
+	</p>
+	<p>
+	<ui:inputCheckbox labelClass="check" label="Select?" value="true" labelPosition="right" />
+	</p>
+	<auradocs:codeblock>&lt;ui:inputCheckbox labelClass="check" label="Select?" value="true" labelPosition="right" /></auradocs:codeblock>
+	
+	<p>The following CSS style replaces the default checkbox with the given image.</p>
+	<auradocs:codeblock>.THIS input[type="checkbox"] {
+	display: none;
+}
+
+.THIS .check span {
+	margin: 20px;
+}
+
+.THIS input[type="checkbox"]+label {
+	display: inline-block;
+	width: 20px;
+	height: 20px;
+	vertical-align: middle;
+	background: url('/auraFW/resources/aura/images/checkbox.png') top left;
+	    cursor: pointer;
+}
+
+.THIS input[type="checkbox"]:checked+label {
+ 	background:url('/auraFW/resources/aura/images/checkbox.png') bottom left;
+ }</auradocs:codeblock>
+
+	<p>For more information on styling components, see <auradocs:topicLink topic="helloHTML">Applying HTML and CSS</auradocs:topicLink>.</p>
+	
+</aura:component>
+
+
+    

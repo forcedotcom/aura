@@ -44,8 +44,8 @@ var AuraStorage = function AuraStorage(config) {
 };
 
 /**
- * Returns the storage name. 
- * @returns {String} The storage name.
+ * Returns the name of the storage type. For example, "smartStore", "websql", or "memory".
+ * @returns {String} The storage type.
  */
 AuraStorage.prototype.getName = function() {
 	return this.adapter.getName();
@@ -85,7 +85,8 @@ AuraStorage.prototype.clear = function() {
 /**
  * Gets an item from storage corresponding to the specified key.
  * <p>See Also: <a href="#help?topic=auraStorageService">Aura Storage Service</a></p>
- * @param {String} key The item key. This is the key used when the item was added to storage using put(). 
+ * @param {String} key The item key. This is the key used when the item was added to storage using put().
+ * @param {Function} resultCallback The function that will be called asynchronously with the item that was fetched from the storage as its parameter.
  * @returns {Object} An item from storage.
  */
 AuraStorage.prototype.get = function(key, resultCallback) {
@@ -167,7 +168,7 @@ AuraStorage.prototype.sweep = function() {
 };
 
 /**
- * Suspends sweeping. The storage adapter is removed if it is expired but sweeping can be suspended if the connection is lost.
+ * Suspends sweeping. The storage adapter is removed if it is expired but sweeping can be suspended if the connection goes offline.
  */
 AuraStorage.prototype.suspendSweeping = function() {
 	this.log("AuraStorage.suspendSweeping()");

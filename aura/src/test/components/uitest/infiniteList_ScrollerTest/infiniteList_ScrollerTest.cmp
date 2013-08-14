@@ -1,0 +1,44 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component implements="ui:pagingInterface, ui:scrollerEmbeddable">
+	
+	<ui:scroller aura:id="scroller1" onPullToRefresh="{!c.refresh}" onPullToLoadMore="{!c.showMore}" class="test">
+	    <ui:infiniteList aura:id="list" itemVar="row" currentPage="{!v.currentPage}" pageSize="{!v.pageSize}" totalItems="{!v.totalItems}">
+			<aura:set attribute="dataProvider">
+				<uitest:infiniteDataProvider currentPage="{!v.currentPage}" pageSize="{!v.pageSize}" totalItems="{!v.totalItems}"/>		
+			</aura:set>
+			
+			<aura:set attribute="itemTemplate">
+				<div style="border: 1px solid black">{!row.index} : {!row.char}</div>
+			</aura:set>
+		</ui:infiniteList>
+    </ui:scroller>
+    
+    <ui:scroller aura:id="scroller2" onPullToRefresh="{!c.refresh2}" onPullToLoadMore="{!c.showMore2}" class="test">
+	    <ui:infiniteList aura:id="list2" itemVar="row" currentPage="{!v.currentPage}" pageSize="{!v.pageSize}" totalItems="{!v.totalItems}">
+			<aura:set attribute="dataProvider">
+				<uitest:infiniteDataProvider currentPage="{!v.currentPage}" pageSize="{!v.pageSize}" totalItems="{!v.totalItems}" listType="single"/>		
+			</aura:set>
+			
+			<aura:set attribute="itemTemplate">
+				<div style="border: 1px solid black">{!row.index} : {!row.char}</div>
+			</aura:set>
+		</ui:infiniteList>
+    </ui:scroller>
+        
+</aura:component>

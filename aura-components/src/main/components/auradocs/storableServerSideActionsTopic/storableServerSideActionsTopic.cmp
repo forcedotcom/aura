@@ -67,7 +67,7 @@ runActionAtServerAndStore:function(cmp, evt, helper){
     // Get server-side action 
     var a = cmp.get("c.fetchDataRecord");
     
-    // Set server-size action as storable
+    // Set server-side action as storable
     a.setStorable();
     
     a.setCallback(cmp, function(a){        
@@ -83,12 +83,12 @@ runActionAtServerAndStore:function(cmp, evt, helper){
 
 
 <p>For a detailed description of the JavaScript API for <code>AuraStorageService</code> and <code>AuraStorage</code>, see 
-    <auradocs:topicLink topic="api:AuraStorageService">AuraStorageService</auradocs:topicLink> and 
-    <auradocs:topicLink topic="api:AuraStorage">AuraStorage</auradocs:topicLink>.</p>
+    <a href="#reference?topic=api:AuraStorageService">AuraStorageService</a> and 
+    <a href="#reference?topic=api:AuraStorage">AuraStorage</a>.</p>
     
 <p><b>See also:</b><br/>    
     <auradocs:topicLink topic="serverSideControllers">Server-Side Controllers</auradocs:topicLink><br/>
     <auradocs:topicLink topic="auraStorageService">Aura Storage Service</auradocs:topicLink><br/>
-    <auradocs:referenceTopicLink topic="api:Action">Action Type</auradocs:referenceTopicLink>
+    <a href="#reference?topic=api:Action">Action Type</a>
 </p>
 </aura:component>

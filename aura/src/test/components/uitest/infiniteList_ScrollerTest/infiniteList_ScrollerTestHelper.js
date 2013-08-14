@@ -15,12 +15,12 @@
  */
 ({
 	refresh: function(component, listName) {
-        var list = component.find(listName);
-        list.get("e.refresh").fire();
+            var list = component.find(listName);
+            list.get("e.refresh").fire();
 	},
 
 	showMore: function(component, listName) {
-        var list = component.find(listName);
-        list.get("e.showMore").fire();
+            var list = component.find(listName);
+            list.get("e.showMore").fire();
 	}
 })

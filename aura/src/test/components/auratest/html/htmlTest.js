@@ -142,9 +142,8 @@
     testRerenderSpecialHtmlAttributes:{
 	test:function(component){
 	    var input = component.find("specialAttributes_input").getElement();
-	    $A.log(input.getAttribute("style"));
-	    $A.test.assertEquals("textElement" , input.dataset.name, "Failed to render data attribute");
-	    $A.test.assertEquals("color:blue;text-align:center" , input.getAttribute("style"), "Failed to render style attribute");
+	    $A.test.assertEquals("textElement" , input.getAttribute("data-name"), "Failed to render data attribute");
+	    $A.test.assertEquals("color:blue;" , input.getAttribute("style").replace(" ",""), "Failed to render style attribute");
 	    $A.test.assertEquals("text" , input.getAttribute("type"), "Failed to render type attribute");
 	    
 	    var a = component.find("specialAttributes_a").getElement();
@@ -156,9 +155,9 @@
 	    component.getAttributes().setValue("href", "http://bbt.com/");
 	    
 	    $A.rerender(component);
-	    input1 = component.find("specialAttributes_input").getElement();
-	    $A.test.assertEquals("inputElement" , input.dataset.name, "Failed to rerender data attribute");
-	    $A.test.assertEquals("color:green;" , input.getAttribute("style"), "Failed to rerender style attribute");
+	    input = component.find("specialAttributes_input").getElement();
+	    $A.test.assertEquals("inputElement" , input.getAttribute("data-name"), "Failed to rerender data attribute");
+	    $A.test.assertEquals("color:green;" , input.getAttribute("style").replace(" ",""), "Failed to rerender style attribute");
 	    $A.test.assertEquals("input" , input.getAttribute("type"), "Failed to rerender type attribute");
 	    
 	    a = component.find("specialAttributes_a").getElement();

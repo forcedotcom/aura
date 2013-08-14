@@ -5,8 +5,7 @@ devices, while providing a scalable long-lived lifecycle to support building app
 engineered for growth. It supports partitioned multi-tier component development 
 that bridges the client and server.
  
-To find out more about Aura please see the [Aura Documentation](http://documentation.auraframework.org/auradocs) site or see the instructions at the end of this README for 
-accessing the documentation on your localhost after you build the project.
+To find out more about Aura, see the [Aura Documentation](http://documentation.auraframework.org/auradocs) site.
 
 ## How Do I Develop with Aura?
 
@@ -112,8 +111,10 @@ Now that you've created your first app, you might be wondering where do I go fro
 
 ### Read the Documentation
 
-Start up your Jetty server and type `http://localhost:8080/auradocs/docs.app` into your browser
-to access the documentation.
+See the [Aura Documentation](http://documentation.auraframework.org/auradocs) site.
+
+Alternatively, you can start up your Jetty server and navigate to `http://localhost:8080/auradocs/docs.app` 
+to access the documentation on your localhost.
 
 ### Explore the Aura Note Sample App
 

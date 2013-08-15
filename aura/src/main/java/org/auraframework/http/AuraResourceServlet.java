@@ -162,14 +162,17 @@ public class AuraResourceServlet extends AuraBaseServlet {
         } catch (QuickFixException qfe) {
             comp = Aura.getDefinitionService().getDefinition("auradev:quickFixException", ComponentDef.class);
         }
+        
         for (String ns : context.getPreloads()) {
             filters.add(new DescriptorFilter(ns, "*"));
         }
+        
         if (comp != null && comp.getDependencies() != null) {
             for (DependencyDef dd : comp.getDependencies()) {
                 filters.add(dd.getDependency());
             }
         }
+        
         return filters;
     }
 
@@ -613,12 +616,17 @@ public class AuraResourceServlet extends AuraBaseServlet {
             keyBuilder.append(dm);
             keyBuilder.append(",");
         }
+        
+        // Swizzle in mode awareness
+        keyBuilder.append(mode.name().toLowerCase());
+        
         key = keyBuilder.toString();
 
         Reference<String> reference = definitionCache.get(key);
         if (reference != null) {
             ret = reference.get();
         }
+        
         if (ret != null) {
             out.append(ret);
             return;

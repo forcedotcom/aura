@@ -17,6 +17,7 @@ package org.auraframework.service;
 
 import org.auraframework.integration.Integration;
 import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
  * <p>
@@ -43,8 +44,10 @@ public interface IntegrationService extends AuraService {
      *            Passing a value of false allows for partial page updates, that is, adding additional
      *            components on subsequent trips to the server after an app has already been loaded.
      * @param userAgent
+	 * @param application Fully qualified (namespace:name) name of the Aura application. The application must extend aura:integrationServiceApp
      * @return
      *         A new integration.
+     * @throws QuickFixException 
      */
-    Integration createIntegration(String contextPath, Mode mode, boolean initializeAura, String userAgent);
+    Integration createIntegration(String contextPath, Mode mode, boolean initializeAura, String userAgent, String application) throws QuickFixException;
 }

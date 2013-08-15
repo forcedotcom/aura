@@ -29,6 +29,7 @@ import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.annotation.UnAdaptableTest;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
+import org.auraframework.throwable.quickfix.QuickFixException;
 import org.junit.Ignore;
 
 import com.google.common.collect.Lists;
@@ -71,13 +72,13 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
         Integration integration = null;
         assertNotNull("Failed to locate integration service implementation.", service);
         // All Nulls
-        integration = service.createIntegration(null, null, true, null);
+        integration = service.createIntegration(null, null, true, null, null);
         assertException(integration);
         // No Context Path
-        integration = service.createIntegration(null, Mode.UTEST, true, null);
+        integration = service.createIntegration(null, Mode.UTEST, true, null, null);
         assertException(integration);
         // No mode specified
-        integration = service.createIntegration("", null, true, null);
+        integration = service.createIntegration("", null, true, null, null);
         assertException(integration);
     }
 
@@ -88,7 +89,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
      */
     @Ignore("W-1495981")
     public void testNullsForCreateIntegration() throws Exception {
-        Integration integration = service.createIntegration("", Mode.UTEST, true, null);
+        Integration integration = createIntegration();
         Map<String, Object> attributes = Maps.newHashMap();
         attributes.put("label", "Click Me");
         Appendable out = new StringBuffer();
@@ -114,7 +115,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
      */
     public void testThrowsOnUnsupportedBrowsers() throws Exception{
         String ie6UserAgent = "Mozilla/4.0 (compatible; MSIE 6.1; Windows XP; .NET CLR 1.1.4322; .NET CLR 2.0.50727)";
-        Integration integration = service.createIntegration("", Mode.DEV, true, ie6UserAgent);
+        Integration integration = service.createIntegration("", Mode.DEV, true, ie6UserAgent, null);
         try{
             injectSimpleComponent(integration);
             fail("Integration service should throw exception when used with unsupported browsers.");
@@ -133,7 +134,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
 
         Mode[] testModes = new Mode[] { Mode.UTEST, Mode.PROD };
         for (Mode m : testModes) {
-            Integration integration = service.createIntegration("", m, true, null);
+            Integration integration = service.createIntegration("", m, true, null, null);
             assertNotNull(String.format(
                     "Failed to create an integration object using IntegrationService in %s mode. Returned null.", m),
                     integration);
@@ -159,7 +160,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
                 String.format(baseComponentTag, "", ""));
         Map<String, Object> attributes = Maps.newHashMap();
         Appendable out = new StringBuffer();
-        Integration integration = service.createIntegration("", Mode.UTEST, true, null);
+        Integration integration = createIntegration();
         try {
             integration.injectComponent(cmp1.getDescriptorName(), attributes, "", "", out);
             integration.injectComponent(cmp2.getDescriptorName(), attributes, "", "", out);
@@ -207,7 +208,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
         attributes.put("obj", "Object");
 
         Appendable out = new StringBuffer();
-        Integration integration = service.createIntegration("", Mode.UTEST, true, null);
+        Integration integration = createIntegration();
         try {
             integration.injectComponent(cmp.getDescriptorName(), attributes, "", "", out);
         } catch (Exception unexpected) {
@@ -219,8 +220,9 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
     /**
      * Verify initializing attributes and event handlers during component
      * injection.
+     * @throws QuickFixException 
      */
-    public void testAttributesAndEvents() {
+    public void testAttributesAndEvents() throws QuickFixException {
         String attributeMarkup = "<aura:attribute name='strAttr' type='String'/>"
                 + "<aura:attribute name='booleanAttr' type='Boolean'/>";
         String eventsMarkup = "<aura:registerevent name='press' type='ui:press'/>"
@@ -235,7 +237,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
         attributes.put("mouseout", "function(e){alert('mouseout')}");
 
         Appendable out = new StringBuffer();
-        Integration integration = service.createIntegration("", Mode.UTEST, true, null);
+        Integration integration = createIntegration();
         try {
             integration.injectComponent(cmp.getDescriptorName(), attributes, "", "", out);
         } catch (Exception unexpected) {
@@ -252,7 +254,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
         Map<String, Object> attributes = Maps.newHashMap();
         attributes.put("fooBar", "");
         Appendable out = new StringBuffer();
-        Integration integration = service.createIntegration("", Mode.UTEST, true, null);
+        Integration integration = createIntegration();
         try {
             integration.injectComponent(simpleComponentTag, attributes, "", "", out);
             fail("Using nonexisting attribute names should have failed.");
@@ -263,12 +265,16 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
         }
     }
 
+	private Integration createIntegration() throws QuickFixException {
+		return service.createIntegration("", Mode.UTEST, true, null, null);
+	}
+
     @Ignore("W-1505382")
     public void testNonStringAttributeValuesForEvents() throws Exception {
         // Non String attribute for functions
         Map<String, Object> attributes = Maps.newHashMap();
         Appendable out = new StringBuffer();
-        Integration integration = service.createIntegration("", Mode.UTEST, true, null);
+        Integration integration = createIntegration();
         attributes.put("label", "Click Me");
         attributes.put("press", new Integer(10));
         try {
@@ -309,7 +315,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
     public void testInjectingNonExistingComponent() throws Exception {
         Map<String, Object> attributes = Maps.newHashMap();
         Appendable out = new StringBuffer();
-        Integration integration = service.createIntegration("", Mode.UTEST, true, null);
+        Integration integration = createIntegration();
         try {
             integration.injectComponent("foo:bared", attributes, "", "", out);
             fail("Instantiating component through integration service should have failed because of missing component def.");
@@ -326,7 +332,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
         String validApp = "test:laxSecurity";
         Map<String, Object> attributes = Maps.newHashMap();
         Appendable out = new StringBuffer();
-        Integration integration = service.createIntegration("", Mode.UTEST, true, null);
+        Integration integration = createIntegration();
         try {
             integration.injectComponent(validApp, attributes, "", "", out);
             fail("Injecting an application through integration service should have failed.");
@@ -348,7 +354,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
                 String.format(baseComponentTag, "", "<aura:attribute name='reqAttr' required='true' type='String'/>"));
         Map<String, Object> attributes = Maps.newHashMap();
         Appendable out = new StringBuffer();
-        Integration integration = service.createIntegration("", Mode.UTEST, true, null);
+        Integration integration = createIntegration();
         try {
             integration.injectComponent(cmp.getDescriptorName(), attributes, "", "", out);
         } catch (Exception unexpected) {

@@ -385,9 +385,27 @@
             var testCmp = component.find('myOutputDateTimeComp');
             aura.test.assertNotNull(testCmp);
 			aura.test.addWaitFor(true, function(){return $A.test.getText(testCmp.find('span').getElement()).length > 0;},function(){
-	        	var outputDateStr = $A.test.getText(testCmp.find('span').getElement());		        				
-	    		aura.test.assertEquals($A.localizationService.formatDateTimeUTC('Sep 23, 2004 9:30:00 AM', 'MMM DD, YYYY h:mm:ss A', 'en'), outputDateStr, "Both datetimes should be same.");
-	    		aura.test.assertEquals($A.localizationService.formatDateTimeUTC('Sep 23, 2004 9:30:00 AM', '', 'en'), outputDateStr, "Both datetimes should be same.");
+	        	var outputDateStr = $A.test.getText(testCmp.find('span').getElement());	
+	        	
+	        	var str;
+	            var d = new Date();
+	            var n = d.getTimezoneOffset();
+	            
+	            if(n == 0){ // GMT
+	            	str = 'Sep 23, 2004 4:30:00 PM';
+	            }
+	            else if(n == 240){ //EST
+	            	str = 'Sep 23, 2004 12:30:00 PM';
+	            }
+	            else if(n == 420){ //PST
+	            	str = 'Sep 23, 2004 9:30:00 AM';
+	            }
+	                        
+	            if(str){ // run time tests 	        	
+	            	aura.test.assertEquals($A.localizationService.formatDateTimeUTC(str, 'MMM DD, YYYY h:mm:ss A', 'en'), outputDateStr, "Both datetimes should be same.");
+	            	aura.test.assertEquals($A.localizationService.formatDateTimeUTC(str, '', 'en'), outputDateStr, "Both datetimes should be same.");
+	            }
+	            
 	    		try{
 	    			$A.localizationService.formatDateTimeUTC('', '', 'en');	    			
 	    		}
@@ -430,9 +448,27 @@
         test:function(component){
         	var testCmp = component.find('myOutputTextComp');
             aura.test.assertNotNull(testCmp);            
-            var outputDateStr = $A.test.getText(testCmp.find('span').getElement());  		        			
-    		aura.test.assertEquals($A.localizationService.formatTimeUTC('Sep 23, 2004 9:30:00 AM', 'h:mm:ss A', 'en'), outputDateStr, "Both times should be same.");
-    		aura.test.assertEquals($A.localizationService.formatTimeUTC('Sep 23, 2004 9:30:00 AM', '', 'en'), outputDateStr, "Both times should be same.");
+            var outputDateStr = $A.test.getText(testCmp.find('span').getElement());  		    
+            
+            var str;
+            var d = new Date();
+            var n = d.getTimezoneOffset();
+            
+            if(n == 0){ // GMT
+            	str = 'Sep 23, 2004 4:30:00 PM';
+            }
+            else if(n == 240){ //EST
+            	str = 'Sep 23, 2004 12:30:00 PM';
+            }
+            else if(n == 420){ //PST
+            	str = 'Sep 23, 2004 9:30:00 AM';
+            }
+                        
+            if(str){ // run time tests            
+            	aura.test.assertEquals($A.localizationService.formatTimeUTC(str, 'h:mm:ss A', 'en'), outputDateStr, "Both times should be same.");
+            	aura.test.assertEquals($A.localizationService.formatTimeUTC(str, '', 'en'), outputDateStr, "Both times should be same.");
+            }
+            
     		try{
     			$A.localizationService.formatTimeUTC('', '', 'en');	    			
     		}
@@ -464,19 +500,20 @@
     },
     
     testToISOString:{
-        test:function(component){
-            var testCmp = component.find('myOutputDateTimeComp');
-            aura.test.assertNotNull(testCmp);
-			aura.test.addWaitFor(true, function(){return $A.test.getText(testCmp.find('span').getElement()).length > 0;},function(){
-	        	var outputDateStr = $A.test.getText(testCmp.find('span').getElement());
-	        	var dateObj = new Date(2004,8,23,4,30,00);
-				var dt1 = $A.localizationService.toISOString(dateObj);				
-				var dt2 = $A.localizationService.formatDateTimeUTC(outputDateStr, "YYYY-MM-DDThh:mm:ss.SSS", 'en');
-	    		aura.test.assertEquals('2004-09-23T11:30:00.000Z', dt1, "Both dates should be same.");	    		
-	    		aura.test.assertEquals('2004-09-23T11:30:00.000', dt2, "Both dates should be same.");
-	    		aura.test.assertEquals('', $A.localizationService.toISOString(''), "Expect ''.");
-	    		aura.test.assertEquals(null, $A.localizationService.toISOString(null), "Expect null.");
-	        });	
+        test:function(component){            
+        	var dateObj = new Date(2004,10,23,12,30,59,123);        	
+        	var expected = dateObj.getUTCFullYear() + "-" + 
+						   (dateObj.getUTCMonth() + 1) + "-" + 
+						   dateObj.getUTCDate() + "T" +
+						   (dateObj.getUTCHours() < 10 ? '0' + dateObj.getUTCHours() : dateObj.getUTCHours()) + ':' +
+						   dateObj.getUTCMinutes() + ':' +
+						   dateObj.getUTCSeconds() + '.' +
+						   dateObj.getUTCMilliseconds() + 'Z';  
+        				
+    		aura.test.assertEquals(expected, $A.localizationService.toISOString(dateObj), "Both dates should be same.");	    			    		
+    		aura.test.assertEquals('', $A.localizationService.toISOString(''), "Expect ''.");
+    		aura.test.assertEquals(null, $A.localizationService.toISOString(null), "Expect null.");
+	       
         }
     },
     
@@ -501,9 +538,26 @@
             aura.test.assertNotNull(testCmp);
 			aura.test.addWaitFor(true, function(){return $A.test.getText(testCmp.find('span').getElement()).length > 0;},function(){
 	        	var outputDateStr = $A.test.getText(testCmp.find('span').getElement());
-		        var dateObj = $A.localizationService.parseDateTimeUTC('Sep 23, 2004 11:30:00 PM', 'MMM DD, YYYY h:mm:ss A', 'en');
-				var dt = $A.localizationService.formatDateTime(dateObj, 'MMM DD, YYYY h:mm:ss A', 'en');
-	    		aura.test.assertEquals(dt, outputDateStr, "Both dates should be same.");	
+		        
+	        	var str;
+	            var d = new Date();
+	            var n = d.getTimezoneOffset();
+	            
+	            if(n == 0){ // GMT
+	            	str = 'Sep 23, 2004 4:30:00 PM';
+	            }
+	            else if(n == 240){ //EST
+	            	str = 'Sep 23, 2004 8:30:00 PM';
+	            }
+	            else if(n == 420){ //PST
+	            	str = 'Sep 23, 2004 11:30:00 PM';
+	            }
+	                        
+	            if(str){ // run time tests 	        		        	
+		        	var dateObj = $A.localizationService.parseDateTimeUTC(str, 'MMM DD, YYYY h:mm:ss A', 'en');
+					var dt = $A.localizationService.formatDateTime(dateObj, 'MMM DD, YYYY h:mm:ss A', 'en');
+		    		aura.test.assertEquals(dt, outputDateStr, "Both dates should be same.");	
+	            }
 	    		
 	    		aura.test.assertEquals(null, $A.localizationService.parseDateTimeUTC('', 'MMM DD, YYYY h:mm:ss A', 'en'), "Expected null.");
 	        });	

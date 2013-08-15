@@ -1185,6 +1185,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         return whitespaceBehavior;
     }
 
+    @Override
     public abstract DefDescriptor<T> getDefaultExtendsDescriptor();
 
 }

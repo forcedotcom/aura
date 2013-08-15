@@ -54,6 +54,7 @@ public class AdminModel {
     private final Map<String,Object> defsData;
     private final Map<String,Object> existsData;
     private final Map<String,Object> stringsData;
+    private final Map<String,Object> descriptorFilterData;
 
     private Map<String,Object> getStats(CacheStats stats) {
         Map<String, Object> data = Maps.newHashMap();
@@ -98,6 +99,7 @@ public class AdminModel {
         addDefsStats(defsData, MasterDefRegistryImpl.getCachedDefs());
         existsData = getStats(MasterDefRegistryImpl.getExistsCacheStats());
         stringsData = getStats(MasterDefRegistryImpl.getStringsCacheStats());
+        descriptorFilterData = getStats(MasterDefRegistryImpl.getDescriptorFilterCacheStats());
 
         registryData = Lists.newArrayListWithCapacity(regs.length);
         for (DefRegistry<?> dr : regs) {
@@ -143,6 +145,11 @@ public class AdminModel {
     @AuraEnabled
     public Map<String, Object> getStringsData() {
         return stringsData;
+    }
+
+    @AuraEnabled
+    public Map<String, Object> getDescriptorFilterData() {
+        return descriptorFilterData;
     }
 
     @AuraEnabled

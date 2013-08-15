@@ -147,6 +147,9 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     private final static Cache<String, String> stringsCache = CacheBuilder.newBuilder()
             .initialCapacity(STRING_CACHE_SIZE).maximumSize(STRING_CACHE_SIZE).recordStats().softValues().build();
 
+    private final static Cache<String, Set<DefDescriptor<?>>> descriptorFilterCache = CacheBuilder.newBuilder()
+            .initialCapacity(DEPENDENCY_CACHE_SIZE).maximumSize(DEPENDENCY_CACHE_SIZE).recordStats().softValues().build();
+
     /**
      * A local dependencies cache.
      * 
@@ -187,6 +190,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
     @Override
     public Set<DefDescriptor<?>> find(DescriptorFilter matcher) {
+        final String filterKey = matcher.toString();
         Set<DefRegistry<?>> registries = delegateRegistries.getRegistries(matcher);
         Set<DefDescriptor<?>> matched = Sets.newHashSet();
 
@@ -196,7 +200,21 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             // registries to implement find, this is necessary.
             //
             if (reg.hasFind()) {
-                matched.addAll(reg.find(matcher));
+                Set<DefDescriptor<?>> registryResults = null;
+
+                if (reg.isCacheable()) {
+                    // cache results per registry
+                    String cacheKey = filterKey + "|" + reg.toString();
+                    registryResults = descriptorFilterCache.getIfPresent(cacheKey);
+                    if (registryResults == null) {
+                        registryResults = reg.find(matcher);
+                        descriptorFilterCache.put(cacheKey, registryResults);
+                    }
+                } else {
+                    registryResults = reg.find(matcher);
+                }
+
+                matched.addAll(registryResults);
             }
         }
         if (localDescs != null) {
@@ -1104,6 +1122,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         depsCache.invalidateAll();
         defsCache.invalidateAll();
         existsCache.invalidateAll();
+        descriptorFilterCache.invalidateAll();
         return false;
     }
 
@@ -1235,6 +1254,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     private static void invalidateStaticCaches(DefDescriptor<?> descriptor) {
 
         depsCache.invalidateAll();
+        descriptorFilterCache.invalidateAll();
 
         if (descriptor == null) {
             defsCache.invalidateAll();
@@ -1287,5 +1307,9 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
     public static CacheStats getStringsCacheStats() {
         return stringsCache.stats();
+    }
+
+    public static CacheStats getDescriptorFilterCacheStats() {
+        return descriptorFilterCache.stats();
     }
 }

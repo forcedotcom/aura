@@ -1,0 +1,63 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="Horizontal Layouts"/>
+
+	<ui:block>
+		<aura:set attribute="left">
+		    <p><code>ui:block</code> provides a horizontal layout for your components. It extends <code>aura:component</code> and is an actionable component.  
+		    It is useful for laying out your labels, fields, and buttons or any groups of components in a row.
+		     For a demo on <code>ui:block</code>, see the <ui:outputURL value="/auradocs#demos?demo=block" label="ui:block demo"/>.
+		    </p>
+		   
+		</aura:set>
+		<aura:set attribute="right">
+		<b>Key Components</b><br/>
+		<auradocs:defLink defType="component" descriptor="ui:block"/>
+		</aura:set>
+	</ui:block>
+	<p>Here is a basic set up of a horizontal layout. The following sample code creates a horizontal view of an image, text field, and a button. The <code>ui:inputText</code> component renders 
+	in between the <code>left</code> and <code>right</code> attributes.</p>
+	<auradocs:codeblock>&lt;ui:block>
+    &lt;aura:set attribute="left">
+        &lt;ui:image src="/auraFW/resources/aura/images/search.png" alt="bLeft" />
+    &lt;/aura:set>
+    &lt;aura:set attribute="right">
+        &lt;ui:button label="Submit"/>
+    &lt;/aura:set>
+    &lt;ui:inputText label="Text" labelPosition="hidden" /> 
+&lt;/ui:block></auradocs:codeblock>
+
+    <h3>Working with Events</h3>
+    <p>Common events for <code>ui:block</code> include the <code>click</code> and <code>mouseover</code> events. For example, <code>click="<aura:text value="{!"/>c.enable}"</code>
+    calls the client-side controller action with the fuction name, <code>enable</code>, when a user clicks anywhere in the layout.</p>
+	<p>For more information on client-side controllers, see <auradocs:topicLink topic="helloActions">Client-Side Controllers</auradocs:topicLink>.</p>
+	
+	<h3>Styling Your Horizontal Layouts</h3>
+	<p><code>ui:block</code> is customizable with regular CSS styling. The output is rendered in <code>div</code> tags with the <code>bLeft</code>, <code>bRight</code>, and <code>bBody</code> classes.
+	</p>
+	
+    <ui:image src="/auraFW/resources/aura/images/uiBlock.png" alt="ui:block for horizontal layouts" />
+    <p>The following CSS class styles the <code>bLeft</code> class on the <code>ui:block</code>. </p>
+	<auradocs:codeblock>.THIS.uiBlock .bLeft { //CSS declaration }</auradocs:codeblock>
+	<p>Alternatively, use the <code>class</code> attribute to specify your own CSS class. For more information on styling components, see <auradocs:topicLink topic="helloHTML">Applying HTML and CSS</auradocs:topicLink>.</p>
+	
+</aura:component>
+
+
+    

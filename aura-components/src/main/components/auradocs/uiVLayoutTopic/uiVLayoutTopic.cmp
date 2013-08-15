@@ -1,0 +1,64 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="Vertical Layouts"/>
+
+	<ui:block>
+		<aura:set attribute="left">
+		    <p><code>ui:vbox</code> provides a vertical layout for your components. It extends <code>aura:component</code> and is an actionable component.  
+		    It is useful for laying out groups of components vertically on a page.
+		     For a demo on <code>ui:vbox</code>, see the <ui:outputURL value="/auradocs#demos?demo=vbox" label="ui:vbox demo"/>.
+		    </p>
+		   
+		</aura:set>
+		<aura:set attribute="right">
+		<b>Key Components</b><br/>
+		<auradocs:defLink defType="component" descriptor="ui:vbox"/>
+		</aura:set>
+	</ui:block>
+	<p>Here is a basic set up of a vertical layout. The following sample code creates a vertical view of a header, body, and footer. The body of the component renders 
+	in between the <code>north</code> and <code>south</code> attributes.</p>
+	
+	<auradocs:codeblock>&lt;ui:vbox>
+    &lt;aura:set attribute="north">
+	&lt;div id="header">Header&lt;/div>
+    &lt;/aura:set>
+    &lt;aura:set attribute="south">
+	&lt;div id="footer">Footer&lt;/div>
+    &lt;/aura:set>
+	body
+&lt;/ui:vbox></auradocs:codeblock>
+
+    <h3>Working with Events</h3>
+    <p>Common events for <code>ui:vbox</code> include the <code>click</code> and <code>mouseover</code> events. For example, <code>click="<aura:text value="{!"/>c.enable}"</code>
+    calls the client-side controller action with the fuction name, <code>enable</code>, when a user clicks anywhere in the layout.</p>
+	<p>For more information on client-side controllers, see <auradocs:topicLink topic="helloActions">Client-Side Controllers</auradocs:topicLink>.</p>
+	
+	<h3>Styling Your Vertical Layouts</h3>
+	<p><code>ui:vbox</code> is customizable with regular CSS styling. Given the above example, the output is rendered in <code>&lt;div id="header" class="uiVbox"></code> and <code>&lt;div id="footer" class="uiVbox"></code> tags, with the footer rendered in the bottom.
+	</p>
+	
+    <ui:image src="/auraFW/resources/aura/images/uiVbox.png" alt="ui:block for vertical layouts" />
+    <p>The following CSS class styles the <code>header</code> element in the <code>north</code> attribute. </p>
+	<auradocs:codeblock>.THIS #header { //CSS declaration }</auradocs:codeblock>
+	<p>For more information on styling components, see <auradocs:topicLink topic="helloHTML">Applying HTML and CSS</auradocs:topicLink>.</p>
+	
+</aura:component>
+
+
+    

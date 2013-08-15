@@ -109,6 +109,8 @@
 	            	<auradocs:contentsNode text="Field-level Errors" id="uiError"/>
 	            	<auradocs:contentsNode text="Drop-down Lists" id="uiSelect"/>
 	            </auradocs:contentsNode>
+	            <auradocs:contentsNode text="Horizontal Layouts" id="uiLayout"/>
+	            <auradocs:contentsNode text="Vertical Layouts" id="uiVLayout"/>
             </auradocs:contentsNode>
             <auradocs:contentsNode text="Designing App UI" id="designAppLayout"/>
             <auradocs:contentsNode text="Creating App Templates" id="createAppTemplate"/>

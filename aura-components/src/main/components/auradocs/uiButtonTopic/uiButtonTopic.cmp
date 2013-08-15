@@ -42,7 +42,7 @@
     <auradocs:codeblock>&lt;ui:button label="Find" iconImgSrc="/auraFW/resources/aura/images/search.png"/></auradocs:codeblock>
     
     <h3>Working with Click Events</h3>
-    <p>The <code>press</code> attribute on the <code>ui:button</code> component handles the click event. For example, <code>press="<aura:text value="{!"/>c.findSomething}"</code>
+    <p>The <code>press</code> event on the <code>ui:button</code> component is fired when the user clicks the button. For example, <code>press="<aura:text value="{!"/>c.findSomething}"</code>
     calls the client-side controller action with the fuction name, <code>findSomething</code>.</p> 
 	<p>For more information on client-side controllers, see <auradocs:topicLink topic="helloActions">Client-Side Controllers</auradocs:topicLink>.</p>
 

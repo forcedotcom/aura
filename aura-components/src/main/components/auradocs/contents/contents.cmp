@@ -101,7 +101,7 @@
             	<auradocs:contentsNode text="Input Components">
 	            	<auradocs:contentsNode text="Overview" id="input"/>
 	            	<auradocs:contentsNode text="Buttons" id="uiButton"/>
-	            	<auradocs:contentsNode text="Date and Time Fields" id="uiField"/>
+	            	<auradocs:contentsNode text="Date and Time Fields" id="uiDateTimeField"/>
 	            	<auradocs:contentsNode text="Number Fields" id="uiNumber"/>
 	            	<auradocs:contentsNode text="Text Fields" id="uiText"/>
 	            	<auradocs:contentsNode text="Checkboxes" id="uiCheckbox"/>

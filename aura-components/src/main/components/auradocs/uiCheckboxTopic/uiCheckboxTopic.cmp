@@ -37,7 +37,7 @@
 	<auradocs:codeblock>&lt;ui:inputCheckbox value="true"/></auradocs:codeblock>
 	<auradocs:codeblock>&lt;!--Initializing the component--><br/>&lt;ui:inputCheckbox aura:id="inCheckbox" value="<aura:text value="{!"/>m.checked}"/>
 	
-&lt;!--The model-->
+//Initializing with a model
 public Boolean getChecked() {
     return true;
 }</auradocs:codeblock>

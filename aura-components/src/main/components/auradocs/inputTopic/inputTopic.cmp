@@ -104,7 +104,7 @@
         </thead>
         <tbody>
             <tr>
-                <td><auradocs:topicLink topic="uiField">Date and Time</auradocs:topicLink></td>
+                <td><auradocs:topicLink topic="uiDateTimeField">Date and Time</auradocs:topicLink></td>
                 <td>An input field for entering date and time.</td>
                 <td><auradocs:defLink defType="component" descriptor="ui:inputDate"/><br/>
                     <auradocs:defLink defType="component" descriptor="ui:inputDateTime"/><br/>

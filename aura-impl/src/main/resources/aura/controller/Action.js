@@ -652,8 +652,10 @@ Action.prototype.toJSON = function() {
  */
 Action.prototype.incomplete = function(context) {
 	this.state = "INCOMPLETE";
+	if (!this.error || !(this.error instanceof Array)) {
+		this.error = [ { message : "Disconnected or Canceled" } ];
+	}
 	this.finishAction(context);
-	this.state = "NEW";
 };
 
 /**

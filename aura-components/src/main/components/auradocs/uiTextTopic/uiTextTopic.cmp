@@ -83,7 +83,7 @@
 	<h4>Using the Text Fields</h4>
 	<p>The following code is a basic set up of an email field.</p>
 	<auradocs:codeblock>&lt;ui:label label="Email" for="emailField"/>
-&lt;ui:inputEmail placeholder="abc@email.com"/></auradocs:codeblock>
+&lt;ui:inputEmail aura:id="emailField" placeholder="abc@email.com"/></auradocs:codeblock>
 	<p><code>ui:label</code> provides a text label for the corresponding field. For more information on using labels, see <auradocs:topicLink topic="label">Label</auradocs:topicLink>.
 	</p>
 	

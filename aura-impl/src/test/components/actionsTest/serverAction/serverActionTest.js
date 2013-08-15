@@ -97,5 +97,24 @@
 							},
 							"Error while running actionCallback : Error while running java://org.auraframework.impl.java.controller.ParallelActionTestController/ACTION$executeInForeground:{}");
 		}
-	}
+	},
+
+    testServerActionSendsError : {
+        test : [ function(cmp) {
+                var a = $A.test.getAction(cmp, "c.errorInForeground", null,
+                      function(action) {
+                          cmp.getAttributes().setValue("errorMessage", action.error[0].message);
+                      });
+                $A.clientService.runActions([ a ], cmp);
+                $A.test.addWaitFor(true, function() {
+                        return cmp.getAttributes().get("errorMessage") !== undefined;
+                    });
+            }, function(cmp) {
+                 var message = cmp.getAttributes().get("errorMessage");
+                 $A.test.assertTrue(message != undefined, "No error message from server at all");
+                 $A.test.assertTrue(message.indexOf("ArrayIndexOutOfBoundsException: 42") > 0,
+                     "Wrong message received from server: " + message);
+            }],
+    },
+
 })

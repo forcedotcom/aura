@@ -16,6 +16,7 @@
 
 -->
 <aura:component controller="java://org.auraframework.impl.java.controller.ParallelActionTestController">
+    <aura:attribute name="errorMessage" type="string"/>
     <ui:button label="Run server action in foreground" press="{!c.cExecuteInForeground}" aura:id="executeInForeground"/>
     <p/>
     <ui:button label="Run server action in foreground with return" press="{!c.cExecuteInForegroundWithReturn}" aura:id="executeInForegroundWithReturn"/>
@@ -23,5 +24,7 @@
     <ui:button label="Run server action in background" press="{!c.cExecuteInBackground}" aura:id="executeInBackground"/>
     <p/>
     <ui:button label="Run server action in background with return" press="{!c.cExecuteInBackgroundWithReturn}" aura:id="executeInBackgroundWithReturn"/>
+    <p/>
+    <ui:button label="Run server action in foreground with error" press="{!c.cErrorInForeground}" aura:id="errorInForeground"/>
     <p/>
 </aura:component>

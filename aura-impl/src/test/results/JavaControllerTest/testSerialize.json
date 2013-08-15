@@ -6,6 +6,19 @@
       {
         "serId":2,
         "value":{
+          "name":"errorInForeground",
+          "descriptor":"java://org.auraframework.impl.java.controller.ParallelActionTestController/ACTION$errorInForeground",
+          "actionType":"SERVER",
+          "returnType":"java://org.auraframework.impl.java.controller.ParallelActionTestController$Record",
+          "background":false,
+          "params":[
+
+          ]
+        }
+      },
+      {
+        "serId":3,
+        "value":{
           "name":"executeInBackground",
           "descriptor":"java://org.auraframework.impl.java.controller.ParallelActionTestController/ACTION$executeInBackground",
           "actionType":"SERVER",
@@ -17,7 +30,7 @@
         }
       },
       {
-        "serId":3,
+        "serId":4,
         "value":{
           "name":"executeInBackgroundWithReturn",
           "descriptor":"java://org.auraframework.impl.java.controller.ParallelActionTestController/ACTION$executeInBackgroundWithReturn",
@@ -26,7 +39,7 @@
           "background":true,
           "params":[
             {
-              "serId":4,
+              "serId":5,
               "value":{
                 "name":"i",
                 "type":"java://int"
@@ -36,7 +49,7 @@
         }
       },
       {
-        "serId":5,
+        "serId":6,
         "value":{
           "name":"executeInForeground",
           "descriptor":"java://org.auraframework.impl.java.controller.ParallelActionTestController/ACTION$executeInForeground",
@@ -49,7 +62,7 @@
         }
       },
       {
-        "serId":6,
+        "serId":7,
         "value":{
           "name":"executeInForegroundWithReturn",
           "descriptor":"java://org.auraframework.impl.java.controller.ParallelActionTestController/ACTION$executeInForegroundWithReturn",
@@ -58,7 +71,7 @@
           "background":false,
           "params":[
             {
-              "serId":7,
+              "serId":8,
               "value":{
                 "name":"i",
                 "type":"java://int"

@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+// Excluding ie8 and 7 browsers due to lack of support for addEventListener function
 ({
     
     
@@ -22,6 +24,7 @@
     * does not fill out the scrollable area 
     */ 
    testNoPullToRefreshNoDivSpace: {
+       browsers: ["-IE7","-IE8"],
         test: function(cmp) {
             var scrlrDiv = cmp.find("scroller3").getElements()[1];
             var divChildren = scrlrDiv.children[0].children.length;
@@ -33,6 +36,7 @@
      * amount of data does not take up all of the space in the scrollable area 
      */
     testDivSpacerSizeForFewItems: {
+	browsers: ["-IE7","-IE8"],
         test: function(cmp) {
             var scrlrDiv = cmp.find("scroller2").getElements()[1];
             var cssText = scrlrDiv.children[0].children[2].style.cssText;
@@ -45,10 +49,11 @@
      * up all of the space, is zero. i.e. if you can scroll you shouldn't have padding
      */
     testDivSpacerSizeForMaxItems: {
+	browsers: ["-IE7","-IE8"],
         test: function(cmp) {
             var scrlrDiv = cmp.find("scroller1").getElements()[1];
             var cssText = scrlrDiv.children[0].children[2].style.cssText;
-            var height = cssText.match( /\d+/g );
+            var height = cssText.match( /\d+/g )[0];
             $A.test.assertTrue(height == 0, "height should be equal to zero, since there is more than enough information");
         }
     }

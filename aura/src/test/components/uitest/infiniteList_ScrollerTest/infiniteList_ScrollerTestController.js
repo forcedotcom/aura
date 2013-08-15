@@ -15,18 +15,18 @@
  */
 ({
 	refresh: function(component, event, helper) {
-        helper.refresh(component, "list");
+             helper.refresh(component, "list");
 	},
 
 	showMore: function(component, event, helper) {
-        helper.showMore(component, "list");
+             helper.showMore(component, "list");
 	},
 	
 	refresh2: function(component, event, helper) {
-        helper.refresh(component, "list2");
+              helper.refresh(component, "list2");
 	},
 
 	showMore2: function(component, event, helper) {
-        helper.showMore(component, "list2");
+              helper.showMore(component, "list2");
 	}
 })

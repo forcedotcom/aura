@@ -17,7 +17,7 @@
 -->
 <aura:component implements="ui:pagingInterface, ui:scrollerEmbeddable">
 	
-	<ui:scroller aura:id="scroller1" onPullToRefresh="{!c.refresh}" onPullToLoadMore="{!c.showMore}" class="test">
+	<ui:scroller aura:id="scroller1" onPullToRefresh="{!c.refresh}" onPullToShowMore="{!c.showMore}" class="test">
 	    <ui:infiniteList aura:id="list" itemVar="row" currentPage="{!v.currentPage}" pageSize="{!v.pageSize}" totalItems="{!v.totalItems}">
 			<aura:set attribute="dataProvider">
 				<uitest:infiniteDataProvider currentPage="{!v.currentPage}" pageSize="{!v.pageSize}" totalItems="{!v.totalItems}"/>		
@@ -29,7 +29,7 @@
 		</ui:infiniteList>
     </ui:scroller>
     
-    <ui:scroller aura:id="scroller2" onPullToRefresh="{!c.refresh2}" onPullToLoadMore="{!c.showMore2}" class="test">
+    <ui:scroller aura:id="scroller2" onPullToRefresh="{!c.refresh2}" onPullToShowMore="{!c.showMore2}" class="test">
 	    <ui:infiniteList aura:id="list2" itemVar="row" currentPage="{!v.currentPage}" pageSize="{!v.pageSize}" totalItems="{!v.totalItems}">
 			<aura:set attribute="dataProvider">
 				<uitest:infiniteDataProvider currentPage="{!v.currentPage}" pageSize="{!v.pageSize}" totalItems="{!v.totalItems}" listType="single"/>		
@@ -39,6 +39,18 @@
 				<div style="border: 1px solid black">{!row.index} : {!row.char}</div>
 			</aura:set>
 		</ui:infiniteList>
+    </ui:scroller>
+    
+    <ui:scroller aura:id="scroller3" class="test">
+        <ui:infiniteList aura:id="list3" itemVar="row" currentPage="{!v.currentPage}" pageSize="{!v.pageSize}" totalItems="{!v.totalItems}">
+            <aura:set attribute="dataProvider">
+                <uitest:infiniteDataProvider currentPage="{!v.currentPage}" pageSize="{!v.pageSize}" totalItems="{!v.totalItems}" listType="single"/>       
+            </aura:set>
+            
+            <aura:set attribute="itemTemplate">
+                <div style="border: 1px solid black">{!row.index} : {!row.char}</div>
+            </aura:set>
+        </ui:infiniteList>
     </ui:scroller>
         
 </aura:component>

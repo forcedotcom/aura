@@ -97,30 +97,42 @@ public class LocaleValueProvider implements GlobalValueProvider {
         
         NumberFormat nf = NumberFormat.getNumberInstance(al.getNumberLocale());
         if (!(nf instanceof DecimalFormat)) {
-            throw new AuraRuntimeException("Expected DecimalFormat, but found " + nf.getClass().getName());
+            //fallback to the default locale
+            nf = NumberFormat.getNumberInstance();
         }
-        DecimalFormat df = (DecimalFormat) nf;
-        builder.put(NUMBER_FORMAT, df.toPattern());
-        DecimalFormatSymbols dfs = df.getDecimalFormatSymbols();
-        builder.put(DECIMAL, dfs.getDecimalSeparator());
-        builder.put(GROUPING, dfs.getGroupingSeparator());
+        
+        if (nf instanceof DecimalFormat) {
+	        DecimalFormat df = (DecimalFormat) nf;
+            builder.put(NUMBER_FORMAT, df.toPattern());
+            DecimalFormatSymbols dfs = df.getDecimalFormatSymbols();
+            builder.put(DECIMAL, dfs.getDecimalSeparator());
+            builder.put(GROUPING, dfs.getGroupingSeparator());
+        }
         
         nf = NumberFormat.getPercentInstance(al.getNumberLocale());
         if (!(nf instanceof DecimalFormat)) {
-            throw new AuraRuntimeException("Expected DecimalFormat, but found " + nf.getClass().getName());
+            //fallback to the default locale
+            nf = NumberFormat.getPercentInstance();
         }
-        DecimalFormat pf = (DecimalFormat) nf;
-        builder.put(PERCENT_FORMAT, pf.toPattern());
+        
+        if (nf instanceof DecimalFormat) {
+            DecimalFormat pf = (DecimalFormat) nf;
+            builder.put(PERCENT_FORMAT, pf.toPattern());
+        }
         
         nf = NumberFormat.getCurrencyInstance(al.getCurrencyLocale());
         if (!(nf instanceof DecimalFormat)) {
-            throw new AuraRuntimeException("Expected DecimalFormat, but found " + nf.getClass().getName());
+            //fallback to the default locale
+            nf = NumberFormat.getCurrencyInstance();
         }
-        DecimalFormat cf = (DecimalFormat) nf;
-        builder.put(CURRENCY_FORMAT, cf.toPattern());
-        DecimalFormatSymbols cdfs = cf.getDecimalFormatSymbols();
-        builder.put(CURRENCY_CODE, cdfs.getCurrency().getCurrencyCode());
-        builder.put(CURRENCY, cdfs.getCurrencySymbol());
+        
+        if (nf instanceof DecimalFormat) {
+            DecimalFormat cf = (DecimalFormat) nf;
+            builder.put(CURRENCY_FORMAT, cf.toPattern());
+            DecimalFormatSymbols cdfs = cf.getDecimalFormatSymbols();
+            builder.put(CURRENCY_CODE, cdfs.getCurrency().getCurrencyCode());
+            builder.put(CURRENCY, cdfs.getCurrencySymbol());
+        }
 
         data = builder.build();
     }

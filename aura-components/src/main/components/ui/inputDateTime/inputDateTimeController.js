@@ -38,6 +38,9 @@
         var elem = outputCmp ? outputCmp.getElement() : null;
         var value = elem ? elem.value : null;
         var format = component.get("v.format");
+        if (!format) { // use default format
+            format = $A.getGlobalValueProviders().get("$Locale.datetimeformat");
+        }
         var langLocale = component.get("v.langLocale");
         var hours = 0
         var mins = 0;

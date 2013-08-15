@@ -440,7 +440,7 @@ var AuraLocalizationService = function AuraLocalizationService() {
         parseDateTime : function(dateTimeString, targetFormat, locale) {
             if (!dateTimeString) {
                 return null;
-        }
+            }
 
             var mDate = moment(dateTimeString, localizationService.getNormalizedFormat(targetFormat), localizationService.getNormalizedLangLocale(locale));
             if (mDate && mDate["isValid"]()) {

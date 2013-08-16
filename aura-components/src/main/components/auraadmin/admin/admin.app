@@ -29,6 +29,7 @@ Caches
 <auraadmin:cacheView data="{!m.defsData}" name="Definitions" showDefs="true" />
 <auraadmin:cacheView data="{!m.existsData}" name="Existence" />
 <auraadmin:cacheView data="{!m.stringsData}" name="Strings" />
+<auraadmin:cacheView data="{!m.descriptorFilterData}" name="Descriptor Filter" />
 </p>
 <p>
 Non-caching Registries

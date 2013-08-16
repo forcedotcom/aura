@@ -494,7 +494,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         // another getDef on other registry instance should re-compile the def
         registry = getDefRegistry(true);
         assertNotNull(registry.getDef(cmpDesc));
-        Mockito.verify(registry, Mockito.times(1)).compileDef(Mockito.eq(cmpDesc),
+        Mockito.verify(registry, Mockito.times(0)).compileDef(Mockito.eq(cmpDesc),
                 Mockito.<Map<DefDescriptor<? extends Definition>, Definition>> any());
     }
 

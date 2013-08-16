@@ -391,7 +391,7 @@
                 var output = component.find("outputText");
                 return $A.test.getText(output.getElement());
             });
-        },
+        }
         ]
     },
 

@@ -54,7 +54,12 @@ Number of static imports needed for .*: 99
 This sets up the Aura copyright header for new Java files
 
 
+-- JS Code Style/Formatting (NOT covered by auraEclipsePrefs.epf)--
+* Window->Preferences->Javascript->Code Style->Formatter->Import: eclipse/auraJSFormat.xml
 
+
+-- JS Code Templates (NOT covered by auraEclipsePrefs.epf)--
+* Window->Preferences->Javascript->Code Style->Code Templates->Import: eclipse/JS.xml
 
 
 -- Save Actions (NOT covered by the import)--

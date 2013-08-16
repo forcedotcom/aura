@@ -54,6 +54,9 @@
         var ret = value;
         if (value) {
             var format = component.get("v.format");
+            if (!format) { // use default format
+                format = $A.getGlobalValueProviders().get("$Locale.dateformat");
+            }
             var langLocale = component.get("v.langLocale");
             var d = $A.localizationService.parseDateTimeUTC(value, format, langLocale);
             ret = $A.localizationService.formatDateUTC(d, "YYYY-MM-DD");

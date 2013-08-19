@@ -28,6 +28,8 @@ import org.auraframework.throwable.quickfix.QuickFixException;
  * </p>
  */
 public interface IntegrationService extends AuraService {
+	public static String NO_DEFAULT_PRELOADS_INTERFACE = "aura:noDefaultPreloads";
+	
     /**
      * Create an Integration object that represents a set of components that
      * will be injected into a non-Aura container.

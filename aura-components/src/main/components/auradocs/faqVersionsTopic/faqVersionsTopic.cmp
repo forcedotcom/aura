@@ -24,10 +24,9 @@
 
     <p>The version number scheme is:</p>
     
-    <p><code><em>major</em>.<em>minor</em>.<em>incremental</em>[-<em>qualifier</em>]</code></p>
+    <p><code><em>major</em>.<em>minor</em>[.<em>incremental</em>][-<em>qualifier</em>]</code></p>
     
-    <p>The <code>major</code>, <code>minor</code>, and <code>incremental</code> parts are all numeric, and
-    the <code>qualifier</code> string is optional. For example, <code>1.2.0</code> or <code>2.5.0-SNAPSHOT</code> are both valid.</p>
+    <p>The <code>major</code>, <code>minor</code>, and optional <code>incremental</code> parts are all numeric. The <code>qualifier</code> string is optional. For example, <code>1.2.0</code>, <code>2.4</code>, or <code>2.5.0-SNAPSHOT</code> are all valid.</p>
     
     <p>The <code>major</code>
     number advances and the <code>minor</code> and <code>incremental</code> counters reset to zero
@@ -59,6 +58,14 @@
     <p>Release candidates are always newer than
     any milestone, and a release candidate or milestone with a higher number
     is newer than others with lower numbers.</p>
+
+    <p>If you have the source code for the Aura framework, you can find the version number in the root folder's <code>pom.xml</code> file. For example:</p>
+        
+<auradocs:codeblock><![CDATA[<project ... >
+    <name>Aura Framework</name>
+    <version>0.273</version>
+</project>]]><br/>
+</auradocs:codeblock>    
 
     <p>Although it will rarely be important, you can use the Java <code>ConfigAdapter.getAuraVersion()</code> method to see what version of Aura is running your code.</p>
 </aura:component>

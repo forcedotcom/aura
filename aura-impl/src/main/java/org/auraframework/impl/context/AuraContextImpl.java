@@ -28,6 +28,7 @@ import org.auraframework.instance.*;
 import org.auraframework.system.*;
 import org.auraframework.test.TestContext;
 import org.auraframework.test.TestContextAdapter;
+import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.AuraUnhandledException;
 import org.auraframework.throwable.quickfix.InvalidEventTypeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -274,8 +275,9 @@ public class AuraContextImpl implements AuraContext {
         this.access = access;
         this.jsonContext = jsonContext;
         this.globalProviders = globalProviders;
-        this.appDesc = appDesc;
         this.isDebugToolEnabled = isDebugToolEnabled;
+        
+		setApplicationDescriptor(appDesc);
     }
 
     @Override
@@ -293,6 +295,7 @@ public class AuraContextImpl implements AuraContext {
         if (preloading) {
             return false;
         }
+        
         if (appDesc != null && !appLoaded) {
             appLoaded = true;
             try {
@@ -307,6 +310,7 @@ public class AuraContextImpl implements AuraContext {
                 }
             }
         }
+        
         if (app != null) {
             for (DependencyDef dd : app.getDependencies()) {
                 if (dd.getDependency().matchDescriptor(descriptor)) {
@@ -314,6 +318,7 @@ public class AuraContextImpl implements AuraContext {
                 }
             }
         }
+        
         return preloadedNamespaces.contains(descriptor.getNamespace());
     }
 

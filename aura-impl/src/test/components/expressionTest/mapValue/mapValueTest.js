@@ -384,10 +384,20 @@
             });
         }, function(component) {
             var map = component.getValue("m.map");
-            map.setValue({"subkey": "set"});
+            map.setValue({"subKey": "set"});
             // Insert a pause for re-rendering.  SetValue leaves DIRTY child
-            // objecst (W-1678810), so it does re-render:
+            // objecst (W-1678810), so it does re-render.  Note that this also
+            // tests our case-insensitivity.
             $A.test.addWaitFor("set", function() {
+                var output = component.find("outputText");
+                return $A.test.getText(output.getElement());
+            });
+        }, function(component) {
+            // Checks case insensitivity
+            var otherMap = $A.expressionService.create(null, { 'subkey' : "second" });
+            var map = component.getValue("m.map");
+            map.setValue(otherMap);
+            $A.test.addWaitFor("second", function() {
                 var output = component.find("outputText");
                 return $A.test.getText(output.getElement());
             });
@@ -403,7 +413,6 @@
         test: function(component){
             var mockGlobalId = 0;
             var leafCounts = { 'simple': 0, 'map': 0, 'array': 0 };
-
             var simval = $A.expressionService.create(null, 180);
             simval.addHandler({'eventName': 'change',
                     'method': function(e) { leafCounts['simple']++; },

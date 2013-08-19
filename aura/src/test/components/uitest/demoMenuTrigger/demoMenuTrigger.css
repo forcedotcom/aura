@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 .THIS .iconClassLink {
-    background-image: url("/auraFW/resources/aura/images/search.png");
-    background-size: auto auto;
+    background-image: url("/auraFW/resources/aura/images/menuitem-check.png");
+    background-repeat: no-repeat;
     width: 16px;
-    height: 16px
+    height: 16px;
 }

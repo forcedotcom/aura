@@ -80,7 +80,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
                 || allClasses.startsWith(oneClass + " ") || allClasses.endsWith(" " + oneClass);
     }
 
-    protected int timeoutInSecs = 30;
+    protected int timeoutInSecs = Integer.parseInt(System.getProperty("webdriver.timeout", "30"));
     private WebDriver currentDriver = null;
     BrowserType currentBrowserType = null;
     protected AuraUITestingUtil auraUITestingUtil;

@@ -28,6 +28,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.RegisterEventDef;
 import org.auraframework.instance.Action;
 import org.auraframework.integration.Integration;
+import org.auraframework.integration.IntegrationServiceObserver;
 import org.auraframework.integration.UnsupportedUserAgentException;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
@@ -48,12 +49,13 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 public class IntegrationImpl implements Integration {
-    public IntegrationImpl(String contextPath, Mode mode, boolean initializeAura, String userAgent, String application) throws QuickFixException {
+	public IntegrationImpl(String contextPath, Mode mode, boolean initializeAura, String userAgent, String application, IntegrationServiceObserver observer) throws QuickFixException {
         this.client = userAgent != null ? new Client(userAgent) : null;
         this.contextPath = contextPath;
         this.mode = mode;
         this.initializeAura = initializeAura;
         this.application = application != null ? application : DEFAULT_APPLICATION;
+        this.observer = observer;
     }
 
     @Override
@@ -72,9 +74,9 @@ public class IntegrationImpl implements Integration {
 
         AuraContext context = getContext("is");
         try {
-            DefDescriptor<ComponentDef> descriptor = Aura.getDefinitionService().getDefDescriptor(tag,
-                    ComponentDef.class);
             DefinitionService definitionService = Aura.getDefinitionService();
+            DefDescriptor<ComponentDef> descriptor = definitionService.getDefDescriptor(tag,
+                    ComponentDef.class);
             ControllerDef componentControllerDef = definitionService.getDefDescriptor("aura://ComponentController",
                     ControllerDef.class).getDef();
 
@@ -198,6 +200,10 @@ public class IntegrationImpl implements Integration {
         if (client != null) {
             context.setClient(client);
         }
+        
+        if (observer != null) {
+        	observer.contextEstablished(this, context);
+        }
 
         for (String preload : preloads) {
             context.addPreload(preload);
@@ -242,7 +248,8 @@ public class IntegrationImpl implements Integration {
     private final Client client;
     private final Set<String> preloads = Sets.newHashSet();
     private final String application;
- 
+    private final IntegrationServiceObserver observer;
+
     private boolean hasApplicationBeenWritten;
     private boolean integrationOwnsContext;    
 }

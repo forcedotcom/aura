@@ -72,13 +72,13 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
         Integration integration = null;
         assertNotNull("Failed to locate integration service implementation.", service);
         // All Nulls
-        integration = service.createIntegration(null, null, true, null, null);
+        integration = service.createIntegration(null, null, true, null, null, null);
         assertException(integration);
         // No Context Path
-        integration = service.createIntegration(null, Mode.UTEST, true, null, null);
+        integration = service.createIntegration(null, Mode.UTEST, true, null, null, null);
         assertException(integration);
         // No mode specified
-        integration = service.createIntegration("", null, true, null, null);
+        integration = service.createIntegration("", null, true, null, null, null);
         assertException(integration);
     }
 
@@ -115,7 +115,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
      */
     public void testThrowsOnUnsupportedBrowsers() throws Exception{
         String ie6UserAgent = "Mozilla/4.0 (compatible; MSIE 6.1; Windows XP; .NET CLR 1.1.4322; .NET CLR 2.0.50727)";
-        Integration integration = service.createIntegration("", Mode.DEV, true, ie6UserAgent, null);
+        Integration integration = service.createIntegration("", Mode.DEV, true, ie6UserAgent, null, null);
         try{
             injectSimpleComponent(integration);
             fail("Integration service should throw exception when used with unsupported browsers.");
@@ -134,7 +134,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
 
         Mode[] testModes = new Mode[] { Mode.UTEST, Mode.PROD };
         for (Mode m : testModes) {
-            Integration integration = service.createIntegration("", m, true, null, null);
+            Integration integration = service.createIntegration("", m, true, null, null, null);
             assertNotNull(String.format(
                     "Failed to create an integration object using IntegrationService in %s mode. Returned null.", m),
                     integration);
@@ -266,7 +266,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
     }
 
 	private Integration createIntegration() throws QuickFixException {
-		return service.createIntegration("", Mode.UTEST, true, null, null);
+		return service.createIntegration("", Mode.UTEST, true, null, null, null);
 	}
 
     @Ignore("W-1505382")

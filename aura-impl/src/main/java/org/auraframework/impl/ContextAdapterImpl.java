@@ -54,8 +54,13 @@ public class ContextAdapterImpl implements ContextAdapter {
 			DefDescriptor<? extends BaseComponentDef> appDesc,
 			boolean isDebugToolEnabled) {
     	AuraContext context = new AuraContextImpl(mode, masterRegistry, defaultPrefixes, format, access, jsonContext,
-                globalProviders, appDesc, isDebugToolEnabled);
+                globalProviders, isDebugToolEnabled);
         currentContext.set(context);
+        
+        if (appDesc != null) {
+        	context.setApplicationDescriptor(appDesc);
+        }
+        
         return context;
 	}
     

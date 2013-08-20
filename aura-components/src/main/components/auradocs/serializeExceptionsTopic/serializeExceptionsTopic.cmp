@@ -1,0 +1,46 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="Serializing Exceptions"/>
+    
+<p>You can serialize server-side exceptions and attach an event to be passed back to the client in such a way that an event is automatically fired on the client side and handled by the client's error-handling event handler.</p> 
+
+<p>To do this, on the server, instantiate a <code>GenericEventException</code> that contains an event and parameters and then throw it. The exception gets serialized and when the action goes back to the client, the exception is sent along with the action as an error on the action. The status of the action will be set as “Error” so if you have a callback, it will have an error on it.</p>
+
+<auradocs:codeblock>
+    @AuraEnabled
+    public static void throwsGEE(@Key("event") String event, @Key("paramName") String paramName,
+            @Key("paramValue") String paramValue) throws Throwable {
+        GenericEventException gee = new GenericEventException(event);
+        if (paramName != null) {
+            gee.addParam(paramName, paramValue);
+        }
+        throw gee;
+    }
+</auradocs:codeblock><br/>
+
+<p>On the client, the client-side framework automatically handles deserializing the event and firing it. It will search for the event first in the component, and then as a global event. If it finds it in the component, it fires a component local event and attaches it to the component. If not, it fires an application-level event.</p> 
+
+<p>A <code>GenericEventException</code> is a server-side Java exception that extends the generic exception, <code>ClientSideEventException</code>. Optionally, you can extend <code>ClientSideEventException</code> yourself but it is easier to use the provided <code>GenericEventException</code>. Other classes that extend <code>ClientSideEventException</code> are the <code>ClientOutOfSyncException</code> class, the <code>SystemErrorException</code> class, the <code>InvalidSessionException</code> class, and the <code>NoAccessException</code> class. These classes are for internal use only.</p>
+
+<p>For a working example of a server-side controller that throws a <code>GenericEventException</code>, refer to the <auradocs:defLink descriptor="test:testActionEvent">test:testActionEvent</auradocs:defLink> component.</p>
+
+<p><b>See also:</b><br/>    
+    <auradocs:topicLink topic="serverSideControllers">Server-Side Controllers</auradocs:topicLink><br/>
+</p>   
+</aura:component>

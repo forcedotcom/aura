@@ -401,17 +401,17 @@
 					// Check for rubber banding because cached wrapper
 					// dimensions and actual wrapper dimensions do not match
 					var wrapperStyle = getComputedStyle(c.getElement(), null);
-					validate(c._scroller.wrapperH === parseInt(wrapperStyle.height),
+					validate(c._scroller.wrapperH === Math.round(wrapperStyle.height.replace("px", "")),
 							'Rubberbanding detected: actual wrapper height does not match cached height', c, errors);
-					validate(c._scroller.wrapperW === parseInt(wrapperStyle.width), 'Rubberbanding detected: actual wrapper width does not match cached width',
+					validate(c._scroller.wrapperW === Math.round(wrapperStyle.width.replace("px", "")), 'Rubberbanding detected: actual wrapper width does not match cached width',
 							c, errors);
 
 					// Check for rubber banding because cached content
 					// dimensions and actual content dimensions do not match
 					var contentStyle = getComputedStyle(c.find('scrollContent').getElement(), null);
-					validate(c._scroller.scrollerH + c._scroller.options.topOffset === parseInt(contentStyle.height),
+					validate(c._scroller.scrollerH + c._scroller.options.topOffset === Math.round(contentStyle.height.replace("px", "")),
 							'Rubberbanding detected: actual content height does not match cached height', c, errors);
-					validate(c._scroller.scrollerW === parseInt(contentStyle.width),
+					validate(c._scroller.scrollerW === Math.round(contentStyle.width.replace("px", "")),
 							'Rubberbanding detected: actual content width does not match cached width', c, errors);
 				}
 			}

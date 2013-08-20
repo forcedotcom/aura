@@ -30,7 +30,7 @@
     <div aura:id="hasClass" class="{!v.classValue ? v.classValue : ''}">has class: {!v.classValue}</div>
     
     <aura:attribute name="type" default="text" type="String"/>
-    <aura:attribute name="style" default="color:blue;" type="String"/>
+    <aura:attribute name="style" default="color:blue" type="String"/>
     <aura:attribute name="dataName" default="textElement" type="String"/>
     <input type="{!v.type}" aura:id="specialAttributes_input" style="{!v.style}" data-name="{!v.dataName}" value="html Attributes"/>
     

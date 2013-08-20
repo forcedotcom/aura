@@ -47,7 +47,7 @@
         test: function(cmp){
         	aura.test.addWaitFor(true, function(){return cmp.find("inputText").getElement().value.length > 0;},function(){
 				var inputDateStr  = cmp.find("inputText").getElement().value;		        
-	    		aura.test.assertEquals('Invalid date time value', inputDateStr, "Value must be an ISO8601-formatted string or a number of milliseconds from Epoch.");
+	    		aura.test.assertEquals('cornholio', inputDateStr, "Value must be an ISO8601-formatted string or a number of milliseconds from Epoch.");
 			});            
         }
     },     

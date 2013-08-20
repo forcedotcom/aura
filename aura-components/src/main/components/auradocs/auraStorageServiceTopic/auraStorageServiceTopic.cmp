@@ -63,7 +63,12 @@
 <p>Aura Storage Service selects a storage adapter on your behalf that matches the  persistent and secure options you specify when initializing the service. For example, if you request a persistent and secure storage service, Aura Storage Service will return the SmartStore storage.</p>
 
 <h3>Storage Types and Options</h3>
-<p>There are two types of storage: custom named storage and the Aura-provided actions storage. Custom storage is storage that you control by adding and retrieving items to and from storage. The actions storage is managed by Aura, is available for server-side actions, and enables caching action response values.</p> 
+<p>There are two types of storage:
+<ul>
+    <li>Custom named storage: Storage that you control by adding and retrieving items to and from storage.</li>
+    <li>Aura-provided actions storage: Storage that is available for client-side and server-side actions that enables caching action response values. For more information, see <auradocs:topicLink topic="storableServerSideActions">Storable Server-Side Actions</auradocs:topicLink>.</li>
+</ul>
+</p> 
 
 <p>When you initialize Aura storage, you can set certain options, such as the maximum cache size and the default expiration time. The storage name is required and must be specified.</p>
 

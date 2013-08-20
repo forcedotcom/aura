@@ -28,7 +28,7 @@
         test: function(cmp) {
             var scrlrDiv = cmp.find("scroller3").getElements()[1];
             var divChildren = scrlrDiv.children[0].children.length;
-            $A.test.assertFalse(divChildren > 1, "There should not be children relating to a spacer");
+            $A.test.assertFalse(divChildren > 1, "User does not want to pull to refresh, there should not be a div for a spacer here");
         }
     },
     /*
@@ -41,7 +41,7 @@
             var scrlrDiv = cmp.find("scroller2").getElements()[1];
             var cssText = scrlrDiv.children[0].children[2].style.cssText;
             var height = cssText.match( /\d+/g )[0];
-            $A.test.assertTrue(height > 0, "height should be greater than zero for spacing, since there is not enough information");
+            $A.test.assertTrue(height > 0, "height should be greater than zero for spacing, since there not enough list element");
         }
     },
     /*
@@ -52,9 +52,10 @@
 	browsers: ["-IE7","-IE8"],
         test: function(cmp) {
             var scrlrDiv = cmp.find("scroller1").getElements()[1];
-            var cssText = scrlrDiv.children[0].children[2].style.cssText;
-            var height = cssText.match( /\d+/g )[0];
-            $A.test.assertTrue(height == 0, "height should be equal to zero, since there is more than enough information");
+            var childrenWithStyle =  scrlrDiv.children[0].children[2];
+            $A.test.addWaitForWithFailureMessage("0", 
+        	    function(){return childrenWithStyle.style.cssText.match( /\d+/g )[0];},
+        	    "height of the space was not zero. List elements go past scrollable area, and should not need a spacer.");
         }
     }
 })

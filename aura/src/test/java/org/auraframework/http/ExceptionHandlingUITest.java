@@ -25,7 +25,6 @@ import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.WebDriverTestCase;
-import org.auraframework.test.WebDriverUtil.BrowserType;
 import org.auraframework.test.annotation.ThreadHostileTest;
 import org.auraframework.test.annotation.UnAdaptableTest;
 import org.openqa.selenium.By;
@@ -210,9 +209,6 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
     /**
      * Stacktrace displayed in non-PRODUCTION if component model instantiation throws.
      */
-    // WebDriver bug in 2.33. WebElement.getText() does not return text not directly visible on Firefox.
-    // See: https://code.google.com/p/selenium/issues/detail?id=5773
-    @ExcludeBrowsers({ BrowserType.FIREFOX })
     public void testCmpModelThrowsDuringInstantiation() throws Exception {
         setProdContextWithoutConfig();
         DefDescriptor<?> cdd = addSourceAutoCleanup(ComponentDef.class,

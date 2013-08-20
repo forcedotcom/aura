@@ -734,12 +734,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
             de = new DependencyEntry(uid, Sets.newTreeSet(dds.keySet()), lmt);
             depsCache.put(makeGlobalKey(de.uid, descriptor), de);
-            //
-            // FIXME: W-1791871 this needs to have a check to see than no registries have
-            // user dependencies, so then we can safely cache things. For the moment
-            // there are no user dependencies.
-            //
-            depsCache.put(key, de);
+
             // See localDependencies comment
             localDependencies.put(de.uid, de);
             localDependencies.put(key, de);

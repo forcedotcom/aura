@@ -256,6 +256,13 @@ AuraContext.prototype.getLoaded = function() {
 };
 
 /**
+ * This should be private but is needed for testing and dev modes.
+ */
+AuraContext.prototype.getPreloadedNamespaces = function() {
+    return this.preloads;
+};
+
+/**
  * DCHASMAN Will be private again soon as part of the second phase of W-1450251
  */
 AuraContext.prototype.setCurrentAction = function(action) {

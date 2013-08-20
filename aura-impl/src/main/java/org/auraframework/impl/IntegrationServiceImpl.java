@@ -25,7 +25,8 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 public class IntegrationServiceImpl implements IntegrationService {
  
     @Override
-    public Integration createIntegration(String contextPath, Mode mode, boolean initializeAura, String userAgent, String application, IntegrationServiceObserver observer) throws QuickFixException {
+    public Integration createIntegration(String contextPath, Mode mode, boolean initializeAura, String userAgent, 
+            String application, IntegrationServiceObserver observer) throws QuickFixException {
         return new IntegrationImpl(contextPath, mode, initializeAura, userAgent, application, observer);
     }
 

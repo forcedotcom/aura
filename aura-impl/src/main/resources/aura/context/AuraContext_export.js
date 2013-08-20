@@ -24,7 +24,7 @@ exp(p,
     //#if {"excludeModes" : ["PRODUCTION"]}
         ,
         "getNum", p.getNum,
-        "getLoaded", p.getLoaded
-
+        "getLoaded", p.getLoaded,
+        "getPreloadedNamespaces", p.getPreloadedNamespaces
     //#end
 );

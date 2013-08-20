@@ -100,4 +100,5 @@ exp(p,
     
     // appcache
     "getAppCacheEvents", p.getAppCacheEvents
+    
 );

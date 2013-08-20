@@ -35,6 +35,8 @@ import org.auraframework.test.annotation.UnAdaptableTest;
 import org.auraframework.util.json.Json;
 import org.junit.Ignore;
 
+import com.google.common.collect.Sets;
+
 /**
  * Unit tests for AuraContextImpl.
  * 
@@ -310,5 +312,39 @@ public class AuraContextImplTest extends AuraImplTestCase {
         context.dropLoaded(dropped);
         String res = Json.serialize(context, context.getJsonSerializationContext());
         goldFileJson(res);
+    }
+    
+    /**
+     * Verify that an app descriptor specified to startContext() is used to setup AuraContext.
+     */
+    public void testSettingAppDescriptorOnContext(){
+        if(Aura.getContextService().isEstablished()){
+            Aura.getContextService().endContext();
+        }
+        DefDescriptor<ApplicationDef> appDesc = Aura.getDefinitionService().getDefDescriptor("test:laxSecurity", ApplicationDef.class);
+        AuraContext cntx = Aura.getContextService().startContext(Mode.FTEST, Format.JSON, Access.AUTHENTICATED, appDesc);
+        assertEquals(appDesc, cntx.getApplicationDescriptor());
+    }
+    
+    /**
+     * Verify that an cmp descriptor specified to startContext() is used to setup AuraContext.
+     */
+    public void testSettingAComponentAsAppDescriptorOnContext(){
+        if(Aura.getContextService().isEstablished()){
+            Aura.getContextService().endContext();
+        }
+        DefDescriptor<ComponentDef> cmpDesc = Aura.getDefinitionService().getDefDescriptor("aura:text", ComponentDef.class);
+        AuraContext cntx = Aura.getContextService().startContext(Mode.FTEST, Format.JSON, Access.AUTHENTICATED, cmpDesc);
+        assertEquals(cmpDesc, cntx.getApplicationDescriptor());
+    }
+    
+    @UnAdaptableTest
+    public void testDefaultPreloadNamespaces(){
+        AuraContext cntx = Aura.getContextService().getCurrentContext();
+        Set<String> preloads = Sets.newHashSet(cntx.getPreloads());
+        Set<String> expectedPreloads = Sets.newHashSet("aura", "ui");
+        assertTrue(preloads.containsAll(expectedPreloads));
+        preloads.removeAll(expectedPreloads);
+        assertTrue("Unexpected namespaces prelaoded:"+preloads.toString(), preloads.isEmpty());
     }
 }

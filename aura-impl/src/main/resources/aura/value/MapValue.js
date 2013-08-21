@@ -121,13 +121,15 @@ MapValue.prototype.setValue = function(newMap) {
             return;
         }
     }
-    for (var k in copyMap) {
-        var key = k;
-
-        if (copyKeys && copyKeys[k]) {
-            key = copyKeys[k];
+    for (var originalKey in copyMap) {
+        var lowerKey;
+        if (copyKeys && copyKeys[originalKey]) {
+            lowerKey = originalKey;
+            originalKey = copyKeys[originalKey];
+        } else {
+            lowerKey = originalKey.toLowerCase();
         }
-        this.add(key, copyMap, k in oldMap);
+        this.add(originalKey, copyMap, lowerKey in oldMap);
     }
 };
 

@@ -135,35 +135,49 @@
 	    	this.assertClassUpdate(component);
     	}
     },
+
     /**
      * Verify rerender of special html attributes
      * type, href, style and data attributes must be set by using setAttribute() on dom elements
      */
     testRerenderSpecialHtmlAttributes:{
-	test:function(component){
-	    var input = component.find("specialAttributes_input").getElement();
-	    $A.test.assertEquals("textElement" , input.getAttribute("data-name"), "Failed to render data attribute");
-	    $A.test.assertEquals("color:blue;" , input.getAttribute("style").replace(" ",""), "Failed to render style attribute");
-	    $A.test.assertEquals("text" , input.getAttribute("type"), "Failed to render type attribute");
-	    
-	    var a = component.find("specialAttributes_a").getElement();
-	    $A.test.assertEquals("http://bazinga.com/" , a.getAttribute("href"), "Failed to render href attribute");
-	    
-	    component.getAttributes().setValue("type", "input");
-	    component.getAttributes().setValue("style", "color:green;");
-	    component.getAttributes().setValue("dataName", "inputElement");
-	    component.getAttributes().setValue("href", "http://bbt.com/");
-	    
-	    $A.rerender(component);
-	    input = component.find("specialAttributes_input").getElement();
-	    $A.test.assertEquals("inputElement" , input.getAttribute("data-name"), "Failed to rerender data attribute");
-	    $A.test.assertEquals("color:green;" , input.getAttribute("style").replace(" ",""), "Failed to rerender style attribute");
-	    $A.test.assertEquals("input" , input.getAttribute("type"), "Failed to rerender type attribute");
-	    
-	    a = component.find("specialAttributes_a").getElement();
-	    $A.test.assertEquals("http://bbt.com/" , a.getAttribute("href"), "Failed to rerender href attribute");
-	}
+		test:function(component){
+		    var input = component.find("specialAttributes_input").getElement();
+		    $A.test.assertEquals("textElement" , input.getAttribute("data-name"), "Failed to render data attribute");
+		    $A.test.assertEquals("color:blue" , input.getAttribute("style").replace(/[ ;]/g,"").toLowerCase(), "Failed to render style attribute");
+		    
+		    var a = component.find("specialAttributes_a").getElement();
+		    $A.test.assertEquals("http://bazinga.com/" , a.getAttribute("href"), "Failed to render href attribute");
+		    
+		    component.getAttributes().setValue("style", "color:green");
+		    component.getAttributes().setValue("dataName", "inputElement");
+		    component.getAttributes().setValue("href", "http://bbt.com/");
+		    
+		    $A.rerender(component);
+		    input = component.find("specialAttributes_input").getElement();
+		    $A.test.assertEquals("inputElement" , input.getAttribute("data-name"), "Failed to rerender data attribute");
+		    $A.test.assertEquals("color:green" , input.getAttribute("style").replace(/[ ;]/g,"").toLowerCase(), "Failed to rerender style attribute");
+		    
+		    a = component.find("specialAttributes_a").getElement();
+		    $A.test.assertEquals("http://bbt.com/" , a.getAttribute("href"), "Failed to rerender href attribute");
+		}
     },
+
+    /**
+     * Change type of input element (non-IE)
+     */
+    testChangeTypeOfInputElement:{
+    	browsers: ["-IE7","-IE8","-IE9"],
+		test:function(component){
+		    var input = component.find("specialAttributes_input").getElement();
+		    $A.test.assertEquals("text" , input.getAttribute("type"), "Failed to render type attribute");
+		    component.getAttributes().setValue("type", "input");
+		    $A.rerender(component);
+		    input = component.find("specialAttributes_input").getElement();
+		    $A.test.assertEquals("input" , input.getAttribute("type"), "Failed to rerender type attribute");
+		}
+    },
+
     /**
      * Verify that touchend event handlers is used if present before using onclick.
      * Automation for W-1564377

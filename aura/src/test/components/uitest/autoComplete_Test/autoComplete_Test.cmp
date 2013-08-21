@@ -94,7 +94,4 @@
     </ui:autocomplete>
     Match Count: <ui:outputText aura:id="autoCompleteCustomOptionMatchSize" value=""/> <br/><br/>
     
-    
-    <br/><br/>
-    <a href="www.salesforce.com">Link to Salesforce</a>
 </aura:component>

@@ -1,0 +1,96 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="Auto-complete"/>
+
+	<ui:block>
+		<aura:set attribute="left">
+		    <p><code>ui:autocomplete</code> displays suggestions as users type in a text field. Data for this component is provided by a server-side model.
+		    This component provides its own text field and text area component. The default is a text field but you can change it to a text area by setting <code>inputType="inputTextArea"</code>.
+		    </p>
+		    
+		</aura:set>
+		<aura:set attribute="right">
+		<b>Key Component</b><br/>
+		<auradocs:defLink defType="component" descriptor="ui:autocomplete"/><br/>
+		<auradocs:defLink defType="component" descriptor="ui:autocompleteOption"/>
+		</aura:set>
+	</ui:block>
+	<p>Here is a basic set up of the auto-complete component with a default input text field. </p>
+
+<auradocs:codeblock>&lt;ui:autocomplete aura:id="autoComplete" optionVar="row" 
+    matchDone="<aura:text value="{!"/>c.handleMatchDone}"
+    inputChange="<aura:text value="{!"/>c.handleInputChange}" 
+    selectListOption="<aura:text value="{!"/>c.handleSelectOption}">
+    &lt;aura:set attribute="dataProvider">
+        &lt;demo:dataProvider/>
+    &lt;/aura:set>
+    &lt;aura:set attribute="listOption">
+        &lt;ui:autocompleteOption label="<aura:text value="{!"/>row.label}" keyword="<aura:text value="{!"/>row.keyword}" 
+                                value="<aura:text value="{!"/>row.value}" visible="<aura:text value="{!"/>row.visible}"/>     
+    &lt;/aura:set>
+&lt;/ui:autocomplete></auradocs:codeblock>
+    
+	<p>For an example of using the auto-complete component, see the <ui:outputURL value="/auradocs#demos?demo=autocomplete" label="ui:autocomplete demo"/>.</p>
+    
+    <h3>Working with Events</h3>
+    <p>Common events for <code>ui:autocomplete</code> include the <code>fetchData</code>, <code>inputChange</code>, <code>matchDone</code>,  and <code>selectListOption</code> events. The behaviors for these events can be configured as desired.
+    For a full list of events that you can use with <code>ui:autocomplete</code>, see the <auradocs:defLink defType="component" descriptor="ui:autocomplete"/> component reference.</p>
+    
+    <h4><code>fetchData</code></h4>
+    <p>Fire the <code>fetchData</code> event if you want to fetch data through the data provider. For example, you can fire this event in the <code>inputChange</code> event when the input value changes.
+     The <code>ui:autocomplete</code> component  automatically matches text on the new data.</p>
+    
+    <h4><code>inputChange</code></h4>
+    <p>Use the <code>inputChange</code> event to handle an input value change. Get the new value with <code>event.getParam("value");</code>. The following code handles a text match on existing data.</p>
+<auradocs:codeblock>var matchEvt = acCmp.get("e.matchText");
+matchEvt.setParams({
+    keyword: event.getParam("value")
+});
+matchEvt.fire();</auradocs:codeblock>
+
+    <h4><code>matchDone</code></h4>
+    <p>Use the <code>matchDone</code> event to handle when a text matching has completed.</p>
+    
+    <h4><code>selectListOption</code></h4>
+    <p>Use the <code>selectListOption</code> event to handle when a list option is displayed. Get the options with <code>event.getParam("option");</code></p>
+    
+	<p>For more information on client-side controllers, see <auradocs:topicLink topic="helloActions">Client-Side Controllers</auradocs:topicLink>.</p>
+	
+	<h3>Providing Data to the Auto-complete Component</h3>
+	<p>In the basic set up above, <code>demo:dataProvider</code> provides the list of data to be displayed as suggestions when a text match occurs. <code>demo:dataProvider</code> extends <code>ui:dataProvider</code> and takes in a server-side model.</p>
+	The following code is a sample data provider for the <code>ui:autocomplete</code> component.
+<auradocs:codeblock>&lt;aura:component extends="ui:dataProvider"
+    model="java://org.auraframework.impl.java.model.TestJavaModel">
+    &lt;aura:attribute name="dataType" type="String"/> 
+&lt;/aura:component></auradocs:codeblock>
+
+	<p>To learn how the data provider is retrieving data from the model, see the server-side model at <code>/aura-impl/src/test/java/org/auraframework/impl/java/model/TestJavaModel.java</code> in the GitHub repo.</p> 
+	
+	<h3>Styling Your Auto-complete Component</h3>
+	<p>The <code>ui:autocomplete</code> component is customizable with regular CSS styling. For example, if you're using the default text field component provided by <code>ui:autocomplete</code>, you can use the following CSS selector.</p>
+<auradocs:codeblock>.THIS.uiInputText {
+    //CSS declaration
+ }</auradocs:codeblock>
+	<p>If you're using the default text area component provided by <code>ui:autocomplete</code>, change the CSS selector to <code>.THIS.uiInputTextArea</code>.
+	 Alternatively, use the <code>class</code> attribute to specify your own CSS class. For more information on styling components, see <auradocs:topicLink topic="helloHTML">Applying HTML and CSS</auradocs:topicLink>.</p>
+	
+</aura:component>
+
+
+    

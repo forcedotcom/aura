@@ -33,7 +33,7 @@
             });
             fetchDataEvt.fire();            
             
-            // If you want to macth on the existing data
+            // If you want to match on the existing data
             /*
             var matchEvt = acCmp.get("e.matchText");
             matchEvt.setParams({

@@ -109,6 +109,7 @@
 	            	<auradocs:contentsNode text="Field-level Errors" id="uiError"/>
 	            	<auradocs:contentsNode text="Drop-down Lists" id="uiSelect"/>
 	            </auradocs:contentsNode>
+	            <auradocs:contentsNode text="Auto-complete" id="uiAutocomplete"/>
 	            <auradocs:contentsNode text="Horizontal Layouts" id="uiLayout"/>
 	            <auradocs:contentsNode text="Vertical Layouts" id="uiVLayout"/>
             </auradocs:contentsNode>

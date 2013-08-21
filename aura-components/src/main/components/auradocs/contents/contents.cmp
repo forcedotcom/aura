@@ -226,6 +226,10 @@
                 <auradocs:contentsNode text="Component Request Glossary" id="cycleRefs" />
             </auradocs:contentsNode>
             <auradocs:contentsNode text="Querying State and Statistics" id="queryLang"/>
+            <auradocs:contentsNode text="Advanced Debugging" >
+                <auradocs:contentsNode text="Aura Debug Tool" id="debugAuraDebugTool"/>
+                <auradocs:contentsNode text="Debugging with Network Traffic" id="debugNetworkTab"/>
+            </auradocs:contentsNode>
         </auradocs:contentsNode>
 
         <auradocs:contentsNode text="Reference" >

@@ -16,7 +16,7 @@
 
 -->
 <aura:component extends="auradocs:topicPanel">
-    <aura:set attribute="title" value="Auto-complete"/>
+    <aura:set attribute="title" value="Working with Auto-complete"/>
 
 	<ui:block>
 		<aura:set attribute="left">
@@ -57,7 +57,7 @@
      The <code>ui:autocomplete</code> component  automatically matches text on the new data.</p>
     
     <h4><code>inputChange</code></h4>
-    <p>Use the <code>inputChange</code> event to handle an input value change. Get the new value with <code>event.getParam("value");</code>. The following code handles a text match on existing data.</p>
+    <p>Use the <code>inputChange</code> event to handle an input value change. Get the new value with <code>event.getParam("value")</code>. The following code handles a text match on existing data.</p>
 <auradocs:codeblock>var matchEvt = acCmp.get("e.matchText");
 matchEvt.setParams({
     keyword: event.getParam("value")
@@ -65,10 +65,10 @@ matchEvt.setParams({
 matchEvt.fire();</auradocs:codeblock>
 
     <h4><code>matchDone</code></h4>
-    <p>Use the <code>matchDone</code> event to handle when a text matching has completed.</p>
+    <p>Use the <code>matchDone</code> event to handle when a text matching has completed, regardless if a match has occurred. You can retrieve the number of matches with <code>event.getParam("size")</code>.</p>
     
     <h4><code>selectListOption</code></h4>
-    <p>Use the <code>selectListOption</code> event to handle when a list option is displayed. Get the options with <code>event.getParam("option");</code></p>
+    <p>Use the <code>selectListOption</code> event to handle when a list option is selected. Get the options with <code>event.getParam("option");</code>. This event is fired by the <code>ui:autocompleteList</code> component when a list option is selected.</p>
     
 	<p>For more information on client-side controllers, see <auradocs:topicLink topic="helloActions">Client-Side Controllers</auradocs:topicLink>.</p>
 	

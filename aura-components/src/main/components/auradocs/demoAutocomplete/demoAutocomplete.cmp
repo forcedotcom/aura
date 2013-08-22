@@ -48,7 +48,7 @@
     <br/><br/>
     
     
-    <div>Autocomplete with large list of data</div><br/>
+    <div>Autocomplete with large list of data <br/>Type <code>some one</code> to test this component.</div><br/>
     <ui:autocomplete aura:id="autoCompleteLargeList" optionVar="row" 
         matchDone="{!c.handleInputChangeLargeListMatchDone}"
         inputChange="{!c.handleInputChangeLargeList}" 

@@ -24,6 +24,7 @@
             <auradocs:demosNode text="To-do List" id="todo"/>
         </ui:treeNode>
         <ui:treeNode title="Components" expanded="true">
+        	<auradocs:demosNode text="ui:autocomplete" id="autocomplete"/>
         	<auradocs:demosNode text="ui:block" id="block"/>
         	<auradocs:demosNode text="ui:carousel" id="carousel"/>
         	<auradocs:demosNode text="ui:dialog" id="dialog"/>

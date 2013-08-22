@@ -15,12 +15,12 @@
     limitations under the License.
 
 -->
-<aura:component implements="ui:visible, ui:pagingInterface" extensible="true" abstract="true" support="proto" description="An abstract component which provides a basic layout for the ui:list component.">  
+<aura:component implements="ui:visible, ui:pagingInterface" extensible="true" abstract="true" support="proto" description="An abstract component which provides a basic layout for the ui:list component.">
     <aura:attribute name="itemTemplate" type="Aura.ComponentDefRef[]" required="true" description="A ComponentDefRef to use as the template for each generated row in the list."/>
     <aura:attribute name="items" type="Object[]" description="An array of arbitrary map objects representing the rows of data in the list."/>
     <aura:attribute name="itemVar" type="String" required="true" description="The name by which to refer to the current data object inside of the template for each row."/>
     <aura:attribute name="dataProvider" type="Aura.Component[]" required="true" description="A list of data provider components. Use a ui:dataProvider component to provide list data."/>
-    
+    <aura:attribute name="emptyListContent" type="Aura.Component[]" description="Content to be shown if the list is empty"/>
     <aura:attribute name="header" type="Aura.Component[]" description="A facet above the rendered list, for use as a list header"/>
     <aura:attribute name="footer" type="Aura.Component[]" description="A facet below the rendered list, for use as a list footer"/>
     
@@ -36,6 +36,9 @@
         
         <div class="listContent">
             {!v.body}
+            <aura:renderIf isTrue="{!(v.items == null || v.items.length == 0) &amp;&amp; v.emptyListContent != null}">
+				{!v.emptyListContent}
+            </aura:renderIf>
             <div class="loadingIndicator">
                 <div class="background"></div>
                 <span class="label">Loading...</span>

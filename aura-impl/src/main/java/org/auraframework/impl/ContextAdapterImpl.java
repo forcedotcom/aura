@@ -57,9 +57,7 @@ public class ContextAdapterImpl implements ContextAdapter {
                 globalProviders, isDebugToolEnabled);
         currentContext.set(context);
         
-        if (appDesc != null) {
-        	context.setApplicationDescriptor(appDesc);
-        }
+    	context.setApplicationDescriptor(appDesc);
         
         return context;
 	}

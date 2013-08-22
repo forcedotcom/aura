@@ -93,12 +93,9 @@ public class AppCacheProgressBarUITest extends WebDriverTestCase {
      */
     @FreshBrowserInstance
     public void testProgressbarNotVisibleInPRODMode() throws Exception {
-        open("/appCache/testApp.app", Mode.PROD, false);
-        assertFalse("Progress bar for appCache should not show up in PROD mode.", findDomElement(appCacheProgressDiv)
-                .isDisplayed());
+        open("/appCache/testApp.app", Mode.PROD);
 
-        // This time simulate the progress event and verify that the progress
-        // bar does not show up.
+        // Timing issues make checking the progress bar on load flappy, so just simulate the event
         auraUITestingUtil.getEval(String.format(APPCACHEPROGRESS, 1, 100));
         assertFalse("Progress bar for appCache should not show up in PROD mode.", findDomElement(appCacheProgressDiv)
                 .isDisplayed());

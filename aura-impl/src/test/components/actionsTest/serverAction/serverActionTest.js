@@ -114,7 +114,7 @@
                  $A.test.assertTrue(message != undefined, "No error message from server at all");
                  $A.test.assertTrue(message.indexOf("ArrayIndexOutOfBoundsException: 42") > 0,
                      "Wrong message received from server: " + message);
-            }],
-    },
+            }]
+    }
 
 })

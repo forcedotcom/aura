@@ -1,0 +1,199 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+<aura:set attribute="title" value="Debugging with Network Traffic"/>
+
+<auradocs:info>This topic describes an internal wire protocol that is subject to change at any time.</auradocs:info>
+
+<p>The Google Chrome Developer Tools let you look at JSON messages on the wire as they travel between the client and the server. The JSON messages are structured in a way that is readable. They are not binary encoded. Looking at JSON network traffic can help you identify performance hotspots and tune your app. For example, you can see when a <code>componentDef</code> is coming across or you could look for data and metadata going across the wire when the metadata should actually be cached. If metadata is repeatedly being sent across the wire, this can have a severe impact on performance.</p>
+
+<p>In this tutorial, we will use the Aura Note sample application to illustrate how JSON messages can be viewed.
+
+<ol>
+    <li>Get the latest version of the sample application by typing <code>git clone https://github.com/forcedotcom/aura-note.git</code> at a command prompt.</li>
+    <li>Type <code>cd aura-note</code></li>
+    <li>Type <code>mvn jetty:run -Pdev</code></li>
+    <li>In Google Chrome, browse to <code>http://localhost:8080/auranote/notes.app</code></li>
+    <li>Right click on the Aura Note web page and select <b>Inspect Element</b> to open the Chrome Developer Tools.</li>
+    <li>In the Chrome Developer Tools window, click the <b>Network</b> tab.</li>
+    <li>In the Note Title field in Aura Note, type <code>My Test Note</code>. In the text field, type <code>This is my note text</code> and click <b>Save</b>.</li>
+</ol>
+</p>
+
+<h2>Understanding the Request</h2>
+
+<p>In the Chrome Developer Tools <b>Network</b> tab, two <code>XMLHttpRequest</code> (XHR) requests are displayed. For an explanation of what each column means, refer to the 
+<a href="https://developers.google.com/chrome-developer-tools/docs/network#network_panel_overview">Chrome Developer Tools documentation</a>.</p>
+
+<p>Click the first request and then click the <b>Headers</b> tab. The <b>Headers</b> tab displays the request that is being sent to the server. In the <b>Form Data</b> section, you can see the <code>message</code> and <code>aura.context</code>:</p>
+
+<auradocs:codeblock>Form Data
+message:
+{"actions":[{"id":"44.2","descriptor":"java://org.auraframework.demo.notes.controllers.NoteEditController/ACTION$saveNote",
+                "params":{"title":"My Test Note","body":"This is my note text","latitude":null,"longitude":null}}]} 
+aura.context:
+{"mode":"DEV","preloads":["aura","ui","auradev","auranote"],"loaded":{"APPLICATION@markup://auranote:notes":"BUI3ODiAK-fwLFsL70ufNQ"},
+                "app":"auranote:notes","lastmod":"1376946254000","fwuid":"ZWE1dXJKa3FSSWtQSzZ6S2NtSWdzQQ"}
+aura.num:
+2
+</auradocs:codeblock>
+
+<h3>aura.context</h3>
+The <code>aura.context</code> is the JSON encoded information that we need to send up to the server every time we communicate with it. It tells us some basic information about the client. 
+<ul>
+    <li><code>mode</code>: Describes the mode that the client is operating in. For more information about the different Aura runtime modes, see <auradocs:topicLink topic="modesReference">Modes Reference</auradocs:topicLink>.</li>
+
+    <li><code>loaded</code>: Tells the server about the application and the version of the client. For example, <code>"loaded":{"APPLICATION@markup://auranote:notes":"BUI3ODiAK-fwLFsL70ufNQ"}</code> means that the application is in the <code>auranote</code> namespace, the application is <code>notes</code> and the version unique hash is <code>"BUI3ODiAK-fwLFsL70ufNQ"</code>. The version is used for change detection so the client can be updated to a new version when necessary. Optionally, if any components are dynamically loaded, they will be displayed at the end of the list. In this example, there is nothing to display. Here is an example from an app that has a component called <code>tutorialsNav</code> that is loaded dynamically: <code>"loaded":{"APPLICATION@markup://auradocs:docs":"4df774xhioeHpDZrhT4cuQ","COMPONENT@markup://auradocs:tutorialsNav":"Lt2UR0hShMLcZT0845WSaA"}</code></li>
+    
+    <li><code>fwuid</code>: The framework unique id is a hash that is used as a fingerprint to detect if the framework has changed.</li>
+</ul>
+
+<h3>aura.num</h3>
+The <code>aura.num</code> displays the number of XHRs that the client has made to the server. This is so we can ensure that any component global IDs contain the <code>aura.num</code> as their suffix. The <code>aura.num</code> attribute gets reset to 0 when you refresh the browser because it is only valid for the life of the page. If you navigate away from an Aura app, the JavaScript memory space gets cleared and the <code>aura.context</code> and all related data is destroyed. The <code>aura.num</code> attribute guarantees that global IDs will always be unique, even when they are created on the server. This is useful because Aura lets you do incremental, partial-page updates.
+
+<h3>message</h3>
+The <code>message</code> contains one or more actions that describe what to do at the server.
+
+<ul>
+    <li><code>id</code>: The id of the action. The postfix of the id is the <code>aura.num</code>. It will be unique across the lifetime of an <code>aura.context</code>. This id is useful when the response is returned because we can use it to look up the callback, if there is one, and complete the processing of the round trip.</li>
+    <li><code>descriptor</code>: The descriptor for the action. In the example, the descriptor is on the <code>NoteEditController</code> in Java and it is the <code>saveNote</code> action.</li>
+    <li><code>params</code>: The parameters that get sent to the server. In the example, you can see the title and the body of the note that we created.</li>
+</ul>
+ 
+<p>If a problem is happening at this point or if performance is slow, add a breakpoint in <code>saveNote</code> in <code>NoteEditController</code> to investigate. It lets you know where you could put a breakpoint on the server side. It is not uncommon to see several actions in one message being sent in one trip to the server. Actions are run one after the other so one slow action could slow your whole app down. Looking at this type of response can help you figure out which one is causing the problems.</p> 
+
+<h2>Understanding the Response</h2>
+
+<ol>
+    <li>In the Chrome Developer Tools window, click the <b>Response</b> tab to see the raw response that is being sent back from the server.</li>
+    <li>Next, click the <b>Preview</b> tab. It displays a formatted view of the response.</li>
+</ol>
+<p>The <code>context</code> section of the response will look something like this:</p>
+
+<auradocs:codeblock>context: {mode:DEV, app:auranote:notes, requestedLocales:[en_US, en],…}
+    app: "auranote:notes"
+    fwuid: "ZWE1dXJKa3FSSWtQSzZ6S2NtSWdzQQ"
+    globalValueProviders: [{type:$Browser,…},…]
+        0: {type:$Browser,…}
+            type: "$Browser"
+            values: {formFactor:DESKTOP, isWindowsPhone:false, isPhone:false, isFIREFOX:false, isIPad:false,…}
+        1: {type:$Locale, values:{language:en, country:US, variant:, langLocale:en_US, dateFormat:MMM d, yyyy,…}}
+            type: "$Locale"
+            values: {language:en, country:US, variant:, langLocale:en_US, dateFormat:MMM d, yyyy,…}
+    lastmod: "1376946254000"
+    loaded: {APPLICATION@markup://auranote:notes:BUI3ODiAK-fwLFsL70ufNQ}
+    mode: "DEV"
+    requestedLocales: [en_US, en]
+</auradocs:codeblock>
+
+<p>It is very similar to what was sent to the server in the request. The <code>context</code> has been updated and it might have some items added to it. In this example, now there are <code>globalValueProviders</code>. The  action we just ran may cause us to go get more labels from the server. They come back in the <code>globalValueProviders</code> which is the global state. It is not specific to any action. The <code>loaded</code> list may have been updated as well. In this example, it went up and came back the same. However, if a component had been created on the server side then that would show up in the loaded list. This is for lazy-loading of metadata, which is very important from a performance standpoint. </p>
+
+<p>The <code>actions</code> section of the response will look something like this:</p>
+<auradocs:codeblock>actions: [{id:44.2, state:SUCCESS,…}]
+    0: {id:44.2, state:SUCCESS,…}
+        error: []
+        id: "44.2"
+        returnValue: {id:5, title:My Test Note, body:This is my note text, createdOn:2013-08-19T21:15:28.062Z}
+        state: "SUCCESS"
+</auradocs:codeblock>
+
+<p>This is the response for the action that we sent out in the request. You can see that there were no errors. The id of the action is echoed back so that callbacks can be looked up so Aura can call the callback and pass it this return value. Latitude and longitude are not included in the <code>returnValue</code> because in this example they are set to null and by default, the JSON serializer will omit null values. The possible values for <code>action.state</code> are <code>SUCCESS</code>, <code>FAILURE</code> and <code>INCOMPLETE</code>. <code>INCOMPLETE</code> means that the server couldn't be reached due to connectivity issues or the action was marked as abortable and new actions were pushed into the action queue before one or more abortable actions completed.
+</p> 
+
+<p>Earlier, we examined the XHR request in the <b>Headers</b> tab and saw that the <code>saveNote</code> action of the <code>NoteEditController</code> was being called. Thus, we can open the <code>NoteEditController.java</code> file in the aura-note sample application and look at the implementation of the <code>saveNote</code> function and observe that it returns a <code>Note</code> Java object. Next, if we look at <code>Note.java</code>, we see that the <code>Note</code> object is serializable and there is a method which creates the JSON payload that is eventually put into the action’s <code>returnValue</code>. Both the client and the server side know that <code>saveNote</code> returns a <code>Note</code> and we will take this return value and turn it into something that looks like a note on the JavaScript side.
+</p>
+
+<h2>Understanding the Second Request</h2>
+
+<p>Click the second request in the <b>Network</b> tab and then click the <b>Headers</b> tab.
+</p>
+
+<p>In the <b>Form Data</b> section, you can see that the descriptor of the action is on the <code>ComponentController</code> and is the <code>getComponent</code> action. This action is to get an instance of <code>auranote:noteList</code> and has no attributes. This action is for refreshing the list of notes on the left side of the app.
+</p>
+
+<auradocs:codeblock>message:
+{"actions":[{"id":"158.9","descriptor":"aura://ComponentController/ACTION$getComponent",
+                "params":{"name":"markup://auranote:noteList","attributes":{}}}]}
+</auradocs:codeblock>
+
+<h2>Understanding the Second Response</h2>
+
+<p>Click the <b>Preview</b> tab to view the server’s response.
+</p>
+
+<auradocs:codeblock>actions: [{id:158.9, state:SUCCESS, returnValue:{serId:1,…}, error:[], components:{1:158.9:{serRefId:1}}}]
+    0: {id:158.9, state:SUCCESS, returnValue:{serId:1,…}, error:[], components:{1:158.9:{serRefId:1}}}
+        components: {1:158.9:{serRefId:1}}
+        error: []
+        id: "158.9"
+        returnValue: {serId:1,…}
+            serId: 1
+            value: {componentDef:{serId:2, value:{descriptor:markup://auranote:noteList}}, globalId:1:158.9,…}
+                attributes: {serId:3, value:{values:{sort:createdOn.desc}}}
+                componentDef: {serId:2, value:{descriptor:markup://auranote:noteList}}
+                globalId: "1:158.9"
+                model: {notes:[{id:7, title:My Test Note, body:This is my note text, createdOn:2013-08-20T03:35:54.034Z},…]}
+                    notes: [{id:7, title:My Test Note, body:This is my note text, createdOn:2013-08-20T03:35:54.034Z},…]
+                        0: {id:7, title:My Test Note, body:This is my note text, createdOn:2013-08-20T03:35:54.034Z}
+                        1: {id:4, title:My new note, body:lorem ipsum. , createdOn:2013-08-17T01:33:15.508Z}
+        state: "SUCCESS"
+</auradocs:codeblock>
+
+<p>The <code>actions.returnValue.value</code> section tells you the <code>componentDef</code> value. In this case, it just returns the descriptor which means we already know about <code>noteList</code> on the client side so we do not need to send the metadata again. The server generated this to tell the client side to create an instance of <code>noteList</code> with the <code>globalId</code> of <code>1:158.9</code>.
+</p>
+
+<p>Next, look at the model:
+</p>
+
+<auradocs:codeblock>model: {notes:[{id:7, title:My Test Note, body:This is my note text, createdOn:2013-08-20T03:35:54.034Z},…]}
+    notes: [{id:7, title:My Test Note, body:This is my note text, createdOn:2013-08-20T03:35:54.034Z},…]
+        0: {id:7, title:My Test Note, body:This is my note text, createdOn:2013-08-20T03:35:54.034Z}
+        1: {id:4, title:My new note, body:lorem ipsum. , createdOn:2013-08-17T01:33:15.508Z}
+</auradocs:codeblock>
+
+<p>You can see what the model contains because the data is in a format that is readable. You can verify that the information being returned is correct.
+</p>
+
+<p>For performance reasons, it is important to reduce the volume of data being transferred. There is a highly redundant structure in the JSON. Many objects are referenced over and over again. So, instead of sending the same data over and over again, and bloating the size of the responses, the JSON encoder on the server side figures out which objects have already been transferred. To do this, Aura uses reference serialization for metadata and assigns a serialization ID (<code>serId</code>) to each of these objects. This means that they can be referenced later. In the <b>Response</b> tab, you can see the <code>serId</code> for the <code>componentDef</code>, which is a reference to <code>noteList</code>:
+</p>
+
+<auradocs:codeblock>"actions":[
+   {
+     "id":"158.9",
+     "state":"SUCCESS",
+     "returnValue":{
+       "serId":1,
+       "value":{
+         "componentDef":{
+           "serId":2,
+           "value":{
+             "descriptor":"markup://auranote:noteList"
+           }
+        ...
+    }
+</auradocs:codeblock>
+
+<p>Although the network traffic initially looks like a lot of noise, it can yield valuable information to help you identify problems and performance hotspots.
+</p>
+
+<p><b>See also:</b><br/>
+    <auradocs:topicLink topic="modesReference">Modes Reference</auradocs:topicLink><br/>
+    <auradocs:topicLink topic="abortableActions">Abortable Actions</auradocs:topicLink><br/>
+    <auradocs:topicLink topic="docTests">Testing Components</auradocs:topicLink>
+</p>
+</aura:component>

@@ -28,21 +28,8 @@
 
 <p>Use the <code>$A.warning(string)</code> method to write a log message to the JavaScript console. As a parameter, it takes the message to display. For example, <code>$A.warning("This is a warning message.");</code> will output "This is a warning message." to the JavaScript console. A stack trace will also be displayed in the JavaScript console. The output is also sent to the Aura Debug Tool.</p>
 
-<h2>Aura Debug Tool</h2>
-
-<auradocs:info>You must disable the popup blocking feature of your web browser to use the debug tool.</auradocs:info>
-
-<p>The Aura debug tool opens a separate browser window and outputs debug information about an Aura component. The debug tool has the following tabs: Errors, Warnings, Components, Events, Storage, Accessibility, and Console.</p>
-
-<p>To launch the Aura Debug tool, add the query string <code>aura.debugtool=true</code> after the URL of the Aura component file that you are viewing in your browser. For example:</p>
-
-<auradocs:codeblock>http://localhost:8080/auranote/noteList.cmp?aura.debugtool=true</auradocs:codeblock>
-
-<p>To display additional statistics in the Components tab, append the query string <code>aura.mode=STATS</code> to the URL. For example:</p>
-
-<auradocs:codeblock>http://localhost:8080/auranote/noteList.cmp?aura.debugtool=true&amp;aura.mode=STATS</auradocs:codeblock>
-
 <p><b>See also:</b><br/>
+    <auradocs:topicLink topic="debugAuraDebugTool">Aura Debug Tool</auradocs:topicLink><br/>
     <auradocs:topicLink topic="modesReference">Modes Reference</auradocs:topicLink><br/>
     <auradocs:topicLink topic="docTests">Testing Components</auradocs:topicLink>
 </p>

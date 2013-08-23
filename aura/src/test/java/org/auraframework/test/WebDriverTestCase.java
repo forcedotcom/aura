@@ -533,31 +533,28 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
         newParams.add(new BasicNameValuePair("aura.test", getQualifiedName()));
         url = url + "?" + URLEncodedUtils.format(newParams, "UTF-8") + hash;
 
-        auraUITestingUtil.getRawEval("document._waitingForReload = true;");
-        try{
-        	openAndWait(url,waitForInit);
+        try {
+            openAndWait(url, waitForInit);
+        } catch (TimeoutException e) {
+            // Hack to avoid timeout issue for IE7 and IE8. Appears that tests fail for the first time when we run the
+            // test in new vm session on Sauce.
+            if (currentBrowserType == BrowserType.IE7 || currentBrowserType == BrowserType.IE8) {
+                openAndWait(url, waitForInit);
+            } else {
+                throw e;
+            }
         }
-        catch(TimeoutException e){
-        	//Adding hack to avoid timeout issue for ie7 and ie8 
-        	//seems like IE7 and IE8 test fails for the first time when we run the test in new vm session
-        	if(currentBrowserType == BrowserType.IE7 || currentBrowserType == BrowserType.IE8){
-        		openAndWait(url,waitForInit);
-        	}
-        	else{
-        		throw e;
-        	}
-        } 
     }
 
-    private void openAndWait(String url, boolean waitForInit) throws MalformedURLException, URISyntaxException{
-    	auraUITestingUtil.getRawEval("document._waitingForReload = true;");
-		openRaw(url);
-		waitForCondition("return !document._waitingForReload");
-		if (waitForInit) {
-			auraUITestingUtil.waitForAuraInit(getExceptionsAllowedDuringInit());
-		}
+    private void openAndWait(String url, boolean waitForInit) throws MalformedURLException, URISyntaxException {
+        auraUITestingUtil.getRawEval("document._waitingForReload = true;");
+        openRaw(url);
+        waitForCondition("return !document._waitingForReload");
+        if (waitForInit) {
+            auraUITestingUtil.waitForAuraInit(getExceptionsAllowedDuringInit());
+        }
     }
-    
+
     public void waitForAuraFrameworkReady() {
         auraUITestingUtil.waitForAuraFrameworkReady(getExceptionsAllowedDuringInit());
     }
@@ -714,9 +711,9 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
             }
         }, timeoutInSecs);
     }
-    
+
     public void waitForAutoCompleteListVisible(final WebElement list, final boolean isVisible) {
-		auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
+        auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
             @Override
             public Boolean apply(WebDriver d) {
                 boolean isInvisible = hasCssClass(list, "invisible");
@@ -731,7 +728,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
     protected WebElement findDomElement(By locator) {
         return auraUITestingUtil.findDomElement(locator);
     }
-    
+
     /**
      * Find list of matching element in the DOM.
      */

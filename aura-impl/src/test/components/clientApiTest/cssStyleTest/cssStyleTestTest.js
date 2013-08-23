@@ -25,20 +25,21 @@
         test : function(cmp) {
             var head = document.getElementsByTagName('head')[0];
             var styleElements = head.getElementsByTagName('style');
-
             var cmpCssPresent = false;
             var nonPreloadedCssPresent = false;
             var uiNamespaceCssPresent = false;
+
             for (var i = 0; i < styleElements.length; i++) {
-                var styleText = $A.util.getText(styleElements[i]);
-                if (styleText === ".clientApiTestCssStyleTest{background-color:#eee}") {
+                var styleText = this.getStyleElementText(styleElements[i]);
+
+                if (styleText.indexOf(".clientApiTestCssStyleTest") !== -1) {
                     if (!cmpCssPresent) {
                         cmpCssPresent = true;
                     } else {
                         $A.test.fail("Component CSS is being applied more than once.");
                     }
                 }
-                if (styleText.indexOf(".testTestValidCSS{color:#1797c0") !== -1) {
+                if (styleText.indexOf(".testTestValidCSS") !== -1) {
                     if (!nonPreloadedCssPresent) {
                         nonPreloadedCssPresent = true;
                     } else {
@@ -75,5 +76,12 @@
             $A.test.assertEquals("clientApiTestCssStyleTest", $A.util.trim(pClasses),
                     "Incorrect class names present on <p> element.");
         }
+    },
+    getStyleElementText : function(element) {
+        var browser = $A.getGlobalValueProviders().get("$Browser");
+        if (browser.isIE7 || browser.isIE8 || browser.isIE9 || browser.isIE10) {
+            return element.styleSheet.cssText;
+        }
+        return $A.util.getText(element);
     }
 })

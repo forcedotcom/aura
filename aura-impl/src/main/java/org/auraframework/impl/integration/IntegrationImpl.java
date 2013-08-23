@@ -172,15 +172,14 @@ public class IntegrationImpl implements Integration {
 
         integrationOwnsContext = !contextService.isEstablished();
 
+        DefDescriptor<ApplicationDef> applicationDescriptor = getApplicationDescriptor(application);
+
         AuraContext context;
         if (integrationOwnsContext) {
-            context = contextService.startContext(mode, Format.JSON, Access.AUTHENTICATED);
+            context = contextService.startContext(mode, Format.JSON, Access.AUTHENTICATED, applicationDescriptor);
         } else {
             context = contextService.getCurrentContext();
         }
-
-        DefDescriptor<ApplicationDef> applicationDescriptor = getApplicationDescriptor(application);
-        context.setApplicationDescriptor(applicationDescriptor);
         
         if (application != DEFAULT_APPLICATION) {
         	// Check to insure that the app extends aura:integrationServiceApp

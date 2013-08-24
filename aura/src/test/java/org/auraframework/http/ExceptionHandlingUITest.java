@@ -114,7 +114,13 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
             if (childElem == null) {
                 fail("cause not found");
             }
-            actual = childElem.getText().replaceAll("\\s+", " ");
+            actual = childElem.getAttribute("textContent");
+            if (actual == null) {
+                // Selenium bug with Firefox trying to grab text not visible on screen.
+                // https://code.google.com/p/selenium/issues/detail?id=5773
+                actual = childElem.getText();
+            }
+            actual = actual.replaceAll("\\s+", " ");
             if (!actual.contains(expectedCause)) {
                 fail("unexpected cause - expected <" + expectedCause + "> but got <" + actual + ">");
             }

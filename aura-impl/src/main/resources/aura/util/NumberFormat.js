@@ -26,8 +26,10 @@ function NumberFormat(format, symbols) {
     this.symbols = symbols || {"decimalSeparator": $A.get("$Locale.decimal"),
                                "groupingSeparator": $A.get("$Locale.grouping"),
                                "currency": $A.get("$Locale.currency"),
-                               "currencyCode": $A.get("$Locale.currencyCode")};
+                               "currencyCode": $A.get("$Locale.currencyCode"),
+                               "zeroDigit": $A.get("$Locale.zero")};
     // default values for any format
+    this.zeroCharCodeOffset = this.symbols["zeroDigit"].charCodeAt(0) - NumberFormat.ZERO.charCodeAt(0);
     this.hasCurrency = false;
     this.multiplier = 0;
     this.minDigits = 1;
@@ -221,6 +223,15 @@ NumberFormat.prototype.replaceCurrency = function(str) {
     return str;
 };
 
+NumberFormat.prototype.translateDigits = function(charArray) {
+    if (this.zeroCharCodeOffset) {
+        for (var i = 0; i < charArray.length; i++) {
+            charArray[i] = String.fromCharCode(charArray[i].charCodeAt(0) + this.zeroCharCodeOffset);
+        }
+    }
+    return charArray;
+};
+
 /**
  * Format a number into a string. Also can take in a string of the format "#.#" for formatting numbers
  * requiring greater than double precision.
@@ -311,14 +322,14 @@ NumberFormat.prototype.format = function(number) {
     // format the integral part
     if (this.groupingDigits <= 0 || decimalPos <= this.groupingDigits) {
         // no need for grouping
-        result = result.concat(charArray.slice(0, decimalPos));
+        result = result.concat(this.translateDigits(charArray.slice(0, decimalPos)));
     } else {
         var dist = decimalPos % this.groupingDigits || this.groupingDigits;
-        result = result.concat(charArray.slice(0, dist));
+        result = result.concat(this.translateDigits(charArray.slice(0, dist)));
         var intPart = charArray.slice(dist, decimalPos);
         while (intPart.length > 0) {
             result.push(this.symbols["groupingSeparator"]);
-            result = result.concat(intPart.splice(0, this.groupingDigits));
+            result = result.concat(this.translateDigits(intPart.splice(0, this.groupingDigits)));
         }
     }
 
@@ -327,10 +338,10 @@ NumberFormat.prototype.format = function(number) {
     if (fracLength > 0 || this.minFractionDigits > 0) {
         result.push(this.symbols["decimalSeparator"]);
         if (fracLength > 0) {
-            result = result.concat(charArray.slice(decimalPos));
+            result = result.concat(this.translateDigits(charArray.slice(decimalPos)));
         }
         for (i = fracLength; i < this.minFractionDigits; i++) {
-            result.push(NumberFormat.ZERO);
+            result.push(this.symbols["zeroDigit"]);
         }
     }
     

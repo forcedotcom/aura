@@ -32,7 +32,8 @@
                             currencyCode: currencyCode,
                             currency: currencySymbol,
                             decimalSeparator: $A.get("$Locale.decimal"),
-                            groupingSeparator: $A.get("$Locale.grouping")
+                            groupingSeparator: $A.get("$Locale.grouping"),
+                            zeroDigit: $A.get("$Locale.zero")
                         };
                     }
                     if (!hasFormat) {
@@ -76,7 +77,8 @@
                                 currencyCode: currencyCode,
                                 currency: currencySymbol,
                                 decimalSeparator: $A.get("$Locale.decimal"),
-                                groupingSeparator: $A.get("$Locale.grouping")
+                                groupingSeparator: $A.get("$Locale.grouping"),
+                                zeroDigit: $A.get("$Locale.zero")
                             };
                         }
                         if (!hasFormat) {

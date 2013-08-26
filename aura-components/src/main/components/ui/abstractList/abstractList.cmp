@@ -36,7 +36,7 @@
         
         <div class="listContent">
             {!v.body}
-            <aura:renderIf isTrue="{!(v.items == null || v.items.length == 0) &amp;&amp; v.emptyListContent != null}">
+            <aura:renderIf isTrue="{!v.items == null || v.items.length == 0}">
 				{!v.emptyListContent}
             </aura:renderIf>
             <div class="loadingIndicator">

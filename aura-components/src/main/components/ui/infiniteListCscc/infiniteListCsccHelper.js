@@ -17,12 +17,10 @@
 	handleDataChange: function(component, event) {
 		var newData = event.getParam("data");
         var items = component.getConcreteComponent().getValue("v.items");
-        var actualItems = items.unwrap();
         
         for (var i=0, len=newData.length; i<len; i++) {
-        	actualItems.push(newData[i]);
+        	items.push(newData[i]);
         }
         
-        items.setValue(actualItems);
 	}
 })

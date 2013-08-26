@@ -15,13 +15,18 @@
  */
 ({
     rangeChange: function(cmp, evt, helper) {
+        // check new ranges, add or destroy components as needed
         helper.rerenderEverything(cmp);
     },
 
     itemsChange: function(cmp, evt, helper) {
         var v = evt.getParam("value");
         if (v === cmp.getValue("v.items")) {
-            helper.rerenderEverything(cmp);
+            if (v.isDifferentArray()) {
+                helper.rerenderEverything(cmp);
+            } else {
+                helper.rerenderSelective(cmp);
+            }
         }
     }
 })

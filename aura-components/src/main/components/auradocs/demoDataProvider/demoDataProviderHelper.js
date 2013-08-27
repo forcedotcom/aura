@@ -17,13 +17,12 @@
     provide: function(component, event, controller) {
         var dataProvider = component.getConcreteComponent();
         if (!dataProvider._loadedOnce) {
-            // it is assumed this dataProvider will come fully equipped with an initial data payload in its model.
+            // This dataProvider should come fully equipped with an initial data payload in its model.
             dataProvider._loadedOnce = true;
         } else {
-           // var keyword = event.getParam("parameters").keyword;
             var action = dataProvider.get("c.getItems");
             action.setParams({
-                //"keyword": keyword
+               //Set parameters for the list here
             });
             action.setCallback(this, function(action) {
                 if (action.getState() === "SUCCESS") {

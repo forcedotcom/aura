@@ -41,9 +41,19 @@
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
     
     <aura:if isTrue="{!v.inputType == 'inputTextArea'}">
-        <ui:inputTextAreaForAutocomplete aura:id="input" class="{!v.inputClass+' '+v.theme}" label="{!v.label}" placeholder="{!v.placeholder}"/>
+        <ui:inputTextAreaForAutocomplete aura:id="input" 
+                                         class="{!v.inputClass+' '+v.theme}" 
+                                         label="{!v.label}"
+                                         labelClass="{!v.labelClass}"
+                                         labelPosition="{!v.labelPosition}"
+                                         placeholder="{!v.placeholder}"/>
         <aura:set attribute="else">
-            <ui:inputTextForAutocomplete aura:id="input" class="{!v.inputClass+' '+v.theme}" label="{!v.label}" placeholder="{!v.placeholder}"/>
+            <ui:inputTextForAutocomplete aura:id="input" 
+                                         class="{!v.inputClass+' '+v.theme}" 
+                                         label="{!v.label}"
+                                         labelClass="{!v.labelClass}"
+                                         labelPosition="{!v.labelPosition}"
+                                         placeholder="{!v.placeholder}"/>
         </aura:set>
     </aura:if>
     

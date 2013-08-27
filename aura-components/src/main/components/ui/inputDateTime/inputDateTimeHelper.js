@@ -79,17 +79,21 @@
             return;
         }
         var d = $A.localizationService.parseDateTimeISO8601(value);
-        var format = component.get("v.format");
-        var langLocale = component.get("v.langLocale");
-        var timezone = component.get("v.timezone");
-        $A.localizationService.UTCToWallTime(d, timezone, function(walltime) {
-            try {
-                var displayValue = $A.localizationService.formatDateTimeUTC(walltime, format, langLocale);
-                _helper.displayDateTime(concreteCmp, displayValue);
-            } catch (e) {
-                _helper.displayDateTime(concreteCmp, e.message);
-            }
-        });
+        if (d) {
+            var format = component.get("v.format");
+            var langLocale = component.get("v.langLocale");
+            var timezone = component.get("v.timezone");
+            $A.localizationService.UTCToWallTime(d, timezone, function(walltime) {
+                try {
+                    var displayValue = $A.localizationService.formatDateTimeUTC(walltime, format, langLocale);
+                    _helper.displayDateTime(concreteCmp, displayValue);
+                } catch (e) {
+                    _helper.displayDateTime(concreteCmp, e.message);
+                }
+            });
+        } else {
+            _helper.displayDateTime(component, value);
+        }
     },
     
     getDateString: function(date) {

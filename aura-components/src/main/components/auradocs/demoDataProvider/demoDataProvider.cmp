@@ -15,16 +15,10 @@
     limitations under the License.
 
 -->
-<aura:component> 
-	<ui:infinitelist aura:id="listData" itemVar="item">
-		<aura:set attribute="dataProvider">
-			<auradocs:demoDataProvider />
-		</aura:set>
-		<aura:set attribute="header">
-		 <ui:button label="Show More" press="{!c.show}"/>
-		</aura:set>
-		<aura:set attribute="itemTemplate">
-			<auradocs:demoListTemplate label="{!item.label}" />
-		</aura:set>
-	</ui:infinitelist>    
+<aura:component extends="ui:dataProvider"
+    model="java://org.auraframework.component.auradev.TestDataProviderModel" 
+    controller="java://org.auraframework.component.auradev.TestDataProviderController" 
+    description="A test data provider."> 
+    <aura:handler name="provide" action="{!c.provide}"/>
 </aura:component>
+

@@ -21,18 +21,19 @@
 	<ui:block>
 		<aura:set attribute="left">
 		    <p>You can create lists in three different ways, using <code>aura:iteration</code>, <code>ui:list</code>, or <code>ui:infiniteList</code>. 
-			<code>aura:iteration</code> is used for shorter lists and can take in data from a model.
+			<code>aura:iteration</code> is used for simple lists and can take in data from a model.
 			For more information on <code>aura:iteration</code>, see <auradocs:topicLink topic="tagIteration">aura:iteration</auradocs:topicLink> and the <ui:outputURL value="/auradocs#demos?demo=todo" label="aura:iteration demo"/>.
 			</p>
 			<p> 
-			<code>ui:list</code> can be used for more robust list implementations that require a data provider and a template for each list item.
-			Additionally, use <code>ui:infiniteList</code> if you want a robust list implementation similar to <code>ui:list</code>, but with a handler that enables you to retrieve more data as necessary.
+			<code>ui:list</code> and <code>ui:infiniteList</code> provide a paging interface to navigate lists. <code>ui:list</code> can be used for more robust list implementations that require a data provider and a template for each list item.
+			Additionally, use <code>ui:infiniteList</code> if you want a robust list implementation similar to <code>ui:list</code>, but with a handler that enables you to retrieve and display more data as necessary.
 			</p>
 		    
 		</aura:set>
 		<aura:set attribute="right">
 		<b>Key Component</b><br/>
-		<auradocs:defLink defType="component" descriptor="ui:list"/>
+		<auradocs:defLink defType="component" descriptor="ui:list"/><br/>
+		<auradocs:defLink defType="component" descriptor="ui:infiniteList"/>
 		</aura:set>
 	</ui:block>
 	<p>Here is a basic set up of the <code>ui:list</code> component with a required data provider and template. </p>
@@ -57,10 +58,10 @@
   &lt;/div>
 &lt;/aura:component></auradocs:codeblock>
 	
-	<p>For an example of using the <code>ui:list</code> component, see the <ui:outputURL value="/auradocs#demos?demo=list" label="ui:list demo"/>.</p>
+	<auradocs:info>For an example of using the <code>ui:infinitelist</code> component, see the <ui:outputURL value="/auradocs#demos?demo=list" label="ui:infiniteList demo"/>.</auradocs:info>
     
     <h3>Working with List Events</h3>
-    <p>Common events for <code>ui:list</code> include user interface events like <code>click</code> events, and list-specific events like <code>refresh</code> and <code>triggerDataProvider</code>.
+    <p><code>ui:list</code> and <code>ui:infiniteList</code> inherits from <code>ui:abstractList</code>. Common events for <code>ui:list</code> include user interface events like <code>click</code> events, and list-specific events like <code>refresh</code> and <code>triggerDataProvider</code>.
     For a full list of events that you can use with <code>ui:list</code>, see the <auradocs:defLink defType="component" descriptor="ui:list"/> component reference.</p>
     
     <h4><code>refresh</code></h4>
@@ -69,8 +70,11 @@
 <auradocs:codeblock>var listData = cmp.find("listData");
 listData.get("e.refresh").fire();</auradocs:codeblock>
     
+    <h4><code>showMore</code></h4>
+    <p>The <code>showMore</code> event in <code>ui:infiniteList</code> handles the fetching of your data and displays it. This event fires the <code>triggerDataProvider</code> event as well. </p>
+    
     <h4><code>triggerDataProvider</code></h4>
-    <p>The<code>triggerDataProvider</code> event triggers the providing of data from a data provider. For example, you can use this event if you want to retrieve more data in a <code>ui:infiniteList</code> component.</p>
+    <p>The<code>triggerDataProvider</code> event triggers the providing of data from a data provider. It is also run during component initialization and refresh. For example, you can use this event if you want to retrieve more data in a <code>ui:infiniteList</code> component.</p>
     <auradocs:codeblock>cmp.getValue("v.currentPage").setValue(targetPage,true);
 var listData = component.find("listData");
 listData.get("e.triggerDataProvider").fire();</auradocs:codeblock>
@@ -79,8 +83,8 @@ listData.get("e.triggerDataProvider").fire();</auradocs:codeblock>
 	<p>For more information on client-side controllers, see <auradocs:topicLink topic="helloActions">Client-Side Controllers</auradocs:topicLink>.</p>
 	
 	<h3>Providing Data to the List Component</h3>
-	<p>In the basic set up above, <code>auradev:testDataProvider</code> provides the list of data to the <code>ui:list</code> component. <code>auradev:testDataProvider</code> extends <code>ui:dataProvider</code> and takes in a server-side model.</p>
-	The following code is the sample data provider, <code>auradev:testDataProvider</code>.
+	<p>In the basic set up above, <code>auradocs:demoDataProvider</code> provides the list of data to the <code>ui:list</code> component. <code>auradocs:demoDataProvider</code> extends <code>ui:dataProvider</code> and takes in a server-side model.</p>
+	The following code is the sample data provider, <code>auradocs:demoDataProvider</code>.
 <auradocs:codeblock>&lt;aura:component extends="ui:dataProvider"
     model="java://org.auraframework.component.auradev.TestDataProviderModel" 
     controller="java://org.auraframework.component.auradev.TestDataProviderController" 
@@ -88,9 +92,8 @@ listData.get("e.triggerDataProvider").fire();</auradocs:codeblock>
       &lt;aura:handler name="provide" action="<aura:text value="{!"/>c.provide}"/>
 &lt;/aura:component></auradocs:codeblock>
 
-	<p>You can customize the <code>provide</code> event in your client-side controller. For example, the following code shows a sample <code>provide</code> helper function for a test provider.</p>
-<auradocs:codeblock> var dataProvider = component.getConcreteComponent();
-var keyword = event.getParam("parameters").keyword;
+	<p>The <code>provide</code> event is fired on initialization by the parent <code>ui:abstractList</code> component. You can customize the <code>provide</code> event in your client-side controller. For example, the following code shows a sample <code>provide</code> helper function for a data provider.</p>
+<auradocs:codeblock>var dataProvider = component.getConcreteComponent();
 var action = dataProvider.get("c.getItems");
     
 //Set the parameters for this action
@@ -108,8 +111,8 @@ action.setCallback(this, function(action) {
     }
 });
 $A.enqueueAction(action);</auradocs:codeblock>
-	<p>See the data provider at <code>aura-components/src/main/components/auradev/testDataProvider/</code> in the GitHub repo.</p>
-	<p>To learn how the data provider is retrieving data from the model, see the server-side model at <code>aura-impl/src/main/java/org/auraframework/component/auradev/TestDataProviderModel.java</code> in the GitHub repo.</p> 
+	<p>See the data provider at <code>aura-components/src/main/components/auradocs/demoDataProvider/</code> in the  <ui:outputURL value="https://github.com/forcedotcom/aura" label="GitHub repo"/>.</p>
+	<p>To learn how the data provider is retrieving data from the model, see the server-side model at <code>aura-impl/src/main/java/org/auraframework/component/auradev/TestDataProviderModel.java</code> in the <ui:outputURL value="https://github.com/forcedotcom/aura" label="GitHub repo"/>.</p> 
 	
 	<h3>Styling Your List Component</h3>
 	<p>The <code>ui:list</code> component is customizable with regular CSS styling. For example, the sample template code above has <code>&lt;div class="row"></code>. To apply CSS, you can use the following CSS selector in the parent component.</p>

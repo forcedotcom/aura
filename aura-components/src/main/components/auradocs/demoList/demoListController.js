@@ -13,11 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
- .THIS .uiBlock .bLeft {
- 	width: 80%;
- }
-
- .THIS .uiMessage .uiBlock .bBody {
- 	width: 80%;
- }
+({
+	show: function(component, event, helper) {        
+        var list = component.find("listData");
+        list.get("e.triggerDataProvider").fire();
+	}
+})

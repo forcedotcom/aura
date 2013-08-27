@@ -16,7 +16,9 @@
 
 -->
 <aura:component extends="auradocs:demoPanel">
-    <aura:set attribute="title" value="ui:list"/>
+    <aura:set attribute="title" value="ui:infiniteList"/>
+    This demo shows a basic implementation of <code>ui:infiniteList</code>. When you click the <b>Show More</b> button, the component fetches the labels from the model and display it below the data that is already loaded.
+    Note that the server-side controller <code>TestDataProviderController.java</code> appends the number of seconds to the labels, which differentiates the next set of results.
 		 <auradocs:info>For more information on this demo, see <auradocs:topicLink topic="uiList">Creating Lists</auradocs:topicLink>.</auradocs:info>
     <auradocs:example descriptor="auradocs:demoList" />
 </aura:component>

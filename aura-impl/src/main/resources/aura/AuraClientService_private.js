@@ -303,9 +303,16 @@ var priv = {
         var i;
 
         var errors = [];
+        //
+        // Note that this is a very specific assertion. We can either be called back from an empty stack
+        // (the normal case, after an XHR has gone to the server), or we can be called back from inside
+        // the popStack protection (currently I only know this to occur in disconnected webkit).
+        //
         if (this.auraStack.length > 0) {
-            $A.error("Action callback called on non-empty stack " + this.auraStack);
-            this.auraStack = [];
+            if (this.auraStack.length != 1 || this.auraStack[0] !== "$A.clientServices.popStack") {
+                $A.error("Action callback called on non-empty stack '" + this.auraStack + "', length = "+this.auraStack.length);
+                this.auraStack = [];
+            }
         }
         // #if {"modes" : ["PTEST"]}
         this.existingTransactionId = collector.getTransactionId();

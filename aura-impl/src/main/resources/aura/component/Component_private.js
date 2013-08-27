@@ -108,7 +108,7 @@ var ComponentPriv = (function(){ // Scoping priv
         this.setupApplicationEventHandlers(cmp);
 
         // index this component with its value provider (if it has a localid)
-        this.doIndex();
+        this.doIndex(cmp);
 
         // instantiate the renderer for this component
         this.setupRenderer(cmp);
@@ -497,11 +497,14 @@ var ComponentPriv = (function(){ // Scoping priv
         }
     };
 
-    ComponentPriv.prototype.doIndex = function(){
+    ComponentPriv.prototype.doIndex = function(cmp){
         var localId = this.localId;
 
         if (localId) {
             var attributeValueProvider = this.attributes.getComponentValueProvider();
+            if (!attributeValueProvider) {
+                attributeValueProvider = cmp;
+            }
             attributeValueProvider.index(localId, this.globalId);
         }
     };

@@ -376,8 +376,7 @@
             });
         }
     },
-    // TODO(W-1766834): setting 'localId' param of config causes error
-    _testConfig_SetLocalId:{
+    testConfig_SetLocalId:{
         test: function(cmp){
             $A.run(function(){
                 cmp.get("c.createCmpWithLocalId").runDeprecated();
@@ -385,15 +384,14 @@
 
             var body = cmp.get('v.body');
             $A.test.assertEquals(1,body.length);
-            var newCmp = body.find("userLocalId");
+            var newCmp = body[0].find("userLocalId");
             $A.test.assertEquals("markup://aura:text",newCmp.getDef().getDescriptor().getQualifiedName());
             $A.test.assertEquals("TextComponent",newCmp.get('v.value'));
             $A.test.assertEquals(6,newCmp.get('v.truncate'));
             $A.test.assertEquals("Tex...",$A.test.getText(newCmp.getElement()));
         }
     },
-    // TODO(W-1766834): setting 'localId' param of config causes error
-    _testConfig_SetLocalIdServerDependencies:{
+    testConfig_SetLocalIdServerDependencies:{
         test: function(cmp){
             $A.run(function(){
                 cmp.get("c.createCmpWithServerDependeciesAndLocalId").runDeprecated();
@@ -402,7 +400,7 @@
             $A.test.addWaitFor(true, $A.test.allActionsComplete, function(){
                 var body = cmp.get('v.body');
                 $A.test.assertEquals(1,body.length);
-                var newCmp = body.find("userLocalId");
+                var newCmp = body[0].find("userLocalId");
                 $A.test.assertDefined(newCmp);
                 $A.test.assertEquals("markup://loadLevelTest:serverComponent",newCmp.getDef().getDescriptor().getQualifiedName());
                 $A.test.assertTrue($A.test.getTextByComponent(newCmp).indexOf('creatingComponentWithServerDependecies')!=-1,
@@ -411,10 +409,10 @@
         }
     },
     // TODO(W-1320697): Specifying expressions as attribute value for new cmp doesn't work
-    _testConfig_SetAttributesAsPropertyReferences:{
+    _testConfig_SetAttributesAsPropertyReferencesServerDeps:{
         test: function(cmp){
             $A.run(function(){
-                cmp.get("c.createCmpWithPropertyReference").runDeprecated();
+                cmp.get("c.createCmpWithPropertyReferenceServerDeps").runDeprecated();
             });
 
             $A.test.addWaitFor(true, $A.test.allActionsComplete, function(){
@@ -427,10 +425,10 @@
         }
     },
     // TODO(W-1320697): Specifying expressions as attribute value for new cmp doesn't work
-    _testConfig_SetAttributesAsPropertyReferences2:{
+    _testConfig_SetAttributesAsPropertyReferencesNoServerDeps:{
         test: function(cmp){
             $A.run(function(){
-                cmp.get("c.createCmpWithPropertyReference2").runDeprecated();
+                cmp.get("c.createCmpWithPropertyReferenceNoServerDeps").runDeprecated();
             });
 
             var body = cmp.get('v.body');

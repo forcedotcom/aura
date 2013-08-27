@@ -78,6 +78,14 @@
         $A.util[visible ? "addClass" : "removeClass"](component.getElement(), "loading");
     },
     
+    updateEmptyListContent:function (component) {
+		// make sure we are referencing a concrete component.
+		var concrete_component = component.getConcreteComponent();
+		var items = concrete_component.get("v.items");
+		var has_items = items != null && items.length > 0;
+        $A.util[has_items ? "removeClass" : "addClass"](concrete_component.getElement(), "showEmptyContent");
+    },
+
     triggerDataProvider: function(component, index) {
         this.showLoading(component, true);
         if (!index) {

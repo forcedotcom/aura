@@ -17,7 +17,7 @@
 -->
 <aura:component>
     <aura:attribute name="caseToRender" type="String" default="full"/>
-    <aura:if isTrue="{!v.caseToRender == 'full'}">    
+    <aura:if isTrue="{!v.caseToRender == 'full'}">  
         <table>
             <th></th>
             <tr><td>
@@ -57,8 +57,58 @@
                 <ui:inputTextArea aura:id="tellUsAboutYou" placeholder="Tell us about yourself" rows="10" cols="20"/>
                 <iframe height="300px" width="50%" src="http://www.salesforce.com"></iframe>
                </td></tr>
-        </table>
+        </table> 
+        
     </aura:if>
+    <aura:if isTrue="{!v.caseToRender == 'labelTest'}">
+        <ui:label for="first" label="first"/>
+        <ui:label for="mid" label="mid"/>    
+         
+        <table>
+             <th scope="row"></th>
+            <tr><td>
+                <ui:block>
+                    <ui:inputText aura:id="first" placeholder="First name"/>
+                    <ui:inputText aura:id="mid" placeholder="Middle Name"/>
+                    <ui:inputText aura:id="last" placeholder="Last name"/>
+                 </ui:block>
+            </td></tr>
+            <tr><td><iframe title="Lets go to google" height="300px" width="50%" src="http://www.salesforce.com"></iframe></td></tr>
+        </table>
+         <table>
+            <th scope="row"></th>
+            <tr><td>
+                
+                <ui:inputDate aura:id="birthdayInput" displayDatePicker="true"/>
+                <fieldset class="field_set">
+                      <legend>what is your age range?</legend>
+                        <br/>
+                      <ui:label for="21-25" label="21-25"/>
+                      <ui:inputRadio aura:id="21-25"/>
+                        <br/>
+                      <ui:label for="26-30" label="26-30"/>
+                      <ui:inputRadio aura:id="26-30"/>
+                </fieldset>
+                <fieldset class="field_set">
+                     <legend>More Options</legend>
+                        <br/>
+                      <ui:label for="31-35" label="31-35"/>
+                      <ui:inputRadio aura:id="31-35"/>
+                        <br/>
+                      
+                      <br/>
+                      <ui:inputRadio label="Old and wise enough" aura:id="Old and wise enough"/>   
+                </fieldset>
+                <ui:inputRadio label="I WANT TO BE CLICKED!!!!" aura:id="click me"/>  
+                <ui:inputTextArea aura:id="tellUsAboutYou" placeholder="Tell us about yourself" rows="10" cols="20"/>
+                <iframe height="300px" title="tmpTitle" width="50%" src="http://www.salesforce.com"></iframe>
+               </td></tr>
+        </table>
+        <ui:label for="tellUsAboutYou" label="tellUsAboutYou"/> 
+        <ui:label for="last" label="last"/> 
+        <ui:label for="birthdayInput" label="Birthday"/>
+    </aura:if>
+    
     <aura:if isTrue="{!v.caseToRender == 'anchorWOInnerText'}">
           <a href="javascript:void(0)">
             <table>

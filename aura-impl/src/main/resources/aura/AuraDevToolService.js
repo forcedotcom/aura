@@ -414,19 +414,18 @@ var AuraDevToolService = function() {
              * @param   imgErrorMsg                - Default error message telling user why they should set alt tag
              * @param   infoMsg                    - Error message for Informational tag
              * @param   decoMsg                    - Error message for Decorative tag
-             * @param   imgTypeNotDefinedMsg       - Error message for imageType attribute not set
              * @returns String                   - String concatenation of all error messages
              */
-            findAllImgTags:function (imgErrorMsg, infoMsg, decoMsg, imgTypeNotDefinedMsg){
+            findAllImgTags:function (imgErrorMsg, infoMsg, decoMsg){
         	 var accessAideFuncs = aura.devToolService.accessbilityAide;
         	
         	 var allImgTags = document.getElementsByTagName("img");
         	 var data_aura_rendered_by = "";
-        	 var imgTypeNotDefinedErrorArray = [];
+        	 var nonAuraImg = [];
         	 var informationErrorArray = [];
         	 var decorationalErrorArray  = [];
         	 var errorMsg = "No component information Available";
-        	 var nonAuraImg = [];
+        	 
         	 var imgType = "";
         	 var alt = "";
         	
@@ -441,11 +440,7 @@ var AuraDevToolService = function() {
          		imgType = $A.getCmp(data_aura_rendered_by).getAttributes().getValueProvider().get('v.imageType');	
          		alt     = $A.getCmp(data_aura_rendered_by).getAttributes().getValueProvider().get('v.alt');
  
-         		//ImageType is currently set to null, if it is still null it is an error
-         		if($A.util.isUndefinedOrNull(imgType)){
-         		   imgTypeNotDefinedErrorArray.push(allImgTags[index]);
-         		}
-         		else if((imgType === "informational" || $A.util.isUndefinedOrNull(imgType)) && ($A.util.isUndefinedOrNull(alt) || alt === "" )){
+         		if((imgType === "informational" || $A.util.isUndefinedOrNull(imgType)) && ($A.util.isUndefinedOrNull(alt) || alt === "")){
          			informationErrorArray.push(allImgTags[index]);
          		}
          		else if(imgType === "decorative" && (!$A.util.isUndefinedOrNull(alt) && alt !== "")){
@@ -455,7 +450,6 @@ var AuraDevToolService = function() {
         	 }
         	 
         	 errorMsg = accessAideFuncs.formatOutput(errorMsg, nonAuraImg);
-        	 errorMsg = errorMsg + accessAideFuncs.formatOutput(imgErrorMsg+imgTypeNotDefinedMsg, imgTypeNotDefinedErrorArray);
         	 errorMsg = errorMsg + accessAideFuncs.formatOutput(imgErrorMsg+infoMsg, informationErrorArray);
         	 errorMsg = errorMsg + accessAideFuncs.formatOutput(imgErrorMsg+decoMsg, decorationalErrorArray);
         	 
@@ -526,7 +520,50 @@ var AuraDevToolService = function() {
         	}
         	return strAttrib;
             },
-            
+            /**
+             * Method that looks at the given tag and will look print out the next two parents components names
+             * @param   tag     - The initial tag to find the parents of
+             * @param   spacing - The amount of spacing that we want per item
+             * @returns String  - The string representation of the the cmp stack trace 
+             */
+            getStackTrace : function(tag, spacing){
+	            var cmp = null;
+                    var cmpInfo = {};
+                    var cmpNameArray = [];
+                    var cmpName = "";
+                    var spaces = "";
+                    
+                    //Keep going up until we hit the either the BODY or HTML tag
+                    while(!$A.util.isUndefinedOrNull(tag) && tag.tagName.toLowerCase() !== "body" && tag.tagName.toLowerCase() !== "html"){
+                         data_aura_rendered_by = tag.getAttribute("data-aura-rendered-by");
+        
+                         //Make sure it has a rendered by value
+                         if(!$A.util.isUndefinedOrNull(data_aura_rendered_by) && data_aura_rendered_by !== "" ){
+                             cmp = $A.getCmp(data_aura_rendered_by);
+                             if(!$A.util.isUndefinedOrNull(cmp)){
+                                 //Grab the namespace and name so that it is not viewed as a hyperlink
+                                 cmp = cmp.getAttributes().getValueProvider().getDef().getDescriptor();
+                                 cmpName = cmp.getNamespace()+":"+cmp.getName();
+                    
+                                 //Making sure that we have unique components
+                                 if(!(cmpName in cmpInfo)){
+                                 	cmpInfo[cmpName] = "";
+                                 	cmpNameArray.push(cmpName);
+                                 }
+                             }
+                         }
+                         tag = tag.parentNode;
+                     }
+                    
+                     spaces = spacing;
+                     cmpName = "";
+                     for(var index=cmpNameArray.length-1; index>=0; index--){
+                     	cmpName = cmpName + spaces+ cmpNameArray[index]+"\n";
+                     	spaces = spaces+"   ";
+                     }
+                     
+                     return cmpName;
+	     },
             /**
              * Method grabs everything from the given array and prints out the error and the tag(s) that are the issue
              * @param   tagError - The error message for the given tag
@@ -574,9 +611,10 @@ var AuraDevToolService = function() {
         		    //Grabbing the erroneous components value provider
             		     cmpDesc = cmp.getAttributes().getValueProvider();
         		    
-        		  //Making sure we are not at the app level
-        		  if(!$A.util.isUndefinedOrNull(cmpDesc) && !$A.util.isUndefinedOrNull(cmpDesc.getAttributes()) && !$A.util.isUndefinedOrNull(cmpDesc.getAttributes().getValueProvider())){      		      
-        		      cmpDesc = cmpDesc.getAttributes().getValueProvider();
+        		  //Making sure we are not at the app level and that we are not looking at a pass through value
+            		  if(!$A.util.isUndefinedOrNull(cmpDesc) && !$A.util.isUndefinedOrNull(cmpDesc.getAttributes()) && 
+				  !$A.util.isUndefinedOrNull(cmpDesc.getAttributes().getValueProvider()) && ("getDef" in cmpDesc.getAttributes().getValueProvider())){      		      
+		              cmpDesc = cmpDesc.getAttributes().getValueProvider();
         		      cmpDesc = cmpDesc.getDef().getDescriptor();
         		      compThatRenderedCmp = cmpDesc.getNamespace()+":"+cmpDesc.getName();
         		  }
@@ -592,6 +630,7 @@ var AuraDevToolService = function() {
         	    }
         	    
         	    errStr = errStr+"Component markup: //"+cmpInfo+"\nFound in: //"+compThatRenderedCmp+"\nRendered Tag:   <"+nodeName+""+accessAideFuncs.attribStringVal(errArray[i].attributes)+">...</"+nodeName+">\n";     	    
+        	    errStr = errStr+"StackTrace:\n" + accessAideFuncs.getStackTrace(errArray[i], "           ");
         	}
                 return errStr;
             },
@@ -816,9 +855,8 @@ var AuraDevToolService = function() {
         		var imgError = "IMG tag must have alt attribute. Refer to http://www.w3.org/TR/UNDERSTANDING-WCAG20/text-equiv.html.";
         		var infoMsg = "\nNote: If the image type is informational, then the alt must be set";
                 	var decoMsg = "\nNote: If the image type is decorative,  then the alt must be the empty string";
-                	var imgTypeNotDefinedMsg  = "\nNote: ImageType Attribute must be set to either decorative or informational";
         		var accessAideFuncs = aura.devToolService.accessbilityAide;
-       		        return accessAideFuncs.findAllImgTags(imgError,infoMsg,decoMsg,imgTypeNotDefinedMsg);
+       		        return accessAideFuncs.findAllImgTags(imgError, infoMsg, decoMsg);
         	    },
         	    /**
                      * Goes through all of the fieldsets tags and makes sure that each on has a legend

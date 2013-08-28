@@ -44,6 +44,6 @@
 	
      <p><b>See also:</b><br/>
       <auradocs:topicLink topic="helloActions">Client-Side Controllers</auradocs:topicLink><br/>
-      <auradocs:topicLink topic="oodWhatsInherited">What is Inherited</auradocs:topicLink>
+      <auradocs:topicLink topic="oodWhatsInherited">What is Inherited?</auradocs:topicLink>
     </p>
 </aura:component>

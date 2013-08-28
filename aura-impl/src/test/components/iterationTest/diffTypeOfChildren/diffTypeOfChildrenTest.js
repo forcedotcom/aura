@@ -18,9 +18,25 @@
      * Verify that a component's provider does not inteferer with the iteration component's provider.
      */
     testChildrenWithJSProvider:{
-        attributes:{start:0, end:2},
+        attributes:{start:0, end:2, csccTest: false},
         test:function(cmp){
             var items = cmp.find("childWithJSProvider");
+            for(var i = 0, n = items.length; i < n; i++){
+                var item = items[i];
+                $A.test.assertEquals("markup://iterationTest:iterationChildWJSProvider", item.getDef().getDescriptor().toString());
+                //Verify that provided attribute value is the same as expected
+                $A.test.assertEquals("TextAppend"+cmp.get('m.innerData')[i],
+                        item.get("v.newStrAttribute"));
+                $A.test.assertEquals("TextAppend"+cmp.get('m.innerData')[i],
+                        $A.test.getTextByComponent(item));
+            }
+        }
+    },
+    
+    testChildrenWithJSProviderCscc:{
+        attributes:{start:0, end:2, csccTest: true},
+        test:function(cmp){
+            var items = cmp.find("childWithJSProvider2");
             for(var i = 0, n = items.length; i < n; i++){
                 var item = items[i];
                 $A.test.assertEquals("markup://iterationTest:iterationChildWJSProvider", item.getDef().getDescriptor().toString());

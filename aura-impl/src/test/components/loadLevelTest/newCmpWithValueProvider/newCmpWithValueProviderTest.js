@@ -59,8 +59,7 @@
      * Create a component whose definition is not available at the client.
      * This definition would be fetched at the server.
      */
-    // TODO(W-1320697): Specifying expressions as attribute value for new component does not work
-    _testValueProviderForDefFetchedFromServer:{
+    testValueProviderForDefFetchedFromServer:{
         attributes:{numberAttribute:999},
         test: function(cmp){
             $A.run(function(){
@@ -68,15 +67,15 @@
             });
 
             $A.test.addWaitFor(true, $A.test.allActionsComplete, function(){
-                var numberCmp = body[0];
+                var numberCmp = cmp.get('v.body')[0];
                 $A.test.assertEquals("markup://loadLevelTest:displayNumber", numberCmp.getDef().getDescriptor().getQualifiedName(),
                         "Failed to create new component: markup://loadLevelTest:displayNumber");
                 $A.test.assertEquals(999,numberCmp.get('v.number'), "Failed to pass attribute values to placeholder");
                         $A.test.assertEquals("999",$A.test.getTextByComponent(numberCmp), "Failed to pass attribute values to placeholder");
 
-                /**W-1318095 - Verify that new Component was provided the local id specified in config
-                $A.test.assertTruthy(cmp.find("num_Id"));
-                $A.test.assertEquals(numberCmp, cmp.find("num_Id"));*/
+                // Verify that new Component was provided the local id specified in config
+                $A.test.assertTruthy(cmp.find("num_Id"), "Failed to find new Component with its localId");
+                $A.test.assertEquals(numberCmp, cmp.find("num_Id"));
             });
         }
     },

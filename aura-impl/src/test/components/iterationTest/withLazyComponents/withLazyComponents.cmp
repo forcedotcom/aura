@@ -34,4 +34,17 @@
             <aura:expression value="{!var}" aura:id="lazyWithAttributes" aura:load="lazy"/>
         </aura:iteration>
     </aura:if>
+    
+    <!--Iterate and push values along with a slow server component -->
+    <aura:if isTrue="{!v.slowFacet}">
+        <aura:iterationCscc aura:id="iterationCscc" items="{!m.innerData}" var="var" indexVar="idx" start="{!v.start}" end="{!v.end}">
+            <loadLevelTest:serverComponent aura:id="lazyCscc" waitId="{!'withLazyComponents'+idx}" aura:load="lazy"/>
+        </aura:iterationCscc>
+    </aura:if>
+    <aura:if isTrue="{!v.fastFacet}">
+        <aura:iterationCscc aura:id="iterationWithAttributesCscc" items="{!m.innerData}" var="var" indexVar="idx" start="{!v.start}" end="{!v.end}">
+            <loadLevelTest:serverComponent aura:id="lazyCscc" waitId="withAttributes" aura:load="lazy"/>
+            <aura:expression value="{!var}" aura:id="lazyWithAttributesCscc" aura:load="lazy"/>
+        </aura:iterationCscc>
+    </aura:if>
 </aura:component>

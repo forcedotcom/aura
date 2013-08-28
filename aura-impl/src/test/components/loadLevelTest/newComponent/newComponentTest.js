@@ -379,17 +379,65 @@
     // TODO(W-1766834): setting 'localId' param of config causes error
     _testConfig_SetLocalId:{
         test: function(cmp){
-            debugger;
             $A.run(function(){
                 cmp.get("c.createCmpWithLocalId").runDeprecated();
             });
 
             var body = cmp.get('v.body');
             $A.test.assertEquals(1,body.length);
-            $A.test.assertEquals("markup://aura:text",body[0].getDef().getDescriptor().getQualifiedName());
-            $A.test.assertEquals("TextComponent",body[0].get('v.value'));
-            $A.test.assertEquals(6,body[0].get('v.truncate'));
-            $A.test.assertEquals("Tex...",$A.test.getText(body[0].getElement()));
+            var newCmp = body.find("userLocalId");
+            $A.test.assertEquals("markup://aura:text",newCmp.getDef().getDescriptor().getQualifiedName());
+            $A.test.assertEquals("TextComponent",newCmp.get('v.value'));
+            $A.test.assertEquals(6,newCmp.get('v.truncate'));
+            $A.test.assertEquals("Tex...",$A.test.getText(newCmp.getElement()));
         }
     },
+    // TODO(W-1766834): setting 'localId' param of config causes error
+    _testConfig_SetLocalIdServerDependencies:{
+        test: function(cmp){
+            $A.run(function(){
+                cmp.get("c.createCmpWithServerDependeciesAndLocalId").runDeprecated();
+            });
+
+            $A.test.addWaitFor(true, $A.test.allActionsComplete, function(){
+                var body = cmp.get('v.body');
+                $A.test.assertEquals(1,body.length);
+                var newCmp = body.find("userLocalId");
+                $A.test.assertDefined(newCmp);
+                $A.test.assertEquals("markup://loadLevelTest:serverComponent",newCmp.getDef().getDescriptor().getQualifiedName());
+                $A.test.assertTrue($A.test.getTextByComponent(newCmp).indexOf('creatingComponentWithServerDependecies')!=-1,
+                        "Failed to set model value for local component.");
+            });
+        }
+    },
+    // TODO(W-1320697): Specifying expressions as attribute value for new cmp doesn't work
+    _testConfig_SetAttributesAsPropertyReferences:{
+        test: function(cmp){
+            $A.run(function(){
+                cmp.get("c.createCmpWithPropertyReference").runDeprecated();
+            });
+
+            $A.test.addWaitFor(true, $A.test.allActionsComplete, function(){
+                var body = cmp.get('v.body');
+                $A.test.assertEquals(1,body.length);
+                $A.test.assertEquals("markup://loadLevelTest:serverComponent",body[0].getDef().getDescriptor().getQualifiedName());
+                $A.test.assertTrue($A.test.getTextByComponent(body[0]).indexOf('testValue')!=-1,
+                        "Failed to set attribute of new component as property reference.");
+            });
+        }
+    },
+    // TODO(W-1320697): Specifying expressions as attribute value for new cmp doesn't work
+    _testConfig_SetAttributesAsPropertyReferences2:{
+        test: function(cmp){
+            $A.run(function(){
+                cmp.get("c.createCmpWithPropertyReference2").runDeprecated();
+            });
+
+            var body = cmp.get('v.body');
+            $A.test.assertEquals(1,body.length);
+            $A.test.assertEquals("markup://ui:outputNumber",body[0].getDef().getDescriptor().getQualifiedName());
+            $A.test.assertTrue($A.test.getTextByComponent(body[0]).indexOf('22')!=-1,
+                    "Failed to set attribute of new component as property reference.");
+        }
+    }
 })

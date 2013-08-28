@@ -14,14 +14,7 @@
  * limitations under the License.
  */
 ({
-    provide : function IterationProvider(component, localCreation) {
-        var realbody = component.getDef().getHelper().createRealBody(component, !localCreation);
-
-        return {
-            attributes: {
-                "realbody": realbody
-            }
-        };
+    theaction: function(cmp, event) {
+        cmp.find('outputText').getAttributes().setValue("value", "action run by " + event.target.className);
     }
 })
-

@@ -15,16 +15,11 @@
     limitations under the License.
 
 -->
-<aura:component render="client" extends="loadLevelTest:lazyLoadHelper">
-    <aura:attribute name="testAttr" type="String" default="testValue" />
-    <aura:attribute name="testAttr2" type="Integer" default="22" />
+<aura:component extensible="true" model="java://org.auraframework.impl.java.model.TestModel">
+    <aura:attribute name="value" type="String"/>
 
-    <ui:button press="{!c.createCmpWithComplexAttributes}" label="Push for component"/>
-    <!--ui:button press="{!c.makeServer}" label="Push for server component"/>
-    <ui:button press="{!c.makeExclusiveServer}" label="Push for exclusive server component"/><br/-->
-    {!v.body}
+    <div>
+        {!v.value} : {!m.readOnlyThing}<br/>
+    </div>
 
-    <aura:registerevent name="press" type="ui:press"/>
-
-    <loadLevelTest:serverComponent/>
 </aura:component>

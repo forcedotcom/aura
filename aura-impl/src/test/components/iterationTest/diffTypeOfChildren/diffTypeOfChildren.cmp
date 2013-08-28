@@ -14,12 +14,34 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 
+    <aura:renderIf isTrue="{!v.csccTest}">
+        <aura:iterationCscc aura:id="iteration" items="{!m.innerData}" var="var" indexVar="idx" start="{!v.start}" end="{!v.end}">
+            <iterationTest:iterationChildWJSProvider aura:id="childWithJSProvider" strAttribute="{!var}"/><br/>
+        </aura:iterationCscc>
+
+        <aura:set attribute="else">
+            <aura:iteration aura:id="iteration" items="{!m.innerData}" var="var" indexVar="idx" start="{!v.start}" end="{!v.end}">
+                <iterationTest:iterationChildWJSProvider aura:id="childWithJSProvider" strAttribute="{!var}"/><br/>
+            </aura:iteration>
+        </aura:set>
+    </aura:renderIf>
+
 -->
 <aura:component render="client" model="java://org.auraframework.impl.java.model.TestIterationModel">
     <aura:attribute name="start" type="Integer"/>
     <aura:attribute name="end" type="Integer"/>
+    <aura:attribute name="csccTest" type="Boolean" default="false" description="Flag for using client-side cmp creation version of iteration" />
 
-    <aura:iteration aura:id="iteration" items="{!m.innerData}" var="var" indexVar="idx" start="{!v.start}" end="{!v.end}">
-        <iterationTest:iterationChildWJSProvider aura:id="childWithJSProvider" strAttribute="{!var}"/><br/>
-    </aura:iteration>
+    {!v.start} {!v.end}
+    <aura:renderIf isTrue="{!v.csccTest}">
+        <aura:iterationCscc aura:id="iteration" items="{!m.innerData}" var="var" indexVar="idx" start="{!v.start}" end="{!v.end}">
+            <iterationTest:iterationChildWJSProvider aura:id="childWithJSProvider2" strAttribute="{!var}"/><br/>
+        </aura:iterationCscc>
+
+        <aura:set attribute="else">
+            <aura:iteration aura:id="iteration" items="{!m.innerData}" var="var" indexVar="idx" start="{!v.start}" end="{!v.end}">
+                <iterationTest:iterationChildWJSProvider aura:id="childWithJSProvider" strAttribute="{!var}"/><br/>
+            </aura:iteration>
+        </aura:set>
+    </aura:renderIf>
 </aura:component>

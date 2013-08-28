@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 ({
-    provide : function IterationProvider(component, localCreation) {
-        var realbody = component.getDef().getHelper().createRealBody(component, !localCreation);
+    addRow : function(cmp, event) {
+        var sl = cmp.getValue("m.stringList");
+        sl.push("new!");
+    },
 
-        return {
-            attributes: {
-                "realbody": realbody
-            }
-        };
+    removeRow : function(cmp, event) {
+        var sl = cmp.getValue("m.stringList");
+        sl.remove(0);
     }
 })
-

@@ -14,6 +14,14 @@
  * limitations under the License.
  */
 ({
+    doUpdate: function(component, value) {
+        if (value) {
+            var regex = new RegExp("\\" + $A.get("$Locale.currency"), "g");
+            value = value.replace(regex, '');
+        }
+        component.setValue("v.value", value);
+    },
+
     getDefaultFormatter: function(cmp) {
         return $A.localizationService.getDefaultCurrencyFormat();
     }

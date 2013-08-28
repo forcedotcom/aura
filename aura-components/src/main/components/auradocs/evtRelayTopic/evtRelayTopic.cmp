@@ -25,9 +25,16 @@
     <p>Let's say that you are extending the <code>ui:menuTrigger</code> component and using an icon or background image. To propagate the click event on the image from the  child component,
     you must propagate the Aura event and refire it in <code>ui:menuTrigger</code>.</p>
  
-    <p>The following sample code shows how <code>uitest:demoMenuTrigger</code> extends <code>ui:menuTrigger</code> and uses a controller action that propogates the event to <code>ui:menuTrigger</code>.
-    In the <code>relay</code> controller action, <code>preEventFiring</code> is an action on <code>ui:menuTrigger</code> that captures the event that triggers the menu and toggles it.</p>
+    <p>The following sample code shows how <code>uitest:demoMenuTrigger</code> extends <code>ui:menuTrigger</code> and uses a controller action that propagates the event to <code>ui:menuTrigger</code>.
+    In the <code>relay</code> controller action, <code>preEventFiring</code> is an action on <code>ui:menuTrigger</code> that captures the event that triggers the menu and toggles it.
+    Note that the trigger doesn't do anything as a standalone. It can be used in a <code>ui:menu</code> component, as shown in the second demo below.
+    </p>
 	<auradocs:example descriptor="uitest:demoMenuTrigger"/>
+	
+	<auradocs:info>In the controller, <code>helper.preEventFiring()</code> calls the action in parent's helper, <code>menuTriggerHelper.js</code>.
+	Similarly, <code>helper.fireEvent()</code> calls the action in the parent's helper, <code>menuItemHelper.js</code>. 
+	See <code>aura-components/src/main/components/ui/menuTrigger/menuTriggerHelper.js</code> and <code>aura-components/src/main/components/ui/menuItem/menuItemHelper.js</code> in the <ui:outputURL value="https://github.com/forcedotcom/aura" label="GitHub repo"/>.
+	</auradocs:info>
 	
 	<p>The following sample code shows an implementation of <code>uitest:demoMenuTrigger</code>.</p>
 	<auradocs:example descriptor="uitest:demoRelay"/>
@@ -36,6 +43,7 @@
 	we can then handle the event the same way as how <code>ui:interactive</code>, which <code>ui:menuTrigger</code> extends, handles native DOM events.</p>
 	
      <p><b>See also:</b><br/>
-      <auradocs:topicLink topic="helloActions">Client-Side Controllers</auradocs:topicLink>
+      <auradocs:topicLink topic="helloActions">Client-Side Controllers</auradocs:topicLink><br/>
+      <auradocs:topicLink topic="oodWhatsInherited">What is Inherited</auradocs:topicLink>
     </p>
 </aura:component>

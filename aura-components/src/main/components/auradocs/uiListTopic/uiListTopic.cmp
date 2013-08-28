@@ -115,7 +115,7 @@ $A.enqueueAction(action);</auradocs:codeblock>
 	<p>To learn how the data provider is retrieving data from the model, see the server-side model at <code>aura-impl/src/main/java/org/auraframework/component/auradev/TestDataProviderModel.java</code> in the <ui:outputURL value="https://github.com/forcedotcom/aura" label="GitHub repo"/>.</p> 
 	
 	<h3>Styling Your List Component</h3>
-	<p>The <code>ui:list</code> component is customizable with regular CSS styling. For example, the sample template code above has <code>&lt;div class="row"></code>. To apply CSS, you can use the following CSS selector in the parent component.</p>
+	<p>The <code>ui:list</code> component is customizable with regular CSS styling. For example, the sample template code above has <code>&lt;div class="row"></code>. To apply CSS, you can use the following CSS selector in the template component.</p>
 <auradocs:codeblock>.THIS .row{
     //CSS declaration
  }</auradocs:codeblock>

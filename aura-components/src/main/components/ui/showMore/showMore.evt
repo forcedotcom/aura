@@ -15,5 +15,5 @@
     limitations under the License.
 
 -->
-<aura:event type="COMPONENT">
+<aura:event type="COMPONENT" description="Used to fetch and display additional list data.">
 </aura:event>

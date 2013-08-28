@@ -24,10 +24,10 @@
     <aura:attribute name="header" type="Aura.Component[]" description="A facet above the rendered list, for use as a list header"/>
     <aura:attribute name="footer" type="Aura.Component[]" description="A facet below the rendered list, for use as a list footer"/>
     
-    <aura:registerEvent name="triggerDataProvider" type="ui:dataProvide"/>
+    <aura:registerEvent name="triggerDataProvider" type="ui:dataProvide"  description="The event fired when the data provider is triggered."/>
     <aura:handler name="triggerDataProvider" action="{!c.triggerDataProvider}"/>
     
-    <aura:registerEvent name="refresh" type="ui:refresh"/>
+    <aura:registerEvent name="refresh" type="ui:refresh" description="The event fired when the component is refreshed."/>
     <aura:handler name="refresh" action="{!c.refresh}"/>
 
     <aura:handler name="init" action="{!c.init}" value="{!this}"/>

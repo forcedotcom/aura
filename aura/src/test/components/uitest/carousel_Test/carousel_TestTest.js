@@ -38,10 +38,15 @@
  			this.goToPageOnCarousel(cmp, "carousel1", 1, "c1-p1");
  		}, function(cmp) {
  			// verify
+ 			var me = this;
  			var carousel = cmp.find("carousel1");
  			var pages = this.getPagesOnCarousel(carousel);
  			
- 			this.verifyPageSelected(pages, 1);
+ 			$A.test.addWaitForWithFailureMessage(true, function(){
+	    		var page = me.getSelectedPage.apply(me, [carousel]);	
+	    		return (page === pages[0]);
+ 			}, "Page 1 is not selected");
+ 			
  			this.verifyMdmPage(this.getSelectedPage(carousel), 1, "New Post 1");
  			this.assertNavigationIndicatorSelected(carousel, 1);
  		}, function(cmp) {
@@ -49,10 +54,15 @@
     		this.goToPageOnCarousel(cmp, "carousel1", 2, "c1-p2");
  		}, function(cmp) {
  			// verify
+ 			var me = this;
  			var carousel = cmp.find("carousel1");
- 			var pages = this.getPagesOnCarousel(carousel);
+ 			var pages = me.getPagesOnCarousel(carousel);
  			
-    		this.verifyPageSelected(pages, 2);
+ 			$A.test.addWaitForWithFailureMessage(true, function(){
+	    		var page = me.getSelectedPage.apply(me, [carousel]);	
+	    		return (page === pages[1]);
+ 			}, "Page 2 is not selected");
+
     		this.verifyMdmPage(this.getSelectedPage(carousel), 1, "New Post 2");
     		this.assertNavigationIndicatorSelected(carousel, 2);
  		}, function(cmp) {
@@ -60,10 +70,15 @@
  			this.goToPageOnCarousel(cmp, "carousel1", 7, "c1-updateOutput");
  		}, function(cmp) {
  			// verify
+ 			var me = this;
  			var carousel = cmp.find("carousel1");
- 			var pages = this.getPagesOnCarousel(carousel);
+ 			var pages = me.getPagesOnCarousel(carousel); 			
  			
-    		this.verifyPageSelected(pages, 7);
+ 			$A.test.addWaitForWithFailureMessage(true, function(){
+	    		var page = me.getSelectedPage.apply(me, [carousel]);	
+	    		return (page === pages[6]);
+ 			}, "Page 7 is not selected");
+
  			// are we on the right page?
  			var outputCmp = pages[6].get("v.body");
  			$A.test.assertFalse($A.util.isUndefinedOrNull(outputCmp), "Could not find output component");
@@ -146,7 +161,7 @@
     		var expectedDefaultPage=2;
     		var carousel = cmp.find("carousel1");
     		var pages = this.getPagesOnCarousel(carousel);
-    		
+			
     		// go through all pages and verify only one is set to selected
     		this.verifyPageSelected(pages, expectedDefaultPage);
     		
@@ -180,11 +195,11 @@
     		var expectedDefaultPage=3;
     		var carousel = cmp.find("carouselDefaultOverride");
     		var selectedPage = this.getPageOnCarousel(carousel, expectedDefaultPage);
-    		
-			$A.test.assertTrue($A.util.hasClass(selectedPage.getElement(), "carousel-page-selected"), 
- 				"Selected page should have 'selected' css");
- 			$A.test.assertFalse($A.util.hasClass(selectedPage.getElement(), "hidden"),
- 				"Selected page should NOT have 'hidden' css");
+    	 
+			$A.test.assertTrue(selectedPage.getValue('v.isSelected').getBooleanValue(),
+ 				"Selected page should be selected");
+			
+			this.assertPageVisibility(selectedPage, true);
  			
  			var outputCmp = selectedPage.get("v.body");
  			$A.test.assertFalse($A.util.isUndefinedOrNull(outputCmp), "Could not find output component");
@@ -194,11 +209,10 @@
     		this.assertNavigationIndicatorSelected(carousel, expectedDefaultPage);
     			
     		// page #2 that was supposed to be default should not have selected css
-    		var pageElem = this.getPageOnCarousel(carousel, 2).getElement();
-    		$A.test.assertFalse($A.util.hasClass(pageElem, "carousel-page-selected"), 
- 				"Selected page should NOT have 'selected' css");
- 			$A.test.assertTrue($A.util.hasClass(pageElem, "hidden"),
- 				"Selected page should have 'hidden' css");
+    		var pageCmp = this.getPageOnCarousel(carousel, 2);
+    		$A.test.assertFalse(pageCmp.getValue('v.isSelected').getBooleanValue(), 
+ 				"Selected page should NOT be selected");
+    		this.assertPageVisibility(pageCmp, false);    		 
     	}
     },
     
@@ -403,6 +417,7 @@
     		"Carousel not given. Is the name of the carousel correct?");
  		var helper = carousel.getDef().getHelper();
  		var indicatorCmp = helper.getPageIndicatorsComponent(carousel);
+ 		
     	return indicatorCmp.find("indicatorItems");
  	},
  	
@@ -421,19 +436,16 @@
  	},
  	
  	assertPageSelected : function(page, isSelected, pageNum) {
- 		page = page.getElement();
  		if (isSelected) {
- 			$A.test.assertTrue($A.util.hasClass(page, "carousel-page-selected"), 
+ 			$A.test.assertTrue(page.getValue('v.isSelected').getBooleanValue(), 
  				"Selected page at " + pageNum + " should have 'selected' css");
- 			$A.test.assertFalse($A.util.hasClass(page, "hidden"),
- 				"Selected page at " + pageNum + " should NOT have 'hidden' css");
- 			this.assertAriaExpanded(page, true);
+ 			this.assertPageVisibility(page, true);
+ 			this.assertAriaExpanded(page.getElement(), true);
  		} else {
- 			$A.test.assertFalse($A.util.hasClass(page, "carousel-page-selected"),
+ 			$A.test.assertFalse(page.getValue('v.isSelected').getBooleanValue(),
  				"UnSelected page at " + pageNum + " should NOT have 'selected' css");
- 			$A.test.assertTrue($A.util.hasClass(page, "hidden"),
- 				"UnSelected page at " + pageNum + " should have 'hidden' css");
- 			this.assertAriaExpanded(page, false);
+ 			this.assertPageVisibility(page, false);
+ 			this.assertAriaExpanded(page.getElement(), false);
  		}
  	},
  	
@@ -465,7 +477,7 @@
  		}
  			
  		for (var i=0; i<indicators.length; i++) { 
- 			var indicatorElem = indicators[i].getElement();
+ 			var indicatorElem = indicators[i].getElement().childNodes[0];
  			
  			if ((selectedIndicator-1) === i) {
  				$A.test.assertTrue($A.util.hasClass(indicatorElem, "carousel-nav-item-selected"), 
@@ -483,6 +495,12 @@
  					errorMsg(selectedIndicator, (i+1), "Checking aria-selected"))
  			}
  		}
+ 	},
+ 	
+ 	assertPageVisibility : function(pageCmp, isVisible) {
+ 		$A.test.addWaitForWithFailureMessage(isVisible, function(){
+			return pageCmp.getValue('v.priv_visible').getBooleanValue();
+		}, "Selected page should be visible");		
  	},
  	
  	/**

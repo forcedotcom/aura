@@ -54,12 +54,13 @@
     		cmp.getValue("v.priv_ariaControlId").setValue(pageId);
     		cmp.getValue("v.priv_ariaSelected").setValue(true);
     		cmp.getValue("v.priv_tabIndex").setValue(0);
-    		$A.util.addClass(cmp.getElement(), selectedItemCss);
+    		$A.util.addClass(cmp.find('pageItem').getElement(), selectedItemCss);
+    		cmp.find('pageItem').getElement().focus();
     	} else {
     		cmp.getValue("v.priv_ariaControlId").setValue('');
     		cmp.getValue("v.priv_ariaSelected").setValue(false);
     		cmp.getValue("v.priv_tabIndex").setValue(-1);
-    		$A.util.removeClass(cmp.getElement(), selectedItemCss);
+    		$A.util.removeClass(cmp.find('pageItem').getElement(), selectedItemCss);
     	}
     }
 }

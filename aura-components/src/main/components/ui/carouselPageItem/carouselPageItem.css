@@ -25,7 +25,7 @@
 	text-align: center;
 }
 
-.THIS a:hover {
+.THIS a:focus {
 	background: #3d576f;
 	outline: none;
 }

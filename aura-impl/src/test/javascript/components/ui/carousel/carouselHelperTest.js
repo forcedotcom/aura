@@ -172,7 +172,17 @@ Test.Components.Ui.Carousel.CarouselHelperTest=function(){
 			};
 			
 			var mockHelperMethods = Mocks.GetMocks(targetHelper, {
-				getPageComponents : function(value){return ["page1", "page2", "page3"];},
+				getPageComponents : function(value){
+					var pageCmp = function(pageName) {
+						this.get = function(exp){							
+							return {
+								setParams: function(){},
+								fire : function(){}
+							}
+						};						
+					}
+					return [new pageCmp("page1"), new pageCmp("page2"), new pageCmp("page3")];
+				},
 				getScroller : function(value){
 					return {
 						scrollToPage : function(pageX, pageY, time){
@@ -187,11 +197,19 @@ Test.Components.Ui.Carousel.CarouselHelperTest=function(){
 			
 			actual = false;
 			
+			var mockAura = Mocks.GetMock(Object.Global(), "$A", Stubs.GetObject({}, {
+				util : {
+					isNumber : function(n) {return true;}
+				}
+			}));
+						
 			// Act
-			mockHelperMethods(function(){
-				targetHelper.selectPage(targetComponent, 1, 0);
+			mockAura(function(){
+				mockHelperMethods(function(){
+					targetHelper.selectPage(targetComponent, 1, 0);
+				})
 			});
-			
+			 			
 			// Assert
 			Assert.True(actual);
 		}
@@ -235,6 +253,7 @@ Test.Components.Ui.Carousel.CarouselHelperTest=function(){
 		function DefaultPageOnCarouselWillOverrideIsDefaultOnPage(){
 			// Arrange
 			var expected = 1;
+			var defaultPage = 1;
 			
 			var targetComponent = {
 				get : function(expression) {
@@ -244,6 +263,9 @@ Test.Components.Ui.Carousel.CarouselHelperTest=function(){
 					} else {
 						return expected;
 					}
+				},
+				getConcreteComponent : function() {
+					return {getDef: function(){return {getHelper: function(){return targetHelper}}}};
 				}
 			};
 			
@@ -277,7 +299,12 @@ Test.Components.Ui.Carousel.CarouselHelperTest=function(){
 		function CorrectDefaultPageIsSelected(){
 			// Arrange
 			var expected = 2;
-			var targetComponent = {get : function(expression) {}};
+			var targetComponent = {
+					get : function(expression) {},
+					getConcreteComponent : function() {
+						return {getDef: function(){return {getHelper: function(){return targetHelper}}}};
+					}
+				};
 			
 			var mockHelperMethods = Mocks.GetMocks(targetHelper, {
 				getPageComponents : function(value){
@@ -309,7 +336,12 @@ Test.Components.Ui.Carousel.CarouselHelperTest=function(){
 		function MultiplePagesMarkedAsDefaultChooseLast(){
 			// Arrange
 			var expected = 3;
-			var targetComponent = {get : function(expression) {}};
+			var targetComponent = {
+					get : function(expression) {},
+					getConcreteComponent : function() {
+						return {getDef: function(){return {getHelper: function(){return targetHelper}}}};
+					}					
+			};
 			
 			var mockHelperMethods = Mocks.GetMocks(targetHelper, {
 				getPageComponents : function(value){
@@ -341,7 +373,12 @@ Test.Components.Ui.Carousel.CarouselHelperTest=function(){
 		function NoDefaultPageIsSet(){
 			// Arrange
 			var expected = 1;
-			var targetComponent = {get : function(expression) {}};
+			var targetComponent = {
+					get : function(expression) {},
+					getConcreteComponent : function() {
+						return {getDef: function(){return {getHelper: function(){return targetHelper}}}};
+					}
+			};
 			
 			var mockHelperMethods = Mocks.GetMocks(targetHelper, {
 				getPageComponents : function(value){

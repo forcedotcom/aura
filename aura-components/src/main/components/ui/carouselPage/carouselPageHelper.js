@@ -47,7 +47,7 @@
 			cmp.getValue('v.isSelected').setValue(true);
 			cmp.getValue("v.priv_ariaExpanded").setValue(true);
 			$A.util.addClass(cmp.getElement(), selectedItemCss);
-			$A.util.removeClass(cmp.getElement(), hiddenCssClass);
+			this.showPage(cmp, selectedPage);
 		} else {
 			cmp.getValue('v.isSelected').setValue(false);
 			cmp.getValue("v.priv_ariaExpanded").setValue(false);
@@ -58,14 +58,15 @@
 	/**
 	 * Update page content
 	 */
-	updatePage: function(cmp, evt) {
-		var pageCmp = evt.getParam("pageComponent");
-		if (pageCmp) {
-			var pageContainer = cmp.find('pageContainer').getValue('v.body');
-			if (!pageContainer.isEmpty()) {
-				pageContainer.destroy();
-	        }
-			pageContainer.setValue(pageCmp);
+	updatePage: function(cmp, pageBody) {
+		var pageContainer = cmp.find('pageContainer').getValue('v.body');
+		
+		if (!pageContainer.isEmpty()) {
+			pageContainer.destroy();
+        }
+		
+		if (pageBody) {
+			pageContainer.setValue(pageBody);
 		}
 	},
 	
@@ -91,21 +92,25 @@
 	},
 	
 	showPage: function(cmp, pageIndex) {
-		var curPage = cmp.get('v.pageIndex'),			
+		var curPage = cmp.get('v.pageIndex'),
+			isVisible = cmp.getValue('v.priv_visible').getBooleanValue(),
 			hiddenClass = 'hidden';
 			
-		if (pageIndex == curPage) {
-			$A.util.removeClass(cmp.getElement(), hiddenClass);			
+		if (pageIndex == curPage && !isVisible) {
+			$A.util.removeClass(cmp.getElement(), hiddenClass);
+			cmp.getValue('v.priv_visible').setValue(true);
 		}		
 	},
 	
 	hidePage: function(cmp, pageIndex) {
 		
-		var curPage = cmp.get('v.pageIndex'),			
+		var curPage = cmp.get('v.pageIndex'),
+			isVisible = cmp.getValue('v.priv_visible').getBooleanValue(),
 			hiddenClass = 'hidden';
 		
-		if (pageIndex == curPage) {			
+		if (pageIndex == curPage && isVisible) {			
 			$A.util.addClass(cmp.getElement(), hiddenClass);
+			cmp.getValue('v.priv_visible').setValue(false);
 		}
 	}
 }

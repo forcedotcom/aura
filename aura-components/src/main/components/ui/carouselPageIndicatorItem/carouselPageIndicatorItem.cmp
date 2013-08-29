@@ -33,10 +33,12 @@
    <aura:handler name="init" value="{!this}" action="{!c.onInit}" />
    <aura:handler name="pageSelected"  action="{!c.onPageSelected}" />    
    <aura:handler name="click" action="{!c.clickHandler}" />
-    <!-- aria-controls attribute is linked to the section id attribute in the page -->  
-    <a aura:id="pageItem" class="{!v.class + ' carousel-nav-item'}" tabindex="{!v.priv_tabIndex}" role="tab" 
-    	aria-controls="{!v.priv_ariaControlId}" aria-selected="{!v.priv_ariaSelected}"
-    	onkeydown="{!c.keyHandler}" >
-		<span class="visually-hidden">{!v.title}</span>
-  	</a>
+    <!-- aria-controls attribute is linked to the section id attribute in the page -->
+    <li role="presentation" class="{!v.class}">  
+	    <a aura:id="pageItem" class="carousel-nav-item" tabindex="{!v.priv_tabIndex}" role="tab" 
+	    	aria-controls="{!v.priv_ariaControlId}" aria-selected="{!v.priv_ariaSelected}"
+	    	onkeydown="{!c.keyHandler}" >
+			<span class="assistiveText">{!v.title}</span>
+	  	</a>
+  	</li>
 </aura:component>    

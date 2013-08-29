@@ -16,6 +16,7 @@
 package org.auraframework.impl.adapter;
 
 import java.text.*;
+import java.util.Currency;
 import java.util.Locale;
 import java.util.Map;
 
@@ -132,7 +133,8 @@ public class LocaleValueProvider implements GlobalValueProvider {
             DecimalFormat cf = (DecimalFormat) nf;
             builder.put(CURRENCY_FORMAT, cf.toPattern());
             DecimalFormatSymbols cdfs = cf.getDecimalFormatSymbols();
-            builder.put(CURRENCY_CODE, cdfs.getCurrency().getCurrencyCode());
+            Currency cur = cdfs.getCurrency();
+            builder.put(CURRENCY_CODE, cur != null ? cur.getCurrencyCode() : "");
             builder.put(CURRENCY, cdfs.getCurrencySymbol());
         }
 

@@ -206,6 +206,7 @@
                 var realbody = cmp.getValue("v.realbody");
                 realbody.destroy();
                 realbody.setValue(newBody);
+            	cmp.getEvent("rerenderComplete").fire();
             }
         });
     },

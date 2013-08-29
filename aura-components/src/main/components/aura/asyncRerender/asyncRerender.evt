@@ -15,14 +15,4 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:abstractList" implements="ui:scrollerEmbeddable" support="proto"
-    provider="java://org.auraframework.component.ui.ListProvider, js://ui.list" description="A list component that iterates over and displays the items in the ui:dataProvider component.">
-    
-    <aura:handler name="showMore" action="{!c.showMore}"/>
-
-	<ul class="{!v.class}">
-	<aura:iterationCscc items="{!v.items}" var="{!v.itemVar}" body="{!v.itemTemplate}" rerenderComplete="{!c.rerenderComplete}">
-		
-	</aura:iterationCscc>
-	</ul>
-</aura:component>
+<aura:event type="COMPONENT" support="GA" description="The event fired when iterationCscc completes its asynchronous rerender."/>

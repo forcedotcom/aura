@@ -32,6 +32,8 @@
 <aura:handler name="change" value="{!v.start}" action="{!c.rangeChange}"/>
 <aura:handler name="change" value="{!v.end}" action="{!c.rangeChange}"/>
 
+<aura:registerEvent name="rerenderComplete" type="aura:asyncRerender" description="The event fired when this component completes its asynchronous rerender."/>
+
 
 <!--
 <aura:attribute name="page" type="Integer"/>

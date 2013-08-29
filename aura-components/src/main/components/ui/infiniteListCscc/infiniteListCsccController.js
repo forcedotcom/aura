@@ -23,5 +23,9 @@
         component.getValue("v.currentPage").setValue(targetPage, true);
         
         helper.triggerDataProvider(component.getSuper());
+	},
+	
+	rerenderComplete: function(component, event, helper) {
+        helper.showLoading(component, false);
 	}
 })

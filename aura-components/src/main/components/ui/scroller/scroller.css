@@ -20,6 +20,8 @@
 
 /* Pull down styles */
 .uiScroller .pullToRefresh {
+	position: relative;
+	z-index: 2;
     display: block;
     height: 40px;
     padding: 10px;

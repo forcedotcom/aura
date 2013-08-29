@@ -458,7 +458,14 @@
             </activation>
             <properties>
                 <platform.chromedriver>linux${sun.arch.data.model}</platform.chromedriver>
+                <chromedriver.version>26.0.1383.0</chromedriver.version>
             </properties>
+        </profile>
+        <profile>
+            <id>ubuntu12</id>
+            <properties>
+                <chromedriver.version>2.2</chromedriver.version>
+           </properties>
         </profile>
         <profile>
             <id>platform.mac</id>
@@ -468,7 +475,8 @@
                 </os>
             </activation>
             <properties>
-                <platform.chromedriver>mac</platform.chromedriver>
+                <platform.chromedriver>mac32</platform.chromedriver>
+                <chromedriver.version>2.2</chromedriver.version>
             </properties>
         </profile>
         <profile>
@@ -479,7 +487,8 @@
                 </os>
             </activation>
             <properties>
-                <platform.chromedriver>win</platform.chromedriver>
+                <platform.chromedriver>win32</platform.chromedriver>
+                <chromedriver.version>2.2</chromedriver.version>
                 <webdriver.chrome.driver>${basedir}/target/bin/chromedriver.exe</webdriver.chrome.driver>
             </properties>
         </profile>

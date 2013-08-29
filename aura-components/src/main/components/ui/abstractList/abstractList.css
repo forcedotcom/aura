@@ -19,6 +19,13 @@
     position:relative;
 }
 
+.THIS .emptyListContent {
+    display: none;
+}
+.THIS.showEmptyContent .emptyListContent {
+    display: block;
+}
+
 .THIS .loadingIndicator{
     display: none;
     height:100%;

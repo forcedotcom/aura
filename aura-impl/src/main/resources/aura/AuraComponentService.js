@@ -424,8 +424,8 @@ var AuraComponentService = function(){
          * Removes the index of the component.
          * @private
          */
-        deIndex: function(component){
-            delete priv.indexes.globalId[component.getGlobalId()];
+        deIndex: function(globalId){ 
+            delete priv.indexes.globalId[globalId];
         },
 
         /**

@@ -539,11 +539,9 @@ ArrayValue.prototype.render = function(parent, insertElements){
         var els = $A.render(item);
 
         var elLen = els.length;
-        for (var j = 0; j < elLen; j++) {
-            ret.push(els[j]);
-        }
-
         if (elLen > 0) {
+            ret = ret.concat(els);
+
             // Just use the last element as the reference node
             referenceNode = els[elLen - 1];
         } else {
@@ -564,7 +562,9 @@ ArrayValue.prototype.render = function(parent, insertElements){
 
     this.setReferenceNode(referenceNode);
 
-    insertElements(ret, parent);
+    if (parent) {
+    	insertElements(ret, parent);
+    }
 
     this.hasBeenRendered = true;
 

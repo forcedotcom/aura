@@ -18,6 +18,8 @@
  * @constructor
  */
 var AuraExpressionService = function AuraExpressionService(){
+	var propertyRefCache = {};
+	
     var expressionService = {
         setValue : function(valueProvider, expression, value){
             if (expression.getValue) {
@@ -43,28 +45,37 @@ var AuraExpressionService = function AuraExpressionService(){
          */
         getValue: function(valueProvider, expression){
             if (aura.util.isString(expression)) {
-                expression = valueFactory.parsePropertyReference(expression);
-            }
-            if (expression.toString() === "FunctionCallValue") {
-                // TODO: bleh need better test here
+            	var cached = propertyRefCache[expression];
+            	if (!cached) {
+	                cached = valueFactory.parsePropertyReference(expression);
+	                propertyRefCache[expression] = cached;
+
+	            	//console.debug("ExpressionService.getValue() cache property ref", [expression, propertyRefCache]);
+            	}
+            	
+                expression = cached;
+            } else if ($A.util.instanceOf(expression, FunctionCallValue)) {
                 return expression.getValue(valueProvider);
             }
 
-            var gvp = $A.getContext().getGlobalValueProviders();
             // use gvp; supports existing usage of $A.get and $A.expressionService.get
-            if( gvp.isGlobalValueExp(expression) ){
+            if (expression.getRoot().charAt(0) === '$'){
+                var gvp = $A.getContext().getGlobalValueProviders();
                 return gvp.getValue(expression, valueProvider);
             }
 
             var propRef = expression;
             var value = valueProvider;
-            while (!aura.util.isUndefinedOrNull(propRef)) {
+            while (propRef) {
                 var root = propRef.getRoot();
+                
                 value = value.getValue(root);
+                
                 if (!value) {
                     // still nothing, time to die
                     break;
                 }
+                
                 propRef = propRef.getStem();
             }
 

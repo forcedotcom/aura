@@ -95,10 +95,12 @@ var AuraRenderingService = function AuraRenderingService(){
                     array[x] = cmp;
                 }
 
-                var renderer = cmp.getRenderer();
-                var elements = renderer.def.render(renderer.renderable) || [];
-
-                priv.finishRender(cmp, elements, ret, parent);
+                if (cmp.isValid()) {
+	                var renderer = cmp.getRenderer();
+	                var elements = renderer.def.render(renderer.renderable) || [];
+	
+	                priv.finishRender(cmp, elements, ret, parent);
+                }
             }
 
             priv.insertElements(ret, parent);
@@ -150,9 +152,11 @@ var AuraRenderingService = function AuraRenderingService(){
             var array = priv.getArray(component);
             for (var i = 0; i < array.length; i++){
                 var cmp = array[i];
-                var renderer = cmp.getRenderer();
-                renderer.def.rerender(renderer.renderable);
-                priv.cleanComponent(cmp.getGlobalId());
+                if (cmp.isValid()) {
+	                var renderer = cmp.getRenderer();
+	                renderer.def.rerender(renderer.renderable);
+	                priv.cleanComponent(cmp.getGlobalId());
+                }
             }
         },
 
@@ -212,7 +216,7 @@ var AuraRenderingService = function AuraRenderingService(){
          */
         removeDirtyValue: function(value) {
             var cmp = value.owner;
-            if(cmp){
+            if(cmp && cmp.isValid()){
                 var id = cmp.getConcreteComponent().getGlobalId();
                 var a = priv.dirtyComponents[id];
                 if (a) {
@@ -222,6 +226,7 @@ var AuraRenderingService = function AuraRenderingService(){
                             break;
                         }
                     }
+                    
                     if (a.length === 0) {
                         delete priv.dirtyComponents[id];
                     }

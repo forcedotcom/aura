@@ -46,9 +46,6 @@ Component.prototype.auraType = "Component";
  * @public
  */
 Component.prototype.getDef = function() {
-    if (!this.assertValid()) {
-        return null;
-    }
     return this.priv.componentDef;
 };
 
@@ -60,10 +57,6 @@ Component.prototype.getDef = function() {
  * @protected
  */
 Component.prototype.index = function(localId, globalId){
-    if (!this.assertValid()) {
-        return null;
-    }
-
     var priv = this.priv;
     if (priv.delegateValueProvider){
         return priv.delegateValueProvider.index(localId, globalId);
@@ -149,9 +142,6 @@ Component.prototype.deIndex = function(localId, globalId){
  * @public
  */
 Component.prototype.find = function(name){
-    if (!this.assertValid()) {
-        return null;
-    }
     if($A.util.isObject(name)){
         var type = name["instancesOf"];
         var instances = [];
@@ -277,9 +267,6 @@ Component.prototype.findInstanceOf = function(type){
  * @returns {Boolean} true if the component is an instance, or false otherwise.
  */
 Component.prototype.isInstanceOf = function(name){
-    if (!this.assertValid()) {
-        return false;
-    }
     return this.getDef().isInstanceOf(name);
 };
 
@@ -288,9 +275,6 @@ Component.prototype.isInstanceOf = function(name){
  * @param {Object} type Applies the type to its definition.
  */
 Component.prototype.implementsDirectly = function(type){
-    if (!this.assertValid()) {
-        return false;
-    }
     return this.getDef().implementsDirectly(type);
 };
 
@@ -304,9 +288,6 @@ Component.prototype.implementsDirectly = function(type){
  * @public
  */
 Component.prototype.addHandler = function(eventName, valueProvider, actionExpression, insert){
-    if (!this.assertValid()) {
-        return;
-    }
     var dispatcher = this.priv.getEventDispatcher(this);
 
     var handlers = dispatcher[eventName];
@@ -328,10 +309,6 @@ Component.prototype.addHandler = function(eventName, valueProvider, actionExpres
  * @public
  */
 Component.prototype.addValueHandler = function(config){
-    if (!this.assertValid()) {
-        return;
-    }
-
     var value = config["value"];
     if($A.util.isString(value) || value.toString() === "PropertyReferenceValue"){
         value = this.getValue(value);
@@ -395,21 +372,38 @@ Component.prototype.destroy = function(async){
                     element.style.display = "none";
                 }
             }
+            
             $A.util.destroyAsync(this);
 
             return null;
         }
+        
+        
         var priv = this.priv;
 
         this._destroying = true;
         
+        var componentDef = this.getDef();
+        var zuper = this.getSuper();
+        
         var globalId = priv.globalId;
         
-        renderingService.unrender(this);
+        $A.renderingService.unrender(this);
 
+        // Track some useful debugging information for InvalidComponent's use
+        //#if {"excludeModes" : ["PRODUCTION"]}
+        this._globalId = globalId;
+        this._componentDef = componentDef;
+        //#end
+                
+        // Swap in InvalidComponent prototype to keep us from having to add validity checks all over the place
+        $A.util.apply(this, InvalidComponent.prototype, true);
+        
         priv.elements = undefined;
-
+        
         priv.deIndex();
+        $A.componentService.deIndex(globalId);
+                
         var vp = priv.valueProviders;
         if (vp) {
             for (var k in vp) {
@@ -439,22 +433,20 @@ Component.prototype.destroy = function(async){
             }
         }
 
-        var componentDef = this.getDef();
-        var handlerDefs = componentDef.getAppHandlerDefs();
-        if (handlerDefs){
-            for (var i = 0; i < handlerDefs.length; i++) {
-                var handlerDef = handlerDefs[i];
-                var handlerConfig = {};
-                handlerConfig["globalId"] = globalId;
-                handlerConfig["event"] = handlerDef["eventDef"].getDescriptor().getQualifiedName();
-                eventService.removeHandler(handlerConfig);
-            }
+        if (componentDef) {
+	        var handlerDefs = componentDef.getAppHandlerDefs();
+	        if (handlerDefs){
+	            for (var i = 0; i < handlerDefs.length; i++) {
+	                var handlerDef = handlerDefs[i];
+	                var handlerConfig = {};
+	                handlerConfig["globalId"] = globalId;
+	                handlerConfig["event"] = handlerDef["eventDef"].getDescriptor().getQualifiedName();
+	                $A.eventService.removeHandler(handlerConfig);
+	            }
+	        }
         }
 
-        componentService.deIndex(this);
-
-        var zuper = this.getSuper();
-        if(zuper){
+        if (zuper){
             zuper.destroy(async);
             priv.superComponent = undefined;
         }
@@ -474,6 +466,7 @@ Component.prototype.destroy = function(async){
                     for(var j=0;j<vals.length;j++){
                         delete vals[j];
                     }
+                    
                     delete eventDispatcher[key];
                 }
             }
@@ -503,9 +496,6 @@ Component.prototype.destroy = function(async){
  * @protected
  */
 Component.prototype.isRendered = function() {
-    if (!this.assertValid()) {
-        return false;
-    }
     return this.priv.rendered;
 };
 
@@ -515,9 +505,6 @@ Component.prototype.isRendered = function() {
  * @private
  */
 Component.prototype.setUnrendering = function(unrendering) {
-    if (!this.assertValid()) {
-        return;
-    }
     this.priv.inUnrender = unrendering;
 };
 
@@ -528,9 +515,6 @@ Component.prototype.setUnrendering = function(unrendering) {
  * @private
  */
 Component.prototype.isUnrendering = function() {
-    if (!this.assertValid()) {
-        return false;
-    }
     return this.priv.inUnrender;
 };
 
@@ -557,9 +541,6 @@ Component.prototype.getRenderer = function() {
  * @public
  */
 Component.prototype.getGlobalId = function() {
-    if (!this.assertValid()) {
-        return null;
-    }
     return this.priv.globalId;
 };
 
@@ -569,9 +550,6 @@ Component.prototype.getGlobalId = function() {
  * @public
  */
 Component.prototype.getLocalId = function() {
-    if (!this.assertValid()) {
-        return null;
-    }
     return this.priv.localId;
 };
 
@@ -580,9 +558,6 @@ Component.prototype.getLocalId = function() {
  * @public
  */
 Component.prototype.getRendering = function(){
-    if (!this.assertValid()) {
-        return false;
-    }
     var concrete = this.getConcreteComponent();
 
     if(this !== concrete){
@@ -597,9 +572,6 @@ Component.prototype.getRendering = function(){
  * @protected
  */
 Component.prototype.getSuper = function(){
-    if (!this.assertValid()) {
-        return null;
-    }
     return this.priv.superComponent;
 };
 
@@ -612,9 +584,6 @@ Component.prototype.getSuper = function(){
  * @protected
  */
 Component.prototype.associateElement = function(config){
-    if (!this.assertValid()) {
-        return;
-    }
     if (!this.isConcrete()){
         var concrete = this.getConcreteComponent();
         concrete.associateElement(config);
@@ -635,9 +604,6 @@ Component.prototype.associateElement = function(config){
  * @public
  */
 Component.prototype.getElements = function(){
-    if (!this.assertValid()) {
-        return [];
-    }
     if (!this.isConcrete()){
         var concrete = this.getConcreteComponent();
         return concrete.getElements();
@@ -652,9 +618,6 @@ Component.prototype.getElements = function(){
  * @public
  */
 Component.prototype.getElement = function(){
-    if (!this.assertValid()) {
-        return null;
-    }
     var elements = this.getElements();
     if (elements) {
         var ret = elements["element"];
@@ -686,9 +649,6 @@ Component.prototype.getElement = function(){
  * Shorthand : <code>get("v")</code>
  */
 Component.prototype.getAttributes = function() {
-    if (!this.assertValid()) {
-        return null;
-    }
     return this.priv.attributes;
 };
 
@@ -733,9 +693,6 @@ Component.prototype.getValue = function(key){
  * @public
  */
 Component.prototype.setValue = function(key, value){
-    if (!this.assertValid()) {
-        return;
-    }
     var v = this.getValue(key);
     if ($A.util.isUndefinedOrNull(v)) {
         $A.error("Invalid key "+key);
@@ -755,9 +712,6 @@ Component.prototype.setValue = function(key, value){
  * @public
  */
 Component.prototype.get = function(key){
-    if (!this.assertValid()) {
-        return;
-    }
     return $A.expressionService.get(this, key);
 };
 
@@ -776,9 +730,6 @@ Component.prototype.getConcreteComponent = function(){
  * @public
  */
 Component.prototype.isConcrete = function() {
-    if (!this.assertValid()) {
-        return false;
-    }
     return !this.priv.concreteComponentId;
 };
 
@@ -796,9 +747,6 @@ Component.prototype.getEventDispatcher = function(){
  * @public
  */
 Component.prototype.getModel = function(){
-    if (!this.assertValid()) {
-        return null;
-    }
     return this.priv.model;
 };
 
@@ -809,12 +757,6 @@ Component.prototype.getModel = function(){
  * @public
  */
 Component.prototype.getEvent = function(name) {
-    if (!this.assertValid()) {
-        return null;
-    }
-    /*if (!this.isConcrete()) {
-        return this.getConcreteComponent().getEvent(name);
-    }*/
     var eventDef = this.getDef().getEventDef(name);
     if (!eventDef) {
 
@@ -853,22 +795,7 @@ Component.prototype.getEventByDescriptor = function(descriptor) {
  * @private
  */
 Component.prototype.fire = function(name) {
-    if (!this.assertValid()) {
-        return;
-    }
     BaseValue.fire(name, this, this.getEventDispatcher());
-};
-
-/**
- * Returns true if the component has not been destroyed.
- * @private
- */
-Component.prototype.assertValid = function(){
-    var valid = !$A.util.isUndefined(this.priv);
-    if (!valid) {
-        $A.error("Invalid component");
-    }
-    return valid;
 };
 
 /**
@@ -988,9 +915,6 @@ Component.prototype.hasEventHandler = function(eventName) {
  * Returns an array of this component's facets, i.e., attributes of type <code>aura://Aura.Component[]</code>
  */
 Component.prototype.getFacets = function() {
-    if (!this.assertValid()) {
-        return [];
-    }
     if (!this.getFacets.cachedFacetNames) {
         // grab the names of each of the facets from the ComponentDef
         var facetNames = [];

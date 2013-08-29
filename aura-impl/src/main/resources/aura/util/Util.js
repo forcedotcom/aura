@@ -60,7 +60,7 @@ $A.ns.Util.prototype.globalEval = $A.ns.Util.prototype.isIE ? function(src) {
  * @returns {Boolean} True if the object is an array, or false otherwise.
  */
 $A.ns.Util.prototype.isArray = typeof Array.isArray === "function" ? Array.isArray : function(obj) {
-    return !!obj && this.objToString.apply(obj) === '[object Array]';
+    return obj instanceof Array;
 };
 
 /**

@@ -192,6 +192,7 @@ var AuraClientService = function() {
 
                     action.setCallback(that, function(a) {
                         var state = a.getState();
+                    	
                         if (state === "SUCCESS") {
                             callback(a.getReturnValue());
                         } else if (state === "INCOMPLETE"){
@@ -275,6 +276,9 @@ var AuraClientService = function() {
          *
          * @param name the name of the last item pushed.
          */
+        
+        startTime: (new Date()).getTime(),
+        
         popStack : function(name) {
             var count = 0;
             var lastName;
@@ -288,6 +292,7 @@ var AuraClientService = function() {
             } else {
                 $A.warning("Pop from empty stack");
             }
+            
             if (priv.auraStack.length === 0) {
                 var tmppush = "$A.clientServices.popStack";
                 priv.auraStack.push(tmppush);
@@ -297,21 +302,27 @@ var AuraClientService = function() {
                     priv.requestCounts[priv.actionQueue.getTransactionId()] = 0;
                 }
                 // #end
+                
                 clientService.processActions();
+                
                 done = !$A["finishedInit"];
                 while (!done && count <= 15) {
                     $A.renderingService.rerenderDirty();
+                    
                     done = !clientService.processActions();
+                    
                     count += 1;
                     if (count > 14) {
                         $A.error("finishFiring has not completed after 15 loops");
                     }
                 }
+                
                 // Force our stack to nothing.
                 lastName = priv.auraStack.pop();
                 if (lastName !== tmppush) {
                     $A.error("Broken stack: popped "+tmppush+" expected "+lastName+", stack = "+priv.auraStack);
                 }
+                
                 // #if {"modes" : ["PTEST"]}
                 if (!priv.existingTransactionId && (priv.requestCounts[priv.actionQueue.getTransactionId()] === 0)) {
                     //no server side actions to wait for.

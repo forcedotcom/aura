@@ -90,6 +90,7 @@ SimpleValue.prototype.merge = function(sv, overwrite) {
     if (!$A.util.instanceOf(sv, SimpleValue)) {
         throw new Error("Cannot merge a " + (typeof sv) + " into a SimpleValue");
     }
+    
     if (overwrite) {
         this.setValue(sv.getValue());
         this.commit();

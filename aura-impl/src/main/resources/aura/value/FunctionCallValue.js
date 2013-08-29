@@ -60,19 +60,23 @@ FunctionCallValue.prototype.getValue = function(vp){
         if (a.isExpression()) {
             a = expressionService.getValue(vp, a);
         }
+        
         var value = null;
         if (a) {
             dirty = dirty || a.isDirty();
             value = a;
         }
+        
         resolvedArgs.push(value);
     }
+    
     var result = this.func.call(null, resolvedArgs);
+    
     var ret;
-    if(result && result.auraType === "Value"){
+    if (result && result.auraType === "Value"){
         ret = result;
         result = ret.unwrap();
-    }else{
+    } else{
         ret = valueFactory.create(result, this.def, this.cmp);
     }
 

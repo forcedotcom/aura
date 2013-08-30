@@ -69,9 +69,9 @@
     testRemoveDataAttribute: {
         test : function(cmp){
             var div = cmp.find("aDiv").getElement();
-            $A.test.assertTrue(div.hasAttribute("data-test-data"), "Data attribute not present on div");
+            $A.test.assertFalse($A.util.isUndefinedOrNull(div.getAttribute("data-test-data")), "Data attribute not present on div");
             $A.util.setDataAttribute(div, "testData", undefined);
-            $A.test.assertFalse(div.hasAttribute("data-test-data"), "Setting data attribute with undefined value " +
+            $A.test.assertTrue($A.util.isUndefinedOrNull(div.getAttribute("data-test-data")), "Setting data attribute with undefined value " +
                 "should remove the attribute");
         }
     },

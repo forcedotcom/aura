@@ -30,6 +30,7 @@
     getValueFromOptionCmps : function(cmp) {
         var opts = this.getOptionCmps(cmp);
         var selectedOptions = [];
+        var optFound = false;
         for (var i = 0, len = opts.length; i < len; i++) {
             var descriptor = opts[i].getDef().getDescriptor();
             if((descriptor.getNamespace() + ":" + descriptor.getName()) === "ui:inputSelectOptionGroup") {
@@ -42,6 +43,7 @@
                                 var txt = body.getValue(j).get("v.text");
                                 if(txt !== undefined){
                                     selectedOptions.push(txt);
+                                    optFound = true;
                                 }
                             }
                         }
@@ -52,11 +54,12 @@
                     var text = opts[i].get("v.text");
                     if(text !== undefined){
                         selectedOptions.push(text);
+                        optFound = true;
                     }
                 }
             }
         }
-        return selectedOptions.join(";");
+        return {found: optFound, optionValue: selectedOptions.join(";")};
     },
 
     /**
@@ -64,17 +67,20 @@
      */
     updateSingleOption: function(optionCmp, newValues) {
         var selected = false;
+        var updated = false;
         if (!$A.util.isUndefinedOrNull(newValues)) { 
         	if ($A.util.isArray(newValues)) {
 	            for(var i=0;i<newValues.length;i++){
 	                if (newValues[i] === optionCmp.get("v.text")) {
 	                    selected = true;
+	                    updated = true;
 	                    break;
 	                }
 	            }
         	} else {
         		if (newValues === optionCmp.get("v.text")) {
         			selected = true;
+        			updated = true;
         		}
         	}
         }
@@ -82,6 +88,7 @@
         if (originalStatus !== selected) {
             optionCmp.setValue("v.value", selected);
         }
+        return updated;
     },
 
     /**
@@ -89,14 +96,16 @@
      */
     updateOptionGroup: function(optionGrpCmp, newValues) {
         var body = optionGrpCmp.getValue("v.body");
+        var updated = false;
         if (body) {
             for(var i = 0; i < body.getLength(); i++) {
                 var descriptor = body.getValue(i).getDef().getDescriptor();
                 if ((descriptor.getNamespace() + ":" + descriptor.getName()) === "ui:inputSelectOption") {
-                    this.updateSingleOption(body.getValue(i), newValues);
+                    updated = this.updateSingleOption(body.getValue(i), newValues) || updated;
                 }
             }
         }
+        return updated;
     },
 
     /**
@@ -104,9 +113,9 @@
      */
     updateOptionsFromValue: function(cmp) {
         var value = cmp.getValue("v.value");
-        var optionValue = this.getValueFromOptionCmps(cmp);
+        var selectedOptions = this.getValueFromOptionCmps(cmp);
         
-        if (value.getValue() === optionValue) {
+        if (selectedOptions.found && value.getValue() === selectedOptions.optionValue) {
             return;
         }
 
@@ -125,7 +134,7 @@
         
         // the options attribute causes an iteration to generate a set of option components with the id "options"
         var generatedOptions = cmp.find("options");
-
+        var optExists = false;
         if(!$A.util.isUndefinedOrNull(generatedOptions)) {
         // case 1:
             var optionsValue = cmp.getValue("v.options");
@@ -138,6 +147,7 @@
 
                 if ((valIsArray && aura.util.arrayIndexOf(newValues, val) > -1) || newValues === val) {
                     optionValue.put("selected", true);
+                    optExists = true;
                 } else {
                     optionValue.put("selected", false);
                 }
@@ -152,15 +162,17 @@
                 for(var i = 0; i < body.getLength(); i++) {
                     var descriptor = body.getValue(i).getDef().getDescriptor();
                     if((descriptor.getNamespace() + ":" + descriptor.getName()) === "ui:inputSelectOptionGroup") {
-                        this.updateOptionGroup(body.getValue(i), newValues);
+                        optExists = this.updateOptionGroup(body.getValue(i), newValues) || optExists;
                     } else if ((descriptor.getNamespace() + ":" + descriptor.getName()) === "ui:inputSelectOption") {
-                        this.updateSingleOption(body.getValue(i), newValues);
+                    	optExists = this.updateSingleOption(body.getValue(i), newValues) || optExists;
                     }
                 }
             }
         }
-        
-        
+
+        if (!optExists) {
+        	this.updateValueFromOptions(cmp);
+        }
     },
 
     getOptionCmps: function(cmp) {
@@ -187,20 +199,20 @@
     	}
         
         var value = cmp.getValue("v.value");
-        var optionValue = this.getValueFromOptionCmps(cmp);
+        var selectedOptions = this.getValueFromOptionCmps(cmp);
 
-        if (value.getValue() !== optionValue) {
+        if (!selectedOptions.found || value.getValue() !== selectedOptions.optionValue) {
 
-            if (!cmp.getValue("v.multiple").getBooleanValue() && optionValue === "") {
+            if (!cmp.getValue("v.multiple").getBooleanValue() && selectedOptions.optionValue === "") {
                 var optionCmps = this.getOptionCmps(cmp);
                 if (optionCmps.length > 0) {
                     // if no options are selected, set the select's value to the first option's value
-                    optionValue = optionCmps[0].get("v.text");
+                	selectedOptions.optionValue = optionCmps[0].get("v.text");
                     optionCmps[0].getValue("v.selected").setValue(true);
                 }
             }
 
-            value.setValue(optionValue, true);
+            value.setValue(selectedOptions.optionValue, true);
         }
     }
 

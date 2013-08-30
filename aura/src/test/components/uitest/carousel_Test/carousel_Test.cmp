@@ -89,11 +89,12 @@
 <ui:carousel aura:id="carousel2" >
 	<aura:set attribute="pageComponents">
  		<ui:carouselPage>
- 			<p>Press button to rerender this carousel with a new carousel that has 100 pages.<br/>
+ 			<p>Press button to rerender this carousel with a new carousel that has 10 pages.<br/>
  				This component will be usefull to test<br/>
  				<ul>
  					<li>One tab carousel</li>
  					<li>Carousel rerendering</li>
+ 					<li>Dynamic tab rendering</li>
  				</ul>
  			</p>
  			<ui:button aura:id="btnCreatePages" press="{!c.addManyPgCarousel}" label="create pages"/>

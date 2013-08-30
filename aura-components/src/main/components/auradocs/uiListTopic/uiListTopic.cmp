@@ -25,8 +25,8 @@
 			For more information on <code>aura:iteration</code>, see <auradocs:topicLink topic="tagIteration">aura:iteration</auradocs:topicLink> and the <ui:outputURL value="/auradocs#demos?demo=todo" label="aura:iteration demo"/>.
 			</p>
 			<p> 
-			<code>ui:list</code> and <code>ui:infiniteList</code> provide a paging interface to navigate lists. <code>ui:list</code> can be used for more robust list implementations that require a data provider and a template for each list item.
-			Additionally, use <code>ui:infiniteList</code> if you want a robust list implementation similar to <code>ui:list</code>, but with a handler that enables you to retrieve and display more data as necessary.
+			<code>ui:list</code> and <code>ui:infiniteList</code> provide a paging interface to navigate lists. <code>ui:list</code> can be used for more robust list implementations that retrieves and display more data as necessary, with a data provider and a template for each list item.
+			Additionally, use <code>ui:infiniteList</code> if you want a robust list implementation similar to <code>ui:list</code>, but with a handler that enables you to retrieve and display more data when the user reaches the bottom of the list.
 			</p>
 		    
 		</aura:set>

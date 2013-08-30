@@ -19,7 +19,7 @@
         var f = cmp.get("v.format");
         var num = cmp.get("v.value");
         var formatted;
-        if ($A.util.isNumber(num) || $A.util.isString(num)) {
+        if (($A.util.isNumber(num) || $A.util.isString(num)) && !$A.util.isEmpty(num)) {    		
             if (!$A.util.isEmpty(f)) {
                 var nf;
                 try {
@@ -46,7 +46,7 @@
             var formatted = '';
             f = f.unwrap();
             val = val.unwrap();
-            if ($A.util.isNumber(val) || $A.util.isString(val)) {
+            if (($A.util.isNumber(val) || $A.util.isString(val)) && !$A.util.isEmpty(val)) {
                 if (!$A.util.isEmpty(f)) {
                     var nf;
                     try {

@@ -18,7 +18,7 @@
 <aura:component extends="auradocs:topicPanel">
     <aura:set attribute="title" value="Setting Label Parameters"/>
        
-<p>The <code>aura:label</code> component accepts parameters, allowing you to provide different values for the labels. This can be useful for localizing your labels.</p>
+<p>The <code>aura:label</code> component accepts parameters, allowing you to dynamically populate placeholder values in labels. This can be useful for localizing your labels.</p>
 
 <p>The label component value attribute accepts one or more numbered parameters, such as:</p>
 
@@ -100,11 +100,11 @@
 
 <auradocs:example descriptor="auradocs:sampleLabelEmbedded" />
 
-<auradocs:info>See <auradocs:topicLink topic="dynamicLabel">Dynamically Constructing Labels</auradocs:topicLink> if you want to construct labels with a global value provider.</auradocs:info>
+<auradocs:info>See <auradocs:topicLink topic="dynamicLabel">Dynamically Constructing Labels</auradocs:topicLink> if you want to construct labels dynamically in JavaScript.</auradocs:info>
 <p><b>See also:</b><br/>   
     <auradocs:defLink descriptor="aura:label">aura:label</auradocs:defLink><br/>
     <auradocs:topicLink topic="expressions">Expressions</auradocs:topicLink><br/>
-    <auradocs:topicLink topic="globalValueProviders">Global Value Providers</auradocs:topicLink><br/>
+    <auradocs:topicLink topic="label">Input Component Labels</auradocs:topicLink><br/>
     <auradocs:topicLink topic="labelAdapter">Label Adapters</auradocs:topicLink>    
  </p>
 

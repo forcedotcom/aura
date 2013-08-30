@@ -16,9 +16,9 @@
 
 -->
 <aura:component extends="auradocs:topicPanel">
-    <aura:set attribute="title" value="Label Adapters"/>
+    <aura:set attribute="title" value="Customizing your Label Implementation"/>
     
-<p>The label adapter enables you to access your application labels. Your label adapter implementation encapsulates the details of finding and returning labels defined outside the application code. Typically, labels are defined separately from the source code to make localization of labels easier.</p>
+<p>You can customize where your app reads labels from by overriding the default label adapter. Your label adapter implementation encapsulates the details of finding and returning labels defined outside the application code. Typically, labels are defined separately from the source code to make localization of labels easier.</p>
 
 <p>To provide a label adapter implementation, implement the <code>LocalizationAdapter</code> interface with the following two methods.</p>
 
@@ -63,10 +63,11 @@ public class MyLocalizationAdapterImpl implements LocalizationAdapter {
 </tbody>
 </table>
 
-<p>The <code>labelExists</code> method indicates whether the specified label is defined or not. Its method parameters are identical to the first two parameters for <code>getLabel</code>. See the parameter descriptions for <code>getLabel</code>.</p>
+<p>The <code>labelExists</code> method indicates whether the specified label is defined or not. Its method parameters are identical to the first two parameters for <code>getLabel</code>.</p>
 
 <p><b>See also:</b><br/>    
-    <auradocs:topicLink topic="globalValueProviders">Global Value Providers</auradocs:topicLink><br/>
+    <auradocs:topicLink topic="adapters">Adapters</auradocs:topicLink><br/>
+    <auradocs:topicLink topic="label">Input Component Labels</auradocs:topicLink><br/>
     <auradocs:topicLink topic="labelParameters">Setting Label Parameters</auradocs:topicLink>
 </p>   
 </aura:component>

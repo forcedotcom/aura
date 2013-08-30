@@ -16,7 +16,7 @@
 
 -->
 <aura:component extends="auradocs:topicPanel">
-    <aura:set attribute="title" value="Label" />
+    <aura:set attribute="title" value="Input Component Labels" />
 
    <p>A label describes the purpose of an input component. To set a label on an input component, use the <code>label</code> attribute.</p>
    
@@ -40,13 +40,14 @@
    
    <p>Note that setting <code>labelPosition="hidden"</code> or <code>labelDisplay="false"</code> hides the label from view but still exposes it to screen readers. 
     Setting <code>labelPosition="hidden"</code> is equivalent to setting <code>labelDisplay="false"</code> on <code>ui:label</code>.</p>
-   <p>To use labels with different values, see <auradocs:topicLink topic="labelParameters">Setting Label Parameters</auradocs:topicLink>.</p>
+   <p>To use labels with placeholders that can be dynamically populated, see <auradocs:topicLink topic="labelParameters">Setting Label Parameters</auradocs:topicLink>.</p>
    
     <auradocs:info>See the <auradocs:defLink descriptor ="ui:label">ui:label</auradocs:defLink> component reference.</auradocs:info>
     
     <p>
     <b>See Also:</b><br/>
     <ui:outputURL value="/auradocs#demos?demo=input" label="ui:input"/><br />
+    <auradocs:topicLink topic="labelParameters">Setting Label Parameters</auradocs:topicLink><br />
     <auradocs:topicLink topic="dynamicLabel">Dynamically Contructing Labels</auradocs:topicLink><br />
     <auradocs:topicLink topic="models">Java Models</auradocs:topicLink>
     </p>

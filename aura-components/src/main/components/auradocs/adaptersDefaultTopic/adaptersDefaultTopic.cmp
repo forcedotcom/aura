@@ -1,0 +1,104 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="Default Adapters"/>
+    
+    <p>This is the list of default adapters.</p>
+    
+    <table class="table table-bordered table-striped">
+          <thead>
+              <tr>
+                     <th>Adapter</th>
+                     <th>Description</th>
+              </tr>
+          </thead>
+          <tbody>
+              <tr>
+                     <td><code>ComponentLocationAdapter</code></td>
+                     <td>Provides the default location for storing component source files. The default is to store components on the filesystem but you could override this to store them in a database.</td>
+              </tr>
+
+              <tr>
+                     <td><code>ConfigAdapter</code></td>
+                     <td>Provides many defaults, including the set of available modes, and the version of the Aura framework.</td>
+              </tr>
+
+              <tr>
+                     <td><code>ContextAdapter</code></td>
+                     <td>Provides the default context. Every request in Aura is associated with a context. After initial loading of an app, each subsequent request is an XHR POST that contains your Aura context configuration, which includes the mode to run in, the name of the app, and the namespaces that already have preloaded metadata on the client.</td>
+              </tr>
+
+              <tr>
+                     <td><code>ExceptionAdapter</code></td>
+                     <td>Provides the default exception handling. The default is to log the exception.</td>
+              </tr>
+
+              <tr>
+                     <td><code>ExpressionAdapter</code></td>
+                     <td>Provides the default expression language.</td>
+              </tr>
+
+              <tr>
+                     <td><code>FormatAdapter</code></td>
+                     <td>Provides the default implementations for reading and writing different resources, such as Aura markup, CSS, or JSON.</td>
+              </tr>
+
+              <tr>
+                     <td><code>GlobalValueProviderAdapter</code></td>
+                     <td>Provides the global value providers. Global value providers are global values, such as <code>$Label</code>, that a component can use in expressions.</td>
+              </tr>
+
+              <tr>
+                     <td><code>JsonSerializerAdapter</code></td>
+                     <td>Provides the default JSON serializers. You can use this adapter to customize how Aura locates the correct serializer implementation to marshall objects to and from JSON.</td>
+              </tr>
+
+              <tr>
+                     <td><code>LocalizationAdapter</code></td>
+                     <td>Provides the default label and locale handling.</td>
+              </tr>
+
+              <tr>
+                     <td><code>LoggingAdapter</code></td>
+                     <td>Provides the default logging.</td>
+              </tr>
+
+              <tr>
+                     <td><code>PrefixDefaultsAdapter</code></td>
+                     <td>Provides the default prefixes for Aura definitions. Each definition describes metadata for an element, such as a component, event, controller, or model.</td>
+              </tr>
+
+              <tr>
+                     <td><code>RegistryAdapter</code></td>
+                     <td>Provides the default registries. Registries store metadata definitions. Some registries last for the duration of a request, while others are cached for the lifetime of an app.</td>
+              </tr>
+
+              <tr>
+                     <td><code>StyleAdapter</code></td>
+                     <td>Provides the default CSS themes.</td>
+              </tr>
+
+          </tbody>
+       </table>
+    
+    <p><b>See also:</b><br/>
+    <auradocs:topicLink topic="adapters">Adapters</auradocs:topicLink><br/>
+    <auradocs:topicLink topic="adaptersOverride">Overriding Default Adapters</auradocs:topicLink>
+    </p>
+
+</aura:component>

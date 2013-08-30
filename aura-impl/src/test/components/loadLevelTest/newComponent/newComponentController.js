@@ -55,7 +55,7 @@
                                                 });
     },
     // Component with server dependencies
-    createCmpWithPropertyReference : function(cmp, evt,helper){
+    createCmpWithPropertyReferenceServerDeps : function(cmp, evt,helper){
         helper.createComponentAndPushToBody(cmp, {componentDef: "markup://loadLevelTest:serverComponent",
                                                     attributes:{
                                                         values:{stringAttribute:'v.testAttr'}
@@ -63,7 +63,7 @@
                                                 });
     },
     // Component with no server dependencies
-    createCmpWithPropertyReference2 : function(cmp, evt,helper){
+    createCmpWithPropertyReferenceNoServerDeps : function(cmp, evt,helper){
         helper.createComponentAndPushToBody(cmp, {componentDef: "markup://ui:outputNumber",
                                                    attributes:{
                                                        values:{ value: "v.testAttr2"

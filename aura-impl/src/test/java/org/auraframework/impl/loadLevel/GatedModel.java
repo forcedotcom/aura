@@ -25,15 +25,15 @@ import org.auraframework.system.Annotations.Model;
 
 /**
  * A model to allow the client to control server speed.
- *
- * This model, in conjunction with {@link GatedModelController} provides a client side latch
- * mechanism on the server. The way this is managed is via the 'waitId' attribute to initialize
- * the model (which then freezes), and two functions on the controller: resumeGateId, and clearGateId
- *
+ * 
+ * This model, in conjunction with {@link GatedModelController} provides a client side latch mechanism on the server.
+ * The way this is managed is via the 'waitId' attribute to initialize the model (which then freezes), and two functions
+ * on the controller: resumeGateId, and clearGateId
+ * 
  * Examples of usage are in loadLevelTest:lazyLoadHelper.cmp
- *
- * This is not intended to be overly robust against misuse, and it is particularly prone to issues
- * if multiple tests use the same gate id. This should be avoided.
+ * 
+ * This is not intended to be overly robust against misuse, and it is particularly prone to issues if multiple tests use
+ * the same gate id. This should be avoided.
  */
 @Model
 public class GatedModel {
@@ -66,5 +66,10 @@ public class GatedModel {
         BaseComponent<?, ?> component = Aura.getContextService().getCurrentContext().getCurrentComponent();
         String str = (String) component.getAttributes().getExpression("stringAttribute");
         return str;
+    }
+
+    @AuraEnabled
+    public String getString2() {
+        return "meep";
     }
 }

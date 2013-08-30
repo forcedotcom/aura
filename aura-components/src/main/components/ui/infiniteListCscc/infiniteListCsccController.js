@@ -14,14 +14,18 @@
  * limitations under the License.
  */
 ({
-    provide : function IterationProvider(component, localCreation) {
-        var realbody = component.getDef().getHelper().createRealBody(component, !localCreation);
-
-        return {
-            attributes: {
-                "realbody": realbody
-            }
-        };
-    }
+	showMore: function(component, event, helper) {
+		var currentPageValue = component.get("v.currentPage"); 
+	
+    	var currentPage = parseInt(currentPageValue, 10);
+		var targetPage = currentPage + 1;
+        
+        component.getValue("v.currentPage").setValue(targetPage, true);
+        
+        helper.triggerDataProvider(component.getSuper());
+	},
+	
+	rerenderComplete: function(component, event, helper) {
+        helper.showLoading(component, false);
+	}
 })
-

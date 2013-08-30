@@ -29,4 +29,13 @@
             {!idx + ':' + var + ','}
         </aura:iteration>
     </aura:renderIf>
+
+    <aura:renderIf aura:id="ifCscc" isTrue="{!v.showIteration}">
+        <aura:set attribute="else">
+            iteration disabled
+        </aura:set>
+        <aura:iteration aura:id="iterationCscc" items="{!v.items}" var="var" indexVar="idx" start="{!v.start}" end="{!v.end}">
+            {!idx + ':' + var + ','}
+        </aura:iteration>
+    </aura:renderIf>
 </aura:component>

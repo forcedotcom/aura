@@ -16,7 +16,7 @@
 
 -->
 <aura:component implements="aura:rootComponent"
-    provider="java://org.auraframework.impl.root.component.IterationProvider, js://aura.iteration"
+    provider="java://org.auraframework.impl.root.component.IterationProvider, js://aura.iterationCscc"
     renderer="js://aura.providedBody, java://org.auraframework.components.aura.ProvidedBodyRenderer"
     support="BETA" description="Renders a view of a collection of items">
 <aura:attribute name="items" type="List" required="true" description="The collection of data to iterate over"/>
@@ -27,9 +27,12 @@
 <aura:attribute name="body" type="Aura.ComponentDefRef[]" required="true" description="Template to use when creating components for each iteration."/>
 <aura:attribute name="realbody" type="Aura.Component[]" description="Internal use only. Any value set will be ignored."/>
 
+<aura:handler name="init" value="{!this}" action="{!c.firstRender}"/>
 <aura:handler name="change" value="{!v.items}" action="{!c.itemsChange}"/>
 <aura:handler name="change" value="{!v.start}" action="{!c.rangeChange}"/>
 <aura:handler name="change" value="{!v.end}" action="{!c.rangeChange}"/>
+
+<aura:registerEvent name="rerenderComplete" type="aura:asyncRerender" description="The event fired when this component completes its asynchronous rerender."/>
 
 
 <!--

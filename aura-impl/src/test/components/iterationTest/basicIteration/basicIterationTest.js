@@ -209,5 +209,207 @@
             value = realbody.get(0);
             $A.test.assertEquals("0:alpha,1:beta,", value.get("v.value"));
         }
+    },
+
+    /**
+     * ----------------------------------------------------------------------------------------------------------------
+     * ------------------------client-side cmp creation tests ---------------------------------------------------------
+     * ----------------------------------------------------------------------------------------------------------------
+     */
+    assertBodyComponentDefRefCscc: function(cmp) {
+        var value = cmp.find("iterationCscc").getValue("v.body");
+        $A.test.assertEquals("ArrayValue", value.toString());
+        $A.test.assertEquals(1, value.getLength());
+        value = value.get(0);
+        $A.test.assertTrue(typeof value === "object");
+        $A.test.assertEquals(undefined, value.auraType);
+        $A.test.assertEquals(undefined, value.getDef);
+        $A.test.assertEquals("markup://aura:expression", value.componentDef.descriptor);
+    },
+
+    /**
+     * Iteration body is rendered by renderIf
+     */
+    testSanityCscc:{
+        attributes:{ items:"alpha,omega" },
+        test:function(cmp){
+            // Verify renderIf
+            var value = cmp.find("ifCscc").getValue("v.body");
+            $A.test.assertEquals("ArrayValue", value.toString());
+            $A.test.assertEquals(1, value.getLength());
+            value = value.get(0);
+            var iteration = cmp.find("iterationCscc");
+            $A.test.assertEquals(iteration, value);
+
+            this.assertBodyComponentDefRef(cmp);
+
+            var realbody = iteration.getValue("v.realbody");
+            $A.test.assertEquals("ArrayValue", realbody.toString());
+            $A.test.assertEquals(2, realbody.getLength());
+            value = realbody.get(0);
+            $A.test.assertTrue(typeof value === "object");
+            $A.test.assertEquals("Component", value.auraType);
+            $A.test.assertEquals("markup://aura:expression", value.getDef().getDescriptor().getQualifiedName());
+            $A.test.assertEquals("0:alpha,", value.get("v.value"));
+            value = realbody.get(1);
+            $A.test.assertTrue(typeof value === "object");
+            $A.test.assertEquals("Component", value.auraType);
+            $A.test.assertEquals("markup://aura:expression", value.getDef().getDescriptor().getQualifiedName());
+            $A.test.assertEquals("1:omega,", value.get("v.value"));
+        }
+    },
+
+    /**
+     * Iteration body is not rendered by renderIf
+     */
+    testNotRenderedCscc:{
+        attributes:{ showIteration:false, items:"alpha,omega" },
+        test:function(cmp){
+            // Verify renderIf
+            var value = cmp.find("ifCscc").getValue("v.body");
+            $A.test.assertEquals("ArrayValue", value.toString());
+            $A.test.assertEquals(1, value.getLength());
+            value = value.get(0);
+            var iteration = cmp.find("iterationCscc");
+            $A.test.assertEquals(iteration, value);
+
+            this.assertBodyComponentDefRef(cmp);
+
+            var realbody = iteration.getValue("v.realbody");
+            $A.test.assertEquals("ArrayValue", realbody.toString());
+            $A.test.assertEquals(2, realbody.getLength());
+            $A.test.assertFalse(iteration.isRendered());
+            $A.test.assertTrue(undefined === iteration.getElements());
+
+            value = realbody.get(0);
+            $A.test.assertTrue(typeof value === "object");
+            $A.test.assertEquals("Component", value.auraType);
+            $A.test.assertEquals("markup://aura:expression", value.getDef().getDescriptor().getQualifiedName());
+            $A.test.assertEquals("0:alpha,", value.get("v.value"));
+            $A.test.assertFalse(value.isRendered());
+            $A.test.assertTrue(undefined === value.getElements());
+            value = realbody.get(1);
+            $A.test.assertTrue(typeof value === "object");
+            $A.test.assertEquals("Component", value.auraType);
+            $A.test.assertEquals("markup://aura:expression", value.getDef().getDescriptor().getQualifiedName());
+            $A.test.assertEquals("1:omega,", value.get("v.value"));
+            $A.test.assertFalse(value.isRendered());
+            $A.test.assertTrue(undefined === value.getElements());
+        }
+    },
+
+    /**
+     * Iteration is empty if items is empty
+     */
+    testItemsEmptyCscc:{
+        test:function(cmp){
+            this.assertBodyComponentDefRef(cmp);
+            var realbody = cmp.find("iterationCscc").getValue("v.realbody");
+            $A.test.assertEquals("ArrayValue", realbody.toString());
+            $A.test.assertEquals(0, realbody.getLength());
+        }
+    },
+
+    testStartAndEndCscc:{
+        attributes:{ items:"a,b,c,d,e", start:2, end:3 },
+        test:function(cmp){
+            this.assertBodyComponentDefRef(cmp);
+            var realbody = cmp.find("iterationCscc").getValue("v.realbody");
+            $A.test.assertEquals(1, realbody.getLength());
+            value = realbody.get(0);
+            $A.test.assertTrue(typeof value === "object");
+            $A.test.assertEquals("2:c,", value.get("v.value"));
+        }
+    },
+
+    /**
+     * Iteration is empty if start greater than items length
+     */
+    testStartGreaterThanLengthCscc:{
+        attributes:{ items:"a,b,c,d,e", start:99 },
+        test:function(cmp){
+            this.assertBodyComponentDefRef(cmp);
+            var realbody = cmp.find("iterationCscc").getValue("v.realbody");
+            $A.test.assertEquals("ArrayValue", realbody.toString());
+            $A.test.assertEquals(0, realbody.getLength());
+        }
+    },
+
+    /**
+     * Iteration is empty if start greater than end
+     */
+    testStartGreaterThanEndCscc:{
+        attributes:{ items:"a,b,c,d,e", start:3, end:2 },
+        test:function(cmp){
+            this.assertBodyComponentDefRef(cmp);
+            var realbody = cmp.find("iterationCscc").getValue("v.realbody");
+            $A.test.assertEquals("ArrayValue", realbody.toString());
+            $A.test.assertEquals(0, realbody.getLength());
+        }
+    },
+
+    /**
+     * Iteration starts at start and contains remainder of list, without end
+     */
+    testStartWithoutEndCscc:{
+        attributes:{ items:"a,b,c,d,e", start:3 },
+        test:function(cmp){
+            this.assertBodyComponentDefRef(cmp);
+            var realbody = cmp.find("iterationCscc").getValue("v.realbody");
+            $A.test.assertEquals(2, realbody.getLength());
+            value = realbody.get(0);
+            $A.test.assertEquals("3:d,", value.get("v.value"));
+            value = realbody.get(1);
+            $A.test.assertEquals("4:e,", value.get("v.value"));
+        }
+    },
+
+    /**
+     * Iteration starts with first item and ends before end, without start
+     */
+    testEndWithoutStartCscc:{
+        attributes:{ items:"a,b,c,d,e", end:3 },
+        test:function(cmp){
+            this.assertBodyComponentDefRef(cmp);
+            var realbody = cmp.find("iterationCscc").getValue("v.realbody");
+            $A.test.assertEquals(3, realbody.getLength());
+            value = realbody.get(0);
+            $A.test.assertEquals("0:a,", value.get("v.value"));
+            value = realbody.get(1);
+            $A.test.assertEquals("1:b,", value.get("v.value"));
+            value = realbody.get(2);
+            $A.test.assertEquals("2:c,", value.get("v.value"));
+        }
+    },
+
+    /**
+     * Iteration starts with first item and ends before end, without start
+     */
+    testStartNegativeCscc:{
+        attributes:{ items:"delta,gamma", start:-3 },
+        test:function(cmp){
+            this.assertBodyComponentDefRef(cmp);
+            var realbody = cmp.find("iterationCscc").getValue("v.realbody");
+            $A.test.assertEquals(2, realbody.getLength());
+            value = realbody.get(0);
+            $A.test.assertEquals("0:delta,", value.get("v.value"));
+            value = realbody.get(1);
+            $A.test.assertEquals("1:gamma,", value.get("v.value"));
+        }
+    },
+
+    /**
+     * Iteration with decimal start value is treated as integer
+     */
+    // W-1299463 start/end values not handled the same on server (intValue)
+    _testStartDecimalCscc:{
+        attributes:{ items:"alhpa,beta", start: 0.000001 },
+        test:function(cmp){
+            this.assertBodyComponentDefRef(cmp);
+            var realbody = cmp.find("iterationCscc").getValue("v.realbody");
+            $A.test.assertEquals(1, realbody.getLength());
+            value = realbody.get(0);
+            $A.test.assertEquals("0:alpha,1:beta,", value.get("v.value"));
+        }
     }
 })

@@ -79,4 +79,71 @@
         <iterationTest:componentIteration start="0" end="0" aura:id="emptyComponentArray">
         </iterationTest:componentIteration>
     </div>
+    
+    <!-- Client-side cmp creaton tests -->
+    <div aura:id="nullCscc">
+        <aura:iterationCscc items="{!m.stringListNull}" var="x">
+            {!x+7} ghost in this shell
+        </aura:iterationCscc>
+    </div>
+
+    <div aura:id="emptyCscc">
+        <aura:iterationCscc items="{!m.emptyList}" var="x">
+            {!x+9} boo!
+        </aura:iterationCscc>
+    </div>
+
+    <div aura:id="stringsCscc">
+        <aura:iterationCscc items="{!m.stringList}" var="x" indexVar="i">
+            <ui:inputText value="{!x+7}"/>
+        </aura:iterationCscc>
+    </div>
+
+    <div aura:id="numbersCscc">
+        <aura:iterationCscc items="{!m.integerList}" var="x" indexVar="i">
+            <ui:inputText size="{!i+3}" value="{!i+3}" maxlength="{!x+3}"/>
+        </aura:iterationCscc>
+    </div>
+
+    <div aura:id="booleansCscc">
+        <aura:iterationCscc items="{!m.booleanList}" var="x" indexVar="i">
+            <ui:inputText value="{!i}" disabled="{!x}"/>
+        </aura:iterationCscc>
+    </div>
+
+    <div aura:id="listsCscc">
+        <aura:iterationCscc items="{!m.listOfList}" var="x" indexVar="i">
+            <aura:iterationCscc items="{!x}" var="y" indexVar="j">
+                <ui:inputText value="{!y + ' is from [' + i + ',' + j + ']'}"/>
+            </aura:iterationCscc>
+        </aura:iterationCscc>
+    </div>
+
+    <!-- no longer working again :(
+    <div aura:id="barecomponentsCscc">
+        <aura:iterationCscc items="{!m.textComponents}" var="x">
+            {!x}
+        </aura:iterationCscc>
+    </div>
+    -->
+
+    <!-- W-1300578 can't pass components?
+    <div aura:id="innercomponentsCscc">
+        <aura:iterationCscc items="{!m.textComponents}" var="x">
+            <div>{!x}</div>
+        </aura:iterationCscc>
+    </div>
+    -->
+    <div>
+        <iterationTest:componentIteration start="0" end="2" aura:id="componentArrayCscc">
+            <aura:set attribute="cmps">
+                <aura:text value="textOnBody" aura:id="text"/>
+                <div title="divOnBody" aura:id="localdiv"/>
+            </aura:set>
+            <aura:set attribute="csccTest" value="true" />
+        </iterationTest:componentIteration>
+        <iterationTest:componentIteration start="0" end="0" aura:id="emptyComponentArrayCscc">
+            <aura:set attribute="csccTest" value="true" />
+        </iterationTest:componentIteration>
+    </div>
 </aura:component>

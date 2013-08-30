@@ -68,12 +68,11 @@
         //Specify current component's attribute as value for new cmp's attribute
         var config = {componentDef:"markup://loadLevelTest:displayNumber",
                       attributes:{
-                    	  values:{
+                          values:{
                               number:expr
                           }
                       }
-                      /**TODO W-1318095: Cannot specify localId for defs fetched from server
-                      , localId:"num_Id"*/
+                      , localId:"num_Id"
                      };
 
         //Specify current component as value provider

@@ -15,16 +15,14 @@
     limitations under the License.
 
 -->
-<aura:component render="client" extends="loadLevelTest:lazyLoadHelper">
-    <aura:attribute name="testAttr" type="String" default="testValue" />
-    <aura:attribute name="testAttr2" type="Integer" default="22" />
+<aura:component extends="ui:abstractList" implements="ui:scrollerEmbeddable" support="proto"
+    provider="java://org.auraframework.component.ui.ListProvider, js://ui.list" description="A list component that iterates over and displays the items in the ui:dataProvider component.">
+    
+    <aura:handler name="showMore" action="{!c.showMore}"/>
 
-    <ui:button press="{!c.createCmpWithComplexAttributes}" label="Push for component"/>
-    <!--ui:button press="{!c.makeServer}" label="Push for server component"/>
-    <ui:button press="{!c.makeExclusiveServer}" label="Push for exclusive server component"/><br/-->
-    {!v.body}
-
-    <aura:registerevent name="press" type="ui:press"/>
-
-    <loadLevelTest:serverComponent/>
+	<ul class="{!v.class}">
+	<aura:iterationCscc items="{!v.items}" var="{!v.itemVar}" body="{!v.itemTemplate}" rerenderComplete="{!c.rerenderComplete}">
+		
+	</aura:iterationCscc>
+	</ul>
 </aura:component>

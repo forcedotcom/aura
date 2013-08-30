@@ -14,9 +14,20 @@
  * limitations under the License.
  */
 ({
-    testIteratingThroughAuraComponentArray:{
-        test:function(cmp){
-            $A.log(cmp);
+    rangeChange: function(cmp, evt, helper) {
+        helper.rerenderEverything(cmp);
+    },
+
+    itemsChange: function(cmp, evt, helper) {
+        var v = evt.getParam("value");
+        if (v === cmp.getValue("v.items")) {
+            helper.rerenderEverything(cmp);
+        }
+    },
+
+    firstRender: function(cmp, evt, helper) {
+        if (cmp.getValue("v.realbody").unwrap().length === 0) {
+            helper.rerenderEverything(cmp);
         }
     }
 })

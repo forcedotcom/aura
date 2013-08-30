@@ -16,19 +16,17 @@
 
 -->
 <aura:component render="client">
-    <aura:attribute name="start" type="Integer"/>
-    <aura:attribute name="end" type="Integer"/>
-    <aura:attribute name="cmps" type="Aura.Component[]"/>
-    <aura:attribute name="csccTest" type="Boolean" default="false" />
+    <aura:attribute name="value" type="String[]" description="The list of messages to be displayed."/>
+    <aura:attribute name="csccTest" type="Boolean" default="false" description="Flag to render client-side cmp creation iteration" />
 
     <aura:renderIf isTrue="{!v.csccTest}">
-        <aura:iterationCscc aura:id="iterationCscc" items="{!v.cmps}" var="var" indexVar="idx" start="{!v.start}" end="{!v.end}">
-            {!var}
+        <aura:iterationCscc items="{!v.value}" var="message">
+            {!message}
         </aura:iterationCscc>
 
         <aura:set attribute="else">
-            <aura:iteration aura:id="iteration" items="{!v.cmps}" var="var" indexVar="idx" start="{!v.start}" end="{!v.end}">
-                {!var}
+            <aura:iteration items="{!v.value}" var="message">
+                {!message}
             </aura:iteration>
         </aura:set>
     </aura:renderIf>

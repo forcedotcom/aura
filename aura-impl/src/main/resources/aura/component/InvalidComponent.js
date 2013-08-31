@@ -69,7 +69,7 @@ InvalidComponent.prototype.findValue = function(name){
 };
 
 InvalidComponent.prototype.unwrap = function() {
-    this.raiseInvalidComponentError();
+	return this;
 };
 
 /**

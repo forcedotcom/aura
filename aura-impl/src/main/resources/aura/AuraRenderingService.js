@@ -195,7 +195,7 @@ var AuraRenderingService = function AuraRenderingService(){
         addDirtyValue: function(value) {
             priv.needsCleaning = true;
             var cmp = value.owner;
-            if(cmp){
+            if(cmp && cmp.isValid()){
                 var id = cmp.getConcreteComponent().getGlobalId();
                 var list = priv.dirtyComponents[id];
                 if (!list) {

@@ -79,6 +79,11 @@ var AuraExpressionService = function AuraExpressionService(){
                 propRef = propRef.getStem();
             }
 
+            // handle PropertyReferenceValue. get its value.
+            if ($A.util.instanceOf(value, PropertyReferenceValue)) {
+                value = this.getValue(valueProvider, value);
+            }
+
             return value;
         },
 

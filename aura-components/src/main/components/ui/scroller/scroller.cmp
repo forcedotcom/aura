@@ -30,7 +30,10 @@
     <aura:attribute name="onScrollStart" type="Aura.Action" description="The action invoked when the user starts scrolling."/>
     <aura:attribute name="onScrollEnd" type="Aura.Action" description="The action invoked when the user stops scrolling."/>
     <aura:attribute name="onScrollMove" type="Aura.Action" description="The action invoked when the user is scrolling."/>
-    
+
+    <aura:attribute name="onScrollToBottom" type="Aura.Action" description="The action invoked when the user has reached the end of the scrolling area."/>
+    <aura:attribute name="scrollToBottomThreshold" type="Integer" default="10" description="When the user scrolls to this many pixels from the bottom of the scrollable area, the onScrollToBottom action is called."/>
+
     <aura:attribute name="onPullToShowMore" type="Aura.Action" description="The action invoked when the user pulls from the bottom to load more.  The spacebar or Enter key also triggers a refresh."/>
     <aura:attribute name="pullToShowMorePull" type="String" default="Pull up to show more..." description="The text to display in the bottom cell before the user pulls to show more content. Default value is &quot;Pull up to show more...&quot;."/>
     <aura:attribute name="pullToShowMoreRelease" type="String" default="Release to show more..." description="The text to display in the revealed area below the scroller contents when the user pulls to show more content in the scroller area, but has not yet released the pull. Default value is &quot;Release to show more...&quot;."/>

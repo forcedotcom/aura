@@ -86,7 +86,7 @@
 		var attributes = component.getAttributes();
 		var enabled = attributes.getValue("enabled").getBooleanValue();
 		var scroller = component.find("scrollWrapper").getElement();
-		
+
 		if (scroller) {
 			
 			this.initWidth(component);
@@ -100,6 +100,9 @@
 					var useTransform = attributes.getValue("useTransform").getBooleanValue();
                     var checkDOMChanges = attributes.getValue("checkDOMChanges").getBooleanValue();
                     var bindEventsToScroller = attributes.getValue("bindEventsToScroller").getBooleanValue();
+
+                    var onScrollToBottomAction = attributes.get("onScrollToBottom");
+                    var scrollToBottomThreshold = attributes.get("scrollToBottomThreshold");
 
 					var pullToRefreshAction = component.get("v.onPullToRefresh");
 					var canRefresh = component.get("v.canRefresh");
@@ -147,7 +150,7 @@
 						
 						return target;
 					};
-					
+
 					//START override iScroll to have the option to bind the events to the scroller itself					
 					iScroll.prototype._bind = function(type, el, bubble) {						
 						var target = this._getEventTarget(type, el);						
@@ -262,6 +265,12 @@
 									action.runDeprecated(e);
 								}
 							}
+
+                            if (onScrollToBottomAction) {
+                                if(-this.maxScrollY + this.y < scrollToBottomThreshold) {
+                                    onScrollToBottomAction.runDeprecated(e);
+                                }
+                            }
 						},
 
 						onRefresh : function() {

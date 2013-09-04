@@ -53,6 +53,8 @@ exp(localizationService,
     "parseDateTimeUTC", localizationService.parseDateTimeUTC,
     "startOf", localizationService.startOf,
     "toISOString", localizationService.toISOString,
+    "translateFromLocalizedDigits", localizationService.translateFromLocalizedDigits,
+    "translateToLocalizedDigits", localizationService.translateToLocalizedDigits,
     "WallTimeToUTC", localizationService.WallTimeToUTC,
     "UTCToWallTime", localizationService.UTCToWallTime
 );

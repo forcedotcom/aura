@@ -30,7 +30,7 @@
         var outputCmp = component.find("span");
         var elem = outputCmp ? outputCmp.getElement() : null;
         if (elem) {
-            elem.textContent = elem.innerText = displayValue;
+            elem.textContent = elem.innerText = $A.localizationService.translateToLocalizedDigits(displayValue);
         }
     }
 })

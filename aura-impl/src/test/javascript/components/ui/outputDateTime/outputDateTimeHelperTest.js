@@ -46,12 +46,20 @@ Test.Ui.OutputDateTime.HelperTest = function(){
 				find:function(component){
 					if(component=="span")return outputComponent;
 				}								
-			};														
+			};		
+			
+			var mockContext = Mocks.GetMock(Object.Global(), "$A", {                                
+				localizationService: {   
+					translateToLocalizedDigits: function(value) { return value; }	            	
+	            }
+	        });												
 			
 			var displayTime = "9/23/04 4:30 PM";
 
             // Act
-			targetHelper.displayDateTime(targetComponent, displayTime);
+            mockContext(function(){					
+				targetHelper.displayDateTime(targetComponent, displayTime);
+			});	
 
             // Assert
             Assert.Equal(displayTime, targetElement.textContent);

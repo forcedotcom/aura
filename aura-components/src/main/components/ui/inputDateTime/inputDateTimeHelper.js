@@ -42,7 +42,7 @@
         var outputCmp = component.find("inputText");
         var elem = outputCmp ? outputCmp.getElement() : null;
         if (elem) {
-            elem.value = displayValue;
+            elem.value = $A.localizationService.translateToLocalizedDigits(displayValue);
         }
     },
     
@@ -51,14 +51,15 @@
      *
      */
     doUpdate : function(component, value) {
-        var ret = value;
+        var v = $A.localizationService.translateFromLocalizedDigits(value);
+        var ret = v;
         if (value) {
             var format = component.get("v.format");
             if (!format) { // use default format
                 format = $A.getGlobalValueProviders().get("$Locale.datetimeformat");
             }
             var langLocale = component.get("v.langLocale");
-            var d = $A.localizationService.parseDateTimeUTC(value, format, langLocale);
+            var d = $A.localizationService.parseDateTimeUTC(v, format, langLocale);
             if (d) {
                 var timezone = component.get("v.timezone");
                 $A.localizationService.WallTimeToUTC(d, timezone, function(utcDate) {

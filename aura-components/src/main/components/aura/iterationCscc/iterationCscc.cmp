@@ -26,6 +26,7 @@
 <aura:attribute name="end" type="Integer" description="The index of the collection to stop at (exclusive)"/>
 <aura:attribute name="body" type="Aura.ComponentDefRef[]" required="true" description="Template to use when creating components for each iteration."/>
 <aura:attribute name="realbody" type="Aura.Component[]" description="Internal use only. Any value set will be ignored."/>
+<aura:attribute name="forceServer" type="Boolean" description="Force a server request for the body." default="false" />
 
 <aura:handler name="init" value="{!this}" action="{!c.firstRender}"/>
 <aura:handler name="change" value="{!v.items}" action="{!c.itemsChange}"/>

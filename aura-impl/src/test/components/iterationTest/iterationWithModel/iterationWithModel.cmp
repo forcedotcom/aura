@@ -28,7 +28,7 @@
     <ui:button aura:id="removeRow" label="Click here to remove item" press="{!c.removeRow}" />
     </div>
 
-    <aura:iterationCscc items="{!m.stringList}" var="item">
+    <aura:iterationCscc items="{!m.stringList}" var="item" forceServer="true">
         <p><iterationTest:iterationWithModelInnerCmp aura:id="innerCmp2" value="{!item}"/></p>
     </aura:iterationCscc>
 

@@ -151,7 +151,7 @@ MemoryStorageAdapter.prototype.evict = function(spaceNeeded) {
 		spaceReclaimed += value.getSize();
 		
 		if (this.debugLoggingEnabled) {
-			$A.log("MemoryStorageAdapter.evict(): evicted", [key, value, spaceReclaimed]);
+			$A.logInternal("MemoryStorageAdapter.evict(): evicted", [key, value, spaceReclaimed]);
 		}
 	}
 };

@@ -23,12 +23,12 @@
         <ui:block>
             <aura:set attribute="right">
                 <aura:renderif isTrue="{!v.closable}">
-                    <a href="javascript:void(0);" class="close" onclick="{!c.press}">&times;</a>
+                    <a href="javascript:void(0);" aura:id="closeMessageLink" class="close" onclick="{!c.press}">&times;</a>
                 </aura:renderif>
             </aura:set>
-            <aura:set attribute="left"><ui:image class="icon" alt="{!v.severity}"/></aura:set>
+            <aura:set attribute="left"><ui:image aura:id="messageIcon" class="icon" alt="{!v.severity}"/></aura:set>
             <aura:renderif isTrue="{!v.title &amp;&amp; v.title !=''}">
-                <h4>{!v.title}</h4>
+                <h4 aura:id="h4Title">{!v.title}</h4>
             </aura:renderif>
             <aura:renderif isTrue="{!v.body.length > 0}">
                 {!v.body}

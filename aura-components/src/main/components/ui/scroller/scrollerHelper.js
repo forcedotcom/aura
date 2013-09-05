@@ -61,20 +61,21 @@
 		switch (event.getParam("destination")) {
 		case "top" :
 			offset = component.find("pullDown").getElement();
-			scroller.scrollTo(0, 0 - offset.clientHeight, event.getParam("time"));
+			scroller.scrollTo(0, 0 - offset.offsetHeight, event.getParam("time"));
 			break;
 		case "bottom" :
 			offset = component.find("pullUp").getElement();
-			scroller.scrollTo(0, 0 - (scrollContent.clientHeight - scrollWrapper.clientHeight - offset.clientHeight), event.getParam("time"));
+			scroller.scrollTo(0, 0 - (scrollContent.offsetHeight - scrollWrapper.offsetHeight - offset.offsetHeight), event.getParam("time"));
 			break;
 		case "left" :
 			scroller.scrollTo(0, 0, event.getParam("time"));
 			break;
 		case "right" :	
-			scroller.scrollTo(0 - (scrollContent.clientWidth - scrollWrapper.clientWidth), 0, event.getParam("time"));
+			scroller.scrollTo(0 - (scrollContent.offsetHeight - scrollWrapper.offsetHeight), 0, event.getParam("time"));
 			break;
 		case "custom" :
-			scroller.scrollTo(event.getParam("xcoord"), event.getParam("ycoord"), event.getParam("time"));
+			offset = component.find("pullDown").getElement();
+			scroller.scrollTo(event.getParam("xcoord"), event.getParam("ycoord") - offset.offsetHeight, event.getParam("time"));
 		}
 	},
 	

@@ -18,7 +18,9 @@
 .THIS   {
  	position: relative;
 	background: #2e4153;
-	display: block;		
+	display: block;
+	backface-visibility:hidden;
+	-webkit-backface-visibility: hidden;		
  }
   
   

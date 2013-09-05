@@ -25,7 +25,6 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.test.WebDriverTestCase;
-import org.auraframework.test.WebDriverTestCase.ExcludeBrowsers;
 import org.auraframework.test.WebDriverUtil.BrowserType;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
@@ -41,7 +40,7 @@ import com.google.common.collect.Maps;
  * UI test for usage of Integration Service.
  * 
  */
-@ExcludeBrowsers({ BrowserType.IPAD, BrowserType.IPHONE })
+
 public class IntegrationServiceImplUITest extends WebDriverTestCase {
     public IntegrationServiceImplUITest(String name) {
         super(name);
@@ -65,6 +64,8 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
      * Verify using IntegrationService to inject a simple component with a Java model, Javascript Controller and Java
      * Controller.
      */
+    //Click is unsupported in these touch based platforms
+    @ExcludeBrowsers({ BrowserType.IPAD, BrowserType.IPHONE })
     public void testSimpleComponentWithModelAndController() throws Exception {
         DefDescriptor<ComponentDef> cmpToInject = setupSimpleComponentWithModelAndController();
         Map<String, Object> attributes = Maps.newHashMap();
@@ -120,6 +121,9 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
     /**
      * Verify use of integration service to inject a component and initialize various types of attributes.
      */
+    //Disabled in chrome because only this test fails with chromedriver 2.2 with a "unknown error: Maximum call stack size exceeded"
+    //exception. It works fine in firefox, IE9.
+    @ExcludeBrowsers(BrowserType.GOOGLECHROME)
     public void testAttributesInitialization() throws Exception {
         String attributeMarkup = "<aura:attribute name='strAttr' type='String'/>"
                 + "<aura:attribute name='booleanAttr' type='Boolean'/>"
@@ -174,6 +178,8 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
     /**
      * Verify use of integration service to inject a component and initialize events with javascript function handlers. 
      */
+    //Click is unsupported in these touch based platforms
+    @ExcludeBrowsers({ BrowserType.IPAD, BrowserType.IPHONE })
     public void testComponentWithRegisteredEvents()throws Exception{
         String bodyMarkup = "<aura:attribute name='attr' type='String' default='Oranges'/> "
                 +"<aura:registerevent name='press' type='ui:press'/>" +

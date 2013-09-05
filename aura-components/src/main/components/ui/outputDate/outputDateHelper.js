@@ -22,6 +22,7 @@
         if (value) {
             var d = $A.localizationService.parseDateTimeUTC(value, "YYYY-MM-DD", langLocale);
             if (d) {
+                d = $A.localizationService.translateToOtherCalendar(d);
                 var v = $A.localizationService.formatDateUTC(d, format, langLocale);
                 displayValue = v ? v : displayValue;
             }

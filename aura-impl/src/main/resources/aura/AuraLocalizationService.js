@@ -557,6 +557,22 @@ var AuraLocalizationService = function AuraLocalizationService() {
         },
         
         /**
+         * Translate the input date from other calendar system (for example, Buddhist calendar) to Gregorian calendar 
+         * based on the locale.
+         * @param {Date} date a Date Object.
+         * @return {Date} an updated Date object.
+         * @memberOf AuraLocalizationService
+         * @public
+         */
+        translateFromOtherCalendar : function(date) {
+            var userLocaleLang = $A.getGlobalValueProviders().get("$Locale.userLocaleLang");
+            if ('th' === userLocaleLang) { // Buddhist year
+                date.setFullYear(date.getFullYear() - 543);
+            }
+            return date;
+        },
+        
+        /**
          * Translate the input string to a string with localized digits (different from Arabic) if there is any.
          * @param {String} input a string with Arabic digits.
          * @return {String} a string with localized digits.
@@ -582,6 +598,21 @@ var AuraLocalizationService = function AuraLocalizationService() {
                 }
             }
             return charArray.join("");
+        },
+        
+        /**
+         * Translate the input date to a date in other calendar system, for example, Buddhist calendar based on the locale.
+         * @param {Date} date a Date Object.
+         * @return {Date} an updated Date object.
+         * @memberOf AuraLocalizationService
+         * @public
+         */
+        translateToOtherCalendar : function(date) {
+            var userLocaleLang = $A.getGlobalValueProviders().get("$Locale.userLocaleLang");
+            if ('th' === userLocaleLang) { // Buddhist year
+                date.setFullYear(date.getFullYear() + 543);
+            }
+            return date;
         },
         
         /**

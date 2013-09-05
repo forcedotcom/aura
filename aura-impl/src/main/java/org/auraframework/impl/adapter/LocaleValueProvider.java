@@ -15,10 +15,8 @@
  */
 package org.auraframework.impl.adapter;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Locale;
-import java.util.Map;
+import java.text.*;
+import java.util.*;
 
 import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;

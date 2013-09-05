@@ -23,6 +23,7 @@
                 var format = component.get("v.format");
                 var langLocale = component.get("v.langLocale");
                 try {
+                    d = $A.localizationService.translateToOtherCalendar(d);
                     displayValue = $A.localizationService.formatDateUTC(d, format, langLocale);
                 } catch (e) {
                     displayValue = e.message;
@@ -61,6 +62,7 @@
             var langLocale = component.get("v.langLocale");
             var d = $A.localizationService.parseDateTimeUTC(v, format, langLocale);
             if (d) {
+                d = $A.localizationService.translateFromOtherCalendar(d);
                 ret = $A.localizationService.formatDateUTC(d, "YYYY-MM-DD");
             }
         }

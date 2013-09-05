@@ -87,7 +87,7 @@ Action.prototype.getNextGlobalId = function() {
  * </p>
  * 
  * @public
- * @returns {ActionDef}
+ * @returns {ActionDef} The action definition, including its name, origin, and descriptor.
  */
 Action.prototype.getDef = function() {
 	return this.def;
@@ -121,14 +121,12 @@ Action.prototype.completeGroups = function() {
 };
 
 /**
- * Sets parameters for the Action. Maps keys to <code>config</code>.
- * <p>
- * For example, <code>serverAction.setParams({ "record": id });</code> sets a parameter on <code>serverAction</code>.
- * </p>
+ * Sets parameters for the Action.
  * 
  * @public
  * @param {Object}
- *            config The parameters for the Action.
+ *            config The key/value pairs that specify the Action.
+ *             For example, <code>serverAction.setParams({ "record": id });</code> sets a parameter on <code>serverAction</code>.
  */
 Action.prototype.setParams = function(config) {
 	var paramDefs = this.paramDefs;
@@ -138,12 +136,12 @@ Action.prototype.setParams = function(config) {
 };
 
 /**
- * Gets an Action parameter.
+ * Gets an Action parameter. 
  * 
  * @public
  * @param {String}
  *            name The name of the Action parameter.
- * @returns {Array}
+ * @returns {Array} For example, <code>event.getParam("button")</code> returns the value of the pressed mouse button.
  */
 Action.prototype.getParam = function(name) {
 	return this.params[name];
@@ -153,7 +151,7 @@ Action.prototype.getParam = function(name) {
  * Gets the collection of parameters for this Action.
  * 
  * @public
- * @returns {Object}
+ * @returns {Object} The key/value pairs that specify the Action.
  */
 Action.prototype.getParams = function() {
 	return this.params;
@@ -633,7 +631,7 @@ Action.prototype.isChained = function() {
 };
 
 /**
- * Returns the key/value pair of the Action id, descriptor, and parameters in JSON format.
+ * Returns the key/value pairs of the Action id, descriptor, and parameters in JSON format.
  * 
  * @public
  */

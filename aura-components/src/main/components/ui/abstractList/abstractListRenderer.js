@@ -26,7 +26,7 @@
 	},
 	rerender : function(component, helper){
 		this.superRerender();
-		var items = component.getValue('v.items');
+		var items = component.getConcreteComponent().getValue('v.items');
 		if (items.isDirty()) {
 			helper.updateEmptyListContent(component);
 		}

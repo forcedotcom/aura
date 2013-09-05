@@ -110,11 +110,12 @@
         </ui:scroller>
     </div>
        
-    <ui:button label="ScrollToTop" press="{!c.scrollToTop}" />
-    <ui:button label="ScrollToBottom" press="{!c.scrollToBottom}" />
-    <ui:button label="ScrollRelative" press="{!c.scrollDown}" />
+    <ui:button aura:id="toTopButton" label="ScrollToTop" press="{!c.scrollToTop}" />
+    <ui:button aura:id="toBotButton" label="ScrollToBottom" press="{!c.scrollToBottom}" />
+    <ui:button aura:id="toStepButton" label="ScrollRelative" press="{!c.scrollDown}" />
+    <ui:button aura:id="toStepUpButton" label="ScrollRelative" press="{!c.scrollUp}" />
     <div class="test">
-    	
+        
         <ui:scroller aura:id="scrollToYTest" onPullToRefresh="{!c.replaceBodyContent}" onPullToShowMore="{!c.replaceBodyContent}">
             I let it fall, my heart
             And as it fell, you rose to claim it
@@ -145,5 +146,4 @@
             <ui:button label="ScrollToTop" press="{!c.scrollToTop}"/>
         </ui:scroller>
     </div>
-
 </aura:component>

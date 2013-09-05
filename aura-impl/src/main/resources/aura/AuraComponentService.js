@@ -186,7 +186,7 @@ var AuraComponentService = function(){
          * @public
          * @memberOf AuraComponentService
          */
-        newComponentAsync: function(callbackScope, callback, config, attributeValueProvider, localCreation, doForce){
+        newComponentAsync: function(callbackScope, callback, config, attributeValueProvider, localCreation, doForce, forceServer){
             $A.assert(config, "config is required in ComponentService.newComponentAsync(config)");
             $A.assert($A.util.isFunction(callback),"newComponentAsync requires a function as the callback parameter");
 
@@ -206,7 +206,7 @@ var AuraComponentService = function(){
                 "descriptor": desc
             };
 
-            if ( !def || (def && def.hasRemoteDependencies()) ) {
+            if ( !def || (def && def.hasRemoteDependencies()) || forceServer ) {
                 that.requestComponent(callbackScope, callback, config, attributeValueProvider);
             } else {
                 var newComp = that.newComponentDeprecated(config, attributeValueProvider, localCreation, doForce);

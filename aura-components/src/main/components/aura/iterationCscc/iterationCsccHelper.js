@@ -67,6 +67,7 @@
         }
         var ivp;
         var len = body.getLength();
+        var forceServer = cmp.get("forceServer");
         //
         // Take off our index, but add the number of components that we will create.
         //
@@ -77,7 +78,7 @@
                 ivp = $A.expressionService.createPassthroughValue(extraProviders, cdr.valueProvider || atts.getValueProvider());
             }
             ret[j] = null;
-            $A.componentService.newComponentAsync(this, this.createAddComponentCallback(indexCollector, j), cdr, ivp);
+            $A.componentService.newComponentAsync(this, this.createAddComponentCallback(indexCollector, j), cdr, ivp, false, false, forceServer);
         }
         return len;
     },

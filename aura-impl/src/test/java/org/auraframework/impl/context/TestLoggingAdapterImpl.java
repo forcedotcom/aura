@@ -87,6 +87,15 @@ public class TestLoggingAdapterImpl extends LoggingAdapterImpl implements TestLo
             if (isCapturing) {
                 logs.add(Maps.newHashMap(valueMap));
             }
+            else {
+            	//TO REMOVE : add this for loop trying to catch 302 missing (W-1818497), this slow the logging process down, remember to remove it later
+            	for (Map.Entry<String, Object> entry : valueMap.entrySet()) {
+            		if(entry.getKey().contains("httpStatus") && entry.getValue().toString().contains("302") ) {
+            			System.out.println("There is a 302 response but isCapturing is false."
+            					+entry.getKey()+":"+entry.getValue().toString());
+            		}
+            	}
+            }
             super.log(valueMap);//keep logging-adapter informed
         }
 

@@ -110,26 +110,40 @@ var priv = {
         priv.cleanComponent(cmp.getGlobalId());
     },
 
-    insertElements : function(elements, refNode, afterRefNode) {
+    /**
+     * Insert elements to the DOM, relative to a reference node,
+     * by default as its last child.
+     *
+     * @private
+     */
+    insertElements : function(elements, refNode, asSibbling, asFirst) {
         if (refNode) {
             var len = elements.length;
-            var toAppend = [];
+            var toInsert = [];
             for (var i = 0; i < len; i++) {
                 var element = elements[i];
                 if (refNode) {
                     if (element["tagName"] && element["tagName"] == "SCRIPT") {
                         aura.util.style.getHead().appendChild(element);
                     } else {
-                        toAppend.push(element);
+                        toInsert.push(element);
                     }
                 }
             }
 
-            if (toAppend.length > 0) {
-                if (afterRefNode) {
-                    $A.util.insertAfter(toAppend, refNode);
+            if (toInsert.length > 0) {
+                if (asSibbling) {
+                    if (asFirst) {
+                        $A.util.insertBefore(toInsert, refNode);
+                    } else {
+                        $A.util.insertAfter(toInsert, refNode);
+                    }
                 } else {
-                    $A.util.appendChild(toAppend, refNode);
+                    if (asFirst) {
+                        $A.util.insertFirst(refNode, toInsert); // Different arglist
+                    } else {
+                        $A.util.appendChild(toInsert, refNode); // Default
+                    }
                 }
             }
         }

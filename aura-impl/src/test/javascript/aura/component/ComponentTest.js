@@ -26,6 +26,229 @@ Test.Aura.Component.ComponentTest=function(){
         });
     });
     
+    [Fixture]
+    function DeIndex() {
+    	//this cover when component is invalid
+    	[Fact]
+    	function ReturnsNullForInvalidComponent() {
+    		//Arrange
+            var target = null;
+            var mockPriv = Mocks.GetMock(Object.Global(), "ComponentPriv" , function(){});
+            mockPriv(function(){
+                target = new Component();
+                target.isValid = function() {return false};
+            });
+            //Act
+            var actual = target.deIndex(null,null);
+            //Assert
+            Assert.Null(actual);
+    	}
+    	
+    	//this cover when delegateValueProvider is not null
+        [Fact]
+        function ReturnsNullFromDelegateValueProvider() {
+            //Arrange
+        	var target = null;
+            var localid = "testLocalId";
+            var globalid = "testGlobalId";
+            var expected = "returnFromDelegateValueProvider";
+            var actual = null;
+            var mockPriv = Mocks.GetMocks(Object.Global(), {
+                "ComponentPriv" : function(){}
+            });
+            var targetValueProvider={
+                deIndex:function(lid,gid){
+                    if((lid==localid)&&(gid==globalid)) return "returnFromDelegateValueProvider";
+                }
+            };
+            mockPriv(function(){
+                target = new Component();
+                target.isValid = function(){return true};
+                target.priv.delegateValueProvider = targetValueProvider;
+            });
+            //Act
+            mockPriv(function(){ 
+                actual = target.deIndex(localid,globalid);
+            });
+            //Assert
+            Assert.Equal(expected, actual);
+        }
+        
+        //this cover when priv.index does not exist
+        [Fact]
+        function ReturnsNullForNullIndex() {
+            //Arrange
+            var target = null;
+            var actual=null;
+            var localid = "testLocalId";
+            var globalid = "testGlobalId";
+            var mockPriv = Mocks.GetMock(Object.Global(), "ComponentPriv" , function(){});
+            mockPriv(function(){
+                target = new Component();
+                target.isValid = function(){return true};
+                target.priv.index = null;
+            });
+            //Act
+            actual = target.deIndex(localid,globalid);
+            //Assert
+            Assert.Null(actual);
+        }
+        
+        //this cover when passing in globalid, and priv.index[localid]=globalid, note index[localid] here is not an array
+        [Fact]
+        function RemoveLocalidFromIndexWhenPassingInGlobalid() {
+            //Arrange
+            var localid = "testLocalId";
+            var globalid = "testGlobalId";
+            var target = null;
+            var actual=null;
+            var mockPriv = Mocks.GetMocks(Object.Global(), {
+                "$A" : {
+                    util : {
+                        isArray : function() {return false;}
+                    }
+                },
+                "ComponentPriv" : function(){}
+            });
+            mockPriv(function(){
+                target = new Component();
+                target.isValid = function(){return true};
+                target.priv.index = [];
+                target.priv.index[localid] = globalid;
+            });
+            //Act
+            mockPriv(function(){ 
+                target.deIndex(localid,globalid);
+                actual = target.priv.index[localid];
+            });
+            //Assert
+            Assert.Undefined(actual);
+        }
+        
+        //This cover when remove only item index[localid] has
+        [Fact]
+    	function RemoveLocalidArrWhenPassingOnlyItemItHas() {
+    		//Arrange
+            var localid = "testLocalId";
+            var globalid = "testGlobalId";
+            var target = null;
+            var actual=null;
+            var mockPriv = Mocks.GetMocks(Object.Global(), {
+                "$A" : {
+                    util : {
+                        isArray : function() {return true;}
+                    }
+                },
+                "ComponentPriv" : function(){}
+            });
+            mockPriv(function(){
+                target = new Component();
+                target.isValid = function(){return true};
+                target.priv.index = [];
+                target.priv.index[localid] = [globalid];
+            });
+            //Act
+            mockPriv(function(){ 
+                target.deIndex(localid,globalid);
+                actual = target.priv.index[localid];
+            });
+            //Assert
+            Assert.Undefined(actual);
+    	}
+        
+        //this cover basic index array with only two global ids, we remove one of them
+        [Fact]
+        function ReturnsLocalidArrWithGblobalidPassingInSimple() {
+            //Arrange
+            var localid = "testLocalId";
+            var globalid1 = "testGlobalId1";
+            var globalid2 = "testGlobalId2";
+            var target = null;
+            var actual= null;
+            var expected= [globalid2];
+            var mockPriv = Mocks.GetMocks(Object.Global(), {
+                "$A" : {
+                    util : {
+                        isArray : function() {return true;}
+                    }
+                },
+                "ComponentPriv" : function(){}
+            });
+            mockPriv(function(){
+                target = new Component();
+                target.isValid = function(){return true};
+                target.priv.index = [];
+                target.priv.index[localid] = [globalid1,globalid2];
+            });
+            //Act
+            mockPriv(function(){ 
+                target.deIndex(localid,globalid1);
+                actual = target.priv.index[localid];
+            });
+            //Assert
+            Assert.Equal(expected, actual);
+        }
+        
+        
+        //this cover complex situation when there are duplications in index array. should we have duplications in index anyway?
+        [Fact,Skip("not sure if we should have duplication in component.index[]:W-1831607")]
+        function ReturnsLocalidArrWithGblobalidPassingInComplex() {
+            //Arrange
+            var localid = "testLocalId";
+            var globalid1 = "testGlobalId1";
+            var globalid2 = "testGlobalId2";
+            var target = null;
+            var actual = null;
+            var expected=[globalid1,globalid2,globalid1];
+            var mockPriv = Mocks.GetMocks(Object.Global(), {
+                "$A" : {
+                    util : {
+                        isArray : function() {return true;}
+                    }
+                },
+                "ComponentPriv" : function(){}
+            });
+            mockPriv(function(){
+                target = new Component();
+                target.isValid = function(){return true};
+                target.priv.index = [];
+                target.priv.index[localid] = [globalid1,globalid1,globalid2,globalid1,globalid1];
+            });
+            //Act
+            mockPriv(function(){ 
+                target.deIndex(localid,globalid1);
+                actual = target.priv.index[localid];
+            });
+            //Assert
+            Assert.Equal(expected, actual);
+        }
+        
+        //this cover when NOT passing in globalid, priv.index exist, what priv.index[localid] has doesn't matter
+        [Fact]
+        function RemoveLocalidFromIndexWhenNotPassingInGlobalid() {
+            //Arrange
+            var localid = "testLocalId";
+            var target = null;
+            var actual=null;
+            var expected=null;
+            var mockPriv = Mocks.GetMocks(Object.Global(), {
+                "ComponentPriv" : function(){}
+            });
+            mockPriv(function(){
+                target = new Component();
+                target.isValid = function(){return true};
+                target.priv.index = [];
+                target.priv.index[localid] = "something";
+            });
+            //Act
+            mockPriv(function(){ 
+                target.deIndex(localid);
+                actual = target.priv.index[localid];
+            });
+            //Assert
+            Assert.Undefined(actual);
+        }
+    }
    
     [Fixture]
     function Index() {

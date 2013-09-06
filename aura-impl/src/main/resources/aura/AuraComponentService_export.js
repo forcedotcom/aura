@@ -25,5 +25,6 @@ exp(componentService,
     "getRegisteredComponentDescriptors", componentService.getRegisteredComponentDescriptors,
     "getIndex", componentService.getIndex,
     "priv", componentService.priv,
-    "renderedBy", componentService.renderedBy
+    "renderedBy", componentService.renderedBy,
+    "computeValue", componentService.computeValue
 );

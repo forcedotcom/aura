@@ -227,33 +227,20 @@ var AuraComponentService = function(){
                     (config["attributes"]["values"] ? config["attributes"]["values"] : config["attributes"])
                     : null;
             var atts = {};
-            var key;
-
-            var compServ = $A.services.component;
 
             //
             // Note to self, these attributes are _not_ Aura Values. They are instead either
             // a literal string or a (generic object) map.
             //
-            for (key in attributes) {
+            for (var key in attributes) {
                 var value = attributes[key];
                 if (value.hasOwnProperty("value")) {
                     value = value["value"];
                 }
                 // no def or component here, because we don't have one.
                 var auraValue = valueFactory.create(value);
-                if(!auraValue.isExpression()){
-                    atts[key] = auraValue.unwrap();
-                } else {
-                    var resolved = $A.expressionService.get(avp, auraValue);
-                    if (resolved) {
-                        // If we got a value, use that.
-                        atts[key] = resolved;
-                    } else {
-                        // try to give the server a version it can use.
-                        atts[key] = auraValue.getValue();
-                    }
-                }
+                    atts[key] = this.computeValue(auraValue, avp);
+
             }
 
             action.setCallback(this, function(a){
@@ -268,8 +255,7 @@ var AuraComponentService = function(){
                         merging = merging["values"];
                     }
                     for (var mkey in attributes) {
-                        var value = attributes[mkey];
-                        merging[mkey] = value;
+                        merging[mkey] = attributes[mkey];
                     }
                     returnedConfig["localId"] = config["localId"];
 
@@ -293,6 +279,36 @@ var AuraComponentService = function(){
                 "attributes" : atts
             });
             $A.enqueueAction(action);
+        },
+
+        /**
+         * Evaluates value object into their literal values. Typically used to pass configs to server.
+         * Iterates through MapValue. Recursion for nested value objects.
+         *
+         * @param valueObj Value Object
+         * @param valueProvider value provider
+         * @returns {*}
+         */
+        computeValue: function(valueObj, valueProvider, raw) {
+            // in case not value object, return
+            if (!$A.util.isValue(valueObj)) {
+                return valueObj;
+            }
+
+            if ($A.util.instanceOf(valueObj, MapValue)) {
+                var ret = {};
+                valueObj.each(function(k,v){
+                    ret[k] = $A.componentService.computeValue(v, valueProvider);
+                });
+                return ret;
+            } else {
+                if (!valueObj.isExpression()) {
+                    return valueObj.unwrap();
+                } else {
+                    var val = $A.expressionService.get(valueProvider, valueObj);
+                    return raw ? val : val || valueObj.getValue();
+                }
+            }
         },
 
         /**

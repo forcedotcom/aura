@@ -81,6 +81,34 @@
         //Test Code, the line below will work fine since it is not specifiying any attributes.
         //helper.createComponentAndPushToBody(cmp, "markup://loadLevelTest:displayNumber");
     },
+
+    /**
+     * Test server dependent client created component with attributes containing PropertyReferenceValue in MapValue
+     */
+    createCmpWithMapValuePropRefValueFromServer : function(cmp, evt,helper){
+        var path = [];
+        path.push('v');
+        path.push('stringAttribute');
+        var expr = $A.expressionService.create(null, {"exprType": "PROPERTY", "path": path});
+
+        var config = {
+            componentDef:"markup://loadLevelTest:displayMap",
+            attributes:{
+                values:{
+                    map: {
+                        map2: {
+                            propRef: expr
+                        },
+                        propRef: expr
+                    }
+                }
+            },
+            localId:"map_Id"
+        };
+
+        helper.createComponentAndPushToBody(cmp, config, cmp);
+    },
+
     /**
      * Create a new component whose definition was already preloaded and
      * use blank object as value provider.

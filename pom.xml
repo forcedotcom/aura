@@ -40,7 +40,7 @@
         <skipUnitTests>false</skipUnitTests>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <createChecksum>true</createChecksum>
-        <selenium.version>2.33.0</selenium.version>
+        <selenium.version>2.35.0</selenium.version>
     </properties>
     <repositories>      
         <repository>

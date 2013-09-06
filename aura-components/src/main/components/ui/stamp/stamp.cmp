@@ -17,5 +17,7 @@
 -->
 <aura:component extensible="true" implements="ui:visible" support="beta" description="A decorated stamp containing text">
     <aura:attribute name="severity" type="String" description="The severity with which to decorate this stamp.  Accepted values: success, warning, important, info, inverse"/>
-    <span class="{!'stamp-'+v.severity+' '+v.class}">{!v.body}</span>
+    <aura:attribute name="title" type="String" description="The title text for the stamp."/>
+    <aura:attribute name="onclick" type="Aura.Action" description="The controller method that runs when the stamp is clicked."/>
+    <span class="{!'stamp-'+v.severity+' '+v.class}" title="{!v.title}" onclick="{!v.onclick}">{!v.body}</span>
 </aura:component>

@@ -23,6 +23,6 @@
 	<aura:attribute name="implementation" type="String"/>
     <aura:handler event="auraStorage:modified" action="{!c.update}"/>
     <aura:renderif isTrue="{!v.enabled}">
-    	<ui:stamp aura:id="stamp" severity="success">{!v.value} K ({!v.storageName}:{!v.implementation})</ui:stamp>
+    	<ui:stamp aura:id="stamp" severity="success" onclick="{!c.showStats}">{!v.value} K</ui:stamp>
    	</aura:renderif>
 </aura:component>

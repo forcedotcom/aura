@@ -16,5 +16,10 @@
 {
     update : function(cmp, event, helper){
     	helper.update(cmp);
+    },
+    
+    showStats : function(cmp, event, helper){
+    	var attributes = cmp.getAttributes();
+    	alert("Storage name: " + attributes.get("storageName") + "\nImplementation: " + attributes.get("implementation"));
     }
 }

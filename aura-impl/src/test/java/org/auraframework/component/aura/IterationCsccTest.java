@@ -57,8 +57,7 @@ public class IterationCsccTest extends AuraImplTestCase {
             getIterationComponent(source, null);
             fail("Expected MissingRequiredAttributeException");
         } catch (Exception e) {
-            checkExceptionFull(e, MissingRequiredAttributeException.class,
-                    "COMPONENT markup://string:thing1 is missing required attribute 'items'");
+            checkExceptionContains(e, MissingRequiredAttributeException.class, "is missing required attribute 'items'");
         }
     }
 
@@ -86,8 +85,8 @@ public class IterationCsccTest extends AuraImplTestCase {
             getIterationComponent(source, attributes);
             fail("Expected MissingRequiredAttributeException");
         } catch (Exception e) {
-            checkExceptionFull(e, MissingRequiredAttributeException.class,
-                    "COMPONENT markup://string:thing1 is missing required attribute 'var'");
+            checkExceptionContains(e, MissingRequiredAttributeException.class,
+                    "is missing required attribute 'var'");
         }
     }
 
@@ -134,10 +133,7 @@ public class IterationCsccTest extends AuraImplTestCase {
             getRenderedBaseComponent(iteration);
             fail("Expected a AuraExecutionException");
         } catch (Exception e) {
-            checkExceptionFull(
-                    e,
-                    AuraExecutionException.class,
-                    "org.auraframework.components.aura.ProvidedBodyRenderer: org.auraframework.throwable.AuraExecutionException: org.auraframework.renderer.ExpressionRenderer: org.auraframework.throwable.AuraRuntimeException: no such property: other");
+            checkExceptionContains(e, AuraExecutionException.class, "no such property: other");
         }
     }
 
@@ -184,10 +180,7 @@ public class IterationCsccTest extends AuraImplTestCase {
             getRenderedBaseComponent(iteration);
             fail("Expected a AuraExecutionException");
         } catch (Exception e) {
-            checkExceptionFull(
-                    e,
-                    AuraExecutionException.class,
-                    "org.auraframework.components.aura.ProvidedBodyRenderer: org.auraframework.throwable.AuraExecutionException: org.auraframework.renderer.ExpressionRenderer: org.auraframework.throwable.AuraRuntimeException: no such property: other");
+            checkExceptionContains(e, AuraExecutionException.class, "no such property: other");
         }
     }
 

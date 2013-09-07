@@ -208,6 +208,43 @@ public abstract class AuraTestCase extends UnitTestCase {
         assertTrue("Unexpected message: " + e.getMessage() + "!=" + message, e.getMessage().startsWith(message));
     }
 
+    /**
+     * Check to ensure that an exception message contains a string and has the correct location.
+     * 
+     * @param e the exception to check.
+     * @param clazz a class to match if it is not null.
+     * @param message The String which is contained in the Exception message.
+     * @param filename a 'file name' to match the location.
+     */
+    protected void checkExceptionContains(Throwable e, Class<?> clazz, String message, String filename) {
+        checkExceptionContains(e, clazz, message);
+        assertLocation(e, filename);
+    }
+
+    /**
+     * Check the exception exactly message contains a string and check the location of an Exception using the Source of
+     * the file in error. Use this method when the location is a full filesystem path to the file (instead of just a
+     * qualified name).
+     * 
+     * Depending on whether we are reading form jars or source, the location in the exception is different. When reading
+     * from source we need to strip the "file:" prefix. When reading from jars we leave the "jar:file:" prefix.
+     */
+    protected void checkExceptionContains(Throwable e, Class<?> clazz, String message, Source<?> src) {
+        checkExceptionContains(e, clazz, message);
+        assertLocation(e, src);
+    }
+
+    /**
+     * Check that an exception message contains a string, ignore location.
+     */
+    protected void checkExceptionContains(Throwable e, Class<?> clazz, String message) {
+        if (clazz != null) {
+            assertEquals("Exception must be " + clazz.getSimpleName(), clazz, e.getClass());
+        }
+        assertTrue("Expected exception message to contain <" + message + ">, but was <" + e.getMessage() + " >", e
+                .getMessage().contains(message));
+    }
+
     protected AuraTestingUtil getAuraTestingUtil() {
         if (auraTestingUtil == null) {
             auraTestingUtil = new AuraTestingUtil();

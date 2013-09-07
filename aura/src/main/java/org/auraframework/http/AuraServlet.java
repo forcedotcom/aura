@@ -137,7 +137,7 @@ public class AuraServlet extends AuraBaseServlet {
      */
     private boolean handleNoCacheRedirect(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        //
+    	//
         // FIXME:!!!
         // This is part of the appcache refresh, forcing a reload while
         // avoiding the appcache. It is here because (fill in the blank).
@@ -146,12 +146,16 @@ public class AuraServlet extends AuraBaseServlet {
         // before we do any checks at all.
         //
         String nocache = nocacheParam.get(request);
-        if (nocache == null || nocache.isEmpty()) { return false; }
+        if (nocache == null || nocache.isEmpty()) { 
+        	System.out.println("AuraServlet.handleNoCacheRedirect, nocache is null or empty, return false for request:"
+        			+request.toString()); 
+        	return false; 
+        }
         response.setContentType("text/plain");
         response.setStatus(HttpServletResponse.SC_MOVED_TEMPORARILY);
-
         String newLocation = "/";
-
+        System.out.println("AuraServlet.handleNoCacheRedirect,set response with 302, request:"
+        +request.toString());
         try {
             final URI uri = new URI(nocache);
             final String fragment = uri.getFragment();
@@ -189,7 +193,6 @@ public class AuraServlet extends AuraBaseServlet {
         AuraContext context;
         String tagName;
         DefType defType;
-
         response.setCharacterEncoding(UTF_ENCODING);
         try {
             context = Aura.getContextService().getCurrentContext();
@@ -211,7 +214,6 @@ public class AuraServlet extends AuraBaseServlet {
             // Make sure we get the fw uid into the context.
             //
             context.setFrameworkUID(Aura.getConfigAdapter().getAuraFrameworkNonce());
-
             tagName = tag.get(request);
             defType = defTypeParam.get(request, DefType.COMPONENT);
 

@@ -89,7 +89,6 @@ public class AuraContextFilter implements Filter {
             loggingService.setValue(LoggingService.REQUEST_METHOD, request.getMethod());
             loggingService.setValue(LoggingService.AURA_REQUEST_URI, request.getRequestURI());
             loggingService.setValue(LoggingService.AURA_REQUEST_QUERY, request.getQueryString());
-
             chain.doFilter(req, res);
         } catch (InvalidParamException e) {
             HttpServletResponse response = (HttpServletResponse) res;
@@ -98,7 +97,6 @@ public class AuraContextFilter implements Filter {
             out.append(e.getMessage());
             return;
         } finally {
-
             try {
                 if (loggingService != null) {
                     try {
@@ -108,6 +106,13 @@ public class AuraContextFilter implements Filter {
                         // ignore.
                     }
                     loggingService.doLog(); // flush out logging values
+                }
+                else {
+                	HttpServletRequest request = (HttpServletRequest) req;
+                	HttpServletResponse response = (HttpServletResponse) res;
+                	System.out.println("loggingService is null when we try to log request:"
+                			+request.getMethod()+request.getRequestURI()+request.getQueryString()
+                			+" and response:"+response.getStatus());
                 }
             } finally {
                 endContext();

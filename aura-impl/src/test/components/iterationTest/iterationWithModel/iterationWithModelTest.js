@@ -21,7 +21,6 @@
     /**
      * Verify adding rows to an iteration does not lose the model data.
      */
-    // using iteration to create cmp with data from model loses aura:id
     //TODO - W-1818696 - this only fails on jenkins autointegration.  Figure out why
     _testAddNewRowsWithModelData: {
         test: function(cmp) {
@@ -69,6 +68,32 @@
                 cmps = cmp.find("innerCmp");
                 $A.test.assertStartsWith("two : readonly", $A.util.getText(cmps[0].getElement()));
                 $A.test.assertStartsWith("three : readonly", $A.util.getText(cmps[1].getElement()));
+            });
+        }
+    },
+
+    /**
+     * Verify that we load the components inside the iteration the expected number of times. Once during the initial
+     * load and once per inner component for a change to the iteration items.
+     * 
+     * Note that if the cmp or initial list to iterate over is changed this test may need to be changed accordingly.
+     */
+    //TODO - W-1818696 - this only fails on jenkins autointegration.  Figure out why
+    _testRenderCount : {
+        test : function(cmp) {
+            var renderCount = window.__testRenderCount;
+            // 6 total renders, 3 for each iteration
+            $A.test.assertEquals(6, renderCount, "Each inner component should be rendered once on load.");
+
+            $A.run(function(){
+                cmp.get("addRow").get("e.press").fire();
+            });
+            $A.test.addWaitFor(4, function() {
+                return cmp.find("innerCmp").length;
+            }, function() {
+                var renderCount = window.__testRenderCount;
+                // 14 total renders, 6 for initial load, 4 additional for each iteration
+                $A.test.assertEquals(14, renderCount, "Unexpected number of total items loaded after adding to list.");
             });
         }
     },

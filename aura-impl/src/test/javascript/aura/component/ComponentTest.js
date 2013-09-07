@@ -199,7 +199,7 @@ Test.Aura.Component.ComponentTest=function(){
             var globalid2 = "testGlobalId2";
             var target = null;
             var actual = null;
-            var expected=[globalid1,globalid2,globalid1];
+            var expected=[globalid2];
             var mockPriv = Mocks.GetMocks(Object.Global(), {
                 "$A" : {
                     util : {

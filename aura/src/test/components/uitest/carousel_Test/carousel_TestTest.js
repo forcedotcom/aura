@@ -114,6 +114,10 @@
  		    var pages = this.getPagesOnCarousel(carousel);
             $A.test.assertEquals(1, pages.length, "Should only see one page");
             this.assertPageSelected(pages[0], true, 1);
+            
+            // verify tab indicators do not display
+            var indicatorItems = cmp.find("carousel2").find("navContainer").get("v.body")[0].find("indicatorItems");
+            $A.test.assertNull(indicatorItems.getElement(), "Should be zero tab indicators displayed");
         }
     },
     

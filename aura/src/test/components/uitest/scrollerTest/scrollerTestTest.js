@@ -15,7 +15,7 @@
  */
 ({
     testBasic: {
-	browsers: ["-IE7","-IE8"],
+    browsers: ["-IE7","-IE8"],
         test: function(component) {
             // Add content to rubberbandingBecauseMissingRefresh to trigger
             // rubber banding
@@ -34,7 +34,7 @@
     },
 
     testDynamicImages : {
-	browsers: ["-IE7","-IE8"],
+    browsers: ["-IE7","-IE8"],
         test: [function(component) {
             // Update an image tag in the scrolled content to insure that this
             // does not cause a problem
@@ -63,7 +63,7 @@
     },
 
     testPullToRefreshDiv: {
-	browsers: ["-IE7","-IE8"],
+    browsers: ["-IE7","-IE8"],
         test: function(component) {
             // Make sure the "pull to refresh" div exists at the top of the scroll contents
             var pullDownDiv = $A.test.getElementByClass("pullToRefresh");
@@ -72,6 +72,7 @@
             $A.test.assertTrue(scroller._scroller.options.topOffset > 0, "Scroller should have a top offset");
         }
     },
+
     testScrollToBot : {
 	browsers: ["-IE7","-IE8"],
 	  test: function(component) {
@@ -83,7 +84,7 @@
 	      $A.test.assertEquals( this.getScrollerPos(component.find("scrollToYTest"), "bot"), scrlr.y,  "The scroller did not end in the correct location");
 	    
 	  }
-  },
+  	},
   
   testScrollToTop : {
       browsers: ["-IE7","-IE8"],
@@ -144,12 +145,24 @@
 	    offset = component.find("pullUp").getElement();
 	    return (0 - (scrollContent.clientHeight - scrollWrapper.clientHeight - offset.clientHeight));
   },
+    
+    testOnScrollToBottomTakeAction: {
+    browsers: ["-IE7","-IE8"],
+        test: function(component) {
+            $A.test.select(".scrollToBottomButton")[0].click();
+            $A.test.addWaitFor("What", 
+                    function () {
+                        return $A.test.select(".updateAfterScroll")[0].innerText;
+                    });
+        }
+    },    
+    
     getErrorMsgs : function(errorsArray) {
-    	var errMsgs = "";
+        var errMsgs = "";
         if (errorsArray) {
-        	for (var i=0; i<errorsArray.length; i++) {
-        		errMsgs+="ERROR["+i+"]"+errorsArray[i]+"\n";
-        	}
+            for (var i=0; i<errorsArray.length; i++) {
+                errMsgs+="ERROR["+i+"]"+errorsArray[i]+"\n";
+            }
         }
         return errMsgs;
     }

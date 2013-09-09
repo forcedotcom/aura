@@ -633,7 +633,8 @@
                                         </fileset>
                                     </path>
                                     <pathconvert property="definitionList" refid="definitions" pathsep=",">
-                                        <regexpmapper from=".*/([^/]*)/[^/]*/(.*)" to="\1:\2" />
+                                        <!-- Allow either slashes (Windows actually uses both) -->
+                                        <regexpmapper from=".*[/\\]([^/\\]*)[/\\][^/\\]*[/\\](.*)" to="\1:\2" />
                                     </pathconvert>
                                     <echo file="target/src-gen/test/components/.index">${definitionList}</echo>
                                 </target>
@@ -659,7 +660,8 @@
                                         </fileset>
                                     </path>
                                     <pathconvert property="definitionList" refid="definitions" pathsep=",">
-                                        <regexpmapper from=".*/([^/]*)/[^/]*/(.*)" to="\1:\2" />
+                                        <!-- Allow either slashes (Windows actually uses both) -->
+                                        <regexpmapper from=".*[/\\]([^/\\]*)[/\\][^/\\]*[/\\](.*)" to="\1:\2" />
                                     </pathconvert>
                                     <echo file="target/src-gen/main/components/.index">${definitionList}</echo>
                                 </target>

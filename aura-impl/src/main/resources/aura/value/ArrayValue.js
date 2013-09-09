@@ -580,6 +580,11 @@ ArrayValue.prototype.unrender = function(){
 };
 
 /**
+ * Rerender the elements in the array.
+ *
+ * This function tries to maintain pointers to various positions in the array
+ * so that it can be correctly re-rendered as necessary.
+ *
  * @private
  */
 ArrayValue.prototype.rerender = function(suppliedReferenceNode, appendChild, insertElements){
@@ -590,6 +595,15 @@ ArrayValue.prototype.rerender = function(suppliedReferenceNode, appendChild, ins
 
     var prevRendered = this.rendered || {};
     var rendered = {};
+    //
+    // These three variables are used to ensure that we do not lose our reference node when the
+    // contents are removed. Basically, if the array is empty, we declare that we need a reference
+    // node, and ensure that one is created if there were previously elements in the array. All
+    // very complicated in the case where you do not have a parent node (which is the case here).
+    //
+    var startReferenceNode = this.referenceNode;
+    var firstReferenceNode = null;
+    var needReference = false;
     if (!this.isEmpty()) {
         var referenceNode = (appendChild || !this.referenceNode) ? suppliedReferenceNode : this.referenceNode;
 
@@ -600,6 +614,7 @@ ArrayValue.prototype.rerender = function(suppliedReferenceNode, appendChild, ins
             var item = array[j];
 
             if (!item["getDef"]) {
+                // FIXME: this kind of flexibility is dangerous.
                 // If someone passed a config in, construct it.
                 item = $A.componentService.newComponentDeprecated(item, null, false, true);
 
@@ -610,11 +625,18 @@ ArrayValue.prototype.rerender = function(suppliedReferenceNode, appendChild, ins
             var globalId = item.getGlobalId();
             var itemReferenceNode;
             if (!item.isRendered()) {
+                //
+                // If the item was not previously rendered, we render after the last element.
+                //
                 var ret = $A.render(item);
                 if (ret.length > 0) {
                     // Just use the last element as the reference node
                     itemReferenceNode = ret[ret.length - 1];
                 } else {
+                    //
+                    // If nothing was rendered put in a placeholder so that we
+                    // can find the element. (FIXME W-1835211: this needs tests -- is it removed?.)
+                    //
                     itemReferenceNode = this.createLocator(" item {rerendered, index:" + j + "} " + item);
                     ret.push(itemReferenceNode);
                 }
@@ -633,8 +655,14 @@ ArrayValue.prototype.rerender = function(suppliedReferenceNode, appendChild, ins
                     itemReferenceNode = item.getElement();
                 }
             }
+            if (firstReferenceNode === null) {
+                firstReferenceNode = itemReferenceNode;
+            }
 
+            //
             // Next iteration of the loop will use this component's ref node as its "top"
+            // FIXME W-1835211: this may remove elements...
+            //
             referenceNode = itemReferenceNode;
             this.setReferenceNode(referenceNode);
 
@@ -642,10 +670,24 @@ ArrayValue.prototype.rerender = function(suppliedReferenceNode, appendChild, ins
 
             rendered[globalId] = itemReferenceNode;
         }
+    } else {
+        needReference = true;
     }
 
     // Unrender components no longer in the array
     for (var key in prevRendered) {
+        if (needReference) {
+            //
+            // If we need a reference node (this only occurs when we have
+            // nothing to render), make sure that we create one and put it
+            // in the right spot. If there was nothing previously rendered
+            // this isn't needed because we already have a locator.
+            // 
+            referenceNode = this.createLocator(" array locator " + this.owner);
+            insertElements([referenceNode], startReferenceNode, true);
+            firstReferenceNode = referenceNode;
+            needReference = false;
+        }
         if (!rendered[key]) {
             var c = $A.getCmp(key);
             if (c && c.isValid()) {
@@ -653,6 +695,10 @@ ArrayValue.prototype.rerender = function(suppliedReferenceNode, appendChild, ins
             }
         }
     }
+    if (firstReferenceNode === null) {
+        firstReferenceNode = startReferenceNode;
+    }
+    this.setReferenceNode(firstReferenceNode);
 
     this.rendered = rendered;
 };
@@ -675,6 +721,9 @@ ArrayValue.prototype.createLocator = function(debugText) {
 };
 
 ArrayValue.prototype.setReferenceNode = function(ref) {
+    if (ref === this.referenceNode) {
+        return;
+    }
     if (this.referenceNode && this.referenceNode._arrayValueOwner === this) {
         this.referenceNode._arrayValueOwner = null;
         $A.util.removeElement(this.referenceNode);

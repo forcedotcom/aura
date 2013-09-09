@@ -16,16 +16,25 @@
 
 {
 	onInit: function(cmp, evt, helper) {
-		var pageCmp = cmp.get('v.priv_pageComponent'),
-			title;
+		var pageCmp = cmp.get('v.priv_pageComponent'),			 
+			title = 'Page ' + cmp.get('v.pageIndex'), //TODO: localize
+			label = title;
 		
-		if (pageCmp && pageCmp.get('v.title')) {			
-			title = pageCmp.get('v.title');			
-		} else {				
-			title = 'Page ' + cmp.get('v.pageIndex');			
+		if (pageCmp && pageCmp.get('v.pageModel')) {
+			var pageModel = pageCmp.get('v.pageModel'); 
+			
+			title = pageModel.title || title;
+			label = pageModel.label || label;
+			
+			if (pageModel.devNameOrId) {
+				cmp.getValue("v.priv_id").setValue("tab_" + pageModel.devNameOrId);
+			}
+		} else if (pageCmp) {			
+			title = pageCmp.get('v.title') || title; 			
 		}
 		
 		cmp.getValue('v.title').setValue(title);
+		cmp.getValue('v.label').setValue(label);
 	},
 	
 	clickHandler: function (cmp, evt, helper) {

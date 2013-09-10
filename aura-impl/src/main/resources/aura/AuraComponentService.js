@@ -234,7 +234,7 @@ var AuraComponentService = function(){
             //
             for (var key in attributes) {
                 var value = attributes[key];
-                if (value.hasOwnProperty("value")) {
+                if (value && value.hasOwnProperty("value")) {
                     value = value["value"];
                 }
                 // no def or component here, because we don't have one.
@@ -296,17 +296,41 @@ var AuraComponentService = function(){
             }
 
             if ($A.util.instanceOf(valueObj, MapValue)) {
+
                 var ret = {};
+                // handle attributes with value provider in attributes
+                if (valueObj.contains("valueProvider") && valueObj.contains("values")) {
+                    valueProvider = valueObj.getValue("valueProvider");
+                }
                 valueObj.each(function(k,v){
-                    ret[k] = $A.componentService.computeValue(v, valueProvider);
+                    // ignore valueProvider
+                    if (k !== "valueProvider") {
+                        ret[k] = $A.componentService.computeValue(v, valueProvider, raw);
+                    }
                 });
                 return ret;
+
+            } else if ($A.util.instanceOf(valueObj, ArrayValue)) {
+
+                var arr = [];
+                valueObj.each(function(item) {
+                    arr.push($A.componentService.computeValue(item, valueProvider, raw));
+                });
+                return arr;
+
             } else {
-                if (!valueObj.isExpression()) {
-                    return valueObj.unwrap();
+
+                // handle PassthroughValue in scenarios when they aren't used in iteration components
+                if ("isExpression" in valueObj) {
+                    if (!valueObj.isExpression()) {
+                        return valueObj.unwrap();
+                    } else {
+                        var val = $A.expressionService.get(valueProvider, valueObj);
+                        // if raw return raw instead of "{!blah}"
+                        return raw ? val : val || valueObj.getValue();
+                    }
                 } else {
-                    var val = $A.expressionService.get(valueProvider, valueObj);
-                    return raw ? val : val || valueObj.getValue();
+                    return null;
                 }
             }
         },

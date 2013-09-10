@@ -75,28 +75,26 @@
             });
 
             // Now lets do some splicing. Insert Value to index first, middle, and last index
-            // TODO(W-1479653): inserting to index 0 actually adds to end of array
-            /*addComponent("Value inserted at index 0", function(body, c) {
+            addComponent("Value inserted at index 0", function(body, c) {
                 body.insert(0, c);
             });
             $A.rerender(component);
             $A.test.assertEquals("Value inserted at index 0", $A.test.getText(values[0]));
-            $A.test.assertEquals(13, values.length);*/
-
+            $A.test.assertEquals(13, values.length);
+            
             addComponent("Value inserted at index 1", function(body, c) {
                 body.insert(1, c);
             });
             $A.rerender(component);
             $A.test.assertEquals("Value inserted at index 1", $A.test.getText(values[1]), "Value not inserted at proper index");
-            $A.test.assertEquals(13, values.length);
+            $A.test.assertEquals(14, values.length);
 
-            // TODO(W-1479653): after test is changed to insert at index 0, modify this block of code to insert at last index again
             addComponent("Value inserted at last index", function(body, c) {
-                body.insert(13, c);
+                body.insert(14, c);
             });
             $A.rerender(component);
-            $A.test.assertEquals("Value inserted at last index", $A.test.getText(values[13]), "Value not inserted at end of array");
-            $A.test.assertEquals(14, values.length);
+            $A.test.assertEquals("Value inserted at last index", $A.test.getText(values[14]), "Value not inserted at end of array");
+            $A.test.assertEquals(15, values.length);
         }
     }
 })

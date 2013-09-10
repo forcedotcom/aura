@@ -632,7 +632,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
     }
 
     protected void waitForElementAbsent(final WebElement e) {
-        waitForElement("Timed out (" + timeoutInSecs + "ms) waiting for " + e + "to disappear.", e, false,
+        waitForElement("Timed out (" + timeoutInSecs + "s) waiting for " + e + "to disappear.", e, false,
                 timeoutInSecs);
     }
 
@@ -641,7 +641,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
     }
 
     protected void waitForElementPresent(final WebElement e) {
-        waitForElement("Timed out (" + timeoutInSecs + "ms) waiting for " + e, e, true, timeoutInSecs);
+        waitForElement("Timed out (" + timeoutInSecs + "s) waiting for " + e, e, true, timeoutInSecs);
     }
 
     /**
@@ -666,7 +666,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
             public Boolean apply(WebDriver d) {
                 return isDisplayed == e.isDisplayed();
             }
-        }, timeoutInSecs);
+        }, timeoutInSecs, msg);
     }
 
     /**

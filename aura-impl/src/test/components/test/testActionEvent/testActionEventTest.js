@@ -104,15 +104,17 @@
                        eventParamName:"msg",
                        eventParamValue:"foo!" },
         test: function(cmp){
-            $A.test.expectAuraError("org.auraframework.throwable.quickfix.DefinitionNotFoundException");
+        	$A.test.expectAuraError("Unable to process your request\n\norg.auraframework.throwable.AuraRuntimeException:");
             cmp.find("trigger").get("e.press").fire();
             $A.test.addWaitFor(
                     true,
                     $A.test.allActionsComplete,
                     function () {
-                	$A.test.assertTrue(
-                		$A.test.getAuraErrorMessage().
-                		indexOf("org.auraframework.throwable.quickfix.DefinitionNotFoundException: " +
+                    	$A.test.assertTrue(
+	                		$A.test.getAuraErrorMessage().
+	                		indexOf("Unable to process your request\n\n"+
+                				"org.auraframework.throwable.AuraRuntimeException: "+
+                				"org.auraframework.throwable.quickfix.DefinitionNotFoundException: " +
                 				"No EVENT named markup://test:testActionEventEventNonExistant found")==0, "Failed to see quick fix exception message");
                     }
                 );

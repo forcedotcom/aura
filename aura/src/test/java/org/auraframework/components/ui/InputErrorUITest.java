@@ -33,8 +33,8 @@ public class InputErrorUITest extends WebDriverTestCase {
     final String STATUS_CLEAR = "Cleared error";
     final String URL = "/uitest/inputErrorTest.cmp";
     final String URL_CST = "/uitest/inputErrorCustomTest.cmp";
-
-    public InputErrorUITest(String name) {
+    
+	public InputErrorUITest(String name) {
         super(name);
     }
 
@@ -44,7 +44,8 @@ public class InputErrorUITest extends WebDriverTestCase {
      * handling setting a custom error component.
      */
     public void testServerErrorUsingOnError() throws Exception {
-        String expectedErrorMsg = "Custom Error Msg: java://org.auraframework.impl.java.controller.JavaTestController: java.lang.Exception: Error Happens!";
+        String expectedErrorMsg = "Custom Error Msg: Unable to process your request org.auraframework.throwable.AuraExecutionException: " +
+        		"java://org.auraframework.impl.java.controller.JavaTestController: java.lang.Exception: Error Happens!";
         d = getDriver();
         open(URL_CST);
         setWebElements("ErrorFireOnErrorEvent", "ClearFireOnClearErrrorsEvent");
@@ -52,12 +53,12 @@ public class InputErrorUITest extends WebDriverTestCase {
         errorBtn.click();
         waitForElementTextPresent(status, STATUS_ERROR);
         WebElement errorElement = d.findElement(By.id("errorDiv"));
-        assertEquals("Incorrect error message", errorElement.getText(), expectedErrorMsg);
+        assertTrue("Incorrect error message", errorElement.getText().startsWith(expectedErrorMsg));
 
         clearBtn.click();
         waitForElementTextPresent(status, STATUS_CLEAR);
         errorElement = d.findElement(By.id("errorDiv"));
-        assertEquals("Error message not cleared", errorElement.getText(), "");
+        assertEquals("Error message not cleared", "", errorElement.getText());
     }
 
     /**
@@ -136,16 +137,21 @@ public class InputErrorUITest extends WebDriverTestCase {
         clearBtn.click();
         waitForElementTextPresent(status, STATUS_CLEAR);
         if (verifyErrMsg) {
-            verifyErrorMessage(input, "");
+        	verifyNoErrorMessage(input);
         }
         verifyCss(input, false);
     }
 
     private void verifyErrorMessage(WebElement element, String expectedErrorMsg) throws Exception {
         WebElement errorElement = d.findElement(By.className("uiInputDefaultError"));
-        assertEquals("Incorrect error message", errorElement.getText(), expectedErrorMsg);
+        assertTrue("Incorrect error message", errorElement.getText().contains(expectedErrorMsg));
     }
-
+    
+    private void verifyNoErrorMessage(WebElement element) throws Exception {
+        WebElement errorElement = d.findElement(By.className("uiInputDefaultError"));
+        assertEquals("Did not expect an error message","", errorElement.getText());
+    }
+    
     private void verifyCss(WebElement element, boolean isError) throws Exception {
         String inputClassValue = element.getAttribute("class");
         if (isError) {

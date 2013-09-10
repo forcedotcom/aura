@@ -206,10 +206,11 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         HttpResponse response = perform(get);
 
         assertEquals(HttpStatus.SC_OK, getStatusCode(response));
-        assertTrue(getResponseBody(response).startsWith(
-                String.format("%s*/{\n  \"message\":\"QualifiedName is required for descriptors\"",
+        String responseText = getResponseBody(response); 
+        assertTrue(responseText.startsWith(
+                String.format("%s*/{\n  \"message\":\"Unable to process your request",
                         AuraBaseServlet.CSRF_PROTECT)));
-
+        assertTrue(responseText.contains("org.auraframework.throwable.AuraRuntimeException: QualifiedName is required for descriptors"));
         get.releaseConnection();
     }
 

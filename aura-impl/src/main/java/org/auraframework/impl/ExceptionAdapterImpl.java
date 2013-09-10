@@ -66,9 +66,8 @@ public class ExceptionAdapterImpl implements ExceptionAdapter {
                 PrintWriter p = new PrintWriter(sw);
                 th.printStackTrace(p);                
                 message = message + "\n\n" + sw.toString();
-        		mapped = new AuraUnhandledException(message);
         	}
-    		mapped = new AuraUnhandledException(message);
+        	mapped = new AuraUnhandledException(message);
         }
         if (error) {
             logging = log.isErrorEnabled();

@@ -22,18 +22,17 @@
                 var action = cmp.get("v.response");
                 var msg = action.error[0].message;
                 var stack = action.error[0].stack;
-
-                $A.log(action);
-                $A.log(action.error);
-
                 $A.test.assertEquals(expectedState, action.state, "Unexpected state: ");
                 if(expectedMessage){
-                    $A.test.assertEquals(expectedMessage, msg, "Unexpected error message: ");
+                	expectedMessage = "Unable to process your request\n\n"+
+            							"org.auraframework.throwable.AuraExecutionException: "+
+            							expectedMessage;
+                    $A.test.assertTrue(msg.indexOf(expectedMessage)==0, "Unexpected error message: ");
                 }
                 if(expectedStack){
-                    $A.test.assertTrue(stack.indexOf(expectedStack) === 0, "Unexpected stack: " + stack);
+                	$A.test.assertTrue(stack.indexOf(expectedStack) === 0, "Unexpected stack: " + stack);
                 } else {
-                    $A.test.assertTrue(stack.indexOf("org.auraframework.throwable.AuraExecutionException: "
+                    $A.test.assertTrue(stack.indexOf("org.auraframework.throwable.AuraUnhandledException: "
                         + expectedMessage) === 0, "Unexpected stack: " + stack);
                 }
             }
@@ -98,7 +97,7 @@
         attributes : { throwableClass:"java.lang.IllegalAccessException",
                        throwableCause:"under 21" },
         test: function(cmp){
-            this.checkResponse(cmp, "ERROR", "java://org.auraframework.impl.java.controller.JavaTestController: " +
+        	this.checkResponse(cmp, "ERROR", "java://org.auraframework.impl.java.controller.JavaTestController: " +
                                                 "java.lang.IllegalAccessException: under 21");
         }
     },
@@ -115,8 +114,27 @@
         attributes : { throwableClass:"aura.throwable.AuraHandledException", 
                        throwableCause:"something to say" },
         test: function(cmp){
-            this.checkResponse(cmp, "ERROR", "something to say", "org.auraframework.throwable.AuraHandledException: " +
+            this.checkHandledExceptionResponse(cmp, "ERROR", "something to say", "org.auraframework.throwable.AuraHandledException: " +
                                                                     "something to say");
         }
-    }
+    },
+    //Because AuraHandledExceptions are treated differently
+    checkHandledExceptionResponse : function(cmp, expectedState, expectedMessage, expectedStack){
+        cmp.find("trigger").get("e.press").fire();
+        $A.test.runAfterIf(
+            function(){ return cmp.get("v.response"); },
+            function(){
+                var action = cmp.get("v.response");
+                var msg = action.error[0].message;
+                var stack = action.error[0].stack;
+                $A.test.assertEquals(expectedState, action.state, "Unexpected state: ");
+                if(expectedMessage){
+                    $A.test.assertTrue(msg.indexOf(expectedMessage)==0, "Unexpected error message: ");
+                }
+                if(expectedStack){
+                	$A.test.assertTrue(stack.indexOf(expectedStack) === 0, "Unexpected stack: " + stack);
+                }
+            }
+        );
+    },
 })

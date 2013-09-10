@@ -250,6 +250,8 @@ public abstract class AuraBaseServlet extends HttpServlet {
                 if (format != Format.JSON) {
                     send404(request, response);
                     if (!isProductionMode(context.getMode())) {
+                    	//Preserve new lines and tabs in the stacktrace since this is directly being written on to the page
+                    	denyMessage = "<pre>"+denyMessage+"</pre>";
                         response.getWriter().println(denyMessage);
                     }
                     return;

@@ -81,6 +81,11 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
 
     private void verifyGetAccessDenied(DefType defType, String attrs, String contextStr, String expectedReason)
             throws Exception {
+    	verifyGetAccessDenied(defType, attrs, contextStr, expectedReason, null);
+    }
+    
+    private void verifyGetAccessDenied(DefType defType, String attrs, String contextStr, String expectedReason, String extendedReason)
+            throws Exception {
         HttpGet get = buildGetRequest(defType, attrs, "", contextStr);
         HttpResponse httpResponse = perform(get);
         int statusCode = getStatusCode(httpResponse);
@@ -93,6 +98,10 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
             if ((expectedReason != null) && (!response.contains(expectedReason))) {
                 fail(String.format("Response body does not contain expected reason.  Expected <%s> in:%n%s",
                         expectedReason, response));
+            }
+            if((extendedReason != null) && (!response.contains(extendedReason))){
+            	fail(String.format("Response body does not contain expected extended reason.  Expected <%s> in:%n%s",
+                        extendedReason, response));
             }
         } else if (!response.contains("URL No Longer Exists")) {
             // sfdc case
@@ -148,7 +157,7 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
     public void testGetDevAppWithThrows() throws Exception {
         verifyGetAccessDenied(DefType.APPLICATION,
                 "securityProvider='org.auraframework.components.security.SecurityProviderThrowsThrowable'",
-                "{'mode':'DEV'}", "Access Denied: cause = generated intentionally");
+                "{'mode':'DEV'}", "Access Denied: cause = Unable to process your request", "java.lang.RuntimeException: generated intentionally");
     }
 
     /**
@@ -160,7 +169,7 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
                 "<aura:application securityProvider='org.auraframework.components.security.SecurityProviderThrowsThrowable'>%s</aura:application>");
         verifyGetAccessDenied(DefType.COMPONENT, "",
                 String.format("{'mode':'DEV','app':'%s'}", appDesc.getQualifiedName()),
-                "Access Denied: cause = generated intentionally");
+                "Access Denied: cause = Unable to process your request", "java.lang.RuntimeException: generated intentionally");
     }
 
     /**

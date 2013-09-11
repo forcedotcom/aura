@@ -25,7 +25,7 @@ function ActionDefRegistry(){
 ActionDefRegistry.prototype.auraType = "ActionDefRegistry";
 
 /**
- * Returns a ActionDef instance from registry
+ * Returns a ActionDef instance from registry. 
  * Throws an error if config is not provided.
  * @param {Object} config Passes in the descriptor of an ActionDef.
  */

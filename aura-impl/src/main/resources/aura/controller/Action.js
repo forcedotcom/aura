@@ -125,7 +125,7 @@ Action.prototype.completeGroups = function() {
  * 
  * @public
  * @param {Object}
- *            config The key/value pairs that specify the Action.
+ *            config The key/value pairs that specify the Action. The key is an attribute on the given component.
  *             For example, <code>serverAction.setParams({ "record": id });</code> sets a parameter on <code>serverAction</code>.
  */
 Action.prototype.setParams = function(config) {
@@ -140,8 +140,8 @@ Action.prototype.setParams = function(config) {
  * 
  * @public
  * @param {String}
- *            name The name of the Action parameter.
- * @returns {Array} For example, <code>event.getParam("button")</code> returns the value of the pressed mouse button.
+ *            name The name of the Action.
+ * @returns {Array} The parameter values
  */
 Action.prototype.getParam = function(name) {
 	return this.params[name];
@@ -288,10 +288,10 @@ Action.prototype.runDeprecated = function(evt) {
 };
 
 /**
- * Gets the current state of the Action. Possible values are "NEW", "RUNNING", and "FAILURE". <br/>
+ * Gets the current state of the Action.
  * 
  * @public
- * @returns {String}
+ * @returns {String} Possible values are "NEW", "RUNNING", and "FAILURE".
  */
 Action.prototype.getState = function() {
 	return this.state;

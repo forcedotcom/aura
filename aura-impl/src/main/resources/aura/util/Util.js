@@ -816,10 +816,12 @@ $A.ns.Util.prototype.isSubDef = function(def, qname) {
  * Returns the base object with the members from the child object.
  * This is commonly used to apply a set of configurations to a default set, to get a single set of configuration properties.
  * @example
- *  util.apply(Child.prototype, Parent); // Returns a new object inheriting all the methods and properties from Parent.
- *  util.apply(Child.prototype, { isCool: true }); // Parent would then have a property of child.
- *  util.apply({ foo: 'bar', diameter: 10}, { diameter: 20, bat: 'man' }, true); //== {foo:'bar', diameter: 20, bat: 'man'}
- *  util.apply({ foo: 'bar', diameter: 10}, { diameter: 20, bat: 'man' }, false); //== {foo:'bar', diameter: 10, bat: 'man'}
+ * <ul>
+ *  <li><code>util.apply(Child.prototype, Parent); // Returns a new object inheriting all the methods and properties from Parent.</code></li>
+ *  <li><code>util.apply(Child.prototype, { isCool: true }); // Parent would then have a property of child.</code></li>
+ *  <li><code>util.apply({ foo: 'bar', diameter: 10}, { diameter: 20, bat: 'man' }, true); //== {foo:'bar', diameter: 20, bat: 'man'}</code></li>
+ *  <li><code>util.apply({ foo: 'bar', diameter: 10}, { diameter: 20, bat: 'man' }, false); //== {foo:'bar', diameter: 10, bat: 'man'}</code></li>
+ *  </ul>
  * @param {Object|Function} baseObject The object that will receive the methods, and properties.
  * @param {Object|Function} members The methods and properties to assign to the baseObject.
  * @param {Boolean} [forceCopy] If the property already exists, should we still copy the member? false by default

@@ -35,7 +35,8 @@
     They are called before and after a test method is run.
     </p>
 
-    <auradocs:info>You can view Aura's test methods in the <ui:outputURL value="#reference?topic=api:Test" label="JavaScript API">JavaScript API reference</ui:outputURL>.
+    <auradocs:info>You can view Aura's test methods in the <auradocs:referenceTopicLink topic="api:Test">JavaScript API reference</auradocs:referenceTopicLink>.
+    
     <p>You may also want to use <auradocs:topicLink topic="testsAssert">assertions</auradocs:topicLink> and <auradocs:topicLink topic="testsUtility">utility functions</auradocs:topicLink> available to you for unit testing.</p>
    </auradocs:info>
 

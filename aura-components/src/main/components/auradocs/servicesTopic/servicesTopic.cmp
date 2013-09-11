@@ -28,7 +28,7 @@
     <h3>AuraComponentService</h3>
     <h4><code>$A.componentService</code></h4>
     <p>The component service enables you to create and manage components. You can use the service to create a component on the client or server and access or manipulate component data.</p>
-    <p>See Also: <a href="#reference?topic=api:AuraComponentService">Methods</a> | <auradocs:topicLink topic ="dynamicCmp">Dynamically Creating a Component</auradocs:topicLink> | <auradocs:topicLink topic ="valueObjects">Value Objects</auradocs:topicLink></p>
+    <p>See Also: <auradocs:referenceTopicLink topic="api:AuraComponentService">Methods</auradocs:referenceTopicLink> | <auradocs:topicLink topic ="dynamicCmp">Dynamically Creating a Component</auradocs:topicLink> | <auradocs:topicLink topic ="valueObjects">Value Objects</auradocs:topicLink></p>
 
     <h3>AuraDevToolService</h3>
     <h4><code>$A.devToolService</code></h4>
@@ -39,42 +39,43 @@
     <h3>AuraEventService</h3>
     <h4><code>$A.eventService</code></h4>
     <p>The event service enables you to create and manage events. For example, you can create a new application event using <code>$A.eventService.newEvent("namespace:component")</code>.</p>
-    <p>See Also: <a href="#reference?topic=api:AuraEventService">Methods</a></p>
+    <p>See Also: <auradocs:referenceTopicLink topic="api:AuraEventService">Methods</auradocs:referenceTopicLink></p>
 
     <h3>AuraExpressionService</h3>
     <h4><code>$A.expressionService</code></h4>
     <p>The expression service enables you to process expressions against a different value provider. 
        For example, you can use <code>$A.expressionService.getValue(cmp, "<aura:text value="{!" />$Label.Section.Param}").getValue()</code> to evaluate labels before passing them as attributes to locally created components. 
        Use <code>component.get()</code> or <code>$A.get()</code> instead if you are resolving expressions for components and do not require manipulating the actual value object.</p>
-    <p>See Also: <a href="#reference?topic=api:AuraExpressionService">Methods</a></p>
+    <p>See Also: <auradocs:referenceTopicLink topic="api:AuraExpressionService">Methods</auradocs:referenceTopicLink></p>
 
     <h3>AuraHistoryService</h3>
     <h4><code>$A.historyService</code></h4>
     <p>The history service enables you to manage browser history and change the location. For example, use <code>$A.historyService.set(location)</code> to add the location to the history service, and use <code>$A.historyService.back()</code>
      or <code>$A.historyService.forward()</code> to load the previous or subsequent URL or layout on the list.</p>
      <auradocs:warning>Internet Explorer 7 and 8 are not supported for this service.</auradocs:warning>
-    <p>See Also: <a href="#reference?topic=api:AuraHistoryService">Methods</a></p>
+    <p>See Also: <auradocs:referenceTopicLink topic="api:AuraHistoryService">Methods</auradocs:referenceTopicLink></p>
 
     <h3>AuraLayoutService</h3>
     <h4><code>$A.layoutService</code></h4>
     <p>The layout service enables you to manage the layout and navigation of your app. For example, you can use the <code>changeLocation()</code> method to pass in a new location and extra parameters for the new URL.</p>
     <p>Internet Explorer 7 and 8 are not supported for this service.</p>    
-    <p>See Also: <a href="#reference?topic=api:AuraLayoutService">Methods</a> | <auradocs:topicLink topic="layouts">Using Layouts</auradocs:topicLink></p>
+    <p>See Also: <auradocs:referenceTopicLink topic="api:AuraLayoutService">Methods</auradocs:referenceTopicLink> | <auradocs:topicLink topic="layouts">Using Layouts</auradocs:topicLink></p>
 
 	<h3>AuraLocalizationService</h3>
 	<h4><code>$A.localizationService</code></h4>
 	<p>The localization service enables you to manage the localization of date and time. For example, <code>$A.localizationService.parseDateTime(value, "yyyy-MM-dd");</code> parses the datetime value in the given format and returns a JavaScript Date object.</p>
-	<p>See Also: <a href="#reference?topic=api:AuraLocalizationService">Methods</a></p>
+	<p>See Also: <auradocs:referenceTopicLink topic="api:AuraLocalizationService">Methods</auradocs:referenceTopicLink></p>
 	
     <h3>AuraRenderingService</h3>
     <h4><code>$A.renderingService</code></h4>
     <p>The rendering service renders components by retrieving and calling their specific renderers. You can override the default rendering behavior in a client-side renderer.</p>
-    <p>See Also: <a href="#reference?topic=api:AuraExpressionService">Methods</a> | <auradocs:topicLink topic="renderers">Using Renderers</auradocs:topicLink></p>
+    <p>See Also: <auradocs:referenceTopicLink topic="api:AuraExpressionService">Methods</auradocs:referenceTopicLink> | <auradocs:topicLink topic="renderers">Using Renderers</auradocs:topicLink></p>
 
     <h3>AuraStorageService</h3>
     <h4><code>$A.storageService</code></h4>
     <p>The storage service provides a caching infrastructure for data storage on the client.</p>
-    <p>See Also: <auradocs:topicLink topic="auraStorageService">Aura Storage Service</auradocs:topicLink> | <a href="#reference?topic=api:AuraStorageService">Methods</a></p>
+    <p>See Also: <auradocs:topicLink topic="auraStorageService">Aura Storage Service</auradocs:topicLink> |
+    <auradocs:referenceTopicLink topic="api:AuraStorageService">Methods</auradocs:referenceTopicLink></p>
 
     <!--TODO: W-1403508 AuraStorageService-->
 

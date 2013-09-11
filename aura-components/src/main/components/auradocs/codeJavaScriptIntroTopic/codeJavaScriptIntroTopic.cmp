@@ -20,7 +20,7 @@
 
 <p>Use JavaScript for client-side Aura code. </p>
 
-<p>The Aura object is the top-level object in the JavaScript framework code. For all the methods available in the Aura class, see <ui:outputURL value="/auradocs#api:Aura" label="Aura JavaScript">Aura</ui:outputURL> in the JavaScript API in the Reference tab. You can use <code>$A</code> in JavaScript code to denote the Aura object.</p>
+<p>The Aura object is the top-level object in the JavaScript framework code. For all the methods available in the Aura class, see <ui:outputURL value="#reference?topic=api:Aura" label="Aura JavaScript">Aura</ui:outputURL> in the JavaScript API in the Reference tab. You can use <code>$A</code> in JavaScript code to denote the Aura object.</p>
 
 <p>A component bundle can contain JavaScript code in a client-side controller, renderer, helper, or test file. We introduced <auradocs:topicLink topic="helloActions">client-side controllers</auradocs:topicLink> earlier as they are the most commonly used of these JavaScript files. To learn more about the other different types of JavaScript files, see:</p>
 

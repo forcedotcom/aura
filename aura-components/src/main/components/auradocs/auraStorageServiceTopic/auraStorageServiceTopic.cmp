@@ -78,7 +78,7 @@
 
 <h3>Initializing and Using Storage</h3>
 
-<p>To use storage, you must initialize it first and specify a name and, optionally, other properties. If you don't specify the optional properties, the Aura Storage Service uses default values set by the <code>initStorage()</code> JavaScript API of <a href="#reference?topic=api:AuraStorageService">AuraStorageService</a>.</p>
+<p>To use storage, you must initialize it first and specify a name and, optionally, other properties. If you don't specify the optional properties, the Aura Storage Service uses default values set by the <code>initStorage()</code> JavaScript API of <auradocs:referenceTopicLink topic="api:AuraStorageService">AuraStorageService</auradocs:referenceTopicLink>.</p>
 
 <h4>Initializing Storage Using Aura Markup</h4>
 <p>You can initialize storage for your component using markup in one of two ways: by using a template or by adding the markup in the component body.</p>
@@ -132,7 +132,7 @@ var storage = $A.storageService.initStorage("MyStorage",    // name
 </auradocs:codeblock><br/>
 
 <h4>Using Aura Storage</h4>
-<p>After you've initialized your custom storage, you can add and retrieve items from your storage. To do so, use the JavaScript <code>put</code> and <code>get</code> API of <a href="#reference?topic=api:AuraStorage">AuraStorage</a>.</p>
+<p>After you've initialized your custom storage, you can add and retrieve items from your storage. To do so, use the JavaScript <code>put</code> and <code>get</code> API of <auradocs:referenceTopicLink topic="api:AuraStorage">AuraStorage</auradocs:referenceTopicLink>.</p>
 
 <auradocs:info>The Aura-provided actions storage for server-side actions automatically adds and retrieves items from storage and doesn't require you to call <code>put</code> and <code>get</code> explicitly.</auradocs:info>
 
@@ -160,7 +160,7 @@ var storage = $A.storageService.getStorage("MyStorage");
 <auradocs:info>The getName() method returns the type of storage selected, not the name of the storage.</auradocs:info>
 
 <p>There are other methods you can call on the storage object. For a detailed description of the JavaScript API for <code>AuraStorageService</code>, see
-<a href="#reference?topic=api:AuraStorageService">AuraStorageService</a> and for <code>AuraStorage</code>, see <a href="#reference?topic=api:AuraStorage">AuraStorage</a>.</p>
+<auradocs:referenceTopicLink topic="api:AuraStorageService">AuraStorageService</auradocs:referenceTopicLink> and for <code>AuraStorage</code>, see <auradocs:referenceTopicLink topic="api:AuraStorage">AuraStorage</auradocs:referenceTopicLink>.</p>
     
 <p>For example, you can get the current cache size and clear the storage, as follows.</p>
 

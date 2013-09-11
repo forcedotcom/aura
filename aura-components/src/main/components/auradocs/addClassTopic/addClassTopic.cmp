@@ -30,7 +30,7 @@
     Similarly, remove the class by using <code>$A.util.removeClass(element, 'class');</code> in your controller.
     <code>cmp.find()</code> locates the element using the local ID, denoted by <code>aura:id="changeIt"</code> in this demo.</p>
     
-    <auradocs:info>See the <ui:outputURL value="#reference?topic=api:Util" label="JavaScript API Reference">JavaScript API Reference</ui:outputURL> for more utility functions for working with DOM elements.</auradocs:info>
+    <auradocs:info>See the <auradocs:referenceTopicLink topic="api:Util">JavaScript API Reference</auradocs:referenceTopicLink> for more utility functions for working with DOM elements.</auradocs:info>
     
     <p><b>See also:</b><br/>
     <auradocs:topicLink topic="helloActions">Client-Side Controllers</auradocs:topicLink><br/>

@@ -27,6 +27,7 @@
    <aura:attribute name="priv_ariaControlId" type="String" description="PRIVATE - Aria control ID." />
    <aura:attribute name="priv_tabIndex" type="Integer" default="-1" description="PRIVATE - tab index" />
    <aura:attribute name="priv_pageComponent" type="Object" description="PRIVATE - Carousel page component." />
+   <aura:attribute name="priv_selectedClass" type="String" description="PRIVATE - CSS class for the selected indicator item." />
    
    <aura:registerevent name="pagerClicked" type="ui:pagerClicked" description="The event fired when the pager is clicked." />
    <aura:registerevent name="pagerKeyed" type="ui:pagerKeyed" description="The event fired when the pager is keyed." />
@@ -37,7 +38,7 @@
    <aura:handler name="click" action="{!c.clickHandler}" />
     <!-- aria-controls attribute is linked to the section id attribute in the page -->
     <li role="presentation" class="{!v.class}">  
-	    <a aura:id="pageItem" class="carousel-nav-item" tabindex="{!v.priv_tabIndex}" role="tab" 
+	    <a aura:id="pageItem" class="{!v.priv_selectedClass + ' carousel-nav-item'}" tabindex="{!v.priv_tabIndex}" role="tab" 
 	    	aria-controls="{!v.priv_ariaControlId}" aria-selected="{!v.priv_ariaSelected}" title="{!v.title}"
 	    	onkeydown="{!c.keyHandler}" id="{!v.priv_id}" >	          
 			<span class="assistiveText">{!v.label}</span>

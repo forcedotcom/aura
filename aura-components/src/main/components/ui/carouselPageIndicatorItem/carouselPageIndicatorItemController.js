@@ -63,13 +63,16 @@
     		cmp.getValue("v.priv_ariaControlId").setValue(pageId);
     		cmp.getValue("v.priv_ariaSelected").setValue(true);
     		cmp.getValue("v.priv_tabIndex").setValue(0);
-    		$A.util.addClass(cmp.find('pageItem').getElement(), selectedItemCss);
-    		cmp.find('pageItem').getElement().focus();
+    		cmp.getValue("v.priv_selectedClass").setValue(selectedItemCss);
+    		var itemEl = cmp.find('pageItem').getElement(); 
+    		if (itemEl) {
+    			itemEl.focus();
+    		}
     	} else {
     		cmp.getValue("v.priv_ariaControlId").setValue('');
     		cmp.getValue("v.priv_ariaSelected").setValue(false);
     		cmp.getValue("v.priv_tabIndex").setValue(-1);
-    		$A.util.removeClass(cmp.find('pageItem').getElement(), selectedItemCss);
+    		cmp.getValue("v.priv_selectedClass").setValue("");
     	}
     }
 }

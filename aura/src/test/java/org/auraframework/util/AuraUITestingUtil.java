@@ -393,6 +393,23 @@ public class AuraUITestingUtil {
         return wait.until(addErrorCheck(function));
     }
 
+    /**
+     * Wait until the provided Function returns true or non-null. If this does not occur, error out with passed in
+     * message. Any uncaught javascript errors will trigger an AssertionFailedError.
+     */
+    public <V> V waitUntil(Function<? super WebDriver, V> function, String message) {
+        return waitUntil(function, timeoutInSecs, message);
+    }
+
+    /**
+     * Wait the specified number of seconds until the provided Function returns true or non-null. If this does not
+     * occur, error out with passed in message. Any uncaught javascript errors will trigger an AssertionFailedError.
+     */
+    public <V> V waitUntil(Function<? super WebDriver, V> function, long timeoutInSecs, String message) {
+        WebDriverWait wait = new WebDriverWait(driver, timeoutInSecs);
+        return wait.withMessage(message).until(addErrorCheck(function));
+    }
+
     public void waitForAuraInit() {
         waitForAuraInit(null);
     }

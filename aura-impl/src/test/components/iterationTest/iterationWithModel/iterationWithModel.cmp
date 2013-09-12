@@ -29,7 +29,7 @@
     </div>
 
     <aura:iterationCscc items="{!m.stringList}" var="item" forceServer="true">
-        <iterationTest:iterationWrapper aura:id="innerCmp2" value="{!item}" />
+        <iterationTest:iterationWrapper aura:id="innerCmpWrapper" value="{!item}" />
     </aura:iterationCscc>
 
 </aura:component>

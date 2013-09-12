@@ -41,7 +41,8 @@
      </p>
      <auradocs:info>Binding the label value to an Object-type attribute may cause a resizing activity on components if the returned String size is much bigger than the initially allocated size.</auradocs:info>
      <p>To get the label value when you have used the label in markup or in a server-side model, use <code>var val = $A.getGlobalValueProviders().get("$Label.Related_Lists.task_mode_today");</code> or
-     <code>$A.get("$Label.Related_Lists.task_mode_today");</code>. Note that <code>get()</code> calls <code>getValue()</code>, which returns a <ui:outputURL value="#reference?topic=api:SimpleValue" label="SimpleValue">SimpleValue</ui:outputURL> object. You can also use <code>$A.expressionService.get("$Label.Related_Lists.task_mode_today");</code> to retrieve a label, but we recommend using <code> $A.getGlobalValueProviders().get()</code> if you want to use a callback function.	    
+     <code>$A.get("$Label.Related_Lists.task_mode_today");</code>. Note that <code>get()</code> calls <code>getValue()</code>, which returns a
+     <auradocs:referenceTopicLink topic="api:SimpleValue">SimpleValue</auradocs:referenceTopicLink> object. You can also use <code>$A.expressionService.get("$Label.Related_Lists.task_mode_today");</code> to retrieve a label, but we recommend using <code> $A.getGlobalValueProviders().get()</code> if you want to use a callback function.	    
      </p>
      <p>To test if your label value is correct, use a callback function.</p>
      <auradocs:codeblock>

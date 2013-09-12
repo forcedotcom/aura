@@ -44,5 +44,5 @@
     <p><code>$A.componentService.newComponentAsync()</code> takes in a callback scope, denoted by <code>this</code>. 
     It also takes in a required <code>callback</code> function that returns your newly created component, and a required <code>config</code> object, which provides the component descriptor and attributes.
     </p>
-    <auradocs:info>See the <ui:outputURL label="JavaScript API reference" value="#reference?topic=api:AuraComponentService"/> for a full list of arguments.</auradocs:info>
+    <auradocs:info>See the <auradocs:referenceTopicLink topic="api:AuraComponentService">JavaScript API reference</auradocs:referenceTopicLink> for a full list of arguments.</auradocs:info>
 </aura:component>

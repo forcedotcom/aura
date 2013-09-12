@@ -44,7 +44,7 @@
 	<code>c.someAction</code> can be an action in a controller in the component's hierarchy. <code>someAction</code> and <code>cmp</code> refers to the event name and value provider respectively.
 	<code>someAction</code> must match the <code>name</code> attribute value in the <code>aura:registerevent</code> or <code>aura:handler</code> tag.</p>
 	
-	<auradocs:info>See the <a href="#reference?topic=api:AuraComponentService">JavaScript API reference</a> for a full list of methods and arguments.</auradocs:info>
+	<auradocs:info>See the <auradocs:referenceTopicLink topic="api:AuraComponentService">JavaScript API reference</auradocs:referenceTopicLink> for a full list of methods and arguments.</auradocs:info>
 	
 	 <p><b>See also:</b><br/>
 	   <auradocs:topicLink topic="renderers">Renderers</auradocs:topicLink><br/>

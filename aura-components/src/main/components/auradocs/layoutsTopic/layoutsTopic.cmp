@@ -23,7 +23,7 @@
 
     <p>Layouts are a metadata-driven description of navigation in an application. You can describe in an XML file how you want the application to respond to changes to everything after the <code>#</code> (hash) in the URL. You can use Aura without layouts, but they offer a centralized location for managing URL-centric navigation.</p>
     
-    <auradocs:info>Internet Explorer 7 and 8 are not supported for the layout service.</auradocs:info>
+    <auradocs:info>Internet Explorer 7 and 8 are not supported for layouts.</auradocs:info>
 
   <h2>Layouts Metadata File</h2>
 

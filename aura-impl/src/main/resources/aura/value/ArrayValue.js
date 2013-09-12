@@ -478,7 +478,7 @@ ArrayValue.prototype.getEventDispatcher = function() {
 
 /**
  * Adds handlers that will be called by the value when a related event is triggered.
- * @param {Object} config The handlers to be added to the queue
+ * @param {Object} config The handlers to be added to the queue.
  */
 ArrayValue.prototype.addHandler = function(config){
     BaseValue.addHandler(config, this.getEventDispatcher());

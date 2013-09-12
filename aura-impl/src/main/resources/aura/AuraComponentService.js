@@ -385,7 +385,7 @@ var AuraComponentService = function(){
 
         /**
          * Gets the component definition from the registry.
-         * @param {Object} config
+         * @param {Object} config The descriptor (<code>markup://ui:scroller</code>) or other component attributes that are provided during its initialization.
          * @param {Object} noInit
          * @returns {ComponentDef}  The metadata of the component
          * @memberOf AuraComponentService

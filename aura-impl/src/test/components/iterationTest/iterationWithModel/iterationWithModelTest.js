@@ -15,7 +15,7 @@
  */
 /**
  * Note that these tests are only for the Client-side component creation (CSCC) iteration component. The tests should
- * be converted to use the normal iteration component when that supports iteration.
+ * be converted to use the normal iteration component when the two components merge.
  */
 ({
     /**
@@ -99,15 +99,30 @@
     },
 
     /**
-     * Verify wrapping the component in an html tag does not erase model data.
+     * Verify wrapping a component which has server side dependencies with a component that does not still goes to the
+     * server. Until W-1787477 is fixed, we can use the forceServer flag to manually force going to the server while
+     * creating the components. Once the bug is fixed we won't need to set the flag and the test should be modified.
      */
-    // TODO(W-1766576): cmp in iteration cannot be wrapped in html tags
-    _testWrapInnerCmpInHtmlTag: {
+    testWrapInnerCmpWithNoServerDeps: {
         test: function(cmp) {
-            var cmps = cmp.find("innerCmp2");
+            var cmps = cmp.find("innerCmpWrapper");
             $A.test.assertStartsWith("one : readonly", $A.util.getText(cmps[0].getElement()));
             $A.test.assertStartsWith("two : readonly", $A.util.getText(cmps[1].getElement()));
             $A.test.assertStartsWith("three : readonly", $A.util.getText(cmps[2].getElement()));
+
+            $A.run(function(){
+                cmp.get("addRow").get("e.press").fire();
+            });
+            // Wait for 4 elements- 3 original plus 1 added
+            $A.test.addWaitFor(4, function() {
+                return cmp.find("innerCmpWrapper").length;
+            }, function() {
+                cmps = cmp.find("innerCmpWrapper");
+                $A.test.assertStartsWith("one : readonly", $A.util.getText(cmps[0].getElement()));
+                $A.test.assertStartsWith("two : readonly", $A.util.getText(cmps[1].getElement()));
+                $A.test.assertStartsWith("three : readonly", $A.util.getText(cmps[2].getElement()));
+                $A.test.assertStartsWith("new! : readonly", $A.util.getText(cmps[3].getElement()));
+            });
         }
     }
 })

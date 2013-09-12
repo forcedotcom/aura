@@ -67,7 +67,7 @@
         }
         var ivp;
         var len = body.getLength();
-        var forceServer = cmp.get("forceServer");
+        var forceServer = cmp.getAttributes().getValue("forceServer").getValue();
         //
         // Take off our index, but add the number of components that we will create.
         //

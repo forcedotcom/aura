@@ -15,7 +15,7 @@
  */
 ({
     testBasic: {
-    browsers: ["-IE7","-IE8"],
+	    browsers: ["-IE7","-IE8"],
         test: function(component) {
             // Add content to rubberbandingBecauseMissingRefresh to trigger
             // rubber banding
@@ -34,7 +34,7 @@
     },
 
     testDynamicImages : {
-    browsers: ["-IE7","-IE8"],
+	    browsers: ["-IE7","-IE8"],
         test: [function(component) {
             // Update an image tag in the scrolled content to insure that this
             // does not cause a problem
@@ -63,7 +63,7 @@
     },
 
     testPullToRefreshDiv: {
-    browsers: ["-IE7","-IE8"],
+		browsers: ["-IE7","-IE8"],
         test: function(component) {
             // Make sure the "pull to refresh" div exists at the top of the scroll contents
             var pullDownDiv = $A.test.getElementByClass("pullToRefresh");
@@ -72,97 +72,96 @@
             $A.test.assertTrue(scroller._scroller.options.topOffset > 0, "Scroller should have a top offset");
         }
     },
-
+    
     testScrollToBot : {
-	browsers: ["-IE7","-IE8"],
-	  test: function(component) {
-	      var scrlr = component.find("scrollToYTest")._scroller;
-	      
-	      $A.test.assertEquals(this.getScrollerPos(component.find("scrollToYTest"), "top"),  scrlr.y, "The starting location of the scroller is incorrect");
-	      component.find("toBotButton").get("e.press").fire();
+	  	browsers: ["-IE7","-IE8"],
+	  	test: function(component) {
+	      	var scrlr = component.find("scrollToYTest")._scroller;
 
-	      $A.test.assertEquals( this.getScrollerPos(component.find("scrollToYTest"), "bot"), scrlr.y,  "The scroller did not end in the correct location");
-	    
-	  }
+	      	$A.test.assertEquals(this.getScrollerPos(component.find("scrollToYTest"), "top"),  scrlr.y, "The starting location of the scroller is incorrect");
+	      	component.find("toBotButton").get("e.press").fire();
+
+	      	$A.test.assertEquals( this.getScrollerPos(component.find("scrollToYTest"), "bot"), scrlr.y,  "The scroller did not end in the correct location");
+
+	  	}
   	},
   
-  testScrollToTop : {
-      browsers: ["-IE7","-IE8"],
-	  test: function(component) {
-	      var scrlr = component.find("scrollToYTest")._scroller;
-	      
-	      component.find("toBotButton").get("e.press").fire();;
-	      
-	      $A.test.assertEquals( this.getScrollerPos(component.find("scrollToYTest"), "bot"), scrlr.y, "The starting location of the scroller is incorrect");
-	      component.find("toTopButton").get("e.press").fire();
-	
-	      $A.test.assertEquals( this.getScrollerPos(component.find("scrollToYTest"), "top"), scrlr.y, "The scroller did not end in the correct location");
-	    
-	  }
-  },
-  testScrollToRelativeDown : {
-      browsers: ["-IE7","-IE8"],
-	  test: function(component) {
-	      var scrlr = component.find("scrollToYTest")._scroller;	      
-	            
-	      component.find("toStepButton").get("e.press").fire();
-	      $A.test.assertEquals(-75, scrlr.y, "The starting location of the scroller is incorrect");
-	      
-	      component.find("toStepButton").get("e.press").fire();	
-	      $A.test.assertEquals(-90, scrlr.y,  "The scroller did not end in the correct location");
-	    
-	  }
-  },
+  	testScrollToTop : {
+      	browsers: ["-IE7","-IE8"],
+	  	test: function(component) {
+	      	var scrlr = component.find("scrollToYTest")._scroller;
 
-  testScrollToRelativeUp : {
-      browsers: ["-IE7","-IE8"],
-	  test: function(component) {
-	      var scrlr = component.find("scrollToYTest")._scroller;	      
-	      component.find("toBotButton").get("e.press").fire();
-	      var pos = this.getScrollerPos(component.find("scrollToYTest"), "bot");
-	      component.find("toStepUpButton").get("e.press").fire();
-	      
-	      pos = pos + 15;
-	      $A.test.assertEquals(pos, scrlr.y, "The starting location of the scroller is incorrect");
-	      
-	      component.find("toStepUpButton").get("e.press").fire();	
-	      pos = pos + 15;
-	      $A.test.assertEquals(pos, scrlr.y,  "The scroller did not end in the correct location");
-	    
-	  }
-  },
-  getScrollerPos : function(component, pos) {
-	
-	var scrollWrapper = component.find("scrollWrapper").getElement(),
+	      	component.find("toBotButton").get("e.press").fire();;
+
+	      	$A.test.assertEquals( this.getScrollerPos(component.find("scrollToYTest"), "bot"), scrlr.y, "The starting location of the scroller is incorrect");
+	      	component.find("toTopButton").get("e.press").fire();
+
+	      	$A.test.assertEquals( this.getScrollerPos(component.find("scrollToYTest"), "top"), scrlr.y, "The scroller did not end in the correct location");
+
+	  	}
+  	},
+  
+  	testScrollToRelativeDown : {
+      	browsers: ["-IE7","-IE8"],
+	  	test: function(component) {
+	      	var scrlr = component.find("scrollToYTest")._scroller;	      
+
+	      	component.find("toStepButton").get("e.press").fire();
+	      	$A.test.assertEquals(-75, scrlr.y, "The starting location of the scroller is incorrect");
+
+	      	component.find("toStepButton").get("e.press").fire();	
+	      	$A.test.assertEquals(-90, scrlr.y,  "The scroller did not end in the correct location");
+	  	}
+  	},
+
+  	testScrollToRelativeUp : {
+     	browsers: ["-IE7","-IE8"],
+	  	test: function(component) {
+	      	var scrlr = component.find("scrollToYTest")._scroller;	      
+	      	component.find("toBotButton").get("e.press").fire();
+	      	var pos = this.getScrollerPos(component.find("scrollToYTest"), "bot");
+	      	component.find("toStepUpButton").get("e.press").fire();
+
+	      	pos = pos + 15;
+	      	$A.test.assertEquals(pos, scrlr.y, "The starting location of the scroller is incorrect");
+
+	      	component.find("toStepUpButton").get("e.press").fire();	
+	      	pos = pos + 15;
+	      	$A.test.assertEquals(pos, scrlr.y,  "The scroller did not end in the correct location");
+	  	}
+  	},
+  
+  	testOnScrollToBottomTakeAction: {
+    	browsers: ["-IE7","-IE8"],
+        test: function(component) {
+            component.find("toBotButton").get("e.press").fire();
+            $A.test.addWaitFor(1, function() {
+            	return component.get("v.scrollToBottomCount");
+            });	
+        }
+    },
+    
+  	getScrollerPos : function(component, pos) {
+
+		var scrollWrapper = component.find("scrollWrapper").getElement(),
 	    scrollContent = component.find("scrollContent").getElement(),
 	    offset;
-	
+
 	    if(pos === "top"){
-		offset = component.find("pullDown").getElement();
-		return (0 - offset.clientHeight);
+			offset = component.find("pullDown").getElement();
+			return (0 - offset.clientHeight);
 	    }
-	    
+
 	    offset = component.find("pullUp").getElement();
 	    return (0 - (scrollContent.clientHeight - scrollWrapper.clientHeight - offset.clientHeight));
-  },
-    
-    testOnScrollToBottomTakeAction: {
-    browsers: ["-IE7","-IE8"],
-        test: function(component) {
-            $A.test.select(".scrollToBottomButton")[0].click();
-            $A.test.addWaitFor("What", 
-                    function () {
-                        return $A.test.select(".updateAfterScroll")[0].innerText;
-                    });
-        }
-    },    
-    
+  	},
+  	
     getErrorMsgs : function(errorsArray) {
-        var errMsgs = "";
+    	var errMsgs = "";
         if (errorsArray) {
-            for (var i=0; i<errorsArray.length; i++) {
-                errMsgs+="ERROR["+i+"]"+errorsArray[i]+"\n";
-            }
+        	for (var i=0; i<errorsArray.length; i++) {
+        		errMsgs+="ERROR["+i+"]"+errorsArray[i]+"\n";
+        	}
         }
         return errMsgs;
     }

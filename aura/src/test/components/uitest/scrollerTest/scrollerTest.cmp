@@ -16,6 +16,8 @@
 
 -->
 <aura:component model="java://org.auraframework.impl.java.model.TestJavaModel">
+	<aura:attribute name="scrollToBottomCount" type="Integer" default="0"/>
+	
     <div class="test">
         <ui:scroller aura:id="basic">
             <img aura:id="dynamicImage"/>
@@ -116,7 +118,7 @@
     <ui:button aura:id="toStepUpButton" label="ScrollRelative" press="{!c.scrollUp}" />
     <div class="test">
         
-        <ui:scroller aura:id="scrollToYTest" onPullToRefresh="{!c.replaceBodyContent}" onPullToShowMore="{!c.replaceBodyContent}">
+        <ui:scroller aura:id="scrollToYTest" onPullToRefresh="{!c.replaceBodyContent}" onPullToShowMore="{!c.replaceBodyContent}" onScrollToBottom="{!c.handleScrollToBottomUpdate}">
             I let it fall, my heart
             And as it fell, you rose to claim it
             It was dark and I was over

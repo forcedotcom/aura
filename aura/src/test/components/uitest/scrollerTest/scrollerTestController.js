@@ -38,5 +38,10 @@
     scrollUp : function(cmp, event, helper) {
     	var scrollEvt = cmp.find("scrollToYTest").getEvent("scrollBy");
     	helper.handleScrollBy(scrollEvt, -15, -15, 0);
+    },
+    
+    handleScrollToBottomUpdate : function (cmp) {
+    	var count = cmp.get("v.scrollToBottomCount") + 1;
+    	cmp.getAttributes().setValue("scrollToBottomCount", count);
     }
 })

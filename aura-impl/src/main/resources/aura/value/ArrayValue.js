@@ -530,7 +530,6 @@ ArrayValue.prototype.render = function(parent, insertElements){
     var referenceNode;
     var ret = [];
 
-    var that = this;
     var array = this.getArray();
     var len = array.length;
     for (var i = 0; i < len; i++) {
@@ -554,7 +553,7 @@ ArrayValue.prototype.render = function(parent, insertElements){
 
     if (ret.length > 0) {
         // Just use the first element as the reference node
-        referenceNode = els[0];
+        referenceNode = ret[0];
     } else {
         referenceNode = this.createLocator(" array locator " + this.owner);
         ret.unshift(referenceNode);
@@ -604,8 +603,8 @@ ArrayValue.prototype.rerender = function(suppliedReferenceNode, appendChild, ins
     var startReferenceNode = this.referenceNode;
     var firstReferenceNode = null;
     var needReference = false;
+    var referenceNode = (appendChild || !this.referenceNode) ? suppliedReferenceNode : this.referenceNode;
     if (!this.isEmpty()) {
-        var referenceNode = (appendChild || !this.referenceNode) ? suppliedReferenceNode : this.referenceNode;
 
         var renderer;
         var array = this.getArray();
@@ -643,7 +642,7 @@ ArrayValue.prototype.rerender = function(suppliedReferenceNode, appendChild, ins
 
                 // When adding children and index is zero, referenceNode still points to parent, 
                 // and we need to call insertFist(), not appendChild()
-                var asFirst = appendChild && (j === 0);
+                var asFirst = (j === 0);
                 insertElements(ret, referenceNode, !appendChild, asFirst);
 
                 $A.afterRender(item);

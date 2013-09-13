@@ -73,18 +73,22 @@
             <artifactId>rhino</artifactId>
             <scope>test</scope>
         </dependency>
-		<dependency>
-		  <groupId>com.phloc</groupId>
-		  <artifactId>phloc-css</artifactId>
-		</dependency>
-		<dependency>
-		  <groupId>commons-io</groupId>
-		  <artifactId>commons-io</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-nop</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>com.phloc</groupId>
+            <artifactId>phloc-css</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-nop</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.ibm.icu</groupId>
+            <artifactId>icu4j</artifactId>
+        </dependency>
     </dependencies>
     <properties>
         <aura.home>${basedir}/..</aura.home>

@@ -15,9 +15,10 @@
  */
 package org.auraframework.util.number;
 
-import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.ParsePosition;
+
+import com.ibm.icu.text.NumberFormat;
 
 public class AuraNumberFormat {
 
@@ -31,6 +32,7 @@ public class AuraNumberFormat {
         }
 
         ParsePosition parsePosition = new ParsePosition(0);
+        numberFormat.setParseStrict(true);
         Number number = numberFormat.parse(input, parsePosition);
         if (number == null || parsePosition.getIndex() == 0) {
             throw new ParseException("Unparseable number: \"" + input + "\"", parsePosition.getErrorIndex());

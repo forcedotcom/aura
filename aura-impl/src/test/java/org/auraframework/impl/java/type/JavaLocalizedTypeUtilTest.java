@@ -84,9 +84,9 @@ public class JavaLocalizedTypeUtilTest extends UnitTestCase {
         assertEquals("German localized String to BigDecimal problem", correctDecimal, deDecimal);
 
         // ...for fr format decimals
-        BigDecimal frDecimal = JavaLocalizedTypeUtil.convert("123456.789", BigDecimal.class, false, new AuraLocaleImpl(
+        BigDecimal frDecimal = JavaLocalizedTypeUtil.convert("123456,789", BigDecimal.class, false, new AuraLocaleImpl(
                 Locale.FRANCE));
-        assertNotNull("German localized String to BigDecimal was null", frDecimal);
-        assertEquals("German localized String to BigDecimal problem", correctDecimal, frDecimal);
+        assertNotNull("France localized String to BigDecimal was null", frDecimal);
+        assertEquals("France localized String to BigDecimal problem", correctDecimal, frDecimal);
     }
 }

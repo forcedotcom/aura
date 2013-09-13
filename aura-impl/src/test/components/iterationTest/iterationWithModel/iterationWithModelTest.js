@@ -21,8 +21,7 @@
     /**
      * Verify adding rows to an iteration does not lose the model data.
      */
-    //TODO - W-1818696 - this only fails on jenkins autointegration.  Figure out why
-    _testAddNewRowsWithModelData: {
+    testAddNewRowsWithModelData: {
         test: function(cmp) {
             var cmps = cmp.find("innerCmp");
             $A.test.assertStartsWith("one : readonly", $A.util.getText(cmps[0].getElement()));
@@ -50,8 +49,7 @@
     /**
      * Verify removing rows from an iteration does not lose the model data.
      */
-    //TODO - W-1818696 - this only fails on jenkins autointegration.  Figure out why
-    _testRemoveRowWithModelData: {
+    testRemoveRowWithModelData: {
         test: function(cmp) {
             var cmps = cmp.find("innerCmp");
             $A.test.assertStartsWith("one : readonly", $A.util.getText(cmps[0].getElement()));
@@ -78,8 +76,7 @@
      * 
      * Note that if the cmp or initial list to iterate over is changed this test may need to be changed accordingly.
      */
-    //TODO - W-1818696 - this only fails on jenkins autointegration.  Figure out why
-    _testRenderCount : {
+    testRenderCount : {
         test : function(cmp) {
             var renderCount = window.__testRenderCount;
             // 6 total renders, 3 for each iteration

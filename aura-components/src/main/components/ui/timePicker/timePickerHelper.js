@@ -13,24 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.THIS {
-    padding: 10px;
-}
-
-.THIS .calGrid {
-    border-collapse: collapse;
-}
-
-.THIS .calGrid th {
-    color: #888;
-    font-size: 11px;
-    padding-bottom: 10px;
-    text-align: center;
-}
-
-@media only screen and (max-width: 999px) and (orientation: portrait) {
-    .THIS .calGrid {
-        border-collapse: collapse;
-        width: 100%;
+({
+    validateNumber: function(value, min, max) {
+        var intRegex = /^\d+$/; // nonnegative integer
+        if (intRegex.test(value)) {
+            var n = parseInt(value);
+            return n <= max && n >= min;
+        }
+        return false;
     }
-}
+})

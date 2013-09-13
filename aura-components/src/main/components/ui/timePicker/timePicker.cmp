@@ -1,0 +1,40 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component implements="ui:visible" description="A time picker which can be used in datePicker to select both date and time">
+    <aura:attribute name="hours" type="Integer" description="The hour value."/>
+    <!--
+    <aura:attribute name="is24HourFormat" type="Boolean" default="false" description="Indicate if it is set to 24 hour or 12-hour with am/pm."/>
+    <aura:attribute name="isPm" type="Boolean" default="false" description="Indeciate if the hour is in am or pm. Only valid when is is24HourFormat false."/>
+    -->
+    <aura:attribute name="minutes" type="Integer" description="The miniue value."/>
+    <aura:attribute name="visible" type="Boolean" default="false" description="Indicates if this time picker is displayed. Defaults to false, which hides this time picker."/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:handler name="change" value="{!v.hours}" action="{!c.hoursChange}"/>
+    <aura:handler name="change" value="{!v.minutes}" action="{!c.minutesChange}"/>
+    
+    <div><ui:inputNumber aura:id="hours" class="input" format="00" value="{!v.hours}"/></div>:
+    <div><ui:inputNumber aura:id="minutes" class="input" format="00" value="{!v.minutes}"/></div>
+    <!--
+    <aura:if isTrue="{!v.is24HourFormat != true}">
+        <ui:inputSelect aura:id="ampm" value="{!v.isPm}">
+            <ui:inputSelectOption aura:id="amOpt" label="AM" value="false"/>
+            <ui:inputSelectOption aura:id="pmOpt" label="PM" value="true"/>
+        </ui:inputSelect>
+    </aura:if>
+    -->
+</aura:component>

@@ -16,10 +16,22 @@
 
 -->
 <aura:component extensible="true" implements="ui:visible" model="java://org.auraframework.component.ui.DatePickerModel" description="A date picker that is used within ui:inputDate and ui:inputDateTime.">
+    <aura:attribute name="hasTime" type="Boolean" default="false" description="Indicate if the parent datePicker component supports time picker."/>
+    <aura:attribute name="hours" type="Integer" description="The hour value of a date object, which is always in 24 hour format."/>
+    <!--
+    <aura:attribute name="is24HourFormat" type="Boolean" default="false" description="Indicate if it is set to 24 hour or 12-hour with am/pm."/>
+    -->
+    <aura:attribute name="minutes" type="Integer" description="The minute value of a date object."/>
     <aura:attribute name="value" type="Date" description="A date corresponding to a calendar day in the format yyyy-mm-dd."/>
     <aura:attribute name="visible" type="Boolean" default="false" description="Indicates if the date picker is displayed. Defaults to false, which hides the date picker."/>
     <aura:registerevent name="selectDate" type="ui:selectDate" description="The event fired when a date is selected."/>
     <div aura:id="datePicker" class="{!v.class + (v.visible == true ? ' visible' : '')}">
+        <aura:if isTrue="{!v.hasTime}">
+            <div class="headerBar">
+                <a aura:id="cancel" onclick="{!c.cancel}" class="calCancel" href="javascript:void(0);">Cancel</a>
+                <a aura:id="set" onclick="{!c.set}" class="calSet" href="javascript:void(0);">Set</a>
+            </div>
+        </aura:if>
         <div class="dateBar">
             <div class="prevLinks">
                 <a aura:id="prevYear" class="navLink prevYear" title="Go to previous year" onclick="{!c.goToPrevYear}" onkeydown="{!c.closeOnTab}">
@@ -39,9 +51,16 @@
             </div>
             <h4 aria-live="assertive" aria-atomic="true" class="monthYear" aura:id="calTitle"/>
         </div>
-        <ui:datePickerGrid aura:id="grid" weekDays="{!m.weekdayLabels}" hide="{!c.hide}" selectDate="{!c.selectDate}" updateCalendarTitle="{!c.updateCalendarTitle}"/>
-        <div class="buttonBar">
-            <a aura:id="today" onclick="{!c.selectToday}" onkeydown="{!c.handleTabToday}" class="calToday" href="javascript:void(0);">Today</a>
-        </div>
+        <ui:datePickerGrid aura:id="grid" hasTime ="{!v.hasTime}" weekDays="{!m.weekdayLabels}" hide="{!c.hide}" selectDate="{!c.selectDate}" updateCalendarTitle="{!c.updateCalendarTitle}"/>
+        <aura:if isTrue="{!v.hasTime}">
+            <div class="timeBar">
+                <ui:timePicker aura:id="time"/>
+            </div>
+            <aura:set attribute="else">
+                <div class="buttonBar">
+                    <a aura:id="today" onclick="{!c.selectToday}" onkeydown="{!c.handleTabToday}" class="calToday" href="javascript:void(0);">Today</a>
+                </div>
+            </aura:set>
+        </aura:if>
     </div>
 </aura:component>

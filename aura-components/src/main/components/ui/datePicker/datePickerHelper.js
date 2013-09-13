@@ -181,7 +181,11 @@
     },
     
     localizeToday: function(component) {
-        var todayElem = component.find("today").getElement();
+        var todayCmp = component.find("today");
+        if (!todayCmp) {
+            return;
+        }
+        var todayElem = todayCmp.getElement();
         var todayLabel = component.get("m.labelForToday");
         if (!todayLabel) {
             todayLabel = "Today";
@@ -233,6 +237,16 @@
             grid.setValue("v.date", initialDate.getDate());
             grid.setValue("v.month", initialDate.getMonth());
             grid.setValue("v.year", initialDate.getFullYear());
+        }
+        
+        // set initial value to time picker if hasTime is true
+        var hasTime = component.getValue("v.hasTime").getBooleanValue();
+        if (hasTime) {
+            var timePickerCmp = component.find("time");
+            if (timePickerCmp) {
+                timePickerCmp.setValue("v.hours", component.get("v.hours"));
+                timePickerCmp.setValue("v.minutes", component.get("v.minutes"));
+            }
         }
     },
     

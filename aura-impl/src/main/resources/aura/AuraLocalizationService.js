@@ -334,6 +334,18 @@ var AuraLocalizationService = function AuraLocalizationService() {
         },
         
         /**
+         * Get the date time related labels (month name, weekday name, am/pm etc.).
+         * @return {Object} the localized label set.
+         * @memberOf AuraLocalizationService
+         * @public
+         */
+        getLocalizedDateTimeLabels : function() {
+            var langLocale = $A.getGlobalValueProviders().get("$Locale.langLocale");
+            var l = localizationService.getNormalizedLangLocale(langLocale);
+            return moment["langData"](l);
+        },
+        
+        /**
          * Gets the number of milliseconds in a duration.
          * @param {Duration} d The duration object returned by localizationService.duration
          * @return {Number} The number of milliseconds in d.

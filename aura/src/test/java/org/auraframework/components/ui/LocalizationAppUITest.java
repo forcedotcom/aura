@@ -95,7 +95,7 @@ public class LocalizationAppUITest extends WebDriverTestCase {
     // Checking functionality of the inputNumber/outputNumber components
     @ExcludeBrowsers({ BrowserType.IE9, BrowserType.IE10, BrowserType.SAFARI, BrowserType.ANDROID_PHONE,
             BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
-    public void testNumberComponents() throws Exception {
+    public void _testNumberComponents() throws Exception {
         open(URL);        
        
         //initial load

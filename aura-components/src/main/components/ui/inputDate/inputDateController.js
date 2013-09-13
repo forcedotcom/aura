@@ -14,6 +14,13 @@
  * limitations under the License.
  */
 ({
+    click: function(component, event, helper) {
+        event.preventDefault();
+        var concreteCmp = component.getConcreteComponent();
+        var _helper = concreteCmp.getDef().getHelper();
+        _helper.displayDatePicker(concreteCmp);
+    },
+    
     doInit: function(component, event, helper) {
         // Set placeholder
         var concreteCmp = component.getConcreteComponent();

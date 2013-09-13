@@ -15,15 +15,9 @@
  */
 package org.auraframework.http;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-import org.apache.http.Header;
-import org.apache.http.HttpHeaders;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.NameValuePair;
+import org.apache.http.*;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicHeader;
@@ -88,8 +82,8 @@ public class InputDateTimeLocaleHttpTest extends AuraHttpTestCase{
         //Grab the object you are looking for from the json tree
         Map<String, Object> context = (Map<String, Object>) json.get("context");
         Map<String, Object> components = (Map<String, Object>) context.get("components");
-        Map<String, Object>  num10= (Map<String, Object>) components.get("10");
-        Map<String, Object>  valueMap = (Map<String, Object>) num10.get("value"); 
+        Map<String, Object>  num11= (Map<String, Object>) components.get("11");
+        Map<String, Object>  valueMap = (Map<String, Object>) num11.get("value"); 
         Map<String, Object> model = (Map<String, Object>) valueMap.get("model");
         ArrayList<Map<String, Object>> monthLabels = (ArrayList<Map<String, Object>>) model.get("monthLabels"); 
         ArrayList<Map<String, Object>> weekDayLabels = (ArrayList<Map<String, Object>>) model.get("weekdayLabels"); 

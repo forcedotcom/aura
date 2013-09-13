@@ -253,10 +253,39 @@
     
     selectDate: function(component, event) {
         var source = event.getSource();
-        // fire selectdate event
-        var selectDateEvent = component.getEvent("selectDate");
-        selectDateEvent.setParams({"value": source.get("v.value")});
-        selectDateEvent.fire();
+        var hasTime = component.getValue("v.hasTime").getBooleanValue();
+        if (hasTime === true) {
+            var firstDate = new Date(component.get("v.year"), component.get("v.month"), 1);
+            var firstDateId = firstDate.getDay();
+            
+            var lastDate = new Date(component.get("v.year"), component.get("v.month") + 1, 0);
+            var lastDateCellCmp = this.findDateComponent(component, lastDate);
+            var lastDateId = lastDateCellCmp.getLocalId();
+            
+            var currentId = source.getLocalId();
+            var currentDate = source.get("v.label");
+            if (currentId < firstDateId) { // previous month
+                var targetDate = new Date(component.get("v.year"), component.get("v.month") - 1, currentDate);
+                component.setValue("v.year", targetDate.getFullYear());
+                component.setValue("v.month", targetDate.getMonth());
+                component.setValue("v.date", targetDate.getDate());
+                this.updateTitle(component, targetDate.getMonth(), targetDate.getFullYear());
+            } else if (currentId > lastDateId) { // next month
+                var targetDate = new Date(component.get("v.year"), component.get("v.month") + 1, currentDate);
+                component.setValue("v.year", targetDate.getFullYear());
+                component.setValue("v.month", targetDate.getMonth());
+                component.setValue("v.date", targetDate.getDate()); 
+                this.updateTitle(component, targetDate.getMonth(), targetDate.getFullYear());
+            } else {
+                source.getElement().focus();
+                component.setValue("v.date", currentDate);
+            }
+            component.setValue("v.selectedDate", component.get("v.year") + "-" + (component.get("v.month") + 1) + "-" + component.get("v.date"));
+        } else { // fire selectdate event
+            var selectDateEvent = component.getEvent("selectDate");
+            selectDateEvent.setParams({"value": source.get("v.value")});
+            selectDateEvent.fire();
+        }
     },
     
     setFocus: function(component) {

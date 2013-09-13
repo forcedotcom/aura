@@ -14,8 +14,11 @@
  * limitations under the License.
  */
 ({
-    click: function(cmp, event, helper) {
-        helper.displayDatePicker(cmp);
+    click: function(component, event, helper) {
+        event.preventDefault();
+        var concreteCmp = component.getConcreteComponent();
+        var _helper = concreteCmp.getDef().getHelper();
+        helper.displayDatePicker(concreteCmp);
     },
     
     doInit: function(component, event, helper) {
@@ -42,26 +45,28 @@
             format = $A.getGlobalValueProviders().get("$Locale.datetimeformat");
         }
         var langLocale = component.get("v.langLocale");
-        var hours = 0
-        var mins = 0;
+        //var hours = 0;
+        //var mins = 0;
         var secs = 0;
         var ms = 0;
         if (value) {
             var currDate = $A.localizationService.parseDateTimeUTC(value, format, langLocale); 
-            hours = currDate.getUTCHours();
-            mins = currDate.getUTCMinutes();
+            //hours = currDate.getUTCHours();
+            //mins = currDate.getUTCMinutes();
             secs = currDate.getUTCSeconds();
             ms = currDate.getUTCMilliseconds();
         }
         
         var dateValue = event.getParam("value");
+        var selectedHours = event.getParam("hours");
+        var selectedMinutes = event.getParam("minutes");
         var newDate = $A.localizationService.parseDateTimeUTC(dateValue, "YYYY-MM-DD", langLocale);
         
         var targetTime = Date.UTC(newDate.getUTCFullYear(), 
                                   newDate.getUTCMonth(), 
                                   newDate.getUTCDate(),
-                                  hours,
-                                  mins,
+                                  selectedHours,
+                                  selectedMinutes,
                                   secs,
                                   ms);
         var d = new Date(targetTime);

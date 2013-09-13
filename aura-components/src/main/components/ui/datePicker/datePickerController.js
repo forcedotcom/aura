@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 ({
+    cancel: function(component, event, helper) {
+        component.setValue("v.visible", false);
+    },
+    
     closeOnTab: function(component, event, helper) {
         helper.handleESCKey(component, event);
         var keyCode = event.keyCode;
@@ -102,6 +106,53 @@
         var selectDateEvent = component.getEvent("selectDate");
         selectDateEvent.setParams({"value": mDate.format("YYYY-MM-DD")});
         selectDateEvent.fire();
+        component.setValue("v.visible", false);
+    },
+    
+    set: function(component, event, helper) {
+        var setDateTimeEvent = component.getEvent("selectDate");
+        if (setDateTimeEvent) {
+            // Get date value
+            var gridCmp = component.find("grid");
+            if (!gridCmp) {
+                return;
+            }
+            var date = gridCmp.get("v.year") + "-" + (gridCmp.get("v.month") + 1) + "-" + gridCmp.get("v.date");
+            
+            // Get time value
+            var timeCmp = component.find("time");
+            if (!timeCmp) {
+                return;
+            }
+            /*
+            var hours = parseInt(timeCmp.get("v.hours"));
+            if (hours == NaN) { // not a number which should not happen
+                hours = 0;
+            } else {
+                var is24HourFormat = timeCmp.getValue("v.is24HourFormat").getBooleanValue();
+                var isPm = timeCmp.getValue("v.isPm").getBooleanValue();
+                if (!is24HourFormat && isPm) {
+                    hours += 12;
+                }
+            }
+            var minutes = parseInt(timeCmp.get("v.minutes"));
+            if (minutes == NaN) { // not a number which should not happen
+                minutes = 0;
+            }
+            */
+            var hoursValue = timeCmp.getValue("v.hours");
+            var minutesValue = timeCmp.getValue("v.minutes");
+            
+            if (!hoursValue.isValid() || !minutesValue.isValid()) {
+                return;
+            } 
+            setDateTimeEvent.setParams({
+                "value": date,
+                "hours": hoursValue.getValue(),
+                "minutes": minutesValue.getValue()
+            });
+            setDateTimeEvent.fire();
+        }
         component.setValue("v.visible", false);
     },
 	

@@ -566,7 +566,8 @@ var AuraLocalizationService = function AuraLocalizationService() {
          */
         translateFromOtherCalendar : function(date) {
             var userLocaleLang = $A.getGlobalValueProviders().get("$Locale.userLocaleLang");
-            if ('th' === userLocaleLang) { // Buddhist year
+            var userLocaleCountry = $A.getGlobalValueProviders().get("$Locale.userLocaleCountry");
+            if ('th' === userLocaleLang && 'TH' === userLocaleCountry) { // Buddhist year
                 date.setFullYear(date.getFullYear() - 543);
             }
             return date;
@@ -609,7 +610,8 @@ var AuraLocalizationService = function AuraLocalizationService() {
          */
         translateToOtherCalendar : function(date) {
             var userLocaleLang = $A.getGlobalValueProviders().get("$Locale.userLocaleLang");
-            if ('th' === userLocaleLang) { // Buddhist year
+            var userLocaleCountry = $A.getGlobalValueProviders().get("$Locale.userLocaleCountry");
+            if ('th' === userLocaleLang && 'TH' === userLocaleCountry) { // Buddhist year
                 date.setFullYear(date.getFullYear() + 543);
             }
             return date;

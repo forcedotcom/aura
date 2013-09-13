@@ -552,12 +552,16 @@ var priv = {
 
     hardRefresh : function() {
         var url = location.href;
+
+        document._hardRefreshWOUrlAppendFlag = false;
+        
         if (!priv.isManifestPresent() || url.indexOf("?nocache=") > -1) {
+        	//debug for flapper
+        	document._hardRefreshWOUrlAppendFlag = true;
             location.reload(true);
             return;
         }
         var params = "?nocache=" + encodeURIComponent(url);
-
         // insert nocache param here for hard refresh
         var hIndex = url.indexOf("#");
         var qIndex = url.indexOf("?");
@@ -787,5 +791,6 @@ if (window.applicationCache && window.applicationCache.addEventListener) {
     window.applicationCache.addEventListener("progress", priv.handleAppcacheProgress, false);
     window.applicationCache.addEventListener("noupdate", priv.handleAppcacheNoUpdate, false);
     window.applicationCache.addEventListener("cached", priv.handleAppcacheCached, false);
+    
     window.applicationCache.addEventListener("obsolete", priv.handleAppcacheObsolete, false);
 }

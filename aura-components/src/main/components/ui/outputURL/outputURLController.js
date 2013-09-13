@@ -15,10 +15,24 @@
  */
 {
     click : function(cmp, event){
-        if (cmp.getAttributes().getValue("disabled").getBooleanValue()) {
+        var attributes = cmp.getAttributes();
+
+        if (attributes.getValue("stopPropagation").getBooleanValue()) {
+            //IE9 & Other Browsers
+            if (event.stopPropagation) {
+              event.stopPropagation();
+            }
+            //IE8 and Lower
+            else {
+              event.cancelBubble = true;
+            }
+        }
+
+        if (attributes.getValue("disabled").getBooleanValue()) {
             event.preventDefault();
             return false;
         }
+
         var clickEvent = cmp.getEvent("linkClick");
         clickEvent.setParams({ "domEvent" : event });
         clickEvent.fire();

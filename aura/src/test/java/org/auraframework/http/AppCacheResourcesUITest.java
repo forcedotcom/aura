@@ -250,6 +250,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
     @ThreadHostileTest("NamespaceDef modification affects namespace")
     @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
     public void testComponentCssChange() throws Exception {
+    	System.out.println("testComponentCssChange begins");
         createDef(NamespaceDef.class, String.format("%s://%s", DefDescriptor.MARKUP_PREFIX, namespace),
                 "<aura:namespace></aura:namespace>");
 
@@ -262,9 +263,15 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
 
         // update a component's css file
         String replacement = getName() + System.currentTimeMillis();
+      //debug for flapper:
+        System.out.println("testComponentCssChange replace token:"+System.currentTimeMillis());
         replaceToken(getTargetComponent().getStyleDescriptor(), replacement);
-
+      //debug for flapper:
+        System.out.println("testComponentCssChange load app again:"+System.currentTimeMillis());
         logs = loadMonitorAndValidateApp(TOKEN, TOKEN, replacement, TOKEN);
+      //debug for flapper:
+        System.out.println("we did hard refresh without appending url with 'nochache':"
+      +auraUITestingUtil.getBooleanEval("return !!document._hardRefreshWOUrlAppendFlag"));
         assertRequests(getExpectedChangeRequests(), logs);
         assertAppCacheStatus(Status.IDLE);
 
@@ -279,10 +286,10 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
      */
     @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
     public void testComponentJsChange() throws Exception {
+    	System.out.println("++++++testComponentJsChange begins:"+System.currentTimeMillis());
         List<Request> logs = loadMonitorAndValidateApp(TOKEN, TOKEN, "", TOKEN);
         assertRequests(getExpectedInitialRequests(), logs);
         assertAppCacheStatus(Status.IDLE);
-
         // update a component's js controller file
         String replacement = getName() + System.currentTimeMillis();
         DefDescriptor<?> desc = null;
@@ -293,8 +300,15 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
                 break;
             }
         }
+      //debug for flapper:
+        System.out.println("++++++testComponentJsChange replace token:"+System.currentTimeMillis());
         replaceToken(desc, replacement);
+      //debug for flapper:
+        System.out.println("++++++testComponentJsChange loadMonitorAndValidateApp:"+System.currentTimeMillis());
         logs = loadMonitorAndValidateApp(TOKEN, replacement, "", TOKEN);
+        //debug for flapper:
+        System.out.println("++++++we did hard refresh without appending url with 'nochache':"
+        +auraUITestingUtil.getBooleanEval("return !!document._hardRefreshWOUrlAppendFlag"));
         assertRequests(getExpectedChangeRequests(), logs);
         assertAppCacheStatus(Status.IDLE);
         logs = loadMonitorAndValidateApp(TOKEN, replacement, "", TOKEN);
@@ -313,8 +327,15 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         assertAppCacheStatus(Status.IDLE);
         // update markup of namespaced component used by app
         String replacement = getName() + System.currentTimeMillis();
+        //debug for flapper:
+        System.out.println("testComponentMarkupChange replace token:"+System.currentTimeMillis());
         replaceToken(getTargetComponent().getDescriptor(), replacement);
+        //debug for flapper:
+        System.out.println("testComponentMarkupChange  reload app:"+System.currentTimeMillis());
         logs = loadMonitorAndValidateApp(replacement, TOKEN, "", TOKEN);
+        //debug for flapper:
+        System.out.println("we did hard refresh without appending url with 'nochache':"
+        +auraUITestingUtil.getBooleanEval("return !!document._hardRefreshWOUrlAppendFlag"));
         assertRequests(getExpectedChangeRequests(), logs);
         assertAppCacheStatus(Status.IDLE);
         logs = loadMonitorAndValidateApp(replacement, TOKEN, "", TOKEN);

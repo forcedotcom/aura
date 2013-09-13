@@ -14,36 +14,13 @@
  * limitations under the License.
  */
 ({
-    checkResponse : function(cmp, expectedState, expectedMessage, expectedStack){
-        cmp.find("trigger").get("e.press").fire();
-        $A.test.runAfterIf(
-            function(){ return cmp.get("v.response"); },
-            function(){
-                var action = cmp.get("v.response");
-                var msg = action.error[0].message;
-                var stack = action.error[0].stack;
-                $A.test.assertEquals(expectedState, action.state, "Unexpected state: ");
-                if(expectedMessage){
-                	expectedMessage = "Unable to process your request\n\n"+
-            							"org.auraframework.throwable.AuraExecutionException: "+
-            							expectedMessage;
-                    $A.test.assertTrue(msg.indexOf(expectedMessage)==0, "Unexpected error message: ");
-                }
-                if(expectedStack){
-                	$A.test.assertTrue(stack.indexOf(expectedStack) === 0, "Unexpected stack: " + stack);
-                } else {
-                    $A.test.assertTrue(stack.indexOf("org.auraframework.throwable.AuraUnhandledException: "
-                        + expectedMessage) === 0, "Unexpected stack: " + stack);
-                }
-            }
-        );
-    },
+    
 
     testThrowable: {
         attributes : { throwableClass:"java.lang.Throwable",
                        throwableCause:"couldn't decide" },
         test: function(cmp){
-            this.checkResponse(cmp, "ERROR", "java://org.auraframework.impl.java.controller.JavaTestController: " +
+            this.checkUnHandledExceptionResponse(cmp, "ERROR", "java://org.auraframework.impl.java.controller.JavaTestController: " +
                                                 "java.lang.Throwable: couldn't decide");
         }
     },
@@ -52,7 +29,7 @@
         attributes : { throwableClass:"java.lang.RuntimeException",
                        throwableCause:"java.lang.IllegalAccessException" },
         test: function(cmp){
-            this.checkResponse(cmp, "ERROR", "java://org.auraframework.impl.java.controller.JavaTestController: " +
+            this.checkUnHandledExceptionResponse(cmp, "ERROR", "java://org.auraframework.impl.java.controller.JavaTestController: " +
                                                 "java.lang.RuntimeException: java.lang.IllegalAccessException");
         }
     },
@@ -61,7 +38,7 @@
         attributes : { throwableClass:"java.lang.Error",
                        throwableCause:"java.lang.RuntimeException" },
         test: function(cmp){
-            this.checkResponse(cmp, "ERROR", "java://org.auraframework.impl.java.controller.JavaTestController: " + 
+            this.checkUnHandledExceptionResponse(cmp, "ERROR", "java://org.auraframework.impl.java.controller.JavaTestController: " + 
                                                 "java.lang.Error: java.lang.RuntimeException");
         }
     },
@@ -70,7 +47,7 @@
         attributes : { throwableClass:"java.lang.reflect.InvocationTargetException",
                        throwableCause:"java.lang.IllegalArgumentException" },
         test: function(cmp){
-            this.checkResponse(cmp, "ERROR", "java://org.auraframework.impl.java.controller.JavaTestController: " +
+            this.checkUnHandledExceptionResponse(cmp, "ERROR", "java://org.auraframework.impl.java.controller.JavaTestController: " +
                                                 "java.lang.reflect.InvocationTargetException");
         }
     },
@@ -79,7 +56,7 @@
         attributes : { throwableClass:"java.lang.reflect.InvocationTargetException",
                        throwableCause:"aura.throwable.AuraHandledException" },
         test: function(cmp){
-            this.checkResponse(cmp, "ERROR", "java://org.auraframework.impl.java.controller.JavaTestController: " +
+            this.checkUnHandledExceptionResponse(cmp, "ERROR", "java://org.auraframework.impl.java.controller.JavaTestController: " +
                                                 "java.lang.reflect.InvocationTargetException");
         }
     },
@@ -88,7 +65,7 @@
         attributes : { throwableClass:"java.lang.IllegalArgumentException",
                        throwableCause:"you're not listening" },
         test: function(cmp){
-            this.checkResponse(cmp, "ERROR", "java://org.auraframework.impl.java.controller.JavaTestController: " + 
+            this.checkUnHandledExceptionResponse(cmp, "ERROR", "java://org.auraframework.impl.java.controller.JavaTestController: " + 
                                                 "java.lang.IllegalArgumentException: you're not listening");
         }
     },
@@ -97,7 +74,7 @@
         attributes : { throwableClass:"java.lang.IllegalAccessException",
                        throwableCause:"under 21" },
         test: function(cmp){
-        	this.checkResponse(cmp, "ERROR", "java://org.auraframework.impl.java.controller.JavaTestController: " +
+        	this.checkUnHandledExceptionResponse(cmp, "ERROR", "java://org.auraframework.impl.java.controller.JavaTestController: " +
                                                 "java.lang.IllegalAccessException: under 21");
         }
     },
@@ -106,7 +83,7 @@
         attributes : { throwableClass:"aura.throwable.AuraHandledException",
                        throwableCause:"java.lang.IllegalArgumentException" },
         test: function(cmp){
-            this.checkResponse(cmp, "ERROR", "", "org.auraframework.throwable.AuraHandledException");
+            this.checkHandledExceptionResponse(cmp, "ERROR", "", "org.auraframework.throwable.AuraHandledException");
         }
     },
 
@@ -133,6 +110,31 @@
                 }
                 if(expectedStack){
                 	$A.test.assertTrue(stack.indexOf(expectedStack) === 0, "Unexpected stack: " + stack);
+                }
+            }
+        );
+    },
+    
+    checkUnHandledExceptionResponse : function(cmp, expectedState, expectedMessage, expectedStack){
+        cmp.find("trigger").get("e.press").fire();
+        $A.test.runAfterIf(
+            function(){ return cmp.get("v.response"); },
+            function(){
+                var action = cmp.get("v.response");
+                var msg = action.error[0].message;
+                var stack = action.error[0].stack;
+                $A.test.assertEquals(expectedState, action.state, "Unexpected state: ");
+                if(expectedMessage){
+                	expectedMessage = "Unable to process your request\n\n"+
+            							"org.auraframework.throwable.AuraExecutionException: "+
+            							expectedMessage;
+                    $A.test.assertTrue(msg.indexOf(expectedMessage)==0, "Unexpected error message: ");
+                }
+                if(expectedStack){
+                	$A.test.assertTrue(stack.indexOf(expectedStack) === 0, "Unexpected stack: " + stack);
+                } else {
+                    $A.test.assertTrue(stack.indexOf("org.auraframework.throwable.AuraUnhandledException: "
+                        + expectedMessage) === 0, "Unexpected stack: " + stack);
                 }
             }
         );

@@ -154,6 +154,11 @@ public class TestExecutor {
         if (testClass.isAnnotationPresent(ThreadHostileTest.class)) {
             return true;
         }
+        if (test instanceof WebDriverTestCase) {
+            if (((WebDriverTestCase) test).getTestLabels().contains("threadHostile")) {
+                return true;
+            }
+        }
         try {
             return testClass.getMethod(((TestCase) test).getName()).isAnnotationPresent(ThreadHostileTest.class);
         } catch (Throwable t) {

@@ -18,14 +18,20 @@ package org.auraframework.impl.java.controller;
 import java.io.IOException;
 import java.util.Map;
 
+import org.auraframework.def.ActionDef;
 import org.auraframework.def.ControllerDef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.system.DefinitionImpl;
+import org.auraframework.impl.system.SubDefDescriptorImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.instance.Action;
+import org.auraframework.system.Location;
 import org.auraframework.system.SubDefDescriptor;
+import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.util.json.Json;
 
 /**
@@ -77,8 +83,15 @@ public class JavaControllerDef extends DefinitionImpl<ControllerDef> implements 
     }
 
     @Override
-    public Action createAction(String actionName, Map<String, Object> paramValues) {
-        return new JavaAction(getDescriptor(), actionMap.get(actionName), paramValues);
+    public Action createAction(String actionName, Map<String, Object> paramValues) throws DefinitionNotFoundException {
+    	JavaActionDef actionDef = actionMap.get(actionName);
+    	if(actionDef == null){
+    		DefDescriptor<ActionDef> desc = SubDefDescriptorImpl.getInstance(actionName, getDescriptor(), ActionDef.class);
+    		throw new DefinitionNotFoundException(desc);
+//    		throw new InvalidDefinitionException(String.format("No action named %s found in controller %s",actionName, descriptor.getQualifiedName()), new Location(
+//                    descriptor.getQualifiedName(), 0));
+        }
+        return new JavaAction(getDescriptor(), actionDef, paramValues);
     }
 
     @Override

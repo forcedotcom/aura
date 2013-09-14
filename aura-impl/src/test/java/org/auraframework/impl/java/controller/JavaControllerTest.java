@@ -56,7 +56,7 @@ public class JavaControllerTest extends AuraImplTestCase {
     }
 
     private void checkPassAction(ControllerDef controller, String name, Map<String, Object> args, State expState,
-            Object returnValue) {
+            Object returnValue) throws DefinitionNotFoundException {
         Action action = controller.createAction(name, args);
         action.run();
         assertEquals(name + " State", expState, action.getState());
@@ -65,7 +65,7 @@ public class JavaControllerTest extends AuraImplTestCase {
     }
 
     private void checkFailAction(ControllerDef controller, String name, Map<String, Object> args, State expState,
-            Class<? extends Exception> error, String errorMessage) {
+            Class<? extends Exception> error, String errorMessage) throws DefinitionNotFoundException {
         Action action = controller.createAction(name, args);
         action.run();
         assertEquals(name + " State", expState, action.getState());
@@ -130,8 +130,6 @@ public class JavaControllerTest extends AuraImplTestCase {
         		"org.auraframework.throwable.AuraExecutionException: " +
         		"java://org.auraframework.impl.java.controller.TestController: " +
         		"java.lang.RuntimeException: intentionally generated");
-        checkFailAction(controller, "imNotHere", empty, State.ERROR, AuraUnhandledException.class,
-                "org.auraframework.throwable.quickfix.InvalidDefinitionException: No action found");
     }
 
     /**
@@ -181,6 +179,14 @@ public class JavaControllerTest extends AuraImplTestCase {
         } catch (DefinitionNotFoundException e) {
             assertEquals(String.format("No CONTROLLER named java://goats found : %s", dd.getQualifiedName()),
                     e.getMessage());
+        }
+        ControllerDef controller = getJavaController("java://org.auraframework.impl.java.controller.TestController");
+        Map<String, Object> empty = new HashMap<String, Object>();
+        try{
+        	controller.createAction("imNotHere", empty);
+        	fail("Should not be able to create JavaAction when method does not exist in Controller class");
+        } catch(DefinitionNotFoundException e){
+        	assertEquals("No ACTION named java://org.auraframework.impl.java.controller.TestController/ACTION$imNotHere found", e.getMessage());
         }
     }
 

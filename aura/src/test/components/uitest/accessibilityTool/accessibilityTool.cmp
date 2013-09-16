@@ -17,6 +17,16 @@
 -->
 <aura:component>
     <aura:attribute name="caseToRender" type="String" default="full"/>
+    
+    <aura:if isTrue="{!v.caseToRender == 'labelsNotNeeded'}">
+        <label for="ID_EGO">Something Something</label>
+        <input type="submit" id="ID_EGO" size="25" value="SUBMIT TO ME"/>
+        <input type="reset" value="Reset ALL THE THINGS!"/>
+        <input type="image" src="/auraFW/resources/aura/images/auraNoteDemo.png" name="image" alt="img" width="60" height="60"/>
+        <input type="hidden" value="I AM HIDDERN"/>
+        <input type="button" size="25" value="CLick me"/>
+        <input type="image" src="/auraFW/resources/aura/images/auraNoteDemo.png" name="image" width="60" height="60"/>
+    </aura:if>
     <aura:if isTrue="{!v.caseToRender == 'full'}">  
         <table>
             <th></th>

@@ -678,16 +678,23 @@ Action.prototype.getRefreshAction = function(originalResponse) {
 
 		storageService.log("Action.refresh(): auto refresh begin: " + this.getId() + " to " + refreshAction.getId());
 
-		refreshAction.callbacks = this.callbacks;
+		var executeCallbackIfUpdated = this.storableConfig ? this.storableConfig["executeCallbackIfUpdated"] : true;
+		if (executeCallbackIfUpdated !== false) {
+			refreshAction.callbacks = this.callbacks;
+		}
+		
 		refreshAction.setParams(this.params);
 		refreshAction.setStorable({
 			"ignoreExisting" : true
 		});
+		
 		refreshAction.abortable = this.abortable;
 		refreshAction.sanitizeStoredResponse(originalResponse);
 		refreshAction.originalResponse = originalResponse;
+		
 		return refreshAction;
 	}
+	
 	return null;
 };
 

@@ -86,7 +86,7 @@
             );
             $A.services.event.finishFiring();
             
-            $A.test.addWaitFor(true, $A.test.allActionsComplete, function(){
+            $A.test.addWaitFor(false, $A.test.isActionPending, function(){
                 var newCmp = cmp.get('v.body')[0];
                 $A.test.assertEquals("markup://valueChange:newComponentInit", newCmp.getDef().getDescriptor().getQualifiedName(),
                         "Failed to create new component: markup://valueChange:newComponentInit");

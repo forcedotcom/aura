@@ -31,7 +31,7 @@
                 }
             );
             $A.eventService.finishFiring();
-            $A.test.addWaitFor(true, $A.test.allActionsComplete, function(){
+            $A.test.addWaitFor(false, $A.test.isActionPending, function(){
                 var reg = /:c/; 
                 $A.test.assertNotNull(newCmp.getGlobalId().match(reg), "GlobalId for clientSide cmp should end with "
                         + "'c' but it is" + newCmp.getGlobalId());

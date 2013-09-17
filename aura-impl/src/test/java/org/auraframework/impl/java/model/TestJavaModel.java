@@ -18,14 +18,25 @@ package org.auraframework.impl.java.model;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.TimeZone;
 
 import org.auraframework.Aura;
 import org.auraframework.components.ui.InputOption;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Model;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.date.*;
+import org.auraframework.util.date.DateOnly;
+import org.auraframework.util.date.DateService;
+import org.auraframework.util.date.DateServiceImpl;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonSerializable;
 
@@ -206,7 +217,53 @@ public class TestJavaModel {
     public List<String> getStringListNull() {
         return null;
     }
-
+    @AuraEnabled
+    public ArrayList<InputOption> getNoOptionsSel() {
+        //String label, String name, boolean selected, String value
+        return new ArrayList<InputOption>(){{
+            add(new InputOption("Tiger", "Tiger", false, "Tiger"));
+            add(new InputOption("Lion", "Lion", false, "Lion"));
+            add(new InputOption("Bear", "Bear", false, "Bear"));
+            
+        }};
+    }
+    @AuraEnabled
+    public ArrayList<InputOption>  getSecondOptionSel() {
+        return new ArrayList<InputOption>(){{
+            add(new InputOption("Tiger", "Tiger", false, "Tiger"));
+            add(new InputOption("Lion", "Lion", true, "Lion"));
+            add(new InputOption("Bear", "Bear", false, "Bear"));
+            
+        }};
+    }
+    @AuraEnabled
+    public ArrayList<InputOption>  getNoOptionsSelWithNone() {
+        return new ArrayList<InputOption>(){{
+            add(new InputOption("None", "None", false, ""));
+            add(new InputOption("Tiger", "Tiger", false, "Tiger"));
+            add(new InputOption("Lion", "Lion", false, "Lion"));
+            add(new InputOption("Bear", "Bear", false, "Bear"));
+            
+        }};
+    }
+    @AuraEnabled
+    public ArrayList<InputOption>  getThirdOptionSelWithNone() {
+        return new ArrayList<InputOption>(){{
+            add(new InputOption("None", "None", false, ""));
+            add(new InputOption("Tiger", "Tiger", false, "Tiger"));
+            add(new InputOption("Lion", "Lion", true, "Lion"));
+            add(new InputOption("Bear", "Bear", false, "Bear"));
+            
+        }};
+    }
+    @AuraEnabled
+    public ArrayList<InputOption>  getThirdOptionSel() {
+        return new ArrayList<InputOption>(){{
+            add(new InputOption("Tiger", "Tiger", false, "Tiger"));
+            add(new InputOption("Lion", "Lion", false, "Lion"));
+            add(new InputOption("Bear", "Bear", true, "Bear"));
+        }};
+    }
     @AuraEnabled
     public List<List<String>> getListOfList() {
         List<List<String>> listofList = new ArrayList<List<String>>();

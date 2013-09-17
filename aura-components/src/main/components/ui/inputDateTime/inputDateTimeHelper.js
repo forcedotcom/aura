@@ -113,22 +113,20 @@
         return date.getUTCFullYear() + "-" + (date.getUTCMonth() + 1) + "-" + date.getUTCDate();
     },
     
-    /*
     is24HourFormat: function(component) {
         var format = component.get("v.format");
         if (!format) {
             format = $A.getGlobalValueProviders().get("$Locale.datetimeformat");
         }
-        return format.toLowerCase().lastIndexOf('a') < 0; // do we have a better way to do this?
+        return !($A.localizationService.isPeriodTimeView(format));
     },
-    */
     
     popUpDatePicker: function(component, date) {
         var datePicker = component.find("datePicker");
         datePicker.setValue("v.value", this.getUTCDateString(date));
         datePicker.setValue("v.hours", date.getUTCHours());
         datePicker.setValue("v.minutes", date.getUTCMinutes());
-        //datePicker.setValue("v.is24HourFormat", this.is24HourFormat(component));
+        datePicker.setValue("v.is24HourFormat", this.is24HourFormat(component));
         datePicker.setValue("v.visible", true);
     }
 })

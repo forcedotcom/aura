@@ -121,35 +121,13 @@
             
             // Get time value
             var timeCmp = component.find("time");
-            if (!timeCmp) {
+            if (!timeCmp || (timeCmp.getValue("v.isValid").getBooleanValue() === false)) {
                 return;
             }
-            /*
-            var hours = parseInt(timeCmp.get("v.hours"));
-            if (hours == NaN) { // not a number which should not happen
-                hours = 0;
-            } else {
-                var is24HourFormat = timeCmp.getValue("v.is24HourFormat").getBooleanValue();
-                var isPm = timeCmp.getValue("v.isPm").getBooleanValue();
-                if (!is24HourFormat && isPm) {
-                    hours += 12;
-                }
-            }
-            var minutes = parseInt(timeCmp.get("v.minutes"));
-            if (minutes == NaN) { // not a number which should not happen
-                minutes = 0;
-            }
-            */
-            var hoursValue = timeCmp.getValue("v.hours");
-            var minutesValue = timeCmp.getValue("v.minutes");
-            
-            if (!hoursValue.isValid() || !minutesValue.isValid()) {
-                return;
-            } 
             setDateTimeEvent.setParams({
                 "value": date,
-                "hours": hoursValue.getValue(),
-                "minutes": minutesValue.getValue()
+                "hours": timeCmp.get("v.hours"),
+                "minutes": timeCmp.get("v.minutes")
             });
             setDateTimeEvent.fire();
         }

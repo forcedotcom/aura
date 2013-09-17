@@ -15,60 +15,94 @@
  */
 ({
     doInit: function(component, event, helper) {
-        // Localize am/pm label
         /*
-        var localizedData = $A.localizationService.getLocalizedDateTimeLabels();
-        var ampm = localizedData._ampm;
-        if (ampm) {
-            var amOptCmp = component.find("amOpt");
-            if (amOptCmp) {
-                amOptCmp.setValue("v.label", ampm.am); 
-            }
-            var pmOptCmp = component.find("pmOpt");
-            if (pmOptCmp) {
-                pmOptCmp.setValue("v.label", ampm.pm); 
-            } 
-        }
-        */
-        
-        // set hours based on 24/12 hour format
-        /*
-        var hours = component.get("v.hours");
-        hours %= 24;
         var is24HourFormat = component.getValue("v.is24HourFormat").getBooleanValue();
-        if (!is24HourFormat) {
-            component.setValue("v.isPm", hours >= 12 : true : false);
-            component.setValue("v.hours", hours % 12);
+        if (is24HourFormat === false) {
+            // Localize am/pm label
+            var localizedData = $A.localizationService.getLocalizedDateTimeLabels();
+            var ampm = localizedData._ampm;
+            if (ampm) {
+                var amOptCmp = component.find("amOpt");
+                if (amOptCmp) {
+                    amOptCmp.setValue("v.label", ampm.am); 
+                }
+                var pmOptCmp = component.find("pmOpt");
+                if (pmOptCmp) {
+                    pmOptCmp.setValue("v.label", ampm.pm); 
+                } 
+            }
         }
         */
     },
     
-    hoursChange: function(component, event, helper) {
-        var hoursCmp = component.find("hours");
-        if (hoursCmp) {
-            var v = hoursCmp.getValue("v.value");
-            var hours = component.get("v.hours");
-            if (helper.validateNumber(hours, 0, 23)) { 
-                v.setValid(true);
-                v.clearErrors();
+    updateAmpm: function(component, event, helper) {
+        var amPmCmp = component.find("ampm");
+        var hours = component.get("v.hours");
+        if (amPmCmp) {
+            if (amPmCmp.get("v.value") == "am") {
+                component.setValue("v.hours", parseInt(hours) - 12);
             } else {
-                v.setValid(false);
-                v.addErrors([{message:"Please input a valid hour value (0 - 23)."}]);
+                component.setValue("v.hours", parseInt(hours) + 12);
             }
         }
     },
     
-    minutesChange: function(component, event, helper) {
-        var minutesCmp = component.find("minutes");
-        if (minutesCmp) {
-            var v = minutesCmp.getValue("v.value");
-            var minutes = component.get("v.minutes");
-            if (helper.validateNumber(minutes, 0, 59)) { 
-                v.setValid(true);
-                v.clearErrors();
+    updateHours: function(component, event, helper) {
+        var is24HourFormat = component.getValue("v.is24HourFormat").getBooleanValue();
+        var hoursCmp = event.getSource();
+        var errorCmp = component.find("hourError");
+        var hoursValue = component.getValue("v.hours");
+        if (hoursCmp && errorCmp) {
+            var hours = hoursCmp.get("v.value");
+            if (is24HourFormat === true) {
+                if (helper.validateNumber(hours, 0, 23)) {
+                    hoursCmp.removeClass("error");
+                    errorCmp.setValue("v.value", []);
+                    errorCmp.addClass("hide");
+                    // update timePicker hours
+                    helper.updateHourValue(component, hours);
+                    component.setValue("v.isValid", true);
+                } else {
+                    hoursCmp.addClass("error");
+                    errorCmp.setValue("v.value", ["Please input a valid hour value (0 - 23)."]);
+                    errorCmp.removeClass("hide");
+                    component.setValue("v.isValid", false);
+                }
             } else {
-                v.setValid(false);
-                v.addErrors([{message:"Please input a valid minute value (0 - 59)"}]);
+                if (helper.validateNumber(hours, 1, 12)) {
+                    hoursCmp.removeClass("error");
+                    errorCmp.setValue("v.value", []);
+                    errorCmp.addClass("hide");
+                    // update timePicker hours
+                    helper.updateHourValue(component, hours);
+                    component.setValue("v.isValid", true);
+                } else {
+                    hoursCmp.addClass("error");
+                    errorCmp.setValue("v.value", ["Please input a valid hour value (1 - 12)."]);
+                    errorCmp.removeClass("hide");
+                    component.setValue("v.isValid", false);
+                }
+            }
+        }
+    },
+    
+    updateMinutes: function(component, event, helper) {
+        var minutesCmp = event.getSource();
+        var errorCmp = component.find("minuteError");
+        var minutesValue = component.getValue("v.minutes");
+        if (minutesCmp && errorCmp) {
+            var minutes = minutesCmp.get("v.value");
+            if (helper.validateNumber(minutes, 0, 59)) {
+                minutesCmp.removeClass("error"); 
+                errorCmp.setValue("v.value", []);
+                errorCmp.addClass("hide");
+                helper.updateMinuteValue(component, minutes);
+                component.setValue("v.isValid", true);
+            } else {
+                minutesCmp.addClass("error");
+                errorCmp.setValue("v.value", ["Please input a valid minute value (0 - 59)."]);
+                errorCmp.removeClass("hide");
+                component.setValue("v.isValid", false);
             }
         }
     }

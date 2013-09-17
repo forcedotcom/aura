@@ -167,8 +167,10 @@ div.THIS {
 }
 
 .THIS .timeBar {
+/*
     height: 46px;
     line-height: 33px;
+*/
     text-align: center;
 }
 

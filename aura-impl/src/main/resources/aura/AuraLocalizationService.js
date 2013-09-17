@@ -401,6 +401,32 @@ var AuraLocalizationService = function AuraLocalizationService() {
         },
         
         /**
+         * An utility function to check if a datetime pattern string uses a 24-hour or period (12 hour with am/pm) time view.
+         * @param {String} datetime pattern string
+         * @return {Boolean} Returns true if it uses period time view.
+         * @memberOf AuraLocalizationService
+         * @public
+         */
+        isPeriodTimeView : function(pattern) {
+            if (!pattern || typeof pattern  != 'string') {
+                return false;
+            }
+            var shouldEscape = false;
+            for (var i = 0; i < pattern.length; i++) {
+                var c = pattern.charAt(i);
+                if (c === 'h' && shouldEscape === false) {
+                    return true;
+                }
+                if (c === '[') {
+                    shouldEscape = true;
+                } else if (c === ']') {
+                    shouldEscape = false;
+                }
+            }
+            return false;
+        },
+        
+        /**
          * Checks if date1 is after date2.
          * @param {String|Number|Date} date1 A date format that the JavaScript Date object can parse
          * @param {String|Number|Date} date2 A date format that the JavaScript Date object can parse

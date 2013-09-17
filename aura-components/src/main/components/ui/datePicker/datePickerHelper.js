@@ -245,6 +245,7 @@
             var timePickerCmp = component.find("time");
             if (timePickerCmp) {
                 timePickerCmp.setValue("v.hours", component.get("v.hours"));
+                timePickerCmp.setValue("v.is24HourFormat", component.get("v.is24HourFormat"));
                 timePickerCmp.setValue("v.minutes", component.get("v.minutes"));
             }
         }

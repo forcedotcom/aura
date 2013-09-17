@@ -16,25 +16,21 @@
 
 -->
 <aura:component implements="ui:visible" description="A time picker which can be used in datePicker to select both date and time">
-    <aura:attribute name="hours" type="Integer" description="The hour value."/>
-    <!--
-    <aura:attribute name="is24HourFormat" type="Boolean" default="false" description="Indicate if it is set to 24 hour or 12-hour with am/pm."/>
-    <aura:attribute name="isPm" type="Boolean" default="false" description="Indeciate if the hour is in am or pm. Only valid when is is24HourFormat false."/>
-    -->
-    <aura:attribute name="minutes" type="Integer" description="The miniue value."/>
+    <aura:attribute name="hours" type="Integer" default="12" description="The hour value."/>
+    <aura:attribute name="is24HourFormat" type="Boolean" default="true" description="Indicate if it is set to 24 hour or 12-hour with am/pm."/>
+    <aura:attribute name="isValid" type="Boolean" default="true" description="Indicate if the valid hour and minute values are inputed."/>
+    <aura:attribute name="minutes" type="Integer" default="0" description="The miniue value."/>
     <aura:attribute name="visible" type="Boolean" default="false" description="Indicates if this time picker is displayed. Defaults to false, which hides this time picker."/>
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
-    <aura:handler name="change" value="{!v.hours}" action="{!c.hoursChange}"/>
-    <aura:handler name="change" value="{!v.minutes}" action="{!c.minutesChange}"/>
     
-    <div><ui:inputNumber aura:id="hours" class="input" format="00" value="{!v.hours}"/></div>:
-    <div><ui:inputNumber aura:id="minutes" class="input" format="00" value="{!v.minutes}"/></div>
-    <!--
-    <aura:if isTrue="{!v.is24HourFormat != true}">
-        <ui:inputSelect aura:id="ampm" value="{!v.isPm}">
-            <ui:inputSelectOption aura:id="amOpt" label="AM" value="false"/>
-            <ui:inputSelectOption aura:id="pmOpt" label="PM" value="true"/>
+    <div><ui:inputNumber aura:id="hours" class="input" change="{!c.updateHours}"/></div>:
+    <div><ui:inputNumber aura:id="minutes" class="input" change="{!c.updateMinutes}"/></div>
+    <aura:renderIf isTrue="{!v.is24HourFormat != true}">
+        <ui:inputSelect aura:id="ampm" change="{!c.updateAmpm}">
+            <ui:inputSelectOption aura:id="amOpt" label="AM" text="am"/>
+            <ui:inputSelectOption aura:id="pmOpt" label="PM" text="pm"/>
         </ui:inputSelect>
-    </aura:if>
-    -->
+    </aura:renderIf>
+    <ui:inputDefaultError aura:id="hourError" class="hide"/>
+    <ui:inputDefaultError aura:id="minuteError" class="hide"/>
 </aura:component>

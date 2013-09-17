@@ -13,34 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*
-div.THIS {
-    display: inline;
-    margin:auto;
-    width:80%;
-}
-*/
-div.THIS {
-    display: inline-block;
-}
-
-div.THIS input { 
-    font-size: 16px;
-    height: 2em;
-    margin: 5px;
-    width: 2em;
-}
-
-div.THIS input.error {
-    border-color: red;
-    background-color: rgba(255, 0, 0, .025);
-}
-
-@media only screen and (max-width: 999px) and (orientation: portrait) {
-    div.THIS input { 
-        font-size: 20px;
-        height: 50px;
-        margin: 10px;
-        width: 50px;
+({
+    render: function(component, helper) {
+        helper.renderTime(component);
+        return this.superRender(); 
+    },
+    
+    rerender: function(component, helper) {
+        if (component.getValue("v.isValid").getBooleanValue() === true) {
+            helper.renderTime(component);
+        }
+        return this.superRerender();   
     }
-}
+})

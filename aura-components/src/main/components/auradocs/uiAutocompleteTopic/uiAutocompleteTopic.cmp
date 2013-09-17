@@ -94,8 +94,12 @@ this.fireDataChangeEvent(dataProvider, data);</auradocs:codeblock>
     //CSS declaration
  }</auradocs:codeblock>
 	<p>If you're using the default text area component provided by <code>ui:autocomplete</code>, change the CSS selector to <code>.THIS.uiInputTextArea</code>.
-	 Alternatively, use the <code>class</code> attribute to specify your own CSS class. For more information on styling components, see <auradocs:topicLink topic="helloHTML">Applying HTML and CSS</auradocs:topicLink>.</p>
-	
+	 Alternatively, use the <code>class</code> attribute to specify your own CSS class.</p>
+
+    <p><b>See also:</b><br/>
+        <auradocs:topicLink topic="cmpCSS">CSS in Components</auradocs:topicLink>
+    </p>
+    	
 </aura:component>
 
 

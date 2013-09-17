@@ -1,0 +1,64 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="Using Storage Service"/>
+
+<p>After you've initialized your custom storage, you can add and retrieve items from your storage. To do so, use the JavaScript <code>put</code> and <code>get</code> API of <auradocs:referenceTopicLink topic="api:AuraStorage">AuraStorage</auradocs:referenceTopicLink>.</p>
+
+<auradocs:info>The Aura-provided actions storage for server-side actions automatically adds and retrieves items from storage and doesn't require you to call <code>put</code> and <code>get</code> explicitly.</auradocs:info>
+
+<p>This example shows how to use the storage object returned by the previous example to store items. The call to <code>put</code> takes a key that is used to uniquely identify the stored item.</p>
+
+<auradocs:codeblock>
+var value1 = 67;
+storage.put("score", value1);
+storage.put("name", "joe smith"); 
+</auradocs:codeblock><br/>
+
+<p>You can retrieve stored items by using the <code>get</code> method. The parameters  of the <code>get</code> method are the key of the value to retrieve and a callback function. The callback function is called asynchronously and has the item that was fetched from the storage as its parameter.</p> 
+
+<auradocs:codeblock>
+storage.get("score", function(item) { var myRetrievedScore = item; });
+storage.get("name", function(item) { console.log(item); }); 
+</auradocs:codeblock><br/>  
+
+<p>You can obtain any initialized named storage by calling <code>getStorage()</code> and by passing it the storage name. For example:</p>
+
+<auradocs:codeblock>
+var storage = $A.storageService.getStorage("MyStorage");
+</auradocs:codeblock><br/>
+
+<auradocs:info>The getName() method returns the type of storage selected, not the name of the storage.</auradocs:info>
+
+<p>There are other methods you can call on the storage object. For a detailed description of the JavaScript API for <code>AuraStorageService</code>, see
+<auradocs:referenceTopicLink topic="api:AuraStorageService">AuraStorageService</auradocs:referenceTopicLink> and for <code>AuraStorage</code>, see <auradocs:referenceTopicLink topic="api:AuraStorage">AuraStorage</auradocs:referenceTopicLink>.</p>
+    
+<p>For example, you can get the current cache size and clear the storage, as follows.</p>
+
+<auradocs:codeblock>
+// Get cache size
+var size = $A.storageService.getStorage("MyStorage").getSize();
+// Clear the cache
+$A.storageService.getStorage("MyStorage").clear();
+</auradocs:codeblock><br/>
+    
+<p><b>See also:</b><br/>    
+    <auradocs:topicLink topic="storableServerSideActions">Storable Server-Side Actions</auradocs:topicLink><br/>
+    <auradocs:topicLink topic="storageInit">Initializing Storage Service</auradocs:topicLink>
+</p>
+</aura:component>

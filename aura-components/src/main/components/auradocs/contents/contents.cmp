@@ -58,10 +58,12 @@
                 <auradocs:contentsNode text="Creating a Component" id="cmpSetup"/>
                 <auradocs:contentsNode text="Component Bundles" id="compBundle"/>
                 <auradocs:contentsNode text="Component IDs" id="compIds"/>
-                <auradocs:contentsNode text="Applying HTML and CSS" id="helloHTML"/>
+                <auradocs:contentsNode text="HTML in Components" id="helloHTML"/>
+                <auradocs:contentsNode text="CSS in Components" id="cmpCSS"/>
                 <auradocs:contentsNode text="Component Attributes" id="helloAttributes"/>
                 <auradocs:contentsNode text="Component Composition" id="nestedComponents"/>
-                <auradocs:contentsNode text="Component Body and Facets" id="helloFacets"/>
+                <auradocs:contentsNode text="Component Body" id="cmpBody"/>
+                <auradocs:contentsNode text="Component Facets" id="helloFacets"/>
                 <auradocs:contentsNode text="Lazy Loading a Component" id="lazyload"/>
                 <auradocs:contentsNode text="Localization" id="localization"/>
                 <auradocs:contentsNode text="Accessibility">
@@ -226,7 +228,11 @@
                 <auradocs:contentsNode text="Controlling Available Modes" id="modesAvailableSet" />
                 <auradocs:contentsNode text="Setting the Default Mode" id="modesSetDefault" />
             </auradocs:contentsNode>
-            <auradocs:contentsNode text="Aura Storage Service" id="auraStorageService" />
+            <auradocs:contentsNode text="Storage Service" >
+                <auradocs:contentsNode text="Introduction" id="auraStorageService"/>
+                <auradocs:contentsNode text="Initializing Storage Service" id="storageInit"/>
+                <auradocs:contentsNode text="Using Storage Service" id="storageUse"/>
+            </auradocs:contentsNode>
             <auradocs:contentsNode text="Component Request Lifecycle" >
                 <auradocs:contentsNode text="Introduction" id="cycleOverview" />
                 <auradocs:contentsNode text="Component Request Overview" id="cycleComp" />

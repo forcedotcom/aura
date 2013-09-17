@@ -34,7 +34,7 @@
     
     <p><b>See also:</b><br/>
     <auradocs:topicLink topic="helloActions">Client-Side Controllers</auradocs:topicLink><br/>
-    <auradocs:topicLink topic="helloHTML">Applying HTML and CSS</auradocs:topicLink><br/>
+    <auradocs:topicLink topic="cmpCSS">CSS in Components</auradocs:topicLink><br/>
     <auradocs:topicLink topic="compBundle">Component Bundles</auradocs:topicLink>
 	</p>
 </aura:component>

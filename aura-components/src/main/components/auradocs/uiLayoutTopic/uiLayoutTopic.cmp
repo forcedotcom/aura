@@ -55,8 +55,12 @@
     <ui:image src="/auraFW/resources/aura/images/uiBlock.png" alt="ui:block for horizontal layouts" />
     <p>The following CSS class styles the <code>bLeft</code> class on the <code>ui:block</code>. </p>
 	<auradocs:codeblock>.THIS.uiBlock .bLeft { //CSS declaration }</auradocs:codeblock>
-	<p>Alternatively, use the <code>class</code> attribute to specify your own CSS class. For more information on styling components, see <auradocs:topicLink topic="helloHTML">Applying HTML and CSS</auradocs:topicLink>.</p>
+	<p>Alternatively, use the <code>class</code> attribute to specify your own CSS class.</p>
 	
+    <p><b>See also:</b><br/>
+        <auradocs:topicLink topic="cmpCSS">CSS in Components</auradocs:topicLink>
+    </p>
+		
 </aura:component>
 
 

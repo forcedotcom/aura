@@ -56,7 +56,11 @@
     <ui:image src="/auraFW/resources/aura/images/uiVbox.png" alt="ui:block for vertical layouts" />
     <p>The following CSS class styles the <code>header</code> element in the <code>north</code> attribute. </p>
 	<auradocs:codeblock>.THIS #header { //CSS declaration }</auradocs:codeblock>
-	<p>For more information on styling components, see <auradocs:topicLink topic="helloHTML">Applying HTML and CSS</auradocs:topicLink>.</p>
+
+    <p><b>See also:</b><br/>
+        <auradocs:topicLink topic="cmpCSS">CSS in Components</auradocs:topicLink>
+    </p>    
+	
 	
 </aura:component>
 

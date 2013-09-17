@@ -20,7 +20,7 @@
 
     <p>An app is a special top-level component whose markup is in a .app file. Just like any other component, you can put CSS in the component bundle in a file called <code>&lt;appName&gt;.css</code>. For example, the demo app markup is in <code>notes.app</code>. Its CSS is in <code>notes.css</code>.</p>
     
-    <p>To learn about the style convention for components, see <auradocs:topicLink topic="helloHTML">Applying HTML and CSS</auradocs:topicLink>.</p>
+    <p>To learn about the style convention for components, see <auradocs:topicLink topic="cmpCSS">CSS in Components</auradocs:topicLink>.</p>
     
     <p>To include external style sheets in your app, see <auradocs:topicLink topic="createAppTemplate">Creating App Templates</auradocs:topicLink>.</p>
 

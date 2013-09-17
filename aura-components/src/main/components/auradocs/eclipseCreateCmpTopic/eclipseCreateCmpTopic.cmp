@@ -86,7 +86,7 @@
 
         <p><b>See also:</b><br/>
     <auradocs:topicLink topic="appOverview">aura:application</auradocs:topicLink><br/>
-    <auradocs:topicLink topic="helloFacets">Component Body and Facets</auradocs:topicLink>
+    <auradocs:topicLink topic="cmpBody">Component Body</auradocs:topicLink>
         </p>
 
 </aura:component>

@@ -1027,6 +1027,23 @@ $A.ns.Aura.prototype.endTransaction = (function() {
     }
 })();
 
+
+
+/**
+ * Map through to Perf.hasActiveTransaction if Perf is loaded, otherwise a no-op. This will be the same no-op as
+ * $A.ns.Aura.prototype.mark, since both are no-ops when Jiffy is missing; we only need one noop object.
+ *
+ * @public
+ * @function
+ */
+$A.ns.Aura.prototype.hasActiveTransaction = (function() {
+    if (window["Perf"]) {
+        return window["Perf"]["hasActiveTransaction"];
+    } else {
+        return $A.ns.Aura.prototype.mark;
+    }
+})();
+
 /**
  * Map through to Perf.updateTransaction if Perf is loaded, otherwise a no-op. This will be the same no-op as
  * $A.ns.Aura.prototype.mark, since both are no-ops when Jiffy is missing; we only need one noop object.

@@ -16,7 +16,8 @@
 
 -->
 <aura:component extends="auradocs:topicPanel">
-    <aura:set attribute="title" value="Aura Storage Service"/>
+    <aura:set attribute="title" value="Storage Service"/>
+
 <p>Aura Storage Service provides a powerful, simple-to-use caching infrastructure for Aura clients. Aura client applications can benefit from caching data to reduce response times of pages by storing and accessing data locally rather than requesting data from the server. This enhances the user experience on the client. Caching is especially beneficial for high-performance, mostly connected applications operating over high latency connections, such as 3G networks.</p>
 
 <p>The advantage of using Aura Storage Service instead of other caching infrastructures, such as Apple local storage for iOS devices, is that Aura Storage Service offers several types of storage through adapters. Storage can be persistent and secure. With persistent storage, cached data is preserved between user sessions in the browser. With secure storage, cached data is encrypted.</p>
@@ -76,104 +77,10 @@
 
 <p>The expiration time for an item in storage specifies the duration after which an item should be replaced with a fresh copy. The refresh interval takes effect only if the item hasn't expired yet and applies to the actions storage only. In that case, if the refresh interval for an item has passed, the item gets refreshed after the same action is called. If stored items have reached their expiration times or have exceeded their refresh intervals, they're replaced only after a call is made to access them and if the client is online.</p>      
 
-<h3>Initializing and Using Storage</h3>
-
-<p>To use storage, you must initialize it first and specify a name and, optionally, other properties. If you don't specify the optional properties, the Aura Storage Service uses default values set by the <code>initStorage()</code> JavaScript API of <auradocs:referenceTopicLink topic="api:AuraStorageService">AuraStorageService</auradocs:referenceTopicLink>.</p>
-
-<h4>Initializing Storage Using Aura Markup</h4>
-<p>You can initialize storage for your component using markup in one of two ways: by using a template or by adding the markup in the component body.</p>
-
-<p>This example shows how to use a template to initialize storage. The component references the template in the <code>template</code> attribute. The template defined in the second example contains <code>auraStorage:init</code> tags that specify storage initialization properties. This example initializes three different storages: the Aura-provided actions storage, and two custom storages named <code>savings</code> and <code>checking</code>.</p>  
-
-<auradocs:codeblock>
-&lt;aura:component render="client" template="auraStorageTest:namedStorageTemplate">
-&lt;/aura:component>
-</auradocs:codeblock><br/>
-
-<auradocs:codeblock>
-&lt;aura:component isTemplate="true" extends="aura:template">
-    &lt;aura:set attribute="auraPreInitBlock">
-        &lt;auraStorage:init name="actions" persistent="false" secure="false" maxSize="9999"/>
-        &lt;auraStorage:init name="savings" persistent="false" secure="true" maxSize="6666"/>
-        &lt;auraStorage:init name="checking" maxSize="7777"/>
-    &lt;/aura:set>    
-&lt;/aura:component>
-</auradocs:codeblock><br/>
-
-<p>Alternatively, you can add <code>auraStorage:init</code> tags directly in the body of your component definition. The following example shows component markup that initializes a storage named <code>savings</code>.</p>
-
-<auradocs:codeblock>
-&lt;aura:component render="client" extensible="true" 
- controller="java://org.auraframework.impl.java.controller.AuraStorageTestController" 
- implements="auraStorage:refreshObserver">
-            
-    &lt;auraStorage:init debugLoggingEnabled="true"
-                         name="savings" 
-                         secure="true" 
-                         persistent="false"
-                         clearStorageOnInit="true"
-                         defaultExpiration="50" 
-                         defaultAutoRefreshInterval="60" />
-&lt;/aura:component>                         
-</auradocs:codeblock><br/>
-
-<h4>Initializing Storage Using JavaScript API</h4>
-<p>Alternatively, you can initialize storage on-the-fly using the JavaScript API. This example shows how to initialize Aura Storage Service using <code>initStorage()</code> in a JavaScript client-side controller.</p>
-
-<auradocs:codeblock>
-var storage = $A.storageService.initStorage("MyStorage",    // name
-                                            true,           // persistent
-                                            true,           // secure
-                                            512,            // maxSize
-                                            600,            // defaultExpiration
-                                            600,            // defaultAutoRefreshInterval
-                                            true,           // debugLoggingEnabled
-                                            true);          // clearStorageOnInit
-</auradocs:codeblock><br/>
-
-<h4>Using Aura Storage</h4>
-<p>After you've initialized your custom storage, you can add and retrieve items from your storage. To do so, use the JavaScript <code>put</code> and <code>get</code> API of <auradocs:referenceTopicLink topic="api:AuraStorage">AuraStorage</auradocs:referenceTopicLink>.</p>
-
-<auradocs:info>The Aura-provided actions storage for server-side actions automatically adds and retrieves items from storage and doesn't require you to call <code>put</code> and <code>get</code> explicitly.</auradocs:info>
-
-<p>This example shows how to use the storage object returned by the previous example to store items. The call to <code>put</code> takes a key that is used to uniquely identify the stored item.</p>
-
-<auradocs:codeblock>
-var value1 = 67;
-storage.put("score", value1);
-storage.put("name", "joe smith"); 
-</auradocs:codeblock><br/>
-
-<p>You can retrieve stored items by using the <code>get</code> method. The parameters  of the <code>get</code> method are the key of the value to retrieve and a callback function. The callback function is called asynchronously and has the item that was fetched from the storage as its parameter.</p> 
-
-<auradocs:codeblock>
-storage.get("score", function(item) { var myRetrievedScore = item; });
-storage.get("name", function(item) { console.log(item); }); 
-</auradocs:codeblock><br/>  
-
-<p>You can obtain any initialized named storage by calling <code>getStorage()</code> and by passing it the storage name. For example:</p>
-
-<auradocs:codeblock>
-var storage = $A.storageService.getStorage("MyStorage");
-</auradocs:codeblock><br/>
-
-<auradocs:info>The getName() method returns the type of storage selected, not the name of the storage.</auradocs:info>
-
-<p>There are other methods you can call on the storage object. For a detailed description of the JavaScript API for <code>AuraStorageService</code>, see
-<auradocs:referenceTopicLink topic="api:AuraStorageService">AuraStorageService</auradocs:referenceTopicLink> and for <code>AuraStorage</code>, see <auradocs:referenceTopicLink topic="api:AuraStorage">AuraStorage</auradocs:referenceTopicLink>.</p>
-    
-<p>For example, you can get the current cache size and clear the storage, as follows.</p>
-
-<auradocs:codeblock>
-// Get cache size
-var size = $A.storageService.getStorage("MyStorage").getSize();
-// Clear the cache
-$A.storageService.getStorage("MyStorage").clear();
-</auradocs:codeblock><br/>
     
 <p><b>See also:</b><br/>    
     <auradocs:topicLink topic="serverSideControllers">Server-Side Controllers</auradocs:topicLink><br/>
     <auradocs:topicLink topic="storableServerSideActions">Storable Server-Side Actions</auradocs:topicLink><br/>
-    <auradocs:referenceTopicLink topic="api:Action">Action Type</auradocs:referenceTopicLink>
+    <auradocs:topicLink topic="storageInit">Initializing Storable Service</auradocs:topicLink>
 </p>
 </aura:component>

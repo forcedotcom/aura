@@ -1,0 +1,43 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="CSS in Components"/>
+
+    <p>To add CSS to a component, add a new file to the component bundle called <code>&lt;componentName&gt;.css</code>.  Aura automatically picks up this new resource and auto-wires it when the component is used in a page.</p>
+    
+    <p>For external CSS resources, see <auradocs:topicLink topic="createAppTemplate">Creating App Templates</auradocs:topicLink>.</p>
+
+    <p>All top-level elements in a component have a special <code>THIS</code> CSS class added to them. This, effectively, adds namespacing to CSS and helps prevent one component's CSS from blowing away another component's styling. Aura throws an error if a CSS file doesn't follow this convention.</p>
+
+    <p>Let's look at a sample <code>helloHTML.cmp</code> component. The CSS is in <code>helloHTML.css</code> and you can see it in the <code>css://style</code> tab. If you need a CSS refresher, see <ui:outputURL value="http://reference.sitepoint.com/css" label="http://reference.sitepoint.com/css"/>.</p>
+
+    <p>The top-level elements match the <code>THIS</code> class and render with a grey background.</p>
+
+    <p>The <code>&lt;div class="white"&gt;</code> element matches the <code>.THIS.white</code> selector and renders with a white background. Note that there is no space in the selector as this rule is for top-level elements.</p>
+
+    <p>The <code>&lt;li class="red"&gt;</code> element matches the <code>.THIS .red</code> selector and renders with a red background. Note that this is a descendant selector and it contains a space as the <code>&lt;li&gt;</code> element is not a top-level element.</p>
+
+    <auradocs:example descriptor="auradocs:helloHTML" />
+    
+    <auradocs:info>See <auradocs:topicLink topic="addClass">Adding and Removing Styles</auradocs:topicLink> for more information.</auradocs:info>
+
+    <p><b>See also:</b><br/>
+        <auradocs:topicLink topic="helloHTML">HTML in Components</auradocs:topicLink>
+    </p>
+
+</aura:component>

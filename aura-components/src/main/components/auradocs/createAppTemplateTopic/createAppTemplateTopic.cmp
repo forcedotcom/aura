@@ -77,7 +77,7 @@
     <p><b>See also:</b><br/>
         <auradocs:topicLink topic="buildApp">Aura Note Demo App</auradocs:topicLink><br/>
         <auradocs:topicLink topic="appOverview">aura:application</auradocs:topicLink><br/>
-        <auradocs:topicLink topic="helloHTML">Applying HTML and CSS</auradocs:topicLink>
+        <auradocs:topicLink topic="cmpCSS">CSS in Components</auradocs:topicLink>
     </p>
     
 </aura:component>

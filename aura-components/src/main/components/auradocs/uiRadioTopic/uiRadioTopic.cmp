@@ -68,7 +68,10 @@ public Boolean getSelected() {
 	<p>The <code>ui:inputRadio</code> component is customizable with regular CSS styling.
 	See <auradocs:topicLink topic="uiCheckbox">Checkboxes</auradocs:topicLink> for a similar way to style an input component.
 	</p>
-	<p>For more information on styling components, see <auradocs:topicLink topic="helloHTML">Applying HTML and CSS</auradocs:topicLink>.</p>
+
+    <p><b>See also:</b><br/>
+        <auradocs:topicLink topic="cmpCSS">CSS in Components</auradocs:topicLink>
+    </p>
 	
 </aura:component>
 

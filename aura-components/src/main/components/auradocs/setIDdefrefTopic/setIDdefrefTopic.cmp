@@ -46,7 +46,7 @@
     <p>You can also create an instance of a component using <code>Aura.getInstanceService().getInstance()</code>, but you should use the <code>ComponentDefRefBuilder</code> if you want to:</p>
     <ul>
         <li>Set an ID on the new component.</li>
-        <li>Set a facet on a top-level component. See <auradocs:topicLink topic="helloFacets">Component Body and Facets</auradocs:topicLink> for more information.</li>
+        <li>Set a facet on a top-level component. See <auradocs:topicLink topic="helloFacets">Component Facets</auradocs:topicLink> for more information.</li>
         <li>Create multiple instances of the components with minimal updates to the definition.</li>
     </ul>
 

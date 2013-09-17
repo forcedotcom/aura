@@ -49,7 +49,7 @@
 &lt;/aura:component&gt;
 </auradocs:codeblock>
                 </td>
-                <td>Use this type to set blocks of markup. For more information, see <auradocs:topicLink topic="helloFacets">Component Body and Facets</auradocs:topicLink>.</td>
+                <td>Use this type to set blocks of markup.</td>
             </tr>
 
             <tr>
@@ -97,4 +97,8 @@
     <code><aura:text value="{!"/>c.openNote}</code>, which is a reference to an action in the client-side controller for <code>noteListRow.cmp</code>.
     The action is executed when a user clicks the bullet associated with <code>&lt;li onclick="<aura:text value="{!"/>v.onclick}"&gt;</code> in <code>listRow.cmp</code>.</p>
 
+    <p><b>See also:</b><br/>
+    <auradocs:topicLink topic="cmpBody">Component Body</auradocs:topicLink>
+    </p>
+    
 </aura:component>

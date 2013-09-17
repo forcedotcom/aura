@@ -108,7 +108,8 @@
 &lt;!--Style for date and time field-->
 .THIS .num { //CSS declaration }
 	</auradocs:codeblock>
-	<p>For more information on styling components, see <auradocs:topicLink topic="helloHTML">Applying HTML and CSS</auradocs:topicLink>.</p>
+	
+	<p>For more information on styling components, see <auradocs:topicLink topic="cmpCSS">CSS in Components</auradocs:topicLink>.</p>
 	
 </aura:component>
 

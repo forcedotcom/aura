@@ -23,7 +23,7 @@
     
     <h2>Inherited <code>body</code> Attribute</h2>
 
-    <p>Every component inherits the <code>body</code> attribute from <code>&lt;aura:component&gt;</code> so <code>body</code> has some special behavior with <code>&lt;aura:set&gt;</code>. See <auradocs:topicLink topic="helloFacets">Component Body and Facets</auradocs:topicLink>.</p>
+    <p>Every component inherits the <code>body</code> attribute from <code>&lt;aura:component&gt;</code> so <code>body</code> has some special behavior with <code>&lt;aura:set&gt;</code>.</p>
 
     <h2>Inherited Attributes</h2>
 
@@ -48,6 +48,7 @@
     <auradocs:example descriptor="auradocs:sampleSetAttrRef" />
     
     <p><b>See also:</b><br/>
+        <auradocs:topicLink topic="cmpBody">Component Body</auradocs:topicLink><br/>
         <auradocs:topicLink topic="tagAuraSetReference">Setting Attributes on a Component Reference</auradocs:topicLink>
     </p>
 </aura:component>

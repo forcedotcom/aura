@@ -109,8 +109,10 @@
 &lt;!--Style for date and time field-->
 .THIS .emailField { //CSS declaration }
 	</auradocs:codeblock>
-	<p>For more information on styling components, see <auradocs:topicLink topic="helloHTML">Applying HTML and CSS</auradocs:topicLink>.</p>
 	
+    <p><b>See also:</b><br/>
+        <auradocs:topicLink topic="cmpCSS">CSS in Components</auradocs:topicLink>
+    </p>	
 </aura:component>
 
 

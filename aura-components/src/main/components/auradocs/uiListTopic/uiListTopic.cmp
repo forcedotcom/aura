@@ -119,8 +119,11 @@ $A.enqueueAction(action);</auradocs:codeblock>
 <auradocs:codeblock>.THIS .row{
     //CSS declaration
  }</auradocs:codeblock>
-	<p>For an example on styling the list component, see the <ui:outputURL value="/auradocs#demos?demo=list" label="ui:list demo"/>.
-	For more information on styling components, see <auradocs:topicLink topic="helloHTML">Applying HTML and CSS</auradocs:topicLink>.</p>
+	<p>For an example on styling the list component, see the <ui:outputURL value="/auradocs#demos?demo=list" label="ui:list demo"/>.</p>
+
+    <p><b>See also:</b><br/>
+        <auradocs:topicLink topic="cmpCSS">CSS in Components</auradocs:topicLink>
+    </p>
 	
 </aura:component>
 

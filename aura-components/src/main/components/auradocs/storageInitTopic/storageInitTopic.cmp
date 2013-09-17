@@ -1,0 +1,79 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="Initializing Storage Service"/>
+   
+<p>To use storage, you must initialize it first and specify a name and, optionally, other properties. If you don't specify the optional properties, the Aura Storage Service uses default values set by the <code>initStorage()</code> JavaScript API of <auradocs:referenceTopicLink topic="api:AuraStorageService">AuraStorageService</auradocs:referenceTopicLink>.</p>
+
+<h2>Using Aura Markup</h2>
+
+<p>You can initialize storage for your component using markup in one of two ways: by using a template or by adding the markup in the component body.</p>
+
+<p>This example shows how to use a template to initialize storage. The component references the template in the <code>template</code> attribute. The template defined in the second example contains <code>auraStorage:init</code> tags that specify storage initialization properties. This example initializes three different storages: the Aura-provided actions storage, and two custom storages named <code>savings</code> and <code>checking</code>.</p>  
+
+<auradocs:codeblock>
+&lt;aura:component render="client" template="auraStorageTest:namedStorageTemplate">
+&lt;/aura:component>
+</auradocs:codeblock><br/>
+
+<auradocs:codeblock>
+&lt;aura:component isTemplate="true" extends="aura:template">
+    &lt;aura:set attribute="auraPreInitBlock">
+        &lt;auraStorage:init name="actions" persistent="false" secure="false" maxSize="9999"/>
+        &lt;auraStorage:init name="savings" persistent="false" secure="true" maxSize="6666"/>
+        &lt;auraStorage:init name="checking" maxSize="7777"/>
+    &lt;/aura:set>    
+&lt;/aura:component>
+</auradocs:codeblock><br/>
+
+<p>Alternatively, you can add <code>auraStorage:init</code> tags directly in the body of your component definition. The following example shows component markup that initializes a storage named <code>savings</code>.</p>
+
+<auradocs:codeblock>
+&lt;aura:component render="client" extensible="true" 
+ controller="java://org.auraframework.impl.java.controller.AuraStorageTestController" 
+ implements="auraStorage:refreshObserver">
+            
+    &lt;auraStorage:init debugLoggingEnabled="true"
+                         name="savings" 
+                         secure="true" 
+                         persistent="false"
+                         clearStorageOnInit="true"
+                         defaultExpiration="50" 
+                         defaultAutoRefreshInterval="60" />
+&lt;/aura:component>                         
+</auradocs:codeblock><br/>
+
+<h2>Using JavaScript</h2>
+<p>Alternatively, you can initialize storage on-the-fly using the JavaScript API. This example shows how to initialize Aura Storage Service using <code>initStorage()</code> in a JavaScript client-side controller.</p>
+
+<auradocs:codeblock>
+var storage = $A.storageService.initStorage("MyStorage",    // name
+                                            true,           // persistent
+                                            true,           // secure
+                                            512,            // maxSize
+                                            600,            // defaultExpiration
+                                            600,            // defaultAutoRefreshInterval
+                                            true,           // debugLoggingEnabled
+                                            true);          // clearStorageOnInit
+</auradocs:codeblock><br/>
+    
+<p><b>See also:</b><br/>    
+    <auradocs:topicLink topic="storableServerSideActions">Storable Server-Side Actions</auradocs:topicLink><br/>
+    <auradocs:topicLink topic="storageUse">Using Storage Service</auradocs:topicLink>
+</p>
+</aura:component>

@@ -1,0 +1,77 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+
+    <aura:set attribute="title" value="Component Body"/>
+
+    <p>We've looked at component attributes and now we will learn more about adding content to a component.</p>
+
+    <p>All components inherently extend <code>&lt;aura:component&gt;</code> at the root of their hierarchy. When you extend a component, you inherit all its attributes. <code>&lt;aura:component&gt;</code> has a <code>body</code> attribute of type <code>Aura.Component[]</code>. The <code>body</code> attribute can be an array of one component, or an empty array, but it's always an array.</p>
+
+    <p>In a component, use "v" to access the collection of attributes. For example, <code><aura:text value="{!"/>v.body}</code> outputs the body of the component. We'll see an example of this soon.</p>
+
+    <h3>Setting the Body Content</h3>
+
+    <p>To set the value of an inherited attribute, use the <code>&lt;aura:set&gt;</code> tag. Since every component inherits the <code>body</code> attribute from <code>&lt;aura:component&gt;</code>, use <code>&lt;aura:set attribute="body"&gt;</code> to set the inherited body attribute in a component.</p>
+
+    <p>The root-level tag of every component is <code>&lt;aura:component&gt;</code>. There are only a few tags that are allowed inside <code>&lt;aura:component&gt;</code>. These include <code>&lt;aura:attribute&gt;</code>, <code>&lt;aura:registerEvent&gt;</code>, <code>&lt;aura:handler&gt;</code>, and <code>&lt;aura:set&gt;</code>.  Any free markup that is not enclosed in one of the allowed tags is assumed to be part of the body. It's equivalent to wrapping that free markup inside <code>&lt;aura:set attribute="body"&gt;</code>.</p>
+
+    <p>Since the <code>body</code> attribute has this special behavior, you can omit <code>&lt;aura:set attribute="body"&gt;</code>.</p>
+
+<auradocs:codeblock><![CDATA[<aura:component>
+    <div>Body part</div>
+    <ui:button label="Push Me/>
+</aura:component>
+]]></auradocs:codeblock>
+
+    <p>This is a shortcut for:</p>
+
+<auradocs:codeblock><![CDATA[<aura:component>
+    <aura:set attribute="body>
+        <div>Body part</div>
+        <ui:button label="Push Me/>
+    </aura:set>
+</aura:component>
+]]></auradocs:codeblock>
+
+    <p>The same logic applies when you use any component that has a <code>body</code> attribute, not just <code>&lt;aura:component&gt;</code>. For example:</p>
+
+<auradocs:codeblock><![CDATA[<ui:panel>
+    Hello world!
+</ui:panel>
+]]></auradocs:codeblock>
+
+    <p>This is a shortcut for:</p>
+
+<auradocs:codeblock><![CDATA[<ui:panel>
+    <aura:set attribute="body">
+        Hello World!
+    </aura:set>
+</ui:panel>
+]]></auradocs:codeblock>
+
+    <h3>Accessing the Component Body</h3>
+
+    <p>To access a component body, use <code>component.getValue("v.body")</code>, where <code>v.body</code> resolves to a value object.</p>
+
+    <p><b>See also:</b><br/>
+    <auradocs:topicLink topic="tagAuraSet">aura:set</auradocs:topicLink><br/>
+    <auradocs:topicLink topic="valueObjects">Value Objects</auradocs:topicLink>
+    </p>
+    
+</aura:component>

@@ -17,6 +17,7 @@ package org.auraframework.impl.root.parser;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Map;
 
 import org.auraframework.def.AttributeDef;
@@ -93,11 +94,32 @@ public class XMLParserTest extends AuraImplTestCase {
 
     public void testParseNonexistent() throws Exception {
         XMLParser parser = XMLParser.getInstance();
-        File tmpFile = Mockito.mock(File.class);
-        Mockito.when(tmpFile.exists()).thenReturn(true);
-        Mockito.when(tmpFile.lastModified()).thenReturn(0L);
-        Mockito.when(tmpFile.getCanonicalPath()).thenReturn("");
-        Mockito.when(tmpFile.getPath()).thenReturn("");
+        
+        // Cannot use Mockito on JDK7 because the File class has been changed to directly access File.path data member
+        File tmpFile = new File("") {
+			@Override
+			public String getPath() {
+				return "";
+			}
+
+			@Override
+			public String getCanonicalPath() throws IOException {
+				return "";
+			}
+
+			@Override
+			public boolean exists() {
+				return true;
+			}
+
+			@Override
+			public long lastModified() {
+				return 0L;
+			}
+
+			private static final long serialVersionUID = 1L;
+        };
+        
         try {
             Source<?> source = new FileSource<ComponentDef>(descriptor, tmpFile, Format.XML);
             parser.parse(null, source);

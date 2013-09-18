@@ -16,13 +16,7 @@
 package org.auraframework.impl.java.model;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Model;
@@ -104,7 +98,7 @@ public class TestModelWithJavaTypeAnnotation {
     @AuraEnabled
     @Type("Set<String>")
     public Set<String> getStringSet() {
-        return new TreeSet<String>();
+        return new HashSet<String>();
     }
 
     // Array of basic data type

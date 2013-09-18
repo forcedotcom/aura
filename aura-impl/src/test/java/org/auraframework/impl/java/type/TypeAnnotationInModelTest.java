@@ -16,13 +16,7 @@
 package org.auraframework.impl.java.type;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.expression.PropertyReferenceImpl;
@@ -112,7 +106,7 @@ public class TypeAnnotationInModelTest extends AuraImplTestCase {
         assertEachModelMember(model, "object", "Aura");
         assertEachModelMember(model, "stringMap", new HashMap<String, String>());
         assertEachModelMember(model, "stringList", new ArrayList<String>());
-        assertEachModelMember(model, "stringSet", new TreeSet<String>());
+        assertEachModelMember(model, "stringSet", new HashSet<String>());
 
     }
 
@@ -124,7 +118,7 @@ public class TypeAnnotationInModelTest extends AuraImplTestCase {
         assertEachModelMember(model, "listOfMaps", l1);
         // Set of maps.
         Map<String, String> m2 = new HashMap<String, String>();
-        Set<Map<String, String>> s2 = new TreeSet<Map<String, String>>();
+        Set<Map<String, String>> s2 = new HashSet<Map<String, String>>();
         s2.add(m2);
         assertEachModelMember(model, "setOfMaps", s2);
         // List of List
@@ -134,17 +128,17 @@ public class TypeAnnotationInModelTest extends AuraImplTestCase {
         assertEachModelMember(model, "listOfList", ll3);
         // Set of List
         List<String> l4 = new ArrayList<String>();
-        Set<List<String>> s4 = new TreeSet<List<String>>();
+        Set<List<String>> s4 = new HashSet<List<String>>();
         s4.add(l4);
         assertEachModelMember(model, "setOfList", s4);
         // List of Set
-        Set<String> s5 = new TreeSet<String>();
+        Set<String> s5 = new HashSet<String>();
         List<Set<String>> l5 = new ArrayList<Set<String>>();
         l5.add(s5);
         assertEachModelMember(model, "listOfSet", l5);
         // Set of Set
-        Set<String> s6 = new TreeSet<String>();
-        Set<Set<String>> ss6 = new TreeSet<Set<String>>();
+        Set<String> s6 = new HashSet<String>();
+        Set<Set<String>> ss6 = new HashSet<Set<String>>();
         ss6.add(s6);
         assertEachModelMember(model, "setOfSet", ss6);
     }
@@ -153,8 +147,6 @@ public class TypeAnnotationInModelTest extends AuraImplTestCase {
         Object value = model.getValue(new PropertyReferenceImpl(memberName, null));
         assertEquals("Expected model method to return " + expectedResult.getClass() + " type object.",
                 expectedResult.getClass(), value.getClass());
-        if (value.getClass() != TreeSet.class) {
-            assertEquals("Model returned unexpected object.", expectedResult, value);
-        }
+        assertEquals("Model returned unexpected object.", expectedResult, value);
     }
 }

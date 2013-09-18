@@ -885,8 +885,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
             define(baseTag, "render=''", "");
             fail("Should not be able to load component with empty render value");
         } catch (Exception e) {
-            checkExceptionFull(e, IllegalArgumentException.class,
-                    "No enum const class org.auraframework.def.BaseComponentDef$RenderType.");
+            checkExceptionRegex(e, IllegalArgumentException.class, "No enum const(ant)? (class )?org\\.auraframework\\.def\\.BaseComponentDef.RenderType\\.");
         }
     }
 
@@ -898,8 +897,8 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
             define(baseTag, "render='typo'", "");
             fail("Should not be able to load component with invalid render value");
         } catch (Exception e) {
-            checkExceptionFull(e, IllegalArgumentException.class,
-                    "No enum const class org.auraframework.def.BaseComponentDef$RenderType.TYPO");
+            checkExceptionRegex(e, IllegalArgumentException.class,
+                    "No enum const(ant)? (class )?org\\.auraframework\\.def\\.BaseComponentDef.RenderType\\.TYPO");
         }
     }
 
@@ -943,8 +942,8 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
             define(baseTag, " whitespace='bogus'", "");
             fail("IllegalArgumentException should have been thrown for bad whitespace value.");
         } catch (Exception e) {
-            checkExceptionFull(e, IllegalArgumentException.class,
-                    "No enum const class org.auraframework.def.BaseComponentDef$WhitespaceBehavior.BOGUS");
+            checkExceptionRegex(e, IllegalArgumentException.class,
+                    "No enum const(ant)? (class )?org\\.auraframework\\.def\\.BaseComponentDef.WhitespaceBehavior\\.BOGUS");
         }
     }
 

@@ -17,6 +17,7 @@ package org.auraframework.test;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
@@ -148,6 +149,19 @@ public abstract class AuraTestCase extends UnitTestCase {
         checkExceptionFull(e, clazz, message);
         assertLocation(e, filename);
     }
+    
+    /**
+     * Check to ensure that an exception matches both message regex and location.
+     * 
+     * @param e the exception to check.
+     * @param clazz a class to match if it is not null.
+     * @param message The message to match (must be exact match).
+     * @param filename a 'file name' to match the location.
+     */
+    protected void checkExceptionRegex(Throwable e, Class<?> clazz, String regex, String filename) {
+        checkExceptionRegex(e, clazz, regex);
+        assertLocation(e, filename);
+    }
 
     /**
      * Check the exception exactly matches the message and check the location of an Exception using the Source of the
@@ -169,7 +183,21 @@ public abstract class AuraTestCase extends UnitTestCase {
         if (clazz != null) {
             assertEquals("Exception must be " + clazz.getSimpleName(), clazz, e.getClass());
         }
+        
         assertEquals("Unexpected message", message, e.getMessage());
+    }
+
+    /**
+     * Check that an exception matches the regex, ignore location.
+     */
+    protected void checkExceptionRegex(Throwable e, Class<?> clazz, String regex) {
+        if (clazz != null) {
+            assertEquals("Exception must be " + clazz.getSimpleName(), clazz, e.getClass());
+        }
+        
+        String message = e.getMessage();
+        Pattern pattern = Pattern.compile(regex);
+        assertTrue("Unexpected message: " + message, pattern.matcher(message).find());
     }
 
     /**

@@ -55,9 +55,8 @@
         <repository>
 	      <id>phloc.com</id>
 	      <url>http://repo.phloc.com/maven2</url>
-	    </repository>
-	    
-	    <repository>
+        </repository>
+        <repository>
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>

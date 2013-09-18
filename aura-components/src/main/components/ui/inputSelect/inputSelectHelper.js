@@ -105,7 +105,7 @@
     updateOptionsFromValue: function(cmp) {
         var value = cmp.getValue("v.value");
         var optionValue = this.getValueFromOptionCmps(cmp);
-
+        
         if (value.getValue() === optionValue) {
             return;
         }
@@ -129,22 +129,21 @@
         if(!$A.util.isUndefinedOrNull(generatedOptions)) {
         // case 1:
             var optionsValue = cmp.getValue("v.options");
-            var options = optionsValue.unwrap();
+            var valIsArray = $A.util.isArray(newValues);
+            cmp._suspendChangeHandlers = true;
 
-            for (var i=0, len=options.length; i < len; i++) {
-                var option = options[i];
+            for (var i = 0, len = optionsValue.getLength(); i < len; i++) {
+                var optionValue = optionsValue.getValue(i);
+                var val = optionValue.get("value");
 
-            	if (($A.util.isArray(newValues) && aura.util.arrayIndexOf(newValues, option.value) > -1) || newValues === option.value) {
-                    option.selected = true;
+                if ((valIsArray && aura.util.arrayIndexOf(newValues, val) > -1) || newValues === val) {
+                    optionValue.put("selected", true);
                 } else {
-                    option.selected = false;
+                    optionValue.put("selected", false);
                 }
             }
 
-            cmp._suspendChangeHandlers = true;
-            optionsValue.setValue(options);
             cmp._suspendChangeHandlers = false;
-            
         } else {
         // case 2:
         	var body = cmp.getValue("v.body");
@@ -161,7 +160,7 @@
             }
         }
         
-
+        
     },
 
     getOptionCmps: function(cmp) {

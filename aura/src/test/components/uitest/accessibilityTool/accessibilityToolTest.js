@@ -116,6 +116,14 @@
 			$A.test.assertEquals(expected, actual , "Unexpected return from CheckAccessibility, should not return errornous string");
 		}
     },
+    testLabelsNotNeeded:{
+	attributes : {caseToRender : 'labelsNotNeeded'},
+	test: function(cmp){
+	        var expected = "Total Number of Errors found: 1";
+		var actual   =  $A.devToolService.checkAccessibility().split("\n")[0];
+		$A.test.assertEquals(expected, actual , "Unexpected return from CheckAccessibility, should return 1 error for input of type image with out an alt");
+	}
+    },
     //Full tests
     testCheckAccessibility:{
 		test: function(cmp){
@@ -124,7 +132,7 @@
 			$A.test.assertEquals(expected, actual , "Unexpected return from CheckAccessibility, should return string with 10 errors");
 		}
     },
-   
+  
     testAssertAccessible:{
 		exceptionsAllowedDuringInit : ["Total Number of Errors found: 10"],
 		test: function(cmp){

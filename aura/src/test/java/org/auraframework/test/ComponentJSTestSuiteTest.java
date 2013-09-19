@@ -47,6 +47,7 @@ import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.JsonReader;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 /**
  * TODO(W-1386863): investigate why/fix the thread hostile nature of these tests.
@@ -270,6 +271,11 @@ public class ComponentJSTestSuiteTest extends TestSuite {
         @Override
         protected Set<String> getExceptionsAllowedDuringInit() {
             return caseDef.getExceptionsAllowedDuringInit();
+        }
+
+        @Override
+        public Set<String> getTestLabels() {
+            return Sets.newHashSet(caseDef.getTestLabels());
         }
 
         private final ComponentTestSuite suite;

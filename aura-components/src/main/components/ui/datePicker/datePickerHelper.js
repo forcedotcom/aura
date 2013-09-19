@@ -242,6 +242,28 @@
         return ret;
     },
     
+    position: function(component) {
+        var divCmp = component.find("datePicker");
+        var elem = divCmp ? divCmp.getElement() : null;
+        if (elem) {
+            elem.style.top = "auto";
+            var visible = component.get("v.visible");
+            if (visible) {
+                var elemRect = elem.getBoundingClientRect();
+                var viewPort = $A.util.getWindowSize();
+                if (elemRect.bottom > viewPort.height) { // no enough space below
+                    if (elemRect.height < elemRect.top) { // move above input field
+                        elem.style.top = 0 - elemRect.height + "px";
+                    } else { // no enough space above either. Put it in the middle of viewport
+                        elem.style.top = 0 - elemRect.top + "px";
+                    }
+                } else {
+                    elem.style.top = "auto";
+                }
+            }
+        }
+    },
+    
     setGridInitialValue: function(component) {
         var initialDate = new Date();
         var value = component.get("v.value");

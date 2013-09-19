@@ -25,6 +25,7 @@
         if (visible === true) {
             helper.localizeToday(component);
         }
+        helper.position(component);
         return ret;
     },
 
@@ -39,6 +40,7 @@
         if (visible === true) {
             helper.localizeToday(component);
         }
+        helper.position(component);
     },
     
     unrender: function(component, helper) {

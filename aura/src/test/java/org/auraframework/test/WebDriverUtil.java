@@ -64,16 +64,17 @@ public final class WebDriverUtil {
     public enum BrowserType {
         FIREFOX(DesiredCapabilities.firefox(), null, Platform.ANY, ExtraCapability.DISABLE_NATIVE_EVENTS),
         IE10(DesiredCapabilities.internetExplorer(), "10", "Windows 2012"),
-        IE9(DesiredCapabilities.internetExplorer(), "9", Platform.VISTA),
+        IE9(DesiredCapabilities.internetExplorer(), "9", "Windows 7"),
         IE8(DesiredCapabilities.internetExplorer(), "8", Platform.WINDOWS),
         IE7(DesiredCapabilities.internetExplorer(), "7", Platform.WINDOWS),
         GOOGLECHROME(DesiredCapabilities.chrome(), null, Platform.ANY),
-        SAFARI(DesiredCapabilities.safari(), "5", "Mac 10.6"),
+        SAFARI(DesiredCapabilities.safari(), "5", "Mac"),
+        SAFARI6(DesiredCapabilities.safari(), "6", "Mac 10.8"),
         ANDROID_PHONE(DesiredCapabilities.android(), "4", "Linux", ExtraCapability.PHONE, ExtraCapability.PORTRAIT),
         ANDROID_TABLET(DesiredCapabilities.android(), "4", "Linux", ExtraCapability.TABLET, ExtraCapability.LANDSCAPE),
-        IPHONE(DesiredCapabilities.iphone(), "5", Platform.MAC),
-        IPAD(DesiredCapabilities.ipad(), "5", "Mac 10.6"),
-        IPADCONTAINER(DesiredCapabilities.ipad(), "5", "Mac 10.6");
+        IPHONE(DesiredCapabilities.iphone(), "6", "Mac 10.8"),
+        IPAD(DesiredCapabilities.ipad(), "6", "Mac 10.8"),
+        IPADCONTAINER(DesiredCapabilities.ipad(), "5", "Mac 10.8");
 
         private final DesiredCapabilities capability;
         private final String version;

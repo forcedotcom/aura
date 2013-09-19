@@ -148,6 +148,24 @@
         return component._onClickStartFunc;
     },
     
+    goToNextYear: function(component) {
+        var grid = component.find("grid");
+        var e = grid.get("e.updateCalendar");
+        if (e) {
+            e.setParams({monthChange: 0, yearChange: 1, setFocus: false});
+            e.fire();
+        }
+    },
+    
+    goToPrevYear: function(component) {
+	    var grid = component.find("grid");
+	    var e = grid.get("e.updateCalendar");
+	    if (e) {
+	        e.setParams({monthChange: 0, yearChange: -1, setFocus: false});
+	        e.fire();
+	    }
+	},
+    
     handleESCKey: function(component, event) {
         var keyCode = event.keyCode;
         if (keyCode == 27) { // Esc key is pressed

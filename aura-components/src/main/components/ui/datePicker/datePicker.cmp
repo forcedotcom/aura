@@ -23,7 +23,7 @@
     <aura:attribute name="value" type="Date" description="A date corresponding to a calendar day in the format yyyy-mm-dd."/>
     <aura:attribute name="visible" type="Boolean" default="false" description="Indicates if the date picker is displayed. Defaults to false, which hides the date picker."/>
     <aura:registerevent name="selectDate" type="ui:selectDate" description="The event fired when a date is selected."/>
-    <div aura:id="datePicker" class="{!v.class + (v.visible == true ? ' visible' : '')}">
+    <div aura:id="datePicker" class="{!v.class + (v.visible == true ? ' visible' : '')}" ontouchstart="{!c.handleTouchStart}" ontouchend="{!c.handleTouchEnd}">
         <aura:if isTrue="{!v.hasTime}">
             <div class="headerBar">
                 <a aura:id="cancel" onclick="{!c.cancel}" class="calCancel" href="javascript:void(0);">Cancel</a>
@@ -32,9 +32,11 @@
         </aura:if>
         <div class="dateBar">
             <div class="prevLinks">
+                <aura:if isTrue="{!!$Browser.isPhone &amp;&amp; !$Browser.isTablet}">
                 <a aura:id="prevYear" class="navLink prevYear" title="Go to previous year" onclick="{!c.goToPrevYear}" onkeydown="{!c.closeOnTab}">
                     <span class="assistiveText">Go to previous year</span>
                 </a>
+                </aura:if>
                 <a aura:id="prevMonth" class="navLink prevMonth" title="Go to previous month" onclick="{!c.goToPrevMonth}" onkeydown="{!c.handleKeydown}">
                     <span class="assistiveText">Go to previous month</span>
                 </a>
@@ -43,9 +45,11 @@
                 <a aura:id="nextMonth" class="navLink nextMonth" title="Go to next month" onclick="{!c.goToNextMonth}" onkeydown="{!c.handleKeydown}">
                     <span class="assistiveText">Go to next month</span>
                 </a>
+                <aura:if isTrue="{!!$Browser.isPhone &amp;&amp; !$Browser.isTablet}">
                 <a aura:id="nextYear" class="navLink nextYear" title="Go to next year" onclick="{!c.goToNextYear}" onkeydown="{!c.focusDateOnTab}">
                     <span class="assistiveText">Go to next year</span>
                 </a>
+                </aura:if>
             </div>
             <h4 aria-live="assertive" aria-atomic="true" class="monthYear" aura:id="calTitle"/>
         </div>

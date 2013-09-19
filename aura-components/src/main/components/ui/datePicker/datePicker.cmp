@@ -23,14 +23,14 @@
     <aura:attribute name="value" type="Date" description="A date corresponding to a calendar day in the format yyyy-mm-dd."/>
     <aura:attribute name="visible" type="Boolean" default="false" description="Indicates if the date picker is displayed. Defaults to false, which hides the date picker."/>
     <aura:registerevent name="selectDate" type="ui:selectDate" description="The event fired when a date is selected."/>
-    <div aura:id="datePicker" class="{!v.class + (v.visible == true ? ' visible' : '')}" ontouchstart="{!c.handleTouchStart}" ontouchend="{!c.handleTouchEnd}">
+    <div aura:id="datePicker" class="{!v.class + (v.visible == true ? ' visible' : '')}">
         <aura:if isTrue="{!v.hasTime}">
             <div class="headerBar">
                 <a aura:id="cancel" onclick="{!c.cancel}" class="calCancel" href="javascript:void(0);">Cancel</a>
                 <a aura:id="set" onclick="{!c.set}" class="calSet" href="javascript:void(0);">Set</a>
             </div>
         </aura:if>
-        <div class="dateBar">
+        <div class="dateBar" ontouchstart="{!c.handleTouchStart}" ontouchend="{!c.handleTouchEnd}">
             <div class="prevLinks">
                 <aura:if isTrue="{!!$Browser.isPhone &amp;&amp; !$Browser.isTablet}">
                 <a aura:id="prevYear" class="navLink prevYear" title="Go to previous year" onclick="{!c.goToPrevYear}" onkeydown="{!c.closeOnTab}">

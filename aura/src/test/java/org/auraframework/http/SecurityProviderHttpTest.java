@@ -154,6 +154,7 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
     /**
      * Deny GET application in DEV mode, with security provider that throws a Throwable.
      */
+    @UnAdaptableTest("W-1590680")
     public void testGetDevAppWithThrows() throws Exception {
         verifyGetAccessDenied(DefType.APPLICATION,
                 "securityProvider='org.auraframework.components.security.SecurityProviderThrowsThrowable'",
@@ -163,6 +164,7 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
     /**
      * Deny GET component in DEV mode, with app with security provider that throws a Throwable.
      */
+    @UnAdaptableTest("W-1590680")
     public void testGetDevCmpWithThrows() throws Exception {
         DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(
                 ApplicationDef.class,

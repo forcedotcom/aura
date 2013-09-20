@@ -19,6 +19,7 @@ import java.util.Map;
 
 import org.auraframework.instance.Action;
 import org.auraframework.instance.ValueProvider;
+import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 
 /**
  * Controller definitions are part of a component definition, providing metadata
@@ -32,5 +33,5 @@ public interface ControllerDef extends ValueProvider, Definition, SubDefinitionP
     Map<String, ? extends ActionDef> getActionDefs();
 
     // TODO: move this to actiondef
-    Action createAction(String actionName, Map<String, Object> paramValues);
+    Action createAction(String actionName, Map<String, Object> paramValues) throws DefinitionNotFoundException ;
 }

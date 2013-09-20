@@ -68,6 +68,7 @@ exp(p,
     "isInstanceOfSpanElement", p.isInstanceOfSpanElement,
     "isInstanceOf", p.isInstanceOf,
     "getElementAttributeValue", p.getElementAttributeValue,
+    "clickOrTouch", p.clickOrTouch,
     
     // javascript
     "getPrototype", p.getPrototype,

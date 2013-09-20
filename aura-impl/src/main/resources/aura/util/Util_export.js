@@ -57,8 +57,8 @@ exp(p,
     "getWindowSize", p.getWindowSize,
     "isComponent", p.isComponent,
     "isValue", p.isValue,
-    "instanceOf", p.instanceOf
-    
+    "instanceOf", p.instanceOf,
+    "supportsTouchEvents", p.supportsTouchEvents
     
     //#if {"excludeModes" : ["PRODUCTION"]}
     ,

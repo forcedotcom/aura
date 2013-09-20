@@ -21,14 +21,16 @@ div.THIS {
 }
 */
 div.THIS {
-    display: inline-block;
+    display: inline-block;    
 }
 
-div.THIS input { 
-    font-size: 16px;
+div.THIS input.input-hours,
+div.THIS input.input-minutes { 
+    font-size: 20px;    
     height: 2em;
     margin: 5px;
     width: 2em;
+    padding: 5px;
 }
 
 div.THIS input.error {
@@ -36,11 +38,8 @@ div.THIS input.error {
     background-color: rgba(255, 0, 0, .025);
 }
 
-@media only screen and (max-width: 999px) and (orientation: portrait) {
-    div.THIS input { 
-        font-size: 20px;
-        height: 50px;
-        margin: 10px;
-        width: 50px;
-    }
+div.THIS select.ampm {
+	width: 3.5em;
+	padding: 5px;
 }
+ 

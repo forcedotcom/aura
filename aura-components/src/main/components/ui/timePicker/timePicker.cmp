@@ -21,6 +21,7 @@
     <aura:attribute name="isValid" type="Boolean" default="true" description="Indicate if the valid hour and minute values are inputed."/>
     <aura:attribute name="minutes" type="Integer" default="0" description="The miniue value."/>
     <aura:attribute name="visible" type="Boolean" default="false" description="Indicates if this time picker is displayed. Defaults to false, which hides this time picker."/>
+
     <div class="{!v.class}">
 	    <ui:inputText aura:id="hours" class="input-hours" change="{!c.updateHours}"/>:
 	    <ui:inputText aura:id="minutes" class="input-minutes" change="{!c.updateMinutes}"/>
@@ -34,3 +35,4 @@
 	    <ui:inputDefaultError aura:id="minuteError" class="hide"/>
     </div>
 </aura:component>
+

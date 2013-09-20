@@ -13,24 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.THIS {
-    padding: 10px;
-}
-
+ .THIS thead {
+ 	background-color: #f0f1f2;
+ 	border-bottom: 1px solid #f0f1f2;
+ }
+ 
 .THIS .calGrid {
     border-collapse: collapse;
 }
 
 .THIS .calGrid th {
-    color: #888;
-    font-size: 11px;
+    color: #696e71;
+    font-size: 13px;
+    font-family: 'ProximaNovaSoft-Semibold';
     padding-bottom: 10px;
     text-align: center;
 }
+ .THIS .calGrid .calRow td {    
+ 	border: 1px solid #eceef0;		
+} 
 
 @media only screen and (max-width: 999px) and (orientation: portrait) {
     .THIS .calGrid {
         border-collapse: collapse;
         width: 100%;
-    }
+        height: 100%;
+    }   
 }

@@ -132,7 +132,7 @@ public class BaseInputDateUITester extends WebDriverTestCase {
          * Returning a Boolean value, whether the label in the calendar matches the month and year that we were
          * expecting
          */
-        return findDomElement(By.cssSelector("h4[class*='monthYear']")).getText();
+        return findDomElement(By.cssSelector("h1[class*='monthYear']")).getText();
     }
 
     // Method to modify calendar

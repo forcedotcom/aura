@@ -13,19 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.THIS {
-    border: 1px solid #E0E0E0;
-}
-
 a.THIS {
     background-color: #FFF;
-    color: #666;
+    color: #696e71;
     display: block;
-    font-size: 12px;
-    height: 30px;
-    line-height: 30px;
-    text-align: center;
-    width: 30px;
+    font-family: 'ProximaNovaSoft-Regular';
+    font-size: 20px;
+    height: 50px;
+    width: 50px;
+    line-height: 50px;
+    text-align: center;       
 }
 
 a.THIS.desktop:hover,
@@ -35,39 +32,45 @@ a.THIS.desktop:active {
     color:#0085C7;
     text-shadow:0 1px 0 rgba(255, 255, 255, 1);
     box-shadow:inset 0 2px 2px rgba(0, 0, 0, .35);
+    outline: 1px solid #666;
 }
 
 a.THIS.prevMonth, a.THIS.nextMonth {
-    background-color: #F6F6F6;
-    color: #BCBCBC;
+    background-color: #FFF;
+    color: #969899;
 }
 
 a.THIS.todayDate {
     background-color: #747474;
     box-shadow: inset 0 2px 2px rgba(0, 0, 0, .35);
-    color: #FFF;
-    outline: 1px solid #666;
+    color: #FFF;   
     text-shadow: 0 1px 0 rgba(0, 0, 0, .65);
 }
 
 a.THIS.selectedDate {
     background-color:#6CAEBF;
-    box-shadow:inset 0 2px 2px rgba(0, 0, 0, .25);
-    color:#FFF;
-    outline:1px solid #568391;
-    text-shadow:0 1px 0 rgba(0, 0, 0, .75);
+    background: -moz-linear-gradient(#3f9fd9,#2789c7); /* FF3.6+ */
+    background: -webkit-linear-gradient(#3f9fd9,#2789c7); /* Chrome10+,Safari5.1+ */
+    background: -ms-linear-gradient(#3f9fd9,#2789c7); /* IE10+ */
+    background: linear-gradient(#3f9fd9,#2789c7); /* W3C */
+    box-shadow: none; 
+   
+    color:#FFF;     
 }
 
 /* Smartphones (portrait) ----------- */
 @media only screen and (max-width: 999px) and (orientation: portrait) {
     a.THIS {
-        background-color: #FFF;
-        color: #666;
-        display: block;
-        font-size: 16px;
-        height: 80px;
-        line-height: 80px;
-        text-align: center;
-        width: 100%;
+       width: 100%;    
+    }
+    
+    a.THIS:hover,
+	a.THIS:focus,
+	a.THIS:active {
+    	outline: none;
+    	background-color: #FFF;
+	    color: #696e71;
+	    text-shadow: none;
+	    box-shadow: none;
     }
 }

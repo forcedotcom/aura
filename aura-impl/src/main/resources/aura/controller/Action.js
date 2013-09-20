@@ -667,8 +667,10 @@ Action.prototype.incomplete = function(context) {
 Action.prototype.getRefreshAction = function(originalResponse) {
 	var storage = originalResponse["storage"];
 	var storageService = this.getStorage();
-	var autoRefreshInterval = this.storableConfig ? this.storableConfig["refresh"] * 1000 : storageService
-			.getDefaultAutoRefreshInterval();
+	var autoRefreshInterval = 
+		(this.storableConfig && !$A.util.isUndefined(this.storableConfig["refresh"]) && $A.util.isNumber(this.storableConfig["refresh"]))
+			? this.storableConfig["refresh"] * 1000 
+			: storageService.getDefaultAutoRefreshInterval();
 
 	// Only auto refresh if the data we have is more than
 	// v.autoRefreshInterval seconds old
@@ -678,7 +680,8 @@ Action.prototype.getRefreshAction = function(originalResponse) {
 
 		storageService.log("Action.refresh(): auto refresh begin: " + this.getId() + " to " + refreshAction.getId());
 
-		var executeCallbackIfUpdated = this.storableConfig ? this.storableConfig["executeCallbackIfUpdated"] : true;
+		var executeCallbackIfUpdated = (this.storableConfig && !$A.util.isUndefined(this.storableConfig["executeCallbackIfUpdated"]))
+			? this.storableConfig["executeCallbackIfUpdated"] : true;
 		if (executeCallbackIfUpdated !== false) {
 			refreshAction.callbacks = this.callbacks;
 		}

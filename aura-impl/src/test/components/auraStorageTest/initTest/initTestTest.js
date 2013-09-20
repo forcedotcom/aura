@@ -693,8 +693,9 @@
      * If a refresh contains the same response as what is stored, then skip
      * replaying the callback. The callback for the stored response is still
      * executed.
+     * Case: Simple action with no components involved
      */
-    testRefreshResponseSameAsStored : {
+    testRefresh_ResponseSameAsStored : {
         attributes : {
             defaultExpiration : 60,
             defaultAutoRefreshInterval : 0 // refresh every action
@@ -748,14 +749,14 @@
     /**
      * If a refresh response differs from what is stored, process the callback.
      */
-    testRefreshResponseDiffersFromStore : {
+    testRefresh_ResponseDiffersFromStore : {
         attributes : {
             defaultExpiration : 60,
             defaultAutoRefreshInterval : 0 // refresh every action
         },
         test : [function(cmp) {
-            cmp._testName = "testSkipReplayOnIdenticalRefresh";
-            this.resetCounter(cmp, "testSkipReplayOnIdenticalRefresh");
+            cmp._testName = "testDontSkipReplayOnNonIdenticalRefresh";
+            this.resetCounter(cmp, "testDontSkipReplayOnNonIdenticalRefresh");
             $A.test.addWaitFor(false, $A.test.isActionPending);
         }, function(cmp) {
             var a = $A.run(function(){
@@ -789,6 +790,108 @@
         } ]
     },
 
+    /**
+     * If a refresh contains the same response as what is stored, then skip
+     * replaying the callback. The callback for the stored response is still
+     * executed.
+     * Case: Action returns a component instance in the response
+     */
+    testRefresh_ResponseWithComponentsSameAsStored : {
+        attributes : {
+            defaultExpiration : 60,
+            defaultAutoRefreshInterval : 0 // refresh every action
+        },
+        test : [function(cmp) {
+        	$A.test.setTestTimeout(30000);
+            cmp._testName = "testSkipReplayOnIdenticalRefreshWithComponents";
+            this.resetCounter(cmp, "testSkipReplayOnIdenticalRefreshWithComponents");
+            $A.test.addWaitFor(false, $A.test.isActionPending);
+        }, function(cmp) {
+        	var a = $A.run(function(){
+                return cmp.getDef().getHelper()
+                    .executeAction(cmp, "c.fetchDataRecordWithComponents", {testName:cmp._testName},
+                        function(a){a.setStorable();})
+                });
+            $A.test.addWaitFor("1", function(){return $A.test.getText(cmp.find("callbackCounter").getElement())},
+                function() {
+                    $A.test.assertEquals("0", $A.test.getText(cmp.find("staticCounter").getElement()));
+                    $A.test.assertEquals("false", $A.test.getText(cmp.find("isFromStorage").getElement()));
+                    $A.storageService.getStorage("actions").adapter.getItem(a.getStorageKey(),
+                        function(item){cmp._originalExpiration = item.expires});
+                });
+        }, function(cmp) {
+            // reset so next response will be same as first
+            cmp._testName = "testSkipReplayOnIdenticalRefreshWithComponents";
+            this.resetCounter(cmp, "testSkipReplayOnIdenticalRefreshWithComponents");
+            $A.test.addWaitFor(false, $A.test.isActionPending);
+            // wait for the timer to tick over
+            var now = new Date().getTime();
+            $A.test.addWaitFor(true, function() { return now < new Date().getTime(); }, function(){});
+        }, function(cmp) {
+        	var a = $A.run(function(){
+                    return cmp.getDef().getHelper().executeAction(cmp, "c.fetchDataRecordWithComponents", {testName:cmp._testName},
+                        function(a){a.setStorable();})
+                });
+            $A.test.addWaitFor("refreshEnd", function(){return $A.test.getText(cmp.find("refreshEnd").getElement());},
+                function() {
+                    $A.test.assertEquals("0", $A.test.getText(cmp.find("staticCounter").getElement()));
+                    $A.test.assertEquals("2", $A.test.getText(cmp.find("callbackCounter").getElement()));
+                    $A.test.assertEquals("true", $A.test.getText(cmp.find("isFromStorage").getElement()));
+                    $A.storageService.getStorage("actions").adapter.getItem(a.getStorageKey(),
+                        function(item){
+                            if(item.expires <= cmp._originalExpiration){
+                                $A.test.fail("storage expiration was not updated after refresh "
+                                    +item.expires+" != "+cmp._originalExpiration);
+                            }
+                        });
+                });
+        } ]
+    },
+    
+    /**
+     * If a action had the same return value but different components were created during the execution of action, 
+     * then the response from refresh action replaces the stored response.
+     */
+    testRefresh_ResponseWithSameReturnValueButAdditionalComponents: {
+        attributes : {
+            defaultExpiration : 60,
+            defaultAutoRefreshInterval : 0 // refresh every action
+        },
+        test : [function(cmp) {
+        	$A.test.setTestTimeout(30000);
+            cmp._testName = "testDontSkipReplayOnNonIdenticalComponentsInRefresh";
+            this.resetCounter(cmp, "testDontSkipReplayOnNonIdenticalComponentsInRefresh");
+            $A.test.addWaitFor(false, $A.test.isActionPending);
+        }, function(cmp) {
+            var a = $A.run(function(){
+                return cmp.getDef().getHelper().executeAction(cmp, "c.fetchDataRecordWithComponents",
+                    {testName:cmp._testName, extraComponentsCreated:true}, function(a){a.setStorable();})
+            });
+            $A.test.addWaitFor("1", function(){return $A.test.getText(cmp.find("callbackCounter").getElement())},
+                function() {
+                    $A.test.assertEquals("0", $A.test.getText(cmp.find("staticCounter").getElement()));
+                    $A.test.assertEquals("false", $A.test.getText(cmp.find("isFromStorage").getElement()));
+                    $A.storageService.getStorage("actions").adapter.getItem(a.getStorageKey(),
+                        function(item){cmp._originalExpiration = item.expires});
+                });
+        }, function(cmp) {
+            // this response will be different(has extra component but same return value) so callback count should be +2 (for get(), then refresh())
+            var a = $A.run(function(){
+                    return cmp.getDef().getHelper().executeAction(cmp, "c.fetchDataRecordWithComponents",
+                        {testName:cmp._testName, extraComponentsCreated:true}, function(a){a.setStorable();})
+                });
+            $A.test.addWaitFor("3", function(){return $A.test.getText(cmp.find("callbackCounter").getElement())},
+                function() {
+                    $A.test.assertEquals("false", $A.test.getText(cmp.find("isFromStorage").getElement()));
+                    $A.storageService.getStorage("actions").adapter.getItem(a.getStorageKey(),
+                        function(item){
+                            if(item.expires <= cmp._originalExpiration){
+                                $A.test.fail("storage expiration was not updated after refresh");
+                            }
+                        });
+                });
+        } ]
+    },
     /**
      * Refresh error not stored, so subsequent refresh will still replay.
      */

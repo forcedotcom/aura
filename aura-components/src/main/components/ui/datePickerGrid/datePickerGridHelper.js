@@ -230,7 +230,7 @@
         } else if (keyCode == 34 && shiftKey == true) { // Page Down + shift
             this.changeCalendar(component, localId, 0, 1);
         } else if (keyCode == 32) { // space bar
-            this.selectDate(component, event);
+            this.handleSpaceBar(component, event);
         } else if (keyCode == 36) { // Home key
             domEvent.stopPropagation();
             this.goToFirstOfMonth(component, localId);
@@ -245,6 +245,14 @@
             domEvent.stopPropagation();
             this.handleESC(component);
         }
+    },
+    
+    handleSpaceBar: function(component, event) {
+        var hasTime = component.getValue("v.hasTime").getBooleanValue();
+        if (hasTime === true) {
+            return;
+        }
+        this.selectDate(component, event);
     },
     
     renderGrid: function(component) {

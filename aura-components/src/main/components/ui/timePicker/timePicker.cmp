@@ -23,8 +23,8 @@
     <aura:attribute name="visible" type="Boolean" default="false" description="Indicates if this time picker is displayed. Defaults to false, which hides this time picker."/>
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
     
-    <div><ui:inputNumber aura:id="hours" class="input" change="{!c.updateHours}"/></div>:
-    <div><ui:inputNumber aura:id="minutes" class="input" change="{!c.updateMinutes}"/></div>
+    <div><ui:inputText aura:id="hours" class="input" change="{!c.updateHours}"/></div>:
+    <div><ui:inputText aura:id="minutes" class="input" change="{!c.updateMinutes}"/></div>
     <aura:renderIf isTrue="{!v.is24HourFormat != true}">
         <ui:inputSelect aura:id="ampm" change="{!c.updateAmpm}">
             <ui:inputSelectOption aura:id="amOpt" label="AM" text="am"/>

@@ -15,7 +15,6 @@
  */
 ({
     doInit: function(component, event, helper) {
-        /*
         var is24HourFormat = component.getValue("v.is24HourFormat").getBooleanValue();
         if (is24HourFormat === false) {
             // Localize am/pm label
@@ -32,7 +31,6 @@
                 } 
             }
         }
-        */
     },
     
     updateAmpm: function(component, event, helper) {

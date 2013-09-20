@@ -46,11 +46,15 @@
         
         // set minutes
         var minutes = component.get("v.minutes");
+        minutes %= 60;
         var minutesCmp = component.find("minutes");
         if (minutesCmp) {
+            minutes = minutes + '';
+            if (minutes.length < 2) {
+                minutes = '0' + minutes;
+            }
             minutesCmp.setValue("v.value", minutes);
         }
-        
     },
     
     updateHourValue: function(component, hours) {

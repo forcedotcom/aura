@@ -876,7 +876,7 @@ var AuraDevToolService = function() {
        		        return accessAideFuncs.findAllImgTags(imgError, infoMsg, decoMsg);
         	    },
         	    /**
-                     * Goes through all of the fieldsets tags and makes sure that each on has a legend
+                     * Goes through all of the fieldsets tags that do not have the display:none field set and makes sure that each one has a legend
                      * @returns String - Returns a string representation of the errors
                      */
         	    checkFieldSetForLegend : function(){
@@ -885,9 +885,15 @@ var AuraDevToolService = function() {
         		var fieldSets = document.getElementsByTagName('fieldset');
         		var legends = "";
         		var errorArray = [];
-        		
+        		var fieldSetSytle  = "";
         		for(var i=0; i<fieldSets.length; i++){
         		        legends = fieldSets[i].getElementsByTagName('legend');
+        		        fieldSetSytle = fieldSets[i].style.display;
+        		      
+        		        if(!$A.util.isUndefinedOrNull(fieldSetSytle) && fieldSetSytle == "none"){
+        		            continue;
+        		        }
+
         	        	if(legends.length === 0){
         	        	    errorArray.push(fieldSets[i]);
         	        	}

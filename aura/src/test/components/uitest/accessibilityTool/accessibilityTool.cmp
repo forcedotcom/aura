@@ -27,6 +27,32 @@
         <input type="button" size="25" value="CLick me"/>
         <input type="image" src="/auraFW/resources/aura/images/auraNoteDemo.png" name="image" width="60" height="60"/>
     </aura:if>
+    
+    <aura:if isTrue="{!v.caseToRender == 'fieldSetWithStyles'}">
+        <fieldset  aura:id="field_set_W_style_and_legend">
+                     <legend>field_set_W_style_and_legend</legend>
+        </fieldset>
+        
+        <fieldset aura:id="field_set_field_style_no_legend">
+        </fieldset>
+        
+        <fieldset aura:id="field_set_fieldset_no_style_legend">
+                     <legend>field_set_fieldset_no_style_legend</legend>
+        </fieldset>
+        
+          <fieldset aura:id="field_set_no_sytle_no_legend">
+         </fieldset>
+        
+          <fieldset aura:id="field_set_fieldset_wrong_style_legend" style="BLAH">
+                     <legend>field_set_fieldset_wrong_style_legend</legend>
+        </fieldset>
+        
+          <fieldset  aura:id="field_set_wrong_style_no_legend" >
+         </fieldset>
+    </aura:if>
+    
+    
+    
     <aura:if isTrue="{!v.caseToRender == 'full'}">  
         <table>
             <th></th>

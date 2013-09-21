@@ -1090,6 +1090,20 @@ var Test = function(){
                 element.fireEvent("on" + event.eventType, event);
             }
         },
+        
+        clickOrTouch: function (element) {        	
+        	if($A.util.supportsTouchEvents()){	
+        		var ts = document.createEvent('TouchEvent'); 
+        		ts.initTouchEvent('touchstart');
+        		var te = document.createEvent('TouchEvent'); 
+        		te.initTouchEvent('touchend');
+        		element.dispatchEvent(ts);
+        		element.dispatchEvent(te);
+        	}
+        	else{
+            	element.click();
+            }
+        },
 
         isInstanceOfText: function(node){
             if(window.Text){

@@ -114,6 +114,61 @@
             cmp.getDef().getHelper().testSetStorableAPIStage4.call(this, cmp);
         } ]
     },
+    
+    /**
+     * Refresh action which refresh the response of stored action can be configured to not call the callback.
+     * This test case verified that.
+     */
+    testSetStorableAPI_executeCallbackIfUpdated : {
+    	attributes : {
+            defaultExpiration : 60,
+            defaultAutoRefreshInterval : 0 // refresh every action
+        },
+        test : [function(cmp) {
+            cmp._testName = "testSkipCallbackOnRefresh";
+            this.resetCounter(cmp, "testSkipCallbackOnRefresh");
+            $A.test.addWaitFor(false, $A.test.isActionPending);
+        }, function(cmp) {
+        	//First action which fetches the response from server.
+            var a = $A.run(function(){
+                return cmp.getDef().getHelper().executeAction(cmp, "c.fetchDataRecord",
+                    {testName:cmp._testName}, function(a){a.setStorable();})
+            });
+            //Wait for first callback
+            $A.test.addWaitFor("1", function(){return $A.test.getText(cmp.find("callbackCounter").getElement())},
+                function() {
+                    $A.test.assertEquals("0", $A.test.getText(cmp.find("staticCounter").getElement()));
+                    $A.test.assertEquals("false", $A.test.getText(cmp.find("isFromStorage").getElement()));
+                    $A.storageService.getStorage("actions").adapter.getItem(a.getStorageKey(),
+                        function(item){cmp._originalExpiration = item.expires});
+                });
+        }, function(cmp) {
+            // Specify that callback should not be called in case of refresh, so callback count should be 1 (for get())
+            var a = $A.run(function(){
+                    return cmp.getDef().getHelper().executeAction(cmp, "c.fetchDataRecord",
+                        {testName:cmp._testName}, function(a){a.setStorable({"executeCallbackIfUpdated":false});})
+                });
+            $A.test.addWaitFor("refreshEnd", function(){return $A.test.getText(cmp.find("refreshEnd").getElement());},
+    	            function() {
+            			//From cached response
+    	                $A.test.assertEquals("0", $A.test.getText(cmp.find("staticCounter").getElement()));
+    	                //Once for the original action and second action which was fetched from storage. None for refresh action
+    	                $A.test.assertEquals("2", $A.test.getText(cmp.find("callbackCounter").getElement()));
+    	                $A.storageService.getStorage("actions").adapter.getItem(a.getStorageKey(),
+    	                    function(item){
+    	                		$A.test.assertEquals(1, item.value.returnValue.Counter,
+    	                				"Refresh action response not stored in storage");
+    	                		if(item.expires <= cmp._originalExpiration){
+    	                            $A.test.fail("storage expiration was not updated after refresh "
+    	                                +item.expires+" != "+cmp._originalExpiration);
+    	                        }
+    	                    });
+    	            });
+        } ]
+    },
+    /**
+     * Providing empty eonfig doesn't change the default behavior. The default refresh interval will be used.
+     */
     testSetStorableAPI_Empty : {
         attributes : {
             defaultExpiration : "60",
@@ -147,10 +202,10 @@
                     return aSecond.getState()
                 }, function() {
                     $A.test.assertTrue(aSecond.isFromStorage(), "failed to fetch cached response");
-                    $A.test.assertEquals("", $A.test.getText(cmp.find("refreshBegin").getElement()),
-                                    "refreshBegin fired unexpectedly");
-                    $A.test.assertEquals("", $A.test.getText(cmp.find("refreshEnd").getElement()),
-                                    "refreshEnd fired unexpectedly");
+                    //Refresh interval should default to 0 and refresh should happen.
+                    $A.test.addWaitFor("refreshEnd", function() {
+                        return $A.test.getText(cmp.find("refreshEnd").getElement())
+                    });
                 });
             } ]
     },
@@ -672,7 +727,7 @@
         }, function(cmp) {
             var a = $A.run(function(){
                     return cmp.getDef().getHelper().executeAction(cmp, "c.fetchDataRecord", {testName:cmp._testName},
-                        function(a){a.setStorable();})
+                        function(a){a.setStorable({"executeCallbackIfUpdated":true});})
                 });
             $A.test.addWaitFor("refreshEnd", function(){return $A.test.getText(cmp.find("refreshEnd").getElement());},
                 function() {
@@ -747,7 +802,7 @@
                     },{
                         error : "java.lang.IllegalStateException"
                     },{
-                        value : "anything really"
+                        value : "anything really, but something new"
                     }]
                 }]
         }],
@@ -756,7 +811,12 @@
             defaultAutoRefreshInterval : 0 // refresh every action
         },
         test : [function(cmp) {
-            var a = cmp.get("c.fetchDataRecord");
+        	$A.test.setTestTimeout(300000);
+            this.resetCounter(cmp, "testRefreshErrorResponseNotStored");
+            $A.test.addWaitFor(false, $A.test.isActionPending);
+        },function(cmp) {
+        	var a = cmp.get("c.fetchDataRecord");
+            a.setParams({testName : "testRefreshErrorResponseNotStored"});
             a.setStorable();
             a.setCallback(cmp, function(action){
                 cmp.getDef().getHelper().findAndSetText(cmp, "callbackCounter",
@@ -770,9 +830,10 @@
                 });
         }, function(cmp) {
             var a = cmp.get("c.fetchDataRecord");
+            a.setParams({testName : "testRefreshErrorResponseNotStored"});
             a.setStorable();
             a.setCallback(cmp, function(action){
-                cmp.getDef().getHelper().findAndSetText(cmp, "callbackCounter",
+            	cmp.getDef().getHelper().findAndSetText(cmp, "callbackCounter",
                     parseInt(cmp.find("callbackCounter").getElement().innerHTML)+1);
             });
             $A.test.enqueueAction(a);
@@ -789,6 +850,7 @@
             $A.test.addWaitFor(true, function() { return now < new Date().getTime(); }, function(){});
         }, function(cmp) {
             var a = cmp.get("c.fetchDataRecord");
+            a.setParams({testName : "testRefreshErrorResponseNotStored"});
             a.setStorable();
             a.setCallback(cmp, function(action){
                     cmp.getDef().getHelper().findAndSetText(cmp, "callbackCounter",

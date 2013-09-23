@@ -1217,6 +1217,12 @@ $A.ns.Util.prototype.isComponent = function(obj) {
 $A.ns.Util.prototype.isValue = function(obj) {
     return (!this.isUndefinedOrNull(obj) && !this.isUndefinedOrNull(obj.auraType) && obj.auraType === 'Value');
 };
+
+$A.ns.Util.prototype.supportsTouchEvents = function() {	 
+	// cache the result--it's not going to change
+	return this.supportsTouchEvents.cache || (this.supportsTouchEvents.cache = !$A.util.isUndefined(document.ontouchstart) && $A.getContext().getMode() !== 'PTEST' && $A.getContext().getMode() !== 'CADENCE' && $A.getContext().getMode() !== 'SELENIUM' && $A.getContext().getMode() !== 'SELENIUMDEBUG');
+};
+
  
 //#if {"excludeModes" : ["PRODUCTION"]}
 /**
@@ -1291,12 +1297,6 @@ $A.ns.Util.prototype.getText = function(node) {
 
 };
 
-
-
-$A.ns.Util.prototype.supportsTouchEvents = function() {	 
-	// cache the result--it's not going to change
-	return this.supportsTouchEvents.cache || (this.supportsTouchEvents.cache = !$A.util.isUndefined(document.ontouchstart) && $A.getContext().getMode() !== 'PTEST' && $A.getContext().getMode() !== 'CADENCE' && $A.getContext().getMode() !== 'SELENIUM' && $A.getContext().getMode() !== 'SELENIUMDEBUG');
-};
 
 
 //#end

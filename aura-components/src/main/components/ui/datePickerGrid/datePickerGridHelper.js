@@ -264,13 +264,13 @@
         var hasTime = component.getValue("v.hasTime").getBooleanValue();
         if (hasTime === true) {
             var firstDate = new Date(component.get("v.year"), component.get("v.month"), 1);
-            var firstDateId = firstDate.getDay();
+            var firstDateId = parseInt(firstDate.getDay());
             
             var lastDate = new Date(component.get("v.year"), component.get("v.month") + 1, 0);
             var lastDateCellCmp = this.findDateComponent(component, lastDate);
-            var lastDateId = lastDateCellCmp.getLocalId();
+            var lastDateId = parseInt(lastDateCellCmp.getLocalId());
             
-            var currentId = source.getLocalId();
+            var currentId = parseInt(source.getLocalId());
             var currentDate = source.get("v.label");
             if (currentId < firstDateId) { // previous month
                 var targetDate = new Date(component.get("v.year"), component.get("v.month") - 1, currentDate);
@@ -285,7 +285,7 @@
                 component.setValue("v.date", targetDate.getDate()); 
                 this.updateTitle(component, targetDate.getMonth(), targetDate.getFullYear());
             } else {
-                source.getElement().focus();
+                source.getElement().focus(); 
                 component.setValue("v.date", currentDate);
             }
             component.setValue("v.selectedDate", component.get("v.year") + "-" + (component.get("v.month") + 1) + "-" + component.get("v.date"));

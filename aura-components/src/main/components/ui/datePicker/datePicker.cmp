@@ -30,7 +30,7 @@
                 <a aura:id="set" onclick="{!c.set}" class="calSet" href="javascript:void(0);">Set</a>
             </div>
         </aura:if>
-        <div class="dateBar" ontouchstart="{!c.handleTouchStart}" ontouchend="{!c.handleTouchEnd}">
+        <div class="dateBar" ontouchstart="{!c.handleTouchStart}" ontouchmove="{!c.handleTouchMove}" ontouchend="{!c.handleTouchEnd}">
             <div class="prevLinks">
                 <aura:if isTrue="{!!$Browser.isPhone &amp;&amp; !$Browser.isTablet}">
                 <a aura:id="prevYear" class="navLink prevYear" title="Go to previous year" onclick="{!c.goToPrevYear}" onkeydown="{!c.closeOnTab}">

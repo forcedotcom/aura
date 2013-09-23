@@ -80,6 +80,18 @@
     },
     
     handleTouchEnd: function(component, event, helper) {
+        var startY = component._onTouchStartY;
+        var endY = component._onTouchEndY;
+        if ((endY - startY) > 5) { // swipe down
+            helper.goToNextYear(component);
+        } else if ((startY - endY) > 5) { // swipe up
+            helper.goToPrevYear(component);
+        }
+    },
+    
+    handleTouchMove: function(component, event, helper) {
+        event.preventDefault();
+        event.stopPropagation();
         var touch;
         var touchIdFound = false;
         for (var i = 0; i < event.changedTouches.length; i++) {
@@ -90,13 +102,8 @@
             }
         }
         if (touchIdFound) {
-            var startY = component._onTouchStartY;
-            var endY = touch.clientY;
-            if ((endY - startY) > 5) { // swipe down
-                helper.goToNextYear(component);
-            } else if ((startY - endY) > 5) { // swipe up
-                helper.goToPrevYear(component);
-            }
+            component._onTouchEndY = touch.clientY; // On Android (Samsung GT), we can't get the position of touchend, 
+                                                    // so we have to record it here.
         }
     },
     

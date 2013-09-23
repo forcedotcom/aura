@@ -60,4 +60,4 @@
 .uiDataTable th:last-child{border-top-right-radius:3px;}
 .uiDataTable tr:last-child td:first-child{border-bottom-left-radius:3px;}
 .uiDataTable tr:last-child td:last-child{border-bottom-right-radius:3px;}
-.uiDataTable tr:last-child td{border-bottom: 0px;}
+.uiDataTable tr:last-child td{border-bottom: 0;}

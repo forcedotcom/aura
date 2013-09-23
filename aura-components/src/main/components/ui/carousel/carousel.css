@@ -13,53 +13,53 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
- 
+
+
 .THIS   {
  	position: relative;
 	background: #2e4153;
-	display: block;		
+	display: block;
  }
-  
-  
- .THIS .carousel-nav-container { 	
+
+
+ .THIS .carousel-nav-container {
  	position: relative;
  	padding: 21px 0;
 	display: block;
 	width: 100%;
-	text-align: center;	
+	text-align: center;
  }
 
  .THIS .carousel-pages {
  	position: relative;
- 	clear: both;	
+ 	clear: both;
 	overflow: hidden;
-	white-space: nowrap;	 	
+	white-space: nowrap;
  }
-   
- 
- .THIS .carousel-pages .page-list { 
+
+
+ .THIS .carousel-pages .page-list {
  	list-style: none;
- 	padding: 0px;
- 	margin: 0px;
+ 	padding: 0;
+ 	margin: 0;
  }
- 
+
  .THIS .carousel-nav-position-top {
- 	top: 0px;
+ 	top: 0;
  }
-  
+
  .THIS .carousel-nav-position-bottom {
- 	bottom: 0px;
+ 	bottom: 0;
  }
-   
- 
- .THIS .carousel-pages .carousel-page { 	
+
+
+ .THIS .carousel-pages .carousel-page {
  	display: inline-block;
- 	vertical-align: top;    
+ 	vertical-align: top;
  }
- 
+
  .THIS .full-height {
  	height: 100%;
  }
- 
- 
+
+

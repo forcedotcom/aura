@@ -94,5 +94,5 @@
 
 
 .THIS ~foo1 +foo2 -foo3 :foo4 #foo5 _foo6 {
-    margin: 0px;
+    margin: 0;
 }

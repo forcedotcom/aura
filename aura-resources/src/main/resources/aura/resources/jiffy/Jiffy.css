@@ -1,7 +1,7 @@
 .jiffyAbsolute {
     position: absolute;
-    top: 0px;
-    left: 0px;
+    top: 0;
+    left: 0;
     width: 99%;
     cursor: move;
     z-index: 999;
@@ -24,7 +24,7 @@
 
 .jiffyContainer table.measures {
     font-weight: bold;
-    border-width: 0px;
+    border-width: 0;
     border-style: none;
     border-collapse: collapse;
     table-layout: fixed;
@@ -44,7 +44,7 @@
     border-color: #efefef;
     border-style: solid none;
     border-width: 1px 0;
-    padding: 4px 0px;
+    padding: 4px 0;
 }
 
 .jiffyContainer td {
@@ -112,14 +112,14 @@
 .jiffyContainer .bar {
     background-image: url(/img/jiffy/bluegradient.png);
     background-repeat: repeat;
-    background-position: 0px 0px;
+    background-position: 0 0;
     text-align: right;
 }
 
 .jiffyContainer .durationBar {
     background-image: url(/img/jiffy/grayflat.png);
     background-repeat: repeat;
-    background-position: 0px 0px;
+    background-position: 0 0;
 }
 
 .jiffyContainer .elapsed {

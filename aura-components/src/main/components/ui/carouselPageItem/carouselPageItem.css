@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
-.THIS   {	
+
+.THIS   {
 	width: 50%;
 	height: 140px;
 	display: table-cell;
@@ -45,6 +45,6 @@
 
 .THIS .entity {
 	border-style: solid;
-	border-width: 0px;
+	border-width: 0;
 	border-radius: 5px;
 }

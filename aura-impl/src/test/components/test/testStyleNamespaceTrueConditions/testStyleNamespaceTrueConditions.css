@@ -78,7 +78,7 @@
   	.THIS .stackOrder {
     	z-index: 500;
     }
-} 
+}
 @else {
   	.THIS .stackOrder {
     	z-index: 600;
@@ -94,7 +94,7 @@
     	padding-left: add(15px,
     					  1px);
     }
-} 
+}
 
 @if (WEBKIT) {
 	.THIS h1+h2 {
@@ -104,16 +104,16 @@
 	.THIS h1~p{
 		font-size: 2em;
 	}
-	
+
 	.THIS #content{
 		margin: 0 auto;
 	}
-	
-	.THIS a[href*=".com"] { 
+
+	.THIS a[href*=".com"] {
 		color: blue;
 	}
-	
+
 	.THIS ~foo1 +foo2 -foo3 :foo4 #foo5 _foo6 {
-		margin: 0px;
+		margin: 0;
 	}
 }

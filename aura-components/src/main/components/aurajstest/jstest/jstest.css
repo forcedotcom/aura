@@ -52,13 +52,13 @@
     filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,StartColorStr='#727a86', EndColorStr='#505864');
     border-bottom: 1px solid #33373d;
     border-right: 1px solid #33373d;
-    -webkit-box-shadow: inset 0px 1px 0px 0px #878e98;
-    -moz-box-shadow: inset 0px 1px 0px 0px #878e98;
-    box-shadow: inset 0px 1px 0px 0px #878e98;
+    -webkit-box-shadow: inset 0 1px 0 0 #878e98;
+    -moz-box-shadow: inset 0 1px 0 0 #878e98;
+    box-shadow: inset 0 1px 0 0 #878e98;
     display: block;
     font-weight: 600;
     color: #fff;
-    text-shadow: 0px 1px 0px rgba(0,0,0,.5);
+    text-shadow: 0 1px 0 rgba(0,0,0,.5);
     margin: 0;
 }
 
@@ -88,9 +88,9 @@
     background-image: linear-gradient(top, rgb(69, 199, 235), rgb(38, 152, 219));
     filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,StartColorStr='#45c7eb', EndColorStr='#2698db');
     border-bottom: 1px solid #103c56;
-    -webkit-box-shadow: inset 0px 1px 0px 0px #6ad2ef;
-    -moz-box-shadow: inset 0px 1px 0px 0px #6ad2ef;
-    box-shadow: inset 0px 1px 0px 0px #6ad2ef;
+    -webkit-box-shadow: inset 0 1px 0 0 #6ad2ef;
+    -moz-box-shadow: inset 0 1px 0 0 #6ad2ef;
+    box-shadow: inset 0 1px 0 0 #6ad2ef;
 }
 
 .aurajstestJstest ul li.uiTab.active > a.tabHeader {
@@ -172,10 +172,10 @@
     -webkit-border-radius: .769em;
     -moz-border-radius: .769em;
     border-radius: .769em;
-    -webkit-box-shadow: inset 0px 1px 3px 0px rgba(0, 0, 0, .26), 0px 1px 0px 0px rgba(255, 255, 255, .15);
-    -moz-box-shadow: inset 0px 1px 3px 0px rgba(0, 0, 0, .26), 0px 1px 0px 0px rgba(255, 255, 255, .15);
-    box-shadow: inset 0px 1px 3px 0px rgba(0, 0, 0, .26), 0px 1px 0px 0px rgba(255, 255, 255, .15);
-    text-shadow: 0px 1px 0px rgba(0,0,0,.5);
+    -webkit-box-shadow: inset 0 1px 3px 0 rgba(0, 0, 0, .26), 0 1px 0 0 rgba(255, 255, 255, .15);
+    -moz-box-shadow: inset 0 1px 3px 0 rgba(0, 0, 0, .26), 0 1px 0 0 rgba(255, 255, 255, .15);
+    box-shadow: inset 0 1px 3px 0 rgba(0, 0, 0, .26), 0 1px 0 0 rgba(255, 255, 255, .15);
+    text-shadow: 0 1px 0 rgba(0,0,0,.5);
     font-weight: 500;
     background: #2173a1;
 }

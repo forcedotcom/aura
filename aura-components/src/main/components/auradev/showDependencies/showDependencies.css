@@ -22,13 +22,13 @@
 }
 
 .THIS ol {
-    margin-top : 0px;
+    margin-top : 0;
 }
 
 .THIS .headerline {
     font-weight: bold;
     margin-top : 10px;
-    margin-bottom : 0px;
+    margin-bottom : 0;
 }
 
 .THIS .headerline li {

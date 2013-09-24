@@ -61,11 +61,12 @@ exp(p,
     "supportsTouchEvents", p.supportsTouchEvents
     
     //#if {"excludeModes" : ["PRODUCTION"]}
-    ,
-    "getDebugToolComponent", p.getDebugToolComponent,
-    "setDebugToolWindow", p.setDebugToolWindow,
-    "getDebugToolsAuraInstance",  p.getDebugToolsAuraInstance,
-    "getUrl", p.getUrl,
-    "getText", p.getText
+	    ,
+	    "getDebugToolComponent", p.getDebugToolComponent,
+	    "setDebugToolWindow", p.setDebugToolWindow,
+	    "getDebugToolsAuraInstance",  p.getDebugToolsAuraInstance,
+	    "getUrl", p.getUrl,
+	    "getText", p.getText,
+	    "errorBasedOnMode", p.errorBasedOnMode
     //#end
 );

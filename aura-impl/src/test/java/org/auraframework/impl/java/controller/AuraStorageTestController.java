@@ -34,6 +34,7 @@ import org.auraframework.system.Annotations.Controller;
 import org.auraframework.system.Annotations.Key;
 import org.auraframework.test.TestContextAdapter;
 import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonSerializable;
 
@@ -167,7 +168,35 @@ public class AuraStorageTestController {
         }
         return r;
     }
-
+    
+    /**
+     * Create extra components, return value of the action is the same but getComponents() of the action differ,
+     * should cause Action refresh to trigger a callback in the client 
+     */
+    @AuraEnabled
+    public static RecordWithComponents fetchDataRecordWithComponents(@Key("testName") String testName, @Key("extraComponentsCreated") Boolean extraComponentsCreated) throws Exception {
+    	staticCounter.putIfAbsent(testName, 0);
+    	//Create extra components the second time this server action is called.
+    	if(extraComponentsCreated!=null && extraComponentsCreated && staticCounter.get(testName).intValue() == 1){
+    		//Reset the counter so action return value is the same
+        	staticCounter.put(testName, 0);
+        	Map<String, Object> attr = Maps.newHashMap();
+        	//W-1859020 - W-1859020 - Revert to auraStorageTest:playerFacet 
+        	//attr.put("value", ""+System.currentTimeMillis());
+        	Aura.getInstanceService().getInstance("ui:datePicker", ComponentDef.class,attr);
+        }
+    	AuraStorageTestController.RecordWithComponents r = new AuraStorageTestController.RecordWithComponents(staticCounter.get(testName),
+                "StorageController");
+        staticCounter.put(testName, new Integer(staticCounter.get(testName).intValue() + 1));
+        Semaphore lock = getSemaphore(testName, null, false);
+        if (lock != null) {
+            if (!lock.tryAcquire(15, TimeUnit.SECONDS)) {
+                return null;
+            }
+        }
+        return r;
+    }
+    
     @AuraEnabled
     public static int getInt(@Key("param") int param) throws Exception {
         return param;
@@ -238,6 +267,52 @@ public class AuraStorageTestController {
             json.writeMapBegin();
             json.writeMapEntry("Counter", getCounterValue());
             json.writeMapEntry("Data", getObject() == null ? "" : getObject());
+            json.writeMapEnd();
+        }
+    }
+    
+    /**
+     * Object to represent return value for controller.
+     */
+    static class RecordWithComponents implements JsonSerializable {
+        Integer counterValue;
+        Object obj;
+        Component cmp;
+
+        RecordWithComponents(Integer counter, Object o) {
+            this.counterValue = counter;
+            this.obj = o;
+            Map<String, Object> attr = Maps.newHashMap();
+//            attr.put("name", ""+ counterValue);
+//            attr.put("nickName", "Counter" + counterValue);
+            attr.put("class", "class_t " + counterValue);
+            try{
+            	//W-1859020 - Revert to auraStorageTest:playerFacet
+            	//cmp = Aura.getInstanceService().getInstance("auraStorageTest:playerFacet", ComponentDef.class, attr);
+            	cmp = Aura.getInstanceService().getInstance("ui:datePicker", ComponentDef.class, attr);
+            }catch(QuickFixException e){
+            	//Do nothing
+            }        }
+
+        public Integer getCounterValue() {
+            return counterValue;
+        }
+
+        public Object getObject() {
+            return obj;
+        }
+        
+        public Component getComponent(){
+            return cmp;               
+        }
+        @Override
+        public void serialize(Json json) throws IOException {
+            json.writeMapBegin();
+            json.writeMapEntry("Counter", getCounterValue());
+            json.writeMapEntry("Data", getObject() == null ? "" : getObject());
+            if(getComponent() != null){
+            	json.writeMapEntry("Component", getComponent());
+            }
             json.writeMapEnd();
         }
     }

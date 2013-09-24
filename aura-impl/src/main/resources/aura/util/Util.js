@@ -1225,80 +1225,82 @@ $A.ns.Util.prototype.supportsTouchEvents = function() {
 
  
 //#if {"excludeModes" : ["PRODUCTION"]}
-/**
- * Gets the aura debug tool component whether in an iframe or not.
- * @returns {Object} The debug tool component.
- */
-$A.ns.Util.prototype.getDebugToolComponent = function(){
-	if (!this.isUndefinedOrNull(this.debugToolWindow)) {
-		var debugElem = this.debugToolWindow.document.getElementById('__aura_debug_tool');
-		if (!this.isUndefinedOrNull(debugElem)) {
-			return this.debugToolWindow["aura"].componentService.getAttributeProviderForElement(debugElem);
+	/**
+	 * Gets the aura debug tool component whether in an iframe or not.
+	 * @returns {Object} The debug tool component.
+	 */
+	$A.ns.Util.prototype.getDebugToolComponent = function(){
+		if (!this.isUndefinedOrNull(this.debugToolWindow)) {
+			var debugElem = this.debugToolWindow.document.getElementById('__aura_debug_tool');
+			if (!this.isUndefinedOrNull(debugElem)) {
+				return this.debugToolWindow["aura"].componentService.getAttributeProviderForElement(debugElem);
+			}
 		}
-	}
-};
-
-/**
- * Gets the aura instance of debug tool which has been opened in a child window
- * 
- * @return {Object} Aura instance
- */
-$A.ns.Util.prototype.getDebugToolsAuraInstance = function(){
-	if (!this.isUndefinedOrNull(this.debugToolWindow)) {  
-		return this.debugToolWindow["aura"];
-	} else {
-		return $A;
-	}
-};
-
-/**
- * Set the aura debug tool handle when opened in a popup.
- */
-$A.ns.Util.prototype.setDebugToolWindow = function(debugWindow){
-	if (!this.isUndefinedOrNull(debugWindow)) {
-		this.debugToolWindow = debugWindow;
-	}
-};
-
-/**
- * Grab windows url, if debug tool is a child window get url of parent
- * 
- * @return URL
- */
-$A.ns.Util.prototype.getUrl = function(){
-    if (this.isUndefinedOrNull(opener)) {
-		return window.location.href; 
-	} else {
-		return opener.location.href;
-	}
-};
-/**
- * Get the text content of a DOM node. Tries <code>innerText</code> followed by
- * <code>textContext</code>, followed by <code>nodeValue</code> to take browser differences into account.
- * @param {Node} node           The node to get the text content from
- */
-$A.ns.Util.prototype.getText = function(node) {
-    var t;
-    //text nodes
-    if(node.nodeType === 3){
-    	t = node.nodeValue;
-    } else {
-    	// chrome, safari, IE have this
-        t = node.innerText;
-
-	// FF & chrome with visibility set to false
-        if (node.textContent !== undefined) {
-            if($A.util.isUndefinedOrNull(t) || t === ""){
-                t = node.textContent;
-            }
-        }
-    }
-    return t;
-
-};
-
-
-
+	};
+	
+	/**
+	 * Gets the aura instance of debug tool which has been opened in a child window
+	 * 
+	 * @return {Object} Aura instance
+	 */
+	$A.ns.Util.prototype.getDebugToolsAuraInstance = function(){
+		if (!this.isUndefinedOrNull(this.debugToolWindow)) {  
+			return this.debugToolWindow["aura"];
+		} else {
+			return $A;
+		}
+	};
+	
+	/**
+	 * Set the aura debug tool handle when opened in a popup.
+	 */
+	$A.ns.Util.prototype.setDebugToolWindow = function(debugWindow){
+		if (!this.isUndefinedOrNull(debugWindow)) {
+			this.debugToolWindow = debugWindow;
+		}
+	};
+	
+	/**
+	 * Grab windows url, if debug tool is a child window get url of parent
+	 * 
+	 * @return URL
+	 */
+	$A.ns.Util.prototype.getUrl = function(){
+	    if (this.isUndefinedOrNull(opener)) {
+			return window.location.href; 
+		} else {
+			return opener.location.href;
+		}
+	};
+	/**
+	 * Get the text content of a DOM node. Tries <code>innerText</code> followed by
+	 * <code>textContext</code>, followed by <code>nodeValue</code> to take browser differences into account.
+	 * @param {Node} node           The node to get the text content from
+	 */
+	$A.ns.Util.prototype.getText = function(node) {
+	    var t;
+	    //text nodes
+	    if(node.nodeType === 3){
+	    	t = node.nodeValue;
+	    } else {
+	    	// chrome, safari, IE have this
+	        t = node.innerText;
+	
+		// FF & chrome with visibility set to false
+	        if (node.textContent !== undefined) {
+	            if($A.util.isUndefinedOrNull(t) || t === ""){
+	                t = node.textContent;
+	            }
+	        }
+	    }
+	    return t;
+	
+	};
+	
+	$A.ns.Util.prototype.errorBasedOnMode = function(msg) {
+		$A.error(msg);
+	
+	};
 //#end
 
 //#include aura.util.Util_export

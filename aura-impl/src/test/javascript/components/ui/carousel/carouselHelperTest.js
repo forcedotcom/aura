@@ -38,6 +38,13 @@ Test.Components.Ui.Carousel.CarouselHelperTest=function(){
 						setValue : function(label, value) {}
 					}
 				},
+				getSuper: function() {
+					return {
+						isInstanceOf: function() {
+							return false;
+						}
+					}
+				},
 				pageIndex : 0,
 				parent : null,
 				width : 3,
@@ -53,6 +60,14 @@ Test.Components.Ui.Carousel.CarouselHelperTest=function(){
 						}
 					}
 				},
+				getSuper: function() {
+					return {
+						isInstanceOf: function() {
+							return false;
+						}
+					}
+				},
+				
 				getValue : function(expression) {
 					if (expression === "v.pageComponents") {
 						return {

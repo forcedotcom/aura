@@ -22,15 +22,16 @@
     <aura:attribute name="minutes" type="Integer" default="0" description="The miniue value."/>
     <aura:attribute name="visible" type="Boolean" default="false" description="Indicates if this time picker is displayed. Defaults to false, which hides this time picker."/>
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
-    
-    <div><ui:inputText aura:id="hours" class="input" change="{!c.updateHours}"/></div>:
-    <div><ui:inputText aura:id="minutes" class="input" change="{!c.updateMinutes}"/></div>
-    <aura:renderIf isTrue="{!v.is24HourFormat != true}">
-        <ui:inputSelect aura:id="ampm" change="{!c.updateAmpm}">
-            <ui:inputSelectOption aura:id="amOpt" label="AM" text="am"/>
-            <ui:inputSelectOption aura:id="pmOpt" label="PM" text="pm"/>
-        </ui:inputSelect>
-    </aura:renderIf>
-    <ui:inputDefaultError aura:id="hourError" class="hide"/>
-    <ui:inputDefaultError aura:id="minuteError" class="hide"/>
+    <div class="{!v.class}">
+	    <ui:inputText aura:id="hours" class="input-hours" change="{!c.updateHours}"/>:
+	    <ui:inputText aura:id="minutes" class="input-minutes" change="{!c.updateMinutes}"/>
+	    <aura:renderIf isTrue="{!v.is24HourFormat != true}">
+	        <ui:inputSelect aura:id="ampm" class="ampm" change="{!c.updateAmpm}">
+	            <ui:inputSelectOption aura:id="amOpt" label="AM" text="am"/>
+	            <ui:inputSelectOption aura:id="pmOpt" label="PM" text="pm"/>
+	        </ui:inputSelect>
+	    </aura:renderIf>
+	    <ui:inputDefaultError aura:id="hourError" class="hide"/>
+	    <ui:inputDefaultError aura:id="minuteError" class="hide"/>
+    </div>
 </aura:component>

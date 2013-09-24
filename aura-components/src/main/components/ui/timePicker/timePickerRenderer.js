@@ -14,6 +14,13 @@
  * limitations under the License.
  */
 ({
+    afterRender: function(component, helper) {
+        var ret = this.superAfterRender();
+        helper.validateHours(component);
+        helper.validateMinutes(component);
+        return ret; 
+    },
+    
     render: function(component, helper) {
         helper.renderTime(component);
         return this.superRender(); 

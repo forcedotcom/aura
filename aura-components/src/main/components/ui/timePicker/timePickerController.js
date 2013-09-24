@@ -46,62 +46,26 @@
     },
     
     updateHours: function(component, event, helper) {
-        var is24HourFormat = component.getValue("v.is24HourFormat").getBooleanValue();
-        var hoursCmp = event.getSource();
-        var errorCmp = component.find("hourError");
-        var hoursValue = component.getValue("v.hours");
-        if (hoursCmp && errorCmp) {
-            var hours = hoursCmp.get("v.value");
-            if (is24HourFormat === true) {
-                if (helper.validateNumber(hours, 0, 23)) {
-                    hoursCmp.removeClass("error");
-                    errorCmp.setValue("v.value", []);
-                    errorCmp.addClass("hide");
-                    // update timePicker hours
-                    helper.updateHourValue(component, hours);
-                    component.setValue("v.isValid", true);
-                } else {
-                    hoursCmp.addClass("error");
-                    errorCmp.setValue("v.value", ["Please input a valid hour value (0 - 23)."]);
-                    errorCmp.removeClass("hide");
-                    component.setValue("v.isValid", false);
-                }
-            } else {
-                if (helper.validateNumber(hours, 1, 12)) {
-                    hoursCmp.removeClass("error");
-                    errorCmp.setValue("v.value", []);
-                    errorCmp.addClass("hide");
-                    // update timePicker hours
-                    helper.updateHourValue(component, hours);
-                    component.setValue("v.isValid", true);
-                } else {
-                    hoursCmp.addClass("error");
-                    errorCmp.setValue("v.value", ["Please input a valid hour value (1 - 12)."]);
-                    errorCmp.removeClass("hide");
-                    component.setValue("v.isValid", false);
-                }
+        if (helper.validateHours(component)) {
+            var hoursCmp = event.getSource();
+            if (hoursCmp) {
+                helper.updateHourValue(component, hoursCmp.get("v.value"));
+                component.setValue("v.isValid", true);
+                return;
             }
         }
+        component.setValue("v.isValid", false);
     },
     
     updateMinutes: function(component, event, helper) {
-        var minutesCmp = event.getSource();
-        var errorCmp = component.find("minuteError");
-        var minutesValue = component.getValue("v.minutes");
-        if (minutesCmp && errorCmp) {
-            var minutes = minutesCmp.get("v.value");
-            if (helper.validateNumber(minutes, 0, 59)) {
-                minutesCmp.removeClass("error"); 
-                errorCmp.setValue("v.value", []);
-                errorCmp.addClass("hide");
-                helper.updateMinuteValue(component, minutes);
+        if (helper.validateMinutes(component)) {
+            var minutesCmp = event.getSource();
+            if (minutesCmp) {
+                helper.updateMinuteValue(component, minutesCmp.get("v.value"));
                 component.setValue("v.isValid", true);
-            } else {
-                minutesCmp.addClass("error");
-                errorCmp.setValue("v.value", ["Please input a valid minute value (0 - 59)."]);
-                errorCmp.removeClass("hide");
-                component.setValue("v.isValid", false);
+                return;
             }
         }
+        component.setValue("v.isValid", false);
     }
 })

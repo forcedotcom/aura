@@ -119,7 +119,7 @@ public class JavaTestController {
 
     @AuraEnabled
     public static void throwsException(@Key("errorMsg") String errorMsg) throws Exception {
-        throw new Exception(errorMsg);
+        throw new AuraHandledException(errorMsg);
     }
 
     private static Map<String, StringBuffer> buffers = Maps.newLinkedHashMap();

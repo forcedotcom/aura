@@ -44,8 +44,7 @@ public class InputErrorUITest extends WebDriverTestCase {
      * handling setting a custom error component.
      */
     public void testServerErrorUsingOnError() throws Exception {
-        String expectedErrorMsg = "Custom Error Msg: Unable to process your request org.auraframework.throwable.AuraExecutionException: " +
-        		"java://org.auraframework.impl.java.controller.JavaTestController: java.lang.Exception: Error Happens!";
+        String expectedErrorMsg = "Custom Error Msg: Error Happens!";
         d = getDriver();
         open(URL_CST);
         setWebElements("ErrorFireOnErrorEvent", "ClearFireOnClearErrrorsEvent");
@@ -53,7 +52,8 @@ public class InputErrorUITest extends WebDriverTestCase {
         errorBtn.click();
         waitForElementTextPresent(status, STATUS_ERROR);
         WebElement errorElement = d.findElement(By.id("errorDiv"));
-        assertTrue("Incorrect error message", errorElement.getText().startsWith(expectedErrorMsg));
+        String errorText = errorElement.getText();
+        assertTrue("Incorrect error message: " + errorText, errorText.startsWith(expectedErrorMsg));
 
         clearBtn.click();
         waitForElementTextPresent(status, STATUS_CLEAR);
@@ -69,9 +69,7 @@ public class InputErrorUITest extends WebDriverTestCase {
         d = getDriver();
         open(URL_CST);
         setWebElements("ErrorFireOnErrorEvent", "ClearFireOnClearErrrorsEvent");
-        induceError(
-                "Custom Error Msg: java://org.auraframework.impl.java.controller.JavaTestController: java.lang.Exception: Error Happens!",
-                true);
+        induceError("Custom Error Msg: Error Happens!", true);
         clearError(true);
     }
 
@@ -82,9 +80,7 @@ public class InputErrorUITest extends WebDriverTestCase {
         d = getDriver();
         open(URL);
         setWebElements("ErrorServer", "ClearNoEvent");
-        induceError(
-                "java://org.auraframework.impl.java.controller.JavaTestController: java.lang.Exception: Error Happens!",
-                true);
+        induceError("Error Happens!", true);
         clearError(true);
     }
 
@@ -144,7 +140,8 @@ public class InputErrorUITest extends WebDriverTestCase {
 
     private void verifyErrorMessage(WebElement element, String expectedErrorMsg) throws Exception {
         WebElement errorElement = d.findElement(By.className("uiInputDefaultError"));
-        assertTrue("Incorrect error message", errorElement.getText().contains(expectedErrorMsg));
+        String errorText = errorElement.getText();
+        assertTrue("Incorrect error message: " + errorText, errorText.contains(expectedErrorMsg));
     }
     
     private void verifyNoErrorMessage(WebElement element) throws Exception {

@@ -30,8 +30,11 @@
 var SmartStoreAdapter = function SmartStoreAdapter(config) {
 
     // DCHASMAN TODO Figure out how to wire up config["name"] to create instances of this adapter!
-    // Looks like we just need to append the config["name"] to the SOUP_NAME prefix in SmartStoreAdapter.prototype.registerSoup() 
-
+    
+    // The soup name for this driver is the SmartStoreAdapter's prefix (cache.) prepended to the 
+    // driver name provided by config["name"]
+    this.soupName = this.SOUP_PREFIX + config["name"];
+    
     this.setupStage = this.SETUP_STAGE_NOT_STARTED;
     this.clearRegisterSoupFailed = false;
     this._currentSize = 0;
@@ -42,7 +45,7 @@ var SmartStoreAdapter = function SmartStoreAdapter(config) {
 //Used at the end of the file before the variable is initialized so the name must be statically available
 SmartStoreAdapter.NAME = "smartstore";
 
-SmartStoreAdapter.prototype.SOUP_NAME = "cache";
+SmartStoreAdapter.prototype.SOUP_PREFIX = "cache.";
 
 //Soup item properties
 SmartStoreAdapter.prototype.SOUP_KEY = "key";
@@ -157,7 +160,7 @@ SmartStoreAdapter.prototype.setItem = function(key, item, successCallback, error
                     entriesToUpsert[0][that.SOUP_KEY] = sanitizedKey;
                     entriesToUpsert[0][that.SOUP_VALUE] = item;
                     that._smartstore["upsertSoupEntriesWithExternalId"](
-                        that.SOUP_NAME,
+                        that.soupName,
                         entriesToUpsert,
                         that.SOUP_KEY,
                         function(items){
@@ -203,7 +206,7 @@ SmartStoreAdapter.prototype.removeItem = function(key, successCallback, errorCal
                 }
                 var newSize = that.incrementSize(-entryFromQuery[that.SOUP_VALUE]["size"]);
                 that._logger("setItem() size post-Remove = " + newSize);
-                that._smartstore["removeFromSoup"](that.SOUP_NAME,
+                that._smartstore["removeFromSoup"](that.soupName,
                     // TODO: This is kind of ugly, looking at this internal variable.  Is this really what is expected?
                     [entryFromQuery["_soupEntryId"]],
                     function() {
@@ -239,7 +242,7 @@ SmartStoreAdapter.prototype.clear = function(successCallback, errorCallback) {
             that.setSize(0);
             // the plan is to remove the soup then register it again
             that._smartstore["removeSoup"](
-                that.SOUP_NAME, 
+                that.soupName, 
                 function(){
                     that.registerSoup(
                         successCallback, 
@@ -264,7 +267,7 @@ SmartStoreAdapter.prototype.clear = function(successCallback, errorCallback) {
 // Note that any caller that also wants to remove the items will have to get the smartstore internal id for each item in order to delete
 // Which is what removeItem does
 SmartStoreAdapter.prototype.getExpired = function(successCallback, errorCallback) {
-	if($A.util.isUndefinedOrNull(successCallback)) {
+    if($A.util.isUndefinedOrNull(successCallback)) {
         throw new Error("No successCallback passed to getExpired");
     }
 
@@ -283,7 +286,7 @@ SmartStoreAdapter.prototype.getExpired = function(successCallback, errorCallback
         var now = new Date().getTime();
         var querySpec = that._smartstore["buildRangeQuerySpec"](that.SOUP_VALUE + "." + that.SOUP_EXPIRES, 0, now, null, that.QUERY_PAGE_SIZE);
         that._smartstore["querySoup"](
-            that.SOUP_NAME,
+            that.soupName,
             querySpec,
             function(cursor) {
                 var cursorIterator = new SmartStoreCursorIterator(that._smartstore, cursor);
@@ -423,7 +426,7 @@ SmartStoreAdapter.prototype.registerSoup = function (successCallback, errorCallb
                     {path:this.SOUP_VALUE + "." + this.SOUP_EXPIRES, type:"integer"}];
     var that = this;
     this._smartstore["registerSoup"](
-        this.SOUP_NAME,
+        this.soupName,
         indexes,
         function(param) {
             that._logger("Success on registerSoup:" + param);
@@ -445,7 +448,7 @@ SmartStoreAdapter.prototype.querySoupForItem = function(key, successCallback, er
 
     var querySpec = this._smartstore["buildExactQuerySpec"](this.SOUP_KEY, sanitizedKey, 1);
     var that = this;
-    this._smartstore["querySoup"](this.SOUP_NAME,querySpec,
+    this._smartstore["querySoup"](this.soupName,querySpec,
         function(cursor){ 
             var cursorIterator = new SmartStoreCursorIterator(that._smartstore, cursor);
             var itemToReturn;
@@ -497,7 +500,7 @@ SmartStoreAdapter.prototype.getNumItems = function(successCallback, errorCallbac
         function(){
             var querySpec = that._smartstore["buildLikeQuerySpec"](that.SOUP_KEY, "%", null, that.QUERY_PAGE_SIZE);
                 that._smartstore["querySoup"](
-                    that.SOUP_NAME,
+                    that.soupName,
                     querySpec,
                     function(cursor) {
                         var cursorIterator = new SmartStoreCursorIterator(that._smartstore, cursor);

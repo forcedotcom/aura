@@ -430,6 +430,45 @@
             }
         ]
     },
+    
+    /**
+     * The name used when creating a SmartStoreAdapter should map to a dedicated soup.
+     * Hence, when writing objects with the same key to adapters with different names, they should
+     * be stored in different soups and thus not overwrite each other.
+     */
+    testMultipleSoups:{
+        test:[
+            function(cmp){
+            	debugger;
+            	// Write key1 to two adapters with different names:
+                this.setToAdapterAndWaitForItem(
+                    new $A.storageService.createAdapter("smartstore", "test"), 
+                    "key1", 
+                    {"value":"in test"}
+                );
+                this.setToAdapterAndWaitForItem(
+                    new $A.storageService.createAdapter("smartstore", "test2"), 
+                    "key1", 
+                    {"value":"in test2"}
+                );
+            },
+            
+            function(cmp){
+            	// Both values written in the previous step should be accessible from
+            	// their respective adapters even though they have the same key.
+                this.assertGetFromAdapter(
+            		new $A.storageService.createAdapter("smartstore", "test"),
+            		"key1", 
+            		{"value":"in test"}
+        		);
+                this.assertGetFromAdapter(
+            		new $A.storageService.createAdapter("smartstore", "test2"),
+            		"key1", 
+            		{"value":"in test2"}
+        		);
+            }
+        ]
+    },
 
     /**
      * Test that getExpired does not return an item that is in the future.
@@ -692,6 +731,17 @@
             });
     },
     /**
+     * Assert the item retrieved in a specific adapter's getItem() call.
+     * An asynchronous call is issued and the result checked in the callback.
+     */
+    assertGetFromAdapter:function(adapter, key, expected){
+        var that = this;
+        this.getFromAdapterAndWaitForItem(adapter, key,
+            function(result) {
+                    that.assertObjectEquals(expected, result, "Object value for " + key + " incorrect");
+            });
+    },
+    /**
      * Assert an item retrieved in a getItem() call is undefined or null.
      * An asynchronous call is issued and the result checked in a callback.
      */
@@ -824,14 +874,14 @@
     //
     
     /**
-     * A convenience method for the setItem() call.  The call is asynchronous.  It should be followed by
-     * a waitForSetItems() or setAndWaitForItem() call as well.  The calling test subfunction must terminate for
-     * the operation to complete.
+     * A convenience method for the setItem() call for a specified adapter.  Like setItem below, The call is 
+     * asynchronous. It should be followed by a waitForSetItems() or setAndWaitForItem() call as well.  
+     * The calling test subfunction must terminate for the operation to complete.
      */
-    setItem:function(key, value){
-        this.setItemCallCounter++;
+    setItemToAdapter:function(adapter, key, value){
+    	this.setItemCallCounter++;
         var that = this;
-        this.adapter.setItem(
+        adapter.setItem(
                 key,
                 value,
                 function() {
@@ -840,6 +890,15 @@
                 function(err) {
                     $A.test.fail("Error on setItem: " + err);
                 });
+    },
+    
+    /**
+     * A convenience method for the setItem() call.  The call is asynchronous.  It should be followed by
+     * a waitForSetItems() or setAndWaitForItem() call as well.  The calling test subfunction must terminate for
+     * the operation to complete.
+     */
+    setItem:function(key, value){
+        this.setItemToAdapter(this.adapter, key, value);
     },
     /**
      * Indicate to the test framework to wait for all outstanding setItem calls to complete.
@@ -860,17 +919,23 @@
         this.setItem(key, value);
         this.waitForSetItems();
     },
+    /**
+     * A convenience method for one setItem() call and one waitForSetItems() call.
+     */
+    setToAdapterAndWaitForItem:function(adapter, key, value){
+        this.setItemToAdapter(adapter, key, value);
+        this.waitForSetItems();
+    },
     
     /**
-     * A convenience method for the getItem() call.  The call is asynchronous.
-     * The function accepts a callback in a parameter, which can be used to inspect or assert the result.
-     * The calling test subfunction must terminate for the operation to complete.
+     * A convenience method for one setItem() call and one waitForSetItems() call 
+     * for a specific adapter.
      */
-    getAndWaitForItem:function(key, callback){
-        var getItemComplete = false;
+    getFromAdapterAndWaitForItem:function(adapter, key, callback){
+    	var getItemComplete = false;
         var getItemResult = null;
         // invoke the getItem call asynchronously
-        this.adapter.getItem(
+        adapter.getItem(
                 key, 
                 function(result) {
                     getItemComplete = true; 
@@ -889,6 +954,15 @@
                 function() {
                     callback(getItemResult);
                 });
+    },
+    
+    /**
+     * A convenience method for the getItem() call.  The call is asynchronous.
+     * The function accepts a callback in a parameter, which can be used to inspect or assert the result.
+     * The calling test subfunction must terminate for the operation to complete.
+     */
+    getAndWaitForItem:function(key, callback){
+        this.getFromAdapterAndWaitForItem(this.adapter, key, callback);
     },
 
     /**

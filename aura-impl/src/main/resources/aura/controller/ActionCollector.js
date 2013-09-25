@@ -37,7 +37,6 @@ $A.ns.ActionCollector = function ActionCollector(actions, finishedCallback) {
     this.actionsFinished = {};
     this.finishedCallback = finishedCallback;
     this.collectorId = $A.ns.ActionCollector.prototype.counter++;
-    this.transactionId = -1; //only used in PTEST mode
     this.actionsRequested = actions;
     if (actions) {
         this.actionsToCollect = actions.length;
@@ -128,20 +127,6 @@ $A.ns.ActionCollector.prototype.setNum = function(num) {
  */
 $A.ns.ActionCollector.prototype.getNum = function() {
     return this.num;
-};
-
-/**
- * Set the 'transaction id' for this collector.  Only used in PTEST mode
- */
-$A.ns.ActionCollector.prototype.setTransactionId = function(transactionId) {
-    this.transactionId = transactionId;
-};
-
-/**
- * get the 'transaction id' for this collector. Only used in PTEST mode
- */
-$A.ns.ActionCollector.prototype.getTransactionId = function() {
-    return this.transactionId;
 };
 
 /**

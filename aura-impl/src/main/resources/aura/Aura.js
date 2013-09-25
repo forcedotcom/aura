@@ -998,15 +998,18 @@ $A.ns.Aura.prototype.endMark = (function() {
 })();
 
 /**
- * Map through to Perf.startTransaction if Perf is loaded, otherwise a no-op. This will be the same no-op as
+ * If Perf is loaded the page-ready and transaction timers will be started, otherwise a no-op. This will be the same no-op as
  * $A.ns.Aura.prototype.mark, since both are no-ops when Jiffy is missing; we only need one noop object.
  *
  * @public
  * @function
  */
-$A.ns.Aura.prototype.startTransaction = (function() {
+$A.ns.Aura.prototype.startTransaction = (function(name) {
     if (window["Perf"]) {
-        return window["Perf"]["startTransaction"];
+        return function(name) {
+            window["Perf"]["startTransaction"](name);
+        	return window["Perf"]["mark"]("page-ready");
+        };
     } else {
         return $A.ns.Aura.prototype.mark;
     }
@@ -1027,18 +1030,18 @@ $A.ns.Aura.prototype.endTransaction = (function() {
     }
 })();
 
-
-
 /**
- * Map through to Perf.hasActiveTransaction if Perf is loaded, otherwise a no-op. This will be the same no-op as
+ * Map through to Perf.endMark with an id of 'page-ready' if Perf is loaded, otherwise a no-op. This will be the same no-op as
  * $A.ns.Aura.prototype.mark, since both are no-ops when Jiffy is missing; we only need one noop object.
  *
  * @public
  * @function
  */
-$A.ns.Aura.prototype.hasActiveTransaction = (function() {
+$A.ns.Aura.prototype.pageReady = (function() {
     if (window["Perf"]) {
-        return window["Perf"]["hasActiveTransaction"];
+        return function() {
+        	return window["Perf"]["endMark"]("page-ready");
+        };
     } else {
         return $A.ns.Aura.prototype.mark;
     }

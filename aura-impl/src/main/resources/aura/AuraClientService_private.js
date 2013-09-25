@@ -111,7 +111,7 @@ var priv = {
             // instead of JSON. There is no real hope of dealing with it,
             // so just flag an error, and carry on.
             //
-            aura.error(text);
+            $A.error(text);
             return null;
         }
 
@@ -139,16 +139,16 @@ var priv = {
                 //
                 text = "//" + text;
             }
-            var resp = aura.util.json.decode(text, true);
+            var resp = $A.util.json.decode(text, true);
 
             // if the error on the server is meant to trigger a client-side
             // event...
-            if (aura.util.isUndefinedOrNull(resp)) {
+            if ($A.util.isUndefinedOrNull(resp)) {
                 // #if {"excludeModes" : ["PRODUCTION"]}
-                aura.error("Communication error, invalid JSON: " + text);
+                $A.error("Communication error, invalid JSON: " + text);
                 // #end
                 // #if {"modes" : ["PRODUCTION"]}
-                aura.error("Communication error, please retry or reload the page");
+                $A.error("Communication error, please retry or reload the page");
                 // #end
                 return null;
             } else if (resp["exceptionEvent"] === true) {
@@ -164,16 +164,16 @@ var priv = {
                 // !!!!!!!!!!HACK ALERT!!!!!!!!!!
                 // #if {"excludeModes" : ["PRODUCTION"]}
                 if (resp["message"] && resp["stack"]) {
-                    aura.error(resp["message"] + "\n" + resp["stack"]);
+                    $A.error(resp["message"] + "\n" + resp["stack"]);
                 } else {
-                    aura.error("Communication error, invalid JSON: " + text);
+                    $A.error("Communication error, invalid JSON: " + text);
                 }
                 // #end
                 // #if {"modes" : ["PRODUCTION"]}
                 if (resp["message"]) {
-                    aura.error(resp["message"]);
+                    $A.error(resp["message"]);
                 } else {
-                    aura.error("Communication error, please retry or reload the page");
+                    $A.error("Communication error, please retry or reload the page");
                 }
                 // #end
                 return null;
@@ -186,13 +186,13 @@ var priv = {
             text = "//" + text;
         }
 
-        var responseMessage = aura.util.json.decode(text, true);
-        if (aura.util.isUndefinedOrNull(responseMessage)) {
+        var responseMessage = $A.util.json.decode(text, true);
+        if ($A.util.isUndefinedOrNull(responseMessage)) {
             // #if {"excludeModes" : ["PRODUCTION"]}
-            aura.error("Communication error, invalid JSON: " + text);
+            $A.error("Communication error, invalid JSON: " + text);
             // #end
             // #if {"modes" : ["PRODUCTION"]}
-            aura.error("Communication error, please retry or reload the page");
+            $A.error("Communication error, please retry or reload the page");
             // #end
             return null;
         }
@@ -217,10 +217,10 @@ var priv = {
             evt.fire();
         } else {
             try {
-                aura.util.json.decodeString(resp["defaultHandler"])();
+                $A.util.json.decodeString(resp["defaultHandler"])();
             } catch (e) {
                 // W-1728079 : verify & remove this comment when error() take two parameters in the future
-                aura.error("Error in defaultHandler for event: " + descriptor, e);
+                $A.error("Error in defaultHandler for event: " + descriptor, e);
             }
         }
     },
@@ -356,7 +356,7 @@ var priv = {
                             action.setParams(actionResponse["params"]);
                             action.setAbortable(false);
                         } else {
-                            aura.assert(action, "Unable to find action for action response " + actionResponse["id"]);
+                            $A.assert(action, "Unable to find action for action response " + actionResponse["id"]);
                         }
                     }
                     that.singleAction(action, noAbort, actionResponse);
@@ -449,7 +449,7 @@ var priv = {
         }
 
         if (actionsToSend.length > 0) {
-            collector.setNum(aura.getContext().incrementNum());
+            collector.setNum($A.getContext().incrementNum());
 
             // clientService.requestQueue reference is mutable
             flightCounter.send();
@@ -461,7 +461,7 @@ var priv = {
                     this.actionCallback(response, collector, flightCounter, abortableId);
                 },
                 "params" : {
-                    "message" : aura.util.json.encode({
+                    "message" : $A.util.json.encode({
                         "actions" : actionsToSend
                     }),
                     "aura.token" : priv.token,

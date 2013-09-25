@@ -52,6 +52,12 @@
         shortName: "Dec"
     }],
     
+    attachToDocumentBody: function(component) {
+        var body = document.getElementsByTagName("body")[0];
+        var elem = component.getElement();
+        body.appendChild(elem);
+    },
+    
     focusDate: function(component) {
         var grid = component.find("grid");
         var e = grid.get("e.focus");
@@ -245,10 +251,15 @@
     position: function(component) {
         var divCmp = component.find("datePicker");
         var elem = divCmp ? divCmp.getElement() : null;
-        if (elem) {
-            elem.style.top = "auto";
-            var visible = component.get("v.visible");
-            if (visible) {
+        var visible = component.get("v.visible");
+        if (elem && visible) {
+            var isPhone = $A.get("$Browser.isPhone");
+            if (isPhone === true) {
+                this.attachToDocumentBody(component);
+                elem.style.top = "0px";
+                elem.style.left = "0px";    
+            } else {
+                elem.style.top = "auto";
                 var elemRect = elem.getBoundingClientRect();
                 var viewPort = $A.util.getWindowSize();
                 if (elemRect.bottom > viewPort.height) { // no enough space below
@@ -258,10 +269,10 @@
                         elem.style.top = 0 - elemRect.top + "px";
                     }
                 } else {
-                    elem.style.top = "auto";
+                    elem.style.top = "auto"; 
                 }
             }
-        }
+        }     
     },
     
     setGridInitialValue: function(component) {

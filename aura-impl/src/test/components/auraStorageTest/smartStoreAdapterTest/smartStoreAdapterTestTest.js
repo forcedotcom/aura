@@ -36,8 +36,8 @@
         test:
             function(cmp){
                 $A.test.assertEquals(0, this.adapter.getSize(), "empty adapter has a non-zero size");
-                this.assertNumItems(0);
-                this.assertGetUndefinedOrNull("the key");
+                this.assertNumItems(this.adapter, 0);
+                this.assertGetUndefinedOrNull(this.adapter, "the key");
         }
     },
     /**
@@ -48,7 +48,7 @@
             function(cmp){
                 try{
                     // we don't support this 
-                    this.setAndWaitForItem("the key", "the value");
+                    this.setAndWaitForItem(this.adapter, "the key", "the value");
                     $A.test.fail("Expected exception not thrown.");
                 } catch(err) {
                     // expect an error here
@@ -64,7 +64,7 @@
             function(cmp){
                 try{
                     // we don't support this 
-                    this.setAndWaitForItem("the key", undefined);
+                    this.setAndWaitForItem(this.adapter, "the key", undefined);
                     $A.test.fail("Expected exception not thrown.");
                 } catch(err) {
                     // expect an error here
@@ -80,7 +80,7 @@
             function(cmp){
                 try{
                     // we don't support this 
-                    this.setAndWaitForItem("the key", null);
+                    this.setAndWaitForItem(this.adapter, "the key", null);
                     $A.test.fail("Expected exception not thrown.");
                 } catch(err) {
                     // expect an error here
@@ -94,12 +94,12 @@
     testSetAndGet:{
         test:[
             function(cmp){
-                this.setAndWaitForItem("a key", {"value":{"oh":"hey", "I":{"am":"an", "object":"what"}}});
+                this.setAndWaitForItem(this.adapter, "a key", {"value":{"oh":"hey", "I":{"am":"an", "object":"what"}}});
             },
             function(cmp){
                 $A.test.assertTrue(this.adapter.getSize() > 0, "size did not increase");
-                this.assertNumItems(1);
-                this.assertGet("a key", {"value":{"oh":"hey", "I":{"am":"an", "object":"what"}}});
+                this.assertNumItems(this.adapter, 1);
+                this.assertGet(this.adapter, "a key", {"value":{"oh":"hey", "I":{"am":"an", "object":"what"}}});
             }]
     },
     /**
@@ -108,7 +108,7 @@
     testSetAndGetWellKnownProperties:{
         test:[
             function(cmp){
-                this.setAndWaitForItem("a key", {
+                this.setAndWaitForItem(this.adapter, "a key", {
                             "value": "v",
                             "created": "c",
                             "something": "s",
@@ -116,8 +116,8 @@
                         });
             },
             function(cmp){
-                this.assertNumItems(1);
-                this.assertGet("a key", {
+                this.assertNumItems(this.adapter, 1);
+                this.assertGet(this.adapter, "a key", {
                     "value": "v",
                     "created": "c",
                     "expires": "e"
@@ -130,28 +130,28 @@
     testSetAndGetSameKey:{
         test:[
             function(cmp){
-                this.setAndWaitForItem("key1", {"value":{"oh":"hey"}});
+                this.setAndWaitForItem(this.adapter, "key1", {"value":{"oh":"hey"}});
             },
             function(cmp){
                 cmp.originalSize = this.adapter.getSize();
                 // must wait for first setItem operation to finish before attempting to 
                 // execute this second one.
-                this.setAndWaitForItem("key1", {"value":{"hello":"there"}});
+                this.setAndWaitForItem(this.adapter, "key1", {"value":{"hello":"there"}});
             },
             function(cmp){
                 $A.test.assertTrue(cmp.originalSize != this.adapter.getSize(), "size did not change");
-                this.assertNumItems(1);
-                this.assertGet("key1", {"value":{"hello":"there"}});
+                this.assertNumItems(this.adapter, 1);
+                this.assertGet(this.adapter, "key1", {"value":{"hello":"there"}});
             },
             function(cmp){
                 // reset to original value
-                this.setAndWaitForItem("key1", {"value":{"oh":"hey"}});
+                this.setAndWaitForItem(this.adapter, "key1", {"value":{"oh":"hey"}});
             },
             function(cmp){
                 // ensure size is being properly adjusted and not just being constantly augmented.
                 $A.test.assertEquals(cmp.originalSize, this.adapter.getSize(), "size is not same as original");
-                this.assertNumItems(1);
-                this.assertGet("key1", {"value":{"oh":"hey"}});
+                this.assertNumItems(this.adapter, 1);
+                this.assertGet(this.adapter, "key1", {"value":{"oh":"hey"}});
             }]
     },
     /**
@@ -160,10 +160,10 @@
     testGetKeyDoesNotExist:{
         test:[
             function(cmp){
-                this.setAndWaitForItem("key1", {"oh":"hey"});
+                this.setAndWaitForItem(this.adapter, "key1", {"oh":"hey"});
             },
             function(cmp){
-                this.assertGetUndefinedOrNull("key2");
+                this.assertGetUndefinedOrNull(this.adapter, "key2");
             }]
     },
     /**
@@ -172,26 +172,26 @@
     testSetAndGetMultiple:{
         test:[
             function(cmp){
-                this.setItem("key1", {"value":{"oh":"hey"}});
-                this.setItem("key2", {"value":{"good":"bye"}});
-                this.setItem("key3", {"value":{"memory":"bad"}});
+                this.setItem(this.adapter, "key1", {"value":{"oh":"hey"}});
+                this.setItem(this.adapter, "key2", {"value":{"good":"bye"}});
+                this.setItem(this.adapter, "key3", {"value":{"memory":"bad"}});
                 this.waitForSetItems();
             },
             function(cmp){
-                this.setAndWaitForItem("key2", {"value":{"good":"overriden bye"}});
+                this.setAndWaitForItem(this.adapter, "key2", {"value":{"good":"overriden bye"}});
             },
             function(cmp){
-                this.assertNumItems(3);
-                this.assertGet("key1", {"value":{"oh":"hey"}});
-                this.assertGet("key2", {"value":{"good":"overriden bye"}});
-                this.assertGet("key3", {"value":{"memory":"bad"}});
+                this.assertNumItems(this.adapter, 3);
+                this.assertGet(this.adapter, "key1", {"value":{"oh":"hey"}});
+                this.assertGet(this.adapter, "key2", {"value":{"good":"overriden bye"}});
+                this.assertGet(this.adapter, "key3", {"value":{"memory":"bad"}});
             },
             function(cmp) {
-                this.setAndWaitForItem("key3", {"value":{"memory": "overridden"}});
+                this.setAndWaitForItem(this.adapter, "key3", {"value":{"memory": "overridden"}});
             },
             function(cmp) {
-                this.assertNumItems(3);
-                this.assertGet("key3", {"value":{"memory":"overridden"}});
+                this.assertNumItems(this.adapter, 3);
+                this.assertGet(this.adapter, "key3", {"value":{"memory":"overridden"}});
             }
         ]
     },
@@ -203,20 +203,20 @@
             function(cmp){
                 // use something that approximates a real-life scenario.
                 // action keys are of the form java://some.package.ClassName/Action$operation
-                this.setItem("j://o.a.i.j.c.A/A$f", {"value": "value1"});
-                this.setItem("j://o.a.i.j.c.A/Af", {"value": "value2"});
-                this.setItem("j:/o.a.i.j.c.A/A$f", {"value": "value3"});
-                this.setItem("j://oai.j.c.A/A$f", {"value": "value4"});
-                this.setItem("j//o.a.i.j.c.A/A$f", {"value": "value5"});
+                this.setItem(this.adapter, "j://o.a.i.j.c.A/A$f", {"value": "value1"});
+                this.setItem(this.adapter, "j://o.a.i.j.c.A/Af", {"value": "value2"});
+                this.setItem(this.adapter, "j:/o.a.i.j.c.A/A$f", {"value": "value3"});
+                this.setItem(this.adapter, "j://oai.j.c.A/A$f", {"value": "value4"});
+                this.setItem(this.adapter, "j//o.a.i.j.c.A/A$f", {"value": "value5"});
                 this.waitForSetItems();
             },
             function(cmp){
-                this.assertGetUndefinedOrNull("joaijcAAf");
-                this.assertGet("j://o.a.i.j.c.A/A$f", {"value": "value1"});
-                this.assertGet("j://o.a.i.j.c.A/Af", {"value": "value2"});
-                this.assertGet("j:/o.a.i.j.c.A/A$f", {"value": "value3"});
-                this.assertGet("j://oai.j.c.A/A$f", {"value": "value4"});
-                this.assertGet("j//o.a.i.j.c.A/A$f", {"value": "value5"});
+                this.assertGetUndefinedOrNull(this.adapter, "joaijcAAf");
+                this.assertGet(this.adapter, "j://o.a.i.j.c.A/A$f", {"value": "value1"});
+                this.assertGet(this.adapter, "j://o.a.i.j.c.A/Af", {"value": "value2"});
+                this.assertGet(this.adapter, "j:/o.a.i.j.c.A/A$f", {"value": "value3"});
+                this.assertGet(this.adapter, "j://oai.j.c.A/A$f", {"value": "value4"});
+                this.assertGet(this.adapter, "j//o.a.i.j.c.A/A$f", {"value": "value5"});
             }
         ]
     },
@@ -231,15 +231,15 @@
     testEncodingKeyWithSpecialChars:{
         test:[
             function(cmp){
-                this.setItem("test永田", {"value": "key non latin"});
-                this.setItem("test‿", {"value": "key connecting"});
-                this.setItem("test_", {"value": "key underscore"});
+                this.setItem(this.adapter, "test永田", {"value": "key non latin"});
+                this.setItem(this.adapter, "test‿", {"value": "key connecting"});
+                this.setItem(this.adapter, "test_", {"value": "key underscore"});
                 this.waitForSetItems();
             },
             function(cmp){
-                this.assertGet("test永田", {"value": "key non latin"});
-                this.assertGet("test‿",  {"value": "key connecting"});
-                this.assertGet("test_",  {"value": "key underscore"});
+                this.assertGet(this.adapter, "test永田", {"value": "key non latin"});
+                this.assertGet(this.adapter, "test‿",  {"value": "key connecting"});
+                this.assertGet(this.adapter, "test_",  {"value": "key underscore"});
             }]
     },    
     /**
@@ -248,75 +248,75 @@
     testValuesWithSpecialChars:{
         test:[
             function(cmp){
-                this.setItem("test non latin", {"value": "key永田"});
-                this.setItem("test connecting", {"value": "key‿"});
+                this.setItem(this.adapter, "test non latin", {"value": "key永田"});
+                this.setItem(this.adapter, "test connecting", {"value": "key‿"});
                 this.waitForSetItems();
             },
             function(cmp){
-                this.assertGet("test non latin", {"value": "key永田"});
-                this.assertGet("test connecting",  {"value": "key‿"});
+                this.assertGet(this.adapter, "test non latin", {"value": "key永田"});
+                this.assertGet(this.adapter, "test connecting",  {"value": "key‿"});
             }]
     },    
     testRemoveItem:{
         test:[
             function(cmp){
-                this.setAndWaitForItem("the key", {"the": "value"});
+                this.setAndWaitForItem(this.adapter, "the key", {"the": "value"});
             },
             function(cmp){
-                this.removeAndWaitForItem("the key");
+                this.removeAndWaitForItem(this.adapter, "the key");
             },
             function(cmp){
                 $A.test.assertEquals(0, this.adapter.getSize());
-                this.assertGetUndefinedOrNull("the key");
-                this.assertNumItems(0);
+                this.assertGetUndefinedOrNull(this.adapter, "the key");
+                this.assertNumItems(this.adapter, 0);
             }]
     },
     testRemoveItemDoesNotExist:{
         test:[
             function(cmp){
-                this.setAndWaitForItem("the key", {"value":{"the": "value"}});
+                this.setAndWaitForItem(this.adapter, "the key", {"value":{"the": "value"}});
             },
             function(cmp){
-                this.removeAndWaitForItem("not the key");
+                this.removeAndWaitForItem(this.adapter, "not the key");
             },
             function(cmp){
-                this.assertNumItems(1);
-                this.assertGetUndefinedOrNull("not the key");
-                this.assertGet("the key", {"value":{"the": "value"}});
+                this.assertNumItems(this.adapter, 1);
+                this.assertGetUndefinedOrNull(this.adapter, "not the key");
+                this.assertGet(this.adapter, "the key", {"value":{"the": "value"}});
             }]
     },
     testRemoveMultipleItems:{
         test:[
             function(cmp){
-                this.setItem("key1", {"value":{"the": "value1"}});
-                this.setItem("key2", {"value":{"the": "value2"}}),
-                this.setAndWaitForItem("key3", {"value":{"the": "value3"}});
+                this.setItem(this.adapter, "key1", {"value":{"the": "value1"}});
+                this.setItem(this.adapter, "key2", {"value":{"the": "value2"}}),
+                this.setAndWaitForItem(this.adapter, "key3", {"value":{"the": "value3"}});
             },
             function(cmp){
-                this.removeItem("key3");
-                this.removeAndWaitForItem("key1");
+                this.removeItem(this.adapter, "key3");
+                this.removeAndWaitForItem(this.adapter, "key1");
             },
             function(cmp){
-                this.assertNumItems(1);
-                this.assertGetUndefinedOrNull("key1");
-                this.assertGet("key2", {"value":{"the": "value2"}});
-                this.assertGetUndefinedOrNull("key3");
+                this.assertNumItems(this.adapter, 1);
+                this.assertGetUndefinedOrNull(this.adapter, "key1");
+                this.assertGet(this.adapter, "key2", {"value":{"the": "value2"}});
+                this.assertGetUndefinedOrNull(this.adapter, "key3");
             }]
     },
     testRemoveThenSetItem:{
         test:[
             function(cmp){
-                this.setAndWaitForItem("the key", {"value":{"the": "value"}});
+                this.setAndWaitForItem(this.adapter, "the key", {"value":{"the": "value"}});
             },
             function(cmp){
-                this.removeAndWaitForItem("the key");
+                this.removeAndWaitForItem(this.adapter, "the key");
             },
             function(cmp){
-                this.setAndWaitForItem("the key", {"value":{"another":"value"}});
+                this.setAndWaitForItem(this.adapter, "the key", {"value":{"another":"value"}});
             },
             function(cmp){
-                this.assertNumItems(1);
-                this.assertGet("the key", {"value":{"another":"value"}});
+                this.assertNumItems(this.adapter, 1);
+                this.assertGet(this.adapter, "the key", {"value":{"another":"value"}});
             }]
     },
     /**
@@ -325,12 +325,12 @@
     testRemoveItemWhenEmpty:{
         test:[
             function(cmp){
-                this.removeAndWaitForItem("the key");
+                this.removeAndWaitForItem(this.adapter, "the key");
             },
             function(cmp){
                 $A.test.assertEquals(0, this.adapter.getSize());
-                this.assertGetUndefinedOrNull("the key");
-                this.assertNumItems(0);
+                this.assertGetUndefinedOrNull(this.adapter, "the key");
+                this.assertNumItems(this.adapter, 0);
             }]
     },
     /**
@@ -339,14 +339,14 @@
     testNewConstructorIsNotClear:{
         test:[
             function(cmp){
-                    this.setAndWaitForItem("key1", {"value":{"oh":"hey"}});
+                    this.setAndWaitForItem(this.adapter, "key1", {"value":{"oh":"hey"}});
             },
             function(cmp){
-                this.assertNumItems(1, "SetItem should have set 1 item");
+                this.assertNumItems(this.adapter, 1, "SetItem should have set 1 item");
             },
             function(cmp){
                 this.adapter = new $A.storageService.createAdapter("smartstore", "test");
-                this.assertGet("key1", {"value":{"oh":"hey"}});
+                this.assertGet(this.adapter, "key1", {"value":{"oh":"hey"}});
             }
         ]
     },
@@ -356,11 +356,11 @@
     testClearWhenEmpty:{
         test:[
             function(cmp){
-                this.clear();
+                this.clear(this.adapter);
             },
             function(cmp){
                 $A.test.assertEquals(0, this.adapter.getSize(), "cleared storage is not empty");
-                this.assertNumItems(0);
+                this.assertNumItems(this.adapter, 0);
             }
         ]
     },
@@ -370,23 +370,23 @@
     testClear:{
         test:[
             function(cmp){
-                this.setItem("key1", {"oh":"hey"});
-                this.setItem("key_a", {"oh":"no"});
+                this.setItem(this.adapter, "key1", {"oh":"hey"});
+                this.setItem(this.adapter, "key_a", {"oh":"no"});
                 this.waitForSetItems();
             },
             function(cmp){
                 // sanity
-                this.assertNumItems(2);
+                this.assertNumItems(this.adapter, 2);
             },
             function(cmp){
                 // clear
-                this.clear();
+                this.clear(this.adapter);
             },
             function(cmp){
                 $A.test.assertEquals(0, this.adapter.getSize(), "cleared storage is not empty");
-                this.assertNumItems(0);
-                this.assertGetUndefinedOrNull("key1");
-                this.assertGetUndefinedOrNull("key_a");
+                this.assertNumItems(this.adapter, 0);
+                this.assertGetUndefinedOrNull(this.adapter, "key1");
+                this.assertGetUndefinedOrNull(this.adapter, "key_a");
             }
         ]
     },
@@ -398,35 +398,35 @@
     testClearAndSet:{
         test:[
             function(cmp){
-                this.setItem("key1", {"oh":"hey"});
-                this.setItem("key_a", {"oh":"no"});
+                this.setItem(this.adapter, "key1", {"oh":"hey"});
+                this.setItem(this.adapter, "key_a", {"oh":"no"});
                 this.waitForSetItems();
             },
             function(cmp){
-                this.clear();
+                this.clear(this.adapter);
             },
             function(cmp){
-                this.setAndWaitForItem("afterkey1", {"value":"clear"});
+                this.setAndWaitForItem(this.adapter, "afterkey1", {"value":"clear"});
             },            
             function(cmp){
-                this.assertNumItems(1);
-                this.assertGet("afterkey1",{"value":"clear"});
+                this.assertNumItems(this.adapter, 1);
+                this.assertGet(this.adapter, "afterkey1",{"value":"clear"});
             }
         ]
     },
     testClearMultipleTimes:{
         test:[
             function(cmp){
-                this.setAndWaitForItem("key1", {"oh":"hey"});
+                this.setAndWaitForItem(this.adapter, "key1", {"oh":"hey"});
             },
             function(cmp){
-                this.clear();
-                this.clear();
+                this.clear(this.adapter);
+                this.clear(this.adapter);
             },
             function(cmp){
                 $A.test.assertEquals(0, this.adapter.getSize(), "cleared storage is not empty");
-                this.assertNumItems(0);
-                this.assertGetUndefinedOrNull("key1");
+                this.assertNumItems(this.adapter, 0);
+                this.assertGetUndefinedOrNull(this.adapter, "key1");
             }
         ]
     },
@@ -434,38 +434,160 @@
     /**
      * The name used when creating a SmartStoreAdapter should map to a dedicated soup.
      * Hence, when writing objects with the same key to adapters with different names, they should
-     * be stored in different soups and thus not overwrite each other.
+     * be stored in different soups and thus not overwrite each other and both be accessible by the 
+     * appropriate adapter.
      */
-    testMultipleSoups:{
+    testMultiAdapterSetItem:{
         test:[
             function(cmp){
-            	debugger;
+            	this._adapters = {
+                    test: new $A.storageService.createAdapter("smartstore", "test"),
+                    test2: new $A.storageService.createAdapter("smartstore", "test2")
+            	}
+            	
             	// Write key1 to two adapters with different names:
-                this.setToAdapterAndWaitForItem(
-                    new $A.storageService.createAdapter("smartstore", "test"), 
-                    "key1", 
-                    {"value":"in test"}
-                );
-                this.setToAdapterAndWaitForItem(
-                    new $A.storageService.createAdapter("smartstore", "test2"), 
-                    "key1", 
-                    {"value":"in test2"}
-                );
+                this.setAndWaitForItem(this._adapters.test, "key1", {"value":"in test"});
+                this.setAndWaitForItem(this._adapters.test2, "key1", {"value":"in test2"});
             },
             
             function(cmp){
             	// Both values written in the previous step should be accessible from
             	// their respective adapters even though they have the same key.
-                this.assertGetFromAdapter(
-            		new $A.storageService.createAdapter("smartstore", "test"),
-            		"key1", 
-            		{"value":"in test"}
-        		);
-                this.assertGetFromAdapter(
-            		new $A.storageService.createAdapter("smartstore", "test2"),
-            		"key1", 
-            		{"value":"in test2"}
-        		);
+                this.assertGet(this._adapters.test, "key1", {"value":"in test"});
+                this.assertGet(this._adapters.test2, "key1", {"value":"in test2"});
+            },
+            
+            function(cmp) {
+            	// Test overwriting values for multiple soups works:
+            	this.setAndWaitForItem(this._adapters.test, "key1", {"value":"in test updated"});
+                this.setAndWaitForItem(this._adapters.test2, "key1", {"value":"in test2 updated"});
+            }, 
+            
+            function(cmp){
+            	// Both values updated in the previous step should be accessible from
+            	// their respective adapters even though they have the same key.
+                this.assertGet(this._adapters.test, "key1", {"value":"in test updated"});
+                this.assertGet(this._adapters.test2, "key1", {"value":"in test2 updated"});
+            },
+        ]
+    },
+    
+    /**
+     * When writing objects with the same key to adapters with different names, they should
+     * be removed individually and not across soups.
+     */
+    testMultiAdapterRemoveItem:{
+        test:[
+            function(cmp){
+            	this._adapters = {
+                    test: new $A.storageService.createAdapter("smartstore", "test"),
+                    test2: new $A.storageService.createAdapter("smartstore", "test2")
+            	}
+            	
+            	// Write key1 to two adapters with different names:
+                this.setAndWaitForItem(this._adapters.test, "key1", {"value":"in test"});
+                this.setAndWaitForItem(this._adapters.test2, "key1", {"value":"in test2"});
+            },
+            
+            function(cmp){
+            	// Remove key1 from the test adapter:
+            	this.removeAndWaitForItem(this._adapters.test, "key1");
+            },
+            
+            function(cmp){
+            	// Test had key1 removed, test2 should be unaffected:
+                this.assertGetUndefinedOrNull(this._adapters.test, "key1");
+                this.assertGet(this._adapters.test2, "key1", {"value":"in test2"});
+            },
+            
+            function(cmp){
+            	// Remove the item from the test2 adapter:
+            	this.removeAndWaitForItem(this._adapters.test2, "key1");
+            },
+            
+            function(cmp){
+            	// Both adapters should now have nothing for key1:
+                this.assertGetUndefinedOrNull(this._adapters.test, "key1");
+                this.assertGetUndefinedOrNull(this._adapters.test2, "key1");
+            }
+        ]
+    },
+    
+    /**
+     * When writing objects with the same key to adapters with different names, clearing a single adapter should
+     * only affect it's soup and not the soup
+     */
+    testMultiAdapterClear:{
+        test:[
+            function(cmp){
+            	this._adapters = {
+                    test: new $A.storageService.createAdapter("smartstore", "test"),
+                    test2: new $A.storageService.createAdapter("smartstore", "test2")
+            	}
+            	
+            	// Write key1 to two adapters with different names:
+                this.setAndWaitForItem(this._adapters.test, "key1", {"value":"in test"});
+                this.setAndWaitForItem(this._adapters.test2, "key1", {"value":"in test2"});
+            },
+            
+            function(cmp){
+            	// clear the test adapter:
+            	this.clear(this._adapters.test);
+            },
+            
+            function(cmp){
+            	// The test adapters has been cleared, it should have no items:
+                this.assertNumItems(this._adapters.test, 0);
+                this.assertNumItems(this._adapters.test2, 1);
+            },
+            
+            function(cmp){
+            	// Clear the test2 adapter:
+            	this.clear(this._adapters.test2);
+            },
+            
+            function(cmp){
+            	// Both adapters are now empty:
+                this.assertNumItems(this._adapters.test, 0);
+                this.assertNumItems(this._adapters.test2, 0);
+            }
+        ]
+    },
+    
+    /**
+     * When writing objects with the same key to adapters with different names, getting the number of items should
+     * correspond to the specific adapter.
+     */
+    testMultiAdapterCounting:{
+        test:[
+            function(cmp){
+            	this._adapters = {
+                    test: new $A.storageService.createAdapter("smartstore", "test"),
+                    test2: new $A.storageService.createAdapter("smartstore", "test2")
+            	}
+            	
+            	// Write 2 items to the test adapter:
+                this.setAndWaitForItem(this._adapters.test, "key1", {"value":"in test"});
+                this.setAndWaitForItem(this._adapters.test, "key2", {"value2":"in test"});
+            },
+            
+            function(cmp){
+            	// Counts the items in the adapters:
+            	this.assertNumItems(this._adapters.test, 2);
+            	this.assertNumItems(this._adapters.test2, 0);
+            },
+            
+            function(cmp){
+            	// Add items to just test2
+                this.setAndWaitForItem(this._adapters.test2, "key1", {"value":"in test2"});
+                this.setAndWaitForItem(this._adapters.test2, "key2", {"value2":"in test2"});
+                this.setAndWaitForItem(this._adapters.test2, "key3", {"value3":"in test2"});
+            },
+            
+            function(cmp){
+            	// Counts the items in the adapters:
+            	this.assertNumItems(this._adapters.test, 2);
+            	this.assertNumItems(this._adapters.test2, 3);
             }
         ]
     },
@@ -479,10 +601,10 @@
         test:[
             function(cmp){
                 //set expiration date for way in the future
-                   this.setAndWaitForItem("key1", {"expires": new Date().getTime() + new Date().getTime() });
+                   this.setAndWaitForItem(this.adapter, "key1", {"expires": new Date().getTime() + new Date().getTime() });
             },
             function(cmp){
-                this.assertGetExpired([]);
+                this.assertGetExpired(this.adapter, []);
             }
         ]
     },
@@ -495,11 +617,11 @@
     testGetExpired:{
         test:[
             function(cmp){
-                   this.setAndWaitForItem("key1", {"expires": new Date().getTime() - 1000 });
+                   this.setAndWaitForItem(this.adapter, "key1", {"expires": new Date().getTime() - 1000 });
             },
             function(cmp){
                 var expected = ["key1"];
-                this.assertGetExpired(expected);
+                this.assertGetExpired(this.adapter, expected);
             }
         ]
     },
@@ -512,11 +634,11 @@
     testGetExpiredSpecialCharactersInKey:{
         test:[
             function(cmp){
-                   this.setAndWaitForItem("key1.{}$%()", {"expires": new Date().getTime() - 1000 });
+                   this.setAndWaitForItem(this.adapter, "key1.{}$%()", {"expires": new Date().getTime() - 1000 });
             },
             function(cmp){
                 var expected = ["key1.{}$%()"];
-                this.assertGetExpired(expected);
+                this.assertGetExpired(this.adapter, expected);
             }
         ]
     },
@@ -536,22 +658,22 @@
                 var numOtherItems = 10;
 
                 for(var i = 0; i < numExpiredItems; i++){
-                    this.setAndWaitForItem("key" + i, {"expires": new Date().getTime() - 1000});
+                    this.setAndWaitForItem(this.adapter, "key" + i, {"expires": new Date().getTime() - 1000});
                 }
                 for(var j = numExpiredItems; j < numExpiredItems + numOtherItems; j++){
-                    this.setAndWaitForItem("key" + j, {"expires": new Date().getTime() + 100000});
+                    this.setAndWaitForItem(this.adapter, "key" + j, {"expires": new Date().getTime() + 100000});
                 }
             },
             function(cmp){
                 var numExpiredItems = this.adapter.QUERY_PAGE_SIZE * 2 + 3;
                 var numOtherItems = 10;
                 
-                this.assertNumItems(numExpiredItems + numOtherItems);
+                this.assertNumItems(this.adapter, numExpiredItems + numOtherItems);
                 var expected = [];
                 for(var i = 0; i < numExpiredItems; i++){
                     expected.push("key" + i);
                 }
-                this.assertGetExpired(expected);
+                this.assertGetExpired(this.adapter, expected);
             }
         ]
     },
@@ -568,18 +690,18 @@
                 var numExpiredItems = this.adapter.QUERY_PAGE_SIZE * 2;
 
                 for(var i = 0; i < numExpiredItems; i++){
-                    this.setAndWaitForItem("key" + i, {"expires": new Date(1000).getTime() - 1000});
+                    this.setAndWaitForItem(this.adapter, "key" + i, {"expires": new Date(1000).getTime() - 1000});
                 }
             },
             function(cmp){
                 var numExpiredItems = this.adapter.QUERY_PAGE_SIZE * 2;
                 
-                this.assertNumItems(numExpiredItems);
+                this.assertNumItems(this.adapter, numExpiredItems);
                 var expected = [];
                 for(var i = 0; i < numExpiredItems; i++){
                     expected.push("key" + i);
                 }
-                this.assertGetExpired(expected);
+                this.assertGetExpired(this.adapter, expected);
             }
         ]
     },
@@ -593,42 +715,67 @@
         test:[
             function(cmp){
                 // run one operation to ensure SmartStoreAdapter has been properly initialized
-                this.setAndWaitForItem("a_key_to_remove", {"value": {"original":"value"}});
+                this.setAndWaitForItem(this.adapter, "a_key_to_remove", {"value": {"original":"value"}});
             },
             function(cmp){
                 this.mockQuerySoupError();
-                this.assertSetItemFailure("key", {"value": {"new":"value"}}, "Error in setItem on call to SmartStore.querySoup: querySoup Mock Error");
+                this.assertSetItemFailure(
+            		this.adapter, 
+            		"key", 
+            		{"value": {"new":"value"}}, 
+            		"Error in setItem on call to SmartStore.querySoup: querySoup Mock Error"
+        		);
             },
             function(cmp){
                 this.mockUpsertSoupEntriesWithExternalIdError();
-                this.assertSetItemFailure("key", {"value": {"new":"value"}}, "Error in setItem on call to SmartStore.upsertSoupEntriesWithExternalId: upsertSoupEntriesWithExternalId Mock Error");
+                this.assertSetItemFailure(
+            		this.adapter, 
+            		"key", 
+            		{"value": {"new":"value"}}, 
+            		"Error in setItem on call to SmartStore.upsertSoupEntriesWithExternalId: upsertSoupEntriesWithExternalId Mock Error"
+        		);
             },
             function(cmp){
                 this.mockQuerySoupError();
-                this.assertGetItemFailure("key", "Error in getItem on call to SmartStore.querySoup: querySoup Mock Error");
+                this.assertGetItemFailure(
+            		this.adapter, 
+            		"key", 
+            		"Error in getItem on call to SmartStore.querySoup: querySoup Mock Error"
+        		);
             },
             function(cmp){
                 this.mockQuerySoupError();
-                this.assertRemoveItemFailure("a_key_to_remove", "Error in removeItem on call to SmartStore.querySoup: querySoup Mock Error");
+                this.assertRemoveItemFailure(
+            		this.adapter, 
+            		"a_key_to_remove", 
+            		"Error in removeItem on call to SmartStore.querySoup: querySoup Mock Error"
+        		);
             },
             function(cmp){
                 this.mockRemoveFromSoupError();
-                this.assertRemoveItemFailure("a_key_to_remove", "Error in removeItem on call to SmartStore.removeFromSoup: removeFromSoup Mock Error");
+                this.assertRemoveItemFailure(
+            		this.adapter, 
+            		"a_key_to_remove", 
+            		"Error in removeItem on call to SmartStore.removeFromSoup: removeFromSoup Mock Error"
+        		);
             },
             function(cmp){
                 this.mockRemoveSoupError();
-                this.assertClearFailure("Error in clear on call to SmartStore.removeSoup: removeSoup Mock Error");
+                this.assertClearFailure(
+            		this.adapter, 
+            		"Error in clear on call to SmartStore.removeSoup: removeSoup Mock Error"
+        		);
             },
             /* TODO: Uncomment and fix after getExpired is properly fixed. */
             /*
             function(cmp){
                 this.mockQuerySoupError();
-                this.assertGetExpiredFailure("Error in getExpired on call to SmartStore.querySoup: querySoup Mock Error");
+                this.assertGetExpiredFailure(this.adapter, "Error in getExpired on call to SmartStore.querySoup: querySoup Mock Error");
             },
             */
             function(cmp){
                 // despite all the errors, we can still do operations afterwards if the smartstore is behaving properly
-                this.assertGet("a_key_to_remove", {"value": {"original":"value"}});
+                this.assertGet(this.adapter, "a_key_to_remove", {"value": {"original":"value"}});
             }
         ]
     },
@@ -645,12 +792,12 @@
                 var numExpiredItems = this.adapter.QUERY_PAGE_SIZE + 1;
 
                 for(var i = 0; i < numExpiredItems; i++){
-                    this.setAndWaitForItem("key" + i, {"expires": new Date().getTime() - 1000});
+                    this.setAndWaitForItem(this.adapter, "key" + i, {"expires": new Date().getTime() - 1000});
                 }
             },
             function(cmp){
                 this.mockMoveCursorToNextPageError();
-                this.assertGetExpiredFailure("Error in getExpired on call to SmartStore.moveCursorToNextPage: moveCursorToNextPage Mock Error");
+                this.assertGetExpiredFailure(this.adapter, "Error in getExpired on call to SmartStore.moveCursorToNextPage: moveCursorToNextPage Mock Error");
             }
         ]
     },
@@ -663,20 +810,28 @@
         test:[
             function(cmp){
                 // perform some operation to ensure setup is bypassed
-                this.assertGetUndefinedOrNull("key");
+                this.assertGetUndefinedOrNull(this.adapter, "key");
             },
             function(cmp){
                 this.mockRegisterSoupError();
-                this.assertClearFailure("Error in clear on call to SmartStore.registerSoup: registerSoup Mock Error");
+                this.assertClearFailure(
+            		this.adapter, 
+            		"Error in clear on call to SmartStore.registerSoup: registerSoup Mock Error"
+        		);
             },
             function(cmp){
                 // subsequent calls to SmartStoreAdapter operations should fail fast
-                this.assertSetItemFailure("key", {"value": {"oh":"my"}}, "SmartStoreAdapter was improperly cleared.");
-                this.assertGetItemFailure("key", "SmartStoreAdapter was improperly cleared.");
-                this.assertRemoveItemFailure("a key", "SmartStoreAdapter was improperly cleared.");
-                this.assertClearFailure("SmartStoreAdapter was improperly cleared.");
+                this.assertSetItemFailure(
+            		this.adapter, 
+            		"key", 
+            		{"value": {"oh":"my"}}, 
+            		"SmartStoreAdapter was improperly cleared."
+        		);
+                this.assertGetItemFailure(this.adapter, "key", "SmartStoreAdapter was improperly cleared.");
+                this.assertRemoveItemFailure(this.adapter, "a key", "SmartStoreAdapter was improperly cleared.");
+                this.assertClearFailure(this.adapter, "SmartStoreAdapter was improperly cleared.");
                 /* TODO: Uncomment and fix after getExpired is properly fixed. */
-//                this.assertGetExpiredFailure("SmartStoreAdapter was improperly cleared.");
+//                this.assertGetExpiredFailure(this.adapter, "SmartStoreAdapter was improperly cleared.");
             }
         ]
     },
@@ -692,15 +847,25 @@
                 // load the adapter after registerSoup error mocked
                 this.adapter = new $A.storageService.createAdapter("smartstore", "test");
                 
-                this.assertSetItemFailure("key", {"value": {"oh":"my"}}, "SmartStoreAdapter was not properly initialized.");
+                this.assertSetItemFailure(
+            		this.adapter, 
+            		"key", 
+            		{"value": {"oh":"my"}}, 
+            		"SmartStoreAdapter was not properly initialized."
+        		);
 
                 // subsequent calls to SmartStoreAdapter operations should fail fast
-                this.assertSetItemFailure("key", {"value": {"oh":"my"}}, "SmartStoreAdapter was not properly initialized.");
-                this.assertGetItemFailure("key", "SmartStoreAdapter was not properly initialized.");
-                this.assertRemoveItemFailure("a key", "SmartStoreAdapter was not properly initialized.");
-                this.assertClearFailure("SmartStoreAdapter was not properly initialized.");
+                this.assertSetItemFailure(
+            		this.adapter, 
+            		"key", 
+            		{"value": {"oh":"my"}}, 
+            		"SmartStoreAdapter was not properly initialized."
+        		);
+                this.assertGetItemFailure(this.adapter, "key", "SmartStoreAdapter was not properly initialized.");
+                this.assertRemoveItemFailure(this.adapter, "a key", "SmartStoreAdapter was not properly initialized.");
+                this.assertClearFailure(this.adapter, "SmartStoreAdapter was not properly initialized.");
                 /* TODO: Uncomment and fix after getExpired is properly fixed. */
-//                this.assertGetExpiredFailure("SmartStoreAdapter was not properly initialized.");
+//                this.assertGetExpiredFailure(this.adapter, "SmartStoreAdapter was not properly initialized.");
             }
         ]
     },
@@ -713,69 +878,68 @@
      * Assert the number of items in the store.
      * An asynchronous call is issued and the result checked in the callback.
      */
-    assertNumItems:function(expected){
+    assertNumItems:function(adapter, expected){
         this.getAndWaitForNumItems(
+            adapter,
             function(result) {
                 $A.test.assertEquals(expected, result, "unexpected number of items");
-            });
+            }
+        );
     },
     /**
      * Assert the item retrieved in a getItem() call.
      * An asynchronous call is issued and the result checked in the callback.
      */
-    assertGet:function(key, expected){
+    assertGet:function(adapter, key, expected){
         var that = this;
-        this.getAndWaitForItem(key,
+        this.getAndWaitForItem(
+    		adapter,
+    		key,
             function(result) {
                     that.assertObjectEquals(expected, result, "Object value for " + key + " incorrect");
-            });
-    },
-    /**
-     * Assert the item retrieved in a specific adapter's getItem() call.
-     * An asynchronous call is issued and the result checked in the callback.
-     */
-    assertGetFromAdapter:function(adapter, key, expected){
-        var that = this;
-        this.getFromAdapterAndWaitForItem(adapter, key,
-            function(result) {
-                    that.assertObjectEquals(expected, result, "Object value for " + key + " incorrect");
-            });
+            }
+		);
     },
     /**
      * Assert an item retrieved in a getItem() call is undefined or null.
      * An asynchronous call is issued and the result checked in a callback.
      */
-    assertGetUndefinedOrNull:function(key){
-        this.getAndWaitForItem(key,
+    assertGetUndefinedOrNull:function(adapter, key){
+        this.getAndWaitForItem(
+    		adapter,
+    		key,
             function(result) {
                 $A.test.assertUndefinedOrNull(result, "Null or undefined value for " + key + " incorrect");
-            });
+            }
+		);
     },
     /**
      * Assert the results of a getExpired call.
      * An asynchronous call is issued and the result checked in a callback.
      */
-    assertGetExpired:function(expected){
+    assertGetExpired:function(adapter, expected){
         var that = this;
         this.getAndWaitForExpired(
-                function(result) {
-                    var expectedAsJson = $A.util.json.encode(expected);
-                    var resultAsJson = $A.util.json.encode(result);
-                    var errorMessageSuffix = "expected [" + expectedAsJson + "], result [" + resultAsJson + "]";
-                    // we can't do a straight-up Array comparison because we can't guarantee the order of items returned
-                    $A.test.assertEquals(expected.length, result.length, "Unexpected number of expired items: " + errorMessageSuffix);
-                    for(var i in expected){
-                        var foundItem = false;
-                        for(var j in result){
-                            if(expected[i] === result[j]){
-                                foundItem = true;
-                            }
-                        }
-                        if(foundItem === false){
-                            $A.test.fail("Did not find expected item " + expected[i] + ": " + errorMessageSuffix);
+    		adapter,
+            function(result) {
+                var expectedAsJson = $A.util.json.encode(expected);
+                var resultAsJson = $A.util.json.encode(result);
+                var errorMessageSuffix = "expected [" + expectedAsJson + "], result [" + resultAsJson + "]";
+                // we can't do a straight-up Array comparison because we can't guarantee the order of items returned
+                $A.test.assertEquals(expected.length, result.length, "Unexpected number of expired items: " + errorMessageSuffix);
+                for(var i in expected){
+                    var foundItem = false;
+                    for(var j in result){
+                        if(expected[i] === result[j]){
+                            foundItem = true;
                         }
                     }
-                });
+                    if(foundItem === false){
+                        $A.test.fail("Did not find expected item " + expected[i] + ": " + errorMessageSuffix);
+                    }
+                }
+            }
+		);
     },
     /**
      * Assert that an operation fails.
@@ -788,85 +952,87 @@
         
         // run a first operation, it should fail
         operation(
-                function() {
-                    unexpectedSuccess = true;
-                },
-                function(err) {
-                    failure = true;
-                    failureMessage = err;
-                });
+            function() {
+                unexpectedSuccess = true;
+            },
+            function(err) {
+                failure = true;
+                failureMessage = err;
+            }
+        );
         
         // wait either for success or failure
         $A.test.addWaitFor(true,
-                function() {
-                    return unexpectedSuccess || failure;
-                },
-                function() {
-                    // verify it was a failure
-                    $A.test.assertFalse(unexpectedSuccess, "The operation was unexpectedly successful");
-                    $A.test.assertTrue(failure, "The operation did not fail");
-                    $A.test.assertEquals(expectedFailureMessage, failureMessage, "Did not get the expected error message");
-                });
+            function() {
+                return unexpectedSuccess || failure;
+            },
+            function() {
+                // verify it was a failure
+                $A.test.assertFalse(unexpectedSuccess, "The operation was unexpectedly successful");
+                $A.test.assertTrue(failure, "The operation did not fail");
+                $A.test.assertEquals(expectedFailureMessage, failureMessage, "Did not get the expected error message");
+            }
+        );
     },
     /**
      * Assert that the setItem operation fails.
      * An asynchronous call is issued and the result checked in a callback.
      */
-    assertSetItemFailure:function(key, value, expectedFailureMessage){
-        var that = this;
+    assertSetItemFailure:function(adapter, key, value, expectedFailureMessage){
         this.assertOperationFailure(
-                function(successCallback, errorCallback) {
-                    that.adapter.setItem(key, value, successCallback, errorCallback);
-                }, 
-                expectedFailureMessage);
+            function(successCallback, errorCallback) {
+                adapter.setItem(key, value, successCallback, errorCallback);
+            }, 
+            expectedFailureMessage
+        );
     },
     /**
      * Assert that the getItem operation fails.
      * An asynchronous call is issued and the result checked in a callback.
      */
-    assertGetItemFailure:function(key, expectedFailureMessage){
-        var that = this;
+    assertGetItemFailure:function(adapter, key, expectedFailureMessage){
         this.assertOperationFailure(
-                function(successCallback, errorCallback) {
-                    that.adapter.getItem(key, successCallback, errorCallback);
-                }, 
-                expectedFailureMessage);
+            function(successCallback, errorCallback) {
+                adapter.getItem(key, successCallback, errorCallback);
+            }, 
+            expectedFailureMessage
+        );
     },
     /**
      * Assert that the removeItem operation fails.
      * An asynchronous call is issued and the result checked in a callback.
      */
-    assertRemoveItemFailure:function(key, expectedFailureMessage){
-        var that = this;
+    assertRemoveItemFailure:function(adapter, key, expectedFailureMessage){
         this.assertOperationFailure(
-                function(successCallback, errorCallback) {
-                    that.adapter.removeItem(key, successCallback, errorCallback);
-                }, 
-                expectedFailureMessage);
+            function(successCallback, errorCallback) {
+                adapter.removeItem(key, successCallback, errorCallback);
+            }, 
+            expectedFailureMessage
+        );
     },
     /**
      * Assert that the clear operation fails.
      * An asynchronous call is issued and the result checked in a callback.
      */
-    assertClearFailure:function(expectedFailureMessage){
-        var that = this;
+    assertClearFailure:function(adapter, expectedFailureMessage){
         this.assertOperationFailure(
-                function(successCallback, errorCallback) {
-                    that.adapter.clear(successCallback, errorCallback);
-                }, 
-                expectedFailureMessage);
+            function(successCallback, errorCallback) {
+                adapter.clear(successCallback, errorCallback);
+            }, 
+            expectedFailureMessage
+        );
     },
     /**
      * Assert that the getExpired operation fails.
      * An asynchronous call is issued and the result checked in a callback.
      */
-    assertGetExpiredFailure:function(expectedFailureMessage){
-        var that = this;
+    assertGetExpiredFailure:function(adapter, expectedFailureMessage){
         this.assertOperationFailure(
-                function(successCallback, errorCallback) {
-                    that.adapter.getExpired(successCallback, errorCallback);
-                }, 
-                expectedFailureMessage);
+            function(successCallback, errorCallback) {
+                adapter.getExpired(successCallback, errorCallback);
+            }, 
+            expectedFailureMessage
+        );
     },
     
     //
@@ -874,32 +1040,25 @@
     //
     
     /**
-     * A convenience method for the setItem() call for a specified adapter.  Like setItem below, The call is 
-     * asynchronous. It should be followed by a waitForSetItems() or setAndWaitForItem() call as well.  
-     * The calling test subfunction must terminate for the operation to complete.
-     */
-    setItemToAdapter:function(adapter, key, value){
-    	this.setItemCallCounter++;
-        var that = this;
-        adapter.setItem(
-                key,
-                value,
-                function() {
-                    that.setItemCallCounter--; 
-                },
-                function(err) {
-                    $A.test.fail("Error on setItem: " + err);
-                });
-    },
-    
-    /**
      * A convenience method for the setItem() call.  The call is asynchronous.  It should be followed by
      * a waitForSetItems() or setAndWaitForItem() call as well.  The calling test subfunction must terminate for
      * the operation to complete.
      */
-    setItem:function(key, value){
-        this.setItemToAdapter(this.adapter, key, value);
+    setItem:function(adapter, key, value){
+    	this.setItemCallCounter++;
+        var that = this;
+        adapter.setItem(
+            key,
+            value,
+            function() {
+                that.setItemCallCounter--; 
+            },
+            function(err) {
+                $A.test.fail("Error on setItem: " + err);
+            }
+        );
     },
+    
     /**
      * Indicate to the test framework to wait for all outstanding setItem calls to complete.
      * The wait is performed after the current subfunction terminates.
@@ -907,53 +1066,18 @@
     waitForSetItems:function(){
         var that = this;
         $A.test.addWaitFor(
-                true, 
-                function() {
-                    return (that.setItemCallCounter === 0); 
-                });
+            true, 
+            function() {
+                return (that.setItemCallCounter === 0); 
+            }
+        );
     },
     /**
      * A convenience method for one setItem() call and one waitForSetItems() call.
      */
-    setAndWaitForItem:function(key, value){
-        this.setItem(key, value);
+    setAndWaitForItem:function(adapter, key, value){
+        this.setItem(adapter, key, value);
         this.waitForSetItems();
-    },
-    /**
-     * A convenience method for one setItem() call and one waitForSetItems() call.
-     */
-    setToAdapterAndWaitForItem:function(adapter, key, value){
-        this.setItemToAdapter(adapter, key, value);
-        this.waitForSetItems();
-    },
-    
-    /**
-     * A convenience method for one setItem() call and one waitForSetItems() call 
-     * for a specific adapter.
-     */
-    getFromAdapterAndWaitForItem:function(adapter, key, callback){
-    	var getItemComplete = false;
-        var getItemResult = null;
-        // invoke the getItem call asynchronously
-        adapter.getItem(
-                key, 
-                function(result) {
-                    getItemComplete = true; 
-                    getItemResult = result;
-                },
-                function(err) {
-                    $A.test.fail("Error on getItem: " + err);
-                });
-        // notify the test that it must wait for the result of the async call
-        // and delegate the result to the callback
-        $A.test.addWaitFor(
-                true, 
-                function() {
-                    return getItemComplete; 
-                }, 
-                function() {
-                    callback(getItemResult);
-                });
     },
     
     /**
@@ -961,26 +1085,51 @@
      * The function accepts a callback in a parameter, which can be used to inspect or assert the result.
      * The calling test subfunction must terminate for the operation to complete.
      */
-    getAndWaitForItem:function(key, callback){
-        this.getFromAdapterAndWaitForItem(this.adapter, key, callback);
+    getAndWaitForItem:function(adapter, key, callback){
+    	var getItemComplete = false;
+        var getItemResult = null;
+        // invoke the getItem call asynchronously
+        adapter.getItem(
+            key, 
+            function(result) {
+                getItemComplete = true; 
+                getItemResult = result;
+            },
+            function(err) {
+                $A.test.fail("Error on getItem: " + err);
+            }
+        
+        );
+        // notify the test that it must wait for the result of the async call
+        // and delegate the result to the callback
+        $A.test.addWaitFor(
+            true, 
+            function() {
+                return getItemComplete; 
+            }, 
+            function() {
+                callback(getItemResult);
+            }
+        );
     },
 
     /**
-     * A convenience method for the removeItem() call.  The call is asynchronous.  It should be followed by
-     * a waitForRemoveItems() or removeAndWaitForItem() call.  The calling test subfunction must terminate for
-     * the operation to complete.
+     * A convenience method for the removeItem() call for the tests adapter.  The call is asynchronous.  
+     * It should be followed by a waitForRemoveItems() or removeAndWaitForItem() call.  
+     * The calling test subfunction must terminate for the operation to complete.
      */
-    removeItem:function(key){
+    removeItem:function(adapter, key){
         this.removeItemCallCounter++;
         var that = this;
         // invoke the removeItem call asynchronously
-        this.adapter.removeItem(key,
-                function() {
-                    that.removeItemCallCounter--;
-                },
-                function(err) {
-                    $A.test.fail("Error on removeItem: " + err);
-                });
+        adapter.removeItem(key,
+            function() {
+                that.removeItemCallCounter--;
+            },
+            function(err) {
+                $A.test.fail("Error on removeItem: " + err);
+            }
+        );
     },
     /**
      * Indicate to the test framework to wait for all outstanding removeItem calls to complete.  
@@ -989,16 +1138,17 @@
     waitForRemoveItems:function(){
         var that = this;
         $A.test.addWaitFor(
-                true, 
-                function() {
-                    return (that.removeItemCallCounter === 0); 
-                });
+            true, 
+            function() {
+                return (that.removeItemCallCounter === 0); 
+            }
+        );
     },
     /**
      * A convenience method for one removeItem() call and one waitForRemoveItems() call.
      */
-    removeAndWaitForItem:function(key){
-        this.removeItem(key);
+    removeAndWaitForItem:function(adapter, key){
+        this.removeItem(adapter, key);
         this.waitForRemoveItems();
     },
     
@@ -1007,25 +1157,28 @@
      * The function accepts a callback in a parameter, which can be used to inspect or assert the result.
      * The calling test subfunction must terminate for the operation to complete.
      */
-    getAndWaitForExpired:function(callback){
+    getAndWaitForExpired:function(adapter, callback){
         var getExpiredComplete = false;
         var getExpiredResult = undefined;
-        this.adapter.getExpired(
-                function(result) {
-                    getExpiredComplete = true;
-                    getExpiredResult = result;
-                },
-                function(err) {
-                    $A.test.fail("Error on getExpired: " + err);
-                });
+        adapter.getExpired(
+            function(result) {
+                getExpiredComplete = true;
+                getExpiredResult = result;
+            },
+            function(err) {
+                $A.test.fail("Error on getExpired: " + err);
+            }
+        );
+        
         $A.test.addWaitFor(
-                true,
-                function() {
-                    return getExpiredComplete;
-                },
-                function() {
-                    callback(getExpiredResult);
-                });
+            true,
+            function() {
+                return getExpiredComplete;
+            },
+            function() {
+                callback(getExpiredResult);
+            }
+        );
     },
 
     /**
@@ -1033,49 +1186,53 @@
      * The function accepts a callback in a parameter, which can be used to inspect or assert the result.
      * The calling test subfunction must terminate for the operation to complete.
      */
-    getAndWaitForNumItems:function(callback){
+    getAndWaitForNumItems:function(adapter, callback){
         var getNumItemsComplete = false;
         var getNumItemsResult = undefined;
         // invoke the getNumItems call asynchronously
-        this.adapter.getNumItems(
-                function(result) {
-                    getNumItemsComplete = true;
-                    getNumItemsResult = result;
-                },
-                function(err) {
-                    $A.test.fail("Error on getNumItems: " + err);
-                });
+        adapter.getNumItems(
+            function(result) {
+                getNumItemsComplete = true;
+                getNumItemsResult = result;
+            },
+            function(err) {
+                $A.test.fail("Error on getNumItems: " + err);
+            }
+        );
         // notify the test that it must wait for the result of the async call
         // and delegate the result to the callback
         $A.test.addWaitFor(
-                true,
-                function() {
-                    return getNumItemsComplete;
-                },
-                function() {
-                    callback(getNumItemsResult);
-                });
+            true,
+            function() {
+                return getNumItemsComplete;
+            },
+            function() {
+                callback(getNumItemsResult);
+            }
+        );
     },
     /**
      * A convenience method for the clear() call.  The call is asynchronous.
      * The calling test subfunction must terminate for the operation to complete.
      */
-    clear:function(){
+    clear:function(adapter){
         var clearComplete = false;
         // invoke the clear call asynchronously
-        this.adapter.clear(
-                function(){
-                    clearComplete = true;
-                },
-                function(err) {
-                    $A.test.fail("Error on clear" + err);
-                });
+        adapter.clear(
+            function(){
+                clearComplete = true;
+            },
+            function(err) {
+                $A.test.fail("Error on clear" + err);
+            }
+        );
         // notify the test that it must wait for the result of the clear call
         $A.test.addWaitFor(
-                true,
-                function() {
-                    return clearComplete;
-                });
+            true,
+            function() {
+                return clearComplete;
+            }
+        );
     },
     /**
      * A convenience method to determine if two objects are rougly structurally equal from a 
@@ -1087,9 +1244,10 @@
         $A.test.assertTrue($A.util.isObject(expected), "expected is not an Object");
         $A.test.assertTrue($A.util.isObject(actual), "actual is not an Object");
         $A.test.assertEquals(
-                $A.util.json.encode(expected),
-                $A.util.json.encode(actual),
-                assertMessage);
+            $A.util.json.encode(expected),
+            $A.util.json.encode(actual),
+            assertMessage
+        );
     },
     /**
      * A convenience method to determine if two arrays are rougly equal from a JSON perspective.
@@ -1101,9 +1259,10 @@
         $A.test.assertTrue($A.util.isArray(expected), "expected is not an Array");
         $A.test.assertTrue($A.util.isArray(actual), "actual is not an Array");
         $A.test.assertEquals(
-                $A.util.json.encode(expected),
-                $A.util.json.encode(actual),
-                assertMessage);
+            $A.util.json.encode(expected),
+            $A.util.json.encode(actual),
+            assertMessage
+        );
     },
     
     
@@ -1128,9 +1287,10 @@
     mockSmartStoreMethod:function(methodNameToMock, replacement){
         // override the specified SmartStore method
         var override = $A.test.overrideFunction(
-                this.getSmartStore(), 
-                methodNameToMock,
-                replacement);
+            this.getSmartStore(), 
+            methodNameToMock,
+            replacement
+        );
         // keep as to-be-restored in case this test fails and we can't restore it ourselves
         this.overrides.push(override);
 
@@ -1138,73 +1298,80 @@
         // to clean up for any subtests and tests that come next
         var that = this;
         $A.test.addWaitFor(
-                true,
-                function() {
-                    return true;
-                },
-                function() {
-                    override.restore();
-                    this.overrides.shift();
-                });
+            true,
+            function() {
+                return true;
+            },
+            function() {
+                override.restore();
+                this.overrides.shift();
+            }
+        );
     },
     /**
      * Replace SmartStore.querySoup with a mock that invokes the error callback.
      */
     mockQuerySoupError:function(){
         this.mockSmartStoreMethod( 
-                "querySoup",
-                function(soupName, querySpec, successCallback, errorCallback){
-                    errorCallback("querySoup Mock Error");
-                });
+            "querySoup",
+            function(soupName, querySpec, successCallback, errorCallback){
+                errorCallback("querySoup Mock Error");
+            }
+        );
     },
     /**
      * Replace SmartStore.upsertSoupEntriesWithExternalIdError with a mock that invokes the error callback.
      */
     mockUpsertSoupEntriesWithExternalIdError:function(){
         this.mockSmartStoreMethod( 
-                "upsertSoupEntriesWithExternalId",
-                function(soupName, entriesToUpsert, externalId, successCallback, errorCallback){
-                    errorCallback("upsertSoupEntriesWithExternalId Mock Error");
-                });
+            "upsertSoupEntriesWithExternalId",
+            function(soupName, entriesToUpsert, externalId, successCallback, errorCallback){
+                errorCallback("upsertSoupEntriesWithExternalId Mock Error");
+            }
+        );
     },
     /**
      * Replace SmartStore.removeFromSoup with a mock that invokes the error callback.
      */
     mockRemoveFromSoupError:function(){
         this.mockSmartStoreMethod(
-                "removeFromSoup",
-                function(soupName, id, successCallback, errorCallback){
-                    errorCallback("removeFromSoup Mock Error");
-                });
+            "removeFromSoup",
+            function(soupName, id, successCallback, errorCallback){
+                errorCallback("removeFromSoup Mock Error");
+            }
+        );
     },
     /**
      * Replace SmartStore.registerSoup with a mock that invokes the error callback.
      */
     mockRegisterSoupError:function(){
         this.mockSmartStoreMethod(
-                "registerSoup",
-                function(soupName, indeces, successCallback, errorCallback){
-                    errorCallback("registerSoup Mock Error");
-                });
+            "registerSoup",
+            function(soupName, indeces, successCallback, errorCallback){
+                errorCallback("registerSoup Mock Error");
+            }
+        );
     },
     /**
      * Replace SmartStore.removeSoup with a mock that invokes the error callback.
      */
     mockRemoveSoupError:function(){
         this.mockSmartStoreMethod(
-                "removeSoup",
-                function(soupName, successCallback, errorCallback){
-                    errorCallback("removeSoup Mock Error");
-                });
+            "removeSoup",
+            function(soupName, successCallback, errorCallback){
+                errorCallback("removeSoup Mock Error");
+            }
+        );
     },
     /**
      * Replace SmartStore.querySoup with a mock that invokes the error callback.
      */
     mockMoveCursorToNextPageError:function(){
         this.mockSmartStoreMethod( 
-                "moveCursorToNextPage",
-                function(cursor, successCallback, errorCallback){
-                    errorCallback("moveCursorToNextPage Mock Error");
-                });
+            "moveCursorToNextPage",
+            function(cursor, successCallback, errorCallback){
+                errorCallback("moveCursorToNextPage Mock Error");
+            }
+        );
     }
 })

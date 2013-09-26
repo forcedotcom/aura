@@ -29,10 +29,6 @@
  */
 var SmartStoreAdapter = function SmartStoreAdapter(config) {
 
-    // DCHASMAN TODO Figure out how to wire up config["name"] to create instances of this adapter!
-    
-    // The soup name for this driver is the SmartStoreAdapter's prefix (cache.) prepended to the 
-    // driver name provided by config["name"]
     this.soupName = this.SOUP_PREFIX + config["name"];
     
     this.setupStage = this.SETUP_STAGE_NOT_STARTED;
@@ -45,7 +41,7 @@ var SmartStoreAdapter = function SmartStoreAdapter(config) {
 //Used at the end of the file before the variable is initialized so the name must be statically available
 SmartStoreAdapter.NAME = "smartstore";
 
-SmartStoreAdapter.prototype.SOUP_PREFIX = "cache.";
+SmartStoreAdapter.prototype.SOUP_PREFIX = "aura_smartstore_adapter.";
 
 //Soup item properties
 SmartStoreAdapter.prototype.SOUP_KEY = "key";

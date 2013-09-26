@@ -67,11 +67,6 @@ var priv = {
     isUnloading : false,
     initDefsObservers : [],
     isDisconnected : false,
-
-    // #if {"modes" : ["PTEST"]}
-    requestCounts : {},
-    existingTransactionId : undefined,
-    // #end
     foreground : new $A.ns.FlightCounter(1),
     background : new $A.ns.FlightCounter(1),
     actionQueue : new ActionQueue(),
@@ -294,9 +289,6 @@ var priv = {
      *            the abortableId associated with the set of actions.
      */
     actionCallback : function(response, collector, flightCounter, abortableId) {
-        // #if {"modes" : ["PTEST"]}
-        var lastAction = undefined;
-        // #end
         var responseMessage = this.checkAndDecodeResponse(response);
         var that = this;
         var noAbort = (abortableId === this.actionQueue.getLastAbortableTransactionId());
@@ -314,9 +306,7 @@ var priv = {
                 this.auraStack = [];
             }
         }
-        // #if {"modes" : ["PTEST"]}
-        this.existingTransactionId = collector.getTransactionId();
-        // #end
+
         $A.run(function() {
             var action, actionResponses;
 
@@ -370,22 +360,12 @@ var priv = {
                         }
                     }
                     that.singleAction(action, noAbort, actionResponse);
-                    // #if {"modes" : ["PTEST"]}
-                    if (action !== undefined) {
-                        lastAction = action;
-                    }
-                    // #end
                 }
             } else if (priv.isDisconnectedOrCancelled(response) && !priv.isUnloading) {
                 var actions = collector.getActionsToSend();
 
                 for ( var m = 0; m < actions.length; m++) {
                     action = actions[m];
-                    // #if {"modes" : ["PTEST"]}
-                    if (action !== undefined) {
-                        lastAction = action;
-                    }
-                    // #end
                     if (noAbort || !action.isAbortable()) {
                         action.incomplete($A.getContext());
                     } else {
@@ -396,21 +376,7 @@ var priv = {
             priv.fireDoneWaiting();
         }, "actionCallback");
 
-        // #if {"modes" : ["PTEST"]}
-        this.existingTransactionId = undefined;
-        // #end
-
         $A.endMark("Completed Action Callback - XHR " + collector.getNum());
-
-        // #if {"modes" : ["PTEST"]}
-        // if there are no more actions for a particular transaction and if
-        // onLoad has already been fired
-        this.requestCounts[collector.getTransactionId()]--;
-        if ((this.requestCounts[collector.getTransactionId()] === 0) && $A.getContext().getTransaction() !== 0) {
-            delete this.requestCounts[collector.getTransactionId()];
-            $A.clientService.unregisterTransaction();
-        }
-        // #end
     },
 
     /**
@@ -484,13 +450,6 @@ var priv = {
 
         if (actionsToSend.length > 0) {
             collector.setNum(aura.getContext().incrementNum());
-            // #if {"modes" : ["PTEST"]}
-            if (!this.existingTransactionId) {
-                collector.setTransactionId(this.actionQueue.getTransactionId());
-            } else {
-                collector.setTransactionId(this.existingTransactionId);
-            }
-            // #end
 
             // clientService.requestQueue reference is mutable
             flightCounter.send();
@@ -522,27 +481,10 @@ var priv = {
             // #end
 
             $A.endMark("Action Request Prepared");
-
-            // #if {"modes" : ["PTEST"]}
-            this.requestCounts[collector.getTransactionId()]++;
-            // #end
             $A.util.transport.request(requestConfig);
-            
-            // #if {"modes" : ["PTEST"]}
-            var tempTx = this.existingTransactionId;
-            var collectorTx = collector.getTransactionId();
-            var that = this;
-            // #end
+
             setTimeout(function() {
-                // #if {"modes" : ["PTEST"]}
-                if (!that.existingTransactionId) {
-                    that.existingTransactionId = collectorTx;
-                }
-                // #end
                 $A.get("e.aura:waiting").fire();
-                // #if {"modes" : ["PTEST"]}
-                that.existingTransactionId = tempTx;
-                // #end
             }, 1);
         } else {
             // We didn't send a request, so clean up the in-flight counter.

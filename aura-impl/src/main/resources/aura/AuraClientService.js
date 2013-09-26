@@ -192,7 +192,6 @@ var AuraClientService = function() {
 
                     action.setCallback(that, function(a) {
                         var state = a.getState();
-                    	
                         if (state === "SUCCESS") {
                             callback(a.getReturnValue());
                         } else if (state === "INCOMPLETE"){
@@ -276,9 +275,6 @@ var AuraClientService = function() {
          *
          * @param name the name of the last item pushed.
          */
-        
-        startTime: (new Date()).getTime(),
-        
         popStack : function(name) {
             var count = 0;
             var lastName;
@@ -292,45 +288,24 @@ var AuraClientService = function() {
             } else {
                 $A.warning("Pop from empty stack");
             }
-            
             if (priv.auraStack.length === 0) {
                 var tmppush = "$A.clientServices.popStack";
                 priv.auraStack.push(tmppush);
-
-                // #if {"modes" : ["PTEST"]}
-                if (!priv.existingTransactionId) {
-                    priv.requestCounts[priv.actionQueue.getTransactionId()] = 0;
-                }
-                // #end
-                
                 clientService.processActions();
-                
                 done = !$A["finishedInit"];
                 while (!done && count <= 15) {
                     $A.renderingService.rerenderDirty();
-                    
                     done = !clientService.processActions();
-                    
                     count += 1;
                     if (count > 14) {
                         $A.error("finishFiring has not completed after 15 loops");
                     }
                 }
-                
                 // Force our stack to nothing.
                 lastName = priv.auraStack.pop();
                 if (lastName !== tmppush) {
                     $A.error("Broken stack: popped "+tmppush+" expected "+lastName+", stack = "+priv.auraStack);
                 }
-                
-                // #if {"modes" : ["PTEST"]}
-                if (!priv.existingTransactionId && (priv.requestCounts[priv.actionQueue.getTransactionId()] === 0)) {
-                    //no server side actions to wait for.
-                    delete priv.requestCounts[priv.actionQueue.getTransactionId()];
-                   // clientService.unregisterTransaction();
-                }
-                // #end
-                
                 priv.auraStack = [];
                 priv.actionQueue.incrementNextTransactionId();
             }
@@ -583,43 +558,6 @@ var AuraClientService = function() {
             }
             
             priv.actionQueue.enqueue(action);
-        },
-
-        /**
-         * Register a new transaction.This clears out the previously set times (of previous transaction),
-         * clears the transactionName
-         * and triggers a new transaction.
-         *
-         * @private
-         */
-        registerTransaction: function() {
-            //#if {"modes" : ["PTEST"]}
-            if (!$A.hasActiveTransaction($A.getContext().getTransaction())) {
-                // to only profile the transactions and not the initial page load
-                // clear out existing timers
-                $A.removeStats();
-                $A.getContext().clearTransactionName();
-                // start a Jiffy transaction
-                $A.startTransaction($A.getContext().incrementTransaction());
-            }
-            //#end
-        },
-
-        /**
-         * Unregister an existing transaction. This ends the current transaction and
-         * updates the transaction name to include all actions.
-         * It also sets the beaconData to piggyback on the next XHR call.
-         *
-         * @private
-         */
-        unregisterTransaction: function() {
-            // end the previously started transaction
-            $A.endTransaction($A.getContext().getTransaction());
-            // set the transaction using #hashtag from the URL and the
-            // concatenated action names as the unique ID
-            $A.updateTransaction("txn_" + $A.getContext().getTransaction(), "txn_" + $A.historyService.get()["token"] + $A.getContext().getTransactionName());
-            // update the vars and set the beaconData to piggyback on the next XHR call
-            $A.setBeaconData($A.toJson());
         },
         
         /**

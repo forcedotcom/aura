@@ -783,16 +783,7 @@ BOOMR_start = new Date().getTime();
             }
 
             return this;
-        },
-        
-        /*
-         * SFDC Implementation
-         * @param {String} time_name
-         * @return true if the timer exists and has not ended
-         */
-        hasActiveTimer : function(timer_name) {
-            return (timer_name && impl.timers[timer_name] && ('start' in impl.timers[timer_name]) && !('end' in impl.timers[timer_name]));
-        },          
+        },        
 
         setTimer : function(timer_name, time_delta) {
             if (timer_name) {
@@ -875,14 +866,6 @@ BOOMR_start = new Date().getTime();
         endTransaction : function(tName) {
             BOOMR.plugins.RT.endTimer('txn_' + tName, new Date().getTime());
             return this;
-        },
-
-        /**
-         * SFDC implementation This method is used to determine if the txn is still active.
-         * @return true if there is an open (not ended transaction with the given hash
-         */
-        hasActiveTransaction : function(tName) {
-            return BOOMR.plugins.RT.hasActiveTimer('txn_' + tName);
         },
 
         /**
@@ -2236,12 +2219,6 @@ IPerf.prototype.startTransaction;
  */
 IPerf.prototype.endTransaction;
 /**
- * @param {!string} tName The id used to identify the transaction.
- * @return {boolean}
- * @override
- */
-IPerf.prototype.hasActiveTransaction;
-/**
  * @param {!string} oldName The id used to identify the old transaction name.
  * @param {!string} newName The id used to identify the new transaction name.
  * @return {!IPerf}
@@ -2674,16 +2651,6 @@ IPerf.prototype.measure;
          */
         endTransaction : function(tName) {
             return BOOMR.plugins.RT.endTransaction(tName);
-        },
-
-        /**
-         * SFDC implementation This method is used to mark the start of a transaction
-         *
-         * @return {boolean} true if transaction is active
-         * @expose
-         */
-        hasActiveTransaction : function(tName) {
-            return BOOMR.plugins.RT.hasActiveTransaction(tName);
         },
 
         /**

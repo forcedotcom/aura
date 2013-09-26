@@ -203,17 +203,9 @@
             	if (!valueExpression.isDefined()) {
     	            // Map from touch event to onclick
                 	valueExpression = onclickExpression;
-    	            eventName = "onclick";
             	}
             }
         }
-
-        //start a new transaction
-
-        if(eventName == "onclick") {
-            $A.services.client._initTransaction();
-        }
-
 
         $A.run(function () {
                 var action = $A.expressionService.get(valueProvider, valueExpression);

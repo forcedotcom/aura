@@ -285,7 +285,6 @@
                 component.setValue("v.date", targetDate.getDate()); 
                 this.updateTitle(component, targetDate.getMonth(), targetDate.getFullYear());
             } else {
-                source.getElement().focus(); 
                 component.setValue("v.date", currentDate);
             }
             component.setValue("v.selectedDate", component.get("v.year") + "-" + (component.get("v.month") + 1) + "-" + component.get("v.date"));

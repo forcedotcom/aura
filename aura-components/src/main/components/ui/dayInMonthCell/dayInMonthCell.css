@@ -28,9 +28,9 @@ a.THIS {
     width: 30px;
 }
 
-a.THIS:hover,
-a.THIS:focus,
-a.THIS:active {
+a.THIS.desktop:hover,
+a.THIS.desktop:focus,
+a.THIS.desktop:active {
     background-color:#E1E1E1;
     color:#0085C7;
     text-shadow:0 1px 0 rgba(255, 255, 255, 1);

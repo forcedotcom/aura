@@ -85,6 +85,7 @@
  			var carousel = cmp.find("carousel1");
             var page = this.getSelectedPage(carousel);
             
+            $A.test.assertNotNull(page, "Page retrieved is null");
             var outputCmp = page.get("v.body");
             $A.test.assertFalse($A.util.isUndefinedOrNull(outputCmp), "Could not find output component");
             $A.test.assertEquals("i have something to say...", outputCmp[2].get("v.value"), 
@@ -97,6 +98,7 @@
     		$A.test.addWaitForWithFailureMessage(true, function(){
     			var carousel = cmp.find("carousel1");
 	    		var page = getSelectedPage.apply(that, [carousel]);
+	    		$A.test.assertNotNull(page, "Page retrieved is null");
 	    		var outputCmp = page.get("v.body");
 	    		$A.test.assertFalse($A.util.isUndefinedOrNull(outputCmp), "Could not find output component");
 	    		return ("hello!" === outputCmp[2].get("v.value"))
@@ -217,17 +219,18 @@
  			}, "Carousel was not rerendered");
  		}, function(cmp){
  			var carousel = cmp.find("carousel2");
- 			// TODO : Bug W-1701867
- 			//var indicators = this.getNavigationIndicators(carousel);
- 			//$A.test.assertEquals(10, indicators.length, 
-            //	"Carousel does not have the correct number of navigation indicators");
-            var expectedPage = this.getPageOnCarousel(carousel, 1);
-            var selectedPage = this.getSelectedPage(carousel);
-            $A.test.assertFalse($A.util.isUndefinedOrNull(selectedPage), 
-            	"No page on rerendered carousel was selected");
-            $A.test.assertEquals(expectedPage.getLocalId(), selectedPage.getLocalId(), 
-            	"Expected focus to be on first page.");
- 		}]
+ 			var expectedPage = this.getPageOnCarousel(carousel, 1);
+ 			
+ 			// verify first page is selected
+ 			var waitForPageChange = this.waitForPageChange;
+ 			var that = this;
+ 			$A.test.addWaitFor(true, function(){
+ 				return waitForPageChange.apply(that, [cmp, "carousel2", expectedPage.getLocalId()]);
+ 			});
+ 			var indicators = this.getNavigationIndicators(carousel);
+ 			$A.test.assertEquals(10, indicators.length, 
+            	"Carousel does not have the correct number of navigation indicators");
+        }]
     },
 
     /**
@@ -289,6 +292,7 @@
             
             // grab child carousel on page
             var parentPage = this.getSelectedPage(parent);
+            $A.test.assertNotNull(parentPage, "Page retrieved is null");
             var child = this.carouselInCarouselGetChildCarousel(parentPage);
             
             // go to page 2 on child carousel
@@ -297,8 +301,10 @@
  			// verify on the correct page
             var parent = cmp.find("carouselInCarousel");
             var parentPage = this.getSelectedPage(parent);
+            $A.test.assertNotNull(parentPage, "Page retrieved is null");
             var child = this.carouselInCarouselGetChildCarousel(parentPage);
             var childPage = this.getSelectedPage(child);
+            $A.test.assertNotNull(childPage, "Page retrieved is null");
             $A.test.assertEquals(childPage.getLocalId(), "childCarousel-smaller-p2", 
             	"Expected to switch to page 2 on child carousel");
             this.assertNavigationIndicatorSelected(child, 2);
@@ -320,6 +326,7 @@
  			// verify parent carousel is on the correct page
             var parent = cmp.find("carouselInCarousel");
             var page2 = this.getSelectedPage(parent);
+            $A.test.assertNotNull(page2, "Page retrieved is null");
             var id = page2.getLocalId();
             $A.test.assertEquals("cinc-p2", id, "Expected to switch to page 2 on parent carousel");
             this.assertNavigationIndicatorSelected(parent, 2);
@@ -327,6 +334,7 @@
             // verify child carousel is on the correct page as well
             var child = this.carouselInCarouselGetChildCarousel(page2);
             var childPage = this.getSelectedPage(child);
+            $A.test.assertNotNull(childPage, "Page retrieved is null");
             $A.test.assertEquals(childPage.getLocalId(), "childCarousel-sameDim-p1", 
             	"Expected to be on page 1 of child carousel")
             this.assertNavigationIndicatorSelected(child, 1);
@@ -387,6 +395,7 @@
  				return page;
  			}
  		}
+ 		return null;
  	},
  	
  	getNavigationIndicators : function(carousel) {
@@ -488,6 +497,7 @@
  	 *     ---------------------------------------------
  	 */
  	verifyMdmPage : function(page, pageItemNumber, expectedPageItemText) {
+ 		$A.test.assertNotNull(page, "Verifying mdm page, page provided is null");
  		pageItemNumber--;
  		var pageItems = page.get("v.body");
 		$A.test.assertEquals(6, pageItems.length, "Incorrect page elements on MDM page.");
@@ -506,6 +516,7 @@
     waitForPageChange : function(cmp, carouselName, pageId) {
     	var c = cmp.find(carouselName);
     	var page = this.getSelectedPage(c);
-    	return (page.getLocalId() === pageId);
+    	var selectedPageId = $A.util.isUndefinedOrNull(page) ? "" : page.getLocalId();
+    	return (selectedPageId === pageId);
     }
 })

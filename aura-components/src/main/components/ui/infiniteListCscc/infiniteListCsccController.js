@@ -27,5 +27,6 @@
 	
 	rerenderComplete: function(component, event, helper) {
         helper.showLoading(component, false);
+        component.getEvent("rerenderComplete").fire();
 	}
 })

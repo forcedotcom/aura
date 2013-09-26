@@ -20,17 +20,26 @@ div.THIS {
     width:80%;
 }
 */
-div.THIS {
-    display: inline-block;    
+div.THIS {	
+	display: inline-block;
+	text-align: center;
+	white-space: nowrap;      
 }
 
 div.THIS input.input-hours,
 div.THIS input.input-minutes { 
-    font-size: 20px;    
-    height: 2em;
-    margin: 5px;
-    width: 2em;
-    padding: 5px;
+    font-size: 50px;
+    font-family: 'ProximaNovaSoft-Regular';
+    color: #3c3d3e;
+    text-align: center;
+    vertical-align: middle;
+    border: 1px solid #bbc0c4;
+    border-radius: 5px;
+    background-color: #ffffff;
+    box-shadow: inset 0 2px 2px 0 rgba(0, 0, 0, 0.05);    
+    height: 80px;
+    width: 80px;
+    margin: 14px 5px;
 }
 
 div.THIS input.error {
@@ -39,7 +48,40 @@ div.THIS input.error {
 }
 
 div.THIS select.ampm {
-	width: 3.5em;
+	font-size: 36px;
+	font-family: 'ProximaNovaSoft-Regular';
+	color: #2a94d6;	
 	padding: 5px;
+	margin: 0;
+	width: auto;
+	border: 0;
+	vertical-align: middle;
+	background-color: #f0f1f2;
+	background-image: none;
+	box-shadow: none;
+	-moz-appearance: none;
+	-webkit-appearance: none;
+	-ms-appearance: none;
+	appearance: none;	
+}
+
+.THIS .time-separator {    
+    width: 6px;
+    height: 18px;    
+}
+
+
+@media only screen and (max-width: 999px) and (orientation: portrait) {
+    div.THIS input.input-hours,
+	div.THIS input.input-minutes {
+    	height: 40px;
+    	width: 40px;
+    	font-size: 32px;
+    	padding: 7px;		
+    }
+    
+    div.THIS select.ampm {
+    	font-size: 20px;
+    }   
 }
  

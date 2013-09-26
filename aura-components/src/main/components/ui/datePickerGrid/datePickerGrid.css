@@ -24,9 +24,9 @@
 
 .THIS .calGrid th {
     color: #696e71;
-    font-size: 13px;
+    font-size: 12px;
     font-family: 'ProximaNovaSoft-Semibold';
-    padding-bottom: 10px;
+    padding: 7px;
     text-align: center;
 }
  .THIS .calGrid .calRow td {    

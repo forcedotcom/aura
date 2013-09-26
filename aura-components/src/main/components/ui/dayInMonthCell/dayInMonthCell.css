@@ -44,11 +44,11 @@ a.THIS.todayDate {
     background-color: #747474;
     box-shadow: inset 0 2px 2px rgba(0, 0, 0, .35);
     color: #FFF;   
-    text-shadow: 0 1px 0 rgba(0, 0, 0, .65);
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, .35);
 }
 
 a.THIS.selectedDate {
-    background-color:#6CAEBF;
+    background-color: #3f9fd9;
     background: -moz-linear-gradient(#3f9fd9,#2789c7); /* FF3.6+ */
     background: -webkit-linear-gradient(#3f9fd9,#2789c7); /* Chrome10+,Safari5.1+ */
     background: -ms-linear-gradient(#3f9fd9,#2789c7); /* IE10+ */
@@ -61,16 +61,7 @@ a.THIS.selectedDate {
 /* Smartphones (portrait) ----------- */
 @media only screen and (max-width: 999px) and (orientation: portrait) {
     a.THIS {
-       width: 100%;    
-    }
-    
-    a.THIS:hover,
-	a.THIS:focus,
-	a.THIS:active {
-    	outline: none;
-    	background-color: #FFF;
-	    color: #696e71;
-	    text-shadow: none;
-	    box-shadow: none;
+       width: 100%;
+       height: 45px;    
     }
 }

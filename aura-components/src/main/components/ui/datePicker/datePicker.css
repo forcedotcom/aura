@@ -160,7 +160,7 @@ div.THIS.phone .scroller {
 .THIS .dateBar .navLink.nextMonth:focus {
     background-position: -66px -23px;
 }
-
+ 
 .THIS .dateBar .nextYear {
     background-position: -98px 7px;
     margin-right: 5px;
@@ -201,7 +201,7 @@ div.THIS.phone .scroller {
 	font-family: ProximaNovaSoft-Bold, Arial, sans-serif;
     font-size: 18px;    
     color: #3c3d3e;
-    line-height: 20px !important;
+    line-height: 24px !important;
 }
 
 .THIS .buttonBar {
@@ -225,16 +225,17 @@ div.THIS.phone .scroller {
 }
 
 .THIS .timeBar {
-/*
-    height: 46px;
-    line-height: 33px;
-*/
-    text-align: center;
+	display:inline-block;
+	width: 100%;
+	text-align: center;
     background-color: #f0f1f2;
-    border-right: 1px solid transparent;    
 }
 
 @media only screen and (max-width: 999px) and (orientation: portrait) {
+    div.THIS {
+        width: 100%;
+    }
+    
     .THIS .dateBar .navLink.prevMonth {
 	    background: url('/auraFW/resources/aura/images/arrow-left.png') no-repeat;
 	    background-size: 12px 14px;
@@ -266,11 +267,5 @@ div.THIS.phone .scroller {
         float: right;
         margin-right: 7px;
         text-align: right;
-    }
-     
-    .THIS .timeBar {
-        height: 76px;
-        line-height: 53px;
-        text-align: center;
     }
 }

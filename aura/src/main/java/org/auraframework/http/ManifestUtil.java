@@ -18,7 +18,8 @@ package org.auraframework.http;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
-
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -82,10 +83,31 @@ public abstract class ManifestUtil {
         // TODO: this is rather bogus.
         //
         final String userAgent = request.getHeader(HttpHeaders.USER_AGENT);
-        if (userAgent != null && !userAgent.contains("AppleWebKit")) {
+        // iOS7 is not handling appcache correctly. Should remove when iOS7 is fixed
+        if (userAgent != null && (!userAgent.contains("AppleWebKit") || isIOS7(userAgent))) {
             return false;
         }
         return isManifestEnabled();
+    }
+
+    /**
+     * Checks user agent for iOS7. This should only be here temporarily as an iOS fix.
+     *
+     * @param userAgent user agent
+     * @return true if ios7
+     */
+    private static boolean isIOS7(String userAgent) {
+        final String iosVersionExpression = "(iPad|iPhone|iPod);.*CPU.*OS (\\d+)_(\\d+)";
+        final Matcher iosMatcher = Pattern.compile(iosVersionExpression).matcher(userAgent);
+
+        while(iosMatcher.find()) {
+            String versionMajor = iosMatcher.group(2);
+            if(versionMajor != null && versionMajor.equals("7")) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

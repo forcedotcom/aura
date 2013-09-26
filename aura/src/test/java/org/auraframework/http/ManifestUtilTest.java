@@ -17,9 +17,15 @@ package org.auraframework.http;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.http.HttpHeaders;
 import org.auraframework.test.UnitTestCase;
 
 import org.auraframework.util.AuraTextUtil;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class ManifestUtilTest extends UnitTestCase {
 
@@ -124,5 +130,18 @@ public class ManifestUtilTest extends UnitTestCase {
         time = checkManifestCookieValue(value, 8, time);
         value = ManifestUtil.updateManifestCookieValue(value);
         assertNull("Did not expire cookie " + value, value);
+    }
+
+    /**
+     * This test should go away when Apple fixes AppCache in iOS7
+     * @throws Exception
+     */
+    public void testAppCacheDisabledIOS7() throws Exception {
+        final String iPhone7 = "Mozilla/5.0 (iPhone; CPU iPhone OS 7_0 like Mac OS X) AppleWebKit/537.51.1 " +
+                "(KHTML, like Gecko) Version/7.0 Mobile/11A465 Safari/9537.53";
+        HttpServletRequest mockRequest = mock(HttpServletRequest.class);
+        when(mockRequest.getHeader(HttpHeaders.USER_AGENT)).thenReturn(iPhone7);
+
+        assertFalse("AppCache should not be enabled for iOS7", ManifestUtil.isManifestEnabled(mockRequest));
     }
 }

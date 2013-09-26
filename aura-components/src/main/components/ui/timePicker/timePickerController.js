@@ -14,25 +14,6 @@
  * limitations under the License.
  */
 ({
-    doInit: function(component, event, helper) {
-        var is24HourFormat = component.getValue("v.is24HourFormat").getBooleanValue();
-        if (is24HourFormat === false) {
-            // Localize am/pm label
-            var localizedData = $A.localizationService.getLocalizedDateTimeLabels();
-            var ampm = localizedData._ampm;
-            if (ampm) {
-                var amOptCmp = component.find("amOpt");
-                if (amOptCmp) {
-                    amOptCmp.setValue("v.label", ampm.am); 
-                }
-                var pmOptCmp = component.find("pmOpt");
-                if (pmOptCmp) {
-                    pmOptCmp.setValue("v.label", ampm.pm); 
-                } 
-            }
-        }
-    },
-    
     updateAmpm: function(component, event, helper) {
         var amPmCmp = component.find("ampm");
         var hours = component.get("v.hours");

@@ -22,11 +22,13 @@
     },
     
     render: function(component, helper) {
+        helper.localizeAmpmLabel(component);
         helper.renderTime(component);
         return this.superRender(); 
     },
     
     rerender: function(component, helper) {
+        helper.localizeAmpmLabel(component);
         if (component.getValue("v.isValid").getBooleanValue() === true) {
             helper.renderTime(component);
         }

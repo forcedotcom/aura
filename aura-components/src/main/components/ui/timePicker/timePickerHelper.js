@@ -31,6 +31,25 @@
         return hours;
     },
     
+    localizeAmpmLabel: function(component) {
+        var is24HourFormat = component.getValue("v.is24HourFormat").getBooleanValue();
+        if (is24HourFormat === false) {
+            // Localize am/pm label
+            var localizedData = $A.localizationService.getLocalizedDateTimeLabels();
+            var ampm = localizedData._ampm;
+            if (ampm) {
+                var amOptCmp = component.find("amOpt");
+                if (amOptCmp) {
+                    amOptCmp.setValue("v.label", ampm.am); 
+                }
+                var pmOptCmp = component.find("pmOpt");
+                if (pmOptCmp) {
+                    pmOptCmp.setValue("v.label", ampm.pm); 
+                } 
+            }
+        }
+    },
+    
     renderTime: function(component) {
         // set hours based on 24/12 hour format
         var is24HourFormat = component.getValue("v.is24HourFormat").getBooleanValue();

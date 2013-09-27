@@ -515,7 +515,7 @@
     
     /**
      * When writing objects with the same key to adapters with different names, clearing a single adapter should
-     * only affect it's soup and not the soup
+     * only affect its soup and not the other.
      */
     testMultiAdapterClear:{
         test:[

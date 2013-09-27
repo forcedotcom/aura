@@ -30,6 +30,7 @@
     <aura:attribute name="autoInitializeSync" type="String" default="false" description="Default value is &#8220;false&#8221;."/>
     <aura:attribute name="afterAuraInit" type="String" description="Not used."/>
     <aura:attribute name="loadingText" type="String" default="Loading" description="The text displayed on the page when the template is loading. Default value is &#8220;Loading&#8221;."/>
+    <aura:attribute name="errorTitle" type="String" default="Oops, there's a problem:" description="The title text displayed on the error dialog when an error has occured. Default value is &#8220;Oops, there's a problem:&#8221;."/>
     <aura:attribute name="errorMessage" type="String" default="CSS Error" description="The error message displayed when an error has occured while loading. Default value is &#8220;CSS Error&#8221;."/>
     <aura:attribute name="forceError" type="Boolean" default="false" description="Set this to true to force the display of an error that would otherwise be hidden because of nesting.."/>
     <aura:attribute name="extraScriptTags" type="Aura.Component[]" description="Additional &lt;script&gt; elements, such as JavaScript libraries. Use multiple &lt;script&gt; elements to include more than one JavaScript library. Set this attribute using aura:set if overriding the template."/>
@@ -250,7 +251,7 @@
                 <div class="auraMsgBox auraErrorBox" aura:id="auraError">
                     <h2>
                         <a class="close" onclick="dismissError();" href="javascript:void(0);">&times;</a>
-                        Oops, there's a problem:
+                        {!v.errorTitle}
                     </h2>
                     <div id="auraErrorMessage">{!v.errorMessage}</div>
                 </div>

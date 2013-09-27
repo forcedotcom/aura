@@ -281,6 +281,9 @@ Test.Components.Ui.Carousel.CarouselHelperTest=function(){
 				},
 				getConcreteComponent : function() {
 					return {getDef: function(){return {getHelper: function(){return targetHelper}}}};
+				},
+				find : function(exp) {
+					return {_scroller: {}};
 				}
 			};
 			
@@ -318,6 +321,9 @@ Test.Components.Ui.Carousel.CarouselHelperTest=function(){
 					get : function(expression) {},
 					getConcreteComponent : function() {
 						return {getDef: function(){return {getHelper: function(){return targetHelper}}}};
+					},
+					find : function(exp) {
+						return {_scroller: {}};
 					}
 				};
 			
@@ -355,7 +361,10 @@ Test.Components.Ui.Carousel.CarouselHelperTest=function(){
 					get : function(expression) {},
 					getConcreteComponent : function() {
 						return {getDef: function(){return {getHelper: function(){return targetHelper}}}};
-					}					
+					},
+					find : function(exp) {
+						return {_scroller: {}};
+					}
 			};
 			
 			var mockHelperMethods = Mocks.GetMocks(targetHelper, {
@@ -392,6 +401,9 @@ Test.Components.Ui.Carousel.CarouselHelperTest=function(){
 					get : function(expression) {},
 					getConcreteComponent : function() {
 						return {getDef: function(){return {getHelper: function(){return targetHelper}}}};
+					},
+					find : function(exp) {
+						return {_scroller: {}};
 					}
 			};
 			

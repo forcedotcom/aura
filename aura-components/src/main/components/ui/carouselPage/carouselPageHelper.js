@@ -16,20 +16,27 @@
 
 {
 	updateSize: function(cmp, width, height) {
-		var width = width || cmp.get('v.priv_width'),
-			height = height || cmp.get('v.priv_height');			
-		
-		var el = cmp.getElement();
+		var w=width || cmp.get('v.priv_width'),
+			h=height || cmp.get('v.priv_height'),
+			el = cmp.getElement();
 		
 		if (!el) {
+			if ($A.util.isNumber(w)) {
+				cmp.getValue('v.priv_width').setValue(w);
+			}
+			
+			if ($A.util.isNumber(h)) {
+				cmp.getValue('v.priv_height').setValue(h);
+			}
+			
 			return;
 		}
 		
-		if ($A.util.isNumber(width)) {
-			el.style.width = width + 'px';
+		if ($A.util.isNumber(w)) {
+			el.style.width = w + 'px';
 		}
-		if ($A.util.isNumber(height)) {
-			el.style.height = height + 'px';
+		if ($A.util.isNumber(h)) {
+			el.style.height = h + 'px';
 		}
 	},
 	

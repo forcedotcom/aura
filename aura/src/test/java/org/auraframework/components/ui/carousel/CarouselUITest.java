@@ -51,7 +51,8 @@ public class CarouselUITest extends WebDriverTestCase {
     /**
      * Able to tab into a page on the carousel.
      */
-    public void testTabIntoCarouselPage() throws Exception {
+    //TODO: Renable after W-1851013 is fixed. Currently this test flaps.
+    public void _testTabIntoCarouselPage() throws Exception {
         open(URL);
         WebDriver driver = getDriver();
         WebElement carousel = getCarousel(driver, 1);

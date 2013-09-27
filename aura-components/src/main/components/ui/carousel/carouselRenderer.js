@@ -26,19 +26,19 @@
 		var shouldRerender = false,
 			width = cmp.getValue('v.width'),
 			height = cmp.getValue('v.height'),
-			pageCmps = cmp.getValue('v.pageComponents');
-		
-		if (width.isDirty() || height.isDirty()) {
-			helper.updateSize(cmp, true);
+			pageCmps = cmp.getValue('v.pageComponents'),
+			forceUpdate = pageCmps.isDirty() ? true : false;
+
+		if (width.isDirty() || height.isDirty() || forceUpdate) {
+			helper.updateSize(cmp, forceUpdate);
 			shouldRerender = true;
-		}
-		
-		if (pageCmps.isDirty()) {
-			shouldRerender = true;		
 		}
 		
 		if (shouldRerender) {
 			this.superRerender();
+			if (forceUpdate) {
+				helper.selectDefaultPage(cmp);
+			}			
 		}
 	}
 }

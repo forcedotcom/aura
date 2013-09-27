@@ -32,6 +32,7 @@
     <aura:attribute name="disabled" type="Boolean" default="false" description="Specifies whether this button should be displayed in a disabled state. Disabled buttons can't be clicked. Default value is &quot;false&quot;."/>
     <aura:attribute name="accesskey" type="String" default="" description="The keyboard access key that puts the button in focus. When the button is in focus, pressing Enter clicks the button."/>
     <aura:attribute name="labelDir" type="String" default="ltr" description="The direction in which the label should be read. Possible values are &quot;rtl&quot; (right to left) and &quot;ltr&quot; (left to right). Default value is &quot;ltr&quot;."/>
+    <aura:attribute name="stopPropagation" type="Boolean" default="false" description="Prevents the click event from bubbling up the DOM tree, preventing any parent handlers from being notified of the event."/>
 
     <aura:registerevent name="press" type="ui:press" description="The controller method that runs when the button is clicked. For example, press=&quot;{!c.showMsg}&quot; references the showMsg method in the controller."/>
 

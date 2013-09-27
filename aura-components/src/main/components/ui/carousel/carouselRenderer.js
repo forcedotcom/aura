@@ -26,15 +26,12 @@
 		var width = cmp.getValue('v.width'),
 			height = cmp.getValue('v.height'),
 			pageCmps = cmp.getValue('v.pageComponents');
-		
-		if (pageCmps.isDirty()) {            
-            $A.get("e.ui:updateSize").fire();  
-		}
+
 		if (width.isDirty() || height.isDirty()) {
 			helper.updateSize(cmp, true);
 		}
 		
-		this.superRerender();		
+		this.superRerender();
 	},
 	
 	unrender: function(cmp, helper) {

@@ -45,12 +45,10 @@
 				pageModel = cmp.get('v.pageModel');
 				
 			cmp.getValue('v.isSelected').setValue(true);
-			cmp.getValue("v.priv_ariaExpanded").setValue(true);
 			$A.util.addClass(cmp.getElement(), selectedItemCss);
 			this.showPage(cmp, selectedPage);
 		} else {
 			cmp.getValue('v.isSelected').setValue(false);
-			cmp.getValue("v.priv_ariaExpanded").setValue(false);
 			$A.util.removeClass(cmp.getElement(), selectedItemCss);
 		}
 	},
@@ -81,9 +79,7 @@
 			cmp.getValue('v.class').setValue(strClass + ' hidden');
 		}
 		
-		if (cmp.get('v.priv_continuousFlow')) {								
-			cmp.getValue('v.priv_ariaExpanded').setValue(true);		 
-		} else {
+		if (!cmp.get('v.priv_continuousFlow')) {
 			var snap = cmp.get('v.priv_snap');			
 			if (snap && snap.indexOf('.') != -1) {
 				cmp.getValue('v.priv_snap').setValue(snap.substring(snap.indexOf('.') + 1));
@@ -98,6 +94,7 @@
 			
 		if (pageIndex == curPage && !isVisible) {
 			$A.util.removeClass(cmp.getElement(), hiddenClass);
+			cmp.getElement().setAttribute('aria-expanded', 'true');
 			cmp.getValue('v.priv_visible').setValue(true);
 		}		
 	},
@@ -110,7 +107,14 @@
 		
 		if (pageIndex == curPage && isVisible) {			
 			$A.util.addClass(cmp.getElement(), hiddenClass);
+			cmp.getElement().setAttribute('aria-expanded', 'false');
 			cmp.getValue('v.priv_visible').setValue(false);
+		}
+	},
+	
+	setDefaultAttributes: function(cmp) {
+		if (!cmp.get('v.priv_continuousFlow')) {
+			cmp.getElement().setAttribute('aria-expanded', 'false');
 		}
 	}
 }

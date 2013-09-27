@@ -1,4 +1,8 @@
+<<<<<<< HEAD
+markup://test:layoutNoLayout : MFPeKpM1YsvNHHEicsQ-eA
+=======
 markup://test:layoutNoLayout : YJLYmtlv0Fn1jeuNmSvpIA
+>>>>>>> Fix gold file as a result of changing template.cmp
 aura://ComponentController : null
 aura://LabelController : null
 aura://TimeZoneInfoController : null

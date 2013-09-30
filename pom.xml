@@ -367,10 +367,15 @@
                 <version>1.7R4</version>
             </dependency>
             <dependency>
-		      <groupId>com.phloc</groupId>
-		      <artifactId>phloc-css</artifactId>
-		      <version>3.5.5</version>
-		    </dependency>
+                <groupId>com.phloc</groupId>
+                <artifactId>phloc-css</artifactId>
+                <version>3.5.5</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ibm.icu</groupId>
+                <artifactId>icu4j</artifactId>
+                <version>51.2</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
     <build>

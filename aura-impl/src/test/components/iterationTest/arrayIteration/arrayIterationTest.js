@@ -42,7 +42,6 @@
                 $A.test.assertEquals("one stringtwo stringred stringblue string", cmpText,
                     "Newly created component not showing up in DOM.");
             });
-
         }
     },
     /**
@@ -135,5 +134,5 @@
                         "Newly created component not showing up in DOM.");
             });
         }
-    },
+    }
 })

@@ -33,13 +33,19 @@ Test.Components.Ui.Button.ButtonControllerTest=function(){
 				getAttributes : function(){
 					return {
 						getValue : function(attributeName){
-							if(attributeName == "disabled"){
-								return {
-									getBooleanValue : function(){
-										return true;
-									}
-								}
-							}
+                            if(attributeName == "disabled"){
+                                return {
+                                    getBooleanValue : function(){
+                                        return true;
+                                    }
+                                }
+                            } else if(attributeName == "stopPropagation"){
+                                return {
+                                    getBooleanValue : function(){
+                                        return false;
+                                    }
+                                }
+                            }
 						}
 					}
 				},
@@ -79,7 +85,13 @@ Test.Components.Ui.Button.ButtonControllerTest=function(){
 										return false;
 									}
 								}
-							}
+							} else if(attributeName == "stopPropagation"){
+                                return {
+                                    getBooleanValue : function(){
+                                        return false;
+                                    }
+                                }
+                            }
 						}
 					}
 				},

@@ -20,7 +20,7 @@
 	<ui:autocomplete aura:id="autoComplete" optionVar="row" 
         matchDone="{!c.handleInputChangeAutoCompleteMatchDone}"
         inputChange="{!c.handleInputChangeAutoComplete}" 
-        selectListOption="{!c.handleSelectOptionAutoComplete}">
+        selectListOption="{!c.handleSelectOptionAutoComplete}" label="Generic Auto Complete">
         <aura:set attribute="dataProvider">
             <uitest:testAutocompleteDataProvider/>
         </aura:set>
@@ -52,7 +52,7 @@
     <ui:autocomplete aura:id="autoCompleteLargeList" optionVar="row" 
         matchDone="{!c.handleInputChangeLargeListMatchDone}"
         inputChange="{!c.handleInputChangeLargeList}" 
-        selectListOption="{!c.handleSelectOptionLargeList}">
+        selectListOption="{!c.handleSelectOptionLargeList}" label="Large List Auto Complete" labelPosition="hidden">
         <aura:set attribute="dataProvider">
             <uitest:testAutocompleteDataProvider dataType="largeList"/>
         </aura:set>

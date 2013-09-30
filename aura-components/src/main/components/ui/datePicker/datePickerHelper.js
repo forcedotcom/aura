@@ -256,8 +256,8 @@
             var isPhone = $A.get("$Browser.isPhone");
             if (isPhone === true) {
                 this.attachToDocumentBody(component);
-                elem.style.top = "0px";
-                elem.style.left = "0px";    
+                var top = (document.documentElement && document.documentElement.scrollTop) || document.body.scrollTop;
+                elem.style.top = top + "px";    
             } else {
                 elem.style.top = "auto";
                 var elemRect = elem.getBoundingClientRect();

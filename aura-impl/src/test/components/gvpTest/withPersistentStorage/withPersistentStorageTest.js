@@ -21,8 +21,8 @@
     		    $A.test.assertTrue($A.test.isActionPending(), 
     	            	"Test Setup Failure: test expects the label to be fetched from server");
     		    $A.test.addWaitFor(
-    		                false,
-    		                $A.test.isActionPending,
+    		                true,
+    		                $A.test.allActionsComplete,
     		                function(){
     		                    //Verify that label is available
     		                    $A.test.assertEquals("Today", gvp.get("$Label.Related_Lists.task_mode_today"), 

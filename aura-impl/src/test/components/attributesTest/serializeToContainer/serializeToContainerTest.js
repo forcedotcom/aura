@@ -20,7 +20,7 @@
             $A.run(function(){
                 cmp.get("c.newComponent").runDeprecated()
             });
-            $A.test.addWaitFor(false, $A.test.isActionPending);
+            $A.test.addWaitFor(true, $A.test.allActionsComplete);
         }, function(cmp) {
             var newcmp = cmp.find("target").get("v.body")[0];
             $A.test.assertEquals("bulk", newcmp.get("v.both"));
@@ -34,7 +34,7 @@
             $A.run(function(){
                 cmp.get("c.newComponent").runDeprecated()
             });
-            $A.test.addWaitFor(false, $A.test.isActionPending);
+            $A.test.addWaitFor(true, $A.test.allActionsComplete);
             var newercmp = cmp.find("target").get("v.body")[0];
             $A.test.assertFalse(newcmp.getGlobalId() === newercmp.getGlobalId());
             $A.test.assertEquals("bulk", newercmp.get("v.both"));

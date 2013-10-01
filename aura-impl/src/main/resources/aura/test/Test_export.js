@@ -79,6 +79,7 @@ exp(p,
     // actions
     "callServerAction", p.callServerAction,
     "isActionPending", p.isActionPending,
+    "allActionsComplete", p.allActionsComplete,
     "markForCompletion", p.markForCompletion,
     "isComplete", p.isComplete,
     "isSuccessfullyComplete", p.isSuccessfullyComplete,

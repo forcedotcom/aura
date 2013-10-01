@@ -107,8 +107,8 @@
         	$A.test.expectAuraError("Unable to process your request\n\norg.auraframework.throwable.AuraRuntimeException:");
             cmp.find("trigger").get("e.press").fire();
             $A.test.addWaitFor(
-                    false,
-                    $A.test.isActionPending,
+                    true,
+                    $A.test.allActionsComplete,
                     function () {
                     	$A.test.assertTrue(
 	                		$A.test.getAuraErrorMessage().

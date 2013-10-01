@@ -24,8 +24,8 @@
                 });
 
                 $A.test.addWaitFor(
-                    false,
-                    $A.test.isActionPending,
+                    true,
+                    $A.test.allActionsComplete,
                     function(){
                         $A.test.assertEquals(6, cmp.get("v.outputValue.value"), "Failed: Wrong value from outputNumber");
                     }
@@ -44,8 +44,8 @@
                 });
 
                 $A.test.addWaitFor(
-                    false,
-                    $A.test.isActionPending,
+                    true,
+                    $A.test.allActionsComplete,
                     function(){
                         var body = cmp.get("v.body");
                         if(body && body.length > 0) {

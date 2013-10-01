@@ -9,8 +9,8 @@
         var a = cmp.get('c.getComponentWithLabelInBody');
         $A.run(function(cmp){a.runDeprecated(a)});
         $A.test.addWaitFor(
-                    false,
-                    $A.test.isActionPending,
+                    true,
+                    $A.test.allActionsComplete,
                     function(){
                         $A.test.assertEquals("Today", gvp.get("$Label.Related_Lists.task_mode_today"),
                             "Failed to add Labels from dynamically created components");
@@ -35,8 +35,8 @@
         $A.test.assertTrue($A.test.isActionPending(),
                 "Test Setup Failure: test expects the label to be fetched from server");
         $A.test.addWaitFor(
-                    false,
-                    $A.test.isActionPending,
+                    true,
+                    $A.test.allActionsComplete,
                     function(){
                         //Verify that label is available
                         $A.test.assertEquals("Today", gvp.get("$Label.Related_Lists.task_mode_today"), 
@@ -53,8 +53,8 @@
         var a = cmp.get('c.getComponentWithLabelInBody');
         $A.run(function(cmp){a.runDeprecated(a)});
         $A.test.addWaitFor(
-                    false,
-                    $A.test.isActionPending,
+                    true,
+                    $A.test.allActionsComplete,
                     function(){
                         //Nothing should have changed
                         $A.test.assertEquals("Today", gvp.get("$Label.Related_Lists.task_mode_today"),

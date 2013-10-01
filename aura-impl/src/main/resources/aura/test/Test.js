@@ -229,10 +229,24 @@ var Test = function(){
         /**
          * Peek if there are any pending server actions.
          *
+         * FIXME: deprecated: always has races, use allActionsComplete or the action completion mechanism
+         *
          * @returns {boolean} Returns true if there are pending server actions, or false otherwise.
          */
         isActionPending : function() {
             return !$A.clientService.idle();
+        },
+
+        /**
+         * Check to see if all the current actions have completed.
+         *
+         * This uses both <code>inRequest</code> and <code>requestQueue</code> to determine if all
+         * of the queued actions have completed. Note that this is different than
+         * the old <code>isActionPending</code> since that was subject to numerous race
+         * conditions.
+         */
+        allActionsComplete : function() {
+            return !$A.test.isActionPending();
         },
 
         /**

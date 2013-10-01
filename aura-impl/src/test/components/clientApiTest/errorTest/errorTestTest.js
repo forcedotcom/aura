@@ -43,7 +43,8 @@
     },
     testStackTracePresent : {
         // A useful stacktrace isn't available on all browsers
-        browsers : ["-IE7", "-IE8", "-IE9", "-IPAD", "-IPHONE"],
+        // Stacktrace only supported in Safari versions >= 6
+        browsers : ["-IE7", "-IE8", "-IE9", "-IPAD", "-IPHONE", "-SAFARI"],
         test : function(cmp) {
             var errorMsg = "Verifying stack trace present";
             $A.test.expectAuraError(errorMsg);

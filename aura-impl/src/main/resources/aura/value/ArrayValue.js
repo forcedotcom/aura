@@ -206,6 +206,13 @@ ArrayValue.prototype.isDirty = function() {
 };
 
 /**
+ * Returns true if a new array has been set using the setValue() method but not yet committed.
+ */
+ArrayValue.prototype.isDifferentArray = function() {
+    return this.dirty && this.newArray !== this.array;
+};
+
+/**
  * Removes uncommitted changes if there are any. isDirty() returns false after rollback() is called.
  * This method doesn't return a value.
  *

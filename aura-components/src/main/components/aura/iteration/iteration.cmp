@@ -21,7 +21,7 @@
     support="BETA" description="Renders a view of a collection of items">
 <aura:attribute name="items" type="List" required="true" description="The collection of data to iterate over"/>
 <aura:attribute name="var" type="String" required="true" description="The name of the variable to use for each item inside the iteration"/>
-<aura:attribute name="indexVar" type="String" description="The name of variable to use for the index of each item inside the iteration"/>
+<aura:attribute name="indexVar" type="String" default="_index" description="The name of variable to use for the index of each item inside the iteration"/>
 <aura:attribute name="start" type="Integer" description="The index of the collection to start at (inclusive)"/>
 <aura:attribute name="end" type="Integer" description="The index of the collection to stop at (exclusive)"/>
 <aura:attribute name="body" type="Aura.ComponentDefRef[]" required="true" description="Template to use when creating components for each iteration."/>

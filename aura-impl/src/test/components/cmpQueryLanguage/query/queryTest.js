@@ -78,7 +78,7 @@
             );
             $A.eventService.finishFiring();
 
-            $A.test.addWaitFor(true, $A.test.allActionsComplete, function(){
+            $A.test.addWaitFor(false, $A.test.isActionPending, function(){
                 result = $A.getQueryStatement().query();
                 this.verifyQueryResultCount(result, 3);
                 $A.test.assertEquals(cmp.find("txt_Id"), result.rows[2], "Components created on client side are not retrieved by query.");

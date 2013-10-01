@@ -27,8 +27,8 @@ import org.openqa.selenium.WebElement;
  * {@link aura.def.EventType} Which means that all handler registered to handle this event are invoked. NOTE: Location
  * change event is fired as soon as the page is loaded. Implementation is in AuraHistoryService_Private.js
  */
-public class BrowserHistoryManagementTest extends WebDriverTestCase {
-    public BrowserHistoryManagementTest(String name) {
+public class BrowserHistoryManagementUITest extends WebDriverTestCase {
+    public BrowserHistoryManagementUITest(String name) {
         super(name);
     }
 
@@ -123,7 +123,6 @@ public class BrowserHistoryManagementTest extends WebDriverTestCase {
      * history service set() is setting the values of this attribute. The actions registered for Location Change event
      * handlers use this num. The number is extracted from the event.
      */
-    // TODO W-1089043
     public void testNavigation() throws Exception {
         open("/test/test_LocChng_Navigation.app");
         int i = 0;
@@ -219,7 +218,7 @@ public class BrowserHistoryManagementTest extends WebDriverTestCase {
         waitForElementPresent(findByCssSelector(locationChangeIndicator));
         assertEquals(Integer.toString(i), findByCssSelector(displayLocator).getText());
         // Using the browser's back button
-        getDriver().navigate().back();
+        auraUITestingUtil.getEval("window.history.back()");
         i--;
         // 1
         waitForElementPresent(findByCssSelector(locationChangeIndicator));

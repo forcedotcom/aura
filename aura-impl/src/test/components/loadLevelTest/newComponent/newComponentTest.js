@@ -42,7 +42,7 @@
                 cmp.get("c.createCmpByFetchingDefFromServer").runDeprecated();
             });
 
-            $A.test.addWaitFor(true, $A.test.allActionsComplete, function(){
+            $A.test.addWaitFor(false, $A.test.isActionPending, function(){
                 var textCmp = cmp.get('v.body')[0];
                 //Since this is created under root component and this is the first component from the server
                 $A.test.assertEquals("1:3.2",textCmp.getGlobalId(), "Expected global id to be 1:3");
@@ -62,7 +62,7 @@
                 cmp.get("c.createComponentWithCompilationProblems").runDeprecated();
             });
 
-            $A.test.addWaitFor(true, $A.test.allActionsComplete, function(){
+            $A.test.addWaitFor(false, $A.test.isActionPending, function(){
                 var errorCmp = cmp.get('v.body')[0];
                 var errorMsg = errorCmp.getValue("v.value").value;
                 $A.test.assertTrue($A.test.contains(errorMsg, 'Duplicate definitions for attribute dup on tag aura:attribute'),
@@ -79,7 +79,7 @@
                 cmp.get("c.createNonExistingComponent").runDeprecated();
             });
 
-            $A.test.addWaitFor(true, $A.test.allActionsComplete, function(){
+            $A.test.addWaitFor(false, $A.test.isActionPending, function(){
                 var errorCmp = cmp.get('v.body')[0];
                 var errorMsg = errorCmp.getValue("v.value").value;
                 $A.test.assertTrue($A.test.contains(errorMsg, 'No COMPONENT named markup://foo:hallelujah found'),
@@ -118,7 +118,7 @@
                 cmp.get("c.createCmpWithComplexAttributes").runDeprecated();
             });
             
-            $A.test.addWaitFor(true, $A.test.allActionsComplete, function(){
+            $A.test.addWaitFor(false, $A.test.isActionPending, function(){
                 var textCmp = cmp.get('v.body')[0];
                 $A.test.assertEquals("one,two", textCmp.get('v.StringArray').toString(), "Failed to pass array attribute values to placeholder");
                 $A.test.assertEquals('onetwo',$A.test.getTextByComponent(textCmp), "Failed to pass array attribute values to placeholder");
@@ -136,7 +136,7 @@
                 cmp.get("c.createCmpWithServerDependecies").runDeprecated();
             });
 
-            $A.test.addWaitFor(true, $A.test.allActionsComplete, function(){
+            $A.test.addWaitFor(false, $A.test.isActionPending, function(){
                 var serverCmp = cmp.get('v.body')[0];
                 $A.test.assertEquals('creatingComponentWithServerDependecies',serverCmp.get("m.string"),
                         "Failed to send attribute with post action, model did not get the attribute required.");
@@ -155,7 +155,7 @@
                 cmp.get("c.createAbstractComponent").runDeprecated();
             });
 
-            $A.test.addWaitFor(true, $A.test.allActionsComplete, function(){
+            $A.test.addWaitFor(false, $A.test.isActionPending, function(){
                 var newCmp = cmp.get('v.body')[0];
                 var cmpImplName = newCmp.getDef().getDescriptor().getQualifiedName();
                 $A.test.assertEquals("markup://test:test_Provider_AbstractBasicExtends", cmpImplName, 
@@ -213,7 +213,7 @@
                 cmp.get("c.createComponentExclusively").runDeprecated();
             });
 
-            $A.test.addWaitFor(true, $A.test.allActionsComplete, function(){
+            $A.test.addWaitFor(false, $A.test.isActionPending, function(){
                 var body = cmp.get('v.body');
                 $A.test.assertEquals("markup://loadLevelTest:serverComponent", body[0].getDef().getDescriptor().getQualifiedName());
                 $A.test.assertEquals("markup://loadLevelTest:displayBoolean", body[1].getDef().getDescriptor().getQualifiedName());
@@ -232,10 +232,10 @@
                 cmp.get("c.createComponentAndVerifyAction").runDeprecated();
             });
 
-            $A.test.addWaitFor(true, $A.test.allActionsComplete, function(){
+            $A.test.addWaitFor(false, $A.test.isActionPending, function(){
                 var serverCmp = cmp.get('v.body')[0];
                 serverCmp.find('makeServer').get('e.press').fire();
-                $A.test.addWaitFor(true, $A.test.allActionsComplete, function(){
+                $A.test.addWaitFor(false, $A.test.isActionPending, function(){
                     var innerCmpBody = serverCmp.get('v.body');
                     $A.test.assertEquals("markup://loadLevelTest:serverComponent", innerCmpBody[0].getDef().getDescriptor().getQualifiedName(),
                             "Could not create comopnent from action of newly created component");
@@ -273,7 +273,7 @@
                     config
                 );
             });
-            $A.test.addWaitFor(true, $A.test.allActionsComplete, function(){
+            $A.test.addWaitFor(false, $A.test.isActionPending, function(){
                 $A.test.assertEquals("markup://loadLevelTest:displayNumber", cmpName,
                         "Failed to create component without fully qualified name in config's componenetDef field");
             });
@@ -294,7 +294,7 @@
                     config
                 );
             });
-            $A.test.addWaitFor(true, $A.test.allActionsComplete, function(){
+            $A.test.addWaitFor(false, $A.test.isActionPending, function(){
                 $A.test.assertEquals("markup://loadLevelTest:displayNumber", cmpName,
                         "Failed to create component without fully qualified name as config");
             });
@@ -328,7 +328,7 @@
                     config
                 );
             });
-            $A.test.addWaitFor(true, $A.test.allActionsComplete, function(){
+            $A.test.addWaitFor(false, $A.test.isActionPending, function(){
                 $A.test.assertEquals("markup://loadLevelTest:displayNumber", cmpName,
                         "Alternative config format did not create proper component");
             });
@@ -367,7 +367,7 @@
                 );
             });
 
-            $A.test.addWaitFor(true, $A.test.allActionsComplete, function(){
+            $A.test.addWaitFor(false, $A.test.isActionPending, function(){
                 var textCmp = cmp.get('v.body')[0];
                 //Since this is created under root component and this is the first component from the server
                 $A.test.assertEquals("1:2.2",textCmp.getGlobalId(), "Expected global id to be 1:2");
@@ -397,7 +397,7 @@
                 cmp.get("c.createCmpWithServerDependeciesAndLocalId").runDeprecated();
             });
 
-            $A.test.addWaitFor(true, $A.test.allActionsComplete, function(){
+            $A.test.addWaitFor(false, $A.test.isActionPending, function(){
                 var body = cmp.get('v.body');
                 $A.test.assertEquals(1,body.length);
                 var newCmp = body[0].find("userLocalId");
@@ -415,7 +415,7 @@
                 cmp.get("c.createCmpWithPropertyReferenceServerDeps").runDeprecated();
             });
 
-            $A.test.addWaitFor(true, $A.test.allActionsComplete, function(){
+            $A.test.addWaitFor(false, $A.test.isActionPending, function(){
                 var body = cmp.get('v.body');
                 $A.test.assertEquals(1,body.length);
                 $A.test.assertEquals("markup://loadLevelTest:serverComponent",body[0].getDef().getDescriptor().getQualifiedName());

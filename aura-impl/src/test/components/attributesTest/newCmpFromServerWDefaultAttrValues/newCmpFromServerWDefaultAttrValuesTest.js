@@ -25,7 +25,7 @@
             );
             $A.eventService.finishFiring();
 
-            $A.test.addWaitFor(true, $A.test.allActionsComplete, function(){
+            $A.test.addWaitFor(false, $A.test.isActionPending, function(){
                 var body = cmp.get('v.body');
                 var newCmp = body[0];
                 $A.test.assertEquals("markup://attributesTest:defaultValue", newCmp.getDef().getDescriptor().getQualifiedName(),

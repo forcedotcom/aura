@@ -22,7 +22,7 @@
 			var action = cmp.get('c.attachOneEvent');
 			action.runDeprecated();
 			$A.eventService.finishFiring();
-			$A.test.addWaitFor(true, $A.test.allActionsComplete,
+			$A.test.addWaitFor(false, $A.test.isActionPending,
 							function() {
 								if (action.getState() === "ERROR") {
 									$A.test.fail("Failed to run server action and attach client events.");
@@ -47,7 +47,7 @@
 			var action = cmp.get('c.attachMultipleEvents');
 			action.runDeprecated();
 			$A.eventService.finishFiring();
-			$A.test.addWaitFor(true, $A.test.allActionsComplete,
+			$A.test.addWaitFor(false, $A.test.isActionPending,
 							function() {
 								if (action.getState() === "ERROR") {
 									$A.test.fail("Failed to run server action and attach multiple client events.");
@@ -70,7 +70,7 @@
 			var action = cmp.get('c.attachDupEvent');
 			action.runDeprecated();
 			$A.eventService.finishFiring();
-			$A.test.addWaitFor(true, $A.test.allActionsComplete,
+			$A.test.addWaitFor(false, $A.test.isActionPending,
 							function() {
 								if (action.getState() === "ERROR") {
 									$A.test.fail("Failed to run server action and attach duplicate client events.");
@@ -98,7 +98,7 @@
 			var action = cmp.get('c.attachEventChain');
 			action.runDeprecated();
 			$A.eventService.finishFiring();
-			$A.test.addWaitFor(true, $A.test.allActionsComplete,
+			$A.test.addWaitFor(false, $A.test.isActionPending,
 					function() {
 						if (action.getState() === "ERROR") {
 							$A.test.fail("Failed to run server action and attach duplicate client events.");

@@ -3,8 +3,8 @@
         test: function (cmp) {
 
             $A.test.addWaitFor(
-                true,
-                $A.test.allActionsComplete,
+                false,
+                $A.test.isActionPending,
                 function () {
                     $A.test.assertEquals("Today", cmp.get("v.simplevalue1.value"), "Failed to get Label");
                 }
@@ -15,8 +15,8 @@
     testNonExistingSection: {
         test: function (cmp) {
             $A.test.addWaitFor(
-                true,
-                $A.test.allActionsComplete,
+                false,
+                $A.test.isActionPending,
                 function () {
 
                     var sv2 = cmp.get("v.simplevalue2.value");
@@ -34,8 +34,8 @@
     testNonExistingLabel: {
         test: function (cmp) {
             $A.test.addWaitFor(
-                true,
-                $A.test.allActionsComplete,
+                false,
+                $A.test.isActionPending,
                 function () {
 
                     var sv3 = cmp.get("v.simplevalue3.value");
@@ -68,8 +68,8 @@
                 });
 
                 $A.test.addWaitFor(
-                    true,
-                    $A.test.allActionsComplete,
+                    false,
+                    $A.test.isActionPending,
                     function () {
                         $A.test.assertEquals("Today", tmt.getValue(), "Label should already be context so it should be the return value");
                     }
@@ -90,8 +90,8 @@
             //Wait for all labels to be fetched and GVP to be ready
             function (cmp) {
                 $A.test.addWaitFor(
-                    true,
-                    $A.test.allActionsComplete
+                    false,
+                    $A.test.isActionPending
                 );
             },
             //Section and name missing from label expression
@@ -109,8 +109,8 @@
             //Expression without an invalid section only
             function (cmp) {
                 $A.test.addWaitFor(
-                    true,
-                    $A.test.allActionsComplete,
+                    false,
+                    $A.test.isActionPending,
                     function () {
                         var sv4 = cmp.get("v.simplevalue4.value");
                         $A.test.assertUndefinedOrNull(sv4, "v.simplevalue4.value should be undefined");

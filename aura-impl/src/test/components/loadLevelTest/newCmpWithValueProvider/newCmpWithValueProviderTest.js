@@ -66,7 +66,7 @@
                 cmp.get('c.createCmpByFetchingDefFromServer').runDeprecated();
             });
 
-            $A.test.addWaitFor(true, $A.test.allActionsComplete, function(){
+            $A.test.addWaitFor(false, $A.test.isActionPending, function(){
                 var numberCmp = cmp.get('v.body')[0];
                 $A.test.assertEquals("markup://loadLevelTest:displayNumber", numberCmp.getDef().getDescriptor().getQualifiedName(),
                         "Failed to create new component: markup://loadLevelTest:displayNumber");
@@ -89,7 +89,7 @@
                 cmp.get('c.createCmpWithMapValuePropRefValueFromServer').runDeprecated();
             });
 
-            $A.test.addWaitFor(true, $A.test.allActionsComplete, function(){
+            $A.test.addWaitFor(false, $A.test.isActionPending, function(){
                 var mapCmp = cmp.get('v.body')[0];
                 $A.test.assertEquals("markup://loadLevelTest:displayMap",
                     mapCmp.getDef().getDescriptor().getQualifiedName(),

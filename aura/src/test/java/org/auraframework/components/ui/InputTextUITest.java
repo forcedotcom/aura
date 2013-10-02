@@ -61,16 +61,16 @@ public class InputTextUITest extends WebDriverTestCase {
             BrowserType.IPHONE })
     // Change event not picked up on IOS devices
     public void testUpdateOnAttributeForNonIosAndroidDevice() throws Exception {
-    	doTestUpdateOnAttributeForNonIosAndroidDevice(TEST_CMP);
+        doTestUpdateOnAttributeForNonIosAndroidDevice(TEST_CMP);
     }
-    
+
     @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.SAFARI,
-        BrowserType.IPHONE })
-	// Change event not picked up on IOS devices
-	public void testUpdateOnAttributeWithLabelsForNonIosAndroidDevice() throws Exception {
-    	doTestUpdateOnAttributeForNonIosAndroidDevice(TEST_CMP_WITH_LABELS);
+            BrowserType.IPHONE })
+    // Change event not picked up on IOS devices
+    public void testUpdateOnAttributeWithLabelsForNonIosAndroidDevice() throws Exception {
+        doTestUpdateOnAttributeForNonIosAndroidDevice(TEST_CMP_WITH_LABELS);
     }
-    
+
     public void doTestUpdateOnAttributeForNonIosAndroidDevice(String url) throws Exception {
         open(url);
         WebElement outputDiv = findDomElement(By.id("output"));
@@ -82,14 +82,14 @@ public class InputTextUITest extends WebDriverTestCase {
 
     @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET })
     public void testUpdateOnAttribute() throws Exception {
-    	doTestUpdateOnAttribute(TEST_CMP);
+        doTestUpdateOnAttribute(TEST_CMP);
     }
-    
+
     @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET })
     public void testUpdateOnAttributeWithLabels() throws Exception {
-    	doTestUpdateOnAttribute(TEST_CMP_WITH_LABELS);
+        doTestUpdateOnAttribute(TEST_CMP_WITH_LABELS);
     }
-    
+
     public void doTestUpdateOnAttribute(String url) throws Exception {
         open(url);
         String value = getCurrentModelValue();
@@ -136,14 +136,14 @@ public class InputTextUITest extends WebDriverTestCase {
 
     @TargetBrowsers({ BrowserType.GOOGLECHROME })
     public void testUpdateOnAttributeWithCertainEventsChrome() throws Exception {
-    	doTestUpdateOnAttributeWithCertainEventsChrome(TEST_CMP);
+        doTestUpdateOnAttributeWithCertainEventsChrome(TEST_CMP);
     }
-    
+
     @TargetBrowsers({ BrowserType.GOOGLECHROME })
     public void testUpdateOnAttributeWithLabelsWithCertainEventsChrome() throws Exception {
-    	doTestUpdateOnAttributeWithCertainEventsChrome(TEST_CMP_WITH_LABELS);
+        doTestUpdateOnAttributeWithCertainEventsChrome(TEST_CMP_WITH_LABELS);
     }
-    
+
     @TargetBrowsers({ BrowserType.GOOGLECHROME })
     public void doTestUpdateOnAttributeWithCertainEventsChrome(String url) throws Exception {
         open(url);
@@ -205,12 +205,13 @@ public class InputTextUITest extends WebDriverTestCase {
      * Android driver sends a mousedown event when clearing the text field.
      */
     public void testUpdateOnAttributeWithCertainEventsAllBrowsers() throws Exception {
-    	doTestUpdateOnAttributeWithCertainEventsAllBrowsers(TEST_CMP);
+        doTestUpdateOnAttributeWithCertainEventsAllBrowsers(TEST_CMP);
     }
+
     public void testUpdateOnAttributeWithLabelsWithCertainEventsAllBrowsers() throws Exception {
-    	doTestUpdateOnAttributeWithCertainEventsAllBrowsers(TEST_CMP_WITH_LABELS);
+        doTestUpdateOnAttributeWithCertainEventsAllBrowsers(TEST_CMP_WITH_LABELS);
     }
-    
+
     public void doTestUpdateOnAttributeWithCertainEventsAllBrowsers(String url) throws Exception {
         open(url);
         String value = getCurrentModelValue();
@@ -300,7 +301,9 @@ public class InputTextUITest extends WebDriverTestCase {
         open(TEST_CMP);
         String inputText = "z";
         WebElement input = findDomElement(By.cssSelector(".keyup2"));
-        WebElement outputValue = findDomElement(By.cssSelector(".outputValue"));
+        // SafariDriver has trouble finding nested elements so use this 2 step approach.
+        WebElement div = findDomElement(By.id("inspectBaseEvent"));
+        WebElement outputValue = div.findElement(By.cssSelector(".outputValue"));
         input.click();
         input.sendKeys(inputText);
         try {
@@ -354,7 +357,7 @@ public class InputTextUITest extends WebDriverTestCase {
         String actualText = (String) auraUITestingUtil.getEval(valueExpression);
         assertEquals("Value of Input text shoud be updated", inputText, actualText);
     }
-    
+
     @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET })
     public void testInputTextWithEmptyLabel() throws Exception {
         open(TEST_CMP_WITH_LABELS);

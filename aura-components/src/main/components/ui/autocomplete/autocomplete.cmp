@@ -39,6 +39,7 @@
     <aura:handler name="matchText" action="{!c.matchText}"/>
     
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:set attribute="labelPosition" value="hidden"/>
     
     <aura:if isTrue="{!v.inputType == 'inputTextArea'}">
         <ui:inputTextAreaForAutocomplete aura:id="input" 

@@ -42,12 +42,11 @@
     },
     
     fireInputChangeEvent: function(component, event) {
-        // Hide the list if it is already visible
+    	// Hide the list if it is already visible
         this.hideList(component);
              
-        // Fire input change event    
-        var inputCmp = event.getSource();
-        var value = inputCmp.getElement().value;
+        //handling case when there is another element like label in the markup
+        var value = component.getDef().getHelper().getInputElement(component).value;
         var inputChangeEvt = component.get("e.inputChange");
         if (inputChangeEvt) {
             inputChangeEvt.setParams({

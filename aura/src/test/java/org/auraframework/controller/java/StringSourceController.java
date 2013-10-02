@@ -15,8 +15,6 @@
  */
 package org.auraframework.controller.java;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.util.List;
 
 import org.auraframework.Aura;
@@ -58,17 +56,5 @@ public class StringSourceController {
             stringSourceLoader.removeSource(descriptor);
         }
         return;
-    }
-    /**
-     * Obtain the commit SHA of HEAD
-     * @return
-     * @throws Exception
-     */
-    @AuraEnabled
-    public static String getCommitSHAAndDate()throws Exception{
-    	Process process = Runtime.getRuntime().exec("git log --pretty=format:%h,%cd -n 1 HEAD");
-        BufferedReader stdInput = new BufferedReader(new InputStreamReader(process.getInputStream()));
-        String commitSHAAndDate = stdInput.readLine();
-    	return commitSHAAndDate;
     }
 }

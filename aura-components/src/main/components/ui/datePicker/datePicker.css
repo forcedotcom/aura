@@ -14,15 +14,26 @@
  * limitations under the License.
  */
 div.THIS {
-    background-color: #FFF;
-    border: 1px solid #CCC;
-    border-radius: 5px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, .25);
+    background-color: #FFF;   
+    border-radius: 8px 8px 0 0;
     display: none;
     position: absolute;
-    z-index: 100;
+    z-index: 9999;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .25);
 }
 
+div.THIS.phone {
+    position: fixed;
+    top: 0;
+    width: 100%;
+}
+    
+div.THIS.phone .scroller {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overflow: scroll;
+}
+ 
 @if (IE7){
     div.THIS {
         background-color: #FFF;
@@ -175,26 +186,25 @@ div.THIS {
 }
 
 @media only screen and (max-width: 999px) and (orientation: portrait) {
-    div.THIS {
-        background-color: #FFF;
-        border: 1px solid #CCC;
-        border-radius: 5px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, .25);
-        display: none;
-        position: absolute;
-        width: 100%;
-        z-index: 100;
-    }
-    .THIS .headerBar {
-        background-color: #6495ED;
-        border-radius: 5px 5px 0 0;
-        font-size: 20px;
-        height: 64px;
-    }
-    .THIS .headerBar a {
-        color: #FFFFFE;
-        margin-top: 20px;
-    }
+    .THIS .dateBar .navLink.prevMonth {
+	    background: url('/auraFW/resources/aura/images/arrow-left.png') no-repeat;
+	    background-size: 12px 14px;
+	    background-position: center;        
+	}
+	
+	.THIS .dateBar .navLink.nextMonth {
+	    background: url('/auraFW/resources/aura/images/arrow-right.png') no-repeat;
+	    background-size: 12px 14px;
+	    background-position: center;        
+	}
+		
+	.THIS .dateBar .navLink.prevMonth:hover,
+	.THIS .dateBar .navLink.prevMonth:focus,
+	.THIS .dateBar .navLink.nextMonth:hover,
+	.THIS .dateBar .navLink.nextMonth:focus {
+		background-position: center;
+	}
+    
     .THIS .headerBar .calCancel {
         display: inline-block;
         float: left;

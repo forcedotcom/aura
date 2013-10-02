@@ -27,6 +27,10 @@
         }
     },
     
+    doInit: function(component, event, helper) {
+        component._windowSize = $A.util.getWindowSize();
+    },
+    
     focusDateOnTab: function(component, event, helper) {
         helper.handleESCKey(component, event);
         var keyCode = event.keyCode;

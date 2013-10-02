@@ -23,46 +23,49 @@
     <aura:attribute name="value" type="Date" description="A date corresponding to a calendar day in the format yyyy-mm-dd."/>
     <aura:attribute name="visible" type="Boolean" default="false" description="Indicates if the date picker is displayed. Defaults to false, which hides the date picker."/>
     <aura:registerevent name="selectDate" type="ui:selectDate" description="The event fired when a date is selected."/>
-    <div aura:id="datePicker" class="{!v.class + (v.visible == true ? ' visible' : '')}">
-        <aura:if isTrue="{!v.hasTime}">
-            <div class="headerBar">
-                <a aura:id="cancel" onclick="{!c.cancel}" class="calCancel" href="javascript:void(0);">Cancel</a>
-                <a aura:id="set" onclick="{!c.set}" class="calSet" href="javascript:void(0);">Set</a>
-            </div>
-        </aura:if>
-        <div class="dateBar" ontouchstart="{!c.handleTouchStart}" ontouchmove="{!c.handleTouchMove}" ontouchend="{!c.handleTouchEnd}">
-            <div class="prevLinks">
-                <aura:if isTrue="{!!$Browser.isPhone &amp;&amp; !$Browser.isTablet}">
-                <a aura:id="prevYear" class="navLink prevYear" title="Go to previous year" onclick="{!c.goToPrevYear}" onkeydown="{!c.closeOnTab}">
-                    <span class="assistiveText">Go to previous year</span>
-                </a>
-                </aura:if>
-                <a aura:id="prevMonth" class="navLink prevMonth" title="Go to previous month" onclick="{!c.goToPrevMonth}" onkeydown="{!c.handleKeydown}">
-                    <span class="assistiveText">Go to previous month</span>
-                </a>
-            </div>
-            <div class="nextLinks">
-                <a aura:id="nextMonth" class="navLink nextMonth" title="Go to next month" onclick="{!c.goToNextMonth}" onkeydown="{!c.handleKeydown}">
-                    <span class="assistiveText">Go to next month</span>
-                </a>
-                <aura:if isTrue="{!!$Browser.isPhone &amp;&amp; !$Browser.isTablet}">
-                <a aura:id="nextYear" class="navLink nextYear" title="Go to next year" onclick="{!c.goToNextYear}" onkeydown="{!c.focusDateOnTab}">
-                    <span class="assistiveText">Go to next year</span>
-                </a>
-                </aura:if>
-            </div>
-            <h4 aria-live="assertive" aria-atomic="true" class="monthYear" aura:id="calTitle"/>
-        </div>
-        <ui:datePickerGrid aura:id="grid" hasTime ="{!v.hasTime}" weekDays="{!m.weekdayLabels}" hide="{!c.hide}" selectDate="{!c.selectDate}" updateCalendarTitle="{!c.updateCalendarTitle}"/>
-        <aura:if isTrue="{!v.hasTime}">
-            <div class="timeBar">
-                <ui:timePicker aura:id="time" is24HourFormat="{!v.is24HourFormat}"/>
-            </div>
-            <aura:set attribute="else">
-                <div class="buttonBar">
-                    <a aura:id="today" onclick="{!c.selectToday}" onkeydown="{!c.handleTabToday}" class="calToday" href="javascript:void(0);">Today</a>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <div aura:id="datePicker" class="{!v.class + (v.visible == true ? ' visible' : '') + ($Browser.isPhone == true ? ' phone' : '')}">
+        <div class="scroller" aura:id="scroller">
+            <aura:if isTrue="{!v.hasTime}">
+                <div class="headerBar">
+                    <a aura:id="cancel" onclick="{!c.cancel}" class="calCancel button" href="javascript:void(0);">Cancel</a>
+                    <a aura:id="set" onclick="{!c.set}" class="calSet button" href="javascript:void(0);">Set</a>
                 </div>
-            </aura:set>
-        </aura:if>
-    </div>
+            </aura:if>
+            <div class="dateBar" ontouchstart="{!c.handleTouchStart}" ontouchmove="{!c.handleTouchMove}" ontouchend="{!c.handleTouchEnd}">
+                <div class="prevLinks">
+                    <aura:if isTrue="{!!$Browser.isPhone &amp;&amp; !$Browser.isTablet}">
+                        <a aura:id="prevYear" class="navLink prevYear" title="Go to previous year" onclick="{!c.goToPrevYear}" onkeydown="{!c.closeOnTab}">
+                            <span class="assistiveText">Go to previous year</span>
+                        </a>
+                    </aura:if>
+                    <a aura:id="prevMonth" class="navLink prevMonth" title="Go to previous month" onclick="{!c.goToPrevMonth}" onkeydown="{!c.handleKeydown}">
+                        <span class="assistiveText">Go to previous month</span>
+                    </a>
+                </div>
+                <div class="nextLinks">
+                    <a aura:id="nextMonth" class="navLink nextMonth" title="Go to next month" onclick="{!c.goToNextMonth}" onkeydown="{!c.handleKeydown}">
+                        <span class="assistiveText">Go to next month</span>
+                    </a>
+                    <aura:if isTrue="{!!$Browser.isPhone &amp;&amp; !$Browser.isTablet}">
+                        <a aura:id="nextYear" class="navLink nextYear" title="Go to next year" onclick="{!c.goToNextYear}" onkeydown="{!c.focusDateOnTab}">
+                            <span class="assistiveText">Go to next year</span>
+                        </a>
+                    </aura:if>
+                </div>
+                <h1 aria-live="assertive" aria-atomic="true" class="monthYear" aura:id="calTitle"/>
+            </div>
+            <ui:datePickerGrid aura:id="grid" hasTime ="{!v.hasTime}" weekDays="{!m.weekdayLabels}" hide="{!c.hide}" selectDate="{!c.selectDate}" updateCalendarTitle="{!c.updateCalendarTitle}"/>
+            <aura:if isTrue="{!v.hasTime}">
+                <div class="timeBar">
+                    <ui:timePicker aura:id="time" is24HourFormat="{!v.is24HourFormat}"/>
+                </div>
+                <aura:set attribute="else">
+                    <div class="buttonBar">
+                        <a aura:id="today" onclick="{!c.selectToday}" onkeydown="{!c.handleTabToday}" class="calToday" href="javascript:void(0);">Today</a>
+                    </div>
+                </aura:set>
+            </aura:if>
+        </div><!-- scroller -->
+    </div><!-- datePicker -->
 </aura:component>

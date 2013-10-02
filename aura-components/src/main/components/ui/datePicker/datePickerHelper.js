@@ -248,20 +248,47 @@
         return ret;
     },
     
+    handleWinResize: function(component, e) {
+        if (!component || !component.isValid()) {
+            return;
+        }
+        var elem = component.getElement();
+        if (elem) {
+            var origWinHeight = component._windowSize.height;
+            var currWinHeight = $A.util.getWindowSize().height;
+            var elemRect = elem.getBoundingClientRect();
+            if (currWinHeight < origWinHeight - 20) { // soft keyboard up
+                elem.style.top = currWinHeight - origWinHeight + "px";
+            } else {
+                elem.style.top = 0 + "px";
+            }
+        }
+    },
+    
     position: function(component) {
         var divCmp = component.find("datePicker");
         var elem = divCmp ? divCmp.getElement() : null;
         var visible = component.get("v.visible");
+        var viewPort = $A.util.getWindowSize();
         if (elem && visible) {
             var isPhone = $A.get("$Browser.isPhone");
             if (isPhone === true) {
                 this.attachToDocumentBody(component);
-                var top = (document.documentElement && document.documentElement.scrollTop) || document.body.scrollTop;
-                elem.style.top = top + "px";    
+                //var top = (document.documentElement && document.documentElement.scrollTop) || document.body.scrollTop;
+                //elem.style.top = top + "px";
+                var scrollerDivCmp = component.find("scroller");
+                var scrollerElem = scrollerDivCmp ? scrollerDivCmp.getElement() : null;
+                if (scrollerElem) { // Set scroller div height to make it scrollable.
+                    var isAndroid = $A.getGlobalValueProviders().get("$Browser.isAndroid");
+                    if (isAndroid == true) {
+                        scrollerElem.style.height = component._windowSize.height + "px";
+                    } else {
+                        scrollerElem.style.height = viewPort.height + "px";
+                    }
+                }
             } else {
                 elem.style.top = "auto";
                 var elemRect = elem.getBoundingClientRect();
-                var viewPort = $A.util.getWindowSize();
                 if (elemRect.bottom > viewPort.height) { // no enough space below
                     if (elemRect.height < elemRect.top) { // move above input field
                         elem.style.top = 0 - elemRect.height + "px";

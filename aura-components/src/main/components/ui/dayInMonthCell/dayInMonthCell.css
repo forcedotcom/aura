@@ -36,8 +36,8 @@ a.THIS.desktop:active {
 }
 
 a.THIS.prevMonth, a.THIS.nextMonth {
-    background-color: #FFF;
-    color: #969899;
+    background-color: #FAFAFA;
+    color: #696e71;
 }
 
 a.THIS.todayDate {

@@ -697,7 +697,8 @@ public class LocalizationServiceImpl implements LocalizationService {
         }
         DecimalFormat df = (DecimalFormat) NumberFormat.getCurrencyInstance(locale);
         df.setParseBigDecimal(true);
-        return ((com.ibm.icu.math.BigDecimal) AuraNumberFormat.parseStrict(currency, df)).toBigDecimal();
+        // TODO: use parseStrict when ICU4J is updated >= 51.2
+        return ((com.ibm.icu.math.BigDecimal) AuraNumberFormat.parse(currency, df, false)).toBigDecimal();
     }
 
     @Override

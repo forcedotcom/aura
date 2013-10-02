@@ -71,12 +71,12 @@ public class LayoutItemsUITest extends WebDriverTestCase {
         verifyExpectedResultsForLayout1();
 
         findDomElement(removeLayoutDone).click();
-        getDriver().navigate().back();
+        auraUITestingUtil.getEval("window.history.back()");
         findDomElement(layoutDone);
         verifyExpectedResultsForInitialLayout();
 
         findDomElement(removeLayoutDone).click();
-        getDriver().navigate().forward();
+        auraUITestingUtil.getEval("window.history.forward()");
         findDomElement(layoutDone);
         verifyExpectedResultsForLayout1();
     }

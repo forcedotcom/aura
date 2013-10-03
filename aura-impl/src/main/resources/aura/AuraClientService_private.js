@@ -385,11 +385,10 @@ var priv = {
                     }
                 }
             }
-            
+            $A.endMark("Completed Action Callback - XHR " + collector.getNum());
             priv.fireDoneWaiting();
         }, stackName);
 
-        $A.endMark("Completed Action Callback - XHR " + collector.getNum());
     },
 
     /**
@@ -464,6 +463,27 @@ var priv = {
         if (actionsToSend.length > 0) {
             collector.setNum($A.getContext().incrementNum());
 
+            var markDescription = undefined;
+            // #if {"modes" : ["PTEST"]}
+            markDescription = ": [";
+            for (var m = 0; m < actionsToSend.length; m++) {
+                if (actionsToSend[m].def) {
+                    markDescription += "'" + actionsToSend[m].def.name
+                } else {
+                    markDescription += "'undefined";
+                }
+                if (actionsToSend[m].background) {
+                    markDescription += "<BG>'";
+                } else {
+                    markDescription += "'";
+                }
+                if (m < actionsToSend.length - 1) {
+                    markDescription += ",";
+                }
+            }
+            markDescription += "]";
+            // #end
+
             // clientService.requestQueue reference is mutable
             flightCounter.send();
             var requestConfig = {
@@ -484,7 +504,8 @@ var priv = {
                     ,
                     "beaconData" : $A.getBeaconData()
                 // #end
-                }
+                },
+                "markDescription" : markDescription
             };
             $A.endMark("Action Group " + collector.getCollectorId() + " enqueued");
 
@@ -754,6 +775,8 @@ var priv = {
     },
 
     handleAppcacheObsolete : function(e) {
+        //debug for flapper
+        var date; var currentTime;
     	if(window.localStorage) {
         	date = new Date();
             currentTime = date.getTime();

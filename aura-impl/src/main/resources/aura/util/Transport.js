@@ -89,15 +89,15 @@ var Transport = function() {
                 if (request["readyState"] == 4 && processed === false) {
                     processed = true;
                     var aura_num = config["params"]["aura.num"];
-                    $A.endMark("Received Response - XHR " + aura_num);
+                    $A.endMark("Received Response - XHR " + aura_num + (config["markDescription"] || ""));
                     config["callback"].call(config["scope"] || window, request);
                     $A.endMark("Callback Complete - XHR " + aura_num);
                 }
             };
             var aura_num = config["params"]["aura.num"];
-            $A.mark("Received Response - XHR " + aura_num);
-            $A.mark("Callback Complete - XHR " + aura_num);
+            $A.mark("Received Response - XHR " + aura_num + (config["markDescription"] || ""));
             $A.mark("Completed Action Callback - XHR " + aura_num);
+            $A.mark("Callback Complete - XHR " + aura_num);
             if (qs && method === "POST") {
                 request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=ISO-8859-13');
                 request.send(qs);

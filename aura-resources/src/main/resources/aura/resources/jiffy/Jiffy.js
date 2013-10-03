@@ -827,7 +827,7 @@ BOOMR_start = new Date().getTime();
                     if (impl.timers.hasOwnProperty(t_name)) {
                         timer = impl.timers[t_name];
                         // only if the timer has been ended
-                        if(timer.end && timer.start) {
+                        if(timer && timer.end && timer.start) {
                             if (typeof timer.delta !== 'number') {
                                 timer.delta = timer.end - timer.start;
                             }
@@ -2226,6 +2226,13 @@ IPerf.prototype.endTransaction;
  */
 IPerf.prototype.updateTransaction;
 /**
+ * @param {!string} oldName The id used to identify the old timer name.
+ * @param {!string} newName The id used to identify the new timer name.
+ * @return {!IPerf}
+ * @override
+ */
+IPerf.prototype.updateMarkName;
+/**
  * Gets the stats related to previous transaction
  */
 IPerf.prototype.getStats;
@@ -2651,6 +2658,17 @@ IPerf.prototype.measure;
          */
         endTransaction : function(tName) {
             return BOOMR.plugins.RT.endTransaction(tName);
+        },
+
+        /**
+         * SFDC implementation This method is used to the update the name of the timer
+         *
+         * @return {!Object} for chaining methods
+         * @this {Object}
+         * @expose
+         */
+        updateMarkName : function(oldName, newName) {
+            return BOOMR.plugins.RT.updateTimer(oldName, newName);
         },
 
         /**

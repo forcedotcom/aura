@@ -29,7 +29,8 @@ var AuraRenderingService = function AuraRenderingService(){
         rerenderDirty : function(stackName){
             if (priv.needsCleaning) {
                 var num = aura.getContext().incrementRender();
-                $A.mark("Rerendering: " + num);
+                var initialMarkName = "Rerendering-" + num;
+                $A.mark(initialMarkName);
                 $A.mark("Fired aura:doneRendering event");
                 priv.needsCleaning = false;
 
@@ -79,18 +80,34 @@ var AuraRenderingService = function AuraRenderingService(){
                 }
                 //#end                     
                 
-                $A.endMark("Rerendering: " + num);
+                $A.endMark(initialMarkName);
                 $A.get("e.aura:doneRendering").fire();
                 $A.endMark("Fired aura:doneRendering event");
+                
+                // update the mark info after the fact to avoid unnecessary hits early to get cmp info
+                // #if {"modes" : ["PTEST"]}
+                var markDescription = initialMarkName + ": [";
+                for (var m = 0; m < cmps.length; m++) {
+                    var rerenderedCmpDef = cmps[m].getDef();
+                    if (rerenderedCmpDef) {
+                        markDescription += "'" + rerenderedCmpDef.descriptor.getQualifiedName() + "'";
+                    }
+                    if (m < cmps.length - 1) {
+                        markDescription += ",";
+                    }
+                }
+                markDescription += "]";
+                $A.updateMarkName(initialMarkName, markDescription);
+                // #end
             }
         },
 
         /**
          * Renders a component by calling its renderer.
          * @param {Component} component
-         * 				The component to be rendered
+         *                 The component to be rendered
          * @param {Component} parent
-         * 				Optional. The component's parent
+         *                 Optional. The component's parent
          * @memberOf AuraRenderingService
          * @public
          */
@@ -118,10 +135,10 @@ var AuraRenderingService = function AuraRenderingService(){
                 }
 
                 if (cmp.isValid()) {
-	                var renderer = cmp.getRenderer();
-	                var elements = renderer.def.render(renderer.renderable) || [];
-	
-	                priv.finishRender(cmp, elements, ret, parent);
+                    var renderer = cmp.getRenderer();
+                    var elements = renderer.def.render(renderer.renderable) || [];
+    
+                    priv.finishRender(cmp, elements, ret, parent);
                 }
             }
 
@@ -133,7 +150,7 @@ var AuraRenderingService = function AuraRenderingService(){
         /**
          * The default behavior after a component is rendered.
          * @param {Component} component
-         * 				The component that has finished rendering
+         *                 The component that has finished rendering
          * @memberOf AuraRenderingService
          * @public
          */
@@ -153,11 +170,11 @@ var AuraRenderingService = function AuraRenderingService(){
          * The default rerenderer for components affected by an event.
          * Call superRerender() from your customized function to chain the rerendering to the components in the body attribute.
          * @param {Component} component
-         * 				The component to be rerendered
+         *                 The component to be rerendered
          * @param {Component} referenceNode
-         * 				The reference node for the component
+         *                 The reference node for the component
          * @param {Component} appendChild
-         * 				The child component
+         *                 The child component
          * @memberOf AuraRenderingService
          * @public
          */
@@ -175,9 +192,9 @@ var AuraRenderingService = function AuraRenderingService(){
             for (var i = 0; i < array.length; i++){
                 var cmp = array[i];
                 if (cmp.isValid()) {
-	                var renderer = cmp.getRenderer();
-	                renderer.def.rerender(renderer.renderable);
-	                priv.cleanComponent(cmp.getGlobalId());
+                    var renderer = cmp.getRenderer();
+                    renderer.def.rerender(renderer.renderable);
+                    priv.cleanComponent(cmp.getGlobalId());
                 }
             }
         },
@@ -186,7 +203,7 @@ var AuraRenderingService = function AuraRenderingService(){
          * The default unrenderer that deletes all the DOM nodes rendered by a component's render() function.
          * Call superUnrender() from your customized function to modify the default behavior.
          * @param {Component} component
-         * 				The component to be unrendered
+         *                 The component to be unrendered
          * @memberOf AuraRenderingService
          * @public
          */

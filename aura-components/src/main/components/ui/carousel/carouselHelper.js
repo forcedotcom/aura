@@ -425,21 +425,25 @@
 		if (curPageCmp && curPageCmp.isRendered()) {
 			var prePageCmp = this.getPageComponentFromIndex(cmp, prevSelectedPage);
 			this.setSelectedPage(cmp, pageIndex);
-
+			
+			me.firePageSelectedEventToPageIndicator(cmp, curPageCmp, pageIndex);
+			
 			cmp.getAttributes().setValue('priv_currentPage', pageIndex);			
 			me.firePageSelectedEventToPage(prePageCmp, pageIndex);
 			me.firePageSelectedEventToPage(curPageCmp, pageIndex);
-			
-			var e = cmp.get('e.loadPage');
 			var pageModel = me.getPageModelFromIndex(cmp, pageIndex);
 			
-			e.setParams({pageComponent: curPageCmp, pageModel: pageModel, pageIndex: pageIndex});    			
-			e.fire();	
-
-			me.firePageSelectedEventToPageIndicator(cmp, curPageCmp, pageIndex);
-			me.delayHideAllUnselectedPages(cmp);
-			//Fire pageSelected to let any sub-components that are handling it know the change has been done. 
-			cmp.get("e.pageSelected").setParams({pageComponent: curPageCmp, "pageModel" : pageModel, pageIndex: pageIndex}).fire();			
+			setTimeout(function() {
+				if (cmp.isValid()) {
+					var e = cmp.get('e.loadPage');				
+					e.setParams({pageComponent: curPageCmp, pageModel: pageModel, pageIndex: pageIndex});    			
+					e.fire();
+					//Fire pageSelected to let any sub-components that are handling it know the change has been done. 
+					cmp.get("e.pageSelected").setParams({pageComponent: curPageCmp, "pageModel" : pageModel, pageIndex: pageIndex}).fire();
+				}
+			}, 0);
+			
+			me.delayHideAllUnselectedPages(cmp);						
 		}
 	},
 	

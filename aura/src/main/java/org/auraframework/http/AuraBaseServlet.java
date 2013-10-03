@@ -106,10 +106,10 @@ public abstract class AuraBaseServlet extends HttpServlet {
 
     /**
      * Tell the browser to not cache.
-     *
-     * This sets several headers to try to ensure that the page will not be cached.
-     * Not sure if last modified matters -goliver
-     *
+     * 
+     * This sets several headers to try to ensure that the page will not be cached. Not sure if last modified matters
+     * -goliver
+     * 
      * @param response the HTTP response to which we will add headers.
      */
     public static void setNoCache(HttpServletResponse response) {
@@ -122,11 +122,10 @@ public abstract class AuraBaseServlet extends HttpServlet {
 
     /**
      * Set a long cache timeout.
-     *
-     * This sets several headers to try to ensure that the page will be cached for a reasonable
-     * length of time. Of note is the last-modified header, which is set to a day ago so that
-     * browsers consider it to be safe.
-     *
+     * 
+     * This sets several headers to try to ensure that the page will be cached for a reasonable length of time. Of note
+     * is the last-modified header, which is set to a day ago so that browsers consider it to be safe.
+     * 
      * @param response the HTTP response to which we will add headers.
      */
     public static void setLongCache(HttpServletResponse response) {
@@ -139,11 +138,10 @@ public abstract class AuraBaseServlet extends HttpServlet {
 
     /**
      * Set a 'short' cache timeout.
-     *
-     * This sets several headers to try to ensure that the page will be cached for a shortish
-     * length of time. Of note is the last-modified header, which is set to a day ago so that
-     * browsers consider it to be safe.
-     *
+     * 
+     * This sets several headers to try to ensure that the page will be cached for a shortish length of time. Of note is
+     * the last-modified header, which is set to a day ago so that browsers consider it to be safe.
+     * 
      * @param response the HTTP response to which we will add headers.
      */
     public static void setShortCache(HttpServletResponse response) {
@@ -180,7 +178,16 @@ public abstract class AuraBaseServlet extends HttpServlet {
     protected void send404(HttpServletRequest request, HttpServletResponse response) throws ServletException,
             IOException {
         response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-        response.getWriter().println("404 Not Found");
+        response.getWriter().println("404 Not Found"
+                + "<!-- Extra text so IE will display our custom 404 page -->"
+                + "<!--                                                   -->"
+                + "<!--                                                   -->"
+                + "<!--                                                   -->"
+                + "<!--                                                   -->"
+                + "<!--                                                   -->"
+                + "<!--                                                   -->"
+                + "<!--                                                   -->"
+                + "<!--                                                   -->");
         Aura.getContextService().endContext();
     }
 
@@ -250,8 +257,9 @@ public abstract class AuraBaseServlet extends HttpServlet {
                 if (format != Format.JSON) {
                     send404(request, response);
                     if (!isProductionMode(context.getMode())) {
-                    	//Preserve new lines and tabs in the stacktrace since this is directly being written on to the page
-                    	denyMessage = "<pre>"+denyMessage+"</pre>";
+                        // Preserve new lines and tabs in the stacktrace since this is directly being written on to the
+                        // page
+                        denyMessage = "<pre>" + denyMessage + "</pre>";
                         response.getWriter().println(denyMessage);
                     }
                     return;
@@ -509,9 +517,9 @@ public abstract class AuraBaseServlet extends HttpServlet {
 
         String html5ShivURL = config.getHTML5ShivURL();
         if (html5ShivURL != null) {
-        	ret.add(html5ShivURL);
+            ret.add(html5ShivURL);
         }
-        
+
         switch (mode) {
         case PTEST:
             ret.add(config.getJiffyJSURL());
@@ -522,7 +530,7 @@ public abstract class AuraBaseServlet extends HttpServlet {
             break;
         default:
         }
-        
+
         ret.add(config.getMomentJSURL());
         ret.addAll(config.getWalltimeJSURLs());
 

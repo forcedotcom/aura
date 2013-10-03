@@ -81,10 +81,11 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
 
     private void verifyGetAccessDenied(DefType defType, String attrs, String contextStr, String expectedReason)
             throws Exception {
-    	verifyGetAccessDenied(defType, attrs, contextStr, expectedReason, null);
+        verifyGetAccessDenied(defType, attrs, contextStr, expectedReason, null);
     }
-    
-    private void verifyGetAccessDenied(DefType defType, String attrs, String contextStr, String expectedReason, String extendedReason)
+
+    private void verifyGetAccessDenied(DefType defType, String attrs, String contextStr, String expectedReason,
+            String extendedReason)
             throws Exception {
         HttpGet get = buildGetRequest(defType, attrs, "", contextStr);
         HttpResponse httpResponse = perform(get);
@@ -93,14 +94,14 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
         get.releaseConnection();
 
         assertEquals("Unexpected http status code", HttpStatus.SC_NOT_FOUND, statusCode);
-        if (response.startsWith("404 Not Found\n")) {
+        if (response.startsWith("404 Not Found")) {
             // standalone aura case
             if ((expectedReason != null) && (!response.contains(expectedReason))) {
                 fail(String.format("Response body does not contain expected reason.  Expected <%s> in:%n%s",
                         expectedReason, response));
             }
-            if((extendedReason != null) && (!response.contains(extendedReason))){
-            	fail(String.format("Response body does not contain expected extended reason.  Expected <%s> in:%n%s",
+            if ((extendedReason != null) && (!response.contains(extendedReason))) {
+                fail(String.format("Response body does not contain expected extended reason.  Expected <%s> in:%n%s",
                         extendedReason, response));
             }
         } else if (!response.contains("URL No Longer Exists")) {
@@ -158,7 +159,8 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
     public void testGetDevAppWithThrows() throws Exception {
         verifyGetAccessDenied(DefType.APPLICATION,
                 "securityProvider='org.auraframework.components.security.SecurityProviderThrowsThrowable'",
-                "{'mode':'DEV'}", "Access Denied: cause = Unable to process your request", "java.lang.RuntimeException: generated intentionally");
+                "{'mode':'DEV'}", "Access Denied: cause = Unable to process your request",
+                "java.lang.RuntimeException: generated intentionally");
     }
 
     /**
@@ -171,7 +173,8 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
                 "<aura:application securityProvider='org.auraframework.components.security.SecurityProviderThrowsThrowable'>%s</aura:application>");
         verifyGetAccessDenied(DefType.COMPONENT, "",
                 String.format("{'mode':'DEV','app':'%s'}", appDesc.getQualifiedName()),
-                "Access Denied: cause = Unable to process your request", "java.lang.RuntimeException: generated intentionally");
+                "Access Denied: cause = Unable to process your request",
+                "java.lang.RuntimeException: generated intentionally");
     }
 
     /**
@@ -198,7 +201,7 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
 
         assertEquals("Unexpected http status code", HttpStatus.SC_NOT_FOUND, statusCode);
         assertTrue("Unexpected response body",
-                response.equals("404 Not Found\n") || response.contains("URL No Longer Exists"));
+                response.startsWith("404 Not Found") || response.contains("URL No Longer Exists"));
     }
 
     /**
@@ -220,7 +223,7 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
 
         assertEquals("Unexpected http status code", HttpStatus.SC_NOT_FOUND, statusCode);
         assertTrue("Unexpected response body",
-                response.equals("404 Not Found\n") || response.contains("URL No Longer Exists"));
+                response.startsWith("404 Not Found") || response.contains("URL No Longer Exists"));
     }
 
     /**
@@ -422,15 +425,15 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
         Map<String, Object> json = null;
 
         try {
-            json = (Map<String, Object>)new JsonReader()
+            json = (Map<String, Object>) new JsonReader()
                     .read(response.substring(AuraBaseServlet.CSRF_PROTECT.length()));
         } catch (Exception e) {
             fail("unable to parse " + response + " " + e.getMessage());
         }
 
         assertEquals("Unexpected state", "SUCCESS",
-                ((Map<String, Object>)((List<Object>)json.get("actions")).get(0)).get("state"));
-        Map<String, Object> context = (Map<String, Object>)json.get("context");
+                ((Map<String, Object>) ((List<Object>) json.get("actions")).get(0)).get("state"));
+        Map<String, Object> context = (Map<String, Object>) json.get("context");
         assertEquals("Unexpected mode", mode.name(), context.get("mode"));
         if (appDescriptor != null) {
             assertEquals("Unexpected app", appDescriptor, context.get("app"));
@@ -447,8 +450,8 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
 
         assertEquals("Unexpected http status code", HttpStatus.SC_OK, statusCode);
         assertTrue("Expected error string", response.endsWith("/*ERROR*/"));
-        Map<String, Object> json = (Map<String, Object>)new JsonReader().read("/*" + response);
-        String desc = ((Map<String, Object>)json.get("event")).get("descriptor").toString();
+        Map<String, Object> json = (Map<String, Object>) new JsonReader().read("/*" + response);
+        String desc = ((Map<String, Object>) json.get("event")).get("descriptor").toString();
         assertEquals("Unexpected event", "markup://aura:noAccess", desc);
     }
 
@@ -545,8 +548,8 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
 
         assertEquals("Unexpected http status code", HttpStatus.SC_OK, statusCode);
         assertTrue("Expected error string", response.endsWith("/*ERROR*/"));
-        Map<String, Object> json = (Map<String, Object>)new JsonReader().read("/*" + response);
-        String desc = ((Map<String, Object>)json.get("event")).get("descriptor").toString();
+        Map<String, Object> json = (Map<String, Object>) new JsonReader().read("/*" + response);
+        String desc = ((Map<String, Object>) json.get("event")).get("descriptor").toString();
         assertEquals("Unexpected event", "markup://aura:noAccess", desc);
     }
 

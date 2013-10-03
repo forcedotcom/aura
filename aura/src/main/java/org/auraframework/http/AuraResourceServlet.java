@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.concurrent.ConcurrentHashMap;
+
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -162,17 +163,17 @@ public class AuraResourceServlet extends AuraBaseServlet {
         } catch (QuickFixException qfe) {
             comp = Aura.getDefinitionService().getDefinition("auradev:quickFixException", ComponentDef.class);
         }
-        
+
         for (String ns : context.getPreloads()) {
             filters.add(new DescriptorFilter(ns, "*"));
         }
-        
+
         if (comp != null && comp.getDependencies() != null) {
             for (DependencyDef dd : comp.getDependencies()) {
                 filters.add(dd.getDependency());
             }
         }
-        
+
         return filters;
     }
 
@@ -494,8 +495,8 @@ public class AuraResourceServlet extends AuraBaseServlet {
         }
 
         /**
-         * style map includes frequency (calculated by its number of descendants). We sort by this frequency to
-         * order the CSS by ancestors first then alphabetical.
+         * style map includes frequency (calculated by its number of descendants). We sort by this frequency to order
+         * the CSS by ancestors first then alphabetical.
          * 
          * Comparing DefDescriptor is cleaner than comparing Definition
          */
@@ -517,7 +518,7 @@ public class AuraResourceServlet extends AuraBaseServlet {
 
     /**
      * Returns map of styles as key and frequency (based on number of descendants) as value
-     *
+     * 
      * @param dependencies definition map
      * @return sorted map
      * @throws QuickFixException
@@ -525,6 +526,10 @@ public class AuraResourceServlet extends AuraBaseServlet {
     private static Map<DefDescriptor<?>, MutableInt> createStyleFrequencyMap(
             Set<DefDescriptor<?>> dependencies)
             throws QuickFixException {
+        if (dependencies == null) {
+            return null;
+        }
+
         Map<DefDescriptor<?>, MutableInt> frequencyMap = Maps.newHashMap();
         for (DefDescriptor<?> defDescriptor : dependencies) {
             // for each component we want to calculate its frequency
@@ -537,14 +542,14 @@ public class AuraResourceServlet extends AuraBaseServlet {
     }
 
     /**
-     * Adds frequency to particular style based on their component's descendants. All other types just get 1 as its frequency.
-     * Adds component's frequency to its style to make ordering CSS easier.
-     *
+     * Adds frequency to particular style based on their component's descendants. All other types just get 1 as its
+     * frequency. Adds component's frequency to its style to make ordering CSS easier.
+     * 
      * @param frequencyMap dependencies frequency map
      * @param descriptor descriptor to add
      */
     private static void addStyleFrequency(Map<DefDescriptor<?>, MutableInt> frequencyMap,
-                                          DefDescriptor<?> descriptor) throws QuickFixException {
+            DefDescriptor<?> descriptor) throws QuickFixException {
         ComponentDef def = (ComponentDef) descriptor.getDef();
         DefDescriptor<StyleDef> styleDefDescriptor = def.getStyleDescriptor();
         if (styleDefDescriptor != null) {
@@ -557,7 +562,7 @@ public class AuraResourceServlet extends AuraBaseServlet {
             }
         }
 
-        DefDescriptor<ComponentDef> superDescriptor =  def.getExtendsDescriptor();
+        DefDescriptor<ComponentDef> superDescriptor = def.getExtendsDescriptor();
         // only when extends component is not the base aura:​component which is the default extends
         if (superDescriptor != null && !superDescriptor.equals(def.getDefaultExtendsDescriptor())) {
             // give supers addition freq to ensure supers are before descendants when sorted
@@ -616,17 +621,17 @@ public class AuraResourceServlet extends AuraBaseServlet {
             keyBuilder.append(dm);
             keyBuilder.append(",");
         }
-        
+
         // Swizzle in mode awareness
         keyBuilder.append(mode.name().toLowerCase());
-        
+
         key = keyBuilder.toString();
 
         Reference<String> reference = definitionCache.get(key);
         if (reference != null) {
             ret = reference.get();
         }
-        
+
         if (ret != null) {
             out.append(ret);
             return;

@@ -76,8 +76,9 @@ div.THIS select.ampm {
 	div.THIS input.input-minutes {
     	height: 40px;
     	width: 40px;
-    	font-size: 32px;
-    	padding: 7px;		
+    	font-size: 30px;
+    	padding: 7px;
+    	box-sizing: content-box;		
     }
     
     div.THIS select.ampm {

@@ -204,10 +204,9 @@ div.THIS.phone .scroller {
     line-height: 24px !important;
 }
 
-.THIS .buttonBar {
-    height: 23px;
-    line-height: 13px;
+.THIS .buttonBar {    
     text-align: center;
+    padding: 7px;
 }
 
 .THIS .buttonBar .calToday {
@@ -232,10 +231,6 @@ div.THIS.phone .scroller {
 }
 
 @media only screen and (max-width: 999px) and (orientation: portrait) {
-    div.THIS {
-        width: 100%;
-    }
-    
     .THIS .dateBar .navLink.prevMonth {
 	    background: url('/auraFW/resources/aura/images/arrow-left.png') no-repeat;
 	    background-size: 12px 14px;

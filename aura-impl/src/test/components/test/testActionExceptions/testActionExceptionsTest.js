@@ -38,7 +38,7 @@
         attributes : { throwableClass:"java.lang.Error",
                        throwableCause:"java.lang.RuntimeException" },
         test: function(cmp){
-            this.checkUnHandledExceptionResponse(cmp, "ERROR", "java://org.auraframework.impl.java.controller.JavaTestController: " + 
+        	this.checkUnHandledExceptionResponse(cmp, "ERROR", "java://org.auraframework.impl.java.controller.JavaTestController: " + 
                                                 "java.lang.Error: java.lang.RuntimeException");
         }
     },
@@ -125,16 +125,18 @@
                 var stack = action.error[0].stack;
                 $A.test.assertEquals(expectedState, action.state, "Unexpected state: ");
                 if(expectedMessage){
-                	expectedMessage = "Unable to process your request\n\n"+
-            							"org.auraframework.throwable.AuraExecutionException: "+
-            							expectedMessage;
-                    $A.test.assertTrue(msg.indexOf(expectedMessage)==0, "Unexpected error message: ");
+                    $A.test.assertNotNull(
+                    		msg.match(/^An internal server error has occurred\nError ID:.*\n\norg\.auraframework\.throwable\.AuraExecutionException:/)
+                    		||
+                    		msg.match(/^Unable to process your request\n\norg\.auraframework\.throwable\.AuraExecutionException:/)
+                    );
+                	$A.test.assertTrue(msg.indexOf(expectedMessage)!= -1, 
+                			"Expected error message not seen: Expected {"+expectedMessage+"} but saw {"+msg+"}");
                 }
                 if(expectedStack){
                 	$A.test.assertTrue(stack.indexOf(expectedStack) === 0, "Unexpected stack: " + stack);
                 } else {
-                    $A.test.assertTrue(stack.indexOf("org.auraframework.throwable.AuraUnhandledException: "
-                        + expectedMessage) === 0, "Unexpected stack: " + stack);
+                    $A.test.assertTrue(stack.indexOf("org.auraframework.throwable.AuraUnhandledException: ") === 0, "Unexpected stack: " + stack);
                 }
             }
         );

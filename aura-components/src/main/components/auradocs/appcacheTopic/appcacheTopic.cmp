@@ -28,7 +28,7 @@
             We recommend disabling AppCache during initial development while your app's resources are still changing. Enable AppCache when you are finished developing the app and before you start using it in production to see whether AppCache improves the app's response time.
     </p>
     <auradocs:info>AppCache can be useful if you're developing apps for mobile devices, which sometimes have very limited browser cache.
-      Apps built for desktop clients may not benefit from the AppCache.</auradocs:info>
+      Apps built for desktop clients may not benefit from the AppCache. Aura supports AppCache for WebKit-based browsers such as Chrome and Safari.</auradocs:info>
 
     <h3>Loading Resources with AppCache</h3>
      <p><ui:image src="/auraFW/resources/aura/images/appcache.png" alt="AppCache and Aura" /></p>

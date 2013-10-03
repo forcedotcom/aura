@@ -27,6 +27,7 @@ import java.util.TimeZone;
 import org.auraframework.Aura;
 import org.auraframework.service.LocalizationService;
 import org.auraframework.service.testdata.LocalizationServiceTestData;
+import org.auraframework.test.UnitTestCase;
 import org.auraframework.util.number.AuraNumberFormat;
 
 import com.ibm.icu.text.NumberFormat;
@@ -34,7 +35,7 @@ import com.ibm.icu.text.NumberFormat;
 /**
  * Tests for LocalizationServiceImpl.
  */
-public class LocalizationServiceImplTest extends AuraImplTestCase {
+public class LocalizationServiceImplTest extends UnitTestCase {
 
     public LocalizationService localizationService = null;
 
@@ -404,17 +405,6 @@ public class LocalizationServiceImplTest extends AuraImplTestCase {
                 } catch (Exception e) {
                     // Expected
                 }
-            }
-        }
-
-        // Currency in USD to parser with UK locale
-        {
-            String inputEN = "$1";
-            try {
-                localizationService.parseCurrency(inputEN, Locale.UK);
-                fail("# Exception not thrown for currency:" + inputEN);
-            } catch (Exception e) {
-                assertTrue("# Incorrect exception type!", ((e instanceof ParseException)));
             }
         }
 

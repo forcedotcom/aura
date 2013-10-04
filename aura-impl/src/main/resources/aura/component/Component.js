@@ -148,7 +148,7 @@ Component.prototype.deIndex = function(localId, globalId){
     // Unfortunately, there are some bizarre loops with deIndex and destroy.
     // For the moment, we don't enforce that this is a valid component until
     // we can track down _why_ it is being called on already destroyed components
-    if (!this.isValid()) {
+    if (!this.priv) {
         return null;
     }
 
@@ -465,6 +465,8 @@ Component.prototype.destroy = function(async){
             }
         }
         if (async) {
+        	this._scheduledForAsyncDestruction = true;
+        	
             for (key in this.priv.elements){
                 var element = this.priv.elements[key];
                 if (element && element.style) {
@@ -908,7 +910,7 @@ Component.prototype.fire = function(name) {
  * @public
  */
 Component.prototype.isValid = function(){
-    return !$A.util.isUndefined(this.priv);
+    return !this._scheduledForAsyncDestruction && this.priv;
 };
 
 /**

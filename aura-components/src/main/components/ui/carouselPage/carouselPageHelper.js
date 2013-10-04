@@ -67,7 +67,7 @@
 		var pageContainer = cmp.find('pageContainer').getValue('v.body');
 		
 		if (!pageContainer.isEmpty()) {
-			pageContainer.destroy();
+			pageContainer.destroy(true);
         }
 		
 		if (pageBody) {

@@ -101,16 +101,15 @@
         }
     },
     assertErrorMessage : function(expectedMsg) {
-
         var messageDiv = $A.util.getElement("auraErrorMessage");
         $A.test.assertNotNull(messageDiv, "Aura error message box did is not present after $A.error()");
         $A.test.assertEquals(1, messageDiv.childNodes.length);
         $A.test.assertEquals("#text", messageDiv.childNodes[0].nodeName);
         var actualMsg = $A.test.getAuraErrorMessage();
-        // Older IE versions put line breaks as \r\n or \r. Replace with just \n for consistency.
-       
-        actualMsg = actualMsg.replace("\n", "");
-        expectedMsg = expectedMsg.replace("\n", "");
+
+        // Get rid of newlines for browser compatability, specifically IE.
+        actualMsg = actualMsg.replace(/\r\n|\n/g, '');
+        expectedMsg = expectedMsg.replace(/\r\n|\n/g, '');
         $A.test.assertStartsWith(expectedMsg, actualMsg, "$A.error failed to display proper error text. Expecting <"
             + expectedMsg + "> but got <" + actualMsg + ">");
     }

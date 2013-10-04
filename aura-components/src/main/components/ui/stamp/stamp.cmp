@@ -19,5 +19,8 @@
     <aura:attribute name="severity" type="String" description="The severity with which to decorate this stamp.  Accepted values: success, warning, important, info, inverse"/>
     <aura:attribute name="title" type="String" description="The title text for the stamp."/>
     <aura:attribute name="onclick" type="Aura.Action" description="The controller method that runs when the stamp is clicked."/>
-    <span class="{!'stamp-'+v.severity+' '+v.class}" title="{!v.title}" onclick="{!v.onclick}">{!v.body}</span>
+    
+    <a aura:id="uiStamp" title="{!v.title}" class="{!'stamp-'+v.severity+' '+v.class}" href="javascript:void(0);" onclick="{!v.onclick}">
+        <span class="assistiveText">{!v.body}</span>
+    </a>
 </aura:component>

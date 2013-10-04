@@ -182,16 +182,16 @@ NumberFormat.prototype.parseError = function(s) {
 NumberFormat.prototype.checkForSpecialChar = function(c) {
     var mult;
     switch (c) {
-    case "¤":
+    case "\u00a4":
         this.hasCurrency = true;
         break;
     case "%":
         mult = 2;
         break;
-    case "‰":
+    case "\u2030":
         mult = 3;
         break;
-    case "‱":
+    case "\u2031":
         mult = 4;
         break;
     }
@@ -218,7 +218,7 @@ NumberFormat.prototype.replaceCurrencies = function() {
 
 NumberFormat.prototype.replaceCurrency = function(str) {
     if (str) {
-        return str.replace(/¤¤/g, this.symbols["currencyCode"]).replace(/¤/g, this.symbols["currency"]);
+        return str.replace(/\u00a4\u00a4/g, this.symbols["currencyCode"]).replace(/\u00a4/g, this.symbols["currency"]);
     }
     return str;
 };

@@ -608,19 +608,19 @@ $A.ns.Util.prototype.on = (function() {
             	element["handlerCache"] = handlerCache = {};
             }
             
-        	var handlers = handlerCache[eventName];
-        	if (handlers) {
-        		for (var n = 0; n < handlers.length; n++) {
-        			if (handlers[n] === handler) {
-            			// Do not wire up duplicate handlers
-            			return;
-        			}
-        		}
-        		
-    			handlers.push(handler);
-        	} else {
-        		handlerCache[eventName] = [handler];
-        	}
+            var handlers = handlerCache[eventName];
+            if (handlers) {
+                for (var n = 0; n < handlers.length; n++) {
+                    if (handlers[n] === handler) {
+                        // Do not wire up duplicate handlers
+                        return;
+                    }
+                }
+                
+                handlers.push(handler);
+            } else {
+                handlerCache[eventName] = [handler];
+            }
         	
             if (timeout) {
                 handler = $A.util.createTimeoutCallback(handler, timeout);
@@ -1049,10 +1049,9 @@ $A.ns.Util.prototype.destroyAsync = function(cmp) {
     this.trashedComponentQueue.push(cmp);
 
     if (!this.componentGCPending) {
-        this.componentGCPending = true;
-
         var mode = $A.getContext().getMode();
         if (mode !== "SELENIUM" && mode !== "SELENIUMDEBUG") {
+            this.componentGCPending = true;
             // Async when not testing to not confuse component stats verification tests
             var that = this;
             setTimeout(function() { that.emptyComponentTrash(); }, 3000);

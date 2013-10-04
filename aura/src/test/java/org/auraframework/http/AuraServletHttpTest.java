@@ -206,16 +206,16 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         HttpResponse response = perform(get);
 
         assertEquals(HttpStatus.SC_OK, getStatusCode(response));
-        String responseText = getResponseBody(response); 
-        assertTrue( responseText.startsWith(
-        				String.format("%s*/{\n  \"message\":\"Unable to process your request",
+        String responseText = getResponseBody(response);
+        assertTrue(responseText.startsWith(
+                String.format("%s*/{\n  \"message\":\"Unable to process your request",
                         AuraBaseServlet.CSRF_PROTECT))
-                        ||
-                    responseText.startsWith(
-                    	String.format("%s*/{\n  \"message\":\"An internal server error has occurred",
-                        AuraBaseServlet.CSRF_PROTECT))    
-                    );
-        assertTrue(responseText.contains("org.auraframework.throwable.AuraRuntimeException: QualifiedName is required for descriptors"));
+                ||
+                responseText.startsWith(
+                        String.format("%s*/{\n  \"message\":\"An internal server error has occurred",
+                                AuraBaseServlet.CSRF_PROTECT)));
+        assertTrue(responseText
+                .contains("org.auraframework.throwable.AuraRuntimeException: QualifiedName is required for descriptors"));
         get.releaseConnection();
     }
 
@@ -369,7 +369,9 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         HttpResponse httpResponse = perform(get);
         assertEquals(HttpStatus.SC_NOT_FOUND, getStatusCode(httpResponse));
         String response = getResponseBody(httpResponse);
-        assertEquals("Expected simple error page but got: " + response, "404 Not Found\ndescriptor is null\n", response);
+        assertTrue("Expected 404 error page but got: " + response, response.startsWith("404 Not Found"));
+        assertTrue("Expected null descriptor error message but got: " + response,
+                response.contains("descriptor is null"));
         get.releaseConnection();
     }
 }

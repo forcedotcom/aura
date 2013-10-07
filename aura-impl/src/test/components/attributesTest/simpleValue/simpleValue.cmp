@@ -20,3 +20,5 @@
     <aura:attribute name="intAttribute" type="Integer"/>
     <ui:button aura:id="button" press="{!c.increment}" label="{!v.intAttribute ? v.intAttribute : 0}"/>
 </aura:component>
+<!-- Warning: this component is used in ComponentQueryLanguageUITest. If you change this component you'll need to
+     modify the test accordingly -->

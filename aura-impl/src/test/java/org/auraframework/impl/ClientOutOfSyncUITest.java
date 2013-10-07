@@ -86,6 +86,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         auraUITestingUtil.getRawEval("document._waitingForReload = true;");
         auraUITestingUtil.findDomElement(By.cssSelector("button")).click();
         waitForCondition("return !document._waitingForReload");
+        auraUITestingUtil.waitForDocumentReady();
         waitForAuraFrameworkReady();
     }
 

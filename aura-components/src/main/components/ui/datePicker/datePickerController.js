@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 ({
+    cancel: function(component, event, helper) {
+        component.setValue("v.visible", false);
+    },
+    
     closeOnTab: function(component, event, helper) {
         helper.handleESCKey(component, event);
         var keyCode = event.keyCode;
@@ -34,12 +38,7 @@
     },
 	
 	goToPrevYear: function(component, event, helper) {
-	    var grid = component.find("grid");
-	    var e = grid.get("e.updateCalendar");
-	    if (e) {
-	        e.setParams({monthChange: 0, yearChange: -1, setFocus: false});
-	        e.fire();
-	    }
+	    helper.goToPrevYear(component);
 	},
 	
 	goToPrevMonth: function(component, event, helper) {
@@ -61,12 +60,7 @@
     },
     
     goToNextYear: function(component, event, helper) {
-        var grid = component.find("grid");
-        var e = grid.get("e.updateCalendar");
-        if (e) {
-            e.setParams({monthChange: 0, yearChange: 1, setFocus: false});
-            e.fire();
-        }
+        helper.goToNextYear(component);
     },
     
     handleKeydown: function(component, event, helper) {
@@ -83,6 +77,34 @@
                 component.setValue("v.visible", false);
             }
         }
+    },
+    
+    handleTouchEnd: function(component, event, helper) {
+        var touch;
+        var touchIdFound = false;
+        for (var i = 0; i < event.changedTouches.length; i++) {
+            touch = event.changedTouches[i];
+            if (touch.identifier === component._onTouchStartId) {
+                touchIdFound = true;
+                break;
+            }
+        }
+        if (touchIdFound) {
+            var startY = component._onTouchStartY;
+            var endY = touch.clientY;
+            if ((endY - startY) > 5) { // swipe down
+                helper.goToNextYear(component);
+            } else if ((startY - endY) > 5) { // swipe up
+                helper.goToPrevYear(component);
+            }
+        }
+    },
+    
+    handleTouchStart: function(component, event, helper) {
+        var touch = event.changedTouches[0];
+        // record the ID to ensure it's the same finger on a multi-touch device
+        component._onTouchStartId = touch.identifier;
+        component._onTouchStartY = touch.clientY;
     },
     
     hide: function(component, event, helper) {
@@ -102,6 +124,31 @@
         var selectDateEvent = component.getEvent("selectDate");
         selectDateEvent.setParams({"value": mDate.format("YYYY-MM-DD")});
         selectDateEvent.fire();
+        component.setValue("v.visible", false);
+    },
+    
+    set: function(component, event, helper) {
+        var setDateTimeEvent = component.getEvent("selectDate");
+        if (setDateTimeEvent) {
+            // Get date value
+            var gridCmp = component.find("grid");
+            if (!gridCmp) {
+                return;
+            }
+            var date = gridCmp.get("v.year") + "-" + (gridCmp.get("v.month") + 1) + "-" + gridCmp.get("v.date");
+            
+            // Get time value
+            var timeCmp = component.find("time");
+            if (!timeCmp || (timeCmp.getValue("v.isValid").getBooleanValue() === false)) {
+                return;
+            }
+            setDateTimeEvent.setParams({
+                "value": date,
+                "hours": timeCmp.get("v.hours"),
+                "minutes": timeCmp.get("v.minutes")
+            });
+            setDateTimeEvent.fire();
+        }
         component.setValue("v.visible", false);
     },
 	

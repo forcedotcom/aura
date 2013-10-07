@@ -23,6 +23,8 @@ var AuraLocalizationService = function AuraLocalizationService() {
     var numberFormat, percentFormat, currencyFormat;
     // moment.js and walltime-js must be loaded before we can use date/time related APIs
     var localizationService = {
+        ZERO : "0",
+        
         cache : {
             format : {},
             langLocale : {}
@@ -332,6 +334,18 @@ var AuraLocalizationService = function AuraLocalizationService() {
         },
         
         /**
+         * Get the date time related labels (month name, weekday name, am/pm etc.).
+         * @return {Object} the localized label set.
+         * @memberOf AuraLocalizationService
+         * @public
+         */
+        getLocalizedDateTimeLabels : function() {
+            var langLocale = $A.getGlobalValueProviders().get("$Locale.langLocale");
+            var l = localizationService.getNormalizedLangLocale(langLocale);
+            return moment["langData"](l);
+        },
+        
+        /**
          * Gets the number of milliseconds in a duration.
          * @param {Duration} d The duration object returned by localizationService.duration
          * @return {Number} The number of milliseconds in d.
@@ -384,6 +398,32 @@ var AuraLocalizationService = function AuraLocalizationService() {
          */
         getYearsInDuration : function(d) {
             return d["years"]();
+        },
+        
+        /**
+         * An utility function to check if a datetime pattern string uses a 24-hour or period (12 hour with am/pm) time view.
+         * @param {String} datetime pattern string
+         * @return {Boolean} Returns true if it uses period time view.
+         * @memberOf AuraLocalizationService
+         * @public
+         */
+        isPeriodTimeView : function(pattern) {
+            if (!pattern || typeof pattern  != 'string') {
+                return false;
+            }
+            var shouldEscape = false;
+            for (var i = 0; i < pattern.length; i++) {
+                var c = pattern.charAt(i);
+                if (c === 'h' && shouldEscape === false) {
+                    return true;
+                }
+                if (c === '[') {
+                    shouldEscape = true;
+                } else if (c === ']') {
+                    shouldEscape = false;
+                }
+            }
+            return false;
         },
         
         /**
@@ -524,6 +564,95 @@ var AuraLocalizationService = function AuraLocalizationService() {
             } else {
                 return date;
             }
+        },
+        
+        /**
+         * Translate the localized digit string to a string with Arabic digits if there is any.
+         * @param {String} input a string with localized digits.
+         * @return {String} a string with Arabic digits.
+         * @memberOf AuraLocalizationService
+         * @public
+         */
+        translateFromLocalizedDigits : function(input) {
+            if (!input) {
+                return input;
+            }
+            
+            var localizedZero = $A.get("$Locale.zero");
+            var zeroCharCodeOffset = localizedZero.charCodeAt(0) - this.ZERO.charCodeAt(0);
+            if (!zeroCharCodeOffset) {
+                return input;
+            }
+            
+            var charArray = input.split("");
+            for (var i = 0; i < charArray.length; i++) {
+                var charCode = charArray[i].charCodeAt(0);
+                if (charCode <= localizedZero.charCodeAt(0) + 9 && charCode >= localizedZero.charCodeAt(0)) {
+                    charArray[i] = String.fromCharCode(charCode - zeroCharCodeOffset);
+                }
+            }
+            return charArray.join("");
+        },
+        
+        /**
+         * Translate the input date from other calendar system (for example, Buddhist calendar) to Gregorian calendar 
+         * based on the locale.
+         * @param {Date} date a Date Object.
+         * @return {Date} an updated Date object.
+         * @memberOf AuraLocalizationService
+         * @public
+         */
+        translateFromOtherCalendar : function(date) {
+            var userLocaleLang = $A.getGlobalValueProviders().get("$Locale.userLocaleLang");
+            var userLocaleCountry = $A.getGlobalValueProviders().get("$Locale.userLocaleCountry");
+            if ('th' === userLocaleLang && 'TH' === userLocaleCountry) { // Buddhist year
+                date.setFullYear(date.getFullYear() - 543);
+            }
+            return date;
+        },
+        
+        /**
+         * Translate the input string to a string with localized digits (different from Arabic) if there is any.
+         * @param {String} input a string with Arabic digits.
+         * @return {String} a string with localized digits.
+         * @memberOf AuraLocalizationService
+         * @public
+         */
+        translateToLocalizedDigits : function(input) {
+            if (!input) {
+                return input;
+            }
+            
+            var localizedZero = $A.get("$Locale.zero");
+            var zeroCharCodeOffset = localizedZero.charCodeAt(0) - this.ZERO.charCodeAt(0);
+            if (!zeroCharCodeOffset) {
+                return input;
+            }
+            
+            var charArray = input.split("");
+            for (var i = 0; i < charArray.length; i++) {
+                var charCode = charArray[i].charCodeAt(0);
+                if (charCode <= "9".charCodeAt(0) && charCode >= "0".charCodeAt(0)) {
+                    charArray[i] = String.fromCharCode(charCode + zeroCharCodeOffset);
+                }
+            }
+            return charArray.join("");
+        },
+        
+        /**
+         * Translate the input date to a date in other calendar system, for example, Buddhist calendar based on the locale.
+         * @param {Date} date a Date Object.
+         * @return {Date} an updated Date object.
+         * @memberOf AuraLocalizationService
+         * @public
+         */
+        translateToOtherCalendar : function(date) {
+            var userLocaleLang = $A.getGlobalValueProviders().get("$Locale.userLocaleLang");
+            var userLocaleCountry = $A.getGlobalValueProviders().get("$Locale.userLocaleCountry");
+            if ('th' === userLocaleLang && 'TH' === userLocaleCountry) { // Buddhist year
+                date.setFullYear(date.getFullYear() + 543);
+            }
+            return date;
         },
         
         /**
@@ -754,7 +883,7 @@ var AuraLocalizationService = function AuraLocalizationService() {
          * @private
          */
         doublePad : function(n) {         	            
-        	return n < 10 ? '00' + n : n  < 100 ? '0' + n : n;
+            return n < 10 ? '00' + n : n  < 100 ? '0' + n : n;
         }
     };
     //#include aura.AuraLocalizationService_export

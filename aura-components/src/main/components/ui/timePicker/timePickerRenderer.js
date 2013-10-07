@@ -13,24 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.THIS {
-    padding: 10px;
-}
-
-.THIS .calGrid {
-    border-collapse: collapse;
-}
-
-.THIS .calGrid th {
-    color: #888;
-    font-size: 11px;
-    padding-bottom: 10px;
-    text-align: center;
-}
-
-@media only screen and (max-width: 999px) and (orientation: portrait) {
-    .THIS .calGrid {
-        border-collapse: collapse;
-        width: 100%;
+({
+    render: function(component, helper) {
+        helper.renderTime(component);
+        return this.superRender(); 
+    },
+    
+    rerender: function(component, helper) {
+        if (component.getValue("v.isValid").getBooleanValue() === true) {
+            helper.renderTime(component);
+        }
+        return this.superRerender();   
     }
-}
+})

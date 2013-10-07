@@ -1,0 +1,36 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component implements="ui:visible" description="A time picker which can be used in datePicker to select both date and time">
+    <aura:attribute name="hours" type="Integer" default="12" description="The hour value."/>
+    <aura:attribute name="is24HourFormat" type="Boolean" default="true" description="Indicate if it is set to 24 hour or 12-hour with am/pm."/>
+    <aura:attribute name="isValid" type="Boolean" default="true" description="Indicate if the valid hour and minute values are inputed."/>
+    <aura:attribute name="minutes" type="Integer" default="0" description="The miniue value."/>
+    <aura:attribute name="visible" type="Boolean" default="false" description="Indicates if this time picker is displayed. Defaults to false, which hides this time picker."/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <div><ui:inputText aura:id="hours" class="input" change="{!c.updateHours}"/></div>:
+    <div><ui:inputText aura:id="minutes" class="input" change="{!c.updateMinutes}"/></div>
+    <aura:renderIf isTrue="{!v.is24HourFormat != true}">
+        <ui:inputSelect aura:id="ampm" change="{!c.updateAmpm}">
+            <ui:inputSelectOption aura:id="amOpt" label="AM" text="am"/>
+            <ui:inputSelectOption aura:id="pmOpt" label="PM" text="pm"/>
+        </ui:inputSelect>
+    </aura:renderIf>
+    <ui:inputDefaultError aura:id="hourError" class="hide"/>
+    <ui:inputDefaultError aura:id="minuteError" class="hide"/>
+</aura:component>

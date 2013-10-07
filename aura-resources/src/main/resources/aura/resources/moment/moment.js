@@ -722,6 +722,9 @@
         var inp = (input + '').toLowerCase();
         var localizedAmpm = moment.langData(lang)._ampm;
         if (localizedAmpm && localizedAmpm.pm) {
+            if ("fi" === lang && (inp.charAt(inp.length - 1) !== ".")) { // am/pm in Finnish should be ap./ip., but the "." is incorrectly stripped off from "input".
+                inp = inp + ".";
+            }
             return inp === localizedAmpm.pm ? 'pm' : 'am';
         }
         return inp;
@@ -2340,6 +2343,17 @@ moment.lang('fi', {
         lll : "Do MMM YYYY, [klo] LT",
         llll : "ddd, Do MMM YYYY, [klo] LT"
     },
+    ampm: { //SFDC
+        am: "ap.",
+        pm: "ip."
+    },
+    meridiem : function (hour, minute, isLower) { //SFDC
+        if (hour < 12) {
+            return "ap.";
+        } else {
+            return "ip.";
+        }
+    },
     calendar : {
         sameDay : '[tänään] [klo] LT',
         nextDay : '[huomenna] [klo] LT',
@@ -3771,6 +3785,17 @@ moment.lang('sv', {
         LL : "D MMMM YYYY",
         LLL : "D MMMM YYYY LT",
         LLLL : "dddd D MMMM YYYY LT"
+    },
+    ampm: { //SFDC
+        am: "fm",
+        pm: "em"
+    },
+    meridiem : function (hour, minute, isLower) { //SFDC
+        if (hour < 12) {
+            return "fm";
+        } else {
+            return "em";
+        }
     },
     calendar : {
         sameDay: '[Idag klockan] LT',

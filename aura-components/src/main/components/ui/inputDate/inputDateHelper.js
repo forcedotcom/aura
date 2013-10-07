@@ -23,6 +23,7 @@
                 var format = component.get("v.format");
                 var langLocale = component.get("v.langLocale");
                 try {
+                    d = $A.localizationService.translateToOtherCalendar(d);
                     displayValue = $A.localizationService.formatDateUTC(d, format, langLocale);
                 } catch (e) {
                     displayValue = e.message;
@@ -30,7 +31,7 @@
             }
         }
         var elem = component.find("inputText").getElement();
-        elem.value = displayValue ? displayValue : '';
+        elem.value = displayValue ? $A.localizationService.translateToLocalizedDigits(displayValue) : '';
     },
     
     displayDatePicker: function(component) {
@@ -51,15 +52,17 @@
      *
      */
     doUpdate : function(component, value) {
-        var ret = value;
+        var v = $A.localizationService.translateFromLocalizedDigits(value);
+        var ret = v;
         if (value) {
             var format = component.get("v.format");
             if (!format) { // use default format
                 format = $A.getGlobalValueProviders().get("$Locale.dateformat");
             }
             var langLocale = component.get("v.langLocale");
-            var d = $A.localizationService.parseDateTimeUTC(value, format, langLocale);
+            var d = $A.localizationService.parseDateTimeUTC(v, format, langLocale);
             if (d) {
+                d = $A.localizationService.translateFromOtherCalendar(d);
                 ret = $A.localizationService.formatDateUTC(d, "YYYY-MM-DD");
             }
         }

@@ -193,7 +193,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
         if (!"GMT".equals(locale)) {
             urls.add(String.format("%s/auraFW/resources/%s/walltime-js/olson/walltime-data_%s.js?aura.fwuid=%s", contextPath, nonce, locale, nonce));
         }
-        
+
         urls.add(String.format("%s/auraFW/resources/%s/walltime-js/walltime.js?aura.fwuid=%s", contextPath, nonce, nonce));
         return urls;
     }

@@ -21,11 +21,17 @@
         
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
     
-    <input aura:id="inputText" id="{!v.domId}" class="{!v.class}" type="text" placeholder="{!v.placeholder}"/>
-    <aura:if isTrue="{!v.displayDatePicker}">
+    <aura:if isTrue="{!$Browser.isPhone || $Browser.isTablet}">
+        <input aura:id="inputText" id="{!v.domId}" class="{!v.class}" type="text" placeholder="{!v.placeholder}" readonly="true" onclick="{!c.click}"/>
+        <aura:set attribute="else">
+            <input aura:id="inputText" id="{!v.domId}" class="{!v.class}" type="text" placeholder="{!v.placeholder}"/>
+        </aura:set>
+    </aura:if>
+    
+    <aura:if isTrue="{!v.displayDatePicker &amp;&amp; !$Browser.isPhone &amp;&amp; !$Browser.isTablet}">
         <a aura:id="datePickerOpener" class="datePicker-openIcon" aria-haspopup="true" onclick="{!c.openDatePicker}">
             <span class="assistiveText">Date Picker</span>
         </a>
-        <ui:datePicker aura:id="datePicker" selectDate="{!c.setValue}"/>
     </aura:if>
+    <ui:datePicker aura:id="datePicker" selectDate="{!c.setValue}"/>
 </aura:component>

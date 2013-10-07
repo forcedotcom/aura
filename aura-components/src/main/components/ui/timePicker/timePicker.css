@@ -13,24 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.THIS {
-    padding: 10px;
+/*
+div.THIS {
+    display: inline;
+    margin:auto;
+    width:80%;
+}
+*/
+div.THIS {
+    display: inline-block;
 }
 
-.THIS .calGrid {
-    border-collapse: collapse;
+div.THIS input { 
+    font-size: 16px;
+    height: 2em;
+    margin: 5px;
+    width: 2em;
 }
 
-.THIS .calGrid th {
-    color: #888;
-    font-size: 11px;
-    padding-bottom: 10px;
-    text-align: center;
+div.THIS input.error {
+    border-color: red;
+    background-color: rgba(255, 0, 0, .025);
 }
 
 @media only screen and (max-width: 999px) and (orientation: portrait) {
-    .THIS .calGrid {
-        border-collapse: collapse;
-        width: 100%;
+    div.THIS input { 
+        font-size: 20px;
+        height: 50px;
+        margin: 10px;
+        width: 50px;
     }
 }

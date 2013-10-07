@@ -57,3 +57,17 @@ a.THIS.selectedDate {
     outline:1px solid #568391;
     text-shadow:0 1px 0 rgba(0, 0, 0, .75);
 }
+
+/* Smartphones (portrait) ----------- */
+@media only screen and (max-width: 999px) and (orientation: portrait) {
+    a.THIS {
+        background-color: #FFF;
+        color: #666;
+        display: block;
+        font-size: 16px;
+        height: 80px;
+        line-height: 80px;
+        text-align: center;
+        width: 100%;
+    }
+}

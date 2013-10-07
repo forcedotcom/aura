@@ -148,6 +148,24 @@
         return component._onClickStartFunc;
     },
     
+    goToNextYear: function(component) {
+        var grid = component.find("grid");
+        var e = grid.get("e.updateCalendar");
+        if (e) {
+            e.setParams({monthChange: 0, yearChange: 1, setFocus: false});
+            e.fire();
+        }
+    },
+    
+    goToPrevYear: function(component) {
+	    var grid = component.find("grid");
+	    var e = grid.get("e.updateCalendar");
+	    if (e) {
+	        e.setParams({monthChange: 0, yearChange: -1, setFocus: false});
+	        e.fire();
+	    }
+	},
+    
     handleESCKey: function(component, event) {
         var keyCode = event.keyCode;
         if (keyCode == 27) { // Esc key is pressed
@@ -181,7 +199,11 @@
     },
     
     localizeToday: function(component) {
-        var todayElem = component.find("today").getElement();
+        var todayCmp = component.find("today");
+        if (!todayCmp) {
+            return;
+        }
+        var todayElem = todayCmp.getElement();
         var todayLabel = component.get("m.labelForToday");
         if (!todayLabel) {
             todayLabel = "Today";
@@ -220,6 +242,28 @@
         return ret;
     },
     
+    position: function(component) {
+        var divCmp = component.find("datePicker");
+        var elem = divCmp ? divCmp.getElement() : null;
+        if (elem) {
+            elem.style.top = "auto";
+            var visible = component.get("v.visible");
+            if (visible) {
+                var elemRect = elem.getBoundingClientRect();
+                var viewPort = $A.util.getWindowSize();
+                if (elemRect.bottom > viewPort.height) { // no enough space below
+                    if (elemRect.height < elemRect.top) { // move above input field
+                        elem.style.top = 0 - elemRect.height + "px";
+                    } else { // no enough space above either. Put it in the middle of viewport
+                        elem.style.top = 0 - elemRect.top + "px";
+                    }
+                } else {
+                    elem.style.top = "auto";
+                }
+            }
+        }
+    },
+    
     setGridInitialValue: function(component) {
         var initialDate = new Date();
         var value = component.get("v.value");
@@ -233,6 +277,17 @@
             grid.setValue("v.date", initialDate.getDate());
             grid.setValue("v.month", initialDate.getMonth());
             grid.setValue("v.year", initialDate.getFullYear());
+        }
+        
+        // set initial value to time picker if hasTime is true
+        var hasTime = component.getValue("v.hasTime").getBooleanValue();
+        if (hasTime) {
+            var timePickerCmp = component.find("time");
+            if (timePickerCmp) {
+                timePickerCmp.setValue("v.hours", component.get("v.hours"));
+                timePickerCmp.setValue("v.is24HourFormat", component.get("v.is24HourFormat"));
+                timePickerCmp.setValue("v.minutes", component.get("v.minutes"));
+            }
         }
     },
     

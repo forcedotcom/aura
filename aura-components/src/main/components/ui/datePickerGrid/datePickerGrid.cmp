@@ -18,6 +18,7 @@
 <aura:component extensible="true" description="Provides the monthly grid view in a ui:datePicker component.">
     <aura:attribute name="class" type="String" description="A CSS style to be attached to the component."/>
     <aura:attribute name="date" type="Integer" description="The currently highlighted date."/>
+    <aura:attribute name="hasTime" type="Boolean" default="false" description="Indicate if the parent datePicker component supports time picker."/>
     <aura:attribute name="month" type="Integer" description="The currently rendered month."/>
     <aura:attribute name="year" type="Integer" description="The currently rendered year."/>
     <aura:attribute name="selectedDate" type="Date" description="The selected date."/>

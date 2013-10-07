@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.uiInputDefaultError {
+.THIS {
     color: red;
     font-size: 0.75em;
 }
 
-.uiInputDefaultError.hide {
+.THIS.hide {
     display: none;
 }

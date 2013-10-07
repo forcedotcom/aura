@@ -27,7 +27,9 @@ import java.util.TimeZone;
 import org.auraframework.Aura;
 import org.auraframework.service.LocalizationService;
 import org.auraframework.service.testdata.LocalizationServiceTestData;
+import org.auraframework.test.AuraTestCase;
 import org.auraframework.test.UnitTestCase;
+import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.number.AuraNumberFormat;
 
 import com.ibm.icu.text.NumberFormat;
@@ -35,7 +37,7 @@ import com.ibm.icu.text.NumberFormat;
 /**
  * Tests for LocalizationServiceImpl.
  */
-public class LocalizationServiceImplTest extends UnitTestCase {
+public class LocalizationServiceImplTest extends AuraTestCase {
 
     public LocalizationService localizationService = null;
 
@@ -97,7 +99,11 @@ public class LocalizationServiceImplTest extends UnitTestCase {
     // TODO(W-1482880): Change how Exceptions are handled after bug is fixed. We
     // should just be catching the Exception
     // type we expect and letting the others be thrown. This will either be
-    // ParseExceptions or IllegalArgumentExceptions
+    // ParseExceptions from AuraNumberFormat.parse(...) or 
+    // IllegalArgumentExceptions from DateServiceImpl.getDateTimeStyleConverter(...) 
+    // or DateServiceImpl.JodaDateConverter.parse(...)
+    // same thing apply to any call of LocalizationService.parseDate(...), parseTime(...), 
+    // parseDateTime(...), formatDate(...), formatTime(...), formatDateTime(...)
     public void testDateTimeParserExceptions() throws IllegalArgumentException {
         // Test invalid date strings in format DateFormat.MEDIUM
         {
@@ -160,6 +166,7 @@ public class LocalizationServiceImplTest extends UnitTestCase {
         }
     }
 
+    // TODO(W-1482880): same as testDateTimeParserExceptions()
     public void testParseTimeParserExceptions() throws ParseException {
         // Test invalid time strings
         {
@@ -169,6 +176,7 @@ public class LocalizationServiceImplTest extends UnitTestCase {
                     fail("No Exception thrown when trying to parse \'" + t + "\' into Time");
                 } catch (Exception e) {
                     // Expected
+                	assertTrue("# Incorrect exception type!", ((e instanceof IllegalArgumentException)));
                 }
             }
         }
@@ -186,153 +194,125 @@ public class LocalizationServiceImplTest extends UnitTestCase {
                     localizationService.parseDateTimeToCalendar(null, null, null, -1, -1));
             assertNull("parseCurrency(null) did not return 'null'", localizationService.parseCurrency(null));
 
-            // parseInt(null)
             try {
                 localizationService.parseInt(null);
                 fail("parseInt(null) did not throw an exception");
             } catch (Exception e) {
-                assertTrue("parseInt(null) threw an incorrect Exception",
-                        e.getMessage().contains("Parameter 'number' was null"));
+            	checkExceptionContains(e, ParseException.class, "Parameter 'number' was null");
             }
 
-            // parseLong(null)
             try {
                 localizationService.parseLong(null);
                 fail("parseLong(null) did not throw an exception");
             } catch (Exception e) {
-                assertTrue("parseLong(null) threw an incorrect Exception",
-                        e.getMessage().contains("Parameter 'number' was null"));
+            	checkExceptionContains(e, ParseException.class, "Parameter 'number' was null");
             }
 
-            // parseFloat(null)
             try {
                 localizationService.parseFloat(null);
                 fail("parseFloat(null) did not throw an exception");
             } catch (Exception e) {
-                assertTrue("parseFloat(null) threw an incorrect Exception",
-                        e.getMessage().contains("Parameter 'number' was null"));
+            	checkExceptionContains(e, ParseException.class, "Parameter 'number' was null");
             }
 
-            // parseDouble(null)
             try {
                 localizationService.parseDouble(null);
                 fail("parseDouble(null) did not throw an exception");
             } catch (Exception e) {
-                assertTrue("parseDouble(null) threw an incorrect Exception",
-                        e.getMessage().contains("Parameter 'number' was null"));
+            	checkExceptionContains(e, ParseException.class, "Parameter 'number' was null");
             }
 
-            // parsePercent(null)
             try {
                 localizationService.parsePercent(null);
                 fail("parsePercent(null) did not throw an exception");
             } catch (Exception e) {
-                assertTrue("parsePercent(null) threw an incorrect Exception",
-                        e.getMessage().contains("Parameter 'percent' was null"));
+            	checkExceptionContains(e, ParseException.class, "Parameter 'percent' was null");
             }
         }
     }
 
     public void testParsersWithEmptyString() throws ParseException {
         {
-            // localizationService.parseCurrency("")
             try {
                 localizationService.parseCurrency("");
                 fail("parseCurrency(\"\") did not throw an exception");
             } catch (Exception e) {
-                assertTrue("parseCurrency(\"\") threw an incorrect Exception",
-                        e.getMessage().contains("Unparseable number: \"\""));
+            	checkExceptionContains(e, ParseException.class, "Unparseable number: \"\"");
             }
 
-            // localizationService.parseDateTimeToCalendar("", null, null, -1,
-            // -1)
             try {
                 localizationService.parseDateTimeToCalendar("", null, null, -1, -1);
                 fail("parseDateTimeToCalendar(\"\", null, null, -1, -1) did not throw an exception");
             } catch (Exception e) {
-                assertTrue("parseDateTimeToCalendar(\"\", null, null, -1, -1) threw an incorrect Exception", e
-                        .getMessage().contains("Style '--' is invalid"));
+            	// TODO(W-1482880): same as testDateTimeParserExceptions()
+            	checkExceptionContains(e, IllegalArgumentException.class, "Style '--' is invalid");
             }
 
-            // localizationService.parseDateTime("")
             try {
                 localizationService.parseDateTime("");
                 fail("parseDateTime(\"\") did not throw an exception");
             } catch (Exception e) {
-                assertTrue("parseDateTime(\"\") threw an incorrect Exception",
-                        e.getMessage().contains("Invalid format: \"\""));
+            	// TODO(W-1482880): same as testDateTimeParserExceptions()
+            	checkExceptionContains(e, IllegalArgumentException.class, "Invalid format: \"\"");
             }
 
-            // localizationService.parseTimeToCalendar("", null, null, -1))
             try {
                 localizationService.parseTimeToCalendar("", null, null, -1);
                 fail("parseTimeToCalendar(\"\", null, null, -1) did not throw an exception");
             } catch (Exception e) {
-                assertTrue("parseTimeToCalendar(\"\", null, null, -1) threw an incorrect Exception", e.getMessage()
-                        .contains("Style '--' is invalid"));
+            	// TODO(W-1482880): same as testDateTimeParserExceptions()
+            	checkExceptionContains(e, IllegalArgumentException.class, "Style '--' is invalid");
             }
 
-            // localizationService.parseTime("")
             try {
                 localizationService.parseTime("");
                 fail("parseTime(\"\") did not throw an exception");
             } catch (Exception e) {
-                assertTrue("parseTime(\"\") threw an incorrect Exception",
-                        e.getMessage().contains("Invalid format: \"\""));
+            	// TODO(W-1482880): same as testDateTimeParserExceptions()
+            	checkExceptionContains(e, IllegalArgumentException.class, "Invalid format: \"\"");
             }
 
-            // localizationService.parseDate("")
             try {
                 localizationService.parseDate("");
                 fail("parseDate(\"\") did not throw an exception");
             } catch (Exception e) {
-                assertTrue("parseDate(\"\") threw an incorrect Exception",
-                        e.getMessage().contains("Invalid format: \"\""));
+            	// TODO(W-1482880): same as testDateTimeParserExceptions()
+            	checkExceptionContains(e, IllegalArgumentException.class, "Invalid format: \"\"");
             }
 
-            // localizationService.parseInt(null)
             try {
                 localizationService.parseInt("");
                 fail("parseInt(\"\") did not throw an exception");
             } catch (Exception e) {
-                assertTrue("parseInt(\"\") threw an incorrect Exception",
-                        e.getMessage().contains("Unparseable number: \"\""));
+            	checkExceptionContains(e, ParseException.class, "Unparseable number: \"\"");
             }
 
-            // localizationService.parseLong(null)
             try {
                 localizationService.parseLong("");
                 fail("parseLong(\"\") did not throw an exception");
             } catch (Exception e) {
-                assertTrue("parseLong(\"\") threw an incorrect Exception",
-                        e.getMessage().contains("Unparseable number: \"\""));
+            	checkExceptionContains(e, ParseException.class, "Unparseable number: \"\"");
             }
 
-            // localizationService.parseFloat(null)
             try {
                 localizationService.parseFloat("");
                 fail("parseFloat(\"\") did not throw an exception");
             } catch (Exception e) {
-                assertTrue("parseFloat(\"\") threw an incorrect Exception",
-                        e.getMessage().contains("Unparseable number: \"\""));
+            	checkExceptionContains(e, ParseException.class, "Unparseable number: \"\"");
             }
 
-            // localizationService.parseDouble(null)
             try {
                 localizationService.parseDouble("");
                 fail("parseDouble(\"\") did not throw an exception");
             } catch (Exception e) {
-                assertTrue("parseDouble(\"\") threw an incorrect Exception",
-                        e.getMessage().contains("Unparseable number: \"\""));
+            	checkExceptionContains(e, ParseException.class, "Unparseable number: \"\"");
             }
 
-            // localizationService.parsePercent(null)
             try {
                 localizationService.parsePercent("");
                 fail("parsePercent(\"\") did not throw an exception");
             } catch (Exception e) {
-                assertTrue("parsePercent(\"\") threw an incorrect Exception",
-                        e.getMessage().contains("Unparseable number: \"\""));
+            	checkExceptionContains(e, ParseException.class, "Unparseable number: \"\"");
             }
         }
     }
@@ -389,7 +369,8 @@ public class LocalizationServiceImplTest extends UnitTestCase {
                     localizationService.parsePercent(per, Locale.FRENCH);
                     fail("No Exception thrown when trying to parse \'" + per + "\' into Percentage");
                 } catch (Exception e) {
-                    // Expected
+                	// Expected error from AuraNumberformat.parse(...)
+                	checkExceptionFull(e, ParseException.class, getErrorMsg(per));
                 }
             }
         }
@@ -403,7 +384,8 @@ public class LocalizationServiceImplTest extends UnitTestCase {
                     localizationService.parseCurrency(curr, Locale.US);
                     fail("No Exception thrown when trying to parse \'" + curr + "\' into Currency");
                 } catch (Exception e) {
-                    // Expected
+                	// Expected error from AuraNumberformat.parse(...)
+                    checkExceptionFull(e, ParseException.class, getErrorMsg(curr));
                 }
             }
         }
@@ -415,7 +397,8 @@ public class LocalizationServiceImplTest extends UnitTestCase {
                 localizationService.parseCurrency(inputCN, Locale.UK);
                 fail("# Exception not thrown for currency:" + inputCN);
             } catch (Exception e) {
-                assertTrue("# Incorrect exception type!", ((e instanceof ParseException)));
+            	// Expected error from AuraNumberformat.parse(...)
+                checkExceptionFull(e, ParseException.class, getErrorMsg(inputCN));
             }
         }
 
@@ -426,7 +409,8 @@ public class LocalizationServiceImplTest extends UnitTestCase {
                 localizationService.parseCurrency(inputCN, new Locale("pt", "BR"));
                 fail("# Exception not thrown for currency:" + inputCN);
             } catch (Exception e) {
-                assertTrue("# Incorrect exception type!", ((e instanceof ParseException)));
+            	// Expected error from AuraNumberformat.parse(...)
+                checkExceptionFull(e, ParseException.class, getErrorMsg(inputCN));
             }
         }
     }
@@ -439,7 +423,8 @@ public class LocalizationServiceImplTest extends UnitTestCase {
                     localizationService.parseInt(num);
                     fail("No Exception thrown when trying to parse \'" + num + "\' into int");
                 } catch (Exception e) {
-                    // Expected
+                	// Expected error from AuraNumberformat.parse(...)
+                	checkExceptionFull(e, ParseException.class, getErrorMsg(num));
                 }
             }
         }
@@ -453,7 +438,8 @@ public class LocalizationServiceImplTest extends UnitTestCase {
                     localizationService.parseLong(num);
                     fail("No Exception thrown when trying to parse \'" + num + "\' into long");
                 } catch (Exception e) {
-                    // Expected
+                	// Expected error from AuraNumberformat.parse(...)
+                	checkExceptionFull(e, ParseException.class, getErrorMsg(num));
                 }
             }
         }
@@ -467,7 +453,8 @@ public class LocalizationServiceImplTest extends UnitTestCase {
                     localizationService.parseFloat(num);
                     fail("No Exception thrown when trying to parse \'" + num + "\' into float");
                 } catch (Exception e) {
-                    // Expected
+                	 // Expected error from AuraNumberformat.parse(...)
+                	checkExceptionFull(e, ParseException.class, getErrorMsg(num));
                 }
             }
         }
@@ -481,7 +468,8 @@ public class LocalizationServiceImplTest extends UnitTestCase {
                     localizationService.parseDouble(num);
                     fail("No Exception thrown when trying to parse \'" + num + "\' into double");
                 } catch (Exception e) {
-                    // Expected
+                    // Expected error from AuraNumberformat.parse(...)
+                	checkExceptionFull(e, ParseException.class, getErrorMsg(num));
                 }
             }
         }
@@ -489,7 +477,6 @@ public class LocalizationServiceImplTest extends UnitTestCase {
 
     public void testStrictNumberParsing() throws ParseException {
         NumberFormat nf = null;
-
         Map<Locale, String[]> strictParserTestNumberStrings = new HashMap<Locale, String[]>();
         strictParserTestNumberStrings.put(Locale.ENGLISH, new String[] { "100.200,300", "1 1", "1.1.1.1" });
         strictParserTestNumberStrings.put(Locale.FRANCE, new String[] { "1 1 1 1", "1.1.1", "00. 000 000",
@@ -505,9 +492,17 @@ public class LocalizationServiceImplTest extends UnitTestCase {
                     AuraNumberFormat.parseStrict(num, nf);
                     fail("No Exception thrown for value:" + num + " and locale:" + locale.getDisplayName());
                 } catch (Exception e) {
-                    // Expected
+                	// Expected error from AuraNumberformat.parse(...)
+                	checkExceptionFull(e, ParseException.class, getErrorMsg(num));
                 }
             }
         }
+    }
+    
+    /*
+     * return error message we are expecting, throw by parse() in AuraNumberFormat.java
+     */
+    public String getErrorMsg(String num) {
+    	return "Unparseable number: \""+num+"\"";
     }
 }

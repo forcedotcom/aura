@@ -22,10 +22,7 @@ import java.util.GregorianCalendar;
 
 import org.auraframework.test.WebDriverTestCase;
 import org.auraframework.test.WebDriverUtil.BrowserType;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 
 public class BaseInputDateUITester extends WebDriverTestCase {
 
@@ -507,7 +504,7 @@ public class BaseInputDateUITester extends WebDriverTestCase {
     // Testing functionality of arrows button on calendar by intercombining them and making them go through months and
     // year
     @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
-    public void testMonthYearByArrowsButtons() throws Exception {
+    public void _testMonthYearByArrowsButtons() throws Exception {
         String nextMonth = "a[class*='navLink nextMonth']";
         String nextYear = "a[class*='navLink nextYear']";
         String prevMonth = "a[class*='navLink prevMonth']";

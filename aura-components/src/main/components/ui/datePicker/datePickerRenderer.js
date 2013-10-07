@@ -41,6 +41,17 @@
             helper.localizeToday(component);
         }
         helper.position(component);
+        var isAndroid = $A.getGlobalValueProviders().get("$Browser.isAndroid");
+        if (isAndroid == true) {
+            var f = function(e) {
+                helper.handleWinResize(component, e);
+            };
+            if (visible === true) {
+                $A.util.on(window, "resize", f);
+            } else {
+                $A.util.removeOn(window, "resize", f);
+            }
+        }
     },
     
     unrender: function(component, helper) {

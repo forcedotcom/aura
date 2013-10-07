@@ -68,7 +68,7 @@ public class DatePickerModel {
         String[] shortWeekdays = weekdaySymbols.getShortWeekdays();
         ArrayList<LocalizedLabel> weekdayList = new ArrayList<LocalizedLabel>(7);
         for (int i = 1; i < weekdays.length; i++) {
-            weekdayList.add(new LocalizedLabel(weekdays[i], shortWeekdays[i]));
+            weekdayList.add(new LocalizedLabel(weekdays[i], shortWeekdays[i].toUpperCase(locale.getLanguageLocale())));
         }
         return weekdayList;
     }

@@ -14,12 +14,21 @@
  * limitations under the License.
  */
 ({
+    afterRender: function(component, helper) {
+        var ret = this.superAfterRender();
+        helper.validateHours(component);
+        helper.validateMinutes(component);
+        return ret; 
+    },
+    
     render: function(component, helper) {
+        helper.localizeAmpmLabel(component);
         helper.renderTime(component);
         return this.superRender(); 
     },
     
     rerender: function(component, helper) {
+        helper.localizeAmpmLabel(component);
         if (component.getValue("v.isValid").getBooleanValue() === true) {
             helper.renderTime(component);
         }

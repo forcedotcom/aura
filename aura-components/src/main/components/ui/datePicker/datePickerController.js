@@ -27,6 +27,10 @@
         }
     },
     
+    doInit: function(component, event, helper) {
+        component._windowSize = $A.util.getWindowSize();
+    },
+    
     focusDateOnTab: function(component, event, helper) {
         helper.handleESCKey(component, event);
         var keyCode = event.keyCode;
@@ -80,6 +84,23 @@
     },
     
     handleTouchEnd: function(component, event, helper) {
+        var startX = component._onTouchStartX;
+        var endX = component._onTouchEndX;
+        var startY = component._onTouchStartY;
+        var endY = component._onTouchEndY;
+        if (Math.abs(startX - endX) > 10) { // left/right swipe
+            return;
+        }
+        if ((endY - startY) > 10) { // swipe down
+            helper.goToNextYear(component);
+        } else if ((startY - endY) > 10) { // swipe up
+            helper.goToPrevYear(component);
+        }
+    },
+    
+    handleTouchMove: function(component, event, helper) {
+        event.preventDefault();
+        event.stopPropagation();
         var touch;
         var touchIdFound = false;
         for (var i = 0; i < event.changedTouches.length; i++) {
@@ -90,13 +111,9 @@
             }
         }
         if (touchIdFound) {
-            var startY = component._onTouchStartY;
-            var endY = touch.clientY;
-            if ((endY - startY) > 5) { // swipe down
-                helper.goToNextYear(component);
-            } else if ((startY - endY) > 5) { // swipe up
-                helper.goToPrevYear(component);
-            }
+            component._onTouchEndX = touch.clientX;
+            component._onTouchEndY = touch.clientY; // On Android (Samsung GT), we can't get the position of touchend, 
+                                                    // so we have to record it here.
         }
     },
     
@@ -104,6 +121,7 @@
         var touch = event.changedTouches[0];
         // record the ID to ensure it's the same finger on a multi-touch device
         component._onTouchStartId = touch.identifier;
+        component._onTouchStartX = touch.clientX;
         component._onTouchStartY = touch.clientY;
     },
     

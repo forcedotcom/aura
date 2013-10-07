@@ -31,6 +31,25 @@
         return hours;
     },
     
+    localizeAmpmLabel: function(component) {
+        var is24HourFormat = component.getValue("v.is24HourFormat").getBooleanValue();
+        if (is24HourFormat === false) {
+            // Localize am/pm label
+            var localizedData = $A.localizationService.getLocalizedDateTimeLabels();
+            var ampm = localizedData._ampm;
+            if (ampm) {
+                var amOptCmp = component.find("amOpt");
+                if (amOptCmp) {
+                    amOptCmp.setValue("v.label", ampm.am); 
+                }
+                var pmOptCmp = component.find("pmOpt");
+                if (pmOptCmp) {
+                    pmOptCmp.setValue("v.label", ampm.pm); 
+                } 
+            }
+        }
+    },
+    
     renderTime: function(component) {
         // set hours based on 24/12 hour format
         var is24HourFormat = component.getValue("v.is24HourFormat").getBooleanValue();
@@ -87,5 +106,61 @@
             return n <= max && n >= min;
         }
         return false;
+    },
+    
+    validateHours: function(component) {
+        var is24HourFormat = component.getValue("v.is24HourFormat").getBooleanValue();
+        var hoursCmp = component.find("hours");
+        var errorCmp = component.find("hourError");
+        if (hoursCmp && errorCmp) {
+            var hours = hoursCmp.get("v.value");
+            if (is24HourFormat === true) {
+                if (this.validateNumber(hours, 0, 23)) {
+                    hoursCmp.removeClass("error");
+                    errorCmp.setValue("v.value", []);
+                    errorCmp.addClass("hide");
+                    return true;
+                } else {
+                    hoursCmp.addClass("error");
+                    errorCmp.setValue("v.value", ["Please input a valid hour value (0 - 23)."]);
+                    errorCmp.removeClass("hide");
+                    return false;
+                }
+            } else {
+                if (this.validateNumber(hours, 1, 12)) {
+                    hoursCmp.removeClass("error");
+                    errorCmp.setValue("v.value", []);
+                    errorCmp.addClass("hide");
+                    return true;
+                } else {
+                    hoursCmp.addClass("error");
+                    errorCmp.setValue("v.value", ["Please input a valid hour value (1 - 12)."]);
+                    errorCmp.removeClass("hide");
+                    return false;
+                }
+            }
+        }
+        return false;
+    },
+    
+    validateMinutes: function(component) {
+        var minutesCmp = component.find("minutes");
+        var errorCmp = component.find("minuteError");
+        if (minutesCmp && errorCmp) {
+            var minutes = minutesCmp.get("v.value");
+            if (this.validateNumber(minutes, 0, 59)) {
+                minutesCmp.removeClass("error"); 
+                errorCmp.setValue("v.value", []);
+                errorCmp.addClass("hide");
+                return true;
+            } else {
+                minutesCmp.addClass("error");
+                errorCmp.setValue("v.value", ["Please input a valid minute value (0 - 59)."]);
+                errorCmp.removeClass("hide");
+                return false;
+            }
+        }
+        return false;
     }
+    
 })

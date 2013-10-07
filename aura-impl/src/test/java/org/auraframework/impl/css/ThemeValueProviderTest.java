@@ -58,21 +58,6 @@ public class ThemeValueProviderTest extends AuraImplTestCase {
         }
     }
 
-    /** check that aliased references work */
-    public void testAliased() throws QuickFixException {
-        assertEquals(aliased().getValue("var.color", null).toString(), COLOR);
-    }
-
-    /** check that you get an error when the alias is not defined */
-    public void testAliasDoesntExist() throws QuickFixException {
-        try {
-            aliased().getValue("abc.color", null);
-            fail("expected to get exception");
-        } catch (AuraRuntimeException e) {
-            assertTrue(e.getMessage().contains("No alias"));
-        }
-    }
-
     /** confirm that we get the value from an overridden theme instead of the original */
     public void testOverridden() throws QuickFixException {
         assertEquals(overridden().getValue("themeTest.baseTheme.color", null).toString(), "yellow");
@@ -95,7 +80,7 @@ public class ThemeValueProviderTest extends AuraImplTestCase {
             provider().getValue("one.two.three.four", null);
             fail("expected to get exception");
         } catch (AuraRuntimeException e) {
-            assertTrue(e.getMessage().contains("Expected exactly 2 or 3"));
+            assertTrue(e.getMessage().contains("Expected exactly 3 parts"));
         }
     }
 
@@ -105,7 +90,7 @@ public class ThemeValueProviderTest extends AuraImplTestCase {
             provider().getValue("one", null);
             fail("expected to get exception");
         } catch (AuraRuntimeException e) {
-            assertTrue(e.getMessage().contains("Expected exactly 2 or 3"));
+            assertTrue(e.getMessage().contains("Expected exactly 3 parts"));
         }
     }
 
@@ -126,14 +111,6 @@ public class ThemeValueProviderTest extends AuraImplTestCase {
         DefDescriptor<ThemeDef> expected2 = ThemeDefImpl.descriptor("themeTest:baseTheme");
         assertEquals(Iterables.get(dds, 0, null), expected);
         assertEquals(Iterables.get(dds, 1, null), expected2);
-    }
-
-    /** check that get qualified descriptors only will not throw an exception on aliases */
-    public void testGetDescriptorsIgnoreAliases() throws QuickFixException {
-        String nonsensical = "var.color";
-        Set<DefDescriptor<ThemeDef>> dds = provider().getDescriptors(nonsensical, null, true);
-        assertTrue(dds.isEmpty());
-        // and also no exceptions
     }
 
     public void testCrossReferenceSelf() throws QuickFixException {
@@ -157,15 +134,10 @@ public class ThemeValueProviderTest extends AuraImplTestCase {
     }
 
     /** utility */
-    public static ThemeValueProvider aliased() {
-        return new ThemeValueProviderImpl(null, ImmutableMap.of("var", ThemeDefImpl.descriptor("test:fakeTheme")));
-    }
-
-    /** utility */
     public static ThemeValueProvider overridden() {
         DefDescriptor<ThemeDef> base = ThemeDefImpl.descriptor("themeTest:baseTheme");
         DefDescriptor<ThemeDef> child = ThemeDefImpl.descriptor("themeTest:childTheme");
         ThemeOverrideMap map = new ThemeOverrideMapImpl(ImmutableMap.of(base, child));
-        return new ThemeValueProviderImpl(map, null);
+        return new ThemeValueProviderImpl(map);
     }
 }

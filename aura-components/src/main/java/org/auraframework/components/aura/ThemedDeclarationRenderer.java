@@ -40,15 +40,11 @@ public class ThemedDeclarationRenderer implements Renderer {
     @Override
     @SuppressWarnings("unchecked")
     public void render(BaseComponent<?, ?> component, Appendable out) throws IOException, QuickFixException {
-
-        String namespace = component.getAttributes().getValue("namespace").toString();
-        String name = component.getAttributes().getValue("name").toString();
         String property = component.getAttributes().getValue("property").toString();
         Location location = (Location) component.getAttributes().getValue("location");
         List<String> references = (List<String>) component.getAttributes().getValue("references");
 
-        String descriptorName = String.format("%s:%s", namespace, name);
-        ThemeValueProvider provider = Aura.getStyleAdapter().getThemeValueProvider(descriptorName);
+        ThemeValueProvider provider = Aura.getStyleAdapter().getThemeValueProvider();
 
         // gather values. there can be multiple values if there were multiple theme functions in the declaration value.
         List<String> resolved = Lists.newArrayList();

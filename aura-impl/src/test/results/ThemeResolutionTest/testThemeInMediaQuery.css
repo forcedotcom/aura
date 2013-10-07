@@ -1,0 +1,3 @@
+@media only screen and (max-width: 999px) and (orientation: portrait) {
+  .themeTestWithMediaQuery {color:red}
+}

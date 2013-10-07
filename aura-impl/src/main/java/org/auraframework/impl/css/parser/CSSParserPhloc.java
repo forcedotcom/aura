@@ -73,7 +73,7 @@ import com.phloc.css.writer.CSSWriterSettings;
 /**
  * Not thread safe.
  */
-public class CSSParser extends DefaultCSSVisitor {
+public class CSSParserPhloc extends DefaultCSSVisitor {
 
     public static final String ISSUE_MESSAGE = "Issue(s) found by Parser:";
 
@@ -115,7 +115,7 @@ public class CSSParser extends DefaultCSSVisitor {
      * @param validateNamespace Whether to validate that the CSS is properly scoped with the correct classnames.
      * @param contents the actual css
      */
-    public CSSParser(String namespace, String name, boolean validateNamespace,
+    public CSSParserPhloc(String namespace, String name, boolean validateNamespace,
             String componentClass, String contents, Set<String> allowedConditions, String filename) {
         this.filename = filename;
         this.componentClass = componentClass;
@@ -565,7 +565,8 @@ public class CSSParser extends DefaultCSSVisitor {
         try {
             AuraContext context = Aura.getContextService().startContext(Mode.DEV, Format.JSON, Access.AUTHENTICATED);
             context.setClient(new Client("Mozilla/5.0 (Windows; U; MSIE 7.0; Windows NT 6.0; en-US)"));
-            System.out.println(Aura.getDefinitionService().getDefinition("ui.button", StyleDef.class).getCode());
+            System.out.println(Aura.getDefinitionService().
+                    getDefinition("ui.button", StyleDef.class).getCode());
         } catch (DefinitionNotFoundException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

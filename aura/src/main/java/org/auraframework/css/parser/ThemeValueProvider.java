@@ -25,7 +25,8 @@ import org.auraframework.system.Location;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
- * Responsible for taking a String reference to a theme variable and finding the applicable value.
+ * Responsible for evaluating a theme expression to the string value. The expression may contain multiple references to
+ * theme variables, as well as valid aura expression syntax.
  * 
  * <p>
  * Fully qualified references (For example, "namespace.themeName.variableName") will resolve as specified to the
@@ -33,28 +34,23 @@ import org.auraframework.throwable.quickfix.QuickFixException;
  * theme overrides are provided (see {@link ThemeOverrideMap}).
  * 
  * <p>
- * Aliased references, (For example, "alias.variableName") will resolve to the theme value in the aliased theme. It's
- * possible for the returned value to be different from the one referenced if theme overrides are provided (see
- * {@link ThemeOverrideMap}).
- * 
- * <p>
- * This can also handle taking a string reference and resolving to the actual {@link DefDescriptor} instead. See
+ * This can also handle taking a string expression and resolving to the actual {@link DefDescriptor} instead. See
  * {@link #resolveToDescriptor(String)}.
  */
 public interface ThemeValueProvider extends ValueProvider {
     /**
-     * Use this to resolve a reference from a String. Do <b>not</b> create your own {@link PropertyReference} to pass to
-     * {@link #getValue(PropertyReference)} as that will most likely result in trying to evaluate the wrong thing
+     * Use this to resolve an expression from a String. Do <b>not</b> create your own {@link PropertyReference} to pass
+     * to {@link #getValue(PropertyReference)} as that will most likely result in trying to evaluate the wrong thing
      * (because of quotes). Only use that method if you already have a correct {@link PropertyReference} on hand.
      * 
-     * @param reference The reference to evaluate.
-     * @param location The location of the reference in the source.
+     * @param expression The expression to evaluate.
+     * @param location The location of the expression in the source.
      * 
      * @return The value, same as from {@link #getValue(PropertyReference)}
      * 
      * @throws QuickFixException
      */
-    Object getValue(String reference, Location location) throws QuickFixException;
+    Object getValue(String expression, Location location) throws QuickFixException;
 
     /**
      * Resolve a reference to the specified {@link DefDescriptor}. Note that the descriptor returned here *may not* be
@@ -69,25 +65,12 @@ public interface ThemeValueProvider extends ValueProvider {
 
     /**
      * Similar to {@link #getDescriptor(PropertyReference)}, except it takes a string. Returns a set because there might
-     * be multiple descriptors in the reference.
+     * be multiple descriptors in the expression.
      * 
-     * @param reference Find the descriptors in this reference.
-     * @param location The location of the reference in the source.
-     * 
-     * @throws QuickFixException
-     */
-    Set<DefDescriptor<ThemeDef>> getDescriptors(String reference, Location location) throws QuickFixException;
-
-    /**
-     * Similar to {@link #getDescriptors(String, Location)}, except this will allow you to only get qualified
-     * descriptors (i.e., to ignore aliases).
-     * 
-     * @param reference Find the descriptors in this reference.
-     * @param location The location of the reference in the source.
-     * @param qualifiedOnly Specify true to only return qualified references.
+     * @param expression Find the descriptors in this expression.
+     * @param location The location of the expression in the source.
      * 
      * @throws QuickFixException
      */
-    Set<DefDescriptor<ThemeDef>> getDescriptors(String reference, Location location, boolean qualifiedOnly)
-            throws QuickFixException;
+    Set<DefDescriptor<ThemeDef>> getDescriptors(String expression, Location location) throws QuickFixException;
 }

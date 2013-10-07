@@ -28,15 +28,15 @@ import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.NamespaceDef;
 import org.auraframework.def.StyleDef;
+import org.auraframework.impl.css.parser.omakase.CssParserOmakase;
 import org.auraframework.impl.system.DefinitionImpl;
+import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.instance.Component;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 
 /**
@@ -49,22 +49,14 @@ public class StyleDefImpl extends DefinitionImpl<StyleDef> implements StyleDef {
     private final String className;
     private final List<ComponentDefRef> components;
     private final Set<String> themeReferences;
+    private final String content;
 
     protected StyleDefImpl(Builder builder) {
         super(builder);
         this.className = builder.className;
-
-        if (builder.components == null) {
-            this.components = ImmutableList.of();
-        } else {
-            this.components = builder.components;
-        }
-
-        if (builder.themeReferences == null) {
-            this.themeReferences = ImmutableSet.of();
-        } else {
-            this.themeReferences = builder.themeReferences;
-        }
+        this.components = AuraUtil.immutableList(builder.components);
+        this.themeReferences = AuraUtil.immutableSet(builder.themeReferences);
+        this.content = builder.content;
     }
 
     @Override
@@ -73,9 +65,9 @@ public class StyleDefImpl extends DefinitionImpl<StyleDef> implements StyleDef {
 
         // dependencies from theme variables in the css file
         if (!themeReferences.isEmpty()) {
-            ThemeValueProvider vp = Aura.getStyleAdapter().getThemeValueProvider();
+            ThemeValueProvider vp = Aura.getStyleAdapter().getThemeValueProviderNoOverrides();
             for (String reference : themeReferences) {
-                dependencies.addAll(vp.getDescriptors(reference, getLocation(), true));
+                dependencies.addAll(vp.getDescriptors(reference, getLocation()));
             }
         }
     }
@@ -86,8 +78,7 @@ public class StyleDefImpl extends DefinitionImpl<StyleDef> implements StyleDef {
 
         // references to themedefs
         if (!themeReferences.isEmpty()) {
-            String descriptorName = String.format("%s:%s", descriptor.getNamespace(), descriptor.getName());
-            ThemeValueProvider vp = Aura.getStyleAdapter().getThemeValueProvider(descriptorName);
+            ThemeValueProvider vp = Aura.getStyleAdapter().getThemeValueProviderNoOverrides();
             for (String reference : themeReferences) {
                 vp.getValue(reference, getLocation()); // get value will validate it's a valid variable
             }
@@ -96,13 +87,21 @@ public class StyleDefImpl extends DefinitionImpl<StyleDef> implements StyleDef {
 
     @Override
     public String getCode() {
-        Map<String, Object> attributes = Maps.newHashMap();
-        attributes.put("body", components);
+        if (content == null) {
+            Map<String, Object> attributes = Maps.newHashMap();
+            attributes.put("body", components);
+            try {
+                Component cmp = Aura.getInstanceService().getInstance("aura:styleDef", ComponentDef.class, attributes);
+                StringBuilder sb = new StringBuilder();
+                Aura.getRenderingService().render(cmp, sb);
+                return sb.toString();
+            } catch (Exception e) {
+                throw new AuraRuntimeException(e);
+            }
+        }
+
         try {
-            Component cmp = Aura.getInstanceService().getInstance("aura:styleDef", ComponentDef.class, attributes);
-            StringBuilder sb = new StringBuilder();
-            Aura.getRenderingService().render(cmp, sb);
-            return sb.toString();
+            return CssParserOmakase.runtime().source(content).themes().parse().content();
         } catch (Exception e) {
             throw new AuraRuntimeException(e);
         }
@@ -131,7 +130,6 @@ public class StyleDefImpl extends DefinitionImpl<StyleDef> implements StyleDef {
     }
 
     public static class Builder extends DefinitionImpl.BuilderImpl<StyleDef> implements StyleDefBuilder {
-
         public Builder() {
             super(StyleDef.class);
         }
@@ -139,6 +137,7 @@ public class StyleDefImpl extends DefinitionImpl<StyleDef> implements StyleDef {
         private String className;
         private List<ComponentDefRef> components;
         private Set<String> themeReferences;
+        private String content;
 
         @Override
         public StyleDef build() {
@@ -163,5 +162,10 @@ public class StyleDefImpl extends DefinitionImpl<StyleDef> implements StyleDef {
             return this;
         }
 
+        @Override
+        public StyleDefBuilder setContent(String content) {
+            this.content = content;
+            return this;
+        }
     }
 }

@@ -20,9 +20,7 @@
             for (var n = 0; n < values.length; n++) {
                 $A.test.assertEquals("Value " + (n + 1), $A.test.getText(values[n]));
             }
-
             var body = component.find("me").getValue("v.body");
-
             function addComponent(label, insertFunction) {
                 // Note that usually we'd want have a wait until the callback with the newly created cmp is called, but
                 // since we don't need to make a server trip the cmp is created and callback called synchronously.
@@ -49,7 +47,11 @@
                     }
                 );
             }
-
+            
+            function removeComponent(cmpArray,index) {
+            	cmpArray.remove(index);
+            }
+            
             function iteration(values, toAdd, insertFunction) {
                 var startIndex = values.length;
 
@@ -57,23 +59,19 @@
                 for (var n = startIndex; n < startIndex + toAdd; n++) {
                     addComponent("Value " + (n + 1), insertFunction);
                 }
-
                 $A.rerender(component);
-
                 values = component.getElement().childNodes;
                 for (n = 0; n < values.length; n++) {
                     $A.test.assertEquals("Value " + (n + 1), $A.test.getText(values[n]));
                 }
             }
-
+            //test adding new component to the array
             iteration(values, 4, function(body, c) {
                 body.push(c);
             });
-
             iteration(values, 4, function(body, c) {
                 body.push(c);
             });
-
             // Now lets do some splicing. Insert Value to index first, middle, and last index
             addComponent("Value inserted at index 0", function(body, c) {
                 body.insert(0, c);
@@ -81,20 +79,48 @@
             $A.rerender(component);
             $A.test.assertEquals("Value inserted at index 0", $A.test.getText(values[0]));
             $A.test.assertEquals(13, values.length);
-            
             addComponent("Value inserted at index 1", function(body, c) {
                 body.insert(1, c);
             });
             $A.rerender(component);
             $A.test.assertEquals("Value inserted at index 1", $A.test.getText(values[1]), "Value not inserted at proper index");
             $A.test.assertEquals(14, values.length);
-
             addComponent("Value inserted at last index", function(body, c) {
                 body.insert(14, c);
             });
             $A.rerender(component);
             $A.test.assertEquals("Value inserted at last index", $A.test.getText(values[14]), "Value not inserted at end of array");
             $A.test.assertEquals(15, values.length);
+            //test removing component from array
+            //remove the first
+            removeComponent(body,0);
+            $A.rerender(component);
+            $A.test.assertEquals("Value inserted at index 1", $A.test.getText(values[0]),"error after removing the first cmp of array");
+            $A.test.assertEquals(14, values.length);
+            //remove the second
+            removeComponent(body,1);
+            $A.rerender(component);
+            $A.test.assertEquals("Value 2", $A.test.getText(values[1]),"error after removing the 2nd cmp of array");
+            $A.test.assertEquals(13, values.length);
+            //remove the last
+            removeComponent(body,12);
+            $A.rerender(component);
+            $A.test.assertEquals("Value 12", $A.test.getText(values[11]),"error after removing the last cmp of array");
+            $A.test.assertEquals(12, values.length);
+            //clean the array and test inserting to an empty array
+            body.clear();
+            $A.rerender(component);
+            //even we clear the body, there is still a comment
+            $A.test.assertEquals(1,values.length);
+            addComponent("Value inserted at index 0 to an empty array", function(body, c) {
+                body.insert(0, c);
+            });
+            $A.log(values);
+            $A.log(body);
+            $A.rerender(component);
+            //values = component.getElement().childNodes;
+            $A.test.assertEquals("Value inserted at index 0 to an empty array", $A.test.getText(values[0]));
+            $A.test.assertEquals(1, values.length);
         }
     }
 })

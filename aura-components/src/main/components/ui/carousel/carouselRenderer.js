@@ -23,19 +23,22 @@
 	},
 	
 	rerender: function(cmp, helper) {
-		var width = cmp.getValue('v.width'),
+		var shouldRerender = false,
+			width = cmp.getValue('v.width'),
 			height = cmp.getValue('v.height'),
 			pageCmps = cmp.getValue('v.pageComponents');
-
+		
 		if (width.isDirty() || height.isDirty()) {
 			helper.updateSize(cmp, true);
+			shouldRerender = true;
 		}
 		
-		this.superRerender();
-	},
-	
-	unrender: function(cmp, helper) {
-		helper.unrender(cmp);
-		this.superUnrender();
+		if (pageCmps.isDirty()) {
+			shouldRerender = true;		
+		}
+		
+		if (shouldRerender) {
+			this.superRerender();
+		}
 	}
 }

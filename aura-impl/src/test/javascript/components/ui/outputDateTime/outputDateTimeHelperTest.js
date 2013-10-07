@@ -222,15 +222,6 @@ Test.Ui.OutputDateTime.HelperTest = function(){
 				displayDateTime:function(component, displayValue){
 					actual = displayValue;					
 				},
-<<<<<<< HEAD
-                getFormat:function(component){
-                    return component.get("v.format");
-                },
-                getTimeZone:function(component) {
-                    return component.get("v.timezone");
-                } 				
-            };	
-=======
 				getFormat:function(component){
 				    return component.get("v.format");
 				},
@@ -238,7 +229,7 @@ Test.Ui.OutputDateTime.HelperTest = function(){
                     return component.get("v.timezone");
                 }		
 			};	
->>>>>>> 8a0ab36... Make getFormat and getTimeZone overridable.
+
 			
 			var concreteComponent={
 				getDef:function(){
@@ -269,12 +260,9 @@ Test.Ui.OutputDateTime.HelperTest = function(){
 				localizationService: {   
 					UTCToWallTime: function(dateObj,timezone, callback) { callback(dateObj); },			
 					formatDateTimeUTC: function(walltime, format, langLocale) { throw {message: expected}; },
-<<<<<<< HEAD
+
 					parseDateTimeISO8601: function(datetimeString) { return new Date(datetimeString); },
                     translateToOtherCalendar: function(date) { return date; }           	
-=======
-					parseDateTimeISO8601: function(datetimeString) { return new Date(datetimeString); }	            	
->>>>>>> 11377d9... Fix outputDateTime in IE8
 	            }
 	        });												
 			 

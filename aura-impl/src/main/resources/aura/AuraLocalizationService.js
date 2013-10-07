@@ -876,7 +876,6 @@ var AuraLocalizationService = function AuraLocalizationService() {
          */
         pad : function(n) { 
             return n < 10 ? '0' + n : n;
-<<<<<<< HEAD
         },
         
         /**
@@ -884,9 +883,7 @@ var AuraLocalizationService = function AuraLocalizationService() {
          * @private
          */
         doublePad : function(n) {         	            
-        	return n < 10 ? '00' + n : n  < 100 ? '0' + n : n;
-=======
->>>>>>> 70ebb75... Fix inputDateTime in IE7 and IE8. @W-1708983@
+            return n < 10 ? '00' + n : n  < 100 ? '0' + n : n;
         }
     };
     //#include aura.AuraLocalizationService_export

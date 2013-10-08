@@ -73,14 +73,14 @@
     -webkit-transform: rotate(0deg) translateZ(0);    
     -webkit-transition-duration: 0ms;
     -webkit-animation-name: pullSpinner;
-    -webkit-animation-duration: 2s;
+    -webkit-animation-duration: .8s;
     -webkit-animation-iteration-count: infinite;
     -webkit-animation-timing-function: linear;
     
     transform: rotate(0deg) translateZ(0);
     transition-duration: 0ms;
     animation-name: pullSpinner;
-    animation-duration: 2s;
+    animation-duration: .8s;
     animation-iteration-count: infinite;
     animation-timing-function: linear;
 }

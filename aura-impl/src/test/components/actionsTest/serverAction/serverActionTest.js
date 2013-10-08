@@ -65,7 +65,7 @@
 									$A.enqueueAction(a);
 								});
 							},
-							"Error while running actionCallback : Error while running java://org.auraframework.impl.java.controller.ParallelActionTestController/ACTION$executeInForeground:{}");
+							"Error while running actionCallback[java://org.auraframework.impl.java.controller.ParallelActionTestController/ACTION$executeInForeground:{}] : Error while running java://org.auraframework.impl.java.controller.ParallelActionTestController/ACTION$executeInForeground:{}");
 		}
 	},
 
@@ -80,7 +80,7 @@
 								$A.clientService.runActions([ a ], cmp, function() {
 								});
 							},
-							"Error while running actionCallback : Error while running java://org.auraframework.impl.java.controller.ParallelActionTestController/ACTION$executeInForeground:{}");
+							"Error while running actionCallback[java://org.auraframework.impl.java.controller.ParallelActionTestController/ACTION$executeInForeground:{}] : Error while running java://org.auraframework.impl.java.controller.ParallelActionTestController/ACTION$executeInForeground:{}");
 		}
 	},
 
@@ -95,7 +95,7 @@
 									throw new Error("this is intentional");
 								});
 							},
-							"Error while running actionCallback : Error while running java://org.auraframework.impl.java.controller.ParallelActionTestController/ACTION$executeInForeground:{}");
+							"Error while running actionCallback[java://org.auraframework.impl.java.controller.ParallelActionTestController/ACTION$executeInForeground:{}] : Error while running java://org.auraframework.impl.java.controller.ParallelActionTestController/ACTION$executeInForeground:{}");
 		}
 	},
 

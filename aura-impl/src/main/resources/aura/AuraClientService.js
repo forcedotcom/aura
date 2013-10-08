@@ -288,24 +288,29 @@ var AuraClientService = function() {
             } else {
                 $A.warning("Pop from empty stack");
             }
+            
             if (priv.auraStack.length === 0) {
                 var tmppush = "$A.clientServices.popStack";
                 priv.auraStack.push(tmppush);
                 clientService.processActions();
                 done = !$A["finishedInit"];
                 while (!done && count <= 15) {
-                    $A.renderingService.rerenderDirty();
+                    $A.renderingService.rerenderDirty(name);
+                    
                     done = !clientService.processActions();
+                    
                     count += 1;
                     if (count > 14) {
                         $A.error("finishFiring has not completed after 15 loops");
                     }
                 }
+                
                 // Force our stack to nothing.
                 lastName = priv.auraStack.pop();
                 if (lastName !== tmppush) {
                     $A.error("Broken stack: popped "+tmppush+" expected "+lastName+", stack = "+priv.auraStack);
                 }
+                
                 priv.auraStack = [];
                 priv.actionQueue.incrementNextTransactionId();
             }

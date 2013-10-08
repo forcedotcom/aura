@@ -26,18 +26,24 @@ var AuraRenderingService = function AuraRenderingService(){
             /**
              * @private
              */
-        rerenderDirty : function(){
+        rerenderDirty : function(stackName){
             if (priv.needsCleaning) {
                 var num = aura.getContext().incrementRender();
                 $A.mark("Rerendering: " + num);
                 $A.mark("Fired aura:doneRendering event");
                 priv.needsCleaning = false;
 
+                //#if {"modes" : ["STATS"]}
+                var cmpsWithWhy = { "stackName": stackName, "components": {} };
+                //#end                     
+                
                 var cmps = [];
                 for (var id in priv.dirtyComponents) {
                     var cmp = $A.componentService.get(id);
-                    // uncomment this to see what's dirty and why.  (please don't delete me again.  it burns.)
-//                    $A.log(cmp.toString(), priv.dirtyComponents[id]);
+                    
+                    // uncomment this to see what's dirty and why.  (please don't delete me again. it burns.)
+                    // $A.log(cmp.toString(), priv.dirtyComponents[id]);
+                    
                     if (cmp && cmp.isValid() && cmp.isRendered()) {
                         //
                         // We assert that we are not unrendering, as we should never be doing that,
@@ -50,13 +56,29 @@ var AuraRenderingService = function AuraRenderingService(){
                         // aura.assert(!cmp.isUnrendering(), "Rerendering a component during unrender");
                         if (!cmp.isUnrendering()) {
                             cmps.push(cmp);
+
+                            //#if {"modes" : ["STATS"]}
+                            cmpsWithWhy["components"][id] = { "id": id, "descr": cmp.getDef().getDescriptor().toString(), "why": priv.dirtyComponents[id] };  
+                            //#end                     
                         }
                     }else{
                         priv.cleanComponent(id);
                     }
                 }
+                
+                //#if {"modes" : ["STATS"]}
+                var startTime = (new Date()).getTime();
+                //#end                     
+                
                 this.rerender(cmps);
 
+                //#if {"modes" : ["STATS"]}
+                if (cmps.length > 0) {
+                	cmpsWithWhy["renderingTime"] = (new Date()).getTime() - startTime;
+                	this.index(cmpsWithWhy);
+                }
+                //#end                     
+                
                 $A.endMark("Rerendering: " + num);
                 $A.get("e.aura:doneRendering").fire();
                 $A.endMark("Fired aura:doneRendering event");
@@ -233,7 +255,20 @@ var AuraRenderingService = function AuraRenderingService(){
                 }
             }
         }
+        
+      //#if {"modes" : ["STATS"]}
+        ,rerenderDirtyIndex : [],
+
+        index : function(info) {
+        	this.rerenderDirtyIndex.push(info);
+        },
+        
+        getRerenderingIndex : function() {
+        	return this.rerenderDirtyIndex;
+        }
+    //#end        
     };
+    
     //#include aura.AuraRenderingService_export
 
     return renderingService;

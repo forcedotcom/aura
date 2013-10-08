@@ -306,6 +306,18 @@ var priv = {
                 this.auraStack = [];
             }
         }
+        
+        var stackName = "actionCallback["; 
+        var actions = collector.getActionsToSend(); 
+        for (var n = 0; n < actions.length; n++) { 
+        	var action = actions[n]; 
+        	if (n > 0) { 
+        		stackName += ", "; 
+    		}
+
+        	stackName += action.getStorageKey(); 
+    	}
+        stackName += "]";
 
         $A.run(function() {
             var action, actionResponses;
@@ -373,8 +385,9 @@ var priv = {
                     }
                 }
             }
+            
             priv.fireDoneWaiting();
-        }, "actionCallback");
+        }, stackName);
 
         $A.endMark("Completed Action Callback - XHR " + collector.getNum());
     },

@@ -13,14 +13,13 @@
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
     See the License for the specific language governing permissions and
     limitations under the License.
-
 -->
 <aura:application controller="java://org.auraframework.impl.java.controller.JavaTestController">
     <aura:attribute name="host" type="String" default=""/>
     <aura:attribute name="actionStatus" type="String" default=""/>
     <aura:attribute name="actionValue" type="String" default=""/>
     <aura:attribute name="eventsFired" type="String" default=""/>
-
+    
     <aura:handler event="aura:connectionLost" action="{!c.logEvent}"/>
     <aura:handler event="aura:connectionResumed" action="{!c.logEvent}"/>
     <aura:handler event="aura:layoutChange" action="{!c.logEvent}"/>
@@ -29,8 +28,9 @@
     <aura:handler name="change" value="{!v.host}" action="{!c.setHost}"/>
 
     <ui:inputText aura:id="inputHost" value="{!v.host}"/>
-    <ui:button aura:id="button" label="test connection" press="{!c.testConnection}"/><br/>
+    <ui:button aura:id="testConnection" label="test connection" press="{!c.testConnection}"/><br/>
     <ui:button aura:id="setConnectedFalseButton" label="set connected false" press="{!c.setConnectedFalse}"/><br/>
+    <ui:button aura:id="setConnectedTrueButton" label="set connected true" press="{!c.setConnectedTrue}"/><br/>
     <ui:outputUrl aura:id="defaultlink" label="default layout" value="#default"/><br/>
     <ui:outputUrl aura:id="actionlink" label="action layout" value="#action"/><br/>
 

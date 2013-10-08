@@ -86,7 +86,7 @@ var priv = {
 
         // failure to communicate with server
         if (priv.isDisconnectedOrCancelled(response)) {
-            priv.setConnectedFalse();
+            priv.setConnected(false);
             return null;
         }
 
@@ -804,18 +804,21 @@ var priv = {
         }
         return false;
     },
-
-    setConnectedFalse : function() {
-        if (priv.isDisconnected) {
-            return;
-        }
-        e = $A.get("e.aura:connectionLost");
+    
+    setConnected : function(isConnected) {
+    	var isDisconnected = !isConnected;
+    	if (isDisconnected === priv.isDisconnected) {
+    		// Already in desired state so no work to be done:
+    		return;
+    	}
+    	
+        e = $A.get(isDisconnected ? "e.aura:connectionLost" : "e.aura:connectionResumed");
         if (e) {
-            priv.isDisconnected = true;
+            priv.isDisconnected = isDisconnected;
             e.fire();
         } else {
             // looks like no definitions loaded yet
-            alert("Connection lost");
+            alert(isDisconnected ? "Connection lost" : "Connection resumed");
         }
     }
 };

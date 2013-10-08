@@ -38,9 +38,6 @@
     			e.setParams(evt.getParams())
     			e.fire();
     		}
-    		        	   	
-        	pageItems[targetPage].getElement().focus();
-        	         	
         	//fire event to target indicator item
         	e = pageItems[targetPage].get("e.pageSelected");
 			e.setParams(evt.getParams())

@@ -61,20 +61,21 @@
 		switch (event.getParam("destination")) {
 		case "top" :
 			offset = component.find("pullDown").getElement();
-			scroller.scrollTo(0, 0 - offset.clientHeight, event.getParam("time"));
+			scroller.scrollTo(0, 0 - offset.offsetHeight, event.getParam("time"));
 			break;
 		case "bottom" :
 			offset = component.find("pullUp").getElement();
-			scroller.scrollTo(0, 0 - (scrollContent.clientHeight - scrollWrapper.clientHeight - offset.clientHeight), event.getParam("time"));
+			scroller.scrollTo(0, 0 - (scrollContent.offsetHeight - scrollWrapper.offsetHeight - offset.offsetHeight), event.getParam("time"));
 			break;
 		case "left" :
 			scroller.scrollTo(0, 0, event.getParam("time"));
 			break;
 		case "right" :	
-			scroller.scrollTo(0 - (scrollContent.clientWidth - scrollWrapper.clientWidth), 0, event.getParam("time"));
+			scroller.scrollTo(0 - (scrollContent.offsetHeight - scrollWrapper.offsetHeight), 0, event.getParam("time"));
 			break;
 		case "custom" :
-			scroller.scrollTo(event.getParam("xcoord"), event.getParam("ycoord"), event.getParam("time"));
+			offset = component.find("pullDown").getElement();
+			scroller.scrollTo(event.getParam("xcoord"), event.getParam("ycoord") - offset.offsetHeight, event.getParam("time"));
 		}
 	},
 	
@@ -98,6 +99,7 @@
 					var vScroll = attributes.getValue("vscroll").getBooleanValue();
 					var showScrollbars = attributes.getValue("showscrollbars").getBooleanValue();
 					var useTransform = attributes.getValue("useTransform").getBooleanValue();
+					var useTransition = attributes.getValue("useTransition").getBooleanValue();
                     var checkDOMChanges = attributes.getValue("checkDOMChanges").getBooleanValue();
                     var bindEventsToScroller = attributes.getValue("bindEventsToScroller").getBooleanValue();
 
@@ -140,9 +142,9 @@
 					iScroll.prototype._getEventTarget = function(type, el) {
 						var target;
 						
-						if (type === this.RESIZE_EV || type === this.END_EV) {
+						if (type === this.RESIZE_EV) {
 							target = window;
-						} else if (bindEventsToScroller) {
+						} else if (this.options.bindEventsToScroller) {
 							target = this.scroller;
 						} else {
 							target = el || this.scroller;
@@ -153,7 +155,7 @@
 
 					//START override iScroll to have the option to bind the events to the scroller itself					
 					iScroll.prototype._bind = function(type, el, bubble) {						
-						var target = this._getEventTarget(type, el);						
+						var target = this._getEventTarget(type, el);
 						target.addEventListener(type, this, !!bubble);
 					};
 					
@@ -177,7 +179,7 @@
 						fadeScrollbar : true,
 
 						useTransform : useTransform,
-						useTransition : false,
+						useTransition : useTransition,
 
 						topOffset : pullDownOffset,
 
@@ -497,6 +499,11 @@
 				that.wrapper = typeof el == 'object' ? el : doc.getElementById(el);
 				that.wrapper.style.overflow = 'hidden';
 				that.scroller = that.wrapper.children[0];
+				that.RESIZE_EV = RESIZE_EV;
+				that.START_EV = START_EV;
+				that.MOVE_EV = MOVE_EV;
+				that.END_EV = END_EV;
+				that.CANCEL_EV = CANCEL_EV;
 
 				// Default options
 				that.options = {
@@ -532,6 +539,7 @@
 					// Snap
 					snap : false,
 					snapThreshold : 1,
+					snapTime : 300,
 
 					// Events
 					onRefresh : null,
@@ -1361,7 +1369,7 @@
 					return {
 						x : x,
 						y : y,
-						time : 600
+						time : that.options.snapTime
 					};
 				},
 

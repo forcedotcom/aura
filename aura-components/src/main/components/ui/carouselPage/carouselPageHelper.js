@@ -16,20 +16,27 @@
 
 {
 	updateSize: function(cmp, width, height) {
-		var width = width || cmp.get('v.priv_width'),
-			height = height || cmp.get('v.priv_height');			
-		
-		var el = cmp.getElement();
+		var w=width || cmp.get('v.priv_width'),
+			h=height || cmp.get('v.priv_height'),
+			el = cmp.getElement();
 		
 		if (!el) {
+			if ($A.util.isNumber(w)) {
+				cmp.getValue('v.priv_width').setValue(w);
+			}
+			
+			if ($A.util.isNumber(h)) {
+				cmp.getValue('v.priv_height').setValue(h);
+			}
+			
 			return;
 		}
 		
-		if ($A.util.isNumber(width)) {
-			el.style.width = width + 'px';
+		if ($A.util.isNumber(w)) {
+			el.style.width = w + 'px';
 		}
-		if ($A.util.isNumber(height)) {
-			el.style.height = height + 'px';
+		if ($A.util.isNumber(h)) {
+			el.style.height = h + 'px';
 		}
 	},
 	
@@ -45,12 +52,10 @@
 				pageModel = cmp.get('v.pageModel');
 				
 			cmp.getValue('v.isSelected').setValue(true);
-			cmp.getValue("v.priv_ariaExpanded").setValue(true);
 			$A.util.addClass(cmp.getElement(), selectedItemCss);
-			$A.util.removeClass(cmp.getElement(), hiddenCssClass);
+			this.showPage(cmp, selectedPage);
 		} else {
 			cmp.getValue('v.isSelected').setValue(false);
-			cmp.getValue("v.priv_ariaExpanded").setValue(false);
 			$A.util.removeClass(cmp.getElement(), selectedItemCss);
 		}
 	},
@@ -58,14 +63,15 @@
 	/**
 	 * Update page content
 	 */
-	updatePage: function(cmp, evt) {
-		var pageCmp = evt.getParam("pageComponent");
-		if (pageCmp) {
-			var pageContainer = cmp.find('pageContainer').getValue('v.body');
-			if (!pageContainer.isEmpty()) {
-				pageContainer.destroy();
-	        }
-			pageContainer.setValue(pageCmp);
+	updatePage: function(cmp, pageBody) {
+		var pageContainer = cmp.find('pageContainer').getValue('v.body');
+		
+		if (!pageContainer.isEmpty()) {
+			pageContainer.destroy();
+        }
+		
+		if (pageBody) {
+			pageContainer.setValue(pageBody);
 		}
 	},
 	
@@ -80,9 +86,7 @@
 			cmp.getValue('v.class').setValue(strClass + ' hidden');
 		}
 		
-		if (cmp.get('v.priv_continuousFlow')) {								
-			cmp.getValue('v.priv_ariaExpanded').setValue(true);		 
-		} else {
+		if (!cmp.get('v.priv_continuousFlow')) {
 			var snap = cmp.get('v.priv_snap');			
 			if (snap && snap.indexOf('.') != -1) {
 				cmp.getValue('v.priv_snap').setValue(snap.substring(snap.indexOf('.') + 1));
@@ -91,21 +95,33 @@
 	},
 	
 	showPage: function(cmp, pageIndex) {
-		var curPage = cmp.get('v.pageIndex'),			
+		var curPage = cmp.get('v.pageIndex'),
+			isVisible = cmp.getValue('v.priv_visible').getBooleanValue(),
 			hiddenClass = 'hidden';
 			
-		if (pageIndex == curPage) {
-			$A.util.removeClass(cmp.getElement(), hiddenClass);			
+		if (pageIndex == curPage && !isVisible) {
+			$A.util.removeClass(cmp.getElement(), hiddenClass);
+			cmp.getElement().setAttribute('aria-expanded', 'true');
+			cmp.getValue('v.priv_visible').setValue(true);
 		}		
 	},
 	
 	hidePage: function(cmp, pageIndex) {
 		
-		var curPage = cmp.get('v.pageIndex'),			
+		var curPage = cmp.get('v.pageIndex'),
+			isVisible = cmp.getValue('v.priv_visible').getBooleanValue(),
 			hiddenClass = 'hidden';
 		
-		if (pageIndex == curPage) {			
+		if (pageIndex == curPage && isVisible) {			
 			$A.util.addClass(cmp.getElement(), hiddenClass);
+			cmp.getElement().setAttribute('aria-expanded', 'false');
+			cmp.getValue('v.priv_visible').setValue(false);
+		}
+	},
+	
+	setDefaultAttributes: function(cmp) {
+		if (!cmp.get('v.priv_continuousFlow')) {
+			cmp.getElement().setAttribute('aria-expanded', 'false');
 		}
 	}
 }

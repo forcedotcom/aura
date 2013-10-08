@@ -47,9 +47,10 @@ Test.Components.Ui.Carousel.CarouselPageHelperTest=function(){
     			getElement : function() {},
     			getValue : function(value) {
     				return {
-    					setValue : function(value) {}
+    					setValue : function(value) {},
+    					getBooleanValue : function() {return true;}
     				}
-    			}
+    			}    			
     		};
     		var targetEvent = {
     			getParam : function(param) {return 1;}

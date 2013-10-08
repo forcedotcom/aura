@@ -125,7 +125,8 @@
 
             self.FastClick.prototype.onTouchStart = function(event) {
                 $A.util.on(this.element, "touchend", this, false);
-                $A.util.on(document.body, "touchmove", this, false);
+                //bind touchmove event to element instead of document, for the event could be stop propagated by child elements
+                $A.util.on(this.element, "touchmove", this, false);
 
                 this.startX = event.touches[0].clientX;
                 this.startY = event.touches[0].clientY;
@@ -153,8 +154,8 @@
             };
 
             self.FastClick.prototype.reset = function() {
-                this.element.removeEventListener("touchend", this, false);
-                document.body.removeEventListener("touchmove", this, false);
+            	$A.util.removeOn(this.element, "touchend", this, false);
+            	$A.util.removeOn(this.element, "touchmove", this, false);
 
                 this.startX = 0;
                 this.startY = 0;

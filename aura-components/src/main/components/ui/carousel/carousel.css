@@ -18,13 +18,15 @@
 .THIS   {
  	position: relative;
 	background: #2e4153;
-	display: block;		
+	display: block;
+	backface-visibility:hidden;
+	-webkit-backface-visibility: hidden;		
  }
   
   
  .THIS .carousel-nav-container { 	
  	position: relative;
- 	padding: 21px 0;
+ 	padding: 20px 0;
 	display: block;
 	width: 100%;
 	text-align: center;	

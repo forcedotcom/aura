@@ -15,6 +15,18 @@
  */
  
 .THIS {
+	display: inline-block;	
+	vertical-align: middle;
+	width: 12px;
+	padding: 0 0.5em;
+	margin: 0 6px;
+	max-width: 150px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.THIS a {	
 	width: 8px;
 	height: 8px;
 	border-radius: 8px;
@@ -22,6 +34,6 @@
 	display: inline-block;
 }
 
-.THIS.carousel-nav-item-selected {
+.THIS .carousel-nav-item-selected {
 	background: #2d95d6;
 }

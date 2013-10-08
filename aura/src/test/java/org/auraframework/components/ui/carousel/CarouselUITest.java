@@ -38,8 +38,8 @@ public class CarouselUITest extends WebDriverTestCase {
 
     private final String URL = "/uitest/carousel_Test.cmp";
     private final String CAROUSEL_XPATH = "//article[contains(@class, 'uitestCarousel_Test')] | //article[contains(@class, 'myclass')]";
-    private final String NAVIGATION_ITEM_SELECTOR = "a[class*='uiCarouselPageIndicatorItem']";
-    private final String NAVIGATION_ITEM_SELECTED_SELECTOR = "a[class*='uiCarouselPageIndicatorItem'][class*='carousel-nav-item-selected']";
+    private final String NAVIGATION_ITEM_SELECTOR = "a[class*='carousel-nav-item']";
+    private final String NAVIGATION_ITEM_SELECTED_SELECTOR = "a[class*='carousel-nav-item-selected']";
     private final String CAROUSEL_PAGE_SELECTOR = "section[class*='uiCarouselPage']";
     private final String CAROUSEL_PAGE_ITEM_SELECTOR = "li[class*='uiCarouselPageItem']";
     private final String AURA_RENDERED_BY_ID = "data-aura-rendered-by";
@@ -51,7 +51,8 @@ public class CarouselUITest extends WebDriverTestCase {
     /**
      * Able to tab into a page on the carousel.
      */
-    public void testTabIntoCarouselPage() throws Exception {
+    //TODO: Renable after W-1851013 is fixed. Currently this test flaps.
+    public void _testTabIntoCarouselPage() throws Exception {
         open(URL);
         WebDriver driver = getDriver();
         WebElement carousel = getCarousel(driver, 1);

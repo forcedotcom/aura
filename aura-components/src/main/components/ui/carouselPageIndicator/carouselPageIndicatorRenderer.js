@@ -13,38 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
-.THIS   {	
-	width: 50%;
-	height: 140px;
-	display: table-cell;
-	outline: 1px solid #2e4153;
-	float: left;
-	background: #344a5f;
-	font-size: .8em;
-	text-align: center;
-}
 
-.THIS a:focus {
-	background: #3d576f;
-	outline: none;
-}
-
-.THIS .action-icon-container {
-	display: block;
-	width: 100%;
-	height: 100%;
-	color: #a9bdd0;
-}
-
-.THIS .entity-mdp {
-	width: 56px;
-	height: 56px;
-	border: 0;
-}
-
-.THIS .entity {
-	border-style: solid;
-	border-width: 0px;
-	border-radius: 5px;
+{
+	rerender: function(cmp) {
+		var pageCmp = cmp.getValue('v.pageComponents');
+		if (pageCmp.isDirty()) {
+			this.superRerender();
+		}
+	}	
 }

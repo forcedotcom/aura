@@ -83,14 +83,7 @@
      */
     pagerKeyed: function (cmp, evt, helper) {	
         helper.handlePagerKeyed(cmp, evt);
-    },
-    
-    /**
-     *  Handle pageSelected event     
-     */    
-    pageSelected: function(cmp, evt, helper) {    	
-    	helper.selectPage(cmp, evt.getParam("pageIndex"));
-    },
+    },    
     
     selectDefaultPage: function (cmp, evt, helper) {   	
     	if (cmp.isRendered()) {

@@ -22,6 +22,7 @@
     <aura:attribute name="showScrollbars" type="Boolean" default="true" description="Shows or hides scroll bars. Default value is &quot;true&quot;, which shows the scroll bars."/>
     <aura:attribute name="enabled" type="Boolean" default="true" description="Displays the scroller in an enabled state. Default value is &quot;true&quot;."/>
     <aura:attribute name="useTransform" type="Boolean" default="true" description="Denotes whether to use transform scrollers and usually used with nested scrollers. Default value is &quot;true&quot;."/>
+    <aura:attribute name="useTransition" type="Boolean" default="true" description="Denotes whether to use css transition. Default value is &quot;false&quot;."/>
     <aura:attribute name="snap" type="String" description="The CSS style used to display the snap area. Locks the scroller to predefined positions."/>
     <aura:attribute name="width" type="String" description="The width of the scroll area in pixels (px) or percentage (%). Default value is &quot;100px&quot;."/>
     <aura:attribute name="class" type="String" description="A CSS style to be attached to the scroll area. This style is added in addition to base styles output by the component."/>
@@ -62,7 +63,7 @@
     <ui:resizeObserver onresize="{!c.refresh}"/>
     <div aura:id="scrollWrapper" class="{!v.class + ' scrollWrapper'}">
         <div aura:id="scrollContent" class="{!v.scrollContentClass}">
-            <aura:if isTrue="{!v.onPullToRefresh != null &amp;&amp; v.canRefresh}">
+            <aura:renderIf isTrue="{!v.onPullToRefresh != null &amp;&amp; v.canRefresh}">
                 <div aura:id="pullDown" class="pullToRefresh pullDown">
                     <span class="pullDownIcon"></span>
                     <div>
@@ -72,11 +73,11 @@
                         <span class="subtitle">{!v.pullToRefreshSubtitle}</span>
                     </div>
                 </div>
-            </aura:if>
+            </aura:renderIf>
 
             {!v.body}
             
-            <aura:if isTrue="{!v.onPullToShowMore != null &amp;&amp; v.canShowMore}">
+            <aura:renderIf isTrue="{!v.onPullToShowMore != null &amp;&amp; v.canShowMore}">
             	<div aura:id="shim"></div>
             	
                 <div aura:id="pullUp" class="pullToRefresh pullDown">
@@ -88,7 +89,8 @@
                         <span class="subtitle">{!v.pullToShowMoreSubtitle}</span>
                     </div>
                 </div>
-            </aura:if>           
+            </aura:renderIf>
+
         </div>
     </div>
 </aura:component>

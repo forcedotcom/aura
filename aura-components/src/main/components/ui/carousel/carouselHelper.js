@@ -17,13 +17,17 @@
 	//number of milliseconds to wait before navigating to the next page with arrow key
 	KEY_PAGE_SELECTION_TIMEOUT_DURATION: 200,
 	//number of pixels the scroller has moved before handling the scrollMove event
-	SCROLL_START_THRESHOLD : 10,
+	SCROLL_START_THRESHOLD : 4,
 	//indicates only the selected page is visible or not
     SHOW_SELECTED_PAGE_ONLY : true,
     //Minimum distance to swipe to find out the intended swipe direction
-    DISTANCE_THRESHOLD : 5,    
+    DISTANCE_THRESHOLD : 5,
+    //Direction
+    HORIZONTAL : 1,    
     //navContainer height, hardcode for now so it does not require updating the size dynamically if width and height is set
     NAV_CONTAINER_HEIGHT : 58,
+    //number of previous or next pages to mark as visible while user is swiping
+    NUMBER_OF_PAGES_TO_SHOW : 3,
    	
 	init : function(cmp) {		
 		this.initSize(cmp);
@@ -60,7 +64,7 @@
 			pageCmps = this.getPageComponents(cmp),			
 			isContinuousFlow = cmp.get('v.continuousFlow'), 
 			isVisible = isContinuousFlow || !this.SHOW_SELECTED_PAGE_ONLY,
-			page, snap = this.getSnap(cmp),	
+			page, pageSuper, pageTmp, snap = this.getSnap(cmp),
 			pageHeight = this.getPageSize(cmp).height,
 			pages = [];	
 		
@@ -76,16 +80,18 @@
 			
 			for ( var i = 0; i < pageCmps.length; i++) {
 				page = pageCmps[i];
+				pageSuper = page.getSuper();
 				//append page components to page container body
 				if ($A.util.isComponent(page) && page.isInstanceOf("ui:carouselPage")) {
+					pageTmp = pageSuper.isInstanceOf('ui:carouselPage') ? pageSuper : page;
 					//page index starts with 1
-					page.getValue('v.pageIndex').setValue(i + 1);
-					page.getValue('v.parent').setValue([cmp]);
-					page.getValue('v.priv_width').setValue(cmp._width);
-					page.getValue('v.priv_height').setValue(pageHeight);
-					page.getValue('v.priv_visible').setValue(isVisible);
-					page.getValue('v.priv_snap').setValue(snap);					
-					page.getValue('v.priv_continuousFlow').setValue(isContinuousFlow);
+					pageTmp.getValue('v.pageIndex').setValue(i + 1);
+					pageTmp.getValue('v.parent').setValue([cmp]);
+					pageTmp.getValue('v.priv_width').setValue(cmp._width);
+					pageTmp.getValue('v.priv_height').setValue(pageHeight);
+					pageTmp.getValue('v.priv_visible').setValue(isVisible);
+					pageTmp.getValue('v.priv_snap').setValue(snap);					
+					pageTmp.getValue('v.priv_continuousFlow').setValue(isContinuousFlow);
 					pages.push(page);
 				}
 			}
@@ -132,44 +138,58 @@
 			var hasTouch = 'ontouchstart' in window;
 			if (hasTouch) {
 				$A.util.on(el, 'touchstart', function(e) {helper.onStart(cmp, e);});
-				$A.util.on(el, 'touchmove', function(e) {helper.onMove(cmp, e);});
-				$A.util.on(el, 'touchend', function(e) {helper.onEnd(cmp, e);});				
+				$A.util.on(el, 'touchmove', function(e) {helper.onMove(cmp, e);});								
 			} else {
 				$A.util.on(el, 'mousedown', function(e) {helper.onStart(cmp, e);});
-				$A.util.on(el, 'mousemove', function(e) {helper.onMove(cmp, e);});
-				$A.util.on(el, 'mouseup', function(e) {helper.onEnd(cmp, e);});
+				$A.util.on(el, 'mousemove', function(e) {helper.onMove(cmp, e);});								
 			}
+			$A.util.on(el, 'click', function(e){helper.onClick(cmp, e)}, true); //useCapture
 		}
 	},
 	
 	onStart: function(cmp, evt) {
 		var point = evt.touches && evt.touches.length == 1 ? evt.touches[0] : evt;	
-		cmp._swipe = { 
+		cmp._startPos = { 
 			startx: point.pageX, 
 			starty: point.pageY
-		}
-		
+		}		
 	},
 	
 	onMove: function(cmp, evt) {
-		var swipe = cmp._swipe;
-		if (swipe) {
-			var point = evt.changedTouches && evt.changedTouches.length == 1 ? evt.changedTouches[0] : evt;	
-	        var dx = point.pageX - swipe.startx,
-	            dy = point.pageY - swipe.starty,
-	            y = Math.abs(dy),
-	            x = Math.abs(dx);
-	
-	        if (x > this.DISTANCE_THRESHOLD && x > y) {					
-	    		//swiping horizontally					
-				evt.stopPropagation();     
-	        }			
+		if (cmp._startPos && this.hasMoved(cmp, evt, this.HORIZONTAL)) {
+    		//swiping horizontally, stop event from bubbling up to prevent parent scroller from moving
+			evt.stopPropagation();
 		}
 	},
+		
+	onClick : function(cmp, evt) {		
+		if (this.hasMoved(cmp, evt)) {			
+			$A.util.squash(evt, true);
+		}
+		delete cmp._startPos;
+	},
 	
-	onEnd : function(cmp, evt) {		
-		delete cmp._swipe;
-	},	
+	/**
+	 * Check whether the mouse/touch past the boundary since it started
+	 */
+	hasMoved : function(cmp, evt, direction) {
+		var startPos = cmp._startPos
+		if (!startPos) {
+			return false;
+		}
+		
+		var point = evt.changedTouches && evt.changedTouches.length == 1 ? evt.changedTouches[0] : evt;	
+        var dx = point.pageX - startPos.startx,
+            dy = point.pageY - startPos.starty,
+            y = Math.abs(dy),
+            x = Math.abs(dx);
+
+        if (direction == this.HORIZONTAL) {
+        	return x > this.DISTANCE_THRESHOLD && x > y;
+        } else {		
+        	return x > this.DISTANCE_THRESHOLD || y > this.DISTANCE_THRESHOLD; 
+        }
+	},
 	
 	getPageComponentsFromIteration : function(iterCmp) {
 		var realBody = iterCmp.get('v.realBody'),
@@ -191,8 +211,8 @@
 	 * This event is always fired after the carousel is rendered
 	 */
 	refresh: function(cmp, evt) {
-		if (cmp.isRendered()) {
-			this._setContainerDeltaX(cmp); 
+		//need to call getConcreteComponent() in case there's a sub-component that extends this component
+		if (cmp.isValid() && cmp.getConcreteComponent().isRendered()) {			 
 			this.updateSize(cmp);
 	    } 
 	},
@@ -200,24 +220,28 @@
 	/**
 	 * Update carousel and page size if carousel width is not pre-defined
 	 */
-	updateSize: function(cmp) {		
-		var origWidth = cmp.get('v.width'),
-			origHeight = cmp.get('v.height');
+	updateSize: function(cmp, force) {		
+		var width = cmp.get('v.width'),
+			height = cmp.get('v.height');
 	
 		var pages = this.getPageComponents(cmp);
 		//need to update size width if carousel width and height is not explicitly set
-		if (pages.length > 0 && !(origWidth  && origHeight)) {
+		if (pages.length > 0) {
 			var carouselSize = this.getCarouselSize(cmp);
-			 	
-			this.updateCarouselSize(cmp, pages, carouselSize);
-			this.updatePageSize(cmp, pages, carouselSize);
-			this._setContainerDeltaX(cmp);
+			// Do not update the carousel if the width is 0
+			if (carouselSize.width > 0) {
+    			this.updateCarouselSize(cmp, pages, carouselSize, force);
+            }
 		}
 	},
 	
-	updateCarouselSize: function(cmp, pages, carouselSize) {		
-		cmp.getValue('v.priv_carouselStyle').setValue(this.getSizeStyle(carouselSize.width, carouselSize.height));		
-		cmp.getValue('v.priv_scrollerWidth').setValue(carouselSize.width * pages.length + 'px'); 
+	updateCarouselSize: function(cmp, pages, carouselSize, force) {		
+		var cStyle = this.getSizeStyle(carouselSize.width, carouselSize.height);		
+		if (cStyle !== cmp.get('v.priv_carouselStyle') || force) {
+			cmp.getValue('v.priv_carouselStyle').setValue(cStyle);
+			cmp.getValue('v.priv_scrollerWidth').setValue(carouselSize.width * pages.length + 'px');
+			this.updatePageSize(cmp, pages, carouselSize);
+		}
 	},
 	
 	updatePageSize: function(cmp, pages, carouselSize) {		 
@@ -246,7 +270,7 @@
 		if (!width) {
 			var el = cmp.getElement();	
 			if (el) {
-				width = el.offsetWidth + this._getContainerDeltaX(cmp);
+				width = el.parentNode.offsetWidth;
 			}
 		}
 		
@@ -265,20 +289,6 @@
 				 
 		return {width: width, height: height};
 	},
-	
-	_setContainerDeltaX: function(cmp) {
-		cmp._newDeltaX = cmp.getElement().parentNode.offsetWidth;
-		if (!cmp._oldDeltaX) {			
-			cmp._containerDeltaX = 0;
-		} else {
-			cmp._containerDeltaX =  cmp._newDeltaX - cmp._oldDeltaX;			 
-		}
-		cmp._oldDeltaX = cmp._newDeltaX;
-	},
-	
-	_getContainerDeltaX: function(cmp) {
-		return cmp._containerDeltaX || 0;		
-	},		 
 	
 	/**
 	 * Update page content
@@ -338,24 +348,29 @@
 		}
 					
 		var scroller = this.getScroller(cmp),
-			nextPage,			
+			nextPage,
+			toPage,
 			prevSelectedPage = cmp.get('v.priv_currentPage');
+		
+		cmp._isMoving = true;
 	 		
 		if (scroller.absDistX > this.SCROLL_START_THRESHOLD && !cmp._isScrollStartProcessed) {
+			var pages = this.getPageComponents(cmp);
+			cmp._isScrollStartProcessed = true;	
 			
 			if (scroller.dirX == 1) {
 				//scrolling to right
 				//scroller page starts with 0;
 				nextPage = scroller.currPageX + 2;
+				toPage = Math.min(nextPage + this.NUMBER_OF_PAGES_TO_SHOW, pages.length); 
 			} else if (scroller.dirX == -1) {
 				//scrolling to the left				
 				nextPage = scroller.currPageX;
+				toPage = Math.max(1, nextPage - this.NUMBER_OF_PAGES_TO_SHOW);
 			}
-					
-			cmp._isScrollStartProcessed = true;
-			var pages = this.getPageComponents(cmp);			
-			if (nextPage > 0 && nextPage <= pages.length) {			
-				this.showPage(this.getPageComponentFromIndex(cmp, nextPage), nextPage);
+								
+			if (nextPage > 0 && nextPage <= pages.length) {
+				this.showPages(cmp, nextPage, toPage);
 			}
 		}
 	},
@@ -370,6 +385,7 @@
 			prevSelectedPage = cmp.get('v.priv_currentPage');
 				
 		cmp._isScrollStartProcessed = false;
+		cmp._isMoving = false;
 
 		if (prevSelectedPage == currentPageX) {
 			//scrolled back to the same page			 
@@ -390,7 +406,7 @@
 		e.fire();		
 	},
 	
-	hidePage: function(pageCmp, pageIndex) {		 
+	hidePage: function(pageCmp, pageIndex) {
 		var e = pageCmp.get('e.hide');
 		e.setParams({'pageIndex' : pageIndex});
 		e.fire();
@@ -402,7 +418,7 @@
 	pageSelected: function(cmp, pageIndex) {
 
 		var prevSelectedPage = cmp.get('v.priv_currentPage');
-			
+		var me = this;	
 		if (prevSelectedPage == pageIndex) {			
 			return;
 		}
@@ -410,36 +426,75 @@
 		var curPageCmp = this.getPageComponentFromIndex(cmp, pageIndex);
 		if (curPageCmp && curPageCmp.isRendered()) {
 			var prePageCmp = this.getPageComponentFromIndex(cmp, prevSelectedPage);
-
+			this.setSelectedPage(cmp, pageIndex);
+			
+			me.firePageSelectedEventToPageIndicator(cmp, curPageCmp, pageIndex);
+			
 			cmp.getAttributes().setValue('priv_currentPage', pageIndex);			
-			this.firePageSelectedEventToPage(prePageCmp, pageIndex);
-			this.firePageSelectedEventToPage(curPageCmp, pageIndex);
+			me.firePageSelectedEventToPage(prePageCmp, pageIndex);
+			me.firePageSelectedEventToPage(curPageCmp, pageIndex);
+			var pageModel = me.getPageModelFromIndex(cmp, pageIndex);
 			
-			var e = cmp.get('e.loadPage');    			
-			e.setParams({pageModel: this.getPageModelFromIndex(cmp, pageIndex), pageIndex: pageIndex});    			
-			e.fire();	
+			setTimeout(function() {
+				if (cmp.isValid()) {
+					var e = cmp.get('e.loadPage');				
+					e.setParams({pageComponent: curPageCmp, pageModel: pageModel, pageIndex: pageIndex});    			
+					e.fire();
+					//Fire pageSelected to let any sub-components that are handling it know the change has been done. 
+					cmp.get("e.pageSelected").setParams({pageComponent: curPageCmp, "pageModel" : pageModel, pageIndex: pageIndex}).fire();
+				}
+			}, 0);
 			
-			this.firePageSelectedEventToPageIndicator(cmp, curPageCmp, pageIndex);
-			
-			this.hideAllUnselectedPages(cmp, pageIndex);
+			me.delayHideAllUnselectedPages(cmp);						
 		}
 	},
 	
-	showAllPages: function(cmp) {	
+	showPages: function(cmp, from, to) {
+		var that = this;
 		var pages = this.getPageComponents(cmp);
-		for (var i=1; i<= pages.length; i++) {
-			this.showPage(pages[i-1], i);
+				
+		if ($A.util.isNumber(from) && $A.util.isNumber(to) && from > 0 && from <= pages.length && to > 0 && to <= pages.length) {
+			var pageCmp = pages[from-1]
+			this.showPage(pageCmp, from);
+			//show rest of the pages for smoother swiping 
+			if (to > from && to <= pages.length) {
+				//scrolling to the right
+				for (var i=from + 1; i<= to; i++) {
+					this.showPage(pages[i-1], i);
+				}
+			} else if (from > to && to > 0) {
+				//scrolling to the left
+				for (var i=from - 1; i >= to; i--) {
+					this.showPage(pages[i-1], i);
+				}
+			}
+		} else {
+			for (var i=1; i<= pages.length; i++) {
+				this.showPage(pages[i-1], i);
+			}
 		}
 	},
 	
-	hideAllUnselectedPages: function(cmp, selectPage) {
-		if (cmp.get('v.continuousFlow')) {
+	hideAllUnselectedPages: function(cmp) {
+		if (!cmp.isValid() || cmp.isValid() && cmp.get('v.continuousFlow')) {
 			return;
 		}
+				
+		if (cmp._delayHidePagesTimer) {
+			window.clearTimeout(cmp._delayHidePagesTimer);
+			cmp._delayHidePagesTimer = null;
+		}
 		
-		var pages = this.getPageComponents(cmp);
+		if (cmp._isMoving) {
+			this.delayHideAllUnselectedPages(cmp);
+			return;			
+		}
+		
+		var pages = this.getPageComponents(cmp),
+			selectedPage = this.getSelectedPage(cmp);
+
 		for (var i=1; i<= pages.length; i++) {			
-			if (i != selectPage) {
+			if (i != selectedPage) {
 				this.hidePage(pages[i-1], i);
 			}
 		}
@@ -475,8 +530,11 @@
 			prevSelectedPage = cmp.get('v.priv_currentPage');
 
 		if (pageIndex > 0 && pageIndex <= pages.length && prevSelectedPage !== pageIndex) {
-
-			this.showAllPages(cmp);		 
+			//show all pages in between before scrolling for better UI experience			
+			var from = prevSelectedPage == -1 ? pageIndex : (prevSelectedPage < pageIndex ? ++prevSelectedPage : --prevSelectedPage);
+			//save the pageIndex, so that it won't be hide by the callback in the timer, which could cause flickering and performance issue
+			this.setSelectedPage(cmp, pageIndex);
+			this.showPages(cmp, from, pageIndex);
 			
 			scroller = this.getScroller(cmp);
 			//scroller page starts with 0
@@ -485,17 +543,21 @@
 	},
 	
 	selectDefaultPage : function(cmp) {
-		var curPage = cmp.get('v.priv_currentPage');
-		
-		if (curPage > -1) {
-			//page already selected;
+		var curPage = cmp.get('v.priv_currentPage'),
+			scroller = this.getScroller(cmp);
+			
+		if (!scroller || curPage > -1) {
 			return;
 		}
-		
+				
+		this.selectPage(cmp, cmp.getConcreteComponent().getDef().getHelper().getDefaultPageIndex(cmp), 0); 
+	},
+	
+	getDefaultPageIndex : function(cmp) {
 		var	pageCmps = this.getPageComponents(cmp),
 			defaultPage = cmp.get('v.defaultPage'),
 			pageToSelect = 1;	
-				 
+			 
 		if (defaultPage) {
 			pageToSelect = defaultPage;
 		} else {
@@ -506,7 +568,8 @@
 		        }
 		    }	        
 		}
-		this.selectPage(cmp, pageToSelect, 0); 
+		
+		return pageToSelect;
 	},
 		 
 		
@@ -554,6 +617,16 @@
 	},
 	
 	/**
+	 * Buffer the execution of the function, if during the time interval, the function is call again, the previous execution will be canceled 
+	 */
+	delayHideAllUnselectedPages : function(cmp) {
+		if (!cmp._delayHidePagesTimer) {
+			var that = this;
+			cmp._delayHidePagesTimer = window.setTimeout(function(){that.hideAllUnselectedPages(cmp)}, 500);
+		}
+	},
+	
+	/**
 	 * Spinner controls
 	 */
 	showLoadingIndicator: function (cmp) {
@@ -576,5 +649,14 @@
 		        evt.fire();
 			}
 		}
+    },
+    
+    setSelectedPage: function(cmp, selectedPage) {    	
+    	cmp._selectedPage = selectedPage; 
+    },
+    
+    getSelectedPage: function(cmp) {    	
+    	return cmp._selectedPage || cmp.get('v.priv_currentPage');
     }
+    
 })

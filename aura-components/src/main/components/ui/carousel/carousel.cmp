@@ -21,6 +21,7 @@
 		<aura:attribute name="title" type="String" description="Title of the carousel" />
 		<aura:attribute name="width" type="Integer" description="Width of the carousel in pixels" />
 		<aura:attribute name="height" type="Integer" description="Height of the carousel in pixels" />
+		<aura:attribute name="useTransition" type="Boolean" default="true" description="" />
 		
 		<aura:attribute name="pageIndicatorPosition" type="String" default="top" description="Position of the page indicator. Acceptable values are 'top' and 'bottom'. " />
 		<aura:attribute name="continuousFlow" type="Boolean" default="false" description="Set to true if the carousel pages should flow continuously. The default is 'false'." />		
@@ -45,8 +46,7 @@
 		<aura:registerevent name="scrollEnd" type="ui:scrollEnd" description="The event fired when the end of the scroller is reached." />
 		<aura:registerevent name="refreshCurrentPage" type="ui:carouselPageEvent" description="Fire this event to refresh the current carousel page." />
 				
-    	<aura:handler name="selectDefaultPage" action="{!c.selectDefaultPage}" />
-    	<aura:handler name="pageSelected" action="{!c.pageSelected}" />    
+    	<aura:handler name="selectDefaultPage" action="{!c.selectDefaultPage}" />    	    
 		<aura:handler name="init" value="{!this}" action="{!c.onInit}" />
 		<aura:handler name="change" value="{!v.pageComponents}" action="{!c.onPageComponentsChanged}" />
 		<aura:handler name="refreshCurrentPage" action="{!c.onRefreshCurrentPage}" />
@@ -62,12 +62,13 @@
 	        			<ui:carouselPageIndicator />        		 
 					</nav>					
 				</aura:if>
-							
-			   	<aura:if isTrue="{!v.spinner.length > 0}"> 
-			   		{!v.spinner}
-			   	</aura:if>
-			   	        
+					        
 		    	<div aura:id="pageContainer" class="carousel-pages">
+		    		<!--TODO: each page should has its own spinner -->
+		    		<aura:if isTrue="{!v.spinner.length > 0}"> 
+			   			{!v.spinner}
+			   		</aura:if>
+			   	
 			    	<ui:scroller aura:id="scroller"			    		
 			    		width="{!v.priv_scrollerWidth}"
 			    	 	class="scroll-container"			    	 	
@@ -78,8 +79,8 @@
 			    	   	refreshed="{!c.onScrollerRefreshed}"
 			    	   	snap="{!v.priv_snap}"
 			    	   	scrollContentClass="{!v.priv_scrollContentClass}"
-			    	   	bindEventsToScroller="true">
-			    	   	
+			    	   	bindEventsToScroller="true"
+			    	   	useTransition="{!v.useTransition}">
 							{!v.pageComponents}
 						 
 					</ui:scroller>					

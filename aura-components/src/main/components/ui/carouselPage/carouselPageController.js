@@ -25,7 +25,7 @@
 	},
 	
 	onPageUpdate: function(cmp, evt, helper) {		
-		helper.updatePage(cmp, evt);
+		helper.updatePage(cmp, evt.getParam("pageComponent"));
 	},
 	
 	onPageShow: function(cmp, evt, helper) {

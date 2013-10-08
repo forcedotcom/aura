@@ -22,12 +22,23 @@
 		helper.selectDefaultPage(cmp);
 	},
 	
-	rerender: function(cmp, helper) { 
-		this.superRerender();
+	rerender: function(cmp, helper) {
+		var shouldRerender = false,
+			width = cmp.getValue('v.width'),
+			height = cmp.getValue('v.height'),
+			pageCmps = cmp.getValue('v.pageComponents'),
+			forceUpdate = pageCmps.isDirty() ? true : false;
+
+		if (width.isDirty() || height.isDirty() || forceUpdate) {
+			helper.updateSize(cmp, forceUpdate);
+			shouldRerender = true;
+		}
 		
-		var pageCmps = cmp.getValue('v.pageComponents');
-		if (pageCmps.isDirty()) {            
-            $A.get("e.ui:updateSize").fire();  
-		}	
+		if (shouldRerender) {
+			this.superRerender();
+			if (forceUpdate) {
+				helper.selectDefaultPage(cmp);
+			}			
+		}
 	}
 }

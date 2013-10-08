@@ -165,6 +165,9 @@ var AuraDevToolService = function() {
                     }
                 }
                 return flattenRegistry(ret);
+            },
+            "rerenderings" : function(){
+                return renderingService.getRerenderingIndex();
             }
 //#end
         },

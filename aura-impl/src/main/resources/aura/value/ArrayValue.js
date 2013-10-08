@@ -28,7 +28,7 @@ function ArrayValue(config, def, component) {
 
     this.fireEvents = true;
     this.initialized = true;
-//#if {"modes" : ["DEVELOPMENT"]}
+//#if {"modes" : ["DEVELOPMENT", "STATS"]}
     if (def) {
         this.name = def.getDescriptor().getQualifiedName();
     }

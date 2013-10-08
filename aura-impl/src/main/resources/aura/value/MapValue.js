@@ -46,7 +46,7 @@ function MapValue(config, def, component){
     }
 
     this.dirty = false;
-//#if {"modes" : ["DEVELOPMENT"]}
+//#if {"modes" : ["DEVELOPMENT", "STATS"]}
     if (def) {
         this.name = def.getDescriptor().getQualifiedName();
     }

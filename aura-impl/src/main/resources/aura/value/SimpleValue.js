@@ -34,7 +34,7 @@ function SimpleValue(config, def, component) {
 
     /** DefDescriptor name for the value. */
     this.name = undefined;
-//#if {"modes" : ["DEVELOPMENT"]}
+//#if {"modes" : ["DEVELOPMENT", "STATS"]}
     if (def) {
         /** Name of this object */
         this.name = def.getDescriptor().getQualifiedName();
@@ -135,8 +135,10 @@ SimpleValue.prototype.setValue = function(v, skipChange) {
     if (!skipChange) {
         list = this.prepare("change");
     }
+    
     this.oldValue = this.value;
     this.value = v;
+    
     if (!skipChange) {
         this.updatePendingValue("change", this);
         this.firePending("change", list);

@@ -21,6 +21,6 @@
     <aura:attribute name="onclick" type="Aura.Action" description="The controller method that runs when the stamp is clicked."/>
     
     <a aura:id="uiStamp" title="{!v.title}" class="{!'stamp-'+v.severity+' '+v.class}" href="javascript:void(0);" onclick="{!v.onclick}">
-        <span class="assistiveText">{!v.body}</span>
+        {!v.body}
     </a>
 </aura:component>

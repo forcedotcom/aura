@@ -109,7 +109,7 @@
             }
         }
     },
-    
+
     /**
      * Make sure that visitation properly short circuits if visit() returns false.
      */
@@ -122,7 +122,7 @@
             var ExpandedOnlyVisitor = function() {
                 this.nodes = [];
             }
-            
+
             ExpandedOnlyVisitor.prototype.visit = function(node) {
                 return node.get('v.expanded');
             }
@@ -133,7 +133,7 @@
                 return;
             }
             var visitor = new ExpandedOnlyVisitor();
-            
+
             var B = cmp.find('B');
             B.getEvent('makeVisitor').setParams({
                 "visitor" : null,
@@ -143,22 +143,24 @@
                     B.getEvent('traverse').setParams(args).fire();
                 }
             }).fire();
-            
+
             aura.test.assertEquals(3, visitor.nodes.length);
             aura.test.assertEquals(cmp.find('B'), visitor.nodes[0]);
             aura.test.assertEquals(cmp.find('D'), visitor.nodes[1]);
             aura.test.assertEquals(cmp.find('F'), visitor.nodes[2]);
         }
     },
-    
+
     /**
      * Make sure that clicking a non-leaf node updates the expansion state.
      */
     testClickExpandCollapse : {
+        // TODO(W-1574768): tree/treeNode are not compatible with IE7/8
+        browsers: ["-IE7", "-IE8"],
         test : function(cmp) {
             // Get our initial state.
             var A = cmp.find('A');
-            
+
             aura.test.assertFalse(A.get('v.expanded'));
             // First click expands.
             var elemA = document.getElementById('node_' + A.getGlobalId());
@@ -167,13 +169,13 @@
             // Second one collapses.
             elemA.click();
             aura.test.assertFalse(A.get('v.expanded'));
-            
+
             // Clicking other elements below doesn't actually affect our expansion state.
             aura.test.assertFalse(cmp.find('C').get('v.expanded'));
             document.getElementById('node_' + cmp.find('C').getGlobalId()).click();
             aura.test.assertFalse(A.get('v.expanded'));
             aura.test.assertTrue(cmp.find('C').get('v.expanded'));
-            
+
             // Likewise, clicking elements above do not affect the local state.
             aura.test.assertTrue(cmp.find('root').get('v.expanded'));
             document.getElementById('node_' + cmp.find('root').getGlobalId()).click();

@@ -52,6 +52,8 @@
 	 * Test can expand and collapse nodes of a tree 
 	 */
 	testExpandCollapseNodesOnTree : {
+        // TODO(W-1574768): tree/treeNode are not compatible with IE7/8
+        browsers: ["-IE7", "-IE8"],
         test : function(cmp) {
         	// tree 1 expand node
         	var toyota = cmp.find("toyota");

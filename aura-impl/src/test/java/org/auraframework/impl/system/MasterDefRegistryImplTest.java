@@ -29,6 +29,7 @@ import java.util.concurrent.TimeUnit;
 import org.auraframework.Aura;
 import org.auraframework.adapter.RegistryAdapter;
 import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.ClientLibraryDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
@@ -473,7 +474,8 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
             checkExceptionStart(e, null, "No COMPONENT named markup://unknown:component found");
         }
         Mockito.verify(registry, Mockito.times(1)).compileDef(Mockito.eq(cmpDesc),
-                Mockito.<Map<DefDescriptor<? extends Definition>, Definition>> any());
+                Mockito.<Map<DefDescriptor<? extends Definition>, Definition>> any(),
+                Mockito.<List<ClientLibraryDef>> any());
 
         // another request for getUid will not re-compile
         Mockito.reset(registry);
@@ -484,7 +486,8 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
             checkExceptionStart(e, null, "No COMPONENT named markup://unknown:component found");
         }
         Mockito.verify(registry, Mockito.times(0)).compileDef(Mockito.eq(cmpDesc),
-                Mockito.<Map<DefDescriptor<? extends Definition>, Definition>> any());
+                Mockito.<Map<DefDescriptor<? extends Definition>, Definition>> any(),
+                Mockito.<List<ClientLibraryDef>> any());
     }
 
     public void testGetUidForNonQuickFixException() throws Exception {
@@ -509,7 +512,8 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
                     String.format("%s:1,38: Invalid attribute \"invalidAttribute\"", cmpDesc.getQualifiedName()));
         }
         Mockito.verify(registry, Mockito.times(1)).compileDef(Mockito.eq(cmpDesc),
-                Mockito.<Map<DefDescriptor<? extends Definition>, Definition>> any());
+                Mockito.<Map<DefDescriptor<? extends Definition>, Definition>> any(),
+                Mockito.<List<ClientLibraryDef>> any());
     }
 
     public void testCompileDef() throws Exception {
@@ -532,7 +536,8 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         ComponentDef def = registry.getDef(cmpDesc);
         assertNotNull(def);
         Mockito.verify(registry, Mockito.times(1)).compileDef(Mockito.eq(cmpDesc),
-                Mockito.<Map<DefDescriptor<? extends Definition>, Definition>> any());
+                Mockito.<Map<DefDescriptor<? extends Definition>, Definition>> any(),
+                Mockito.<List<ClientLibraryDef>> any());
         assertCompiledDef(def);
 
         // check all dependencies
@@ -567,7 +572,8 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         String uid = registry.getUid(null, def.getDescriptor());
         assertNotNull(uid);
         Mockito.verify(registry, Mockito.times(1)).compileDef(Mockito.eq(def.getDescriptor()),
-                Mockito.<Map<DefDescriptor<? extends Definition>, Definition>> any());
+                Mockito.<Map<DefDescriptor<? extends Definition>, Definition>> any(),
+                Mockito.<List<ClientLibraryDef>> any());
         Mockito.doReturn(true).when(def).isValid();
         assertCompiledDef(def);
 
@@ -589,19 +595,22 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         MasterDefRegistryImpl registry = getDefRegistry(true);
         registry.getDef(cmpDesc);
         Mockito.verify(registry, Mockito.times(1)).compileDef(Mockito.eq(cmpDesc),
-                Mockito.<Map<DefDescriptor<? extends Definition>, Definition>> any());
+                Mockito.<Map<DefDescriptor<? extends Definition>, Definition>> any(),
+                Mockito.<List<ClientLibraryDef>> any());
 
         // another getDef on same registry should not re-compile the def
         Mockito.reset(registry);
         assertNotNull(registry.getDef(cmpDesc));
         Mockito.verify(registry, Mockito.times(0)).compileDef(Mockito.eq(cmpDesc),
-                Mockito.<Map<DefDescriptor<? extends Definition>, Definition>> any());
+                Mockito.<Map<DefDescriptor<? extends Definition>, Definition>> any(),
+                Mockito.<List<ClientLibraryDef>> any());
 
         // another getDef on other registry instance should re-compile the def
         registry = getDefRegistry(true);
         assertNotNull(registry.getDef(cmpDesc));
         Mockito.verify(registry, Mockito.times(1)).compileDef(Mockito.eq(cmpDesc),
-                Mockito.<Map<DefDescriptor<? extends Definition>, Definition>> any());
+                Mockito.<Map<DefDescriptor<? extends Definition>, Definition>> any(),
+                Mockito.<List<ClientLibraryDef>> any());
     }
 
     public void testGetDefDescriptorNull() throws Exception {
@@ -996,5 +1005,28 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
             return true;
         }
         return false;
+    }
+
+    /**
+     * Verify basic functionality of MasterDefRegistryImpl.getClientLibraries.
+     * The same methods are test in ClientLibraryServiceImplTest, where we use ClientLibraryService.getUrls()
+     * @throws Exception
+     */
+    public void testGetClientLibraries()throws Exception{
+        MasterDefRegistry mdr = Aura.getContextService().getCurrentContext().getDefRegistry();
+        List<ClientLibraryDef> libDefs = mdr.getClientLibraries(null);
+        assertNull(libDefs);
+        
+        DefDescriptor<ApplicationDef> appDesc = Aura.getDefinitionService().getDefDescriptor(
+                "clientLibraryTest:testDependencies", ApplicationDef.class);
+        AuraContext cntx = Aura.getContextService().getCurrentContext();
+        cntx.setApplicationDescriptor(appDesc);
+        Aura.getDefinitionService().updateLoaded(appDesc);
+        
+        libDefs = mdr.getClientLibraries(cntx.getUid(appDesc));
+
+        //13 from clientLibraryTest:testDependencies and its dependencies + 4 from aura:component
+        //Update this number when you add new aura:clientLibrary tags to these components
+        assertEquals(17, libDefs.size());
     }
 }

@@ -16,12 +16,19 @@
 
 -->
 <aura:component abstract="true"
-         extensible="true"
-         template="aura:template"
-         renderer="js://aura.component, java://org.auraframework.renderer.ComponentRenderer"
-         implements="aura:rootComponent"
-         support="GA"
+                extensible="true"
+                template="aura:template"
+                renderer="js://aura.component, java://org.auraframework.renderer.ComponentRenderer"
+                implements="aura:rootComponent"
+                support="GA"
                 description="The root of the component hierarchy. Provides a default rendering implementation.">
+
+    <!-- required framework client libraries -->
+    <aura:clientLibrary name="UIPerfCss" type="CSS" modes="PTEST" />
+    <aura:clientLibrary name="UIPerf" type="JS" modes="PTEST,CADENCE"/>
+    <aura:clientLibrary name="UIPerfUi" type="JS" modes="PTEST"/>
+    <aura:clientLibrary name="CkEditor" type="JS" />
+
     <!-- we need to include all of the aura events, because many don't have direct references -->
     <aura:dependency resource="markup://aura" type="EVENT" />
     <aura:dependency resource="markup://aura:placeholder" />

@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-
 import org.auraframework.adapter.ComponentLocationAdapter;
 import org.auraframework.adapter.RegistryAdapter;
 import org.auraframework.def.ControllerDef;
@@ -33,6 +32,7 @@ import org.auraframework.def.HelperDef;
 import org.auraframework.def.ModelDef;
 import org.auraframework.def.ProviderDef;
 import org.auraframework.def.RendererDef;
+import org.auraframework.def.ResourceDef;
 import org.auraframework.def.SecurityProviderDef;
 import org.auraframework.def.TestSuiteDef;
 import org.auraframework.impl.compound.controller.CompoundControllerDefFactory;
@@ -160,9 +160,10 @@ public class AuraRegistryProviderImpl implements RegistryAdapter {
                     AuraRegistryProviderImpl.<HelperDef> createJavascriptRegistry(jsSourceFactory, DefType.HELPER),
                     AuraRegistryProviderImpl.<ProviderDef> createJavascriptRegistry(jsSourceFactory, DefType.PROVIDER),
                     AuraRegistryProviderImpl.<ModelDef> createJavascriptRegistry(jsSourceFactory, DefType.MODEL),
+                    AuraRegistryProviderImpl.<ResourceDef> createJavascriptRegistry(jsSourceFactory, DefType.RESOURCE),
 
                     createDefRegistry(new StyleDefFactory(new SourceFactory(styleLoaders)),
-                            Sets.newHashSet(DefType.STYLE),
+                            Sets.newHashSet(DefType.STYLE, DefType.RESOURCE),
                             Sets.newHashSet(DefDescriptor.CSS_PREFIX, DefDescriptor.TEMPLATE_CSS_PREFIX)),
                     createDefRegistry(new JavaTypeDefFactory(javaLoaders), DefType.TYPE, DefDescriptor.JAVA_PREFIX),
                     createDefRegistry(new JavaModelDefFactory(javaLoaders), DefType.MODEL, DefDescriptor.JAVA_PREFIX),

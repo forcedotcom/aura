@@ -17,7 +17,9 @@ package org.auraframework.http;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.activation.MimetypesFileTypeMap;
 import javax.servlet.ServletConfig;
@@ -27,12 +29,14 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.google.common.collect.Sets;
 import org.apache.http.HttpHeaders;
 import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ExceptionAdapter;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
+import org.auraframework.def.ClientLibraryDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
@@ -462,20 +466,22 @@ public abstract class AuraBaseServlet extends HttpServlet {
     }
 
     public static List<String> getScripts() throws QuickFixException {
+        AuraContext context = Aura.getContextService().getCurrentContext();
         List<String> ret = Lists.newArrayList();
-        ret.addAll(getBaseScripts());
-        ret.addAll(getNamespacesScripts());
+        ret.addAll(getBaseScripts(context));
+        ret.addAll(getNamespacesScripts(context));
         return ret;
     }
 
     public static List<String> getStyles() throws QuickFixException {
         AuraContext context = Aura.getContextService().getCurrentContext();
-        Mode mode = context.getMode();
         String contextPath = context.getContextPath();
-        ConfigAdapter config = Aura.getConfigAdapter();
 
-        List<String> ret = Lists.newArrayList();
+        Set<String> ret = Sets.newLinkedHashSet();
 
+        // add css client libraries
+        ret.addAll(getClientLibraryUrls(context, ClientLibraryDef.Type.CSS));
+        
         StringBuilder defs = new StringBuilder(contextPath).append("/l/");
         StringBuilder sb = new StringBuilder();
 
@@ -489,48 +495,42 @@ public abstract class AuraBaseServlet extends HttpServlet {
         defs.append("/app.css");
         ret.add(defs.toString());
 
-        if (mode == Mode.PTEST) {
-            ret.add(config.getJiffyCSSURL());
-        }
-
-        return ret;
+        return new ArrayList<String>(ret);
     }
 
-    public static List<String> getBaseScripts() throws QuickFixException {
-        AuraContext context = Aura.getContextService().getCurrentContext();
-        Mode mode = context.getMode();
+    /**
+     * Gets all client libraries specified. Uses client library service to resolve any urls that weren't specified.
+     * Returns list of non empty client library urls.
+     *
+     *
+     * @param context aura context
+     * @param type CSS or JS
+     * @return list of urls for client libraries
+     */
+    private static Set<String> getClientLibraryUrls(AuraContext context, ClientLibraryDef.Type type) throws QuickFixException {
+        return Aura.getClientLibraryService().getUrls(context, type);
+    }
 
+    public static List<String> getBaseScripts(AuraContext context) throws QuickFixException {
         ConfigAdapter config = Aura.getConfigAdapter();
-
-        List<String> ret = Lists.newArrayList();
+        Set<String> ret = Sets.newLinkedHashSet();
 
         String html5ShivURL = config.getHTML5ShivURL();
         if (html5ShivURL != null) {
             ret.add(html5ShivURL);
         }
 
-        switch (mode) {
-        case PTEST:
-            ret.add(config.getJiffyJSURL());
-            ret.add(config.getJiffyUIJSURL());
-            break;
-        case CADENCE:
-            ret.add(config.getJiffyJSURL());
-            break;
-        default:
-        }
-
         ret.add(config.getMomentJSURL());
         ret.addAll(config.getWalltimeJSURLs());
-        ret.add(config.getCKEditorURL());
 
+        ret.addAll(getClientLibraryUrls(context, ClientLibraryDef.Type.JS));
+        // framework js should be after other client libraries
         ret.add(config.getAuraJSURL());
 
-        return ret;
+        return new ArrayList<String>(ret);
     }
 
-    public static List<String> getNamespacesScripts() throws QuickFixException {
-        AuraContext context = Aura.getContextService().getCurrentContext();
+    public static List<String> getNamespacesScripts(AuraContext context) throws QuickFixException {
         String contextPath = context.getContextPath();
         List<String> ret = Lists.newArrayList();
 

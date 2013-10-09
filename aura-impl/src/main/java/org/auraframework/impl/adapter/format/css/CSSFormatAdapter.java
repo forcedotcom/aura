@@ -15,6 +15,9 @@
  */
 package org.auraframework.impl.adapter.format.css;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.auraframework.impl.adapter.format.BaseFormatAdapter;
 
 /**
@@ -22,10 +25,18 @@ import org.auraframework.impl.adapter.format.BaseFormatAdapter;
 public abstract class CSSFormatAdapter<T> extends BaseFormatAdapter<T> {
 
     protected static final String name = "CSS";
+    protected static final Pattern pattern1 = Pattern.compile("\\s*([{};,:])\\s*");
+    protected static final Pattern pattern2 = Pattern.compile("\\s+");
 
     @Override
     public String getFormatName() {
         return name;
+    }
+
+    protected String compress(String contents) {
+        Matcher compressionMatcher1 = pattern1.matcher(contents);
+        Matcher compressionMatcher2 = pattern2.matcher(compressionMatcher1.replaceAll("$1"));
+        return compressionMatcher2.replaceAll(" ");
     }
 
 }

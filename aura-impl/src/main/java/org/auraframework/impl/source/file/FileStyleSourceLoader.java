@@ -29,7 +29,12 @@ import com.google.common.collect.ImmutableSet;
 public class FileStyleSourceLoader extends FileSourceLoader {
 
     public static final Set<String> PREFIXES = ImmutableSet.of("css", "templateCss");
-    private static final Set<DefType> DEFTYPES = EnumSet.of(DefType.STYLE);
+    private static final Set<DefType> DEFTYPES = EnumSet.of(DefType.STYLE, DefType.RESOURCE);
+
+    static {
+        extensions.put(DefType.RESOURCE, "Resource.css");
+        extensions.put(DefType.STYLE, ".css");
+    }
 
     public FileStyleSourceLoader(File base) {
         super(base);
@@ -38,7 +43,7 @@ public class FileStyleSourceLoader extends FileSourceLoader {
     @Override
     public <D extends Definition> FileSource<D> getSource(DefDescriptor<D> descriptor) {
         String cssFilename = String.format("%s/%s/%s%s", descriptor.getNamespace(), descriptor.getName(),
-                descriptor.getName(), ".css");
+                descriptor.getName(), extensions.get(descriptor.getDefType()));
         File cssFile = new File(base, cssFilename);
         String cssName = String.format("%s://%s.%s", descriptor.getPrefix(), descriptor.getNamespace(),
                 descriptor.getName());

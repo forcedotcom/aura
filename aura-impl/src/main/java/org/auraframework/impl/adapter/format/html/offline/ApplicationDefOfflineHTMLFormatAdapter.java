@@ -103,7 +103,7 @@ public class ApplicationDefOfflineHTMLFormatAdapter extends OfflineHTMLFormatAda
             File css = new File(outputDir, String.format("%s.css", appName));
             FileWriter cssWriter = new FileWriter(css);
             try {
-                AuraResourceServlet.writeCss(dependencies, cssWriter);
+                AuraResourceServlet.writeAppCss(dependencies, cssWriter);
             } finally {
                 cssWriter.close();
             }

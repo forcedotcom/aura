@@ -22,7 +22,9 @@ import org.auraframework.def.HelperDef;
 import org.auraframework.def.ModelDef;
 import org.auraframework.def.ProviderDef;
 import org.auraframework.def.RendererDef;
+import org.auraframework.def.ResourceDef;
 import org.auraframework.def.TestSuiteDef;
+import org.auraframework.impl.clientlibrary.handler.ResourceDefHandler;
 import org.auraframework.impl.javascript.parser.handler.JavascriptControllerDefHandler;
 import org.auraframework.impl.javascript.parser.handler.JavascriptHandler;
 import org.auraframework.impl.javascript.parser.handler.JavascriptHelperDefHandler;
@@ -68,6 +70,10 @@ public class JavascriptParser implements Parser {
             return (D) builder.build();
         case MODEL: {
             return (D) new JavascriptModelDefHandler((DefDescriptor<ModelDef>) descriptor, source).getDefinition();
+        }
+        case RESOURCE: {
+            return (D) new ResourceDefHandler<ResourceDef>((DefDescriptor<ResourceDef>) descriptor,
+                    (Source<ResourceDef>) source).createDefinition();
         }
         default:
             return null;

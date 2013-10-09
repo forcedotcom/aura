@@ -39,6 +39,8 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
     // /required_root/optional_nonce/required_rest_of_path
     private static final Pattern RESOURCES_PATTERN = Pattern.compile("^/([^/]+)(/[-_0-9a-zA-Z]+)?(/.*)$");
 
+    public static final String RESOURCES_FORMAT = "%s/auraFW/resources/%s/%s";
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         // defend against directory traversal attack

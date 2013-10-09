@@ -78,7 +78,7 @@ public class StringSourceLoader implements SourceLoader {
             DefType.APPLICATION, DefType.COMPONENT, DefType.EVENT,
             DefType.INTERFACE, DefType.LAYOUTS, DefType.CONTROLLER,
             DefType.HELPER, DefType.NAMESPACE, DefType.RENDERER, DefType.STYLE,
-            DefType.TESTSUITE);
+            DefType.TESTSUITE, DefType.RESOURCE);
 
     /**
      * A counter that we can use to guarantee unique names across multiple calls to add a source.

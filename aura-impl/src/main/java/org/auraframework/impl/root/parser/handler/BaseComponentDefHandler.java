@@ -36,6 +36,7 @@ import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.ModelDef;
 import org.auraframework.def.ProviderDef;
 import org.auraframework.def.RendererDef;
+import org.auraframework.def.ResourceDef;
 import org.auraframework.def.StyleDef;
 import org.auraframework.def.TestSuiteDef;
 import org.auraframework.expression.PropertyReference;
@@ -147,6 +148,9 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef>
         } else if (DependencyDefHandler.TAG.equalsIgnoreCase(tag)) {
             builder.addDependency(new DependencyDefHandler<T>(this, xmlReader,
                     source).getElement());
+        } else if (ClientLibraryDefHandler.TAG.equalsIgnoreCase(tag)) {
+            builder.addClientLibrary(new ClientLibraryDefHandler<T>(this, xmlReader,
+                    source).getElement());
         } else {
             body.add(getDefRefHandler(this).getElement());
             // if it wasn't one of the above, it must be a defref, or an error
@@ -235,10 +239,10 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef>
         }
 
         // See if there is a clientController that has the same qname.
-        String jsControllerName = String.format("js://%s.%s",
+        String jsDescriptorName = String.format("js://%s.%s",
                 defDescriptor.getNamespace(), defDescriptor.getName());
         DefDescriptor<ControllerDef> jsDescriptor = DefDescriptorImpl
-                .getInstance(jsControllerName, ControllerDef.class);
+                .getInstance(jsDescriptorName, ControllerDef.class);
         if (jsDescriptor.exists()) {
             builder.controllerDescriptors.add(jsDescriptor);
         }
@@ -258,7 +262,7 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef>
         } else {
             // See if there is a clientRenderer that has the same qname.
             DefDescriptor<RendererDef> jsRendererDescriptor = DefDescriptorImpl
-                    .getInstance(jsControllerName, RendererDef.class);
+                    .getInstance(jsDescriptorName, RendererDef.class);
             if (jsRendererDescriptor.exists()) {
                 builder.addRenderer(jsRendererDescriptor.getQualifiedName());
             }
@@ -275,10 +279,16 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef>
         } else {
             // See if there is a helper that has the same qname.
             DefDescriptor<HelperDef> jsHelperDescriptor = DefDescriptorImpl
-                    .getInstance(jsControllerName, HelperDef.class);
+                    .getInstance(jsDescriptorName, HelperDef.class);
             if (jsHelperDescriptor.exists()) {
                 builder.addHelper(jsHelperDescriptor.getQualifiedName());
             }
+        }
+
+        DefDescriptor<ResourceDef> jsResourceDescriptor = DefDescriptorImpl
+                .getInstance(jsDescriptorName, ResourceDef.class);
+        if (jsResourceDescriptor.exists()) {
+            builder.addResource(jsResourceDescriptor.getQualifiedName());
         }
 
         // See if there is a style that has the same qname.
@@ -293,11 +303,16 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef>
             builder.styleDescriptor = cssDescriptor;
         }
 
+        DefDescriptor<ResourceDef> cssResourceDescriptor = DefDescriptorImpl.getInstance(styleName, ResourceDef.class);
+        if (cssResourceDescriptor.exists()) {
+            builder.addResource(cssResourceDescriptor.getQualifiedName());
+        }
+
         // Do not consider Javascript Test suite defs in PROD and PRODDEBUG modes.
         if (mode != Mode.PROD && mode != Mode.PRODDEBUG) {
             // See if there is a test suite that has the same qname.
             DefDescriptor<TestSuiteDef> jsTestSuiteDescriptor = DefDescriptorImpl
-                    .getInstance(jsControllerName, TestSuiteDef.class);
+                    .getInstance(jsDescriptorName, TestSuiteDef.class);
             if (jsTestSuiteDescriptor.exists()) {
                 builder.testSuiteDefDescriptor = jsTestSuiteDescriptor;
             }

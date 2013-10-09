@@ -1063,6 +1063,21 @@ $A.ns.Aura.prototype.updateTransaction = (function() {
 })();
 
 /**
+ * Map through to Perf.updateMarkName if Perf is loaded, otherwise a no-op. This will be the same no-op as
+ * $A.ns.Aura.prototype.mark, since both are no-ops when Jiffy is missing; we only need one noop object.
+ *
+ * @public
+ * @function
+ */
+$A.ns.Aura.prototype.updateMarkName = (function() {
+    if (window["Perf"]) {
+        return window["Perf"]["updateMarkName"];
+    } else {
+        return $A.ns.Aura.prototype.mark;
+    }
+})();
+
+/**
  * Map through to toJson if Perf is loaded, otherwise a no-op. This will be the same no-op as
  * $A.ns.Aura.prototype.mark, since both are no-ops when Jiffy is missing; we only need one noop object.
  *

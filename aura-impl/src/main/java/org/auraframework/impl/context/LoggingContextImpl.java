@@ -273,10 +273,22 @@ public class LoggingContextImpl implements LoggingContext {
 
     }
 
+    /**
+     * A simple nestable timer class.  Time is reported in milliseconds.
+     * If the timer start method is nested (called more than once before stop is called
+     * reference counting is employed so that the timer keeps running until the number
+     * of stop calls equals the number of previous start calls.
+     * The timer is restartable.  Addition start/stop calls will add to the previous
+     * total time unless restart is called in between.
+     *
+     */
     public static class Timer {
+        //totalTime and startTime is are nanoseconds for compatibility with System.getNanoTime();
+        //getTime converts totalTime to ms
         private long startTime = -1;
-        private long totalTime = 0;
+        private long totalTime = -1;
         private final String name;
+        private int startCount = 0;
 
         public Timer(String name) {
             this.name = name;
@@ -287,28 +299,35 @@ public class LoggingContextImpl implements LoggingContext {
         }
 
         public void start() {
-            if (startTime < 0) { // if invoke two starts without stop, the
-                                 // second has no effect
-                startTime = System.currentTimeMillis();
+            startCount ++;
+            if (startTime < 0) {
+                startTime = System.nanoTime();
             }
         }
 
         public void stop() {
-            if (startTime >= 0) { // if invoke two stops without start, the
-                                  // second stop has no effect
-                long curr = System.currentTimeMillis();
-                totalTime += curr - startTime;
+            startCount--;
+            if (startCount == 0 && startTime >= 0) {
+                long curr = System.nanoTime();
+                totalTime = ((totalTime > 0) ? totalTime : 0)  + curr - startTime;
                 startTime = -1;
             }
         }
 
+        /**
+         * @return The accumulated duration in ms.
+         */
         public long getTime() {
-            return totalTime;
+            return (totalTime > 0) ? (totalTime / 1000000L) : totalTime; //convert to ms for public consumption
         }
 
+        /**
+         * Reset the accumulated total time.  If the timer was
+         * started it is now stopped and the accumulated time is discarded.
+         */
         public void reset() {
             startTime = -1;
-            totalTime = 0;
+            totalTime = -1;
         }
     }
 

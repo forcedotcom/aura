@@ -38,6 +38,7 @@ public class JavaActionDef extends DefinitionImpl<ActionDef> implements ActionDe
     private final Class<?>[] javaParams;
     private final Method method;
     private final boolean background;
+    private final boolean caboose;
 
     protected JavaActionDef(Builder builder) {
         super(builder);
@@ -47,6 +48,7 @@ public class JavaActionDef extends DefinitionImpl<ActionDef> implements ActionDe
         this.javaParams = builder.javaParams;
         this.method = builder.method;
         this.background = builder.background;
+        this.caboose = builder.caboose;
     }
 
     @Override
@@ -85,6 +87,10 @@ public class JavaActionDef extends DefinitionImpl<ActionDef> implements ActionDe
     	return background;
     }
 
+    public boolean isCaboose() {
+    	return caboose;
+    }
+
     @Override
     public void serialize(Json json) throws IOException {
         json.writeMapBegin();
@@ -93,6 +99,7 @@ public class JavaActionDef extends DefinitionImpl<ActionDef> implements ActionDe
         json.writeMapEntry("actionType", getActionType());
         json.writeMapEntry("returnType", getReturnType());
         json.writeMapEntry("background", isBackground());
+        json.writeMapEntry("caboose", isCaboose());
         json.writeMapEntry("params", params);
         json.writeMapEnd();
     }
@@ -109,6 +116,7 @@ public class JavaActionDef extends DefinitionImpl<ActionDef> implements ActionDe
         private Class<?>[] javaParams;
         private Method method;
         private boolean background = false;
+        private boolean caboose = false;
 
         @Override
         public JavaActionDef build() {
@@ -155,8 +163,12 @@ public class JavaActionDef extends DefinitionImpl<ActionDef> implements ActionDe
             this.method = method;
         }
 
-		public void setBackground(boolean background) {
-			this.background = background;
-		}
+	public void setBackground(boolean background) {
+	    this.background = background;
+	}
+
+	public void setCaboose(boolean caboose) {
+	    this.caboose = caboose;
+	}
     }
 }

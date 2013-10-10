@@ -28,6 +28,8 @@ function ActionDef(config) {
 	this.actionType = config["actionType"];
 	this.meth = null;
 	this.paramDefs = {};
+        this.background = false;
+        this.caboose = false;
 
 	if (this.actionType === "SERVER") {
 		this.returnType = new ValueDef(config["returnType"]);
@@ -40,7 +42,12 @@ function ActionDef(config) {
 				this.paramDefs[param.getName()] = param;
 			}
 		}
-		this.background = config["background"];
+                if (config["background"]) {
+                    this.background = true;
+                }
+                if (config["caboose"]) {
+                    this.caboose = true;
+                }
 	}
 
 	if (this.actionType === "CLIENT") {
@@ -86,7 +93,8 @@ ActionDef.prototype.getActionType = function() {
 /**
  * Returns true if the Action type is client-side, or false otherwise.
  * 
- * @returns {Boolean}
+ * @public
+ * @returns {!boolean}
  */
 ActionDef.prototype.isClientAction = function() {
 	return this.actionType === "CLIENT";
@@ -95,7 +103,8 @@ ActionDef.prototype.isClientAction = function() {
 /**
  * Returns true if the Action type is server-side, or false otherwise.
  * 
- * @returns {Boolean}
+ * @public
+ * @returns {!boolean}
  */
 ActionDef.prototype.isServerAction = function() {
 	return this.actionType === "SERVER";
@@ -103,10 +112,20 @@ ActionDef.prototype.isServerAction = function() {
 
 /**
  * Returns true if the action is defined as background (i.e. @BackgroundAction on the java class)
- * @returns {Boolean}
+ * @protected
+ * @returns {!boolean}
  */
 ActionDef.prototype.isBackground = function() {
 	return this.background === true;
+};
+
+/**
+ * Returns true if the action is defined as 'force boxcar' (i.e. @CabooseAction on the java class)
+ * @protected
+ * @returns {!boolean}
+ */
+ActionDef.prototype.isCaboose = function() {
+	return this.caboose === true;
 };
 
 /**
@@ -118,7 +137,7 @@ ActionDef.prototype.isBackground = function() {
  * @returns {Action}
  */
 ActionDef.prototype.newInstance = function(cmp) {
-	return new Action(this, this.meth, this.paramDefs, this.isBackground(), cmp);
+	return new Action(this, this.meth, this.paramDefs, this.background, cmp, this.caboose);
 };
 
 // #include aura.controller.ActionDef_export

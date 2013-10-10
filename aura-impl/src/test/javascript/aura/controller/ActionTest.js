@@ -377,7 +377,7 @@ Test.Aura.Controller.ActionTest = function() {
 			// Arrange
 			var expectedScope = "expectedScope";
 			var expectedCallback = "expectedCallback";
-			var callbackNames = [ "SUCCESS", "ERROR", "ABORTED", "INCOMPLETE" ];
+			var callbackNames = [ "SUCCESS", "ERROR", "INCOMPLETE" ];
 			var expected = {
 				s : expectedScope,
 				fn : expectedCallback
@@ -393,7 +393,6 @@ Test.Aura.Controller.ActionTest = function() {
 			Assert.Equal({
 				"SUCCESS" : expected,
 				"ERROR" : expected,
-				"ABORTED" : expected,
 				"INCOMPLETE" : expected
 			}, target.callbacks);
 		}
@@ -403,7 +402,7 @@ Test.Aura.Controller.ActionTest = function() {
 			// Arrange
 			var expectedScope = "expectedScope";
 			var expectedCallback = "expectedCallback";
-			var callbackNames = [ "SUCCESS", "ERROR", "ABORTED", "INCOMPLETE" ];
+			var callbackNames = [ "SUCCESS", "ERROR", "INCOMPLETE" ];
 			var expected = {
 				s : expectedScope,
 				fn : expectedCallback
@@ -419,7 +418,6 @@ Test.Aura.Controller.ActionTest = function() {
 			Assert.Equal({
 				"SUCCESS" : expected,
 				"ERROR" : expected,
-				"ABORTED" : expected,
 				"INCOMPLETE" : expected
 			}, target.callbacks);
 		}
@@ -450,6 +448,53 @@ Test.Aura.Controller.ActionTest = function() {
 			Assert.Equal(expected, actual);
 		}
 	}
+
+	[ Fixture ]
+	function SetAllAboardCallback() {
+		var mockContext = Mocks.GetMock(Object.Global(), "$A", {
+			util : {
+				isFunction : function() {
+					return true;
+				}
+			}
+		});
+
+		var mockErrorContext = Mocks.GetMock(Object.Global(), "$A", {
+			util : {
+				isFunction : function() {
+					return false;
+				}
+			},
+
+		});
+
+		[ Fact ]
+		function ConstructorClearsCallback() {
+			// Arrange
+			var target = new Action();
+
+			// Act
+
+                        // Assert 
+                        Assert.Undefined(target.allAboardCallback);
+                }
+
+		[ Fact ]
+		function SetsCallback() {
+			// Arrange
+			var expectedScope = "expectedScope";
+                        var expectedCallback = "expectedCallback";
+			var target = new Action();
+
+			// Act
+			mockContext(function() {
+				target.setAllAboardCallback(expectedScope, expectedCallback);
+			});
+
+                        // Assert (we can't tell exactly what it is, so just look for set).
+                        Assert.False(target.allAboardCallback === undefined);
+                }
+        }
 
 	[ Fixture ]
 	function WrapCallback() {

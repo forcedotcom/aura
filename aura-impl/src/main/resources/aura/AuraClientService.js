@@ -379,6 +379,30 @@ var AuraClientService = function() {
             priv.token = newToken;
         },
 
+
+        /**
+         * Create an action group with a callback.
+         *
+         * The callback will be called when all actions are complete within the group.
+         *
+         * @param actions
+         *      {Array.<Action>} the array of actions.
+         * @param scope
+         *      {Object} the scope for the function.
+         * @param callback
+         *      {function} The callback function
+         */
+        makeActionGroup : function(actions, scope, callback) {
+            var group = undefined;
+            $A.assert($A.util.isArray(actions), "makeActionGroup expects a list of actions, but instead got: " + actions);
+            if (callback !== undefined) {
+                $A.assert($A.util.isFunction(callback),
+                        "makeActionGroup expects the callback to be a function, but instead got: " + callback);
+                group = new ActionCallbackGroup(actions, scope, callback);
+            }
+            return group;
+        },
+
         /**
          * Run the actions.
          *
@@ -388,9 +412,9 @@ var AuraClientService = function() {
          * the 'transaction' associated with the current aura stack, so abortable actions might go
          * out in two separate requests without cancelling each other.
          *
+         * @param {Array.<Action>}
+         *            actions an array of Action objects
          * @param {Object}
-         *            actions
-         * @param {function}
          *            scope The scope in which the function is executed
          * @param {function}
          *            callback The callback function to run
@@ -398,21 +422,13 @@ var AuraClientService = function() {
          * @public
          */
         runActions : function(actions, scope, callback) {
-            $A.assert($A.util.isArray(actions), "runActions expects a list of actions, but instead got: " + actions);
-            if (!$A.util.isUndefined(callback)) {
-                $A.assert($A.util.isFunction(callback),
-                        "runActions expects the callback to be a function, but instead got: " + callback);
-            }
-            var group = new ActionCallbackGroup(actions, scope, callback);
             var i;
-            if (priv.foreground.start()) {
-                priv.actionQueue.bypass(actions);
-                priv.request(actions, priv.foreground);
-            } else {
-                for (i = 0; i < actions.length; i++) {
-                    priv.actionQueue.enqueue(actions[i]);
-                }
+
+            clientService.makeActionGroup(actions, scope, callback);
+            for (i = 0; i < actions.length; i++) {
+                priv.actionQueue.enqueue(actions[i]);
             }
+            clientService.processActions();
         },
 
         /**
@@ -596,7 +612,12 @@ var AuraClientService = function() {
                 processedActions = true;
             }
             
-            if (priv.foreground.start()) {
+            //
+            // Only send forground actions if we have something that
+            // needs to be sent (force boxcar will delay this)
+            // FIXME: we need measures of how long this delays things.
+            //
+            if (priv.actionQueue.needXHR() && priv.foreground.start()) {
                 actions = priv.actionQueue.getServerActions();
                 if (actions.length > 0) {
                     priv.request(actions, priv.foreground);

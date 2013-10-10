@@ -29,6 +29,7 @@ var ActionQueue = function ActionQueue() {
 	this.nextTransactionId = -1;
 	this.lastAbortableTransactionId = -1;
 	this.actions = [];
+        this.xhr = false;
 };
 
 ActionQueue.prototype.auraType = "ActionQueue";
@@ -46,13 +47,21 @@ ActionQueue.prototype.auraType = "ActionQueue";
  *            dontSave do not actually put the action in the queue (internal use only).
  */
 ActionQueue.prototype.enqueue = function(action, dontSave) {
-	if (action.isAbortable() && (this.lastAbortableTransactionId !== this.nextTransactionId)) {
-		this.actions = this.clearPreviousAbortableActions(this.actions);
-		this.lastAbortableTransactionId = this.nextTransactionId;
-	}
-	if (!dontSave) {
-		this.actions.push(action);
-	}
+    if (action.isAbortable() && (this.lastAbortableTransactionId !== this.nextTransactionId)) {
+        this.actions = this.clearPreviousAbortableActions(this.actions);
+        this.lastAbortableTransactionId = this.nextTransactionId;
+    }
+    if (!dontSave) {
+        //
+        // only do this in the case that we are saving the action, because otherwise
+        // we would think we have an XHR even if it was a bypass. XHR is only set for
+        // forground server actions that are not forced into a boxcar.
+        //
+        if (!action.isCaboose() && action.getDef().isServerAction() && !action.isBackground()) {
+            this.xhr = true;
+        }
+        this.actions.push(action);
+    }
 };
 
 /**
@@ -97,6 +106,13 @@ ActionQueue.prototype.incrementNextTransactionId = function() {
 };
 
 /**
+ * Does the queue currently have an action that wants an immediate XHR?.
+ */
+ActionQueue.prototype.needXHR = function() {
+    return this.xhr;
+};
+
+/**
  * Pop the current set of foreground server actions.
  * 
  * Pop the current set of foreground server actions (that are not isBackground()), clearing the actions from the queue.
@@ -105,6 +121,7 @@ ActionQueue.prototype.incrementNextTransactionId = function() {
  * @return {Array} the array of actions, empty if there are none.
  */
 ActionQueue.prototype.getServerActions = function() {
+        this.xhr = false;
 	return this.filterActions(function(action) {
 		return action.getDef().isServerAction() && !action.isBackground();
 	});

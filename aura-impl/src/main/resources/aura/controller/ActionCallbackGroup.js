@@ -32,11 +32,9 @@ var ActionCallbackGroup = function ActionCallbackGroup(actions, scope, callback)
 	this.hold = true; // used to prevent callbacks when we haven't finished.
 
 	for ( var idx = 0; idx < actions.length; idx++) {
-		var action = actions[idx];
-		if (action.addCallbackGroup !== undefined) {
-			this.actions.push(action);
-			action.addCallbackGroup(this);
-		}
+            var action = actions[idx];
+            this.actions.push(action);
+            action.addCallbackGroup(this);
 	}
 	//
 	// This code deals with actions that may have already been complete.
@@ -45,9 +43,7 @@ var ActionCallbackGroup = function ActionCallbackGroup(actions, scope, callback)
 	//
 	this.hold = false;
 	if (this.callback && this.actions.length === 0) {
-		this.callback.call(this.scope || window, {
-			"errors" : []
-		});
+            this.callback.call(this.scope || window, { "errors" : [] });
 	}
 };
 

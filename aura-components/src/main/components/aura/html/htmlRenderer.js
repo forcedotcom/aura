@@ -26,7 +26,16 @@
             tag = "div";
         }
         var HTMLAttributes = attributes.getValue("HTMLAttributes");
-        var ret = document.createElement(tag);
+        
+        //Fix for name being read only attribute on IE7
+        var isIE7 = $A.get("$Browser.isIE7");
+        if(isIE7 ===  true && tag == "input"){
+        	var value = $A.expressionService.getValue(valueProvider, "v.name");
+        	var ret = document.createElement('<input name="' + value.getValue() + '">');
+        }
+        else{
+        	var ret = document.createElement(tag);
+        }
 
         if (HTMLAttributes && HTMLAttributes.each) {
             // go through all the HTML tag attributes (except class, which is handled specially below)

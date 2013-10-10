@@ -142,7 +142,7 @@ public class LoggingContextImpl implements LoggingContext {
                 throw new AuraRuntimeException(e);
             }
             names.add(counterKey);
-            loggingValues.put(key + "Time", entry.getValue().getTime());
+            loggingValues.put(key, entry.getValue().getTime());
         }
 
         for (Map.Entry<String, Long> entry : nums.entrySet()) {

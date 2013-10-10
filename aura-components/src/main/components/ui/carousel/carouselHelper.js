@@ -132,19 +132,33 @@
 	},
 	
 	attachEvents : function(cmp) {
+		var el = cmp.getElement();		 
+		var helper = this;
+		var hasTouch = 'ontouchstart' in window;
+		
+		cmp._startEvt = hasTouch ? 'touchstart' : 'mousedown';
+		cmp._moveEvt = hasTouch ? 'touchmove' : 'mousemove';
+		cmp._resizeEvt =  hasTouch ? 'orientationchange' : 'resize';
+		
+		cmp._onStart = function(e) {helper.onStart(cmp, e)}; 
+		cmp._onMove = function(e) {helper.onMove(cmp, e)}; 				
+		cmp._onClick = function(e){helper.onClick(cmp, e)};
+		cmp._onResize = function(e) {helper.refresh(cmp)};
+		 
+		$A.util.on(el, cmp._startEvt, cmp._onStart);
+		$A.util.on(el, cmp._moveEvt, cmp._onMove);
+		$A.util.on(el, 'click', cmp._onClick, true); //useCapture			
+		$A.util.on(window, cmp._resizeEvt, cmp._onResize);		
+	},
+	
+	detachEvents : function(cmp) {
 		var el = cmp.getElement();
-		if (el) {
-			var helper = this;
-			var hasTouch = 'ontouchstart' in window;
-			if (hasTouch) {
-				$A.util.on(el, 'touchstart', function(e) {helper.onStart(cmp, e);});
-				$A.util.on(el, 'touchmove', function(e) {helper.onMove(cmp, e);});								
-			} else {
-				$A.util.on(el, 'mousedown', function(e) {helper.onStart(cmp, e);});
-				$A.util.on(el, 'mousemove', function(e) {helper.onMove(cmp, e);});								
-			}
-			$A.util.on(el, 'click', function(e){helper.onClick(cmp, e)}, true); //useCapture
-		}
+		var hasTouch = 'ontouchstart' in window;
+		
+		$A.util.removeOn(el, cmp._startEvt, cmp._onStart);
+		$A.util.removeOn(el, cmp._moveEvt, cmp._onMove);
+		$A.util.removeOn(el, 'click', cmp._onClick, true);
+		$A.util.removeOn(window, cmp._resizeEvt, cmp._onResize);
 	},
 	
 	onStart: function(cmp, evt) {
@@ -207,15 +221,33 @@
 	},
 		
 	/**
-	 * Handle window resize event
-	 * This event is always fired after the carousel is rendered
+	 * Handle window resize or orientationchange event
 	 */
 	refresh: function(cmp, evt) {
 		//need to call getConcreteComponent() in case there's a sub-component that extends this component
-		if (cmp.isValid() && cmp.getConcreteComponent().isRendered()) {			 
-			this.updateSize(cmp);
-	    } 
+		if (cmp.isValid() && cmp.getConcreteComponent().isRendered()) {
+			var me = this;
+			var selectedPage = me.getSelectedPage(cmp);			
+			var scroller = me.getScroller(cmp);			
+			me.updateSize(cmp);
+			//Need to scroll if not on the first page to reset the x position after resize
+			//TODO: this should be fixed inside ui:scroller instead of here
+			if (selectedPage > 0) {				
+				if (cmp._scrollToTimeout) {
+					window.clearTimeout(cmp._scrollToTimeout)
+					cmp._scrollToTimeout = null;
+				}
+				//need to wait for scroller to finish refreshing
+				cmp._scrollToTimeout = window.setTimeout(function(){
+					var curPage = me.getSelectedPage(cmp);
+					if (curPage == selectedPage) {						
+						scroller.scrollToPage(--selectedPage, null, 0);
+					}
+				}, 500);
+			}
+		}
 	},
+	
 	
 	/**
 	 * Update carousel and page size if carousel width is not pre-defined
@@ -228,14 +260,15 @@
 		//need to update size width if carousel width and height is not explicitly set
 		if (pages.length > 0) {
 			var carouselSize = this.getCarouselSize(cmp);
-			// Do not update the carousel if the width is 0
+
+            // Do not update the carousel if the width is 0
 			if (carouselSize.width > 0) {
     			this.updateCarouselSize(cmp, pages, carouselSize, force);
             }
 		}
 	},
-	
-	updateCarouselSize: function(cmp, pages, carouselSize, force) {		
+
+	updateCarouselSize: function(cmp, pages, carouselSize, force) {
 		var cStyle = this.getSizeStyle(carouselSize.width, carouselSize.height);		
 		if (cStyle !== cmp.get('v.priv_carouselStyle') || force) {
 			cmp.getValue('v.priv_carouselStyle').setValue(cStyle);
@@ -252,7 +285,7 @@
 			//page width always same as carousel width	
 			e.setParams({pageSize: {width: carouselSize.width, height: pageSize.height}});
 			e.fire(); 
-		}		 
+		}
 	},
 	
 	getSizeStyle: function(width, height) {
@@ -260,7 +293,7 @@
 			
 		style += height ? 'height:' + height + 'px;' : '';
 		
-		return style ? style : null;		
+		return style ? style : '';		
 	},
 	
 	getCarouselSize: function(cmp) {		
@@ -536,7 +569,7 @@
 			this.setSelectedPage(cmp, pageIndex);
 			this.showPages(cmp, from, pageIndex);
 			
-			scroller = this.getScroller(cmp);
+			var scroller = this.getScroller(cmp);
 			//scroller page starts with 0
 			scroller.scrollToPage(--pageIndex, null, time);			
 		}		
@@ -655,8 +688,12 @@
     	cmp._selectedPage = selectedPage; 
     },
     
-    getSelectedPage: function(cmp) {    	
+    getSelectedPage: function(cmp) {
     	return cmp._selectedPage || cmp.get('v.priv_currentPage');
+    },
+    
+    unrender: function(cmp) {
+    	this.detachEvents(cmp);
     }
     
 })

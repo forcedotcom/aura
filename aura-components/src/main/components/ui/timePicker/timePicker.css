@@ -28,7 +28,7 @@ div.THIS {
 
 div.THIS input.input-hours,
 div.THIS input.input-minutes { 
-    font-size: 50px;
+    font-size: 45px;
     font-family: 'ProximaNovaSoft-Regular';
     color: #3c3d3e;
     text-align: center;
@@ -51,7 +51,7 @@ div.THIS select.ampm {
 	font-size: 36px;
 	font-family: 'ProximaNovaSoft-Regular';
 	color: #2a94d6;	
-	padding: 5px;
+	padding: 0 0 0 5px;
 	margin: 0;
 	width: auto;
 	border: 0;

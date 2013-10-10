@@ -31,5 +31,17 @@
     	test: function(component){
     		aura.test.assertFalse(component.find("radio").getElement().disabled, "Element not correctly enabled");
     	}
+    },
+    
+    /**
+     * Verify radio button is clickable
+     */
+    testClick: {
+    	attributes : {name: "testRadio"},
+    	test: function(component){
+    		radioElement = component.find("radio").getElement();
+    		$A.test.clickOrTouch(radioElement);
+    		aura.test.assertTrue(radioElement.checked, "Radio Element was not clickable");
+    	}
     }
 })

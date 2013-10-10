@@ -549,7 +549,17 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
     private void openAndWait(String url, boolean waitForInit) throws MalformedURLException, URISyntaxException {
         auraUITestingUtil.getRawEval("document._waitingForReload = true;");
         openRaw(url);
-        waitForCondition("return !document._waitingForReload");
+        auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
+            @Override
+            public Boolean apply(WebDriver d) {
+                Object ret = auraUITestingUtil.getRawEval("return !document._waitingForReload");
+                if (ret != null && ((Boolean) ret).booleanValue()) {
+                    return true;
+                }
+                return false;
+            }
+        }, timeoutInSecs);
+
         if (waitForInit) {
             auraUITestingUtil.waitForAuraInit(getExceptionsAllowedDuringInit());
         }

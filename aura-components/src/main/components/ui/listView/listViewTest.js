@@ -2203,8 +2203,7 @@
                 });
 
                 aura.test.assertEquals(expected, actual);
-            },
-
+            }
         ]
     },
 

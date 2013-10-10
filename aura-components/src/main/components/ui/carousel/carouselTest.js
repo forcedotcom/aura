@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 ({
+    // Excluded on IE7/8 because uses unsupported HTML5 features
+    browsers: ["-IE7", "-IE8"],
 	testCarouselNavTop: {
 		test : function(component){
 			var nav = component.find('navContainer');

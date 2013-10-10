@@ -19,7 +19,11 @@
     },
 
     setConnectedFalse : function( component, event, helper) {
-        $A.clientService.setConnectedFalse();
+        $A.clientService.setConnected(false);
+    },
+    
+    setConnectedTrue : function( component, event, helper) {
+        $A.clientService.setConnected(true);
     },
 
     testConnection: function(component, event, helper) {

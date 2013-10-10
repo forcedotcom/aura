@@ -539,11 +539,22 @@ var AuraClientService = function() {
         },
 
         /**
-         * Inform Aura that the the environment is offline. One source of data
+         * Inform Aura that the environment is offline. One source of data
          * is native code. Immediate and future communication with the server may fail.
+         * @deprecated - use setConnected(false) instead.
          */
         setConnectedFalse : function() {
-            priv.setConnectedFalse();
+            priv.setConnected(false);
+        },
+        
+        /**
+         * Inform Aura that the environment is either online or offline. 
+         * 
+         * @param {Boolean} isConnected true to set Aura to online mode; 
+         * false to set Aura to offline mode.
+         */
+        setConnected: function(isConnected) {
+        	priv.setConnected(isConnected);
         },
 
         /**

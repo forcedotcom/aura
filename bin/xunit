@@ -1,2 +1,2 @@
 #!/bin/sh
-mvn test -DskipUnitTests -DskipJsDoc -Pxunit.js
+mvn test -DskipUnitTests -DskipJsDoc -Pxunit.js -Dxunit.js.format=text

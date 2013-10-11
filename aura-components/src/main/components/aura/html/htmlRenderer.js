@@ -15,10 +15,11 @@
  */
 ({
     render : function(component, helper) {
-        var placeholder = "auraplaceholder";
+    	var placeholder = "auraplaceholder";
         var attributes = component.getAttributes();
         var valueProvider = attributes.getValueProvider();
         var replacements = {};
+        var ret;
 
         var tag = attributes.get("tag");
         if ($A.util.isUndefinedOrNull(tag)) {
@@ -31,10 +32,16 @@
         var isIE7 = $A.get("$Browser.isIE7");
         if(isIE7 ===  true && tag == "input"){
         	var value = $A.expressionService.getValue(valueProvider, "v.name");
-        	var ret = document.createElement('<input name="' + value.getValue() + '">');
+        	if($A.util.isEmpty(value)){
+        		ret = document.createElement(tag);
+        	}
+        	else{
+        		value = value.getValue();
+        		ret = document.createElement('<input name="' + value + '">');
+        	}
         }
         else{
-        	var ret = document.createElement(tag);
+        	ret = document.createElement(tag);
         }
 
         if (HTMLAttributes && HTMLAttributes.each) {

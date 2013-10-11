@@ -16,6 +16,8 @@
 
 -->
 <aura:component>
-  <ui:outputText aura:id="dlh_outputText" value="after datePicker show up, click me or any other place on the page to make it disappear"/>
+  <div id="dlh_outputText">
+  after datePicker show up, click me or any other place on the page to make it disappear
+  </div>
   <ui:inputDate aura:id ="dlh_inputDate" displayDatePicker="true" label="date picker with label" class="date_input_box" placeHolder="" format="yyyy-MM-dd"/>
 </aura:component>

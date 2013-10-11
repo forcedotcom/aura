@@ -169,7 +169,11 @@ div.THIS.phone .scroller {
 
 .THIS .buttonBar .calToday {
     color: #0085C7;
-    font-size: 13px;
+    font-size: 18px;
+	line-height: 24px !important;
+	border:0px solid #fff;
+	background:transparent;
+	cursor:pointer;
 }
 
 .THIS .buttonBar .calToday:hover,

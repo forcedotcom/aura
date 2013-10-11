@@ -160,7 +160,7 @@
 					};
 					
 					iScroll.prototype._unbind = function(type, el, bubble) {
-						var target = this._getEventTarget(type, el);						
+						var target = this._getEventTarget(type, el);	
 						target.removeEventListener(type, this, !!bubble);						 
 					};
 					//END 
@@ -212,25 +212,27 @@
 						},
 
 						onScrollMove : function(e) {
+							var PULL_DISTANCE = 5; // how far to pull past a pull indicator to activate it
+							
 							if (pullToRefreshAction && canRefresh) {
-								if (this.y > 5 && $A.util.hasClass(pullDownEl, 'pullDown')) {
+								if (this.y > PULL_DISTANCE && $A.util.hasClass(pullDownEl, 'pullDown')) {
 									$A.util.swapClass(pullDownEl, 'pullDown', 'pullFlip');
 									this.minScrollY = 0;
-								} else if (this.y < 5 && $A.util.hasClass(pullDownEl, 'pullFlip')) {
+								} else if (this.y < PULL_DISTANCE && $A.util.hasClass(pullDownEl, 'pullFlip')) {
 									$A.util.swapClass(pullDownEl, 'pullFlip', 'pullDown');
 									this.minScrollY = -pullDownOffset;
 								}
 							}
 							
 							if (pullToShowMoreAction && canShowMore) {
-								var threshold = this.totalScrollY + 5;
+								var threshold = this.bottomY - PULL_DISTANCE;
 								
 								if (this.y < threshold && $A.util.hasClass(pullUpEl, 'pullDown')) {
 									$A.util.swapClass(pullUpEl, 'pullDown', 'pullFlip');
-									this.maxScrollY = this.totalScrollY;
+									this.maxScrollY = this.bottomY;
 								} else if (this.y > threshold && $A.util.hasClass(pullUpEl, 'pullFlip')) {
 									$A.util.swapClass(pullUpEl, 'pullFlip', 'pullDown');
-									this.maxScrollY = this.totalScrollYWithoutPullUp;
+									this.maxScrollY = this.bottomYWithoutPullUp;
 								}
 							}							
 							
@@ -291,8 +293,7 @@
 									$A.util.swapClass(pullUpEl, 'pullLoading', 'pullDown');
 								}, 50);
 							
-								// TODO: this could be possibly be more efficient
-								var oldShim = shim.offsetHeight;
+								// TODO: this could all possibly be more efficient
 								shim.style.height = "0"
 								var actualContentHeight = scroller.children[0].offsetHeight
 								
@@ -302,15 +303,21 @@
 									shim.style.height = leftoverSpace + "px";
 								}
 								
-								this.maxScrollY += oldShim;
+								/* bottomY is the scroller's y value when the bottom of the scroller content
+								 * (including the "load more" affordance) meets the bottom of the scroller's wrapper
+								 * (i.e., when the very bottom of all content is reached).
+								 * 
+								 * bottomYWithoutPullUp is the scroller's y value when the bottom of the scroller content
+								 * (*NOT* including the "load more" affordance) meets the bottom of the scroller's wrapper.
+								 * 
+								 * These are not native iScroll properties and are used only for our benefit when
+								 * calculating pullToLoadMore behaviour.
+								 */
+								this.bottomY = this.wrapperH - this.scroller.offsetHeight;
+								this.bottomYWithoutPullUp = this.bottomY + pullUpOffset;
+								
+								this.maxScrollY = this.bottomYWithoutPullUp;
 							}
-							
-							// totalScrollY includes the shim and pullToShowMore divs and is for our own reference.
-							// maxScrollY is actually used by iScroll to determine when to bounce back.
-							this.totalScrollY = this.maxScrollY;
-							this.totalScrollYWithoutPullUp = this.totalScrollY + pullUpOffset;
-							this.maxScrollY = this.totalScrollYWithoutPullUp;
-							
 						}
 					});
 

@@ -18,6 +18,10 @@
 <aura:component extends="ui:abstractList" implements="ui:scrollerEmbeddable" support="proto"
     provider="java://org.auraframework.component.ui.ListProvider, js://ui.list" description="A list component that iterates over and displays the items in the ui:dataProvider component.">
     
+    <!-- This event should probably become part of the base component definition, so any asynchronously
+         created component can announce its completion -->
+    <aura:registerEvent name="rerenderComplete" type="aura:asyncRerender" description="The event fired when this component completes its asynchronous rerender."/>
+    
     <aura:handler name="showMore" action="{!c.showMore}"/>
 
 	<ul class="{!v.class}">

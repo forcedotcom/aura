@@ -31,7 +31,13 @@
     handleDataChange: function(component, event, helper) {
     	component = component.getConcreteComponent();
     	helper = component.getDef().getHelper();
-    
+
+    	if (component._refreshing) {
+    		component.getConcreteComponent().getValue("v.items").clear();
+    		
+    		component._refreshing = false;
+    	}
+    	
     	helper.handleDataChange(component, event);
     },
     
@@ -43,9 +49,8 @@
     
     refresh: function(component, event, helper) {
     	component.getConcreteComponent().getValue("v.currentPage").setValue(1, true);
-    
-    	var items = component.getConcreteComponent().getValue("v.items");
-    	items.clear();
+    	
+    	component.getConcreteComponent()._refreshing = true;
     	
     	helper.triggerDataProvider(component);
     },

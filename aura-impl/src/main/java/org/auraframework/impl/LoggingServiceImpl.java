@@ -18,6 +18,7 @@ package org.auraframework.impl;
 import org.auraframework.adapter.LoggingAdapter;
 import org.auraframework.service.LoggingService;
 import org.auraframework.system.LoggingContext;
+import org.auraframework.system.LoggingContext.KeyValueLogger;
 
 /**
  */
@@ -154,5 +155,14 @@ public class LoggingServiceImpl implements LoggingService {
             return null;
         }
         return la.getLoggingContext();
+    }
+
+    @Override
+    public KeyValueLogger getKeyValueLogger(StringBuffer log) {
+        LoggingContext lc = getLoggingContext();
+        if (lc != null) {
+            return lc.getKeyValueLogger(log);
+        }
+        return null;
     }
 }

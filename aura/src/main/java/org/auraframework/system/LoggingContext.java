@@ -41,5 +41,14 @@ public interface LoggingContext {
     void setValue(String name, Object value);
 
     void log();
+    
+    KeyValueLogger getKeyValueLogger(StringBuffer log);
+
+    /**
+     * Interface to allow formatted logging of key value pairs
+     */
+    public interface KeyValueLogger {
+        public void log(String key, String value);
+    }
 
 }

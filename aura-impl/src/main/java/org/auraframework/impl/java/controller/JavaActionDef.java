@@ -34,6 +34,7 @@ public class JavaActionDef extends DefinitionImpl<ActionDef> implements ActionDe
     private static final long serialVersionUID = -9179014361802437154L;
     private final DefDescriptor<TypeDef> returnTypeDescriptor;
     private final List<ValueDef> params;
+    private final List<String> loggableParams;
     private final Class<?>[] javaParams;
     private final Method method;
     private final boolean background;
@@ -42,6 +43,7 @@ public class JavaActionDef extends DefinitionImpl<ActionDef> implements ActionDe
         super(builder);
         this.returnTypeDescriptor = builder.returnTypeDescriptor;
         this.params = AuraUtil.immutableList(builder.params);
+        this.loggableParams = builder.loggableParams;
         this.javaParams = builder.javaParams;
         this.method = builder.method;
         this.background = builder.background;
@@ -55,6 +57,10 @@ public class JavaActionDef extends DefinitionImpl<ActionDef> implements ActionDe
     @Override
     public List<ValueDef> getParameters() {
         return params;
+    }
+
+    public List<String> getLoggableParams() {
+        return loggableParams;
     }
 
     Class<?>[] getJavaParams() {
@@ -99,6 +105,7 @@ public class JavaActionDef extends DefinitionImpl<ActionDef> implements ActionDe
 
         private DefDescriptor<TypeDef> returnTypeDescriptor;
         private List<ValueDef> params;
+        private List<String> loggableParams;
         private Class<?>[] javaParams;
         private Method method;
         private boolean background = false;
@@ -124,6 +131,15 @@ public class JavaActionDef extends DefinitionImpl<ActionDef> implements ActionDe
          */
         public void setParams(List<ValueDef> params) {
             this.params = params;
+        }
+
+        /**
+         * Sets the loggable param names for this instance.
+         * 
+         * @param params The loggableParams.
+         */
+        public void setLoggableParams(List<String> loggableParams) {
+            this.loggableParams = loggableParams;
         }
 
         /**

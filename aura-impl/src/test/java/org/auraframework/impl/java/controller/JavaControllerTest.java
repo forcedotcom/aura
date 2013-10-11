@@ -15,6 +15,7 @@
  */
 package org.auraframework.impl.java.controller;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,6 +28,7 @@ import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.Action.State;
+import org.auraframework.system.LoggingContext.KeyValueLogger;
 import org.auraframework.throwable.AuraUnhandledException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
@@ -240,5 +242,49 @@ public class JavaControllerTest extends AuraImplTestCase {
     public void testSerialize() throws Exception {
         ControllerDef controller = getJavaController("java://org.auraframework.impl.java.controller.ParallelActionTestController");
         serializeAndGoldFile(controller);
+    }
+
+    /**
+     * Tests to verify the logging of params
+     */
+    public void testParamLogging() throws Exception {
+        ControllerDef controller = getJavaController("java://org.auraframework.impl.java.controller.JavaTestController");
+        JavaAction nonLoggableStringAction = (JavaAction)controller.createAction("getString", null);
+        JavaAction nonLoggableIntAction = (JavaAction)controller.createAction("getInt", null);
+        JavaAction loggableStringAction = (JavaAction)controller.createAction("getLoggableString", Collections.singletonMap("param", (Object)"bar"));
+        JavaAction loggableIntAction = (JavaAction)controller.createAction("getLoggableString", Collections.singletonMap("param", (Object)1));
+        JavaAction loggableNullAction = (JavaAction)controller.createAction("getLoggableString", Collections.singletonMap("param", null));
+        TestLogger testLogger = new TestLogger();
+        
+        nonLoggableStringAction.logParams(testLogger);
+        assertNull("Key should not have been logged", testLogger.key);
+        assertNull("Value should not have been logged", testLogger.value);
+        
+        nonLoggableIntAction.logParams(testLogger);
+        assertNull("Key should not have been logged", testLogger.key);
+        assertNull("Value should not have been logged", testLogger.value);
+        
+        loggableStringAction.logParams(testLogger);
+        assertEquals("Key was not logged", "param", testLogger.key);
+        assertEquals("Value was not logged", "bar", testLogger.value);
+        
+        loggableIntAction.logParams(testLogger);
+        assertEquals("Key was not logged", "param", testLogger.key);
+        assertEquals("Value was not logged", "1", testLogger.value);
+        
+        loggableNullAction.logParams(testLogger);
+        assertEquals("Key was not logged", "param", testLogger.key);
+        assertEquals("Value was not logged", "null", testLogger.value);
+    }
+    
+    private static class TestLogger implements KeyValueLogger {
+
+        private String key = null;
+        private String value = null;
+        @Override
+        public void log(String key, String value) {
+            this.key = key;
+            this.value = value;
+        }
     }
 }

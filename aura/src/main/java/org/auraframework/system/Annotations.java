@@ -42,6 +42,7 @@ public interface Annotations {
     @Target(ElementType.PARAMETER)
     public @interface Key {
         String value();
+        boolean loggable() default false;
     }
 
     @Retention(RetentionPolicy.RUNTIME)

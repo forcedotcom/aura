@@ -16,7 +16,9 @@
 package org.auraframework.impl.java.controller;
 
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -31,7 +33,9 @@ import org.auraframework.instance.Action;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.StorableAction;
 import org.auraframework.service.LoggingService;
+import org.auraframework.system.Annotations.Key;
 import org.auraframework.system.Location;
+import org.auraframework.system.LoggingContext.KeyValueLogger;
 import org.auraframework.throwable.AuraExecutionException;
 import org.auraframework.throwable.AuraHandledException;
 import org.auraframework.throwable.AuraUnhandledException;
@@ -240,4 +244,14 @@ public class JavaAction implements StorableAction {
     private final Map<String, BaseComponent<?, ?>> componentRegistry = Maps.newLinkedHashMap();
     private int nextId = 1;
     private boolean storable;
+    
+    @Override
+    public void logParams(KeyValueLogger logger) {
+        List<String> loggableParams = actionDef.getLoggableParams();
+        if (paramValues != null && loggableParams != null) {
+            for (String paramName : loggableParams) {
+                logger.log(paramName, String.valueOf(paramValues.get(paramName)));
+            }
+        }
+    }
 }

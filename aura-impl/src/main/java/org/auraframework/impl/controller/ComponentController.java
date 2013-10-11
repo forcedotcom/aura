@@ -37,7 +37,7 @@ import com.google.common.collect.Lists;
 public class ComponentController {
 
     @AuraEnabled
-    public static Component getComponent(@Key("name") String name, @Key("attributes") Map<String, Object> attributes)
+    public static Component getComponent(@Key(value = "name", loggable = true) String name, @Key("attributes") Map<String, Object> attributes)
             throws QuickFixException {
         DefinitionService definitionService = Aura.getDefinitionService();
         DefDescriptor<ComponentDef> desc = definitionService.getDefDescriptor(name, ComponentDef.class);
@@ -46,7 +46,7 @@ public class ComponentController {
     }
 
     @AuraEnabled
-    public static Application getApplication(@Key("name") String name, @Key("attributes") Map<String, Object> attributes)
+    public static Application getApplication(@Key(value = "name", loggable = true) String name, @Key("attributes") Map<String, Object> attributes)
             throws QuickFixException {
         DefinitionService definitionService = Aura.getDefinitionService();
         DefDescriptor<ApplicationDef> desc = definitionService.getDefDescriptor(name, ApplicationDef.class);
@@ -55,13 +55,13 @@ public class ComponentController {
     }
 
     @AuraEnabled
-    public static ComponentDef getComponentDef(@Key("name") String name) throws QuickFixException {
+    public static ComponentDef getComponentDef(@Key(value = "name", loggable = true) String name) throws QuickFixException {
         DefDescriptor<ComponentDef> desc = Aura.getDefinitionService().getDefDescriptor(name, ComponentDef.class);
         return Aura.getDefinitionService().getDefinition(desc);
     }
 
     @AuraEnabled
-    public static ApplicationDef getApplicationDef(@Key("name") String name) throws QuickFixException {
+    public static ApplicationDef getApplicationDef(@Key(value = "name", loggable = true) String name) throws QuickFixException {
         DefDescriptor<ApplicationDef> desc = Aura.getDefinitionService().getDefDescriptor(name, ApplicationDef.class);
         return Aura.getDefinitionService().getDefinition(desc);
     }

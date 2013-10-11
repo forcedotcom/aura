@@ -23,6 +23,7 @@ import org.auraframework.def.ActionDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.BaseComponent;
+import org.auraframework.system.LoggingContext.KeyValueLogger;
 import org.auraframework.throwable.AuraExecutionException;
 import org.auraframework.util.javascript.Literal;
 import org.auraframework.util.json.Json;
@@ -141,4 +142,9 @@ public class MockAction implements Action {
     private final List<Action> actions;
     private final Map<String, BaseComponent<?, ?>> components;
     private final List<Object> errors;
+    
+    @Override
+    public void logParams(KeyValueLogger paramLogger) {
+        // not implemented
+    }
 }

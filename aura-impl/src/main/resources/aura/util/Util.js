@@ -1182,6 +1182,34 @@ $A.ns.Util.prototype.squash = function(event, preventDefault) {
     }
 };
 
+/**
+ * Strip off html tags from html codes.
+
+ * @param {String} input the input html codes
+ * @param {Array} tags the html tag names to be removed
+ * @return {String} an output string without those specified tags
+ */
+$A.ns.Util.prototype.stripTags = function(input, tags) {
+    if (this.isUndefinedOrNull(input) || this.isEmpty(input)) {
+        return;
+    }
+    var div = document.createElement('div');
+    div.innerHTML = input;
+    if (!this.isArray(tags)) {
+        tags = [tags];
+    }
+    for (var j = 0; j < tags.length; j++) {
+        var elems = div.getElementsByTagName(tags[j]);
+        var i = elems.length;
+        while (i--) {
+            elems[i].parentNode.removeChild(elems[i]);
+        }
+    }
+    var result = div.innerHTML;
+    this.removeElement(div);
+    return result;
+};
+
 
 /**
  * Simple function to get client viewport dimensions. If neither window.innerWidth

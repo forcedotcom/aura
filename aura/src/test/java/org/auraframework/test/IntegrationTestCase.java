@@ -57,6 +57,7 @@ import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.system.LoggingContext.KeyValueLogger;
 import org.auraframework.test.annotation.IntegrationTest;
 import org.auraframework.test.annotation.ThreadHostileTest;
 import org.auraframework.test.configuration.TestServletConfig;
@@ -450,6 +451,11 @@ public abstract class IntegrationTestCase extends AuraTestCase {
         @Override
         public int getNextId() {
             return nextId++;
+        }
+
+        @Override
+        public void logParams(KeyValueLogger paramLogger) {
+            // not implemented
         }
 
     }

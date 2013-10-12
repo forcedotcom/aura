@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.auraframework.def.ActionDef;
+import org.auraframework.system.LoggingContext.KeyValueLogger;
 import org.auraframework.throwable.AuraExecutionException;
 import org.auraframework.util.javascript.Literal;
 import org.auraframework.util.json.Json;
@@ -116,4 +117,10 @@ public interface Action extends Instance<ActionDef> {
     public Map<String, BaseComponent<?, ?>> getComponents();
 
     public int getNextId();
+
+    /**
+     * Log any params that are useful and safe to log.
+     * @param paramLogger
+     */
+    public void logParams(KeyValueLogger logger);
 }

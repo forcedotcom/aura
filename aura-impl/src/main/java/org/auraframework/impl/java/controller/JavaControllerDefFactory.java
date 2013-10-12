@@ -118,6 +118,7 @@ public class JavaControllerDefFactory extends BaseJavaDefFactory<ControllerDef> 
         String name = method.getName();
         Class<?>[] paramTypes = method.getParameterTypes();
         List<ValueDef> params = Lists.newArrayList();
+        List<String> loggableParams = Lists.newArrayList();
         Annotation[][] paramAnnotations = method.getParameterAnnotations();
 
         if (!Modifier.isPublic(modifiers) || !Modifier.isStatic(modifiers)) {
@@ -143,9 +144,14 @@ public class JavaControllerDefFactory extends BaseJavaDefFactory<ControllerDef> 
                     DefDescriptor<TypeDef> typeDefDesc = DefDescriptorImpl.getInstance(qn, TypeDef.class);
 
                     // FIXME = "we need an md5";
-                    ValueDef valueDef = new JavaValueDef(((Key) annotation).value(), typeDefDesc, new Location(
+                    String paramName = ((Key) annotation).value();
+                    ValueDef valueDef = new JavaValueDef(paramName, typeDefDesc, new Location(
                             controllerClass.getName() + "." + name, 0));
                     params.add(valueDef);
+                    
+                    if (((Key)annotation).loggable()) {
+                        loggableParams.add(paramName);
+                    }
                 }
             }
             if (!found) {
@@ -154,6 +160,7 @@ public class JavaControllerDefFactory extends BaseJavaDefFactory<ControllerDef> 
             }
         }
         actionBuilder.setParams(params);
+        actionBuilder.setLoggableParams(loggableParams);
         
     	actionBuilder.setBackground(method.isAnnotationPresent(BackgroundAction.class));
         

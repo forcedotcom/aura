@@ -17,6 +17,7 @@ package org.auraframework.service;
 
 import org.auraframework.Aura;
 import org.auraframework.system.LoggingContext;
+import org.auraframework.system.LoggingContext.KeyValueLogger;
 
 /**
  * <p>
@@ -140,4 +141,9 @@ public interface LoggingService extends AuraService {
      * flush the logged values.
      */
     void doLog();
+    
+    /**
+     * get a key value pair logger that appends to the buffer
+     */
+    KeyValueLogger getKeyValueLogger(StringBuffer log);
 }

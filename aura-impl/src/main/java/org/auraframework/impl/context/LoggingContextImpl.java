@@ -171,6 +171,11 @@ public class LoggingContextImpl implements LoggingContext {
         log(loggingValues);
     }
 
+    @Override
+    public KeyValueLogger getKeyValueLogger(StringBuffer log) {
+        return new KVLogger(log);
+    }
+    
     /**
      * do the logging.
      */
@@ -272,7 +277,20 @@ public class LoggingContextImpl implements LoggingContext {
         }
 
     }
-
+    
+    private static class KVLogger implements KeyValueLogger {
+        private final StringBuffer logLine;
+        
+        KVLogger(StringBuffer logLine) {
+            this.logLine = logLine;
+        }
+        
+        @Override
+        public void log(String name, String value) {
+            logLine.append("{").append(name).append(",").append(value).append("}");
+        }
+    }
+    
     /**
      * A simple nestable timer class.  Time is reported in milliseconds.
      * If the timer start method is nested (called more than once before stop is called

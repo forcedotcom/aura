@@ -17,6 +17,7 @@ package org.auraframework.impl;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -25,6 +26,7 @@ import org.auraframework.Aura;
 import org.auraframework.def.ActionDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.impl.java.controller.JavaAction;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.Event;
 import org.auraframework.service.ContextService;
@@ -32,6 +34,7 @@ import org.auraframework.service.LoggingService;
 import org.auraframework.service.SerializationService;
 import org.auraframework.service.ServerService;
 import org.auraframework.system.AuraContext;
+import org.auraframework.system.LoggingContext.KeyValueLogger;
 import org.auraframework.system.Message;
 import org.auraframework.throwable.AuraExecutionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -88,9 +91,13 @@ public class ServerServiceImpl implements ServerService {
         LoggingService loggingService = Aura.getLoggingService();
         List<Action> result = Lists.newArrayList();
         for (Action action : actions) {
-            DefDescriptor<ActionDef> defDes = action.getDescriptor();
+            StringBuffer timerName = new StringBuffer(action.getDescriptor().getQualifiedName());
+            KeyValueLogger logger = loggingService.getKeyValueLogger(timerName);
+            if (logger != null) {
+                action.logParams(logger);
+            }
             try {
-                loggingService.startTimer(LoggingService.TIMER_ACTION + defDes.getQualifiedName());
+                loggingService.startTimer(LoggingService.TIMER_ACTION + timerName);
 
                 // Always include the action in the result
                 result.add(action);
@@ -116,7 +123,7 @@ public class ServerServiceImpl implements ServerService {
             } catch (AuraExecutionException x) {
                 Aura.getExceptionAdapter().handleException(x, action);
             } finally {
-                loggingService.stopTimer(LoggingService.TIMER_ACTION + defDes.getQualifiedName());
+                loggingService.stopTimer(LoggingService.TIMER_ACTION + timerName);
             }
         }
 

@@ -14,6 +14,13 @@
  * limitations under the License.
  */
 {
+    handleKeydown : function(cmp, event){
+        var keydownEvent = cmp.getEvent("keydown");
+        keydownEvent.setParams({"domEvent": event});
+        keydownEvent.fire();
+        return true;
+    },
+     
     press : function(cmp, event){
         var attributes = cmp.getAttributes();
 

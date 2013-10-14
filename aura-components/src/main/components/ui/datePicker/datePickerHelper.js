@@ -209,14 +209,11 @@
         if (!todayCmp) {
             return;
         }
-        var todayElem = todayCmp.getElement();
         var todayLabel = component.get("m.labelForToday");
         if (!todayLabel) {
             todayLabel = "Today";
         }
-        if (todayElem) {
-            todayElem.textContent = todayElem.innerText = todayLabel;
-        }
+        todayCmp.setValue("v.label", todayLabel);
     },
     
     getNormalizedLang: function(component) {

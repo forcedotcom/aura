@@ -34,9 +34,10 @@
     <aura:attribute name="labelDir" type="String" default="ltr" description="The direction in which the label should be read. Possible values are &quot;rtl&quot; (right to left) and &quot;ltr&quot; (left to right). Default value is &quot;ltr&quot;."/>
     <aura:attribute name="stopPropagation" type="Boolean" default="false" description="Prevents the click event from bubbling up the DOM tree, preventing any parent handlers from being notified of the event."/>
 
+    <aura:registerevent name="keydown" type="ui:keydown" description="The controller method that runs when a key is pressed down on the button."/>
     <aura:registerevent name="press" type="ui:press" description="The controller method that runs when the button is clicked. For example, press=&quot;{!c.showMsg}&quot; references the showMsg method in the controller."/>
 
-    <button type="{!v.buttonType}" aura:id="button" class="{!v.class +' '+v.theme+' uiBlock'}" onclick="{!c.press}" disabled="{!v.disabled}" accesskey="{!v.accesskey}" title="{!v.buttonTitle}">
+    <button type="{!v.buttonType}" aura:id="button" class="{!v.class +' '+v.theme+' uiBlock'}" onclick="{!c.press}" onkeydown="{!c.handleKeydown}" disabled="{!v.disabled}" accesskey="{!v.accesskey}" title="{!v.buttonTitle}">
         <aura:if isTrue="{!v.iconImgSrc != '' || v.iconClass != ''}">
             <img src="{!v.iconImgSrc != '' ? v.iconImgSrc : '/auraFW/resources/aura/s.gif'}" class="{!v.iconClass+' icon bLeft'}" alt="{!v.label}"/>
         </aura:if>

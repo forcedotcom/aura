@@ -33,10 +33,16 @@
 	},
 
 	waitForLog : function(cmp, index, content) {
-		$A.test.addWaitFor(content, function() {
-			var val = cmp.getAttributes().getValue("log").getValue(index);
-			return val === undefined ? val : val.unwrap();
-		});
+                var actual;
+		$A.test.addWaitFor(false, function() {
+			actual = cmp.getAttributes().getValue("log").getValue(index);
+                        if (actual !== undefined) {
+                            actual = actual.unwrap();
+                        }
+                        return actual === undefined;
+                }, function() {
+                    $A.test.assertEquals(content, actual, "mismatch on log entry "+index);
+                });
 	},
 
 	getAction : function(cmp, actionName, commands, callback, background, abortable) {
@@ -642,7 +648,7 @@
 		} ]
 	},
 
-	testRunActionsBypassesQueue : {
+	testRunActionsForcesQueue : {
 		test : [ function(cmp) {
 			var that = this;
 			// queue up foreground action
@@ -658,48 +664,18 @@
 				that.log(this, "run1 callback");
 			});
 
-			this.waitForLog(cmp, 0, "run1:run1");
-			this.waitForLog(cmp, 1, "run1 callback");
-			this.waitForLog(cmp, 2, "fore1:afterRun1,fore1");
+			// queue up foreground action
+                        $A.run(function() {
+                            $A.enqueueAction(that.getAction(cmp, "c.execute", "APPEND fore2;READ;", function(a) {
+                                that.log(cmp, "fore2:" + a.getReturnValue());
+                            }));
+                        });
+
+			this.waitForLog(cmp, 0, "fore1:fore1");
+			this.waitForLog(cmp, 1, "run1:run1");
+			this.waitForLog(cmp, 2, "run1 callback");
+			this.waitForLog(cmp, 3, "fore2:afterRun1,fore2");
 		} ]
-	},
-
-	testRunActionsForegroundedIfBypassing : {
-		test : [
-				function(cmp) {
-					var that = this;
-					// run set of only background actions (need to reach in-flight foreground max)
-					$A.clientService.runActions([ that.getAction(cmp, "c.executeBackground",
-							"WAIT run1;APPEND run1;READ;", function(a) {
-								that.log(cmp, "run1:" + a.getReturnValue());
-							}) ], cmp, function(a) {
-						that.log(this, "run1 callback");
-					});
-
-					$A.run(function() {
-						// try enqueuing another background action
-						$A.enqueueAction(that.getAction(cmp, "c.executeBackground", "APPEND back1;READ;", function(a) {
-							that.log(cmp, "back1:" + a.getReturnValue());
-						}));
-
-						// try enqueuing a foreground action
-						$A.enqueueAction(that.getAction(cmp, "c.execute", "APPEND fore1;READ;", function(a) {
-							that.log(cmp, "fore1:" + a.getReturnValue());
-						}));
-					});
-					// "queued" background action actually passes through since runActions is always foreground
-					// "queued" foreground action is queued
-					this.waitForLog(cmp, 0, "back1:back1");
-				}, function(cmp) {
-					var that = this;
-					$A.run(function() {
-						// release pending actions
-						$A.enqueueAction(that.getAction(cmp, "c.executeBackground", "RESUME run1;"));
-					});
-					this.waitForLog(cmp, 1, "run1:run1");
-					this.waitForLog(cmp, 2, "run1 callback");
-					this.waitForLog(cmp, 3, "fore1:fore1");
-				} ]
 	},
 
 	testRunActionsWithoutBypass : {

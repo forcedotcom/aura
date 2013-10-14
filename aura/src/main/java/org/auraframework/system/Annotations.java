@@ -33,6 +33,19 @@ public interface Annotations {
     public @interface BackgroundAction {
     }
 
+    /**
+     * Marks a method to be queued and wait for the next action that would be sent.
+     *
+     * This can be used when the action is to send data that is not critical, and that we
+     * want to boxcar with other actions to avoid performance penalties.
+     *
+     * The AuraEnabled annotation is still required to use this method as a server action.
+     */
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.METHOD)
+    public @interface CabooseAction {
+    }
+
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.METHOD)
     public @interface AuraEnabled {

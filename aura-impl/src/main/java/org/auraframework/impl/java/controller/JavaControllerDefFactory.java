@@ -36,6 +36,7 @@ import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.SubDefDescriptorImpl;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.BackgroundAction;
+import org.auraframework.system.Annotations.CabooseAction;
 import org.auraframework.system.Annotations.Controller;
 import org.auraframework.system.Annotations.Key;
 import org.auraframework.system.DefFactory;
@@ -163,6 +164,7 @@ public class JavaControllerDefFactory extends BaseJavaDefFactory<ControllerDef> 
         actionBuilder.setLoggableParams(loggableParams);
         
     	actionBuilder.setBackground(method.isAnnotationPresent(BackgroundAction.class));
+    	actionBuilder.setCaboose(method.isAnnotationPresent(CabooseAction.class));
         
         return actionBuilder.build();
     }

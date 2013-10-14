@@ -11,6 +11,7 @@
           "actionType":"SERVER",
           "returnType":"java://org.auraframework.impl.java.controller.ParallelActionTestController$Record",
           "background":false,
+          "caboose":false,
           "params":[
 
           ]
@@ -24,6 +25,7 @@
           "actionType":"SERVER",
           "returnType":"java://void",
           "background":true,
+          "caboose":false,
           "params":[
 
           ]
@@ -37,6 +39,7 @@
           "actionType":"SERVER",
           "returnType":"java://org.auraframework.impl.java.controller.ParallelActionTestController$Record",
           "background":true,
+          "caboose":false,
           "params":[
             {
               "serId":5,
@@ -56,6 +59,7 @@
           "actionType":"SERVER",
           "returnType":"java://void",
           "background":false,
+          "caboose":false,
           "params":[
 
           ]
@@ -69,6 +73,7 @@
           "actionType":"SERVER",
           "returnType":"java://org.auraframework.impl.java.controller.ParallelActionTestController$Record",
           "background":false,
+          "caboose":false,
           "params":[
             {
               "serId":8,

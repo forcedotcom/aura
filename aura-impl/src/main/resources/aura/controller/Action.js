@@ -22,15 +22,19 @@
  * @constructor
  * @param {Object}
  *            def The definition of the Action.
- * @param {Function}
+ * @param {function}
  *            method The method for the Action. For client-side Action only. A function to serialize the Action as a
  *            String in the JSON representation.
  * @param {Object}
  *            paramDefs The parameter definitions for the Action.
- * @param {Object}
+ * @param {boolean}
+ *            background is the action defined as a background action?
+ * @param {Component}
  *            cmp The component associated with the Action.
+ * @param {boolean}
+ *            caboose should this action wait for the next non boxcar action?
  */
-function Action(def, method, paramDefs, background, cmp) {
+function Action(def, method, paramDefs, background, cmp, caboose) {
     this.def = def;
     this.meth = method;
     this.paramDefs = paramDefs;
@@ -47,6 +51,8 @@ function Action(def, method, paramDefs, background, cmp) {
     this.id = undefined;
     this.originalResponse = undefined;
     this.storable = false;
+    this.caboose = caboose;
+    this.allAboardCallback = undefined;
 }
 
 Action.prototype.nextActionId = 1;
@@ -122,7 +128,7 @@ Action.prototype.completeGroups = function() {
 
 /**
  * Sets parameters for the Action.
- * 
+ *
  * @public
  * @param {Object}
  *            config The key/value pairs that specify the Action. The key is an attribute on the given component.
@@ -136,12 +142,30 @@ Action.prototype.setParams = function(config) {
 };
 
 /**
+ * Sets a single parameter for the Action.
+ * 
+ * @public
+ * @param {!string}
+ *            key the name of the parameter to set.
+ * @param {Object}
+ *            value the value to set.
+ *
+ */
+Action.prototype.setParam = function(key, value) {
+    var paramDef = this.paramDefs[key];
+
+    if (paramDef) {
+        this.params[key] = value;
+    }
+};
+
+/**
  * Gets an Action parameter. 
  * 
  * @public
- * @param {String}
+ * @param {!string}
  *            name The name of the Action.
- * @returns {Array} The parameter values
+ * @returns {Object} The parameter values
  */
 Action.prototype.getParam = function(name) {
 	return this.params[name];
@@ -176,7 +200,7 @@ Action.prototype.getComponent = function() {
  * @public
  * @param {Object}
  *            scope The scope in which the function is executed.
- * @param {Function}
+ * @param {function}
  *            callback The callback function to run for each controller.
  * @param {String}
  *            name The action state for which the callback is to be associated with.
@@ -196,16 +220,12 @@ Action.prototype.setCallback = function(scope, callback, name) {
 			fn : callback,
 			s : scope
 		};
-		this.callbacks["ABORTED"] = {
-			fn : callback,
-			s : scope
-		};
 		this.callbacks["INCOMPLETE"] = {
 			fn : callback,
 			s : scope
 		};
 	} else {
-		if (name !== "SUCCESS" && name !== "ERROR" && name !== "ABORTED" && name !== "INCOMPLETE") {
+                if (name !== "SUCCESS" && name !== "ERROR" && name !== "ABORTED" && name !== "INCOMPLETE") {
 			$A.error("Illegal name " + name);
 			return;
 		}
@@ -214,6 +234,41 @@ Action.prototype.setCallback = function(scope, callback, name) {
 			s : scope
 		};
 	}
+};
+
+/**
+ * Set an 'all aboard' callback, called just before the action is sent.
+ *
+ * This can be used in conjunction with 'caboose' to implement a log+flush pattern.
+ * Intended to be called as the 'train' leaves the 'station'. Note that setParam should
+ * be used to set aditional parameters at this point.
+ *
+ * @param {Object}
+ *      scope The scope for the callback function.
+ * @param {Function}
+ *      callback the function to call.
+ *
+ */
+Action.prototype.setAllAboardCallback = function(scope, callback) {
+    if (!$A.util.isFunction(callback)) {
+        $A.error("Action 'All Aboard' callback should be a function");
+        return;
+    }
+    var that = this;
+    this.allAboardCallback = function() { callback.call(scope, that); };
+};
+
+/**
+ * Call the 'all aboard' callback.
+ *
+ * This should only be called internally just before an action is sent to the server.
+ *
+ * @protected
+ */
+Action.prototype.callAllAboardCallback = function () {
+    if (this.allAboardCallback) {
+        this.allAboardCallback();
+    }
 };
 
 /**
@@ -585,6 +640,31 @@ Action.prototype.setStorable = function(config) {
 Action.prototype.isStorable = function() {
 	var ignoreExisting = this.storableConfig && this.storableConfig["ignoreExisting"];
 	return this._isStorable() && !ignoreExisting;
+};
+
+/**
+ * Sets this action as a 'caboose'.
+ *
+ * This is only relevant for server side actions, and will cause the action to never initiate
+ * an XHR request. This action will not be sent to the server until there is some other action
+ * that would cause a server round-trip. This can be a little dangerous, as the this will queue
+ * forever if nothing goes to the server.
+ * 
+ * @public
+ */
+Action.prototype.setCaboose = function() {
+    this.caboose = true;
+};
+
+
+/**
+ * Returns true if the function should not create an XHR request.
+ * 
+ * @public
+ * @returns {boolean}
+ */
+Action.prototype.isCaboose = function() {
+    return this.caboose;
 };
 
 /**

@@ -146,25 +146,13 @@ Test.Aura.Controller.ActionCallbackGroupTest = function() {
 			}
 
 			[ Fact ]
-			function DoesNotCopyActionWithoutAddCallbackGroup() {
-				var invalid = [ {} ];
-
-				var actual = new ActionCallbackGroup(invalid, null, function() {
-				}).actions;
-
-				Assert.Equal([], actual);
-			}
-
-			[ Fact ]
 			function CopiesMultipleActions() {
 				var valid1 = new MockAction("valid1");
 				var valid2 = new MockAction("valid2");
-				var invalid = {};
-				var actions = [ valid1, invalid, valid2 ];
+				var actions = [ valid1, valid2 ];
 				var expected = [ valid1, valid2 ];
 
-				var actual = new ActionCallbackGroup(actions, null, function() {
-				}).actions;
+				var actual = new ActionCallbackGroup(actions, null, function() { }).actions;
 
 				Assert.Equal(expected, actual);
 			}

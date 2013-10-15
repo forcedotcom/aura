@@ -17,16 +17,12 @@ package org.auraframework.impl;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import org.auraframework.Aura;
-import org.auraframework.def.ActionDef;
 import org.auraframework.def.BaseComponentDef;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.impl.java.controller.JavaAction;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.Event;
 import org.auraframework.service.ContextService;

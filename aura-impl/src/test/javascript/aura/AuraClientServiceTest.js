@@ -52,51 +52,51 @@ Test.Aura.AuraClientServiceTest = function() {
 	});
 
 	var MockAction = function(type) {
-		this.auraType = "Action";
-		this.setBackground = Stubs.GetMethod();
-                if (type === undefined) {
-                    type = "server";
-                }
-                this.isAbortable = Stubs.GetMethod(false);
-                this.isCaboose = Stubs.GetMethod(false);
-                this.isBackground = Stubs.GetMethod(false);
-                this.runDeprecated = Stubs.GetMethod();
-                this.addCallbackGroup = Stubs.GetMethod();
-                this.abort = Stubs.GetMethod();
-                this.getDef = Stubs.GetMethod({
-                    isClientAction : Stubs.GetMethod(true),
-                    isServerAction : Stubs.GetMethod(false)
-                });
-                var sdef = Stubs.GetMethod({
-                    isClientAction : Stubs.GetMethod(false),
-                    isServerAction : Stubs.GetMethod(true)
-                });
-                if (type === "clientbackground") {
-                    this.isBackground = Stubs.GetMethod(true);
-                } else if (type === "server") {
-                    this.getDef = sdef;
-                } else if (type === "serverbackground") {
-                    this.getDef = sdef;
-                    this.isBackground = Stubs.GetMethod(true);
-                } else if (type === "serverabortable") {
-                    this.getDef = sdef;
-                    this.isAbortable = Stubs.GetMethod(true);
-                } else if (type === "serverforceboxcar") {
-                    this.getDef = sdef;
-                    this.isCaboose = Stubs.GetMethod(true);
-                }
-        };
+        this.auraType = "Action";
+        this.setBackground = Stubs.GetMethod();
+        if (type === undefined) {
+            type = "server";
+        }
+        this.isAbortable = Stubs.GetMethod(false);
+        this.isCaboose = Stubs.GetMethod(false);
+        this.isBackground = Stubs.GetMethod(false);
+        this.runDeprecated = Stubs.GetMethod();
+        this.addCallbackGroup = Stubs.GetMethod();
+        this.abort = Stubs.GetMethod();
+        this.getDef = Stubs.GetMethod({
+            isClientAction : Stubs.GetMethod(true),
+            isServerAction : Stubs.GetMethod(false)
+        });
+        var sdef = Stubs.GetMethod({
+            isClientAction : Stubs.GetMethod(false),
+            isServerAction : Stubs.GetMethod(true)
+        });
+        if (type === "clientbackground") {
+            this.isBackground = Stubs.GetMethod(true);
+        } else if (type === "server") {
+            this.getDef = sdef;
+        } else if (type === "serverbackground") {
+            this.getDef = sdef;
+            this.isBackground = Stubs.GetMethod(true);
+        } else if (type === "serverabortable") {
+            this.getDef = sdef;
+            this.isAbortable = Stubs.GetMethod(true);
+        } else if (type === "serverforceboxcar") {
+            this.getDef = sdef;
+            this.isCaboose = Stubs.GetMethod(true);
+        }
+    };
 
-        var MockActionQueue = function() {
-            this.clientActions = [];
-            this.serverActions = [];
-            this.nextBackgroundAction = null;
-            this.xhr = false;
-            this.getClientActions = function() { return this.clientActions; };
-            this.getServerActions = function() { return this.serverActions; };
-            this.getNextBackgroundAction = function() { return this.nextBackgroundAction; };
-            this.needXHR = function() { return this.xhr; };
-        };
+    var MockActionQueue = function() {
+        this.clientActions = [];
+        this.serverActions = [];
+        this.nextBackgroundAction = null;
+        this.xhr = false;
+        this.getClientActions = function() { return this.clientActions; };
+        this.getServerActions = function() { return this.serverActions; };
+        this.getNextBackgroundAction = function() { return this.nextBackgroundAction; };
+        this.needXHR = function() { return this.xhr; };
+    };
 
 	//
 	// FIXME: most of the enqueue action stuff should be removed, and
@@ -119,7 +119,7 @@ Test.Aura.AuraClientServiceTest = function() {
 		[ Fact ]
 		function QueuesServerAction() {
 			var action = new MockAction();
-                        var target;
+            var target;
 			mockGlobal(function() {
 				target = new AuraClientService();
 				target.priv.actionQueue.enqueue = Stubs.GetMethod("action", undefined);
@@ -138,7 +138,7 @@ Test.Aura.AuraClientServiceTest = function() {
 		[ Fact ]
 		function QueuesClientAction() {
 			var action = new MockAction("client");
-                        var target;
+            var target;
 			mockGlobal(function() {
 				target = new AuraClientService();
 				target.priv.actionQueue.enqueue = Stubs.GetMethod("action", undefined);
@@ -158,8 +158,8 @@ Test.Aura.AuraClientServiceTest = function() {
 		function AbortableActionsAreCleared() {
 			// Arrange
 			var target;
-                        var abortable = new MockAction("serverabortable");
-                        var action = new MockAction("server");
+            var abortable = new MockAction("serverabortable");
+            var action = new MockAction("server");
 
 			mockGlobal(function() {
 				target = new AuraClientService();
@@ -304,13 +304,13 @@ Test.Aura.AuraClientServiceTest = function() {
 	function ProcessActions() {
 		[ Fact ]
 		function ReturnsFalseIfForegroundMax() {
-                        var target;
+            var target;
 			mockGlobal(function() {
 				target = new AuraClientService();
 			});
-                        target.priv.actionQueue = new MockActionQueue();
-                        target.priv.actionQueue.serverActions = [ "action" ];
-                        target.priv.actionQueue.xhr = true;
+            target.priv.actionQueue = new MockActionQueue();
+            target.priv.actionQueue.serverActions = [ "action" ];
+            target.priv.actionQueue.xhr = true;
 			target.priv.foreground.started = target.priv.foreground.max;
 
 			var actual;
@@ -323,12 +323,12 @@ Test.Aura.AuraClientServiceTest = function() {
 
 		[ Fact ]
 		function ReturnsFalseIfBackgroundMax() {
-                        var target;
+            var target;
 			mockGlobal(function() {
 				target = new AuraClientService();
 			});
-                        target.priv.actionQueue = new MockActionQueue();
-                        target.priv.actionQueue.nextBackgroundAction = "action";
+            target.priv.actionQueue = new MockActionQueue();
+            target.priv.actionQueue.nextBackgroundAction = "action";
 			target.priv.background.started = target.priv.background.max;
 
 			var actual;
@@ -341,11 +341,11 @@ Test.Aura.AuraClientServiceTest = function() {
 
 		[ Fact ]
 		function ReturnsFalseIfQueueEmpty() {
-                        var target;
+            var target;
 			mockGlobal(function() {
 				target = new AuraClientService();
 			});
-                        target.priv.actionQueue = new MockActionQueue();
+            target.priv.actionQueue = new MockActionQueue();
 
 			var actual;
 			mockGlobal(function() {
@@ -358,14 +358,14 @@ Test.Aura.AuraClientServiceTest = function() {
 		[ Fact ]
 		function CallsRequestIfServerActionsAvailable() {
 			var action = "server";
-                        var target;
+            var target;
 			mockGlobal(function() {
 				target = new AuraClientService();
 			});
 			target.priv.request = Stubs.GetMethod("actions", "flightCounter", undefined);
-                        target.priv.actionQueue = new MockActionQueue();
+            target.priv.actionQueue = new MockActionQueue();
 			target.priv.actionQueue.serverActions = [ action ];
-                        target.priv.actionQueue.xhr = true;
+            target.priv.actionQueue.xhr = true;
 
 			mockGlobal(function() {
 				target.processActions();
@@ -380,18 +380,37 @@ Test.Aura.AuraClientServiceTest = function() {
 			} ], target.priv.request.Calls);
 		}
 
+        [ Fact ]
+        function DoesNotCallRequestIfXhrSetToFalse() {
+            var action = "server";
+            var target;
+            mockGlobal(function() {
+                target = new AuraClientService();
+            });
+            target.priv.actionQueue = new MockActionQueue();
+            target.priv.actionQueue.serverActions = [ action ];
+            target.priv.actionQueue.xhr = false;
+
+            var actual;
+            mockGlobal(function() {
+                actual = target.processActions();
+            });
+
+            Assert.False(actual);
+        }
+
 		[ Fact ]
 		function ReturnsTrueIfServerActionsSent() {
 			var action = "server";
-                        var target;
+            var target;
 			mockGlobal(function() {
 				target = new AuraClientService();
 			});
 			target.priv.request = function() {
 			};
-                        target.priv.actionQueue = new MockActionQueue();
+            target.priv.actionQueue = new MockActionQueue();
 			target.priv.actionQueue.serverActions = [ action ];
-                        target.priv.actionQueue.xhr = true;
+            target.priv.actionQueue.xhr = true;
 
 			var actual;
 			mockGlobal(function() {
@@ -404,12 +423,12 @@ Test.Aura.AuraClientServiceTest = function() {
 		[ Fact ]
 		function CallsRequestIfBackgroundActionAvailable() {
 			var action = "background";
-                        var target;
+            var target;
 			mockGlobal(function() {
 				target = new AuraClientService();
 			});
 			target.priv.request = Stubs.GetMethod("actions", "flightCounter", undefined);
-                        target.priv.actionQueue = new MockActionQueue();
+            target.priv.actionQueue = new MockActionQueue();
 			target.priv.actionQueue.nextBackgroundAction = action;
 
 			var actual;
@@ -429,13 +448,13 @@ Test.Aura.AuraClientServiceTest = function() {
 		[ Fact ]
 		function ReturnsTrueIfBackgroundActionSent() {
 			var action = "background";
-                        var target;
+            var target;
 			mockGlobal(function() {
 				target = new AuraClientService();
 			});
 			target.priv.request = function() {
 			};
-                        target.priv.actionQueue = new MockActionQueue();
+            target.priv.actionQueue = new MockActionQueue();
 			target.priv.actionQueue.nextBackgroundAction = action;
 
 			var actual;
@@ -450,15 +469,15 @@ Test.Aura.AuraClientServiceTest = function() {
 		function CallsRequestForBothServerAndBackgroundActions() {
 			var actionServer = "server";
 			var actionBackground = "background";
-                        var target;
+            var target;
 			mockGlobal(function() {
 				target = new AuraClientService();
 			});
 			target.priv.request = Stubs.GetMethod("actions", "flightCounter", undefined);
-                        target.priv.actionQueue = new MockActionQueue();
+            target.priv.actionQueue = new MockActionQueue();
 			target.priv.actionQueue.serverActions = [ actionServer ];
-                        target.priv.actionQueue.xhr = true;
-                        target.priv.actionQueue.nextBackgroundAction = actionBackground;
+            target.priv.actionQueue.xhr = true;
+            target.priv.actionQueue.nextBackgroundAction = actionBackground;
 
 			var actual;
 			mockGlobal(function() {
@@ -481,152 +500,164 @@ Test.Aura.AuraClientServiceTest = function() {
 		}
 	}
 
-	[ Fixture ]
-	function RunActions() {
-		[ Fact ]
-		function AssertsActionsIsArray() {
-			var expectedArrayCheck = "checked";
-			var stubbedAssert = Stubs.GetMethod("condition", "msg", null);
-			var stubbedIsArray = Stubs.GetMethod("param", expectedArrayCheck);
-			var expected = "expected";
-			mockGlobal(function() {
-				$A.assert = stubbedAssert;
-				$A.util.isArray = stubbedIsArray;
-				var target = new AuraClientService();
-				target.priv.request = function() {
-				};
-				target.priv.enqueueAction = function() {
-                                };
-				target.priv.processActions = function() {
-                                };
+    [ Fixture ]
+    function MakeActionGroup() {
+        [ Fact ]
+        function AssertsActionsIsArray() {
+            var expectedArrayCheck = "checked";
+            var stubbedAssert = Stubs.GetMethod("condition", "msg", null);
+            var stubbedIsArray = Stubs.GetMethod("param", expectedArrayCheck);
+            var expected = "expected";
+            mockGlobal(function() {
+                $A.assert = stubbedAssert;
+                $A.util.isArray = stubbedIsArray;
+                var target = new AuraClientService();
 
-                                try {
-                                    target.runActions(expected);
-                                } catch (e) {
-                                    // We expect an exception because our version of assert
-                                    // doesn't do the right thing.
-                                }
-			});
+                try {
+                    target.makeActionGroup(expected);
+                } catch (e) {
+                    // We expect an exception because our version of assert
+                    // doesn't do the right thing.
+                }
+            });
 
-			Assert.Equal([ {
-				Arguments : {
-					param : expected
-				},
-				ReturnValue : expectedArrayCheck
-			} ], stubbedIsArray.Calls);
-			Assert.Equal([ {
-				Arguments : {
-					condition : expectedArrayCheck,
-					msg : "makeActionGroup expects a list of actions, but instead got: expected"
-				},
-				ReturnValue : null
-			} ], stubbedAssert.Calls);
-		}
+            Assert.Equal([ {
+                Arguments : {
+                    param : expected
+                },
+                ReturnValue : expectedArrayCheck
+            } ], stubbedIsArray.Calls);
+            Assert.Equal([ {
+                Arguments : {
+                    condition : expectedArrayCheck,
+                    msg : "makeActionGroup expects a list of actions, but instead got: expected"
+                },
+                ReturnValue : null
+            } ], stubbedAssert.Calls);
+        }
 
-		[ Fact ]
-		function AssertsCallbackIsFunction() {
-			var expectedArrayCheck = "checked";
-			var action = new MockAction();
-			var stubbedAssert = Stubs.GetMethod("condition", "msg", null);
-			var stubbedIsFunction = Stubs.GetMethod("param", expectedArrayCheck);
-			var expected = function() {
-				return "expected callback";
-			};
-			mockGlobal(function() {
-				$A.util.isUndefined = function() {
-					return false;
-				};
-				$A.assert = stubbedAssert;
-				$A.util.isFunction = stubbedIsFunction;
-				var target = new AuraClientService();
-				target.priv.request = function() {
-				};
-				target.priv.enqueueAction = function() {
-                                };
-				target.priv.processActions = function() {
-                                };
+        [ Fact ]
+        function AssertsCallbackIsFunction() {
+            var expectedArrayCheck = "checked";
+            var action = new MockAction();
+            var stubbedAssert = Stubs.GetMethod("condition", "msg", null);
+            var stubbedIsFunction = Stubs.GetMethod("param", expectedArrayCheck);
+            var expected = function() {
+                return "expected callback";
+            };
+            mockGlobal(function() {
+                $A.util.isUndefined = function() {
+                    return false;
+                };
+                $A.assert = stubbedAssert;
+                $A.util.isFunction = stubbedIsFunction;
+                var target = new AuraClientService();
+                target.makeActionGroup([action], undefined, expected);
+            });
 
-                                target.runActions([action], undefined, expected);
-			});
+            Assert.Equal([ {
+                Arguments : {
+                    param : expected
+                },
+                ReturnValue : expectedArrayCheck
+            } ], stubbedIsFunction.Calls);
+            Assert.Equal({
+                Arguments : {
+                    condition : expectedArrayCheck,
+                    msg : "makeActionGroup expects the callback to be a function, but instead got: " + expected
+                },
+                ReturnValue : null
+            }, stubbedAssert.Calls[1]);
+        }
 
-			Assert.Equal([ {
-				Arguments : {
-					param : expected
-				},
-				ReturnValue : expectedArrayCheck
-			} ], stubbedIsFunction.Calls);
-			Assert.Equal({
-				Arguments : {
-					condition : expectedArrayCheck,
-					msg : "makeActionGroup expects the callback to be a function, but instead got: " + expected
-				},
-				ReturnValue : null
-			}, stubbedAssert.Calls[1]);
-		}
+        [ Fact ]
+        function DoesNotAssertCallbackIsFunctionIfCallbackUndefined() {
+            var stubbedAssert = Stubs.GetMethod("condition", "msg", null);
+            var action = new MockAction();
+            mockGlobal(function() {
+                $A.util.isUndefined = function() {
+                    return true;
+                };
+                $A.assert = stubbedAssert;
+                var target = new AuraClientService();
+                target.makeActionGroup([action], undefined, undefined);
+            });
 
-		[ Fact ]
-		function DoesNotAssertCallbackIsFunctionIfCallbackUndefined() {
-			var stubbedAssert = Stubs.GetMethod("condition", "msg", null);
-			var action = new MockAction();
-			mockGlobal(function() {
-				$A.util.isUndefined = function() {
-					return true;
-				};
-				$A.assert = stubbedAssert;
-				var target = new AuraClientService();
-				target.priv.request = function() { };
-				target.priv.enqueueAction = function() { };
-				target.priv.processActions = function() { };
+            var i;
+            for (i = 0; i < stubbedAssert.Calls.length; i++) {
+                Assert.NotEqual("makeActionGroup expects the callback to be a function, but instead got: " + undefined,
+                                stubbedAssert.Calls[i].Arguments.msg);
+            }
+        }
+    }
 
-                                target.runActions([action], undefined, undefined);
-			});
+    [ Fixture ]
+    function RunActions() {
+        [ Fact ]
+        function CallsMakeActionGroup() {
+            var expectedActions = ["action"];
+            var expectedScope = "scope";
+            var expectedCallback = "callback";
+            var target;
+            mockGlobal(function() {
+                target = new AuraClientService();
+                target.makeActionGroup = Stubs.GetMethod("actions", "scope", "callback", null);
+                target.priv.actionQueue.enqueue = function(){};
+                target.processActions = function(){};
+                target.runActions(expectedActions, expectedScope, expectedCallback);
+            });
 
-                        var i;
-                        for (i = 0; i < stubbedAssert.Calls.length; i++) {
-                            Assert.NotEqual("makeActionGroup expects the callback to be a function, but instead got: " + undefined,
-                                            stubbedAssert.Calls[i].Arguments.msg);
-                        }
-		}
+            Assert.Equal([ {
+                Arguments : {
+                    actions: expectedActions,
+                    scope: expectedScope,
+                    callback: expectedCallback
+                },
+                ReturnValue : null
+            } ], target.makeActionGroup.Calls);
+        }
 
-		[ Fact ]
-		function CallsRequest() {
-                        var action = new MockAction();
-			var actions = [ action ];
-			var callback = function() { };
-			var target;
-			mockGlobal(function() {
-				target = new AuraClientService();
-				target.priv.request = Stubs.GetMethod("param", "flightCounter", null);
-				target.priv.makeActionGroup = Stubs.GetMethod(null);
+        [ Fact ]
+        function CallsEnqueueOnEachAction() {
+            var actions = ["action1", "action2"];
+            var target;
+            mockGlobal(function() {
+                target = new AuraClientService();
+                target.makeActionGroup = function(){};
+                target.priv.actionQueue.enqueue = Stubs.GetMethod("param", null);
+                target.processActions = function(){};
+                target.runActions(actions);
+            });
 
-				target.runActions(actions, undefined, callback);
-			});
+            Assert.Equal([{
+                Arguments : {
+                    param: actions[0]
+                },
+                ReturnValue : null
+                },
+                { Arguments : {
+                    param: actions[1]
+                },
+                ReturnValue : null
+                }
+            ], target.priv.actionQueue.enqueue.Calls);
+        }
 
-			Assert.Equal([ {
-				Arguments : {
-					param : actions,
-					flightCounter : target.priv.foreground
-				},
-				ReturnValue : null
-			} ], target.priv.request.Calls);
-		}
+        [ Fact ]
+        function CallsProcessActions() {
+            var expectedActions = ["action"];
+            var expectedScope = "scope";
+            var expectedCallback = "callback";
+            var target;
+            mockGlobal(function() {
+                target = new AuraClientService();
+                target.makeActionGroup = function(){};
+                target.priv.actionQueue.enqueue = function(){};
+                target.processActions = Stubs.GetMethod(null);
+                target.runActions(expectedActions, expectedScope, expectedCallback);
+            });
 
-		[ Fact ]
-		function NoCallToRequestIfBlocked() {
-			var callback = function() {
-			};
-			var target;
-                        var action = new MockAction();
-			var actions = [ action ];
-			mockGlobal(function() {
-				target = new AuraClientService();
-				target.priv.request = Stubs.GetMethod("param", null);
-				target.priv.foreground.started = target.priv.foreground.max;
-
-				target.runActions(actions, undefined, callback);
-			});
-
-			Assert.Equal([], target.priv.request.Calls);
-		}
-	}
+            Assert.Equal(1, target.processActions.Calls.length);
+        }
+    }
 }

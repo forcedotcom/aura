@@ -243,6 +243,7 @@ Action.prototype.setCallback = function(scope, callback, name) {
  * Intended to be called as the 'train' leaves the 'station'. Note that setParam should
  * be used to set aditional parameters at this point.
  *
+ * @public
  * @param {Object}
  *      scope The scope for the callback function.
  * @param {Function}

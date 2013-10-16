@@ -35,7 +35,7 @@ var ActionQueue = function ActionQueue() {
 ActionQueue.prototype.auraType = "ActionQueue";
 
 /**
- * Put a single action in the queue, possibly clearing prior abortable actionssssssss.
+ * Put a single action in the queue, possibly clearing prior abortable actions.
  * 
  * This maintains the order of the queue, but if, this action is the first action in the current transaction that is
  * abortable, all previous abortable actions are cleared.

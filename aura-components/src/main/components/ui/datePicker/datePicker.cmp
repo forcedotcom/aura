@@ -62,7 +62,7 @@
                 </div>
                 <aura:set attribute="else">
                     <div class="buttonBar">
-                        <a aura:id="today" onclick="{!c.selectToday}" onkeydown="{!c.handleTabToday}" class="calToday" href="javascript:void(0);">Today</a>
+                        <ui:button aura:id="today" press="{!c.selectToday}" keydown="{!c.handleTabToday}" class="calToday" label="Today"/>
                     </div>
                 </aura:set>
             </aura:if>

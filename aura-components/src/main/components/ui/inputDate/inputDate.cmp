@@ -28,7 +28,7 @@
         </aura:set>
     </aura:if>
     
-    <aura:if isTrue="{!v.displayDatePicker &amp;&amp; !$Browser.isPhone &amp;&amp; !$Browser.isTablet}">
+    <aura:if isTrue="{!v.displayDatePicker}">
         <a aura:id="datePickerOpener" class="datePicker-openIcon" aria-haspopup="true" onclick="{!c.openDatePicker}">
             <span class="assistiveText">Date Picker</span>
         </a>

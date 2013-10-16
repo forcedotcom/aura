@@ -35,13 +35,13 @@
     },
     
     displayDatePicker: function(component) {
-        var currentDate = new Date();
-        var value = component.get("v.value");
-        if (value) {
-            currentDate = $A.localizationService.parseDateTime(value, "yyyy-MM-dd");
-        }
         var datePicker = component.find("datePicker");
-        if (datePicker) {
+        if (datePicker && datePicker.get("v.visible") === false) {
+            var currentDate = new Date();
+            var value = component.get("v.value");
+            if (value) {
+                currentDate = $A.localizationService.parseDateTime(value, "yyyy-MM-dd");
+            }
             datePicker.setValue("v.value", this.getDateString(currentDate));
             datePicker.setValue("v.visible", true);
         }

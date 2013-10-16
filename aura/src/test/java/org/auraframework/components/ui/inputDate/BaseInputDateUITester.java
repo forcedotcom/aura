@@ -319,9 +319,9 @@ public class BaseInputDateUITester extends WebDriverTestCase {
 
         // Clicking on the today link
         classOfActiveElem = "" + auraUITestingUtil.getEval(CLASSNAME);
-        element = findDomElement(By.cssSelector("a[class*='" + classOfActiveElem + "']"));
-        assertEquals("Tabbing through every buttong did not take us to the today button", "calToday",
-                element.getAttribute("class"));
+        element = findDomElement(By.cssSelector("button[class*='" + classOfActiveElem + "']"));
+        String elementClass = element.getAttribute("class"); 
+        assertTrue("Tabbing through every buttong did not take us to the today button", elementClass.indexOf("calToday") >= 0);
     }
 
     // Checking functionality of the shift tab button
@@ -351,7 +351,8 @@ public class BaseInputDateUITester extends WebDriverTestCase {
         String shftTab = Keys.SHIFT + "" + Keys.TAB;
 
         // Going from Today hyperlink, back to SELECTED_DATE
-        gotToNextElem(driver, shftTab);
+        String classOfActiveElemButton = "button[class*='" + auraUITestingUtil.getEval(CLASSNAME) + "']";
+        findDomElement(By.cssSelector(classOfActiveElemButton)).sendKeys(shftTab);
 
         // Going from SELECTED_DATE to next-year
         gotToNextElem(driver, shftTab);

@@ -21,6 +21,7 @@
     <aura:attribute name="value" type="String" required="true" description="The text displayed when this component is rendered."/>
     <aura:attribute name="target" type="String" description="The target destination where this rendered component is displayed. Possible values: _blank, _parent, _self, _top"/>   
     <aura:attribute name="alt" type="String" description="The alternate text description for image (used when there is no label)"/>
+    <aura:attribute name="stopPropagation" type="Boolean" default="false" description="Prevents the click event from bubbling up the DOM tree, preventing any parent handlers from being notified of the event."/>
     
     <aura:registerevent name="linkClick" type="ui:linkClick" description="The event fired when the user clicks the link."/>
     <a aura:id="link" class="{!v.class}" dir="{!v.dir}" href="{!v.value}" title="{!v.title}" onclick="{!c.click}" target="{!v.target}">

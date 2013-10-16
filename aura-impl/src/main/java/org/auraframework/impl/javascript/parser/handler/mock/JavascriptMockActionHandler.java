@@ -27,6 +27,7 @@ import org.auraframework.def.ControllerDef;
 import org.auraframework.def.TestSuiteDef;
 import org.auraframework.instance.Action.State;
 import org.auraframework.system.Source;
+import org.auraframework.test.Resettable;
 import org.auraframework.test.mock.Answer;
 import org.auraframework.test.mock.DelegatingStubHandler;
 import org.auraframework.test.mock.Invocation;
@@ -56,7 +57,7 @@ public class JavascriptMockActionHandler extends JavascriptMockHandler<Controlle
         List<Stub<?>> stubs = getStubs(map.get("stubs"));
 
         return (ControllerDef) Proxy.newProxyInstance(this.getClass().getClassLoader(),
-                new Class<?>[] { ControllerDef.class }, new DelegatingStubHandler(controllerDef, stubs));
+                new Class<?>[] { ControllerDef.class, Resettable.class}, new DelegatingStubHandler(controllerDef, stubs));
     }
 
     @Override

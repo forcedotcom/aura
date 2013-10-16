@@ -50,6 +50,7 @@ import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.Client;
 import org.auraframework.system.MasterDefRegistry;
+import org.auraframework.test.Resettable;
 import org.auraframework.test.TestContext;
 import org.auraframework.test.TestContextAdapter;
 import org.auraframework.util.AuraTextUtil;
@@ -75,6 +76,7 @@ public class AuraContextFilter implements Filter {
     private static final StringParam app = new StringParam(AuraServlet.AURA_PREFIX + "app", 0, false);
     private static final StringParam num = new StringParam(AuraServlet.AURA_PREFIX + "num", 0, false);
     private static final StringParam test = new StringParam(AuraServlet.AURA_PREFIX + "test", 0, false);
+    private static final BooleanParam testReset = new BooleanParam(AuraServlet.AURA_PREFIX + "testReset", false);
     private static final StringParam contextConfig = new StringParam(AuraServlet.AURA_PREFIX + "context", 0, false);
 
     private String componentDir = null;
@@ -182,7 +184,11 @@ public class AuraContextFilter implements Filter {
                         MasterDefRegistry registry = context.getDefRegistry();
                         Set<Definition> mocks = testContext.getLocalDefs();
                         if (mocks != null) {
+                            boolean doReset = testReset.get(request);
                             for (Definition def : mocks) {
+                                if (doReset && def instanceof Resettable) {
+                                    ((Resettable) def).reset();
+                                }
                                 registry.addLocalDef(def);
                             }
                         }

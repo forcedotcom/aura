@@ -1,3 +1,9 @@
-cd `dirname $0`/../aura-integration-test
+#!/bin/sh
 # if you need to specify a Java system property, do so in aura-jetty/pom.xml, in the <systemProperties> section
-mvn verify -DskipUnitTests -DskipJsDoc -DrunIntTests -DtestNameContains=$@ 
+MVN_ARGS="";
+while test $# -gt 1; do
+    MVN_ARGS="$MVN_ARGS $1";
+    shift;
+done
+name=$1;
+mvn verify -DskipUnitTests -DskipJsDoc -DrunOnlyIntTests $MVN_ARGS -DtestNameContains=$name

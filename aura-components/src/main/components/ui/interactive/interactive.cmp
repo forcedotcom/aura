@@ -17,6 +17,7 @@
 -->
 <aura:component extensible="true" abstract="true" implements="ui:visible" description="An abstract component which capsulates common events." support="GA">
     <aura:attribute name="disabled" type="Boolean" default="false" description="Specifies whether the component should be displayed in a disabled state. Default value is &quot;false&quot;."/>
+	<aura:attribute name="disableDoubleClicks" type="Boolean" default="false" description="Disables double clicking the component within 350ms"/>
 
     <aura:registerEvent name="blur" type="ui:blur" description="The event fired when the user moves off from the component."/>
     <aura:registerEvent name="focus" type="ui:focus" description="The event fired when the user focuses on the component."/>

@@ -457,6 +457,17 @@ BOOMR_start = new Date().getTime();
             }
 
             return this;
+        },
+        
+        /**
+         * SFDC implementation This is to re-init the beacon_url 
+         * (used on unauthenticated pages)
+         * 
+         * @param {!string} url The URL to use for beaconing data
+         * @private
+         */
+        setBeaconUrl : function(url) {
+        	impl["beacon_url"] = url;
         }
 
     };
@@ -743,7 +754,7 @@ BOOMR_start = new Date().getTime();
                     this.endTimer('jiffy_ld', BOOMR.t_lstart);
                     // The difference between t_lstart and t_start gives the
                     // time to download
-                    this.setTimer('jiffy_lat', BOOMR.t_start - BOOMR.t_lstart);
+                    this.setTimer('jiffy_lat', BOOMR.t_start - BOOMR.t_lstart, BOOMR.t_lstart);
                 }
             }
             impl.r = impl.r2 = d.referrer.replace(/#.*/, '');
@@ -783,21 +794,29 @@ BOOMR_start = new Date().getTime();
             }
 
             return this;
-        },        
+        },
 
-        setTimer : function(timer_name, time_delta) {
+        /**
+         * SFDC Implementation
+         * @param {String} timer_name
+         * @param {!Number} time_delta
+         * @param {!Number=} time_start
+         * @return {!Object} for chaining methods
+         */
+        setTimer : function(timer_name, time_delta, time_start) {
             if (timer_name) {
                 impl.timers[timer_name] = {
-                    delta : time_delta
+                    delta : time_delta,
+                    start : time_start
                 };
             }
             return this;
         },
 
-        /*
+        /**
          * SFDC Implementation
-         * @param {String} old_timer
-         * @param {!String) new_timer
+         * @param {string} old_timer
+         * @param {string} new_timer
          */
         updateTimer : function(old_timer, new_timer) {
             if (old_timer) {
@@ -827,7 +846,7 @@ BOOMR_start = new Date().getTime();
                     if (impl.timers.hasOwnProperty(t_name)) {
                         timer = impl.timers[t_name];
                         // only if the timer has been ended
-                        if(timer && timer.end && timer.start) {
+                        if(timer.end && timer.start) {
                             if (typeof timer.delta !== 'number') {
                                 timer.delta = timer.end - timer.start;
                             }
@@ -925,19 +944,19 @@ BOOMR_start = new Date().getTime();
                 if (impl.responseStart) {
                     this.endTimer('t_resp', impl.responseStart);
                     if (impl.timers['t_load']) {
-                        this.setTimer('t_page', impl.timers['t_load'].end - impl.responseStart);
+                        this.setTimer('t_page', impl.timers['t_load'].end - impl.responseStart, impl.responseStart);
                     } else {
-                    	var delta = k - impl.responseStart;
-                    	
-                    	//Chrome will sometimes report a negative number.
-                    	if(delta > 0) {
-                    		this.setTimer('t_page', delta);
-                    	} else if(impl.timers.hasOwnProperty('t_page')) {
-                    		this.endTimer('t_page');
-                    	}
+                        var delta = k - impl.responseStart;
+
+                        //Chrome will sometimes report a negative number.
+                        if(delta > 0) {
+                            this.setTimer('t_page', delta, impl.responseStart);
+                        } else if(impl.timers.hasOwnProperty('t_page')) {
+                            this.endTimer('t_page');
+                        }
                     }
                 } else if (impl.timers.hasOwnProperty('t_page')) {
-                	
+
                     this.endTimer('t_page');
                 }
                 if (impl.timers.hasOwnProperty('t_postrender')) {
@@ -952,7 +971,7 @@ BOOMR_start = new Date().getTime();
                 if (impl.t_start && impl.navigationType !== 2) {
                     g = impl.t_start;
                     BOOMR.addVar('rt.start', 'cookie');
-                    this.setTimer('t_page', k - BOOMR.t_start);
+                    this.setTimer('t_page', k - BOOMR.t_start, BOOMR.t_start);
                 }
             }
 
@@ -1004,12 +1023,7 @@ BOOMR_start = new Date().getTime();
                     continue;
                 }
 
-                if (basic_timers.hasOwnProperty(t_name)) {
-                    BOOMR.addVar(t_name, timer.delta);
-                } else {
-
-                    t_other.push(t_name + '|' + timer.delta);
-                }
+                BOOMR.addVar(t_name, timer.delta);
                 ntimers++;
             }
 
@@ -1031,7 +1045,6 @@ BOOMR_start = new Date().getTime();
                 'rt.sl' : impl.sessionLength
             });
 
-            impl.timers = {};
             impl.complete = true;
 
             BOOMR.sendBeacon(); // we call sendBeacon() anyway because some
@@ -2092,6 +2105,7 @@ BOOMR.init({
 
 // This is to get the end time of Jiffy JS parsing
 BOOMR.t_end = new Date().getTime();
+
 /** This file is used for the closure compiler in advanced mode to define custom data types and allows for better minification and type checking */
 
 /** @typedef {{name: !string, value: !number}} */
@@ -2111,6 +2125,7 @@ function IPerfStubs() {}
  * @param {!string} id The id used to identify the mark.
  * @param {window.typePerfLogLevel=} logLevel The level at which this mark should
  * be logged at.
+ * @return {!IPerf}
  */
 IPerfStubs.prototype.mark;
 /**
@@ -2118,6 +2133,7 @@ IPerfStubs.prototype.mark;
  * the same id.
  * @param {window.typePerfLogLevel=} logLevel The level at which this mark should
  * be logged at.
+ * @return {!IPerf}
  */
 IPerfStubs.prototype.endMark;
 /**
@@ -2178,6 +2194,7 @@ IPerf.prototype.setTimer;
 IPerf.prototype.measureToJson;
 /**
  * Serializes timers to JSON.
+ * @param {boolean=} includeMarks
  * @return {!string} JSON-serialized version of timers.
  */
 IPerf.prototype.toJson;
@@ -2208,13 +2225,13 @@ IPerf.prototype.clearBeaconData;
 IPerf.prototype.removeStats;
 /**
  * @param {!string} tName The id used to identify the transaction.
- * @return {!IPerf}
+ * @return {!IPerf} for chaining methods
  * @override
  */
 IPerf.prototype.startTransaction;
 /**
  * @param {!string} tName The id used to identify the transaction.
- * @return {!IPerf}
+ * @return {!IPerf} for chaining methods
  * @override
  */
 IPerf.prototype.endTransaction;
@@ -2225,13 +2242,6 @@ IPerf.prototype.endTransaction;
  * @override
  */
 IPerf.prototype.updateTransaction;
-/**
- * @param {!string} oldName The id used to identify the old timer name.
- * @param {!string} newName The id used to identify the new timer name.
- * @return {!IPerf}
- * @override
- */
-IPerf.prototype.updateMarkName;
 /**
  * Gets the stats related to previous transaction
  */
@@ -2427,7 +2437,7 @@ IPerf.prototype.measure;
             if (Perf.currentLogLevel.value <= Perf.getLogLevel(logLevel).value) {
                 if(timer_delta >= 0) {
                     BOOMR.plugins.RT.setTimer(timer_name, timer_delta);
-            	} else {
+                } else {
                     BOOMR.plugins.RT.endTimer(timer_name);
                 }
             }
@@ -2450,6 +2460,7 @@ IPerf.prototype.measure;
         /**
          * Serializes timers to JSON.
          *
+         * @param {boolean=} includeMarks
          * @return {!string} JSON-serialized version of timers.
          * @expose
          * @suppress {checkTypes}
@@ -2458,10 +2469,10 @@ IPerf.prototype.measure;
             // check and update any newly created timers
             BOOMR.plugins.RT.updateVars();
             // this is a hack to include RT in the beacon - sorry this is the quickest fix I could come up with.
-            var timers = BOOMR.plugins.RT.getTimers();
-            var rt = BOOMR.plugins.RT.getSessionStart(),
+            var timers = BOOMR.plugins.RT.getTimers(),
+            rt = BOOMR.plugins.RT.getSessionStart(),
             json = ["{",'sessionID:"', BOOMR.plugins.RT.getSessionID(),'",', "st:", rt, ",", 'pn:"', w.document.URL, '",', 'uid:"', Math.round(Math.random() * 1000000000000000), '",'],
-                markJson = [], measureJson = [], k, measure, vars = BOOMR.getVars();
+                markJson = [], measureJson = [], k, measure, vars = BOOMR.getVars(), timer;
 
             for (k in vars) {
                 if ((k != "r") && (k != "r2") && (k != "t_other")) {
@@ -2473,12 +2484,8 @@ IPerf.prototype.measure;
                         measure[JiffyConstants.MEASURE_NAME] = k;
                         measure[JiffyConstants.MARK_NAME] = k;
                         measure[JiffyConstants.ELAPSED_TIME] = vars[k];
-                        if (timers[k]) {
-                            measure[JiffyConstants.REFERENCE_TIME] = timers[k].start;
-                        }
-                        else {
-                            measure[JiffyConstants.REFERENCE_TIME] = rt;
-                        }
+                        timer = timers[k];
+                        measure[JiffyConstants.REFERENCE_TIME] = (timer && timer.start) ? timer.start : rt;
                         measureJson.push(Perf.measureToJson(measure));
                     }
                 }
@@ -2510,7 +2517,8 @@ IPerf.prototype.measure;
         getMeasures : function() {
             // check and update any newly created timers
             BOOMR.plugins.RT.updateVars();
-            var rt = BOOMR.plugins.RT.getSessionStart(), measures = [], vars = BOOMR.getVars(), k, measure;
+            var timers = BOOMR.plugins.RT.getTimers(),
+            rt = BOOMR.plugins.RT.getSessionStart(), measures = [], vars = BOOMR.getVars(), k, measure;
             for (k in vars) {
                 if ((k != "r") && (k != "r2") && (k != "t_other")) {
                     if (vars.hasOwnProperty(k) && !isNaN(vars[k])) {
@@ -2518,7 +2526,7 @@ IPerf.prototype.measure;
                         measure[JiffyConstants.MEASURE_NAME] = k;
                         measure[JiffyConstants.MARK_NAME] = k;
                         measure[JiffyConstants.ELAPSED_TIME] = vars[k];
-                        measure[JiffyConstants.REFERENCE_TIME] = rt;
+                        measure[JiffyConstants.REFERENCE_TIME] = timers[k] ? timers[k].start : rt;
                         measures.push(measure);
                     }
                 }
@@ -2565,23 +2573,22 @@ IPerf.prototype.measure;
 
         /**
          * @private
-         * @param {Object. <String,*>=} args Arguments to initialize the Perf object. Currently this parameter is not
-         *        used.
+         * @param {!Object.<String,*>=} args Arguments to initialize the Perf object.
          * @expose
-         * TODO: pass in args to BOOMR.init
          */
         init : function(args) {
-            BOOMR.init({
-                /** @expose */
-                BW : {
-                    enabled : false
-                },
-                /** @expose */
-                beacon_url : BEACONURL,
-                /** @expose */
-                autorun : false
-            });
+            BOOMR.init(args);
         },
+        
+        /**
+         * SFDC implementation This is to re-init the beacon_url 
+         * (used on unauthenticated pages)
+         * 
+         * @param {!string} url The URL to use for beaconing data
+         * @private
+         * @expose
+         */
+        setBeaconUrl : BOOMR.setBeaconUrl,
 
         /**
          * @typedef {BOOMR.subscribe}
@@ -2597,7 +2604,8 @@ IPerf.prototype.measure;
          * @expose
          */
         stat : function(label, elapsedMillis) {
-            BOOMR.addVar(label, elapsedMillis);
+            //Changing the implementation so we can separate out stats and measures
+            BOOMR.addVar("st_" + label, elapsedMillis);
             return Perf;
         },
 
@@ -2619,7 +2627,7 @@ IPerf.prototype.measure;
 
         /**
          * Called when the page is ready to interact with. To support the existing Jiffy.onLoad method.
-         *
+         * 
          * @expose
          */
         onLoad : function() {
@@ -2641,8 +2649,8 @@ IPerf.prototype.measure;
         /**
          * SFDC implementation This method is used to mark the start of a transaction
          *
-         * @return {!Object} for chaining methods
-         * @this {Object}
+         * @param {!string} tName The id used to identify the transaction
+         * @return {!IPerf} for chaining methods
          * @expose
          */
         startTransaction : function(tName) {
@@ -2650,32 +2658,24 @@ IPerf.prototype.measure;
         },
 
         /**
-         * SFDC implementation This method is used to mark the start of a transaction
+         * SFDC implementation This method is used to mark the end of a
+         * transaction.
          *
-         * @return {!Object} for chaining methods
-         * @this {Object}
+         * @param {!string} tName The id used to identify the transaction
+         * @return {!IPerf} for chaining methods
          * @expose
          */
         endTransaction : function(tName) {
             return BOOMR.plugins.RT.endTransaction(tName);
         },
-
+        
         /**
-         * SFDC implementation This method is used to the update the name of the timer
+         * SFDC implementation This method is used to the update the name of the
+         * transaction
          *
-         * @return {!Object} for chaining methods
-         * @this {Object}
-         * @expose
-         */
-        updateMarkName : function(oldName, newName) {
-            return BOOMR.plugins.RT.updateTimer(oldName, newName);
-        },
-
-        /**
-         * SFDC implementation This method is used to the update the name of the transaction
-         *
-         * @return {!Object} for chaining methods
-         * @this {Object}
+         * @param {!string} oldName The id used to identify the old transaction name.
+         * @param {!string} newName The id used to identify the new transaction name.
+         * @return {!IPerf} for chaining methods
          * @expose
          */
         updateTransaction : function(oldName, newName) {
@@ -2683,10 +2683,10 @@ IPerf.prototype.measure;
         },
 
         /**
-         * This method is used to figure if onLoad/page_ready has been fired or not
+         * This method is used to figure if onLoad/page_ready has been fired or
+         * not
          *
          * @return {!boolean}
-         * @this {Object}
          * @expose
          */
         onLoadFired : function() {

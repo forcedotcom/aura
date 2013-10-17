@@ -78,7 +78,34 @@ public class JavaTestController {
     public static int getLoggableInt(@Key(value = "param", loggable = true) int param) throws Exception {
         return param;
     }
-
+    
+    @AuraEnabled 
+    public static String getSelectedParamLogging(@Key(value = "strparam", loggable = true) String strparam, @Key(value = "intparam") int intparam){
+        return strparam;
+    }
+    
+    @AuraEnabled 
+    public static String getMultiParamLogging(@Key(value = "we", loggable = true) String we, @Key(value = "two", loggable = true) int two){
+        return we+two;
+    }
+    
+    @AuraEnabled
+    public static int getExplicitExcludeLoggable(@Key(value = "param", loggable = false) int param){
+        return param;
+    }
+    
+    @AuraEnabled
+    public static String getCustomParamLogging(@Key(value = "param", loggable = true) CustomParamType param){
+        return "Anything";
+    }
+    
+    public static class CustomParamType{
+        @Override
+        public String toString(){
+            return "CustomParamType_toString";
+        }
+    }
+    
     /**
      * Note: these cases are pretty specific to js://test.testActionExceptions
      * 

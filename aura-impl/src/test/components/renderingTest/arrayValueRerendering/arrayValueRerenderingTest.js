@@ -47,14 +47,8 @@
                     }
                 );
             }
-            
-            function removeComponent(cmpArray,index) {
-            	cmpArray.remove(index);
-            }
-            
             function iteration(values, toAdd, insertFunction) {
                 var startIndex = values.length;
-
                 // Add a few items to the end of the body
                 for (var n = startIndex; n < startIndex + toAdd; n++) {
                     addComponent("Value " + (n + 1), insertFunction);
@@ -93,32 +87,33 @@
             $A.test.assertEquals(15, values.length);
             //test removing component from array
             //remove the first
-            removeComponent(body,0);
+            body.remove(0);
             $A.rerender(component);
             $A.test.assertEquals("Value inserted at index 1", $A.test.getText(values[0]),"error after removing the first cmp of array");
             $A.test.assertEquals(14, values.length);
             //remove the second
-            removeComponent(body,1);
+            body.remove(1);
             $A.rerender(component);
             $A.test.assertEquals("Value 2", $A.test.getText(values[1]),"error after removing the 2nd cmp of array");
             $A.test.assertEquals(13, values.length);
             //remove the last
-            removeComponent(body,12);
+            body.remove(12);
             $A.rerender(component);
             $A.test.assertEquals("Value 12", $A.test.getText(values[11]),"error after removing the last cmp of array");
             $A.test.assertEquals(12, values.length);
             //clean the array and test inserting to an empty array
-            body.clear();
+            body.clear(); 
+            $A.test.assertEquals(0,body.getLength());
+            //we clear the body, AuraRenderingService.rerender -> ArrayValue.rerender will put a comment as a reference node
+            //before rerender, value length is still 12
+            $A.test.assertEquals(12,values.length);
             $A.rerender(component);
-            //even we clear the body, there is still a comment
+            //after rerender, value length become 1
             $A.test.assertEquals(1,values.length);
             addComponent("Value inserted at index 0 to an empty array", function(body, c) {
                 body.insert(0, c);
             });
-            $A.log(values);
-            $A.log(body);
             $A.rerender(component);
-            //values = component.getElement().childNodes;
             $A.test.assertEquals("Value inserted at index 0 to an empty array", $A.test.getText(values[0]));
             $A.test.assertEquals(1, values.length);
         }

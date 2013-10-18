@@ -33,7 +33,6 @@ import org.auraframework.system.Location;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraRuntimeException;
-import org.mockito.Mockito;
 
 public class XMLParserTest extends AuraImplTestCase {
 

@@ -500,7 +500,7 @@ public class AuraResourceServlet extends AuraBaseServlet {
          * 
          * Comparing DefDescriptor is cleaner than comparing Definition
          */
-        Comparator frequencyComparator = Ordering.natural().reverse().onResultOf(Functions.forMap(styles))
+        Comparator<DefDescriptor<StyleDef>> frequencyComparator = Ordering.natural().reverse().onResultOf(Functions.forMap(styles))
                 .compound(Ordering.natural());
         SortedMap<DefDescriptor<StyleDef>, Integer> sorted = ImmutableSortedMap.copyOf(styles, frequencyComparator);
 

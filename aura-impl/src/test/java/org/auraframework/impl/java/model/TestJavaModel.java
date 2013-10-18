@@ -456,6 +456,16 @@ public class TestJavaModel {
     public String getTextAreaText() {
         return "Some text from server\nspecially created to fit in....\n\n\na textarea!";
     }
+    
+    @AuraEnabled
+    public String getTextWithTags() {
+        return "Some text from server with tags<script>Script</script><style>Style</style>";
+    }
+    
+    @AuraEnabled
+    public String getTextWithNestedTags() {
+        return "Some text from server with nested tags<script><script></script></script><script><style></style></script>";
+    }
 
     @AuraEnabled
     public String getUrl() {

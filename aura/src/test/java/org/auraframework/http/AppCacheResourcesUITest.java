@@ -125,7 +125,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
     /**
      * Opening cached app will only query server for the manifest and the component load.
      */
-    @TargetBrowsers({ BrowserType.GOOGLECHROME,  BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
+    @TargetBrowsers({  BrowserType.GOOGLECHROME,  BrowserType.SAFARI,   BrowserType.IPAD, BrowserType.IPHONE })
     @TestLabels("auraSanity")
     public void testNoChanges() throws Exception {
         List<Request> logs = loadMonitorAndValidateApp(TOKEN, TOKEN, "", TOKEN);
@@ -143,20 +143,22 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
     /**
      * Opening cached app that had a prior cache error will reload the app.
      */
-    @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
+    @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.SAFARI,  BrowserType.IPAD, BrowserType.IPHONE })
     @TestLabels("auraSanity")
     public void testCacheError() throws Exception {
+    	//debug for flapper:
+    	System.out.println("testCacheError,loadMonitorAndValidateApp, TS:"+System.currentTimeMillis());
         List<Request> logs = loadMonitorAndValidateApp(TOKEN, TOKEN, "", TOKEN);
         assertRequests(getExpectedInitialRequests(), logs);
         assertAppCacheStatus(Status.IDLE);
-
         Date expiry = new Date(System.currentTimeMillis() + 60000);
         String cookieName = getManifestCookieName();
         getDriver().manage().addCookie(
                 new Cookie(cookieName, "error", null, "/", expiry));
+        //debug for flapper:
+        System.out.println("testCacheError,add error cookie, loadMonitorAndValidateApp again, TS:"+System.currentTimeMillis());
         logs = loadMonitorAndValidateApp(TOKEN, TOKEN, "", TOKEN);
         List<Request> expectedChange = Lists.newArrayList();
-
         expectedChange.add(new Request("/auraResource", null, null, "manifest", 404)); // reset
         expectedChange.add(new Request("/aura", namespace + ":" + appName, null, "HTML", 302)); // hard refresh
         switch (getBrowserType()) {
@@ -175,18 +177,15 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         }
         assertRequests(expectedChange, logs);
         assertAppCacheStatus(Status.IDLE);
-
         // There may be a varying number of requests, depending on when the
         // initial manifest response is received.
         Cookie cookie = getDriver().manage().getCookieNamed(cookieName);
         assertFalse("Manifest cookie was not changed " + cookie.getValue(), "error".equals(cookie.getValue()));
     }
-
-
     /**
      * for Chrome and Safari/IPAD/IPHONE Opening uncached app that had a prior cache error will have limited caching
      */
-    @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
+    @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.SAFARI,  BrowserType.IPAD, BrowserType.IPHONE })
     public void testCacheErrorWithEmptyCache() throws Exception {
     	//debug for flapper:
     	System.out.println("testCacheErrorWithEmptyCache,open aura/application.app, TS:"+System.currentTimeMillis());
@@ -205,20 +204,16 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         expectedChange.add(new Request("/auraResource", null, null, "js", 200));
         assertRequests(expectedChange, logs);
         assertAppCacheStatus(Status.UNCACHED);
-
         // There may be a varying number of requests, depending on when the
         // initial manifest response is received.
         Cookie cookie = getDriver().manage().getCookieNamed(cookieName);
         assertNull("No manifest cookie should be present", cookie);
-        //debug for flapper:
-        List<Request> logs2 = loadMonitorAndValidateApp(TOKEN, TOKEN, "", TOKEN);
-        System.out.println("logs2:"+logs2.toString());
     }
 
     /**
      * Manifest request limit exceeded for the time period should result in reset.
      */
-    @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
+    @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.SAFARI,  BrowserType.IPAD, BrowserType.IPHONE })
     public void testManifestRequestLimitExceeded() throws Exception {
         List<Request> logs = loadMonitorAndValidateApp(TOKEN, TOKEN, "", TOKEN);
         assertRequests(getExpectedInitialRequests(), logs);
@@ -327,7 +322,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
     /**
      * Opening cached app after component markup change will trigger cache update.
      */
-    @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
+    @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.SAFARI,  BrowserType.IPAD, BrowserType.IPHONE })
     public void testComponentMarkupChange() throws Exception {
         List<Request> logs = loadMonitorAndValidateApp(TOKEN, TOKEN, "", TOKEN);
         assertRequests(getExpectedInitialRequests(), logs);
@@ -462,9 +457,6 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         TestLoggingAdapterController.beginCapture();
         open(String.format("/%s/%s.app", namespace, appName));
         
-        //openNoAura(String.format("/%s/%s.app", namespace, appName));
-        //this is redundant, we did this in open(some url)
-        //auraUITestingUtil.waitForAppCacheReady();
         WebElement elem = auraUITestingUtil
                 .waitUntil(new Function<WebDriver, WebElement>() {
                     @Override

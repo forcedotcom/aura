@@ -563,13 +563,41 @@ var priv = {
             url = url.substring(0, cutIndex);
         }
 
-        location.href = url + params;
-        //debug for flapper
-    	if(window.localStorage) {
-    		date = new Date();
+        if(window.localStorage) {
+        	date = new Date();
             currentTime = date.getTime();
-        	window.localStorage.setItem("hardRefresh_touched","append nocache to url:"+location.href+",TS:"+currentTime);
+            window.localStorage.setItem("urlplusparams","url is: "+url+"  params is: "+ params+"   TS:"+currentTime);
         }
+                
+        var sIndex = url.lastIndexOf("/");
+        var appName = url.substring(sIndex+1,url.length);
+        var newUrl = appName + params;
+        //use history.pushState to change the url of current page without actually loading it.
+        //AuraServlet will force the reload when GET request with current url contains '?nocache=someUrl' 
+        //after reload, someUrl will become the current url.
+        //state is null: don't need to track the state with popstate
+        //title is null: don't want to set the page title.
+        history.pushState(null,null,newUrl);
+        
+    	//fallback to old way : set location.href will trigger the reload right away
+    	//we need this because when AuraResourceServlet's GET request with a 'error' cookie, 
+    	//AuraServlet doesn't get to do the GET reqeust
+    	if( (location.href).indexOf("?nocache=") > -1 ) {
+    		//debug for flapper
+        	if(window.localStorage) {
+        		date = new Date();
+                currentTime = date.getTime();
+            	window.localStorage.setItem("hardRefresh_touched","fall back to setting location.href,url:"+location.href+",TS:"+currentTime);
+            }
+    		location.href = (url + params);
+    	}else {
+    		//debug for flapper
+        	if(window.localStorage) {
+        		date = new Date();
+                currentTime = date.getTime();
+            	window.localStorage.setItem("hardRefresh_touched","url:"+location.href+",TS:"+currentTime);
+            }
+    	}
         
     },
 

@@ -299,6 +299,41 @@
         }     
     },
     
+    refreshYearSelection: function(component) {
+        var minY = component.get("v.minYear");
+        if (!minY) {
+            minY = (new Date()).getFullYear() - 100;
+        }
+        var maxY = component.get("v.maxYear");
+        if (!maxY) {
+            maxY = (new Date()).getFullYear() + 30;
+        }
+        var yearTitleCmp = component.find("yearTitle");
+        if (yearTitleCmp) {
+            var body = yearTitleCmp.getValue("v.body");
+            body.clear();
+            for (var i = minY; i <= maxY; i++) {
+                $A.componentService.newComponentAsync(
+                    this,
+                    function(newcmp){
+            	        body.push(newcmp);
+                    },
+                    {
+                        "componentDef": "markup://ui:inputSelectOption",
+                        "attributes": {
+                            "values": { 
+                                "label": i + "",
+                                "value": false,
+                                "text": i + "",
+                                "disabled": false 
+                            }
+                        }
+                    }
+                );
+            }
+        }
+    },
+    
     setGridInitialValue: function(component) {
         var initialDate = new Date();
         var value = component.get("v.value");
@@ -341,6 +376,11 @@
     },
     
     updateMonthYear: function(component, value) {
+        var isDesktop = $A.get("$Browser.formFactor") == "DESKTOP";
+        if (!isDesktop) { // mobile
+            this.updateMobileMonthYear(component, value);
+            return;
+        }
         var grid = component.find("grid");
         if (grid) {
             var titleCmp = component.find("calTitle");
@@ -356,5 +396,36 @@
                 }
             }
         }
-    } 
+    },
+    
+    updateMobileMonthYear: function(component, value) {
+        var grid = component.find("grid");
+        if (grid) {
+            var m = grid.get("v.month");
+            var y = grid.get("v.year");
+            var monthTitleCmp = component.find("monthTitle");
+            if (monthTitleCmp) {
+                var monthLabels = component.get("m.monthLabels");
+                monthTitleCmp.setValue("v.value", monthLabels[m].fullName); 
+            }
+            var yearTitleCmp = component.find("yearTitle");
+            if (yearTitleCmp) {
+                yearTitleCmp.setValue("v.value", y);
+            }   
+        }
+    },
+    
+    yearChange: function(component) {
+        var grid = component.find("grid");
+        var yearCmp = component.find("yearTitle");
+        if (grid && yearCmp) {
+            var e = grid.get("e.updateCalendar");
+            if (e) {
+                var y = parseInt(grid.get("v.year"));
+                var selectedYear = parseInt(yearCmp.get("v.value"));
+                e.setParams({monthChange: 0, yearChange: selectedYear - y, setFocus: false});
+                e.fire();
+            }
+        }
+    }
 })

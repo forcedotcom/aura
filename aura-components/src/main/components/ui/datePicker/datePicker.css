@@ -155,15 +155,33 @@ div.THIS.phone .scroller {
     background-position: -98px -23px;
 }
 
-.THIS .dateBar .monthYear {
-    font-size: 13px;
-    font-weight: bold;
-    color: #555;
+.THIS .dateBar .monthYear, .THIS .dateBar .monthYear span {
+	font-family: ProximaNovaSoft-Bold, Arial, sans-serif;
+    font-size: 18px;    
+    color: #3c3d3e;
+    line-height: 24px !important;
 }
 
-.THIS .buttonBar {
-    height: 23px;
-    line-height: 13px;
+.THIS .dateBar select {
+	color: #2a94d6;
+	font-family: ProximaNovaSoft-Bold, Arial, sans-serif;
+	font-size: 18px;
+	line-height: 24px !important;
+	padding: 0 0 0 5px;
+	margin: 0;
+	width: auto;
+	border: 0;
+	vertical-align: baseline;
+	background-color: #f0f1f2;
+	background-image: none;
+	box-shadow: none;
+	-moz-appearance: none;
+	-webkit-appearance: none;
+	-ms-appearance: none;
+	appearance: none;	
+}
+
+.THIS .buttonBar {    
     text-align: center;
 }
 

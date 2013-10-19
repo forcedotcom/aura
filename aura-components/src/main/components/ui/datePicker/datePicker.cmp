@@ -19,6 +19,8 @@
     <aura:attribute name="hasTime" type="Boolean" default="false" description="Indicate if the parent datePicker component supports time picker."/>
     <aura:attribute name="hours" type="Integer" description="The hour value of a date object, which is always in 24 hour format."/>
     <aura:attribute name="is24HourFormat" type="Boolean" default="true" description="Indicate if it is set to 24 hour or 12-hour with am/pm."/>
+    <aura:attribute name="maxYear" type="Integer" description="The maximal year for year selection. Only on mobile. The default is the current year plus 30."/>
+    <aura:attribute name="minYear" type="Integer" description="The minimum year for year selection. Only on mobile. The default is the current year minus 100."/>
     <aura:attribute name="minutes" type="Integer" description="The minute value of a date object."/>
     <aura:attribute name="value" type="Date" description="A date corresponding to a calendar day in the format yyyy-mm-dd."/>
     <aura:attribute name="visible" type="Boolean" default="false" description="Indicates if the date picker is displayed. Defaults to false, which hides the date picker."/>
@@ -32,7 +34,7 @@
                     <a aura:id="set" onclick="{!c.set}" class="calSet button" href="javascript:void(0);">Set</a>
                 </div>
             </aura:if>
-            <div class="dateBar" ontouchstart="{!c.handleTouchStart}" ontouchmove="{!c.handleTouchMove}" ontouchend="{!c.handleTouchEnd}">
+            <div class="dateBar">
                 <div class="prevLinks">
                     <aura:if isTrue="{!!$Browser.isPhone &amp;&amp; !$Browser.isTablet}">
                         <a aura:id="prevYear" class="navLink prevYear" title="Go to previous year" onclick="{!c.goToPrevYear}" onkeydown="{!c.closeOnTab}">
@@ -53,7 +55,15 @@
                         </a>
                     </aura:if>
                 </div>
-                <h1 aria-live="assertive" aria-atomic="true" class="monthYear" aura:id="calTitle"/>
+                <aura:if isTrue="{!$Browser.formFactor != 'DESKTOP'}">
+                    <h1 aria-live="assertive" aria-atomic="true" class="monthYear" aura:id="calTitle">
+                        <ui:outputText aura:id="monthTitle" value=""/>
+                        <ui:inputSelect aura:id="yearTitle" change="{!c.yearChange}"/>
+                    </h1>
+                    <aura:set attribute="else">
+                        <h1 aria-live="assertive" aria-atomic="true" class="monthYear" aura:id="calTitle"/>
+                    </aura:set>
+                </aura:if>
             </div>
             <ui:datePickerGrid aura:id="grid" hasTime ="{!v.hasTime}" weekDays="{!m.weekdayLabels}" hide="{!c.hide}" selectDate="{!c.selectDate}" updateCalendarTitle="{!c.updateCalendarTitle}"/>
             <aura:if isTrue="{!v.hasTime}">

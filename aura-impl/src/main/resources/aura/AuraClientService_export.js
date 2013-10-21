@@ -28,6 +28,5 @@ exp(clientService,
     "setOutdated", clientService.setOutdated,
     "injectComponent", clientService.injectComponent,
     "isConnected", clientService.isConnected,
-	"setConnected", clientService.setConnected,
-	/** @deprecated */ "setConnectedFalse", clientService.setConnectedFalse
+	"setConnected", clientService.setConnected
 );

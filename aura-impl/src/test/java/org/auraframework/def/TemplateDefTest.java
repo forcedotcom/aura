@@ -269,5 +269,44 @@ public class TemplateDefTest extends AuraImplTestCase {
                 fail(msg);
         }
     }
+    
+    /**
+     * Verify the new errorTitle attribute, with default error message.
+     */
+    public void testDefaultErrorTitleAttributeInTemplate() throws Exception {    	       
+        DefDescriptor<ComponentDef> errorTitleIntemplate = addSourceAutoCleanup(
+                ComponentDef.class,
+                String.format(
+                        baseComponentTag,
+                        "isTemplate='true' extends='aura:template' ",
+                        ""));
+        
+        StringBuffer sb = new StringBuffer();
+        Component template = Aura.getInstanceService().getInstance(errorTitleIntemplate);
+        Aura.getRenderingService().render(template, sb);
+        String result = sb.toString();
+        assertTrue("errorTitle attribute on aura:template has wrong text",
+                result.contains("Oops, there's a problem:"));       
+        
+    }
 
+    /**
+     * Verify the new errorTitle attribute, when error message is provided in template.
+     */
+    public void testCustomErrorTitleAttributeInTemplate() throws Exception {
+    	String errorTitle = "<aura:set attribute='errorTitle'>Looks like there's a problem.</aura:set>";        
+        DefDescriptor<ComponentDef> errorTitleIntemplate = addSourceAutoCleanup(
+                ComponentDef.class,
+                String.format(
+                        baseComponentTag,
+                        "isTemplate='true' extends='aura:template' ",
+                        errorTitle));
+        
+        StringBuffer sb = new StringBuffer();
+        Component template = Aura.getInstanceService().getInstance(errorTitleIntemplate);
+        Aura.getRenderingService().render(template, sb);
+        String result = sb.toString();
+        assertTrue("errorTitle attribute on aura:template has wrong text",
+                result.contains("Looks like there's a problem."));              
+    }
 }

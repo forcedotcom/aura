@@ -21,7 +21,7 @@
         if ($A.util.isUndefinedOrNull(value) || $A.util.isEmpty(value)) {
             return;
         }
-        var updatedValue = $A.util.stripTags($A.util.stripTags(value, this.TAGS_TO_STRIPPED));
+        var updatedValue = $A.util.stripTags(value, this.TAGS_TO_STRIPPED);
         if (updatedValue != value) {
             component.setValue("v.value", updatedValue);
         }

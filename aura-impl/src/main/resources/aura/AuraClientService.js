@@ -406,7 +406,7 @@ var AuraClientService = function() {
         /**
          * Run the actions.
          *
-         * This function effectively attempts to submit the list of actions given immediately (if
+         * This function effectively attempts to submit all pending actions immediately (if
          * there is room in the outgoing request queue). If there is no way to immediately queue
          * the actions, they are submitted via the normal mechanism. Note that this does not change
          * the 'transaction' associated with the current aura stack, so abortable actions might go

@@ -110,6 +110,8 @@
             $A.rerender(component);
             //after rerender, value length become 1
             $A.test.assertEquals(1,values.length);
+            //make sure the node is a comment node
+            $A.test.assertEquals(8,values[0].nodeType);
             addComponent("Value inserted at index 0 to an empty array", function(body, c) {
                 body.insert(0, c);
             });

@@ -212,69 +212,61 @@ public class AuraResourceServletTest extends AuraTestCase {
             fail("found duplicated code in: " + text);
         }
     }
-    
+
     /**
-     * Sanity check to make sure that app.css does not have duplicate copy of component CSS.
-     * Component CSS was being added twice, once because they were part of preload namespace 
-     * and a second time because of component dependency. This test mocks such duplication.  
-     * W-1588568
+     * Sanity check to make sure that app.css does not have duplicate copy of component CSS. Component CSS was being
+     * added twice, once because they were part of preload namespace and a second time because of component dependency.
+     * This test mocks such duplication. W-1588568
      */
-    public void testWriteCssWithoutDupes() throws Exception{
+    public void testWriteCssWithoutDupes() throws Exception {
         Aura.getContextService().startContext(AuraContext.Mode.DEV, AuraContext.Format.CSS,
                 AuraContext.Access.AUTHENTICATED);
-        AuraContext ctx =  Aura.getContextService().getCurrentContext();
-        //First reference to preloadTest
+        AuraContext ctx = Aura.getContextService().getCurrentContext();
+        // First reference to preloadTest
         ctx.addPreload("preloadTest");
-        //preloadTest:test_SimpleApplication has the second explicit reference to preloadTest as a preload namespace
-        DefDescriptor<ApplicationDef> appDesc = Aura.getDefinitionService().getDefDescriptor("preloadTest:test_SimpleApplication", ApplicationDef.class);
+        // preloadTest:test_SimpleApplication has the second explicit reference to preloadTest as a preload namespace
+        DefDescriptor<ApplicationDef> appDesc = Aura.getDefinitionService().getDefDescriptor(
+                "preloadTest:test_SimpleApplication", ApplicationDef.class);
         ctx.setApplicationDescriptor(appDesc);
         Aura.getDefinitionService().updateLoaded(appDesc, false);
-        
+
         StringBuilder output = new StringBuilder();
         AuraResourceServlet.writeCss(output);
-        
-        //A snippet of component css
+
+        // A snippet of component css
         String cssPiece = "AuraResourceServletTest-testWriteCssWithoutDupes";
         Pattern pattern = Pattern.compile(cssPiece);
         Matcher matcher = pattern.matcher(output.toString());
         int count = 0;
-        while(matcher.find() && count<3) count++;
+        while (matcher.find() && count < 3)
+            count++;
         assertEquals("Component CSS repeated", 1, count);
     }
 
     /**
-     * Verify super CSS is before CSS of components extending it. ui:input before ui:inputText before ui:inputNumber
-     * before ui:inputPercent
-     *
-     * This test needs to be refactored if/when empty CSS declarations are removed.
-     *
-     * @throws Exception
+     * Verify CSS is ordered based off number of dependencies. Super component CSS should come before compnent that
+     * extends super. If two components have the same number of dependencies, they should be written out in alphabetical
+     * order.
      */
     public void testCSSOrder() throws Exception {
         Aura.getContextService().startContext(AuraContext.Mode.DEV, AuraContext.Format.CSS,
                 AuraContext.Access.AUTHENTICATED);
-        AuraContext ctx =  Aura.getContextService().getCurrentContext();
-        DefDescriptor<ApplicationDef> appDesc = Aura.getDefinitionService().getDefDescriptor("auratest:test_SimpleServerRenderedPage", ApplicationDef.class);
+        AuraContext ctx = Aura.getContextService().getCurrentContext();
+        DefDescriptor<ApplicationDef> appDesc = Aura.getDefinitionService().getDefDescriptor("test:cssOrderTest",
+                ApplicationDef.class);
         ctx.setApplicationDescriptor(appDesc);
         Aura.getDefinitionService().updateLoaded(appDesc, false);
 
         StringBuilder output = new StringBuilder();
         AuraResourceServlet.writeCss(output);
-
         String css = output.toString();
 
-        assertTrue("ui:input CSS should be before ui:inputText",
-                css.indexOf(".uiInput") < css.indexOf(".uiInputText"));
-        assertTrue("ui:inputText CSS should be before ui:inputNumber",
-                css.indexOf(".uiInputText") < css.indexOf(".uiInputNumber"));
-        assertTrue("ui:inputNumber CSS should be before ui:inputPercent",
-                css.indexOf(".uiInputNumber") < css.indexOf(".uiInputPercent"));
-        // Verify CSS sorts alphabetically when frequency (# of dependents) the same (inputPercent, inputRange, and
-        // inputFile all have 0 dependents).
-        assertTrue("ui:inputPercent CSS should be before ui:inputRange",
-                css.indexOf(".uiInputPercent") < css.indexOf(".uiInputRange"));
-        assertTrue("ui:inputFile CSS should be before ui:inputPercent",
-                css.indexOf(".uiInputFile") < css.indexOf(".uiInputPercent"));
-
+        assertTrue("grandparent CSS should be written before parent CSS",
+                css.indexOf(".setAttributesTestGrandparent") < css.indexOf(".setAttributesTestParent"));
+        assertTrue("parent CSS should be written before child CSS",
+                css.indexOf(".setAttributesTestParent") < css.indexOf(".setAttributesTestChild"));
+        // Verify CSS sorts alphabetically when frequency (# of dependents) the same
+        assertTrue("Components with same number of dependnecies should be ordered alphabetically",
+                css.indexOf(".setAttributesTestAnotherChild") < css.indexOf(".setAttributesTestChild"));
     }
 }

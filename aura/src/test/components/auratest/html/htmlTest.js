@@ -139,8 +139,11 @@
     /**
      * Verify rerender of special html attributes
      * type, href, style and data attributes must be set by using setAttribute() on dom elements
+     * 
+     * Ie7 does not support the inline style attribute.
      */
     testRerenderSpecialHtmlAttributes:{
+	browsers: ["-IE7"],
 		test:function(component){
 		    var input = component.find("specialAttributes_input").getElement();
 		    $A.test.assertEquals("textElement" , input.getAttribute("data-name"), "Failed to render data attribute");

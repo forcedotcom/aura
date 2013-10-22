@@ -28,16 +28,22 @@ import com.google.common.collect.Lists;
 public class Stub<T> {
 	private final Invocation invocation;
 	private final List<Answer<T>> answers;
+	private int answerIndex;
 
 	public Stub(Invocation invocation, List<Answer<T>> answers) {
 		if (answers.isEmpty()) {
 			throw new IllegalArgumentException(
 					"Must provide at least one answer for a stub");
 		}
+		reset();
 		this.invocation = invocation;
 		this.answers = Lists.newLinkedList(answers);
 	}
 
+	public void reset() {
+        this.answerIndex = 0;
+	}
+	
 	/**
 	 * Get the invocation that this stub applies to.
 	 * @return
@@ -54,11 +60,11 @@ public class Stub<T> {
 	 * 
 	 * @return the Answer for the current method invocation
 	 */
-	public Answer<T> getNextAnswer() {
-		if (answers.size() == 1) {
-			return answers.get(0);
-		} else {
-			return answers.remove(0);
-		}
-	}
+    public Answer<T> getNextAnswer() {
+        Answer<T> ret = answers.get(answerIndex);
+        if (answerIndex < answers.size() - 1) {
+            answerIndex++;
+        }
+        return ret;
+    }
 }

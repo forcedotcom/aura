@@ -71,7 +71,12 @@
 
     <profiles>
         <profile>
-            <id>test-archetype</id>
+            <id>runIntTests</id>
+            <activation>
+                <property>
+                    <name>runIntTests</name>
+                </property>
+            </activation>
             <build>
                 <testResources>
                     <testResource>

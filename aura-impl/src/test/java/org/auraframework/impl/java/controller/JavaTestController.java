@@ -27,6 +27,7 @@ import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.instance.Component;
 import org.auraframework.system.Annotations.AuraEnabled;
+import org.auraframework.system.Annotations.BackgroundAction;
 import org.auraframework.system.Annotations.Controller;
 import org.auraframework.system.Annotations.Key;
 import org.auraframework.system.Location;
@@ -78,40 +79,41 @@ public class JavaTestController {
     public static int getLoggableInt(@Key(value = "param", loggable = true) int param) throws Exception {
         return param;
     }
-    
-    @AuraEnabled 
-    public static String getSelectedParamLogging(@Key(value = "strparam", loggable = true) String strparam, @Key(value = "intparam") int intparam){
+
+    @AuraEnabled
+    public static String getSelectedParamLogging(@Key(value = "strparam", loggable = true) String strparam,
+            @Key(value = "intparam") int intparam) {
         return strparam;
     }
-    
-    @AuraEnabled 
-    public static String getMultiParamLogging(@Key(value = "we", loggable = true) String we, @Key(value = "two", loggable = true) int two){
-        return we+two;
-    }
-    
+
     @AuraEnabled
-    public static int getExplicitExcludeLoggable(@Key(value = "param", loggable = false) int param){
+    public static String getMultiParamLogging(@Key(value = "we", loggable = true) String we,
+            @Key(value = "two", loggable = true) int two) {
+        return we + two;
+    }
+
+    @AuraEnabled
+    public static int getExplicitExcludeLoggable(@Key(value = "param", loggable = false) int param) {
         return param;
     }
-    
+
     @AuraEnabled
-    public static String getCustomParamLogging(@Key(value = "param", loggable = true) CustomParamType param){
+    public static String getCustomParamLogging(@Key(value = "param", loggable = true) CustomParamType param) {
         return "Anything";
     }
-    
-    public static class CustomParamType{
+
+    public static class CustomParamType {
         @Override
-        public String toString(){
+        public String toString() {
             return "CustomParamType_toString";
         }
     }
-    
+
     /**
      * Note: these cases are pretty specific to js://test.testActionExceptions
      * 
      * @param exceptionType What type (class) of exception to throw
-     * @param cause Cause parameter of Exception. Either a class of type
-     *            Throwable or String
+     * @param cause Cause parameter of Exception. Either a class of type Throwable or String
      */
     @AuraEnabled
     public static void throwsThrowable(@Key("type") String exceptionType, @Key("cause") String cause) throws Throwable {
@@ -143,7 +145,7 @@ public class JavaTestController {
             throw new RuntimeException();
         }
     }
-    
+
     @AuraEnabled
     public static void throwsCSE(@Key("event") String event, @Key("paramName") String paramName,
             @Key("paramValue") String paramValue) throws Throwable {
@@ -174,8 +176,8 @@ public class JavaTestController {
     }
 
     /**
-     * Wait for delayMs milliseconds and then return a auratest:text component
-     * whose value is the current buffer contents plus the current append.
+     * Wait for delayMs milliseconds and then return a auratest:text component whose value is the current buffer
+     * contents plus the current append.
      */
     @AuraEnabled
     public static Component appendBuffer(@Key("id") String id, @Key("delayMs") BigDecimal delayMs,
@@ -281,6 +283,12 @@ public class JavaTestController {
     }
 
     @AuraEnabled
+    @BackgroundAction
+    public static String echoTextBackground(@Key("inVar") String inVar) {
+        return inVar;
+    }
+
+    @AuraEnabled
     public static String echoTextArea(@Key("inVar") String inVar) {
         return inVar;
     }
@@ -303,7 +311,7 @@ public class JavaTestController {
         AuraRuntimeException e = new AuraRuntimeException("throwExceptionNoLineNums", loc);
         throw e;
     }
-    
+
     @AuraEnabled
     public static void dummy() {
     }

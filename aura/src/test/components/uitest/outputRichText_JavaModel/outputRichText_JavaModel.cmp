@@ -15,8 +15,10 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:output" extensible="true" support="GA" description="Displays rich text as specified in the value attribute."> 
-	<div class="{!v.class}" dir="{!v.dir}" aura:id="div">
-		<aura:unescapedHTML value="{!v.value}" />
-	</div>	 
+<aura:component model='java://org.auraframework.impl.java.model.TestJavaModel'>
+    <ui:outputRichText value='{!m.stringNull}' aura:id='myComp1'/> <br/>    
+    <ui:outputRichText value='{!m.stringEmpty}' aura:id='myComp2'/> <br/>    
+    <ui:outputRichText value='{!m.text}' aura:id='myComp3'/> <br/>    
+    <ui:outputRichText value='{!m.textWithTags}' aura:id='myComp4'/> <br/>	
+    <ui:outputRichText value='{!m.textWithNestedTags}' aura:id='myComp5'/> <br/>	
 </aura:component>

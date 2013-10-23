@@ -410,7 +410,14 @@
             }
             var yearTitleCmp = component.find("yearTitle");
             if (yearTitleCmp) {
-                yearTitleCmp.setValue("v.value", y);
+                yearTitleCmp.setValue("v.value", y+"");
+                // For some reason, ui:inputSelect doesn't refresh on mobile,
+                // so we have to directly set DOM value here.
+                var selectCmp = yearTitleCmp.find("select");
+                var selectElem = selectCmp ? selectCmp.getElement() : null;
+                if (selectElem) {
+                    selectElem.value = y + "";
+                }
             }   
         }
     },

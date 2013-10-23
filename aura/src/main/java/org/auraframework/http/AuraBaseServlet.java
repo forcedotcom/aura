@@ -18,9 +18,7 @@ package org.auraframework.http;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-
 import javax.activation.MimetypesFileTypeMap;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -358,7 +356,7 @@ public abstract class AuraBaseServlet extends HttpServlet {
     public static boolean shouldCacheHTMLTemplate(HttpServletRequest request) {
         AuraContext context = Aura.getContextService().getCurrentContext();
         try {
-            DefDescriptor<? extends BaseComponentDef> appDefDesc = context.getApplicationDescriptor();
+            DefDescriptor<? extends BaseComponentDef> appDefDesc = context.getLoadingApplicationDescriptor();
             if (appDefDesc != null && appDefDesc.getDefType().equals(DefType.APPLICATION)) {
                 Boolean isOnePageApp = ((ApplicationDef) appDefDesc.getDef()).isOnePageApp();
                 if (isOnePageApp != null) {
@@ -445,20 +443,14 @@ public abstract class AuraBaseServlet extends HttpServlet {
         return lastMod;
     }
 
-    protected DefDescriptor<?> setupQuickFix(AuraContext context, boolean preload) {
+    protected DefDescriptor<?> setupQuickFix(AuraContext context) {
         DefinitionService ds = Aura.getDefinitionService();
         MasterDefRegistry mdr = context.getDefRegistry();
 
         try {
-            DefDescriptor<?> qfdesc = ds.getDefDescriptor("auradev:quickFixException", ComponentDef.class);
+            DefDescriptor<ComponentDef> qfdesc = ds.getDefDescriptor("auradev:quickFixException", ComponentDef.class);
             String uid = mdr.getUid(null, qfdesc);
-            // if (!preload) {
-            // Set<DefDescriptor<?>> loaded = Sets.newHashSet();
-            // loaded.addAll(mdr.getDependencies(uid));
-            // context.setPreloadedDeps(loaded);
-            // }
-            context.addLoaded(qfdesc, uid);
-            context.setPreloading(qfdesc);
+            context.setPreloadedDefinitions(mdr.getDependencies(uid));
             return qfdesc;
         } catch (QuickFixException death) {
             //
@@ -478,27 +470,24 @@ public abstract class AuraBaseServlet extends HttpServlet {
 
     public static List<String> getStyles() throws QuickFixException {
         AuraContext context = Aura.getContextService().getCurrentContext();
-        Set<String> preloads = context.getPreloads();
         Mode mode = context.getMode();
         String contextPath = context.getContextPath();
         ConfigAdapter config = Aura.getConfigAdapter();
 
         List<String> ret = Lists.newArrayList();
 
-        if (preloads != null && !preloads.isEmpty()) {
-            StringBuilder defs = new StringBuilder(contextPath).append("/l/");
-            StringBuilder sb = new StringBuilder();
+        StringBuilder defs = new StringBuilder(contextPath).append("/l/");
+        StringBuilder sb = new StringBuilder();
 
-            try {
-                Aura.getSerializationService().write(context, null, AuraContext.class, sb, "HTML");
-            } catch (IOException e) {
-                throw new AuraRuntimeException(e);
-            }
-            String contextJson = AuraTextUtil.urlencode(sb.toString());
-            defs.append(contextJson);
-            defs.append("/app.css");
-            ret.add(defs.toString());
+        try {
+            Aura.getSerializationService().write(context, null, AuraContext.class, sb, "HTML");
+        } catch (IOException e) {
+            throw new AuraRuntimeException(e);
         }
+        String contextJson = AuraTextUtil.urlencode(sb.toString());
+        defs.append(contextJson);
+        defs.append("/app.css");
+        ret.add(defs.toString());
 
         if (mode == Mode.PTEST) {
             ret.add(config.getJiffyCSSURL());
@@ -542,26 +531,23 @@ public abstract class AuraBaseServlet extends HttpServlet {
 
     public static List<String> getNamespacesScripts() throws QuickFixException {
         AuraContext context = Aura.getContextService().getCurrentContext();
-        Set<String> preloads = context.getPreloads();
         String contextPath = context.getContextPath();
         List<String> ret = Lists.newArrayList();
 
-        if (preloads != null && !preloads.isEmpty()) {
-            StringBuilder defs = new StringBuilder(contextPath).append("/l/");
-            StringBuilder sb = new StringBuilder();
+        StringBuilder defs = new StringBuilder(contextPath).append("/l/");
+        StringBuilder sb = new StringBuilder();
 
-            try {
-                Aura.getSerializationService().write(context, null, AuraContext.class, sb, "HTML");
-            } catch (IOException e) {
-                throw new AuraRuntimeException(e);
-            }
-
-            String contextJson = AuraTextUtil.urlencode(sb.toString());
-            defs.append(contextJson);
-            defs.append("/app.js");
-
-            ret.add(defs.toString());
+        try {
+            Aura.getSerializationService().write(context, null, AuraContext.class, sb, "HTML");
+        } catch (IOException e) {
+            throw new AuraRuntimeException(e);
         }
+
+        String contextJson = AuraTextUtil.urlencode(sb.toString());
+        defs.append(contextJson);
+        defs.append("/app.js");
+
+        ret.add(defs.toString());
 
         return ret;
     }

@@ -34,7 +34,7 @@ public class InputErrorUITest extends WebDriverTestCase {
     final String URL = "/uitest/inputError_Test.cmp";
     final String URL_CST = "/uitest/inputError_CustomTest.cmp";
     
-	public InputErrorUITest(String name) {
+    public InputErrorUITest(String name) {
         super(name);
     }
 
@@ -133,12 +133,17 @@ public class InputErrorUITest extends WebDriverTestCase {
         clearBtn.click();
         waitForElementTextPresent(status, STATUS_CLEAR);
         if (verifyErrMsg) {
-        	verifyNoErrorMessage(input);
+            verifyNoErrorMessage(input);
         }
         verifyCss(input, false);
     }
 
     private void verifyErrorMessage(WebElement element, String expectedErrorMsg) throws Exception {
+        //
+        // Note that we wait for the element to appear in our dom, as we are racing with
+        // it (and we lose this race on fast machines).
+        //
+        waitForElementAppear(By.className("uiInputDefaultError"));
         WebElement errorElement = d.findElement(By.className("uiInputDefaultError"));
         String errorText = errorElement.getText();
         assertTrue("Incorrect error message: " + errorText, errorText.contains(expectedErrorMsg));

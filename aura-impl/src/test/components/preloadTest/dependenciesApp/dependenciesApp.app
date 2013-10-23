@@ -15,10 +15,9 @@
     limitations under the License.
 
 -->
-<aura:component>
-    <p aura:id="p">Sew much style</p>
-    <ui:inputText aura:id="inputText" value="in one component" />
-    <ui:outputText aura:id="outputText" value="out the other" />
-    <test:testValidCSS />
-    {!v.body}
-</aura:component>
+<aura:application securityProvider="java://org.auraframework.java.securityProvider.LaxSecurityProvider" access="public" render="client">
+    <ui:button label="UI Button" />
+    <preloadTest:test_SpecialCharacter />
+    <test:test_button label="test button" />
+    <auratest:test_button label="auratest button"/>
+</aura:application>

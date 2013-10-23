@@ -51,6 +51,15 @@
 			component._refreshing = false;
 		}
 	},
+		
+	swapShowMore: function (cmp) {
+		$A.util.removeElement(cmp._pullUpEl);
+		
+		// Timeout to allow for rendering of new element.
+		setTimeout(function () { 
+			cmp._pullUpEl = cmp.find('pullUp').getElement();;
+		}, 100);
+	},
 	
 	handleScrollTo : function(component, event) {
 		var scroller = component._scroller,
@@ -59,23 +68,23 @@
 			offset;
 		
 		switch (event.getParam("destination")) {
-		case "top" :
-			offset = component.find("pullDown").getElement();
-			scroller.scrollTo(0, 0 - offset.offsetHeight, event.getParam("time"));
-			break;
-		case "bottom" :
-			offset = component.find("pullUp").getElement();
-			scroller.scrollTo(0, 0 - (scrollContent.offsetHeight - scrollWrapper.offsetHeight - offset.offsetHeight), event.getParam("time"));
-			break;
-		case "left" :
-			scroller.scrollTo(0, 0, event.getParam("time"));
-			break;
-		case "right" :	
-			scroller.scrollTo(0 - (scrollContent.offsetHeight - scrollWrapper.offsetHeight), 0, event.getParam("time"));
-			break;
-		case "custom" :
-			offset = component.find("pullDown").getElement();
-			scroller.scrollTo(event.getParam("xcoord"), event.getParam("ycoord") - offset.offsetHeight, event.getParam("time"));
+			case "top" :
+				offset = component.find("pullDown").getElement();
+				scroller.scrollTo(0, 0 - offset.offsetHeight, event.getParam("time"));
+				break;
+			case "bottom" :
+				offset = component.find("pullUp").getElement();
+				scroller.scrollTo(0, 0 - (scrollContent.offsetHeight - scrollWrapper.offsetHeight - offset.offsetHeight), event.getParam("time"));
+				break;
+			case "left" :
+				scroller.scrollTo(0, 0, event.getParam("time"));
+				break;
+			case "right" :	
+				scroller.scrollTo(0 - (scrollContent.offsetHeight - scrollWrapper.offsetHeight), 0, event.getParam("time"));
+				break;
+			case "custom" :
+				offset = component.find("pullDown").getElement();
+				scroller.scrollTo(event.getParam("xcoord"), event.getParam("ycoord") - offset.offsetHeight, event.getParam("time"));
 		}
 	},
 	
@@ -109,6 +118,7 @@
 					var pullToRefreshAction = component.get("v.onPullToRefresh");
 					var canRefresh = component.get("v.canRefresh");
 					var pullDownOffset = 0;
+					
 					if (pullToRefreshAction && canRefresh) {
 						var pullDownEl = component.find("pullDown").getElement();
 						// pullDownEl.offsetHeight is unreliable, so calculating
@@ -120,14 +130,15 @@
 					}
 					
 					var pullToShowMoreAction = component.get("v.onPullToShowMore");
-					var canShowMore = component.get("v.canShowMore");
+					component._canShowMore = component.get("v.canShowMore");
 					var pullUpOffset = 0;
-					if (pullToShowMoreAction && canShowMore) {
+					
+					if (pullToShowMoreAction && component._canShowMore) {
 						var shim = component.find("shim").getElement();
-						var pullUpEl = component.find("pullUp").getElement();
+						component._pullUpEl = component.find("pullUp").getElement();
 						// pullUpEl.offsetHeight is unreliable, so calculating
 						// by hand from the computed styles
-						var pullUpElInfo = getComputedStyle(pullUpEl);
+						var pullUpElInfo = getComputedStyle(component._pullUpEl);
 						pullUpOffset = (parseInt(pullUpElInfo.height) || 0) + (parseInt(pullUpElInfo.paddingTop) || 0)
 								+ (parseInt(pullUpElInfo.paddingBottom) || 0) + (parseInt(pullUpElInfo.marginTop) || 0)
 								+ (parseInt(pullUpElInfo.marginBottom) || 0)
@@ -223,15 +234,15 @@
 									this.minScrollY = -pullDownOffset;
 								}
 							}
-							
-							if (pullToShowMoreAction && canShowMore) {
+														
+							if (pullToShowMoreAction && component._canShowMore) {
 								var threshold = this.bottomY - PULL_DISTANCE;
 								
-								if (this.y < threshold && $A.util.hasClass(pullUpEl, 'pullDown')) {
-									$A.util.swapClass(pullUpEl, 'pullDown', 'pullFlip');
+								if (this.y < threshold && $A.util.hasClass(component._pullUpEl, 'pullDown')) {
+									$A.util.swapClass(component._pullUpEl, 'pullDown', 'pullFlip');
 									this.maxScrollY = this.bottomY;
-								} else if (this.y > threshold && $A.util.hasClass(pullUpEl, 'pullFlip')) {
-									$A.util.swapClass(pullUpEl, 'pullFlip', 'pullDown');
+								} else if (this.y > threshold && $A.util.hasClass(component._pullUpEl, 'pullFlip')) {
+									$A.util.swapClass(component._pullUpEl, 'pullFlip', 'pullDown');
 									this.maxScrollY = this.bottomYWithoutPullUp;
 								}
 							}							
@@ -253,9 +264,9 @@
 								}
 							}
 							
-							if (pullToShowMoreAction && canShowMore) {
-								if ($A.util.hasClass(pullUpEl, 'pullFlip')) {
-									$A.util.swapClass(pullUpEl, 'pullFlip', 'pullLoading');
+							if (pullToShowMoreAction && component._canShowMore) {
+								if ($A.util.hasClass(component._pullUpEl, 'pullFlip')) {
+									$A.util.swapClass(component._pullUpEl, 'pullFlip', 'pullLoading');
 									setTimeout(function() {
 										pullToShowMoreAction.runDeprecated();
 									}, 1);
@@ -277,7 +288,7 @@
                             }
 						},
 
-						onRefresh : function() {
+						onRefresh : function() {							
 							if (pullToRefreshAction && canRefresh) {
 								// keep the "loading" styling as it animates up
 								// then replace with the "pull down" styling
@@ -286,11 +297,11 @@
 								}, 50);
 							}
 							
-							if (pullToShowMoreAction && canShowMore) {
+							if (pullToShowMoreAction && component._canShowMore) {
 								// keep the "loading" styling as it animates up
 								// then replace with the "pull down" styling
 								setTimeout(function() {
-									$A.util.swapClass(pullUpEl, 'pullLoading', 'pullDown');
+									$A.util.swapClass(component._pullUpEl, 'pullLoading', 'pullDown');
 								}, 50);
 							
 								// TODO: this could all possibly be more efficient

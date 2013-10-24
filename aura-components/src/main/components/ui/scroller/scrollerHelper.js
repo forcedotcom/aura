@@ -53,8 +53,6 @@
 	},
 		
 	swapShowMore: function (cmp) {
-		$A.util.removeElement(cmp._pullUpEl);
-		
 		// Timeout to allow for rendering of new element.
 		setTimeout(function () { 
 			cmp._pullUpEl = cmp.find('pullUp').getElement();;
@@ -130,10 +128,9 @@
 					}
 					
 					var pullToShowMoreAction = component.get("v.onPullToShowMore");
-					component._canShowMore = component.get("v.canShowMore");
 					var pullUpOffset = 0;
 					
-					if (pullToShowMoreAction && component._canShowMore) {
+					if (pullToShowMoreAction && component.get('v.canShowMore')) {
 						var shim = component.find("shim").getElement();
 						component._pullUpEl = component.find("pullUp").getElement();
 						// pullUpEl.offsetHeight is unreliable, so calculating
@@ -235,7 +232,7 @@
 								}
 							}
 														
-							if (pullToShowMoreAction && component._canShowMore) {
+							if (pullToShowMoreAction && component.get('v.canShowMore')) {
 								var threshold = this.bottomY - PULL_DISTANCE;
 								
 								if (this.y < threshold && $A.util.hasClass(component._pullUpEl, 'pullDown')) {
@@ -264,7 +261,7 @@
 								}
 							}
 							
-							if (pullToShowMoreAction && component._canShowMore) {
+							if (pullToShowMoreAction && component.get('v.canShowMore')) {
 								if ($A.util.hasClass(component._pullUpEl, 'pullFlip')) {
 									$A.util.swapClass(component._pullUpEl, 'pullFlip', 'pullLoading');
 									setTimeout(function() {
@@ -297,7 +294,7 @@
 								}, 50);
 							}
 							
-							if (pullToShowMoreAction && component._canShowMore) {
+							if (pullToShowMoreAction && component.get('v.canShowMore')) {
 								// keep the "loading" styling as it animates up
 								// then replace with the "pull down" styling
 								setTimeout(function() {

@@ -37,8 +37,6 @@
     	var newValue = evt.getParam('value').getValue(),
     		oldValue = cmp.getValue('v.canShowMore').oldValue;
     	
-    	cmp._canShowMore = newValue; 
-    	
     	// false => true ?
     	if (!oldValue && newValue) {
     		hlp.swapShowMore(cmp);	

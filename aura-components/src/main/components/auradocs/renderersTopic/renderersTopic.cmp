@@ -88,6 +88,8 @@
 
     <p>If you want to use a library, such as jQuery, to access the DOM, use it in <code>afterRender()</code>.</p>
 
+    <p>You generally want to extend default after rendering by calling <code>superAfterRender()</code> in your <code>afterRender()</code> function before you add your custom code.</p>
+    
     <h2>Unrendering Components</h2>
 
     <p>The base <code>unrender()</code> function deletes all the DOM nodes rendered by a component's <code>render()</code> function. It is called by the framework when a component is being destroyed. Customize this behavior by overriding <code>unrender()</code> in your component's renderer. This can be useful when you are working with third-party libraries that are not native to the framework.</p>

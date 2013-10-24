@@ -239,12 +239,9 @@ public class Json {
     /**
      * @param obj The thing to serialize
      * @param out The destination for the serialized form
-     * @param format true if output should be indented and multiline for human
-     *            readability (default = false)
-     * @param refSupport true if @Serialization annotations should be honored
-     *            (default = false)
-     * @throws JsonSerializationException if there's an issue during
-     *             serialization
+     * @param format true if output should be indented and multiline for human readability (default = false)
+     * @param refSupport true if @Serialization annotations should be honored (default = false)
+     * @throws JsonSerializationException if there's an issue during serialization
      */
     public static void serialize(Object obj, Appendable out, boolean format, boolean refSupport) {
         try {
@@ -765,6 +762,9 @@ public class Json {
         writeComma();
         writeIndent();
         JsonSerializer<Object> serializer = serializationContext.getSerializer(key);
+        if (serializer == null) {
+            throw new JsonSerializerNotFoundException(key);
+        }
         serializer.serialize(this, key);
         writeMapSeparator();
     }

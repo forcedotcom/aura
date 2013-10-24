@@ -140,7 +140,10 @@
      * Verify rerender of special html attributes
      * type, href, style and data attributes must be set by using setAttribute() on dom elements
      * 
-     * Ie7 does not support the inline style attribute.
+     * Ie7 does not support setting inline style attribute with a string. It is of type object. 
+     * To set it, we would need to set style.stylsheet.cssText equal to the css sytle that we want. 
+     * Disabling it until it is fixed
+     * W-1911367
      */
     testRerenderSpecialHtmlAttributes:{
 	browsers: ["-IE7"],

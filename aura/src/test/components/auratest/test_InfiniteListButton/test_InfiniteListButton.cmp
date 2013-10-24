@@ -1,0 +1,5 @@
+<aura:component>
+    <aura:attribute name="item" type="Object" required="true"/>
+
+    <ui:button aura:id="myButton" label="{! v.item.isClosed ? ('isClosed-true' + ' ' + v.item.Id): ('isClose-false' +  ' ' + v.item.Id) }" press="{!c.toggle}"/>
+</aura:component>

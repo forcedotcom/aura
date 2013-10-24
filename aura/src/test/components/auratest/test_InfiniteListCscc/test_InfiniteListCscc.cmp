@@ -1,0 +1,23 @@
+<aura:component>
+    <style>
+        .closed {
+            text-decoration: line-through;
+        }
+    </style>
+
+    <ui:button label="add item" aura:id="addItem" press="{!c.add}"/>
+
+    <ui:infiniteListCscc aura:id="list" itemVar="item">
+        <aura:set attribute="dataProvider">
+            <auratest:test_InfiniteListDataProvider/>
+        </aura:set>
+
+        <aura:set attribute="itemTemplate">
+            <div>
+                <auratest:test_InfiniteListButton aura:id="aButton" item="{!item}"/> 
+            </div>
+        </aura:set>
+    </ui:infiniteListCscc>
+
+
+</aura:component>

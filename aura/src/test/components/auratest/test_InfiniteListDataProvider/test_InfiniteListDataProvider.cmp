@@ -1,0 +1,2 @@
+<aura:component extends="ui:dataProvider" model="java://test.model.test_InfiniteListCsccModel">
+</aura:component>

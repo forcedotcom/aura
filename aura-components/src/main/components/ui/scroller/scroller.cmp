@@ -60,7 +60,10 @@
     <aura:registerEvent name="scrollBy" type="ui:scrollBy" description="The event fired when the scroller should move to a new destination relative to its current position."/>
     <aura:handler name="scrollBy" action="{!c.scrollBy}" description="Catches the event fired when the scroller should move to a new destination relative to its current position."/>
     
+    <aura:handler name="change" value="{!v.canShowMore}" action="{!c.handleCanShowMoreChange}"/>
+    
     <ui:resizeObserver onresize="{!c.refresh}"/>
+    
     <div aura:id="scrollWrapper" class="{!v.class + ' scrollWrapper'}">
         <div aura:id="scrollContent" class="{!v.scrollContentClass}">
             <aura:renderIf isTrue="{!v.onPullToRefresh != null &amp;&amp; v.canRefresh}">

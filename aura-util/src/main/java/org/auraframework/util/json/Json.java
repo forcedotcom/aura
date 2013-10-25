@@ -757,6 +757,7 @@ public class Json {
      * 
      * @param key
      * @throws IOException
+     * @throws JsonSerializerNotFoundException if a serializer is not found for the key
      */
     public void writeMapKey(Object key) throws IOException {
         writeComma();

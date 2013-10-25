@@ -13,14 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-({        
-    provide : function AbstractListProvider(component) {
-        var items = component.get("v.dataProvider.0.m.items");
-        
-        return {
-            attributes: {
-                "items": items
-            }
+({
+    add: function (cmp) {
+        var list = cmp.find('list'),
+            task = {
+            ActivityDate: "2013-08-27",
+            IsClosed: false,
+            Id: "Client"
         };
+
+        list.getValue('v.items').insert(0, task);
+    },
+    remove: function (cmp) {
+        var list = cmp.find('list');
+
+        list.getValue('v.items').remove(1);
     }
+
 })

@@ -182,6 +182,9 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
                 int extIndex = resStr.lastIndexOf(".");
                 String minFile = resStr.substring(0, extIndex) + MINIFIED_FILE_SUFFIX + resStr.substring(extIndex);
                 if (resourceLoader.getResource(minFile) != null) {
+                	if (in != null) {
+                		in.close();
+                	}
                     in = resourceLoader.getResourceAsStream(minFile);
                 }
             }

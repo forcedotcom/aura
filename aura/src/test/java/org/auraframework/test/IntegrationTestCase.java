@@ -38,6 +38,8 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.params.HttpClientParams;
+
+import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.entity.ContentType;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.HttpParams;
@@ -62,6 +64,8 @@ import org.auraframework.test.annotation.IntegrationTest;
 import org.auraframework.test.annotation.ThreadHostileTest;
 import org.auraframework.test.configuration.TestServletConfig;
 import org.auraframework.throwable.AuraExecutionException;
+import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonReader;
 
@@ -161,9 +165,129 @@ public abstract class IntegrationTestCase extends AuraTestCase {
         return obtainGetMethod(path, followRedirects, null);
     }
 
-    protected HttpGet obtainGetMethod(String path, Header[] headers) throws MalformedURLException,
-            URISyntaxException {
+    protected HttpGet obtainGetMethod(String path, Header[] headers) throws MalformedURLException, URISyntaxException {
         return obtainGetMethod(path, true, headers);
+    }
+
+    /**
+     * Build a URL for a get from the given parameters with all the standard parameters set.
+     *
+     * This is a convenience function to make gets more consistent. It sets:
+     * <ul>
+     *   <li>aura.tag: the descriptor to get.</li>
+     *   <li>aura.defType: the type of the descriptor.</li>
+     *   <li>aura.context: the context, including
+     *     <ul>
+     *       <li>loaded: the descriptor + type from above.</li>
+     *       <li>fwUID: the framework UID</li>
+     *       <li>mode: from the parameters</li>
+     *       <li>format: from the parameters</li>
+     *     </ul>
+     *   </li>
+     * </ul>
+     *
+     * @param mode the Aura mode to use.
+     * @param format the format (HTML vs JSON) to use
+     * @param desc the descriptor to set as the primary object.
+     * @param type the type of descriptor.
+     * @param params extra parameters to set.
+     * @param headers extra headers.
+     */
+    protected HttpGet obtainAuraGetMethod(Mode mode, Format format, String desc, Class<? extends BaseComponentDef> type,
+            Map<String,String> params, Header[] headers)
+            throws QuickFixException, MalformedURLException, URISyntaxException {
+        return obtainAuraGetMethod(mode, format, Aura.getDefinitionService().getDefDescriptor(desc, type), params, headers);
+    }
+
+    protected HttpGet obtainAuraGetMethod(Mode mode, Format format, DefDescriptor<? extends BaseComponentDef> desc,
+            Map<String,String> params, Header[] headers)
+            throws QuickFixException, MalformedURLException, URISyntaxException {
+        List<NameValuePair> urlparams = Lists.newArrayList();
+        urlparams.add(new BasicNameValuePair("aura.tag", String.format("%s:%s", desc.getNamespace(), desc.getName())));
+          
+        for (Map.Entry<String, String> entry : params.entrySet()) {
+            urlparams.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
+        }
+        urlparams.add(new BasicNameValuePair("aura.context", getContext(mode, format, desc, false)));
+        String query = URLEncodedUtils.format(urlparams, "UTF-8");
+
+        // final url Request to be send to server
+        return obtainGetMethod("aura?" + query, true, headers);
+    }
+
+    /**
+     * Get a context for use with a get/post.
+     *
+     * @param mode the Aura mode to use.
+     * @param format the format (HTML vs JSON) to use
+     * @param desc the descriptor to set as the primary object.
+     * @param type the type of descriptor.
+     * @param modified break the context uid.
+     */
+    protected String getContext(Mode mode, Format format, String desc, Class<? extends BaseComponentDef> type,
+            boolean modified) throws QuickFixException {
+        return getContext(mode, format, Aura.getDefinitionService().getDefDescriptor(desc, type), modified);
+    }
+
+    protected String getContext(Mode mode, Format format, DefDescriptor<? extends BaseComponentDef> desc,
+            boolean modified) throws QuickFixException {
+        ContextService contextService = Aura.getContextService();
+        String ctxtString;
+        AuraContext ctxt = contextService.startContext(mode, format, Access.AUTHENTICATED, desc);
+        ctxt.setFrameworkUID(Aura.getConfigAdapter().getAuraFrameworkNonce());
+        ctxtString = getSerializedAuraContextWithModifiedUID(ctxt, modified);
+        contextService.endContext();
+        return ctxtString;
+    }
+
+    /**
+     * Get a serialized context with a possibly modified UID.
+     */
+    protected String getSerializedAuraContextWithModifiedUID(AuraContext ctx, boolean modify) throws QuickFixException {
+        String uid;
+        if (modify) {
+            uid = getModifiedAppUID();
+        } else {
+            uid = getAppUID(ctx);
+        }
+        ctx.addLoaded(ctx.getApplicationDescriptor(), uid);
+        return getSerializedAuraContext(ctx);
+    }
+
+    protected String getSerializedAuraContext(AuraContext ctx) throws QuickFixException {
+        StringBuilder sb = new StringBuilder();
+        try {
+            Aura.getSerializationService().write(ctx, null, AuraContext.class, sb, "HTML");
+        } catch (IOException e) {
+            throw new AuraRuntimeException(e);
+        }
+        return sb.toString();
+    }
+
+    protected String getAppUID() throws QuickFixException {
+        return getAppUID(Aura.getContextService().getCurrentContext());
+    }
+
+    protected String getAppUID(AuraContext ctxt) throws QuickFixException {
+        return ctxt.getDefRegistry().getUid(null, ctxt.getApplicationDescriptor());
+    }
+
+    protected String getModifiedAppUID(String old) {
+        StringBuilder sb = new StringBuilder(old);
+        char flip = sb.charAt(3);
+
+        // change the character.
+        if (flip == 'a') {
+            flip = 'b';
+        } else {
+            flip = 'a';
+        }
+        sb.setCharAt(3, flip);
+        return sb.toString();
+    }
+
+    protected String getModifiedAppUID() throws QuickFixException {
+        return getModifiedAppUID(getAppUID());
     }
 
     /**

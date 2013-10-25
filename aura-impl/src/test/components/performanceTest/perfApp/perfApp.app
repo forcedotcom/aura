@@ -57,7 +57,7 @@
     
     <!-- Garbage collection of DOM elements and Components-->
     <br/>
-    <ui:button label="Push component to page" press="{!c.pushComponent}"/>
+    <ui:button label="Push component to page" press="{!c.pushComponent}" class="pushCmp"/>
     <ui:button label="Measure time to destroy component (Component.destroy())" press="{!c.destroyComponent}"/>
     
     <!-- TODO W-1557952 re-enable when we figure out why the mark/measure in Util.removeElement() was causing issues -->

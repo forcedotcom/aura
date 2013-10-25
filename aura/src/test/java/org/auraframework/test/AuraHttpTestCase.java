@@ -19,13 +19,18 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 
+import java.util.Map;
+
 import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.protocol.ClientContext;
+import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.cookie.Cookie;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.cookie.BasicClientCookie;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
@@ -37,6 +42,9 @@ import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.quickfix.QuickFixException;
+
+import com.google.common.collect.Lists;
 
 /**
  * Base class with some helper methods specific to Aura.
@@ -226,52 +234,4 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
         contextService.endContext();
         return ctxtString;
     }
-
-    protected String getSerializedAuraContext(AuraContext ctx) throws Exception {
-        StringBuilder sb = new StringBuilder();
-        try {
-            Aura.getSerializationService().write(ctx, null, AuraContext.class, sb, "HTML");
-        } catch (IOException e) {
-            throw new AuraRuntimeException(e);
-        }
-        return sb.toString();
-    }
-
-    protected String getSerializedAuraContextWithModifiedUID(AuraContext ctx, boolean modify) throws Exception {
-        String uid;
-        if (modify) {
-            uid = getModifiedAppUID();
-        } else {
-            uid = getAppUID(ctx);
-        }
-        ctx.addLoaded(ctx.getApplicationDescriptor(), uid);
-        return getSerializedAuraContext(ctx);
-    }
-
-    protected String getAppUID() throws Exception {
-        return getAppUID(Aura.getContextService().getCurrentContext());
-    }
-
-    protected String getAppUID(AuraContext ctxt) throws Exception {
-        return ctxt.getDefRegistry().getUid(null, ctxt.getApplicationDescriptor());
-    }
-
-    protected String getModifiedAppUID(String old) throws Exception {
-        StringBuilder sb = new StringBuilder(old);
-        char flip = sb.charAt(3);
-
-        // change the character.
-        if (flip == 'a') {
-            flip = 'b';
-        } else {
-            flip = 'a';
-        }
-        sb.setCharAt(3, flip);
-        return sb.toString();
-    }
-
-    protected String getModifiedAppUID() throws Exception {
-        return getModifiedAppUID(getAppUID());
-    }
-
 }

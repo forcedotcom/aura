@@ -19,15 +19,16 @@ import java.util.*;
 
 import org.apache.http.*;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicHeader;
-import org.apache.http.message.BasicNameValuePair;
+
+import org.auraframework.def.ApplicationDef;
+import org.auraframework.system.AuraContext.Format;
+import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.AuraHttpTestCase;
 import org.auraframework.test.annotation.UnAdaptableTest;
 import org.auraframework.util.json.JsonReader;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
 
 /**
  * Automation to check support for date and dateTimePicker for different Locales.
@@ -35,42 +36,26 @@ import com.google.common.collect.Lists;
 @UnAdaptableTest
 public class InputDateTimeLocaleHttpTest extends AuraHttpTestCase{
 	
-	 //Monday in Chinese
-	private final String dayOfWeek = "星期一";
+    //Monday in Chinese
+    private final String dayOfWeek = "星期一";
     
     //January in chinese
-	private final String month = "一月";
+    private final String month = "一月";
     
     //Chinese locale symbol
-	private final String locale = "zh";
+    private final String locale = "zh";
 	
-	public InputDateTimeLocaleHttpTest(String name) {
-		super(name);
-	}
+    public InputDateTimeLocaleHttpTest(String name) {
+        super(name);
+    }
 
-	@SuppressWarnings("unchecked")
-    private void getValueByLocale(String locale, String dayOfWeek, String month, Map<String, String> urlAuraParameters)
-            throws Exception {
-        String query = "";
-     
-        List<NameValuePair> params = Lists.newArrayList();
-          
-        for (Map.Entry<String, String> entry : urlAuraParameters.entrySet()) {
-            params.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
-        }
-        query = URLEncodedUtils.format(params, "UTF-8");
-
-        // final url Request to be send to server
-        String url = "aura?" + query;
-
-        Header[] headers = new Header[]{ new BasicHeader(HttpHeaders.ACCEPT_LANGUAGE, locale) };
-
-        HttpGet get = obtainGetMethod(url, headers);
-        HttpResponse httpResponse = perform(get);
+    @SuppressWarnings("unchecked")
+    private void checkValues(String dayOfWeek, String month, HttpGet auraGet) throws Exception {
+        HttpResponse httpResponse = perform(auraGet);
 
         String response = getResponseBody(httpResponse);
         int statusCode = getStatusCode(httpResponse);
-        get.releaseConnection();
+        auraGet.releaseConnection();
 
         if (HttpStatus.SC_OK != statusCode) {
             fail(String.format("Unexpected status code <%s>, expected <%s>, response:%n%s", statusCode,
@@ -95,16 +80,15 @@ public class InputDateTimeLocaleHttpTest extends AuraHttpTestCase{
 
     }
 
-	/**
-	 * Test to verify daysofweek and month changes for chinese locale
-	 * For Date Picker
+    /**
+     * Test to verify daysofweek and month changes for chinese locale
+     * For Date Picker
      * @throws Exception
-	 */
-	public void testCheckLocaleForDatePicker() throws Exception{
-		
-		Map<String, String> urlAuraParameters = ImmutableMap.of("aura.tag", "uiTest:datePickerTest", "aura.context",
-                "{'mode':'DEV'}", "visible","true");
-        
-        getValueByLocale(locale, dayOfWeek, month, urlAuraParameters);
+     */
+    public void testCheckLocaleForDatePicker() throws Exception{
+        Header[] headers = new Header[]{ new BasicHeader(HttpHeaders.ACCEPT_LANGUAGE, locale) };
+        HttpGet auraGet = this.obtainAuraGetMethod(Mode.DEV, Format.JSON, "uiTest:datePickerTest", ApplicationDef.class,
+                ImmutableMap.of("visible", "true"), headers);
+        checkValues(dayOfWeek, month, auraGet);
     }
 }

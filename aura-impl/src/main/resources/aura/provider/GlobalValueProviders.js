@@ -197,6 +197,7 @@ $A.ns.GlobalValueProviders.prototype.get = function(expression, component, callb
 /**
  * Delegates to value provider.
  *
+ * @deprecated use setValue instead
  * @param expression
  * @param [component]
  * @param [callback]
@@ -214,6 +215,27 @@ $A.ns.GlobalValueProviders.prototype.getValue = function(expression, component, 
         vp = this.getValueProvider(type);
 
     return vp.getValue(expression, component, callback);
+};
+
+/**
+ * Delegates to a value provider, taking the provided component to hold the result.
+ * 
+ * @param expression expression to resolve
+ * @param [dest] value to assign
+ * @param [callback] callback to call after assignment
+ */
+$A.ns.GlobalValueProviders.prototype.setValue = function(expression, dest, callback) {
+    // in case anything other than gvps are requested
+    if( !this.isGlobalValueExp(expression) ) {
+        return undefined;
+    }
+
+    expression = this.createPropertyRef(expression);
+
+    var type = expression.getRoot(),
+    vp = this.getValueProvider(type);
+
+    return vp.setValue(expression, dest, callback);
 
 };
 

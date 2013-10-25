@@ -26,8 +26,8 @@ function SimpleValue(config, def, component) {
     $A.ns.AttributeValue.call(this);
     $A.assert(!config || config.auraType !== this.auraType);
 
-    /** Initial value of the simple value.  Please be a simple type! */
-    this.value = config;
+    /** Initial value of the simple value.  Must be a simple type! */
+    this.value = SimpleValue.checkType(config);
 
     /** Optional component "owning" this value. */
     this.owner = component;
@@ -63,6 +63,26 @@ function SimpleValue(config, def, component) {
 $A.ns.Util.derivePrototype(SimpleValue, $A.ns.AttributeValue);
 
 SimpleValue.prototype.auraType = "Value";
+
+/** Validates and possibly simplifies a prospective input value. */
+SimpleValue.checkType = function(v) {
+    if (v instanceof Object) {
+        // There are only a few types of Object we'll accept...
+//        if (!v.auraType) {
+//            throw new Error("SimpleValue can't accept an Object");
+//        }
+//        if (v instanceof MapValue) {
+//            throw new Error("SimpleValue can't accept a MapValue");
+//        }
+//        if (v instanceof ArrayValue) {
+//            throw new Error("SimpleValue can't accept an ArrayValue");
+//        }
+        if (v instanceof SimpleValue) {
+            v = v.getValue();
+        }
+    }
+    return v;
+};
 
 /**
  * Returns the unwrapped value. This is the underlying value that is wrapped in the value object. The last value set will always be returned,
@@ -130,6 +150,8 @@ SimpleValue.prototype.getPreviousValue = function() {
  * @param {Object} v The value to be set.
  */
 SimpleValue.prototype.setValue = function(v, skipChange) {
+    v = SimpleValue.checkType(v);
+
     this.makeDirty();
     var list = null;
     if (!skipChange) {

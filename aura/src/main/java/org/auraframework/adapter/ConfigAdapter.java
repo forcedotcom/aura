@@ -45,6 +45,8 @@ public interface ConfigAdapter extends AuraAdapter {
     String getMomentJSURL();
     
     List<String> getWalltimeJSURLs();
+    
+    String getCKEditorURL();
 
     String getCSRFToken();
 

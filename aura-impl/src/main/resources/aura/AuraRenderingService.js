@@ -86,18 +86,18 @@ var AuraRenderingService = function AuraRenderingService(){
                 
                 // update the mark info after the fact to avoid unnecessary hits early to get cmp info
                 // #if {"modes" : ["PTEST"]}
-                var markDescription = initialMarkName + ": [";
-                for (var m = 0; m < cmps.length; m++) {
-                    var rerenderedCmpDef = cmps[m].getDef();
-                    if (rerenderedCmpDef) {
-                        markDescription += "'" + rerenderedCmpDef.descriptor.getQualifiedName() + "'";
+                    var markDescription = initialMarkName + ": [";
+                    for (var m = 0; m < cmps.length; m++) {
+                        var rerenderedCmpDef = cmps[m].getDef();
+                        if (rerenderedCmpDef) {
+                            markDescription += "'" + rerenderedCmpDef.descriptor.getQualifiedName() + "'";
+                        }
+                        if (m < cmps.length - 1) {
+                            markDescription += ",";
+                        }
                     }
-                    if (m < cmps.length - 1) {
-                        markDescription += ",";
-                    }
-                }
-                markDescription += "]";
-                $A.updateMarkName(initialMarkName, markDescription);
+                    markDescription += "]";
+                    $A.updateMarkName(initialMarkName, markDescription);
                 // #end
             }
         },

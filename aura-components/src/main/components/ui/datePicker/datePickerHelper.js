@@ -271,8 +271,6 @@
             var isPhone = $A.get("$Browser.isPhone");
             if (isPhone === true) {
                 this.attachToDocumentBody(component);
-                //var top = (document.documentElement && document.documentElement.scrollTop) || document.body.scrollTop;
-                //elem.style.top = top + "px";
                 var scrollerDivCmp = component.find("scroller");
                 var scrollerElem = scrollerDivCmp ? scrollerDivCmp.getElement() : null;
                 if (scrollerElem) { // Set scroller div height to make it scrollable.
@@ -287,11 +285,7 @@
                 elem.style.top = "auto";
                 var elemRect = elem.getBoundingClientRect();
                 if (elemRect.bottom > viewPort.height) { // no enough space below
-                    if (elemRect.height < elemRect.top) { // move above input field
-                        elem.style.top = 0 - elemRect.height + "px";
-                    } else { // no enough space above either. Put it in the middle of viewport
-                        elem.style.top = 0 - elemRect.top + "px";
-                    }
+                    elem.style.top = 0 - (elemRect.bottom - viewPort.height) + "px"; // Move it up a bit
                 } else {
                     elem.style.top = "auto"; 
                 }

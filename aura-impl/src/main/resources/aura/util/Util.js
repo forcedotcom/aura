@@ -1041,40 +1041,35 @@ if (!!Array.prototype.indexOf) {
     };
 }
 
+
 /**
  * Schedules the specified component to be asynchronously destroyed.
  * @param {cmp} element The component to be destroyed.
  */
-$A.ns.Util.prototype.destroyAsync = function(cmp) {    
+$A.ns.Util.prototype.destroyAsync = function(cmp) {
 	if (this.componentGCProcessing) {
 		// We're in the middle of emptying the component trash and something just async to destroy another 
 		// component async so finish the destroy now
 		if (cmp && cmp.finishDestroy) {
-        	cmp.finishDestroy();
+			cmp.finishDestroy();
         }
 	} else {
         this.trashedComponentQueue.push(cmp);
 
         if (!this.componentGCPending) {
-	        var mode = $A.getContext().getMode();
-	        if (mode !== "SELENIUM" && mode !== "SELENIUMDEBUG") {
-	            this.componentGCPending = true;
+            this.componentGCPending = true;
+            
+            // Async when not testing to not confuse component stats verification tests
+            var that = this;
+            setTimeout(function() { 
+            	try {
+	            	that.componentGCProcessing = true;
 	            
-	            // Async when not testing to not confuse component stats verification tests
-	            var that = this;
-	            setTimeout(function() { 
-	            	try {
-		            	that.componentGCProcessing = true;
-		            
-		            	that.emptyComponentTrash();
-	            	} finally {
-	            		that.componentGCProcessing = false;
-	            	}
-	        	}, 3000);
-	        } else {
-	            // Synchronous when not testing
-	            this.emptyComponentTrash();
-	        }
+	            	that.emptyComponentTrash();
+            	} finally {
+            		that.componentGCProcessing = false;
+            	}
+        	}, 3000);
 	    }
     }
 };

@@ -31,8 +31,8 @@ public class InputErrorUITest extends WebDriverTestCase {
     final String ERR_CSS = "inputError";
     final String STATUS_ERROR = "Got Error";
     final String STATUS_CLEAR = "Cleared error";
-    final String URL = "/uitest/inputErrorTest.cmp";
-    final String URL_CST = "/uitest/inputErrorCustomTest.cmp";
+    final String URL = "/uitest/inputError_Test.cmp";
+    final String URL_CST = "/uitest/inputError_CustomTest.cmp";
     
 	public InputErrorUITest(String name) {
         super(name);

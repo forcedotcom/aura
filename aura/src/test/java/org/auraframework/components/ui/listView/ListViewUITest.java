@@ -29,13 +29,14 @@ import org.openqa.selenium.WebElement;
 public class ListViewUITest extends WebDriverTestCase {
 
     private final static String EMPTY_LIST_MESSAGE = "No records to display.";
+    private final String URL = "/uitest/listView_Test.app";
 
     public ListViewUITest(String name) {
         super(name);
     }
 
     public void testEmptyListGeneratedColumns() throws Exception {
-        open("/uitest/listViewTest.app");
+        open(URL);
         WebDriver driver = this.getDriver();
 
         WebElement tableElement = driver.findElement(By.id("ui:listView:test-empty-list-generated-columns"));
@@ -62,7 +63,7 @@ public class ListViewUITest extends WebDriverTestCase {
     }
 
     public void testEmptyListSpecifiedColumns() throws Exception {
-        open("/uitest/listViewTest.app");
+        open(URL);
         WebDriver driver = this.getDriver();
 
         WebElement tableElement = driver.findElement(By.id("ui:listView:test-empty-list-specified-columns"));
@@ -91,7 +92,7 @@ public class ListViewUITest extends WebDriverTestCase {
     }
 
     public void testListGeneratedColumns() throws Exception {
-        open("/uitest/listViewTest.app");
+        open(URL);
         WebDriver driver = this.getDriver();
 
         List<Map<String, String>> expectedData = ListViewTestData.GENERATED_LIST_DATA;
@@ -129,7 +130,7 @@ public class ListViewUITest extends WebDriverTestCase {
     }
 
     public void testListSpecifiedColumns() throws Exception {
-        open("/uitest/listViewTest.app");
+        open(URL);
         WebDriver driver = this.getDriver();
 
         List<Map<String, String>> expectedData = ListViewTestData.SPECIFIED_LIST_DATA;
@@ -203,7 +204,7 @@ public class ListViewUITest extends WebDriverTestCase {
     }
 
     public void testCellClickEvent() throws Exception {
-        open("/uitest/listViewTest.app");
+        open(URL);
 
         WebDriver driver = this.getDriver();
         WebElement tableElement = driver.findElement(By.id("ui:listView:test-list-events-webdriver-test"));
@@ -218,7 +219,7 @@ public class ListViewUITest extends WebDriverTestCase {
     // anyway though because the actual use case would be touch events instead of clicks.
     @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET })
     public void testHeaderClickEvent() throws Exception {
-        open("/uitest/listViewTest.app");
+        open(URL);
 
         WebDriver driver = this.getDriver();
         WebElement tableElement = driver.findElement(By.id("ui:listView:test-list-events-webdriver-test"));

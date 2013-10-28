@@ -19,7 +19,7 @@
     <aura:set attribute="title" value="ui:autocomplete"/>
 		 <p>Type <code>hello world</code> to test the <code>ui:autocomplete</code> components below.</p>
 		 <p> The data provider for this demo is available at
-		 <code>aura/src/test/components/uitest/testAutocompleteDataProvider</code> in the GitHub repo. This data is iterated over in a list by <code>ui:autocompleteList</code> in the <code>ui:autocomplete</code> component.
+		 <code>aura/src/test/components/uitest/autocomplete_TestDataProvider</code> in the GitHub repo. This data is iterated over in a list by <code>ui:autocompleteList</code> in the <code>ui:autocomplete</code> component.
 		 Clicking a list option fires the <code>selectListOption</code> event. You can retrieve the number of matches by using the <code>size</code> parameter in the <code>matchDone</code> event.</p>  
 		 
 		 <p>These demos show you how to use the <code>matchDone</code>, <code>inputChange</code>, and <code>selectListOption</code> events. The number of matches is displayed after <code>matchDone</code> is fired.</p>

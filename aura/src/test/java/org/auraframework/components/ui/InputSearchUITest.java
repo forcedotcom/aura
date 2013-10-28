@@ -39,7 +39,7 @@ public class InputSearchUITest extends WebDriverTestCase {
         String cmpValueExpression = auraUITestingUtil.prepareReturnStatement(auraUITestingUtil
                 .getValueFromRootExpr("v.value"));
         valueExpression = auraUITestingUtil.prepareReturnStatement(valueExpression);
-        open("/uitest/inputSearchHandlingSearchEvent.cmp");
+        open("/uitest/inputSearch_HandlingSearchEvent.cmp");
 
         WebElement input = auraUITestingUtil.findElementAndTypeEventNameInIt("search");
         assertFalse("Search event should not have been triggered yet",
@@ -58,7 +58,7 @@ public class InputSearchUITest extends WebDriverTestCase {
     public void testClearSelection() throws Exception {
         String valueExpression = auraUITestingUtil.getValueFromRootExpr("v.searched");
         valueExpression = auraUITestingUtil.prepareReturnStatement(valueExpression);
-        open("/uitest/inputSearchHandlingSearchEvent.cmp?showClear=true");
+        open("/uitest/inputSearch_HandlingSearchEvent.cmp?showClear=true");
 
         WebElement input = auraUITestingUtil.findElementAndTypeEventNameInIt("search");
         assertEquals("The initial value in input Search is wrong", "search", input.getAttribute("value"));

@@ -39,9 +39,9 @@ import org.openqa.selenium.WebElement;
 
 public class DialogUITest extends WebDriverTestCase {
 
-    private final String URL_MODAL = "/uitest/dialogModalTest.cmp";
-    private final String URL_NON_MODAL = "/uitest/dialogNonModalTest.cmp";
-    private final String URL_NON_MODAL_WITH_CHECKBOXES = "/uitest/dialogNonModalWCheckboxesTest.cmp";
+    private final String URL_MODAL = "/uitest/dialog_ModalTest.cmp";
+    private final String URL_NON_MODAL = "/uitest/dialog_NonModalTest.cmp";
+    private final String URL_NON_MODAL_WITH_CHECKBOXES = "/uitest/dialog_NonModalWCheckboxesTest.cmp";
     private final String CLASSNAME = "return $A.test.getActiveElement().className";
     private final String TITLE = "return $A.test.getActiveElement().title";
     private final String SHIFT_TAB = Keys.SHIFT + "" + Keys.TAB;

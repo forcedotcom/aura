@@ -45,7 +45,7 @@ public class InputCutCopyPasteUITest extends WebDriverTestCase {
         }
 
         WebDriver d = getDriver();
-        open("/uitest/inputCutCopyPasteEventTest.cmp");
+        open("/uitest/inputText_CutCopyPasteEventTest.cmp");
         WebElement input = d.findElement(By.xpath("//input"));
         WebElement output = d.findElement(By.xpath("//span[@class='uiOutputText']"));
         input.click();

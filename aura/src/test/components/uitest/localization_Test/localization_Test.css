@@ -13,13 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.components.ui.inputDate;
+div.uitestLocalization_Test {
+	background-color: #B0C4DE;
+	font-size: 12px;
+	font-weight: bold;
+	color: #039;
+}
 
-public class InputDateWithLabelUITest extends BaseInputDateUITester {
-
-    public InputDateWithLabelUITest(String name) {
-        super(name);
-        URL = "/uitest/datePicker_WithLabelTest.cmp";
-    }
-
+.uitestLocalization_Test#outSubmitCountDiv{
+	font-size: 10px;
+	color: #039;
+	background-color: #99CCFF;
+	left:0;
+	bottom:0;
+	position:fixed;
+	width:9%;
 }

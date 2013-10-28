@@ -19,6 +19,6 @@ public class InputDateUITest extends BaseInputDateUITester {
 
     public InputDateUITest(String name) {
         super(name);
-        URL = "/uitest/datePickerTest.cmp";
+        URL = "/uitest/datePicker_Test.cmp";
     }
 }

@@ -21,7 +21,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 public class TabsetUITest extends WebDriverTestCase {
-    private final String URL = "/uitest/tabsetTest.cmp";
+    private final String URL = "/uitest/tabset_Test.cmp";
 
     public TabsetUITest(String name) {
         super(name);

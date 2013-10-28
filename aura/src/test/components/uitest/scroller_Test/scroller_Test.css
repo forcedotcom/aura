@@ -13,13 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.components.ui.inputDate;
-
-public class InputDateWithLabelUITest extends BaseInputDateUITester {
-
-    public InputDateWithLabelUITest(String name) {
-        super(name);
-        URL = "/uitest/datePicker_WithLabelTest.cmp";
-    }
-
+.uitestScroller_Test.test {
+	height: 100px;
+	width: 200px;
+	border: solid 1px blue;
+	margin: 8px;
+	overflow: hidden;
 }
+

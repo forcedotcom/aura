@@ -65,7 +65,7 @@ public class ListViewTestData {
 
             // Keys in this map correspond to hard-wired fieldName attributes of
             // columns in a list in
-            // listViewTest.app. That list has nested columns, and only those
+            // listView_Test.app. That list has nested columns, and only those
             // columns that are leaf-node
             // level columns are keyed from here.
             row.put("third row 0, leaf 0", "row " + i + ", value 0");
@@ -82,7 +82,7 @@ public class ListViewTestData {
             Map<String, String> row = new HashMap<String, String>();
             // Keys in this map correspond to hard-wired fieldName attributes of
             // columns in a list in
-            // listViewTest.app. That list has nested columns, and only those
+            // listView_Test.app. That list has nested columns, and only those
             // columns that are non-leaf-node
             // level columns are keyed from here. Non-leaf-node columns
             // shouldn't be map-able to fields in the

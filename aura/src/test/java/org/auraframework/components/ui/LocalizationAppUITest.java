@@ -22,7 +22,7 @@ import org.openqa.selenium.WebElement;
 
 public class LocalizationAppUITest extends WebDriverTestCase {
 
-	public String URL = "/uitest/testLocalizationApp.app";
+	public String URL = "/uitest/localization_Test.app";
 	
 	public LocalizationAppUITest(String name) {
 		super(name);		

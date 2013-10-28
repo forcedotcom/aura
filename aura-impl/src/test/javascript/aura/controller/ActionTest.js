@@ -1566,10 +1566,6 @@ Test.Aura.Controller.ActionTest = function() {
 		}
 	}
 
-	// [Fixture]
-	// function GetRefreshAction(){
-	// }
-
 	[ Fixture ]
 	function SanitizeStoredResponse() {
 		[ Fact ]

@@ -21,10 +21,11 @@ Test.Aura.Controller.ActionCallbackGroupTest = function() {
 
 	var MockAction = function(id) {
 		this.id = id;
-		this.addCallbackGroup = function() {
-		};
-	}
-
+	};
+	MockAction.prototype.addCallbackGroup = function() {
+	};
+	var mockWindow = Mocks.GetMock(Object.Global(), "window", {});
+	
 	[Fixture]
 	function Constructor() {
 		[ Fact ]
@@ -42,8 +43,11 @@ Test.Aura.Controller.ActionCallbackGroupTest = function() {
 			var expected = function() {
 				return "expected";
 			};
+			var actual;
 
-			var actual = new ActionCallbackGroup([], null, expected).callback;
+			mockWindow(function() {
+			    actual = new ActionCallbackGroup([], null, expected).callback;
+			});
 
 			Assert.Equal(expected, actual);
 		}
@@ -51,9 +55,11 @@ Test.Aura.Controller.ActionCallbackGroupTest = function() {
 		[ Fact ]
 		function ExecutesCallbackIfActionsEmpty() {
 			var stubbedCallback = Stubs.GetMethod("param", null);
-
-			new ActionCallbackGroup([], null, stubbedCallback);
-
+			
+			mockWindow(function() {
+			    new ActionCallbackGroup([], null, stubbedCallback);
+			});
+			
 			Assert.Equal([ {
 				Arguments : {
 					param : {
@@ -94,7 +100,6 @@ Test.Aura.Controller.ActionCallbackGroupTest = function() {
 		[ Fact ]
 		function ExecutesCallbackWithWindowScopeIfScopeUndefined() {
 			var expected = "expected";
-			var mockWindow = Mocks.GetMock(Object.Global(), "window", {});
 			var callback = function() {
 				this.property = expected;
 			};
@@ -111,7 +116,6 @@ Test.Aura.Controller.ActionCallbackGroupTest = function() {
 		[ Fact ]
 		function ExecutesCallbackWithWindowScopeIfScopeNull() {
 			var expected = "expected";
-			var mockWindow = Mocks.GetMock(Object.Global(), "window", {});
 			var callback = function() {
 				this.property = expected;
 			};
@@ -127,8 +131,12 @@ Test.Aura.Controller.ActionCallbackGroupTest = function() {
 
 		[ Fact ]
 		function SetsEmptyActionsIfActionsEmpty() {
-			var actual = new ActionCallbackGroup([], null, function() {
-			}).actions;
+		    	var actual;
+		    
+		    	mockWindow(function() {
+        			actual = new ActionCallbackGroup([], null, function() {
+        			}).actions;
+		    	});
 
 			Assert.Equal([], actual);
 		}
@@ -257,13 +265,21 @@ Test.Aura.Controller.ActionCallbackGroupTest = function() {
 		}
 
 		[ Fact ]
-		function ExeutesCallbackIfLastActionCompleted() {
+		function ExecutesCallbackIfLastActionCompleted() {
+		    	//Arrange
 			var action = new MockAction();
 			var stubbedCallback = Stubs.GetMethod("param", null);
-			var group = new ActionCallbackGroup([ action ], null, stubbedCallback);
+			var group;
+			mockWindow(function() {
+			    group = new ActionCallbackGroup([ action ], null, stubbedCallback);
+			});
+			
+			//Act
+			mockWindow(function(){
+			    group.completeAction(action);
+			});
 
-			group.completeAction(action);
-
+			//Assert
 			Assert.Equal([ {
 				Arguments : {
 					param : {
@@ -315,7 +331,6 @@ Test.Aura.Controller.ActionCallbackGroupTest = function() {
 		function ExecutesCallbackWithWindowScopeIfScopeUndefined() {
 			var action = new MockAction();
 			var expected = "expected";
-			var mockWindow = Mocks.GetMock(Object.Global(), "window", {});
 			var callback = function() {
 				this.property = expected;
 			};
@@ -334,7 +349,6 @@ Test.Aura.Controller.ActionCallbackGroupTest = function() {
 		function ExecutesCallbackWithWindowScopeIfScopeNull() {
 			var action = new MockAction();
 			var expected = "expected";
-			var mockWindow = Mocks.GetMock(Object.Global(), "window", {});
 			var callback = function() {
 				this.property = expected;
 			};

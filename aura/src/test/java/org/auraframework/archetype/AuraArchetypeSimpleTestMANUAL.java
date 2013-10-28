@@ -16,10 +16,11 @@
 package org.auraframework.archetype;
 
 import com.google.common.collect.ImmutableList;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpGet;
-import org.auraframework.test.IntegrationTestCase;
+import org.auraframework.test.AuraHttpTestCase;
 import org.auraframework.test.annotation.UnAdaptableTest;
 import org.auraframework.util.IOUtil;
 
@@ -42,7 +43,7 @@ import java.util.List;
  * @since 0.0.178
  */
 @UnAdaptableTest
-public class AuraArchetypeSimpleTestMANUAL extends IntegrationTestCase {
+public class AuraArchetypeSimpleTestMANUAL extends AuraHttpTestCase {
     private static class MavenArtifact {
         private final String artifactId;
         private final String groupId;

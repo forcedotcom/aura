@@ -17,16 +17,15 @@
 Function.RegisterNamespace("Test.Aura.Controller");
 
 [Fixture]
+Test.Aura.Controller.ActionCollectorTest = function(){
 
-//Mock the exp() function defined in Aura.js, this is originally used for exposing members using a export.js file
-Mocks.GetMock(Object.Global(), "exp", function(){})(function(){
-    Mocks.GetMock(Object.Global(), "$A", function(){})(function(){
-        $A.ns = {};
+    //Mock the exp() function defined in Aura.js, this is originally used for exposing members using a export.js file
+    $A = {};
+    $A.ns = {};
+    Mocks.GetMock(Object.Global(), "exp", function(){})(function(){
         //#import aura.controller.ActionCollector
     });
-});
 
-Test.Aura.Controller.ActionCollectorTest = function(){
     [Fixture]
     function Constructor(){
         [Fact]

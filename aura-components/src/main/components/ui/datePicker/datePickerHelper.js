@@ -271,8 +271,6 @@
             var isPhone = $A.get("$Browser.isPhone");
             if (isPhone === true) {
                 this.attachToDocumentBody(component);
-                //var top = (document.documentElement && document.documentElement.scrollTop) || document.body.scrollTop;
-                //elem.style.top = top + "px";
                 var scrollerDivCmp = component.find("scroller");
                 var scrollerElem = scrollerDivCmp ? scrollerDivCmp.getElement() : null;
                 if (scrollerElem) { // Set scroller div height to make it scrollable.
@@ -287,16 +285,47 @@
                 elem.style.top = "auto";
                 var elemRect = elem.getBoundingClientRect();
                 if (elemRect.bottom > viewPort.height) { // no enough space below
-                    if (elemRect.height < elemRect.top) { // move above input field
-                        elem.style.top = 0 - elemRect.height + "px";
-                    } else { // no enough space above either. Put it in the middle of viewport
-                        elem.style.top = 0 - elemRect.top + "px";
-                    }
+                    elem.style.top = 0 - (elemRect.bottom - viewPort.height) + "px"; // Move it up a bit
                 } else {
                     elem.style.top = "auto"; 
                 }
             }
         }     
+    },
+    
+    refreshYearSelection: function(component) {
+        var minY = component.get("v.minYear");
+        if (!minY) {
+            minY = (new Date()).getFullYear() - 100;
+        }
+        var maxY = component.get("v.maxYear");
+        if (!maxY) {
+            maxY = (new Date()).getFullYear() + 30;
+        }
+        var yearTitleCmp = component.find("yearTitle");
+        if (yearTitleCmp) {
+            var body = yearTitleCmp.getValue("v.body");
+            body.clear();
+            for (var i = minY; i <= maxY; i++) {
+                $A.componentService.newComponentAsync(
+                    this,
+                    function(newcmp){
+            	        body.push(newcmp);
+                    },
+                    {
+                        "componentDef": "markup://ui:inputSelectOption",
+                        "attributes": {
+                            "values": { 
+                                "label": i + "",
+                                "value": false,
+                                "text": i + "",
+                                "disabled": false 
+                            }
+                        }
+                    }
+                );
+            }
+        }
     },
     
     setGridInitialValue: function(component) {
@@ -341,6 +370,11 @@
     },
     
     updateMonthYear: function(component, value) {
+        var isDesktop = $A.get("$Browser.formFactor") == "DESKTOP";
+        if (!isDesktop) { // mobile
+            this.updateMobileMonthYear(component, value);
+            return;
+        }
         var grid = component.find("grid");
         if (grid) {
             var titleCmp = component.find("calTitle");
@@ -356,5 +390,43 @@
                 }
             }
         }
-    } 
+    },
+    
+    updateMobileMonthYear: function(component, value) {
+        var grid = component.find("grid");
+        if (grid) {
+            var m = grid.get("v.month");
+            var y = grid.get("v.year");
+            var monthTitleCmp = component.find("monthTitle");
+            if (monthTitleCmp) {
+                var monthLabels = component.get("m.monthLabels");
+                monthTitleCmp.setValue("v.value", monthLabels[m].fullName); 
+            }
+            var yearTitleCmp = component.find("yearTitle");
+            if (yearTitleCmp) {
+                yearTitleCmp.setValue("v.value", y+"");
+                // For some reason, ui:inputSelect doesn't refresh on mobile,
+                // so we have to directly set DOM value here.
+                var selectCmp = yearTitleCmp.find("select");
+                var selectElem = selectCmp ? selectCmp.getElement() : null;
+                if (selectElem) {
+                    selectElem.value = y + "";
+                }
+            }   
+        }
+    },
+    
+    yearChange: function(component) {
+        var grid = component.find("grid");
+        var yearCmp = component.find("yearTitle");
+        if (grid && yearCmp) {
+            var e = grid.get("e.updateCalendar");
+            if (e) {
+                var y = parseInt(grid.get("v.year"));
+                var selectedYear = parseInt(yearCmp.get("v.value"));
+                e.setParams({monthChange: 0, yearChange: selectedYear - y, setFocus: false});
+                e.fire();
+            }
+        }
+    }
 })

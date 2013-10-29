@@ -28,6 +28,7 @@
     },
     
     doInit: function(component, event, helper) {
+        helper.refreshYearSelection(component);
         helper.localizeToday(component);
         component._windowSize = $A.util.getWindowSize();
     },
@@ -178,5 +179,9 @@
         var date = new Date();
         date.setFullYear(event.getParam("year"), event.getParam("month"));
         helper.updateMonthYear(component, date.getTime());
+    },
+    
+    yearChange: function(component, event, helper) {
+        helper.yearChange(component);
     }
 })

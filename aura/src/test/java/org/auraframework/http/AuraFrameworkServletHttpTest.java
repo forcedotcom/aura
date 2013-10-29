@@ -237,6 +237,17 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
     }
 
     /**
+     * Verify the Vary header is set to Accept-Encoding. This should be set for cacheable and compressed js/css files.
+     */
+    public void testHasVaryHeader() throws Exception {
+        HttpGet get = obtainNoncedGetMethod(sampleTextResourcePath, false);
+        HttpResponse response = perform(get);
+        Header varyHeader = response.getFirstHeader(HttpHeaders.VARY);
+        assertNotNull("Vary header is not set.", varyHeader);
+        assertEquals("Vary header set to wrong value.", "Accept-Encoding", varyHeader.getValue());
+    }
+
+    /**
      * Verify that AuraFrameworkServlet responds successfully to valid request for a binary resource.
      */
     public void testRequestBinaryResourceWithNonce() throws Exception {

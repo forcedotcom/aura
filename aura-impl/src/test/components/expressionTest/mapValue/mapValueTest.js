@@ -335,7 +335,6 @@
 //            $A.log("for destroy");
 //            val.destroy();
 //            this.assertChangeEvent(component, 1, val);
-
             $A.log("for updating value object of existing key")
             val = $A.expressionService.create(null, "costco");
             val.setValue("kirkland");
@@ -343,7 +342,7 @@
 
             $A.log("for updating existing key with a new value object");
             map.put("bagel", val);
-            this.assertChangeEvent(component, "bagel", val);
+            this.assertChangeEvent(component, "bagel", val.getValue());
             
             $A.log("for updating existing simple value of a key");
             val.setValue("Sarah Lee");

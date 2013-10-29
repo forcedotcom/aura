@@ -31,7 +31,7 @@
       function(cmp){
         var gvp = $A.getGlobalValueProviders();
         var tempLabel = gvp.getValue("$Label" + ".Related_Lists" + ".task_mode_today");
-        $A.test.assertEquals("[Related_Lists.task_mode_today]", tempLabel.getValue());
+        $A.test.assertEquals("[pending Related_Lists.task_mode_today]", tempLabel.getValue());
         $A.test.assertTrue($A.test.isActionPending(),
                 "Test Setup Failure: test expects the label to be fetched from server");
         $A.test.addWaitFor(

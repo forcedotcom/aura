@@ -477,28 +477,6 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
                 String.format("%s%s%s", jsToken, cssToken, fwToken),
                 output.getText());
         
-        //debug for flapper:
-        System.out.println("hardRefresh_touched:"
-        		+auraUITestingUtil.getRawEval("return window.localStorage.getItem('hardRefresh_touched');"));
-        System.out.println("handleAppcacheChecking:"
-        		+auraUITestingUtil.getRawEval("return window.localStorage.getItem('handleAppcacheChecking');"));
-        System.out.println("handleAppcacheUpdateReady:"
-        		+auraUITestingUtil.getRawEval("return window.localStorage.getItem('handleAppcacheUpdateReady');"));
-        System.out.println("handleAppcacheError:"
-        		+auraUITestingUtil.getRawEval("return window.localStorage.getItem('handleAppcacheError');"));
-        System.out.println("handleAppcacheError2:"
-        		+auraUITestingUtil.getRawEval("return window.localStorage.getItem('handleAppcacheError2');"));
-        System.out.println("handleAppcacheDownloading:"
-        		+auraUITestingUtil.getRawEval("return window.localStorage.getItem('handleAppcacheDownloading');"));
-        System.out.println("handleAppcacheProgress:"
-        		+auraUITestingUtil.getRawEval("return window.localStorage.getItem('handleAppcacheProgress');"));
-        System.out.println("handleAppcacheNoUpdate:"
-        		+auraUITestingUtil.getRawEval("return window.localStorage.getItem('handleAppcacheNoUpdate');"));
-        System.out.println("handleAppcacheCached:"
-        		+auraUITestingUtil.getRawEval("return window.localStorage.getItem('handleAppcacheCached');"));
-        System.out.println("handleAppcacheObsolete:"
-        		+auraUITestingUtil.getRawEval("return window.localStorage.getItem('handleAppcacheObsolete');"));
-
         return logs;
     }
 

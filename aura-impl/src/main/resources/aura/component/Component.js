@@ -447,13 +447,22 @@ Component.prototype.finishDestroy = function(){
  * act of doing an asynchronous destroy creates false 'races' because it leaves
  * all of the events wired up.</p>
  *
- * @param {Boolean} async Set to true if component should be destroyed asychronously. The default value is false.
+ * @param {Boolean} async Set to true if component should be destroyed asychronously. The default value is true.
  * @public
  */
 Component.prototype.destroy = function(async){
     var i;
 
+    //#if {"modes" : ["TESTING", "TESTINGDEBUG", "AUTOTESTING", "AUTOTESTINGDEBUG"]}
+	async = false; // Force synchronous destroy when in testing modes
+	//#end
+
     if (this.priv && !this._destroying){
+    	// Default to async destroy
+        if (async === undefined) {
+        	async = true;
+        }
+        
         var key;
 
         if (this.priv.docLevelHandlers !== undefined) {
@@ -464,6 +473,7 @@ Component.prototype.destroy = function(async){
                 }
             }
         }
+        
         if (async) {
         	this._scheduledForAsyncDestruction = true;
         	
@@ -473,6 +483,7 @@ Component.prototype.destroy = function(async){
                     element.style.display = "none";
                 }
             }
+            
             $A.util.destroyAsync(this);
 
             return null;
@@ -586,6 +597,7 @@ Component.prototype.destroy = function(async){
         this.priv = undefined;
         return globalId;
     }
+    
     return null;
 };
 

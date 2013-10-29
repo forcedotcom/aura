@@ -426,7 +426,7 @@ Test.Aura.Component.ComponentTest=function(){
 					};
 
 					target = new Component();
-					target.destroy();
+					target.destroy(false);
 				});
 			});
 

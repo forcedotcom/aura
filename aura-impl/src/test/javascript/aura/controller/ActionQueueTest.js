@@ -21,7 +21,12 @@ Test.Aura.Controller.ActionQueueTest = function() {
     // Mock the exp() function defined in Aura.js, this is originally used for exposing members using a export.js file
     Mocks.GetMock(Object.Global(), "exp", function() {
     })(function() {
+	// Action objects are used for tests here
+	// #import aura.controller.Action
+	
+	//This file is testing the implementation for ActionQueue, so import that
         // #import aura.controller.ActionQueue
+	
     });
 
     var serverDef = {

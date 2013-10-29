@@ -217,10 +217,11 @@
                                        <echo>Executing tests</echo>
                                        <switch value="${xunit.js.engine}">
                                            <case value="rhino">
-                                               <java classname="org.mozilla.javascript.tools.shell.Main" classpathref="maven.test.classpath" fork="true" failonerror="false" resultproperty="xunit.returnvalue" output="${project.build.directory}/xunitjs/rawresults.xml">
+                                               <java classname="org.mozilla.javascript.tools.shell.Main" classpathref="maven.test.classpath" fork="true" failonerror="false" resultproperty="xunit.returnvalue"  output="${project.build.directory}/xunitjs/rawresults.xml">
                                                    <jvmarg value="-Daura.home=${basedir}/.." />
                                                     <arg value="${xunit.js.console}" />
                                                     <arg value="/output:${xunit.js.format}" />
+                                                    <arg value="/strict:false" />
                                                     <arg value="/dependency:${basedir}/src/test/tools/xUnit/dependencies/" />
                                                     <arg value="${project.build.directory}/xunitjs/xunitTests" />
                                                </java>

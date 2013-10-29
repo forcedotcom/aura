@@ -24,8 +24,8 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 
 public class InputMultiSelectUITest extends WebDriverTestCase {
-    private final String[] URL = new String[] { "/uitest/inputMultiSelectTest.cmp",
-            "/uitest/inputMultiSelectNestedOptionsTest.cmp" };
+    private final String[] URL = new String[] { "/uitest/inputMultiSelect_Test.cmp",
+            "/uitest/inputMultiSelect_NestedOptionsTest.cmp" };
     private By outputLocator = By.xpath("//span[@class='uiOutputText']");
     private By selectLocator = By.xpath("//select[1]");
     private By submitLocator = By.xpath("//button");

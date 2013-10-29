@@ -33,8 +33,8 @@ import org.openqa.selenium.interactions.Actions;
 @TargetBrowsers({BrowserType.GOOGLECHROME, BrowserType.FIREFOX})
 public class MenuUITest extends WebDriverTestCase{
 
-	public static final String MENUTEST_APP = "/uitest/menuTest.app";
-	public static final String MENUTEST_METADATA_APP = "/uitest/menuMetadataTest.app";
+	public static final String MENUTEST_APP = "/uitest/menu_Test.app";
+	public static final String MENUTEST_METADATA_APP = "/uitest/menu_MetadataTest.app";
 	
 	public MenuUITest(String name) {
 		super(name);

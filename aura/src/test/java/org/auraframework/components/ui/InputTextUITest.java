@@ -31,8 +31,8 @@ import org.openqa.selenium.support.ui.ExpectedCondition;
  */
 public class InputTextUITest extends WebDriverTestCase {
 
-    public static final String TEST_CMP = "/uitest/inputtextupdateontest.cmp";
-    public static final String TEST_CMP_WITH_LABELS = "/uitest/inputtextupdateonwithlabeltest.cmp";
+    public static final String TEST_CMP = "/uitest/inputtext_updateontest.cmp";
+    public static final String TEST_CMP_WITH_LABELS = "/uitest/inputtext_updateonwithlabeltest.cmp";
 
     public InputTextUITest(String name) {
         super(name);
@@ -238,7 +238,7 @@ public class InputTextUITest extends WebDriverTestCase {
     @ExcludeBrowsers({ BrowserType.IPAD, BrowserType.IPHONE, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET,
             BrowserType.SAFARI })
     public void testMaxLength() throws Exception {
-        open("/uitest/inputTextMaxLength.cmp");
+        open("/uitest/inputText_MaxLength.cmp");
         WebElement input = findDomElement(By.cssSelector("input.uiInputText.uiInput"));
         input.click();
         input.sendKeys("1234567890");
@@ -246,7 +246,7 @@ public class InputTextUITest extends WebDriverTestCase {
     }
 
     public void testNoMaxLength() throws Exception {
-        open("/uitest/inputTextNoMaxLength.cmp");
+        open("/uitest/inputText_NoMaxLength.cmp");
         WebElement input = findDomElement(By.cssSelector("input.uiInputText.uiInput"));
         input.click();
         String inputText = "1234567890";

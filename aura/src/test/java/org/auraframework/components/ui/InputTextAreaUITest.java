@@ -24,7 +24,7 @@ import org.openqa.selenium.WebElement;
  */
 public class InputTextAreaUITest extends WebDriverTestCase {
 
-    public static final String TEST_CMP = "/uitest/inputTextAreaUpdateOnTest.cmp";
+    public static final String TEST_CMP = "/uitest/inputTextArea_UpdateOnTest.cmp";
 
     public InputTextAreaUITest(String name) {
         super(name);

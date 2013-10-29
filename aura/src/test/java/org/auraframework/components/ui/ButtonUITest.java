@@ -29,8 +29,8 @@ public class ButtonUITest extends WebDriverTestCase {
     }
 
     public void testButtonLabelRequired() throws Exception {
-        final String errorMsg = "COMPONENT markup://uitest:buttonLabelRequiredTest is missing required attribute 'label'";
-        openNoAura("/uitest/buttonLabelRequiredTest.cmp");
+        final String errorMsg = "COMPONENT markup://uitest:button_LabelRequiredTest is missing required attribute 'label'";
+        openNoAura("/uitest/button_LabelRequiredTest.cmp");
         auraUITestingUtil.waitForDocumentReady();
         WebDriverWait wait = new WebDriverWait(getDriver(), timeoutInSecs);
         wait.withMessage("Required label error not displayed");
@@ -43,7 +43,7 @@ public class ButtonUITest extends WebDriverTestCase {
     }
     
     public void testDomEventAttributeOnPressEvent() throws Exception {
-    	open("/uitest/buttonTest.cmp");
+    	open("/uitest/button_Test.cmp");
     	WebElement btn = findDomElement(By.cssSelector(".testDomEventBtn"));
     	btn.click();
     	

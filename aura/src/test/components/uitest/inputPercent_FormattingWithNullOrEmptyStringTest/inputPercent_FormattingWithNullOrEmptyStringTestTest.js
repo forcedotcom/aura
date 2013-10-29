@@ -13,13 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.components.ui.inputDate;
+({  
+	testEmptyInputPercent:{
+        test:function(cmp){
+            var testCmp = cmp.find('inputPercentEmpty');
+            aura.test.assertNotNull(testCmp);
+            aura.test.assertEquals('', testCmp.getElement().value, "Should have displayed a blank value.");
+        }
+    },
 
-public class InputDateWithLabelUITest extends BaseInputDateUITester {
-
-    public InputDateWithLabelUITest(String name) {
-        super(name);
-        URL = "/uitest/datePicker_WithLabelTest.cmp";
+	testNullInputPercent:{
+        test:function(cmp){
+            var testCmp = cmp.find('inputPercentNull');
+            aura.test.assertNotNull(testCmp);
+            aura.test.assertEquals('', testCmp.getElement().value, "Should have displayed a blank value.");
+        }
     }
-
-}
+})

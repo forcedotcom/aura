@@ -16,33 +16,37 @@
 /*
  * Copyright, 2013, salesforce.com All Rights Reserved Company Confidential
  */
-package org.auraframework.impl.javascript;
+package org.auraframework.util.resource;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 
-import junit.framework.TestCase;
-
-import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.test.UnitTestCase;
 
 /** Test class for the from-jars-only variation of an AuraJavascriptGroup */
-public class AuraJavascriptResourceGroupTest extends TestCase {
+public class CompiledGroupTest extends UnitTestCase {
 
-    private static class MockAJRG extends AuraJavascriptResourceGroup {
+    public static final String GROUP_NAME = "test-group";
+    public static final String SAVE_FILE = "test-group.properties";
+
+    private static class MockAJRG extends CompiledGroup {
         String props;
 
-        public MockAJRG(String hash, String lastMod) {
+        public MockAJRG(String name, String saveFileName, String hash, String lastMod) {
+
+            super(name, saveFileName);
+
             StringBuilder builder = new StringBuilder("# Header text\n");
             if (hash != null) {
-                builder.append(AuraJavascriptResourceGroup.UUID_PROPERTY);
+                builder.append(CompiledGroup.UUID_PROPERTY);
                 builder.append("=");
                 builder.append(hash);
                 builder.append("\n");
             }
             if (lastMod != null) {
-                builder.append(AuraJavascriptResourceGroup.LASTMOD_PROPERTY);
+                builder.append(CompiledGroup.LASTMOD_PROPERTY);
                 builder.append("=");
                 builder.append(lastMod);
                 builder.append("\n");
@@ -60,68 +64,62 @@ public class AuraJavascriptResourceGroupTest extends TestCase {
         }
     }
 
-    public void testWithRealProperties() throws Exception {
-        if (this.getClass().getResource(AuraJavascriptResourceGroup.VERSION_URI) == null) {
-            fail("Test run before GenerateJavascript has made " + AuraJavascriptResourceGroup.VERSION_URI);
-        }
-
-        AuraJavascriptResourceGroup ajrg = new AuraJavascriptResourceGroup();
-        AuraJavascriptGroup ajg = new AuraJavascriptGroup();
-
-        assertEquals(ajg.getGroupHash(), ajrg.getGroupHash());
-        assertEquals(ajg.getLastMod(), ajrg.getLastMod());
-    }
-
     public void testWithMockProperties() throws Exception {
-        AuraJavascriptResourceGroup ajrg = new MockAJRG("aMockHashValue", "23456789");
+        CompiledGroup ajrg = new MockAJRG(GROUP_NAME, SAVE_FILE, "aMockHashValue", "23456789");
         assertEquals("aMockHashValue", ajrg.getGroupHash().toString());
         assertEquals(23456789L, ajrg.getLastMod());
     }
 
     public void testThrowsWithoutProperties() throws Exception {
         try {
-            AuraJavascriptResourceGroup ajrg = new AuraJavascriptResourceGroup() {
+            CompiledGroup compiled = new CompiledGroup(GROUP_NAME, SAVE_FILE) {
                 @Override
                 protected InputStream getPropertyStream() {
                     return null;
                 }
             };
-            fail("Should not have constructed an AJRG without properties! fwuid=" + ajrg.getGroupHash().toString());
-        } catch (AuraRuntimeException e) {
-            assertTrue(e.getMessage().startsWith("Can't find " + AuraJavascriptResourceGroup.VERSION_URI));
+
+            compiled.getGroupHash();
+
+            fail("Exception expected for null file stream");
+        } catch (RuntimeException e) {
+            assertTrue(e.getMessage().startsWith("Can't find"));
+            assertTrue(e.getMessage().contains(SAVE_FILE));
         }
     }
 
     public void testThrowsWithBadLastMod() throws Exception {
         try {
-            AuraJavascriptResourceGroup ajrg = new MockAJRG("aMockHashValue", "BadNumberFormat");
-            fail("Should not have constructed an AJRG without properties! lastMod=" + ajrg.getLastMod());
-        } catch (AuraRuntimeException e) {
-            assertTrue(e.getMessage().startsWith("Can't parse "));
-            assertTrue(e.getMessage().contains(AuraJavascriptResourceGroup.VERSION_URI));
+            CompiledGroup compiled = new MockAJRG(GROUP_NAME, SAVE_FILE, "aMockHashValue", "BadNumberFormat");
+            compiled.getLastMod();
+            fail("Should have exception for bad number format");
+        } catch (NumberFormatException e) {
+            assertTrue(e.getMessage().contains("BadNumberFormat"));
         }
     }
 
     public void testThrowsWithoutHash() throws Exception {
         try {
-            AuraJavascriptResourceGroup ajrg = new MockAJRG(null, "12345");
-            fail("Should not have constructed an AJRG without properties! lastMod=" + ajrg.getLastMod());
-        } catch (AuraRuntimeException e) {
+            CompiledGroup compiled = new MockAJRG(GROUP_NAME, SAVE_FILE, null, "12345");
+            compiled.getGroupHash();
+            fail("Exception expected for null hash");
+        } catch (RuntimeException e) {
             assertTrue(e.getMessage().startsWith("Can't parse "));
-            assertTrue(e.getMessage().contains(AuraJavascriptResourceGroup.VERSION_URI));
+            assertTrue(e.getMessage().contains(SAVE_FILE));
         }
         try {
-            AuraJavascriptResourceGroup ajrg = new MockAJRG("", "12345");
-            fail("Should not have constructed an AJRG without properties! lastMod=" + ajrg.getLastMod());
-        } catch (AuraRuntimeException e) {
+            CompiledGroup compiled = new MockAJRG(GROUP_NAME, SAVE_FILE, "", "12345");
+            compiled.getGroupHash();
+            fail("Exception expected for empty hash string");
+        } catch (RuntimeException e) {
             assertTrue(e.getMessage().startsWith("Can't parse "));
-            assertTrue(e.getMessage().contains(AuraJavascriptResourceGroup.VERSION_URI));
+            assertTrue(e.getMessage().contains(SAVE_FILE));
         }
     }
 
     public void testThrowsIOError() throws Exception {
         try {
-            AuraJavascriptResourceGroup ajrg = new AuraJavascriptResourceGroup() {
+            CompiledGroup compiled = new CompiledGroup(GROUP_NAME, SAVE_FILE) {
                 @Override
                 protected InputStream getPropertyStream() {
                     return new InputStream() {
@@ -132,10 +130,11 @@ public class AuraJavascriptResourceGroupTest extends TestCase {
                     };
                 }
             };
-            fail("Should not have constructed an AJRG without properties! fwuid=" + ajrg.getGroupHash().toString());
-        } catch (AuraRuntimeException e) {
+            compiled.getGroupHash();
+            fail("IOException expected");
+        } catch (RuntimeException e) {
             assertTrue(e.getMessage().startsWith("Can't parse "));
-            assertTrue(e.getMessage().contains(AuraJavascriptResourceGroup.VERSION_URI));
+            assertTrue(e.getMessage().contains(SAVE_FILE));
             assertTrue(e.getCause() instanceof IOException);
         }
     }

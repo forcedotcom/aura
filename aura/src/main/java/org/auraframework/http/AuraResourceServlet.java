@@ -36,6 +36,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.auraframework.Aura;
+import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
@@ -328,6 +329,7 @@ public class AuraResourceServlet extends AuraBaseServlet {
             // need to make sure that they are in at least one place.
             //
             Map<String, Object> attribs = Maps.newHashMap();
+            ConfigAdapter config = Aura.getConfigAdapter();
             attribs.put(LAST_MOD,
                     String.format("app=%s, FW=%s", getContextAppUid(), Aura.getConfigAdapter().getAuraFrameworkNonce()));
             attribs.put(UID, getContextAppUid());

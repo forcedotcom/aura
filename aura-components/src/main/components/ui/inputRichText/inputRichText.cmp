@@ -15,6 +15,17 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:input" extensible="true" support="PROTO" description="An input field for entering rich text.">
-    <ui:underConstruction/>
+<aura:component extends="ui:inputTextArea"  extensible="true" description="An input field for entering rich text.">
+	<aura:attribute name="toolbar" type="String" default="basic" description="Specify the toolbar config to be used. Custom config can be added in inputRichTextHelper."/>
+	<aura:attribute name="toolbarLocation" type="String" default="top" description="Location of the toolbar. Possible options are &quot;top&quot; and &quot;bottom&quot;." /> 
+	
+	<aura:attribute name="width" type="String"  description="The editor UI outer width. This can be an integer, for pixel sizes, or any CSS-defined unit." />
+	<aura:attribute name="height" type="String" description="The height of the editing area (that includes the editor content). This can be an integer, for pixel sizes, or any CSS-defined length unit." />
+	
+	<aura:attribute name="isRichText" type="Boolean" default="true" description="Disable or enable rich text." />
+	<aura:attribute name="langLocale" type="String" description="The user interface language localization to use."/>
+	<aura:attribute name="editorConfiguration" type="Map" default="{}" description="Editor configuration settings." />	
+ 	
+ 	<aura:handler event="ui:toggleRichText" action="{!c.toggle}" description="Handler for ui:toggleRichText event" />
+ 	
 </aura:component>

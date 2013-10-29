@@ -533,6 +533,7 @@ public abstract class AuraBaseServlet extends HttpServlet {
 
         ret.add(config.getMomentJSURL());
         ret.addAll(config.getWalltimeJSURLs());
+        ret.add(config.getCKEditorURL());
 
         ret.add(config.getAuraJSURL());
 

@@ -1,0 +1,390 @@
+/*
+Copyright (c) 2003-2011, CKSource - Frederico Knabben. All rights reserved.
+For licensing, see LICENSE.html or http://ckeditor.com/license
+*/
+
+@media print
+{
+	/* For printing, we simply hide the toolbar */
+
+	.cke_skin_aura .cke_toolbox
+	{
+		display: none;
+	}
+}
+
+.cke_skin_aura .cke_browser_webkit .cke_toolbox,
+.cke_skin_aura .cke_browser_webkit .cke_toolbox > span
+{
+	white-space: normal;
+}
+
+.cke_skin_aura .cke_toolbox
+{
+	clear: both;
+	/* Define the padding-bottom otherwise the collapser button will not be clickable #4932*/
+	padding-bottom: 1px;
+}
+
+.cke_skin_aura a.cke_toolbox_collapser
+{
+	/* arrowtop.gif */
+	background-image: url(images/arrowbtn.gif);
+	_background-image: url(images/arrowbtn.gif);
+	background-position: 0 0; /* +3px +4px */
+	background-repeat: no-repeat;
+	width: 16px;
+	height: 16px;
+	float: right;
+	margin: 11px 0 2px;
+	cursor: pointer;
+}
+
+.cke_skin_aura a:hover.cke_toolbox_collapser
+{
+	/* arrowtop.gif */
+	background-image: url(images/arrowbtn.gif);
+	_background-image: url(images/arrowbtn.gif);
+	background-position: 0 -23px; /* +3px +4px */
+	background-repeat: no-repeat;
+	width: 16px;
+	height: 16px;
+	float: right;
+	margin: 11px 0 2px;
+	cursor: pointer;
+}
+
+.cke_skin_aura .cke_rtl a.cke_toolbox_collapser,
+.cke_skin_aura .cke_rtl a:hover.cke_toolbox_collapser
+{
+	float: left;
+}
+
+.cke_skin_aura a.cke_toolbox_collapser span
+{
+	display: none;
+}
+
+.cke_skin_aura .cke_hc a.cke_toolbox_collapser span
+{
+	font-size: 10px;
+	font-weight: bold;
+	font-family: Arial;
+	display: inline;
+}
+
+.cke_skin_aura a.cke_toolbox_collapser_min
+{
+	/* arrowleft.gif*/
+	background-image: url(images/arrowbtn.gif);
+	_background-image: url(images/arrowbtn.gif);
+	background-position: 0 -46px; /* +4px +3px */
+	background-repeat: no-repeat;
+	margin: 0 4px;
+}
+
+.cke_skin_aura a:hover.cke_toolbox_collapser_min
+{
+	/* arrowleft.gif*/
+	background-image: url(images/arrowbtn.gif);
+	_background-image: url(images/arrowbtn.gif);
+	background-position: 0 -69px; /* +4px +3px */
+	background-repeat: no-repeat;
+	margin: 0 4px;
+}
+
+.cke_skin_aura .cke_rtl a.cke_toolbox_collapser_min,
+.cke_skin_aura .cke_rtl a:hover.cke_toolbox_collapser_min
+{
+	/* arrowright.gif*/
+	background-position: 4px -1408px; /* +2px +3px */
+}
+
+.cke_skin_aura .cke_separator
+{
+	display: inline-block;
+	border-left: solid 1px #DBDBDB;
+	margin: 3px 3px 0;
+	height: 16px;
+
+	/* These are for IE < 8, but it's ok for the others */
+	vertical-align: top;
+}
+
+.cke_skin_aura .cke_break
+{
+	font-size: 0;
+	clear: left;
+}
+
+.cke_skin_aura .cke_rtl .cke_break
+{
+	clear: right;
+}
+
+.cke_skin_aura .cke_toolbar_start
+{
+	display: none;
+}
+
+.cke_skin_aura .cke_toolgroup
+{
+	-moz-border-radius:3px;
+	-webkit-border-radius: 3px;
+	border-radius: 3px;
+	background-image: url(images/boxgradient.png);
+	_background-image: url(images/boxgradient.png);
+	background-repeat: repeat-x;
+	background-position: 0 0;
+	float: left;
+	margin-right: 6px;
+	margin-bottom: 5px;
+	padding: 2px;
+	display: inline;
+	height: 24px;
+	border: 1px solid #dbdbdb;
+}
+
+.cke_skin_aura .cke_rtl .cke_toolgroup
+{
+	float: right;
+	margin-right: 0;
+	margin-left: 6px;
+}
+
+.cke_skin_aura .cke_button a,
+.cke_skin_aura .cke_button a:hover,
+.cke_skin_aura .cke_button a:focus,
+.cke_skin_aura .cke_button a:active,
+.cke_skin_aura .cke_button a.cke_off
+{
+	border-radius: 3px;
+	outline: none;
+	padding: 2px 4px;
+	height: 20px;
+	display: inline-block;
+	cursor: default;
+	border: 1px solid transparent;
+}
+
+.cke_skin_aura .cke_browser_ie6 .cke_button a
+{
+    border: 1px solid #fff;
+}
+
+.cke_skin_aura .cke_button a,
+.cke_skin_aura .cke_button a.cke_off
+{
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+}
+
+.cke_skin_aura .cke_hc .cke_button a,
+.cke_skin_aura .cke_hc .cke_button a.cke_off
+{
+	border: 1px solid white;
+}
+
+.cke_skin_aura .cke_button a.cke_on
+{
+	background-color: #a3d7ff;
+	padding: 2px 4px;
+}
+
+.cke_skin_aura .cke_hc .cke_button a.cke_on
+{
+	padding: 0 2px !important;
+	border-width: 3px;
+}
+
+.cke_skin_aura .cke_button a:hover.cke_on,
+.cke_skin_aura .cke_button a:focus.cke_on,
+.cke_skin_aura .cke_button a:active.cke_on,	/* IE */
+.cke_skin_aura .cke_button a:hover.cke_off,
+.cke_skin_aura .cke_button a:focus.cke_off,
+.cke_skin_aura .cke_button a:active.cke_off	/* IE */
+{
+	padding: 2px 4px;
+}
+
+.cke_skin_aura .cke_button a:hover,
+.cke_skin_aura .cke_button a:focus,
+.cke_skin_aura .cke_button a:active	/* IE */
+{
+	background-color: #e3f3ff;
+	border: 1px solid #99ccff;
+}
+
+.cke_skin_aura .cke_button a:hover.cke_on,
+.cke_skin_aura .cke_button a:focus.cke_on,
+.cke_skin_aura .cke_button a:active.cke_on	/* IE */
+{
+	background-color: #86caff;
+}
+
+.cke_skin_aura .cke_hc .cke_button a:hover,
+.cke_skin_aura .cke_hc .cke_button a:focus,
+.cke_skin_aura .cke_hc .cke_button a:active	/* IE */
+{
+	padding: 0 2px !important;
+	border-width: 3px;
+}
+
+.cke_skin_aura .cke_button .cke_icon
+{
+    background-image: url(icons.png);
+    _background-image: url(icons.gif);
+	background-position: 100px;
+	background-repeat: no-repeat;
+	margin-top: 1px;
+	width: 16px;
+	height: 16px;
+	display: inline-block;
+	cursor: default;
+}
+
+.cke_skin_aura .cke_rtl .cke_button .cke_icon
+{
+	background-image: url(icons_rtl.png);
+}
+.cke_skin_aura .cke_browser_ie6 .cke_button .cke_icon,
+.cke_skin_aura .cke_browser_ie6 .cke_rtl .cke_button .cke_icon,
+.cke_skin_aura .cke_browser_ie .cke_button.cke_noalphafix .cke_icon,
+.cke_skin_aura .cke_browser_ie .cke_rtl .cke_button.cke_noalphafix .cke_icon
+{
+	filter: ;
+}
+
+
+.cke_skin_aura .cke_button .cke_label
+{
+	cursor: default;
+	display: none;
+	padding-left: 3px;
+	line-height: 18px;
+}
+
+.cke_skin_aura .cke_hc .cke_button .cke_label
+{
+	padding: 0;
+	display: inline-block;
+}
+
+.cke_skin_aura .cke_hc .cke_button .cke_icon
+{
+	display: none;
+}
+
+.cke_skin_aura .cke_accessibility
+{
+	position: absolute;
+	display: block;
+	width: 0;
+	height: 0;
+	overflow: hidden;
+}
+
+.cke_skin_aura .cke_button .cke_buttonarrow
+{
+	display: inline-block;
+	height: 17px;
+	width: 8px;
+	background-position: 2px -1469px; /* (+2, -5) */
+	background-image: url(images/sprites.png);
+	_background-image: url(images/sprites_ie6.png);
+	background-repeat: no-repeat;
+	cursor: default;
+}
+
+/* IE with zoom != 100% will distort the icons otherwise #4821 */
+.cke_skin_aura .cke_browser_ie .cke_button .cke_buttonarrow
+{
+	filter: progid:DXImageTranauraorm.Microsoft.AlphaImageLoader(sizingMethod='scale');
+}
+.cke_skin_aura .cke_browser_ie6 .cke_button .cke_buttonarrow
+{
+	filter: ;
+}
+
+/*** Firefox 2 ***/
+
+.cke_skin_aura .cke_browser_gecko .cke_toolbar,
+.cke_skin_aura .cke_browser_gecko .cke_button a,
+.cke_skin_aura .cke_browser_gecko .cke_button a.cke_off,
+.cke_skin_aura .cke_browser_gecko .cke_button .cke_icon,
+.cke_skin_aura .cke_browser_gecko .cke_button .cke_buttonarrow,
+.cke_skin_aura .cke_browser_gecko .cke_separator,
+.cke_skin_aura .cke_browser_gecko .cke_toolbar_start
+{
+	display: block;
+	float: left;
+}
+
+.cke_skin_aura .cke_browser_gecko.cke_hc .cke_button .cke_icon
+{
+	display: none;
+}
+
+.cke_skin_aura .cke_browser_gecko .cke_rtl .cke_toolbar,
+.cke_skin_aura .cke_browser_gecko .cke_rtl .cke_button a,
+.cke_skin_aura .cke_browser_gecko .cke_rtl.cke_button a.cke_off,
+.cke_skin_aura .cke_browser_gecko .cke_rtl .cke_button .cke_icon,
+.cke_skin_aura .cke_browser_gecko .cke_rtl .cke_button .cke_buttonarrow,
+.cke_skin_aura .cke_browser_gecko .cke_rtl .cke_separator,
+.cke_skin_aura .cke_browser_gecko .cke_rtl .cke_toolbar_start
+{
+	float: right;
+}
+
+.cke_skin_aura .cke_browser_gecko .cke_button .cke_label,
+.cke_skin_aura .cke_browser_gecko .cke_break
+{
+	float: left;
+}
+
+.cke_skin_aura .cke_browser_gecko .cke_rtl .cke_button .cke_label,
+.cke_skin_aura .cke_browser_gecko .cke_rtl .cke_break
+{
+	float: right;
+}
+
+/*** WebKit ***/
+
+/* We have originally used display:inline-block+float for cke_toolbar and it
+   worked well in all browsers, except IE+RTL. We had to change it to inline
+   and remove the float. This change didn't play well with Safari. */
+
+.cke_skin_aura .cke_browser_webkit .cke_toolbar
+{
+	float: left;
+}
+
+.cke_skin_aura .cke_browser_webkit .cke_rtl .cke_toolbar
+{
+	float: right;
+}
+
+/*** Mixed Fixes ***/
+
+.cke_skin_aura .cke_browser_ie .cke_button .cke_label
+{
+	line-height: 16px;
+}
+
+/* Fix cursor shape consistency on toolbar combos (#4031) */
+.cke_skin_aura .cke_browser_ie .cke_rcombo,
+.cke_skin_aura .cke_browser_ie .cke_rcombo *
+{
+	cursor: default;
+}
+
+.cke_skin_aura .cke_browser_ie .cke_toolbox
+{
+	padding-bottom: 5px;
+	_padding-bottom: 6px;
+}
+
+.cke_shared .cke_skin_aura .cke_browser_ie .cke_toolbox
+{
+	padding-bottom: 0;
+}

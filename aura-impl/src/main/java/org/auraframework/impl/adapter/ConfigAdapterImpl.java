@@ -197,6 +197,13 @@ public class ConfigAdapterImpl implements ConfigAdapter {
         urls.add(String.format("%s/auraFW/resources/%s/walltime-js/walltime.js?aura.fwuid=%s", contextPath, nonce, nonce));
         return urls;
     }
+    
+    @Override
+    public String getCKEditorURL() {
+    	String nonce = Aura.getContextService().getCurrentContext().getFrameworkUID();
+        String contextPath = Aura.getContextService().getCurrentContext().getContextPath();        
+        return String.format("%s/auraFW/resources/%s/ckeditor-3.6.6/ckeditor.js?aura.fwuid=%s", contextPath, nonce, nonce);
+    }
 
     @Override
     public String getHTML5ShivURL() {

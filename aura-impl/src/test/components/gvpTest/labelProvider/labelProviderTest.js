@@ -141,7 +141,6 @@
             //Fetch a new label from server
             function (cmp) {
                 var gvp = $A.getGlobalValueProviders();
-                cmp._callBack = false;
                 gvp.get("$Label.Related_Lists.FooBar", undefined,
                     function (label) {
                         cmp._callBack = true;
@@ -157,7 +156,7 @@
                         $A.test.assertTrue(
                             cmp._label === "FIXME - LocalizationAdapter.getLabel() needs implementation!" ||
                             cmp._label === "__MISSING LABEL__ PropertyFile - val FooBar not found in section Related_Lists",
-                            "$Label.Related_Lists.FooBar should have error value, found '" + cmp._label + "'"
+                            "$Label.Related_Lists.FooBar should have error value"
                         );
                     })
             },

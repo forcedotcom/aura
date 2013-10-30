@@ -19,35 +19,49 @@
  * @constructor
  */
 $A.ns.LabelValueProvider = function() {
-    this.values = undefined;
+    this.values = null;
     this.queue = {};
 };
 
+/**
+ * Checks value is not defined or SimpleValue is not defined
+ *
+ * @param value
+ * @return {boolean}
+ * @private
+ */
+$A.ns.LabelValueProvider.prototype.isUndefinedSimpleValue = function(value) {
+    return (!value || (value.toString() === "SimpleValue" && !value.isDefined()));
+};
 
 /**
  * Performs LabelController.getLabel action to get specified section and name.
- * Sets up label queue so that server action for the same label is only
- * requested once.  And results are cached when AuraContext is joined, so the
- * queue only merges simultaneously-outstanding requests; future ones hit the
- * cached entry.
+ * Sets up label queue so that server action for the same label is only requested once
  *
  * @param section
  * @param name
- * @param [dest] value to hold result
+ * @param [component] component owner
  * @param [callback]
+ * @return {SimpleValue}
  * @private
  */
-$A.ns.LabelValueProvider.prototype.requestServerLabel = function(section, name, dest, callback) {
+$A.ns.LabelValueProvider.prototype.requestServerLabel = function(section, name, component, callback) {
 
     var lvp = this,
-        queue = this.getQueue(section, name);
+        queue = this.getQueue(section, name),
+        isComponent = $A.util.isComponent(component),
+        placeholder = $A.getContext().getMode() === "PROD" ? "" : "[" + section + "." + name + "]",
+        resValue = valueFactory.create(placeholder, null, isComponent ? component : null);
 
-    if (dest) {
-        queue.addReturnValue(dest);
+    if (isComponent) {
+        queue.addComponent(component);
     }
+
     if ($A.util.isFunction(callback)) {
         queue.addCallback(callback);
     }
+
+    queue.addReturnValue(resValue);
 
     if (!queue.isRequested()) {
 
@@ -74,7 +88,7 @@ $A.ns.LabelValueProvider.prototype.requestServerLabel = function(section, name, 
             var callbacks = queue.getCallbacks();
 
             for (i = 0; i < callbacks.length; i++) {
-                callbacks[i].call(null, a.getReturnValue());
+                callbacks[i].call(null, resValue);
             }
 
             lvp.removeQueue(section, name);
@@ -82,13 +96,16 @@ $A.ns.LabelValueProvider.prototype.requestServerLabel = function(section, name, 
 
         $A.enqueueAction(action);
 
-        if (!dest || !dest.owner) {
+        if (!isComponent) {
             // forces immediate lookup if not data-bound to component
-            $A.run(function() {}, "LabelValueProvider.requestServerLabel");
+        	$A.run(function() {}, "LabelValueProvider.requestServerLabel");
         }
 
         queue.setRequested();
     }
+
+    return resValue;
+
 };
 
 /**
@@ -144,74 +161,54 @@ $A.ns.LabelValueProvider.prototype.getValues = function() {
 /**
  * Loops through existing values to find value. If no value found, send request to server
  *
- * @deprecated prefer setValue
  * @param expression
- * @param [component] component to mark dirty when value is retrieved
- * @param [callback] callback after value is retrieved
- * @return a new {SimpleValue}, which will get the actual value some time later.  It
- *     initially has a placeholder string only.
+ * @param [component]
+ * @param [callback]
+ * @return {SimpleValue}
  */
 $A.ns.LabelValueProvider.prototype.getValue = function(expression, component, callback) {
-    if(!expression.path || expression.path.length != 3) {
-        $A.log("$Label requests must have both section and name");
-        return;
-    }
-    var stem = expression.getStem(),
-        section = stem.path[0],
-        name = stem.path[1];
-    var placeholder = $A.getContext().getMode() === "PROD" ? "" : "[pending " + section + "." + name + "]";
-    var value = valueFactory.create(placeholder, null, component ? component : null);
-    this.setValue(expression, value,  callback);
-    return value;
-};
-
-/**
- * Loops through existing values to find value. If no value found, send request to server
- *
- * @param expression
- * @param [dest] The desired destination value to assign.  May be undefined or null to not
- *     assign at all.
- * @param [callback] A callback to call after assigning dest.
- */
-$A.ns.LabelValueProvider.prototype.setValue = function(expression, dest, callback) {
-
-    if(!expression.path || expression.path.length != 3) {
-        $A.log("$Label requests must have both section and name");
-        return;
-    }
 
     var value;
-    var stem = expression.getStem(),
-    section = stem.path[0],
-    name = stem.path[1];
 
-    if (this.values) {
-        // Check for an existing cached value
-        value = this.values;
-        var propRef = expression.getStem();
-        while (!$A.util.isUndefinedOrNull(propRef)) {
-            var root = propRef.getRoot();
-            value = value.getValue(root);
-            if (!value || value instanceof SimpleValue && !value.isDefined()) {
-                // the value should be a Value Object. If not, we'll end with value
-                // as undefined, and we're done.  Values are entered for cache when
-                // the Aura context is joined.
-                value = undefined;
-                break;
+    if(expression.path && expression.path.length == 3) {
+
+        var stem = expression.getStem(),
+            section = stem.path[0],
+            name = stem.path[1];
+
+        if( this.values ) {
+            value = this.values;
+            var propRef = expression.getStem();
+            while (!$A.util.isUndefinedOrNull(propRef)) {
+                var root = propRef.getRoot();
+                value = value.getValue(root);
+                if(!value) {
+                    // the value should be a Value Object. if not, set as undefined and done.
+                    value = undefined;
+                    break;
+                }
+                propRef = propRef.getStem();
             }
-            propRef = propRef.getStem();
         }
+
+        if(this.isUndefinedSimpleValue(value)) {
+            // request from server if no value found in existing gvps
+            value = this.requestServerLabel(section, name, component, callback);
+        } else {
+
+            if ($A.util.isValue(value) && $A.util.isComponent(component)) {
+                // create new value object with reference to owner component
+                value = valueFactory.create(value.unwrap(), null, component);
+            }
+
+            if( $A.util.isFunction(callback) ) {
+                callback.call(null, value);
+            }
+
+        }
+    } else {
+        $A.log("$Label requests must have both section and name");
     }
 
-    if (!value) {
-        // request from server if no value found in existing gvps
-        this.requestServerLabel(section, name, dest, callback);
-    } else {
-        if ($A.util.isValue(dest)) {
-            dest.setValue(value);
-        }
-        if( $A.util.isFunction(callback) ) {
-            callback.call(null, value);
-        }
-    }
+    return value;
 };

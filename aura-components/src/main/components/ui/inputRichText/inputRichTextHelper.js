@@ -79,14 +79,14 @@
 	 *
 	 */
 	initEditor : function(cmp) {
-		var self = this,		
-			editorId = this.getEditorId(cmp),
-			editorInstance = CKEDITOR.instances[editorId];
-		 
-		if (!editorInstance) {
-			var helper = cmp.getConcreteComponent().getDef().getHelper() || this;
-			var editorConfig = helper.getEditorConfig(cmp);
-			editorInstance = CKEDITOR.replace(editorId, editorConfig);
+		if (cmp.getValue('v.isRichText').getBooleanValue()) {
+			var editorId = this.getEditorId(cmp),		
+				editorInstance = CKEDITOR.instances[editorId];
+			
+			if (!editorInstance) {			
+				var helper = cmp.getConcreteComponent().getDef().getHelper() || this;				
+				editorInstance = CKEDITOR.replace(editorId,  helper.getEditorConfig(cmp));
+			}
 		}
 	},
 		
@@ -96,7 +96,7 @@
 		if (isRichText && !cmp.get('v.isRichText')) {
 			cmp.getValue('v.isRichText').setValue(isRichText);
 			if (!CKEDITOR.instances[editorId]) {
-				this.initializeCKEditor(cmp);
+				this.initEditor(cmp);
 			}
 		}
 		else if (!isRichText && cmp.get('v.isRichText')) {
@@ -141,11 +141,7 @@
 	},
 	
 	getLocale : function(cmp) {
-		var langLocale = cmp.get("v.langLocale");
-        if (!langLocale) {
-            langLocale = $A.getGlobalValueProviders().get("$Locale.langLocale");
-        }
-        return langLocale;
+		return $A.getGlobalValueProviders().get("$Locale.langLocale");
 	},
 	
 	/**
@@ -244,7 +240,7 @@
 	               	 {name: 'links',       items : [ 'Link','Unlink','Anchor']},
 	               	 {name: 'insert', items : ['Image']},
 	               	 {name: 'paragraph', items : ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'Indent', 'Outdent', 'BulletedList', 'NumberedList']},
-	               	 {name: 'styles', items : [ 'Styles','Format','Font','FontSize' ] },
+	               	 {name: 'styles', items : [ 'Styles','Format','Font','FontSize' ] }
 	            ]; 
 			}
 			toolbarConfig = this.standardToolbarConfig;			 

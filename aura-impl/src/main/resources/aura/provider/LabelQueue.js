@@ -25,6 +25,22 @@ $A.ns.LabelQueue = function() {
 };
 
 /**
+ * Getter components
+ * @return {Array}
+ */
+$A.ns.LabelQueue.prototype.getComponents = function() {
+    return this.components;
+};
+
+/**
+ * Add component to component array
+ * @param component
+ */
+$A.ns.LabelQueue.prototype.addComponent = function(component) {
+    this.components.push(component);
+};
+
+/**
  * Getter SimpleValues
  * @return {Array}
  */
@@ -75,6 +91,7 @@ $A.ns.LabelQueue.prototype.isRequested = function() {
  * Resets / Initializes queue variables
  */
 $A.ns.LabelQueue.prototype.reset = function() {
+    this.components = [];
     this.callbacks = [];
     this.returnValues = [];
     this.requested = false;

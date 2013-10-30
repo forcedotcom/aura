@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.components.ui;
+package org.auraframework.components.ui.inputMultiSelect;
 
 import java.util.List;
 

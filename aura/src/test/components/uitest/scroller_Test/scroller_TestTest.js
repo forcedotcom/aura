@@ -73,6 +73,32 @@
         }
     },
     
+    testToggleCanShowMore: {
+    browsers: ["-IE7","-IE8"],
+        test: [function(component) {
+            // Make sure the "pull to show more" div exists
+        	var scroller = component.find("scrollToYTest");
+            var pullUpDiv = scroller.find("pullUp").getElement();
+            $A.test.assertNotNull(pullUpDiv, "There should be a 'pullUp' div");
+            
+            // toggle canShowMore dynamiclly
+            scroller.getValue("v.canShowMore").setValue(false);
+        }, function(component) {
+        	// Now the "pull to show more" div should not exists
+        	var scroller = component.find("scrollToYTest");
+            var pullUpDiv = scroller.find("pullUp").getElement();
+            $A.test.assertFalse(scroller.get("v.canShowMore"), "canShowMore should have been disabled");
+            $A.test.assertNull(pullUpDiv, "There should NOT be a 'pullUp' div");
+            
+            // toggle canShowMore again
+            scroller.getValue("v.canShowMore").setValue(true);
+        }, function(component) {
+        	// "pull to show more" div should be present again
+        	var pullUpDiv = component.find("scrollToYTest").find("pullUp").getElement();
+            $A.test.assertNotNull(pullUpDiv, "There should be a 'pullUp' div");
+        }]        
+    },
+    
     testScrollToBot : {
 	  	browsers: ["-IE7","-IE8"],
 	  	test: function(component) {

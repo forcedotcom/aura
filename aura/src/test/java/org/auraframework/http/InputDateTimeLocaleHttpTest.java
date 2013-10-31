@@ -21,7 +21,7 @@ import java.util.Map;
 import org.apache.http.*;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.message.BasicHeader;
-import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.ComponentDef;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.AuraHttpTestCase;
@@ -87,7 +87,7 @@ public class InputDateTimeLocaleHttpTest extends AuraHttpTestCase{
      */
     public void testCheckLocaleForDatePicker() throws Exception{
         Header[] headers = new Header[]{ new BasicHeader(HttpHeaders.ACCEPT_LANGUAGE, locale) };
-        HttpGet auraGet = this.obtainAuraGetMethod(Mode.DEV, Format.JSON, "uiTest:datePicker_Test", ApplicationDef.class,
+        HttpGet auraGet = this.obtainAuraGetMethod(Mode.DEV, Format.JSON, "uiTest:datePicker_Test", ComponentDef.class,
                 ImmutableMap.of("visible", "true"), headers);
         checkValues(dayOfWeek, month, auraGet);
     }

@@ -247,7 +247,7 @@
 			break;
 		case 'full' :
 			if (!this.fullToolbarConfig) {
-				this.basicToolbarConfig = [
+				this.fullToolbarConfig = [
 			        { name: 'clipboard',   items : [ 'Cut','Copy','Paste','PasteText','PasteFromWord','-','Undo','Redo' ] },
 			        { name: 'editing',     items : [ 'Find','Replace','-','SelectAll','-','SpellChecker', 'Scayt' ] },
 			        { name: 'forms',       items : [ 'Form', 'Checkbox', 'Radio', 'TextField', 'Textarea', 'Select', 'Button', 'ImageButton', 'HiddenField' ] },

@@ -773,7 +773,12 @@ var Test = function(){
             // Now lets see if there is a corresponding private (obfuscated) version that we also need to mock
             var nonExportedFunctionName;
             for (var key in instance) {
-            	var f = instance[key];
+                try {
+                    var f = instance[key];
+                } catch (e) {
+                    // IE: Handle "Unspecified error" for properties like "fileCreatedDate"
+                    continue;
+                }
             	if (key !== name && f === originalFunction) { 
             		nonExportedFunctionName = key;
                     instance[key] = newFunction;

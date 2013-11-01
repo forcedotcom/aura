@@ -688,16 +688,19 @@ function(name, ve, config) {
                     
                     if (casedName === "checked"){
                     	ret.setAttribute("defaultChecked", true);
-                	}
+                    }
                 }
             } else {
                 
                 
                 
                 if (!aura.util.isUndefined(value) && !($A.util.isIE && this.isInputNullValue(ret.tagName, name, value))) {
-                	var casedAttribute = this.caseAttribute(name);
+                    var casedAttribute = this.caseAttribute(name);
                     var lowerName = name.toLowerCase();
-                    if (lowerName === "type" || lowerName === "href" || lowerName === "style" || lowerName.indexOf("data-") === 0) { 
+                    if (lowerName === "style" && $A.util.isIE) {
+                        ret.style.cssText = value;
+                    } else if (lowerName === "type" || lowerName === "href" || lowerName === "style" || lowerName.indexOf("data-") === 0) {
+                        
                         ret.setAttribute(casedAttribute, value);
                     } else {
                         ret[casedAttribute] = value;

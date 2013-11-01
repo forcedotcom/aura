@@ -16,7 +16,7 @@
 
 -->
 <aura:component render="client">
-	<aura:attribute name="classValue" type="String"/>
+    <aura:attribute name="classValue" type="String"/>
     <a aura:id="nohash" href="http://www.salesforce.com/">salesforce</a>
     <a aura:id="hashString" href="#layout">layout</a>
     <a aura:id="hash" href="#">hash</a>

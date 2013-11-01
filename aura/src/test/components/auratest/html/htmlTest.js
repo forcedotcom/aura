@@ -106,9 +106,9 @@
     },
 
     assertClassUpdate : function(component, newValue) {
-		component.getValue("v.classValue").setValue(newValue);
-		$A.rerender(component);
-		$A.test.assertEquals(newValue ? newValue : "", component.find("hasClass").getElement().className);
+        component.getValue("v.classValue").setValue(newValue);
+        $A.rerender(component);
+        $A.test.assertEquals(newValue ? newValue : "", component.find("hasClass").getElement().className);
     },
     
     /**
@@ -127,46 +127,60 @@
     testRerenderUpdatedClassAttribute: {
     	attributes: { classValue : "upper" },
     	test: function(component) {
-    		$A.test.assertEquals("upper", component.find("hasClass").getElement().className, "initial class not set");
-	    	this.assertClassUpdate(component, "");
-	    	this.assertClassUpdate(component, "middle");
-	    	this.assertClassUpdate(component, null);
-	    	this.assertClassUpdate(component, "lower");
-	    	this.assertClassUpdate(component);
+            $A.test.assertEquals("upper", component.find("hasClass").getElement().className, "initial class not set");
+            this.assertClassUpdate(component, "");
+            this.assertClassUpdate(component, "middle");
+            this.assertClassUpdate(component, null);
+            this.assertClassUpdate(component, "lower");
+            this.assertClassUpdate(component);
     	}
     },
 
     /**
      * Verify rerender of special html attributes
      * type, href, style and data attributes must be set by using setAttribute() on dom elements
-     * 
-     * Ie7 does not support setting inline style attribute with a string. It is of type object. 
-     * To set it, we would need to set style.stylsheet.cssText equal to the css sytle that we want. 
-     * Disabling it until it is fixed
-     * W-1911367
      */
     testRerenderSpecialHtmlAttributes:{
-	browsers: ["-IE7"],
-		test:function(component){
-		    var input = component.find("specialAttributes_input").getElement();
-		    $A.test.assertEquals("textElement" , input.getAttribute("data-name"), "Failed to render data attribute");
-		    $A.test.assertEquals("color:blue" , input.getAttribute("style").replace(/[ ;]/g,"").toLowerCase(), "Failed to render style attribute");
-		    
-		    var a = component.find("specialAttributes_a").getElement();
-		    $A.test.assertEquals("http://bazinga.com/" , a.getAttribute("href"), "Failed to render href attribute");
-		    
-		    component.getAttributes().setValue("style", "color:green");
-		    component.getAttributes().setValue("dataName", "inputElement");
-		    component.getAttributes().setValue("href", "http://bbt.com/");
-		    
-		    $A.rerender(component);
-		    input = component.find("specialAttributes_input").getElement();
-		    $A.test.assertEquals("inputElement" , input.getAttribute("data-name"), "Failed to rerender data attribute");
-		    $A.test.assertEquals("color:green" , input.getAttribute("style").replace(/[ ;]/g,"").toLowerCase(), "Failed to rerender style attribute");
-		    
-		    a = component.find("specialAttributes_a").getElement();
-		    $A.test.assertEquals("http://bbt.com/" , a.getAttribute("href"), "Failed to rerender href attribute");
-		}
+        test:function(component){
+            var input = component.find("specialAttributes_input").getElement();
+            var styleText;
+
+            $A.test.assertEquals("textElement" , input.getAttribute("data-name"), "Failed to render data attribute");
+
+            //
+            // Warning! IE7 returns an object for style, so this first attempt fails because replace doesn't exist.
+            //
+            try {
+                styleText = input.getAttribute("style").replace(/[ ;]/g,"").toLowerCase();
+            } catch (e) {
+                styleText = input.style.cssText.replace(/[ ;]/g,"").toLowerCase();
+            }
+            $A.test.assertEquals("color:blue" , styleText);
+            
+            var a = component.find("specialAttributes_a").getElement();
+            $A.test.assertEquals("http://bazinga.com/" , a.getAttribute("href"), "Failed to render href attribute");
+            
+            component.getAttributes().setValue("style", "color:green");
+            component.getAttributes().setValue("dataName", "inputElement");
+            component.getAttributes().setValue("href", "http://bbt.com/");
+            
+            $A.rerender(component);
+            input = component.find("specialAttributes_input").getElement();
+            $A.test.assertEquals("inputElement" , input.getAttribute("data-name"), "Failed to rerender data attribute");
+
+            //
+            // Warning! IE7 returns an object for style, so this first attempt fails because replace doesn't exist.
+            //
+            try {
+                styleText = input.getAttribute("style").replace(/[ ;]/g,"").toLowerCase();
+            } catch (e) {
+                styleText = input.style.cssText.replace(/[ ;]/g,"").toLowerCase();
+            }
+            $A.test.assertEquals("color:green" , styleText);
+            
+            a = component.find("specialAttributes_a").getElement();
+            $A.test.assertEquals("http://bbt.com/" , a.getAttribute("href"), "Failed to rerender href attribute");
+        }
     },
 
     /**
@@ -174,14 +188,14 @@
      */
     testChangeTypeOfInputElement:{
     	browsers: ["-IE7","-IE8","-IE9"],
-		test:function(component){
-		    var input = component.find("specialAttributes_input").getElement();
-		    $A.test.assertEquals("text" , input.getAttribute("type"), "Failed to render type attribute");
-		    component.getAttributes().setValue("type", "input");
-		    $A.rerender(component);
-		    input = component.find("specialAttributes_input").getElement();
-		    $A.test.assertEquals("input" , input.getAttribute("type"), "Failed to rerender type attribute");
-		}
+        test:function(component){
+            var input = component.find("specialAttributes_input").getElement();
+            $A.test.assertEquals("text" , input.getAttribute("type"), "Failed to render type attribute");
+            component.getAttributes().setValue("type", "input");
+            $A.rerender(component);
+            input = component.find("specialAttributes_input").getElement();
+            $A.test.assertEquals("input" , input.getAttribute("type"), "Failed to rerender type attribute");
+        }
     },
 
     /**

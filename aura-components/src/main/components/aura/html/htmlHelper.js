@@ -305,16 +305,19 @@
                     // Support for IE's weird handling of checked
                     if (casedName === "checked"){
                     	ret.setAttribute("defaultChecked", true);
-                	}
+                    }
                 }
             } else {
                 // as long as we have a valid value at this point, set
                 // it as an attribute on the DOM node
                 // IE renders null value as string "null" for input (text) element, we have to work around that.
                 if (!aura.util.isUndefined(value) && !($A.util.isIE && this.isInputNullValue(ret.tagName, name, value))) {
-                	var casedAttribute = this.caseAttribute(name);
+                    var casedAttribute = this.caseAttribute(name);
                     var lowerName = name.toLowerCase();
-                    if (lowerName === "type" || lowerName === "href" || lowerName === "style" || lowerName.indexOf("data-") === 0) { // special case we have to use "setAttribute"
+                    if (lowerName === "style" && $A.util.isIE) {
+                        ret.style.cssText = value;
+                    } else if (lowerName === "type" || lowerName === "href" || lowerName === "style" || lowerName.indexOf("data-") === 0) {
+                        // special case we have to use "setAttribute"
                         ret.setAttribute(casedAttribute, value);
                     } else {
                         ret[casedAttribute] = value;

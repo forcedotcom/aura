@@ -458,10 +458,11 @@ Component.prototype.destroy = function(async){
 	//#end
 
     if (this.priv && !this._destroying){
+    	// DCHASMAN TODO W-1879487 Reverted in 188 because of hard to diagnose rerendering weirdness in a couple of tests and one:'s mru/lists view
     	// Default to async destroy
-        if (async === undefined) {
+        /*if (async === undefined) {
         	async = true;
-        }
+        }*/
         
         var key;
 

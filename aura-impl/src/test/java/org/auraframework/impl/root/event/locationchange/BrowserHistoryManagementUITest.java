@@ -19,6 +19,8 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 
 import org.auraframework.test.WebDriverTestCase;
+import org.auraframework.test.WebDriverTestCase.ExcludeBrowsers;
+import org.auraframework.test.WebDriverUtil.BrowserType;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
@@ -27,6 +29,8 @@ import org.openqa.selenium.WebElement;
  * {@link aura.def.EventType} Which means that all handler registered to handle this event are invoked. NOTE: Location
  * change event is fired as soon as the page is loaded. Implementation is in AuraHistoryService_Private.js
  */
+// History Service is not supported in IE7 or IE8
+@ExcludeBrowsers({ BrowserType.IE7, BrowserType.IE8 })
 public class BrowserHistoryManagementUITest extends WebDriverTestCase {
     public BrowserHistoryManagementUITest(String name) {
         super(name);

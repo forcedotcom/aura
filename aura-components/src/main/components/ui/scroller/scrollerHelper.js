@@ -35,8 +35,6 @@
 
 			var scroller = component._scroller;
 			if (!$A.util.isUndefined(scroller)) {
-				scroller.unbindTransientHandlers();
-				
 				scroller.refresh();
 								
 				var compEvents = component.getEvent("refreshed");						
@@ -892,6 +890,8 @@
 				},
 
 				_move : function(e) {
+					this._transitioning = true;
+					
 				    var tagName = e.target.nodeName.toLowerCase();
 				    // ssun don't scroll if we are in a textarea since it is hard
 				    // to scroll the textarea and the page at the same time.
@@ -983,7 +983,8 @@
 				},
 
 				_end : function(e) {
-				
+					this._transitioning = false;
+
 					if (hasTouch && e.touches.length !== 0)
 						return;
 
@@ -1501,7 +1502,7 @@
 					that._scrollbar('h');
 					that._scrollbar('v');
 
-					if (!that.zoomed) {
+					if (!that.zoomed && !that._transitioning) {
 						that.scroller.style[transitionDuration] = '0';
 						that._resetPos(doNotAnimate ? 0 : 200);
 					}

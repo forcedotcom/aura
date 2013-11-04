@@ -22,7 +22,9 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 import org.auraframework.impl.javascript.AuraJavascriptGroup;
-import org.auraframework.impl.javascript.AuraJavascriptResourceGroup;
+import org.auraframework.impl.source.AuraResourcesHashingGroup;
+import org.auraframework.util.resource.CompiledGroup;
+import org.auraframework.util.resource.HashingGroup;
 import org.auraframework.impl.util.AuraImplFiles;
 
 /**
@@ -31,6 +33,7 @@ import org.auraframework.impl.util.AuraImplFiles;
 public class GenerateJavascript {
     public static void main(String[] args) throws IOException {
         Logger logger = Logger.getLogger(GenerateJavascript.class.getName());
+        // aura js
         logger.info("Generating framework javascript");
         AuraJavascriptGroup js = new AuraJavascriptGroup();
         // generate the js into this package, this one right here I say.
@@ -48,11 +51,28 @@ public class GenerateJavascript {
         // Store the precomputed hash into a file.
         logger.info("Saving framework version to filesystem");
         Properties props = new Properties();
-        props.setProperty(AuraJavascriptResourceGroup.UUID_PROPERTY, js.getGroupHash().toString());
-        props.setProperty(AuraJavascriptResourceGroup.LASTMOD_PROPERTY, Long.toString(js.getLastMod()));
+        props.setProperty(CompiledGroup.UUID_PROPERTY, js.getGroupHash().toString());
+        props.setProperty(CompiledGroup.LASTMOD_PROPERTY, Long.toString(js.getLastMod()));
 
-        File propertyFile = new File(dest, AuraJavascriptResourceGroup.VERSION_FILE);
-        props.store(new FileWriter(propertyFile), "Aura framework version information by GenerateJavascript");
+        File propertyFile = new File(dest, AuraJavascriptGroup.FILE_NAME);
+        FileWriter writer = new FileWriter(propertyFile);
+        props.store(writer, "Aura framework version information by GenerateJavascript");
+        writer.close();
+
+        // resources
+        // Create hashing group for aura resources. Doesn't need to parse or generate. Just hash it.
+        HashingGroup resourceJs = new AuraResourcesHashingGroup();
+        props = new Properties();
+        props.setProperty(CompiledGroup.UUID_PROPERTY, resourceJs.getGroupHash().toString());
+        props.setProperty(CompiledGroup.LASTMOD_PROPERTY, Long.toString(resourceJs.getLastMod()));
+        propertyFile = new File(dest, AuraResourcesHashingGroup.FILE_NAME);
+        writer = new FileWriter(propertyFile);
+        logger.info("Saving resources version to filesystem");
+        props.store(writer, "Aura resources version information by GenerateJavascript");
+        writer.close();
+
+        // No waiting for jvm to realize we're done.
+        System.exit(0);
     }
 
 }

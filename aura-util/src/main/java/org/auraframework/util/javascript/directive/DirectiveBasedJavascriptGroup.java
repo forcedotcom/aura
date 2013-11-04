@@ -238,10 +238,15 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
 
     @Override
     public void regenerate(File destRoot) throws IOException {
+        reset();
+        generate(destRoot, true);
+        postProcess();
+    }
+
+    @Override
+    public void reset() throws IOException {
         setContents(null, this.startFile);
         parse();
         getGroupHash(); // Ensure the new bundle knows its hash once the directives are parsed.
-        generate(destRoot, true);
-        postProcess();
     }
 }

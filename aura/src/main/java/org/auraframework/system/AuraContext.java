@@ -394,7 +394,7 @@ public interface AuraContext {
     /**
      * Set the framework UID from the client (or server).
      *
-     * @param the UID that we should set.
+     * @param uid that we should set.
      */
     void setFrameworkUID(String uid);
 

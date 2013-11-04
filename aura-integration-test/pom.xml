@@ -505,6 +505,7 @@
                 </os>
             </activation>
             <properties>
+                <xdisplay.skip>true</xdisplay.skip>
                 <platform.chromedriver>win32</platform.chromedriver>
                 <chromedriver.version>2.2</chromedriver.version>
                 <webdriver.chrome.driver>${basedir}/target/bin/chromedriver.exe</webdriver.chrome.driver>

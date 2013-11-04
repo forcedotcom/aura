@@ -15,10 +15,15 @@
     limitations under the License.
 
 -->
-<aura:component controller="java://org.auraframework.impl.java.controller.JavaTestController">
-    <aura:attribute name="cmpType" type="string"/>
-    <aura:attribute name="ref" type="Object"/>
+<aura:component>
+	<aura:attribute name="testCmpName" type="String" default="Text"/>
+	<aura:attribute name="testContent" type="String"/>
 
-    <ui:button aura:id="submitBtn" label="submit" press="{!c.submit}"/> <br/>
-    Value is: <ui:outputText aura:id="outputValue" value=""/> <br/>
+	<a id="linkbefore" domId="linkbefore" class="linkbefore" href="">RichText</a><br/>
+    <ui:inputRichText aura:id="Text" value="{!v.testContent}"/> <br/> 
+    <a id="linkafter" domId="linkafter" class="linkafter" href="">Custom Rich Text</a><br/>
+    <ui:inputRichText aura:id="rtCustom"/> <br/>
+    				  		 
+    <auratest:baseInputTest aura:id="base" cmpType="{!v.testCmpName}" ref="{!v.testContent}"/>
+
 </aura:component>

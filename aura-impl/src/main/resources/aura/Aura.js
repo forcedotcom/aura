@@ -1216,8 +1216,6 @@ var services = $A.services;
 // TODO(fabbott): Remove the legacy 'aura' top-level name.
 window['aura'] = window['$A'];
 
-
-
 // #include aura.storage.adapters.MemoryAdapter
 // #include aura.storage.adapters.IndexedDBAdapter
 // #include aura.storage.adapters.SmartStoreAdapter

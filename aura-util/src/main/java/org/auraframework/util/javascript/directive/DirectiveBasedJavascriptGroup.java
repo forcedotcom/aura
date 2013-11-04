@@ -16,7 +16,6 @@
 package org.auraframework.util.javascript.directive;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
@@ -239,15 +238,10 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
 
     @Override
     public void regenerate(File destRoot) throws IOException {
-        reset();
-        generate(destRoot, true);
-        postProcess();
-    }
-
-    @Override
-    public void reset() throws IOException {
         setContents(null, this.startFile);
         parse();
         getGroupHash(); // Ensure the new bundle knows its hash once the directives are parsed.
+        generate(destRoot, true);
+        postProcess();
     }
 }

@@ -48,8 +48,7 @@ public class DirectiveBasedJavascriptGroupTest extends UnitTestCase {
             fail("Creating a Directive Based javascript Group by specifying a directory as start file should have failed."
                     + test.getName());
         } catch (IOException e) {
-            assertTrue("Add File function failed because of an unexpected error message",
-                e.getMessage().startsWith("File did not exist or was not a valid, acceptable file"));
+            assertTrue(e.getMessage().startsWith("File did not exist or was not a .js file: "));
         }
     }
 

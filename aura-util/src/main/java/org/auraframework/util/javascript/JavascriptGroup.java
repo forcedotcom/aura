@@ -19,13 +19,41 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Set;
 
-import org.auraframework.util.resource.FileGroup;
 import org.auraframework.util.text.Hash;
 
 /**
  * A group of javascript files that can be generated into one file.
  */
-public interface JavascriptGroup extends FileGroup {
+public interface JavascriptGroup {
+
+    String getName();
+
+    long getLastMod();
+
+    /**
+     * Fetches a hash <i>almost</i> guaranteed to change if anything in the
+     * group changes. Note that this should imply that the files must be
+     * traversed in some stable order, regardless of whether {@link #getFiles()}
+     * returns them in that order.
+     * 
+     * FIXME: This likely needs an SFDC patch, too.
+     * 
+     * @return a hash of all the files in the group.
+     * @throws IOException if a file in the group cannot be read for hashing
+     */
+    Hash getGroupHash() throws IOException;
+
+    File addFile(String s) throws IOException;
+
+    File addDirectory(String s) throws IOException;
+
+    Set<File> getFiles();
+
+    /**
+     * is this group out of date? It can only check files that were in the group
+     * when initially parsed, newly added files won't show up
+     */
+    boolean isStale();
 
     /**
      * stage 1: parse the files and collect metadata

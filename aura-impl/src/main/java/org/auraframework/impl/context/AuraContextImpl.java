@@ -256,6 +256,8 @@ public class AuraContextImpl implements AuraContext {
     
     private final boolean isDebugToolEnabled;
 
+    private String resourcesUID;
+
     public AuraContextImpl(Mode mode, MasterDefRegistry masterRegistry, Map<DefType, String> defaultPrefixes,
             Format format, Access access, JsonSerializationContext jsonContext,
             Map<ValueProviderType, GlobalValueProvider> globalProviders, boolean isDebugToolEnabled) {

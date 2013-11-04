@@ -360,8 +360,8 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
         // first request for app should have only 1 log for each desc
         SecurityProviderAccessLogger.clearLog();
         String url = String.format("/string/%s.%s?aura.context=%s", appDesc.getName(), "app", AuraTextUtil
-                .urlencode(String.format("{'mode':'PROD','fwuid':'%s','app':'%s'}", Aura.getConfigAdapter()
-                        .getAuraFrameworkNonce(), appDesc.getDescriptorName())));
+                .urlencode(String.format("{'mode':'PROD','fwuid':'%s','app':'%s'}", Aura.getConfigAdapter(),
+                        appDesc.getDescriptorName())));
 
         HttpGet get = obtainGetMethod(url);
         HttpResponse response = perform(get);

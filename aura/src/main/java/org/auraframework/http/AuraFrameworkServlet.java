@@ -26,7 +26,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.http.HttpHeaders;
 import org.auraframework.Aura;
-import org.auraframework.http.RequestParam.StringParam;
 import org.auraframework.util.IOUtil;
 import org.auraframework.util.resource.ResourceLoader;
 
@@ -34,7 +33,6 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
 
     private static final long serialVersionUID = 6034969764380397480L;
     private static final ResourceLoader resourceLoader = Aura.getConfigAdapter().getResourceLoader();
-    private final static StringParam fwUIDParam = new StringParam(AURA_PREFIX + "fwuid", 0, false);
     private static final String MINIFIED_FILE_SUFFIX = ".min";
 
     // RESOURCES_PATTERN format:
@@ -53,21 +51,18 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
-        String fwUid = fwUIDParam.get(request);
 
         long ifModifiedSince = request.getDateHeader(HttpHeaders.IF_MODIFIED_SINCE);
         InputStream in = null;
         try {
+
             //
             // Careful with race conditions here, we should only call regenerateAuraJS
             // _before_ we get the nonce.
             //
             Aura.getConfigAdapter().regenerateAuraJS();
-            String currentFwUid = Aura.getConfigAdapter().getAuraFrameworkNonce();
-
-            // process path (not in a function because can't use non-synced
-            // member vars in servlet)
-            String format = null;
+            // framework uid is combination of aura js and resources uid
+            String currentUid = Aura.getConfigAdapter().getAuraFrameworkNonce();
 
             // match entire path once, looking for root, optional nonce, and
             // rest-of-path
@@ -86,29 +81,24 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
             if (nonceUid != null) {
                 nonceUid = nonceUid.substring(1);
             }
-            //
-            // This is ugly. We can't really distinguish here between a nonce
-            // and a path. So rather than try to be cute, if the nonce doesn't
-            // match, we just use it as part of the path. In practice this will
-            // do exactly the same thing.
-            //
-            if (fwUid != null) { 
-                if (!fwUid.equals(nonceUid) && nonceUid != null) {
-                    //
-                    // This is the case where there is an fwUid, and there is no real
-                    // nonce. We reconnect the falsely matched nonce & file. Note that
-                    // fwUid should never be null for new fetches of the framework js.
-                    //
-                    file = "/"+nonceUid+file;
-                }
-                //
-                // In any case, if we have an fwUid as a parameter, we can erase the
-                // nonceUid.
-                //
-                haveUid = true;
-                nonceUid = null;
+
+            // process path (not in a function because can't use non-synced
+            // member vars in servlet)
+            String format = null;
+
+            String root = matcher.group(1);
+
+            if (root.equals("resources")) {
+                format = "/aura/resources%s";
+            } else if (root.equals("javascript")) {
+                format = "/aura/javascript%s";
             }
-            if (currentFwUid.equals(fwUid) || currentFwUid.equals(nonceUid)) {
+            if (format == null) {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND);
+                return;
+            }
+
+            if (currentUid != null && currentUid.equals(nonceUid)) {
                 //
                 // If we match the nonce and we have an if-modified-since, we
                 // can just send back a not modified. Timestamps don't matter.
@@ -128,51 +118,35 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
                 }
                 matchedUid = true;
                 haveUid = true;
-                nonceUid = null;
-            } else if (fwUid != null) {
+            } else {
                 //
-                // Whoops, we have a mismatched nonce. Note that a mismatch of the nonce
-                // does _not_ mean we definitely mismatched.
+                // Whoops, we have a mismatched nonce.
                 //
                 matchedUid = false;
             }
-            String root = matcher.group(1);
-            if (root.equals("resources")) {
-                format = "/aura/resources%s";
-            } else if (root.equals("javascript")) {
-                format = "/aura/javascript%s";
-            }
-            if (format == null) {
-                response.sendError(HttpServletResponse.SC_NOT_FOUND);
-                return;
-            }
+
             String resStr = String.format(format, file);
 
             //
-            // This will attempt to get the file without the nonce. This is the normal case where the
-            // nonce was not stripped.
+            // Check whether path has wrong nonce or the path contains no nonce
             //
-            // TODO: once we have deployed the aura.fwuid=<blah> for a while, we can change this logic to make
-            // it simpler, as nonce will always be null... in fact, we'll be able to put it inside the
-            // if, and never have it exist out here.
-            //
-            in = resourceLoader.getResourceAsStream(resStr);
-            if (nonceUid != null) {
-                if (in == null) {
-                    //
-                    // In this case the nonce was actually part of the file path, so
-                    // we act as if we got none. This is actually very dangerous. as
-                    // if there was a nonce, and it mismatched, we will give the wrong
-                    // content for the nonce.
-                    //
-                    resStr = String.format(format, "/"+nonceUid+file);
-                    in = resourceLoader.getResourceAsStream(resStr);
-                    if (in != null) {
+            if (nonceUid != null && !matchedUid) {
+
+                // has "nonce" like path but uids don't match
+                if (resourceLoader.getResource(resStr) == null) {
+                    // Check if resource exists with nonced path
+                    resStr = String.format(format, "/" + nonceUid + file);
+                    if (resourceLoader.getResource(resStr) != null) {
+                        // file exists so doesn't have a nonce
                         haveUid = false;
+                    } else {
+                        // no resource found
+                        response.sendError(HttpServletResponse.SC_NOT_FOUND);
+                        return;
                     }
                 } else {
+                    // nonce exists but not matching
                     haveUid = true;
-                    matchedUid = false;
                 }
             }
 
@@ -182,12 +156,11 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
                 int extIndex = resStr.lastIndexOf(".");
                 String minFile = resStr.substring(0, extIndex) + MINIFIED_FILE_SUFFIX + resStr.substring(extIndex);
                 if (resourceLoader.getResource(minFile) != null) {
-                	if (in != null) {
-                		in.close();
-                	}
-                    in = resourceLoader.getResourceAsStream(minFile);
+                    resStr = minFile;
                 }
             }
+
+            in = resourceLoader.getResourceAsStream(resStr);
 
             //
             // Check if it exists. DANGER: if there is a nonce, this is really an

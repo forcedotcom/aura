@@ -13,28 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.util.javascript;
+package org.auraframework.impl.source;
+
+import org.auraframework.impl.util.AuraImplFiles;
+import org.auraframework.util.resource.HashingGroup;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FileNotFoundException;
-
-import org.auraframework.util.resource.CommonFileGroup;
+import java.io.IOException;
 
 /**
- * Implementation of the common stuff shared between the main javascript library in sfdc and the new directive based
- * javascript groups
+ * Aura resources wrapper containing constants for the resources group
  */
-public abstract class CommonJavascriptGroupImpl extends CommonFileGroup implements JavascriptGroup {
+public class AuraResourcesHashingGroup extends HashingGroup {
 
-    public CommonJavascriptGroupImpl(String name, File root) {
-        super(name, root, JS_FILTER);
-    }
+    public static final String GROUP_NAME = "aura-resources";
+    public static final String FILE_NAME = "resourcesuid.properties";
+    public static final File ROOT_DIR = AuraImplFiles.AuraResourcesSourceDirectory.asFile();
 
-    /**
-     * Only js files
-     */
-    public static final FileFilter JS_FILTER = new FileFilter() {
+    public static final FileFilter FILE_FILTER = new FileFilter() {
         @Override
         public boolean accept(File f) {
             return f.getName().endsWith(".js");
@@ -42,4 +39,7 @@ public abstract class CommonJavascriptGroupImpl extends CommonFileGroup implemen
     };
 
 
+    public AuraResourcesHashingGroup() throws IOException {
+        super(GROUP_NAME, ROOT_DIR, FILE_FILTER);
+    }
 }

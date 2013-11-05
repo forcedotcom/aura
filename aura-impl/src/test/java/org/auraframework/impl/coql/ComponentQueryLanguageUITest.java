@@ -46,10 +46,10 @@ public class ComponentQueryLanguageUITest extends WebDriverTestCase {
      */
     public void testQueryLanguageAvailableInNonprodMode() throws Exception {
         open("/test/laxSecurity.app");
-        Object query = auraUITestingUtil.getEval("return window.$A.getQueryStatement");
-        assertNotNull("Query language should be available in non PROD mode.", query);
-        query = auraUITestingUtil.getEval("return window.$A.getQueryStatement()");
-        assertNotNull("$A.q() failed to return query", query);
+        Boolean query = auraUITestingUtil.getBooleanEval("return $A.hasOwnProperty('getQueryStatement');");
+        assertTrue("Query language should be available in non-PROD mode.", query);
+        query = auraUITestingUtil.getBooleanEval("return 'query' in $A.getQueryStatement();");
+        assertTrue("$A.getQueryStatement() should have 'query' property.", query);
     }
 
     /**

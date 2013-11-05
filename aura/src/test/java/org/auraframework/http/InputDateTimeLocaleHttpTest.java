@@ -16,9 +16,13 @@
 package org.auraframework.http;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Map;
 
-import org.apache.http.*;
+import org.apache.http.Header;
+import org.apache.http.HttpHeaders;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.message.BasicHeader;
 import org.auraframework.def.ComponentDef;
@@ -27,6 +31,7 @@ import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.AuraHttpTestCase;
 import org.auraframework.test.annotation.UnAdaptableTest;
 import org.auraframework.util.json.JsonReader;
+import org.json.JSONException;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -35,7 +40,7 @@ import com.google.common.collect.ImmutableMap;
  */
 @UnAdaptableTest
 public class InputDateTimeLocaleHttpTest extends AuraHttpTestCase{
-	
+    
     //Monday in Chinese
     private final String dayOfWeek = "星期一";
     
@@ -44,7 +49,7 @@ public class InputDateTimeLocaleHttpTest extends AuraHttpTestCase{
     
     //Chinese locale symbol
     private final String locale = "zh";
-	
+    
     public InputDateTimeLocaleHttpTest(String name) {
         super(name);
     }
@@ -67,8 +72,52 @@ public class InputDateTimeLocaleHttpTest extends AuraHttpTestCase{
         //Grab the object you are looking for from the json tree
         Map<String, Object> context = (Map<String, Object>) json.get("context");
         Map<String, Object> components = (Map<String, Object>) context.get("components");
-        Map<String, Object>  num11= (Map<String, Object>) components.get("11");
-        Map<String, Object>  valueMap = (Map<String, Object>) num11.get("value"); 
+        String numKey ="";
+        Map<String, Object>  num = null;
+        Iterator<String> it = components.keySet().iterator();
+        
+        /*
+         * Structure of components map: 
+         * {
+         *   20:{
+         *       serId:10, 
+         *       value:{
+         *               model:{
+         *                      monthLabels:[...], 
+         *                      weekdayLabels:[...], 
+         *                      langLocale:zh
+         *                     }, 
+         *               componentDef:{
+         *                             serId:11, 
+         *                             value:{...}
+         *                            }, 
+         *               globalId:20
+         *              }
+         *      }, 
+         *    1:{
+         *        serRefId:1
+         *      }
+         * }
+         * What we want is the gloabalId key (in this case 20), since it is the only one with the key 'value' underneath it.
+         * We could just look for 20 but that is going to change. next lines of code try to find the key, that has the key 
+         * value under it.  
+         */
+        
+               
+        while(it.hasNext()){
+            numKey = it.next();
+            num = (Map<String, Object>) components.get(numKey);
+            if(num.containsKey("value")){
+                break;
+            }
+            num = null;
+        }
+        
+        if(num == null){
+            throw new JSONException("Key: 'Values', not found under parent key(s): "+components.keySet().toString());
+        }
+        
+        Map<String, Object>  valueMap = (Map<String, Object>) num.get("value"); 
         Map<String, Object> model = (Map<String, Object>) valueMap.get("model");
         ArrayList<Map<String, Object>> monthLabels = (ArrayList<Map<String, Object>>) model.get("monthLabels"); 
         ArrayList<Map<String, Object>> weekDayLabels = (ArrayList<Map<String, Object>>) model.get("weekdayLabels"); 
@@ -87,7 +136,7 @@ public class InputDateTimeLocaleHttpTest extends AuraHttpTestCase{
      */
     public void testCheckLocaleForDatePicker() throws Exception{
         Header[] headers = new Header[]{ new BasicHeader(HttpHeaders.ACCEPT_LANGUAGE, locale) };
-        HttpGet auraGet = this.obtainAuraGetMethod(Mode.DEV, Format.JSON, "uiTest:datePicker_Test", ComponentDef.class,
+        HttpGet auraGet = this.obtainAuraGetMethod(Mode.DEV, Format.JSON, "uiTest:inputDate_Test", ComponentDef.class,
                 ImmutableMap.of("visible", "true"), headers);
         checkValues(dayOfWeek, month, auraGet);
     }

@@ -16,6 +16,10 @@
 
 -->
 <aura:component>
-  <ui:inputDate displayDatePicker="true" class="date_input_box" placeHolder="" format="yyyy-MM-dd"/>
- <!--<ui:datePicker visible="true" />-->
+      <aura:attribute name="value" type="String"/>
+      <div id="dlh_outputText">
+          after datePicker show up, click me or any other place on the page to make it disappear
+      </div>
+      <ui:label for="datePickerTestCmp" label="date picker with label" />
+      <ui:inputDate aura:id="datePickerTestCmp" displayDatePicker="true" class="date_input_box" format="yyyy-MM-dd" value="{!v.value}"/>
 </aura:component>

@@ -42,8 +42,8 @@
 	testSizeArray:{
 		test:function(cmp) {
 			// there are 4 array elements with a total of 22 characters
-			// 4*(8+2) + 22*2
-			$A.test.assertEquals(84, this.estimateSize(["Brian", "Kevin", "Matthew", "Dave0"]));
+			// 4*(8+8) + 22*2
+			$A.test.assertEquals(108, this.estimateSize(["Brian", "Kevin", "Matthew", "Dave0"]));
 		}
 	},
 
@@ -68,8 +68,8 @@
 			team.devs = {"Dev1": "Brian", "Dev2": "Kevin", "Dev3": "DaveO"};
 			
 			// 6 nested keys + 3 nested array elements + 1 number + 53 explicit string characters 
-			// 6*8 + 3*(8+2) + 1*8 + 2*53 
-			$A.test.assertEquals(192, this.estimateSize(team));
+			// 6*8 + 3*(8+8) + 1*8 + 2*53 
+			$A.test.assertEquals(210, this.estimateSize(team));
 		}
 	},
 	

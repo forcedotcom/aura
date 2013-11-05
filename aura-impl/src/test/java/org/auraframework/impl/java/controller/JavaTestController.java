@@ -17,7 +17,9 @@ package org.auraframework.impl.java.controller;
 
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -314,5 +316,19 @@ public class JavaTestController {
 
     @AuraEnabled
     public static void dummy() {
+    }
+    
+    @SuppressWarnings("rawtypes")
+	@AuraEnabled
+    public static List<Map> getList(@Key("start") int start, @Key("limit") int limit) throws Exception {
+    	List<Map> myList = new ArrayList<Map>();
+    	for (int i=start; i < limit; i++) {
+    		char alphabet = (char) (65 + (i%26));
+    		Map<String, String> row = new HashMap<String, String>();
+    		row.put("index", (i+1) + "");
+    		row.put("char", "server " + alphabet);
+    		myList.add(row);          
+        	}
+    	return myList;
     }
 }

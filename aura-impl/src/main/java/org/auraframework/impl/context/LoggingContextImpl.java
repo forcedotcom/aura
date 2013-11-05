@@ -18,6 +18,7 @@ package org.auraframework.impl.context;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.auraframework.service.LoggingService;
 import org.auraframework.system.LoggingContext;
 
 import com.google.common.collect.Maps;
@@ -32,8 +33,57 @@ public class LoggingContextImpl implements LoggingContext {
 
     private final Map<String, Object> loggingValues = Maps.newHashMap();
     private final Map<String, Timer> timers = Maps.newHashMap();
-    private final Map<String, Long> nums = Maps.newHashMap();
+    private final Map<String, Counter> counters = Maps.newHashMap();
     private final Map<String, Object> values = Maps.newHashMap();
+    
+    private final Map<String, Map<String, Long>> actionStats = Maps.newHashMap();
+    
+    @Override
+    public void startAction(String actionName) {
+        Map<String, Long> actionStatMap = Maps.newHashMap();
+        actionStats.put(actionName, actionStatMap);
+        for (Map.Entry<String, Timer> timerEntry : timers.entrySet()) {
+            Timer timer = timerEntry.getValue();
+            timer.mark(actionName);
+        }
+        for (Map.Entry<String, Counter> counterEntry : counters.entrySet()) {
+            Counter counter = counterEntry.getValue();
+            counter.mark(actionName);
+        }
+        startActionTimer(actionName);
+    }
+    
+    protected void startActionTimer(String actionName) {
+        startTimer(LoggingService.TIMER_ACTION + actionName);
+    }
+    
+    @Override
+    public void stopAction(String actionName) {
+        stopActionTimer(actionName);
+        Map<String, Long> actionStatsMap = actionStats.get(actionName);
+        if (actionStatsMap != null) {
+            Timer actionTimer = timers.get(LoggingService.TIMER_ACTION + actionName);
+            if (actionTimer != null) {
+                actionStatsMap.put(LoggingService.TIMER_ACTION, actionTimer.getTime());
+            }
+            for (Map.Entry<String, Timer> timerEntry : timers.entrySet()) {
+                Long timeSinceMark = timerEntry.getValue().getTimeSince(actionName);
+                if (timeSinceMark != null && timeSinceMark > 0L) {
+                    actionStatsMap.put(timerEntry.getKey(), timeSinceMark);
+                }
+            }
+            for (Map.Entry<String, Counter> counterEntry : counters.entrySet()) {
+                Long countSinceMark = counterEntry.getValue().getCountSince(actionName);
+                if (countSinceMark != null && countSinceMark > 0L) {
+                    actionStatsMap.put(counterEntry.getKey(), countSinceMark);
+                }
+            }
+        }
+    }
+    
+    protected void stopActionTimer(String actionName) {
+        stopTimer(LoggingService.TIMER_ACTION + actionName);
+    }
 
     @Override
     public void startTimer(String name) {
@@ -72,11 +122,11 @@ public class LoggingContextImpl implements LoggingContext {
 
     @Override
     public long getNum(String key) {
-        Long result = nums.get(key);
+        Counter result = counters.get(key);
         if (result == null) {
             return -1;
         }
-        return result;
+        return result.get();
     }
 
     @Override
@@ -86,17 +136,22 @@ public class LoggingContextImpl implements LoggingContext {
 
     @Override
     public void incrementNumBy(String key, long num) {
-        Long origNum = this.nums.get(key);
+        Counter origNum = this.counters.get(key);
         if (origNum == null) {
-            origNum = 0L;
+            counters.put(key, new Counter(num));
+        } else {
+            origNum.increment(num);
         }
-
-        setNum(key, origNum + num);
     }
 
     @Override
     public void setNum(String key, long num) {
-        nums.put(key, num);
+        Counter counter = counters.get(key);
+        if (counter == null) {
+            counters.put(key, new Counter(num));
+        } else {
+            counter.set(num);
+        }
     }
 
     @Override
@@ -117,9 +172,12 @@ public class LoggingContextImpl implements LoggingContext {
         for (Map.Entry<String, Timer> entry : timers.entrySet()) {
             loggingValues.put(entry.getKey(), entry.getValue().getTime());
         }
-        loggingValues.putAll(nums);
+        for (Map.Entry<String, Counter> entry : counters.entrySet()) {
+            loggingValues.put(entry.getKey(), entry.getValue().get());
+        }
         loggingValues.putAll(values);
         log(loggingValues);
+        logActions(loggingValues);
     }
 
     @Override
@@ -141,6 +199,25 @@ public class LoggingContextImpl implements LoggingContext {
         logger.info(buffer);
     }
     
+    protected void logActions(Map<String, Object> valueMap) {
+        for (Map.Entry<String, Map<String, Long>> actionStat : actionStats.entrySet()) {
+            String actionName = actionStat.getKey();
+            Map<String, Long> actionMap = actionStat.getValue();
+            logAction(actionName, actionMap, valueMap);
+        }
+    }
+    
+    protected void logAction(String actionName, Map<String, Long> actionMap, Map<String, Object> valueMap) {
+        StringBuilder buffer = new StringBuilder(actionName);
+
+        for (Map.Entry<String, Long> entry : actionMap.entrySet()) {
+            if (entry.getValue() != null) {
+                buffer.append(";" + entry.getKey() + ": " + String.valueOf(entry.getValue()));
+            }
+        }
+        logger.info(buffer);
+    }
+    
     private static class KVLogger implements KeyValueLogger {
         private final StringBuffer logLine;
         
@@ -151,6 +228,42 @@ public class LoggingContextImpl implements LoggingContext {
         @Override
         public void log(String name, String value) {
             logLine.append("{").append(name).append(",").append(value).append("}");
+        }
+    }
+    
+    /**
+     * A simple counter class.  Used instead of an Long so that it can keep track of a names mark.
+     */
+    private static class Counter {
+        private Map<String, Long> marks = Maps.newHashMap();
+        private long count = 0;
+        
+        public Counter(long num) {
+            set(num);
+        }
+        
+        public void increment(long num) {
+            count += num;
+        }
+
+        public void set(long num) {
+            count = num;
+        }
+        
+        public long get() {
+            return count;
+        }
+        
+        /**
+         * @param markName if the markName already exists it will be replaced
+         */
+        public void mark(String markName) {
+            marks.put(markName, count);
+        }
+        
+        public long getCountSince(String markName) {
+            Long mark = marks.get(markName);
+            return (mark == null) ? 0 : count - mark;
         }
     }
     
@@ -166,10 +279,11 @@ public class LoggingContextImpl implements LoggingContext {
     public static class Timer {
         //totalTime and startTime is are nanoseconds for compatibility with System.getNanoTime();
         //getTime converts totalTime to ms
-        private long startTime = -1;
-        private long totalTime = -1;
+        private long startTime = -1L;
+        private long totalTime = -1L;
         private final String name;
         private int startCount = 0;
+        private Map<String, Long> marks = Maps.newHashMap();
 
         public Timer(String name) {
             this.name = name;
@@ -181,25 +295,46 @@ public class LoggingContextImpl implements LoggingContext {
 
         public void start() {
             startCount ++;
-            if (startTime < 0) {
+            if (startTime < 0L) {
                 startTime = System.nanoTime();
             }
         }
 
         public void stop() {
             startCount--;
-            if (startCount == 0 && startTime >= 0) {
+            if (startCount == 0L && startTime >= 0L) {
                 long curr = System.nanoTime();
-                totalTime = ((totalTime > 0) ? totalTime : 0)  + curr - startTime;
+                totalTime = ((totalTime > 0L) ? totalTime : 0L)  + curr - startTime;
                 startTime = -1;
             }
+        }
+        
+        /**
+         * Like a stop watch lap time with a name, does not stop the timer.
+         * @param markName if the markName already exists it will be replaced not incremented
+         */
+        private void mark(String markName) {
+            long markTime = 0L;
+            if (totalTime > 0L || startTime > 0L) {// started at least once
+                markTime = ((totalTime > 0L) ? totalTime : 0L)  + ((startTime > 0L) ? (System.nanoTime() - startTime) : 0L);
+            }
+            marks.put(markName, markTime);
+        }
+        
+        private long getTimeSince(String markName) {
+            if (totalTime > 0L || startTime > 0L) {// started at least once
+                long duration = ((totalTime > 0L) ? totalTime : 0L)  + ((startTime > 0L) ? (System.nanoTime() - startTime) : 0L);
+                Long markTime = marks.get(markName);
+                return (markTime == null) ? -1L : ((duration - markTime) / 1000000L);
+            }
+            return -1L;
         }
 
         /**
          * @return The accumulated duration in ms.
          */
         public long getTime() {
-            return (totalTime > 0) ? (totalTime / 1000000L) : totalTime; //convert to ms for public consumption
+            return (totalTime > 0L) ? (totalTime / 1000000L) : totalTime; //convert to ms for public consumption
         }
 
         /**
@@ -207,8 +342,8 @@ public class LoggingContextImpl implements LoggingContext {
          * started it is now stopped and the accumulated time is discarded.
          */
         public void reset() {
-            startTime = -1;
-            totalTime = -1;
+            startTime = -1L;
+            totalTime = -1L;
         }
     }
 

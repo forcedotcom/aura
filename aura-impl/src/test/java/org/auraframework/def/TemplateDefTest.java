@@ -285,8 +285,8 @@ public class TemplateDefTest extends AuraImplTestCase {
         Component template = Aura.getInstanceService().getInstance(errorTitleIntemplate);
         Aura.getRenderingService().render(template, sb);
         String result = sb.toString();
-        assertTrue("errorTitle attribute on aura:template has wrong text",
-                result.contains("Oops, there's a problem:"));       
+        assertTrue("errorTitle attribute on aura:template has wrong text: "+result,
+                result.contains("Looks like there's a problem:"));
         
     }
 

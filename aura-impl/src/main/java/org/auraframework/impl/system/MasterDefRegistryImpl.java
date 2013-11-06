@@ -32,12 +32,14 @@ import org.apache.log4j.Logger;
 import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
+import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.SecurityProviderDef;
 import org.auraframework.impl.root.DependencyDefImpl;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.service.LoggingService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Mode;
@@ -1271,8 +1273,16 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             defsCache.invalidateAll();
             existsCache.invalidateAll();
         } else {
+            DefinitionService ds = Aura.getDefinitionService();
+            DefDescriptor<ComponentDef> cdesc = ds.getDefDescriptor(descriptor, "markup", ComponentDef.class);
+            DefDescriptor<ApplicationDef> adesc = ds.getDefDescriptor(descriptor, "markup", ApplicationDef.class);
+
             defsCache.invalidate(descriptor);
             existsCache.invalidate(descriptor);
+            defsCache.invalidate(cdesc);
+            existsCache.invalidate(cdesc);
+            defsCache.invalidate(adesc);
+            existsCache.invalidate(adesc);
 
             // invalidate all DDs with the same namespace if its a namespace DD
             if (descriptor.getDefType() == DefType.NAMESPACE) {

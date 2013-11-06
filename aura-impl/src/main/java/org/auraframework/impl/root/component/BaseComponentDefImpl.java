@@ -49,7 +49,6 @@ import org.auraframework.def.RendererDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.def.StyleDef;
 import org.auraframework.def.TestSuiteDef;
-import org.auraframework.def.ThemeDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.root.AttributeDefRefImpl;
 import org.auraframework.impl.root.RootDefinitionImpl;
@@ -67,7 +66,6 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
@@ -97,7 +95,6 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     private final List<EventHandlerDef> eventHandlers;
     private final List<AttributeDefRef> facets;
     private final Set<PropertyReference> expressionRefs;
-    private final Map<String, DefDescriptor<ThemeDef>> themeAliases;
 
     private final RenderType render;
     private final WhitespaceBehavior whitespaceBehavior;
@@ -136,7 +133,6 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         this.testSuiteDefDescriptor = builder.testSuiteDefDescriptor;
         this.facets = AuraUtil.immutableList(builder.facets);
         this.dependencies = AuraUtil.immutableList(builder.dependencies);
-        this.themeAliases = AuraUtil.immutableMap(builder.themeAliases);
 
         String renderName = builder.render;
         if (renderName == null) {
@@ -329,11 +325,6 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         // have to do all sorts of craaaazy checks here for dupes and matches
         // and bah
         validateExpressionRefs();
-
-        // theme aliases
-        for (DefDescriptor<ThemeDef> themeDescriptor : themeAliases.values()) {
-            themeDescriptor.getDef().validateReferences();
-        }
     }
 
     /**
@@ -458,8 +449,6 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         if (templateDefDescriptor != null) {
             dependencies.add(templateDefDescriptor);
         }
-
-        dependencies.addAll(themeAliases.values());
 
         for (DependencyDef dep : this.dependencies) {
             dep.appendDependencies(dependencies);
@@ -865,11 +854,6 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         return ret;
     }
 
-    @Override
-    public Map<String, DefDescriptor<ThemeDef>> getThemeAliases() {
-        return themeAliases;
-    }
-
     public static abstract class Builder<T extends BaseComponentDef> extends
             RootDefinitionImpl.Builder<T> implements BaseComponentDefBuilder<T> {
 
@@ -889,7 +873,6 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         public List<DefDescriptor<RendererDef>> rendererDescriptors;
         public List<DefDescriptor<HelperDef>> helperDescriptors;
         public List<AttributeDefRef> facets;
-        public Map<String, DefDescriptor<ThemeDef>> themeAliases;
 
         public Set<DefDescriptor<InterfaceDef>> interfaces;
         public List<DefDescriptor<ControllerDef>> controllerDescriptors;
@@ -1008,15 +991,6 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         @Override
         public Builder<T> setStyleDef(StyleDef styleDef) {
             this.styleDescriptor = styleDef.getDescriptor();
-            return this;
-        }
-
-        @Override
-        public Builder<T> addThemeAlias(String alias, DefDescriptor<ThemeDef> descriptor) {
-            if (this.themeAliases == null) {
-                this.themeAliases = Maps.newHashMap();
-            }
-            this.themeAliases.put(alias, descriptor);
             return this;
         }
     }

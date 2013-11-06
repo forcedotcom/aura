@@ -17,7 +17,6 @@ package org.auraframework.def;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -84,8 +83,6 @@ public interface BaseComponentDef extends RootDefinition {
     ComponentDef getTemplateDef() throws QuickFixException;
 
     DefDescriptor<ComponentDef> getTemplateDefDescriptor();
-
-    Map<String, DefDescriptor<ThemeDef>> getThemeAliases();
 
     public static enum RenderType {
         SERVER, CLIENT, AUTO

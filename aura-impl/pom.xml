@@ -89,6 +89,10 @@
             <groupId>com.ibm.icu</groupId>
             <artifactId>icu4j</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.salesforce</groupId>
+            <artifactId>omakase</artifactId>
+        </dependency>              
     </dependencies>
     <properties>
         <aura.home>${basedir}/..</aura.home>

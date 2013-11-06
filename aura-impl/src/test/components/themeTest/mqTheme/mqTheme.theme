@@ -1,0 +1,5 @@
+<aura:theme>
+    <aura:attribute name="normal" default="only screen and (max-width: 999px) and (orientation: portrait)"/>
+    <aura:attribute name="bad" default="screen (max-width: 999px)"/>
+    <aura:attribute name="empty" default=""/>
+</aura:theme>

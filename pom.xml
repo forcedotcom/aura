@@ -376,6 +376,11 @@
                 <artifactId>icu4j</artifactId>
                 <version>4.6.1</version>
             </dependency>
+            <dependency>
+                <groupId>com.salesforce</groupId>
+                <artifactId>omakase</artifactId>
+                <version>0.0.3</version>
+            </dependency>            
         </dependencies>
     </dependencyManagement>
     <build>

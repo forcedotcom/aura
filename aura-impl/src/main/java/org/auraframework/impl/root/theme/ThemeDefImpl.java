@@ -222,7 +222,7 @@ public class ThemeDefImpl extends RootDefinitionImpl<ThemeDef> implements ThemeD
         }
 
         // validate cross references (from expressions)
-        ThemeValueProvider themeProvider = Aura.getStyleAdapter().getThemeValueProvider();
+        ThemeValueProvider themeProvider = Aura.getStyleAdapter().getThemeValueProviderNoOverrides();
         for (PropertyReference ref : expressionRefs) {
             if (!ref.getRoot().equals("this")) {
                 themeProvider.getDescriptor(ref).getDef().validateReferences();
@@ -241,13 +241,11 @@ public class ThemeDefImpl extends RootDefinitionImpl<ThemeDef> implements ThemeD
         }
 
         // dependencies cross references (from expressions)
-        ThemeValueProvider themeProvider = Aura.getStyleAdapter().getThemeValueProvider();
+        ThemeValueProvider themeProvider = Aura.getStyleAdapter().getThemeValueProviderNoOverrides();
         for (PropertyReference ref : expressionRefs) {
-            if (ref.getRoot().equals("this")) {
-                continue;
+            if (!ref.getRoot().equals("this")) {
+                dependencies.add(themeProvider.getDescriptor(ref));
             }
-
-            dependencies.add(themeProvider.getDescriptor(ref));
         }
     }
 

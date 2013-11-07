@@ -159,7 +159,7 @@
 		var config = {
 				skin : 'aura',
 				language : locale,
-				widht: width,
+				width: width,
 				height: height,
 				bodyClass: 'inputRichTextBody',				
 				toolbar : toolbarConfig,

@@ -45,14 +45,14 @@
 
         require = function (id) {
             if (!modules[id]) {
-                throw "module " + id + " not found";
+                throw new Error("module " + id + " not found");
             }
             return modules[id].factory ? build(modules[id]) : modules[id].exports;
         };
 
         define = function (id, factory) {
             if (modules[id]) {
-                throw "module " + id + " already defined";
+                throw new Error("module " + id + " already defined");
             }
 
             modules[id] = {
@@ -86,7 +86,13 @@
             for (var key in interceptors) {
                 if (key === req) {
                     setTimeout(function() {
-                        try { interceptors[key](successCB, errorCB, args); } catch (err) { errorCB(err); }
+                        try { 
+                            interceptors[key](successCB, errorCB, args); 
+                        } catch (err) { 
+                            console.error("Error caught when calling " + service + ":" + action + " " + err);
+                            console.error(err.stack);
+                            errorCB(err); 
+                        }
                     }, 0);
                     found = true;
                     break;
@@ -109,7 +115,12 @@
         };
     });
 
+    define("cordova/exec", function(require, exports, module) {
+        var cordova = require("cordova");
+
+        module.exports = cordova.exec;
+    });
+
     window.cordova = require("cordova");
 
 })(window);
-

@@ -94,7 +94,11 @@ var MockSmartStore = (function(window) {
         },
 
         checkSoup: function(soupName) {
-            if (!this.soupExists(soupName))  throw "Soup: " + soupName + " does not exist";
+            if (!this.soupExists(soupName))  throw new Error("Soup: " + soupName + " does not exist");
+        },
+
+        checkIndex: function(soupName, path) {
+            if (["_soup", "_soupEntryId"].indexOf(path) == -1 && !this.indexExists(soupName, path)) throw new Error(soupName + " does not have an index on " + path); 
         },
 
         soupExists: function(soupName) {
@@ -131,7 +135,7 @@ var MockSmartStore = (function(window) {
         upsertSoupEntries: function(soupName, entries, externalIdPath) {
             this.checkSoup(soupName); 
             if (externalIdPath != "_soupEntryId" && !this.indexExists(soupName, externalIdPath)) 
-                throw soupName + " does not have an index on " + externalIdPath; 
+                throw new Error(soupName + " does not have an index on " + externalIdPath); 
 
             var soup = _soups[soupName];
             var upsertedEntries = [];
@@ -147,7 +151,11 @@ var MockSmartStore = (function(window) {
                         var soupElt = soup[soupEltId];
                         var projection = this.project(soupElt, externalIdPath);
                         if (projection == externalId) {
-                            if (!isNew) throw "There are more than one soup elements where " + externalIdPath + " is " + externalId;
+                            if (!isNew) {
+                                msg = "There are more than one soup elements where " + externalIdPath + " is " + externalId;
+                                console.error(msg);
+                                throw new Error(msg);
+                            }
                             entry._soupEntryId = soupEltId;
                             isNew = false;
                         }
@@ -197,13 +205,105 @@ var MockSmartStore = (function(window) {
             return o;
         },
 
+        smartQuerySoupFull: function(querySpec) {
+            // NB we don't have full support evidently
+
+            var smartSql = querySpec.smartSql;
+
+            // SELECT {soupName:selectField} FROM {soupName} WHERE {soupName:whereField} IN (values)
+            var m = smartSql.match(/SELECT {(.*):(.*)} FROM {(.*)} WHERE {(.*):(.*)} IN \((.*)\)/i);
+            if (m != null && m[1] == m[3] && m[1] == m[4]) {
+                var soupName = m[1];
+                var selectField = m[2]
+                var whereField = m[5];
+
+                var values = m[6].split(",");
+                for (var i=0; i<values.length; i++) {
+                    values[i] = values[i].split("'")[1]; // getting rid of surrounding '
+                }
+
+                this.checkSoup(soupName); 
+                this.checkIndex(soupName, selectField);
+                this.checkIndex(soupName, whereField);
+                var soup = _soups[soupName];
+
+                var results = [];
+                for (var soupEntryId in soup) {
+                    var soupElt = soup[soupEntryId];
+                    var value = (whereField == "_soupEntryId" ? soupEntryId : this.project(soupElt, whereField));
+                    if (values.indexOf(value) >= 0) {
+                        var row = [];
+                        row.push(selectField == "_soup" ? soupElt : (selectField == "_soupEntryId" ? soupEntryId : this.project(soupElt, selectField)));
+                        results.push(row);
+                    }
+                }
+
+                return results;
+            }
+
+            // Case-insensitive sorted like query
+            // SELECT {soupName:_soup} FROM {soupName} WHERE {soupName:whereField} LIKE 'value' ORDER BY LOWER({soupName:orderByField})
+            var m = smartSql.match(/SELECT {(.*):_soup} FROM {(.*)} WHERE {(.*):(.*)} LIKE '(.*)' ORDER BY LOWER\({(.*):(.*)}\)/i);
+            if (m != null && m[1] == m[2] && m[1] == m[3] && m[1] == m[6]) {
+                var soupName = m[1];
+                var whereField = m[4];
+                var likeRegexp = new RegExp("^" + m[5].replace(/%/g, ".*"), "i");
+                var orderField = m[7];
+
+                this.checkSoup(soupName); 
+                this.checkIndex(soupName, whereField);
+                this.checkIndex(soupName, orderField);
+                var soup = _soups[soupName];
+
+                var results = [];
+                for (var soupEntryId in soup) {
+                    var soupElt = soup[soupEntryId];
+                    var projection = this.project(soupElt, whereField);
+                    if (projection.match(likeRegexp)) {
+                        var row = [];
+                        row.push(soupElt);
+                        results.push(row);
+                    }
+                }
+
+                results = results.sort(function(row1, row2) {
+                    var p1 = row1[0][orderField].toLowerCase();
+                    var p2 = row2[0][orderField].toLowerCase();
+                    return ( p1 > p2 ? 1 : (p1 == p2 ? 0 : -1));
+                });
+
+                return results;
+            }
+
+            // SELECT count(*) FROM {soupName}
+            var m = smartSql.match(/SELECT count\(\*\) FROM {(.*)}/i);
+            if (m != null) {
+                var soupName = m[1];
+                this.checkSoup(soupName); 
+                var soup = _soups[soupName];
+                var count = 0;
+                for (var soupEntryId in soup) {
+                    count++;
+                }
+                return [[count]];
+            }
+
+            // If we get here, it means we don't support that query in the mock smartstore
+            throw new Error("SmartQuery not supported by MockSmartStore:" + smartSql);
+        },
+
         querySoupFull: function(soupName, querySpec) {
+            if (querySpec.queryType == "smart") {
+                return this.smartQuerySoupFull(querySpec);
+            }
+
+            // other query type
             this.checkSoup(soupName); 
-            if (!this.indexExists(soupName, querySpec.indexPath)) throw soupName + " does not have an index on " + querySpec.indexPath; 
+            this.checkIndex(soupName, querySpec.indexPath);
 
             var soup = _soups[soupName];
             var results = [];
-            var likeRegexp = (querySpec.likeKey ? new RegExp(querySpec.likeKey.replace(/%/g, ".*")) : null);
+            var likeRegexp = (querySpec.likeKey ? new RegExp("^" + querySpec.likeKey.replace(/%/g, ".*"), "i") : null);
             for (var soupEntryId in soup) {
                 var soupElt = soup[soupEntryId];
                 var projection = this.project(soupElt, querySpec.indexPath);
@@ -225,7 +325,7 @@ var MockSmartStore = (function(window) {
                 }
             }
 
-            results.sort(function(soupElt1,soupElt2) {
+            results = results.sort(function(soupElt1,soupElt2) {
                 var p1 = soupElt1[querySpec.indexPath];
                 var p2 = soupElt2[querySpec.indexPath];
                 var compare = ( p1 > p2 ? 1 : (p1 == p2 ? 0 : -1));
@@ -297,6 +397,11 @@ var MockSmartStore = (function(window) {
                 successCB(self.querySoup(soupName, querySpec));
             });
 
+            cordova.interceptExec(SMARTSTORE_SERVICE, "pgRunSmartQuery", function (successCB, errorCB, args) {
+                var querySpec = args[0].querySpec;
+                successCB(self.querySoup(null, querySpec));
+            });
+
             cordova.interceptExec(SMARTSTORE_SERVICE, "pgRetrieveSoupEntries", function (successCB, errorCB, args) {
                 var soupName = args[0].soupName;
                 var entryIds = args[0].entryIds;
@@ -340,6 +445,3 @@ var MockSmartStore = (function(window) {
 
 var mockStore = new MockSmartStore();
 mockStore.hookToCordova(cordova);
-
-
-

@@ -37,8 +37,6 @@ import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.impl.javascript.AuraJavascriptGroup;
 import org.auraframework.impl.source.AuraResourcesHashingGroup;
-import org.auraframework.util.resource.CompiledGroup;
-import org.auraframework.util.resource.HashingGroup;
 import org.auraframework.impl.util.AuraImplFiles;
 import org.auraframework.impl.util.BrowserInfo;
 import org.auraframework.system.AuraContext;
@@ -49,11 +47,12 @@ import org.auraframework.util.AuraLocale;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.IOUtil;
 import org.auraframework.util.javascript.JavascriptGroup;
+import org.auraframework.util.resource.CompiledGroup;
 import org.auraframework.util.resource.FileGroup;
 import org.auraframework.util.resource.ResourceLoader;
+import org.auraframework.util.text.Hash;
 
 import com.google.common.collect.Lists;
-import org.auraframework.util.text.Hash;
 
 public class ConfigAdapterImpl implements ConfigAdapter {
 
@@ -65,6 +64,9 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     protected final Set<Mode> allModes = EnumSet.allOf(Mode.class);
     private final JavascriptGroup jsGroup;
     private final FileGroup resourcesGroup;
+    private String jsUid = "";
+    private String resourcesUid = "";
+    private String fwUid = "";
     private final ResourceLoader resourceLoader;
     private final Long buildTimestamp;
     private String auraVersionString;
@@ -141,7 +143,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
 
     }
 
-    private FileGroup newAuraResourcesHashingGroup() throws IOException {
+    protected FileGroup newAuraResourcesHashingGroup() throws IOException {
         return new AuraResourcesHashingGroup();
     }
 
@@ -394,14 +396,21 @@ public class ConfigAdapterImpl implements ConfigAdapter {
             String jsHash = jsGroup.getGroupHash().toString();
             String resourcesHash = getAuraResourcesNonce();
 
-            return makeHash(jsHash, resourcesHash);
+            // don't want to makeHash every time so store results and return appropriately
+            if (!jsHash.equals(this.jsUid) || !resourcesHash.equals(this.resourcesUid)) {
+                this.jsUid = jsHash;
+                this.resourcesUid = resourcesHash;
+                this.fwUid = makeHash(this.jsUid, this.resourcesUid);
+            }
+
+            return this.fwUid;
 
         } catch (IOException e) {
             throw new AuraRuntimeException("Can't read framework files", e);
         }
     }
 
-    private String makeHash(String one, String two) throws IOException {
+    protected String makeHash(String one, String two) throws IOException {
         StringReader reader = new StringReader(one + two);
         return new Hash(reader).toString();
     }

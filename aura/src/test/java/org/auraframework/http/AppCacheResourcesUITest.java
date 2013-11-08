@@ -126,7 +126,6 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
      * Opening cached app will only query server for the manifest and the component load.
      */
     @TargetBrowsers({  BrowserType.GOOGLECHROME,  BrowserType.SAFARI,   BrowserType.IPAD, BrowserType.IPHONE })
-    @TestLabels("auraSanity")
     public void testNoChanges() throws Exception {
         List<Request> logs = loadMonitorAndValidateApp(TOKEN, TOKEN, "", TOKEN);
         assertRequests(getExpectedInitialRequests(), logs);
@@ -144,7 +143,6 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
      * Opening cached app that had a prior cache error will reload the app.
      */
     @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.SAFARI,  BrowserType.IPAD, BrowserType.IPHONE })
-    @TestLabels("auraSanity")
     public void testCacheError() throws Exception {
     	//debug for flapper:
     	System.out.println("testCacheError,loadMonitorAndValidateApp, TS:"+System.currentTimeMillis());

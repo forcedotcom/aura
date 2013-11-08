@@ -131,6 +131,45 @@
         }
     },
 
+    testObservers : {
+        test:function(cmp) {
+            var ballot = cmp.find("ballot");
+            var idxDiv = cmp.find("index").getElement();
+            var valDiv = cmp.find("value").getElement();
+
+            ballot.getValue("m.candidates.string").setValue(0);
+
+            var attrib = cmp.getValue("m.string");
+            var value = cmp.getAttributes().getValue("observed");
+            attrib.setValue(value);  // implicitly tracks value in m.string
+            $A.test.assertEquals("first", attrib.getValue());
+            $A.test.assertEquals("first", $A.test.getText(valDiv));
+            $A.test.assertEquals(1, ballot.get("m.candidates.string"));
+
+            value.setValue("second");  // tracked by observer, including change event
+            $A.test.assertEquals("second", attrib.getValue());
+            $A.test.assertEquals("second", $A.test.getText(valDiv));
+            $A.test.assertEquals(2, ballot.get("m.candidates.string"));
+
+            attrib.unobserve(cmp);  // No-op, except to generate a warning
+            attrib.observe(value);  // No-op, already in effect
+            value.setValue("third");   // only one change per set, not doubled!
+            $A.test.assertEquals("third", attrib.getValue());
+            $A.test.assertEquals("third", $A.test.getText(valDiv));
+            $A.test.assertEquals(3, ballot.get("m.candidates.string"));
+
+            attrib.unobserve(value);  // Unlink
+            value.setValue("fourth");   // Not propagated
+            $A.test.assertEquals("third", attrib.getValue());
+            $A.test.assertEquals("third", $A.test.getText(valDiv));
+            $A.test.assertEquals(3, ballot.get("m.candidates.string"));
+
+            value.observe(attrib);  // Preferred new syntax
+            attrib.setValue("fifth");
+            $A.test.assertEquals("fifth", value.getValue());
+        }
+    },
+
         //
         // FIXME: W-1296937 this should cause an error that we can check. This is a simple
         // infinite recursion. If you uncomment this, it gives a different result

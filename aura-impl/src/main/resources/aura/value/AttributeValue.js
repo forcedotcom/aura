@@ -68,6 +68,14 @@ $A.ns.AttributeValue = function () {
    this.eventDispatcher = undefined;
 
    /**
+    * Observers, which track the value of some other "observed" value without
+    * the weight of full events.
+    */
+   this.observers = undefined;
+   /** Back reference to an observed value. */
+   this.observing = undefined;
+
+   /**
     * If defined, this is a pending event that has been prepared and is accumulating
     * data prior to being fired.
     */
@@ -86,6 +94,76 @@ $A.ns.AttributeValue.getQName = function (simpleName) {
  */
 $A.ns.AttributeValue.prototype.addHandlers = function(config) {
     $A.error("AttributeValue.addHandlers is abstract and should not be called.");
+};
+
+/**
+ * Initiates observation of a different value by this one, so that future changes
+ * will automatically be reflected here also.  Because assignment is type-specific,
+ * however, this method does NOT assign any initial value; it should be extended
+ * in specific subtypes to do that. 
+ *
+ * @param target the value to observe.  Errors in case of type mismatch.
+ * @protected
+ */
+$A.ns.AttributeValue.prototype.observe = function(target) {
+    if (target === this) {
+        return;  // Reflexive observation is nonsensical or automatic, your choice.
+    }
+    if (target.constructor !== this.constructor) {
+        $A.error("Type mismatch between " + this.toString() + " and " + target.toString());
+    }
+    if (this.observing) {
+        if (this.observing === target) {
+            return;  // No-op, already done
+        }
+        this.unobserve(this.observing);
+    }
+    if (target.observers === undefined) {
+        target.observers = [];
+    }
+    for (var i = 0; i < target.observers.length; ++i) {
+        if (target.observers[i] === this) {
+            return;  // Already observing
+        }
+    }
+    target.observers.push(this); 
+    this.observing = target;
+    this.setValue(target);
+};
+
+/**
+ * Updates observers for a changed value of the observed.
+ *
+ * @param newv  The new value, unwrapped, suitable for passing to observer.setValue(newv)
+ */
+$A.ns.AttributeValue.prototype.informObservers = function (newv) {
+    if (this.observers) {
+        for (var i = 0; i < this.observers.length; ++i) {
+            this.observers[i].setValue(newv);
+        }
+    }
+};
+
+/**
+ * Stops tracking a previously-observed value.  The current value remains unchanged,
+ * but future changes to the previously-observed one will not cause further changes to
+ * this one.
+ *
+ * @param target the value to stop observing.
+ */
+$A.ns.AttributeValue.prototype.unobserve = function(target) {
+    if (this.observing !== target) {
+        $A.warning("Un-observing a previously un-observed value is a sign of confusion.");
+        return;
+    }
+    if (target.observers) {
+        for (var i = 0; i < target.observers.length; ++i) {
+            if (target.observers[i] === this) {
+                target.observers.splice(i, 1);  // remove it
+            }
+        }
+    }
+    this.observing = undefined;
 };
 
 /**

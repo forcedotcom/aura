@@ -343,11 +343,11 @@
 
             $A.log("for updating existing key with a new value object");
             map.put("bagel", val);
-            this.assertChangeEvent(component, "bagel", val);
+            this.assertChangeEvent(component, "bagel", val.getValue());
             
             $A.log("for updating existing simple value of a key");
             val.setValue("Sarah Lee");
-            this.assertNoChangeEvent(component);
+            this.assertChangeEvent(component, "bagel", "Sarah Lee");
 
             // MapValue
             //var newMap = $A.expressionService.create(null, {"Banana":"Del Monte"});

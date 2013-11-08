@@ -6,7 +6,7 @@
                 false,
                 $A.test.isActionPending,
                 function () {
-                    $A.test.assertEquals("Today", cmp.get("v.simplevalue1.value"), "Failed to get Label");
+                    $A.test.assertEquals("Today", cmp.get("v.simplevalue1"), "Failed to get Label");
                 }
             );
         }
@@ -19,7 +19,7 @@
                 $A.test.isActionPending,
                 function () {
 
-                    var sv2 = cmp.get("v.simplevalue2.value");
+                    var sv2 = cmp.get("v.simplevalue2");
 
                     $A.test.assertTrue(
                         sv2 === "FIXME - LocalizationAdapter.getLabel() needs implementation!" ||
@@ -38,7 +38,7 @@
                 $A.test.isActionPending,
                 function () {
 
-                    var sv3 = cmp.get("v.simplevalue3.value");
+                    var sv3 = cmp.get("v.simplevalue3");
 
                     $A.test.assertTrue(
                         sv3 === "FIXME - LocalizationAdapter.getLabel() needs implementation!" ||
@@ -80,7 +80,7 @@
 
     testInvalidGVPExpressions: {
         test: function (cmp) {
-            var result = $A.getGlobalValueProviders().get("v.simplevalue3.value");
+            var result = $A.getGlobalValueProviders().get("v.simplevalue3");
             $A.test.assertEquals(undefined, result, "Invalid GVP expression should return undefined");
         }
     },
@@ -112,8 +112,8 @@
                     false,
                     $A.test.isActionPending,
                     function () {
-                        var sv4 = cmp.get("v.simplevalue4.value");
-                        $A.test.assertUndefinedOrNull(sv4, "v.simplevalue4.value should be undefined");
+                        var sv4 = cmp.get("v.simplevalue4");
+                        $A.test.assertUndefinedOrNull(sv4, "v.simplevalue4 should be undefined");
                     }
                 );
             }

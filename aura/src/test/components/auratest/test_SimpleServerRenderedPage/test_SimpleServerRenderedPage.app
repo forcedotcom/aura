@@ -16,5 +16,9 @@
 
 -->
 <aura:application render="server">
+    <aura:dependency resource="ui:*" />
+    <aura:dependency resource="aura:*" />
+    <aura:dependency resource="auradev:*" />
+    <aura:dependency resource="preloadTest:*" />
     <test:test_JavaRndr_Component/>
 </aura:application>

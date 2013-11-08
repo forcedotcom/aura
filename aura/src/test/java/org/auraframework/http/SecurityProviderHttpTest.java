@@ -405,7 +405,6 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
 
         Map<String, String> params = new HashMap<String, String>();
         params.put("message", jsonMessage);
-        params.put("aura.lastmod", "" + getLastMod(mode));
         params.put("aura.token", getCsrfToken());
         params.put("aura.context", String.format("{'mode':'%s'%s,'fwuid':'%s'}", mode.name(),
                 appDescriptor == null ? "" : String.format(",'app':'%s'", appDescriptor), Aura.getConfigAdapter()

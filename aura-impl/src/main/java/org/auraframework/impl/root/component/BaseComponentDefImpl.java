@@ -16,8 +16,6 @@
 
 package org.auraframework.impl.root.component;
 
-import static org.auraframework.instance.ValueProviderType.LABEL;
-
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -67,6 +65,8 @@ import org.auraframework.util.json.Json;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+
+import static org.auraframework.instance.ValueProviderType.LABEL;
 
 public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         RootDefinitionImpl<T> implements BaseComponentDef, Serializable {

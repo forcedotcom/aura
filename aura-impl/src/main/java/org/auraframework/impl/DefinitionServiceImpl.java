@@ -16,7 +16,6 @@
 package org.auraframework.impl;
 
 import java.lang.ref.WeakReference;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -43,7 +42,6 @@ import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 /**
@@ -193,12 +191,9 @@ public class DefinitionServiceImpl implements DefinitionService {
     /**
      * Take in the information off the context and sanitize, populating dependencies.
      * 
-     * This routine takes in the current descriptor, and a boolean to tell us
-     * if we are preloading. It then expands out dependencies and cleans up the
-     * set of explicitly loaded descriptors by removing descriptors that are
-     * implicitly loaded by others in the set. If there is a problem with the
-     * descriptor, it cleans up, and possibly sets the context descriptor to
-     * a quickfix, then lets the exception percolate up.
+     * This routine takes in the current descriptor, It then expands out dependencies and
+     * cleans up the set of explicitly loaded descriptors by removing descriptors that are
+     * implicitly loaded by others in the set.
      * 
      * Note that the client out of sync exception has higher 'precedence' than
      * the quick fix exception. This allows the servlet to correctly refresh a
@@ -214,65 +209,64 @@ public class DefinitionServiceImpl implements DefinitionService {
      * the client, and allow our future requests to be smaller.
      * 
      * @param loading The descriptor we think we are loading.
-     * @param preload are we preloading?
      * @throws ClientOutOfSyncException if the uid on something is a mismatch
      * @throws QuickFixException if a definition can't be compiled.
      */
     @Override
-    public void updateLoaded(DefDescriptor<?> loading, boolean preload)
-            throws QuickFixException, ClientOutOfSyncException {
+    public void updateLoaded(DefDescriptor<?> loading) throws QuickFixException, ClientOutOfSyncException {
         ContextService contextService = Aura.getContextService();
         AuraContext context;
         MasterDefRegistry mdr;
-        List<Map.Entry<DefDescriptor<?>, String>> entries;
         Set<DefDescriptor<?>> loaded = Sets.newHashSet();
 
         contextService.assertEstablished();
         context = contextService.getCurrentContext();
         mdr = context.getDefRegistry();
-        entries = Lists.newArrayList(context.getLoaded().entrySet());
-        //
-        // TODO (optimize): we could reverse this set randomly to try
-        // to sanitize the list in opposite directions. No need to be
-        // exact (hard to test though).
-        //
-        for (Map.Entry<DefDescriptor<?>, String> entry : entries) {
-            DefDescriptor<?> descriptor = entry.getKey();
-            String uid = entry.getValue();
-            if (uid == null) {
-                loaded.add(descriptor);
-            } else if (loaded.contains(descriptor)) {
-                context.dropLoaded(descriptor);
-            } else {
-                // validate the uid.
-                String tuid = null;
-                QuickFixException qfe = null;
+        if (context.getPreloadedDefinitions() == null) {
+            //
+            // TODO (optimize): we could reverse this set randomly to try
+            // to sanitize the list in opposite directions. No need to be
+            // exact (hard to test though).
+            //
+            for (Map.Entry<DefDescriptor<?>, String> entry : context.getClientLoaded().entrySet()) {
+                DefDescriptor<?> descriptor = entry.getKey();
+                String uid = entry.getValue();
+                if (uid == null) {
+                    loaded.add(descriptor);
+                } else if (loaded.contains(descriptor)) {
+                    context.dropLoaded(descriptor);
+                } else {
+                    // validate the uid.
+                    String tuid = null;
+                    QuickFixException qfe = null;
 
-                try {
-                    tuid = mdr.getUid(uid, descriptor);
-                } catch (QuickFixException broke) {
-                    //
-                    // See note above. This is how we enforce precedence of ClientOutOfSyncException
-                    //
-                    qfe = broke;
-                }
-                if (!uid.equals(tuid)) {
-                    throw new ClientOutOfSyncException(descriptor + ": mismatched UIDs " + uid + " != " + tuid);
-                }
-                if (qfe != null) {
-                    throw qfe;
-                }
-                if (!descriptor.equals(loading)) {
+                    try {
+                        tuid = mdr.getUid(uid, descriptor);
+                    } catch (QuickFixException broke) {
+                        //
+                        // See note above. This is how we enforce precedence of ClientOutOfSyncException
+                        //
+                        qfe = broke;
+                    }
+                    if (!uid.equals(tuid)) {
+                        throw new ClientOutOfSyncException(descriptor + ": mismatched UIDs " + uid + " != " + tuid);
+                    }
+                    if (qfe != null) {
+                        throw qfe;
+                    }
                     loaded.addAll(mdr.getDependencies(uid));
                 }
             }
+            context.setPreloadedDefinitions(loaded);
+        } else {
+            loaded = context.getPreloadedDefinitions();
         }
         //
         // Now make sure that our current definition is somewhere there
         // If this fails, we will throw an exception, and all will be
         // well.
         //
-        if (loading != null && !context.getLoaded().containsKey(loading)) {
+        if (loading != null && !loaded.contains(loading) && !context.getLoaded().containsKey(loading)) {
             String uid = mdr.getUid(null, loading);
 
             if (uid == null) {

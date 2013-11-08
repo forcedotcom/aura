@@ -169,13 +169,12 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
     @UnAdaptableTest
     @ThreadHostileTest("preloads namespace")
     public void testMultipleAppCache() throws Exception {
-        String appFormat = "<aura:application securityProvider='java://org.auraframework.components.security.SecurityProviderAlwaysAllows' useAppCache='true' preload='%s'>\n    <%s:%s />\n</aura:application>";
+        String appFormat = "<aura:application securityProvider='java://org.auraframework.components.security.SecurityProviderAlwaysAllows' useAppCache='true'>\n    <%s:%s />\n</aura:application>";
         String componentText = "<aura:component>the body</aura:component>";
         DefDescriptor<ComponentDef> oldCompDesc = addSourceAutoCleanup(ComponentDef.class, componentText, "oldComp");
         StringSource<ComponentDef> oldComp = (StringSource<ComponentDef>) getSource(oldCompDesc);
 
-        String appText = String.format(appFormat, oldCompDesc.getNamespace(), oldCompDesc.getNamespace(),
-                oldCompDesc.getName());
+        String appText = String.format(appFormat, oldCompDesc.getNamespace(), oldCompDesc.getName());
         DefDescriptor<ApplicationDef> oldAppDesc = addSourceAutoCleanup(ApplicationDef.class, appText, "old");
         StringSource<ApplicationDef> oldApp = (StringSource<ApplicationDef>) getSource(oldAppDesc);
         enablePreloads(oldAppDesc);
@@ -198,8 +197,7 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
 
         DefDescriptor<ComponentDef> newCompDesc = addSourceAutoCleanup(ComponentDef.class, componentText);
         ((StringSource<?>) getSource(newCompDesc)).setLastModified(later);
-        appText = String.format(appFormat, newCompDesc.getNamespace(), newCompDesc.getNamespace(),
-                newCompDesc.getName());
+        appText = String.format(appFormat, newCompDesc.getNamespace(), newCompDesc.getName());
         DefDescriptor<ApplicationDef> newerAppDesc = addSourceAutoCleanup(ApplicationDef.class, appText);
         ((StringSource<?>) getSource(newerAppDesc)).setLastModified(later);
 
@@ -208,8 +206,7 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
         Aura.getContextService().startContext(Mode.DEV, null, Access.AUTHENTICATED, newerAppDesc);
 
         // Sanity check that we get the expected answer in DEV mode.
-        // assertEquals("Sanity check DEV mode lastMod update", later.getTime(),
-        // AuraServlet.getLastMod());
+        assertEquals("Sanity check DEV mode lastMod update", later, AuraBaseServlet.getLastMod());
 
         Aura.getContextService().endContext();
         Aura.getContextService().startContext(Mode.PROD, null, Access.AUTHENTICATED, newerAppDesc);
@@ -218,17 +215,16 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
         //
         // The newer app should give its newer lastmod 'later'.
         //
-        assertEquals("Expected second app to show up as soon", later, AuraBaseServlet.getLastMod());
+        assertEquals("Expected second app to show up as later", later, AuraBaseServlet.getLastMod());
         Aura.getContextService().endContext();
 
         //
-        // Switching back to dev mode should reset, and give us 'later' for the
-        // first app as the
-        // namespace was updated by newer
+        // we preload dependencies now not namespaces so changing the namespace won't have any effect.
+        // should still be soon
         //
         Aura.getContextService().startContext(Mode.DEV, null, Access.AUTHENTICATED, oldAppDesc);
-        enablePreloads(newerAppDesc);
-        assertEquals("Expected first app to show up as later second time", later, AuraBaseServlet.getLastMod());
+        enablePreloads(oldAppDesc);
+        assertEquals("Expected first app to show up as soon second time", soon, AuraBaseServlet.getLastMod());
         Aura.getContextService().endContext();
 
         Aura.getContextService().startContext(Mode.PROD, null, Access.AUTHENTICATED, newerAppDesc);

@@ -19,7 +19,6 @@ import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -36,7 +35,6 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.test.AuraHttpTestCase;
 import org.auraframework.test.client.UserAgent;
-import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.JsFunction;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonReader;
@@ -50,32 +48,6 @@ import org.auraframework.util.json.JsonReader;
 public class AuraServletHttpTest extends AuraHttpTestCase {
     public AuraServletHttpTest(String name) {
         super(name);
-    }
-
-    /**
-     * Get responses should have preloads serialized.
-     */
-    @SuppressWarnings("unchecked")
-    public void testGetContextHasPreloads() throws Exception {
-        String url = "/aura?aura.tag=test%3Atext&aura.context="
-                + AuraTextUtil.urlencode(getSimpleContext(Format.JSON, false));
-        HttpGet get = obtainGetMethod(url);
-        HttpResponse httpResponse = perform(get);
-        int statusCode = getStatusCode(httpResponse);
-        String response = getResponseBody(httpResponse);
-        get.releaseConnection();
-
-        if (HttpStatus.SC_OK != statusCode) {
-            fail(String.format("Unexpected status code <%s>, expected <%s>, response:%n%s", statusCode,
-                    HttpStatus.SC_OK, response));
-        }
-        Map<String, Object> json = (Map<String, Object>) new JsonReader().read(response
-                .substring(AuraBaseServlet.CSRF_PROTECT.length()));
-        Map<String, Object> context = (Map<String, Object>) json.get("context");
-        assertTrue("preloads wasn't serialized", context.containsKey("preloads"));
-        List<String> preloads = (List<String>) context.get("preloads");
-        assertNotNull(preloads);
-        assertTrue("missing explicit preload", preloads.contains("preloadTest"));
     }
 
     /**
@@ -115,7 +87,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
                 .substring(AuraBaseServlet.CSRF_PROTECT.length()));
         @SuppressWarnings("unchecked")
         Map<String, Object> context = (Map<String, Object>) json.get("context");
-        assertFalse("preloads shouldn't get serialized on posts", context.containsKey("preloads"));
+        assertFalse("There should no longer be preloads", context.containsKey("preloads"));
     }
 
     /**
@@ -366,11 +338,9 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
                 "<aura:application><aura:attribute type='bah'/></aura:application>");
         HttpGet get = obtainGetMethod(String.format("/%s/%s.app", desc.getNamespace(), desc.getName()));
         HttpResponse httpResponse = perform(get);
-        assertEquals(HttpStatus.SC_NOT_FOUND, getStatusCode(httpResponse));
+        assertEquals(HttpStatus.SC_OK, getStatusCode(httpResponse));
         String response = getResponseBody(httpResponse);
-        assertTrue("Expected 404 error page but got: " + response, response.startsWith("404 Not Found"));
-        assertTrue("Expected null descriptor error message but got: " + response,
-                response.contains("descriptor is null"));
+        assertTrue("Expected null descriptor error message but got: " + response, response.contains("descriptor is null"));
         get.releaseConnection();
     }
 }

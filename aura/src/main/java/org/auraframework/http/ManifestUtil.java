@@ -17,7 +17,6 @@ package org.auraframework.http;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.servlet.http.Cookie;
@@ -120,11 +119,6 @@ public abstract class ManifestUtil {
 
         AuraContext context = Aura.getContextService().getCurrentContext();
         DefDescriptor<? extends BaseComponentDef> appDefDesc = context.getApplicationDescriptor();
-        Set<String> preloads = context.getPreloads();
-
-        if (preloads == null || preloads.isEmpty()) {
-            return false;
-        }
 
         if (appDefDesc != null && appDefDesc.getDefType().equals(DefType.APPLICATION)) {
             try {

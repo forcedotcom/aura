@@ -50,6 +50,13 @@
                 </td>
             </tr>
             <tr>
+                <td>Rich Text</td>
+                <td>An input field for entering rich text with a WYSIWYG rich text editor.</td>
+                <td><auradocs:defLink defType="component" descriptor="ui:inputRichText"/><br/>
+                <auradocs:defLink defType="component" descriptor="ui:outputRichText"/>
+                </td>
+             </tr>
+            <tr>
                 <td>Search</td>
                 <td>An input field for entering a search term.</td>
                 <td><auradocs:defLink defType="component" descriptor="ui:inputSearch"/>
@@ -68,13 +75,6 @@
                 <td>An input field for entering multiple-line text.</td>
                 <td><auradocs:defLink defType="component" descriptor="ui:inputTextArea"/><br/>
                 <auradocs:defLink defType="component" descriptor="ui:outputTextArea"/>
-                </td>
-             </tr>
-             <tr>
-                <td>Rich Text</td>
-                <td>An input field for entering rich text with a WYSIWYG rich text editor.</td>
-                <td><auradocs:defLink defType="component" descriptor="ui:inputRichText"/><br/>
-                <auradocs:defLink defType="component" descriptor="ui:outputRichText"/>
                 </td>
              </tr>
              <tr>

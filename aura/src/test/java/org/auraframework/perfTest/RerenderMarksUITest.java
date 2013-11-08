@@ -63,8 +63,10 @@ public class RerenderMarksUITest extends PerfMetricsTestCase {
      * 2. Attribute value change causes multiple component rerender 
      * 3. Server action where no component rerender is caused.
      * @throws Exception
+     * 
+     * Re-enable after bug W-1935316 is fixed
      */
-    public void testRerenderMarksHaveAllComponentNames() throws Exception{
+    public void _testRerenderMarksHaveAllComponentNames() throws Exception{
         Map<String, String> logStats = Maps.newHashMap();
         open("/performanceTest/perfApp.app", Mode.CADENCE);
         clearStats();

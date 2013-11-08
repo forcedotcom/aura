@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -121,6 +122,7 @@ public class AuraContextFilter implements Filter {
         }
     }
 
+    @SuppressWarnings("unchecked")
     protected AuraContext startContext(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException,
             ServletException {
         HttpServletRequest request = (HttpServletRequest) req;
@@ -154,11 +156,10 @@ public class AuraContextFilter implements Filter {
             if (lastMod != null && !lastMod.isEmpty()) {
                 context.setLastMod(lastMod);
             }
-            @SuppressWarnings("unchecked")
-            List<Object> dynamicNamespaces = (List<Object>) configMap.get("dn");
-            if (dynamicNamespaces != null) {
-                for (Object dn : dynamicNamespaces) {
-                    context.addDynamicNamespace((String) dn);
+            List<Object> preloads = (List<Object>) configMap.get("preloads");
+            if (preloads != null) {
+                for (Object preload : preloads) {
+                    context.addPreload((String) preload);
                 }
             }
             getLoaded(context, configMap.get("loaded"));

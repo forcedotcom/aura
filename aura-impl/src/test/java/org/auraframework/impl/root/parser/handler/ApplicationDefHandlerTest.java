@@ -28,6 +28,7 @@ import org.auraframework.impl.source.StringSource;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.base.Optional;
@@ -85,6 +86,27 @@ public class ApplicationDefHandlerTest extends AuraImplTestCase {
         }
     }
 
+    /**
+     * Verify that wild characters are not accepted for preload specifier
+     * 
+     * @throws Exception
+     */
+    public void testWildCharactersForPreLoad() throws Exception {
+        XMLParser parser = XMLParser.getInstance();
+        DefDescriptor<ApplicationDef> descriptor = DefDescriptorImpl.getInstance("test:fakeparser",
+                ApplicationDef.class);
+        StringSource<ApplicationDef> source = new StringSource<ApplicationDef>(descriptor,
+                "<aura:application preload=\"*,?,/\"></aura:application>", "myID", Format.XML);
+        try {
+            ApplicationDef app = parser.parse(descriptor, source);
+            app.validateDefinition();
+            app.validateReferences();
+            fail("Should have thrown Exception. Wild characters cannot be specified for preload namespace");
+        } catch (InvalidDefinitionException expected) {
+            assertTrue("Unexpected message " + expected.getMessage(),
+                    expected.getMessage().equals("Illegal namespace in ?"));
+        }
+    }
 
     public void testThemeOverrides() throws Exception {
         DefDescriptor<ThemeDef> parent = addSourceAutoCleanup(ThemeDef.class, "<aura:theme></aura:theme>");

@@ -38,6 +38,7 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.SecurityProviderDef;
+import org.auraframework.impl.root.DependencyDefImpl;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.service.LoggingService;
 import org.auraframework.system.AuraContext;
@@ -85,7 +86,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     private final static int DEFINITION_CACHE_SIZE = 4096;
     private final static int DEPENDENCY_CACHE_SIZE = 100;
     private final static int STRING_CACHE_SIZE = 100;
-    private static final Logger logger = Logger.getLogger(MasterDefRegistryImpl.class);
+    private static final Logger logger = Logger.getLogger("MasterDefRegistryImpl");
 
     /**
      * A dependency entry for a uid+descriptor.
@@ -366,6 +367,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         public final LoggingService loggingService = Aura.getLoggingService();
         public final Map<DefDescriptor<? extends Definition>, CompilingDef<?>> compiled = Maps.newHashMap();
         public final Map<DefDescriptor<? extends Definition>, Definition> dependencies;
+        public boolean addedPreloads = false;
 
         // public final Map<DefDescriptor<? extends Definition>, Definition>
         // dependencies = Maps.newHashMap();
@@ -522,7 +524,22 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             //
             Set<DefDescriptor<?>> newDeps = Sets.newHashSet();
             cd.def.appendDependencies(newDeps);
-
+            //
+            // FIXME: this code will go away with preloads.
+            // This pulls in the context preloads. not pretty, but it works.
+            //
+            if (!cc.addedPreloads && cd.descriptor.getDefType().equals(DefType.APPLICATION)) {
+                cc.addedPreloads = true;
+                Set<String> preloads = cc.context.getPreloads();
+                for (String preload : preloads) {
+                    if (!preload.contains("_")) {
+                        DependencyDefImpl.Builder ddb = new DependencyDefImpl.Builder();
+                        ddb.setResource(preload);
+                        ddb.setType("APPLICATION,COMPONENT,STYLE,EVENT");
+                        ddb.build().appendDependencies(newDeps);
+                    }
+                }
+            }
             for (DefDescriptor<?> dep : newDeps) {
                 if (!defs.containsKey(dep)) {
                     CompilingDef<?> depcd = cc.getCompiling(dep);
@@ -682,9 +699,10 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                 return null;
             }
             for (Definition t : dds.values()) {
-                lmt = updateLastMod(lmt, t);
+                if (t.getLocation() != null && t.getLocation().getLastModified() > lmt) {
+                    lmt = t.getLocation().getLastModified();
+                }
             }
-            lmt = updateLastMod(lmt, def);
             StringBuilder sb = new StringBuilder(dds.size() * 20);
 
             //
@@ -731,13 +749,6 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         } finally {
             compilingDescriptor = lastCompiling;
         }
-    }
-
-    private long updateLastMod(long lastModTime, Definition def) {
-        if (def.getLocation() != null && def.getLocation().getLastModified() > lastModTime) {
-            lastModTime = def.getLocation().getLastModified();
-        }
-        return lastModTime;
     }
 
     /**
@@ -1257,7 +1268,6 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
         depsCache.invalidateAll();
         descriptorFilterCache.invalidateAll();
-        stringsCache.invalidateAll();
 
         if (descriptor == null) {
             defsCache.invalidateAll();

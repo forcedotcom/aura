@@ -15,8 +15,6 @@
  */
 package org.auraframework.test;
 
-import junit.framework.AssertionFailedError;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
@@ -37,6 +35,8 @@ import java.util.Scanner;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import junit.framework.AssertionFailedError;
+
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
@@ -53,7 +53,6 @@ import org.auraframework.util.AuraUITestingUtil;
 import org.auraframework.util.AuraUtil;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -212,7 +211,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
     /**
      * Load a string as a component in an app.
      * 
-     * @param namePrefix the name of the component
+     * @param name the name of the component
      * @param componentText The actual text of the component.
      * @param isClient Should we use client or server rendering.
      */
@@ -233,9 +232,9 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
     }
 
     /**
-     * A convenience routine to load a application string.
+     * A convienience routine to load a application string.
      * 
-     * @param namePrefix the application name.
+     * @param name the application name.
      * @param appText the actual text of the application
      */
     protected void loadApplication(String namePrefix, String appText, boolean isClient) throws MalformedURLException,
@@ -478,7 +477,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
 
     /**
      * Open a Aura URL with the default mode provided by {@link WebDriverTestCase#getAuraModeForCurrentBrowser()} and
-     * wait for intialization as defined by {@link AuraUITestingUtil#waitForAuraInit()}.
+     * wait for intialization as defined by {@link WebDriverTestCase#waitForAuraInit()}.
      * 
      * @throws MalformedURLException
      * @throws URISyntaxException
@@ -534,7 +533,6 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
         newParams.add(new BasicNameValuePair("aura.test", getQualifiedName()));
         url = url + "?" + URLEncodedUtils.format(newParams, "UTF-8") + hash;
 
-        auraUITestingUtil.getRawEval("document._waitingForReload = true;");
         try {
             openAndWait(url, waitForInit);
         } catch (TimeoutException e) {
@@ -670,7 +668,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
      * @param e WebElement to look for
      * @param isDisplayed if set to true, will wait till the element is displayed else will wait till element is not
      *            visible.
-     * @param timeoutInSecs number of seconds to wait before erroring out
+     * @param timeoutinSecs number of seconds to wait before erroring out
      */
     protected void waitForElement(String msg, final WebElement e, final boolean isDisplayed, int timeoutInSecs) {
         auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
@@ -682,36 +680,13 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
     }
 
     /**
-     * Waits for element with matching locator to appear on screen.
-     * 
-     * @param msg Error message on timeout.
-     * @param locator By of element waiting for.
-     */
-    public void waitForElementAppear(String msg, final By locator) {
-        WebDriverWait wait = new WebDriverWait(getDriver(), timeoutInSecs);
-        wait.withMessage(msg);
-        wait.ignoring(NoSuchElementException.class);
-        wait.until(new ExpectedCondition<Boolean>() {
-            @Override
-            public Boolean apply(WebDriver d) {
-                return isElementPresent(locator);
-            }
-        });
-    }
-
-    public void waitForElementAppear(By locator) {
-        String msg = "Element with locator \'" + locator.toString() + "\' never appeared";
-        waitForElementAppear(msg, locator);
-    }
-
-    /**
      * Overriding wait to wait until the dialog box closes, Since we are using the class variable to check for the
      * Dialog box, it changes from dialog modal medium uiDialog slideUp -> dialog modal medium uiDialog-> dialog hidden
      * modal medium uiDialog (this is the state that we want to make sure to grab)
      * 
-     * @param selectorToFindCmp way to find componenet (ex: "div[class*='dialog']")
+     * @param selector way to find componenet (ex: "div[class*='dialog']")
      * @param attr components attribute that we want to find
-     * @param itemAttrShouldContain Keyword that we are looking for in the attribute
+     * @param itemInAttr Keyword that we are looking for in the attribute
      * @param useBangOperator Whether we want to use the bang operator or not
      */
     public void waitForComponentToChangeStatus(final String selectorToFindCmp, final String attr,

@@ -16,7 +16,6 @@
 
 -->
 <aura:component implements="ui:elementInterface" extensible="true" support="GA"            description="A column based listview with comprehensive event support.">
-    <aura:dependency resource="ui:listView*" />
     <aura:attribute name="id" type="String" default="default"                              description="The unique id of the listview instance."/>
 
     <aura:attribute name="alternateRowClass" type="String" required="false"                description="Optional. The css class to use for alternating rows."/>

@@ -15,17 +15,14 @@
  */
 package org.auraframework.impl.preload;
 
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Map;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpGet;
-import org.auraframework.def.ApplicationDef;
 import org.auraframework.http.AuraBaseServlet;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.system.AuraContext.Format;
 import org.auraframework.test.AuraHttpTestCase;
 import org.auraframework.test.annotation.TestLabels;
 import org.auraframework.util.json.JsonReader;
@@ -66,7 +63,8 @@ public class PreloadNameSpaceHttpTest extends AuraHttpTestCase {
     }
 
     /**
-     * Test there are no more preloaded namespaces.
+     * Verify preload namespaces are properly attached to the Context, including the preloads explicitly declared on the
+     * component using the preload='<namespace>' tag.
      */
     @SuppressWarnings("unchecked")
     public void testPreloadsOnContext() throws Exception {
@@ -78,13 +76,18 @@ public class PreloadNameSpaceHttpTest extends AuraHttpTestCase {
         Map<String, Object> context = (Map<String, Object>) outerMap.get("context");
         ArrayList<String> preloads = (ArrayList<String>) context.get("preloads");
 
-        assertNull("Preloads found in the Context", preloads);
+        assertNotNull("No preloads found in the Context", preloads);
+        assertTrue("Preloads array on Context is empty", !preloads.isEmpty());
+        assertTrue("'aura' preloaded namespace not found on Context", preloads.contains("aura"));
+        assertTrue("'ui' preloaded namespace not found on Context", preloads.contains("ui"));
+        assertTrue("Preloads explicitly declared on component using the preload='' tag should be present on Context",
+                preloads.contains("preloadTest"));
     }
 
     private String obtainResponseCheckStatus() throws Exception {
-        String url = String.format("/aura?aura.tag=%s&aura.deftype=APPLICATION&aura.context=%s", "preloadTest:test_Preload_Cmp_SameNameSpace",
-            URLEncoder.encode(getContext(Mode.FTEST, Format.JSON, "preloadTest:test_Preload_Cmp_SameNameSpace",
-                ApplicationDef.class, false), "UTF-8"));
+        String url = String
+                .format("/aura?aura.tag=preloadTest:test_Preload_Cmp_SameNameSpace&aura.format=JSON&aura.mode=FTEST&aura.lastmod=%s&aura.deftype=APPLICATION",
+                        getLastMod(Mode.FTEST, "preloadTest"));
         HttpGet get = obtainGetMethod(url);
         HttpResponse httpResponse = perform(get);
         int statusCode = getStatusCode(httpResponse);

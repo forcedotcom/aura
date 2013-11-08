@@ -16,8 +16,6 @@
 
 -->
 <aura:application extensible="true" template="aura:integrationServiceTemplate" securityProvider="java://org.auraframework.impl.integration.IntegrationServiceSecurityProvider" render="CLIENT">
-    <aura:dependency resource="ui:message" />
-    <aura:dependency resource="ui:outputText" />
     <aura:registerevent name="addComponent" type="aura:addIntegrationComponent"/>
     <aura:handler name="addComponent" action="{!c.addComponent}" />
 </aura:application>

@@ -16,22 +16,20 @@
 
 -->
 <aura:component template="auradev:quickFixTemplate">
-    <aura:dependency resource="markup://auradev:*" />
     <aura:attribute name="exception" type="java://org.auraframework.throwable.quickfix.QuickFixException" />
+        <div class="content">
+            <div class="toolbar">Error: {!v.exception.message}
+                <aura:if isTrue="{!v.exception.location != null}">
+                    <div class="location">at {!v.exception.location}</div>
+                </aura:if>
+            </div>
 
-    <div class="content">
-        <div class="toolbar">Error: {!v.exception.message}
-            <aura:if isTrue="{!v.exception.location != null}">
-                <div class="location">at {!v.exception.location}</div>
-            </aura:if>
-        </div>
-
-        <div class="optionWrapper">
-            <div class="options" aura:id="container">
-                <aura:iteration items="{!v.exception.quickFixes}" var="quickFix">
-                    <auradev:quickFixButton quickFix="{!quickFix}" showUI="{!c.showUI}" />
-                </aura:iteration>
+            <div class="optionWrapper">
+                <div class="options" aura:id="container">
+                    <aura:iteration items="{!v.exception.quickFixes}" var="quickFix">
+                        <auradev:quickFixButton quickFix="{!quickFix}" showUI="{!c.showUI}" />
+                    </aura:iteration>
+                </div>
             </div>
         </div>
-    </div>
 </aura:component>

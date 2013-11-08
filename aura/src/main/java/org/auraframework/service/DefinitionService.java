@@ -83,9 +83,8 @@ public interface DefinitionService extends AuraService, SourceListener {
 
     /**
      * Creates a {@link DefDescriptor} from the qualified name passed in,
-     * retrieves the named Definition and then returns it.
-     *
-     * FIXME: some callers use a descriptorName instead of a qualifiedName here!
+     * retrieves the named Definition and then returns it. FIXME: some callers
+     * use a descriptorName instead of a qualifiedName here!
      * 
      * @return The named definition
      * @throws DefinitionNotFoundException if definition does not exist
@@ -163,10 +162,11 @@ public interface DefinitionService extends AuraService, SourceListener {
      * update the set of loaded descriptors, and validate.
      * 
      * @param loading the descriptor that we are loading if any.
+     * @param preload are we in 'preload'?
      * @throws ClientOutOfSyncException if one of the defs is out of date.
      * @throws QuickFixException if a definition can't be compiled.
      */
-    void updateLoaded(DefDescriptor<?> loading) throws QuickFixException, ClientOutOfSyncException;
+    void updateLoaded(DefDescriptor<?> loading, boolean preload) throws QuickFixException, ClientOutOfSyncException;
 
     /**
      * Register interest in real-time changes to source, if available

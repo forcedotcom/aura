@@ -22,6 +22,7 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.EventDef;
 import org.auraframework.service.ContextService;
+import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
@@ -238,9 +239,6 @@ public class AuraServletIntegrationTest extends IntegrationTestCase {
         assertLastModAfterUpdate(Mode.DEV, appDesc, touchSource(depDef.getDescriptor()), true);
     }
 
-    /**
-     * This updates because CSS is now using dependencies.
-     */
     @UnAdaptableTest
     public void testGetLastModDevUpdateDependentEventMarkup() throws Exception {
         DefDescriptor<ApplicationDef> appDesc = Aura.getDefinitionService().getDefDescriptor(
@@ -265,8 +263,11 @@ public class AuraServletIntegrationTest extends IntegrationTestCase {
     public void testGetLastModDevUpdatePreloadedCss() throws Exception {
         DefDescriptor<ApplicationDef> appDesc = Aura.getDefinitionService().getDefDescriptor(
                 "updateTest:updateWithPreload", ApplicationDef.class);
-        Aura.getContextService().startContext(Mode.DEV, Format.HTML, Access.AUTHENTICATED, appDesc);
-        ComponentDef depDef = Aura.getDefinitionService().getDefinition("updateTest:updateableOther", ComponentDef.class);
+        AuraContext context = Aura.getContextService().startContext(Mode.DEV, Format.HTML, Access.AUTHENTICATED,
+                appDesc);
+        context.addPreload("updateTest");
+        ComponentDef depDef = Aura.getDefinitionService().getDefinition("updateTest:updateableOther",
+                ComponentDef.class);
         assertLastModAfterUpdate(Mode.DEV, appDesc, touchSource(depDef.getStyleDescriptor()), true);
     }
 
@@ -313,10 +314,10 @@ public class AuraServletIntegrationTest extends IntegrationTestCase {
      */
     public void testGetManifestWithoutPreloads() throws Exception {
         DefDescriptor<ApplicationDef> desc = Aura.getDefinitionService().getDefDescriptor(
-                "appCache:nopreload", ApplicationDef.class);
-        Aura.getContextService().startContext(Mode.PROD, Format.HTML, Access.AUTHENTICATED, desc);
-        assertTrue(ManifestUtil.isManifestEnabled());
-
+                "appPreloadTest:appCacheNoPreload", ApplicationDef.class);
+        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.HTML, Access.AUTHENTICATED, desc);
+        context.clearPreloads();
+        assertEquals(false, ManifestUtil.isManifestEnabled());
     }
 
     /**
@@ -325,12 +326,16 @@ public class AuraServletIntegrationTest extends IntegrationTestCase {
     @ThreadHostileTest("preload sensitive")
     public void testGetManifestWithPreloads() throws Exception {
         DefDescriptor<ApplicationDef> desc = Aura.getDefinitionService().getDefDescriptor(
-                "appCache:nopreload", ApplicationDef.class);
-        Aura.getContextService().startContext(Mode.PROD, Format.HTML, Access.AUTHENTICATED, desc);
+                "appPreloadTest:appCacheNoPreload", ApplicationDef.class);
+        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.HTML, Access.AUTHENTICATED, desc);
+        context.clearPreloads();
+        context.addPreload("aura");
+        context.addPreload("ui");
         String url = ManifestUtil.getManifestUrl();
         assertEquals(
-                "/l/%7B%22mode%22%3A%22PROD%22%2C%22app%22%3A%22appCache%3Anopreload%22%2C%22test%22%3A%22" +
-                "org.auraframework.http.AuraServletIntegrationTest.testGetManifestWithPreloads%22%7D/app.manifest",
+                "/l/%7B%22mode%22%3A%22PROD%22%2C%22app%22%3A%22appPreloadTest%3AappCacheNoPreload%22%2C"
+                        + "%22preloads%22%3A%5B%22aura%22%2C%22ui%22%5D%2C"
+                        + "%22test%22%3A%22org.auraframework.http.AuraServletIntegrationTest.testGetManifestWithPreloads%22%7D/app.manifest",
                 url);
     }
 }

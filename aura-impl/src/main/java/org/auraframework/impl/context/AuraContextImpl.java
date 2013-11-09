@@ -16,44 +16,26 @@
 package org.auraframework.impl.context;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+
+import javax.xml.stream.XMLStreamException;
 
 import org.auraframework.Aura;
-import org.auraframework.def.BaseComponentDef;
-import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.*;
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.def.EventType;
 import org.auraframework.http.AuraBaseServlet;
-import org.auraframework.instance.Action;
-import org.auraframework.instance.BaseComponent;
-import org.auraframework.instance.Event;
-import org.auraframework.instance.GlobalValueProvider;
-import org.auraframework.instance.ValueProviderType;
-import org.auraframework.system.AuraContext;
-import org.auraframework.system.Client;
-import org.auraframework.system.MasterDefRegistry;
+import org.auraframework.instance.*;
+import org.auraframework.system.*;
 import org.auraframework.test.TestContext;
 import org.auraframework.test.TestContextAdapter;
+import org.auraframework.throwable.AuraUnhandledException;
 import org.auraframework.throwable.quickfix.InvalidEventTypeException;
+import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
-import org.auraframework.util.json.BaseJsonSerializationContext;
-import org.auraframework.util.json.Json;
-import org.auraframework.util.json.JsonSerializationContext;
-import org.auraframework.util.json.JsonSerializer;
+import org.auraframework.util.json.*;
 import org.auraframework.util.json.JsonSerializer.NoneSerializer;
-import org.auraframework.util.json.JsonSerializers;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import com.google.common.collect.*;
 
 public class AuraContextImpl implements AuraContext {
     public static class SerializationContext extends BaseJsonSerializationContext {
@@ -115,6 +97,9 @@ public class AuraContextImpl implements AuraContext {
                 } else {
                     json.writeMapEntry("cmp", String.format("%s:%s", appDesc.getNamespace(), appDesc.getName()));
                 }
+            }
+            if (ctx.getSerializePreLoad()) {
+                json.writeMapEntry("preloads", ctx.getPreloads());
             }
             if (ctx.getRequestedLocales() != null) {
                 List<String> locales = new ArrayList<String>();
@@ -230,9 +215,7 @@ public class AuraContextImpl implements AuraContext {
 
     private String currentNamespace;
 
-    private final Set<String> dynamicNamespaces = Sets.newLinkedHashSet();
-
-    private Set<DefDescriptor<?>> preloadedDefinitions = null;
+    private final LinkedHashSet<String> preloadedNamespaces = Sets.newLinkedHashSet();
 
     private final Format format;
 
@@ -247,13 +230,19 @@ public class AuraContextImpl implements AuraContext {
 
     private String contextPath = "";
 
+    private boolean serializePreLoad = true;
+
     private boolean serializeLastMod = true;
 
     private boolean preloading = false;
 
     private DefDescriptor<? extends BaseComponentDef> appDesc;
 
-    private DefDescriptor<? extends BaseComponentDef> loadingAppDesc;
+    private BaseComponentDef app;
+
+    private boolean appLoaded = false;
+
+    private DefDescriptor<?> preloadingDesc;
 
     private List<Locale> requestedLocales;
 
@@ -270,7 +259,13 @@ public class AuraContextImpl implements AuraContext {
     public AuraContextImpl(Mode mode, MasterDefRegistry masterRegistry, Map<DefType, String> defaultPrefixes,
             Format format, Access access, JsonSerializationContext jsonContext,
             Map<ValueProviderType, GlobalValueProvider> globalProviders, boolean isDebugToolEnabled) {
-
+        if (access == Access.AUTHENTICATED) {
+            preloadedNamespaces.add("aura");
+            preloadedNamespaces.add("ui");
+            if (mode == Mode.DEV) {
+                preloadedNamespaces.add("auradev");
+            }
+        }
         this.mode = mode;
         this.masterRegistry = masterRegistry;
         this.defaultPrefixes = defaultPrefixes;
@@ -282,17 +277,45 @@ public class AuraContextImpl implements AuraContext {
     }
 
     @Override
+    public void addPreload(String preload) {
+        preloadedNamespaces.add(preload);
+    }
+
+    @Override
+    public void clearPreloads() {
+        preloadedNamespaces.clear();
+    }
+
+    @Override
     public boolean isPreloaded(DefDescriptor<?> descriptor) {
         if (preloading) {
             return false;
         }
-        if (dynamicNamespaces.contains(descriptor.getNamespace())) {
-            return true;
+        
+        if (appDesc != null && !appLoaded) {
+            appLoaded = true;
+            try {
+                app = masterRegistry.getDef(appDesc);
+            } catch (QuickFixException qfe) {
+                // we just don't have an app, ignore this.
+            } catch (AuraUnhandledException ahe) {
+                // Ugh! our file has been created, but not written?
+                // TODO: W-1486796
+                if (!(ahe.getCause() instanceof XMLStreamException)) {
+                    throw ahe;
+                }
+            }
         }
-        if (preloadedDefinitions != null) {
-            return preloadedDefinitions.contains(descriptor);
+        
+        if (app != null) {
+            for (DependencyDef dd : app.getDependencies()) {
+                if (dd.getDependency().matchDescriptor(descriptor)) {
+                    return true;
+                }
+            }
         }
-        return false;
+        
+        return preloadedNamespaces.contains(descriptor.getNamespace());
     }
 
     @Override
@@ -303,11 +326,6 @@ public class AuraContextImpl implements AuraContext {
     @Override
     public DefDescriptor<? extends BaseComponentDef> getApplicationDescriptor() {
         return appDesc;
-    }
-
-    @Override
-    public DefDescriptor<? extends BaseComponentDef> getLoadingApplicationDescriptor() {
-        return (loadingAppDesc != null)?loadingAppDesc:appDesc;
     }
 
     @Override
@@ -351,16 +369,6 @@ public class AuraContextImpl implements AuraContext {
     }
 
     @Override
-    public Set<DefDescriptor<?>> getPreloadedDefinitions() {
-        return preloadedDefinitions;
-    }
-
-    @Override
-    public void setPreloadedDefinitions(Set<DefDescriptor<?>> preloadedDefinitions) {
-        this.preloadedDefinitions = Collections.unmodifiableSet(preloadedDefinitions);
-    }
-
-    @Override
     public Format getFormat() {
         return format;
     }
@@ -396,6 +404,11 @@ public class AuraContextImpl implements AuraContext {
     }
 
     @Override
+    public Set<String> getPreloads() {
+        return Collections.unmodifiableSet(preloadedNamespaces);
+    }
+
+    @Override
     public List<Locale> getRequestedLocales() {
         return requestedLocales;
     }
@@ -403,6 +416,11 @@ public class AuraContextImpl implements AuraContext {
     @Override
     public boolean getSerializeLastMod() {
         return serializeLastMod;
+    }
+
+    @Override
+    public boolean getSerializePreLoad() {
+        return serializePreLoad;
     }
 
     @Override
@@ -433,11 +451,6 @@ public class AuraContextImpl implements AuraContext {
         } else {
             componentRegistry.put(component.getGlobalId(), component);
         }
-    }
-
-    @Override
-    public void setLoadingApplicationDescriptor(DefDescriptor<? extends BaseComponentDef> loadingAppDesc) {
-        this.loadingAppDesc = loadingAppDesc;
     }
 
     @Override
@@ -499,11 +512,6 @@ public class AuraContextImpl implements AuraContext {
     }
 
     @Override
-    public void addDynamicNamespace(String namespace) {
-        this.dynamicNamespaces.add(namespace);
-    }
-
-    @Override
     public void setRequestedLocales(List<Locale> requestedLocales) {
         this.requestedLocales = requestedLocales;
     }
@@ -511,6 +519,11 @@ public class AuraContextImpl implements AuraContext {
     @Override
     public void setSerializeLastMod(boolean serializeLastMod) {
         this.serializeLastMod = serializeLastMod;
+    }
+
+    @Override
+    public void setSerializePreLoad(boolean serializePreLoad) {
+        this.serializePreLoad = serializePreLoad;
     }
 
     @Override
@@ -539,7 +552,7 @@ public class AuraContextImpl implements AuraContext {
     @Override
     public void setClientLoaded(Map<DefDescriptor<?>, String> clientLoaded) {
         loaded.putAll(clientLoaded);
-        this.clientLoaded.putAll(clientLoaded);
+        clientLoaded.putAll(clientLoaded);
     }
 
     @Override
@@ -561,6 +574,16 @@ public class AuraContextImpl implements AuraContext {
     @Override
     public Map<DefDescriptor<?>, String> getLoaded() {
         return Collections.unmodifiableMap(loaded);
+    }
+
+    @Override
+    public void setPreloading(DefDescriptor<?> descriptor) {
+        preloadingDesc = descriptor;
+    }
+
+    @Override
+    public DefDescriptor<?> getPreloading() {
+        return preloadingDesc;
     }
 
     @Override

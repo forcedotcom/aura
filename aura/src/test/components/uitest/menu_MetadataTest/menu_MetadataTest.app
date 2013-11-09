@@ -16,7 +16,6 @@
 
 -->
 <aura:application model="java://org.auraframework.component.ui.MenuTestModel">
-<aura:dependency resource="ui:*" type="COMPONENT" />
 <div style="margin:20px;">
     <div style="display:inline-block;width:50%;vertical-align:top;">
         <h2>Checkbox - Metadata driven menu</h2>

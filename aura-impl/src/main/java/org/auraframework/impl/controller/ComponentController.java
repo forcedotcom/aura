@@ -41,7 +41,7 @@ public class ComponentController {
             throws QuickFixException {
         DefinitionService definitionService = Aura.getDefinitionService();
         DefDescriptor<ComponentDef> desc = definitionService.getDefDescriptor(name, ComponentDef.class);
-        definitionService.updateLoaded(desc);
+        definitionService.updateLoaded(desc, false);
         return Aura.getInstanceService().getInstance(desc, attributes);
     }
 
@@ -50,7 +50,7 @@ public class ComponentController {
             throws QuickFixException {
         DefinitionService definitionService = Aura.getDefinitionService();
         DefDescriptor<ApplicationDef> desc = definitionService.getDefDescriptor(name, ApplicationDef.class);
-        definitionService.updateLoaded(desc);
+        definitionService.updateLoaded(desc, false);
         return Aura.getInstanceService().getInstance(desc, attributes);
     }
 

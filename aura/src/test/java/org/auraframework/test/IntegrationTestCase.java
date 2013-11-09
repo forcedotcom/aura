@@ -79,6 +79,41 @@ public abstract class IntegrationTestCase extends AuraTestCase {
         return getTestServletConfig().getCsrfToken();
     }
 
+    /**
+     * Note: Any tests utilizing getLastMod are suspects for {@link ThreadHostileTest} since the last mod is shared
+     * global state.
+     */
+    protected static long getLastMod(Mode mode, String... preloads) throws Exception {
+        // AuraContextImpl adds aura & ui namespaces as default
+        // SFDCAuraContext adds os namespace as default
+        List<String> preloadsList = Lists.<String> newArrayList(new String[] { "aura", "ui" });
+        preloadsList.addAll(Arrays.asList(preloads));
+
+        ContextService contextService = Aura.getContextService();
+        AuraContext context;
+
+        // reuse existing context if available
+        AuraContext originalContext = null;
+        if (contextService.isEstablished()) {
+            originalContext = contextService.getCurrentContext();
+        }
+        if (originalContext == null || !originalContext.getMode().equals(mode)) {
+            context = contextService.startContext(mode, Format.JSON, Access.AUTHENTICATED);
+        } else {
+            context = originalContext;
+        }
+
+        for (String preload : preloadsList) {
+            context.addPreload(preload);
+        }
+
+        long lastMod = AuraBaseServlet.getLastMod();
+
+        setContext(originalContext);
+
+        return lastMod;
+    }
+
     protected TestServletConfig getTestServletConfig() {
         if (servletConfig == null) {
             servletConfig = Aura.get(TestServletConfig.class);

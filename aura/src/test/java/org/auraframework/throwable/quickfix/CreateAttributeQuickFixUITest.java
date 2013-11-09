@@ -146,8 +146,5 @@ public class CreateAttributeQuickFixUITest extends WebDriverTestCase {
         util.verifyToolbarText("The attribute \"foo\" was "
                 + "not found on the COMPONENT markup://auratest:createAttributeQuickFix_child");
         util.clickCreateButton("Create Attribute");
-        // Wait for next page to appear
-        waitForElementAppear("Clicking quickfix button did not advance to next page.",
-                By.cssSelector("input[name='attName']"));
     }
 }

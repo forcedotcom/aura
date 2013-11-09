@@ -16,7 +16,6 @@
 
 -->
 <aura:component extensible="true" implements="ui:visible" support="BETA" description="A tab set that displays a list of tabs in an unordered list.">
-    <aura:dependency resource="ui:updateSize" type="EVENT" />
     <div class="{!'tablist ' + v.class}" aura:id="div" role="tablist">
         <ul class="tabLabels" aura:id="ul">
             {!v.body}

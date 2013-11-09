@@ -20,5 +20,4 @@
     <ui:inputText aura:id="inputText" value="in one component" />
     <ui:outputText aura:id="outputText" value="out the other" />
     <test:testValidCSS />
-    {!v.body}
 </aura:component>

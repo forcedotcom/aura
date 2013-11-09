@@ -15,8 +15,10 @@
  */
 package org.auraframework.impl.adapter.format.html;
 
+import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.system.AuraContext;
 import org.auraframework.test.annotation.UnAdaptableTest;
 
 /**
@@ -43,6 +45,8 @@ public class ComponentDefHTMLFormatAdapterTest extends BaseComponentDefHTMLForma
      */
     @UnAdaptableTest
     public void testWriteManifestWithPreloads() throws Exception {
+        AuraContext context = Aura.getContextService().getCurrentContext();
+        context.addPreload("aura");
         DefDescriptor<ComponentDef> desc = addSourceAutoCleanup(ComponentDef.class,
                 "<aura:component render='client'></aura:component>");
         String body = doWrite(desc.getDef());

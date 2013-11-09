@@ -48,7 +48,7 @@ public class StyleAdapterImpl implements StyleAdapter {
      * @return The overrides from the current app, or null if not set (or if the current "app" is a component)
      */
     private static ThemeOverrideMap overrides() {
-        DefDescriptor<?> desc = Aura.getContextService().getCurrentContext().getLoadingApplicationDescriptor();
+        DefDescriptor<?> desc = Aura.getContextService().getCurrentContext().getApplicationDescriptor();
 
         if (desc != null && desc.getDefType() == DefType.APPLICATION) {
             try {

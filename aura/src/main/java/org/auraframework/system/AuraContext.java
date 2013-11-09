@@ -215,6 +215,28 @@ public interface AuraContext {
      */
     String getNum();
 
+    /**
+     * Namespaces whose defs should be, or have been preloaded on the client.
+     *
+     * @param preload
+     */
+    void addPreload(String preload);
+
+    /**
+     * Clear the current set of preloads.
+     *
+     * This can be used to reset preloads in the case of error, preventing
+     * recurrance of any quick fix error.
+     */
+    void clearPreloads();
+
+    /**
+     * get the current set of preloads.
+     *
+     * By default, the aura and os namespaces are included.
+     */
+    Set<String> getPreloads();
+
     Format getFormat();
 
     Access getAccess();
@@ -231,6 +253,10 @@ public interface AuraContext {
 
     void setContextPath(String path);
 
+    boolean getSerializePreLoad();
+
+    void setSerializePreLoad(boolean s);
+
     boolean getSerializeLastMod();
 
     void setSerializeLastMod(boolean serializeLastMod);
@@ -239,7 +265,25 @@ public interface AuraContext {
 
     void setPreloading(boolean p);
 
-    void addDynamicNamespace(String namespace);
+    /**
+     * Set the current descriptor to send.
+     *
+     * This sets a descriptor that is intended to be 'preloaded'
+     * on the client. This means that it, and all of the non-loaded
+     * dependencies will be sent to the client. This is set by the
+     * servlet to allow us to know what we should send without
+     * changing the context sent to the client.
+     *
+     * TODO: move this W-1474844
+     */
+    void setPreloading(DefDescriptor<?> descriptor);
+
+    /**
+     * Get the currently preloading descriptor.
+     *
+     * TODO: move this W-1474844
+     */
+    DefDescriptor<?> getPreloading();
 
     /**
      * Set the incoming loaded descriptors.
@@ -316,49 +360,12 @@ public interface AuraContext {
     /**
      * Set the application (or component) descriptor.
      *
-     * This sets the application. It should generally be used at context start time
-     * only, and will only allow certain overrides.
+     * This returns the currently loaded application/component for this context.
+     * It can only be a component for non-production mode.
      *
      * @param appDesc the descriptor for the application/component.
      */
     void setApplicationDescriptor(DefDescriptor<? extends BaseComponentDef> appDesc);
-
-    /**
-     * Get the current 'loading' application descriptor.
-     *
-     * This generally returns the application descriptor passed in from the client, but
-     * in dev mode, when a quick fix exception occurs, this will be the quick fix rather
-     * than the application. That way we keep our context clean, but remember that we
-     * have a quick fix.
-     *
-     * @return the application descriptor.
-     */
-    DefDescriptor<? extends BaseComponentDef> getLoadingApplicationDescriptor();
-
-    /**
-     * Set the loading application (or component) descriptor.
-     *
-     * This sets a descriptor to tell the app server that we are actually loading a different
-     * application/component than the original one supplied. This is used to override the
-     * descriptor in the case of a quick fix (but could be used for other things as well).
-     *
-     * @param loadingAppDesc the descriptor for the application/component.
-     */
-    void setLoadingApplicationDescriptor(DefDescriptor<? extends BaseComponentDef> loadingAppDesc);
-
-    /**
-     * Set the definitions that the client should already have.
-     *
-     * @param preloaded the actual set.
-     */
-    void setPreloadedDefinitions(Set<DefDescriptor<?>> preloaded);
-
-    /**
-     * Set the definitions that the client should already have.
-     *
-     * @return the actual set (unmodifiable).
-     */
-    Set<DefDescriptor<?>> getPreloadedDefinitions();
 
     List<Locale> getRequestedLocales();
 
@@ -387,7 +394,7 @@ public interface AuraContext {
     /**
      * Set the framework UID from the client (or server).
      *
-     * @param uid UID that we should set.
+     * @param uid that we should set.
      */
     void setFrameworkUID(String uid);
 

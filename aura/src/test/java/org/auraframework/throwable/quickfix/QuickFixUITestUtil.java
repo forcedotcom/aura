@@ -15,9 +15,9 @@
  */
 package org.auraframework.throwable.quickfix;
 
-import junit.framework.Assert;
-
 import java.io.File;
+
+import junit.framework.Assert;
 
 import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
@@ -75,7 +75,7 @@ public class QuickFixUITestUtil {
     /**
      * Wait for the browser to refresh and display the given text, or timeout with error.
      */
-    protected void waitForFixToProcess(String msg, final By elementSelector, final String text) {
+    private void waitForFixToProcess(String msg, final By elementSelector, final String text) {
         WebDriverWait wait = new WebDriverWait(testCase.getDriver(), 30);
         // Expect StaleElementReferenceException if browser hasn't displayed new text yet, so ignore until timeout
         wait.withMessage(msg).ignoring(StaleElementReferenceException.class).until(new ExpectedCondition<Boolean>() {

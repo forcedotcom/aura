@@ -147,15 +147,11 @@ public class AuraServlet extends AuraBaseServlet {
         //
         String nocache = nocacheParam.get(request);
         if (nocache == null || nocache.isEmpty()) { 
-        	System.out.println("AuraServlet.handleNoCacheRedirect, nocache is null or empty, return false for request:"
-        			+request.toString()); 
         	return false; 
         }
         response.setContentType("text/plain");
         response.setStatus(HttpServletResponse.SC_MOVED_TEMPORARILY);
         String newLocation = "/";
-        System.out.println("AuraServlet.handleNoCacheRedirect,set response with 302, request:"
-        +request.toString());
         try {
             final URI uri = new URI(nocache);
             final String fragment = uri.getFragment();

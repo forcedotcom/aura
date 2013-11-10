@@ -208,7 +208,6 @@ public class AuraResourceServlet extends AuraBaseServlet {
         }
         long ifModifiedSince = request.getDateHeader("If-Modified-Since");
         String uid = null;
-
         if (ifModifiedSince != -1) {
             uid = context.getUid(appDesc);
         }
@@ -219,6 +218,8 @@ public class AuraResourceServlet extends AuraBaseServlet {
                 // In this case, we have an unmodified descriptor, so just tell
                 // the client that.
                 //
+            	System.out.println("TS:"+System.currentTimeMillis()+",​AuraResourceServlet.handleTopLevel,​reqeust:"+request.toString());
+                
                 response.sendError(HttpServletResponse.SC_NOT_MODIFIED);
                 return false;
             }
@@ -740,7 +741,7 @@ public class AuraResourceServlet extends AuraBaseServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         AuraContext context = Aura.getContextService().getCurrentContext();
         response.setCharacterEncoding(AuraBaseServlet.UTF_ENCODING);
-
+        System.out.println("AuraResourceServlet,​doGet request:"+request.toString());
         setLongCache(response);
         AuraContext.Format format = context.getFormat();
         response.setContentType(getContentType(format));

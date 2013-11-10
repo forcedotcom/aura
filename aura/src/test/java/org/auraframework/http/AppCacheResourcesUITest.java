@@ -308,9 +308,6 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
       //debug for flapper:
         System.out.println("++++++testComponentJsChange loadMonitorAndValidateApp,TS:"+System.currentTimeMillis());
         logs = loadMonitorAndValidateApp(TOKEN, replacement, "", TOKEN);
-        //debug for flapper:
-        System.out.println("++++++we did hard refresh without appending url with 'nochache':"
-        +auraUITestingUtil.getBooleanEval("return !!document._hardRefreshWOUrlAppendFlag"));
         assertRequests(getExpectedChangeRequests(), logs);
         assertAppCacheStatus(Status.IDLE);
         logs = loadMonitorAndValidateApp(TOKEN, replacement, "", TOKEN);

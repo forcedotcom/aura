@@ -31,6 +31,7 @@ import org.apache.http.util.EntityUtils;
 import org.auraframework.Aura;
 import org.auraframework.test.AuraHttpTestCase;
 import org.auraframework.test.annotation.ThreadHostileTest;
+import org.auraframework.test.annotation.UnAdaptableTest;
 
 /**
  * Automation to verify the implementation of AuraFrameworkServlet. AuraFrameworkServlet responds to requests of pattern
@@ -227,7 +228,10 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
 
     /**
      * Verify the Vary header is set to Accept-Encoding. This should be set for cacheable and compressed js/css files.
+     *
+     * UnAdaptableTest because SFDC removes vary header
      */
+    @UnAdaptableTest
     public void testHasVaryHeader() throws Exception {
         HttpGet get = obtainNoncedGetMethod(sampleTextResourcePath, false);
         HttpResponse response = perform(get);

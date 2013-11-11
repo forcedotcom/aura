@@ -15,12 +15,12 @@
  */
 package org.auraframework.component.aura;
 
+import java.util.Map;
+
 import org.auraframework.test.WebDriverTestCase;
 import org.auraframework.test.annotation.ThreadHostileTest;
 import org.auraframework.test.annotation.UnAdaptableTest;
 import org.auraframework.test.controller.TestLoggingAdapterController;
-
-import java.util.Map;
 
 /**
  * UI Test for LabelValueProvider.js
@@ -42,9 +42,10 @@ public class LabelValueProviderUITest extends WebDriverTestCase {
      *
      * @throws Exception
      */
+    // TODO: W-1937281: Fix this test. TestLoggingAdapterController ?
     @ThreadHostileTest("TestLoggingAdapter not thread-safe")
     @UnAdaptableTest("Missing TestLoggingAdapter impl")
-    public void testEfficientActionRequests() throws Exception {
+    public void _testEfficientActionRequests() throws Exception {
         TestLoggingAdapterController.beginCapture();
         open(URL);
         auraUITestingUtil.waitForAuraInit();

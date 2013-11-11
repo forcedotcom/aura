@@ -21,7 +21,6 @@ import java.io.StringReader;
 import java.net.URI;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletException;
@@ -35,8 +34,6 @@ import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.def.DependencyDef;
-import org.auraframework.def.DescriptorFilter;
 import org.auraframework.http.RequestParam.EnumParam;
 import org.auraframework.http.RequestParam.StringParam;
 import org.auraframework.instance.Action;
@@ -186,6 +183,7 @@ public class AuraServlet extends AuraBaseServlet {
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        DefinitionService definitionService = Aura.getDefinitionService();
         AuraContext context;
         String tagName;
         DefType defType;
@@ -224,25 +222,13 @@ public class AuraServlet extends AuraBaseServlet {
             //
             if (handleNoCacheRedirect(request, response)) { return; }
 
-            DefinitionService definitionService = Aura.getDefinitionService();
             DefDescriptor<? extends BaseComponentDef> defDescriptor = definitionService.getDefDescriptor(tagName,
                     defType == DefType.APPLICATION ? ApplicationDef.class : ComponentDef.class);
 
             AuraContext curContext = Aura.getContextService().getCurrentContext();
             curContext.setApplicationDescriptor(defDescriptor);
-            definitionService.updateLoaded(defDescriptor, false);
+            definitionService.updateLoaded(defDescriptor);
             def = defDescriptor.getDef();
-
-            // discover dependent items that must be added to the context
-            // (to ensure related items such as CSS make it to client)
-            List<DependencyDef> dds = def.getDependencies();
-            for (DependencyDef dd : dds) {
-                DescriptorFilter df = dd.getDependency();
-                if (df.getNamespaceMatch().isConstant()) {
-                    String targetNamespace = df.getNamespaceMatch().toString();
-                    curContext.addPreload(targetNamespace);
-                }
-            }
 
         } catch (RequestParam.InvalidParamException ipe) {
             handleServletException(new SystemErrorException(ipe), false, context, request, response, false);
@@ -251,6 +237,10 @@ public class AuraServlet extends AuraBaseServlet {
             handleServletException(new SystemErrorException(mpe), false, context, request, response, false);
             return;
         } catch (QuickFixException qfe) {
+            //
+            // Whoops. we need to set up our preloads correctly here.
+            //
+            setupQuickFix(context);
             handleServletException(qfe, true, context, request, response, false);
             return;
         } catch (Throwable t) {
@@ -431,7 +421,7 @@ public class AuraServlet extends AuraBaseServlet {
             if (context.getApplicationDescriptor() != null) {
                 // ClientOutOfSync will drop down.
                 try {
-                    Aura.getDefinitionService().updateLoaded(context.getApplicationDescriptor(), false);
+                    Aura.getDefinitionService().updateLoaded(context.getApplicationDescriptor());
                 } catch (QuickFixException qfe) {
                     //
                     // ignore quick fix. If we got a 'new' quickfix, it will be thrown as
@@ -451,7 +441,6 @@ public class AuraServlet extends AuraBaseServlet {
                 loggingService.startTimer(LoggingService.TIMER_SERIALIZATION);
                 loggingService.startTimer(LoggingService.TIMER_SERIALIZATION_AURA);
                 try {
-                    context.setSerializePreLoad(false);
                     PrintWriter out = response.getWriter();
                     out.write(CSRF_PROTECT);
                     written = true;

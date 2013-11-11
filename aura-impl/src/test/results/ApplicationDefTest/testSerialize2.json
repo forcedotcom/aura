@@ -5,47 +5,93 @@
     "superDef":{
       "serId":2,
       "value":{
-        "descriptor":"markup://aura:application"
-      }
-    },
-    "attributeDefs":[
-      {
-        "serId":3,
-        "value":{
-          "descriptor":"body",
-          "typeDefDescriptor":"aura://Aura.Component[]",
-          "required":false,
-          "visibility":"PUBLIC"
-        }
-      }
-    ],
-    "locationChangeEventDef":{
-      "serId":4,
-      "value":{
-        "descriptor":"markup://aura:locationChange",
-        "type":"APPLICATION",
-        "superDef":{
-          "serId":5,
+        "descriptor":"markup://aura:application",
+        "rendererDef":{
+          "serId":3,
           "value":{
-            "descriptor":"markup://aura:applicationEvent",
-            "type":"APPLICATION",
-            "attributes":{
+            "descriptor":"js://aura.component",
+            "render":
+function(component) {
+        var body = component.getValue("v.body");
+        var rendering = component.getRendering();
+        return rendering ? rendering : $A.render(body);
+    },
+            "afterRender":
+function(component) {
+        var body = component.getAttributes().getValue("body");
+        $A.afterRender(body);
+    },
+            "rerender":
+function(component) {
+        var body = component.getAttributes().getValue("body");
+        $A.rerender(body);
+    },
+            "unrender":
+function(component) {
+        var body = component.getAttributes().getValue("body");
+        $A.unrender(body);
 
-            }
+        var elements = component.getElements();
+        for (var key in elements){
+            var element = elements[key];
+            delete elements[key];
+            aura.util.removeElement(element);
+        }
+    }
           }
         },
-        "attributes":{
-          "token":{
-            "serId":6,
+        "attributeDefs":[
+          {
+            "serId":4,
             "value":{
-              "descriptor":"token",
-              "typeDefDescriptor":"aura://String",
+              "descriptor":"body",
+              "typeDefDescriptor":"aura://Aura.Component[]",
               "required":false,
               "visibility":"PUBLIC"
             }
           }
+        ],
+        "interfaces":[
+          "markup://aura:rootComponent"
+        ],
+        "isAbstract":true,
+        "locationChangeEventDef":{
+          "serId":5,
+          "value":{
+            "descriptor":"markup://aura:locationChange",
+            "type":"APPLICATION",
+            "superDef":{
+              "serId":6,
+              "value":{
+                "descriptor":"markup://aura:applicationEvent",
+                "type":"APPLICATION",
+                "attributes":{
+
+                }
+              }
+            },
+            "attributes":{
+              "token":{
+                "serId":7,
+                "value":{
+                  "descriptor":"token",
+                  "typeDefDescriptor":"aura://String",
+                  "required":false,
+                  "visibility":"PUBLIC"
+                }
+              }
+            }
+          }
         }
       }
+    },
+    "attributeDefs":[
+      {
+        "serRefId":4
+      }
+    ],
+    "locationChangeEventDef":{
+      "serRefId":5
     }
   }
 }

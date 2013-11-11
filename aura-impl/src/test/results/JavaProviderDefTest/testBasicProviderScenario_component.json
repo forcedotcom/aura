@@ -8,18 +8,61 @@
         "superDef":{
           "serId":3,
           "value":{
-            "descriptor":"markup://aura:component"
+            "descriptor":"markup://aura:component",
+            "rendererDef":{
+              "serId":4,
+              "value":{
+                "descriptor":"js://aura.component",
+                "render":
+function(component) {
+        var body = component.getValue("v.body");
+        var rendering = component.getRendering();
+        return rendering ? rendering : $A.render(body);
+    },
+                "afterRender":
+function(component) {
+        var body = component.getAttributes().getValue("body");
+        $A.afterRender(body);
+    },
+                "rerender":
+function(component) {
+        var body = component.getAttributes().getValue("body");
+        $A.rerender(body);
+    },
+                "unrender":
+function(component) {
+        var body = component.getAttributes().getValue("body");
+        $A.unrender(body);
+
+        var elements = component.getElements();
+        for (var key in elements){
+            var element = elements[key];
+            delete elements[key];
+            aura.util.removeElement(element);
+        }
+    }
+              }
+            },
+            "attributeDefs":[
+              {
+                "serId":5,
+                "value":{
+                  "descriptor":"body",
+                  "typeDefDescriptor":"aura://Aura.Component[]",
+                  "required":false,
+                  "visibility":"PUBLIC"
+                }
+              }
+            ],
+            "interfaces":[
+              "markup://aura:rootComponent"
+            ],
+            "isAbstract":true
           }
         },
         "attributeDefs":[
           {
-            "serId":4,
-            "value":{
-              "descriptor":"body",
-              "typeDefDescriptor":"aura://Aura.Component[]",
-              "required":false,
-              "visibility":"PUBLIC"
-            }
+            "serRefId":5
           }
         ],
         "facets":[
@@ -28,12 +71,12 @@
             "value":[
               {
                 "componentDef":{
-                  "serId":5,
+                  "serId":6,
                   "value":{
                     "descriptor":"markup://test:test_Provider_Interface",
                     "attributes":{
                       "defaultAttr":{
-                        "serId":6,
+                        "serId":7,
                         "value":{
                           "descriptor":"defaultAttr",
                           "typeDefDescriptor":"aura://String",
@@ -46,7 +89,7 @@
                         }
                       },
                       "implNumber":{
-                        "serId":7,
+                        "serId":8,
                         "value":{
                           "descriptor":"implNumber",
                           "typeDefDescriptor":"aura://String",

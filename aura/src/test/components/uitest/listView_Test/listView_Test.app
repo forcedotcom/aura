@@ -16,7 +16,7 @@
 
 -->
 <aura:application  model="java://org.auraframework.components.ui.listView.ListViewTestModel">
-
+    <aura:dependency resource="ui:*" type="COMPONENT" />
     Empty list, generated columns
     <ui:listView id="test-empty-list-generated-columns" aura:id="test-empty-list-generated-columns"/>
     <hr/>

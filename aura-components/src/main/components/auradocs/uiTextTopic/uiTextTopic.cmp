@@ -50,6 +50,13 @@
                 </td>
             </tr>
             <tr>
+                <td>Rich Text</td>
+                <td>An input field for entering rich text with a WYSIWYG rich text editor.</td>
+                <td><auradocs:defLink defType="component" descriptor="ui:inputRichText"/><br/>
+                <auradocs:defLink defType="component" descriptor="ui:outputRichText"/>
+                </td>
+             </tr>
+            <tr>
                 <td>Search</td>
                 <td>An input field for entering a search term.</td>
                 <td><auradocs:defLink defType="component" descriptor="ui:inputSearch"/>
@@ -86,6 +93,16 @@
 &lt;ui:inputEmail aura:id="emailField" placeholder="abc@email.com"/></auradocs:codeblock>
 	<p><code>ui:label</code> provides a text label for the corresponding field. For more information on using labels, see <auradocs:topicLink topic="label">Label</auradocs:topicLink>.
 	</p>
+	
+	<h4>Using the Rich Text Field</h4>
+	<p>The following code is a basic set up of a rich text field and its corresponding output component.</p>
+	<auradocs:codeblock>&lt;ui:inputRichText aura:id="inputRT" label="Rich Text Demo" labelPosition="hidden" placeholder="Put some rich text here"/>
+&lt;ui:button aura:id="outputButton" 
+        buttonTitle="Click to see what you put into the rich text field" 
+        label="Display" press="<aura:text value="{!"/>c.getInput}"/>
+&lt;ui:outputRichText aura:id="outputRT" value=" "/> 
+    </auradocs:codeblock>
+    <p>For more information, see the <ui:outputURL value="/auradocs#demos?demo=inputRT" label="ui:inputRichText demo"/>.</p>
 	
 	<h4>Providing Auto-complete Suggestions in Text Fields</h4>
 	<p>Auto-complete is available with the <code>ui:autocomplete</code> component, which uses a text or text area of its own.

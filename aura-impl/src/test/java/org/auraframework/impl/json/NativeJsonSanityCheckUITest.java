@@ -17,7 +17,6 @@ package org.auraframework.impl.json;
 
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.WebDriverTestCase;
-import org.auraframework.test.annotation.TestLabels;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -42,7 +41,6 @@ public class NativeJsonSanityCheckUITest extends WebDriverTestCase {
      * 
      * @throws Exception
      */
-    @TestLabels("auraSanity")
     public void testNativeJsonUsageInJSRendererDef() throws Exception {
         // PRODDEBUG and PROD, both will force usage of Native Json
         open("/test/testJSRenderer.cmp", Mode.PRODDEBUG);
@@ -56,7 +54,6 @@ public class NativeJsonSanityCheckUITest extends WebDriverTestCase {
      * 
      * @throws Exception
      */
-    @TestLabels("auraSanity")
     public void testNativeJsonUsageInJSHelperDef() throws Exception {
         open("/test/testJSRendererUsingHelper.cmp", Mode.PRODDEBUG);
         WebElement outputDiv = getDriver().findElement(By.cssSelector("div[class~='button']"));
@@ -69,7 +66,6 @@ public class NativeJsonSanityCheckUITest extends WebDriverTestCase {
      * Sanity check to verify that Javascript Controller & Java Controller work
      * in PROD mode
      */
-    @TestLabels("auraSanity")
     public void testNativeJsonUsageInControllerDef() throws Exception {
         open("/test/test_CompoundCntrlr.cmp", Mode.PRODDEBUG);
         final WebElement button = getDriver().findElement(By.cssSelector("div[class~='test_locator']"));

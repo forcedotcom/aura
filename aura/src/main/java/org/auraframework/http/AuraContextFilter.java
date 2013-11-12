@@ -30,6 +30,8 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpHeaders;
 import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
@@ -81,9 +83,18 @@ public class AuraContextFilter implements Filter {
 
     private String componentDir = null;
 
+    private static final Log LOG = LogFactory.getLog(AuraContextFilter.class);
+
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws ServletException,
             IOException {
+
+        if (Aura.getContextService().isEstablished()) {
+            LOG.error("Aura context was not released correctly! New context will NOT be created.");
+            chain.doFilter(req, res);
+            return;
+        }
+
         LoggingService loggingService = Aura.getLoggingService();
         try {
             startContext(req, res, chain);

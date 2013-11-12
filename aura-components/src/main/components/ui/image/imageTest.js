@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-//@since 0.0.61
+//since 0.0.61
 ({
     testDefaultAttributes:{
 	exceptionsAllowedDuringInit : ["\"alt\" attribute should not be empty for informational image"], 	

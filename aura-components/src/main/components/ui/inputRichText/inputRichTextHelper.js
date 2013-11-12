@@ -20,8 +20,7 @@
 	 * @Override
 	 */
 	addDomHandler : function(cmp, event) {		
-		var editorId = this.getEditorId(cmp),
-			editorInstance = CKEDITOR.instances[editorId];
+		var	editorInstance = this.getEditorInstance(cmp);
 
 		if (editorInstance) {			
 			editorInstance.on(event, this.editorEventHandler, cmp);
@@ -37,7 +36,7 @@
 	handleUpdate : function(cmp, event) {
 		var helper = cmp.getDef().getHelper();
         var updateOn = helper.getUpdateOn(cmp);
-        var editorInstance = CKEDITOR.instances[helper.getEditorId(cmp)]; 
+        var editorInstance = this.getEditorInstance(cmp); 
         // if this is an event we're supposed to update on
         if ($A.util.arrayIndexOf(updateOn, event.name || event.type) > -1) {
         	var value = cmp.get('v.value');
@@ -80,28 +79,26 @@
 	 */
 	initEditor : function(cmp) {
 		if (cmp.getValue('v.isRichText').getBooleanValue()) {
-			var editorId = this.getEditorId(cmp),		
-				editorInstance = CKEDITOR.instances[editorId];
+			var editorInstance = this.getEditorInstance(cmp);
 			
 			if (!editorInstance) {			
-				var helper = cmp.getConcreteComponent().getDef().getHelper() || this;				
-				editorInstance = CKEDITOR.replace(editorId,  helper.getEditorConfig(cmp));
+				var helper = cmp.getConcreteComponent().getDef().getHelper() || this;
+				editorInstance = CKEDITOR.replace(helper.getEditorId(cmp),  helper.getEditorConfig(cmp));
 			}
 		}
 	},
 		
 	toggle : function(cmp, isRichText) {
-		var editorId = this.getEditorId(cmp);
+		var editorInstance = this.getEditorInstance(cmp);
 		
 		if (isRichText && !cmp.get('v.isRichText')) {
 			cmp.getValue('v.isRichText').setValue(isRichText);
-			if (!CKEDITOR.instances[editorId]) {
+			if (!editorInstance) {
 				this.initEditor(cmp);
 			}
 		}
 		else if (!isRichText && cmp.get('v.isRichText')) {
-			var plainText,
-				editorInstance = CKEDITOR.instances[editorId];
+			var plainText;
 							
 			cmp.getValue('v.isRichText').setValue(isRichText);
 			
@@ -115,12 +112,17 @@
 			
 			// TODO: determine if we want the <p></p> surrounding plain text when we toggle to rich text
 			// Set the textarea contents to be the plaintext b/c ckeditor doesn't
-			document.getElementById(editorId).value = plainText;				
+			document.getElementById(this.getEditorId(cmp)).value = plainText;
+			cmp.getValue('v.value').setValue(plainText);
 		}
 	},
 		
 	getEditorId : function(cmp) {
 		return cmp.getConcreteComponent().get('v.domId');
+	},
+	
+	getEditorInstance : function (cmp) {
+		return CKEDITOR ? CKEDITOR.instances[this.getEditorId(cmp)] : null;
 	},
 	
 	/**
@@ -129,12 +131,12 @@
 	 * which is autowired to save
 	 */
 	getContent : function(cmp) {
-		var editorInstance = CKEDITOR.instances[this.getEditorId(cmp)];
+		var editorInstance = this.getEditorInstance(cmp);
 		return editorInstance ? editorInstance.getData() : this.getDomElementValue(this.getInputElement(cmp)) || '';
 	},
 	
 	setContent : function(cmp, content) {
-		var editorInstance = CKEDITOR.instances[this.getEditorId(cmp)];
+		var editorInstance = this.getEditorInstance(cmp);
 		if (editorInstance) {
 			editorInstance.setData(content);
 		}
@@ -168,6 +170,7 @@
 				resize_enabled : false,
 				forcePasteAsPlainText : false,
 	    		forceSimpleAmpersand : true,	    		
+	    		extraPlugins : 'onchange',
 	    		/*
 	    	     * Deactivate:
 	    	     * - The Element path component (RTE's "status bar")
@@ -188,11 +191,6 @@
 	    		forceSimpleAmpersand : true    	 
 			};
 		
-		var editorConfigAttr = cmp.getValue('v.editorConfiguration').unwrap();		
-		config = this.merge(editorConfigAttr, config);
-		//onchange is required
-		config.extraPlugins = config.extraPlugins ? config.extraPlugins + ',onchange' : 'onchange';
-		
 		return config;
 	},
 	
@@ -203,10 +201,8 @@
         var property;
 
         if (target) {
-            for (property in source) {
-                if (target[property] === undefined) {
-                    target[property] = source[property];
-                }
+            for (property in source) {               
+            	target[property] = source[property];                
             }
         }
 
@@ -275,21 +271,15 @@
 			toolbarConfig = this.emailToolbarConfig;			 
 			break;
 		default:
-			if (!this.defaultToolbarConfig) {
-				this.defaultToolbarConfig = [
-	               	 {name: 'basicstyles', items : ['Bold', 'Italic']},
-	               	 {name: 'paragraph', items : [ 'NumberedList','BulletedList']}	               	 
-	            ]; 
-			}
-			toolbarConfig = this.defaultToolbarConfig;
+			toolbarConfig = toolbar;
 		}
 		return toolbarConfig;
 	},
 	
 	unrender : function(cmp) {
-		var editorId = this.getEditorId(cmp);
-		if (CKEDITOR.instances[editorId]) {
-			CKEDITOR.instances[editorId].destroy();
+		var editorInstance = this.getEditorInstance(cmp);
+		if (editorInstance) {
+			editorInstance.destroy();
 		}
 	}
 })

@@ -48,6 +48,7 @@
     <aura:attribute name="pullToRefreshUpdating" type="String" default="Loading..." description="The text to display while the scroller component is updating after the user pulls to refresh the scroller. Default value is &quot;Loading...&quot;."/>
     <aura:attribute name="pullToRefreshSubtitle" type="String" description="The text to display in the top cell when the user pulls the scroller area to refresh the content."/>
     <aura:attribute name="canRefresh" type="Boolean" default="true" description="Whether this scroller can be invoked to refresh its content. Defaults to true."/>
+    <aura:attribute name="extendedPullContent" type="Aura.Component[]" description="Add additional hidden content to be shown just above the starting scroll position"/>
     
     <aura:attribute name="stopEventPropagation" type="Boolean" default="false" description="Disables DOM event propagation. (This probably isn't something you want to enable.)"/>
     <aura:attribute name="checkDOMChanges" type="Boolean" default="false" description="Refresh the scroller after DOM changes."/>
@@ -75,6 +76,12 @@
                         <div class="label loadingLabel">{!v.pullToRefreshUpdating}</div>
                         <span class="subtitle">{!v.pullToRefreshSubtitle}</span>
                     </div>
+                </div>
+            </aura:renderIf>
+
+            <aura:renderIf isTrue="{!v.extendedPullContent != null &amp;&amp; v.extendedPullContent.length > 0}">
+                <div aura:id="pullContent" class="pullContent">
+                    {!v.extendedPullContent}
                 </div>
             </aura:renderIf>
 

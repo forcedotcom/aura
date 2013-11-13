@@ -156,6 +156,7 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
 
         DefDescriptor<? extends RootDefinition> desc = null;
         this.descriptor = descriptor;
+        this.originalDescriptor = descriptor;
 
         if (def == null) {
             try {
@@ -187,6 +188,7 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
         loggingService.startTimer(LoggingService.TIMER_COMPONENT_CREATION);
         try {
             this.globalId = getNextGlobalId();
+            System.out.println(this.globalId + ": "+this.descriptor);
 
             this.attributeSet = new AttributeSetImpl(desc, attributeValueProvider);
 
@@ -296,7 +298,11 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
         BaseComponent<?, ?> oldComponent = context.setCurrentComponent(this);
         try {
             json.writeMapBegin();
-            json.writeMapEntry("componentDef", getComponentDef());
+            BaseComponentDef def = getComponentDef();
+            json.writeMapEntry("componentDef", def);
+            if (!def.getDescriptor().equals(originalDescriptor)) {
+                json.writeMapEntry("original", originalDescriptor);
+            }
             json.writeMapEntry("globalId", getGlobalId());
 
             if ((attributeSet.getValueProvider() == null || hasProvidedAttributes) && !attributeSet.isEmpty()) {
@@ -458,6 +464,7 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
         return model;
     }
 
+    protected final DefDescriptor<D> originalDescriptor;
     protected DefDescriptor<D> descriptor;
     protected DefDescriptor<? extends RootDefinition> intfDescriptor;
     private final String globalId;

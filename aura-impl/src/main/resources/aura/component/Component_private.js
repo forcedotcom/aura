@@ -34,10 +34,43 @@ var ComponentPriv = (function(){ // Scoping priv
         // create the globally unique id for this component
         this.setupGlobalId(config["globalId"], localCreation);
 
+        var logCD = config["componentDef"]["descriptor"];
+        if (logCD.getQualifiedName) {
+            logCD = logCD.getQualifiedName();
+        }
+        console.log(this.globalId+": "+logCD);
         // get any partial configuration that was serialized by the server
         var partialConfig = $A.getContext().getComponentConfig(this.globalId);
         if (partialConfig) {
             this.partialConfig = partialConfig;
+
+            var partialConfigO = partialConfig["original"];
+            var partialConfigCD;
+            var configCD = config["componentDef"]["descriptor"];
+            if (configCD.getQualifiedName) {
+                configCD = configCD.getQualifiedName();
+            }
+            if (partialConfig["componentDef"]) {
+                partialConfigCD = partialConfig["componentDef"]["descriptor"];
+            }
+            if (partialConfigO !== undefined && partialConfigCD !== configCD) {
+                if (partialConfigO !== configCD) {
+                    $A.log("Configs at error");
+                    $A.log(config);
+                    $A.log(partialConfig);
+                    $A.error("Mismatch at "+this.globalId+" client expected "+configCD
+                        +" but got original "+partialConfigO
+                        +" providing "+partialConfigCD+ " from server");
+                }
+            } else if (partialConfigCD) {
+                if (partialConfigCD !== configCD) {
+                    $A.log("Configs at error");
+                    $A.log(config);
+                    $A.log(partialConfig);
+                    $A.error("Mismatch at "+this.globalId+" client expected "+configCD
+                        +" but got "+partialConfigCD+" from server");
+                }
+            }
         }
 
         // get server rendering if there was one

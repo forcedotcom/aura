@@ -342,6 +342,7 @@ function(value) {
         ]
       }
     },
+    "original":"markup://test:test_Provider_Interface",
     "globalId":"1",
     "attributes":{
       "serId":18,

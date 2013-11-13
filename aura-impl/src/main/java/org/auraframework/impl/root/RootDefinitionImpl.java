@@ -91,7 +91,7 @@ public abstract class RootDefinitionImpl<T extends RootDefinition> extends Defin
 
         public Builder(Class<T> defClass) {
             super(defClass);
-            this.attributeDefs = Maps.newHashMap();
+            this.attributeDefs = Maps.newLinkedHashMap();
         }
 
         public void addProvider(String name) {

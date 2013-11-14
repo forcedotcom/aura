@@ -26,126 +26,126 @@ Test.Ui.OutputRichText.HelperTest = function(){
 		targetHelper=result;
 	});
 	
-    [Fixture]
-    function validate(){    	    	    	        
-    	    	    	    	    	
-        [Fact]
-        function valueUndefinedOrNull(){
-        	// Arrange     
-        	var expected = null;       
-        	
-        	var targetComponent={
-        		value : null,	
-    			get:function(attribute){
-    				if(attribute=="v.value") return this.value;
-    			}
-    		};   
-        	
-			var mockContext = Mocks.GetMock(Object.Global(), "$A", {                                
-				util: {   
-					isUndefinedOrNull: function(value) { return true; },
-					isEmpty: function(value) { return false; }	  
-	            }
-	        });												
-						
-            // Act
-            mockContext(function(){					
-				targetHelper.validate(targetComponent);
-			});	
-
-            // Assert
-            Assert.Equal(expected, targetComponent.value);            
-        }
-        
-        [Fact]
-        function valueEmpty(){
-        	// Arrange    
-        	var expected = '';  
-        	
-        	var targetComponent={
-        		value : '',	
-    			get:function(attribute){
-    				if(attribute=="v.value") return this.value;
-    			}
-    		};   
-    	
-			var mockContext = Mocks.GetMock(Object.Global(), "$A", {                                
-				util: {   
-					isUndefinedOrNull: function(value) { return false; },
-					isEmpty: function(value) { return true; }
-	            }
-	        });												
-						
-            // Act
-            mockContext(function(){					
-				targetHelper.validate(targetComponent);
-			});	
-
-            // Assert
-            Assert.Equal(expected, targetComponent.value);            
-        }
-        
-        [Fact]
-        function valueWithoutTags(){
-        	// Arrange    
-        	var expected = 'value';  
-        	
-        	var targetComponent={
-        		value : 'value',	
-    			get:function(attribute){
-    				if(attribute=="v.value") return this.value;
-    			}
-    		};   
-    	
-			var mockContext = Mocks.GetMock(Object.Global(), "$A", {                                
-				util: {   
-					isUndefinedOrNull: function(value) { return false; },
-					isEmpty: function(value) { return false; },
-					stripTags: function(value, tag) { return value; }
-	            }
-	        });												
-						
-            // Act
-            mockContext(function(){					
-				targetHelper.validate(targetComponent);
-			});	
-
-            // Assert
-            Assert.Equal(expected, targetComponent.value);            
-        }
-        
-        [Fact]
-        function valueWithTags(){
-        	// Arrange    
-        	var expected = 'value-script,style';     
-        	
-        	var targetComponent={
-        		value : 'value',	
-    			get:function(attribute){
-    				if(attribute=="v.value") return this.value;
-    			},
-    			setValue:function(attribute, val){
-    				if(attribute=="v.value") this.value = val;
-    			}
-    		};   
-        	        	
-			var mockContext = Mocks.GetMock(Object.Global(), "$A", {                                
-				util: {   
-					isUndefinedOrNull: function(value) { return false; },
-					isEmpty: function(value) { return false; },
-					stripTags: function(value, tags) {return value + '-' + tags; }
-	            }
-	        });	
-															
-            // Act
-            mockContext(function(){		            	
-            		targetHelper.validate(targetComponent);            	
-			});	
-
-            // Assert
-            Assert.Equal(expected, targetComponent.value);            
-        }
-        
-    }
+//    [Fixture]
+//    function validate(){    	    	    	        
+//    	    	    	    	    	
+//        [Fact]
+//        function valueUndefinedOrNull(){
+//        	// Arrange     
+//        	var expected = null;       
+//        	
+//        	var targetComponent={
+//        		value : null,	
+//    			get:function(attribute){
+//    				if(attribute=="v.value") return this.value;
+//    			}
+//    		};   
+//        	
+//			var mockContext = Mocks.GetMock(Object.Global(), "$A", {                                
+//				util: {   
+//					isUndefinedOrNull: function(value) { return true; },
+//					isEmpty: function(value) { return false; }	  
+//	            }
+//	        });												
+//						
+//            // Act
+//            mockContext(function(){					
+//				targetHelper.validate(targetComponent);
+//			});	
+//
+//            // Assert
+//            Assert.Equal(expected, targetComponent.value);            
+//        }
+//        
+//        [Fact]
+//        function valueEmpty(){
+//        	// Arrange    
+//        	var expected = '';  
+//        	
+//        	var targetComponent={
+//        		value : '',	
+//    			get:function(attribute){
+//    				if(attribute=="v.value") return this.value;
+//    			}
+//    		};   
+//    	
+//			var mockContext = Mocks.GetMock(Object.Global(), "$A", {                                
+//				util: {   
+//					isUndefinedOrNull: function(value) { return false; },
+//					isEmpty: function(value) { return true; }
+//	            }
+//	        });												
+//						
+//            // Act
+//            mockContext(function(){					
+//				targetHelper.validate(targetComponent);
+//			});	
+//
+//            // Assert
+//            Assert.Equal(expected, targetComponent.value);            
+//        }
+//        
+//        [Fact]
+//        function valueWithoutTags(){
+//        	// Arrange    
+//        	var expected = 'value';  
+//        	
+//        	var targetComponent={
+//        		value : 'value',	
+//    			get:function(attribute){
+//    				if(attribute=="v.value") return this.value;
+//    			}
+//    		};   
+//    	
+//			var mockContext = Mocks.GetMock(Object.Global(), "$A", {                                
+//				util: {   
+//					isUndefinedOrNull: function(value) { return false; },
+//					isEmpty: function(value) { return false; },
+//					stripTags: function(value, tag) { return value; }
+//	            }
+//	        });												
+//						
+//            // Act
+//            mockContext(function(){					
+//				targetHelper.validate(targetComponent);
+//			});	
+//
+//            // Assert
+//            Assert.Equal(expected, targetComponent.value);            
+//        }
+//        
+//        [Fact]
+//        function valueWithTags(){
+//        	// Arrange    
+//        	var expected = 'value-script,style';     
+//        	
+//        	var targetComponent={
+//        		value : 'value',	
+//    			get:function(attribute){
+//    				if(attribute=="v.value") return this.value;
+//    			},
+//    			setValue:function(attribute, val){
+//    				if(attribute=="v.value") this.value = val;
+//    			}
+//    		};   
+//        	        	
+//			var mockContext = Mocks.GetMock(Object.Global(), "$A", {                                
+//				util: {   
+//					isUndefinedOrNull: function(value) { return false; },
+//					isEmpty: function(value) { return false; },
+//					stripTags: function(value, tags) {return value + '-' + tags; }
+//	            }
+//	        });	
+//															
+//            // Act
+//            mockContext(function(){		            	
+//            		targetHelper.validate(targetComponent);            	
+//			});	
+//
+//            // Assert
+//            Assert.Equal(expected, targetComponent.value);            
+//        }
+//        
+//    }
     
 }

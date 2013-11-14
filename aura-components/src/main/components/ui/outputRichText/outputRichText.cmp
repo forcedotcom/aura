@@ -16,6 +16,8 @@
 
 -->
 <aura:component extends="ui:output" extensible="true" support="GA" description="Displays rich text as specified in the value attribute."> 
+	<aura:attribute name="supportedTags" type="String" 
+	    description="An list of supported HTML tag names separated by comma; All others are stripped off. The default value is used if it is not specified."/>
 	<div class="{!v.class}" dir="{!v.dir}" aura:id="div">
 		<aura:unescapedHTML value="{!v.value}" />
 	</div>	 

@@ -53,7 +53,7 @@ public class TestJavaModel {
     static HashMap<String, ArrayList<InputOption>> optionMap = new LinkedHashMap<String, ArrayList<InputOption>>();
     static List<Item> items;
     static List<Item> itemsEmpty = new ArrayList<Item>();
-    static List<Item> itemsLarge;
+    static List<Item> itemsLarge;       
     
     static {
         inputOptions.add(new InputOption("Option1", "Opt1", false, "option1"));
@@ -512,16 +512,36 @@ public class TestJavaModel {
     @AuraEnabled
     public String getTextAreaText() {
         return "Some text from server\nspecially created to fit in....\n\n\na textarea!";
+    }  
+    
+    @AuraEnabled
+    public String getTextWithScriptTag() {
+        return "<big>Some text from server with script tag</big><script>Script</script>";
     }
     
     @AuraEnabled
-    public String getTextWithTags() {
-        return "Some text from server with tags<script>Script</script><style>Style</style>";
+    public String getTextWithStyleTag() {
+        return "<big>Some text from server with style tag</big><style>Style</style>";
     }
     
     @AuraEnabled
-    public String getTextWithNestedTags() {
-        return "Some text from server with nested tags<script><script></script></script><script><style></style></script>";
+    public String getTextWithBlacklistedTags() {
+        return "Some text from server with blacklisted tags<script>Script</script><style></style>";
+    }
+    
+    @AuraEnabled
+    public String getTextWithBlacklistedNestedTags() {
+        return "Some text from server with nested blacklisted tags<script><script></script></script><script><style></style></script>";
+    }
+    
+    @AuraEnabled
+    public String getTextWithBlacklistedChildrenTags() {
+        return "Some text from server with nested blacklisted tags in div<div><script></script><script><style></style></script></div>";
+    }
+    
+    @AuraEnabled
+    public String getTextWithWhitelistedChildrenTags() {
+        return "Some text from server with nested input in balcklisted tags<script><input></input></script>";
     }
 
     @AuraEnabled

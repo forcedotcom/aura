@@ -481,6 +481,11 @@
         </profile>
         <profile>
             <id>ubuntu12</id>
+            <activation>
+               <property>
+                 <name>env.UBUNTU12</name>
+               </property>
+            </activation>
             <properties>
                 <chromedriver.version>2.2</chromedriver.version>
             </properties>

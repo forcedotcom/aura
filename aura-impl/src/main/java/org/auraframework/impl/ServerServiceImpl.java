@@ -15,7 +15,6 @@
  */
 package org.auraframework.impl;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
@@ -25,22 +24,18 @@ import org.auraframework.Aura;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.Event;
-import org.auraframework.service.ContextService;
 import org.auraframework.service.LoggingService;
-import org.auraframework.service.SerializationService;
 import org.auraframework.service.ServerService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.LoggingContext.KeyValueLogger;
 import org.auraframework.system.Message;
 import org.auraframework.throwable.AuraExecutionException;
-import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.collect.Lists;
 
 public class ServerServiceImpl implements ServerService {
 
     private static final long serialVersionUID = -2779745160285710414L;
-    private final ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(30);
 
     @Override
     public Message<?> run(final Message<?> message, final AuraContext context) {
@@ -56,44 +51,17 @@ public class ServerServiceImpl implements ServerService {
         return ret;
     }
 
-    @Override
-    public Future<?> runAsync(final Message<?> message, final Appendable callback, final AuraContext context) {
-
-        return executor.submit(new Callable<Boolean>() {
-            @Override
-            public Boolean call() throws IOException, QuickFixException {
-                SerializationService serializationService = Aura.getSerializationService();
-                ContextService contextService = Aura.getContextService();
-                try {
-                    contextService.startContext(context.getMode(), context.getFormat(), context.getAccess());
-
-                    if (message != null) {
-                        List<Action> actions = message.getActions();
-
-                        actions = ServerServiceImpl.run(actions);
-
-                        serializationService.writeCollection(actions, Action.class, callback);
-                    }
-                } finally {
-                    contextService.endContext();
-                }
-                return true;
-            }
-        });
-
-    }
-
     private static List<Action> run(List<Action> actions) {
         LoggingService loggingService = Aura.getLoggingService();
         List<Action> result = Lists.newArrayList();
         for (Action action : actions) {
-            StringBuffer timerName = new StringBuffer(action.getDescriptor().getQualifiedName());
-            KeyValueLogger logger = loggingService.getKeyValueLogger(timerName);
+            StringBuffer actionAndParams = new StringBuffer(action.getDescriptor().getQualifiedName());
+            KeyValueLogger logger = loggingService.getKeyValueLogger(actionAndParams);
             if (logger != null) {
                 action.logParams(logger);
             }
             try {
-                loggingService.startTimer(LoggingService.TIMER_ACTION + timerName);
+                loggingService.startAction(actionAndParams.toString());
 
                 // Always include the action in the result
                 result.add(action);
@@ -119,7 +87,7 @@ public class ServerServiceImpl implements ServerService {
             } catch (AuraExecutionException x) {
                 Aura.getExceptionAdapter().handleException(x, action);
             } finally {
-                loggingService.stopTimer(LoggingService.TIMER_ACTION + timerName);
+                loggingService.stopAction(actionAndParams.toString());
             }
         }
 

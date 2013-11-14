@@ -50,6 +50,22 @@ public class LoggingServiceImpl implements LoggingService {
     }
 
     @Override
+    public void startAction(String actionName) {
+        LoggingContext lc = getLoggingContext();
+        if (lc != null) {
+            lc.startAction(actionName);
+        }
+    }
+    
+    @Override
+    public void stopAction(String actionName) {
+        LoggingContext lc = getLoggingContext();
+        if (lc != null) {
+            lc.stopAction(actionName);
+        }
+    }
+    
+    @Override
     public void stopTimer(String name) {
         LoggingContext lc = getLoggingContext();
         if (lc != null) {

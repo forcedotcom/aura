@@ -14,58 +14,91 @@
  * limitations under the License.
  */
 ({
-	/**
-     * Verify that outputRichText can accept Object from java model and handle it.
-     */
-    testNullValueFromJavaModel:{
+	
+    testNullValue:{
         test:function(cmp){
             var testCmp = cmp.find('myComp1');
-            aura.test.assertNotNull(testCmp);
-            aura.test.assertEquals('', $A.test.getText(testCmp.find('div').getElement()), "Failed to handle null from Java model");
+            $A.test.assertNotNull(testCmp);
+            $A.test.assertEquals('', $A.test.getText(testCmp.find('div').getElement()), "Failed to handle null from Java model");
         }
     },
-
-	/**
-     * Verify that outputRichText can accept Boolean from java model and handle it.
-     */
-    testEmptyStringValueFromJavaModel:{
+	
+    testEmptyStringValue:{
         test:function(cmp){
             var testCmp = cmp.find('myComp2');
-            aura.test.assertNotNull(testCmp);
-            aura.test.assertEquals('', $A.test.getText(testCmp.find('div').getElement()), "Failed to handle empty string from Java model");
+            $A.test.assertNotNull(testCmp);
+            $A.test.assertEquals('', $A.test.getText(testCmp.find('div').getElement()), "Failed to handle empty string from Java model");
         }
     },	
-
-	/**
-     * Verify that outputRichText can accept String from java model and display it.
-     */
-    testStringValueFromJavaModel:{
+	
+    testStringValue:{
         test:function(cmp){
             var testCmp = cmp.find('myComp3');
-            aura.test.assertNotNull(testCmp);
-            aura.test.assertEquals('Model', $A.test.getText(testCmp.find('div').getElement()), "Failed to display String from Java model");
+            $A.test.assertNotNull(testCmp);
+            $A.test.assertEquals('Model', $A.test.getText(testCmp.find('div').getElement()), "Failed to display String from Java model");
         }
     },
-
-	/**
-     * Verify that outputRichText can accept String from java model and display it after escaping tags.
-     */
-    testStringValueWithTagsFromJavaModel:{
+        
+    testStringValueWithScriptTag:{
         test:function(cmp){
             var testCmp = cmp.find('myComp4');
-            aura.test.assertNotNull(testCmp);
-            aura.test.assertEquals('Some text from server with tags', $A.test.getText(testCmp.find('div').getElement()), "Failed to display richtext from Java model");
+            $A.test.assertNotNull(testCmp);
+            $A.test.assertEquals('Some text from server with script tag', $A.test.getText(testCmp.find('div').getElement()), "Failed to display richtext from Java model");
+            $A.test.assertEquals(1, testCmp.find('div').getElement().getElementsByTagName("big").length, "Big tag should be there");
+            $A.test.assertEquals(0, testCmp.find('div').getElement().getElementsByTagName("script").length, "Escapped script tag should not be there");
         }
     },
-
-	/**
-     * Verify that outputRichText can accept String from java model and display it after escaping tags.
-     */
-    testStringValueWithNestedTagsFromJavaModel:{
+        
+    testStringValueWithStyleTag:{
         test:function(cmp){
             var testCmp = cmp.find('myComp5');
-            aura.test.assertNotNull(testCmp);
-            aura.test.assertEquals('Some text from server with nested tags', $A.test.getText(testCmp.find('div').getElement()), "Failed to display richtext from Java model");
+            $A.test.assertNotNull(testCmp);
+            $A.test.assertEquals('Some text from server with style tag', $A.test.getText(testCmp.find('div').getElement()), "Failed to display richtext from Java model");
+            $A.test.assertEquals(1, testCmp.find('div').getElement().getElementsByTagName("big").length, "Big tag should be there");
+            $A.test.assertEquals(0, testCmp.find('div').getElement().getElementsByTagName("style").length, "Escapped style tag should not be there");
+        }
+    },
+	
+    testStringValueWithBlacklistedTags:{
+        test:function(cmp){
+            var testCmp = cmp.find('myComp6');
+            $A.test.assertNotNull(testCmp);
+            $A.test.assertEquals('Some text from server with blacklisted tags', $A.test.getText(testCmp.find('div').getElement()), "Failed to display richtext from Java model");
+            $A.test.assertEquals(0, testCmp.find('div').getElement().getElementsByTagName("script").length, "Escapped script tag should not be there");
+            // Uncomment when bug is fixed.
+            //$A.test.assertEquals(0, testCmp.find('div').getElement().getElementsByTagName("style").length, "Escapped style tag should not be there");
+        }
+    },
+	
+    testStringValueWithNestedBlacklistedTags:{
+        test:function(cmp){
+            var testCmp = cmp.find('myComp7');
+            $A.test.assertNotNull(testCmp);
+            $A.test.assertEquals('Some text from server with nested blacklisted tags', $A.test.getText(testCmp.find('div').getElement()), "Failed to display richtext from Java model");
+            $A.test.assertEquals(0, testCmp.find('div').getElement().getElementsByTagName("script").length, "Escapped script tag should not be there");
+            $A.test.assertEquals(0, testCmp.find('div').getElement().getElementsByTagName("style").length, "Escapped style tag should not be there");
+        }
+    },        
+        
+    testStringValueWithWhitelistedChildrenTags:{
+        test:function(cmp){
+            var testCmp = cmp.find('myComp8');
+            $A.test.assertNotNull(testCmp);
+            $A.test.assertEquals('Some text from server with nested input in balcklisted tags', $A.test.getText(testCmp.find('div').getElement()), "Failed to display richtext from Java model");                
+            $A.test.assertEquals(0, testCmp.find('div').getElement().getElementsByTagName("script").length, "Escapped script tag should not be there");
+            $A.test.assertEquals(0, testCmp.find('div').getElement().getElementsByTagName("input").length, "Input tag should not be there");
+        }
+    },
+        
+    testStringValueWithBlacklistedChildrenTags:{
+        test:function(cmp){
+            var testCmp = cmp.find('myComp9');
+            $A.test.assertNotNull(testCmp);
+            $A.test.assertEquals('Some text from server with nested blacklisted tags in div', $A.test.getText(testCmp.find('div').getElement()).trim(), "Failed to display richtext from Java model");
+            $A.test.assertEquals(1, testCmp.find('div').getElement().getElementsByTagName("div").length, "Div tag should not be there");
+            // Uncomment when bug is fixed.
+            //$A.test.assertEquals(0, testCmp.find('div').getElement().getElementsByTagName("script").length, "Escapped script tag should not be there");
+            //$A.test.assertEquals(0, testCmp.find('div').getElement().getElementsByTagName("style").length, "Escapped style tag should not be there");            
         }
     }
 })

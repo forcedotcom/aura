@@ -45,7 +45,7 @@
             $A.test.assertNotNull(testCmp);
             $A.test.assertEquals('Some text from server with script tag', $A.test.getText(testCmp.find('div').getElement()), "Failed to display richtext from Java model");
             $A.test.assertEquals(1, testCmp.find('div').getElement().getElementsByTagName("big").length, "Big tag should be there");
-            $A.test.assertEquals(0, testCmp.find('div').getElement().getElementsByTagName("script").length, "Escapped script tag should not be there");
+            $A.test.assertEquals(0, testCmp.find('div').getElement().getElementsByTagName("script").length, "script tag should not be there");
         }
     },
         
@@ -55,7 +55,7 @@
             $A.test.assertNotNull(testCmp);
             $A.test.assertEquals('Some text from server with style tag', $A.test.getText(testCmp.find('div').getElement()), "Failed to display richtext from Java model");
             $A.test.assertEquals(1, testCmp.find('div').getElement().getElementsByTagName("big").length, "Big tag should be there");
-            $A.test.assertEquals(0, testCmp.find('div').getElement().getElementsByTagName("style").length, "Escapped style tag should not be there");
+            $A.test.assertEquals(0, testCmp.find('div').getElement().getElementsByTagName("style").length, "style tag should not be there");
         }
     },
 	
@@ -64,9 +64,9 @@
             var testCmp = cmp.find('myComp6');
             $A.test.assertNotNull(testCmp);
             $A.test.assertEquals('Some text from server with blacklisted tags', $A.test.getText(testCmp.find('div').getElement()), "Failed to display richtext from Java model");
-            $A.test.assertEquals(0, testCmp.find('div').getElement().getElementsByTagName("script").length, "Escapped script tag should not be there");
+            $A.test.assertEquals(0, testCmp.find('div').getElement().getElementsByTagName("script").length, "script tag should not be there");
             // Uncomment when bug is fixed.
-            //$A.test.assertEquals(0, testCmp.find('div').getElement().getElementsByTagName("style").length, "Escapped style tag should not be there");
+            //$A.test.assertEquals(0, testCmp.find('div').getElement().getElementsByTagName("style").length, "style tag should not be there");
         }
     },
 	
@@ -75,8 +75,8 @@
             var testCmp = cmp.find('myComp7');
             $A.test.assertNotNull(testCmp);
             $A.test.assertEquals('Some text from server with nested blacklisted tags', $A.test.getText(testCmp.find('div').getElement()), "Failed to display richtext from Java model");
-            $A.test.assertEquals(0, testCmp.find('div').getElement().getElementsByTagName("script").length, "Escapped script tag should not be there");
-            $A.test.assertEquals(0, testCmp.find('div').getElement().getElementsByTagName("style").length, "Escapped style tag should not be there");
+            $A.test.assertEquals(0, testCmp.find('div').getElement().getElementsByTagName("script").length, "script tag should not be there");
+            $A.test.assertEquals(0, testCmp.find('div').getElement().getElementsByTagName("style").length, "style tag should not be there");
         }
     },        
         
@@ -85,7 +85,7 @@
             var testCmp = cmp.find('myComp8');
             $A.test.assertNotNull(testCmp);
             $A.test.assertEquals('Some text from server with nested input in balcklisted tags', $A.test.getText(testCmp.find('div').getElement()), "Failed to display richtext from Java model");                
-            $A.test.assertEquals(0, testCmp.find('div').getElement().getElementsByTagName("script").length, "Escapped script tag should not be there");
+            $A.test.assertEquals(0, testCmp.find('div').getElement().getElementsByTagName("script").length, "script tag should not be there");
             $A.test.assertEquals(0, testCmp.find('div').getElement().getElementsByTagName("input").length, "Input tag should not be there");
         }
     },
@@ -97,8 +97,47 @@
             $A.test.assertEquals('Some text from server with nested blacklisted tags in div', $A.test.getText(testCmp.find('div').getElement()).trim(), "Failed to display richtext from Java model");
             $A.test.assertEquals(1, testCmp.find('div').getElement().getElementsByTagName("div").length, "Div tag should not be there");
             // Uncomment when bug is fixed.
-            //$A.test.assertEquals(0, testCmp.find('div').getElement().getElementsByTagName("script").length, "Escapped script tag should not be there");
-            //$A.test.assertEquals(0, testCmp.find('div').getElement().getElementsByTagName("style").length, "Escapped style tag should not be there");            
+            //$A.test.assertEquals(0, testCmp.find('div').getElement().getElementsByTagName("script").length, "script tag should not be there");
+            //$A.test.assertEquals(0, testCmp.find('div').getElement().getElementsByTagName("style").length, "style tag should not be there");            
+        }
+    },
+    
+    testStringValueWithEvent:{
+        test:function(cmp){
+            var testCmp = cmp.find('myComp10');
+            $A.test.assertNotNull(testCmp);
+            $A.test.assertEquals('Some text from server with input tag with event', $A.test.getText(testCmp.find('div').getElement()), "Failed to display richtext from Java model");            
+            $A.test.assertEquals(1, testCmp.find('div').getElement().getElementsByTagName("input").length, "Input tag should be there");
+            
+            var ele = testCmp.find('div').getElement().getElementsByTagName("input")[0];
+            $A.test.assertFalse($A.util.isUndefinedOrNull(ele) , "Input tag should be there");
+            var cl = ele.onclick;
+            $A.test.assertFalse($A.util.isUndefinedOrNull(cl) , "Input tag should have onclick attribute");
+            $A.test.assertTrue($A.util.isUndefinedOrNull(cl.nodeValue) , "onclick attribute should be null");
+        }
+    },
+    
+    testStringValueWithMultipleEvent:{
+        test:function(cmp){
+            var testCmp = cmp.find('myComp11');
+            $A.test.assertNotNull(testCmp);
+            $A.test.assertEquals('Some text from server with input tags with events', $A.test.getText(testCmp.find('div').getElement()), "Failed to display richtext from Java model");            
+            $A.test.assertEquals(2, testCmp.find('div').getElement().getElementsByTagName("input").length, "Input tags should be there");
+            
+            var ele1 = testCmp.find('div').getElement().getElementsByTagName("input")[0];
+            $A.test.assertFalse($A.util.isUndefinedOrNull(ele1) , "Input tag should be there");
+            var cl1 = ele1.onclick;
+            $A.test.assertFalse($A.util.isUndefinedOrNull(cl1) , "Input tag should have onclick attribute");
+            $A.test.assertTrue($A.util.isUndefinedOrNull(cl1.nodeValue) , "onclick attribute should be null");
+            
+            var ele2 = testCmp.find('div').getElement().getElementsByTagName("input")[1];
+            $A.test.assertFalse($A.util.isUndefinedOrNull(ele2) , "Input tag should be there");
+            var cl21 = ele2.onclick;
+            $A.test.assertFalse($A.util.isUndefinedOrNull(cl21) , "Input tag should have onclick attribute");
+            $A.test.assertTrue($A.util.isUndefinedOrNull(cl21.nodeValue) , "onclick attribute should be null");            
+            var cl22 = ele2.onfocus;
+            $A.test.assertFalse($A.util.isUndefinedOrNull(cl22) , "Input tag should have onfocus attribute");
+            $A.test.assertTrue($A.util.isUndefinedOrNull(cl22.nodeValue) , "onfocus attribute should be null");
         }
     }
 })

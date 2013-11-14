@@ -23,8 +23,10 @@
     <aura:attribute name="visible" type="Boolean" default="false" description="Indicates if this time picker is displayed. Defaults to false, which hides this time picker."/>
 
     <div class="{!v.class}">
+		<ui:label label="hours" for="hours" labelDisplay="false"/>
 	    <ui:inputText aura:id="hours" class="input-hours" change="{!c.updateHours}"/>
 	    <ui:image class="time-separator" imageType="decorative" src="/auraFW/resources/aura/images/time-separator.png" />
+	    <ui:label label="minutes" for="minutes" labelDisplay="false"/>
 	    <ui:inputText aura:id="minutes" class="input-minutes" change="{!c.updateMinutes}"/>
 	    <aura:renderIf isTrue="{!v.is24HourFormat != true}">
 	        <ui:inputSelect aura:id="ampm" class="ampm" change="{!c.updateAmpm}">

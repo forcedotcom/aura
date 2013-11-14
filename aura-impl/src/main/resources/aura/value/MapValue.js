@@ -59,6 +59,18 @@ function MapValue(config, def, component){
 MapValue.prototype.auraType = "Value";
 
 /**
+ * Recursively fire for subelements of the map.  Used in particular
+ * when MapValue.put() adds a new submap to a MapValue with handlers
+ * already registered.
+ * @private
+ */
+MapValue.prototype.fire = function(name) {
+    for (var k in this.value) {
+        this.value[k].fire(name);
+    }
+};
+
+/**
  * Returns a SimpleValue for the specified key.
  * @param {String} k The key for whose value is to be fetched.
  */

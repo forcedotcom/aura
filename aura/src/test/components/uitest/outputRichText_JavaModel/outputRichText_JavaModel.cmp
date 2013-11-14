@@ -24,5 +24,7 @@
     <ui:outputRichText value='{!m.textWithBlacklistedTags}' aura:id='myComp6'/> <br/>	
     <ui:outputRichText value='{!m.textWithBlacklistedNestedTags}' aura:id='myComp7'/> <br/>	    
     <ui:outputRichText value='{!m.textWithWhitelistedChildrenTags}' aura:id='myComp8'/> <br/>
-    <ui:outputRichText value='{!m.textWithBlacklistedChildrenTags}' aura:id='myComp9'/> <br/>    
+    <ui:outputRichText value='{!m.textWithBlacklistedChildrenTags}' aura:id='myComp9'/> <br/>  
+  	<ui:outputRichText value='{!m.textWithEvent}' aura:id='myComp10'/>
+  	<ui:outputRichText value='{!m.textWithMultipleEvents}' aura:id='myComp11'/>  	
 </aura:component>

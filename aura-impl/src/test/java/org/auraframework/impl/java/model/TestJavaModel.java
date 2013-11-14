@@ -543,6 +543,16 @@ public class TestJavaModel {
     public String getTextWithWhitelistedChildrenTags() {
         return "Some text from server with nested input in balcklisted tags<script><input></input></script>";
     }
+    
+    @AuraEnabled
+    public String getTextWithEvent() {
+        return "Some text from server with input tag with event<input type=\"button\" value=\"click\" onclick=\"alert('hello')\" />";
+    }
+    
+    @AuraEnabled
+    public String getTextWithMultipleEvents() {
+        return "Some text from server with input tags with events<input type=\"button\" value=\"click\" onclick=\"alert('hello')\" /><input type=\"text\" onclick=\"alert('click')\" onfocus=\"alert('focus')\" />";
+    }
 
     @AuraEnabled
     public String getUrl() {

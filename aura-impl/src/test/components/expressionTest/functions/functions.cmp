@@ -16,7 +16,7 @@
 
 -->
 <aura:component extends="expressionTest:suite" render="client" model="java://org.auraframework.impl.java.model.TestJavaModel">
-    <aura:attribute name="integer" type="int"/>
+    <aura:attribute name="integer" type="integer"/>
     <aura:attribute name="double" type="double"/>
     <aura:attribute name="doubleString" type="String"/>
     <aura:attribute name="string" type="String"/>

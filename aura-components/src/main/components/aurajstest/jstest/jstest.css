@@ -131,7 +131,7 @@
 
 
 .aurajstestJstest section div.testContent {
-    height: 100%
+    height: 100%;
 }
 
 .aurajstestJstest iframe {
@@ -165,7 +165,7 @@
     line-height: 1em;
     height: 1em;
     padding: .4em .6em;
-    margin: -.8em 0 0 0;
+    margin: .8em 0 0 0;
     color: #fff;
     text-indent: 0;
     text-align: center;

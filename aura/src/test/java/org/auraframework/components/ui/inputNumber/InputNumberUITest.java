@@ -104,16 +104,15 @@ public class InputNumberUITest extends WebDriverTestCase {
         input.sendKeys("abcdef");
         submit.click();
         waitForElementTextPresent(output, "Got Error!");
-
-        WebElement error = d.findElement(By.className("uiInputDefaultError"));
-        assertEquals("Incorrect error message", "Invalid value for inVar: java://long", error.getText());
+        auraUITestingUtil.waitForElementText(By.className("uiInputDefaultError"),
+                "Invalid value for inVar: java://long", true, "Error element never inserted into DOM");
 
         // clear error
         input.clear();
         input.sendKeys("1234");
         submit.click();
         waitForElementTextPresent(output, "1234");
-        error = d.findElement(By.className("uiInputDefaultError"));
-        assertEquals("Error message should be gone", "", error.getText());
+        auraUITestingUtil.waitForElementText(By.className("uiInputDefaultError"), "", true,
+                "Error message never cleared after valid input");
     }
 }

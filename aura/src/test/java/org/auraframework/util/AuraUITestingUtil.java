@@ -472,13 +472,14 @@ public class AuraUITestingUtil {
      * Finds the WebElement identified by locator and applies the provided Function to it, ignoring
      * StaleElementReferenceException.
      * 
-     * @param locator
-     * @param function
+     * @param locator By locator to find WebElement in the DOM.
+     * @param function Function to run on web
+     * @param message Message to display to user on timeout.
      * @return
      */
-    public <R> R waitForElementFunction(final By locator, final Function<WebElement, R> function) {
+    public <R> R waitForElementFunction(final By locator, final Function<WebElement, R> function, String message) {
         WebDriverWait wait = new WebDriverWait(driver, timeoutInSecs);
-        return wait.until(new ExpectedCondition<R>() {
+        return wait.withMessage(message).until(new ExpectedCondition<R>() {
             private WebElement element = null;
 
             @Override
@@ -496,29 +497,36 @@ public class AuraUITestingUtil {
         });
     }
 
+    public <R> R waitForElementFunction(final By locator, final Function<WebElement, R> function) {
+        return waitForElementFunction(locator, function, "Timeout waiting for element");
+    }
+
     /**
      * Wait for text of an element to be either present or not present.
      * 
-     * @param locator
-     * @param text
-     * @param toBePresent
+     * @param locator By locator to find WebElement in the DOM.
+     * @param text Text on the found WebElement.
+     * @param toBePresent True if we want text passed in as parameter to equal text on found WebElement.
+     * @param message Message to display to user on timeout.
      */
-    public void waitForElementText(final By locator, final String text, final boolean toBePresent) {
+    public void waitForElementText(final By locator, final String text, final boolean toBePresent, String message) {
         waitForElementFunction(locator, new Function<WebElement, Boolean>() {
             @Override
             public Boolean apply(WebElement element) {
                 return toBePresent == element.getText().equals(text);
             }
-        });
+        }, message);
+    }
+
+    public void waitForElementText(final By locator, final String text, final boolean toBePresent) {
+        waitForElementText(locator, text, toBePresent, "Timeout looking for element with text: " + text);
     }
 
     /**
      * Method of exposing accessibility tool to be exposed for testing purposes
      * 
-     * @return ArrayList - either 0,1, or 2.
-     *                            Position 0: Indicates there were no errors
-     *                            Position 1: Indicates that there were errors
-     *                            Position 2: Indicates that something unexpected happened.
+     * @return ArrayList - either 0,1, or 2. Position 0: Indicates there were no errors Position 1: Indicates that there
+     *         were errors Position 2: Indicates that something unexpected happened.
      */
     public ArrayList<String> doAccessibilityCheck() {
         String jsString = "return ((window.$A != null || window.$A !=undefined) && (!$A.util.isUndefinedOrNull($A.devToolService)))? "

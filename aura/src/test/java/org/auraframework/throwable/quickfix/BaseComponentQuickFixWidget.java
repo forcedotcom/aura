@@ -26,7 +26,7 @@ import org.openqa.selenium.WebElement;
 /**
  * Widget class for QuickFixes to create new component/application bundles. This class handles verificaiton of UI
  * differences between creating a component and application bundle.
- *
+ * 
  * Logic that is different between handling component and application bundles is passed to inner class
  * BaseComponentQuickFixUtil. Logic common to all Quickfixes, including adding/removing attribtues etc, is passed to
  * QuickFixUITestUtil.
@@ -131,6 +131,8 @@ public class BaseComponentQuickFixWidget {
             Assert.assertTrue("Could not locate the create button or the label on button is invalid.",
                     testCase.isElementPresent(createButton));
             testUtil.clickButtonByLocalId("createButton");
+            testCase.waitForElementAppear("Clicking quickfix button did not advance to next screen.",
+                    By.cssSelector("input[name='client.controller']"));
         }
 
         /**
@@ -138,14 +140,12 @@ public class BaseComponentQuickFixWidget {
          */
         public void verifyCustomizationMenu() {
             // No support for controller yet
-            By jsController = By
-                    .cssSelector("input[name='client.controller']");
+            By jsController = By.cssSelector("input[name='client.controller']");
             Assert.assertTrue("Could not locate checkbox to create JS controller file.",
                     testCase.isElementPresent(jsController));
 
             // No support for renderer yet
             By jsRenderer = By.cssSelector("input[name='client.renderer']");
-
             Assert.assertTrue("Could not locate checkbox to create JS renderer file.",
                     testCase.isElementPresent(jsRenderer));
 
@@ -153,8 +153,7 @@ public class BaseComponentQuickFixWidget {
             Assert.assertTrue("Could not locate checkbox to create css style file.", testCase.isElementPresent(css));
 
             // No support for controller yet
-            By javaController = By
-                    .cssSelector("input[name='java.controller']");
+            By javaController = By.cssSelector("input[name='java.controller']");
             Assert.assertTrue("Could not locate checkbox to create java controller file.",
                     testCase.isElementPresent(javaController));
 

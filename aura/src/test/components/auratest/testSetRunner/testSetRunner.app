@@ -16,6 +16,5 @@
 
 -->
 <aura:application securityProvider="java://org.auraframework.components.security.SecurityProviderAlwaysAllows">
-<auratest:testSetRunnerC aura:load="lazy">
-</auratest:testSetRunnerC>
+    <auratest:testSetRunnerC aura:load="lazy" />
 </aura:application>

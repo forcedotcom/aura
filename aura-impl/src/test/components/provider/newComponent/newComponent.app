@@ -16,6 +16,8 @@
 
 -->
 <aura:application preload="provider" render="client" securityProvider="java://org.auraframework.components.security.SecurityProviderAlwaysAllows">
+    <aura:dependency resource="provider:*" />
+    <aura:dependency resource="markup://ui:outputText" />
     <aura:attribute name="newDescriptor" type="String" default="markup://provider:clientProvider"/>
     <aura:attribute name="newAttributes" type="String" default="{value:&quot;{componentDef:'markup://aura:text',attributes:{value:'breadwinner'}}&quot;}"/>
 

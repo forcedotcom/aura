@@ -27,5 +27,5 @@
     the definition, then the top line will be highlighted as pink, and any definitions that could not be retrieved
     may also show up in the list.
     </p>
-    <auradev:showDependencies component="{!v.component}" clearPreloads="{!v.clearPreloads}" />
+    <auradev:showDependencies component="{!v.component}" />
 </aura:application>

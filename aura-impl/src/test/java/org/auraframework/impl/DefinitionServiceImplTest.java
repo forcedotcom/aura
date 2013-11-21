@@ -45,6 +45,8 @@ import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
+import com.google.common.collect.Maps;
+
 /**
  * Tests for DefinitionServiceImpl.
  * 
@@ -166,15 +168,15 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         context.addLoaded(dummyDesc, null);
 
         // null input should not affect the loaded set
-        Aura.getDefinitionService().updateLoaded(null, false);
+        Aura.getDefinitionService().updateLoaded(null);
         Map<DefDescriptor<?>, String> loaded = context.getLoaded();
-        assertEquals("Loaded set should have changed size", 1, loaded.size());
+        assertEquals("Loaded set should not have changed size", 1, loaded.size());
         assertNull("Wrong uid for loaded", loaded.get(dummyDesc));
 
         // one more try to make sure
-        Aura.getDefinitionService().updateLoaded(null, false);
+        Aura.getDefinitionService().updateLoaded(null);
         loaded = context.getLoaded();
-        assertEquals("Loaded set should have changed size", 1, loaded.size());
+        assertEquals("Loaded set should not have changed size", 1, loaded.size());
         assertNull("Wrong uid for loaded", loaded.get(dummyDesc));
     }
 
@@ -183,11 +185,12 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
      */
     public void testUpdateLoadedWithWrongUidInContext() throws Exception {
         AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Access.AUTHENTICATED);
-        DefDescriptor<?> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
-                String.format(baseComponentTag, "", ""));
-        context.addLoaded(cmpDesc, "expired");
+        DefDescriptor<?> cmpDesc = addSourceAutoCleanup(ComponentDef.class, String.format(baseComponentTag, "", ""));
+        Map<DefDescriptor<?>,String> clientLoaded = Maps.newHashMap();
+        clientLoaded.put(cmpDesc, "expired");
+        context.setClientLoaded(clientLoaded);
         try {
-            Aura.getDefinitionService().updateLoaded(cmpDesc, false);
+            Aura.getDefinitionService().updateLoaded(cmpDesc);
             fail("Expected ClientOutOfSyncException");
         } catch (ClientOutOfSyncException e) {
             checkExceptionStart(e, ClientOutOfSyncException.class,
@@ -203,7 +206,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         DefDescriptor<?> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "", "<invalid:thisbetternotexistorthistestwillfail/>"));
         try {
-            Aura.getDefinitionService().updateLoaded(cmpDesc, false);
+            Aura.getDefinitionService().updateLoaded(cmpDesc);
             fail("Expected DefinitionNotFoundException");
         } catch (DefinitionNotFoundException e) {
             checkExceptionStart(e, DefinitionNotFoundException.class,
@@ -218,9 +221,11 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Access.AUTHENTICATED);
         DefDescriptor<?> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "", "<invalid:thisbetternotexistorthistestwillfail/>"));
-        context.addLoaded(cmpDesc, "expired");
+        Map<DefDescriptor<?>,String> clientLoaded = Maps.newHashMap();
+        clientLoaded.put(cmpDesc, "expired");
+        context.setClientLoaded(clientLoaded);
         try {
-            Aura.getDefinitionService().updateLoaded(cmpDesc, false);
+            Aura.getDefinitionService().updateLoaded(cmpDesc);
             fail("Expected ClientOutOfSyncException");
         } catch (ClientOutOfSyncException e) {
             checkExceptionStart(e, ClientOutOfSyncException.class,
@@ -242,7 +247,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         Map<DefDescriptor<?>, String> loaded = context.getLoaded();
         assertNull("Parent should not be loaded initially", loaded.get(cmpDesc));
 
-        Aura.getDefinitionService().updateLoaded(cmpDesc, false);
+        Aura.getDefinitionService().updateLoaded(cmpDesc);
         loaded = context.getLoaded();
         assertEquals("Parent was updated incorrectly", uid, loaded.get(cmpDesc));
     }
@@ -270,7 +275,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         assertEquals("Parent was not added", uid, loaded.get(cmpDesc));
         assertNull("Dependency should not have been added", loaded.get(depDesc));
 
-        Aura.getDefinitionService().updateLoaded(cmpDesc, false);
+        Aura.getDefinitionService().updateLoaded(cmpDesc);
         loaded = context.getLoaded();
         assertEquals("Parent was updated incorrectly", uid, loaded.get(cmpDesc));
         assertEquals("Dependency should have been added in update", depUid, loaded.get(depDesc));

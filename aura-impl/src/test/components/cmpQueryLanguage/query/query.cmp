@@ -16,4 +16,5 @@
 
 -->
 <aura:component render="client" model="java://org.auraframework.impl.java.model.TestJavaModel">
+    <aura:dependency resource="provider:*" />
 </aura:component>

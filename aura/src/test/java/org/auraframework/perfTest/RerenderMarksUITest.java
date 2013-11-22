@@ -66,7 +66,7 @@ public class RerenderMarksUITest extends PerfMetricsTestCase {
      * 
      * Re-enable after bug W-1935316 is fixed
      */
-    public void _testRerenderMarksHaveAllComponentNames() throws Exception{
+    public void testRerenderMarksHaveAllComponentNames() throws Exception{
         Map<String, String> logStats = Maps.newHashMap();
         open("/performanceTest/perfApp.app", Mode.CADENCE);
         clearStats();

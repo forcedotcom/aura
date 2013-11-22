@@ -966,36 +966,13 @@ $A.ns.Aura.prototype.trace = function() {
 $A.ns.Aura.prototype.mark = window["Perf"] ? window["Perf"]["mark"] : function(){ return this; };
 
 /**
- * Map through to Jiffy.measure if Jiffy is loaded, otherwise a no-op.
- * This will be the same no-op as <code>$A.ns.Aura.prototype.mark</code>, since both
- * are no-ops when Jiffy is missing; we only need one noop object.
- *
- * @public
- * @function
- * @deprecated Use endMark instead
- */
-$A.ns.Aura.prototype.measure = (function() {
-    if (window["Perf"]) {
-        return window["Perf"]["measure"];
-    } else {
-        return $A.ns.Aura.prototype.mark;
-    }
-})();
-
-/**
  * Map through to Perf.endMark if Perf is loaded, otherwise a no-op. This will be the same no-op as
  * $A.ns.Aura.prototype.mark, since both are no-ops when Jiffy is missing; we only need one noop object.
  *
  * @public
  * @function
  */
-$A.ns.Aura.prototype.endMark = (function() {
-    if (window["Perf"]) {
-        return window["Perf"]["endMark"];
-    } else {
-        return $A.ns.Aura.prototype.mark;
-    }
-})();
+$A.ns.Aura.prototype.endMark = window["Perf"] ? window["Perf"]["endMark"] : $A.ns.Aura.prototype.mark;
 
 /**
  * If Perf is loaded the page-ready and transaction timers will be started, otherwise a no-op. This will be the same no-op as

@@ -67,12 +67,8 @@ function(component) {
           {
             "serId":6,
             "value":{
-              "descriptor":"defaultAttr",
+              "descriptor":"implNumber",
               "typeDefDescriptor":"aura://String",
-              "defaultValue":{
-                "descriptor":"defaultAttr",
-                "value":"meh"
-              },
               "required":false,
               "visibility":"PUBLIC"
             }
@@ -80,8 +76,12 @@ function(component) {
           {
             "serId":7,
             "value":{
-              "descriptor":"implNumber",
+              "descriptor":"defaultAttr",
               "typeDefDescriptor":"aura://String",
+              "defaultValue":{
+                "descriptor":"defaultAttr",
+                "value":"meh"
+              },
               "required":false,
               "visibility":"PUBLIC"
             }
@@ -126,6 +126,24 @@ function(component) {
                       {
                         "serId":10,
                         "value":{
+                          "descriptor":"value",
+                          "typeDefDescriptor":"aura://String",
+                          "required":false,
+                          "visibility":"PUBLIC"
+                        }
+                      },
+                      {
+                        "serId":11,
+                        "value":{
+                          "descriptor":"truncate",
+                          "typeDefDescriptor":"aura://Integer",
+                          "required":false,
+                          "visibility":"PUBLIC"
+                        }
+                      },
+                      {
+                        "serId":12,
+                        "value":{
                           "descriptor":"truncateByWord",
                           "typeDefDescriptor":"aura://Boolean",
                           "defaultValue":{
@@ -137,7 +155,7 @@ function(component) {
                         }
                       },
                       {
-                        "serId":11,
+                        "serId":13,
                         "value":{
                           "descriptor":"ellipsis",
                           "typeDefDescriptor":"aura://Boolean",
@@ -145,24 +163,6 @@ function(component) {
                             "descriptor":"ellipsis",
                             "value":true
                           },
-                          "required":false,
-                          "visibility":"PUBLIC"
-                        }
-                      },
-                      {
-                        "serId":12,
-                        "value":{
-                          "descriptor":"truncate",
-                          "typeDefDescriptor":"aura://Integer",
-                          "required":false,
-                          "visibility":"PUBLIC"
-                        }
-                      },
-                      {
-                        "serId":13,
-                        "value":{
-                          "descriptor":"value",
-                          "typeDefDescriptor":"aura://String",
                           "required":false,
                           "visibility":"PUBLIC"
                         }
@@ -342,6 +342,7 @@ function(value) {
         ]
       }
     },
+    "original":"markup://test:test_Provider_Interface",
     "globalId":"1",
     "attributes":{
       "serId":18,

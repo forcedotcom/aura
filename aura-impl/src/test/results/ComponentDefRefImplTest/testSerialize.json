@@ -108,6 +108,24 @@ function(component) {
                     {
                       "serId":8,
                       "value":{
+                        "descriptor":"value",
+                        "typeDefDescriptor":"aura://String",
+                        "required":false,
+                        "visibility":"PUBLIC"
+                      }
+                    },
+                    {
+                      "serId":9,
+                      "value":{
+                        "descriptor":"truncate",
+                        "typeDefDescriptor":"aura://Integer",
+                        "required":false,
+                        "visibility":"PUBLIC"
+                      }
+                    },
+                    {
+                      "serId":10,
+                      "value":{
                         "descriptor":"truncateByWord",
                         "typeDefDescriptor":"aura://Boolean",
                         "defaultValue":{
@@ -119,7 +137,7 @@ function(component) {
                       }
                     },
                     {
-                      "serId":9,
+                      "serId":11,
                       "value":{
                         "descriptor":"ellipsis",
                         "typeDefDescriptor":"aura://Boolean",
@@ -127,24 +145,6 @@ function(component) {
                           "descriptor":"ellipsis",
                           "value":true
                         },
-                        "required":false,
-                        "visibility":"PUBLIC"
-                      }
-                    },
-                    {
-                      "serId":10,
-                      "value":{
-                        "descriptor":"truncate",
-                        "typeDefDescriptor":"aura://Integer",
-                        "required":false,
-                        "visibility":"PUBLIC"
-                      }
-                    },
-                    {
-                      "serId":11,
-                      "value":{
-                        "descriptor":"value",
-                        "typeDefDescriptor":"aura://String",
                         "required":false,
                         "visibility":"PUBLIC"
                       }

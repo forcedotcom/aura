@@ -188,7 +188,6 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
         loggingService.startTimer(LoggingService.TIMER_COMPONENT_CREATION);
         try {
             this.globalId = getNextGlobalId();
-            System.out.println(this.globalId + ": "+this.descriptor);
 
             this.attributeSet = new AttributeSetImpl(desc, attributeValueProvider);
 

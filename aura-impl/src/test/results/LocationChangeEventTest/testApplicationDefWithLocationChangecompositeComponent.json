@@ -267,7 +267,7 @@ function(cmp, event) {
                       {
                         "serId":22,
                         "value":{
-                          "descriptor":"class",
+                          "descriptor":"label",
                           "typeDefDescriptor":"aura://String",
                           "required":false,
                           "visibility":"PUBLIC"
@@ -276,7 +276,7 @@ function(cmp, event) {
                       {
                         "serId":23,
                         "value":{
-                          "descriptor":"label",
+                          "descriptor":"class",
                           "typeDefDescriptor":"aura://String",
                           "required":false,
                           "visibility":"PUBLIC"
@@ -803,8 +803,8 @@ function(event) {
                                   {
                                     "serId":31,
                                     "value":{
-                                      "descriptor":"HTMLAttributes",
-                                      "typeDefDescriptor":"aura://Map",
+                                      "descriptor":"tag",
+                                      "typeDefDescriptor":"aura://String",
                                       "required":false,
                                       "visibility":"PUBLIC"
                                     }
@@ -812,8 +812,8 @@ function(event) {
                                   {
                                     "serId":32,
                                     "value":{
-                                      "descriptor":"tag",
-                                      "typeDefDescriptor":"aura://String",
+                                      "descriptor":"HTMLAttributes",
+                                      "typeDefDescriptor":"aura://Map",
                                       "required":false,
                                       "visibility":"PUBLIC"
                                     }

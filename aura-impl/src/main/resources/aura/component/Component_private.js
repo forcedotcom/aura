@@ -34,11 +34,6 @@ var ComponentPriv = (function(){ // Scoping priv
         // create the globally unique id for this component
         this.setupGlobalId(config["globalId"], localCreation);
 
-        var logCD = config["componentDef"]["descriptor"];
-        if (logCD.getQualifiedName) {
-            logCD = logCD.getQualifiedName();
-        }
-        console.log(this.globalId+": "+logCD);
         // get any partial configuration that was serialized by the server
         var partialConfig = $A.getContext().getComponentConfig(this.globalId);
         if (partialConfig) {

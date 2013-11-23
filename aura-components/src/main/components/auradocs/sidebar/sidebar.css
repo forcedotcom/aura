@@ -53,6 +53,7 @@
 }
 
 .THIS.uiTree li input:checked+ol {
+    background: none;
 	padding: 1.25em 0 0 80px;
 }
 

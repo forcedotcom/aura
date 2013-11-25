@@ -33,12 +33,8 @@ $A.ns.Aura.prototype["userAssert"] = $A.ns.Aura.prototype.userAssert;
 $A.ns.Aura.prototype["log"] = $A.ns.Aura.prototype.log;
 $A.ns.Aura.prototype["logf"] = $A.ns.Aura.prototype.logf;
 $A.ns.Aura.prototype["trace"] = $A.ns.Aura.prototype.trace;
-$A.ns.Aura.prototype["mark"] = $A.ns.Aura.prototype.mark;
 $A.ns.Aura.prototype["getGlobalValueProviders"] = $A.ns.Aura.prototype.getGlobalValueProviders;
-/**
- * @deprecated Use endMark instead
- */
-$A.ns.Aura.prototype["measure"] = $A.ns.Aura.prototype.measure;
+$A.ns.Aura.prototype["mark"] = $A.ns.Aura.prototype.mark;
 $A.ns.Aura.prototype["endMark"] = $A.ns.Aura.prototype.endMark;
 $A.ns.Aura.prototype["startTransaction"] = $A.ns.Aura.prototype.startTransaction;
 $A.ns.Aura.prototype["endTransaction"] = $A.ns.Aura.prototype.endTransaction;

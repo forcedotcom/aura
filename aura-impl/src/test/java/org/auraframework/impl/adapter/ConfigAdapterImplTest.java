@@ -15,6 +15,12 @@
  */
 package org.auraframework.impl.adapter;
 
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
@@ -22,9 +28,12 @@ import java.util.Properties;
 import java.util.TimeZone;
 
 import org.auraframework.impl.javascript.AuraJavascriptGroup;
+import org.auraframework.impl.source.AuraResourcesHashingGroup;
 import org.auraframework.impl.util.AuraImplFiles;
 import org.auraframework.test.UnitTestCase;
 import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.util.resource.FileGroup;
+import org.auraframework.util.text.Hash;
 import org.mockito.Mockito;
 
 /**
@@ -44,8 +53,8 @@ public class ConfigAdapterImplTest extends UnitTestCase {
     };
 
     /**
-     * Make sure that version file is available in aura package. If this test
-     * fails, then we have a build/packaging issue.
+     * Make sure that version file is available in aura package. If this test fails, then we have a build/packaging
+     * issue.
      */
     public void testVersionPropFile() throws Exception {
         String path = "/version.prop";
@@ -74,9 +83,8 @@ public class ConfigAdapterImplTest extends UnitTestCase {
     }
 
     /**
-     * Test regenerateAuraJS() functionality. For failure testing, the test
-     * makes a fake jsGroup which will still act as though it saw an error (and
-     * should be handled as such).
+     * Test regenerateAuraJS() functionality. For failure testing, the test makes a fake jsGroup which will still act as
+     * though it saw an error (and should be handled as such).
      */
     public void testRegenerateHandlesErrors() throws Exception {
         // The real case should work, of course:
@@ -85,7 +93,7 @@ public class ConfigAdapterImplTest extends UnitTestCase {
         assertTrue("Framework nonce should not be empty", impl.getAuraFrameworkNonce().length() > 0);
 
         // But an error case should fail, and not be swallowed.
-        final AuraJavascriptGroup mockJsGroup = Mockito.mock(AuraJavascriptGroup.class);
+        final AuraJavascriptGroup mockJsGroup = mock(AuraJavascriptGroup.class);
 
         impl = new ConfigAdapterImpl() {
             @Override
@@ -99,7 +107,7 @@ public class ConfigAdapterImplTest extends UnitTestCase {
             }
         };
         try {
-            Mockito.when(mockJsGroup.isStale()).thenReturn(true);
+            when(mockJsGroup.isStale()).thenReturn(true);
             Mockito.doThrow(new MockException("Pretend we had a compile error in regeneration")).when(mockJsGroup)
                     .regenerate(AuraImplFiles.AuraResourceJavascriptDirectory.asFile());
             impl.regenerateAuraJS();
@@ -111,7 +119,7 @@ public class ConfigAdapterImplTest extends UnitTestCase {
 
         // Try again, without changes; it should still fail.
         try {
-            Mockito.when(mockJsGroup.isStale()).thenReturn(false);
+            when(mockJsGroup.isStale()).thenReturn(false);
             impl.regenerateAuraJS();
             fail("Second compilation failure should have been caught!");
         } catch (AuraRuntimeException e2) {
@@ -126,9 +134,75 @@ public class ConfigAdapterImplTest extends UnitTestCase {
         // jsGroup.regenerate() can't work, even though the mock
         // jsGroup.regenerate() will..
         if (!AuraImplFiles.AuraResourceJavascriptDirectory.asFile().exists()) {
-            Mockito.reset(mockJsGroup);
-            Mockito.when(mockJsGroup.isStale()).thenReturn(true);
+            reset(mockJsGroup);
+            when(mockJsGroup.isStale()).thenReturn(true);
             impl.regenerateAuraJS();
         }
+    }
+
+    /**
+     * getAuraFrameworkNonce() is called a lot. This tests ensures that we aren't computing the final hash between js
+     * and resources {@link ConfigAdapterImpl#makeHash(String, String)} unless there are changes.
+     * 
+     * Also testing the hash results are consistent
+     */
+    public void testFrameworkUid() throws Exception {
+
+        final AuraJavascriptGroup jsGroup = mock(AuraJavascriptGroup.class);
+        Hash jsHash = mock(Hash.class);
+        when(jsGroup.isStale()).thenReturn(false);
+        when(jsGroup.getGroupHash()).thenReturn(jsHash);
+
+        final AuraResourcesHashingGroup resourcesGroup = mock(AuraResourcesHashingGroup.class);
+        Hash resourcesHash = mock(Hash.class);
+        when(resourcesGroup.isStale()).thenReturn(false);
+        when(resourcesGroup.getGroupHash()).thenReturn(resourcesHash);
+
+        ConfigAdapterImpl configAdapter = new ConfigAdapterImpl() {
+            @Override
+            protected AuraJavascriptGroup newAuraJavascriptGroup() throws IOException {
+                return jsGroup;
+            }
+
+            @Override
+            protected FileGroup newAuraResourcesHashingGroup() throws IOException {
+                return resourcesGroup;
+            }
+        };
+
+        ConfigAdapterImpl spy = Mockito.spy(configAdapter);
+
+        when(jsHash.toString()).thenReturn("jsGroup");
+        when(resourcesHash.toString()).thenReturn("resourcesGroup");
+
+        String uid = spy.getAuraFrameworkNonce();
+        verify(spy, Mockito.times(1)).makeHash(anyString(), anyString());
+        assertEquals("Framework uid is not correct", "9YifBh-oLwXkDGW3d3qyDQ", uid);
+
+        reset(spy);
+        uid = spy.getAuraFrameworkNonce();
+        // test that makeHash is not called because jsHash and resourcesHash has not changed
+        verify(spy, Mockito.never()).makeHash(anyString(), anyString());
+        assertEquals("Framework uid is not correct", "9YifBh-oLwXkDGW3d3qyDQ", uid);
+
+        // change js hash, verify changes framework nonce
+        when(jsHash.toString()).thenReturn("MocKitYMuCK");
+        reset(spy);
+        uid = spy.getAuraFrameworkNonce();
+        verify(spy, Mockito.times(1)).makeHash(anyString(), anyString());
+        assertEquals("Framework uid is not correct", "ltz-V8xGPGhXbOiTtfSApQ", uid);
+
+        // change resource hash, verify changes framework nonce
+        when(resourcesHash.toString()).thenReturn("MuCkiTyMocK");
+        reset(spy);
+        uid = spy.getAuraFrameworkNonce();
+        verify(spy, Mockito.times(1)).makeHash(anyString(), anyString());
+        assertEquals("Framework uid is not correct", uid, "BJTaoiCDxoAF4Wbh0iC9lA");
+
+        reset(spy);
+        uid = spy.getAuraFrameworkNonce();
+        // test that makeHash is not called because jsHash and resourcesHash has not changed
+        verify(spy, Mockito.never()).makeHash(anyString(), anyString());
+        assertEquals("Framework uid is not correct", uid, "BJTaoiCDxoAF4Wbh0iC9lA");
     }
 }

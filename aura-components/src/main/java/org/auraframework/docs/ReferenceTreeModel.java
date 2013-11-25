@@ -34,13 +34,19 @@ import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Model;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 @Model
 public class ReferenceTreeModel {
-
+	/*
+     * Map indicates whether a particular namespace should be displayed on the auraDocs.
+     */
+	final static Set<String> IGNORED_NAMESPACES = ImmutableSet.of("auradocs");
+   
     private static final List<TreeNode> tree = initTree();
+    
     private static QuickFixException initException = null;
 
     public ReferenceTreeModel() throws QuickFixException {
@@ -85,25 +91,28 @@ public class ReferenceTreeModel {
         Set<DefDescriptor<E>> descriptors = definitionService.find(matcher);
         for (DefDescriptor<E> desc : descriptors) {
             String namespace = desc.getNamespace();
-            TreeNode namespaceTreeNode = namespaceTreeNodes.get(desc.getNamespace());
-            if (namespaceTreeNode == null) {
-                namespaceTreeNode = new TreeNode(null, namespace);
-                namespaceTreeNodes.put(namespace, namespaceTreeNode);
-                ret.add(namespaceTreeNode);
+            //W-1715615: ignore auradocs namespace and all namespaces ending with Test
+            if(!IGNORED_NAMESPACES.contains(namespace) && !namespace.toLowerCase().endsWith("test")){
+            	TreeNode namespaceTreeNode = namespaceTreeNodes.get(desc.getNamespace());
+                if (namespaceTreeNode == null) {
+                    namespaceTreeNode = new TreeNode(null, namespace);
+                    namespaceTreeNodes.put(namespace, namespaceTreeNode);
+                    ret.add(namespaceTreeNode);
+                }
+
+                String href = String.format("#reference?descriptor=%s%s%s", namespace, sep, desc.getName());
+
+                href += "&defType=" + desc.getDefType().name().toLowerCase();
+
+                // Preload the def
+                try {
+                    desc.getDef();
+                } catch (Exception e) {
+                    // ignore problems, we were only trying to preload
+                }
+
+                namespaceTreeNode.addChild(new TreeNode(href, desc.getName()));
             }
-
-            String href = String.format("#reference?descriptor=%s%s%s", namespace, sep, desc.getName());
-
-            href += "&defType=" + desc.getDefType().name().toLowerCase();
-
-            // Preload the def
-            try {
-                desc.getDef();
-            } catch (Exception e) {
-                // ignore problems, we were only trying to preload
-            }
-
-            namespaceTreeNode.addChild(new TreeNode(href, desc.getName()));
         }
         Collections.sort(ret);
         return ret;

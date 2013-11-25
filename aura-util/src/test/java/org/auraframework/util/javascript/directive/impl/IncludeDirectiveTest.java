@@ -126,7 +126,8 @@ public class IncludeDirectiveTest extends UnitTestCase {
             dp.parseFile();
             fail("Should have failed processing a non-existing file");
         } catch (IOException expected) {
-            assertTrue(expected.getMessage().contains("File did not exist or was not a .js file: "));
+            assertTrue("Add File function failed because of an unexpected error message",
+                expected.getMessage().startsWith("File did not exist or was not a valid, acceptable file"));
         }
 
     }

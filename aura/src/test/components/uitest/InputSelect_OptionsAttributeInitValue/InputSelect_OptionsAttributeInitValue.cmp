@@ -1,0 +1,86 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component model='java://org.auraframework.impl.java.model.TestJavaModel'>
+    <aura:attribute name="whichToRender" type="String" default="VUWND"/>
+    <!--
+        Checking for case when no default value is given in inputSelect, 
+        and not inputSelectOption is chosen result should Tiger is default
+        element chosen
+     -->
+    <aura:if isTrue="{!v.whichToRender == 'VUWND'}">
+        <ui:inputSelect aura:id="Value_Undef_With_No_Default" options="{!m.noOptionsSel}" />
+    </aura:if>
+     <!--
+        Checking for case when no default value is given in inputSelect, 
+        and inputSelectOption is set to true for Lion. Lion should be chosen
+     -->
+      <aura:if isTrue="{!v.whichToRender == 'VDSE'}">
+        <ui:inputSelect aura:id="Value_Def_Selection_Exists" value="Bear" options="{!m.noOptionsSel}" />
+    </aura:if>
+     <!--
+        Checking for case when default for input select is Bear, result 
+        should be bear is the initial item shown
+     -->
+    <aura:if isTrue="{!v.whichToRender == 'VUWD'}">
+        <ui:inputSelect aura:id="Value_Undef_With_Default" options="{!m.secondOptionSel}" />
+    </aura:if>
+    <!--
+        Checking for case when default for input select is Moose, result 
+        should be Moose but it doesn't exist as an option so default goes 
+        to the first element
+     -->
+    <aura:if isTrue="{!v.whichToRender == 'VDSDNE'}">
+        <ui:inputSelect aura:id="Value_Def_Selection_DNE" value="Moose" options="{!m.noOptionsSel}"/>
+    </aura:if>
+    <!--
+        Checking for case when default for input select is null, and there are no inputSelectOptions
+        result should be that nothing is selected
+     -->
+    <aura:if isTrue="{!v.whichToRender == 'VNNO'}">
+        <ui:inputSelect aura:id="Value_Null_No_Options" value="" />
+    </aura:if>
+    <!--
+        Checking for case when default for input select is Null, result 
+        should be the first element is selected
+     -->
+    <aura:if isTrue="{!v.whichToRender == 'VNWNNO'}">
+        <ui:inputSelect aura:id="Value_Null_With_No_Null_Option" value="" options="{!m.noOptionsSel}" />
+    </aura:if>
+    <!--
+        Checking for case when default for input select is Null, result 
+        should be the first element is selected, where first elements text is null
+     -->
+    <aura:if isTrue="{!v.whichToRender == 'VNWNO'}">
+        <ui:inputSelect aura:id="Value_Null_With_Null_Option" value="" options="{!m.noOptionsSelWithNone}" />
+    </aura:if>
+       <!--
+        Checking for case when default for input select is Null, and an inputSelectOption
+        is selected, result should be the first element is selected
+     -->
+    <aura:if isTrue="{!v.whichToRender == 'VNWDANO'}">
+        <ui:inputSelect aura:id="Value_Null_With_Default_And_Null_Option" value="" options="{!m.thirdOptionSelWithNone}"/>
+    </aura:if>
+     <!--
+        Checking for case when default for input select is Null, and an inputSelectOption
+        is selected, result should be the first element is selected
+     -->
+    <aura:if isTrue="{!v.whichToRender == 'VNWDANNO'}">
+        <ui:inputSelect aura:id="Value_Null_With_Default_And_No_Null_Option" value="" options="{!m.thirdOptionSel}" />
+    </aura:if>
+    
+</aura:component>

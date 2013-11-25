@@ -41,12 +41,20 @@ SizeEstimator.prototype.estimateSize = function(value) {
         bytes = this.sizeOfString(value);
     } else if ($A.util.isNumber(value)) {
         bytes = this.NUMBER_SIZE;
-    } else if ($A.util.isArray(value) || $A.util.isObject(value)) {
-        // recursive case
-        for (var i in value) {
-            bytes += this.sizeOfString(i);
+    } else if ($A.util.isArray(value)) {
+        for (var i = 0; i < value.length; i++) {
+            bytes += this.NUMBER_SIZE; //the index
             bytes += 8; // an assumed existence overhead
             bytes += this.estimateSize(value[i]);
+        }
+    } else if ($A.util.isObject(value)) {
+        // recursive case
+        for (var j in value) {
+            if (value.hasOwnProperty(j)) {
+                bytes += this.sizeOfString(j);
+                bytes += 8; // an assumed existence overhead
+                bytes += this.estimateSize(value[j]);
+            }
         }
     }
 

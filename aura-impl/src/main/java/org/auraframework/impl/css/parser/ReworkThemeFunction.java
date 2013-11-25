@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.auraframework.components.aura.ThemedDeclarationRenderer;
-import org.auraframework.css.parser.ThemeValueProvider;
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.StyleDef;
 import org.auraframework.impl.root.component.ComponentDefRefImpl;
@@ -38,17 +37,6 @@ import com.phloc.css.writer.CSSWriterSettings;
 /**
  * Reworks the custom theme function, <code>theme(...)</code> or <code>t(...)</code>, to an aura:themedDeclaration
  * component.
- * 
- * <p>
- * The theme function takes one and only one argument. In most cases the theme function takes a fully qualified
- * reference to a theme variable, for example, <code>margin: theme('myNamespace.myTheme.margin')</code>. You can also
- * use aliases, for example, <code>margin: theme('myAlias.margin')</code>. See {@link ThemeValueProvider} for more about
- * aliases.
- * 
- * <p>
- * The argument to the theme function can also be an expression. For example, you can reference multiple values like
- * <code>margin: theme("myAlias.marginTopBottom + ' ' +  myAlias.marginLeftRight")</code>. You can add literal text
- * using this method too, e.g., <code>margin: theme("'0 ' + myAlias.marginLeftRight")</code>
  * 
  * @see ThemedDeclarationRenderer
  */

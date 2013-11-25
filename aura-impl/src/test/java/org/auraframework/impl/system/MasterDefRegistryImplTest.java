@@ -35,9 +35,12 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
+
+import org.auraframework.def.HelperDef;
 import org.auraframework.def.LayoutsDef;
 import org.auraframework.def.NamespaceDef;
 import org.auraframework.def.RendererDef;
+import org.auraframework.def.StyleDef;
 import org.auraframework.impl.AuraImpl;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.parser.handler.XMLHandler.InvalidSystemAttributeException;
@@ -49,8 +52,10 @@ import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.DefRegistry;
+import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.system.Source;
 import org.auraframework.system.SourceListener;
+import org.auraframework.test.AuraTestingUtil;
 import org.auraframework.test.annotation.ThreadHostileTest;
 import org.auraframework.test.annotation.UnAdaptableTest;
 import org.auraframework.test.util.AuraPrivateAccessor;
@@ -194,6 +199,108 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
                 masterDefReg.find(new DescriptorFilter(String.format("markup://%s:*notherecaptain", namespace))).size());
     }
 
+    private static class AddableDef<T extends Definition> {
+        private Class<T> defClass;
+        private String format;
+        private String content;
+
+        public AddableDef(Class<T> defClass, String format, String content) {
+            this.defClass = defClass;
+            this.format = format;
+            this.content = content;
+        }
+
+        public Class<T> getDefClass() { return this.defClass; }
+        public String getFQN(String namespace, String name) {
+            return String.format(this.format, namespace, name);
+        }
+        public String getContent() { return content; }
+    }
+
+    private static AddableDef<?> addable [] = new AddableDef [] {
+        // Ignoring top level bundle defs.
+        // APPLICATION(ApplicationDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
+        // COMPONENT(ComponentDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
+        // EVENT(EventDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
+        // INTERFACE(InterfaceDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
+        // LAYOUTS(LayoutsDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
+        // NAMESPACE(NamespaceDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ""),
+        new AddableDef<ControllerDef>(ControllerDef.class, "js://%s.%s",
+                "({method: function(cmp) {}})"),
+        new AddableDef<HelperDef>(HelperDef.class, "js://%s.%s",
+                "({method: function(cmp) {}})"),
+        //new AddableDef<ProviderDef>(ProviderDef.class, "js://%s.%s",
+        //        "({provide: function(cmp) {}})"),
+        new AddableDef<RendererDef>(RendererDef.class, "js://%s.%s",
+                "({render: function(cmp) {}})"),
+        new AddableDef<StyleDef>(StyleDef.class, "css://%s.%s",
+                ".THIS {display:block;}"),
+        // Ignoring TESTSUITE(TestSuiteDef.class, Format.JS, DefDescriptor.JAVASCRIPT_PREFIX, "."),
+        // Ignoring THEME(ThemeDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":");
+    };
+
+    private MasterDefRegistry resetDefRegistry() {
+        ContextService contextService = Aura.getContextService();
+        if (contextService.isEstablished()) {
+            contextService.endContext();
+        }
+        contextService.startContext(Mode.UTEST, Format.JSON, Access.AUTHENTICATED);
+        return contextService.getCurrentContext().getDefRegistry();
+    }
+
+    private <T extends Definition> void checkAddRemove(DefDescriptor<?> tld, String suid,
+            AddableDef<T> toAdd) throws QuickFixException {
+        DefDescriptor<T> dd;
+        String uid, ouid;
+        Set<DefDescriptor<?>> deps;
+        AuraTestingUtil util = getAuraTestingUtil();
+        MasterDefRegistry mdr;
+
+        dd = DefDescriptorImpl.getInstance(toAdd.getFQN(tld.getNamespace(), tld.getName()),
+                toAdd.getDefClass());
+        util.addSourceAutoCleanup(dd, toAdd.getContent());
+        mdr = resetDefRegistry();
+        uid = mdr.getUid(null, tld);
+        assertFalse("UID should change on add for "+dd.getDefType()+"@"+dd, suid.equals(uid));
+        deps = mdr.getDependencies(uid);
+        assertTrue("dependencies should contain the newly created "+dd.getDefType()+"@"+dd,
+                deps.contains(dd));
+        ouid = uid;
+        util.removeSource(dd);
+        mdr = resetDefRegistry();
+        uid = mdr.getUid(null, tld);
+        assertNotSame("UID should change on removal for "+dd.getDefType()+"@"+dd, ouid, uid);
+        deps = mdr.getDependencies(uid);
+        assertFalse("dependencies should not contain the deleted "+dd, deps.contains(dd));
+    }
+
+    private <T extends Definition> void checkOneTLD(String fqn, Class<T> clazz, String content)
+            throws QuickFixException {
+        AuraTestingUtil util = getAuraTestingUtil();
+        String uid;
+
+        DefDescriptor<T> tld = DefDescriptorImpl.getInstance(fqn, clazz);
+        util.addSourceAutoCleanup(tld, content);
+        MasterDefRegistry mdr = resetDefRegistry();
+        // prime the cache.
+        uid = mdr.getUid(null, tld);
+        assertNotNull(tld+" did not give us a UID", uid);
+        for (AddableDef<?> adding : addable) {
+            checkAddRemove(tld, uid, adding);
+        }
+        util.removeSource(tld);
+    }
+
+    public void testComponentChChChChanges() throws Exception {
+        checkOneTLD("markup://chchch:changes"+getAuraTestingUtil().getNonce(),
+                ComponentDef.class, "<aura:component></aura:component>");
+    }
+
+    public void testApplicationChChChChanges() throws Exception {
+        checkOneTLD("markup://chchch:changes"+getAuraTestingUtil().getNonce(),
+                ApplicationDef.class, "<aura:application></aura:application>");
+    }
+
     public void testStringCache() throws Exception {
         String namespace = "testStringCache" + getAuraTestingUtil().getNonce();
         DefDescriptor<ApplicationDef> houseboat = addSourceAutoCleanup(ApplicationDef.class,
@@ -263,7 +370,6 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         DefDescriptor<ApplicationDef> desc = Aura.getDefinitionService()
                 .getDefDescriptor(cmpName, ApplicationDef.class);
         MasterDefRegistryImpl masterDefReg = getDefRegistry(false);
-        Aura.getContextService().getCurrentContext().clearPreloads();
         String uid = masterDefReg.getUid(null, desc);
         assertNotNull("Could not retrieve UID for component " + cmpName, uid);
         Set<DefDescriptor<?>> dependencies = masterDefReg.getDependencies(uid);

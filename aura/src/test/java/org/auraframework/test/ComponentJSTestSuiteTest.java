@@ -148,7 +148,8 @@ public class ComponentJSTestSuiteTest extends TestSuite {
             if (defType == DefType.APPLICATION) {
                 ext = ".app";
             }
-            return String.format("/%s/%s%s?aura.mode=%s", descriptor.getNamespace(), descriptor.getName(), ext, mode);
+            return String.format("/%s/%s%s?aura.mode=%s&aura.testReset=true", descriptor.getNamespace(),
+                    descriptor.getName(), ext, mode);
         }
 
         /**

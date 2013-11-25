@@ -79,11 +79,6 @@
     	z-index: 500;
     }
 } 
-@else {
-  	.THIS .stackOrder {
-    	z-index: 600;
-    }
-}
 
 .THIS .displayStyle {
 	display: inline

@@ -28,8 +28,6 @@ import org.auraframework.Aura;
 import org.auraframework.service.LocalizationService;
 import org.auraframework.service.testdata.LocalizationServiceTestData;
 import org.auraframework.test.AuraTestCase;
-import org.auraframework.test.UnitTestCase;
-import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.number.AuraNumberFormat;
 
 import com.ibm.icu.text.NumberFormat;

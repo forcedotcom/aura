@@ -32,6 +32,9 @@
 		$A.test.assertTrue(uid.length > 0, "expected non-empty string for uid for " + fullDescriptor);
 	},
 
+        /**
+         * Get Application works because only component has been loaded.
+         */
 	testLoadedGetApplication : {
 		testLabels : [ "auraSanity" ],
 		test : [ function(c) {
@@ -42,17 +45,20 @@
 		} ]
 	},
 
+        /**
+         * GetComponent (component) will not appear in loaded.
+         */
 	testLoadedGetComponent : {
 		testLabels : [ "auraSanity" ],
 		test : [ function(c) {
 			this.assertNoUid("COMPONENT@markup://aura:component");
 			this.doGet(true, "aura:component");
 		}, function(c) {
-			this.assertUid("COMPONENT@markup://aura:component");
+			this.assertNoUid("COMPONENT@markup://aura:component");
 		} ]
 	},
 
-	_testLoadedGetComponentWithDependencies : {
+	testLoadedGetComponentWithDependencies : {
 		testLabels : [ "auraSanity" ],
 		test : [ function(c) {
 			this.assertNoUid("COMPONENT@markup://auratest:text");
@@ -60,7 +66,11 @@
 			this.doGet(true, "auratest:text");
 		}, function(c) {
 			this.assertUid("COMPONENT@markup://auratest:text");
-			this.assertUid("COMPONENT@markup://aura:text");
+			this.assertNoUid("COMPONENT@markup://aura:text");
+			this.doGet(true, "aura:text");
+		}, function(c) {
+			this.assertUid("COMPONENT@markup://auratest:text");
+			this.assertNoUid("COMPONENT@markup://aura:text");
 		} ]
 	}
 })

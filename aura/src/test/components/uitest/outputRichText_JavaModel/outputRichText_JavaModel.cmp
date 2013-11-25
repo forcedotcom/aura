@@ -1,0 +1,30 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component model='java://org.auraframework.impl.java.model.TestJavaModel'>
+    <ui:outputRichText value='{!m.stringNull}' aura:id='myComp1'/> <br/>    
+    <ui:outputRichText value='{!m.stringEmpty}' aura:id='myComp2'/> <br/>    
+    <ui:outputRichText value='{!m.text}' aura:id='myComp3'/> <br/>    
+    <ui:outputRichText value='{!m.textWithScriptTag}' aura:id='myComp4'/> <br/>
+    <ui:outputRichText value='{!m.textWithStyleTag}' aura:id='myComp5'/> <br/>
+    <ui:outputRichText value='{!m.textWithBlacklistedTags}' aura:id='myComp6'/> <br/>	
+    <ui:outputRichText value='{!m.textWithBlacklistedNestedTags}' aura:id='myComp7'/> <br/>	    
+    <ui:outputRichText value='{!m.textWithWhitelistedChildrenTags}' aura:id='myComp8'/> <br/>
+    <ui:outputRichText value='{!m.textWithBlacklistedChildrenTags}' aura:id='myComp9'/> <br/>  
+  	<ui:outputRichText value='{!m.textWithEvent}' aura:id='myComp10'/>
+  	<ui:outputRichText value='{!m.textWithMultipleEvents}' aura:id='myComp11'/>  	
+</aura:component>

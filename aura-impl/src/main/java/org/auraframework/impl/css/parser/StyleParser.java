@@ -22,6 +22,8 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.StyleDef;
+import org.auraframework.impl.css.parser.omakase.CssParserOmakase;
+import org.auraframework.impl.css.parser.omakase.CssParserOmakase.ParserResult;
 import org.auraframework.impl.css.style.StyleDefImpl;
 import org.auraframework.system.Client;
 import org.auraframework.system.Parser;
@@ -36,10 +38,11 @@ import com.google.common.collect.ImmutableSet;
  */
 public class StyleParser implements Parser {
 
-    private static StyleParser instance = new StyleParser(true);
-    private static StyleParser nonValidatingInstance = new StyleParser(false);
+    private static final StyleParser instance = new StyleParser(true);
+    private static final StyleParser nonValidatingInstance = new StyleParser(false);
 
-    public static Set<String> allowedConditions;
+    public static final Set<String> allowedConditions;
+    private final boolean doValidation;
 
     // build list of conditional permutations and allowed conditionals
     static {
@@ -58,18 +61,12 @@ public class StyleParser implements Parser {
         return nonValidatingInstance;
     }
 
-    private final boolean doValidation;
-
     protected StyleParser(boolean doValidation) {
         this.doValidation = doValidation;
     }
 
     public boolean shouldValidate(String name) {
-        if (name.toLowerCase().endsWith("template")) {
-            return false;
-        }
-        return doValidation;
-
+        return name.toLowerCase().endsWith("template") ? false : doValidation;
     }
 
     @SuppressWarnings("unchecked")
@@ -85,12 +82,26 @@ public class StyleParser implements Parser {
             builder.setClassName(className);
             builder.setOwnHash(source.getHash());
 
-            CSSParser parser = new CSSParser(descriptor.getNamespace(), descriptor.getName(),
-                    shouldValidate(descriptor.getName()), className, source.getContents(), allowedConditions,
-                    source.getSystemId());
+            if (ParserStrategy.omakase()) {
+                ParserResult result = CssParserOmakase.preprocess()
+                        .source(source.getContents())
+                        .namespace(descriptor.getNamespace())
+                        .resourceName(source.getSystemId())
+                        .componentClass(className, shouldValidate(descriptor.getName()))
+                        .allowedConditions(allowedConditions)
+                        .themes()
+                        .parse();
 
-            builder.setComponents(parser.parse());
-            builder.setThemeReferences(parser.getThemeReferences());
+                builder.setContent(result.content());
+                builder.setThemeReferences(result.themeExpressions());
+            } else {
+                CSSParserPhloc parser = new CSSParserPhloc(descriptor.getNamespace(), descriptor.getName(),
+                        shouldValidate(descriptor.getName()), className, source.getContents(), allowedConditions,
+                        source.getSystemId());
+
+                builder.setComponents(parser.parse());
+                builder.setThemeReferences(parser.getThemeReferences());
+            }
 
             return (D) builder.build();
         }

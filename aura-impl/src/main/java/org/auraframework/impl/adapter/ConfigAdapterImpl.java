@@ -15,26 +15,42 @@
  */
 package org.auraframework.impl.adapter;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Properties;
+import java.util.Set;
+import java.util.TimeZone;
 
 import org.apache.log4j.Logger;
 import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.impl.javascript.AuraJavascriptGroup;
-import org.auraframework.impl.javascript.AuraJavascriptResourceGroup;
+import org.auraframework.impl.source.AuraResourcesHashingGroup;
 import org.auraframework.impl.util.AuraImplFiles;
 import org.auraframework.impl.util.BrowserInfo;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.AuraError;
 import org.auraframework.throwable.AuraRuntimeException;
-import org.auraframework.util.*;
+import org.auraframework.util.AuraLocale;
+import org.auraframework.util.AuraTextUtil;
+import org.auraframework.util.IOUtil;
 import org.auraframework.util.javascript.JavascriptGroup;
+import org.auraframework.util.resource.CompiledGroup;
+import org.auraframework.util.resource.FileGroup;
 import org.auraframework.util.resource.ResourceLoader;
+import org.auraframework.util.text.Hash;
 
 import com.google.common.collect.Lists;
 
@@ -47,6 +63,10 @@ public class ConfigAdapterImpl implements ConfigAdapter {
 
     protected final Set<Mode> allModes = EnumSet.allOf(Mode.class);
     private final JavascriptGroup jsGroup;
+    private final FileGroup resourcesGroup;
+    private String jsUid = "";
+    private String resourcesUid = "";
+    private String fwUid = "";
     private final ResourceLoader resourceLoader;
     private final Long buildTimestamp;
     private String auraVersionString;
@@ -70,6 +90,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
             throw new AuraRuntimeException(e);
         }
 
+        // Framework JS
         JavascriptGroup tempGroup = null;
         try {
             tempGroup = newAuraJavascriptGroup();
@@ -85,9 +106,21 @@ public class ConfigAdapterImpl implements ConfigAdapter {
              * do want a hash. Question: hypothetically, could we have a hybrid with a subset of files as files, and the
              * rest in jars? This wouldn't be accounted for here.
              */
-            tempGroup = new AuraJavascriptResourceGroup();
+            tempGroup = new CompiledGroup(AuraJavascriptGroup.GROUP_NAME, AuraJavascriptGroup.FILE_NAME);
         }
         jsGroup = tempGroup;
+
+        // Aura Resources
+        FileGroup tempResourcesGroup;
+        try {
+            tempResourcesGroup = newAuraResourcesHashingGroup();
+            tempResourcesGroup.getGroupHash();
+        } catch (IOException e) {
+            tempResourcesGroup = new CompiledGroup(AuraResourcesHashingGroup.GROUP_NAME,
+                    AuraResourcesHashingGroup.FILE_NAME);
+        }
+        resourcesGroup = tempResourcesGroup;
+
         Properties props = (jsGroup == null) ? loadProperties() : null;
         if (props == null) {
             // If we don't get the framework version from properties, the default is a development build:
@@ -108,6 +141,10 @@ public class ConfigAdapterImpl implements ConfigAdapter {
         validateCss = AuraTextUtil.isNullEmptyOrWhitespace(validateCssString)
                 || Boolean.parseBoolean(validateCssString.trim());
 
+    }
+
+    protected FileGroup newAuraResourcesHashingGroup() throws IOException {
+        return new AuraResourcesHashingGroup();
     }
 
     @Override
@@ -179,7 +216,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     public String getMomentJSURL() {
     	String nonce = Aura.getContextService().getCurrentContext().getFrameworkUID();
         String contextPath = Aura.getContextService().getCurrentContext().getContextPath();
-        return String.format("%s/auraFW/resources/%s/moment/moment.js?aura.fwuid=%s", contextPath, nonce, nonce);
+        return String.format("%s/auraFW/resources/%s/moment/moment.js", contextPath, nonce);
     }
     
     @Override
@@ -191,11 +228,19 @@ public class ConfigAdapterImpl implements ConfigAdapter {
         List<String> urls = Lists.newLinkedList();
     	String nonce = Aura.getContextService().getCurrentContext().getFrameworkUID();
         if (!"GMT".equals(locale)) {
-            urls.add(String.format("%s/auraFW/resources/%s/walltime-js/olson/walltime-data_%s.js?aura.fwuid=%s", contextPath, nonce, locale, nonce));
+            urls.add(String.format("%s/auraFW/resources/%s/walltime-js/olson/walltime-data_%s.js", contextPath,
+                    nonce, locale));
         }
 
-        urls.add(String.format("%s/auraFW/resources/%s/walltime-js/walltime.js?aura.fwuid=%s", contextPath, nonce, nonce));
+        urls.add(String.format("%s/auraFW/resources/%s/walltime-js/walltime.js", contextPath, nonce));
         return urls;
+    }
+    
+    @Override
+    public String getCKEditorURL() {
+    	String nonce = Aura.getContextService().getCurrentContext().getFrameworkUID();
+        String contextPath = Aura.getContextService().getCurrentContext().getContextPath();        
+        return String.format("%s/auraFW/resources/%s/ckeditor-3.6.6/ckeditor.js", contextPath, nonce);
     }
 
     @Override
@@ -207,7 +252,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
         if (b.isIE7() || b.isIE8()) {
             String nonce = context.getFrameworkUID();
             String contextPath = context.getContextPath();
-            ret = String.format("%s/auraFW/resources/%s/html5shiv/html5shiv.js?aura.fwuid=%s", contextPath, nonce, nonce);
+            ret = String.format("%s/auraFW/resources/%s/html5shiv/html5shiv.js", contextPath, nonce);
         }
 
         return ret;
@@ -218,7 +263,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
         String contextPath = Aura.getContextService().getCurrentContext().getContextPath();
         String suffix = Aura.getContextService().getCurrentContext().getMode().getJavascriptMode().getSuffix();
     	String nonce = Aura.getContextService().getCurrentContext().getFrameworkUID();
-        return String.format("%s/auraFW/javascript/%s/aura_%s.js?aura.fwuid=%s", contextPath, nonce, suffix, nonce);
+        return String.format("%s/auraFW/javascript/%s/aura_%s.js", contextPath, nonce, suffix);
     }
 
     @Override
@@ -347,9 +392,37 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     public final String getAuraFrameworkNonce() {
         regenerateAuraJS();
         try {
-            return jsGroup.getGroupHash().toString();
+            // framework nonce now consists of Aura JS and resources files (CSS and JS)
+            String jsHash = jsGroup.getGroupHash().toString();
+            String resourcesHash = getAuraResourcesNonce();
+
+            // don't want to makeHash every time so store results and return appropriately
+            if (!jsHash.equals(this.jsUid) || !resourcesHash.equals(this.resourcesUid)) {
+                this.jsUid = jsHash;
+                this.resourcesUid = resourcesHash;
+                this.fwUid = makeHash(this.jsUid, this.resourcesUid);
+            }
+
+            return this.fwUid;
+
         } catch (IOException e) {
             throw new AuraRuntimeException("Can't read framework files", e);
+        }
+    }
+
+    protected String makeHash(String one, String two) throws IOException {
+        StringReader reader = new StringReader(one + two);
+        return new Hash(reader).toString();
+    }
+
+    private String getAuraResourcesNonce() {
+        try {
+            if (!isProduction() && resourcesGroup != null && resourcesGroup.isStale()) {
+                resourcesGroup.reset();
+            }
+            return resourcesGroup.getGroupHash().toString();
+        } catch (IOException e) {
+            throw new AuraRuntimeException("Can't read Aura resources files", e);
         }
     }
 }

@@ -21,8 +21,8 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
-import org.auraframework.throwable.quickfix.StyleParserException;
 import org.auraframework.throwable.quickfix.ThemeValueNotFoundException;
 
 /**
@@ -89,27 +89,12 @@ public class ThemeResolutionTest extends AuraImplTestCase {
         }
     }
 
-    /** errors with mixing of raw text with theme function */
-    public void testMixingRawTextWithThemeFunction() throws Exception {
-        try {
-            get("themeTest.invalidMixing").getDef().getCode();
-            fail("expected to get exception");
-        } catch (StyleParserException e) {
-            assertTrue(e.getMessage().contains("Cannot mix"));
-        }
-    }
-
     /** application-level theme overrides work as expected */
     public void testThemeOverrides() throws Exception {
         String appLoc = "themeTest:overrideApp";
         DefDescriptor<ApplicationDef> app = DefDescriptorImpl.getInstance(appLoc, ApplicationDef.class);
         Aura.getContextService().getCurrentContext().setApplicationDescriptor(app);
         gold(get("themeTest.overrideApp"));
-    }
-
-    /** aliases work as expected */
-    public void testAliases() throws Exception {
-        gold(get("themeTest.componentWithAliases"));
     }
 
     /** if the variable value is an empty string then the declaration should be removed */
@@ -120,6 +105,31 @@ public class ThemeResolutionTest extends AuraImplTestCase {
     /** test expressions */
     public void testExpression() throws Exception {
         gold(get("themeTest.withExpression"));
+    }
+
+    /** theme in media query */
+    public void testThemeInMediaQuery() throws Exception {
+        gold(get("themeTest.withMediaQuery"));
+    }
+
+    /** theme in media query has error */
+    public void testThemeInMediaQueryHasError() throws Exception {
+        try {
+            get("themeTest.withBadMediaQuery").getDef().getCode();
+            fail("expected to get exception");
+        } catch (AuraRuntimeException e) {
+            assertTrue(e.getMessage().contains("Expected to find"));
+        }
+    }
+
+    /** theme in media query evaluates to empty */
+    public void testThemeInMediaQueryEvalsToEmpty() throws Exception {
+        try {
+            get("themeTest.withEmptyMediaQuery").getDef().getCode();
+            fail("expected to get exception");
+        } catch (AuraRuntimeException e) {
+            assertTrue(e.getMessage().contains("must not evaluate to an empty string"));
+        }
     }
 
     private DefDescriptor<StyleDef> get(String locator) {

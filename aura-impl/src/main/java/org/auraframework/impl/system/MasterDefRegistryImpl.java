@@ -16,13 +16,7 @@
 package org.auraframework.impl.system;
 
 import java.lang.ref.WeakReference;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedSet;
+import java.util.*;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
@@ -30,22 +24,12 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.log4j.Logger;
 import org.auraframework.Aura;
-import org.auraframework.def.ApplicationDef;
-import org.auraframework.def.BaseComponentDef;
-import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.*;
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.def.Definition;
-import org.auraframework.def.DescriptorFilter;
-import org.auraframework.def.SecurityProviderDef;
-import org.auraframework.impl.root.DependencyDefImpl;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.service.LoggingService;
-import org.auraframework.system.AuraContext;
+import org.auraframework.system.*;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.system.DefRegistry;
-import org.auraframework.system.Location;
-import org.auraframework.system.MasterDefRegistry;
-import org.auraframework.system.Source;
-import org.auraframework.system.SourceListener;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
@@ -53,13 +37,8 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.text.Hash;
 
 import com.google.common.base.Optional;
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheStats;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import com.google.common.cache.*;
+import com.google.common.collect.*;
 
 /**
  * Overall Master definition registry implementation, there be dragons here.
@@ -84,7 +63,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     private final static int DEFINITION_CACHE_SIZE = 4096;
     private final static int DEPENDENCY_CACHE_SIZE = 100;
     private final static int STRING_CACHE_SIZE = 100;
-    private static final Logger logger = Logger.getLogger("MasterDefRegistryImpl");
+    private static final Logger logger = Logger.getLogger(MasterDefRegistryImpl.class);
 
     /**
      * A dependency entry for a uid+descriptor.
@@ -365,7 +344,6 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         public final LoggingService loggingService = Aura.getLoggingService();
         public final Map<DefDescriptor<? extends Definition>, CompilingDef<?>> compiled = Maps.newHashMap();
         public final Map<DefDescriptor<? extends Definition>, Definition> dependencies;
-        public boolean addedPreloads = false;
 
         // public final Map<DefDescriptor<? extends Definition>, Definition>
         // dependencies = Maps.newHashMap();
@@ -522,22 +500,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             //
             Set<DefDescriptor<?>> newDeps = Sets.newHashSet();
             cd.def.appendDependencies(newDeps);
-            //
-            // FIXME: this code will go away with preloads.
-            // This pulls in the context preloads. not pretty, but it works.
-            //
-            if (!cc.addedPreloads && cd.descriptor.getDefType().equals(DefType.APPLICATION)) {
-                cc.addedPreloads = true;
-                Set<String> preloads = cc.context.getPreloads();
-                for (String preload : preloads) {
-                    if (!preload.contains("_")) {
-                        DependencyDefImpl.Builder ddb = new DependencyDefImpl.Builder();
-                        ddb.setResource(preload);
-                        ddb.setType("APPLICATION,COMPONENT,STYLE,EVENT");
-                        ddb.build().appendDependencies(newDeps);
-                    }
-                }
-            }
+
             for (DefDescriptor<?> dep : newDeps) {
                 if (!defs.containsKey(dep)) {
                     CompilingDef<?> depcd = cc.getCompiling(dep);
@@ -697,10 +660,9 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                 return null;
             }
             for (Definition t : dds.values()) {
-                if (t.getLocation() != null && t.getLocation().getLastModified() > lmt) {
-                    lmt = t.getLocation().getLastModified();
-                }
+                lmt = updateLastMod(lmt, t);
             }
+            lmt = updateLastMod(lmt, def);
             StringBuilder sb = new StringBuilder(dds.size() * 20);
 
             //
@@ -747,6 +709,13 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         } finally {
             compilingDescriptor = lastCompiling;
         }
+    }
+
+    private long updateLastMod(long lastModTime, Definition def) {
+        if (def.getLocation() != null && def.getLocation().getLastModified() > lastModTime) {
+            lastModTime = def.getLocation().getLastModified();
+        }
+        return lastModTime;
     }
 
     /**
@@ -1083,9 +1052,15 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                             desc));
                 }
             } else {
-                if (!securityProviderDef.isAllowed(desc)) {
-                    throw new NoAccessException(String.format("Access to %s disallowed by %s", desc,
-                            securityProviderDef.getDescriptor().getName()));
+                try {
+                    if (!securityProviderDef.isAllowed(desc)) {
+                        throw new NoAccessException(String.format("Access to %s disallowed by %s", desc,
+                                securityProviderDef.getDescriptor().getName()));
+                    }
+                } catch (NoAccessException e) {
+                    // Sometimes security providers throw instead of returning.  Rather than losing
+                    // the stack trace in the exception, we catch and re-throw with that information
+                    throw e;
                 }
             }
             accessCache.add(desc);
@@ -1266,13 +1241,22 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
         depsCache.invalidateAll();
         descriptorFilterCache.invalidateAll();
+        stringsCache.invalidateAll();
 
         if (descriptor == null) {
             defsCache.invalidateAll();
             existsCache.invalidateAll();
         } else {
+            DefinitionService ds = Aura.getDefinitionService();
+            DefDescriptor<ComponentDef> cdesc = ds.getDefDescriptor(descriptor, "markup", ComponentDef.class);
+            DefDescriptor<ApplicationDef> adesc = ds.getDefDescriptor(descriptor, "markup", ApplicationDef.class);
+
             defsCache.invalidate(descriptor);
             existsCache.invalidate(descriptor);
+            defsCache.invalidate(cdesc);
+            existsCache.invalidate(cdesc);
+            defsCache.invalidate(adesc);
+            existsCache.invalidate(adesc);
 
             // invalidate all DDs with the same namespace if its a namespace DD
             if (descriptor.getDefType() == DefType.NAMESPACE) {

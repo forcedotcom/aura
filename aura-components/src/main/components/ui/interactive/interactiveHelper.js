@@ -48,10 +48,10 @@
         var component = htmlCmp.getAttributes().getComponentValueProvider().getConcreteComponent();
         var helper = component.getDef().getHelper();
         
-        if (!helper) {
+        if (!helper || component._recentlyClicked) {
             return;
         }
-
+        
         // extended components can do some event processing before the Aura event gets fired
         if (helper.preEventFiring) {
             helper.preEventFiring(component, event);
@@ -60,6 +60,11 @@
         // fire the equivalent Aura event
         if (helper.fireEvent) {
             helper.fireEvent(component, event, helper);
+        }
+        
+        if (event.type == "click" && component.getValue("v.disableDoubleClicks").getValue()) {
+        	component._recentlyClicked = true;
+        	window.setTimeout(function() { component._recentlyClicked = false; }, 350);
         }
     },
 

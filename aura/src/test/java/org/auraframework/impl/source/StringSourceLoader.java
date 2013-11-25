@@ -20,6 +20,9 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
 import javax.annotation.Nullable;
 
 import org.auraframework.Aura;
@@ -52,8 +55,17 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 /**
- * This source loader allows tests to load and unload source from strings rather than from the file system or looking at
- * the classpath. This loader is a singleton to ensure that it can be authoritative for the "string" namespace.
+ * This source loader allows tests to load and unload source from strings.
+ *
+ * This loader is a singleton to ensure that it can be authoritative for the "string" namespace.
+ *
+ * FIXME: W-1933490!!!! The namespaces map is very dangerous here, as it is mutable in ways that
+ * aura does not expect. There is a lock to ensure that the read/modify/write operations that are used
+ * by source 'put' methods are atomic, but that does not guarantee coherency. In particular, we may
+ * lie to aura and say that we have namespaces that we don't, or provide descriptors via find that aura
+ * will not be able to find because it has a fixed idea of the namespaces represented. This could be
+ * fixed by providing a fixed view into the namespaces provided.
+ *
  */
 public class StringSourceLoader implements SourceLoader {
     public static final String DEFAULT_NAMESPACE = "string";
@@ -72,6 +84,7 @@ public class StringSourceLoader implements SourceLoader {
      * A counter that we can use to guarantee unique names across multiple calls to add a source.
      */
     private static AtomicLong counter = new AtomicLong();
+    private static Lock nsLock = new ReentrantLock();
 
     /**
      * A helper to hold the singleton instance.
@@ -175,25 +188,30 @@ public class StringSourceLoader implements SourceLoader {
 
     private final <D extends Definition> StringSource<D> putSource(DefDescriptor<D> descriptor,
             StringSource<D> source, boolean overwrite) {
-        String namespace = descriptor.getNamespace();
-        Map<DefDescriptor<? extends Definition>, StringSource<? extends Definition>> sourceMap = namespaces
-                .get(namespace);
-
         SourceMonitorEvent event = SourceMonitorEvent.created;
 
-        if (sourceMap == null) {
-            sourceMap = Maps.newHashMap();
-            namespaces.put(namespace, sourceMap);
-        } else {
-            boolean containsKey = sourceMap.containsKey(descriptor);
-            Preconditions.checkState(overwrite || !containsKey);
-            if (containsKey) {
-                event = SourceMonitorEvent.changed;
+        nsLock.lock();
+        try {
+            String namespace = descriptor.getNamespace();
+            Map<DefDescriptor<? extends Definition>, StringSource<? extends Definition>> sourceMap;
+           
+            sourceMap = namespaces.get(namespace);
+
+            if (sourceMap == null) {
+                sourceMap = Maps.newHashMap();
+                namespaces.put(namespace, sourceMap);
+            } else {
+                boolean containsKey = sourceMap.containsKey(descriptor);
+                Preconditions.checkState(overwrite || !containsKey);
+                if (containsKey) {
+                    event = SourceMonitorEvent.changed;
+                }
+
             }
-
+            sourceMap.put(descriptor, source);
+        } finally {
+            nsLock.unlock();
         }
-        sourceMap.put(descriptor, source);
-
         // notify source listeners of change
         Aura.getDefinitionService().onSourceChanged(descriptor, event);
 
@@ -206,15 +224,20 @@ public class StringSourceLoader implements SourceLoader {
      * @param descriptor the descriptor identifying the loaded definition to remove.
      */
     public final void removeSource(DefDescriptor<?> descriptor) {
-        String namespace = descriptor.getNamespace();
-        Map<DefDescriptor<? extends Definition>, StringSource<? extends Definition>> sourceMap = namespaces
-                .get(namespace);
-        Preconditions.checkState(sourceMap != null);
-        Preconditions.checkState(sourceMap.remove(descriptor) != null);
-        if (!DEFAULT_NAMESPACE.equals(namespace) && sourceMap.isEmpty()) {
-            namespaces.remove(sourceMap);
+        nsLock.lock();
+        try {
+            String namespace = descriptor.getNamespace();
+            Map<DefDescriptor<? extends Definition>, StringSource<? extends Definition>> sourceMap;
+           
+            sourceMap = namespaces.get(namespace);
+            Preconditions.checkState(sourceMap != null);
+            Preconditions.checkState(sourceMap.remove(descriptor) != null);
+            if (!DEFAULT_NAMESPACE.equals(namespace) && sourceMap.isEmpty()) {
+                namespaces.remove(namespace);
+            }
+        } finally {
+            nsLock.unlock();
         }
-
         // notify source listeners of change
         Aura.getDefinitionService().onSourceChanged(descriptor, SourceMonitorEvent.deleted);
     }
@@ -286,6 +309,11 @@ public class StringSourceLoader implements SourceLoader {
                 // return a copy of the StringSource to emulate other Sources (hash is reset)
                 return new StringSource<D>(ret);
             }
+            if (descriptor.getDefType().equals(DefType.NAMESPACE)) {
+                Format format = DescriptorInfo.get(descriptor.getDefType().getPrimaryInterface()).getFormat();
+                return new StringSource<D>(descriptor, "", descriptor.getQualifiedName(),
+                        format);
+            }
         }
         return null;
     }
@@ -333,8 +361,7 @@ public class StringSourceLoader implements SourceLoader {
         }
 
         @SuppressWarnings("unchecked")
-        private <D extends Definition> DefDescriptor<D> getDescriptor(
-                String namespace, String name) {
+        private <D extends Definition> DefDescriptor<D> getDescriptor(String namespace, String name) {
             return (DefDescriptor<D>) Aura.getDefinitionService()
                     .getDefDescriptor(
                             String.format("%s://%s%s%s", prefix, namespace,

@@ -18,14 +18,25 @@ package org.auraframework.impl.java.model;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.TimeZone;
 
 import org.auraframework.Aura;
 import org.auraframework.components.ui.InputOption;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Model;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.date.*;
+import org.auraframework.util.date.DateOnly;
+import org.auraframework.util.date.DateService;
+import org.auraframework.util.date.DateServiceImpl;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonSerializable;
 
@@ -42,7 +53,7 @@ public class TestJavaModel {
     static HashMap<String, ArrayList<InputOption>> optionMap = new LinkedHashMap<String, ArrayList<InputOption>>();
     static List<Item> items;
     static List<Item> itemsEmpty = new ArrayList<Item>();
-    static List<Item> itemsLarge;
+    static List<Item> itemsLarge;       
     
     static {
         inputOptions.add(new InputOption("Option1", "Opt1", false, "option1"));
@@ -206,7 +217,53 @@ public class TestJavaModel {
     public List<String> getStringListNull() {
         return null;
     }
-
+    @AuraEnabled
+    public ArrayList<InputOption> getNoOptionsSel() {
+        //String label, String name, boolean selected, String value
+        return new ArrayList<InputOption>(){{
+            add(new InputOption("Tiger", "Tiger", false, "Tiger"));
+            add(new InputOption("Lion", "Lion", false, "Lion"));
+            add(new InputOption("Bear", "Bear", false, "Bear"));
+            
+        }};
+    }
+    @AuraEnabled
+    public ArrayList<InputOption>  getSecondOptionSel() {
+        return new ArrayList<InputOption>(){{
+            add(new InputOption("Tiger", "Tiger", false, "Tiger"));
+            add(new InputOption("Lion", "Lion", true, "Lion"));
+            add(new InputOption("Bear", "Bear", false, "Bear"));
+            
+        }};
+    }
+    @AuraEnabled
+    public ArrayList<InputOption>  getNoOptionsSelWithNone() {
+        return new ArrayList<InputOption>(){{
+            add(new InputOption("None", "None", false, ""));
+            add(new InputOption("Tiger", "Tiger", false, "Tiger"));
+            add(new InputOption("Lion", "Lion", false, "Lion"));
+            add(new InputOption("Bear", "Bear", false, "Bear"));
+            
+        }};
+    }
+    @AuraEnabled
+    public ArrayList<InputOption>  getThirdOptionSelWithNone() {
+        return new ArrayList<InputOption>(){{
+            add(new InputOption("None", "None", false, ""));
+            add(new InputOption("Tiger", "Tiger", false, "Tiger"));
+            add(new InputOption("Lion", "Lion", true, "Lion"));
+            add(new InputOption("Bear", "Bear", false, "Bear"));
+            
+        }};
+    }
+    @AuraEnabled
+    public ArrayList<InputOption>  getThirdOptionSel() {
+        return new ArrayList<InputOption>(){{
+            add(new InputOption("Tiger", "Tiger", false, "Tiger"));
+            add(new InputOption("Lion", "Lion", false, "Lion"));
+            add(new InputOption("Bear", "Bear", true, "Bear"));
+        }};
+    }
     @AuraEnabled
     public List<List<String>> getListOfList() {
         List<List<String>> listofList = new ArrayList<List<String>>();
@@ -455,6 +512,46 @@ public class TestJavaModel {
     @AuraEnabled
     public String getTextAreaText() {
         return "Some text from server\nspecially created to fit in....\n\n\na textarea!";
+    }  
+    
+    @AuraEnabled
+    public String getTextWithScriptTag() {
+        return "<big>Some text from server with script tag</big><script>Script</script>";
+    }
+    
+    @AuraEnabled
+    public String getTextWithStyleTag() {
+        return "<big>Some text from server with style tag</big><style>Style</style>";
+    }
+    
+    @AuraEnabled
+    public String getTextWithBlacklistedTags() {
+        return "Some text from server with blacklisted tags<script>Script</script><style></style>";
+    }
+    
+    @AuraEnabled
+    public String getTextWithBlacklistedNestedTags() {
+        return "Some text from server with nested blacklisted tags<script><script></script></script><script><style></style></script>";
+    }
+    
+    @AuraEnabled
+    public String getTextWithBlacklistedChildrenTags() {
+        return "Some text from server with nested blacklisted tags in div<div><script></script><script><style></style></script></div>";
+    }
+    
+    @AuraEnabled
+    public String getTextWithWhitelistedChildrenTags() {
+        return "Some text from server with nested input in balcklisted tags<script><input></input></script>";
+    }
+    
+    @AuraEnabled
+    public String getTextWithEvent() {
+        return "Some text from server with input tag with event<input type=\"button\" value=\"click\" onclick=\"alert('hello')\" />";
+    }
+    
+    @AuraEnabled
+    public String getTextWithMultipleEvents() {
+        return "Some text from server with input tags with events<input type=\"button\" value=\"click\" onclick=\"alert('hello')\" /><input type=\"text\" onclick=\"alert('click')\" onfocus=\"alert('focus')\" />";
     }
 
     @AuraEnabled

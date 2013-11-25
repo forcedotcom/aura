@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.auraframework</groupId>
         <artifactId>aura-framework</artifactId>
-        <version>0.401-SNAPSHOT</version>
+        <version>0.512-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <dependencies>
@@ -89,6 +89,10 @@
             <groupId>com.ibm.icu</groupId>
             <artifactId>icu4j</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.salesforce</groupId>
+            <artifactId>omakase</artifactId>
+        </dependency>              
     </dependencies>
     <properties>
         <aura.home>${basedir}/..</aura.home>
@@ -221,6 +225,7 @@
                                                    <jvmarg value="-Daura.home=${basedir}/.." />
                                                     <arg value="${xunit.js.console}" />
                                                     <arg value="/output:${xunit.js.format}" />
+                                                    <arg value="/strict:false" />
                                                     <arg value="/dependency:${basedir}/src/test/tools/xUnit/dependencies/" />
                                                     <arg value="${project.build.directory}/xunitjs/xunitTests" />
                                                </java>

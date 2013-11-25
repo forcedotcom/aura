@@ -40,7 +40,7 @@
     	    disabled="{!v.disabled}"
     	    multiple="{!v.multiple}">
         <aura:iteration items="{!v.options}" var="option">
-            <ui:inputSelectOption aura:id="options" label="{!option.label}" value="{!option.selected}" text="{!option.value}" disabled="{!option.disabled}"/>
+            <ui:inputSelectOption aura:id="options" class="{!option.class}" label="{!option.label}" value="{!option.selected}" text="{!option.value}" disabled="{!option.disabled}"/>
         </aura:iteration>
         {!v.body}
     </select>

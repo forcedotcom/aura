@@ -367,6 +367,11 @@ ArrayValue.prototype.destroy = function(async) {
 //#if {"modes" : ["STATS"]}
     valueFactory.deIndex(this);
 //#end
+
+//#if {"modes" : ["TESTING", "TESTINGDEBUG", "AUTOTESTING", "AUTOTESTINGDEBUG"]}
+	async = false; // Force synchronous destroy when in testing modes
+//#end
+	
     function destroy(a, async) {
         var array = a.dirty ? a.newArray : a.array;
         for (var i = 0; i < array.length; i++) {

@@ -38,6 +38,34 @@ var ComponentPriv = (function(){ // Scoping priv
         var partialConfig = $A.getContext().getComponentConfig(this.globalId);
         if (partialConfig) {
             this.partialConfig = partialConfig;
+
+            var partialConfigO = partialConfig["original"];
+            var partialConfigCD;
+            var configCD = config["componentDef"]["descriptor"];
+            if (configCD.getQualifiedName) {
+                configCD = configCD.getQualifiedName();
+            }
+            if (partialConfig["componentDef"]) {
+                partialConfigCD = partialConfig["componentDef"]["descriptor"];
+            }
+            if (partialConfigO !== undefined && partialConfigCD !== configCD) {
+                if (partialConfigO !== configCD) {
+                    $A.log("Configs at error");
+                    $A.log(config);
+                    $A.log(partialConfig);
+                    $A.error("Mismatch at "+this.globalId+" client expected "+configCD
+                        +" but got original "+partialConfigO
+                        +" providing "+partialConfigCD+ " from server");
+                }
+            } else if (partialConfigCD) {
+                if (partialConfigCD !== configCD) {
+                    $A.log("Configs at error");
+                    $A.log(config);
+                    $A.log(partialConfig);
+                    $A.error("Mismatch at "+this.globalId+" client expected "+configCD
+                        +" but got "+partialConfigCD+" from server");
+                }
+            }
         }
 
         // get server rendering if there was one

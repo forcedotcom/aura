@@ -15,10 +15,12 @@
  */
 package org.auraframework.http;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
 import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
@@ -37,7 +39,6 @@ import org.auraframework.system.Source;
 import org.auraframework.test.WebDriverTestCase;
 import org.auraframework.test.WebDriverUtil.BrowserType;
 import org.auraframework.test.annotation.FreshBrowserInstance;
-import org.auraframework.test.annotation.TestLabels;
 import org.auraframework.test.annotation.ThreadHostileTest;
 import org.auraframework.test.controller.TestLoggingAdapterController;
 import org.auraframework.util.AuraTextUtil;
@@ -87,11 +88,11 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         cmpName = "cachecomponent";
 
         DefDescriptor<ComponentDef> cmpDesc = createDef(ComponentDef.class, String.format("%s:%s", namespace, cmpName),
-                "<aura:component>" 
-                		+ "<aura:attribute name='output' type='String'/>"
+                "<aura:component>"
+                        + "<aura:attribute name='output' type='String'/>"
                         + "<div class='clickableme' onclick='{!c.cssalert}'>@@@TOKEN@@@</div>"
-                        + "<div class='attroutput'>{!v.output}</div>" 
-        		+"</aura:component>");
+                        + "<div class='attroutput'>{!v.output}</div>"
+                        + "</aura:component>");
 
         createDef(
                 ControllerDef.class, String.format("%s://%s.%s", DefDescriptor.JAVASCRIPT_PREFIX, namespace, cmpName),
@@ -125,8 +126,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
     /**
      * Opening cached app will only query server for the manifest and the component load.
      */
-    @TargetBrowsers({ BrowserType.GOOGLECHROME,  BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
-    @TestLabels("auraSanity")
+    @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
     public void testNoChanges() throws Exception {
         List<Request> logs = loadMonitorAndValidateApp(TOKEN, TOKEN, "", TOKEN);
         assertRequests(getExpectedInitialRequests(), logs);
@@ -144,7 +144,6 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
      * Opening cached app that had a prior cache error will reload the app.
      */
     @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
-    @TestLabels("auraSanity")
     public void testCacheError() throws Exception {
         List<Request> logs = loadMonitorAndValidateApp(TOKEN, TOKEN, "", TOKEN);
         assertRequests(getExpectedInitialRequests(), logs);
@@ -152,11 +151,10 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
 
         Date expiry = new Date(System.currentTimeMillis() + 60000);
         String cookieName = getManifestCookieName();
-        getDriver().manage().addCookie(
-                new Cookie(cookieName, "error", null, "/", expiry));
+        updateCookie(cookieName, "error", expiry, "/");
+
         logs = loadMonitorAndValidateApp(TOKEN, TOKEN, "", TOKEN);
         List<Request> expectedChange = Lists.newArrayList();
-
         expectedChange.add(new Request("/auraResource", null, null, "manifest", 404)); // reset
         expectedChange.add(new Request("/aura", namespace + ":" + appName, null, "HTML", 302)); // hard refresh
         switch (getBrowserType()) {
@@ -175,28 +173,22 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         }
         assertRequests(expectedChange, logs);
         assertAppCacheStatus(Status.IDLE);
-
-        // There may be a varying number of requests, depending on when the
-        // initial manifest response is received.
+        // There may be a varying number of requests, depending on when the initial manifest response is received.
         Cookie cookie = getDriver().manage().getCookieNamed(cookieName);
         assertFalse("Manifest cookie was not changed " + cookie.getValue(), "error".equals(cookie.getValue()));
     }
 
-
     /**
-     * for Chrome and Safari/IPAD/IPHONE Opening uncached app that had a prior cache error will have limited caching
+     * Opening uncached app that had a prior cache error will have limited caching.
      */
     @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
     public void testCacheErrorWithEmptyCache() throws Exception {
-    	//debug for flapper:
-    	System.out.println("testCacheErrorWithEmptyCache,open aura/application.app, TS:"+System.currentTimeMillis());
         openNoAura("/aura/application.app"); // just need a domain page to set cookie from
+
         Date expiry = new Date(System.currentTimeMillis() + 60000);
         String cookieName = getManifestCookieName();
-        getDriver().manage().addCookie(
-                new Cookie(cookieName, "error", null, "/", expiry));
-        //debug for flapper:
-        System.out.println("testCacheErrorWithEmptyCache,loadMonitorAndValidateApp,TS:"+System.currentTimeMillis());
+        updateCookie(cookieName, "error", expiry, "/");
+
         List<Request> logs = loadMonitorAndValidateApp(TOKEN, TOKEN, "", TOKEN);
         List<Request> expectedChange = Lists.newArrayList();
         expectedChange.add(new Request("/auraResource", null, null, "manifest", 404)); // reset
@@ -205,14 +197,9 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         expectedChange.add(new Request("/auraResource", null, null, "js", 200));
         assertRequests(expectedChange, logs);
         assertAppCacheStatus(Status.UNCACHED);
-
-        // There may be a varying number of requests, depending on when the
-        // initial manifest response is received.
+        // There may be a varying number of requests, depending on when the initial manifest response is received.
         Cookie cookie = getDriver().manage().getCookieNamed(cookieName);
         assertNull("No manifest cookie should be present", cookie);
-        //debug for flapper:
-        List<Request> logs2 = loadMonitorAndValidateApp(TOKEN, TOKEN, "", TOKEN);
-        System.out.println("logs2:"+logs2.toString());
     }
 
     /**
@@ -228,7 +215,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         String cookieName = getManifestCookieName();
         Cookie cookie = getDriver().manage().getCookieNamed(cookieName);
         String timeVal = cookie.getValue().split(":")[1];
-        getDriver().manage().addCookie(new Cookie(cookieName, "8:" + timeVal, null, "/", expiry));
+        updateCookie(cookieName, "8:" + timeVal, expiry, "/");
         logs = loadMonitorAndValidateApp(TOKEN, TOKEN, "", TOKEN);
         List<Request> expectedChange = Lists.newArrayList();
 
@@ -258,8 +245,8 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
     @ThreadHostileTest("NamespaceDef modification affects namespace")
     @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
     public void testComponentCssChange() throws Exception {
-    	//debug for flapper:
-    	System.out.println("testComponentCssChange begins TS:"+System.currentTimeMillis());
+        // debug for flapper:
+        System.out.println("testComponentCssChange begins TS:" + System.currentTimeMillis());
         createDef(NamespaceDef.class, String.format("%s://%s", DefDescriptor.MARKUP_PREFIX, namespace),
                 "<aura:namespace></aura:namespace>");
 
@@ -272,13 +259,13 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
 
         // update a component's css file
         String replacement = getName() + System.currentTimeMillis();
-      
+
         replaceToken(getTargetComponent().getStyleDescriptor(), replacement);
-      
-        //debug for flapper:
-        System.out.println("testComponentCssChange load app again, TS:"+System.currentTimeMillis());
+
+        // debug for flapper:
+        System.out.println("testComponentCssChange load app again, TS:" + System.currentTimeMillis());
         logs = loadMonitorAndValidateApp(TOKEN, TOKEN, replacement, TOKEN);
-        
+
         assertRequests(getExpectedChangeRequests(), logs);
         assertAppCacheStatus(Status.IDLE);
 
@@ -293,7 +280,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
      */
     @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
     public void testComponentJsChange() throws Exception {
-    	System.out.println("++++++testComponentJsChange begins,TS:"+System.currentTimeMillis());
+        System.out.println("++++++testComponentJsChange begins,TS:" + System.currentTimeMillis());
         List<Request> logs = loadMonitorAndValidateApp(TOKEN, TOKEN, "", TOKEN);
         assertRequests(getExpectedInitialRequests(), logs);
         assertAppCacheStatus(Status.IDLE);
@@ -307,15 +294,12 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
                 break;
             }
         }
-      //debug for flapper:
-        System.out.println("++++++testComponentJsChange replace token,TS:"+System.currentTimeMillis());
+        // debug for flapper:
+        System.out.println("++++++testComponentJsChange replace token,TS:" + System.currentTimeMillis());
         replaceToken(desc, replacement);
-      //debug for flapper:
-        System.out.println("++++++testComponentJsChange loadMonitorAndValidateApp,TS:"+System.currentTimeMillis());
+        // debug for flapper:
+        System.out.println("++++++testComponentJsChange loadMonitorAndValidateApp,TS:" + System.currentTimeMillis());
         logs = loadMonitorAndValidateApp(TOKEN, replacement, "", TOKEN);
-        //debug for flapper:
-        System.out.println("++++++we did hard refresh without appending url with 'nochache':"
-        +auraUITestingUtil.getBooleanEval("return !!document._hardRefreshWOUrlAppendFlag"));
         assertRequests(getExpectedChangeRequests(), logs);
         assertAppCacheStatus(Status.IDLE);
         logs = loadMonitorAndValidateApp(TOKEN, replacement, "", TOKEN);
@@ -334,15 +318,8 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         assertAppCacheStatus(Status.IDLE);
         // update markup of namespaced component used by app
         String replacement = getName() + System.currentTimeMillis();
-        //debug for flapper:
-        System.out.println("testComponentMarkupChange replace token,TS:"+System.currentTimeMillis());
         replaceToken(getTargetComponent().getDescriptor(), replacement);
-        //debug for flapper:
-        System.out.println("testComponentMarkupChange  reload app,TS:"+System.currentTimeMillis());
         logs = loadMonitorAndValidateApp(replacement, TOKEN, "", TOKEN);
-        //debug for flapper:
-        System.out.println("++++++++we did hard refresh without appending url with 'nochache':"
-        +auraUITestingUtil.getBooleanEval("return !!document._hardRefreshWOUrlAppendFlag"));
         assertRequests(getExpectedChangeRequests(), logs);
         assertAppCacheStatus(Status.IDLE);
         logs = loadMonitorAndValidateApp(replacement, TOKEN, "", TOKEN);
@@ -410,12 +387,11 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         }
 
         failed = unexpectedRequests.size() > 0 || missingRequests.size() > 0;
-        
-        
+
         System.out.println(">>> assertRequests: ");
         System.out.println("EXPECTED:");
         for (Request r : expected) {
-            System.out.println("E: " + r + ",fudge:"+r.fudge);
+            System.out.println("E: " + r + ",fudge:" + r.fudge);
         }
         System.out.println("ACTUAL:");
         for (Request r : actual) {
@@ -457,14 +433,11 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
      */
     private List<Request> loadMonitorAndValidateApp(final String markupToken, String jsToken, String cssToken,
             String fwToken) throws Exception {
-    	System.out.println("loadMonitorAndValidateApp,logging adapter start capturing,"
-    			+"open "+namespace+"/"+appName+", TS:"+System.currentTimeMillis());
+        System.out.println("loadMonitorAndValidateApp,logging adapter start capturing,"
+                + "open " + namespace + "/" + appName + ", TS:" + System.currentTimeMillis());
         TestLoggingAdapterController.beginCapture();
         open(String.format("/%s/%s.app", namespace, appName));
-        
-        //openNoAura(String.format("/%s/%s.app", namespace, appName));
-        //this is redundant, we did this in open(some url)
-        //auraUITestingUtil.waitForAppCacheReady();
+
         WebElement elem = auraUITestingUtil
                 .waitUntil(new Function<WebDriver, WebElement>() {
                     @Override
@@ -478,34 +451,12 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
                     }
                 });
         List<Request> logs = endMonitoring();
-        
+
         elem.click();
         WebElement output = findDomElement(By.cssSelector("div.attroutput"));
         assertEquals("Unexpected alert text",
                 String.format("%s%s%s", jsToken, cssToken, fwToken),
                 output.getText());
-        
-        //debug for flapper:
-        System.out.println("hardRefresh_touched:"
-        		+auraUITestingUtil.getRawEval("return window.localStorage.getItem('hardRefresh_touched');"));
-        System.out.println("handleAppcacheChecking:"
-        		+auraUITestingUtil.getRawEval("return window.localStorage.getItem('handleAppcacheChecking');"));
-        System.out.println("handleAppcacheUpdateReady:"
-        		+auraUITestingUtil.getRawEval("return window.localStorage.getItem('handleAppcacheUpdateReady');"));
-        System.out.println("handleAppcacheError:"
-        		+auraUITestingUtil.getRawEval("return window.localStorage.getItem('handleAppcacheError');"));
-        System.out.println("handleAppcacheError2:"
-        		+auraUITestingUtil.getRawEval("return window.localStorage.getItem('handleAppcacheError2');"));
-        System.out.println("handleAppcacheDownloading:"
-        		+auraUITestingUtil.getRawEval("return window.localStorage.getItem('handleAppcacheDownloading');"));
-        System.out.println("handleAppcacheProgress:"
-        		+auraUITestingUtil.getRawEval("return window.localStorage.getItem('handleAppcacheProgress');"));
-        System.out.println("handleAppcacheNoUpdate:"
-        		+auraUITestingUtil.getRawEval("return window.localStorage.getItem('handleAppcacheNoUpdate');"));
-        System.out.println("handleAppcacheCached:"
-        		+auraUITestingUtil.getRawEval("return window.localStorage.getItem('handleAppcacheCached');"));
-        System.out.println("handleAppcacheObsolete:"
-        		+auraUITestingUtil.getRawEval("return window.localStorage.getItem('handleAppcacheObsolete');"));
 
         return logs;
     }
@@ -619,7 +570,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
              */
             return ImmutableList.of(new Request(2, "/aura", namespace + ":" + appName, null, "HTML", 200), new Request(
                     2, "/auraResource", null, null, "manifest", 200), new Request("/auraResource", null, null, "css",
-                    200), new Request(2,"/auraResource", null, null, "js", 200));
+                    200), new Request(2, "/auraResource", null, null, "js", 200));
         case SAFARI:
         case IPHONE:
         case IPAD:
@@ -736,4 +687,11 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         return Mode.SELENIUM;
     }
 
+    private void updateCookie(String name, String value, Date expiry, String path) {
+        SimpleDateFormat sd = new SimpleDateFormat();
+        sd.setTimeZone(TimeZone.getTimeZone("GMT"));
+        String expiryFormatted = sd.format(expiry);
+        String command = "document.cookie = '" + name + "=error; expires=" + expiryFormatted + "; path=" + path + "';";
+        auraUITestingUtil.getEval(command);
+    }
 }

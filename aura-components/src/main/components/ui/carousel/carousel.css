@@ -35,8 +35,7 @@
  .THIS .carousel-pages {
  	position: relative;
  	clear: both;	
-	overflow: hidden;
-	white-space: nowrap;	 	
+	overflow: hidden; 	
  }
    
  

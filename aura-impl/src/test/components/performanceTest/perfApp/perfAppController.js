@@ -10,11 +10,13 @@
         cmp.getAttributes().setValue("end", 10)
     },
     simpleServerAction:function(cmp){
+	cmp._simpleServerActionComplete = false;
         $A.mark("XHR call time: Simple Server Controller");
         var a = cmp.get('c.getString');
         a.setExclusive(); //So that it does not get batches with other requests
         a.setCallback(cmp,function(a){
             $A.endMark("XHR call time: Simple Server Controller");
+            cmp._simpleServerActionComplete = true;
         });
         $A.enqueueAction(a);
     },

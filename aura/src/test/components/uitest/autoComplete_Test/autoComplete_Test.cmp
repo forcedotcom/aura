@@ -22,7 +22,7 @@
         inputChange="{!c.handleInputChangeAutoComplete}" 
         selectListOption="{!c.handleSelectOptionAutoComplete}" label="Generic Auto Complete">
         <aura:set attribute="dataProvider">
-            <uitest:testAutocompleteDataProvider/>
+            <uitest:autocomplete_TestDataProvider/>
         </aura:set>
         <aura:set attribute="listOption">
             <ui:autocompleteOption label="{!row.label}" keyword="{!row.keyword}" value="{!row.value}" visible="{!row.visible}"/>
@@ -38,7 +38,7 @@
         inputChange="{!c.handleInputChangeNoData}" 
         selectListOption="{!c.handleSelectOptionNoData}">
         <aura:set attribute="dataProvider">
-            <uitest:testAutocompleteDataProvider dataType="emptyList"/>
+            <uitest:autocomplete_TestDataProvider dataType="emptyList"/>
         </aura:set>
         <aura:set attribute="listOption">
             <ui:autocompleteOption label="{!row.label}" keyword="{!row.keyword}" value="{!row.value}" visible="{!row.visible}"/>
@@ -54,7 +54,7 @@
         inputChange="{!c.handleInputChangeLargeList}" 
         selectListOption="{!c.handleSelectOptionLargeList}" label="Large List Auto Complete" labelPosition="hidden">
         <aura:set attribute="dataProvider">
-            <uitest:testAutocompleteDataProvider dataType="largeList"/>
+            <uitest:autocomplete_TestDataProvider dataType="largeList"/>
         </aura:set>
         <aura:set attribute="listOption">
             <ui:autocompleteOption label="{!row.label}" keyword="{!row.keyword}" value="{!row.value}" visible="{!row.visible}"/>
@@ -70,7 +70,7 @@
         inputChange="{!c.handleInputChangeCustomTemplate}" 
         selectListOption="{!c.handleSelectOptionCustomTemplate}">
         <aura:set attribute="dataProvider">
-            <uitest:testAutocompleteDataProvider/>
+            <uitest:autocomplete_TestDataProvider/>
         </aura:set>
         <aura:set attribute="listOption">
             <uitest:autoComplete_CustomTemplate value="{!row.label}" visible="{!row.visible}"/>
@@ -86,7 +86,7 @@
         inputChange="{!c.handleInputChangeCustomOption}" 
         selectListOption="{!c.handleSelectOptionCustomOption}">
         <aura:set attribute="dataProvider">
-            <uitest:testAutocompleteDataProvider/>
+            <uitest:autocomplete_TestDataProvider/>
         </aura:set>
         <aura:set attribute="listOption">
             <uitest:autoComplete_CustomOption label="{!row.label}" visible="{!row.visible}"/>

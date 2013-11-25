@@ -16,6 +16,8 @@
 
 -->
 <aura:component model="java://org.auraframework.impl.java.model.ValueChangeModel">
+    <aura:attribute name="observed" type="String" default="first"/>
+
     <aura:handler name="change" value="{!m.string}" action="{!c.stringChange}"/>
     <aura:handler name="change" value="{!m.map}" action="{!c.mapChange}"/>
     <aura:handler name="change" value="{!m.list}" action="{!c.listChange}"/>

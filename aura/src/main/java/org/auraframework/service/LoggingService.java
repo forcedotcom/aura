@@ -61,6 +61,16 @@ public interface LoggingService extends AuraService {
      * Close and clean up logging context
      */
     void release();
+    
+    /**
+     * Start timers for an action.
+     */
+    void startAction(String actionName);
+    
+    /**
+     * Stop all timers for an action
+     */
+    void stopAction(String actionName);
 
     /**
      * Start a timer.

@@ -35,8 +35,6 @@
 
 			var scroller = component._scroller;
 			if (!$A.util.isUndefined(scroller)) {
-				scroller.unbindTransientHandlers();
-				
 				scroller.refresh();
 								
 				var compEvents = component.getEvent("refreshed");						
@@ -51,6 +49,13 @@
 			component._refreshing = false;
 		}
 	},
+		
+	swapShowMore: function (cmp) {
+		// Timeout to allow for rendering of new element.
+		setTimeout(function () { 
+			cmp._pullUpEl = cmp.find('pullUp').getElement();;
+		}, 100);
+	},
 	
 	handleScrollTo : function(component, event) {
 		var scroller = component._scroller,
@@ -59,28 +64,49 @@
 			offset;
 		
 		switch (event.getParam("destination")) {
-		case "top" :
-			offset = component.find("pullDown").getElement();
-			scroller.scrollTo(0, 0 - offset.offsetHeight, event.getParam("time"));
-			break;
-		case "bottom" :
-			offset = component.find("pullUp").getElement();
-			scroller.scrollTo(0, 0 - (scrollContent.offsetHeight - scrollWrapper.offsetHeight - offset.offsetHeight), event.getParam("time"));
-			break;
-		case "left" :
-			scroller.scrollTo(0, 0, event.getParam("time"));
-			break;
-		case "right" :	
-			scroller.scrollTo(0 - (scrollContent.offsetHeight - scrollWrapper.offsetHeight), 0, event.getParam("time"));
-			break;
-		case "custom" :
-			offset = component.find("pullDown").getElement();
-			scroller.scrollTo(event.getParam("xcoord"), event.getParam("ycoord") - offset.offsetHeight, event.getParam("time"));
+			case "top" :
+				offset = component.find("pullDown").getElement();
+				scroller.scrollTo(0, 0 - offset.offsetHeight, event.getParam("time"));
+				break;
+			case "bottom" :
+				offset = component.find("pullUp").getElement();
+				scroller.scrollTo(0, 0 - (scrollContent.offsetHeight - scrollWrapper.offsetHeight - offset.offsetHeight), event.getParam("time"));
+				break;
+			case "left" :
+				scroller.scrollTo(0, 0, event.getParam("time"));
+				break;
+			case "right" :	
+				scroller.scrollTo(0 - (scrollContent.offsetHeight - scrollWrapper.offsetHeight), 0, event.getParam("time"));
+				break;
+			case "custom" :
+				offset = component.find("pullDown").getElement();
+				scroller.scrollTo(event.getParam("xcoord"), event.getParam("ycoord") - offset.offsetHeight, event.getParam("time"));
 		}
 	},
 	
 	handleScrollBy : function(component, event) {
 		component._scroller.scrollTo(event.getParam("deltaX"), event.getParam("deltaY"), event.getParam("time"), true);
+	},
+	parseIntHelper : function(str){
+		return parseInt(str, 10) || 0; // always use radix 10, return 0 if falsey
+	},
+	heightOffsetHelper : function(component){
+		var el_info = getComputedStyle(component.getElement());
+		// use these dimensions to calculate a height offset:
+		var dims = [
+			'height'     ,
+			'marginTop'  , 'marginBottom' ,
+			'paddingTop' , 'paddingBottom',
+			'borderTop'  , 'borderBottom'
+		];
+		// note that the box model *must* be content-box for this to be correct.
+		// https://developer.mozilla.org/en-US/docs/Web/CSS/box-sizing
+
+		var offset = 0;
+		for (var i = 0; i < dims.length; i++){
+			offset += this.parseIntHelper(el_info[dims[i]]);
+		}
+		return offset;
 	},
 
 	init : function(component) {
@@ -109,28 +135,32 @@
 					var pullToRefreshAction = component.get("v.onPullToRefresh");
 					var canRefresh = component.get("v.canRefresh");
 					var pullDownOffset = 0;
+					
 					if (pullToRefreshAction && canRefresh) {
-						var pullDownEl = component.find("pullDown").getElement();
-						// pullDownEl.offsetHeight is unreliable, so calculating
-						// by hand from the computed styles
-						var pullDownElInfo = getComputedStyle(pullDownEl);
-						pullDownOffset = (parseInt(pullDownElInfo.height) || 0) + (parseInt(pullDownElInfo.paddingTop) || 0)
-								+ (parseInt(pullDownElInfo.paddingBottom) || 0) + (parseInt(pullDownElInfo.marginTop) || 0)
-								+ (parseInt(pullDownElInfo.marginBottom) || 0)
+						var pullDownComponent = component.find("pullDown");
+						var pullDownEl = pullDownComponent.getElement();
+						//offsetHeight is unreliable.  Calculate from computed styles.
+						pullDownOffset = this.heightOffsetHelper(pullDownComponent);
 					}
 					
 					var pullToShowMoreAction = component.get("v.onPullToShowMore");
-					var canShowMore = component.get("v.canShowMore");
 					var pullUpOffset = 0;
-					if (pullToShowMoreAction && canShowMore) {
+					
+					if (pullToShowMoreAction && component.get('v.canShowMore')) {
 						var shim = component.find("shim").getElement();
-						var pullUpEl = component.find("pullUp").getElement();
-						// pullUpEl.offsetHeight is unreliable, so calculating
-						// by hand from the computed styles
-						var pullUpElInfo = getComputedStyle(pullUpEl);
-						pullUpOffset = (parseInt(pullUpElInfo.height) || 0) + (parseInt(pullUpElInfo.paddingTop) || 0)
-								+ (parseInt(pullUpElInfo.paddingBottom) || 0) + (parseInt(pullUpElInfo.marginTop) || 0)
-								+ (parseInt(pullUpElInfo.marginBottom) || 0)
+						var pullUpComponent = component.find("pullUp");
+						var pullUpEl = pullUpComponent.getElement();
+						component._pullUpEl = pullUpEl;
+						//offsetHeight is unreliable.  Calculate from computed styles.
+						pullUpOffset = this.heightOffsetHelper(pullUpComponent);
+					}
+
+					var pullContent = component.get("v.extendedPullContent");
+					var pullContentOffset = 0;
+
+					if (pullContent !== null && pullContent.length > 0 ){
+						//offsetHeight is unreliable.  Calculate from computed styles.
+						pullContentOffset = this.heightOffsetHelper(component.find("pullContent"));
 					}
 
 					if ($A.util.isUndefined(window.iScroll)) {
@@ -182,6 +212,7 @@
 						useTransition : useTransition,
 
 						topOffset : pullDownOffset,
+						y : - (pullDownOffset + pullContentOffset),
 
 						lockDirection : true,
 
@@ -223,15 +254,15 @@
 									this.minScrollY = -pullDownOffset;
 								}
 							}
-							
-							if (pullToShowMoreAction && canShowMore) {
+														
+							if (pullToShowMoreAction && component.get('v.canShowMore')) {
 								var threshold = this.bottomY - PULL_DISTANCE;
 								
-								if (this.y < threshold && $A.util.hasClass(pullUpEl, 'pullDown')) {
-									$A.util.swapClass(pullUpEl, 'pullDown', 'pullFlip');
+								if (this.y < threshold && $A.util.hasClass(component._pullUpEl, 'pullDown')) {
+									$A.util.swapClass(component._pullUpEl, 'pullDown', 'pullFlip');
 									this.maxScrollY = this.bottomY;
-								} else if (this.y > threshold && $A.util.hasClass(pullUpEl, 'pullFlip')) {
-									$A.util.swapClass(pullUpEl, 'pullFlip', 'pullDown');
+								} else if (this.y > threshold && $A.util.hasClass(component._pullUpEl, 'pullFlip')) {
+									$A.util.swapClass(component._pullUpEl, 'pullFlip', 'pullDown');
 									this.maxScrollY = this.bottomYWithoutPullUp;
 								}
 							}							
@@ -253,9 +284,9 @@
 								}
 							}
 							
-							if (pullToShowMoreAction && canShowMore) {
-								if ($A.util.hasClass(pullUpEl, 'pullFlip')) {
-									$A.util.swapClass(pullUpEl, 'pullFlip', 'pullLoading');
+							if (pullToShowMoreAction && component.get('v.canShowMore')) {
+								if ($A.util.hasClass(component._pullUpEl, 'pullFlip')) {
+									$A.util.swapClass(component._pullUpEl, 'pullFlip', 'pullLoading');
 									setTimeout(function() {
 										pullToShowMoreAction.runDeprecated();
 									}, 1);
@@ -277,7 +308,7 @@
                             }
 						},
 
-						onRefresh : function() {
+						onRefresh : function() {							
 							if (pullToRefreshAction && canRefresh) {
 								// keep the "loading" styling as it animates up
 								// then replace with the "pull down" styling
@@ -286,18 +317,19 @@
 								}, 50);
 							}
 							
-							if (pullToShowMoreAction && canShowMore) {
+							if (pullToShowMoreAction && component.get('v.canShowMore')) {
 								// keep the "loading" styling as it animates up
 								// then replace with the "pull down" styling
 								setTimeout(function() {
-									$A.util.swapClass(pullUpEl, 'pullLoading', 'pullDown');
+									$A.util.swapClass(component._pullUpEl, 'pullLoading', 'pullDown');
 								}, 50);
 							
 								// TODO: this could all possibly be more efficient
-								shim.style.height = "0"
-								var actualContentHeight = scroller.children[0].offsetHeight
-								
-								var leftoverSpace = scroller.offsetHeight - (actualContentHeight - pullUpOffset - pullDownOffset);
+								shim.style.height = "0";
+								var actualContentHeight = scroller.children[0].offsetHeight;
+								var heightAdjustments = pullUpOffset + pullDownOffset + pullContentOffset;
+								var adjustedContentHeight = actualContentHeight - heightAdjustments;
+								var leftoverSpace = scroller.offsetHeight - adjustedContentHeight;
 								
 								if (leftoverSpace > 0) {
 									shim.style.height = leftoverSpace + "px";
@@ -884,6 +916,8 @@
 				},
 
 				_move : function(e) {
+					this._transitioning = true;
+					
 				    var tagName = e.target.nodeName.toLowerCase();
 				    // ssun don't scroll if we are in a textarea since it is hard
 				    // to scroll the textarea and the page at the same time.
@@ -975,7 +1009,8 @@
 				},
 
 				_end : function(e) {
-				
+					this._transitioning = false;
+
 					if (hasTouch && e.touches.length !== 0)
 						return;
 
@@ -1122,8 +1157,19 @@
 				},
 
 				_resetPos : function(time) {
-					var that = this, resetX = that.x >= 0 ? 0 : that.x < that.maxScrollX ? that.maxScrollX : that.x, resetY = that.y >= that.minScrollY
-							|| that.maxScrollY > 0 ? that.minScrollY : that.y < that.maxScrollY ? that.maxScrollY : that.y;
+					var that = this;
+					var resetX = that.x;
+					if (that.x >= 0){
+						resetX = 0;
+					} else if (that.x < that.maxScrollX){
+						resetX = that.maxScrollX;
+					}
+					var resetY = that.y;
+					if (that.y >= that.minScrollY || that.maxScrollY > 0){
+						resetY = that.minScrollY;
+					} else if(that.y < that.maxScrollY){
+						resetY = that.maxScrollY;
+					}
 
 					if (resetX == that.x && resetY == that.y) {
 						if (that.moved) {
@@ -1493,7 +1539,7 @@
 					that._scrollbar('h');
 					that._scrollbar('v');
 
-					if (!that.zoomed) {
+					if (!that.zoomed && !that._transitioning) {
 						that.scroller.style[transitionDuration] = '0';
 						that._resetPos(doNotAnimate ? 0 : 200);
 					}

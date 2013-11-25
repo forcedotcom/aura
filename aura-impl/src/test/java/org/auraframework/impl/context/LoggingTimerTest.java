@@ -17,10 +17,10 @@ package org.auraframework.impl.context;
 
 import java.lang.reflect.Field;
 
-import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.context.LoggingContextImpl.Timer;
+import org.auraframework.test.UnitTestCase;
 
-public class LoggingTimerTest extends AuraImplTestCase {
+public class LoggingTimerTest extends UnitTestCase {
 
     public LoggingTimerTest(String name) {
         super(name);

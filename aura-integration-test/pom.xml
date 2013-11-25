@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.auraframework</groupId>
         <artifactId>aura-framework</artifactId>
-        <version>0.401-SNAPSHOT</version>
+        <version>0.512-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <dependencies>
@@ -354,6 +354,31 @@
             </build>
         </profile>
         <profile>
+            <id>runOnlyIntTests</id>
+            <activation>
+                <property>
+                    <name>runOnlyIntTests</name>
+                </property>
+            </activation>
+            <properties>
+                <testPhase>integration-test</testPhase>
+                <testSetupPhase>pre-integration-test</testSetupPhase>
+                <testTeardownPhase>post-integration-test</testTeardownPhase>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>build-helper-maven-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
             <id>dev</id>
             <activation>
                 <property>
@@ -456,6 +481,11 @@
         </profile>
         <profile>
             <id>ubuntu12</id>
+            <activation>
+               <property>
+                 <name>env.UBUNTU12</name>
+               </property>
+            </activation>
             <properties>
                 <chromedriver.version>2.2</chromedriver.version>
             </properties>
@@ -480,6 +510,7 @@
                 </os>
             </activation>
             <properties>
+                <xdisplay.skip>true</xdisplay.skip>
                 <platform.chromedriver>win32</platform.chromedriver>
                 <chromedriver.version>2.2</chromedriver.version>
                 <webdriver.chrome.driver>${basedir}/target/bin/chromedriver.exe</webdriver.chrome.driver>

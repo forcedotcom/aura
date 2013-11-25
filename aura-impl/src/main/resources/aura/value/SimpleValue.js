@@ -130,6 +130,25 @@ SimpleValue.prototype.getPreviousValue = function() {
  * @param {Object} v The value to be set.
  */
 SimpleValue.prototype.setValue = function(v, skipChange) {
+    if (this.observing) {
+        if (this.observing === v) {
+            if (this.value !== v.value) {
+                this.setValue(v.value);
+            }
+            return;  // Already done; nothing to do here
+        }
+        if (this.observing.value != v) {
+            this.unobserve(this.observing);  // Implicitly unlink by explicit assignment
+        }
+    }
+    if (v instanceof SimpleValue) {
+        // The idiom foo.setValue(sv) used to be used to create a "tracking"
+        // assignment, albeit buggily, so that semantic is preserved here.
+        $A.warning("Prefer SimpleValue.observe(wrappedvalue) for tracking assignments, not SV.setValue(wrappedvalue)");
+        this.observe(v);
+        return;  // The observe also does an initial setvalue.
+    }
+
     this.makeDirty();
     var list = null;
     if (!skipChange) {
@@ -143,6 +162,7 @@ SimpleValue.prototype.setValue = function(v, skipChange) {
         this.updatePendingValue("change", this);
         this.firePending("change", list);
     }
+    this.informObservers(this.value);
 };
 
 /**

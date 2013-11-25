@@ -528,21 +528,7 @@ var priv = {
 
     hardRefresh : function() {
         var url = location.href;
-        //debug for flapper
-        var date; var currentTime;
-        if(window.localStorage) {
-        	date = new Date();
-            currentTime = date.getTime();
-        	window.localStorage.setItem("hardRefresh_touched","url:"+url+",TS:"+currentTime);
-        }
-        //aura.assert(false,"bang from hardRefresh ");
         if (!priv.isManifestPresent() || url.indexOf("?nocache=") > -1) {
-        	//debug for flapper
-        	if(window.localStorage) {
-        		date = new Date();
-                currentTime = date.getTime();
-            	window.localStorage.setItem("hardRefresh_touched","!isManifestPresent or url contains nocache,location.reload,"+",TS:"+currentTime);
-            }
             location.reload(true);
             return;
         }
@@ -563,14 +549,23 @@ var priv = {
             url = url.substring(0, cutIndex);
         }
 
-        location.href = url + params;
-        //debug for flapper
-    	if(window.localStorage) {
-    		date = new Date();
-            currentTime = date.getTime();
-        	window.localStorage.setItem("hardRefresh_touched","append nocache to url:"+location.href+",TS:"+currentTime);
-        }
+                
+        var sIndex = url.lastIndexOf("/");
+        var appName = url.substring(sIndex+1,url.length);
+        var newUrl = appName + params;
+        //use history.pushState to change the url of current page without actually loading it.
+        //AuraServlet will force the reload when GET request with current url contains '?nocache=someUrl' 
+        //after reload, someUrl will become the current url.
+        //state is null: don't need to track the state with popstate
+        //title is null: don't want to set the page title.
+        history.pushState(null,null,newUrl);
         
+    	//fallback to old way : set location.href will trigger the reload right away
+    	//we need this because when AuraResourceServlet's GET request with a 'error' cookie, 
+    	//AuraServlet doesn't get to do the GET reqeust
+    	if( (location.href).indexOf("?nocache=") > -1 ) {
+    		location.href = (url + params);
+    	}
     },
 
     flushLoadEventQueue : function() {
@@ -608,15 +603,6 @@ var priv = {
 
     handleAppcacheChecking : function(e) {
     	document._appcacheChecking = true;
-    	//debug for flapper
-        var date; var currentTime;
-        if(window.localStorage) {
-        	date = new Date();
-            currentTime = date.getTime();
-            var old = window.localStorage.getItem("handleAppcacheChecking");
-            var update = old?(old+"; TS:"+currentTime):("TS:"+currentTime);
-            window.localStorage.setItem("handleAppcacheChecking",update);
-        }
         if (priv.isDevMode()) {
             // TODO IBOGDANOV Why are you checking in commented out code like
             // this???
@@ -628,15 +614,6 @@ var priv = {
     },
 
     handleAppcacheUpdateReady : function(event) {
-    	//debug for flapper
-        var date; var currentTime;
-        if(window.localStorage) {
-        	date = new Date();
-            currentTime = date.getTime();
-        	var old = window.localStorage.getItem("handleAppcacheUpdateReady");
-            var update = old?(old+"; TS:"+currentTime):("TS:"+currentTime);
-            window.localStorage.setItem("handleAppcacheUpdateReady",update);
-        }
     	if (window.applicationCache.swapCache) {
             window.applicationCache.swapCache();
         }
@@ -656,27 +633,11 @@ var priv = {
     },
 
     handleAppcacheError : function(e) {
-    	//debug for flapper
-        var date; var currentTime;
-        if(window.localStorage) {
-        	date = new Date();
-            currentTime = date.getTime();
-        	var old = window.localStorage.getItem("handleAppcacheError");
-            var update = old?(old+"; TS:"+currentTime):("TS:"+currentTime);
-            window.localStorage.setItem("handleAppcacheError",update);
-        }
     	if (e.stopImmediatePropagation) {
             e.stopImmediatePropagation();
         }
         if (window.applicationCache
                 && (window.applicationCache.status === window.applicationCache.UNCACHED || window.applicationCache.status === window.applicationCache.OBSOLETE)) {
-        	//debug for flapper
-            if(window.localStorage) {
-            	date = new Date();
-                currentTime = date.getTime();
-            	window.localStorage.setItem("handleAppcacheError2",
-            			"window.applicationCache.status"+window.applicationCache.status+", return, TS:"+currentTime);
-            }
         	return;
         }
         var manifestURL = priv.getManifestURL();
@@ -685,14 +646,6 @@ var priv = {
         }
 
         if (manifestURL) {
-        	//debug for flapper
-            if(window.localStorage) {
-            	date = new Date();
-                currentTime = date.getTime();
-               
-            	window.localStorage.setItem("handleAppcacheError2",
-            			"send GET reqeust for manifestURL:"+manifestURL+", TS:"+currentTime);
-            }
             setTimeout(function() {
                 $A.util.transport.request({
                     "url" : manifestURL,
@@ -713,15 +666,6 @@ var priv = {
     },
 
     handleAppcacheDownloading : function(e) {
-    	//debug for flapper
-        var date; var currentTime;
-        if(window.localStorage) {
-        	date = new Date();
-            currentTime = date.getTime();
-            var old = window.localStorage.getItem("handleAppcacheDownloading");
-            var update = old?(old+"; TS:"+currentTime):("TS:"+currentTime);
-            window.localStorage.setItem("handleAppcacheDownloading",update);
-        }
         if (priv.isDevMode()) {
             var progress = Math.round(100 * e.loaded / e.total);
             priv.showProgress(progress + 1);
@@ -731,15 +675,6 @@ var priv = {
     },
 
     handleAppcacheProgress : function(e) {
-    	//debug for flapper
-        var date; var currentTime;
-        if(window.localStorage) {
-        	date = new Date();
-            currentTime = date.getTime();
-            var old = window.localStorage.getItem("handleAppcacheProgress");
-            var update = old?(old+"; TS:"+currentTime):("TS:"+currentTime);
-            window.localStorage.setItem("handleAppcacheProgress",update);
-        }
         if (priv.isDevMode()) {
             var progress = Math.round(100 * e.loaded / e.total);
             priv.showProgress(progress);
@@ -747,43 +682,16 @@ var priv = {
     },
 
     handleAppcacheNoUpdate : function(e) {
-    	//debug for flapper
-        var date; var currentTime;
-        if(window.localStorage) {
-        	date = new Date();
-            currentTime = date.getTime();
-            var old = window.localStorage.getItem("handleAppcacheNoUpdate");
-            var update = old?(old+"; TS:"+currentTime):("TS:"+currentTime);
-            window.localStorage.setItem("handleAppcacheNoUpdate",update);
-        }
         if (priv.isDevMode()) {
             priv.showProgress(100);
         }
     },
 
     handleAppcacheCached : function(e) {
-    	//debug for flapper
-        var date; var currentTime;
-        if(window.localStorage) {
-        	date = new Date();
-            currentTime = date.getTime();
-            var old = window.localStorage.getItem("handleAppcacheCached");
-            var update = old?(old+"; TS:"+currentTime):("TS:"+currentTime);
-            window.localStorage.setItem("handleAppcacheCached",update);
-        }
     	priv.showProgress(100);
     },
 
     handleAppcacheObsolete : function(e) {
-        //debug for flapper
-        var date; var currentTime;
-    	if(window.localStorage) {
-        	date = new Date();
-            currentTime = date.getTime();
-            var old = window.localStorage.getItem("handleAppcacheObsolete");
-            var update = old?(old+"; TS:"+currentTime):("TS:"+currentTime);
-            window.localStorage.setItem("handleAppcacheObsolete",update);
-        }
     	priv.hardRefresh();
     },
 

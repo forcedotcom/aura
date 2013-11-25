@@ -185,6 +185,43 @@ public class JsonTest extends UnitTestCase {
         assertEquals("{\n", json.getAppendable().toString());
     }
 
+    private static class NoSerializerClass { public NoSerializerClass() { } };
+
+    private static class NoSerializerContext extends DefaultJsonSerializationContext {
+        public NoSerializerContext() {
+            super(false, false, false);
+        }
+
+        @Override
+        public JsonSerializer<Object> getSerializer(Object o) {
+            if (o instanceof NoSerializerClass) {
+                return null;
+            }
+            return super.getSerializer(o);
+        }
+    }
+
+    public void testWriteValueNoSerializer() throws IOException {
+        Json json = new Json(new StringBuilder(), null, new NoSerializerContext());
+        try {
+            json.writeValue(new NoSerializerClass());
+            fail("should throw exception");
+        } catch (JsonSerializerNotFoundException jse) {
+            assertTrue(jse.getMessage().contains("NoSerializerClass"));
+        }
+    }
+
+    public void testWriteKeyNoSerializer() throws IOException {
+        Json json = new Json(new StringBuilder(), null, new NoSerializerContext());
+        json.writeMapBegin();
+        try {
+            json.writeMapKey(new NoSerializerClass());
+            fail("should throw exception");
+        } catch (JsonSerializerNotFoundException jse) {
+            assertTrue(jse.getMessage().contains("NoSerializerClass"));
+        }
+    }
+
     public void testWriteMapEnd() throws IOException {
         try {
             Json json = new Json(new StringBuilder(), false, false);

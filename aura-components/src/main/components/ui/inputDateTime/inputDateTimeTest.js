@@ -21,10 +21,20 @@
     testInitialValue:{
         attributes : {value: '2012-09-10T14:00:00.000Z', format: 'MM/dd/yyyy HH:mm:ss', timezone: 'Europe/Berlin'},
         test: function(cmp){
-            aura.test.addWaitFor(true, function(){return cmp.find("inputText").getElement().value.length > 0;},function(){
-                var inputDateStr = cmp.find("inputText").getElement().value;
-                aura.test.assertEquals("09/10/2012 16:00:00", inputDateStr, "Incorrect initial date/time display.");
-            });
+        	aura.test.addWaitFor(false, 
+        			function() {
+        				return $A.util.isUndefinedOrNull(cmp.find("inputText").getElement().value);
+        			},
+        			function() {
+        				aura.test.addWaitFor(true, 
+        						function(){return cmp.find("inputText").getElement().value.length > 0;},
+        						function(){
+        							var inputDateStr = cmp.find("inputText").getElement().value;
+        							aura.test.assertEquals("09/10/2012 16:00:00", inputDateStr, "Incorrect initial date/time display.");
+        						}
+        				);
+        			}
+        	);
         }
     },
 

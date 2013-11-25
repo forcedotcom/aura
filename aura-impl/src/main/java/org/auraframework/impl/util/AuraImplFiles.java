@@ -52,7 +52,7 @@ public enum AuraImplFiles {
      * into, also in the resources module
      */
     AuraResourceJavascriptClassDirectory(AuraFiles.Core.getPath(), "aura-resources", "target", "classes", "aura",
-            "javascript"), 
+            "javascript"),
     /**
      * javascript source file directory for xUnit tests 
      */
@@ -60,7 +60,17 @@ public enum AuraImplFiles {
     /**
      * javascript tests destination, xUnit test files are generated into this directory
      */
-    AuraResourceJavascriptTestDirectory(AuraImplModuleDirectory.getPath(), "target", "xunitjs");
+    AuraResourceJavascriptTestDirectory(AuraImplModuleDirectory.getPath(), "target", "xunitjs"),
+
+    /**
+     * aura-resources Module Root dir
+     */
+    AuraResourcesModuleDirectory(AuraFiles.Core.getPath(), "aura-resources"),
+
+    /**
+     * aura-resources source directory
+     */
+    AuraResourcesSourceDirectory(AuraResourcesModuleDirectory.getPath(), "src/main/resources");
     
     private final String path;
 

@@ -29,7 +29,9 @@ import org.auraframework.util.javascript.directive.JavascriptGeneratorMode;
  */
 public class AuraJavascriptGroup extends DirectiveBasedJavascriptGroup {
 
-    static final String GROUP_NAME = "aura";
+    public static final String GROUP_NAME = "aura";
+    // file name of properties file that contains compiled version info
+    public static final String FILE_NAME = "aurafwuid.properties";
 
     public AuraJavascriptGroup() throws IOException {
         this(AuraImplFiles.AuraJavascriptSourceDirectory.asFile());

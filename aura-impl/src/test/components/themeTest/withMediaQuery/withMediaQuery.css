@@ -1,0 +1,5 @@
+@media theme('themeTest.mqTheme.normal') {
+  .THIS {
+    color: red;
+  }  
+}

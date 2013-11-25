@@ -19,6 +19,6 @@
     <aura:attribute name="cmpType" type="string"/>
     <aura:attribute name="ref" type="Object"/>
 
-    <ui:button label="submit" press="{!c.submit}"/> <br/>
+    <ui:button aura:id="submitBtn" label="submit" press="{!c.submit}"/> <br/>
     Value is: <ui:outputText aura:id="outputValue" value=""/> <br/>
 </aura:component>

@@ -22,9 +22,6 @@
             helper.updateGlobalEventListeners(component);
         }
         var ret = this.superAfterRender();
-        if (visible === true) {
-            helper.localizeToday(component);
-        }
         helper.position(component);
         return ret;
     },
@@ -37,9 +34,6 @@
             helper.updateGlobalEventListeners(component);
         }
         this.superRerender();
-        if (visible === true) {
-            helper.localizeToday(component);
-        }
         helper.position(component);
         var isAndroid = $A.getGlobalValueProviders().get("$Browser.isAndroid");
         if (isAndroid == true) {

@@ -49,7 +49,7 @@ public class CommonJavascriptGroupImplTest extends UnitTestCase {
         assertEquals("Javascript Group name not set on the group object", localCJG.getName(), "test");
         // Verify Initialization
         verifyCleanState(localCJG);
-        localCJG.reset();
+        localCJG.clear();
         verifyCleanState(localCJG);
         String validJSFile = "head.js";
         String validJSDirectory = "/dummyDir";
@@ -60,7 +60,7 @@ public class CommonJavascriptGroupImplTest extends UnitTestCase {
         assertTrue("Directories should be accepted for Javascript Groups", localCJG.getFiles().size() == 1);
         // There should only be one js file and that should be innersibling.js
         assertTrue("", localCJG.getFiles().iterator().next().getName().equals(file.getName()));
-        localCJG.reset();
+        localCJG.clear();
         try {
             localCJG.addDirectory(validJSFile);
             fail("Add Directory should not be accepting files");
@@ -83,26 +83,26 @@ public class CommonJavascriptGroupImplTest extends UnitTestCase {
         File[] list = localCJG.getFiles().toArray(new File[localCJG.getFiles().size()]);
         assertFalse("Addition of a valid javascript file failed",
                 list.length == 1 || list[0].getName().equals("head.js"));
-        localCJG.reset();
+        localCJG.clear();
         try {
             localCJG.addFile(validJSDirectory);
             fail("Add File should not be accepting files");
         } catch (FileNotFoundException e) {
-            assertTrue("Add File function failed because of an unexpected error",
-                    e.getMessage().startsWith("File did not exist or was not a .js file: "));
+            assertTrue("Add File function failed because of an unexpected error message",
+                    e.getMessage().startsWith("File did not exist or was not a valid, acceptable file: "));
         }
         try {
             localCJG.addFile(invalidJSDirectory);
             fail("Add File should not be accepting non existing directories");
         } catch (FileNotFoundException e) {
-            assertTrue("Add File function failed because of an unexpected error",
-                    e.getMessage().startsWith("File did not exist or was not a .js file: "));
+            assertTrue("Add File function failed because of an unexpected error message",
+                    e.getMessage().startsWith("File did not exist or was not a valid, acceptable file: "));
         }
         // Create a new file and add it to the Group and verify that the last
         // mod date has been changed.
-        localCJG.reset();
+        localCJG.clear();
         String newFileName = new Long(System.currentTimeMillis()).toString() + ".js";
-        File newFile = new File(localCJG.root, newFileName);
+        File newFile = new File(localCJG.getRoot(), newFileName);
         Writer writer = new FileWriter(newFile);
         writer.write("");
         writer.close();
@@ -220,6 +220,10 @@ public class CommonJavascriptGroupImplTest extends UnitTestCase {
 
         @Override
         public void regenerate(File destRoot) throws IOException {
+        }
+
+        @Override
+        public void reset() throws IOException {
         }
     }
 }

@@ -328,15 +328,6 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         }
     }
 
-    public void testThemeAliasDependencies() throws QuickFixException {
-        DefDescriptor<ThemeDef> theme = addSourceAutoCleanup(ThemeDef.class, "<aura:theme/>");
-        DefDescriptor<ComponentDef> cmp = addSourceAutoCleanup(ComponentDef.class,
-                String.format("<aura:component themeAlias=\"var=%s\"></aura:component>", theme.getDescriptorName()));
-        Set<DefDescriptor<?>> dependencies = Sets.newHashSet();
-        cmp.getDef().appendDependencies(dependencies);
-        assertTrue(dependencies.contains(theme));
-    }
-
     /**
      * AuraRuntimeException if model is empty.
      */
@@ -885,7 +876,8 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
             define(baseTag, "render=''", "");
             fail("Should not be able to load component with empty render value");
         } catch (Exception e) {
-            checkExceptionRegex(e, IllegalArgumentException.class, "No enum const(ant)? (class )?org\\.auraframework\\.def\\.BaseComponentDef.RenderType\\.");
+            checkExceptionRegex(e, IllegalArgumentException.class,
+                    "No enum const(ant)? (class )?org\\.auraframework\\.def\\.BaseComponentDef.RenderType\\.");
         }
     }
 

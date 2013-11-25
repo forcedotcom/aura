@@ -17,7 +17,6 @@ package org.auraframework.component.auradev;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.SortedSet;
 
 import org.auraframework.Aura;
@@ -42,8 +41,7 @@ import com.google.common.collect.Sets;
 @Model
 public class ShowDependenciesModel {
 	public ShowDependenciesModel() throws QuickFixException {
-		this((String) getAttributeValue("component"),
-				(Boolean) getAttributeValue("clearPreloads"));
+		this((String) getAttributeValue("component"));
 	}
 
 	private static Object getAttributeValue(String name)
@@ -52,23 +50,16 @@ public class ShowDependenciesModel {
 				.getCurrentComponent().getAttributes().getValue(name);
 	}
 
-	public ShowDependenciesModel(final String cmpname,
-			final boolean clearPreloads) {
+	public ShowDependenciesModel(final String cmpname) {
 		AuraContext context = Aura.getContextService().getCurrentContext();
 		DefDescriptor<?> descriptor;
 		SortedSet<DefDescriptor<?>> sorted;
 		MasterDefRegistry mdr = context.getDefRegistry();
-		Set<String> preloads = null;
 		String uid;
 
 		this.error = true;
 		this.items = Lists.newArrayList();
 		try {
-			if (clearPreloads) {
-				preloads = context.getPreloads();
-				context.clearPreloads();
-			}
-
 			Definition def = Aura.getDefinitionService().getDefinition(cmpname,
 					DefType.COMPONENT, DefType.APPLICATION);
 			if (def == null) {
@@ -88,12 +79,6 @@ public class ShowDependenciesModel {
 					"%s: %s : list of reached components...",
 					AuraTextUtil.escapeForHTML(cmpname), t.getMessage());
 			sorted = Sets.newTreeSet(mdr.filterRegistry(null).keySet());
-		} finally {
-			if (preloads != null) {
-				for (String p : preloads) {
-					context.addPreload(p);
-				}
-			}
 		}
 		
 		try {

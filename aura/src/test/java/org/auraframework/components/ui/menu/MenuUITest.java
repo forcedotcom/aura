@@ -22,6 +22,7 @@ import org.auraframework.test.*;
 import org.auraframework.test.WebDriverTestCase.TargetBrowsers;
 import org.auraframework.test.WebDriverUtil.BrowserType;
 import org.openqa.selenium.*;
+import org.openqa.selenium.interactions.Actions;
 
 /**
  * UI automation to verify Action, checkbox and radio Menu using mouse and keyboard interaction .
@@ -32,8 +33,8 @@ import org.openqa.selenium.*;
 @TargetBrowsers({BrowserType.GOOGLECHROME, BrowserType.FIREFOX})
 public class MenuUITest extends WebDriverTestCase{
 
-	public static final String MENUTEST_APP = "/uitest/menuTest.app";
-	public static final String MENUTEST_METADATA_APP = "/uitest/menuMetadataTest.app";
+	public static final String MENUTEST_APP = "/uitest/menu_Test.app";
+	public static final String MENUTEST_METADATA_APP = "/uitest/menu_MetadataTest.app";
 	
 	public MenuUITest(String name) {
 		super(name);
@@ -346,5 +347,24 @@ public class MenuUITest extends WebDriverTestCase{
 		String uiMenu = auraUITestingUtil.getFindAtRootExpr(uiMenuLocalId);
 		auraUITestingUtil.getEval("$A.unrender(" + uiMenu + ")");
 		assertFalse("UiMenu should not be present after unrender", isElementPresent(By.className(uiMenuClassName)));
+	}
+	
+	/**
+	 * Test case to check double clicking on Menu Trigger link component within 350ms
+	 * with disableDoubleClicks attribute set disregards the 2nd click.
+	 * Test case for W-1855568
+	 * @throws MalformedURLException
+	 * @throws URISyntaxException
+	 */
+	public void testDoubleClickOnMenuTrigger() throws MalformedURLException, URISyntaxException{
+		open(MENUTEST_APP);
+		String label = "triggercheckPosition";
+		String menuName = "checkPosition";
+		WebDriver driver = this.getDriver();
+		WebElement menuLabel = driver.findElement(By.className(label));
+		WebElement menu = driver.findElement(By.className(menuName));
+		Actions a = new Actions(driver);
+		a.doubleClick(menuLabel).build().perform();
+		assertTrue("Check Menu list should be expanded even after double click", menu.getAttribute("class").contains("visible"));
 	}
 }

@@ -8,7 +8,7 @@
   <parent>
     <groupId>org.auraframework</groupId>
     <artifactId>aura-framework</artifactId>
-    <version>0.401-SNAPSHOT</version>
+    <version>0.512-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
@@ -71,7 +71,12 @@
 
     <profiles>
         <profile>
-            <id>test-archetype</id>
+            <id>runIntTests</id>
+            <activation>
+                <property>
+                    <name>runIntTests</name>
+                </property>
+            </activation>
             <build>
                 <testResources>
                     <testResource>

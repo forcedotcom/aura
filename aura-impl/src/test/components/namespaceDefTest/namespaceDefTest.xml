@@ -3,6 +3,7 @@
         <tokens>
             <FOO>red</FOO>
             <BAR>baz</BAR>
+            <GRADIENT>to bottom, hsl(0, 80%, 70%), #bada55</GRADIENT>
         </tokens>
     </style>
 </aura:namespace>

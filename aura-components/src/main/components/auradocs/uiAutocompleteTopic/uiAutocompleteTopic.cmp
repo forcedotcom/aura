@@ -85,7 +85,7 @@ matchEvt.fire();</auradocs:codeblock>
 var dataProvider = component.getConcreteComponent();
 //Fire the onchange event in the ui:dataProvider component
 this.fireDataChangeEvent(dataProvider, data);</auradocs:codeblock>
-	<p>See the data provider at <code>aura/src/test/components/uitest/testAutocompleteDataProvider</code> in the GitHub repo.</p>
+	<p>See the data provider at <code>aura/src/test/components/uitest/autocomplete_TestDataProvider</code> in the GitHub repo.</p>
 	<p>To learn how the data provider is retrieving data from the model, see the server-side model at <code>/aura-impl/src/test/java/org/auraframework/impl/java/model/TestJavaModel.java</code> in the GitHub repo.</p> 
 	
 	<h3>Styling Your Auto-complete Component</h3>

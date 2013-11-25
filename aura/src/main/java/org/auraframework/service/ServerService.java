@@ -16,7 +16,6 @@
 package org.auraframework.service;
 
 import java.io.IOException;
-import java.util.concurrent.Future;
 
 import org.auraframework.Aura;
 import org.auraframework.system.AuraContext;
@@ -33,5 +32,4 @@ import org.auraframework.throwable.quickfix.QuickFixException;
  */
 public interface ServerService extends AuraService {
     Message<?> run(Message<?> message, AuraContext context) throws QuickFixException, IOException;
-    Future<?> runAsync(final Message<?> message, final Appendable callback, final AuraContext context);
 }

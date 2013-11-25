@@ -15,6 +15,10 @@
  */
 ({  
     displayDatePicker: function(component) {
+        var datePicker = component.find("datePicker");
+        if (!datePicker || datePicker.get("v.visible") === true) {
+            return;
+        }
         var now = new Date(); // local date
         // Later on, we will use getUTC... methods to get year/month/date
         var currentDate = new Date(Date.UTC(now.getFullYear(), 
@@ -129,10 +133,12 @@
     
     popUpDatePicker: function(component, date) {
         var datePicker = component.find("datePicker");
-        datePicker.setValue("v.value", this.getUTCDateString(date));
-        datePicker.setValue("v.hours", date.getUTCHours());
-        datePicker.setValue("v.minutes", date.getUTCMinutes());
-        datePicker.setValue("v.is24HourFormat", this.is24HourFormat(component));
-        datePicker.setValue("v.visible", true);
+        if (datePicker) {
+            datePicker.setValue("v.value", this.getUTCDateString(date));
+            datePicker.setValue("v.hours", date.getUTCHours());
+            datePicker.setValue("v.minutes", date.getUTCMinutes());
+            datePicker.setValue("v.is24HourFormat", this.is24HourFormat(component));
+            datePicker.setValue("v.visible", true);
+        }
     }
 })

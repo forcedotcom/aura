@@ -90,6 +90,17 @@
             this.assertErrorMessage("foo : bar");
         }
     },
+    testDuplicateErrorMsgAllExpected : {
+    	test : function(cmp) { 
+    		//on test_priv: we allow duplication with expecting error messages
+    		$A.test.expectAuraError("foo");
+    		$A.test.expectAuraError("foo");
+    		//on browser: error msg comes later will override previous one
+    		$A.error("foo", new Error("bar1"));
+    		$A.error("foo", new Error("bar2"));
+    		this.assertErrorMessage("foo : bar2");
+    	}
+    },
     /**
      * Verify passing a string in for the Error param of $A.error() gives an unrecognized paremeter error message.
      */

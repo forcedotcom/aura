@@ -24,6 +24,7 @@ import org.auraframework.def.ModelDef;
 import org.auraframework.def.TestSuiteDef;
 import org.auraframework.instance.Model;
 import org.auraframework.system.Source;
+import org.auraframework.test.Resettable;
 import org.auraframework.test.mock.DelegatingStubHandler;
 import org.auraframework.test.mock.Invocation;
 import org.auraframework.test.mock.MockModel;
@@ -51,8 +52,8 @@ public class JavascriptMockModelHandler extends JavascriptMockHandler<ModelDef> 
 
         List<Stub<?>> stubs = getStubs(map.get("stubs"));
 
-        return (ModelDef) Proxy.newProxyInstance(this.getClass().getClassLoader(), new Class<?>[] { ModelDef.class },
-                new DelegatingStubHandler(baseDef, stubs));
+        return (ModelDef) Proxy.newProxyInstance(this.getClass().getClassLoader(), new Class<?>[] { ModelDef.class,
+                Resettable.class }, new DelegatingStubHandler(baseDef, stubs));
     }
 
     @SuppressWarnings("unchecked")
@@ -60,7 +61,8 @@ public class JavascriptMockModelHandler extends JavascriptMockHandler<ModelDef> 
     protected <T> T getValue(Object object, Class<T> retClass) throws QuickFixException {
         if (object != null && Model.class.equals(retClass)) {
             if (!(object instanceof Map)) {
-                throw new InvalidDefinitionException("Mock Model expects a map of property names to Answers.", getLocation());
+                throw new InvalidDefinitionException("Mock Model expects a map of property names to Answers.",
+                        getLocation());
             }
             Map<String, Object> properties = Maps.newHashMap();
             Map<?, ?> propMap = (Map<?, ?>) object;

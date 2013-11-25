@@ -13,12 +13,15 @@
      *   I believe it's safe to assume that these are large enough to hold our keys and objects. to be 100% sure we would need
      *   to have tests running on the devices
      */
-	//we have a white-list of browsers('GOOGLECHROME', 'SAFARI') in this test because we only support webkit browser for smart store adapter.the smart store is only accessible via our mobile SDK. 
-	browsers: ['GOOGLECHROME', 'SAFARI'],
+    //we have a white-list of browsers('GOOGLECHROME', 'SAFARI') in this test because we only support webkit browser for smart store adapter.the smart store is only accessible via our mobile SDK. 
+    browsers: ['GOOGLECHROME', 'SAFARI'],
     setUp:function(cmp){
         this.adapter = new $A.storageService.createAdapter("smartstore", "test");
         this.setItemCallCounter = 0;
         this.removeItemCallCounter = 0;
+        
+        // Constants:
+        this.SALESFORCE_MOBILE_SDK_VERSION = "2.0.0"
         
         // store references to some functions for the purpose of restoring mocks later
         this.overrides = [];
@@ -29,6 +32,40 @@
             this.overrides[i].restore();
         }
     },
+    
+    /**
+     * Test to ensure that the mobile SDK in use is of the correct version:
+     */
+    testMobileSdkVersion: {
+        test: [
+            function(cmp) {
+                var self = this;
+                self._sdkVersion = null;
+                
+                function successCallback(versionInformation) {
+                    self._sdkVersion = versionInformation && versionInformation.sdkVersion;
+                }
+                
+                function errorCallback() {
+                    self._sdkVersion = "ERROR";
+                }
+                
+                cordova.require("salesforce/plugin/sdkinfo").getInfo(successCallback, errorCallback);
+                
+                $A.test.addWaitFor(true, function() {
+                    return self._sdkVersion !== null;
+                });
+            },
+            function(cmp) {
+                $A.test.assertEquals(
+                    this._sdkVersion, 
+                    this.SALESFORCE_MOBILE_SDK_VERSION, 
+                    "Unexpected Mobile SDK Version"
+                );
+            }
+        ]
+    },
+    
     /**
      * Test status when the storage is empty.
      */
@@ -440,32 +477,32 @@
     testMultiAdapterSetItem:{
         test:[
             function(cmp){
-            	this._adapters = {
+                this._adapters = {
                     test: new $A.storageService.createAdapter("smartstore", "test"),
                     test2: new $A.storageService.createAdapter("smartstore", "test2")
-            	}
-            	
-            	// Write key1 to two adapters with different names:
+                }
+                
+                // Write key1 to two adapters with different names:
                 this.setAndWaitForItem(this._adapters.test, "key1", {"value":"in test"});
                 this.setAndWaitForItem(this._adapters.test2, "key1", {"value":"in test2"});
             },
             
             function(cmp){
-            	// Both values written in the previous step should be accessible from
-            	// their respective adapters even though they have the same key.
+                // Both values written in the previous step should be accessible from
+                // their respective adapters even though they have the same key.
                 this.assertGet(this._adapters.test, "key1", {"value":"in test"});
                 this.assertGet(this._adapters.test2, "key1", {"value":"in test2"});
             },
             
             function(cmp) {
-            	// Test overwriting values for multiple soups works:
-            	this.setAndWaitForItem(this._adapters.test, "key1", {"value":"in test updated"});
+                // Test overwriting values for multiple soups works:
+                this.setAndWaitForItem(this._adapters.test, "key1", {"value":"in test updated"});
                 this.setAndWaitForItem(this._adapters.test2, "key1", {"value":"in test2 updated"});
             }, 
             
             function(cmp){
-            	// Both values updated in the previous step should be accessible from
-            	// their respective adapters even though they have the same key.
+                // Both values updated in the previous step should be accessible from
+                // their respective adapters even though they have the same key.
                 this.assertGet(this._adapters.test, "key1", {"value":"in test updated"});
                 this.assertGet(this._adapters.test2, "key1", {"value":"in test2 updated"});
             },
@@ -479,34 +516,34 @@
     testMultiAdapterRemoveItem:{
         test:[
             function(cmp){
-            	this._adapters = {
+                this._adapters = {
                     test: new $A.storageService.createAdapter("smartstore", "test"),
                     test2: new $A.storageService.createAdapter("smartstore", "test2")
-            	}
-            	
-            	// Write key1 to two adapters with different names:
+                }
+                
+                // Write key1 to two adapters with different names:
                 this.setAndWaitForItem(this._adapters.test, "key1", {"value":"in test"});
                 this.setAndWaitForItem(this._adapters.test2, "key1", {"value":"in test2"});
             },
             
             function(cmp){
-            	// Remove key1 from the test adapter:
-            	this.removeAndWaitForItem(this._adapters.test, "key1");
+                // Remove key1 from the test adapter:
+                this.removeAndWaitForItem(this._adapters.test, "key1");
             },
             
             function(cmp){
-            	// Test had key1 removed, test2 should be unaffected:
+                // Test had key1 removed, test2 should be unaffected:
                 this.assertGetUndefinedOrNull(this._adapters.test, "key1");
                 this.assertGet(this._adapters.test2, "key1", {"value":"in test2"});
             },
             
             function(cmp){
-            	// Remove the item from the test2 adapter:
-            	this.removeAndWaitForItem(this._adapters.test2, "key1");
+                // Remove the item from the test2 adapter:
+                this.removeAndWaitForItem(this._adapters.test2, "key1");
             },
             
             function(cmp){
-            	// Both adapters should now have nothing for key1:
+                // Both adapters should now have nothing for key1:
                 this.assertGetUndefinedOrNull(this._adapters.test, "key1");
                 this.assertGetUndefinedOrNull(this._adapters.test2, "key1");
             }
@@ -520,34 +557,34 @@
     testMultiAdapterClear:{
         test:[
             function(cmp){
-            	this._adapters = {
+                this._adapters = {
                     test: new $A.storageService.createAdapter("smartstore", "test"),
                     test2: new $A.storageService.createAdapter("smartstore", "test2")
-            	}
-            	
-            	// Write key1 to two adapters with different names:
+                }
+                
+                // Write key1 to two adapters with different names:
                 this.setAndWaitForItem(this._adapters.test, "key1", {"value":"in test"});
                 this.setAndWaitForItem(this._adapters.test2, "key1", {"value":"in test2"});
             },
             
             function(cmp){
-            	// clear the test adapter:
-            	this.clear(this._adapters.test);
+                // clear the test adapter:
+                this.clear(this._adapters.test);
             },
             
             function(cmp){
-            	// The test adapters has been cleared, it should have no items:
+                // The test adapters has been cleared, it should have no items:
                 this.assertNumItems(this._adapters.test, 0);
                 this.assertNumItems(this._adapters.test2, 1);
             },
             
             function(cmp){
-            	// Clear the test2 adapter:
-            	this.clear(this._adapters.test2);
+                // Clear the test2 adapter:
+                this.clear(this._adapters.test2);
             },
             
             function(cmp){
-            	// Both adapters are now empty:
+                // Both adapters are now empty:
                 this.assertNumItems(this._adapters.test, 0);
                 this.assertNumItems(this._adapters.test2, 0);
             }
@@ -561,33 +598,33 @@
     testMultiAdapterCounting:{
         test:[
             function(cmp){
-            	this._adapters = {
+                this._adapters = {
                     test: new $A.storageService.createAdapter("smartstore", "test"),
                     test2: new $A.storageService.createAdapter("smartstore", "test2")
-            	}
-            	
-            	// Write 2 items to the test adapter:
+                }
+                
+                // Write 2 items to the test adapter:
                 this.setAndWaitForItem(this._adapters.test, "key1", {"value":"in test"});
                 this.setAndWaitForItem(this._adapters.test, "key2", {"value2":"in test"});
             },
             
             function(cmp){
-            	// Counts the items in the adapters:
-            	this.assertNumItems(this._adapters.test, 2);
-            	this.assertNumItems(this._adapters.test2, 0);
+                // Counts the items in the adapters:
+                this.assertNumItems(this._adapters.test, 2);
+                this.assertNumItems(this._adapters.test2, 0);
             },
             
             function(cmp){
-            	// Add items to just test2
+                // Add items to just test2
                 this.setAndWaitForItem(this._adapters.test2, "key1", {"value":"in test2"});
                 this.setAndWaitForItem(this._adapters.test2, "key2", {"value2":"in test2"});
                 this.setAndWaitForItem(this._adapters.test2, "key3", {"value3":"in test2"});
             },
             
             function(cmp){
-            	// Counts the items in the adapters:
-            	this.assertNumItems(this._adapters.test, 2);
-            	this.assertNumItems(this._adapters.test2, 3);
+                // Counts the items in the adapters:
+                this.assertNumItems(this._adapters.test, 2);
+                this.assertNumItems(this._adapters.test2, 3);
             }
         ]
     },
@@ -720,51 +757,51 @@
             function(cmp){
                 this.mockQuerySoupError();
                 this.assertSetItemFailure(
-            		this.adapter, 
-            		"key", 
-            		{"value": {"new":"value"}}, 
-            		"Error in setItem on call to SmartStore.querySoup: querySoup Mock Error"
-        		);
+                    this.adapter, 
+                    "key", 
+                    {"value": {"new":"value"}}, 
+                    "Error in setItem on call to SmartStore.querySoup: querySoup Mock Error"
+                );
             },
             function(cmp){
                 this.mockUpsertSoupEntriesWithExternalIdError();
                 this.assertSetItemFailure(
-            		this.adapter, 
-            		"key", 
-            		{"value": {"new":"value"}}, 
-            		"Error in setItem on call to SmartStore.upsertSoupEntriesWithExternalId: upsertSoupEntriesWithExternalId Mock Error"
-        		);
+                    this.adapter, 
+                    "key", 
+                    {"value": {"new":"value"}}, 
+                    "Error in setItem on call to SmartStore.upsertSoupEntriesWithExternalId: upsertSoupEntriesWithExternalId Mock Error"
+                );
             },
             function(cmp){
                 this.mockQuerySoupError();
                 this.assertGetItemFailure(
-            		this.adapter, 
-            		"key", 
-            		"Error in getItem on call to SmartStore.querySoup: querySoup Mock Error"
-        		);
+                    this.adapter, 
+                    "key", 
+                    "Error in getItem on call to SmartStore.querySoup: querySoup Mock Error"
+                );
             },
             function(cmp){
                 this.mockQuerySoupError();
                 this.assertRemoveItemFailure(
-            		this.adapter, 
-            		"a_key_to_remove", 
-            		"Error in removeItem on call to SmartStore.querySoup: querySoup Mock Error"
-        		);
+                    this.adapter, 
+                    "a_key_to_remove", 
+                    "Error in removeItem on call to SmartStore.querySoup: querySoup Mock Error"
+                );
             },
             function(cmp){
                 this.mockRemoveFromSoupError();
                 this.assertRemoveItemFailure(
-            		this.adapter, 
-            		"a_key_to_remove", 
-            		"Error in removeItem on call to SmartStore.removeFromSoup: removeFromSoup Mock Error"
-        		);
+                    this.adapter, 
+                    "a_key_to_remove", 
+                    "Error in removeItem on call to SmartStore.removeFromSoup: removeFromSoup Mock Error"
+                );
             },
             function(cmp){
                 this.mockRemoveSoupError();
                 this.assertClearFailure(
-            		this.adapter, 
-            		"Error in clear on call to SmartStore.removeSoup: removeSoup Mock Error"
-        		);
+                    this.adapter, 
+                    "Error in clear on call to SmartStore.removeSoup: removeSoup Mock Error"
+                );
             },
             /* TODO: Uncomment and fix after getExpired is properly fixed. */
             /*
@@ -815,18 +852,18 @@
             function(cmp){
                 this.mockRegisterSoupError();
                 this.assertClearFailure(
-            		this.adapter, 
-            		"Error in clear on call to SmartStore.registerSoup: registerSoup Mock Error"
-        		);
+                    this.adapter, 
+                    "Error in clear on call to SmartStore.registerSoup: registerSoup Mock Error"
+                );
             },
             function(cmp){
                 // subsequent calls to SmartStoreAdapter operations should fail fast
                 this.assertSetItemFailure(
-            		this.adapter, 
-            		"key", 
-            		{"value": {"oh":"my"}}, 
-            		"SmartStoreAdapter was improperly cleared."
-        		);
+                    this.adapter, 
+                    "key", 
+                    {"value": {"oh":"my"}}, 
+                    "SmartStoreAdapter was improperly cleared."
+                );
                 this.assertGetItemFailure(this.adapter, "key", "SmartStoreAdapter was improperly cleared.");
                 this.assertRemoveItemFailure(this.adapter, "a key", "SmartStoreAdapter was improperly cleared.");
                 this.assertClearFailure(this.adapter, "SmartStoreAdapter was improperly cleared.");
@@ -848,19 +885,19 @@
                 this.adapter = new $A.storageService.createAdapter("smartstore", "test");
                 
                 this.assertSetItemFailure(
-            		this.adapter, 
-            		"key", 
-            		{"value": {"oh":"my"}}, 
-            		"SmartStoreAdapter was not properly initialized."
-        		);
+                    this.adapter, 
+                    "key", 
+                    {"value": {"oh":"my"}}, 
+                    "SmartStoreAdapter was not properly initialized."
+                );
 
                 // subsequent calls to SmartStoreAdapter operations should fail fast
                 this.assertSetItemFailure(
-            		this.adapter, 
-            		"key", 
-            		{"value": {"oh":"my"}}, 
-            		"SmartStoreAdapter was not properly initialized."
-        		);
+                    this.adapter, 
+                    "key", 
+                    {"value": {"oh":"my"}}, 
+                    "SmartStoreAdapter was not properly initialized."
+                );
                 this.assertGetItemFailure(this.adapter, "key", "SmartStoreAdapter was not properly initialized.");
                 this.assertRemoveItemFailure(this.adapter, "a key", "SmartStoreAdapter was not properly initialized.");
                 this.assertClearFailure(this.adapter, "SmartStoreAdapter was not properly initialized.");
@@ -893,12 +930,12 @@
     assertGet:function(adapter, key, expected){
         var that = this;
         this.getAndWaitForItem(
-    		adapter,
-    		key,
+            adapter,
+            key,
             function(result) {
                     that.assertObjectEquals(expected, result, "Object value for " + key + " incorrect");
             }
-		);
+        );
     },
     /**
      * Assert an item retrieved in a getItem() call is undefined or null.
@@ -906,12 +943,12 @@
      */
     assertGetUndefinedOrNull:function(adapter, key){
         this.getAndWaitForItem(
-    		adapter,
-    		key,
+            adapter,
+            key,
             function(result) {
                 $A.test.assertUndefinedOrNull(result, "Null or undefined value for " + key + " incorrect");
             }
-		);
+        );
     },
     /**
      * Assert the results of a getExpired call.
@@ -920,7 +957,7 @@
     assertGetExpired:function(adapter, expected){
         var that = this;
         this.getAndWaitForExpired(
-    		adapter,
+            adapter,
             function(result) {
                 var expectedAsJson = $A.util.json.encode(expected);
                 var resultAsJson = $A.util.json.encode(result);
@@ -939,7 +976,7 @@
                     }
                 }
             }
-		);
+        );
     },
     /**
      * Assert that an operation fails.
@@ -1045,7 +1082,7 @@
      * the operation to complete.
      */
     setItem:function(adapter, key, value){
-    	this.setItemCallCounter++;
+        this.setItemCallCounter++;
         var that = this;
         adapter.setItem(
             key,
@@ -1086,7 +1123,7 @@
      * The calling test subfunction must terminate for the operation to complete.
      */
     getAndWaitForItem:function(adapter, key, callback){
-    	var getItemComplete = false;
+        var getItemComplete = false;
         var getItemResult = null;
         // invoke the getItem call asynchronously
         adapter.getItem(

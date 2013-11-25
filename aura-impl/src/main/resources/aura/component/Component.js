@@ -148,7 +148,7 @@ Component.prototype.deIndex = function(localId, globalId){
     // Unfortunately, there are some bizarre loops with deIndex and destroy.
     // For the moment, we don't enforce that this is a valid component until
     // we can track down _why_ it is being called on already destroyed components
-    if (!this.isValid()) {
+    if (!this.priv) {
         return null;
     }
 
@@ -447,13 +447,23 @@ Component.prototype.finishDestroy = function(){
  * act of doing an asynchronous destroy creates false 'races' because it leaves
  * all of the events wired up.</p>
  *
- * @param {Boolean} async Set to true if component should be destroyed asychronously. The default value is false.
+ * @param {Boolean} async Set to true if component should be destroyed asychronously. The default value is true.
  * @public
  */
 Component.prototype.destroy = function(async){
     var i;
 
+    //#if {"modes" : ["TESTING", "TESTINGDEBUG", "AUTOTESTING", "AUTOTESTINGDEBUG"]}
+	async = false; // Force synchronous destroy when in testing modes
+	//#end
+
     if (this.priv && !this._destroying){
+    	// DCHASMAN TODO W-1879487 Reverted in 188 because of hard to diagnose rerendering weirdness in a couple of tests and one:'s mru/lists view
+    	// Default to async destroy
+        /*if (async === undefined) {
+        	async = true;
+        }*/
+        
         var key;
 
         if (this.priv.docLevelHandlers !== undefined) {
@@ -464,13 +474,17 @@ Component.prototype.destroy = function(async){
                 }
             }
         }
+        
         if (async) {
+        	this._scheduledForAsyncDestruction = true;
+        	
             for (key in this.priv.elements){
                 var element = this.priv.elements[key];
                 if (element && element.style) {
                     element.style.display = "none";
                 }
             }
+            
             $A.util.destroyAsync(this);
 
             return null;
@@ -584,6 +598,7 @@ Component.prototype.destroy = function(async){
         this.priv = undefined;
         return globalId;
     }
+    
     return null;
 };
 
@@ -908,7 +923,7 @@ Component.prototype.fire = function(name) {
  * @public
  */
 Component.prototype.isValid = function(){
-    return !$A.util.isUndefined(this.priv);
+    return !this._scheduledForAsyncDestruction && this.priv;
 };
 
 /**

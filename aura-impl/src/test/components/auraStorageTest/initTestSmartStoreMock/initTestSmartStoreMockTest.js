@@ -1,4 +1,9 @@
 ({
+    // We have a white-list of browsers('GOOGLECHROME', 'SAFARI') in this test because we only support webkit
+    // browsers for the smart store adapter since the smart store is only accessible via our mobile SDK. 
+
+    browsers: ['GOOGLECHROME', 'SAFARI'],
+
     /**
      * Verify the smartstore adapter is selected for actions when auraStorage:init is used without
      * any specification.

@@ -50,8 +50,6 @@
 		<aura:handler name="init" value="{!this}" action="{!c.onInit}" />
 		<aura:handler name="change" value="{!v.pageComponents}" action="{!c.onPageComponentsChanged}" />
 		<aura:handler name="refreshCurrentPage" action="{!c.onRefreshCurrentPage}" />
-		
-		<ui:resizeObserver onresize="{!c.refresh}"/>
 					
 		<article class="{!v.class}" style="{!v.priv_carouselStyle}" role="article">
 		 

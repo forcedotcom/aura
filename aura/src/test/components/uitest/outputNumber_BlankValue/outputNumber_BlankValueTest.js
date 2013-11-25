@@ -14,11 +14,9 @@
  * limitations under the License.
  */
 ({
-    //@userStory a07T0000001isvq
     /**
      * Verify assigning an uninitialized local variable to outputNumber's value attribute.
      */
-    //W-952720
     testUninitializedValue:{
         test:function(cmp){
             var testOutputNumberCmp = cmp.find('uninitializedVariable');

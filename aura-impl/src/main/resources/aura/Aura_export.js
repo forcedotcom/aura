@@ -52,6 +52,7 @@ $A.ns.Aura.prototype["removeStats"] = $A.ns.Aura.prototype.removeStats;
 $A.ns.Aura.prototype["onLoadFired"] = $A.ns.Aura.prototype.onLoadFired;
 $A.ns.Aura.prototype["logLevel"] = $A.ns.Aura.prototype.logLevel;
 $A.ns.Aura.prototype["fitTo"] = $A.ns.Aura.prototype.fitTo;
+$A.ns.Aura.prototype["updateMarkName"] = $A.ns.Aura.prototype.updateMarkName;
 // //#end
 
 //#if {"excludeModes" : ["PRODUCTION"]}

@@ -27,6 +27,7 @@ import org.auraframework.def.ProviderDef;
 import org.auraframework.def.TestSuiteDef;
 import org.auraframework.instance.ComponentConfig;
 import org.auraframework.system.Source;
+import org.auraframework.test.Resettable;
 import org.auraframework.test.mock.Answer;
 import org.auraframework.test.mock.DelegatingStubHandler;
 import org.auraframework.test.mock.Invocation;
@@ -48,7 +49,7 @@ public class JavascriptMockProviderHandler extends JavascriptMockHandler<Provide
         ProviderDef baseDef = getBaseDefinition((String) map.get("descriptor"), ProviderDef.class);
         List<Stub<?>> stubs = getStubs(map.get("stubs"));
         return (ProviderDef) Proxy.newProxyInstance(this.getClass()
-                .getClassLoader(), new Class<?>[] { ProviderDef.class },
+                .getClassLoader(), new Class<?>[] { ProviderDef.class, Resettable.class },
                 new DelegatingStubHandler(baseDef, stubs));
     }
 

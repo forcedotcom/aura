@@ -15,10 +15,10 @@
  */
 {
 	afterRender: function(cmp, helper) {
-		helper.attachEvents(cmp);
 		//update size in case carousel width is not specified
 		helper.updateSize(cmp);
 		this.superAfterRender();
+		helper.attachEvents(cmp);
 		helper.selectDefaultPage(cmp);
 	},
 	
@@ -26,10 +26,11 @@
 		var shouldRerender = false,
 			width = cmp.getValue('v.width'),
 			height = cmp.getValue('v.height'),
+			cStyle = cmp.getValue('v.priv_carouselStyle'),	
 			pageCmps = cmp.getValue('v.pageComponents'),
 			forceUpdate = pageCmps.isDirty() ? true : false;
 
-		if (width.isDirty() || height.isDirty() || forceUpdate) {
+		if (width.isDirty() || height.isDirty() || cStyle.isDirty() || forceUpdate) {
 			helper.updateSize(cmp, forceUpdate);
 			shouldRerender = true;
 		}
@@ -40,5 +41,10 @@
 				helper.selectDefaultPage(cmp);
 			}			
 		}
+	},
+	
+	unrender: function(cmp, helper) {
+		helper.unrender(cmp);
+		this.superUnrender();
 	}
 }

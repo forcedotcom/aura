@@ -31,6 +31,7 @@ import org.apache.http.util.EntityUtils;
 import org.auraframework.Aura;
 import org.auraframework.test.AuraHttpTestCase;
 import org.auraframework.test.annotation.ThreadHostileTest;
+import org.auraframework.test.annotation.UnAdaptableTest;
 
 /**
  * Automation to verify the implementation of AuraFrameworkServlet. AuraFrameworkServlet responds to requests of pattern
@@ -43,6 +44,7 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
     public final String sampleBinaryResourcePath = "/auraFW/resources/aura/auraIdeLogo.png";
     public final String sampleTextResourcePath = "/auraFW/resources/aura/resetCSS.css";
     public final String sampleJavascriptResourcePath = "/auraFW/javascript/aura_dev.js";
+    public final String sampleJavascriptResourcePathWithNonce = "/auraFW/javascript/%s/aura_dev.js";
     public final String sampleBinaryResourcePathWithNonce = "/auraFW/resources/%s/aura/auraIdeLogo.png";
     public final String sampleTextResourcePathWithNonce = "/auraFW/resources/%s/aura/resetCSS.css";
     private final long timeWindowExpiry = 600000; // ten minute expiration test window
@@ -126,18 +128,6 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
         }
         String realPath = String.format(noncedPath, nonce);
 
-        return obtainGetMethod(realPath);
-    }
-
-    protected HttpGet obtainUidedGetMethod(String path, boolean fake) throws Exception {
-        String nonce;
-
-        if (fake) {
-            nonce = "thisisnotanonce";
-        } else {
-            nonce = Aura.getConfigAdapter().getAuraFrameworkNonce();
-        }
-        String realPath = path + "?aura.fwuid=" + nonce;
         return obtainGetMethod(realPath);
     }
 
@@ -225,7 +215,7 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
         Calendar stamp = Calendar.getInstance();
         stamp.add(Calendar.DAY_OF_YEAR, 45);
 
-        HttpGet get = obtainUidedGetMethod(sampleBinaryResourcePath, false);
+        HttpGet get = obtainNoncedGetMethod(sampleBinaryResourcePathWithNonce, false);
         get.setHeader(HttpHeaders.IF_MODIFIED_SINCE,
                 new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz").format(stamp.getTime()));
 
@@ -234,6 +224,20 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
         int statusCode = getStatusCode(httpResponse);
         assertEquals("Expected server to return a 304 for unexpired cache.", HttpStatus.SC_NOT_MODIFIED, statusCode);
         assertNull(getResponseBody(httpResponse));
+    }
+
+    /**
+     * Verify the Vary header is set to Accept-Encoding. This should be set for cacheable and compressed js/css files.
+     *
+     * UnAdaptableTest because SFDC removes vary header
+     */
+    @UnAdaptableTest
+    public void testHasVaryHeader() throws Exception {
+        HttpGet get = obtainNoncedGetMethod(sampleTextResourcePath, false);
+        HttpResponse response = perform(get);
+        Header varyHeader = response.getFirstHeader(HttpHeaders.VARY);
+        assertNotNull("Vary header is not set.", varyHeader);
+        assertEquals("Vary header set to wrong value.", "Accept-Encoding", varyHeader.getValue());
     }
 
     /**
@@ -344,23 +348,21 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
     /**
      * Verify that AuraFrameworkServlet responds successfully to valid request for a javascript resource.
      */
-    public void testRequestJavascriptResourceLongExpire() throws Exception {
+    public void testRequestJavascriptResourceNoExpire() throws Exception {
         HttpGet get = obtainGetMethod(sampleJavascriptResourcePath);
         HttpResponse response = perform(get);
 
         checkExpired(response, "text/javascript");
         get.releaseConnection();
+    }
 
-        get = obtainUidedGetMethod(sampleJavascriptResourcePath, false);
-        response = perform(get);
-
+    /**
+     * Verify that AuraFrameworkServlet responds successfully to valid request for nonced aura js
+     */
+    public void testRequestJavascriptResourceLongExpire() throws Exception {
+        HttpGet get = obtainNoncedGetMethod(sampleJavascriptResourcePathWithNonce, false);
+        HttpResponse response = perform(get);
         checkLongCache(response, "text/javascript");
-        get.releaseConnection();
-
-        get = obtainUidedGetMethod(sampleJavascriptResourcePath, true);
-        response = perform(get);
-
-        checkExpired(response, "text/javascript");
         get.releaseConnection();
     }
 

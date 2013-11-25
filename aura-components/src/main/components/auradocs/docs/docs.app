@@ -1,4 +1,4 @@
-<!--
+    <!--
 
     Copyright (C) 2013 salesforce.com, inc.
 
@@ -23,6 +23,9 @@
     preload="auradocs,aurastorage"
     locationChangeEvent="auradocs:locationChange"
     implements="auraStorage:refreshObserver">
+
+    <aura:dependency resource="auradocs:*" />
+    <aura:dependency resource="aurastorage:*" />
 
     <aura:handler event="aura:waiting" action="{!c.waiting}"/>
     <aura:handler event="aura:doneWaiting" action="{!c.doneWaiting}"/>

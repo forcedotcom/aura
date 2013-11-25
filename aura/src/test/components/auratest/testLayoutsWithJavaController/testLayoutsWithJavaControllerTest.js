@@ -16,7 +16,9 @@
 ({
     waitForLayoutItems: function(component, callback){
         aura.test.runAfterIf(
-            function(){return $A.util.hasClass(component.find("ready").getElement(),"layoutDone");},
+            function(){
+            	return $A.util.hasClass(component.find("ready").getElement(),"layoutDone");
+            },
             callback);
     },
 

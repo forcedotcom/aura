@@ -24,11 +24,11 @@ import org.auraframework.def.StyleDef;
 /**
  */
 public interface StyleDefBuilder extends DefBuilder<StyleDef, StyleDef> {
-
     StyleDefBuilder setClassName(String className);
 
     StyleDefBuilder setComponents(List<ComponentDefRef> components);
 
     StyleDefBuilder setThemeReferences(Set<String> themeReferences);
 
+    StyleDefBuilder setContent(String content);
 }

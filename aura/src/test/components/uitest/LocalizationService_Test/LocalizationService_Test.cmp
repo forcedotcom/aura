@@ -1,0 +1,48 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component >
+
+    timezoneGMT:<br/>
+    <ui:outputDateTime value="2004-09-23T16:30:00.000Z" timezone="GMT" aura:id="myOutputDateTimeComp" /> <br/>
+    <ui:outputDateTime value="2004-09-23T16:30:00.000+0800" timezone="GMT" aura:id="myOutputDateTimeCompGMT8" /> <br/> <!--Sep 23, 2004 8:30:00 AM-->
+
+    timezoneGMT+8 HongKong(No daylight saving time): <br/>
+    2013-11-02T16:01:00.000Z :<br/>
+    <ui:outputDateTime value="2013-11-02T16:01:00.000Z" timezone="Asia/Hong_Kong" aura:id="myOutputDateTimeCompHongKong1" /> <br/> <!--Nov 3, 2013 12:01:00 PM-->
+    2013-11-02T17:01:00.000Z :<br/>
+    <ui:outputDateTime value="2013-11-02T17:01:00.000Z" timezone="Asia/Hong_Kong" aura:id="myOutputDateTimeCompHongKong2" /> <br/> <!--Nov 3, 2013 1:01:00 PM-->
+    2013-11-02T18:01:00.000Z :<br/>
+    <ui:outputDateTime value="2013-11-02T18:01:00.000Z" timezone="Asia/Hong_Kong" aura:id="myOutputDateTimeCompHongKong3" /> <br/> <!--Nov 3, 2013 2:01:00 PM-->
+    
+    timezoneGMT-5 NewYork (GMT-4 in SummaryTime 03/10/2013 2am ~ 11/03/2013 1am): <br/>
+    2013-11-03T04:01:00.000Z :<br/> 
+    <ui:outputDateTime value="2013-11-03T04:01:00.000Z" timezone="America/New_York" aura:id="myOutputDateTimeCompNewYork1" /> <br/> <!-- Nov 3, 2013 12:01:00 AM -->
+    2013-11-03T05:01:00.000Z :<br/> 
+    <ui:outputDateTime value="2013-11-03T05:01:00.000Z" timezone="America/New_York" aura:id="myOutputDateTimeCompNewYork2" /> <br/> <!-- Nov 3, 2013 1:01:00 AM -->
+    2013-11-03T06:01:00.000Z :<br/> 
+    <ui:outputDateTime value="2013-11-03T06:01:00.000Z" timezone="America/New_York" aura:id="myOutputDateTimeCompNewYork3" /> <br/> <!-- again Nov 3, 2013 1:01:00 AM -->
+    
+    
+    
+    
+    <ui:outputDate value="2004-09-23" aura:id="myOutputDateComp" /> <br/>
+    <ui:outputText value="4:30:00 PM" aura:id="myOutputTextComp" /> <br/> 
+    <ui:outputNumber value="3.14159" format=".00" aura:id="myOutputNumberComp" /> <br/>
+    <ui:outputPercent value="0.14566" format=".00%" aura:id="myOutputPercentComp" /> <br/>
+    <ui:outputCurrency value="1234567890" format="¤#,##0.00" aura:id="myOutputCurrencyComp" /> 
+</aura:component>

@@ -24,10 +24,22 @@
 			scroller.unbindTransientHandlers();
 		}    	
     },
+    
     scrollTo: function(component, event, helper) {
     	helper.handleScrollTo(component, event);
     },
+    
     scrollBy: function(component, event, helper) {
     	helper.handleScrollBy(component, event);
+    },
+    
+    handleCanShowMoreChange: function (cmp, evt, hlp) {
+    	var newValue = evt.getParam('value').getValue(),
+    		oldValue = cmp.getValue('v.canShowMore').oldValue;
+    	
+    	// false => true ?
+    	if (!oldValue && newValue) {
+    		hlp.swapShowMore(cmp);	
+    	}
     }
 })

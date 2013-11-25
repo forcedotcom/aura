@@ -28,6 +28,8 @@
     },
     
     doInit: function(component, event, helper) {
+        helper.refreshYearSelection(component);
+        helper.localizeToday(component);
         component._windowSize = $A.util.getWindowSize();
     },
     
@@ -72,13 +74,16 @@
     },
     
     handleTabToday: function(component, event, helper) {
-        var keycode = event.keyCode;
-        if (keycode == 9) {
-            if (event.shiftKey == true) { // Tab + shift
-                event.preventDefault();
-                helper.focusDate(component);
-            } else { // Tab
-                component.setValue("v.visible", false);
+        var domEvent = event.getParam("domEvent");
+        if (domEvent) {
+            var keycode = domEvent.keyCode;
+            if (keycode == 9) {
+                if (domEvent.shiftKey == true) { // Tab + shift
+                    domEvent.preventDefault();
+                    helper.focusDate(component);
+                } else { // Tab
+                    component.setValue("v.visible", false);
+                }
             }
         }
     },
@@ -174,5 +179,9 @@
         var date = new Date();
         date.setFullYear(event.getParam("year"), event.getParam("month"));
         helper.updateMonthYear(component, date.getTime());
+    },
+    
+    yearChange: function(component, event, helper) {
+        helper.yearChange(component);
     }
 })

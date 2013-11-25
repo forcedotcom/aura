@@ -17,7 +17,9 @@ package org.auraframework.impl.java.controller;
 
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +29,7 @@ import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.instance.Component;
 import org.auraframework.system.Annotations.AuraEnabled;
+import org.auraframework.system.Annotations.BackgroundAction;
 import org.auraframework.system.Annotations.Controller;
 import org.auraframework.system.Annotations.Key;
 import org.auraframework.system.Location;
@@ -79,12 +82,40 @@ public class JavaTestController {
         return param;
     }
 
+    @AuraEnabled
+    public static String getSelectedParamLogging(@Key(value = "strparam", loggable = true) String strparam,
+            @Key(value = "intparam") int intparam) {
+        return strparam;
+    }
+
+    @AuraEnabled
+    public static String getMultiParamLogging(@Key(value = "we", loggable = true) String we,
+            @Key(value = "two", loggable = true) int two) {
+        return we + two;
+    }
+
+    @AuraEnabled
+    public static int getExplicitExcludeLoggable(@Key(value = "param", loggable = false) int param) {
+        return param;
+    }
+
+    @AuraEnabled
+    public static String getCustomParamLogging(@Key(value = "param", loggable = true) CustomParamType param) {
+        return "Anything";
+    }
+
+    public static class CustomParamType {
+        @Override
+        public String toString() {
+            return "CustomParamType_toString";
+        }
+    }
+
     /**
      * Note: these cases are pretty specific to js://test.testActionExceptions
      * 
      * @param exceptionType What type (class) of exception to throw
-     * @param cause Cause parameter of Exception. Either a class of type
-     *            Throwable or String
+     * @param cause Cause parameter of Exception. Either a class of type Throwable or String
      */
     @AuraEnabled
     public static void throwsThrowable(@Key("type") String exceptionType, @Key("cause") String cause) throws Throwable {
@@ -116,7 +147,7 @@ public class JavaTestController {
             throw new RuntimeException();
         }
     }
-    
+
     @AuraEnabled
     public static void throwsCSE(@Key("event") String event, @Key("paramName") String paramName,
             @Key("paramValue") String paramValue) throws Throwable {
@@ -147,8 +178,8 @@ public class JavaTestController {
     }
 
     /**
-     * Wait for delayMs milliseconds and then return a auratest:text component
-     * whose value is the current buffer contents plus the current append.
+     * Wait for delayMs milliseconds and then return a auratest:text component whose value is the current buffer
+     * contents plus the current append.
      */
     @AuraEnabled
     public static Component appendBuffer(@Key("id") String id, @Key("delayMs") BigDecimal delayMs,
@@ -254,6 +285,12 @@ public class JavaTestController {
     }
 
     @AuraEnabled
+    @BackgroundAction
+    public static String echoTextBackground(@Key("inVar") String inVar) {
+        return inVar;
+    }
+
+    @AuraEnabled
     public static String echoTextArea(@Key("inVar") String inVar) {
         return inVar;
     }
@@ -276,8 +313,22 @@ public class JavaTestController {
         AuraRuntimeException e = new AuraRuntimeException("throwExceptionNoLineNums", loc);
         throw e;
     }
-    
+
     @AuraEnabled
     public static void dummy() {
+    }
+    
+    @SuppressWarnings("rawtypes")
+	@AuraEnabled
+    public static List<Map> getList(@Key("start") int start, @Key("limit") int limit) throws Exception {
+    	List<Map> myList = new ArrayList<Map>();
+    	for (int i=start; i < limit; i++) {
+    		char alphabet = (char) (65 + (i%26));
+    		Map<String, String> row = new HashMap<String, String>();
+    		row.put("index", (i+1) + "");
+    		row.put("char", "server " + alphabet);
+    		myList.add(row);          
+        	}
+    	return myList;
     }
 }

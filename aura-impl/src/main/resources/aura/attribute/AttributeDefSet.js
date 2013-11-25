@@ -23,13 +23,27 @@
  */
 function AttributeDefSet(parent, configs){
     if (configs) {
-        var values = {};
+        this.values = {};
+        // maintain attribute order
+        this.valuesOrder = [];
+        var hasBody = false;
         for (var i = 0; i < configs.length; i++) {
             var attributeDef = new AttributeDef(configs[i]);
-            values[attributeDef.getDescriptor().getQualifiedName().toLowerCase()] = attributeDef;
+            var qname = attributeDef.getDescriptor().getQualifiedName().toLowerCase();
+            this.values[qname] = attributeDef;
+
+            // server side creates component and processes attributes first then processes facets or "body"
+            // so we need to do the same client side to prevent global id mismatches.
+            if (qname !== 'body') {
+                this.valuesOrder.push(qname);
+            } else {
+                hasBody = true;
+            }
         }
 
-        this.values = values;
+        if (hasBody) {
+            this.valuesOrder.push('body');
+        }
     }
 }
 
@@ -41,10 +55,13 @@ AttributeDefSet.prototype.auraType = "AttributeDefSet";
  */
 AttributeDefSet.prototype.createInstances = function(config, component, suppressValidation, localCreation){
     var values = this.values;
+    var valuesOrder = this.valuesOrder;
     var mapConfig = {};
-    if (values) {
+    if (values && valuesOrder) {
         var configValues = config ? config["values"] : null;
-        for (var lowerName in values) {
+
+        for (var i = 0; i < valuesOrder.length; i++) {
+            var lowerName = valuesOrder[i];
             var attributeDef = values[lowerName];
 
             var name = attributeDef.getDescriptor().getQualifiedName();
@@ -94,9 +111,10 @@ AttributeDefSet.prototype.createInstances = function(config, component, suppress
  */
 AttributeDefSet.prototype.each = function(f){
     var values = this.values;
+    var valuesOrder = this.valuesOrder;
     if (values) {
-        for (var name in values){
-            f(values[name]);
+        for (var i = 0; i < valuesOrder.length; i++) {
+            f(values[valuesOrder[i]]);
         }
     }
 };

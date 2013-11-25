@@ -19,6 +19,10 @@ package org.auraframework.system;
  * LoggingContext public interface
  */
 public interface LoggingContext {
+    
+    void startAction(String actionName);
+    
+    void stopAction(String actionName);
 
     void startTimer(String name);
 

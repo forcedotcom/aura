@@ -15,14 +15,17 @@
  */
 package org.auraframework.system;
 
+import java.util.regex.Pattern;
+
 public class Client {
 
     public static final Client OTHER = new Client();
+    public static final Pattern IE11_PATTERN = Pattern.compile("\\(windows .*; trident/[.\\d]*; rv:11.0\\)");
 
     private final String userAgent;
 
     public enum Type {
-        WEBKIT, FIREFOX, IE6, IE7, IE8, IE9, IE10, OTHER
+        WEBKIT, FIREFOX, IE6, IE7, IE8, IE9, IE10, IE11, OTHER
     }
 
     private final Type type;
@@ -40,7 +43,7 @@ public class Client {
         }
 
         ua = ua.trim().toLowerCase();
-
+        
         if (ua.contains("chrome") || ua.contains("safari")) {
             type = Type.WEBKIT;
         } else if (ua.contains("firefox")) {
@@ -55,6 +58,8 @@ public class Client {
             type = Type.IE7;
         } else if (ua.contains("msie 6")) {
             type = Type.IE6;
+        } else if (IE11_PATTERN.matcher(ua).find()){
+            type = Type.IE11;
         } else {
             type = Type.OTHER;
         }

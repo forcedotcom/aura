@@ -1,6 +1,6 @@
 ({
-    testChromeBrowser:{
-	browsers: [ 'GOOGLECHROME', 'IE10', 'IE9', 'IE8', 'IE7', 'FIREFOX', 'SAFARI'],
+    testDesktopBrowser:{
+	browsers: [ 'GOOGLECHROME', 'IE11', 'IE10', 'IE9', 'IE8', 'IE7', 'FIREFOX', 'SAFARI'],
     	test:function(cmp){
 	    var gvp = $A.getGlobalValueProviders();
 	    $A.test.assertEquals("DESKTOP", gvp.get("$Browser.formfactor"));

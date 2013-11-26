@@ -7,7 +7,7 @@
      */
     testAppCacheEvents: {
         // AppCache only supported on WebKit browsers
-        browsers:["-FIREFOX","-IE7","-IE8","-IE9", "-IE10", "-ANDROID_PHONE", "-ANDROID_TABLET"],
+        browsers:["-FIREFOX","-IE7","-IE8","-IE9", "-IE10", "-IE11", "-ANDROID_PHONE", "-ANDROID_TABLET"],
         test: function(component){
             var appCacheEvents = $A.test.getAppCacheEvents();
             var lastEvent = appCacheEvents.length - 1;

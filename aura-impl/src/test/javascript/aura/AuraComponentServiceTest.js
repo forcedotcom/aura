@@ -17,22 +17,36 @@ Function.RegisterNamespace("Test.Aura");
 
 [Fixture]
 Test.Aura.AuraComponentServiceTest = function(){
-	// Mock the exp() function defined in Aura.js, this is originally used for exposing members using a export.js file
-	Mocks.GetMock(Object.Global(), "exp", function() {
-	})(function() {
-		// #import aura.AuraComponentService
-	});
+    var $A = {
+        ns : {},
+        assert: function(condition, message) {
+            if (!condition) {
+                var error = new Error(message);
+                throw error;
+            }
+        },
+        util: {
+            isFunction: function(obj){
+                return false;
+            }
+        }
+    };
+    //Mock the exp() function defined in Aura.js, this is originally used for exposing members using a export.js file
+    Mocks.GetMocks(Object.Global(), { "exp": function(){}, "$A":$A})(function(){
+        // #import aura.AuraComponentService
+    });
 
     // Mocks necessary to create a new AuraComponentService Object
     var mockOnLoadUtil = Mocks.GetMocks(Object.Global(), {
-        ComponentDefRegistry: function(){},
-        ControllerDefRegistry: function(){},
-        ActionDefRegistry: function(){},
-        ModelDefRegistry: function(){},
-        ProviderDefRegistry: function(){},
-        RendererDefRegistry: function(){},
-        HelperDefRegistry: function(){},
-        exp: function(){}
+        "ComponentDefRegistry": function(){},
+        "ControllerDefRegistry": function(){},
+        "ActionDefRegistry": function(){},
+        "ModelDefRegistry": function(){},
+        "ProviderDefRegistry": function(){},
+        "RendererDefRegistry": function(){},
+        "HelperDefRegistry": function(){},
+        "exp": function(){},
+        "$A": $A
     });
 
     [Fixture]
@@ -43,19 +57,11 @@ Test.Aura.AuraComponentServiceTest = function(){
             var expected = "config is required in ComponentService.newComponentAsync(config)";
             var target;
             mockOnLoadUtil(function(){
-                target = new AuraComponentService();
-            });
-            var mockAssert = Mocks.GetMock(Object.Global(), "$A", {
-                assert: function(condition, message) {
-                    if (!condition) {
-                        var error = new Error(message);
-                        throw error;
-                    }
-                }
+                target = new $A.ns.AuraComponentService();
             });
 
             // Act
-            mockAssert(function(){
+            mockOnLoadUtil(function(){
                 actual = Record.Exception(function(){
                     target.newComponentAsync(null, function(){}, undefined);
                 });
@@ -71,24 +77,11 @@ Test.Aura.AuraComponentServiceTest = function(){
             var expected = "newComponentAsync requires a function as the callback parameter";
             var target;
             mockOnLoadUtil(function(){
-                target = new AuraComponentService();
-            });
-            var mockContext = Mocks.GetMock(Object.Global(), "$A", {
-                assert: function(condition, message) {
-                    if (!condition) {
-                        var error = new Error(message);
-                        throw error;
-                    }
-                },
-                util: {
-                    isFunction: function(obj){
-                        return false;
-                    }
-                }
+                target = new $A.ns.AuraComponentService();
             });
 
             // Act
-            mockContext(function(){
+            mockOnLoadUtil(function(){
                 actual = Record.Exception(function(){
                     target.newComponentAsync(null, undefined, {});
                 });

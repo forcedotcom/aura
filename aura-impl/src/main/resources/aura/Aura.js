@@ -130,7 +130,7 @@ $A.ns.Aura = function() {
     //#end
 
     this.clientService = new AuraClientService();
-    this.componentService = new AuraComponentService();
+    this.componentService = new $A.ns.AuraComponentService();
     this.serializationService = new AuraSerializationService();
     this.renderingService = new AuraRenderingService();
     this.expressionService = new AuraExpressionService();
@@ -303,11 +303,20 @@ $A.ns.Aura = function() {
      * @param {Component|Array} cmp
      * @borrows AuraComponentService.get
      */
-    this.getCmp = this.componentService.get;
+    this.getCmp = function(globalId) {
+        return this.componentService.get(globalId);
+    };
 
-    this.newCmp = this.componentService.newComponent;
-    this.newCmpDeprecated = this.componentService.newComponentDeprecated;
-    this.newCmpAsync = this.componentService.newComponentAsync;
+    this.newCmp = function(config, attributeValueProvider, localCreation, doForce) {
+        return this.componentService.newComponentDeprecated(config, attributeValueProvider, localCreation, doForce);
+    };
+    this.newCmpDeprecated = function(config, attributeValueProvider, localCreation, doForce) {
+        return this.componentService.newComponentDeprecated(config, attributeValueProvider, localCreation, doForce);
+    };
+
+    this.newCmpAsync = function(callbackScope, callback, config, attributeValueProvider, localCreation, doForce, forceServer){
+        return this.componentService.newComponentAsync(callbackScope, callback, config, attributeValueProvider, localCreation, doForce, forceServer);
+    };
 
     /**
      * Equivalent to <code>$A.eventService.newEvent()</code>.

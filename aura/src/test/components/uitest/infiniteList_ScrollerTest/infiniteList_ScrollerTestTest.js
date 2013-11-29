@@ -39,7 +39,7 @@
 	browsers: ["-IE7","-IE8"],
         test: function(cmp) {
             var scrlrDiv = cmp.find("scroller2").getElements()[1];
-            var cssText = scrlrDiv.children[0].children[2].style.cssText;
+            var cssText = scrlrDiv.children[0].children[3].style.cssText;
             var height = cssText.match( /\d+/g )[0];
             $A.test.assertTrue(height > 0, "height should be greater than zero for spacing, since there not enough list element");
         }
@@ -52,7 +52,7 @@
 	browsers: ["-IE7","-IE8"],
         test: function(cmp) {
             var scrlrDiv = cmp.find("scroller1").getElements()[1];
-            var childrenWithStyle =  scrlrDiv.children[0].children[2];
+            var childrenWithStyle =  scrlrDiv.children[0].children[3];
             $A.test.addWaitForWithFailureMessage("0", 
         	    function(){return childrenWithStyle.style.cssText.match( /\d+/g )[0];},
         	    "height of the space was not zero. List elements go past scrollable area, and should not need a spacer.");

@@ -14,6 +14,28 @@
  * limitations under the License.
  */
 ({
+        doInit : function(component, event, helper) {
+            var array = [];
+            $A.componentService.newComponentAsync(
+                    this,
+                    function (newcmp) {
+                        array.push(newcmp);
+                        component.setValue("v.extendedPullAtrib",array);
+                    },
+                    {
+                        "componentDef": {
+                            "descriptor": "markup://ui:outputDate"
+                        },
+                        
+                        "attributes": {
+                            "values": {
+                            	"value"  : "12/12/2012 12:12",
+                            	"format" : 'M/d/yy h:m'
+                            }
+                        }
+                    }
+            );
+        },
 	refresh: function(component, event, helper) {
              helper.refresh(component, "list");
 	},

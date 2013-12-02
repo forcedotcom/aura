@@ -61,6 +61,7 @@ public class JavaActionDef extends DefinitionImpl<ActionDef> implements ActionDe
         return params;
     }
 
+    @Override
     public List<String> getLoggableParams() {
         return loggableParams;
     }

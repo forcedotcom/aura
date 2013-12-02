@@ -35,8 +35,7 @@ import com.google.common.collect.Maps;
  * A simple Action used when mocking Controller creations.
  */
 public class MockAction implements Action {
-    public MockAction(DefDescriptor<ActionDef> descriptor, State state,
-            Object returnValue) {
+    public MockAction(DefDescriptor<ActionDef> descriptor, State state, Object returnValue) {
         this(descriptor, state, returnValue, null, null, null);
     }
 
@@ -134,6 +133,26 @@ public class MockAction implements Action {
         }
         json.writeMapEnd();
     }
+    
+    @Override
+    public void logParams(KeyValueLogger paramLogger) {
+        // not implemented
+    }
+
+    @Override
+    public boolean isStorable() {
+        return this.storable;
+    }
+
+    @Override
+    public void setStorable() {
+        this.storable = true;
+    }
+
+    @Override
+    public Map<String, Object> getParams() {
+        return null;
+    }
 
     private final DefDescriptor<ActionDef> descriptor;
     private String id;
@@ -142,9 +161,5 @@ public class MockAction implements Action {
     private final List<Action> actions;
     private final Map<String, BaseComponent<?, ?>> components;
     private final List<Object> errors;
-    
-    @Override
-    public void logParams(KeyValueLogger paramLogger) {
-        // not implemented
-    }
+    private boolean storable;
 }

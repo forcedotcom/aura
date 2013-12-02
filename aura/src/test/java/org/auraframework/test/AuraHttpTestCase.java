@@ -534,5 +534,18 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
             // not implemented
         }
 
+        @Override
+        public boolean isStorable() {
+            return false;
+        }
+
+        @Override
+        public void setStorable() {
+        }
+
+        @Override
+        public Map<String, Object> getParams() {
+            return null;
+        }
     }
 }

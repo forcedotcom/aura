@@ -48,8 +48,6 @@ import org.auraframework.service.InstanceService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.MasterDefRegistry;
-import org.auraframework.system.SourceListener;
-import org.auraframework.throwable.AuraUnhandledException;
 import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.javascript.JavascriptProcessingError;

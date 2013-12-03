@@ -174,7 +174,7 @@ Test.Ui.OutputRichText.HelperTest = function(){
         [Fact]
         function valueWithDefaultTags(){
         	// Arrange    
-        	var expected = 'value:form,input,button,img,div,span,ol,li,p,ul,a,h1,h2,h3,strong,em,u,s,sub,sup,blockquote,pre,big,' +
+        	var expected = 'value:form,input,button,img,div,span,ol,li,p,ul,a,h1,h2,h3,b,i,strong,em,u,s,sub,sup,blockquote,pre,big,' +
         				   'small,tt,code,kbd,samp,var,del,ins,cite,q,table,tr,td,caption,thead,th,tbody,tfoot,hr,object,param,' +
         				   'embed,iframe';  
         	

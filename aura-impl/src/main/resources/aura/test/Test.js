@@ -1018,9 +1018,14 @@ var Test = function(){
          * custom util to get element by class name for IE7
          * @private
          */
-        getElementsByClassNameCustom: function (className) {
+        getElementsByClassNameCustom: function (className, parentElement) {
             var results = [];
-            aura.test.walkTheDOM(document.body, function(node) {
+            
+            if($A.util.isUndefinedOrNull(parentElement)){
+        	parentElement = document.body;
+            }
+            
+            aura.test.walkTheDOM(parentElement, function(node) {
                 var a, c = node.className,
                     i;
                 if (c) {
@@ -1034,6 +1039,19 @@ var Test = function(){
                 }
             });
             return results;
+        },
+        /**
+         * Gets the first element on the page starting from parentElement, that has the specified class name.
+         * @param {Object} parentElement DOM element that we want to start at.
+         * @param {String} classname The CSS class name.
+         * @returns {Object} The first element denoting the class, or null if none is found.
+         */
+        findChildWithClassName : function(parentElement, className){            
+            var results = aura.test.getElementsByClassNameCustom(className, parentElement);        	
+            if (results && results.length > 0) {
+                return results;
+            }           
+            return null;           
         },
         /**
          * Gets the first element on the page that have the specified class name.

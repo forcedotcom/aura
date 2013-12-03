@@ -24,13 +24,12 @@
                     },
                     {
                         "componentDef": {
-                            "descriptor": "markup://ui:outputDate"
+                            "descriptor": "markup://ui:outputText"
                         },
                         
                         "attributes": {
                             "values": {
                             	"value"  : "12/12/2012 12:12",
-                            	"format" : 'M/d/yy h:m'
                             }
                         }
                     }

@@ -186,12 +186,25 @@
 					//START override iScroll to have the option to bind the events to the scroller itself					
 					iScroll.prototype._bind = function(type, el, bubble) {						
 						var target = this._getEventTarget(type, el);
-						target.addEventListener(type, this, !!bubble);
+						$A.util.on(target, type, this, !!bubble);
 					};
 					
 					iScroll.prototype._unbind = function(type, el, bubble) {
 						var target = this._getEventTarget(type, el);	
-						target.removeEventListener(type, this, !!bubble);						 
+						$A.util.removeOn(target, type, this, !!bubble);						 
+					};
+					
+					//Stop propagating the event to children if scrolling is canceled by tapping on the scroller while it's still scrolling
+					iScroll.prototype._getEventBuster = function(scroller) {
+						if (!this._eventBuster) {
+							this._eventBuster = function(e) {
+								if (scroller._transitionCanceled && scroller.distX == 0 && scroller.distY == 0) {
+									$A.util.squash(e, true);
+									scroller._resetPos(200);
+								}
+							}							
+						}
+						return this._eventBuster;
 					};
 					//END 
 					
@@ -352,7 +365,6 @@
 							}
 						}
 					});
-
 					this.initImageOnload(component);
 				}
 			} else {
@@ -638,6 +650,9 @@
 
 				that._bind(RESIZE_EV, window);
 				that._bind(START_EV);
+				
+				$A.util.on(that.wrapper, END_EV, that._getEventBuster(that), true); //capture phase
+				
 				if (!hasTouch) {
 					if (that.options.wheelAction != 'none') {
 						that._bind('DOMMouseScroll');
@@ -835,6 +850,7 @@
 
 				_start : function(e) {
 					var that = this, point = hasTouch ? e.touches[0] : e, matrix, x, y, c1, c2;
+					that._transitionCanceled = false;
 					
 					if (that.options.onBeforeScrollStart)
 						that.options.onBeforeScrollStart.call(that, e);
@@ -890,6 +906,8 @@
 								that._unbind(TRNEND_EV);
 							else
 								cancelFrame(that.aniTime);
+							
+							that._transitionCanceled = true;
 							that.steps = [];
 							that._pos(x, y);
 							if (that.options.onScrollEnd)
@@ -1456,6 +1474,8 @@
 					that._unbind(MOVE_EV, window);
 					that._unbind(END_EV, window);
 					that._unbind(CANCEL_EV, window);
+					
+					$A.util.removeOn(that.scroller, END_EV, that._getEventBuster(that), true);
 
 					if (!that.options.hasTouch) {
 						that._unbind('DOMMouseScroll');

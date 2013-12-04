@@ -45,7 +45,7 @@ public class PerfMetricsTestCase extends WebDriverTestCase {
 
     protected Map<String, String> getJiffyStats(String stage, ArrayList<String> transactionsToGather) {
         Map<String, String> stats = Maps.newHashMap();
-        String json = auraUITestingUtil.getEval("return JSON.stringify(Jiffy.toJson())").toString();
+        String json = auraUITestingUtil.getEval("return JSON.stringify(Perf.toJson())").toString();
         getName();
         json = json.substring(1, json.length() - 1);
         json = json.replace("\\\"", "\"");

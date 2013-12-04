@@ -352,6 +352,23 @@ var AuraDevToolService = function() {
             return cmp.output();
         },
         accessbilityAide:{
+        	/**
+        	 * Method to used to get the innerText of anchors. It gets each child (if there are children)
+        	 * then gets the text from it. It will not return null.
+        	 */
+        	getAllInnerText: function(anchor){
+        		var childText = "";
+        		var anchorChildren = anchor.children;
+        		if(anchorChildren.length === 0){
+        			childText = $A.util.getText(anchor);
+        		}
+        		else{
+	        		for(var index = 0; index < anchorChildren.length; index++){ 
+	        			childText = childText + $A.util.getText(anchorChildren[index]);
+	        		}
+        		}
+        		return childText;
+        	},
             /**
              * Helper function that will return true if the two values equal each other
              * @param   attribute  - Contents of the attribute that we want to look at
@@ -699,10 +716,8 @@ var AuraDevToolService = function() {
     	        	    anchor = anchors[index];
     	        	    
     	        	    //Text should not be undefined or null at any point since $A.test.getText will always return something
-    	        	    text = $A.util.getText(anchor).replace(/[\s\t\r\n]/g,'');
-    	        	    
-    	        	    if(text === "" && accessAideFuncs.anchrDoesNotHaveImgWithAlt(anchor)){
-    	        		errArray.push(anchor);
+    	        	    if(accessAideFuncs.getAllInnerText(anchor).replace(/[\s\t\r\n]/g,'') === "" && accessAideFuncs.anchrDoesNotHaveImgWithAlt(anchor)){
+    	        	    	errArray.push(anchor);
     	        	    }
     	        	}
     	        	return errArray;
@@ -942,8 +957,8 @@ var AuraDevToolService = function() {
             var result = "";
             aura.devToolService.accessbilityAide.errorCount = 0;
             
-            for(var funcNames in functions){
-        	result = result + functions[funcNames]();
+            for(var funcNames in functions){           
+        	   result = result + functions[funcNames]();
             }
             
             if(aura.devToolService.accessbilityAide.errorCount === 0){

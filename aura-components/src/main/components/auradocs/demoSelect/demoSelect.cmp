@@ -16,6 +16,8 @@
 
 -->
 <aura:component>
+<aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+
 <div style="padding-bottom:10px;"><b>Single Selection</b></div>
 <ui:inputSelect class="single" aura:id="InputSelectSingle" change="{!c.onSingleSelectChange}">
         <ui:inputSelectOptionGroup label="Mammal">
@@ -49,5 +51,8 @@
     </ui:inputSelect>
     <p>Selected Items:</p>
      <p><ui:outputText class="result" aura:id="multiResult" value="" /></p>
+    <br/>
     
+   <div style="padding-bottom:10px;"><b>Dynamic Option Generation</b></div>
+  	<ui:inputSelect label="Select me: " class="dynamic" aura:id="InputSelectDynamic" />
 </aura:component>

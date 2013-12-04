@@ -17,7 +17,6 @@
 -->
 <aura:component>
     <aura:attribute name="caseToRender" type="String" default="full"/>
-    
     <aura:if isTrue="{!v.caseToRender == 'labelsNotNeeded'}">
         <label for="ID_EGO">Something Something</label>
         <input type="submit" id="ID_EGO" size="25" value="SUBMIT TO ME"/>
@@ -84,6 +83,9 @@
                         <br/>
                       <ui:label label="31-35"/>
                       <ui:inputRadio aura:id="31-35"/>
+                      <ui:label label="36-40">
+                      	<ui:inputRadio aura:id="36-40"/>
+                      </ui:label>
                         <br/>
                       
                       <br/>

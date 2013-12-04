@@ -182,7 +182,7 @@ public class AuraTestingUtil {
             private Set<DefDescriptor<?>> descriptors = Sets.newHashSet(cached);
 
             @Override
-            public void onSourceChanged(DefDescriptor<?> source, SourceMonitorEvent event) {
+            public void onSourceChanged(DefDescriptor<?> source, SourceMonitorEvent event, String filePath) {
                 if (descriptors.remove(source)) {
                     latch.countDown();
                 }
@@ -193,7 +193,7 @@ public class AuraTestingUtil {
         };
         definitionService.subscribeToChangeNotification(listener);
         for (DefDescriptor<?> desc : cached) {
-            definitionService.onSourceChanged(desc, SourceMonitorEvent.changed);
+            definitionService.onSourceChanged(desc, SourceMonitorEvent.changed, null);
         }
         if (!latch.await(CACHE_CLEARING_TIMEOUT_SECS, TimeUnit.SECONDS)) {
             throw new AuraRuntimeException(String.format(

@@ -213,7 +213,7 @@ public class StringSourceLoader implements SourceLoader {
             nsLock.unlock();
         }
         // notify source listeners of change
-        Aura.getDefinitionService().onSourceChanged(descriptor, event);
+        Aura.getDefinitionService().onSourceChanged(descriptor, event, null);
 
         return source;
     }
@@ -239,7 +239,7 @@ public class StringSourceLoader implements SourceLoader {
             nsLock.unlock();
         }
         // notify source listeners of change
-        Aura.getDefinitionService().onSourceChanged(descriptor, SourceMonitorEvent.deleted);
+        Aura.getDefinitionService().onSourceChanged(descriptor, SourceMonitorEvent.deleted, null);
     }
 
     /**

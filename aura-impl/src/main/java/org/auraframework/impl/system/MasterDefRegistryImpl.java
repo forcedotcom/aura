@@ -1204,7 +1204,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
      * @param event - what type of event triggered the change
      */
     public static void notifyDependentSourceChange(Collection<WeakReference<SourceListener>> listeners,
-            DefDescriptor<?> source, SourceListener.SourceMonitorEvent event) {
+            DefDescriptor<?> source, SourceListener.SourceMonitorEvent event, String filePath) {
         boolean haveLock = false;
 
         try {
@@ -1223,7 +1223,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                 SourceListener sl = i.get();
 
                 if (sl != null) {
-                    sl.onSourceChanged(source, event);
+                    sl.onSourceChanged(source, event, filePath);
                 }
             }
             // lastly, clear MDR's static caches

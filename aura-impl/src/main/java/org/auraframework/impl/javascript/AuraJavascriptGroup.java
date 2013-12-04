@@ -19,7 +19,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.EnumSet;
 
+import org.auraframework.Aura;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.impl.source.file.AuraFileMonitor;
 import org.auraframework.impl.util.AuraImplFiles;
+import org.auraframework.system.SourceListener;
 import org.auraframework.util.javascript.directive.DirectiveBasedJavascriptGroup;
 import org.auraframework.util.javascript.directive.DirectiveTypes;
 import org.auraframework.util.javascript.directive.JavascriptGeneratorMode;
@@ -27,14 +31,24 @@ import org.auraframework.util.javascript.directive.JavascriptGeneratorMode;
 /**
  * the aura javascript. starts at Force.js
  */
-public class AuraJavascriptGroup extends DirectiveBasedJavascriptGroup {
+public class AuraJavascriptGroup extends DirectiveBasedJavascriptGroup implements SourceListener {
 
     public static final String GROUP_NAME = "aura";
     // file name of properties file that contains compiled version info
     public static final String FILE_NAME = "aurafwuid.properties";
+    public static final File ROOT_DIR = AuraImplFiles.AuraJavascriptSourceDirectory.asFile();
+    private boolean isStale = true;
 
     public AuraJavascriptGroup() throws IOException {
-        this(AuraImplFiles.AuraJavascriptSourceDirectory.asFile());
+        this(false);
+    }
+
+    public AuraJavascriptGroup(boolean monitor) throws IOException {
+        this(ROOT_DIR);
+        if (monitor) {
+            Aura.getDefinitionService().subscribeToChangeNotification(this);
+            AuraFileMonitor.addDirectory(ROOT_DIR.getPath());
+        }
     }
 
     /**
@@ -48,6 +62,37 @@ public class AuraJavascriptGroup extends DirectiveBasedJavascriptGroup {
                 JavascriptGeneratorMode.AUTOTESTINGDEBUG, JavascriptGeneratorMode.PRODUCTION,
                 JavascriptGeneratorMode.PRODUCTIONDEBUG, JavascriptGeneratorMode.DOC,
                 JavascriptGeneratorMode.PTEST));
+    }
+
+    @Override
+    public boolean isStale() {
+        if (!isGroupHashKnown()) {
+            return true;
+        }
+        return isStale;
+    }
+
+    @Override
+    public void generate(File destRoot, boolean doValidation) throws IOException {
+        isStale = false;
+        super.generate(destRoot, doValidation);
+    }
+
+    @Override
+    public void regenerate(File destRoot) throws IOException {
+        isStale = false;
+        super.regenerate(destRoot);
+    }
+
+
+    @Override
+    public void onSourceChanged(DefDescriptor<?> source, SourceMonitorEvent event, String filePath) {
+        if (filePath != null) {
+            File updatedFile = new File(filePath);
+            if (filePath.startsWith(ROOT_DIR.getPath()) && JS_FILTER.accept(updatedFile)) {
+                isStale = true;
+            }
+        }
     }
 
 }

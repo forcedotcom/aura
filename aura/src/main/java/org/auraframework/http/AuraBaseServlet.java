@@ -561,7 +561,7 @@ public abstract class AuraBaseServlet extends HttpServlet {
      */
     private static class SourceNotifier implements SourceListener {
         @Override
-        public void onSourceChanged(DefDescriptor<?> source, SourceMonitorEvent event) {
+        public void onSourceChanged(DefDescriptor<?> source, SourceMonitorEvent event, String filePath) {
             lastModMap.clear();
         }
     }

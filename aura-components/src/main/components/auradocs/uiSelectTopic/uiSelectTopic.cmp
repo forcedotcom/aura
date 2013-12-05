@@ -110,7 +110,7 @@
     
     <auradocs:codeblock>&lt;aura:component model="java://org.auraframework.docs.SizeModel">
     &lt;aura:attribute name="sizes" type="List" description="A list of input options."/>
-    &lt;ui:inputSelect label="Size" options="<aura:text value="{!"/>m.sizes"/>
+    &lt;ui:inputSelect label="Size" options="<aura:text value="{!"/>m.sizes}"/>
 &lt;aura:component>    
     </auradocs:codeblock>
     

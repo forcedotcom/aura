@@ -84,4 +84,9 @@ public class JavascriptActionDef extends DefinitionImpl<ActionDef> implements Ac
             return new JavascriptActionDef(this);
         }
     }
+
+    @Override
+    public List<String> getLoggableParams() {
+        return Collections.emptyList();
+    }
 }

@@ -475,7 +475,7 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
     protected I concreteComponent;
     protected boolean remoteProvider = false;
     private final Map<String, List<String>> index = Maps.newLinkedHashMap();
-    // FIXME - the keys should be ValueProviders, but first we need to wrap non-m/v/c providers.
+    // FIXME - the values should be ValueProviders, but first we need to wrap non-m/v/c providers.
     protected final Map<String, Object> valueProviders = new LinkedHashMap<String, Object>();
     protected boolean hasLocalDependencies = false;
     protected boolean hasProvidedAttributes;

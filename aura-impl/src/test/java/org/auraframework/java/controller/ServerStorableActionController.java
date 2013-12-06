@@ -90,7 +90,7 @@ public class ServerStorableActionController {
         currentAction.add(actions);
     }
     static void runActionAndMarkStorable(List<Action> actions, String actionName, Map<String, Object> params, boolean storable) throws Exception{
-        StorableAction action = Aura.getInstanceService().getInstance( actionName, ActionDef.class, params);
+        Action action = Aura.getInstanceService().getInstance( actionName, ActionDef.class, params);
         if(storable){action.setStorable();}
         actions.add(action);
     }
@@ -145,8 +145,7 @@ public class ServerStorableActionController {
     @AuraEnabled
     public static String markingSelfAsStorable(){
         Action currentAction = Aura.getContextService().getCurrentContext().getCurrentAction();
-        StorableAction s = (StorableAction)currentAction;
-        s.setStorable();
+        currentAction.setStorable();
         return "Marking my self as storable";
     }
     static void incrementCounter(String testName){

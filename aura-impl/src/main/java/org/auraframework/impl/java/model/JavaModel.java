@@ -27,6 +27,7 @@ import org.auraframework.def.ModelDef;
 import org.auraframework.def.TypeDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.java.type.JavaValueProvider;
+import org.auraframework.instance.InstanceStack;
 import org.auraframework.instance.Model;
 import org.auraframework.instance.ValueProvider;
 import org.auraframework.service.LoggingService;
@@ -41,9 +42,14 @@ import org.auraframework.util.json.Json;
 public class JavaModel implements Model {
     private final Object bean;
     private final JavaModelDef modelDef;
+    private final String path;
 
     public JavaModel(JavaModelDef modelDef) {
         this.modelDef = modelDef;
+        InstanceStack iStack = Aura.getContextService().getCurrentContext().getInstanceStack();
+        iStack.pushInstance(this);
+        iStack.setAttributeName("m");
+        this.path = iStack.getPath();
         Class<?> clazz = this.modelDef.getJavaType();
         try {
             this.bean = clazz.newInstance();
@@ -54,6 +60,8 @@ public class JavaModel implements Model {
         } catch(Exception e){
         	throw makeException(e.getMessage(),e,this.modelDef);
         }
+        iStack.clearAttributeName("m");
+        iStack.popInstance(this);
     }
 
     @Override
@@ -83,6 +91,11 @@ public class JavaModel implements Model {
     @Override
     public Object getValue(PropertyReference key) throws QuickFixException {
         return getValue(bean, key, this.modelDef);
+    }
+
+    @Override
+    public String getPath() {
+        return this.path;
     }
 
     /**

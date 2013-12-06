@@ -61,4 +61,9 @@ public class EventHandlerImpl implements EventHandler {
         return null;
     }
 
+    @Override
+    public String getPath() {
+        // fixme: not sure if we need one here, or where it might come from.
+        return "unknown";
+    }
 }

@@ -25,6 +25,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.ModelDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.java.model.JavaModel;
+import org.auraframework.instance.InstanceStack;
 import org.auraframework.instance.Model;
 import org.auraframework.service.LoggingService;
 import org.auraframework.throwable.AuraRuntimeException;
@@ -39,12 +40,19 @@ public class JavascriptModel implements Model {
     private Map<String, Object> bean = Maps.newHashMap();
 
     private final JavascriptModelDef modelDef;
+    private final String path;
 
     public JavascriptModel(JavascriptModelDef modelDef) {
         this.modelDef = modelDef;
+        InstanceStack iStack = Aura.getContextService().getCurrentContext().getInstanceStack();
+        iStack.pushInstance(this);
+        iStack.setAttributeName("m");
+        this.path = iStack.getPath();
         for (JavascriptValueDef member : this.modelDef.getAllMembers()) {
             bean.put(member.getName(), clone(member.getDefaultValue()));
         }
+        iStack.clearAttributeName("m");
+        iStack.popInstance(this);
     }
 
     @SuppressWarnings("unchecked")
@@ -110,4 +118,8 @@ public class JavascriptModel implements Model {
         return modelDef.getDescriptor();
     }
 
+    @Override
+    public String getPath() {
+        return path;
+    }
 }

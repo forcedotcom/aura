@@ -75,8 +75,17 @@ function(component) {
                   "value":{
                     "descriptor":"markup://test:test_Provider_Interface",
                     "attributes":{
-                      "defaultAttr":{
+                      "implNumber":{
                         "serId":7,
+                        "value":{
+                          "descriptor":"implNumber",
+                          "typeDefDescriptor":"aura://String",
+                          "required":false,
+                          "visibility":"PUBLIC"
+                        }
+                      },
+                      "defaultAttr":{
+                        "serId":8,
                         "value":{
                           "descriptor":"defaultAttr",
                           "typeDefDescriptor":"aura://String",
@@ -84,15 +93,6 @@ function(component) {
                             "descriptor":"defaultAttr",
                             "value":"meh"
                           },
-                          "required":false,
-                          "visibility":"PUBLIC"
-                        }
-                      },
-                      "implNumber":{
-                        "serId":8,
-                        "value":{
-                          "descriptor":"implNumber",
-                          "typeDefDescriptor":"aura://String",
                           "required":false,
                           "visibility":"PUBLIC"
                         }
@@ -115,6 +115,7 @@ function(component) {
         ]
       }
     },
-    "globalId":"9"
+    "globalId":"9",
+    "creationPath":"fakeActionId"
   }
 }

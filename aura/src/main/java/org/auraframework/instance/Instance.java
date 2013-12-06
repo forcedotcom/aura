@@ -22,10 +22,19 @@ import org.auraframework.util.json.JsonSerializable;
 /**
  */
 public interface Instance<T extends Definition> extends JsonSerializable {
-
     /**
      * @return the Descriptor for the definition of which this is an instance
      */
     DefDescriptor<T> getDescriptor();
 
+    /**
+     * Get the 'path' of this component in the component tree.
+     *
+     * This path consists of the set of attributes and indices that leads to 
+     * where this component was instantiated. This path must match the client
+     * generated path.
+     *
+     * @return the string representation of the path.
+     */
+    String getPath();
 }

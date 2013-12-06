@@ -21,6 +21,7 @@ import java.util.Map;
 
 import org.auraframework.def.ActionDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.instance.AbstractActionImpl;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.system.LoggingContext.KeyValueLogger;
@@ -34,22 +35,23 @@ import com.google.common.collect.Maps;
 /**
  * A simple Action used when mocking Controller creations.
  */
-public class MockAction implements Action {
+public class MockAction extends AbstractActionImpl<ActionDef> {
     public MockAction(DefDescriptor<ActionDef> descriptor, State state, Object returnValue) {
         this(descriptor, state, returnValue, null, null, null);
     }
 
     public MockAction(DefDescriptor<ActionDef> descriptor, State state,
             Object returnValue, List<Action> actions,
-            Map<String, BaseComponent<?, ?>> components, List<Object> errors) {
+            Map<String, BaseComponent<?, ?>> componentRegistry, List<Object> errors) {
+        super(null, null, null);
         this.descriptor = descriptor;
-        this.id = null;
         this.state = (state == null ? State.SUCCESS : state);
         this.returnValue = returnValue;
-        this.actions = (actions == null) ? Lists.<Action> newLinkedList()
-                : actions;
-        this.components = (components == null) ? Maps
-                .<String, BaseComponent<?, ?>> newHashMap() : components;
+        if (actions != null) {
+            add(actions);
+        }
+        this.componentRegistry = (componentRegistry == null) ? Maps
+                .<String, BaseComponent<?, ?>> newHashMap() : componentRegistry;
         this.errors = (errors == null) ? Lists.<Object> newLinkedList()
                 : errors;
     }
@@ -65,23 +67,7 @@ public class MockAction implements Action {
     }
 
     @Override
-    public String getId() {
-        return id;
-    }
-
-    @Override
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    @Override
     public void run() throws AuraExecutionException {
-
-    }
-
-    @Override
-    public State getState() {
-        return state;
     }
 
     @Override
@@ -90,41 +76,16 @@ public class MockAction implements Action {
     }
 
     @Override
-    public void add(List<Action> actions) {
-        actions.addAll(actions);
-    }
-
-    @Override
-    public List<Action> getActions() {
-        return actions;
-    }
-
-    @Override
-    public void registerComponent(BaseComponent<?, ?> component) {
-        components.put(component.getGlobalId(), component);
-    }
-
-    @Override
-    public Map<String, BaseComponent<?, ?>> getComponents() {
-        return components;
-    }
-
-    @Override
-    public int getNextId() {
-        return 0;
-    }
-
-    @Override
     public void serialize(Json json) throws IOException {
         json.writeMapBegin();
-        json.writeMapEntry("id", id);
+        json.writeMapEntry("id", getId());
         json.writeMapEntry("state", state);
         json.writeMapEntry("returnValue", returnValue == null ? Literal.NULL : returnValue);
         json.writeMapEntry("error", getErrors());
-        if (!components.isEmpty()) {
+        if (!componentRegistry.isEmpty()) {
             json.writeMapKey("components");
             json.writeMapBegin();
-            for (BaseComponent<?, ?> component : components.values()) {
+            for (BaseComponent<?, ?> component : componentRegistry.values()) {
                 if (component.hasLocalDependencies()) {
                     json.writeMapEntry(component.getGlobalId(), component);
                 }
@@ -139,27 +100,7 @@ public class MockAction implements Action {
         // not implemented
     }
 
-    @Override
-    public boolean isStorable() {
-        return this.storable;
-    }
-
-    @Override
-    public void setStorable() {
-        this.storable = true;
-    }
-
-    @Override
-    public Map<String, Object> getParams() {
-        return null;
-    }
-
     private final DefDescriptor<ActionDef> descriptor;
-    private String id;
-    private final State state;
     private final Object returnValue;
-    private final List<Action> actions;
-    private final Map<String, BaseComponent<?, ?>> components;
     private final List<Object> errors;
-    private boolean storable;
 }

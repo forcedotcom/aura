@@ -782,37 +782,49 @@ Action.prototype.getRefreshAction = function(originalResponse) {
 	return null;
 };
 
+Action.prototype.sanitizePartialConfig = function(pc, suffix) {
+    // rewrite globalId
+    var newGlobalId = pc["globalId"];
+    newGlobalId = newGlobalId.substr(0, newGlobalId.indexOf(":") + 1) + suffix;
+    pc["globalId"] = newGlobalId;
+
+    // rewrite creation path
+    var newCreationPath = pc["creationPath"];
+    if (newCreationPath) {
+        var slashIdx = newCreationPath.indexOf("/");
+        if (slashIdx > 0) {
+            newCreationPath = suffix + newCreationPath.substr(newCreationPath.indexOf("/"));
+        } else {
+            newCreationPath = suffix;
+        }
+        pc["creationPath"] = newCreationPath;
+    }
+    return pc;
+};
+
 /**
  * Sanitize generation number references to allow actions to be replayed w/out globalId conflicts.
  * 
  * @private
  */
 Action.prototype.sanitizeStoredResponse = function(response) {
-	var santizedComponents = {};
-	
-	var globalId;
-	var suffix = this.getId();
-	
-	var components = response["components"];
-	for (globalId in components) {
-		var newGlobalId = globalId.substr(0, globalId.indexOf(":") + 1) + suffix;
+    var santizedComponents = {};
+    var globalId;
+    var suffix = this.getId();
+    var pc;
+    
+    var components = response["components"];
+    for (globalId in components) {
+        pc = this.sanitizePartialConfig(components[globalId], suffix);
+        santizedComponents[pc["globalId"]] = pc;
+    }
 
-		// Rewrite the globalId
-		var c = components[globalId];
-		c["globalId"] = newGlobalId;
+    response["components"] = santizedComponents;
 
-		santizedComponents[newGlobalId] = c;
-	}
-
-	response["components"] = santizedComponents;
-
-	var returnValue = response["returnValue"];
-	if (returnValue) {
-		globalId = returnValue["globalId"];
-		if (globalId) {
-			returnValue["globalId"] = globalId.substr(0, globalId.indexOf(":") + 1) + suffix;
-		}
-	}
+    var returnValue = response["returnValue"];
+    if (returnValue && returnValue["globalId"]) {
+        this.sanitizePartialConfig(returnValue, suffix);
+    }
 };
 
 /**

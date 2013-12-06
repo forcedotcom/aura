@@ -36,6 +36,7 @@ import org.auraframework.instance.Action;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Event;
 import org.auraframework.instance.GlobalValueProvider;
+import org.auraframework.instance.InstanceStack;
 import org.auraframework.instance.ValueProviderType;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.Client;
@@ -580,6 +581,20 @@ public class AuraContextImpl implements AuraContext {
 
     @Override
     public boolean getIsDebugToolEnabled() {
-            return isDebugToolEnabled;
+        return isDebugToolEnabled;
+    }
+
+    private InstanceStack fakeStack;
+
+    @Override
+    public InstanceStack getInstanceStack() {
+        if (currentAction != null) {
+            return currentAction.getInstanceStack();
+        } else {
+            if (fakeStack == null) {
+                fakeStack = new InstanceStack("fakeActionId");
+            }
+            return fakeStack;
+        }
     }
 }

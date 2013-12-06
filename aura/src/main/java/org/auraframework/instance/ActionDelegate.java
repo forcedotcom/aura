@@ -115,13 +115,19 @@ public abstract class ActionDelegate implements Action {
         return original.toString();
     }
 
-    /**
-     * Log any params that are useful and safe to log.
-     * @param paramLogger
-     */
     @Override
     public void logParams(KeyValueLogger logger) {
         original.logParams(logger);
+    }
+
+    @Override
+    public InstanceStack getInstanceStack() {
+        return original.getInstanceStack();
+    }
+
+    @Override
+    public String getPath() {
+        return original.getPath();
     }
 
     private Action original;

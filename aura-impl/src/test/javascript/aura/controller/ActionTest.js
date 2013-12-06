@@ -1579,8 +1579,8 @@ Test.Aura.Controller.ActionTest = function() {
 			}
 			var response = {
 				"components" : {
-					"globalId:originalSuffix" : {
-						"globalId" : "originalId"
+					"globalId:originalId" : {
+						"globalId" : "globalId:originalId"
 					}
 				}
 			}
@@ -1603,8 +1603,8 @@ Test.Aura.Controller.ActionTest = function() {
 			}
 			var response = {
 				"components" : {
-					"globalId:originalSuffix" : {
-						"globalId" : "originalId"
+					"globalId:originalId" : {
+						"globalId" : "globalId:originalId"
 					}
 				}
 			}

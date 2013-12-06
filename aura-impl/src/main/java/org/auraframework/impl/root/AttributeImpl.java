@@ -17,6 +17,8 @@ package org.auraframework.impl.root;
 
 import java.io.IOException;
 
+import org.auraframework.Aura;
+
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.instance.Attribute;
@@ -25,6 +27,7 @@ import org.auraframework.util.json.Json;
 public class AttributeImpl implements Attribute {
     public AttributeImpl(DefDescriptor<AttributeDef> descriptor) {
         this.descriptor = descriptor;
+        this.path = Aura.getContextService().getCurrentContext().getInstanceStack().getPath();
     }
 
     @Override
@@ -67,7 +70,13 @@ public class AttributeImpl implements Attribute {
         return dirty;
     }
 
+    @Override
+    public String getPath() {
+        return path;
+    }
+
     private final DefDescriptor<AttributeDef> descriptor;
     private Object value;
     private boolean dirty = false;
+    private final String path;
 }

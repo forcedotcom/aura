@@ -53,10 +53,9 @@ public class JavaTestController {
         int count = input == null ? 1 : Integer.parseInt(input);
         List<Component> cmps = new LinkedList<Component>();
         while (count-- > 0) {
-            Component cmp = Aura.getInstanceService().getInstance("auratest:text", ComponentDef.class);
             Object val = token + ":java:" + count;
             Map<String, Object> atts = ImmutableMap.of("value", val);
-            cmp.getAttributes().set(atts);
+            Component cmp = Aura.getInstanceService().getInstance("auratest:text", ComponentDef.class, atts);
             cmps.add(cmp);
         }
         return cmps.toArray();

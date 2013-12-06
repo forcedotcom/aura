@@ -113,4 +113,8 @@ public class IterationValueProvider<D extends BaseComponentDef, I extends BaseCo
         return attributeValueProvider.getModel();
     }
 
+    @Override
+    public String getPath() {
+        return attributeValueProvider.getPath();
+    }
 }

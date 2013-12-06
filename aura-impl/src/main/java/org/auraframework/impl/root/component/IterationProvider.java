@@ -38,7 +38,6 @@ import com.google.common.collect.Maps;
 @Provider
 public class IterationProvider implements ComponentConfigProvider {
     @Override
-    @SuppressWarnings("unchecked")
     public ComponentConfig provide() throws QuickFixException {
         BaseComponent<?, ?> component = Aura.getContextService().getCurrentContext().getCurrentComponent();
         ComponentConfig cc = new ComponentConfig();

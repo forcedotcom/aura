@@ -1139,6 +1139,7 @@ function(value) {
         }
       }
     },
-    "globalId":"1"
+    "globalId":"1",
+    "creationPath":"fakeActionId"
   }
 }

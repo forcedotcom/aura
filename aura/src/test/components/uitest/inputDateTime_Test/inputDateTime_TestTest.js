@@ -20,9 +20,12 @@
     testCancelLink : {
     	attributes : {value: "2012-09-10 11:23", format: "MM-dd-yyyy hh:mm"},
     	test : [function(cmp) {
+    		var input = cmp.find("dateTimePickerTest").find("inputText").getElement();
+    		$A.test.assertNotNull(input, "input not visible");
+    		
     		var value = cmp.find("dateTimePickerTest").get("v.value");
     		$A.test.assertEquals("2012-09-10 11:23", value, "Initial value incorrect");
-    		
+
     		this.openDatePicker(cmp);
     	}, function(cmp) {
     		var datePicker = cmp.find("dateTimePickerTest").find("datePicker");
@@ -31,7 +34,7 @@
     		cancelLink.click();
     		$A.test.addWaitFor(false, function(){return $A.util.hasClass(datePicker.getElement(), "visible")});
     		
-    		value = cmp.find("dateTimePickerTest").get("v.value");
+    		var value = cmp.find("dateTimePickerTest").get("v.value");
     		$A.test.assertEquals("2012-09-10 11:23", value, "Cancel was pressed value should not have changed");
     	}]
     },
@@ -41,8 +44,11 @@
  	 */
     // TODO : @ctatlah - figure out why time is different when test runs on autobuilds
     _testSetLink : {
-    	attributes : {format: "M/dd/yyyy hh:mm"},
+    	attributes : {format: "MM/dd/yyyy hh:mm"},
     	test : [function(cmp) {
+    		var input = cmp.find("dateTimePickerTest").find("inputText").getElement();
+    		$A.test.assertNotNull(input, "input not visible");
+    		
     		var value = cmp.find("dateTimePickerTest").get("v.value");
     		$A.test.assertEquals(undefined, value, "Initial value incorrect");
     		
@@ -55,9 +61,8 @@
     		$A.test.addWaitFor(false, function(){return $A.util.hasClass(datePicker.getElement(), "visible")});
     		
     		var expectedDate = this.getCleanDate(null, true);
-    		value = cmp.find("dateTimePickerTest").get("v.value");
+    		var value = cmp.find("dateTimePickerTest").get("v.value");
     		var setDate = this.getCleanDate(value, true);
-    		
     		$A.test.assertEquals(expectedDate, setDate, "Incorrect datetime was set.");
     	}]
     },
@@ -73,6 +78,8 @@
     		var title = cmp.find("dateTimePickerTest").find("datePicker").find("calTitle");
     		var titleText = $A.test.getText(title.getElement());
 	    	$A.test.assertEquals(expectedText, titleText);
+	    	var domValue = $A.util.getText($A.test.getElementByClass("monthYear")[0]);
+    		$A.test.assertEquals(expectedText, domValue, "DOM value incorrect");
     	}
     },
     
@@ -92,7 +99,7 @@
     	var dateSep = "-";
     	var timeSep = ":";
     	var someDate = dateValue ? new Date(dateValue) : new Date();
-    	var retDate = someDate.getMonth() + dateSep +
+    	var retDate = (someDate.getMonth()+1) + dateSep +
     		someDate.getDate() + dateSep +
     		someDate.getFullYear()
     	if (hasTime) {

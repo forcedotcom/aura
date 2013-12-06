@@ -470,7 +470,13 @@ public class AuraResourceServlet extends AuraBaseServlet {
             // we only need the style of the component
             MutableInt freq = frequencyMap.get(styleDefDescriptor);
             if (freq == null) {
-                frequencyMap.put(styleDefDescriptor, new MutableInt(1));
+                int initial = 1;
+                if (styleDefDescriptor.getNamespace().equals("aura") ||
+                        styleDefDescriptor.getNamespace().equals("ui")) {
+                    // aura and ui namespace component css should always be above others so that they can be overridden
+                    initial = 6;
+                }
+                frequencyMap.put(styleDefDescriptor, new MutableInt(initial));
             } else {
                 freq.increment();
             }

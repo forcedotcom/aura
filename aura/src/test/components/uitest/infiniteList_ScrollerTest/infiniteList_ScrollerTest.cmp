@@ -16,8 +16,10 @@
 
 -->
 <aura:component implements="ui:pagingInterface, ui:scrollerEmbeddable">
-	
-	<ui:scroller aura:id="scroller1" onPullToRefresh="{!c.refresh}" onPullToShowMore="{!c.showMore}" class="test">
+	<aura:attribute name="extendedPullAtrib"  type="Aura.Component[]"/>
+	 <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+	<ui:scroller aura:id="scroller1" onPullToRefresh="{!c.refresh}" extendedPullContent='{!v.extendedPullAtrib}' onPullToShowMore="{!c.showMore}" class="test">
+	    
 	    <ui:infiniteList aura:id="list" itemVar="row" currentPage="{!v.currentPage}" pageSize="{!v.pageSize}" totalItems="{!v.totalItems}">
 			<aura:set attribute="dataProvider">
 				<uitest:infiniteDataProvider currentPage="{!v.currentPage}" pageSize="{!v.pageSize}" totalItems="{!v.totalItems}"/>		
@@ -29,7 +31,7 @@
 		</ui:infiniteList>
     </ui:scroller>
     
-    <ui:scroller aura:id="scroller2" onPullToRefresh="{!c.refresh2}" onPullToShowMore="{!c.showMore2}" class="test">
+    <ui:scroller aura:id="scroller2" onPullToRefresh="{!c.refresh2}" extendedPullContent='{!v.extendedPullAtrib}' onPullToShowMore="{!c.showMore2}" class="test">
 	    <ui:infiniteList aura:id="list2" itemVar="row" currentPage="{!v.currentPage}" pageSize="{!v.pageSize}" totalItems="{!v.totalItems}">
 			<aura:set attribute="dataProvider">
 				<uitest:infiniteDataProvider currentPage="{!v.currentPage}" pageSize="{!v.pageSize}" totalItems="{!v.totalItems}" listType="single"/>		

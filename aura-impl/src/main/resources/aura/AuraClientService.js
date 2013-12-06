@@ -95,7 +95,7 @@ var AuraClientService = function() {
             }
             $A.endMark("Registered Components [" + comConfigs.length + "]");
 
-            $A.measure("Initial Scripts Finished", "PageStart");
+            $A.endMark("PageStart");
 
             // Let any interested parties know that defs have been initialized
             for ( var n = 0; n < priv.initDefsObservers.length; n++) {
@@ -223,7 +223,7 @@ var AuraClientService = function() {
                             }
                         }
 
-                        $A.measure("Completed Component Callback", "Sending XHR " + $A.getContext().getNum());
+                        $A.endMark("Sending XHR " + $A.getContext().getNum());
                     });
 
                     clientService.enqueueAction(action);

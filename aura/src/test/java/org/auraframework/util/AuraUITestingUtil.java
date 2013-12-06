@@ -340,21 +340,14 @@ public class AuraUITestingUtil {
      */
     public List<WebElement> findDomElements(final By locator) {
         WebDriverWait wait = new WebDriverWait(driver, timeoutInSecs);
-        return wait.until(new ExpectedCondition<List<WebElement>>() {
-            private List<WebElement> elements = null;
+        return wait.ignoring(StaleElementReferenceException.class).until(new ExpectedCondition<List<WebElement>>() {
 
             @Override
             public List<WebElement> apply(WebDriver d) {
-                if (elements == null) {
-                    elements = driver.findElements(locator);
-                }
-                try {
-                    if (elements.size() > 0 &&
-                            getBooleanEval("return arguments[0].ownerDocument === document", elements.get(0))) {
-                        return elements;
-                    }
-                } catch (StaleElementReferenceException e) {
-                    elements = null;
+                List<WebElement> elements = driver.findElements(locator);
+                if (elements.size() > 0 &&
+                        getBooleanEval("return arguments[0].ownerDocument === document", elements.get(0))) {
+                    return elements;
                 }
                 return null;
             }

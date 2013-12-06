@@ -131,6 +131,17 @@
 	    }] 
     },
     /**
+     * Acessibility test, making sure that any functionality added is still accessible
+     */
+    testAccessibile : {
+    	attributes : {value: "2038-09-10", format: "MM-dd-yyyy"},
+    	        test : [function(cmp) {
+    	  			this.openDatePicker(cmp);
+    	    	}, function(cmp) {	
+    	    		$A.test.assertAccessible();
+    	    	}]
+    	    },
+    /**
      * Testing arrow combination of increasing month, and year
      */
     testIncreaseMonthAndYear :{

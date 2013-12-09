@@ -67,11 +67,13 @@ public enum AuraImplFiles {
      */
     AuraResourcesModuleDirectory(AuraFiles.Core.getPath(), "aura-resources"),
 
+    AuraResourcesClassDirectory(AuraFiles.Core.getPath(), "aura-resources", "target", "classes", "aura", "resources"),
+
     /**
      * aura-resources source directory
      */
-    AuraResourcesSourceDirectory(AuraResourcesModuleDirectory.getPath(), "src/main/resources");
-    
+    AuraResourcesSourceDirectory(AuraResourcesModuleDirectory.getPath(), "src/main/resources/aura/resources");
+
     private final String path;
 
     private AuraImplFiles(String... path) {

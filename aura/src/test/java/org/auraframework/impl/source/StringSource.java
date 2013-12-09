@@ -104,7 +104,7 @@ public class StringSource<D extends Definition> extends Source<D> {
         if (newContents != null) {
             data.getBuffer().setLength(0);
             data.write(newContents.toString());
-            Aura.getDefinitionService().onSourceChanged(getDescriptor(), SourceMonitorEvent.changed);
+            Aura.getDefinitionService().onSourceChanged(getDescriptor(), SourceMonitorEvent.changed, null);
         }
         return true;
     }
@@ -113,7 +113,7 @@ public class StringSource<D extends Definition> extends Source<D> {
     public void clearContents() {
         data.getBuffer().setLength(0);
         data.touch();
-        Aura.getDefinitionService().onSourceChanged(getDescriptor(), SourceMonitorEvent.changed);
+        Aura.getDefinitionService().onSourceChanged(getDescriptor(), SourceMonitorEvent.changed, null);
     }
 
     public long setLastModified(long lastModified) {

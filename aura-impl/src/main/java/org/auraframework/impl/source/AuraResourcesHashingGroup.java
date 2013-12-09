@@ -19,17 +19,26 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Logger;
+import org.auraframework.Aura;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.impl.source.file.AuraFileMonitor;
 import org.auraframework.impl.util.AuraImplFiles;
+import org.auraframework.system.SourceListener;
+import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.resource.HashingGroup;
 
 /**
  * Aura resources wrapper containing constants for the resources group
  */
-public class AuraResourcesHashingGroup extends HashingGroup {
+public class AuraResourcesHashingGroup extends HashingGroup implements SourceListener {
 
+    private static final Logger LOG = Logger.getLogger(AuraResourcesHashingGroup.class);
     public static final String GROUP_NAME = "aura-resources";
     public static final String FILE_NAME = "resourcesuid.properties";
     public static final File ROOT_DIR = AuraImplFiles.AuraResourcesSourceDirectory.asFile();
+    private boolean isStale = true;
 
     public static final FileFilter FILE_FILTER = new FileFilter() {
         @Override
@@ -38,8 +47,60 @@ public class AuraResourcesHashingGroup extends HashingGroup {
         }
     };
 
-
     public AuraResourcesHashingGroup() throws IOException {
+        this(false);
+    }
+
+    public AuraResourcesHashingGroup(boolean monitor) throws IOException {
         super(GROUP_NAME, ROOT_DIR, FILE_FILTER);
+        if (monitor) {
+            Aura.getDefinitionService().subscribeToChangeNotification(this);
+            AuraFileMonitor.addDirectory(ROOT_DIR.getPath());
+        }
+    }
+
+    @Override
+    public boolean isStale() {
+        if (!isGroupHashKnown()) {
+            return true;
+        }
+        return isStale;
+    }
+
+    @Override
+    public void reset() throws IOException {
+        isStale = false;
+        super.reset();
+    }
+
+    /**
+     * Updates resources in generated classes and refreshes resources cache for updated file
+     *
+     * @param updatedFile path of updated file
+     */
+    private static synchronized void updateResource(File updatedFile) {
+        String path = updatedFile.getPath();
+        String relativePath = path.substring(ROOT_DIR.getPath().length(), path.length());
+        String classFilePath = AuraImplFiles.AuraResourcesClassDirectory.getPath() + relativePath;
+        File destination = new File(classFilePath);
+        try {
+            FileUtils.copyFile(updatedFile, destination, false);
+            String refresh = path.substring(path.indexOf("aura/resources"), path.length());
+            Aura.getConfigAdapter().getResourceLoader().refreshCache(refresh);
+            LOG.info("Updated resource file: " + relativePath);
+        } catch (IOException ioe) {
+            throw new AuraRuntimeException("Unable to refresh aura resources", ioe);
+        }
+    }
+
+    @Override
+    public void onSourceChanged(DefDescriptor<?> source, SourceMonitorEvent event, String filePath) {
+        if (filePath != null) {
+            File updatedFile = new File(filePath);
+            if (filePath.startsWith(ROOT_DIR.getPath()) && FILE_FILTER.accept(updatedFile)) {
+                isStale = true;
+                updateResource(updatedFile);
+            }
+        }
     }
 }

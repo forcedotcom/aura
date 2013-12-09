@@ -33,7 +33,7 @@ import org.auraframework.system.SourceListener.SourceMonitorEvent;
  */
 public class FileSourceListener implements FileListener {
 
-    private static final Logger logger = Logger.getLogger(FileSourceListener.class);
+    private static final Logger LOG = Logger.getLogger(FileSourceListener.class);
     private static final EnumMap<DefDescriptor.DefType, String> extensions = new EnumMap<DefDescriptor.DefType, String>(
             DefDescriptor.DefType.class);
 
@@ -68,17 +68,18 @@ public class FileSourceListener implements FileListener {
         notifySourceChanges(event, SourceMonitorEvent.changed);
     }
 
-    public void onSourceChanged(DefDescriptor<?> defDescriptor, SourceListener.SourceMonitorEvent smEvent) {
-        Aura.getDefinitionService().onSourceChanged(defDescriptor, smEvent);
+    public void onSourceChanged(DefDescriptor<?> defDescriptor, SourceListener.SourceMonitorEvent smEvent,
+                                String filePath) {
+        Aura.getDefinitionService().onSourceChanged(defDescriptor, smEvent, filePath);
     }
 
     private void notifySourceChanges(FileChangeEvent event, SourceListener.SourceMonitorEvent smEvent) {
 
-        String filePath = event.getFile().toString();
-        logger.info("File changes: " + filePath);
+        String filePath = event.getFile().getName().getPath();
+        LOG.info("File changed: " + filePath);
 
         DefDescriptor<?> defDescriptor = getDefDescriptor(filePath);
-        onSourceChanged(defDescriptor, smEvent);
+        onSourceChanged(defDescriptor, smEvent, filePath);
     }
 
     private DefDescriptor<?> getDefDescriptor(String filePath) {

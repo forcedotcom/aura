@@ -35,7 +35,6 @@ import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.annotation.UnAdaptableTest;
 import org.auraframework.util.json.Json;
-import org.junit.Ignore;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;

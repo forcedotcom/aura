@@ -29,6 +29,7 @@
 	    <ui:label label="minutes" for="minutes" labelDisplay="false"/>
 	    <ui:inputText aura:id="minutes" class="input-minutes" change="{!c.updateMinutes}"/>
 	    <aura:renderIf isTrue="{!v.is24HourFormat != true}">
+	    	<ui:label label="period" for="ampm" labelDisplay="false"/>
 	        <ui:inputSelect aura:id="ampm" class="ampm" change="{!c.updateAmpm}">
 	            <ui:inputSelectOption aura:id="amOpt" label="AM" text="am"/>
 	            <ui:inputSelectOption aura:id="pmOpt" label="PM" text="pm"/>

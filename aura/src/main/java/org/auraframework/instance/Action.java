@@ -80,18 +80,15 @@ public interface Action extends Instance<ActionDef> {
             json.writeMapEntry("returnValue", returnValue);
             json.writeMapEntry("error", action.getErrors());
 
-            if (action instanceof StorableAction) {
-            	StorableAction storableAction = (StorableAction) action;
-                if (storableAction.isStorable()) {
-                    json.writeMapEntry("storable", true);
-    
-                    json.writeMapEntry("action", action.getDescriptor().getQualifiedName());
-    
-                    // Include params for storable server actions
-                    Map<String, Object> params = storableAction.getParams();
-                    if (params != null && !params.isEmpty()) {
-                        json.writeMapEntry("params", params);
-                    }
+            if (action.isStorable()) {
+                json.writeMapEntry("storable", true);
+
+                json.writeMapEntry("action", action.getDescriptor().getQualifiedName());
+
+                // Include params for storable server actions
+                Map<String, Object> params = action.getParams();
+                if (params != null && !params.isEmpty()) {
+                    json.writeMapEntry("params", params);
                 }
             }
 
@@ -123,4 +120,10 @@ public interface Action extends Instance<ActionDef> {
      * @param paramLogger
      */
     public void logParams(KeyValueLogger logger);
+
+    public boolean isStorable();
+
+    public void setStorable();
+
+    public Map<String, Object> getParams();
 }

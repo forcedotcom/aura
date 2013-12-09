@@ -16,9 +16,6 @@
 package org.auraframework.impl;
 
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import org.auraframework.Aura;
 import org.auraframework.def.BaseComponentDef;

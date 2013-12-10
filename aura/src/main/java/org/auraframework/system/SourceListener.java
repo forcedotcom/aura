@@ -50,6 +50,6 @@ public interface SourceListener {
      * @param source - null (affects all) or definition of the source that was affected
      * @param event - what has happened to that source
      */
-    public void onSourceChanged(DefDescriptor<?> source, SourceMonitorEvent event);
+    public void onSourceChanged(DefDescriptor<?> source, SourceMonitorEvent event, String filePath);
 
 }

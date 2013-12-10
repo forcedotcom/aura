@@ -42,6 +42,24 @@ div.THIS input.input-minutes {
     margin: 14px 5px;
 }
 
+@if (IE7) {
+	div.THIS input.input-hours,
+	div.THIS input.input-minutes {
+		height: 64px;
+    	width: 76px;
+		padding-top:13px;		
+	}	 
+}
+
+@if (IE8) {
+	div.THIS input.input-hours,
+	div.THIS input.input-minutes {
+		height: 64px;
+    	width: 76px;
+		padding-top:13px;		
+	}	 
+}
+
 div.THIS input.error {
     border-color: red;
     background-color: rgba(255, 0, 0, .025);

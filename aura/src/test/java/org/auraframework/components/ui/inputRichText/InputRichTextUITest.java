@@ -24,36 +24,36 @@ import org.openqa.selenium.support.ui.ExpectedCondition;
 import com.google.common.base.Function;
 
 public class InputRichTextUITest extends WebDriverTestCase {
-	private final String URL = "/uitest/inputRichText_Test.cmp";
-	private final String LINKBEFORE_LOCATOR = ".linkbefore";
-	private final String CK_EDITOR_LOCATOR = ".cke_contents";
-	private final String SUBMIT_BUTTON_LOCATOR = ".uiButton";
-	private final String OUTPUT_LOCATOR = ".uiOutputText";
-	private final String RT_CMP = "Text";
-	
-	public InputRichTextUITest(String name) {
-		super(name);
-	}
-	
-	/**
-	 * Able to tab into inputRichText Component.
-	 */
-	public void testRichTextTabing() throws Exception {
-		open(URL);
-		WebDriver driver = getDriver();
-		WebElement beforeLink =  driver.findElement(By.cssSelector(LINKBEFORE_LOCATOR));
-		WebElement ckEditor =  driver.findElement(By.cssSelector(CK_EDITOR_LOCATOR));
-		WebElement ckEditorInput =  ckEditor.findElement(By.tagName("iframe"));
-		WebElement submitBtn =  driver.findElement(By.cssSelector(SUBMIT_BUTTON_LOCATOR));
+    private final String URL = "/uitest/inputRichText_Test.cmp";
+    private final String LINKBEFORE_LOCATOR = ".linkbefore";
+    private final String CK_EDITOR_LOCATOR = ".cke_contents";
+    private final String SUBMIT_BUTTON_LOCATOR = ".uiButton";
+    private final String OUTPUT_LOCATOR = ".uiOutputText";
+    private final String RT_CMP = "Text";
+    
+    public InputRichTextUITest(String name) {
+        super(name);
+    }
+    
+    /**
+     * Able to tab into inputRichText Component.
+     */
+    public void testRichTextTabbing() throws Exception {
+        open(URL);
+        WebDriver driver = getDriver();
+        WebElement beforeLink = auraUITestingUtil.waitForElement(By.cssSelector(LINKBEFORE_LOCATOR));
+        WebElement ckEditor =  auraUITestingUtil.waitForElement(By.cssSelector(CK_EDITOR_LOCATOR));
+        WebElement ckEditorInput =  ckEditor.findElement(By.tagName("iframe"));
+        WebElement submitBtn =  driver.findElement(By.cssSelector(SUBMIT_BUTTON_LOCATOR));
 
-		String inputText = "im here";
-		
-		// setup
-		beforeLink.click();
-		
-		// tab into 
-		auraUITestingUtil.pressTab(beforeLink);
+        String inputText = "im here";
         
+        // setup
+        beforeLink.click();
+        
+        // tab into 
+        auraUITestingUtil.pressTab(beforeLink);
+    
         // type into ck editor
         ckEditorInput.sendKeys(inputText);
         waitForTextInRichText(RT_CMP, inputText);
@@ -61,38 +61,37 @@ public class InputRichTextUITest extends WebDriverTestCase {
         // click submit and see if text was entered into editor
         submitBtn.click();
         assertOutputText(driver, inputText);
-	}
-	
-	/**
-	 * Test html content is escaped.
-	 */
-	public void testHtmlContentEscaped() throws Exception {
-		open(URL);
-		WebDriver driver = getDriver();
-		WebElement ckEditor =  driver.findElement(By.cssSelector(CK_EDITOR_LOCATOR));
-		WebElement ckEditorInput =  ckEditor.findElement(By.tagName("iframe"));
-		
-		String html = "</html>";
-		String escapedHtml = "&lt;/html&gt;";
-		
-		ckEditor.click();
-		ckEditorInput.sendKeys(html);
-		waitForTextInRichText(RT_CMP, escapedHtml);
-	}
-	
-	private void waitForTextInRichText(final String auraId, final String text) {
-        auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
-            @Override
-            public Boolean apply(WebDriver d) {
-            	String expr = auraUITestingUtil.getValueFromCmpRootExpression(auraId, "v.value");
-            	String rtText = (String) auraUITestingUtil.getEval(expr);
-            	System.out.println("Waiting for RT input: '" + text + "' == '" + rtText + "'");
-        		return text.equals(rtText);
-            }
-        });
-	}
-	
-	private void assertOutputText(WebDriver d, String expectedText) {
-		auraUITestingUtil.waitForElementText(By.cssSelector(OUTPUT_LOCATOR), expectedText, true);
-	}
+    }
+    
+    /**
+     * Test html content is escaped.
+     */
+    public void testHtmlContentEscaped() throws Exception {
+        open(URL);
+        WebDriver driver = getDriver();
+        WebElement ckEditor =  auraUITestingUtil.waitForElement(By.cssSelector(CK_EDITOR_LOCATOR));
+        WebElement ckEditorInput =  ckEditor.findElement(By.tagName("iframe"));
+        
+        String html = "</html>";
+        String escapedHtml = "&lt;/html&gt;";
+        
+        ckEditor.click();
+        ckEditorInput.sendKeys(html);
+        waitForTextInRichText(RT_CMP, escapedHtml);
+    }
+    
+    private void waitForTextInRichText(final String auraId, final String text) {
+    auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
+        @Override
+        public Boolean apply(WebDriver d) {
+            String expr = auraUITestingUtil.getValueFromCmpRootExpression(auraId, "v.value");
+            String rtText = (String) auraUITestingUtil.getEval(expr);
+            return text.equals(rtText);
+        }
+    });
+    }
+    
+    private void assertOutputText(WebDriver d, String expectedText) {
+            auraUITestingUtil.waitForElementText(By.cssSelector(OUTPUT_LOCATOR), expectedText, true);
+    }
 }

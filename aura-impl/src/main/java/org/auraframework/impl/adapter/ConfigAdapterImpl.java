@@ -37,6 +37,7 @@ import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.impl.javascript.AuraJavascriptGroup;
 import org.auraframework.impl.source.AuraResourcesHashingGroup;
+import org.auraframework.impl.source.file.AuraFileMonitor;
 import org.auraframework.impl.util.AuraImplFiles;
 import org.auraframework.impl.util.BrowserInfo;
 import org.auraframework.system.AuraContext;
@@ -141,10 +142,14 @@ public class ConfigAdapterImpl implements ConfigAdapter {
         validateCss = AuraTextUtil.isNullEmptyOrWhitespace(validateCssString)
                 || Boolean.parseBoolean(validateCssString.trim());
 
+        if (!isProduction()) {
+            AuraFileMonitor.start();
+        }
+
     }
 
     protected FileGroup newAuraResourcesHashingGroup() throws IOException {
-        return new AuraResourcesHashingGroup();
+        return new AuraResourcesHashingGroup(true);
     }
 
     @Override
@@ -380,7 +385,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
      * AuraJavascriptGroup that experiences synthetic errors.
      */
     protected AuraJavascriptGroup newAuraJavascriptGroup() throws IOException {
-        return new AuraJavascriptGroup();
+        return new AuraJavascriptGroup(true);
     }
 
     @Override

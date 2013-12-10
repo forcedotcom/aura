@@ -278,13 +278,13 @@ public class DefinitionServiceImpl implements DefinitionService {
     }
 
     @Override
-    public void onSourceChanged(DefDescriptor<?> source, SourceListener.SourceMonitorEvent event) {
+    public void onSourceChanged(DefDescriptor<?> source, SourceListener.SourceMonitorEvent event, String filePath) {
         for (WeakReference<SourceListener> i : listeners) {
             if (i.get() == null) {
                 listeners.remove(i);
             }
         }
-        MasterDefRegistryImpl.notifyDependentSourceChange(listeners, source, event);
+        MasterDefRegistryImpl.notifyDependentSourceChange(listeners, source, event, filePath);
     }
 
     @Override

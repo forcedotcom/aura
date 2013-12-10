@@ -76,6 +76,6 @@
 		var value = inputSelect.getValue("v.value").getValue();
 		$A.test.assertEquals("Tiger", value,"ValueNullWithDefaultAndNoNullOption failed to initialize, by using inputSelect options in the body");
 	}
-    },
+    }
 })
 

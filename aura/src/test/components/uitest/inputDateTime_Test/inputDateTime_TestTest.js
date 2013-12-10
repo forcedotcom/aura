@@ -87,6 +87,7 @@
     	var opener = cmp.find("dateTimePickerTest").find("datePickerOpener").getElement();
 		var inputBox = cmp.find("dateTimePickerTest").find("inputText").getElement();
 	    var datePicker = cmp.find("dateTimePickerTest").find("datePicker").getElement();
+	    debugger;
 	    if($A.util.isUndefinedOrNull(opener)) {
 	    	inputBox.click();
 		} else {

@@ -67,7 +67,7 @@
             //No Key
             try{
         	mval.getValue();
-        	$A.test.fail("getValue cannot be called without a key")
+        	$A.test.fail("getValue cannot be called without a key");
             }catch(e){/*Expected*/}
             //Non string key TODO: W-1611590
             /*mval = $A.expressionService.create(null, {23:"bar"});
@@ -172,7 +172,6 @@
             $A.test.assertEquals(true, setval.isDirty());
         }
     },
-
     /**
      * Setting a MapValue to a simple value that is undefined should clear the map.
      */
@@ -206,25 +205,6 @@
                 $A.test.fail("Expected exception from setValue(ArrayValue)");
             } catch (e) {
             }
-        }
-    },
-
-
-
-    /**
-     * Setting map value to a primitive null should reset the map.
-     */
-    testSetValuePrimitiveNull: {
-        test: function(component){
-            var setval = $A.expressionService.create(null, {"a":"b"});
-            $A.test.assertEquals("MapValue", setval.toString());
-            $A.test.assertEquals(1, this.calculateSize(setval));
-            $A.test.assertEquals(false, setval.isDirty());
-            setval.setValue(null);
-
-            $A.test.assertEquals(undefined, setval.get("a"));
-            $A.test.assertEquals(0, this.calculateSize(setval));
-            $A.test.assertEquals(true, setval.isDirty());
         }
     },
 
@@ -379,48 +359,6 @@
         }]
     },
 
-    testMapSetValueRenders: {
-        test: [ function(component) {
-            var map = component.getValue("m.map");
-            map.put("subkey", "put");
-            // Insert a pause for re-rendering.  Put of a "new" key is CLEAN,
-            // perhaps oddly, so it doesn't re-render:
-            $A.test.addWaitFor("", function() {
-                var output = component.find("outputText");
-                return $A.test.getText(output.getElement());
-            });
-        }, function(component) {
-           var map = component.getValue("m.map");
-            map.put("subkey", "put2");
-            // Insert a pause for re-rendering.  Put of a "old" key is DIRTY,
-            // in the usual "I've been changed" way, so it does re-render:
-            $A.test.addWaitFor("put2", function() {
-                var output = component.find("outputText");
-                return $A.test.getText(output.getElement());
-            });
-        }, function(component) {
-            var map = component.getValue("m.map");
-            map.setValue({"subKey": "set"});
-            // Insert a pause for re-rendering.  SetValue leaves DIRTY child
-            // objecst (W-1678810), so it does re-render.  Note that this also
-            // tests our case-insensitivity.
-            $A.test.addWaitFor("set", function() {
-                var output = component.find("outputText");
-                return $A.test.getText(output.getElement());
-            });
-        }, function(component) {
-            // Checks case insensitivity
-            var otherMap = $A.expressionService.create(null, { 'subkey' : "second" });
-            var map = component.getValue("m.map");
-            map.setValue(otherMap);
-            $A.test.addWaitFor("second", function() {
-                var output = component.find("outputText");
-                return $A.test.getText(output.getElement());
-            });
-        }
-        ]
-    },
-
     /**
      * Tests that values cross-propagate "as expected."  Note that I'm not
      * convinced this is good, but it tests our actual behavior as of 25jul2013.
@@ -432,7 +370,7 @@
             var simval = $A.expressionService.create(null, 180);
             simval.addHandler({'eventName': 'change',
                     'method': function(e) { leafCounts['simple']++; },
-                    'globalId': mockGlobalId++,
+                    'globalId': mockGlobalId++
                 });
 
             var submap = $A.expressionService.create(null, {"magnitude": 10, "units": "mph"});
@@ -490,5 +428,61 @@
         }
     },
 
+    testMapSetValueRenders: {
+        test: [ function(component) {
+            var map = component.getValue("m.map");
+            map.put("subkey", "put");
+            // Insert a pause for re-rendering.  Put of a "new" key is CLEAN,
+            // perhaps oddly, so it doesn't re-render:
+            $A.test.addWaitFor("", function() {
+                var output = component.find("outputText");
+                return $A.test.getText(output.getElement());
+            });
+        }, function(component) {
+           var map = component.getValue("m.map");
+            map.put("subkey", "put2");
+            // Insert a pause for re-rendering.  Put of a "old" key is DIRTY,
+            // in the usual "I've been changed" way, so it does re-render:
+            $A.test.addWaitFor("put2", function() {
+                var output = component.find("outputText");
+                return $A.test.getText(output.getElement());
+            });
+        }, function(component) {
+            var map = component.getValue("m.map");
+            map.setValue({"subKey": "set"});
+            // Insert a pause for re-rendering.  SetValue leaves DIRTY child
+            // objecst (W-1678810), so it does re-render.  Note that this also
+            // tests our case-insensitivity.
+            $A.test.addWaitFor("set", function() {
+                var output = component.find("outputText");
+                return $A.test.getText(output.getElement());
+            });
+        }, function(component) {
+            // Checks case insensitivity
+            var otherMap = $A.expressionService.create(null, { 'subkey' : "second" });
+            var map = component.getValue("m.map");
+            map.setValue(otherMap);
+            $A.test.addWaitFor("second", function() {
+                var output = component.find("outputText");
+                return $A.test.getText(output.getElement());
+            });
+        }
+        ]
+    },
+    /**
+     * Setting map value to a primitive null should reset the map.
+     */
+    testSetValuePrimitiveNull: {
+        test: function(component){
+            var setval = $A.expressionService.create(null, {"a":"b"});
+            $A.test.assertEquals("MapValue", setval.toString());
+            $A.test.assertEquals(1, this.calculateSize(setval));
+            $A.test.assertEquals(false, setval.isDirty());
+            setval.setValue(null);
 
+            $A.test.assertEquals(undefined, setval.get("a"));
+            $A.test.assertEquals(0, this.calculateSize(setval));
+            $A.test.assertEquals(true, setval.isDirty());
+        }
+    }
 })

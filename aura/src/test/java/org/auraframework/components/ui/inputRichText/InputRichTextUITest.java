@@ -21,8 +21,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 
-import com.google.common.base.Function;
-
 public class InputRichTextUITest extends WebDriverTestCase {
     private final String URL = "/uitest/inputRichText_Test.cmp";
     private final String LINKBEFORE_LOCATOR = ".linkbefore";
@@ -40,11 +38,10 @@ public class InputRichTextUITest extends WebDriverTestCase {
      */
     public void testRichTextTabbing() throws Exception {
         open(URL);
-        WebDriver driver = getDriver();
         WebElement beforeLink = auraUITestingUtil.waitForElement(By.cssSelector(LINKBEFORE_LOCATOR));
         WebElement ckEditor =  auraUITestingUtil.waitForElement(By.cssSelector(CK_EDITOR_LOCATOR));
         WebElement ckEditorInput =  ckEditor.findElement(By.tagName("iframe"));
-        WebElement submitBtn =  driver.findElement(By.cssSelector(SUBMIT_BUTTON_LOCATOR));
+        WebElement submitBtn =  auraUITestingUtil.findDomElement(By.cssSelector(SUBMIT_BUTTON_LOCATOR));
 
         String inputText = "im here";
         
@@ -60,7 +57,7 @@ public class InputRichTextUITest extends WebDriverTestCase {
         
         // click submit and see if text was entered into editor
         submitBtn.click();
-        assertOutputText(driver, inputText);
+        assertOutputText(inputText);
     }
     
     /**
@@ -68,7 +65,6 @@ public class InputRichTextUITest extends WebDriverTestCase {
      */
     public void testHtmlContentEscaped() throws Exception {
         open(URL);
-        WebDriver driver = getDriver();
         WebElement ckEditor =  auraUITestingUtil.waitForElement(By.cssSelector(CK_EDITOR_LOCATOR));
         WebElement ckEditorInput =  ckEditor.findElement(By.tagName("iframe"));
         
@@ -91,7 +87,7 @@ public class InputRichTextUITest extends WebDriverTestCase {
     });
     }
     
-    private void assertOutputText(WebDriver d, String expectedText) {
+    private void assertOutputText(String expectedText) {
             auraUITestingUtil.waitForElementText(By.cssSelector(OUTPUT_LOCATOR), expectedText, true);
     }
 }

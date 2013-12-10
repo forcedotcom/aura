@@ -585,9 +585,11 @@
     },
 
     /**
-     * Test that simulating a DOM-level touchstart event on the table results in a call to helper-fireEvents()
+     * Test that simulating a DOM-level touchstart event on the table results in a call to helper-fireEvents().
+     * Touch events not supported in IE7/8
      */
     testTouchStartEventFired: {
+    	browsers: ["-IE7","-IE8"],
         test: function(app) {
             this.verifyDomEventFiresListViewEvents(app.find("test-list-generated-columns"), "touchstart", $A.test.assertTrue,
                     "DOM event firing did not result in call to helper->fireEvents");
@@ -595,9 +597,11 @@
     },
 
     /**
-     * Test that simulating a DOM-level touchend event on the table results in a call to helper-fireEvents()
+     * Test that simulating a DOM-level touchend event on the table results in a call to helper-fireEvents().
+     * Touch events not supported in IE7/8
      */
     testTouchEndEventFired: {
+    	browsers: ["-IE7","-IE8"],
         test: function(app) {
             this.verifyDomEventFiresListViewEvents(app.find("test-list-generated-columns"), "touchend", $A.test.assertTrue,
                     "DOM event firing did not result in call to helper->fireEvents");
@@ -605,9 +609,11 @@
     },
 
     /**
-     * Test that simulating a DOM-level touchmove event on the table results in a call to helper-fireEvents()
+     * Test that simulating a DOM-level touchmove event on the table results in a call to helper-fireEvents().
+     * Touch events not supported in IE7/8.
      */
     testTouchMoveEventFired: {
+    	browsers: ["-IE7","-IE8"],
         test: function(app) {
             this.verifyDomEventFiresListViewEvents(app.find("test-list-generated-columns"), "touchmove", $A.test.assertTrue,
                     "DOM event firing did not result in call to helper->fireEvents");

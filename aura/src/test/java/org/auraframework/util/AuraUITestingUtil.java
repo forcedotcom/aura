@@ -27,6 +27,7 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.auraframework.util.json.JsonReader;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
@@ -53,6 +54,69 @@ public class AuraUITestingUtil {
 
     public void setTimeoutInSecs(long timeoutInSecs) {
         this.timeoutInSecs = timeoutInSecs;
+    }
+
+    /**
+     * An internal class to wait for and retrieve an element from the driver.
+     */
+    private static class WaitAndRetrieve implements ExpectedCondition<Boolean> {
+        private By locator;
+        private WebElement found = null;
+
+        public WaitAndRetrieve(By locator) {
+            this.locator = locator;
+        }
+
+        @Override
+        public Boolean apply(WebDriver d) {
+            List<WebElement> elements = d.findElements(locator);
+
+            if (elements.size() > 0) {
+                found = elements.get(0);
+                return true;
+            }
+            return false;
+        }
+
+        public WebElement getFound() {
+            return this.found;
+        }
+
+        @Override
+        public String toString() {
+            return "WaitAndRetrieve: "+this.locator+" found "+this.found;
+        }
+    }
+
+    /**
+     * Waits for element with matching locator to appear in dom.
+     *
+     * This will wait for at least one element with the locator to appear in the dom,
+     * and it will return the first element found. If there are more than one element
+     * that match the locator, this will succeed when the first one appears.
+     * 
+     * @param msg Error message on timeout.
+     * @param locator By of element waiting for.
+     */
+    public WebElement waitForElement(String msg, By locator) {
+        WaitAndRetrieve war = new WaitAndRetrieve(locator);
+        WebDriverWait wait = new WebDriverWait(driver, timeoutInSecs);
+        wait.withMessage(msg);
+        wait.ignoring(NoSuchElementException.class);
+        wait.until(war);
+        return war.getFound();
+    }
+
+    /**
+     * Waits for element with matching locator to appear in dom.
+     *
+     * Convenience routine to supply a message.
+     *
+     * @param locator By of element waiting for.
+     */
+    public WebElement waitForElement(By locator) {
+        String msg = "Element with locator \'" + locator.toString() + "\' never appeared";
+        return waitForElement(msg, locator);
     }
 
     public WebElement findElementAndTypeEventNameInIt(String event) {

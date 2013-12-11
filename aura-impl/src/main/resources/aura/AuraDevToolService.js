@@ -563,6 +563,12 @@ var AuraDevToolService = function() {
              * @param   spacing - The amount of spacing that we want per item
              * @returns String  - The string representation of the the cmp stack trace 
              */
+            /**
+             * Method that looks at the given tag and will look print out the next two parents components names
+             * @param   tag     - The initial tag to find the parents of
+             * @param   spacing - The amount of spacing that we want per item
+             * @returns String  - The string representation of the the cmp stack trace 
+             */
             getStackTrace : function(tag, spacing){
 	            var cmp = null;
                     var cmpInfo = {};
@@ -578,14 +584,16 @@ var AuraDevToolService = function() {
                          if(!$A.util.isUndefinedOrNull(data_aura_rendered_by) && data_aura_rendered_by !== "" ){
                              cmp = $A.getCmp(data_aura_rendered_by);
                              if(!$A.util.isUndefinedOrNull(cmp)){
-                                 //Grab the namespace and name so that it is not viewed as a hyperlink
-                                 cmp = cmp.getAttributes().getValueProvider().getDef().getDescriptor();
-                                 cmpName = cmp.getNamespace()+":"+cmp.getName();
-                    
-                                 //Making sure that we have unique components
-                                 if(!(cmpName in cmpInfo)){
-                                 	cmpInfo[cmpName] = "";
-                                 	cmpNameArray.push(cmpName);
+                                 cmp = cmp.getAttributes().getValueProvider();
+                                 if("getDef" in cmp){
+                                	 cmp = cmp.getDef().getDescriptor();
+                                     cmpName = cmp.getNamespace()+":"+cmp.getName();
+
+                                     //Making sure that we have unique components
+                                     if(!(cmpName in cmpInfo)){
+                                     	cmpInfo[cmpName] = "";
+                                     	cmpNameArray.push(cmpName);
+                                     }
                                  }
                              }
                          }
@@ -600,7 +608,7 @@ var AuraDevToolService = function() {
                      }
                      
                      return cmpName;
-	     },
+	        },
             /**
              * Method grabs everything from the given array and prints out the error and the tag(s) that are the issue
              * @param   tagError - The error message for the given tag

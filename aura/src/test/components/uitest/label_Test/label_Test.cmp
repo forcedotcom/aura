@@ -17,7 +17,7 @@
 -->
 
 <aura:component model="java://org.auraframework.component.ui.MenuTestModel">
-
+<aura:attribute default="top" type="String" name="whichPosition"/>
 <h1>label separete from input with raw string id association</h1>
 	<table>
 	<tbody>
@@ -74,104 +74,33 @@
 		<ui:inputText label="{!item.label}" value="{!item.value}" aura:id="iteration"/>
 	</aura:iteration>
 <hr />
-<h1>label with default position</h1>
-
-	<ui:inputCheckbox label="inputCheckbox" value="false" aura:id="defaultPosition"/>
-	<ui:inputDate label="inputDate" value="I'm an inputDate"/>
-	<ui:inputDateTime label="inputDateTime" value="I'm an inputDateTime"/>
-	<ui:inputNumber label="inputNumber" value="42"/>
-	<ui:inputRadio label="inputRadio" value="42"/>
-	<ui:inputRange label="inputRange" value="6"/>
-	<ui:inputSearch label="inputSearch" value="6"/>
-	<ui:inputSelect label="inputSelect" value="I'm an inputSelect"/>       
-	<ui:inputText label="inputTest" value="I'm an inputText"/>
-	<ui:inputTextArea label="inputTextArea" value="I'm an inputTextArea"/>
- 	   
- 	   
-   <ui:inputPhone label="inputPhone" value="I'm an inputPhone"/>
-   <ui:inputEmail label="I'm a inputEmail" value="I'm an inputEmail"/>
-   <ui:inputSecret label="I'm an inputSecret" value="I'm an inputSecret"/>
-   <ui:inputURL label="I'm an inputURL" value="I'm an inputURL"/>
-   
-   <ui:inputTime label="I'm an inputTime" value="I'm an inputTime"/>
-   
-   
    <ui:inputPercent label="inputPercent" value="42"/>
    <ui:inputCurrency  label="inputCurrency" value="42" labelPosition="left" aura:id="leftPosition"/>
    
 <hr />   
-<h1>label with top position</h1>
+<h1>label with {!v.whichPosition} position</h1>
 
-	<ui:inputCheckbox label="inputCheckbox" labelPosition="top" value="false" aura:id="topPosition"/>
-	<ui:inputDate label="inputDate" labelPosition="top" value="I'm an inputDate"/>
-	<ui:inputDateTime label="inputDateTime" labelPosition="top" value="I'm an inputDateTime"/>
-	<ui:inputNumber label="inputNumber" labelPosition="top" value="42"/>
-	<ui:inputRadio label="inputRadio" labelPosition="top" value="42"/>
-	<ui:inputRange label="inputRange" labelPosition="top" value="6"/>
-	<ui:inputSearch label="inputSearch" labelPosition="top" value="6"/>
-	<ui:inputSelect label="inputSelect" labelPosition="top" value="I'm an inputSelect"/>       
-	<ui:inputText label="inputTest" labelPosition="top" value="I'm an inputText"/>
-	<ui:inputTextArea label="inputTextArea" labelPosition="top" value="I'm an inputTextArea"/>
+	<ui:inputCheckbox label="inputCheckbox" labelPosition="{!v.whichPosition}" value="false" aura:id="topInputCheckBox"/>
+	<ui:inputDate label="inputDate" labelPosition="{!v.whichPosition}" value="I'm an inputDate"/>
+	<ui:inputDateTime label="inputDateTime" labelPosition="{!v.whichPosition}" value="I'm an inputDateTime"/>
+	<ui:inputNumber label="inputNumber" labelPosition="{!v.whichPosition}" value="42"/>
+	<ui:inputRadio label="inputRadio" labelPosition="{!v.whichPosition}" value="42"/>
+	<ui:inputRange label="inputRange" labelPosition="{!v.whichPosition}" value="6"/>
+	<ui:inputSearch label="inputSearch" labelPosition="{!v.whichPosition}" value="6"/>
+	<ui:inputSelect label="inputSelect" labelPosition="{!v.whichPosition}" value="I'm an inputSelect"/>       
+	<ui:inputText label="inputTest" labelPosition="{!v.whichPosition}" value="I'm an inputText"/>
+	<ui:inputTextArea label="inputTextArea" labelPosition="{!v.whichPosition}" value="I'm an inputTextArea"/>
  	   
-   <ui:inputPhone label="inputPhone" labelPosition="top" value="I'm an inputPhone"/>
-   <ui:inputEmail label="I'm a inputEmail" labelPosition="top" value="I'm an inputEmail"/>
-   <ui:inputSecret label="I'm an inputSecret" labelPosition="top" value="I'm an inputSecret"/>
-   <ui:inputURL label="I'm an inputURL" labelPosition="top" value="I'm an inputURL"/>
+   <ui:inputPhone label="inputPhone" labelPosition="{!v.whichPosition}" value="I'm an inputPhone"/>
+   <ui:inputEmail label="I'm a inputEmail" labelPosition="{!v.whichPosition}" value="I'm an inputEmail"/>
+   <ui:inputSecret label="I'm an inputSecret" labelPosition="{!v.whichPosition}" value="I'm an inputSecret"/>
+   <ui:inputURL label="I'm an inputURL" labelPosition="{!v.whichPosition}" value="I'm an inputURL"/>
    
-   <ui:inputTime label="I'm an inputTime" labelPosition="top" value="I'm an inputTime"/>
+   <ui:inputTime label="I'm an inputTime" labelPosition="{!v.whichPosition}" value="I'm an inputTime"/>
       
-   <ui:inputPercent label="inputPercent" labelPosition="top" value="42"/>
-   <ui:inputCurrency  label="inputCurrency" labelPosition="top" value="42"/>
+   <ui:inputPercent label="inputPercent" labelPosition="{!v.whichPosition}" value="42"/>
+   <ui:inputCurrency  label="inputCurrency" labelPosition="{!v.whichPosition}" value="42"/>
    
-<hr />
-<h1>label with right position</h1>
-
-	<ui:inputCheckbox label="inputCheckbox" labelPosition="right" value="false" aura:id="rightPosition"/>
-	<ui:inputDate label="inputDate" labelPosition="right" value="I'm an inputDate"/>
-	<ui:inputDateTime label="inputDateTime" labelPosition="right" value="I'm an inputDateTime"/>
-	<ui:inputNumber label="inputNumber" labelPosition="right" value="42"/>
-	<ui:inputRadio label="inputRadio" labelPosition="right" value="42"/>
-	<ui:inputRange label="inputRange" labelPosition="right" value="6"/>
-	<ui:inputSearch label="inputSearch" labelPosition="right" value="6"/>
-	<ui:inputSelect label="inputSelect" labelPosition="right" value="I'm an inputSelect"/>       
-	<ui:inputText label="inputTest" labelPosition="right" value="I'm an inputText"/>
-	<ui:inputTextArea label="inputTextArea" labelPosition="right" value="I'm an inputTextArea"/>
- 	   
- 	   
-   <ui:inputPhone label="inputPhone" labelPosition="right" value="I'm an inputPhone"/>
-   <ui:inputEmail label="I'm a inputEmail" labelPosition="right" value="I'm an inputEmail"/>
-   <ui:inputSecret label="I'm an inputSecret" labelPosition="right" value="I'm an inputSecret"/>
-   <ui:inputURL label="I'm an inputURL" labelPosition="right" value="I'm an inputURL"/>
-   
-   <ui:inputTime label="I'm an inputTime" labelPosition="right" value="I'm an inputTime"/>
-      
-   <ui:inputPercent label="inputPercent" labelPosition="right" value="42"/>
-   <ui:inputCurrency  label="inputCurrency" labelPosition="right" value="42"/>
-      
-<hr />
-<h1>label with bottom position</h1>
-
-	<ui:inputCheckbox label="inputCheckbox" labelPosition="bottom" value="false" aura:id="bottomPosition"/>
-	<ui:inputDate label="inputDate" labelPosition="bottom" value="I'm an inputDate"/>
-	<ui:inputDateTime label="inputDateTime" labelPosition="bottom" value="I'm an inputDateTime"/>
-	<ui:inputNumber label="inputNumber" labelPosition="bottom" value="42"/>
-	<ui:inputRadio label="inputRadio" labelPosition="bottom" value="42"/>
-	<ui:inputRange label="inputRange" labelPosition="bottom" value="6"/>
-	<ui:inputSearch label="inputSearch" labelPosition="bottom" value="6"/>
-	<ui:inputSelect label="inputSelect" labelPosition="bottom" value="I'm an inputSelect"/>       
-	<ui:inputText label="inputTest" labelPosition="bottom" value="I'm an inputText"/>
-	<ui:inputTextArea label="inputTextArea" labelPosition="bottom" value="I'm an inputTextArea"/>
- 	   
- 	   
-   <ui:inputPhone label="inputPhone" labelPosition="bottom" value="I'm an inputPhone"/>
-   <ui:inputEmail label="I'm a inputEmail" labelPosition="bottom" value="I'm an inputEmail"/>
-   <ui:inputSecret label="I'm an inputSecret" labelPosition="bottom" value="I'm an inputSecret"/>
-   <ui:inputURL label="I'm an inputURL" labelPosition="bottom" value="I'm an inputURL"/>
-   
-   <ui:inputTime label="I'm an inputTime" labelPosition="bottom" value="I'm an inputTime"/>
-      
-   <ui:inputPercent label="inputPercent" labelPosition="bottom" value="42"/>
-   <ui:inputCurrency  label="inputCurrency" labelPosition="bottom" value="42"/>
 <hr />
 <h1>label with hidden position</h1>
 <ui:inputTextArea label="inputTextArea" labelPosition="hidden" value="I'm an inputTextArea" aura:id="hiddenPosition"/><br/> 	

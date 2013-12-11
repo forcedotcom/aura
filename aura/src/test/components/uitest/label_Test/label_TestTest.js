@@ -95,8 +95,9 @@
      * Test label with default position
      */
     testLabelWithDefaultPosition: {
+    	attributes : {whichPosition : "left"},
     	test: function(component){
-    		var div = component.find("defaultPosition").getElement();
+    		var div = component.find("topInputCheckBox").getElement();
     		var label = div.getElementsByTagName('label')[0];
             var input = div.getElementsByTagName('input')[0];
     		var labelId = this.getLabelIdValue(label);
@@ -105,12 +106,13 @@
             $A.test.assertTrue($A.test.contains(label.className, "left"), "Class Name:" + label.className + " should contain left");
         }
     },
-    
+     
     /**
      * Test label with left position
      */
     testLabelWithLeftPosition: {
     	test: function(component){
+    		debugger;
     		var div = component.find("leftPosition").getElement();
     		var label = div.getElementsByTagName('label')[0];
             var input = div.getElementsByTagName('input')[0];
@@ -125,8 +127,10 @@
      * Test label with Top position
      */
     testLabelWithTopPosition: {
+    	attributes : {whichPosition : "top"},
     	test: function(component){
-    		var div = component.find("topPosition").getElement();
+    		debugger;
+    		var div = component.find("topInputCheckBox").getElement();
     		var label = div.getElementsByTagName('label')[0];
             var input = div.getElementsByTagName('input')[0];
     		var labelId = this.getLabelIdValue(label);
@@ -142,8 +146,10 @@
      * Test label with right position
      */
     testLabelWithRightPosition: {
+    	attributes : {whichPosition : "right"},
     	test: function(component){
-    		var div = component.find("rightPosition").getElement();
+    		debugger;
+    		var div = component.find("topInputCheckBox").getElement();
     		var label = div.getElementsByTagName('label')[0];
             var input = div.getElementsByTagName('input')[0];
     		var labelId = this.getLabelIdValue(label);
@@ -157,8 +163,9 @@
      * Test label with bottom position
      */
     testLabelWithBottomPosition: {
+    	attributes : {whichPosition : "bottom"},
     	test: function(component){
-    		var div = component.find("bottomPosition").getElement();
+    		var div = component.find("topInputCheckBox").getElement();
     		var label = div.getElementsByTagName('label')[0];
             var input = div.getElementsByTagName('input')[0];
     		var labelId = this.getLabelIdValue(label);

@@ -190,7 +190,7 @@ public class JavaProviderDef extends DefinitionImpl<ProviderDef> implements Prov
     }
 
     @Override
-    public ComponentConfig provide(DefDescriptor<? extends RootDefinition> intfDescriptor) {
+    public ComponentConfig provide(DefDescriptor<? extends RootDefinition> intfDescriptor) throws QuickFixException {
         ComponentConfig config = null;
         LoggingService loggingService = Aura.getLoggingService();
         loggingService.stopTimer(LoggingService.TIMER_AURA);
@@ -205,7 +205,7 @@ public class JavaProviderDef extends DefinitionImpl<ProviderDef> implements Prov
                 loggingService.incrementNum("JavaCallCount");
             }
         } catch (Exception e) {
-            AuraExceptionUtil.wrapExecutionException(e, this.location);
+            throw AuraExceptionUtil.wrapExecutionException(e, this.location);
         } finally {
             loggingService.stopTimer("java");
             loggingService.startTimer(LoggingService.TIMER_AURA);

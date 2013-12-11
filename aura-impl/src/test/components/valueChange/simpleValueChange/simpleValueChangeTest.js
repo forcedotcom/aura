@@ -318,7 +318,7 @@
             var errorMsg = "Type mismatch between SimpleValue and somestring";
             $A.test.expectAuraError(errorMsg);
             valueA.observe(stringValue);
-        },
+        }
         
     },
 

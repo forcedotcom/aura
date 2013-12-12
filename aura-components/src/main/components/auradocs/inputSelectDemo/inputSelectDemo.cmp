@@ -29,6 +29,7 @@
     	<aura:set attribute="south">
     	<p>When working with <code>ui:inputSelect</code> to create a list of options, you can allow multiple selections by setting the <code>multiple</code> attribute to <code>true</code>.
     	Group options using <code>ui:inputSelectOptionGroup</code> and in each group, nest each option with <code>ui:inputSelectOption</code>. For more information, see  <auradocs:topicLink topic="uiSelect">Drop-down Lists</auradocs:topicLink>.
+    		Alternatively, display a list of options from a model by using the format <code>&lt;ui:inputSelect options="<aura:text value="{!"/>m.selectOptions}" /></code> and creating the list of options in the model using <code>ArrayList&lt;InputOption></code>.
     	</p>		
     	 <auradocs:info>See the <auradocs:defLink descriptor ="ui:inputSelect">ui:inputSelect</auradocs:defLink> component reference.</auradocs:info>
    </aura:set>

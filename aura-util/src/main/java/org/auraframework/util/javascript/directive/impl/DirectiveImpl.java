@@ -47,11 +47,7 @@ public abstract class DirectiveImpl implements Directive {
                 parsedLine = null;
             }
         }
-        if (parsedLine != null && parsedLine instanceof Map) {
-            config = (Map<String, Object>) parsedLine;
-        } else {
-            config = null;
-        }
+        config = ((parsedLine instanceof Map) ? (Map<String, Object>) parsedLine  : null);
 
         if (config != null) {
             List<Object> modeStrings = (List<Object>) config.get("modes");

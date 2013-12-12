@@ -31,28 +31,32 @@
         var nl = [];
         var loaded = ctx.getLoaded();
         for (var p in loaded) {
-            var x = loaded[p];
-            if (x.length > 10) {
-                var posn = Math.floor(Math.random() * (x.length-1));
-                var repl;
-                var orig = x.charAt(posn);
-                var rposn = selection.indexOf(orig);
-
-                if (rposn > -1) {
-                    repl = Math.floor(Math.random() * (selection.length-1));
-                    if (repl >= rposn) {
-                        repl += 1;
-                    }
-                } else {
-                    repl = Math.floor(Math.random() * selection.length);
-                }
-                var r = selection.charAt(repl);
-                x = x.substr(0,posn)+r+x.substr(posn+1);
-                nl[p] = x;
-            }
+        	if (loaded.hasOwnProperty(p)) {
+	            var x = loaded[p];
+	            if (x.length > 10) {
+	                var posn = Math.floor(Math.random() * (x.length-1));
+	                var repl;
+	                var orig = x.charAt(posn);
+	                var rposn = selection.indexOf(orig);
+	
+	                if (rposn > -1) {
+	                    repl = Math.floor(Math.random() * (selection.length-1));
+	                    if (repl >= rposn) {
+	                        repl += 1;
+	                    }
+	                } else {
+	                    repl = Math.floor(Math.random() * selection.length);
+	                }
+	                var r = selection.charAt(repl);
+	                x = x.substr(0,posn)+r+x.substr(posn+1);
+	                nl[p] = x;
+	            }
+        	}
         }
         for (var q in nl) {
-            loaded[q] = nl[q];
+        	if (nl.hasOwnProperty(q)) {
+        		loaded[q] = nl[q];
+        	}
         }
         c.getValue("v.text").setValue("i was updated");
         var a = c.get("c.noArgs");

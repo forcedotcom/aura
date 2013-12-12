@@ -64,8 +64,8 @@ public final class WebDriverUtil {
     public enum BrowserType {
         FIREFOX(DesiredCapabilities.firefox(), null, Platform.ANY, ExtraCapability.DISABLE_NATIVE_EVENTS),
         IE11(DesiredCapabilities.internetExplorer(), "11", "Windows 8.1"),
-        IE10(DesiredCapabilities.internetExplorer(), "10", "Windows 2012"),
-        IE9(DesiredCapabilities.internetExplorer(), "9", "Windows 7"),
+        IE10(DesiredCapabilities.internetExplorer(), "10", Platform.WIN8),
+        IE9(DesiredCapabilities.internetExplorer(), "9", Platform.VISTA),
         IE8(DesiredCapabilities.internetExplorer(), "8", Platform.WINDOWS),
         IE7(DesiredCapabilities.internetExplorer(), "7", Platform.WINDOWS),
         GOOGLECHROME(DesiredCapabilities.chrome(), null, Platform.ANY),

@@ -196,7 +196,26 @@ AttributeDefSet.prototype.createAttribute = function(config, def, component, val
         valueConfig = config;
     }
 
-    return valueFactory.create(valueConfig, def, component);
+    // For unset maps and lists, we need to get that it's a map or list, and then reset the value to null/undef
+    var hasRealValue = true;
+    if (valueConfig === undefined || valueConfig === null) {
+        var defType = def.getTypeDefDescriptor();
+        if (defType.lastIndexOf("[]") === defType.length - 2 || defType.indexOf("://List") >= 0) {
+            hasRealValue = valueConfig;
+            valueConfig = [];
+        } else if (defType.indexOf("://Map") >= 0) {
+            hasRealValue = valueConfig;
+            valueConfig = {};
+        }
+    }
+    valueConfig = valueFactory.create(valueConfig, def, component);
+    if (!hasRealValue) {
+        // For maps and arrays that were null or undefined, we needed to make a
+        // fake empty one to get the right value type, but now need to set the
+        // actual value:
+        valueConfig.setValue(hasRealValue);
+    }
+    return valueConfig;
 };
 
 //#include aura.attribute.AttributeDefSet_export

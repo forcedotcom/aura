@@ -28,6 +28,9 @@ function MapValue(config, def, component){
     this.keys = {};
     this.owner = component;
 
+    /** One of "true" if set to any {...} object, or "null" or "undefined" if not */
+    this.hasRealValue = true;
+
     var k;
     // attributes can come through here but have no way of knowing the member keys
     // models have getMembers
@@ -38,6 +41,7 @@ function MapValue(config, def, component){
             this.add(k, config);
         }
     } else {
+        this.hasRealValue = (config !== null && config !== undefined);
         if (config) {
             for (k in config) {
                 this.add(k, config);
@@ -108,8 +112,10 @@ MapValue.prototype.setValue = function(newMap) {
     this.keys = {};
     this.makeDirty();
     if ($A.util.isUndefinedOrNull(newMap) || (newMap.isDefined && !newMap.isDefined())) {
+        this.hasRealValue = false;
         return;
     }
+    this.hasRealValue = true;
     if (!$A.util.isObject(newMap)) {
         $A.assert(false, "newMap must be an object");
     }
@@ -185,6 +191,7 @@ MapValue.prototype.merge = function(yourMap, overwrite) {
             my[key] = yourvalue;
         }
     }
+    this.hasRealValue = true;
 };
 
 /**
@@ -199,6 +206,11 @@ MapValue.prototype.isExpression = function(){
  */
 MapValue.prototype.isLiteral = function(){
     return false;
+};
+
+/** Returns true if this was set to null or undefined */
+MapValue.prototype.isUnset = function() {
+    return !this.hasRealValue;
 };
 
 /**

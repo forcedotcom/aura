@@ -23,6 +23,7 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.TreeMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -430,6 +431,33 @@ public class JsonTest extends UnitTestCase {
         json.writeMapEntry("key2", "value2");
         json.writeMapEnd();
         assertEquals("{\n  \"key1\":\"value1\",\n  \"key2\":\"value2\"\n}", json.getAppendable().toString());
+    }
+
+    public void testWriteMapEntryTyped() throws IOException {
+        List<String> list = new ArrayList<String>(2);
+        list.add("item1");
+        list.add("item2");
+        Json json = new Json(new StringBuilder(), false, false);
+        json.writeMapBegin();
+        json.writeMapEntry("key", list);
+        json.writeMapEnd();
+        assertEquals("{\"key\":[\"item1\",\"item2\"]}", json.getAppendable().toString());
+
+        json = new Json(new StringBuilder(), false, false);
+        json.writeMapBegin();
+        json.writeMapEntry("key", null, "java://java.util.List");
+        json.writeMapEnd();
+        assertEquals("{\"key\":[]}", json.getAppendable().toString());
+
+        Map<String,Integer> map = new TreeMap<String,Integer>();
+        map.put("item1", 1);
+        map.put("item2", 2);
+        json = new Json(new StringBuilder(), false, false);
+        json.writeMapBegin();
+        json.writeMapEntry("map1", map);
+        json.writeMapEntry("map2", null, "java://java.util.Map");
+        json.writeMapEnd();
+        assertEquals("{\"map1\":{\"item1\":1,\"item2\":2},\"map2\":{}}", json.getAppendable().toString());
     }
 
     public void testWriteMapKey() throws IOException {

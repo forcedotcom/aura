@@ -19,7 +19,6 @@
 	test: function(cmp){    
 	    	cmp.get("field_set_W_style_and_legend").getElement().style.display="none";
 	    	cmp.get("field_set_field_style_no_legend").getElement().style.display="none";
-	    	cmp.get("field_set_wrong_style_no_legend").getElement().style.display="BLAH";
 	    	
 		var expected = "Total Number of Errors found: 2";
 		var output    = $A.devToolService.checkAccessibility();

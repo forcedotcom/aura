@@ -25,8 +25,6 @@ function AttributeDef(config){
     //this.typeDef = null,//FIXME - look up in TypeDefRegistry
     if (config["defaultValue"] !== undefined) {
         this.defaultValue = config["defaultValue"]["value"];
-    } else if (this.typeDefDescriptor.substr(this.typeDefDescriptor.length-2) === "[]" || this.typeDefDescriptor.indexOf("aura://List") === 0) {
-        this.defaultValue = [];
     }
     this.required = config["required"];
 }

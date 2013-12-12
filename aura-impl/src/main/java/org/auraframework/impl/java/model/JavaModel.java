@@ -78,7 +78,17 @@ public class JavaModel implements Model {
         loggingService.startTimer("java");
         try {
             for (JavaValueDef member : this.modelDef.getAllMembers()) {
-                json.writeMapEntry(member.getName(), member.getValueFrom(bean));
+                Object value = member.getValueFrom(bean);
+                String typeName = null;
+                if (value == null) {
+                    try {
+                        typeName = member.getType().toString();
+                    } catch (QuickFixException qfe) {
+                        // Uh, swallow this and just treat it as not-a-list, not-a-map.
+                        // It probably should never happen, but we don't want to choke for it.
+                    }
+                }
+                json.writeMapEntry(member.getName(), value, typeName);
             }
         } finally {
             loggingService.stopTimer("java");

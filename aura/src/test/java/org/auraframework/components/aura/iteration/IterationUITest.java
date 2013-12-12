@@ -66,7 +66,7 @@ public class IterationUITest extends WebDriverTestCase {
                                                                      // class?
         // For ie8 className does not have quotes
         clientHtml = clientHtml.replaceAll(" class=[^>]+", "");
-
+        
         serverHtml = serverHtml.replaceAll("\\s+", " "); // replace whitespace
                                                          // with a single space
         serverHtml = serverHtml.replaceAll(" id=\"[^\"]+\"", ""); // server
@@ -81,6 +81,16 @@ public class IterationUITest extends WebDriverTestCase {
         // needs an extra space
         serverHtml = serverHtml.replaceAll("(?i)</DIV>from", "</DIV> from");
         serverHtml = serverHtml.replaceAll("(?i)<BR>from", "<BR> from");
+        // space between div tags
+        clientHtml = clientHtml.replaceAll("> <", "><"); 
+        serverHtml = serverHtml.replaceAll("> <", "><");
+        // uppercased tags
+        clientHtml = clientHtml.replaceAll("DIV", "div");
+        clientHtml = clientHtml.replaceAll("BUTTON", "button");
+        clientHtml = clientHtml.replaceAll("BR", "br");
+        serverHtml = serverHtml.replaceAll("DIV", "div");
+        serverHtml = serverHtml.replaceAll("BUTTON", "button");
+        serverHtml = serverHtml.replaceAll("BR", "br");
 
         assertEquals(clientHtml, serverHtml);
         goldFileText(clientHtml);
@@ -120,6 +130,7 @@ public class IterationUITest extends WebDriverTestCase {
 
         serverHtml = serverHtml.replaceAll("<(?i)/?tbody>", ""); // server has extra
         // tbody?
+        
         assertEquals(clientHtml, serverHtml);
         goldFileText(clientHtml);
     }
@@ -179,7 +190,17 @@ public class IterationUITest extends WebDriverTestCase {
         // needs an extra space
         serverHtml = serverHtml.replaceAll("(?i)</DIV>from", "</DIV> from");
         serverHtml = serverHtml.replaceAll("(?i)<BR>from", "<BR> from");
-
+        // space between div tags
+        clientHtml = clientHtml.replaceAll("> <", "><"); 
+        serverHtml = serverHtml.replaceAll("> <", "><");
+        // uppercased tags
+        clientHtml = clientHtml.replaceAll("DIV", "div");
+        clientHtml = clientHtml.replaceAll("BUTTON", "button");
+        clientHtml = clientHtml.replaceAll("BR", "br");
+        serverHtml = serverHtml.replaceAll("DIV", "div");
+        serverHtml = serverHtml.replaceAll("BUTTON", "button");
+        serverHtml = serverHtml.replaceAll("BR", "br");
+        
         assertEquals(clientHtml, serverHtml);
         goldFileText(clientHtml);
     }

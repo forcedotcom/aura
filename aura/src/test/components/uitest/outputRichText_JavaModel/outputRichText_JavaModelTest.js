@@ -63,7 +63,8 @@
         test:function(cmp){
             var testCmp = cmp.find('myComp6');
             $A.test.assertNotNull(testCmp);
-            $A.test.assertEquals('Some text from server with blacklisted tags', $A.test.getText(testCmp.find('div').getElement()), "Failed to display richtext from Java model");
+            var actual = $A.test.getText(testCmp.find('div').getElement());
+            $A.test.assertEquals('Some text from server with blacklisted tags', $A.util.trim(actual), "Failed to display richtext from Java model");
             $A.test.assertEquals(0, testCmp.find('div').getElement().getElementsByTagName("script").length, "script tag should not be there");
             // Uncomment when bug is fixed.
             //$A.test.assertEquals(0, testCmp.find('div').getElement().getElementsByTagName("style").length, "style tag should not be there");
@@ -94,7 +95,8 @@
         test:function(cmp){
             var testCmp = cmp.find('myComp9');
             $A.test.assertNotNull(testCmp);
-            $A.test.assertEquals('Some text from server with nested blacklisted tags in div', $A.test.getText(testCmp.find('div').getElement()).trim(), "Failed to display richtext from Java model");
+            var actual = $A.test.getText(testCmp.find('div').getElement());
+            $A.test.assertEquals('Some text from server with nested blacklisted tags in div', $A.util.trim(actual), "Failed to display richtext from Java model");
             $A.test.assertEquals(1, testCmp.find('div').getElement().getElementsByTagName("div").length, "Div tag should not be there");
             // Uncomment when bug is fixed.
             //$A.test.assertEquals(0, testCmp.find('div').getElement().getElementsByTagName("script").length, "script tag should not be there");
@@ -102,7 +104,11 @@
         }
     },
     
+    /**
+     * We remove events and IE7 handles null events differently. 
+     */
     testStringValueWithEvent:{
+    	browsers:["-IE7"],
         test:function(cmp){
             var testCmp = cmp.find('myComp10');
             $A.test.assertNotNull(testCmp);
@@ -117,7 +123,26 @@
         }
     },
     
+    testStringValueWithEventInIE7:{
+    	browsers:["IE7"],
+        test:function(cmp){
+            var testCmp = cmp.find('myComp10');
+            $A.test.assertNotNull(testCmp);
+            $A.test.assertEquals('Some text from server with input tag with event', $A.test.getText(testCmp.find('div').getElement()), "Failed to display richtext from Java model");            
+            $A.test.assertEquals(1, testCmp.find('div').getElement().getElementsByTagName("input").length, "Input tag should be there");
+            
+            var ele = testCmp.find('div').getElement().getElementsByTagName("input")[0];
+            $A.test.assertFalse($A.util.isUndefinedOrNull(ele) , "Input tag should be there");
+            var cl = ele.onclick;
+            $A.test.assertTrue($A.util.isUndefinedOrNull(cl) , "Input tag should not have onclick attribute");
+        }
+    },
+    
+    /**
+     * We remove events and IE7 handles null events differently. 
+     */
     testStringValueWithMultipleEvent:{
+    	browsers:["-IE7"],
         test:function(cmp){
             var testCmp = cmp.find('myComp11');
             $A.test.assertNotNull(testCmp);

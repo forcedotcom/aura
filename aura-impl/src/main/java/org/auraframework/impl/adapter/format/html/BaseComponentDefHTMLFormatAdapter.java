@@ -94,11 +94,11 @@ public abstract class BaseComponentDefHTMLFormatAdapter<T extends BaseComponentD
                 }
 
                 sb.setLength(0);
-                writeHtmlScripts(AuraServlet.getBaseScripts(), sb);
+                writeHtmlScripts(AuraServlet.getBaseScripts(context), sb);
                 attributes.put("auraBaseScriptTags", sb.toString());
 
                 sb.setLength(0);
-                writeHtmlScripts(AuraServlet.getNamespacesScripts(), true, sb);
+                writeHtmlScripts(AuraServlet.getNamespacesScripts(context), true, sb);
                 attributes.put("auraNamespacesScriptTags", sb.toString());
 
                 if(!Aura.getContextService().getCurrentContext().getMode().equals(Mode.PROD) &&

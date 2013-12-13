@@ -30,6 +30,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.http.HttpHeaders;
 import org.auraframework.Aura;
@@ -349,6 +350,23 @@ public class AuraResourceServlet extends AuraBaseServlet {
         }
     }
 
+    private void writeCss(HttpServletRequest request, Set<DefDescriptor<?>> dependencies, AuraContext context,
+                          Appendable out) throws IOException, QuickFixException {
+        if (isAppRequest(request)) {
+            writeAppCss(dependencies, out);
+        } else {
+            writeResourcesCss(context, out);
+        }
+    }
+
+    private boolean isAppRequest(HttpServletRequest request) {
+        String type = request.getParameter(AuraResourceRewriteFilter.TYPE_PARAM);
+        if (StringUtils.endsWithIgnoreCase(type, "app")) {
+            return true;
+        }
+        return false;
+    }
+
     /**
      * write out CSS.
      * 
@@ -359,7 +377,7 @@ public class AuraResourceServlet extends AuraBaseServlet {
      * @throws IOException if unable to write to the response
      * @throws QuickFixException if the definitions could not be compiled.
      */
-    public static void writeCss(Set<DefDescriptor<?>> dependencies, Appendable out)
+    public static void writeAppCss(Set<DefDescriptor<?>> dependencies, Appendable out)
             throws IOException, QuickFixException {
         AuraContext context = Aura.getContextService().getCurrentContext();
         
@@ -451,6 +469,10 @@ public class AuraResourceServlet extends AuraBaseServlet {
         return frequencyMap;
     }
 
+    public static void writeResourcesCss(AuraContext context, Appendable out) throws IOException, QuickFixException {
+        Aura.getClientLibraryService().writeCss(context, out);
+    }
+
     /**
      * Adds frequency to particular style based on their component's descendants. All other types just get 1 as its
      * frequency. Adds component's frequency to its style to make ordering CSS easier.
@@ -511,6 +533,19 @@ public class AuraResourceServlet extends AuraBaseServlet {
     }
 
     private static final AuraControllerFilter ACF = new AuraControllerFilter();
+
+    private void writeJs(HttpServletRequest request, Set<DefDescriptor<?>> dependencies, AuraContext context,
+                         Appendable out) throws IOException, QuickFixException {
+        if (isAppRequest(request)) {
+            writeDefinitions(dependencies, out);
+        } else {
+            writeResourcesJs(context, out);
+        }
+    }
+
+    private void writeResourcesJs(AuraContext context, Appendable out) throws IOException, QuickFixException {
+        Aura.getClientLibraryService().writeJs(context, out);
+    }
 
     /**
      * write out the complete set of definitions in JS.
@@ -652,7 +687,7 @@ public class AuraResourceServlet extends AuraBaseServlet {
                 return;
             }
             try {
-                writeCss(topLevel, response.getWriter());
+                writeCss(request, topLevel, context, response.getWriter());
             } catch (Throwable t) {
                 handleServletException(t, true, context, request, response, true);
             }
@@ -663,7 +698,7 @@ public class AuraResourceServlet extends AuraBaseServlet {
                 return;
             }
             try {
-                writeDefinitions(topLevel, response.getWriter());
+                writeJs(request, topLevel, context, response.getWriter());
             } catch (Throwable t) {
                 handleServletException(t, true, context, request, response, true);
             }
@@ -714,4 +749,4 @@ public class AuraResourceServlet extends AuraBaseServlet {
     public void init(ServletConfig config) {
         servletContext = config.getServletContext();
     }
-}
+}   

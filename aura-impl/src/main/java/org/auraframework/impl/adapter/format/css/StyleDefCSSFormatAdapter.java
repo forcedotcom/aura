@@ -17,14 +17,11 @@ package org.auraframework.impl.adapter.format.css;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.annotation.concurrent.ThreadSafe;
 
 import org.auraframework.Aura;
 import org.auraframework.def.StyleDef;
-import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
@@ -33,9 +30,6 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 @ThreadSafe
 public class StyleDefCSSFormatAdapter extends CSSFormatAdapter<StyleDef> {
 
-    private static final Pattern pattern1 = Pattern.compile("\\s*([{};,:])\\s*");
-    private static final Pattern pattern2 = Pattern.compile("\\s+");
-
     @Override
     public Class<StyleDef> getType() {
         return StyleDef.class;
@@ -43,10 +37,9 @@ public class StyleDefCSSFormatAdapter extends CSSFormatAdapter<StyleDef> {
 
     @Override
     public void writeCollection(Collection<? extends StyleDef> values, Appendable out) throws IOException,
-            QuickFixException {
-        AuraContext context = Aura.getContextService().getCurrentContext();
-        Mode mode = context.getMode();
-        boolean compress = !(mode.isDevMode() || mode.isTestMode());
+    QuickFixException {
+        Mode mode = Aura.getContextService().getCurrentContext().getMode();
+        boolean compress = !mode.prettyPrint();
         StringBuilder sb = new StringBuilder();
         Appendable accum;
 
@@ -62,9 +55,7 @@ public class StyleDefCSSFormatAdapter extends CSSFormatAdapter<StyleDef> {
             }
         }
         if (compress) {
-            Matcher compressionMatcher1 = pattern1.matcher(sb.toString());
-            Matcher compressionMatcher2 = pattern2.matcher(compressionMatcher1.replaceAll("$1"));
-            out.append(compressionMatcher2.replaceAll(" "));
+            out.append(compress(sb.toString()));
         }
     }
 }

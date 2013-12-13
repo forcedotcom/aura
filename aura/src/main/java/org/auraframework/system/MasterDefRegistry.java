@@ -15,9 +15,11 @@
  */
 package org.auraframework.system;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.auraframework.def.ClientLibraryDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
@@ -176,4 +178,12 @@ public interface MasterDefRegistry {
      * @param key the value to store.
      */
     <T extends Definition> void putCachedString(String uid, DefDescriptor<?> descriptor, String key, String value);
+
+    /**
+     * Returns list of client libraries for given uid
+     *
+     * @param uid uid of app or cmp
+     * @return list of client libraries for uid
+     */
+    <T extends Definition> List<ClientLibraryDef> getClientLibraries(String uid);
 }

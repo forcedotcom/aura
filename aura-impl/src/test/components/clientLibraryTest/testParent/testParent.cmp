@@ -1,0 +1,5 @@
+<aura:component extensible="true">
+    <aura:clientLibrary name="parent" url="http://likeaboss.com/parent.js" type="JS"/>
+    <aura:clientLibrary name="duplicate" url="http://likeaboss.com/duplicate.js" type="JS"/>
+    <aura:clientLibrary url="http://likeaboss.com/mode.js" type="JS" modes="STATS" />
+</aura:component>

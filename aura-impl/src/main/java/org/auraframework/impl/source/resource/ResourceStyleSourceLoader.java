@@ -15,7 +15,6 @@
  */
 package org.auraframework.impl.source.resource;
 
-import java.util.EnumSet;
 import java.util.Set;
 
 import org.auraframework.def.DefDescriptor;
@@ -30,7 +29,11 @@ public class ResourceStyleSourceLoader extends ResourceSourceLoader {
 
     public static final Set<String> PREFIXES = ImmutableSet.of(DefDescriptor.CSS_PREFIX,
             DefDescriptor.TEMPLATE_CSS_PREFIX);
-    private static final Set<DefType> DEFTYPES = EnumSet.of(DefType.STYLE);
+
+    static {
+        extensions.put(DefType.RESOURCE, "Resource.css");
+        extensions.put(DefType.STYLE, ".css");
+    }
 
     public ResourceStyleSourceLoader(String basePackage) {
         super(basePackage);
@@ -40,7 +43,7 @@ public class ResourceStyleSourceLoader extends ResourceSourceLoader {
     protected String getPath(DefDescriptor<?> descriptor) {
         // Get rid of the inner type qualifier.
         String cssFilename = String.format("%s/%s/%s%s", descriptor.getNamespace(), descriptor.getName(),
-                descriptor.getName(), ".css");
+                descriptor.getName(), extensions.get(descriptor.getDefType()));
 
         return cssFilename;
     }
@@ -58,6 +61,6 @@ public class ResourceStyleSourceLoader extends ResourceSourceLoader {
 
     @Override
     public Set<DefType> getDefTypes() {
-        return DEFTYPES;
+        return extensions.keySet();
     }
 }

@@ -941,7 +941,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
 
     /**
      * Verify the whitespace attribute specified on a component tag. By default the whitespace logic is optimize, which
-     * removes all non-necessary whitespace. Test method for {@link aura.def.BaseComponentDef#getWhitespace()}.
+     * removes all non-necessary whitespace. Test method for {@link org.auraframework.def.BaseComponentDef#getWhitespaceBehavior()}.
      */
     public void testGetWhitespaceDefault() throws Exception {
         WhitespaceBehavior defaultWhitespaceBehavior = define(baseTag, "", "").getWhitespaceBehavior();
@@ -951,7 +951,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
 
     /**
      * Verify the whitespace attribute specified as preserve. Test method for
-     * {@link aura.def.BaseComponentDef#getWhitespace()}.
+     * {@link org.auraframework.def.BaseComponentDef#getWhitespaceBehavior()}.
      */
     public void testGetWhitespacePreserve() throws Exception {
         T preserveWhitespaceComponentDef = define(baseTag, " whitespace='preserve'", "");
@@ -961,7 +961,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
 
     /**
      * Verify the whitespace attribute specified as optimize. Test method for
-     * {@link aura.def.BaseComponentDef#getWhitespace()}.
+     * {@link org.auraframework.def.BaseComponentDef#getWhitespaceBehavior()}.
      */
     public void testGetWhitespaceOptimize() throws Exception {
         T optimizeWhitespaceComponentDef = define(baseTag, " whitespace='optimize'", "");
@@ -970,7 +970,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
     }
 
     /**
-     * No dependencies by default. Test method for {@link aura.def.BaseComponentDef#getDependencies()}.
+     * No dependencies by default. Test method for {@link org.auraframework.def.BaseComponentDef#getDependencies()}.
      */
     public void testGetDependenciesWithoutDependencies() throws Exception {
         T baseComponentDef = define(baseTag, "", "");
@@ -979,7 +979,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
     }
 
     /**
-     * Dependency returned for default namespace. Test method for {@link aura.def.BaseComponentDef#getDependencies()}.
+     * Dependency returned for default namespace. Test method for {@link org.auraframework.def.BaseComponentDef#getDependencies()}.
      */
     public void testGetDependenciesDefaultNamespace() throws Exception {
         T baseComponentDef = define(baseTag, "", "<aura:dependency resource=\"*://aura:*\" type=\"EVENT\"/>");
@@ -988,7 +988,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
 
     /**
      * Dependency returned for non-default namespace. Test method for
-     * {@link aura.def.BaseComponentDef#getDependencies()}.
+     * {@link org.auraframework.def.BaseComponentDef#getDependencies()}.
      */
     public void testGetDependenciesNonDefaultNamespace() throws Exception {
         T baseComponentDef = define(baseTag, "", "<aura:dependency resource=\"*://auratest:*\" type=\"EVENT\"/>");
@@ -1286,7 +1286,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
     }
 
     /**
-     * Test method for {@link BaseComponentDef#isInstanceOf()}.
+     * Test method for {@link BaseComponentDef#isInstanceOf(DefDescriptor)}.
      */
     public void testIsInstanceOfAbstract() throws Exception {
         // Test cases for Abstract Component extensions
@@ -1303,7 +1303,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
     }
 
     /**
-     * Test method for {@link BaseComponentDef#isInstanceOf()}.
+     * Test method for {@link BaseComponentDef#isInstanceOf(DefDescriptor)}.
      */
     public void testIsInstanceOfInterface() throws Exception {
         // Test cases for Interface inheritance and implementations
@@ -1719,5 +1719,25 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         assertTrue(temp instanceof Map);
         Map<Object, Object> cmpConfig = (HashMap<Object, Object>) temp;
         return cmpConfig.containsKey(property) ? cmpConfig.get(property) : null;
+    }
+
+    public void testClientLibraryDefValidation() throws Exception{
+        DefDescriptor<T> missingRequiredAttr = addSourceAutoCleanup(getDefClass(),
+                String.format(baseTag, "", "<aura:clientLibrary type='JS' />"));
+        try{
+            missingRequiredAttr.getDef();
+            fail("Failed to validate client library type which didn't specify a name attribute.");
+        }catch(InvalidDefinitionException e){
+            assertEquals("Must have either a name or url", e.getMessage());
+        }
+        
+        DefDescriptor<T> invalidResource = addSourceAutoCleanup(getDefClass(),
+                String.format(baseTag, "", "<aura:clientLibrary name='doesntExist' type='js' url='js://foo.bar'/>"));
+        try {
+            invalidResource.getDef();
+            fail("Failed to validate client library type which specified non existing component resource.");
+        } catch(Exception e) {
+            checkExceptionFull(e, InvalidDefinitionException.class, "No resource named js://foo.bar found");
+        }
     }
 }

@@ -26,6 +26,7 @@ import org.auraframework.adapter.LoggingAdapter;
 import org.auraframework.adapter.PrefixDefaultsAdapter;
 import org.auraframework.adapter.RegistryAdapter;
 import org.auraframework.adapter.StyleAdapter;
+import org.auraframework.clientlibrary.ClientLibraryService;
 import org.auraframework.impl.BuilderServiceImpl;
 import org.auraframework.impl.ClientServiceImpl;
 import org.auraframework.impl.ContextAdapterImpl;
@@ -43,6 +44,7 @@ import org.auraframework.impl.adapter.ConfigAdapterImpl;
 import org.auraframework.impl.adapter.GlobalValueProviderAdapterImpl;
 import org.auraframework.impl.adapter.JsonSerializerAdapterImpl;
 import org.auraframework.impl.adapter.StyleAdapterImpl;
+import org.auraframework.impl.adapter.format.css.ClientLibraryCSSFormatAdapter;
 import org.auraframework.impl.adapter.format.css.StyleDefCSSFormatAdapter;
 import org.auraframework.impl.adapter.format.css.ThrowableCSSFormatAdapter;
 import org.auraframework.impl.adapter.format.html.ApplicationDefHTMLFormatAdapter;
@@ -55,6 +57,7 @@ import org.auraframework.impl.adapter.format.html.TestSuiteDefHTMLFormatAdapter;
 import org.auraframework.impl.adapter.format.html.ThrowableHTMLFormatAdapter;
 import org.auraframework.impl.adapter.format.html.embedded.ApplicationDefEmbeddedHTMLFormatAdapter;
 import org.auraframework.impl.adapter.format.html.offline.ApplicationDefOfflineHTMLFormatAdapter;
+import org.auraframework.impl.adapter.format.js.ClientLibraryJSFormatAdapter;
 import org.auraframework.impl.adapter.format.js.ComponentDefJSFormatAdapter;
 import org.auraframework.impl.adapter.format.js.ThrowableJSFormatAdapter;
 import org.auraframework.impl.adapter.format.json.ActionJSONFormatAdapter;
@@ -68,6 +71,7 @@ import org.auraframework.impl.adapter.format.json.EventDefJSONFormatAdapter;
 import org.auraframework.impl.adapter.format.json.MessageJSONFormatAdapter;
 import org.auraframework.impl.adapter.format.json.TestSuiteDefJSONFormatAdapter;
 import org.auraframework.impl.adapter.format.json.ThrowableJSONFormatAdapter;
+import org.auraframework.impl.clientlibrary.ClientLibraryServiceImpl;
 import org.auraframework.impl.context.AuraContextServiceImpl;
 import org.auraframework.impl.context.AuraPrefixDefaultsProviderImpl;
 import org.auraframework.impl.context.AuraRegistryProviderImpl;
@@ -326,6 +330,16 @@ public class AuraImplConfig {
     }
 
     @Impl
+    public static FormatAdapter<?> clientLibraryCSSFormatAdapter() {
+        return new ClientLibraryCSSFormatAdapter();
+    }
+
+    @Impl
+    public static FormatAdapter<?> clientLibraryJSFormatAdapter() {
+        return new ClientLibraryJSFormatAdapter();
+    }
+
+    @Impl
     public static JsonSerializerAdapter auraImplJsonSerializationAdapter() {
         return new JsonSerializerAdapterImpl();
     }
@@ -384,6 +398,12 @@ public class AuraImplConfig {
     @PrimaryImpl
     public static IntegrationService integrationService() {
         return new IntegrationServiceImpl();
+    }
+
+    @Impl
+    @PrimaryImpl
+    public static ClientLibraryService auraImplclientLibraryService() {
+        return new ClientLibraryServiceImpl();
     }
 
     @Impl

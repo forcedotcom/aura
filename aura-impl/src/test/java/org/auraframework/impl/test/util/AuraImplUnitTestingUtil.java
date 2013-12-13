@@ -29,6 +29,7 @@ import org.auraframework.def.AttributeDef;
 import org.auraframework.def.AttributeDef.SerializeToType;
 import org.auraframework.def.AttributeDefRef;
 import org.auraframework.def.BaseComponentDef;
+import org.auraframework.def.ClientLibraryDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.ControllerDef;
@@ -49,6 +50,7 @@ import org.auraframework.def.StyleDef;
 import org.auraframework.def.ThemeDef;
 import org.auraframework.def.TypeDef;
 import org.auraframework.expression.PropertyReference;
+import org.auraframework.impl.clientlibrary.ClientLibraryDefImpl;
 import org.auraframework.impl.root.AttributeDefImpl;
 import org.auraframework.impl.root.AttributeDefRefImpl;
 import org.auraframework.impl.root.AttributeImpl;
@@ -68,6 +70,7 @@ import org.auraframework.impl.root.theme.ThemeDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.instance.BaseComponent;
+import org.auraframework.system.AuraContext;
 import org.auraframework.system.Location;
 import org.auraframework.system.SubDefDescriptor;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -315,6 +318,26 @@ public class AuraImplUnitTestingUtil {
 	public AttributeDefImpl makeAttributeDef() {
 		return makeAttributeDef(null, null, null, false, null, null, null);
 	}
+
+    public ClientLibraryDef makeClientLibraryDef(String name, String url,
+                                                 ClientLibraryDef.Type type,
+                                                 Set<AuraContext.Mode> modes,
+                                                 boolean combine,
+                                                 DefDescriptor<? extends RootDefinition> parentDescriptor,
+                                                 Location location) {
+        ClientLibraryDefImpl.Builder builder = new ClientLibraryDefImpl.Builder();
+
+        builder.setName(name);
+        builder.setUrl(url);
+        builder.setType(type);
+        builder.setModes(modes);
+        builder.setCombine(combine);
+
+        builder.setParentDescriptor(parentDescriptor);
+        builder.setLocation(location);
+
+        return builder.build();
+    }
 
 	/**
 	 * A null parameter indicates you don't care what the value is, and thus it

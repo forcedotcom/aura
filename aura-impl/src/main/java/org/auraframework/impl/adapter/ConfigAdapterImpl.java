@@ -163,24 +163,6 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     }
 
     @Override
-    public String getJiffyCSSURL() {
-        String contextPath = Aura.getContextService().getCurrentContext().getContextPath();
-        return String.format("%s/auraFW/resources/jiffy/Jiffy.css", contextPath);
-    }
-
-    @Override
-    public String getJiffyJSURL() {
-        String contextPath = Aura.getContextService().getCurrentContext().getContextPath();
-        return String.format("%s/auraFW/resources/jiffy/Jiffy.js", contextPath);
-    }
-
-    @Override
-    public String getJiffyUIJSURL() {
-        String contextPath = Aura.getContextService().getCurrentContext().getContextPath();
-        return String.format("%s/auraFW/resources/jiffy/JiffyUi.js", contextPath);
-    }
-
-    @Override
     public synchronized void regenerateAuraJS() {
         /*
          * If we're missing source, jsGroup will be an AuraResourceGroup and isStale() is always false. If we're in
@@ -216,14 +198,14 @@ public class ConfigAdapterImpl implements ConfigAdapter {
             }
         }
     }
-    
+
     @Override
     public String getMomentJSURL() {
     	String nonce = Aura.getContextService().getCurrentContext().getFrameworkUID();
         String contextPath = Aura.getContextService().getCurrentContext().getContextPath();
         return String.format("%s/auraFW/resources/%s/moment/moment.js", contextPath, nonce);
     }
-    
+
     @Override
     public List<String> getWalltimeJSURLs() {
         AuraLocale al = Aura.getLocalizationAdapter().getAuraLocale();
@@ -239,13 +221,6 @@ public class ConfigAdapterImpl implements ConfigAdapter {
 
         urls.add(String.format("%s/auraFW/resources/%s/walltime-js/walltime.js", contextPath, nonce));
         return urls;
-    }
-    
-    @Override
-    public String getCKEditorURL() {
-    	String nonce = Aura.getContextService().getCurrentContext().getFrameworkUID();
-        String contextPath = Aura.getContextService().getCurrentContext().getContextPath();        
-        return String.format("%s/auraFW/resources/%s/ckeditor-3.6.6/ckeditor.js", contextPath, nonce);
     }
 
     @Override

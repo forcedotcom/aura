@@ -16,7 +16,13 @@
 package org.auraframework.impl.system;
 
 import java.lang.ref.WeakReference;
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedSet;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
@@ -24,12 +30,24 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.log4j.Logger;
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.BaseComponentDef;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.ClientLibraryDef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.Definition;
+import org.auraframework.def.DescriptorFilter;
+import org.auraframework.def.SecurityProviderDef;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.service.LoggingService;
-import org.auraframework.system.*;
+import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.system.DefRegistry;
+import org.auraframework.system.Location;
+import org.auraframework.system.MasterDefRegistry;
+import org.auraframework.system.Source;
+import org.auraframework.system.SourceListener;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
@@ -37,8 +55,13 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.text.Hash;
 
 import com.google.common.base.Optional;
-import com.google.common.cache.*;
-import com.google.common.collect.*;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheStats;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 /**
  * Overall Master definition registry implementation, there be dragons here.
@@ -77,11 +100,14 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         public final String uid;
         public final long lastModTime;
         public final SortedSet<DefDescriptor<?>> dependencies;
+        public final List<ClientLibraryDef> clientLibraries;
         public final QuickFixException qfe;
 
-        public DependencyEntry(String uid, SortedSet<DefDescriptor<?>> dependencies, long lastModTime) {
+        public DependencyEntry(String uid, SortedSet<DefDescriptor<?>> dependencies, long lastModTime,
+                               List<ClientLibraryDef> clientLibraries) {
             this.uid = uid;
             this.dependencies = Collections.unmodifiableSortedSet(dependencies);
+            this.clientLibraries = Collections.unmodifiableList(clientLibraries);
             this.lastModTime = lastModTime;
             this.qfe = null;
         }
@@ -89,6 +115,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         public DependencyEntry(QuickFixException qfe) {
             this.uid = null;
             this.dependencies = null;
+            this.clientLibraries = null;
             this.lastModTime = 0;
             this.qfe = qfe;
         }
@@ -222,6 +249,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             case HELPER:
             case STYLE:
             case TYPE:
+            case RESOURCE:
             case PROVIDER:
             case SECURITY_PROVIDER:
                 qualifiedNamePattern = "%s://%s.%s";
@@ -344,11 +372,14 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         public final LoggingService loggingService = Aura.getLoggingService();
         public final Map<DefDescriptor<? extends Definition>, CompilingDef<?>> compiled = Maps.newHashMap();
         public final Map<DefDescriptor<? extends Definition>, Definition> dependencies;
+        public final List<ClientLibraryDef> clientLibs;
 
         // public final Map<DefDescriptor<? extends Definition>, Definition>
         // dependencies = Maps.newHashMap();
-        public CompileContext(Map<DefDescriptor<? extends Definition>, Definition> dependencies) {
+        public CompileContext(Map<DefDescriptor<? extends Definition>, Definition> dependencies,
+            List<ClientLibraryDef> clientLibs) {
             this.dependencies = dependencies;
+            this.clientLibs = clientLibs;
         }
 
         public <D extends Definition> CompilingDef<D> getCompiling(DefDescriptor<D> descriptor) {
@@ -509,6 +540,13 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             }
             deps.addAll(newDeps);
             cc.dependencies.put(cd.descriptor, cd.def);
+
+            // get client libs
+            if (cd.def instanceof BaseComponentDef) {
+                BaseComponentDef baseComponent = (BaseComponentDef) cd.def;
+                baseComponent.addClientLibs(cc.clientLibs);
+            }
+
             return cd.def;
         } catch (DefinitionNotFoundException dnfe) {
             //
@@ -583,9 +621,10 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
      * @param descriptor the descriptor that we wish to compile.
      */
     protected <D extends Definition> D compileDef(DefDescriptor<D> descriptor,
-            Map<DefDescriptor<? extends Definition>, Definition> dependencies) throws QuickFixException {
+            Map<DefDescriptor<? extends Definition>, Definition> dependencies,
+            List<ClientLibraryDef> clientLibs) throws QuickFixException {
         Set<DefDescriptor<?>> next = Sets.newHashSet();
-        CompileContext cc = new CompileContext(dependencies);
+        CompileContext cc = new CompileContext(dependencies, clientLibs);
         D def;
 
         rLock.lock();
@@ -651,7 +690,8 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         try {
             compilingDescriptor = descriptor;
             Map<DefDescriptor<? extends Definition>, Definition> dds = Maps.newTreeMap();
-            Definition def = compileDef(descriptor, dds);
+            List<ClientLibraryDef> clientLibs = Lists.newArrayList();
+            Definition def = compileDef(descriptor, dds, clientLibs);
             DependencyEntry de;
             String uid;
             long lmt = 0;
@@ -694,7 +734,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             // de = getDE(uid, key);
             // if (de == null) {
 
-            de = new DependencyEntry(uid, Sets.newTreeSet(dds.keySet()), lmt);
+            de = new DependencyEntry(uid, Sets.newTreeSet(dds.keySet()), lmt, clientLibs);
             depsCache.put(makeGlobalKey(de.uid, descriptor), de);
 
             // See localDependencies comment
@@ -777,6 +817,16 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
         if (de != null) {
             return de.dependencies;
+        }
+        return null;
+    }
+
+    @Override
+    public <T extends Definition> List<ClientLibraryDef> getClientLibraries(String uid) {
+        DependencyEntry de = localDependencies.get(uid);
+
+        if (de != null) {
+            return de.clientLibraries;
         }
         return null;
     }

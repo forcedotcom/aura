@@ -37,6 +37,7 @@ import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.LayoutsDef;
 import org.auraframework.def.ProviderDef;
 import org.auraframework.def.RendererDef;
+import org.auraframework.def.ResourceDef;
 import org.auraframework.def.TestSuiteDef;
 import org.auraframework.def.StyleDef;
 import org.auraframework.impl.system.StaticDefRegistryImpl;
@@ -89,23 +90,22 @@ public class RegistrySerializer {
         DefinitionService defService = Aura.getDefinitionService();
 
         return Lists
-                .<DefRegistry<?>> newArrayList(
-                        createRegistry(defService.getDefDescriptor(String.format("%s:*", namespace),
-                                ApplicationDef.class)),
-                        createRegistry(defService.getDefDescriptor(String.format("%s:*", namespace), LayoutsDef.class)),
-                        createRegistry(defService.getDefDescriptor(String.format("%s:*", namespace), InterfaceDef.class)),
-                        createRegistry(defService.getDefDescriptor(String.format("%s:*", namespace), EventDef.class)),
-                        createRegistry(defService.getDefDescriptor(String.format("%s:*", namespace), ComponentDef.class)),
-                        createRegistry(defService.getDefDescriptor(String.format("js://%s.*", namespace),
-                                ControllerDef.class)), createRegistry(defService.getDefDescriptor(
-                                String.format("js://%s.*", namespace), HelperDef.class)), createRegistry(defService
-                                .getDefDescriptor(String.format("js://%s.*", namespace), ProviderDef.class)),
-                        createRegistry(defService.getDefDescriptor(String.format("js://%s.*", namespace),
-                                RendererDef.class)), createRegistry(defService.getDefDescriptor(
-                                String.format("js://%s.*", namespace), TestSuiteDef.class)), createRegistry(defService
-                                .getDefDescriptor(String.format("css://%s.*", namespace), StyleDef.class)),
-                        createRegistry(defService.getDefDescriptor(String.format("templateCss://%s.*", namespace),
-                                StyleDef.class)));
+            .<DefRegistry<?>> newArrayList(
+                createRegistry(defService.getDefDescriptor(String.format("%s:*", namespace), ApplicationDef.class)),
+                createRegistry(defService.getDefDescriptor(String.format("%s:*", namespace), LayoutsDef.class)),
+                createRegistry(defService.getDefDescriptor(String.format("%s:*", namespace), InterfaceDef.class)),
+                createRegistry(defService.getDefDescriptor(String.format("%s:*", namespace), EventDef.class)),
+                createRegistry(defService.getDefDescriptor(String.format("%s:*", namespace), ComponentDef.class)),
+                createRegistry(defService.getDefDescriptor(String.format("js://%s.*", namespace), ControllerDef.class)),
+                createRegistry(defService.getDefDescriptor(String.format("js://%s.*", namespace), HelperDef.class)),
+                createRegistry(defService.getDefDescriptor(String.format("js://%s.*", namespace), ProviderDef.class)),
+                createRegistry(defService.getDefDescriptor(String.format("js://%s.*", namespace), RendererDef.class)),
+                createRegistry(defService.getDefDescriptor(String.format("js://%s.*", namespace), TestSuiteDef.class)),
+                createRegistry(defService.getDefDescriptor(String.format("js://%s.*", namespace), ResourceDef.class)),
+                createRegistry(defService.getDefDescriptor(String.format("css://%s.*", namespace), StyleDef.class)),
+                createRegistry(defService.getDefDescriptor(String.format("css://%s.*", namespace), ResourceDef.class)),
+                createRegistry(defService.getDefDescriptor(String.format("templateCss://%s.*", namespace),
+                        StyleDef.class)));
     }
 
     @SuppressWarnings("unchecked")

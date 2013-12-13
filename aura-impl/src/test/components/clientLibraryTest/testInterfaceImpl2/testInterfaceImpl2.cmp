@@ -1,0 +1,3 @@
+<aura:component>
+    <aura:clientLibrary name="interfaceImpl2" url="http://likeaboss.com/interfaceImpl2.js" type="JS"/>
+</aura:component>

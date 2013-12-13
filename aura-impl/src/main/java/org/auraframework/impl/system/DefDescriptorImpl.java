@@ -151,6 +151,7 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
             case RENDERER:
             case HELPER:
             case STYLE:
+            case RESOURCE:
             case TYPE:
             case SECURITY_PROVIDER:
             case PROVIDER:

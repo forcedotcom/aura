@@ -21,7 +21,9 @@ import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
+import org.auraframework.def.ResourceDef;
 import org.auraframework.def.StyleDef;
+import org.auraframework.impl.clientlibrary.handler.ResourceDefHandler;
 import org.auraframework.impl.css.parser.omakase.CssParserOmakase;
 import org.auraframework.impl.css.parser.omakase.CssParserOmakase.ParserResult;
 import org.auraframework.impl.css.style.StyleDefImpl;
@@ -104,6 +106,9 @@ public class StyleParser implements Parser {
             }
 
             return (D) builder.build();
+        } else if (descriptor.getDefType() == DefType.RESOURCE) {
+            return (D) new ResourceDefHandler<ResourceDef>((DefDescriptor<ResourceDef>) descriptor,
+                    (Source<ResourceDef>) source).createDefinition();
         }
 
         return null;

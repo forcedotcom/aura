@@ -84,6 +84,8 @@ public interface BaseComponentDef extends RootDefinition {
 
     DefDescriptor<ComponentDef> getTemplateDefDescriptor();
 
+    public List<ClientLibraryDef> getClientLibraries();
+    
     public static enum RenderType {
         SERVER, CLIENT, AUTO
     };
@@ -110,5 +112,13 @@ public interface BaseComponentDef extends RootDefinition {
     WhitespaceBehavior getWhitespaceBehavior();
 
     DefDescriptor<? extends BaseComponentDef> getDefaultExtendsDescriptor();
+
+    /**
+     * Adds specified client libraries to definition
+     * @param clientLibs list of client libraries
+     */
+    void addClientLibs(List<ClientLibraryDef> clientLibs);
+
+    Set<ResourceDef> getResourceDefs() throws QuickFixException;
 
 }

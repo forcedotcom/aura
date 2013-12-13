@@ -1,0 +1,5 @@
+<aura:interface provider="java://org.auraframework.impl.java.provider.ClientLibraryTestProvider">
+    <aura:attribute name="implNumber" type="String"/>
+    <!--aura:clientLibrary name="HTML5Shiv" type="JS" /-->
+    
+</aura:interface>

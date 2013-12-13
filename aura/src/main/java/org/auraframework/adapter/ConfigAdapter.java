@@ -36,18 +36,6 @@ public interface ConfigAdapter extends AuraAdapter {
     /** Returns a string to identify this unique version of the Aura framework. */
     String getAuraFrameworkNonce();
 
-    String getJiffyJSURL();
-
-    String getJiffyUIJSURL();
-
-    String getJiffyCSSURL();
-    
-    String getMomentJSURL();
-    
-    List<String> getWalltimeJSURLs();
-    
-    String getCKEditorURL();
-
     String getCSRFToken();
 
     void validateCSRFToken(String token);
@@ -69,4 +57,8 @@ public interface ConfigAdapter extends AuraAdapter {
     boolean validateCss();
 
 	String getHTML5ShivURL();
+
+    String getMomentJSURL();
+
+    List<String> getWalltimeJSURLs();
 }

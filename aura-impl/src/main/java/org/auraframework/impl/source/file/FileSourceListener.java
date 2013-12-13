@@ -51,6 +51,8 @@ public class FileSourceListener implements FileListener {
         extensions.put(DefDescriptor.DefType.PROVIDER, "Provider.js");
         extensions.put(DefDescriptor.DefType.HELPER, "Helper.js");
         extensions.put(DefDescriptor.DefType.MODEL, "Model.js");
+        extensions.put(DefDescriptor.DefType.RESOURCE, "Resource.css");
+        extensions.put(DefDescriptor.DefType.RESOURCE, "Resource.js");
     }
 
     @Override
@@ -95,7 +97,7 @@ public class FileSourceListener implements FileListener {
                 String extension = filePath.substring(filePath.lastIndexOf("."));
 
                 String qname;
-                if (defType == DefDescriptor.DefType.STYLE) {
+                if (extension.equalsIgnoreCase(".css")) {
                     qname = String.format("css://%s.%s", namespace, name);
                 } else if (extension.equalsIgnoreCase(".js")) {
                     qname = String.format("js://%s.%s", namespace, name);

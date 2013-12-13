@@ -1,0 +1,3 @@
+var clientLibraryTest = {
+    cool: "awesome"
+};

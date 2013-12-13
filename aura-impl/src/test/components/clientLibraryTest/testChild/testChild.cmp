@@ -1,0 +1,5 @@
+<aura:component extends="clientLibraryTest:testParent">
+    <aura:clientLibrary name="child" url="http://likeaboss.com/child.js" type="JS"/>
+    <aura:clientLibrary name="duplicate" url="http://likeaboss.com/duplicate.js" type="JS"/>
+    <aura:clientLibrary url="http://likeaboss.com/mode.js" type="JS" modes="CADENCE" />
+</aura:component>

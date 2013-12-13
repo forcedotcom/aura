@@ -42,6 +42,7 @@ public class FileJavascriptSourceLoader extends FileSourceLoader {
         extensions.put(DefType.PROVIDER, "Provider.js");
         extensions.put(DefType.HELPER, "Helper.js");
         extensions.put(DefType.MODEL, "Model.js");
+        extensions.put(DefType.RESOURCE, "Resource.js");
 
         filters.put(DefType.CONTROLLER, new SourceFileFilter(DefType.CONTROLLER));
         filters.put(DefType.RENDERER, new SourceFileFilter(DefType.RENDERER));
@@ -49,6 +50,7 @@ public class FileJavascriptSourceLoader extends FileSourceLoader {
         filters.put(DefType.PROVIDER, new SourceFileFilter(DefType.PROVIDER));
         filters.put(DefType.HELPER, new SourceFileFilter(DefType.HELPER));
         filters.put(DefType.MODEL, new SourceFileFilter(DefType.MODEL));
+        filters.put(DefType.RESOURCE, new SourceFileFilter(DefType.RESOURCE));
     }
 
     public FileJavascriptSourceLoader(File base) {

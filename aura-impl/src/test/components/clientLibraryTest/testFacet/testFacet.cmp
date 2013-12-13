@@ -1,0 +1,5 @@
+<aura:component >
+    <aura:clientLibrary name="facet" url="http://likeaboss.com/facet.js" type="JS"/>
+    <aura:clientLibrary name="duplicate" url="http://likeaboss.com/duplicate.js" type="JS"/>
+    <aura:clientLibrary url="http://likeaboss.com/mode.js" type="JS" modes="DEV" />
+</aura:component>

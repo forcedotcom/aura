@@ -152,12 +152,13 @@ public class AuraResourceServletTest extends AuraTestCase {
         final boolean minify = !(mode.isTestMode() || mode.isDevMode());
         final String mKey = minify ? "MIN:" : "DEV:";
 
-        HttpServletRequest request = new DummyHttpServletRequest(){
+        DummyHttpServletRequest request = new DummyHttpServletRequest(){
             @Override
             public long getDateHeader(String name) {
                 return -1;
             }
         };
+        request.setQueryParam(AuraResourceRewriteFilter.TYPE_PARAM, "app");
         HttpServletResponse response = new DummyHttpServletResponse();
         AuraResourceServlet servlet = new AuraResourceServlet();
         servlet.doGet(request, response);
@@ -189,12 +190,13 @@ public class AuraResourceServletTest extends AuraTestCase {
         final boolean minify = !(mode.isTestMode() || mode.isDevMode());
         final String mKey = minify ? "MIN:" : "DEV:";
 
-        HttpServletRequest request = new DummyHttpServletRequest(){
+        DummyHttpServletRequest request = new DummyHttpServletRequest(){
             @Override
             public long getDateHeader(String name) {
                 return -1;
             }
         };
+        request.setQueryParam(AuraResourceRewriteFilter.TYPE_PARAM, "app");
         HttpServletResponse response = new DummyHttpServletResponse();
         AuraResourceServlet servlet = new AuraResourceServlet();
         servlet.doGet(request, response);
@@ -259,7 +261,7 @@ public class AuraResourceServletTest extends AuraTestCase {
         Set<DefDescriptor<?>> dependencies = context.getDefRegistry().getDependencies(uid);
         
         StringBuilder output = new StringBuilder();
-        AuraResourceServlet.writeCss(dependencies, output);
+        AuraResourceServlet.writeAppCss(dependencies, output);
 
         // A snippet of component css
         String cssPiece = "AuraResourceServletTest-testWriteCssWithoutDupes";
@@ -298,8 +300,7 @@ public class AuraResourceServletTest extends AuraTestCase {
         allDeps.addAll(child2deps);
 
         StringBuilder output = new StringBuilder();
-        AuraResourceServlet.writeCss(allDeps, output);
-
+        AuraResourceServlet.writeAppCss(allDeps, output);
         String css = output.toString();
         System.out.println(css);
 
@@ -324,7 +325,7 @@ public class AuraResourceServletTest extends AuraTestCase {
         Set<DefDescriptor<?>> dependencies = context.getDefRegistry().getDependencies(uid);
 
         StringBuilder output = new StringBuilder();
-        AuraResourceServlet.writeCss(dependencies, output);
+        AuraResourceServlet.writeAppCss(dependencies, output);
 
         String sourceNoWhitespace = output.toString().replaceAll("\\s", "");
         String preloaded1 = ".clientApiTestCssStyleTest{background-color:#eee}";

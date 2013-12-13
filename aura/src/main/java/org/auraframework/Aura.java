@@ -21,6 +21,7 @@ import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ExceptionAdapter;
 import org.auraframework.adapter.LocalizationAdapter;
 import org.auraframework.adapter.StyleAdapter;
+import org.auraframework.clientlibrary.ClientLibraryService;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.Definition;
 import org.auraframework.instance.Application;
@@ -161,6 +162,13 @@ public class Aura {
      */
     public static IntegrationService getIntegrationService() {
         return Aura.get(IntegrationService.class);
+    }
+
+    /**
+     * Gets {@link ClientLibraryService}: service for including external client libraries (CSS or JS)
+     */
+    public static ClientLibraryService getClientLibraryService() {
+        return Aura.get(ClientLibraryService.class);
     }
 
     public static <T> T get(Class<T> type) {

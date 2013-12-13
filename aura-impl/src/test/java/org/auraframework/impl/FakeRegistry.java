@@ -15,9 +15,11 @@
  */
 package org.auraframework.impl;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.auraframework.def.ClientLibraryDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
@@ -120,6 +122,11 @@ public class FakeRegistry implements MasterDefRegistry {
 
     @Override
     public <T extends Definition> void putCachedString(String uid, DefDescriptor<?> descriptor, String key, String value) {
+    }
+
+    @Override
+    public <T extends Definition> List<ClientLibraryDef> getClientLibraries(String uid) {
+        return null;
     }
 
 }

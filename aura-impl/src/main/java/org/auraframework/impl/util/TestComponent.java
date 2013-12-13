@@ -24,6 +24,7 @@ import java.util.Set;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.AttributeDefRef;
 import org.auraframework.def.BaseComponentDef;
+import org.auraframework.def.ClientLibraryDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
@@ -36,6 +37,7 @@ import org.auraframework.def.ModelDef;
 import org.auraframework.def.ProviderDef;
 import org.auraframework.def.RegisterEventDef;
 import org.auraframework.def.RendererDef;
+import org.auraframework.def.ResourceDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.def.StyleDef;
 import org.auraframework.system.Location;
@@ -284,12 +286,26 @@ public final class TestComponent implements ComponentDef {
     }
 
     @Override
+    public void addClientLibs(List<ClientLibraryDef> clientLibs) {
+    }
+
+    @Override
     public StyleDef getStyleDef() throws QuickFixException {
         return null;
     }
 
     @Override
     public DefDescriptor<? extends BaseComponentDef> getDefaultExtendsDescriptor() {
+        return null;
+    }
+
+    @Override
+    public List<ClientLibraryDef> getClientLibraries() {
+        return null;
+    }
+
+    @Override
+    public Set<ResourceDef> getResourceDefs() throws QuickFixException {
         return null;
     }
 }

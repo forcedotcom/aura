@@ -92,7 +92,7 @@ public class ComponentRenderingUITest extends WebDriverTestCase {
                 isAuraClientEnginePresentOnPage());
         assertTrue("Using java renderer failed.",
                 getText(By.cssSelector("body")).contains("salesforce.com, inc, All rights reserved"));
-        assertTrue("Using java renderer failed", isElementPresent(By.xpath("//a[@href='http://www.salesforce.com']")));
+        assertTrue("Using java renderer failed", isElementPresent(By.xpath("//a[starts-with(@href, 'http://www.salesforce.com')]")));
 
     }
 

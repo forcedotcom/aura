@@ -21,6 +21,8 @@ import org.auraframework.test.WebDriverTestCase;
 import org.auraframework.test.annotation.ThreadHostileTest;
 import org.auraframework.test.annotation.UnAdaptableTest;
 import org.auraframework.test.controller.TestLoggingAdapterController;
+import org.auraframework.util.AuraUITestingUtil;
+import org.openqa.selenium.By;
 
 /**
  * UI Test for LabelValueProvider.js
@@ -29,26 +31,22 @@ public class LabelValueProviderUITest extends WebDriverTestCase {
 
     // URL string to go to
     private final String URL = "/gvpTest/labelProvider.cmp";
+    private By label1 = By.xpath("//div[@id='div1']");
 
     public LabelValueProviderUITest(String name) {
         super(name);
     }
 
     /**
-     * Tests that there are no multiple action requests for the same $Label.
-     *
-     * labelProviderRenderer.js has multiple requests for the same $Label. There are only three unique $Labels so
-     * we should only see three action requests for those unique $Labels
-     *
+     * Test we have one java call for each valid label request.
      * @throws Exception
      */
-    // TODO: W-1937281: Fix this test. TestLoggingAdapterController ?
     @ThreadHostileTest("TestLoggingAdapter not thread-safe")
-    @UnAdaptableTest("Missing TestLoggingAdapter impl")
-    public void _testEfficientActionRequests() throws Exception {
+    public void testEfficientActionRequests() throws Exception {
         TestLoggingAdapterController.beginCapture();
         open(URL);
-        auraUITestingUtil.waitForAuraInit();
+        auraUITestingUtil.waitForElementText(label1, "simplevalue1: Today", true);
+        
         Long callCount = 0L;
         boolean isLabelControllerCalled = false;
         for (Map<String, Object> log : TestLoggingAdapterController.endCapture()) {
@@ -58,14 +56,8 @@ public class LabelValueProviderUITest extends WebDriverTestCase {
                 break;
             }
         }
-
         assertTrue("Fail: LabelController should be called", isLabelControllerCalled);
         assertTrue("Fail: There should be three calls to LabelController", callCount == 3L);
-
     }
 
-    public void testDummy() throws Exception {
-        // no op test added to avoid warning result in jenkins
-        // TODO: remove when the above test is fixed and enabled
-    }
 }

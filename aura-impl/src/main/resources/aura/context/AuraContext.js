@@ -68,7 +68,7 @@ AuraContext.prototype.getGlobalValueProviders = function() {
  */
 AuraContext.prototype.encodeForServer = function() {
     var dn = this.getDynamicNamespaces();
-
+    
     return aura.util.json.encode({
         "mode" : this.mode,
         "dn" : dn,
@@ -213,12 +213,14 @@ AuraContext.prototype.getApp = function() {
 AuraContext.prototype.joinComponentConfigs = function(otherComponentConfigs) {
     if (otherComponentConfigs) {
         for ( var k in otherComponentConfigs) {
-            var config = otherComponentConfigs[k];
-            var def = config["componentDef"];
-            if (def) {
-                componentService.getDef(def);
-            }
-            this.componentConfigs[k] = config;
+        	if (otherComponentConfigs.hasOwnProperty(k)) {
+	            var config = otherComponentConfigs[k];
+	            var def = config["componentDef"];
+	            if (def) {
+	                componentService.getDef(def);
+	            }
+	            this.componentConfigs[k] = config;
+        	}
         }
     }
 };
@@ -232,12 +234,14 @@ AuraContext.prototype.joinLoaded = function(loaded) {
     }
     if (loaded) {
         for ( var i in loaded) {
-            var newL = loaded[i];
-            if (newL === 'deleted') {
-                delete this.loaded[i];
-            } else {
-                this.loaded[i] = newL;
-            }
+        	if (loaded.hasOwnProperty(i) && !($A.util.isFunction(i))) {
+	            var newL = loaded[i];
+	            if (newL === 'deleted') {
+	                delete this.loaded[i];
+	            } else {
+	                this.loaded[i] = newL;
+	            }
+        	}
         }
     }
 };

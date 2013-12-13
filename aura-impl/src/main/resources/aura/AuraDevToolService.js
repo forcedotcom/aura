@@ -111,25 +111,25 @@ var AuraDevToolService = function() {
 
         "views" : {
             "component" : function(){
-                return flattenRegistry($A.services.component.priv.indexes.globalId);
+                return flattenRegistry($A.services.component.indexes.globalId);
             },
             "componentDef" : function(){
-                return flattenRegistry($A.services.component.priv.registry.componentDefs);
+                return flattenRegistry($A.services.component.registry.componentDefs);
             },
             "controllerDef" : function(){
-                return flattenRegistry($A.services.component.priv.controllerDefRegistry.controllerDefs);
+                return flattenRegistry($A.services.component.controllerDefRegistry.controllerDefs);
             },
             "modelDef" : function(){
-                return flattenRegistry($A.services.component.priv.modelDefRegistry.modelDefs);
+                return flattenRegistry($A.services.component.modelDefRegistry.modelDefs);
             },
             "providerDef" : function(){
-                return flattenRegistry($A.services.component.priv.providerDefRegistry.providerDefs);
+                return flattenRegistry($A.services.component.providerDefRegistry.providerDefs);
             },
             "rendererDef" : function(){
-                return flattenRegistry($A.services.component.priv.rendererDefRegistry.rendererDefs);
+                return flattenRegistry($A.services.component.rendererDefRegistry.rendererDefs);
             },
             "helperDef" : function(){
-                return flattenRegistry($A.services.component.priv.helperDefRegistry.helperDefs);
+                return flattenRegistry($A.services.component.helperDefRegistry.helperDefs);
             }
 //#if {"modes" : ["STATS"]}
             ,

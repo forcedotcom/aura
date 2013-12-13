@@ -895,7 +895,7 @@
     /**
      * Refresh error not stored, so subsequent refresh will still replay.
      */
-    testRefreshErrorResponseNotStored : {
+    _testRefreshErrorResponseNotStored : {
         mocks : [{
             type : "ACTION",
                 stubs : [{

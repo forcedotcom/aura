@@ -25,6 +25,7 @@ import org.auraframework.instance.*;
 import org.auraframework.system.Annotations.Provider;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 /**
@@ -47,37 +48,46 @@ public class IterationProvider implements ComponentConfigProvider {
         cc.setAttributes(m);
 
         AttributeSet atts = component.getAttributes();
-        List<Object> items = (List<Object>) atts.getValue("items");
-        String var = (String) atts.getValue("var");
-        String indexVar = (String) atts.getValue("indexVar");
-        if (items != null && !items.isEmpty()) {
-            int realstart = 0;
-            int realend = items.size();
-            ComponentDefRefArray body = (ComponentDefRefArray) atts.getValue("body");
-            Integer start = getIntValue(atts.getValue("start"));
-            Integer end = getIntValue(atts.getValue("end"));
-            if (start == null && end == null) {
-                // int page = (Integer)atts.getValue("page");
-                // int pageSize = (Integer)atts.getValue("pageSize");
-            } else {
-                if (start != null && start > realstart) {
-                    realstart = start;
-                }
-                if (end != null && end < realend) {
-                    realend = end;
-                }
-            }
-            // boolean reverse = (Boolean)atts.getValue("reverse");
-            for (int i = realstart; i < realend; i++) {
-                Map<String, Object> providers = new HashMap<String, Object>();
-                providers.put(var, items.get(i));
-                if (indexVar != null) {
-                    providers.put(indexVar, i);
-                }
-                // realbody ends up dirty, don't need it to be
-                components.addAll(body.newInstance(atts.getValueProvider(), providers));
+        Iterable<?> value = (Iterable<?>)atts.getValue("items");
+        if (value != null) {
+            List<?> items = Lists.newArrayList(value);
+            if (!items.isEmpty()) {
+                String var = (String) atts.getValue("var");
+                String indexVar = (String) atts.getValue("indexVar");
+
+                int realstart = 0;
+	            int realend = items.size();
+	            
+	            ComponentDefRefArray body = (ComponentDefRefArray) atts.getValue("body");
+	            Integer start = getIntValue(atts.getValue("start"));
+	            Integer end = getIntValue(atts.getValue("end"));
+	            if (start == null && end == null) {
+	                // int page = (Integer)atts.getValue("page");
+	                // int pageSize = (Integer)atts.getValue("pageSize");
+	            } else {
+	                if (start != null && start > realstart) {
+	                    realstart = start;
+	                }
+	                
+	                if (end != null && end < realend) {
+	                    realend = end;
+	                }
+	            }
+	            
+	            // boolean reverse = (Boolean)atts.getValue("reverse");
+	            for (int i = realstart; i < realend; i++) {
+	                Map<String, Object> providers = new HashMap<String, Object>();
+	                providers.put(var, items.get(i));
+	                if (indexVar != null) {
+	                    providers.put(indexVar, i);
+	                }
+	                
+	                // realbody ends up dirty, don't need it to be
+	                components.addAll(body.newInstance(atts.getValueProvider(), providers));
+	            }
             }
         }
+        
         return cc;
     }
 

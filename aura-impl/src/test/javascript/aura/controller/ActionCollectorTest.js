@@ -18,11 +18,25 @@ Function.RegisterNamespace("Test.Aura.Controller");
 
 [Fixture]
 Test.Aura.Controller.ActionCollectorTest = function(){
+    var $A = {
+        ns : {},
+        assert: function(condition, message) {
+            if (!condition) {
+                var error = new Error(message);
+                throw error;
+            }
+        },
+        util: {
+            isFunction: function(obj){
+                return false;
+            }
+        }
+    };
+
+    var mockAura = Mocks.GetMocks(Object.Global(), { "$A": $A });
 
     //Mock the exp() function defined in Aura.js, this is originally used for exposing members using a export.js file
-    $A = {};
-    $A.ns = {};
-    Mocks.GetMock(Object.Global(), "exp", function(){})(function(){
+    Mocks.GetMocks(Object.Global(), { "exp": function(){}, "$A":$A})(function(){
         //#import aura.controller.ActionCollector
     });
 
@@ -32,7 +46,10 @@ Test.Aura.Controller.ActionCollectorTest = function(){
         function ActionsToSendToEmpty(){
             // Arrange
             var expected = [];
-            var target = new $A.ns.ActionCollector();
+            var target;
+            mockAura(function(){
+                target = new $A.ns.ActionCollector();
+            });
 
             // Act
             var actual = target.actionsToSend;
@@ -45,7 +62,10 @@ Test.Aura.Controller.ActionCollectorTest = function(){
         function ActionsToCompleteToEmpty(){
             // Arrange
             var expected = [];
-            var target = new $A.ns.ActionCollector();
+            var target;
+            mockAura(function(){
+                target = new $A.ns.ActionCollector();
+            });
 
             // Act
             var actual = target.actionsToComplete;
@@ -58,7 +78,10 @@ Test.Aura.Controller.ActionCollectorTest = function(){
         function SetsNumToMinus1(){
             // Arrange
             var expected = -1;
-            var target = new $A.ns.ActionCollector();
+            var target;
+            mockAura(function(){
+                target = new $A.ns.ActionCollector();
+            });
 
             // Act
             var actual = target.num;
@@ -71,7 +94,10 @@ Test.Aura.Controller.ActionCollectorTest = function(){
         function SetsToCollectTo0(){
             // Arrange
             var expected = 0;
-            var target = new $A.ns.ActionCollector();
+            var target;
+            mockAura(function(){
+                target = new $A.ns.ActionCollector();
+            });
 
             // Act
             var actual = target.actionsToCollect;
@@ -84,7 +110,10 @@ Test.Aura.Controller.ActionCollectorTest = function(){
         function ActionsRequestedSetsToCollect(){
             // Arrange
             var expected = 1;
-            var target = new $A.ns.ActionCollector(["action"]);
+            var target;
+            mockAura(function(){
+                target = new $A.ns.ActionCollector(["action"]);
+            });
 
             // Act
             var actual = target.actionsToCollect
@@ -100,7 +129,10 @@ Test.Aura.Controller.ActionCollectorTest = function(){
         function ActionsRequestedStartsAsInput(){
             // Arrange
             var expected = [ "action" ];
-            var target = new $A.ns.ActionCollector(expected);
+            var target;
+            mockAura(function(){
+                target = new $A.ns.ActionCollector(expected);
+            });
 
             // Act
             var actual = target.getActionsRequested();
@@ -113,7 +145,10 @@ Test.Aura.Controller.ActionCollectorTest = function(){
         function ActionsRequestedIsSettable(){
             // Arrange
             var expected = [ "action1", "action2" ];
-            var target = new $A.ns.ActionCollector();
+            var target;
+            mockAura(function(){
+                target = new $A.ns.ActionCollector();
+            });
             target.actionsRequested = expected;
 
             // Act

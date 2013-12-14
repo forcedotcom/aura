@@ -136,6 +136,26 @@
 		$A.test.assertEquals(expected, actual , "Unexpected return from CheckAccessibility, should return 1 error for input of type image with out an alt");
 	}
     },
+    testAnchorMenuTest:{
+		attributes : {caseToRender : 'anchorMenuTest'},
+		test: function(cmp){
+			var expected = "";
+			var output    = $A.devToolService.checkAccessibility();
+			var actual   =  output.split("\n")[0];
+			$A.test.assertEquals(expected, actual , "Unexpected return from CheckAccessibility, should not return errornous string. output: \n"+output);
+		}
+    },
+    testCKEditorTest:{
+		attributes : {caseToRender : 'ckeditor_test'},
+		test: function(cmp){
+			var expected = "";
+			var output    = $A.devToolService.checkAccessibility();
+			var actual   =  output.split("\n")[0];
+			$A.test.assertEquals(expected, actual , "Unexpected return from CheckAccessibility, should not return errornous string. output: \n"+output);
+		}
+    },
+    
+    
     //Full tests
     testCheckAccessibility:{
 		test: function(cmp){

@@ -188,6 +188,23 @@
             <img class="/auraFW/resources/aura/s.gif uiImage" src="/auraFW/resources/aura/s.gif" />
         </a>
     </aura:if>
+   <aura:if isTrue="{!v.caseToRender == 'anchorMenuTest'}">
+         <ui:menu>
+            <ui:menuTriggerLink class="radioMenuLabel" aura:id="radioMenuLabel" label="National League West"/>
+            <ui:menuList class="radioMenu" aura:id="radioMenu">
+                <ui:radioMenuItem class="radioItem1" aura:id="radioItem1" label="San Francisco"/>
+                <ui:radioMenuItem class="radioItem2" aura:id="radioItem2" label="LA Dodgers"/>
+                <ui:radioMenuItem class="radioItem3" aura:id="radioItem3" label="Arizona"/>
+                <ui:radioMenuItem class="radioItem4" aura:id="radioItem4" label="Diego" disabled="true"/>
+                <ui:radioMenuItem class="radioItem5" aura:id="radioItem5" label="Colorado"/>
+            </ui:menuList>
+        </ui:menu>
+    </aura:if>
+    <aura:if isTrue="{!v.caseToRender == 'ckeditor_test'}">
+        <ui:inputRichText aura:id="RICH_TEXT" label="label For Rich Text" value="{!v.testContent}"/> <br/> 
+    </aura:if>
+    
+    
     <aura:if isTrue="{!v.caseToRender == 'NoRadioErrors'}">
        <fieldset class="field_set">
             <legend>More Options</legend>

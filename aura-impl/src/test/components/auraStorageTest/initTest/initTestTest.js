@@ -895,7 +895,7 @@
     /**
      * Refresh error not stored, so subsequent refresh will still replay.
      */
-    _testRefreshErrorResponseNotStored : {
+    testRefreshErrorResponseNotStored : {
         mocks : [{
             type : "ACTION",
                 stubs : [{
@@ -956,16 +956,24 @@
             a.setParams({testName : "testRefreshErrorResponseNotStored"});
             a.setStorable();
             a.setCallback(cmp, function(action){
-                    cmp.getDef().getHelper().findAndSetText(cmp, "callbackCounter",
-                        parseInt(cmp.find("callbackCounter").getElement().innerHTML)+1);
-                });
+                var newCount = parseInt(cmp.find("callbackCounter").getElement().innerHTML) + 1;
+                cmp.getDef().getHelper().findAndSetText(cmp, "callbackCounter", newCount);
+                // first action run will be stored refresh action
+                if (newCount == 4) {
+                    $A.storageService.getStorage("actions").adapter.getItem(a.getStorageKey(),
+                        function(item){
+                            $A.test.assertEquals(cmp._originalExpiration, item.expires, "Refresh action not run");
+                        });
+                }
+            });
             $A.test.enqueueAction(a);
-            $A.test.addWaitFor("4", function(){return $A.test.getText(cmp.find("callbackCounter").getElement())},
+            $A.test.addWaitFor("5", function(){return $A.test.getText(cmp.find("callbackCounter").getElement())},
                 function(){
                     $A.storageService.getStorage("actions").adapter.getItem(a.getStorageKey(),
                         function(item){
-                            $A.test.assertEquals(cmp._originalExpiration, item.expires,
-                                "storage expiration was not updated after refresh");
+                            // after new action is run, it is stored with new expires time
+                            $A.test.assertTrue(cmp._originalExpiration < item.expires,
+                                    "storage expiration was not updated after refresh");
                         });
                 });
         } ]

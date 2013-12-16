@@ -17,3 +17,7 @@
  .THIS .uiBlock .bLeft {
  	width: 80%;
  }
+
+ .THIS .auradocsWarning .uiBlock .bLeft {
+ 	width: inherit;
+ }

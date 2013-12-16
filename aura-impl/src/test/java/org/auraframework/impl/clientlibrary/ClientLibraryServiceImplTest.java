@@ -34,6 +34,7 @@ import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.test.annotation.UnAdaptableTest;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.NoContextException;
 import org.auraframework.throwable.quickfix.ClientLibraryException;
@@ -89,6 +90,8 @@ public class ClientLibraryServiceImplTest extends AuraImplTestCase {
         assertTrue(url.contains("Jiffy.css"));
     }
 
+    // SFDC uses UIPerf
+    @UnAdaptableTest
     public void testJiffyJS() throws Exception {
         ClientLibraryDef clientLibrary = vendor.makeClientLibraryDef("UIPerf", null, ClientLibraryDef.Type.JS,
                 null, false, null, null);
@@ -96,6 +99,8 @@ public class ClientLibraryServiceImplTest extends AuraImplTestCase {
         assertTrue(url.contains("Jiffy.js"));
     }
 
+    // SFDC uses UIPerf
+    @UnAdaptableTest
     public void testJiffyUiJS() throws Exception {
         ClientLibraryDef clientLibrary = vendor.makeClientLibraryDef("UIPerfUi", null, ClientLibraryDef.Type.JS,
                 null, false, null, null);
@@ -284,6 +289,8 @@ public class ClientLibraryServiceImplTest extends AuraImplTestCase {
         assertRootComponentResourceUrl(appDesc, resourceUrl, Type.CSS);
     }
 
+    // SFDC uses UIPerf
+    @UnAdaptableTest
     public void testGetUrlsChangesWithMode() throws Exception {
         Aura.getContextService().endContext();
         Aura.getContextService().startContext(Mode.PTEST, Format.JSON, Access.AUTHENTICATED);

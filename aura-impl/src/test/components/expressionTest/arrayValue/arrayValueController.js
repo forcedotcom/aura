@@ -19,5 +19,12 @@
             cmp._log=[];
         }
         cmp._log.push(evt.getParams());
+        cmp._dirty = [];
+        var val = evt.getParam("value");
+        for (var i = 0; i < val.getLength(); ++i) {
+            if (val.getValue(i).isDirty()) {
+                cmp._dirty.push(i);
+            }
+        }
     }
 })

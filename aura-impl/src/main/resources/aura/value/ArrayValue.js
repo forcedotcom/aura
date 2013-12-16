@@ -244,6 +244,9 @@ ArrayValue.prototype.push = function(config) {
     var ar = this.getArray();
 
     var value = valueFactory.create(config, null, this.owner);
+    if (value.makeDirty) {
+        value.makeDirty();
+    }
     ar.push(value);
     this.hasRealValue = true;
     this.makeDirty();
@@ -262,7 +265,11 @@ ArrayValue.prototype.insert = function(index, config) {
         ar.splice(index, 0, value);
         this.hasRealValue = true;
         this.makeDirty();
-
+        for (var i = index; i < ar.length; i++) {
+            if (ar[i].makeDirty) {
+                ar[i].makeDirty();
+            }
+        }
         this.addValueHandlers(value);
     }
 };
@@ -275,7 +282,11 @@ ArrayValue.prototype.remove = function(index) {
         var ar = this.getArray();
         var removed = ar.splice(index, 1)[0];
         this.makeDirty();
-
+        for (var i = index; i < ar.length; i++) {
+            if (ar[i].makeDirty) {
+                ar[i].makeDirty();
+            }
+        }
         var handlers = this.handlers;
         if (handlers) {
             for (var globalId in handlers) {

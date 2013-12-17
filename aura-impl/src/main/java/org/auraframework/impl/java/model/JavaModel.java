@@ -22,9 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.auraframework.Aura;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.ModelDef;
-import org.auraframework.def.TypeDef;
+import org.auraframework.def.*;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.java.type.JavaValueProvider;
 import org.auraframework.instance.InstanceStack;

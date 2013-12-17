@@ -32,11 +32,11 @@
         var isIE7 = $A.get("$Browser.isIE7");
         if(isIE7 ===  true && tag == "input"){
         	var value = $A.expressionService.getValue(valueProvider, "v.name");
+        	value = value.getValue();
         	if($A.util.isEmpty(value)){
         		ret = document.createElement(tag);
         	}
         	else{
-        		value = value.getValue();
         		ret = document.createElement('<input name="' + value + '">');
         	}
         }

@@ -15,16 +15,43 @@
  */
  .THIS .why {
     width: 40%;
+    padding-bottom: 20px;
  	}
 .THIS .bLeft{
     width: 50%;
     padding-right: 10px;
+    padding-bottom: 20px;
 }
-.THIS .why .uiImage{
-	margin:10px;
-	background-repeat: no-repeat;
+
+.THIS .uiBlock .bBody {
+	height: 100%;
 }
+
 .THIS .bLeft .uiImage{
 	margin:auto;
 	background-repeat: no-repeat;
+}
+
+.THIS a {
+
+	color: #242424;
+	border-bottom: 1px solid #e3e3e3;
+	text-transform: uppercase;
+	letter-spacing: 0.1em;
+	background-color: #fbf0f0;
+	padding: 10px 20px 10px 20px;
+	width: 100px;
+	margin-bottom: 20px;
+	border-radius: 2px;
+	-webkit-border-radius: 2px;
+	-moz-border-radius: 2px;
+	-moz-transition: background-color .25s ease-in-out;
+	-webkit-transition: background-color .25s ease-in-out;
+	-o-transition: background-color .25s ease-in-out;
+	-ms-transition: background-color .25s ease-in-out;
+	transition: background-color .25s ease-in-out;
+}
+.THIS a:hover {
+	background-color: #dc595c;
+	color: #fff;
 }

@@ -352,23 +352,6 @@ var AuraDevToolService = function() {
             return cmp.output();
         },
         accessbilityAide:{
-        	/**
-        	 * Method to used to get the innerText of anchors. It gets each child (if there are children)
-        	 * then gets the text from it. It will not return null.
-        	 */
-        	getAllInnerText: function(anchor){
-        		var childText = "";
-        		var anchorChildren = anchor.children;
-        		if(anchorChildren.length === 0){
-        			childText = $A.util.getText(anchor);
-        		}
-        		else{
-	        		for(var index = 0; index < anchorChildren.length; index++){ 
-	        			childText = childText + $A.util.getText(anchorChildren[index]);
-	        		}
-        		}
-        		return childText;
-        	},
             /**
              * Helper function that will return true if the two values equal each other
              * @param   attribute  - Contents of the attribute that we want to look at
@@ -719,13 +702,23 @@ var AuraDevToolService = function() {
     	        	var errArray = [];
     	        	var anchor = null;
     	        	var text = "";
+    	        	var anchorId = null;
     	        	var accessAideFuncs = $A.devToolService.accessbilityAide;
     	        	for(var index = 0; index<anchors.length; index++){
     	        	    anchor = anchors[index];
     	        	    
-    	        	    //Text should not be undefined or null at any point since $A.test.getText will always return something
-    	        	    if(accessAideFuncs.getAllInnerText(anchor).replace(/[\s\t\r\n]/g,'') === "" && accessAideFuncs.anchrDoesNotHaveImgWithAlt(anchor)){
-    	        	    	errArray.push(anchor);
+    	        	    anchorId = anchor.getAttribute("id");
+    	        	    
+    	        	    // Temporary fix for ckeditor. current issue is that ckeditor set "=" which causes innerText to not return the correct value
+    	        	    // Work-around will be temporary and should be removed when ckeditor is updated.
+    	        	    // Bug to track removal: W-1979552
+    	        	    if($A.util.isUndefinedOrNull(anchorId) || anchorId.indexOf("cke_") !== 0 ){
+    	        	    	 //Text should not be undefined or null at any point since $A.test.getText will always return something
+        	        	    text = $A.util.getText(anchor).replace(/[\s\t\r\n]/g,'');
+        	        	                        
+        	        	    if(text === "" && accessAideFuncs.anchrDoesNotHaveImgWithAlt(anchor)){
+        	        	          errArray.push(anchor);
+        	        	    }
     	        	    }
     	        	}
     	        	return errArray;

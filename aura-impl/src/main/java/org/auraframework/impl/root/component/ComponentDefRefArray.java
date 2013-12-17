@@ -19,9 +19,12 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import org.auraframework.Aura;
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Component;
+
+import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonSerializable;
@@ -58,9 +61,14 @@ public class ComponentDefRefArray implements JsonSerializable {
             // TODO: rename this thing
             valueProvider = new IterationValueProvider(valueProvider, extraProviders);
         }
+        AuraContext context = Aura.getContextService().getCurrentContext();
+        int idx = 0;
         for (ComponentDefRef cdr : this.cdrs) {
             // only foreach returns a list, once that is gone get rid of get(0)
+            context.getInstanceStack().setAttributeIndex(idx);
             components.add(cdr.newInstance(valueProvider).get(0));
+            context.getInstanceStack().clearAttributeIndex(idx);
+            idx += 1;
         }
         return components;
     }

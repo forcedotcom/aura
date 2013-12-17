@@ -44,7 +44,11 @@ public abstract class AbstractActionImpl<T extends ActionDef> implements Action 
 
     @Override
     public void setId(String id) {
-        this.actionId = id;
+        //
+        // We _MUST NOT_ have a current stack when ID is set.
+        //
+        assert instanceStack == null;
+        actionId = id;
     }
 
     @Override
@@ -132,16 +136,29 @@ public abstract class AbstractActionImpl<T extends ActionDef> implements Action 
             }
         }
     }
+    
+    @Override
+    public InstanceStack getInstanceStack() {
+        if (instanceStack == null) {
+            instanceStack = new InstanceStack(actionId);
+        }
+        return instanceStack;
+    }
 
+    @Override
+    public String getPath() {
+        return actionId;
+    }
 
     private String actionId;
     private List<Action> actions = null;
-    private Map<String, BaseComponent<?, ?>> componentRegistry = null;
     private int nextId = 1;
     private boolean storable;
 
+    protected Map<String, BaseComponent<?, ?>> componentRegistry = null;
     protected final Map<String, Object> paramValues;
     protected final DefDescriptor<ControllerDef> controllerDescriptor;
     protected final T actionDef;
     protected State state;
+    private InstanceStack instanceStack;
 }

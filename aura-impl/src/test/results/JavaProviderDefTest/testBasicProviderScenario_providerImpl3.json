@@ -344,6 +344,7 @@ function(value) {
     },
     "original":"markup://test:test_Provider_Interface",
     "globalId":"1",
+    "creationPath":"fakeActionId",
     "attributes":{
       "serId":18,
       "value":{

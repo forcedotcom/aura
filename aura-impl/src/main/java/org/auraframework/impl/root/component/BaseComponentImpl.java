@@ -76,6 +76,7 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
         } finally {
             loggingService.stopTimer(LoggingService.TIMER_COMPONENT_CREATION);
         }
+        Aura.getContextService().getCurrentContext().getInstanceStack().popInstance(this);
     }
 
     @SuppressWarnings("unchecked")
@@ -89,6 +90,7 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
         } finally {
             loggingService.stopTimer(LoggingService.TIMER_COMPONENT_CREATION);
         }
+        Aura.getContextService().getCurrentContext().getInstanceStack().popInstance(this);
     }
 
     /**
@@ -101,6 +103,11 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
      */
     public BaseComponentImpl(DefDescriptor<D> descriptor, Collection<AttributeDefRef> attributeDefRefs,
             BaseComponent<?, ?> attributeValueProvider, String localId) throws QuickFixException {
+        //
+        // DANGER WILL ROBINSON!!!! DANGER WILL ROBINSON!!!
+        // Thit does not call finishComponent because it actually uses the version
+        // of the constructor immediately below, which has already called finishComponent.
+        //
         this(descriptor, attributeDefRefs, attributeValueProvider, null, null);
         this.localId = localId;
     }
@@ -121,6 +128,7 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
         } finally {
             loggingService.stopTimer(LoggingService.TIMER_COMPONENT_CREATION);
         }
+        Aura.getContextService().getCurrentContext().getInstanceStack().popInstance(this);
     }
 
     /**
@@ -140,6 +148,7 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
         } finally {
             loggingService.stopTimer(LoggingService.TIMER_COMPONENT_CREATION);
         }
+        Aura.getContextService().getCurrentContext().getInstanceStack().popInstance(this);
     }
 
     /**
@@ -153,10 +162,13 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
      */
     private BaseComponentImpl(DefDescriptor<D> descriptor, BaseComponent<?, ?> attributeValueProvider,
             Map<String, Object> valueProviders, I extender, D def) throws QuickFixException {
-
+        AuraContext context = Aura.getContextService().getCurrentContext();
         DefDescriptor<? extends RootDefinition> desc = null;
+
+        context.getInstanceStack().pushInstance(this);
         this.descriptor = descriptor;
         this.originalDescriptor = descriptor;
+        this.path = context.getInstanceStack().getPath();
 
         if (def == null) {
             try {
@@ -189,7 +201,7 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
         try {
             this.globalId = getNextGlobalId();
 
-            this.attributeSet = new AttributeSetImpl(desc, attributeValueProvider);
+            this.attributeSet = new AttributeSetImpl(desc, attributeValueProvider, this);
 
             if (valueProviders != null) {
                 this.valueProviders.putAll(valueProviders);
@@ -214,18 +226,22 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
     }
 
     protected void finishInit() throws QuickFixException {
+        AuraContext context = Aura.getContextService().getCurrentContext();
+
         injectComponent();
         createModel();
+
+        context.getInstanceStack().setAttributeName("$");
         createSuper();
+        context.getInstanceStack().clearAttributeName("$");
+
         validateAttributes();
         getComponentDef().retrieveLabels();
-        AuraContext context = Aura.getContextService().getCurrentContext();
 
         DefDescriptor<RendererDef> rendererDesc = getComponentDef().getRendererDescriptor();
         if ((rendererDesc != null && rendererDesc.getDef().isLocal()) || !context.isPreloaded(getDescriptor())) {
             hasLocalDependencies = true;
         }
-
         context.registerComponent(this);
     }
 
@@ -303,6 +319,7 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
                 json.writeMapEntry("original", originalDescriptor);
             }
             json.writeMapEntry("globalId", getGlobalId());
+            json.writeMapEntry("creationPath", getPath());
 
             if ((attributeSet.getValueProvider() == null || hasProvidedAttributes) && !attributeSet.isEmpty()) {
                 json.writeMapEntry("attributes", attributeSet);
@@ -463,10 +480,16 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
         return model;
     }
 
+    @Override
+    public String getPath() {
+        return path;
+    }
+
     protected final DefDescriptor<D> originalDescriptor;
     protected DefDescriptor<D> descriptor;
     protected DefDescriptor<? extends RootDefinition> intfDescriptor;
     private final String globalId;
+    private final String path;
     protected String localId;
     protected final AttributeSet attributeSet;
     private Model model;

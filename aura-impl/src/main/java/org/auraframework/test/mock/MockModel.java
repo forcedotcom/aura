@@ -88,5 +88,10 @@ public class MockModel implements Model {
     public DefDescriptor<ModelDef> getDescriptor() {
         return descriptor;
     }    
+
+    @Override
+    public String getPath() {
+        return "mock";
+    }
 }
 

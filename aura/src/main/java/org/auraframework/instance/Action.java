@@ -126,4 +126,9 @@ public interface Action extends Instance<ActionDef> {
     public void setStorable();
 
     public Map<String, Object> getParams();
+
+    /**
+     * Get the instance stack for this action.
+     */
+    public InstanceStack getInstanceStack();
 }

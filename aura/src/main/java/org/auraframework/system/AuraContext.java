@@ -25,6 +25,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.BaseComponent;
+import org.auraframework.instance.InstanceStack;
 import org.auraframework.instance.Event;
 import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.instance.ValueProviderType;
@@ -398,5 +399,10 @@ public interface AuraContext {
      */
     String getFrameworkUID();
 
-	boolean getIsDebugToolEnabled();
+    /**
+     * FIXME: This is busted!!!!
+     */
+    boolean getIsDebugToolEnabled();
+
+    InstanceStack getInstanceStack();
 }

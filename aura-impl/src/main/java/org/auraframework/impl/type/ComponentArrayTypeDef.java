@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.auraframework.Aura;
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.TypeDef;
@@ -29,6 +30,7 @@ import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Component;
+import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
@@ -88,13 +90,18 @@ public class ComponentArrayTypeDef extends DefinitionImpl<TypeDef> implements Ty
 
         List<BaseComponent<?, ?>> components = new ArrayList<BaseComponent<?, ?>>();
         List<?> list = (List<?>) config;
+        AuraContext context = Aura.getContextService().getCurrentContext();
 
         if (list != null) {
+            int idx = 0;
             for (Object defRef : list) {
                 if (defRef instanceof BaseComponent) {
                     components.add((BaseComponent<?, ?>) defRef);
                 } else if (defRef instanceof ComponentDefRef) {
+                    context.getInstanceStack().setAttributeIndex(idx);
                     components.addAll(((ComponentDefRef) defRef).newInstance(valueProvider));
+                    context.getInstanceStack().clearAttributeIndex(idx);
+                    idx += 1;
                 } else {
                     throw new InvalidDefinitionException(String.format("Expected Component, recieved %s", defRef
                             .getClass().getName()), getLocation());
@@ -119,5 +126,4 @@ public class ComponentArrayTypeDef extends DefinitionImpl<TypeDef> implements Ty
             componentDefRef.appendDependencies(deps);
         }
     }
-
 }

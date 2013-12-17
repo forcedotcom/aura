@@ -138,6 +138,7 @@ function(component) {
         ]
       }
     },
-    "globalId":"1"
+    "globalId":"1",
+    "creationPath":"fakeActionId"
   }
 }

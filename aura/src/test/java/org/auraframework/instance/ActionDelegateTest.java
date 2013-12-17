@@ -63,6 +63,10 @@ public class ActionDelegateTest extends UnitTestCase {
             methodMap.put(m.getName(), m);
             calledMap.put(m.getName(), Boolean.FALSE);
         }
+        oneCall(methodMap, calledMap, "getDescriptor");
+        oneCall(methodMap, calledMap, "getPath");
+        oneCall(methodMap, calledMap, "serialize", (Object)null);
+        
         oneCall(methodMap, calledMap, "getId");
         oneCall(methodMap, calledMap, "setId", new String("id"));
         oneCall(methodMap, calledMap, "run");
@@ -78,5 +82,10 @@ public class ActionDelegateTest extends UnitTestCase {
         oneCall(methodMap, calledMap, "isStorable");
         oneCall(methodMap, calledMap, "setStorable");
         oneCall(methodMap, calledMap, "getParams");
+
+        oneCall(methodMap, calledMap, "getInstanceStack");
+        for (Method m : Action.class.getMethods()) {
+            assertTrue(m.getName()+"was not called", calledMap.get(m.getName()));
+        }
     }
 }

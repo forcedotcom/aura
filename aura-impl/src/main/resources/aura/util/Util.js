@@ -41,7 +41,7 @@ $A.ns.Util = function() {
 /**
  * Browser check, does the validation using the userAgent.
  */
-$A.ns.Util.prototype.isIE = navigator.userAgent.indexOf("MSIE") != -1;
+$A.ns.Util.prototype.isIE = (navigator.userAgent.indexOf("MSIE") != -1) || (navigator.userAgent.indexOf("Trident/") != -1);
 
 /**
  * evals code globally, without enclosing the current scope

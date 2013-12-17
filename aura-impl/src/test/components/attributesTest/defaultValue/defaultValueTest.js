@@ -32,6 +32,12 @@
 		}
 	},
 
+	testMapDataTypeAndDefaultValue : {
+		test : function(cmp) {
+			this.verifyDefaultValuesOfMapDataType(cmp);
+		}
+	},
+
 	testCaseSensitivity : {
 		test : function(cmp) {
 			$A.test.assertEquals("Aura", cmp.getAttributes().get("strATTRIBUTEWithDefaultValue"));
@@ -90,6 +96,7 @@
         				// W-1324216
         				// this.verifyDefaultValuesOfListDataType(newComp);
         				this.verifyChangingAttributeValues(newComp);
+                        this.verifyDefaultValuesOfMapDataType(newComp);
 					},
 					"markup://attributesTest:defaultValue",
 					null, null, null
@@ -140,15 +147,33 @@
 	verifyDefaultValuesOfListDataType : function(testCmp) {
 		var listAttr = testCmp.getAttributes().getValue("listAttributeWithDefaultValue");
 		$A.test.assertTrue(listAttr.toString() === "ArrayValue",
-				"Expected to find attribute of ArrayValue type but found" + listAttr.constructor);
+				"Expected to find attribute of ArrayValue type but found" + listAttr.toString());
 		$A.test.assertEquals("Value", listAttr.auraType);
 		$A.test.assertEquals("true", listAttr.getValue(0).getValue());
 		$A.test.assertEquals("false", listAttr.getValue(1).getValue());
 		$A.test.assertEquals("true", listAttr.getValue(2).getValue());
 
-		var a = testCmp.getAttributes().get("listAttributeWithNoDefaultValue");
-		$A.test.assertTrue($A.util.isArray(a));
+		var a = testCmp.getAttributes().getValue("listAttributeWithNoDefaultValue");
+        $A.test.assertTrue(a.isUnset());
+        $A.test.assertTrue(a.toString() === "ArrayValue");
+        $A.test.assertEquals(0, a.getLength());
+        a = testCmp.getAttributes().get("listAttributeWithNoDefaultValue");
+        $A.test.assertTrue($A.util.isArray(a));
 		$A.test.assertEquals(0, a.length, "Array type attributes without default value should have empty as value");
+
+	},
+
+	verifyDefaultValuesOfMapDataType : function(testCmp) {
+		var mapAttr = testCmp.getAttributes().getValue("mapAttributeWithDefaultValue");
+		$A.test.assertTrue(mapAttr.toString() === "MapValue",
+				"Expected to find attribute of MapValue type but found" + mapAttr.toString());
+		$A.test.assertEquals("Value", mapAttr.auraType);
+		$A.test.assertEquals(1, mapAttr.get("a"));
+
+		var a = testCmp.getAttributes().getValue("mapAttributeWithNoDefaultValue");
+		$A.test.assertTrue(a.toString() === "MapValue", "Expected no-default map to be a MapValue, not " + a.toString());
+		$A.test.assertTrue(a.isUnset());
+		$A.test.assertEquals(undefined, a.get("a"));
 	},
 
 	verifyChangingAttributeValues : function(testCmp) {

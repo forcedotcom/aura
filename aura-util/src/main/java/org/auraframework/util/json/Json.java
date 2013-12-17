@@ -28,6 +28,7 @@ import java.lang.annotation.Target;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -745,6 +746,32 @@ public class Json {
      * @throws IOException
      */
     public void writeMapEntry(Object key, Object value) throws IOException {
+        writeMapEntry(key, value, null);
+    }
+
+    /**
+     * Write a value into the current Map, and add leading commas and formatting
+     * as appropriate.  This version will consult its {@code type} parameter to
+     * decide how to serialize null maps and arrays.
+     * 
+     * @param key
+     * @param value
+     * @param type
+     * @throws IOException
+     */
+    public void writeMapEntry(Object key, Object value, String type) throws IOException {
+        if (value == null && type != null) {
+            try {
+                Class valueClass = Json.class.getClassLoader().loadClass(type.substring("java://".length()));
+                if (Iterable.class.isAssignableFrom(valueClass)) {
+                    value = new ArrayList<Boolean>(0);
+                } else if (Map.class.isAssignableFrom(valueClass)) {
+                    value = new HashMap<String,String>(0);
+                }
+            } catch (ClassNotFoundException e) {
+                // Nevermind; treat "we don't know" as a non-list, non-map
+            }
+        }
         if (value != null || serializationContext.isNullValueEnabled()) {
             writeMapKey(key);
             writeValue(value);

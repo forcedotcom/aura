@@ -23,6 +23,7 @@
  */
 function ArrayValue(config, def, component) {
     this.owner = component;
+    this.hasRealValue = true;
     this.setValue(config);
     this.commit();
 
@@ -104,6 +105,11 @@ ArrayValue.prototype.isEmpty = function() {
     return this.getLength() === 0;
 };
 
+/** Returns true if the array was set to null or undefined, not an actual array. */
+ArrayValue.prototype.isUnset = function() {
+    return !this.hasRealValue;
+};
+
 /**
  * Removes all objects from the array.
  */
@@ -127,6 +133,7 @@ ArrayValue.prototype.setIsOwner = function(isOwner) {
  */
 ArrayValue.prototype.setValue = function(newArray, skipChange) {
     this.fireEvents = false;
+    this.hasRealValue = (newArray !== null && newArray !== undefined);
 
     this.newArray = [];
     this.makeDirty();
@@ -156,7 +163,6 @@ ArrayValue.prototype.setValue = function(newArray, skipChange) {
  * Recursively destroys all values in the array
  */
 ArrayValue.prototype.destroyOrphans = function(array, async) {
-    
      while (array.length > 0) {
          var v = array.pop();
          if (v && v.destroy) {
@@ -177,7 +183,7 @@ ArrayValue.prototype.commit = function(clean) {
         if (this.array && this.isOwner) {
             this.destroyOrphans(this.array,true);
         }
-            
+
         this.array = this.newArray;
         this.rollback(clean);
     }
@@ -239,7 +245,7 @@ ArrayValue.prototype.push = function(config) {
 
     var value = valueFactory.create(config, null, this.owner);
     ar.push(value);
-
+    this.hasRealValue = true;
     this.makeDirty();
     this.addValueHandlers(value);
 };
@@ -254,6 +260,7 @@ ArrayValue.prototype.insert = function(index, config) {
         var ar = this.getArray();
         var value = valueFactory.create(config, null, this.owner);
         ar.splice(index, 0, value);
+        this.hasRealValue = true;
         this.makeDirty();
 
         this.addValueHandlers(value);

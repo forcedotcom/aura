@@ -328,6 +328,9 @@
             var val0 = array.getValue(0);
             $A.test.assertEquals("SimpleValue", val0.toString());
             $A.test.assertEquals("a simple value", val0.unwrap());
+            $A.test.assertFalse(val0.isDirty());  // Cleared during addHandlers
+            $A.test.assertEquals(1, component._dirty.length);
+            $A.test.assertEquals(0, component._dirty[0]);
             this.assertChangeEvent(component);
 
             // push onto non-empty array
@@ -337,6 +340,9 @@
             var val1 = array.getValue(1);
             $A.test.assertEquals("MapValue", val1.toString());
             $A.test.assertEquals("some value", val1.get("somekey"));
+            $A.test.assertFalse(val1.isDirty());
+            $A.test.assertEquals(1, component._dirty.length);
+            $A.test.assertEquals(1, component._dirty[0]);
             this.assertChangeEvent(component);
 
             // push again, why not?
@@ -349,6 +355,8 @@
             $A.test.assertEquals(2, val2.getLength());
             $A.test.assertEquals("first", val2.get(0));
             $A.test.assertEquals(true, val2.get(1));
+            $A.test.assertEquals(1, component._dirty.length);
+            $A.test.assertEquals(2, component._dirty[0]);
             this.assertChangeEvent(component);
 
             // push a SimpleValue (shouldn't get wrapped)
@@ -356,6 +364,9 @@
             $A.test.assertEquals(4, array.getLength());
             var val = array.getValue(3);
             $A.test.assertEquals("SimpleValue", val.toString());
+            $A.test.assertEquals(2, component._dirty.length);
+            $A.test.assertEquals(0, component._dirty[0]);
+            $A.test.assertEquals(3, component._dirty[1]);
             $A.test.assertEquals("a simple value", val.unwrap());
             this.assertChangeEvent(component);
 
@@ -365,6 +376,9 @@
             val = array.getValue(4);
             $A.test.assertEquals("SimpleValue", val.toString());
             $A.test.assertEquals(null, val.unwrap());
+            $A.test.assertFalse(val.isDirty());
+            $A.test.assertEquals(1, component._dirty.length);
+            $A.test.assertEquals(4, component._dirty[0]);
             this.assertChangeEvent(component);
 
             // push undefined
@@ -373,6 +387,9 @@
             val = array.getValue(5);
             $A.test.assertEquals("SimpleValue", val.toString());
             $A.test.assertEquals(undefined, val.unwrap());
+            $A.test.assertFalse(val.isDirty());
+            $A.test.assertEquals(1, component._dirty.length);
+            $A.test.assertEquals(5, component._dirty[0]);
             this.assertChangeEvent(component);
 
             array.push();
@@ -380,6 +397,9 @@
             val = array.getValue(6);
             $A.test.assertEquals("SimpleValue", val.toString());
             $A.test.assertEquals(undefined, val.unwrap());
+            $A.test.assertFalse(val.isDirty(), "newly pushed undef isn't dirty");
+            $A.test.assertEquals(1, component._dirty.length);
+            $A.test.assertEquals(6, component._dirty[0]);
             this.assertChangeEvent(component);
         }
     },
@@ -434,6 +454,21 @@
             $A.test.assertEquals(val1, array.getValue(2));
             $A.test.assertEquals(val3, array.getValue(3));
             this.assertChangeEvent(component);
+
+            // inserted subvalue, and higher ones, become dirty
+            array.commit();  // Clear existing dirty bits
+            var subv = $A.expressionService.create(null, 3);
+            $A.test.assertFalse(subv.isDirty(), "new value was already dirty");
+            array.insert(1, subv);
+            $A.test.assertFalse(array.getValue(0).isDirty(), "AV.insert dirtied unchanged item 0");
+            $A.test.assertTrue(array.getValue(1).isDirty(), "AV.insert didn't dirty (or wrongly cleared) unowned item 1");
+            $A.test.assertFalse(array.getValue(2).isDirty(), "AV.insert didn't un-dirty item 2");
+            this.assertChangeEvent(component);
+            $A.test.assertEquals(4, component._dirty.length, "Wrong number of dirty subcomponents");
+            $A.test.assertEquals(1, component._dirty[0], "Wrong index of first dirty subcomponent");
+            $A.test.assertEquals(2, component._dirty[1], "Wrong index of first dirty subcomponent");
+            $A.test.assertEquals(3, component._dirty[2], "Wrong index of first dirty subcomponent");
+            $A.test.assertEquals(4, component._dirty[3], "Wrong index of first dirty subcomponent");
 
             array.clear();
             component._log = undefined;
@@ -496,12 +531,16 @@
             $A.test.assertEquals("r", array.get(3));
 
             // remove inner
+            var lost = array.getValue(2);
+            $A.test.assertFalse(lost.isDirty(), "Removed value is dirty too soon");
             array.remove(2);
             $A.test.assertEquals(3, array.getLength());
             $A.test.assertEquals("q", array.get(0));
             $A.test.assertEquals("w", array.get(1));
             $A.test.assertEquals("r", array.get(2));
             this.assertChangeEvent(component);
+            $A.test.assertEquals(1, component._dirty.length, "Removal left wrong number of dirty elements");
+            $A.test.assertEquals(2, component._dirty[0], "First dirty value wasn't index 2");
 
             // remove head
             array.remove(0);

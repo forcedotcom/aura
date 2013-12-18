@@ -7,7 +7,7 @@
         a.setExclusive();
         $A.test.enqueueAction(a);
     },
-    executeAction:function(cmp, actionName, actionParam, additionalProperties){
+    executeAction:function(cmp, actionName, actionParam, additionalProperties, extraCallback){
         var a = cmp.get(actionName);
         if(actionParam) a.setParams(actionParam);
         a.setCallback(cmp, function(a){
@@ -16,6 +16,9 @@
             cmp.getDef().getHelper().findAndSetText(cmp, "responseData", returnValue.Data);
             cmp.getDef().getHelper().findAndSetText(cmp, "isFromStorage", a.isFromStorage());
             cmp.getDef().getHelper().findAndSetText(cmp, "callbackCounter", parseInt(cmp.find("callbackCounter").getElement().innerHTML)+1);
+            if (extraCallback) {
+                extraCallback(a);
+            }
         });
         if(additionalProperties){
             additionalProperties(a);

@@ -802,15 +802,16 @@
             defaultAutoRefreshInterval : 0 // refresh every action
         },
         test : [function(cmp) {
-        	$A.test.setTestTimeout(30000);
+            $A.test.setTestTimeout(30000);
             cmp._testName = "testSkipReplayOnIdenticalRefreshWithComponents";
             this.resetCounter(cmp, "testSkipReplayOnIdenticalRefreshWithComponents");
             $A.test.addWaitFor(false, $A.test.isActionPending);
         }, function(cmp) {
-        	var a = $A.run(function(){
+            var a = $A.run(function(){
                 return cmp.getDef().getHelper()
                     .executeAction(cmp, "c.fetchDataRecordWithComponents", {testName:cmp._testName},
-                        function(a){a.setStorable();})
+                        function(a){a.setStorable();},
+                        function(a){$A.test.clearAndAssertComponentConfigs(a);});
                 });
             $A.test.addWaitFor("1", function(){return $A.test.getText(cmp.find("callbackCounter").getElement())},
                 function() {
@@ -828,9 +829,10 @@
             var now = new Date().getTime();
             $A.test.addWaitFor(true, function() { return now < new Date().getTime(); }, function(){});
         }, function(cmp) {
-        	var a = $A.run(function(){
+            var a = $A.run(function(){
                     return cmp.getDef().getHelper().executeAction(cmp, "c.fetchDataRecordWithComponents", {testName:cmp._testName},
-                        function(a){a.setStorable();})
+                        function(a){a.setStorable();},
+                        function(a){$A.test.clearAndAssertComponentConfigs(a);});
                 });
             $A.test.addWaitFor("refreshEnd", function(){return $A.test.getText(cmp.find("refreshEnd").getElement());},
                 function() {
@@ -865,7 +867,8 @@
         }, function(cmp) {
             var a = $A.run(function(){
                 return cmp.getDef().getHelper().executeAction(cmp, "c.fetchDataRecordWithComponents",
-                    {testName:cmp._testName, extraComponentsCreated:true}, function(a){a.setStorable();})
+                    {testName:cmp._testName, extraComponentsCreated:true}, function(a){a.setStorable();},
+                        function(a){$A.test.clearAndAssertComponentConfigs(a);});
             });
             $A.test.addWaitFor("1", function(){return $A.test.getText(cmp.find("callbackCounter").getElement())},
                 function() {
@@ -878,7 +881,8 @@
             // this response will be different(has extra component but same return value) so callback count should be +2 (for get(), then refresh())
             var a = $A.run(function(){
                     return cmp.getDef().getHelper().executeAction(cmp, "c.fetchDataRecordWithComponents",
-                        {testName:cmp._testName, extraComponentsCreated:true}, function(a){a.setStorable();})
+                        {testName:cmp._testName, extraComponentsCreated:true}, function(a){a.setStorable();},
+                        function(a){$A.test.clearAndAssertComponentConfigs(a);});
                 });
             $A.test.addWaitFor("3", function(){return $A.test.getText(cmp.find("callbackCounter").getElement())},
                 function() {

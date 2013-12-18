@@ -1,7 +1,7 @@
 ({
-	handleClick : function(cmp) {
+    handleClick : function(cmp) {
         var a = cmp.get("c.setStorable");
         a.setParams({actionsToMark: ["java://org.auraframework.java.controller.ServerStorableActionController/ACTION$storedAction"]});
         $A.enqueueAction(a);
-	}
+    }
 })

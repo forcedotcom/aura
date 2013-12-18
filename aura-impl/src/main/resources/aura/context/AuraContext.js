@@ -19,6 +19,8 @@
  *            can include a mode, such as "DEV" for development mode or "PROD" for production mode.
  * @constructor
  * @protected
+ * @param {Object}
+ *      config the 'founding' config for the context from the server.
  */
 function AuraContext(config) {
     this.mode = config["mode"];
@@ -40,7 +42,7 @@ function AuraContext(config) {
     this.cmp = config["cmp"];
     this.test = config["test"];
 
-    this.joinComponentConfigs(config["components"]);
+    this.joinComponentConfigs(config["components"], "");
     this.globalValueProviders = new $A.ns.GlobalValueProviders(config["globalValueProviders"]);
 }
 
@@ -48,6 +50,8 @@ function AuraContext(config) {
  * Returns the mode for the current request. Defaults to "PROD" for production mode and "DEV" for development mode.
  * The HTTP request format is <code>http://<your server>/namespace/component?aura.mode=PROD</code>.
  * <p>See Also: <a href="#help?topic=modesReference">AuraContext</a></p>
+ *
+ * @return {string} the mode from the server.
  */
 AuraContext.prototype.getMode = function() {
     return this.mode;
@@ -100,6 +104,8 @@ AuraContext.prototype.getDynamicNamespaces = function() {
 
 /**
  * @private
+ * @param {Object}
+ *      otherContext the context from the server to join in to this one.
  */
 AuraContext.prototype.join = function(otherContext) {
     if (otherContext["mode"] !== this.getMode()) {
@@ -113,12 +119,15 @@ AuraContext.prototype.join = function(otherContext) {
     }
     this.globalValueProviders.join(otherContext["globalValueProviders"]);
     $A.localizationService.init();
-    this.joinComponentConfigs(otherContext["components"]);
+    this.joinComponentConfigs(otherContext["components"], ""+this.getNum());
     this.joinLoaded(otherContext["loaded"]);
 };
 
 /**
+ * FIXME: this should return a string, and it should probably not even be here.
+ *
  * @private
+ * @return {number} the 'num' for this context
  */
 AuraContext.prototype.getNum = function() {
     return this.num;
@@ -209,20 +218,103 @@ AuraContext.prototype.getApp = function() {
 
 /**
  * @private
+ * @param {Object}
+ *      otherComponentConfigs the component configs from the server to join in.
+ * @param {string}
+ *      actionId the id of the action that we are joining in (used to amend the creationPath).
  */
-AuraContext.prototype.joinComponentConfigs = function(otherComponentConfigs) {
+AuraContext.prototype.joinComponentConfigs = function(otherComponentConfigs, actionId) {
     if (otherComponentConfigs) {
         for ( var k in otherComponentConfigs) {
-        	if (otherComponentConfigs.hasOwnProperty(k)) {
-	            var config = otherComponentConfigs[k];
-	            var def = config["componentDef"];
-	            if (def) {
-	                componentService.getDef(def);
-	            }
-	            this.componentConfigs[k] = config;
-        	}
+            if (otherComponentConfigs.hasOwnProperty(k)) {
+                var config = otherComponentConfigs[k];
+                var def = config["componentDef"];
+                if (def) {
+                    componentService.getDef(def);
+                }
+                this.componentConfigs[k] = config;
+            }
         }
     }
+};
+
+/**
+ * finish off the component configs for an action.
+ *
+ * This routine looks through all of the pending component configs, and
+ * flags any that are un-consumed at the end of the action. This is a
+ * relatively strict enforcement, but since we have all of the partial
+ * configs to create the components, it is not clear why we would leave
+ * them lying around.
+ *
+ * The Rule: You must consume component configs in the action callback.
+ * you may _not_ delay creating components.
+ *
+ * @private
+ * @param {string}
+ *      actionId the id of the action to strip out.
+ */
+AuraContext.prototype.finishComponentConfigs = function(actionId) {
+    var count = 0;
+    var ccs = this.componentConfigs;
+    var suffix = ":"+actionId;
+    var len = suffix.length;
+    var error = "";
+
+    for ( var k in ccs ) {
+        if (ccs.hasOwnProperty(k) && k.substr(-len) === suffix) {
+            $A.log("config not consumed: "+k, ccs[k]);
+            delete ccs[k];
+            if (error !== "") {
+                error = error+",";
+            }
+            error = error + k;
+        } else {
+            count += 1;
+        }
+    }
+    if (error !== "") {
+        $A.error(error);
+    }
+    if (count === 0) {
+        this.componentConfigs = {};
+    } else {
+        $A.log("leftover configs ", ccs);
+        $A.error("leftover configs");
+    }
+};
+
+/**
+ * Clear out pending component configs.
+ *
+ * This routine can be used in error conditions (or in tests) to clear out
+ * configs left over by an action. In this case, we remove them, and drop
+ * them on the floor to be garbage collected.
+ *
+ * @public
+ * @param {string}
+ *      actionId the action id that we should clear.
+ * @return {number} the count of component configs removed.
+ */
+AuraContext.prototype.clearComponentConfigs = function(actionId) {
+    var removed = 0;
+    var count = 0;
+    var ccs = this.componentConfigs;
+    var suffix = ":"+actionId;
+    var len = suffix.length;
+
+    for ( var k in ccs ) {
+        if (ccs.hasOwnProperty(k) && k.substr(-len) === suffix) {
+            removed += 1;
+            delete ccs[k];
+        } else {
+            count += 1;
+        }
+    }
+    if (count === 0) {
+        this.componentConfigs = {};
+    }
+    return removed;
 };
 
 /**
@@ -248,6 +340,8 @@ AuraContext.prototype.joinLoaded = function(loaded) {
 
 /**
  * This should be private but is needed for testing... ideas?
+ *
+ * ... should move to $A.test.
  */
 AuraContext.prototype.getLoaded = function() {
     return this.loaded;
@@ -255,6 +349,8 @@ AuraContext.prototype.getLoaded = function() {
 
 /**
  * This should be private but is needed for testing and dev modes.
+ *
+ * ... should move to $A.test.
  */
 AuraContext.prototype.getPreloadedNamespaces = function() {
     return this.preloads;

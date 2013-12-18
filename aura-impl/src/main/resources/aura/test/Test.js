@@ -227,6 +227,21 @@ var Test = function(){
         },
 
         /**
+         * clear out component configs returned by an action.
+         *
+         * This must be called within the action callback. It fails if no components are
+         * cleared.
+         *
+         * @param action
+         *      the action to clear.
+         */
+        clearAndAssertComponentConfigs : function(a) {
+            if ($A.getContext().clearComponentConfigs(a.getId()) === 0) {
+                aura.test.fail("No component configs were cleared for "+a.getStorageKey());
+            }
+        },
+
+        /**
          * Peek if there are any pending server actions.
          *
          * @returns {boolean} Returns true if there are pending server actions, or false otherwise.

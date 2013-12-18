@@ -91,6 +91,7 @@ exp(p,
     "releaseRequests", p.releaseRequests,
     "enqueueAction", p.enqueueAction,
     "runActionsAsTransaction", p.runActionsAsTransaction,
+    "clearAndAssertComponentConfigs", p.clearAndAssertComponentConfigs,
 
     // events
     "addEventHandler", p.addEventHandler,

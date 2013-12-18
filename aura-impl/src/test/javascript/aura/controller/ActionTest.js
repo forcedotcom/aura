@@ -988,6 +988,19 @@ Test.Aura.Controller.ActionTest = function() {
 
 	[ Fixture ]
 	function FinishAction() {
+		var mockContext = Mocks.GetMock(Object.Global(), "$A", {
+			getContext : function() {
+				return {
+					joinComponentConfigs : function() {
+					},
+					finishComponentConfigs : function() {
+					},
+                                        getNum : function() {
+                                            return 0;
+                                        }
+				};
+			}
+		});
 
 		[ Fact ]
 		function CallsActionCallbackIfCmpIsValid() {
@@ -1014,12 +1027,19 @@ Test.Aura.Controller.ActionTest = function() {
 			target.getStorage = function() {
 				return false;
 			}
+			target.getId = function() {
+                                return "1";
+			}
 			var actual = false;
 
 			// Act
 			target.finishAction({
 				setCurrentAction : function() {
-				}
+				},
+                                joinComponentConfigs : function() {
+                                },
+                                finishComponentConfigs : function() {
+                                }
 			});
 
 			// Assert
@@ -1029,20 +1049,17 @@ Test.Aura.Controller.ActionTest = function() {
 		[ Fact ]
 		function CallsCompleteGroups() {
 			var target = new Action();
+                        var context = { setCurrentAction : function() { } };
 			target.completeGroups = Stubs.GetMethod(null);
+                        target.getStorage = function () { return false; };
+                        target.getId = function () { return "1"; };
 
-			var error = Record.Exception(function() {
-				target.finishAction({
-					setCurrentAction : function() {
-					}
-				});
-			})
+                        target.finishAction(context);
 
 			Assert.Equal([ {
 				Arguments : {},
 				ReturnValue : null
 			} ], target.completeGroups.Calls);
-			Assert.Null(error);
 		}
 
 		[ Fact ]
@@ -1050,15 +1067,19 @@ Test.Aura.Controller.ActionTest = function() {
 			var target = new Action();
 			target.completeGroups = Stubs.GetMethod(null);
 			target.components = "something";
+                        target.getStorage = function () { return false; };
+                        target.getId = function () { return "1"; };
 
 			var error = Record.Exception(function() {
+                            mockContext(function() {
 				target.finishAction({
-					setCurrentAction : function() {
-					},
-					joinComponentConfigs : function() {
-						throw new Error("intentional");
-					}
+                                    setCurrentAction : function() {
+                                    },
+                                    joinComponentConfigs : function() {
+                                        throw new Error("intentional");
+                                    }
 				});
+                            });
 			});
 
 			Assert.Equal([ {
@@ -1066,6 +1087,82 @@ Test.Aura.Controller.ActionTest = function() {
 				ReturnValue : null
 			} ], target.completeGroups.Calls);
 			Assert.Equal("intentional", error);
+		}
+
+		[ Fact ]
+		function CallsContextFinishComponentsWithStorageFalse() {
+			var target = new Action();
+                        var expectedId = "9955";
+                        var context = {
+                            joinComponentConfigs : function() { },
+                            setCurrentAction : function() { }
+                        };
+                        context.finishComponentConfigs = Stubs.GetMethod("id", null);
+                        context.clearComponentConfigs = Stubs.GetMethod("id", null);
+                        target.components = { "hi":{ "globalId":"hi", "creationPath":"hi" } };
+			target.completeGroups = Stubs.GetMethod(null);
+                        target.getStorage = function () { return false; };
+                        target.getId = function () { return expectedId; };
+
+                        target.finishAction(context);
+
+			Assert.Equal([ {
+                                Arguments : { "id": expectedId },
+				ReturnValue : null
+			} ], context.finishComponentConfigs.Calls);
+			Assert.Equal([ ], context.clearComponentConfigs.Calls);
+		}
+
+		[ Fact ]
+		function CallsClearComponentsWithStorageTrueAndNoCB() {
+			var target = new Action();
+                        var expectedId = "9955";
+                        var context = {
+                            joinComponentConfigs : function() { },
+                            setCurrentAction : function() { }
+                        };
+                        context.finishComponentConfigs = Stubs.GetMethod("id", null);
+                        context.clearComponentConfigs = Stubs.GetMethod("id", null);
+                        target.components = { "hi":{ "globalId":"hi", "creationPath":"hi" } };
+			target.completeGroups = Stubs.GetMethod(null);
+                        target.getStorage = function () { return true; };
+                        target.storable = true;
+                        target.getId = function () { return expectedId; };
+
+                        target.finishAction(context);
+                        Assert.Equal(JSON.stringify(context.finishComponentConfigs.Calls), "[]");
+
+			Assert.Equal([ ], context.finishComponentConfigs.Calls);
+			Assert.Equal([ {
+                                Arguments : { "id": expectedId },
+				ReturnValue : null
+			} ], context.clearComponentConfigs.Calls);
+		}
+
+		[ Fact ]
+		function CallsContextFinishComponentsWithCB() {
+			var target = new Action();
+                        var expectedId = "9955";
+                        var context = {
+                            joinComponentConfigs : function() { },
+                            setCurrentAction : function() { }
+                        };
+                        context.finishComponentConfigs = Stubs.GetMethod("id", null);
+                        context.clearComponentConfigs = Stubs.GetMethod("id", null);
+                        target.components = { "hi":{ "globalId":"hi", "creationPath":"hi" } };
+			target.completeGroups = Stubs.GetMethod(null);
+                        target.getStorage = function () { return false; };
+                        target.getState = function () { return "FAKESTATE"; };
+                        target.getId = function () { return expectedId; };
+                        target.callbacks = { "FAKESTATE": { "fn" : function() {} }};
+
+                        target.finishAction(context);
+
+			Assert.Equal([ {
+                                Arguments : { "id":expectedId },
+				ReturnValue : null
+			} ], context.finishComponentConfigs.Calls);
+			Assert.Equal([ ], context.clearComponentConfigs.Calls);
 		}
 	}
 

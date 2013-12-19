@@ -49,7 +49,7 @@ public class UtilUiTest extends WebDriverTestCase {
 		assertEquals(
 				true,
 				auraUITestingUtil
-						.getBooleanEval("var res = window['handledByTest'];delete window['handledByTest'];return res===true;"));
+						.getBooleanEval("var res = window['handledByTest'];window['handledByTest'] = undefined;return res===true;"));
 		assertEquals(
 				true,
 				auraUITestingUtil

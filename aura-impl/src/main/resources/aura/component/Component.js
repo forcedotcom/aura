@@ -163,8 +163,12 @@ Component.prototype.deIndex = function(localId, globalId){
                 if($A.util.isArray(index)){
                     for(var i=0;i<index.length;i++){
                         if(index[i] === globalId){
-
                             index.splice(i, 1);
+                            //
+                            // If we have removed an index, we need to back up
+                            // our counter to process the same index.
+                            //
+                            i -= 1;
                         }
                     }
                     if(index.length === 0){

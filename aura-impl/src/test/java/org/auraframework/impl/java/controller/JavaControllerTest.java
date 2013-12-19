@@ -286,7 +286,6 @@ public class JavaControllerTest extends AuraImplTestCase {
     }
     
     @ThreadHostileTest("TestLoggingAdapter not thread-safe")
-    @UnAdaptableTest("Missing TestLoggingAdapter impl")
     public void testParamLogging_NoParams() throws Exception{
         ControllerDef controller = getJavaController("java://org.auraframework.impl.java.controller.TestController");
         Map<String, Object> params = Maps.newHashMap();
@@ -298,7 +297,6 @@ public class JavaControllerTest extends AuraImplTestCase {
     }
     
     @ThreadHostileTest("TestLoggingAdapter not thread-safe")
-    @UnAdaptableTest("Missing TestLoggingAdapter impl")
     public void testParamLogging_SelectParameters() throws Exception{
         ControllerDef controller = getJavaController("java://org.auraframework.impl.java.controller.JavaTestController");
         Map<String, Object> params = Maps.newHashMap();
@@ -312,7 +310,6 @@ public class JavaControllerTest extends AuraImplTestCase {
     }
     
     @ThreadHostileTest("TestLoggingAdapter not thread-safe")
-    @UnAdaptableTest("Missing TestLoggingAdapter impl")
     public void testParamLogging_MultipleParameters() throws Exception{
         ControllerDef controller = getJavaController("java://org.auraframework.impl.java.controller.JavaTestController");
         Map<String, Object> params = Maps.newHashMap();
@@ -326,7 +323,6 @@ public class JavaControllerTest extends AuraImplTestCase {
     }
     
     @ThreadHostileTest("TestLoggingAdapter not thread-safe")
-    @UnAdaptableTest("Missing TestLoggingAdapter impl")
     public void testParamLogging_NullValuesForParameters() throws Exception{
         ControllerDef controller = getJavaController("java://org.auraframework.impl.java.controller.JavaTestController");
         Map<String, Object> params = Maps.newHashMap();
@@ -338,7 +334,6 @@ public class JavaControllerTest extends AuraImplTestCase {
     }
     
     @ThreadHostileTest("TestLoggingAdapter not thread-safe")
-    @UnAdaptableTest("Missing TestLoggingAdapter impl")
     public void testParamLogging_ParametersOfCustomDataType() throws Exception{
         ControllerDef controller = getJavaController("java://org.auraframework.impl.java.controller.JavaTestController");
         Map<String, Object> params = Maps.newHashMap();
@@ -351,7 +346,6 @@ public class JavaControllerTest extends AuraImplTestCase {
     }
     
     @ThreadHostileTest("TestLoggingAdapter not thread-safe")
-    @UnAdaptableTest("Missing TestLoggingAdapter impl")
     public void testParamLogging_ChainingActions() throws Exception{
         ControllerDef controller = getJavaController("java://org.auraframework.java.controller.ActionChainingController");
         Map<String, Object> params = Maps.newHashMap();

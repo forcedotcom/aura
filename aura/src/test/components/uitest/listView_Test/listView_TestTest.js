@@ -183,8 +183,9 @@
                 $A.test.fail("Exception should have been thrown");
             }
             catch(e) {
-                $A.test.assertTrue(e.toString().indexOf("Unknown type attribute specified") > -1,
-                        "Expected exception was not thrown for an invalid column type");
+                $A.test.assertTrue(e.message.indexOf("Unknown type attribute specified") > -1,
+                        "Expected exception was not thrown for an invalid column type: " + 
+                        e.message);
             }
         }
     },

@@ -69,7 +69,9 @@
                 var elemRect = elem.getBoundingClientRect();
                 var viewPort = $A.util.getWindowSize();
                 if (elemRect.bottom > viewPort.height) { // no enough space below
-                    elem.style.top = 0 - elemRect.height + "px"; 
+                	//getBoundingClientRect method does not return height and width in IE7 and Ie8
+                	var height = typeof elemRect.height != 'undefined' ? elemRect.height : elemRect.bottom - elemRect.top;
+                	elem.style.top = 0 - height + "px"; 
                 } else {
                     elem.style.top = "auto";
                 }

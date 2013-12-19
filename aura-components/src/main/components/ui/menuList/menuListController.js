@@ -52,6 +52,11 @@
             }
         }
         component.setValue("v.childMenuItems", children);
+        //scroller not supported for IE 7, 8
+        var valueProvider = $A.getGlobalValueProviders(); 
+        if (valueProvider.get("$Browser.isIE7") || valueProvider.get('$Browser.isIE8')) {
+        	cmp.setValue('v.scrollable', false);
+        };
     },
     
     visibleChange: function(component, event, helper) {

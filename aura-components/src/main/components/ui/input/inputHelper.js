@@ -158,7 +158,7 @@
      */
     validate : function(component, valueProvider) {
         var inputEl = this.getInputElement(component);
-        var errorCmp = component.get("v.errorComponent")[0];
+        var errorCmp = component.get("v.errorComponent")[0]; 
         
         $A.util.removeClass(inputEl, "inputError");
         
@@ -181,13 +181,16 @@
             m.push(valueErr[i].message);
         }
         var errorCmp = component.get("v.errorComponent")[0];
-        if (errorCmp && !errorCmp.getValue("v.value").compare(m)) {
+        if (errorCmp) {
             errorCmp.setValue("v.value", m);
         } else {
             $A.componentService.newComponentAsync(
                 this,
                 function(errorCmp) {
-                    component.setValue("v.errorComponent", errorCmp);
+                	var ariaDesc = component.getValue("v.ariaDescribedby").getValue();
+                    ariaDesc = this.addTokenToString(ariaDesc, errorCmp.getGlobalId());
+                	component.setValue("v.errorComponent", errorCmp);
+                	this.setAttribute(component, {key: "ariaDescribedby", value: ariaDesc});
                 },
                 {
                 "componentDef": "markup://ui:inputDefaultError",
@@ -251,13 +254,27 @@
         var attrs = cmp.getAttributes(),			
         concreteCmp = cmp.getConcreteComponent(),
         parentCmp = concreteCmp.getSuper();
-        
+       
         concreteCmp.getAttributes().setValue(attr.key, attr.value);
         //need to traverse up the hierarchy and set the attributes, since attribute lookup is not hierarchical once initialized
         while(parentCmp) {
         	parentCmp.getAttributes().setValue(attr.key, attr.value);
         	parentCmp = parentCmp.getSuper();
         } 
+    },
+    
+    // Can str ever be null/undef?
+    addTokenToString: function(str, token) {
+    	token = $A.util.trim(token);
+    	str = $A.util.trim(str);
+    	if (str) {
+    		if ((' ' + str + ' ').indexOf(' ' + token + ' ') == -1) {
+    			str += ' ' + token;
+    		}
+    	} else {
+    		str = token;
+    	}
+    	return str
     },
     
     addInputClass: function(cmp) {    	

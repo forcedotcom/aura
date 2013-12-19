@@ -26,7 +26,6 @@
 		return this.superRender();
 	},
 	
-	
 	afterRender: function(component, helper) {
         this.superAfterRender();
 		helper.addInputClass(component);
@@ -46,7 +45,7 @@
     	var concreteCmp = component.getConcreteComponent();
         var concreteHelper = concreteCmp.getDef().getHelper();
         concreteHelper.addInputDomEvents(component);
-         
+        
         helper.handleErrors(component);
         if (component.get("v.doFormat")) {
             var concreteCmp = component.getConcreteComponent();
@@ -58,6 +57,7 @@
             }
         }
         helper.addInputClass(component);
+        
         this.superRerender();
     }
 })

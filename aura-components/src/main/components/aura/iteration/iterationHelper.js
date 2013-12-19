@@ -26,13 +26,20 @@
             extraProviders[indexVar] = $A.expressionService.create(null, index);
         }
         var ivp;
+
+        $A.setCreationPathIndex(index);
+        $A.pushCreationPath("/body");
+
         for (var j = 0; j < body.getLength(); j++) {
+        	$A.setCreationPathIndex(j);
             var cdr = body.get(j);
             if (!ivp) {
                 ivp = $A.expressionService.createPassthroughValue(extraProviders, cdr.valueProvider || atts.getValueProvider());
             }
             ret.push($A.componentService.newComponentDeprecated(cdr, ivp, false, doForce));
         }
+        
+        $A.popCreationPath("/body");
         return ret;
     },
 
@@ -44,9 +51,12 @@
         if (items && !items.isLiteral() && !items.isEmpty()) {
             var start = this.getStart(cmp);
             var end = this.getEnd(cmp);
+
+            $A.pushCreationPath("/realbody");
             for (var i = start; i < end; i++) {
                 realbody = realbody.concat(this.createComponentsForIndex(cmp, items, i, doForce));
             }
+            $A.popCreationPath("/realbody");
         }
         return realbody;
     },

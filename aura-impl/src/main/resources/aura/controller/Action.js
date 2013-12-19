@@ -53,6 +53,12 @@ function Action(def, method, paramDefs, background, cmp, caboose) {
     this.storable = false;
     this.caboose = caboose;
     this.allAboardCallback = undefined;
+
+    this.pathStack = [];
+    this.canCreate = true;
+    // start with a body
+    this.pushPath("/body");
+    this.incPathIndex(0);
 }
 
 Action.prototype.nextActionId = 1;
@@ -83,6 +89,124 @@ Action.prototype.getNextGlobalId = function() {
     }
     return this.nextGlobalId++;
 };
+
+// if a component is replacing the same-named component at the same level (eg provider)
+// this reactivates the path's error detection
+// so that is can request it's location again without reporting error
+Action.prototype.reactivatePath = function() {
+	this.canCreate = true;
+};
+
+Action.prototype.pushPath = function(pathPart) {
+    this.canCreate = true;
+    switch (pathPart) {
+    case "/body" : pathPart = "/*"; break;
+    case "/super" : pathPart = "/$"; break;
+    }
+    var pathEntry = { relPath: pathPart, idx: undefined, startIdx: undefined };
+    this.pathStack.push(pathEntry);
+};
+
+Action.prototype.popPath = function(pathPart) {
+    this.canCreate = false;
+    switch (pathPart) {
+    case "/body" : pathPart = "/*"; break;
+    case "/super" : pathPart = "/$"; break;
+    }
+    var last = this.pathStack.pop();
+    if (!last || last.relPath !== pathPart /*|| last.idx !== undefined*/) {
+            $A.log("unexpected unwinding of pathStack.  found " + (last ? (last.relPath + " idx " + last.idx  ) : "empty") + " expected "  + pathPart);
+    }
+    return last;
+};
+
+Action.prototype.topPath = function() {
+	var top = this.pathStack.length < 1 ? undefined : this.pathStack[this.pathStack.length - 1];
+	if (!top) {
+		console.log("Trying to look at empty stack");
+		return undefined;
+	}
+	return top;
+};
+
+Action.prototype.incPathIndex = function(idx) {
+	this.canCreate = true;
+	var top = this.topPath();
+	if (top)
+	{
+		// establish starting index
+		if (top.idx === undefined) {
+			top.startIdx = idx;
+			top.idx = idx;
+		}
+		else if (idx !== top.idx + 1) {
+			console.log("Improper index increment");
+		}
+		else {
+			top.idx = idx;
+		}
+	}
+	else {
+		console.log("Attempting to increment index on empty stack");
+	}	
+	
+};
+
+Action.prototype.decPathIndex = function(idx) {
+	var top = this.topPath();
+	if (top)
+	{
+		// establish starting index
+		if (top.idx === undefined || top.idx !== idx) {
+			console.log("Improper index decrement");
+		}
+		else if (top.startIdx == idx) {
+			top.startIdx = undefined;
+			top.idx = undefined;
+		}
+		else {
+			top.idx--;
+		}
+	}
+	else {
+		console.log("Attempting to decrement index on empty stack");
+	}	
+};
+
+/**
+ * Gets the current creatorPath from the top of the pathStack
+ * 
+ * @private
+ * @returns {String}
+ */
+Action.prototype.getCurrentPath = function() {
+   var result = this.getId();
+   var size = this.pathStack.length;
+   
+   if (!this.canCreate) {
+        $A.log("Not ready to create. path depth:" + size);
+   }
+   this.canCreate = false; // this will cause next call to getCurrentPath to fail if not popped
+   
+   for (var i=0; i<size; i++) {
+       var entry = this.pathStack[i];
+       result += (entry.relPath + (entry.idx !== undefined ? ("~" + entry.idx) : ""  )); 
+   }
+   
+   return result;
+};
+
+/**
+ * Gets the current pathDepth from the top of the pathStack
+ * 
+ * @private
+ * @returns {number}
+ */
+Action.prototype.getPathDepth = function() {
+   return this.pathStack.length;
+};
+
+
 
 /**
  * Gets the <code>ActionDef</code> object. Shorthand: <code>get("def")</code>

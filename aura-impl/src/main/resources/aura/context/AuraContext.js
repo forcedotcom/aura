@@ -262,11 +262,15 @@ AuraContext.prototype.finishComponentConfigs = function(actionId) {
     var error = "";
 
     for ( var k in ccs ) {
-        if (ccs.hasOwnProperty(k) && k.substr(-len) === suffix) {
-            $A.log("config not consumed: "+k, ccs[k]);
-            delete ccs[k];
-            if (error !== "") {
-                error = error+",";
+        if (ccs.hasOwnProperty(k) && (k === actionId || k.substr(0,len) === prefix)) {
+            removed += 1;
+            if (logit) {
+                $A.log("config not consumed: "+k, ccs[k]);
+                delete ccs[k];
+                if (error !== "") {
+                    error = error+", ";
+                }
+                error = error + k;
             }
             error = error + k;
         } else {
@@ -274,7 +278,7 @@ AuraContext.prototype.finishComponentConfigs = function(actionId) {
         }
     }
     if (error !== "") {
-        $A.error(error);
+        $A.warning("unused configs for "+actionId+": "+error);
     }
     if (count === 0) {
         this.componentConfigs = {};
@@ -373,7 +377,8 @@ AuraContext.prototype.setCurrentAction = function(action) {
 };
 
 /**
- * @private
+ * EBA - temporarily made public for helpers to obtain action - return to private when current visibility is determined
+ * @public
  */
 AuraContext.prototype.getCurrentAction = function(action) {
     return this.currentAction;

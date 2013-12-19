@@ -85,18 +85,22 @@ AttributeDefSet.prototype.createInstances = function(config, component, suppress
             if (!suppressValidation){
                 aura.assert(hasValue || !attributeDef.isRequired(), "Missing required attribute " + name);
             }
-
             if (!hasValue) {
-                // We cannot defer creation of default facets because they must be recreated in server order on the client to maintain globalId integrity
+                // We cannot defer creation of default facets because they must be recreated in server order on the cli
                 var isFacet = attributeDef.getTypeDefDescriptor() === "aura://Aura.Component[]";
                 if (isFacet) {
                     value = attributeDef.getDefault();
                     hasValue = !$A.util.isUndefined(value);
                 }
             }
-
             if (hasValue) {
-                var attribute = this.createAttribute(value, attributeDef, component, config["valueProvider"], localCreation);
+                var path = "/"+name;
+                $A.pushCreationPath(path);
+                try {
+                    var attribute = this.createAttribute(value, attributeDef, component, config["valueProvider"], localCreation, false);
+                } finally {
+                    $A.popCreationPath(path);
+                }
                 mapConfig[name] = attribute;
             }
         }
@@ -114,7 +118,7 @@ AttributeDefSet.prototype.each = function(f){
     var valuesOrder = this.valuesOrder;
     if (values) {
         for (var i = 0; i < valuesOrder.length; i++) {
-            f(values[valuesOrder[i]]);
+            f(values[valuesOrder[i]],i);
         }
     }
 };
@@ -136,18 +140,23 @@ AttributeDefSet.prototype.getDef = function(name){
  * @private
  */
 AttributeDefSet.prototype.createAttribute = function(config, def, component, valueProvider, localCreation, forceInstantiate) {
-    function createComponent(item) {
+    function createComponent(item, idx) {
         if (!v["attributes"]) {
             v["attributes"] = {
                 "values": {}
             };
         }
 
+    	if (act) { 
+    		act.incPathIndex(idx);
+    	}
+        	
         v["attributes"]["values"][varName] = item;
         v["delegateValueProvider"] = valueProvider;
         v["valueProviders"] = {};
         v["valueProviders"][varName] = item;
 
+    	// TODO - remove comment - EBA1
         var cmp = componentService.newComponentDeprecated(v, valueProvider, localCreation, true);
 
         delete v["attributes"]["values"][varName];
@@ -156,23 +165,34 @@ AttributeDefSet.prototype.createAttribute = function(config, def, component, val
         valueConfig.push(cmp);
     }
 
+    var act = $A.getContext().getCurrentAction(); 
     var noInstantiate = def.getTypeDefDescriptor() === "aura://Aura.ComponentDefRef[]";
     var valueConfig;
     if (config && config["componentDef"]) {
+    	// TODO - not sure why doForce param is set false here - had to make it explicit to add last param, but it was missing (aka false) in the past
+    	
+    	// TODO - remove comment - EBA1
         valueConfig = componentService.newComponentDeprecated(config, null, localCreation, true);
     } else if (aura.util.isArray(config)) {
         valueConfig = [];
 
         for(var i = 0; i < config.length; i++) {
-            var v = config[i];
+                var v = config[i];
             if (v["componentDef"]) {
                 if (v["items"]) {
-                    //foreach
+                    if (act) { 
+                        act.incPathIndex(i);
+                        act.pushPath("/realbody");
+                    }
+                    // iteration of some sort
                     var itemsValue = expressionService.getValue(valueProvider, valueFactory.create(v["items"]));
                     // temp workaround for no typedef if value is null
                     if (itemsValue && itemsValue.each) {
                         var varName = v['var'];
                         itemsValue.each(createComponent, v["reverse"]);
+                    }
+                    if (act) { 
+                        act.popPath("/realbody");
                     }
                 } else {
                     if (noInstantiate && !forceInstantiate) {
@@ -184,7 +204,9 @@ AttributeDefSet.prototype.createAttribute = function(config, def, component, val
                         cdr["valueProvider"] = valueProvider;
                         valueConfig.push(new SimpleValue(cdr, def, component));
                     } else {
-                        valueConfig.push(componentService.newComponentDeprecated(v, valueProvider, localCreation, true));
+                        if (act) { act.incPathIndex(i); }
+                        // TODO - remove comment - EBA1
+                        valueConfig.push(componentService.newComponentDeprecated(v, valueProvider, localCreation, true, null));
                     }
                 }
 

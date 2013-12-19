@@ -25,8 +25,11 @@
             facet = atts.getValue("else");
             //console.log("fiction " + cmp.getGlobalId());
         }
+
+        $A.pushCreationPath("/realbody");
         var realbody = [];
         for (var i = 0, length = facet.getLength(); i < length; i++) {
+        	$A.setCreationPathIndex(i);
             var cdr = facet.get(i);
             var cmps = $A.componentService.newComponentDeprecated(cdr, cdr.valueProvider || atts.getValueProvider(), false, doForce);
             if ($A.util.isArray(cmps)) {
@@ -35,6 +38,7 @@
                 realbody.push(cmps);
             }
         }
+        $A.popCreationPath("/realbody");
         
         return realbody;
     }

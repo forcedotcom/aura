@@ -96,16 +96,22 @@
         }
         var ivp;
         var len = body.getLength();
+        
+        $A.setCreationPathIndex(index);
+        $A.pushCreationPath("/body");
         //
         // Take off our index, but add the number of components that we will create.
         //
         for (var j = 0; j < body.getLength(); j++) {
+            $A.setCreationPathIndex(j);
             var cdr = body.get(j);
             if (!ivp) {
                 ivp = $A.expressionService.createPassthroughValue(extraProviders, cdr.valueProvider || atts.getValueProvider());
             }
             ret.push( $A.componentService.newComponentDeprecated(cdr, ivp, false, doForce) );
         }
+        $A.popCreationPath("/body");
+        
         return ret;
     },
 
@@ -175,6 +181,8 @@
         var indexVar = atts.get("indexVar");
 
         if (items && !items.isLiteral() && !items.isEmpty()) {
+            $A.pushCreationPath("/realbody");
+            
             var realstart = 0;
             var realend = items.getLength();
             var start = atts.getValue("start");
@@ -195,6 +203,7 @@
             for (var i = realstart; i < realend; i++) {
                 realbody = realbody.concat(this.createComponentsForIndexFromServer(cmp, items, i, doForce));
             }
+            $A.popCreationPath("/realbody");
         }
         
         return realbody;

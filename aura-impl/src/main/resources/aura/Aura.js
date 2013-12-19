@@ -318,6 +318,72 @@ $A.ns.Aura = function() {
         return this.componentService.newComponentAsync(callbackScope, callback, config, attributeValueProvider, localCreation, doForce, forceServer);
     };
 
+
+
+    /**
+     * pushes current portion of attribute's creationPath onto stack
+     * @param {String} creationPath
+     *
+     * @public
+     */
+    this.pushCreationPath = function(creationPath) {
+    	var ctx = this.getContext();
+    	if (!ctx) {
+    		return;
+    	}
+    	
+    	var act = ctx.getCurrentAction();
+
+    	if (!act) {
+    		return;
+    	}
+    	
+    	act.pushPath(creationPath);
+    };
+
+    /**
+     * pops current portion of attribute's creationPath from stack
+     * @param {String} creationPath
+     *
+     * @public
+     */
+    this.popCreationPath = function(creationPath) {
+    	var ctx = this.getContext();
+    	if (!ctx) { 
+    		return;
+    	}
+    	
+    	var act = ctx.getCurrentAction();
+
+    	if (!act) {
+    		return;
+    	}
+    	
+    	act.popPath(creationPath);
+    };
+
+    /**
+     * sets pathIndex for the current attribute on creationPath's stack
+     * @param {String} creationPath
+     *
+     * @public
+     */
+    this.setCreationPathIndex = function(idx) {
+    	var ctx = this.getContext();
+    	if (!ctx) {
+    		return;
+    	}
+    	
+    	var act = ctx.getCurrentAction();
+
+    	if (!act) {
+    		return;
+    	}
+    	
+    	act.incPathIndex(idx);
+    };
+
+    
     /**
      * Equivalent to <code>$A.eventService.newEvent()</code>.
      * <p>See Also: <a href="#reference?topic="AuraEventService">AuraEventService</a></p>
@@ -347,6 +413,9 @@ $A.ns.Aura = function() {
         "unrender", aura.unrender,
         "afterRender", aura.afterRender,
         "getCmp", aura.getCmp,
+        "pushCreationPath", aura.pushCreationPath,
+        "popCreationPath", aura.popCreationPath,
+        "setCreationPathIndex", aura.setCreationPathIndex,
         //#if {"excludeModes" : ["PRODUCTION"]}
             "devToolService", aura.devToolService,
             "getQueryStatement", aura.devToolService.newStatement,
@@ -809,6 +878,7 @@ $A.ns.Aura.prototype.logInternal = function(type, message, error, trace) {
 
     if (!$A.util.isUndefinedOrNull(message)) {
         stringVersion += " : " + message;
+        logMsg += message;
     }
     if (!$A.util.isUndefinedOrNull(error) && !$A.util.isUndefinedOrNull(error.message)) {
         stringVersion += " : " + error.message;
@@ -1173,6 +1243,9 @@ $A.ns.Aura.prototype.setMode = function(mode) {
 $A.ns.Aura.prototype.getGlobalValueProviders = function() {
     return this.getContext().getGlobalValueProviders();
 };
+
+
+
 
 // #include aura.Aura_export
 

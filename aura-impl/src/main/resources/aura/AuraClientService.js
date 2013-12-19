@@ -40,14 +40,18 @@ var AuraClientService = function() {
             $A.mark("Initial Component Created");
             $A.mark("Initial Component Rendered");
             var body = document.body;
+            
+            // not on in dev modes to preserve stacktrace in debug tools
             //#if {"modes" : ["PRODUCTION"]}
             try {
                 //#end
-                if (token) {
+
+            	if (token) {
                     priv.token = token;
                 }
 
                 // Why is this happening in the ClientService? --JT
+                // NOTE: no creation path here, we are at the top level
                 var component = componentService.newComponentDeprecated(config, null, false, true);
 
                 $A.endMark("Initial Component Created");

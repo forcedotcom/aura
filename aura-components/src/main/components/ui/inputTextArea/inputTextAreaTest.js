@@ -94,14 +94,16 @@
     },
     /**
      * Verify setting resizable attribute to true, then switching to false.
+     * Do not run in IE7 because hasAttribute() support is IE8+
      */
     testResizable: {
+    	browsers : ["-IE7"],
         attributes : {resizable: true},
         test: function(component){
-            var textarea = document.createElement('textarea');
-            if (textarea.hasAttribute("resizable")) {
-            	// resizable is supported
-                aura.test.assertEquals('both', $A.util.style.getCSSProperty(component.getElement(),'resize'), "Textarea not correctly resizable");
+        	var textarea = document.createElement('textarea');
+        	if (textarea.hasAttribute("resizable")) {
+        		// resizable is supported
+            	aura.test.assertEquals('both', $A.util.style.getCSSProperty(component.getElement(),'resize'), "Textarea not correctly resizable");
                 component.getValue("v.resizable").setValue(false);
                 $A.rerender(component);
                 aura.test.assertEquals('none', $A.util.style.getCSSProperty(component.getElement(),'resize'), "Textarea resizable attribute not correct after switching.");

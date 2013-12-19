@@ -910,7 +910,7 @@ $A.ns.Util.prototype.acceptsData = function(element) {
  * @param {String} key The data key to look up on element.
  */
 $A.ns.Util.prototype.getDataAttribute = function(element, key) {
-    if (!this.acceptsData(element) || this.isUndefined(key)) {
+	if (!this.acceptsData(element) || this.isUndefined(key)) {
         return null;
     }
 
@@ -957,7 +957,7 @@ $A.ns.Util.prototype.getDataAttributeName = function(key) {
  * @returns {Boolean}
  */
 $A.ns.Util.prototype.hasDataAttribute = function(element, key) {
-    return !this.isUndefinedOrNull(this.getDataAttribute(element, key));
+	return !this.isUndefinedOrNull(this.getDataAttribute(element, key));
 };
 
 /**
@@ -1319,16 +1319,20 @@ $A.ns.Util.prototype.supportsTouchEvents = function() {
 	    } else {
 	    	// chrome, safari, IE have this
 	        t = node.innerText;
-	
-		// FF & chrome with visibility set to false
+	        
+			// FF & chrome with visibility set to false
 	        if (node.textContent !== undefined) {
-	            if($A.util.isUndefinedOrNull(t) || t === ""){
+	            if(this.isEmpty(t)){
 	                t = node.textContent;
 	            }
 	        }
+	        
+	        // if its <style> innerText doesnt work so try cssText (for IE)
+	        if (node.tagName === "STYLE" && this.isEmpty(t) && !this.isUndefinedOrNull(node.styleSheet)) {
+	        	t = node.styleSheet.cssText;
+	        }
 	    }
 	    return t;
-	
 	};
 	
 	$A.ns.Util.prototype.errorBasedOnMode = function(msg) {

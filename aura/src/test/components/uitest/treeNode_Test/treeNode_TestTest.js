@@ -91,8 +91,8 @@
                     "F", "H", "chi", "psi", "omega", "C" ];
             var expected = [];
             
-            for(var id in expectedIds){
-            	expected.push(cmp.find(expectedIds[id]));
+            for(var i=0; i < expectedIds.length; i++){
+            	expected.push(cmp.find(expectedIds[i]));
             }
            
             var nodes = [];

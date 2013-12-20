@@ -355,7 +355,7 @@ public interface AuraContext {
     void setPreloadedDefinitions(Set<DefDescriptor<?>> preloaded);
 
     /**
-     * Set the definitions that the client should already have.
+     * Get the definitions that the client should already have.
      *
      * @return the actual set (unmodifiable).
      */

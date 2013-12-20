@@ -679,6 +679,20 @@ var Test = function(){
             aura.test.assertEquals(false,condition,assertMessage);
         },
 
+        /**
+         * Assert that the value passed in is undefined.
+         * @param {Object} arg1
+         * 				The argument to evaluate
+         * @param {String} assertMessage
+         * 				The message that is returned if the argument is not undefined
+         */
+        assertUndefined : function(arg1, assertMessage){
+            if(!assertMessage){
+                assertMessage = "Assertion failure, Expected: {undefined}, but Actual: {"+arg1+"} ";
+            }
+            aura.test.assertTrue($A.util.isUndefined(arg1),assertMessage);
+        },
+
          /**
          * Assert that the value passed in is either undefined or null.
          * @param {Object} arg1
@@ -688,7 +702,7 @@ var Test = function(){
          */
         assertUndefinedOrNull : function(arg1, assertMessage){
             if(!assertMessage){
-                assertMessage = "Assertion failure, Expected: {Undefined or Null}, but Actual: {"+arg1+"} ";
+                assertMessage = "Assertion failure, Expected: {undefined or null}, but Actual: {"+arg1+"} ";
             }
             aura.test.assertTrue($A.util.isUndefinedOrNull(arg1),assertMessage);
         },
@@ -702,7 +716,7 @@ var Test = function(){
          */
         assertNull : function(arg1, assertMessage){
             if(!assertMessage){
-                assertMessage = "Assertion failure, Expected: {Null}, but Actual: {"+arg1+"} ";
+                assertMessage = "Assertion failure, Expected: {null}, but Actual: {"+arg1+"} ";
             }
             aura.test.assertTrue(arg1===null,assertMessage);
         },
@@ -716,7 +730,7 @@ var Test = function(){
          */
         assertNotNull : function(arg1, assertMessage){
         	if(!assertMessage){
-                assertMessage = "Assertion failure, Expected: {Non Null}, but Actual:{"+arg1+"}";
+                assertMessage = "Assertion failure, Expected: {non-null}, but Actual:{"+arg1+"}";
             }
             aura.test.assertTrue(arg1!==null,assertMessage);
         },

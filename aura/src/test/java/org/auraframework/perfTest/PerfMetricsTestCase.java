@@ -31,37 +31,42 @@ import com.google.common.collect.Maps;
  * Note that Jiffy is only loaded in PTEST (and Cadence) modes.
  */
 public class PerfMetricsTestCase extends WebDriverTestCase {
-    public PerfMetricsTestCase(String name) {
-        super(name);
-    }
+	public PerfMetricsTestCase(String name) {
+		super(name);
+	}
 
-    protected void clearStats() {
-        auraUITestingUtil.getEval("Jiffy.removeStats()");
-    }
+	protected void clearStats() {
+		auraUITestingUtil.getEval("Perf.removeStats()");
+	}
 
-    protected Map<String, String> getJiffyStats(ArrayList<String> transactionsToGather) {
-        return getJiffyStats(null, transactionsToGather);
-    }
+	protected Map<String, String> getJiffyStats(
+			ArrayList<String> transactionsToGather) {
+		return getJiffyStats(null, transactionsToGather);
+	}
 
-    protected Map<String, String> getJiffyStats(String stage, ArrayList<String> transactionsToGather) {
-        Map<String, String> stats = Maps.newHashMap();
-        String json = auraUITestingUtil.getEval("return $A.util.json.encode(Perf.toJson())").toString();
-        getName();
-        json = json.substring(1, json.length() - 1);
-        json = json.replace("\\\"", "\"");
-        StringReader in = new StringReader(json);
-        Map<?, ?> message = (Map<?, ?>) new JsonReader().read(in);
-        @SuppressWarnings("unchecked")
-        ArrayList<HashMap<?, ?>> measures = (ArrayList<HashMap<?, ?>>) message.get("measures");
-        for (HashMap<?, ?> marks : measures) {
-            if (!transactionsToGather.isEmpty()) {
-                if (!transactionsToGather.contains(marks.get("measure"))) {
-                    continue;
-                }
-            }
-            String measureName = marks.get("measure").toString() + (stage != null ? ("_" + stage) : "");
-            stats.put(measureName, marks.get("et").toString());
-        }
-        return stats;
-    }
+	protected Map<String, String> getJiffyStats(String stage,
+			ArrayList<String> transactionsToGather) {
+		Map<String, String> stats = Maps.newHashMap();
+		String json = auraUITestingUtil.getEval(
+				"return $A.util.json.encode(Perf.toJson())").toString();
+		getName();
+		json = json.substring(1, json.length() - 1);
+		json = json.replace("\\\"", "\"");
+		StringReader in = new StringReader(json);
+		Map<?, ?> message = (Map<?, ?>) new JsonReader().read(in);
+		@SuppressWarnings("unchecked")
+		ArrayList<HashMap<?, ?>> measures = (ArrayList<HashMap<?, ?>>) message
+				.get("measures");
+		for (HashMap<?, ?> marks : measures) {
+			if (!transactionsToGather.isEmpty()) {
+				if (!transactionsToGather.contains(marks.get("measure"))) {
+					continue;
+				}
+			}
+			String measureName = marks.get("measure").toString()
+					+ (stage != null ? ("_" + stage) : "");
+			stats.put(measureName, marks.get("et").toString());
+		}
+		return stats;
+	}
 }

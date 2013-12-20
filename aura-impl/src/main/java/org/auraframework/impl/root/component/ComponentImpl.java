@@ -104,9 +104,7 @@ public final class ComponentImpl extends BaseComponentImpl<ComponentDef, Compone
                 }
 
                 if (providerDef.isLocal()) {
-                    context.getInstanceStack().setAttributeName(descriptor.getNamespace()+":"+descriptor.getName());
                     ComponentConfig config = providerDef.provide(intfDescriptor);
-                    context.getInstanceStack().clearAttributeName(descriptor.getNamespace()+":"+descriptor.getName());
                     if (config != null) {
                         ProviderDef remoteProviderDef = root.getProviderDef();
                         if (remoteProviderDef == null || remoteProviderDef.isLocal()) {

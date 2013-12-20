@@ -23,6 +23,8 @@ import org.auraframework.Aura;
 import org.auraframework.def.ComponentConfigProvider;
 import org.auraframework.instance.*;
 import org.auraframework.system.Annotations.Provider;
+
+import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.collect.Lists;
@@ -39,9 +41,11 @@ import com.google.common.collect.Maps;
 public class IterationProvider implements ComponentConfigProvider {
     @Override
     public ComponentConfig provide() throws QuickFixException {
-        BaseComponent<?, ?> component = Aura.getContextService().getCurrentContext().getCurrentComponent();
+        AuraContext context = Aura.getContextService().getCurrentContext();
+        BaseComponent<?, ?> component = context.getCurrentComponent();
         ComponentConfig cc = new ComponentConfig();
         List<Component> components = new ArrayList<Component>();
+        InstanceStack iStack = context.getInstanceStack();
         Map<String, Object> m = Maps.newHashMapWithExpectedSize(1);
         m.put("realbody", components);
         cc.setAttributes(m);
@@ -55,35 +59,43 @@ public class IterationProvider implements ComponentConfigProvider {
                 String indexVar = (String) atts.getValue("indexVar");
 
                 int realstart = 0;
-	            int realend = items.size();
-	            
-	            ComponentDefRefArray body = (ComponentDefRefArray) atts.getValue("body");
-	            Integer start = getIntValue(atts.getValue("start"));
-	            Integer end = getIntValue(atts.getValue("end"));
-	            if (start == null && end == null) {
-	                // int page = (Integer)atts.getValue("page");
-	                // int pageSize = (Integer)atts.getValue("pageSize");
-	            } else {
-	                if (start != null && start > realstart) {
-	                    realstart = start;
-	                }
-	                
-	                if (end != null && end < realend) {
-	                    realend = end;
-	                }
-	            }
-	            
-	            // boolean reverse = (Boolean)atts.getValue("reverse");
-	            for (int i = realstart; i < realend; i++) {
-	                Map<String, Object> providers = new HashMap<String, Object>();
-	                providers.put(var, items.get(i));
-	                if (indexVar != null) {
-	                    providers.put(indexVar, i);
-	                }
-	                
-	                // realbody ends up dirty, don't need it to be
-	                components.addAll(body.newInstance(atts.getValueProvider(), providers));
-	            }
+                int realend = items.size();
+                
+                ComponentDefRefArray body = (ComponentDefRefArray) atts.getValue("body");
+                Integer start = getIntValue(atts.getValue("start"));
+                Integer end = getIntValue(atts.getValue("end"));
+                if (start == null && end == null) {
+                    // int page = (Integer)atts.getValue("page");
+                    // int pageSize = (Integer)atts.getValue("pageSize");
+                } else {
+                    if (start != null && start > realstart) {
+                        realstart = start;
+                    }
+                    
+                    if (end != null && end < realend) {
+                        realend = end;
+                    }
+                }
+                
+                // boolean reverse = (Boolean)atts.getValue("reverse");
+                iStack.setAttributeName("realbody");
+                for (int i = realstart; i < realend; i++) {
+                    iStack.setAttributeIndex(i);
+                    iStack.pushInstance(component);
+                    iStack.setAttributeName("body");
+                    Map<String, Object> providers = new HashMap<String, Object>();
+                    providers.put(var, items.get(i));
+                    if (indexVar != null) {
+                        providers.put(indexVar, i);
+                    }
+                    
+                    // realbody ends up dirty, don't need it to be
+                    components.addAll(body.newInstance(atts.getValueProvider(), providers));
+                    iStack.clearAttributeName("body");
+                    iStack.popInstance(component);
+                    iStack.clearAttributeIndex(i);
+                }
+                iStack.clearAttributeName("realbody");
             }
         }
         

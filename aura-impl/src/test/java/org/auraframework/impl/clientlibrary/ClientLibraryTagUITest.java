@@ -23,68 +23,69 @@ import org.openqa.selenium.WebElement;
 import com.ibm.icu.util.Calendar;
 
 public class ClientLibraryTagUITest extends WebDriverTestCase {
-    public ClientLibraryTagUITest(String name){
+    public ClientLibraryTagUITest(String name) {
         super(name);
     }
-    
+
     /**
      * Verify that Javascript and Style resources marked as combinable are available at the client.
-     * clientLibraryTest:clientLibraryTest
-     *  Moment, Walltime, js://clientLibraryTest.clientLibraryTest are marked as combinable JS resources.
-     *  css://clientLibraryTest.clientLibraryTest is marked as combinable CSS resource
+     * clientLibraryTest:clientLibraryTest Moment, Walltime, js://clientLibraryTest.clientLibraryTest are marked as
+     * combinable JS resources. css://clientLibraryTest.clientLibraryTest is marked as combinable CSS resource
+     * 
      * @throws Exception
      */
-    public void testCombinableResources()throws Exception{
+    public void testCombinableResources() throws Exception {
         open("/clientLibraryTest/clientLibraryTest.app");
         waitForAuraFrameworkReady();
         Object yearThruMoment = auraUITestingUtil.getEval("return moment(new Date()).year()");
         assertNotNull(yearThruMoment);
-        assertEquals(Calendar.getInstance().get(Calendar.YEAR), ((Long)yearThruMoment).intValue());
-        
+        assertEquals(Calendar.getInstance().get(Calendar.YEAR), ((Long) yearThruMoment).intValue());
+
         Object walltime = auraUITestingUtil.getEval("return WallTime");
         assertNotNull(walltime);
-        
-        assertEquals("awesome",auraUITestingUtil.getEval("return clientLibraryTest.cool;"));
-        
+
+        assertEquals("awesome", auraUITestingUtil.getEval("return clientLibraryTest.cool;"));
+
         WebElement div = findDomElement(By.cssSelector("div[class~='identifier']"));
-        assertTrue(div.getCssValue("border").contains("none"));
-        
-        
+        String divCss = div.getCssValue("background-color");
+        assertEquals("CSS not loaded from combinable resource", "rgba(255, 0, 0, 1)", divCss);
+
     }
+
     /**
-     * Verify that Javascript and Style resources marked as uncombinable are available at the client.
-     * WalltimeLocale is an uncombinable JS resource.
+     * Verify that Javascript and Style resources marked as uncombinable are available at the client. WalltimeLocale is
+     * an uncombinable JS resource.
+     * 
      * @throws Exception
      */
-    public void testNonCombinableResources()throws Exception{
+    public void testNonCombinableResources() throws Exception {
         open("/clientLibraryTest/clientLibraryTest.app");
         waitForAuraFrameworkReady();
         Object walltimeLocale = auraUITestingUtil.getEval("return WallTime");
         assertNotNull(walltimeLocale);
     }
-    
+
     /**
-     * Verify that resource change depending on Mode.
-     * Mixture of combinable and uncombinable resources
+     * Verify that resource change depending on Mode. Mixture of combinable and uncombinable resources
      */
-    public void testModeDependentResources()throws Exception{
+    public void testModeDependentResources() throws Exception {
         open("/clientLibraryTest/clientLibraryTest.app", Mode.PTEST);
-        
-        //PTEST only resources
+
+        // PTEST only resources
         Object jiffyData = auraUITestingUtil.getEval("return Perf.toJson()");
         assertNotNull(jiffyData);
-        
+
         Object jiffyUI = auraUITestingUtil.getEval("return Perf.ui");
         assertNotNull(jiffyUI);
-        
-        //Mode independent resources
+
+        // Mode independent resources
         Object yearThruMoment = auraUITestingUtil.getEval("return moment(new Date()).year()");
         assertNotNull(yearThruMoment);
-        assertEquals(Calendar.getInstance().get(Calendar.YEAR), ((Long)yearThruMoment).intValue());
-        
+        assertEquals(Calendar.getInstance().get(Calendar.YEAR), ((Long) yearThruMoment).intValue());
+
         Object walltime = auraUITestingUtil.getEval("return WallTime");
         assertNotNull(walltime);
-        
-        assertEquals("awesome",auraUITestingUtil.getEval("return clientLibraryTest.cool;"));
+
+        assertEquals("awesome", auraUITestingUtil.getEval("return clientLibraryTest.cool;"));
     }
 }

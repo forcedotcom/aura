@@ -30,10 +30,12 @@
     testRichTextHtmlContent:{
     	attributes : {testContent: "<b>some content</b></html>"},
     	test : [function(component) {
+    		this.assertRichTextInitalized(component.find("Text"));
+    	}, function(component) {
     		component.find("base").find("submitBtn").get("e.press").fire();
     		$A.test.addWaitFor(false, function(){
     			var content = component.find("base").find("outputValue").get("v.value");
-    			return content != "";
+    			return content === "<b>some content</b></html>";
 			});
     	}, function(component) {
     		var rtValue = component.find("Text").get("v.value");

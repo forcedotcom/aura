@@ -21,6 +21,8 @@ import org.auraframework.Aura;
 import org.auraframework.def.ComponentConfigProvider;
 import org.auraframework.instance.*;
 import org.auraframework.system.Annotations.Provider;
+
+import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.collect.Maps;
@@ -33,7 +35,9 @@ public class IfProvider implements ComponentConfigProvider {
 
     @Override
     public ComponentConfig provide() throws QuickFixException {
-        BaseComponent<?, ?> component = Aura.getContextService().getCurrentContext().getCurrentComponent();
+        AuraContext context = Aura.getContextService().getCurrentContext();
+        BaseComponent<?, ?> component = context.getCurrentComponent();
+        InstanceStack iStack = context.getInstanceStack();
         ComponentConfig cc = new ComponentConfig();
         List<Component> components = new ArrayList<Component>();
         Map<String, Object> m = Maps.newHashMapWithExpectedSize(1);
@@ -53,7 +57,9 @@ public class IfProvider implements ComponentConfigProvider {
             // System.err.println("fiction " + component.getGlobalId());
         }
         if (facet != null) {
+            iStack.setAttributeName("realbody");
             components.addAll(facet.newInstance(atts.getValueProvider()));
+            iStack.clearAttributeName("realbody");
         }
         return cc;
     }

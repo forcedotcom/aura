@@ -30,13 +30,20 @@
      */
     testCarouselSpinnerAppearsDisappears : {
     	browsers: ["-IE7","-IE8"],
- 		test : function(cmp){
+ 		test : [function(cmp){
+ 			// spinner appears
+ 			var spinnerElement = cmp.find("testSpinner").getElement();
+ 			$A.test.addWaitFor("false", function() {
+				var elm = cmp.find("testSpinner").getElement();
+				return $A.util.hasClass(elm,"hideEl").toString();
+			});
+ 		}, function(cmp){
+ 			// spinner is gone
 			var spinnerElement = cmp.find("testSpinner").getElement();
-			$A.test.assertFalse($A.util.hasClass(spinnerElement,"hideEl"));
 			$A.test.addWaitFor("true", function() {
 				var elm = cmp.find("testSpinner").getElement();
 				return $A.util.hasClass(elm,"hideEl").toString();
 			});
-        }
+        }]
     }
 })

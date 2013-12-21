@@ -18,14 +18,14 @@
 <aura:component support="PROTO" extensible="true"
   description="The Aura debug tool opens a separate browser window and outputs debug information about an Aura component. The debug tool has the following tabs: Errors, Warnings, Components, Events, Storage, Accessibility, and Console. To launch the Aura Debug tool, add the query string aura.debugtool=true after the URL of the Aura component file that you are viewing in your browser. For example: http://localhost:8080/auranote/noteList.cmp?aura.debugtool=true. To display additional statistics in the Components tab, append the query string aura.mode=STATS to the URL. For example: http://localhost:8080/auranote/noteList.cmp?aura.debugtool=true&amp;aura.mode=STATS. You must disable the popup blocking feature of your web browser to use the debug tool.">
 	
-	<aura:attribute name="errorsData" type="String" default=""/>
-	<aura:attribute name="warningsData" type="String" default=""/>
-	<aura:attribute name="cmpData" type="String" default=""/> <!-- to see additional stats use aura.mode=STATS -->
-	<aura:attribute name="eventData" type="String" default=""/>
-	<aura:attribute name="storageData" type="String" default="0 K ()"/>
-	<aura:attribute name="consoleData" type="String" default=""/>
-	<aura:attribute name="storageName" type="String" default="actions"/>
-	<aura:attribute name="accessibilityData" type="String" default=""/>
+	<aura:attribute name="errorsData" type="String" default="" description="The errors found in the component."/>
+	<aura:attribute name="warningsData" type="String" default="" description="The warnings found in the component."/>
+	<aura:attribute name="cmpData" type="String" default="" description="The component data, including the number of components and its definitions. If aura.mode=STATS is used, the number of each value objects are also returned. "/> <!-- to see additional stats use aura.mode=STATS -->
+	<aura:attribute name="eventData" type="String" default="The events found in the component, including value initializations and application events such as after component initialization and rendering."/>
+	<aura:attribute name="storageData" type="String" default="0 K ()" description="The storage name, its size in KB, and its status (OK, Warning, or Critical)."/>
+	<aura:attribute name="consoleData" type="String" default="Logs the errors and warnings found in the component."/>
+	<aura:attribute name="storageName" type="String" default="actions" description="The storage name, retrieved from the Storage Service."/>
+	<aura:attribute name="accessibilityData" type="String" default="" default="" description="The accessibility errors found in the component, based on Web Content Accessibility Guidelines 2.0."/>
 	
 	<aura:handler event="aura:debugLog" action="{!c.debugLogEventListener}"/>
 	<aura:handler event="aura:systemError" action="{!c.errorEventListener}"/>

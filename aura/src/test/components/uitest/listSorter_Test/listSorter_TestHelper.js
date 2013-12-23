@@ -29,22 +29,5 @@
 		}
 		var resultCmp = cmp.find(outCmpName);
         resultCmp.setValue("v.value", sortOrder);
-    },
-    
-    handleSelectOption: function(cmp, event, autoCompleteCmpName) {
-    	var optionCmp = event.getParam("option");
-    	var accCmp = cmp.find(autoCompleteCmpName);
-        var input = accCmp.find("input");
-        var list = accCmp.find("list");
-        var value = "";
-        
-        if (optionCmp.isInstanceOf("uitest:autoComplete_CustomTemplate")) {
-        	value = optionCmp.getValue("v.value").getValue();
-        } else if (optionCmp.isInstanceOf("ui:autocompleteOption")) {
-        	value = optionCmp.getValue("v.label").getValue();
-        } 
-        input.setValue("v.value", value);
-        list.setValue("v.visible", false);
     }
-    
 })

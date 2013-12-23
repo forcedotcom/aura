@@ -21,11 +21,11 @@
 	<aura:attribute name="errorsData" type="String" default="" description="The errors found in the component."/>
 	<aura:attribute name="warningsData" type="String" default="" description="The warnings found in the component."/>
 	<aura:attribute name="cmpData" type="String" default="" description="The component data, including the number of components and its definitions. If aura.mode=STATS is used, the number of each type of value object is also returned. "/>
-	<aura:attribute name="eventData" type="String" default="The component and application events fired in the component, shown with the parameters that are passed to the events."/>
+	<aura:attribute name="eventData" type="String" default="" description="The component and application events fired in the component, shown with the parameters that are passed to the events."/>
 	<aura:attribute name="storageData" type="String" default="0 K ()" description="The storage name, its size in KB, and its status (OK, Warning, or Critical)."/>
-	<aura:attribute name="consoleData" type="String" default="Logs the errors and warnings found in the component."/>
+	<aura:attribute name="consoleData" type="String" default="" description="Logs the errors and warnings found in the component."/>
 	<aura:attribute name="storageName" type="String" default="actions" description="The storage name, retrieved from the Storage Service."/>
-	<aura:attribute name="accessibilityData" type="String" default="" default="" description="The accessibility errors found in the component, based on Web Content Accessibility Guidelines 2.0."/>
+	<aura:attribute name="accessibilityData" type="String" default="" description="The accessibility errors found in the component, based on Web Content Accessibility Guidelines 2.0."/>
 	
 	<aura:handler event="aura:debugLog" action="{!c.debugLogEventListener}"/>
 	<aura:handler event="aura:systemError" action="{!c.errorEventListener}"/>

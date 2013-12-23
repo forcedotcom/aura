@@ -39,11 +39,9 @@
     <div aura:id="sorterContainer" class="{!v.class + ' listSorterContainer'}">	        	 		
 	 	<div class="headerBar">
             <a aura:id="cancel" onclick="{!c.onCancel}" class="cancel button" href="javascript:void(0);">Cancel
-            	<span class="assistiveText">Cancel</span>
             </a>
             <span aura:id="title" class="title">{!v.title}</span>
             <a aura:id="set" onclick="{!c.onApply}" class="apply button" href="javascript:void(0);">Apply
-            	<span class="assistiveText">Apply</span>
             </a>
         </div>
         <div aura:id="sortOrderPicker" class="sortOrderPicker">

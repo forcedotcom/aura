@@ -1,22 +1,13 @@
 ({
-	applyPressed: function(cmp, list, helper){
-		//if list contains "-" then its descending order
-		var desc = "-";
-		list = list.toString();
-		var sortOrder;
-		//ascending order
-		if(!list.indexOf(desc) != -1){
-			list = list.replace("-","");
-			sortOrder = list + " : Z-A"
-		}
-		else{
-			sortOrder = list + " : A-Z"
-		}
-		var resultCmp = cmp.find("defaultListSorterResult");
-        resultCmp.setValue("v.value", sortOrder);
+	handleApplyPressed: function(cmp, list, helper){
+		helper.handleApplyPressed(cmp, list, "defaultListSorterResult");
 	},
 	
-	cancelPressed: function(cmp){
+	handleApplyPressedForLargeList: function(cmp, list, helper){
+		helper.handleApplyPressed(cmp, list, "largeListSorterResult");
+	},
+	
+	handleCancelPressed: function(cmp){
 		cmp.getValue("v.cancelEventFired").setValue(true);
 	}
 })

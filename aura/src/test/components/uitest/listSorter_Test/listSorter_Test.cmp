@@ -18,7 +18,7 @@
 <aura:component>
 <aura:attribute name="cancelEventFired" type="boolean" default="false"/>
 <aura:attribute name="title" type="String" default="Sort" description="The title of this component." />
- <ui:listSorter aura:id="defaultListSorter" onApply="{!c.applyPressed}" onCancel="{!c.cancelPressed}" title="{!v.title}">
+ <ui:listSorter aura:id="defaultListSorter" onApply="{!c.handleApplyPressed}" onCancel="{!c.handleCancelPressed}" title="{!v.title}">
  	<aura:set attribute="dataProvider">
  		<uitest:listSorterDataProvider />
  	</aura:set>
@@ -30,7 +30,7 @@ Which Sort got Appplied:<ui:outputText aura:id="defaultListSorterResult" value="
    
  <br/><br/>
  
- <ui:listSorter aura:id="largeListSorter">
+ <ui:listSorter aura:id="largeListSorter" onApply="{!c.handleApplyPressedForLargeList}" onCancel="{!c.handleCancelPressed}">
  	<aura:set attribute="dataProvider" >
  		<uitest:listSorterDataProvider dataType="largeList"/>
  	</aura:set>

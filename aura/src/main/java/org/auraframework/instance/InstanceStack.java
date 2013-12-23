@@ -35,6 +35,12 @@ import com.google.common.collect.Lists;
  */
 public class InstanceStack {
     public InstanceStack(String base) {
+        //
+        // This should never happen, but it did in certain
+        // tests. The guard remains to ensure that we don't
+        // die with a useless null pointer exception.
+        //
+        assert base != null;
         this.base = base;
         this.path = new StringBuilder(base);
         this.stack = Lists.newArrayList();

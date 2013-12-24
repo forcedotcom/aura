@@ -1,0 +1,55 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component>
+<aura:attribute name="cancelEventFired" type="boolean" default="false"/>
+<aura:attribute name="title" type="String" default="Sort" description="The title of this component." />
+ <ui:listSorter aura:id="defaultListSorter" onApply="{!c.handleApplyPressed}" onCancel="{!c.handleCancelPressed}" title="{!v.title}">
+ 	<aura:set attribute="dataProvider">
+ 		<uitest:listSorterDataProvider />
+ 	</aura:set>
+ 	<aura:set attribute="trigger">
+ 		<ui:menuTriggerLink label="Default List Sorter" aura:id="defaultListSorterTrigger"/>
+ 	</aura:set>
+ </ui:listSorter>
+Which Sort got Appplied:<ui:outputText aura:id="defaultListSorterResult" value=""/>
+   
+ <br/><br/>
+ 
+ <ui:listSorter aura:id="largeListSorter" onApply="{!c.handleApplyPressedForLargeList}" onCancel="{!c.handleCancelPressed}">
+ 	<aura:set attribute="dataProvider" >
+ 		<uitest:listSorterDataProvider dataType="largeList"/>
+ 	</aura:set>
+ 	<aura:set attribute="trigger">
+ 		<ui:menuTriggerLink label="Large List Sorter" aura:id="largeListSorterTrigger"/>
+ 	</aura:set>
+ </ui:listSorter>
+Which Sort got Appplied:<ui:outputText aura:id="largeListSorterResult" value=""/>
+ 
+ <br/><br/>
+ 
+ <ui:listSorter aura:id="emptyListSorter">
+ 	<aura:set attribute="dataProvider" >
+ 		<uitest:listSorterDataProvider dataType="emptyList"/>
+ 	</aura:set>
+ 	<aura:set attribute="trigger">
+ 		<ui:menuTriggerLink label="Empty List Sorter" aura:id="emptyListSorterTrigger"/>
+ 	</aura:set>
+ </ui:listSorter>
+ 
+
+</aura:component>

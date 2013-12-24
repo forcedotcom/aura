@@ -127,16 +127,19 @@
                 $A.util.on(this.element, "touchend", this, false);
                 //bind touchmove event to element instead of document, for the event could be stop propagated by child elements
                 $A.util.on(this.element, "touchmove", this, false);
-
-                this.startX = event.touches[0].clientX;
-                this.startY = event.touches[0].clientY;
+                if(event.touches){
+                    this.startX = event.touches[0].clientX;
+                    this.startY = event.touches[0].clientY;
+                }
             };
 
             self.FastClick.prototype.onTouchMove = function(event) {
-                if (Math.abs(event.touches[0].clientX - this.startX) > 4
-                        || Math.abs(event.touches[0].clientY - this.startY) > 4) {
-                    this.reset();
-                }
+            	if(event.touches){
+            		if (Math.abs(event.touches[0].clientX - this.startX) > 4
+                            || Math.abs(event.touches[0].clientY - this.startY) > 4) {
+                        this.reset();
+                    }
+            	}
             };
 
             self.FastClick.prototype.onClick = function(event) {

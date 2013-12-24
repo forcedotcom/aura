@@ -65,13 +65,14 @@
         if (elem) {
             elem.style.top = "auto";
             var visible = component.get("v.visible");
+            var scrollable = component.get('v.scrollable');
             if (visible) {
                 var elemRect = elem.getBoundingClientRect();
                 var viewPort = $A.util.getWindowSize();
-                if (elemRect.bottom > viewPort.height) { // no enough space below
+                if (!scrollable && elemRect.bottom > viewPort.height) { // no enough space below
                 	//getBoundingClientRect method does not return height and width in IE7 and Ie8
                 	var height = typeof elemRect.height != 'undefined' ? elemRect.height : elemRect.bottom - elemRect.top;
-                	elem.style.top = 0 - height + "px"; 
+                	elem.style.top = 0 - height + "px";
                 } else {
                     elem.style.top = "auto";
                 }

@@ -54,7 +54,11 @@ public class TestJavaModel {
     static HashMap<String, ArrayList<InputOption>> optionMap = new LinkedHashMap<String, ArrayList<InputOption>>();
     static List<Item> items;
     static List<Item> itemsEmpty = new ArrayList<Item>();
-    static List<Item> itemsLarge;       
+    static List<Item> itemsLarge; 
+    static List<LoadColumn> columns;
+    static List<LoadColumn> noColumns = Collections.emptyList();
+    static List<LoadColumn> maxColumns;   
+    static List<ColumnsSelected> columnsSelected;
     
     static {
         inputOptions.add(new InputOption("Option1", "Opt1", false, "option1"));
@@ -84,6 +88,24 @@ public class TestJavaModel {
             categoryOption.add(new InputOption("", "", false, "opt3-sub2"));
         }
         return categoryOption;
+    }
+    
+    static {
+    	columns = new ArrayList<LoadColumn>(5);
+    	columns.add(new LoadColumn("Hidden Column", "HiddenColumn", false));
+    	for (int i = 1; i <= 4; i++) {
+    		columns.add(new LoadColumn("Column " + i, "Column" + i));
+        }
+    	maxColumns = new ArrayList<LoadColumn>(20);
+    	for (int i = 1; i <= 20; i++) {
+    		maxColumns.add(new LoadColumn("Column " + i, "Column" + i));
+        }
+    }
+    
+    static {
+    	columnsSelected = new ArrayList<ColumnsSelected>(1);
+    	//column2 order should be Z-A
+    	columnsSelected.add(new ColumnsSelected("Column2", false));
     }
     
     static {
@@ -121,6 +143,77 @@ public class TestJavaModel {
             json.writeMapEntry("value", this.value);
             json.writeMapEnd();
         }
+    }
+    
+    public static class LoadColumn implements JsonSerializable {
+        private String label;
+        private String fieldName;
+        private Boolean isSortable;
+        
+        public LoadColumn(String label, String fieldName, Boolean isSortable) {
+            this.label = label;
+            this.fieldName = fieldName;
+            this.isSortable = isSortable;
+        }
+        
+        public LoadColumn(String label, String fieldName) {
+            this.label = label;
+            this.fieldName = fieldName;
+            this.isSortable = true;
+        }
+        
+        public String getLabel() {
+			return label;
+		}
+
+		public String getFieldName() {
+			return fieldName;
+		}
+
+		public Boolean getIsSortable() {
+			return isSortable;
+		}
+
+		@Override
+        public void serialize(Json json) throws IOException {
+            json.writeMapBegin();
+            json.writeMapEntry("label", this.label);
+            json.writeMapEntry("fieldName", this.fieldName);
+            json.writeMapEntry("isSortable", this.isSortable);
+            json.writeMapEnd();
+        }
+    }
+    
+    public static class ColumnsSelected implements JsonSerializable {
+        private String fieldName;
+        private Boolean ascending;
+        
+        public ColumnsSelected(String fieldName, Boolean ascending) {
+			this.fieldName = fieldName;
+			this.ascending = ascending;
+		}
+
+		public String getFieldName() {
+			return fieldName;
+		}
+
+		public Boolean getAscending() {
+			return ascending;
+		}
+		
+		@Override
+        public void serialize(Json json) throws IOException {
+            json.writeMapBegin();
+            json.writeMapEntry("fieldName", this.fieldName);
+            json.writeMapEntry("ascending", this.ascending);
+            json.writeMapEnd();
+        }
+		
+    }
+    
+    @AuraEnabled
+    public List<ColumnsSelected>  getDefaultOrderByList() {
+        return columnsSelected;
     }
     
     @AuraEnabled
@@ -580,5 +673,18 @@ public class TestJavaModel {
     		return itemsEmpty;
     	}
         return items;
+    }
+    
+    @AuraEnabled
+    public List<LoadColumn> getColumns() throws QuickFixException {
+    	String dataType = (String)Aura.getContextService().getCurrentContext().getCurrentComponent().getAttributes().getValue("dataType");
+    	if (dataType == null) {
+    		return columns;
+    	} else if (dataType.equals("largeList")) {
+    		return maxColumns;
+    	} else if (dataType.equals("emptyList")) {
+    		return noColumns;
+    	}
+        return columns;
     }
 }

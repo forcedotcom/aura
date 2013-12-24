@@ -1,0 +1,71 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extensible="true" description="This component provides the user selected items with sort order based on the data from the data provider.">
+
+	<aura:attribute name="dataProvider" type="Aura.Component[]" required="true" description="A list of data provider components. Use a ui:dataProvider component to provide list data."/>	
+	<aura:attribute name="class" type="String" description="A CSS style to be attached to the component. This style is added in addition to base styles output by the component." />
+	<aura:attribute name="title" type="String" default="Sort" description="The title of this component." />
+	<aura:attribute name="visible" type="Boolean" default="false" description="Controls the visibility of the component."/>		
+	<aura:attribute name="items" type="Object[]" description="An array of arbitrary map objects representing the rows of data in the list." />
+	<aura:attribute name="triggerLabel" type="String" description="The text displayed on the trigger component." />
+	<aura:attribute name="trigger" type="Aura.Component[]" description="Trigger component" />
+	<aura:attribute name="modal" type="Boolean" default="true" description="Determines whether the component is a modal dialog." />
+	 	
+	<aura:attribute name="onApply" type="Aura.Action" description="The action invoked when the user click on the apply button. The selected items are passed in as the argument. If the sort order is descending, the prefix '-' is appended to the the item." />
+	<aura:attribute name="onOpen" type="Aura.Action" description="The action invoked when the user click on the trigger to open the sorter component." />
+	<aura:attribute name="onCancel" type="Aura.Action" description="The action invoked when the user click on the cancel button or hit ESC key to close the listSorter component." />
+
+	<aura:handler name="init" value="{!this}" action="{!c.init}" />	
+	<aura:handler name="change" value="{!v.visible}" action="{!c.onVisible}" />
+	
+	<div>		 	
+        {!v.trigger}
+    </div>      
+    <div aura:id="sorterContainer" class="{!v.class + ' listSorterContainer'}">	        	 		
+	 	<div class="headerBar">
+            <a aura:id="cancel" onclick="{!c.onCancel}" class="cancel button" href="javascript:void(0);">Cancel
+            </a>
+            <span aura:id="title" class="title">{!v.title}</span>
+            <a aura:id="set" onclick="{!c.onApply}" class="apply button" href="javascript:void(0);">Apply
+            </a>
+        </div>
+        <div aura:id="sortOrderPicker" class="sortOrderPicker">
+        	<a aura:id="ascBtn" onclick="{!c.onAsc}" class="button ascButton" href="javascript:void(0);">A-Z            		
+        	</a>
+        	<a aura:id="decBtn" onclick="{!c.onDec}" class="button decButton" href="javascript:void(0);">Z-A            		
+        	</a>
+        	<div class="output">
+        		<ui:outputText aura:id="selectedItemOutput" value="" />
+        		<span aura:id="separator" class="hidden">&nbsp;:&nbsp;</span>
+        		<ui:outputText aura:id="selectedSortOrderOutput"  value="" />
+        	</div>	            	
+        </div>            
+		<ui:menu aura:id="sorterMenu"  closeOnClickOutside="false" class="sorterMenu">
+			<ui:menuList aura:id="sorterMenuList" visible="{!v.visible}" scrollable="true" class="sorterMenuList" menuSelect="{!c.onMenuSelected}" menuExpand="{!c.onMenuExpand}" menuCollapse="{!c.onMenuCollapse}">										 
+				<aura:iteration items="{!v.items}" var="item">
+	    			<ui:radioMenuItem  value="{!item.fieldName}" label="{!item.label}" />
+	    			<ui:menuItemSeparator />    			
+	    		</aura:iteration>
+	    	</ui:menuList>		    				
+		</ui:menu>
+	</div>
+	<aura:if isTrue="{!v.modal}">
+		<div aura:id="mask" class="listSorterMask">&nbsp;</div>
+	</aura:if>	  
+	 
+</aura:component>

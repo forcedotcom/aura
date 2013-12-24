@@ -16,9 +16,14 @@
 
 -->
 <aura:component extensible="true" implements="ui:visible" description="A dropdown menu with a trigger that controls its visibility." support="GA">
+    <aura:attribute name="closeOnClickOutside" type="Boolean" default="true" description="Close menu when user click or tap outside of the menu" />
     <aura:registerEvent name="menuTriggerPress" type="ui:menuTriggerPress" description="The event fired when the menu trigger is pressed."/>
+    <aura:registerEvent name="refresh" type="ui:refresh" description="Fire this event to refresh the menu"/>
+
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
     <aura:handler name="menuTriggerPress" action="{!c.trigger}"/>
+    <aura:handler name="refresh" action="{!c.doInit}"/>
+    
     <div aura:id="app" class="{!v.class}" role="application">
         {!v.body}
     </div>

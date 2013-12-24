@@ -215,10 +215,13 @@
     selectSortByColumnAndAssert: function(listSorter, columnNumber){
     	var menuItem = this.getMenuItemByColumnNumber(listSorter,columnNumber);
     	menuItem.get('e.click').fire();
-    	$A.test.addWaitForWithFailureMessage("Column " + columnNumber, function(){
+    	var expectedColumn = "Column " + columnNumber;
+    	$A.test.addWaitForWithFailureMessage(expectedColumn, function(){
 			var actualSelectedItemOutput = $A.test.getText(listSorter.find("selectedItemOutput").getElement());
     		return actualSelectedItemOutput;
 			}, "Wrong Selected field displayed on Dialog");
+    	//TODO: Uncomment below line after W-1985179 is fix
+    	//$A.test.assertEquals(expectedColumn, $A.test.getActiveElementText(), expectedColumn + " should be focused");
     },
     
     /**

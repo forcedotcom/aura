@@ -16,6 +16,8 @@
 package org.auraframework.components.ui.inputRichText;
 
 import org.auraframework.test.WebDriverTestCase;
+import org.auraframework.test.WebDriverTestCase.ExcludeBrowsers;
+import org.auraframework.test.WebDriverUtil.BrowserType;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -36,6 +38,8 @@ public class InputRichTextUITest extends WebDriverTestCase {
     /**
      * Able to tab into inputRichText Component.
      */
+    /* Excluding safari because safari driver has issues with element.sendkeys(Keys.TAB) */
+    @ExcludeBrowsers({BrowserType.SAFARI})
     public void testRichTextTabbing() throws Exception {
         open(URL);
         WebElement beforeLink = auraUITestingUtil.waitForElement(By.cssSelector(LINKBEFORE_LOCATOR));
@@ -63,6 +67,8 @@ public class InputRichTextUITest extends WebDriverTestCase {
     /**
      * Test html content is escaped.
      */
+    /* Issue with sendKeys in Safari https://code.google.com/p/selenium/issues/detail?id=4467 */
+    @ExcludeBrowsers({BrowserType.SAFARI})
     public void testHtmlContentEscaped() throws Exception {
         open(URL);
         WebElement ckEditor =  auraUITestingUtil.waitForElement(By.cssSelector(CK_EDITOR_LOCATOR));

@@ -21,6 +21,7 @@ import org.auraframework.test.WebDriverTestCase;
 import org.auraframework.test.WebDriverTestCase.ExcludeBrowsers;
 import org.auraframework.test.WebDriverUtil.BrowserType;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -52,6 +53,8 @@ public class CarouselUITest extends WebDriverTestCase {
     /**
      * Able to tab into a page on the carousel.
      */
+    /* Excluding safari because safari driver has issues with element.sendkeys(Keys.TAB) */
+    @ExcludeBrowsers({BrowserType.SAFARI})
     public void testTabIntoCarouselPage() throws Exception {
         open(URL);
         WebDriver driver = getDriver();
@@ -121,6 +124,8 @@ public class CarouselUITest extends WebDriverTestCase {
     /**
      * Tabing on the last element on a carousel page tabs you out of the carousel.
      */
+    /* Excluding safari because safari driver has issues with element.sendkeys(Keys.TAB) */
+    @ExcludeBrowsers({BrowserType.SAFARI})
     public void testTabOutOfCarousel() throws Exception {
         open(URL);
         WebDriver driver = getDriver();
@@ -142,6 +147,8 @@ public class CarouselUITest extends WebDriverTestCase {
     /**
      * Tabing out of carousel from the first element on carousel.
      */
+    /* Excluding safari because safari driver has issues with element.sendkeys(Keys.TAB) */
+    @ExcludeBrowsers({BrowserType.SAFARI})
     public void testShiftTabOutOfCarousel() throws Exception {
         open(URL);
         WebDriver driver = getDriver();
@@ -241,9 +248,34 @@ public class CarouselUITest extends WebDriverTestCase {
     private WebElement getCarousel(WebDriver d, int carouselNum) {
         List<WebElement> carousels = d.findElements(By.xpath(CAROUSEL_XPATH));
         WebElement carousel = carousels.get(--carouselNum);
-        new Actions(d).moveToElement(carousel).perform();
+        moveToCarousel(d, carousel);
         return carousel;
     }
+    
+    /*
+     * WebDriver.moveToElement() does not work in safari - https://code.google.com/p/selenium/issues/detail?id=4136
+     * This is a workaround for that.
+     */
+    private boolean moveToCarousel(WebDriver d, WebElement c)
+	{
+		boolean result = false;
+		
+		try {
+			new Actions(d).moveToElement(c).perform();
+			result = true;
+		} catch (Exception e) {
+			String mouseOverScript = "if(document.createEvent){" +
+					"var evObj = document.createEvent('MouseEvents');" +
+					"evObj.initEvent('mouseover', true, false);" +
+					"arguments[0].dispatchEvent(evObj);" +
+					"} else if(document.createEventObject) {" +
+					"arguments[0].fireEvent('onmouseover');}";
+			auraUITestingUtil.getEval(mouseOverScript, c);
+			result = true;
+		}
+		
+		return result;
+	}
 
     private List<WebElement> getPagesOnCarousel(WebElement c) {
         return c.findElements(By.cssSelector(CAROUSEL_PAGE_SELECTOR));

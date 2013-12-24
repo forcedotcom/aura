@@ -31,7 +31,7 @@
     		var datePicker = cmp.find("dateTimePickerTest").find("datePicker");
     		var cancelLink = datePicker.find("cancel").getElement();
     		
-    		cancelLink.click();
+    		$A.test.clickOrTouch(cancelLink);
     		$A.test.addWaitFor(false, function(){return $A.util.hasClass(datePicker.getElement(), "visible")});
     		
     		var value = cmp.find("dateTimePickerTest").get("v.value");
@@ -57,7 +57,7 @@
     		var datePicker = cmp.find("dateTimePickerTest").find("datePicker");
     		var setLink = datePicker.find("set").getElement();
     		
-    		setLink.click();
+    		$A.test.clickOrTouch(setLink);
     		$A.test.addWaitFor(false, function(){return $A.util.hasClass(datePicker.getElement(), "visible")});
     		
     		var expectedDate = this.getCleanDate(null, true);
@@ -97,11 +97,10 @@
     	var opener = cmp.find("dateTimePickerTest").find("datePickerOpener").getElement();
 		var inputBox = cmp.find("dateTimePickerTest").find("inputText").getElement();
 	    var datePicker = cmp.find("dateTimePickerTest").find("datePicker").getElement();
-	    debugger;
 	    if($A.util.isUndefinedOrNull(opener)) {
-	    	inputBox.click();
+	    	$A.test.clickOrTouch(inputBox);
 		} else {
-			opener.click();
+			$A.test.clickOrTouch(opener);
 		}
 		$A.test.addWaitFor(true, function(){return $A.util.hasClass(datePicker, "visible")});
     },

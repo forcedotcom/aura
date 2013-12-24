@@ -1156,7 +1156,12 @@ var Test = function(){
         		element.dispatchEvent(te);
         	}
         	else{
-            	element.click();
+        		if ($A.util.isUndefinedOrNull(element.click)) {
+        			// manually fire event
+        			aura.test.fireDomEvent(element, "click");
+        		} else {
+        			element.click();
+        		}
             }
         },
 

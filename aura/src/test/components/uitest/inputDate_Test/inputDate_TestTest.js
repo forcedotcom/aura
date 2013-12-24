@@ -45,13 +45,14 @@
       		var curDate = $A.test.getActiveElement();
       		var tbody = curDate.parentNode.parentNode.parentNode;
       		var aboveCurrentDate = tbody.children[2].children[3].children[0];
-      		aboveCurrentDate.click();
+      		$A.test.clickOrTouch(aboveCurrentDate);
       		$A.test.addWaitFor(false, function(){return $A.util.hasClass(datePicker, "visible")});
   		}, function(cmp) {
   			var dateValue = cmp.find("datePickerTestCmp").find("inputText").getElement().value;
   			$A.test.assertEquals("2013-09-18", dateValue.toString(), "Clicking on one week prior to todays date did not render the correct result.");
 		}]
     },
+    
     /**
      * Testing that all 12 months, appear in the correct order
      */
@@ -96,6 +97,7 @@
 	            $A.test.assertEquals(expected, actual, "Month year combo incorrect");       
 	    }] 
     },
+    
     /**
      * Testing arrow combination of decrease month, and increasing year
      */
@@ -113,6 +115,7 @@
 
 	    }] 
     },
+    
     /**
      * Testing arrow combination of increasing month, and  decrease year
      */
@@ -130,6 +133,7 @@
 
 	    }] 
     },
+    
     /**
      * Acessibility test, making sure that any functionality added is still accessible
      */
@@ -189,6 +193,7 @@
 	        $A.test.assertEquals("2013", actualSelectValue, "Year select value incorrect");    
     	}
     },
+    
     testDocumentLevelHandler:{
         //For iphone/ipad:
         //when the date picker is up, it suppose to take the whole screen. there is no 'other place' you can 'touch'
@@ -207,6 +212,7 @@
             $A.test.assertFalse(date_picker.get("v.visible"));
         }
     },
+    
     iterateCal : function(monthIter, yearIter, monthButton, yearButton){
           var i;
           for(i = 0; i< monthIter; i++){
@@ -218,14 +224,15 @@
           }
           
     },
+    
    openDatePicker : function(cmp) {
     	var opener = cmp.find("datePickerTestCmp").find("datePickerOpener").getElement();
 		var inputBox = cmp.find("datePickerTestCmp").find("inputText").getElement();
 	    var datePicker = cmp.find("datePickerTestCmp").find("datePicker").getElement();
 	    if($A.util.isUndefinedOrNull(opener)) {
-	    	inputBox.click();
+	    	$A.test.clickOrTouch(inputBox);
 		} else {
-			opener.click();
+			$A.test.clickOrTouch(opener);
 		}
 		$A.test.addWaitFor(true, function(){return $A.util.hasClass(datePicker, "visible")});
     },

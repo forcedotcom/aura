@@ -547,7 +547,7 @@ var AuraClientService = function() {
         /**
          * Return whether Aura believes it is online. This is only an educated
          * guess. Immediate and future communication with the server may fail.
-         *
+         * @memberOf AuraClientService
          * @return true if Aura believes it is online; false otherwise.
          */
         isConnected : function() {
@@ -557,8 +557,9 @@ var AuraClientService = function() {
         /**
          * Inform Aura that the environment is either online or offline. 
          * 
-         * @param {Boolean} isConnected true to set Aura to online mode; 
-         * false to set Aura to offline mode.
+         * @param {Boolean} isConnected Set to true to run Aura in online mode,  
+         * or false to run Aura in offline mode.
+         * @memberOf AuraClientService
          */
         setConnected: function(isConnected) {
         	priv.setConnected(isConnected);
@@ -567,10 +568,11 @@ var AuraClientService = function() {
         /**
          * Queue an action for execution after the current event loop has ended.
          *
-         * This must be called from within an event loop!
+         * This function must be called from within an event loop.
          *
          * @param {Action} action the action to enqueue
-         * @param {Boolean} background if true the action will be backgrounded, otherwise the value of action.isBackground() is used.
+         * @param {Boolean} background Set to true to run the action in the background, otherwise the value of action.isBackground() is used.
+         * @memberOf AuraClientService
          */
         enqueueAction : function(action, background) {
             $A.assert(!$A.util.isUndefinedOrNull(action), "EnqueueAction() cannot be called on an undefined or null action.");

@@ -18,12 +18,12 @@
 <aura:component>
 <aura:attribute name="cancelEventFired" type="boolean" default="false"/>
 <aura:attribute name="title" type="String" default="Sort" description="The title of this component." />
- <ui:listSorter aura:id="defaultListSorter" onApply="{!c.handleApplyPressed}" onCancel="{!c.handleCancelPressed}" title="{!v.title}">
+ <ui:listSorter aura:id="defaultListSorter" class="defaultListSorter" onApply="{!c.handleApplyPressed}" onCancel="{!c.handleCancelPressed}" title="{!v.title}">
  	<aura:set attribute="dataProvider">
  		<uitest:listSorterDataProvider />
  	</aura:set>
  	<aura:set attribute="trigger">
- 		<ui:menuTriggerLink label="Default List Sorter" aura:id="defaultListSorterTrigger"/>
+ 		<ui:menuTriggerLink class="defaultListSorterTrigger" label="Default List Sorter" aura:id="defaultListSorterTrigger"/>
  	</aura:set>
  </ui:listSorter>
 Which Sort got Appplied:<ui:outputText aura:id="defaultListSorterResult" value=""/>

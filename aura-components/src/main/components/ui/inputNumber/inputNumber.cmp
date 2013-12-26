@@ -34,7 +34,8 @@
        		  step="{!v.step}"
        		  placeholder="{!v.placeholder}"
        		  required="{!v.required}"
-       		  disabled="{!v.disabled}"/>
+       		  disabled="{!v.disabled}"
+       		  aria-describedby="{!v.ariaDescribedby}"/>
        <aura:set attribute="else">
            {!v.body}
        </aura:set>

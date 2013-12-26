@@ -30,7 +30,7 @@
         	//Use cancel button to close the sorter
         	this.closeSorter(listSorter);
         }, function(cmp) {
-        //	this.assertCancelEventFired(cmp);
+        	this.assertCancelEventFired(cmp);
     	}]
     },
     

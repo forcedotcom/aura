@@ -140,6 +140,15 @@ public abstract class AbstractActionImpl<T extends ActionDef> implements Action 
     @Override
     public InstanceStack getInstanceStack() {
         if (instanceStack == null) {
+            //
+            // This should never happen, but there are some tests that fail to
+            // initialize the ID. This led to a null pointer exception. Here we
+            // force the action ID to a non-null, meaning that setId will now
+            // fail.
+            //
+            if (actionId == null) {
+                actionId = "unknown";
+            }
             instanceStack = new InstanceStack(actionId);
         }
         return instanceStack;

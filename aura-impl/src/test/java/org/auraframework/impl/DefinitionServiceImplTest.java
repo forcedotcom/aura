@@ -16,36 +16,28 @@
 package org.auraframework.impl;
 
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.auraframework.Aura;
-import org.auraframework.def.ApplicationDef;
-import org.auraframework.def.BaseComponentDef;
-import org.auraframework.def.ComponentDef;
-import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.*;
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.def.DescriptorFilter;
-import org.auraframework.def.TypeDef;
 import org.auraframework.impl.context.AuraRegistryProviderImpl;
-import org.auraframework.impl.system.DefDescriptorImpl;
-import org.auraframework.impl.system.DefFactoryImpl;
-import org.auraframework.impl.system.DefinitionImpl;
+import org.auraframework.impl.system.*;
 import org.auraframework.instance.BaseComponent;
-import org.auraframework.system.AuraContext;
+import org.auraframework.system.*;
 import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.system.DefRegistry;
-import org.auraframework.system.SourceLoader;
 import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 /**
  * Tests for DefinitionServiceImpl.
@@ -160,25 +152,36 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
     }
 
     /**
-     * Should do nothing with null descriptor.
+     * Client loaded set is still preloaded for null input
      */
-    public void testUpdateLoadedNull() throws Exception {
+    public void testUpdateLoadedInitialNull() throws Exception {
         AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Access.AUTHENTICATED);
         DefDescriptor<?> dummyDesc = DefDescriptorImpl.getInstance("uh:oh", ComponentDef.class);
-        context.addLoaded(dummyDesc, null);
+        DefDescriptor<?> clientDesc = addSourceAutoCleanup(ComponentDef.class, String.format(baseComponentTag, "", ""));
+        String clientUid = context.getDefRegistry().getUid(null, clientDesc);
+        context.setClientLoaded(ImmutableMap.<DefDescriptor<?>, String>of(clientDesc, clientUid));
+
+        assertNull("No preloads initially", context.getPreloadedDefinitions());
 
         // null input should not affect the loaded set
         Aura.getDefinitionService().updateLoaded(null);
         Map<DefDescriptor<?>, String> loaded = context.getLoaded();
-        assertEquals("Loaded set should not have changed size", 1, loaded.size());
-        assertNull("Wrong uid for loaded", loaded.get(dummyDesc));
+        assertEquals("Loaded set should only have client loaded", 1, loaded.size());
+        assertEquals("Wrong uid for preloaded", clientUid, loaded.get(clientDesc));
+        assertNull("Not expecting uid for loaded", loaded.get(dummyDesc));
+        Set<DefDescriptor<?>> preloads = context.getPreloadedDefinitions();
+        assertNotNull("Client set should be preloaded", preloads);
+        assertTrue("Preloads missing parent", preloads.contains(clientDesc));
 
         // one more try to make sure
         Aura.getDefinitionService().updateLoaded(null);
         loaded = context.getLoaded();
         assertEquals("Loaded set should not have changed size", 1, loaded.size());
-        assertNull("Wrong uid for loaded", loaded.get(dummyDesc));
-    }
+        assertEquals("Preloaded uid should not have changed", clientUid, loaded.get(clientDesc));
+        assertNull("Still not expecting uid for loaded", loaded.get(dummyDesc));
+        Set<DefDescriptor<?>> preloadsAgain = context.getPreloadedDefinitions();
+        assertTrue("Preloaded set should not have changed", Sets.difference(preloads, preloadsAgain).isEmpty());
+}
 
     /**
      * ClientOutOfSyncException thrown when context uid is not current.
@@ -199,7 +202,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
     }
 
     /**
-     * QFE expected.
+     * QFE expected from inner getUid.
      */
     public void testUpdateLoadedWithQuickFixException() throws Exception {
         Aura.getContextService().startContext(Mode.PROD, Format.JSON, Access.AUTHENTICATED);
@@ -211,6 +214,21 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         } catch (DefinitionNotFoundException e) {
             checkExceptionStart(e, DefinitionNotFoundException.class,
                     "No COMPONENT named markup://invalid:thisbetternotexistorthistestwillfail found");
+        }
+    }
+
+    /**
+     * DefinitionNotFoundException expected when non-loaded descriptor is not found in the registry.
+     */
+    public void testUpdateLoadedWithNonExistentDescriptor() throws Exception {
+        Aura.getContextService().startContext(Mode.PROD, Format.JSON, Access.AUTHENTICATED);
+        DefDescriptor<ComponentDef> testDesc = getAuraTestingUtil().createStringSourceDescriptor("garbage", ComponentDef.class);
+        try {
+            Aura.getDefinitionService().updateLoaded(testDesc);
+            fail("Expected DefinitionNotFoundException");
+        } catch (DefinitionNotFoundException e) {
+            checkExceptionStart(e, DefinitionNotFoundException.class,
+                    String.format("No COMPONENT named %s found", testDesc.getQualifiedName()));
         }
     }
 
@@ -234,9 +252,36 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
     }
 
     /**
-     * UID added to loaded set for unloaded descriptor.
+     * UID, for unloaded descriptor, added to empty loaded set.
      */
-    public void testUpdateLoaded() throws Exception {
+    public void testUpdateLoadedInitial() throws Exception {
+        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Access.AUTHENTICATED,
+                laxSecurityApp);
+        DefDescriptor<?> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
+                String.format(baseComponentTag, "", ""));
+        String uid = context.getDefRegistry().getUid(null, cmpDesc);
+        context.getDefRegistry().invalidate(cmpDesc);
+
+        DefDescriptor<?> clientDesc = addSourceAutoCleanup(ComponentDef.class, String.format(baseComponentTag, "", ""));
+        String clientUid = context.getDefRegistry().getUid(null, clientDesc);
+        context.setClientLoaded(ImmutableMap.<DefDescriptor<?>, String>of(clientDesc, clientUid));
+
+        Map<DefDescriptor<?>, String> loaded = context.getLoaded();
+        assertNull("Parent should not be loaded initially", loaded.get(cmpDesc));
+        assertNull("No preloads initially", context.getPreloadedDefinitions());
+
+        Aura.getDefinitionService().updateLoaded(cmpDesc);
+        loaded = context.getLoaded();
+        assertEquals("Parent was updated incorrectly", uid, loaded.get(cmpDesc));
+        Set<DefDescriptor<?>> preloads = context.getPreloadedDefinitions();
+        assertNotNull("Client set should be preloaded", preloads);
+        assertTrue("Preloads missing parent", preloads.contains(clientDesc));
+    }
+
+    /**
+     * Null descriptor shouldn't affect current loaded set.
+     */
+    public void testUpdateLoadedNullWithLoadedSet() throws Exception {
         AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Access.AUTHENTICATED,
                 laxSecurityApp);
         DefDescriptor<?> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
@@ -250,12 +295,154 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         Aura.getDefinitionService().updateLoaded(cmpDesc);
         loaded = context.getLoaded();
         assertEquals("Parent was updated incorrectly", uid, loaded.get(cmpDesc));
+        assertEquals("Loaded set should only have added component", 1, loaded.size());
+
+        // null input should not affect the loaded set
+        Aura.getDefinitionService().updateLoaded(null);
+        loaded = context.getLoaded();
+        assertEquals("Loaded set should not have changed size", 1, loaded.size());
+        assertEquals("uid should not have been updated", uid, loaded.get(cmpDesc));
     }
 
     /**
+     * UID, for unloaded descriptor, added to non-empty loaded set.
+     */
+    public void testUpdateLoadedWithLoadedSet() throws Exception {
+        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Access.AUTHENTICATED,
+                laxSecurityApp);
+        DefDescriptor<?> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
+                String.format(baseComponentTag, "", ""));
+        DefDescriptor<?> nextDesc = addSourceAutoCleanup(ComponentDef.class,
+                String.format(baseComponentTag, "", ""));
+        String uid = context.getDefRegistry().getUid(null, cmpDesc);
+        String nextUid = context.getDefRegistry().getUid(null, nextDesc);
+        Aura.getDefinitionService().updateLoaded(cmpDesc);
+
+        Map<DefDescriptor<?>, String> loaded = context.getLoaded();
+        assertEquals("Loaded set should only have added component", 1, loaded.size());
+        assertEquals("First uid was updated incorrectly", uid, loaded.get(cmpDesc));
+
+        Aura.getDefinitionService().updateLoaded(nextDesc);
+        loaded = context.getLoaded();
+        assertEquals("Loaded set should have 2 components", 2, loaded.size());
+        assertEquals("First uid should not have changed", uid, loaded.get(cmpDesc));
+        assertEquals("Second uid was updated incorrectly", nextUid, loaded.get(nextDesc));
+    }
+
+    /**
+     * UID, for unloaded descriptor, added to non-empty loaded set.
+     */
+    public void testUpdateLoadedNotInPreloadedSet() throws Exception {
+        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Access.AUTHENTICATED,
+                laxSecurityApp);
+        DefDescriptor<?> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
+                String.format(baseComponentTag, "", ""));
+        DefDescriptor<?> nextDesc = addSourceAutoCleanup(ComponentDef.class,
+                String.format(baseComponentTag, "", ""));
+        String nextUid = context.getDefRegistry().getUid(null, nextDesc);
+        context.setPreloadedDefinitions(ImmutableSet.<DefDescriptor<?>>of(cmpDesc));
+        
+        Map<DefDescriptor<?>, String> loaded = context.getLoaded();
+        assertEquals("Loaded set should be empty", 0, loaded.size());
+
+        Aura.getDefinitionService().updateLoaded(nextDesc);
+        loaded = context.getLoaded();
+        assertEquals("Loaded set should only have non-preloaded component", 1, loaded.size());
+        assertEquals("uid was updated incorrectly", nextUid, loaded.get(nextDesc));
+    }
+
+    /**
+     * Preloads are empty if nothing loaded on client. 
+     */
+    public void testUpdateLoadedWithoutPreloads() throws Exception {
+        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Access.AUTHENTICATED);
+        assertNull(context.getPreloadedDefinitions());
+        Aura.getDefinitionService().updateLoaded(null);
+        assertEquals(0,context.getPreloadedDefinitions().size());
+    }
+    
+    /**
+     * Dependencies should be added to preloads during updateLoaded.
+     */
+    public void testUpdateLoadedSpidersPreloadDependencies() throws Exception {
+        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Access.AUTHENTICATED,
+                laxSecurityApp);
+        DefDescriptor<?> depDesc = addSourceAutoCleanup(ComponentDef.class, String.format(baseComponentTag, "", ""));
+        DefDescriptor<?> clientDesc = addSourceAutoCleanup(ComponentDef.class,
+                String.format(baseComponentTag, "", String.format("<%s/>", depDesc.getDescriptorName())));
+        String uid = context.getDefRegistry().getUid(null, clientDesc);
+
+        context.setClientLoaded(ImmutableMap.<DefDescriptor<?>,String>of(clientDesc, uid));
+        assertNull("Preloads shouldn't be set until update", context.getPreloadedDefinitions());
+
+        Aura.getDefinitionService().updateLoaded(null);
+        Set<DefDescriptor<?>> preloads = context.getPreloadedDefinitions();
+        assertTrue("Preloads missing parent from client", preloads.contains(clientDesc));
+        assertTrue("Preloads missing dependency of client", preloads.contains(depDesc));
+    }
+
+    /**
+     * Def not validated and dependencies not added to preloads if client UID is null. (not sure why this has to be this way, possibly local defs)
+     * W-1989780
+     */
+    public void testUpdateLoadedWithNullClientUID() throws Exception {
+        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Access.AUTHENTICATED,
+                laxSecurityApp);
+        DefDescriptor<?> depDesc = addSourceAutoCleanup(ComponentDef.class, String.format(baseComponentTag, "", ""));
+        DefDescriptor<?> clientDesc = addSourceAutoCleanup(ComponentDef.class,
+                String.format(baseComponentTag, "", "<invalid:thisbetternotexistorthistestwillfail/>"));
+        Map<DefDescriptor<?>,String> clientLoaded = Maps.newHashMap();
+        clientLoaded.put(clientDesc, null);
+        context.setClientLoaded(clientLoaded);
+
+        Aura.getDefinitionService().updateLoaded(clientDesc);
+        assertNull("How did UID get populated?", context.getLoaded().get(clientDesc));
+        Set<DefDescriptor<?>> preloads = context.getPreloadedDefinitions();
+        assertTrue("Preloads missing parent from client", preloads.contains(clientDesc));
+        assertFalse("Dependency shouldn't be preloaded", preloads.contains(depDesc));        
+    }
+    
+    /**
+     * Loaded dependencies are pruned from preloads
+     * W-1989778
+     */
+    public void testUpdateLoadedUnloadsRedundancies() throws Exception {
+        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Access.AUTHENTICATED,
+                laxSecurityApp);
+        DefDescriptor<?> depDesc = addSourceAutoCleanup(ComponentDef.class, String.format(baseComponentTag, "", ""));
+        DefDescriptor<?> clientDesc = addSourceAutoCleanup(ComponentDef.class,
+                String.format(baseComponentTag, "", String.format("<%s/>", depDesc.getDescriptorName())));
+        String depUid = context.getDefRegistry().getUid(null, depDesc);
+        String clientUid = context.getDefRegistry().getUid(null, clientDesc);
+
+        // client has both parent and dependency loaded
+        Map<DefDescriptor<?>,String> clientLoaded = Maps.newLinkedHashMap(); // BUG?!: ordering of map is important!!!
+        clientLoaded.put(clientDesc, clientUid);
+        clientLoaded.put(depDesc, depUid);
+        context.setClientLoaded(clientLoaded);
+
+        // check that both are loaded
+        Map<DefDescriptor<?>, String> loaded = context.getLoaded();
+        assertEquals("Parent missing from loaded set", clientUid, loaded.get(clientDesc));
+        assertEquals("Dependency missing from loaded set", depUid, loaded.get(depDesc));
+        
+        Aura.getDefinitionService().updateLoaded(null);
+
+        // dependency is redundant with client set, so it should be removed from loaded set
+        loaded = context.getLoaded();
+        assertEquals("Parent missing from loaded set", clientUid, loaded.get(clientDesc));
+        assertEquals("Dependency missing from loaded set", null, loaded.get(depDesc));
+
+        // check dependency is still in preloads
+        Set<DefDescriptor<?>> preloads = context.getPreloadedDefinitions();
+        assertTrue("Preloads missing parent from client", preloads.contains(clientDesc));
+        assertTrue("Preloads missing dependency from client", preloads.contains(depDesc));
+    }
+    
+    /**
      * Dependencies should be added to loaded set during updateLoaded.
      */
-    public void _testUpdateLoadedDependency() throws Exception {
+    public void _testUpdateLoadedWithImplicitDependency() throws Exception {
         AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Access.AUTHENTICATED,
                 laxSecurityApp);
         DefDescriptor<?> depDesc = addSourceAutoCleanup(ComponentDef.class, String.format(baseComponentTag, "", ""));
@@ -263,8 +450,6 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
                 String.format(baseComponentTag, "", String.format("<%s/>", depDesc.getDescriptorName())));
         String uid = context.getDefRegistry().getUid(null, cmpDesc);
         String depUid = context.getDefRegistry().getUid(null, depDesc);
-        context.getDefRegistry().invalidate(cmpDesc);
-        context.getDefRegistry().invalidate(depDesc);
 
         Map<DefDescriptor<?>, String> loaded = context.getLoaded();
         assertNull("Parent should not be loaded initially", loaded.get(cmpDesc));

@@ -316,7 +316,6 @@ public class AuraServletIntegrationTest extends IntegrationTestCase {
                 "appCache:nopreload", ApplicationDef.class);
         Aura.getContextService().startContext(Mode.PROD, Format.HTML, Access.AUTHENTICATED, desc);
         assertTrue(ManifestUtil.isManifestEnabled());
-
     }
 
     /**

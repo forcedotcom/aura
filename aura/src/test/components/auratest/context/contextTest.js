@@ -1,12 +1,20 @@
 ({
-	doGet : function(doGetComponent, descriptor) {
+        //
+        // Get a component, clearing the configs if necessary.
+        //
+	doGet : function(doGetComponent, descriptor, haveComponents) {
 		var action = $A.get("c.aura://ComponentController.get" + (doGetComponent ? "Component" : "Application"));
+                // sanity check.
+                $A.test.assertTrue(haveComponents !== undefined);
 		action.setParams({
 			name : descriptor
 		});
 		var gotResponse = false;
-		action.setCallback(this, function() {
+		action.setCallback(this, function(a) {
 			gotResponse = true;
+                        if (haveComponents) {
+                            $A.test.clearAndAssertComponentConfigs(a);
+                        }
 		});
 		$A.test.callServerAction(action);
 		$A.test.addWaitFor(true, function() {
@@ -39,7 +47,7 @@
 		testLabels : [ "auraSanity" ],
 		test : [ function(c) {
 			this.assertNoUid("APPLICATION@markup://aura:application");
-			this.doGet(false, "aura:application");
+			this.doGet(false, "aura:application", true);
 		}, function(c) {
 			this.assertUid("APPLICATION@markup://aura:application");
 		} ]
@@ -52,7 +60,7 @@
 		testLabels : [ "auraSanity" ],
 		test : [ function(c) {
 			this.assertNoUid("COMPONENT@markup://aura:component");
-			this.doGet(true, "aura:component");
+			this.doGet(true, "aura:component", false);
 		}, function(c) {
 			this.assertNoUid("COMPONENT@markup://aura:component");
 		} ]
@@ -65,7 +73,7 @@
 		testLabels : [ "auraSanity" ],
 		test : [ function(c) {
 			this.assertNoUid("COMPONENT@markup://aura:text");
-			this.doGet(true, "aura:text");
+			this.doGet(true, "aura:text", false);
 		}, function(c) {
 			this.assertNoUid("COMPONENT@markup://aura:text");
 		} ]
@@ -78,7 +86,7 @@
 		testLabels : [ "auraSanity" ],
 		test : [ function(c) {
 			this.assertNoUid("COMPONENT@markup://auratest:text");
-			this.doGet(true, "auratest:text");
+			this.doGet(true, "auratest:text", true);
 		}, function(c) {
 			this.assertUid("COMPONENT@markup://auratest:text");
 			this.assertNoUid("COMPONENT@markup://auratest:html"); //check that another namespace component is not loaded
@@ -92,7 +100,7 @@
 		testLabels : [ "auraSanity" ],
 		test : [ function(c) {
 			this.assertNoUid("COMPONENT@markup://auratest:testComponent1");
-			this.doGet(true, "auratest:testComponent1");
+			this.doGet(true, "auratest:testComponent1", true);
 		}, function(c) {
 			this.assertUid("COMPONENT@markup://auratest:testComponent1");
 			this.assertNoUid("COMPONENT@markup://auratest:testComponent2"); //contained dependency is not loaded
@@ -108,11 +116,11 @@
 		test : [ function(c) {
 			this.assertNoUid("COMPONENT@markup://auratest:testComponent1");
 			this.assertNoUid("COMPONENT@markup://auratest:testComponent2");
-			this.doGet(true, "auratest:testComponent1");
+			this.doGet(true, "auratest:testComponent1", true);
 		}, function(c) {
 			this.assertUid("COMPONENT@markup://auratest:testComponent1");
 			this.assertNoUid("COMPONENT@markup://auratest:testComponent2"); //contained dependency is not loaded
-			this.doGet(true, "auratest:testComponent2");
+			this.doGet(true, "auratest:testComponent2", false);
 		}, function(c) {
 			this.assertUid("COMPONENT@markup://auratest:testComponent1");
 			this.assertNoUid("COMPONENT@markup://auratest:testComponent2"); //dependency is still not loaded
@@ -128,11 +136,11 @@
 		test : [ function(c) {
 			this.assertNoUid("COMPONENT@markup://auratest:testComponent1");
 			this.assertNoUid("COMPONENT@markup://auratest:testComponent2");
-			this.doGet(true, "auratest:testComponent2");
+			this.doGet(true, "auratest:testComponent2", false);
 		}, function(c) {
 			this.assertNoUid("COMPONENT@markup://auratest:testComponent1");
 			this.assertUid("COMPONENT@markup://auratest:testComponent2");
-			this.doGet(true, "auratest:testComponent1");
+			this.doGet(true, "auratest:testComponent1", false);
 		}, function(c) {
 			this.assertUid("COMPONENT@markup://auratest:testComponent1");
 			this.assertNoUid("COMPONENT@markup://auratest:testComponent2"); // TODO: dependency is not removed from loaded set

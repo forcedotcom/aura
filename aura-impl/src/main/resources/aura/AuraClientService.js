@@ -476,8 +476,13 @@ var AuraClientService = function() {
                 if (!errors) {
                     componentConfig = a.getReturnValue();
                 } else {
-                    // Display the errors in a ui:message
-                    // instead
+                    //
+                    // Make sure we clear any configs associated with the action.
+                    //
+                    $A.getContext().clearComponentConfigs(a.getId());
+                    // 
+                    // Display the errors in a ui:message instead
+                    //
                     componentConfig = {
                         "componentDef" : {
                             "descriptor" : "markup://ui:message"

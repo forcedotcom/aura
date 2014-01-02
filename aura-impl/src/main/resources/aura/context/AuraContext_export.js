@@ -20,7 +20,8 @@ exp(p,
     "incrementTransaction", p.incrementTransaction,
     "getApp", p.getApp,
     "setCurrentAction", p.setCurrentAction,
-    "getGlobalValueProviders", p.getGlobalValueProviders
+    "getGlobalValueProviders", p.getGlobalValueProviders,
+    "clearComponentConfigs", p.clearComponentConfigs
     //#if {"excludeModes" : ["PRODUCTION"]}
         ,
         "getNum", p.getNum,

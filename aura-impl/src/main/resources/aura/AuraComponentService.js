@@ -200,14 +200,24 @@ $A.ns.AuraComponentService.prototype.newComponentAsync = function(callbackScope,
 
     var def = configObj["definition"],
         desc = configObj["descriptor"];
+    var forceClient = false;
 
     config = configObj["configuration"];
+
+    //
+    // Short circuit our check for remote dependencies, since we've
+    // been handed a partial config. This feels distinctly like a hack
+    // and will hopefully disappear with ComponentCreationContexts.
+    //
+    if (config["globalId"] && !forceServer) {
+        forceClient = true;
+    }
 
     config["componentDef"] = {
         "descriptor": desc
     };
 
-    if ( !def || (def && def.hasRemoteDependencies()) || forceServer ) {
+    if ( !forceClient && (!def || (def && def.hasRemoteDependencies()) || forceServer )) {
         this.requestComponent(callbackScope, callback, config, attributeValueProvider);
     } else {
         var newComp = this.newComponentDeprecated(config, attributeValueProvider, localCreation, doForce);

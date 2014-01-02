@@ -62,28 +62,26 @@ Action.prototype.auraType = "Action";
  * Gets the Action Id.
  * 
  * @private
- * @returns {String}
+ * @returns {string}
  */
 Action.prototype.getId = function() {
-	if (!this.id) {
-		this.id = this.actionId + "." + $A.getContext().getNum();
-	}
-
-	return this.id;
+    if (!this.id) {
+        this.id = this.actionId + "." + $A.getContext().getNum();
+    }
+    return this.id;
 };
 
 /**
  * Gets the next action scoped Id.
  * 
  * @private
- * @returns {String}
+ * @returns {string}
  */
 Action.prototype.getNextGlobalId = function() {
-	if (!this.nextGlobalId) {
-		this.nextGlobalId = 1;
-	}
-
-	return this.nextGlobalId++;
+    if (!this.nextGlobalId) {
+        this.nextGlobalId = 1;
+    }
+    return this.nextGlobalId++;
 };
 
 /**
@@ -96,7 +94,7 @@ Action.prototype.getNextGlobalId = function() {
  * @returns {ActionDef} The action definition, including its name, origin, and descriptor.
  */
 Action.prototype.getDef = function() {
-	return this.def;
+    return this.def;
 };
 
 /**
@@ -105,13 +103,15 @@ Action.prototype.getDef = function() {
  * If this action is already completed, <code>completeAction()</code> is called.
  * 
  * @private
+ * @param {CallbackGroup} group
+ *      the group to add
  */
 Action.prototype.addCallbackGroup = function(group) {
-	if (this.state === "NEW") {
-		this.groups.push(group);
-	} else {
-		group.completeAction(this);
-	}
+    if (this.state === "NEW") {
+        this.groups.push(group);
+    } else {
+        group.completeAction(this);
+    }
 };
 
 /**
@@ -120,10 +120,10 @@ Action.prototype.addCallbackGroup = function(group) {
  * @private
  */
 Action.prototype.completeGroups = function() {
-	while (this.groups.length > 0) {
-		var group = this.groups.pop();
-		group.completeAction(this);
-	}
+    while (this.groups.length > 0) {
+        var group = this.groups.pop();
+        group.completeAction(this);
+    }
 };
 
 /**
@@ -135,10 +135,10 @@ Action.prototype.completeGroups = function() {
  *             For example, <code>serverAction.setParams({ "record": id });</code> sets a parameter on <code>serverAction</code>.
  */
 Action.prototype.setParams = function(config) {
-	var paramDefs = this.paramDefs;
-	for ( var key in paramDefs) {
-		this.params[key] = config[key];
-	}
+    var paramDefs = this.paramDefs;
+    for ( var key in paramDefs) {
+        this.params[key] = config[key];
+    }
 };
 
 /**
@@ -165,10 +165,10 @@ Action.prototype.setParam = function(key, value) {
  * @public
  * @param {!string}
  *            name The name of the Action.
- * @returns {Object} The parameter values
+ * @returns {Object} The parameter value
  */
 Action.prototype.getParam = function(name) {
-	return this.params[name];
+    return this.params[name];
 };
 
 /**
@@ -178,16 +178,17 @@ Action.prototype.getParam = function(name) {
  * @returns {Object} The key/value pairs that specify the Action.
  */
 Action.prototype.getParams = function() {
-	return this.params;
+    return this.params;
 };
 
 /**
  * Gets the component for this Action.
  * 
  * @private
+ * @returns {Component} the component, if any.
  */
 Action.prototype.getComponent = function() {
-	return this.cmp;
+    return this.cmp;
 };
 
 /**
@@ -202,38 +203,38 @@ Action.prototype.getComponent = function() {
  *            scope The scope in which the function is executed.
  * @param {function}
  *            callback The callback function to run for each controller.
- * @param {String}
+ * @param {string*}
  *            name The action state for which the callback is to be associated with.
  */
 Action.prototype.setCallback = function(scope, callback, name) {
-	if (!$A.util.isFunction(callback)) {
-		$A.error("Action callback should be a function");
-		return;
-	}
-	// If name is undefined or specified as "ALL", then apply same callback in all cases
-	if (name === undefined || name === "ALL") {
-		this.callbacks["SUCCESS"] = {
-			fn : callback,
-			s : scope
-		};
-		this.callbacks["ERROR"] = {
-			fn : callback,
-			s : scope
-		};
-		this.callbacks["INCOMPLETE"] = {
-			fn : callback,
-			s : scope
-		};
-	} else {
-                if (name !== "SUCCESS" && name !== "ERROR" && name !== "ABORTED" && name !== "INCOMPLETE") {
-			$A.error("Illegal name " + name);
-			return;
-		}
-		this.callbacks[name] = {
-			fn : callback,
-			s : scope
-		};
-	}
+    if (!$A.util.isFunction(callback)) {
+        $A.error("Action callback should be a function");
+        return;
+    }
+    // If name is undefined or specified as "ALL", then apply same callback in all cases
+    if (name === undefined || name === "ALL") {
+        this.callbacks["SUCCESS"] = {
+            fn : callback,
+            s : scope
+        };
+        this.callbacks["ERROR"] = {
+            fn : callback,
+            s : scope
+        };
+        this.callbacks["INCOMPLETE"] = {
+            fn : callback,
+            s : scope
+        };
+    } else {
+        if (name !== "SUCCESS" && name !== "ERROR" && name !== "ABORTED" && name !== "INCOMPLETE") {
+            $A.error("Illegal name " + name);
+            return;
+        }
+        this.callbacks[name] = {
+            fn : callback,
+            s : scope
+        };
+    }
 };
 
 /**
@@ -285,19 +286,19 @@ Action.prototype.callAllAboardCallback = function () {
  *            callback the callback to call after the current callback is executed.
  */
 Action.prototype.wrapCallback = function(scope, callback) {
-	var nestedCallbacks = this.callbacks;
-	var outerCallback = callback;
-	var outerScope = scope;
-	this.callbacks = {};
+    var nestedCallbacks = this.callbacks;
+    var outerCallback = callback;
+    var outerScope = scope;
+    this.callbacks = {};
 
-	this.setCallback(this, function(action, cmp) {
-		var cb = nestedCallbacks[this.getState()];
-		if (cb && cb.fn) {
-			cb.fn.call(cb.s, this, cmp);
-		}
-		outerCallback.call(outerScope, this, cmp);
-		this.callbacks = nestedCallbacks;
-	});
+    this.setCallback(this, function(action, cmp) {
+        var cb = nestedCallbacks[this.getState()];
+        if (cb && cb.fn) {
+            cb.fn.call(cb.s, this, cmp);
+        }
+        outerCallback.call(outerScope, this, cmp);
+        this.callbacks = nestedCallbacks;
+    });
 };
 
 /**
@@ -314,7 +315,7 @@ Action.prototype.wrapCallback = function(scope, callback) {
  *            evt The event that calls the Action.
  */
 Action.prototype.run = function(evt) {
-	this.runDeprecated(evt);
+    this.runDeprecated(evt);
 };
 
 /**
@@ -329,28 +330,28 @@ Action.prototype.run = function(evt) {
  *            evt The event that calls the Action.
  */
 Action.prototype.runDeprecated = function(evt) {
-	$A.assert(this.def.isClientAction(),
-			"run() cannot be called on a server action. Use $A.enqueueAction() on a server action instead.");
-	this.state = "RUNNING";
-	try {
-		var helper = this.cmp.getDef().getHelper();
-		this.returnValue = this.meth.call(this, this.cmp, evt, helper);
-		this.state = "SUCCESS";
-	} catch (e) {
-		this.state = "FAILURE";
-		$A.log("Action failed: " + this.cmp.getDef().getDescriptor().getQualifiedName() + " -> "
-				+ this.getDef().getName(), e);
-	}
+    $A.assert(this.def.isClientAction(),
+                    "run() cannot be called on a server action. Use $A.enqueueAction() on a server action instead.");
+    this.state = "RUNNING";
+    try {
+        var helper = this.cmp.getDef().getHelper();
+        this.returnValue = this.meth.call(this, this.cmp, evt, helper);
+        this.state = "SUCCESS";
+    } catch (e) {
+        this.state = "FAILURE";
+        $A.log("Action failed: " + this.cmp.getDef().getDescriptor().getQualifiedName() + " -> "
+                        + this.getDef().getName(), e);
+    }
 };
 
 /**
  * Gets the current state of the Action.
  * 
  * @public
- * @returns {String} Possible values are "NEW", "RUNNING", and "FAILURE".
+ * @returns {string} Possible values are "NEW", "RUNNING", and "FAILURE".
  */
 Action.prototype.getState = function() {
-	return this.state;
+    return this.state;
 };
 
 /**
@@ -359,7 +360,7 @@ Action.prototype.getState = function() {
  * @public
  */
 Action.prototype.getReturnValue = function() {
-	return this.returnValue;
+    return this.returnValue;
 };
 
 /**
@@ -371,7 +372,7 @@ Action.prototype.getReturnValue = function() {
  * @public
  */
 Action.prototype.getError = function() {
-	return this.error;
+    return this.error;
 };
 
 /**
@@ -380,7 +381,7 @@ Action.prototype.getError = function() {
  * @public
  */
 Action.prototype.isBackground = function() {
-	return this.background === true;
+    return this.background === true;
 };
 
 /**
@@ -390,7 +391,7 @@ Action.prototype.isBackground = function() {
  * @public
  */
 Action.prototype.setBackground = function() {
-	this.background = true;
+    this.background = true;
 };
 
 /**
@@ -407,9 +408,9 @@ Action.prototype.setBackground = function() {
  *            action The action to run.
  */
 Action.prototype.runAfter = function(action) {
-	$A.assert(action.def.isServerAction(),
-			"RunAfter() cannot be called on a client action. Use run() on a client action instead.");
-	$A.clientService.enqueueAction(action);
+    $A.assert(action.def.isServerAction(),
+                    "RunAfter() cannot be called on a client action. Use run() on a client action instead.");
+    $A.clientService.enqueueAction(action);
 };
 
 /**
@@ -421,60 +422,60 @@ Action.prototype.runAfter = function(action) {
  * @return {Boolean} Returns true if the response differs from the original response
  */
 Action.prototype.updateFromResponse = function(response) {
-	this.sanitizeStoredResponse(response);
-	this.state = response["state"];
-	this.responseState = response["state"];
-	this.returnValue = response["returnValue"];
-	this.error = response["error"];
-	this.storage = response["storage"];
-	this.components = response["components"];
-	if (this.state === "ERROR") {
-		//
-		// Careful now. If we get back an event from the server as part of the error,
-		// we want to fire off the event. Note that this will also remove it from the
-		// list of errors, and this may leave us with an empty error list. In that case
-		// we toss in a message of 'event fired' to prevent confusion from having an
-		// error state, but no error.
-		//
-		// This code is perhaps a bit tenuous, as it attempts to reverse the mapping from
-		// event descriptor to event name in the component, giving back the first one that
-		// it finds (deep down in code). This almost violates encapsulation, but, well,
-		// not badly enough to remove it.
-		//
-		var i;
-		var newErrors = [];
-		var fired = false;
-		for (i = 0; i < response["error"].length; i++) {
-			var err = response["error"][i];
-			if (err["exceptionEvent"]) {
-				fired = true;
-				this.events.push(err["event"]);
-			} else {
-				newErrors.push(err);
-			}
-		}
-		if (fired === true && newErrors.length === 0) {
-			newErrors.push({
-				"message" : "Event fired"
-			});
-		}
-		this.error = newErrors;
-	} else if (this.originalResponse && this.state === "SUCCESS") {
-		// Compare the refresh response with the original response and return false if they are equal (no update)
-		this.sanitizeStoredResponse(this.originalResponse);
-		
-		var originalValue = $A.util.json.encode(this.originalResponse["returnValue"]);
-		var refreshedValue = $A.util.json.encode(response["returnValue"]);
-		if (refreshedValue === originalValue) {
-			var originalComponents = $A.util.json.encode(this.originalResponse["components"]);
-			var refreshedComponents = $A.util.json.encode(response["components"]);
-			if (refreshedComponents === originalComponents) {
-				this.getStorage().log("Action.updateFromResponse(): skipping duplicate response: " + this.getId());
-				return false;
-			}
-		}
-	}
-	return true;
+    this.sanitizeStoredResponse(response);
+    this.state = response["state"];
+    this.responseState = response["state"];
+    this.returnValue = response["returnValue"];
+    this.error = response["error"];
+    this.storage = response["storage"];
+    this.components = response["components"];
+    if (this.state === "ERROR") {
+        //
+        // Careful now. If we get back an event from the server as part of the error,
+        // we want to fire off the event. Note that this will also remove it from the
+        // list of errors, and this may leave us with an empty error list. In that case
+        // we toss in a message of 'event fired' to prevent confusion from having an
+        // error state, but no error.
+        //
+        // This code is perhaps a bit tenuous, as it attempts to reverse the mapping from
+        // event descriptor to event name in the component, giving back the first one that
+        // it finds (deep down in code). This almost violates encapsulation, but, well,
+        // not badly enough to remove it.
+        //
+        var i;
+        var newErrors = [];
+        var fired = false;
+        for (i = 0; i < response["error"].length; i++) {
+            var err = response["error"][i];
+            if (err["exceptionEvent"]) {
+                fired = true;
+                this.events.push(err["event"]);
+            } else {
+                newErrors.push(err);
+            }
+        }
+        if (fired === true && newErrors.length === 0) {
+            newErrors.push({
+                "message" : "Event fired"
+            });
+        }
+        this.error = newErrors;
+    } else if (this.originalResponse && this.state === "SUCCESS") {
+        // Compare the refresh response with the original response and return false if they are equal (no update)
+        this.sanitizeStoredResponse(this.originalResponse);
+        
+        var originalValue = $A.util.json.encode(this.originalResponse["returnValue"]);
+        var refreshedValue = $A.util.json.encode(response["returnValue"]);
+        if (refreshedValue === originalValue) {
+            var originalComponents = $A.util.json.encode(this.originalResponse["components"]);
+            var refreshedComponents = $A.util.json.encode(response["components"]);
+            if (refreshedComponents === originalComponents) {
+                this.getStorage().log("Action.updateFromResponse(): skipping duplicate response: " + this.getId());
+                return false;
+            }
+        }
+    }
+    return true;
 };
 
 /**
@@ -483,32 +484,32 @@ Action.prototype.updateFromResponse = function(response) {
  * WARNING: Use after finishAction() since getStored() modifies <code>this.components</code>.
  * 
  * @private
- * @param {String}
+ * @param {string}
  *            storageName the name of the storage to use.
  */
 Action.prototype.getStored = function(storageName) {
-	if (this.storable && this.responseState === "SUCCESS") {
-		// Rewrite any embedded ComponentDef from object to descriptor only
-		for ( var globalId in this.components) {
-			var c = this.components[globalId];
-			if (c) {
-				var def = c["componentDef"];
-				c["componentDef"] = {
-					"descriptor" : def["descriptor"]
-				};
-			}
-		}
-		return {
-			"returnValue" : this.returnValue,
-			"components" : this.components,
-			"state" : "SUCCESS",
-			"storage" : {
-				"name" : storageName,
-				"created" : new Date().getTime()
-			}
-		};
-	}
-	return null;
+    if (this.storable && this.responseState === "SUCCESS") {
+        // Rewrite any embedded ComponentDef from object to descriptor only
+        for ( var globalId in this.components) {
+            var c = this.components[globalId];
+            if (c) {
+                var def = c["componentDef"];
+                c["componentDef"] = {
+                    "descriptor" : def["descriptor"]
+                };
+            }
+        }
+        return {
+            "returnValue" : this.returnValue,
+            "components" : this.components,
+            "state" : "SUCCESS",
+            "storage" : {
+                "name" : storageName,
+                "created" : new Date().getTime()
+            }
+        };
+    }
+    return null;
 };
 
 /**
@@ -519,33 +520,43 @@ Action.prototype.getStored = function(storageName) {
  *            context the context for pushing and popping the current action.
  */
 Action.prototype.finishAction = function(context) {
-	var previous = context.setCurrentAction(this);
-	try {
-		// Add in any Action scoped components /or partial configs
-		if (this.components) {
-			context.joinComponentConfigs(this.components);
-		}
+    var previous = context.setCurrentAction(this);
+    var clearComponents = false;
+    var id = this.getId(context);
+    try {
+        if (this.cmp === undefined || this.cmp.isValid()) {
+            // Add in any Action scoped components /or partial configs
+            if (this.components) {
+                context.joinComponentConfigs(this.components, id);
+                clearComponents = true;
+            }
 
-		if (this.cmp === undefined || this.cmp.isValid()) {
-			if (this.events.length > 0) {
-				for (var x = 0; x < this.events.length; x++) {
-					this.parseAndFireEvent(this.events[x], this.cmp);
-				}
-			}
+            if (this.events.length > 0) {
+                for (var x = 0; x < this.events.length; x++) {
+                    this.parseAndFireEvent(this.events[x], this.cmp);
+                }
+            }
 
-			// If there is a callback for the action's current state, invoke that too
-			var cb = this.callbacks[this.getState()];
+            // If there is a callback for the action's current state, invoke that too
+            var cb = this.callbacks[this.getState()];
 
-			if (cb) {
-				cb.fn.call(cb.s, this, this.cmp);
-			}
-		} else {
-			this.abort();
-		}
-	} finally {
-		context.setCurrentAction(previous);
-		this.completeGroups();
-	}
+            if (cb) {
+                cb.fn.call(cb.s, this, this.cmp);
+            }
+            if (this.components && (cb || !this.storable || !this.getStorage())) {
+                context.finishComponentConfigs(id);
+                clearComponents = false;
+            }
+        } else {
+            this.abort();
+        }
+    } finally {
+        context.setCurrentAction(previous);
+        this.completeGroups();
+        if (clearComponents) {
+            context.clearComponentConfigs(id);
+        }
+    }
 };
 
 /**
@@ -554,8 +565,8 @@ Action.prototype.finishAction = function(context) {
  * @private
  */
 Action.prototype.abort = function() {
-	this.state = "ABORTED";
-	this.completeGroups();
+    this.state = "ABORTED";
+    this.completeGroups();
 };
 
 /**
@@ -564,7 +575,7 @@ Action.prototype.abort = function() {
  * @public
  */
 Action.prototype.setAbortable = function() {
-	this.abortable = true;
+    this.abortable = true;
 };
 
 /**
@@ -573,7 +584,7 @@ Action.prototype.setAbortable = function() {
  * @private
  */
 Action.prototype.isRefreshAction = function() {
-	return this.originalResponse !== undefined;
+    return this.originalResponse !== undefined;
 };
 
 /**
@@ -583,7 +594,7 @@ Action.prototype.isRefreshAction = function() {
  * @returns {Boolean} The function is abortable (true), or false otherwise.
  */
 Action.prototype.isAbortable = function() {
-	return this.abortable || false;
+    return this.abortable || false;
 };
 
 /**
@@ -596,7 +607,7 @@ Action.prototype.isAbortable = function() {
  * @returns {Boolean} Set to true if the Action should be exclusive, or false otherwise.
  */
 Action.prototype.setExclusive = function(val) {
-	this.exclusive = val === undefined ? true : val;
+    this.exclusive = val === undefined ? true : val;
 };
 
 /**
@@ -606,7 +617,7 @@ Action.prototype.setExclusive = function(val) {
  * @returns {Boolean}
  */
 Action.prototype.isExclusive = function() {
-	return this.exclusive || false;
+    return this.exclusive || false;
 };
 
 /**
@@ -621,15 +632,15 @@ Action.prototype.isExclusive = function() {
  *            following options: <code>ignoreExisting</code> and <code>refresh</code>.
  */
 Action.prototype.setStorable = function(config) {
-	$A.assert(this.def.isServerAction(), "setStorable() cannot be called on a client action.");
-	this.storable = true;
-	this.storableConfig = config;
+    $A.assert(this.def.isServerAction(), "setStorable() cannot be called on a client action.");
+    this.storable = true;
+    this.storableConfig = config;
 
-	//
-	// Storable actions must also be abortable (idempotent, replayable and non-mutating)
-	// Careful with this, as it will cause side effects if there are other abortable actions
-	//
-	this.setAbortable();
+    //
+    // Storable actions must also be abortable (idempotent, replayable and non-mutating)
+    // Careful with this, as it will cause side effects if there are other abortable actions
+    //
+    this.setAbortable();
 };
 
 /**
@@ -639,8 +650,8 @@ Action.prototype.setStorable = function(config) {
  * @returns {Boolean}
  */
 Action.prototype.isStorable = function() {
-	var ignoreExisting = this.storableConfig && this.storableConfig["ignoreExisting"];
-	return this._isStorable() && !ignoreExisting;
+    var ignoreExisting = this.storableConfig && this.storableConfig["ignoreExisting"];
+    return this._isStorable() && !ignoreExisting;
 };
 
 /**
@@ -672,7 +683,7 @@ Action.prototype.isCaboose = function() {
  * @private
  */
 Action.prototype._isStorable = function() {
-	return this.storable || false;
+    return this.storable || false;
 };
 
 /**
@@ -681,7 +692,7 @@ Action.prototype._isStorable = function() {
  * @private
  */
 Action.prototype.getStorageKey = function() {
-	return this.getDef().getDescriptor().toString() + ":" + $A.util["json"].encode(this.getParams());
+    return this.getDef().getDescriptor().toString() + ":" + $A.util["json"].encode(this.getParams());
 };
 
 /**
@@ -691,7 +702,7 @@ Action.prototype.getStorageKey = function() {
  * @returns {Boolean}
  */
 Action.prototype.isFromStorage = function() {
-	return !$A.util.isUndefinedOrNull(this.storage);
+    return !$A.util.isUndefinedOrNull(this.storage);
 };
 
 /**
@@ -700,8 +711,8 @@ Action.prototype.isFromStorage = function() {
  * @public
  */
 Action.prototype.setChained = function() {
-	this.chained = true;
-	$A.enqueueAction(this);
+    this.chained = true;
+    $A.enqueueAction(this);
 };
 
 /**
@@ -711,7 +722,7 @@ Action.prototype.setChained = function() {
  * @returns {Boolean}
  */
 Action.prototype.isChained = function() {
-	return this.chained || false;
+    return this.chained || false;
 };
 
 /**
@@ -720,11 +731,11 @@ Action.prototype.isChained = function() {
  * @public
  */
 Action.prototype.toJSON = function() {
-	return {
-		"id" : this.getId(),
-		"descriptor" : this.getDef().getDescriptor(),
-		"params" : this.getParams()
-	};
+    return {
+        "id" : this.getId(),
+        "descriptor" : this.getDef().getDescriptor(),
+        "params" : this.getParams()
+    };
 };
 
 /**
@@ -733,11 +744,11 @@ Action.prototype.toJSON = function() {
  * @private
  */
 Action.prototype.incomplete = function(context) {
-	this.state = "INCOMPLETE";
-	if (!this.error || !(this.error instanceof Array)) {
-		this.error = [ { message : "Disconnected or Canceled" } ];
-	}
-	this.finishAction(context);
+    this.state = "INCOMPLETE";
+    if (!this.error || !(this.error instanceof Array)) {
+        this.error = [ { message : "Disconnected or Canceled" } ];
+    }
+    this.finishAction(context);
 };
 
 /**
@@ -746,42 +757,52 @@ Action.prototype.incomplete = function(context) {
  * @private
  */
 Action.prototype.getRefreshAction = function(originalResponse) {
-	var storage = originalResponse["storage"];
-	var storageService = this.getStorage();
-	var autoRefreshInterval = 
-		(this.storableConfig && !$A.util.isUndefined(this.storableConfig["refresh"]) && $A.util.isNumber(this.storableConfig["refresh"]))
-			? this.storableConfig["refresh"] * 1000 
-			: storageService.getDefaultAutoRefreshInterval();
+    var storage = originalResponse["storage"];
+    var storageService = this.getStorage();
+    var autoRefreshInterval = 
+            (this.storableConfig && !$A.util.isUndefined(this.storableConfig["refresh"])
+             && $A.util.isNumber(this.storableConfig["refresh"]))
+                    ? this.storableConfig["refresh"] * 1000 
+                    : storageService.getDefaultAutoRefreshInterval();
 
-	// Only auto refresh if the data we have is more than
-	// v.autoRefreshInterval seconds old
-	var now = new Date().getTime();
-	if ((now - storage["created"]) > autoRefreshInterval) {
-		var refreshAction = this.def.newInstance(this.cmp);
+    // Only auto refresh if the data we have is more than
+    // v.autoRefreshInterval seconds old
+    var now = new Date().getTime();
+    if ((now - storage["created"]) > autoRefreshInterval) {
+        var refreshAction = this.def.newInstance(this.cmp);
 
-		storageService.log("Action.refresh(): auto refresh begin: " + this.getId() + " to " + refreshAction.getId());
+        storageService.log("Action.refresh(): auto refresh begin: " + this.getId() + " to " + refreshAction.getId());
 
-		var executeCallbackIfUpdated = (this.storableConfig && !$A.util.isUndefined(this.storableConfig["executeCallbackIfUpdated"]))
-			? this.storableConfig["executeCallbackIfUpdated"] : true;
-		if (executeCallbackIfUpdated !== false) {
-			refreshAction.callbacks = this.callbacks;
-		}
-		
-		refreshAction.setParams(this.params);
-		refreshAction.setStorable({
-			"ignoreExisting" : true
-		});
-		
-		refreshAction.abortable = this.abortable;
-		refreshAction.sanitizeStoredResponse(originalResponse);
-		refreshAction.originalResponse = originalResponse;
-		
-		return refreshAction;
-	}
-	
-	return null;
+        var executeCallbackIfUpdated = (this.storableConfig && !$A.util.isUndefined(this.storableConfig["executeCallbackIfUpdated"]))
+                ? this.storableConfig["executeCallbackIfUpdated"] : true;
+        if (executeCallbackIfUpdated !== false) {
+            refreshAction.callbacks = this.callbacks;
+        }
+        
+        refreshAction.setParams(this.params);
+        refreshAction.setStorable({
+            "ignoreExisting" : true
+        });
+        
+        refreshAction.abortable = this.abortable;
+        refreshAction.sanitizeStoredResponse(originalResponse);
+        refreshAction.originalResponse = originalResponse;
+        
+        return refreshAction;
+    }
+    
+    return null;
 };
 
+/**
+ * Sanitize a partial config.
+ *
+ * @param {Object}
+ *      pc the partial config to sanitize (in place)
+ * @param {string}
+ *      suffix The suffix that we are about to put on.
+ * @return {Object} the partial config that was passed in, modified.
+ */
 Action.prototype.sanitizePartialConfig = function(pc, suffix) {
     // rewrite globalId
     var newGlobalId = pc["globalId"];
@@ -834,7 +855,7 @@ Action.prototype.sanitizeStoredResponse = function(response) {
  * @returns {Storage}
  */
 Action.prototype.getStorage = function() {
-	return $A.storageService.getStorage("actions");
+    return $A.storageService.getStorage("actions");
 };
 
 /**
@@ -843,21 +864,21 @@ Action.prototype.getStorage = function() {
  * @private
  */
 Action.prototype.parseAndFireEvent = function(evtObj) {
-	var descriptor = evtObj["descriptor"];
+    var descriptor = evtObj["descriptor"];
 
-	// If the current component has registered to fire the event,
-	// then create the event object and associate it with this component(make it the source)
-	var evt = this.getComponent().getEventByDescriptor(descriptor);
-	if (evt !== null) {
-		if (evtObj["attributes"]) {
-			evt.setParams(evtObj["attributes"]["values"]);
-		}
-		evt.fire();
-	} else {
-		// Else create the event using ClientService and fire it. Usually the case for APPLICATION events.
-		// If the event is a COMPONENT event, it is fired anyway but has no effect because its an orphan(without source)
-		$A.clientService.parseAndFireEvent(evtObj);
-	}
+    // If the current component has registered to fire the event,
+    // then create the event object and associate it with this component(make it the source)
+    var evt = this.getComponent().getEventByDescriptor(descriptor);
+    if (evt !== null) {
+        if (evtObj["attributes"]) {
+            evt.setParams(evtObj["attributes"]["values"]);
+        }
+        evt.fire();
+    } else {
+        // Else create the event using ClientService and fire it. Usually the case for APPLICATION events.
+        // If the event is a COMPONENT event, it is fired anyway but has no effect because its an orphan(without source)
+        $A.clientService.parseAndFireEvent(evtObj);
+    }
 };
 
 /**
@@ -866,14 +887,14 @@ Action.prototype.parseAndFireEvent = function(evtObj) {
  * @private
  */
 Action.prototype.fireRefreshEvent = function(event) {
-	// storageService.log("Action.refresh(): auto refresh: "+event+" for "+this.actionId);
-	if (this.cmp && this.cmp.isValid()) {
-		var isRefreshObserver = this.cmp.isInstanceOf("auraStorage:refreshObserver");
-		if (isRefreshObserver) {
-			this.cmp.getEvent(event).setParams({
-				"action" : this
-			}).fire();
-		}
-	}
+    // storageService.log("Action.refresh(): auto refresh: "+event+" for "+this.actionId);
+    if (this.cmp && this.cmp.isValid()) {
+        var isRefreshObserver = this.cmp.isInstanceOf("auraStorage:refreshObserver");
+        if (isRefreshObserver) {
+            this.cmp.getEvent(event).setParams({
+                    "action" : this
+            }).fire();
+        }
+    }
 };
 // #include aura.controller.Action_export

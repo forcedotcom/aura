@@ -30,6 +30,7 @@
 
     <p>All attributes have a name and a type. Attribute names must start with a letter or underscore. They can also contain numbers or hyphens after the first character. For a list of valid attribute types, see <auradocs:topicLink topic="attrTypesOverview">Supported aura:attribute types</auradocs:topicLink>.</p>
 
+	<auradocs:warning>You can't use attributes with hyphens in expressions. For example, <code>cmp.getValue("v.name-withHyphen")</code> is supported, but not <code>&lt;ui:button label="<aura:text value="{!"/>v.name-withHyphen}"/&gt;</code>.</auradocs:warning>
     <p>Attributes may be marked as required by specifying <code>required="true"</code>, and may also specify a default value.</p>
 
     <p>In this case we've got an attribute named <code>whom</code> of type String. If no value is specified, it defaults to "world".</p>

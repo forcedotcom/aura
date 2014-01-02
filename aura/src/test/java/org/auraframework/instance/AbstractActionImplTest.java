@@ -15,23 +15,22 @@
  */
 package org.auraframework.instance;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+
 import org.auraframework.def.ActionDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
-
 import org.auraframework.system.LoggingContext;
-
 import org.auraframework.test.UnitTestCase;
 import org.auraframework.throwable.AuraExecutionException;
+import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.json.Json;
 import org.mockito.Mockito;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
 
 public class AbstractActionImplTest extends UnitTestCase {
     public AbstractActionImplTest(String name) throws Exception {
@@ -128,8 +127,8 @@ public class AbstractActionImplTest extends UnitTestCase {
         assertEquals("state should be able to change", Action.State.RUNNING, test.getState());
     }
 
-    private BaseComponent<?,?> getComponentWithPath(final String path) {
-        BaseComponent<?,?> comp = Mockito.mock(BaseComponent.class);
+    private BaseComponent<?, ?> getComponentWithPath(final String path) {
+        BaseComponent<?, ?> comp = Mockito.mock(BaseComponent.class);
 
         Mockito.when(comp.getPath()).thenReturn(path);
         return comp;
@@ -139,18 +138,18 @@ public class AbstractActionImplTest extends UnitTestCase {
         ActionDef def = Mockito.mock(ActionDef.class);
         MyAction test = new MyAction(null, def, null);
 
-        Map<String,BaseComponent<?,?>> comps = test.getComponents();
+        Map<String, BaseComponent<?, ?>> comps = test.getComponents();
         assertNotNull("Components should never be null", comps);
         assertEquals("Components should empty", 0, comps.size());
 
-        BaseComponent<?,?> x = getComponentWithPath("a");
+        BaseComponent<?, ?> x = getComponentWithPath("a");
         test.registerComponent(x);
         comps = test.getComponents();
         assertNotNull("Components should never be null", comps);
         assertEquals("Components should have one component", 1, comps.size());
         assertEquals("Components should have x", x, comps.get("a"));
 
-        BaseComponent<?,?> y = getComponentWithPath("b");
+        BaseComponent<?, ?> y = getComponentWithPath("b");
         test.registerComponent(y);
         comps = test.getComponents();
         assertNotNull("Components should never be null", comps);
@@ -216,5 +215,25 @@ public class AbstractActionImplTest extends UnitTestCase {
         test.logParams(logger);
         // params of null should avoid calls to the logger.
         Mockito.verifyNoMoreInteractions(logger);
+    }
+
+    public void testInstanceStack() {
+        ActionDef def = Mockito.mock(ActionDef.class);
+        Action test = new MyAction(null, def, null);
+        test.setId("expectedId");
+        InstanceStack iStack = test.getInstanceStack();
+        assertEquals("Instance stack should be initialized with action ID as path", "expectedId/*~0", iStack.getPath());
+    }
+
+    public void testSetIdWithInstanceStackSet() {
+        ActionDef def = Mockito.mock(ActionDef.class);
+        Action test = new MyAction(null, def, null);
+        test.getInstanceStack();
+        try {
+            test.setId("newId");
+            fail("Expected error when setting ID after InstanceStack initialized");
+        } catch (Exception e) {
+            assertExceptionMessage(e, AuraRuntimeException.class, "Already have an instance stack when ID is set");
+        }
     }
 }

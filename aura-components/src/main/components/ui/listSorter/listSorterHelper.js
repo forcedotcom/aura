@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{
+({
 	LABELS :{'ASC' : 'A-Z', 'DESC' : 'Z-A'},
 	CONSTANTS : {ASC: 'ASC', DESC: 'DESC', DESC_PREFIX: "-"},
 		
@@ -213,7 +213,8 @@
 		
 		if (cmp.get('v.visible')) {
 			return;
-		}		
+		}
+		this.attachEventHandler(cmp);		
 		var selected = cmp._defaultOrderByList;
 		if (selected && selected.length > 0) {
 			//reset selectedItems to default
@@ -227,18 +228,66 @@
 			}			
 		}
 		cmp.setValue('v.visible', true);
-		var isPhone = $A.getGlobalValueProviders().get("$Browser.isPhone");
-		if (isPhone) {
-			//fill up the rest of the screen with the menu list
-			var viewPort = $A.util.getWindowSize(),
-				pickerCtEl = cmp.find('sortOrderPicker').getElement(),				 
-				menuListHeight = viewPort.height - pickerCtEl.offsetHeight;
-			
-			cmp.find('sorterMenuList').getElement().style.height = menuListHeight + 'px';
-		}		
+		//fill up the rest of the screen with the menu list
+		var container = cmp.find('sorterContainer').getElement(),
+			header = cmp.find('headerBar').getElement(),
+			pickerCtEl = cmp.find('sortOrderPicker').getElement(),
+			menuListHeight = container.offsetHeight - header.offsetHeight - pickerCtEl.offsetHeight;
+		
+		cmp.find('sorterMenuList').getElement().style.height = menuListHeight + 'px';				
 	},
 	
+	handleOnClose : function(cmp) {
+		this.removeEventHandler(cmp);
+		cmp.getValue('v.visible').setValue(false, true);
+		this.setVisible(cmp, false);
+	},
+	
+	attachEventHandler : function(cmp) {
+		if (!cmp._keydownHandler) {
+			cmp._keydownHandler = this.getKeydownHandler(cmp);
+		}
+		$A.util.on(document, 'keydown', cmp._keydownHandler);
+		$A.util.on(document.body, this.getOnClickEventProp("onClickStartEvent"), this.getOnClickStartFunction(cmp));
+        $A.util.on(document.body, this.getOnClickEventProp("onClickEndEvent"), this.getOnClickEndFunction(cmp));    
+	},
+	
+	removeEventHandler : function(cmp) {
+		$A.util.removeOn(document, 'keydown', cmp._keydownHandler);
+		$A.util.removeOn(document.body, this.getOnClickEventProp("onClickStartEvent"), this.getOnClickStartFunction(cmp));
+        $A.util.removeOn(document.body, this.getOnClickEventProp("onClickEndEvent"), this.getOnClickEndFunction(cmp)); 
+		delete cmp._keydownHandler;		
+	},
+	
+	/**
+     * Constructs the handler for the DOM keydown event. Includes handlers for tab key (including shift+tab)
+     */
+    getKeydownHandler : function(cmp) {
+    	return function(event) {
+	        switch (event.keyCode) {
+	            case 9: // tab key, keep focus inside the dialog
+	            	var container = cmp.find('sorterContainer').getElement(),
+	    			currentFocus = document.activeElement,
+	    			shiftPressed = event.shiftKey,
+	    			firstFocusable = cmp.find('ascBtn').getElement(),
+	    			applyBtn = cmp.find('set').getElement();  	
+                    if (currentFocus === applyBtn && !shiftPressed) {
+                        $A.util.squash(event, true);
+                        firstFocusable.focus();
+                    } else if (currentFocus === firstFocusable && shiftPressed) {
+                        $A.util.squash(event, true);
+                        applyBtn.focus();
+                    }                   
+	                break;
+            }   	
+    	}
+    },
+	
 	handleApply : function(cmp) {
+		this.removeEventHandler(cmp);
+		cmp.getValue('v.visible').setValue(false, true);
+		this.setVisible(cmp, false);
+		
 		var action = cmp.get('v.onApply');
 		if (action) {
 			var result = [], order;
@@ -250,8 +299,6 @@
 			}			
 			action.runDeprecated(result);
 		}
-		
-	    cmp.getValue('v.visible').setValue(false);
 	},
 	
 	position : function(cmp) { 
@@ -386,5 +433,5 @@
 	    } while(currentNode);
 	
 	    return false;
-    },
-}
+    }
+})

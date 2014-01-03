@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{
+({
 	init : function(cmp, evt, helper) {
 		helper.doInit(cmp);
 	},
@@ -32,7 +32,11 @@
 	},
 	
 	onCancel: function(cmp, evt, helper) {
-		cmp.getValue('v.visible').setValue(false);
+		helper.handleOnClose(cmp);
+		var action = cmp.get('v.onCancel');
+        if (action) {
+        	action.runDeprecated();
+        }
 	},
 	
 	onMenuExpand: function(cmp, evt, helper) {
@@ -76,12 +80,10 @@
 	onVisible : function(cmp, evt, helper) {
 		var visible = evt.getParam('value').unwrap();
 		if (visible) {
-			$A.util.on(document.body, helper.getOnClickEventProp("onClickStartEvent"), helper.getOnClickStartFunction(cmp));
-	        $A.util.on(document.body, helper.getOnClickEventProp("onClickEndEvent"), helper.getOnClickEndFunction(cmp));    
+			helper.attachEventHandler(cmp);    
 		} else {
-			$A.util.removeOn(document.body, helper.getOnClickEventProp("onClickStartEvent"), helper.getOnClickStartFunction(cmp));
-	        $A.util.removeOn(document.body, helper.getOnClickEventProp("onClickEndEvent"), helper.getOnClickEndFunction(cmp)); 
+			helper.removeEventHandler(cmp);
 		}
 		helper.setVisible(cmp, visible);		
 	}
-}
+})

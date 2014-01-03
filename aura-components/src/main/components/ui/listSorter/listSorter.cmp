@@ -23,6 +23,8 @@
 	<aura:attribute name="visible" type="Boolean" default="false" description="Controls the visibility of the component."/>		
 	<aura:attribute name="items" type="Object[]" description="An array of arbitrary map objects representing the rows of data in the list." />
 	<aura:attribute name="triggerLabel" type="String" description="The text displayed on the trigger component." />
+	<aura:attribute name="ascendingLabel" type="String" default="Ascending" description="Assistive text label for the ascending button" />
+	<aura:attribute name="descendingLabel" type="String" default="Descending" description="Assistive text label for the descending button" />
 	<aura:attribute name="trigger" type="Aura.Component[]" description="Trigger component" />
 	<aura:attribute name="modal" type="Boolean" default="true" description="Determines whether the component is a modal dialog." />
 	 	
@@ -33,36 +35,40 @@
 	<aura:handler name="init" value="{!this}" action="{!c.init}" />	
 	<aura:handler name="change" value="{!v.visible}" action="{!c.onVisible}" />
 	
-	<div>		 	
+	<div>
         {!v.trigger}
     </div>      
-    <div aura:id="sorterContainer" class="{!v.class + ' listSorterContainer'}">	        	 		
-	 	<div class="headerBar">
+    <div aura:id="sorterContainer" class="{!v.class + ' listSorterContainer'}">
+    	<div class="body">
+	        <div aura:id="sortOrderPicker" class="sortOrderPicker">
+	        	<a aura:id="ascBtn" onclick="{!c.onAsc}" class="button ascButton" href="javascript:void(0);">A-Z
+	        		<span class="assistiveText">{!v.ascendingLabel}</span>            		
+	        	</a>
+	        	<a aura:id="decBtn" onclick="{!c.onDec}" class="button decButton" href="javascript:void(0);">Z-A
+	        		<span class="assistiveText">{!v.descendingLabel}</span>            		
+	        	</a>
+	        	<div class="output">
+	        		<ui:outputText aura:id="selectedItemOutput" value="" />
+	        		<span aura:id="separator" class="hidden">&nbsp;:&nbsp;</span>
+	        		<ui:outputText aura:id="selectedSortOrderOutput"  value="" />
+	        	</div>	            	
+	        </div>            
+			<ui:menu aura:id="sorterMenu" closeOnClickOutside="false" class="sorterMenu">
+				<ui:menuList aura:id="sorterMenuList" closeOnTabKey="false" visible="{!v.visible}" scrollable="true" class="sorterMenuList" menuSelect="{!c.onMenuSelected}" menuExpand="{!c.onMenuExpand}" menuCollapse="{!c.onMenuCollapse}">										 
+					<aura:iteration items="{!v.items}" var="item">
+		    			<ui:radioMenuItem  value="{!item.fieldName}" label="{!item.label}" />
+		    			<ui:menuItemSeparator />
+		    		</aura:iteration>
+		    	</ui:menuList>
+			</ui:menu>
+		</div>
+		<div aura:id="headerBar" class="headerBar">
             <a aura:id="cancel" onclick="{!c.onCancel}" class="cancel button" href="javascript:void(0);">Cancel
             </a>
             <span aura:id="title" class="title">{!v.title}</span>
             <a aura:id="set" onclick="{!c.onApply}" class="apply button" href="javascript:void(0);">Apply
             </a>
         </div>
-        <div aura:id="sortOrderPicker" class="sortOrderPicker">
-        	<a aura:id="ascBtn" onclick="{!c.onAsc}" class="button ascButton" href="javascript:void(0);">A-Z            		
-        	</a>
-        	<a aura:id="decBtn" onclick="{!c.onDec}" class="button decButton" href="javascript:void(0);">Z-A            		
-        	</a>
-        	<div class="output">
-        		<ui:outputText aura:id="selectedItemOutput" value="" />
-        		<span aura:id="separator" class="hidden">&nbsp;:&nbsp;</span>
-        		<ui:outputText aura:id="selectedSortOrderOutput"  value="" />
-        	</div>	            	
-        </div>            
-		<ui:menu aura:id="sorterMenu"  closeOnClickOutside="false" class="sorterMenu">
-			<ui:menuList aura:id="sorterMenuList" visible="{!v.visible}" scrollable="true" class="sorterMenuList" menuSelect="{!c.onMenuSelected}" menuExpand="{!c.onMenuExpand}" menuCollapse="{!c.onMenuCollapse}">										 
-				<aura:iteration items="{!v.items}" var="item">
-	    			<ui:radioMenuItem  value="{!item.fieldName}" label="{!item.label}" />
-	    			<ui:menuItemSeparator />    			
-	    		</aura:iteration>
-	    	</ui:menuList>		    				
-		</ui:menu>
 	</div>
 	<aura:if isTrue="{!v.modal}">
 		<div aura:id="mask" class="listSorterMask">&nbsp;</div>

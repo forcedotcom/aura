@@ -52,11 +52,7 @@
         	defaultSortOrder = this.defaultSortOrder(listSorter);
         	sortApplied = this.getSortOrderApplied(cmp,"defaultListSorter");
         	$A.test.assertEquals(defaultSortOrder, sortApplied, "Sort not applied correctly after apply button was pressed.");
-        }, function(cmp) {
-        	//Use cancel button to close the sorter
-        	this.closeSorter(listSorter);
-        	this.assertCancelEventFired(cmp);
-    	}]
+        }]
     },
     
     /**

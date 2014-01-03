@@ -116,6 +116,6 @@ function(component) {
       }
     },
     "globalId":"9",
-    "creationPath":"fakeActionId"
+    "creationPath":"fakeActionId/*~2"
   }
 }

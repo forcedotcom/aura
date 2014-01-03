@@ -17,6 +17,8 @@ package org.auraframework.instance;
 
 import java.util.List;
 
+import org.auraframework.throwable.AuraRuntimeException;
+
 import com.google.common.collect.Lists;
 
 /**
@@ -40,20 +42,22 @@ public class InstanceStack {
         // tests. The guard remains to ensure that we don't
         // die with a useless null pointer exception.
         //
-        assert base != null;
-        this.base = base;
+        if (base == null) {
+            throw new AuraRuntimeException("base must not be null");
+        }
         this.path = new StringBuilder(base);
         this.stack = Lists.newArrayList();
-        this.current = null;
+        this.current = new Entry(null, path.length());
+        setAttributeName("body");
+        setAttributeIndex(0);
+        this.current.top = true;
+        this.base = path.toString();
     }
 
     /**
      * start processing a component.
      */
     public void pushInstance(Instance<?> instance) {
-        if (current != null) {
-            assert current.state != StackState.FinishedIndex;
-        }
         stack.add(current);
         current = new Entry(instance, path.length());
     }
@@ -62,8 +66,15 @@ public class InstanceStack {
      * start processing a component.
      */
     public void popInstance(Instance<?> instance) {
-        assert current.instance == instance;
+        if (current.instance != instance) {
+            throw new AuraRuntimeException("mismatched instance pop");
+        }
         current = stack.remove(stack.size()-1);
+        if (current.top) {
+            int index = current.index;
+            clearAttributeIndex(index);
+            setAttributeIndex(index+1);
+        }
     }
 
     /**
@@ -75,8 +86,10 @@ public class InstanceStack {
      * will pre-fill the path to the correct point.
      */
     public void markParent(Instance<?> parent) {
-        if (current != null) {
-            assert current.instance == parent;
+        if (!current.top) {
+            if (current.instance != parent) {
+                throw new AuraRuntimeException("Don't know how to handle setAttribute here");
+            }
             current.count += 1;
         } else {
             path.setLength(0);
@@ -89,7 +102,9 @@ public class InstanceStack {
      * Clear the parent previously marked.
      */
     public void clearParent(Instance<?> parent) {
-        assert current.instance == parent;
+        if (current.instance != parent) {
+            throw new AuraRuntimeException("mismatched clear parent");
+        }
         if (current.count > 0) {
             current.count -= 1;
         } else {
@@ -107,8 +122,9 @@ public class InstanceStack {
      * setting it.
      */
     public void setAttributeName(String name) {
-        assert current.name == null;
-        current.state = StackState.AtName;
+        if (current.name != null || current.top) {
+            throw new AuraRuntimeException("Setting name illegally");
+        }
         current.name = name;
         path.append("/");
         if (name.equals("body")) {
@@ -123,8 +139,9 @@ public class InstanceStack {
      * pop a previously pushed name off the stack.
      */
     public void clearAttributeName(String name) {
-        assert name.equals(current.name);
-        current.state = StackState.AtComponent;
+        if (!name.equals(current.name)) {
+            throw new AuraRuntimeException("mismatched clearAttributeName for "+name);
+        }
         current.name = null;
         path.setLength(current.startPos);
     }
@@ -136,8 +153,13 @@ public class InstanceStack {
      * way to index anything else.
      */
     public void setAttributeIndex(int index) {
-        assert current.name != null;
-        current.state = StackState.AtIndex;
+        if (current.name == null) {
+            throw new AuraRuntimeException("no name when index set");
+        }
+        if (current.index != -1) {
+            throw new AuraRuntimeException("missing clearAttributeIndex");
+        }
+        current.index = index;
         path.append("~");
         path.append(index);
     }
@@ -146,7 +168,10 @@ public class InstanceStack {
      * pop a previously pushed index off the stack.
      */
     public void clearAttributeIndex(int index) {
-        current.state = StackState.FinishedIndex;
+        if (current.index != index) {
+            throw new AuraRuntimeException("mismatched clearAttributeIndex");
+        }
+        current.index = -1;
         path.setLength(current.namePos);
     }
 
@@ -157,20 +182,14 @@ public class InstanceStack {
         return path.toString();
     }
 
-    private enum StackState {
-        AtComponent,
-        AtName,
-        AtIndex,
-        FinishedIndex
-    };
-
     private static class Entry {
-        public StackState state = StackState.AtComponent;
         public final Instance<?> instance;
         public final int startPos;
         public String name;
         public int namePos;
         public int count;
+        public int index;
+        public boolean top;
         
         public Entry(Instance<?> instance, int startPos) {
             this.instance = instance;
@@ -178,11 +197,13 @@ public class InstanceStack {
             this.namePos = -1;
             this.name = null;
             this.count = 0;
+            this.top = false;
+            this.index = -1;
         }
     };
 
     private StringBuilder path;
     private List<Entry> stack;
     private Entry current;
-    private String base;
+    private final String base;
 }

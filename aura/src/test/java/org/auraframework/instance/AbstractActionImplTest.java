@@ -128,10 +128,10 @@ public class AbstractActionImplTest extends UnitTestCase {
         assertEquals("state should be able to change", Action.State.RUNNING, test.getState());
     }
 
-    private BaseComponent<?,?> getComponentWithGlobalID(final String globalId) {
+    private BaseComponent<?,?> getComponentWithPath(final String path) {
         BaseComponent<?,?> comp = Mockito.mock(BaseComponent.class);
 
-        Mockito.when(comp.getGlobalId()).thenReturn(globalId);
+        Mockito.when(comp.getPath()).thenReturn(path);
         return comp;
     }
 
@@ -143,14 +143,14 @@ public class AbstractActionImplTest extends UnitTestCase {
         assertNotNull("Components should never be null", comps);
         assertEquals("Components should empty", 0, comps.size());
 
-        BaseComponent<?,?> x = getComponentWithGlobalID("a");
+        BaseComponent<?,?> x = getComponentWithPath("a");
         test.registerComponent(x);
         comps = test.getComponents();
         assertNotNull("Components should never be null", comps);
         assertEquals("Components should have one component", 1, comps.size());
         assertEquals("Components should have x", x, comps.get("a"));
 
-        BaseComponent<?,?> y = getComponentWithGlobalID("b");
+        BaseComponent<?,?> y = getComponentWithPath("b");
         test.registerComponent(y);
         comps = test.getComponents();
         assertNotNull("Components should never be null", comps);

@@ -100,7 +100,7 @@ function(component) {
       }
     },
     "globalId":"1",
-    "creationPath":"fakeActionId",
+    "creationPath":"fakeActionId/*~0",
     "attributes":{
       "serId":8,
       "value":{

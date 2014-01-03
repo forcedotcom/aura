@@ -302,9 +302,16 @@ AuraContext.prototype.clearComponentConfigs = function(actionId) {
     var ccs = this.componentConfigs;
     var suffix = ":"+actionId;
     var len = suffix.length;
+    var offset;
 
     for ( var k in ccs ) {
-        if (ccs.hasOwnProperty(k) && k.substr(-len) === suffix) {
+        //
+        // Have a care with this. IE7 does not handle negative offsets
+        // to substr, so this must actually calculate the offset rather
+        // than using -len.
+        //
+        offset = k.length - len;
+        if (ccs.hasOwnProperty(k) && k.substr(offset) === suffix) {
             removed += 1;
             delete ccs[k];
         } else {

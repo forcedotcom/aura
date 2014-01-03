@@ -61,14 +61,14 @@ This guide explains the accessibility features of Aura components in the <code>u
     </p>
 	
 	<h3>Help and Error Messages</h3>
-	<p>Use the <code>aria-describedby</code> attribute to associate the help text or error message with a particular field.</p>
+	<p>Use the <code>ariaDescribedby</code> attribute to associate the help text or error message with a particular field.</p>
 	<p> 
-	<ui:inputText label="Contact Name" labelPosition="top" aria-describedby="contact"/>
+	<ui:inputText label="Contact Name" labelPosition="top" ariaDescribedby="contact"/>
 	<ui:outputText aura:id="contact" value="This is an example of a help text"/>
 	</p>
 	<p>
 <auradocs:codeblock>
-&lt;ui:inputText label="Contact Name" labelPosition="top" aria-describedby="contact" /&gt;
+&lt;ui:inputText label="Contact Name" labelPosition="top" ariaDescribedby="contact" /&gt;
 &lt;ui:outputText aura:id="contact" value="This is an example of a help text." /&gt;
 </auradocs:codeblock> 
 	</p>

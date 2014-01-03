@@ -15,30 +15,41 @@
  */
 package org.auraframework.impl.css.parser.omakase;
 
+import java.io.IOException;
+import java.util.Set;
+
 import org.auraframework.css.parser.ThemeValueProvider;
 import org.auraframework.system.Location;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.Sets;
+import com.salesforce.omakase.SupportMatrix;
 import com.salesforce.omakase.ast.atrule.AtRule;
+import com.salesforce.omakase.ast.atrule.GenericAtRuleExpression;
 import com.salesforce.omakase.ast.atrule.MediaQueryList;
+import com.salesforce.omakase.ast.declaration.AbstractTerm;
+import com.salesforce.omakase.ast.declaration.GenericFunctionValue;
+import com.salesforce.omakase.ast.declaration.PropertyValueMember;
 import com.salesforce.omakase.ast.declaration.RawFunction;
-import com.salesforce.omakase.ast.declaration.TermListMember;
 import com.salesforce.omakase.broadcast.Broadcaster;
-import com.salesforce.omakase.broadcast.QueryableBroadcaster;
 import com.salesforce.omakase.broadcast.SingleInterestBroadcaster;
+import com.salesforce.omakase.broadcast.annotation.Subscribable;
+import com.salesforce.omakase.data.Prefix;
 import com.salesforce.omakase.parser.ParserException;
 import com.salesforce.omakase.parser.ParserFactory;
 import com.salesforce.omakase.parser.Source;
-import com.salesforce.omakase.parser.refiner.AtRuleRefinerStrategy;
-import com.salesforce.omakase.parser.refiner.FunctionRefinerStrategy;
+import com.salesforce.omakase.parser.refiner.AtRuleRefiner;
+import com.salesforce.omakase.parser.refiner.FunctionRefiner;
 import com.salesforce.omakase.parser.refiner.Refiner;
+import com.salesforce.omakase.writer.StyleAppendable;
+import com.salesforce.omakase.writer.StyleWriter;
 
 /**
  * Parses the arguments to custom {@link ThemeFunction} AST objects.
  */
-public final class ThemeFunctionRefiner implements FunctionRefinerStrategy, AtRuleRefinerStrategy {
+final class ThemeFunctionRefiner implements FunctionRefiner, AtRuleRefiner {
     private static final String UNABLE_PARSE = "Unable to parse the remaining content '%s'";
     private static final String INVALID_EMPTY = "The theme function arguments '%s' must not evaluate to an " +
             "empty string. Ensure that the variable(s) referenced have a valid media query expression value";
@@ -51,6 +62,7 @@ public final class ThemeFunctionRefiner implements FunctionRefinerStrategy, AtRu
     public static final String SHORTHAND_FUNCTION = SHORTHAND + "(";
 
     private final ThemeValueProvider provider;
+    private final Set<String> expressions = Sets.newHashSet();
 
     /** provider may be null */
     public ThemeFunctionRefiner(ThemeValueProvider provider) {
@@ -61,24 +73,29 @@ public final class ThemeFunctionRefiner implements FunctionRefinerStrategy, AtRu
     public boolean refine(RawFunction raw, Broadcaster broadcaster, Refiner refiner) {
         if (!raw.name().equals(NORMAL) && !raw.name().equals(SHORTHAND)) return false;
 
-        ThemeFunction function = new ThemeFunction(raw.line(), raw.column(), stripQuotes(raw.args()));
+        String expression = stripQuotes(raw.args());
+        expressions.add(expression);
 
         // if the provider was given then we can evaluate the expression
         if (provider != null) {
             try {
                 Location location = new Location(null, raw.line(), raw.column(), -1);
-                Object evaluated = provider.getValue(function.expression(), location);
-                Source source = new Source(evaluated.toString(), raw.line(), raw.column());
+                String evaluated = provider.getValue(expression, location).toString();
 
-                QueryableBroadcaster qb = new QueryableBroadcaster();
-                ParserFactory.termSequenceParser().parse(source, qb, refiner);
-                function.members(qb.filter(TermListMember.class));
+                if (evaluated.isEmpty()) {
+                    broadcaster.broadcast(new ThemeFunctionEmptyTerm(expression));
+                } else {
+                    Source source = new Source(evaluated.toString(), raw.line(), raw.column());
+                    ParserFactory.termSequenceParser().parse(source, broadcaster, refiner);
+                }
             } catch (QuickFixException e) {
                 throw new ParserException(e);
             }
+        } else {
+            // passthrough mode
+            broadcaster.broadcast(new GenericFunctionValue(raw.line(), raw.column(), NORMAL, raw.args()));
         }
 
-        broadcaster.broadcast(function);
         return true;
     }
 
@@ -97,14 +114,13 @@ public final class ThemeFunctionRefiner implements FunctionRefinerStrategy, AtRu
         // extract the inner expression
         String expression = raw.substring(raw.indexOf('(') + 1, raw.lastIndexOf(')'));
         expression = stripQuotes(expression).trim();
-
-        ThemeMediaQueryList themeFunction = new ThemeMediaQueryList(line, col, expression);
+        expressions.add(expression);
 
         // if the provider was given then we can evaluate the expression
         if (provider != null) {
             try {
                 Location location = new Location(null, line, col, -1);
-                Object evaluated = provider.getValue(themeFunction.expression(), location);
+                Object evaluated = provider.getValue(expression, location);
 
                 // cannot be empty
                 if (AuraTextUtil.isEmptyOrWhitespace(evaluated.toString())) {
@@ -120,9 +136,8 @@ public final class ThemeFunctionRefiner implements FunctionRefinerStrategy, AtRu
                 ParserFactory.mediaQueryListParser().parse(source, single, refiner);
                 Optional<MediaQueryList> queryList = single.broadcasted();
 
-                // must have found a media query list
                 if (queryList.isPresent()) {
-                    themeFunction.queryList(queryList.get());
+                    atRule.expression(queryList.get());
                 }
 
                 // nothing should be left in the expression content
@@ -132,11 +147,17 @@ public final class ThemeFunctionRefiner implements FunctionRefinerStrategy, AtRu
             } catch (QuickFixException e) {
                 throw new ParserException(e);
             }
+        } else {
+            // passthrough mode
+            atRule.expression(new GenericAtRuleExpression(NORMAL_FUNCTION + expression + ")"));
         }
 
-        atRule.expression(themeFunction);
+        // return false because we didn't refine the block, just the expression. the standard refiner will pick that up.
+        return false;
+    }
 
-        return false; // return false because we didn't refine the block, just the expression
+    public Set<String> expressions() {
+        return expressions;
     }
 
     private static String stripQuotes(String string) {
@@ -144,5 +165,32 @@ public final class ThemeFunctionRefiner implements FunctionRefinerStrategy, AtRu
         char last = string.charAt(string.length() - 1);
         return ((first == '"' && last == '"') || (first == '\'' && last == '\'')) ?
                 string.substring(1, string.length() - 1) : string;
+    }
+
+    @Subscribable
+    static final class ThemeFunctionEmptyTerm extends AbstractTerm {
+        private final String expression;
+
+        public ThemeFunctionEmptyTerm(String expression) {
+            this.expression = expression;
+        }
+
+        public String expression() {
+            return expression;
+        }
+
+        @Override
+        public boolean isWritable() {
+            return false;
+        }
+
+        @Override
+        public void write(StyleWriter writer, StyleAppendable appendable) throws IOException {
+        }
+
+        @Override
+        protected PropertyValueMember makeCopy(Prefix prefix, SupportMatrix support) {
+            return new ThemeFunctionEmptyTerm(expression);
+        }
     }
 }

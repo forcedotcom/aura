@@ -29,6 +29,7 @@ import com.salesforce.omakase.PluginRegistry;
 import com.salesforce.omakase.plugin.Plugin;
 import com.salesforce.omakase.plugin.basic.Conditionals;
 import com.salesforce.omakase.plugin.basic.ConditionalsValidator;
+import com.salesforce.omakase.plugin.basic.Prefixer;
 import com.salesforce.omakase.plugin.other.UnquotedIEFilterPlugin;
 import com.salesforce.omakase.plugin.validator.StandardValidation;
 import com.salesforce.omakase.writer.StyleWriter;
@@ -70,11 +71,19 @@ public final class CssParserOmakase {
             this.runtime = runtime;
 
             // add default plugins
+
+            if (!runtime) {
+                // we only want extra validation on the preprocess pass. During subsequent runtime calls we will already
+                // know the code is valid so no need to validate again.
+                plugins.add(new StandardValidation());
+            }
+
             plugins.add(new UrlCacheBusting());
             plugins.add(new UnquotedIEFilterPlugin());
+            plugins.add(Prefixer.defaultBrowserSupport().prune(true));
         }
 
-        /** css source code */
+        /** specify css source code */
         public ParserConfiguration source(CharSequence content) {
             this.content = content.toString();
             return this;
@@ -94,7 +103,7 @@ public final class CssParserOmakase {
             return this;
         }
 
-        /** replacement class name (no dot), e.g., uiButton */
+        /** replacement class name (no dot), e.g., "uiButton" */
         public ParserConfiguration componentClass(String componentClass, boolean validate) {
             if (!runtime) {
                 plugins.add(new SelectorScoping(componentClass, validate));
@@ -126,25 +135,19 @@ public final class CssParserOmakase {
 
         /** parses the CSS according to the specified configuration */
         public ParserResult parse() throws StyleParserException, QuickFixException {
-            // if not runtime then add standard library validations
-            if (!runtime) {
-                plugins.add(new StandardValidation());
-            }
-
             // determine the output compression level based on the aura mode
             Mode mode = Aura.getContextService().getCurrentContext().getMode();
             StyleWriter writer = mode.prettyPrint() ? StyleWriter.inline() : StyleWriter.compressed();
 
             // do the parsing
             CssErrorManager em = new CssErrorManager(resourceName);
-            PluginRegistry registry = Omakase.source(content).add(plugins).add(writer).errorManager(em).process();
+            PluginRegistry registry = Omakase.source(content).add(plugins).add(writer).add(em).process();
 
             // report any errors found during parsing
             em.checkErrors();
 
             // return the results
             ParserResult result = new ParserResult();
-
             result.content = writer.write();
 
             if (registry.retrieve(ThemeFunctionPlugin.class).isPresent()) {

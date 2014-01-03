@@ -34,7 +34,7 @@ import com.salesforce.omakase.plugin.basic.AutoRefiner;
 /**
  * Perform namespace.xml variable substitutions.
  */
-public final class TokenReplacement implements DependentPlugin {
+final class TokenReplacement implements DependentPlugin {
     private static final Pattern PATTERN = Pattern.compile("[A-Z][A-Z0-9_]+");
 
     private final String namespace;
@@ -60,7 +60,7 @@ public final class TokenReplacement implements DependentPlugin {
     }
 
     @Rework
-    public void keywordInsideFunction(RawFunction value) {
+    public void tokenInsideFunction(RawFunction value) {
         if (PATTERN.matcher(value.args()).matches()) {
             String resolved = resolve(value.args());
             if (resolved != null) {

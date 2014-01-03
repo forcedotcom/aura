@@ -102,7 +102,7 @@ public final class ThemeValueProviderImpl implements ThemeValueProvider {
         }
 
         PropertyReference sub = reference.getSub(0, 2);
-        String descName = String.format("%s:%s", sub.getRoot(), sub.getLeaf());
+        String descName = sub.getRoot() + ":" + sub.getLeaf();
         return Aura.getDefinitionService().getDefDescriptor(descName, ThemeDef.class);
     }
 

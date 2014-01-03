@@ -49,6 +49,10 @@
 }
 
 .THIS .headerBar {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
     background-color: #6495ED;
     background: -webkit-linear-gradient(#2a93d5,#107abb);
 	background: linear-gradient(#2a93d5,#107abb);
@@ -104,6 +108,11 @@
 	background-image: -o-linear-gradient(top, #2891d3, #1983c5);	
 }
 
+.THIS.listSorterContainer .body {
+	position: relative;
+	top: 42px;
+} 
+
 .THIS .sortOrderPicker {
 	margin: 0 auto;
 	padding: 28px 0;
@@ -154,8 +163,7 @@
 }
 
 .THIS div.uiMenuList {
-	position: relative;
-	height: 500px;
+	position: relative;	
 	box-shadow: none;		
 }
 

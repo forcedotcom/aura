@@ -109,8 +109,9 @@
      */
     handleTabkeydown: function(component, event) {
         var parent = this.getParentComponent(component);
+		var closeOnTab = parent.get('v.closeOnTabKey');
         var concreteParentCmp = parent.getConcreteComponent();
-        if (concreteParentCmp) {
+        if (concreteParentCmp && closeOnTab) {
             if (concreteParentCmp.get("v.visible") === true) {
                 concreteParentCmp.setValue("v.visible", false);
                 if (component.get("v.disabled") === true) {

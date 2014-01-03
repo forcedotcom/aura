@@ -18,6 +18,7 @@ var p = $A.ns.Util.prototype;
 exp(p,
     "isIE", p.isIE,
     "isArray", p.isArray,
+    "isBoolean", p.isBoolean,
     "isObject", p.isObject,
     "isError", p.isError,
     "isFunction", p.isFunction,
@@ -59,7 +60,8 @@ exp(p,
     "isComponent", p.isComponent,
     "isValue", p.isValue,
     "instanceOf", p.instanceOf,
-    "supportsTouchEvents", p.supportsTouchEvents
+    "supportsTouchEvents", p.supportsTouchEvents,
+    "estimateSize", p.estimateSize
     
     //#if {"excludeModes" : ["PRODUCTION"]}
 	    ,

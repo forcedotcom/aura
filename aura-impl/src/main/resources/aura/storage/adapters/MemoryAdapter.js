@@ -15,8 +15,6 @@
  */
 /*jslint sub: true */
 
-//#include aura.storage.adapters.SizeEstimator
-
 /**
  * @namespace The value Object used in the backing store of the MemoryStorageAdapter.
  * @constructor
@@ -43,7 +41,6 @@ var MemoryStorageAdapter = function MemoryStorageAdapter(config) {
 	this.mru = [];
 	this.cachedSize = 0;
 	this.isDirtyForCachedSize = false;
-	this.sizeEstimator = new SizeEstimator();
 	this.maxSize = config["maxSize"];
 	this.debugLoggingEnabled = config["debugLoggingEnabled"];
 };
@@ -86,7 +83,7 @@ MemoryStorageAdapter.prototype.getItem = function(key, resultCallback) {
 MemoryStorageAdapter.prototype.setItem = function(key, item) {
 	// For the size calculation, consider only the inputs to the storage layer: key and value
 	// Ignore all the extras added by the Storage layer.
-	var size = this.sizeEstimator.estimateSize(key) + this.sizeEstimator.estimateSize(item["value"]);
+	var size = $A.util.estimateSize(key) + $A.util.estimateSize(item["value"]);
 	
 	if (size > this.maxSize) {
             $A.error("MemoryStorageAdapter.setItem() cannot store an item over the maxSize");
@@ -154,10 +151,6 @@ MemoryStorageAdapter.prototype.evict = function(spaceNeeded) {
 			$A.logInternal("MemoryStorageAdapter.evict(): evicted", [key, value, spaceReclaimed]);
 		}
 	}
-};
-
-MemoryStorageAdapter.prototype.getSizeEstimator = function() {
-	return this.sizeEstimator;
 };
 
 // #if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}

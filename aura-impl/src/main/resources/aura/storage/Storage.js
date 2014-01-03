@@ -37,6 +37,15 @@ var AuraStorage = function AuraStorage(config) {
     	this.adapter.clear();
     }
     
+    // work around the obfuscation logic to allow external Adapters to properly plug in
+    this.adapter.clear = this.adapter.clear || this.adapter["clear"];
+    this.adapter.getExpired = this.adapter.getExpired || this.adapter["getExpired"];
+    this.adapter.getItem = this.adapter.getItem || this.adapter["getItem"];
+    this.adapter.getName = this.adapter.getName || this.adapter["getName"];
+    this.adapter.getSize = this.adapter.getSize || this.adapter["getSize"];
+    this.adapter.removeItem = this.adapter.removeItem || this.adapter["removeItem"];
+    this.adapter.setItem = this.adapter.setItem || this.adapter["setItem"];  
+    
     //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
     	this.adapter["getItem"] = this.adapter.getItem;
     	this["adapter"] = this.adapter;

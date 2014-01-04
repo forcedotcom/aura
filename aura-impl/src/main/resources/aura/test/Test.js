@@ -707,7 +707,19 @@ var Test = function(){
             }
             aura.test.assertTrue($A.util.isUndefined(arg1),assertMessage);
         },
-
+        /**
+         * Assert that the value passed in is not undefined or null.
+         * @param {Object} arg1
+         * 				The argument to evaluate
+         * @param {String} assertMessage
+         * 				The message that is returned if the argument is not undefined or null
+         */
+        assertNotUndefinedOrNull : function(arg1, assertMessage){
+            if(!assertMessage){
+                assertMessage = "Assertion failure, Expected: {undefined or null}, but Actual: {"+arg1+"} ";
+            }
+            aura.test.assertTrue(!$A.util.isUndefinedOrNull(arg1),assertMessage);
+        },
          /**
          * Assert that the value passed in is either undefined or null.
          * @param {Object} arg1
@@ -721,6 +733,7 @@ var Test = function(){
             }
             aura.test.assertTrue($A.util.isUndefinedOrNull(arg1),assertMessage);
         },
+        
 
          /**
          * Assert that value === null.

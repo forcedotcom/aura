@@ -54,7 +54,7 @@
 	        	</div>	            	
 	        </div>            
 			<ui:menu aura:id="sorterMenu" closeOnClickOutside="false" class="sorterMenu">
-				<ui:menuList aura:id="sorterMenuList" closeOnTabKey="false" visible="{!v.visible}" scrollable="true" class="sorterMenuList" menuSelect="{!c.onMenuSelected}" menuExpand="{!c.onMenuExpand}" menuCollapse="{!c.onMenuCollapse}">										 
+				<ui:menuList aura:id="sorterMenuList" closeOnTabKey="false" visible="{!v.visible}" class="sorterMenuList scrollable" menuSelect="{!c.onMenuSelected}" menuExpand="{!c.onMenuExpand}" menuCollapse="{!c.onMenuCollapse}">										 
 					<aura:iteration items="{!v.items}" var="item">
 		    			<ui:radioMenuItem  value="{!item.fieldName}" label="{!item.label}" />
 		    			<ui:menuItemSeparator />

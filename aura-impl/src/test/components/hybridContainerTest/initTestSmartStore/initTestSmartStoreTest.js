@@ -9,7 +9,7 @@
      * any specification.
      */
     testAdapterSelection : {
-       testLabels: ['hybridContainer'],
+       labels : ['hybridContainer'],
        test : function(cmp) {
                         var storage = $A.storageService.getStorage("actions");
                         $A.test.assertTruthy(storage, "Failed to fetch named storage.");
@@ -25,7 +25,7 @@
      *  "refresh": "Time in seconds to override action's current storage expiration"}
      */
      testSetStorableAPI:{
-        testLabels: ['hybridContainer'],
+        labels : ['hybridContainer'],
         attributes:{
             defaultExpiration : "60",
             defaultAutoRefreshInterval : "60"
@@ -47,7 +47,7 @@
      *        defaultExpiration : 5, //I am king
      *        defaultAutoRefreshInterval : 60 //Very high but doesn't matter
      *    },
-     *    testLabels: ['hybridContainer'],
+     *    labels : ['hybridContainer'],
      *    test:[function(cmp) { cmp.getDef().getHelper().testCacheExpirationStage1.call(this,cmp);},
      *          function(cmp) { cmp.getDef().getHelper().testCacheExpirationStage2.call(this,cmp);},
      *          function(cmp) { cmp.getDef().getHelper().testCacheExpirationStage3.call(this,cmp);},
@@ -59,7 +59,7 @@
      */
 
     testActionKeyOverloading:{
-        testLabels: ['hybridContainer'],
+        labels : ['hybridContainer'],
         test:[function(cmp) { cmp.getDef().getHelper().testActionKeyOverloadingStage1.call(this,cmp);},
               function(cmp) { cmp.getDef().getHelper().testActionKeyOverloadingStage2.call(this,cmp);},
               function(cmp) { cmp.getDef().getHelper().testActionKeyOverloadingStage3.call(this,cmp);},
@@ -71,7 +71,7 @@
      * Grouping multiple actions and setting them to be storable.
      */
     testActionGrouping:{
-        testLabels: ['hybridContainer'],
+        labels : ['hybridContainer'],
         attributes:{
             defaultExpiration : 60,
             defaultAutoRefreshInterval : 60

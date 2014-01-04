@@ -15,7 +15,7 @@
  */
 ({
     testOutdatedServerAction:{
-        testLabels: ["auraSanity"],
+        labels : ["auraSanity"],
         test:function(cmp){
             cmp.getSuper().find("trigger").get("e.press").fire();
             $A.test.addWaitFor("i was updated properly", function(){return cmp.getSuper().get("v.text")});

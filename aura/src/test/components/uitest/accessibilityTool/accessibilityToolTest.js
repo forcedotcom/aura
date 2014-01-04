@@ -137,12 +137,12 @@
     },
     
     testLabelsNotNeeded:{
-	attributes : {caseToRender : 'labelsNotNeeded'},
-	test: function(cmp){
-	        var expected = "Total Number of Errors found: 1";
-		var actual   =  $A.devToolService.checkAccessibility().split("\n")[0];
-		$A.test.assertEquals(expected, actual , "Unexpected return from CheckAccessibility, should return 1 error for input of type image with out an alt");
-	}
+		attributes : {caseToRender : 'labelsNotNeeded'},
+		test: function(cmp){
+		        var expected = "Total Number of Errors found: 1";
+			var actual   =  $A.devToolService.checkAccessibility().split("\n")[0];
+			$A.test.assertEquals(expected, actual , "Unexpected return from CheckAccessibility, should return 1 error for input of type image with out an alt");
+		}
     },
     
     testAnchorMenuTest:{

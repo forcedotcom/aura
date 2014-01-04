@@ -15,7 +15,7 @@
  */
 ({
     testBackRefsAreCorrect:{
-        testLabels: ["auraSanity"],
+        labels: ["auraSanity"],
         test:function(cmp){
             var element = document.getElementById("ifDiv");
             var component = $A.services.component.getRenderingComponentForElement(element).getAttributes().getValueProvider();

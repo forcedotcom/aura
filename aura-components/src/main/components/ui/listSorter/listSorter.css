@@ -13,6 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+.THIS .scrollable {
+	overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
 .THIS.open.listSorterContainer {	
 	border-radius: 8px 8px 0 0;
 	width: 320px;

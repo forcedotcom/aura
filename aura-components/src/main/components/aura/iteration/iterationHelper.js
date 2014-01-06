@@ -28,7 +28,7 @@
         var ivp;
 
         $A.setCreationPathIndex(index);
-        $A.pushCreationPath("/body");
+        $A.pushCreationPath("body");
 
         for (var j = 0; j < body.getLength(); j++) {
         	$A.setCreationPathIndex(j);
@@ -39,7 +39,7 @@
             ret.push($A.componentService.newComponentDeprecated(cdr, ivp, false, doForce));
         }
         
-        $A.popCreationPath("/body");
+        $A.popCreationPath("body");
         return ret;
     },
 
@@ -52,11 +52,11 @@
             var start = this.getStart(cmp);
             var end = this.getEnd(cmp);
 
-            $A.pushCreationPath("/realbody");
+            $A.pushCreationPath("realbody");
             for (var i = start; i < end; i++) {
                 realbody = realbody.concat(this.createComponentsForIndex(cmp, items, i, doForce));
             }
-            $A.popCreationPath("/realbody");
+            $A.popCreationPath("realbody");
         }
         return realbody;
     },

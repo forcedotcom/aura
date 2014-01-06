@@ -42,9 +42,9 @@ exp(p,
     "setCaboose", p.setCaboose,
     "isCaboose", p.isCaboose,
     "setAllAboardCallback", p.setAllAboardCallback,
-    "pushPath", p.pushPath,
-    "popPath", p.popPath,
-    "incPathIndex", p.incPathIndex,
+    "pushCreationPath", p.pushCreationPath,
+    "popCreationPath", p.popCreationPath,
+    "setCreationPathIndex", p.setCreationPathIndex,
     "isFromStorage", p.isFromStorage,
     "toJSON", p.toJSON
     //#if {"excludeModes" : ["PRODUCTION"]}

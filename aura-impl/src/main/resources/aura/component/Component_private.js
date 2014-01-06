@@ -18,9 +18,6 @@ var ComponentPriv = (function() { // Scoping priv
 
     var nextClientCreatedComponentId = 0;
 
-    // if creationPath is passed, it will be pushed and popped from path stack.
-    // if you pushPath via another method, pass something falsey for
-    // creationPath
     var ComponentPriv = function ComponentPriv(config, cmp, localCreation) {
         cmp.priv = this;
 
@@ -39,7 +36,7 @@ var ComponentPriv = (function() { // Scoping priv
 
         if (act) {
             this.creationPath = act.getCurrentPath();
-            console.log("l: [" + this.creationPath + "]");
+            //$A.log("l: [" + this.creationPath + "]");
         }
 
         // create the globally unique id for this component
@@ -95,7 +92,7 @@ var ComponentPriv = (function() { // Scoping priv
                             +" for creationPath = "+this.creationPath);
                     globalIdError = undefined;
                 }
-            } 
+            }
             if (globalIdError) {
                 $A.log("Mismatch at " + globalIdError
                       +" for creationPath = "+this.creationPath);
@@ -109,60 +106,11 @@ var ComponentPriv = (function() { // Scoping priv
                 this.rendering = this.partialConfig["rendering"];
         }
 
-        var partialConfig = undefined;
-        if (this.creationPath) {
-            partialConfig = $A.getContext().getComponentConfig(this.creationPath);
-        }
-        if (partialConfig) {
-            var globalIdError = undefined;
-            var partialConfigO = partialConfig["original"];
-            var partialConfigCD;
-            var configCD = config["componentDef"]["descriptor"];
-            if (configCD.getQualifiedName) {
-                configCD = configCD.getQualifiedName();
-            }
-            if (partialConfig["globalId"] !== this.globalId) {
-                globalIdError = "Global ID server["+partialConfig["globalId"]+"] != client["
-                    + this.globalId+"]";
-            }
-            if (partialConfig["componentDef"]) {
-                partialConfigCD = partialConfig["componentDef"]["descriptor"];
-            }
-            if (partialConfigO !== undefined && partialConfigCD !== configCD) {
-                if (partialConfigO !== configCD) {
-                    if (globalIdError === undefined) {
-                        globalIdError = this.globalId;
-                    }
-                    $A.log("Configs at error");
-                    $A.log(config);
-                    $A.log(partialConfig);
-                    $A.error("Mismatch at " + globalIdError
-                            + " client expected " + configCD
-                            + " but got original " + partialConfigO
-                            + " providing " + partialConfigCD + " from server "
-                            + " for creationPath = "+this.creationPath);
-                    globalIdError = undefined;
-                }
-            } else if (partialConfigCD) {
-                if (partialConfigCD !== configCD) {
-                    if (globalIdError === undefined) {
-                        globalIdError = this.globalId;
-                    }
-                    $A.log("Configs at error");
-                    $A.log(config);
-                    $A.log(partialConfig);
-                    $A.error("Mismatch at " + globalIdError
-                            + " client expected " + configCD + " but got "
-                            + partialConfigCD + " from server "
-                            +" for creationPath = "+this.creationPath);
-                    globalIdError = undefined;
-                }
-            }
-            if (globalIdError) {
-                $A.error("Mismatch at " + globalIdError
-                         +" for creationPath = "+this.creationPath);
-            }
-        }
+        // add this component to the global index
+        componentService.index(cmp);
+
+        // sets this components definition, preferring the one in partialconfig if it exists
+        this.setupComponentDef(config["componentDef"]);
 
         // for components inside of a foreach, sets up the value provider
         // they will delegate all m/v/c values to
@@ -469,12 +417,12 @@ var ComponentPriv = (function() { // Scoping priv
             superAttributes["valueProvider"] = attributeValueProvider;
             superConfig["attributes"] = superAttributes;
 
-            $A.pushCreationPath("/super");
+            $A.pushCreationPath("super");
             try {
                 this.superComponent = componentService.newComponentDeprecated(
                                 superConfig, null, localCreation, true);
             } finally {
-                $A.popCreationPath("/super");
+                $A.popCreationPath("super");
             }
         }
 
@@ -661,8 +609,9 @@ var ComponentPriv = (function() { // Scoping priv
             if (providerDef) {
                 var act = $A.getContext().getCurrentAction();
                 if (act) {
-                    // allow the provider to re-use the path of the current component without complaint
-                    act.reactivatePath(); 
+                    // allow the provider to re-use the path of the current component
+                    // without complaint
+                    act.reactivatePath();
                 }
                 // use it
                 var provided = providerDef.provide(cmp, localCreation);

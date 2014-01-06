@@ -329,16 +329,13 @@ $A.ns.Aura = function() {
     this.pushCreationPath = function(creationPath) {
     	var ctx = this.getContext();
     	if (!ctx) {
-    		return;
+            return;
     	}
-    	
     	var act = ctx.getCurrentAction();
-
     	if (!act) {
-    		return;
+            return;
     	}
-    	
-    	act.pushPath(creationPath);
+    	act.pushCreationPath(creationPath);
     };
 
     /**
@@ -350,16 +347,13 @@ $A.ns.Aura = function() {
     this.popCreationPath = function(creationPath) {
     	var ctx = this.getContext();
     	if (!ctx) { 
-    		return;
+            return;
     	}
-    	
     	var act = ctx.getCurrentAction();
-
     	if (!act) {
-    		return;
+            return;
     	}
-    	
-    	act.popPath(creationPath);
+    	act.popCreationPath(creationPath);
     };
 
     /**
@@ -371,16 +365,13 @@ $A.ns.Aura = function() {
     this.setCreationPathIndex = function(idx) {
     	var ctx = this.getContext();
     	if (!ctx) {
-    		return;
+            return;
     	}
-    	
     	var act = ctx.getCurrentAction();
-
     	if (!act) {
-    		return;
+            return;
     	}
-    	
-    	act.incPathIndex(idx);
+    	act.setCreationPathIndex(idx);
     };
 
     

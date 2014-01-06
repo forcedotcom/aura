@@ -94,12 +94,11 @@ AttributeDefSet.prototype.createInstances = function(config, component, suppress
                 }
             }
             if (hasValue) {
-                var path = "/"+name;
-                $A.pushCreationPath(path);
+                $A.pushCreationPath(name);
                 try {
                     var attribute = this.createAttribute(value, attributeDef, component, config["valueProvider"], localCreation, false);
                 } finally {
-                    $A.popCreationPath(path);
+                    $A.popCreationPath(name);
                 }
                 mapConfig[name] = attribute;
             }
@@ -148,7 +147,7 @@ AttributeDefSet.prototype.createAttribute = function(config, def, component, val
         }
 
     	if (act) { 
-    		act.incPathIndex(idx);
+            act.setCreationPathIndex(idx);
     	}
         	
         v["attributes"]["values"][varName] = item;
@@ -156,7 +155,6 @@ AttributeDefSet.prototype.createAttribute = function(config, def, component, val
         v["valueProviders"] = {};
         v["valueProviders"][varName] = item;
 
-    	// TODO - remove comment - EBA1
         var cmp = componentService.newComponentDeprecated(v, valueProvider, localCreation, true);
 
         delete v["attributes"]["values"][varName];
@@ -169,9 +167,8 @@ AttributeDefSet.prototype.createAttribute = function(config, def, component, val
     var noInstantiate = def.getTypeDefDescriptor() === "aura://Aura.ComponentDefRef[]";
     var valueConfig;
     if (config && config["componentDef"]) {
-    	// TODO - not sure why doForce param is set false here - had to make it explicit to add last param, but it was missing (aka false) in the past
-    	
-    	// TODO - remove comment - EBA1
+    	// TODO - not sure why doForce param is set false here 
+        //  had to make it explicit to add last param, but it was missing (aka false) in the past
         valueConfig = componentService.newComponentDeprecated(config, null, localCreation, true);
     } else if (aura.util.isArray(config)) {
         valueConfig = [];
@@ -181,8 +178,8 @@ AttributeDefSet.prototype.createAttribute = function(config, def, component, val
             if (v["componentDef"]) {
                 if (v["items"]) {
                     if (act) { 
-                        act.incPathIndex(i);
-                        act.pushPath("/realbody");
+                        act.setCreationPathIndex(i);
+                        act.pushCreationPath("realbody");
                     }
                     // iteration of some sort
                     var itemsValue = expressionService.getValue(valueProvider, valueFactory.create(v["items"]));
@@ -192,7 +189,7 @@ AttributeDefSet.prototype.createAttribute = function(config, def, component, val
                         itemsValue.each(createComponent, v["reverse"]);
                     }
                     if (act) { 
-                        act.popPath("/realbody");
+                        act.popCreationPath("realbody");
                     }
                 } else {
                     if (noInstantiate && !forceInstantiate) {
@@ -204,8 +201,7 @@ AttributeDefSet.prototype.createAttribute = function(config, def, component, val
                         cdr["valueProvider"] = valueProvider;
                         valueConfig.push(new SimpleValue(cdr, def, component));
                     } else {
-                        if (act) { act.incPathIndex(i); }
-                        // TODO - remove comment - EBA1
+                        if (act) { act.setCreationPathIndex(i); }
                         valueConfig.push(componentService.newComponentDeprecated(v, valueProvider, localCreation, true, null));
                     }
                 }

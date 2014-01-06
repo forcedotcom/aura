@@ -98,7 +98,7 @@
         var len = body.getLength();
         
         $A.setCreationPathIndex(index);
-        $A.pushCreationPath("/body");
+        $A.pushCreationPath("body");
         //
         // Take off our index, but add the number of components that we will create.
         //
@@ -110,7 +110,7 @@
             }
             ret.push( $A.componentService.newComponentDeprecated(cdr, ivp, false, doForce) );
         }
-        $A.popCreationPath("/body");
+        $A.popCreationPath("body");
         
         return ret;
     },
@@ -181,7 +181,7 @@
         var indexVar = atts.get("indexVar");
 
         if (items && !items.isLiteral() && !items.isEmpty()) {
-            $A.pushCreationPath("/realbody");
+            $A.pushCreationPath("realbody");
             
             var realstart = 0;
             var realend = items.getLength();
@@ -203,7 +203,7 @@
             for (var i = realstart; i < realend; i++) {
                 realbody = realbody.concat(this.createComponentsForIndexFromServer(cmp, items, i, doForce));
             }
-            $A.popCreationPath("/realbody");
+            $A.popCreationPath("realbody");
         }
         
         return realbody;

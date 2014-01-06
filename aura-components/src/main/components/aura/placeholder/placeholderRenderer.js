@@ -34,12 +34,10 @@
 
             var newBody;
             if (a.getState() === "SUCCESS"){
-            	// TODO - remove comment - EBA1
                 newBody = $A.newCmpDeprecated(a.getReturnValue(), avp, false, false);
                 newBody.getAttributes().merge(attributes, true);
             } else {
                 var errors = a.getError();
-            	// TODO - remove comment - EBA1
                 newBody = $A.newCmpDeprecated("markup://aura:text", null, false, false);
                 if (errors) {
                     newBody.getValue("v.value").setValue(errors[0].message);

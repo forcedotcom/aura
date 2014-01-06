@@ -26,7 +26,7 @@
             //console.log("fiction " + cmp.getGlobalId());
         }
 
-        $A.pushCreationPath("/realbody");
+        $A.pushCreationPath("realbody");
         var realbody = [];
         for (var i = 0, length = facet.getLength(); i < length; i++) {
         	$A.setCreationPathIndex(i);
@@ -38,7 +38,7 @@
                 realbody.push(cmps);
             }
         }
-        $A.popCreationPath("/realbody");
+        $A.popCreationPath("realbody");
         
         return realbody;
     }

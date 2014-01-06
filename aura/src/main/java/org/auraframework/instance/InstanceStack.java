@@ -129,6 +129,8 @@ public class InstanceStack {
         path.append("/");
         if (name.equals("body")) {
             path.append("*");
+        } else if (name.equals("realbody")) {
+            path.append("+");
         } else {
             path.append(name);
         }

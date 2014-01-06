@@ -26,6 +26,7 @@
 		$A.test.assertEquals(expected, actual , "Unexpected return from CheckAccessibility, should not return errornous string. output: \n"+output);
 	}
     },
+    
     testHeadersCorrectOrder:{
 		attributes : {caseToRender : 'headersCorrectOrder'},
 		test: function(cmp){
@@ -45,6 +46,7 @@
 			$A.test.assertEquals(expected, actual , "Unexpected return from CheckAccessibility, should return string with 2 errors. output: \n"+output);
 		}
     },
+    
     testHeadersWrongOrderWrapAround:{
 		attributes : {caseToRender : 'headersWrongOrderWrapAround'},
 		test: function(cmp){
@@ -54,6 +56,7 @@
 			$A.test.assertEquals(expected, actual , "Unexpected return from CheckAccessibility, should return string with 2 errors. output: \n"+output);
 		}
     },
+    
     testHeadersWrongOrderReverse:{
 		attributes : {caseToRender : 'headersWrongOrderReverse'},
 		test: function(cmp){
@@ -63,6 +66,7 @@
 			$A.test.assertEquals(expected, actual , "Unexpected return from CheckAccessibility, should not return errornous string. output: \n"+output);
 		}
     },
+    
     testAnchorWithInnerText:{
 		attributes : {caseToRender : 'anchorWInnerText'},
 		test: function(cmp){
@@ -92,6 +96,7 @@
 			$A.test.assertEquals(expected, actual , "Unexpected return from CheckAccessibility, should return string with 1 errors. output: \n"+output);
 		}
     },
+    
     testAnchorInOutputURLDeco:{
 		attributes : {caseToRender : 'anchorInOutputURLDeco'},
 		test: function(cmp){
@@ -101,6 +106,7 @@
 			$A.test.assertEquals(expected, actual , "Unexpected return from CheckAccessibility, should return string with 2 errors. output: \n"+output);
 		}
     },
+    
     testRadioIsInFieldSetError:{
 		attributes : {caseToRender : 'RadioErrors'},
 		test: function(cmp){
@@ -120,6 +126,7 @@
 			$A.test.assertEquals(expected, actual , "Unexpected return from CheckAccessibility, should not return errornous string. output: \n"+output);
 		}
     },
+    
     testLabels:{
 		attributes : {caseToRender : 'labelTest'},
 		test: function(cmp){
@@ -128,6 +135,7 @@
 			$A.test.assertEquals(expected, actual , "Unexpected return from CheckAccessibility, should not return errornous string");
 		}
     },
+    
     testLabelsNotNeeded:{
 	attributes : {caseToRender : 'labelsNotNeeded'},
 	test: function(cmp){
@@ -136,6 +144,7 @@
 		$A.test.assertEquals(expected, actual , "Unexpected return from CheckAccessibility, should return 1 error for input of type image with out an alt");
 	}
     },
+    
     testAnchorMenuTest:{
 		attributes : {caseToRender : 'anchorMenuTest'},
 		test: function(cmp){
@@ -145,6 +154,7 @@
 			$A.test.assertEquals(expected, actual , "Unexpected return from CheckAccessibility, should not return errornous string. output: \n"+output);
 		}
     },
+    
     testCKEditorTest:{
 		attributes : {caseToRender : 'ckeditor_test'},
 		test: function(cmp){
@@ -154,8 +164,35 @@
 			$A.test.assertEquals(expected, actual , "Unexpected return from CheckAccessibility, should not return errornous string. output: \n"+output);
 		}
     },
-    
-    
+
+    testUseSpecificDomElement:{
+	attributes : {caseToRender : 'full'},
+	test: [function(cmp){
+	        var tableToUse    = document.getElementById("table1"); 
+		var expected = "Total Number of Errors found: 4";
+		var output    = $A.devToolService.checkAccessibility(tableToUse);
+		var actual   =  output.split("\n")[0];
+		$A.test.assertEquals(expected, actual , "Unexpected return from CheckAccessibility, should not return errornous string. output: \n"+output);
+	},
+	function(cmp){
+	        var fieldSetToUse = document.getElementById("field_set"); 
+		var expected = "Total Number of Errors found: 2";
+		var output    = $A.devToolService.checkAccessibility(fieldSetToUse);
+		var actual   =  output.split("\n")[0];
+		$A.test.assertEquals(expected, actual , "Unexpected return from CheckAccessibility, should not return errornous string. output: \n"+output);
+	}]
+	
+     },
+     
+     testNoElements:{
+		attributes : {caseToRender : 'None'},
+		test: function(cmp){
+			var expected = "";
+			var output    = $A.devToolService.checkAccessibility();
+			var actual   =  output.split("\n")[0];
+			$A.test.assertEquals(expected, actual , "Unexpected return from CheckAccessibility, should not return errornous string. output: \n"+output);
+		}
+     },
     //Full tests
     testCheckAccessibility:{
 		test: function(cmp){

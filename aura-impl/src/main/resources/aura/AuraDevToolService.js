@@ -419,10 +419,9 @@ var AuraDevToolService = function() {
              * @param   decoMsg                    - Error message for Decorative tag
              * @returns String                   - String concatenation of all error messages
              */
-            findAllImgTags:function (imgErrorMsg, infoMsg, decoMsg){
+            findAllImgTags:function (allImgTags, imgErrorMsg, infoMsg, decoMsg){
         	 var accessAideFuncs = aura.devToolService.accessbilityAide;
-        	
-        	 var allImgTags = document.getElementsByTagName("img");
+               	
         	 var data_aura_rendered_by = "";
         	 var nonAuraImg = [];
         	 var informationErrorArray = [];
@@ -821,16 +820,16 @@ var AuraDevToolService = function() {
              * Function that will find all nested Headers and make sure that they have in 1 lvl difference
              * @returns String - Returns a string representation of the errors
              */
-            checkNestedHeaders : function(){
+            checkNestedHeaders : function(domElem){
                    var headerErrMsg = "Headings are properly nested and increased by 1 level at a time. e.g., h1 followed by h2, h2 followed by h2 or h3. Refer to http://www.w3.org/TR/WCAG20-TECHS/G141.html.";
                    var errArray = [];
                    var accessAideFuncs = $A.devToolService.accessbilityAide;
-                   var hdrs1 = document.getElementsByTagName("h1");
-                   var hdrs2 = document.getElementsByTagName("h2");
-                   var hdrs3 = document.getElementsByTagName("h3");
-                   var hdrs4 = document.getElementsByTagName("h4");
-                   var hdrs5 = document.getElementsByTagName("h5");
-                   var hdrs6 = document.getElementsByTagName("h6");
+                   var hdrs1 = domElem.getElementsByTagName("h1");
+                   var hdrs2 = domElem.getElementsByTagName("h2");
+                   var hdrs3 = domElem.getElementsByTagName("h3");
+                   var hdrs4 = domElem.getElementsByTagName("h4");
+                   var hdrs5 = domElem.getElementsByTagName("h5");
+                   var hdrs6 = domElem.getElementsByTagName("h6");
 
                    errArray = errArray.concat(accessAideFuncs.findNextHeader(hdrs1, "h2", {"h2":"", "h3":"", "h4":"", "h5":"", "h6":""}));
                    errArray = errArray.concat(accessAideFuncs.findNextHeader(hdrs2, "h3", {"h3":"", "h4":"", "h5":"", "h6":""}));
@@ -845,11 +844,11 @@ var AuraDevToolService = function() {
                 * Function that will find all anchors and make sure that they have text in them
                 * @returns String - Returns a string representation of the errors
                 */
-               checkAnchorHasText : function(){
+               checkAnchorHasText : function(domElem){
                       var anchorErrMsg = "Anchor tag should contain proper link text and tell what the link is about. For a graphical link, uses ui:image instead,"+
                    		      " or uses a span tag with assistiveText class to include the link text; uses ui:button if it's a button.";
                       var accessAideFuncs = $A.devToolService.accessbilityAide;
-                      var anchors = document.getElementsByTagName("a");
+                      var anchors = domElem.getElementsByTagName("a");
                       return accessAideFuncs.formatOutput(anchorErrMsg, accessAideFuncs.checkAnchorHasInnerText(anchors));
                   
                 },
@@ -857,51 +856,56 @@ var AuraDevToolService = function() {
                  * Function that will find all ths and make sure that they have scope in them, and that they are equal to row, col, rowgroup, colgroup
                  * @returns String - Returns a string representation of the errors
                  */
-                  checkHeadTitle : function(){
+                  checkHeadTitle : function(domElem){
         		var hdErrMsg = "Head element must include non-empty title element. Refer to http://www.w3.org/TR/UNDERSTANDING-WCAG20/navigation-mechanisms.html.";
         		var accessAideFuncs = $A.devToolService.accessbilityAide;
-        		var hd = document.getElementsByTagName("head")[0];
+        		var hd = domElem.getElementsByTagName("head")[0];
+        		
+        		if($A.util.isEmpty(hd)){
+        		    return "";
+        		}
         		return accessAideFuncs.formatOutput(hdErrMsg, accessAideFuncs.checkHeadHasCorrectTitle(hdErrMsg, hd));
         	     },
                     /**
                      * Function that will find all ths and make sure that they have scope in them, and that they are equal to row, col, rowgroup, colgroup
                      * @returns String - Returns a string representation of the errors
                      */
-            	     checkThHasScope : function(){
+            	     checkThHasScope : function(domElem){
             		var thScopeMsg = "Table header must have scope attribute. Refer to http://www.w3.org/TR/UNDERSTANDING-WCAG20/content-structure-separation.html.";
         		var accessAideFuncs = aura.devToolService.accessbilityAide;
-        		var ths = document.getElementsByTagName("th");
+        		var ths = domElem.getElementsByTagName("th");
         		return accessAideFuncs.formatOutput(thScopeMsg,accessAideFuncs.checkForAttrib(ths,"scope", {'row': false, 'col': false, 'rowgroup': false, 'colgroup' : false}, accessAideFuncs.doesNotContain));
             	     },
                      /**
                       * Function that will find all IFrames and make sure that they have titles in them
                       * @returns String - Returns a string representation of the errors
                       */
-        	     checkIFrameHasTitle : function(){
+        	     checkIFrameHasTitle : function(domElem){
         		var iFrameTitleMsg = "Each frame and iframe element must have non-empty title attribute. Refer to http://www.w3.org/TR/UNDERSTANDING-WCAG20/ensure-compat.html.";
         		var accessAideFuncs = aura.devToolService.accessbilityAide;
-        		var iframe = document.getElementsByTagName("iframe");
+        		var iframe = domElem.getElementsByTagName("iframe");
         		return accessAideFuncs.formatOutput(iFrameTitleMsg,accessAideFuncs.checkForAttrib(iframe, "title", "", accessAideFuncs.doesContain));
         	    },
         	    /**
                      * Grabs all images tags and makes sure they have titles
                      * @returns String - Returns a string representation of the errors
                      */
-        	    checkImageTagForAlt : function(){
+        	    checkImageTagForAlt : function(domElem){
         		var imgError = "IMG tag must have alt attribute. Refer to http://www.w3.org/TR/UNDERSTANDING-WCAG20/text-equiv.html.";
         		var infoMsg = "\nNote: If the image type is informational, then the alt must be set";
                 	var decoMsg = "\nNote: If the image type is decorative,  then the alt must be the empty string";
         		var accessAideFuncs = aura.devToolService.accessbilityAide;
-       		        return accessAideFuncs.findAllImgTags(imgError, infoMsg, decoMsg);
+        		var allImgTags = domElem.getElementsByTagName("img");
+       		        return accessAideFuncs.findAllImgTags(allImgTags, imgError, infoMsg, decoMsg);
         	    },
         	    /**
                      * Goes through all of the fieldsets tags that do not have the display:none field set and makes sure that each one has a legend
                      * @returns String - Returns a string representation of the errors
                      */
-        	    checkFieldSetForLegend : function(){
+        	    checkFieldSetForLegend : function(domElem){
         		var fieldsetLegnedMsg = "Fieldset element must include legend element. Refer to http://www.w3.org/TR/UNDERSTANDING-WCAG20/minimize-error.html.";
         		var accessAideFuncs = aura.devToolService.accessbilityAide;
-        		var fieldSets = document.getElementsByTagName('fieldset');
+        		var fieldSets = domElem.getElementsByTagName('fieldset');
         		var legends = "";
         		var errorArray = [];
         		var fieldSetSytle  = "";
@@ -923,23 +927,23 @@ var AuraDevToolService = function() {
                      * Gets all radio buttons, then traverses up the tree to find if they are in a fieldset
                      * @returns String - Returns a string representation of the errors
                      */
-        	    checkRadioButtonsInFieldSet : function(){
+        	    checkRadioButtonsInFieldSet : function(domElem){
         		 var radioButtonFieldSetMsg = "Radio button and checkbox should group by fieldset and legend elements. Refer to http://www.w3.org/TR/UNDERSTANDING-WCAG20/content-structure-separation.html.";
         		 var accessAideFuncs = aura.devToolService.accessbilityAide;
-        		 var inputTags = document.getElementsByTagName('input');
+        		 var inputTags = domElem.getElementsByTagName('input');
         		 return accessAideFuncs.formatOutput(radioButtonFieldSetMsg, accessAideFuncs.radioButtonAide(inputTags));
         	    },
         	    /**
                      * Verifys that all inputs have a label
                      * @returns String - Returns a string representation of the errors
                      */
-        	    checkInputHasLabel : function() {
+        	    checkInputHasLabel : function(domElem) {
         		var inputLabelMsg   = "A label element must be directly before/after the input controls, and the for attribute of label must match the id attribute of the input controls, OR the label should be wrapped around an input. Refer to http://www.w3.org/TR/UNDERSTANDING-WCAG20/minimize-error.html.";
         		var accessAideFuncs = aura.devToolService.accessbilityAide;
-        		var inputTextTags   = document.getElementsByTagName('input');
-         		var textAreaTags    = document.getElementsByTagName('textarea');
-                        var selectTags      = document.getElementsByTagName('select');
-                        var lbls = document.getElementsByTagName("LABEL");  
+        		var inputTextTags   = domElem.getElementsByTagName('input');
+         		var textAreaTags    = domElem.getElementsByTagName('textarea');
+                        var selectTags      = domElem.getElementsByTagName('select');
+                        var lbls = domElem.getElementsByTagName("LABEL");  
                         var errorArray = [];
                         
                         errorArray = errorArray.concat(accessAideFuncs.inputLabelAide(lbls, inputTextTags));
@@ -953,13 +957,17 @@ var AuraDevToolService = function() {
          * Calls all functions in VerifyAccessibility and stores the result in a string
          * @returns String - Returns a a concatenated string representation of all errors or the empty string
          */
-        checkAccessibility : function(){
+        checkAccessibility : function(domElem){
             var functions = aura.devToolService.verifyAccessibility;
             var result = "";
             aura.devToolService.accessbilityAide.errorCount = 0;
             
+            if($A.util.isUndefinedOrNull(domElem)){
+        	domElem = document;
+            }
+            
             for(var funcNames in functions){           
-        	   result = result + functions[funcNames]();
+        	   result = result + functions[funcNames](domElem);
             }
             
             if(aura.devToolService.accessbilityAide.errorCount === 0){

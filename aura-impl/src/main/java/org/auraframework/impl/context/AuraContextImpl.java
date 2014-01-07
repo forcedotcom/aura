@@ -188,18 +188,16 @@ public class AuraContextImpl implements AuraContext {
 
                 Map<String, BaseComponent<?, ?>> components = ctx.getComponents();
                 if (!components.isEmpty()) {
-                    List<BaseComponent<?, ?>> sorted = Lists.newArrayList(components.values());
-                    Collections.sort(sorted, GID_SORTER);
-                    json.writeMapKey("components");
-                    json.writeMapBegin();
+                    List<BaseComponent<?, ?>> sorted = Lists.newArrayList();
 
-                    for (BaseComponent<?, ?> component : sorted) {
+                    for (BaseComponent<?,?> component : components.values()) {
                         if (component.hasLocalDependencies()) {
-                            json.writeMapEntry(component.getGlobalId(), component);
+                            sorted.add(component);
                         }
                     }
-
-                    json.writeMapEnd();
+                    Collections.sort(sorted, GID_SORTER);
+                    json.writeMapKey("components");
+                    json.writeArray(sorted);
                 }
             }
             json.writeMapEnd();

@@ -49,61 +49,44 @@ var ComponentPriv = (function() { // Scoping priv
         if (partialConfig) {
             this.partialConfig = partialConfig;
 
-            var globalIdError = undefined;
             var partialConfigO = partialConfig["original"];
             var partialConfigCD;
             var configCD = config["componentDef"]["descriptor"];
             if (configCD.getQualifiedName) {
                 configCD = configCD.getQualifiedName();
             }
-            if (partialConfig["globalId"] !== this.globalId) {
-                globalIdError = "Global ID server["+partialConfig["globalId"]+"] != client["
-                    + this.globalId+"]";
-            }
             if (partialConfig["componentDef"]) {
                 partialConfigCD = partialConfig["componentDef"]["descriptor"];
             }
             if (partialConfigO !== undefined && partialConfigCD !== configCD) {
                 if (partialConfigO !== configCD) {
-                    if (globalIdError === undefined) {
-                        globalIdError = this.globalId;
-                    }
                     $A.log("Configs at error");
                     $A.log(config);
                     $A.log(partialConfig);
-                    $A.error("Mismatch at " + globalIdError
+                    $A.error("Mismatch at " + this.globalId
                             + " client expected " + configCD
                             + " but got original " + partialConfigO
                             + " providing " + partialConfigCD + " from server "
                             + " for creationPath = "+this.creationPath);
-                    globalIdError = undefined;
                 }
             } else if (partialConfigCD) {
                 if (partialConfigCD !== configCD) {
-                    if (globalIdError === undefined) {
-                        globalIdError = this.globalId;
-                    }
                     $A.log("Configs at error");
                     $A.log(config);
                     $A.log(partialConfig);
-                    $A.error("Mismatch at " + globalIdError
+                    $A.error("Mismatch at " + this.globalId
                             + " client expected " + configCD + " but got "
                             + partialConfigCD + " from server "
                             +" for creationPath = "+this.creationPath);
-                    globalIdError = undefined;
                 }
-            }
-            if (globalIdError) {
-                $A.log("Mismatch at " + globalIdError
-                      +" for creationPath = "+this.creationPath);
             }
         }
 
         // get server rendering if there was one
         if (config["rendering"]) {
-                this.rendering = config["rendering"];
+            this.rendering = config["rendering"];
         } else if (partialConfig && partialConfig["rendering"]) {
-                this.rendering = this.partialConfig["rendering"];
+            this.rendering = this.partialConfig["rendering"];
         }
 
         // add this component to the global index

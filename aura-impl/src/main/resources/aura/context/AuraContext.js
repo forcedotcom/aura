@@ -41,9 +41,10 @@ function AuraContext(config) {
     this.app = config["app"];
     this.cmp = config["cmp"];
     this.test = config["test"];
-
-    this.joinComponentConfigs(config["components"], "");
     this.globalValueProviders = new $A.ns.GlobalValueProviders(config["globalValueProviders"]);
+    // Careful now, the def is null, this fake action sets up our paths.
+    this.currentAction = new Action(null, ""+this.num, null, null, false, null, false);
+    this.joinComponentConfigs(config["components"], this.currentAction.getId());
 }
 
 /**
@@ -71,14 +72,10 @@ AuraContext.prototype.getGlobalValueProviders = function() {
  * @private
  */
 AuraContext.prototype.encodeForServer = function() {
-    var preloads = this.getDynamicNamespaces();
-    if (this.preloads) {
-        preloads = preloads.concat(this.preloads);
-    }
+    var dn = this.getDynamicNamespaces();
 
     return aura.util.json.encode({
         "mode" : this.mode,
-        "preloads": preloads,
         "loaded" : this.loaded,
         "app" : this.app,
         "cmp" : this.cmp,
@@ -229,19 +226,17 @@ AuraContext.prototype.getApp = function() {
  *      actionId the id of the action that we are joining in (used to amend the creationPath).
  */
 AuraContext.prototype.joinComponentConfigs = function(otherComponentConfigs, actionId) {
-    var cP;
+    var cP, idx, config, def;
 
     if (otherComponentConfigs) {
-        for ( var k in otherComponentConfigs) {
-            if (otherComponentConfigs.hasOwnProperty(k)) {
-                var config = otherComponentConfigs[k];
-                var def = config["componentDef"];
-                if (def) {
-                    componentService.getDef(def);
-                }
-                cP = config["creationPath"];
-                this.componentConfigs[cP] = config;
+        for (idx = 0; idx < otherComponentConfigs.length; idx++) {
+            config = otherComponentConfigs[idx];
+            def = config["componentDef"];
+            if (def) {
+                componentService.getDef(def);
             }
+            cP = config["creationPath"];
+            this.componentConfigs[actionId+cP] = config;
         }
     }
 };

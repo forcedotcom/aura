@@ -72,7 +72,6 @@
         ]
       }
     },
-    "globalId":"9",
-    "creationPath":"fakeActionId/*~2"
+    "creationPath":"/*[2]"
   }
 }

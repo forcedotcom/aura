@@ -15,7 +15,7 @@
  */
 package org.auraframework.http;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -54,7 +54,6 @@ public class InputDateTimeLocaleHttpTest extends AuraHttpTestCase{
         super(name);
     }
 
-    @SuppressWarnings("unchecked")
     private void checkValues(String dayOfWeek, String month, HttpGet auraGet) throws Exception {
         HttpResponse httpResponse = perform(auraGet);
 
@@ -66,20 +65,21 @@ public class InputDateTimeLocaleHttpTest extends AuraHttpTestCase{
             fail(String.format("Unexpected status code <%s>, expected <%s>, response:%n%s", statusCode,
                     HttpStatus.SC_OK, response));
         }
+        @SuppressWarnings("unchecked")
         Map<String, Object> json = (Map<String, Object>) new JsonReader().read(response
                 .substring(AuraBaseServlet.CSRF_PROTECT.length()));
         
         //Grab the object you are looking for from the json tree
+        @SuppressWarnings("unchecked")
         Map<String, Object> context = (Map<String, Object>) json.get("context");
-        Map<String, Object> components = (Map<String, Object>) context.get("components");
-        String numKey ="";
+        @SuppressWarnings("unchecked")
+        List<Map<String,Object>> components = (List<Map<String,Object>>) context.get("components");
         Map<String, Object>  num = null;
-        Iterator<String> it = components.keySet().iterator();
         
         /*
-         * Structure of components map: 
-         * {
-         *   20:{
+         * Structure of components array: 
+         * [
+         *   {
          *       serId:10, 
          *       value:{
          *               model:{
@@ -94,33 +94,35 @@ public class InputDateTimeLocaleHttpTest extends AuraHttpTestCase{
          *               globalId:20
          *              }
          *      }, 
-         *    1:{
+         *    {
          *        serRefId:1
-         *      }
-         * }
+         *    }
+         * ]
          * What we want is the gloabalId key (in this case 20), since it is the only one with the key 'value' underneath it.
          * We could just look for 20 but that is going to change. next lines of code try to find the key, that has the key 
          * value under it.  
          */
         
                
-        while(it.hasNext()){
-            numKey = it.next();
-            num = (Map<String, Object>) components.get(numKey);
-            if(num.containsKey("value")){
+        for (Map<String,Object> cmp : components) {
+            if(cmp.containsKey("value")){
+                num = cmp;
                 break;
             }
-            num = null;
         }
         
         if(num == null){
-            throw new JSONException("Key: 'Values', not found under parent key(s): "+components.keySet().toString());
+            throw new JSONException("Key: 'Values', not found under parent key(s): "+components.toString());
         }
         
+        @SuppressWarnings("unchecked")
         Map<String, Object>  valueMap = (Map<String, Object>) num.get("value"); 
+        @SuppressWarnings("unchecked")
         Map<String, Object> model = (Map<String, Object>) valueMap.get("model");
-        ArrayList<Map<String, Object>> monthLabels = (ArrayList<Map<String, Object>>) model.get("monthLabels"); 
-        ArrayList<Map<String, Object>> weekDayLabels = (ArrayList<Map<String, Object>>) model.get("weekdayLabels"); 
+        @SuppressWarnings("unchecked")
+        List<Map<String, Object>> monthLabels = (List<Map<String, Object>>) model.get("monthLabels"); 
+        @SuppressWarnings("unchecked")
+        List<Map<String, Object>> weekDayLabels = (List<Map<String, Object>>) model.get("weekdayLabels"); 
         Map<String, Object> weekdayFromServer = weekDayLabels.get(1);
         Map<String, Object> monthFromServer = monthLabels.get(0);
         

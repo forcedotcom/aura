@@ -66,57 +66,57 @@ public class InstanceStackTest extends UnitTestCase {
 
     public void testPath() {
         InstanceStack iStack = new InstanceStack("testBase");
-        assertEquals("InstanceStack constructor should set path to base", "testBase/*~0", iStack.getPath());
+        assertEquals("InstanceStack constructor should set path to base", "/*[0]", iStack.getPath());
 
         iStack.pushInstance(new TestInstance());
 
         // Set and clear attributes
         iStack.setAttributeName("attr1");
-        assertEquals("Setting attribute name should append name to path", "testBase/*~0/attr1", iStack.getPath());
+        assertEquals("Setting attribute name should append name to path", "/*[0]/attr1", iStack.getPath());
         iStack.clearAttributeName("attr1");
-        assertEquals("Clearing attribute name should remove name from path", "testBase/*~0", iStack.getPath());
+        assertEquals("Clearing attribute name should remove name from path", "/*[0]", iStack.getPath());
         iStack.setAttributeName("body");
-        assertEquals("Setting attribute name as body should append '*' to path", "testBase/*~0/*", iStack.getPath());
+        assertEquals("Setting attribute name as body should append '*' to path", "/*[0]/*", iStack.getPath());
         iStack.clearAttributeName("body");
-        assertEquals("testBase/*~0", iStack.getPath());
+        assertEquals("/*[0]", iStack.getPath());
         iStack.setAttributeName("realbody");
-        assertEquals("Setting attribute name as realbody should append '+' to path", "testBase/*~0/+", iStack.getPath());
+        assertEquals("Setting attribute name as realbody should append '+' to path", "/*[0]/+", iStack.getPath());
         iStack.clearAttributeName("realbody");
-        assertEquals("testBase/*~0", iStack.getPath());
+        assertEquals("/*[0]", iStack.getPath());
 
         // Set and clear indexes
         iStack.setAttributeName("attr2");
         iStack.setAttributeIndex(42);
-        assertEquals("testBase/*~0/attr2~42", iStack.getPath());
+        assertEquals("/*[0]/attr2[42]", iStack.getPath());
         iStack.clearAttributeIndex(42);
-        assertEquals("testBase/*~0/attr2", iStack.getPath());
+        assertEquals("/*[0]/attr2", iStack.getPath());
     }
 
     public void testPopInstanceToTopIncrementsIndex() {
         InstanceStack iStack = new InstanceStack("testBase");
-        assertEquals("InstanceStack constructor should set path to base", "testBase/*~0", iStack.getPath());
+        assertEquals("InstanceStack constructor should set path to base", "/*[0]", iStack.getPath());
         TestInstance ti = new TestInstance();
         iStack.pushInstance(ti);
         iStack.popInstance(ti);
-        assertEquals("Popping to top of stack should increment index", "testBase/*~1", iStack.getPath());
+        assertEquals("Popping to top of stack should increment index", "/*[1]", iStack.getPath());
         iStack.pushInstance(ti);
         iStack.popInstance(ti);
-        assertEquals("Popping to top of stack should increment index", "testBase/*~2", iStack.getPath());
+        assertEquals("Popping to top of stack should increment index", "/*[2]", iStack.getPath());
     }
 
     public void testMarkParentNoCurrentInstance() {
         InstanceStack iStack = new InstanceStack("testBase");
-        assertEquals("InstanceStack constructor should set path to base", "testBase/*~0", iStack.getPath());
+        assertEquals("InstanceStack constructor should set path to base", "/*[0]", iStack.getPath());
         TestInstance parent = new TestInstance("parentBase");
         iStack.markParent(parent);
         assertEquals("Marking parent should set path to the parent's path", "parentBase", iStack.getPath());
         iStack.clearParent(parent);
-        assertEquals("Clearing parent should reset path to original base path", "testBase/*~0", iStack.getPath());
+        assertEquals("Clearing parent should reset path to original base path", "/*[0]", iStack.getPath());
     }
 
     public void testMarkParentMultipleTimes() {
         InstanceStack iStack = new InstanceStack("testBase");
-        assertEquals("InstanceStack constructor should set path to base", "testBase/*~0", iStack.getPath());
+        assertEquals("InstanceStack constructor should set path to base", "/*[0]", iStack.getPath());
         TestInstance parent = new TestInstance("parent");
         iStack.markParent(parent);
         assertEquals("Marking parent should set path to the parent's path", "parent", iStack.getPath());
@@ -125,7 +125,7 @@ public class InstanceStackTest extends UnitTestCase {
         iStack.clearParent(parent);
         assertEquals("parent", iStack.getPath());
         iStack.clearParent(parent);
-        assertEquals("Clearing both parents should reset path to original base path", "testBase/*~0", iStack.getPath());
+        assertEquals("Clearing both parents should reset path to original base path", "/*[0]", iStack.getPath());
     }
 
     public void testErrorWrongParent() {

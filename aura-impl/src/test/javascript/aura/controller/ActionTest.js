@@ -112,7 +112,7 @@ Test.Aura.Controller.ActionTest = function() {
 			// Act
 			mockContext(function() {
 				mockActionId(function() {
-					actual = new Action().getId();
+					actual = new Action(null, targetContextNum).getId();
 				});
 			});
 
@@ -129,7 +129,7 @@ Test.Aura.Controller.ActionTest = function() {
 			// Act
 			mockContext(function() {
 				mockActionId(function() {
-					target = new Action();
+					target = new Action(null, targetContextNum);
 					target.getId();
 				});
 			});
@@ -210,7 +210,7 @@ Test.Aura.Controller.ActionTest = function() {
 			var paramDefs = {
 				key : 1
 			};
-			var target = new Action(null, null, paramDefs);
+			var target = new Action(null, null, null, paramDefs);
 			var config = {
 				key : expected
 			};
@@ -231,7 +231,7 @@ Test.Aura.Controller.ActionTest = function() {
 			var config = {
 				key2 : "new"
 			};
-			var target = new Action(null, null, paramDefs);
+			var target = new Action(null, null, null, paramDefs);
 			target.params["key1"] = "existing";
 
 			target.setParams(config);
@@ -252,7 +252,7 @@ Test.Aura.Controller.ActionTest = function() {
 				key1 : "new",
 				key3 : "ignored"
 			};
-			var target = new Action(null, null, paramDefs);
+			var target = new Action(null, null, null, paramDefs);
 
 			target.setParams(config);
 
@@ -583,14 +583,10 @@ Test.Aura.Controller.ActionTest = function() {
 			var mockAssert = Mocks.GetMock(Object.Global(), "$A", {
 				assert : function(param) {
 				},
-				log : function(msg) {
+				warning : function(msg) {
 					actual = msg;
 				}
 			});
-			var def = {
-				isClientAction : function() {
-				}
-			};
 			var cmp = {
 				getDef : function() {
 					return {
@@ -605,15 +601,14 @@ Test.Aura.Controller.ActionTest = function() {
 				}
 			};
 			var target = new Action();
-			target.def = def;
 			target.cmp = cmp;
-			target.getDef = function() {
-				return {
-					getName : function() {
-						return expectedName;
-					}
+			target.def = {
+                                getName : function() {
+                                        return expectedName;
+                                },
+				isClientAction : function() {
 				}
-			}
+                        };
 			var actual = null;
 
 			// Act
@@ -670,13 +665,9 @@ Test.Aura.Controller.ActionTest = function() {
 			var mockAssert = Mocks.GetMock(Object.Global(), "$A", {
 				assert : function(param) {
 				},
-				log : function() {
+				warning : function() {
 				}
 			});
-			var def = {
-				isClientAction : function() {
-				}
-			};
 			var cmp = {
 				getDef : function() {
 					return {
@@ -690,14 +681,13 @@ Test.Aura.Controller.ActionTest = function() {
 				}
 			};
 			var target = new Action();
-			target.def = def;
 			target.cmp = cmp;
-			target.getDef = function() {
-				return {
-					getName : function() {
-					}
+			target.def = {
+                                getName : function() {
+                                },
+				isClientAction : function() {
 				}
-			}
+                        };
 
 			// Act
 			mockAssert(function() {
@@ -972,7 +962,7 @@ Test.Aura.Controller.ActionTest = function() {
 			target.returnValue = "NONE";
 			target.state = "SUCCESS";
 			target.responseState = "SUCCESS";
-			target.components = {};
+			target.components = [];
 
 			// Act
 			var stored = target.getStored("bogus");
@@ -1099,7 +1089,7 @@ Test.Aura.Controller.ActionTest = function() {
                         };
                         context.finishComponentConfigs = Stubs.GetMethod("id", null);
                         context.clearComponentConfigs = Stubs.GetMethod("id", null);
-                        target.components = { "hi":{ "globalId":"hi", "creationPath":"hi" } };
+                        target.components = [ { "creationPath":"hi" } ];
 			target.completeGroups = Stubs.GetMethod(null);
                         target.getStorage = function () { return false; };
                         target.getId = function () { return expectedId; };
@@ -1123,7 +1113,7 @@ Test.Aura.Controller.ActionTest = function() {
                         };
                         context.finishComponentConfigs = Stubs.GetMethod("id", null);
                         context.clearComponentConfigs = Stubs.GetMethod("id", null);
-                        target.components = { "hi":{ "globalId":"hi", "creationPath":"hi" } };
+                        target.components = [ { "creationPath":"hi" } ];
 			target.completeGroups = Stubs.GetMethod(null);
                         target.getStorage = function () { return true; };
                         target.storable = true;
@@ -1149,7 +1139,7 @@ Test.Aura.Controller.ActionTest = function() {
                         };
                         context.finishComponentConfigs = Stubs.GetMethod("id", null);
                         context.clearComponentConfigs = Stubs.GetMethod("id", null);
-                        target.components = { "hi":{ "globalId":"hi", "creationPath":"hi" } };
+                        target.components = [ { "creationPath":"hi" } ];
 			target.completeGroups = Stubs.GetMethod(null);
                         target.getStorage = function () { return false; };
                         target.getState = function () { return "FAKESTATE"; };
@@ -1483,18 +1473,15 @@ Test.Aura.Controller.ActionTest = function() {
 				}
 			});
 			var target = new Action();
-			target.getParams = function() {
-			};
-			target.getDef = function() {
-				return {
-					getDescriptor : function() {
-						return {
-							toString : function() {
-								return expectedDescriptor;
-							}
-						}
-					}
-				}
+                        target.params = undefined;
+			target.def = {
+                                getDescriptor : function() {
+                                        return {
+                                                toString : function() {
+                                                        return expectedDescriptor;
+                                                }
+                                        }
+                                }
 			};
 
 			// Act
@@ -1644,98 +1631,18 @@ Test.Aura.Controller.ActionTest = function() {
 			target.getId = function() {
 				return expectedId;
 			}
-			target.getParams = function() {
-				return expectedParams;
-			}
-			target.getDef = function() {
-				return {
+			target.params = expectedParams;
+			target.def = {
 					getDescriptor : function() {
 						return expectedDescriptor;
 					}
-				}
-			}
+                        };
 
 			// Act
 			var actual = target.toJSON();
 
 			// Assert
 			Assert.Equal(expected, actual);
-		}
-	}
-
-	[ Fixture ]
-	function SanitizeStoredResponse() {
-		[ Fact ]
-		function ChangesGlobalIdOfComponent() {
-			// Arrange
-			var suffix = "newSuffix";
-			var expectedNewId = "globalId:" + suffix;
-			var target = new Action();
-			target.getId = function() {
-				return suffix;
-			}
-			var response = {
-				"components" : {
-					"globalId:originalId" : {
-						"globalId" : "globalId:originalId"
-					}
-				}
-			}
-
-			// Act
-			target.sanitizeStoredResponse(response);
-
-			// Assert
-			Assert.True(expectedNewId in response["components"]);
-		}
-
-		[ Fact ]
-		function AddsKeyNamedGlobalIdWithNewGlobalIdAsValueToResponse() {
-			// Arrange
-			var suffix = "newSuffix";
-			var expectedNewId = "globalId:" + suffix;
-			var target = new Action();
-			target.getId = function() {
-				return suffix;
-			}
-			var response = {
-				"components" : {
-					"globalId:originalId" : {
-						"globalId" : "globalId:originalId"
-					}
-				}
-			}
-
-			// Act
-			target.sanitizeStoredResponse(response);
-			var actual = response["components"][expectedNewId]["globalId"];
-
-			// Assert
-			Assert.Equal(expectedNewId, actual);
-		}
-
-		[ Fact ]
-		function ChangesReturnValueGlobalIdIfSet() {
-			// Arrange
-			var suffix = "newSuffix";
-			var expectedNewId = "globalId:" + suffix;
-			var target = new Action();
-			target.getId = function() {
-				return suffix;
-			}
-			var response = {
-				"components" : {},
-				"returnValue" : {
-					"globalId" : "globalId:origSuffix"
-				}
-			}
-
-			// Act
-			target.sanitizeStoredResponse(response);
-			var actual = response["returnValue"]["globalId"];
-
-			// Assert
-			Assert.Equal(expectedNewId, actual);
 		}
 	}
 

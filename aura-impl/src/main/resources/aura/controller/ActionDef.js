@@ -137,7 +137,7 @@ ActionDef.prototype.isCaboose = function() {
  * @returns {Action}
  */
 ActionDef.prototype.newInstance = function(cmp) {
-	return new Action(this, this.meth, this.paramDefs, this.background, cmp, this.caboose);
+    return new Action(this, "a", this.meth, this.paramDefs, this.background, cmp, this.caboose);
 };
 
 // #include aura.controller.ActionDef_export

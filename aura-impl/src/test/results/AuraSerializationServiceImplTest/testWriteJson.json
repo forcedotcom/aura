@@ -56,8 +56,7 @@
         ]
       }
     },
-    "globalId":"1",
-    "creationPath":"fakeActionId/*~0",
+    "creationPath":"/*[0]",
     "attributes":{
       "serId":7,
       "value":{

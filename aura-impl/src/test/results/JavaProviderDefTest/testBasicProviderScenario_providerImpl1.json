@@ -108,8 +108,7 @@
       }
     },
     "original":"markup://test:test_Provider_Interface",
-    "globalId":"5",
-    "creationPath":"fakeActionId/*~1",
+    "creationPath":"/*[1]",
     "attributes":{
       "serId":10,
       "value":{

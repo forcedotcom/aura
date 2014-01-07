@@ -131,7 +131,7 @@ $A.ns.AuraComponentService.prototype.newComponentDeprecated = function(config, a
 
     config = configObj["configuration"];
 
-    if(doForce !== true && !config["globalId"]){
+    if(doForce !== true && !config["creationPath"]){
         if(def && !def.hasRemoteDependencies() ){
             localCreation = true;
             delete config["load"];

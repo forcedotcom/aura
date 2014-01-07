@@ -222,7 +222,7 @@ public class AbstractActionImplTest extends UnitTestCase {
         Action test = new MyAction(null, def, null);
         test.setId("expectedId");
         InstanceStack iStack = test.getInstanceStack();
-        assertEquals("Instance stack should be initialized with action ID as path", "expectedId/*~0", iStack.getPath());
+        assertEquals("Instance stack should be initialized with action ID as path", "/*[0]", iStack.getPath());
     }
 
     public void testSetIdWithInstanceStackSet() {

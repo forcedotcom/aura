@@ -17,7 +17,7 @@ Function.RegisterNamespace("Test.Aura.Util");
 
 [Fixture]
 Test.Aura.UtilTest=function(){
-	auraMock=function(delegate){
+	var auraMock=function(delegate){
 		Mocks.GetMocks(Object.Global(),{
 			exp:function() {},
 			window:Object.Global(),
@@ -199,6 +199,59 @@ Test.Aura.UtilTest=function(){
 			});
             // Assert
             Assert.Equal(expected, actual); 					
+		}
+	}
+	
+	[Fixture]
+	function isIE(){
+		var auraMockCustomUserAgent=function(delegate, userAgentOverride){
+			Mocks.GetMocks(Object.Global(),{
+				exp:function() {},
+				window:Object.Global(),
+				document:{createDocumentFragment:function() {}},
+				Json:function() {},
+				Transport:function() {},
+				Style:function() {},
+				Bitset:{},
+				NumberFormat:{},			
+				$A:{ns:{}},
+				navigator:{userAgent : userAgentOverride }
+			})(function(){
+				// #import aura.util.Util
+				delegate();
+			});
+		}
+		
+		[Fact]
+		function IE11UserAgentReturnsTrue(){
+			//Arrange
+			var actual;
+			var userAgent = "Mozilla/5.0 (Windows NT 6.3; WOW64; Trident/7.0; .NET4.0E; .NET4.0C; rv:11.0) like Gecko";
+			
+			//Act
+			auraMockCustomUserAgent(function(){
+				var targetUtil = new $A.ns.Util();
+				actual = targetUtil.isIE; 
+			}, userAgent);
+			
+			// Assert
+			Assert.True(actual);
+		}
+		
+		[Fact]
+		function ChromeUserAgentReturnsFalse(){
+			//Arrange
+			var actual;
+			var userAgent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.63 Safari/537.36";
+			
+			//Act
+			auraMockCustomUserAgent(function(){
+				var targetUtil = new $A.ns.Util();
+				actual = targetUtil.isIE; 
+			}, userAgent);
+			
+			// Assert
+			Assert.False(actual);
 		}
 	}
 }

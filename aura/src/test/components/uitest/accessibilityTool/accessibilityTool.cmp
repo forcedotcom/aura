@@ -50,10 +50,8 @@
          </fieldset>
     </aura:if>
     
-    
-    
     <aura:if isTrue="{!v.caseToRender == 'full'}">  
-        <table>
+        <table id="table1">
             <th></th>
             <tr><td>
                 <ui:block>
@@ -69,7 +67,7 @@
             <tr><td>
                 <ui:label for="birthdayInput" label="Birthday"/>
                 <ui:inputDate aura:id="birthdayInput" displayDatePicker="true"/>
-                <fieldset class="field_set">
+                <fieldset id="field_set" class="field_set">
                       <span>what is your age range?</span>
                         <br/>
                       <ui:label label="21-25"/>
@@ -84,7 +82,7 @@
                       <ui:label label="31-35"/>
                       <ui:inputRadio aura:id="31-35"/>
                       <ui:label label="36-40">
-                      	<ui:inputRadio aura:id="36-40"/>
+                      <ui:inputRadio aura:id="36-40"/>
                       </ui:label>
                         <br/>
                       

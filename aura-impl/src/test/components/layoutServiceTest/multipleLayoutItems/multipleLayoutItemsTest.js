@@ -21,7 +21,7 @@
     //TODO: W-1635821 - fix this flapper
     _testEventsPreAndPostLayoutChange:{
 	browsers:["-IE7", "-IE8", "-IE9"],
-	testLabels : ["UnAdaptableTest"],
+	labels : ["UnAdaptableTest"],
 	test:[
 	      function(cmp){
 		  $A.test.setTestTimeout(5000);

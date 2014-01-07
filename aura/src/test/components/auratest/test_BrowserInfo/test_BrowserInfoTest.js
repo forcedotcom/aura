@@ -54,7 +54,7 @@
  */
     testBrowserInfoChrome : {
     	browsers:["GOOGLECHROME"],
-    	testLabels : ["UnAdaptableTest"],
+    	labels : ["UnAdaptableTest"],
         test : function(component) {
         	this.assertBrowserProperties(component, {
     			formFactor : "DESKTOP",
@@ -69,7 +69,7 @@
     },
     
     testBrowserInfoFireFox : {
-    	testLabels : ["UnAdaptableTest"],
+    	labels : ["UnAdaptableTest"],
     	browsers:["FIREFOX"],
         test : function(component) {
         	this.assertBrowserProperties(component, {
@@ -85,7 +85,7 @@
     },
     
     testBrowserInfoSafari : {
-    	testLabels : ["UnAdaptableTest"],
+    	labels : ["UnAdaptableTest"],
     	browsers:["SAFARI"],
         test : function(component) {
         	this.assertBrowserProperties(component, {
@@ -101,7 +101,7 @@
     },
     
     testBrowserInfoIPad : {
-    	testLabels : ["UnAdaptableTest"],
+    	labels : ["UnAdaptableTest"],
     	browsers:["IPAD"],
         test : function(component) {
         	this.assertBrowserProperties(component, {
@@ -117,7 +117,7 @@
     },
     //Marking as undaptable because SFDC does not currently support testing on IPHONE
     testBrowserInfoIPhone : {
-	testLabels : ["UnAdaptableTest"],
+	labels : ["UnAdaptableTest"],
     	browsers:["IPHONE"],
         test : function(component) {
         	this.assertBrowserProperties(component, {
@@ -133,7 +133,7 @@
     },
     
     testBrowserInfoAndroidPhone : {
-    	testLabels : ["UnAdaptableTest"],
+    	labels : ["UnAdaptableTest"],
     	browsers:["ANDROID_PHONE"],
         test : function(component) {
         	this.assertBrowserProperties(component, {
@@ -149,7 +149,7 @@
     },
     
     testBrowserInfoAndroidTablet : {
-    	testLabels : ["UnAdaptableTest"],
+    	labels : ["UnAdaptableTest"],
     	browsers:["ANDROID_TABLET"],
         test : function(component) {
         	this.assertBrowserProperties(component, {

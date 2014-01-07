@@ -103,6 +103,7 @@ public class JavascriptTestSuiteDefHandler extends JavascriptHandler<TestSuiteDe
                         DefDescriptor.MARKUP_PREFIX);
 
         Map<String, Object> suiteAttributes = (Map<String, Object>) map.get("attributes");
+        List<String> suiteLabels = (List<String>) map.get("labels");
         List<String> suiteBrowsers = (List<String>) (List<?>) map.get("browsers");
         Set<Definition> suiteMocks = parseMocks(compDesc, (List<Object>) map.get("mocks"));
         
@@ -136,10 +137,14 @@ public class JavascriptTestSuiteDefHandler extends JavascriptHandler<TestSuiteDe
                     attributes.putAll(caseAttributes);
                 }
 
-                List<String> labelsList = (List<String>) (List<?>) value
-                        .get("testLabels");
-                Set<String> labels = labelsList == null ? Collections.EMPTY_SET
-                        : Sets.newHashSet(labelsList);
+                List<String> caseLabels = (List<String>) (List<?>) value.get("labels");
+                Set<String> labels = Sets.newHashSet();
+				if (suiteLabels != null) {
+					labels.addAll(suiteLabels);
+				}
+				if (caseLabels != null) {
+					labels.addAll(caseLabels);
+				}
 
                 List<String> caseBrowsers = (List<String>) (List<?>) value
                         .get("browsers");

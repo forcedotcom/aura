@@ -204,7 +204,7 @@
      */
     testTouchEndHandlerUsedWhenPresent:{
 	browsers:["IPAD"],
-	testLabels : ["UnAdaptableTest"],
+	labels : ["UnAdaptableTest"],
 	test: [
 	  //Both click handler and touch end handler defined     
 	  function(component){

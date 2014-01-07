@@ -19,7 +19,7 @@
      */
     testSimpleLazyLoading:{
         attributes:{start:0,end:2, slowFacet:true},
-        testLabels: [ "threadHostile" ],
+        labels : [ "threadHostile" ],
         test:function(cmp){
             var helper = cmp.getDef().getHelper();
             var items = cmp.find("lazy");
@@ -89,7 +89,7 @@
      */
     testLazyLoadingWithAttributeValues:{
         attributes:{start:0,end:4, fastFacet:true},
-        testLabels: [ "threadHostile" ],
+        labels : [ "threadHostile" ],
         test:function(cmp){
             var helper = cmp.getDef().getHelper();
             var iteration = cmp.find("iterationWithAttributes");
@@ -130,7 +130,7 @@
      */
     testSimpleLazyLoadingCscc:{
         attributes:{start:0,end:2, slowFacet:true},
-        testLabels: [ "threadHostile" ],
+        labels : [ "threadHostile" ],
         test:function(cmp){
             var helper = cmp.getDef().getHelper();
             var items = cmp.find("lazyCscc");
@@ -200,7 +200,7 @@
      */
     testLazyLoadingWithAttributeValuesCscc:{
         attributes:{start:0,end:4, fastFacet:true},
-        testLabels: [ "threadHostile" ],
+        labels : [ "threadHostile" ],
         test:function(cmp){
             var helper = cmp.getDef().getHelper();
             var iteration = cmp.find("iterationWithAttributesCscc");

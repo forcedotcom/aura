@@ -19,7 +19,8 @@
 		
 	doInit : function(cmp) {
 		//default to ASC
-    	this.updateSortOrderPicker(cmp, this.CONSTANTS.ASC);
+		this.DEFAULT_SORT_ORDER = this.CONSTANTS.ASC; 
+    	this.updateSortOrderPicker(cmp, this.DEFAULT_SORT_ORDER);
 		this.initSorterTrigger(cmp);
 		this.initDataProvider(cmp);		
 		this.triggerDataProvider(cmp);
@@ -52,16 +53,16 @@
 	initDataProvider: function(cmp) {
         var dataProviders = cmp.getValue("v.dataProvider").unwrap();
         
-        if (dataProviders && dataProviders.length && dataProviders.length > 0) {
+        if ($A.util.isArray(dataProviders)) {
         	var items, selectedItems;
+        	cmp._dataProviders = dataProviders;
             for (var i = 0; i < dataProviders.length; i++) {
             	//get initial values from dataprovider
-            	items = dataProviders[i].get('m.columns');            	 
-            	this.initItems(cmp, items, dataProviders[i].get('m.defaultOrderByList'));
+            	items = dataProviders[i].get('v.columns');            	 
+            	this.initItems(cmp, items, this.parseSortBy(cmp, dataProviders[i].get('v.sortBy')));
             	//add handler
                 dataProviders[i].addHandler("onchange", cmp, "c.handleDataChange");
             }
-            cmp._dataProviders = dataProviders;             
         }        
     },
     
@@ -75,18 +76,20 @@
 			var filteredItems = [], sList = [], fieldName, label;
 			if (selectedItems) {
 				for (var i=0; i< selectedItems.length; i++) {
-					cmp._sortOrderMap[selectedItems[i].fieldName] = selectedItems[i].ascending ? this.CONSTANTS.ASC : this.CONSTANTS.DESC;				
+					cmp._sortOrderMap[selectedItems[i].fieldName] = {order: selectedItems[i].ascending ? this.CONSTANTS.ASC : this.CONSTANTS.DESC, selected: true};				
 				}
 			}
 			var indx = 0;
 			for (var i=0; i<items.length; i++) {
 				if (typeof items[i].isSortable == 'undefined' || items[i].isSortable == true) {
 					fieldName = items[i].fieldName;
-					label = items[i].label;					
+					label = items[i].label;
+					
 					if (!cmp._sortOrderMap[fieldName]) {
 						//default to ASC order
-						cmp._sortOrderMap[fieldName] = this.CONSTANTS.ASC; 
+						cmp._sortOrderMap[fieldName] = {order: this.CONSTANTS.ASC, index: indx, selected: false}; 
 					} else {
+						cmp._sortOrderMap[fieldName].index = indx;
 						//add to selected list
 						sList.push({value: fieldName, label: label, index: indx});
 					}
@@ -96,10 +99,134 @@
 			}
 			
 			cmp._selectedItems = sList;
-			cmp._defaultOrderByList = sList;
 			cmp.getValue('v.items').setValue(filteredItems);			
 			this.updateSortedItemsLable(cmp);
 		}
+	},
+	
+	handleOnOpen : function(cmp) {
+		var items = cmp.getValue('v.items');		
+		if (cmp.get('v.visible')) {
+			return;
+		}		
+		this.attachEventHandler(cmp);		
+		var selected = this.getDefaultSortBy(cmp);
+		if (selected && selected.length > 0 && items && items.getLength() > 0) {
+			//update selected item sort orders
+			for (var i=0; i< selected.length; i++) {
+				if (cmp._sortOrderMap[selected[i].fieldName]) {
+					cmp._sortOrderMap[selected[i].fieldName].order = selected[i].ascending ? this.CONSTANTS.ASC : this.CONSTANTS.DESC;
+				}
+			}
+			//reset selectedItems to default
+			this.setSelectedItems(cmp, selected);
+			//select menu item
+			this.selectMenuItem(cmp, selected);
+			//focus on the first selected default item 
+			var index = selected[0].index;
+			if (items.unwrap()[index]) {
+				cmp.find('sorterMenuList').setValue("v.focusItemIndex", index);
+			}			
+		}
+		cmp.setValue('v.visible', true);
+		//fill up the rest of the screen with the menu list
+		var container = cmp.find('sorterContainer').getElement(),
+			header = cmp.find('headerBar').getElement(),
+			pickerCtEl = cmp.find('sortOrderPicker').getElement(),
+			menuListHeight = container.offsetHeight - header.offsetHeight - pickerCtEl.offsetHeight;
+		
+		cmp.find('sorterMenuList').getElement().style.height = menuListHeight + 'px';				
+	},
+	
+	handleOnCancel : function(cmp) {
+		this.removeEventHandler(cmp);
+		this.reset(cmp);
+		cmp.getValue('v.visible').setValue(false, true);
+		this.setVisible(cmp, false);
+		
+		var action = cmp.get('v.onCancel');
+        if (action) {
+        	action.runDeprecated();
+        }
+	},
+	
+	handleApply : function(cmp) {
+		this.removeEventHandler(cmp);
+		cmp.getValue('v.visible').setValue(false, true);
+		this.setVisible(cmp, false);
+		
+		var action = cmp.get('v.onApply');
+		if (action) {
+			var result = [], order;
+			var selectedItems = this.getSelectedItems(cmp);
+			for (var i=0; i < selectedItems.length; i++) {
+				// append prefix for descending order
+				order = cmp._sortOrderMap[selectedItems[i].fieldName].order === this.CONSTANTS.DESC ? this.CONSTANTS.DESC_PREFIX : '';
+				result.push(order + selectedItems[i].fieldName);
+			}			
+			action.runDeprecated(result);
+		}
+	},
+	
+	/**
+	 * Reset selected items and sort orders
+	 */
+	reset: function(cmp) {
+		//reset sort orders
+		var sMap = cmp._sortOrderMap;
+		for (var prop in sMap) {
+			if (sMap.hasOwnProperty(prop)) {
+				if (!sMap[prop].selected) {
+					sMap[prop].order = this.DEFAULT_SORT_ORDER;
+				}
+			}
+		}
+		//reset selected menu items
+		var menuItems = cmp.find('sorterMenuList').getValue('v.childMenuItems')		 
+		for (var i=0; i < menuItems.getLength(); i++) {			 
+			var item = menuItems.getValue(i);
+			if (item.get('v.selected') === true) {
+				item.getValue('v.selected').setValue(false, true);
+			}
+		}
+	},
+	
+	/**
+	 * Get default sortBy from data provider
+	 */
+	getDefaultSortBy: function(cmp) {		
+	    	//TODO: need to support multiple data providers
+		var sortBy = this.parseSortBy(cmp, cmp._dataProviders[0].get('v.sortBy'));
+		for (var i=0; i< sortBy.length; i++) {
+			if (cmp._sortOrderMap[sortBy[i].fieldName]) {
+				//update item index
+				sortBy[i].index = cmp._sortOrderMap[sortBy[i].fieldName].index; 
+			}
+		}
+		return sortBy;
+	},
+	    
+	/**
+	 * Parse sortBy string which are comma separated into an array of objects
+	 */
+	parseSortBy: function(cmp, sortBy) {
+		var ret = [];
+		if ($A.util.isString(sortBy)) {
+			sortBy = sortBy.split(',');
+			var fieldName;
+			for (var i=0; i<sortBy.length; i++) {
+				//fieldName starts with "-" prefix means descending
+	    		if (sortBy[i].indexOf(this.CONSTANTS.DESC_PREFIX) != -1) {
+	    			var fn = sortBy[i].substring(1); 
+	    			ret.push({fieldName: fn, ascending: false});
+	    		} else {
+	    			ret.push({fieldName: sortBy[i], ascending: true});
+	    		}
+			}
+		} else if ($A.util.isArray(sortBy)) {
+			ret = sortBy;
+		}
+		return ret;
 	},
      
     triggerDataProvider: function(cmp, index) {    	
@@ -123,10 +250,10 @@
 	},
 	
 	updateSelectedItemsSortOrder : function(cmp, order) {
-		var selectedItems = this.getSelectedItems(cmp);
+		var selectedItems = this.getSelectedMenuItems(cmp);
 		if (selectedItems) {
 			for (var i=0; i< selectedItems.length; i++) {
-				cmp._sortOrderMap[selectedItems[i].value] = order;
+				cmp._sortOrderMap[selectedItems[i].fieldName].order = order;
 			}
 		}
 	},
@@ -139,12 +266,12 @@
 			$A.util.addClass(cmp.find('decBtn').getElement(), "selected");
 			$A.util.removeClass(cmp.find('ascBtn').getElement(), "selected");
 		}
-		this.setCurrentSortOrder(order);
+		this.setCurrentSortOrder(cmp, order);
 		cmp.find('selectedSortOrderOutput').getValue('v.value').setValue(this.LABELS[order]);
 	},
 	
 	updateSortedItemsLable : function(cmp) {
-		var selectedItems = this.getSelectedItems(cmp);
+		var selectedItems = this.getSelectedMenuItems(cmp);
 		if (selectedItems && selectedItems.length > 0) {
 			var values = [];
 			for (var i=0; i<selectedItems.length; i++) {
@@ -168,7 +295,7 @@
 			for (var i = 0; i < menuItems.getLength(); i++) {
 				var c = menuItems.getValue(i);
 			    if (c.get('v.selected') === true) {			    	
-			    	values.push({value: c.get('v.value'), label: c.get('v.label'), index: i});
+			    	values.push({fieldName: c.get('v.value'), label: c.get('v.label'), index: i});
 			    }
 			}
 	    }
@@ -197,50 +324,17 @@
 		if (selectedItems && selectedItems.length > 0) {
 			var item;
 			for (var i = 0; i < selectedItems.length; i++) {
-				item = menuItems.getValue(selectedItems[i].index);
-				if (item) {
-					item.setValue('v.selected', true);
+				if (typeof selectedItems[i].index != 'undefined') {
+					item = menuItems.getValue(selectedItems[i].index);
+					if (item) {
+						item.setValue('v.selected', true);
+					}
 				}
 			}
 			this.updateSortedItemsLable(cmp);
 			//support single select only for now
-			this.updateSortOrderPicker(cmp, cmp._sortOrderMap[selectedItems[0].value]);
+			this.updateSortOrderPicker(cmp, cmp._sortOrderMap[selectedItems[0].fieldName].order);
 		}
-	},
-	
-	handleOnOpen : function(cmp) {
-		var items = cmp.getValue('v.items');
-		
-		if (cmp.get('v.visible')) {
-			return;
-		}
-		this.attachEventHandler(cmp);		
-		var selected = cmp._defaultOrderByList;
-		if (selected && selected.length > 0) {
-			//reset selectedItems to default
-			this.setSelectedItems(cmp, selected);
-			//select menu item
-			this.selectMenuItem(cmp, selected);
-			//focus on the first selected default item 
-			var index = selected[0].index;
-			if (items.unwrap()[index]) {
-				cmp.find('sorterMenuList').setValue("v.focusItemIndex", index);
-			}			
-		}
-		cmp.setValue('v.visible', true);
-		//fill up the rest of the screen with the menu list
-		var container = cmp.find('sorterContainer').getElement(),
-			header = cmp.find('headerBar').getElement(),
-			pickerCtEl = cmp.find('sortOrderPicker').getElement(),
-			menuListHeight = container.offsetHeight - header.offsetHeight - pickerCtEl.offsetHeight;
-		
-		cmp.find('sorterMenuList').getElement().style.height = menuListHeight + 'px';				
-	},
-	
-	handleOnClose : function(cmp) {
-		this.removeEventHandler(cmp);
-		cmp.getValue('v.visible').setValue(false, true);
-		this.setVisible(cmp, false);
 	},
 	
 	attachEventHandler : function(cmp) {
@@ -282,24 +376,6 @@
             }   	
     	}
     },
-	
-	handleApply : function(cmp) {
-		this.removeEventHandler(cmp);
-		cmp.getValue('v.visible').setValue(false, true);
-		this.setVisible(cmp, false);
-		
-		var action = cmp.get('v.onApply');
-		if (action) {
-			var result = [], order;
-			var selectedItems = this.getSelectedItems(cmp);
-			for (var i=0; i < selectedItems.length; i++) {
-				// append prefix for descending order
-				order = cmp._sortOrderMap[selectedItems[i].value] === this.CONSTANTS.DESC ? this.CONSTANTS.DESC_PREFIX : '';
-				result.push(order + selectedItems[i].value);
-			}			
-			action.runDeprecated(result);
-		}
-	},
 	
 	position : function(cmp) { 
     	if (cmp.get('v.modal')) {
@@ -371,9 +447,9 @@
                     return;
                 }
              
-                if (!helper.isElementInComponent(component.find('sorterContainer'), event.target)) {
+                if (!helper.isElementInComponent(component.find('sorterContainer'), event.target)) {                	
                     // Collapse the sorter
-                	 component.setValue("v.visible", false);
+                	helper.handleOnCancel(component);
                 }
                 
             };

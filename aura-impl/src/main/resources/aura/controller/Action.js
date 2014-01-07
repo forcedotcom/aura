@@ -18,7 +18,7 @@
  * A base class for an Aura Action to be passed to an associated component. An Action is created in a client-side or
  * server-side controller. Invoke an Action in a controller by declaring cmp.get("c.actionName"). Call a server-side
  * Action from a client-side controller.
- * 
+ *
  * @constructor
  * @param {Object}
  *            def The definition of the Action.
@@ -53,6 +53,12 @@ function Action(def, method, paramDefs, background, cmp, caboose) {
     this.storable = false;
     this.caboose = caboose;
     this.allAboardCallback = undefined;
+
+    this.pathStack = [];
+    this.canCreate = true;
+    // start with a body
+    this.pushCreationPath("body");
+    this.setCreationPathIndex(0);
 }
 
 Action.prototype.nextActionId = 1;
@@ -60,7 +66,7 @@ Action.prototype.auraType = "Action";
 
 /**
  * Gets the Action Id.
- * 
+ *
  * @private
  * @returns {string}
  */
@@ -73,7 +79,7 @@ Action.prototype.getId = function() {
 
 /**
  * Gets the next action scoped Id.
- * 
+ *
  * @private
  * @returns {string}
  */
@@ -84,12 +90,113 @@ Action.prototype.getNextGlobalId = function() {
     return this.nextGlobalId++;
 };
 
+// if a component is replacing the same-named component at the same level (eg provider)
+// this reactivates the path's error detection
+// so that is can request it's location again without reporting error
+Action.prototype.reactivatePath = function() {
+	this.canCreate = true;
+};
+
+Action.prototype.pushCreationPath = function(pathPart) {
+    var addedPath;
+    this.canCreate = true;
+    switch (pathPart) {
+    case "body" : pathPart = "*"; break;
+    case "realbody" : pathPart = "+"; break;
+    case "super" : pathPart = "$"; break;
+    }
+    addedPath = "/"+pathPart;
+    var pathEntry = { relPath: addedPath, idx: undefined, startIdx: undefined };
+    this.pathStack.push(pathEntry);
+};
+
+Action.prototype.popCreationPath = function(pathPart) {
+    var addedPath;
+    this.canCreate = false;
+    switch (pathPart) {
+    case "body" : pathPart = "*"; break;
+    case "realbody" : pathPart = "+"; break;
+    case "super" : pathPart = "$"; break;
+    }
+    addedPath = "/"+pathPart;
+    var last = this.pathStack.pop();
+    if (!last || last.relPath !== addedPath /*|| last.idx !== undefined*/) {
+        $A.warning("unexpected unwinding of pathStack.  found "
+            + (last ? (last.relPath + " idx " + last.idx  ) : "empty") + " expected "  + addedPath);
+    }
+    return last;
+};
+
+Action.prototype.topPath = function() {
+    var top = this.pathStack.length < 1 ? undefined : this.pathStack[this.pathStack.length - 1];
+    if (!top) {
+        $A.warning("Trying to look at empty stack");
+        return undefined;
+    }
+    return top;
+};
+
+Action.prototype.setCreationPathIndex = function(idx) {
+    this.canCreate = true;
+    var top = this.topPath();
+    if (top) {
+        // establish starting index
+        if (top.idx === undefined) {
+            top.startIdx = idx;
+            top.idx = idx;
+        }
+        else if (idx !== top.idx + 1) {
+            $A.log("Improper index increment");
+        } else {
+            top.idx = idx;
+        }
+    }
+    else {
+        $A.log("Attempting to increment index on empty stack");
+    }
+};
+
+/**
+ * Gets the current creatorPath from the top of the pathStack
+ *
+ * @private
+ * @returns {String}
+ */
+Action.prototype.getCurrentPath = function() {
+   var result = this.getId();
+   var size = this.pathStack.length;
+
+   if (!this.canCreate) {
+        $A.log("Not ready to create. path depth:" + size);
+   }
+   this.canCreate = false; // this will cause next call to getCurrentPath to fail if not popped
+
+   for (var i=0; i<size; i++) {
+       var entry = this.pathStack[i];
+       result += (entry.relPath + (entry.idx !== undefined ? ("~" + entry.idx) : ""  ));
+   }
+
+   return result;
+};
+
+/**
+ * Gets the current pathDepth from the top of the pathStack
+ *
+ * @private
+ * @returns {number}
+ */
+Action.prototype.getPathDepth = function() {
+   return this.pathStack.length;
+};
+
+
+
 /**
  * Gets the <code>ActionDef</code> object. Shorthand: <code>get("def")</code>
  * <p>
  * See Also: <a href="#reference?topic=api:ActionDef">ActionDef</a>
  * </p>
- * 
+ *
  * @public
  * @returns {ActionDef} The action definition, including its name, origin, and descriptor.
  */
@@ -99,9 +206,9 @@ Action.prototype.getDef = function() {
 
 /**
  * Adds a callback group for completion tracking.
- * 
+ *
  * If this action is already completed, <code>completeAction()</code> is called.
- * 
+ *
  * @private
  * @param {CallbackGroup} group
  *      the group to add
@@ -116,7 +223,7 @@ Action.prototype.addCallbackGroup = function(group) {
 
 /**
  * Marks this action as complete for all callback groups.
- * 
+ *
  * @private
  */
 Action.prototype.completeGroups = function() {
@@ -143,7 +250,7 @@ Action.prototype.setParams = function(config) {
 
 /**
  * Sets a single parameter for the Action.
- * 
+ *
  * @public
  * @param {!string}
  *            key the name of the parameter to set.
@@ -160,8 +267,8 @@ Action.prototype.setParam = function(key, value) {
 };
 
 /**
- * Gets an Action parameter. 
- * 
+ * Gets an Action parameter.
+ *
  * @public
  * @param {!string}
  *            name The name of the Action.
@@ -173,7 +280,7 @@ Action.prototype.getParam = function(name) {
 
 /**
  * Gets the collection of parameters for this Action.
- * 
+ *
  * @public
  * @returns {Object} The key/value pairs that specify the Action.
  */
@@ -183,7 +290,7 @@ Action.prototype.getParams = function() {
 
 /**
  * Gets the component for this Action.
- * 
+ *
  * @private
  * @returns {Component} the component, if any.
  */
@@ -197,7 +304,7 @@ Action.prototype.getComponent = function() {
  * <p>
  * See Also: <a href="#help?topic=serverSideControllers">Server-Side Controllers</a>
  * </p>
- * 
+ *
  * @public
  * @param {Object}
  *            scope The scope in which the function is executed.
@@ -275,10 +382,10 @@ Action.prototype.callAllAboardCallback = function () {
 
 /**
  * Wrap the current action callbacks to ensure that they get called before a given function.
- * 
+ *
  * This can be used to add additional functionality to the already existing callbacks, allowing the user to effectively
  * 'append' a function to the current one.
- * 
+ *
  * @private
  * @param {Object}
  *            scope the scope in which the new function should be called.
@@ -304,11 +411,11 @@ Action.prototype.wrapCallback = function(scope, callback) {
 /**
  * Deprecated. Note: This method is deprecated and should not be used. Instead, use the <code>enqueueAction</code>
  * method on the Aura type. For example, <code>$A.enqueueAction(action)</code>.
- * 
+ *
  * The deprecated run method runs client-side actions. Do not use it for running server-side actions.
- * 
+ *
  * If you must have synchronous execution, you can temporarily use runDeprecated.
- * 
+ *
  * @deprecated
  * @public
  * @param {Event}
@@ -320,10 +427,10 @@ Action.prototype.run = function(evt) {
 
 /**
  * Deprecated. Run an action immediately.
- * 
+ *
  * This function should only be used for old code that requires inline execution of actions. Note that the code then
  * must know if the action is client side or server side, since server side actions cannot be executed inline.
- * 
+ *
  * @deprecated
  * @public
  * @param {Event}
@@ -346,7 +453,7 @@ Action.prototype.runDeprecated = function(evt) {
 
 /**
  * Gets the current state of the Action.
- * 
+ *
  * @public
  * @returns {string} Possible values are "NEW", "RUNNING", and "FAILURE".
  */
@@ -356,7 +463,7 @@ Action.prototype.getState = function() {
 
 /**
  * Gets the return value of the Action. A server-side Action can return any object containing serializable JSON data.<br/>
- * 
+ *
  * @public
  */
 Action.prototype.getReturnValue = function() {
@@ -368,7 +475,7 @@ Action.prototype.getReturnValue = function() {
  * <p>
  * For example, <code>$A.message(action.getError().message);</code> logs the error message.
  * </p>
- * 
+ *
  * @public
  */
 Action.prototype.getError = function() {
@@ -377,7 +484,7 @@ Action.prototype.getError = function() {
 
 /**
  * Returns true if the actions should be enqueued in the background, false if it should be run in the foreground.
- * 
+ *
  * @public
  */
 Action.prototype.isBackground = function() {
@@ -387,7 +494,7 @@ Action.prototype.isBackground = function() {
 /**
  * Sets the action to run as a background action. This cannot be unset. Background actions are usually long running and
  * lower priority actions.
- * 
+ *
  * @public
  */
 Action.prototype.setBackground = function() {
@@ -397,11 +504,11 @@ Action.prototype.setBackground = function() {
 /**
  * Deprecated. Note: This method is deprecated and should not be used. Instead, use the <code>enqueueAction</code>
  * method on the Aura type. For example, <code>$A.enqueueAction(action)</code>.
- * 
+ *
  * The deprecated <code>runAfter</code> method adds a specified server-side action to the action queue. It is for
  * server-side actions only. For example, <code>this.runAfter(serverAction);</code> sends the action to the server and
  * runs the callback when the server action completes (if the action was not aborted).
- * 
+ *
  * @deprecated
  * @public
  * @param {Action}
@@ -415,7 +522,7 @@ Action.prototype.runAfter = function(action) {
 
 /**
  * Update the fields from a response.
- * 
+ *
  * @private
  * @param {Object}
  *            response The response from the server.
@@ -463,7 +570,7 @@ Action.prototype.updateFromResponse = function(response) {
     } else if (this.originalResponse && this.state === "SUCCESS") {
         // Compare the refresh response with the original response and return false if they are equal (no update)
         this.sanitizeStoredResponse(this.originalResponse);
-        
+
         var originalValue = $A.util.json.encode(this.originalResponse["returnValue"]);
         var refreshedValue = $A.util.json.encode(response["returnValue"]);
         if (refreshedValue === originalValue) {
@@ -480,9 +587,9 @@ Action.prototype.updateFromResponse = function(response) {
 
 /**
  * Gets a storable response from this action.
- * 
+ *
  * WARNING: Use after finishAction() since getStored() modifies <code>this.components</code>.
- * 
+ *
  * @private
  * @param {string}
  *            storageName the name of the storage to use.
@@ -514,7 +621,7 @@ Action.prototype.getStored = function(storageName) {
 
 /**
  * Calls callbacks and fires events upon completion of the action.
- * 
+ *
  * @private
  * @param {Object}
  *            context the context for pushing and popping the current action.
@@ -561,7 +668,7 @@ Action.prototype.finishAction = function(context) {
 
 /**
  * Mark this action as aborted.
- * 
+ *
  * @private
  */
 Action.prototype.abort = function() {
@@ -571,7 +678,7 @@ Action.prototype.abort = function() {
 
 /**
  * Marks the Action as abortable. For server-side Actions only.
- * 
+ *
  * @public
  */
 Action.prototype.setAbortable = function() {
@@ -580,7 +687,7 @@ Action.prototype.setAbortable = function() {
 
 /**
  * Checks if this action is a refresh.
- * 
+ *
  * @private
  */
 Action.prototype.isRefreshAction = function() {
@@ -589,7 +696,7 @@ Action.prototype.isRefreshAction = function() {
 
 /**
  * Checks if the function is abortable. For server-side Actions only.
- * 
+ *
  * @public
  * @returns {Boolean} The function is abortable (true), or false otherwise.
  */
@@ -600,7 +707,7 @@ Action.prototype.isAbortable = function() {
 /**
  * An exclusive Action is processed on an XMLHttpRequest of its own. <code>a.setExclusive(true)</code> and
  * <code>a.setExclusive()</code> are the same. For server-side Actions only.
- * 
+ *
  * @public
  * @param {Object}
  *            val
@@ -612,7 +719,7 @@ Action.prototype.setExclusive = function(val) {
 
 /**
  * Returns true if a given function is exclusive, or false otherwise.
- * 
+ *
  * @public
  * @returns {Boolean}
  */
@@ -625,7 +732,7 @@ Action.prototype.isExclusive = function() {
  * <p>
  * See Also: <a href="#help?topic=auraStorageService">Aura Storage Service</a>
  * </p>
- * 
+ *
  * @public
  * @param {Object}
  *            config Optional. A set of key/value pairs that specify the storage options to set. You can set the
@@ -645,7 +752,7 @@ Action.prototype.setStorable = function(config) {
 
 /**
  * Returns true if the function is storable, or false otherwise. For server-side Actions only.
- * 
+ *
  * @public
  * @returns {Boolean}
  */
@@ -661,7 +768,7 @@ Action.prototype.isStorable = function() {
  * an XHR request. This action will not be sent to the server until there is some other action
  * that would cause a server round-trip. This can be a little dangerous, as the this will queue
  * forever if nothing goes to the server.
- * 
+ *
  * @public
  */
 Action.prototype.setCaboose = function() {
@@ -671,7 +778,7 @@ Action.prototype.setCaboose = function() {
 
 /**
  * Returns true if the function should not create an XHR request.
- * 
+ *
  * @public
  * @returns {boolean}
  */
@@ -688,7 +795,7 @@ Action.prototype._isStorable = function() {
 
 /**
  * Gets the storage key in name-value pairs.
- * 
+ *
  * @private
  */
 Action.prototype.getStorageKey = function() {
@@ -697,7 +804,7 @@ Action.prototype.getStorageKey = function() {
 
 /**
  * Returns true if a given function is from the current storage, or false otherwise.
- * 
+ *
  * @public
  * @returns {Boolean}
  */
@@ -707,7 +814,7 @@ Action.prototype.isFromStorage = function() {
 
 /**
  * Chains a function to run after the current Action. For server-side Actions only.
- * 
+ *
  * @public
  */
 Action.prototype.setChained = function() {
@@ -717,7 +824,7 @@ Action.prototype.setChained = function() {
 
 /**
  * Returns true if a given function is chained, or false otherwise. For server-side Actions only.
- * 
+ *
  * @private
  * @returns {Boolean}
  */
@@ -727,7 +834,7 @@ Action.prototype.isChained = function() {
 
 /**
  * Returns the key/value pairs of the Action id, descriptor, and parameters in JSON format.
- * 
+ *
  * @public
  */
 Action.prototype.toJSON = function() {
@@ -740,7 +847,7 @@ Action.prototype.toJSON = function() {
 
 /**
  * Mark the current action as incomplete.
- * 
+ *
  * @private
  */
 Action.prototype.incomplete = function(context) {
@@ -753,16 +860,16 @@ Action.prototype.incomplete = function(context) {
 
 /**
  * Refreshes the Action. Used with storage.
- * 
+ *
  * @private
  */
 Action.prototype.getRefreshAction = function(originalResponse) {
     var storage = originalResponse["storage"];
     var storageService = this.getStorage();
-    var autoRefreshInterval = 
+    var autoRefreshInterval =
             (this.storableConfig && !$A.util.isUndefined(this.storableConfig["refresh"])
              && $A.util.isNumber(this.storableConfig["refresh"]))
-                    ? this.storableConfig["refresh"] * 1000 
+                    ? this.storableConfig["refresh"] * 1000
                     : storageService.getDefaultAutoRefreshInterval();
 
     // Only auto refresh if the data we have is more than
@@ -778,19 +885,19 @@ Action.prototype.getRefreshAction = function(originalResponse) {
         if (executeCallbackIfUpdated !== false) {
             refreshAction.callbacks = this.callbacks;
         }
-        
+
         refreshAction.setParams(this.params);
         refreshAction.setStorable({
             "ignoreExisting" : true
         });
-        
+
         refreshAction.abortable = this.abortable;
         refreshAction.sanitizeStoredResponse(originalResponse);
         refreshAction.originalResponse = originalResponse;
-        
+
         return refreshAction;
     }
-    
+
     return null;
 };
 
@@ -825,7 +932,7 @@ Action.prototype.sanitizePartialConfig = function(pc, suffix) {
 
 /**
  * Sanitize generation number references to allow actions to be replayed w/out globalId conflicts.
- * 
+ *
  * @private
  */
 Action.prototype.sanitizeStoredResponse = function(response) {
@@ -833,7 +940,7 @@ Action.prototype.sanitizeStoredResponse = function(response) {
     var globalId;
     var suffix = this.getId();
     var pc;
-    
+
     var components = response["components"];
     for (globalId in components) {
         pc = this.sanitizePartialConfig(components[globalId], suffix);
@@ -850,7 +957,7 @@ Action.prototype.sanitizeStoredResponse = function(response) {
 
 /**
  * Gets the Action storage.
- * 
+ *
  * @private
  * @returns {Storage}
  */
@@ -860,7 +967,7 @@ Action.prototype.getStorage = function() {
 
 /**
  * Uses the event object in the action's response and fires the event.
- * 
+ *
  * @private
  */
 Action.prototype.parseAndFireEvent = function(evtObj) {
@@ -883,7 +990,7 @@ Action.prototype.parseAndFireEvent = function(evtObj) {
 
 /**
  * Fire off a refresh event if there is a valid component listener.
- * 
+ *
  * @private
  */
 Action.prototype.fireRefreshEvent = function(event) {

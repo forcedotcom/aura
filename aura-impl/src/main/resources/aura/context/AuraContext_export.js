@@ -19,6 +19,7 @@ exp(p,
     "getMode", p.getMode,
     "incrementTransaction", p.incrementTransaction,
     "getApp", p.getApp,
+    "getCurrentAction", p.getCurrentAction,
     "setCurrentAction", p.setCurrentAction,
     "getGlobalValueProviders", p.getGlobalValueProviders,
     "clearComponentConfigs", p.clearComponentConfigs

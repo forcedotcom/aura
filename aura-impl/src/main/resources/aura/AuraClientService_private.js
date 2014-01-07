@@ -254,7 +254,7 @@ var priv = {
 
             if (noAbort || !action.isAbortable()) {
                 if (needUpdate) {
-                    action.finishAction($A.getContext());
+                	action.finishAction($A.getContext());
                 }
                 if (action.isRefreshAction()) {
                     action.fireRefreshEvent("refreshEnd");

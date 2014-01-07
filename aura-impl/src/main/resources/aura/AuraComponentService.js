@@ -192,6 +192,7 @@ $A.ns.AuraComponentService.prototype.newComponentAsync = function(callbackScope,
     $A.assert(config, "config is required in ComponentService.newComponentAsync(config)");
     $A.assert($A.util.isFunction(callback),"newComponentAsync requires a function as the callback parameter");
 
+    //TODO - arrays are incorrectly created synchronously in all cases. 
     if ($A.util.isArray(config)){
         return this.newComponentArray(config, attributeValueProvider, localCreation, doForce);
     }

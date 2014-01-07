@@ -201,11 +201,13 @@ AuraContext.prototype.getNextGlobalId = function() {
 
 /**
  * @private
+ *
+ * @param {string} creationPath the creation path to look up.
  */
-AuraContext.prototype.getComponentConfig = function(globalId) {
+AuraContext.prototype.getComponentConfig = function(creationPath) {
     var componentConfigs = this.componentConfigs;
-    var ret = componentConfigs[globalId];
-    delete componentConfigs[globalId];
+    var ret = componentConfigs[creationPath];
+    delete componentConfigs[creationPath];
     return ret;
 };
 
@@ -224,6 +226,8 @@ AuraContext.prototype.getApp = function() {
  *      actionId the id of the action that we are joining in (used to amend the creationPath).
  */
 AuraContext.prototype.joinComponentConfigs = function(otherComponentConfigs, actionId) {
+    var cP;
+
     if (otherComponentConfigs) {
         for ( var k in otherComponentConfigs) {
             if (otherComponentConfigs.hasOwnProperty(k)) {
@@ -232,10 +236,54 @@ AuraContext.prototype.joinComponentConfigs = function(otherComponentConfigs, act
                 if (def) {
                     componentService.getDef(def);
                 }
-                this.componentConfigs[k] = config;
+                cP = config["creationPath"];
+                this.componentConfigs[cP] = config;
             }
         }
     }
+};
+
+/**
+ * Internal routine to clear out component configs to factor out common code.
+ *
+ * @private
+ * @param {string} actionId the action id that we should clear.
+ * @param {logit} should we log as we go? including errors.
+ * @return {number} the count of component configs removed.
+ */
+AuraContext.prototype.internalClear = function(actionId, logit) {
+    var count = 0;
+    var removed = 0;
+    var error = "";
+    var prefix = actionId+"/";
+    var len = prefix.length;
+    var ccs = this.componentConfigs;
+
+    for ( var k in ccs ) {
+        if (ccs.hasOwnProperty(k) && (k === actionId || k.substr(0,len) === prefix)) {
+            removed += 1;
+            if (logit) {
+                $A.log("config not consumed: "+k, ccs[k]);
+                delete ccs[k];
+                if (error !== "") {
+                    error = error+", ";
+                }
+                error = error + k;
+            }
+        } else {
+            count += 1;
+        }
+    }
+    if (error !== "") {
+        $A.warning("unused configs for "+actionId+": "+error);
+    }
+    if (count === 0) {
+        this.componentConfigs = {};
+    } else if (logit) {
+        $A.log("leftover configs ", ccs);
+        $A.error("leftover configs");
+    }
+    return removed;
 };
 
 /**
@@ -251,37 +299,10 @@ AuraContext.prototype.joinComponentConfigs = function(otherComponentConfigs, act
  * you may _not_ delay creating components.
  *
  * @private
- * @param {string}
- *      actionId the id of the action to strip out.
+ * @param {string} actionId the action id that we should clear.
  */
 AuraContext.prototype.finishComponentConfigs = function(actionId) {
-    var count = 0;
-    var ccs = this.componentConfigs;
-    var suffix = ":"+actionId;
-    var len = suffix.length;
-    var error = "";
-
-    for ( var k in ccs ) {
-        if (ccs.hasOwnProperty(k) && k.substr(-len) === suffix) {
-            $A.log("config not consumed: "+k, ccs[k]);
-            delete ccs[k];
-            if (error !== "") {
-                error = error+",";
-            }
-            error = error + k;
-        } else {
-            count += 1;
-        }
-    }
-    if (error !== "") {
-        $A.error(error);
-    }
-    if (count === 0) {
-        this.componentConfigs = {};
-    } else {
-        $A.log("leftover configs ", ccs);
-        $A.error("leftover configs");
-    }
+    this.internalClear(actionId, true);
 };
 
 /**
@@ -292,36 +313,11 @@ AuraContext.prototype.finishComponentConfigs = function(actionId) {
  * them on the floor to be garbage collected.
  *
  * @public
- * @param {string}
- *      actionId the action id that we should clear.
+ * @param {string} actionId the action id that we should clear.
  * @return {number} the count of component configs removed.
  */
 AuraContext.prototype.clearComponentConfigs = function(actionId) {
-    var removed = 0;
-    var count = 0;
-    var ccs = this.componentConfigs;
-    var suffix = ":"+actionId;
-    var len = suffix.length;
-    var offset;
-
-    for ( var k in ccs ) {
-        //
-        // Have a care with this. IE7 does not handle negative offsets
-        // to substr, so this must actually calculate the offset rather
-        // than using -len.
-        //
-        offset = k.length - len;
-        if (ccs.hasOwnProperty(k) && k.substr(offset) === suffix) {
-            removed += 1;
-            delete ccs[k];
-        } else {
-            count += 1;
-        }
-    }
-    if (count === 0) {
-        this.componentConfigs = {};
-    }
-    return removed;
+    return this.internalClear(actionId, false);
 };
 
 /**
@@ -373,7 +369,8 @@ AuraContext.prototype.setCurrentAction = function(action) {
 };
 
 /**
- * @private
+ * EBA - temporarily made public for helpers to obtain action - return to private when current visibility is determined
+ * @public
  */
 AuraContext.prototype.getCurrentAction = function(action) {
     return this.currentAction;

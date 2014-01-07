@@ -357,11 +357,11 @@ ArrayValue.prototype.each = function(func, reverse) {
     var i;
     if (reverse) {
         for(i = a.length - 1; i >= 0; i--){
-            func(a[i]);
+            func(a[i],i);
         }
     } else {
         for(i = 0; i < a.length; i++){
-            func(a[i]);
+            func(a[i],i);
         }
     }
 };

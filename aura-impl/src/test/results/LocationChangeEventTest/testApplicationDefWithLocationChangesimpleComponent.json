@@ -1146,6 +1146,6 @@ function(value) {
       }
     },
     "globalId":"1",
-    "creationPath":"fakeActionId"
+    "creationPath":"fakeActionId/*~0"
   }
 }

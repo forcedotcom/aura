@@ -43,6 +43,8 @@ import org.auraframework.system.Client;
 import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.test.TestContext;
 import org.auraframework.test.TestContextAdapter;
+
+import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.InvalidEventTypeException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.BaseJsonSerializationContext;
@@ -432,7 +434,14 @@ public class AuraContextImpl implements AuraContext {
         if (action != null) {
             action.registerComponent(component);
         } else {
-            componentRegistry.put(component.getGlobalId(), component);
+            //
+            // This assertion should work, but we can build attributes
+            // more than once, especially for default values.
+            //
+            if (componentRegistry.containsKey(component.getPath())) {
+                //throw new AuraRuntimeException("duplicate component path"+component.getPath());
+            }
+            componentRegistry.put(component.getPath(), component);
         }
     }
 

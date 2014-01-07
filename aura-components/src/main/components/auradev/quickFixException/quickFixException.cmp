@@ -16,7 +16,9 @@
 
 -->
 <aura:component template="auradev:quickFixTemplate">
-    <aura:dependency resource="markup://auradev:*" />
+    <aura:dependency resource="markup://auradev:*QuickFix" />
+    <aura:dependency resource="markup://auradev:quickFix*" />
+    <aura:dependency resource="markup://aura:*" />
     <aura:attribute name="exception" type="java://org.auraframework.throwable.quickfix.QuickFixException" />
 
     <div class="content">

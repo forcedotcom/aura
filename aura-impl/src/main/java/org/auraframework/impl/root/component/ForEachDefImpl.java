@@ -83,7 +83,7 @@ public class ForEachDefImpl extends ComponentDefRefImpl implements ForEachDef {
 
             AuraContext context = Aura.getContextService().getCurrentContext();
             context.getInstanceStack().pushInstance(valueProvider);
-            context.getInstanceStack().setAttributeName("foreach");
+            context.getInstanceStack().setAttributeName("realbody");
             int idx = 0;
             for (Object o : iterable) {
                 context.getInstanceStack().setAttributeIndex(idx);
@@ -102,7 +102,7 @@ public class ForEachDefImpl extends ComponentDefRefImpl implements ForEachDef {
                 context.getInstanceStack().clearAttributeIndex(idx);
                 idx += 1;
             }
-            context.getInstanceStack().clearAttributeName("foreach");
+            context.getInstanceStack().clearAttributeName("realbody");
             context.getInstanceStack().popInstance(valueProvider);
         }
         return ret;

@@ -45,4 +45,12 @@
     It also takes in a required <code>callback</code> function that returns your newly created component, and a required <code>config</code> object, which provides the component descriptor and attributes.
     </p>
     <auradocs:info>See the <auradocs:referenceTopicLink topic="api:AuraComponentService">JavaScript API reference</auradocs:referenceTopicLink> for a full list of arguments.</auradocs:info>
-</aura:component>
+    
+    <h2>Discussion</h2>
+    <p>Server-side dependencies include server-side models, renderers, controllers, or providers for the component and its super components.
+    A component with server-side dependencies will be created on the server, even if it's preloaded.
+    If there are no server dependencies and the definition already exists on the client via preloading or declared dependencies, Aura doesn't make a server trip.</p>
+    <p>If a component isn't preloaded and is created on the server the first time, Aura caches the definition in the registry.	
+    Using <code>$A.newCmpAsync</code> ensures that all server dependencies are recognized, and Aura makes a server call even though it has a cached definition of the component.
+    </p>
+    </aura:component>

@@ -27,7 +27,7 @@ import org.openqa.selenium.*;
  * UI automation for ui:ListSorter.
  * @userStory a07B0000000USVf
  */
-@TargetBrowsers({BrowserType.GOOGLECHROME, BrowserType.FIREFOX})
+@TargetBrowsers({BrowserType.GOOGLECHROME, BrowserType.FIREFOX, BrowserType.IE7})
 public class ListSorterUITest extends WebDriverTestCase{
 
 	public static final String APP = "/uitest/listSorter_Test.cmp";
@@ -43,9 +43,8 @@ public class ListSorterUITest extends WebDriverTestCase{
 	 * Test case for W-1985435
 	 * @throws MalformedURLException
 	 * @throws URISyntaxException
-	 * TODO: Uncomment the test after W-1985435 is fixed
 	 */
-	public void _testTabOutOfListSorter() throws MalformedURLException, URISyntaxException {
+	public void testTabOutOfListSorter() throws MalformedURLException, URISyntaxException {
 		verifyTabOutAndEscBehaviour(Keys.TAB, true);
 	}
 	

@@ -32,11 +32,7 @@
 	},
 	
 	onCancel: function(cmp, evt, helper) {
-		helper.handleOnClose(cmp);
-		var action = cmp.get('v.onCancel');
-        if (action) {
-        	action.runDeprecated();
-        }
+		helper.handleOnCancel(cmp);
 	},
 	
 	onMenuExpand: function(cmp, evt, helper) {
@@ -58,7 +54,7 @@
 		
 		helper.setSelectedItems(cmp, helper.getSelectedMenuItems(cmp));
 		helper.updateSortedItemsLable(cmp);
-		helper.updateSortOrderPicker(cmp, cmp._sortOrderMap[selectedValue]);
+		helper.updateSortOrderPicker(cmp, cmp._sortOrderMap[selectedValue].order);
 	},
 	
 	onAsc : function(cmp, evt, helper) {

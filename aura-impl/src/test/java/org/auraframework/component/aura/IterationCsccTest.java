@@ -15,9 +15,7 @@
  */
 package org.auraframework.component.aura;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
@@ -25,9 +23,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.instance.Component;
 import org.auraframework.throwable.AuraExecutionException;
-import org.auraframework.throwable.quickfix.InvalidExpressionException;
-import org.auraframework.throwable.quickfix.InvalidReferenceException;
-import org.auraframework.throwable.quickfix.MissingRequiredAttributeException;
+import org.auraframework.throwable.quickfix.*;
 import org.junit.Ignore;
 
 import com.google.common.collect.Lists;
@@ -52,7 +48,7 @@ public class IterationCsccTest extends AuraImplTestCase {
     }
 
     public void testItemsMissing() throws Exception {
-        String source = "<aura:iterationCscc var='x'>lalala</aura:iterationCscc>";
+        String source = "<aura:iteration var='x'>lalala</aura:iteration>";
         try {
             getIterationComponent(source, null);
             fail("Expected MissingRequiredAttributeException");
@@ -62,7 +58,7 @@ public class IterationCsccTest extends AuraImplTestCase {
     }
 
     public void testItemsNull() throws Exception {
-        String source = "<aura:iterationCscc items='{!v.items}' var='x'>{!x}lalala</aura:iterationCscc>";
+        String source = "<aura:iteration items='{!v.items}' var='x'>{!x}lalala</aura:iteration>";
         Map<String, Object> attributes = Maps.newHashMap();
         attributes.put("items", null);
         Component iteration = getIterationComponent(source, attributes);
@@ -70,7 +66,7 @@ public class IterationCsccTest extends AuraImplTestCase {
     }
 
     public void testItemsEmpty() throws Exception {
-        String source = "<aura:iterationCscc items='{!v.items}' var='x'>{!x}lalala</aura:iterationCscc>";
+        String source = "<aura:iteration items='{!v.items}' var='x'>{!x}lalala</aura:iteration>";
         Map<String, Object> attributes = Maps.newHashMap();
         attributes.put("items", Collections.EMPTY_LIST);
         Component iteration = getIterationComponent(source, attributes);
@@ -78,7 +74,7 @@ public class IterationCsccTest extends AuraImplTestCase {
     }
 
     public void testVarMissing() throws Exception {
-        String source = "<aura:iterationCscc items='{!v.items}'>G</aura:iterationCscc>";
+        String source = "<aura:iteration items='{!v.items}'>G</aura:iteration>";
         Map<String, Object> attributes = Maps.newHashMap();
         attributes.put("items", Lists.newArrayList("q", "r", "s"));
         try {
@@ -91,7 +87,7 @@ public class IterationCsccTest extends AuraImplTestCase {
     }
 
     public void testVarEmpty() throws Exception {
-        String source = "<aura:iterationCscc items='{!v.items}' var='' indexVar='i'>{!i}</aura:iterationCscc>";
+        String source = "<aura:iteration items='{!v.items}' var='' indexVar='i'>{!i}</aura:iteration>";
         Map<String, Object> attributes = Maps.newHashMap();
         attributes.put("items", Lists.newArrayList("q", "r", "s"));
         Component iteration = getIterationComponent(source, attributes);
@@ -100,7 +96,7 @@ public class IterationCsccTest extends AuraImplTestCase {
 
     @Ignore("W-1300971")
     public void _testVarInvalid() throws Exception {
-        String source = "<aura:iterationCscc items='{!v.items}' var='99bottles'>{!99bottles}</aura:iterationCscc>";
+        String source = "<aura:iteration items='{!v.items}' var='99bottles'>{!99bottles}</aura:iteration>";
         Map<String, Object> attributes = Maps.newHashMap();
         attributes.put("items", Lists.newArrayList("q", "r", "s"));
         Component iteration = getIterationComponent(source, attributes);
@@ -109,7 +105,7 @@ public class IterationCsccTest extends AuraImplTestCase {
 
     @Ignore("W-1300971")
     public void _testVarWithPeriod() throws Exception {
-        String source = "<aura:iterationCscc items='{!v.items}' var='my.prop'>{!my.prop}</aura:iterationCscc>";
+        String source = "<aura:iteration items='{!v.items}' var='my.prop'>{!my.prop}</aura:iteration>";
         Map<String, Object> attributes = Maps.newHashMap();
         attributes.put("items", Lists.newArrayList("q", "r", "s"));
         Component iteration = getIterationComponent(source, attributes);
@@ -117,7 +113,7 @@ public class IterationCsccTest extends AuraImplTestCase {
     }
 
     public void testVarShadow() throws Exception {
-        String source = "<aura:attribute name='other' type='String' default='huzzah'/><aura:iterationCscc items='{!v.items}' var='v' indexVar='i'>{!i}{!v}|</aura:iterationCscc>";
+        String source = "<aura:attribute name='other' type='String' default='huzzah'/><aura:iteration items='{!v.items}' var='v' indexVar='i'>{!i}{!v}|</aura:iteration>";
         Map<String, Object> attributes = Maps.newHashMap();
         attributes.put("items", Lists.newArrayList("q", "r", "s"));
         Component iteration = getIterationComponent(source, attributes);
@@ -125,7 +121,7 @@ public class IterationCsccTest extends AuraImplTestCase {
     }
 
     public void testVarShadowError() throws Exception {
-        String source = "<aura:attribute name='other' type='String' default='huzzah'/><aura:iterationCscc items='{!v.items}' var='v' indexVar='i'>{!i}{!v}{!v.other}|</aura:iterationCscc>";
+        String source = "<aura:attribute name='other' type='String' default='huzzah'/><aura:iteration items='{!v.items}' var='v' indexVar='i'>{!i}{!v}{!v.other}|</aura:iteration>";
         Map<String, Object> attributes = Maps.newHashMap();
         attributes.put("items", Lists.newArrayList("q", "r", "s"));
         Component iteration = getIterationComponent(source, attributes);
@@ -138,7 +134,7 @@ public class IterationCsccTest extends AuraImplTestCase {
     }
 
     public void testIndexVarEmpty() throws Exception {
-        String source = "<aura:iterationCscc items='{!v.items}' var='x' indexVar=''>{!x}</aura:iterationCscc>";
+        String source = "<aura:iteration items='{!v.items}' var='x' indexVar=''>{!x}</aura:iteration>";
         Map<String, Object> attributes = Maps.newHashMap();
         attributes.put("items", Lists.newArrayList("q", "r", "s"));
         Component iteration = getIterationComponent(source, attributes);
@@ -147,7 +143,7 @@ public class IterationCsccTest extends AuraImplTestCase {
 
     @Ignore("W-1300971")
     public void _testIndexVarInvalid() throws Exception {
-        String source = "<aura:iterationCscc items='{!v.items}' var='x' indexVar='99bottles'>{!99bottles}</aura:iterationCscc>";
+        String source = "<aura:iteration items='{!v.items}' var='x' indexVar='99bottles'>{!99bottles}</aura:iteration>";
         Map<String, Object> attributes = Maps.newHashMap();
         attributes.put("items", Lists.newArrayList("q", "r", "s"));
         Component iteration = getIterationComponent(source, attributes);
@@ -156,7 +152,7 @@ public class IterationCsccTest extends AuraImplTestCase {
 
     @Ignore("W-1300971")
     public void _testIndexVarWithPeriod() throws Exception {
-        String source = "<aura:iterationCscc items='{!v.items}' var='x' indexVar='my.prop'>{!my.prop}</aura:iterationCscc>";
+        String source = "<aura:iteration items='{!v.items}' var='x' indexVar='my.prop'>{!my.prop}</aura:iteration>";
         Map<String, Object> attributes = Maps.newHashMap();
         attributes.put("items", Lists.newArrayList("q", "r", "s"));
         Component iteration = getIterationComponent(source, attributes);
@@ -164,7 +160,7 @@ public class IterationCsccTest extends AuraImplTestCase {
     }
 
     public void testIndexVarShadow() throws Exception {
-        String source = "<aura:attribute name='other' type='String' default='huzzah'/><aura:iterationCscc items='{!v.items}' var='x' indexVar='v'>{!x}{!v}|</aura:iterationCscc>";
+        String source = "<aura:attribute name='other' type='String' default='huzzah'/><aura:iteration items='{!v.items}' var='x' indexVar='v'>{!x}{!v}|</aura:iteration>";
         Map<String, Object> attributes = Maps.newHashMap();
         attributes.put("items", Lists.newArrayList("q", "r", "s"));
         Component iteration = getIterationComponent(source, attributes);
@@ -172,7 +168,7 @@ public class IterationCsccTest extends AuraImplTestCase {
     }
 
     public void testIndexVarShadowError() throws Exception {
-        String source = "<aura:attribute name='other' type='String' default='huzzah'/><aura:iterationCscc items='{!v.items}' var='x' indexVar='v'>{!x}{!v}{!v.other}|</aura:iterationCscc>";
+        String source = "<aura:attribute name='other' type='String' default='huzzah'/><aura:iteration items='{!v.items}' var='x' indexVar='v'>{!x}{!v}{!v.other}|</aura:iteration>";
         Map<String, Object> attributes = Maps.newHashMap();
         attributes.put("items", Lists.newArrayList("q", "r", "s"));
         Component iteration = getIterationComponent(source, attributes);
@@ -185,7 +181,7 @@ public class IterationCsccTest extends AuraImplTestCase {
     }
 
     public void testStartGreaterThanLength() throws Exception {
-        String source = "<aura:iterationCscc start='4' items='{!v.items}' var='x' indexVar='i'>{!i}{!x+'|'}</aura:iterationCscc>";
+        String source = "<aura:iteration start='4' items='{!v.items}' var='x' indexVar='i'>{!i}{!x+'|'}</aura:iteration>";
         Map<String, Object> attributes = Maps.newHashMap();
         attributes.put("items", Lists.newArrayList("q", "r", "s"));
         Component iteration = getIterationComponent(source, attributes);
@@ -193,7 +189,7 @@ public class IterationCsccTest extends AuraImplTestCase {
     }
 
     public void testStartNegative() throws Exception {
-        String source = "<aura:iterationCscc items='{!v.items}' var='x' indexVar='i' start='-9'>{!i}{!x+'|'}</aura:iterationCscc>";
+        String source = "<aura:iteration items='{!v.items}' var='x' indexVar='i' start='-9'>{!i}{!x+'|'}</aura:iteration>";
         Map<String, Object> attributes = Maps.newHashMap();
         attributes.put("items", Lists.newArrayList("q", "r", "s"));
         Component iteration = getIterationComponent(source, attributes);
@@ -201,7 +197,7 @@ public class IterationCsccTest extends AuraImplTestCase {
     }
 
     public void testStartGreaterThanEnd() throws Exception {
-        String source = "<aura:iterationCscc start='1' end='0' items='{!v.items}' var='x' indexVar='i'>{!i}{!x+'|'}</aura:iterationCscc>";
+        String source = "<aura:iteration start='1' end='0' items='{!v.items}' var='x' indexVar='i'>{!i}{!x+'|'}</aura:iteration>";
         Map<String, Object> attributes = Maps.newHashMap();
         attributes.put("items", Lists.newArrayList("q", "r", "s"));
         Component iteration = getIterationComponent(source, attributes);
@@ -209,7 +205,7 @@ public class IterationCsccTest extends AuraImplTestCase {
     }
 
     public void testStartNotANumber() throws Exception {
-        String source = "<aura:iterationCscc start='one' items='{!v.items}' var='x' indexVar='i'>{!i}{!x+'|'}</aura:iterationCscc>";
+        String source = "<aura:iteration start='one' items='{!v.items}' var='x' indexVar='i'>{!i}{!x+'|'}</aura:iteration>";
         Map<String, Object> attributes = Maps.newHashMap();
         attributes.put("items", Lists.newArrayList("q", "r", "s"));
         try {
@@ -221,7 +217,7 @@ public class IterationCsccTest extends AuraImplTestCase {
     }
 
     public void testStartDecimal() throws Exception {
-        String source = "<aura:iterationCscc start='1.1' items='{!v.items}' var='x' indexVar='i'>{!i}{!x+'|'}</aura:iterationCscc>";
+        String source = "<aura:iteration start='1.1' items='{!v.items}' var='x' indexVar='i'>{!i}{!x+'|'}</aura:iteration>";
         Map<String, Object> attributes = Maps.newHashMap();
         attributes.put("items", Lists.newArrayList("q", "r", "s"));
         Component iteration = getIterationComponent(source, attributes);
@@ -230,7 +226,7 @@ public class IterationCsccTest extends AuraImplTestCase {
     }
 
     public void testEndGreaterThanLength() throws Exception {
-        String source = "<aura:iterationCscc end='4' items='{!v.items}' var='x' indexVar='i'>{!i}{!x+'|'}</aura:iterationCscc>";
+        String source = "<aura:iteration end='4' items='{!v.items}' var='x' indexVar='i'>{!i}{!x+'|'}</aura:iteration>";
         Map<String, Object> attributes = Maps.newHashMap();
         attributes.put("items", Lists.newArrayList("q", "r", "s"));
         Component iteration = getIterationComponent(source, attributes);
@@ -238,7 +234,7 @@ public class IterationCsccTest extends AuraImplTestCase {
     }
 
     public void testEndNegative() throws Exception {
-        String source = "<aura:iterationCscc items='{!v.items}' var='x' indexVar='i' end='-9'>{!i}{!x+'|'}</aura:iterationCscc>";
+        String source = "<aura:iteration items='{!v.items}' var='x' indexVar='i' end='-9'>{!i}{!x+'|'}</aura:iteration>";
         Map<String, Object> attributes = Maps.newHashMap();
         attributes.put("items", Lists.newArrayList("q", "r", "s"));
         Component iteration = getIterationComponent(source, attributes);
@@ -246,7 +242,7 @@ public class IterationCsccTest extends AuraImplTestCase {
     }
 
     public void testEndNotANumber() throws Exception {
-        String source = "<aura:iterationCscc end='one' items='{!v.items}' var='x' indexVar='i'>{!i}{!x+'|'}</aura:iterationCscc>";
+        String source = "<aura:iteration end='one' items='{!v.items}' var='x' indexVar='i'>{!i}{!x+'|'}</aura:iteration>";
         Map<String, Object> attributes = Maps.newHashMap();
         attributes.put("items", Lists.newArrayList("q", "r", "s"));
         try {
@@ -258,7 +254,7 @@ public class IterationCsccTest extends AuraImplTestCase {
     }
 
     public void testEndDecimal() throws Exception {
-        String source = "<aura:iterationCscc end='2.2' items='{!v.items}' var='x' indexVar='i'>{!i}{!x+'|'}</aura:iterationCscc>";
+        String source = "<aura:iteration end='2.2' items='{!v.items}' var='x' indexVar='i'>{!i}{!x+'|'}</aura:iteration>";
         Map<String, Object> attributes = Maps.newHashMap();
         attributes.put("items", Lists.newArrayList("q", "r", "s"));
         Component iteration = getIterationComponent(source, attributes);
@@ -267,7 +263,7 @@ public class IterationCsccTest extends AuraImplTestCase {
     }
 
     public void testRealBodyIgnored() throws Exception {
-        String source = "<aura:iterationCscc items='{!v.items}' var='x' indexVar='i'><aura:set attribute='realbody'>casper</aura:set>{!i}{!x+'|'}</aura:iterationCscc>";
+        String source = "<aura:iteration items='{!v.items}' var='x' indexVar='i'><aura:set attribute='realbody'>casper</aura:set>{!i}{!x+'|'}</aura:iteration>";
         Map<String, Object> attributes = Maps.newHashMap();
         attributes.put("items", Lists.newArrayList("q", "r", "s"));
         Component iteration = getIterationComponent(source, attributes);
@@ -283,13 +279,13 @@ public class IterationCsccTest extends AuraImplTestCase {
      * Verify that iteams, var and body are required attributes.
      */
     public void testRequiredAttributes() throws Exception {
-        ComponentDef def = Aura.getDefinitionService().getDefinition("aura:iterationCscc", ComponentDef.class);
+        ComponentDef def = Aura.getDefinitionService().getDefinition("aura:iteration", ComponentDef.class);
         assertNotNull(def);
-        assertTrue("Cannot use iterationCscc component with something to iterate through.", def
+        assertTrue("Cannot use iteration component with something to iterate through.", def
                 .getAttributeDef("items")
                 .isRequired());
         assertTrue("Require a reference variable to iterate.", def.getAttributeDef("var").isRequired());
-        assertTrue("Require a template to put in components for each iterationCscc.", def.getAttributeDef("body")
+        assertTrue("Require a template to put in components for each iteration.", def.getAttributeDef("body")
                 .isRequired());
     }
 
@@ -302,7 +298,7 @@ public class IterationCsccTest extends AuraImplTestCase {
         // Similar to BaseComponentDefTest.testLazyLoadingFacets()
         DefDescriptor<ComponentDef> desc = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "",
-                        "<aura:iterationCscc aura:load='LAZY'><aura:text/></aura:iterationCscc>"));
+                        "<aura:iteration aura:load='LAZY'><aura:text/></aura:iteration>"));
         try {
             Aura.getInstanceService().getInstance(desc);
             fail("Should not be able to pass non simple attribute values to lazy loading facets.");

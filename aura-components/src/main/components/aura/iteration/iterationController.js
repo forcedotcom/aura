@@ -15,18 +15,19 @@
  */
 ({
     rangeChange: function(cmp, evt, helper) {
-        // check new ranges, add or destroy components as needed
         helper.rerenderEverything(cmp);
     },
 
     itemsChange: function(cmp, evt, helper) {
         var v = evt.getParam("value");
         if (v === cmp.getValue("v.items")) {
-            if (v.isDifferentArray()) {
-                helper.rerenderEverything(cmp);
-            } else {
-                helper.rerenderSelective(cmp);
-            }
+            helper.rerenderEverything(cmp);
+        }
+    },
+
+    firstRender: function(cmp, evt, helper) {
+        if (cmp.getValue("v.realbody").unwrap().length === 0) {
+            helper.rerenderEverything(cmp);
         }
     }
 })

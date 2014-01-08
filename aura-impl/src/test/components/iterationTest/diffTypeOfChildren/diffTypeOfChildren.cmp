@@ -15,9 +15,9 @@
     limitations under the License.
 
     <aura:renderIf isTrue="{!v.csccTest}">
-        <aura:iterationCscc aura:id="iteration" items="{!m.innerData}" var="var" indexVar="idx" start="{!v.start}" end="{!v.end}">
+        <aura:iteration aura:id="iteration" items="{!m.innerData}" var="var" indexVar="idx" start="{!v.start}" end="{!v.end}">
             <iterationTest:iterationChildWJSProvider aura:id="childWithJSProvider" strAttribute="{!var}"/><br/>
-        </aura:iterationCscc>
+        </aura:iteration>
 
         <aura:set attribute="else">
             <aura:iteration aura:id="iteration" items="{!m.innerData}" var="var" indexVar="idx" start="{!v.start}" end="{!v.end}">
@@ -34,9 +34,9 @@
 
     {!v.start} {!v.end}
     <aura:renderIf isTrue="{!v.csccTest}">
-        <aura:iterationCscc aura:id="iteration" items="{!m.innerData}" var="var" indexVar="idx" start="{!v.start}" end="{!v.end}">
+        <aura:iteration aura:id="iteration" items="{!m.innerData}" var="var" indexVar="idx" start="{!v.start}" end="{!v.end}">
             <iterationTest:iterationChildWJSProvider aura:id="childWithJSProvider2" strAttribute="{!var}"/><br/>
-        </aura:iterationCscc>
+        </aura:iteration>
 
         <aura:set attribute="else">
             <aura:iteration aura:id="iteration" items="{!m.innerData}" var="var" indexVar="idx" start="{!v.start}" end="{!v.end}">

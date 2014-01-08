@@ -18,7 +18,7 @@
 <aura:component implements="aura:rootComponent"
     provider="java://org.auraframework.impl.root.component.IterationProvider, js://aura.iteration"
     renderer="js://aura.providedBody, java://org.auraframework.components.aura.ProvidedBodyRenderer"
-    support="BETA" description="Renders a view of a collection of items">
+    support="BETA" description="Renders a view of a collection of items. Supports iterations containing components that can be created exclusively on the client-side.">
 <aura:attribute name="items" type="List" required="true" description="The collection of data to iterate over"/>
 <aura:attribute name="var" type="String" required="true" description="The name of the variable to use for each item inside the iteration"/>
 <aura:attribute name="indexVar" type="String" default="_index" description="The name of variable to use for the index of each item inside the iteration"/>
@@ -26,10 +26,13 @@
 <aura:attribute name="end" type="Integer" description="The index of the collection to stop at (exclusive)"/>
 <aura:attribute name="body" type="Aura.ComponentDefRef[]" required="true" description="Template to use when creating components for each iteration."/>
 <aura:attribute name="realbody" type="Aura.Component[]" description="Internal use only. Any value set will be ignored."/>
+<aura:attribute name="forceServer" type="Boolean" description="Force a server request for the body. Set to true if the iteration contains any elements requiring server-side creation." default="false" />
 
+<aura:handler name="init" value="{!this}" action="{!c.firstRender}"/>
 <aura:handler name="change" value="{!v.items}" action="{!c.itemsChange}"/>
 <aura:handler name="change" value="{!v.start}" action="{!c.rangeChange}"/>
 <aura:handler name="change" value="{!v.end}" action="{!c.rangeChange}"/>
+<aura:registerEvent name="rerenderComplete" type="aura:asyncRerender" description="The event fired when this component completes its asynchronous rerender."/>
 
 
 <!--

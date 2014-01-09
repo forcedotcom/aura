@@ -1222,13 +1222,8 @@ var Test = function(){
          * @param {HTMLElement} element The element from which to retrieve data.
          * @param {String} attributeName The name of attribute to look up on element.
          */
-        getElementAttributeValue:function(element,attributeName){
-        	var attrValue = element.getAttribute(attributeName);
-        	//For browser Compatibility - getAttribute doesn't always work in IE
-        	if($A.util.isUndefinedOrNull(attrValue)){
-        		attrValue = element.attributes[attributeName].nodeValue;
-        	}
-        	return attrValue;
+        getElementAttributeValue : function(element,attributeName){
+        	return $A.util.getElementAttributeValue(element, attributeName);
         },
 
         /**

@@ -901,6 +901,29 @@ $A.ns.Util.prototype.acceptsData = function(element) {
 
     return true;
 };
+/**
+ * @description
+ * Return attributeValue of an element
+ * @param {HTMLElement} element The element from which to retrieve data.
+ * @param {String} attributeName The name of attribute to look up on element.
+ */
+$A.ns.Util.prototype.getElementAttributeValue = function(element,attributeName){
+        //Gets list of attributes as they are written on the Element. The return value of this is going to be undefined
+        var attrValue = element.attributes[attributeName];
+        
+        //If the element does exist, then get its nodeValue. 
+        //If it doesn't exist, we will return null per Mozzilla Standards and how the getAttribute method works normally
+	if(!$A.util.isUndefinedOrNull(attrValue)){
+	    attrValue = attrValue.nodeValue;
+	}else{
+	    attrValue = null;
+	}
+		
+	//Return what we have found
+	return attrValue;
+};
+
+
 
 /**
  * @description

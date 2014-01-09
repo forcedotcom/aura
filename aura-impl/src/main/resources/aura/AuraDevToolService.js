@@ -404,7 +404,7 @@ var AuraDevToolService = function() {
         	}
         	
                 for(var j =0; j<labels.length; j++){
-                    atrib = labels[j].getAttribute(attribute);
+                    atrib = $A.util.getElementAttributeValue(labels[j], attribute);
             	    if(!aura.util.isUndefinedOrNull(atrib)){
             	       dict[atrib] = true;
             	    }
@@ -432,7 +432,7 @@ var AuraDevToolService = function() {
         	 var alt = "";
         	
         	 for(var index = 0; index < allImgTags.length; index++){
-        	     data_aura_rendered_by = allImgTags[index].getAttribute("data-aura-rendered-by");
+        	     data_aura_rendered_by = $A.util.getElementAttributeValue(allImgTags[index], "data-aura-rendered-by");
         	     
         	    // Will more than likely have a rendered by value but double checking 
          	    if(data_aura_rendered_by === null || data_aura_rendered_by === "" ){
@@ -478,12 +478,12 @@ var AuraDevToolService = function() {
   	        
   	        for (var index = 0; index < inputTags.length; index++){
   	            inputTag = inputTags[index];
-  	            type = inputTag.getAttribute("type");
+  	            type = $A.util.getElementAttributeValue(inputTag, "type");
   	            if(!$A.util.isUndefinedOrNull(type) && inputTypes.indexOf(type)> -1){
 	        	continue;
 	            }
 	            else if (type == "image"){
-	        	var alt = inputTag.getAttribute("alt");
+	        	var alt = $A.util.getElementAttributeValue(inputTag, "alt");
 	        	if($A.util.isUndefinedOrNull(alt) || alt.replace(/[\s\t\r\n]/g,'') === ""){
 	        	  errorArray.push(inputTag); 
        		        }
@@ -511,7 +511,7 @@ var AuraDevToolService = function() {
 	        var atrib ="";
 	        
 	        for(var i=0; i<tags.length; i++){
-	                atrib = tags[i].getAttribute(attribute);
+	                atrib = $A.util.getElementAttributeValue(tags[i], attribute);
 	        	if(aura.util.isUndefinedOrNull(atrib) || evalFunc(atrib.toLowerCase(), errorVal)){
 	        	    errorArray.push(tags[i]);
 	        	}
@@ -560,7 +560,7 @@ var AuraDevToolService = function() {
                     
                     //Keep going up until we hit the either the BODY or HTML tag
                     while(!$A.util.isUndefinedOrNull(tag) && tag.tagName.toLowerCase() !== "body" && tag.tagName.toLowerCase() !== "html"){
-                         data_aura_rendered_by = tag.getAttribute("data-aura-rendered-by");
+                         data_aura_rendered_by = $A.util.getElementAttributeValue(tag, "data-aura-rendered-by");
         
                          //Make sure it has a rendered by value
                          if(!$A.util.isUndefinedOrNull(data_aura_rendered_by) && data_aura_rendered_by !== "" ){
@@ -615,7 +615,7 @@ var AuraDevToolService = function() {
         	accessAideFuncs.errorCount = len + accessAideFuncs.errorCount; 
         	for(var i = 0; i<len; i++){
         	    nodeName = errArray[i].nodeName.toLowerCase();
-        	    data_aura_rendered_by = errArray[i].getAttribute("data-aura-rendered-by");
+        	    data_aura_rendered_by = $A.util.getElementAttributeValue(errArray[i], "data-aura-rendered-by");
         	    
         	    //Make sure it has a rendered by value
         	    if($A.util.isUndefinedOrNull(data_aura_rendered_by) || data_aura_rendered_by === "" ){
@@ -684,7 +684,7 @@ var AuraDevToolService = function() {
         	    var alt = "";
         	    
         	    for(var i =0; i<imgs.length; i++){
-        		alt = imgs[i].getAttribute("alt");
+        		alt = $A.util.getElementAttributeValue(imgs[i], "alt");
         		if(!$A.util.isUndefinedOrNull(alt) && alt.replace(/[\s\t\r\n]/g,'') !== ""){
         		   return false;    
         		}
@@ -706,7 +706,7 @@ var AuraDevToolService = function() {
     	        	for(var index = 0; index<anchors.length; index++){
     	        	    anchor = anchors[index];
     	        	    
-    	        	    anchorId = anchor.getAttribute("id");
+    	        	    anchorId = $A.util.getElementAttributeValue(anchor, "id");
     	        	    
     	        	    // Temporary fix for ckeditor. current issue is that ckeditor set "=" which causes innerText to not return the correct value
     	        	    // Work-around will be temporary and should be removed when ckeditor is updated.
@@ -738,9 +738,9 @@ var AuraDevToolService = function() {
               		 
                		 for(var i =0; i<inputTags.length; i++){ 
               		     inputTag = inputTags[i];
-              		     inputType = inputTag.getAttribute('type').toLowerCase();
+              		     inputType = $A.util.getElementAttributeValue(inputTag, 'type').toLowerCase();
               		     if(inputType === "radio" || inputType === "checkbox"){
-              			 rcName = inputTag.getAttribute('name');
+              			 rcName = $A.util.getElementAttributeValue(inputTag, 'name');
               			 if($A.util.isUndefinedOrNull(rcName)){
               			     continue;
               			 }
@@ -883,8 +883,26 @@ var AuraDevToolService = function() {
         	     checkIFrameHasTitle : function(domElem){
         		var iFrameTitleMsg = "Each frame and iframe element must have non-empty title attribute. Refer to http://www.w3.org/TR/UNDERSTANDING-WCAG20/ensure-compat.html.";
         		var accessAideFuncs = aura.devToolService.accessbilityAide;
-        		var iframe = domElem.getElementsByTagName("iframe");
-        		return accessAideFuncs.formatOutput(iFrameTitleMsg,accessAideFuncs.checkForAttrib(iframe, "title", "", accessAideFuncs.doesContain));
+                        var iframes = domElem.getElementsByTagName("iframe");
+        		
+        		/**THIS CODE BLOCK SHOULD BE REMOVED AFTER PARTIAL CODE RUNNING**/
+        		var id = null;
+        		var src = null;
+        		var frame = null;
+        		var iframeArray = [];
+        		for(var i = 0; i<iframes.length; i++){
+        			frame = iframes[i];
+        			id  = $A.util.getElementAttributeValue(frame, "id");
+        			src = $A.util.getElementAttributeValue(frame, "src"); 
+        			if((!$A.util.isUndefinedOrNull(src) && src.indexOf("/apex/") !== -1) ||
+        					(!$A.util.isUndefinedOrNull(id) && id.toLowerCase().indexOf("vfframeid") !== -1)){
+        				continue;
+        			}
+        			
+        			iframeArray.push(frame);
+        		}
+        		/*************************************************************************/
+        		return accessAideFuncs.formatOutput(iFrameTitleMsg,accessAideFuncs.checkForAttrib(iframeArray, "title", "", accessAideFuncs.doesContain));
         	    },
         	    /**
                      * Grabs all images tags and makes sure they have titles

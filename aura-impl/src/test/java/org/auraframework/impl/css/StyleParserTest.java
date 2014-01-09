@@ -227,6 +227,13 @@ public class StyleParserTest extends AuraImplTestCase {
         goldFileText(style.getCode());
     }
 
+    public void testAutoPrefixing() throws Exception {
+        DefDescriptor<StyleDef> descriptor = DefDescriptorImpl.getInstance("test.testStyleNamespacePrefixing",
+                StyleDef.class);
+        StyleDef style = descriptor.getDef();
+        goldFileText(style.getCode());
+    }
+
     /**
      * Test SVG data uris
      */

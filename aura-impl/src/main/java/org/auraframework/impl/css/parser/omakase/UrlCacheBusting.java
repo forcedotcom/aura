@@ -26,7 +26,7 @@ import com.salesforce.omakase.plugin.Plugin;
 /**
  * Add cache-busters to urls.
  */
-public final class UrlCacheBusting implements Plugin {
+final class UrlCacheBusting implements Plugin {
     private final boolean enabled;
 
     public UrlCacheBusting() {

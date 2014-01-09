@@ -20,19 +20,19 @@ import com.salesforce.omakase.PluginRegistry;
 import com.salesforce.omakase.ast.selector.ClassSelector;
 import com.salesforce.omakase.ast.selector.Selector;
 import com.salesforce.omakase.ast.selector.SelectorPart;
-import com.salesforce.omakase.ast.selector.Selectors;
 import com.salesforce.omakase.broadcast.annotation.Rework;
 import com.salesforce.omakase.broadcast.annotation.Validate;
 import com.salesforce.omakase.error.ErrorLevel;
 import com.salesforce.omakase.error.ErrorManager;
 import com.salesforce.omakase.plugin.DependentPlugin;
 import com.salesforce.omakase.plugin.basic.AutoRefiner;
+import com.salesforce.omakase.util.Selectors;
 
 /**
  * Handles changing ".THIS" inside of selectors (at the start or anywhere) to the actual class name. If so specified,
  * this can also validate that every selector starts with the expected class name.
  */
-public final class SelectorScoping implements DependentPlugin {
+final class SelectorScoping implements DependentPlugin {
     private static final String MSG = "CSS selector must begin with '.%s' or '.THIS'";
     private static final String THIS = "THIS";
 
@@ -58,10 +58,11 @@ public final class SelectorScoping implements DependentPlugin {
 
     @Validate
     public void validate(Selector selector, ErrorManager em) {
-        if (validate) {
-            // must have a class selector with the designated class name, and it must be before any combinator
+        if (validate && !selector.isKeyframe()) {
+            // must have class selector with the designated name, and it must be before any combinator (adjoining)
             Optional<SelectorPart> first = selector.parts().first();
-            if (!first.isPresent() || !Selectors.hasClassSelector(first.get().adjoining(), className)) {
+
+            if (!first.isPresent() || !Selectors.hasClassSelector(Selectors.adjoining(first.get()), className)) {
                 em.report(ErrorLevel.FATAL, selector, String.format(MSG, className));
             }
         }

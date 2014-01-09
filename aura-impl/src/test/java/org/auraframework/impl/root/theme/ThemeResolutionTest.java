@@ -132,6 +132,11 @@ public class ThemeResolutionTest extends AuraImplTestCase {
         }
     }
 
+    /** themes with auto-prefixable properties */
+    public void testThemeAutoPrefix() throws Exception {
+        gold(get("themeTest.autoPrefix"));
+    }
+
     private DefDescriptor<StyleDef> get(String locator) {
         return DefDescriptorImpl.getInstance(locator, StyleDef.class);
     }

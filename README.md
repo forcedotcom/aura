@@ -84,20 +84,18 @@ The following output confirms that your template has been generated successfully
 
     `cd helloWorld` 
     
-2. As a temporary fix, you'll need to edit the `pom.xml` file in the current directory. Find the `<repositories>` section and add this to it - and yes, we're working on fixing this right now:
-<pre><code>
-    &lt;repository>
-        &lt;id>libs-external&lt;/id>
-        &lt;url>http://repo.auraframework.org/libs-release&lt;/url>
-    &lt;/repository>    
-</code></pre>
+2. Build the app.
+
+    `mvn clean install`
+    
 3. Start the Jetty server on port 8080.
 
     `mvn jetty:run`
     
     To use another port, append: `-Djetty.port=portNumber. For example, mvn jetty:run -Djetty.port=9877`.
-4. Test your app in a browser.
-       `http://localhost:8080/helloWorld/helloWorld.app`       
+4. Test your app in a browser by navigating to:
+
+    `http://localhost:8080/helloWorld/helloWorld.app`       
 You should see a simple greeting in your browser.
 5. To stop the Jetty server and free up the port when you are finished, press `CTRL+C` on the command line.
     

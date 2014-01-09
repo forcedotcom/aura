@@ -11,3 +11,4 @@ pom.xml.releaseBackup
 .idea/*
 *.iml
 version.properties
+*~

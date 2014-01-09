@@ -77,7 +77,8 @@
     testMapAsMessageParam : {
         test : function(cmp) {
             var map = { first: "first error", second: "second error" };
-            var errorMsg = map['first'] + '\n' + map['second'];
+            var errorMsg = "Unknown Error : caught {\"first\":\"" + map['first'] +
+                    '\",\"second\":\"' + map['second'] + "\"}";
             $A.test.expectAuraError(errorMsg);
             $A.error(map);
             this.assertErrorMessage(errorMsg);
@@ -102,13 +103,14 @@
     	}
     },
     /**
-     * Verify passing a string in for the Error param of $A.error() gives an unrecognized paremeter error message.
+     * Verify passing a string in for the Error param of $A.error() gives does
+     * something sensible with the non-Error information it has.
      */
     testStringForErrorParam : {
         test : function(cmp) {
             $A.test.expectAuraError("foo");
             $A.error("foo", "bar");
-           this.assertErrorMessage("Internal Error: Unrecognized parameter");
+           this.assertErrorMessage("foo : caught \"bar\"");
         }
     },
     assertErrorMessage : function(expectedMsg) {

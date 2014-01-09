@@ -600,6 +600,10 @@ $A.ns.Aura.prototype.finishInit = function(doNotCallJiffyOnLoad) {
  * &nbsp;&nbsp;&nbsp;&nbsp;//more tests<br/>
  * }
  * </code>
+ *
+ * This code tries to separate a "display message" (with limited information for users in production
+ * modes) from a "log message" (always complete).
+ *
  * @public
  * @param {String} msg The error message to be displayed to the user.
  * @param {Error} [e] The error object to be displayed to the user.
@@ -615,8 +619,18 @@ $A.ns.Aura.prototype.error = function(msg, e){
     }
     if (!e) {
         e = undefined;
-    } else if (!$A.util.isObject(e) && !$A.util.isError(e)) {
-        logMsg = "Internal Error: Unrecognized parameter to aura.error";
+    } else if (!$A.util.isError(e)) {
+        // Somebody's thrown something bogus, or we're on IE, but either way we
+        // should do what we can...
+        if ($A.util.isObject(e) && e.message) {
+            var stk = e.stack;
+            e = new Error("caught " + e.message);
+            if (stk) {
+                e.stack = e.stk;
+            }
+        } else {
+            e = new Error("caught " + JSON.stringify(e));
+        }
     }
     if (!logMsg.length) {
         logMsg = "Unknown Error";
@@ -625,6 +639,9 @@ $A.ns.Aura.prototype.error = function(msg, e){
     if (e && !$A.util.isUndefinedOrNull(e.message)) {
         dispMsg = dispMsg+" : "+e.message;
     }
+
+    var testMsg = dispMsg;
+
     //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
     var stack = this.getStackTrace(e);
     $A.logInternal("Error", logMsg, e, stack);
@@ -660,7 +677,7 @@ $A.ns.Aura.prototype.error = function(msg, e){
         //
         // Note that this sends the only the error message string (no stack) through to the test
         //
-        $A.test.auraError(msg);
+        $A.test.auraError(testMsg);
     }
     if (!$A.initialized) {
         $A["hasErrors"] = true;

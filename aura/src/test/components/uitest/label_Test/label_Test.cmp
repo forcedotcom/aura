@@ -17,7 +17,8 @@
 -->
 
 <aura:component model="java://org.auraframework.component.ui.MenuTestModel">
-<aura:attribute default="top" type="String" name="whichPosition"/>
+<!-- Mirror default label position from input.cmp -->
+<aura:attribute default="left" type="String" name="whichPosition"/>
 <h1>label separete from input with raw string id association</h1>
 	<table>
 	<tbody>
@@ -79,15 +80,14 @@
    
 <hr />   
 <h1>label with {!v.whichPosition} position</h1>
-
-	<ui:inputCheckbox label="inputCheckbox" labelPosition="{!v.whichPosition}" value="false" aura:id="topInputCheckBox"/>
+	<ui:inputCheckbox label="inputCheckbox" labelPosition="{!v.whichPosition}" value="false" aura:id="myInputCheckbox"/>
 	<ui:inputDate label="inputDate" labelPosition="{!v.whichPosition}" value="I'm an inputDate"/>
 	<ui:inputDateTime label="inputDateTime" labelPosition="{!v.whichPosition}" value="I'm an inputDateTime"/>
 	<ui:inputNumber label="inputNumber" labelPosition="{!v.whichPosition}" value="42"/>
 	<ui:inputRadio label="inputRadio" labelPosition="{!v.whichPosition}" value="42"/>
 	<ui:inputRange label="inputRange" labelPosition="{!v.whichPosition}" value="6"/>
 	<ui:inputSearch label="inputSearch" labelPosition="{!v.whichPosition}" value="6"/>
-	<ui:inputSelect label="inputSelect" labelPosition="{!v.whichPosition}" value="I'm an inputSelect"/>       
+	<ui:inputSelect label="inputSelect" labelPosition="{!v.whichPosition}" value="I'm an inputSelect"/>
 	<ui:inputText label="inputTest" labelPosition="{!v.whichPosition}" value="I'm an inputText"/>
 	<ui:inputTextArea label="inputTextArea" labelPosition="{!v.whichPosition}" value="I'm an inputTextArea"/>
  	   
@@ -100,7 +100,6 @@
       
    <ui:inputPercent label="inputPercent" labelPosition="{!v.whichPosition}" value="42"/>
    <ui:inputCurrency  label="inputCurrency" labelPosition="{!v.whichPosition}" value="42"/>
-   
 <hr />
 <h1>label with hidden position</h1>
 <ui:inputTextArea label="inputTextArea" labelPosition="hidden" value="I'm an inputTextArea" aura:id="hiddenPosition"/><br/> 	

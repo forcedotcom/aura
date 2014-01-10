@@ -15,52 +15,52 @@
  */
 
 ({
-	/**
-	 * Return labelId for label
-	 */
-	getLabelIdValue: function(labelElement){
-		return $A.test.getElementAttributeValue(labelElement,"for");
+    /**
+     * Return labelId for label
+     */
+    getLabelIdValue: function(labelElement){
+        return $A.test.getElementAttributeValue(labelElement,"for");
     },
-    
+
     /**
      * Return Id for input
      */
     getInputIdValue: function(inputElement){
         return $A.test.getElementAttributeValue(inputElement,"id");
     },
-    
+
     /**
      * Test label separate from input with raw string id
      */
     testLabelSeparateFromInputWithRawStringId: {
-    	test: function(component){
-    		var label = component.find("rawStringLabel").getElement();
+        test: function(component){
+            var label = component.find("rawStringLabel").getElement();
             var input = component.find("rawStringinput").getElement();
             var labelId = this.getLabelIdValue(label);
             var inputId = this.getInputIdValue(input);
             $A.test.assertEquals(labelId, inputId, "Raw Id for label and input should be the same");
         }
     },
-    
+
     /**
      * label separate from input with aura:id
      */
     testLabelSeparateFromInputWithAuraId: {
-    	test: function(component){
-    		var label = component.find("myinputtextLabel").getElement();
+        test: function(component){
+            var label = component.find("myinputtextLabel").getElement();
             var input = component.find("myinputtext").getElement();
             var labelId = this.getLabelIdValue(label);
             var inputId = this.getInputIdValue(input);
             $A.test.assertEquals(labelId, inputId, "Global Id for label and input should be the same");
         }
     },
-    
+
     /**
      * hidden label separate from input
      */
     testHiddenLabel: {
-    	test: function(component){
-    		var label = component.find("myHiddenLabel").getElement();
+        test: function(component){
+            var label = component.find("myHiddenLabel").getElement();
             var input = component.find("myHiddeninputtext").getElement();
             var labelId = this.getLabelIdValue(label);
             var inputId = this.getInputIdValue(input);
@@ -69,13 +69,13 @@
             $A.test.assertEquals("assistiveText", label.children[0].className, "Class Name should be assistiveText");
         }
     },
-    
+
     /**
      * Label's created by iteration
      */
     testLabelCreationByIteration: {
-    	test: function(component){
-    		var input1 = component.find("iteration")[0].getElement();
+        test: function(component){
+            var input1 = component.find("iteration")[0].getElement();
             var label1Element = input1.getElementsByTagName('label')[0];
             var input1Element = input1.getElementsByTagName('input')[0];
             var label1Id = this.getLabelIdValue(label1Element);
@@ -90,50 +90,48 @@
             $A.test.assertEquals(input2Id, label2Id, "Global Id for label1 and input created by iteration should be the same");
         }
     },
-    
+
     /**
      * Test label with default position
      */
     testLabelWithDefaultPosition: {
-    	attributes : {whichPosition : "left"},
-    	test: function(component){
-    		var div = component.find("topInputCheckBox").getElement();
-    		var label = div.getElementsByTagName('label')[0];
+        attributes : {whichPosition : "left"},
+        test: function(component){
+            var div = component.find("myInputCheckbox").getElement();
+            var label = div.getElementsByTagName('label')[0];
             var input = div.getElementsByTagName('input')[0];
-    		var labelId = this.getLabelIdValue(label);
+            var labelId = this.getLabelIdValue(label);
             var inputId = this.getInputIdValue(input);
             $A.test.assertEquals(labelId, inputId, "Global Id for label and input in default positon should be the same");
             $A.test.assertTrue($A.test.contains(label.className, "left"), "Class Name:" + label.className + " should contain left");
         }
     },
-     
+
     /**
      * Test label with left position
      */
     testLabelWithLeftPosition: {
-    	test: function(component){
-    		debugger;
-    		var div = component.find("leftPosition").getElement();
-    		var label = div.getElementsByTagName('label')[0];
+        test: function(component){
+            var div = component.find("leftPosition").getElement();
+            var label = div.getElementsByTagName('label')[0];
             var input = div.getElementsByTagName('input')[0];
-    		var labelId = this.getLabelIdValue(label);
+            var labelId = this.getLabelIdValue(label);
             var inputId = this.getInputIdValue(input);
             $A.test.assertEquals(labelId, inputId, "Global Id for label and input in Left positon should be the same");
             $A.test.assertTrue($A.test.contains(label.className, "left"), "Class Name:" + label.className + " should contain left");
         }
     },
-    
+
     /**
      * Test label with Top position
      */
     testLabelWithTopPosition: {
-    	attributes : {whichPosition : "top"},
-    	test: function(component){
-    		debugger;
-    		var div = component.find("topInputCheckBox").getElement();
-    		var label = div.getElementsByTagName('label')[0];
+        attributes : {whichPosition : "top"},
+        test: function(component){
+            var div = component.find("myInputCheckbox").getElement();
+            var label = div.getElementsByTagName('label')[0];
             var input = div.getElementsByTagName('input')[0];
-    		var labelId = this.getLabelIdValue(label);
+            var labelId = this.getLabelIdValue(label);
             var inputId = this.getInputIdValue(input);
             $A.test.assertEquals(labelId, inputId, "Global Id for label and input in top positon should be the same");
             $A.test.assertTrue($A.test.contains(label.className, "top"), "Class Name:" + label.className + " should contain top");
@@ -141,34 +139,33 @@
             $A.test.assertEquals("block", $A.test.getStyle(label,'display'), "Css property for label with positon top should be display=block");
         }
     },
-    
+
     /**
      * Test label with right position
      */
     testLabelWithRightPosition: {
-    	attributes : {whichPosition : "right"},
-    	test: function(component){
-    		debugger;
-    		var div = component.find("topInputCheckBox").getElement();
-    		var label = div.getElementsByTagName('label')[0];
+        attributes : {whichPosition : "right"},
+        test: function(component){
+            var div = component.find("myInputCheckbox").getElement();
+            var label = div.getElementsByTagName('label')[0];
             var input = div.getElementsByTagName('input')[0];
-    		var labelId = this.getLabelIdValue(label);
+            var labelId = this.getLabelIdValue(label);
             var inputId = this.getInputIdValue(input);
             $A.test.assertEquals(labelId, inputId, "Global Id for label and input in right positon should be the same");
             $A.test.assertTrue($A.test.contains(label.className, "right"), "Class Name:" + label.className + " should contain right");
         }
     },
-    
+
     /**
      * Test label with bottom position
      */
     testLabelWithBottomPosition: {
-    	attributes : {whichPosition : "bottom"},
-    	test: function(component){
-    		var div = component.find("topInputCheckBox").getElement();
-    		var label = div.getElementsByTagName('label')[0];
+        attributes : {whichPosition : "bottom"},
+        test: function(component){
+            var div = component.find("myInputCheckbox").getElement();
+            var label = div.getElementsByTagName('label')[0];
             var input = div.getElementsByTagName('input')[0];
-    		var labelId = this.getLabelIdValue(label);
+            var labelId = this.getLabelIdValue(label);
             var inputId = this.getInputIdValue(input);
             $A.test.assertEquals(labelId, inputId, "Global Id for label and input in bottom positon should be the same");
             $A.test.assertTrue($A.test.contains(label.className, "bottom"), "Class Name:" + label.className + " should contain bottom");
@@ -176,20 +173,20 @@
             $A.test.assertEquals("block", $A.test.getStyle(label,'display'), "Css property for label with positon bottom should be display=block");
         }
     },
-    
+
     /**
      * Test label with hidden position
      * Test case for W-1728057
      */
     testLabelWithHiddenPosition: {
-    	test: function(component){
-    		var div = component.find("hiddenPosition").getElement();
-    		var label = div.getElementsByTagName('label')[0];
-    		var input = div.getElementsByTagName('textarea')[0];
-    		var labelId = this.getLabelIdValue(label);
-    		var inputId = this.getInputIdValue(input);
-    		$A.test.assertEquals(labelId, inputId, "Global Id for label and textarea in hidden positon should be the same");
-    		$A.test.assertEquals("assistiveText", label.children[0].className, "Class Name for Label should be assistiveText");
+        test: function(component){
+            var div = component.find("hiddenPosition").getElement();
+            var label = div.getElementsByTagName('label')[0];
+            var input = div.getElementsByTagName('textarea')[0];
+            var labelId = this.getLabelIdValue(label);
+            var inputId = this.getInputIdValue(input);
+            $A.test.assertEquals(labelId, inputId, "Global Id for label and textarea in hidden positon should be the same");
+            $A.test.assertEquals("assistiveText", label.children[0].className, "Class Name for Label should be assistiveText");
         }
     }
 })

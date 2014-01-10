@@ -1,3 +1,0 @@
-<aura:theme>
-  <aura:attribute name="position" default="fixed" />
-</aura:theme>

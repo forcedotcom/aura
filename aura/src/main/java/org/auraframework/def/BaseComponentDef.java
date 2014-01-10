@@ -121,4 +121,8 @@ public interface BaseComponentDef extends RootDefinition {
 
     Set<ResourceDef> getResourceDefs() throws QuickFixException;
 
+    /**
+     * Gets the {@link ThemeDef} that's part of the component bundle, e.g., the local theme.
+     */
+    DefDescriptor<ThemeDef> getLocalThemeDescriptor();
 }

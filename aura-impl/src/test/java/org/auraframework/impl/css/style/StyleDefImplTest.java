@@ -22,13 +22,13 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.NamespaceDef;
 import org.auraframework.def.StyleDef;
 import org.auraframework.def.ThemeDef;
-import org.auraframework.impl.AuraImplTestCase;
-import org.auraframework.impl.root.theme.ThemeDefImpl;
-import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.impl.css.StyleTestCase;
 import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.throwable.quickfix.ThemeValueNotFoundException;
+import org.auraframework.util.AuraTextUtil;
 
 import com.google.common.collect.Sets;
 
@@ -37,12 +37,14 @@ import com.google.common.collect.Sets;
  * 
  * @since 0.0.240
  */
-public class StyleDefImplTest extends AuraImplTestCase {
+public class StyleDefImplTest extends StyleTestCase {
     public StyleDefImplTest(String name) {
         super(name);
     }
 
     /**
+     * TODONM remove
+     * 
      * StyleDef must have a dependency on a NamespaceDef.
      */
     public void testAppendDependenciesHasNamespaceDef() throws Exception {
@@ -68,12 +70,63 @@ public class StyleDefImplTest extends AuraImplTestCase {
         assertTrue("NamespaceDef missing from StyleDef dependencies", deps.contains(nsDesc));
     }
 
-    public void testThemeDependencies() throws QuickFixException {
-        StyleDef def = DefDescriptorImpl.getInstance("themeTest.simple", StyleDef.class).getDef();
-        DefDescriptor<ThemeDef> expected = ThemeDefImpl.descriptor("themeTest:baseTheme");
+    public void testThemeDependenciesNsThemeOnly() throws QuickFixException {
+        DefDescriptor<ThemeDef> theme = addNsTheme(theme().var("color", "red"));
+        DefDescriptor<StyleDef> style = addStyleDef(".THIS {color: theme(color) }");
 
         Set<DefDescriptor<?>> dependencies = Sets.newHashSet();
-        def.appendDependencies(dependencies);
-        assertTrue(dependencies.contains(expected));
+        style.getDef().appendDependencies(dependencies);
+        assertTrue(dependencies.contains(theme));
+    }
+
+    public void testThemeDependenciesLocalThemeOnly() throws QuickFixException {
+        DefDescriptor<StyleDef> style = addStyleDef(".THIS {color: theme(color) }");
+        DefDescriptor<ThemeDef> theme = addLocalTheme(theme().var("color", "red"), style);
+
+        assertTrue("expected theme to be a localTheme", theme.getDef().isLocalTheme());
+
+        Set<DefDescriptor<?>> dependencies = Sets.newHashSet();
+        style.getDef().appendDependencies(dependencies);
+        assertTrue(dependencies.contains(theme));
+    }
+
+    public void testThemeDependenciesBothThemes() throws QuickFixException {
+        DefDescriptor<ThemeDef> nsTheme = addNsTheme(theme().var("color", "red"));
+        DefDescriptor<StyleDef> style = addStyleDef(".THIS {color: theme(color) }");
+        DefDescriptor<ThemeDef> localTheme = addLocalTheme(theme().var("color", "red"), style);
+
+        Set<DefDescriptor<?>> dependencies = Sets.newHashSet();
+        style.getDef().appendDependencies(dependencies);
+        assertTrue("expected dependencies to contain namespace theme", dependencies.contains(nsTheme));
+        assertTrue("expected dependencies to contain local theme", dependencies.contains(localTheme));
+    }
+
+    public void testThemeDependenciesDoesntHaveThemeDef() throws QuickFixException {
+        DefDescriptor<ThemeDef> nsTheme = addNsTheme("<aura:theme><aura:var name='color' value='red'/></aura:theme>");
+        DefDescriptor<StyleDef> style = addStyleDef(".THIS {color: red }");
+        DefDescriptor<ThemeDef> localTheme = addLocalTheme(theme().var("color", "red"), style);
+
+        Set<DefDescriptor<?>> dependencies = Sets.newHashSet();
+        style.getDef().appendDependencies(dependencies);
+        assertFalse(dependencies.contains(nsTheme));
+        assertFalse(dependencies.contains(localTheme));
+    }
+
+    public void testInvalidRef() throws QuickFixException {
+        addNsTheme("<aura:theme><aura:var name='color' value='red'/></aura:theme>");
+        DefDescriptor<StyleDef> style = addStyleDef(".THIS {color: theme(bam) }");
+
+        try {
+            style.getDef().validateReferences();
+            fail("expected an exception");
+        } catch (Exception e) {
+            checkExceptionContains(e, ThemeValueNotFoundException.class, "was not found");
+        }
+    }
+
+    public void testGetClassName() throws QuickFixException {
+        DefDescriptor<StyleDef> style = addStyleDef(".THIS {color: red }");
+        String expected = style.getNamespace() + AuraTextUtil.initCap(style.getName());
+        assertEquals(expected, style.getDef().getClassName());
     }
 }

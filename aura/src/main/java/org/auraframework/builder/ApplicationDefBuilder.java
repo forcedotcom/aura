@@ -23,13 +23,15 @@ import org.auraframework.def.ThemeDef;
 /**
  */
 public interface ApplicationDefBuilder extends BaseComponentDefBuilder<ApplicationDef> {
-
     ApplicationDefBuilder setAccess(String access);
 
     ApplicationDefBuilder setLayouts(LayoutsDef layouts);
 
     ApplicationDefBuilder setSecurityProviderDescriptor(String securityProvider);
 
-    ApplicationDefBuilder addThemeOverride(DefDescriptor<ThemeDef> original, DefDescriptor<ThemeDef> override);
-
+    /**
+     * Specifies the {@link ThemeDef} to use as the override theme. Vars specified in the override theme take precedence
+     * over default var values within the whole application.
+     */
+    ApplicationDefBuilder setOverrideThemeDescriptor(DefDescriptor<ThemeDef> overrideThemeDescriptor);
 }

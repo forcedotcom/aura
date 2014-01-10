@@ -124,7 +124,8 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
     }
 
     @ThreadHostileTest("NamespaceDef modification affects namespace")
-    public void testGetClientRenderingAfterNamespaceChange() throws Exception {
+    // TODONM remove (do we need one for themes?)
+    public void _testGetClientRenderingAfterNamespaceChange() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "", "<div id='out'>hi</div>"));
         String className = cmpDesc.getNamespace() + StringUtils.capitalize(cmpDesc.getName());
@@ -353,7 +354,8 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
     }
 
     @ThreadHostileTest("NamespaceDef modification affects namespace")
-    public void testPostAfterNamespaceChange() throws Exception {
+    // TODONM remove (do we need one for themes?)
+    public void _testPostAfterNamespaceChange() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = setupTriggerComponent("", "<div id='out'>hi</div>");
         String className = cmpDesc.getNamespace() + StringUtils.capitalize(cmpDesc.getName());
         DefDescriptor<?> styleDesc = Aura.getDefinitionService().getDefDescriptor(cmpDesc, DefDescriptor.CSS_PREFIX,

@@ -1,0 +1,4 @@
+<!-- Recipe 5 -->
+<aura:component>
+  <div> {!v.body} </div>
+</aura:component>

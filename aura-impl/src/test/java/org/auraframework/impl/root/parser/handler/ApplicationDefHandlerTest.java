@@ -30,8 +30,6 @@ import org.auraframework.system.Parser.Format;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-import com.google.common.base.Optional;
-
 public class ApplicationDefHandlerTest extends AuraImplTestCase {
     XMLStreamReader xmlReader;
     XMLInputFactory xmlInputFactory;
@@ -87,30 +85,13 @@ public class ApplicationDefHandlerTest extends AuraImplTestCase {
         }
     }
 
+    public void testReadThemeAttribute() throws QuickFixException {
+        DefDescriptor<ThemeDef> override = addSourceAutoCleanup(ThemeDef.class, "<aura:theme></aura:theme>");
 
-    public void testThemeOverrides() throws Exception {
-        DefDescriptor<ThemeDef> parent = addSourceAutoCleanup(ThemeDef.class, "<aura:theme></aura:theme>");
-        DefDescriptor<ThemeDef> child = addSourceAutoCleanup(ThemeDef.class,
-                String.format("<aura:theme extends=\"%s\"></aura:theme>", parent.getDescriptorName()));
-
-        String src = String.format("<aura:application themeOverrides=\"%s=%s\"></aura:application>",
-                parent.getDescriptorName(), child.getDescriptorName());
+        String src = String.format("<aura:application overrideTheme=\"%s\"></aura:application>",
+                override.getDescriptorName());
 
         DefDescriptor<ApplicationDef> app = addSourceAutoCleanup(ApplicationDef.class, src);
-
-        Optional<DefDescriptor<ThemeDef>> override = app.getDef().getThemeOverrides().getOverride(parent);
-        assertEquals(override.get(), child);
+        assertEquals(override, app.getDef().getOverrideThemeDescriptor());
     }
-
-    public void testMalformedThemeOverrideString() throws QuickFixException {
-        DefDescriptor<ApplicationDef> dd = addSourceAutoCleanup(ApplicationDef.class,
-                "<aura:application themeOverrides=\"test:fakeTheme\"></aura:application>");
-        try {
-            dd.getDef();
-            fail("expected to throw AuraRuntimeException.");
-        } catch (InvalidDefinitionException e) {
-            assertTrue(e.getMessage().contains("Invalid themeOverrides format"));
-        }
-    }
-
 }

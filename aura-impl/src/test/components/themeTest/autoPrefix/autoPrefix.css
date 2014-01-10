@@ -1,4 +1,0 @@
-.THIS {
-  box-sizing: t(themeTest.baseTheme.sizing);
-  background: theme("'linear-gradient(' + themeTest.baseTheme.gradient + ')'");
-}

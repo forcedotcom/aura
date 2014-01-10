@@ -15,29 +15,42 @@
  */
 package org.auraframework.adapter;
 
-import org.auraframework.css.parser.ThemeOverrideMap;
-import org.auraframework.css.parser.ThemeValueProvider;
+import org.auraframework.css.ThemeValueProvider;
+import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.StyleDef;
 import org.auraframework.def.ThemeDef;
+import org.auraframework.system.AuraContext;
 
 /**
  * Adapter for CSS/Style stuff.
  */
 public interface StyleAdapter extends AuraAdapter {
     /**
-     * Gets a {@link ThemeValueProvider}, used for resolving {@link ThemeDef} variables. Uses the default overrides
-     * specified in the currently loaded application.
-     */
-    ThemeValueProvider getThemeValueProvider();
-
-    /**
-     * Gets a {@link ThemeValueProvider}, used for resolving {@link ThemeDef} variables.
+     * Gets a {@link ThemeValueProvider} using whatever {@link ThemeDef} override is specified on the current
+     * {@link AuraContext}, or the {@link ApplicationDef#getOverrideThemeDescriptor()}. This is usually the method you
+     * want.
      * 
-     * @param overrides Overridden {@link ThemeDef}s.
+     * @param descriptor The {@link StyleDef} descriptor of the CSS file being parsed. This is used to determine which
+     *            namespace-default {@link ThemeDef} to use, as well as which component-bundle {@link ThemeDef} to use.
      */
-    ThemeValueProvider getThemeValueProvider(ThemeOverrideMap overrides);
+    ThemeValueProvider getThemeValueProvider(DefDescriptor<StyleDef> descriptor);
 
     /**
-     * Gets a {@link ThemeValueProvider}, used for resolving {@link ThemeDef} variables. This will ignore any overrides.
+     * Gets a {@link ThemeValueProvider} using the given override theme.
+     * 
+     * @param descriptor The {@link StyleDef} descriptor of the CSS file being parsed. This is used to determine which
+     *            namespace-default {@link ThemeDef} to use, as well as which component-bundle {@link ThemeDef} to use.
+     * @param override Use this {@link ThemeDef} as the override theme.
      */
-    ThemeValueProvider getThemeValueProviderNoOverrides();
+    ThemeValueProvider getThemeValueProvider(DefDescriptor<StyleDef> descriptor, DefDescriptor<ThemeDef> override);
+
+    /**
+     * Gets a {@link ThemeValueProvider} that doesn't use any override theme (even if one is set on the current
+     * {@link AuraContext}).
+     * 
+     * @param descriptor The {@link StyleDef} descriptor of the CSS file being parsed. This is used to determine which
+     *            namespace-default {@link ThemeDef} to use, as well as which component-bundle {@link ThemeDef} to use.
+     */
+    ThemeValueProvider getThemeValueProviderNoOverrides(DefDescriptor<StyleDef> descriptor);
 }

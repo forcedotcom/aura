@@ -22,13 +22,15 @@ import java.util.Set;
 
 import org.auraframework.Aura;
 import org.auraframework.builder.StyleDefBuilder;
-import org.auraframework.css.parser.ThemeValueProvider;
+import org.auraframework.css.ThemeValueProvider;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.NamespaceDef;
 import org.auraframework.def.StyleDef;
-import org.auraframework.impl.css.parser.omakase.CssParserOmakase;
+import org.auraframework.def.ThemeDef;
+import org.auraframework.impl.css.parser.CssPreprocessor;
+import org.auraframework.impl.root.theme.Themes;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.instance.Component;
@@ -40,20 +42,19 @@ import org.auraframework.util.json.Json;
 import com.google.common.collect.Maps;
 
 public class StyleDefImpl extends DefinitionImpl<StyleDef> implements StyleDef {
-
     private static final long serialVersionUID = 7140896215068458158L;
 
-    private final String className;
-    private final List<ComponentDefRef> components;
-    private final Set<String> themeReferences;
     private final String content;
+    private final String className;
+    private final Set<String> expressions;
+    private final List<ComponentDefRef> components; /* TODONM remove */
 
     protected StyleDefImpl(Builder builder) {
         super(builder);
-        this.className = builder.className;
-        this.components = AuraUtil.immutableList(builder.components);
-        this.themeReferences = AuraUtil.immutableSet(builder.themeReferences);
         this.content = builder.content;
+        this.className = builder.className;
+        this.expressions = AuraUtil.immutableSet(builder.expressions);
+        this.components = AuraUtil.immutableList(builder.components); /* TODONM remove */
     }
 
     @Override
@@ -61,15 +62,18 @@ public class StyleDefImpl extends DefinitionImpl<StyleDef> implements StyleDef {
         dependencies.add(Aura.getDefinitionService().getDefDescriptor(descriptor.getNamespace(), NamespaceDef.class));
         dependencies.add(Aura.getDefinitionService().getDefDescriptor("aura:styleDef", ComponentDef.class));
 
-        // dependencies from theme variables in the css file
-        if (!themeReferences.isEmpty()) {
-            ThemeValueProvider vp = Aura.getStyleAdapter().getThemeValueProviderNoOverrides();
-            for (String reference : themeReferences) {
-                try {
-                    dependencies.addAll(vp.getDescriptors(reference, getLocation()));
-                } catch (QuickFixException qfe) {
-                    // ignore, we will catch this in validateReferences.
-                }
+        if (!expressions.isEmpty()) {
+            // we know that any expression means we have a dependency on a theme, but we can't determine here if that is
+            // only a dependency on the local theme, only on the namespace-default, or both (however if the expression
+            // references a var not defined in either then a QFE will be thrown during #validateReferences).
+            DefDescriptor<ThemeDef> localTheme = Themes.getLocalTheme(descriptor);
+            if (localTheme.exists()) {
+                dependencies.add(localTheme);
+            }
+
+            DefDescriptor<ThemeDef> namespaceTheme = Themes.getNamespaceDefaultTheme(descriptor);
+            if (namespaceTheme.exists()) {
+                dependencies.add(namespaceTheme);
             }
         }
     }
@@ -78,12 +82,11 @@ public class StyleDefImpl extends DefinitionImpl<StyleDef> implements StyleDef {
     public void validateReferences() throws QuickFixException {
         super.validateReferences();
 
-        // references to themedefs
-        if (!themeReferences.isEmpty()) {
-            ThemeValueProvider vp = Aura.getStyleAdapter().getThemeValueProviderNoOverrides();
-            for (String reference : themeReferences) {
-                vp.getDescriptors(reference, getLocation());
-                vp.getValue(reference, getLocation()); // get value will validate it's a valid variable
+        // validate that expressions reference valid vars
+        if (!expressions.isEmpty()) {
+            ThemeValueProvider vp = Aura.getStyleAdapter().getThemeValueProviderNoOverrides(descriptor);
+            for (String reference : expressions) {
+                vp.getValue(reference, getLocation()); // getValue will validate it's a valid expression/variable
             }
         }
     }
@@ -91,6 +94,7 @@ public class StyleDefImpl extends DefinitionImpl<StyleDef> implements StyleDef {
     @Override
     public String getCode() {
         if (content == null) {
+            /* TODONM remove this block */
             Map<String, Object> attributes = Maps.newHashMap();
             attributes.put("body", components);
             try {
@@ -104,7 +108,7 @@ public class StyleDefImpl extends DefinitionImpl<StyleDef> implements StyleDef {
         }
 
         try {
-            return CssParserOmakase.runtime().source(content).themes().parse().content();
+            return CssPreprocessor.runtime().source(content).themes(descriptor).parse().content();
         } catch (Exception e) {
             throw new AuraRuntimeException(e);
         }
@@ -137,14 +141,20 @@ public class StyleDefImpl extends DefinitionImpl<StyleDef> implements StyleDef {
             super(StyleDef.class);
         }
 
-        private String className;
-        private List<ComponentDefRef> components;
-        private Set<String> themeReferences;
         private String content;
+        private String className;
+        private Set<String> expressions;
+        private List<ComponentDefRef> components; /* TODONM remove */
 
         @Override
         public StyleDef build() {
             return new StyleDefImpl(this);
+        }
+
+        @Override
+        public StyleDefBuilder setContent(String content) {
+            this.content = content;
+            return this;
         }
 
         @Override
@@ -154,20 +164,15 @@ public class StyleDefImpl extends DefinitionImpl<StyleDef> implements StyleDef {
         }
 
         @Override
+        public StyleDefBuilder setThemeExpressions(Set<String> expressions) {
+            this.expressions = expressions;
+            return this;
+        }
+
+        /* TODONM remove */
+        @Override
         public StyleDefBuilder setComponents(List<ComponentDefRef> components) {
             this.components = components;
-            return this;
-        }
-
-        @Override
-        public StyleDefBuilder setThemeReferences(Set<String> themeReferences) {
-            this.themeReferences = themeReferences;
-            return this;
-        }
-
-        @Override
-        public StyleDefBuilder setContent(String content) {
-            this.content = content;
             return this;
         }
     }

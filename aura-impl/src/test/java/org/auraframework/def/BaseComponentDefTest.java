@@ -1742,4 +1742,17 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
             checkExceptionFull(e, InvalidDefinitionException.class, "No resource named js://foo.bar found");
         }
     }
+
+    /** tests the local theme is added to the dependencies */
+    public void testAppendsLocalThemeToDependencies() throws Exception {
+        DefDescriptor<ThemeDef> themeDesc = addSourceAutoCleanup(ThemeDef.class, "<aura:theme/>");
+        String fmt = String.format("%s:%s", themeDesc.getNamespace(), themeDesc.getName());
+        DefDescriptor<ComponentDef> cmpDesc = DefDescriptorImpl.getInstance(fmt, ComponentDef.class);
+        addSourceAutoCleanup(cmpDesc, "<aura:component/>");
+        assertEquals(themeDesc, cmpDesc.getDef().getLocalThemeDescriptor());
+
+        Set<DefDescriptor<?>> deps = Sets.newHashSet();
+        cmpDesc.getDef().appendDependencies(deps);
+        assertTrue(deps.contains(themeDesc));
+    }
 }

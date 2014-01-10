@@ -33,6 +33,8 @@ import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonSerializer.NoneSerializer;
 
+import com.google.common.collect.ImmutableList;
+
 /**
  * an expression in aura
  */
@@ -47,6 +49,10 @@ public class PropertyReferenceImpl implements PropertyReference {
     public PropertyReferenceImpl(String expr, Location l) {
         // TODO: delete this constructor, splitting should be done by the parser
         this(AuraTextUtil.splitSimple(".", expr), l);
+    }
+
+    public PropertyReferenceImpl(Iterable<String> pieces, Location l) {
+        this(ImmutableList.copyOf(pieces), l);
     }
 
     protected PropertyReferenceImpl(List<String> pieces, Location l) {

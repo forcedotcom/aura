@@ -77,12 +77,14 @@ public class ThemeDefImpl extends RootDefinitionImpl<ThemeDef> implements ThemeD
 
     @Override
     public Optional<Object> variable(String name) throws QuickFixException {
+        DefDescriptor<AttributeDef> desc = Aura.getDefinitionService().getDefDescriptor(name, AttributeDef.class);
+
         // first check overrides
-        Optional<Object> found = asOverridden(name);
+        Optional<Object> found = asOverridden(desc);
 
         // if not there check own attributes
         if (!found.isPresent()) {
-            found = fromSelf(name);
+            found = fromSelf(desc);
         }
 
         // if not there then check parent
@@ -93,8 +95,7 @@ public class ThemeDefImpl extends RootDefinitionImpl<ThemeDef> implements ThemeD
         return found;
     }
 
-    private Optional<Object> asOverridden(String name) {
-        DefDescriptor<AttributeDef> desc = Aura.getDefinitionService().getDefDescriptor(name, AttributeDef.class);
+    private Optional<Object> asOverridden(DefDescriptor<AttributeDef> desc) {
         AttributeDefRef attributeDefRef = overrides.get(desc);
         if (attributeDefRef == null) {
             return Optional.absent();
@@ -103,8 +104,7 @@ public class ThemeDefImpl extends RootDefinitionImpl<ThemeDef> implements ThemeD
         }
     }
 
-    private Optional<Object> fromSelf(String name) {
-        DefDescriptor<AttributeDef> desc = Aura.getDefinitionService().getDefDescriptor(name, AttributeDef.class);
+    private Optional<Object> fromSelf(DefDescriptor<AttributeDef> desc) {
         AttributeDef attributeDef = attributeDefs.get(desc);
         if (attributeDef == null) {
             return Optional.absent();

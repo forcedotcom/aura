@@ -20,6 +20,7 @@ package org.auraframework.impl.css.parser;
  */
 public final class ParserStrategy {
     public static boolean omakase() {
-        return !("phloc".equals(System.getProperty("cssparser")));
+        return true;
+        // return !("phloc".equals(System.getProperty("cssparser")));
     }
 }

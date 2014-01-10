@@ -4,4 +4,6 @@
   <aura:attribute name="lineHeight" default="5" type="Integer" />
   <aura:attribute name="spacious" default="false" type="Boolean" />
   <aura:attribute name="bgcolor" default="green" />
+  <aura:attribute name="sizing" default="border-box" />
+  <aura:attribute name="gradient" default="red, yellow" />
 </aura:theme>

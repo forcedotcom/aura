@@ -50,9 +50,7 @@
     <p>Server-side dependencies include server-side models, renderers, or providers for the component and its super components.
     A component with server-side dependencies will be created on the server, even if it's preloaded.
     If there are no server dependencies and the definition already exists on the client via preloading or declared dependencies, no server call is made.</p>
-    <p>	
-    If a component has server-side dependencies, Aura makes a server call even though it has a cached definition of the component.
-    </p>
+   
     <p>If a component has both a server-side and client-side renderer or provider, the client-side renderer or provider is used.
     </p>
     <auradocs:info>Creating components where the top-level components don't have server dependencies but nested inner components do is not currently supported.</auradocs:info>

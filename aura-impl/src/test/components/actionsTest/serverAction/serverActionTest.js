@@ -115,6 +115,79 @@
                  $A.test.assertTrue(message.indexOf("ArrayIndexOutOfBoundsException: 42") > 0,
                      "Wrong message received from server: " + message);
             }]
-    }
+    },
 
+    /**
+     * When requesting a component via an action, the returned config should be consumed on the client in the Action
+     * callback. If it is not, a warning should be logged.
+     */
+    testUnconsumedPartialConfigsLogsWarning : {
+        test : function(cmp) {
+            $A.test.expectAuraWarning("unused configs");
+            var action = $A.get("c.aura://ComponentController.getComponent");
+            action.setParams({
+                "name" : "markup://loadLevelTest:serverComponent"
+            });
+            action.setCallback(this, function(a) {
+                if (a.getState() === "SUCCESS") {
+                    // Here is where the config should normally be consumed
+                }
+            });
+            $A.run(function(){
+                $A.enqueueAction(action);
+            });
+
+            $A.test.addWaitFor(false, $A.test.isActionPending, function(){
+                // This test will fail if we don't get the warning specificed by the $A.test.expectAuraWarning()
+                // call above. This wait is just to ensure the Action code finishes.
+            });
+        }
+    },
+
+    /**
+     * Storable actions without a callback are a special case and should have their unused component configs cleared
+     * automatically without an error or warning.
+     */
+    testClearingPartialConfigsOnStorableActions : {
+        test : function(cmp) {
+            // All configs in this test should be consumed or automatically cleared so fail on any warnings
+            $A.test.overrideFunction($A, "warning",
+                    function(msg) {
+                        if (msg.substring(0, 14) == "unused configs") {
+                            $A.test.fail("Unused config warning should not be thrown");
+                        }
+                    }
+            );
+
+            // Run storable action (no callback) that has unconsumed component configs
+            var actionStorable = $A.get("c.aura://ComponentController.getComponent");
+            actionStorable.setStorable();
+            actionStorable.setParams({
+                "name" : "markup://loadLevelTest:serverComponent"
+            });
+            $A.run(function(){
+                $A.enqueueAction(actionStorable);
+            });
+
+            // Wait for storable action to complete
+            $A.test.addWaitFor(false, $A.test.isActionPending, function(){
+                var action = $A.get("c.aura://ComponentController.getComponent");
+                action.setParams({
+                    "name" : "markup://loadLevelTest:serverComponent"
+                });
+                action.setCallback(this, function(a) {
+                    if (a.getState() === "SUCCESS") {
+                        // Consume config to avoid warning/error
+                        $A.newCmpDeprecated(a.getReturnValue());
+                    }
+                });
+
+                // Run another action to verify there are no lingering configs from previous storable action
+                $A.run(function() {
+                    $A.enqueueAction(action);
+                });
+                $A.test.addWaitFor(false, $A.test.isActionPending, function(){ });
+            });
+        }
+    }
 })

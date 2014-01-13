@@ -53,8 +53,9 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
-
         long ifModifiedSince = request.getDateHeader(HttpHeaders.IF_MODIFIED_SINCE);
+        System.out.println(System.currentTimeMillis()+",AuraFrameworkServlet.doGet,request:" +request.toString()+
+        		"\npath:"+path);
         InputStream in = null;
         try {
 
@@ -65,7 +66,6 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
             Aura.getConfigAdapter().regenerateAuraJS();
             // framework uid is combination of aura js and resources uid
             String currentUid = Aura.getConfigAdapter().getAuraFrameworkNonce();
-
             // match entire path once, looking for root, optional nonce, and
             // rest-of-path
             Matcher matcher = RESOURCES_PATTERN.matcher(path);
@@ -73,13 +73,14 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND);
                 return;
             }
-
             String nonceUid = matcher.group(2);
             String file = null;
             boolean haveUid = false;
             boolean matchedUid = false;
             file = matcher.group(3);
-
+System.out.println("group1:"+matcher.group(1)+"\ngroup2(as nonceUid):"+
+            matcher.group(2)+"\ngroup3(as file)"+matcher.group(3)
+            +",\ncurrentUid(from getAuraFrameworkNonce):"+currentUid+",ifModifiedSince:"+ifModifiedSince);
             if (nonceUid != null) {
                 nonceUid = nonceUid.substring(1);
             }
@@ -99,7 +100,6 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND);
                 return;
             }
-            System.out.println("currentUid:"+currentUid+",nonceUid:"+nonceUid+",​ifModifiedSince:"+ifModifiedSince);
             if (currentUid != null && currentUid.equals(nonceUid)) {
                 //
                 // If we match the nonce and we have an if-modified-since, we
@@ -115,7 +115,7 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
                 // includes all of the resources that may be requested...
                 //
                 if (ifModifiedSince != -1) {
-                	 System.out.println("TS:"+System.currentTimeMillis()+",currentUit = nonceUid, ifModifiedSince!=-1,send response with 304, return");
+                    System.out.println("TS:"+System.currentTimeMillis()+",currentUid = nonceUid && ifModifiedSince!=-1,send response with 304, return");
                     response.sendError(HttpServletResponse.SC_NOT_MODIFIED);
                     return;
                 }
@@ -215,6 +215,7 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
 
             IOUtil.copyStream(in, response.getOutputStream());
         } finally {
+        	System.out.println(System.currentTimeMillis()+",AuraFrameworkServlet.doGet,try{} end, close in if it's not null");
             if (in != null) {
                 try {
                     in.close();

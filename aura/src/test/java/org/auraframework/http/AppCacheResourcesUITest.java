@@ -246,7 +246,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
     @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
     public void testComponentCssChange() throws Exception {
         // debug for flapper:
-        System.out.println("testComponentCssChange begins TS:" + System.currentTimeMillis());
+        System.out.println(System.currentTimeMillis()+",testComponentCssChange begins");
         createDef(NamespaceDef.class, String.format("%s://%s", DefDescriptor.MARKUP_PREFIX, namespace),
                 "<aura:namespace></aura:namespace>");
 
@@ -263,7 +263,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         replaceToken(getTargetComponent().getStyleDescriptor(), replacement);
 
         // debug for flapper:
-        System.out.println("testComponentCssChange load app again, TS:" + System.currentTimeMillis());
+        System.out.println(System.currentTimeMillis()+",testComponentCssChange load app again");
         logs = loadMonitorAndValidateApp(TOKEN, TOKEN, replacement, TOKEN);
 
         assertRequests(getExpectedChangeRequests(), logs);
@@ -433,8 +433,8 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
      */
     private List<Request> loadMonitorAndValidateApp(final String markupToken, String jsToken, String cssToken,
             String fwToken) throws Exception {
-        System.out.println("loadMonitorAndValidateApp,logging adapter start capturing,"
-                + "open " + namespace + "/" + appName + ", TS:" + System.currentTimeMillis());
+        System.out.println(System.currentTimeMillis()+",loadMonitorAndValidateApp,logging adapter start capturing,"
+                + "open " + namespace + "/" + appName );
         TestLoggingAdapterController.beginCapture();
         open(String.format("/%s/%s.app", namespace, appName));
 

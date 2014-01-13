@@ -96,7 +96,7 @@ Test.Aura.Component.ComponentTest=function(){
         
         //this cover when passing in globalid, and priv.index[localid]=globalid, note index[localid] here is not an array
         [Fact]
-        function RemoveLocalidFromIndexWhenPassingInGlobalid() {
+        function RemoveLocalIdFromIndexWhenPassingInGlobalId() {
             //Arrange
             var localid = "testLocalId";
             var globalid = "testGlobalId";
@@ -127,7 +127,7 @@ Test.Aura.Component.ComponentTest=function(){
         
         //This cover when remove only item index[localid] has
         [Fact]
-    	function RemoveLocalidArrWhenPassingOnlyItemItHas() {
+    	function RemoveLocalIdArrayWhenPassingOnlyItemItHas() {
     		//Arrange
             var localid = "testLocalId";
             var globalid = "testGlobalId";
@@ -158,7 +158,7 @@ Test.Aura.Component.ComponentTest=function(){
         
         //this cover basic index array with only two global ids, we remove one of them
         [Fact]
-        function ReturnsLocalidArrWithGblobalidPassingInSimple() {
+        function ReturnsLocalIdArrayWithGlobalIdPassingInSimple() {
             //Arrange
             var localid = "testLocalId";
             var globalid1 = "testGlobalId1";
@@ -188,11 +188,10 @@ Test.Aura.Component.ComponentTest=function(){
             //Assert
             Assert.Equal(expected, actual);
         }
-        
-        
-        //this cover complex situation when there are duplications in index array. should we have duplications in index anyway?
-        [Fact,Skip("not sure if we should have duplication in component.index[]:W-1831607")]
-        function ReturnsLocalidArrWithGblobalidPassingInComplex() {
+
+        //this cover complex situation when there are duplications in index array.
+        [Fact]
+        function ReturnsLocalIdArrayWithGlobalIdPassingInComplex() {
             //Arrange
             var localid = "testLocalId";
             var globalid1 = "testGlobalId1";
@@ -225,7 +224,7 @@ Test.Aura.Component.ComponentTest=function(){
         
         //this cover when NOT passing in globalid, priv.index exist, what priv.index[localid] has doesn't matter
         [Fact]
-        function RemoveLocalidFromIndexWhenNotPassingInGlobalid() {
+        function RemoveLocalIdFromIndexWhenNotPassingInGlobalId() {
             //Arrange
             var localid = "testLocalId";
             var target = null;
@@ -457,7 +456,4 @@ Test.Aura.Component.ComponentTest=function(){
 			Assert.Equal(expected, actual);
 		}
 	}//end of [Fixture]function GetDef()
-      
 }
-
-

@@ -23,6 +23,9 @@
     <p>To learn about the style convention for components, see <auradocs:topicLink topic="cmpCSS">CSS in Components</auradocs:topicLink>.</p>
     
     <p>To include external style sheets in your app, see <auradocs:topicLink topic="createAppTemplate">Creating App Templates</auradocs:topicLink>.</p>
+    
+    <p>Additionally, use themes to apply a consistent style across your app. Create themes in files with the  <code>.theme</code> extension before using or extending them. Each theme file contains attributes that define style names and default values.
+		You can then use theme functions, which are lookups to those attributes, in your component's CSS files within the same namespace or across namespaces.</p>
 
     <p><b>See also:</b><br/>
         <auradocs:topicLink topic="buildApp">Aura Note Demo App</auradocs:topicLink><br/>

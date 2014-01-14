@@ -123,7 +123,7 @@
                 <auradocs:contentsNode text="Setting Label Parameters" id="labelParameters"/>
                 <auradocs:contentsNode text="Customizing your Label Implementation" id="labelAdapter"/>
             </auradocs:contentsNode>
-            <auradocs:contentsNode text="Styling Apps" id="styleApp"/>
+            
             <auradocs:contentsNode text="Handling App Navigation" >
                 <auradocs:contentsNode text="Introduction" id="urlNav" />
                 <auradocs:contentsNode text="Using Layouts for Metadata-Driven Navigation" id="layouts"/>
@@ -132,6 +132,14 @@
             <auradocs:contentsNode text="Controlling App Access with Security Providers" id="securityProviders" />
         </auradocs:contentsNode>
 
+		 <auradocs:contentsNode text="Styling Apps">
+		 	<auradocs:contentsNode text="Overview"  id="styleApp"/>
+		 	<auradocs:contentsNode text="Building Your Themes" id="theme"/>
+		 	<auradocs:contentsNode text="Overriding Themes Across Apps" id="themeApp"/>
+		 	<auradocs:contentsNode text="Using Expressions in Themes" id="themeExp"/>
+		 	<auradocs:contentsNode text="Using Media queries with Themes" id="themeMedia"/>
+		 </auradocs:contentsNode>
+		 
         <auradocs:contentsNode text="Code" >
             <auradocs:contentsNode text="Overview" id="code"/>
             <auradocs:contentsNode text="JavaScript" >

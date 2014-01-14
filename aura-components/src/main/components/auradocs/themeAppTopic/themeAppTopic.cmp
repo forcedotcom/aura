@@ -1,0 +1,58 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="Override Themes Across Apps"/>
+		<p>Your apps might use different values for a specific variable. A theme extension and override enables you to specify different values in an app's theme file.</p>
+		<p>For example, you want to vary the margin for the mobile and desktop version of your app. In your base theme file, specify the margin attribute.</p>
+		
+		<auradocs:codeblock>&lt;!--myNamespace/myTheme/myTheme.theme-->
+&lt;aura:theme>
+  &lt;aura:attribute name="margin_space" default=""/>
+&lt;/aura:theme></auradocs:codeblock>
+
+		<p>Then, extend and override the base theme.</p>
+		
+		<h2>Extend the Theme</h2>
+		<p>In your desktop and mobile namespaces, extend the base theme by specifying the values for the margin.</p>
+		<auradocs:codeblock>&lt;!--desktopNamespace/desktopTheme/desktopTheme.theme-->
+&lt;aura:theme extends="myNamespace:myTheme">
+  &lt;aura:set attribute="margin_space" value="20px"/>
+&lt;/aura:theme></auradocs:codeblock>
+
+		<auradocs:codeblock>&lt;!--mobileNamespace/mobileTheme/mobileTheme.theme-->
+&lt;aura:theme extends="myNamespace:myTheme">
+  &lt;aura:set attribute="margin_space" value="10px"/>
+&lt;/aura:theme></auradocs:codeblock>
+
+		<h2>Override the Theme</h2>
+		<p>In your app files, specify the theme overrides on the <code>aura:application</code> tags.</p>
+		<auradocs:codeblock>&lt;!--desktopNamespace/desktop/desktop.app-->
+&lt;aura:application themeOverrides="myNamespace:myTheme=desktopNamespace:desktopTheme">
+&lt;/aura:application></auradocs:codeblock>
+
+		<auradocs:codeblock>&lt;!--mobileNamespace/mobile/mobile.app-->
+&lt;aura:application themeOverrides="myNamespace:myTheme=mobileNamespace:mobileTheme">
+&lt;/aura:application></auradocs:codeblock>
+
+		<h2>Apply the Theme</h2>
+		<p>In the CSS file of your component, use theme functions to lookup to the respective style values.</p>
+		<auradocs:codeblock>&lt;!--myNamespace/myComponent/myComponent.css-->
+.THIS {
+  margin: t('myNamespace.myTheme.margin_space');
+}</auradocs:codeblock>
+</aura:component>

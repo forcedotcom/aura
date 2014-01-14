@@ -18,9 +18,6 @@
 	CONSTANTS : {ASC: 'ASC', DESC: 'DESC', DESC_PREFIX: "-"},
 		
 	doInit : function(cmp) {
-		//default to ASC
-		this.DEFAULT_SORT_ORDER = this.CONSTANTS.ASC; 
-    	this.updateSortOrderPicker(cmp, this.DEFAULT_SORT_ORDER);
 		this.initSorterTrigger(cmp);
 		this.initDataProvider(cmp);		
 		this.triggerDataProvider(cmp);
@@ -99,8 +96,7 @@
 			}
 			
 			cmp._selectedItems = sList;
-			cmp.getValue('v.items').setValue(filteredItems);			
-			this.updateSortedItemsLable(cmp);
+			cmp.getValue('v.items').setValue(filteredItems);
 		}
 	},
 	
@@ -129,13 +125,7 @@
 			}			
 		}
 		cmp.setValue('v.visible', true);
-		//fill up the rest of the screen with the menu list
-		var container = cmp.find('sorterContainer').getElement(),
-			header = cmp.find('headerBar').getElement(),
-			pickerCtEl = cmp.find('sortOrderPicker').getElement(),
-			menuListHeight = container.offsetHeight - header.offsetHeight - pickerCtEl.offsetHeight;
-		
-		cmp.find('sorterMenuList').getElement().style.height = menuListHeight + 'px';				
+		this.updateSize(cmp);
 	},
 	
 	handleOnCancel : function(cmp) {
@@ -158,7 +148,7 @@
 		var action = cmp.get('v.onApply');
 		if (action) {
 			var result = [], order;
-			var selectedItems = this.getSelectedItems(cmp);
+			var selectedItems = this.getSelectedMenuItems(cmp);
 			for (var i=0; i < selectedItems.length; i++) {
 				// append prefix for descending order
 				order = cmp._sortOrderMap[selectedItems[i].fieldName].order === this.CONSTANTS.DESC ? this.CONSTANTS.DESC_PREFIX : '';
@@ -259,14 +249,18 @@
 	},
 	
 	updateSortOrderPicker : function(cmp, order) {
+		var selectedLabel = 'selected';
 		if (order == this.CONSTANTS.ASC) {
+			cmp.find('ascSelected').setValue('v.value', selectedLabel);
+			cmp.find('descSelected').setValue('v.value', '');
 			$A.util.addClass(cmp.find('ascBtn').getElement(), "selected");
 			$A.util.removeClass(cmp.find('decBtn').getElement(), "selected");			
 		} else if (order == this.CONSTANTS.DESC) {
+			cmp.find('descSelected').setValue('v.value', selectedLabel);
+			cmp.find('ascSelected').setValue('v.value', '');
 			$A.util.addClass(cmp.find('decBtn').getElement(), "selected");
 			$A.util.removeClass(cmp.find('ascBtn').getElement(), "selected");
 		}
-		this.setCurrentSortOrder(cmp, order);
 		cmp.find('selectedSortOrderOutput').getValue('v.value').setValue(this.LABELS[order]);
 	},
 	
@@ -302,14 +296,6 @@
 	    return values;
 	},
 	
-	getCurrentSortOrder : function(cmp) {
-		return cmp._currentSortOrder;
-	},
-	
-	setCurrentSortOrder : function(cmp, order) {
-		cmp._currentSortOrder = order;
-	},
-	
 	getSelectedItems : function(cmp) {
 		return cmp._selectedItems;
 	},
@@ -338,60 +324,94 @@
 	},
 	
 	attachEventHandler : function(cmp) {
-		if (!cmp._keydownHandler) {
-			cmp._keydownHandler = this.getKeydownHandler(cmp);
-		}
-		$A.util.on(document, 'keydown', cmp._keydownHandler);
+		$A.util.on(document, 'keydown', this.getKeydownHandler(cmp));
 		$A.util.on(document.body, this.getOnClickEventProp("onClickStartEvent"), this.getOnClickStartFunction(cmp));
-        $A.util.on(document.body, this.getOnClickEventProp("onClickEndEvent"), this.getOnClickEndFunction(cmp));    
+        $A.util.on(document.body, this.getOnClickEventProp("onClickEndEvent"), this.getOnClickEndFunction(cmp));
+        $A.util.on(window, 'orientationchange', this.getOrientationChangeHandler(cmp));
 	},
 	
 	removeEventHandler : function(cmp) {
-		$A.util.removeOn(document, 'keydown', cmp._keydownHandler);
+		$A.util.removeOn(document, 'keydown', this.getKeydownHandler(cmp));
 		$A.util.removeOn(document.body, this.getOnClickEventProp("onClickStartEvent"), this.getOnClickStartFunction(cmp));
-        $A.util.removeOn(document.body, this.getOnClickEventProp("onClickEndEvent"), this.getOnClickEndFunction(cmp)); 
-		delete cmp._keydownHandler;		
+        $A.util.removeOn(document.body, this.getOnClickEventProp("onClickEndEvent"), this.getOnClickEndFunction(cmp));
+        $A.util.removeOn(window, 'orientationchange', this.getOrientationChangeHandler(cmp));
+	},
+	
+	position : function(cmp) { 
+    	if (cmp.get('v.modal')) {
+    		//attach the dom to the document body as a modal dialog    		
+    		document.body.appendChild(cmp.find('mask').getElement());
+    		document.body.appendChild(cmp.find('sorterContainer').getElement());
+    	}
+    },
+    
+    /**
+     * Update dialog size
+     */
+    updateSize : function(cmp) {
+    	var containerEl = cmp.find('sorterContainer').getElement(); 
+		var isPhone = $A.getGlobalValueProviders().get("$Browser.isPhone");
+		if (isPhone) {
+			var viewPort = $A.util.getWindowSize(),
+				header = cmp.find('headerBar').getElement(),
+				pickerCtEl = cmp.find('sortOrderPicker').getElement(),
+				menuListHeight = viewPort.height - header.offsetHeight - pickerCtEl.offsetHeight;
+			
+			//fill up the whole screen
+			$A.util.addClass(cmp.find('sorterContainer').getElement(), 'phone');
+			containerEl.style.width = viewPort.width + 'px';
+			containerEl.style.height = viewPort.height + 'px';
+			
+			//update sorter menu size to fill up the rest of the screen with the menu list
+			cmp.find('sorterMenuList').getElement().style.height = menuListHeight + 'px';
+		} else {
+			//update sorter menu size to fill up the rest of the screen with the menu list
+			var header = cmp.find('headerBar').getElement(),
+				pickerCtEl = cmp.find('sortOrderPicker').getElement(),
+				menuListHeight = containerEl.offsetHeight - header.offsetHeight - pickerCtEl.offsetHeight;
+			
+			cmp.find('sorterMenuList').getElement().style.height = menuListHeight + 'px';
+		}
+    },
+    
+	/**
+	 * Handler for device orientation change event
+	 */
+	getOrientationChangeHandler : function(cmp) {
+		if (!cmp._orientationChange) {
+			var helper = this;		
+			cmp._orientationChange = function(event) {
+				helper.updateSize(cmp);
+			}
+		}
+		return cmp._orientationChange;
 	},
 	
 	/**
      * Constructs the handler for the DOM keydown event. Includes handlers for tab key (including shift+tab)
      */
     getKeydownHandler : function(cmp) {
-    	return function(event) {
-	        switch (event.keyCode) {
-	            case 9: // tab key, keep focus inside the dialog
-	            	var container = cmp.find('sorterContainer').getElement(),
-	    			currentFocus = document.activeElement,
-	    			shiftPressed = event.shiftKey,
-	    			firstFocusable = cmp.find('ascBtn').getElement(),
-	    			applyBtn = cmp.find('set').getElement();  	
-                    if (currentFocus === applyBtn && !shiftPressed) {
-                        $A.util.squash(event, true);
-                        firstFocusable.focus();
-                    } else if (currentFocus === firstFocusable && shiftPressed) {
-                        $A.util.squash(event, true);
-                        applyBtn.focus();
-                    }                   
-	                break;
-            }   	
+    	if (!cmp._keydownHandler) {
+			cmp._keydownHandler = function(event) {
+		        switch (event.keyCode) {
+		            case 9: // tab key, keep focus inside the dialog
+		            	var container = cmp.find('sorterContainer').getElement(),
+		    			currentFocus = document.activeElement,
+		    			shiftPressed = event.shiftKey,
+		    			firstFocusable = cmp.find('ascBtn').getElement(),
+		    			applyBtn = cmp.find('set').getElement();  	
+	                    if (currentFocus === applyBtn && !shiftPressed) {
+	                        $A.util.squash(event, true);
+	                        firstFocusable.focus();
+	                    } else if (currentFocus === firstFocusable && shiftPressed) {
+	                        $A.util.squash(event, true);
+	                        applyBtn.focus();
+	                    }                   
+		                break;
+	            }   	
+			}
     	}
-    },
-	
-	position : function(cmp) { 
-    	if (cmp.get('v.modal')) {
-    		var containerEl = cmp.find('sorterContainer').getElement(); 
-    		var isPhone = $A.getGlobalValueProviders().get("$Browser.isPhone");
-    		if (isPhone) {
-    			var viewPort = $A.util.getWindowSize();
-    			//fill up the whole screen
-    			$A.util.addClass(cmp.find('sorterContainer').getElement(), 'phone');
-    			containerEl.style.width = viewPort.width + 'px';
-    			containerEl.style.height = viewPort.height + 'px';
-    		}
-    		//attach the dom to the document body as a modal dialog
-    		document.body.appendChild(cmp.find('mask').getElement());
-    		document.body.appendChild(containerEl);
-    	}
+    	return cmp._keydownHandler;
     },
 	
 	getOnClickStartFunction: function(component) {

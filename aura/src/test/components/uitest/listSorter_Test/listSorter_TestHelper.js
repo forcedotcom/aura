@@ -20,7 +20,7 @@
 		list = list.toString();
 		var sortOrder;
 		//ascending order
-		if(!list.indexOf(desc) != -1){
+		if(list.indexOf(desc) > -1){
 			list = list.replace("-","");
 			sortOrder = list + " : Z-A"
 		}

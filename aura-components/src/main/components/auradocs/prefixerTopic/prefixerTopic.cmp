@@ -1,0 +1,108 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="Vendor Prefixes"/>
+		<p>Vendor prefixes, such as <code>-moz-</code> and <code>-webkit-</code> among many others, are automatically added in Aura.
+		 You only need to write the unprefixed version, and Aura automatically adds any prefixes that are necessary when generating the CSS output.
+		If you choose to add them, they are used as-is. This enables you to specify alternative values for certain prefixes.</p>
+		<p>For example, this is an unprefixed version of <code>border-radius</code>.</p>
+		<auradocs:codeblock>.class {
+border-radius: 3px;
+}</auradocs:codeblock>
+		<p>The previous declaration results in the following declarations.</p>
+		<auradocs:codeblock>.class {
+-webkit-border-radius: 3px;
+-moz-border-radius: 3px;
+border-radius: 3px;
+}</auradocs:codeblock>
+		<h3>Support for Automatic Prefixes</h3>
+		<auradocs:codeblock>animation                   
+animation-delay             
+animation-direction         
+animation-duration          
+animation-fill-mode         
+animation-iteration-count   
+animation-name              
+animation-play-state        
+animation-timing-function   
+backface-visibility         
+background-clip             
+background-origin           
+background-size             
+border-bottom-left-radius   
+border-bottom-right-radius  
+border-image                
+border-image-outset         
+border-image-repeat         
+border-image-slice          
+border-image-source         
+border-image-width          
+border-radius               
+border-top-left-radius      
+border-top-right-radius     
+box-shadow                  
+box-sizing                  
+column-count                
+column-fill                 
+column-gap                  
+column-rule                 
+column-rule-color           
+column-rule-style           
+column-rule-width           
+column-span                 
+column-width                
+columns                     
+hyphens                     
+perspective                 
+perspective-origin          
+tab-size                    
+transform                   
+transform-origin            
+transform-style             
+transition                  
+transition-delay            
+transition-duration         
+transition-property         
+transition-timing-function  
+user-select	
+
+Function                    
+----------------------------
+calc                        
+linear-gradient             
+repeating-linear-gradient   
+
+At Rule                     
+----------------------------
+keyframes                   
+
+Selector                    
+----------------------------
+selection    
+</auradocs:codeblock>
+
+		<h3>Browser Support</h3>
+		<p>Browser support for automatic prefixes includes:
+		 <ul>
+		   <li>Last four versions of iOS Safari</li>
+		   <li>Last two versions of Chrome and Firefox</li>
+		   <li>Last three versions of Android, IE 7 and later</li>
+		   <li>Latest versions of Safari, IE, Mobile and Opera Mini</li>
+		 </ul>
+		 </p>		
+</aura:component>

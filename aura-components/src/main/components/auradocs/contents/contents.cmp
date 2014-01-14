@@ -138,6 +138,7 @@
 		 	<auradocs:contentsNode text="Overriding Themes Across Apps" id="themeApp"/>
 		 	<auradocs:contentsNode text="Using Expressions in Themes" id="themeExp"/>
 		 	<auradocs:contentsNode text="Using Media queries with Themes" id="themeMedia"/>
+		 	<auradocs:contentsNode text="Vendor Prefixes" id="prefixer"/>
 		 </auradocs:contentsNode>
 		 
         <auradocs:contentsNode text="Code" >

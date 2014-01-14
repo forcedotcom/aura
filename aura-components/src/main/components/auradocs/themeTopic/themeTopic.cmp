@@ -16,12 +16,12 @@
 
 -->
 <aura:component extends="auradocs:topicPanel">
-    <aura:set attribute="title" value="Building Your Themes"/>
+    <aura:set attribute="title" value="Building Themes"/>
 		<p>Create a theme file before using them in your CSS files or extending them in another theme file.</p>
 		
 		<h2>Create a Theme file</h2>
 		<p>The theme filename must use the <code>.theme</code> extension, and the name of the theme must be the same as the name of its folder, in the format <code>myNamespace/myTheme/myTheme.theme</code>.
-		Theme files contain <code>aura:attribute</code> tags that define specific values for styling your components. The following is a sample theme file.</p>
+		Theme files contain <code>aura:attribute</code> tags that define specific values for styling your components. This is a sample theme file.</p>
 		<auradocs:codeblock>&lt;!--myNamespace/myTheme/myTheme.theme-->
 &lt;aura:theme>
   &lt;aura:attribute name="TEXT_COLOR" default="#111"/>
@@ -30,25 +30,19 @@
   &lt;!-- Other attributes here-->
 &lt;/aura:theme></auradocs:codeblock>
 		
-		<h2>Use Theme Variables Within A Namespace</h2>
+		<h2>Use Theme Variables Within or Across A Namespace</h2>
 		<p>A theme function is a lookup to a theme variable. Instead of declaring a color each time, use theme functions for reusability of your theme variables. Theme functions have this format:
 		<code>t(myNamespace.myTheme.attributeName)</code>.</p>
 		<auradocs:info><code>t(myNamespace.myTheme.attributeName)</code> is a shorthand for <code>theme(myNamespace.myTheme.attributeName)</code>.</auradocs:info>
-		<p>In your component's CSS file within the same namespace, add the following CSs declarations. These theme functions are lookups to the values defined in the theme file.</p>
+		<p>In your component's CSS file, add the following CSS declarations. These theme functions are lookups to the values defined in the theme file.</p>
 		<auradocs:codeblock>.THIS {
   color: t(myNamespace.myTheme.TEXT_COLOR);
   background: t(myNamespace.myTheme.GRADIENT_ANCHOR);
 }</auradocs:codeblock>
 
-	<h2>Use Theme Variables Across a Namespace</h2>
-	<p>Suppose you&#x2019;re working on a component in a different namespace. In the CSS file, add the following CSS declarations.</p>
-	<auradocs:codeblock>.THIS {
-  color: t(myNamespace.myTheme.TEXT_COLOR);
-  background: t(myNamespace.myTheme.GRADIENT_ANCHOR);
-}</auradocs:codeblock>
-
+	
 	<h2>Extend A Theme</h2>
-	<p>Attributes in a theme file contains default values which you can override. To extend a theme file, use the <code>extends</code> attribute in the <code>aura:theme</code> tag. The following theme extends
+	<p>Attributes in a theme file contain default values that you can override. To extend a theme file, use the <code>extends</code> attribute in the <code>aura:theme</code> tag. This theme extends
 	<code>myNamespace/myTheme/myTheme.theme</code>.</p>
 	<auradocs:codeblock>&lt;!--myNamespace/newTheme/newTheme.theme-->
 &lt;aura:theme extends="myNamespace:myTheme">

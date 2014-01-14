@@ -18,7 +18,7 @@
 <aura:component extends="auradocs:topicPanel">
     <aura:set attribute="title" value="Using Expressions in Themes"/>
 		<p>Expressions such as string concatenation, mathematical operations, and conditional operations can be used with your themes. When using mathematical operations, you must define the correct type for the theme attribute.</p>
-		<p>For example, you want to use mathematical operations in your style declarations for margins. Let&#x2019;s assume that your have the following base theme file.</p>
+		<p>For example, you want to use mathematical operations in your style declarations for margins. Let's assume that you have this base theme file.</p>
 		<auradocs:codeblock>&lt;!--myNamespace/myTheme/myTheme.theme-->
 &lt;aura:theme>
   &lt;aura:attribute name="margin_space" default="10px"/>
@@ -27,7 +27,7 @@
 &lt;/aura:theme></auradocs:codeblock>
 
 	<h2>Examples of Expressions in Themes</h2>
-	<p>The following expression extends the margin value in base theme, which results in <code>margin: 5px 10px</code>.</p>
+	<p>The following expression uses the margin value in the base theme, and results in <code>margin: 5px 10px</code>.</p>
 	<auradocs:codeblock>margin: t('5px ' + myNamespace.myTheme.margin_space);</auradocs:codeblock>
 	
 	<p>The following expression shows a mathematical operation, which results in <code>line-height: 10;</code>.</p>

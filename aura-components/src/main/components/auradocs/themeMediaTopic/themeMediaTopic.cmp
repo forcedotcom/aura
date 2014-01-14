@@ -18,7 +18,7 @@
 <aura:component extends="auradocs:topicPanel">
     <aura:set attribute="title" value="Using Media Queries with Themes"/>
 		<p>Media queries determine the styles to use for a range of output devices. You can define the default value in the base theme file and use them in your CSS files.</p>
-		<p>This example shows how you can define the media query that targets screen devices with a minimum viewport width of 320px, and use it in a style declaration.</p>
+		<p>This example shows how to define the media query that targets screen devices with a minimum viewport width of 320px, and use it in a style declaration.</p>
 		<auradocs:codeblock>&lt;!--myNamespace/standard/standard.theme-->
 &lt;aura:theme>
   &lt;aura:attribute name="query" default="only screen and (min-device-width: 320px)"/>

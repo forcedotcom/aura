@@ -50,7 +50,7 @@
 &lt;/aura:application></auradocs:codeblock>
 
 		<h2>Apply the Theme</h2>
-		<p>In the CSS file of your component, use theme functions to lookup to the respective style values.</p>
+		<p>In the CSS file of your component, use theme functions to refer to the base theme values. The app's theme override determines which sub-theme to use.</p>
 		<auradocs:codeblock>&lt;!--myNamespace/myComponent/myComponent.css-->
 .THIS {
   margin: t('myNamespace.myTheme.margin_space');

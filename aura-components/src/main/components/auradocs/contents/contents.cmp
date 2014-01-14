@@ -116,6 +116,7 @@
 	             <auradocs:contentsNode text="Creating Lists" id="uiList"/>	            
             </auradocs:contentsNode>
             <auradocs:contentsNode text="Designing App UI" id="designAppLayout"/>
+            <auradocs:contentsNode text="Styling Apps"  id="styleApp"/>
             <auradocs:contentsNode text="Creating App Templates" id="createAppTemplate"/>
             <auradocs:contentsNode text="Adding App Components" id="addAppComponents"/>
             <auradocs:contentsNode text="Using Labels" >
@@ -132,9 +133,9 @@
             <auradocs:contentsNode text="Controlling App Access with Security Providers" id="securityProviders" />
         </auradocs:contentsNode>
 
-		 <auradocs:contentsNode text="Styling Apps">
-		 	<auradocs:contentsNode text="Overview"  id="styleApp"/>
-		 	<auradocs:contentsNode text="Building Your Themes" id="theme"/>
+		 <auradocs:contentsNode text="Theming Apps">
+		 	<auradocs:contentsNode text="Overview"  id="themeOvw"/>
+		 	<auradocs:contentsNode text="Building Themes" id="theme"/>
 		 	<auradocs:contentsNode text="Overriding Themes Across Apps" id="themeApp"/>
 		 	<auradocs:contentsNode text="Using Expressions in Themes" id="themeExp"/>
 		 	<auradocs:contentsNode text="Using Media queries with Themes" id="themeMedia"/>

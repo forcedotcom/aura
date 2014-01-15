@@ -584,18 +584,17 @@ var ComponentPriv = (function() { // Scoping priv
 
     ComponentPriv.prototype.injectComponent = function(config, cmp, localCreation) {
         var componentDef = this.componentDef;
-        if ((componentDef.isAbstract() || componentDef.getProviderDef())
-                        && !this.concreteComponentId) {
+        if ((componentDef.isAbstract() || componentDef.getProviderDef()) && !this.concreteComponentId) {
             var providerDef = componentDef.getProviderDef();
             var realComponentDef;
             var attributes;
+            var act = $A.getContext().getCurrentAction();
+
+            if (act) {
+                // allow the provider to re-use the path of the current component without complaint
+                act.reactivatePath();
+            }
             if (providerDef) {
-                var act = $A.getContext().getCurrentAction();
-                if (act) {
-                    // allow the provider to re-use the path of the current component
-                    // without complaint
-                    act.reactivatePath();
-                }
                 // use it
                 var provided = providerDef.provide(cmp, localCreation);
                 realComponentDef = provided["componentDef"];

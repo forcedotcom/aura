@@ -36,6 +36,7 @@ $A.ns.Util = function() {
     this.trashedComponentQueue = [];
     this.dataAttributeCache = {};
     this.debugToolWindow = undefined;
+    this.sizeEstimator = new SizeEstimator();
 };
 
 /**
@@ -1280,6 +1281,15 @@ $A.ns.Util.prototype.supportsTouchEvents = function() {
 	return this.supportsTouchEvents.cache || (this.supportsTouchEvents.cache = !$A.util.isUndefined(document.ontouchstart) && $A.getContext().getMode() !== 'PTEST' && $A.getContext().getMode() !== 'CADENCE' && $A.getContext().getMode() !== 'SELENIUM' && $A.getContext().getMode() !== 'SELENIUMDEBUG');
 };
 
+/**
+ * Estimate the amount of space that will be utilized by an object or primitive.
+ * 
+ * @param {Object} item The object or primitive whose size to estimate.
+ */
+$A.ns.Util.prototype.estimateSize = function(obj) {
+    return this.sizeEstimator.estimateSize(obj);
+};
+
  
 //#if {"excludeModes" : ["PRODUCTION"]}
 	/**
@@ -1364,4 +1374,5 @@ $A.ns.Util.prototype.supportsTouchEvents = function() {
 	};
 //#end
 
+//#include aura.storage.adapters.SizeEstimator
 //#include aura.util.Util_export

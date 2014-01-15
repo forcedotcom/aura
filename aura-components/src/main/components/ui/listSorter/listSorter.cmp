@@ -41,16 +41,20 @@
     <div aura:id="sorterContainer" class="{!v.class + ' listSorterContainer'}">
     	<div class="body">
 	        <div aura:id="sortOrderPicker" class="sortOrderPicker">
-	        	<a aura:id="ascBtn" onclick="{!c.onAsc}" class="button ascButton" href="javascript:void(0);">A-Z
-	        		<span class="assistiveText">{!v.ascendingLabel}</span>            		
-	        	</a>
+         		<a aura:id="ascBtn" onclick="{!c.onAsc}" class="button ascButton" href="javascript:void(0);">A-Z
+         			<span class="assistiveText">{!v.ascendingLabel}</span>
+         			<ui:outputText aura:id="ascSelected" class="assistiveText" value="" />
+         		</a>
+	        	
 	        	<a aura:id="decBtn" onclick="{!c.onDec}" class="button decButton" href="javascript:void(0);">Z-A
-	        		<span class="assistiveText">{!v.descendingLabel}</span>            		
+	        		<span class="assistiveText">{!v.descendingLabel}</span>
+	        		<ui:outputText aura:id="descSelected" class="assistiveText" value="" />
 	        	</a>
+	        	
 	        	<div class="output">
 	        		<ui:outputText aura:id="selectedItemOutput" value="" />
 	        		<span aura:id="separator" class="hidden">&nbsp;:&nbsp;</span>
-	        		<ui:outputText aura:id="selectedSortOrderOutput"  value="" />
+	        		<ui:outputText aura:id="selectedSortOrderOutput" value="" />
 	        	</div>	            	
 	        </div>            
 			<ui:menu aura:id="sorterMenu" closeOnClickOutside="false" class="sorterMenu">

@@ -172,14 +172,14 @@
 		var expected = "Total Number of Errors found: 4";
 		var output    = $A.devToolService.checkAccessibility(tableToUse);
 		var actual   =  output.split("\n")[0];
-		$A.test.assertEquals(expected, actual , "Unexpected return from CheckAccessibility, should not return errornous string. output: \n"+output);
+		$A.test.assertEquals(expected, actual , "Unexpected return from CheckAccessibility, should return errornous string with 4 errors. output: \n"+output);
 	},
 	function(cmp){
 	        var fieldSetToUse = document.getElementById("field_set"); 
 		var expected = "Total Number of Errors found: 2";
 		var output    = $A.devToolService.checkAccessibility(fieldSetToUse);
 		var actual   =  output.split("\n")[0];
-		$A.test.assertEquals(expected, actual , "Unexpected return from CheckAccessibility, should not return errornous string. output: \n"+output);
+		$A.test.assertEquals(expected, actual , "Unexpected return from CheckAccessibility, should return errornous with 2 errors string. output: \n"+output);
 	}]
 	
      },
@@ -193,6 +193,16 @@
 			$A.test.assertEquals(expected, actual , "Unexpected return from CheckAccessibility, should not return errornous string. output: \n"+output);
 		}
      },
+     testSkipVisualForceIframes : {
+	 attributes : {caseToRender : 'skipIframeForVisForce'},
+		test: function(cmp){
+			var expected = "Total Number of Errors found: 1";
+			var output    = $A.devToolService.checkAccessibility();
+			var actual   =  output.split("\n")[0];
+			$A.test.assertEquals(expected, actual , "Unexpected return from CheckAccessibility, should return errornous string with 1 errors. output: \n"+output);
+		}
+     },
+     
     //Full tests
     testCheckAccessibility:{
 		test: function(cmp){

@@ -17,6 +17,14 @@
 -->
 <aura:component>
     <aura:attribute name="caseToRender" type="String" default="full"/>
+    <aura:if isTrue="{!v.caseToRender == 'skipIframeForVisForce'}">
+        <iframe id="vfFrameId" src="http://localhost.blah.com/apex//testDetail0000?id=000x000xxx0000000"></iframe>
+        <iframe id="DiffernetID" src="/apex/blahField?id=00-xx00000000000"></iframe>
+        <iframe id="vfFrameId" src="/setup/ui/blah.jsp"></iframe>
+        <iframe src="http://www.salesforce.com"></iframe> 
+    </aura:if> 
+   
+    
     <aura:if isTrue="{!v.caseToRender == 'labelsNotNeeded'}">
         <label for="ID_EGO">Something Something</label>
         <input type="submit" id="ID_EGO" size="25" value="SUBMIT TO ME"/>

@@ -1285,5 +1285,4 @@ window['aura'] = window['$A'];
 
 // #include aura.storage.adapters.MemoryAdapter
 // #include aura.storage.adapters.IndexedDBAdapter
-// #include aura.storage.adapters.SmartStoreAdapter
 // #include aura.storage.adapters.WebSQLAdapter

@@ -19,7 +19,6 @@ exp(p
 	//#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
 		,
 		"getSize", p.getSize,
-		"getSizeEstimator", p.getSizeEstimator,
 		"getMRU", p.getMRU
 	//#end
 );

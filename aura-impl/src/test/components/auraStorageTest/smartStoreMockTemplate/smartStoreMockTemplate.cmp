@@ -1,9 +1,0 @@
-<aura:component isTemplate="true" extensible="true" extends="aura:template">
-    <aura:set attribute="extraScriptTags">
-        <script src="/auraFW/resources/mobileSdk2.0/test/MockCordova.js"></script>
-        <script src="/auraFW/resources/mobileSdk2.0/cordova.force.js"></script>
-        <script src="/auraFW/resources/mobileSdk2.0/test/MockSDKInfo.js"></script>
-        <script src="/auraFW/resources/mobileSdk2.0/test/MockSmartStore.js"></script>
-    </aura:set>
-    {!v.containerScripts}
-</aura:component>

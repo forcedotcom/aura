@@ -64,5 +64,3 @@ SizeEstimator.prototype.estimateSize = function(value) {
 SizeEstimator.prototype.sizeOfString = function(value) {
     return value.length * this.CHARACTER_SIZE;
 };
-
-//#include aura.storage.adapters.SizeEstimator_export

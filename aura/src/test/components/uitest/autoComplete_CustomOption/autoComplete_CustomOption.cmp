@@ -22,5 +22,5 @@
 		 function properly, or else using key down/up will not navigate to next
 		 option.
 	-->
-	<div><a aura:id="option">{!v.label}</a></div>
+	<div class="customOption"><a aura:id="option">{!v.label}</a></div>
 </aura:component>

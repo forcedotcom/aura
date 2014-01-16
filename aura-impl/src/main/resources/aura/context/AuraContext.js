@@ -71,11 +71,14 @@ AuraContext.prototype.getGlobalValueProviders = function() {
  * @private
  */
 AuraContext.prototype.encodeForServer = function() {
-    var dn = this.getDynamicNamespaces();
-    
+    var preloads = this.getDynamicNamespaces();
+    if (this.preloads) {
+        preloads = preloads.concat(this.preloads);
+    }
+
     return aura.util.json.encode({
         "mode" : this.mode,
-        "dn" : dn,
+        "preloads": preloads,
         "loaded" : this.loaded,
         "app" : this.app,
         "cmp" : this.cmp,

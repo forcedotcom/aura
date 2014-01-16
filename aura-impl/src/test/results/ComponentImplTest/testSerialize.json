@@ -16,61 +16,18 @@
         "superDef":{
           "serId":4,
           "value":{
-            "descriptor":"markup://aura:component",
-            "rendererDef":{
-              "serId":5,
-              "value":{
-                "descriptor":"js://aura.component",
-                "render":
-function(component) {
-        var body = component.getValue("v.body");
-        var rendering = component.getRendering();
-        return rendering ? rendering : $A.render(body);
-    },
-                "afterRender":
-function(component) {
-        var body = component.getAttributes().getValue("body");
-        $A.afterRender(body);
-    },
-                "rerender":
-function(component) {
-        var body = component.getAttributes().getValue("body");
-        $A.rerender(body);
-    },
-                "unrender":
-function(component) {
-        var body = component.getAttributes().getValue("body");
-        $A.unrender(body);
-
-        var elements = component.getElements();
-        for (var key in elements){
-            var element = elements[key];
-            delete elements[key];
-            aura.util.removeElement(element);
-        }
-    }
-              }
-            },
-            "attributeDefs":[
-              {
-                "serId":6,
-                "value":{
-                  "descriptor":"body",
-                  "typeDefDescriptor":"aura://Aura.Component[]",
-                  "required":false,
-                  "visibility":"PUBLIC"
-                }
-              }
-            ],
-            "interfaces":[
-              "markup://aura:rootComponent"
-            ],
-            "isAbstract":true
+            "descriptor":"markup://aura:component"
           }
         },
         "attributeDefs":[
           {
-            "serRefId":6
+            "serId":5,
+            "value":{
+              "descriptor":"body",
+              "typeDefDescriptor":"aura://Aura.Component[]",
+              "required":false,
+              "visibility":"PUBLIC"
+            }
           }
         ],
         "facets":[
@@ -79,7 +36,7 @@ function(component) {
             "value":[
               {
                 "componentDef":{
-                  "serId":7,
+                  "serId":6,
                   "value":{
                     "descriptor":"markup://test:child1",
                     "superDef":{
@@ -87,10 +44,10 @@ function(component) {
                     },
                     "attributeDefs":[
                       {
-                        "serRefId":6
+                        "serRefId":5
                       },
                       {
-                        "serId":8,
+                        "serId":7,
                         "value":{
                           "descriptor":"attr",
                           "typeDefDescriptor":"aura://String",
@@ -105,7 +62,7 @@ function(component) {
                         "value":[
                           {
                             "componentDef":{
-                              "serId":9,
+                              "serId":8,
                               "value":{
                                 "descriptor":"markup://test:child2",
                                 "superDef":{
@@ -113,7 +70,7 @@ function(component) {
                                 },
                                 "attributeDefs":[
                                   {
-                                    "serRefId":6
+                                    "serRefId":5
                                   }
                                 ]
                               }

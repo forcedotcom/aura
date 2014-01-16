@@ -328,8 +328,9 @@ public class AuraServletIntegrationTest extends IntegrationTestCase {
         Aura.getContextService().startContext(Mode.PROD, Format.HTML, Access.AUTHENTICATED, desc);
         String url = ManifestUtil.getManifestUrl();
         assertEquals(
-                "/l/%7B%22mode%22%3A%22PROD%22%2C%22app%22%3A%22appCache%3Anopreload%22%2C%22test%22%3A%22" +
-                "org.auraframework.http.AuraServletIntegrationTest.testGetManifestWithPreloads%22%7D/app.manifest",
+                "/l/%7B%22mode%22%3A%22PROD%22%2C%22app%22%3A%22appCache%3Anopreload%22%2C%22preloads%22%3A%5B%22" +
+                        "aura%22%2C%22ui%22%5D%2C%22test%22%3A%22org.auraframework.http.AuraServletIntegrationTest." +
+                        "testGetManifestWithPreloads%22%7D/app.manifest",
                 url);
     }
 }

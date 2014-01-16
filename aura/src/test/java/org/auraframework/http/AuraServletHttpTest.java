@@ -87,7 +87,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
                 .substring(AuraBaseServlet.CSRF_PROTECT.length()));
         @SuppressWarnings("unchecked")
         Map<String, Object> context = (Map<String, Object>) json.get("context");
-        assertFalse("There should no longer be preloads", context.containsKey("preloads"));
+        assertTrue("There should preloads", context.containsKey("preloads"));
     }
 
     /**

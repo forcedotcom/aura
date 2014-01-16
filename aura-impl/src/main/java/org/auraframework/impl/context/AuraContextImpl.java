@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -43,8 +44,6 @@ import org.auraframework.system.Client;
 import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.test.TestContext;
 import org.auraframework.test.TestContextAdapter;
-
-import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.InvalidEventTypeException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.BaseJsonSerializationContext;
@@ -118,6 +117,9 @@ public class AuraContextImpl implements AuraContext {
                 } else {
                     json.writeMapEntry("cmp", String.format("%s:%s", appDesc.getNamespace(), appDesc.getName()));
                 }
+            }
+            if (ctx.getSerializePreLoad()) {
+                json.writeMapEntry("preloads", ctx.getPreloads());
             }
             if (ctx.getRequestedLocales() != null) {
                 List<String> locales = new ArrayList<String>();
@@ -235,6 +237,8 @@ public class AuraContextImpl implements AuraContext {
 
     private final Set<String> dynamicNamespaces = Sets.newLinkedHashSet();
 
+    private final LinkedHashSet<String> preloadedNamespaces = Sets.newLinkedHashSet();
+
     private Set<DefDescriptor<?>> preloadedDefinitions = null;
 
     private final Format format;
@@ -249,6 +253,8 @@ public class AuraContextImpl implements AuraContext {
     private int nextId = 1;
 
     private String contextPath = "";
+
+    private boolean serializePreLoad = true;
 
     private boolean serializeLastMod = true;
 
@@ -274,6 +280,15 @@ public class AuraContextImpl implements AuraContext {
             Format format, Access access, JsonSerializationContext jsonContext,
             Map<ValueProviderType, GlobalValueProvider> globalProviders, boolean isDebugToolEnabled) {
 
+        // TODO: remove preloads
+        if (access == Access.AUTHENTICATED) {
+            preloadedNamespaces.add("aura");
+            preloadedNamespaces.add("ui");
+            if (mode == Mode.DEV) {
+                preloadedNamespaces.add("auradev");
+            }
+        }
+
         this.mode = mode;
         this.masterRegistry = masterRegistry;
         this.defaultPrefixes = defaultPrefixes;
@@ -282,6 +297,11 @@ public class AuraContextImpl implements AuraContext {
         this.jsonContext = jsonContext;
         this.globalProviders = globalProviders;
         this.isDebugToolEnabled = isDebugToolEnabled;
+    }
+
+    @Override
+    public void addPreload(String preload) {
+        preloadedNamespaces.add(preload);
     }
 
     @Override
@@ -295,7 +315,9 @@ public class AuraContextImpl implements AuraContext {
         if (preloadedDefinitions != null) {
             return preloadedDefinitions.contains(descriptor);
         }
-        return false;
+
+        // TODO: remove preloads
+        return preloadedNamespaces.contains(descriptor.getNamespace());
     }
 
     @Override
@@ -399,6 +421,11 @@ public class AuraContextImpl implements AuraContext {
     }
 
     @Override
+    public Set<String> getPreloads() {
+        return Collections.unmodifiableSet(preloadedNamespaces);
+    }
+
+    @Override
     public List<Locale> getRequestedLocales() {
         return requestedLocales;
     }
@@ -406,6 +433,11 @@ public class AuraContextImpl implements AuraContext {
     @Override
     public boolean getSerializeLastMod() {
         return serializeLastMod;
+    }
+
+    @Override
+    public boolean getSerializePreLoad() {
+        return serializePreLoad;
     }
 
     @Override

@@ -25,9 +25,9 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.BaseComponent;
-import org.auraframework.instance.InstanceStack;
 import org.auraframework.instance.Event;
 import org.auraframework.instance.GlobalValueProvider;
+import org.auraframework.instance.InstanceStack;
 import org.auraframework.instance.ValueProviderType;
 import org.auraframework.util.javascript.directive.JavascriptGeneratorMode;
 import org.auraframework.util.json.JsonSerializationContext;
@@ -216,6 +216,20 @@ public interface AuraContext {
      */
     String getNum();
 
+    /**
+     * Namespaces whose defs should be, or have been preloaded on the client.
+     *
+     * @param preload
+     */
+    void addPreload(String preload);
+
+    /**
+     * get the current set of preloads.
+     *
+     * By default, the aura and os namespaces are included.
+     */
+    Set<String> getPreloads();
+
     Format getFormat();
 
     Access getAccess();
@@ -231,6 +245,8 @@ public interface AuraContext {
     String getContextPath();
 
     void setContextPath(String path);
+
+    boolean getSerializePreLoad();
 
     boolean getSerializeLastMod();
 

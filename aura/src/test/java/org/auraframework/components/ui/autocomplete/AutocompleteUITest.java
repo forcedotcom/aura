@@ -33,7 +33,7 @@ public class AutocompleteUITest extends WebDriverTestCase {
 	private final String AUTOCOMPLETE_LIST_SELECTOR = "div[class*='uiAutocompleteList']";
 	private final String AUTOCOMPLETE_OPTION_SELECTOR = "li[class*='uiAutocompleteOption']";
 	private final String AUTOCOMPLETE_CUSTOM_TEMPLATE_OPTION_SELECTOR = "div[class*='uitestAutoComplete_CustomTemplate']";
-	private final String AUTOCOMPLETE_CUSTOM_OPTION_SELECTOR = "div[class*='uiAutocompleteOption']";
+	private final String AUTOCOMPLETE_CUSTOM_OPTION_SELECTOR = "div[class*='customOption']";
 	private final String MATCHED_SELECTOR = "mark[class*='data-match']";
 			
 	private Map<String, Integer> AUTOCOMPLETE_COMPONENT = new HashMap<String, Integer>();

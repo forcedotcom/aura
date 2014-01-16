@@ -32,13 +32,14 @@ import org.apache.log4j.Logger;
 import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
-import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ClientLibraryDef;
+import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.SecurityProviderDef;
+import org.auraframework.impl.root.DependencyDefImpl;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.service.LoggingService;
 import org.auraframework.system.AuraContext;
@@ -374,6 +375,9 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         public final Map<DefDescriptor<? extends Definition>, Definition> dependencies;
         public final List<ClientLibraryDef> clientLibs;
 
+        // TODO: remove preloads
+        public boolean addedPreloads = false;
+
         // public final Map<DefDescriptor<? extends Definition>, Definition>
         // dependencies = Maps.newHashMap();
         public CompileContext(Map<DefDescriptor<? extends Definition>, Definition> dependencies,
@@ -531,6 +535,24 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             //
             Set<DefDescriptor<?>> newDeps = Sets.newHashSet();
             cd.def.appendDependencies(newDeps);
+
+
+            //
+            // TODO: remove preloads
+            // This pulls in the context preloads. not pretty, but it works.
+            //
+            if (!cc.addedPreloads && cd.descriptor.getDefType().equals(DefType.APPLICATION)) {
+                cc.addedPreloads = true;
+                Set<String> preloads = cc.context.getPreloads();
+                for (String preload : preloads) {
+                    if (!preload.contains("_")) {
+                        DependencyDefImpl.Builder ddb = new DependencyDefImpl.Builder();
+                        ddb.setResource(preload);
+                        ddb.setType("APPLICATION,COMPONENT,STYLE,EVENT");
+                        ddb.build().appendDependencies(newDeps);
+                    }
+                }
+            }
 
             for (DefDescriptor<?> dep : newDeps) {
                 if (!defs.containsKey(dep)) {

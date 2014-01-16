@@ -17,6 +17,7 @@ package org.auraframework.impl.integration;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Set;
 
 import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
@@ -45,6 +46,7 @@ import org.auraframework.util.json.Json;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 public class IntegrationImpl implements Integration {
     public IntegrationImpl(String contextPath, Mode mode, boolean initializeAura, String userAgent, String application, IntegrationServiceObserver observer) throws QuickFixException {
@@ -151,6 +153,14 @@ public class IntegrationImpl implements Integration {
         }
     }
     
+    @Override
+    @Deprecated
+    public void addPreload(String namespace) {
+        if (namespace != null && !namespace.isEmpty()) {
+            preloads.add(namespace);
+        }
+    }
+
     private void releaseContext() {
         if (contextDepthCount == 0) {
             Aura.getContextService().endContext();
@@ -200,6 +210,11 @@ public class IntegrationImpl implements Integration {
         if (observer != null) {
             observer.contextEstablished(this, context);
         }
+
+        for (String preload : preloads) {
+            context.addPreload(preload);
+        }
+
         return context;
     }
 
@@ -235,6 +250,7 @@ public class IntegrationImpl implements Integration {
     private final Mode mode;
     private final boolean initializeAura;
     private final Client client;
+    private final Set<String> preloads = Sets.newHashSet();
     private final String application;
     private final IntegrationServiceObserver observer;
 

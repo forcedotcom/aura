@@ -165,11 +165,13 @@ public class AuraContextFilter implements Filter {
             if (lastMod != null && !lastMod.isEmpty()) {
                 context.setLastMod(lastMod);
             }
+
+            // TODO: remove preloads
             @SuppressWarnings("unchecked")
-            List<Object> dynamicNamespaces = (List<Object>) configMap.get("dn");
-            if (dynamicNamespaces != null) {
-                for (Object dn : dynamicNamespaces) {
-                    context.addDynamicNamespace((String) dn);
+            List<Object> preloads = (List<Object>) configMap.get("preloads");
+            if (preloads != null) {
+                for (Object preload : preloads) {
+                    context.addPreload((String) preload);
                 }
             }
             getLoaded(context, configMap.get("loaded"));

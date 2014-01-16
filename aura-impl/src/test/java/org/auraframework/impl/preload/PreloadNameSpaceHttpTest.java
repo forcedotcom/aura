@@ -24,8 +24,8 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpGet;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.http.AuraBaseServlet;
-import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.AuraContext.Format;
+import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.AuraHttpTestCase;
 import org.auraframework.test.annotation.TestLabels;
 import org.auraframework.util.json.JsonReader;
@@ -78,7 +78,7 @@ public class PreloadNameSpaceHttpTest extends AuraHttpTestCase {
         Map<String, Object> context = (Map<String, Object>) outerMap.get("context");
         ArrayList<String> preloads = (ArrayList<String>) context.get("preloads");
 
-        assertNull("Preloads found in the Context", preloads);
+        assertNotNull("Preloads not found in the Context", preloads);
     }
 
     private String obtainResponseCheckStatus() throws Exception {

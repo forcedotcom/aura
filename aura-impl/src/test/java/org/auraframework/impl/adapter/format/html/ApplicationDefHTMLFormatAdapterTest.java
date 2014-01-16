@@ -109,7 +109,7 @@ public class ApplicationDefHTMLFormatAdapterTest extends BaseComponentDefHTMLFor
         int start = body.indexOf("<html ");
         String tag = body.substring(start, body.indexOf('>', start) + 1);
         String expectedSubPath = AuraTextUtil.urlencode(String.format(
-                "{\"mode\":\"UTEST\",\"app\":\"%s\",\"loaded\":{\"APPLICATION@%s\":\"%s\"},\"test\":\"%s\"}",
+                "{\"mode\":\"UTEST\",\"app\":\"%s\",\"preloads\":[\"aura\",\"ui\"],\"loaded\":{\"APPLICATION@%s\":\"%s\"},\"test\":\"%s\"}",
                 desc.getDescriptorName(), desc.getQualifiedName(), uid, getQualifiedName()));
         String expectedAttribute = " manifest=\"/l/" + expectedSubPath + "/app.manifest\"";
         if (!tag.contains(expectedAttribute)) {

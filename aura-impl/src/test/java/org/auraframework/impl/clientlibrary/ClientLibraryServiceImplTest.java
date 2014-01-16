@@ -364,9 +364,9 @@ public class ClientLibraryServiceImplTest extends AuraImplTestCase {
 
         // Order in dependencies is not maintained as per markup, its as per BaseComponentDefImpl.appendDependencies().
         //TODO: Is that acceptable?
-        assertEquals("http://likeaboss.com/child.js", it.next());
         assertEquals("http://likeaboss.com/facet.js", it.next());
         assertEquals(getResolver("CkEditor", Type.JS).getUrl(), it.next());
+        assertEquals("http://likeaboss.com/child.js", it.next());
         assertEquals("http://likeaboss.com/parent.js", it.next());
 
     }

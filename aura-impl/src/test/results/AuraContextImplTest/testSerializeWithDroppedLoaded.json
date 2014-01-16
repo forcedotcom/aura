@@ -1,5 +1,8 @@
 {
   "mode":"UTEST",
   "app":"test:laxSecurity",
+  "preloads":[
+
+  ],
   "test":"org.auraframework.impl.context.AuraContextImplTest.testSerializeWithDroppedLoaded"
 }

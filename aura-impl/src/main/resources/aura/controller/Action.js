@@ -90,9 +90,13 @@ Action.prototype.getNextGlobalId = function() {
     return this.nextGlobalId++;
 };
 
-// if a component is replacing the same-named component at the same level (eg provider)
-// this reactivates the path's error detection
-// so that is can request it's location again without reporting error
+/**
+ *  If a component is replacing the same-named component at the same level (e.g. provider),
+ *  this reactivates the path's error detection, so that is can request it's location again without reporting error.
+ *  @private
+ */
+// 
+// 
 Action.prototype.reactivatePath = function() {
 	this.canCreate = true;
 };
@@ -127,6 +131,9 @@ Action.prototype.popCreationPath = function(pathPart) {
     return last;
 };
 
+/**
+ * @private
+ */
 Action.prototype.topPath = function() {
     var top = this.pathStack.length < 1 ? undefined : this.pathStack[this.pathStack.length - 1];
     if (!top) {
@@ -364,6 +371,10 @@ Action.prototype.setAllAboardCallback = function(scope, callback) {
         return;
     }
     var that = this;
+    
+    /**
+     * @private
+     */
     this.allAboardCallback = function() { callback.call(scope, that); };
 };
 
@@ -372,7 +383,7 @@ Action.prototype.setAllAboardCallback = function(scope, callback) {
  *
  * This should only be called internally just before an action is sent to the server.
  *
- * @protected
+ * @private
  */
 Action.prototype.callAllAboardCallback = function () {
     if (this.allAboardCallback) {

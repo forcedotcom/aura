@@ -161,6 +161,7 @@ ArrayValue.prototype.setValue = function(newArray, skipChange) {
 
 /**
  * Recursively destroys all values in the array
+ * @private
  */
 ArrayValue.prototype.destroyOrphans = function(array, async) {
      while (array.length > 0) {
@@ -276,6 +277,7 @@ ArrayValue.prototype.insert = function(index, config) {
 
 /**
  * Removes from the array the item at the specified index and returns the removed item.
+ * @param index The array index of the item to be removed
  */
 ArrayValue.prototype.remove = function(index) {
     if ($A.util.isNumber(index) && index >= 0 && index < this.getLength()) {
@@ -319,7 +321,7 @@ ArrayValue.prototype.addValueHandlers = function(value){
 };
 
 /**
- * @protected
+ * @private
  */
 ArrayValue.prototype.fire = function(name) {
     if (this.initialized && this.fireEvents){
@@ -732,10 +734,16 @@ ArrayValue.prototype.rerender = function(suppliedReferenceNode, appendChild, ins
     this.rendered = rendered;
 };
 
+/**
+ * Returns the reference node during a rerender.
+ */
 ArrayValue.prototype.getReferenceNode = function() {
     return this.referenceNode;
 };
 
+/**
+ * @private
+ */
 ArrayValue.prototype.createLocator = function(debugText) {
     var label = "";
 

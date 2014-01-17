@@ -25,8 +25,11 @@
 		<li><auradocs:defLink descriptor="ui:carousel" defType="component" /></li>
 		<li><auradocs:defLink descriptor="ui:datePicker" defType="component" /></li>
 		<li><auradocs:defLink descriptor="ui:dialog" defType="component" /></li>
+		<li><auradocs:defLink descriptor="ui:image" defType="component" /></li>
+		<li><auradocs:defLink descriptor="ui:input" defType="component" /></li>
 		<li><auradocs:defLink descriptor="ui:menu" defType="component" /></li>
 	</ul>
+	<p>When customizing these components or their sub-components, be careful in preserving code that ensures accessibility, such as the <code>aria</code> attributes.</p>
 	</p>
 	<h3>Accessibility Testing</h3>
 	<p>Testing your app for accessibility ensures that the app is accessible by users of varying abilities. For apps developed on Android devices,

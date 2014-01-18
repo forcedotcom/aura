@@ -25,9 +25,8 @@
 	     value.setValid(false);
 	     value.addErrors({"message":"Number should have (5,7] digits"})
 	 }
-	 
 	 //Check integer starts with 1;
-	 if(num[0] != "1"){
+	 if(num.charAt(0) != "1"){
 	     value.setValid(false);
 	     value.addErrors({"message":"The number given should start with a 1"});
 	 }

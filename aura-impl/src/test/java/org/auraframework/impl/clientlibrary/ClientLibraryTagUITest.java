@@ -41,8 +41,8 @@ public class ClientLibraryTagUITest extends WebDriverTestCase {
         assertNotNull(yearThruMoment);
         assertEquals(Calendar.getInstance().get(Calendar.YEAR), ((Long) yearThruMoment).intValue());
 
-        Object walltime = auraUITestingUtil.getEval("return WallTime");
-        assertNotNull(walltime);
+        Boolean walltime = (Boolean)auraUITestingUtil.getEval("return !!WallTime");
+        assertTrue(walltime);
 
         assertEquals("awesome", auraUITestingUtil.getEval("return clientLibraryTest.cool;"));
 
@@ -61,8 +61,8 @@ public class ClientLibraryTagUITest extends WebDriverTestCase {
     public void testNonCombinableResources() throws Exception {
         open("/clientLibraryTest/clientLibraryTest.app");
         waitForAuraFrameworkReady();
-        Object walltimeLocale = auraUITestingUtil.getEval("return WallTime");
-        assertNotNull(walltimeLocale);
+        Boolean walltimeLocale = (Boolean)auraUITestingUtil.getEval("return !!WallTime");
+        assertTrue(walltimeLocale);
     }
 
     /**
@@ -75,16 +75,16 @@ public class ClientLibraryTagUITest extends WebDriverTestCase {
         Object jiffyData = auraUITestingUtil.getEval("return Perf.toJson()");
         assertNotNull(jiffyData);
 
-        Object jiffyUI = auraUITestingUtil.getEval("return Perf.ui");
-        assertNotNull(jiffyUI);
+        Boolean jiffyUI = (Boolean)auraUITestingUtil.getEval("return !!Perf.ui");
+        assertTrue(jiffyUI);
 
         // Mode independent resources
         Object yearThruMoment = auraUITestingUtil.getEval("return moment(new Date()).year()");
         assertNotNull(yearThruMoment);
         assertEquals(Calendar.getInstance().get(Calendar.YEAR), ((Long) yearThruMoment).intValue());
 
-        Object walltime = auraUITestingUtil.getEval("return WallTime");
-        assertNotNull(walltime);
+        Boolean walltime = (Boolean)auraUITestingUtil.getEval("return !!WallTime");
+        assertTrue(walltime);
 
         assertEquals("awesome", auraUITestingUtil.getEval("return clientLibraryTest.cool;"));
     }

@@ -59,8 +59,7 @@
         }
     },
 	
-    // W-1952332 - style tag not escaped
-    _testStringValueWithBlacklistedTags:{
+    testStringValueWithBlacklistedTags:{
         test:function(cmp){
             var testCmp = cmp.find('myComp6');
             $A.test.assertNotNull(testCmp);
@@ -91,8 +90,7 @@
         }
     },
 
-    // W-1952332 - script and style tags not escaped.
-    _testStringValueWithBlacklistedChildrenTags:{
+    testStringValueWithBlacklistedChildrenTags:{
         test:function(cmp){
             var testCmp = cmp.find('myComp9');
             $A.test.assertNotNull(testCmp);

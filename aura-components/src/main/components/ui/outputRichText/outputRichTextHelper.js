@@ -67,8 +67,13 @@
         }
         this.removeEventHandlers(element);
         var nodes = element.childNodes;
-        for (var i = 0; i < nodes.length; i ++) {
+        var len = nodes.length;
+        for (var i = 0; i < len; i++) {
             this.validateElement(nodes[i], supportedTags);
+            if (len > nodes.length) { // the current element is removed
+                len = nodes.length
+                i--;
+            }
         }
     }
 })

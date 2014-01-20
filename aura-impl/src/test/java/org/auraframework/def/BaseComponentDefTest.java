@@ -941,7 +941,8 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
 
     /**
      * Verify the whitespace attribute specified on a component tag. By default the whitespace logic is optimize, which
-     * removes all non-necessary whitespace. Test method for {@link org.auraframework.def.BaseComponentDef#getWhitespaceBehavior()}.
+     * removes all non-necessary whitespace. Test method for
+     * {@link org.auraframework.def.BaseComponentDef#getWhitespaceBehavior()}.
      */
     public void testGetWhitespaceDefault() throws Exception {
         WhitespaceBehavior defaultWhitespaceBehavior = define(baseTag, "", "").getWhitespaceBehavior();
@@ -979,7 +980,8 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
     }
 
     /**
-     * Dependency returned for default namespace. Test method for {@link org.auraframework.def.BaseComponentDef#getDependencies()}.
+     * Dependency returned for default namespace. Test method for
+     * {@link org.auraframework.def.BaseComponentDef#getDependencies()}.
      */
     public void testGetDependenciesDefaultNamespace() throws Exception {
         T baseComponentDef = define(baseTag, "", "<aura:dependency resource=\"*://aura:*\" type=\"EVENT\"/>");
@@ -1179,7 +1181,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
     }
 
     /**
-     * hasLocalDependencies is true if component has clientside provider. Test method for
+     * hasLocalDependencies is true if component only has serverside provider. Test method for
      * {@link BaseComponentDef#hasLocalDependencies()}.
      */
     public void testHasLocalDependenciesWithServersideProvider() throws Exception {
@@ -1721,22 +1723,22 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         return cmpConfig.containsKey(property) ? cmpConfig.get(property) : null;
     }
 
-    public void testClientLibraryDefValidation() throws Exception{
+    public void testClientLibraryDefValidation() throws Exception {
         DefDescriptor<T> missingRequiredAttr = addSourceAutoCleanup(getDefClass(),
                 String.format(baseTag, "", "<aura:clientLibrary type='JS' />"));
-        try{
+        try {
             missingRequiredAttr.getDef();
             fail("Failed to validate client library type which didn't specify a name attribute.");
-        }catch(InvalidDefinitionException e){
+        } catch (InvalidDefinitionException e) {
             assertEquals("Must have either a name or url", e.getMessage());
         }
-        
+
         DefDescriptor<T> invalidResource = addSourceAutoCleanup(getDefClass(),
                 String.format(baseTag, "", "<aura:clientLibrary name='doesntExist' type='js' url='js://foo.bar'/>"));
         try {
             invalidResource.getDef();
             fail("Failed to validate client library type which specified non existing component resource.");
-        } catch(Exception e) {
+        } catch (Exception e) {
             checkExceptionFull(e, InvalidDefinitionException.class, "No resource named js://foo.bar found");
         }
     }

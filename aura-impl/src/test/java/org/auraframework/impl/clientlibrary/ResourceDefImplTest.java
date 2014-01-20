@@ -26,7 +26,6 @@ import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.util.json.Json;
 
 import com.google.common.base.Charsets;
-import com.google.common.collect.Sets;
 
 public class ResourceDefImplTest extends AuraImplTestCase {
     public ResourceDefImplTest(String name){

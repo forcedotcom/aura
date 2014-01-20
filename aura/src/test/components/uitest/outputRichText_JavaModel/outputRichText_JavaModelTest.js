@@ -59,15 +59,15 @@
         }
     },
 	
-    testStringValueWithBlacklistedTags:{
+    // W-1952332 - style tag not escaped
+    _testStringValueWithBlacklistedTags:{
         test:function(cmp){
             var testCmp = cmp.find('myComp6');
             $A.test.assertNotNull(testCmp);
             var actual = $A.test.getText(testCmp.find('div').getElement());
             $A.test.assertEquals('Some text from server with blacklisted tags', $A.util.trim(actual), "Failed to display richtext from Java model");
             $A.test.assertEquals(0, testCmp.find('div').getElement().getElementsByTagName("script").length, "script tag should not be there");
-            // Uncomment when bug is fixed.
-            //$A.test.assertEquals(0, testCmp.find('div').getElement().getElementsByTagName("style").length, "style tag should not be there");
+            $A.test.assertEquals(0, testCmp.find('div').getElement().getElementsByTagName("style").length, "style tag should not be there");
         }
     },
 	
@@ -90,17 +90,17 @@
             $A.test.assertEquals(0, testCmp.find('div').getElement().getElementsByTagName("input").length, "Input tag should not be there");
         }
     },
-        
-    testStringValueWithBlacklistedChildrenTags:{
+
+    // W-1952332 - script and style tags not escaped.
+    _testStringValueWithBlacklistedChildrenTags:{
         test:function(cmp){
             var testCmp = cmp.find('myComp9');
             $A.test.assertNotNull(testCmp);
             var actual = $A.test.getText(testCmp.find('div').getElement());
             $A.test.assertEquals('Some text from server with nested blacklisted tags in div', $A.util.trim(actual), "Failed to display richtext from Java model");
-            $A.test.assertEquals(1, testCmp.find('div').getElement().getElementsByTagName("div").length, "Div tag should not be there");
-            // Uncomment when bug is fixed.
-            //$A.test.assertEquals(0, testCmp.find('div').getElement().getElementsByTagName("script").length, "script tag should not be there");
-            //$A.test.assertEquals(0, testCmp.find('div').getElement().getElementsByTagName("style").length, "style tag should not be there");            
+            $A.test.assertEquals(1, testCmp.find('div').getElement().getElementsByTagName("div").length, "Only the outer Div should be present");
+            $A.test.assertEquals(0, testCmp.find('div').getElement().getElementsByTagName("script").length, "script tag should not be there");
+            $A.test.assertEquals(0, testCmp.find('div').getElement().getElementsByTagName("style").length, "style tag should not be there");
         }
     },
     

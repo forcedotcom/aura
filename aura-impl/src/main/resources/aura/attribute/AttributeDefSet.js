@@ -125,7 +125,7 @@ AttributeDefSet.prototype.each = function(f){
 /**
  * Returns the AttributeDef object.
  * @param {String} name The name of the AttributeDef instance, which matches the qualified name of the attributeDef descriptor.
- * @returns {AttributeDef}
+ * @returns {AttributeDef} An AttributeDef object is stored in a parent definition, such as a ComponentDef object. 
  */
 AttributeDefSet.prototype.getDef = function(name){
     var values = this.values;

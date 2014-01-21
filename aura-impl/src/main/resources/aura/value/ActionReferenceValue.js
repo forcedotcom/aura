@@ -52,6 +52,7 @@ ActionReferenceValue.prototype.unwrap = function(){
 
 /**
  *  Do not call this method. Always throws an error because this type cannot be merged into.
+ *  @private
  */
 ActionReferenceValue.prototype.merge = function(sv, overwrite) {
     throw new Error("Cannot merge into an ActionReferenceValue");

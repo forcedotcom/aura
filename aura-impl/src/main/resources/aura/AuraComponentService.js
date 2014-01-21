@@ -296,8 +296,9 @@ $A.ns.AuraComponentService.prototype.requestComponent = function(callbackScope, 
  * Evaluates value object into their literal values. Typically used to pass configs to server.
  * Iterates through MapValue. Recursion for nested value objects.
  *
- * @param valueObj Value Object
- * @param valueProvider value provider
+ * @param {Object} valueObj Value Object
+ * @param {Object} valueProvider value provider
+ * @param {Boolean} raw
  * @returns {*}
  */
 $A.ns.AuraComponentService.prototype.computeValue = function(valueObj, valueProvider, raw) {
@@ -352,9 +353,9 @@ $A.ns.AuraComponentService.prototype.computeValue = function(valueObj, valueProv
 /**
  * Provides processed component config, definition, and descriptor.
  *
- * @param config
- * @param attributeValueProvider
- * @return {{configuration: {}, definition: ComponentDef, descriptor: String}}
+ * @param {Object} config
+ * @param {Object} attributeValueProvider
+ * @return {Object} {{configuration: {}, definition: ComponentDef, descriptor: String}}
  */
 $A.ns.AuraComponentService.prototype.getComponentConfigs = function(config, attributeValueProvider) {
     if(config && $A.util.isString(config)){

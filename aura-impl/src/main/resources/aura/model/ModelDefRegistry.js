@@ -28,7 +28,7 @@ ModelDefRegistry.prototype.auraType = "ModelDefRegistry";
  * Returns a ModelDef instance or config after adding to the registry.
  * Throws an error if config is not provided.
  * @param {Object} config Passes in a config, a ModelDef, or the name of a ModelDef.
- * @returns a ModelDef instance or config after adding to the registry
+ * @returns {ModelDef} A ModelDef instance or config after adding to the registry
  */
 ModelDefRegistry.prototype.getDef = function(config){
     aura.assert(config, "ModelDef Config required for registration");

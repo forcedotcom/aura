@@ -37,7 +37,7 @@ var Test = function(){
          *             it will evaluate it before comparison.
          * @param {Object} testFunction
          *             A function to evaluate and compare against expected.
-         * @param {function} callback
+         * @param {Function} callback
          *             Invoked after the comparison evaluates to true
          */
         addWaitFor : function(expected, testFunction, callback){
@@ -54,7 +54,7 @@ var Test = function(){
          *
          * @param {Object} success true if the action should succeed.
          * @param {Object} actionName the name of the action from createAction or markForCompletion
-         * @param {function} callback Invoked after the action completes
+         * @param {Function} callback Invoked after the action completes
          */
         addWaitForAction : function(success, actionName, callback) {
             var theAction = actionName;
@@ -89,7 +89,7 @@ var Test = function(){
          *             A function to evaluate and compare against expected.
          * @param {String} failureMessage
          *			The message that is returned if the condition is not true
-         * @param {function} callback
+         * @param {Function} callback
          *             Invoked after the comparison evaluates to true
          */
         addWaitForWithFailureMessage : function(expected, testFunction, failureMessage, callback){
@@ -129,7 +129,7 @@ var Test = function(){
         /**
          * Add a cleanup function that is run on teardown.
          *
-         * @param cleanupFunction the function to run on teardown.
+         * @param {Function} cleanupFunction the function to run on teardown.
          */
         addCleanup : function(cleanupFunction) {
             priv.cleanups.push(cleanupFunction);
@@ -143,7 +143,7 @@ var Test = function(){
          *           The name of the action from the component's perspective (e.g. "c.doSomething")
          * @param {Object} params
          *            The parameters to pass to the action
-         * @param {function} callback
+         * @param {Function} callback
          *            The callback function to execute for the action, or if not a function a name for the action
          * @returns {Action} an instance of the action
          */
@@ -199,7 +199,7 @@ var Test = function(){
          *            params The parameters to pass to the action, as a Map (name:value)
          * @param {Object}
          *            returnType The return type descriptor for the action, e.g. java://java.lang.String
-         * @param {function}
+         * @param {Function}
          *            callback An optional callback to execute with the component as the scope
          * @returns {Action} an instance of the action
          */
@@ -244,7 +244,7 @@ var Test = function(){
         /**
          * Peek if there are any pending server actions.
          *
-         * @returns {boolean} Returns true if there are pending server actions, or false otherwise.
+         * @returns {Boolean} Returns true if there are pending server actions, or false otherwise.
          */
         isActionPending : function() {
             return !$A.clientService.idle();
@@ -325,7 +325,7 @@ var Test = function(){
          * next stage of the test case.
          * @param {Action} action
          *            The action to invoke
-         * @param {boolean} doImmediate
+         * @param {Boolean} doImmediate
          *             If set to true, the request will be sent immediately, otherwise
          *             the action will be handled as any other Action and may
          *             be queued behind prior requests.
@@ -388,11 +388,11 @@ var Test = function(){
          * Invoke a callback after the provided condition evaluates to truthy,
          * checking on the condition every specified interval.
          * Truthy values can refer to a non-empty String, a non-zero number, a non-empty array, an object, or an expression evaluating to true.
-         * @param {function} conditionFunction
+         * @param {Function} conditionFunction
          *             The function to evaluate
-         * @param {function} callback
+         * @param {Function} callback
          *             The callback function to run if conditionFunction evaluates to truthy
-         * @param {int} intervalInMs
+         * @param {Number} intervalInMs
          *             The number of milliseconds between each evaluation of
          *             conditionFunction
          */
@@ -423,7 +423,7 @@ var Test = function(){
 
         /**
          * Set test to timeout in a period of miliseconds from now.
-         * @param {int} timeoutMsec
+         * @param {Number} timeoutMsec
          *             The number of milliseconds from the current time when the test should
          *             timeout
          */
@@ -433,7 +433,7 @@ var Test = function(){
 
         /**
          * Return whether the test is finished.
-         * @returns {boolean}
+         * @returns {Boolean}
          *             Returns true if the test has completed, or false otherwise.
          */
         isComplete : function(){
@@ -668,7 +668,7 @@ var Test = function(){
 
         /**
          * Assert that the condition === true.
-         * @param {boolean} condition
+         * @param {Boolean} condition
          * 				The condition to evaluate
          * @param {String} assertMessage
          * 				The message that is returned if the condition !==true
@@ -682,7 +682,7 @@ var Test = function(){
 
         /**
          * Assert that the condition === false.
-         * @param {boolean} condition
+         * @param {Boolean} condition
          * 				The condition to evaluate
          * @param {String} assertMessage
          * 				The message that is returned if the condition !==false
@@ -795,9 +795,9 @@ var Test = function(){
          * 				The instance of the object
          * @param {String} name
          * 				The name of the function to be replaced
-         * @param {function} newFunction
+         * @param {Function} newFunction
          * 				The new function that replaces originalFunction
-         * @returns {function}
+         * @returns {Function}
          *             The override (newFunction) with an added "restore"
          *             function that, when invoked, will restore originalFunction
          *             on instance
@@ -860,12 +860,12 @@ var Test = function(){
          * 				The instance of the object
          * @param {String} name
          * 				The name of the function whose arguments are applied to the handler
-         * @param {function} newFunction
+         * @param {Function} newFunction
          * 				The target function to attach the handler to
-         * @param {boolean} postProcess
+         * @param {Boolean} postProcess
          *             Set to true if the handler will be called after the target function
          *             or false if the handler will be called before originalFunction
-         * @returns {function}
+         * @returns {Function}
          *             The override of originalFunction, which has a "restore"
          *             function that, when invoked, will restore originalFunction
          *             on instance
@@ -994,7 +994,7 @@ var Test = function(){
          * Check if a node has been "deleted" by Aura.
          * @param {Node} node
          * 				The node to check
-         * @returns {boolean}
+         * @returns {Boolean}
          * 				Returns true if the specified node has been deleted, or false otherwise
          */
         isNodeDeleted : function(node){
@@ -1022,7 +1022,7 @@ var Test = function(){
          *             The string to check
          * @param {String} targetString
          *             The string to look for within testString
-         * @returns {boolean}
+         * @returns {Boolean}
          * 				Return true if testString contains targetString, or false otherwise
          */
         contains : function(testString, targetString){
@@ -1142,6 +1142,10 @@ var Test = function(){
             }
         },
         
+        /**
+         * Checks if an element supports Touch events. Otherwise, issue a click on the element.
+         * @param {HTMLElement} element
+         */
         clickOrTouch: function (element) {        	
         	if($A.util.supportsTouchEvents()){	
         		var ts = document.createEvent('TouchEvent'); 
@@ -1156,6 +1160,11 @@ var Test = function(){
             }
         },
 
+
+        /**
+         * Checks if the specified node is a text node.
+         * @param node The node to check
+         */
         isInstanceOfText: function(node){
             if(window.Text){
                 return node instanceof window.Text;
@@ -1163,38 +1172,76 @@ var Test = function(){
             return node.nodeType == 3;
         },
 
+        /**
+         * Checks if the specified element is an anchor element.
+         * @param {HTMLElement} element The element to check
+         */
         isInstanceOfAnchorElement: function(element){
             return aura.test.isInstanceOf(element, window.HTMLAnchorElement, "a");
         },
 
+        /**
+         * Checks if the specified element is an input element.
+         * @param {HTMLElement} element The element to check
+         */
         isInstanceOfInputElement: function(element){
             return aura.test.isInstanceOf(element, window.HTMLInputElement, "input");
         },
 
+        /**
+         * Checks if the specified element is a list element.
+         * @param {HTMLElement} element The element to check
+         */
         isInstanceOfLiElement: function(element){
             return aura.test.isInstanceOf(element, window.HTMLLiElement, "li");
         },
 
+        /**
+         * Checks if the specified element is a paragraph element.
+         * @param {HTMLElement} element The element to check
+         */
         isInstanceOfParagraphElement: function(element){
             return aura.test.isInstanceOf(element, window.HTMLParagraphElement, "p");
         },
 
+        /**
+         * Checks if the specified element is a button element.
+         * @param {HTMLElement} element The element to check
+         */
         isInstanceOfButtonElement: function(element){
             return aura.test.isInstanceOf(element, window.HTMLButtonElement, "button");
         },
 
+        /**
+         * Checks if the specified element is an image element.
+         * @param {HTMLElement} element The element to check
+         */
         isInstanceOfImageElement: function(element){
             return aura.test.isInstanceOf(element, window.HTMLImageElement, "img");
         },
 
+        /**
+         * Checks if the specified element is a div element.
+         * @param {HTMLElement} element The element to check
+         */
         isInstanceOfDivElement: function(element){
             return aura.test.isInstanceOf(element, window.HTMLDivElement, "div");
         },
         
+        /**
+         * Checks if the specified element is a span element.
+         * @param {HTMLElement} element The element to check
+         */
         isInstanceOfSpanElement: function(element){
             return aura.test.isInstanceOf(element, window.HTMLSpanElement, "span");
         },
 
+        /**
+         * Checks if the specified element is an instance of another element.
+         * @param element The element to check
+         * @param elementType Checks element against elementType
+         * @param tag
+         */
         isInstanceOf: function(element, elementType, tag){
             if(elementType){
                 return element instanceof elementType;
@@ -1232,9 +1279,9 @@ var Test = function(){
          *
          * @param {String}
          *            eventName The registered name, for component events; the descriptor name for application events.
-         * @param {function}
+         * @param {Function}
          *            handler The function handler, which should expect the event as input.
-         * @param {Object}
+         * @param {Component}
          *            component The component to add the handler on.
          */
         addEventHandler : function(eventName, handler, component) {

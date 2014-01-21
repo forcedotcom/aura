@@ -37,6 +37,7 @@ Style.prototype.getHead = function(){
 /**
  * Applies a CSS style to an element using the HTML style element.
  * Appends the HTML style element as a child of the head element.
+ * @private
  * @param {String} styleText The HTML style element, including the type attribute.
  * @returns {Object} The style element
  */
@@ -78,6 +79,11 @@ Style.prototype.include = function(href) {
     return styleElement;
 };
 
+/**
+ * Gets the CSS property of an element.
+ * @param {HTMLElement} el The HTML element
+ * @param {String} cssprop The CSS property to be retrieved
+ */
 Style.prototype.getCSSProperty = function(el, cssprop) {
     if (el.currentStyle){ //IE
         return el.currentStyle[cssprop];

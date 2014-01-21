@@ -128,6 +128,7 @@ SimpleValue.prototype.getPreviousValue = function() {
  * called.
  *
  * @param {Object} v The value to be set.
+ * @param {Boolean} skipChange Set to true if you want to skip firing of the change event, which indicates that the content or state has changed. Or set to false if you want to fire the change event.
  */
 SimpleValue.prototype.setValue = function(v, skipChange) {
     if (this.observing) {

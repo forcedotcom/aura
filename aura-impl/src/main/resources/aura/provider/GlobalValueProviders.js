@@ -161,9 +161,9 @@ $A.ns.GlobalValueProviders.prototype.createPropertyRef = function(expression) {
 };
 
 /**
- * Checks whether expression is for global values
- *
- * @param expression
+ * Checks whether expression is for global values.
+ * @private
+ * @param {String} expression
  * @return {Boolean}
  */
 $A.ns.GlobalValueProviders.prototype.isGlobalValueExp = function(expression) {
@@ -179,12 +179,11 @@ $A.ns.GlobalValueProviders.prototype.isGlobalValueExp = function(expression) {
 };
 
 /**
- * Calls getValue for Value Object. Unwraps and calls callback if provided
+ * Calls getValue for Value Object. Unwraps and calls callback if provided.
  *
- * @param expression
- * @param [component]
- * @param [callback]
- * @return {String} value of expression
+ * @param {String} expression 
+ * @param {Component} component
+ * @return {String} The value of expression
  */
 $A.ns.GlobalValueProviders.prototype.get = function(expression, component, callback) {
     return $A.unwrap(this.getValue(expression, component, function(result) {
@@ -197,9 +196,9 @@ $A.ns.GlobalValueProviders.prototype.get = function(expression, component, callb
 /**
  * Delegates to value provider.
  *
- * @param expression
- * @param [component]
- * @param [callback]
+ * @param {String} expression
+ * @param {Component} component
+ * @param {Function} callback
  * @return {SimpleValue}
  */
 $A.ns.GlobalValueProviders.prototype.getValue = function(expression, component, callback) {

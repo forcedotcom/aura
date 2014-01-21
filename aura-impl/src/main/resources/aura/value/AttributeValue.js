@@ -40,9 +40,9 @@
  * that creates a pending event during its preparation phase may fire it during
  * the fire phase.
  *
- * There is a school of thought that holds this class should promote to
+ * This class should potentially be promoted to
  * BaseValue, which is today a static utility collection used both by
- * AttributeValues and also by Component.  But let's figure it out before that...
+ * AttributeValues and also by Component.
  *
  * @protected
  * @constructor
@@ -82,14 +82,18 @@ $A.ns.AttributeValue = function () {
    this.pending = undefined;
 };
 
-/** Static to convert simple names to qualified. */
+/** Static to convert simple names to qualified. 
+ * @param {String} simpleName The simple name to be converted to a qualified name with the format prefix://namespace:name.
+ * 
+ */
 $A.ns.AttributeValue.getQName = function (simpleName) {
     var eventDef = BaseValue.getEventDef(simpleName);
     return eventDef.getDescriptor().getQualifiedName();
 };
 
 /**
- * Adds a new the handlers.
+ * Adds new handlers. This is an abstract method and should not be called.
+ * @param {Object} config
  * @protected
  */
 $A.ns.AttributeValue.prototype.addHandlers = function(config) {
@@ -167,7 +171,7 @@ $A.ns.AttributeValue.prototype.unobserve = function(target) {
 };
 
 /**
- * Destroys the handlers.
+ * Destroys the handlers. This is an abstract method and should not be called.
  * @protected
  */
 $A.ns.AttributeValue.prototype.destroyHandlers = function(globalId) {
@@ -244,6 +248,8 @@ $A.ns.AttributeValue.prototype.hasPending = function(eventQName) {
  * Adds an entry to the value of pending events, for this attribute and any
  * pending parents.  For parent events, we need to accumulate the intervening
  * keys for the value object.
+ * @param {String} eventName
+ * @param {Object} value
  *
  * @protected
  */
@@ -281,6 +287,8 @@ $A.ns.AttributeValue.prototype.updatePendingValue = function(eventName, value) {
  * and all parents up to either the top level or the first level with an
  * already-pending change.  Any layers WITHOUT handlers are skipped from that
  * maximal return list.
+ * 
+ * @param {String} The event name
  *
  * @protected
  */
@@ -306,6 +314,8 @@ $A.ns.AttributeValue.prototype.prepare = function(eventName) {
  * the events in eventList should be prepared, and pending will have been
  * deleted in any AttributeValue with no pending events after that change.
  * @protected
+ * @param {String} The event name
+ * @param {Object} eventList The list of events to fire
  */
 $A.ns.AttributeValue.prototype.firePending = function(eventName, eventList) {
     if (eventList) {

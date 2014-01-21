@@ -162,6 +162,9 @@ AttributeSet.prototype.mergeValues = function(yourValues, overwrite) {
     }
 };
 
+/**
+ * @private
+ */
 AttributeSet.prototype.createDefault = function(name) {
     if (!$A.util.isUndefinedOrNull(name) && !this.values.contains(name)) {
         // Dynamically create the attribute now that something has asked for it

@@ -35,7 +35,7 @@ function ControllerDef(config){
 ControllerDef.prototype.auraType = "ControllerDef";
 
 /**
- * Gets the Controller Descriptor (e.g. markup://aura:component).
+ * Gets the Controller Descriptor with the format <code>markup://aura:component</code>.
  * @returns {Object}
  */
 ControllerDef.prototype.getDescriptor = function(){

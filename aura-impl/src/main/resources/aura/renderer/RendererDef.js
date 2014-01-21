@@ -46,7 +46,7 @@ RendererDef.prototype["auraType"] = RendererDef.prototype.auraType;
 
 /**
  * Gets the renderer methods recursively in the component's hierarchy.
- * @param {Object} component The component associated with the renderer.
+ * @param {Component} component The component associated with the renderer.
  */
 RendererDef.prototype.render = function RendererDef$Render(component) {
     var renderer = component.getRenderer();
@@ -62,7 +62,7 @@ RendererDef.prototype.render = function RendererDef$Render(component) {
 
 /**
  * Gets the methods after the render method recursively in the component's hierarchy.
- * @param {Object} component The component associated with the renderer.
+ * @param {Component} component The component associated with the renderer.
  */
 RendererDef.prototype.afterRender = function RendererDef$AfterRender(component) {
     var renderer = component.getRenderer();
@@ -76,7 +76,7 @@ RendererDef.prototype.afterRender = function RendererDef$AfterRender(component) 
 
 /**
  * Gets the rerenderer methods recursively in the component's hierarchy.
- * @param {Object} component The component associated with the renderer.
+ * @param {Component} component The component associated with the renderer.
  */
 RendererDef.prototype.rerender = function RendererDef$Rerender(component) {
     var renderer = component.getRenderer();
@@ -90,7 +90,7 @@ RendererDef.prototype.rerender = function RendererDef$Rerender(component) {
 
 /**
  * Revert the render by removing the DOM elements.
- * @param {Object} component The component associated with the renderer.
+ * @param {Component} component The component associated with the renderer.
  */
 RendererDef.prototype.unrender = function RendererDef$Unrender(component) {
     var renderer = component.getRenderer();

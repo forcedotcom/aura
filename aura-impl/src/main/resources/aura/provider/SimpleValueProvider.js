@@ -38,12 +38,12 @@ $A.ns.SimpleValueProvider.prototype.getValues = function() {
 };
 
 /**
- * Gets value and creates new simple value that references specified component
+ * Gets value and creates new simple value that references specified component.
  *
- * @param expression
- * @param [component]
- * @param [callback]
- * @return {SimpleValue}
+ * @param {String} expression 
+ * @param {Component} component
+ * @param {Function} callback
+ * @return {SimpleValue} The simple value that references the component.
  */
 $A.ns.SimpleValueProvider.prototype.getValue = function(expression, component, callback) {
     var value;

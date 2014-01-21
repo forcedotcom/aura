@@ -371,7 +371,7 @@ $A.ns.Util.prototype.appendChild = function(newEl, referenceEl) {
 /**
  * Removes the specified element from the DOM.
  *
- * Careful that there be dragons here. Since we hijack the normal delete
+ * Use this method with caution. Since we hijack the normal delete
  * functionality, we need to be careful of odd event processing. Specifically
  * we end up sending off some events that would not otherwise be sent.
  *
@@ -569,7 +569,7 @@ $A.ns.Util.prototype.createTimeoutCallback = function(callback, toleranceMillis)
  * @param {String} eventName The name of the DOM event, minus the "on" prefix (e.g. "click", "focus", "blur", etc.).
  * @param {Object} handler The JS handler to add.
  * @param {Boolean} useCapture Whether to use event capturing.
- * @param {Integer} timeout Optional timeout (in milliseconds) that will delay the handler execution.
+ * @param {Number} timeout Optional timeout (in milliseconds) that will delay the handler execution.
  * @returns {Object} Either a function (success) or null (fail)
  */
 $A.ns.Util.prototype.on = (function() {
@@ -1123,13 +1123,16 @@ $A.ns.Util.derivePrototype = function(child, parent) {
 
 /**
  * Returns whether "instance" is, directly or indirectly, an instance of
- * "type."  An object is indirectly an instance if derivePrototypeFrom was
+ * "constructor."  An object is indirectly an instance if derivePrototypeFrom was
  * used to make the child type derive from the parent type.
  * 
- * We don't use the builtin "instanceof" because Javascript doesn't understand
- * type inheritance, and to fake it out you would need child.prototype to be
- * an instance of parent; having "unbound" instances is ugly at best and may
- * need to be invalid objects at worst, so no.  But this is the cost of that.
+ * JavaScript's instanceof operator is not used as it doesn't understand
+ * type inheritance. Using this method would avoid the need for child.prototype to be
+ * an instance of parent; we also avoid having "unbound" instances.
+ * 
+ * @param instance The object to test
+ * @param constructor  The object to test against
+ * @returns {Boolean} Returns true if instance is an instance of constructor.
  */
 $A.ns.Util.prototype.instanceOf = function(instance, constructor) {
     if (instance === null || instance === undefined || constructor === null || constructor === undefined) {

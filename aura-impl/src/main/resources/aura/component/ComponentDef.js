@@ -124,9 +124,8 @@ $A.ns.ComponentDef = function ComponentDef(config){
 $A.ns.ComponentDef.prototype.auraType = "ComponentDef";
 
 /**
- * Gets the Component Descriptor. Returns a DefDescriptor object.
- * A DefDescriptor object contains a prefix, namespace, and name.
- * @returns {DefDescriptor}
+ * Returns a DefDescriptor object.
+ * @returns {DefDescriptor}  A DefDescriptor object contains a prefix, namespace, and name.
  */
 $A.ns.ComponentDef.prototype.getDescriptor = function(){
     return this.descriptor;
@@ -141,8 +140,8 @@ $A.ns.ComponentDef.prototype.isAbstract = function(){
 };
 
 /**
- * @return the ComponentDef for the immediate super type,
- * or null if none exists (should only be null for aura:component)
+ * Returns the component definition for the immediate super type or null if none exists (should only be null for aura:component).
+ * @return {ComponentDef} The ComponentDef for the immediate super type
  */
 $A.ns.ComponentDef.prototype.getSuperDef = function() {
     return this.superDef;
@@ -344,7 +343,7 @@ $A.ns.ComponentDef.prototype.getValueHandlerDefs = function(){
 };
 
 /**
- *Converts a ComponentDef to type String.
+ *Converts a ComponentDef object to type String.
  *@returns {String}
  */
 $A.ns.ComponentDef.prototype.toString = function(){
@@ -376,7 +375,7 @@ $A.ns.ComponentDef.prototype.implementsDirectly = function(type){
 };
 
 /**
- * Gets the location change event. Returns the qualified name of the event. E.g. "markup://aura:locationChange"
+ * Gets the location change event. Returns the qualified name of the event in the format <code>markup://aura:locationChange</code>.
  */
 $A.ns.ComponentDef.prototype.getLocationChangeEvent = function() {
     var evt = this.locationChangeEventDef;

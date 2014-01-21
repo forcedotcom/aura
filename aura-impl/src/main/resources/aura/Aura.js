@@ -616,15 +616,15 @@ $A.ns.Aura.prototype.finishInit = function(doNotCallJiffyOnLoad) {
  * test as well.
  *
  * @description <p>Example:</p>
- * <code>
- * testDuplicate : {<br/>
- * &nbsp;&nbsp;&nbsp;&nbsp;exceptionsAllowedDuringInit : ["Duplicate found!"],<br/>
- * &nbsp;&nbsp;&nbsp;&nbsp;attributes : {<br/>
- * &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;dupCmp : true<br/>
- * &nbsp;&nbsp;&nbsp;&nbsp;},<br/>
- * &nbsp;&nbsp;&nbsp;&nbsp;//more tests<br/>
+ * <pre>
+ * testDuplicate : {
+   exceptionsAllowedDuringInit : ["Duplicate found!"], 
+     attributes : {
+ *     dupCmp : true
+ *   },
+ *    //more tests
  * }
- * </code>
+ * </pre>
  *
  * <p>This code tries to separate a "display message" (with limited information for users in production
  * modes) from a "log message" (always complete).</p>

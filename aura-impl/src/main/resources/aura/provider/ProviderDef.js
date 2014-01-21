@@ -31,7 +31,8 @@ ProviderDef.prototype.auraType = "ProviderDef";
 /**
  * Runs the provide method on the component and returns the component definition.
  * Throws an error if the provide method is not found.
- * @param {Object} component
+ * @param {Component} component 
+ * @param {Boolean} localCreation
  */
 ProviderDef.prototype.provide = function(component, localCreation){
     var provideMethod = this.provideMethod;

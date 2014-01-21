@@ -131,7 +131,7 @@ ArrayValue.prototype.setIsOwner = function(isOwner) {
  * Sets the array to newArray.
  *
  * @param {Object} newArray The new array. This can be an array of literal JavaScript values or an array of value objects.
- * @param {Boolean} skipChange Set to true if you want to skip firing of the change event, which indicates that the content or state has changed.
+ * @param {Boolean} skipChange Set to true if you want to skip firing of the change event, which indicates that the content or state has changed. Or set to false if you want to fire the change event.
  */
 ArrayValue.prototype.setValue = function(newArray, skipChange) {
     this.fireEvents = false;

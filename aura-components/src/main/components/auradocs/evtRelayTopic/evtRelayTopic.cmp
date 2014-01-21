@@ -27,9 +27,28 @@
  
     <p>The following sample code shows how <code>uitest:demoMenuTrigger</code> extends <code>ui:menuTrigger</code> and uses a controller action that propagates the event to <code>ui:menuTrigger</code>.
     In the <code>relay</code> controller action, <code>preEventFiring</code> is an action on <code>ui:menuTrigger</code> that captures the event that triggers the menu and toggles it.
-    Note that the trigger doesn't do anything as a standalone. It can be used in a <code>ui:menu</code> component, as shown in the second demo below.
+    Note that the trigger doesn't do anything as a standalone but it can be used in a <code>ui:menu</code> component later.
     </p>
-	<auradocs:example descriptor="uitest:demoMenuTrigger"/>
+    <auradocs:codeblock>&lt;!--uitest:demoMenuTrigger-->
+&lt;aura:component extends="ui:menuTrigger">
+  &lt;aura:attribute name="label" type="String" default="Trigger" description="The text to display as a tooltip."/>
+  &lt;ui:outputURL value="javascript:void(0)" iconClass="iconClassLink" linkClick="<aura:text value="{!"/>c.relay}" label="<aura:text value="{!"/>v.label}" alt="<aura:text value="{!"/>v.label}" class="<aura:text value="{!"/>v.class}" />
+&lt;/aura:component></auradocs:codeblock>
+	
+	<auradocs:codeblock>//The controller
+({
+    relay : function(cmp, evt, helper){
+      var clickEvent = evt.getParam("domEvent");
+      helper.preEventFiring(cmp, clickEvent);
+    helper.fireEvent(cmp, clickEvent, helper);
+    }
+})</auradocs:codeblock>
+  <auradocs:codeblock>/**The CSS**/
+.THIS .iconClassLink {
+  background: url("../img/trigger.png") no-repeat;
+  width: 16px;
+  height: 16px;
+}</auradocs:codeblock>
 	
 	<auradocs:info>In the controller, <code>helper.preEventFiring()</code> calls the action in parent's helper, <code>menuTriggerHelper.js</code>.
 	Similarly, <code>helper.fireEvent()</code> calls the action in the parent's helper, <code>menuItemHelper.js</code>. 
@@ -37,10 +56,21 @@
 	</auradocs:info>
 	
 	<p>The following sample code shows an implementation of <code>uitest:demoMenuTrigger</code>.</p>
-	<auradocs:example descriptor="uitest:demoRelay"/>
+	<auradocs:codeblock>&lt;!--Menu trigger extended with ui:outputURL-->
+&lt;aura:component>
+  &lt;ui:menu>
+    &lt;uitest:demoMenuTrigger aura:id="trigger" label="Select something" />
+    &lt;ui:menuList>
+    	&lt;!--Your ui:actionMenuItem components go here-->
+    &lt;/ui:menuList>
+  &lt;/ui:menu>	
+&lt;/aura:component</auradocs:codeblock>
 	
 	<p>In <code>uitest:demoMenuTrigger</code>, we captured the <code>click</code> DOM event from the Aura event and propagated it to the parent components. By doing so,
 	we can then handle the event the same way as how <code>ui:interactive</code>, which <code>ui:menuTrigger</code> extends, handles native DOM events.</p>
+	
+	<auradocs:info>For a full implementation of this demo, see <code>aura/aura/src/test/components/uitest/demoRelay</code> in the <ui:outputURL value="https://github.com/forcedotcom/aura" label="GitHub repo"/>.</auradocs:info>
+	
 	
      <p><b>See also:</b><br/>
       <auradocs:topicLink topic="helloActions">Client-Side Controllers</auradocs:topicLink><br/>

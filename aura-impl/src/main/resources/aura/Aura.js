@@ -654,7 +654,7 @@ $A.ns.Aura.prototype.error = function(msg, e){
                 e.stack = e.stk;
             }
         } else {
-            e = new Error("caught " + JSON.stringify(e));
+            e = new Error("caught " + $A.util.json.encode(e));
         }
     }
     if (!logMsg.length) {

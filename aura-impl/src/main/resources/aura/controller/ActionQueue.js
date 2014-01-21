@@ -23,8 +23,10 @@
  * This object is not intended to be public.
  * 
  * @name ActionQueue
+ * @private
  * @constructor
  */
+
 var ActionQueue = function ActionQueue() {
 	this.nextTransactionId = -1;
 	this.lastAbortableTransactionId = -1;

@@ -15,7 +15,7 @@
  */
 /*jslint sub: true */
 /**
- * @class Constructs a new ComponentDef. A ComponentDef instance is created as part of Aura initialization.
+ * @class Constructs a new ComponentDef object, which is a component definition. A ComponentDef instance is created as part of Aura initialization.
  * @constructor
  * @protected
  */
@@ -277,8 +277,9 @@ $A.ns.ComponentDef.prototype.getModelDef = function() {
 };
 
 /**
- * Gets the event definitions.
+ * Returns the event definitions.
  * @param {String} The name of the event definition.
+ * @param {Boolean} includeValueEvents Set to true to include the value events.
  * @returns{Object}
  */
 $A.ns.ComponentDef.prototype.getEventDef = function(name, includeValueEvents) {
@@ -352,7 +353,7 @@ $A.ns.ComponentDef.prototype.toString = function(){
 
 /**
  * Checks whether the Component is an instance of the given component name (or interface name).
- * @param {String} name The name of the component (or interface), with a format of <namespace>:<componentName> (e.g., ui:button).
+ * @param {String} name The name of the component (or interface), with a format of <code>namespace:componentName</code> (e.g., <code>ui:button</code>).
  * @returns {Boolean} True if the Component is an instance, or false otherwise.
  */
 $A.ns.ComponentDef.prototype.isInstanceOf = function(name){
@@ -366,6 +367,10 @@ $A.ns.ComponentDef.prototype.isInstanceOf = function(name){
     return false;
 };
 
+/**
+ * Primarily used by isInstanceOf().
+ * @private
+ */
 $A.ns.ComponentDef.prototype.implementsDirectly = function(type){
     return !$A.util.isUndefined(this.interfaces[type]);
 };

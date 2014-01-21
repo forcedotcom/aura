@@ -32,8 +32,8 @@ function AttributeDef(config){
 AttributeDef.prototype.auraType = "AttributeDef";
 
 /**
- * Gets the descriptor. Returns a DefDescriptor object.
- * @returns {DefDescriptor}
+ * Gets the descriptor. Returns a DefDescriptor object that contains the metadata for the attribute.
+ * @returns {DefDescriptor} The qualified name for a DefDescriptor object has the format <code>prefix://namespace:name</code>.
  */
 AttributeDef.prototype.getDescriptor = function(){
     return this.descriptor;

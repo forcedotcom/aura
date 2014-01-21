@@ -43,8 +43,9 @@ ArrayValue.prototype.auraType = "Value";
 
 /**
  * Returns the value object at the specified index.
- * getValue('length') will return a value object representing the length of this array value.
+ * <code>getValue('length')</code> returns a value object representing the length of this array value.
  * Any other argument for getValue() will flag an error.
+ * @param {Number} i The length of the array.
  */
 ArrayValue.prototype.getValue = function(i) {
     if (aura.util.isString(i)) {
@@ -129,7 +130,8 @@ ArrayValue.prototype.setIsOwner = function(isOwner) {
 /**
  * Sets the array to newArray.
  *
- * @param newArray The new array. This can be an array of literal JavaScript values or an array of value objects.
+ * @param {Object} newArray The new array. This can be an array of literal JavaScript values or an array of value objects.
+ * @param {Boolean} skipChange Set to true if you want to skip firing of the change event, which indicates that the content or state has changed.
  */
 ArrayValue.prototype.setValue = function(newArray, skipChange) {
     this.fireEvents = false;
@@ -161,6 +163,7 @@ ArrayValue.prototype.setValue = function(newArray, skipChange) {
 
 /**
  * Recursively destroys all values in the array
+ * @param {Boolean} async Set to true if values are to be destroyed asynchronously.
  * @private
  */
 ArrayValue.prototype.destroyOrphans = function(array, async) {
@@ -239,7 +242,7 @@ ArrayValue.prototype.rollback = function(clean){
 /**
  * Adds a new item to the end of the array.
  *
- * @param config The value for the new item. This can be either a literal JavaScript value or a value object.
+ * @param {Object} config The value for the new item. This can be either a literal JavaScript value or a value object.
  */
 ArrayValue.prototype.push = function(config) {
     var ar = this.getArray();
@@ -256,8 +259,8 @@ ArrayValue.prototype.push = function(config) {
 
 /**
  * Inserts an item at the specified index of the array.
- * @param index The array index where the value will be inserted
- * @param config The value of the new item. This can be either a literal JavaScript value or a value object.
+ * @param {Number} index The array index where the value will be inserted.
+ * @param {Object} config The value of the new item. This can be either a literal JavaScript value or a value object.
  */
 ArrayValue.prototype.insert = function(index, config) {
     if ($A.util.isNumber(index) && index >= 0) {
@@ -277,7 +280,7 @@ ArrayValue.prototype.insert = function(index, config) {
 
 /**
  * Removes from the array the item at the specified index and returns the removed item.
- * @param index The array index of the item to be removed
+ * @param {Number} index The array index of the item to be removed
  */
 ArrayValue.prototype.remove = function(index) {
     if ($A.util.isNumber(index) && index >= 0 && index < this.getLength()) {
@@ -345,14 +348,14 @@ ArrayValue.prototype.isLiteral = function() {
 
 /**
  * Iterates through the array and calls the user-defined function on each value.
- * For example, this function simply alerts the user for each value in the array.
- *
+ * <p>For example, this function simply alerts the user for each value in the array.</p>
+ * <code>
  * arrValue.each(function(val) {
  *      alert(val);
  * });
- *
- * @param func The function that operates on each value.
- * @param reverse If defined, reverses the direction of the iteration.
+ *</code>
+ * @param {Function} func The function that operates on each value.
+ * @param {Boolean} reverse If defined, reverses the direction of the iteration.
  */
 ArrayValue.prototype.each = function(func, reverse) {
     var a = this.getArray();
@@ -369,9 +372,9 @@ ArrayValue.prototype.each = function(func, reverse) {
 };
 
 /**
- * Returns the unwrapped value at the specified index.
+ * Calls getValue() and returns the unwrapped value at the specified index.
  *
- * @param i index of value to return.
+ * @param {Number} i Index of value to return.
  */
 ArrayValue.prototype.getRawValue = function(i) {
     var ret = this.getValue(i);
@@ -382,6 +385,7 @@ ArrayValue.prototype.getRawValue = function(i) {
 /**
  * Recursively destroys all values in the array and deletes the array.
  * Also, removes any onchange handlers listening to this value object.
+ * @param {Boolean} async Set to true if values are to be destroyed asynchronously. The default is false.
  */
 ArrayValue.prototype.destroy = function(async) {
 //#if {"modes" : ["STATS"]}
@@ -463,7 +467,7 @@ ArrayValue.prototype.unwrap = function(){
 /**
  * Compare to an ArrayValue or Array.
  * @param {Object} arr The object that is compared. If the object is neither an ArrayValue nor an Array, return false.
- * @returns {Boolean} if they are identical return true, otherwise return false.
+ * @returns {Boolean} Returns true if they are identical return true, otherwise return false.
  */
 ArrayValue.prototype.compare = function(arr) {
     if (arr && arr.auraType === "Value" && arr.toString() === "ArrayValue") {

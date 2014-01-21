@@ -307,13 +307,38 @@ $A.ns.Aura = function() {
         return this.componentService.get(globalId);
     };
 
+    /**
+     * Client-side component creation. This method is replaced by newComponentAsync().
+     * @param {Object} config
+     * @param {Object} attributeValueProvider
+     * @param {Boolean} localCreation
+     */
     this.newCmp = function(config, attributeValueProvider, localCreation, doForce) {
         return this.componentService.newComponentDeprecated(config, attributeValueProvider, localCreation, doForce);
     };
+    /**
+     * Previously known as newComponent(). This method is replaced by newComponentAsync().
+     * @param {Object} config
+     * @param {Object} attributeValueProvider
+     * @param {Boolean} localCreation
+     * @param {Boolean} doForce 
+     */
     this.newCmpDeprecated = function(config, attributeValueProvider, localCreation, doForce) {
         return this.componentService.newComponentDeprecated(config, attributeValueProvider, localCreation, doForce);
     };
 
+    /**
+     * Creates components from a client-side controller or helper. Equivalent to <code>$A.newCmpAsync()</code>.
+     * If no server-side dependencies are found, this method runs synchronously.
+     * @param {Object} callbackScope The callback scope
+     * @param {Function} callback The callback function, required for returning the newly created component
+     * @param {Object} config Provides the component descriptor and attributes. Example:
+     * <p><code>"componentDef": "markup://ui:button", "attributes": { "values": {label: "Submit"}}</code></p>
+     * @param {Object} attributeValueProvider
+     * @param {Boolean} localCreation
+     * @param {Boolean} doForce
+     * @param {Boolean} forceServer
+     */
     this.newCmpAsync = function(callbackScope, callback, config, attributeValueProvider, localCreation, doForce, forceServer){
         return this.componentService.newComponentAsync(callbackScope, callback, config, attributeValueProvider, localCreation, doForce, forceServer);
     };
@@ -321,7 +346,7 @@ $A.ns.Aura = function() {
 
 
     /**
-     * pushes current portion of attribute's creationPath onto stack
+     * Pushes current portion of attribute's creationPath onto stack
      * @param {String} creationPath
      *
      * @public
@@ -601,8 +626,8 @@ $A.ns.Aura.prototype.finishInit = function(doNotCallJiffyOnLoad) {
  * }
  * </code>
  *
- * This code tries to separate a "display message" (with limited information for users in production
- * modes) from a "log message" (always complete).
+ * <p>This code tries to separate a "display message" (with limited information for users in production
+ * modes) from a "log message" (always complete).</p>
  *
  * @public
  * @param {String} msg The error message to be displayed to the user.
@@ -1245,8 +1270,8 @@ $A.ns.Aura.prototype.setMode = function(mode) {
 };
 
 /**
- * Get GVP directly
- * @return {GlobalValueProviders}
+ * Get GVP directly.
+ * @return {GlobalValueProviders} The global value provider, such as $Label, $Browser, $Locale, etc.
  */
 $A.ns.Aura.prototype.getGlobalValueProviders = function() {
     return this.getContext().getGlobalValueProviders();

@@ -78,9 +78,6 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
             boolean haveUid = false;
             boolean matchedUid = false;
             file = matcher.group(3);
-System.out.println("group1:"+matcher.group(1)+"\ngroup2(as nonceUid):"+
-            matcher.group(2)+"\ngroup3(as file)"+matcher.group(3)
-            +",\ncurrentUid(from getAuraFrameworkNonce):"+currentUid+",ifModifiedSince:"+ifModifiedSince);
             if (nonceUid != null) {
                 nonceUid = nonceUid.substring(1);
             }
@@ -215,7 +212,6 @@ System.out.println("group1:"+matcher.group(1)+"\ngroup2(as nonceUid):"+
 
             IOUtil.copyStream(in, response.getOutputStream());
         } finally {
-        	System.out.println(System.currentTimeMillis()+",AuraFrameworkServlet.doGet,try{} end, close in if it's not null");
             if (in != null) {
                 try {
                     in.close();

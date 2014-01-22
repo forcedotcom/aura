@@ -969,6 +969,9 @@ $A.ns.Util.prototype.setDataAttribute = function(element, key, value) {
 
 };
 
+/**
+ * @private
+ */
 $A.ns.Util.prototype.getDataAttributeName = function(key) {
 	var name = this.dataAttributeCache[key];
 	if (!name) {

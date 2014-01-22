@@ -21,11 +21,20 @@
         browsers : ["-IE7", "-IE8"],
         test : function(cmp) {
             var found = false;
+            var cssText = "";
             var styleSheets = document.styleSheets;
             for (var i = 0; i < styleSheets.length; i++) {
                 var cssRules = styleSheets[i].cssRules;
                 for (var j = 0; j < cssRules.length; j++) {
-                    var cssText = cssRules[j].cssText;
+                    /*
+                     * IE10 has a nasty habit of throwing "unknown" (when using typeof) or Member not found. exceptions with 
+                     * CSS styles that it doesn't understand
+                     */
+                    if ($A.getGlobalValueProviders().get("$Browser").isIE10 && typeof cssRules[j].cssText === 'unknown') {
+                       continue; 
+                    }
+                    cssText = cssRules[j].cssText;
+                    
                     cssText = cssText.replace(/\s+/g, '').toLowerCase();
                     // Different browsers have slightly different formatting so just check enough to feel confident
                     if (cssText.indexOf(".templaterule{border") != -1 && cssText.indexOf("font-style:italic") != -1) {

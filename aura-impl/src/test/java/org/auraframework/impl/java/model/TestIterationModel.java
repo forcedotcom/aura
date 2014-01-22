@@ -39,6 +39,7 @@ public class TestIterationModel {
     private final List<Object> data;
     private final List<Object> capitaldata;
     private final List<String> innerdata;
+    private final List<Object> data2;
 
     public TestIterationModel() {
         data = new LinkedList<Object>();
@@ -56,11 +57,24 @@ public class TestIterationModel {
             capitaldata.add(dora);
         }
         innerdata = ImmutableList.of("gah", "bah", "stah", "brah", "yah", "nah", "hah");
+        data2 = new LinkedList<Object>();
+        final List<String> listForData2;
+        listForData2 = ImmutableList.of("typeif","typeifelse","typeifnested","typeifserver");
+        for (int i=0; i<listForData2.size();i++) {
+        	Map<String, Object> dora2 = new HashMap<String, Object>();
+        	dora2.put("type",listForData2.get(i));
+        	data2.add(dora2);
+        }
     }
 
     @AuraEnabled
     public List<Object> getData() {
         return data;
+    }
+    
+    @AuraEnabled
+    public List<Object> getData2() {
+        return data2;
     }
 
     @AuraEnabled

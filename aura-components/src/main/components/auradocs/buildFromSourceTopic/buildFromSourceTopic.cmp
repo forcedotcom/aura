@@ -25,7 +25,7 @@
     <h2>Prerequisites</h2>
         <ol>
 
-            <li><ui:outputURL value="http://www.oracle.com/technetwork/java/javase/downloads/" label="Java Development Kit (JDK) 1.6">Java Development Kit (JDK) 1.6</ui:outputURL></li>
+            <li><ui:outputURL value="http://www.oracle.com/technetwork/java/javase/downloads/" label="JDK 1.7 or JDK 1.6">JDK 1.7 or JDK 1.6</ui:outputURL></li>
             <li><ui:outputURL value="http://maven.apache.org/download.html" label="Apache Maven 3">Apache Maven 3</ui:outputURL></li>
         </ol>
 
@@ -61,7 +61,7 @@ mvn install
     <p>You can use your IDE of choice. These instructions show you how to import the Aura source into Eclipse.</p>
 
     <ol>
-        <li>Install <ui:outputURL value="http://www.eclipse.org/downloads/" label="Eclipse 3.7">Eclipse 3.7</ui:outputURL>. Choose the Eclipse distribution for Java EE Developers. This includes JavaScript editing and other Web UI tools.</li>
+        <li>Install <ui:outputURL value="http://www.eclipse.org/downloads/" label="Eclipse 3.7 or later">Eclipse 3.7 or later</ui:outputURL>. Choose the Eclipse distribution for Java EE Developers. This includes JavaScript editing and other Web UI tools.</li>
         <li>Open Eclipse and install the Eclipse Maven plugin, m2eclipse, by clicking <b>Help > Install New Software ...</b></li>
         <li>Enter <code>http://download.eclipse.org/technology/m2e/releases</code> and click <b>Add</b>.</li>
         <li>Select Maven Integration for Eclipse and click <b>Next</b>.</li>

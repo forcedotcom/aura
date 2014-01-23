@@ -111,7 +111,7 @@ var ComponentPriv = (function() { // Scoping priv
 
             // for components inside of a foreach, sets up the value provider
             // they will delegate all m/v/c values to
-            this.setupDelegateValueProvider(config["delegateValueProvider"], localCreation);
+            this.setupDelegateValueProvider(config["delegateValueProvider"], localCreation, cmp.ccc);
 
             // join attributes from partial config and config, preferring
             // partial when overlapping
@@ -147,7 +147,7 @@ var ComponentPriv = (function() { // Scoping priv
 
             // runs component provider and replaces this component with the
             // provided one
-            this.injectComponent(config, cmp, localCreation);
+            this.injectComponent(config, cmp, localCreation, cmp.ccc);
 
             // instantiates this components model
             this.setupModel(config["model"], cmp);
@@ -156,7 +156,7 @@ var ComponentPriv = (function() { // Scoping priv
             this.setupValueProviders(config["valueProviders"], cmp);
 
             // instantiate super component(s)
-            this.setupSuper(cmp, configAttributes, localCreation);
+            this.setupSuper(cmp, configAttributes, localCreation, cmp.ccc);
 
             // does some extra attribute validation for requiredness
             this.validateAttributes(cmp, configAttributes);
@@ -327,16 +327,23 @@ var ComponentPriv = (function() { // Scoping priv
         this.componentDef = componentDef;
     };
 
-    ComponentPriv.prototype.setupDelegateValueProvider = function(config, localCreation) {
+    ComponentPriv.prototype.setupDelegateValueProvider = function(config, localCreation, ccc) {
         if (config) {
-            if (config["globalId"]) {
-                this.delegateValueProvider = componentService.get(config["globalId"]);
+            if (config['globalId']) {
+                this.delegateValueProvider = componentService.get(config['globalId']);
             } else {
                 this.delegateValueProvider = config;
             }
             if (!this.delegateValueProvider) {
-                this.delegateValueProvider = componentService
-                                .newComponentDeprecated(config, null, localCreation, true);
+
+                if (ccc) {
+                    var self = this;
+                    ccc.loadComponent(config, null, localCreation, function(component) {
+                        self.delegateValueProvider = component;
+                    }, false, false, true);
+                } else {
+                    this.delegateValueProvider = componentService.newComponentDeprecated(config, null, localCreation, true);
+                }
             }
         }
     };
@@ -371,7 +378,7 @@ var ComponentPriv = (function() { // Scoping priv
     };
 
     ComponentPriv.prototype.setupSuper = function(attributeValueProvider,
-                    configAttributes, localCreation) {
+                    configAttributes, localCreation, ccc) {
         var superDef = this.componentDef.getSuperDef();
         if (superDef) {
             var attributeValues = {};
@@ -419,19 +426,29 @@ var ComponentPriv = (function() { // Scoping priv
             superAttributes["valueProvider"] = attributeValueProvider;
             superConfig["attributes"] = superAttributes;
 
+            var self = this;
+            var setSuperComponent = function(component) {
+                self.superComponent = component;
+                if (component) {
+                    var valueProviders = self.getValueProviders();
+                    if (!valueProviders['super']) {
+                        valueProviders['super'] = component;
+                    }
+                }
+            };
+
             $A.pushCreationPath("super");
+
             try {
-                this.superComponent = componentService.newComponentDeprecated(
-                                superConfig, null, localCreation, true);
+
+                if (ccc) {
+                    ccc.loadComponent(superConfig, null, localCreation, setSuperComponent, false, false, true);
+                } else {
+                    setSuperComponent(componentService.newComponentDeprecated(superConfig, null, localCreation, true));
+                }
+
             } finally {
                 $A.popCreationPath("super");
-            }
-        }
-
-        if (this.superComponent) {
-            var valueProviders = this.getValueProviders();
-            if (!valueProviders["super"]) {
-                valueProviders["super"] = this.superComponent;
             }
         }
     };
@@ -601,12 +618,44 @@ var ComponentPriv = (function() { // Scoping priv
         }
     };
 
-    ComponentPriv.prototype.injectComponent = function(config, cmp, localCreation) {
+    ComponentPriv.prototype.injectComponent = function(config, cmp, localCreation, ccc) {
+
+        var self = this,
+            setProvided = function(realComponentDef, attributes) {
+                $A.assert(realComponentDef
+                    && realComponentDef.auraType === 'ComponentDef'
+                    && !realComponentDef.isAbstract(),
+                    'No concrete implementation provided');
+
+                self.componentDef = realComponentDef;
+
+
+                /**
+                 * TODO: Fix injecting attributes. async and un-sync component creation
+                 *
+                 * client provided has to have the same attributes as current cmp
+                 * because injectComponent is called after setupAttributes. Thus,
+                 * attributes are already created for the component at this point.
+                 *
+                 */
+                if (attributes) {
+                    for ( var k in attributes) {
+                        var value = cmp.getAttributes().getValue(k, true);
+                        if (!value) {
+                            aura.assert(value, 'No attribute named ' + k
+                                + ' found but was returned by provider');
+                        }
+
+                        value.setValue(attributes[k]);
+                        value.commit();
+                    }
+                }
+            };
+
+
         var componentDef = this.componentDef;
         if ((componentDef.isAbstract() || componentDef.getProviderDef()) && !this.concreteComponentId) {
             var providerDef = componentDef.getProviderDef();
-            var realComponentDef;
-            var attributes;
             var act = $A.getContext().getCurrentAction();
 
             if (act) {
@@ -615,34 +664,13 @@ var ComponentPriv = (function() { // Scoping priv
             }
             if (providerDef) {
                 // use it
-                var provided = providerDef.provide(cmp, localCreation);
-                realComponentDef = provided["componentDef"];
-                attributes = provided["attributes"];
+                providerDef.provide(cmp, localCreation, setProvided, ccc);
             } else {
                 var partialConfig = this.partialConfig;
-                aura.assert(partialConfig,
-                            "Abstract component without provider def cannot be instantiated : "
+                $A.assert(partialConfig,
+                            'Abstract component without provider def cannot be instantiated : '
                             + componentDef);
-                realComponentDef = componentService.getDef(partialConfig["componentDef"]);
-            }
-
-            aura.assert(realComponentDef
-                        && realComponentDef.auraType === "ComponentDef"
-                        && !realComponentDef.isAbstract(),
-                        "No concrete implementation provided");
-
-            this.componentDef = realComponentDef;
-            if (attributes) {
-                for ( var k in attributes) {
-                    var value = cmp.getAttributes().getValue(k, true);
-                    if (!value) {
-                        aura.assert(value, "No attribute named " + k
-                                        + " found but was returned by provider");
-                    }
-
-                    value.setValue(attributes[k]);
-                    value.commit();
-                }
+                setProvided(componentService.getDef(partialConfig["componentDef"]), null);
             }
         }
     };

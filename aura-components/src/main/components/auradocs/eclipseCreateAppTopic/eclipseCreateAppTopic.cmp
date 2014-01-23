@@ -24,10 +24,11 @@
     </p>
 
     <h2>Prerequisites</h2>
+    <auradocs:info>You must complete the <auradocs:topicLink topic="qsCmdLine">command-line quick start</auradocs:topicLink> for the Eclipse quick start to work successfully.</auradocs:info>
         <ol>
-            <li><ui:outputURL value="http://www.oracle.com/technetwork/java/javase/downloads/" label="Java Development Kit (JDK) 1.6">Java Development Kit (JDK) 1.6</ui:outputURL></li>
+            <li><ui:outputURL value="http://www.oracle.com/technetwork/java/javase/downloads/" label="JDK 1.7 or JDK 1.6">JDK 1.7 or JDK 1.6</ui:outputURL></li>
             <li><ui:outputURL value="http://maven.apache.org/download.html" label="Apache Maven 3">Apache Maven 3</ui:outputURL></li>
-            <li><ui:outputURL value="http://www.eclipse.org/downloads/" label="Eclipse 3.7">Eclipse 3.7</ui:outputURL>, and <ui:outputURL value="http://www.eclipse.org/m2e/download/" label="m2eclipse">m2eclipse plugin</ui:outputURL>. Choose the Eclipse distribution for Java EE Developers. This includes JavaScript editing and other Web UI tools.</li>
+            <li><ui:outputURL value="http://www.eclipse.org/downloads/" label="Eclipse 3.7">Eclipse 3.7 or later</ui:outputURL> and <ui:outputURL value="http://www.eclipse.org/m2e/download/" label="m2eclipse">m2eclipse plugin</ui:outputURL>. Choose the Eclipse distribution for Java EE Developers. This includes JavaScript editing and other Web UI tools.</li>
         </ol>
 
     <h2>Step 1: Specify the Remote Archetype</h2>

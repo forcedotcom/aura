@@ -18,9 +18,8 @@
 <aura:component extends="expressionTest:suite" render="client" model="java://org.auraframework.impl.java.model.TestJavaModel">
     <aura:attribute name="isNull" type="String"/>
 
-    <!-- W-1002517 https://gus.soma.salesforce.com/a07B0000000FSRL
     <expressionTest:test expression="{!null}" exprText="null" expected="null"/>
-    -->
+
     <expressionTest:test expression="{!v.isNull}" exprText="v.isNull" expected="null"/>
     <expressionTest:test expression="{!undefined}" exprText="undefined" expected="undefined"/>
 
@@ -92,16 +91,17 @@
 
     <expressionTest:test expression="{!abs(null)}" exprText="abs(null)" expected="0"/>
 
-    <!-- W-1005793 https://gus.soma.salesforce.com/a07B0000000FTi7IAG
+    <!-- W-1005793 - undefined instead of null is seen when model function returns null
     <expressionTest:test expression="{!m.stringNull}" exprText="m.stringNull" expected="null"/>
     <expressionTest:test expression="{!m.integerNull}" exprText="m.integerNull" expected="null"/>
     <expressionTest:test expression="{!m.doubleNull}" exprText="m.doubleNull" expected="null"/>
     <expressionTest:test expression="{!m.objectNull}" exprText="m.objectNull" expected="null"/>
+    -->
+    
     <expressionTest:test expression="{!!m.stringNull}" exprText="!m.stringNull" expected="true"/>
     <expressionTest:test expression="{!!m.objectNull}" exprText="!m.objectNull" expected="true"/>
     <expressionTest:test expression="{!null == m.stringNull}" exprText="null == m.stringNull" expected="true"/>
     <expressionTest:test expression="{!null == m.integerNull}" exprText="null == m.integerNull" expected="true"/>
     <expressionTest:test expression="{!null == m.doubleNull}" exprText="null == m.doubleNull" expected="true"/>
     <expressionTest:test expression="{!null == m.objectNull}" exprText="null == m.objectNull" expected="true"/>
-    -->
 </aura:component>

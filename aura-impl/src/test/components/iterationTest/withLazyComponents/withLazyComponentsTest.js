@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 ({
+	labels : [ "threadHostile" ],
     /**
      * Verify simple lazy loading case. 
      */
     testSimpleLazyLoading:{
         attributes:{start:0,end:2, slowFacet:true},
-        labels : [ "threadHostile" ],
         test:function(cmp){
             var helper = cmp.getDef().getHelper();
             var items = cmp.find("lazy");
@@ -89,7 +89,6 @@
      */
     testLazyLoadingWithAttributeValues:{
         attributes:{start:0,end:4, fastFacet:true},
-        labels : [ "threadHostile" ],
         test:function(cmp){
             var helper = cmp.getDef().getHelper();
             var iteration = cmp.find("iterationWithAttributes");
@@ -130,7 +129,6 @@
      */
     testSimpleLazyLoadingCscc:{
         attributes:{start:0,end:2, slowFacet:true},
-        labels : [ "threadHostile" ],
         test:function(cmp){
             var helper = cmp.getDef().getHelper();
             var items = cmp.find("lazyCscc");
@@ -200,7 +198,6 @@
      */
     testLazyLoadingWithAttributeValuesCscc:{
         attributes:{start:0,end:4, fastFacet:true},
-        labels : [ "threadHostile" ],
         test:function(cmp){
             var helper = cmp.getDef().getHelper();
             var iteration = cmp.find("iterationWithAttributesCscc");

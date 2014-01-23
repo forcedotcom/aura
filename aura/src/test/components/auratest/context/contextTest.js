@@ -1,4 +1,5 @@
 ({
+	labels : [ "auraSanity" ],
         //
         // Get a component, clearing the configs if necessary.
         //
@@ -44,7 +45,6 @@
      * Application that is not preloaded will appear in loaded set.
      */
 	testLoaded_UnloadedApplicationIsLoaded : {
-		labels : [ "auraSanity" ],
 		test : [ function(c) {
 			this.assertNoUid("APPLICATION@markup://aura:application");
 			this.doGet(false, "aura:application", true);
@@ -57,7 +57,6 @@
      * Component that is preloaded, because it is an implicit dependency, will not appear in loaded set.
      */
 	testLoaded_UnloadedImplicitDependencyIsNotLoaded : {
-		labels : [ "auraSanity" ],
 		test : [ function(c) {
 			this.assertNoUid("COMPONENT@markup://aura:component");
 			this.doGet(true, "aura:component", false);
@@ -66,11 +65,11 @@
 		} ]
 	},
 
+	
     /**
      * Component that is preloaded, because it is a namespace dependency, will not appear in loaded set.
      */
 	testLoaded_PreloadedNamespaceDependencyIsNotLoaded : {
-		labels : [ "auraSanity" ],
 		test : [ function(c) {
 			this.assertNoUid("COMPONENT@markup://aura:text");
 			this.doGet(true, "aura:text", false);
@@ -83,7 +82,6 @@
      * Component that is not preloaded will appear in loaded set.
      */
 	testLoaded_UnloadedComponentIsLoaded : {
-		labels : [ "auraSanity" ],
 		test : [ function(c) {
 			this.assertNoUid("COMPONENT@markup://auratest:text");
 			this.doGet(true, "auratest:text", true);
@@ -97,7 +95,6 @@
      * Dependencies of loaded component will not appear in loaded set.
      */
 	testLoaded_DependencyIsNotLoaded : {
-		labels : [ "auraSanity" ],
 		test : [ function(c) {
 			this.assertNoUid("COMPONENT@markup://auratest:testComponent1");
 			this.doGet(true, "auratest:testComponent1", true);
@@ -112,7 +109,6 @@
      * Dependencies of loaded component, even if loaded explicitly, will not appear in loaded set.
      */
 	testLoaded_DependencyIsNotLoadedEvenIfExplicitlyLoaded : {
-		labels : [ "auraSanity" ],
 		test : [ function(c) {
 			this.assertNoUid("COMPONENT@markup://auratest:testComponent1");
 			this.assertNoUid("COMPONENT@markup://auratest:testComponent2");
@@ -132,7 +128,6 @@
      * W-1989778
      */
 	_testLoaded_LoadedDependencyIsUnloadedIfParentIsLoaded : {
-		labels : [ "auraSanity" ],
 		test : [ function(c) {
 			this.assertNoUid("COMPONENT@markup://auratest:testComponent1");
 			this.assertNoUid("COMPONENT@markup://auratest:testComponent2");

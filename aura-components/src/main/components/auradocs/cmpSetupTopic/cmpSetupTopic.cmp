@@ -53,6 +53,11 @@
                 <td>A description of the component.</td>
             </tr>
             <tr>
+                <td><code>extends</code></td>
+                <td>String</td>
+                <td>The component to be extended, for example, <code>ui:input</code>.</td>
+            </tr>
+            <tr>
                 <td><code>extensible</code></td>
                 <td>Boolean</td>
                 <td>Set to <code>true</code> if the component can be extended, or <code>false</code> otherwise.</td>

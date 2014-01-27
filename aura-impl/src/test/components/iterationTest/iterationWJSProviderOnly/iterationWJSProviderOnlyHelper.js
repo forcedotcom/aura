@@ -15,9 +15,15 @@
  */
 ({
     typeMap : {
-        "typeif": "ifTest:testIf",
-        "typeifelse": "ifTest:testIfElse",
-        "typeifnested": "ifTest:testIfNested",
-        "typeifserver": "ifTest:testIfServer"
+        "typeif": "ifTest:testIf",//It is not true.It is literally not false.
+        "typeifelse": "ifTest:testIfElse",//It wishes it was true.It is not true.
+        "typeifnested": "ifTest:testIfNested",//It wishes it was true.It is not true.
+        "typeifserver": "ifTest:testIf"
+        /* "typeifserver": "ifTest:testIfServer"
+         * W-2022347
+         * ifTest:testIfServer is removed from test because the difference between loading it alone
+         * ({! !v.thang} is undefined), and loading it through iterationWJSProviderOnly ({! !v.thang} is true). 
+        "typeifserver": "ifTest:testIfServer"//It is literally not false.
+        */
     }
 })

@@ -14,7 +14,7 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 -->
-<aura:component provider="js://iterationTest.iterationWJSProviderOnly">
-<aura:dependency resource="ifTest:*" type="COMPONENT" />
-<aura:attribute name="type" type="String" description="component with javascript provider only"/>
+<aura:component abstract="true" provider="js://iterationTest.iterationWJSProviderOnly">
+    <aura:dependency resource="ifTest:*" type="COMPONENT" />
+    <aura:attribute name="type" type="String" description="type of component we load, see helper for the list"/>
 </aura:component>

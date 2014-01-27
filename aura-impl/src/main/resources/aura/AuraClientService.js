@@ -448,7 +448,7 @@ var AuraClientService = function() {
          * @param {String}
          *            localId
          * @memberOf AuraClientService
-         * @private
+         * @public
          */
         injectComponent : function(rawConfig, locatorDomId, localId) {
             var config = $A.util.json.resolveRefs(rawConfig);

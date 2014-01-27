@@ -62,11 +62,6 @@ public final class ComponentImpl extends BaseComponentImpl<ComponentDef, Compone
         super(descriptor, attributeDefRefs, attributeValueProvider, valueProviders, delegateValueProvider);
     }
 
-    protected ComponentImpl(DefDescriptor<ComponentDef> descriptor, Component extender,
-            BaseComponent<?, ?> attributeValueProvider, Component concreteComponent) throws QuickFixException {
-        super(descriptor, extender, attributeValueProvider, concreteComponent);
-    }
-
     @Override
     protected void createSuper() throws QuickFixException {
         ComponentDef def = getComponentDef();
@@ -172,4 +167,8 @@ public final class ComponentImpl extends BaseComponentImpl<ComponentDef, Compone
         super.finishInit();
     }
 
+    private ComponentImpl(DefDescriptor<ComponentDef> descriptor, Component extender,
+            BaseComponent<?, ?> attributeValueProvider, Component concreteComponent) throws QuickFixException {
+        super(descriptor, extender, attributeValueProvider, concreteComponent);
+    }
 }

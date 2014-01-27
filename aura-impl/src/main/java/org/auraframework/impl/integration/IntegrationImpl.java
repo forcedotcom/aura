@@ -134,11 +134,7 @@ public class IntegrationImpl implements Integration {
                     init.append(";\n");
                 }
 
-                init.append(String
-                        .format(
-                                "$A.getRoot().get(\"e.addComponent\").setParams({ config: config, locatorDomId: \"%s\", localId: \"%s\" }).fire();\n",
-                                locatorDomId,
-                                localId));
+                init.append(String.format("$A.run(function() { $A.clientService.injectComponent(config, \"%s\", \"%s\"); });\n", locatorDomId, localId));
 
                 out.append("<script>").append(init).append("</script>");
 

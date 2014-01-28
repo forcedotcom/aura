@@ -15,9 +15,25 @@
  */
 package org.auraframework.def;
 
+import org.auraframework.Aura;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+
 public class ComponentDefTest extends BaseComponentDefTest<ComponentDef> {
 
     public ComponentDefTest(String name) {
         super(name, ComponentDef.class, "aura:component");
+    }
+
+    /**
+     * InvalidDefinitionException if we try to instantiate an abstract component with no providers.
+     */
+    public void testAbstractNoProvider() throws Exception {
+        try {
+            ComponentDef cd = define(baseTag, "abstract='true'", "");
+            Aura.getInstanceService().getInstance(cd);
+            fail("Should not be able to instantiate a component with no providers.");
+        } catch (Exception e) {
+            checkExceptionContains(e, InvalidDefinitionException.class, "cannot be instantiated directly");
+        }
     }
 }

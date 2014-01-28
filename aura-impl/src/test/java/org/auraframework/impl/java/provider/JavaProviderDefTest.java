@@ -19,12 +19,19 @@ import java.util.List;
 import java.util.Map;
 
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.InterfaceDef;
+import org.auraframework.def.ProviderDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.instance.Component;
 import org.auraframework.throwable.AuraRuntimeException;
-import org.auraframework.throwable.quickfix.*;
+import org.auraframework.throwable.quickfix.AuraValidationException;
+import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+import org.auraframework.throwable.quickfix.MissingRequiredAttributeException;
+import org.auraframework.throwable.quickfix.QuickFixException;
 import org.junit.Ignore;
 
 import com.google.common.collect.Maps;
@@ -166,7 +173,8 @@ public class JavaProviderDefTest extends AuraImplTestCase {
             try {
                 Aura.getInstanceService().getInstance(desc.getQualifiedName(), ComponentDef.class);
                 fail("Invalid provider defined: Should have failed to provide a component implementing this interface.");
-            } catch (AuraRuntimeException expected) {}
+            } catch (AuraRuntimeException expected) {
+            }
         }
         for (String testcase : markupTestCases) {
             markupTestCase = String.format(markupSkeleton, testcase);
@@ -174,7 +182,8 @@ public class JavaProviderDefTest extends AuraImplTestCase {
             try {
                 Aura.getInstanceService().getInstance(desc.getQualifiedName(), ComponentDef.class);
                 fail("Invalid provider defined: Should have failed to provide a component implementing this interface.");
-            } catch (InvalidDefinitionException expected) {}
+            } catch (InvalidDefinitionException expected) {
+            }
         }
         for (String testcase : definitionNotFoundCases) {
             markupTestCase = String.format(markupSkeleton, testcase);
@@ -182,7 +191,8 @@ public class JavaProviderDefTest extends AuraImplTestCase {
             try {
                 Aura.getInstanceService().getInstance(desc.getQualifiedName(), ComponentDef.class);
                 fail("Invalid provider defined: Should have failed to provide a component implementing this interface.");
-            } catch (DefinitionNotFoundException expected) {}
+            } catch (DefinitionNotFoundException expected) {
+            }
         }
     }
 
@@ -543,6 +553,18 @@ public class JavaProviderDefTest extends AuraImplTestCase {
             checkExceptionFull(e, InvalidDefinitionException.class,
                     "Failed to instantiate org.auraframework.impl.java.provider.TestProviderThrowsDuringInstantiation",
                     javaPrvdrDefDesc.getDescriptorName());
+        }
+    }
+
+    /**
+     * Verify QuickFixExceptions thrown in the provide method are not swallowed.
+     */
+    public void testProviderThrowsQFE() throws Exception {
+        try {
+            Aura.getInstanceService().getInstance("test:test_Provider_ThrowsQFE", ComponentDef.class);
+            fail("Should have thrown exception in provider's provide() method.");
+        } catch (Exception e) {
+            checkExceptionFull(e, InvalidDefinitionException.class, "From TestProviderThrowsQFEDuringProvide");
         }
     }
 }

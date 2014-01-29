@@ -15,7 +15,6 @@
  */
 package org.auraframework.system;
 
-
 public class Client {
 
     public static final Client OTHER = new Client();
@@ -41,9 +40,9 @@ public class Client {
         }
 
         ua = ua.trim().toLowerCase();
-        if (ua.contains("chrome") || ua.contains("safari") || 
-        		(ua.contains("applewebkit")&& (ua.contains("iphone")||ua.contains("ipad"))) // ios UIWebView
-        		) {
+        if (ua.contains("chrome") || ua.contains("safari") ||
+                (ua.contains("applewebkit") && (ua.contains("iphone") || ua.contains("ipad"))) // ios UIWebView
+        ) {
             type = Type.WEBKIT;
         } else if (ua.contains("firefox")) {
             type = Type.FIREFOX;

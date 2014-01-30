@@ -63,7 +63,7 @@
 	testClientActionJavascriptError : {
 		test : [ function(cmp) {
 			var message, error;
-			$A.test.addFunctionHandler($A, "log", function(msg, err) {
+			$A.test.addFunctionHandler($A, "warning", function(msg, err) {
 				message = msg;
 				error = err;
 			});

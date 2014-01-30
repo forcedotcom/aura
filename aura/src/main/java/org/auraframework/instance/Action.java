@@ -26,6 +26,8 @@ import org.auraframework.util.javascript.Literal;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonSerializer.NoneSerializer;
 
+import com.google.common.collect.Lists;
+
 /**
  */
 public interface Action extends Instance<ActionDef> {
@@ -94,19 +96,18 @@ public interface Action extends Instance<ActionDef> {
 
             Map<String, BaseComponent<?, ?>> components = action.getComponents();
             if (!components.isEmpty()) {
-                json.writeMapKey("components");
-                json.writeMapBegin();
+                List<BaseComponent<?, ?>> sorted = Lists.newArrayList();
 
-                for (BaseComponent<?, ?> component : components.values()) {
+                for (BaseComponent<?,?> component : components.values()) {
                     if (component.hasLocalDependencies()) {
-                        json.writeMapEntry(component.getGlobalId(), component);
+                        sorted.add(component);
                     }
                 }
-                json.writeMapEnd();
+                json.writeMapKey("components");
+                json.writeArray(sorted);
             }
             json.writeMapEnd();
         }
-
     }
 
     public void registerComponent(BaseComponent<?, ?> component);

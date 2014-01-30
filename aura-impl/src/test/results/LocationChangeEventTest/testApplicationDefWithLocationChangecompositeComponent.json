@@ -357,7 +357,6 @@ function(cmp, event) {
         }
       }
     },
-    "globalId":"7",
-    "creationPath":"fakeActionId/*~1"
+    "creationPath":"/*[1]"
   }
 }

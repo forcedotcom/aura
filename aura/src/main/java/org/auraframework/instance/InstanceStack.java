@@ -45,7 +45,7 @@ public class InstanceStack {
         if (base == null) {
             throw new AuraRuntimeException("base must not be null");
         }
-        this.path = new StringBuilder(base);
+        this.path = new StringBuilder();
         this.stack = Lists.newArrayList();
         this.current = new Entry(null, path.length());
         setAttributeName("body");
@@ -162,8 +162,9 @@ public class InstanceStack {
             throw new AuraRuntimeException("missing clearAttributeIndex");
         }
         current.index = index;
-        path.append("~");
+        path.append("[");
         path.append(index);
+        path.append("]");
     }
 
     /**

@@ -486,6 +486,10 @@ $A.ns.Aura = function() {
 $A.ns.Aura.prototype.initAsync = function(config) {
     $A.mark("Component Load Complete");
     $A.mark("Component Load Initiated");
+    //
+    // we don't handle components that come back here. This is used in the case where there
+    // are none.
+    //
     $A.context = new AuraContext(config["context"]);
     clientService.initHost(config["host"]);
     clientService.loadComponent(config["descriptor"], config["attributes"], function(resp) {
@@ -513,9 +517,13 @@ $A.ns.Aura.prototype.initConfig = function(config, useExisting, doNotInitializeS
         clientService.initHost(config["host"]);
 
         $A.context = new AuraContext(config["context"]);
-        this.init(config["instance"], config["token"], config["context"], null, doNotInitializeServices, doNotCallJiffyOnLoad);
+        this.init(config["instance"], config["token"], config["context"],
+            null, doNotInitializeServices, doNotCallJiffyOnLoad);
+        $A.context.finishComponentConfigs($A.context.getCurrentAction().getId());
+        $A.context.setCurrentAction(null);
     } else {
         // Use the existing context and just join the new context into it
+        // FIXME: is this used? it won't do the right thing if there are components.
         $A.getContext().join(config["context"]);
     }
 };

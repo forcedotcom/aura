@@ -308,7 +308,7 @@ Test.Aura.Controller.ActionQueueTest = function() {
 
         [ Fact ]
         function ReturnsEmptyListIfNoClientActions() {
-            var background = new Action(serverDef, null, null, true);
+            var background = new Action(serverDef, null, null, null, true);
             var server = new Action(serverDef);
             var target = new ActionQueue();
             target.actions = [ background, server ];
@@ -334,8 +334,8 @@ Test.Aura.Controller.ActionQueueTest = function() {
         [ Fact ]
         function ReturnsClientActionsFromSet() {
             var first = new Action(clientDef);
-            var background = new Action(serverDef, null, null, true);
-            var second = new Action(clientDef, null, null, true);
+            var background = new Action(serverDef, null, null, null, true);
+            var second = new Action(clientDef, null, null, null, true);
             var server = new Action(serverDef);
             var third = new Action(clientDef);
             var target = new ActionQueue();
@@ -371,7 +371,7 @@ Test.Aura.Controller.ActionQueueTest = function() {
 
         [ Fact ]
         function ReturnsEmptyListIfNoServerActions() {
-            var background = new Action(serverDef, null, null, true);
+            var background = new Action(serverDef, null, null, null, true);
             var client = new Action(clientDef);
             var target = new ActionQueue();
             target.actions = [ background, client ];
@@ -397,7 +397,7 @@ Test.Aura.Controller.ActionQueueTest = function() {
         [ Fact ]
         function ReturnsServerActionsFromSet() {
             var first = new Action(serverDef);
-            var background = new Action(serverDef, null, null, true);
+            var background = new Action(serverDef, null, null, null, true);
             var second = new Action(serverDef);
             var client = new Action(clientDef);
             var third = new Action(serverDef);
@@ -437,8 +437,8 @@ Test.Aura.Controller.ActionQueueTest = function() {
 
         [ Fact ]
         function ReturnsFirstFromFront() {
-            var expected = new Action(serverDef, null, null, true);
-            var other = new Action(serverDef, null, null, true);
+            var expected = new Action(serverDef, null, null, null, true);
+            var other = new Action(serverDef, null, null, null, true);
             var server = new Action(serverDef);
             var client = new Action(clientDef);
             var target = new ActionQueue();
@@ -454,7 +454,7 @@ Test.Aura.Controller.ActionQueueTest = function() {
         function ReturnsFirstFromEnd() {
             var server = new Action(serverDef);
             var client = new Action(clientDef);
-            var expected = new Action(serverDef, null, null, true);
+            var expected = new Action(serverDef, null, null, null, true);
             var target = new ActionQueue();
             target.actions = [ server, client, expected ];
 

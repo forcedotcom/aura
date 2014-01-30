@@ -22,6 +22,8 @@
  * @constructor
  * @param {Object}
  *            def The definition of the Action.
+ * @param {string}
+ *            suffix A suffix to distinguish components.
  * @param {function}
  *            method The method for the Action. For client-side Action only. A function to serialize the Action as a
  *            String in the JSON representation.
@@ -34,7 +36,7 @@
  * @param {boolean}
  *            caboose should this action wait for the next non boxcar action?
  */
-function Action(def, method, paramDefs, background, cmp, caboose) {
+function Action(def, suffix, method, paramDefs, background, cmp, caboose) {
     this.def = def;
     this.meth = method;
     this.paramDefs = paramDefs;
@@ -48,7 +50,7 @@ function Action(def, method, paramDefs, background, cmp, caboose) {
     this.groups = [];
     this.components = null;
     this.actionId = Action.prototype.nextActionId++;
-    this.id = undefined;
+    this.id = this.actionId + "." + suffix;
     this.originalResponse = undefined;
     this.storable = false;
     this.caboose = caboose;
@@ -71,9 +73,6 @@ Action.prototype.auraType = "Action";
  * @returns {string}
  */
 Action.prototype.getId = function() {
-    if (!this.id) {
-        this.id = this.actionId + "." + $A.getContext().getNum();
-    }
     return this.id;
 };
 
@@ -101,6 +100,12 @@ Action.prototype.reactivatePath = function() {
 	this.canCreate = true;
 };
 
+/**
+ * push a new part on the creation path.
+ *
+ * @private
+ * @param {string} pathPart the new path part to insert.
+ */
 Action.prototype.pushCreationPath = function(pathPart) {
     var addedPath;
     this.canCreate = true;
@@ -110,10 +115,17 @@ Action.prototype.pushCreationPath = function(pathPart) {
     case "super" : pathPart = "$"; break;
     }
     addedPath = "/"+pathPart;
-    var pathEntry = { relPath: addedPath, idx: undefined, startIdx: undefined };
+    var newPath = this.topPath() + addedPath;
+    var pathEntry = { relPath: addedPath, absPath:newPath, idx: undefined, startIdx: undefined };
     this.pathStack.push(pathEntry);
 };
 
+/**
+ * pop off the path part that was previously pushed.
+ *
+ * @private
+ * @param {string} pathPart the path part previously pushed.
+ */
 Action.prototype.popCreationPath = function(pathPart) {
     var addedPath;
     this.canCreate = false;
@@ -132,34 +144,40 @@ Action.prototype.popCreationPath = function(pathPart) {
 };
 
 /**
+ * get the path for the top entry of the path stack.
+ *
  * @private
+ * @return {string} the top level path.
  */
 Action.prototype.topPath = function() {
-    var top = this.pathStack.length < 1 ? undefined : this.pathStack[this.pathStack.length - 1];
-    if (!top) {
-        $A.warning("Trying to look at empty stack");
-        return undefined;
+    if (this.pathStack.length === 0) {
+        return this.getId();
     }
-    return top;
+    var top = this.pathStack[this.pathStack.length - 1];
+    return (top.absPath + (top.idx !== undefined ? ("[" + top.idx + "]") : ""  ));
 };
 
+/**
+ * set the path index.
+ *
+ * @private
+ * @param {number} the index to set.
+ */
 Action.prototype.setCreationPathIndex = function(idx) {
     this.canCreate = true;
-    var top = this.topPath();
-    if (top) {
-        // establish starting index
-        if (top.idx === undefined) {
-            top.startIdx = idx;
-            top.idx = idx;
-        }
-        else if (idx !== top.idx + 1) {
-            $A.log("Improper index increment");
-        } else {
-            top.idx = idx;
-        }
+    if (this.pathStack.length < 1) {
+        $A.warning("Attempting to increment index on empty stack");
     }
-    else {
-        $A.log("Attempting to increment index on empty stack");
+    var top = this.pathStack[this.pathStack.length - 1];
+    // establish starting index
+    if (top.idx === undefined) {
+        top.startIdx = idx;
+        top.idx = idx;
+    }
+    else if (idx !== top.idx + 1) {
+        $A.warning("Improper index increment");
+    } else {
+        top.idx = idx;
     }
 };
 
@@ -174,29 +192,11 @@ Action.prototype.getCurrentPath = function() {
    var size = this.pathStack.length;
 
    if (!this.canCreate) {
-        $A.log("Not ready to create. path depth:" + size);
+       $A.warning("Not ready to create. path: "+this.topPath());
    }
    this.canCreate = false; // this will cause next call to getCurrentPath to fail if not popped
-
-   for (var i=0; i<size; i++) {
-       var entry = this.pathStack[i];
-       result += (entry.relPath + (entry.idx !== undefined ? ("~" + entry.idx) : ""  ));
-   }
-
-   return result;
+   return this.topPath();
 };
-
-/**
- * Gets the current pathDepth from the top of the pathStack
- *
- * @private
- * @returns {number}
- */
-Action.prototype.getPathDepth = function() {
-   return this.pathStack.length;
-};
-
-
 
 /**
  * Gets the <code>ActionDef</code> object. Shorthand: <code>get("def")</code>
@@ -448,8 +448,8 @@ Action.prototype.run = function(evt) {
  *            evt The event that calls the Action.
  */
 Action.prototype.runDeprecated = function(evt) {
-    $A.assert(this.def.isClientAction(),
-                    "run() cannot be called on a server action. Use $A.enqueueAction() on a server action instead.");
+    $A.assert(this.def && this.def.isClientAction(),
+             "run() cannot be called on a server action. Use $A.enqueueAction() instead.");
     this.state = "RUNNING";
     try {
         var helper = this.cmp.getDef().getHelper();
@@ -457,8 +457,8 @@ Action.prototype.runDeprecated = function(evt) {
         this.state = "SUCCESS";
     } catch (e) {
         this.state = "FAILURE";
-        $A.log("Action failed: " + this.cmp.getDef().getDescriptor().getQualifiedName() + " -> "
-                        + this.getDef().getName(), e);
+        $A.warning("Action failed: " + this.cmp.getDef().getDescriptor().getQualifiedName() + " -> "
+                   + this.def.getName(), e);
     }
 };
 
@@ -540,7 +540,6 @@ Action.prototype.runAfter = function(action) {
  * @return {Boolean} Returns true if the response differs from the original response
  */
 Action.prototype.updateFromResponse = function(response) {
-    this.sanitizeStoredResponse(response);
     this.state = response["state"];
     this.responseState = response["state"];
     this.returnValue = response["returnValue"];
@@ -580,8 +579,6 @@ Action.prototype.updateFromResponse = function(response) {
         this.error = newErrors;
     } else if (this.originalResponse && this.state === "SUCCESS") {
         // Compare the refresh response with the original response and return false if they are equal (no update)
-        this.sanitizeStoredResponse(this.originalResponse);
-
         var originalValue = $A.util.json.encode(this.originalResponse["returnValue"]);
         var refreshedValue = $A.util.json.encode(response["returnValue"]);
         if (refreshedValue === originalValue) {
@@ -607,14 +604,18 @@ Action.prototype.updateFromResponse = function(response) {
  */
 Action.prototype.getStored = function(storageName) {
     if (this.storable && this.responseState === "SUCCESS") {
-        // Rewrite any embedded ComponentDef from object to descriptor only
-        for ( var globalId in this.components) {
-            var c = this.components[globalId];
-            if (c) {
-                var def = c["componentDef"];
-                c["componentDef"] = {
-                    "descriptor" : def["descriptor"]
-                };
+        if (this.components) {
+            // Rewrite any embedded ComponentDef from object to descriptor only
+            var idx;
+
+            for (idx = 0; idx < this.components.length; idx++) {
+                var c = this.components[idx];
+                if (c) {
+                    var def = c["componentDef"];
+                    c["componentDef"] = {
+                        "descriptor" : def["descriptor"]
+                    };
+                }
             }
         }
         return {
@@ -750,7 +751,8 @@ Action.prototype.isExclusive = function() {
  *            following options: <code>ignoreExisting</code> and <code>refresh</code>.
  */
 Action.prototype.setStorable = function(config) {
-    $A.assert(this.def.isServerAction(), "setStorable() cannot be called on a client action.");
+    $A.assert(this.def && this.def.isServerAction(),
+              "setStorable() cannot be called on a client action.");
     this.storable = true;
     this.storableConfig = config;
 
@@ -810,7 +812,8 @@ Action.prototype._isStorable = function() {
  * @private
  */
 Action.prototype.getStorageKey = function() {
-    return this.getDef().getDescriptor().toString() + ":" + $A.util["json"].encode(this.getParams());
+    return (this.def?this.def.getDescriptor().toString():"")
+           + ":" + $A.util["json"].encode(this.params);
 };
 
 /**
@@ -851,8 +854,8 @@ Action.prototype.isChained = function() {
 Action.prototype.toJSON = function() {
     return {
         "id" : this.getId(),
-        "descriptor" : this.getDef().getDescriptor(),
-        "params" : this.getParams()
+        "descriptor" : (this.def?this.def.getDescriptor():"UNKNOWN"),
+        "params" : this.params
     };
 };
 
@@ -886,7 +889,7 @@ Action.prototype.getRefreshAction = function(originalResponse) {
     // Only auto refresh if the data we have is more than
     // v.autoRefreshInterval seconds old
     var now = new Date().getTime();
-    if ((now - storage["created"]) > autoRefreshInterval) {
+    if ((now - storage["created"]) > autoRefreshInterval && this.def) {
         var refreshAction = this.def.newInstance(this.cmp);
 
         storageService.log("Action.refresh(): auto refresh begin: " + this.getId() + " to " + refreshAction.getId());
@@ -903,67 +906,12 @@ Action.prototype.getRefreshAction = function(originalResponse) {
         });
 
         refreshAction.abortable = this.abortable;
-        refreshAction.sanitizeStoredResponse(originalResponse);
         refreshAction.originalResponse = originalResponse;
 
         return refreshAction;
     }
 
     return null;
-};
-
-/**
- * Sanitize a partial config.
- *
- * @param {Object}
- *      pc the partial config to sanitize (in place)
- * @param {string}
- *      suffix The suffix that we are about to put on.
- * @return {Object} the partial config that was passed in, modified.
- */
-Action.prototype.sanitizePartialConfig = function(pc, suffix) {
-    // rewrite globalId
-    var newGlobalId = pc["globalId"];
-    newGlobalId = newGlobalId.substr(0, newGlobalId.indexOf(":") + 1) + suffix;
-    pc["globalId"] = newGlobalId;
-
-    // rewrite creation path
-    var newCreationPath = pc["creationPath"];
-    if (newCreationPath) {
-        var slashIdx = newCreationPath.indexOf("/");
-        if (slashIdx > 0) {
-            newCreationPath = suffix + newCreationPath.substr(newCreationPath.indexOf("/"));
-        } else {
-            newCreationPath = suffix;
-        }
-        pc["creationPath"] = newCreationPath;
-    }
-    return pc;
-};
-
-/**
- * Sanitize generation number references to allow actions to be replayed w/out globalId conflicts.
- *
- * @private
- */
-Action.prototype.sanitizeStoredResponse = function(response) {
-    var santizedComponents = {};
-    var globalId;
-    var suffix = this.getId();
-    var pc;
-
-    var components = response["components"];
-    for (globalId in components) {
-        pc = this.sanitizePartialConfig(components[globalId], suffix);
-        santizedComponents[pc["globalId"]] = pc;
-    }
-
-    response["components"] = santizedComponents;
-
-    var returnValue = response["returnValue"];
-    if (returnValue && returnValue["globalId"]) {
-        this.sanitizePartialConfig(returnValue, suffix);
-    }
 };
 
 /**

@@ -95,8 +95,7 @@
       }
     },
     "original":"markup://test:test_Provider_Interface",
-    "globalId":"1",
-    "creationPath":"fakeActionId/*~0",
+    "creationPath":"/*[0]",
     "attributes":{
       "serId":9,
       "value":{

@@ -95,7 +95,6 @@
         ]
       }
     },
-    "globalId":"1",
-    "creationPath":"fakeActionId/*~0"
+    "creationPath":"/*[0]"
   }
 }

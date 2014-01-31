@@ -54,8 +54,6 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
             return;
         }
         long ifModifiedSince = request.getDateHeader(HttpHeaders.IF_MODIFIED_SINCE);
-        System.out.println(System.currentTimeMillis()+",AuraFrameworkServlet.doGet,request:" +request.toString()+
-        		"\npath:"+path);
         InputStream in = null;
         try {
 
@@ -112,7 +110,6 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
                 // includes all of the resources that may be requested...
                 //
                 if (ifModifiedSince != -1) {
-                    System.out.println("TS:"+System.currentTimeMillis()+",currentUid = nonceUid && ifModifiedSince!=-1,send response with 304, return");
                     response.sendError(HttpServletResponse.SC_NOT_MODIFIED);
                     return;
                 }

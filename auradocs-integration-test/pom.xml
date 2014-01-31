@@ -87,8 +87,8 @@
         </dependency>
     </dependencies>
     <properties>
-        <chromedriver.url>http://chromedriver.googlecode.com/files/{artifactId}_{classifier}_{version}.zip</chromedriver.url>
-        <chromedriver.version>26.0.1383.0</chromedriver.version>
+        <chromedriver.url>http://chromedriver.storage.googleapis.com/{version}/{artifactId}_{classifier}.zip</chromedriver.url>
+        <chromedriver.version>2.8</chromedriver.version>
         <jetty.spawn>true</jetty.spawn>
         <jetty.resources>${basedir}/src/test/resources/htdocs</jetty.resources>
         <aura.build.id />
@@ -457,15 +457,17 @@
                 </os>
             </activation>
             <properties>
-                <platform.chromedriver>linux${sun.arch.data.model}</platform.chromedriver>
+                <chromedriver.url>http://chromedriver.googlecode.com/files/{artifactId}_{classifier}_{version}.zip</chromedriver.url>
                 <chromedriver.version>26.0.1383.0</chromedriver.version>
+                <platform.chromedriver>linux${sun.arch.data.model}</platform.chromedriver>
             </properties>
         </profile>
         <profile>
             <id>ubuntu12</id>
             <properties>
-                <chromedriver.version>2.2</chromedriver.version>
-           </properties>
+                <chromedriver.url>http://chromedriver.storage.googleapis.com/{version}/{artifactId}_{classifier}.zip</chromedriver.url>
+                <chromedriver.version>2.8</chromedriver.version>
+            </properties>
         </profile>
         <profile>
             <id>platform.mac</id>
@@ -475,8 +477,9 @@
                 </os>
             </activation>
             <properties>
+                <chromedriver.url>http://chromedriver.storage.googleapis.com/{version}/{artifactId}_{classifier}.zip</chromedriver.url>
+                <chromedriver.version>2.8</chromedriver.version>
                 <platform.chromedriver>mac32</platform.chromedriver>
-                <chromedriver.version>2.2</chromedriver.version>
             </properties>
         </profile>
         <profile>
@@ -488,7 +491,6 @@
             </activation>
             <properties>
                 <platform.chromedriver>win32</platform.chromedriver>
-                <chromedriver.version>2.2</chromedriver.version>
                 <webdriver.chrome.driver>${basedir}/target/bin/chromedriver.exe</webdriver.chrome.driver>
             </properties>
         </profile>

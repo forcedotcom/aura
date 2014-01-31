@@ -17,7 +17,7 @@
 -->
 <aura:component extends="auradocs:topicPanel">
     <aura:set attribute="title" value="Date and Time Fields"/>
-    
+
 	    <p>Date and time fields provide client-side localization and date picker support. HTML5 support is also available.
 	     They inherit the behavior and events from <code>ui:input</code> and <code>ui:inputDateComponent</code>, including <code>min</code> and <code>max</code> date attributes and common keyboard and mouse events.
 		   If you want to render the output from these field components, use the respective <code>ui:output</code> components. For example, to render the output for the <code>ui:inputDate</code> component,
@@ -75,6 +75,15 @@
     
     <p><code>ui:label</code> provides a text label for the corresponding field. For more information on using labels, see <auradocs:topicLink topic="label">Label</auradocs:topicLink>.
 	</p>
+	<p>This example results in the following HTML.</p>
+<auradocs:codeblock>&lt;label for="globalId" class="uiLabel">&lt;span>Birthday&lt;/span>&lt;/label>
+&lt;input placeholder="MMM d, yyyy" type="text" id="globalId" class="uiInput uiInputDate">
+&lt;a class="datePicker-openIcon uiInput uiInputDate" aria-haspopup="true">
+  &lt;span class="assistiveText">Date Picker&lt;/span>
+&lt;/a>
+&lt;div class="uiDatePicker uiInput uiInputDate">
+  &lt;!--Date picker set to visible when icon is clicked-->
+&lt;/div></auradocs:codeblock>	
 	
 	<h4>Localizing the Date and Time</h4>
 	 <p>The following code is a basic set up of a date and time field with client-side localization, which renders as  <ui:outputDateTime langLocale="de" timezone="Europe/Berlin" value="2013-05-08"/>.</p>

@@ -45,7 +45,11 @@ public Boolean getSelected() {
 	For more information on working with server-side models, see <auradocs:topicLink topic="model">Java Models</auradocs:topicLink>.</p>
 	
 	<h4>Disabled State</h4>
-	<auradocs:codeblock>&lt;ui:inputRadio disabled="true" /></auradocs:codeblock>
+	<auradocs:codeblock>&lt;ui:inputRadio label="Select" disabled="true" labelPosition="left" /></auradocs:codeblock>
+	
+	<p>The previous example results in the following HTML.</p>
+<auradocs:codeblock>&lt;label class="uiLabel-left uiLabel" for="globalId">&lt;span>Select&lt;/span>&lt;/label>
+&lt;input type="radio" id="globalId" class="uiInput uiInputRadio"></auradocs:codeblock>
     
     <h3>Working with Events</h3>
     <p>Common events for <code>ui:inputRadio</code> include the <code>click</code> and <code>change</code> events. For example, <code>click="<aura:text value="{!"/>c.showItem}"</code>

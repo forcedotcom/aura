@@ -42,7 +42,7 @@
     <auradocs:codeblock>&lt;ui:button label="Find" iconImgSrc="/auraFW/resources/aura/images/search.png"/></auradocs:codeblock>
     
     <h4>HTML Rendering</h4>
-    <p>The above markup for a button with text and image results in the following HTML:</p>
+    <p>The markup for a button with text and image results in the following HTML:</p>
     <auradocs:codeblock>&lt;button class="default uiBlock uiButton" accesskey type="button">
   &lt;img class="icon bLeft" alt="Find" src="path/to/img">
   &lt;span class="label bBody truncate" dir="ltr">Find&lt;/span>

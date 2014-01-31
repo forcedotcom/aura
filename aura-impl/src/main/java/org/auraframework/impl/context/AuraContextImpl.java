@@ -31,6 +31,7 @@ import org.auraframework.Aura;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.Definition;
 import org.auraframework.def.EventType;
 import org.auraframework.http.AuraBaseServlet;
 import org.auraframework.instance.Action;
@@ -44,8 +45,9 @@ import org.auraframework.system.Client;
 import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.test.TestContext;
 import org.auraframework.test.TestContextAdapter;
+
+import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.InvalidEventTypeException;
-import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.BaseJsonSerializationContext;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonSerializationContext;
@@ -78,19 +80,6 @@ public class AuraContextImpl implements AuraContext {
         }
     }
 
-    private static class GlobalIdSorter implements Comparator<BaseComponent<?, ?>> {
-        @Override
-        public int compare(BaseComponent<?, ?> arg0, BaseComponent<?, ?> arg1) {
-            String gid0 = arg0.getGlobalId();
-            String gid1 = arg1.getGlobalId();
-            List<String> gid0split = AuraTextUtil.splitSimple(":", gid0, 2);
-            List<String> gid1split = AuraTextUtil.splitSimple(":", gid1, 2);
-            return (Integer.parseInt(gid0split.get(gid0split.size() - 1))
-                - Integer.parseInt(gid1split.get(gid1split.size() - 1)));
-        }
-    }
-
-    private static final GlobalIdSorter GID_SORTER = new GlobalIdSorter();
 
     private static class Serializer extends NoneSerializer<AuraContext> {
         private final boolean forClient;
@@ -186,20 +175,8 @@ public class AuraContextImpl implements AuraContext {
                     json.writeArrayEnd();
                 }
 
-                Map<String, BaseComponent<?, ?>> components = ctx.getComponents();
-                if (!components.isEmpty()) {
-                    List<BaseComponent<?, ?>> sorted = Lists.newArrayList();
-
-                    for (BaseComponent<?,?> component : components.values()) {
-                        if (component.hasLocalDependencies()) {
-                            sorted.add(component);
+                ctx.serializeAsPart(json);
                         }
-                    }
-                    Collections.sort(sorted, GID_SORTER);
-                    json.writeMapKey("components");
-                    json.writeArray(sorted);
-                }
-            }
             json.writeMapEnd();
         }
     }
@@ -246,10 +223,6 @@ public class AuraContextImpl implements AuraContext {
     private final Map<DefDescriptor<?>, String> loaded = Maps.newLinkedHashMap();
     private final Map<DefDescriptor<?>, String> clientLoaded = Maps.newLinkedHashMap();
 
-    private final Map<String, BaseComponent<?, ?>> componentRegistry = Maps.newLinkedHashMap();
-
-    private int nextId = 1;
-
     private String contextPath = "";
 
     private boolean serializePreLoad = true;
@@ -273,6 +246,8 @@ public class AuraContextImpl implements AuraContext {
     private String fwUID;
     
     private final boolean isDebugToolEnabled;
+
+    private InstanceStack fakeInstanceStack;
 
     public AuraContextImpl(Mode mode, MasterDefRegistry masterRegistry, Map<DefType, String> defaultPrefixes,
             Format format, Access access, JsonSerializationContext jsonContext,
@@ -336,11 +311,6 @@ public class AuraContextImpl implements AuraContext {
     @Override
     public Client getClient() {
         return client;
-    }
-
-    @Override
-    public Map<String, BaseComponent<?, ?>> getComponents() {
-        return componentRegistry;
     }
 
     @Override
@@ -409,11 +379,6 @@ public class AuraContextImpl implements AuraContext {
     }
 
     @Override
-    public int getNextId() {
-        return nextId++;
-    }
-
-    @Override
     public String getNum() {
         return num;
     }
@@ -456,23 +421,6 @@ public class AuraContextImpl implements AuraContext {
     @Override
     public boolean isDevMode() {
         return getMode().isDevMode();
-    }
-
-    @Override
-    public void registerComponent(BaseComponent<?, ?> component) {
-        Action action = getCurrentAction();
-        if (action != null) {
-            action.registerComponent(component);
-        } else {
-            //
-            // This assertion should work, but we can build attributes
-            // more than once, especially for default values.
-            //
-            if (componentRegistry.containsKey(component.getPath())) {
-                //throw new AuraRuntimeException("duplicate component path"+component.getPath());
-            }
-            componentRegistry.put(component.getPath(), component);
-        }
     }
 
     @Override
@@ -623,17 +571,33 @@ public class AuraContextImpl implements AuraContext {
         return isDebugToolEnabled;
     }
 
-    private InstanceStack fakeStack;
+    @Override
+    public int getNextId() {
+        return getInstanceStack().getNextId();
+    }
+
 
     @Override
     public InstanceStack getInstanceStack() {
         if (currentAction != null) {
             return currentAction.getInstanceStack();
         } else {
-            if (fakeStack == null) {
-                fakeStack = new InstanceStack();
+            if (fakeInstanceStack == null) {
+                fakeInstanceStack = new InstanceStack();
             }
-            return fakeStack;
+            return fakeInstanceStack;
+        }
+    }
+
+    @Override
+    public void registerComponent(BaseComponent<?, ?> component) {
+        getInstanceStack().registerComponent(component);
+            }
+
+    @Override
+    public void serializeAsPart(Json json) throws IOException {
+        if (fakeInstanceStack != null) {
+            fakeInstanceStack.serializeAsPart(json);
         }
     }
 }

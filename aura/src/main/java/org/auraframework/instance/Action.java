@@ -26,9 +26,8 @@ import org.auraframework.util.javascript.Literal;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonSerializer.NoneSerializer;
 
-import com.google.common.collect.Lists;
-
 /**
+ * An interface for the server side implementation of an action.
  */
 public interface Action extends Instance<ActionDef> {
 
@@ -94,27 +93,10 @@ public interface Action extends Instance<ActionDef> {
                 }
             }
 
-            Map<String, BaseComponent<?, ?>> components = action.getComponents();
-            if (!components.isEmpty()) {
-                List<BaseComponent<?, ?>> sorted = Lists.newArrayList();
-
-                for (BaseComponent<?,?> component : components.values()) {
-                    if (component.hasLocalDependencies()) {
-                        sorted.add(component);
-                    }
-                }
-                json.writeMapKey("components");
-                json.writeArray(sorted);
-            }
+            action.getInstanceStack().serializeAsPart(json);
             json.writeMapEnd();
         }
     }
-
-    public void registerComponent(BaseComponent<?, ?> component);
-
-    public Map<String, BaseComponent<?, ?>> getComponents();
-
-    public int getNextId();
 
     /**
      * Log any params that are useful and safe to log.

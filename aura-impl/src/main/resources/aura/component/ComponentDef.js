@@ -417,8 +417,10 @@ $A.ns.ComponentDef.prototype.initRenderer = function() {
         if (!this.rendererDef) {
             // no rendererdef, get the superdefs
             var superStuff = s.getRenderingDetails();
-            rd.rendererDef = superStuff.rendererDef;
-            rd.distance = superStuff.distance + 1;
+            if (superStuff) {
+                rd.rendererDef = superStuff.rendererDef;
+                rd.distance = superStuff.distance + 1;
+            }
         }
         var superStyles = s.getAllStyleDefs();
         if (superStyles) {
@@ -427,6 +429,15 @@ $A.ns.ComponentDef.prototype.initRenderer = function() {
     }
     if (this.styleDef) {
         this.allStyleDefs.push(this.styleDef);
+    }
+    if (!rd.rendererDef) {
+        //
+        // If we don't have a renderer, make sure we mark that here. Note
+        // that we can't assert that we have a renderer, because sometimes
+        // there are component defs that don't, maybe the server shouldn't
+        // send them down, as they cannot be instantiated on the client.
+        //
+        rd = undefined;
     }
     this.renderingDetails = rd;
 };

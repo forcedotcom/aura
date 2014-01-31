@@ -38,7 +38,6 @@ import org.auraframework.system.Annotations.Model;
 @Model
 public class GatedModel {
     public GatedModel() throws Exception {
-        Aura.getContextService().getCurrentContext().getComponents();
         Aura.getContextService().getCurrentContext().getGlobalProviders();
         String id = null;
         try {

@@ -329,10 +329,8 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
                 if (rendererDef.isLocal()) {
                     StringWriter sw = new StringWriter();
                     rendererDef.render(this, sw);
-                    // Not writing directly to json.appendable because then it
-                    // wouldn't get escaped.
-                    // ideally Json would have a FilterWriter that escapes that
-                    // we could use here.
+                    // Not writing directly to json.appendable because then it wouldn't get escaped.
+                    // ideally Json would have a FilterWriter that escapes that we could use here.
                     json.writeMapEntry("rendering", sw.toString());
                 }
             }
@@ -391,7 +389,7 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
         int id;
         String suffix;
         if (action != null) {
-            id = action.getNextId();
+            id = action.getInstanceStack().getNextId();
             suffix = action.getId();
         } else {
             id = context.getNextId();

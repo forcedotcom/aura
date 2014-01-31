@@ -25,7 +25,6 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.system.LoggingContext;
 import org.auraframework.test.UnitTestCase;
 import org.auraframework.throwable.AuraExecutionException;
-import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.json.Json;
 import org.mockito.Mockito;
 
@@ -138,20 +137,20 @@ public class AbstractActionImplTest extends UnitTestCase {
         ActionDef def = Mockito.mock(ActionDef.class);
         MyAction test = new MyAction(null, def, null);
 
-        Map<String, BaseComponent<?, ?>> comps = test.getComponents();
+        Map<String, BaseComponent<?, ?>> comps = test.getInstanceStack().getComponents();
         assertNotNull("Components should never be null", comps);
         assertEquals("Components should empty", 0, comps.size());
 
         BaseComponent<?, ?> x = getComponentWithPath("a");
-        test.registerComponent(x);
-        comps = test.getComponents();
+        test.getInstanceStack().registerComponent(x);
+        comps = test.getInstanceStack().getComponents();
         assertNotNull("Components should never be null", comps);
         assertEquals("Components should have one component", 1, comps.size());
         assertEquals("Components should have x", x, comps.get("a"));
 
         BaseComponent<?, ?> y = getComponentWithPath("b");
-        test.registerComponent(y);
-        comps = test.getComponents();
+        test.getInstanceStack().registerComponent(y);
+        comps = test.getInstanceStack().getComponents();
         assertNotNull("Components should never be null", comps);
         assertEquals("Components should have two components", 2, comps.size());
         assertEquals("Components should have x", x, comps.get("a"));
@@ -162,9 +161,9 @@ public class AbstractActionImplTest extends UnitTestCase {
         ActionDef def = Mockito.mock(ActionDef.class);
         Action test = new MyAction(null, def, null);
 
-        assertEquals("nextId should be initialized to 1", 1, test.getNextId());
-        assertEquals("nextId should increment", 2, test.getNextId());
-        assertEquals("nextId should increment again", 3, test.getNextId());
+        assertEquals("nextId should be initialized to 1", 1, test.getInstanceStack().getNextId());
+        assertEquals("nextId should increment", 2, test.getInstanceStack().getNextId());
+        assertEquals("nextId should increment again", 3, test.getInstanceStack().getNextId());
     }
 
     public void testStorable() {
@@ -222,18 +221,16 @@ public class AbstractActionImplTest extends UnitTestCase {
         Action test = new MyAction(null, def, null);
         test.setId("expectedId");
         InstanceStack iStack = test.getInstanceStack();
-        assertEquals("Instance stack should be initialized with action ID as path", "/*[0]", iStack.getPath());
+        assertEquals("Instance stack should be initialized without action ID as path", "/*[0]", iStack.getPath());
     }
 
+    /**
+     * This used to throw an exception, no longer.
+     */
     public void testSetIdWithInstanceStackSet() {
         ActionDef def = Mockito.mock(ActionDef.class);
         Action test = new MyAction(null, def, null);
         test.getInstanceStack();
-        try {
-            test.setId("newId");
-            fail("Expected error when setting ID after InstanceStack initialized");
-        } catch (Exception e) {
-            assertExceptionMessage(e, AuraRuntimeException.class, "Already have an instance stack when ID is set");
-        }
+        test.setId("newId");
     }
 }

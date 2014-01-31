@@ -245,8 +245,6 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
     @ThreadHostileTest("NamespaceDef modification affects namespace")
     @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
     public void testComponentCssChange() throws Exception {
-        // debug for flapper:
-        System.out.println(System.currentTimeMillis()+",testComponentCssChange begins");
         createDef(NamespaceDef.class, String.format("%s://%s", DefDescriptor.MARKUP_PREFIX, namespace),
                 "<aura:namespace></aura:namespace>");
 
@@ -254,7 +252,6 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
                 ".THIS {background-image: url(/auraFW/resources/qa/images/s.gif?@@@TOKEN@@@);}");
 
         List<Request> logs = loadMonitorAndValidateApp(TOKEN, TOKEN, TOKEN, TOKEN);
-        checkFlag();
         assertRequests(getExpectedInitialRequests(), logs);
         assertAppCacheStatus(Status.IDLE);
         
@@ -263,10 +260,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
 
         replaceToken(getTargetComponent().getStyleDescriptor(), replacement);
 
-        // debug for flapper:
-        System.out.println(System.currentTimeMillis()+",testComponentCssChange load app again");
         logs = loadMonitorAndValidateApp(TOKEN, TOKEN, replacement, TOKEN);
-        checkFlag();
         assertRequests(getExpectedChangeRequests(), logs);
         assertAppCacheStatus(Status.IDLE);
 
@@ -281,28 +275,20 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
      */
     @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
     public void testComponentJsChange() throws Exception {
-        System.out.println("++++++testComponentJsChange begins,TS:" + System.currentTimeMillis());
         List<Request> logs = loadMonitorAndValidateApp(TOKEN, TOKEN, "", TOKEN);
-        checkFlag();
         assertRequests(getExpectedInitialRequests(), logs);
         assertAppCacheStatus(Status.IDLE);
         // update a component's js controller file
         String replacement = getName() + System.currentTimeMillis();
         DefDescriptor<?> desc = null;
         for (DefDescriptor<?> cd : getTargetComponent().getControllerDefDescriptors()) {
-            System.out.println("is " + cd.toString() + " a js descriptor?");
             if ("js".equals(cd.getPrefix())) {
                 desc = cd;
                 break;
             }
         }
-        // debug for flapper:
-        System.out.println("++++++testComponentJsChange replace token,TS:" + System.currentTimeMillis());
         replaceToken(desc, replacement);
-        // debug for flapper:
-        System.out.println("++++++testComponentJsChange loadMonitorAndValidateApp,TS:" + System.currentTimeMillis());
         logs = loadMonitorAndValidateApp(TOKEN, replacement, "", TOKEN);
-        checkFlag();
         assertRequests(getExpectedChangeRequests(), logs);
         assertAppCacheStatus(Status.IDLE);
         logs = loadMonitorAndValidateApp(TOKEN, replacement, "", TOKEN);
@@ -317,7 +303,6 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
     @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
     public void testComponentMarkupChange() throws Exception {
         List<Request> logs = loadMonitorAndValidateApp(TOKEN, TOKEN, "", TOKEN);
-        checkFlag();
         assertRequests(getExpectedInitialRequests(), logs);
         assertAppCacheStatus(Status.IDLE);
         // update markup of namespaced component used by app
@@ -327,7 +312,6 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         assertRequests(getExpectedChangeRequests(), logs);
         assertAppCacheStatus(Status.IDLE);
         logs = loadMonitorAndValidateApp(replacement, TOKEN, "", TOKEN);
-        checkFlag();
         List<Request> expected = Lists.newArrayList(new Request("/auraResource", null, null, "manifest", 200));
         assertRequests(expected, logs);
         assertAppCacheStatus(Status.IDLE);
@@ -438,8 +422,6 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
      */
     private List<Request> loadMonitorAndValidateApp(final String markupToken, String jsToken, String cssToken,
             String fwToken) throws Exception {
-        System.out.println(System.currentTimeMillis()+",loadMonitorAndValidateApp,logging adapter start capturing,"
-                + "open " + namespace + "/" + appName+".app" );
         TestLoggingAdapterController.beginCapture();
         open(String.format("/%s/%s.app", namespace, appName));
 
@@ -466,33 +448,6 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         return logs;
     }
     
-    //for 304-extra flapper
-    private void checkFlag() {
-    	String flag_handleAppcacheChecking = 
-        		(String)auraUITestingUtil.getEval("return window.localStorage.getItem(\"flag_handleAppcacheChecking\");");
-    	String flag_handleAppcacheUpdateReady = 
-        		(String)auraUITestingUtil.getEval("return window.localStorage.getItem(\"flag_handleAppcacheUpdateReady\");");
-    	String flag_handleAppcacheError = 
-        		(String)auraUITestingUtil.getEval("return window.localStorage.getItem(\"flag_handleAppcacheError\");");
-    	String flag_handleAppcacheDownloading = 
-        		(String)auraUITestingUtil.getEval("return window.localStorage.getItem(\"flag_handleAppcacheDownloading\");");
-    	String flag_handleAppcacheNoUpdate = 
-        		(String)auraUITestingUtil.getEval("return window.localStorage.getItem(\"flag_handleAppcacheNoUpdate\");");
-    	String flag_handleAppcacheCached = 
-        		(String)auraUITestingUtil.getEval("return window.localStorage.getItem(\"flag_handleAppcacheCached\");");
-    	String flag_handleAppcacheObsolete = 
-        		(String)auraUITestingUtil.getEval("return window.localStorage.getItem(\"flag_handleAppcacheObsolete\");");
-    	String flag_handleAppcacheProgress = 
-        		(String)auraUITestingUtil.getEval("return window.localStorage.getItem(\"flag_handleAppcacheProgress\");");
-        System.out.println("flag_handleAppcacheChecking:"+flag_handleAppcacheChecking);
-        System.out.println("flag_handleAppcacheUpdateReady:"+flag_handleAppcacheUpdateReady);
-        System.out.println("flag_handleAppcacheError:"+flag_handleAppcacheError);
-        System.out.println("flag_handleAppcacheDownloading:"+flag_handleAppcacheDownloading);
-        System.out.println("flag_handleAppcacheNoUpdate:"+flag_handleAppcacheNoUpdate);
-        System.out.println("flag_handleAppcacheCached:"+flag_handleAppcacheCached);
-        System.out.println("flag_handleAppcacheObsolete:"+flag_handleAppcacheObsolete);
-        System.out.println("flag_handleAppcacheProgress:"+flag_handleAppcacheProgress);
-    }
 
     // replaces TOKEN found in the source file with the provided replacement
     private void replaceToken(DefDescriptor<?> descriptor, String replacement) throws Exception {

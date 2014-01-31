@@ -119,13 +119,6 @@ public class AuraContextFilter implements Filter {
                     }
                     loggingService.doLog(); // flush out logging values
                 }
-                else {
-                	HttpServletRequest request = (HttpServletRequest) req;
-                	HttpServletResponse response = (HttpServletResponse) res;
-                	System.out.println("loggingService is null when we try to log request:"
-                			+request.getMethod()+request.getRequestURI()+request.getQueryString()
-                			+" and response:"+response.getStatus());
-                }
             } finally {
                 endContext();
             }

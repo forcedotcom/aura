@@ -601,16 +601,7 @@ var priv = {
         return !!priv.getManifestURL();
     },
 
-    setFlag : function(name) {
-    	date = new Date();
-    	var oldInfo = window.localStorage.getItem(name);
-    	if(!oldInfo) { oldInfo=" "; }
-    	window.localStorage.setItem(name, 
-    			oldInfo+","+date.getTime());
-    },
-    
     handleAppcacheChecking : function(e) {
-    	priv.setFlag("flag_handleAppcacheChecking");
     	document._appcacheChecking = true;
         if (priv.isDevMode()) {
             // TODO IBOGDANOV Why are you checking in commented out code like
@@ -623,7 +614,6 @@ var priv = {
     },
 
     handleAppcacheUpdateReady : function(event) {
-    	priv.setFlag("flag_handleAppcacheUpdateReady");
     	if (window.applicationCache.swapCache) {
             window.applicationCache.swapCache();
         }
@@ -643,7 +633,6 @@ var priv = {
     },
 
     handleAppcacheError : function(e) {
-    	priv.setFlag("flag_handleAppcacheError");
     	if (e.stopImmediatePropagation) {
             e.stopImmediatePropagation();
         }
@@ -677,7 +666,6 @@ var priv = {
     },
 
     handleAppcacheDownloading : function(e) {
-    	priv.setFlag("flag_handleAppcacheDownloading");
         if (priv.isDevMode()) {
             var progress = Math.round(100 * e.loaded / e.total);
             priv.showProgress(progress + 1);
@@ -687,7 +675,6 @@ var priv = {
     },
 
     handleAppcacheProgress : function(e) {
-    	priv.setFlag("flag_handleAppcacheProgress");
         if (priv.isDevMode()) {
             var progress = Math.round(100 * e.loaded / e.total);
             priv.showProgress(progress);
@@ -695,19 +682,16 @@ var priv = {
     },
 
     handleAppcacheNoUpdate : function(e) {
-    	priv.setFlag("flag_handleAppcacheNoUpdate");
         if (priv.isDevMode()) {
             priv.showProgress(100);
         }
     },
 
     handleAppcacheCached : function(e) {
-    	priv.setFlag("flag_handleAppcacheCached");
     	priv.showProgress(100);
     },
 
     handleAppcacheObsolete : function(e) {
-    	priv.setFlag("flag_handleAppcacheObsolete");
     	priv.hardRefresh();
     },
 

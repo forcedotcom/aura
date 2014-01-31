@@ -41,6 +41,13 @@
     <h4>Button with Text and Image</h4>
     <auradocs:codeblock>&lt;ui:button label="Find" iconImgSrc="/auraFW/resources/aura/images/search.png"/></auradocs:codeblock>
     
+    <h4>HTML Rendering</h4>
+    <p>The above markup for a button with text and image results in the following HTML:</p>
+    <auradocs:codeblock>&lt;button class="default uiBlock uiButton" accesskey type="button">
+  &lt;img class="icon bLeft" alt="Find" src="path/to/img">
+  &lt;span class="label bBody truncate" dir="ltr">Find&lt;/span>
+&lt;/button></auradocs:codeblock>
+    
     <h3>Working with Click Events</h3>
     <p>The <code>press</code> event on the <code>ui:button</code> component is fired when the user clicks the button. For example, <code>press="<aura:text value="{!"/>c.findSomething}"</code>
     calls the client-side controller action with the fuction name, <code>findSomething</code>.</p> 

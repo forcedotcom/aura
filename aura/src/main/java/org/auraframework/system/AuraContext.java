@@ -189,6 +189,11 @@ public interface AuraContext {
      * @return The default prefix for the given DefType in this context
      */
     String getDefaultPrefix(DefType defType);
+    
+    /**
+     * Get the full set of default prefixes.
+     */
+    Map<DefType, String> getDefaultPrefixes();
 
     /**
      * Get the mode of execution.

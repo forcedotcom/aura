@@ -19,7 +19,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.auraframework.test.WebDriverTestCase;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
 
 /**
  * Automation for verifying Layouts.

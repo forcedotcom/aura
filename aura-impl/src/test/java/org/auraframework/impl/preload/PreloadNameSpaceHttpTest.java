@@ -56,13 +56,10 @@ public class PreloadNameSpaceHttpTest extends AuraHttpTestCase {
         Map<String, Object> outerMap = (Map<String, Object>) new JsonReader().read(componentInJson);
         Map<String, Object> component = (Map<String, Object>) outerMap.get("component");
         Map<String, Object> value = (Map<String, Object>) component.get("value");
-        Map<String, Object> componentDef = (Map<String, Object>) value.get("componentDef");
-        componentDef = (Map<String, Object>) componentDef.get("value");
+        String componentDef = (String)value.get("componentDef");
 
         // Verify that Descriptor was the only value sent back as part of the componentDef
-        assertTrue(componentDef.size() == 1);
-        assertTrue(componentDef.containsKey("descriptor"));
-        assertEquals(componentDef.get("descriptor"), "markup://preloadTest:test_Preload_Cmp_SameNameSpace");
+        assertEquals(componentDef, "markup://preloadTest:test_Preload_Cmp_SameNameSpace");
     }
 
     /**

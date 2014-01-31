@@ -66,11 +66,17 @@ var ComponentPriv = (function() { // Scoping priv
                 var partialConfigO = partialConfig["original"];
                 var partialConfigCD;
                 var configCD = config["componentDef"]["descriptor"];
-                if (configCD.getQualifiedName) {
+                if (!configCD) {
+                    configCD = config["componentDef"];
+                } else if (configCD.getQualifiedName) {
                     configCD = configCD.getQualifiedName();
                 }
                 if (partialConfig["componentDef"]) {
-                    partialConfigCD = partialConfig["componentDef"]["descriptor"];
+                    if (partialConfig["componentDef"]["descriptor"]) {
+                        partialConfigCD = partialConfig["componentDef"]["descriptor"];
+                    } else {
+                        partialConfigCD = partialConfig["componentDef"];
+                    }
                 }
                 if (partialConfigO !== undefined && partialConfigCD !== configCD) {
                     if (partialConfigO !== configCD) {

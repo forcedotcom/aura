@@ -53,7 +53,13 @@ ComponentDefRegistry.prototype.getDef = function(config, noInit) {
     $A.assert(config, "ComponentDef Config required for registration");
 
     // We don't re-register (or modify in any way) once we've registered
-    var descriptor = config["descriptor"] || config;
+    var descriptor;
+    if (config["descriptor"]) {
+        descriptor = config["descriptor"];
+    } else {
+        descriptor = config;
+        config = undefined;
+    }
     if ($A.util.isString(descriptor) && (descriptor.indexOf("://") < 0)) {
         descriptor = "markup://" + descriptor; // support shorthand
     }
@@ -74,6 +80,8 @@ ComponentDefRegistry.prototype.getDef = function(config, noInit) {
 
             $A.endMark("ComponentDefRegistry.localStorageCache");
         }
+
+        $A.assert(config !== undefined, "Unknown component "+descriptor);
 
         ret = new $A.ns.ComponentDef(config);
         this.componentDefs[ret.getDescriptor().toString()] = ret;

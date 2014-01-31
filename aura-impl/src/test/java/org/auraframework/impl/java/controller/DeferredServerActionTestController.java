@@ -15,15 +15,9 @@
  */
 package org.auraframework.impl.java.controller;
 
-import java.io.IOException;
-
 import org.auraframework.system.Annotations.AuraEnabled;
-import org.auraframework.system.Annotations.BackgroundAction;
 import org.auraframework.system.Annotations.Controller;
-import org.auraframework.system.Annotations.Key;
 import org.auraframework.throwable.AuraHandledException;
-import org.auraframework.util.json.Json;
-import org.auraframework.util.json.JsonSerializable;
 
 @Controller
 public class DeferredServerActionTestController {

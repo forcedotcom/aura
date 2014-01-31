@@ -236,9 +236,12 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
         context.getInstanceStack().clearAttributeName("$");
 
         validateAttributes();
-        getComponentDef().retrieveLabels();
 
-        DefDescriptor<RendererDef> rendererDesc = getComponentDef().getRendererDescriptor();
+        BaseComponentDef def = getComponentDef();
+
+        def.retrieveLabels();
+
+        DefDescriptor<RendererDef> rendererDesc = def.getRendererDescriptor();
         if ((rendererDesc != null && rendererDesc.getDef().isLocal()) || !context.isPreloaded(getDescriptor())) {
             hasLocalDependencies = true;
         }
@@ -311,11 +314,18 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
     public void serialize(Json json) throws IOException {
         AuraContext context = Aura.getContextService().getCurrentContext();
         BaseComponent<?, ?> oldComponent = context.setCurrentComponent(this);
+
         try {
-            json.writeMapBegin();
             BaseComponentDef def = getComponentDef();
-            json.writeMapEntry("componentDef", def);
-            if (!def.getDescriptor().equals(originalDescriptor)) {
+
+            json.writeMapBegin();
+            //
+            // Be very careful here. descriptor != def.getDescriptor().
+            // This is 'case normalizing', as the client is actually case
+            // sensitive for descriptors (ugh!).
+            //
+            json.writeMapEntry("componentDef", def.getDescriptor());
+            if (!descriptor.equals(originalDescriptor)) {
                 json.writeMapEntry("original", originalDescriptor);
             }
             json.writeMapEntry("creationPath", getPath());
@@ -324,8 +334,8 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
                 json.writeMapEntry("attributes", attributeSet);
             }
 
-            if (getComponentDef().getRendererDescriptor() != null) {
-                RendererDef rendererDef = getComponentDef().getRendererDescriptor().getDef();
+            if (def.getRendererDescriptor() != null) {
+                RendererDef rendererDef = def.getRendererDescriptor().getDef();
                 if (rendererDef.isLocal()) {
                     StringWriter sw = new StringWriter();
                     rendererDef.render(this, sw);

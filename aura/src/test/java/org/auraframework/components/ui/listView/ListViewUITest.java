@@ -47,7 +47,6 @@ public class ListViewUITest extends WebDriverTestCase {
         // Header
         assertTrue("The thead in an empty list with single-level generated columns thead should contain one row",
                 getNumRows(tHeadElement) == 1);
-        System.out.println(getCellsInRow(tHeadElement, "th"));
         assertTrue("Empty list with generated columns should not contain any header cells",
                 getCellsInRow(tHeadElement, "th").size() == 0);
 

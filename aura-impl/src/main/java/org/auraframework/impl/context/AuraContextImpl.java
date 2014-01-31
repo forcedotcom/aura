@@ -19,6 +19,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -30,6 +32,7 @@ import org.auraframework.Aura;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.Definition;
 import org.auraframework.def.EventType;
 import org.auraframework.def.ThemeDef;
 import org.auraframework.http.AuraBaseServlet;
@@ -77,6 +80,14 @@ public class AuraContextImpl implements AuraContext {
         }
     }
 
+    private static class DefSorter implements Comparator<Definition> {
+        @Override
+        public int compare(Definition arg0, Definition arg1) {
+            return arg0.getDescriptor().compareTo(arg1.getDescriptor());
+        }
+    }
+
+    private static final DefSorter DEFSORTER = new DefSorter();
 
     private static class Serializer extends NoneSerializer<AuraContext> {
         private final boolean forClient;
@@ -90,6 +101,13 @@ public class AuraContextImpl implements AuraContext {
         }
 
         public static final String DELETED = "deleted";
+
+        private void writeDefs(Json json, String name, List<Definition> writable) throws IOException {
+            if (writable.size() > 0) {
+                Collections.sort(writable, DEFSORTER);
+                json.writeMapEntry(name, writable);
+            }
+        }
 
         @Override
         public void serialize(Json json, AuraContext ctx) throws IOException {
@@ -172,8 +190,42 @@ public class AuraContextImpl implements AuraContext {
                     json.writeArrayEnd();
                 }
 
-                ctx.serializeAsPart(json);
+                //
+                // Now comes the tricky part, we have to serialize all of the definitions that are
+                // required on the client side, and, of all types. This way, we won't have to handle
+                // ugly cases of actual definitions nested inside our configs, and, we ensure that
+                // all dependencies actually get sent to the client. Note that the 'loaded' set needs
+                // to be updated as well, but that needs to happen prior to this.
+                //
+                Map<DefDescriptor<? extends Definition>, Definition> defMap;
+
+                defMap = ctx.getDefRegistry().filterRegistry(ctx.getPreloadedDefinitions());
+
+                if (defMap.size() > 0) {
+                    List<Definition> componentDefs = Lists.newArrayList();
+                    List<Definition> eventDefs = Lists.newArrayList();
+
+                    for (Map.Entry<DefDescriptor<? extends Definition>, Definition> entry : defMap.entrySet()) {
+                        DefDescriptor<? extends Definition> desc = entry.getKey();
+                        DefType dt = desc.getDefType();
+                        Definition d = entry.getValue();
+                        //
+                        // Ignore defs that ended up not being valid. This is arguably something
+                        // that the MDR should have done when filtering.
+                        //
+                        if (d != null) {
+                            if (DefType.COMPONENT.equals(dt) || DefType.APPLICATION.equals(dt)) {
+                                componentDefs.add(d);
+                            } else if (DefType.EVENT.equals(dt)) {
+                                eventDefs.add(d);
+                            }
                         }
+                    }
+                    writeDefs(json, "componentDefs", componentDefs);
+                    writeDefs(json, "eventDefs", eventDefs);
+                }
+                ctx.serializeAsPart(json);
+            }
             json.writeMapEnd();
         }
     }
@@ -335,6 +387,11 @@ public class AuraContextImpl implements AuraContext {
     @Override
     public String getDefaultPrefix(DefType defType) {
         return defaultPrefixes.get(defType);
+    }
+
+    @Override
+    public Map<DefType,String> getDefaultPrefixes() {
+        return defaultPrefixes;
     }
 
     @Override

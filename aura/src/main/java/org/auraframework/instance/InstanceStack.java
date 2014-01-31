@@ -43,7 +43,7 @@ import com.google.common.collect.Maps;
  * our 'parentage', but that is much easier said than done.
  */
 public class InstanceStack {
-	public InstanceStack() {
+    public InstanceStack() {
         this.path = new StringBuilder();
         this.stack = Lists.newArrayList();
         this.current = new Entry(null, path.length());
@@ -68,27 +68,26 @@ public class InstanceStack {
         if (current.instance != instance) {
             throw new AuraRuntimeException("mismatched instance pop");
         }
-		current = stack.remove(stack.size() - 1);
+        current = stack.remove(stack.size() - 1);
         if (current.top) {
             int index = current.index;
             clearAttributeIndex(index);
-			setAttributeIndex(index + 1);
+            setAttributeIndex(index + 1);
         }
     }
 
     /**
      * Ensure that we have the expected parent.
      *
-	 * This is used by parented items to ensure that their parent is on the
-	 * stack. This is required in the case that something is changed outside of
-	 * the tree traversal. In which case this routine will pre-fill the path to
-	 * the correct point.
+     * This is used by parented items to ensure that their parent is on the
+     * stack. This is required in the case that something is changed outside of
+     * the tree traversal. In which case this routine will pre-fill the path to
+     * the correct point.
      */
     public void markParent(Instance<?> parent) {
         if (!current.top) {
             if (current.instance != parent) {
-				throw new AuraRuntimeException(
-						"Don't know how to handle setAttribute here");
+                throw new AuraRuntimeException("Don't know how to handle setAttribute here");
             }
             current.count += 1;
         } else {
@@ -142,8 +141,7 @@ public class InstanceStack {
      */
     public void clearAttributeName(String name) {
         if (!name.equals(current.name)) {
-			throw new AuraRuntimeException("mismatched clearAttributeName for "
-					+ name);
+            throw new AuraRuntimeException("mismatched clearAttributeName for " + name);
         }
         current.name = null;
         path.setLength(current.startPos);
@@ -152,8 +150,8 @@ public class InstanceStack {
     /**
      * push an index onto the stack.
      *
-	 * This must be pushed on to a 'name', as there is no way to index anything
-	 * else.
+     * This must be pushed on to a 'name', as there is no way to index anything
+     * else.
      */
     public void setAttributeIndex(int index) {
         if (current.name == null) {

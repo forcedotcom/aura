@@ -1,103 +1,11 @@
 {
   "serId":1,
   "value":{
-    "componentDef":{
-      "serId":2,
-      "value":{
-        "descriptor":"markup://test:test_Provider_providerImpl3",
-        "superDef":{
-          "serId":3,
-          "value":{
-            "descriptor":"markup://aura:component"
-          }
-        },
-        "attributeDefs":[
-          {
-            "serId":4,
-            "value":{
-              "descriptor":"body",
-              "typeDefDescriptor":"aura://Aura.Component[]",
-              "required":false,
-              "visibility":"PUBLIC"
-            }
-          },
-          {
-            "serId":5,
-            "value":{
-              "descriptor":"implNumber",
-              "typeDefDescriptor":"aura://String",
-              "required":false,
-              "visibility":"PUBLIC"
-            }
-          },
-          {
-            "serId":6,
-            "value":{
-              "descriptor":"defaultAttr",
-              "typeDefDescriptor":"aura://String",
-              "defaultValue":{
-                "descriptor":"defaultAttr",
-                "value":"meh"
-              },
-              "required":false,
-              "visibility":"PUBLIC"
-            }
-          }
-        ],
-        "interfaces":[
-          "markup://test:test_Provider_Interface"
-        ],
-        "facets":[
-          {
-            "descriptor":"body",
-            "value":[
-              {
-                "componentDef":{
-                  "serId":7,
-                  "value":{
-                    "descriptor":"markup://aura:text"
-                  }
-                },
-                "attributes":{
-                  "values":{
-                    "value":{
-                      "descriptor":"value",
-                      "value":"\n    Implementation 3 "
-                    }
-                  }
-                }
-              },
-              {
-                "componentDef":{
-                  "serId":8,
-                  "value":{
-                    "descriptor":"markup://aura:expression"
-                  }
-                },
-                "attributes":{
-                  "values":{
-                    "value":{
-                      "descriptor":"value",
-                      "value":{
-                        "exprType":"PROPERTY",
-                        "path":[
-                          "v",
-                          "implNumber"
-                        ]
-                      }
-                    }
-                  }
-                }
-              }
-            ]
-          }
-        ]
-      }
-    },
+    "componentDef":"markup://test:test_Provider_providerImpl3",
     "original":"markup://test:test_Provider_Interface",
     "creationPath":"/*[0]",
     "attributes":{
-      "serId":9,
+      "serId":2,
       "value":{
         "values":{
           "defaultAttr":"meh",

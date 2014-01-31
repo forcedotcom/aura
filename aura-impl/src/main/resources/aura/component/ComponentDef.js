@@ -77,11 +77,20 @@ $A.ns.ComponentDef = function ComponentDef(config){
         for (var j = 0; j < handlerDefConfigs.length; j++) {
             var handlerConfig = handlerDefConfigs[j];
             if(handlerConfig["eventDef"]){
-                handlerConfig["eventDef"] = eventService.getEventDef(handlerConfig["eventDef"]);
+                //
+                // We cannot modify handlerConfig here, as it is sometimes stored
+                // in localStorage. We used to replace eventDef with the actual
+                // eventDef, but the json serialize-deserialize loses the object
+                // prototype.
+                //
+                appHandlerConfig = {
+                    "action": handlerConfig["action"],
+                    "eventDef": eventService.getEventDef(handlerConfig["eventDef"])
+                };
                 if(!appHandlerDefs){
                     appHandlerDefs = [];
                 }
-                appHandlerDefs.push(handlerConfig);
+                appHandlerDefs.push(appHandlerConfig);
             }else if(handlerConfig["value"]){
                 if(!valueHandlerDefs){
                     valueHandlerDefs = [];
@@ -394,7 +403,9 @@ $A.ns.ComponentDef.prototype.getLayouts = function(){
  */
 $A.ns.ComponentDef.prototype.initSuperDef = function(config){
     if (config) {
-        return $A.componentService.getDef(config);
+        var sdef = $A.componentService.getDef(config);
+        $A.assert(sdef, "Super def undefined for "+this.descriptor+" value = "+config["descriptor"]);
+        return sdef;
     }
     return null;
 };

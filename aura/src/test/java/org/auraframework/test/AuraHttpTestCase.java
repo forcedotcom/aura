@@ -446,15 +446,12 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
                 params.put("message", jsonMessage);
                 params.put("aura.token", getTestServletConfig().getCsrfToken());
 
-                AuraContext context = Aura.getContextService()
-                        .getCurrentContext();
+                AuraContext context = Aura.getContextService().getCurrentContext();
                 if (context != null) {
                     StringBuilder sb = new StringBuilder();
                     context.setSerializeLastMod(false);
-                    context.setFrameworkUID(Aura.getConfigAdapter()
-                            .getAuraFrameworkNonce());
-                    Aura.getSerializationService().write(context, null,
-                            AuraContext.class, sb, "HTML");
+                    context.setFrameworkUID(Aura.getConfigAdapter().getAuraFrameworkNonce());
+                    Aura.getSerializationService().write(context, null, AuraContext.class, sb, "HTML");
                     params.put("aura.context", sb.toString());
                 } else {
                     //

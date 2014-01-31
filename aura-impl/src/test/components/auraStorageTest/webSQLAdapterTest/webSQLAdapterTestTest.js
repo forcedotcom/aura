@@ -92,11 +92,11 @@
 		    this.assertAfterGet(cmp, storage, "key2", function(){
 			var item = cmp["key2"];
 			$A.test.assertDefined(item);
-	        //waitFor size to change as an attempt to fix flappiness on autobuilds
-	        $A.test.addWaitForWithFailureMessage(true, function(){
-	            return storage.getSize()>=2 && storage.getSize()<2.002;
-	        }, "Expected value of approx. 2, got: "+storage.getSize());
-		    });
+                        //waitFor size to change as an attempt to fix flappiness on autobuilds
+                        $A.test.addWaitForWithFailureMessage(true, function(){
+                                return storage.getSize()>=2 && storage.getSize()<2.002;
+                            }, "Expected value of approx. 2, got: "+storage.getSize());
+                    });
 		}
 		]
     },
@@ -132,10 +132,10 @@
 		    storage.put("sport", map);
 		    //Assert that item was retrieved from storage
 		    this.assertAfterGet(cmp, storage, "sport", 
-			    		function(){
-						var item = cmp["sport"];
-						$A.test.assertEquals("Basketball", item["NBA"], "Failed to retrieve map value");
-					});
+                            function(){
+                                var item = cmp["sport"];
+                                $A.test.assertEquals("Basketball", item["NBA"], "Failed to retrieve map value");
+                            });
 		},
 		/**
 		 * Insert a literal value
@@ -180,33 +180,33 @@
 	    		$A.test.assertEquals("SUCCESS", a.getState())
 	    		$A.test.assertDefined(a.getReturnValue);
                         $A.test.clearAndAssertComponentConfigs(a);
-	            $A.newCmpAsync(
+                        $A.newCmpAsync(
 	                    this,
 	                    function(newCmp){
 	                        $A.test.assertEquals("markup://auraStorageTest:teamFacet", newCmp.getDef().getDescriptor().toString());
 	                        storage.put("actionResponse", a);
 	                    },
 	                    a.getReturnValue()
-	            );
+                        );
 		    });
 		    $A.enqueueAction(a);
 		    $A.eventService.finishFiring();
 		    this.assertAfterGet(cmp, storage, "actionResponse", 
-		    		function(){
-					/*TODO: W-1620511 - actions are not flattened correctly, most properties are ommited
-					 * //Verify that action is usable after it was retrieved from cache
-					var item = cmp["actionResponse"];
-					$A.test.assertEquals("SUCCESS", item.getState());
-					$A.test.assertDefined(item.getReturnValue);
-					$A.newCmpAsync(
-	                    this,
-	                    function(newCmp){
-	                        $A.test.assertEquals("markup://auraStorageTest:teamFacet", newCmp.getDef().getDescriptor().toString());
-	                    },
-	                    a.getReturnValue()
-	                );*/
-				});
-		}
+                            function(){
+                                /*TODO: W-1620511 - actions are not flattened correctly, most properties are ommited
+                                 * //Verify that action is usable after it was retrieved from cache
+                                var item = cmp["actionResponse"];
+                                $A.test.assertEquals("SUCCESS", item.getState());
+                                $A.test.assertDefined(item.getReturnValue);
+                                $A.newCmpAsync(
+                                    this,
+                                    function(newCmp){
+                                        $A.test.assertEquals("markup://auraStorageTest:teamFacet", newCmp.getDef().getDescriptor().toString());
+                                    },
+                                    a.getReturnValue()
+                                );*/
+                            });
+                }
 		]
 	
     },

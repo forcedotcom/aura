@@ -93,6 +93,10 @@
 &lt;ui:inputEmail aura:id="emailField" placeholder="abc@email.com"/></auradocs:codeblock>
 	<p><code>ui:label</code> provides a text label for the corresponding field. For more information on using labels, see <auradocs:topicLink topic="label">Label</auradocs:topicLink>.
 	</p>
+	<p>This example results in the following HTML.</p>
+<auradocs:codeblock>&lt;label for="globalId" class="uiLabel">&lt;span>Email&lt;/span>&lt;/label>
+&lt;input placeholder="abc@email.com" type="email" id="globalId" class="uiInput uiInputText uiInputEmail">  
+</auradocs:codeblock>
 	
 	<h4>Using the Rich Text Field</h4>
 	<p>The following code is a basic set up of a rich text field and its corresponding output component.</p>

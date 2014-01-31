@@ -77,6 +77,17 @@
 &lt;ui:inputRange aura:id="qtyField" min="1" max="10"/></auradocs:codeblock>
 	<p><code>ui:label</code> provides a text label for the corresponding field. For more information on using labels, see <auradocs:topicLink topic="label">Label</auradocs:topicLink>.
 	</p>
+	
+	<p>These examples result in the following HTML.</p>
+	<auradocs:codeblock>&lt;label for="globalId" class="uiLabel">&lt;span>Discount&lt;/span>&lt;/label>	
+	&lt;input aria-describedby max="99999999999999" step="1" placeholder type="text" min="-99999999999999" id="globalId" 
+	          class="uiInput uiInputText uiInputNumber uiInputPercent">
+	</auradocs:codeblock>
+	
+	<auradocs:codeblock>&lt;label for="globalId" class="uiLabel">&lt;span>Quantity&lt;/span>&lt;/label>	
+	&lt;input max="10" step="1" type="range" min="1" id="globalId" class="uiInput uiInputText uiInputNumber uiInputRange">
+	</auradocs:codeblock>
+	
 	<h4>Formatting and Localizing the Number Fields</h4>
 	<p>The <code>format</code> attribute determines the format of the number input. The Locale default format is used if none is provided.
 	The following code is a basic set up of a number field, which displays <code>10,000.00</code> based on the provided <code>format</code> attribute.</p>

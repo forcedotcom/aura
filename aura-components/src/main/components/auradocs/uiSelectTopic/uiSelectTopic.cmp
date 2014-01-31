@@ -47,6 +47,15 @@
     &lt;/ui:inputSelectOptionGroup>
 &lt;/ui:inputSelect></auradocs:codeblock>
 
+	<p>This example results in the following HTML.</p>
+	<auradocs:codeblock>&lt;select size="1" id="globalId" class="uiInput uiInputSelect">
+  &lt;optgroup label="Group 1" class="uiInputSelectOptionGroup">
+  &lt;option value="Red" class="uiInputSelectOption">Red&lt;/option>
+  &lt;!--more option tags here-->
+&lt;/optgroup>
+&lt;!--more optgroup tags here-->
+&lt;/select></auradocs:codeblock>
+
 	<h4>Multiple Selection</h4>
 	<auradocs:codeblock>&lt;ui:inputSelect multiple="true" size="5">
     &lt;ui:inputSelectOptionGroup label="Group 1">

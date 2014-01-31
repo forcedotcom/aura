@@ -32,8 +32,8 @@ import org.apache.log4j.Logger;
 import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
-import org.auraframework.def.ClientLibraryDef;
 import org.auraframework.def.ComponentDef;
+import org.auraframework.def.ClientLibraryDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
@@ -50,6 +50,7 @@ import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.system.Source;
 import org.auraframework.system.SourceListener;
 import org.auraframework.throwable.AuraRuntimeException;
+
 import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -177,13 +178,13 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
     private final Map<DefDescriptor<? extends Definition>, Definition> defs = Maps.newHashMap();
 
-    private DefDescriptor<?> compilingDescriptor = null;
-
     private final boolean useCache = true;
 
     private Set<DefDescriptor<? extends Definition>> localDescs = null;
 
     private final Set<DefDescriptor<?>> accessCache = Sets.newLinkedHashSet();
+
+    private CompileContext currentCC;
 
     private SecurityProviderDef securityProvider;
 	private DefDescriptor<? extends BaseComponentDef> lastRootDesc;
@@ -337,6 +338,12 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
          */
         public boolean cacheable = false;
 
+
+        /**
+         * have we validated this def yet?
+         */
+        public boolean validated = false;
+
         @Override
         public String toString() {
             StringBuffer sb = new StringBuffer();
@@ -374,16 +381,28 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         public final Map<DefDescriptor<? extends Definition>, CompilingDef<?>> compiled = Maps.newHashMap();
         public final Map<DefDescriptor<? extends Definition>, Definition> dependencies;
         public final List<ClientLibraryDef> clientLibs;
+        public final boolean frozen;
+        public final DefDescriptor<? extends Definition> topLevel;
+        public Set<DefDescriptor<?>> next;
 
         // TODO: remove preloads
         public boolean addedPreloads = false;
 
         // public final Map<DefDescriptor<? extends Definition>, Definition>
         // dependencies = Maps.newHashMap();
-        public CompileContext(Map<DefDescriptor<? extends Definition>, Definition> dependencies,
-            List<ClientLibraryDef> clientLibs) {
+        public CompileContext(DefDescriptor<? extends Definition> topLevel,
+                Map<DefDescriptor<? extends Definition>, Definition> dependencies, List<ClientLibraryDef> clientLibs) {
             this.dependencies = dependencies;
             this.clientLibs = clientLibs;
+            this.frozen = false;
+            this.topLevel = topLevel;
+        }
+
+        public CompileContext(DefDescriptor<? extends Definition> topLevel) {
+            this.topLevel = topLevel;
+            this.frozen = true;
+            this.dependencies = Maps.newHashMap();
+            this.clientLibs = Lists.newArrayList();
         }
 
         public <D extends Definition> CompilingDef<D> getCompiling(DefDescriptor<D> descriptor) {
@@ -483,7 +502,6 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         context.setCurrentNamespace(canonical.getNamespace());
         compiling.def.validateDefinition();
         compiling.built = true;
-        defs.put(canonical, compiling.def);
         return true;
     }
 
@@ -502,8 +520,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
      * @param deps the set of dependencies that we are accumulating.
      * @throws QuickFixException if the definition is not found, or validateDefinition() throws one.
      */
-    private <D extends Definition> D getHelper(DefDescriptor<D> descriptor, CompileContext cc,
-            Set<DefDescriptor<?>> deps) throws QuickFixException {
+    private <D extends Definition> D getHelper(DefDescriptor<D> descriptor, CompileContext cc) throws QuickFixException {
         CompilingDef<D> cd = cc.getCompiling(descriptor);
 
         if (cd.def != null) {
@@ -560,11 +577,13 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                     depcd.parents.add(cd.def);
                 }
             }
-            deps.addAll(newDeps);
+            cc.next.addAll(newDeps);
+            if (cc.dependencies != null) {
             cc.dependencies.put(cd.descriptor, cd.def);
+            }
 
             // get client libs
-            if (cd.def instanceof BaseComponentDef) {
+            if (cc.clientLibs != null && cd.def instanceof BaseComponentDef) {
                 BaseComponentDef baseComponent = (BaseComponentDef) cd.def;
                 baseComponent.addClientLibs(cc.clientLibs);
             }
@@ -591,19 +610,31 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
      * 
      * @param context only needed to do setCurrentNamspace.
      */
-    private void finishValidation(AuraContext context, Collection<CompilingDef<?>> compiling) throws QuickFixException {
+    private void finishValidation() throws QuickFixException {
+        int iteration = 0;
+        List<CompilingDef<?>> compiling = null;
+
         //
-        // Now validate our references.
+        // Validate our references. This part is uh, painful.
+        // Turns out that validating references can pull in things we didn't see, so we
+        // loop infinitely... or at least a few times.
         //
+        do {
+            compiling = Lists.newArrayList(currentCC.compiled.values());
         for (CompilingDef<?> cd : compiling) {
             // FIXME: setting the current namespace on the context seems extremely hackish
-            context.setCurrentNamespace(cd.descriptor.getNamespace());
-            if (cd.built) {
-                // FIXME: this may be incorrect, we may need to validate references even when we did
-                // not actually build this, and we may not need to if the registry is pre-compiled.
+                currentCC.context.setCurrentNamespace(cd.descriptor.getNamespace());
+                if (cd.built && !cd.validated) {
+                    if (iteration != 0) {
+                        logger.warn("Nested add of "+cd.descriptor+" during validation of "+currentCC.topLevel);
+                        throw new AuraRuntimeException("Nested add of "+cd.descriptor+" during validation of "+currentCC.topLevel);
+                    }
                 cd.def.validateReferences();
+                    cd.validated = true;
             }
         }
+            iteration += 1;
+        } while (compiling.size() < currentCC.compiled.size());
 
         //
         // And finally, mark everything as happily compiled.
@@ -645,16 +676,39 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     protected <D extends Definition> D compileDef(DefDescriptor<D> descriptor,
             Map<DefDescriptor<? extends Definition>, Definition> dependencies,
             List<ClientLibraryDef> clientLibs) throws QuickFixException {
-        Set<DefDescriptor<?>> next = Sets.newHashSet();
-        CompileContext cc = new CompileContext(dependencies, clientLibs);
         D def;
 
+        CompileContext hackNested = null;
         rLock.lock();
         try {
-            cc.loggingService.startTimer(LoggingService.TIMER_DEFINITION_CREATION);
+            //
+            // Temporary hack to avoid bugs in W-2020486
+            // Once that bug is fixed, the commented out code below should be re-inserted and tested.
+            // It will catch more errors where dependencies are handled incorrectly
+            //
+            hackNested = currentCC;
+            //if (currentCC == null) {
+                currentCC = new CompileContext(descriptor, dependencies, clientLibs);
+                if (hackNested == null) {
+                    currentCC.loggingService.startTimer(LoggingService.TIMER_DEFINITION_CREATION);
+                }
+            //} else {
+            //    if (currentCC.frozen) {
+                    //
+                    // We were trying to build a frozen DE, and we got badness. This should be
+                    // a difficult to trigger race condition, However, I dislike the idea that
+                    // this might cause a horrific, twisted infinite loop.
+                    //
+            //        logger.error("Client out of sync on "+currentCC.topLevel+" looking for "+descriptor);
+                    //throw new ClientOutOfSyncException("unable to rebuild definition");
+            //        throw new AuraRuntimeException("unable to rebuild definition");
+            //    }
+            //    throw new AuraRuntimeException("nested: "+descriptor+" in "+currentCC.topLevel);
+            //}
             try {
+                currentCC.next = Sets.newHashSet();
                 try {
-                    def = getHelper(descriptor, cc, next);
+                    def = getHelper(descriptor, currentCC);
                 } catch (DefinitionNotFoundException ndfe) {
                     //
                     // ignore a nonexistent def here.
@@ -666,17 +720,20 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                 // All child definitions are added to the 'next' set, while walking the 'current'
                 // set.
                 //
-                while (next.size() > 0) {
-                    Set<DefDescriptor<?>> current = next;
-                    next = Sets.newHashSet();
+                while (currentCC.next.size() > 0) {
+                    Set<DefDescriptor<?>> current = currentCC.next;
+                    currentCC.next = Sets.newHashSet();
                     for (DefDescriptor<?> cdesc : current) {
-                        getHelper(cdesc, cc, next);
+                        getHelper(cdesc, currentCC);
                     }
                 }
-                finishValidation(cc.context, cc.compiled.values());
+                finishValidation();
                 return def;
             } finally {
-                cc.loggingService.stopTimer(LoggingService.TIMER_DEFINITION_CREATION);
+                if (hackNested == null) {
+                    currentCC.loggingService.stopTimer(LoggingService.TIMER_DEFINITION_CREATION);
+                }
+                currentCC = hackNested;
             }
         } finally {
             rLock.unlock();
@@ -708,9 +765,32 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         // See localDependencies comment
         String key = makeLocalKey(descriptor);
 
-        DefDescriptor<?> lastCompiling = compilingDescriptor;
+        if (currentCC != null) {
+            throw new AuraRuntimeException("Ugh, nested compileDE/buildDE on "+currentCC.topLevel
+                    +" trying to build "+descriptor);
+        }
+        //
+        // This is very ugly... it probably should not be done this way, but AFAICT we need to do this
+        // unfortunately, it also will break if anyone ever changes what happens. Our real problem is
+        // the roundabout routing and uncertainty therein. Going out to DefinitionService to get defs, then
+        // coming back through here is dangerous at best.
+        //
+        DefDescriptor<? extends BaseComponentDef> rootDesc;
+       
+        rootDesc = Aura.getContextService().getCurrentContext().getApplicationDescriptor();
+        if (!descriptor.equals(rootDesc) && rootDesc != null) {
+            //
+            // This is needed to make sure that we have already loaded up all our definitions,
+            // and don't need to re-fetch this half way through.
+            //
+            try {
+                getDef(rootDesc);
+            } catch (QuickFixException qfe) {
+                // ignore this, we'll hit it later anyway.
+            }
+        }
+
         try {
-            compilingDescriptor = descriptor;
             Map<DefDescriptor<? extends Definition>, Definition> dds = Maps.newTreeMap();
             List<ClientLibraryDef> clientLibs = Lists.newArrayList();
             Definition def = compileDef(descriptor, dds, clientLibs);
@@ -768,8 +848,6 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             // See localDependencies comment
             localDependencies.put(key, new DependencyEntry(qfe));
             throw qfe;
-        } finally {
-            compilingDescriptor = lastCompiling;
         }
     }
 
@@ -868,19 +946,38 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
      * @return A compilingDef for the definition, or null if not needed.
      * @throws QuickFixException if something has gone terribly wrong.
      */
-    private <D extends Definition> void validateHelper(AuraContext context, DefDescriptor<D> descriptor,
-            List<CompilingDef<?>> compiled) throws QuickFixException {
+    private <D extends Definition> void validateHelper(DefDescriptor<D> descriptor) throws QuickFixException {
         CompilingDef<D> compiling = new CompilingDef<D>();
         compiling.descriptor = descriptor;
-        if (!fillCompilingDef(compiling, context)) {
+        if (!fillCompilingDef(compiling, currentCC.context)) {
             throw new DefinitionNotFoundException(descriptor);
         }
         if (compiling.built) {
-            compiled.add(compiling);
-        } else {
-            defs.put(compiling.descriptor, compiling.def);
+            currentCC.compiled.put(descriptor, compiling);
         }
     }
+
+    /**
+     * Build a DE 'in place' with no tree traversal.
+     */
+    private <D extends Definition> void buildDE(DependencyEntry de, DefDescriptor<?> descriptor)
+            throws QuickFixException {
+        if (currentCC != null) {
+            throw new AuraRuntimeException("Ugh, nested compileDE/buildDE on "+currentCC.topLevel
+                    +" trying to build "+descriptor);
+        }
+        currentCC = new CompileContext(descriptor);
+        try {
+            validateHelper(descriptor);
+            for (DefDescriptor<?> dd : de.dependencies) {
+                validateHelper(dd);
+            }
+            finishValidation();
+        } finally {
+            currentCC = null;
+        }
+    }
+
 
     /**
      * Get a definition.
@@ -894,21 +991,31 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
      */
     @Override
     public <D extends Definition> D getDef(DefDescriptor<D> descriptor) throws QuickFixException {
-        rLock.lock();
-        try {
             if (descriptor == null) {
                 return null;
             }
+        rLock.lock();
+        try {
             if (defs.containsKey(descriptor)) {
                 @SuppressWarnings("unchecked")
                 D def = (D) defs.get(descriptor);
                 return def;
             }
-            if (compilingDescriptor != null) {
-                // Bad news, someone didn't do dependencies right.
-                // Aura.getExceptionAdapter()
-                // .handleException(new AuraRuntimeException("Invalid dependencies "+descriptor
-                // +" not in dependency tree for "+compilingDescriptor));
+            if (currentCC != null) {
+                if (currentCC.compiled.containsKey(descriptor)) {
+                    @SuppressWarnings("unchecked")
+                    CompilingDef<D> cd = (CompilingDef<D>)currentCC.compiled.get(descriptor);
+                    if (cd.def != null) {
+                        return cd.def;
+                    }
+                    return getHelper(descriptor, currentCC);
+                } else {
+                    //
+                    // If we are nested, compileDef will do the right thing.
+                    // This is a bit ugly though.
+                    //
+                    return compileDef(descriptor, null, null);
+                }
             }
             DependencyEntry de = getDE(null, descriptor);
             if (de == null) {
@@ -935,13 +1042,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             //
             // Now we need to actually do the build..
             //
-            List<CompilingDef<?>> compiled = Lists.newArrayList();
-            AuraContext context = Aura.getContextService().getCurrentContext();
-            validateHelper(context, descriptor, compiled);
-            for (DefDescriptor<?> dd : de.dependencies) {
-                validateHelper(context, dd, compiled);
-            }
-            finishValidation(context, compiled);
+            buildDE(de, descriptor);
             @SuppressWarnings("unchecked")
             D def = (D) defs.get(descriptor);
             return def;
@@ -954,7 +1055,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     @Override
     public <D extends Definition> void save(D def) {
         getRegistryFor((DefDescriptor<D>) def.getDescriptor()).save(def);
-        defs.remove(def.getDescriptor());
+        invalidate(def.getDescriptor());
     }
 
     @Override
@@ -1047,7 +1148,12 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         if (securityProvider == null || !lastRootDesc.equals(rootDesc)) {
             SecurityProviderDef securityProviderDef = null;
             if (rootDesc != null && rootDesc.getDefType().equals(DefType.APPLICATION)) {
-                ApplicationDef root = (ApplicationDef) getDef(rootDesc);
+                ApplicationDef root = null;
+                try {
+                    root = (ApplicationDef) getDef(rootDesc);
+                } catch (QuickFixException qfe) {
+                    // ignore, we get null
+                }
                 if (root != null) {
                     DefDescriptor<SecurityProviderDef> securityDesc = root.getSecurityProviderDefDescriptor();
                     if (securityDesc != null) {
@@ -1215,6 +1321,9 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
      * 
      * Note: there is no guarantee that the definitions have been fetched from cache here, so there is a very subtle
      * race condition.
+     * 
+     * Also note that this _MUST NOT_ be called inside of a compile, or things may get out of wack. We probably
+     * should be asserting this somewhere.
      * 
      * @param uid the uid for cache lookup (null means unknown).
      * @param descriptor the descriptor to fetch.

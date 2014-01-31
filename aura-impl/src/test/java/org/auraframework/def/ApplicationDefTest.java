@@ -22,7 +22,6 @@ import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.annotation.ThreadHostileTest;
 import org.auraframework.test.annotation.UnAdaptableTest;
-import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
@@ -53,7 +52,7 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
         try {
             Aura.getDefinitionService().getDefinition(desc);
             fail("No AuraRuntimeException when securityProvider is empty string");
-        } catch (AuraRuntimeException e) {
+        } catch (InvalidDefinitionException e) {
             assertEquals("QualifiedName is required for descriptors", e.getMessage());
         }
     }
@@ -275,7 +274,6 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
         } catch (InvalidDefinitionException e) {
             assertEquals("Invalid dependency *://somecrap:*[COMPONENT]", e.getMessage());
         }
-
     }
 
     /**

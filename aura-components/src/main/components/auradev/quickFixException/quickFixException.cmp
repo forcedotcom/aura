@@ -20,6 +20,7 @@
     <aura:dependency resource="markup://auradev:quickFix*" />
     <aura:dependency resource="markup://aura:*" />
     <aura:attribute name="exception" type="java://org.auraframework.throwable.quickfix.QuickFixException" />
+    <aura:attribute name="cause" type="String" default="" />
 
     <div class="content">
         <div class="toolbar">Error: {!v.exception.message}
@@ -33,7 +34,13 @@
                 <aura:iteration items="{!v.exception.quickFixes}" var="quickFix">
                     <auradev:quickFixButton quickFix="{!quickFix}" showUI="{!c.showUI}" />
                 </aura:iteration>
+                <aura:if isTrue="{! v.cause != ''}">
+                    <div class="causeWrapper">
+                        <pre>{!v.cause}</pre>
+                    </div>
+                </aura:if>
             </div>
         </div>
+        <div class="bottom"></div>
     </div>
 </aura:component>

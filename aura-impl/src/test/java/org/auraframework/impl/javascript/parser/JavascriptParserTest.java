@@ -45,6 +45,7 @@ import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraImplFiles;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.util.ServiceLocator;
 import org.auraframework.util.json.Json;
 
@@ -281,18 +282,14 @@ public class JavascriptParserTest extends AuraImplTestCase {
                 .getInstance("js://test.testInvalidJSController",
                         ControllerDef.class);
         Source<?> source = getJavascriptSourceLoader().getSource(descriptor);
+        ControllerDef cd = parser.parse(descriptor, source);
         try {
-            parser.parse(descriptor, source);
+            cd.validateDefinition();
             fail("Javascript controller must only contain functions");
         } catch (Exception e) {
-            assertEquals(
-                    "Exception must be "
-                            + AuraRuntimeException.class.getSimpleName(),
-                    AuraRuntimeException.class, e.getClass());
-            e.getMessage().contains(
+        	this.checkExceptionContains(e, InvalidDefinitionException.class,
                     "Attempted to convert \"global=\" to BigDecimal");
         }
-
     }
 
     /**
@@ -307,16 +304,13 @@ public class JavascriptParserTest extends AuraImplTestCase {
                 .getInstance("js://test.testNonFunctionElementsInJSController",
                         ControllerDef.class);
         Source<?> source = getJavascriptSourceLoader().getSource(descriptor);
+        ControllerDef cd = parser.parse(descriptor, source);
         try {
-            parser.parse(descriptor, source);
+            cd.validateDefinition();
             fail("Javascript controller must only contain functions");
-        } catch (AuraRuntimeException expected) {
-            assertTrue(expected
-                    .getCause()
-                    .getCause()
-                    .getMessage()
-                    .startsWith(
-                            "Only functions are allowed in javascript controllers"));
+        } catch (Exception e) {
+        	this.checkExceptionContains(e, InvalidDefinitionException.class,
+                            "JsonStreamParseException");
         }
     }
 

@@ -32,7 +32,6 @@ import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.FakeRegistry;
 import org.auraframework.impl.root.AttributeDefImpl;
 import org.auraframework.impl.root.event.RegisterEventDefImpl;
-import org.auraframework.impl.root.parser.handler.XMLHandler.InvalidSystemAttributeException;
 import org.auraframework.impl.source.StringSource;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Location;
@@ -271,7 +270,7 @@ public class InterfaceDefTest extends AuraImplTestCase {
         try {
             d.getDef();
             fail("An interface cannot implement another interface, it can only extend it.");
-        } catch (InvalidSystemAttributeException expected) {
+        } catch (InvalidDefinitionException expected) {
         }
     }
 

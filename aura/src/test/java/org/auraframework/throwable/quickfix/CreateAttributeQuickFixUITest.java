@@ -95,7 +95,7 @@ public class CreateAttributeQuickFixUITest extends WebDriverTestCase {
         open("/auratest/createAttributeQuickFix.cmp", Mode.DEV);
         verifyToolbarAndClickCreateButton();
         setAttributeNameType("foo", "myInvalidType");
-        util.clickFix(false, "Invalid attribute type:myInvalidType");
+        util.clickFix(false, "No TYPE named java://myInvalidType");
         AttributeDef fooAttr = defDescriptor.getDef().getAttributeDef("foo");
         assertNull(fooAttr);
     }

@@ -28,6 +28,7 @@ import org.auraframework.system.*;
 import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
+
 import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
@@ -284,8 +285,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
     public void testUpdateLoadedNullWithLoadedSet() throws Exception {
         AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Access.AUTHENTICATED,
                 laxSecurityApp);
-        DefDescriptor<?> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
-                String.format(baseComponentTag, "", ""));
+        DefDescriptor<?> cmpDesc = addSourceAutoCleanup(ComponentDef.class, String.format(baseComponentTag, "", ""));
         String uid = context.getDefRegistry().getUid(null, cmpDesc);
         context.getDefRegistry().invalidate(cmpDesc);
 
@@ -577,7 +577,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
             }
 
             @Override
-            public void appendDependencies(Set<DefDescriptor<?>> dependencies) throws QuickFixException {
+            public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
                 dependencies.add(Aura.getDefinitionService().getDefDescriptor("test://foo.barA", TypeDef.class));
                 dependencies.add(Aura.getDefinitionService().getDefDescriptor("test://foo.barB", TypeDef.class));
                 dependencies.add(Aura.getDefinitionService().getDefDescriptor("test://foo.barC", TypeDef.class));

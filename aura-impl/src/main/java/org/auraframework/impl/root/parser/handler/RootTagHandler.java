@@ -80,6 +80,14 @@ public abstract class RootTagHandler<T extends RootDefinition> extends Container
 
     protected abstract RootDefinitionBuilder<T> getBuilder();
 
+    public void setParseError(Throwable t) {
+        RootDefinitionBuilder<T> builder = getBuilder();
+
+        if (builder != null) {
+            builder.setParseError(t);
+        }
+    }
+
     @Override
     protected void readAttributes() throws QuickFixException {
         RootDefinitionBuilder<T> builder = getBuilder();

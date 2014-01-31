@@ -23,12 +23,10 @@ import org.auraframework.def.AttributeDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.ThemeDef;
 import org.auraframework.impl.AuraImplTestCase;
-import org.auraframework.impl.root.parser.handler.XMLHandler.InvalidSystemAttributeException;
 import org.auraframework.impl.source.StringSource;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.system.Source;
-import org.auraframework.throwable.AuraUnhandledException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -87,9 +85,8 @@ public class ThemeDefTest extends AuraImplTestCase {
             source(badMarkup);
             fail("Bad markup should be caught");
         } catch (Exception e) {
-            assertTrue("Exception must be " + AuraUnhandledException.class.getSimpleName(),
-                    e instanceof AuraUnhandledException);
-            expectMessage(e, "XML document structures must start and end within the same entity");
+            checkExceptionContains(e, InvalidDefinitionException.class,
+                    "XML document structures must start and end within the same entity");
         }
     }
 
@@ -100,9 +97,8 @@ public class ThemeDefTest extends AuraImplTestCase {
             source(badMarkup);
             fail("Invalid nesting of attributes should be caught");
         } catch (Exception e) {
-            assertTrue("Exception must be " + InvalidSystemAttributeException.class.getSimpleName(),
-                    e instanceof InvalidSystemAttributeException);
-            expectMessage(e, "Invalid attribute \"name\"");
+            checkExceptionContains(e, InvalidDefinitionException.class,
+                    "Invalid attribute \"name\"");
         }
     }
 
@@ -117,9 +113,7 @@ public class ThemeDefTest extends AuraImplTestCase {
             source(badTheme);
             fail("Unsupported attributes should not be allowed");
         } catch (Exception e) {
-            assertTrue("Exception must be " + InvalidSystemAttributeException.class.getSimpleName(),
-                    e instanceof InvalidSystemAttributeException);
-            expectMessage(e, "Invalid attribute \"fakeattrib\"");
+            checkExceptionContains(e, InvalidDefinitionException.class, "Invalid attribute \"fakeattrib\"");
 
         }
     }

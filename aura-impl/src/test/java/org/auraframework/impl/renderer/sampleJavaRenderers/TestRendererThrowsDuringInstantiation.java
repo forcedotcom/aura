@@ -24,7 +24,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 public class TestRendererThrowsDuringInstantiation implements Renderer {
 
     public TestRendererThrowsDuringInstantiation() {
-        throw new Error("invisible me");
+        throw new RuntimeException("invisible me");
     }
 
     @Override

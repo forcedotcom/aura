@@ -66,4 +66,11 @@ public class JavascriptRendererDefHandler extends JavascriptHandler<RendererDef,
         builder.expressionRefs.addAll(propRefs);
     }
 
+    @Override
+    protected RendererDef createDefinition(Throwable error) {
+        setDefBuilderFields(builder);
+        builder.setParseError(error);
+        return builder.build();
+    }
+
 }

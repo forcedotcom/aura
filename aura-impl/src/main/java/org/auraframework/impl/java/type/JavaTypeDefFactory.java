@@ -28,7 +28,6 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.TypeDef;
 import org.auraframework.impl.java.BaseJavaDefFactory;
 import org.auraframework.system.SourceLoader;
-import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.AuraTextUtil;
 
 /**
@@ -75,42 +74,42 @@ public class JavaTypeDefFactory extends BaseJavaDefFactory<TypeDef> {
     @Override
     protected Class<?> getClazz(DefDescriptor<TypeDef> descriptor) {
         Class<?> clazz = null;
-        try {
-            String className = descriptor.getName();
-            if (descriptor.getNamespace() == null) {
+        String className = descriptor.getName();
+        if (descriptor.getNamespace() == null) {
 
-                if (className.equals("List") || className.startsWith("List<") || className.endsWith("[]")) {
-                    clazz = ArrayList.class;
-                } else if (className.equals("Map") || className.startsWith("Map<")) {
-                    clazz = HashMap.class;
-                } else if (className.equals("Set") || className.startsWith("Set<")) {
-                    clazz = HashSet.class;
-                } else if (className.equals("Decimal")) {
-                    clazz = BigDecimal.class;
-                } else if (className.equals("Date")) {
-                    clazz = Date.class;
-                } else if (className.equals("DateTime")) {
-                    clazz = Calendar.class;
-                } else if (className.equals("int")) {
-                    clazz = Integer.class;
-                } else if (className.equals("char")) {
-                    clazz = Character.class;
-                } else {
-                    try {
-                        clazz = Class.forName("java.lang." + AuraTextUtil.initCap(className));
-                    } catch (ClassNotFoundException e) {
-                        // ignore
-                    }
-                }
+            if (className.equals("List") || className.startsWith("List<") || className.endsWith("[]")) {
+                clazz = ArrayList.class;
+            } else if (className.equals("Map") || className.startsWith("Map<")) {
+                clazz = HashMap.class;
+            } else if (className.equals("Set") || className.startsWith("Set<")) {
+                clazz = HashSet.class;
+            } else if (className.equals("Decimal")) {
+                clazz = BigDecimal.class;
+            } else if (className.equals("Date")) {
+                clazz = Date.class;
+            } else if (className.equals("DateTime")) {
+                clazz = Calendar.class;
+            } else if (className.equals("int")) {
+                clazz = Integer.class;
+            } else if (className.equals("char")) {
+                clazz = Character.class;
             } else {
-                className = String.format("%s.%s", descriptor.getNamespace(), getRawClassName(className));
+                try {
+                    clazz = Class.forName("java.lang." + AuraTextUtil.initCap(className));
+                } catch (ClassNotFoundException e) {
+                    // ignore
+                }
             }
+        } else {
+            className = String.format("%s.%s", descriptor.getNamespace(), getRawClassName(className));
+        }
 
-            if (clazz == null) {
+        if (clazz == null) {
+            try {
                 clazz = Class.forName(className);
+            } catch (ClassNotFoundException e) {
+                // ignore
             }
-        } catch (ClassNotFoundException e) {
-            throw new AuraRuntimeException(e);
         }
         return clazz;
     }

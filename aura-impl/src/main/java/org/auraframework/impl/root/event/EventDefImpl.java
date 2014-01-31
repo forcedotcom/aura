@@ -106,9 +106,8 @@ public class EventDefImpl extends RootDefinitionImpl<EventDef> implements EventD
 
     @Override
     public void validateDefinition() throws QuickFixException {
-        if (this.getDescriptor() == null) {
-            throw new InvalidDefinitionException("Descriptor cannot be null for EventDef", getLocation());
-        }
+        super.validateDefinition();
+
         if (eventType == null) {
             throw new InvalidDefinitionException("EventType cannot be null", getLocation());
         }
@@ -142,6 +141,7 @@ public class EventDefImpl extends RootDefinitionImpl<EventDef> implements EventD
 
     @Override
     public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
+        super.appendDependencies(dependencies);
         if (extendsDescriptor != null) {
             dependencies.add(extendsDescriptor);
         }

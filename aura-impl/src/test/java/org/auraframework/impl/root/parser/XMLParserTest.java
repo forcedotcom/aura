@@ -32,7 +32,9 @@ import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Location;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.system.Source;
-import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.AuraUnhandledException;
+
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 
 public class XMLParserTest extends AuraImplTestCase {
 
@@ -65,10 +67,11 @@ public class XMLParserTest extends AuraImplTestCase {
         XMLParser parser = XMLParser.getInstance();
         descriptor = DefDescriptorImpl.getInstance("test:parserInvalid", ComponentDef.class);
         Source<?> source = getSource(descriptor);
+        ComponentDef cd = parser.parse(descriptor, source);
         try {
-            parser.parse(descriptor, source);
+            cd.validateDefinition();
             fail("Parsing invalid source should throw exception");
-        } catch (AuraRuntimeException e) {
+        } catch (InvalidDefinitionException e) {
             Location location = e.getLocation();
             assertTrue("Wrong filename.", location.getFileName().endsWith("parserInvalid.cmp"));
             assertEquals(19, location.getLine());
@@ -80,10 +83,11 @@ public class XMLParserTest extends AuraImplTestCase {
         XMLParser parser = XMLParser.getInstance();
         descriptor = DefDescriptorImpl.getInstance("test:parserFragment", ComponentDef.class);
         Source<?> source = getSource(descriptor);
+        ComponentDef cd = parser.parse(descriptor, source);
         try {
-            parser.parse(descriptor, source);
+            cd.validateDefinition();
             fail("Parsing invalid source should throw exception");
-        } catch (AuraRuntimeException e) {
+        } catch (InvalidDefinitionException e) {
             Location location = e.getLocation();
             assertTrue("Wrong filename.", location.getFileName().endsWith("parserFragment.cmp"));
             assertEquals(18, location.getLine());
@@ -96,35 +100,35 @@ public class XMLParserTest extends AuraImplTestCase {
         
         // Cannot use Mockito on JDK7 because the File class has been changed to directly access File.path data member
         File tmpFile = new File("") {
-			@Override
-			public String getPath() {
-				return "";
-			}
+            @Override
+            public String getPath() {
+                return "";
+            }
 
-			@Override
-			public String getCanonicalPath() throws IOException {
-				return "";
-			}
+            @Override
+            public String getCanonicalPath() throws IOException {
+                return "";
+            }
 
-			@Override
-			public boolean exists() {
-				return true;
-			}
+            @Override
+            public boolean exists() {
+                return true;
+            }
 
-			@Override
-			public long lastModified() {
-				return 0L;
-			}
+            @Override
+            public long lastModified() {
+                return 0L;
+            }
 
-			private static final long serialVersionUID = 1L;
+            private static final long serialVersionUID = 1L;
         };
         
+        Source<?> source = new FileSource<ComponentDef>(descriptor, tmpFile, Format.XML);
         try {
-            Source<?> source = new FileSource<ComponentDef>(descriptor, tmpFile, Format.XML);
             parser.parse(null, source);
             fail("Parsing nonexistent source should throw exception");
-        } catch (AuraRuntimeException e) {
-            assertTrue(e.getCause() instanceof FileNotFoundException);
+        } catch (AuraUnhandledException e) {
+            assertEquals(FileNotFoundException.class, e.getCause().getCause().getClass());
         }
     }
 
@@ -135,7 +139,8 @@ public class XMLParserTest extends AuraImplTestCase {
         try {
             parser.parse(descriptor, source);
             fail("Parsing null source should throw exception");
-        } catch (NullPointerException e) {
+        } catch (AuraUnhandledException e) {
+            assertEquals(NullPointerException.class, e.getCause().getClass());
             // good!
         }
     }

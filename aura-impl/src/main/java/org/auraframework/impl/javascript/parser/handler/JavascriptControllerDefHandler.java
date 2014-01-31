@@ -74,4 +74,11 @@ public class JavascriptControllerDefHandler extends JavascriptHandler<Controller
     public void addExpressionReferences(Set<PropertyReference> propRefs) {
         builder.expressionRefs.addAll(propRefs);
     }
+
+    @Override
+    protected ControllerDef createDefinition(Throwable error) {
+        setDefBuilderFields(builder);
+        builder.setParseError(error);
+        return builder.build();
+    }
 }

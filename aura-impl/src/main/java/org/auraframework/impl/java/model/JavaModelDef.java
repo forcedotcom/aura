@@ -78,11 +78,9 @@ public class JavaModelDef extends DefinitionImpl<ModelDef> implements ModelDef {
 
     /**
      * Add our dependencies to the set.
-     * 
-     * @throws QuickFixException
      */
     @Override
-    public void appendDependencies(Set<DefDescriptor<?>> dependencies) throws QuickFixException {
+    public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
         // FIXME: put all of our method dependencies in here...
         // Note that we have a chicken and egg problem, as we can't
         // ensure that the type is available until after the call to

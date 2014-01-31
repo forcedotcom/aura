@@ -69,8 +69,10 @@ public class ClientLibraryDefHandlerTest extends AuraImplTestCase {
         StringSource<ComponentDef> source = new StringSource<ComponentDef>(descriptor,
                 "<aura:component><aura:clientLibrary name='HTML5Shiv' type='fooBar' /></aura:component>", "myID",
                 Format.XML);
+
+        ComponentDef cd = parser.parse(descriptor, source);
         try {
-            parser.parse(descriptor, source);
+            cd.validateDefinition();
             fail("Should have failed on encountering bad type attribute");
         } catch (Exception e) {
             checkExceptionFull(e, InvalidDefinitionException.class, "Missing valid type");
@@ -81,8 +83,9 @@ public class ClientLibraryDefHandlerTest extends AuraImplTestCase {
         StringSource<ComponentDef> source = new StringSource<ComponentDef>(descriptor,
                 "<aura:component><aura:clientLibrary name='HTML5Shiv' type='JS, CSS' /></aura:component>", "myID",
                 Format.XML);
+        ComponentDef cd = parser.parse(descriptor, source);
         try {
-            parser.parse(descriptor, source);
+            cd.validateDefinition();
             fail("Should accept only valid types for type attribute.");
         } catch (Exception e) {
             checkExceptionFull(e, InvalidDefinitionException.class, "Missing valid type");
@@ -133,8 +136,9 @@ public class ClientLibraryDefHandlerTest extends AuraImplTestCase {
                         "<aura:clientLibrary name='HTML5Shiv' type='JS' modes='fooBar'/>" +
                         "</aura:component>", "myID",
                 Format.XML);
+        ComponentDef cd = parser.parse(descriptor, source);
         try {
-            parser.parse(descriptor, source);
+        	cd.validateDefinition();
             fail("Should not accept invalid mode specification.");
         } catch (Exception e) {
             checkExceptionFull(e, InvalidDefinitionException.class, "Invalid mode specified");

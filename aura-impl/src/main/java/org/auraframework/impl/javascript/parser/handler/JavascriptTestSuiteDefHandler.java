@@ -139,12 +139,12 @@ public class JavascriptTestSuiteDefHandler extends JavascriptHandler<TestSuiteDe
 
                 List<String> caseLabels = (List<String>) (List<?>) value.get("labels");
                 Set<String> labels = Sets.newHashSet();
-				if (suiteLabels != null) {
-					labels.addAll(suiteLabels);
-				}
-				if (caseLabels != null) {
-					labels.addAll(caseLabels);
-				}
+                if (suiteLabels != null) {
+                    labels.addAll(suiteLabels);
+                }
+                if (caseLabels != null) {
+                    labels.addAll(caseLabels);
+                }
 
                 List<String> caseBrowsers = (List<String>) (List<?>) value
                         .get("browsers");
@@ -194,5 +194,12 @@ public class JavascriptTestSuiteDefHandler extends JavascriptHandler<TestSuiteDe
     @Override
     public void addExpressionReferences(Set<PropertyReference> propRefs) {
         // ignore these
+    }
+
+    @Override
+    protected TestSuiteDef createDefinition(Throwable error) {
+        setDefBuilderFields(builder);
+        builder.setParseError(error);
+        return builder.build();
     }
 }

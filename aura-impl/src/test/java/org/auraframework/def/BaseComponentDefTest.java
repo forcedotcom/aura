@@ -329,14 +329,14 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
     }
 
     /**
-     * AuraRuntimeException if model is empty.
+     * InvalidDefinitionException if model is empty.
      */
     public void testModelEmpty() throws Exception {
         try {
             define(baseTag, "model=''", "");
             fail("Should not be able to load component with empty model");
         } catch (Exception e) {
-            checkExceptionFull(e, AuraRuntimeException.class, "QualifiedName is required for descriptors");
+            checkExceptionFull(e, InvalidDefinitionException.class, "QualifiedName is required for descriptors");
         }
     }
 
@@ -362,8 +362,8 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         try {
             compDesc.getDef();
             fail("Should not be able to load component with multiple models");
-        } catch (AuraRuntimeException e) {
-            checkExceptionFull(e, AuraRuntimeException.class,
+        } catch (Exception e) {
+            checkExceptionFull(e, InvalidDefinitionException.class,
                     "Invalid Descriptor Format: java://org.auraframework.impl.java.model.TestModel,js://test.jsModel");
         }
     }
@@ -393,7 +393,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
             define(baseTag, "controller=''", "");
             fail("Should not be able to load component with empty controller");
         } catch (Exception e) {
-            checkExceptionFull(e, AuraRuntimeException.class, "QualifiedName is required for descriptors");
+            checkExceptionFull(e, InvalidDefinitionException.class, "QualifiedName is required for descriptors");
         }
     }
 
@@ -417,7 +417,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
             define(baseTag, "renderer=''", "");
             fail("Should not be able to load component with empty renderer");
         } catch (Exception e) {
-            checkExceptionFull(e, AuraRuntimeException.class, "QualifiedName is required for descriptors");
+            checkExceptionFull(e, InvalidDefinitionException.class, "QualifiedName is required for descriptors");
         }
     }
 
@@ -441,7 +441,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
             define(baseTag, "provider=''", "");
             fail("Should not be able to load component with empty provider");
         } catch (Exception e) {
-            checkExceptionFull(e, AuraRuntimeException.class, "QualifiedName is required for descriptors");
+            checkExceptionFull(e, InvalidDefinitionException.class, "QualifiedName is required for descriptors");
         }
     }
 
@@ -876,7 +876,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
             define(baseTag, "render=''", "");
             fail("Should not be able to load component with empty render value");
         } catch (Exception e) {
-            checkExceptionRegex(e, IllegalArgumentException.class,
+            checkExceptionRegex(e, InvalidDefinitionException.class,
                     "No enum const(ant)? (class )?org\\.auraframework\\.def\\.BaseComponentDef.RenderType\\.");
         }
     }
@@ -889,7 +889,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
             define(baseTag, "render='typo'", "");
             fail("Should not be able to load component with invalid render value");
         } catch (Exception e) {
-            checkExceptionRegex(e, IllegalArgumentException.class,
+            checkExceptionRegex(e, InvalidDefinitionException.class,
                     "No enum const(ant)? (class )?org\\.auraframework\\.def\\.BaseComponentDef.RenderType\\.TYPO");
         }
     }
@@ -934,7 +934,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
             define(baseTag, " whitespace='bogus'", "");
             fail("IllegalArgumentException should have been thrown for bad whitespace value.");
         } catch (Exception e) {
-            checkExceptionRegex(e, IllegalArgumentException.class,
+            checkExceptionRegex(e, InvalidDefinitionException.class,
                     "No enum const(ant)? (class )?org\\.auraframework\\.def\\.BaseComponentDef.WhitespaceBehavior\\.BOGUS");
         }
     }
@@ -1002,7 +1002,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
      */
     public void testDependencyNonExistent() throws Exception {
         try {
-            define(baseTag, "", "<aura:dependency resource=\"*://idontexist:*\"/>");
+        	define(baseTag, "", "<aura:dependency resource=\"*://idontexist:*\"/>");
             fail("Should not be able to load non-existant resource as dependency");
         } catch (Exception e) {
             checkExceptionFull(e, InvalidDefinitionException.class, "Invalid dependency *://idontexist:*[COMPONENT]");
@@ -1015,7 +1015,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
     public void testDependencyInvalid() throws Exception {
         // Invalid descriptor pattern
         try {
-            define(baseTag, "", "<aura:dependency resource=\"*://auratest.*\"/>");
+        	define(baseTag, "", "<aura:dependency resource=\"*://auratest.*\"/>");
             fail("Should not be able to load resource, bad DefDescriptor format");
         } catch (Exception e) {
             checkExceptionFull(e, InvalidDefinitionException.class, "Illegal namespace in *://auratest.*");
@@ -1283,7 +1283,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
             cmp.getDef();
             fail(defType + " should throw Exception when extends is empty");
         } catch (Exception e) {
-            checkExceptionFull(e, AuraRuntimeException.class, "QualifiedName is required for descriptors");
+            checkExceptionFull(e, InvalidDefinitionException.class, "QualifiedName is required for descriptors");
         }
     }
 
@@ -1537,7 +1537,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
             define(baseTag, "implements=''", "");
             fail(DefType.getDefType(getDefClass()) + " should throw Exception when implements is empty");
         } catch (Exception e) {
-            checkExceptionFull(e, AuraRuntimeException.class, "QualifiedName is required for descriptors");
+            checkExceptionFull(e, InvalidDefinitionException.class, "QualifiedName is required for descriptors");
         }
     }
 
@@ -1569,12 +1569,13 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
     }
 
     public void testBuildWithNullDescriptor() throws Exception {
+        BaseComponentDef bcd = vendor.makeBaseComponentDefWithNulls(getDefClass(), null, null, null, null,
+                null, null, null, null, null, null, null, null, false, false);
         try {
-            vendor.makeBaseComponentDefWithNulls(getDefClass(), null, null, null, null,
-                    null, null, null, null, null, null, null, null, false, false);
-            fail("Should have thrown AuraException for null AuraDescriptor");
-        } catch (AuraRuntimeException e) {
-            checkExceptionFull(e, AuraRuntimeException.class, "descriptor is null");
+            bcd.validateDefinition();
+            fail("Should have thrown AuraRuntimeException for null descriptor");
+        } catch (Exception e) {
+            checkExceptionFull(e, InvalidDefinitionException.class, "No descriptor");
         }
     }
 

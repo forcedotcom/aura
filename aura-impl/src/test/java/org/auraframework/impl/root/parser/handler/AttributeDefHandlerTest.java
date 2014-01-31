@@ -103,29 +103,19 @@ public class AttributeDefHandlerTest extends AuraImplTestCase {
     }
 
     public void testInvalidSystemAttributeName() throws Exception {
-        StringSource<AttributeDef> attributeSource = new StringSource<AttributeDef>(desc,
-                "<aura:attribute foo='bar' name='mystring' type='java://String' default='{!blah.some.expression}'/>",
-                "myID", Format.XML);
-        XMLStreamReader attributeXmlReader = getXmlReader(attributeSource);
-
         try {
-            new AttributeDefHandler<ComponentDef>(cdh, attributeXmlReader, attributeSource);
+            getElement("<aura:attribute foo='bar' name='mystring' type='java://String' default='{!blah.some.expression}'/>");
             fail("Expected InvalidSystemAttributeException to be thrown");
-        } catch (Throwable t) {
+        } catch (Exception t) {
             assertExceptionMessageEndsWith(t, InvalidSystemAttributeException.class, "Invalid attribute \"foo\"");
         }
     }
 
     public void testInvalidSystemAttributePrefix() throws Exception {
-        StringSource<AttributeDef> attributeSource = new StringSource<AttributeDef>(desc,
-                "<aura:attribute name='mystring' type='java://String' other:default='{!blah.some.expression}'/>",
-                "myID", Format.XML);
-        XMLStreamReader attributeXmlReader = getXmlReader(attributeSource);
-
         try {
-            new AttributeDefHandler<ComponentDef>(cdh, attributeXmlReader, attributeSource);
+            getElement("<aura:attribute name='mystring' type='java://String' other:default='{!blah.some.expression}'/>");
             fail("Expected InvalidSystemAttributeException to be thrown");
-        } catch (Throwable t) {
+        } catch (Exception t) {
             assertExceptionMessageEndsWith(t, InvalidSystemAttributeException.class,
                     "Invalid attribute \"other:default\"");
         }
@@ -177,7 +167,7 @@ public class AttributeDefHandlerTest extends AuraImplTestCase {
             ad.getTypeDef();
             fail("Expected Exception to be thrown when attribute is a non-existent java type");
         } catch (Throwable t) {
-            assertExceptionMessage(t, AuraRuntimeException.class, "java.lang.ClassNotFoundException: invalid");
+            assertExceptionMessage(t, DefinitionNotFoundException.class, "No TYPE named java://invalid found");
         }
     }
 

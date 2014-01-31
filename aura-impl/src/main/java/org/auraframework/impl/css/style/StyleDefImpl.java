@@ -39,9 +39,6 @@ import org.auraframework.util.json.Json;
 
 import com.google.common.collect.Maps;
 
-/**
- * FIXME - barely implemented #W-690042
- */
 public class StyleDefImpl extends DefinitionImpl<StyleDef> implements StyleDef {
 
     private static final long serialVersionUID = 7140896215068458158L;
@@ -60,14 +57,19 @@ public class StyleDefImpl extends DefinitionImpl<StyleDef> implements StyleDef {
     }
 
     @Override
-    public void appendDependencies(Set<DefDescriptor<?>> dependencies) throws QuickFixException {
+    public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
         dependencies.add(Aura.getDefinitionService().getDefDescriptor(descriptor.getNamespace(), NamespaceDef.class));
+        dependencies.add(Aura.getDefinitionService().getDefDescriptor("aura:styleDef", ComponentDef.class));
 
         // dependencies from theme variables in the css file
         if (!themeReferences.isEmpty()) {
             ThemeValueProvider vp = Aura.getStyleAdapter().getThemeValueProviderNoOverrides();
             for (String reference : themeReferences) {
-                dependencies.addAll(vp.getDescriptors(reference, getLocation()));
+                try {
+                    dependencies.addAll(vp.getDescriptors(reference, getLocation()));
+                } catch (QuickFixException qfe) {
+                    // ignore, we will catch this in validateReferences.
+                }
             }
         }
     }
@@ -80,6 +82,7 @@ public class StyleDefImpl extends DefinitionImpl<StyleDef> implements StyleDef {
         if (!themeReferences.isEmpty()) {
             ThemeValueProvider vp = Aura.getStyleAdapter().getThemeValueProviderNoOverrides();
             for (String reference : themeReferences) {
+                vp.getDescriptors(reference, getLocation());
                 vp.getValue(reference, getLocation()); // get value will validate it's a valid variable
             }
         }

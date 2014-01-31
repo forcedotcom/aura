@@ -214,7 +214,7 @@ public final class TestComponent implements ComponentDef {
     }
 
     @Override
-    public void appendDependencies(Set<DefDescriptor<?>> dependencies) throws QuickFixException {
+    public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
     }
 
     @Override

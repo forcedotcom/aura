@@ -106,6 +106,7 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
 
         @Override
         public ApplicationDefImpl build() {
+            finish();
             return new ApplicationDefImpl(this);
         }
 
@@ -193,7 +194,7 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
     }
 
     @Override
-    public void appendDependencies(Set<DefDescriptor<?>> dependencies) throws QuickFixException {
+    public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
         super.appendDependencies(dependencies);
 
         if (layoutsDefDescriptor != null) {
@@ -205,6 +206,12 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
                 dependencies.add(entry.getKey());
                 dependencies.add(entry.getValue());
             }
+        }
+        if (securityProviderDescriptor != null) {
+        	dependencies.add(securityProviderDescriptor);
+        }
+        if (locationChangeEventDescriptor != null) {
+        	dependencies.add(locationChangeEventDescriptor);
         }
     }
 

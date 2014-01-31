@@ -23,8 +23,8 @@ import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.component.ComponentDefRefArray;
 import org.auraframework.impl.type.ComponentDefRefArrayTypeDef;
 import org.auraframework.instance.Component;
-import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 
 /**
  * Unit tests for attributes of type Aura.Component, Aura.Component[] and
@@ -131,7 +131,7 @@ public class AuraComponentAttributeTypeTest extends AuraImplTestCase {
         try {
             Aura.getInstanceService().getInstance(desc);
             fail("Should have failed creation because of incomplete formula.");
-        } catch (AuraRuntimeException e) {
+        } catch (InvalidDefinitionException e) {
         }
 
         // Non existing Component

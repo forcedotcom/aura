@@ -109,11 +109,12 @@ public class DependencyDefImplTest extends AuraImplTestCase {
                 containsDependency(deps, "markup://aura:application"));
 
         // Try to get dependency that doesn't exist, verify exception thrown
+        testDependencyDef = vendor.makeDependencyDef(vendor.makeComponentDefDescriptor("hi"),
+                "markup://aura:iDontExist", "APPLICATION", vendor.makeLocation("f1", 5, 5, 0));
+        deps.clear();
+        testDependencyDef.appendDependencies(deps);
         try {
-            testDependencyDef = vendor.makeDependencyDef(vendor.makeComponentDefDescriptor("hi"),
-                    "markup://aura:iDontExist", "APPLICATION", vendor.makeLocation("f1", 5, 5, 0));
-            deps.clear();
-            testDependencyDef.appendDependencies(deps);
+            testDependencyDef.validateReferences();
             fail("Exception not thrown when looking for dependency that does not exist");
         } catch (Exception e) {
             checkExceptionFull(e, InvalidDefinitionException.class,
@@ -121,11 +122,12 @@ public class DependencyDefImplTest extends AuraImplTestCase {
         }
 
         // Valid resource name but wrong type
+        testDependencyDef = vendor.makeDependencyDef(vendor.makeComponentDefDescriptor("hi"),
+                "markup://aura:application", "COMPONENT", vendor.makeLocation("f1", 5, 5, 0));
+        deps.clear();
+        testDependencyDef.appendDependencies(deps);
         try {
-            testDependencyDef = vendor.makeDependencyDef(vendor.makeComponentDefDescriptor("hi"),
-                    "markup://aura:application", "COMPONENT", vendor.makeLocation("f1", 5, 5, 0));
-            deps.clear();
-            testDependencyDef.appendDependencies(deps);
+            testDependencyDef.validateReferences();
             fail("Exception not thrown when dependency resource is valid but is of wrong type");
         } catch (Exception e) {
             checkExceptionFull(e, InvalidDefinitionException.class,

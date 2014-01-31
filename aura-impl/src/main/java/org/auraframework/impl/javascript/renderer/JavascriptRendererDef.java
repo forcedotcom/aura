@@ -45,7 +45,7 @@ public class JavascriptRendererDef extends DefinitionImpl<RendererDef> implement
     private final String code;
     private final Set<PropertyReference> expressionRefs;
 
-    protected JavascriptRendererDef(Builder builder) throws QuickFixException {
+    protected JavascriptRendererDef(Builder builder) {
         super(builder);
         this.render = builder.render;
         this.afterRender = builder.afterRender;
@@ -53,6 +53,10 @@ public class JavascriptRendererDef extends DefinitionImpl<RendererDef> implement
         this.unrender = builder.unrender;
         this.code = builder.code;
         this.expressionRefs = builder.expressionRefs;
+    }
+
+    @Override
+    public void validateDefinition() throws QuickFixException {
         retrieveLabels();
     }
 
@@ -102,7 +106,7 @@ public class JavascriptRendererDef extends DefinitionImpl<RendererDef> implement
         public Set<PropertyReference> expressionRefs = Sets.newHashSet();
 
         @Override
-        public JavascriptRendererDef build() throws QuickFixException {
+        public JavascriptRendererDef build() {
             return new JavascriptRendererDef(this);
         }
     }

@@ -35,6 +35,7 @@ import org.auraframework.test.mock.MockAction;
 import org.auraframework.test.mock.Stub;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.impl.javascript.controller.JavascriptControllerDef.Builder;
 
 import com.google.common.collect.ImmutableList;
 
@@ -137,5 +138,12 @@ public class JavascriptMockActionHandler extends JavascriptMockHandler<Controlle
             List<?> parameters = getParameters();
             return method.getName().equals(getMethodName()) && parameters.get(0).equals(args[0]);
         }
+    }
+
+    @Override
+    protected ControllerDef createDefinition(Throwable error) {
+        Builder builder = new Builder();
+        builder.setParseError(error);
+        return builder.build();
     }
 }

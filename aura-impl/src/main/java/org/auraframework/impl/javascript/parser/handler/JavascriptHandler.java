@@ -70,40 +70,38 @@ public abstract class JavascriptHandler<D extends Definition, T extends Definiti
         builder.setLocation(getLocation());
     }
 
-    public T getDefinition() throws QuickFixException {
+    public T getDefinition() {
         JsonStreamReader in = null;
+        Map<String, Object> map = null;
         try {
             in = new JsonStreamReader(source.getHashingReader(), getHandlerProvider());
-            JsonConstant token = in.next();
-            if (token == JsonConstant.FUNCTION_ARGS_START) {
-                in.next();
+            try {
+                JsonConstant token = in.next();
+                if (token == JsonConstant.FUNCTION_ARGS_START) {
+                    in.next();
+                }
+                map = in.getObject();
+            } finally {
+                try {
+                    in.close();
+                } catch (IOException e) {
+                    // We are in a very confusing state here, don't throw an exception.
+                    // Either we've already had an exception, in which case we have
+                    // more information there, or we successfully finished, in which
+                    // case it is rather unclear how this could happen.
+                }
             }
-            Map<String, Object> map = in.getObject();
-            in.close();
 
             TextTokenizer tt = TextTokenizer.tokenize(source.getContents(), getLocation());
             tt.addExpressionRefs(this);
 
             return createDefinition(map);
+        } catch (QuickFixException qfe) {
+            return createDefinition(qfe);
         } catch (JsonParseException pe) {
-            throw new AuraRuntimeException(pe, getLocation());
+            return createDefinition(new AuraRuntimeException(pe, getLocation()));
         } catch (IOException e) {
-            throw new AuraRuntimeException(e, getLocation());
-        } finally {
-            if (in != null) {
-                try {
-                    in.close();
-                } catch (IOException e) {
-                    // We are in a very confusing state here, don't throw an
-                    // exception.
-                    // Either we've already had an exception, in which case we
-                    // have
-                    // more information there, or we successfully finished, in
-                    // which
-                    // case it is rather unclear how this could happen.
-                    // throw new AuraRuntimeException(e);
-                }
-            }
+            return createDefinition(new AuraRuntimeException(e, getLocation()));
         }
     }
 
@@ -113,6 +111,13 @@ public abstract class JavascriptHandler<D extends Definition, T extends Definiti
      * @param map the source that was read in
      */
     protected abstract T createDefinition(Map<String, Object> map) throws QuickFixException;
+
+    /**
+     * create the definition from a parse error.
+     * 
+     * @param error the parse error.
+     */
+    protected abstract T createDefinition(Throwable error);
 
     public static String getCompressedSource(Source<?> source) {
         /**

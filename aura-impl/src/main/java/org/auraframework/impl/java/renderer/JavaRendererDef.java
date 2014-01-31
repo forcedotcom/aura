@@ -57,7 +57,7 @@ public class JavaRendererDef extends DefinitionImpl<RendererDef> implements Rend
     @Override
     public void validateDefinition() throws QuickFixException {
         super.validateDefinition();
-        if (this.renderer == null) {
+        if (renderer == null) {
             throw new InvalidDefinitionException("Renderer must implement the Renderer interface.", location);
         }
     }
@@ -103,23 +103,26 @@ public class JavaRendererDef extends DefinitionImpl<RendererDef> implements Rend
          * This class is currently a bit over complicated, as it handles the old
          * static case for render methods.
          */
-        protected void buildRenderer() throws QuickFixException {
-            if (this.rendererClass == null) {
+        protected void buildRenderer() {
+            if (rendererClass == null) {
                 return;
             }
 
-            List<Class<? extends Renderer>> interfaces = AuraUtil.findInterfaces(this.rendererClass, Renderer.class);
+            List<Class<? extends Renderer>> interfaces = AuraUtil.findInterfaces(rendererClass, Renderer.class);
             if (!interfaces.isEmpty()) {
                 try {
-                    this.rendererInstance = (Renderer) rendererClass.newInstance();
+                    rendererInstance = (Renderer) rendererClass.newInstance();
                 } catch (InstantiationException ie) {
-                    throw new InvalidDefinitionException("Cannot instantiate " + getLocation(), getLocation());
+                    setParseError(new InvalidDefinitionException("Cannot instantiate " + getLocation(), getLocation()));
                 } catch (IllegalAccessException iae) {
-                    throw new InvalidDefinitionException("Constructor is inaccessible for " + getLocation(),
-                            getLocation());
+                    setParseError(new InvalidDefinitionException("Constructor is inaccessible for " + getLocation(),
+                            getLocation()));
+                } catch (RuntimeException e) {
+                    setParseError(new InvalidDefinitionException("Cannot instantiate " + getLocation(), getLocation(),
+                            e));
                 }
             } else {
-                this.rendererInstance = null;
+                rendererInstance = null;
             }
         }
 
@@ -133,7 +136,7 @@ public class JavaRendererDef extends DefinitionImpl<RendererDef> implements Rend
         }
 
         @Override
-        public JavaRendererDef build() throws QuickFixException {
+        public JavaRendererDef build() {
             this.buildRenderer();
             return new JavaRendererDef(this);
         }

@@ -23,6 +23,7 @@ import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.javascript.helper.JavascriptHelperDef;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 
 /**
  * @hierarchy Aura.Unit Tests.Components.HelperDef
@@ -100,7 +101,7 @@ public class HelperDefTest extends AuraImplTestCase {
         try {
             testCmp2.getDef();
             fail("The helper directive used the wrong format. It is using a colon(':') as seperator. Should have failed.");
-        } catch (AuraRuntimeException e) {
+        } catch (InvalidDefinitionException e) {
             assertTrue(e.getMessage().contains("Invalid Descriptor Format"));
         }
 
@@ -120,7 +121,7 @@ public class HelperDefTest extends AuraImplTestCase {
         try {
             Aura.getDefinitionService().getDefinition("test:test_ComponentWithBadHelper", ComponentDef.class);
             fail("Should have failed to fetch component definition because helper file is incomplete.");
-        } catch (AuraRuntimeException e) {
+        } catch (InvalidDefinitionException e) {
             assertNotNull(e);
         }
     }

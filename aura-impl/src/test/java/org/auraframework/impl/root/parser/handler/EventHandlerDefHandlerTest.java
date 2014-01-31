@@ -23,7 +23,8 @@ import org.auraframework.impl.root.parser.XMLParser;
 import org.auraframework.impl.source.StringSource;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Parser.Format;
-import org.auraframework.throwable.AuraRuntimeException;
+
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 
 public class EventHandlerDefHandlerTest extends AuraImplTestCase {
 
@@ -47,12 +48,13 @@ public class EventHandlerDefHandlerTest extends AuraImplTestCase {
         StringSource<ComponentDef> source = new StringSource<ComponentDef>(descriptor, "<aura:component>"
                 + "<aura:registerevent name='dupName' type='aura:click'/>"
                 + "<aura:registerevent name='dupName' type='aura:click'/>" + "</aura:component>", "myID", Format.XML);
+        ComponentDef cd = parser.parse(descriptor, source);
         try {
-            parser.parse(descriptor, source);
+            cd.validateDefinition();
             fail("Should have thrown AuraRuntimeException for registering two events with the same name");
-        } catch (AuraRuntimeException e) {
-            assertTrue("Failed due to some other reason but not duplicate event names",
-                    e.getMessage().contains("Multiple events registered with name"));
+        } catch (Exception e) {
+            checkExceptionContains(e, InvalidDefinitionException.class, 
+                    "Multiple events registered with name");
         }
 
     }
@@ -67,10 +69,13 @@ public class EventHandlerDefHandlerTest extends AuraImplTestCase {
         DefDescriptor<EventDef> descriptor = DefDescriptorImpl.getInstance("aura:testevent", EventDef.class);
         StringSource<EventDef> source = new StringSource<EventDef>(descriptor,
                 "<aura:event type='component' abstract='true'></aura:event>", "myID", Format.XML);
+        EventDef ed = parser.parse(descriptor, source);
         try {
-            parser.parse(descriptor, source);
+            ed.validateDefinition();
             fail("Should have thrown AuraRuntimeException for creating an abstract event");
-        } catch (AuraRuntimeException e) {
+        } catch (Exception e) {
+            checkExceptionContains(e, InvalidDefinitionException.class, 
+                    "Invalid attribute \"abstract\"");
         }
     }
 }

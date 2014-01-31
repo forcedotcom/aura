@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.auraframework.builder.RootDefinitionBuilder;
 import org.auraframework.def.AttributeDef;
@@ -28,6 +29,7 @@ import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
+
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.collect.ImmutableMap;
@@ -62,6 +64,17 @@ public abstract class RootDefinitionImpl<T extends RootDefinition> extends Defin
         }
 
         this.hashCode = AuraUtil.hashCode(descriptor, location, attributeDefs);
+    }
+
+    @Override
+    public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
+        super.appendDependencies(dependencies);
+        if (providerDescriptors != null) {
+            dependencies.addAll(providerDescriptors);
+        } 
+        for (AttributeDef attr : attributeDefs.values()) {
+            attr.appendDependencies(dependencies);
+        }
     }
 
     @Override
@@ -122,6 +135,7 @@ public abstract class RootDefinitionImpl<T extends RootDefinition> extends Defin
             this.support = support;
             return this;
         }
+
     }
 
     @Override

@@ -68,4 +68,20 @@ public interface DefBuilder<PrimaryIntf extends Definition, DefOrRefType extends
     DefBuilder<PrimaryIntf, DefOrRefType> setOwnHash(String hash);
 
     DefDescriptor<PrimaryIntf> getDescriptor();
+
+    /**
+     * Set an error from when we are parsing/building the def.
+     *
+     * This method allows the building process to set a parse error that will be returned
+     * as a quick fix exception. If the cause is of an appropriate type information is
+     * extracted/sent on to the quick fix.
+     *
+     * @param cause the underlying throwable.
+     */
+    void setParseError(Throwable cause);
+
+    /**
+     * Get any error that occurred during the build process.
+     */
+    QuickFixException getParseError();
 }

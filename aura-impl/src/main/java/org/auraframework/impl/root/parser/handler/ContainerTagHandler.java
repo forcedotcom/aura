@@ -50,6 +50,7 @@ public abstract class ContainerTagHandler<T extends Definition> extends XMLHandl
     @Override
     public final T getElement() throws XMLStreamException, QuickFixException {
         if (source.exists()) {
+            validateAttributes();
             this.startLocation = getLocation();
             String startTag = getTagName();
             if (!handlesTag(startTag)) {
@@ -87,6 +88,10 @@ public abstract class ContainerTagHandler<T extends Definition> extends XMLHandl
             }
         }
 
+        return createDefinition();
+    }
+
+    public final T getErrorElement() throws QuickFixException {
         return createDefinition();
     }
 

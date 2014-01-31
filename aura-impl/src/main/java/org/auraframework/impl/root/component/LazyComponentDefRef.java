@@ -52,7 +52,7 @@ public class LazyComponentDefRef extends ComponentDefRefImpl {
     }
 
     @Override
-    public void appendDependencies(Set<DefDescriptor<?>> dependencies) throws QuickFixException {
+    public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
         DefDescriptor<?> descriptor = (DefDescriptor<?>) getAttributeDefRef("refDescriptor").getValue(); 
         dependencies.add(descriptor);
         super.appendDependencies(dependencies);

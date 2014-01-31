@@ -115,7 +115,7 @@
     },
 
     supportsTouchEvents : function () {
-        return $A.util.supportsTouchEvents() || navigator.msPointerEnabled;
+        return $A.util.supportsTouchEvents();
     },
 
     initFastClick : function() {

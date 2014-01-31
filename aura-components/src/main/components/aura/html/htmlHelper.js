@@ -77,137 +77,157 @@
         "track" : true,
         "wbr" : true
     },
+    
+    GESTURE: function (){
+        var g;
+        if (this.cachedGestures) {
+            return this.cachedGestures;
+        } else {
+            if (navigator.msPointerEnabled) {
+                g = {
+                        start : 'MSPointerDown',
+                        move : 'MSPointerMove',
+                        end : 'MSPointerUp' 
+                    };
+                
+            } else {
+                g = {
+                        start : 'touchstart',
+                        move : 'touchmove',
+                        end : 'touchend'
+                    };
+            }
+            return this.cachedGestures = g;
+        }
+    },
 
     caseAttribute : function(attribute) {
         return this.SPECIAL_CASINGS()[attribute.toLowerCase()] !== undefined ? this.SPECIAL_CASINGS()[attribute.toLowerCase()] : attribute.toLowerCase();
     },
 
     createFastClickHandler : function(element, handler) {
-        var self = this;
+        var FastClick = this.initFastClick();
         if (this.supportsTouchEvents()) {
-            this.initFastClick();
-
-            // Add "fast click" support for touch enabled devices to avoid 300ms browser lag while it figures out if its a gesture or a click
-            var FastClick = self.FastClick;
-            var fc = new FastClick(element, handler);
+            new FastClick(element, handler);
         } else {
             $A.util.on(element, "click", handler);
         }
     },
 
     supportsTouchEvents : function () {
-    	return $A.util.supportsTouchEvents();
+        return $A.util.supportsTouchEvents();
     },
 
     initFastClick : function() {
-        var self = this;
-        if (!self.FastClick) {
-            self.FastClick = function(element, handler) {
+        var gesture = this.GESTURE(),
+            FastClick;
+
+        if (!this.FastClick) {
+            FastClick = function(element, handler) {
                 this.element = element;
                 this.handler = handler;
-
-                element.addEventListener("touchstart", this, false);
+                element.addEventListener(gesture.start, this, false);
             };
 
-            self.FastClick.prototype.handleEvent = function(event) {
-                switch (event.type) {
-                case "touchstart":
-                    this.onTouchStart(event);
-                    break;
-                case "touchmove":
-                    this.onTouchMove(event);
-                    break;
-                case "touchend":
-                    this.onClick(event);
-                    break;
-                }
-            };
-
-            self.FastClick.prototype.onTouchStart = function(event) {
-                $A.util.on(this.element, "touchend", this, false);
-                //bind touchmove event to element instead of document, for the event could be stop propagated by child elements
-                $A.util.on(this.element, "touchmove", this, false);
-                if(event.touches){
-                    this.startX = event.touches[0].clientX;
-                    this.startY = event.touches[0].clientY;
-                }
-            };
-
-            self.FastClick.prototype.onTouchMove = function(event) {
-            	if(event.touches){
-            		if (Math.abs(event.touches[0].clientX - this.startX) > 4
-                            || Math.abs(event.touches[0].clientY - this.startY) > 4) {
+            FastClick.prototype = {
+                handleEvent : function (event) {
+                    switch (event.type) {
+                    case 'touchstart':
+                    case 'MSPointerDown':
+                        this.onTouchStart(event);
+                        break;
+                    case 'touchmove':
+                    case 'MSPointerMove':
+                        this.onTouchMove(event);
+                        break;
+                    case 'touchend':
+                    case 'MSPointerUp':
+                        this.onClick(event);
+                        break;
+                    }
+                },
+                onTouchStart : function(event) {
+                    var point = event.touches ? event.touches[0] : event;
+                    $A.util.on(this.element, gesture.end, this, false);
+                    //bind touchmove event to element instead of document, for the event could be stop propagated by child elements
+                    $A.util.on(this.element, gesture.move, this, false);
+                    this.startX = point.pageX;
+                    this.startY = point.pageY;
+                },
+                onTouchMove : function(event) {
+                    var point = event.touches ? event.touches[0] : event;
+                    if (Math.abs(point.pageX - this.startX) > 4 || Math.abs(point.pageY - this.startY) > 4) {
                         this.reset();
                     }
-            	}
-            };
+                },
+                onClick : function(event) {
+                    event.stopPropagation();
+                    event.preventDefault();
+                    this.element.focus();
+                    this.handler(event);
 
-            self.FastClick.prototype.onClick = function(event) {
-                event.stopPropagation();
-                event.preventDefault();
-                this.element.focus();
-                this.handler(event);
+                    if (event.type == gesture.end) {
+                        this.preventGhostClick(this.startX, this.startY);
+                    }
+                    this.reset();
+                },
+                reset : function() {
+                   $A.util.removeOn(this.element, gesture.end, this, false);
+                   $A.util.removeOn(this.element, gesture.move, this, false);
 
-                if (event.type == "touchend") {
-                    self.FastClick.preventGhostClick(this.startX,
-                            this.startY);
+                    this.startX = 0;
+                    this.startY = 0;
+                },
+                preventGhostClick : function(x, y) {
+                    FastClick.clickbusterCoordinates.push(x, y);
+                    window.setTimeout(FastClick.pop, 2500);
+                },
+
+                pop : function() {
+                    FastClick.clickbusterCoordinates.splice(0, 2);
                 }
-
-                this.reset();
             };
 
-            self.FastClick.prototype.reset = function() {
-            	$A.util.removeOn(this.element, "touchend", this, false);
-            	$A.util.removeOn(this.element, "touchmove", this, false);
-
-                this.startX = 0;
-                this.startY = 0;
-            };
-
-            self.FastClick.preventGhostClick = function(x, y) {
-                self.FastClick.clickbusterCoordinates.push(x, y);
-                window.setTimeout(self.FastClick.pop, 2500);
-            };
-
-            self.FastClick.pop = function() {
-                self.FastClick.clickbusterCoordinates.splice(0, 2);
-            };
-
-            var onClickBuster = function(event) {
-                for ( var i = 0; i < self.FastClick.clickbusterCoordinates.length; i += 2) {
-                    var x = self.FastClick.clickbusterCoordinates[i];
-                    var y = self.FastClick.clickbusterCoordinates[i + 1];
-                    if (Math.abs(event.clientX - x) < 25
-                            && Math.abs(event.clientY - y) < 25) {
+            FastClick.onClickBuster = function(event) {
+                var point = event.touches ? event.touches[0] : event,
+                    i, x, y;
+                for (i = 0; i < FastClick.clickbusterCoordinates.length; i += 2) {
+                    x = FastClick.clickbusterCoordinates[i];
+                    y = FastClick.clickbusterCoordinates[i + 1];
+                    if (Math.abs(point.pageX - x) < 25 && Math.abs(point.pageY - y) < 25) {
                         event.stopPropagation();
                         event.preventDefault();
                     }
                 }
             };
 
-            self.FastClick.clickbusterCoordinates = [];
-            $A.util.on(document, "click", onClickBuster, true);
+            FastClick.clickbusterCoordinates = [];
+            $A.util.on(document, "click", FastClick.onClickBuster, true);
+
+            this.FastClick = FastClick;
         }
+
+        return this.FastClick;
     },
 
     domEventHandler : function (event) {
-        var eventName = "on" + event.type;
-        var element = event.currentTarget;
-        var ownerComponent = $A.componentService.getRenderingComponentForElement(element);
-        var attributes = ownerComponent.getAttributes();
-        var valueProvider = attributes.getValueProvider();
+        var eventName       = "on" + event.type,
+            element         = event.currentTarget,
+            ownerComponent  = $A.componentService.getRenderingComponentForElement(element),
+            attributes      = ownerComponent.getAttributes(),
+            valueProvider   = attributes.getValueProvider(),
+            htmlAttributes  = attributes.getValue("HTMLAttributes"),
+            valueExpression = htmlAttributes.getValue(eventName),
+            onclickExpression;
 
-        var htmlAttributes = attributes.getValue("HTMLAttributes");
-        var valueExpression = htmlAttributes.getValue(eventName);
-
-        if (eventName === "ontouchend") {
-        	// Validate that either onclick or ontouchend is wired up to an action never both simultaneously
-            var onclickExpression = htmlAttributes.getValue("onclick");
+        if (eventName === 'touchend' || 'MSPointerUp') {
+            // Validate that either onclick or ontouchend is wired up to an action never both simultaneously
+            onclickExpression = htmlAttributes.getValue("onclick");
             if (onclickExpression.isDefined()) {
-            	if (!valueExpression.isDefined()) {
-    	            // Map from touch event to onclick
-                	valueExpression = onclickExpression;
-            	}
+                if (!valueExpression.isDefined()) {
+                    // Map from touch event to onclick
+                    valueExpression = onclickExpression;
+                }
             }
         }
 
@@ -227,13 +247,13 @@
     },
 
     createHtmlAttribute: function(name, ve, config) {
-        var ret = config.ret;
-        var component = config.component;
-        var attributes = component.getAttributes();
-        var valueProvider = attributes.getValueProvider();
-        var on = $A.util.on;
+        var ret           = config.ret,
+            component     = config.component,
+            attributes    = component.getAttributes(),
+            valueProvider = attributes.getValueProvider(),
+            on            = $A.util.on,
+            value;
 
-        var value;
         // special handling if the attribute is an inline event handler
         if (name.toLowerCase().indexOf("on") === 0) {
             var eventName = name.substring(2);
@@ -247,23 +267,23 @@
             // ve is either an expression (and needs to be evaluated by
             // the expressionService), or a literal
             if (ve && ve.isExpression) {
-            	if (ve.isExpression()) {
-	                value = $A.expressionService.getValue(valueProvider, ve);
+                if (ve.isExpression()) {
+                    value = $A.expressionService.getValue(valueProvider, ve);
 
-	                // get the actual value from the Value object (if it's not null)
-	                if (value && value.auraType === "Value") {
-	                    if (aura.util.arrayIndexOf(this.SPECIAL_BOOLEANS, name.toLowerCase()) > -1) {
-	                        // TODO: values should someday know their type and do the right thing with getValue()
-	                        value = value.getBooleanValue();
-	                    } else {
-	                        value = value.getValue();
-	                    }
-	                }
-            	} else {
+                    // get the actual value from the Value object (if it's not null)
+                    if (value && value.auraType === "Value") {
+                        if (aura.util.arrayIndexOf(this.SPECIAL_BOOLEANS, name.toLowerCase()) > -1) {
+                            // TODO: values should someday know their type and do the right thing with getValue()
+                            value = value.getBooleanValue();
+                        } else {
+                            value = value.getValue();
+                        }
+                    }
+                } else {
                     value = ve.getValue();
-            	}
+                }
             } else{
-            	value = ve;
+                value = ve;
             }
 
             var isHash = value && value.indexOf && value.indexOf("#") === 0;
@@ -299,7 +319,7 @@
                 ret.setAttribute(name, value);
             } else if (aura.util.arrayIndexOf(this.SPECIAL_BOOLEANS, name.toLowerCase()) > -1) {
                 // handle the boolean attributes for whom presence implies truth
-            	var casedName = this.caseAttribute(name);
+                var casedName = this.caseAttribute(name);
                 if (value === false) {
                     ret.removeAttribute(casedName);
                 } else {
@@ -307,7 +327,7 @@
 
                     // Support for IE's weird handling of checked
                     if (casedName === "checked"){
-                    	ret.setAttribute("defaultChecked", true);
+                        ret.setAttribute("defaultChecked", true);
                     }
                 }
             } else {

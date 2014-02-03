@@ -21,15 +21,15 @@
 	<p>Aura components are created with accessibility in mind. A sample of components and that are built based on the <ui:outputURL label="WAI-ARIA 1.0 Authoring Practices" target="_blank" value="http://www.w3.org/TR/wai-aria-practices/" /> are as follows.
 	This guideline applies to components that extend these components. 
 	<ul>
-		<li><auradocs:defLink descriptor="ui:autocomplete" defType="component" /></li>
-		<li><auradocs:defLink descriptor="ui:carousel" defType="component" /></li>
-		<li><auradocs:defLink descriptor="ui:datePicker" defType="component" /></li>
-		<li><auradocs:defLink descriptor="ui:dialog" defType="component" /></li>
-		<li><auradocs:defLink descriptor="ui:image" defType="component" /></li>
-		<li><auradocs:defLink descriptor="ui:input" defType="component" /></li>
-		<li><auradocs:defLink descriptor="ui:menu" defType="component" /></li>
+		<li><auradocs:defLink descriptor="ui:autocomplete" defType="component" /> - for autocompleting dropdowns</li>
+		<li><auradocs:defLink descriptor="ui:carousel" defType="component" /> - for carousel interactions</li>
+		<li><auradocs:defLink descriptor="ui:datePicker" defType="component" /> - for calendar pickers</li>
+		<li><auradocs:defLink descriptor="ui:dialog" defType="component" /> - for modal and non-modal overlays</li>
+		<li><auradocs:defLink descriptor="ui:image" defType="component" /> - for images and icons</li>
+		<li><auradocs:defLink descriptor="ui:input" defType="component" /> - for input elements such as text, textarea, or date</li>
+		<li><auradocs:defLink descriptor="ui:menu" defType="component" /> - for menus, dropdowns, and muttons</li>
 	</ul>
-	<p>When customizing these components or their sub-components, be careful in preserving code that ensures accessibility, such as the <code>aria</code> attributes.</p>
+	<p>When customizing these components or their sub-components, be careful in preserving code that ensures accessibility, such as the <code>aria</code> attributes. See <auradocs:topicLink topic="overviewUI">Building the User Interface</auradocs:topicLink> for components you can use in your apps.</p>
 	</p>
 	<h3>Accessibility Testing</h3>
 	<p>Testing your app for accessibility ensures that the app is accessible by users of varying abilities. For apps developed on Android devices,
@@ -37,6 +37,24 @@
 	For iOS devices, use <ui:outputURL label="VoiceOver" value="https://developer.apple.com/library/ios/#technotes/TestingAccessibilityOfiOSApps/TestAccessibilityonYourDevicewithVoiceOver" target="_blank"/> to test for accessibility.
 	For desktop devices, use <ui:outputURL value="http://wave.webaim.org/toolbar/" label="Wave Toolbar"/> to check for accessibility errors and recommendations for your apps.
 	</p>
+	
+	<p>To check that a component's HTML output is accessibility compliant, run <code> $A.test.assertAccessible()</code>. You can also run <code>$A.devToolService.checkAccessibility()</code> on a browser console.
+	</p>
+	
+	<h3>Accessibility Anti-Patterns</h3>
+	<p>When developing or testing with Aura and HTML markup, beware of:</p>
+	<ul>
+		<li>Images without <code>alt</code> attribute.</li>
+		<li>Anchor element without textual content</li>
+		<li><code>input</code> elements without associated <code>label</code></li>
+		<li>Group of radio buttons not in a <code>fieldset</code> tag</li>
+		<li><code>iframe</code> or <code>frame</code> elements with empty <code>title</code> attribute</li>
+		<li><code>fieldset</code> element without a <code>legend</code></li>
+		<li><code>th</code> element without a <code>scope</code> attribute</li>
+		<li><code>head</code> element with an empty <code>title</code></li>
+		<li>Headings (<code>H1</code>, <code>H2</code>, etc.) increasing by more than one level at a time</li>
+		<li>CSS color contrast ratio between text and background less than 4.5:1</li>
+	</ul>
 	
 	<p>
     <b>See Also:</b><br/>

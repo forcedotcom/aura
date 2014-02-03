@@ -87,7 +87,7 @@ This guide explains the accessibility features of Aura components in the <code>u
     
     <h3>Images</h3>
     <p>For an image to be accessible, set an appropriate alternative text attribute. If your image is informational, or actionable as part of a hyperlink, set the <code>alt</code> attribute to a descriptive alternative text.
-    	If the image is purely decorative, set <code>imageType="decorative"</code>. This generates a null <code>alt</code> attribute in the <code>img</code> tag.
+    	If the image is purely decorative, set <code>imageType="decorative"</code>. This generates a null <code>alt</code> attribute in the <code>img</code> tag. 
 
 <auradocs:codeblock>
 &lt;ui:image src="s.gif" imageType="informational" alt="Open Menu">

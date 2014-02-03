@@ -20,7 +20,7 @@
     <h3><code>ui:image</code></h3>
     <p>To display images, use the <code>ui:image</code> component. <code>ui:image</code> provides built-in functionalities that automates common usages of the HTML <code>&lt;img&gt;</code> tag, such as <code>href</code> linking and other attributes.
      For an example on how you can use component attributes in images to switch between CSS classes, take a look at the <auradocs:defLink descriptor="ui:outputCheckbox">ui:outputCheckbox</auradocs:defLink> component.</p> 
-    <p>Additionally, include the <code>imageType</code> attribute to denote if the image is informational or decorative.</p>
+    <p>Additionally, include the <code>imageType</code> attribute to denote if the image is informational or decorative. Use the <code>title</code> attribute for tooltips, especially for icons.</p>
     <h4>Informational Image</h4>
     <p>Informational images can provide information that may not be available in the text, such as a Like or Follow image. 
     They are actionable and can stand alone in a button or hyperlink. 

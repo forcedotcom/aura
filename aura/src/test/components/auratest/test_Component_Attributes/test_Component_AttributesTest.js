@@ -96,14 +96,26 @@
         }
 
     },
-    testVerifyInsertingNewAttributes:{
+
+    /**
+     * Verify behavior of setting the value of an attribute that does not exist.
+     * 
+     * Currently setting a non-existent attribute is a no-op, but after W-795118 is fixed, we should throw an Error.
+     */
+    testVerifySetValueNonExistentAttributes:{
         test: function(component){
-            //Calling getValue() on a non existing key (attribute)
             var attributeSet = component.getAttributes();
             var newValue = attributeSet.getValue('nonExistingAttribute');
-            aura.test.assertFalse(newValue.isDefined(), 'A defined Value object was created');
-            //TODO: W-795118
-            //aura.test.assertTrue(attributeSet.getValue('nonExistingAttribute').getValue()==='blah', "New member value not editable");
+            $A.test.assertFalse(newValue.isDefined(), 'A defined Value object was created');
+            // TODO(W-795118): AttributeSet.setValues should assert that the attribute exists
+            // try {
+                attributeSet.setValue('nonExistingAttribute', 'blahhh');
+                // $A.test.fail("Setting a non-existent attribute should throw error.");
+            // } catch (e) {
+                // $A.test.assertTrue(e.message.indexOf("Assertion Failed!: Unknown attribute") != -1,
+                //        "Setting non-existent attribute did not throw expected Error.");
+                $A.test.assertFalse(attributeSet.getValue('nonExistingAttribute').isDefined());
+            // }
         }
     },
 

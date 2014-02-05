@@ -43,6 +43,7 @@ public final class ClientLibraryDefImpl extends DefinitionImpl<ClientLibraryDef>
     private final Type type;
     private final Set<AuraContext.Mode> modes;
     private final boolean combine;
+    private final int myHashCode;
 
     protected ClientLibraryDefImpl(Builder builder) {
         super(builder);
@@ -52,6 +53,21 @@ public final class ClientLibraryDefImpl extends DefinitionImpl<ClientLibraryDef>
         this.url = builder.url;
         this.modes = builder.modes;
         this.combine = builder.combine;
+
+        int val = 0;
+
+        if (url != null) {
+            val += url.hashCode();
+        }
+        if (name != null) {
+            val += name.hashCode();
+        }
+        if (modes != null) {
+            for (AuraContext.Mode mode : modes) {
+                val += mode.hashCode();
+            }
+        }
+        this.myHashCode = val;
     }
 
     @Override
@@ -187,6 +203,11 @@ public final class ClientLibraryDefImpl extends DefinitionImpl<ClientLibraryDef>
 
         }
         return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return myHashCode;
     }
 
     public static class Builder extends DefinitionImpl.BuilderImpl<ClientLibraryDef>

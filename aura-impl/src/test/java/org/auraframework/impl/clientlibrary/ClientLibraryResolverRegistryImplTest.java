@@ -128,7 +128,7 @@ public class ClientLibraryResolverRegistryImplTest extends AuraImplTestCase {
         assertResolvers("CkEditor", Type.JS, AuraResourceResolver.class);
     }
     
-    private void assertResolvers(String name, Type type, Class expectedResolver){
+    private void assertResolvers(String name, Type type, Class<?> expectedResolver){
         ClientLibraryResolverRegistry reg = ClientLibraryResolverRegistryImpl.INSTANCE;
         ClientLibraryResolver resolver = reg.get(name, type);
         assertNotNull("Failed to find resolver for "+name+" of type "+type.toString(), resolver);

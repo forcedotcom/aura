@@ -29,7 +29,6 @@ import org.openqa.selenium.WebElement;
 
 public class InputDateWithLabelUITest extends WebDriverTestCase {
 
-    
     // URL string to go to
     public String URL = "/uitest/inputDate_Test.cmp";
     private final String DATE_FORMAT_STR = "yyyy-MM-dd";
@@ -41,19 +40,19 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
     private final String SELECTED_DATE = "a[class*='selectedDate']";
 
     private final String CLASSNAME = "return $A.test.getActiveElement().className";
-    
+
     public InputDateWithLabelUITest(String name) {
         super(name);
 
-       
     }
+
     /**
-     * Excluded Browser Reasons: 
+     * Excluded Browser Reasons:
      * IE7:    pageUpDown test is flappy, works through webdriver after running a few times and manually. Issue here is that it will 
      *         sometimes stop one short
-     * IE8:    homeEndButton test is flappy, works fine manually and on webdriver after running a few times     
-     * IE9/10: Sending in Shift anything (tab, page up, page down), does not register when sent through WebDriver. 
-     *         Manually works fine 
+     * IE8:    homeEndButton test is flappy, works fine manually and on webdriver after running a few times 
+     * IE9/10: Sending in Shift anything (tab, page up, page down), does not register when sent through WebDriver.
+     *         Manually works fine
      * Android and IOS devices: this feature will not be used on mobile devices. Instead the their native versions will be used 
      * Safari: Sending in Shift tab does not register when sent through WebDriver. Manually works fine
      */
@@ -100,7 +99,6 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
         return element.getAttribute("value");
     }
 
-   
     private String homeEndButtonHelper(String initDate, Keys buttonToPress)
     {
         // Getting the input box, making sure it is clear, and sending in the the starting date
@@ -139,7 +137,8 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
      *********************************** Date Picker Tests*******************************************
      ***********************************************************************************************/
     // Home and End Button Test using January (31 days) , February (28 or 29 days), September (30 days)
-    @ExcludeBrowsers({ BrowserType.IE7, BrowserType.IE8, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
+    @ExcludeBrowsers({ BrowserType.IE7, BrowserType.IE8, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET,
+            BrowserType.IPAD, BrowserType.IPHONE })
     public void testHomeEnd() throws Exception {
         open(URL);
 
@@ -173,7 +172,8 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
     }
 
     // Testing the functionality of page_down, page_up, shift+page_down, shift+page_up
-    @ExcludeBrowsers({ BrowserType.IE7, BrowserType.IE9, BrowserType.IE10, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET,
+    @ExcludeBrowsers({ BrowserType.IE7, BrowserType.IE9, BrowserType.IE10, BrowserType.ANDROID_PHONE,
+            BrowserType.ANDROID_TABLET,
             BrowserType.IPAD, BrowserType.IPHONE })
     public void testPageUpDownYear() throws Exception {
         DateFormat formatter = new SimpleDateFormat(DATE_FORMAT_STR);
@@ -243,8 +243,8 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
 
     // Testing functionallity of tab, starting from the InputBox to the today button
     // Do Not run with Safari. Safari does not handle tabs normally
-    @ExcludeBrowsers({ BrowserType.SAFARI, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD,
-            BrowserType.IPHONE })
+    @ExcludeBrowsers({ BrowserType.SAFARI6, BrowserType.SAFARI, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET,
+            BrowserType.IPAD, BrowserType.IPHONE })
     public void testTab() throws Exception {
         open(URL);
 
@@ -272,13 +272,14 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
         // Clicking on the today link
         classOfActiveElem = "" + auraUITestingUtil.getEval(CLASSNAME);
         element = findDomElement(By.cssSelector("button[class*='" + classOfActiveElem + "']"));
-        String elementClass = element.getAttribute("class"); 
-        assertTrue("Tabbing through every buttong did not take us to the today button", elementClass.indexOf("calToday") >= 0);
+        String elementClass = element.getAttribute("class");
+        assertTrue("Tabbing through every buttong did not take us to the today button",
+                elementClass.indexOf("calToday") >= 0);
     }
 
     // Checking functionality of the shift tab button
-    @ExcludeBrowsers({ BrowserType.IE9, BrowserType.IE10, BrowserType.SAFARI, BrowserType.ANDROID_PHONE,
-            BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
+    @ExcludeBrowsers({ BrowserType.IE9, BrowserType.IE10, BrowserType.SAFARI6, BrowserType.SAFARI,
+            BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
     public void testShiftTab() throws Exception {
         open(URL);
 
@@ -303,7 +304,7 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
         String shftTab = Keys.SHIFT + "" + Keys.TAB;
 
         // Going from Today hyperlink, back to SELECTED_DATE
-        //gotToNextElem(driver, shftTab);
+        // gotToNextElem(driver, shftTab);
         String classOfActiveElemButton = "button[class*='" + auraUITestingUtil.getEval(CLASSNAME) + "']";
         findDomElement(By.cssSelector(classOfActiveElemButton)).sendKeys(shftTab);
 

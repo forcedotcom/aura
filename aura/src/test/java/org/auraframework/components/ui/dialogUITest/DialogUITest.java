@@ -27,11 +27,11 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 /**
- * Non-supported browsers:
+ * Non-supported browsers: 
  *              IE7:    Does not work friendly with web-driver tabbing functionality or with $A.foreach
- *                      Test that use that do not test on IE. Manual testing has been done.
- *              IE8:    Does not work with $A.foreach. Manual testing has been done however
- *              Safari: Does not support tabbing/pressing enter when done through web driver. So the tests that require it 
+ *                      Test that use that do not test on IE. Manual testing has been done. 
+ *              IE8:    Does not work with $A.foreach. Manual testing has been done however 
+ *              Safari: Does not support tabbing/pressing enter when done through web driver. So the tests that require it
  *                      have been removed.
  * 
  * @author mkohanfars
@@ -63,7 +63,7 @@ public class DialogUITest extends WebDriverTestCase {
 
     // Helper method used to make sure that enter is not used for Safari
     public void clickOnElementOrPressEnter(WebElement elm) {
-        if (BrowserType.SAFARI.equals(getBrowserType())) {
+        if (BrowserType.SAFARI6.equals(getBrowserType()) || BrowserType.SAFARI.equals(getBrowserType())) {
             elm.click();
         } else {
             auraUITestingUtil.pressEnter(elm);
@@ -133,8 +133,8 @@ public class DialogUITest extends WebDriverTestCase {
     /***********************************************************************************************
      *************************** NON-MODAL DIALOG BOX CHECK******************************************
      ***********************************************************************************************/
-    @ExcludeBrowsers({ BrowserType.IE7, BrowserType.IE8, BrowserType.SAFARI, BrowserType.ANDROID_PHONE,
-            BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
+    @ExcludeBrowsers({ BrowserType.IE7, BrowserType.IE8, BrowserType.SAFARI6, BrowserType.SAFARI,
+            BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
     public void testDialogNonModalCheckBoxes() throws MalformedURLException, URISyntaxException {
         open(URL_NON_MODAL_WITH_CHECKBOXES);
 
@@ -143,7 +143,8 @@ public class DialogUITest extends WebDriverTestCase {
 
         String classOfActiveElem = "input[class*='" + auraUITestingUtil.getEval(CLASSNAME) + "']";
         WebElement element = driver.findElement(By.cssSelector(classOfActiveElem));
-        Boolean obj = (Boolean)auraUITestingUtil.getEval("return $A.util.hasClass(arguments[0],\"checkbox1\")", element);
+        Boolean obj = (Boolean) auraUITestingUtil.getEval("return $A.util.hasClass(arguments[0],\"checkbox1\")",
+                element);
         assertTrue("Did not move to next checkbox", obj.booleanValue());
         element.click();
 
@@ -157,8 +158,8 @@ public class DialogUITest extends WebDriverTestCase {
     }
 
     // Checking if Dialog box will will close after having all elements tabbed through
-    @ExcludeBrowsers({ BrowserType.IE7, BrowserType.SAFARI, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET,
-            BrowserType.IPAD, BrowserType.IPHONE })
+    @ExcludeBrowsers({ BrowserType.IE7, BrowserType.SAFARI6, BrowserType.SAFARI, BrowserType.ANDROID_PHONE,
+            BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
     public void testDialogNonModalTab() throws MalformedURLException, URISyntaxException {
         open(URL_NON_MODAL);
 
@@ -189,11 +190,11 @@ public class DialogUITest extends WebDriverTestCase {
         element = driver.findElement(By.cssSelector(classOfActiveElem));
 
         assertClassesSame("Hitting tab did not go to item that called the dialog box",
-            LAUNCH_DIALOG, element.getAttribute("className"));
+                LAUNCH_DIALOG, element.getAttribute("className"));
     }
 
-    @ExcludeBrowsers({ BrowserType.IE7, BrowserType.SAFARI, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET,
-            BrowserType.IPAD, BrowserType.IPHONE })
+    @ExcludeBrowsers({ BrowserType.IE7, BrowserType.SAFARI6, BrowserType.SAFARI, BrowserType.ANDROID_PHONE,
+            BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
     public void testDialogNonModalFocusOnExit() throws MalformedURLException, URISyntaxException {
         open(URL_NON_MODAL);
 
@@ -212,13 +213,13 @@ public class DialogUITest extends WebDriverTestCase {
         // Make sure focus is back on the ok button
         element = driver.findElement(By.cssSelector("button[class*='" + auraUITestingUtil.getEval(CLASSNAME) + "']"));
         assertClassesSame("Hitting tab did not go to item that called the dialog box",
-            LAUNCH_DIALOG, element.getAttribute("className"));
+                LAUNCH_DIALOG, element.getAttribute("className"));
     }
 
     // Checking that the Escape button should not submit with submiting
     // here
-    @ExcludeBrowsers({ BrowserType.IE7, BrowserType.SAFARI, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET,
-            BrowserType.IPAD, BrowserType.IPHONE })
+    @ExcludeBrowsers({ BrowserType.IE7, BrowserType.SAFARI6, BrowserType.SAFARI, BrowserType.ANDROID_PHONE,
+            BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
     public void testDialogNonModalDefaultSubmit() throws MalformedURLException, URISyntaxException {
         open(URL_NON_MODAL);
 
@@ -272,8 +273,8 @@ public class DialogUITest extends WebDriverTestCase {
     }
 
     // Check that shift tab does not break nonModal Dialog boxes
-    @ExcludeBrowsers({ BrowserType.IE7, BrowserType.SAFARI, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET,
-            BrowserType.IPAD, BrowserType.IPHONE })
+    @ExcludeBrowsers({ BrowserType.IE7, BrowserType.SAFARI6, BrowserType.SAFARI, BrowserType.ANDROID_PHONE,
+            BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
     public void testDialogNonModalShiftTab() throws MalformedURLException, URISyntaxException {
         open(URL_NON_MODAL);
 
@@ -291,7 +292,7 @@ public class DialogUITest extends WebDriverTestCase {
         element = driver.findElement(By.cssSelector(classOfActiveElem));
 
         assertClassesSame("Hitting tab did not go to item that called the dialog box",
-            LAUNCH_DIALOG, element.getAttribute("className"));
+                LAUNCH_DIALOG, element.getAttribute("className"));
     }
 
     /***********************************************************************************************

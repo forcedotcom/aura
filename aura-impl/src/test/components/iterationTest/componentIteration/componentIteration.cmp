@@ -22,9 +22,9 @@
     <aura:attribute name="csccTest" type="Boolean" default="false" />
 
     <aura:renderIf isTrue="{!v.csccTest}">
-        <aura:iterationCscc aura:id="iterationCscc" items="{!v.cmps}" var="var" indexVar="idx" start="{!v.start}" end="{!v.end}">
+        <aura:iteration aura:id="iterationCscc" items="{!v.cmps}" var="var" indexVar="idx" start="{!v.start}" end="{!v.end}">
             {!var}
-        </aura:iterationCscc>
+        </aura:iteration>
 
         <aura:set attribute="else">
             <aura:iteration aura:id="iteration" items="{!v.cmps}" var="var" indexVar="idx" start="{!v.start}" end="{!v.end}">

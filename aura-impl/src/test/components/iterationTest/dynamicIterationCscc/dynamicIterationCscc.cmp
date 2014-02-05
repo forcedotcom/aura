@@ -49,9 +49,9 @@ delete item at #<ui:inputNumber value="{!v.tochange}"/>
 </div>
 
 <div class="containerCscc" aura:id="containerCscc">
-    <aura:iterationCscc aura:id="iterationCscc" items="{!m.data}" var="stuff" indexVar="index" start="{!v.start}" end="{!v.end}">
+    <aura:iteration aura:id="iterationCscc" items="{!m.data}" var="stuff" indexVar="index" start="{!v.start}" end="{!v.end}">
         <div aura:id="simpleCscc" class="{!'row row'+index}">{!index}:{!stuff.stringy}</div>
-    </aura:iterationCscc>
+    </aura:iteration>
 </div>
 
 </aura:component>

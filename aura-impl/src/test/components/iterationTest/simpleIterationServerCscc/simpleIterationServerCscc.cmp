@@ -19,17 +19,17 @@
 
 <div class="testRoot">
 
-<aura:iterationCscc items="{!m.data}" var="itsavar">
+<aura:iteration items="{!m.data}" var="itsavar">
 <div aura:id="simple">{!itsavar.stringy}</div>
-</aura:iterationCscc>
+</aura:iteration>
 
-<aura:iterationCscc items="{!m.data}" var="stuff" indexVar="index" start="6" end="10">
+<aura:iteration items="{!m.data}" var="stuff" indexVar="index" start="6" end="10">
 <div aura:id="complex">{!index == 7 ? 'lucky #7' : ''} <button class="{!'button' + index}">{!stuff.stringy}</button></div>
-</aura:iterationCscc>
+</aura:iteration>
 
-<aura:iterationCscc items="{!m.data}" var="stuff" start="9" end="10">
+<aura:iteration items="{!m.data}" var="stuff" start="9" end="10">
 <iterationTest:iterationChildWithModel aura:id="childwithmodel" fromiteration="{!stuff.whatever}" fromparent="{!m.derp}"/>
-</aura:iterationCscc>
+</aura:iteration>
 
 </div>
 

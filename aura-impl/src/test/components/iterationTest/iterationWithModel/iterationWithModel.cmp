@@ -17,9 +17,9 @@
 -->
 <aura:component extensible="true" model="java://org.auraframework.impl.java.model.TestModel">
 
-    <aura:iterationCscc items="{!m.stringList}" var="item">
+    <aura:iteration items="{!m.stringList}" var="item">
         <iterationTest:iterationWithModelInnerCmp aura:id="innerCmp" value="{!item}"/>
-    </aura:iterationCscc>
+    </aura:iteration>
 
     <div>
     <ui:button aura:id="addRow" label="Click here to add item" press="{!c.addRow}" />
@@ -28,8 +28,8 @@
     <ui:button aura:id="removeRow" label="Click here to remove item" press="{!c.removeRow}" />
     </div>
 
-    <aura:iterationCscc items="{!m.stringList}" var="item" forceServer="true">
+    <aura:iteration items="{!m.stringList}" var="item" forceServer="true">
         <iterationTest:iterationWrapper aura:id="innerCmpWrapper" value="{!item}" />
-    </aura:iterationCscc>
+    </aura:iteration>
 
 </aura:component>

@@ -13,13 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*jslint sub: true */
-var p = layoutService;
-exp(p,
-    "refreshLayout", p.refreshLayout,
-    "back", p.back,
-    "pop", p.pop,
-    "clearHistory", p.clearHistory,
-    "layout", p.layout,
-    "setCurrentLayoutTitle", p.setCurrentLayoutTitle
-);
+
+{
+    "data": ""
+}

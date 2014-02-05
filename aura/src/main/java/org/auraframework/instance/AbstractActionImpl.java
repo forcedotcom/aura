@@ -159,7 +159,7 @@ public abstract class AbstractActionImpl<T extends ActionDef> implements Action 
             if (actionId == null) {
                 actionId = "unknown";
             }
-            instanceStack = new InstanceStack(actionId);
+            instanceStack = new InstanceStack();
         }
         return instanceStack;
     }

@@ -1,0 +1,32 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component>
+    <aura:attribute name="value" type="String"/>
+    <aura:attribute name="headerComponents" type="Aura.Component[]"/>
+    <aura:attribute name="innerComponents" type="Aura.Component[]"/>
+    <aura:attribute name="footerComponents" type="Aura.Component[]">
+        <componentTest:hasBody aura:id="footerbody">
+            footerdefault
+        </componentTest:hasBody>
+    </aura:attribute>
+    {!v.headerComponents}
+    {!v.value}
+    {!v.body}
+    {!v.innerComponents}
+    {!v.footerComponents}
+</aura:component>

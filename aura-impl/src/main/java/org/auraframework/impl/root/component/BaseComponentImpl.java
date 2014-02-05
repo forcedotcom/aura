@@ -319,7 +319,6 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
                 json.writeMapEntry("original", originalDescriptor);
             }
             json.writeMapEntry("creationPath", getPath());
-            //json.writeMapEntry("globalId", getGlobalId());
 
             if ((attributeSet.getValueProvider() == null || hasProvidedAttributes) && !attributeSet.isEmpty()) {
                 json.writeMapEntry("attributes", attributeSet);

@@ -13,13 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*jslint sub: true */
-var p = layoutService;
-exp(p,
-    "refreshLayout", p.refreshLayout,
-    "back", p.back,
-    "pop", p.pop,
-    "clearHistory", p.clearHistory,
-    "layout", p.layout,
-    "setCurrentLayoutTitle", p.setCurrentLayoutTitle
-);
+({
+    appendComponent: function(cmp) {
+        $A.componentService.newComponentAsync(
+            this,
+            function(newCmp) {
+            	cmp.getAttributes().getValue("output").push(newCmp);
+            },
+        	{
+                componentDef: {
+                    descriptor: cmp.getAttributes().get("descriptor")
+                },
+                attributes: {
+                    values: { value : cmp.getAttributes().get("value") }
+                }
+            }, null, null, null
+        );
+    }
+});

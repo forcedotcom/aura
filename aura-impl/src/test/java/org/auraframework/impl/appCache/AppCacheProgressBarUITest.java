@@ -27,12 +27,11 @@ import org.openqa.selenium.By;
  * 
  * ThreadHostile because simultaneous loads of the testApp will interfere with progress bar loading.
  * 
- * AppCache tests are only for webkit browsers. Excluded from Safari5, iOS for not supporting ProgressEvent. Note that
- * Safari6 should support ProgressEvent.
+ * AppCache tests are only for webkit browsers. Excluded from Safari5, iOS for not supporting ProgressEvent.
  * 
  * TODO(W-1708575): Android AppCache tests fail when running on SauceLabs
  */
-@TargetBrowsers({ BrowserType.GOOGLECHROME })
+@TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.SAFARI6 })
 public class AppCacheProgressBarUITest extends WebDriverTestCase {
     private final String PROGRESSEVENTSCRIPT = "var evt = new ProgressEvent('%s', {%s});"
             + "window.applicationCache.dispatchEvent(evt);";

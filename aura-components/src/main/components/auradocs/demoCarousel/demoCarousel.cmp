@@ -21,20 +21,12 @@
     <ui:carousel width="300">
 	    <aura:set attribute="pageComponents">
 	        <ui:carouselPage>
-	            <ui:carouselPageItem label="New Item" class="blue" />
-				<ui:carouselPageItem label="Search" class="green" />
-				<ui:carouselPageItem label="View All" class="yellow" />	
-				<ui:carouselPageItem label="Settings" class="red" />
-	        </ui:carouselPage>
-	        <ui:carouselPage isDefault="true">
-                <ui:carouselPageItem label="Find Item" class="blue" />
-                <ui:carouselPageItem label="Batch Delete" class="green" />
-                <ui:carouselPageItem label="Account" class="yellow" /> 
-                <ui:carouselPageItem label="Settings" class="red" />
+	            <h1>{!m.data[0].header}</h1>
+	            <p>{!m.data[0].str}</p>
 	        </ui:carouselPage>
 	        <ui:carouselPage>
-	            <h1>{!m.header}</h1>
-	            <p>{!m.str}</p>
+	            <h1>{!m.data[1].header}</h1>
+	            <p>{!m.data[1].str}</p>
 	        </ui:carouselPage>
 	    </aura:set>
     </ui:carousel>

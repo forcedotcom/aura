@@ -17,48 +17,12 @@
 	display: block;
 	width: 100%;
 	color: #a9bdd0;
+	
 }
 
-.THIS .entity {
-	margin-right: auto;
-	margin-left: auto;
-	position: relative;
-	top: 32px;
+.THIS .carousel-pages {
+	min-height: 400px;
+	padding: 20px;
 }
 
-.THIS .blue {
-	background-color: #1396b1;
-	border-color: #0e6f83;
-}
 
-.THIS .green {
-	background-color: #30ae63;
-	border-color: #25864c;
-}
-
-.THIS .yellow {
-	background-color: #edbd1f;
-	border-color: #c99e10;
-}
-
-.THIS .entity-poll {
-	background-color: #4377bf;
-	border-color: #355f9a;
-}
-
-.THIS .red {
-	background-color: #cd575c;
-	border-color: #ba373d;
-}
-
-.THIS .entity-label {
-	position: relative;
-	top: 44px;
-}
-
-.THIS .entity.entity-mdp {
-	display: block;
-	width: 56px;
-	height: 56px;
-	border: 0;
-}

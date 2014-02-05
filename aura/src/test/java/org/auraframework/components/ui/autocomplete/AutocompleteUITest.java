@@ -113,7 +113,7 @@ public class AutocompleteUITest extends WebDriverTestCase {
 	// TODO : Bug W-1780786
 	@ExcludeBrowsers({ BrowserType.IE7, BrowserType.IE8, BrowserType.FIREFOX,
 	    BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, 
-	    BrowserType.IPAD, BrowserType.IPHONE, BrowserType.IPADCONTAINER})
+	    BrowserType.IPAD, BrowserType.IPHONE})
 	public void testAutoCompleteTabing() throws Exception {
 		open(URL);
         WebDriver driver = getDriver();
@@ -137,7 +137,7 @@ public class AutocompleteUITest extends WebDriverTestCase {
 	// Excluding mobile devices since they dont have arrow key functionality
 	@ExcludeBrowsers({ BrowserType.IE7, BrowserType.IE8, 
 	    BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, 
-	    BrowserType.IPAD, BrowserType.IPHONE, BrowserType.IPADCONTAINER})
+	    BrowserType.IPAD, BrowserType.IPHONE})
 	public void testAutoCompleteArrowKeys() throws Exception {
 		open(URL);
         WebDriver driver = getDriver();

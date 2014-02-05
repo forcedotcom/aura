@@ -43,6 +43,21 @@
     &lt;ui:inputText label="Text" labelPosition="hidden" /> 
 &lt;/ui:block></auradocs:codeblock>
 
+	<h3>HTML Rendering</h3>
+	<p>The previous example results in the following HTML.</p>
+	
+<auradocs:codeblock>&lt;div class="uiBlock">
+  &lt;div class="bLeft">
+    &lt;img alt="bLeft" src="path/to/img" class="uiImage">
+  &lt;/div>
+  &lt;div class="bRight">
+    &lt;!--button goes here-->
+  &lt;/div>
+  &lt;div class="bBody">
+    &lt;!--inputText goes here-->
+  &lt;/div>
+&lt;/div></auradocs:codeblock>
+
     <h3>Working with Events</h3>
     <p>Common events for <code>ui:block</code> include the <code>click</code> and <code>mouseover</code> events. For example, <code>click="<aura:text value="{!"/>c.enable}"</code>
     calls the client-side controller action with the fuction name, <code>enable</code>, when a user clicks anywhere in the layout.</p>

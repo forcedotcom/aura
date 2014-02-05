@@ -101,6 +101,59 @@ Action.prototype.reactivatePath = function() {
 };
 
 /**
+ * force the creation path to match a given value.
+ *
+ * This checks to see if the path matches, otherwise, it forces the path
+ * to the one supplied. A warning is emitted if the path mismatches.
+ *
+ * @private
+ * @param {string} path the path to force
+ */
+Action.prototype.forceCreationPath = function(path) {
+    var absPath = "(empty)";
+    //
+    // We add the id, since our server path is bare.
+    //
+    var newAbsPath = this.getId()+path;
+    if (this.pathStack.length > 0) {
+        var top = this.pathStack[this.pathStack.length - 1];
+        if (top.absPath === newAbsPath) {
+            // We are ok, the creation path is actually the correct one, ignore it.
+            return;
+        }
+        absPath = top.absPath;
+    }
+    $A.warning("force path of "+newAbsPath+" from "+absPath
+        +" likely a use of returned component array without changing index");
+    var pathEntry = { relPath: "~FORCED~", absPath:newAbsPath, idx: undefined, startIdx: undefined };
+    this.pathStack.push(pathEntry);
+    return newAbsPath;
+};
+
+/**
+ * release a creation path that was previously forced.
+ *
+ * This is the mirrored call to 'forceCreationPath' that releases the 'force'.
+ * 
+ * @private
+ * @param {string} path
+ */
+Action.prototype.releaseCreationPath = function(path) {
+    var last;
+    if (this.pathStack.length > 0) {
+        last = this.pathStack[this.pathStack.length - 1];
+    }
+    if (!last || last.absPath !== path) {
+        $A.assert(false, "unexpected unwinding of pathStack.  found "
+            + (last ? (last.absPath + " idx " + last.idx  ) : "empty") + " expected "  + path);
+    }
+    if (last && last.relPath === "~FORCED~") {
+        // This is the case where we forced in the path.
+        this.pathStack.pop();
+    }
+};
+
+/**
  * push a new part on the creation path.
  *
  * @private
@@ -137,7 +190,7 @@ Action.prototype.popCreationPath = function(pathPart) {
     addedPath = "/"+pathPart;
     var last = this.pathStack.pop();
     if (!last || last.relPath !== addedPath /*|| last.idx !== undefined*/) {
-        $A.warning("unexpected unwinding of pathStack.  found "
+        $A.assert(false, "unexpected unwinding of pathStack.  found "
             + (last ? (last.relPath + " idx " + last.idx  ) : "empty") + " expected "  + addedPath);
     }
     return last;

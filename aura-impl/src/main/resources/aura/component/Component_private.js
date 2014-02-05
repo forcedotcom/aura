@@ -33,139 +33,158 @@ var ComponentPriv = (function() { // Scoping priv
 
         var context = $A.getContext();
         var act = context.getCurrentAction();
+        var forcedPath = false;
 
-        if (act) {
-            this.creationPath = act.getCurrentPath();
-            //$A.log("l: [" + this.creationPath + "]");
-        }
-
-        // create the globally unique id for this component
-        this.setupGlobalId(config["globalId"], localCreation);
-
-        var partialConfig = undefined;
-        if (this.creationPath) {
-            partialConfig = context.getComponentConfig(this.creationPath);
-        }
-        if (partialConfig) {
-            this.partialConfig = partialConfig;
-
-            var partialConfigO = partialConfig["original"];
-            var partialConfigCD;
-            var configCD = config["componentDef"]["descriptor"];
-            if (configCD.getQualifiedName) {
-                configCD = configCD.getQualifiedName();
-            }
-            if (partialConfig["componentDef"]) {
-                partialConfigCD = partialConfig["componentDef"]["descriptor"];
-            }
-            if (partialConfigO !== undefined && partialConfigCD !== configCD) {
-                if (partialConfigO !== configCD) {
-                    $A.log("Configs at error");
-                    $A.log(config);
-                    $A.log(partialConfig);
-                    $A.error("Mismatch at " + this.globalId
-                            + " client expected " + configCD
-                            + " but got original " + partialConfigO
-                            + " providing " + partialConfigCD + " from server "
-                            + " for creationPath = "+this.creationPath);
+        try {
+            if (act) {
+                if (config["creationPath"]) {
+                    //
+                    // This is a server side config, so we need to sync ourselves with it.
+                    // The use case here is that the caller has gotten a returned array of
+                    // components, and is instantiating them independently. We can warn the
+                    // user when they do the wrong thing, but we'd actually like it to work
+                    // for most cases.
+                    //
+                    this.creationPath = act.forceCreationPath(config["creationPath"]);
+                    forcedPath = true;
+                } else {
+                    this.creationPath = act.getCurrentPath();
                 }
-            } else if (partialConfigCD) {
-                if (partialConfigCD !== configCD) {
-                    $A.log("Configs at error");
-                    $A.log(config);
-                    $A.log(partialConfig);
-                    $A.error("Mismatch at " + this.globalId
-                            + " client expected " + configCD + " but got "
-                            + partialConfigCD + " from server "
-                            +" for creationPath = "+this.creationPath);
+                //$A.log("l: [" + this.creationPath + "]");
+            }
+
+            // create the globally unique id for this component
+            this.setupGlobalId(config["globalId"], localCreation);
+
+            var partialConfig = undefined;
+            if (this.creationPath) {
+                partialConfig = context.getComponentConfig(this.creationPath);
+            }
+            if (partialConfig) {
+                this.partialConfig = partialConfig;
+
+                var partialConfigO = partialConfig["original"];
+                var partialConfigCD;
+                var configCD = config["componentDef"]["descriptor"];
+                if (configCD.getQualifiedName) {
+                    configCD = configCD.getQualifiedName();
+                }
+                if (partialConfig["componentDef"]) {
+                    partialConfigCD = partialConfig["componentDef"]["descriptor"];
+                }
+                if (partialConfigO !== undefined && partialConfigCD !== configCD) {
+                    if (partialConfigO !== configCD) {
+                        $A.log("Configs at error");
+                        $A.log(config);
+                        $A.log(partialConfig);
+                        $A.error("Mismatch at " + this.globalId
+                                + " client expected " + configCD
+                                + " but got original " + partialConfigO
+                                + " providing " + partialConfigCD + " from server "
+                                + " for creationPath = "+this.creationPath);
+                    }
+                } else if (partialConfigCD) {
+                    if (partialConfigCD !== configCD) {
+                        $A.log("Configs at error");
+                        $A.log(config);
+                        $A.log(partialConfig);
+                        $A.error("Mismatch at " + this.globalId
+                                + " client expected " + configCD + " but got "
+                                + partialConfigCD + " from server "
+                                +" for creationPath = "+this.creationPath);
+                    }
                 }
             }
-        }
 
-        // get server rendering if there was one
-        if (config["rendering"]) {
-            this.rendering = config["rendering"];
-        } else if (partialConfig && partialConfig["rendering"]) {
-            this.rendering = this.partialConfig["rendering"];
-        }
+            // get server rendering if there was one
+            if (config["rendering"]) {
+                this.rendering = config["rendering"];
+            } else if (partialConfig && partialConfig["rendering"]) {
+                this.rendering = this.partialConfig["rendering"];
+            }
 
-        // add this component to the global index
-        componentService.index(cmp);
+            // add this component to the global index
+            componentService.index(cmp);
 
-        // sets this components definition, preferring the one in partialconfig if it exists
-        this.setupComponentDef(config["componentDef"]);
+            // sets this components definition, preferring the one in partialconfig if it exists
+            this.setupComponentDef(config["componentDef"]);
 
-        // for components inside of a foreach, sets up the value provider
-        // they will delegate all m/v/c values to
-        this.setupDelegateValueProvider(config["delegateValueProvider"], localCreation);
+            // for components inside of a foreach, sets up the value provider
+            // they will delegate all m/v/c values to
+            this.setupDelegateValueProvider(config["delegateValueProvider"], localCreation);
 
-        // join attributes from partial config and config, preferring
-        // partial when overlapping
-        var configAttributes = config["attributes"];
-        if (partialConfig && partialConfig["attributes"]) {
-            if (!config["attributes"]) {
-                configAttributes = partialConfig["attributes"];
-            } else {
-                configAttributes = {};
-                var atCfg = config["attributes"];
-                for ( var key in atCfg) {
-                    configAttributes[key] = atCfg[key];
-                }
-
-                atCfg = partialConfig["attributes"];
-                for (key in atCfg) {
-                    if (key !== "valueProvider") {
+            // join attributes from partial config and config, preferring
+            // partial when overlapping
+            var configAttributes = config["attributes"];
+            if (partialConfig && partialConfig["attributes"]) {
+                if (!config["attributes"]) {
+                    configAttributes = partialConfig["attributes"];
+                } else {
+                    configAttributes = {};
+                    var atCfg = config["attributes"];
+                    for ( var key in atCfg) {
                         configAttributes[key] = atCfg[key];
                     }
-                }
 
-                atCfg = config["attributes"]["values"];
-                for (key in atCfg) {
-                    if (!configAttributes["values"][key]) {
-                        configAttributes["values"][key] = atCfg[key];
+                    atCfg = partialConfig["attributes"];
+                    for (key in atCfg) {
+                        if (key !== "valueProvider") {
+                            configAttributes[key] = atCfg[key];
+                        }
+                    }
+
+                    atCfg = config["attributes"]["values"];
+                    for (key in atCfg) {
+                        if (!configAttributes["values"][key]) {
+                            configAttributes["values"][key] = atCfg[key];
+                        }
                     }
                 }
             }
+
+            // creates the attributeset with that weirdass mush of attributes
+            this.setupAttributes(configAttributes, cmp, localCreation);
+
+            // runs component provider and replaces this component with the
+            // provided one
+            this.injectComponent(config, cmp, localCreation);
+
+            // instantiates this components model
+            this.setupModel(config["model"], cmp);
+
+            // create all value providers for this component m/v/c etc.
+            this.setupValueProviders(config["valueProviders"], cmp);
+
+            // instantiate super component(s)
+            this.setupSuper(cmp, configAttributes, localCreation);
+
+            // does some extra attribute validation for requiredness
+            this.validateAttributes(cmp, configAttributes);
+
+            // sets up component level events
+            this.setupComponentEvents(configAttributes ? configAttributes["events"] : null,
+                configAttributes ? configAttributes["values"] : null, cmp);
+
+            // for application type events
+            this.setupApplicationEventHandlers(cmp);
+
+            // index this component with its value provider (if it has a
+            // localid)
+            this.doIndex(cmp);
+
+            // instantiate the renderer for this component
+            this.setupRenderer(cmp);
+
+            // starting watching all values for events
+            this.setupValueEventHandlers(cmp);
+
+            // clean up refs to partial config
+            this.partialConfig = undefined;
+        } finally {
+            if (forcedPath && act) {
+                act.releaseCreationPath(this.creationPath);
+            }
         }
-
-        // creates the attributeset with that weirdass mush of attributes
-        this.setupAttributes(configAttributes, cmp, localCreation);
-
-        // runs component provider and replaces this component with the
-        // provided one
-        this.injectComponent(config, cmp, localCreation);
-
-        // instantiates this components model
-        this.setupModel(config["model"], cmp);
-
-        // create all value providers for this component m/v/c etc.
-        this.setupValueProviders(config["valueProviders"], cmp);
-
-        // instantiate super component(s)
-        this.setupSuper(cmp, configAttributes, localCreation);
-
-        // does some extra attribute validation for requiredness
-        this.validateAttributes(cmp, configAttributes);
-
-        // sets up component level events
-        this.setupComponentEvents(configAttributes ? configAttributes["events"] : null,
-            configAttributes ? configAttributes["values"] : null, cmp);
-
-        // for application type events
-        this.setupApplicationEventHandlers(cmp);
-
-        // index this component with its value provider (if it has a
-        // localid)
-        this.doIndex(cmp);
-
-        // instantiate the renderer for this component
-        this.setupRenderer(cmp);
-
-        // starting watching all values for events
-        this.setupValueEventHandlers(cmp);
-
-        // clean up refs to partial config
-        this.partialConfig = undefined;
     };
 
     ComponentPriv.prototype.nextGlobalId = function(localCreation) {
@@ -630,6 +649,7 @@ var ComponentPriv = (function() { // Scoping priv
 
     ComponentPriv.prototype.setupRenderer = function(cmp) {
         var rd = this.componentDef.getRenderingDetails();
+        $A.assert(rd !== undefined, "Instantiating "+this.componentDef.getDescriptor()+" which has no renderer");
         var renderable = cmp;
         for (var i = 0; i < rd.distance; i++) {
             renderable = renderable.getSuper();

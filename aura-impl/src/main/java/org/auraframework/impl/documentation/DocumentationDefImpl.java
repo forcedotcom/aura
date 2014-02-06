@@ -37,12 +37,12 @@ import com.google.common.collect.Lists;
 
 public class DocumentationDefImpl extends RootDefinitionImpl<DocumentationDef> implements DocumentationDef {
 
-	private static final long serialVersionUID = 7808842576422413967L;
+    private static final long serialVersionUID = 7808842576422413967L;
 
-	private final LinkedHashMap<String, DescriptionDef> descriptionDefs;
+    private final LinkedHashMap<String, DescriptionDef> descriptionDefs;
     private final LinkedHashMap<String, ExampleDef> exampleDefs;
 	
-	protected DocumentationDefImpl(Builder builder) {
+    protected DocumentationDefImpl(Builder builder) {
         super(builder);
         
         this.descriptionDefs = builder.descriptionMap;
@@ -59,15 +59,15 @@ public class DocumentationDefImpl extends RootDefinitionImpl<DocumentationDef> i
     	throw new UnsupportedOperationException("DocumentationDef cannot contain AttributeDefs.");
     }
     
-	@Override
-	public Map<String, ? extends DescriptionDef> getDescriptionDefs() {
-		return descriptionDefs;
-	}
+    @Override
+    public Map<String, ? extends DescriptionDef> getDescriptionDefs() {
+            return descriptionDefs;
+    }
 
-	@Override
-	public Map<String, ? extends ExampleDef> getExampleDefs() {
-		return exampleDefs;
-	}
+    @Override
+    public Map<String, ? extends ExampleDef> getExampleDefs() {
+            return exampleDefs;
+    }
 
     @Override
     public List<DefDescriptor<?>> getBundle() {

@@ -32,7 +32,6 @@ import org.auraframework.test.AuraHttpTestCase;
 import org.auraframework.test.annotation.TestLabels;
 import org.auraframework.test.annotation.UnAdaptableTest;
 import org.auraframework.util.AuraTextUtil;
-import org.junit.Ignore;
 
 /**
  * Automation to verify the functioning of AuraResourceServlet. AuraResourceServlet is used to preload definitions of
@@ -47,7 +46,6 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
         super(name);
     }
 
-    @Ignore("W-2034311")
     @TestLabels("auraSanity")
     public void testCSSOrdering() throws Exception {
         String modeAndContext = getContext(Mode.DEV, Format.CSS, "auratest:test_css_a", ComponentDef.class, false);
@@ -66,9 +64,9 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
         idx_b = response.indexOf("div.auratestTest_css_b");
         idx_c = response.indexOf("div.auratestTest_css_c");
         idx_d = response.indexOf("div.auratestTest_css_d");
-        assertTrue("_d must come before _c", idx_d < idx_c);
-        assertTrue("_c must come before _b", idx_c < idx_b);
-        assertTrue("_b must come before _a", idx_b < idx_a);
+        assertTrue("_d must come before _c in: "+response, idx_d < idx_c);
+        assertTrue("_c must come before _b in: "+response, idx_c < idx_b);
+        assertTrue("_b must come before _a in: "+response, idx_b < idx_a);
     }
 
     /**

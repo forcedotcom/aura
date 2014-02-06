@@ -30,7 +30,6 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.system.SourceListener;
 import org.auraframework.test.AuraTestCase;
 import org.auraframework.test.DummyHttpServletRequest;
@@ -275,42 +274,43 @@ public class AuraResourceServletTest extends AuraTestCase {
     }
 
     /**
-     * Verify CSS is ordered based off number of dependencies. Super component CSS should come before compnent that
-     * extends super. If two components have the same number of dependencies, they should be written out in alphabetical
-     * order.
+     * Verify that the css writer writes in the order given.
      */
     public void testCSSOrder() throws Exception {
         DefDescriptor<ApplicationDef> appDesc = Aura.getDefinitionService()
                 .getDefDescriptor("auratest:test_SimpleServerRenderedPage", ApplicationDef.class);
+        DefDescriptor<ComponentDef> grandparent = Aura.getDefinitionService()
+                .getDefDescriptor("setAttributesTest:grandparent", ComponentDef.class);
+        DefDescriptor<ComponentDef> parent = Aura.getDefinitionService()
+                .getDefDescriptor("setAttributesTest:parent", ComponentDef.class);
         DefDescriptor<ComponentDef> child1 = Aura.getDefinitionService()
                 .getDefDescriptor("setAttributesTest:child", ComponentDef.class);
         DefDescriptor<ComponentDef> child2 = Aura.getDefinitionService()
-                .getDefDescriptor("setAttributesTest:anotherchild", ComponentDef.class);
-        AuraContext context = Aura.getContextService().startContext(AuraContext.Mode.DEV, AuraContext.Format.CSS,
+                .getDefDescriptor("setAttributesTest:anotherChild", ComponentDef.class);
+        Aura.getContextService().startContext(AuraContext.Mode.DEV, AuraContext.Format.CSS,
                 AuraContext.Access.AUTHENTICATED, appDesc);
-        MasterDefRegistry mdr = context.getDefRegistry();
-        final String uid = mdr.getUid(null, appDesc);
-        context.addLoaded(appDesc, uid);
 
-        Set<DefDescriptor<?>> dependencies = mdr.getDependencies(uid);
-        Set<DefDescriptor<?>> child1deps = mdr.getDependencies(mdr.getUid(null, child1));
-        Set<DefDescriptor<?>> child2deps = mdr.getDependencies(mdr.getUid(null, child2));
-        Set<DefDescriptor<?>> allDeps = Sets.newHashSet(dependencies);
-        allDeps.addAll(child1deps);
-        allDeps.addAll(child2deps);
+        Set<DefDescriptor<?>> writable = Sets.newLinkedHashSet();
+
+        writable.add(child1.getDef().getStyleDescriptor());
+        writable.add(grandparent.getDef().getStyleDescriptor());
+        writable.add(parent.getDef().getStyleDescriptor());
+        writable.add(child2.getDef().getStyleDescriptor());
 
         StringBuilder output = new StringBuilder();
-        AuraResourceServlet.writeAppCss(allDeps, output);
+        AuraResourceServlet.writeAppCss(writable, output);
         String css = output.toString();
-        System.out.println(css);
 
-        assertTrue("grandparent CSS should be written before parent CSS",
+        //
+        // order should be exactly that above.
+        // child1, grandparent, parent, child2
+        // 
+        assertTrue("parent CSS should be written before child CSS in: "+css,
+                css.indexOf(".setAttributesTestChild") < css.indexOf(".setAttributesTestGrandparent"));
+        assertTrue("grandparent CSS should be written before parent CSS in: "+css,
                 css.indexOf(".setAttributesTestGrandparent") < css.indexOf(".setAttributesTestParent"));
-        assertTrue("parent CSS should be written before child CSS",
-                css.indexOf(".setAttributesTestParent") < css.indexOf(".setAttributesTestChild"));
-        // Verify CSS sorts alphabetically when frequency (# of dependents) the same
-        assertTrue("Components with same number of dependnecies should be ordered alphabetically",
-                css.indexOf(".setAttributesTestAnotherChild") < css.indexOf(".setAttributesTestChild"));
+        assertTrue("parent CSS should be written before another child CSS in: "+css,
+                css.indexOf(".setAttributesTestParent") < css.indexOf(".setAttributesTestAnotherChild"));
     }
 
     public void testPreloadCSSDependencies() throws Exception {

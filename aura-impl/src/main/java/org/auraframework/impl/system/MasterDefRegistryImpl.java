@@ -16,7 +16,15 @@
 package org.auraframework.impl.system;
 
 import java.lang.ref.WeakReference;
-import java.util.*;
+
+import java.util.ArrayDeque;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Deque;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
@@ -77,14 +85,14 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     private static class DependencyEntry {
         public final String uid;
         public final long lastModTime;
-        public final SortedSet<DefDescriptor<?>> dependencies;
+        public final Set<DefDescriptor<?>> dependencies;
         public final List<ClientLibraryDef> clientLibraries;
         public final QuickFixException qfe;
 
-        public DependencyEntry(String uid, SortedSet<DefDescriptor<?>> dependencies, long lastModTime,
+        public DependencyEntry(String uid, Set<DefDescriptor<?>> dependencies, long lastModTime,
                                List<ClientLibraryDef> clientLibraries) {
             this.uid = uid;
-            this.dependencies = Collections.unmodifiableSortedSet(dependencies);
+            this.dependencies = dependencies;
             this.clientLibraries = Collections.unmodifiableList(clientLibraries);
             this.lastModTime = lastModTime;
             this.qfe = null;
@@ -163,7 +171,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     private CompileContext currentCC;
 
     private SecurityProviderDef securityProvider;
-	private DefDescriptor<? extends BaseComponentDef> lastRootDesc;
+    private DefDescriptor<? extends BaseComponentDef> lastRootDesc;
 
     public MasterDefRegistryImpl(DefRegistry<?>... registries) {
         delegateRegistries = new RegistryTrie(registries);
@@ -179,6 +187,8 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         Set<DefRegistry<?>> registries = delegateRegistries.getRegistries(matcher);
         Set<DefDescriptor<?>> matched = Sets.newHashSet();
 
+        rLock.lock();
+        try {
         for (DefRegistry<?> reg : registries) {
             //
             // This could be a little dangerous, but unless we force all of our
@@ -187,7 +197,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             if (reg.hasFind()) {
                 Set<DefDescriptor<?>> registryResults = null;
 
-                if (reg.isCacheable()) {
+                if (isCacheable(reg)) {
                     // cache results per registry
                     String cacheKey = filterKey + "|" + reg.toString();
                     registryResults = descriptorFilterCache.getIfPresent(cacheKey);
@@ -208,6 +218,9 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                     matched.add(desc);
                 }
             }
+        }
+        } finally {
+            rLock.unlock();
         }
 
         return matched;
@@ -252,6 +265,8 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                 // TODO: FIXME
                 throw new AuraRuntimeException(String.format("Find on %s defs not supported.", matcher.getDefType().name()));
             }
+            rLock.lock();
+            try {
             for (String namespace : delegateRegistries.getAllNamespaces()) {
                 String qualifiedName = String.format(qualifiedNamePattern,
                         matcher.getPrefix() != null ? matcher.getPrefix() : "*", namespace,
@@ -263,6 +278,9 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                 if (registry != null) {
                     matched.addAll(registry.find(namespacedMatcher));
                 }
+            }
+            } finally {
+                rLock.unlock();
             }
         } else {
             matched = getRegistryFor(matcher).find(matcher);
@@ -286,7 +304,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
      * This embodies a definition that is in the process of being compiled. It stores the descriptor, definition, and
      * the registry to which it belongs to avoid repeated lookups.
      */
-    private static class CompilingDef<T extends Definition> {
+    private static class CompilingDef<T extends Definition> implements Comparable<CompilingDef<?>> {
         /**
          * The descriptor we are compiling.
          */
@@ -302,7 +320,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         /**
          * All of the parents (needed in the case that we fail).
          */
-        public Set<Definition> parents = Sets.newHashSet();
+        public Map<DefDescriptor<?>, CompilingDef<?>> parents = Maps.newLinkedHashMap();
 
         /**
          * Did we build this definition?.
@@ -310,6 +328,11 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
          * If this is true, we need to do the validation steps after finishing.
          */
         public boolean built = false;
+
+        /**
+         * The 'level' of this def in the compile tree.
+         */
+        public int level = 0;
 
         /**
          * Is this def cacheable?
@@ -322,6 +345,35 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
          */
         public boolean validated = false;
 
+        private boolean inCycle = false;
+
+        /**
+         * Check to see if this def is in a cycle.
+         */
+        public boolean isInCycle() {
+            if (inCycle) {
+                return true;
+            }
+            Map<DefDescriptor<?>, CompilingDef<?>> cycleCheck = Maps.newHashMap();
+            Map<DefDescriptor<?>, CompilingDef<?>> current = Maps.newHashMap(parents);
+            Map<DefDescriptor<?>, CompilingDef<?>> next = Maps.newHashMap();
+            int cycleSize;
+
+            do {
+                cycleSize = cycleCheck.size();
+                for (CompilingDef<?> pcd : current.values()) {
+                    next.putAll(pcd.parents);
+                }
+                cycleCheck.putAll(next);
+                Map<DefDescriptor<?>, CompilingDef<?>> tmp = current;
+                current = next;
+                next = tmp;
+                next.clear();
+            } while (!cycleCheck.containsKey(descriptor) && cycleSize > cycleCheck.size());
+            inCycle = cycleCheck.containsKey(descriptor);
+            return inCycle;
+        }
+
         @Override
         public String toString() {
             StringBuffer sb = new StringBuffer();
@@ -331,6 +383,10 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                 sb.append("[");
                 sb.append(def.getOwnHash());
                 sb.append("]");
+
+                sb.append("<");
+                sb.append(level);
+                sb.append(">");
             } else {
                 sb.append("[not-compiled]");
             }
@@ -338,13 +394,54 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             sb.append(built);
             sb.append(", cacheable=");
             sb.append(cacheable);
+            sb.append(", inCycle=");
+            sb.append(inCycle);
             if (parents != null && !parents.isEmpty()) {
                 sb.append(", parents=");
-                sb.append(parents);
+                sb.append(parents.keySet());
             }
             return sb.toString();
         }
+
+        @Override
+        public int compareTo(CompilingDef<?> o) {
+            if (o.level != this.level) {
+                return o.level - this.level;
+            }
+            return this.descriptor.compareTo(o.descriptor);
+        }
     }
+
+    private static class CCStackEntry {
+        public final DefDescriptor<?> descriptor;
+        private Set<DefDescriptor<?>> next;
+        private Set<DefDescriptor<?>> current;
+        public final int level;
+
+        public CCStackEntry(DefDescriptor<?> descriptor, int level) {
+            this.descriptor = descriptor;
+            this.next = Sets.newHashSet();
+            this.current = Sets.newHashSet();
+            this.level = level;
+        }
+
+        public Set<DefDescriptor<?>> getNext() {
+            return this.next;
+        }
+
+        public Set<DefDescriptor<?>> swap() {
+            Set<DefDescriptor<?>> tmp = current;
+            this.current = this.next;
+            this.next = tmp;
+            tmp.clear();
+            return this.current;
+        }
+
+        @Override
+        public String toString() {
+            return descriptor.toString()+"@"+level+"["+next.size()+","+current.size()+"]";
+        }
+    };
 
     /**
      * The compile context.
@@ -357,30 +454,43 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         public final AuraContext context = Aura.getContextService().getCurrentContext();
         public final LoggingService loggingService = Aura.getLoggingService();
         public final Map<DefDescriptor<? extends Definition>, CompilingDef<?>> compiled = Maps.newHashMap();
-        public final Map<DefDescriptor<? extends Definition>, Definition> dependencies;
         public final List<ClientLibraryDef> clientLibs;
-        public final boolean frozen;
         public final DefDescriptor<? extends Definition> topLevel;
-        public Set<DefDescriptor<?>> next;
+        private Deque<CCStackEntry> stack = new ArrayDeque<CCStackEntry>(); 
+        public int level;
 
         // TODO: remove preloads
         public boolean addedPreloads = false;
 
-        // public final Map<DefDescriptor<? extends Definition>, Definition>
-        // dependencies = Maps.newHashMap();
-        public CompileContext(DefDescriptor<? extends Definition> topLevel,
-                Map<DefDescriptor<? extends Definition>, Definition> dependencies, List<ClientLibraryDef> clientLibs) {
-            this.dependencies = dependencies;
+        public CompileContext(DefDescriptor<? extends Definition> topLevel, List<ClientLibraryDef> clientLibs) {
             this.clientLibs = clientLibs;
-            this.frozen = false;
             this.topLevel = topLevel;
+            this.level = 0;
         }
 
         public CompileContext(DefDescriptor<? extends Definition> topLevel) {
+            this.clientLibs = null;
             this.topLevel = topLevel;
-            this.frozen = true;
-            this.dependencies = Maps.newHashMap();
-            this.clientLibs = Lists.newArrayList();
+        }
+
+        public void pushDescriptor(DefDescriptor<?> newTop) {
+            stack.addLast(new CCStackEntry(newTop, level));
+        }
+
+        public Set<DefDescriptor<?>> getNext() {
+            return stack.peekLast().getNext();
+        }
+
+        public Set<DefDescriptor<?>> swap() {
+            return stack.peekLast().swap();
+        }
+
+        public void popDescriptor() {
+            stack.removeLast();
+            CCStackEntry last = stack.peekLast();
+            if (last != null) {
+                this.level = last.level;
+            }
         }
 
         public <D extends Definition> CompilingDef<D> getCompiling(DefDescriptor<D> descriptor) {
@@ -453,7 +563,6 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                     compiling.def = cachedDef;
                     compiling.descriptor = canonical;
                     compiling.built = false;
-                    defs.put(canonical, cachedDef);
                     return true;
                 } else {
                     return false;
@@ -464,7 +573,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         //
         // The last case. This is our first compile or the def is uncacheable.
         // In this case, we make sure that the initial validation is called, and put
-        // the def in the non-validated set.
+        // the def in the 'built' set.
         //
         compiling.def = registry.getDef(compiling.descriptor);
         if (compiling.def == null) {
@@ -474,13 +583,34 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         DefDescriptor<D> canonical = (DefDescriptor<D>) compiling.def.getDescriptor();
         compiling.descriptor = canonical;
 
-        // cc.loggingService.incrementNum(LoggingService.DEF_COUNT);
-        // FIXME: setting the current namespace on the context seems
-        // extremely hackish
+        //cc.loggingService.incrementNum(LoggingService.DEF_COUNT);
         context.setCurrentNamespace(canonical.getNamespace());
         compiling.def.validateDefinition();
         compiling.built = true;
         return true;
+    }
+
+    /**
+     * Get a definition not found exception for a compiling def.
+     */
+    private QuickFixException getDNF(CompilingDef<?> cd) {
+        //
+        // If we can figure out a location, feed it back to the user, as
+        // it makes it much easier to fix.
+        //
+        if (!cd.parents.isEmpty()) {
+            StringBuilder sb = new StringBuilder();
+            Location handy = null;
+            for (CompilingDef<?> parent : cd.parents.values()) {
+                handy = parent.def.getLocation();
+                if (sb.length() != 0) {
+                    sb.append(", ");
+                }
+                sb.append(parent.descriptor.toString());
+            }
+            return new DefinitionNotFoundException(cd.descriptor, handy, sb.toString());
+        }
+        return new DefinitionNotFoundException(cd.descriptor);
     }
 
     /**
@@ -495,92 +625,77 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
      * 
      * @param descriptor the descriptor that we are currently handling, must not be in the compiling defs.
      * @param cc the compile context to allow us to accumulate information.
-     * @param deps the set of dependencies that we are accumulating.
+     * @param level the 'level' that we are compiling at.
      * @throws QuickFixException if the definition is not found, or validateDefinition() throws one.
      */
-    private <D extends Definition> D getHelper(DefDescriptor<D> descriptor, CompileContext cc) throws QuickFixException {
+    private <D extends Definition> D getHelper(DefDescriptor<D> descriptor, CompileContext cc)
+            throws QuickFixException {
         CompilingDef<D> cd = cc.getCompiling(descriptor);
-
-        if (cd.def != null) {
-            return cd.def;
+        if (cc.level > cd.level) {
+            cd.level = cc.level;
         }
-        try {
+        //
+        // careful here. We don't just return with the non-null def because that breaks our levels.
+        // We need to walk the whole tree, which is unfortunate perf-wise.
+        //
+        if (cd.def == null) {
             if (!fillCompilingDef(cd, cc.context)) {
-                //
-                // At this point, we have failed to get the def, so we should throw an
-                // error. The first stanza is to provide a more useful error description
-                // including the set of components using the missing component.
-                //
-                if (!cd.parents.isEmpty()) {
-                    StringBuilder sb = new StringBuilder();
-                    Location handy = null;
-                    for (Definition parent : cd.parents) {
-                        handy = parent.getLocation();
-                        if (sb.length() != 0) {
-                            sb.append(", ");
-                        }
-                        sb.append(parent.getDescriptor().toString());
-                    }
-                    throw new DefinitionNotFoundException(descriptor, handy, sb.toString());
-                }
-                throw new DefinitionNotFoundException(descriptor);
+                // No def. Blow up.
+                throw getDNF(cd);
             }
-            //
-            // Ok. We have a def. let's figure out what to do with it.
-            //
-            Set<DefDescriptor<?>> newDeps = Sets.newHashSet();
-            cd.def.appendDependencies(newDeps);
-
-
-            //
-            // TODO: remove preloads
-            // This pulls in the context preloads. not pretty, but it works.
-            //
-            if (!cc.addedPreloads && cd.descriptor.getDefType().equals(DefType.APPLICATION)) {
-                cc.addedPreloads = true;
-                Set<String> preloads = cc.context.getPreloads();
-                for (String preload : preloads) {
-                    if (!preload.contains("_")) {
-                        DependencyDefImpl.Builder ddb = new DependencyDefImpl.Builder();
-                        ddb.setResource(preload);
-                        ddb.setType("APPLICATION,COMPONENT,STYLE,EVENT");
-                        ddb.build().appendDependencies(newDeps);
-                    }
-                }
-            }
-
-            for (DefDescriptor<?> dep : newDeps) {
-                if (!defs.containsKey(dep)) {
-                    CompilingDef<?> depcd = cc.getCompiling(dep);
-                    depcd.parents.add(cd.def);
-                }
-            }
-            cc.next.addAll(newDeps);
-            if (cc.dependencies != null) {
-            cc.dependencies.put(cd.descriptor, cd.def);
-            }
-
             // get client libs
             if (cc.clientLibs != null && cd.def instanceof BaseComponentDef) {
                 BaseComponentDef baseComponent = (BaseComponentDef) cd.def;
                 baseComponent.addClientLibs(cc.clientLibs);
             }
+        }
 
-            return cd.def;
-        } catch (DefinitionNotFoundException dnfe) {
-            //
-            // In the case that we have a DefinitionNotFoundException for our current descriptor,
-            // cache the fact that we didn't find one.
-            //
-            if (dnfe.getDescriptor().equals(descriptor)) {
-                cd.def = null;
-                defs.put(descriptor, cd.def);
-                if (cd.cacheable) {
-                    defsCache.put(descriptor, Optional.fromNullable(cd.def));
+        //
+        // Ok. We have a def. let's figure out what to do with it.
+        // Unfortunately, we need a new set of dependencies to create the parent set below.
+        // If we do not track parents, we can just use 'appendDependencies(next)', which would
+        // be a significant perf advantage.
+        //
+        Set<DefDescriptor<?>> newDeps = Sets.newHashSet();
+        cd.def.appendDependencies(newDeps);
+
+
+        //
+        // TODO: remove preloads
+        // This pulls in the context preloads. not pretty, but it works.
+        //
+        if (!cc.addedPreloads && cd.descriptor.getDefType().equals(DefType.APPLICATION)) {
+            cc.addedPreloads = true;
+            Set<String> preloads = cc.context.getPreloads();
+            for (String preload : preloads) {
+                if (!preload.contains("_")) {
+                    DependencyDefImpl.Builder ddb = new DependencyDefImpl.Builder();
+                    ddb.setResource(preload);
+                    ddb.setType("APPLICATION,COMPONENT,STYLE,EVENT");
+                    ddb.build().appendDependencies(newDeps);
                 }
             }
-            throw dnfe;
         }
+
+        Set<DefDescriptor<?>> next = cc.getNext();
+        for (DefDescriptor<?> dep : newDeps) {
+            CompilingDef<?> depcd = cc.getCompiling(dep);
+            if (!depcd.parents.containsKey(cd.descriptor)) {
+                //
+                // In this case, this is a new link, so we know that we don't
+                // need to worry about cycles.
+                //
+                depcd.parents.put(cd.descriptor, cd);
+                next.add(dep);
+            } else if (!depcd.isInCycle()) {
+                //
+                // If this dependency is not in a cycle, continue processing.
+                //
+                next.add(dep);
+            }
+        }
+
+        return cd.def;
     }
 
     /**
@@ -597,20 +712,23 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         // Turns out that validating references can pull in things we didn't see, so we
         // loop infinitely... or at least a few times.
         //
+        // This can be changed once we remove the ability to nest, as we will never allow
+        // this. That way we won't have to copy our list so many times.
+        //
         do {
             compiling = Lists.newArrayList(currentCC.compiled.values());
-        for (CompilingDef<?> cd : compiling) {
-            // FIXME: setting the current namespace on the context seems extremely hackish
+            for (CompilingDef<?> cd : compiling) {
+                // FIXME: setting the current namespace on the context seems extremely hackish
                 currentCC.context.setCurrentNamespace(cd.descriptor.getNamespace());
                 if (cd.built && !cd.validated) {
                     if (iteration != 0) {
                         logger.warn("Nested add of "+cd.descriptor+" during validation of "+currentCC.topLevel);
-                        throw new AuraRuntimeException("Nested add of "+cd.descriptor+" during validation of "+currentCC.topLevel);
+                        //throw new AuraRuntimeException("Nested add of "+cd.descriptor+" during validation of "+currentCC.topLevel);
                     }
-                cd.def.validateReferences();
+                    cd.def.validateReferences();
                     cd.validated = true;
+                }
             }
-        }
             iteration += 1;
         } while (compiling.size() < currentCC.compiled.size());
 
@@ -618,12 +736,17 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         // And finally, mark everything as happily compiled.
         //
         for (CompilingDef<?> cd : compiling) {
-            defs.put(cd.descriptor, cd.def);
-            if (cd.built) {
-                if (cd.cacheable) {
-                    defsCache.put(cd.descriptor, Optional.of(cd.def));
+            if (cd.def == null) {
+                throw new AuraRuntimeException("Missing def for "+cd.descriptor+" during validation of "+currentCC.topLevel);
+            }
+            if (cd.def != null) {
+                defs.put(cd.descriptor, cd.def);
+                if (cd.built) {
+                    if (cd.cacheable) {
+                        defsCache.put(cd.descriptor, Optional.of(cd.def));
+                    }
+                    cd.def.markValid();
                 }
-                cd.def.markValid();
             }
         }
     }
@@ -651,43 +774,35 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
      * 
      * @param descriptor the descriptor that we wish to compile.
      */
-    protected <D extends Definition> D compileDef(DefDescriptor<D> descriptor,
-            Map<DefDescriptor<? extends Definition>, Definition> dependencies,
-            List<ClientLibraryDef> clientLibs) throws QuickFixException {
+    private <D extends Definition> D compileDef(DefDescriptor<D> descriptor, CompileContext cc)
+            throws QuickFixException {
         D def;
+        int level = cc.level;
+        boolean nested = (cc == currentCC);
 
-        CompileContext hackNested = null;
+        if (!nested && currentCC != null) {
+            throw new AuraRuntimeException("Unexpected nesting of contexts. This is not allowed");
+        }
         rLock.lock();
         try {
-            //
-            // Temporary hack to avoid bugs in W-2020486
-            // Once that bug is fixed, the commented out code below should be re-inserted and tested.
-            // It will catch more errors where dependencies are handled incorrectly
-            //
-            hackNested = currentCC;
-            //if (currentCC == null) {
-                currentCC = new CompileContext(descriptor, dependencies, clientLibs);
-                if (hackNested == null) {
-                    currentCC.loggingService.startTimer(LoggingService.TIMER_DEFINITION_CREATION);
-                }
-            //} else {
-            //    if (currentCC.frozen) {
-                    //
-                    // We were trying to build a frozen DE, and we got badness. This should be
-                    // a difficult to trigger race condition, However, I dislike the idea that
-                    // this might cause a horrific, twisted infinite loop.
-                    //
-            //        logger.error("Client out of sync on "+currentCC.topLevel+" looking for "+descriptor);
-                    //throw new ClientOutOfSyncException("unable to rebuild definition");
-            //        throw new AuraRuntimeException("unable to rebuild definition");
-            //    }
-            //    throw new AuraRuntimeException("nested: "+descriptor+" in "+currentCC.topLevel);
-            //}
+            currentCC = cc;
+            currentCC.pushDescriptor(descriptor);
+            if (!nested) {
+                currentCC.loggingService.startTimer(LoggingService.TIMER_DEFINITION_CREATION);
+            }
             try {
-                currentCC.next = Sets.newHashSet();
                 try {
                     def = getHelper(descriptor, currentCC);
                 } catch (DefinitionNotFoundException ndfe) {
+                    if (nested) {
+                        // ooh, nasty, we might be in a 'failure is ok state', in which case
+                        // we need to be sure that we don't mess up the finishValidation step
+                        // by leaving an empty entry around... If failure is _not_ ok, the next
+                        // level up will break.
+                        if (currentCC.compiled.containsKey(descriptor)) {
+                            currentCC.compiled.remove(descriptor);
+                        }
+                    }
                     //
                     // ignore a nonexistent def here.
                     //
@@ -698,22 +813,32 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                 // All child definitions are added to the 'next' set, while walking the 'current'
                 // set.
                 //
-                while (currentCC.next.size() > 0) {
-                    Set<DefDescriptor<?>> current = currentCC.next;
-                    currentCC.next = Sets.newHashSet();
+                while (currentCC.getNext().size() > 0) {
+                    Set<DefDescriptor<?>> current = currentCC.swap();
+
+                    level += 1;
+                    if (level > 1000) {
+                        throw new AuraRuntimeException("too many levels, you have a cycle");
+                    }
+                    currentCC.level = level;
                     for (DefDescriptor<?> cdesc : current) {
                         getHelper(cdesc, currentCC);
                     }
                 }
-                finishValidation();
+                if (!nested) {
+                    finishValidation();
+                }
                 return def;
             } finally {
-                if (hackNested == null) {
+                if (!nested) {
                     currentCC.loggingService.stopTimer(LoggingService.TIMER_DEFINITION_CREATION);
                 }
-                currentCC = hackNested;
+                currentCC.popDescriptor();
             }
         } finally {
+            if (!nested) {
+                currentCC = null;
+            }
             rLock.unlock();
         }
     }
@@ -736,11 +861,11 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
      * </ul>
      * 
      * @param descriptor the incoming descriptor to compile
-     * @return the definition compiled from the descriptor, or null if not found.
+     * @return the definition compiled from the descriptor, or null if not found.currentCC
      * @throws QuickFixException if the definition failed to compile.
      */
-    private <T extends Definition> DependencyEntry compileDE(DefDescriptor<T> descriptor) throws QuickFixException {
-        // See localDependencies comment
+    protected <T extends Definition> DependencyEntry compileDE(DefDescriptor<T> descriptor) throws QuickFixException {
+        // See localDependencies commentcurrentCC
         String key = makeLocalKey(descriptor);
 
         if (currentCC != null) {
@@ -769,9 +894,9 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         }
 
         try {
-            Map<DefDescriptor<? extends Definition>, Definition> dds = Maps.newTreeMap();
             List<ClientLibraryDef> clientLibs = Lists.newArrayList();
-            Definition def = compileDef(descriptor, dds, clientLibs);
+            CompileContext cc = new CompileContext(descriptor, clientLibs);
+            Definition def = compileDef(descriptor, cc);
             DependencyEntry de;
             String uid;
             long lmt = 0;
@@ -779,30 +904,42 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             if (def == null) {
                 return null;
             }
-            for (Definition t : dds.values()) {
-                lmt = updateLastMod(lmt, t);
-            }
-            lmt = updateLastMod(lmt, def);
-            StringBuilder sb = new StringBuilder(dds.size() * 20);
+
+            List<CompilingDef<?>> compiled = Lists.newArrayList(cc.compiled.values());
+            Collections.sort(compiled);
+
+            Set<DefDescriptor<? extends Definition>> deps = Sets.newLinkedHashSet();
 
             //
-            // Calculate our hash based on the descriptors and their hashes (if any).
-            // This uses a promise, and the string builder methods of Hash.
+            // Now walk the sorted list, building up our dependencies, uid, and lmt.
             //
+            StringBuilder sb = new StringBuilder(256);
             Hash.StringBuilder globalBuilder = new Hash.StringBuilder();
-            for (Map.Entry<DefDescriptor<?>, Definition> entry : dds.entrySet()) {
+            for (CompilingDef<?> cd : compiled) {
+                if (cd.def == null) {
+                    // actually, this should never happen.
+                    throw getDNF(cd);
+                }
+
+                deps.add(cd.descriptor);
+                lmt = updateLastMod(lmt, cd.def);
+
+                //
+                // Now update our hash.
+                //
                 sb.setLength(0);
-                sb.append(entry.getKey().getQualifiedName().toLowerCase());
+                sb.append(cd.descriptor.getQualifiedName().toLowerCase());
                 sb.append("|");
-                String hash = entry.getValue().getOwnHash();
+                String hash = cd.def.getOwnHash();
                 if (hash != null) {
-                    // TODO: we need to ensure that null hashes are ok
                     sb.append(hash.toString());
                 }
                 sb.append(",");
                 globalBuilder.addString(sb.toString());
             }
+            lmt = updateLastMod(lmt, def);
             uid = globalBuilder.build().toString();
+
             //
             // Now try a re-lookup. This may catch existing cached
             // entries where uid was null.
@@ -814,7 +951,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             // de = getDE(uid, key);
             // if (de == null) {
 
-            de = new DependencyEntry(uid, Sets.newTreeSet(dds.keySet()), lmt, clientLibs);
+            de = new DependencyEntry(uid, Collections.unmodifiableSet(deps), lmt, clientLibs);
             depsCache.put(makeGlobalKey(de.uid, descriptor), de);
 
             // See localDependencies comment
@@ -927,12 +1064,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     private <D extends Definition> void validateHelper(DefDescriptor<D> descriptor) throws QuickFixException {
         CompilingDef<D> compiling = new CompilingDef<D>();
         compiling.descriptor = descriptor;
-        if (!fillCompilingDef(compiling, currentCC.context)) {
-            throw new DefinitionNotFoundException(descriptor);
-        }
-        if (compiling.built) {
-            currentCC.compiled.put(descriptor, compiling);
-        }
+        currentCC.compiled.put(descriptor, compiling);
     }
 
     /**
@@ -949,6 +1081,11 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             validateHelper(descriptor);
             for (DefDescriptor<?> dd : de.dependencies) {
                 validateHelper(dd);
+            }
+            for (CompilingDef<?> compiling : currentCC.compiled.values()) {
+                if (!fillCompilingDef(compiling, currentCC.context)) {
+                    throw new DefinitionNotFoundException(descriptor);
+                }
             }
             finishValidation();
         } finally {
@@ -969,16 +1106,15 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
      */
     @Override
     public <D extends Definition> D getDef(DefDescriptor<D> descriptor) throws QuickFixException {
-            if (descriptor == null) {
-                return null;
-            }
+        if (descriptor == null) {
+            return null;
+        }
         rLock.lock();
         try {
-            if (defs.containsKey(descriptor)) {
-                @SuppressWarnings("unchecked")
-                D def = (D) defs.get(descriptor);
-                return def;
-            }
+            //
+            // If our current context is not null, we always want to recurse
+            // in to properly include the defs.
+            //
             if (currentCC != null) {
                 if (currentCC.compiled.containsKey(descriptor)) {
                     @SuppressWarnings("unchecked")
@@ -986,14 +1122,17 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                     if (cd.def != null) {
                         return cd.def;
                     }
-                    return getHelper(descriptor, currentCC);
-                } else {
-                    //
-                    // If we are nested, compileDef will do the right thing.
-                    // This is a bit ugly though.
-                    //
-                    return compileDef(descriptor, null, null);
                 }
+                //
+                // If we are nested, compileDef will do the right thing.
+                // This is a bit ugly though.
+                //
+                return compileDef(descriptor, currentCC);
+            }
+            if (defs.containsKey(descriptor)) {
+                @SuppressWarnings("unchecked")
+                D def = (D) defs.get(descriptor);
+                return def;
             }
             DependencyEntry de = getDE(null, descriptor);
             if (de == null) {
@@ -1032,14 +1171,22 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     @SuppressWarnings("unchecked")
     @Override
     public <D extends Definition> void save(D def) {
+        wLock.lock();
+        try {
         getRegistryFor((DefDescriptor<D>) def.getDescriptor()).save(def);
         invalidate(def.getDescriptor());
+        } finally {
+            wLock.unlock();
+    }
     }
 
     @Override
     public <D extends Definition> boolean exists(DefDescriptor<D> descriptor) {
         boolean cacheable;
+        boolean regExists;
 
+        rLock.lock();
+        try {
         if (defs.get(descriptor) != null) {
             return true;
         }
@@ -1070,10 +1217,13 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                 }
             }
         }
-        boolean regExists = reg.exists(descriptor);
+            regExists = reg.exists(descriptor);
         if (cacheable) {
             Boolean cacheVal = Boolean.valueOf(regExists);
             existsCache.put(descriptor, cacheVal);
+        }
+        } finally {
+            rLock.unlock();
         }
         return regExists;
     }
@@ -1090,6 +1240,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     @Override
     public <D extends Definition> void addLocalDef(D def) {
         DefDescriptor<? extends Definition> desc = def.getDescriptor();
+
         defs.put(desc, def);
         if (localDescs == null) {
             localDescs = Sets.newHashSet();
@@ -1149,7 +1300,8 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
     @Override
     public void assertAccess(DefDescriptor<?> desc) throws QuickFixException {
-
+        rLock.lock();
+        try {
         if (!accessCache.contains(desc)) {
             Aura.getLoggingService().incrementNum("SecurityProviderCheck");
             DefType defType = desc.getDefType();
@@ -1220,6 +1372,9 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                 }
             }
             accessCache.add(desc);
+        }
+        } finally {
+            rLock.unlock();
         }
     }
 

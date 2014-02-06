@@ -274,7 +274,6 @@
      */
     closeSorter : function(listSorter) {
     	var cancelButton = listSorter.find("cancel").getElement();
-    	//cancelButton.click();
 		$A.test.clickOrTouch(cancelButton);
     	this.assertUISorterPresent(listSorter, false);
     },

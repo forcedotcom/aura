@@ -123,8 +123,14 @@ Action.prototype.forceCreationPath = function(path) {
         }
         absPath = top.absPath;
     }
-    $A.warning("force path of "+newAbsPath+" from "+absPath
-        +" likely a use of returned component array without changing index");
+    if (path.length < 2 || path.indexOf("/", 1) !== -1) {
+        //
+        // Only warn if this is not a top level path, to save developers from having
+        // to know the internal implementation of aura (or deal with warnings)
+        //
+        $A.warning("force path of "+newAbsPath+" from "+absPath
+            +" likely a use of returned component array without changing index");
+    }
     var pathEntry = { relPath: "~FORCED~", absPath:newAbsPath, idx: undefined, startIdx: undefined };
     this.pathStack.push(pathEntry);
     return newAbsPath;

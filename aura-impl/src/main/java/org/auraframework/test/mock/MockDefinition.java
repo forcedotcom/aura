@@ -74,7 +74,7 @@ public abstract class MockDefinition<D extends Definition> implements Definition
     }
 
     @Override
-    public void appendDependencies(Set<DefDescriptor<?>> dependencies) throws QuickFixException {
+    public void appendDependencies(Set<DefDescriptor<?>> dependencies){
     }
 
     @Override

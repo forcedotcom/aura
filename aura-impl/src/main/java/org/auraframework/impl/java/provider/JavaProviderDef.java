@@ -122,6 +122,9 @@ public class JavaProviderDef extends DefinitionImpl<ProviderDef> implements Prov
             } catch (IllegalAccessException iae) {
                 throw new InvalidDefinitionException("Constructor is inaccessible for "
                         + builder.providerClass.getName(), location);
+            } catch (RuntimeException e) {
+                throw new InvalidDefinitionException("Failed to instantiate " + builder.providerClass.getName(),
+                        location, e);
             }
         } else {
             //

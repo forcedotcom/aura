@@ -63,7 +63,6 @@ public abstract class XMLHandler<T extends Definition> {
         this.xmlReader = xmlReader;
         this.xmlWriter = null;
         this.source = source;
-        validateAttributes();
     }
 
     protected XMLHandler() {
@@ -136,7 +135,7 @@ public abstract class XMLHandler<T extends Definition> {
         throw new AuraRuntimeException(String.format(message, args), getLocation());
     }
 
-    private void validateAttributes() {
+    protected void validateAttributes() {
         if (!isSystemTag()) {
             return;
         }

@@ -16,7 +16,7 @@
 package org.auraframework.http;
 
 import java.util.List;
-import java.util.Iterator;
+
 import java.util.Map;
 
 import org.apache.http.Header;

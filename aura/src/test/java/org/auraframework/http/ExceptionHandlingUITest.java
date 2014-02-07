@@ -59,6 +59,11 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
         Aura.getContextService().startContext(Mode.PROD, Format.HTML, Access.AUTHENTICATED);
     }
 
+    private void setDevContextWithoutConfig() throws Exception {
+        Aura.getContextService().endContext();
+        Aura.getContextService().startContext(Mode.DEV, Format.HTML, Access.AUTHENTICATED);
+    }
+
     private String getAppUrl(String attributeMarkup, String bodyMarkup) throws Exception {
         String appMarkup = String.format(baseAppTag, attributeMarkup, bodyMarkup);
         DefDescriptor<ApplicationDef> add = addSourceAutoCleanup(ApplicationDef.class, appMarkup);
@@ -70,8 +75,7 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
      * exception message. W-1308475 - Never'd removal/change of duplicate div#auraErrorMessage
      */
     private void assertNoStacktraceServerRendering() throws Exception {
-        WebElement elem = findDomElement(By
-                .xpath(errorBoxPath));
+        WebElement elem = findDomElement(By.xpath(errorBoxPath));
         if (elem == null) {
             fail("error message not found");
         }
@@ -80,7 +84,7 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
     }
 
     private void assertNoStacktrace() throws Exception {
-        String actual = auraUITestingUtil.getQuickFixMessage().replaceAll("\\s+", " ");
+        String actual = auraUITestingUtil.getAuraErrorMessage().replaceAll("\\s+", " ");
         assertEquals("Unable to process your request", actual);
     }
 
@@ -89,8 +93,7 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
      * exception message. W-1308475 - Never'd removal/change of duplicate div#auraErrorMessage
      */
     private void assertStacktraceServerRendering(String messageStartsWith, String... causeStartsWith) throws Exception {
-        WebElement elem = findDomElement(By
-                .xpath(errorBoxPath));
+        WebElement elem = findDomElement(By.xpath(errorBoxPath));
         if (elem == null) {
             fail("error message not found");
         }
@@ -99,7 +102,12 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
     }
 
     private void assertStacktrace(String messageStartsWith, String... causeStartsWith) throws Exception {
-        String actual = auraUITestingUtil.getQuickFixMessage().replaceAll("\\s+", " ");
+        String actual = auraUITestingUtil.getAuraErrorMessage().replaceAll("\\s+", " ");
+        assertStacktraceCommon(actual, messageStartsWith, causeStartsWith);
+    }
+
+    private void assertQuickFixStacktrace(String messageStartsWith, String... causeStartsWith) throws Exception {
+        String actual = auraUITestingUtil.getQuickFixCause().replaceAll("\\s+", " ");
         assertStacktraceCommon(actual, messageStartsWith, causeStartsWith);
     }
 
@@ -108,19 +116,7 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
         if (!actual.contains(messageStartsWith)) {
             fail("unexpected error message - expected <" + messageStartsWith + "> but got <" + actual + ">");
         }
-        String childSelector = "#auraErrorMessage";
         for (String expectedCause : causeStartsWith) {
-            WebElement childElem = findDomElement(By.cssSelector(childSelector));
-            if (childElem == null) {
-                fail("cause not found");
-            }
-            actual = childElem.getAttribute("textContent");
-            if (actual == null) {
-                // Selenium bug with Firefox trying to grab text not visible on screen.
-                // https://code.google.com/p/selenium/issues/detail?id=5773
-                actual = childElem.getText();
-            }
-            actual = actual.replaceAll("\\s+", " ");
             if (!actual.contains(expectedCause)) {
                 fail("unexpected cause - expected <" + expectedCause + "> but got <" + actual + ">");
             }
@@ -141,15 +137,15 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
     }
 
     /**
-     * Stacktrace displayed in non-PRODUCTION if component provider instantiation throws.
+     * QuickFix displayed if provider throws during instantiation.
      */
     public void testCmpProviderThrowsDuringInstantiation() throws Exception {
-        setProdContextWithoutConfig();
+        setDevContextWithoutConfig();
         DefDescriptor<?> cdd = addSourceAutoCleanup(
                 InterfaceDef.class,
                 "<aura:interface provider='java://org.auraframework.impl.java.provider.TestProviderThrowsDuringInstantiation'></aura:interface>");
         openRaw(getAppUrl("", String.format("<%s:%s/>", cdd.getNamespace(), cdd.getName())));
-        assertStacktrace(
+        assertQuickFixStacktrace(
                 "java.lang.RuntimeException: that was intentional at org.auraframework.impl.java.provider.TestProviderThrowsDuringInstantiation.",
                 "(TestProviderThrowsDuringInstantiation.java:");
     }
@@ -166,13 +162,13 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
     }
 
     /**
-     * Stacktrace displayed in non-PRODUCTION if application provider instantiation throws.
+     * QuickFix displayed if provider throws during instantiation.
      */
     public void testAppProviderThrowsDuringInstantiation() throws Exception {
-        setProdContextWithoutConfig();
+        setDevContextWithoutConfig();
         openRaw(getAppUrl(
                 "provider='java://org.auraframework.impl.java.provider.TestProviderThrowsDuringInstantiation'", ""));
-        assertStacktrace("that was intentional at org.auraframework.impl.java.provider.TestProviderThrowsDuringInstantiation.");
+        assertQuickFixStacktrace("that was intentional at org.auraframework.impl.java.provider.TestProviderThrowsDuringInstantiation.");
     }
 
     /**
@@ -192,7 +188,7 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
      * Stacktrace displayed in non-PRODUCTION if component provider instantiation throws.
      */
     public void testCmpProviderThrowsDuringProvide() throws Exception {
-        setProdContextWithoutConfig();
+        setDevContextWithoutConfig();
         DefDescriptor<?> cdd = addSourceAutoCleanup(
                 InterfaceDef.class,
                 "<aura:interface provider='java://org.auraframework.impl.java.provider.TestProviderThrowsDuringProvide'></aura:interface>");
@@ -216,7 +212,7 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
      * Stacktrace displayed in non-PRODUCTION if component model instantiation throws.
      */
     public void testCmpModelThrowsDuringInstantiation() throws Exception {
-        setProdContextWithoutConfig();
+        setDevContextWithoutConfig();
         DefDescriptor<?> cdd = addSourceAutoCleanup(ComponentDef.class,
                 "<aura:component model='java://org.auraframework.impl.java.model.TestModelThrowsDuringInstantiation'></aura:component>");
         openRaw(getAppUrl("", String.format("<%s:%s/>", cdd.getNamespace(), cdd.getName())));
@@ -242,13 +238,13 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
      * Stacktrace displayed in non-PRODUCTION if component renderer instantiation throws.
      */
     public void testCmpRendererThrowsDuringInstantiation() throws Exception {
-        setProdContextWithoutConfig();
+        setDevContextWithoutConfig();
         DefDescriptor<?> cdd = addSourceAutoCleanup(
                 ComponentDef.class,
                 "<aura:component renderer='java://org.auraframework.impl.renderer.sampleJavaRenderers.TestRendererThrowsDuringInstantiation'></aura:component>");
         openRaw(getAppUrl("", String.format("<%s:%s/>", cdd.getNamespace(), cdd.getName())));
-        assertStacktrace(
-                "java.lang.Error: invisible me at org.auraframework.impl.renderer.sampleJavaRenderers.TestRendererThrowsDuringInstantiation.",
+        assertQuickFixStacktrace(
+                "java.lang.RuntimeException: invisible me at org.auraframework.impl.renderer.sampleJavaRenderers.TestRendererThrowsDuringInstantiation.",
                 "(TestRendererThrowsDuringInstantiation.java:");
     }
 
@@ -293,7 +289,7 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
                 ApplicationDef.class,
                 "<aura:application securityProvider='java://org.auraframework.components.security.SecurityProviderAlwaysAllows''></aura:application>");
         openRaw(String.format("/%s/%s.app", add.getNamespace(), add.getName()));
-        assertStacktrace("org.auraframework.throwable.AuraUnhandledException: "
+        assertQuickFixStacktrace("org.auraframework.throwable.AuraUnhandledException: "
                 + String.format("markup://%s:%s:1,111: ParseError at [row,col]:[2,111]", add.getNamespace(),
                         add.getName()));
     }
@@ -304,8 +300,8 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
     public void testControllerThrowsWithFileName() throws Exception {
         String fileName = "auratest/parseError";
         openRaw(fileName + ".cmp");
-        assertStacktrace("org.auraframework.throwable.AuraRuntimeException: ");
-        assertStacktrace("auratest/parseError/parseErrorController.js");
+        assertQuickFixStacktrace("org.auraframework.throwable.AuraRuntimeException: ");
+        assertQuickFixStacktrace("auratest/parseError/parseErrorController.js");
     }
 
     /**

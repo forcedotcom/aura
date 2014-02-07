@@ -23,7 +23,7 @@ import org.auraframework.def.ThemeDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.parser.handler.ThemeDefHandler;
 import org.auraframework.impl.system.DefDescriptorImpl;
-import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
@@ -89,7 +89,7 @@ public class ThemeDefHandlerTest extends AuraImplTestCase {
             source(src);
             fail("Empty value for type is disallowed and the definition does not parse");
         } catch (Exception e) {
-            checkExceptionStart(e, AuraRuntimeException.class, "QualifiedName is required for descriptors");
+            checkExceptionStart(e, InvalidDefinitionException.class, "QualifiedName is required for descriptors");
         }
     }
 
@@ -105,7 +105,7 @@ public class ThemeDefHandlerTest extends AuraImplTestCase {
             source(src);
             fail("Unsupported value for type should cause the definition to fail parsing.");
         } catch (Exception e) {
-            checkExceptionStart(e, AuraRuntimeException.class, "Invalid Descriptor Format: An Unsupported Type");
+            checkExceptionStart(e, InvalidDefinitionException.class, "Invalid Descriptor Format: An Unsupported Type");
         }
     }
 
@@ -127,7 +127,7 @@ public class ThemeDefHandlerTest extends AuraImplTestCase {
         try {
             source("<aura:theme><aura:foo/></aura:theme>");
             fail("Should have thrown AuraException aura:foo isn't a valid child tag for aura:theme");
-        } catch (AuraRuntimeException e) {
+        } catch (InvalidDefinitionException e) {
         }
     }
 
@@ -135,7 +135,7 @@ public class ThemeDefHandlerTest extends AuraImplTestCase {
         try {
             source("<aura:theme>Test</aura:theme>");
             fail("Should have thrown AuraException because text is between aura:theme tags");
-        } catch (AuraRuntimeException e) {
+        } catch (InvalidDefinitionException e) {
         }
     }
 

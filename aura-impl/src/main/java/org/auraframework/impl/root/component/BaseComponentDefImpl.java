@@ -139,19 +139,16 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         this.facets = AuraUtil.immutableList(builder.facets);
         this.dependencies = AuraUtil.immutableList(builder.dependencies);
         this.clientLibraries = AuraUtil.immutableList(builder.clientLibraries);
-
-        String renderName = builder.render;
-        if (renderName == null) {
-            this.render = RenderType.AUTO;
-        } else {
-            this.render = RenderType.valueOf(renderName.toUpperCase());
-        }
-
+        this.render = builder.renderType;
         this.whitespaceBehavior = builder.whitespaceBehavior;
 
         this.expressionRefs = AuraUtil.immutableSet(builder.expressionRefs);
-        this.compoundControllerDescriptor = DefDescriptorImpl.getAssociateDescriptor(getDescriptor(),
-                ControllerDef.class, DefDescriptor.COMPOUND_PREFIX);
+        if (getDescriptor() != null) { 
+            this.compoundControllerDescriptor = DefDescriptorImpl.getAssociateDescriptor(getDescriptor(),
+                    ControllerDef.class, DefDescriptor.COMPOUND_PREFIX);
+        } else {
+            this.compoundControllerDescriptor = null;
+        }
         this.hashCode = AuraUtil.hashCode(super.hashCode(), events, controllerDescriptors, modelDefDescriptor,
                 extendsDescriptor, interfaces, rendererDescriptors, helperDescriptors, resourceDescriptors);
     }
@@ -416,7 +413,9 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
      * @throws QuickFixException
      */
     @Override
-    public void appendDependencies(Set<DefDescriptor<?>> dependencies) throws QuickFixException {
+    public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
+        super.appendDependencies(dependencies);
+
         for (AttributeDefRef facet : this.facets) {
             facet.appendDependencies(dependencies);
         }
@@ -925,6 +924,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         public WhitespaceBehavior whitespaceBehavior;
         List<DependencyDef> dependencies;
         public List<ClientLibraryDef> clientLibraries;
+        private RenderType renderType;
 
         @Override
         public Builder<T> setFacet(String key, Object value) {
@@ -1051,6 +1051,18 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             }
             this.clientLibraries.add(clientLibrary);
             return this;
+        }
+
+        protected void finish() {
+            if (render == null) {
+                this.renderType = RenderType.AUTO;
+            } else {
+                try {
+                    this.renderType = RenderType.valueOf(render.toUpperCase());
+                } catch (Exception e) {
+                    setParseError(e);
+                }
+            }
         }
     }
 

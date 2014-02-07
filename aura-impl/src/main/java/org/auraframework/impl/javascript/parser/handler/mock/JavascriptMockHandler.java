@@ -62,8 +62,12 @@ public abstract class JavascriptMockHandler<D extends Definition> extends Javasc
     }
 
     @Override
-    public D getDefinition() throws QuickFixException {
-        return createDefinition(sourceMap);
+    public D getDefinition() {
+        try {
+            return createDefinition(sourceMap);
+        } catch (QuickFixException qfe) {
+            return createDefinition(qfe);
+        }
     }
 
     /**

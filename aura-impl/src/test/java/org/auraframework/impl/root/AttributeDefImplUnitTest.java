@@ -54,7 +54,8 @@ public class AttributeDefImplUnitTest extends
         this.qualifiedDescriptorName = "testAttribute";
     }
 
-    public void testAppendDependenciesNullDefaultValue() throws Exception {
+    // This is incorrect, and I'm not sure what we should test here.
+    public void _testAppendDependenciesNullDefaultValue() throws Exception {
         Set<DefDescriptor<?>> dependencies = Mockito.spy(Sets.<DefDescriptor<?>> newHashSet());
         this.defaultValue = null;
         buildDefinition().appendDependencies(dependencies);

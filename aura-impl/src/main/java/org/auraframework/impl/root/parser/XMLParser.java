@@ -27,10 +27,12 @@ import javax.xml.stream.XMLStreamReader;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.def.RootDefinition;
+import org.auraframework.impl.root.parser.handler.RootTagHandler;
 import org.auraframework.impl.root.parser.handler.RootTagHandlerFactory;
 import org.auraframework.system.Location;
 import org.auraframework.system.Parser;
 import org.auraframework.system.Source;
+import org.auraframework.throwable.AuraExceptionInfo;
 import org.auraframework.throwable.AuraUnhandledException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -70,6 +72,7 @@ public class XMLParser implements Parser {
     public <D extends Definition> D parse(DefDescriptor<D> descriptor, Source<?> source) throws QuickFixException {
         Reader reader = null;
         XMLStreamReader xmlReader = null;
+        RootTagHandler<? extends RootDefinition> handler = null;
 
         D ret = null;
         try {
@@ -77,6 +80,10 @@ public class XMLParser implements Parser {
                 reader = new HTMLReader(source.getHashingReader());
 
                 xmlReader = xmlInputFactory.createXMLStreamReader(source.getSystemId(), reader);
+            }
+            handler = RootTagHandlerFactory.newInstance((DefDescriptor<RootDefinition>) descriptor,
+                    (Source<RootDefinition>) source, xmlReader);
+            if (xmlReader != null) {
                 // need to skip junk above the start that is ok
                 LOOP: while (xmlReader.hasNext()) {
                     int type = xmlReader.next();
@@ -98,13 +105,8 @@ public class XMLParser implements Parser {
                     throw new InvalidDefinitionException("Empty file", getLocation(xmlReader, source));
                 }
             }
-            ret = (D) RootTagHandlerFactory.newInstance((DefDescriptor<RootDefinition>) descriptor,
-                    (Source<RootDefinition>) source, xmlReader).getElement();
-
-            // the handler will stop at the END_ELEMENT, verify there is nothing
-            // left
-
-            if (source.exists()) {
+            ret = (D)handler.getElement();
+            if (xmlReader != null) {
                 LOOP: while (xmlReader.hasNext()) {
                     int type = xmlReader.next();
                     switch (type) {
@@ -120,8 +122,23 @@ public class XMLParser implements Parser {
                     }
                 }
             }
-        } catch (XMLStreamException e) {
-            throw new AuraUnhandledException(e.getLocalizedMessage(), getLocation(xmlReader, source), e);
+        } catch (Exception e) {
+            if (handler != null) {
+                if (e instanceof AuraExceptionInfo) {
+                    handler.setParseError(e);
+                } else {
+                    handler.setParseError(new AuraUnhandledException(e.getLocalizedMessage(),
+                        getLocation(xmlReader, source), e));
+                }
+                try {
+                    ret = (D)handler.getErrorElement();
+                } catch (Throwable t) {
+                    // rethrow our original error, what else can we do?
+                    throw new AuraUnhandledException(e.getLocalizedMessage(), getLocation(xmlReader, source), e);
+                }
+            } else {
+                throw new AuraUnhandledException(e.getLocalizedMessage(), getLocation(xmlReader, source), e);
+            }
         } finally {
             try {
                 if (reader != null) {

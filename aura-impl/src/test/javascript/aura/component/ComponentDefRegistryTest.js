@@ -138,6 +138,8 @@ Test.Aura.Component.ComponentDefRegistryTest = function() {
 		    return obj === undefined || obj === null;
 		}
 	    },
+	    warning : function(message, error){
+            },
 	    assert : function(condition, message){
 		    if(!condition){
 			var error = new Error(message);
@@ -172,6 +174,8 @@ Test.Aura.Component.ComponentDefRegistryTest = function() {
                     isUndefinedOrNull : function(obj) {
                         return obj === undefined || obj === null;
                     }
+                },
+                warning : function(message, error){
                 },
                 assert : function(condition, message){
                         if(!condition){
@@ -379,6 +383,8 @@ Test.Aura.Component.ComponentDefRegistryTest = function() {
     [Fixture]
     function UseLocalCache() {
 	var mockAuraUtil = Mocks.GetMock(Object.Global(), "$A", {
+	    warning : function(message, error){
+            },
 	    util : {
 		isUndefinedOrNull : function(obj) {
 		    return obj === undefined || obj === null;
@@ -503,6 +509,8 @@ Test.Aura.Component.ComponentDefRegistryTest = function() {
 				}
 			    });
 	    var mockAuraUtil = Mocks.GetMock(Object.Global(), "$A", {
+                warning : function(message, error){
+                },
 		util : {
 		    json : {
 			decode : function(s) {
@@ -585,6 +593,8 @@ Test.Aura.Component.ComponentDefRegistryTest = function() {
 				}
 			    });
 	    var mockAuraUtil = Mocks.GetMock(Object.Global(), "$A", {
+                warning : function(message, error){
+                },
 		util : {
 		    json : {
 			decode : function(s) {
@@ -633,6 +643,8 @@ Test.Aura.Component.ComponentDefRegistryTest = function() {
 	    // Arrange
 	    var storage = {};
 	    var mockAuraUtil = Mocks.GetMock(Object.Global(), "$A", {
+                warning : function(message, error){
+                },
 		util : {
 		    json : {
 			encode : function(s) {
@@ -678,6 +690,8 @@ Test.Aura.Component.ComponentDefRegistryTest = function() {
 	    // Arrange
 	    var storage = {};
 	    var mockAuraUtil = Mocks.GetMock(Object.Global(), "$A", {
+                warning : function(message, error){
+                },
 		util : {
 		    json : {
 			encode : function(s) {

@@ -61,7 +61,7 @@ public interface Definition extends JsonSerializable, Serializable {
     /**
      * Adds all the descriptors for all definitions this depends on to the list
      */
-    void appendDependencies(Set<DefDescriptor<?>> dependencies) throws QuickFixException;
+    void appendDependencies(Set<DefDescriptor<?>> dependencies);
 
     /**
      * @return the name of this definition, not necessarily unique

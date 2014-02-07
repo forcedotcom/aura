@@ -93,28 +93,6 @@ public abstract class BaseComponentDefImplUnitTest<I extends BaseComponentDefImp
     }
 
     @Override
-    public void testGetNameNullDescriptor() throws Exception {
-        this.descriptor = null;
-        try {
-            buildDefinition();
-            fail("Expected an exception when trying to getName() if descriptor is null");
-        } catch (Throwable t) {
-            assertExceptionMessage(t, AuraRuntimeException.class, "descriptor is null");
-        }
-    }
-
-    @Override
-    public void testValidateDefinitionNullDescriptor() throws Exception {
-        this.descriptor = null;
-        try {
-            buildDefinition().validateDefinition();
-            fail("Expected an exception for null descriptor");
-        } catch (Throwable t) {
-            assertExceptionMessage(t, AuraRuntimeException.class, "descriptor is null");
-        }
-    }
-
-    @Override
     public void testValidateReferences() throws Exception {
         setupValidateReferences();
         this.extendsDescriptor = null;

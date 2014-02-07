@@ -139,15 +139,15 @@ public class JavaProviderDefTest extends AuraImplTestCase {
         String markupSkeleton = "<aura:interface %s>"
                 + "<aura:attribute name=\"defaultAttr\" type=\"String\" default=\"meh\"/>" + "</aura:interface>";
         String markupTestCase;
-        String[] runtimeTestCases = { "provider=\"\"", // Blank provider
-                // Bad return type, basically forcing a class cast exception
-                "provider=\"java://org.auraframework.impl.java.provider.TestProviderWithBadReturnType\"",
+        String[] runtimeTestCases = {                // Return a component which does not exist
+                "provider=\"java://org.auraframework.impl.java.provider.TestProvideNonExistingComponent\"",
                 // Provider returns null
                 "provider=\"java://org.auraframework.impl.java.provider.TestProvideReturnNull\"",
-                // Return a component which does not exist
-                "provider=\"java://org.auraframework.impl.java.provider.TestProvideNonExistingComponent\""
+               // Bad return type, basically forcing a class cast exception
+                "provider=\"java://org.auraframework.impl.java.provider.TestProviderWithBadReturnType\""
         };
-        String[] markupTestCases = { "", // No Provider
+        String[] markupTestCases = {  "provider=\"\"", // Blank provider
+                "", // No Provider
                 // No provide method in the Java Provider
                 "provider=\"java://org.auraframework.impl.java.provider.TestProviderWithNoProvideMethod\"",
                 // Non static provide method in the Java Provider
@@ -399,15 +399,13 @@ public class JavaProviderDefTest extends AuraImplTestCase {
     /**
      * Component provided by the provider should extend the Abstract component requested.
      * 
-     * @TestLabels("ignore")
      * @throws Exception
      */
-    @Ignore("W-775818 - no validation for Java providers")
     public void testProviderComponentExtendsAbstract() throws Exception {
         try {
             Aura.getInstanceService().getInstance("test:test_Provider_AbstractNoExtends", ComponentDef.class);
             fail("Should have checked that the component provided by the provider does not extend test:test_Provider_AbstractNoExtends");
-        } catch (AuraRuntimeException e) {
+        } catch (DefinitionNotFoundException e) {
         }
     }
 
@@ -542,7 +540,9 @@ public class JavaProviderDefTest extends AuraImplTestCase {
             javaPrvdrDefDesc.getDef();
             fail("Expected an intentional error");
         } catch (Throwable e) {
-            assertEquals("that was intentional", e.getMessage());
+            checkExceptionFull(e, InvalidDefinitionException.class,
+                    "Failed to instantiate org.auraframework.impl.java.provider.TestProviderThrowsDuringInstantiation",
+                    javaPrvdrDefDesc.getDescriptorName());
         }
     }
 }

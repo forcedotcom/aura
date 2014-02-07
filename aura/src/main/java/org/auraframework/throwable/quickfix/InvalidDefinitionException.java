@@ -25,6 +25,10 @@ public class InvalidDefinitionException extends AuraValidationException {
      */
     private static final long serialVersionUID = -2797862358172183334L;
 
+    public InvalidDefinitionException(String message, Location location, Throwable cause) {
+        super(message, location, cause);
+    }
+
     public InvalidDefinitionException(String message, Location location) {
         super(message, location);
     }

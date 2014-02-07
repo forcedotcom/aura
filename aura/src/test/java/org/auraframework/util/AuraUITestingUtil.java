@@ -418,10 +418,62 @@ public class AuraUITestingUtil {
         });
     }
 
+    /**
+     * Get an error message from the error div.
+     *
+     * FIXME: this is _not_ a quick fix message. This is the error box that is used by $A.error.
+     * Also note that this does not check if the box is visible. This box should always be present,
+     * and may contain old text that is no longer relevant. Please don't use this!
+     *
+     * @return the error message.
+     */
+    @Deprecated
     public String getQuickFixMessage() {
         WebElement errorBox = driver.findElement(By.id("auraErrorMessage"));
         if (errorBox == null) {
-            Assert.fail("Aura quick fix errorBox not found.");
+            Assert.fail("Aura errorBox not found.");
+        }
+        return errorBox.getText();
+    }
+
+    /**
+     * Get the current aura error message.
+     *
+     * This will fail the test if the div is not found (which means that the page did
+     * not load at all). If the box is not displayed, it returns an empty string.
+     *
+     * @return any error message that is displayed.
+     */
+    public String getAuraErrorMessage() {
+        WebElement errorBox = driver.findElement(By.id("auraErrorMessage"));
+        if (errorBox == null) {
+            Assert.fail("Aura errorBox not found.");
+        }
+        if (!errorBox.isDisplayed()) {
+            return "";
+        }
+        return errorBox.getText();
+    }
+
+    /**
+     * Assert that our error message is the expected production error message.
+     */
+    public void assertProdErrorMessage() throws Exception {
+        String actual = getAuraErrorMessage().replaceAll("\\s+", " ");
+        Assert.assertEquals("Unable to process your request", actual);
+    }
+
+    /**
+     * Get any 'cause' message from a quick fix exception
+     *
+     * @return the quick fix cause exception.
+     */
+    public String getQuickFixCause() {
+        WebElement errorBox = driver.findElement(By.className("causeWrapper"));
+        if (errorBox == null) {
+            // This is actually ok, as the box is not rendered if the cause is not present
+            // In this case return an empty string.
+            return "";
         }
         return errorBox.getText();
     }

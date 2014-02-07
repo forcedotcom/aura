@@ -109,7 +109,7 @@ public class ForEachDefImpl extends ComponentDefRefImpl implements ForEachDef {
     }
 
     @Override
-    public void appendDependencies(Set<DefDescriptor<?>> dependencies) throws QuickFixException {
+    public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
         getComponentDef().appendDependencies(dependencies);
     }
 

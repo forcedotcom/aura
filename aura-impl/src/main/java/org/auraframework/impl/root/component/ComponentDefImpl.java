@@ -50,6 +50,7 @@ public class ComponentDefImpl extends BaseComponentDefImpl<ComponentDef> impleme
 
         @Override
         public ComponentDef build() {
+            finish();
             return new ComponentDefImpl(this);
         }
     }

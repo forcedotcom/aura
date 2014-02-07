@@ -27,7 +27,7 @@ import org.auraframework.impl.root.parser.XMLParser;
 import org.auraframework.impl.source.StringSource;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Parser.Format;
-import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.base.Optional;
@@ -78,10 +78,12 @@ public class ApplicationDefHandlerTest extends AuraImplTestCase {
                 "<aura:application><aura:attribute name=\"implNumber\" type=\"String\"/>"
                         + "<aura:attribute name=\"implNumber\" type=\"String\"/></aura:application>", "myID",
                 Format.XML);
+        ApplicationDef ad = parser.parse(descriptor, source);
         try {
-            parser.parse(descriptor, source);
+            ad.validateDefinition();
             fail("Should have thrown Exception. Two attributes with the same name cannot exist");
-        } catch (AuraRuntimeException expected) {
+        } catch (Exception e) {
+            checkExceptionContains(e, InvalidDefinitionException.class, "Duplicate definitions for attribute implNumber");
         }
     }
 
@@ -106,7 +108,7 @@ public class ApplicationDefHandlerTest extends AuraImplTestCase {
         try {
             dd.getDef();
             fail("expected to throw AuraRuntimeException.");
-        } catch (AuraRuntimeException e) {
+        } catch (InvalidDefinitionException e) {
             assertTrue(e.getMessage().contains("Invalid themeOverrides format"));
         }
     }

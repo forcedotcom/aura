@@ -20,6 +20,7 @@ import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.parser.handler.XMLHandler.InvalidSystemAttributeException;
 import org.auraframework.instance.Component;
 import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.junit.Ignore;
 
 /**
@@ -259,14 +260,16 @@ public class TemplateDefTest extends AuraImplTestCase {
             boolean expectException) {
         try {
             desc.getDef();
-            if (expectException)
+            if (expectException) {
                 fail(msg);
+            }
         } catch (Exception e) {
-            if (expectException && e instanceof AuraRuntimeException) {
+            if (expectException && e instanceof InvalidDefinitionException) {
                 assertTrue(e.getMessage().contains("script tags only allowed in templates"));
                 return;
-            } else
+            } else {
                 fail(msg);
+            }
         }
     }
     

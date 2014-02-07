@@ -18,10 +18,12 @@ package org.auraframework.impl.javascript.parser.handler.mock;
 import java.lang.reflect.Proxy;
 import java.util.List;
 import java.util.Map;
+
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.ModelDef;
 import org.auraframework.def.TestSuiteDef;
+import org.auraframework.impl.javascript.model.JavascriptModelDef.Builder;
 import org.auraframework.instance.Model;
 import org.auraframework.system.Source;
 import org.auraframework.test.Resettable;
@@ -40,20 +42,23 @@ import com.google.common.collect.Maps;
 public class JavascriptMockModelHandler extends JavascriptMockHandler<ModelDef> {
     private DefDescriptor<ModelDef> modelDefDescriptor = null;
 
-    public JavascriptMockModelHandler(DefDescriptor<TestSuiteDef> descriptor, Source<?> source,
-            DefDescriptor<? extends BaseComponentDef> targetDescriptor, Map<String, Object> map) {
+    public JavascriptMockModelHandler(DefDescriptor<TestSuiteDef> descriptor,
+            Source<?> source,
+            DefDescriptor<? extends BaseComponentDef> targetDescriptor,
+            Map<String, Object> map) {
         super(descriptor, source, targetDescriptor, map);
     }
 
     @Override
-    protected ModelDef createDefinition(Map<String, Object> map) throws QuickFixException {
+    protected ModelDef createDefinition(Map<String, Object> map)
+            throws QuickFixException {
         ModelDef baseDef = getBaseDefinition((String) map.get("descriptor"), ModelDef.class);
         modelDefDescriptor = baseDef.getDescriptor();
 
         List<Stub<?>> stubs = getStubs(map.get("stubs"));
 
-        return (ModelDef) Proxy.newProxyInstance(this.getClass().getClassLoader(), new Class<?>[] { ModelDef.class,
-                Resettable.class }, new DelegatingStubHandler(baseDef, stubs));
+        return (ModelDef) Proxy.newProxyInstance(this.getClass().getClassLoader(),
+                new Class<?>[] { ModelDef.class, Resettable.class }, new DelegatingStubHandler(baseDef, stubs));
     }
 
     @SuppressWarnings("unchecked")
@@ -61,13 +66,15 @@ public class JavascriptMockModelHandler extends JavascriptMockHandler<ModelDef> 
     protected <T> T getValue(Object object, Class<T> retClass) throws QuickFixException {
         if (object != null && Model.class.equals(retClass)) {
             if (!(object instanceof Map)) {
-                throw new InvalidDefinitionException("Mock Model expects a map of property names to Answers.",
+                throw new InvalidDefinitionException(
+                        "Mock Model expects a map of property names to Answers.",
                         getLocation());
             }
             Map<String, Object> properties = Maps.newHashMap();
             Map<?, ?> propMap = (Map<?, ?>) object;
             for (Object key : propMap.keySet()) {
-                properties.put((String) key, getAnswer(propMap.get(key), Object.class));
+                properties.put((String) key,
+                        getAnswer(propMap.get(key), Object.class));
             }
             return (T) new MockModel(modelDefDescriptor, properties);
         } else {
@@ -83,6 +90,13 @@ public class JavascriptMockModelHandler extends JavascriptMockHandler<ModelDef> 
     @Override
     protected Invocation getDefaultInvocation() throws QuickFixException {
         return new Invocation("newInstance", null, Model.class);
+    }
+
+    @Override
+    protected ModelDef createDefinition(Throwable error) {
+        Builder builder = new Builder();
+        builder.setParseError(error);
+        return builder.build();
     }
 
 }

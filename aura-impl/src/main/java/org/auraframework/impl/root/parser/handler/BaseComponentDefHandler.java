@@ -61,8 +61,7 @@ import com.google.common.collect.Sets;
 
 /**
  */
-public abstract class BaseComponentDefHandler<T extends BaseComponentDef>
-        extends RootTagHandler<T> {
+public abstract class BaseComponentDefHandler<T extends BaseComponentDef> extends RootTagHandler<T> {
 
     private static final String ATTRIBUTE_RENDER = "render";
     private static final String ATTRIBUTE_TEMPLATE = "template";

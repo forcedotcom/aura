@@ -64,13 +64,13 @@ public interface ThemeValueProvider extends ValueProvider {
     DefDescriptor<ThemeDef> getDescriptor(PropertyReference reference);
 
     /**
-     * Similar to {@link #getDescriptor(PropertyReference)}, except it takes a string. Returns a set because there might
-     * be multiple descriptors in the expression.
+     * Similar to {@link #getDescriptor(PropertyReference)}, except it takes a string.
+     *
+     * Returns a set because there might be multiple descriptors in the expression.
+     * FIXME: there should be a separate validation step.
      * 
      * @param expression Find the descriptors in this expression.
      * @param location The location of the expression in the source.
-     * 
-     * @throws QuickFixException
      */
     Set<DefDescriptor<ThemeDef>> getDescriptors(String expression, Location location) throws QuickFixException;
 }

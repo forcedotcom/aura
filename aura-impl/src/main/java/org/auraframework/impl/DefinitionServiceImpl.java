@@ -183,8 +183,9 @@ public class DefinitionServiceImpl implements DefinitionService {
     public void save(Definition def) throws QuickFixException {
         ContextService contextService = Aura.getContextService();
         contextService.assertEstablished();
+        
+        def.validateDefinition();
         contextService.assertAccess(def.getDescriptor());
-
         Aura.getContextService().getCurrentContext().getDefRegistry().save(def);
     }
 

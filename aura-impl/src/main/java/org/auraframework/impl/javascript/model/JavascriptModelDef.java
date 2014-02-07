@@ -108,8 +108,7 @@ public class JavascriptModelDef extends DefinitionImpl<ModelDef> implements Mode
         }
 
         @Override
-        public JavascriptModelDef build() throws QuickFixException {
-
+        public JavascriptModelDef build() {
             return new JavascriptModelDef(this);
         }
     }

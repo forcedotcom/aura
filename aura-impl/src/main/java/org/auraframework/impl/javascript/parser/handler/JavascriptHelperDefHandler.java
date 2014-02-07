@@ -54,4 +54,11 @@ public class JavascriptHelperDefHandler extends JavascriptHandler<HelperDef, Hel
         builder.expressionRefs.addAll(propRefs);
     }
 
+    @Override
+    protected HelperDef createDefinition(Throwable error) {
+        setDefBuilderFields(builder);
+        builder.setParseError(error);
+        return builder.build();
+    }
+
 }

@@ -21,6 +21,7 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;
 
 /**
@@ -227,19 +228,14 @@ public class ExpressionValidationTest extends AuraImplTestCase {
      */
     public void testFunctionNotFound() throws Exception {
         final String noFunction = "No function found for key: ";
-        verifyAuraRuntimeException("{!isNull(null)}", "", noFunction + "isNull");
-        verifyAuraRuntimeException("{!1 > v.div ? isFinite(v.num/v.div) : true}", "", noFunction + "isFinite");
-        verifyAuraRuntimeException("{!v.max > absolute(-1)}", "", noFunction + "absolute");
+        verifyValidationException("{!isNull(null)}", "", noFunction + "isNull", InvalidDefinitionException.class);
+        verifyValidationException("{!1 > v.div ? isFinite(v.num/v.div) : true}", "", noFunction + "isFinite", InvalidDefinitionException.class);
+        verifyValidationException("{!v.max > absolute(-1)}", "", noFunction + "absolute", InvalidDefinitionException.class);
     }
 
     private void verifyInvalidExpressionException(String strExpr, String dblExpr, String expectedMsgContains)
             throws Exception {
         verifyValidationException(strExpr, dblExpr, expectedMsgContains, InvalidExpressionException.class);
-    }
-
-    private void verifyAuraRuntimeException(String strExpr, String dblExpr, String expectedMsgContains)
-            throws Exception {
-        verifyValidationException(strExpr, dblExpr, expectedMsgContains, AuraRuntimeException.class);
     }
 
     private void verifyValidationException(String strExpr, String dblExpr, String expectedMsgContains,

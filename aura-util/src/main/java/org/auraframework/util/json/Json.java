@@ -762,7 +762,7 @@ public class Json {
     public void writeMapEntry(Object key, Object value, String type) throws IOException {
         if (value == null && type != null) {
             try {
-                Class valueClass = Json.class.getClassLoader().loadClass(type.substring("java://".length()));
+                Class<?> valueClass = Json.class.getClassLoader().loadClass(type.substring("java://".length()));
                 if (Iterable.class.isAssignableFrom(valueClass)) {
                     value = new ArrayList<Boolean>(0);
                 } else if (Map.class.isAssignableFrom(valueClass)) {

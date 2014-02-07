@@ -25,6 +25,7 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.ProviderDef;
 import org.auraframework.def.TestSuiteDef;
+import org.auraframework.impl.javascript.provider.JavascriptProviderDef.Builder;
 import org.auraframework.instance.ComponentConfig;
 import org.auraframework.system.Source;
 import org.auraframework.test.Resettable;
@@ -131,6 +132,13 @@ public class JavascriptMockProviderHandler extends JavascriptMockHandler<Provide
     @Override
     protected Invocation getDefaultInvocation() throws QuickFixException {
         return new Invocation("provide", null, ComponentConfig.class);
+    }
+
+    @Override
+    protected ProviderDef createDefinition(Throwable error) {
+        Builder builder = new Builder();
+        builder.setParseError(error);
+        return builder.build();
     }
 
 }

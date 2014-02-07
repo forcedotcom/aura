@@ -37,7 +37,7 @@ public final class DependencyDefImpl extends DefinitionImpl<DependencyDef> imple
     private static final long serialVersionUID = -3245215240391599759L;
     private final DefDescriptor<? extends RootDefinition> parentDescriptor;
     private final DescriptorFilter dependency;
-    private final QuickFixException error;
+    private QuickFixException error;
 
     protected DependencyDefImpl(Builder builder) {
         super(builder);
@@ -73,15 +73,20 @@ public final class DependencyDefImpl extends DefinitionImpl<DependencyDef> imple
     @Override
     public void validateReferences() throws QuickFixException {
         super.validateReferences();
+        if (this.error != null) {
+            throw this.error;
+        }
     }
 
     @Override
-    public void appendDependencies(Set<DefDescriptor<?>> dependencies) throws QuickFixException {
+    public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
         MasterDefRegistry mdf = Aura.getContextService().getCurrentContext().getDefRegistry();
         Set<DefDescriptor<?>> found = mdf.find(this.dependency);
         if (found.size() == 0) {
             // TODO: QuickFix for broken dependency.
-            throw new InvalidDefinitionException("Invalid dependency " + this.dependency, getLocation());
+            if (error == null) {
+                error = new InvalidDefinitionException("Invalid dependency " + this.dependency, getLocation());
+            }
         }
         dependencies.addAll(found);
     }

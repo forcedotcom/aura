@@ -131,11 +131,9 @@ public class EventDefTest extends AuraImplTestCase {
         DefDescriptor<EventDef> desc = DefDescriptorImpl.getInstance("fake:event", EventDef.class);
         DefDescriptor<EventDef> ext = DefDescriptorImpl.getInstance("fake:extendevent", EventDef.class);
         EventDefImpl def = vendor.makeEventDef(desc, EventType.COMPONENT, null, null, ext);
-        Set<DefDescriptor<?>> expected = new HashSet<DefDescriptor<?>>();
-        expected.add(ext);
         Set<DefDescriptor<?>> dependencies = new HashSet<DefDescriptor<?>>();
         def.appendDependencies(dependencies);
-        assertEquals("dependencies are incorrect", expected, dependencies);
+        assertTrue("dependencies don't contain the superclass: "+dependencies, dependencies.contains(ext));
     }
 
     public void testSerialize() throws Exception {

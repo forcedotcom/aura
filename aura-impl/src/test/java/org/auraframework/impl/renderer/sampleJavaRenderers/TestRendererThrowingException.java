@@ -25,7 +25,7 @@ public class TestRendererThrowingException implements Renderer {
 
     @Override
     public void render(BaseComponent<?, ?> component, Appendable appendable) throws IOException, QuickFixException {
-        throw new ArithmeticException();
+        throw new ArithmeticException("From TestRendererThrowingException");
     }
 
 }

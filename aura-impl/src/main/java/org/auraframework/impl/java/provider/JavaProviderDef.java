@@ -183,9 +183,8 @@ public class JavaProviderDef extends DefinitionImpl<ProviderDef> implements Prov
     /**
      * Validate our definition.
      * 
-     * This validation ensures that we have a provider method to get either a
-     * descriptor (simple case) or a config (complex case). It also refuses to
-     * allow a method by the name of provideAttributes.
+     * This validation ensures that we have a provider method to get either a descriptor (simple case) or a config
+     * (complex case). It also refuses to allow a method by the name of provideAttributes.
      */
     @Override
     public void validateDefinition() throws QuickFixException {
@@ -228,7 +227,7 @@ public class JavaProviderDef extends DefinitionImpl<ProviderDef> implements Prov
             config = staticConfigProvider.provide(ref);
             loggingService.incrementNum("JavaCallCount");
         } catch (Exception e) {
-            AuraExceptionUtil.wrapExecutionException(e, this.location);
+            throw AuraExceptionUtil.wrapExecutionException(e, this.location);
         } finally {
             loggingService.stopTimer("java");
             loggingService.startTimer(LoggingService.TIMER_AURA);

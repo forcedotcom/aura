@@ -13,22 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.impl.java.provider;
+package org.auraframework.impl.renderer.sampleJavaRenderers;
 
-import org.auraframework.def.ComponentDef;
-import org.auraframework.def.ComponentDescriptorProvider;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.system.Annotations.Provider;
+import java.io.IOException;
 
-/**
- * An interface provider used for testing.
- */
-@Provider
-public class TestProviderThrowsDuringProvide implements ComponentDescriptorProvider {
+import org.auraframework.def.Renderer;
+import org.auraframework.instance.BaseComponent;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+import org.auraframework.throwable.quickfix.QuickFixException;
+
+public class TestRendererThrowsQFEDuringRender implements Renderer {
 
     @Override
-    public DefDescriptor<ComponentDef> provide() {
-        throw new RuntimeException("out of stock");
+    public void render(BaseComponent<?, ?> component, Appendable appendable) throws IOException, QuickFixException {
+        throw new InvalidDefinitionException("From TestRendererThrowsQFEDuringRender", null);
     }
 
 }

@@ -14,10 +14,29 @@
  * limitations under the License.
  */
 ({
+	/** Behavior when the data from one of its data providers changes **/
 	handleDataChange: function(component, event) {
 		component.getConcreteComponent().getValue("v.items").setValue(event.getParam("data"));
         this.showLoading(component, false);
 	},
+	
+	/** Behavior to prepare the list for new data before a refresh **/
+	beforeRefresh: function(component, event) {
+		component.getConcreteComponent().getValue("v.items").clear();
+	},
+	
+	updateEmptyListContent:function (component) {
+		// make sure we are referencing a concrete component.
+		var concrete_component = component.getConcreteComponent();
+		var items = concrete_component.get("v.items");
+		var has_items = items != null && items.length > 0;
+        $A.util[has_items ? "removeClass" : "addClass"](concrete_component.getElement(), "showEmptyContent");
+    },
+    
+    /** Behavior for triggering data providers on initialization **/
+    initTriggerDataProviders: function(component) {
+    	this.triggerDataProvider(component);
+    },
 
     init: function(component) {
         this.initDataProvider(component);
@@ -77,20 +96,13 @@
     showLoading:function (component, visible) {
         $A.util[visible ? "addClass" : "removeClass"](component.getElement(), "loading");
     },
-    
-    updateEmptyListContent:function (component) {
-		// make sure we are referencing a concrete component.
-		var concrete_component = component.getConcreteComponent();
-		var items = concrete_component.get("v.items");
-		var has_items = items != null && items.length > 0;
-        $A.util[has_items ? "removeClass" : "addClass"](concrete_component.getElement(), "showEmptyContent");
-    },
 
     triggerDataProvider: function(component, index) {
         this.showLoading(component, true);
         if (!index) {
             index = 0;
         }
+        
         if (index >= 0 && index < component._dataProviders.length) {
             component._dataProviders[index].get("e.provide").fire();
         }

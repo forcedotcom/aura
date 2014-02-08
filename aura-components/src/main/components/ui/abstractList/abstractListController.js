@@ -33,7 +33,7 @@
     	helper = component.getDef().getHelper();
 
     	if (component._refreshing) {
-    		component.getConcreteComponent().getValue("v.items").clear();
+    		helper.beforeRefresh(component, event);
     		
     		component._refreshing = false;
     	}
@@ -44,18 +44,30 @@
     init: function(component, event, helper) {
         helper.init(component);
         
-        helper.triggerDataProvider(component);
+        helper.initTriggerDataProviders(component);
     },
     
+    // TODO: Support refresh-all behavior
     refresh: function(component, event, helper) {
+    	var params = event.getParam("parameters");
+    	var index = 0;
+    	if (params) {
+    		index = params.index;
+    	}
+    	
     	component.getConcreteComponent().getValue("v.currentPage").setValue(1, true);
     	
     	component.getConcreteComponent()._refreshing = true;
-    	
-    	helper.triggerDataProvider(component);
+
+    	helper.triggerDataProvider(component, index);
     },
     
     triggerDataProvider: function(component, event, helper) {
-    	helper.triggerDataProvider(component);
+    	var params = event.getParam("parameters");
+    	var index = 0;
+    	if (params) {
+    		index = params.index;
+    	}
+    	helper.triggerDataProvider(component, index);
     }
 })

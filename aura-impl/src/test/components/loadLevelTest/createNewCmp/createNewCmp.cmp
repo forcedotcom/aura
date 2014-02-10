@@ -15,5 +15,16 @@
     limitations under the License.
 
 -->
-<aura:application preload="setAttributesTest" render="server">
-</aura:application>
+<aura:component render="client" extends="loadLevelTest:lazyLoadHelper">
+    <aura:attribute name="testAttr" type="String" default="testValue" />
+    <aura:attribute name="testAttr2" type="Integer" default="22" />
+
+    <aura:dependency resource="aura:renderIf" />
+    <!-- Component declared as dependency should create on client if no server deps -->
+    <aura:dependency resource="loadLevelTest:clientComponent" />
+    <aura:dependency resource="loadLevelTest:serverComponent" />
+    
+    <aura:dependency resource="loadLevelTest:clientWithServerChild" />
+
+    {!v.body}
+</aura:component>

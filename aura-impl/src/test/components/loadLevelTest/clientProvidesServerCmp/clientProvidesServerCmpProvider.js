@@ -14,13 +14,7 @@
  * limitations under the License.
  */
 ({
-    createComponentAndPushToBody:function(cmp, config){
-        $A.newCmpAsync(
-            this,
-            function(newCmp){
-                cmp.getValue("v.body").push(newCmp);
-            },
-            config
-        );
+    provide : function() {
+        return 'markup://loadLevelTest:clientWithServerChild';
     }
 })

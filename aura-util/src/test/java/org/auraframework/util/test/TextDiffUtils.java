@@ -15,6 +15,8 @@
  */
 package org.auraframework.util.test;
 
+import junit.framework.Assert;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -24,10 +26,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.net.URL;
-
 import javax.xml.parsers.ParserConfigurationException;
-
-import junit.framework.Assert;
 
 import org.auraframework.util.AuraUtil;
 import org.auraframework.util.adapter.SourceControlAdapter;
@@ -71,13 +70,10 @@ public class TextDiffUtils extends BaseDiffUtils<String> {
     public void writeGoldFile(String results) {
         URL url = getDestUrl();
         SourceControlAdapter sca = AuraUtil.getSourceControlAdapter();
-        if (!sca.canCheckout() || !url.getProtocol().equals("file")) {
-            throw new RuntimeException("Unable to write to gold file: " + url.toString());
-        }
         try {
             File f = new File(url.getFile());
             boolean existed = f.exists();
-            if (existed && !f.canWrite()) {
+            if (existed && !f.canWrite() && sca.canCheckout()) {
                 sca.checkout(f);
             }
             if (!f.getParentFile().exists()) {
@@ -87,7 +83,7 @@ public class TextDiffUtils extends BaseDiffUtils<String> {
             fw.write(results);
             fw.close();
 
-            if (!existed) {
+            if (!existed && sca.canCheckout()) {
                 sca.add(f);
             }
         } catch (Throwable t) {

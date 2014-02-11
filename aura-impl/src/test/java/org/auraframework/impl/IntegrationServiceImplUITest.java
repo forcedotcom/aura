@@ -436,7 +436,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
         assertTrue("Window location does not end with expected #", getDriver().getCurrentUrl().endsWith("#forward"));
 
         // Manually firing locationChange event
-        expectedTxt = "Location Change fired:0";
+        expectedTxt = "Location Change fired:1";
         auraUITestingUtil.getEval("$A.eventService.newEvent('aura:locationChange').fire()");
         assertEquals("Manully firing locationChange event failed",
                 expectedTxt, getText(By.cssSelector("div.testDiv")));

@@ -28,9 +28,14 @@ var priv = {
     changeHandler : function(){
         var loc = location["hash"];
         var event = eventService.newEvent(this.getEvent());
+        
+        /*if (navigator.userAgent.match(/(iPad|iPhone|iPod touch);.*CPU.*OS 7_\d/i)) {
+        }*/
+        
         if (loc) {
             event.setParams(this.parseLocation(loc));
         }
+        
         event.fire();
     },
 

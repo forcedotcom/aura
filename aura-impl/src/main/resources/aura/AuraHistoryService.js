@@ -31,7 +31,10 @@ var AuraHistoryService = function(){
 	     * @public
 	     */
         set : function(token){
-            location.hash = '#' + token;
+            //location.hash = '#' + token;
+        	
+        	history.pushState(null, null, '#' + token);       	
+            priv.changeHandler();
         },
         
         /**
@@ -84,9 +87,15 @@ var AuraHistoryService = function(){
             var hasEvent = 'onhashchange' in window && ( docMode === undefined || docMode > 7 );
 
             if (hasEvent) {
-                window["onhashchange"] = function(){
+                /*window["onhashchange"] = function(){
                     priv.changeHandler();
-                };
+                };*/
+                
+                window.addEventListener("popstate", function(e) {
+                    $A.log("popstate!!!", location["hash"]);
+                    priv.changeHandler();
+                });
+
             }else{
                 var hash = location["hash"];
                 var watch = function(){

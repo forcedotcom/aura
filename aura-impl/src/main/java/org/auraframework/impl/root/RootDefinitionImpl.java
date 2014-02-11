@@ -15,26 +15,17 @@
  */
 package org.auraframework.impl.root;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.auraframework.builder.RootDefinitionBuilder;
-import org.auraframework.def.AttributeDef;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.ProviderDef;
-import org.auraframework.def.RootDefinition;
+import org.auraframework.def.*;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
 
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import com.google.common.collect.*;
 
 /**
  * Shared definition code between component and event definition.
@@ -44,6 +35,7 @@ public abstract class RootDefinitionImpl<T extends RootDefinition> extends Defin
     private static final long serialVersionUID = -3649366896204152939L;
     protected final Map<DefDescriptor<AttributeDef>, AttributeDef> attributeDefs;
     protected final List<DefDescriptor<ProviderDef>> providerDescriptors;
+    protected final DefDescriptor<DocumentationDef> documentationDescriptor;
     private final int hashCode;
     private final SupportLevel support;
 
@@ -62,8 +54,20 @@ public abstract class RootDefinitionImpl<T extends RootDefinition> extends Defin
         } else {
             support = builder.support;
         }
+        
+        this.documentationDescriptor = builder.documentationDescriptor;
 
         this.hashCode = AuraUtil.hashCode(descriptor, location, attributeDefs);
+        
+        try {
+			DocumentationDef d = this.getDocumentationDef();
+			if (d != null) {
+				
+			}
+		} catch (QuickFixException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
 
     @Override
@@ -74,6 +78,10 @@ public abstract class RootDefinitionImpl<T extends RootDefinition> extends Defin
         } 
         for (AttributeDef attr : attributeDefs.values()) {
             attr.appendDependencies(dependencies);
+        }
+
+        if (documentationDescriptor != null) {
+        	dependencies.add(documentationDescriptor);
         }
     }
 
@@ -101,6 +109,7 @@ public abstract class RootDefinitionImpl<T extends RootDefinition> extends Defin
         public Map<DefDescriptor<AttributeDef>, AttributeDef> attributeDefs;
         private List<DefDescriptor<ProviderDef>> providerDescriptors;
         private SupportLevel support;
+        private DefDescriptor<DocumentationDef> documentationDescriptor;
 
         public Builder(Class<T> defClass) {
             super(defClass);
@@ -112,6 +121,10 @@ public abstract class RootDefinitionImpl<T extends RootDefinition> extends Defin
                 this.providerDescriptors = Lists.newArrayList();
             }
             this.providerDescriptors.add(DefDescriptorImpl.getInstance(name, ProviderDef.class));
+        }
+        
+        public void addDocumentation(String name) {
+            this.setDocumentationDescriptor(DefDescriptorImpl.getInstance(name, DocumentationDef.class));
         }
 
         /**
@@ -136,6 +149,13 @@ public abstract class RootDefinitionImpl<T extends RootDefinition> extends Defin
             return this;
         }
 
+        public DefDescriptor<DocumentationDef> getDocumentationDescriptor() {
+            return documentationDescriptor;
+        }
+
+        public void setDocumentationDescriptor(DefDescriptor<DocumentationDef> documentationDescriptor) {
+            this.documentationDescriptor = documentationDescriptor;
+        }
     }
 
     @Override
@@ -187,6 +207,19 @@ public abstract class RootDefinitionImpl<T extends RootDefinition> extends Defin
                     break;
                 }
             }
+        }
+        return def;
+    }
+    
+    /**
+     * @return The documentation def, which explains the spirit and usage of this application or component.
+     * @throws QuickFixException
+     */
+    @Override
+    public DocumentationDef getDocumentationDef() throws QuickFixException {
+        DocumentationDef def = null;
+        if (documentationDescriptor != null) {
+        	def = documentationDescriptor.getDef();
         }
         return def;
     }

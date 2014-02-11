@@ -57,8 +57,10 @@ public interface DefDescriptor<T extends Definition> extends JsonSerializable,
 		ACTION(ActionDef.class), //
 		TYPE(TypeDef.class), //
 		STYLE(StyleDef.class), //
-		THEME(ThemeDef.class), //
+		THEME(ThemeDef.class), //	
 		DOCUMENTATION(DocumentationDef.class), //
+		DESCRIPTION(DescriptionDef.class), //
+		EXAMPLE(ExampleDef.class), //
 		TESTSUITE(TestSuiteDef.class), //
 		TESTCASE(TestCaseDef.class), //
 		PROVIDER(ProviderDef.class), //

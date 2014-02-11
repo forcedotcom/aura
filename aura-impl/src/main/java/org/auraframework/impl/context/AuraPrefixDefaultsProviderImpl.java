@@ -43,6 +43,7 @@ public class AuraPrefixDefaultsProviderImpl implements PrefixDefaultsAdapter {
         defaults.put(DefType.SECURITY_PROVIDER, DefDescriptor.JAVA_PREFIX);
         defaults.put(DefType.TESTSUITE, DefDescriptor.JAVASCRIPT_PREFIX);
         defaults.put(DefType.RESOURCE, DefDescriptor.JAVASCRIPT_PREFIX);
+        defaults.put(DefType.DOCUMENTATION, DefDescriptor.MARKUP_PREFIX);
     }
 
     @Override

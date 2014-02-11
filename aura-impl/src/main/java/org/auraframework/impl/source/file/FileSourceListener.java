@@ -53,6 +53,7 @@ public class FileSourceListener implements FileListener {
         extensions.put(DefDescriptor.DefType.MODEL, "Model.js");
         extensions.put(DefDescriptor.DefType.RESOURCE, "Resource.css");
         extensions.put(DefDescriptor.DefType.RESOURCE, "Resource.js");
+        extensions.put(DefDescriptor.DefType.DOCUMENTATION, ".auradoc");
     }
 
     @Override

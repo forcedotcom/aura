@@ -17,15 +17,7 @@ package org.auraframework.impl.root.parser.handler;
 
 import javax.xml.stream.XMLStreamReader;
 
-import org.auraframework.def.ApplicationDef;
-import org.auraframework.def.ComponentDef;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.EventDef;
-import org.auraframework.def.InterfaceDef;
-import org.auraframework.def.LayoutsDef;
-import org.auraframework.def.NamespaceDef;
-import org.auraframework.def.RootDefinition;
-import org.auraframework.def.ThemeDef;
+import org.auraframework.def.*;
 import org.auraframework.system.Source;
 
 public class RootTagHandlerFactory {
@@ -55,6 +47,9 @@ public class RootTagHandlerFactory {
         case THEME:
             return (RootTagHandler<T>) new ThemeDefHandler((DefDescriptor<ThemeDef>) defDescriptor,
                     (Source<ThemeDef>) source, xmlReader);
+        case DOCUMENTATION:
+            return (RootTagHandler<T>) new DocumentationDefHandler((DefDescriptor<DocumentationDef>) defDescriptor,
+                    (Source<DocumentationDef>) source, xmlReader);
         default:
             throw new UnsupportedOperationException();
         }

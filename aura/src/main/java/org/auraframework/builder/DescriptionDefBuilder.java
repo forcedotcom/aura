@@ -13,19 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.def;
+package org.auraframework.builder;
 
-import java.util.Map;
+import org.auraframework.def.DescriptionDef;
 
-import org.auraframework.throwable.quickfix.QuickFixException;
-
-/**
- */
-public interface DocumentationDef extends RootDefinition {
-    @Override
-    DefDescriptor<DocumentationDef> getDescriptor();
-    
-    Map<String, ? extends DescriptionDef> getDescriptionDefs();
-    
-    Map<String, ? extends ExampleDef> getExampleDefs();
+public interface DescriptionDefBuilder extends DefBuilder<DescriptionDef, DescriptionDef> {
+    public void setBody(String body);    
+    public void setId(String id);
 }

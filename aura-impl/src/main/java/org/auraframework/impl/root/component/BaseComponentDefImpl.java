@@ -1120,6 +1120,11 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         if (helperDescriptors != null) {
             ret.addAll(helperDescriptors);
         }
+        
+        if (documentationDescriptor != null) {
+        	ret.add(documentationDescriptor);
+        }
+        
         return ret;
     }
 

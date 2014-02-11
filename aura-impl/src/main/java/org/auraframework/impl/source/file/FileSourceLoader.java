@@ -15,19 +15,11 @@
  */
 package org.auraframework.impl.source.file;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.util.EnumMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.io.*;
+import java.util.*;
 
-import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.*;
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.def.Definition;
-import org.auraframework.def.DescriptorFilter;
 import org.auraframework.impl.source.BaseSourceLoader;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Parser.Format;
@@ -62,6 +54,7 @@ public class FileSourceLoader extends BaseSourceLoader {
         filters.put(DefType.LAYOUTS, new SourceFileFilter(DefType.LAYOUTS));
         filters.put(DefType.NAMESPACE, new SourceFileFilter(DefType.NAMESPACE));
         filters.put(DefType.THEME, new SourceFileFilter(DefType.THEME));
+        filters.put(DefType.DOCUMENTATION, new SourceFileFilter(DefType.DOCUMENTATION));
     }
 
     public FileSourceLoader(File base) {

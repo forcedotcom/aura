@@ -13,19 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.def;
+package org.auraframework.impl.documentation;
 
-import java.util.Map;
+import org.auraframework.def.DocumentationDef;
+import org.auraframework.impl.source.SourceFactory;
+import org.auraframework.impl.system.CacheableDefFactoryImpl;
 
-import org.auraframework.throwable.quickfix.QuickFixException;
+public class DocumentationDefFactory extends CacheableDefFactoryImpl<DocumentationDef> {
 
-/**
- */
-public interface DocumentationDef extends RootDefinition {
-    @Override
-    DefDescriptor<DocumentationDef> getDescriptor();
-    
-    Map<String, ? extends DescriptionDef> getDescriptionDefs();
-    
-    Map<String, ? extends ExampleDef> getExampleDefs();
+    public DocumentationDefFactory(SourceFactory sourceFactory) {
+        super(sourceFactory);
+    }
+
 }

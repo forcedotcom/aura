@@ -27,7 +27,17 @@ var AuraClientService = function() {
 
     var clientService = {
 
-        /** @private */
+        /**
+         * Init host is used to set the host name for communications.
+         *
+         * It should only be called once during the application life cycle, since it
+         * will be deleted in production mode.
+         *
+         * Note that in testing, this can be used to make the host appear unreachable.
+         *
+         * @param {string} host the host name of the server.
+         * @public
+         */
         initHost : function(host) {
             priv.host = host || "";
             //#if {"modes" : ["PRODUCTION"]}
@@ -35,13 +45,29 @@ var AuraClientService = function() {
             //#end
         },
 
-        /** @private */
+        /**
+         * Initialize aura.
+         *
+         * This should never be called by client code. It is exposed, but deleted after
+         * first use.
+         *
+         * @param {Object} config the configuration for aura.
+         * @param {string} token the XSS token.
+         * @param {function} callback the callback when init is complete.
+         * @param {object} container the place to install aura (defaults to document.body).
+         * @private
+         */
         init : function(config, token, callback, container) {
             $A.mark("Initial Component Created");
             $A.mark("Initial Component Rendered");
             var body = document.body;
             
+            //
             // not on in dev modes to preserve stacktrace in debug tools
+            // Why? - goliver
+            // I think this should be done in all cases, the $A.error can be more
+            // instructive than an uncaught exception.
+            //
             //#if {"modes" : ["PRODUCTION"]}
             try {
                 //#end
@@ -72,11 +98,24 @@ var AuraClientService = function() {
             delete this.init;
         },
 
+        /**
+         * This function is used by the test service to determine if there are outstanding actions.
+         *
+         * @private
+         */
         idle : function() {
             return priv.foreground.idle() && priv.background.idle() && priv.actionQueue.actions.length === 0;
         },
 
-        /** @private */
+        /**
+         * Initialize definitions.
+         *
+         * This should never be called by client code. It is exposed, but deleted after
+         * first use.
+         *
+         * @param {Object} config the set of definitions to initialize
+         * @private
+         */
         initDefs : function(config) {
             var evtConfigs = aura.util.json.resolveRefs(config["eventDefs"]);
             $A.mark("Registered Events [" + evtConfigs.length + "]");
@@ -112,7 +151,15 @@ var AuraClientService = function() {
             delete this.initDefs;
         },
 
-        /** @private */
+        /**
+         * Run a callback after defs are initialized.
+         *
+         * This is for internal use only. The function is called synchronously if definitions have
+         * already been initialized.
+         *
+         * @param {function} callback the callback that should be invoked after defs are initialized
+         * @private
+         */
         runAfterInitDefs : function(callback) {
             if (this.initDefs) {
                 // Add to the list of callbacks waiting until initDefs() is done
@@ -141,10 +188,12 @@ var AuraClientService = function() {
         },
 
         /**
-         * Throw an exception.
+         * Fire an event exception from the wire.
          *
-         * @param {Object}
-         *            config The data for the exception event
+         * This is published, but only for use in the case of an event exception serialized as JS,
+         * not sure if this is important.
+         *
+         * @param {Object} config The data for the exception event
          * @memberOf AuraClientService
          * @private
          */
@@ -237,6 +286,8 @@ var AuraClientService = function() {
 
         /**
          * Check to see if we are inside the aura processing 'loop'.
+         *
+         * @private
          */
         inAuraLoop : function() {
             return priv.auraStack.length > 0;
@@ -246,10 +297,10 @@ var AuraClientService = function() {
          * Check to see if a public pop should be allowed.
          *
          * We allow a public pop if the name was pushed, or if there is nothing
-         * on the stack.
+         * on the stack. 
          *
-         * @param name the name of the public 'pop' that will happen.
-         * @return true if the pop should be allowed.
+         * @param {string} name the name of the public 'pop' that will happen.
+         * @return {Boolean} true if the pop should be allowed.
          */
         checkPublicPop : function(name) {
             if (priv.auraStack.length > 0) {
@@ -264,7 +315,8 @@ var AuraClientService = function() {
         /**
          * Push a new name on the stack.
          *
-         * @param name the name of the item to push.
+         * @param {string} name the name of the item to push.
+         * @private
          */
         pushStack : function(name) {
             priv.auraStack.push(name);
@@ -278,6 +330,7 @@ var AuraClientService = function() {
          * the server.
          *
          * @param name the name of the last item pushed.
+         * @private
          */
         popStack : function(name) {
             var count = 0;
@@ -439,14 +492,11 @@ var AuraClientService = function() {
          * Inject a component and set up its event handlers. For Integration
          * Service.
          *
-         * @param {Component}
-         *            parent
-         * @param {Object}
-         *            rawConfig
-         * @param {String}
-         *            placeholderId
-         * @param {String}
-         *            localId
+         * FIXME: this should be private.
+         *
+         * @param {Object} rawConfig the config for the component to be injected
+         * @param {String} locatorDomId the DOM id where we should place our element.
+         * @param {String} localId the local id for the component to be created.
          * @memberOf AuraClientService
          * @public
          */
@@ -558,6 +608,7 @@ var AuraClientService = function() {
          * Immediate and future communication with the server may fail.
          * @memberOf AuraClientService
          * @return {Boolean} Returns true if Aura believes it is online; false otherwise.
+         * @public
          */
         isConnected : function() {
             return !priv.isDisconnected;
@@ -569,6 +620,7 @@ var AuraClientService = function() {
          * @param {Boolean} isConnected Set to true to run Aura in online mode,  
          * or false to run Aura in offline mode.
          * @memberOf AuraClientService
+         * @public
          */
         setConnected: function(isConnected) {
         	priv.setConnected(isConnected);
@@ -582,6 +634,7 @@ var AuraClientService = function() {
          * @param {Action} action the action to enqueue
          * @param {Boolean} background Set to true to run the action in the background, otherwise the value of action.isBackground() is used.
          * @memberOf AuraClientService
+         * @public
          */
         enqueueAction : function(action, background) {
             $A.assert(!$A.util.isUndefinedOrNull(action), "EnqueueAction() cannot be called on an undefined or null action.");

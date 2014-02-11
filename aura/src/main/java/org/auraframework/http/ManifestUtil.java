@@ -34,6 +34,8 @@ import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
+import com.google.common.net.HttpHeaders;
+
 /**
  * A set of static http servlet utilities.
  *
@@ -76,6 +78,11 @@ public abstract class ManifestUtil {
      * Check to see if we allow appcache on the current request.
      */
     public static boolean isManifestEnabled(HttpServletRequest request) {
+    	final String userAgent = request.getHeader(HttpHeaders.USER_AGENT);
+        if (userAgent != null && !userAgent.contains("AppleWebKit")) {
+            return false;
+        }
+
         return isManifestEnabled();
     }
 

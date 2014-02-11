@@ -52,6 +52,10 @@
     </aura:set>
     <ui:tabSet class="subtabs">
         <auradocs:stretchTab title="overview">
+        	<aura:if isTrue="{!m.documentation != null &amp;&amp; m.documentation.descriptions.length > 0}"> 
+        		<auradocs:defDescription descriptions="{!m.documentation.descriptions}"/>
+        	</aura:if>
+        
             <aura:if isTrue="{!m.attributes.length > 0}">
                 <auradocs:defMemberList title="Attributes" list="{!m.attributes}"/>
             </aura:if>
@@ -63,6 +67,10 @@
             <aura:if isTrue="{!m.events.length > 0}">
                 <auradocs:defMemberList title="Events" list="{!m.events}"/>
             </aura:if>
+            
+            <aura:if isTrue="{!m.documentation != null &amp;&amp; m.documentation.examples.length > 0}"> 
+        		<auradocs:defExamples examples="{!m.documentation.examples}"/>
+        	</aura:if>
         </auradocs:stretchTab>
 
         <auradocs:stretchEditorPanel title="source" descriptor="{!v.descriptor}" defType="{!v.defType}"/>

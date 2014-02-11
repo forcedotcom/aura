@@ -23,22 +23,8 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.Aura;
 import org.auraframework.builder.RootDefinitionBuilder;
-import org.auraframework.def.AttributeDef;
-import org.auraframework.def.AttributeDefRef;
-import org.auraframework.def.BaseComponentDef;
+import org.auraframework.def.*;
 import org.auraframework.def.BaseComponentDef.WhitespaceBehavior;
-import org.auraframework.def.ComponentDef;
-import org.auraframework.def.ComponentDefRef;
-import org.auraframework.def.ControllerDef;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.HelperDef;
-import org.auraframework.def.InterfaceDef;
-import org.auraframework.def.ModelDef;
-import org.auraframework.def.ProviderDef;
-import org.auraframework.def.RendererDef;
-import org.auraframework.def.ResourceDef;
-import org.auraframework.def.StyleDef;
-import org.auraframework.def.TestSuiteDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.root.AttributeDefImpl;
 import org.auraframework.impl.root.AttributeDefRefImpl;
@@ -47,17 +33,12 @@ import org.auraframework.impl.root.event.RegisterEventDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.SubDefDescriptorImpl;
 import org.auraframework.impl.util.TextTokenizer;
-import org.auraframework.system.AuraContext;
+import org.auraframework.system.*;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.system.Source;
-import org.auraframework.system.SubDefDescriptor;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import com.google.common.collect.*;
 
 /**
  */
@@ -364,6 +345,13 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef> extend
         if (templateName != null) {
             builder.templateDefDescriptor = DefDescriptorImpl.getInstance(
                     templateName, ComponentDef.class);
+        }
+ 
+        DefDescriptor<DocumentationDef> documentationDescriptor = DefDescriptorImpl.getAssociateDescriptor(
+        		builder.getDescriptor(), DocumentationDef.class, DefDescriptor.MARKUP_PREFIX);
+
+        if (documentationDescriptor.exists()) {
+            builder.addDocumentation(documentationDescriptor.getQualifiedName());
         }
 
         builder.render = getAttributeValue(ATTRIBUTE_RENDER);

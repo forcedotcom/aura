@@ -15,17 +15,10 @@
  */
 package org.auraframework.def;
 
-import java.util.Map;
-
-import org.auraframework.throwable.quickfix.QuickFixException;
-
-/**
- */
-public interface DocumentationDef extends RootDefinition {
+public interface DescriptionDef extends Definition {
     @Override
-    DefDescriptor<DocumentationDef> getDescriptor();
+    DefDescriptor<DescriptionDef> getDescriptor();
     
-    Map<String, ? extends DescriptionDef> getDescriptionDefs();
-    
-    Map<String, ? extends ExampleDef> getExampleDefs();
+    String getBody();
+    String getId();
 }

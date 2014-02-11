@@ -24,6 +24,7 @@ import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
+import org.auraframework.def.DocumentationDef;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.EventHandlerDef;
 import org.auraframework.def.InterfaceDef;
@@ -57,6 +58,7 @@ public class ComponentDefModel {
     private final boolean isAbstract;
     private final List<String> interfaces = Lists.newArrayList();
     private final List<DefModel> defs = Lists.newArrayList();
+    private final DocumentationDefModel doc;
 
     public ComponentDefModel() throws QuickFixException {
 
@@ -75,6 +77,14 @@ public class ComponentDefModel {
             for (AttributeDef attribute : rootDef.getAttributeDefs().values()) {
                 attributes.add(new AttributeModel(attribute));
             }
+            
+            DocumentationDef docDef = rootDef.getDocumentationDef();
+            if (docDef != null) {
+            	doc = new DocumentationDefModel(docDef);
+            } else {
+            	doc = null;
+            }
+            
             if (definition instanceof BaseComponentDef) {
                 BaseComponentDef cmpDef = (BaseComponentDef) definition;
                 for (RegisterEventDef reg : cmpDef.getRegisterEventDefs().values()) {
@@ -86,6 +96,7 @@ public class ComponentDefModel {
                 for (DefDescriptor<InterfaceDef> intf : cmpDef.getInterfaces()) {
                     interfaces.add(intf.getNamespace() + ":" + intf.getName());
                 }
+                
                 DefDescriptor<?> superDesc = cmpDef.getExtendsDescriptor();
                 if (superDesc != null) {
                     theSuper = superDesc.getNamespace() + ":" + superDesc.getName();
@@ -126,6 +137,7 @@ public class ComponentDefModel {
             theSuper = null;
             isExtensible = false;
             isAbstract = false;
+            doc = null;
         }
         this.type = type;
     }
@@ -203,6 +215,11 @@ public class ComponentDefModel {
     @AuraEnabled
     public List<DefModel> getDefs() {
         return defs;
+    }
+    
+    @AuraEnabled
+    public DocumentationDefModel getDocumentation() {
+    	return doc;
     }
 
     public class AttributeModel implements JsonSerializable {

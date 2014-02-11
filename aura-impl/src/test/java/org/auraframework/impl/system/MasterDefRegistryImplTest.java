@@ -765,7 +765,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         try {
             mdr.assertAccess(auraApp);
             fail("should fail to grant access to aura:application");
-        } catch (NoAccessException nae) {
+        } catch (InvalidDefinitionException nae) {
             assertTrue("exception should say something about abstract", nae.getMessage()
                     .contains("Abstract definition"));
         }

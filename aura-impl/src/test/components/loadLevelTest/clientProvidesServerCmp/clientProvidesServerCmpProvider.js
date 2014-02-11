@@ -13,19 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.def;
-
-import java.util.Map;
-
-import org.auraframework.throwable.quickfix.QuickFixException;
-
-/**
- */
-public interface DocumentationDef extends RootDefinition {
-    @Override
-    DefDescriptor<DocumentationDef> getDescriptor();
-    
-    Map<String, ? extends DescriptionDef> getDescriptionDefs();
-    
-    Map<String, ? extends ExampleDef> getExampleDefs();
-}
+({
+    provide : function() {
+        return 'markup://loadLevelTest:clientWithServerChild';
+    }
+})

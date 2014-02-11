@@ -15,5 +15,12 @@
     limitations under the License.
 
 -->
-<aura:application preload="setAttributesTest" render="server">
-</aura:application>
+<aura:component extensible="true">
+    <aura:attribute name="descriptions" type="Object"/>
+    
+    <h3>Description</h3>
+   
+  	<aura:foreach items="{!v.descriptions}" var="desc">
+		<aura:unescapedHtml value="{!desc}"/>
+    </aura:foreach>
+</aura:component>

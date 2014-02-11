@@ -13,14 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-({
-    createComponentAndPushToBody:function(cmp, config){
-        $A.newCmpAsync(
-            this,
-            function(newCmp){
-                cmp.getValue("v.body").push(newCmp);
-            },
-            config
-        );
-    }
-})
+package org.auraframework.builder;
+
+import org.auraframework.def.DescriptionDef;
+
+public interface DescriptionDefBuilder extends DefBuilder<DescriptionDef, DescriptionDef> {
+    public void setBody(String body);    
+    public void setId(String id);
+}

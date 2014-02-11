@@ -13,19 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.def;
+({
+	/**
+	 * Returns the img tag in this component.
+	 */
+	getImageElement : function(cmp) {
+		var el = cmp.getElement();    		
 
-import java.util.Map;
-
-import org.auraframework.throwable.quickfix.QuickFixException;
-
-/**
- */
-public interface DocumentationDef extends RootDefinition {
-    @Override
-    DefDescriptor<DocumentationDef> getDescriptor();
-    
-    Map<String, ? extends DescriptionDef> getDescriptionDefs();
-    
-    Map<String, ? extends ExampleDef> getExampleDefs();
-}
+    	if (this.isAnchorImage(cmp)) {
+    		el = el.children[0];
+    	}
+    	return el;
+	},
+	
+	isAnchorImage : function(cmp) {
+		var href = cmp.getValue("v.href").getValue();
+		return !$A.util.isEmpty(href)
+	}
+})

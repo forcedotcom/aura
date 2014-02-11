@@ -110,6 +110,26 @@
         }
     },
     
+    testGetImageElementWithoutAnchor:{
+    	attributes : {src: '/auraFW/resources/aura/auralogo.png', imageType:'decorative'},
+    	test : function(cmp) {
+    		var imgEl = cmp.getDef().getHelper().getImageElement(cmp);
+
+    		$A.test.assertTrue($A.test.isInstanceOfImageElement(imgEl));
+    		$A.test.assertEquals(imgEl, document.getElementsByTagName("img")[0]);
+    	}
+    },
+    
+    testGetImageElementWithAnchor:{
+    	attributes : {src: '/auraFW/resources/aura/auralogo.png', href: 'http://www.salesforce.com', imageType:'decorative'},
+    	test : function(cmp) {
+    		var imgEl = cmp.getDef().getHelper().getImageElement(cmp);
+    		
+    		$A.test.assertTrue($A.test.isInstanceOfImageElement(imgEl));
+    		$A.test.assertEquals(imgEl, document.getElementsByTagName("img")[0]);
+    	}
+    },
+    
     //W-1014086
     _testAccessibility:{
         test:function(cmp){

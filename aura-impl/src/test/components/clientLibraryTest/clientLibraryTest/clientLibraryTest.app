@@ -10,7 +10,7 @@
     <aura:clientLibrary name="clTestAppCSS" url="css://clientLibraryTest.clientLibraryTest" type="CSS" combine="true" />
 
     <div class='identifier clientLibraryTestStyle' />
-    <div class='jiffyCssIdentifier jiffyAbsolute'/>
+    <div class='PerfCssIdentifier PerfAbsolute'/>
 
     <aura:clientLibrary name="UIPerfCsS" type="CSS" modes="STATS" />
 </aura:application>

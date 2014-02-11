@@ -50,6 +50,7 @@ $A.ns.Aura.prototype["onLoadFired"] = $A.ns.Aura.prototype.onLoadFired;
 $A.ns.Aura.prototype["logLevel"] = $A.ns.Aura.prototype.logLevel;
 $A.ns.Aura.prototype["fitTo"] = $A.ns.Aura.prototype.fitTo;
 $A.ns.Aura.prototype["updateMarkName"] = $A.ns.Aura.prototype.updateMarkName;
+$A.ns.Aura.prototype["Perf"] = $A.ns.Aura.prototype.Perf;
 // //#end
 
 //#if {"excludeModes" : ["PRODUCTION"]}

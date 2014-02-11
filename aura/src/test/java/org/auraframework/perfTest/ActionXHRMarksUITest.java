@@ -39,12 +39,12 @@ public class ActionXHRMarksUITest extends PerfMetricsTestCase {
      */
     public void testBackgroundActionMark() throws Exception {
         Map<String, String> logStats = Maps.newHashMap();
-        open("/test/jiffyActionMarksTest.cmp", Mode.CADENCE);
+        open("/test/UIPerfActionMarksTest.cmp", Mode.CADENCE);
         WebElement button = getDriver().findElement(By.cssSelector(".backgroundButton"));
         button.click();
         waitForElementTextPresent(getDriver().findElement(By.cssSelector(".outputText")), "Background action complete");
 
-        logStats.putAll(getJiffyStats(Lists.newArrayList("Received Response - XHR 2: ['echoTextBackground<BG>']")));
+        logStats.putAll(getUIPerfStats(Lists.newArrayList("Received Response - XHR 2: ['echoTextBackground<BG>']")));
         assertTrue("Did not receive background Action XHR mark with Action name and '<BG>' tag.",
                 logStats.containsKey("Received Response - XHR 2: ['echoTextBackground<BG>']"));
     }
@@ -54,12 +54,12 @@ public class ActionXHRMarksUITest extends PerfMetricsTestCase {
      */
     public void testForegroundActionMark() throws Exception {
         Map<String, String> logStats = Maps.newHashMap();
-        open("/test/jiffyActionMarksTest.cmp", Mode.CADENCE);
+        open("/test/UIPerfActionMarksTest.cmp", Mode.CADENCE);
         WebElement button = getDriver().findElement(By.cssSelector(".foregroundButton"));
         button.click();
         waitForElementTextPresent(getDriver().findElement(By.cssSelector(".outputText")), "Foreground action complete");
 
-        logStats.putAll(getJiffyStats(Lists.newArrayList("Received Response - XHR 2: ['echoText']")));
+        logStats.putAll(getUIPerfStats(Lists.newArrayList("Received Response - XHR 2: ['echoText']")));
         assertTrue("Did not receive foreground Action XHR mark with Action name.",
                 logStats.containsKey("Received Response - XHR 2: ['echoText']"));
     }
@@ -69,12 +69,12 @@ public class ActionXHRMarksUITest extends PerfMetricsTestCase {
      */
     public void testMultipleForegroundActionsMark() throws Exception {
         Map<String, String> logStats = Maps.newHashMap();
-        open("/test/jiffyActionMarksTest.cmp", Mode.CADENCE);
+        open("/test/UIPerfActionMarksTest.cmp", Mode.CADENCE);
         WebElement button = getDriver().findElement(By.cssSelector(".multiForegroundButton"));
         button.click();
         waitForElementTextPresent(getDriver().findElement(By.cssSelector(".outputText")), "Fore1Fore2Fore3");
 
-        logStats.putAll(getJiffyStats(Lists
+        logStats.putAll(getUIPerfStats(Lists
                 .newArrayList("Received Response - XHR 2: ['echoText','echoText','echoText']")));
         assertTrue("Did not receive foreground Action XHR with multiple Action names appended.",
                 logStats.containsKey("Received Response - XHR 2: ['echoText','echoText','echoText']"));

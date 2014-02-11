@@ -27,9 +27,9 @@ import org.auraframework.util.json.JsonReader;
 import com.google.common.collect.Maps;
 
 /**
- * Base class for testing Jiffy performance marks.
+ * Base class for testing UIPerf performance marks.
  * 
- * Note that Jiffy is only loaded in PTEST (and Cadence) modes.
+ * Note that UIPerf is only loaded in PTEST (and Cadence) modes.
  */
 public class PerfMetricsTestCase extends WebDriverTestCase {
 	public PerfMetricsTestCase(String name) {
@@ -37,19 +37,19 @@ public class PerfMetricsTestCase extends WebDriverTestCase {
 	}
 
 	protected void clearStats() {
-		auraUITestingUtil.getEval("Perf.removeStats()");
+		auraUITestingUtil.getEval("$A.Perf.removeStats()");
 	}
 
-	protected Map<String, String> getJiffyStats(
+	protected Map<String, String> getUIPerfStats(
 			ArrayList<String> transactionsToGather) {
-		return getJiffyStats(null, transactionsToGather);
+		return getUIPerfStats(null, transactionsToGather);
 	}
 
-    protected Map<String, String> getJiffyStats(String stage, 
+    protected Map<String, String> getUIPerfStats(String stage, 
     		ArrayList<String> transactionsToGather) {
         Map<String, String> stats = Maps.newHashMap();
         String json = auraUITestingUtil.getEval(
-        		"return $A.util.json.encode(Perf.toJson())").toString();
+        		"return $A.util.json.encode($A.Perf.toJson())").toString();
         getName();
         json = json.substring(1, json.length() - 1);
         json = json.replace("\\\"", "\"");

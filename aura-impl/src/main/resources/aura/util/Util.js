@@ -40,12 +40,16 @@ $A.ns.Util = function() {
 };
 
 /**
- * Browser check, does the validation using the userAgent.
+ * Browser check for all supported versions of Internet Explorer, does the validation using the userAgent.
+ * 
+ * @returns {Boolean} true if Internet Explorer detected
  */
 $A.ns.Util.prototype.isIE = (navigator.userAgent.indexOf("MSIE") != -1) || (navigator.userAgent.indexOf("Trident/") != -1);
 
 /**
  * evals code globally, without enclosing the current scope
+ * 
+ * @private
  */
 $A.ns.Util.prototype.globalEval = $A.ns.Util.prototype.isIE ? function(src) {
     // use assignment to variable so that the newlines in src are not actually treated as the end of the line
@@ -57,6 +61,7 @@ $A.ns.Util.prototype.globalEval = $A.ns.Util.prototype.isIE ? function(src) {
 
 /**
  * Checks whether the specified object is an array.
+ * 
  * @param {Object} obj The object to check for.
  * @returns {Boolean} True if the object is an array, or false otherwise.
  */
@@ -68,6 +73,7 @@ $A.ns.Util.prototype.isArray = typeof Array.isArray === "function" ? Array.isArr
  * Checks whether the specified object is a valid object.
  * A valid object: Is not a DOM element, is not a native browser class (XMLHttpRequest)
  * is not falsey, and is not an array, error, function string or number.
+ * 
  * @param {Object} obj The object to check for.
  * @returns {Boolean} True if the object is a valid object, or false otherwise.
  */
@@ -79,6 +85,7 @@ $A.ns.Util.prototype.isObject = function(obj){
  * Checks whether the specified object is a valid error.
  * A valid error: Is not a DOM element, native browser class (XMLHttpRequest), falsey,
  * array, function string or number.
+ * 
  * @param {Object} obj The object to check for.
  * @returns {Boolean} True if the object is a valid error, or false otherwise.
  */
@@ -90,6 +97,7 @@ $A.ns.Util.prototype.isError = function(obj){
  * Checks whether the specified object is a valid function.
  * A valid function: Is not a DOM element, native browser class (XMLHttpRequest), falsey,
  * array, error, or number.
+ * 
  * @param {Object} obj The object to check for.
  * @returns {Boolean} True if the object is a valid function, or false otherwise.
  */
@@ -99,6 +107,7 @@ $A.ns.Util.prototype.isFunction = function(obj){
 
 /**
  * Checks if the object is of type string.
+ * 
  * @param {Object} obj The object to check for.
  * @returns {Boolean} True if the object is of type string, or false otherwise.
  */
@@ -108,6 +117,7 @@ $A.ns.Util.prototype.isString = function(obj){
 
 /**
  * Checks if the object is of type number.
+ * 
  * @param {Object} obj The object to check for.
  * @returns {Boolean} True if the object is of type number, or false otherwise.
  */
@@ -117,6 +127,7 @@ $A.ns.Util.prototype.isNumber = function(obj){
 
 /**
  * Checks if the object is a finite number (not NaN or Infinity or -Infinity)
+ * 
  * @param {Object} obj The object to check for.
  * @returns {Boolean} True if the object is a finite number, or false otherwise.
  */
@@ -126,6 +137,7 @@ $A.ns.Util.prototype.isFiniteNumber = function(obj){
 
 /**
  * Checks if the object is of type boolean.
+ * 
  * @param {Object} obj The object to check for.
  * @returns {Boolean} True if the object is of type boolean, or false otherwise.
  */
@@ -135,6 +147,7 @@ $A.ns.Util.prototype.isBoolean = function(obj){
 
 /**
  * Checks if the object is undefined.
+ * 
  * @param {Object} obj The object to check for.
  * @returns {Boolean} True if the object type is undefined, or false otherwise.
  */
@@ -144,6 +157,7 @@ $A.ns.Util.prototype.isUndefined = function(obj){
 
 /**
  * Checks if the object is undefined or null.
+ * 
  * @param {Object} obj The object to check for.
  * @returns {Boolean} True if the object type is undefined or null, or return false otherwise.
  */
@@ -155,6 +169,7 @@ $A.ns.Util.prototype.isUndefinedOrNull = function(obj){
  * Checks if the object is empty.
  * An empty object's value is undefined, null, an empty array, or empty string. An object with no native
  * properties is not considered empty at this time.
+ * 
  * @param {Object} obj The object to check for.
  * @returns {Boolean} True if the object is empty, or false otherwise.
  */
@@ -164,6 +179,7 @@ $A.ns.Util.prototype.isEmpty = function(obj){
 
 /**
  * Gets a DOM element by its id without any leading characters (e.g. #) unless the ID contains them.
+ * 
  * @param {String} id The corresponding id of the DOM element.
  * @returns {Object} The element with the matching id, or null if none is found.
  */
@@ -173,6 +189,7 @@ $A.ns.Util.prototype.getElement = function(id){
 
 /**
  * Checks whether the element has the specified class.
+ * 
  * @param {Object} element The element to check for.
  * @param {String} clz The CSS class name to check for.
  * @returns {Boolean} True if the specified class is found for the element, or false otherwise.
@@ -193,6 +210,7 @@ $A.ns.Util.prototype.hasClass = function(element, clz){
 /**
  * Adds the specified class to the element, depending on whether it already existed on that element.
  * See <a href="#help?topic=addClass">Adding and Removing Styles</a> for more information.
+ * 
  * @param {Object} element The element to apply the class on.
  * @param {String} clz The CSS class to be applied on the element.
  *
@@ -219,6 +237,7 @@ $A.ns.Util.prototype.addClass = function(element, clz){
 /**
  * Removes the class from an element.
  * See <a href="#help?topic=addClass">Adding and Removing Styles</a> for more information.
+ * 
  * @param {Object} element The element to remove the class from.
  * @param {String} clz The CSS class to be removed from the element.
  */
@@ -245,6 +264,7 @@ $A.ns.Util.prototype.removeClass = function(element, clz){
 
 /**
  * Adds a class or removes it from an element.
+ * 
  * @param {Object} element The element to add or remove the class from.
  * @param {String} clz The CSS class to be added or removed from the class.
  */
@@ -260,6 +280,7 @@ $A.ns.Util.prototype.toggleClass = function(element, clz){
 
 /**
  * Swaps an element's class by removing the selected class and adding another in its place.
+ * 
  * @param {Object} element The element to be processed.
  * @param {String} clz1 The class to remove from the element.
  * @param {String} clz2 The class to add to the element.
@@ -277,6 +298,7 @@ $A.ns.Util.prototype.swapClass = function(element, clz1, clz2){
 
 /**
  * Inserts element(s) as the first child of the parent element.
+ * 
  * @param {Object} parent The parent element
  * @param {Array|Object} child The child element to insert as the first child in the parent element.
  */
@@ -299,6 +321,7 @@ $A.ns.Util.prototype.insertFirst = function(parent, child){
 /**
  * Inserts a new element, newEl, directly before the reference element, referenceEl.
  * If the reference element is a parent node, insert the new element directly before the parent node.
+ * 
  * @param {Object} newE1 The new element to insert.
  * @param {Object} referenceE1 The reference element
  * @returns {Object} The element that was inserted.
@@ -320,6 +343,7 @@ $A.ns.Util.prototype.insertBefore = function(newEl, referenceEl) {
 /**
  * Inserts a new element, newEl, directly after the reference element, referenceEl.
  * If the reference element is a parent node, insert the new element directly after the parent node.
+ * 
  * @param {Object} newE1 The new element to insert.
  * @param {Object} referenceE1 The reference element
  * @returns {Object} The element that was inserted.
@@ -347,6 +371,7 @@ $A.ns.Util.prototype.insertAfter = function(newEl, referenceEl) {
 
 /**
  * Adds a new element to the end of the reference element. Does not work if the canHaveChildren property on the reference element is false.
+ * 
  * @param {Object} newE1 The element to append as a child of the reference element.
  * @param {Object} referenceE1 The existing element
  * @returns {Object} The new element that was added
@@ -443,6 +468,7 @@ $A.ns.Util.prototype.removeElement = function(element) {
 
 /**
  * Decodes the URL by replacing the encoded text with the character that it represents.
+ * 
  * @param {String} url The URL string to be decoded.
  * @returns {Object} The decoded URL.
  */
@@ -458,6 +484,7 @@ $A.ns.Util.prototype.urlDecode = function(url){
 
 /**
  * Trims a string by removing newlines, spaces, and tabs from the beginning and end of the string.
+ * 
  * @param {String} st The string to be trimmed.
  * @returns {String}
  */
@@ -467,6 +494,7 @@ $A.ns.Util.prototype.trim = function(st){
 
 /**
  * Truncates a string to the given length.
+ * 
  * @param {String} st The string to be truncated.
  * @param {Number} len The length of characters. Includes the ellipsis if ellipsis is set to true.
  * @param {Boolean} ellipsis If set to true, an ellipsis is added to the truncated string.
@@ -512,11 +540,10 @@ $A.ns.Util.prototype.truncate = function(st, len, ellipsis, truncateByWord){
  * This is useful to defer responding to a stream of repetetive events until the
  * end of the stream.
  * 
- * @param {Function}
- *            callback The function to be run once the tolerance period has
- *            passed.
- * @param {Number}
- *            toleranceMillis The tolerance duration in milliseconds.
+ * @param {Function} callback
+ *          The function to be run once the tolerance period has passed.
+ * @param {Number} toleranceMillis
+ *          The tolerance duration in milliseconds.
  * @returns {Function} The function to invoke in order to trigger a start/reset
  *          of the tolerance period.
  */
@@ -653,7 +680,6 @@ $A.ns.Util.prototype.on = (function() {
  * @param {String} eventName The name of the DOM event, minus the "on" prefix (e.g. "click", "focus", "blur", etc.).
  * @param {Function} listener The JS listener function to remove.
  * @param {Boolean} useCapture Whether to use event capturing.
- * @returns {void}
  */
 $A.ns.Util.prototype.removeOn = function(element, eventName, listener, useCapture) {
 	if (listener.registeredAuraHandler) {
@@ -672,6 +698,7 @@ $A.ns.Util.prototype.removeOn = function(element, eventName, listener, useCaptur
 /**
  * Stores the values of a form to a Map object. Values from a checkbox, radio, drop-down list, and textarea
  * are stored in the Map.
+ * 
  * @param {Object} form
  * @returns {Object} The map containing the values from the form input.
  */
@@ -710,12 +737,13 @@ $A.ns.Util.prototype.formToMap = function(form) {
             }
         }
     }
-
     return map;
 };
+
 /**
  * Gets the selected values from a list of options.
  * Returns a single value if only a single option is selected.
+ * 
  * @param {Object} select
  * @returns {Object} A list of selected options.
  */
@@ -745,12 +773,12 @@ $A.ns.Util.prototype.getSelectValue = function(select) {
  * Adds a value to a map with a given key.  If the key already exists, the values are turned into a list.
  * If the value has a dot in it - e.g. "properties.4" - it will be turned into an inner map, with
  * the second part as the inner key.
+ * 
  * @param {Object} inputMap The input map to be processed.
  * @param {String} key The data key whose value is to be added to the input map.
  * @param {Object} value The value of the data to add to the input map.
  */
 $A.ns.Util.prototype.addValueToMap = function(inputMap, key, value) {
-
     if (key.indexOf(".") > 0) {
         var inputName = key.substring(0, key.indexOf("."));
         var subMapKey = key.substring(key.indexOf(".") + 1, key.length);
@@ -783,12 +811,12 @@ $A.ns.Util.prototype.addValueToMap = function(inputMap, key, value) {
  * input name="def.def1"
  * input name="def.def2"
  * get put in the input map under "def", as a map with "def1" and "def2" mapped to their values.
+ * 
  * @param {Object} inputMap The input map to be processed.
  * @param {String} key The data key whose value is to be added to the input map.
  * @param {Object} value The value of the data to add to the input map.
  * @param {String} subMapKey
  */
-
 $A.ns.Util.prototype.addMapValueToMap = function(inputMap, key, value, subMapKey) {
     var subMap = inputMap[key];
     if (!subMap) {
@@ -798,6 +826,15 @@ $A.ns.Util.prototype.addMapValueToMap = function(inputMap, key, value, subMapKey
     subMap[subMapKey] = value;
 };
 
+/**
+ * Walks up a definition hierarchy to search for a sub definition by qualified name.
+ * 
+ * @param {Object} def
+ *          The definition to search
+ * @param {String} qname
+ *          The qualified name to search for
+ * @returns {Boolean} true if qualified name is found in defs hierarchy
+ */
 $A.ns.Util.prototype.isSubDef = function(def, qname) {
     while (def) {
         if (def.getDescriptor().getQualifiedName() === qname) {
@@ -844,20 +881,21 @@ $A.ns.Util.prototype.apply = function(/* Object|Function */ baseObject, /* Objec
     return baseObject;
 };
 
+$A.ns.Util.prototype.CAMEL_CASE_TO_HYPHENS_REGEX = /([A-Z])/g;
+
 /**
  * Converts camelCase to hyphens.
+ * 
  * @param {String} str The string to be converted.
  * @returns {String} The string containing hyphens that replaces the camelCase.
  */
-
-$A.ns.Util.prototype.CAMEL_CASE_TO_HYPHENS_REGEX = /([A-Z])/g;
-
 $A.ns.Util.prototype.camelCaseToHyphens = function(str) {
     return str.replace(this.CAMEL_CASE_TO_HYPHENS_REGEX, "-$1").toLowerCase();
 };
 
 /**
  * Converts hyphens to camelCase.
+ * 
  * @param {String} str The string to be converted.
  * @returns {String} The string in camelCase.
  */
@@ -869,10 +907,10 @@ $A.ns.Util.prototype.hyphensToCamelCase = function(str) {
     return str.replace(/-([a-z])/gi, hyphensToCamelCaseHelper);
 };
 
-
 /**
  * @description
  * A map of nodeNames that cannot accept custom data attributes.
+ * @private
  */
 $A.ns.Util.prototype.noData = {
     "embed": true,
@@ -884,6 +922,7 @@ $A.ns.Util.prototype.noData = {
 /**
  * @description
  * Returns whether a given DOM element can accept custom data attributes.
+ * 
  * @param {HTMLElement} element The element to check for custom data attribute support.
  * @returns {Boolean} Whether element accepts custom data attributes.
  */
@@ -899,37 +938,32 @@ $A.ns.Util.prototype.acceptsData = function(element) {
             return !(match === true || element.getAttribute("classid") !== match);
         }
     }
-
     return true;
 };
+
 /**
- * @description
  * Return attributeValue of an element
+ * 
  * @param {HTMLElement} element The element from which to retrieve data.
  * @param {String} attributeName The name of attribute to look up on element.
  */
 $A.ns.Util.prototype.getElementAttributeValue = function(element,attributeName){
-    
-    
-    
-        var attrValue = element.getAttribute(attributeName);
-	//For browser Compatibility - getAttribute doesn't always work in IE
-	if($A.util.isUndefinedOrNull(attrValue)){
-	    //Gets list of attributes as they are written on the Element. The return value of this is going to be undefined
-	    attrValue = element.attributes[attributeName];
-	    
-	    //If the element does exist, then get its nodeValue. 
-	    //If it doesn't exist, we will return null per Mozzilla Standards and how the getAttribute method works normally
-	    if(!$A.util.isUndefinedOrNull(attrValue)){
-		    attrValue = attrValue.nodeValue;
-		}else{
-		    attrValue = null;
-		}
-	}
-	return attrValue;
+    var attrValue = element.getAttribute(attributeName);
+    //For browser Compatibility - getAttribute doesn't always work in IE
+    if($A.util.isUndefinedOrNull(attrValue)){
+        //Gets list of attributes as they are written on the Element. The return value of this is going to be undefined
+        attrValue = element.attributes[attributeName];
+
+        //If the element does exist, then get its nodeValue. 
+        //If it doesn't exist, we will return null per Mozzilla Standards and how the getAttribute method works normally
+        if(!$A.util.isUndefinedOrNull(attrValue)){
+            attrValue = attrValue.nodeValue;
+        } else {
+            attrValue = null;
+        }
+    }
+    return attrValue;
 };
-
-
 
 /**
  * @description
@@ -986,7 +1020,7 @@ $A.ns.Util.prototype.getDataAttributeName = function(key) {
  * Checks whether a custom data attribute value already exists.
  * @param {HTMLElement} element The element from which to retrieve data.
  * @param {String} key The data key to look up on element.
- * @returns {Boolean}
+ * @returns {Boolean} true if element has data attribute
  */
 $A.ns.Util.prototype.hasDataAttribute = function(element, key) {
 	return !this.isUndefinedOrNull(this.getDataAttribute(element, key));
@@ -1073,36 +1107,37 @@ if (!!Array.prototype.indexOf) {
     };
 }
 
-
 /**
  * Schedules the specified component to be asynchronously destroyed.
- * @param {cmp} element The component to be destroyed.
+ * @param {Component} cmp 
+ *          The component to be destroyed.
+ * @private
  */
 $A.ns.Util.prototype.destroyAsync = function(cmp) {
-	if (this.componentGCProcessing) {
-		// We're in the middle of emptying the component trash and something just async to destroy another 
-		// component async so finish the destroy now
-		if (cmp && cmp.finishDestroy) {
-			cmp.finishDestroy();
+    if (this.componentGCProcessing) {
+        // We're in the middle of emptying the component trash and something just async to destroy another 
+        // component async so finish the destroy now
+        if (cmp && cmp.finishDestroy) {
+            cmp.finishDestroy();
         }
-	} else {
+    } else {
         this.trashedComponentQueue.push(cmp);
 
         if (!this.componentGCPending) {
             this.componentGCPending = true;
-            
+
             // Async when not testing to not confuse component stats verification tests
             var that = this;
             setTimeout(function() { 
-            	try {
-	            	that.componentGCProcessing = true;
-	            
-	            	that.emptyComponentTrash();
-            	} finally {
-            		that.componentGCProcessing = false;
-            	}
-        	}, 3000);
-	    }
+                try {
+                   that.componentGCProcessing = true;
+
+                    that.emptyComponentTrash();
+                } finally {
+                    that.componentGCProcessing = false;
+                }
+            }, 3000);
+        }
     }
 };
 
@@ -1114,6 +1149,8 @@ $A.ns.Util.prototype.destroyAsync = function(cmp) {
  * Call this after declaring the child constructor function, but before setting
  * child methods onto the prototype, so that the child methods can override the
  * inherited ones.
+ * 
+ * @private
  */
 $A.ns.Util.derivePrototype = function(child, parent) {
     for (var method in parent.prototype) {
@@ -1207,7 +1244,6 @@ $A.ns.Util.prototype.contains = function(container, element) {
 
  * @param {UIEvent} event the DOM event to squash
  * @param {Boolean} preventDefault if preventDefault() should also be called
- * @return {void}
  */
 $A.ns.Util.prototype.squash = function(event, preventDefault) {
     event = event || window.event;
@@ -1301,7 +1337,6 @@ $A.ns.Util.prototype.estimateSize = function(obj) {
     return this.sizeEstimator.estimateSize(obj);
 };
 
- 
 //#if {"excludeModes" : ["PRODUCTION"]}
 	/**
 	 * Gets the aura debug tool component whether in an iframe or not.
@@ -1315,11 +1350,11 @@ $A.ns.Util.prototype.estimateSize = function(obj) {
 			}
 		}
 	};
-	
+
 	/**
 	 * Gets the aura instance of debug tool which has been opened in a child window
 	 * 
-	 * @return {Object} Aura instance
+	 * @returns {Object} Aura instance
 	 */
 	$A.ns.Util.prototype.getDebugToolsAuraInstance = function(){
 		if (!this.isUndefinedOrNull(this.debugToolWindow)) {  
@@ -1328,7 +1363,7 @@ $A.ns.Util.prototype.estimateSize = function(obj) {
 			return $A;
 		}
 	};
-	
+
 	/**
 	 * Set the aura debug tool handle when opened in a popup.
 	 */
@@ -1337,11 +1372,11 @@ $A.ns.Util.prototype.estimateSize = function(obj) {
 			this.debugToolWindow = debugWindow;
 		}
 	};
-	
+
 	/**
 	 * Grab windows url, if debug tool is a child window get url of parent
 	 * 
-	 * @return URL
+	 * @returns {String} URL of the window
 	 */
 	$A.ns.Util.prototype.getUrl = function(){
 	    if (this.isUndefinedOrNull(opener)) {
@@ -1350,10 +1385,13 @@ $A.ns.Util.prototype.estimateSize = function(obj) {
 			return opener.location.href;
 		}
 	};
+
 	/**
 	 * Get the text content of a DOM node. Tries <code>innerText</code> followed by
 	 * <code>textContext</code>, followed by <code>nodeValue</code> to take browser differences into account.
-	 * @param {Node} node           The node to get the text content from
+	 * @param {Node} node
+	 *             The node to get the text content from
+	 * @returns {String} The text content of the DOM node
 	 */
 	$A.ns.Util.prototype.getText = function(node) {
 	    var t;
@@ -1363,7 +1401,7 @@ $A.ns.Util.prototype.estimateSize = function(obj) {
 	    } else {
 	    	// chrome, safari, IE have this
 	        t = node.innerText;
-	        
+
 			// FF & chrome with visibility set to false
 	        if (node.textContent !== undefined) {
 	            if(this.isEmpty(t)){
@@ -1378,10 +1416,9 @@ $A.ns.Util.prototype.estimateSize = function(obj) {
 	    }
 	    return t;
 	};
-	
+
 	$A.ns.Util.prototype.errorBasedOnMode = function(msg) {
 		$A.error(msg);
-	
 	};
 //#end
 

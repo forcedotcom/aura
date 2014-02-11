@@ -1,0 +1,16 @@
+<aura:documentation>
+	<aura:description>
+		<p>
+			<code>ui:dataProvider</code>s are responsible for fetching and returning rows of data to a consuming component, such as <code>ui:list</code>.
+		</p>
+		<p>
+			A <code>ui:dataProvider</code> can fetch data however it wants.  It may fire a server action to get rows from a server-side database, or create data in JavaScript and require no server interaction, or even some combination of the two.
+		</p>
+		<p>
+			When a <code>ui:dataProvider</code> has new data to report (e.g., when a server action has returned), it does so via the <code>ui:dataChanged</code> event, which has the relevant data attached as <code>data</code>.  <code>ui:dataProvider</code>'s helper provides a function <code>fireDataChangeEvent(dataProvider, data)</code> to surface this event.
+		</p>
+		<p>
+			A <code>ui:dataProvider</code> can also be triggered by the wrapping component to provide data, via the <code>ui:dataProvide</code> event.  This event has a <code>parameters</code> attribute that can be used as input to the <code>ui:dataProvider</code>.
+		</p>
+	</aura:description>
+</aura:documentation>

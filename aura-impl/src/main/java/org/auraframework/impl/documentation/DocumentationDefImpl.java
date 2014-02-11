@@ -1,3 +1,18 @@
+/*
+ * Copyright (C) 2013 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.auraframework.impl.documentation;
 
 import java.io.IOException;
@@ -24,14 +39,14 @@ public class DocumentationDefImpl extends RootDefinitionImpl<DocumentationDef> i
 
 	private static final long serialVersionUID = 7808842576422413967L;
 
-	private final List<DefDescriptor<DescriptionDef>> descriptionDescriptors;
-    private final List<DefDescriptor<ExampleDef>> exampleDescriptors;
+	private final LinkedHashMap<String, DescriptionDef> descriptionDefs;
+    private final LinkedHashMap<String, ExampleDef> exampleDefs;
 	
 	protected DocumentationDefImpl(Builder builder) {
         super(builder);
         
-        this.descriptionDescriptors = builder.descriptionDescriptors;
-        this.exampleDescriptors = builder.exampleDescriptors;
+        this.descriptionDefs = builder.descriptionMap;
+        this.exampleDefs = builder.exampleMap;
     }
 
     @Override
@@ -45,26 +60,13 @@ public class DocumentationDefImpl extends RootDefinitionImpl<DocumentationDef> i
     }
     
 	@Override
-	public Map<String, ? extends DescriptionDef> getDescriptionDefs() throws QuickFixException {
-		Map<String, DescriptionDef> map = new LinkedHashMap<String, DescriptionDef>();
-		
-		DescriptionDef def = null;
-		String id = null;
-		
-		for (DefDescriptor<DescriptionDef> defDesc : this.descriptionDescriptors) {
-			def = defDesc.getDef();
-			id = def.getId();
-			
-			map.put(id, def);
-		}
-		
-		return Collections.unmodifiableMap(map);
+	public Map<String, ? extends DescriptionDef> getDescriptionDefs() {
+		return descriptionDefs;
 	}
 
 	@Override
 	public Map<String, ? extends ExampleDef> getExampleDefs() {
-		// TODO Auto-generated method stub
-		return null;
+		return exampleDefs;
 	}
 
     @Override
@@ -89,8 +91,8 @@ public class DocumentationDefImpl extends RootDefinitionImpl<DocumentationDef> i
             super(DocumentationDef.class);
         }
         
-        private List<DefDescriptor<DescriptionDef>> descriptionDescriptors;
-        private List<DefDescriptor<ExampleDef>> exampleDescriptors;
+    	private final LinkedHashMap<String, DescriptionDef> descriptionMap = new LinkedHashMap<String, DescriptionDef>();
+        private final LinkedHashMap<String, ExampleDef> exampleMap = new LinkedHashMap<String, ExampleDef>();
 
         /**
          * @see org.auraframework.impl.system.DefinitionImpl.BuilderImpl#build()
@@ -100,18 +102,12 @@ public class DocumentationDefImpl extends RootDefinitionImpl<DocumentationDef> i
             return new DocumentationDefImpl(this);
         }
         
-        public void addDescription(DescriptionDef description) {
-            if (this.descriptionDescriptors == null) {
-                this.descriptionDescriptors = Lists.newArrayList();
-            }
-            this.descriptionDescriptors.add(description.getDescriptor());
+        public void addDescription(String id, DescriptionDef description) {
+            this.descriptionMap.put(id, description);
         }
         
-        public void addExample(ExampleDef example) {
-            if (this.exampleDescriptors == null) {
-                this.exampleDescriptors = Lists.newArrayList();
-            }
-            this.exampleDescriptors.add(example.getDescriptor());
+        public void addExample(String id, ExampleDef example) {
+            this.exampleMap.put(id, example);
         }
     }
 }

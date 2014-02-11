@@ -1,3 +1,18 @@
+/*
+ * Copyright (C) 2013 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.auraframework.impl.root.parser.handler;
 
 import java.io.IOException;
@@ -9,8 +24,9 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.builder.RootDefinitionBuilder;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DocumentationDef;
 import org.auraframework.def.DescriptionDef;
+import org.auraframework.def.DocumentationDef;
+import org.auraframework.def.ExampleDef;
 import org.auraframework.impl.documentation.DocumentationDefImpl;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraError;
@@ -24,6 +40,10 @@ public class DocumentationDefHandler extends RootTagHandler<DocumentationDef> {
     protected final static Set<String> ALLOWED_ATTRIBUTES = Collections.emptySet();
 
     private final DocumentationDefImpl.Builder builder = new DocumentationDefImpl.Builder();
+    
+    // counter used to index DescriptionDefs with no explicit id
+    private int idCounter = 0;
+    
     private StringBuilder body = new StringBuilder();
 
     public DocumentationDefHandler() {
@@ -56,24 +76,26 @@ public class DocumentationDefHandler extends RootTagHandler<DocumentationDef> {
         String tag = getTagName();
         
         if (DescriptionDefHandler.TAG.equalsIgnoreCase(tag)) {
-            builder.addDescription(new DescriptionDefHandler<DocumentationDef>(this, xmlReader, source).getElement());
+        	DescriptionDef desc = new DescriptionDefHandler<DocumentationDef>(this, xmlReader, source).getElement();
+        	String id = desc.getId();
+            builder.addDescription(id, desc);
         } else if (ExampleDefHandler.TAG.equalsIgnoreCase(tag)) {
-        	builder.addExample(new ExampleDefHandler<DocumentationDef>(this, xmlReader, source).getElement());
+        	ExampleDef ex = new ExampleDefHandler<DocumentationDef>(this, xmlReader, source).getElement();
+        	String name = ex.getName();
+        	builder.addExample(name, ex);
         } else {
-        	throw new XMLStreamException("DocumentationDef cannot contain tag " + tag);
+        	throw new XMLStreamException(String.format("<%s> cannot contain tag %s", getHandledTag(), tag));
         }
-        
-        // body.append();
     }
 
     @Override
     protected void handleChildText() throws XMLStreamException, QuickFixException {
         String text = xmlReader.getText();
         if (!AuraTextUtil.isNullEmptyOrWhitespace(text)) {
-        	throw new XMLStreamException("Should DocumentationDef have free text?");
+        	throw new XMLStreamException(String.format(
+        			"<%s> can contain only <aura:description> and <aura:example> tags.\nFound text: %s",
+        			getHandledTag(), text));
         }
-        	
-//        body.append(text);
     }
 
     @Override
@@ -91,5 +113,11 @@ public class DocumentationDefHandler extends RootTagHandler<DocumentationDef> {
         } catch (Exception x) {
             throw new AuraError(x);
         }
+    }
+    
+    public String getNextId() {
+    	String ret = Integer.toString(idCounter);
+    	idCounter++;
+    	return ret;
     }
 }

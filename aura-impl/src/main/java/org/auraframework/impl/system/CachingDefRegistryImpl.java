@@ -44,8 +44,4 @@ public class CachingDefRegistryImpl<T extends Definition> extends NonCachingDefR
     public boolean isCacheable() {
         return true;
     }
-    
-    public String toString() {
-    	return this.getClass().getName() + " defs[ " + this.getDefTypes().toString() + " ] prefixes[ " + this.getPrefixes().toString() + " ]";
-    }
 }

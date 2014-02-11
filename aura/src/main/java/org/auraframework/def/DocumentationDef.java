@@ -25,7 +25,7 @@ public interface DocumentationDef extends RootDefinition {
     @Override
     DefDescriptor<DocumentationDef> getDescriptor();
     
-    Map<String, ? extends DescriptionDef> getDescriptionDefs() throws QuickFixException;
+    Map<String, ? extends DescriptionDef> getDescriptionDefs();
     
     Map<String, ? extends ExampleDef> getExampleDefs();
 }

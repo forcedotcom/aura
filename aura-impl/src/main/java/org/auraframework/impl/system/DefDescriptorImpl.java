@@ -20,9 +20,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.auraframework.Aura;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.Definition;
-import org.auraframework.def.TypeDef;
+import org.auraframework.def.*;
 import org.auraframework.impl.type.AuraStaticTypeDefRegistry;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.service.LoggingService;
@@ -175,10 +173,12 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
                 }
 
                 break;
+                // subtypes
             case ACTION:
-                // subtype?
+            case DESCRIPTION:
+            case EXAMPLE:
                 throw new AuraRuntimeException(
-                        String.format("ActionDef descriptor must be a subdef: %s", qualifiedName));
+                        String.format("%s descriptor must be a subdef: %s", defType.name(), qualifiedName));
             case ATTRIBUTE:
             case LAYOUT:
             case LAYOUT_ITEM:

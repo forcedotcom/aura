@@ -16,13 +16,7 @@
 package org.auraframework.impl.system;
 
 import java.lang.ref.WeakReference;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedSet;
+import java.util.*;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
@@ -30,40 +24,22 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.log4j.Logger;
 import org.auraframework.Aura;
-import org.auraframework.def.ApplicationDef;
-import org.auraframework.def.BaseComponentDef;
-import org.auraframework.def.ComponentDef;
-import org.auraframework.def.ClientLibraryDef;
-import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.*;
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.def.Definition;
-import org.auraframework.def.DescriptorFilter;
-import org.auraframework.def.SecurityProviderDef;
 import org.auraframework.impl.root.DependencyDefImpl;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.service.LoggingService;
-import org.auraframework.system.AuraContext;
+import org.auraframework.system.*;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.system.DefRegistry;
-import org.auraframework.system.Location;
-import org.auraframework.system.MasterDefRegistry;
-import org.auraframework.system.Source;
-import org.auraframework.system.SourceListener;
 import org.auraframework.throwable.AuraRuntimeException;
-
 import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.text.Hash;
 
 import com.google.common.base.Optional;
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheStats;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import com.google.common.cache.*;
+import com.google.common.collect.*;
 
 /**
  * Overall Master definition registry implementation, there be dragons here.
@@ -271,8 +247,10 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                 qualifiedNamePattern = "%s://%s:%s";
                 break;
             case ACTION:
+            case DESCRIPTION:
+            case EXAMPLE:
                 // TODO: FIXME
-                throw new AuraRuntimeException("Find on ACTION defs not supported.");
+                throw new AuraRuntimeException(String.format("Find on %s defs not supported.", matcher.getDefType().name()));
             }
             for (String namespace : delegateRegistries.getAllNamespaces()) {
                 String qualifiedName = String.format(qualifiedNamePattern,

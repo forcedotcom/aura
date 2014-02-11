@@ -102,10 +102,12 @@ public class DocumentationDefImpl extends RootDefinitionImpl<DocumentationDef> i
             return new DocumentationDefImpl(this);
         }
         
+        @Override
         public void addDescription(String id, DescriptionDef description) {
             this.descriptionMap.put(id, description);
         }
         
+        @Override
         public void addExample(String id, ExampleDef example) {
             this.exampleMap.put(id, example);
         }

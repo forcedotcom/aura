@@ -120,8 +120,8 @@
         }
 
         var newValues = cmp.get("v.value") || "";
-        
-        if (cmp.get("v.multiple")) {
+        var isMultiple = cmp.getValue("v.multiple").getBooleanValue();
+        if (isMultiple) {
         	newValues = newValues.split(";");
         } else {
         	newValues += "";
@@ -148,11 +148,19 @@
                 if ((valIsArray && aura.util.arrayIndexOf(newValues, val) > -1) || newValues === val) {
                     optionValue.put("selected", true);
                     optExists = true;
+                    // Workaround to force rerender on option. Bugged on multiselects.
+                    if (!isMultiple) {
+                    	optionsValue.remove(i);
+                        optionsValue.insert(i, optionValue.unwrap());
+                    }
                 } else {
                     optionValue.put("selected", false);
                 }
             }
-
+            // Workaround to force rerender for multiselects.
+            if (isMultiple) {
+            	cmp.getValue("v.options").setValue(optionsValue.unwrap());
+            }
             cmp._suspendChangeHandlers = false;
         } else {
         // case 2:

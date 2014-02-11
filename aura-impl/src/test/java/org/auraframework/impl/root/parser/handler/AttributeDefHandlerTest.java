@@ -33,7 +33,7 @@ import org.auraframework.def.Definition.Visibility;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.AttributeDefImpl;
-import org.auraframework.impl.root.parser.handler.XMLHandler.InvalidSystemAttributeException;
+import org.auraframework.impl.root.parser.handler.XMLDefinitionHandler.InvalidSystemAttributeException;
 import org.auraframework.impl.source.StringSource;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.throwable.AuraRuntimeException;

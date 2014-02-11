@@ -30,6 +30,7 @@ import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DependencyDef;
+import org.auraframework.def.DocumentationDef;
 import org.auraframework.def.EventHandlerDef;
 import org.auraframework.def.HelperDef;
 import org.auraframework.def.InterfaceDef;
@@ -308,4 +309,9 @@ public final class TestComponent implements ComponentDef {
     public Set<ResourceDef> getResourceDefs() throws QuickFixException {
         return null;
     }
+
+	@Override
+	public DocumentationDef getDocumentationDef() throws QuickFixException {
+		return null;
+	}
 }

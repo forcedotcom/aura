@@ -23,7 +23,7 @@ import java.util.TreeMap;
 
 import org.auraframework.Aura;
 import org.auraframework.impl.root.parser.XMLWriter;
-import org.auraframework.impl.root.parser.handler.XMLHandler;
+import org.auraframework.impl.root.parser.handler.XMLDefinitionHandler;
 import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
@@ -59,13 +59,13 @@ public class RegistryAndSystemTagsJsonSerializer {
     private static void loadMetadataForSystemComponents(
             Map<String, Map<String, Map<String, Map<String, String>>>> components) {
         XMLWriter xmlWriter = new XMLWriter();
-        Collection<XMLHandler<?>> specialComps = xmlWriter.getHandlers().values();
+        Collection<XMLDefinitionHandler<?>> specialComps = xmlWriter.getHandlers().values();
         Map<String, Map<String, Map<String, String>>> component;
         Map<String, Map<String, String>> componentDetails;
-        for (XMLHandler<?> specialComp : specialComps) {
+        for (XMLDefinitionHandler<?> specialComp : specialComps) {
             String compName = specialComp.getHandledTag();
             // some handlers don't really have a TAG..
-            if (XMLHandler.SYSTEM_TAGS.contains(compName)) {
+            if (XMLDefinitionHandler.SYSTEM_TAGS.contains(compName)) {
                 component = new TreeMap<String, Map<String, Map<String, String>>>();
                 componentDetails = new TreeMap<String, Map<String, String>>();
                 for (String attribute : specialComp.getAllowedAttributes()) {

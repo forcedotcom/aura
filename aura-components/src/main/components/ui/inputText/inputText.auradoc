@@ -1,0 +1,17 @@
+<aura:documentation>
+	<aura:description>
+		Here's a description.
+		
+		Oh crap, here comes a tag!
+		
+		<b>Old school bold</b>
+		
+		We made it past the tag?
+		
+		Phew.
+	</aura:description>
+	
+	<aura:example>
+		EXAMPLE BODY
+	</aura:example>
+</aura:documentation>

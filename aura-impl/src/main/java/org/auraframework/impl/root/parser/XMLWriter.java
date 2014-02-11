@@ -40,7 +40,7 @@ import org.auraframework.impl.root.parser.handler.ForEachDefHandler;
 import org.auraframework.impl.root.parser.handler.InterfaceDefHandler;
 import org.auraframework.impl.root.parser.handler.RegisterEventHandler;
 import org.auraframework.impl.root.parser.handler.ThemeDefHandler;
-import org.auraframework.impl.root.parser.handler.XMLHandler;
+import org.auraframework.impl.root.parser.handler.XMLDefinitionHandler;
 import org.auraframework.impl.root.theme.ThemeDefImpl;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraRuntimeException;
@@ -53,7 +53,7 @@ public class XMLWriter implements org.auraframework.system.SourceWriter {
 
     private static final XMLWriter instance = new XMLWriter();
 
-    private final Map<Class<? extends Definition>, XMLHandler<?>> handlers = Maps
+    private final Map<Class<? extends Definition>, XMLDefinitionHandler<?>> handlers = Maps
             .newHashMap();
 
     @SuppressWarnings("rawtypes")
@@ -84,7 +84,7 @@ public class XMLWriter implements org.auraframework.system.SourceWriter {
         Writer sourceWriter = source.getWriter();
         try {
             Class<?> clz = def.getClass();
-            XMLHandler<D> handler = (XMLHandler<D>) handlers.get(clz);
+            XMLDefinitionHandler<D> handler = (XMLDefinitionHandler<D>) handlers.get(clz);
             handler.writeElement(def, sourceWriter);
         } catch (Exception e) {
             throw new AuraRuntimeException(e);
@@ -98,7 +98,7 @@ public class XMLWriter implements org.auraframework.system.SourceWriter {
         }
     }
 
-    public Map<Class<? extends Definition>, XMLHandler<?>> getHandlers() {
+    public Map<Class<? extends Definition>, XMLDefinitionHandler<?>> getHandlers() {
         return handlers;
     }
 }

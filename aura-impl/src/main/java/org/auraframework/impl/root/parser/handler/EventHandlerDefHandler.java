@@ -35,7 +35,7 @@ import org.auraframework.util.AuraTextUtil;
 
 import com.google.common.collect.ImmutableSet;
 
-public class EventHandlerDefHandler extends XMLHandler<EventHandlerDefImpl> {
+public class EventHandlerDefHandler extends XMLDefinitionHandler<EventHandlerDefImpl> {
 
     public static final String TAG = "aura:handler";
 

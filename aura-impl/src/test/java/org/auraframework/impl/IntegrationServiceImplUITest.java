@@ -418,8 +418,6 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
         auraUITestingUtil.getEval("$A.historyService.set('forward')");
         assertTrue("Failed to change window location using set()",
                 getDriver().getCurrentUrl().endsWith("#forward"));
-        assertEquals("aura:locationChange should not have been fired on set()",
-                expectedTxt, getText(By.cssSelector("div.testDiv")));
 
         // historyService.get()
         assertEquals("get() failed to retrieve expected token",
@@ -438,7 +436,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
         assertTrue("Window location does not end with expected #", getDriver().getCurrentUrl().endsWith("#forward"));
 
         // Manually firing locationChange event
-        expectedTxt = "Location Change fired:0";
+        expectedTxt = "Location Change fired:1";
         auraUITestingUtil.getEval("$A.eventService.newEvent('aura:locationChange').fire()");
         assertEquals("Manully firing locationChange event failed",
                 expectedTxt, getText(By.cssSelector("div.testDiv")));

@@ -17,13 +17,11 @@ package org.auraframework.http;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.http.HttpHeaders;
 import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
@@ -35,6 +33,8 @@ import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
+
+import com.google.common.net.HttpHeaders;
 
 /**
  * A set of static http servlet utilities.
@@ -78,35 +78,12 @@ public abstract class ManifestUtil {
      * Check to see if we allow appcache on the current request.
      */
     public static boolean isManifestEnabled(HttpServletRequest request) {
-        //
-        // TODO: this is rather bogus.
-        //
-        final String userAgent = request.getHeader(HttpHeaders.USER_AGENT);
-        // iOS7 is not handling appcache correctly. Should remove when iOS7 is fixed
-        if (userAgent != null && (!userAgent.contains("AppleWebKit") || isIOS7(userAgent))) {
+    	final String userAgent = request.getHeader(HttpHeaders.USER_AGENT);
+        if (userAgent != null && !userAgent.contains("AppleWebKit")) {
             return false;
         }
+
         return isManifestEnabled();
-    }
-
-    /**
-     * Checks user agent for iOS7. This should only be here temporarily as an iOS fix.
-     *
-     * @param userAgent user agent
-     * @return true if ios7
-     */
-    private static boolean isIOS7(String userAgent) {
-        final String iosVersionExpression = "(iPad|iPhone|iPod);.*CPU.*OS (\\d+)_(\\d+)";
-        final Matcher iosMatcher = Pattern.compile(iosVersionExpression).matcher(userAgent);
-
-        while(iosMatcher.find()) {
-            String versionMajor = iosMatcher.group(2);
-            if(versionMajor != null && versionMajor.equals("7")) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /**

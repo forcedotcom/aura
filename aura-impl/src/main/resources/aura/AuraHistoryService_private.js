@@ -28,9 +28,11 @@ var priv = {
     changeHandler : function(){
         var loc = location["hash"];
         var event = eventService.newEvent(this.getEvent());
+        
         if (loc) {
             event.setParams(this.parseLocation(loc));
         }
+        
         event.fire();
     },
 

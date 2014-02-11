@@ -34,16 +34,16 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 /**
  * Abstract handler for tags that contain other tags.
  */
-public abstract class XMLContainerDefHandler<T extends Definition> extends XMLDefinitionHandler<T> {
+public abstract class ContainerTagHandler<T extends Definition> extends XMLHandler<T> {
     protected Location startLocation;
     protected WhitespaceBehavior whitespaceBehavior = BaseComponentDef.DefaultWhitespaceBehavior;
     public static final String SCRIPT_TAG = "script";
 
-    public XMLContainerDefHandler() {
+    public ContainerTagHandler() {
         super();
     }
 
-    public XMLContainerDefHandler(XMLStreamReader xmlReader, Source<?> source) {
+    public ContainerTagHandler(XMLStreamReader xmlReader, Source<?> source) {
         super(xmlReader, source);
     }
 
@@ -133,7 +133,7 @@ public abstract class XMLContainerDefHandler<T extends Definition> extends XMLDe
      * @return this container's tag. May return a more generic term for the
      *         class of tag expected if more than one is handled. Not safe for
      *         tag comparisons, only for messaging. For comparisons, use
-     *         handlesTag(tag)
+     *         getHandledTag()
      */
     @Override
     public abstract String getHandledTag();

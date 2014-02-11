@@ -33,7 +33,7 @@ import com.google.common.collect.ImmutableSet;
 /**
  * Super class for the top level tags, handles some common setup
  */
-public abstract class RootTagHandler<T extends RootDefinition> extends XMLContainerDefHandler<T> implements
+public abstract class RootTagHandler<T extends RootDefinition> extends ContainerTagHandler<T> implements
         ExpressionContainerHandler {
 
     protected final DefDescriptor<T> defDescriptor;

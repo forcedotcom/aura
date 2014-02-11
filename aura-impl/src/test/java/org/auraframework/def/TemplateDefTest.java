@@ -17,7 +17,7 @@ package org.auraframework.def;
 
 import org.auraframework.Aura;
 import org.auraframework.impl.AuraImplTestCase;
-import org.auraframework.impl.root.parser.handler.XMLDefinitionHandler.InvalidSystemAttributeException;
+import org.auraframework.impl.root.parser.handler.XMLHandler.InvalidSystemAttributeException;
 import org.auraframework.instance.Component;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;

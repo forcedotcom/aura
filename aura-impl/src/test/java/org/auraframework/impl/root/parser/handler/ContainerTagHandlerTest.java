@@ -28,7 +28,7 @@ import org.auraframework.system.Parser.Format;
 import org.auraframework.throwable.AuraRuntimeException;
 
 /**
- * Test for {@link XMLContainerDefHandler}.
+ * Test for {@link ContainerTagHandler}.
  */
 public class ContainerTagHandlerTest extends AuraImplTestCase {
     XMLStreamReader xmlReader;

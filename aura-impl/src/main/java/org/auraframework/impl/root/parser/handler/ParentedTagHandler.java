@@ -33,7 +33,7 @@ import org.auraframework.util.AuraTextUtil;
 /**
  * Tag handler has a parent
  */
-public abstract class ParentedTagHandler<T extends Definition, P extends RootDefinition> extends XMLContainerDefHandler<T> {
+public abstract class ParentedTagHandler<T extends Definition, P extends RootDefinition> extends ContainerTagHandler<T> {
 
     private RootTagHandler<P> parentHandler;
 

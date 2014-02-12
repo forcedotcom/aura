@@ -21,7 +21,6 @@
     <aura:attribute name="value" type="String" description="The input value of the date/time."/>
     <aura:attribute name="placeholder" type="String" description="The text that is displayed by default."/>
     <aura:attribute name="timezone" type="String" description="The timezone ID, for example, America/Los_Angeles."/>
-    <aura:set attribute="updateOn" value="blur"/>
         
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
     

@@ -25,7 +25,6 @@ var AuraHistoryService = function(){
     var historyService = {
 		/**
 	     * Sets the new location. For example, <code>$A.services.history.set("search")</code> sets the location to <code>#search</code>. 
-	     * Otherwise, use <code>$A.services.layout.changeLocation()</code> to override existing URL parameters.
 	     * @param {Object} token The provided token set to the current location hash
 	     * @memberOf AuraHistoryService
 	     * @public

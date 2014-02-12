@@ -104,40 +104,6 @@
 </auradocs:codeblock>
 
 
-<h2>Overriding Layout Handling</h2>
-
-<p>Instead of using <code>AuraHistoryService</code>, you can advertise from a component that you want to handle layouts instead of using a layouts file. For example, you may want to make a dynamic layout decision based on conditional logic, which you can't do in a layouts file.</p>
-
-<p>A component advertises that it wants to handle its own layouts by implementing the <code>aura:layoutHandler</code> interface. For example: </p>
-
-<!-- Note: couldn't use CDATA for this as need to escape the "{!" characters -->
-<auradocs:codeblock>
-  &lt;aura:component implements="aura:layoutHandler"&gt;
-    &lt;aura:handler name="layout" action="<aura:text value="{!"/>c.layout}" /&gt;
-  &lt;/aura:component&gt;
-</auradocs:codeblock>
-
-<p>The layout for this component is handled in the <code>layout</code> function in its controller.</p>
-
-<p>The layout events have a <code>defaultAction</code> parameter that you can run if you want to conditionally use the layouts defined in your app's layout file instead of your custom layout processing. This is a simple examle but it shows you how you can conditionally handle your layouts.</p>
-
-<auradocs:codeblock>
-    layout: function(component, event, helper) {
-      // Get the default layout event handling
-        var defaultAction = event.getParam("defaultAction");
-        var newLocation = event.getParam("location");
-        // Use the default handling for some criteria
-        if (newLocation == 'home') {
-            defaultAction();
-        }...
-        else {
-            // add your custom layout handling here
-        }
-    }
-</auradocs:codeblock>
-
-<p>The layout service has a <code>changeLocation</code> method you can call to pass some extra parameters to the layout function.  For example, you could have a helper file that uses <code><aura:text value="$A"/>.layoutService.changeLocation</code> to set a parameter that is passed to the layout function in the controller of the components that implement <code>aura:layoutHandler</code>. For example, to add an <code>extraParam</code> parameter to the <code>#</code> value in the URL:</p>
-
 <auradocs:codeblock>
   <![CDATA[$A.layoutService.changeLocation(c._location, {
     extraParam : true }

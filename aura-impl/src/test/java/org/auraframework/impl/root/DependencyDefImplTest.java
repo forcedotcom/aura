@@ -88,7 +88,6 @@ public class DependencyDefImplTest extends AuraImplTestCase {
                 vendor.makeLocation("f1", 5, 5, 0));
         testDependencyDef.appendDependencies(deps);
         assertTrue("Dependency not found", containsDependency(deps, "markup://aura:rootComponent"));
-        assertTrue("Dependency not found", containsDependency(deps, "markup://aura:layoutHandler"));
 
         // Check dependency that exists but is wrong type
         // TODO(W-1497192): can't find providers or helpers as dependencies
@@ -97,8 +96,6 @@ public class DependencyDefImplTest extends AuraImplTestCase {
         // "aura", "PROVIDER", vendor.makeLocation("f1", 5, 5, 0));
         // deps.clear();
         // testDependencyDef.appendDependencies(deps);
-        // assertFalse("Dependency should not have been found",
-        // containsDependency(deps, "markup://aura:layoutHandler"));
 
         // Get dependency of specific component
         testDependencyDef = vendor.makeDependencyDef(vendor.makeComponentDefDescriptor("hi"),

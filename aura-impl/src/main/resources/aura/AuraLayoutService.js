@@ -22,47 +22,13 @@ var AuraLayoutService = function(){
 
     //#include aura.AuraLayoutService_private
 
-    var skipLocationChangeHandlerSemaphore = 0;
     var markName = "";
 
     var layoutService = {
-        // Call this method to make use of the layoutHandler override and pass in params that override the existing URL params
-            /**
-             * Changes the location with new URL and parameters. <p>Example:</p>
-             * <code>$A.layoutService.changeLocation(location, {<br />
-             * &nbsp;&nbsp;renderAll : false<br />
-             * });</code>
-             * @param {Object} newLocation The new location set to the hash of the URL
-             * @param {Object} overrideParams The parameters that override the existing URL parameters
-             * @memberOf AuraLayoutService
-             * @public
-             */
-        changeLocation : function(newLocation, overrideParams) {
-            var newHash = '#' + newLocation;
-            if (!window.location || !window.location.hash || (newHash != window.location.hash)) {
-                // The hash is changing so handleLocationChange will be called. Tell it to short-circuit.
-                skipLocationChangeHandlerSemaphore++;
-            }
-
-            window.location = newHash;
-
-            overrideParams = overrideParams || {};
-            overrideParams["token"] = newLocation;
-
-            if (!overrideParams || !overrideParams["noLayout"]) {
-                layoutService.layout(newLocation, overrideParams);
-            }
-        },
-
         /**
          * @private
          */
         handleLocationChange : function(event){
-            if (skipLocationChangeHandlerSemaphore > 0) {
-                skipLocationChangeHandlerSemaphore--;
-                return;
-            }
-
             //Always having a hash means that the page won't reload when we go back this point.
             if(window.location.toString()["indexOf"]("#") == -1){
                 window.location.replace(window.location + "#");
@@ -128,9 +94,6 @@ var AuraLayoutService = function(){
             if (priv.history.length > 1) {
                 this.pop();
                 this.refreshLayout();
-                // We've just handled the re-layout. Update the history but
-                // don't double-layout.
-                skipLocationChangeHandlerSemaphore++;
                 historyService.back();
             }else{
                 historyService.set(priv.layouts.getDefault().getName());

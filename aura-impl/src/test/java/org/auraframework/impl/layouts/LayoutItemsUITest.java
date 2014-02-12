@@ -19,6 +19,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.auraframework.test.WebDriverTestCase;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 
 /**
  * Automation for verifying Layouts.
@@ -82,9 +83,8 @@ public class LayoutItemsUITest extends WebDriverTestCase {
     }
 
     private void verifyExpectedResultsForInitialLayout() throws Exception {
-        assertEquals("Ready to party?", findDomElement(resultBtn1).getText());
+    	waitForElementText(findDomElement(resultBtn1), "Ready to party?", true, 3);
         assertEquals("", findDomElement(resultBtn2).getText());
-
     }
 
     private void verifyExpectedResultsForLayout1() throws Exception {

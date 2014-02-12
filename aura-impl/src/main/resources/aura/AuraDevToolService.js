@@ -430,7 +430,7 @@ var AuraDevToolService = function() {
         	 
         	 var imgType = "";
         	 var alt = "";
-        	
+        	 var htmlAlt = "";
         	 for(var index = 0; index < allImgTags.length; index++){
         	     data_aura_rendered_by = $A.util.getElementAttributeValue(allImgTags[index], "data-aura-rendered-by");
         	     
@@ -441,11 +441,25 @@ var AuraDevToolService = function() {
          	    else{
          		imgType = $A.getCmp(data_aura_rendered_by).getAttributes().getValueProvider().get('v.imageType');	
          		alt     = $A.getCmp(data_aura_rendered_by).getAttributes().getValueProvider().get('v.alt');
- 
-         		if((imgType === "informational" || $A.util.isUndefinedOrNull(imgType)) && ($A.util.isUndefinedOrNull(alt) || alt === "")){
+         		htmlAlt = $A.util.getElementAttributeValue(allImgTags[index], "alt");
+         		
+         		/**check for cases when we are using a pure html img cmp.
+         		 * 
+         		 * Check if both imageType and alt type are undefiend. 
+         		 * If they are both null we are looking at a pure html component inside the cmp. 
+         		 * This means two things:
+         		 *      1) a user is using the img tag
+         		 *      2) A component in an aura namespace (ui probably) is using the img tag (other than ui:image) 
+         		*/
+         		if($A.util.isUndefinedOrNull(imgType) && $A.util.isUndefinedOrNull(alt)){
+         		    if($A.util.isUndefinedOrNull(htmlAlt) || htmlAlt.replace(/[\s\t\r\n]/g,'') ===''){
+         		       informationErrorArray.push(allImgTags[index]);
+         		    }
+         		}
+         		else if((imgType === "informational" || $A.util.isUndefinedOrNull(imgType)) && ($A.util.isUndefinedOrNull(alt) || alt.replace(/[\s\t\r\n]/g,'') === "")){
          			informationErrorArray.push(allImgTags[index]);
          		}
-         		else if(imgType === "decorative" && (!$A.util.isUndefinedOrNull(alt) && alt !== "")){
+         		else if(imgType === "decorative" && (!$A.util.isUndefinedOrNull(alt) && alt.replace(/[\s\t\r\n]/g,'') !== "")){
          			 decorationalErrorArray.push(allImgTags[index]);
          		}
          	    }
@@ -767,6 +781,31 @@ var AuraDevToolService = function() {
                		 return errorArray;
                  },
                  /**
+                   * Method that takes in a list of buttons and makes sure that they all have some text associated with them in the labels
+                   * @param   buttons     - All buttons that are on the page
+                   * @returns Array    - Array of all the errors
+                   */
+                 buttonLabelAide : function(buttons){
+                     var errorArray = [];
+                     var button = null;
+                     var buttonImage = null;
+                     var testText = null;
+                     for(var i = 0; i<buttons.length; i++){
+                	 button = buttons[i];
+                	 if(!$A.util.isUndefinedOrNull(button)){ 
+                	     
+                	     buttonImage = button.getElementsByTagName("img");
+                	     if(buttonImage.length === 0){                		 
+                		 testText = $A.util.getText(button).replace(/[\s\t\r\n]/g, '');
+                		 if(testText === ''){
+                 			errorArray.push(button);  
+                 		 }
+                	     }
+                	 }     
+             	     }
+                     return errorArray;               
+                 },
+                 /**
                   * Method that takes in a list of h#, the tag that show follow directly after, and all possible items that can be found.
                   * It will start start searching through siblings of h# to find invalid-nested tags and return an error array with them if found
                   * @param   tags     - Array of all h# tags to look at
@@ -941,6 +980,13 @@ var AuraDevToolService = function() {
         	         }
         		return accessAideFuncs.formatOutput(fieldsetLegnedMsg, errorArray);
         	    }, 
+        	    checkButtonsHaveNonEmptyLabel : function(domElem){
+           		 var buttonLabelErrorMsg = "Button should have non-empty label. When using ui:button, assign a non-empty string to label attribute.";
+           		 var accessAideFuncs = aura.devToolService.accessbilityAide;
+           		 var buttonTags = domElem.getElementsByTagName('button');
+           		 return accessAideFuncs.formatOutput(buttonLabelErrorMsg, accessAideFuncs.buttonLabelAide(buttonTags));
+           	    },
+       	    
         	    /**
                      * Gets all radio buttons, then traverses up the tree to find if they are in a fieldset
                      * @returns String - Returns a string representation of the errors

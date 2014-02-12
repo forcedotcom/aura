@@ -20,7 +20,7 @@ function publish(symbolSet) {
 		
 	// used to allow Link to check the details of things being linked to
 	Link.symbolSet = symbolSet;
-
+		
 	// create the required templates
 	try {
 		var classTemplate = new JSDOC.JsPlate(publish.conf.templatesDir+"class.tmpl");
@@ -38,6 +38,9 @@ function publish(symbolSet) {
 	
 	// get an array version of the symbolset, useful for filtering
 	var symbols = symbolSet.toArray();
+
+        // Added to create the json version for Aura.
+        IO.saveFile(publish.conf.outDir, "symbolSet.json", encode(symbols));
 	
 	// create the hilited source code files
 	var files = JSDOC.opt.srcFiles;
@@ -197,4 +200,34 @@ function resolveLinks(str, from) {
 	);
 	
 	return str;
+}
+
+/** Aura's encode function */
+function encode (obj){
+    if(typeof(JSON) !== "undefined") {
+        return JSON.stringify(obj);
+    }
+
+    if (obj === undefined) {
+        return 'null';
+    }
+
+    switch (obj.constructor) {
+        case String: return '"' + obj.replace(/\"/g,'\\"').replace(/\r|\n|\f/g,"\\n")+ '"';
+        case Array:
+            var buf = [];
+            for (var i=0; i<obj.length; i++) {
+                buf.push(encode(obj[i]));
+            }
+            return '[' + buf.join(',') + ']';
+        case Object:
+        default:
+            var buf2 = [];
+            for (var k in obj) {
+                if (obj.hasOwnProperty(k)) {
+                    buf2.push(encode(k) + ':' + encode(obj[k]));
+                }
+            }
+            return '{' + buf2.join(',') + '}';
+    }
 }

@@ -23,6 +23,10 @@
                 <includes>
                     <include>**/*</include>
                 </includes>
+                <excludes>
+                    <exclude>**/jsdoc/*.html</exclude>
+                    <exclude>**/jsdoc/symbols</exclude>
+                </excludes>
             </resource>
             <resource>
                 <directory>src/main/resources</directory>

@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 ({
+    //Excluding IE7/8 because this test will only work with modern browsers
+    browsers:["-IE7","-IE8"],
     testFieldSetsWStyle:{
 	attributes : {caseToRender : 'fieldSetWithStyles'},	
 	test: function(cmp){    
@@ -26,7 +28,17 @@
 		$A.test.assertEquals(expected, actual , "Unexpected return from CheckAccessibility, should not return errornous string. output: \n"+output);
 	}
     },
+
     
+    testButtonLabelValid:{
+	attributes : {caseToRender : 'buttonLabelValid'},
+	test: function(cmp){
+		var expected = "Total Number of Errors found: 3";
+		var output    = $A.devToolService.checkAccessibility();
+		var actual   =  output.split("\n")[0];
+		$A.test.assertEquals(expected, actual , "Unexpected return from CheckAccessibility, should not return errornous string. output: \n"+output);
+	}
+},
     testHeadersCorrectOrder:{
 		attributes : {caseToRender : 'headersCorrectOrder'},
 		test: function(cmp){
@@ -90,10 +102,10 @@
     testAnchorInOutputURLInfo:{
 		attributes : {caseToRender : 'anchorInOutputURLInfo'},
 		test: function(cmp){
-			var expected = "Total Number of Errors found: 1";
+			var expected = "";
 			var output    = $A.devToolService.checkAccessibility();
 			var actual   =  output.split("\n")[0];
-			$A.test.assertEquals(expected, actual , "Unexpected return from CheckAccessibility, should return string with 1 errors. output: \n"+output);
+			$A.test.assertEquals(expected, actual , "Unexpected return from CheckAccessibility, should return string with 0 errors. output: \n"+output);
 		}
     },
     

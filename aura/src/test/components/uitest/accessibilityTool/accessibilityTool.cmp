@@ -17,14 +17,28 @@
 -->
 <aura:component>
     <aura:attribute name="caseToRender" type="String" default="full"/>
+    
+    <!--Test for case where VF creates iframes but they dynamically add title after rendering. Test is to make sure that VF items are skipped-->
     <aura:if isTrue="{!v.caseToRender == 'skipIframeForVisForce'}">
         <iframe id="vfFrameId" src="http://localhost.blah.com/apex//testDetail0000?id=000x000xxx0000000"></iframe>
         <iframe id="DiffernetID" src="/apex/blahField?id=00-xx00000000000"></iframe>
         <iframe id="vfFrameId" src="/setup/ui/blah.jsp"></iframe>
         <iframe src="http://www.salesforce.com"></iframe> 
+    </aura:if>
+    <!--Test for buttons. Making sure that the label attribute is set correctly-->  
+    <aura:if isTrue="{!v.caseToRender == 'buttonLabelValid'}">
+       <!--Buttons should fail, no label-->
+       <ui:button iconImgSrc="/auraFW/resources/aura/images/bug.png" label=""/>
+       <ui:button labelDisplay="false" label=" "/> 
+       <ui:button label=""/> 
+      
+       <!--Three buttons that are set correctly-->
+       <ui:button iconImgSrc="/auraFW/resources/aura/images/bug.png" label="bug Icon" />
+       <ui:button labelDisplay="false" label="This should not be shown"/> 
+       <ui:button label="This should be shown"/>  
     </aura:if> 
-   
     
+    <!--Test for inputs that don't need labels. Verifying that they don't fail-->
     <aura:if isTrue="{!v.caseToRender == 'labelsNotNeeded'}">
         <label for="ID_EGO">Something Something</label>
         <input type="submit" id="ID_EGO" size="25" value="SUBMIT TO ME"/>
@@ -35,6 +49,7 @@
         <input type="image" src="/auraFW/resources/aura/images/auraNoteDemo.png" name="image" width="60" height="60"/>
     </aura:if>
     
+    <!--Test for fieldset legends. All fields sets should have a legend associated with them-->
     <aura:if isTrue="{!v.caseToRender == 'fieldSetWithStyles'}">
         <fieldset  aura:id="field_set_W_style_and_legend">
                      <legend>field_set_W_style_and_legend</legend>
@@ -58,6 +73,7 @@
          </fieldset>
     </aura:if>
     
+    <!--Generic test. Making sure that all of these separate test modules find the correct errorneous items-->
     <aura:if isTrue="{!v.caseToRender == 'full'}">  
         <table id="table1">
             <th></th>
@@ -102,8 +118,11 @@
                 <iframe height="300px" width="50%" src="http://www.salesforce.com"></iframe>
                </td></tr>
         </table> 
-        
     </aura:if>
+    
+    <!--Same test as above. The difference is that this one focuses on having labels above and below their respective inputs. 
+        As long and an input has a label, it should not matter where it is located in the dom
+    -->
     <aura:if isTrue="{!v.caseToRender == 'labelTest'}">
         <ui:label for="first" label="first"/>
         <ui:label for="mid" label="mid"/>    
@@ -153,6 +172,7 @@
         <ui:label for="birthdayInput" label="Birthday"/>
     </aura:if>
     
+    <!-- Test for Anchor inner text. All anchors should have some innerText. This test does not have innerText-->
     <aura:if isTrue="{!v.caseToRender == 'anchorWOInnerText'}">
           <a href="javascript:void(0)">
             <table>
@@ -166,6 +186,8 @@
             </table>
         </a>
     </aura:if> 
+    
+    <!-- Test for Anchor inner text. All anchors should have some innerText. This test has innerText-->
     <aura:if isTrue="{!v.caseToRender == 'anchorWInnerText'}">
           <a href="javascript:void(0)">
             <table>
@@ -184,16 +206,25 @@
             </table>
         </a>
     </aura:if>
+    
+    <!--Test for outputURL. This test makes sure that img wrapped anchors have alt and that they are found correctly.
+     This test should not have a failure
+     -->
     <aura:if isTrue="{!v.caseToRender == 'anchorInOutputURLInfo'}">
          <a href="javascript:void(0);" title="" dir="ltr" class="uiOutputURL">
             <img class="/auraFW/resources/aura/s.gif uiImage" alt="heloo" src="/auraFW/resources/aura/s.gif" />
         </a>
     </aura:if>
+    <!--Test for outputURL. This test makes sure that img wrapped anchors have alt and that they are found correctly.
+        This test should fail since no alt is defined
+    -->
      <aura:if isTrue="{!v.caseToRender == 'anchorInOutputURLDeco'}">
          <a href="javascript:void(0);" title="" dir="ltr" class="uiOutputURL">
             <img class="/auraFW/resources/aura/s.gif uiImage" src="/auraFW/resources/aura/s.gif" />
         </a>
     </aura:if>
+    
+   <!--Test specifically making sure that it doesn't break menuitems. All menuItems default to radio buttons--> 
    <aura:if isTrue="{!v.caseToRender == 'anchorMenuTest'}">
          <ui:menu>
             <ui:menuTriggerLink class="radioMenuLabel" aura:id="radioMenuLabel" label="National League West"/>
@@ -206,11 +237,15 @@
             </ui:menuList>
         </ui:menu>
     </aura:if>
+    
+    <!--Test making sure that we skip ckeditor. There is an issue with the current version of CKEDITOR with one of its attributes
+        Skipping until, we upgrade
+    -->
     <aura:if isTrue="{!v.caseToRender == 'ckeditor_test'}">
         <ui:inputRichText aura:id="RICH_TEXT" label="label For Rich Text" value="{!v.testContent}"/> <br/> 
     </aura:if>
     
-    
+    <!--test for radio buttons in fieldSets. All radio buttons with the same name should be in a fieldset. No errors-->
     <aura:if isTrue="{!v.caseToRender == 'NoRadioErrors'}">
        <fieldset class="field_set">
             <legend>More Options</legend>
@@ -225,6 +260,8 @@
         <ui:inputCheckbox label="Radio8" name="Group3"/>
         <ui:inputRadio label="Radio9" name="Group4"/>
     </aura:if>
+    
+    <!--test for radio buttons in fieldSets. All radio buttons with the same name should be in a fieldset. Errors-->
    <aura:if isTrue="{!v.caseToRender == 'RadioErrors'}">
        <fieldset class="field_set">
             <legend>More Options</legend>
@@ -240,6 +277,9 @@
         <ui:inputCheckbox label="Radio9" name="Group3"/>
         <ui:inputRadio    label="Radio10" name="Group4"/>
     </aura:if>
+    <!--Test for header elements. These test make sure that the header order is sequential
+        <h1></h1>, <h2></h2> are correct. <h1></h1>, <h3></h3> is incorrect order
+    -->
     <aura:if isTrue="{!v.caseToRender == 'headersCorrectOrder'}">
           <h1>1stHeader</h1>
           <h2>2ndHeader</h2>

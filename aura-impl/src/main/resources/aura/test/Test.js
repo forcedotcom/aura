@@ -285,7 +285,7 @@ var Test = function(){
          */
         isActionComplete : function(name) {
             if ($A.util.isUndefinedOrNull(priv.completed[name])) {
-                aura.test.fail("Unregistered name "+name);
+                $A.test.fail("Unregistered name "+name);
             }
             return priv.completed[name] !== "INCOMPLETE";
         },
@@ -299,9 +299,9 @@ var Test = function(){
          */
         isActionSuccessfullyComplete : function(name) {
             if ($A.util.isUndefinedOrNull(priv.completed[name])) {
-                aura.test.fail("Unregistered name "+name);
+                $A.test.fail("Unregistered name "+name);
             }
-            return priv.completed[name] !== "INCOMPLETE";
+            return priv.completed[name] === "SUCCESS";
         },
 
         /**

@@ -13,10 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-// add the Function.bind method for JS engines that don't support it (e.g. IE)
+//
 if (!Function.prototype.bind) {
-    Function.prototype.bind=function (scope) {
-        var method=this;
+
+    /**
+     * Add the Function.bind method for JS engines that don't support it (e.g. IE)
+     *
+     * @param {Object} scope - callback scope
+     * @returns {Function}
+     */
+    Function.prototype.bind = function (scope) {
+        var method = this;
         var preLoadArgs = Array.prototype.slice.call(arguments, 1);
         return function () {
             return method.apply(scope, preLoadArgs.concat(Array.prototype.slice.call(arguments, 0)));

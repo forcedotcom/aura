@@ -25,8 +25,8 @@ $A.ns.LabelQueue = function() {
 };
 
 /**
- * Getter components
- * @return {Array}
+ * Components getter
+ * @return {Component[]}
  */
 $A.ns.LabelQueue.prototype.getComponents = function() {
     return this.components;
@@ -34,15 +34,15 @@ $A.ns.LabelQueue.prototype.getComponents = function() {
 
 /**
  * Add component to component array
- * @param component
+ * @param {Component} component - component to add
  */
 $A.ns.LabelQueue.prototype.addComponent = function(component) {
     this.components.push(component);
 };
 
 /**
- * Getter SimpleValues
- * @return {Array}
+ * SimpleValues getter
+ * @return {SimpleValue[]} array of SimpleValues
  */
 $A.ns.LabelQueue.prototype.getReturnValues = function() {
     return this.returnValues;
@@ -58,7 +58,7 @@ $A.ns.LabelQueue.prototype.addReturnValue = function(value) {
 
 /**
  * Getter callbacks
- * @return {Array}
+ * @return {Function[]}
  */
 $A.ns.LabelQueue.prototype.getCallbacks = function() {
     return this.callbacks;

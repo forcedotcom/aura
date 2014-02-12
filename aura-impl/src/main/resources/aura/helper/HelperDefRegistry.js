@@ -29,8 +29,8 @@ HelperDefRegistry.prototype.auraType = "HelperDefRegistry";
  * Throws an error if componentDefDescriptor is not provided.
  * @param {Object} componentDefDescriptor Required. The descriptor for the componentDef object.
  * @param {Object} config Passes in a config, a HelperDef, or the name of a HelperDef.
- * @param {ComponenDef} componentDef If provided, resolves the HelperDefs in the component's hierarchy.
- * @returns a HelperDef instance or config after adding to the registry
+ * @param {ComponentDef} componentDef If provided, resolves the HelperDefs in the component's hierarchy.
+ * @returns {HelperDef} HelperDef instance or config after adding to the registry
  */
 HelperDefRegistry.prototype.getDef = function(componentDefDescriptor, config, componentDef){
     aura.assert(componentDefDescriptor, "ComponentDef Descriptor is required");

@@ -33,8 +33,8 @@ $A.ns.GlobalValueProviders = function (gvp) {
 /**
  * Joins new GVPs with existing and saves to storage
  *
- * @param gvps
- * @param doNotPersist
+ * @param {Object} gvps
+ * @param {Boolean} doNotPersist
  * @private
  */
 $A.ns.GlobalValueProviders.prototype.join = function(gvps, doNotPersist) {
@@ -80,7 +80,7 @@ $A.ns.GlobalValueProviders.prototype.join = function(gvps, doNotPersist) {
 /**
  * Wrapper to get storage.
  *
- * @return storage
+ * @return {Object} storage - undefined if no storage exists
  * @private
  */
 $A.ns.GlobalValueProviders.prototype.getStorage = function () {
@@ -117,7 +117,7 @@ $A.ns.GlobalValueProviders.prototype.loadFromStorage = function() {
 /**
  * Loads GVP config when from context
  *
- * @param gvp Global Value Providers
+ * @param {Object} gvp Global Value Providers
  * @private
  */
 $A.ns.GlobalValueProviders.prototype.load = function(gvp) {
@@ -135,8 +135,8 @@ $A.ns.GlobalValueProviders.prototype.load = function(gvp) {
 /**
  * Returns value provider or empty SimpleValueProvider
  *
- * @param type
- * @return ValueProvider
+ * @param {String} type - key for value provider
+ * @return {Object} ValueProvider
  * @private
  */
 $A.ns.GlobalValueProviders.prototype.getValueProvider = function(type) {

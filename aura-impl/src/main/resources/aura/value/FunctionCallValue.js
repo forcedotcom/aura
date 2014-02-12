@@ -105,6 +105,7 @@ FunctionCallValue.prototype.merge = function() {
 
 /**
  * Sets the isLiteral flag to false to denote that the element can be changed.
+ * @returns {Boolean} false
  */
 FunctionCallValue.prototype.isLiteral = function(){
     return false;
@@ -112,6 +113,7 @@ FunctionCallValue.prototype.isLiteral = function(){
 
 /**
  * Sets the isExpression flag to true to denote that the element is an expression.
+ * @returns {Boolean} true
  */
 FunctionCallValue.prototype.isExpression = function(){
     return true;
@@ -130,6 +132,7 @@ FunctionCallValue.prototype.destroy = function(){
 
 /**
  * Sets the isDefined flag to true.
+ * @returns {Boolean} true
  */
 FunctionCallValue.prototype.isDefined = function(){
     return true;
@@ -137,6 +140,7 @@ FunctionCallValue.prototype.isDefined = function(){
 
 /**
  * Helpful for logging/debugging.  Prints String value of the wrapped object.
+ * @returns {String} FunctionCallValue
  */
 FunctionCallValue.prototype.toString = function(){
     return "FunctionCallValue";

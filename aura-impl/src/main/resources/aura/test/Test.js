@@ -139,13 +139,14 @@ var Test = function(){
          * Get an instance of an action based on the specified parameters and callback function.
          *
          * @param {Component} component
+         *           The Component on which to search for the action
          * @param {String} name
          *           The name of the action from the component's perspective (e.g. "c.doSomething")
          * @param {Object} params
-         *            The parameters to pass to the action
+         *           The parameters to pass to the action
          * @param {Function} callback
-         *            The callback function to execute for the action, or if not a function a name for the action
-         * @returns {Action} an instance of the action
+         *           The callback function to execute for the action, or if not a function a name for the action
+         * @returns {Action} An instance of the action
          */
         getAction:function(component, name, params, callback){
             var action = component.get(name);
@@ -178,7 +179,12 @@ var Test = function(){
         },
 
         /**
-         * enqueue an action, ensuring that it is safely inside an aura call.
+         * Enqueue an action, ensuring that it is safely inside an aura call.
+         * 
+         * @param {Action} action
+         *          The action to enqueue.
+         * @param {Boolean} background
+         *          Set to true to run the action in the background, otherwise the value of action.isBackground() is used.
          */
         enqueueAction: function(action, background) {
             $A.run(function() { $A.enqueueAction(action, background); });
@@ -191,16 +197,16 @@ var Test = function(){
          * 			{name:"aura:text", attributes:{value:"valuable"}},<br/>
          * 			function(action){alert(action.getReturnValue().attributes.values.value)})</code>
          * 
-         * @param {Component}
+         * @param {Component} component
          *            The scope to run the action with, even if the action is not visible to it
-         * @param {String}
-         *            descriptor The descriptor for the action - e.g. java://my.own.Controller/ACTION$doIt
-         * @param {Object}
-         *            params The parameters to pass to the action, as a Map (name:value)
-         * @param {Object}
-         *            returnType The return type descriptor for the action, e.g. java://java.lang.String
-         * @param {Function}
-         *            callback An optional callback to execute with the component as the scope
+         * @param {String} descriptor
+         *            The descriptor for the action - e.g. java://my.own.Controller/ACTION$doIt
+         * @param {Object} params
+         *            The parameters to pass to the action, as a Map (name:value)
+         * @param {Object} returnType
+         *            The return type descriptor for the action, e.g. java://java.lang.String
+         * @param {Function} callback
+         *            An optional callback to execute with the component as the scope
          * @returns {Action} an instance of the action
          */
         getExternalAction : function(component, descriptor, params, returnType, callback) {
@@ -227,13 +233,13 @@ var Test = function(){
         },
 
         /**
-         * clear out component configs returned by an action.
+         * Clear out component configs returned by an action.
          *
          * This must be called within the action callback. It fails if no components are
          * cleared.
          *
-         * @param action
-         *      the action to clear.
+         * @param {Action} action
+         *      The action to clear.
          */
         clearAndAssertComponentConfigs : function(a) {
             if ($A.getContext().clearComponentConfigs(a.getId()) === 0) {
@@ -257,17 +263,17 @@ var Test = function(){
          * The action passed in may have a callback set previously, if so, that
          * callback will be called before the action is set as complete.
          *
-         * @param a the action to modify
-         * @param name the name to use (must be unique.
+         * @param {Action} action The action to modify
+         * @param {String} name The name to use (must be unique)
          */
-        markForCompletion : function(a, name) {
+        markForCompletion : function(action, name) {
             if (!$A.util.isUndefinedOrNull(priv.completed[name])) {
-                aura.test.fail("Duplicate name "+name);
+                $A.test.fail("Duplicate name "+name);
             }
             var myName = name;
             priv.completed[myName] = "INCOMPLETE";
-            a.wrapCallback(priv, function(action) {
-                if (action.getState() === "SUCCESS") {
+            action.wrapCallback(priv, function(a) {
+                if (a.getState() === "SUCCESS") {
                     priv.completed[myName] = "SUCCESS";
                 } else {
                     priv.completed[myName] = "FAILURE";
@@ -282,6 +288,10 @@ var Test = function(){
          * will check that the callback has been called (and thus
          * that the action is complete). It does not check for
          * success/failure.
+         * 
+         * @param {String} name
+         *          The name of the action to check for completion
+         * @returns {Boolean} true if action has completed, false otherwise.
          */
         isActionComplete : function(name) {
             if ($A.util.isUndefinedOrNull(priv.completed[name])) {
@@ -296,6 +306,10 @@ var Test = function(){
          * If you have previously called <code>markForCompletion</code> this
          * will check that the callback has been called with a
          * successful completion code.
+         * 
+         * @param {String} name 
+         *          The name of the action to check for success
+         * @returns {Boolean} true if action has completed successfully, false otherwise.
          */
         isActionSuccessfullyComplete : function(name) {
             if ($A.util.isUndefinedOrNull(priv.completed[name])) {
@@ -311,6 +325,9 @@ var Test = function(){
          * will check that the callback has been called (and thus
          * that the action is complete). It does not check for
          * success/failure.
+         * 
+         * @param {String} name
+         *          The name of the Action to check.
          */
         clearComplete : function(name) {
             if ($A.util.isUndefinedOrNull(priv.completed[name])) {
@@ -393,8 +410,7 @@ var Test = function(){
          * @param {Function} callback
          *             The callback function to run if conditionFunction evaluates to truthy
          * @param {Number} intervalInMs
-         *             The number of milliseconds between each evaluation of
-         *             conditionFunction
+         *             The number of milliseconds between each evaluation of conditionFunction
          */
         runAfterIf : function(conditionFunction, callback, intervalInMs){
             if(priv.inProgress === 0){
@@ -475,9 +491,10 @@ var Test = function(){
         },
 
         /**
-         * internally used error function to log an error for a given test.
+         * Internally used error function to log an error for a given test.
          *
          * @param {Object or String} e the error object or message.
+         * @private
          */
         auraError : function(e) {
             if (!priv.putMessage(priv.preErrors, priv.expectedErrors, e)) {
@@ -486,18 +503,20 @@ var Test = function(){
         },
 
         /**
-         * Tell the test that we expect an error.
+         * Tell the test that we expect an error. Test will fail if expected error
+         * is not received.
          *
-         * @param {String} e the error message that we expect.
+         * @param {String} e The error message that we expect.
          */
         expectAuraError : function(e) {
             priv.expectMessage(priv.preErrors, priv.expectedErrors, e);
         },
 
         /**
-         * internally used error function to log an error for a given test.
+         * Internally used warning function to log a warning for a given test.
          *
-         * @param {String} w the warning message.
+         * @param {String} w The warning message.
+         * @private
          */
         auraWarning : function(w) {
             if (!priv.putMessage(priv.preWarnings, priv.expectedWarnings, w)) {
@@ -508,7 +527,8 @@ var Test = function(){
         },
 
         /**
-         * Tell the test that we expect a warning.
+         * Tell the test that we expect a warning. If this function is called and the
+         * test does not receive the expected warning, the test will fail.
          *
          * @param {String} w the warning message that we expect.
          */
@@ -518,14 +538,15 @@ var Test = function(){
 
         /**
          * Assert that if(condition) check evaluates to true.
-         * @param {Object} condition
-         * 				The condition to evaluate
-         * @param {String} assertMessage
-         * 				The message that is returned if the condition is not true
          * @description A truthy value refers to an Object, a string, a non-zero number, a non-empty array, or true.
          * <p>Example:</p>
          * Positive: assertTruthy("helloWorld"),
          * Negative: assertTruthy(null)
+         * 
+         * @param {Object} condition
+         *              The condition to evaluate
+         * @param {String} assertMessage
+         *              The message that is returned if the condition is not true
          */
         assertTruthy : function(condition, assertMessage) {
             if (!condition) {
@@ -539,18 +560,21 @@ var Test = function(){
         },
         /**
          * Assert that the current component HTML is Accessibility compliant.
-         * @param {String} errorMessage
-         * 				The message that is returned if the condition is not false
-         * @description Calls the checkAccessibilty method to verify certain tags are accessible
          * 
-         *Returns      If call to checkAccessibility returns the empty string, no error, otherwise errors were found
+         * @description Calls the checkAccessibilty method to verify certain tags are accessible.
+         * 
+         * @param {String} errorMessage
+         *          The message that is returned if the condition is not false
+         * @throws {Error} Throws Error containing concatenated string representation of all
+         *                 accessibility errors found
          */
         assertAccessible : function() {
             var res = aura.devToolService.checkAccessibility();
             if (res !== "") {
-        	throw new Error(res);
+                throw new Error(res);
             }
         },
+
          /**
          * Assert that the if(condition) check evaluates to false.
          * @param {Object} condition
@@ -586,7 +610,6 @@ var Test = function(){
         assert : function(condition, assertMessage) {
             aura.test.assertTruthy(condition, assertMessage);
         },
-
 
         /**
          * Assert that the two values provided are equal.
@@ -768,7 +791,7 @@ var Test = function(){
          * @param {String} assertMessage
          *             Defaults to "Assertion failure", if assertMessage is not provided
          * @throws {Error}
-         * 				Throws error with a message
+         *             Throws error with a message
          */
         fail : function(assertMessage){
             if(assertMessage){
@@ -1034,13 +1057,20 @@ var Test = function(){
         
         /**
          * Returns a reference to the object that is currently designated as the active element in the document.
+         * 
+         * @returns {DOMElement} The current active element.
          */
         getActiveElement : function(){
-        	return document.activeElement;
+            return document.activeElement;
         },
-        
+
+        /**
+         * Returns the inner text of the current active element in the document.
+         * 
+         * @returns {String} The text of the current active DOM element.
+         */
         getActiveElementText : function(){
-        	return aura.test.getText(document.activeElement);
+        	return $A.test.getText(document.activeElement);
         },
 
         /**
@@ -1082,19 +1112,21 @@ var Test = function(){
             });
             return results;
         },
+
         /**
          * Gets the first element on the page starting from parentElement, that has the specified class name.
          * @param {Object} parentElement DOM element that we want to start at.
          * @param {String} classname The CSS class name.
          * @returns {Object} The first element denoting the class, or null if none is found.
          */
-        findChildWithClassName : function(parentElement, className){            
-            var results = aura.test.getElementsByClassNameCustom(className, parentElement);        	
+        findChildWithClassName : function(parentElement, className){
+            var results = aura.test.getElementsByClassNameCustom(className, parentElement);
             if (results && results.length > 0) {
                 return results;
-            }           
-            return null;           
+            }
+            return null;
         },
+
         /**
          * Gets the first element on the page that have the specified class name.
          * @param {String} classname The CSS class name.
@@ -1118,7 +1150,7 @@ var Test = function(){
              }
              return null;
          },
-         
+
         /**
          * Given an HTML element and an eventName, fire the corresponding DOM event. Code adapted from a stack overflow
          * question's answer.
@@ -1141,34 +1173,36 @@ var Test = function(){
                 element.fireEvent("on" + event.eventType, event);
             }
         },
-        
+
         /**
          * Checks if an element supports Touch events. Otherwise, issue a click on the element.
+         * 
          * @param {HTMLElement} element
+         *          The element to click or fire touch event on.
          */
-        clickOrTouch: function (element) {        	
-        	if($A.util.supportsTouchEvents()){	
-        		var ts = document.createEvent('TouchEvent'); 
-        		ts.initTouchEvent('touchstart');
-        		var te = document.createEvent('TouchEvent'); 
-        		te.initTouchEvent('touchend');
-        		element.dispatchEvent(ts);
-        		element.dispatchEvent(te);
-        	}
-        	else{
-        		if ($A.util.isUndefinedOrNull(element.click)) {
-        			// manually fire event
-        			aura.test.fireDomEvent(element, "click");
-        		} else {
-        			element.click();
-        		}
+        clickOrTouch: function (element) {
+            if($A.util.supportsTouchEvents()){
+                var ts = document.createEvent('TouchEvent');
+                ts.initTouchEvent('touchstart');
+                var te = document.createEvent('TouchEvent');
+                te.initTouchEvent('touchend');
+                element.dispatchEvent(ts);
+                element.dispatchEvent(te);
+            } else {
+                if ($A.util.isUndefinedOrNull(element.click)) {
+                    // manually fire event
+                    $A.test.fireDomEvent(element, "click");
+                } else {
+                    element.click();
+                }
             }
         },
 
-
         /**
          * Checks if the specified node is a text node.
-         * @param node The node to check
+         * @param {Node} node 
+         *          The node to check
+         * @returns {Boolean} true if node is text node.
          */
         isInstanceOfText: function(node){
             if(window.Text){
@@ -1180,6 +1214,7 @@ var Test = function(){
         /**
          * Checks if the specified element is an anchor element.
          * @param {HTMLElement} element The element to check
+         * @returns {Boolean} true if element is an anchor element.
          */
         isInstanceOfAnchorElement: function(element){
             return aura.test.isInstanceOf(element, window.HTMLAnchorElement, "a");
@@ -1188,6 +1223,7 @@ var Test = function(){
         /**
          * Checks if the specified element is an input element.
          * @param {HTMLElement} element The element to check
+         * @returns {Boolean} true if element is an input element.
          */
         isInstanceOfInputElement: function(element){
             return aura.test.isInstanceOf(element, window.HTMLInputElement, "input");
@@ -1196,6 +1232,7 @@ var Test = function(){
         /**
          * Checks if the specified element is a list element.
          * @param {HTMLElement} element The element to check
+         * @returns {Boolean} true if element is a list element.
          */
         isInstanceOfLiElement: function(element){
             return aura.test.isInstanceOf(element, window.HTMLLiElement, "li");
@@ -1204,6 +1241,7 @@ var Test = function(){
         /**
          * Checks if the specified element is a paragraph element.
          * @param {HTMLElement} element The element to check
+         * @returns {Boolean} true if element is a paragraph element.
          */
         isInstanceOfParagraphElement: function(element){
             return aura.test.isInstanceOf(element, window.HTMLParagraphElement, "p");
@@ -1212,6 +1250,7 @@ var Test = function(){
         /**
          * Checks if the specified element is a button element.
          * @param {HTMLElement} element The element to check
+         * @returns {Boolean} true if element is a button element.
          */
         isInstanceOfButtonElement: function(element){
             return aura.test.isInstanceOf(element, window.HTMLButtonElement, "button");
@@ -1220,6 +1259,7 @@ var Test = function(){
         /**
          * Checks if the specified element is an image element.
          * @param {HTMLElement} element The element to check
+         * @returns {Boolean} true if element is an image element.
          */
         isInstanceOfImageElement: function(element){
             return aura.test.isInstanceOf(element, window.HTMLImageElement, "img");
@@ -1228,6 +1268,7 @@ var Test = function(){
         /**
          * Checks if the specified element is a div element.
          * @param {HTMLElement} element The element to check
+         * @returns {Boolean} true if element is a div element.
          */
         isInstanceOfDivElement: function(element){
             return aura.test.isInstanceOf(element, window.HTMLDivElement, "div");
@@ -1236,6 +1277,7 @@ var Test = function(){
         /**
          * Checks if the specified element is a span element.
          * @param {HTMLElement} element The element to check
+         * @returns {Boolean} true if element is a span element.
          */
         isInstanceOfSpanElement: function(element){
             return aura.test.isInstanceOf(element, window.HTMLSpanElement, "span");
@@ -1243,9 +1285,16 @@ var Test = function(){
 
         /**
          * Checks if the specified element is an instance of another element.
-         * @param element The element to check
-         * @param elementType Checks element against elementType
-         * @param tag
+         * 
+         * @param {HTMLElement} element
+         *          The element to check
+         * @param {HTMLElement} elementType
+         *          Checks element against elementType
+         * @param {String} tag
+         *          Check element.tagName against tag
+         * @returns {Boolean} true if element is of type elementType. Or if elementType
+         *                    is undefined, check element is of type ELEMENT_NODE and
+         *                    it's tagName is equal to tag
          */
         isInstanceOf: function(element, elementType, tag){
             if(elementType){
@@ -1254,6 +1303,12 @@ var Test = function(){
             return element.nodeType == 1 && element.tagName.toLowerCase() == tag;
         },
 
+        /**
+         * Returns set of keys on passed in Object.
+         * 
+         * @param {Object} obj
+         *          Object to retrieve set of keys from.
+         */
         objectKeys:function(obj){
             if (Object.keys) {
                 return Object.keys(obj);
@@ -1311,7 +1366,7 @@ var Test = function(){
                 }, 'TESTHANDLER'); // expression is irrelevant
             }
         },
-        
+
         // Used by tests to modify framework source to trigger JS last mod update
         /** @ignore */
         dummyFunction : function(){
@@ -1321,13 +1376,15 @@ var Test = function(){
         getAppCacheEvents: function() {
             return priv.appCacheEvents;
         },
-        
+
         /**
-         * Extract the error message from aura error div(the grey error message on the page)
+         * Extract the error message from Aura error div(the grey error message on the page)
+         * 
+         * @returns {String} The text of the Aura error
          */
         getAuraErrorMessage: function(){
-            return aura.test.getText($A.util.getElement("auraErrorMessage"));
-        }    
+            return $A.test.getText($A.util.getElement("auraErrorMessage"));
+        }
     };
 
     //#include aura.test.Test_export

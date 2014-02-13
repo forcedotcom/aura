@@ -880,7 +880,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     }
 
     @Override
-    public <T extends Definition> long getLastMod(String uid) {
+    public long getLastMod(String uid) {
         DependencyEntry de = localDependencies.get(uid);
 
         if (de != null) {
@@ -890,7 +890,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     }
 
     @Override
-    public <T extends Definition> Set<DefDescriptor<?>> getDependencies(String uid) {
+    public Set<DefDescriptor<?>> getDependencies(String uid) {
         DependencyEntry de = localDependencies.get(uid);
 
         if (de != null) {
@@ -900,7 +900,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     }
 
     @Override
-    public <T extends Definition> List<ClientLibraryDef> getClientLibraries(String uid) {
+    public List<ClientLibraryDef> getClientLibraries(String uid) {
         DependencyEntry de = localDependencies.get(uid);
 
         if (de != null) {
@@ -1273,7 +1273,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     }
 
     @Override
-    public <T extends Definition> String getCachedString(String uid, DefDescriptor<?> descriptor, String key) {
+    public String getCachedString(String uid, DefDescriptor<?> descriptor, String key) {
         DependencyEntry de = localDependencies.get(uid);
 
         if (de != null) {
@@ -1283,7 +1283,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     }
 
     @Override
-    public <T extends Definition> void putCachedString(String uid, DefDescriptor<?> descriptor, String key, String value) {
+    public void putCachedString(String uid, DefDescriptor<?> descriptor, String key, String value) {
         DependencyEntry de = localDependencies.get(uid);
 
         if (de != null) {

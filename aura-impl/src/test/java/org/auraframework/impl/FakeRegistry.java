@@ -106,26 +106,26 @@ public class FakeRegistry implements MasterDefRegistry {
     }
 
     @Override
-    public <T extends Definition> long getLastMod(String uid) {
+    public long getLastMod(String uid) {
         return 0;
     }
 
     @Override
-    public <T extends Definition> Set<DefDescriptor<?>> getDependencies(String uid) {
+    public Set<DefDescriptor<?>> getDependencies(String uid) {
         return null;
     }
 
     @Override
-    public <T extends Definition> String getCachedString(String uid, DefDescriptor<?> descriptor, String key) {
+    public String getCachedString(String uid, DefDescriptor<?> descriptor, String key) {
         return null;
     }
 
     @Override
-    public <T extends Definition> void putCachedString(String uid, DefDescriptor<?> descriptor, String key, String value) {
+    public void putCachedString(String uid, DefDescriptor<?> descriptor, String key, String value) {
     }
 
     @Override
-    public <T extends Definition> List<ClientLibraryDef> getClientLibraries(String uid) {
+    public List<ClientLibraryDef> getClientLibraries(String uid) {
         return null;
     }
 

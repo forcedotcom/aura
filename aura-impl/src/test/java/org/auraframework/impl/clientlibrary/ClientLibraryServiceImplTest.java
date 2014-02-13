@@ -315,7 +315,7 @@ public class ClientLibraryServiceImplTest extends AuraImplTestCase {
             getClientLibraryUrls(appDesc, Type.CSS);
             fail("Should have thrown exception for no resolver");
         } catch (Exception e) {
-            checkExceptionFull(e, ClientLibraryException.class, "Client library must have resolver if url is blank: UIPerfCSS");
+            checkExceptionFull(e, ClientLibraryException.class, "Client library must have resolver if url is blank: UIPerfCsS");
         }
     }
 

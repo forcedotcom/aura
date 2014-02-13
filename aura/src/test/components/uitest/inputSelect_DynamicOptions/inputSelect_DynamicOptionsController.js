@@ -15,10 +15,10 @@
  */
 ({
 	init : function(cmp) {
-		var opts = [{ label: "Option1", value: "Option1", class: "option" },
-		            { label: "Option2", value: "Option2", class: "option", selected: true },
-		            { label: "Option3", value: "Option3", class: "option" },
-		            { label: "Option4", value: "Option4", class: "option" }];
+		var opts = [{ "label": "Option1", "value": "Option1", "class": "option" },
+		            { "label": "Option2", "value": "Option2", "class": "option", selected: true },
+		            { "label": "Option3", "value": "Option3", "class": "option" },
+		            { "label": "Option4", "value": "Option4", "class": "option" }];
 		
 		cmp.find("dynamicSelect").setValue("v.options", opts);
 	}

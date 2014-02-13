@@ -19,11 +19,11 @@
     <aura:attribute name="testAttr" type="String" default="testValue" />
     <aura:attribute name="testAttr2" type="Integer" default="22" />
 
+    <!-- Components declared as dependency should create on client if no server dependencies -->
     <aura:dependency resource="aura:renderIf" />
-    <!-- Component declared as dependency should create on client if no server deps -->
     <aura:dependency resource="loadLevelTest:clientComponent" />
     <aura:dependency resource="loadLevelTest:serverComponent" />
-    
+
     <aura:dependency resource="loadLevelTest:clientWithServerChild" />
 
     {!v.body}

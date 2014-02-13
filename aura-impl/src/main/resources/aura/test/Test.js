@@ -127,6 +127,16 @@ var Test = function(){
         },
 
         /**
+         * Get total count of foreground and background requests sent to the server.
+         * 
+         * This routine can be used to get a before and after count on server requests to attempt to verify
+         * we are only sending the necessary amount of requests.
+         */
+        getSentRequestCount : function () {
+            return $A.clientService["priv"].foreground.sent + $A.clientService["priv"].background.sent;
+        },
+
+        /**
          * Add a cleanup function that is run on teardown.
          *
          * @param {Function} cleanupFunction the function to run on teardown.

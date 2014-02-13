@@ -17,37 +17,60 @@
  * Tests to verify AuraComponentService.newComponentAsync() or $A.newCmpAsync()
  */
 ({
-    // TODO(tbliss): include lazy load and exclusive tests? or are those disappearing with deprecated?
     /**
      * Verify creatiion of a component whose definition is available at the client.
      */
     testPreloadedDef: {
         test: function(cmp) {
-            // TODO(tbliss): should releaseRequests() be in a finally block? do we need it at all?
-            $A.test.blockRequests(); // block server requests to ensure this is run entirely on the client
-            $A.run(function() {
-                $A.newCmpAsync(
-                        this,
-                        function(newCmp) {
-                            cmp.getValue("v.body").push(newCmp);
-                        },
-                        "markup://aura:text"
-                );
-            });
-
-            var body = cmp.get('v.body');
-            $A.test.assertEquals(1,body.length);
-            $A.test.assertEquals("markup://aura:text",body[0].getDef().getDescriptor().getQualifiedName());
-            $A.test.assertEquals("0:c",body[0].getGlobalId());
-            $A.test.releaseRequests();
+            try {
+                $A.test.blockRequests(); // block server requests to ensure this is run entirely on the client
+                $A.run(function(){
+                    $A.newCmpAsync(this, function(newCmp){
+                        cmp.getValue("v.body").push(newCmp);
+                    }, "markup://aura:text");
+                });
+                
+                var body = cmp.get('v.body');
+                $A.test.assertEquals(1, body.length);
+                $A.test.assertEquals("markup://aura:text", body[0].getDef().getDescriptor().getQualifiedName());
+                $A.test.assertEquals("0:c", body[0].getGlobalId());
+            } finally {
+                $A.test.releaseRequests();
+            }
         }
     },
 
     /**
-     * Verify creating a component whose definition is fetched from the server.
+     * Verify creation of a component without server dependencies whose definition is declared as a dependency so can
+     * be created on the client without a trip to the server.
+     */
+    testCreateDependencyDef: {
+        test: function(cmp) {
+            try {
+                $A.test.blockRequests(); // block server requests to ensure this is run entirely on the client
+                $A.run(function(){
+                    $A.newCmpAsync(this, function(newCmp){
+                        cmp.getValue("v.body").push(newCmp);
+                    }, "markup://loadLevelTest:clientComponent");
+                });
+
+                var body = cmp.get('v.body');
+                $A.test.assertEquals(1, body.length);
+                $A.test.assertEquals("markup://loadLevelTest:clientComponent", body[0].getDef().getDescriptor().getQualifiedName());
+                $A.test.assertEquals("0:c", body[0].getGlobalId());
+            } finally {
+                $A.test.releaseRequests();
+            }
+        }
+    },
+
+    /**
+     * Verify creating a component whose definition is fetched from the server. Then verify the cmp definition is saved
+     * on the client so we don't need to make another trip to the server on subsequent requests.
      */
     testFetchNewDefFromServer:{
-        test: function(cmp) {
+        test: [
+        function(cmp) {
             $A.run(function() {
                 $A.newCmpAsync(
                         this,
@@ -72,14 +95,42 @@
                 $A.test.assertEquals(99,textCmp.get('v.number'), "Failed to pass attribute values to created component");
                 $A.test.assertEquals("99",$A.test.getTextByComponent(textCmp), "Failed to pass attribute values to created component");
             });
-        }
+        },
+        function(cmp) {
+            // After retrieving the cmp from the server, it should be saved on the client in the def registry
+            try {
+                $A.test.blockRequests(); // block server requests to ensure this is run entirely on the client
+                $A.run(function(){
+                    $A.newCmpAsync(
+                        this,
+                        function(newCmp) {
+                            cmp.getValue("v.body").push(newCmp);
+                        },
+                        {
+                            componentDef: "markup://loadLevelTest:displayNumber",
+                            attributes: {
+                                values: {
+                                    number: 100
+                                }
+                            }
+                        }
+                    );
+                });
+
+                var textCmp = cmp.get('v.body')[1];
+                $A.test.assertEquals(100,textCmp.get('v.number'), "Failed to pass attribute values to created component");
+                $A.test.assertEquals("100",$A.test.getTextByComponent(textCmp), "Failed to pass attribute values to created component");
+            } finally {
+                $A.test.releaseRequests();
+            }
+        }]
     },
 
     /**
      * Create a component whose definition is already available at the client, but the component has server
      * dependencies (java model). Verify that attributes are passed to the server with the post action.
      */
-    testCreateComponentWithServerDependencies:{
+    testCreatePreloadedDefWithServerDependencies:{
         test:function(cmp){
             $A.run(function(){
                 $A.newCmpAsync(
@@ -109,10 +160,38 @@
     },
 
     /**
+     * Create a component with multiple levels of server dependencies and verify only one XHR request to the
+     * server is made.
+     */
+    testCreateMultipleLevelServerDef:{
+        test:function(cmp){
+            var origCount = $A.test.getSentRequestCount();
+            $A.run(function(){
+                $A.newCmpAsync(
+                        this,
+                        function(newCmp) {
+                            cmp.getValue("v.body").push(newCmp);
+                        },
+                        {
+                            componentDef: "markup://loadLevelTest:serverWithInnerServerCmp"
+                        }
+                );
+            });
+
+            $A.test.addWaitFor(false, $A.test.isActionPending, function(){
+                $A.test.assertEquals("markup://loadLevelTest:serverWithInnerServerCmp",
+                        cmp.get('v.body')[0].getDef().getDescriptor().getQualifiedName());
+                $A.test.assertEquals(origCount + 1, $A.test.getSentRequestCount(),
+                        "Only a single XHR to the server should have been sent.");
+            });
+        }
+    },
+
+    /**
      * Verify creating a component that's available on the client, but has an inner comopnent with server-side
      * dependencies (in this case, a model).
      */
-    // TODO: enable test when component attributes are created async
+    // TODO(W-1961207): enable test when component attributes are created async
     _testPreloadedDefWithNonPreloadedInnerCmp : {
         test : function(cmp) {
             $A.run(function() {
@@ -210,7 +289,7 @@
      * Test to verify creating an invalid component returns proper error.
      * test:test_Preload_BadCmp has two attributes with the same name.
      */
-    testCreateFetchBadComponent:{
+    testCreateBadServerComponent:{
         test: function(cmp){
             $A.run(function(){
                 $A.newCmpAsync(
@@ -221,7 +300,7 @@
                         "test:test_Preload_BadCmp"
                 );
             });
-
+ 
             $A.test.addWaitFor(false, $A.test.isActionPending, function(){
                 var errorCmp = cmp.get('v.body')[0];
                 var errorMsg = errorCmp.getValue("v.value").value;
@@ -230,6 +309,7 @@
             });
         }
     },
+
     /**
      * Test to verify trying to create a non-existent component returns proper error.
      */
@@ -436,9 +516,8 @@
 
     testMissingRequiredAttribute:{
         test:function(cmp){
-            var config = {componentDef:"markup://aura:renderIf"};
             try{
-                $A.newCmpAsync(this, function(){}, config);
+                $A.newCmpAsync(this, function(){}, "markup://aura:renderIf");
                 $A.test.fail('Should have failed to create component without a descriptor.');
             }catch(e){
                 $A.test.assertEquals("Missing required attribute aura:renderIf.isTrue",e.message);
@@ -539,15 +618,12 @@
         }
     },
 
-    // ---------------------------------------------------------------------------------------------------------------
-    // Provider tests
-    // ---------------------------------------------------------------------------------------------------------------
     /**
      * Create a component with a provider which provides a component that contains an inner component with server
      * dependencies. Verfiy component is successfully created and contains data from it's model.
      */
 
-    // TODO: enable this test when component attributes are converted to async
+    // TODO(W-1961207): enable this test when component attributes are converted to async
     _testCreateComponentNotOnClientWithClientProvider: {
         test: function(cmp) {
             $A.run(function() {
@@ -571,9 +647,6 @@
         }
     },
 
-    // ---------------------------------------------------------------------------------------------------------------
-    // TODO(tbliss): Do we care about lazy and exclusive tests still?
-    // ---------------------------------------------------------------------------------------------------------------
     /**
      * Create a component with a facet that is marked for lazy loading.
      * This is 2 levels of lazy loading, first the component itself is lazy loaded, then the facet inside the component is lazy loaded.

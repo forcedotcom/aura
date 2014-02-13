@@ -12,5 +12,5 @@
     <div class='identifier clientLibraryTestStyle' />
     <div class='jiffyCssIdentifier jiffyAbsolute'/>
 
-    <aura:clientLibrary name="UIPerfCSS" type="CSS" modes="STATS" />
+    <aura:clientLibrary name="UIPerfCsS" type="CSS" modes="STATS" />
 </aura:application>

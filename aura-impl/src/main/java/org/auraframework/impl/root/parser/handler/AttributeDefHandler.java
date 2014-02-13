@@ -31,6 +31,7 @@ import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.util.TextTokenizer;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.AuraTextUtil;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
@@ -92,6 +93,10 @@ public class AttributeDefHandler<P extends RootDefinition> extends ParentedTagHa
     protected void readAttributes() {
         String name = getAttributeValue(ATTRIBUTE_NAME);
 
+        if (AuraTextUtil.isNullEmptyOrWhitespace(name)) {
+        	error("Attribute '%s' is required on <%s>", ATTRIBUTE_NAME, TAG);
+        }
+        
         builder.setParentDescriptor(getParentHandler().getDefDescriptor());
         builder.setDescriptor(DefDescriptorImpl.getInstance(name, AttributeDef.class));
         builder.setLocation(getLocation());

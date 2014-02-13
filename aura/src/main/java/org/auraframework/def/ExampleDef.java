@@ -19,8 +19,10 @@ public interface ExampleDef extends Definition {
     @Override
     DefDescriptor<ExampleDef> getDescriptor();
     
+    @Override
     String getName();
     String getLabel();
+    @Override
     String getDescription();
     
     String getMarkup();

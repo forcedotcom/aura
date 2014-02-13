@@ -24,8 +24,10 @@ import javax.xml.stream.XMLStreamReader;
 import org.auraframework.def.*;
 import org.auraframework.impl.documentation.ExampleDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.impl.system.SubDefDescriptorImpl;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.AuraTextUtil;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -53,7 +55,13 @@ public class ExampleDefHandler<P extends RootDefinition> extends ParentedTagHand
 
     @Override
     protected void readAttributes() {
-    	builder.setDescriptor(DefDescriptorImpl.getInstance(getParentHandler().defDescriptor.getName(), ExampleDef.class));
+    	String name = getAttributeValue(ATTRIBUTE_NAME);    	
+    	
+        if (AuraTextUtil.isNullEmptyOrWhitespace(name)) {
+            error("Attribute '%s' is required on <%s>", ATTRIBUTE_NAME, TAG);
+        }
+    	
+    	builder.setDescriptor(SubDefDescriptorImpl.getInstance(name, getParentHandler().defDescriptor, ExampleDef.class));
         builder.setLocation(getLocation());
     }
 

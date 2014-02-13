@@ -36,11 +36,13 @@ public class DescriptionDefImpl extends DefinitionImpl<DescriptionDef> implement
         this.id = builder.id;
     }
 
+    @Override
     public String getBody() {
 		return body;
 	}
 
-	public String getId() {
+	@Override
+    public String getId() {
 		return id;
 	}
 
@@ -66,10 +68,12 @@ public class DescriptionDefImpl extends DefinitionImpl<DescriptionDef> implement
             return new DescriptionDefImpl(this);
         }
         
+        @Override
         public void setBody(String body) {
             this.body = body;
         }
         
+        @Override
         public void setId(String id) {
             this.id = id;
         }

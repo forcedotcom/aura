@@ -24,9 +24,8 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.def.DescriptionDef;
 import org.auraframework.def.DocumentationDef;
-import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.documentation.DescriptionDefImpl;
-import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.impl.system.SubDefDescriptorImpl;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
@@ -56,13 +55,11 @@ public class DescriptionDefHandler<P> extends ParentedTagHandler<DescriptionDefI
     @Override
     protected void readAttributes() {
     	String id = getAttributeValue(ATTRIBUTE_ID);
-    	if (id != null) {
-    		builder.setId(id);
-    	} else {
-    		builder.setId(((DocumentationDefHandler) getParentHandler()).getNextId());
+    	if (id == null) {
+    		id = ((DocumentationDefHandler) getParentHandler()).getNextId();
     	}
-    	
-        builder.setDescriptor(DefDescriptorImpl.getInstance(getParentHandler().defDescriptor.getName(), DescriptionDef.class));
+        builder.setDescriptor(SubDefDescriptorImpl.getInstance(id, getParentHandler().defDescriptor, DescriptionDef.class));
+        builder.setId(id);
         builder.setLocation(getLocation());
     }
 

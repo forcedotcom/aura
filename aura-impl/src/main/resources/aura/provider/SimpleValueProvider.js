@@ -23,7 +23,8 @@ $A.ns.SimpleValueProvider = function() {
 };
 
 /**
- * Setter values
+ * Replaces all values with a new map.
+ *
  * @param values
  */
 $A.ns.SimpleValueProvider.prototype.setValues = function(values) {
@@ -31,7 +32,7 @@ $A.ns.SimpleValueProvider.prototype.setValues = function(values) {
 };
 
 /**
- * Getter values
+ * Gets a map of all values.
  */
 $A.ns.SimpleValueProvider.prototype.getValues = function() {
     return this.values;
@@ -40,9 +41,10 @@ $A.ns.SimpleValueProvider.prototype.getValues = function() {
 /**
  * Gets value and creates new simple value that references specified component.
  *
- * @param {String} expression 
- * @param {Component} component
- * @param {Function} callback
+ * @param {String} expression used to compute the new values.
+ * @param {Component} component to own the new values
+ * @param {Function} callback called after creating the new values, passing {@code null} and
+ *    the new value map.
  * @return {SimpleValue} The simple value that references the component.
  */
 $A.ns.SimpleValueProvider.prototype.getValue = function(expression, component, callback) {

@@ -80,7 +80,9 @@ SimpleValue.prototype.unwrap = function() {
 };
 
 /**
- * Merges the passed in value.
+ * Merges the passed in value, replacing its value with the given input or doing nothing
+ * depending on the overwrite parameter.  This is the leaf of a recursive support of merge
+ * for ArrayValue and MapValue collections.
  *
  * @param {Object} sv - The value to overwrite.
  * @param {Boolean} overwrite - If overwrite is false, this method only does a type check for the sv argument

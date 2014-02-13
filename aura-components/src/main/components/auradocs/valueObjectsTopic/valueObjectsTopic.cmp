@@ -17,26 +17,19 @@
 -->
 <aura:component extends="auradocs:topicPanel">
 
-    <aura:set attribute="title" value="Value Objects"/>
+    <aura:set attribute="title" value="Reading Values"/>
 
-    <p>All expressions resolve to a "value object", which is a thin wrapper around the actual data. The wrapper layer around the literal JavaScript objects enables you to modify data in a transactional manner and selectively rerender and update the UI in response to data changes.</p>
+    <p>If you only care about the value of an expression, you can use <code>component.get("<em>expression</em>")</code>
+    to resolve the value.  For example, if a component <code>cmp</code> has a label attribute and you want to get the
+    string for the label, use <code>cmp.get("v.label")</code>.  However, sometimes you may want more than just the
+    resolved string.</p>
 
-    <p>There are a few different types of value objects. The most common ones are <code>SimpleValue</code>, <code>ArrayValue</code>, and <code>MapValue</code>. See <auradocs:topicLink topic="valueObjectTypes">Value Object Types</auradocs:topicLink> for more information.</p>
+    <h3>Setting Values</h3>
+    <p>To set an attribute value object, use <code>component.setValue("expression")</code>.  If this expression is not
+    settable (for example, if it is arithmetic like <code>v.one + v.two</code>), this will produce an error.  Otherwise,
+    it will update the value referenced by the expression, and fire <code>valueChange</code> events to all
+    registered change handlers.</p>
 
-    <h3>Accessing the Value Object</h3>
-    <p>To access a value object in JavaScript, use <code>component.getValue("<em>expression</em>")</code>.</p>
-
-    <p>Let's look at a component that refers to itself as <code>cmp</code> in its renderer. Use the following code in JavaScript to retrieve the <code>label</code> attribute for that component:</p>
-
-<auradocs:codeblock>
-    var labelValue = cmp.getValue("v.label");
-</auradocs:codeblock>
-
-    <p>In this case, the value object is a <code>SimpleValue</code> because it wraps the label, which is a string. You can use <code>unwrap()</code> to retrieve the native object or <code>get()</code> to return the unwrapped value.
-    </p>
-
-    <h3>Setting the Value Object</h3>
-    <p>To set the  value object, use <code>component.setValue("expression")</code>.</p>
     <p> Let's look at the component with an <code>errorMsg</code> attribute:</p>
     <auradocs:codeblock>
     &lt;aura:attribute name="errorMsg" type="String"/>
@@ -46,15 +39,46 @@
     Error Status: &lt;ui:outputText aura:id="status" value=""/&gt;
     </auradocs:codeblock>
 
-    <p>The following code shows how the <code>handleClearError</code> controller uses <code>setValue()</code> to set the value object:</p>
+    <p>The following code shows how the <code>handleClearError</code> controller uses <code>setValue()</code> to set the
+    value object:</p>
     <auradocs:codeblock>
     var inputCmp = component.find("inputCmp");
-    component.getValue("v.errorMsg").setValue("");
+    component.setValue("v.errorMsg", "");
     component.find("status").getAttributes().setValue("value", "Cleared error");
     </auradocs:codeblock>
 
-    <p>The controller retrieves the <code>errorMsg</code> attribute and sets an empty string in the component body denoted by<code><aura:text value="{!"/>v.errorMsg}</code>.
-    Similarly, <code>find("status").getAttributes().setValue("value", "Cleared error")</code> finds the component with an ID of <code>status</code> and sets its value with the string <code>"Cleared error"</code>.</p>
+    <p>The controller retrieves the <code>errorMsg</code> attribute and sets an empty string in the component body
+    denoted by<code><aura:text value="{!"/>v.errorMsg}</code>.  Similarly,
+    <code>find("status").getAttributes().setValue("value", "Cleared error")</code> finds the component with an ID of
+    <code>status</code> and sets its value with the string <code>"Cleared error"</code>.</p>
+
+    <h3>Value Objects</h3>
+
+    <p>Internally, all attributes (and expressions) resolve to a "value object", which is a thin wrapper around the
+    actual data.  In most cases, you should avoid directly using value objects, as shown above.  However, in a few uses,
+    they are necessary.  Specifically, the wrapper layer provides some transactional commit-or-rollback support around
+    updates and associating error information from validation.  Also, for array and map values, <code>getValue()</code>
+    can be more efficient, because <code>get()</code> copies the internal value.</p>
+
+    <p>There are a few different types of value objects. The most common ones are <code>SimpleValue</code>,
+    <code>ArrayValue</code>, and <code>MapValue</code>. See <auradocs:topicLink topic="valueObjectTypes">Value Object Types</auradocs:topicLink>
+    for more information.</p>
+
+    <h3>Accessing the Value Object</h3>
+    <p>Again, in general, you should prefer not to reference the value object yourself.  When you do want to, however,
+    you may access a value object in JavaScript, use <code>component.getValue("<em>expression</em>")</code>.</p>
+
+    <p>Let's look at that labeled component again, and assume it refers to itself as <code>cmp</code> in its renderer.
+    Use the following code in JavaScript to retrieve the <code>label</code> attribute for that component:</p>
+
+<auradocs:codeblock>
+    var labelValue = cmp.getValue("v.label");
+</auradocs:codeblock>
+
+    <p>In this case, the value object is a <code>SimpleValue</code> because it wraps the label, which is a string.
+    You can use <code>unwrap()</code> to retrieve the native object or <code>get()</code> to return the unwrapped value.
+    In this case, where the label is probably read
+    </p>
 
     <h3>Appending the Value Object</h3>
     <p>After accessing the value object, you can append it to another component. For example, you may want to retrieve the body of a component and append it to another component.
@@ -65,6 +89,7 @@
     </auradocs:codeblock>
     <p><code>cmpToAppend</code> can be a component from another body, a facet,  or created dynamically.
     Note that you don't have to set the value after adding the item.</p>
+
     <h2>Introspection Methods</h2>
 
     <p>These methods give you information about the underlying data in a value object.</p>
@@ -126,7 +151,9 @@
 
             <tr>
                 <td><code>rollback()</code></td>
-                <td>Removes the current uncommitted value if there is one. <code>isDirty()</code> returns <code>false</code> after <code>rollback()</code> is called. This method doesn't return a value.</td>
+                <td>Removes the current uncommitted value if there is one. <code>isDirty()</code> returns <code>false</code> after <code>rollback()</code> is called. This method doesn't return a value.
+                Note that attributes are committed or rolled back independently; the similarity in naming should not confuse you into expecting
+                database-like transactions across many entities.</td>
             </tr>
 
             <tr>

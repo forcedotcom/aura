@@ -151,14 +151,14 @@ public interface MasterDefRegistry {
      * 
      * @param uid the UID for the definition (must have called {@link #getUid(String, DefDescriptor<?>)}).
      */
-    <T extends Definition> long getLastMod(String uid);
+    long getLastMod(String uid);
 
     /**
      * Get the dependencies for a descriptor.
      * 
      * @param uid the UID for the definition (must have called {@link #getUid(String, DefDescriptor<?>)}).
      */
-    <T extends Definition> Set<DefDescriptor<?>> getDependencies(String uid);
+    Set<DefDescriptor<?>> getDependencies(String uid);
 
     /**
      * Get a named string from the cache for a def.
@@ -167,7 +167,7 @@ public interface MasterDefRegistry {
      * @param descriptor the descriptor.
      * @param key the key.
      */
-    <T extends Definition> String getCachedString(String uid, DefDescriptor<?> descriptor, String key);
+    String getCachedString(String uid, DefDescriptor<?> descriptor, String key);
 
     /**
      * Put a named string in the cache for a def.
@@ -177,7 +177,7 @@ public interface MasterDefRegistry {
      * @param key the key (must be unique).
      * @param key the value to store.
      */
-    <T extends Definition> void putCachedString(String uid, DefDescriptor<?> descriptor, String key, String value);
+    void putCachedString(String uid, DefDescriptor<?> descriptor, String key, String value);
 
     /**
      * Returns list of client libraries for given uid
@@ -185,5 +185,5 @@ public interface MasterDefRegistry {
      * @param uid uid of app or cmp
      * @return list of client libraries for uid
      */
-    <T extends Definition> List<ClientLibraryDef> getClientLibraries(String uid);
+    List<ClientLibraryDef> getClientLibraries(String uid);
 }

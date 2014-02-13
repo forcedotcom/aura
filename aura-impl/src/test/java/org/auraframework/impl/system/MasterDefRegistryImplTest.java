@@ -473,9 +473,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         } catch (DefinitionNotFoundException e) {
             checkExceptionStart(e, null, "No COMPONENT named markup://unknown:component found");
         }
-        Mockito.verify(registry, Mockito.times(1)).compileDef(Mockito.eq(cmpDesc),
-                Mockito.<Map<DefDescriptor<? extends Definition>, Definition>> any(),
-                Mockito.<List<ClientLibraryDef>> any());
+        Mockito.verify(registry, Mockito.times(1)).compileDE(Mockito.eq(cmpDesc));
 
         // another request for getUid will not re-compile
         Mockito.reset(registry);
@@ -485,9 +483,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         } catch (DefinitionNotFoundException e) {
             checkExceptionStart(e, null, "No COMPONENT named markup://unknown:component found");
         }
-        Mockito.verify(registry, Mockito.times(0)).compileDef(Mockito.eq(cmpDesc),
-                Mockito.<Map<DefDescriptor<? extends Definition>, Definition>> any(),
-                Mockito.<List<ClientLibraryDef>> any());
+        Mockito.verify(registry, Mockito.times(0)).compileDE(Mockito.eq(cmpDesc));
     }
 
     public void testGetUidForNonQuickFixException() throws Exception {
@@ -511,9 +507,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
             checkExceptionFull(e, InvalidDefinitionException.class,
                     String.format("%s:1,38: Invalid attribute \"invalidAttribute\"", cmpDesc.getQualifiedName()));
         }
-        Mockito.verify(registry, Mockito.times(0)).compileDef(Mockito.eq(cmpDesc),
-                Mockito.<Map<DefDescriptor<? extends Definition>, Definition>> any(),
-                Mockito.<List<ClientLibraryDef>> any());
+        Mockito.verify(registry, Mockito.times(0)).compileDE(Mockito.eq(cmpDesc));
     }
 
     public void testCompileDef() throws Exception {
@@ -535,9 +529,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         assertNotNull(uid);
         ComponentDef def = registry.getDef(cmpDesc);
         assertNotNull(def);
-        Mockito.verify(registry, Mockito.times(1)).compileDef(Mockito.eq(cmpDesc),
-                Mockito.<Map<DefDescriptor<? extends Definition>, Definition>> any(),
-                Mockito.<List<ClientLibraryDef>> any());
+        Mockito.verify(registry, Mockito.times(1)).compileDE(Mockito.eq(cmpDesc));
         assertCompiledDef(def);
 
         // check all dependencies
@@ -571,9 +563,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         // get def UID to trigger compileDef, etc.
         String uid = registry.getUid(null, def.getDescriptor());
         assertNotNull(uid);
-        Mockito.verify(registry, Mockito.times(1)).compileDef(Mockito.eq(def.getDescriptor()),
-                Mockito.<Map<DefDescriptor<? extends Definition>, Definition>> any(),
-                Mockito.<List<ClientLibraryDef>> any());
+        Mockito.verify(registry, Mockito.times(1)).compileDE(Mockito.eq(def.getDescriptor()));
         Mockito.doReturn(true).when(def).isValid();
         assertCompiledDef(def);
 
@@ -594,23 +584,17 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class, cmpContent);
         MasterDefRegistryImpl registry = getDefRegistry(true);
         registry.getDef(cmpDesc);
-        Mockito.verify(registry, Mockito.times(1)).compileDef(Mockito.eq(cmpDesc),
-                Mockito.<Map<DefDescriptor<? extends Definition>, Definition>> any(),
-                Mockito.<List<ClientLibraryDef>> any());
+        Mockito.verify(registry, Mockito.times(1)).compileDE(Mockito.eq(cmpDesc));
 
         // another getDef on same registry should not re-compile the def
         Mockito.reset(registry);
         assertNotNull(registry.getDef(cmpDesc));
-        Mockito.verify(registry, Mockito.times(0)).compileDef(Mockito.eq(cmpDesc),
-                Mockito.<Map<DefDescriptor<? extends Definition>, Definition>> any(),
-                Mockito.<List<ClientLibraryDef>> any());
+        Mockito.verify(registry, Mockito.times(0)).compileDE(Mockito.eq(cmpDesc));
 
         // another getDef on other registry instance should re-compile the def
         registry = getDefRegistry(true);
         assertNotNull(registry.getDef(cmpDesc));
-        Mockito.verify(registry, Mockito.times(1)).compileDef(Mockito.eq(cmpDesc),
-                Mockito.<Map<DefDescriptor<? extends Definition>, Definition>> any(),
-                Mockito.<List<ClientLibraryDef>> any());
+        Mockito.verify(registry, Mockito.times(1)).compileDE(Mockito.eq(cmpDesc));
     }
 
     public void testGetDefDescriptorNull() throws Exception {
@@ -765,7 +749,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         try {
             mdr.assertAccess(auraApp);
             fail("should fail to grant access to aura:application");
-        } catch (InvalidDefinitionException nae) {
+        } catch (NoAccessException nae) {
             assertTrue("exception should say something about abstract", nae.getMessage()
                     .contains("Abstract definition"));
         }

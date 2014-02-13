@@ -36,9 +36,6 @@ import org.auraframework.throwable.quickfix.QuickFixException;
  * The GUID referenced here is a globally unique ID for the top level definition
  * passed in. This ID is used to ensure that the client version matches the
  * local version.
- *
- * TODO: To handle global invalidates (e.g. a filesystem watcher or DB update watcher),
- * there will be a callback mechanism that clears out the global cache.
  */
 public interface MasterDefRegistry {
     /**
@@ -155,6 +152,9 @@ public interface MasterDefRegistry {
 
     /**
      * Get the dependencies for a descriptor.
+     *
+     * This set is guaranteed to be in order of 'use' in that a component should come before
+     * all components that use it or depend on it.
      * 
      * @param uid the UID for the definition (must have called {@link #getUid(String, DefDescriptor<?>)}).
      */

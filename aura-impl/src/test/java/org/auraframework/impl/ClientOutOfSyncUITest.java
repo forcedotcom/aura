@@ -60,8 +60,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         src.addOrUpdate(content);
     }
 
-    private DefDescriptor<ComponentDef> setupTriggerComponent(String attrs,
-            String body) {
+    private DefDescriptor<ComponentDef> setupTriggerComponent(String attrs, String body) {
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(
                 ComponentDef.class,
                 String.format(

@@ -47,7 +47,6 @@ import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.Location;
-import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.mockito.Mock;
 import org.mockito.Mockito;

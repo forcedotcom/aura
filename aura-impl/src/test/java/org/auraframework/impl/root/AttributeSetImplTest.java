@@ -161,7 +161,7 @@ public class AttributeSetImplTest extends AuraImplTestCase {
             Aura.getInstanceService().getInstance(desc);
             fail("foobar is not a valid attribute type.");
         } catch (DefinitionNotFoundException e) {
-            assertEquals("No TYPE named java://foobar found", e.getMessage());
+            assertEquals("No TYPE named java://foobar found : "+desc.getQualifiedName(), e.getMessage());
         }
     }
 

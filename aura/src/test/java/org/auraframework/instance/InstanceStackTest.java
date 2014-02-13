@@ -50,7 +50,7 @@ public class InstanceStackTest extends UnitTestCase {
         }
 
         @Override
-        public DefDescriptor getDescriptor() {
+        public DefDescriptor<Definition> getDescriptor() {
             return null;
         }
 

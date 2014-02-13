@@ -58,16 +58,6 @@ public abstract class RootDefinitionImpl<T extends RootDefinition> extends Defin
         this.documentationDescriptor = builder.documentationDescriptor;
 
         this.hashCode = AuraUtil.hashCode(descriptor, location, attributeDefs);
-        
-        try {
-			DocumentationDef d = this.getDocumentationDef();
-			if (d != null) {
-				
-			}
-		} catch (QuickFixException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
     }
 
     @Override
@@ -81,7 +71,7 @@ public abstract class RootDefinitionImpl<T extends RootDefinition> extends Defin
         }
 
         if (documentationDescriptor != null) {
-        	dependencies.add(documentationDescriptor);
+            dependencies.add(documentationDescriptor);
         }
     }
 

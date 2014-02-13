@@ -19,13 +19,18 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import java.util.Set;
+
+import org.auraframework.Aura;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.NamespaceDef;
 import org.auraframework.def.RegisterEventDef;
 import org.auraframework.def.RootDefinition;
+import org.auraframework.def.TypeDef;
 import org.auraframework.impl.root.RootDefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
@@ -38,6 +43,15 @@ public class NamespaceDefImpl extends RootDefinitionImpl<NamespaceDef> implement
     protected NamespaceDefImpl(Builder builder) {
         super(builder);
         this.styleTokens = AuraUtil.immutableMap(builder.styleTokens);
+    }
+    
+    @Override
+    public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
+        DefinitionService ds = Aura.getDefinitionService();
+        
+        super.appendDependencies(dependencies);
+        dependencies.add(ds.getDefDescriptor("String", TypeDef.class));
+        dependencies.add(ds.getDefDescriptor("Map", TypeDef.class));
     }
 
     @Override

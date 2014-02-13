@@ -16,7 +16,6 @@
 package org.auraframework.components.ui.inputRichText;
 
 import org.auraframework.test.WebDriverTestCase;
-import org.auraframework.test.WebDriverTestCase.ExcludeBrowsers;
 import org.auraframework.test.WebDriverUtil.BrowserType;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;

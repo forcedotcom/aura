@@ -13,21 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*jslint sub: true */
-/**
- * @namespace Creates a ValueDef instance.
- * @constructor
- * @param config used to create the value definition.  Only config["name"] is used.
- */
-function ValueDef(config){
-    this.name = config["name"];
+{
+    render : function(cmp, helper){
+        return this.superRender(); 
+    },
+
+    rerender : function(cmp, helper){
+debugger;
+        return this.superRerender(); 
+    }
 }
-
-ValueDef.prototype.auraType = "ValueDef";
-
-/**
- * Returns the name of the ValueDef instance.
- */
-ValueDef.prototype.getName = function(){
-    return this.name;
-};

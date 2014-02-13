@@ -15,10 +15,10 @@
  */
 /*jslint sub: true */
 /**
- * @class A value object wrapper for a map. Each value in the map is a value object rather than a JavaScript literal
- * value. A value object is a thin wrapper around the actual data. The wrapper layer around the literal JavaScript
- * objects enables you to modify data in a transactional manner. The framework selectively rerenders and updates the
- * UI in response to data changes.
+ * @class A value object wrapper for a map with case-insensitive keys. Each value in the map is a value object rather
+ * than a JavaScript literal value. A value object is a thin wrapper around the actual data. The wrapper layer around
+ * the literal JavaScript objects enables you to modify data in a transactional manner. The framework selectively
+ * rerenders and updates the UI in response to data changes.
  *
  * @constructor
  * @protected
@@ -174,7 +174,8 @@ MapValue.prototype.get = function(key){
 };
 
 /**
- * Merges the specified map into the current map.
+ * Merges the specified map into the current map.  After this, the map will have all its original
+ * keys <i>plus</i> keys from the supplied maps.
  *
  * @param {Object} yourMap The map to merge into the current map.
  * @param {Boolean} overwrite If set to true, entries from yourMap overwrite entries in the current map.
@@ -275,7 +276,9 @@ MapValue.prototype.each = function(func, config){
 
 /**
  * Convenience method for getting the current value (committed or not)
- * of a named property of this map.  Same as calling getValue(k).getValue().
+ * of a named property of this map.  Same as calling getValue(k).unwrap(),
+ * and different from get() in that it bypasses the expression service.
+ *
  * @param {String} k The key for the value to return.
  */
 MapValue.prototype.getRawValue = function(k){
@@ -388,6 +391,7 @@ MapValue.prototype.put = function(k, v){
 };
 
 /**
+ * Adds a new handler to the map value, fired when its children are changed.
  * @public
  */
 MapValue.prototype.addHandler = function(config){
@@ -415,6 +419,8 @@ MapValue.prototype.addHandler = function(config){
 };
 
 /**
+ * Destroys handlers registered for a given global id.
+ *
  * @protected
  */
 MapValue.prototype.destroyHandlers = function(globalId){
@@ -434,6 +440,8 @@ MapValue.prototype.destroyHandlers = function(globalId){
 };
 
 /**
+ * Returns true if the map contains the given key, in a case-insensitive test.
+ *
  * @private
  */
 MapValue.prototype.contains = function(key){

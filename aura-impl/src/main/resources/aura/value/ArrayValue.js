@@ -373,6 +373,8 @@ ArrayValue.prototype.each = function(func, reverse) {
 
 /**
  * Calls getValue() and returns the unwrapped value at the specified index.
+ * Different from <code>get()</code>, which is generally preferred, because this bypasses
+ * the expression service for lookup.
  *
  * @param {Number} i Index of value to return.
  */

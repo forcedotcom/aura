@@ -13,21 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*jslint sub: true */
-/**
- * @namespace Creates a ValueDef instance.
- * @constructor
- * @param config used to create the value definition.  Only config["name"] is used.
- */
-function ValueDef(config){
-    this.name = config["name"];
+{
+    toggleone: function(cmp, event, helper){
+    	var one = cmp.getAttributes().getValue("one");
+        one.setValue(!one.getValue());
+    },
+ 
+    toggletwo: function(cmp, event, helper){
+        var two = cmp.getAttributes().getValue("two");
+        two.setValue(!two.getValue());
+    },
+
+    togglethree: function(cmp, event, helper){
+        var three = cmp.getAttributes().getValue("three");
+        three.setValue(!three.getValue());
+    }   
 }
 
-ValueDef.prototype.auraType = "ValueDef";
-
-/**
- * Returns the name of the ValueDef instance.
- */
-ValueDef.prototype.getName = function(){
-    return this.name;
-};

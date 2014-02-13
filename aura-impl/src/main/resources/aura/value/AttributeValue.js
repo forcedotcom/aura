@@ -15,9 +15,10 @@
  */
 /*jslint sub: true */
 /**
- * An abstract base class for attribute Value implementations.  Attribute
- * values may be simple (String, integer, etc.) or compound (Map or Array).
- * When an attribute is changed, it fires a single changeEvent for the
+ * An abstract base class for attribute Value implementations.
+ * 
+ * Attribute values may be simple (String, integer, etc.) or compound (Map or
+ * Array).  When an attribute is changed, it fires a single changeEvent for the
  * modification; compound attributes must collect several sub-element
  * changes into one change event.
  *

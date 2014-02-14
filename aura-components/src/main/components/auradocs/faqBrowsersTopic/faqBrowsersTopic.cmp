@@ -43,10 +43,10 @@
               <tr>
                      <td>Internet Explorer</td>
                      <td>We recommend using Internet Explorer 9, 10, or 11. 
-                     <p>Internet Explorer 7 and 8 may provide a degraded performance and are not supported for <auradocs:topicLink topic="services">the history and layout services</auradocs:topicLink>.</p></td>
+                     <p>Internet Explorer 7 and 8 may provide a degraded performance.</p></td>
               </tr>
           </tbody>
        </table>
 
-    <auradocs:info>We recommend enabling JavaScript and cookies in your web browsers. Modern browsers can take advantage of Aura's HTML5 features and older ones default to available alternatives.</auradocs:info>
+    <auradocs:info>For all browsers, you must enable JavaScript. We recommend enabling cookies.</auradocs:info>
 </aura:component>

@@ -118,7 +118,7 @@ public class ComponentArrayTypeDef extends DefinitionImpl<TypeDef> implements Ty
      */
     @SuppressWarnings("unchecked")
     @Override
-    public void appendDependencies(Object instance, Set<DefDescriptor<?>> deps) throws QuickFixException {
+    public void appendDependencies(Object instance, Set<DefDescriptor<?>> deps) {
 
         List<ComponentDefRef> value = (List<ComponentDefRef>) instance;
 

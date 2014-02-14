@@ -56,7 +56,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         super.tearDown();
     }
 
-    public void testGetDefinitionOfApplicationWithPublicAccessInPublicContext() throws Exception {
+    public void testGetDefinitionOfApplicationWithPublicAccessInPublicContext() throws QuickFixException {
         DefDescriptor<? extends BaseComponentDef> desc = addSourceAutoCleanup(
                 ApplicationDef.class,
                 String.format(
@@ -67,7 +67,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         assertEquals(desc, Aura.getDefinitionService().getDefinition(desc).getDescriptor());
     }
 
-    public void testGetDefinitionOfApplicationWithPublicAccessInAuthenticatedContext() throws Exception {
+    public void testGetDefinitionOfApplicationWithPublicAccessInAuthenticatedContext() throws QuickFixException {
         DefDescriptor<? extends BaseComponentDef> desc = addSourceAutoCleanup(
                 ApplicationDef.class,
                 String.format(
@@ -78,7 +78,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         assertEquals(desc, Aura.getDefinitionService().getDefinition(desc).getDescriptor());
     }
 
-    public void testGetDefinitionOfApplicationWithAuthenicatedAccessInPublicContext() throws Exception {
+    public void testGetDefinitionOfApplicationWithAuthenicatedAccessInPublicContext() throws QuickFixException {
         DefDescriptor<? extends BaseComponentDef> desc = addSourceAutoCleanup(
                 ApplicationDef.class, String.format(baseApplicationTag,
                         "securityProvider='java://org.auraframework.java.securityProvider.LaxSecurityProvider'", ""));
@@ -90,7 +90,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         }
     }
 
-    public void testGetDefinitionOfApplicationWithAuthenicatedAccessInAuthenticatedContext() throws Exception {
+    public void testGetDefinitionOfApplicationWithAuthenicatedAccessInAuthenticatedContext() throws QuickFixException {
         DefDescriptor<? extends BaseComponentDef> desc = addSourceAutoCleanup(
                 ApplicationDef.class, String.format(baseApplicationTag,
                         "securityProvider='java://org.auraframework.java.securityProvider.LaxSecurityProvider'", ""));
@@ -101,7 +101,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
     /**
      * ContextService.assertAccess is called during getDefinition(DefDescriptor).
      */
-    public void testGetDefinition_DefDescriptor_assertAccess() throws Exception {
+    public void testGetDefinition_DefDescriptor_assertAccess() throws QuickFixException {
         Aura.getContextService().startContext(Mode.PROD, Format.HTML, Access.PUBLIC);
         DefDescriptor<ComponentDef> desc = addSourceAutoCleanup(ComponentDef.class, "<aura:component></aura:component>");
         try {
@@ -114,7 +114,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
     /**
      * ContextService.assertAccess is called during getDefinition(String, Class).
      */
-    public void testGetDefinition_StringClass_assertAccess() throws Exception {
+    public void testGetDefinition_StringClass_assertAccess() throws QuickFixException {
         Aura.getContextService().startContext(Mode.PROD, Format.HTML, Access.PUBLIC);
         DefDescriptor<ComponentDef> desc = addSourceAutoCleanup(ComponentDef.class, "<aura:component></aura:component>");
         try {
@@ -127,7 +127,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
     /**
      * ContextService.assertAccess is called during getDefinition(String, DefType...).
      */
-    public void testGetDefinition_StringDefType_assertAccess() throws Exception {
+    public void testGetDefinition_StringDefType_assertAccess() throws QuickFixException {
         Aura.getContextService().startContext(Mode.PROD, Format.HTML, Access.PUBLIC);
         DefDescriptor<ComponentDef> desc = addSourceAutoCleanup(ComponentDef.class, "<aura:component></aura:component>");
         try {
@@ -573,7 +573,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
             }
 
             @Override
-            public void appendDependencies(Object instance, Set<DefDescriptor<?>> deps) throws QuickFixException {
+            public void appendDependencies(Object instance, Set<DefDescriptor<?>> deps) {
             }
 
             @Override

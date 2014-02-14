@@ -79,6 +79,8 @@ public interface InstanceService extends AuraService {
      * 
      * @return The named definition
      * @throws DefinitionNotFoundException if definition does not exist
+     * @throws QuickFixException
+     * @throws AuraRuntimeException: this might throw AuraRuntimeException from BaseComponentImpl.injectComponent()
      */
     <T extends Instance<D>, D extends Definition> T getInstance(String qualifiedName, Class<D> defClass)
             throws DefinitionNotFoundException, QuickFixException;

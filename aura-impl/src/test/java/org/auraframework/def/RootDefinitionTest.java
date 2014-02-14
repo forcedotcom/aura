@@ -21,6 +21,7 @@ import java.util.Map;
 import org.auraframework.def.RootDefinition.SupportLevel;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
 public abstract class RootDefinitionTest<T extends RootDefinition> extends DefinitionTest<T> {
@@ -38,12 +39,13 @@ public abstract class RootDefinitionTest<T extends RootDefinition> extends Defin
         return defClass;
     }
 
-    protected T define(String source) throws Exception {
+   
+    protected T define(String source) throws QuickFixException {
         DefDescriptor<T> desc = addSourceAutoCleanup(getDefClass(), source);
         return desc.getDef();
     }
 
-    protected T define(String source, Object... replacements) throws Exception {
+    protected T define(String source, Object... replacements) throws QuickFixException {
         return define(String.format(source, replacements));
     }
 

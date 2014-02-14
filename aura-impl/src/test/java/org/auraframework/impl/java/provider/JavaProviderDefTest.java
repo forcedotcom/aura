@@ -541,7 +541,7 @@ public class JavaProviderDefTest extends AuraImplTestCase {
     }
 
     /**
-     * Exception thrown during provider instantiation should ...(be wrapped in a AuraRuntimeException?).
+     * Exception thrown during provider instantiation should be a InvalidDefinitionException.
      */
     public void testProviderThrowsDuringInstantiation() throws Exception {
         DefDescriptor<ProviderDef> javaPrvdrDefDesc = DefDescriptorImpl.getInstance(

@@ -54,5 +54,5 @@ public interface TypeDef extends Definition {
 
     Object initialize(Object config, BaseComponent<?, ?> valueProvider) throws QuickFixException;
 
-    void appendDependencies(Object instance, Set<DefDescriptor<?>> deps) throws QuickFixException;
+    void appendDependencies(Object instance, Set<DefDescriptor<?>> deps);
 }

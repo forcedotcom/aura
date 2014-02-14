@@ -92,7 +92,7 @@ public class ComponentTypeDef extends DefinitionImpl<TypeDef> implements TypeDef
      * @throws QuickFixException
      */
     @Override
-    public void appendDependencies(Object instance, Set<DefDescriptor<?>> deps) throws QuickFixException {
+    public void appendDependencies(Object instance, Set<DefDescriptor<?>> deps) {
         ((ComponentDefRef) instance).appendDependencies(deps);
     }
 

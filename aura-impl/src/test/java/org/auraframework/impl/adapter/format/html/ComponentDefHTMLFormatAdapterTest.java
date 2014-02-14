@@ -38,8 +38,6 @@ public class ComponentDefHTMLFormatAdapterTest extends BaseComponentDefHTMLForma
     /**
      * Don't append the manifest attribute to <html> when accessing components
      * directly.
-     * 
-     * TODO: re-enable after W-1166679
      */
     @UnAdaptableTest
     public void testWriteManifestWithPreloads() throws Exception {

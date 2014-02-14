@@ -436,10 +436,6 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             handler.appendDependencies(dependencies);
         }
 
-        if (providerDescriptors != null) {
-            dependencies.addAll(providerDescriptors);
-        }
-
         if (controllerDescriptors != null) {
             dependencies.addAll(controllerDescriptors);
         }

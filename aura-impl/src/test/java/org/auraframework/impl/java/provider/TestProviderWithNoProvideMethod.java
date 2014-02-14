@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 package org.auraframework.impl.java.provider;
-
+/**
+ * this provider is for JavaProviderDefTest.testInterfaceWithNoProvider
+ */
 public class TestProviderWithNoProvideMethod {
 
 }

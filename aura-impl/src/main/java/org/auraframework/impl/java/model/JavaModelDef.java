@@ -151,11 +151,15 @@ public class JavaModelDef extends DefinitionImpl<ModelDef> implements ModelDef {
         }
 
         @Override
-        public JavaModelDef build() throws QuickFixException {
+        public JavaModelDef build() {
             this.memberMap = new TreeMap<String, JavaValueDef>();
             for (Method method : this.modelClass.getMethods()) {
                 if (method.getAnnotation(AuraEnabled.class) != null) {
-                    addMethod(method);
+                    try {
+						addMethod(method);
+					} catch (QuickFixException e) {
+						setParseError(e);
+					}
                 }
             }
             return new JavaModelDef(this);

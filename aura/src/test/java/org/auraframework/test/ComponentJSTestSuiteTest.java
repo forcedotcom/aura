@@ -243,7 +243,7 @@ public class ComponentJSTestSuiteTest extends TestSuite {
             open(getUrl(), Mode.AUTOJSTEST);
 
             String ret = (String) auraUITestingUtil.getEval(String.format(
-                    "return window.aura.test.run('%s', '%s')",
+                    "return window.aura.test.run('%s', '%s', 30)",
                     AuraTextUtil.escapeForJavascriptString(caseDef.getName()),
                     AuraTextUtil.escapeForJavascriptString(suite.getCode())));
 

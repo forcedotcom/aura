@@ -41,7 +41,7 @@
                 return;
             }
         }
-        win.aura.test.run(cmp.get("v.case.name"), cmp.get("v.suite.code"), 1);
+        win.aura.test.run(cmp.get("v.case.name"), cmp.get("v.suite.code"), 10);
         cmp.getDef().getHelper().displayResults(cmp, win);
     },
 

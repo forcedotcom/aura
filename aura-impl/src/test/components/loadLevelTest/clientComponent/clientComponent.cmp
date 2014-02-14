@@ -16,5 +16,5 @@
 
 -->
 <aura:component>
-    Client Component{!globalId}<br/>
+    Client Component {!globalId}<br/>
 </aura:component>

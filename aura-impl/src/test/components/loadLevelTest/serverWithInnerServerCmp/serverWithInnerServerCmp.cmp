@@ -15,10 +15,6 @@
     limitations under the License.
 
 -->
-<aura:component >
-    This component is in place just make sure that compilation failes. This is required for PreloadNameSpaceUITest.testPreloadNameSpaceWithBadComponent()
-    <aura:attribute type="String" name="dup"/>
-    <aura:attribute type="String" name="dup"/>
+<aura:component  model="java://org.auraframework.impl.loadLevel.GatedModel">
+    <loadLevelTest:clientWithServerChild />
 </aura:component>
-<!--This component is used in PreloadNameSpaceUITest.testPreloadNameSpaceWithBadComponent()
-    and loadLevelTest.createNewCmpTest.js -->

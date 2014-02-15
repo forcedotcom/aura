@@ -17,13 +17,10 @@ package org.auraframework.components.ui.carousel;
 
 import java.util.List;
 
-import org.auraframework.test.WebDriverTestCase;
+import org.auraframework.test.*;
 import org.auraframework.test.WebDriverTestCase.ExcludeBrowsers;
 import org.auraframework.test.WebDriverUtil.BrowserType;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 
@@ -42,7 +39,7 @@ public class CarouselUITest extends WebDriverTestCase {
     private final String NAVIGATION_ITEM_SELECTOR = "a[class*='carousel-nav-item']";
     private final String NAVIGATION_ITEM_SELECTED_SELECTOR = "a[class*='carousel-nav-item-selected']";
     private final String CAROUSEL_PAGE_SELECTOR = "section[class*='uiCarouselPage']";
-    private final String CAROUSEL_PAGE_ITEM_SELECTOR = "li[class*='uiCarouselPageItem']";
+    private final String CAROUSEL_PAGE_ITEM_SELECTOR = "li[class*='pageItem']";
     private final String AURA_RENDERED_BY_ID = "data-aura-rendered-by";
 
     public CarouselUITest(String name) {

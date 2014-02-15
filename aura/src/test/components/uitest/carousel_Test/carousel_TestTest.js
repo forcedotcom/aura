@@ -574,7 +574,7 @@
 				.assertNotNull(page,
 						"Verifying mdm page, page provided is null");
 		pageItemNumber--;
-		var pageItems = page.get("v.body");
+		var pageItems = page.get('v.body')[0].get('v.body');
 		$A.test.assertEquals(6, pageItems.length,
 				"Incorrect page elements on MDM page.");
 		var pageItem = pageItems[pageItemNumber];

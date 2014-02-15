@@ -22,20 +22,24 @@
  	<ui:carousel aura:id="carousel1" width="450" height="450" class="myclass">
  		<aura:set attribute="pageComponents">
 	 		<ui:carouselPage aura:id="c1-p1">
-	 			<ui:carouselPageItem label="New Post 1" class="entity-post" />
-	 			<ui:carouselPageItem label="Task 1" class="entity-task" />
-	 			<ui:carouselPageItem label="New Opportunity 1" class="entity-opportunity" />	
-	 			<ui:carouselPageItem label="Thank Someone 1" class="entity-thanks" />
-	 			<ui:carouselPageItem label="File 1" class="entity-file" />
-	 			<ui:carouselPageItem label="Post a New Poll 1" class="entity-poll" />
+	 			<ul aura:id="pageItems">
+		 			<li class="pageItem"><a href="#"><span class="entity-post">New Post 1</span></a></li>
+		 			<li class="pageItem"><a href="#"><span class="entity-task">Task 1</span></a></li>
+		 			<li class="pageItem"><a href="#"><span class="entity-opportunity">New Opportunity 1</span></a></li>
+		 			<li class="pageItem"><a href="#"><span class="entity-thanks">Thank Someone 1</span></a></li>
+		 			<li class="pageItem"><a href="#"><span class="entity-file">File 1</span></a></li>
+		 			<li class="pageItem"><a href="#"><span class="entity-poll">Post a New Poll 1</span></a></li>
+	 			</ul>
 	 		</ui:carouselPage>
 	 		<ui:carouselPage aura:id="c1-p2" isDefault="{!true}">
-	 			<ui:carouselPageItem label="New Post 2" class="entity-post" />
-	 			<ui:carouselPageItem label="Task 2" class="entity-task" />
-	 			<ui:carouselPageItem label="New Opportunity 2" class="entity-opportunity" />	
-	 			<ui:carouselPageItem label="Thank Someone 2" class="entity-thanks" />
-	 			<ui:carouselPageItem label="File 2" class="entity-file" />
-	 			<ui:carouselPageItem label="Post a New Poll 2" class="entity-poll" />
+	 			<ul aura:id="pageItems">
+		 			<li class="pageItem"><a href="#"><span class="entity-post">New Post 2</span></a></li>
+		 			<li class="pageItem"><a href="#"><span class="entity-task">Task 2</span></a></li>
+		 			<li class="pageItem"><a href="#"><span class="entity-opportunity">New Opportunity 2</span></a></li>
+		 			<li class="pageItem"><a href="#"><span class="entity-thanks">Thank Someone 2</span></a></li>
+		 			<li class="pageItem"><a href="#"><span class="entity-file">File 2</span></a></li>
+		 			<li class="pageItem"><a href="#"><span class="entity-poll">Post a New Poll 2</span></a></li>
+	 			</ul>
 	 		</ui:carouselPage>
 	 		<ui:carouselPage aura:id="c1-pageWithLongString" title="PAGE 3">
 	 			{!m.longStr}
@@ -45,7 +49,9 @@
 	 		</ui:carouselPage>
 	 		<ui:carouselPage aura:id="c1-mixContent">
 	 			<h1>Welcome to this page!</h1>
-	 			<ui:carouselPageItem label="Carousel Page Item"/>
+	 			<ul aura:id="pageItems">
+		 			<li class="pageItem"><a href="#"><span class="entity-post">Carousel Page Item</span></a></li>
+		 		</ul>
 	 			<div>
 	 				<ui:image src="/auraFW/resources/aura/images/hula.gif" imageType="decorative"/> This is an ui:carousel page to demo the exciting ui:carousel components. Enjoy!
 	 			</div>

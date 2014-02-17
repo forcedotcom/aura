@@ -17,7 +17,7 @@
 /**
  * @namespace Creates a HelperDef instance.
  * @constructor
- * @protected
+ * @private
  */
 function HelperDef(config, zuper){
     var functions = config["functions"] || {};
@@ -40,6 +40,8 @@ HelperDef.prototype.auraType = "HelperDef";
 
 /**
  * Returns the functions for HelperDef.
+ *
+ * @public
  */
 HelperDef.prototype.getFunctions = function HelperDef$getFunctions(){
     return this.functions;

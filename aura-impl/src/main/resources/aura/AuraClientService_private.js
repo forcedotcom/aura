@@ -199,6 +199,11 @@ var priv = {
         return responseMessage;
     },
 
+    /**
+     * fire an event passed back on the wire as an 'event exception'
+     *
+     * @param {Object} resp the response from the server.
+     */
     throwExceptionEvent : function(resp) {
         var evtObj = resp["event"];
         var descriptor = evtObj["descriptor"];
@@ -233,7 +238,7 @@ var priv = {
      * Process a single action/response.
      * 
      * Note that it does this inside an $A.run to provide protection against error returns, and to notify the user if an
-     * error occurs.
+     * erroroccurs.
      * 
      * @private
      * @param {Action}

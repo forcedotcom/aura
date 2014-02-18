@@ -73,7 +73,6 @@
         //
         bodyCollector.count += len - 1;
         for (var j = 0; j < body.getLength(); j++) {
-        	$A.setCreationPathIndex(j);
             var cdr = body.get(j);
             if (!ivp) {
                 ivp = $A.expressionService.createPassthroughValue(extraProviders, cdr.valueProvider || atts.getValueProvider());
@@ -96,7 +95,6 @@
             extraProviders[indexVar] = $A.expressionService.create(null, index);
         }
         var ivp;
-        var len = body.getLength();
         
         $A.setCreationPathIndex(index);
         $A.pushCreationPath("body");
@@ -135,8 +133,6 @@
     createRealBody: function(cmp, doForce, callback) {
         var atts = cmp.getAttributes();
         var items = atts.getValue("items");
-        var varName = atts.get("var");
-        var indexVar = atts.get("indexVar");
         //
         // The collector for the components.
         // Note that we put the count of items in our count, and
@@ -193,8 +189,6 @@
         var realbody = [];
         var atts = cmp.getAttributes();
         var items = atts.getValue("items");
-        var varName = atts.get("var");
-        var indexVar = atts.get("indexVar");
 
         if (items && !items.isLiteral() && !items.isEmpty()) {
             $A.pushCreationPath("realbody");
@@ -249,6 +243,7 @@
             if (!ivp) {
                 ivp = $A.expressionService.createPassthroughValue(extraProviders, cdr.valueProvider || atts.getValueProvider());
             }
+            $A.setCreationPathIndex(j);
             $A.componentService.newComponentAsync(this, this.createSelectiveComponentsCallback(selectiveBodyCollector, j), cdr, ivp, false, false, forceServer);
         }
     },
@@ -282,7 +277,7 @@
                 var realbody = cmp.getValue("v.realbody");
                 realbody.destroy();
                 realbody.setValue(newBody);
-            	cmp.getEvent("rerenderComplete").fire();
+                cmp.getEvent("rerenderComplete").fire();
             }
         });
     },
@@ -334,8 +329,8 @@
                             for (var j = 0; j < newcmps.length; j++) {
                                 realbody.push(newcmps[j]);
                             }
-            	            cmp.getEvent("rerenderComplete").fire();
-            	        }
+                            cmp.getEvent("rerenderComplete").fire();
+                        }
                     });
                 } else {
                     // item was added, instantiate new cmp, re-number rest
@@ -354,8 +349,8 @@
                                 }
                             }
                             realbody.setValue(cmparray);
-            	            cmp.getEvent("rerenderComplete").fire();
-            	        }
+                            cmp.getEvent("rerenderComplete").fire();
+                        }
                     });
                 }               
             } else {
@@ -366,7 +361,7 @@
                         for (var j = 0; j < newcmps.length; j++) {
                             realbody.push(newcmps[j]);
                         }
-            	        cmp.getEvent("rerenderComplete").fire();
+                        cmp.getEvent("rerenderComplete").fire();
                     }
                 });
             }

@@ -94,9 +94,11 @@ AttributeDefSet.prototype.createInstances = function(config, component, suppress
                 }
             }
             if (hasValue) {
+                var attribute;
+
                 $A.pushCreationPath(name);
                 try {
-                    var attribute = this.createAttribute(value, attributeDef, component, config["valueProvider"], localCreation, false);
+                    attribute = this.createAttribute(value, attributeDef, component, config["valueProvider"], localCreation, false);
                 } finally {
                     $A.popCreationPath(name);
                 }

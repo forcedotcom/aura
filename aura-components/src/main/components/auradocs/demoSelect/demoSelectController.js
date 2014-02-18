@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{
+({
     doInit : function(cmp) {
         var opts = [
             { "class": "optionClass", label: "Option1", value: "opt1", selected: "true" },
@@ -35,5 +35,4 @@
 	         resultCmp = cmp.find("multiResult");
 	         resultCmp.setValue("v.value", selectCmp.getValue("v.value").getValue());
 	 }
-}
-
+})

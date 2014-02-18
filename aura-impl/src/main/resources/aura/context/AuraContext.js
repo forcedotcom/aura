@@ -246,7 +246,7 @@ AuraContext.prototype.joinComponentConfigs = function(otherComponentConfigs, act
  *
  * @private
  * @param {string} actionId the action id that we should clear.
- * @param {logit} should we log as we go? including errors.
+ * @param {boolean} logit should we log as we go? including errors.
  * @return {number} the count of component configs removed.
  */
 AuraContext.prototype.internalClear = function(actionId, logit) {
@@ -369,8 +369,9 @@ AuraContext.prototype.setCurrentAction = function(action) {
 /**
  * EBA - temporarily made public for helpers to obtain action - return to private when current visibility is determined
  * @public
+ * @return the current action.
  */
-AuraContext.prototype.getCurrentAction = function(action) {
+AuraContext.prototype.getCurrentAction = function() {
     return this.currentAction;
 };
 

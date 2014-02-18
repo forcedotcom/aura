@@ -129,9 +129,15 @@ public class IterationUITest extends WebDriverTestCase {
         serverHtml = serverHtml.replaceAll("</DIV>but indexVar", "</DIV> but indexVar");
 
         serverHtml = serverHtml.replaceAll("<(?i)/?tbody>", ""); // server has extra
-        // tbody?
+        														 // tbody?
         
         assertEquals(clientHtml, serverHtml);
+        
+        // in ie 8 clientHtml has:
+        clientHtml = clientHtml.toLowerCase()          // tags are in caps
+        	.replaceAll("scope=row", "scope=\"row\"")  // does not have extra quotes
+        	.replaceAll("> <", "><");                  // has extra spaces between tags
+        
         goldFileText(clientHtml);
     }
 
@@ -201,7 +207,7 @@ public class IterationUITest extends WebDriverTestCase {
         serverHtml = serverHtml.replaceAll("BUTTON", "button");
         serverHtml = serverHtml.replaceAll("BR", "br");
         
-        assertEquals(clientHtml, serverHtml);
+        assertEquals(clientHtml, serverHtml);        
         goldFileText(clientHtml);
     }
 
@@ -238,8 +244,15 @@ public class IterationUITest extends WebDriverTestCase {
         serverHtml = serverHtml.replaceAll("</DIV>but indexVar", "</DIV> but indexVar");
 
         serverHtml = serverHtml.replaceAll("<(?i)/?tbody>", ""); // server has extra
-        // tbody?
+        														 // tbody?
+        
         assertEquals(clientHtml, serverHtml);
+
+        // in ie 8 clientHtml has:
+        clientHtml = clientHtml.toLowerCase()          // tags are in caps
+        	.replaceAll("scope=row", "scope=\"row\"")  // does not have extra quotes
+        	.replaceAll("> <", "><");                  // has extra spaces between tags
+
         goldFileText(clientHtml);
     }
 }

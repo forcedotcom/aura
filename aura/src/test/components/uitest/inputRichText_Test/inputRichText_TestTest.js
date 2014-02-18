@@ -18,6 +18,7 @@
 	 * Test multiple inputRichText components rendered.
 	 */
 	testMultipleRichTextComponents: {
+		browsers:["-ANDROID_PHONE","-ANDROID_TABLET"],
 		test : function(component) {
 			this.assertRichTextInitalized(component.find("Text"));
 			this.assertRichTextInitalized(component.find("rtCustom"));
@@ -28,6 +29,7 @@
      * Test html content.
      */
     testRichTextHtmlContent:{
+    	browsers:["-ANDROID_PHONE","-ANDROID_TABLET"],
     	attributes : {testContent: "<b>some content</b></html>"},
     	test : [function(component) {
     		this.assertRichTextInitalized(component.find("Text"));

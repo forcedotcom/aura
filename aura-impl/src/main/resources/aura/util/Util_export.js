@@ -62,8 +62,10 @@ exp(p,
     "isValue", p.isValue,
     "instanceOf", p.instanceOf,
     "supportsTouchEvents", p.supportsTouchEvents,
-    "estimateSize", p.estimateSize
-    
+    "estimateSize", p.estimateSize,
+    "createPromise", p.createPromise,
+    "when", p.when
+
     //#if {"excludeModes" : ["PRODUCTION"]}
 	    ,
 	    "getDebugToolComponent", p.getDebugToolComponent,

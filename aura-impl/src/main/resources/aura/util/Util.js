@@ -589,6 +589,29 @@ $A.ns.Util.prototype.createTimeoutCallback = function(callback, toleranceMillis)
     };
 };
 
+/** 
+ * Factory for Promise objects. 
+ *
+ * @param func  function encapsulating your asynchronous work. 
+ *              Do not provide anything if you wish to use resolve and reject directly.
+ */
+$A.ns.Util.prototype.createPromise = function (func) {
+    return new $A.ns.Promise(func);
+};
+
+/** 
+ * Factory for When promise callback wall. 
+ *
+ * @param  variable length list of UNRESOLVED Promise objects
+ */ 
+$A.ns.Util.prototype.when = function () {
+    if (arguments.length === 0) {
+        throw 'When must be given at least one promise.';
+    }
+
+    return $A.ns.Promise.when.apply(this, arguments);      
+};
+
 /**
  * Adds an event listener to a DOM element.
  *

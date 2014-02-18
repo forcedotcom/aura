@@ -49,6 +49,7 @@ $A['ns'] = $A.ns; // TODO: use exportSymbols when available
 
 var clientService;
 
+// #include aura.Promise
 // #include aura.util.Function
 // #include aura.util.Util
 // #include {"modes" : ["TESTING","AUTOTESTING", "TESTINGDEBUG", "AUTOTESTINGDEBUG", "DOC"], "path" : "aura.test.Test"}
@@ -256,6 +257,16 @@ $A.ns.Aura = function() {
     this.enqueueAction = this.clientService.enqueueAction;
 
     /**
+     * Equivalent to <code>$A.clientService.deferAction()</code>.
+     * <p>See Also: <a href="#reference?topic=api:AuraClientService">AuraClientService</a></p>
+     * @public
+     * @function
+     * @param {Action} action
+     * @borrows AuraClientService.deferAction
+     */
+    this.deferAction = this.clientService.deferAction;
+
+    /**
      * Equivalent to <code>$A.renderingService.render()</code>.
      * <p>See Also: <a href="#reference?topic=api:AuraRenderingService">AuraRenderingService</a></p>
      * @public
@@ -424,6 +435,7 @@ $A.ns.Aura = function() {
         "storageService", aura.storageService,
         "services", aura.services,
         "enqueueAction", aura.enqueueAction,
+        "deferAction", aura.deferAction,
         "render", aura.render,
         "rerender", aura.rerender,
         "unrender", aura.unrender,

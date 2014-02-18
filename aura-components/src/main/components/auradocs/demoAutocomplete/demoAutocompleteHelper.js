@@ -32,9 +32,9 @@
         var list = accCmp.find("list");
         var value = "";
         
-        if (optionCmp.isInstanceOf("uitest:autoComplete_CustomTemplate")) {
-        	value = optionCmp.getValue("v.value").getValue();
-        } else if (optionCmp.isInstanceOf("ui:autocompleteOption")) {
+      //  if (optionCmp.isInstanceOf("uitest:autoComplete_CustomTemplate")) {
+      //  	value = optionCmp.getValue("v.value").getValue();
+      if (optionCmp.isInstanceOf("ui:autocompleteOption")) {
         	value = optionCmp.getValue("v.label").getValue();
         } 
         input.setValue("v.value", value);

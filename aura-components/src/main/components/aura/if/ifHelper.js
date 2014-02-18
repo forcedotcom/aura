@@ -27,7 +27,6 @@
         }
 
         $A.pushCreationPath("realbody");
-        var realbody = [];
         for (var i = 0, length = facet.getLength(); i < length; i++) {
         	$A.setCreationPathIndex(i);
             var cdr = facet.get(i);

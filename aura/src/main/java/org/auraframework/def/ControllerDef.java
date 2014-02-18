@@ -26,12 +26,36 @@ import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
  * from a controller that the component definition needs to know like what
  * actions and types of data are exposed.
  */
-public interface ControllerDef extends ValueProvider, Definition, SubDefinitionProvider<ActionDef> {
+public interface ControllerDef extends ValueProvider, Definition {
+    /**
+     * Get the descriptor for this def.
+     */
     @Override
     DefDescriptor<ControllerDef> getDescriptor();
 
+    /**
+     * Get the map of actions by name in this controller.
+     *
+     * @return the map of actions, never null.
+     */
     Map<String, ? extends ActionDef> getActionDefs();
 
-    // TODO: move this to actiondef
+    /**
+     * Create an action from this controller.
+     *
+     * FIXME: should this move to ActionDef?
+     *
+     * @param actionName the name of the action to create.
+     * @param paramValues the parameters to set on the action.
+     * @throws DefinitionNotFoundException if the action is not a valid action.
+     */
     Action createAction(String actionName, Map<String, Object> paramValues) throws DefinitionNotFoundException ;
+
+    /**
+     * Get an action def by name.
+     *
+     * @param name the name of the action to fetch
+     * @return the action def, or null if none.
+     */
+    ActionDef getSubDefinition(String name);
 }

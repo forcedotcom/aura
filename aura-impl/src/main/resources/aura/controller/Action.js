@@ -91,11 +91,11 @@ Action.prototype.getNextGlobalId = function() {
 
 /**
  *  If a component is replacing the same-named component at the same level (e.g. provider),
- *  this reactivates the path's error detection, so that is can request it's location again without reporting error.
+ *  this reactivates the path's error detection, so that is can request it's location again without
+ *  reporting an error.
+ *
  *  @private
  */
-// 
-// 
 Action.prototype.reactivatePath = function() {
 	this.canCreate = true;
 };
@@ -104,7 +104,8 @@ Action.prototype.reactivatePath = function() {
  * force the creation path to match a given value.
  *
  * This checks to see if the path matches, otherwise, it forces the path
- * to the one supplied. A warning is emitted if the path mismatches.
+ * to the one supplied. A warning is emitted if the path mismatches but only
+ * if it is not the top level.
  *
  * @private
  * @param {string} path the path to force
@@ -140,9 +141,11 @@ Action.prototype.forceCreationPath = function(path) {
  * release a creation path that was previously forced.
  *
  * This is the mirrored call to 'forceCreationPath' that releases the 'force'.
+ * The path must match the call to forceCreationPath, and the path must have
+ * been forced.
  * 
  * @private
- * @param {string} path
+ * @param {string} path the path to release.
  */
 Action.prototype.releaseCreationPath = function(path) {
     var last;
@@ -395,6 +398,13 @@ Action.prototype.setCallback = function(scope, callback, name) {
             s : scope
         };
         this.callbacks["INCOMPLETE"] = {
+            fn : callback,
+            s : scope
+        };
+        // FIXME: this is rather horrific, as it is not what it claims, but it is currently
+        // depended on. This callback is only called when the server has a problem with the
+        // arguments, which seems less than obvious
+        this.callbacks["ABORTED"] = {
             fn : callback,
             s : scope
         };

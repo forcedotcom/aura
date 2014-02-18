@@ -16,9 +16,7 @@
 
 -->
 <aura:component extensible="true" support="GA"
-    description="This component creates a button that executes an action defined by a controller. The visual appearance of buttons is highly configurable, as are text and accessibility attributes.
-
-    &lt;ui:button&gt; responds to a single user interface event. Clicking the button triggers the client-side controller method set for the press event.">
+    description="Represents a button element.">
 
     <aura:attribute name="theme" type="String" default="default" description="The default CSS style used to display the button."/>
     <aura:attribute name="buttonTitle" type="String" description="The text displayed in a tooltip when the mouse pointer hovers over the button."/>

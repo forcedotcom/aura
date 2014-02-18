@@ -1,16 +1,22 @@
 <aura:documentation>
 	<aura:description>
 		<p>
-			<code>ui:dataProvider</code>s are responsible for fetching and returning rows of data to a consuming component, such as <code>ui:list</code>.
+			A <code>ui:dataProvider</code> component fetches and returns rows of data to a consuming component, such as <code>ui:list</code>.
 		</p>
 		<p>
-			A <code>ui:dataProvider</code> can fetch data however it wants.  It may fire a server action to get rows from a server-side database, or create data in JavaScript and require no server interaction, or even some combination of the two.
+			This component can fetch data in various ways.  It can fire a server action to get rows from a server-side database, or create data in JavaScript and require no server interaction, or even some combination of the two.
 		</p>
 		<p>
-			When a <code>ui:dataProvider</code> has new data to report (e.g., when a server action has returned), it does so via the <code>ui:dataChanged</code> event, which has the relevant data attached as <code>data</code>.  <code>ui:dataProvider</code>'s helper provides a function <code>fireDataChangeEvent(dataProvider, data)</code> to surface this event.
+			When a <code>ui:dataProvider</code> component has new data to report (e.g., when a server action has returned), it attaches the relevant data to the <code>ui:dataChanged</code> event.  <code>ui:dataProvider</code>'s helper provides a function <code>fireDataChangeEvent(dataProvider, data)</code> to surface this event.
+			For example, this code attaches the data to the <code>ui:dataChanged</code> event.
+	    </p>
+	    <p><code>
+         var data = action.getReturnValue(); <br/> this.fireDataChangeEvent(dataProvider, data); 
+        </code>
 		</p>
 		<p>
 			A <code>ui:dataProvider</code> can also be triggered by the wrapping component to provide data, via the <code>ui:dataProvide</code> event.  This event has a <code>parameters</code> attribute that can be used as input to the <code>ui:dataProvider</code>.
+			To customize this behavior, set the event handler in the component that extends <code>ui:dataProvider</code> by using the <code>aura:handler</code> tag with the attribute <code>name="provide"</code>.
 		</p>
 	</aura:description>
 </aura:documentation>

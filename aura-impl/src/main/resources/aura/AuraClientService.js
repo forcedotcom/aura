@@ -636,6 +636,7 @@ var AuraClientService = function() {
          * @memberOf AuraClientService
          * @public
          */
+        // TODO: remove boolean trap http://ariya.ofilabs.com/2011/08/hall-of-api-shame-boolean-trap.html 
         enqueueAction : function(action, background) {
             $A.assert(!$A.util.isUndefinedOrNull(action), "EnqueueAction() cannot be called on an undefined or null action.");
             $A.assert(!$A.util.isUndefined(action.auraType)&& action.auraType==="Action", "Cannot call EnqueueAction() with a non Action parameter.");
@@ -646,7 +647,36 @@ var AuraClientService = function() {
             
             priv.actionQueue.enqueue(action);
         },
+
+        /**
+         * Defer the action by returning a Promise object. 
+         * Configure your action excluding the callback prior to deferring. 
+         * The Promise is a thenable, meaning it exposes a 'then' function for consumers to chain updates.
+         * Do NOT use the promise constructor to initiate the action - it will subvert the actionQueue.
+         *
+         * @public
+         * @param {Action} the target action
+         * @return {Promise} a promise which is resolved or rejected depending on the state of the action
+         */
+        deferAction : function (action) {
+            var promise = new $A.util.createPromise();
         
+            action.wrapCallback(this, function (a) {
+                if (a.getState() === 'SUCCESS') {
+                    promise.resolve(a.getReturnValue());
+                }
+                else {
+                    // Reject the promise as it was not successful.
+                    // Give the user a somewhat useful object to use on reject. 
+                    promise.reject({ state: a.getState(), action: a });
+                }
+            });
+
+            this.enqueueAction(action);
+            
+            return promise; 
+        },
+    
         /**
          * process the current set of actions, looping if needed.
          *

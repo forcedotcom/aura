@@ -1,0 +1,18 @@
+<aura:documentation>
+	<aura:description>
+		<p>
+			A <code>ui:menu</code> component represents a menu that contains a trigger and list items. You can wire up list items to actions in a client-side controller so that selection of the item triggers an action.
+			List items can be initialized in the menu's model.
+		</p>
+		<p>
+			To use a trigger, which opens the menu, nest the <code>ui:menuTriggerLink</code> component in <code>ui:menu</code>. For list items, use the <code>ui:menuList</code> component, and include any of these
+			list item components that can trigger a client-side controller action:
+			<ul>
+			    <li><code>ui:actionMenuItem</code> - A menu item</li>
+			    <li><code>ui:checkboxMenuItem</code> - A checkbox that supports multiple selections</li>
+			    <li><code>ui:radioMenuItem</code> - A radio item that supports single selection</li>
+			</ul>
+			To include a separator for these menu items, use <code>ui:menuItemSeparator</code>.
+		</p>
+	</aura:description>
+</aura:documentation>

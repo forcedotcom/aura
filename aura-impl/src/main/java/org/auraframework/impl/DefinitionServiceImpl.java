@@ -231,16 +231,18 @@ public class DefinitionServiceImpl implements DefinitionService {
             //
             for (Map.Entry<DefDescriptor<?>, String> entry : context.getClientLoaded().entrySet()) {
                 DefDescriptor<?> descriptor = entry.getKey();
-                String uid = entry.getValue();
-                if (uid == null) {
-                    loaded.add(descriptor);
-                } else if (loaded.contains(descriptor)) {
+                if (loaded.contains(descriptor)) {
                     context.dropLoaded(descriptor);
                 } else {
                     // validate the uid.
+                    String uid = entry.getValue();
                     String tuid = null;
                     QuickFixException qfe = null;
 
+                    if (uid == null) {
+                        // If we are given a null, bounce out.
+                        throw new ClientOutOfSyncException(descriptor + ": missing UID ");
+                    }
                     try {
                         tuid = mdr.getUid(uid, descriptor);
                     } catch (QuickFixException broke) {

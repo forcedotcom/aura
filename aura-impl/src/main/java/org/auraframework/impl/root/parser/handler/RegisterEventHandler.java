@@ -68,6 +68,9 @@ public class RegisterEventHandler extends XMLHandler<RegisterEventDefImpl> {
         if (AuraTextUtil.isNullEmptyOrWhitespace(type)) {
             error("type attribute is required on registerevent");
         }
+        if (AuraTextUtil.isNullEmptyOrWhitespace(name)) {
+            error("name is a required attribute on tag registerevent");
+        }
         Location location = getLocation();
         DefDescriptor<EventDef> eventDefDescriptor = DefDescriptorImpl.getInstance(type, EventDef.class);
         // validation on descriptor and such.

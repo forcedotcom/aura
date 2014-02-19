@@ -38,6 +38,7 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
     private final String DATE_ICON_SEL = "a[class*='datePicker-openIcon']";
     private final String ARIA_SELECTED_SEL = "a[aria-selected*='true']";
     private final String SELECTED_DATE = "a[class*='selectedDate']";
+    private final String OUTPUT_ST = "span[class*='outputStatus']";
 
     private final String CLASSNAME = "return $A.test.getActiveElement().className";
 
@@ -275,6 +276,38 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
         String elementClass = element.getAttribute("class");
         assertTrue("Tabbing through every buttong did not take us to the today button",
                 elementClass.indexOf("calToday") >= 0);
+    }
+    
+    //Test case for W-2031902
+    @ExcludeBrowsers({ BrowserType.SAFARI6, BrowserType.SAFARI, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET,
+        BrowserType.IPAD, BrowserType.IPHONE })
+    public void testValueChangeEvent() throws Exception {
+	    open(URL);
+	    // Tab test Begins
+	    // Getting input textbox in focus
+	    WebElement element = findDomElement(By.cssSelector(DATE_INPUT_BOX_SEL));
+	
+	    // Tabbing to the next item and getting what is in focus
+	    auraUITestingUtil.pressTab(element);
+	    
+	    element = findDomElement(By.cssSelector(OUTPUT_ST));
+	    //tab out does not fire value change event
+	    assertEquals("Value Change event should not be fired", "", element.getText());
+	    
+	    // Setting focus to the Calendar Icon and clicking on it
+	    element = findDomElement(By.cssSelector(DATE_ICON_SEL));
+	    element.click();
+	
+	    // Todays date should be on focus, Grabbing that element. Pressing tab with WebDriver after clicking on the icon
+	    // will move to the move month to the left
+	    String classOfActiveElem = "" + auraUITestingUtil.getEval(CLASSNAME);
+	    element = findDomElement(By.cssSelector("a[class*='" + classOfActiveElem + "']"));
+	
+	    // Moving from the on focus element to the today link
+	    auraUITestingUtil.pressEnter(element);
+	    //make sure value change event got fired
+	    element = findDomElement(By.cssSelector(OUTPUT_ST));
+	    assertEquals("Value Change event should not be fired", "Value Change Event Fired", element.getText());
     }
 
     // Checking functionality of the shift tab button

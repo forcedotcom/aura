@@ -25,11 +25,6 @@ import org.auraframework.util.json.Json;
 
 /**
  * Unit tests for InstanceStack.java.
- * 
- * Note that the 'assert' keyword is not enabled by default so tests may fail depending on where they are run. Running
- * the tests through JUnit inside Eclipse, for example, fails but run from the command line using the 'mvn verify'
- * command passes.
- * 
  */
 public class InstanceStackTest extends UnitTestCase {
 
@@ -65,7 +60,7 @@ public class InstanceStackTest extends UnitTestCase {
     }
 
     public void testPath() {
-        InstanceStack iStack = new InstanceStack("testBase");
+        InstanceStack iStack = new InstanceStack();
         assertEquals("InstanceStack constructor should set path to base", "/*[0]", iStack.getPath());
 
         iStack.pushInstance(new TestInstance());
@@ -93,7 +88,7 @@ public class InstanceStackTest extends UnitTestCase {
     }
 
     public void testPopInstanceToTopIncrementsIndex() {
-        InstanceStack iStack = new InstanceStack("testBase");
+        InstanceStack iStack = new InstanceStack();
         assertEquals("InstanceStack constructor should set path to base", "/*[0]", iStack.getPath());
         TestInstance ti = new TestInstance();
         iStack.pushInstance(ti);
@@ -105,7 +100,7 @@ public class InstanceStackTest extends UnitTestCase {
     }
 
     public void testMarkParentNoCurrentInstance() {
-        InstanceStack iStack = new InstanceStack("testBase");
+        InstanceStack iStack = new InstanceStack();
         assertEquals("InstanceStack constructor should set path to base", "/*[0]", iStack.getPath());
         TestInstance parent = new TestInstance("parentBase");
         iStack.markParent(parent);
@@ -115,7 +110,7 @@ public class InstanceStackTest extends UnitTestCase {
     }
 
     public void testMarkParentMultipleTimes() {
-        InstanceStack iStack = new InstanceStack("testBase");
+        InstanceStack iStack = new InstanceStack();
         assertEquals("InstanceStack constructor should set path to base", "/*[0]", iStack.getPath());
         TestInstance parent = new TestInstance("parent");
         iStack.markParent(parent);
@@ -130,7 +125,7 @@ public class InstanceStackTest extends UnitTestCase {
 
     public void testErrorWrongParent() {
         // Mark a new parent without clearing the first
-        InstanceStack iStack = new InstanceStack("testBase");
+        InstanceStack iStack = new InstanceStack();
         iStack.markParent(new TestInstance("parent"));
         try {
             iStack.markParent(new TestInstance("different parent"));
@@ -140,7 +135,7 @@ public class InstanceStackTest extends UnitTestCase {
         }
 
         // Clear an instance that hasn't been marked as a parent
-        iStack = new InstanceStack("testBase");
+        iStack = new InstanceStack();
         iStack.markParent(new TestInstance("parent"));
         try {
             iStack.clearParent(new TestInstance("different parent"));
@@ -151,7 +146,7 @@ public class InstanceStackTest extends UnitTestCase {
     }
 
     public void testErrorPushPopDifferentInstances() {
-        InstanceStack iStack = new InstanceStack("testBase");
+        InstanceStack iStack = new InstanceStack();
         iStack.pushInstance(new TestInstance("instance1"));
         try {
             iStack.popInstance(new TestInstance("instance2"));
@@ -162,7 +157,7 @@ public class InstanceStackTest extends UnitTestCase {
     }
 
     public void testErrorSetAttributeNameWithoutClearing() {
-        InstanceStack iStack = new InstanceStack("testBase");
+        InstanceStack iStack = new InstanceStack();
         iStack.pushInstance(new TestInstance("instance"));
         iStack.setAttributeName("first");
         try {
@@ -174,7 +169,7 @@ public class InstanceStackTest extends UnitTestCase {
     }
 
     public void testErrorSetIndexWithoutAttributeSet() {
-        InstanceStack iStack = new InstanceStack("testBase");
+        InstanceStack iStack = new InstanceStack();
         iStack.pushInstance(new TestInstance("instance"));
         try {
             iStack.setAttributeIndex(1);
@@ -185,7 +180,7 @@ public class InstanceStackTest extends UnitTestCase {
     }
 
     public void testErrorClearIndexWithoutSettingIndex() {
-        InstanceStack iStack = new InstanceStack("testBase");
+        InstanceStack iStack = new InstanceStack();
         iStack.pushInstance(new TestInstance());
         iStack.setAttributeName("attribute");
         try {
@@ -197,7 +192,7 @@ public class InstanceStackTest extends UnitTestCase {
     }
 
     public void testErrorClearIndexWhileDifferentIndexSet() {
-        InstanceStack iStack = new InstanceStack("testBase");
+        InstanceStack iStack = new InstanceStack();
         iStack.pushInstance(new TestInstance());
         iStack.setAttributeName("attribute");
         iStack.setAttributeIndex(11);
@@ -210,7 +205,7 @@ public class InstanceStackTest extends UnitTestCase {
     }
 
     public void testErrorSetIndexWithoutClearingPreviousIndex() {
-        InstanceStack iStack = new InstanceStack("testBase");
+        InstanceStack iStack = new InstanceStack();
         iStack.pushInstance(new TestInstance());
         iStack.setAttributeName("attribute");
         iStack.setAttributeIndex(42);

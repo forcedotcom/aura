@@ -75,6 +75,10 @@ function Component(config, localCreation, componentCreationContext){
     this.ccc = componentCreationContext;
     this.priv = new ComponentPriv(config, this, localCreation);
     this._destroying = false;
+    
+    //#if {"modes" : ["TESTING","AUTOTESTING", "TESTINGDEBUG", "AUTOTESTINGDEBUG"]}
+    this["creationPath"] = this.priv.creationPath;
+    //#end
 }
 
 /**

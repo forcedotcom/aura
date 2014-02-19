@@ -28,6 +28,7 @@ var priv = {
         preWarnings : [],
         expectedErrors : [],
         expectedWarnings : [],
+        failOnWarning : false,
         timeoutTime : 0,
         appCacheEvents : [], // AppCache events in order, as they are picked up
 
@@ -147,6 +148,11 @@ function run(name, code, count){
     }
     var cmp = $A.getRoot();
     var suite = aura.util.json.decode(code);
+
+    var suiteFailOnWarning = suite["failOnWarning"] || false;
+    var failOnWarning = suite[name]["failOnWarning"];
+    priv.failOnWarning = $A.util.isUndefined(failOnWarning) ? suiteFailOnWarning : failOnWarning;
+
     var stages = suite[name]["test"];
     stages = $A.util.isArray(stages) ? stages : [stages];
 
@@ -265,7 +271,7 @@ function run(name, code, count){
                     logErrors(logError, "Received unexpected error:",priv.preErrors);
                     priv.preErrors = null;
 
-                    logErrors(function(str) { $A.log(str); }, "Received unexpected warning:",priv.preWarnings);
+                    logErrors(priv.failOnWarning ? logError : function(str) { $A.log(str); }, "Received unexpected warning:",priv.preWarnings);
                     priv.preWarnings = null;
                 }
             }

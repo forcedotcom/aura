@@ -740,10 +740,10 @@ $A.ns.Aura.prototype.error = function(msg, e){
  * @param {Error} e an error, if any.
  */
 $A.ns.Aura.prototype.warning = function(w, e) {
-    if ($A.test && $A.test.auraWarning(w)) {
-        return;
-    }
     $A.logInternal("Warning",w, e, this.getStackTrace(e));
+    if ($A.test) {
+    	$A.test.auraWarning(w);
+    }
 };
 
 /**

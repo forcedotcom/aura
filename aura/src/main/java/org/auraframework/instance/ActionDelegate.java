@@ -81,21 +81,6 @@ public abstract class ActionDelegate implements Action {
     }
 
     @Override
-    public void registerComponent(BaseComponent<?, ?> component) {
-        original.registerComponent(component);
-    }
-
-    @Override
-    public Map<String, BaseComponent<?, ?>> getComponents() {
-        return original.getComponents();
-    }
-
-    @Override
-    public int getNextId() {
-        return original.getNextId();
-    }
-
-    @Override
     public Map<String, Object> getParams() {
         return original.getParams();
     }

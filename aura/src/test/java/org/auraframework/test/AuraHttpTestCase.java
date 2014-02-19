@@ -50,7 +50,6 @@ import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.http.AuraBaseServlet;
 import org.auraframework.instance.Action;
-import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.InstanceStack;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
@@ -419,12 +418,8 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
         private List<Object> errors;
         private HttpPost post;
         private String rawResponse;
-        private final Map<String, BaseComponent<?, ?>> componentRegistry = Maps
-                .newLinkedHashMap();
-        private int nextId = 1;
 
-        public ServerAction(String qualifiedName,
-                Map<String, Object> actionParams) {
+        public ServerAction(String qualifiedName, Map<String, Object> actionParams) {
             this.qualifiedName = qualifiedName;
             this.actionParams = actionParams;
         }
@@ -543,21 +538,6 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
         @Override
         public List<Object> getErrors() {
             return errors;
-        }
-
-        @Override
-        public void registerComponent(BaseComponent<?, ?> component) {
-            componentRegistry.put(component.getGlobalId(), component);
-        }
-
-        @Override
-        public Map<String, BaseComponent<?, ?>> getComponents() {
-            return componentRegistry;
-        }
-
-        @Override
-        public int getNextId() {
-            return nextId++;
         }
 
         @Override

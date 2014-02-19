@@ -15,6 +15,7 @@
  */
 package org.auraframework.system;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -30,6 +31,7 @@ import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.instance.InstanceStack;
 import org.auraframework.instance.ValueProviderType;
 import org.auraframework.util.javascript.directive.JavascriptGeneratorMode;
+import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonSerializationContext;
 
 /**
@@ -236,12 +238,6 @@ public interface AuraContext {
 
     Map<ValueProviderType, GlobalValueProvider> getGlobalProviders();
 
-    Map<String, BaseComponent<?, ?>> getComponents();
-
-    void registerComponent(BaseComponent<?, ?> component);
-
-    int getNextId();
-
     String getContextPath();
 
     void setContextPath(String path);
@@ -420,5 +416,31 @@ public interface AuraContext {
      */
     boolean getIsDebugToolEnabled();
 
+    /**
+     * Get the instance stack currently in use.
+     *
+     * This could either be a 'local' instance stack for the context (deprecated behavior)
+     * or it could be from the action.
+     */
     InstanceStack getInstanceStack();
+
+    /**
+     * Register a new component.
+     *
+     * This is the entry point for adding a new component to the context.
+     * This delegates to the appropriate instance stack.
+     *
+     * @param component the component to register.
+     */
+    void registerComponent(BaseComponent<?, ?> component);
+
+    /**
+     * Get the next id for the context.
+     */
+    int getNextId();
+
+    /**
+     * Serialize out the components.
+     */
+    void serializeAsPart(Json json) throws IOException;
 }

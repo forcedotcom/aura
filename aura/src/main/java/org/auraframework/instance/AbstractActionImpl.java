@@ -24,10 +24,8 @@ import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 
 import org.auraframework.system.LoggingContext.KeyValueLogger;
-import org.auraframework.throwable.AuraRuntimeException;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
 public abstract class AbstractActionImpl<T extends ActionDef> implements Action {
     public AbstractActionImpl(DefDescriptor<ControllerDef> controllerDescriptor, T actionDef,
@@ -45,12 +43,6 @@ public abstract class AbstractActionImpl<T extends ActionDef> implements Action 
 
     @Override
     public void setId(String id) {
-        //
-        // We _MUST NOT_ have a current stack when ID is set.
-        //
-        if (instanceStack != null) {
-            throw new AuraRuntimeException("Already have an instance stack when ID is set");
-        }
         actionId = id;
     }
 
@@ -78,34 +70,6 @@ public abstract class AbstractActionImpl<T extends ActionDef> implements Action 
     }
 
     //public List<Object> getErrors();
-
-    @Override
-    public void registerComponent(BaseComponent<?, ?> component) {
-        if (componentRegistry == null) {
-            componentRegistry = Maps.newLinkedHashMap();
-        }
-        //
-        // This following assertion should work, but default attributes and
-        // providers setting attributes can break this.
-        //
-        if (componentRegistry.containsKey(component.getPath())) {
-            //throw new AuraRuntimeException("duplicate component path"+component.getPath());
-        }
-        componentRegistry.put(component.getPath(), component);
-    }
-
-    @Override
-    public Map<String, BaseComponent<?, ?>> getComponents() {
-        if (componentRegistry == null) {
-            return Collections.emptyMap();
-        }
-        return componentRegistry;
-    }
-
-    @Override
-    public int getNextId() {
-        return nextId++;
-    }
 
     @Override
     public DefDescriptor<ActionDef> getDescriptor() {
@@ -150,15 +114,6 @@ public abstract class AbstractActionImpl<T extends ActionDef> implements Action 
     @Override
     public InstanceStack getInstanceStack() {
         if (instanceStack == null) {
-            //
-            // This should never happen, but there are some tests that fail to
-            // initialize the ID. This led to a null pointer exception. Here we
-            // force the action ID to a non-null, meaning that setId will now
-            // fail.
-            //
-            if (actionId == null) {
-                actionId = "unknown";
-            }
             instanceStack = new InstanceStack();
         }
         return instanceStack;
@@ -171,13 +126,11 @@ public abstract class AbstractActionImpl<T extends ActionDef> implements Action 
 
     private String actionId;
     private List<Action> actions = null;
-    private int nextId = 1;
     private boolean storable;
+    private InstanceStack instanceStack;
 
-    protected Map<String, BaseComponent<?, ?>> componentRegistry = null;
     protected final Map<String, Object> paramValues;
     protected final DefDescriptor<ControllerDef> controllerDescriptor;
     protected final T actionDef;
     protected State state;
-    private InstanceStack instanceStack;
 }

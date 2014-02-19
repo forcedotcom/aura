@@ -30,7 +30,6 @@ import org.auraframework.util.javascript.Literal;
 import org.auraframework.util.json.Json;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
 /**
  * A simple Action used when mocking Controller creations.
@@ -50,10 +49,12 @@ public class MockAction extends AbstractActionImpl<ActionDef> {
         if (actions != null) {
             add(actions);
         }
-        this.componentRegistry = (componentRegistry == null) ? Maps
-                .<String, BaseComponent<?, ?>> newHashMap() : componentRegistry;
-        this.errors = (errors == null) ? Lists.<Object> newLinkedList()
-                : errors;
+        this.errors = (errors == null) ? Lists.<Object> newLinkedList() : errors;
+        if (componentRegistry != null) {
+            for (BaseComponent<?,?> comp : componentRegistry.values()) {
+                this.getInstanceStack().registerComponent(comp);
+            }
+        }
     }
 
     @Override
@@ -82,16 +83,7 @@ public class MockAction extends AbstractActionImpl<ActionDef> {
         json.writeMapEntry("state", state);
         json.writeMapEntry("returnValue", returnValue == null ? Literal.NULL : returnValue);
         json.writeMapEntry("error", getErrors());
-        if (!componentRegistry.isEmpty()) {
-            json.writeMapKey("components");
-            json.writeMapBegin();
-            for (BaseComponent<?, ?> component : componentRegistry.values()) {
-                if (component.hasLocalDependencies()) {
-                    json.writeMapEntry(component.getGlobalId(), component);
-                }
-            }
-            json.writeMapEnd();
-        }
+        this.getInstanceStack().serializeAsPart(json);
         json.writeMapEnd();
     }
     

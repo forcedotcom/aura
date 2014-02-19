@@ -75,9 +75,6 @@ public class ActionDelegateTest extends UnitTestCase {
         oneCall(methodMap, calledMap, "getReturnValue");
         oneCall(methodMap, calledMap, "getState");
         oneCall(methodMap, calledMap, "getErrors");
-        oneCall(methodMap, calledMap, "registerComponent", (Object)null);
-        oneCall(methodMap, calledMap, "getComponents");
-        oneCall(methodMap, calledMap, "getNextId");
         oneCall(methodMap, calledMap, "logParams", (Object)null);
         oneCall(methodMap, calledMap, "isStorable");
         oneCall(methodMap, calledMap, "setStorable");

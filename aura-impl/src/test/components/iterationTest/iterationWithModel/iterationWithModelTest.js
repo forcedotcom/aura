@@ -13,10 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/**
- * Note that these tests are only for the Client-side component creation (CSCC) iteration component. The tests should
- * be converted to use the normal iteration component when the two components merge.
- */
 ({
     /**
      * Verify adding rows to an iteration does not lose the model data.
@@ -97,7 +93,9 @@
 
     /**
      * Verify wrapping a component which has server side dependencies with a component that does not still goes to the
-     * server. Until W-1787477 is fixed, we can use the forceServer flag to manually force going to the server while
+     * server. 
+     * 
+     * TODO(W-1787477): Until fixed, we can use the forceServer flag to manually force going to the server while
      * creating the components. Once the bug is fixed we won't need to set the flag and the test should be modified.
      */
     testWrapInnerCmpWithNoServerDeps: {

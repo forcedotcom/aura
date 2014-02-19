@@ -382,24 +382,23 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
     }
 
     /**
-     * Def not validated and dependencies not added to preloads if client UID is null. (not sure why this has to be this way, possibly local defs)
-     * W-1989780
+     * Def not validated and ClientOutOfSyncException.
      */
     public void testUpdateLoadedWithNullClientUID() throws Exception {
         AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Access.AUTHENTICATED,
                 laxSecurityApp);
-        DefDescriptor<?> depDesc = addSourceAutoCleanup(ComponentDef.class, String.format(baseComponentTag, "", ""));
         DefDescriptor<?> clientDesc = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "", "<invalid:thisbetternotexistorthistestwillfail/>"));
         Map<DefDescriptor<?>,String> clientLoaded = Maps.newHashMap();
         clientLoaded.put(clientDesc, null);
         context.setClientLoaded(clientLoaded);
 
-        Aura.getDefinitionService().updateLoaded(clientDesc);
-        assertNull("How did UID get populated?", context.getLoaded().get(clientDesc));
-        Set<DefDescriptor<?>> preloads = context.getPreloadedDefinitions();
-        assertTrue("Preloads missing parent from client", preloads.contains(clientDesc));
-        assertFalse("Dependency shouldn't be preloaded", preloads.contains(depDesc));        
+        try {
+            Aura.getDefinitionService().updateLoaded(clientDesc);
+            fail("expected a client out of sync");
+        } catch (ClientOutOfSyncException coose) {
+            // ok.
+        }
     }
     
     /**

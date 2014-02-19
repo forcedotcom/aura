@@ -16,7 +16,7 @@
 
 -->
 <aura:component>
-	<div>Autocomplete test</div><br/>
+	<div>Autocomplete <br/>Type <code>hello world</code> to test this component.</div><br/>
 	<ui:autocomplete aura:id="autoComplete" optionVar="row" 
         matchDone="{!c.handleInputChangeAutoCompleteMatchDone}"
         inputChange="{!c.handleInputChangeAutoComplete}" 
@@ -62,36 +62,5 @@
     </ui:autocomplete>
   	Match Count: <ui:outputText aura:id="autoCompleteLargeListMatchSize" value=""/> <br/><br/>
     <br/><br/>
-   
-    
-    <div>Autocomplete with custom template</div><br/>
-    <ui:autocomplete aura:id="autoCompleteCustomTemplate" optionVar="row" 
-        matchDone="{!c.handleInputChangeCustomTemplateMatchDone}"
-        inputChange="{!c.handleInputChangeCustomTemplate}" 
-        selectListOption="{!c.handleSelectOptionCustomTemplate}">
-        <aura:set attribute="dataProvider">
-            <auradocs:demoAutocompleteProvider/>
-        </aura:set>
-        <aura:set attribute="listOption">
-            <uitest:autoComplete_CustomTemplate value="{!row.label}" visible="{!row.visible}"/>
-        </aura:set>
-    </ui:autocomplete>
-    Match Count: <ui:outputText aura:id="autoCompleteCustomTemplateMatchSize" value=""/> <br/><br/>
-    <br/><br/>
-    
-    
-    <div>Autocomplete extending ui:autocompleteOption</div><br/>
-    <ui:autocomplete aura:id="autoCompleteCustomOption" optionVar="row" 
-        matchDone="{!c.handleInputChangeCustomOptionMatchDone}"
-        inputChange="{!c.handleInputChangeCustomOption}" 
-        selectListOption="{!c.handleSelectOptionCustomOption}">
-        <aura:set attribute="dataProvider">
-            <auradocs:demoAutocompleteProvider/>
-        </aura:set>
-        <aura:set attribute="listOption">
-            <uitest:autoComplete_CustomOption label="{!row.label}" visible="{!row.visible}"/>
-        </aura:set>
-    </ui:autocomplete>
-    Match Count: <ui:outputText aura:id="autoCompleteCustomOptionMatchSize" value=""/> <br/><br/>
     
 </aura:component>

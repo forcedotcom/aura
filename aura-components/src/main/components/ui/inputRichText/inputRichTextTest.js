@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 ({
+	browsers:["-ANDROID_PHONE","-ANDROID_TABLET"],
+	
 	ckeButtons:{
 		bold: "cke_button_bold",
 		italic: "cke_button_italic",

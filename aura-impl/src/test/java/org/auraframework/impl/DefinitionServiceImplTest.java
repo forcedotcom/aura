@@ -24,6 +24,7 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.impl.context.AuraRegistryProviderImpl;
 import org.auraframework.impl.system.*;
 import org.auraframework.instance.BaseComponent;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.*;
 import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Format;
@@ -182,7 +183,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         assertNull("Still not expecting uid for loaded", loaded.get(dummyDesc));
         Set<DefDescriptor<?>> preloadsAgain = context.getPreloadedDefinitions();
         assertTrue("Preloaded set should not have changed", Sets.difference(preloads, preloadsAgain).isEmpty());
-}
+    }
 
     /**
      * ClientOutOfSyncException thrown when context uid is not current.
@@ -403,7 +404,6 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
     
     /**
      * Loaded dependencies are pruned from preloads
-     * W-1989778
      */
     public void testUpdateLoadedUnloadsRedundancies() throws Exception {
         AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Access.AUTHENTICATED,
@@ -415,7 +415,8 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         String clientUid = context.getDefRegistry().getUid(null, clientDesc);
 
         // client has both parent and dependency loaded
-        Map<DefDescriptor<?>,String> clientLoaded = Maps.newLinkedHashMap(); // BUG?!: ordering of map is important!!!
+        // in dependency last order
+        Map<DefDescriptor<?>,String> clientLoaded = Maps.newLinkedHashMap();
         clientLoaded.put(clientDesc, clientUid);
         clientLoaded.put(depDesc, depUid);
         context.setClientLoaded(clientLoaded);
@@ -430,12 +431,137 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         // dependency is redundant with client set, so it should be removed from loaded set
         loaded = context.getLoaded();
         assertEquals("Parent missing from loaded set", clientUid, loaded.get(clientDesc));
-        assertEquals("Dependency missing from loaded set", null, loaded.get(depDesc));
+        assertEquals("Dependency stil in loaded set", null, loaded.get(depDesc));
 
         // check dependency is still in preloads
         Set<DefDescriptor<?>> preloads = context.getPreloadedDefinitions();
         assertTrue("Preloads missing parent from client", preloads.contains(clientDesc));
         assertTrue("Preloads missing dependency from client", preloads.contains(depDesc));
+    }
+    
+    /**
+     * Loaded dependencies are pruned from preloads even if before
+     */
+    public void testUpdateLoadedUnloadsRedundanciesBefore() throws Exception {
+        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Access.AUTHENTICATED,
+                laxSecurityApp);
+        DefDescriptor<?> depDesc = addSourceAutoCleanup(ComponentDef.class, String.format(baseComponentTag, "", ""));
+        DefDescriptor<?> clientDesc = addSourceAutoCleanup(ComponentDef.class,
+                String.format(baseComponentTag, "", String.format("<%s/>", depDesc.getDescriptorName())));
+        String depUid = context.getDefRegistry().getUid(null, depDesc);
+        String clientUid = context.getDefRegistry().getUid(null, clientDesc);
+
+        // client has both parent and dependency loaded
+        // in dependency first order
+        Map<DefDescriptor<?>,String> clientLoaded = Maps.newLinkedHashMap();
+        clientLoaded.put(depDesc, depUid);
+        clientLoaded.put(clientDesc, clientUid);
+        context.setClientLoaded(clientLoaded);
+
+        // check that both are loaded
+        Map<DefDescriptor<?>, String> loaded = context.getLoaded();
+        assertEquals("Parent missing from loaded set", clientUid, loaded.get(clientDesc));
+        assertEquals("Dependency missing from loaded set", depUid, loaded.get(depDesc));
+        
+        Aura.getDefinitionService().updateLoaded(null);
+
+        // dependency is redundant with client set, so it should be removed from loaded set
+        loaded = context.getLoaded();
+        assertEquals("Parent missing from loaded set", clientUid, loaded.get(clientDesc));
+        assertEquals("Dependency still in loaded set", null, loaded.get(depDesc));
+
+        // check dependency is still in preloads
+        Set<DefDescriptor<?>> preloads = context.getPreloadedDefinitions();
+        assertTrue("Preloads missing parent from client", preloads.contains(clientDesc));
+        assertTrue("Preloads missing dependency from client", preloads.contains(depDesc));
+    }
+
+    /**
+     * Check circular dependencies, keeping component.
+     */
+    public void testUpdateLoadedUnloadsCircularComp() throws Exception {
+        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Access.AUTHENTICATED,
+                laxSecurityApp);
+        DefinitionService ds = Aura.getDefinitionService();
+        DefDescriptor<?> compDesc = ds.getDefDescriptor("markup://aura:component", ComponentDef.class);
+        DefDescriptor<?> tempDesc = ds.getDefDescriptor("markup://aura:template", ComponentDef.class);
+        String compUid = context.getDefRegistry().getUid(null, compDesc);
+        String tempUid = context.getDefRegistry().getUid(null, tempDesc);
+
+        //
+        // Now make sure we have truly circular references.
+        //
+        assertTrue("Component should have template in dependencies",
+                context.getDefRegistry().getDependencies(compUid).contains(tempDesc));
+        assertTrue("Template should have component in dependencies",
+                context.getDefRegistry().getDependencies(tempUid).contains(compDesc));
+
+        // client has both component and templage
+        Map<DefDescriptor<?>,String> clientLoaded = Maps.newLinkedHashMap();
+        clientLoaded.put(compDesc, compUid);
+        clientLoaded.put(tempDesc, tempUid);
+        context.setClientLoaded(clientLoaded);
+
+        // check that both are loaded
+        Map<DefDescriptor<?>, String> loaded = context.getLoaded();
+        assertEquals("Component missing from loaded set", compUid, loaded.get(compDesc));
+        assertEquals("Template missing from loaded set", tempUid, loaded.get(tempDesc));
+        
+        Aura.getDefinitionService().updateLoaded(null);
+
+        // dependency is redundant with client set, so it should be removed from loaded set
+        loaded = context.getLoaded();
+        assertEquals("Component missing from loaded set", compUid, loaded.get(compDesc));
+        assertEquals("Template still in loaded set", null, loaded.get(tempDesc));
+
+        // check dependency is still in preloads
+        Set<DefDescriptor<?>> preloads = context.getPreloadedDefinitions();
+        assertTrue("Preloads missing component from client", preloads.contains(compDesc));
+        assertTrue("Preloads missing template from client", preloads.contains(tempDesc));
+    }
+    
+    /**
+     * Check circular dependencies, keeping template.
+     */
+    public void testUpdateLoadedUnloadsCircularTemp() throws Exception {
+        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Access.AUTHENTICATED,
+                laxSecurityApp);
+        DefinitionService ds = Aura.getDefinitionService();
+        DefDescriptor<?> compDesc = ds.getDefDescriptor("markup://aura:component", ComponentDef.class);
+        DefDescriptor<?> tempDesc = ds.getDefDescriptor("markup://aura:template", ComponentDef.class);
+        String compUid = context.getDefRegistry().getUid(null, compDesc);
+        String tempUid = context.getDefRegistry().getUid(null, tempDesc);
+
+        //
+        // Now make sure we have truly circular references.
+        //
+        assertTrue("Component should have template in dependencies",
+                context.getDefRegistry().getDependencies(compUid).contains(tempDesc));
+        assertTrue("Template should have component in dependencies",
+                context.getDefRegistry().getDependencies(tempUid).contains(compDesc));
+
+        // client has both component and templage
+        Map<DefDescriptor<?>,String> clientLoaded = Maps.newLinkedHashMap();
+        clientLoaded.put(tempDesc, tempUid);
+        clientLoaded.put(compDesc, compUid);
+        context.setClientLoaded(clientLoaded);
+
+        // check that both are loaded
+        Map<DefDescriptor<?>, String> loaded = context.getLoaded();
+        assertEquals("Component missing from loaded set", compUid, loaded.get(compDesc));
+        assertEquals("Template missing from loaded set", tempUid, loaded.get(tempDesc));
+        
+        Aura.getDefinitionService().updateLoaded(null);
+
+        // dependency is redundant with client set, so it should be removed from loaded set
+        loaded = context.getLoaded();
+        assertEquals("Template missing from loaded set", tempUid, loaded.get(tempDesc));
+        assertEquals("Component still in loaded set", null, loaded.get(compDesc));
+
+        // check dependency is still in preloads
+        Set<DefDescriptor<?>> preloads = context.getPreloadedDefinitions();
+        assertTrue("Preloads missing component from client", preloads.contains(compDesc));
+        assertTrue("Preloads missing template from client", preloads.contains(tempDesc));
     }
     
     /**

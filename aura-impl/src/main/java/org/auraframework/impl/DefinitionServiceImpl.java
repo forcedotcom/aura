@@ -219,6 +219,8 @@ public class DefinitionServiceImpl implements DefinitionService {
         AuraContext context;
         MasterDefRegistry mdr;
         Set<DefDescriptor<?>> loaded = Sets.newHashSet();
+        Set<DefDescriptor<?>> prev = Sets.newHashSet();
+        Set<DefDescriptor<?>> remove = null;
 
         contextService.assertEstablished();
         context = contextService.getCurrentContext();
@@ -257,12 +259,27 @@ public class DefinitionServiceImpl implements DefinitionService {
                     if (qfe != null) {
                         throw qfe;
                     }
-                    loaded.addAll(mdr.getDependencies(uid));
+                    Set<DefDescriptor<?>> deps = mdr.getDependencies(uid);
+                    loaded.addAll(deps);
+                    for (DefDescriptor x : prev) {
+                        if (deps.contains(x)) {
+                            if (remove == null) {
+                                remove = Sets.newHashSet();
+                            }
+                            remove.add(x);
+                        }
+                    }
+                    prev.add(descriptor);
                 }
             }
             context.setPreloadedDefinitions(loaded);
         } else {
             loaded = context.getPreloadedDefinitions();
+        }
+        if (remove != null) {
+            for (DefDescriptor<?> x : remove) {
+                context.dropLoaded(x);
+            }
         }
         //
         // Now make sure that our current definition is somewhere there

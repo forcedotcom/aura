@@ -6,7 +6,7 @@
 		</p>
 		<p>
 			A text-only button has only the required <code>label</code> attribute set on it. An image-only button has the required <code>label</code> attribute with the <code>iconImgSrc</code> set for its image path and the <code>labelDisplay</code> attribute set to <code>false</code>.
-			To create a button with both image and text, use both the <code>label</code> and <code>iconImgSrc</code> attributes. 
+			To create a button with both image and text, use both the <code>label</code> and <code>iconImgSrc</code> attributes. An image can also be set by using the <code>iconClass</code> attribute via a CSS style.
 		</p>
 		<p>
 			The visual appearance of buttons is highly configurable, as are text and accessibility attributes.

@@ -19,18 +19,9 @@
     <aura:attribute name="start" type="Integer"/>
     <aura:attribute name="end" type="Integer"/>
     <aura:attribute name="cmps" type="Aura.Component[]"/>
-    <aura:attribute name="csccTest" type="Boolean" default="false" />
 
-    <aura:renderIf isTrue="{!v.csccTest}">
-        <aura:iteration aura:id="iterationCscc" items="{!v.cmps}" var="var" indexVar="idx" start="{!v.start}" end="{!v.end}">
-            {!var}
-        </aura:iteration>
-
-        <aura:set attribute="else">
-            <aura:iteration aura:id="iteration" items="{!v.cmps}" var="var" indexVar="idx" start="{!v.start}" end="{!v.end}">
-                {!var}
-            </aura:iteration>
-        </aura:set>
-    </aura:renderIf>
+    <aura:iteration aura:id="iteration" items="{!v.cmps}" var="var" indexVar="idx" start="{!v.start}" end="{!v.end}">
+        {!var}
+    </aura:iteration>
 
 </aura:component>

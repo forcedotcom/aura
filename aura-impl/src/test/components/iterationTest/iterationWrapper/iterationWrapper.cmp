@@ -17,5 +17,7 @@
 -->
 <aura:component>
     <aura:attribute name="value" type="String" default="hello" />
+    
+    <!-- Html tags do not have server dependencies, but the wrapped inner cmp does -->
     <p><iterationTest:iterationWithModelInnerCmp value="{!v.value}"/></p>
 </aura:component>

@@ -15,4 +15,4 @@
     limitations under the License.
 
 -->
-<aura:event type="COMPONENT" support="GA" description="The event fired when iterationCscc completes its asynchronous rerender."/>
+<aura:event type="COMPONENT" support="GA" description="The event fired when iteration completes its asynchronous rerender."/>

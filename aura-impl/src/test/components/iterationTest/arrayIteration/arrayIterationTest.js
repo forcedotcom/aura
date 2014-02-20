@@ -29,8 +29,7 @@
                 "componentDef": "markup://iterationTest:arrayIterationPreloaded",
                 "attributes": {
                         "values": {
-                            "value" : ['one string', 'two string', 'red string', 'blue string'],
-                            "csccTest" : false
+                            "value" : ['one string', 'two string', 'red string', 'blue string']
                         }
                     }
                 }
@@ -44,6 +43,7 @@
             });
         }
     },
+
     /**
      * Verify creation of a non-preloaded component that contains an iteration.
      */
@@ -57,70 +57,7 @@
                     "componentDef": "markup://iterationTest:arrayIterationNotPreloaded",
                     "attributes": {
                         "values": {
-                            "value": ['one string', 'two string', 'red string', 'blue string'],
-                            "csccTest": false
-                        }
-                    }
-                });
-            });
-
-            // Non-preloaded cmp creation will be asynchronous so add a wait here.
-            $A.test.addWaitFor(false, $A.test.isActionPending, function() {
-                var p = document.getElementsByTagName("p");
-                var cmpText = $A.util.getText(p[0]);
-                $A.test.assertEquals("one stringtwo stringred stringblue string", cmpText,
-                        "Newly created component not showing up in DOM.");
-            });
-        }
-    },
-    /**
-     * ----------------------------------------------------------------------------------------------------------------
-     * These tests (below) are for the special iterationCscc component. This component should be temporary and eventually
-     * merged with the standard iteration cmp. Once that happens we can remove these tests and edit the test components.
-     */
-    testClientSideCmpCreationPreloadedCscc: {
-        test:function(cmp) {
-            $A.componentService.newComponentAsync(
-                this,
-                function(newCmp) {
-                    cmp.setValue("v.newCmp", newCmp);
-                    $A.rerender(cmp);
-                },
-                {
-                "componentDef": "markup://iterationTest:arrayIterationPreloaded",
-                "attributes": {
-                        "values": {
-                            "value" : ['one string', 'two string', 'red string', 'blue string'],
-                            "csccTest" : true
-                        }
-                    }
-                }
-            );
-
-
-            $A.test.addWaitFor(false, $A.test.isActionPending, function() {
-                var p = document.getElementsByTagName("p");
-                var cmpText = $A.util.getText(p[0]);
-                $A.test.assertEquals("one stringtwo stringred stringblue string", cmpText,
-                    "Newly created component not showing up in DOM.");
-            });
-        }
-    },
-    /**
-     * Verify creation of a non-preloaded component that contains an iteration.
-     */
-    testClientSideCmpCreationNotPreloadedCscc: {
-        test:function(cmp) {
-            $A.run(function(){
-                $A.componentService.newComponentAsync(this, function(newCmp){
-                    cmp.setValue("v.newCmp", newCmp);
-                    $A.rerender(cmp);
-                }, {
-                    "componentDef": "markup://iterationTest:arrayIterationNotPreloaded",
-                    "attributes": {
-                        "values": {
-                            "value": ['one string', 'two string', 'red string', 'blue string'],
-                            "csccTest": true
+                            "value": ['one string', 'two string', 'red string', 'blue string']
                         }
                     }
                 });

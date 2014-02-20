@@ -15,17 +15,39 @@
  */
 package org.auraframework.builder;
 
-import org.auraframework.def.AttributeDefRef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.ThemeDef;
+import org.auraframework.def.VarDef;
 
-/**
- *
- */
-public interface ThemeDefBuilder extends RootDefinitionBuilder<ThemeDef> {
+public interface ThemeDefBuilder extends DefBuilder<ThemeDef, ThemeDef> {
+    /**
+     * Sets whether this theme is a "local" theme. A local theme is one that exists within a component or app bundle
+     * instead of in its own bundle.
+     */
+    ThemeDefBuilder setIsLocal(boolean isLocal);
 
-    void setExtendsDescriptor(DefDescriptor<ThemeDef> extendsDescriptor);
+    /**
+     * Specifies the parent theme.
+     */
+    ThemeDefBuilder setExtendsDescriptor(DefDescriptor<ThemeDef> extendsDescriptor);
 
-    void addOverride(AttributeDefRef ref);
+    /**
+     * Adds a theme to import.
+     * <p>
+     * During var lookup, if no declared vars specify a value for the var name, each imported theme will be consulted
+     * for the value until one is found. The imports will be consulted in reverse order of how they are listed in the
+     * source, e.g., subsequent themes in the source will preempt previously listed imports.
+     * <p>
+     * Imported themes are consulted before looking at inherited vars, making them roughly equivalent to vars directly
+     * declared within this theme.
+     * <p>
+     * Imports must be added before all declared vars. Local themes (themes inside of a component bundle) cannot be
+     * imported.
+     */
+    ThemeDefBuilder addImport(DefDescriptor<ThemeDef> themeDescriptor);
 
+    /**
+     * Adds a var to this theme.
+     */
+    ThemeDefBuilder addVarDef(VarDef var);
 }

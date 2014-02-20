@@ -25,6 +25,7 @@ import org.auraframework.Aura;
 import org.auraframework.builder.RootDefinitionBuilder;
 import org.auraframework.def.*;
 import org.auraframework.def.BaseComponentDef.WhitespaceBehavior;
+import org.auraframework.def.ThemeDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.root.AttributeDefImpl;
 import org.auraframework.impl.root.AttributeDefRefImpl;
@@ -286,6 +287,13 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef> extend
         DefDescriptor<ResourceDef> cssResourceDescriptor = DefDescriptorImpl.getInstance(styleName, ResourceDef.class);
         if (cssResourceDescriptor.exists()) {
             builder.addResource(cssResourceDescriptor.getQualifiedName());
+        }
+
+        // See if there is a themedef that has the same qname. todo -- add localTheme attr as well?
+        String themeName = String.format("%s:%s", defDescriptor.getNamespace(), defDescriptor.getName());
+        DefDescriptor<ThemeDef> themeDesc = DefDescriptorImpl.getInstance(themeName, ThemeDef.class);
+        if (themeDesc.exists()) {
+            builder.localThemeDescriptor = themeDesc;
         }
 
         // Do not consider Javascript Test suite defs in PROD and PRODDEBUG modes.

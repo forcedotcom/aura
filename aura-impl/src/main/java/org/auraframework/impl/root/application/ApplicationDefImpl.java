@@ -18,13 +18,10 @@ package org.auraframework.impl.root.application;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.auraframework.Aura;
 import org.auraframework.builder.ApplicationDefBuilder;
-import org.auraframework.css.parser.ThemeOverrideMap;
 import org.auraframework.def.ActionDef;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ControllerDef;
@@ -36,7 +33,6 @@ import org.auraframework.def.ThemeDef;
 import org.auraframework.expression.Expression;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.AuraImpl;
-import org.auraframework.impl.css.parser.ThemeOverrideMapImpl;
 import org.auraframework.impl.root.component.BaseComponentDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.util.AuraUtil;
@@ -51,7 +47,6 @@ import org.auraframework.util.json.Json;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
 /**
  * The definition of an Application. Holds all information about a given type of application. ApplicationDefs are
@@ -79,14 +74,9 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
         this.isAppcacheEnabled = builder.isAppcacheEnabled;
         this.additionalAppCacheURLs = builder.additionalAppCacheURLs;
         this.isOnePageApp = builder.isOnePageApp;
+        this.overrideThemeDescriptor = builder.overrideThemeDescriptor;
 
-        if (builder.themeOverrides != null && !builder.themeOverrides.isEmpty()) {
-            this.themeOverrides = new ThemeOverrideMapImpl(builder.themeOverrides, getLocation());
-        } else {
-            this.themeOverrides = null;
-        }
-
-        this.hashCode = AuraUtil.hashCode(super.hashCode(), themeOverrides);
+        this.hashCode = AuraUtil.hashCode(super.hashCode(), overrideThemeDescriptor);
     }
 
     public static class Builder extends BaseComponentDefImpl.Builder<ApplicationDef> implements ApplicationDefBuilder {
@@ -98,7 +88,7 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
         public Boolean isOnePageApp;
         public DefDescriptor<SecurityProviderDef> securityProviderDescriptor;
         public String additionalAppCacheURLs;
-        public Map<DefDescriptor<ThemeDef>, DefDescriptor<ThemeDef>> themeOverrides;
+        public DefDescriptor<ThemeDef> overrideThemeDescriptor;
 
         public Builder() {
             super(ApplicationDef.class);
@@ -134,11 +124,8 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
         }
 
         @Override
-        public ApplicationDefBuilder addThemeOverride(DefDescriptor<ThemeDef> original, DefDescriptor<ThemeDef> override) {
-            if (themeOverrides == null) {
-                themeOverrides = Maps.newHashMap();
-            }
-            themeOverrides.put(original, override);
+        public ApplicationDefBuilder setOverrideThemeDescriptor(DefDescriptor<ThemeDef> overrideThemeDescriptor) {
+            this.overrideThemeDescriptor = overrideThemeDescriptor;
             return this;
         }
     }
@@ -201,11 +188,8 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
             dependencies.add(layoutsDefDescriptor);
         }
 
-        if (themeOverrides != null) {
-            for (Entry<DefDescriptor<ThemeDef>, DefDescriptor<ThemeDef>> entry : themeOverrides.map().entrySet()) {
-                dependencies.add(entry.getKey());
-                dependencies.add(entry.getValue());
-            }
+        if (overrideThemeDescriptor != null) {
+            dependencies.add(overrideThemeDescriptor);
         }
         if (securityProviderDescriptor != null) {
         	dependencies.add(securityProviderDescriptor);
@@ -288,13 +272,15 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
         // Will throw quickfix exception if not found.
         securityProviderDesc.getDef();
 
-        // theme overrides
-        if (themeOverrides != null) {
-            themeOverrides.validate();
-            for (Entry<DefDescriptor<ThemeDef>, DefDescriptor<ThemeDef>> entry : themeOverrides.map().entrySet()) {
-                entry.getKey().getDef().validateReferences();
-                entry.getValue().getDef().validateReferences();
-            }
+        // the override theme must not be a local theme. otherwise, it would allow users to circumvent var
+        // cross-reference validation (regular themes enforce that cross references are defined in the same file,
+        // but local themes allow cross references to the namespace-default file.)
+        if (overrideThemeDescriptor != null
+                && overrideThemeDescriptor.getDef().isLocalTheme()
+                && overrideThemeDescriptor != getLocalThemeDescriptor()) {
+            throw new InvalidDefinitionException(
+                    String.format("%s must not specify another component's local theme as the overrideTheme", getName()),
+                    getLocation());
         }
     }
 
@@ -320,8 +306,8 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
     }
 
     @Override
-    public ThemeOverrideMap getThemeOverrides() {
-        return themeOverrides;
+    public DefDescriptor<ThemeDef> getOverrideThemeDescriptor() {
+        return overrideThemeDescriptor;
     }
 
     @Override
@@ -335,7 +321,7 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
             ApplicationDefImpl other = (ApplicationDefImpl) obj;
 
             return super.equals(obj)
-                    && Objects.equal(this.themeOverrides, other.themeOverrides);
+                    && Objects.equal(this.overrideThemeDescriptor, other.overrideThemeDescriptor);
         }
 
         return false;
@@ -345,7 +331,7 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
     private final DefDescriptor<LayoutsDef> layoutsDefDescriptor;
     private final Access access;
     private final DefDescriptor<SecurityProviderDef> securityProviderDescriptor;
-    private final ThemeOverrideMap themeOverrides;
+    private final DefDescriptor<ThemeDef> overrideThemeDescriptor;
     private final int hashCode;
 
     private final Boolean isAppcacheEnabled;

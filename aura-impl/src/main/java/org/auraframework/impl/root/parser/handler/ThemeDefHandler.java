@@ -24,12 +24,13 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.Aura;
 import org.auraframework.builder.RootDefinitionBuilder;
-import org.auraframework.def.AttributeDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.StyleDef;
 import org.auraframework.def.ThemeDef;
+import org.auraframework.def.ThemeDefRef;
+import org.auraframework.def.VarDef;
 import org.auraframework.expression.PropertyReference;
-import org.auraframework.impl.root.AttributeDefImpl;
 import org.auraframework.impl.root.theme.ThemeDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.instance.Component;
@@ -41,23 +42,16 @@ import org.auraframework.util.AuraTextUtil;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 /**
  * Handler for aura:theme tags.
- * 
- * <p>
- * Themes only contain {@link AttributeDef}s as content.
  */
-public class ThemeDefHandler extends RootTagHandler<ThemeDef> {
-
-    public static final String TAG = "aura:theme";
-
+public final class ThemeDefHandler extends RootTagHandler<ThemeDef> {
+    protected static final String TAG = "aura:theme";
     private static final String ATTRIBUTE_EXTENDS = "extends";
 
-    protected final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_EXTENDS,
-            RootTagHandler.ATTRIBUTE_SUPPORT, RootTagHandler.ATTRIBUTE_DESCRIPTION);
+    protected final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(
+            ATTRIBUTE_EXTENDS, ATTRIBUTE_SUPPORT, ATTRIBUTE_DESCRIPTION);
 
     private final ThemeDefImpl.Builder builder = new ThemeDefImpl.Builder();
 
@@ -68,9 +62,11 @@ public class ThemeDefHandler extends RootTagHandler<ThemeDef> {
     public ThemeDefHandler(DefDescriptor<ThemeDef> defDescriptor, Source<ThemeDef> source, XMLStreamReader xmlReader) {
         super(defDescriptor, source, xmlReader);
         builder.setOwnHash(source.getHash());
-        builder.extendsDescriptor = null;
-        builder.overrides = Maps.newHashMap();
-        builder.expressionRefs = Sets.newHashSet();
+    }
+
+    @Override
+    public String getHandledTag() {
+        return TAG;
     }
 
     @Override
@@ -87,9 +83,8 @@ public class ThemeDefHandler extends RootTagHandler<ThemeDef> {
     protected void readAttributes() throws QuickFixException {
         super.readAttributes();
 
-        // extends
         String parent = getAttributeValue(ATTRIBUTE_EXTENDS);
-        if (parent != null) {
+        if (!AuraTextUtil.isNullEmptyOrWhitespace(parent)) {
             builder.setExtendsDescriptor(DefDescriptorImpl.getInstance(parent.trim(), ThemeDef.class));
         }
     }
@@ -97,11 +92,26 @@ public class ThemeDefHandler extends RootTagHandler<ThemeDef> {
     @Override
     protected void handleChildTag() throws XMLStreamException, QuickFixException {
         String tag = getTagName();
-        if (AttributeDefHandler.TAG.equalsIgnoreCase(tag)) {
-            AttributeDefImpl def = new AttributeDefHandler<ThemeDef>(this, xmlReader, source, "String").getElement();
-            builder.addAttributeDef(DefDescriptorImpl.getInstance(def.getName(), AttributeDef.class), def);
-        } else if (AttributeDefRefHandler.TAG.equalsIgnoreCase(tag)) {
-            builder.addOverride(new AttributeDefRefHandler<ThemeDef>(this, xmlReader, source).getElement());
+
+        if (VarDefHandler.TAG.equalsIgnoreCase(tag)) {
+            VarDef def = new VarDefHandler<ThemeDef>(this, xmlReader, source).getElement();
+            if (builder.vars().containsKey(def.getName())) {
+                error("Duplicate var %s", def.getName());
+            }
+            builder.addVarDef(def);
+
+        } else if (ThemeDefRefHandler.TAG.equalsIgnoreCase(tag)) {
+            // imports must come before vars. This is mainly for simplifying the var lookup implementation, while still
+            // matching the most common expected usages of imports vs. declared vars.
+            if (!builder.vars().isEmpty()) {
+                error("tag %s must come before all declared vars", ThemeDefRefHandler.TAG);
+            }
+
+            ThemeDefRef def = new ThemeDefRefHandler<ThemeDef>(this, xmlReader, source).getElement();
+            if (builder.imports().contains(def.getThemeDescriptor())) {
+                error("Duplicate theme import %s", def.getName());
+            }
+            builder.addImport(def.getThemeDescriptor());
         } else {
             error("Found unexpected tag %s", tag);
         }
@@ -109,15 +119,9 @@ public class ThemeDefHandler extends RootTagHandler<ThemeDef> {
 
     @Override
     protected void handleChildText() throws XMLStreamException, QuickFixException {
-        String text = xmlReader.getText();
-        if (!AuraTextUtil.isNullEmptyOrWhitespace(text)) {
+        if (!AuraTextUtil.isNullEmptyOrWhitespace(xmlReader.getText())) {
             error("No literal text allowed in theme definition");
         }
-    }
-
-    @Override
-    public String getHandledTag() {
-        return TAG;
     }
 
     @Override
@@ -129,13 +133,19 @@ public class ThemeDefHandler extends RootTagHandler<ThemeDef> {
     protected ThemeDef createDefinition() throws QuickFixException {
         builder.setDescriptor(getDefDescriptor());
         builder.setLocation(startLocation);
+
+        // we determine that a theme is a local theme if it exists in the same bundle as a css source
+        String fmt = String.format("%s.%s", defDescriptor.getNamespace(), defDescriptor.getName());
+        DefDescriptor<StyleDef> style = Aura.getDefinitionService().getDefDescriptor(fmt, StyleDef.class);
+        builder.setIsLocal(style.exists());
+
         return builder.build();
     }
 
     @Override
     public void writeElement(ThemeDef def, Appendable out) throws IOException {
         try {
-            Map<String, Object> attributes = ImmutableMap.<String, Object> of("def", def);
+            Map<String, Object> attributes = ImmutableMap.<String, Object>of("def", def);
             DefinitionService defService = Aura.getDefinitionService();
             DefDescriptor<ComponentDef> tmplDesc = defService.getDefDescriptor("auradev:saveTheme", ComponentDef.class);
             Component tmpl = Aura.getInstanceService().getInstance(tmplDesc, attributes);

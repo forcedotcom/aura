@@ -65,7 +65,8 @@ public class NamespaceDefTest extends AuraImplTestCase {
         assertEquals("red", def.getStyleTokens().get("FOO"));
     }
 
-    public void testStyleTokens() throws Exception {
+    /* tokens functionality deprecated by themes */
+    public void _testStyleTokens() throws Exception {
         DefinitionService defService = Aura.getDefinitionService();
         StyleDef styleDef = defService.getDefinition("namespaceDefTest.testStyleTokens", StyleDef.class);
         assertEquals(

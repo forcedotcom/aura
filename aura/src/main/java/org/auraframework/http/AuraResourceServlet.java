@@ -67,7 +67,6 @@ import com.google.common.collect.Sets;
  * fetches), since these calls may well be to re-populate a cache. In general, we should send back at least the basics
  * needed for the client to survive. All resets should be done from {@link AuraServlet}, or when fetching the manifest
  * here.
- 
  */
 public class AuraResourceServlet extends AuraBaseServlet {
 
@@ -82,8 +81,8 @@ public class AuraResourceServlet extends AuraBaseServlet {
     /**
      * Provide a better way of distinguishing templates from styles..
      * 
-     * This is used to apply the style definition filter for 'templates', but is
-     * getting rather further embedded in code.
+     * This is used to apply the style definition filter for 'templates', but is getting rather further embedded in
+     * code.
      * 
      * TODO: W-1486762
      */
@@ -121,14 +120,14 @@ public class AuraResourceServlet extends AuraBaseServlet {
     /**
      * check the top level component/app.
      * 
-     * This routine checks to see that we have a valid top level component. If our top level component is out
-     * of sync, we have to ignore it here, but we _must_ force the client to not cache the response.
-     *
-     * If there is a QFE, we substitute the QFE descriptor for the one given us, and continue. Again, we cannot
-     * allow caching.
-     *
-     * Finally, if there is no descriptor given, we simply ignore the request and give them an empty response. Which
-     * is done here by returning null.
+     * This routine checks to see that we have a valid top level component. If our top level component is out of sync,
+     * we have to ignore it here, but we _must_ force the client to not cache the response.
+     * 
+     * If there is a QFE, we substitute the QFE descriptor for the one given us, and continue. Again, we cannot allow
+     * caching.
+     * 
+     * Finally, if there is no descriptor given, we simply ignore the request and give them an empty response. Which is
+     * done here by returning null.
      * 
      * Also note that this handles the 'if-modified-since' header, as we want to tell the browser that nothing changed
      * in that case.
@@ -222,8 +221,8 @@ public class AuraResourceServlet extends AuraBaseServlet {
      * 
      * The manifest contains CSS and JavaScript URLs. These specified resources are copied into the AppCache with the
      * HTML template. When the page is reloaded, the existing manifest is compared to the new manifest. If they are
-     * identical, the resources are served from the AppCache. Otherwise, the resources are requested from the server
-     * and the AppCache is updated.
+     * identical, the resources are served from the AppCache. Otherwise, the resources are requested from the server and
+     * the AppCache is updated.
      * 
      * @param request the request
      * @param response the response
@@ -347,7 +346,7 @@ public class AuraResourceServlet extends AuraBaseServlet {
     }
 
     private void writeCss(HttpServletRequest request, Set<DefDescriptor<?>> dependencies, AuraContext context,
-                          Appendable out) throws IOException, QuickFixException {
+            Appendable out) throws IOException, QuickFixException {
         if (isAppRequest(request)) {
             writeAppCss(dependencies, out);
         } else {
@@ -376,31 +375,39 @@ public class AuraResourceServlet extends AuraBaseServlet {
     public static void writeAppCss(Set<DefDescriptor<?>> dependencies, Appendable out)
             throws IOException, QuickFixException {
         AuraContext context = Aura.getContextService().getCurrentContext();
+
         Mode mode = context.getMode();
         final boolean minify = !(mode.isTestMode() || mode.isDevMode());
         final String mKey = minify ? "MIN:" : "DEV:";
 
-        DefDescriptor<?> applicationDescriptor = context.getLoadingApplicationDescriptor();
-        final String uid = context.getUid(applicationDescriptor);
+        DefDescriptor<?> appDesc = context.getLoadingApplicationDescriptor();
+
+        final String uid = context.getUid(appDesc);
         final String key = "CSS:" + mKey + uid;
 
         context.setPreloading(true);
 
-        String cached = context.getDefRegistry().getCachedString(uid, applicationDescriptor, key);
+        if (context.getOverrideThemeDescriptor() == null && appDesc != null
+                && appDesc.getDefType() == DefType.APPLICATION) {
+            ApplicationDef app = ((ApplicationDef) appDesc.getDef());
+            context.setOverrideThemeDescriptor(app.getOverrideThemeDescriptor());
+        }
+
+        String cached = context.getDefRegistry().getCachedString(uid, appDesc, key);
         if (cached == null) {
             List<StyleDef> orderedStyleDefs = Lists.newArrayList();
 
             for (DefDescriptor<?> dd : dependencies) {
                 if (dd.getDefType().equals(DefType.STYLE)) {
                     @SuppressWarnings("unchecked")
-                    DefDescriptor<StyleDef> dds = (DefDescriptor<StyleDef>)dd;
+                    DefDescriptor<StyleDef> dds = (DefDescriptor<StyleDef>) dd;
                     orderedStyleDefs.add(dds.getDef());
                 }
             }
             StringBuffer sb = new StringBuffer();
             Aura.getSerializationService().writeCollection(orderedStyleDefs, StyleDef.class, sb, "CSS");
             cached = sb.toString();
-            context.getDefRegistry().putCachedString(uid, applicationDescriptor, key, cached);
+            context.getDefRegistry().putCachedString(uid, appDesc, key, cached);
         }
         out.append(cached);
     }
@@ -420,7 +427,7 @@ public class AuraResourceServlet extends AuraBaseServlet {
 
         context.setPreloading(true);
         Aura.getSerializationService().writeCollection(filterAndLoad(BaseComponentDef.class, dependencies, null),
-            BaseComponentDef.class, out);
+                BaseComponentDef.class, out);
     }
 
     private static class AuraControllerFilter implements TempFilter {
@@ -433,7 +440,7 @@ public class AuraResourceServlet extends AuraBaseServlet {
     private static final AuraControllerFilter ACF = new AuraControllerFilter();
 
     private void writeJs(HttpServletRequest request, Set<DefDescriptor<?>> dependencies, AuraContext context,
-                         Appendable out) throws IOException, QuickFixException {
+            Appendable out) throws IOException, QuickFixException {
         if (isAppRequest(request)) {
             writeDefinitions(dependencies, out);
         } else {
@@ -454,8 +461,8 @@ public class AuraResourceServlet extends AuraBaseServlet {
     public static void writeDefinitions(Set<DefDescriptor<?>> dependencies, Appendable out)
             throws IOException, QuickFixException {
         AuraContext context = Aura.getContextService().getCurrentContext();
-        
-		Mode mode = context.getMode();
+
+        Mode mode = context.getMode();
         final boolean minify = !(mode.isTestMode() || mode.isDevMode());
         final String mKey = minify ? "MIN:" : "DEV:";
         //
@@ -475,10 +482,7 @@ public class AuraResourceServlet extends AuraBaseServlet {
 
         if (cached == null) {
 
-
-
             StringBuilder sb = new StringBuilder();
-
 
             sb.append("$A.clientService.initDefs({");
 
@@ -647,4 +651,4 @@ public class AuraResourceServlet extends AuraBaseServlet {
     public void init(ServletConfig config) {
         servletContext = config.getServletContext();
     }
-}   
+}

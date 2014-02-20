@@ -17,45 +17,29 @@ package org.auraframework.impl.adapter;
 
 import org.auraframework.Aura;
 import org.auraframework.adapter.StyleAdapter;
-import org.auraframework.css.parser.ThemeOverrideMap;
-import org.auraframework.css.parser.ThemeValueProvider;
-import org.auraframework.def.ApplicationDef;
+import org.auraframework.css.ThemeValueProvider;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.impl.css.parser.ThemeValueProviderImpl;
-import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.def.StyleDef;
+import org.auraframework.def.ThemeDef;
+import org.auraframework.impl.css.ThemeValueProviderImpl;
 
-public class StyleAdapterImpl implements StyleAdapter {
-
+public final class StyleAdapterImpl implements StyleAdapter {
     @Override
-    public ThemeValueProvider getThemeValueProvider() {
-        return new ThemeValueProviderImpl(overrides());
+    public ThemeValueProvider getThemeValueProvider(DefDescriptor<StyleDef> descriptor) {
+        return getThemeValueProvider(descriptor, overrides());
     }
 
     @Override
-    public ThemeValueProvider getThemeValueProvider(ThemeOverrideMap overrides) {
-        return new ThemeValueProviderImpl(overrides);
+    public ThemeValueProvider getThemeValueProvider(DefDescriptor<StyleDef> descriptor, DefDescriptor<ThemeDef> override) {
+        return new ThemeValueProviderImpl(descriptor, override);
     }
 
     @Override
-    public ThemeValueProvider getThemeValueProviderNoOverrides() {
-        return new ThemeValueProviderImpl(null);
+    public ThemeValueProvider getThemeValueProviderNoOverrides(DefDescriptor<StyleDef> descriptor) {
+        return new ThemeValueProviderImpl(descriptor, null);
     }
 
-    /**
-     * Finds the theme overrides from the current app from the context, if present.
-     * 
-     * @return The overrides from the current app, or null if not set (or if the current "app" is a component)
-     */
-    private static ThemeOverrideMap overrides() {
-        DefDescriptor<?> desc = Aura.getContextService().getCurrentContext().getLoadingApplicationDescriptor();
-
-        if (desc != null && desc.getDefType() == DefType.APPLICATION) {
-            try {
-                return ((ApplicationDef) desc.getDef()).getThemeOverrides();
-            } catch (QuickFixException e) {
-            }
-        }
-        return null;
+    private static DefDescriptor<ThemeDef> overrides() {
+        return Aura.getContextService().getCurrentContext().getOverrideThemeDescriptor();
     }
 }

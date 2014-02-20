@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -31,8 +30,8 @@ import org.auraframework.Aura;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.def.Definition;
 import org.auraframework.def.EventType;
+import org.auraframework.def.ThemeDef;
 import org.auraframework.http.AuraBaseServlet;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.BaseComponent;
@@ -45,8 +44,6 @@ import org.auraframework.system.Client;
 import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.test.TestContext;
 import org.auraframework.test.TestContextAdapter;
-
-import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.InvalidEventTypeException;
 import org.auraframework.util.json.BaseJsonSerializationContext;
 import org.auraframework.util.json.Json;
@@ -244,10 +241,12 @@ public class AuraContextImpl implements AuraContext {
     private final List<Event> clientEvents = Lists.newArrayList();
 
     private String fwUID;
-    
+
     private final boolean isDebugToolEnabled;
 
     private InstanceStack fakeInstanceStack;
+
+    private DefDescriptor<ThemeDef> overrideThemeDescriptor;
 
     public AuraContextImpl(Mode mode, MasterDefRegistry masterRegistry, Map<DefType, String> defaultPrefixes,
             Format format, Access access, JsonSerializationContext jsonContext,
@@ -535,7 +534,6 @@ public class AuraContextImpl implements AuraContext {
         loaded.put(descriptor, uid);
     }
 
-
     @Override
     public void dropLoaded(DefDescriptor<?> descriptor) {
         loaded.remove(descriptor);
@@ -576,7 +574,6 @@ public class AuraContextImpl implements AuraContext {
         return getInstanceStack().getNextId();
     }
 
-
     @Override
     public InstanceStack getInstanceStack() {
         if (currentAction != null) {
@@ -592,12 +589,22 @@ public class AuraContextImpl implements AuraContext {
     @Override
     public void registerComponent(BaseComponent<?, ?> component) {
         getInstanceStack().registerComponent(component);
-            }
+    }
 
     @Override
     public void serializeAsPart(Json json) throws IOException {
         if (fakeInstanceStack != null) {
             fakeInstanceStack.serializeAsPart(json);
         }
+    }
+
+    @Override
+    public DefDescriptor<ThemeDef> getOverrideThemeDescriptor() {
+        return overrideThemeDescriptor;
+    }
+
+    @Override
+    public void setOverrideThemeDescriptor(DefDescriptor<ThemeDef> themeDescriptor) {
+        this.overrideThemeDescriptor = themeDescriptor;
     }
 }

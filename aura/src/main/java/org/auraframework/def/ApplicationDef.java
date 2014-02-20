@@ -17,7 +17,6 @@ package org.auraframework.def;
 
 import java.util.List;
 
-import org.auraframework.css.parser.ThemeOverrideMap;
 import org.auraframework.system.AuraContext.Access;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
@@ -45,7 +44,12 @@ public interface ApplicationDef extends BaseComponentDef {
     Boolean isOnePageApp() throws QuickFixException;
 
     /**
-     * Gets the map of overridden {@link ThemeDef}s, or null if not specified.
+     * Gets the theme override, if present.
+     * 
+     * Note that this differs from the "local theme" ({@link #getLocalThemeDescriptor()}), as this is specifically the
+     * application-wide override theme. In contrast, the local theme is applicable only to its component/app bundle.
+     * However, for applications only, the local theme and override theme may refer to the same {@link ThemeDef} (if the
+     * app override theme is in the app bundle).
      */
-    ThemeOverrideMap getThemeOverrides();
+    DefDescriptor<ThemeDef> getOverrideThemeDescriptor();
 }

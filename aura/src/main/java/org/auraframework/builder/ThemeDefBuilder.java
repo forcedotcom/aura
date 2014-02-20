@@ -21,10 +21,10 @@ import org.auraframework.def.VarDef;
 
 public interface ThemeDefBuilder extends DefBuilder<ThemeDef, ThemeDef> {
     /**
-     * Sets whether this theme is a "local" theme. A local theme is one that exists within a component or app bundle
-     * instead of in its own bundle.
+     * Sets whether this theme is a component theme. A component theme is one that exists within a component or app
+     * bundle instead of in its own bundle.
      */
-    ThemeDefBuilder setIsLocal(boolean isLocal);
+    ThemeDefBuilder setIsCmpTheme(boolean isCmpTheme);
 
     /**
      * Specifies the parent theme.
@@ -41,7 +41,7 @@ public interface ThemeDefBuilder extends DefBuilder<ThemeDef, ThemeDef> {
      * Imported themes are consulted before looking at inherited vars, making them roughly equivalent to vars directly
      * declared within this theme.
      * <p>
-     * Imports must be added before all declared vars. Local themes (themes inside of a component bundle) cannot be
+     * Imports must be added before all declared vars. Component themes (themes inside of a component bundle) cannot be
      * imported.
      */
     ThemeDefBuilder addImport(DefDescriptor<ThemeDef> themeDescriptor);

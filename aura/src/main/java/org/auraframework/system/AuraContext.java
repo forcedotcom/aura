@@ -25,12 +25,14 @@ import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.ThemeDef;
+import org.auraframework.http.AuraBaseServlet;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Event;
 import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.instance.InstanceStack;
 import org.auraframework.instance.ValueProviderType;
+import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.javascript.directive.JavascriptGeneratorMode;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonSerializationContext;
@@ -97,7 +99,7 @@ public interface AuraContext {
     }
 
     public static boolean isDebugToolEnabled = false;
-    
+
     public static enum Format {
         MANIFEST, CSS, JS, JSON, HTML;
     }
@@ -201,7 +203,7 @@ public interface AuraContext {
      * @return The default prefix for the given DefType in this context
      */
     String getDefaultPrefix(DefType defType);
-    
+
     /**
      * Get the full set of default prefixes.
      */
@@ -465,12 +467,39 @@ public interface AuraContext {
     void serializeAsPart(Json json) throws IOException;
 
     /**
-     * Gets the {@link ThemeDef} that overrides default variable values for any CSS processed within this context.
+     * Adds all app-specified themes to this context, unless the theme is already added. The themes will be prepended
+     * <em>before</em> all themes added with {@link #appendThemeDescriptor(DefDescriptor)}.
+     * 
      */
-    DefDescriptor<ThemeDef> getOverrideThemeDescriptor();
+    void addAppThemeDescriptors() throws QuickFixException;
 
     /**
-     * Sets the {@link ThemeDef} to override default variable values for any CSS processed within this context.
+     * Explicitly appends a theme override after other currently specified themes. This will also be after any themes on
+     * the current application.
+     * 
+     * @param themeDescriptor The override theme.
      */
-    void setOverrideThemeDescriptor(DefDescriptor<ThemeDef> themeDescriptor);
+    void appendThemeDescriptor(DefDescriptor<ThemeDef> themeDescriptor) throws QuickFixException;
+
+    /**
+     * Gets the list of override themes explicitly specified to this context. These are the themes that are used to
+     * "override" the default var values. Note that this is returned in specification order. For the order that var
+     * lookup/resolution will occur, see {@link #getThemeDescriptorsOrdered()} instead.
+     * <p>
+     * While usually the theme overrides are specified on the application tag itself, in some situations the overrides
+     * may be directly specified to this context, e.g., in some usages of the integration service.
+     * <p>
+     * The application's override themes are not implicitly included in this result by default. However, note that the
+     * application's override themes are explicitly added to the context at one point during the request (See
+     * {@link AuraBaseServlet#getStyles()}). Effectively this means that these themes <em>will</em> be included during
+     * the actual CSS request itself.
+     */
+    List<DefDescriptor<ThemeDef>> getThemeDescriptors();
+
+    /**
+     * See #getThemeDescriptors(). The difference is that this method orders the themes for proper evaluation purposes
+     * (i.e., themes specified last should be consulted first).
+     */
+    List<DefDescriptor<ThemeDef>> getThemeDescriptorsOrdered();
+
 }

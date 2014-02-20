@@ -94,7 +94,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     private final List<DefDescriptor<HelperDef>> helperDescriptors;
     private final List<DefDescriptor<ResourceDef>> resourceDescriptors;
     private final DefDescriptor<ControllerDef> compoundControllerDescriptor;
-    private final DefDescriptor<ThemeDef> localThemeDescriptor;
+    private final DefDescriptor<ThemeDef> cmpThemeDescriptor;
 
     private final Set<DefDescriptor<InterfaceDef>> interfaces;
     private final List<DefDescriptor<ControllerDef>> controllerDescriptors;
@@ -148,10 +148,10 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         this.clientLibraries = AuraUtil.immutableList(builder.clientLibraries);
         this.render = builder.renderType;
         this.whitespaceBehavior = builder.whitespaceBehavior;
-        this.localThemeDescriptor = builder.localThemeDescriptor;
+        this.cmpThemeDescriptor = builder.cmpThemeDescriptor;
 
         this.expressionRefs = AuraUtil.immutableSet(builder.expressionRefs);
-        if (getDescriptor() != null) { 
+        if (getDescriptor() != null) {
             this.compoundControllerDescriptor = DefDescriptorImpl.getAssociateDescriptor(getDescriptor(),
                     ControllerDef.class, DefDescriptor.COMPOUND_PREFIX);
         } else {
@@ -159,7 +159,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         }
         this.hashCode = AuraUtil.hashCode(super.hashCode(), events, controllerDescriptors, modelDefDescriptor,
                 extendsDescriptor, interfaces, rendererDescriptors, helperDescriptors, resourceDescriptors,
-                localThemeDescriptor);
+                cmpThemeDescriptor);
     }
 
     /**
@@ -216,7 +216,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
                         String.format(
                                 "Component %s cannot be a rootComponent and extend %s", getDescriptor(),
                                 this.extendsDescriptor),
-                        getLocation());
+                                getLocation());
             }
         }
 
@@ -491,8 +491,8 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             dependencies.add(templateDefDescriptor);
         }
 
-        if (localThemeDescriptor != null) {
-            dependencies.add(localThemeDescriptor);
+        if (cmpThemeDescriptor != null) {
+            dependencies.add(cmpThemeDescriptor);
         }
         
         if (imports != null) {
@@ -666,8 +666,8 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     }
 
     @Override
-    public DefDescriptor<ThemeDef> getLocalThemeDescriptor() {
-        return localThemeDescriptor;
+    public DefDescriptor<ThemeDef> getCmpTheme() {
+        return cmpThemeDescriptor;
     }
 
     @Override
@@ -725,14 +725,14 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
 
             return getDescriptor().equals(other.getDescriptor())
                     && controllerDescriptors
-                            .equals(other.controllerDescriptors)
+                    .equals(other.controllerDescriptors)
                     && (modelDefDescriptor == null ? other.modelDefDescriptor == null
-                            : modelDefDescriptor
-                                    .equals(other.modelDefDescriptor))
+                    : modelDefDescriptor
+                    .equals(other.modelDefDescriptor))
                     && (extendsDescriptor == null ? other.extendsDescriptor == null
-                            : extendsDescriptor.equals(other.extendsDescriptor))
-                    && (localThemeDescriptor == null ? other.localThemeDescriptor == null
-                            : localThemeDescriptor.equals(other.localThemeDescriptor))
+                    : extendsDescriptor.equals(other.extendsDescriptor))
+                    && (cmpThemeDescriptor == null ? other.cmpThemeDescriptor == null
+                    : cmpThemeDescriptor.equals(other.cmpThemeDescriptor))
                     && events.equals(other.events)
                     && getLocation().equals(other.getLocation());
         }
@@ -843,7 +843,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     }
 
     protected abstract void serializeFields(Json json) throws IOException,
-            QuickFixException;
+    QuickFixException;
 
     /**
      * @see ComponentDef#getRendererDescriptor()
@@ -972,7 +972,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         public DefDescriptor<ComponentDef> templateDefDescriptor;
         public DefDescriptor<TestSuiteDef> testSuiteDefDescriptor;
         public DefDescriptor<StyleDef> styleDescriptor;
-        public DefDescriptor<ThemeDef> localThemeDescriptor;
+        public DefDescriptor<ThemeDef> cmpThemeDescriptor;
         public List<DefDescriptor<RendererDef>> rendererDescriptors;
         public List<DefDescriptor<HelperDef>> helperDescriptors;
         public List<DefDescriptor<ResourceDef>> resourceDescriptors;

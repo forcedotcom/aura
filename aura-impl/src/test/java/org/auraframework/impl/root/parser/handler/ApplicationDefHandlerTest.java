@@ -88,10 +88,10 @@ public class ApplicationDefHandlerTest extends AuraImplTestCase {
     public void testReadThemeAttribute() throws QuickFixException {
         DefDescriptor<ThemeDef> override = addSourceAutoCleanup(ThemeDef.class, "<aura:theme></aura:theme>");
 
-        String src = String.format("<aura:application overrideTheme=\"%s\"></aura:application>",
+        String src = String.format("<aura:application theme=\"%s\"></aura:application>",
                 override.getDescriptorName());
 
         DefDescriptor<ApplicationDef> app = addSourceAutoCleanup(ApplicationDef.class, src);
-        assertEquals(override, app.getDef().getOverrideThemeDescriptor());
+        assertEquals(override, app.getDef().getThemeDescriptor());
     }
 }

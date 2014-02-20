@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+
 import javax.activation.MimetypesFileTypeMap;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -29,7 +30,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.google.common.collect.Sets;
 import org.apache.http.HttpHeaders;
 import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
@@ -57,6 +57,7 @@ import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 @SuppressWarnings("serial")
 public abstract class AuraBaseServlet extends HttpServlet {
@@ -481,9 +482,14 @@ public abstract class AuraBaseServlet extends HttpServlet {
 
         // add css client libraries
         ret.addAll(getClientLibraryUrls(context, ClientLibraryDef.Type.CSS));
-        
+
         StringBuilder defs = new StringBuilder(contextPath).append("/l/");
         StringBuilder sb = new StringBuilder();
+
+        // add app theme to the context. we do this here so that when the context is serialized below it includes the
+        // app themes. This ensures ALL applicable themes are part of the url, making client-side caching more
+        // predictable
+        context.addAppThemeDescriptors();
 
         try {
             Aura.getSerializationService().write(context, null, AuraContext.class, sb, "HTML");
@@ -501,13 +507,14 @@ public abstract class AuraBaseServlet extends HttpServlet {
     /**
      * Gets all client libraries specified. Uses client library service to resolve any urls that weren't specified.
      * Returns list of non empty client library urls.
-     *
-     *
+     * 
+     * 
      * @param context aura context
      * @param type CSS or JS
      * @return list of urls for client libraries
      */
-    private static Set<String> getClientLibraryUrls(AuraContext context, ClientLibraryDef.Type type) throws QuickFixException {
+    private static Set<String> getClientLibraryUrls(AuraContext context, ClientLibraryDef.Type type)
+            throws QuickFixException {
         return Aura.getClientLibraryService().getUrls(context, type);
     }
 

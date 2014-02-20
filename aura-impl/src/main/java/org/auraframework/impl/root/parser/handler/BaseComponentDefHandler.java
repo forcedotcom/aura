@@ -322,11 +322,11 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef> extend
             builder.addResource(cssResourceDescriptor.getQualifiedName());
         }
 
-        // See if there is a themedef that has the same qname. todo -- add localTheme attr as well?
+        // See if there is a themedef that has the same qname. todo -- add cmpTheme attr as well?
         String themeName = String.format("%s:%s", defDescriptor.getNamespace(), defDescriptor.getName());
         DefDescriptor<ThemeDef> themeDesc = DefDescriptorImpl.getInstance(themeName, ThemeDef.class);
         if (mdr.exists(themeDesc)) {
-            builder.localThemeDescriptor = themeDesc;
+            builder.cmpThemeDescriptor = themeDesc;
         }
 
         // Do not consider Javascript Test suite defs in PROD and PRODDEBUG modes.

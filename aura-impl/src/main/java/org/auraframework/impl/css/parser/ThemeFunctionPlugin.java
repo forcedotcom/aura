@@ -25,6 +25,7 @@ import org.auraframework.Aura;
 import org.auraframework.css.ThemeValueProvider;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
+import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.salesforce.omakase.SupportMatrix;
 import com.salesforce.omakase.ast.atrule.AtRule;
@@ -52,8 +53,15 @@ final class ThemeFunctionPlugin implements SyntaxPlugin {
     private final ThemeFunctionRefiner themeRefiner;
 
     /** use a constructor method instead */
-    private ThemeFunctionPlugin(boolean passthrough, DefDescriptor<StyleDef> styleDef) {
-        ThemeValueProvider provider = Aura.getStyleAdapter().getThemeValueProvider(styleDef);
+    private ThemeFunctionPlugin(boolean passthrough, DefDescriptor<StyleDef> styleDef) throws QuickFixException {
+
+        ThemeValueProvider provider;
+        if (passthrough) {
+            provider = Aura.getStyleAdapter().getThemeValueProviderNoOverrides(styleDef);
+        } else {
+            provider = Aura.getStyleAdapter().getThemeValueProvider(styleDef);
+        }
+
         themeRefiner = new ThemeFunctionRefiner(passthrough, provider);
     }
 
@@ -100,12 +108,12 @@ final class ThemeFunctionPlugin implements SyntaxPlugin {
     }
 
     /** This will collect all theme function references but will leave them unevaluated in the CSS */
-    public static ThemeFunctionPlugin passthrough(DefDescriptor<StyleDef> styleDef) {
+    public static ThemeFunctionPlugin passthrough(DefDescriptor<StyleDef> styleDef) throws QuickFixException {
         return new ThemeFunctionPlugin(true, styleDef);
     }
 
     /** This will resolve all theme function references */
-    public static ThemeFunctionPlugin resolving(DefDescriptor<StyleDef> styleDef) {
+    public static ThemeFunctionPlugin resolving(DefDescriptor<StyleDef> styleDef) throws QuickFixException {
         return new ThemeFunctionPlugin(false, styleDef);
     }
 
@@ -127,7 +135,8 @@ final class ThemeFunctionPlugin implements SyntaxPlugin {
         }
 
         @Override
-        public void write(StyleWriter writer, StyleAppendable appendable) throws IOException {}
+        public void write(StyleWriter writer, StyleAppendable appendable) throws IOException {
+        }
 
         @Override
         protected PropertyValueMember makeCopy(Prefix prefix, SupportMatrix support) {

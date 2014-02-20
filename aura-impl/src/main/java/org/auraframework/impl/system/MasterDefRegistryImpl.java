@@ -262,6 +262,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             case TYPE:
             case RESOURCE:
             case PROVIDER:
+            case THEME_PROVIDER:
                 qualifiedNamePattern = "%s://%s.%s";
                 break;
             case ATTRIBUTE:

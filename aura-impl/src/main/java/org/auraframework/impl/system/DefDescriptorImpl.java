@@ -21,7 +21,9 @@ import java.util.regex.Pattern;
 
 import org.auraframework.Aura;
 import org.auraframework.cache.Cache;
-import org.auraframework.def.*;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.Definition;
+import org.auraframework.def.TypeDef;
 import org.auraframework.impl.type.AuraStaticTypeDefRegistry;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.service.CachingService;
@@ -49,7 +51,7 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
 
 
     private static CachingService cSrv = Aura.getCachingService();
-    
+
     /**
      * Pattern for tag descriptors : foo:bar Group 0 = QName = foo:bar Group 1 = prefix Group 2 = namespace = foo Group
      * 3 = name = bar prefix = null
@@ -122,6 +124,7 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
             case RESOURCE:
             case TYPE:
             case PROVIDER:
+            case THEME_PROVIDER:
                 Matcher matcher = CLASS_PATTERN.matcher(qualifiedName);
                 if (matcher.matches()) {
                     prefix = matcher.group(1);
@@ -295,7 +298,7 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
                 return result;
             }
         }
-        
+
         return new DefDescriptorImpl<E>(qualifiedName, defClass);
     }
 
@@ -310,25 +313,25 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
         if (name == null || defClass == null) {
             throw new AuraRuntimeException("descriptor is null");
         }
-        
+
         DescriptorKey dk = new DescriptorKey(name, defClass);
-        
-        Cache<DescriptorKey, DefDescriptor<? extends Definition>> cache = 
+
+        Cache<DescriptorKey, DefDescriptor<? extends Definition>> cache =
                 cSrv.getDefDescriptorByNameCache();
 
-        
+
         @SuppressWarnings("unchecked")
         DefDescriptor<E> result = (DefDescriptor<E>) cache.getIfPresent(dk);
         if (result == null) {
             result = buildInstance(name, defClass);
-            
+
             // Our input names may not be qualified, but we should ensure that
             // the fully-qualified is properly cached to the same object.
             // I'd like an unqualified name to either throw or be resolved first,
             // but that's breaking or non-performant respectively.
             if (!dk.getName().equals(result.getQualifiedName())) {
                 DescriptorKey fullDK = new DescriptorKey(result.getQualifiedName(), defClass);
-                
+
                 @SuppressWarnings("unchecked")
                 DefDescriptor<E> fullResult = (DefDescriptor<E>) cache.getIfPresent(fullDK);
                 if (fullResult == null) {
@@ -338,10 +341,10 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
                     result = fullResult;
                 }
             }
-            
+
             cache.put(dk, result);
         }
-        
+
         return result;
     }
 

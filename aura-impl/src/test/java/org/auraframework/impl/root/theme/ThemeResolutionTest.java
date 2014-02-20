@@ -18,7 +18,10 @@ package org.auraframework.impl.root.theme;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
 import org.auraframework.def.ThemeDef;
+import org.auraframework.def.ThemeDescriptorProvider;
 import org.auraframework.impl.css.StyleTestCase;
+import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.system.Annotations.Provider;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
@@ -32,7 +35,7 @@ public class ThemeResolutionTest extends StyleTestCase {
 
     private void assertStyle(DefDescriptor<StyleDef> style, String expected) throws QuickFixException {
         expected = expected.replace(".THIS", "." + style.getDef().getClassName());
-        assertEquals("Did not get the expected css code", expected, style.getDef().getCode());
+        assertEquals("Did not get the expected css code", expected, getParsedCssUseAppTheme(style));
     }
 
     /** where the variable value is unquoted */
@@ -119,7 +122,8 @@ public class ThemeResolutionTest extends StyleTestCase {
         try {
             addStyleDef(".THIS{color: theme(color)").getDef().getCode();
             fail("expected exception");
-        } catch (Exception e) {}
+        } catch (Exception e) {
+        }
     }
 
     /** errors when the variable does not exist */
@@ -128,7 +132,8 @@ public class ThemeResolutionTest extends StyleTestCase {
         try {
             addStyleDef(".THIS{color: theme(dolor)").getDef().getCode();
             fail("expected exception");
-        } catch (Exception e) {}
+        } catch (Exception e) {
+        }
     }
 
     /** if the variable value is an empty string then the declaration should be removed */
@@ -249,44 +254,56 @@ public class ThemeResolutionTest extends StyleTestCase {
         assertStyle(addStyleDef(src), ".THIS {background:purple}");
     }
 
-    /** test using local themes */
-    public void testLocalThemes() throws Exception {
+    /** test using component themes */
+    public void testCmpTheme() throws Exception {
         addNsTheme(theme().var("brandColor", "red"));
         DefDescriptor<StyleDef> styleDef = addStyleDef(".THIS {color:theme(myColor)}");
-        addLocalTheme(theme().var("myColor", "{!brandColor}"), styleDef);
+        addCmpTheme(theme().var("myColor", "{!brandColor}"), styleDef);
         assertStyle(styleDef, ".THIS {color:red}");
     }
 
-    /** test that the correct override theme is used under various combinations of which files exist */
-    public void testAppOverrideThemeWhenExplicitOnly() throws Exception {
+    /** test using component themes for app css */
+    public void testCmpThemeForApp() throws Exception {
+        addNsTheme(theme().var("color1", "red"));
+
+        addContextApp("<aura:application/>");
+        addContextAppBundleTheme(theme().var("color2", "green"));
+        DefDescriptor<StyleDef> styleDef = addContextAppBundleStyle(".THIS {color:theme(color2)}");
+
+        assertStyle(styleDef, ".THIS {color:green}");
+    }
+
+    /** test that the correct app theme is used under various combinations of which files exist */
+    public void testAppThemeWhenExplicitOnly() throws Exception {
         // component in a different ns, with a ns default theme
         addNsThemeOtherNamespace(theme().var("color", "red"));
         DefDescriptor<StyleDef> toTest = addStyleDefOtherNamespace(".THIS {color: theme(color)}");
 
-        // our app is in a different ns from the cmp, specifying an explicit override theme
+        // our app is in a different ns from the cmp, specifying an explicit app theme
         DefDescriptor<ThemeDef> override = addSeparateTheme(theme().var("color", "blue"));
-        addContextApp(String.format("<aura:application overrideTheme='%s'/>", override.getDescriptorName()));
+        addContextApp(String.format("<aura:application theme='%s'/>", override.getDescriptorName()));
 
         // the explicit theme should override the components namespace-default theme
         assertStyle(toTest, ".THIS {color:blue}");
     }
 
-    /** test that the correct override theme is used under various combinations of which files exist */
-    public void testAppOverrideThemeWhenBundleOnly() throws Exception {
+    /** test that the correct app theme is used under various combinations of which files exist */
+    public void testAppThemeWhenBundleOnly() throws Exception {
         // component in a different ns, with a ns default theme
         addNsThemeOtherNamespace(theme().var("color", "red"));
         DefDescriptor<StyleDef> toTest = addStyleDefOtherNamespace(".THIS {color: theme(color)}");
 
-        // our app is in a different ns from the cmp, using an app bundle theme
+        // our app is in a different ns from the cmp, using an app bundle theme. however the bundle
+        // theme should not be used here!
         addContextAppBundleTheme(theme().var("color", "blue"));
         addContextApp("<aura:application/>");
 
-        // the bundle theme should override the components namespace-default theme
-        assertStyle(toTest, ".THIS {color:blue}");
+        // the bundle theme should NOT override the components namespace-default theme
+        assertStyle(toTest, ".THIS {color:red}");
     }
 
-    /** test that the correct override theme is used under various combinations of which files exist */
-    public void testAppOverrideThemeWhenImplicitOnly() throws Exception {
+    /** test that the correct app theme is used under various combinations of which files exist */
+    public void testAppThemeWhenImplicitOnly() throws Exception {
         // component in a different ns, with a ns default theme
         addNsThemeOtherNamespace(theme().var("color", "red"));
         DefDescriptor<StyleDef> toTest = addStyleDefOtherNamespace(".THIS {color: theme(color)}");
@@ -299,38 +316,38 @@ public class ThemeResolutionTest extends StyleTestCase {
         assertStyle(toTest, ".THIS {color:blue}");
     }
 
-    /** test that the correct override theme is used under various combinations of which files exist */
-    public void testAppOverrideThemeWhenNoOverride() throws Exception {
+    /** test that the correct app theme is used under various combinations of which files exist */
+    public void testAppThemeWhenEmptyTheme() throws Exception {
         // component in a different ns, with a ns default theme
         addNsThemeOtherNamespace(theme().var("color", "red"));
         DefDescriptor<StyleDef> toTest = addStyleDefOtherNamespace(".THIS {color: theme(color)}");
 
-        // our app is in a different ns from the cmp, with no override theme
-        addContextApp(String.format("<aura:application overrideTheme=''/>"));
+        // our app is in a different ns from the cmp, specifying an empty string for the theme
+        addContextApp(String.format("<aura:application theme=''/>"));
 
         // no override should be set, so it should fallback to the cmp's namespace-default theme
         assertStyle(toTest, ".THIS {color:red}");
     }
 
-    /** test that the correct override theme is used under various combinations of which files exist */
-    public void testAppOverrideThemeWhenExplicitAndBundle() throws Exception {
+    /** test that the correct app theme is used under various combinations of which files exist */
+    public void testAppThemeWhenExplicitAndBundle() throws Exception {
         // component in a different ns, with a ns default theme
         addNsThemeOtherNamespace(theme().var("color", "red"));
         DefDescriptor<StyleDef> toTest = addStyleDefOtherNamespace(".THIS {color: theme(color)}");
 
-        // a bundle theme exists
+        // a bundle theme exists for the app
         addContextAppBundleTheme(theme().var("color", "blue"));
 
-        // our app is in a different ns from the cmp, specifying an explicit override theme
+        // our app is in a different ns from the cmp, specifying an explicit app theme
         DefDescriptor<ThemeDef> override = addSeparateTheme(theme().var("color", "green"));
-        addContextApp(String.format("<aura:application overrideTheme='%s'/>", override.getDescriptorName()));
+        addContextApp(String.format("<aura:application theme='%s'/>", override.getDescriptorName()));
 
-        // the explicit theme outranks the cmp's namespace-default and the app's bundle theme
+        // the explicit theme outranks the cmp's namespace-default theme
         assertStyle(toTest, ".THIS {color:green}");
     }
 
-    /** test that the correct override theme is used under various combinations of which files exist */
-    public void testAppOverrideThemeWhenExplicitAndImplicit() throws Exception {
+    /** test that the correct app theme is used under various combinations of which files exist */
+    public void testAppThemeWhenExplicitAndImplicit() throws Exception {
         // component in a different ns, with a ns default theme
         addNsThemeOtherNamespace(theme().var("color", "red"));
         DefDescriptor<StyleDef> toTest = addStyleDefOtherNamespace(".THIS {color: theme(color)}");
@@ -338,16 +355,16 @@ public class ThemeResolutionTest extends StyleTestCase {
         // a namespace-default theme exists in the app's namespace
         addNsTheme(theme().var("color", "blue"));
 
-        // our app is in a different ns from the cmp, specifying an explicit override theme
+        // our app is in a different ns from the cmp, specifying an explicit app theme
         DefDescriptor<ThemeDef> override = addSeparateTheme(theme().var("color", "green"));
-        addContextApp(String.format("<aura:application overrideTheme='%s'/>", override.getDescriptorName()));
+        addContextApp(String.format("<aura:application theme='%s'/>", override.getDescriptorName()));
 
-        // the explicit theme outranks the cmp's namespace-default and the app's bundle theme
+        // the explicit theme outranks the cmp's namespace-default and the app's namespace-default theme
         assertStyle(toTest, ".THIS {color:green}");
     }
 
-    /** test that the correct override theme is used under various combinations of which files exist */
-    public void testAppOverrideThemeWhenBundleAndImplicit() throws Exception {
+    /** test that the correct app theme is used under various combinations of which files exist */
+    public void testAppThemeWhenBundleAndImplicit() throws Exception {
         // component in a different ns, with a ns default theme
         addNsThemeOtherNamespace(theme().var("color", "red"));
         DefDescriptor<StyleDef> toTest = addStyleDefOtherNamespace(".THIS {color: theme(color)}");
@@ -355,18 +372,18 @@ public class ThemeResolutionTest extends StyleTestCase {
         // a namespace-default theme exists in the app's namespace
         addNsTheme(theme().var("color", "blue"));
 
-        // a bundle theme exists
+        // a bundle theme exists for the app (the bundle theme should not be used as the override!)
         addContextAppBundleTheme(theme().var("color", "green"));
 
         // our app is in a different ns from the cmp
         addContextApp("<aura:application/>");
 
-        // the bundle theme outranks the app's namespace-default theme and the cmp's namespace-default theme
-        assertStyle(toTest, ".THIS {color:green}");
+        // the namespace-default theme for the app outranks the cmp's namespace-default theme
+        assertStyle(toTest, ".THIS {color:blue}");
     }
 
-    /** test that the correct override theme is used under various combinations of which files exist */
-    public void testAppOverrideThemeWhenExplicitBundleAndImplicit() throws Exception {
+    /** test that the correct app theme is used under various combinations of which files exist */
+    public void testAppThemeWhenExplicitBundleAndImplicit() throws Exception {
         // component in a different ns, with a ns default theme
         addNsThemeOtherNamespace(theme().var("color", "red"));
         DefDescriptor<StyleDef> toTest = addStyleDefOtherNamespace(".THIS {color: theme(color)}");
@@ -374,33 +391,33 @@ public class ThemeResolutionTest extends StyleTestCase {
         // a namespace-default theme exists in the app's namespace
         addNsTheme(theme().var("color", "blue"));
 
-        // a bundle theme exists
+        // a bundle theme exists (the bundle theme should not be used as the override!)
         addContextAppBundleTheme(theme().var("color", "green"));
 
-        // our app is in a different ns from the cmp, specifying an explicit override theme
+        // our app is in a different ns from the cmp, specifying an explicit app theme
         DefDescriptor<ThemeDef> override = addSeparateTheme(theme().var("color", "orange"));
-        addContextApp(String.format("<aura:application overrideTheme='%s'/>", override.getDescriptorName()));
+        addContextApp(String.format("<aura:application theme='%s'/>", override.getDescriptorName()));
 
         // the explicit theme outranks the other themes
         assertStyle(toTest, ".THIS {color:orange}");
     }
 
-    /** test when an override theme doesn't define a var for a cmp in another namespace */
-    public void testOverrideThemeDoesntContainVar() throws Exception {
+    /** test when an app theme doesn't define a var for a cmp in another namespace */
+    public void testAppThemeDoesntContainVar() throws Exception {
         // component in a different ns, with a ns default theme
         addNsThemeOtherNamespace(theme().var("color", "red"));
         DefDescriptor<StyleDef> toTest = addStyleDefOtherNamespace(".THIS {color: theme(color)}");
 
-        // our app is in a different ns from the cmp, specifying an explicit override theme
+        // our app is in a different ns from the cmp, specifying an explicit app theme
         DefDescriptor<ThemeDef> override = addSeparateTheme(theme().var("font", "arial"));
-        addContextApp(String.format("<aura:application overrideTheme='%s'/>", override.getDescriptorName()));
+        addContextApp(String.format("<aura:application theme='%s'/>", override.getDescriptorName()));
 
         // the cmp should fallback to it's namespace-default theme, without an error
         assertStyle(toTest, ".THIS {color:red}");
     }
 
-    /** test that an override theme inherited var is applied */
-    public void testExplicitOverrideThemeInheritedVar() throws Exception {
+    /** test that an app theme inherited var is applied */
+    public void testExplicitAppThemeInheritedVar() throws Exception {
         // component in a different ns, with a ns default theme
         addNsThemeOtherNamespace(theme().var("color", "red"));
         DefDescriptor<StyleDef> toTest = addStyleDefOtherNamespace(".THIS {color: theme(color)}");
@@ -408,16 +425,16 @@ public class ThemeResolutionTest extends StyleTestCase {
         // the explicit theme will inherit from this one
         DefDescriptor<ThemeDef> parent = addSeparateTheme(theme().var("color", "blue"));
 
-        // our app is in a different ns from the cmp, specifying an explicit override theme
+        // our app is in a different ns from the cmp, specifying an explicit app theme
         DefDescriptor<ThemeDef> override = addSeparateTheme(theme().parent(parent).var("font", "arial"));
-        addContextApp(String.format("<aura:application overrideTheme='%s'/>", override.getDescriptorName()));
+        addContextApp(String.format("<aura:application theme='%s'/>", override.getDescriptorName()));
 
         // the inherited value should be used
         assertStyle(toTest, ".THIS {color:blue}");
     }
 
-    /** test that an override theme inherited var is applied */
-    public void testImplicitOverrideThemeInheritedVar() throws Exception {
+    /** test that an app theme inherited var is applied */
+    public void testImplicitAppThemeInheritedVar() throws Exception {
         // component in a different ns, with a ns default theme
         addNsThemeOtherNamespace(theme().var("color", "red"));
         DefDescriptor<StyleDef> toTest = addStyleDefOtherNamespace(".THIS {color: theme(color)}");
@@ -434,7 +451,7 @@ public class ThemeResolutionTest extends StyleTestCase {
     }
 
     /** test when an implicit theme inherits from the other cmp's default theme */
-    public void testImplicitOverrideThemeCircleAround() throws Exception {
+    public void testImplicitAppThemeCircleAround() throws Exception {
         // component in a different ns, with a ns default theme
         DefDescriptor<ThemeDef> otherTheme = addNsThemeOtherNamespace(theme().var("color", "red"));
         DefDescriptor<StyleDef> toTest = addStyleDefOtherNamespace(".THIS {color: theme(color)}");
@@ -450,7 +467,7 @@ public class ThemeResolutionTest extends StyleTestCase {
     }
 
     /** test when an implicit theme inherits from the other cmp's default theme, but then changes the val */
-    public void testImplicitOverrideThemeCircleAroundChanged() throws Exception {
+    public void testImplicitAppThemeCircleAroundChanged() throws Exception {
         // component in a different ns, with a ns default theme
         DefDescriptor<ThemeDef> otherTheme = addNsThemeOtherNamespace(theme().var("color", "red"));
         DefDescriptor<StyleDef> toTest = addStyleDefOtherNamespace(".THIS {color: theme(color)}");
@@ -463,5 +480,25 @@ public class ThemeResolutionTest extends StyleTestCase {
 
         // the app's implicit theme's value should be used
         assertStyle(toTest, ".THIS {color:blue}");
+    }
+
+    @Provider
+    public static final class Provider1 implements ThemeDescriptorProvider {
+        @Override
+        public DefDescriptor<ThemeDef> provide() throws QuickFixException {
+            return DefDescriptorImpl.getInstance("themeProviderTest:themeResolutionProvider", ThemeDef.class);
+        }
+    }
+
+    /** test that a provided theme works */
+    public void testAppExplicitThemeUsesProvider() throws Exception {
+        addNsTheme(theme().var("color", "red"));
+        DefDescriptor<StyleDef> styleDef = addStyleDef(".THIS {color:theme(color)}");
+
+        DefDescriptor<ThemeDef> override = addSeparateTheme(theme().provider("java://" + Provider1.class.getName()));
+        addContextApp(String.format("<aura:application theme='%s'/>", override.getDescriptorName()));
+
+        // should get the value from the provided theme
+        assertStyle(styleDef, ".THIS {color:blue}");
     }
 }

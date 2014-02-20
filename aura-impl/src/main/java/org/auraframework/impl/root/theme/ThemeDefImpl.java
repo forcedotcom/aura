@@ -27,9 +27,11 @@ import org.auraframework.builder.ThemeDefBuilder;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.ProviderDef;
 import org.auraframework.def.RegisterEventDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.def.ThemeDef;
+import org.auraframework.def.ThemeProviderDef;
 import org.auraframework.def.VarDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.root.RootDefinitionImpl;
@@ -55,26 +57,28 @@ import com.google.common.collect.Sets;
 public final class ThemeDefImpl extends RootDefinitionImpl<ThemeDef> implements ThemeDef {
     private static final long serialVersionUID = -7900230831915100535L;
 
-    private final boolean isLocal;
+    private final boolean isCmpTheme;
     private final Map<String, VarDef> vars;
     private final List<DefDescriptor<ThemeDef>> imports;
     private final Set<PropertyReference> expressionRefs;
     private final DefDescriptor<ThemeDef> extendsDescriptor;
+    private final DefDescriptor<ThemeProviderDef> providerDescriptor;
     private final int hashCode;
 
     public ThemeDefImpl(Builder builder) {
         super(builder);
-        this.isLocal = builder.isLocal;
+        this.isCmpTheme = builder.isCmpTheme;
         this.imports = builder.orderedImmutableImports();
         this.vars = AuraUtil.immutableMap(builder.vars);
         this.extendsDescriptor = builder.extendsDescriptor;
+        this.providerDescriptor = builder.providerDescriptor;
         this.expressionRefs = AuraUtil.immutableSet(builder.expressionRefs);
-        this.hashCode = AuraUtil.hashCode(descriptor, location, extendsDescriptor, imports, vars);
+        this.hashCode = AuraUtil.hashCode(super.hashCode(), extendsDescriptor, imports, vars, providerDescriptor);
     }
 
     @Override
-    public boolean isLocalTheme() {
-        return isLocal;
+    public boolean isCmpTheme() {
+        return isCmpTheme;
     }
 
     @Override
@@ -83,15 +87,42 @@ public final class ThemeDefImpl extends RootDefinitionImpl<ThemeDef> implements 
     }
 
     @Override
+    public DefDescriptor<ThemeProviderDef> getThemeProviderDescriptor() {
+        return providerDescriptor;
+    }
+
+    @Override
+    public boolean isConcrete() {
+        return providerDescriptor == null;
+    }
+
+    @Override
+    public DefDescriptor<ThemeDef> getConcreteDescriptor() throws QuickFixException {
+        if (providerDescriptor == null) {
+            return descriptor;
+        }
+
+        DefDescriptor<ThemeDef> provided = providerDescriptor.getDef().provide();
+        while (!provided.getDef().isConcrete()) {
+            provided = provided.getDef().getConcreteDescriptor();
+        }
+        return provided;
+    }
+
+    @Override
     public boolean hasVar(String name) throws QuickFixException {
         if (vars.containsKey(name)) {
             return true;
         }
         for (DefDescriptor<ThemeDef> theme : imports) {
-            if (theme.getDef().hasVar(name)) return true;
+            if (theme.getDef().hasVar(name)) {
+                return true;
+            }
         }
         if (extendsDescriptor != null) {
-            if (extendsDescriptor.getDef().hasVar(name)) return true;
+            if (extendsDescriptor.getDef().hasVar(name)) {
+                return true;
+            }
         }
         return false;
     }
@@ -110,7 +141,9 @@ public final class ThemeDefImpl extends RootDefinitionImpl<ThemeDef> implements 
 
         for (DefDescriptor<ThemeDef> theme : imports) {
             Optional<VarDef> value = theme.getDef().getVarDef(name);
-            if (value.isPresent()) return value;
+            if (value.isPresent()) {
+                return value;
+            }
         }
 
         if (extendsDescriptor != null) {
@@ -137,7 +170,9 @@ public final class ThemeDefImpl extends RootDefinitionImpl<ThemeDef> implements 
 
     @Override
     public Iterable<String> getImportedNames() throws QuickFixException {
-        if (imports.isEmpty()) return ImmutableSet.of();
+        if (imports.isEmpty()) {
+            return ImmutableSet.of();
+        }
 
         List<Iterable<String>> iterables = Lists.newArrayList();
         for (DefDescriptor<ThemeDef> theme : imports) {
@@ -172,6 +207,38 @@ public final class ThemeDefImpl extends RootDefinitionImpl<ThemeDef> implements 
 
         for (VarDef def : vars.values()) {
             def.validateDefinition();
+        }
+
+        // themes with providers are basically only expected to be used in isolation from other features
+        if (providerDescriptor != null) {
+            if (!vars.isEmpty()) {
+                String msg = String.format("Theme %s must not specify vars if using a provider", descriptor);
+                throw new InvalidDefinitionException(msg, getLocation());
+            }
+
+            if (!imports.isEmpty()) {
+                String msg = String.format("Theme %s must not specify imports if using a provider", descriptor);
+                throw new InvalidDefinitionException(msg, getLocation());
+            }
+
+            if (extendsDescriptor != null) {
+                String msg = String.format("Theme %s must not use 'extends' and 'provider' attributes together",
+                        descriptor);
+                throw new InvalidDefinitionException(msg, getLocation());
+            }
+
+            // component-bundle themes can't use a provider
+            if (isCmpTheme) {
+                String msg = String.format("Component theme %s must not specify a provider", descriptor);
+                throw new InvalidDefinitionException(msg, getLocation());
+            }
+
+            // namespace default theme should not utilize a provider
+            DefDescriptor<ThemeDef> nsDefaultTheme = Themes.getNamespaceDefaultTheme(descriptor);
+            if (nsDefaultTheme.equals(descriptor)) {
+                String msg = String.format("Namespace-default theme %s must not specify a provider", descriptor);
+                throw new InvalidDefinitionException(msg, getLocation());
+            }
         }
     }
 
@@ -208,32 +275,32 @@ public final class ThemeDefImpl extends RootDefinitionImpl<ThemeDef> implements 
                 throw new InvalidDefinitionException(msg, getLocation());
             }
 
-            // local themes can't extend other themes. This is an arbitrary restriction to prevent improper usage.
+            // cmp themes can't extend other themes. This is an arbitrary restriction to prevent improper usage.
             // if changing, be sure to look over any impact on appendDependencies as well.
-            if (isLocal) {
-                String msg = String.format("Local theme %s must not extend any other theme", descriptor);
+            if (isCmpTheme) {
+                String msg = String.format("Component theme %s must not extend any other theme", descriptor);
                 throw new InvalidDefinitionException(msg, getLocation());
             }
 
-            // the parent theme must not be a local theme. This would usually be a mistake/improper usage.
-            if (extendsDescriptor.getDef().isLocalTheme()) {
-                String msg = String.format("Theme %s must not extend from a local theme", descriptor);
+            // the parent theme must not be a cmp theme. This would usually be a mistake/improper usage.
+            if (extendsDescriptor.getDef().isCmpTheme()) {
+                String msg = String.format("Theme %s must not extend from a component theme", descriptor);
                 throw new InvalidDefinitionException(msg, getLocation());
             }
         }
 
-        // local themes cannot import. most of the time this would be improper usage
+        // cmp themes cannot import. most of the time this would be improper usage.
         // if changing, be sure to look over any impact on appendDependencies as well.
-        if (isLocal && !imports.isEmpty()) {
-            throw new InvalidDefinitionException("Local themes cannot import another theme", getLocation());
+        if (isCmpTheme && !imports.isEmpty()) {
+            throw new InvalidDefinitionException("Component themes cannot import another theme", getLocation());
         }
 
         for (DefDescriptor<ThemeDef> theme : imports) {
             ThemeDef def = theme.getDef();
 
-            // can't import a local theme
-            if (def.isLocalTheme()) {
-                String msg = String.format("Theme %s cannot be imported because it is a local theme", theme);
+            // can't import a cmp theme
+            if (def.isCmpTheme()) {
+                String msg = String.format("Theme %s cannot be imported because it is a component theme", theme);
                 throw new InvalidDefinitionException(msg, getLocation());
             }
 
@@ -244,7 +311,13 @@ public final class ThemeDefImpl extends RootDefinitionImpl<ThemeDef> implements 
                 throw new InvalidDefinitionException(msg, getLocation());
             }
 
-            // TODONM imported themes can't use a provider
+            // can't import a theme that uses a provider. If we allowed this, it would pose unique challenges to
+            // properly detect "changes" and determine hash identity (for example, if an imported theme used a provider
+            // that suddenly returns a different result, the importing theme wouldn't know about that change).
+            if (def.getThemeProviderDescriptor() != null) {
+                String msg = String.format("Theme %s cannot be imported since it uses the 'provider' attribute", theme);
+                throw new InvalidDefinitionException(msg, getLocation());
+            }
         }
 
         // vars
@@ -253,10 +326,10 @@ public final class ThemeDefImpl extends RootDefinitionImpl<ThemeDef> implements 
         }
 
         // verify var cross references refer to something defined on this theme or on a parent theme. Or if this is a
-        // local theme it can also refer to something on the namespace default theme.
+        // cmp theme it can also refer to something on the namespace default theme.
         Iterable<String> names = getAllNames();
 
-        if (isLocal) {
+        if (isCmpTheme) {
             DefDescriptor<ThemeDef> nsDefaultTheme = Themes.getNamespaceDefaultTheme(descriptor);
             if (nsDefaultTheme.exists()) {
                 names = Iterables.concat(names, nsDefaultTheme.getDef().getAllNames());
@@ -275,6 +348,10 @@ public final class ThemeDefImpl extends RootDefinitionImpl<ThemeDef> implements 
     public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
         super.appendDependencies(dependencies);
 
+        if (providerDescriptor != null) {
+            dependencies.add(providerDescriptor);
+        }
+
         if (extendsDescriptor != null) {
             dependencies.add(extendsDescriptor);
         }
@@ -285,8 +362,8 @@ public final class ThemeDefImpl extends RootDefinitionImpl<ThemeDef> implements 
 
         dependencies.addAll(imports);
 
-        // local themes might cross reference a a global var from the namespace-default theme
-        if (isLocal) {
+        // cmp themes might cross reference a global var from the namespace-default theme
+        if (isCmpTheme) {
             Set<String> names = getDeclaredNames();
             DefDescriptor<ThemeDef> nsDefaultTheme = Themes.getNamespaceDefaultTheme(descriptor);
             for (PropertyReference ref : expressionRefs) {
@@ -337,6 +414,30 @@ public final class ThemeDefImpl extends RootDefinitionImpl<ThemeDef> implements 
     }
 
     @Override
+    public DefDescriptor<ProviderDef> getProviderDescriptor() throws QuickFixException {
+        // prevent confusion with theme provider
+        throw new UnsupportedOperationException("method not supported on ThemeDef");
+    }
+
+    @Override
+    public ProviderDef getLocalProviderDef() throws QuickFixException {
+        // prevent confusion with theme provider
+        throw new UnsupportedOperationException("method not supported on ThemeDef");
+    }
+
+    @Override
+    public ProviderDef getProviderDef() throws QuickFixException {
+        // prevent confusion with theme provider
+        throw new UnsupportedOperationException("method not supported on ThemeDef");
+    }
+
+    @Override
+    public boolean isInConcreteAndHasLocalProvider() throws QuickFixException {
+        // prevent confusion with theme provider
+        throw new UnsupportedOperationException("method not supported on ThemeDef");
+    }
+
+    @Override
     public int hashCode() {
         return hashCode;
     }
@@ -349,15 +450,17 @@ public final class ThemeDefImpl extends RootDefinitionImpl<ThemeDef> implements 
                     && Objects.equal(location, other.location)
                     && Objects.equal(extendsDescriptor, other.extendsDescriptor)
                     && Objects.equal(imports, other.imports)
-                    && Objects.equal(vars, other.vars);
+                    && Objects.equal(vars, other.vars)
+                    && Objects.equal(providerDescriptor, other.providerDescriptor);
         }
 
         return false;
     }
 
     public static final class Builder extends RootDefinitionImpl.Builder<ThemeDef> implements ThemeDefBuilder {
-        private boolean isLocal;
+        private boolean isCmpTheme;
         private DefDescriptor<ThemeDef> extendsDescriptor;
+        private DefDescriptor<ThemeProviderDef> providerDescriptor;
         private Set<PropertyReference> expressionRefs;
         private Set<DefDescriptor<ThemeDef>> imports = Sets.newLinkedHashSet();
         private Map<String, VarDef> vars = Maps.newLinkedHashMap();
@@ -367,8 +470,8 @@ public final class ThemeDefImpl extends RootDefinitionImpl<ThemeDef> implements 
         }
 
         @Override
-        public Builder setIsLocal(boolean isLocal) {
-            this.isLocal = isLocal;
+        public Builder setIsCmpTheme(boolean isCmpTheme) {
+            this.isCmpTheme = isCmpTheme;
             return this;
         }
 
@@ -380,7 +483,7 @@ public final class ThemeDefImpl extends RootDefinitionImpl<ThemeDef> implements 
 
         @Override
         public Builder addImport(DefDescriptor<ThemeDef> themeDescriptor) {
-            // this check should be done by the handler, but in case this theme is being built by something else we
+            // this check is also done by the handler, but in case this theme is being built by something else we
             // still need to check it. imports must come first in order to correctly indicate that while
             // "last one wins", declared vars will always win out over vars from imports. If that fact changes, this
             // check can go away. This is mainly for simplifying the var lookup implementation, while still
@@ -394,6 +497,11 @@ public final class ThemeDefImpl extends RootDefinitionImpl<ThemeDef> implements 
         @Override
         public Builder addVarDef(VarDef var) {
             vars.put(var.getName(), var);
+            return this;
+        }
+
+        public Builder setProviderDescriptor(DefDescriptor<ThemeProviderDef> providerDescriptor) {
+            this.providerDescriptor = providerDescriptor;
             return this;
         }
 
@@ -430,6 +538,12 @@ public final class ThemeDefImpl extends RootDefinitionImpl<ThemeDef> implements 
         @Override
         public void addAttributeDef(DefDescriptor<AttributeDef> attrdesc, AttributeDef attributeDef) {
             throw new UnsupportedOperationException("use var defs instead of attribute defs");
+        }
+
+        @Override
+        public void addProvider(String name) {
+            // prevent confusion with theme provider
+            throw new UnsupportedOperationException("use setProviderDescriptor instead");
         }
     }
 }

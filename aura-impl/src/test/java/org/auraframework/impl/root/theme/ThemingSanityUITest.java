@@ -52,11 +52,11 @@ public class ThemingSanityUITest extends WebDriverTestCase {
     }
 
     /**
-     * Verify theme extension.
+     * Verify theme override.
      * 
      * @throws Exception
      */
-    public void testThemeExtension() throws Exception {
+    public void testThemeOverride() throws Exception {
         // base theme
         final String expectedHeight1 = "300px";
         final String expectedColor1 = "rgba(255, 0, 0, 1)"; // red
@@ -66,7 +66,7 @@ public class ThemingSanityUITest extends WebDriverTestCase {
         final String expectedColor2 = "rgba(255, 255, 0, 1)"; // yellow
         final String expectedBgColor2 = "rgba(0, 128, 0, 1)"; // green
 
-        open("/themeSanityTest/themeExtension.app");
+        open("/themeSanityTest/usingOverride.app");
 
         String actualHeight1 = getDriver().findElement(By.cssSelector(".themeSanityTestHeader")).getCssValue("height");
         String actualColor1 = getDriver().findElement(By.cssSelector(".themeSanityTestHeader")).getCssValue("color");

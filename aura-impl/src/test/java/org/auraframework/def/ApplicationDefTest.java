@@ -230,21 +230,31 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
     /** verify that we set the correct theme descriptor when there is an explicit theme on the app tag */
     public void testExplicitTheme() throws QuickFixException {
         DefDescriptor<ThemeDef> theme = addSourceAutoCleanup(ThemeDef.class, "<aura:theme></aura:theme>");
-
-        String src = String.format("<aura:application overrideTheme=\"%s\"/>", theme.getDescriptorName());
+        String src = String.format("<aura:application theme=\"%s\"/>", theme.getDescriptorName());
         DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class, src);
-        assertEquals(theme, desc.getDef().getOverrideThemeDescriptor());
+        assertEquals(theme, desc.getDef().getThemeDescriptor());
     }
 
-    /** verify that we set the correct theme descriptor when there is only a bundle theme */
-    public void testBundleTheme() throws QuickFixException {
-        DefDescriptor<ThemeDef> theme = addSourceAutoCleanup(ThemeDef.class, "<aura:theme></aura:theme>");
+    /** verify that we set the correct theme descriptor when there is an explicit theme and a cmp theme */
+    public void testExplicitAndCmpTheme() throws QuickFixException {
+        // standalone theme
+        DefDescriptor<ThemeDef> explicitTheme = addSourceAutoCleanup(ThemeDef.class, "<aura:theme></aura:theme>");
 
-        String src = "<aura:application/>";
-        DefDescriptor<ApplicationDef> desc = DefDescriptorImpl.getInstance(theme.getDescriptorName(),
-                ApplicationDef.class);
-        addSourceAutoCleanup(desc, src);
-        assertEquals(theme, desc.getDef().getOverrideThemeDescriptor());
+        // style
+        DefDescriptor<StyleDef> styleDesc = addSourceAutoCleanup(StyleDef.class, ".THIS{}");
+
+        // theme is in same bundle as style
+        String qn = String.format("%s:%s", styleDesc.getNamespace(), styleDesc.getName());
+        DefDescriptor<ThemeDef> cmpTheme = DefDescriptorImpl.getInstance(qn, ThemeDef.class);
+        addSourceAutoCleanup(cmpTheme, "<aura:theme/>");
+
+        // app is in same bundle as theme and style
+        DefDescriptor<ApplicationDef> appDesc = DefDescriptorImpl.getInstance(qn, ApplicationDef.class);
+        String src = String.format("<aura:application theme=\"%s\"/>", explicitTheme.getDescriptorName());
+        addSourceAutoCleanup(appDesc, src);
+
+        // cmp theme should not have an impact, explicit theme should be used
+        assertEquals(explicitTheme, appDesc.getDef().getThemeDescriptor());
     }
 
     /** verify that we set the correct theme descriptor when there is only the namespace default theme */
@@ -260,7 +270,7 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
                 String.format("%s:%s", dummy.getNamespace(), getAuraTestingUtil().getNonce(getName())),
                 ApplicationDef.class);
         addSourceAutoCleanup(desc, src);
-        assertEquals(nsTheme, desc.getDef().getOverrideThemeDescriptor());
+        assertEquals(nsTheme, desc.getDef().getThemeDescriptor());
     }
 
     /** an empty value for the theme attr means that you don't want any theme, even the implicit one */
@@ -271,18 +281,18 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
                 String.format("%s:%sTheme", dummy.getNamespace(), dummy.getNamespace()), ThemeDef.class);
         addSourceAutoCleanup(nsTheme, "<aura:theme></aura:theme>");
 
-        String src = "<aura:application overrideTheme=''/>";
+        String src = "<aura:application theme=''/>";
         DefDescriptor<ApplicationDef> desc = DefDescriptorImpl.getInstance(
                 String.format("%s:%s", dummy.getNamespace(), getAuraTestingUtil().getNonce(getName())),
                 ApplicationDef.class);
         addSourceAutoCleanup(desc, src);
-        assertNull(desc.getDef().getOverrideThemeDescriptor());
+        assertNull(desc.getDef().getThemeDescriptor());
     }
 
     /** verify theme descriptor is added to dependency set */
     public void testThemeAddedToDeps() throws QuickFixException {
         DefDescriptor<ThemeDef> theme = addSourceAutoCleanup(ThemeDef.class, "<aura:theme></aura:theme>");
-        String src = String.format("<aura:application overrideTheme=\"%s\"/>", theme.getDescriptorName());
+        String src = String.format("<aura:application theme=\"%s\"/>", theme.getDescriptorName());
         DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class, src);
 
         Set<DefDescriptor<?>> deps = Sets.newHashSet();
@@ -292,7 +302,7 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
 
     /** verify theme descriptor ref is validated */
     public void testInvalidThemeRef() throws QuickFixException {
-        String src = String.format("<aura:application overrideTheme=\"%s\"/>", "wall:maria");
+        String src = String.format("<aura:application theme=\"%s\"/>", "wall:maria");
         DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class, src);
 
         try {
@@ -303,38 +313,22 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
         }
     }
 
-    /** however the application's bundle theme can be the override theme */
-    public void testOverrideThemeCantBeLocalTheme() throws QuickFixException {
+    /** an application can't specify a cmp bundle theme as its theme (even the one in its own bundle) */
+    public void testAppThemeCantBeCmpTheme() throws QuickFixException {
         DefDescriptor<StyleDef> styleDesc = addSourceAutoCleanup(StyleDef.class, ".THIS{}");
 
         String fmt = String.format("%s:%s", styleDesc.getNamespace(), styleDesc.getName());
         DefDescriptor<ThemeDef> themeDesc = DefDescriptorImpl.getInstance(fmt, ThemeDef.class);
         addSourceAutoCleanup(themeDesc, "<aura:theme/>");
 
-        String src = String.format("<aura:application overrideTheme=\"%s\"/>", themeDesc.getDescriptorName());
+        String src = String.format("<aura:application theme=\"%s\"/>", themeDesc.getDescriptorName());
         DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class, src);
 
         try {
             desc.getDef().validateReferences();
             fail("expected to get an exception");
         } catch (Exception e) {
-            checkExceptionContains(e, InvalidDefinitionException.class, "local theme");
+            checkExceptionContains(e, InvalidDefinitionException.class, "must not specify");
         }
-    }
-
-    /** verify that the override theme cannot be a local theme */
-    public void testOverrideThemeIsBundleTheme() throws QuickFixException {
-        DefDescriptor<StyleDef> styleDesc = addSourceAutoCleanup(StyleDef.class, ".THIS{}");
-
-        String fmt = String.format("%s:%s", styleDesc.getNamespace(), styleDesc.getName());
-        DefDescriptor<ThemeDef> themeDesc = DefDescriptorImpl.getInstance(fmt, ThemeDef.class);
-        addSourceAutoCleanup(themeDesc, "<aura:theme/>");
-
-        DefDescriptor<ApplicationDef> appDesc = DefDescriptorImpl.getInstance(fmt, ApplicationDef.class);
-        addSourceAutoCleanup(appDesc, "<aura:application/>");
-
-        assertTrue(themeDesc.getDef().isLocalTheme());
-        assertSame(appDesc.getDef().getLocalThemeDescriptor(), appDesc.getDef().getOverrideThemeDescriptor());
-        appDesc.getDef().validateReferences(); // no error
     }
 }

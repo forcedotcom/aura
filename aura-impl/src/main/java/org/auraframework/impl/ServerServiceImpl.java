@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.auraframework.Aura;
-import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
@@ -150,12 +149,6 @@ public class ServerServiceImpl implements ServerService {
         final String key = "CSS:" + context.getClient().getType() + "$" + mKey + uid;
 
         context.setPreloading(true);
-
-        if (context.getOverrideThemeDescriptor() == null && appDesc != null
-                && appDesc.getDefType() == DefType.APPLICATION) {
-            ApplicationDef app = ((ApplicationDef) appDesc.getDef());
-            context.setOverrideThemeDescriptor(app.getOverrideThemeDescriptor());
-        }
 
         String cached = context.getDefRegistry().getCachedString(uid, appDesc, key);
         if (cached == null) {

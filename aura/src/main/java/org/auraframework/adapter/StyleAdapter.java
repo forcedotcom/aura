@@ -16,25 +16,24 @@
 package org.auraframework.adapter;
 
 import org.auraframework.css.ThemeValueProvider;
-import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
 import org.auraframework.def.ThemeDef;
 import org.auraframework.system.AuraContext;
+import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
  * Adapter for CSS/Style stuff.
  */
 public interface StyleAdapter extends AuraAdapter {
     /**
-     * Gets a {@link ThemeValueProvider} using whatever {@link ThemeDef} override is specified on the current
-     * {@link AuraContext}, or the {@link ApplicationDef#getOverrideThemeDescriptor()}. This is usually the method you
-     * want.
+     * Gets a {@link ThemeValueProvider} using whatever theme overrides are set on the current {@link AuraContext}. This
+     * is usually the method you want.
      * 
      * @param descriptor The {@link StyleDef} descriptor of the CSS file being parsed. This is used to determine which
      *            namespace-default {@link ThemeDef} to use, as well as which component-bundle {@link ThemeDef} to use.
      */
-    ThemeValueProvider getThemeValueProvider(DefDescriptor<StyleDef> descriptor);
+    ThemeValueProvider getThemeValueProvider(DefDescriptor<StyleDef> descriptor) throws QuickFixException;
 
     /**
      * Gets a {@link ThemeValueProvider} using the given override theme.
@@ -43,7 +42,8 @@ public interface StyleAdapter extends AuraAdapter {
      *            namespace-default {@link ThemeDef} to use, as well as which component-bundle {@link ThemeDef} to use.
      * @param override Use this {@link ThemeDef} as the override theme.
      */
-    ThemeValueProvider getThemeValueProvider(DefDescriptor<StyleDef> descriptor, DefDescriptor<ThemeDef> override);
+    ThemeValueProvider getThemeValueProvider(DefDescriptor<StyleDef> descriptor, DefDescriptor<ThemeDef> override)
+            throws QuickFixException;
 
     /**
      * Gets a {@link ThemeValueProvider} that doesn't use any override theme (even if one is set on the current
@@ -52,5 +52,5 @@ public interface StyleAdapter extends AuraAdapter {
      * @param descriptor The {@link StyleDef} descriptor of the CSS file being parsed. This is used to determine which
      *            namespace-default {@link ThemeDef} to use, as well as which component-bundle {@link ThemeDef} to use.
      */
-    ThemeValueProvider getThemeValueProviderNoOverrides(DefDescriptor<StyleDef> descriptor);
+    ThemeValueProvider getThemeValueProviderNoOverrides(DefDescriptor<StyleDef> descriptor) throws QuickFixException;
 }

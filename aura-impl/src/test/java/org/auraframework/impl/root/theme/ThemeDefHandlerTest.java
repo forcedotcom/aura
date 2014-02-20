@@ -22,6 +22,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.ThemeDef;
 import org.auraframework.def.VarDef;
 import org.auraframework.impl.css.StyleTestCase;
+import org.auraframework.impl.java.provider.TestThemeProvider;
 import org.auraframework.impl.root.parser.handler.ThemeDefHandler;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 
@@ -123,13 +124,23 @@ public class ThemeDefHandlerTest extends StyleTestCase {
         assertNull(theme.getDef().getExtendsDescriptor());
     }
 
-    public void testIsLocalThemeFalse() throws Exception {
+    public void testIsCmpThemeFalse() throws Exception {
         DefDescriptor<ThemeDef> theme = addSeparateTheme(theme().var("color", "red"));
-        assertFalse(theme.getDef().isLocalTheme());
+        assertFalse(theme.getDef().isCmpTheme());
     }
 
-    public void testIsLocalThemeTrue() throws Exception {
+    public void testIsCmpThemeTrue() throws Exception {
         DefDescriptor<ThemeDef> theme = addThemeAndStyle(theme().var("color", "red"), ".THIS{}");
-        assertTrue(theme.getDef().isLocalTheme());
+        assertTrue(theme.getDef().isCmpTheme());
+    }
+
+    public void testProvider() throws Exception {
+        DefDescriptor<ThemeDef> theme = addSeparateTheme(theme().provider(TestThemeProvider.REF));
+        assertEquals(TestThemeProvider.REF, theme.getDef().getThemeProviderDescriptor().getQualifiedName());
+    }
+
+    public void testEmptyProvider() throws Exception {
+        DefDescriptor<ThemeDef> theme = addSeparateTheme(theme().provider(""));
+        assertNull(theme.getDef().getThemeProviderDescriptor());
     }
 }

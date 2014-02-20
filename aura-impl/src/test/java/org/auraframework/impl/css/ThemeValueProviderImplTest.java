@@ -19,7 +19,9 @@ import org.auraframework.css.ThemeValueProvider;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
 import org.auraframework.def.ThemeDef;
+import org.auraframework.def.ThemeDescriptorProvider;
 import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.system.Annotations.Provider;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -44,29 +46,29 @@ public class ThemeValueProviderImplTest extends StyleTestCase {
     /** check that a simple resolves */
     public void testSimple() throws QuickFixException {
         addNsTheme(theme().var("color", "red"));
-        assertEquals("red", provider().getValue("color", null));
+        assertEquals("red", tvp().getValue("color", null));
     }
 
-    /** check that a value from the local theme resolves */
-    public void testLocalTheme() throws QuickFixException {
+    /** check that a value from the cmp theme resolves */
+    public void testCmpTheme() throws QuickFixException {
         DefDescriptor<StyleDef> style = addStyleDef(".THIS{}");
-        addLocalTheme(theme().var("color", "red"), style);
-        assertEquals("red", provider(style).getValue("color", null));
+        addCmpTheme(theme().var("color", "red"), style);
+        assertEquals("red", tvp(style).getValue("color", null));
     }
 
-    /** check that a value from the local theme preempts namespace default */
-    public void testLocalThemePreemptsNsDefaultTheme() throws QuickFixException {
+    /** check that a value from the cmp theme preempts namespace default */
+    public void testCmpThemePreemptsNsDefaultTheme() throws QuickFixException {
         addNsTheme(theme().var("color", "red"));
         DefDescriptor<StyleDef> style = addStyleDef(".THIS{}");
-        addLocalTheme(theme().var("color", "green"), style);
-        assertEquals("green", provider(style).getValue("color", null));
+        addCmpTheme(theme().var("color", "green"), style);
+        assertEquals("green", tvp(style).getValue("color", null));
     }
 
     /** confirm that we get the right inherited var value */
     public void testInherited() throws QuickFixException {
         DefDescriptor<ThemeDef> parent = addSeparateTheme(theme().var("color", "red"));
         addNsTheme(theme().parent(parent).var("margin", "10px"));
-        assertEquals("red", provider().getValue("color", null));
+        assertEquals("red", tvp().getValue("color", null));
     }
 
     /** confirm that we get the value from an override theme instead of the original */
@@ -84,21 +86,41 @@ public class ThemeValueProviderImplTest extends StyleTestCase {
         assertEquals("blue", overridden(override).getValue("color", null));
     }
 
-    /** confirm even if a local theme exists, the override wins */
+    /** confirm even if a cmp theme exists, the override wins */
     public void testOverridePremptsLocalAndNsDefaultThemes() throws QuickFixException {
         addNsTheme(theme().var("color", "red"));
 
         DefDescriptor<StyleDef> style = addStyleDef(".THIS{}");
-        addLocalTheme(theme().var("color", "green"), style);
+        addCmpTheme(theme().var("color", "green"), style);
 
         DefDescriptor<ThemeDef> override = addSeparateTheme(theme().var("color", "blue"));
+        assertEquals("blue", overridden(override, style).getValue("color", null));
+    }
+
+    @Provider
+    public static final class TmpProvider implements ThemeDescriptorProvider {
+        @Override
+        public DefDescriptor<ThemeDef> provide() throws QuickFixException {
+            return DefDescriptorImpl.getInstance("themeProviderTest:tvp", ThemeDef.class);
+        }
+    }
+
+    /** the override theme may utilize a provider, in which case we should find and use the concrete theme */
+    public void testOverrideUsesProvider() throws QuickFixException {
+        addNsTheme(theme().var("color", "red"));
+
+        DefDescriptor<StyleDef> style = addStyleDef(".THIS{}");
+
+        String prov = "java://" + TmpProvider.class.getName();
+        DefDescriptor<ThemeDef> override = addSeparateTheme(theme().provider(prov));
+
         assertEquals("blue", overridden(override, style).getValue("color", null));
     }
 
     /** check that we get an error if the namespace default theme doesn't exist */
     public void testNamespaceThemeDoesntExist() throws QuickFixException {
         try {
-            provider().getValue("color", null);
+            tvp().getValue("color", null);
             fail("expected an exception");
         } catch (Exception e) {
             checkExceptionContains(e, DefinitionNotFoundException.class, "No THEME");
@@ -109,15 +131,15 @@ public class ThemeValueProviderImplTest extends StyleTestCase {
     public void testVariableDoesntExist() throws QuickFixException {
         addNsTheme(theme().var("color", "red"));
         try {
-            provider().getValue("roloc", null);
+            tvp().getValue("roloc", null);
             fail("expected an exception");
         } catch (Exception e) {
             checkExceptionContains(e, ThemeValueNotFoundException.class, "was not found");
         }
     }
 
-    /** confirm that we get an error if the override theme is specified but non existant */
-    public void testOverrideThemeDefDoesntExist() throws QuickFixException {
+    /** confirm that we get an error if the override theme is specified but non existent */
+    public void testAppThemeDefDoesntExist() throws QuickFixException {
         addNsTheme(theme().var("color", "red"));
         DefDescriptor<ThemeDef> override = DefDescriptorImpl.getInstance("idont:exist", ThemeDef.class);
 
@@ -143,7 +165,7 @@ public class ThemeValueProviderImplTest extends StyleTestCase {
     public void testMalformedLong() throws QuickFixException {
         addNsTheme(theme().var("color", "red"));
         try {
-            provider().getValue("blah.blah.blah", null);
+            tvp().getValue("blah.blah.blah", null);
             fail("expected to get an exception");
         } catch (Exception e) {
             checkExceptionContains(e, AuraRuntimeException.class, "Invalid number of parts");
@@ -153,14 +175,14 @@ public class ThemeValueProviderImplTest extends StyleTestCase {
     /** confirm that cross referencing a var defined in the same theme def resolves */
     public void testCrossReferenceSelf() throws QuickFixException {
         addNsTheme(theme().var("color", "red").var("myColor", "{!color}"));
-        assertEquals("red", provider().getValue("myColor", null));
+        assertEquals("red", tvp().getValue("myColor", null));
     }
 
     /** confirm that cross referencing a var defined in a parent theme def resolves */
     public void testCrossReferenceInherited() throws QuickFixException {
         DefDescriptor<ThemeDef> parent = addSeparateTheme(theme().var("color", "red"));
         addNsTheme(theme().parent(parent).var("myColor", "{!color}"));
-        assertEquals("red", provider().getValue("color", null));
+        assertEquals("red", tvp().getValue("color", null));
     }
 
     /** confirm that an error is thrown if the cross referenced var doesn't exist */
@@ -168,26 +190,29 @@ public class ThemeValueProviderImplTest extends StyleTestCase {
         addNsTheme(theme().var("myColor", "{!color}"));
 
         try {
-            provider().getValue("myColor", null);
+            tvp().getValue("myColor", null);
             fail("expected to get an exception");
         } catch (Exception e) {
             checkExceptionContains(e, ThemeValueNotFoundException.class, "was not found");
         }
     }
 
-    private ThemeValueProvider provider() {
-        return provider(def);
+    /** tvp = theme value provider */
+    private ThemeValueProvider tvp() throws QuickFixException {
+        return tvp(def);
     }
 
-    private ThemeValueProvider provider(DefDescriptor<StyleDef> def) {
+    /** tvp = theme value provider */
+    private ThemeValueProvider tvp(DefDescriptor<StyleDef> def) throws QuickFixException {
         return new ThemeValueProviderImpl(def, null);
     }
 
-    private ThemeValueProvider overridden(DefDescriptor<ThemeDef> override) {
+    private ThemeValueProvider overridden(DefDescriptor<ThemeDef> override) throws QuickFixException {
         return overridden(override, def);
     }
 
-    private ThemeValueProvider overridden(DefDescriptor<ThemeDef> override, DefDescriptor<StyleDef> def) {
+    private ThemeValueProvider overridden(DefDescriptor<ThemeDef> override, DefDescriptor<StyleDef> def)
+            throws QuickFixException {
         return new ThemeValueProviderImpl(def, override);
     }
 }

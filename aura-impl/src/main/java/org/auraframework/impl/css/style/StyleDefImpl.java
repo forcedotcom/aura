@@ -63,11 +63,11 @@ public class StyleDefImpl extends DefinitionImpl<StyleDef> implements StyleDef {
 
         if (!expressions.isEmpty()) {
             // we know that any expression means we have a dependency on a theme, but we can't determine here if that is
-            // only a dependency on the local theme, only on the namespace-default, or both (however if the expression
-            // references a var not defined in either then a QFE will be thrown during #validateReferences).
-            DefDescriptor<ThemeDef> localTheme = Themes.getLocalTheme(descriptor);
-            if (localTheme.exists()) {
-                dependencies.add(localTheme);
+            // only a dependency on the component theme, only on the namespace-default, or both (however if the
+            // expression references a var not defined in either then a QFE will be thrown during #validateReferences).
+            DefDescriptor<ThemeDef> cmpTheme = Themes.getCmpTheme(descriptor);
+            if (cmpTheme.exists()) {
+                dependencies.add(cmpTheme);
             }
 
             DefDescriptor<ThemeDef> namespaceTheme = Themes.getNamespaceDefaultTheme(descriptor);

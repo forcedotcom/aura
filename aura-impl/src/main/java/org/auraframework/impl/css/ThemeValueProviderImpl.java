@@ -41,17 +41,18 @@ import com.google.common.base.Optional;
 public final class ThemeValueProviderImpl implements ThemeValueProvider {
     private static final String MALFORMED = "Invalid number of parts in theme reference, for theme function argument '%s'";
 
-    private final DefDescriptor<ThemeDef> localTheme;
+    private final DefDescriptor<ThemeDef> cmpTheme;
     private final DefDescriptor<ThemeDef> namespaceTheme;
     private final DefDescriptor<ThemeDef> overrideTheme;
 
-    public ThemeValueProviderImpl(DefDescriptor<StyleDef> scope, DefDescriptor<ThemeDef> overrideTheme) {
+    public ThemeValueProviderImpl(DefDescriptor<StyleDef> scope, DefDescriptor<ThemeDef> overrideTheme)
+            throws QuickFixException {
         checkNotNull(scope, "scope cannot be null");
 
-        DefDescriptor<ThemeDef> localTheme = Themes.getLocalTheme(scope);
-        this.localTheme = localTheme.exists() ? localTheme : null;
+        DefDescriptor<ThemeDef> cmpTheme = Themes.getCmpTheme(scope);
+        this.cmpTheme = cmpTheme.exists() ? cmpTheme : null;
         this.namespaceTheme = Themes.getNamespaceDefaultTheme(scope);
-        this.overrideTheme = overrideTheme;
+        this.overrideTheme = overrideTheme != null ? overrideTheme.getDef().getConcreteDescriptor() : null;
     }
 
     @Override
@@ -85,13 +86,17 @@ public final class ThemeValueProviderImpl implements ThemeValueProvider {
         // check from an override
         if (overrideTheme != null) {
             value = overrideTheme.getDef().getVar(reference.getRoot());
-            if (value.isPresent()) return value;
+            if (value.isPresent()) {
+                return value;
+            }
         }
 
         // check from component bundle
-        if (localTheme != null) {
-            value = localTheme.getDef().getVar(reference.getRoot());
-            if (value.isPresent()) return value;
+        if (cmpTheme != null) {
+            value = cmpTheme.getDef().getVar(reference.getRoot());
+            if (value.isPresent()) {
+                return value;
+            }
         }
 
         // check namespace-default theme

@@ -37,21 +37,21 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
     protected Set<String> expectedAttrsInCustomNS;
     protected XMLHandler<?> defHandler;
     private static AtomicLong counter = new AtomicLong();
-    
+
     public DefAttributesVisibilityTest(String name){
         super(name);
     }
-    
+
     public void testVerifyAttributesVisibleInPrivilegedNamespace()throws Exception{
         defHandler = getHandler(false);
         compareExpectedWithActual(expectedAttrsInPrivilegedNS, defHandler);
     }
-    
+
     public void testVerifyAttributesVisibleInCustomNamespace() throws Exception{
         defHandler = getHandler(true);
         compareExpectedWithActual(expectedAttrsInCustomNS, defHandler);
     }
-    
+
     abstract XMLHandler<?> getHandler(boolean b) throws DefinitionNotFoundException;
     private static void compareExpectedWithActual(Set<String> expected, XMLHandler<?> defHandler)throws Exception{
         Set<String> actualAttributes=null;
@@ -62,10 +62,10 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
         }
         Set<String> expectedButAbsent = Sets.newHashSet(expected);
         expectedButAbsent.removeAll(actualAttributes);
-        
+
         Set<String> notExpectedButPresent = Sets.newHashSet(actualAttributes);
         notExpectedButPresent.removeAll(expected);
-        
+
         assertTrue("Expected attributes but not allowed "+ expectedButAbsent+
                 "\n Not expected attributes but allowed "+ notExpectedButPresent, expectedButAbsent.isEmpty()&&notExpectedButPresent.isEmpty());
     }
@@ -83,8 +83,8 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
         private static <T extends Definition> ContainerTagHandler<?> getHandler(boolean isCustomNamespace, Class<T> clazz) throws DefinitionNotFoundException{
             DefDescriptor<T> desc = Aura.getDefinitionService().getDefDescriptor(
                     String.format("%s:%s", (isCustomNamespace?StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE:StringSourceLoader.DEFAULT_NAMESPACE),
-                            "stringResource"+counter), 
-                    clazz);
+                            "stringResource"+counter),
+                            clazz);
             return RootTagHandlerFactory.newInstance((DefDescriptor<RootDefinition>)desc, null, null);
         }
     }
@@ -93,9 +93,9 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
         public void setUp() throws Exception {
             super.setUp();
             expectedAttrsInCustomNS = Sets.newHashSet("access", "description", "implements", "useAppcache", "controller", "model");
-            expectedAttrsInPrivilegedNS = Sets.newHashSet("preload", "layouts", "locationChangeEvent", "additionalAppCacheURLs", "isOnePageApp", 
-                                            "overrideTheme", "render", "template", "provider", "abstract", "extensible", "isTemplate", "extends", 
-                                            "style", "helper", "renderer", "whitespace", "support");
+            expectedAttrsInPrivilegedNS = Sets.newHashSet("preload", "layouts", "locationChangeEvent", "additionalAppCacheURLs", "isOnePageApp",
+                    "theme", "render", "template", "provider", "abstract", "extensible", "isTemplate", "extends",
+                    "style", "helper", "renderer", "whitespace", "support");
             expectedAttrsInPrivilegedNS.addAll(expectedAttrsInCustomNS);
             clazz = ApplicationDef.class;
         }
@@ -108,8 +108,8 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
         public void setUp() throws Exception {
             super.setUp();
             expectedAttrsInCustomNS = Sets.newHashSet("access", "description", "implements", "controller", "model");
-            expectedAttrsInPrivilegedNS = Sets.newHashSet("render", "template", "provider", "abstract", "extensible", "isTemplate", "extends", 
-                                            "style", "helper", "renderer", "whitespace", "support");
+            expectedAttrsInPrivilegedNS = Sets.newHashSet("render", "template", "provider", "abstract", "extensible", "isTemplate", "extends",
+                    "style", "helper", "renderer", "whitespace", "support");
             expectedAttrsInPrivilegedNS.addAll(expectedAttrsInCustomNS);
             clazz = ComponentDef.class;
         }
@@ -143,7 +143,7 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
             super(name);
         }
     }
-    
+
     public static class AttributeDefAttributesVisibilityTest extends DefAttributesVisibilityTest{
         public AttributeDefAttributesVisibilityTest(String name){
             super(name);
@@ -159,8 +159,8 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
         @SuppressWarnings("unchecked")
         XMLHandler<?> getHandler(boolean isCustomNamespace) throws DefinitionNotFoundException{
             return new AttributeDefHandler<ApplicationDef>(
-                    (RootTagHandler<ApplicationDef>)RootDefAttributesVisibilityTest.getHandler(isCustomNamespace, ApplicationDef.class), 
-                    null, 
+                    (RootTagHandler<ApplicationDef>)RootDefAttributesVisibilityTest.getHandler(isCustomNamespace, ApplicationDef.class),
+                    null,
                     null);
         }
     }
@@ -199,8 +199,8 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
         @SuppressWarnings("unchecked")
         XMLHandler<?> getHandler(boolean isCustomNamespace) throws DefinitionNotFoundException{
             return new AttributeDefRefHandler<ApplicationDef>(
-                    (RootTagHandler<ApplicationDef>)RootDefAttributesVisibilityTest.getHandler(isCustomNamespace, ApplicationDef.class), 
-                    null, 
+                    (RootTagHandler<ApplicationDef>)RootDefAttributesVisibilityTest.getHandler(isCustomNamespace, ApplicationDef.class),
+                    null,
                     null);
         }
     }
@@ -219,8 +219,8 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
         @SuppressWarnings("unchecked")
         XMLHandler<?> getHandler(boolean isCustomNamespace) throws DefinitionNotFoundException{
             return new EventHandlerDefHandler(
-                    (RootTagHandler<ApplicationDef>)RootDefAttributesVisibilityTest.getHandler(isCustomNamespace, ApplicationDef.class), 
-                    null, 
+                    (RootTagHandler<ApplicationDef>)RootDefAttributesVisibilityTest.getHandler(isCustomNamespace, ApplicationDef.class),
+                    null,
                     null);
         }
     }

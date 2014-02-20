@@ -121,6 +121,6 @@ public class ComponentDefHandlerTest extends AuraImplTestCase {
         String fmt = String.format("%s:%s", themeDesc.getNamespace(), themeDesc.getName());
         DefDescriptor<ComponentDef> cmpDesc = DefDescriptorImpl.getInstance(fmt, ComponentDef.class);
         addSourceAutoCleanup(cmpDesc, "<aura:component/>");
-        assertEquals(themeDesc, cmpDesc.getDef().getLocalThemeDescriptor());
+        assertEquals(themeDesc, cmpDesc.getDef().getCmpTheme());
     }
 }

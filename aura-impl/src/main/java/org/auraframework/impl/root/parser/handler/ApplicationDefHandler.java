@@ -24,6 +24,7 @@ import org.auraframework.Aura;
 import org.auraframework.def.*;
 import org.auraframework.impl.root.DependencyDefImpl;
 import org.auraframework.impl.root.application.ApplicationDefImpl;
+import org.auraframework.impl.root.theme.Themes;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.instance.Component;
 import org.auraframework.service.DefinitionService;
@@ -131,25 +132,17 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
             appBuilder.isOnePageApp = false;
         }
 
-        String themeName = getAttributeValue(ATTRIBUTE_OVERRIDE_THEME);
-        if (themeName != null) {
-            // an empty string is a valid value, and it means don't use any theme override. this is a way to opt-out of
-            // the implicit default (below)
-            if (!AuraTextUtil.isNullEmptyOrWhitespace(themeName)) {
-                appBuilder.setOverrideThemeDescriptor(DefDescriptorImpl.getInstance(themeName, ThemeDef.class));
+        String theme = getAttributeValue(ATTRIBUTE_THEME);
+        if (theme != null) {
+            // an empty string is a valid value, and it means don't use any theme.
+            // this is a way to opt-out of the implicit default (below)
+            if (!AuraTextUtil.isNullEmptyOrWhitespace(theme)) {
+                appBuilder.setThemeDescriptor(DefDescriptorImpl.getInstance(theme, ThemeDef.class));
             }
         } else {
-            // check for app bundle theme
-            themeName = defDescriptor.getDescriptorName();
-            DefDescriptor<ThemeDef> desc = DefDescriptorImpl.getInstance(themeName, ThemeDef.class);
-            if (desc.exists()) {
-                appBuilder.setOverrideThemeDescriptor(desc);
-            } else {
-                // the implicit theme override for an app is the namespace-default theme, if it exists
-                themeName = String.format("%s:%sTheme", defDescriptor.getNamespace(), defDescriptor.getNamespace());
-                desc = DefDescriptorImpl.getInstance(themeName, ThemeDef.class);
-                appBuilder.setOverrideThemeDescriptor(desc.exists() ? desc : null);
-            }
+            // the implicit theme override for an app is the namespace-default theme, if it exists
+            DefDescriptor<ThemeDef> desc = Themes.getNamespaceDefaultTheme(defDescriptor);
+            appBuilder.setThemeDescriptor(desc.exists() ? desc : null);
         }
     }
 
@@ -180,7 +173,7 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
     private static final String ATTRIBUTE_APPCACHE_ENABLED = "useAppcache";
     private static final String ATTRIBUTE_ADDITIONAL_APPCACHE_URLS = "additionalAppCacheURLs";
     private static final String ATTRIBUTE_IS_ONE_PAGE_APP = "isOnePageApp";
-    private static final String ATTRIBUTE_OVERRIDE_THEME = "overrideTheme";
+    private static final String ATTRIBUTE_THEME = "theme";
 
     private static final Set<String> ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>()
             .add(ATTRIBUTE_APPCACHE_ENABLED)
@@ -188,5 +181,5 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
     
 	private static final Set<String> PRIVILEGED_ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>().add(
 			ATTRIBUTE_PRELOAD, ATTRIBUTE_LAYOUTS, ATTRIBUTE_LOCATION_CHANGE_EVENT, 
-            ATTRIBUTE_ADDITIONAL_APPCACHE_URLS, ATTRIBUTE_IS_ONE_PAGE_APP, ATTRIBUTE_OVERRIDE_THEME).addAll(ALLOWED_ATTRIBUTES).addAll(BaseComponentDefHandler.PRIVILEGED_ALLOWED_ATTRIBUTES).build();
+            ATTRIBUTE_ADDITIONAL_APPCACHE_URLS, ATTRIBUTE_IS_ONE_PAGE_APP, ATTRIBUTE_THEME).addAll(ALLOWED_ATTRIBUTES).addAll(BaseComponentDefHandler.PRIVILEGED_ALLOWED_ATTRIBUTES).build();
 }

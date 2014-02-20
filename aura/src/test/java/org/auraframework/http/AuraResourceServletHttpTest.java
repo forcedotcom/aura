@@ -46,8 +46,13 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
         super(name);
     }
 
+    /**
+     * Verify style def ordering for components included as facets.
+     * Create a chain of components as facet and verify the order of css(Style Defs)
+     * @throws Exception
+     */
     @TestLabels("auraSanity")
-    public void testCSSOrdering() throws Exception {
+    public void testCSSOrdering_AcrossFacets() throws Exception {
         String modeAndContext = getContext(Mode.DEV, Format.CSS, "auratest:test_css_a", ComponentDef.class, false);
         String url = "/l/" + AuraTextUtil.urlencode(modeAndContext) + "/app.css";
         HttpGet get = obtainGetMethod(url);
@@ -67,6 +72,27 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
         assertTrue("_d must come before _c in: "+response, idx_d < idx_c);
         assertTrue("_c must come before _b in: "+response, idx_c < idx_b);
         assertTrue("_b must come before _a in: "+response, idx_b < idx_a);
+    }
+
+    @TestLabels("auraSanity")
+    public void testCSSOrdering_AcrossInheritance() throws Exception {
+        String modeAndContext = getContext(Mode.DEV, Format.CSS, "auratest:test_css_child", ComponentDef.class, false);
+        String url = "/l/" + AuraTextUtil.urlencode(modeAndContext) + "/app.css";
+        HttpGet get = obtainGetMethod(url);
+        HttpResponse httpResponse = perform(get);
+        int statusCode = getStatusCode(httpResponse);
+        String response = getResponseBody(httpResponse);
+        get.releaseConnection();
+
+        assertEquals(HttpStatus.SC_OK, statusCode);
+
+        int idx_child, idx_parent, idx_grandParent;
+
+        idx_child = response.indexOf("div.auratestTest_css_child");
+        idx_parent = response.indexOf("div.auratestTest_css_parent");
+        idx_grandParent = response.indexOf("div.auratestTest_css_grandParent");
+        assertTrue("_grandParent must come before _parent in: "+response, idx_grandParent < idx_parent);
+        assertTrue("_parent must come before _child in: "+response, idx_parent < idx_child);
     }
 
     /**

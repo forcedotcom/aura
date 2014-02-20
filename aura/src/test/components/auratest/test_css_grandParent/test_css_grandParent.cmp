@@ -16,8 +16,7 @@
 
 -->
 <!-- Used in AuraResourceServletHttpTest.testCSSOrder -->
-<aura:component>
-    <aura:attribute name="content" type="String" default="Component A"/>
-    <auratest:test_css_b content="{!v.content}" aura:id="b"/>
-    <auratest:test_css_c content="{!v.content}" aura:id="c"/>
+<aura:component extensible="true">
+    <div aura:id="grandParent">GrandParent's own content</div>
+    {!v.body}
 </aura:component>

@@ -21,6 +21,7 @@ Test.Aura.Controller.ActionDefTest = function() {
 	Mocks.GetMock(Object.Global(), "exp", function() {
 	})(function() {
 		// #import aura.controller.ActionDef
+		// #import aura.controller.Action
 	});
 
 	[ Fixture ]

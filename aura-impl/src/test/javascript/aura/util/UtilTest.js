@@ -254,5 +254,52 @@ Test.Aura.UtilTest=function(){
 			Assert.False(actual);
 		}
 	}
+
+    [Fixture]
+    function merge() {
+        [Fact]
+        function testMerge() {
+            auraMock(function() {
+                var util = new $A.ns.Util(),
+                    array1 = [0, 1],
+                    array2 = [2, 3, 4],
+                    array3 = [5, 6, 7, 8],
+                    i = 0;
+                
+                // Merge arrays into array1 and test:
+                util.merge(array1, array2, array3);
+                Assert.Equal(9, array1.length);
+                for (i = 0; i < array1.length; i++) {
+                    Assert.Equal(i, array1[i]);
+                }
+                
+                // Merge just array1 and make sure it doesn't change.
+                util.merge(array1);
+                Assert.Equal(9, array1.length);
+                for (i = 0; i < array1.length; i++) {
+                    Assert.Equal(i, array1[i]);
+                }
+            });
+        }
+        
+        [Fact]
+        function testMergeError() {
+            auraMock(function() {
+                try {
+                    new $A.ns.Util().merge({}, [0], [1, 2]);
+                    Assert.False(true, "Invalid arguments. Should throw exception.");
+                } catch (e) {
+                    Assert.Equal("Merge takes only arrays as arguments.", e);
+                }
+                
+                try {
+                    new $A.ns.Util().merge([0], [1, 2], {});
+                    Assert.False(true, "Invalid arguments. Should throw exception.");
+                } catch (e) {
+                    Assert.Equal("Merge takes only arrays as arguments.", e);
+                }
+            });
+        }
+    }
 }
  

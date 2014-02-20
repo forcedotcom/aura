@@ -63,6 +63,18 @@ function Action(def, suffix, method, paramDefs, background, cmp, caboose) {
     this.setCreationPathIndex(0);
 }
 
+// Static methods:
+
+Action.getStorageKey = function(descriptor, params) {
+	return descriptor + ":" + $A.util["json"].encode(params);
+};
+
+Action.getStorage = function() {
+    return $A.storageService.getStorage("actions");
+};
+
+// Instance methods:
+
 Action.prototype.nextActionId = 1;
 Action.prototype.auraType = "Action";
 
@@ -881,8 +893,10 @@ Action.prototype._isStorable = function() {
  * @private
  */
 Action.prototype.getStorageKey = function() {
-    return (this.def?this.def.getDescriptor().toString():"")
-           + ":" + $A.util["json"].encode(this.params);
+    return Action.getStorageKey(
+        this.def ? this.def.getDescriptor().toString() : "",
+        this.params
+    );
 };
 
 /**
@@ -990,7 +1004,7 @@ Action.prototype.getRefreshAction = function(originalResponse) {
  * @returns {Storage}
  */
 Action.prototype.getStorage = function() {
-    return $A.storageService.getStorage("actions");
+    return Action.getStorage();
 };
 
 /**

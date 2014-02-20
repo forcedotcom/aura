@@ -19,6 +19,7 @@ import org.auraframework.Aura;
 import org.auraframework.system.AuraContext;
 import org.auraframework.test.AuraTestCase;
 import org.auraframework.test.annotation.ThreadHostileTest;
+import org.auraframework.test.annotation.UnAdaptableTest;
 
 /**
  * Tests {@link TestingSecurityProvider}
@@ -29,6 +30,7 @@ public class TestingSecurityProviderTest extends AuraTestCase {
         super(name);
     }
 
+    @UnAdaptableTest
     public void testProduction() throws Exception {
         assertFalse("Production should have no access", isAllowed(true, AuraContext.Mode.PROD));
     }
@@ -45,25 +47,17 @@ public class TestingSecurityProviderTest extends AuraTestCase {
         assertTrue("non production with PROD should have access", isAllowed(false, AuraContext.Mode.PROD));
     }
 
-    private boolean isAllowed(boolean isProduction, AuraContext.Mode mode) {
+    public static boolean isAllowed(boolean isProduction, AuraContext.Mode mode) {
         try {
             getMockConfigAdapter().setIsProduction(isProduction);
-            startContext(mode);
+            Aura.getContextService().startContext(mode,
+                    AuraContext.Format.JSON, AuraContext.Access.AUTHENTICATED);
 
             TestingSecurityProvider securityProvider = new TestingSecurityProvider();
             return securityProvider.isAllowed(null);
 
         } finally {
-            endContext();
+            Aura.getContextService().endContext();
         }
-    }
-
-    private void startContext(AuraContext.Mode mode) {
-        Aura.getContextService().startContext(mode,
-                AuraContext.Format.JSON, AuraContext.Access.AUTHENTICATED);
-    }
-
-    private void endContext() {
-        Aura.getContextService().endContext();
     }
 }

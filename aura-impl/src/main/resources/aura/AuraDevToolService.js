@@ -419,18 +419,19 @@ var AuraDevToolService = function() {
              * @param   decoMsg                    - Error message for Decorative tag
              * @returns String                   - String concatenation of all error messages
              */
-            findAllImgTags:function (allImgTags, imgErrorMsg, infoMsg, decoMsg){
+            findAllImgTags:function (allImgTags, imgErrorMsg, infoMsg, decoMsg, altError){
         	 var accessAideFuncs = aura.devToolService.accessbilityAide;
                	
         	 var data_aura_rendered_by = "";
         	 var nonAuraImg = [];
         	 var informationErrorArray = [];
         	 var decorationalErrorArray  = [];
+        	 var wrongAltErrorArray  = [];
         	 var errorMsg = "No component information Available";
         	 
         	 var imgType = "";
         	 var alt = "";
-        	 var htmlAlt = "";
+        	
         	 for(var index = 0; index < allImgTags.length; index++){
         	     data_aura_rendered_by = $A.util.getElementAttributeValue(allImgTags[index], "data-aura-rendered-by");
         	     
@@ -443,29 +444,51 @@ var AuraDevToolService = function() {
          		alt     = $A.getCmp(data_aura_rendered_by).getAttributes().getValueProvider().get('v.alt');
          		htmlAlt = $A.util.getElementAttributeValue(allImgTags[index], "alt");
          		
-         		/**check for cases when we are using a pure html img cmp.
+         		/**
+         		 * For the case that we are not looking at a ui:image component the imageType attribute will be undefined
+         		 * This if block will replace the alt with the html attributes alt tag or the empty string. By default we 
+         		 * are going to assume that every tag that is not through ui:image is going to be of type informational.
          		 * 
-         		 * Check if both imageType and alt type are undefiend. 
-         		 * If they are both null we are looking at a pure html component inside the cmp. 
-         		 * This means two things:
-         		 *      1) a user is using the img tag
-         		 *      2) A component in an aura namespace (ui probably) is using the img tag (other than ui:image) 
-         		*/
-         		if($A.util.isUndefinedOrNull(imgType) && $A.util.isUndefinedOrNull(alt)){
-         		    if($A.util.isUndefinedOrNull(htmlAlt) || htmlAlt.replace(/[\s\t\r\n]/g,'') ===''){
-         		       informationErrorArray.push(allImgTags[index]);
+         		 * Once we have the item set, we will make sure that everything is stripped of spaces, and lowercased to make
+         		 * all of the data flat. 
+         		 * 
+         		 * Then three checks
+         		 * 1) make sure that the keywords "undefined", "null", "empty" are not the sole value of the alt
+         		 * 2) if the item is of type informational, make sure that the alt is not the empty string
+         		 * 3) if the item is of type decorative, make sure that the alt is the empty string.
+         		 * 
+         		 */
+         		if($A.util.isUndefinedOrNull(imgType)){
+         		    
+         		    imgType = "informational";
+         		    if($A.util.isUndefinedOrNull(htmlAlt)){
+         			alt="";
          		    }
+         		    else{
+         			alt = htmlAlt;
+         		    }         		    
          		}
-         		else if((imgType === "informational" || $A.util.isUndefinedOrNull(imgType)) && ($A.util.isUndefinedOrNull(alt) || alt.replace(/[\s\t\r\n]/g,'') === "")){
+         		
+         		if($A.util.isUndefinedOrNull(alt)){
+         		    alt="";
+         		}
+         		
+         		alt = alt.toLowerCase().replace(/[\s\t\r\n]/g,'');
+         		
+         		if(alt==="undefined" || alt==="null" || alt ==="empty"){
+         		        wrongAltErrorArray.push(allImgTags[index]);
+         		}
+         		else if(imgType === "informational" &&  ($A.util.isUndefinedOrNull(alt) || alt === "")){
          			informationErrorArray.push(allImgTags[index]);
          		}
-         		else if(imgType === "decorative" && (!$A.util.isUndefinedOrNull(alt) && alt.replace(/[\s\t\r\n]/g,'') !== "")){
+         		else if(imgType === "decorative" && (!$A.util.isUndefinedOrNull(alt) && alt !== "")){
          			 decorationalErrorArray.push(allImgTags[index]);
          		}
          	    }
         	 }
         	 
         	 errorMsg = accessAideFuncs.formatOutput(errorMsg, nonAuraImg);
+        	 errorMsg = errorMsg + accessAideFuncs.formatOutput(imgErrorMsg+altError, wrongAltErrorArray);
         	 errorMsg = errorMsg + accessAideFuncs.formatOutput(imgErrorMsg+infoMsg, informationErrorArray);
         	 errorMsg = errorMsg + accessAideFuncs.formatOutput(imgErrorMsg+decoMsg, decorationalErrorArray);
         	 
@@ -553,12 +576,6 @@ var AuraDevToolService = function() {
         	}
         	return strAttrib;
             },
-            /**
-             * Method that looks at the given tag and will look print out the next two parents components names
-             * @param   tag     - The initial tag to find the parents of
-             * @param   spacing - The amount of spacing that we want per item
-             * @returns String  - The string representation of the the cmp stack trace 
-             */
             /**
              * Method that looks at the given tag and will look print out the next two parents components names
              * @param   tag     - The initial tag to find the parents of
@@ -951,9 +968,10 @@ var AuraDevToolService = function() {
         		var imgError = "IMG tag must have alt attribute. Refer to http://www.w3.org/TR/UNDERSTANDING-WCAG20/text-equiv.html.";
         		var infoMsg = "\nNote: If the image type is informational, then the alt must be set";
                 	var decoMsg = "\nNote: If the image type is decorative,  then the alt must be the empty string";
+                	var altError = "\nNote: Alt attribute cannot not be equal to \"undefined\", \"empty\", \"null\"";
         		var accessAideFuncs = aura.devToolService.accessbilityAide;
         		var allImgTags = domElem.getElementsByTagName("img");
-       		        return accessAideFuncs.findAllImgTags(allImgTags, imgError, infoMsg, decoMsg);
+       		        return accessAideFuncs.findAllImgTags(allImgTags, imgError, infoMsg, decoMsg, altError);
         	    },
         	    /**
                      * Goes through all of the fieldsets tags that do not have the display:none field set and makes sure that each one has a legend

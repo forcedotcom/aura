@@ -25,6 +25,24 @@
         <iframe id="vfFrameId" src="/setup/ui/blah.jsp"></iframe>
         <iframe src="http://www.salesforce.com"></iframe> 
     </aura:if>
+    
+    <!--Test for image alt. Mixture of failures and correct tags-->  
+    <aura:if isTrue="{!v.caseToRender == 'imageTagTest'}">
+         <img src="1" alt="Blah"/>
+         <ui:image src="2" alt="" imageType="decorative"/>
+         <ui:image src="3" alt="  Blah  " imageType="informational"/>
+         
+         <!--Images that are going to be errors-->        
+         <img src="4" alt="UnDeFiNeD"/>
+         <img src="5" alt="Null"/>
+         <img src="6" alt="EMPTY"/>
+         <img src="7"/>
+         <img src="8" alt=""/>
+         <ui:image src="9" alt="  UnDeFiNeD  " imageType="informational"/>
+         <ui:image src="10" alt="  EMPTY  " imageType="informational"/>
+         <ui:image src="11" alt="  NuLl  " imageType="informational"/>
+    </aura:if>
+  
     <!--Test for buttons. Making sure that the label attribute is set correctly-->  
     <aura:if isTrue="{!v.caseToRender == 'buttonLabelValid'}">
        <!--Buttons should fail, no label-->

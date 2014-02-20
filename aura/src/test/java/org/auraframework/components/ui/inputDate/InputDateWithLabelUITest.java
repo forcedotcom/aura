@@ -48,14 +48,14 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
     }
 
     /**
-     * Excluded Browser Reasons:
-     * IE7:    pageUpDown test is flappy, works through webdriver after running a few times and manually. Issue here is that it will 
-     *         sometimes stop one short
-     * IE8:    homeEndButton test is flappy, works fine manually and on webdriver after running a few times 
-     * IE9/10: Sending in Shift anything (tab, page up, page down), does not register when sent through WebDriver.
-     *         Manually works fine
-     * Android and IOS devices: this feature will not be used on mobile devices. Instead the their native versions will be used 
-     * Safari: Sending in Shift tab does not register when sent through WebDriver. Manually works fine
+     * Excluded Browser Reasons: 
+     *      IE7:    pageUpDown test is flappy, works through webdriver after running a few times and manually. Issue
+     *              here is that it will sometimes stop one short
+     *      IE8:    homeEndButton test is flappy, works fine manually and on webdriver after running a few times
+     *      IE9/10: Sending in Shift anything (tab, page up, page down), does not register when sent through WebDriver.
+     *              Manually works fine 
+     *      Android/IOS: This feature will not be used on mobile devices. Instead the their native versions will be used
+     *      Safari: Sending in Shift tab does not register when sent through WebDriver. Manually works fine
      */
     /***********************************************************************************************
      *********************************** HELPER FUNCTIONS********************************************
@@ -244,7 +244,7 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
 
     // Testing functionallity of tab, starting from the InputBox to the today button
     // Do Not run with Safari. Safari does not handle tabs normally
-    @ExcludeBrowsers({ BrowserType.SAFARI6, BrowserType.SAFARI, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET,
+    @ExcludeBrowsers({ BrowserType.SAFARI5, BrowserType.SAFARI, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET,
             BrowserType.IPAD, BrowserType.IPHONE })
     public void testTab() throws Exception {
         open(URL);
@@ -277,41 +277,41 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
         assertTrue("Tabbing through every buttong did not take us to the today button",
                 elementClass.indexOf("calToday") >= 0);
     }
-    
-    //Test case for W-2031902
-    @ExcludeBrowsers({ BrowserType.SAFARI6, BrowserType.SAFARI, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET,
-        BrowserType.IPAD, BrowserType.IPHONE })
+
+    // Test case for W-2031902
+    @ExcludeBrowsers({ BrowserType.SAFARI5, BrowserType.SAFARI, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET,
+            BrowserType.IPAD, BrowserType.IPHONE })
     public void testValueChangeEvent() throws Exception {
-	    open(URL);
-	    // Tab test Begins
-	    // Getting input textbox in focus
-	    WebElement element = findDomElement(By.cssSelector(DATE_INPUT_BOX_SEL));
-	
-	    // Tabbing to the next item and getting what is in focus
-	    auraUITestingUtil.pressTab(element);
-	    
-	    element = findDomElement(By.cssSelector(OUTPUT_ST));
-	    //tab out does not fire value change event
-	    assertEquals("Value Change event should not be fired", "", element.getText());
-	    
-	    // Setting focus to the Calendar Icon and clicking on it
-	    element = findDomElement(By.cssSelector(DATE_ICON_SEL));
-	    element.click();
-	
-	    // Todays date should be on focus, Grabbing that element. Pressing tab with WebDriver after clicking on the icon
-	    // will move to the move month to the left
-	    String classOfActiveElem = "" + auraUITestingUtil.getEval(CLASSNAME);
-	    element = findDomElement(By.cssSelector("a[class*='" + classOfActiveElem + "']"));
-	
-	    // Moving from the on focus element to the today link
-	    auraUITestingUtil.pressEnter(element);
-	    //make sure value change event got fired
-	    element = findDomElement(By.cssSelector(OUTPUT_ST));
-	    assertEquals("Value Change event should not be fired", "Value Change Event Fired", element.getText());
+        open(URL);
+        // Tab test Begins
+        // Getting input textbox in focus
+        WebElement element = findDomElement(By.cssSelector(DATE_INPUT_BOX_SEL));
+
+        // Tabbing to the next item and getting what is in focus
+        auraUITestingUtil.pressTab(element);
+
+        element = findDomElement(By.cssSelector(OUTPUT_ST));
+        // tab out does not fire value change event
+        assertEquals("Value Change event should not be fired", "", element.getText());
+
+        // Setting focus to the Calendar Icon and clicking on it
+        element = findDomElement(By.cssSelector(DATE_ICON_SEL));
+        element.click();
+
+        // Todays date should be on focus, Grabbing that element. Pressing tab with WebDriver after clicking on the icon
+        // will move to the move month to the left
+        String classOfActiveElem = "" + auraUITestingUtil.getEval(CLASSNAME);
+        element = findDomElement(By.cssSelector("a[class*='" + classOfActiveElem + "']"));
+
+        // Moving from the on focus element to the today link
+        auraUITestingUtil.pressEnter(element);
+        // make sure value change event got fired
+        element = findDomElement(By.cssSelector(OUTPUT_ST));
+        assertEquals("Value Change event should not be fired", "Value Change Event Fired", element.getText());
     }
 
     // Checking functionality of the shift tab button
-    @ExcludeBrowsers({ BrowserType.IE9, BrowserType.IE10, BrowserType.SAFARI6, BrowserType.SAFARI,
+    @ExcludeBrowsers({ BrowserType.IE9, BrowserType.IE10, BrowserType.SAFARI5, BrowserType.SAFARI,
             BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
     public void testShiftTab() throws Exception {
         open(URL);

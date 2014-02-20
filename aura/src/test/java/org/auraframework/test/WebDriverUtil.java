@@ -69,8 +69,8 @@ public final class WebDriverUtil {
         IE8(DesiredCapabilities.internetExplorer(), "8", Platform.WINDOWS),
         IE7(DesiredCapabilities.internetExplorer(), "7", Platform.WINDOWS),
         GOOGLECHROME(DesiredCapabilities.chrome(), null, Platform.ANY),
-        SAFARI(DesiredCapabilities.safari(), "5", "Mac"),
-        SAFARI6(DesiredCapabilities.safari(), "6", "Mac 10.8"),
+        SAFARI(DesiredCapabilities.safari(), "6", "OS X 10.8"),
+        SAFARI5(DesiredCapabilities.safari(), "5", "Mac"), // Not run in autobuilds
         ANDROID_PHONE(DesiredCapabilities.android(), "4", "Linux", ExtraCapability.PHONE, ExtraCapability.PORTRAIT),
         ANDROID_TABLET(DesiredCapabilities.android(), "4", "Linux", ExtraCapability.TABLET, ExtraCapability.LANDSCAPE),
         IPHONE(DesiredCapabilities.iphone(), "6", "Mac 10.8"),

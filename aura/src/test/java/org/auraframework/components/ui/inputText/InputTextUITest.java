@@ -57,14 +57,14 @@ public class InputTextUITest extends WebDriverTestCase {
         value = assertModelValue(event); // value should have been updated
     }
 
-    @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.SAFARI6,
+    @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.SAFARI5,
             BrowserType.SAFARI, BrowserType.IPHONE })
     // Change event not picked up on IOS devices
     public void testUpdateOnAttributeForNonIosAndroidDevice() throws Exception {
         doTestUpdateOnAttributeForNonIosAndroidDevice(TEST_CMP);
     }
 
-    @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.SAFARI6,
+    @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.SAFARI5,
             BrowserType.SAFARI, BrowserType.IPHONE })
     // Change event not picked up on IOS devices
     public void testUpdateOnAttributeWithLabelsForNonIosAndroidDevice() throws Exception {
@@ -236,7 +236,7 @@ public class InputTextUITest extends WebDriverTestCase {
 
     // W-1551077: Issue with Webdriver API ignores maxlength HTML5 attribute (iOS/Safari)
     @ExcludeBrowsers({ BrowserType.IPAD, BrowserType.IPHONE, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET,
-            BrowserType.SAFARI6, BrowserType.SAFARI })
+            BrowserType.SAFARI5, BrowserType.SAFARI })
     public void testMaxLength() throws Exception {
         open("/uitest/inputText_MaxLength.cmp");
         WebElement input = findDomElement(By.cssSelector("input.uiInputText.uiInput"));
@@ -315,7 +315,7 @@ public class InputTextUITest extends WebDriverTestCase {
     }
 
     // W-1625895: Safari WebDriver bug- cannot right click because interactions API not implemented
-    @ExcludeBrowsers({ BrowserType.IPAD, BrowserType.IPHONE, BrowserType.SAFARI6, BrowserType.SAFARI,
+    @ExcludeBrowsers({ BrowserType.IPAD, BrowserType.IPHONE, BrowserType.SAFARI5, BrowserType.SAFARI,
             BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET })
     public void testBaseMouseClickEventValue() throws Exception {
         open(TEST_CMP);

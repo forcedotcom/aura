@@ -34,72 +34,72 @@ public class InputRichTextUITest extends WebDriverTestCase {
     private final String SUBMIT_BUTTON_LOCATOR = ".uiButton";
     private final String OUTPUT_LOCATOR = ".uiOutputText";
     private final String RT_CMP = "Text";
-    
+
     public InputRichTextUITest(String name) {
         super(name);
     }
-    
+
     /**
      * Able to tab into inputRichText Component.
      */
     /* Excluding safari because safari driver has issues with element.sendkeys(Keys.TAB) */
-    @ExcludeBrowsers({BrowserType.SAFARI, BrowserType.SAFARI6, 
-    	BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET})
+    @ExcludeBrowsers({ BrowserType.SAFARI, BrowserType.SAFARI5,
+            BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET })
     public void testRichTextTabbing() throws Exception {
         open(URL);
         WebElement beforeLink = auraUITestingUtil.waitForElement(By.cssSelector(LINKBEFORE_LOCATOR));
-        WebElement ckEditor =  auraUITestingUtil.waitForElement(By.cssSelector(CK_EDITOR_LOCATOR));
-        WebElement ckEditorInput =  ckEditor.findElement(By.tagName("iframe"));
-        WebElement submitBtn =  auraUITestingUtil.findDomElement(By.cssSelector(SUBMIT_BUTTON_LOCATOR));
+        WebElement ckEditor = auraUITestingUtil.waitForElement(By.cssSelector(CK_EDITOR_LOCATOR));
+        WebElement ckEditorInput = ckEditor.findElement(By.tagName("iframe"));
+        WebElement submitBtn = auraUITestingUtil.findDomElement(By.cssSelector(SUBMIT_BUTTON_LOCATOR));
 
         String inputText = "im here";
-        
+
         // setup
         beforeLink.click();
-        
-        // tab into 
+
+        // tab into
         auraUITestingUtil.pressTab(beforeLink);
-    
+
         // type into ck editor
         ckEditorInput.sendKeys(inputText);
         waitForTextInRichText(RT_CMP, inputText);
-        
+
         // click submit and see if text was entered into editor
         submitBtn.click();
         assertOutputText(inputText);
     }
-    
+
     /**
      * Test html content is escaped.
      */
     /* Issue with sendKeys in Safari https://code.google.com/p/selenium/issues/detail?id=4467 */
-    @ExcludeBrowsers({BrowserType.SAFARI, BrowserType.SAFARI6, 
-    	BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET})
+    @ExcludeBrowsers({ BrowserType.SAFARI, BrowserType.SAFARI5,
+            BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET })
     public void testHtmlContentEscaped() throws Exception {
         open(URL);
-        WebElement ckEditor =  auraUITestingUtil.waitForElement(By.cssSelector(CK_EDITOR_LOCATOR));
-        WebElement ckEditorInput =  ckEditor.findElement(By.tagName("iframe"));
-        
+        WebElement ckEditor = auraUITestingUtil.waitForElement(By.cssSelector(CK_EDITOR_LOCATOR));
+        WebElement ckEditorInput = ckEditor.findElement(By.tagName("iframe"));
+
         String html = "</html>";
         String escapedHtml = "&lt;/html&gt;";
-        
+
         ckEditor.click();
         ckEditorInput.sendKeys(html);
         waitForTextInRichText(RT_CMP, escapedHtml);
     }
-    
+
     private void waitForTextInRichText(final String auraId, final String text) {
-    auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
-        @Override
-        public Boolean apply(WebDriver d) {
-            String expr = auraUITestingUtil.getValueFromCmpRootExpression(auraId, "v.value");
-            String rtText = (String) auraUITestingUtil.getEval(expr);
-            return text.equals(rtText);
-        }
-    });
+        auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
+            @Override
+            public Boolean apply(WebDriver d) {
+                String expr = auraUITestingUtil.getValueFromCmpRootExpression(auraId, "v.value");
+                String rtText = (String) auraUITestingUtil.getEval(expr);
+                return text.equals(rtText);
+            }
+        });
     }
-    
+
     private void assertOutputText(String expectedText) {
-            auraUITestingUtil.waitForElementText(By.cssSelector(OUTPUT_LOCATOR), expectedText, true);
+        auraUITestingUtil.waitForElementText(By.cssSelector(OUTPUT_LOCATOR), expectedText, true);
     }
 }

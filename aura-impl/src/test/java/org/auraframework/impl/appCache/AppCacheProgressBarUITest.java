@@ -31,7 +31,7 @@ import org.openqa.selenium.By;
  * 
  * TODO(W-1708575): Android AppCache tests fail when running on SauceLabs
  */
-@TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.SAFARI6 })
+@TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.SAFARI })
 public class AppCacheProgressBarUITest extends WebDriverTestCase {
     private final String PROGRESSEVENTSCRIPT = "var evt = new ProgressEvent('%s', {%s});"
             + "window.applicationCache.dispatchEvent(evt);";

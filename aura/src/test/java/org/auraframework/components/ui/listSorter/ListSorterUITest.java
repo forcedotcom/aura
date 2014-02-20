@@ -29,7 +29,7 @@ import org.openqa.selenium.WebElement;
 /**
  * UI automation for ui:ListSorter.
  */
-@TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.FIREFOX, BrowserType.IE7, BrowserType.SAFARI6,
+@TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.FIREFOX, BrowserType.IE7, BrowserType.SAFARI5,
         BrowserType.SAFARI })
 public class ListSorterUITest extends WebDriverTestCase {
 

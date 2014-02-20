@@ -37,11 +37,11 @@ public class ThemingSanityUITest extends WebDriverTestCase {
         final String expectedFgColor = "rgba(255, 0, 0, 1)"; // red
         final String expectedHeight = "300px";
 
-        open("/themeTest/themeVariable.cmp");
-        String actualBgColor = getDriver().findElement(By.cssSelector(".themeTestHeader")).getCssValue(
+        open("/themeSanityTest/themeVariable.cmp");
+        String actualBgColor = getDriver().findElement(By.cssSelector(".themeSanityTestHeader")).getCssValue(
                 "background-color");
-        String actualFgColor = getDriver().findElement(By.cssSelector(".themeTestHeader")).getCssValue("color");
-        String actualHeight = getDriver().findElement(By.cssSelector(".themeTestHeader")).getCssValue("height");
+        String actualFgColor = getDriver().findElement(By.cssSelector(".themeSanityTestHeader")).getCssValue("color");
+        String actualHeight = getDriver().findElement(By.cssSelector(".themeSanityTestHeader")).getCssValue("height");
 
         assertTrue("Loaded app should have template css present for background-color.",
                 expectedBgColor.equalsIgnoreCase(actualBgColor));
@@ -49,21 +49,6 @@ public class ThemingSanityUITest extends WebDriverTestCase {
                 expectedFgColor.equalsIgnoreCase(actualFgColor));
         assertTrue("Loaded app should have template css present for height.",
                 expectedHeight.equalsIgnoreCase(actualHeight));
-    }
-
-    /**
-     * Verify using theme variables across multiple namepaces
-     * 
-     * @throws Exception
-     */
-    public void testThemeVariablesAcrossNamespaces() throws Exception {
-        final String expectedFontFamily = "arial,sans-serif";
-
-        open("/themeTest/themeAcrossNamespaces.cmp");
-        String actualFontFamily = getDriver().findElement(By.cssSelector(".themeTestThemeAcrossNamespaces"))
-                .getCssValue("font-family").replaceAll("\\s", "");
-        assertTrue("Loaded app should have template css present for font family",
-                expectedFontFamily.equalsIgnoreCase(actualFontFamily));
     }
 
     /**
@@ -81,15 +66,15 @@ public class ThemingSanityUITest extends WebDriverTestCase {
         final String expectedColor2 = "rgba(255, 255, 0, 1)"; // yellow
         final String expectedBgColor2 = "rgba(0, 128, 0, 1)"; // green
 
-        open("/themeTest/themeExtension.cmp");
+        open("/themeSanityTest/themeExtension.app");
 
-        String actualHeight1 = getDriver().findElement(By.cssSelector(".themeTestHeader")).getCssValue("height");
-        String actualColor1 = getDriver().findElement(By.cssSelector(".themeTestHeader")).getCssValue("color");
-        String actualBgColor1 = getDriver().findElement(By.cssSelector(".themeTestHeader")).getCssValue(
+        String actualHeight1 = getDriver().findElement(By.cssSelector(".themeSanityTestHeader")).getCssValue("height");
+        String actualColor1 = getDriver().findElement(By.cssSelector(".themeSanityTestHeader")).getCssValue("color");
+        String actualBgColor1 = getDriver().findElement(By.cssSelector(".themeSanityTestHeader")).getCssValue(
                 "background-color");
 
-        String actualColor2 = getDriver().findElement(By.cssSelector(".themeTestHeader2")).getCssValue("color");
-        String actualBgColor2 = getDriver().findElement(By.cssSelector(".themeTestHeader2")).getCssValue(
+        String actualColor2 = getDriver().findElement(By.cssSelector(".themeSanityTestHeader2")).getCssValue("color");
+        String actualBgColor2 = getDriver().findElement(By.cssSelector(".themeSanityTestHeader2")).getCssValue(
                 "background-color");
 
         assertTrue("Loaded app should have base theme applied for height",
@@ -103,5 +88,4 @@ public class ThemingSanityUITest extends WebDriverTestCase {
         assertTrue("Loaded app should have overridden child theme applied for background-color",
                 expectedBgColor2.equalsIgnoreCase(actualBgColor2));
     }
-
 }

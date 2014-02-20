@@ -37,7 +37,6 @@ import org.auraframework.service.DefinitionService;
 import org.auraframework.service.InstanceService;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraError;
-import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
@@ -58,7 +57,6 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
             XMLStreamReader xmlReader) {
         super(applicationDefDescriptor, source, xmlReader);
         appBuilder = (ApplicationDefImpl.Builder) builder;
-        appBuilder.themeOverrides = Maps.newHashMap();
     }
 
     @Override
@@ -144,29 +142,24 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
             appBuilder.isOnePageApp = false;
         }
 
-        // theme overrides
-        String themeOverrideNames = getAttributeValue(ATTRIBUTE_THEME_OVERRIDES);
-        if (!AuraTextUtil.isNullEmptyOrWhitespace(themeOverrideNames)) {
-
-            DefinitionService defService = Aura.getDefinitionService();
-
-            for (String overrideString : AuraTextUtil.splitSimple(",", themeOverrideNames)) {
-                List<String> parts = AuraTextUtil.splitSimple("=", overrideString);
-                if (parts.size() != 2) {
-                    throw new AuraRuntimeException(String.format(THEME_FORMAT, overrideString), getLocation());
-                }
-
-                String original = parts.get(0);
-                String override = parts.get(1);
-
-                if (AuraTextUtil.isEmptyOrWhitespace(original) || AuraTextUtil.isEmptyOrWhitespace(override)) {
-                    throw new AuraRuntimeException(String.format(THEME_FORMAT, overrideString), getLocation());
-                }
-
-                DefDescriptor<ThemeDef> originalDescriptor = defService.getDefDescriptor(original, ThemeDef.class);
-                DefDescriptor<ThemeDef> overrideDescriptor = defService.getDefDescriptor(override, ThemeDef.class);
-
-                appBuilder.addThemeOverride(originalDescriptor, overrideDescriptor);
+        String themeName = getAttributeValue(ATTRIBUTE_OVERRIDE_THEME);
+        if (themeName != null) {
+            // an empty string is a valid value, and it means don't use any theme override. this is a way to opt-out of
+            // the implicit default (below)
+            if (!AuraTextUtil.isNullEmptyOrWhitespace(themeName)) {
+                appBuilder.setOverrideThemeDescriptor(DefDescriptorImpl.getInstance(themeName, ThemeDef.class));
+            }
+        } else {
+            // check for app bundle theme
+            themeName = defDescriptor.getDescriptorName();
+            DefDescriptor<ThemeDef> desc = DefDescriptorImpl.getInstance(themeName, ThemeDef.class);
+            if (desc.exists()) {
+                appBuilder.setOverrideThemeDescriptor(desc);
+            } else {
+                // the implicit theme override for an app is the namespace-default theme, if it exists
+                themeName = String.format("%s:%sTheme", defDescriptor.getNamespace(), defDescriptor.getNamespace());
+                desc = DefDescriptorImpl.getInstance(themeName, ThemeDef.class);
+                appBuilder.setOverrideThemeDescriptor(desc.exists() ? desc : null);
             }
         }
     }
@@ -195,13 +188,11 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
     private static final String ATTRIBUTE_APPCACHE_ENABLED = "useAppcache";
     private static final String ATTRIBUTE_ADDITIONAL_APPCACHE_URLS = "additionalAppCacheURLs";
     private static final String ATTRIBUTE_IS_ONE_PAGE_APP = "isOnePageApp";
-    private static final String ATTRIBUTE_THEME_OVERRIDES = "themeOverrides";
-
-    private static final String THEME_FORMAT = "Invalid themeOverrides format '%s'. Try rewriting like theme1=theme2";
+    private static final String ATTRIBUTE_OVERRIDE_THEME = "overrideTheme";
 
     private final static Set<String> ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>()
             .add(ATTRIBUTE_PRELOAD, ATTRIBUTE_LAYOUTS, ATTRIBUTE_LOCATION_CHANGE_EVENT, ATTRIBUTE_PRELOAD,
                     ATTRIBUTE_ACCESS, ATTRIBUTE_SECURITY_PROVIDER, ATTRIBUTE_APPCACHE_ENABLED,
-                    ATTRIBUTE_ADDITIONAL_APPCACHE_URLS, ATTRIBUTE_IS_ONE_PAGE_APP, ATTRIBUTE_THEME_OVERRIDES)
+                    ATTRIBUTE_ADDITIONAL_APPCACHE_URLS, ATTRIBUTE_IS_ONE_PAGE_APP, ATTRIBUTE_OVERRIDE_THEME)
             .addAll(BaseComponentDefHandler.ALLOWED_ATTRIBUTES).build();
 }

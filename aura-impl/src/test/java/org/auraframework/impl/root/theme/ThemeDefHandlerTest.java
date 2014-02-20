@@ -15,139 +15,121 @@
  */
 package org.auraframework.impl.root.theme;
 
+import java.util.List;
 import java.util.Map;
 
-import org.auraframework.def.AttributeDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.ThemeDef;
-import org.auraframework.impl.AuraImplTestCase;
+import org.auraframework.def.VarDef;
+import org.auraframework.impl.css.StyleTestCase;
 import org.auraframework.impl.root.parser.handler.ThemeDefHandler;
-import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
-import org.auraframework.throwable.quickfix.InvalidExpressionException;
-import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
  * Unit tests for {@link ThemeDefHandler}.
  */
-public class ThemeDefHandlerTest extends AuraImplTestCase {
+public class ThemeDefHandlerTest extends StyleTestCase {
     public ThemeDefHandlerTest(String name) {
         super(name);
     }
 
-    public void testAttributes() throws Exception {
-        String src = "<aura:theme><aura:attribute name='test' type='String' default='abc'/></aura:theme>";
-        ThemeDef def = source(src);
+    public void testVars() throws Exception {
+        ThemeDef def = addSeparateTheme(theme().var("test1", "1").var("test2", "2")).getDef();
 
-        Map<DefDescriptor<AttributeDef>, AttributeDef> attrs = def.getAttributeDefs();
-        assertEquals("didn't get expected number of attributes", 1, attrs.size());
+        Map<String, VarDef> vars = def.getDeclaredVarDefs();
+        assertEquals("didn't get expected number of vars", 2, vars.size());
 
-        DefDescriptor<AttributeDef> attr = DefDescriptorImpl.getInstance("test", AttributeDef.class);
-        assertTrue("didn't find expected attribute", attrs.containsKey(attr));
-        assertEquals("incorrect value for attribute", "abc", attrs.get(attr).getDefaultValue().getValue());
+        assertTrue("didn't find expected var", vars.containsKey("test1"));
+        assertEquals("incorrect value for var", "2", vars.get("test2").getValue());
     }
 
-    /** no type specified should be same as type=String" */
-    public void testDefaultType() throws Exception {
-        String src = "<aura:theme><aura:attribute name='test' default='abc'/></aura:theme>";
-        ThemeDef def = source(src);
+    public void testImports() throws Exception {
+        DefDescriptor<ThemeDef> import1 = addSeparateTheme(theme()
+                .var("var1", "1").var("var2", "2").var("var3", "3"));
 
-        Map<DefDescriptor<AttributeDef>, AttributeDef> attrs = def.getAttributeDefs();
-        assertEquals("didn't get expected number of attributes", 1, attrs.size());
+        DefDescriptor<ThemeDef> import2 = addSeparateTheme(theme()
+                .var("var1", "1").var("var2", "2").var("var3", "3"));
 
-        DefDescriptor<AttributeDef> attr = DefDescriptorImpl.getInstance("test", AttributeDef.class);
-        assertTrue("didn't find expected attribute", attrs.containsKey(attr));
-        assertEquals("incorrect value for attribute", "abc", attrs.get(attr).getDefaultValue().getValue());
-        assertEquals("Didn't find correct name for String type", "String", attrs.get(attr).getTypeDef().getDescriptor()
-                .getName());
-        assertEquals("Didn't find correct qualified name for String type", "aura://String", attrs.get(attr)
-                .getTypeDef().getDescriptor().getQualifiedName());
-        assertEquals("Didn't find correct descriptor name for String type", "String", attrs.get(attr).getTypeDef()
-                .getDescriptor().getDescriptorName());
+        DefDescriptor<ThemeDef> import3 = addSeparateTheme(theme()
+                .var("var1", "1").var("var2", "2").var("var3", "3"));
+
+        ThemeDef def = addSeparateTheme(theme()
+                .imported(import1)
+                .imported(import2)
+                .imported(import3))
+                .getDef();
+
+        List<DefDescriptor<ThemeDef>> imports = def.getDeclaredImports();
+        assertEquals(3, imports.size());
     }
 
-    /**
-     * Non String type should be parsed without error Note this is different behavior from regular aura:attribute where
-     * type is a required attribute.
-     **/
-    public void testTypeNonString() throws QuickFixException {
-        String src = "<aura:theme>" + "<aura:attribute name='test' default='1' type='Integer' />" + "</aura:theme>";
-        ThemeDef def = source(src);
-        AttributeDef aDef = def.getAttributeDef("test");
-        assertEquals("Default value should be an Integer of value 1", 1,
-                Integer.parseInt(aDef.getDefaultValue().getValue().toString()));
-    }
+    public void testImportAfterDeclared() throws Exception {
+        DefDescriptor<ThemeDef> imp = addSeparateTheme(theme().var("var1", "1"));
 
-    /**
-     * Type is specified as "". "" is disallowed and the definition does not parse.
-     * 
-     * @throws QuickFixException
-     */
-    public void testEmptyType() throws QuickFixException {
-        String src = "<aura:theme>" + "<aura:attribute name='test' default='1' type='' />" + "</aura:theme>";
         try {
-            source(src);
-            fail("Empty value for type is disallowed and the definition does not parse");
+            addSeparateTheme(theme().var("var2", "2").imported(imp)).getDef();
+            fail("expected to get an exception");
         } catch (Exception e) {
-            checkExceptionStart(e, InvalidDefinitionException.class, "QualifiedName is required for descriptors");
-        }
-    }
-
-    /**
-     * Tests type that is unsupported.
-     * 
-     * @throws QuickFixException
-     */
-    public void testInvalidType() throws QuickFixException {
-        String src = "<aura:theme>" + "<aura:attribute name='test' default='1' type='An Unsupported Type' />"
-                + "</aura:theme>";
-        try {
-            source(src);
-            fail("Unsupported value for type should cause the definition to fail parsing.");
-        } catch (Exception e) {
-            checkExceptionStart(e, InvalidDefinitionException.class, "Invalid Descriptor Format: An Unsupported Type");
-        }
-    }
-
-    /**
-     * When there is a mismatch between value of default and expected type, parsing should fail. Eg. Type is Integer but
-     * value for default is of type String.
-     */
-    public void testDefaultTypeMismatch() {
-        String src = "<aura:theme>" + "<aura:attribute name='test' default='abc' type='Integer' />" + "</aura:theme>";
-        try {
-            source(src);
-            fail("Theme shouldn't parse when there exists a mismatch between default value and default type");
-        } catch (Exception e) {
-            checkExceptionStart(e, InvalidExpressionException.class, "For input string: \"abc\"");
+            checkExceptionContains(e, InvalidDefinitionException.class, "must come before");
         }
     }
 
     public void testInvalidChild() throws Exception {
         try {
-            source("<aura:theme><aura:foo/></aura:theme>");
+            addSeparateTheme("<aura:theme><aura:foo/></aura:theme>").getDef();
             fail("Should have thrown AuraException aura:foo isn't a valid child tag for aura:theme");
-        } catch (InvalidDefinitionException e) {
+        } catch (Exception e) {
+            checkExceptionContains(e, InvalidDefinitionException.class, "Found unexpected tag");
         }
     }
 
     public void testWithTextBetweenTag() throws Exception {
         try {
-            source("<aura:theme>Test</aura:theme>");
+            addSeparateTheme("<aura:theme>Test</aura:theme>").getDef();
             fail("Should have thrown AuraException because text is between aura:theme tags");
-        } catch (InvalidDefinitionException e) {
+        } catch (Exception e) {
+            checkExceptionContains(e, InvalidDefinitionException.class, "No literal text");
+        }
+    }
+
+    public void testDuplicateVars() throws Exception {
+        try {
+            addSeparateTheme(theme().var("test", "1").var("test", "1")).getDef();
+            fail("expected to get an exception");
+        } catch (Exception e) {
+            checkExceptionContains(e, InvalidDefinitionException.class, "Duplicate var");
+        }
+    }
+
+    public void testDuplicateImports() throws Exception {
+        DefDescriptor<ThemeDef> import1 = addSeparateTheme(theme().var("var1", "1"));
+
+        try {
+            addSeparateTheme(theme().imported(import1).imported(import1)).getDef();
+            fail("expected to get an exception");
+        } catch (Exception e) {
+            checkExceptionContains(e, InvalidDefinitionException.class, "Duplicate theme import");
         }
     }
 
     public void testExtends() throws Exception {
-        DefDescriptor<ThemeDef> desc = vendor.getThemeDefDescriptor();
-        String src = "<aura:theme extends=\"%s\"></aura:theme>";
-        ThemeDef def = source(String.format(src, desc.getDescriptorName()));
-        assertEquals(def.getExtendsDescriptor(), desc);
+        DefDescriptor<ThemeDef> parent = addSeparateTheme(theme().var("color", "red"));
+        DefDescriptor<ThemeDef> child = addSeparateTheme(theme().parent(parent));
+        assertEquals(child.getDef().getExtendsDescriptor(), parent);
     }
 
-    /** utility */
-    private ThemeDef source(String contents) throws QuickFixException {
-        return addSourceAutoCleanup(ThemeDef.class, contents).getDef();
+    public void testEmptyExtends() throws Exception {
+        DefDescriptor<ThemeDef> theme = addSeparateTheme("<aura:theme extends=' '/>");
+        assertNull(theme.getDef().getExtendsDescriptor());
+    }
+
+    public void testIsLocalThemeFalse() throws Exception {
+        DefDescriptor<ThemeDef> theme = addSeparateTheme(theme().var("color", "red"));
+        assertFalse(theme.getDef().isLocalTheme());
+    }
+
+    public void testIsLocalThemeTrue() throws Exception {
+        DefDescriptor<ThemeDef> theme = addThemeAndStyle(theme().var("color", "red"), ".THIS{}");
+        assertTrue(theme.getDef().isLocalTheme());
     }
 }

@@ -25,7 +25,7 @@ import org.auraframework.system.Location;
  * Exceptions used when a variable (attribute) isn't found in a {@link ThemeDef}.
  */
 public class ThemeValueNotFoundException extends AuraValidationException {
-    private static final String MSG = "The attribute \"%s\" was not found on the %s %s";
+    private static final String MSG = "The var \"%s\" was not found on the %s %s";
     private static final long serialVersionUID = -2571041901012359701L;
 
     public ThemeValueNotFoundException(String name, DefDescriptor<ThemeDef> descriptor) {
@@ -33,7 +33,7 @@ public class ThemeValueNotFoundException extends AuraValidationException {
     }
 
     public ThemeValueNotFoundException(String name, DefDescriptor<ThemeDef> descriptor, Location location) {
-        super(getMessage(checkNotNull(name), descriptor), location, new CreateThemeAttributeQuickFix(descriptor, name));
+        super(getMessage(checkNotNull(name), descriptor), location, new CreateThemeVarQuickFix(descriptor, name));
     }
 
     private static String getMessage(String variable, DefDescriptor<ThemeDef> descriptor) {

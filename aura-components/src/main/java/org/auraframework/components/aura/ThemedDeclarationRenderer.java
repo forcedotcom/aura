@@ -18,13 +18,10 @@ package org.auraframework.components.aura;
 import java.io.IOException;
 import java.util.List;
 
-import org.auraframework.Aura;
-import org.auraframework.css.parser.ThemeValueProvider;
 import org.auraframework.def.Renderer;
 import org.auraframework.def.StyleDef;
 import org.auraframework.def.ThemeDef;
 import org.auraframework.instance.BaseComponent;
-import org.auraframework.system.Location;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
@@ -41,15 +38,15 @@ public class ThemedDeclarationRenderer implements Renderer {
     @SuppressWarnings("unchecked")
     public void render(BaseComponent<?, ?> component, Appendable out) throws IOException, QuickFixException {
         String property = component.getAttributes().getValue("property").toString();
-        Location location = (Location) component.getAttributes().getValue("location");
+        // Location location = (Location) component.getAttributes().getValue("location");
         List<String> references = (List<String>) component.getAttributes().getValue("references");
 
-        ThemeValueProvider provider = Aura.getStyleAdapter().getThemeValueProvider();
+        // ThemeValueProvider provide = Aura.getStyleAdapter().getThemeValueProvider(component.);
 
         // gather values. there can be multiple values if there were multiple theme functions in the declaration value.
         List<String> resolved = Lists.newArrayList();
         for (String reference : references) {
-            String value = provider.getValue(reference, location).toString();
+            String value = reference;// provider.getValue(reference, location).toString();
 
             // for any empty values, we don't output the declaration at all
             if (AuraTextUtil.isNullOrEmpty(value)) {

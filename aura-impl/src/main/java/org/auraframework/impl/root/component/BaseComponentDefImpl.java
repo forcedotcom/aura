@@ -16,6 +16,8 @@
 
 package org.auraframework.impl.root.component;
 
+import static org.auraframework.instance.ValueProviderType.LABEL;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -49,6 +51,7 @@ import org.auraframework.def.ResourceDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.def.StyleDef;
 import org.auraframework.def.TestSuiteDef;
+import org.auraframework.def.ThemeDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.root.AttributeDefRefImpl;
 import org.auraframework.impl.root.RootDefinitionImpl;
@@ -67,8 +70,6 @@ import org.auraframework.util.json.Json;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-
-import static org.auraframework.instance.ValueProviderType.LABEL;
 
 public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
@@ -90,6 +91,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     private final List<DefDescriptor<HelperDef>> helperDescriptors;
     private final List<DefDescriptor<ResourceDef>> resourceDescriptors;
     private final DefDescriptor<ControllerDef> compoundControllerDescriptor;
+    private final DefDescriptor<ThemeDef> localThemeDescriptor;
 
     private final Set<DefDescriptor<InterfaceDef>> interfaces;
     private final List<DefDescriptor<ControllerDef>> controllerDescriptors;
@@ -141,6 +143,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         this.clientLibraries = AuraUtil.immutableList(builder.clientLibraries);
         this.render = builder.renderType;
         this.whitespaceBehavior = builder.whitespaceBehavior;
+        this.localThemeDescriptor = builder.localThemeDescriptor;
 
         this.expressionRefs = AuraUtil.immutableSet(builder.expressionRefs);
         if (getDescriptor() != null) { 
@@ -150,7 +153,8 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             this.compoundControllerDescriptor = null;
         }
         this.hashCode = AuraUtil.hashCode(super.hashCode(), events, controllerDescriptors, modelDefDescriptor,
-                extendsDescriptor, interfaces, rendererDescriptors, helperDescriptors, resourceDescriptors);
+                extendsDescriptor, interfaces, rendererDescriptors, helperDescriptors, resourceDescriptors,
+                localThemeDescriptor);
     }
 
     /**
@@ -243,6 +247,8 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             localDeps = true;
             return;
         }
+
+        // TODONM should themeDescriptor be added here?(but in app def impl not here)
 
         if (providerDescriptors != null) {
             boolean hasRemote = providerDescriptors.isEmpty();
@@ -464,6 +470,10 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             dependencies.add(templateDefDescriptor);
         }
 
+        if (localThemeDescriptor != null) {
+            dependencies.add(localThemeDescriptor);
+        }
+
         for (DependencyDef dep : this.dependencies) {
             dep.appendDependencies(dependencies);
         }
@@ -619,6 +629,11 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     }
 
     @Override
+    public DefDescriptor<ThemeDef> getLocalThemeDescriptor() {
+        return localThemeDescriptor;
+    }
+
+    @Override
     public boolean isAbstract() {
         return isAbstract;
     }
@@ -679,6 +694,8 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
                                     .equals(other.modelDefDescriptor))
                     && (extendsDescriptor == null ? other.extendsDescriptor == null
                             : extendsDescriptor.equals(other.extendsDescriptor))
+                    && (localThemeDescriptor == null ? other.localThemeDescriptor == null
+                            : localThemeDescriptor.equals(other.localThemeDescriptor))
                     && events.equals(other.events)
                     && getLocation().equals(other.getLocation());
         }
@@ -883,13 +900,13 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             ret.addAll(getSuperDef().getModelDefDescriptors());
         }
         return ret;
-    }    
+    }
 
     @Override
-    public List<ClientLibraryDef> getClientLibraries(){
+    public List<ClientLibraryDef> getClientLibraries() {
         return clientLibraries;
     }
-    
+
     public static abstract class Builder<T extends BaseComponentDef> extends
             RootDefinitionImpl.Builder<T> implements BaseComponentDefBuilder<T> {
 
@@ -906,6 +923,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         public DefDescriptor<ComponentDef> templateDefDescriptor;
         public DefDescriptor<TestSuiteDef> testSuiteDefDescriptor;
         public DefDescriptor<StyleDef> styleDescriptor;
+        public DefDescriptor<ThemeDef> localThemeDescriptor;
         public List<DefDescriptor<RendererDef>> rendererDescriptors;
         public List<DefDescriptor<HelperDef>> helperDescriptors;
         public List<DefDescriptor<ResourceDef>> resourceDescriptors;
@@ -1042,7 +1060,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
 
         @Override
         public Builder<T> addClientLibrary(ClientLibraryDef clientLibrary) {
-            if(this.clientLibraries == null) {
+            if (this.clientLibraries == null) {
                 this.clientLibraries = Lists.newArrayList();
             }
             this.clientLibraries.add(clientLibrary);

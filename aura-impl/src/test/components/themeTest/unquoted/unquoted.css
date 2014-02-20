@@ -1,4 +1,0 @@
-.THIS {
-  color: theme(themeTest.baseTheme.color);
-  margin: theme('5px ' + themeTest.baseTheme.margin);
-}

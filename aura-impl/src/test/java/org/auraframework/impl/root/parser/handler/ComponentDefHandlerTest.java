@@ -20,6 +20,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.ThemeDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.component.ComponentDefImpl;
 import org.auraframework.impl.root.parser.XMLParser;
@@ -112,5 +113,14 @@ public class ComponentDefHandlerTest extends AuraImplTestCase {
             fail("Should have thrown Exception. Attribute value cannot be blank.");
         } catch (InvalidDefinitionException expected) {
         }
+    }
+
+    /** tests that themes in the component bundle are correctly associated */
+    public void testLocalComponentTheme() throws Exception {
+        DefDescriptor<ThemeDef> themeDesc = addSourceAutoCleanup(ThemeDef.class, "<aura:theme/>");
+        String fmt = String.format("%s:%s", themeDesc.getNamespace(), themeDesc.getName());
+        DefDescriptor<ComponentDef> cmpDesc = DefDescriptorImpl.getInstance(fmt, ComponentDef.class);
+        addSourceAutoCleanup(cmpDesc, "<aura:component/>");
+        assertEquals(themeDesc, cmpDesc.getDef().getLocalThemeDescriptor());
     }
 }

@@ -1,0 +1,6 @@
+<aura:theme>
+    <aura:var name="color" value="red" />
+    <aura:var name="bgcolor" value="green" />
+    <aura:var name="color2" value="{!color}"/>
+    <aura:var name="bgcolor2" value="{!bgcolor}"/>
+</aura:theme>

@@ -24,6 +24,7 @@ import java.util.Set;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.ThemeDef;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Event;
@@ -443,4 +444,14 @@ public interface AuraContext {
      * Serialize out the components.
      */
     void serializeAsPart(Json json) throws IOException;
+
+    /**
+     * Gets the {@link ThemeDef} that overrides default variable values for any CSS processed within this context.
+     */
+    DefDescriptor<ThemeDef> getOverrideThemeDescriptor();
+
+    /**
+     * Sets the {@link ThemeDef} to override default variable values for any CSS processed within this context.
+     */
+    void setOverrideThemeDescriptor(DefDescriptor<ThemeDef> themeDescriptor);
 }

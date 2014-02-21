@@ -422,9 +422,11 @@
                         <app>XML_STYLE</app>
                         <intf>XML_STYLE</intf>
                         <evt>XML_STYLE</evt>
+                        <auradoc>XML_STYLE</auradoc>
                         <apt>DOUBLETILDE_STYLE</apt>
                         <properties>SCRIPT_STYLE</properties>
                         <sh>SCRIPT_STYLE</sh>
+                        <conf>SCRIPT_STYLE</conf>
                         <txt>TEXT</txt>
                         <bat>BATCH</bat>
                         <cmd>BATCH</cmd>

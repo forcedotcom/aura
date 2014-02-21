@@ -21,5 +21,5 @@ public interface ExampleDef extends Definition {
     
     String getLabel();
     
-    String getMarkup();
+    DefDescriptor<ComponentDef> getRef();
 }

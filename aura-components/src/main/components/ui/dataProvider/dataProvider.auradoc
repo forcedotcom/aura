@@ -19,11 +19,6 @@
 			To customize this behavior, set the event handler in the component that extends <code>ui:dataProvider</code> by using the <code>aura:handler</code> tag with the attribute <code>name="provide"</code>.
 		</p>
 	</aura:description>
-	<!--aura:example name="example1" label="Our First Example" description="All this one does is show a button.">
-		<ui:button label="Example Button"/>
-	</aura:example-->
 	
-	<aura:example name="example2" label="Our Second Example" description="This one references a demo cmp externally.">
-		<auradocs:testRef/>
-	</aura:example>
+	<aura:example name="example1" ref="uiExamples:dataProviderExample"/>
 </aura:documentation>

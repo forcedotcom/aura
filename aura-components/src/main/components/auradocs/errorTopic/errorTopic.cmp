@@ -27,7 +27,7 @@
 
     <p>The following demo shows how Aura handles a validation error and uses the default error component to display the error message.</p>
      <p>When you enter a value and click <b>Submit</b>, an action in the controller validates the input and displays an error message if the input is not a number. Entering a valid input clears the error.
-    <auradocs:example descriptor="auradocs:sampleError" />
+    <auradocs:viewer descriptor="auradocs:sampleError" />
 
 
     The controller uses a <auradocs:referenceTopicLink topic="api:SimpleValue">SimpleValue</auradocs:referenceTopicLink> object. It invalidates the input value using <code>setValid(false)</code> and clears any error using <code>setValid(true)</code>. You can add error messages to the input value using <code>addErrors()</code>. </p>
@@ -40,7 +40,7 @@
 
     <p>The following demo shows how you can handle a validation error using custom error handlers and display the error message using the default error component.</p>
 
-    <auradocs:example descriptor="auradocs:sampleErrors" />
+    <auradocs:viewer descriptor="auradocs:sampleErrors" />
 
     <p>When you enter a value and click <b>Submit</b>, an action in the controller executes. However, instead of letting Aura handle the errors, you have to provide a custom error handler using the <code>onError</code> attribute in the component. </p>
 

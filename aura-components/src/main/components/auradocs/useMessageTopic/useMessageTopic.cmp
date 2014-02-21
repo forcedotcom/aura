@@ -28,23 +28,23 @@
     <p>This demo shows an overlay dialog. Set <code>clickOutToClose="false"</code> to prevent the dialog from being closed when you click outside of the dialog area.
     Note that you can use the <code>ui:openDialog</code> and <code>ui:closeDialog</code> application events to handle the opening and closing of your dialogs. Take a look at the js://controller source tab to see how you can implement these events.</p>
     <auradocs:info>See  <auradocs:defLink descriptor="ui:openDialog" defType="event">ui:openDialog</auradocs:defLink> and <auradocs:defLink descriptor="ui:closeDialog" defType="event">ui:closeDialog</auradocs:defLink> for supported parameters.</auradocs:info>
-    <auradocs:example descriptor="auradocs:demoDialog" />
+    <auradocs:viewer descriptor="auradocs:demoDialog" />
     
     <p>This demo shows a modal dialog, which is set using <code>isModal="true"</code>. You can use the default buttons by placing the <code>ui:dialogButtons</code> component in the <code>&lt;aura:set attribute="buttons"&gt;</code> tag, as shown in the Component source tab.
     Refer to the <auradocs:defLink descriptor="ui:dialogButtons">ui:dialogButtons</auradocs:defLink> component reference to see the actions wired to the default buttons.</p>
-    <auradocs:example descriptor="auradocs:demoModal" />
+    <auradocs:viewer descriptor="auradocs:demoModal" />
     
 	<h3><code>ui:message</code></h3>
 	<p>Use <code>ui:message</code> to display a message and use the <code>severity</code> attribute to indicate its severity level, which determines the style to use when displaying the message. 
 	If the <code>closable</code> attribute is set to true, the message is hidden when the &times; symbol is pressed. Additionally, you can wire an action to the <code>ui:message</code> component using the <code>actionable</code> attribute.</p>    
 	<auradocs:info>See the <auradocs:defLink descriptor ="ui:message">ui:message</auradocs:defLink> component reference.</auradocs:info>
-	<auradocs:example descriptor="auradocs:demoMessage" />
+	<auradocs:viewer descriptor="auradocs:demoMessage" />
 	
 	<h3><code>ui:stamp</code></h3>
 	<p>Use <code>ui:stamp</code> to display a decorated stamp containing text. The demo below shows stamps with different <code>severity</code> attribute values. For example, the
 	component reference uses <code>ui:stamp</code> to denote the support level of the components.</p>
 	<auradocs:info>See the <auradocs:defLink descriptor="ui:stamp">ui:stamp</auradocs:defLink> component reference.</auradocs:info> 
-	<auradocs:example descriptor="auradocs:demoStamp" />
+	<auradocs:viewer descriptor="auradocs:demoStamp" />
 	
 	<p><b>See also:</b><br/>
 	  <auradocs:topicLink topic="helloActions">Client-Side Controllers</auradocs:topicLink><br/>

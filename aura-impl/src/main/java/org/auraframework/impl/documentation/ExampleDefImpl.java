@@ -16,9 +16,11 @@
 package org.auraframework.impl.documentation;
 
 import java.io.IOException;
+import java.util.Set;
 
 import org.auraframework.builder.ExampleDefBuilder;
-import org.auraframework.def.ExampleDef;
+import org.auraframework.def.*;
+import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.util.json.Json;
 
@@ -26,21 +28,16 @@ public class ExampleDefImpl extends DefinitionImpl<ExampleDef> implements Exampl
 
 	private static final long serialVersionUID = -4467201134487458023L;
 
-    private Object body;
+    private DefDescriptor<ComponentDef> ref;
     private String name;
     private String label;
-    private String markup;
 	
 	protected ExampleDefImpl(Builder builder) {
         super(builder);
         
-        this.body = builder.body;
+        this.ref = builder.ref;
         this.name = builder.name;
         this.label = builder.label;
-    }
-	
-    public Object getBody() {
-        return body;
     }
 
     @Override
@@ -54,8 +51,14 @@ public class ExampleDefImpl extends DefinitionImpl<ExampleDef> implements Exampl
     }
     
     @Override
-    public String getMarkup() {
-        return markup;
+    public DefDescriptor<ComponentDef> getRef() {
+        return ref;
+    }
+        
+    @Override
+    public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
+        super.appendDependencies(dependencies);
+        dependencies.add(ref);
     }
 
     @Override
@@ -69,7 +72,7 @@ public class ExampleDefImpl extends DefinitionImpl<ExampleDef> implements Exampl
 
     public static class Builder extends DefinitionImpl.BuilderImpl<ExampleDef> implements ExampleDefBuilder {
         
-        private Object body;
+        private DefDescriptor<ComponentDef> ref;
         private String name;
         private String label;
 
@@ -86,20 +89,14 @@ public class ExampleDefImpl extends DefinitionImpl<ExampleDef> implements Exampl
         }
 
         @Override
-        public ExampleDefBuilder setBody(Object body) {
-            this.body = body;
-            return this;
-        }
-        
-        @Override
         public ExampleDefBuilder setName(String name) {
             this.name = name;
             return this;
         }
 
         @Override
-        public ExampleDefBuilder setLabel(String label) {
-            this.label = label;
+        public ExampleDefBuilder setRef(String qualifiedName) {
+            this.ref = DefDescriptorImpl.getInstance(qualifiedName, ComponentDef.class);
             return this;
         }
     }

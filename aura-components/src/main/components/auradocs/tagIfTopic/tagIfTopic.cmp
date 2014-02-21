@@ -54,12 +54,12 @@
 
        <p>The <b>Component source</b> tab shows the markup for <code>sampleIf.cmp</code>, which extends <code>sampleIfDemo.cmp</code>.</p>
 
-       <auradocs:example descriptor="auradocs:sampleIf" />
+       <auradocs:viewer descriptor="auradocs:sampleIf" />
 
 
        <p><b>sampleIfDemo.cmp</b></p>
 
-       <auradocs:example descriptor="auradocs:sampleIfDemo" />
+       <auradocs:viewer descriptor="auradocs:sampleIfDemo" />
 
         <p>The <code>aura:if</code> component displays the  elements in the body when the <code>isTrue</code> attribute evaluates to true. In this case, the body displays when the <code>show</code> attribute contains a value.
          The <code>show</code> attribute is set in <code>sampleIf.cmp</code>, which extends <code>sampleIfDemo.cmp</code>.</p>

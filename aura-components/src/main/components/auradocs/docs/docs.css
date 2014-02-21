@@ -27,6 +27,12 @@
 	line-height: 120%;
 }
 
+.THIS .bordered {
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	padding: 8px;
+}
+
 .THIS.container {
 	background-color: #fff;
 	margin-left: auto;

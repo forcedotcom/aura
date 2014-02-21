@@ -19,21 +19,12 @@ import java.io.IOException;
 import java.util.List;
 
 import org.auraframework.Aura;
-import org.auraframework.def.AttributeDef;
-import org.auraframework.def.BaseComponentDef;
-import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.*;
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.def.Definition;
-import org.auraframework.def.DocumentationDef;
-import org.auraframework.def.EventDef;
-import org.auraframework.def.EventHandlerDef;
-import org.auraframework.def.InterfaceDef;
-import org.auraframework.def.RegisterEventDef;
-import org.auraframework.def.RootDefinition;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Model;
-import org.auraframework.system.AuraContext;
+import org.auraframework.system.*;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonSerializable;
@@ -129,7 +120,10 @@ public class ComponentDefModel {
                 List<DefDescriptor<?>> deps = ((RootDefinition) definition).getBundle();
 
                 for (DefDescriptor<?> dep : deps) {
-                    defs.add(new DefModel(dep));
+                    // we already surface the documentation--users don't need to see the source for it.
+                    if (dep.getDefType() != DefType.DOCUMENTATION) {
+                        defs.add(new DefModel(dep));
+                    }
                 }
             }
         } else {

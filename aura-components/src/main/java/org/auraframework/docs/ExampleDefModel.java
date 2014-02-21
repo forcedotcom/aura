@@ -40,10 +40,6 @@ public class ExampleDefModel implements JsonSerializable {
     public String getLabel() {
         return this.exampleDef.getLabel();
     }
-    
-    public String getMarkup() {
-        return this.exampleDef.getMarkup();
-    }
 
     @Override
     public void serialize(Json json) throws IOException {
@@ -51,7 +47,6 @@ public class ExampleDefModel implements JsonSerializable {
         json.writeMapEntry("name", getName());
         json.writeMapEntry("description", getDescription());
         json.writeMapEntry("label", getLabel());
-        json.writeMapEntry("markup", getMarkup());
         json.writeMapEnd();
     }
 }

@@ -15,9 +15,16 @@
     limitations under the License.
 
 -->
-<aura:component extensible="true" model="java://org.auraframework.docs.DefExamplesModel">
-	<aura:attribute name="descriptor" type="String" required="true"/>
-    <aura:attribute name="defType" type="String" default="Component"/>
+<aura:component extends="auradocs:example">
+	<!-- there should be a way to do this automatically, but... -->
+	<aura:set attribute="descriptor" value="uiExamples:dataProviderExample"/>
+	
+	<aura:set attribute="title" value="Using ui:dataProvider"/>
+    <aura:set attribute="description">
+    	<p>A nice long description.  Multiple paragraphs, external links--the whole deal.</p>
+    	
+    	<p>Not sure how the links should work just yet...</p>
+    </aura:set>
     
-    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+	<ui:button label="This is distinctly not a list, but you get the idea."></ui:button>
 </aura:component>

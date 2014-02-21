@@ -44,10 +44,6 @@ var AuraExpressionService = function AuraExpressionService(){
          * @memberOf AuraExpressionService
          */
         getValue: function(valueProvider, expression){
-        	if (expression && expression.indexOf && expression.indexOf("example") >= 0) {
-//#debugger
-        	}
-        	
             if (aura.util.isString(expression)) {
             	var cached = propertyRefCache[expression];
             	if (!cached) {

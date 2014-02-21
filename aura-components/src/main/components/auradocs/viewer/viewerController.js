@@ -13,21 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-({
-    render : function ExampleRenderer(cmp){
-        var attributes = cmp.getAttributes();
-        var desc = new DefDescriptor(attributes.getRawValue("descriptor"));
-        var ret = this.superRender();
-        var url = "/"+desc.getNamespace()+"/"+desc.getName()+".cmp";
+{
+    refresh : function(cmp, event){
+        var frame = Ext.getCmp(cmp.find("frame").getElement().id).el.dom;
+        frame.contentWindow.location.reload(true);
+    },
+
+    updateLocation : function(cmp, event){
         var locationBar = cmp.find("locationBar").getElement();
-        locationBar.value = url;
         var frame = cmp.find("frame").getElement();
-        var cachebuster = Math.random() * 100000;
-        var app = $A.getContext().getApp();
-        frame.src = url + "?aura.cb="+cachebuster + "&aura.mode=" + $A.getContext().getMode() + (app?"&aura.app="+app:"");
-
-
-
-        return ret;
+        frame.contentWindow.location = locationBar.value;
     }
-})
+}

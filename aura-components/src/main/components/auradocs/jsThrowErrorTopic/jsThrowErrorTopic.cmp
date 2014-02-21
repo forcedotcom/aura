@@ -30,7 +30,7 @@
     
     <p>This sample shows you the basics of throwing and catching an error in a JavaScript controller.</p>
     
-    <auradocs:example descriptor="auradocs:sampleThrowError" /> 
+    <auradocs:viewer descriptor="auradocs:sampleThrowError" /> 
     
     <p>See the controller code for an example of throwing an error in a try-catch block. The message in the error is displayed to the user in a dynamically created <code>ui:message</code> component.</p>
     

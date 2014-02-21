@@ -15,9 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extensible="true" model="java://org.auraframework.docs.DefExamplesModel">
-	<aura:attribute name="descriptor" type="String" required="true"/>
-    <aura:attribute name="defType" type="String" default="Component"/>
-    
-    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+<aura:component>
+	<uiExamples:dataProviderExample aura:id="one"/>
+	<uiExamples:dataProviderExample aura:id="two"/>
 </aura:component>

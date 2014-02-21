@@ -18,7 +18,8 @@ package org.auraframework.docs;
 import java.io.IOException;
 import java.util.List;
 
-import org.auraframework.def.*;
+import org.auraframework.def.DescriptionDef;
+import org.auraframework.def.DocumentationDef;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonSerializable;
 
@@ -46,14 +47,8 @@ public class DocumentationDefModel implements JsonSerializable {
 		return ret;
 	}
 	
-	public List<ExampleDefModel> getExamples() {
-		List<ExampleDefModel> ret = Lists.newArrayList();
-		
-		for (ExampleDef exDef : this.docDef.getExampleDefs().values()) {
-			ret.add(new ExampleDefModel(exDef));
-		}
-		
-		return ret;
+	public boolean getHasExamples() {
+		return !this.docDef.getExampleDefs().isEmpty();
 	}
 
 	@Override
@@ -61,7 +56,7 @@ public class DocumentationDefModel implements JsonSerializable {
 		json.writeMapBegin();
 		json.writeMapEntry("descriptor", getDescriptor());
 		json.writeMapEntry("descriptions", getDescriptions());
-		json.writeMapEntry("examples", getExamples());
+		json.writeMapEntry("hasExamples", getHasExamples());
 		json.writeMapEnd();
 	}
 }

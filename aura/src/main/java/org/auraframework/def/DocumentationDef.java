@@ -23,7 +23,7 @@ public interface DocumentationDef extends RootDefinition {
     @Override
     DefDescriptor<DocumentationDef> getDescriptor();
     
-    Map<String, ? extends DescriptionDef> getDescriptionDefs();
+    Map<String, DescriptionDef> getDescriptionDefs();
     
-    Map<String, ? extends ExampleDef> getExampleDefs();
+    Map<String, ExampleDef> getExampleDefs();
 }

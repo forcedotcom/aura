@@ -268,7 +268,8 @@ Component.prototype.unwrap = function() {
  * @private
  */
 Component.prototype.findInstancesOf = function(type, ret, cmp){
-    cmp = cmp || this.getSuperest();
+    cmp = cmp || this.getSuperest();   
+    
     var body = cmp.get("v.body");
     if(body){
         for(var i=0;i<body.length;i++){

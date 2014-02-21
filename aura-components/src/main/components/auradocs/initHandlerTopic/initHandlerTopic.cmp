@@ -24,7 +24,7 @@
 
 <h2>Code</h2>
 
-    <auradocs:example descriptor="auradocs:sampleInitHandler" />
+    <auradocs:viewer descriptor="auradocs:sampleInitHandler" />
 
 <h2>Discussion</h2>
 

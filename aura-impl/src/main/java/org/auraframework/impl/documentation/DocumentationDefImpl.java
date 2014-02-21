@@ -49,12 +49,12 @@ public class DocumentationDefImpl extends RootDefinitionImpl<DocumentationDef> i
     }
     
     @Override
-    public Map<String, ? extends DescriptionDef> getDescriptionDefs() {
+    public Map<String, DescriptionDef> getDescriptionDefs() {
             return descriptionDefs;
     }
 
     @Override
-    public Map<String, ? extends ExampleDef> getExampleDefs() {
+    public Map<String, ExampleDef> getExampleDefs() {
             return exampleDefs;
     }
 
@@ -92,13 +92,15 @@ public class DocumentationDefImpl extends RootDefinitionImpl<DocumentationDef> i
         }
         
         @Override
-        public void addDescription(String id, DescriptionDef description) {
+        public DocumentationDefBuilder addDescription(String id, DescriptionDef description) {
             this.descriptionMap.put(id, description);
+            return this;
         }
         
         @Override
-        public void addExample(String id, ExampleDef example) {
+        public DocumentationDefBuilder addExample(String id, ExampleDef example) {
             this.exampleMap.put(id, example);
+            return this;
         }
     }
 }

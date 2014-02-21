@@ -21,7 +21,7 @@
     	<aura:set attribute="north">
     	<p> <code>ui:block</code> creates a horizontal box area.</p>
     		    
-    	 <auradocs:example descriptor="auradocs:demoBlock" />
+    	 <auradocs:viewer descriptor="auradocs:demoBlock" />
     	</aura:set>
     	<aura:set attribute="south">
     	<p>

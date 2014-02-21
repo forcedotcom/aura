@@ -136,9 +136,9 @@ public class JavaControllerTest extends AuraImplTestCase {
         checkPassAction(controller, "doSomething", hasOne, State.SUCCESS, null);
         checkPassAction(controller, "getString", empty, State.SUCCESS, "TestController");
         checkFailAction(controller, "throwException", empty, State.ERROR, AuraUnhandledException.class,
-        		"org.auraframework.throwable.AuraExecutionException: " +
-        		"java://org.auraframework.impl.java.controller.TestController: " +
-        		"java.lang.RuntimeException: intentionally generated");
+                "org.auraframework.throwable.AuraExecutionException: " +
+                        "java://org.auraframework.impl.java.controller.TestController: " +
+                        "java.lang.RuntimeException: intentionally generated");
     }
 
     /**
@@ -163,8 +163,8 @@ public class JavaControllerTest extends AuraImplTestCase {
         args.clear();
         checkFailAction(controller, "sumValues", args, State.ERROR, AuraUnhandledException.class,
                 "org.auraframework.throwable.AuraExecutionException: " +
-                "java://org.auraframework.impl.java.controller.TestControllerWithParameters: " +
-                "java.lang.NullPointerException");
+                        "java://org.auraframework.impl.java.controller.TestControllerWithParameters: " +
+                        "java.lang.NullPointerException");
 
         args.put("a", "x");
         args.put("b", "y");
@@ -191,11 +191,13 @@ public class JavaControllerTest extends AuraImplTestCase {
         }
         ControllerDef controller = getJavaController("java://org.auraframework.impl.java.controller.TestController");
         Map<String, Object> empty = new HashMap<String, Object>();
-        try{
+        try {
             controller.createAction("imNotHere", empty);
             fail("Should not be able to create JavaAction when method does not exist in Controller class");
-        } catch(DefinitionNotFoundException e){
-            assertEquals("No ACTION named java://org.auraframework.impl.java.controller.TestController/ACTION$imNotHere found", e.getMessage());
+        } catch (DefinitionNotFoundException e) {
+            assertEquals(
+                    "No ACTION named java://org.auraframework.impl.java.controller.TestController/ACTION$imNotHere found",
+                    e.getMessage());
         }
     }
 
@@ -203,6 +205,20 @@ public class JavaControllerTest extends AuraImplTestCase {
         assertControllerThrows("java://org.auraframework.impl.java.controller.TestControllerWithDuplicateAction",
                 InvalidDefinitionException.class, "Duplicate action appendStrings",
                 "org.auraframework.impl.java.controller.TestControllerWithDuplicateAction");
+    }
+
+    public void testGetSubDefinition() throws Exception {
+        ControllerDef controller = getJavaController("java://org.auraframework.impl.java.controller.TestController");
+        ActionDef subDef = controller.getSubDefinition("getString");
+        assertEquals("SubDefinition is the wrong type", ActionDef.ActionType.SERVER, subDef.getActionType());
+        assertEquals("java://org.auraframework.impl.java.controller.TestController/ACTION$getString", subDef
+                .getDescriptor().getQualifiedName());
+    }
+
+    public void testGetNullSubDefinition() throws Exception {
+        ControllerDef controller = getJavaController("java://org.auraframework.impl.java.controller.TestController");
+        ActionDef subDefNonExistent = controller.getSubDefinition("iDontExist");
+        assertNull("Trying to retrieve non-existent subdefiniton should return null", subDefNonExistent);
     }
 
     /**
@@ -256,126 +272,151 @@ public class JavaControllerTest extends AuraImplTestCase {
      */
     public void testParamLogging() throws Exception {
         ControllerDef controller = getJavaController("java://org.auraframework.impl.java.controller.JavaTestController");
-        JavaAction nonLoggableStringAction = (JavaAction)controller.createAction("getString", null);
-        JavaAction nonLoggableIntAction = (JavaAction)controller.createAction("getInt", null);
-        JavaAction loggableStringAction = (JavaAction)controller.createAction("getLoggableString", Collections.singletonMap("param", (Object)"bar"));
-        JavaAction loggableIntAction = (JavaAction)controller.createAction("getLoggableString", Collections.singletonMap("param", (Object)1));
-        JavaAction loggableNullAction = (JavaAction)controller.createAction("getLoggableString", Collections.singletonMap("param", null));
+        JavaAction nonLoggableStringAction = (JavaAction) controller.createAction("getString", null);
+        JavaAction nonLoggableIntAction = (JavaAction) controller.createAction("getInt", null);
+        JavaAction loggableStringAction = (JavaAction) controller.createAction("getLoggableString",
+                Collections.singletonMap("param", (Object) "bar"));
+        JavaAction loggableIntAction = (JavaAction) controller.createAction("getLoggableString",
+                Collections.singletonMap("param", (Object) 1));
+        JavaAction loggableNullAction = (JavaAction) controller.createAction("getLoggableString",
+                Collections.singletonMap("param", null));
         TestLogger testLogger = new TestLogger();
-        
+
         nonLoggableStringAction.logParams(testLogger);
         assertNull("Key should not have been logged", testLogger.key);
         assertNull("Value should not have been logged", testLogger.value);
-        
+
         nonLoggableIntAction.logParams(testLogger);
         assertNull("Key should not have been logged", testLogger.key);
         assertNull("Value should not have been logged", testLogger.value);
-        
+
         loggableStringAction.logParams(testLogger);
         assertEquals("Key was not logged", "param", testLogger.key);
         assertEquals("Value was not logged", "bar", testLogger.value);
-        
+
         loggableIntAction.logParams(testLogger);
         assertEquals("Key was not logged", "param", testLogger.key);
         assertEquals("Value was not logged", "1", testLogger.value);
-        
+
         loggableNullAction.logParams(testLogger);
         assertEquals("Key was not logged", "param", testLogger.key);
         assertEquals("Value was not logged", "null", testLogger.value);
     }
-    
+
     @ThreadHostileTest("TestLoggingAdapter not thread-safe")
-    public void testParamLogging_NoParams() throws Exception{
+    public void testParamLogging_NoParams() throws Exception {
         ControllerDef controller = getJavaController("java://org.auraframework.impl.java.controller.TestController");
         Map<String, Object> params = Maps.newHashMap();
         Action nonLoggableStringAction = controller.createAction("getString", params);
         List<Map<String, Object>> logs = runActionsAndReturnLogs(Lists.newArrayList(nonLoggableStringAction));
-        assertEquals(1,logs.size());
-        assertTrue("Failed to log a server action",
-                logs.get(0).containsKey("action_java://org.auraframework.impl.java.controller.TestController/ACTION$getString"));
+        assertEquals(1, logs.size());
+        assertTrue(
+                "Failed to log a server action",
+                logs.get(0).containsKey(
+                        "action_java://org.auraframework.impl.java.controller.TestController/ACTION$getString"));
     }
-    
+
     @ThreadHostileTest("TestLoggingAdapter not thread-safe")
-    public void testParamLogging_SelectParameters() throws Exception{
+    public void testParamLogging_SelectParameters() throws Exception {
         ControllerDef controller = getJavaController("java://org.auraframework.impl.java.controller.JavaTestController");
         Map<String, Object> params = Maps.newHashMap();
         params.put("strparam", "BoogaBoo");
         params.put("intparam", 1);
         Action selectParamLoggingAction = controller.createAction("getSelectedParamLogging", params);
         List<Map<String, Object>> logs = runActionsAndReturnLogs(Lists.newArrayList(selectParamLoggingAction));
-        assertEquals(1,logs.size());
-        assertTrue("Failed to log a server action and selected parameter assignment",
-                logs.get(0).containsKey("action_java://org.auraframework.impl.java.controller.JavaTestController/ACTION$getSelectedParamLogging{strparam,BoogaBoo}"));
+        assertEquals(1, logs.size());
+        assertTrue(
+                "Failed to log a server action and selected parameter assignment",
+                logs.get(0)
+                        .containsKey(
+                                "action_java://org.auraframework.impl.java.controller.JavaTestController/ACTION$getSelectedParamLogging{strparam,BoogaBoo}"));
     }
-    
+
     @ThreadHostileTest("TestLoggingAdapter not thread-safe")
-    public void testParamLogging_MultipleParameters() throws Exception{
+    public void testParamLogging_MultipleParameters() throws Exception {
         ControllerDef controller = getJavaController("java://org.auraframework.impl.java.controller.JavaTestController");
         Map<String, Object> params = Maps.newHashMap();
         params.put("we", "we");
         params.put("two", "two");
         Action selectParamLoggingAction = controller.createAction("getMultiParamLogging", params);
         List<Map<String, Object>> logs = runActionsAndReturnLogs(Lists.newArrayList(selectParamLoggingAction));
-        assertEquals(1,logs.size());
-        assertTrue("Failed to log a server action and multiple params",
-                logs.get(0).containsKey("action_java://org.auraframework.impl.java.controller.JavaTestController/ACTION$getMultiParamLogging{we,we}{two,two}"));
+        assertEquals(1, logs.size());
+        assertTrue(
+                "Failed to log a server action and multiple params",
+                logs.get(0)
+                        .containsKey(
+                                "action_java://org.auraframework.impl.java.controller.JavaTestController/ACTION$getMultiParamLogging{we,we}{two,two}"));
     }
-    
+
     @ThreadHostileTest("TestLoggingAdapter not thread-safe")
-    public void testParamLogging_NullValuesForParameters() throws Exception{
+    public void testParamLogging_NullValuesForParameters() throws Exception {
         ControllerDef controller = getJavaController("java://org.auraframework.impl.java.controller.JavaTestController");
         Map<String, Object> params = Maps.newHashMap();
         Action selectParamLoggingAction = controller.createAction("getLoggableString", params);
         List<Map<String, Object>> logs = runActionsAndReturnLogs(Lists.newArrayList(selectParamLoggingAction));
-        assertEquals(1,logs.size());
-        assertTrue("Failed to log a server action and param with null value",
-                logs.get(0).containsKey("action_java://org.auraframework.impl.java.controller.JavaTestController/ACTION$getLoggableString{param,null}"));
+        assertEquals(1, logs.size());
+        assertTrue(
+                "Failed to log a server action and param with null value",
+                logs.get(0)
+                        .containsKey(
+                                "action_java://org.auraframework.impl.java.controller.JavaTestController/ACTION$getLoggableString{param,null}"));
     }
-    
+
     @ThreadHostileTest("TestLoggingAdapter not thread-safe")
-    public void testParamLogging_ParametersOfCustomDataType() throws Exception{
+    public void testParamLogging_ParametersOfCustomDataType() throws Exception {
         ControllerDef controller = getJavaController("java://org.auraframework.impl.java.controller.JavaTestController");
         Map<String, Object> params = Maps.newHashMap();
         params.put("param", new JavaTestController.CustomParamType());
         Action selectParamLoggingAction = controller.createAction("getCustomParamLogging", params);
         List<Map<String, Object>> logs = runActionsAndReturnLogs(Lists.newArrayList(selectParamLoggingAction));
-        assertEquals(1,logs.size());
-        assertTrue("Logging custom action param time failed to call toString() of the custom type",
-                logs.get(0).containsKey("action_java://org.auraframework.impl.java.controller.JavaTestController/ACTION$getCustomParamLogging{param,CustomParamType_toString}"));
+        assertEquals(1, logs.size());
+        assertTrue(
+                "Logging custom action param time failed to call toString() of the custom type",
+                logs.get(0)
+                        .containsKey(
+                                "action_java://org.auraframework.impl.java.controller.JavaTestController/ACTION$getCustomParamLogging{param,CustomParamType_toString}"));
     }
-    
+
     @ThreadHostileTest("TestLoggingAdapter not thread-safe")
-    public void testParamLogging_ChainingActions() throws Exception{
+    public void testParamLogging_ChainingActions() throws Exception {
         ControllerDef controller = getJavaController("java://org.auraframework.java.controller.ActionChainingController");
         Map<String, Object> params = Maps.newHashMap();
         params.put("a", 1);
         params.put("b", 1);
-        params.put("actions", "{\"actions\":[{\"descriptor\":\"java://org.auraframework.java.controller.ActionChainingController/ACTION$multiply\",\"params\":{\"a\":2}}]}");
+        params.put(
+                "actions",
+                "{\"actions\":[{\"descriptor\":\"java://org.auraframework.java.controller.ActionChainingController/ACTION$multiply\",\"params\":{\"a\":2}}]}");
         Action selectParamLoggingAction = controller.createAction("add", params);
         List<Map<String, Object>> logs = runActionsAndReturnLogs(Lists.newArrayList(selectParamLoggingAction));
-        assertEquals(1,logs.size());
-        assertTrue("Failed to log server action",
-                logs.get(0).containsKey("action_java://org.auraframework.java.controller.ActionChainingController/ACTION$add"));
-        assertTrue("Failed to log chained server action",
-                logs.get(0).containsKey("action_java://org.auraframework.java.controller.ActionChainingController/ACTION$multiply"));
+        assertEquals(1, logs.size());
+        assertTrue(
+                "Failed to log server action",
+                logs.get(0).containsKey(
+                        "action_java://org.auraframework.java.controller.ActionChainingController/ACTION$add"));
+        assertTrue(
+                "Failed to log chained server action",
+                logs.get(0).containsKey(
+                        "action_java://org.auraframework.java.controller.ActionChainingController/ACTION$multiply"));
     }
-    
-    private List<Map<String, Object>> runActionsAndReturnLogs(List<Action> actions)throws Exception{
+
+    private List<Map<String, Object>> runActionsAndReturnLogs(List<Action> actions) throws Exception {
         List<Map<String, Object>> logs;
         TestLoggingAdapterController.beginCapture();
-        try{
+        try {
             Aura.getServerService().run(new Message<ComponentDef>(actions), null);
-        }finally{
+        } finally {
             Aura.getLoggingService().doLog();
             logs = TestLoggingAdapterController.endCapture();
             assertNotNull(logs);
         }
         return logs;
     }
+
     private static class TestLogger implements KeyValueLogger {
 
         private String key = null;
         private String value = null;
+
         @Override
         public void log(String key, String value) {
             this.key = key;

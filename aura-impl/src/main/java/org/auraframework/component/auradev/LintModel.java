@@ -70,8 +70,9 @@ public class LintModel {
 											String fileUrl = source.getUrl();
 											fileUrl = fileUrl.substring(fileUrl.lastIndexOf(File.separatorChar));
 											List<JavascriptProcessingError> ret = jsv.validate(fileUrl, code, false, false);
-											Map<String, String> m = new TreeMap<String, String>();
+											Map<String, String> m;
 											for (JavascriptProcessingError error : ret) {
+												m = new TreeMap<String, String>();
 												String comp = descriptor.getNamespace()+":"+descriptor.getName();
 												m.put("CompName", comp);
 												m.put("ErrorMessage", error.toString());

@@ -48,58 +48,58 @@
         </thead>
         <tbody>
             <tr aura:id="calRow1" class="calRow">
-                <td><ui:dayInMonthCell aura:id="0"/></td>
-                <td><ui:dayInMonthCell aura:id="1"/></td>
-                <td><ui:dayInMonthCell aura:id="2"/></td>
-                <td><ui:dayInMonthCell aura:id="3"/></td>
-                <td><ui:dayInMonthCell aura:id="4"/></td>
-                <td><ui:dayInMonthCell aura:id="5"/></td>
-                <td><ui:dayInMonthCell aura:id="6"/></td>
+                <td><ui:dayInMonthCell aura:id="0" label="0"/></td>
+                <td><ui:dayInMonthCell aura:id="1" label="0"/></td>
+                <td><ui:dayInMonthCell aura:id="2" label="0"/></td>
+                <td><ui:dayInMonthCell aura:id="3" label="0"/></td>
+                <td><ui:dayInMonthCell aura:id="4" label="0"/></td>
+                <td><ui:dayInMonthCell aura:id="5" label="0"/></td>
+                <td><ui:dayInMonthCell aura:id="6" label="0"/></td>
             </tr>
             <tr aura:id="calRow2" class="calRow">
-                <td><ui:dayInMonthCell aura:id="7"/></td>
-                <td><ui:dayInMonthCell aura:id="8"/></td>
-                <td><ui:dayInMonthCell aura:id="9"/></td>
-                <td><ui:dayInMonthCell aura:id="10"/></td>
-                <td><ui:dayInMonthCell aura:id="11"/></td>
-                <td><ui:dayInMonthCell aura:id="12"/></td>
-                <td><ui:dayInMonthCell aura:id="13"/></td>
+                <td><ui:dayInMonthCell aura:id="7" label="0"/></td>
+                <td><ui:dayInMonthCell aura:id="8" label="0"/></td>
+                <td><ui:dayInMonthCell aura:id="9" label="0"/></td>
+                <td><ui:dayInMonthCell aura:id="10" label="0"/></td>
+                <td><ui:dayInMonthCell aura:id="11" label="0"/></td>
+                <td><ui:dayInMonthCell aura:id="12" label="0"/></td>
+                <td><ui:dayInMonthCell aura:id="13" label="0"/></td>
             </tr>
             <tr aura:id="calRow3" class="calRow">
-                <td><ui:dayInMonthCell aura:id="14"/></td>
-                <td><ui:dayInMonthCell aura:id="15"/></td>
-                <td><ui:dayInMonthCell aura:id="16"/></td>
-                <td><ui:dayInMonthCell aura:id="17"/></td>
-                <td><ui:dayInMonthCell aura:id="18"/></td>
-                <td><ui:dayInMonthCell aura:id="19"/></td>
-                <td><ui:dayInMonthCell aura:id="20"/></td>
+                <td><ui:dayInMonthCell aura:id="14" label="0"/></td>
+                <td><ui:dayInMonthCell aura:id="15" label="0"/></td>
+                <td><ui:dayInMonthCell aura:id="16" label="0"/></td>
+                <td><ui:dayInMonthCell aura:id="17" label="0"/></td>
+                <td><ui:dayInMonthCell aura:id="18" label="0"/></td>
+                <td><ui:dayInMonthCell aura:id="19" label="0"/></td>
+                <td><ui:dayInMonthCell aura:id="20" label="0"/></td>
             </tr>
             <tr aura:id="calRow4" class="calRow">
-                <td><ui:dayInMonthCell aura:id="21"/></td>
-                <td><ui:dayInMonthCell aura:id="22"/></td>
-                <td><ui:dayInMonthCell aura:id="23"/></td>
-                <td><ui:dayInMonthCell aura:id="24"/></td>
-                <td><ui:dayInMonthCell aura:id="25"/></td>
-                <td><ui:dayInMonthCell aura:id="26"/></td>
-                <td><ui:dayInMonthCell aura:id="27"/></td>
+                <td><ui:dayInMonthCell aura:id="21" label="0"/></td>
+                <td><ui:dayInMonthCell aura:id="22" label="0"/></td>
+                <td><ui:dayInMonthCell aura:id="23" label="0"/></td>
+                <td><ui:dayInMonthCell aura:id="24" label="0"/></td>
+                <td><ui:dayInMonthCell aura:id="25" label="0"/></td>
+                <td><ui:dayInMonthCell aura:id="26" label="0"/></td>
+                <td><ui:dayInMonthCell aura:id="27" label="0"/></td>
             </tr>
             <tr aura:id="calRow5" class="calRow">
-                <td><ui:dayInMonthCell aura:id="28"/></td>
-                <td><ui:dayInMonthCell aura:id="29"/></td>
-                <td><ui:dayInMonthCell aura:id="30"/></td>
-                <td><ui:dayInMonthCell aura:id="31"/></td>
-                <td><ui:dayInMonthCell aura:id="32"/></td>
-                <td><ui:dayInMonthCell aura:id="33"/></td>
-                <td><ui:dayInMonthCell aura:id="34"/></td>
+                <td><ui:dayInMonthCell aura:id="28" label="0"/></td>
+                <td><ui:dayInMonthCell aura:id="29" label="0"/></td>
+                <td><ui:dayInMonthCell aura:id="30" label="0"/></td>
+                <td><ui:dayInMonthCell aura:id="31" label="0"/></td>
+                <td><ui:dayInMonthCell aura:id="32" label="0"/></td>
+                <td><ui:dayInMonthCell aura:id="33" label="0"/></td>
+                <td><ui:dayInMonthCell aura:id="34" label="0"/></td>
             </tr>
             <tr aura:id="calRow6" class="calRow">
-                <td><ui:dayInMonthCell aura:id="35"/></td>
-                <td><ui:dayInMonthCell aura:id="36"/></td>
-                <td><ui:dayInMonthCell aura:id="37"/></td>
-                <td><ui:dayInMonthCell aura:id="38"/></td>
-                <td><ui:dayInMonthCell aura:id="39"/></td>
-                <td><ui:dayInMonthCell aura:id="40"/></td>
-                <td><ui:dayInMonthCell aura:id="41"/></td>
+                <td><ui:dayInMonthCell aura:id="35" label="0"/></td>
+                <td><ui:dayInMonthCell aura:id="36" label="0"/></td>
+                <td><ui:dayInMonthCell aura:id="37" label="0"/></td>
+                <td><ui:dayInMonthCell aura:id="38" label="0"/></td>
+                <td><ui:dayInMonthCell aura:id="39" label="0"/></td>
+                <td><ui:dayInMonthCell aura:id="40" label="0"/></td>
+                <td><ui:dayInMonthCell aura:id="41" label="0"/></td>
             </tr>
         </tbody>
     </table>

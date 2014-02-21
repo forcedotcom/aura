@@ -17,6 +17,7 @@ package org.auraframework.impl.documentation;
 
 import java.io.IOException;
 
+import org.auraframework.builder.ExampleDefBuilder;
 import org.auraframework.def.ExampleDef;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.util.json.Json;
@@ -25,18 +26,52 @@ public class ExampleDefImpl extends DefinitionImpl<ExampleDef> implements Exampl
 
 	private static final long serialVersionUID = -4467201134487458023L;
 
-	protected ExampleDefImpl(org.auraframework.impl.system.DefinitionImpl.RefBuilderImpl<ExampleDef, ?> builder) {
+    private Object body;
+    private String name;
+    private String label;
+    private String markup;
+	
+	protected ExampleDefImpl(Builder builder) {
         super(builder);
-        // TODO Auto-generated constructor stub
+        
+        this.body = builder.body;
+        this.name = builder.name;
+        this.label = builder.label;
+    }
+	
+    public Object getBody() {
+        return body;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public String getLabel() {
+        return label;
+    }
+    
+    @Override
+    public String getMarkup() {
+        return markup;
     }
 
     @Override
     public void serialize(Json json) throws IOException {
-        // TODO Auto-generated method stub
-        
+        json.writeMapBegin();
+        json.writeMapEntry("name", getName());
+        json.writeMapEntry("description", getDescription());
+        json.writeMapEntry("label", getLabel());
+        json.writeMapEnd();
     }    
 
-    public static class Builder extends DefinitionImpl.BuilderImpl<ExampleDef> {
+    public static class Builder extends DefinitionImpl.BuilderImpl<ExampleDef> implements ExampleDefBuilder {
+        
+        private Object body;
+        private String name;
+        private String label;
 
         public Builder() {
             super(ExampleDef.class);
@@ -49,17 +84,23 @@ public class ExampleDefImpl extends DefinitionImpl<ExampleDef> implements Exampl
         public ExampleDefImpl build() {
             return new ExampleDefImpl(this);
         }
+
+        @Override
+        public ExampleDefBuilder setBody(Object body) {
+            this.body = body;
+            return this;
+        }
+        
+        @Override
+        public ExampleDefBuilder setName(String name) {
+            this.name = name;
+            return this;
+        }
+
+        @Override
+        public ExampleDefBuilder setLabel(String label) {
+            this.label = label;
+            return this;
+        }
     }
-
-	@Override
-	public String getLabel() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String getMarkup() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 }

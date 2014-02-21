@@ -22,7 +22,6 @@ import org.auraframework.def.*;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
-
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.collect.*;
@@ -69,10 +68,6 @@ public abstract class RootDefinitionImpl<T extends RootDefinition> extends Defin
         for (AttributeDef attr : attributeDefs.values()) {
             attr.appendDependencies(dependencies);
         }
-
-        if (documentationDescriptor != null) {
-            dependencies.add(documentationDescriptor);
-        }
     }
 
     @Override
@@ -113,8 +108,9 @@ public abstract class RootDefinitionImpl<T extends RootDefinition> extends Defin
             this.providerDescriptors.add(DefDescriptorImpl.getInstance(name, ProviderDef.class));
         }
         
-        public void addDocumentation(String name) {
-            this.setDocumentationDescriptor(DefDescriptorImpl.getInstance(name, DocumentationDef.class));
+        public Builder<T> setDocumentation(String name) {
+            documentationDescriptor = DefDescriptorImpl.getInstance(name, DocumentationDef.class);
+            return this;
         }
 
         /**
@@ -137,14 +133,6 @@ public abstract class RootDefinitionImpl<T extends RootDefinition> extends Defin
         public Builder<T> setSupport(SupportLevel support) {
             this.support = support;
             return this;
-        }
-
-        public DefDescriptor<DocumentationDef> getDocumentationDescriptor() {
-            return documentationDescriptor;
-        }
-
-        public void setDocumentationDescriptor(DefDescriptor<DocumentationDef> documentationDescriptor) {
-            this.documentationDescriptor = documentationDescriptor;
         }
     }
 

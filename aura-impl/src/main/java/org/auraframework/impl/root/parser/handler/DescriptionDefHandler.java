@@ -18,12 +18,9 @@ package org.auraframework.impl.root.parser.handler;
 import java.io.IOException;
 import java.util.Set;
 
-import javax.xml.stream.XMLStreamConstants;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.*;
 
-import org.auraframework.def.DescriptionDef;
-import org.auraframework.def.DocumentationDef;
+import org.auraframework.def.*;
 import org.auraframework.impl.documentation.DescriptionDefImpl;
 import org.auraframework.impl.system.SubDefDescriptorImpl;
 import org.auraframework.system.Source;
@@ -63,14 +60,20 @@ public class DescriptionDefHandler<P> extends ParentedTagHandler<DescriptionDefI
         builder.setLocation(getLocation());
     }
 
+    /* This method is essentially a generic HTML parser.
+       If we ever refactor XMLHandler to allow handlers without Definitions,
+       this should probably be pulled into its own handler.
+    */
     @Override
     protected void handleChildTag() throws XMLStreamException, QuickFixException {
     	String startTag = getTagName();
     	
+    	if (!HtmlTag.allowed(startTag)) {
+    	    error("Invalid tag <%s>", startTag);
+    	}
+    	
     	body.append(String.format("<%s>", startTag));
     	
-    	// TODO: this is only so DocDefs are usable for the doc blitz.
-    	// Finish the refactor to XMLHandler to allow handlers without Definitions.
     	loop: while (xmlReader.hasNext()) {
             int next = xmlReader.next();
             switch (next) {

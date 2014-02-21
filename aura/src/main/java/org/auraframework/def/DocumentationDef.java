@@ -17,8 +17,6 @@ package org.auraframework.def;
 
 import java.util.Map;
 
-import org.auraframework.throwable.quickfix.QuickFixException;
-
 /**
  */
 public interface DocumentationDef extends RootDefinition {

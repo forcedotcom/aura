@@ -16,18 +16,10 @@
 package org.auraframework.impl.documentation;
 
 import java.io.IOException;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.auraframework.builder.DocumentationDefBuilder;
-import org.auraframework.def.AttributeDef;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DescriptionDef;
-import org.auraframework.def.DocumentationDef;
-import org.auraframework.def.ExampleDef;
-import org.auraframework.def.RegisterEventDef;
-import org.auraframework.def.RootDefinition;
+import org.auraframework.def.*;
 import org.auraframework.impl.root.RootDefinitionImpl;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;

@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2013 salesforce.com, inc.
  *
+ * Copyright (C) 2013 salesforce.com, inc.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,9 +17,7 @@ package org.auraframework.impl.system;
 
 import java.util.Set;
 
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.Definition;
-import org.auraframework.def.DescriptorFilter;
+import org.auraframework.def.*;
 import org.auraframework.system.DefFactory;
 import org.auraframework.system.Source;
 

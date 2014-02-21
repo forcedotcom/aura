@@ -15,16 +15,6 @@
     limitations under the License.
 
 -->
-<aura:component extensible="true">
-    <aura:attribute name="examples" type="List"/>
-    
-    <h3>Examples</h3>
-    
-    <aura:iteration items="{!v.examples}" var="example">
-	    <h4>{!example.label}</h4>
-	    
-	    <div>{!example.description}</div>
-	    
-	    <code>{!example.markup}</code>
-    </aura:iteration>
+<aura:component>
+    <ui:button label="Externally Referenced!"/>
 </aura:component>

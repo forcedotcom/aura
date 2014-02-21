@@ -15,12 +15,10 @@
  */
 package org.auraframework.builder;
 
-import org.auraframework.def.DescriptionDef;
-import org.auraframework.def.DocumentationDef;
-import org.auraframework.def.ExampleDef;
+import org.auraframework.def.*;
 
 public interface DocumentationDefBuilder extends RootDefinitionBuilder<DocumentationDef> {
 	
-    public void addDescription(String id, DescriptionDef description);
-    public void addExample(String id, ExampleDef example);
+    DocumentationDefBuilder addDescription(String id, DescriptionDef description);
+    DocumentationDefBuilder addExample(String id, ExampleDef example);
 }

@@ -26,6 +26,7 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.impl.compound.controller.CompoundControllerDefFactory;
 import org.auraframework.impl.controller.AuraStaticControllerDefRegistry;
 import org.auraframework.impl.css.style.StyleDefFactory;
+import org.auraframework.impl.documentation.ExampleComponentDefFactory;
 import org.auraframework.impl.java.controller.JavaControllerDefFactory;
 import org.auraframework.impl.java.model.JavaModelDefFactory;
 import org.auraframework.impl.java.provider.JavaProviderDefFactory;
@@ -117,7 +118,10 @@ public class AuraRegistryProviderImpl implements RegistryAdapter {
             ret = new DefRegistry<?>[] {
                     AuraStaticTypeDefRegistry.INSTANCE,
                     AuraStaticControllerDefRegistry.INSTANCE,
+                    
                     createDefRegistry(new RootDefFactory(new SourceFactory(markupLoaders)), rootDefTypes, rootPrefixes),
+                    createDefRegistry(new ExampleComponentDefFactory(), DefType.COMPONENT, DefDescriptor.EXAMPLE_PREFIX),
+                    
                     AuraRegistryProviderImpl.<ControllerDef> createDefRegistry(new CompoundControllerDefFactory(),
                             DefType.CONTROLLER, DefDescriptor.COMPOUND_PREFIX),
                     AuraRegistryProviderImpl.<ControllerDef> createDefRegistry(

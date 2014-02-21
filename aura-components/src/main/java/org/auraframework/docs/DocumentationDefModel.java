@@ -18,16 +18,13 @@ package org.auraframework.docs;
 import java.io.IOException;
 import java.util.List;
 
-import org.auraframework.def.DescriptionDef;
-import org.auraframework.def.DocumentationDef;
-import org.auraframework.def.ExampleDef;
+import org.auraframework.def.*;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonSerializable;
 
 import com.google.common.collect.Lists;
 
-public class DocumentationDefModel implements JsonSerializable,
-		Comparable<DocumentationDefModel> {
+public class DocumentationDefModel implements JsonSerializable {
 
 	private final DocumentationDef docDef;
 
@@ -49,11 +46,11 @@ public class DocumentationDefModel implements JsonSerializable,
 		return ret;
 	}
 	
-	public List<String> getExamples() {
-		List<String> ret = Lists.newArrayList();
+	public List<ExampleDefModel> getExamples() {
+		List<ExampleDefModel> ret = Lists.newArrayList();
 		
 		for (ExampleDef exDef : this.docDef.getExampleDefs().values()) {
-			ret.add(exDef.getMarkup());
+			ret.add(new ExampleDefModel(exDef));
 		}
 		
 		return ret;
@@ -66,10 +63,5 @@ public class DocumentationDefModel implements JsonSerializable,
 		json.writeMapEntry("descriptions", getDescriptions());
 		json.writeMapEntry("examples", getExamples());
 		json.writeMapEnd();
-	}
-
-	@Override
-	public int compareTo(DocumentationDefModel o) {
-		return getDescriptor().compareTo(o.getDescriptor());
 	}
 }

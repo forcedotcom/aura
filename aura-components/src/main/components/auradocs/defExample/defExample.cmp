@@ -16,15 +16,14 @@
 
 -->
 <aura:component extensible="true">
-    <aura:attribute name="examples" type="List"/>
+    <aura:attribute name="example" type="Object"/>
+    {!example}
     
-    <h3>Examples</h3>
+    <h4>Label: {!example.label}</h4>
     
-    <aura:iteration items="{!v.examples}" var="example">
-	    <h4>{!example.label}</h4>
-	    
-	    <div>{!example.description}</div>
-	    
-	    <code>{!example.markup}</code>
-    </aura:iteration>
+    <div>Description: {!example.description}</div>
+    
+    <div>Markup: {!example.markup}</div>
+    
+    <!--div>{!example.body}</div-->
 </aura:component>

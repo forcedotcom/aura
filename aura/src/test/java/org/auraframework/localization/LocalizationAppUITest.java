@@ -29,7 +29,7 @@ public class LocalizationAppUITest extends WebDriverTestCase {
     }
 
     // Checking functionality of the inputDate/outputDate components
-    @ExcludeBrowsers({ BrowserType.IE9, BrowserType.IE10, BrowserType.SAFARI6, BrowserType.SAFARI,
+    @ExcludeBrowsers({ BrowserType.IE9, BrowserType.IE10, BrowserType.SAFARI5, BrowserType.SAFARI,
             BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
     public void testDateComponents() throws Exception {
         open(URL);
@@ -64,7 +64,7 @@ public class LocalizationAppUITest extends WebDriverTestCase {
     }
 
     // Checking functionality of the inputDateTime/outputDateTime components
-    @ExcludeBrowsers({ BrowserType.IE9, BrowserType.IE10, BrowserType.SAFARI6, BrowserType.SAFARI,
+    @ExcludeBrowsers({ BrowserType.IE9, BrowserType.IE10, BrowserType.SAFARI5, BrowserType.SAFARI,
             BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
     public void testDateTimeComponents() throws Exception {
         open(URL);
@@ -102,7 +102,7 @@ public class LocalizationAppUITest extends WebDriverTestCase {
     }
 
     // Checking functionality of the inputNumber/outputNumber components
-    @ExcludeBrowsers({ BrowserType.IE9, BrowserType.IE10, BrowserType.SAFARI6, BrowserType.SAFARI,
+    @ExcludeBrowsers({ BrowserType.IE9, BrowserType.IE10, BrowserType.SAFARI5, BrowserType.SAFARI,
             BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
     public void _testNumberComponents() throws Exception {
         open(URL);
@@ -134,7 +134,7 @@ public class LocalizationAppUITest extends WebDriverTestCase {
     }
 
     // Checking functionality of the inputPercent/outputPercent components
-    @ExcludeBrowsers({ BrowserType.IE9, BrowserType.IE10, BrowserType.SAFARI6, BrowserType.SAFARI,
+    @ExcludeBrowsers({ BrowserType.IE9, BrowserType.IE10, BrowserType.SAFARI5, BrowserType.SAFARI,
             BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
     public void testPercentComponents() throws Exception {
         open(URL);
@@ -166,7 +166,7 @@ public class LocalizationAppUITest extends WebDriverTestCase {
     }
 
     // Checking functionality of the inputCurrency/outputCurrency components
-    @ExcludeBrowsers({ BrowserType.IE9, BrowserType.IE10, BrowserType.SAFARI6, BrowserType.SAFARI,
+    @ExcludeBrowsers({ BrowserType.IE9, BrowserType.IE10, BrowserType.SAFARI5, BrowserType.SAFARI,
             BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
     public void testCurrencyComponents() throws Exception {
         open(URL);

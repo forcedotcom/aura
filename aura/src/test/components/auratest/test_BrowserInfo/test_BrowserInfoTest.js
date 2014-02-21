@@ -85,7 +85,7 @@
     },
     
     testBrowserInfoSafari : {
-    	browsers:["SAFARI6"],
+    	browsers:["SAFARI"],
         test : function(component) {
         	this.assertBrowserProperties(component, {
     			formFactor : "DESKTOP",

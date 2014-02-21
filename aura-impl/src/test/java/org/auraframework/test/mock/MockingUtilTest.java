@@ -43,10 +43,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 
 /*
- * W-1625166: Excluding from BrowserType.SAFARI6,SAFARI,FIREFOX,IE10,IE7,IE8,IPAD,IPHONE : failed at assertion: expected:<[not a
- * list]> but was:<[Modelonetwothree]> . if run with saucelab, GOOGLECHROME has the same problem. GOOGLECHROME only work
- * under command line :mvn verify -DskipUnitTests -DskipJsDoc -DrunIntTests -DtestNameContains="testMockModel" -Pdesktop
- * -Dwebdriver.browser.type=GOOGLECHROME
+ * TODO(W-2049499): Figure out why exactly this isn't working on browsers besides Chrome
  */
 @Controller
 @TargetBrowsers({ BrowserType.GOOGLECHROME })

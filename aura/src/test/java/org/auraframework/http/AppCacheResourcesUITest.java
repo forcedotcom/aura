@@ -126,7 +126,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
     /**
      * Opening cached app will only query server for the manifest and the component load.
      */
-    @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.SAFARI6, BrowserType.SAFARI, BrowserType.IPAD,
+    @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.SAFARI5, BrowserType.SAFARI, BrowserType.IPAD,
             BrowserType.IPHONE })
     public void testNoChanges() throws Exception {
         List<Request> logs = loadMonitorAndValidateApp(TOKEN, TOKEN, "", TOKEN);
@@ -144,7 +144,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
     /**
      * Opening cached app that had a prior cache error will reload the app.
      */
-    @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.SAFARI6, BrowserType.SAFARI, BrowserType.IPAD,
+    @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.SAFARI5, BrowserType.SAFARI, BrowserType.IPAD,
             BrowserType.IPHONE })
     public void testCacheError() throws Exception {
         List<Request> logs = loadMonitorAndValidateApp(TOKEN, TOKEN, "", TOKEN);
@@ -183,7 +183,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
     /**
      * Opening uncached app that had a prior cache error will have limited caching.
      */
-    @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.SAFARI6, BrowserType.SAFARI, BrowserType.IPAD,
+    @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.SAFARI5, BrowserType.SAFARI, BrowserType.IPAD,
             BrowserType.IPHONE })
     public void testCacheErrorWithEmptyCache() throws Exception {
         openNoAura("/aura/application.app"); // just need a domain page to set cookie from
@@ -208,7 +208,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
     /**
      * Manifest request limit exceeded for the time period should result in reset.
      */
-    @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.SAFARI6, BrowserType.SAFARI, BrowserType.IPAD,
+    @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.SAFARI5, BrowserType.SAFARI, BrowserType.IPAD,
             BrowserType.IPHONE })
     public void testManifestRequestLimitExceeded() throws Exception {
         List<Request> logs = loadMonitorAndValidateApp(TOKEN, TOKEN, "", TOKEN);
@@ -247,7 +247,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
      * Opening cached app after namespace style change will trigger cache update.
      */
     @ThreadHostileTest("NamespaceDef modification affects namespace")
-    @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.SAFARI6, BrowserType.SAFARI, BrowserType.IPAD,
+    @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.SAFARI5, BrowserType.SAFARI, BrowserType.IPAD,
             BrowserType.IPHONE })
     public void testComponentCssChange() throws Exception {
         createDef(NamespaceDef.class, String.format("%s://%s", DefDescriptor.MARKUP_PREFIX, namespace),
@@ -278,7 +278,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
     /**
      * Opening cached app after namespace controller change will trigger cache update.
      */
-    @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.SAFARI6, BrowserType.SAFARI, BrowserType.IPAD,
+    @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.SAFARI5, BrowserType.SAFARI, BrowserType.IPAD,
             BrowserType.IPHONE })
     public void testComponentJsChange() throws Exception {
         List<Request> logs = loadMonitorAndValidateApp(TOKEN, TOKEN, "", TOKEN);
@@ -306,7 +306,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
     /**
      * Opening cached app after component markup change will trigger cache update.
      */
-    @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.SAFARI6, BrowserType.SAFARI, BrowserType.IPAD,
+    @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.SAFARI5, BrowserType.SAFARI, BrowserType.IPAD,
             BrowserType.IPHONE })
     public void testComponentMarkupChange() throws Exception {
         List<Request> logs = loadMonitorAndValidateApp(TOKEN, TOKEN, "", TOKEN);

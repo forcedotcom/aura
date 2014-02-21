@@ -15,6 +15,7 @@
     limitations under the License.
 
 -->
+ 
 <aura:application>
 <aura:attribute name="name" type="String"/>
 <ui:message title="Usage:" severity="info">

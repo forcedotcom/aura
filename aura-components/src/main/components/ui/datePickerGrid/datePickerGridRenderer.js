@@ -15,7 +15,6 @@
  */
 ({
     afterRender: function(component, helper) {
-        helper.renderGrid(component);
         return this.superAfterRender();
     },
 

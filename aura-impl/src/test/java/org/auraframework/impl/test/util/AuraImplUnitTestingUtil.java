@@ -36,6 +36,7 @@ import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.def.Definition.Visibility;
+import org.auraframework.def.DefinitionAccess;
 import org.auraframework.def.DependencyDef;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.EventHandlerDef;
@@ -272,6 +273,11 @@ public class AuraImplUnitTestingUtil {
             @Override
             public Visibility getVisibility() {
                 return Visibility.PUBLIC;
+            }
+            
+            @Override 
+            public DefinitionAccess getAccess() {
+            	return null;
             }
 
             @Override

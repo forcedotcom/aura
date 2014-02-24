@@ -30,6 +30,8 @@ public interface RootDefinition extends Definition {
         PROTO, DEPRECATED, BETA, GA
     }
 
+    public enum DefinitionAccessType {ACCESS_PUBLIC, ACCESS_GLOBAL, ACCESS_OTHER};
+
     @Override
     DefDescriptor<? extends RootDefinition> getDescriptor();
 

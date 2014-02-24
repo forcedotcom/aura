@@ -29,6 +29,7 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
+import org.auraframework.def.DefinitionAccess;
 import org.auraframework.def.DependencyDef;
 import org.auraframework.def.DocumentationDef;
 import org.auraframework.def.EventHandlerDef;
@@ -281,6 +282,11 @@ public final class TestComponent implements ComponentDef {
     @Override
     public Visibility getVisibility() {
         return Visibility.PUBLIC;
+    }
+    
+    @Override
+    public DefinitionAccess getAccess() {
+    	return null;
     }
 
     @Override

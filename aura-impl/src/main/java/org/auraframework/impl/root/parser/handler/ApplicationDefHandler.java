@@ -26,6 +26,8 @@ import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefinitionAccess;
+import org.auraframework.def.DefinitionAccess.BasicAccessType;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.LayoutsDef;
 import org.auraframework.def.ThemeDef;
@@ -65,6 +67,11 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
     }
 
     @Override
+	public Set<BasicAccessType> getAllowedAccessValues() {
+		return ALLOWED_ACCESS_VALUES;
+	}
+
+	@Override
     protected ApplicationDefImpl.Builder createBuilder() {
         return new ApplicationDefImpl.Builder();
     }
@@ -90,7 +97,7 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
 
         appBuilder.setSecurityProviderDescriptor(getAttributeValue(ATTRIBUTE_SECURITY_PROVIDER));
 
-        appBuilder.access = getAttributeValue(ATTRIBUTE_ACCESS);
+        ////appBuilder.access = getAttributeValue(ATTRIBUTE_ACCESS);
 
         String locationChangeEvent = getAttributeValue(ATTRIBUTE_LOCATION_CHANGE_EVENT);
         if (!AuraTextUtil.isNullEmptyOrWhitespace(locationChangeEvent)) {
@@ -183,7 +190,6 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
     private static final String ATTRIBUTE_PRELOAD = "preload";
     private static final String ATTRIBUTE_LAYOUTS = "layouts";
     private static final String ATTRIBUTE_LOCATION_CHANGE_EVENT = "locationChangeEvent";
-    private static final String ATTRIBUTE_ACCESS = "access";
     private static final String ATTRIBUTE_SECURITY_PROVIDER = "securityProvider";
     private static final String ATTRIBUTE_APPCACHE_ENABLED = "useAppcache";
     private static final String ATTRIBUTE_ADDITIONAL_APPCACHE_URLS = "additionalAppCacheURLs";
@@ -192,7 +198,12 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
 
     private final static Set<String> ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>()
             .add(ATTRIBUTE_PRELOAD, ATTRIBUTE_LAYOUTS, ATTRIBUTE_LOCATION_CHANGE_EVENT, ATTRIBUTE_PRELOAD,
-                    ATTRIBUTE_ACCESS, ATTRIBUTE_SECURITY_PROVIDER, ATTRIBUTE_APPCACHE_ENABLED,
+                    ATTRIBUTE_SECURITY_PROVIDER, ATTRIBUTE_APPCACHE_ENABLED,
                     ATTRIBUTE_ADDITIONAL_APPCACHE_URLS, ATTRIBUTE_IS_ONE_PAGE_APP, ATTRIBUTE_OVERRIDE_THEME)
             .addAll(BaseComponentDefHandler.ALLOWED_ATTRIBUTES).build();
+    
+    private final static Set<BasicAccessType> ALLOWED_ACCESS_VALUES = new ImmutableSet.Builder<BasicAccessType>()
+            .add(BasicAccessType.AUTHENTICATED, BasicAccessType.PUBLIC, BasicAccessType.PREVIEW, 
+            		BasicAccessType.INTERNAL).build();
+
 }

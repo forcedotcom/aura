@@ -85,7 +85,7 @@ public class DefinitionServiceImpl implements DefinitionService {
         // we have a more generic check on all defs.
         //
         if (def != null && def.getDescriptor().getDefType() == DefType.APPLICATION
-                && ((ApplicationDef) def).getAccess() == Access.AUTHENTICATED) {
+                && ((ApplicationDef) def).getAccess().requiresAuthentication()) {
             AuraContext context = Aura.getContextService().getCurrentContext();
             if (context.getAccess() != Access.AUTHENTICATED) {
                 def = null;

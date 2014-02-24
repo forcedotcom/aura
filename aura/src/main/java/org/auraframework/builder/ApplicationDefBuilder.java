@@ -23,7 +23,6 @@ import org.auraframework.def.ThemeDef;
 /**
  */
 public interface ApplicationDefBuilder extends BaseComponentDefBuilder<ApplicationDef> {
-    ApplicationDefBuilder setAccess(String access);
 
     ApplicationDefBuilder setLayouts(LayoutsDef layouts);
 

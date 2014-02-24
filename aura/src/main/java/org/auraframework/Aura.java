@@ -17,28 +17,13 @@ package org.auraframework;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.auraframework.adapter.ConfigAdapter;
-import org.auraframework.adapter.ExceptionAdapter;
-import org.auraframework.adapter.LocalizationAdapter;
-import org.auraframework.adapter.StyleAdapter;
+import org.auraframework.adapter.*;
 import org.auraframework.clientlibrary.ClientLibraryService;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.Definition;
-import org.auraframework.instance.Application;
-import org.auraframework.instance.Component;
-import org.auraframework.instance.Instance;
-import org.auraframework.service.BuilderService;
-import org.auraframework.service.ClientService;
-import org.auraframework.service.ContextService;
-import org.auraframework.service.DefinitionService;
-import org.auraframework.service.InstanceService;
-import org.auraframework.service.IntegrationService;
-import org.auraframework.service.LocalizationService;
-import org.auraframework.service.LoggingService;
-import org.auraframework.service.RenderingService;
-import org.auraframework.service.SerializationService;
-import org.auraframework.service.ServerService;
-import org.auraframework.system.AuraContext;
+import org.auraframework.instance.*;
+import org.auraframework.service.*;
+import org.auraframework.system.*;
 import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
@@ -155,6 +140,13 @@ public class Aura {
      */
     public static StyleAdapter getStyleAdapter() {
         return Aura.get(StyleAdapter.class);
+    }
+
+    /**
+     * Get the Definition Parser Adapter: hooks for host environment to interact with definition parsing
+     */
+    public static DefinitionParserAdapter getDefinitionParserAdapter() {
+        return Aura.get(DefinitionParserAdapter.class);
     }
 
     /**

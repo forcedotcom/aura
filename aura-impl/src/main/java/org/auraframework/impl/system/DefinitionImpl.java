@@ -22,9 +22,10 @@ import java.util.Set;
 import org.auraframework.builder.DefBuilder;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
+import org.auraframework.def.DefinitionAccess;
+import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.system.Location;
 import org.auraframework.system.SubDefDescriptor;
-
 import org.auraframework.throwable.AuraExceptionInfo;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -51,19 +52,20 @@ public abstract class DefinitionImpl<T extends Definition> implements Definition
     private final QuickFixException parseError;
     private final String ownHash;
     private final Hash sourceHash;
+    private final DefinitionAccess access;
     private boolean valid;
 
     protected DefinitionImpl(DefDescriptor<T> descriptor, Location location, Visibility visibility) {
-        this(descriptor, location, null, null, visibility, null, null, null);
+        this(descriptor, location, null, null, visibility, null, null, null, null);
     }
 
     protected DefinitionImpl(RefBuilderImpl<T, ?> builder) {
         this(builder.getDescriptor(), builder.getLocation(), builder.subDefs, builder.description, builder
-                .visibility, builder.getOwnHash(), builder.getSourceHash(), builder.getParseError());
+                .visibility, builder.getAccess(), builder.getOwnHash(), builder.getSourceHash(), builder.getParseError());
     }
 
     DefinitionImpl(DefDescriptor<T> descriptor, Location location, Map<SubDefDescriptor<?, T>, Definition> subDefs,
-            String description, Visibility visibility, String ownHash, Hash sourceHash, QuickFixException parseError) {
+            String description, Visibility visibility, DefinitionAccess access, String ownHash, Hash sourceHash, QuickFixException parseError) {
         this.descriptor = descriptor;
         this.location = location;
         this.subDefs = subDefs;
@@ -72,6 +74,7 @@ public abstract class DefinitionImpl<T extends Definition> implements Definition
         this.ownHash = ownHash;
         this.sourceHash = sourceHash;
         this.parseError = parseError;
+        this.access = access == null ? DefinitionAccessImpl.defaultAccess() : access;
     }
 
     /**
@@ -93,6 +96,11 @@ public abstract class DefinitionImpl<T extends Definition> implements Definition
     @Override
     public Visibility getVisibility(){
         return visibility == null ? Visibility.PUBLIC : visibility;
+    }
+    
+    @Override
+    public DefinitionAccess getAccess() {
+    	return access;
     }
 
     /**
@@ -201,13 +209,23 @@ public abstract class DefinitionImpl<T extends Definition> implements Definition
         public Hash hash;
         public String ownHash;
         private QuickFixException parseError;
+        private DefinitionAccess access;
 
         protected RefBuilderImpl(Class<T> defClass) {
             this.defClass = defClass;
             //this.ownHash = String.valueOf(System.currentTimeMillis());
         }
 
-        @Override
+        public RefBuilderImpl<T, A> setAccess(DefinitionAccess access) {
+            this.access = access;
+            return this;
+        }
+
+        public DefinitionAccess getAccess() {
+        	return access;
+		}
+
+		@Override
         public RefBuilderImpl<T, A> setLocation(String fileName, int line, int column, long lastModified) {
             location = new Location(fileName, line, column, lastModified);
             return this;

@@ -20,6 +20,7 @@ import java.util.Set;
 
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
+import org.auraframework.def.DefinitionAccess;
 import org.auraframework.system.Location;
 import org.auraframework.system.SubDefDescriptor;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -102,6 +103,11 @@ public abstract class MockDefinition<D extends Definition> implements Definition
     @Override
     public Visibility getVisibility() {
         return Visibility.PUBLIC;
+    }
+    
+    @Override
+    public DefinitionAccess getAccess() {
+    	return null;
     }
 
     @Override

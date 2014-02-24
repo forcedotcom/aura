@@ -18,6 +18,7 @@ package org.auraframework.impl.root.application;
 import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefinitionAccess;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.LayoutsDef;
 import org.auraframework.def.SecurityProviderDef;
@@ -34,7 +35,7 @@ public class ApplicationDefImplUnitTest extends
     DefDescriptor<EventDef> locationChangeEventDescriptor;
     @Mock
     DefDescriptor<LayoutsDef> layoutsDefDescriptor;
-    String access;
+    DefinitionAccess access;
     @Mock
     DefDescriptor<SecurityProviderDef> securityProviderDescriptor;
     Boolean isAppcacheEnabled;
@@ -55,7 +56,7 @@ public class ApplicationDefImplUnitTest extends
     protected ApplicationDef buildDefinition(Builder builder) throws Exception {
         builder.locationChangeEventDescriptor = this.locationChangeEventDescriptor;
         builder.layoutsDefDescriptor = this.layoutsDefDescriptor;
-        builder.access = this.access;
+        builder.setAccess(this.access);
         builder.securityProviderDescriptor = this.securityProviderDescriptor;
         builder.isAppcacheEnabled = this.isAppcacheEnabled;
         builder.additionalAppCacheURLs = this.additionalAppCacheURLs;

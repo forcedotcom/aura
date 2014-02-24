@@ -1265,8 +1265,9 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
             cmp.getDef();
             fail(defType + " should throw Exception when extending non-existent component");
         } catch (QuickFixException e) {
-            checkExceptionFull(e, DefinitionNotFoundException.class, "No " + defType
-                    + " named markup://aura:iDontExist found : " + cmp.getQualifiedName(), cmp.getQualifiedName());
+            checkExceptionFull(e, DefinitionNotFoundException.class,
+                    "No " + defType + " named markup://aura:iDontExist found : [" + cmp.getQualifiedName()+"]",
+                    cmp.getQualifiedName());
         }
     }
 

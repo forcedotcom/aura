@@ -381,8 +381,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         buffer.append(uid);
         buffer.append("\n");
 
-        SortedSet<DefDescriptor<?>> sorted = Sets.newTreeSet(dependencies);
-        for (DefDescriptor<?> dep : sorted) {
+        for (DefDescriptor<?> dep : dependencies) {
             buffer.append(dep);
             buffer.append(" : ");
             buffer.append(masterDefReg.getDef(dep).getOwnHash());

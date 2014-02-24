@@ -120,7 +120,7 @@ public class EventHandlerDefTest extends AuraImplTestCase {
         } catch (DefinitionNotFoundException e) {
             assertEquals(
                     "Incorrect exception message",
-                    String.format("No EVENT named markup://ThisIsNotAValidEventName found : %s",
+                    String.format("No EVENT named markup://ThisIsNotAValidEventName found : [%s]",
                             componentDefDescriptor.getQualifiedName()), e.getMessage());
         }
     }

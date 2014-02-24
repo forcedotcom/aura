@@ -31,6 +31,7 @@ public interface LoggingService extends AuraService {
 
     public static final String CMP_COUNT = "cmpCount";
     public static final String DEF_COUNT = "defCount";
+    public static final String DEF_VISIT_COUNT = "defVisitCount";
     public static final String DEF_DESCRIPTOR_COUNT = "defDescriptorCount";
     public static final String TIMER_DESERIALIZATION = "deSerialization";
     public static final String AURA_REQUEST_QUERY = "auraRequestQuery";

@@ -259,7 +259,7 @@ public class InterfaceDefTest extends AuraImplTestCase {
             fail("Did not get expected exception: " + DefinitionNotFoundException.class.getName());
         } catch (Exception e) {
             checkExceptionFull(e, DefinitionNotFoundException.class,
-                    "No INTERFACE named markup://aura:iDontExist found : " + cmpDesc.getQualifiedName(),
+                    "No INTERFACE named markup://aura:iDontExist found : [" + cmpDesc.getQualifiedName()+"]",
                     cmpDesc.getQualifiedName());
         }
     }

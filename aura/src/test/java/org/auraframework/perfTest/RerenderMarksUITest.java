@@ -26,7 +26,7 @@ import com.google.common.collect.Maps;
 
 /**
  * 
- * Automation to verify Jiffy marks for rerender cycle.
+ * Automation to verify UIPerf marks for rerender cycle.
  */
 public class RerenderMarksUITest extends PerfMetricsTestCase {
     public RerenderMarksUITest(String name){
@@ -35,7 +35,7 @@ public class RerenderMarksUITest extends PerfMetricsTestCase {
     
     /**
      * Simple scenario where a top level attribute change initiates a rerender cycle.
-     * Subsequent rerender of the same component should also be logged in Jiffy.
+     * Subsequent rerender of the same component should also be logged in UIPerf.
      * @throws Exception
      */
     public void testRerenderMarksHaveComponentName() throws Exception{
@@ -46,13 +46,13 @@ public class RerenderMarksUITest extends PerfMetricsTestCase {
         button.click();
         waitForElementTextPresent(getDriver().findElement(By.cssSelector("button[class~='uiButton']")), "clicked");
 
-        logStats.putAll(getJiffyStats(Lists.newArrayList("Rerendering-2: ['markup://ui:button']")));
-        assertFalse("Did not find Jiffy marks with component information for Rerender cycle.",
+        logStats.putAll(getUIPerfStats(Lists.newArrayList("Rerendering-2: ['markup://ui:button']")));
+        assertFalse("Did not find UIPerf marks with component information for Rerender cycle.",
                 logStats.isEmpty());
         logStats.clear();
         
         button.click();
-        logStats.putAll(getJiffyStats(Lists.newArrayList("Rerendering-3: ['markup://ui:button']")));
+        logStats.putAll(getUIPerfStats(Lists.newArrayList("Rerendering-3: ['markup://ui:button']")));
         assertFalse("Did not mark multiple Rerender of same component.",
                 logStats.isEmpty());
     }
@@ -76,15 +76,15 @@ public class RerenderMarksUITest extends PerfMetricsTestCase {
         button.click();
         waitForElementPresent(getDriver().findElement(By.cssSelector("tr[class~='grey']")));
 
-        logStats.putAll(getJiffyStats(Lists.newArrayList("Rerendering-3: ['markup://performanceTest:perfApp']")));
-        assertFalse("Rerender of root component not marked in Jiffy.",
+        logStats.putAll(getUIPerfStats(Lists.newArrayList("Rerendering-3: ['markup://performanceTest:perfApp']")));
+        assertFalse("Rerender of root component not marked in UIPerf.",
                 logStats.isEmpty());
         logStats.clear();
         
-        //Make a value change to cause multiple component rerender, the jiffy mark should have qualified names of the components
+        //Make a value change to cause multiple component rerender, the UIPerf mark should have qualified names of the components
         WebElement innerButton = getDriver().findElement(By.cssSelector("button[class~='changeIteratonIndex']"));
         innerButton.click();
-        logStats.putAll(getJiffyStats(Lists.newArrayList("Rerendering-4: ['markup://performanceTest:perfApp','markup://aura:iteration','markup://aura:iteration','markup://aura:iteration']")));
+        logStats.putAll(getUIPerfStats(Lists.newArrayList("Rerendering-4: ['markup://performanceTest:perfApp','markup://aura:iteration','markup://aura:iteration','markup://aura:iteration']")));
         assertFalse("Multiple component Rerender should be marked with all componentNames.",
                 logStats.isEmpty());
         logStats.clear();
@@ -93,7 +93,7 @@ public class RerenderMarksUITest extends PerfMetricsTestCase {
         innerButton = getDriver().findElement(By.cssSelector("button[class~='simpleServerAction']"));
         innerButton.click();
         waitForCondition("return $A.getRoot()._simpleServerActionComplete");
-        logStats.putAll(getJiffyStats(Lists.newArrayList("Rerendering-5: []")));
+        logStats.putAll(getUIPerfStats(Lists.newArrayList("Rerendering-5: []")));
         assertFalse("Server action that causes no components to rerender should be logged but with no component names.",
                 logStats.isEmpty());
         //Server action should cause no rerender and hence rerender mark should be 0

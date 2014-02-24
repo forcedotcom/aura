@@ -137,7 +137,7 @@
 
             <tr>
                 <td><code>PTEST</code></td>
-                <td>Use for running performance tests using the Jiffy Graph UI. Loads Jiffy performance test tools and enables the Jiffy Graph UI. Jiffy is an end-to-end real-world web page instrumentation and measurement suite.
+                <td>Use for running performance tests using the UIPerf Graph UI. Loads UIPerf performance test tools and enables the UIPerf Graph UI. UIPerf is an end-to-end real-world web page instrumentation and measurement suite.
 
                     <p>This mode doesn’t use the Google Closure Compiler.</p>
                 </td>
@@ -145,8 +145,8 @@
 
             <tr>
                 <td><code>CADENCE</code></td>
-                <td>Use for running performance tests if you want to use Jiffy metrics and track the numbers server-side. Loads and runs Jiffy performance test tools and logs the results on the server.
-                    <p>Cadence tests use Jiffy, but don’t load the Jiffy Graph UI.</p>
+                <td>Use for running performance tests if you want to use UIPerf metrics and track the numbers server-side. Loads and runs UIPerf performance test tools and logs the results on the server.
+                    <p>Cadence tests use UIPerf, but don’t load the UIPerf Graph UI.</p>
                 </td>
             </tr>
 

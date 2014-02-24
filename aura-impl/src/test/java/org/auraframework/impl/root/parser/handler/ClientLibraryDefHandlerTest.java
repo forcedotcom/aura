@@ -96,7 +96,7 @@ public class ClientLibraryDefHandlerTest extends AuraImplTestCase {
         StringSource<ComponentDef> source = new StringSource<ComponentDef>(descriptor,
                 "<aura:component>" +
                         "<aura:clientLibrary name='HTML5Shiv' type='JS' />" +
-                        "<aura:clientLibrary name='Jiffy' type='JS' modes=''/>" +
+                        "<aura:clientLibrary name='UIPerf' type='JS' modes=''/>" +
                         "</aura:component>", "myID",
                 Format.XML);
         ComponentDef cmpDef = parser.parse(descriptor, source);
@@ -113,7 +113,7 @@ public class ClientLibraryDefHandlerTest extends AuraImplTestCase {
         StringSource<ComponentDef> source = new StringSource<ComponentDef>(descriptor,
                 "<aura:component>" +
                         "<aura:clientLibrary name='HTML5Shiv' type='JS' modes='DEV'/>" +
-                        "<aura:clientLibrary name='Jiffy' type='JS' modes='DEV,FTEST'/>" +
+                        "<aura:clientLibrary name='UIPerf' type='JS' modes='DEV,FTEST'/>" +
                         "</aura:component>", "myID",
                 Format.XML);
         ComponentDef cmpDef = parser.parse(descriptor, source);
@@ -170,7 +170,7 @@ public class ClientLibraryDefHandlerTest extends AuraImplTestCase {
                         "<aura:clientLibrary url='//jslibrary/abc/sfdc/Alto.js' combine='true'/>" + //5
                         "<aura:clientLibrary url='https://www.likeaboss.com/jslibrary/xyz/sfdc/Zen.js' combine='true'/>" + //6
                         "<aura:clientLibrary url='http://www.likeaboss.com/jslibrary/xyz/sfdc/Zen.js' combine='true'/>" + //7
-                        "<aura:clientLibrary name='Jiffy' type='JS' combine='false'/>" + //8
+                        "<aura:clientLibrary name='UIPerf' type='JS' combine='false'/>" + //8
                         "</aura:component>", "myID",
                 Format.XML);
         ComponentDef cmpDef = parser.parse(descriptor, source);

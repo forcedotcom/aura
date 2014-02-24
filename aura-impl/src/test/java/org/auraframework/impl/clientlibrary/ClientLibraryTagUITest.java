@@ -72,11 +72,11 @@ public class ClientLibraryTagUITest extends WebDriverTestCase {
         open("/clientLibraryTest/clientLibraryTest.app", Mode.PTEST);
 
         // PTEST only resources
-        Object jiffyData = auraUITestingUtil.getEval("return Perf.toJson()");
-        assertNotNull(jiffyData);
+        Object UIPerfData = auraUITestingUtil.getEval("return $A.Perf.toJson()");
+        assertNotNull(UIPerfData);
 
-        Boolean jiffyUI = (Boolean)auraUITestingUtil.getEval("return !!Perf.ui");
-        assertTrue(jiffyUI);
+        Boolean UIPerfUI = (Boolean)auraUITestingUtil.getEval("return !!$A.Perf.ui");
+        assertTrue(UIPerfUI);
 
         // Mode independent resources
         Object yearThruMoment = auraUITestingUtil.getEval("return moment(new Date()).year()");

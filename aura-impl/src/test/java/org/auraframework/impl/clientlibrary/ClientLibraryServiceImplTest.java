@@ -83,29 +83,29 @@ public class ClientLibraryServiceImplTest extends AuraImplTestCase {
         assertTrue(cls instanceof ClientLibraryServiceImpl);
     }
 
-    public void testJiffyCSS() throws Exception {
+    public void testUIPerfCSS() throws Exception {
         ClientLibraryDef clientLibrary = vendor.makeClientLibraryDef("UIPerfCss", null, ClientLibraryDef.Type.CSS,
                 null, false, null, null);
         String url = clientLibraryService.getResolvedUrl(clientLibrary);
-        assertTrue(url.contains("Jiffy.css"));
+        assertTrue(url.contains("UIPerf.css"));
     }
 
     // SFDC uses UIPerf
     @UnAdaptableTest
-    public void testJiffyJS() throws Exception {
+    public void testUIPerfJS() throws Exception {
         ClientLibraryDef clientLibrary = vendor.makeClientLibraryDef("UIPerf", null, ClientLibraryDef.Type.JS,
                 null, false, null, null);
         String url = clientLibraryService.getResolvedUrl(clientLibrary);
-        assertTrue(url.contains("Jiffy.js"));
+        assertTrue(url.contains("UIPerf.js"));
     }
 
     // SFDC uses UIPerf
     @UnAdaptableTest
-    public void testJiffyUiJS() throws Exception {
+    public void testUIPerfUiJS() throws Exception {
         ClientLibraryDef clientLibrary = vendor.makeClientLibraryDef("UIPerfUi", null, ClientLibraryDef.Type.JS,
                 null, false, null, null);
         String url = clientLibraryService.getResolvedUrl(clientLibrary);
-        assertTrue(url.contains("JiffyUi.js"));
+        assertTrue(url.contains("UIPerfUi.js"));
     }
 
     public void testWriteResourcesCSS() throws Exception {

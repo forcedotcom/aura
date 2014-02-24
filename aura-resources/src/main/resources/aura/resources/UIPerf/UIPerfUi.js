@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/* This section was adapted from the Jiffy Firebug Extension by Bill Scott */
-Jiffy.ui = function() {
+/* This section was adapted from the UIPerf Firebug Extension by Bill Scott */
+Perf.ui = function() {
     /*************/
     /** PRIVATE **/
     /*************/
@@ -28,26 +28,27 @@ Jiffy.ui = function() {
     var dragging = false;
     var dragRel = {x: 0, y: 0};
 
-    var ET = JiffyConstants.ELAPSED_TIME;
-    var RT = JiffyConstants.REFERENCE_TIME;
-    var MARK = JiffyConstants.MARK_NAME;
+    var ET = PerfConstants.ELAPSED_TIME;
+    var RT = PerfConstants.REFERENCE_TIME;
+    var MARK = PerfConstants.MARK_NAME;
 
+    /** @return {boolean} **/
     function shouldDisplay() {
         // don't display if we are inside of a frame
         return window.self === window.top;
     }
 
     /**
-     *  Translates Jiffy's measures into a JSON object with additional aggregate info
+     *  Translates UIPerf's measures into a JSON object with additional aggregate info
      *
-     *  @return aggregated marks object
+     *  @return {!Array.<window.typejsonMeasure>} aggregated marks object
      */
     function aggregateData() {
         var marks = {};
-        marks[JiffyConstants.PAGE_START_MARK] = {};
-        marks[JiffyConstants.PAGE_START_MARK][ET] = 0;
-        marks[JiffyConstants.PAGE_START_MARK].m = [];
-        var measures = Jiffy.getMeasures();
+        marks[PerfConstants.PAGE_START_MARK] = {};
+        marks[PerfConstants.PAGE_START_MARK][ET] = 0;
+        marks[PerfConstants.PAGE_START_MARK].m = [];
+        var measures = Perf.getMeasures();
 
         // each entry in measures has the name of its corresponding mark
         for(var i=0; i<measures.length; i++) {
@@ -81,7 +82,7 @@ Jiffy.ui = function() {
     function generateStatsTable(marks) {
         var innerHtml = ['<table width="100%" border="0" cellpadding="0" cellspacing="0" class="measures"><tbody>'];
 
-        var startTime = Jiffy.startTime;
+        var startTime = Perf.startTime;
         var oddRow = true;
 
         var curMark, markEt, measures;
@@ -118,7 +119,7 @@ Jiffy.ui = function() {
                     barHTML = ['<div style="margin-left: ', left, '%; width: ', elapsedBarWidth, '%;" class="bar">', timeStr, '</div>'];
                 }
 
-                innerHtml.push('<tr id="', Jiffy.ui.util.stripString(markName), '_', uniqueSuffix, '" class="markRow ', rowType, '">',
+                innerHtml.push('<tr id="', Perf.ui.util.stripString(markName), '_', uniqueSuffix, '" class="markRow ', rowType, '">',
                                '<td class="toggle open mark unhover"><span class="label ', rowType, '">', markName, '</span></td>',
                                '<td>', barHTML.join(''), '</td>',
                                '</tr>');
@@ -131,9 +132,9 @@ Jiffy.ui = function() {
                     left = (left==100) ? 99 : left;
                     barWidth = percentLength(m[ET]);
                     barWidth = (barWidth < 1) ? 1 : barWidth;
-                    var measureName = m[JiffyConstants.MEASURE_NAME];
+                    var measureName = m[PerfConstants.MEASURE_NAME];
                     measureName = (measureName.length < 150) ? measureName : measureName.substring(0, 150) + "...";
-                    innerHtml.push('<tr class="evtRow ', rowType, ' showRow ', Jiffy.ui.util.stripString(markName), '_', uniqueSuffix, '">',
+                    innerHtml.push('<tr class="evtRow ', rowType, ' showRow ', Perf.ui.util.stripString(markName), '_', uniqueSuffix, '">',
                                    '<td class="measure unhover"><span class="label ', rowType, '">', measureName, '</span></td>',
                                    '<td><div style="margin-left: ', left, '%; width: ', barWidth, '%;" class="bar">', timeStr, '</div></td>',
                                    '</tr>');
@@ -156,100 +157,100 @@ Jiffy.ui = function() {
                 return;
             }
 
-            var measuresLength = Jiffy.getMeasures().length;
+            var measuresLength = Perf.getMeasures().length;
             function renderHelper() {
-                if (measuresLength != Jiffy.getMeasures().length) {
-                    measuresLength = Jiffy.getMeasures().length;
-                    Jiffy.ui.renderStats(rootContainer);
+                if (measuresLength != Perf.getMeasures().length) {
+                    measuresLength = Perf.getMeasures().length;
+                    Perf.ui.renderStats(rootContainer);
                 }
                 setTimeout(renderHelper, 1000);
             }
             return function() {
-                Jiffy.ui.renderStats(rootContainer);
+                Perf.ui.renderStats(rootContainer);
                 renderHelper();
             };
         })(),
 
-        // Render the Jiffy UI to this container instead of the default one.
+        // Render the UIPerf UI to this container instead of the default one.
         appendTo: function(parent) {
             rootContainer = parent;
         },
 
         // main method.  calls everything else as necessary and displays the graph.
         renderStats : function(parent) {
-            Jiffy.ui.initContainer(parent);
+            Perf.ui.initContainer(parent);
             statsView.innerHTML = generateStatsTable(aggregateData());
-            Jiffy.ui.addHandlers();
+            Perf.ui.addHandlers();
         },
 
         rowClick : function(e) {
-            var markRow = Jiffy.ui.util.getEventTarget(e);
+            var markRow = Perf.ui.util.getEventTarget(e);
             while (markRow.nodeName != "TR") {
                 markRow = markRow.parentNode;
             }
             var toggleCell = markRow.childNodes[0];
 
-            var evtRows = Jiffy.ui.util.getElementsByClassName(markRow.id, statsView, "tr");
-            Jiffy.ui.util.toggleClasses(evtRows, "showRow", "hideRow");
-            Jiffy.ui.util.toggleClasses(toggleCell, "open", "closed");
+            var evtRows = Perf.ui.util.getElementsByClassName(markRow.id, statsView, "tr");
+            Perf.ui.util.toggleClasses(evtRows, "showRow", "hideRow");
+            Perf.ui.util.toggleClasses(toggleCell, "open", "closed");
         },
 
         rowMouseOver : function(e) {
-            var label = Jiffy.ui.util.getEventTarget(e);
+            var label = Perf.ui.util.getEventTarget(e);
             if (label.nodeName == "SPAN") {
-                Jiffy.ui.util.removeClass(label.parentNode, "unhover");
-                Jiffy.ui.util.setClass(label, "onhover");
+                Perf.ui.util.removeClass(label.parentNode, "unhover");
+                Perf.ui.util.setClass(label, "onhover");
             }
         },
 
         rowMouseOut : function(e) {
-            var label = Jiffy.ui.util.getEventTarget(e);
+            var label = Perf.ui.util.getEventTarget(e);
             if (label.nodeName == "SPAN") {
-                Jiffy.ui.util.setClass(label.parentNode, "unhover");
-                Jiffy.ui.util.removeClass(label, "onhover");
+                Perf.ui.util.setClass(label.parentNode, "unhover");
+                Perf.ui.util.removeClass(label, "onhover");
             }
         },
 
         addHandlers : function() {
             // add the twisty handler for marks
-            var markRows = Jiffy.ui.util.getElementsByClassName("markRow", statsView, "tr");
+            var markRows = Perf.ui.util.getElementsByClassName("markRow", statsView, "tr");
             for(var i=0;i<markRows.length; i++) {
-                Jiffy.ui.util.addEvent(markRows[i].childNodes[0], "click", Jiffy.ui.rowClick);
+                Perf.ui.util.addEvent(markRows[i].childNodes[0], "click", Perf.ui.rowClick);
             }
 
             // add handler to show full labels if they are truncated
-            var labels = Jiffy.ui.util.getElementsByClassName("label", statsView, "span");
+            var labels = Perf.ui.util.getElementsByClassName("label", statsView, "span");
             for(var j=0;j<labels.length; j++) {
-                Jiffy.ui.util.addEvent(labels[j], "mouseover", Jiffy.ui.rowMouseOver);
-                Jiffy.ui.util.addEvent(labels[j], "mouseout", Jiffy.ui.rowMouseOut);
+                Perf.ui.util.addEvent(labels[j], "mouseover", Perf.ui.rowMouseOver);
+                Perf.ui.util.addEvent(labels[j], "mouseout", Perf.ui.rowMouseOut);
             }
         },
 
-        // clears graph and existing Jiffy measures
+        // clears graph and existing UIPerf measures
         clearStats : function() {
             statsView.innerHTML = "";
-            Jiffy.clearMeasures();
+            Perf.clearMeasures();
         },
 
         changeLogLevel: function() {
             var newLevel = this.options[this.selectedIndex].value;
 
-            if(Jiffy.currentLogLevel.name == newLevel) {
+            if(Perf.currentLogLevel.name == newLevel) {
                 return;
             }
 
-            Jiffy.util.setCookie(JiffyConstants.COOKIE_NAME, newLevel);
+            Perf.util.setCookie(PerfConstants.COOKIE_NAME, newLevel);
 
             window.location.reload();
 
         },
 
-        disableJiffy: function() {
+        disablePerf: function() {
             var expiredDate = new Date(new Date().getTime() - 1000000);
 
             // Delete Cookie enablement cookie and set it explicitly disabled.
-            Jiffy.util.setCookie("enableJiffy", "", expiredDate);
-            Jiffy.util.setCookie("disableJiffy", "1");
+            Perf.util.setCookie("enablePerf", "", expiredDate);
+            Perf.util.setCookie("disablePerf", "1");
 
             window.location.reload();
         },
@@ -262,30 +263,30 @@ Jiffy.ui = function() {
                 timeline = true;
             }
 
-            Jiffy.ui.renderStats(true);
+            Perf.ui.renderStats(true);
         },
 
         showHide : function() {
-            Jiffy.ui.util.toggleClass(statsView, "hidden");
+            Perf.ui.util.toggleClass(statsView, "hidden");
         },
 
         dragStart : function(event) {
-            var e = Jiffy.ui.util.getEvent(event);
-            var target = Jiffy.ui.util.getEventTarget(e);
+            var e = Perf.ui.util.getEvent(event);
+            var target = Perf.ui.util.getEventTarget(e);
             if (target.nodeName != "INPUT") {
                 dragging = true;
                 dragRel.x = e.clientX - container.offsetLeft;
                 dragRel.y = e.clientY - container.offsetTop;
-                Jiffy.ui.util.eventSmash(e);
+                Perf.ui.util.eventSmash(e);
             }
         },
 
         dragMove : function(event) {
             if (dragging) {
-                var e = Jiffy.ui.util.getEvent(event);
+                var e = Perf.ui.util.getEvent(event);
                 var topY = (e.clientY - dragRel.y) > 0 ? (e.clientY - dragRel.y) : 0;
                 container.style.top  = topY + "px";
-                Jiffy.ui.util.eventSmash(e);
+                Perf.ui.util.eventSmash(e);
             }
         },
 
@@ -299,7 +300,7 @@ Jiffy.ui = function() {
             if (container) {
                 return;
             }
-            container = Jiffy.ui.createContainer();
+            container = Perf.ui.createContainer();
 
             var appendTo = document.body;
             if (parent) {
@@ -309,21 +310,21 @@ Jiffy.ui = function() {
             if (elseAppendTo) {
                 appendTo = elseAppendTo;
             } else {
-                Jiffy.ui.util.setClass(container, "jiffyAbsolute");
-                Jiffy.ui.util.addEvent(document, "mouseup", Jiffy.ui.dragStop);
-                Jiffy.ui.util.addEvent(container, "mousedown", Jiffy.ui.dragStart);
-                Jiffy.ui.util.addEvent(document, "mousemove", Jiffy.ui.dragMove);
+                Perf.ui.util.setClass(container, "perfAbsolute");
+                Perf.ui.util.addEvent(document, "mouseup", Perf.ui.dragStop);
+                Perf.ui.util.addEvent(container, "mousedown", Perf.ui.dragStart);
+                Perf.ui.util.addEvent(document, "mousemove", Perf.ui.dragMove);
             }
 
             appendTo.appendChild(container);
 
-            Jiffy.ui.addStatsView();
+            Perf.ui.addStatsView();
         },
 
         createContainer: function() {
             var container = document.createElement("div");
-            container.id = "jiffyContainer";
-            container.className = "jiffyContainer";
+            container.id = "perfContainer";
+            container.className = "perfContainer";
 
             var buttonBar = document.createElement("div");
             buttonBar.className = "buttonBar";
@@ -331,30 +332,30 @@ Jiffy.ui = function() {
             var showHideButton = document.createElement("input");
             showHideButton.type = "button";
             showHideButton.value = "Show/Hide";
-            showHideButton.onclick = Jiffy.ui.showHide;
+            showHideButton.onclick = Perf.ui.showHide;
 
             var timelineButton = document.createElement("input");
             timelineButton.type = "button";
             timelineButton.value = "Toggle Timeline";
-            timelineButton.onclick = Jiffy.ui.toggleTimeline;
+            timelineButton.onclick = Perf.ui.toggleTimeline;
 
             var clearButton = document.createElement("input");
             clearButton.type = "button";
             clearButton.value = "Clear";
-            clearButton.onclick = Jiffy.ui.clearStats;
+            clearButton.onclick = Perf.ui.clearStats;
 
             var disableButton = document.createElement("input");
             disableButton.type = "button";
-            disableButton.value = "Disable Jiffy";
-            disableButton.onclick = Jiffy.ui.disableJiffy;
+            disableButton.value = "Disable Perf";
+            disableButton.onclick = Perf.ui.disablePerf;
 
             var toggleLogLevelSelect = document.createElement("select");
-                toggleLogLevelSelect.onchange = toggleLogLevelSelect.onclick = Jiffy.ui.changeLogLevel;
+                toggleLogLevelSelect.onchange = toggleLogLevelSelect.onclick = Perf.ui.changeLogLevel;
 
             var logLevelEnum = window.PerfLogLevel || {};
             var option;
             var logLevelName;
-            var currentLogLevelName = Jiffy.currentLogLevel.name;
+            var currentLogLevelName = Perf.currentLogLevel.name;
             for(var level in logLevelEnum) {
                 if(logLevelEnum.hasOwnProperty(level)) {
                     logLevelName = logLevelEnum[level].name;
@@ -389,7 +390,7 @@ Jiffy.ui = function() {
     };
 }();
 
-Jiffy.ui.util = {
+Perf.ui.util = {
     isArray : function(object) {
         return object && typeof object === "object" && 'splice' in object
                 && 'join' in object;

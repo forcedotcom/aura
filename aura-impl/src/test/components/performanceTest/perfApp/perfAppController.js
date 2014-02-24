@@ -36,7 +36,7 @@
         $A.enqueueAction(a);
     },
     changeLayout:function(cmp){
-        //This can be done using $A.layoutService too, but that does not utilize built in Jiffy marks.
+        //This can be done using $A.layoutService too, but that does not utilize built in UIPerf marks.
         $A.historyService.set('basketBall');
     },
     revertLayout:function(cmp){

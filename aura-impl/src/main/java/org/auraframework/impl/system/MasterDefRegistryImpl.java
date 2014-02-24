@@ -17,10 +17,8 @@ package org.auraframework.impl.system;
 
 import java.lang.ref.WeakReference;
 
-import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Deque;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -320,11 +318,6 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         public T def;
 
         /**
-         * All of the parents (needed in the case that we fail).
-         */
-        public Map<DefDescriptor<?>, CompilingDef<?>> parents = Maps.newLinkedHashMap();
-
-        /**
          * Did we build this definition?.
          * 
          * If this is true, we need to do the validation steps after finishing.
@@ -347,35 +340,6 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
          */
         public boolean validated = false;
 
-        private boolean inCycle = false;
-
-        /**
-         * Check to see if this def is in a cycle.
-         */
-        public boolean isInCycle() {
-            if (inCycle) {
-                return true;
-            }
-            Map<DefDescriptor<?>, CompilingDef<?>> cycleCheck = Maps.newHashMap();
-            Map<DefDescriptor<?>, CompilingDef<?>> current = Maps.newHashMap(parents);
-            Map<DefDescriptor<?>, CompilingDef<?>> next = Maps.newHashMap();
-            int cycleSize;
-
-            do {
-                cycleSize = cycleCheck.size();
-                for (CompilingDef<?> pcd : current.values()) {
-                    next.putAll(pcd.parents);
-                }
-                cycleCheck.putAll(next);
-                Map<DefDescriptor<?>, CompilingDef<?>> tmp = current;
-                current = next;
-                next = tmp;
-                next.clear();
-            } while (!cycleCheck.containsKey(descriptor) && cycleSize > cycleCheck.size());
-            inCycle = cycleCheck.containsKey(descriptor);
-            return inCycle;
-        }
-
         @Override
         public String toString() {
             StringBuffer sb = new StringBuffer();
@@ -396,12 +360,6 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             sb.append(built);
             sb.append(", cacheable=");
             sb.append(cacheable);
-            sb.append(", inCycle=");
-            sb.append(inCycle);
-            if (parents != null && !parents.isEmpty()) {
-                sb.append(", parents=");
-                sb.append(parents.keySet());
-            }
             return sb.toString();
         }
 
@@ -413,37 +371,6 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             return this.descriptor.compareTo(o.descriptor);
         }
     }
-
-    private static class CCStackEntry {
-        public final DefDescriptor<?> descriptor;
-        private Set<DefDescriptor<?>> next;
-        private Set<DefDescriptor<?>> current;
-        public final int level;
-
-        public CCStackEntry(DefDescriptor<?> descriptor, int level) {
-            this.descriptor = descriptor;
-            this.next = Sets.newHashSet();
-            this.current = Sets.newHashSet();
-            this.level = level;
-        }
-
-        public Set<DefDescriptor<?>> getNext() {
-            return this.next;
-        }
-
-        public Set<DefDescriptor<?>> swap() {
-            Set<DefDescriptor<?>> tmp = current;
-            this.current = this.next;
-            this.next = tmp;
-            tmp.clear();
-            return this.current;
-        }
-
-        @Override
-        public String toString() {
-            return descriptor.toString()+"@"+level+"["+next.size()+","+current.size()+"]";
-        }
-    };
 
     /**
      * The compile context.
@@ -458,7 +385,6 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         public final Map<DefDescriptor<? extends Definition>, CompilingDef<?>> compiled = Maps.newHashMap();
         public final List<ClientLibraryDef> clientLibs;
         public final DefDescriptor<? extends Definition> topLevel;
-        private Deque<CCStackEntry> stack = new ArrayDeque<CCStackEntry>(); 
         public int level;
 
         // TODO: remove preloads
@@ -473,26 +399,6 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         public CompileContext(DefDescriptor<? extends Definition> topLevel) {
             this.clientLibs = null;
             this.topLevel = topLevel;
-        }
-
-        public void pushDescriptor(DefDescriptor<?> newTop) {
-            stack.addLast(new CCStackEntry(newTop, level));
-        }
-
-        public Set<DefDescriptor<?>> getNext() {
-            return stack.peekLast().getNext();
-        }
-
-        public Set<DefDescriptor<?>> swap() {
-            return stack.peekLast().swap();
-        }
-
-        public void popDescriptor() {
-            stack.removeLast();
-            CCStackEntry last = stack.peekLast();
-            if (last != null) {
-                this.level = last.level;
-            }
         }
 
         public <D extends Definition> CompilingDef<D> getCompiling(DefDescriptor<D> descriptor) {
@@ -585,7 +491,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         DefDescriptor<D> canonical = (DefDescriptor<D>) compiling.def.getDescriptor();
         compiling.descriptor = canonical;
 
-        //cc.loggingService.incrementNum(LoggingService.DEF_COUNT);
+        currentCC.loggingService.incrementNum(LoggingService.DEF_COUNT);
         context.setCurrentNamespace(canonical.getNamespace());
         compiling.def.validateDefinition();
         compiling.built = true;
@@ -593,111 +499,83 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     }
 
     /**
-     * Get a definition not found exception for a compiling def.
-     */
-    private QuickFixException getDNF(CompilingDef<?> cd) {
-        //
-        // If we can figure out a location, feed it back to the user, as
-        // it makes it much easier to fix.
-        //
-        if (!cd.parents.isEmpty()) {
-            StringBuilder sb = new StringBuilder();
-            Location handy = null;
-            for (CompilingDef<?> parent : cd.parents.values()) {
-                handy = parent.def.getLocation();
-                if (sb.length() != 0) {
-                    sb.append(", ");
-                }
-                sb.append(parent.descriptor.toString());
-            }
-            return new DefinitionNotFoundException(cd.descriptor, handy, sb.toString());
-        }
-        return new DefinitionNotFoundException(cd.descriptor);
-    }
-
-    /**
      * A private helper routine to make the compiler code more sane.
-     * 
-     * This processes a single definition in a dependency tree. It works as a single step in a breadth first traversal
-     * of the tree, accumulating children in the 'deps' set, and updating the compile context with the current
-     * definition.
-     * 
-     * Note that once the definition has been retrieved, this code uses the 'canonical' descriptor from the definition,
-     * discarding the incoming descriptor.
      * 
      * @param descriptor the descriptor that we are currently handling, must not be in the compiling defs.
      * @param cc the compile context to allow us to accumulate information.
-     * @param level the 'level' that we are compiling at.
+     * @param stack the incoming stack (linked hash set, so order is preserved).
+     * @param parent the direct parent of the definition we are looking up.
      * @throws QuickFixException if the definition is not found, or validateDefinition() throws one.
      */
-    private <D extends Definition> D getHelper(DefDescriptor<D> descriptor, CompileContext cc)
-            throws QuickFixException {
+    private <D extends Definition> D getHelper(DefDescriptor<D> descriptor, CompileContext cc,
+            Set<DefDescriptor<?>> stack, Definition parent) throws QuickFixException {
+        currentCC.loggingService.incrementNum(LoggingService.DEF_VISIT_COUNT);
+        if (stack.contains(descriptor)) {
+            //System.out.println("cycle at "+stack+" "+descriptor);
+            return null;
+        }
         CompilingDef<D> cd = cc.getCompiling(descriptor);
         if (cc.level > cd.level) {
             cd.level = cc.level;
-        }
-        //
-        // careful here. We don't just return with the non-null def because that breaks our levels.
-        // We need to walk the whole tree, which is unfortunate perf-wise.
-        //
-        if (cd.def == null) {
-            if (!fillCompilingDef(cd, cc.context)) {
-                // No def. Blow up.
-                throw getDNF(cd);
+            if (cd.def != null) {
+                //System.out.println("recalculating at "+stack+" "+descriptor);
             }
-            // get client libs
-            if (cc.clientLibs != null && cd.def instanceof BaseComponentDef) {
-                BaseComponentDef baseComponent = (BaseComponentDef) cd.def;
-                baseComponent.addClientLibs(cc.clientLibs);
+        } else {
+            if (cd.def != null) {
+                return cd.def;
             }
         }
-
-        //
-        // Ok. We have a def. let's figure out what to do with it.
-        // Unfortunately, we need a new set of dependencies to create the parent set below.
-        // If we do not track parents, we can just use 'appendDependencies(next)', which would
-        // be a significant perf advantage.
-        //
-        Set<DefDescriptor<?>> newDeps = Sets.newHashSet();
-        cd.def.appendDependencies(newDeps);
-
-
-        //
-        // TODO: remove preloads
-        // This pulls in the context preloads. not pretty, but it works.
-        //
-        if (!cc.addedPreloads && cd.descriptor.getDefType().equals(DefType.APPLICATION)) {
-            cc.addedPreloads = true;
-            Set<String> preloads = cc.context.getPreloads();
-            for (String preload : preloads) {
-                if (!preload.contains("_")) {
-                    DependencyDefImpl.Builder ddb = new DependencyDefImpl.Builder();
-                    ddb.setResource(preload);
-                    ddb.setType("APPLICATION,COMPONENT,STYLE,EVENT");
-                    ddb.build().appendDependencies(newDeps);
+        cc.level += 1;
+        stack.add(descriptor);
+        try {
+            //
+            // careful here. We don't just return with the non-null def because that breaks our levels.
+            // We need to walk the whole tree, which is unfortunate perf-wise.
+            //
+            if (cd.def == null) {
+                if (!fillCompilingDef(cd, cc.context)) {
+                    // No def. Blow up.
+                    Location l = null;
+                    if (parent != null) {
+                        l = parent.getLocation();
+                    }
+                    stack.remove(descriptor);
+                    throw new DefinitionNotFoundException(descriptor, l, stack.toString());
+                }
+                // get client libs
+                if (cc.clientLibs != null && cd.def instanceof BaseComponentDef) {
+                    BaseComponentDef baseComponent = (BaseComponentDef) cd.def;
+                    baseComponent.addClientLibs(cc.clientLibs);
                 }
             }
-        }
 
-        Set<DefDescriptor<?>> next = cc.getNext();
-        for (DefDescriptor<?> dep : newDeps) {
-            CompilingDef<?> depcd = cc.getCompiling(dep);
-            if (!depcd.parents.containsKey(cd.descriptor)) {
-                //
-                // In this case, this is a new link, so we know that we don't
-                // need to worry about cycles.
-                //
-                depcd.parents.put(cd.descriptor, cd);
-                next.add(dep);
-            } else if (!depcd.isInCycle()) {
-                //
-                // If this dependency is not in a cycle, continue processing.
-                //
-                next.add(dep);
+            Set<DefDescriptor<?>> newDeps = Sets.newHashSet();
+            cd.def.appendDependencies(newDeps);
+
+            //
+            // TODO: remove preloads
+            // This pulls in the context preloads. not pretty, but it works.
+            //
+            if (!cc.addedPreloads && cd.descriptor.getDefType().equals(DefType.APPLICATION)) {
+                cc.addedPreloads = true;
+                Set<String> preloads = cc.context.getPreloads();
+                for (String preload : preloads) {
+                    if (!preload.contains("_")) {
+                        DependencyDefImpl.Builder ddb = new DependencyDefImpl.Builder();
+                        ddb.setResource(preload);
+                        ddb.setType("APPLICATION,COMPONENT,STYLE,EVENT");
+                        ddb.build().appendDependencies(newDeps);
+                    }
+                }
             }
+            for (DefDescriptor<?> dep : newDeps) {
+                getHelper(dep, cc, stack, cd.def);
+            }
+            return cd.def;
+        } finally {
+            cc.level -= 1;
+            stack.remove(descriptor);
         }
-
-        return cd.def;
     }
 
     /**
@@ -779,7 +657,6 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     private <D extends Definition> D compileDef(DefDescriptor<D> descriptor, CompileContext cc)
             throws QuickFixException {
         D def;
-        int level = cc.level;
         boolean nested = (cc == currentCC);
 
         if (!nested && currentCC != null) {
@@ -788,13 +665,13 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         rLock.lock();
         try {
             currentCC = cc;
-            currentCC.pushDescriptor(descriptor);
             if (!nested) {
                 currentCC.loggingService.startTimer(LoggingService.TIMER_DEFINITION_CREATION);
             }
             try {
+                Set<DefDescriptor<?>> stack = Sets.newLinkedHashSet();
                 try {
-                    def = getHelper(descriptor, currentCC);
+                    def = getHelper(descriptor, currentCC, stack, null);
                 } catch (DefinitionNotFoundException ndfe) {
                     if (nested) {
                         // ooh, nasty, we might be in a 'failure is ok state', in which case
@@ -805,28 +682,16 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                             currentCC.compiled.remove(descriptor);
                         }
                     }
-                    //
-                    // ignore a nonexistent def here.
-                    //
-                    return null;
+                    if (descriptor.equals(ndfe.getDescriptor())) {
+                        //
+                        // ignore a nonexistent def here.
+                        //
+                        return null;
+                    } else {
+                        throw ndfe;
+                    }
                 }
-                //
-                // This loop accumulates over a breadth first traversal of the dependency tree.
-                // All child definitions are added to the 'next' set, while walking the 'current'
-                // set.
-                //
-                while (currentCC.getNext().size() > 0) {
-                    Set<DefDescriptor<?>> current = currentCC.swap();
 
-                    level += 1;
-                    if (level > 1000) {
-                        throw new AuraRuntimeException("too many levels, you have a cycle");
-                    }
-                    currentCC.level = level;
-                    for (DefDescriptor<?> cdesc : current) {
-                        getHelper(cdesc, currentCC);
-                    }
-                }
                 if (!nested) {
                     finishValidation();
                 }
@@ -835,7 +700,6 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                 if (!nested) {
                     currentCC.loggingService.stopTimer(LoggingService.TIMER_DEFINITION_CREATION);
                 }
-                currentCC.popDescriptor();
             }
         } finally {
             if (!nested) {
@@ -920,7 +784,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             for (CompilingDef<?> cd : compiled) {
                 if (cd.def == null) {
                     // actually, this should never happen.
-                    throw getDNF(cd);
+                    throw new DefinitionNotFoundException(cd.descriptor);
                 }
 
                 deps.add(cd.descriptor);

@@ -192,7 +192,7 @@ public class JavaModelTest extends AuraImplTestCase {
             Aura.getInstanceService().getInstance(dd);
             fail("Expected DefinitionNotFoundException");
         } catch (DefinitionNotFoundException e) {
-            assertEquals(String.format("No MODEL named java://goats found : %s", dd.getQualifiedName()), e.getMessage());
+            assertEquals(String.format("No MODEL named java://goats found : [%s]", dd.getQualifiedName()), e.getMessage());
         }
     }
 

@@ -15,7 +15,7 @@
  */
 /*jslint sub: true */
 /**
- * @namespace The WebSQL adapter for storage service implementation
+ * @description The WebSQL adapter for storage service implementation
  * @constructor
  */
 var WebSQLStorageAdapter = function WebSQLStorageAdapter(config) {

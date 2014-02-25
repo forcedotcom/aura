@@ -52,7 +52,7 @@
         <xunit.js.console>${project.build.directory}/tools/xUnit/xUnit.js.Console.js</xunit.js.console>
         <xunit.js.format>xml</xunit.js.format>
     </properties>
-    <repositories>
+    <repositories>      
         <repository>
             <snapshots>
                 <enabled>false</enabled>
@@ -68,13 +68,6 @@
             <url>http://repo.auraframework.org/libs-release</url>
         </repository>
     </repositories>
-    <pluginRepositories>
-        <pluginRepository>
-            <id>jsdoctk</id>
-            <url>http://jsdoctk-plugin.googlecode.com/svn/repo</url>
-        </pluginRepository>
-    </pluginRepositories>
-
     <distributionManagement>
         <repository>
             <id>maven.auraframework.org</id>
@@ -780,7 +773,7 @@
                                             <include name="**/*.css" />
                                             <include name="**/*.theme" />
                                             <include name="**/*Test.js" />
-                                            <include name="**/*.auradoc" />
+											<include name="**/*.auradoc" />
                                         </fileset>
                                     </path>
                                     <pathconvert property="definitionList" refid="definitions" pathsep=",">
@@ -983,9 +976,9 @@
                     <version>0.5</version>
                 </plugin>
                 <plugin>
-                    <groupId>nl.windgazer</groupId>
-                    <artifactId>jsdoctk-plugin</artifactId>
-                    <version>2.3.2</version>
+                    <groupId>com.github.phasebash</groupId>
+                    <artifactId>jsdoc3-maven-plugin</artifactId>
+                    <version>1.0.7</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>

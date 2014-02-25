@@ -15,7 +15,7 @@
  */
 /*jslint sub: true */
 /**
- * @namespace Creates a LayoutsDef instance with a collection of layouts and layoutDefs.
+ * @description Creates a LayoutsDef instance with a collection of layouts and layoutDefs.
  * @param {Object} config
  * @constructor
  * @protected

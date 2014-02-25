@@ -15,7 +15,7 @@
  */
 /*jslint sub: true, evil : true  */
 /**
- * @namespace The Aura Dev Tool Service, accessible using $A.devToolServices.
+ * @description The Aura Dev Tool Service, accessible using $A.devToolServices.
  * Use mostly in non-production modes.
  * @constructor
  * @protected
@@ -69,9 +69,10 @@ var AuraDevToolService = function() {
 
     /**
      * Mostly used by select.
-     * @private
+     * 
      * @param reg
      * @returns {Array}
+     * @private
      */
 
     function flattenRegistry(reg){

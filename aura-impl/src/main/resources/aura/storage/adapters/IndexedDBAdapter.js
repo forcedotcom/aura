@@ -15,7 +15,7 @@
  */
 /*jslint sub: true */
 /**
- * @namespace The IndexedDB adapter for storage service implementation
+ * @description The IndexedDB adapter for storage service implementation
  * @constructor
  */
 var IndexedDBStorageAdapter = function IndexedDBStorageAdapter(config) {

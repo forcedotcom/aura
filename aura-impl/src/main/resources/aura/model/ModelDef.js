@@ -15,7 +15,7 @@
  */
 /*jslint sub: true */
 /**
- * @namespace Creates a new ModelDef instance.
+ * @description Creates a new ModelDef instance.
  * @constructor
  */
 function ModelDef(config){

@@ -15,7 +15,7 @@
  */
 /*jslint sub: true */
 /**
- * @namespace A registry for HelperDefs.
+ * @description A registry for HelperDefs.
  * @constructor
  */
 function HelperDefRegistry(){

@@ -15,7 +15,7 @@
  */
 /*jslint sub: true */
 /**
- * @namespace Creates a HelperDef instance.
+ * @description Creates a HelperDef instance.
  * @constructor
  * @private
  */

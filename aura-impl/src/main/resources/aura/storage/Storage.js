@@ -15,7 +15,7 @@
  */
 /*jslint sub: true */
 /**
- * @namespace The storage service implementation
+ * @description The storage service implementation
  * @constructor
  * @param {Object} config The configuration describing the characteristics of the storage to be created.
  */
@@ -146,11 +146,11 @@ AuraStorage.prototype.put = function(key, value) {
 };
 
 /**
- * @private
- * Asynchronously removes the item indicated by key.
+ * @description Asynchronously removes the item indicated by key.
  * @param {String} key The key of the item to remove.
  * @param {Boolean} doNotFireModified A bool indicating whether or not to fire the modified event on item removal.
  * @return {Promise} A Promise that will remove the item from storage.
+ * @private
  */
 AuraStorage.prototype.remove = function(key, doNotFireModified) {
     var promise = this.adapter.removeItem(key)
@@ -163,9 +163,9 @@ AuraStorage.prototype.remove = function(key, doNotFireModified) {
 };
 
 /**
- * @private
- * Asynchronously removes all expired items.
+ * @description Asynchronously removes all expired items.
  * @return{Promise} A Promise that will execute sweep.
+ * @private
  */
 AuraStorage.prototype.sweep = function() {
     var that = this;

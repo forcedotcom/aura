@@ -15,7 +15,7 @@
  */
 /*jslint sub: true */
 /**
- * @namespace A registry for ModelDefs.
+ * @description A registry for ModelDefs.
  * @constructor
  */
 function ModelDefRegistry(){

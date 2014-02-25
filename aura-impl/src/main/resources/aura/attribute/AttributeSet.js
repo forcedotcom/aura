@@ -16,7 +16,7 @@
 /*jslint sub: true */
 
 /**
- * @namespace Creates an AttributeSet instance.
+ * @description Creates an AttributeSet instance.
  * @param {Object}
  *            config Sets the values with the config object, if provided.
  * @param {Object}

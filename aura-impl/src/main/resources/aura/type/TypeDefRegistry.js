@@ -15,7 +15,7 @@
  */
 /*jslint sub: true */
 /**
- * @namespace
+ * 
  * @constructor
  */
 function TypeDefRegistry(){

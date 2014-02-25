@@ -20,7 +20,6 @@
  * A glorified stack to keep track of which component we're working
  * on behalf of.  Stack frames may have arbitrary annotations attached.
  *
- * @namespace 
  * @constructor
  */
 $A.ns.AuraComponentContext = function() {

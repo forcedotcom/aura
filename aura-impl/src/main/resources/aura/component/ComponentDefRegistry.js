@@ -15,7 +15,7 @@
  */
 /*jslint sub: true */
 /**
- * @namespace A registry for ComponentDef objects.
+ * @description A registry for ComponentDef objects.
  * @constructor
  * @protected
  */

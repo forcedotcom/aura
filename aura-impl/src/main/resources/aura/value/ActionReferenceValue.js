@@ -15,7 +15,9 @@
  */
 /*jslint sub: true */
 /**
- * @class ActionReferenceValue is the underlying value object for an attribute in a component of type Aura.Action.
+ * @class ActionReferenceValue.
+ *
+ * this is the underlying value object for an attribute in a component of type Aura.Action.
  * You can use ActionReferenceValue to pass an action to another component that will invoke the action.
  * A value object is a thin wrapper around the actual data. The wrapper layer around the literal JavaScript objects enables you
  * to modify data in a transactional manner. The framework selectively rerenders and updates the UI in response to data changes.

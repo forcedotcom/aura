@@ -15,7 +15,7 @@
  */
 /*jslint sub: true */
 /**
- * @namespace A Value wrapper for a property reference.
+ * @description A Value wrapper for a property reference.
  * @constructor
  * @protected
  */

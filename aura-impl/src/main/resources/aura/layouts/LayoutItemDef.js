@@ -15,7 +15,7 @@
  */
 /*jslint sub: true */
 /**
- * @namespace A LayoutItemDef instance that is created with LayoutDef.
+ * @description A LayoutItemDef instance that is created with LayoutDef.
  * @param {Object} config
  * @constructor
  * @protected

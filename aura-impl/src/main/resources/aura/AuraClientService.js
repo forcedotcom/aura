@@ -15,7 +15,7 @@
  */
 /*jslint sub: true */
 /**
- * @namespace The Aura Client Service, accessible using $A.services.client.
+ * @description The Aura Client Service, accessible using $A.services.client.
  *            Communicates with the Aura Server.
  * @constructor
  */

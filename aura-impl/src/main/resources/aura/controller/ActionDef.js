@@ -15,7 +15,7 @@
  */
 /*jslint sub: true*/
 /**
- * @namespace The Action Definition including the name, descriptor, action type, method, and parameter definitions. An
+ * @description The Action Definition including the name, descriptor, action type, method, and parameter definitions. An
  *            ActionDef instance is created as part of the ControllerDef initialization.
  * 
  * @constructor
@@ -73,8 +73,8 @@ ActionDef.prototype.getName = function() {
 /**
  * Gets the Action Descriptor.
  * 
- * @private
  * @returns {Object}
+ * @private
  */
 ActionDef.prototype.getDescriptor = function() {
 	return this.descriptor;
@@ -83,8 +83,8 @@ ActionDef.prototype.getDescriptor = function() {
 /**
  * Gets the Action type, which can either be "CLIENT" or "SERVER".
  * 
- * @private
  * @returns {String} Possible values are "CLIENT" or "SERVER".
+ * @private
  */
 ActionDef.prototype.getActionType = function() {
 	return this.actionType;
@@ -131,10 +131,10 @@ ActionDef.prototype.isCaboose = function() {
 /**
  * Returns a new Action instance.
  * 
- * @private
  * @param {Object}
  *            cmp The component associated with the Action.
  * @returns {Action}
+ * @private
  */
 ActionDef.prototype.newInstance = function(cmp) {
     return new Action(this, "a", this.meth, this.paramDefs, this.background, cmp, this.caboose);

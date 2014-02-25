@@ -15,7 +15,7 @@
  */
 /*jslint sub: true */
 /**
- * @namespace Creates a new AttributeDefSet instance.
+ * @description Creates a new AttributeDefSet instance.
  * @param {Object} configs For each configs object provided, a new AttributeDef instance is added
  * @constructor
  * @protected

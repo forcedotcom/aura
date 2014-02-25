@@ -1,7 +1,7 @@
 <aura:application render="client" useAppcache="true" >
 
     <!-- test duplicates -->
-    <aura:clientLibrary name="UIPerfCss" type="CSS" modes="PTEST" />
+    <aura:clientLibrary name="UIPerfCSS" type="CSS" modes="PTEST" />
     <aura:clientLibrary name="UIPerf" type="JS" modes="PTEST,CADENCE"/>
     <aura:clientLibrary name="UIPerfUi" type="JS" modes="PTEST"/>
     <aura:clientLibrary name="CkEditor" type="JS" />

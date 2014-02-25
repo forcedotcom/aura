@@ -24,7 +24,7 @@
                 description="The root of the component hierarchy. Provides a default rendering implementation.">
 
     <!-- required framework client libraries -->
-    <aura:clientLibrary name="UIPerfCss" type="CSS" modes="PTEST" />
+    <aura:clientLibrary name="UIPerfCSS" type="CSS" modes="PTEST" />
     <aura:clientLibrary name="UIPerf" type="JS" modes="PTEST,CADENCE"/>
     <aura:clientLibrary name="UIPerfUi" type="JS" modes="PTEST"/>
     <aura:clientLibrary name="CkEditor" type="JS" />

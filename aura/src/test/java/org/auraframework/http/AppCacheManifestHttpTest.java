@@ -381,7 +381,7 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
     
     /**
      * 
-     * UIPerf, UIPerfUi, UIPerfCss, walltimelocale are uncombinable in PTEST mode.
+     * UIPerf, UIPerfUi, UIPerfCSS, walltimelocale are uncombinable in PTEST mode.
      */
     public void testUncombinableResourceUrlsAreAddedToAppCacheManifest()throws Exception{
         setHttpUserAgent(APPCACHE_SUPPORTED_USERAGENT);

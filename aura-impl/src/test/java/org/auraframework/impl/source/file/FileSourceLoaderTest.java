@@ -89,6 +89,9 @@ public class FileSourceLoaderTest extends AuraImplTestCase {
             if (reader != null) {
                 try {
                     reader.close();
+                    fail("Did not get an exception for not reading the entire file");
+                } catch (IllegalStateException ise) {
+                    // expected, we didn't read the file.
                 } catch (IOException e) {
                     fail(e.getMessage());
                 }
@@ -119,6 +122,9 @@ public class FileSourceLoaderTest extends AuraImplTestCase {
             if (reader != null) {
                 try {
                     reader.close();
+                    fail("Did not get an exception for not reading the entire file");
+                } catch (IllegalStateException ise) {
+                    // expected, we didn't read the file.
                 } catch (IOException e) {
                     fail(e.getMessage());
                 }

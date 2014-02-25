@@ -23,6 +23,7 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.LayoutsDef;
 import org.auraframework.def.TypeDef;
 import org.auraframework.impl.AuraImplTestCase;
+import org.auraframework.test.annotation.ThreadHostileTest;
 import org.auraframework.throwable.AuraRuntimeException;
 
 public class DefDescriptorImplTest extends AuraImplTestCase {
@@ -75,6 +76,7 @@ public class DefDescriptorImplTest extends AuraImplTestCase {
         assertEquals(testDescriptor.getDefType(), DefType.COMPONENT);
     }
 
+    @ThreadHostileTest("cache dependent")
     public void testGetInstance() throws Exception {
         // test getInstance(tag, defClass)
         DefDescriptor<?> testDescriptor = DefDescriptorImpl.getInstance("aura:text", ComponentDef.class);
@@ -85,7 +87,7 @@ public class DefDescriptorImplTest extends AuraImplTestCase {
         // even if the component doesn't exist
         assertNotNull(DefDescriptorImpl.getInstance("fake:component", ComponentDef.class));
 
-        // subsequent calls to getInstance should return the same object
+        // subsequent calls to getInstance should return objects that are the same.
         assertSame(testDescriptor, (DefDescriptorImpl.getInstance("aura:text", ComponentDef.class)));
 
         // test getInstance(null, defClass)

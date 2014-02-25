@@ -57,19 +57,32 @@ public abstract class Source<D extends Definition> implements Serializable {
         private MessageDigest digest;
         private final Charset utf8;
         private boolean hadError;
+        private boolean closed;
 
         public HashingReader(Reader reader) {
             this.reader = reader;
             try {
                 digest = MessageDigest.getInstance("MD5");
             } catch (NoSuchAlgorithmException e) {
-                throw new RuntimeException("MD5 is a required MessageDigest algorithm, but is not registered here.");
+                throw new IllegalStateException("MD5 is a required MessageDigest algorithm, but is not registered here.");
             }
             utf8 = Charset.forName("UTF-8");
         }
 
         @Override
         public void close() throws IOException {
+            if (closed) {
+                return;
+            }
+            closed = true;
+            if (reader.read() != -1) {
+                //
+                // If someone didn't finish reading the file, we want to yell at them
+                // and make sure the code is fixed. If we let it fall through, we may end
+                // up with a null hash, which no-one will notice.
+                //
+                throw new IllegalStateException("Closed a hashing file without reading the entire thing");
+            }
             if (digest != null) {
                 setChangeInfo();
             }

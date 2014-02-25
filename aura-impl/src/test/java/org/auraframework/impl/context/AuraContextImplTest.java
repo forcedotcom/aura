@@ -52,9 +52,10 @@ public class AuraContextImplTest extends AuraImplTestCase {
     }
 
     /**
-     * Verify the serialized format of a ComponentDef when it belongs to a pre-load namespace. Components which belong
-     * to a pre-load namespace will only have the descriptor as part of their ComponentDef. This descriptor will be used
-     * on the client side to obtain the full blown componentDef.
+     * Verify the serialized format of a ComponentDef when it was 'preloaded'.
+     *
+     * Components which are 'preloaded' will be serialized as the descriptor. This allows the client to determine
+     * that the component should be present easily, and give a more reasonable error message if it is not.
      */
     public void testComponentDefSerializedFormat() throws Exception {
         DefDescriptor<ApplicationDef> appDesc = Aura.getDefinitionService().getDefDescriptor(
@@ -67,7 +68,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
         context.setClientLoaded(clientLoaded);
         ds.updateLoaded(null);
 
-        assertEquals("{\"descriptor\":\"markup://preloadTest:dependenciesApp\"}", Json.serialize(appDef));
+        assertEquals("\"markup://preloadTest:dependenciesApp\"", Json.serialize(appDef));
     }
 
     /**

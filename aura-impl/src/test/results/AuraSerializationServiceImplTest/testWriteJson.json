@@ -1,64 +1,10 @@
 {
   "serId":1,
   "value":{
-    "componentDef":{
-      "serId":2,
-      "value":{
-        "descriptor":"markup://test:child1",
-        "superDef":{
-          "serId":3,
-          "value":{
-            "descriptor":"markup://aura:component"
-          }
-        },
-        "attributeDefs":[
-          {
-            "serId":4,
-            "value":{
-              "descriptor":"body",
-              "typeDefDescriptor":"aura://Aura.Component[]",
-              "required":false,
-              "visibility":"PUBLIC"
-            }
-          },
-          {
-            "serId":5,
-            "value":{
-              "descriptor":"attr",
-              "typeDefDescriptor":"aura://String",
-              "required":false,
-              "visibility":"PUBLIC"
-            }
-          }
-        ],
-        "facets":[
-          {
-            "descriptor":"body",
-            "value":[
-              {
-                "componentDef":{
-                  "serId":6,
-                  "value":{
-                    "descriptor":"markup://test:child2",
-                    "superDef":{
-                      "serRefId":3
-                    },
-                    "attributeDefs":[
-                      {
-                        "serRefId":4
-                      }
-                    ]
-                  }
-                }
-              }
-            ]
-          }
-        ]
-      }
-    },
+    "componentDef":"markup://test:child1",
     "creationPath":"/*[0]",
     "attributes":{
-      "serId":7,
+      "serId":2,
       "value":{
         "values":{
           "attr":"yo"

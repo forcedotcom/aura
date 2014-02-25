@@ -723,9 +723,11 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             boolean preloaded = context.isPreloaded(getDescriptor());
             boolean preloading = context.isPreloading();
 
-            json.writeMapBegin();
-            json.writeMapEntry("descriptor", getDescriptor());
-            if (!preloaded) {
+            if (preloaded) {
+                json.writeValue(descriptor);
+            } else {
+                json.writeMapBegin();
+                json.writeMapEntry("descriptor", descriptor);
                 context.setCurrentNamespace(descriptor.getNamespace());
                 RendererDef rendererDef = getRendererDef();
                 if (rendererDef != null && !rendererDef.isLocal()) {
@@ -785,9 +787,8 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
                     json.writeMapEntry("testSuiteDef", getTestSuiteDef());
                 }
                 serializeFields(json);
+                json.writeMapEnd();
             }
-
-            json.writeMapEnd();
         } catch (QuickFixException e) {
             throw new AuraUnhandledException("unhandled exception", e);
         }

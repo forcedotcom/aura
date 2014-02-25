@@ -23,6 +23,8 @@
  *      config the 'founding' config for the context from the server.
  */
 function AuraContext(config) {
+    var i, defs, length;
+
     this.mode = config["mode"];
     this.preloads = config["preloads"];
     this.loaded = config["loaded"];
@@ -44,6 +46,20 @@ function AuraContext(config) {
     this.globalValueProviders = new $A.ns.GlobalValueProviders(config["globalValueProviders"]);
     // Careful now, the def is null, this fake action sets up our paths.
     this.currentAction = new Action(null, ""+this.num, null, null, false, null, false);
+    if (config["componentDefs"]) {
+        defs = config["componentDefs"];
+        length = defs.length;
+        for (i = 0; i < length; i++) {
+            $A.services.component.getDef(defs[i]);
+        }
+    }
+    if (config["eventDefs"]) {
+        defs = config["eventDefs"];
+        length = defs.length;
+        for (i = 0; i < length; i++) {
+            $A.services.event.getEventDef(defs[i]);
+        }
+    }
     this.joinComponentConfigs(config["components"], this.currentAction.getId());
 }
 
@@ -108,6 +124,8 @@ AuraContext.prototype.getDynamicNamespaces = function() {
  *      otherContext the context from the server to join in to this one.
  */
 AuraContext.prototype.join = function(otherContext) {
+    var i, defs, length;
+
     if (otherContext["mode"] !== this.getMode()) {
         throw new Error("Mode mismatch");
     }
@@ -119,6 +137,20 @@ AuraContext.prototype.join = function(otherContext) {
     }
     this.globalValueProviders.join(otherContext["globalValueProviders"]);
     $A.localizationService.init();
+    if (otherContext["componentDefs"]) {
+        defs = otherContext["componentDefs"];
+        length = defs.length;
+        for (i = 0; i < length; i++) {
+            $A.services.component.getDef(defs[i]);
+        }
+    }
+    if (otherContext["eventDefs"]) {
+        defs = otherContext["eventDefs"];
+        length = defs.length;
+        for (i = 0; i < length; i++) {
+            $A.services.event.getEventDef(defs[i]);
+        }
+    }
     this.joinComponentConfigs(otherContext["components"], ""+this.getNum());
     this.joinLoaded(otherContext["loaded"]);
 };
@@ -346,6 +378,15 @@ AuraContext.prototype.joinLoaded = function(loaded) {
  */
 AuraContext.prototype.getLoaded = function() {
     return this.loaded;
+};
+
+/**
+ * This should be private but is needed for testing and dev modes.
+ *
+ * ... should move to $A.test.
+ */
+AuraContext.prototype.getPreloadedNamespaces = function() {
+    return this.preloads;
 };
 
 /**

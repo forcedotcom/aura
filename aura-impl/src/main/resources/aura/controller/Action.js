@@ -685,20 +685,6 @@ Action.prototype.updateFromResponse = function(response) {
  */
 Action.prototype.getStored = function(storageName) {
     if (this.storable && this.responseState === "SUCCESS") {
-        if (this.components) {
-            // Rewrite any embedded ComponentDef from object to descriptor only
-            var idx;
-
-            for (idx = 0; idx < this.components.length; idx++) {
-                var c = this.components[idx];
-                if (c) {
-                    var def = c["componentDef"];
-                    c["componentDef"] = {
-                        "descriptor" : def["descriptor"]
-                    };
-                }
-            }
-        }
         return {
             "returnValue" : this.returnValue,
             "components" : this.components,

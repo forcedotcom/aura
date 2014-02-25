@@ -28,6 +28,8 @@ function Event(config) {
     this.fired = false;
 }
 
+Event.prototype.auraType = "Event";
+
 /**
  * Gets the source component associated with this Event.
  * @returns {Object}

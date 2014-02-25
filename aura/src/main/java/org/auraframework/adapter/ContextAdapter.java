@@ -34,20 +34,73 @@ import org.auraframework.util.json.JsonSerializationContext;
  */
 
 public interface ContextAdapter extends AuraAdapter {
+    /**
+     * Release a context.
+     */
     void release();
 
+    /**
+     * Establish a new context.
+     *
+     * @param mode the mode for the context.
+     * @param masterRegistry the master def registry.
+     * @param defaultPrefixes
+     * @param format the format expected as a result.
+     * @param access the access mode for the context.
+     * @param jsonContext a serialization context for serializing data.
+     * @param globalProviders global value providers.
+     * @param appDesc the controlling application descriptor.
+     */
     AuraContext establish(Mode mode, MasterDefRegistry masterRegistry, Map<DefType, String> defaultPrefixes,
             Format format, Access access, JsonSerializationContext jsonContext,
             Map<ValueProviderType, GlobalValueProvider> globalProviders,
             DefDescriptor<? extends BaseComponentDef> appDesc);
 
+    /**
+     * Establish a new context.
+     *
+     * @param mode the mode for the context.
+     * @param masterRegistry the master def registry.
+     * @param defaultPrefixes
+     * @param format the format expected as a result.
+     * @param access the access mode for the context.
+     * @param jsonContext a serialization context for serializing data.
+     * @param globalProviders global value providers.
+     * @param appDesc the controlling application descriptor.
+     * @param isDebugToolEnabled a broken parameter that should not be here.
+     */
     AuraContext establish(Mode mode, MasterDefRegistry masterRegistry, Map<DefType, String> defaultPrefixes,
             Format format, Access access, JsonSerializationContext jsonContext,
             Map<ValueProviderType, GlobalValueProvider> globalProviders,
             DefDescriptor<? extends BaseComponentDef> appDesc,
             boolean isDebugToolEnabled);
     
+    /**
+     * is a context established in this thread?.
+     *
+     * @return true if a context has been established.
+     */
     boolean isEstablished();
 
+    /**
+     * Push a system context.
+     *
+     * This function is used to create a system only context to hide internal operations from
+     * the wire.
+     *
+     * @return the new context.
+     */
+    AuraContext pushSystemContext();
+
+    /**
+     * Pop a system context previously pushed.
+     */
+    void popSystemContext();
+
+    /**
+     * Get the current aura context.
+     *
+     * @return the current context.
+     */
     AuraContext getCurrentContext();
 }

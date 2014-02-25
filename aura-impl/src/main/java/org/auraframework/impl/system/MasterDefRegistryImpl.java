@@ -171,6 +171,10 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     private SecurityProviderDef securityProvider;
     private DefDescriptor<? extends BaseComponentDef> lastRootDesc;
 
+    public MasterDefRegistryImpl(MasterDefRegistryImpl original) {
+        this.delegateRegistries = original.delegateRegistries;
+    }
+
     public MasterDefRegistryImpl(DefRegistry<?>... registries) {
         delegateRegistries = new RegistryTrie(registries);
     }
@@ -187,36 +191,36 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
         rLock.lock();
         try {
-        for (DefRegistry<?> reg : registries) {
-            //
-            // This could be a little dangerous, but unless we force all of our
-            // registries to implement find, this is necessary.
-            //
-            if (reg.hasFind()) {
-                Set<DefDescriptor<?>> registryResults = null;
+            for (DefRegistry<?> reg : registries) {
+                //
+                // This could be a little dangerous, but unless we force all of our
+                // registries to implement find, this is necessary.
+                //
+                if (reg.hasFind()) {
+                    Set<DefDescriptor<?>> registryResults = null;
 
-                if (isCacheable(reg)) {
-                    // cache results per registry
-                    String cacheKey = filterKey + "|" + reg.toString();
-                    registryResults = descriptorFilterCache.getIfPresent(cacheKey);
-                    if (registryResults == null) {
+                    if (isCacheable(reg)) {
+                        // cache results per registry
+                        String cacheKey = filterKey + "|" + reg.toString();
+                        registryResults = descriptorFilterCache.getIfPresent(cacheKey);
+                        if (registryResults == null) {
+                            registryResults = reg.find(matcher);
+                            descriptorFilterCache.put(cacheKey, registryResults);
+                        }
+                    } else {
                         registryResults = reg.find(matcher);
-                        descriptorFilterCache.put(cacheKey, registryResults);
                     }
-                } else {
-                    registryResults = reg.find(matcher);
-                }
 
-                matched.addAll(registryResults);
-            }
-        }
-        if (localDescs != null) {
-            for (DefDescriptor<? extends Definition> desc : localDescs) {
-                if (matcher.matchDescriptor(desc)) {
-                    matched.add(desc);
+                    matched.addAll(registryResults);
                 }
             }
-        }
+            if (localDescs != null) {
+                for (DefDescriptor<? extends Definition> desc : localDescs) {
+                    if (matcher.matchDescriptor(desc)) {
+                        matched.add(desc);
+                    }
+                }
+            }
         } finally {
             rLock.unlock();
         }

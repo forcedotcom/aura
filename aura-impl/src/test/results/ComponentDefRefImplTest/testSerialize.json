@@ -5,9 +5,7 @@
       "descriptor":"markup://test:text",
       "superDef":{
         "serId":2,
-        "value":{
-          "descriptor":"markup://aura:component"
-        }
+        "value":"markup://aura:component"
       },
       "attributeDefs":[
         {
@@ -36,9 +34,7 @@
             {
               "componentDef":{
                 "serId":5,
-                "value":{
-                  "descriptor":"markup://aura:text"
-                }
+                "value":"markup://aura:text"
               },
               "attributes":{
                 "values":{

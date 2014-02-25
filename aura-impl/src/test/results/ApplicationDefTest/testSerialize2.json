@@ -4,9 +4,7 @@
     "descriptor":"markup://fake:component",
     "superDef":{
       "serId":2,
-      "value":{
-        "descriptor":"markup://aura:application"
-      }
+      "value":"markup://aura:application"
     },
     "attributeDefs":[
       {

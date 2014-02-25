@@ -86,16 +86,16 @@ public class AuraContextServiceImpl implements ContextService {
     }
     
     @Override
-	public AuraContext startContext(Mode mode, Format format, Access access,
-			DefDescriptor<? extends BaseComponentDef> appDesc,
-			boolean isDebugToolEnabled) {
-		return startContext(mode, null, format, access, appDesc, isDebugToolEnabled);
-	}
+    public AuraContext startContext(Mode mode, Format format, Access access,
+                    DefDescriptor<? extends BaseComponentDef> appDesc,
+                    boolean isDebugToolEnabled) {
+        return startContext(mode, null, format, access, appDesc, isDebugToolEnabled);
+    }
 
     @Override
     public AuraContext startContext(Mode mode, Set<SourceLoader> loaders, Format format, Access access,
             DefDescriptor<? extends BaseComponentDef> appDesc) {
-    	return startContext(mode, loaders, format, access, appDesc, false);
+        return startContext(mode, loaders, format, access, appDesc, false);
     }
     
     @Override
@@ -116,6 +116,17 @@ public class AuraContextServiceImpl implements ContextService {
         } finally {
             Aura.getLoggingService().release();
         }
+    }
+
+    @Override
+    public AuraContext pushSystemContext() {
+        assertEstablished();
+        return AuraImpl.getContextAdapter().pushSystemContext();
+    }
+
+    @Override
+    public void popSystemContext() {
+        AuraImpl.getContextAdapter().popSystemContext();
     }
 
     private PrefixDefaultsAdapter getDefaultsProvider() {

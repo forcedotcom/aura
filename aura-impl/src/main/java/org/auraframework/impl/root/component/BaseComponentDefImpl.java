@@ -110,7 +110,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     private final int hashCode;
 
     private transient Boolean localDeps = null;
-    
+
     protected BaseComponentDefImpl(Builder<T> builder) {
         super(builder);
         this.modelDefDescriptor = builder.modelDefDescriptor;
@@ -940,7 +940,6 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         List<DependencyDef> dependencies;
         public List<ClientLibraryDef> clientLibraries;
         private RenderType renderType;
-		//public DefinitionAccess access;
 
         @Override
         public Builder<T> setFacet(String key, Object value) {

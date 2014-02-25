@@ -17,7 +17,6 @@ package org.auraframework.impl.root.application;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.Map.Entry;
 
 import org.auraframework.Aura;
 import org.auraframework.builder.ApplicationDefBuilder;
@@ -54,9 +53,6 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
         this.locationChangeEventDescriptor = builder.locationChangeEventDescriptor;
 
         this.layoutsDefDescriptor = builder.layoutsDefDescriptor;
-        
-        //this.accessRequired = (getAccess().requiresAuthentication()) ? Access.AUTHENTICATED : Access.PUBLIC;
-        
         this.securityProviderDescriptor = builder.securityProviderDescriptor;
         this.isAppcacheEnabled = builder.isAppcacheEnabled;
         this.additionalAppCacheURLs = builder.additionalAppCacheURLs;
@@ -304,7 +300,6 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
 
     private final DefDescriptor<EventDef> locationChangeEventDescriptor;
     private final DefDescriptor<LayoutsDef> layoutsDefDescriptor;
-    //private final Access accessRequired;
     private final DefDescriptor<SecurityProviderDef> securityProviderDescriptor;
     private final DefDescriptor<ThemeDef> overrideThemeDescriptor;
     private final int hashCode;

@@ -26,7 +26,7 @@ import org.auraframework.throwable.quickfix.InvalidAccessValueException;
 public interface DefinitionAccess {
 	
     public enum BasicAccessType {
-    	AUTHENTICATED, PUBLIC, GLOBAL, PRIVATE, 
+    	AUTHENTICATED, UNAUTHENTICATED, PUBLIC, GLOBAL, PRIVATE, 
     	PREVIEW, INTERNAL
     };
     

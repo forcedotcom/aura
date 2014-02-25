@@ -18,13 +18,12 @@ package org.auraframework.test.mock;
 import java.io.IOException;
 import java.util.Set;
 
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.Definition;
-import org.auraframework.def.DefinitionAccess;
+import org.auraframework.def.*;
+import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.system.Location;
 import org.auraframework.system.SubDefDescriptor;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.json.Json;
+import org.auraframework.util.json.*;
 import org.auraframework.util.json.Json.Serialization;
 import org.auraframework.util.json.Json.Serialization.ReferenceType;
 
@@ -107,7 +106,7 @@ public abstract class MockDefinition<D extends Definition> implements Definition
     
     @Override
     public DefinitionAccess getAccess() {
-    	return null;
+    	return DefinitionAccessImpl.defaultAccess();
     }
 
     @Override

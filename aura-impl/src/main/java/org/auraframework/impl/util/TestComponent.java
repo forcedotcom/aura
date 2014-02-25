@@ -16,33 +16,10 @@
 package org.auraframework.impl.util;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
-import org.auraframework.def.AttributeDef;
-import org.auraframework.def.AttributeDefRef;
-import org.auraframework.def.BaseComponentDef;
-import org.auraframework.def.ClientLibraryDef;
-import org.auraframework.def.ComponentDef;
-import org.auraframework.def.ControllerDef;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.Definition;
-import org.auraframework.def.DefinitionAccess;
-import org.auraframework.def.DependencyDef;
-import org.auraframework.def.DocumentationDef;
-import org.auraframework.def.EventHandlerDef;
-import org.auraframework.def.HelperDef;
-import org.auraframework.def.InterfaceDef;
-import org.auraframework.def.ModelDef;
-import org.auraframework.def.ProviderDef;
-import org.auraframework.def.RegisterEventDef;
-import org.auraframework.def.RendererDef;
-import org.auraframework.def.ResourceDef;
-import org.auraframework.def.RootDefinition;
-import org.auraframework.def.StyleDef;
-import org.auraframework.def.ThemeDef;
+import org.auraframework.def.*;
+import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.system.Location;
 import org.auraframework.system.SubDefDescriptor;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -286,7 +263,7 @@ public final class TestComponent implements ComponentDef {
     
     @Override
     public DefinitionAccess getAccess() {
-    	return null;
+        return DefinitionAccessImpl.defaultAccess();
     }
 
     @Override

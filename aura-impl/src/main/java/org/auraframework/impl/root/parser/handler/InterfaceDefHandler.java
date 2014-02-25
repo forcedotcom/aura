@@ -15,21 +15,15 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.Aura;
 import org.auraframework.builder.RootDefinitionBuilder;
-import org.auraframework.def.AttributeDef;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.InterfaceDef;
-import org.auraframework.def.ProviderDef;
-import org.auraframework.def.RegisterEventDef;
+import org.auraframework.def.*;
+import org.auraframework.def.DefinitionAccess.BasicAccessType;
 import org.auraframework.impl.root.AttributeDefImpl;
 import org.auraframework.impl.root.event.RegisterEventDefImpl;
 import org.auraframework.impl.root.intf.InterfaceDefImpl;
@@ -50,7 +44,7 @@ public class InterfaceDefHandler extends RootTagHandler<InterfaceDef> {
     private static final String ATTRIBUTE_EXTENDS = "extends";
 
     protected final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_PROVIDER, ATTRIBUTE_EXTENDS,
-            RootTagHandler.ATTRIBUTE_SUPPORT, RootTagHandler.ATTRIBUTE_DESCRIPTION);
+            RootTagHandler.ATTRIBUTE_SUPPORT, RootTagHandler.ATTRIBUTE_DESCRIPTION, ATTRIBUTE_ACCESS);
 
     private final InterfaceDefImpl.Builder builder = new InterfaceDefImpl.Builder();
 
@@ -143,4 +137,12 @@ public class InterfaceDefHandler extends RootTagHandler<InterfaceDef> {
         return builder;
     }
 
+    @Override
+    public Set<BasicAccessType> getAllowedAccessValues() {
+        return ALLOWED_ACCESS_VALUES;
+    }
+
+    private final static Set<BasicAccessType> ALLOWED_ACCESS_VALUES = new ImmutableSet.Builder<BasicAccessType>()
+            .add(BasicAccessType.GLOBAL, BasicAccessType.PUBLIC, BasicAccessType.PREVIEW, 
+                    BasicAccessType.INTERNAL).build();
 }

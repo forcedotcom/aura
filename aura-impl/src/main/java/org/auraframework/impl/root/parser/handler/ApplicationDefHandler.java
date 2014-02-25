@@ -16,21 +16,13 @@
 package org.auraframework.impl.root.parser.handler;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.Aura;
-import org.auraframework.def.ApplicationDef;
-import org.auraframework.def.ComponentDef;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DefinitionAccess;
+import org.auraframework.def.*;
 import org.auraframework.def.DefinitionAccess.BasicAccessType;
-import org.auraframework.def.EventDef;
-import org.auraframework.def.LayoutsDef;
-import org.auraframework.def.ThemeDef;
 import org.auraframework.impl.root.DependencyDefImpl;
 import org.auraframework.impl.root.application.ApplicationDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
@@ -96,8 +88,6 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
         super.readAttributes();
 
         appBuilder.setSecurityProviderDescriptor(getAttributeValue(ATTRIBUTE_SECURITY_PROVIDER));
-
-        ////appBuilder.access = getAttributeValue(ATTRIBUTE_ACCESS);
 
         String locationChangeEvent = getAttributeValue(ATTRIBUTE_LOCATION_CHANGE_EVENT);
         if (!AuraTextUtil.isNullEmptyOrWhitespace(locationChangeEvent)) {
@@ -203,7 +193,8 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
             .addAll(BaseComponentDefHandler.ALLOWED_ATTRIBUTES).build();
     
     private final static Set<BasicAccessType> ALLOWED_ACCESS_VALUES = new ImmutableSet.Builder<BasicAccessType>()
-            .add(BasicAccessType.AUTHENTICATED, BasicAccessType.PUBLIC, BasicAccessType.PREVIEW, 
-            		BasicAccessType.INTERNAL).build();
+            .add(BasicAccessType.AUTHENTICATED, BasicAccessType.UNAUTHENTICATED, 
+                    BasicAccessType.GLOBAL, BasicAccessType.PUBLIC, 
+                    BasicAccessType.PREVIEW, BasicAccessType.INTERNAL).build();
 
 }

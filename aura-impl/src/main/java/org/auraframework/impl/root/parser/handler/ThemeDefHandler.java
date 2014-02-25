@@ -24,12 +24,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.Aura;
 import org.auraframework.builder.RootDefinitionBuilder;
-import org.auraframework.def.ComponentDef;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.StyleDef;
-import org.auraframework.def.ThemeDef;
-import org.auraframework.def.ThemeDefRef;
-import org.auraframework.def.VarDef;
+import org.auraframework.def.*;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.root.theme.ThemeDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
@@ -51,7 +46,7 @@ public final class ThemeDefHandler extends RootTagHandler<ThemeDef> {
     private static final String ATTRIBUTE_EXTENDS = "extends";
 
     protected final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(
-            ATTRIBUTE_EXTENDS, ATTRIBUTE_SUPPORT, ATTRIBUTE_DESCRIPTION);
+            ATTRIBUTE_EXTENDS, ATTRIBUTE_SUPPORT, ATTRIBUTE_DESCRIPTION, ATTRIBUTE_ACCESS);
 
     private final ThemeDefImpl.Builder builder = new ThemeDefImpl.Builder();
 

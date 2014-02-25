@@ -51,7 +51,7 @@ public class DefinitionAccessImpl implements DefinitionAccess {
 	
 	@Override
 	public boolean requiresAuthentication() {
-		return !access.contains(BasicAccessType.PUBLIC);   // default is authenticated
+		return !access.contains(BasicAccessType.UNAUTHENTICATED);   // default is authenticated
 	}
 
 	@Override
@@ -61,7 +61,7 @@ public class DefinitionAccessImpl implements DefinitionAccess {
 
 	@Override
 	public boolean isPublic() {
-		return access.contains(BasicAccessType.PUBLIC);
+		return !(access.contains(BasicAccessType.GLOBAL) || access.contains(BasicAccessType.PRIVATE));  // default is public
 	}
 
 	@Override
@@ -84,8 +84,8 @@ public class DefinitionAccessImpl implements DefinitionAccess {
 			}
 		}
 		// Now check for invalid/contradictory combinations
-		if (access.contains(BasicAccessType.AUTHENTICATED) && access.contains(BasicAccessType.PUBLIC)) {
-			throw new InvalidAccessValueException("Access attribute cannot specify both AUTHENTICATED and PUBLIC");
+		if (access.contains(BasicAccessType.AUTHENTICATED) && access.contains(BasicAccessType.UNAUTHENTICATED)) {
+			throw new InvalidAccessValueException("Access attribute cannot specify both AUTHENTICATED and UNAUTHENTICATED");
 		}
 
 		Set<BasicAccessType> scopes = new HashSet<BasicAccessType>(SCOPE_ACCESS_VALUES);

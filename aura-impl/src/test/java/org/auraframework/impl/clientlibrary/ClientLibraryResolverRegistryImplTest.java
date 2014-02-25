@@ -122,7 +122,7 @@ public class ClientLibraryResolverRegistryImplTest extends AuraImplTestCase {
     }
 
     public void testStandardAuraFrameworkLib() {
-        assertResolvers("UIPerfCss", Type.CSS, AuraResourceResolver.class);
+        assertResolvers("UIPerfCSS", Type.CSS, AuraResourceResolver.class);
         assertResolvers("UIPerf", Type.JS, AuraResourceResolver.class);
         assertResolvers("UIPerfUi", Type.JS, AuraResourceResolver.class);
         assertResolvers("CkEditor", Type.JS, AuraResourceResolver.class);

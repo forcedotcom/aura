@@ -83,8 +83,10 @@ public class ClientLibraryServiceImplTest extends AuraImplTestCase {
         assertTrue(cls instanceof ClientLibraryServiceImpl);
     }
 
+    // SFDC uses UIPerf
+    @UnAdaptableTest
     public void testUIPerfCSS() throws Exception {
-        ClientLibraryDef clientLibrary = vendor.makeClientLibraryDef("UIPerfCss", null, ClientLibraryDef.Type.CSS,
+        ClientLibraryDef clientLibrary = vendor.makeClientLibraryDef("UIPerfCSS", null, ClientLibraryDef.Type.CSS,
                 null, false, null, null);
         String url = clientLibraryService.getResolvedUrl(clientLibrary);
         assertTrue(url.contains("UIPerf.css"));
@@ -153,7 +155,7 @@ public class ClientLibraryServiceImplTest extends AuraImplTestCase {
         assertNull(clientLibraryService.getResolvedUrl(null));
 
         // Non existing
-        ClientLibraryDef badClientLibrary = vendor.makeClientLibraryDef("UIPerfCss", null, Type.JS,
+        ClientLibraryDef badClientLibrary = vendor.makeClientLibraryDef("UIPerfCSS", null, Type.JS,
                 null, false, null, null);
         assertNull(clientLibraryService.getResolvedUrl(badClientLibrary));
 

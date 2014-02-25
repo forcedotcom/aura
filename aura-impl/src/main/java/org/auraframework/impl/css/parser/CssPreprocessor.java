@@ -31,6 +31,7 @@ import com.salesforce.omakase.PluginRegistry;
 import com.salesforce.omakase.plugin.Plugin;
 import com.salesforce.omakase.plugin.basic.Conditionals;
 import com.salesforce.omakase.plugin.basic.ConditionalsValidator;
+import com.salesforce.omakase.plugin.basic.PrefixPruner;
 import com.salesforce.omakase.plugin.basic.Prefixer;
 import com.salesforce.omakase.plugin.other.UnquotedIEFilterPlugin;
 import com.salesforce.omakase.plugin.validator.StandardValidation;
@@ -81,6 +82,7 @@ public final class CssPreprocessor {
             plugins.add(new UrlCacheBustingPlugin());
             plugins.add(new UnquotedIEFilterPlugin());
             plugins.add(Prefixer.defaultBrowserSupport().prune(true));
+            plugins.add(PrefixPruner.prunePrefixedAtRules());
         }
 
         /** specify css source code */

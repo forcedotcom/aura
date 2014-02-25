@@ -823,6 +823,86 @@ var AuraDevToolService = function() {
                      return errorArray;               
                  },
                  /**
+                  * Method that goes through all tables present on the page and makes sure the tags underneath them have either an id or scope associated with them
+                  * @param   tables        - The tags to find 
+                  * @param   tableErrorMsg - The error message to show when errors are found
+                  * @returns Array         - The error array
+                  */
+                 checkTables : function(tables, tableErrorMsg){
+                     var headerDict = {};
+                     var allThsAreCorrect = [];
+                     var ths = [];
+                     var scopeVal = "";
+                     var idVals = "";
+                     var errorArray = [];
+                     var i = 0, j = 0;
+                     var skipTDCheck = false;
+                     var validScopes = {'row': false, 'col': false, 'rowgroup': false, 'colgroup' : false};
+                     for(var index = 0; index<tables.length; index++){
+                	 ths = tables[index].getElementsByTagName("th");
+                	//Reset Variables
+                         headerDict = {};
+                         allThsHaveScope = [];
+                         skipTDCheck = false;
+                         
+                         //If we have no headers, tds wont be a problem
+                         if(ths.length === 0){
+                             continue;
+                         }
+                         //Phase 1:  If all <th> within a <table> contain scope attribute and scope attribute value is one of col, row, colgroup, rowgroup, then pass test. 
+                         for(i = 0; i<ths.length; i++){                      
+                             //Grab scope
+                             scopeVal = $A.util.getElementAttributeValue(ths[i], "scope");
+                             idVals = $A.util.getElementAttributeValue(ths[i], "id");
+                             //If Scope exists
+                             if(!$A.util.isUndefinedOrNull(scopeVal)){
+                            	 if(!(scopeVal in validScopes) || $A.util.trim(scopeVal) === ""){
+                            	    errorArray.push(ths[i]);
+                            	 }
+                            	 
+                            	 skipTDCheck = true;
+                            	
+                             }
+                             else if(!$A.util.isUndefinedOrNull(idVals)){
+                        	 headerDict[idVals] = true;
+                             }
+                             else{
+                        	 errorArray.push(ths[i]);
+                             }
+                         }
+                         
+                         //If we have already found an error with the THS (either they don't have an ID or they don't have a scope) skip the rest
+                         if(!$A.util.isEmpty(errorArray) || skipTDCheck){
+                             continue;
+                         }
+                       
+                       
+                         //Phase 2: If all <th> within a <table> contain "id" and all <td> contain "headers" attribute, and each id listed in header attribute matches id attribute of a <th>, then pass test.
+                         tds = tables[index].getElementsByTagName("td");
+                         
+                         //Don't need this I believe
+                         if(tds.length === 0){
+                             continue;
+                         }
+                         for(i = 0; i<tds.length; i++){
+                             idVals = $A.util.getElementAttributeValue(tds[i], "headers");
+                             if($A.util.isUndefinedOrNull(idVals)){
+                        	 errorArray.push(tds[i]);
+                        	 continue;
+                             }
+                             
+                             idVals = $A.util.trim(idVals).split(/\s+/);
+                             for(j = 0; j<idVals.length; j++){
+                        	 if(!(idVals[j] in headerDict)){
+                        	     errorArray.push(tds[i]);
+                        	     break;
+                        	 }
+                             }
+                         }
+                     }
+                     return errorArray;
+                 },
+                 /**
                   * Method that takes in a list of h#, the tag that show follow directly after, and all possible items that can be found.
                   * It will start start searching through siblings of h# to find invalid-nested tags and return an error array with them if found
                   * @param   tags     - Array of all h# tags to look at
@@ -922,16 +1002,16 @@ var AuraDevToolService = function() {
         		}
         		return accessAideFuncs.formatOutput(hdErrMsg, accessAideFuncs.checkHeadHasCorrectTitle(hdErrMsg, hd));
         	     },
-                    /**
-                     * Function that will find all ths and make sure that they have scope in them, and that they are equal to row, col, rowgroup, colgroup
-                     * @returns String - Returns a string representation of the errors
-                     */
-            	     checkThHasScope : function(domElem){
-            		var thScopeMsg = "Table header must have scope attribute. Refer to http://www.w3.org/TR/UNDERSTANDING-WCAG20/content-structure-separation.html.";
-        		var accessAideFuncs = aura.devToolService.accessbilityAide;
-        		var ths = domElem.getElementsByTagName("th");
-        		return accessAideFuncs.formatOutput(thScopeMsg,accessAideFuncs.checkForAttrib(ths,"scope", {'row': false, 'col': false, 'rowgroup': false, 'colgroup' : false}, accessAideFuncs.doesNotContain));
-            	     },
+        	     /**
+                      * Function that will find all ths and make sure that they have scope in them, and that they are equal to row, col, rowgroup, colgroup
+                      * @returns String - Returns a string representation of the errors
+                      */
+             	     checkTableIsAccessible : function(domElem){
+             		var tableErrorMsg = "Table header must properly associate with table cell by, either using 'scope' attribute with one of the values 'row', 'col', 'rowgroup' and 'colgroup', or using id and headers attributes.";
+         		var accessAideFuncs = aura.devToolService.accessbilityAide;
+         		var tables = domElem.getElementsByTagName("table");
+         		return accessAideFuncs.formatOutput(tableErrorMsg, accessAideFuncs.checkTables(tables, tableErrorMsg));
+             	     },
                      /**
                       * Function that will find all IFrames and make sure that they have titles in them
                       * @returns String - Returns a string representation of the errors

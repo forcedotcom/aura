@@ -1131,6 +1131,294 @@ if (!!Array.prototype.indexOf) {
 }
 
 /**
+ * Creates a new function whith bound arguments.
+ * @param {Function} method to bind.
+ * @param {Any} bound 'this' instance for the new function's scope.
+ * @param {Any} var-args of bound parameters.
+ * @returns {Function} a new function that invokes the provided function instance with bound arguments.
+ */
+if (!!Function.prototype.bind) {
+    $A.ns.Util.prototype.bind = function(method /*, this, bind arguments*/) {
+        var args = Array.prototype.slice.call(arguments, 1);
+        return Function.prototype.bind.apply(method, args);
+    };
+} else {
+    $A.ns.Util.prototype.bind = function(method /*, this, bind arguments*/) {
+        var args = Array.prototype.slice.call(arguments, 1),
+            that = args.shift(),
+            util = this instanceof $A.ns.Util ? this : new $A.ns.Util();
+        
+        if (!util.isFunction(method)) {
+            throw new TypeError("$A.util.bind called on non-function.");
+        } 
+        
+        if (arguments.length === 1) {
+            return method;
+        }
+        
+        return function(/*remaining arguments*/) {
+            var remainingArgs = Array.prototype.slice.call(arguments);
+            var combined = util.merge([], args, remainingArgs);
+            return method.apply(that, combined);
+        };
+    };
+}
+
+/**
+ * Returns the map's keys as an array.
+ * @param {Object} map to extract keys from.
+ * @returns {Array} of key {String}s. 
+ */
+if (!!(Object && Object.keys)) {
+    $A.ns.Util.prototype.keys = Object.keys;
+} else {
+    $A.ns.Util.prototype.keys = function(object) {
+        var util = this instanceof $A.ns.Util ? this : new $A.ns.Util();
+        
+        var isAnyObjectType = !util.isObject(object)
+            && !util.isFunction(object)
+            && !util.isArray(object);
+        
+        if (isAnyObjectType) {
+            throw new TypeError("$A.util.keys called on non-object.");
+        } 
+        
+        var keys = [], key;
+        for (key in object) {
+            if (Object.prototype.hasOwnProperty.call(object, key)) {
+                keys.push(key);
+            }
+        }
+        return keys;
+    };
+}
+
+/**
+ * Does an in-place merge of any number of array into the first.
+ * @param {Array} array to receive the elements of subsequent arrays.
+ * @param {Array} var-args of arrays that will have their elements copied into the first.
+ * @returns {Array} the first array (which has been modified in-place).
+ */
+$A.ns.Util.prototype.merge = function(first /*, var-args of arrays*/) {
+    var arrays = Array.prototype.slice.call(arguments, 1),
+        util = this instanceof $A.ns.Util ? this : new $A.ns.Util();
+    
+    if (!arrays) {
+        return first;
+    }
+    
+    if (!util.isArray(first)) {
+        throw "Merge takes only arrays as arguments.";
+    }
+    
+    util.forEach(arrays, function(array) {
+        if (!util.isArray(array)) {
+            throw "Merge takes only arrays as arguments.";
+        }
+    });
+    
+    util.forEach(arrays, function(array) {
+        util.forEach(array, function(element) {
+            first.push(element);
+        });
+    });
+    
+    return first;
+};
+
+/**
+ * Runs a function over each element in an array.
+ * @param {Array} array to loop over.
+ * @param {Function} method to call for each element.
+ * @param {Any} the 'this' instance inside the scope of provided method.
+ */
+if (!!Array.prototype.forEach) {
+    $A.ns.Util.prototype.forEach = function(array, method, that) {
+        array.forEach(method, that);
+    };
+} else {
+    $A.ns.Util.prototype.forEach = function(array, method, that) {
+        var util = this instanceof $A.ns.Util ? this : new $A.ns.Util();
+        
+        if (!util.isArray(array)) {
+            throw new TypeError("$A.util.forEach called on non-array.");
+        }         
+        
+        if (!util.isFunction(method)) {
+            throw new TypeError("$A.util.forEach called with non-function callback.");
+        } 
+        
+        var index;
+        for (index = 0; index < array.length; index++) {
+            method.call(that, array[index], index);
+        }
+    };
+}
+
+/**
+ * Returns an array containing the return value of the provided function over every element of the input array.
+ * @param {Array} array to loop over.
+ * @param {Function} tranforms an element from the input array to an element in the output array.
+ * @param {Any} the 'this' instance inside the scope of provided transformation method.
+ * @returns {Array} where every element is a result of the transformation function
+ * applied to the element (at the same index) from the input array.
+ */
+if (!!Array.prototype.map) {
+    $A.ns.Util.prototype.map = function(array, method, that) {
+        return array.map(method, that);
+    };
+} else {
+    $A.ns.Util.prototype.map = function(array, method, that) {
+        var util = this instanceof $A.ns.Util ? this : new $A.ns.Util();
+        
+        if (!util.isArray(array)) {
+            throw new TypeError("$A.util.map called on non-array.");
+        } 
+        
+        if (!util.isFunction(method)) {
+            throw new TypeError("$A.util.map called with non-function callback.");
+        } 
+        
+        var index, result = [];
+        for (index = 0; index < array.length; index++) {
+            result.push(method.call(that, array[index], index));
+        }
+        return result;
+    };
+}
+
+/**
+ * Loops over an array, calling a function that provides the returned result of calling the function on the 
+ * previous element.  
+ * @param {Array} array to loop over.
+ * @param {Function} reduction method that takes the resturned result from the previous call, the current element from 
+ * the input array and index. 
+ * @param {Any} the initial object passed to the first element in the array's reduction method.
+ * @returns {Any} the final value returned from calling the reduction method on the last element.
+ */
+if (!!Array.prototype.reduce) {
+    $A.ns.Util.prototype.reduce = function(array, method, initial) {
+        return array.reduce(method, initial);
+    };
+} else {
+    $A.ns.Util.prototype.reduce = function(array, method, initial) {
+        var util = this instanceof $A.ns.Util ? this : new $A.ns.Util();
+        
+        if (!util.isArray(array)) {
+            throw new TypeError("$A.util.reduce called on non-array.");
+        } 
+        
+        if (!util.isFunction(method)) {
+            throw new TypeError("$A.util.reduce called with non-function callback.");
+        } 
+        
+        var index, result = initial;
+        for (index = 0; index < array.length; index++) {
+            result = method.call(this, result, array[index], index);
+        }
+        return result;
+    };
+}
+
+/**
+ * Loops over an array, calling a function that returns some boolean. Returns true if all calls return a truthy result.
+ * @param {Array} array to loop over.
+ * @param {Function} predicate that returns a boolean result based on the current array element.
+ * @param {Any} the 'this' instance inside the scope of provided transformation method.
+ * @returns {Boolean} true if all elements of the array satisfy the predicate.
+ */
+if (!!Array.prototype.every) {
+    $A.ns.Util.prototype.every = function(array, predicate, that) {
+        return array.every(predicate, that);
+    };
+} else {
+    $A.ns.Util.prototype.every = function(array, predicate, that) {
+        var util = this instanceof $A.ns.Util ? this : new $A.ns.Util();
+        
+        if (!util.isArray(array)) {
+            throw new TypeError("$A.util.every called on non-array.");
+        } 
+        
+        if (!util.isFunction(predicate)) {
+            throw new TypeError("$A.util.every called with non-function predicate.");
+        } 
+        
+        var index;
+        for (index = 0; index < array.length; index++) {
+            if(!predicate.call(that, array[index], index)) {
+                return false;
+            }
+        }
+        return true;
+    };
+}
+
+/**
+ * Loops over an array, calling a function that returns some boolean. Returns true if any calls return a truthy result.
+ * @param {Array} array to loop over.
+ * @param {Function} predicate that returns a boolean result based on the current array element.
+ * @param {Any} the 'this' instance inside the scope of provided transformation method.
+ * @returns {Boolean} true if any of the elements of the array satisfy the predicate.
+ */
+if (!!Array.prototype.some) {
+    $A.ns.Util.prototype.some = function(array, predicate, that) {
+        return array.some(predicate, that);
+    };
+} else {
+    $A.ns.Util.prototype.some = function(array, predicate, that) {
+        var util = this instanceof $A.ns.Util ? this : new $A.ns.Util();
+        
+        if (!util.isArray(array)) {
+            throw new TypeError("$A.util.some called on non-array.");
+        } 
+        
+        if (!util.isFunction(predicate)) {
+            throw new TypeError("$A.util.some called with non-function predicate.");
+        } 
+        
+        var index;
+        for (index = 0; index < array.length; index++) {
+            if(predicate.call(that, array[index], index)) {
+                return true;
+            }
+        }
+        return false;
+    };
+}
+
+/**
+ * Loops over an array, constructing a new array with the elements that pass the filter predicate.
+ * @param {Function} predicate that returns a boolean result based on the current array element the result of which
+ *                   indicates whether the element will be returned in the filter result array.
+ * @param {Any} the 'this' instance inside the scope of provided predicate.
+ * @returns {Array} ordered array of elements that pass the predicate.
+ */
+if (!!Array.prototype.filter) {
+    $A.ns.Util.prototype.filter = function(array, predicate, that) {
+        return array.filter(predicate, that);
+    };
+} else {
+    $A.ns.Util.prototype.filter = function(array, predicate, that) {
+        var util = this instanceof $A.ns.Util ? this : new $A.ns.Util();
+        
+        if (!util.isArray(array)) {
+            throw new TypeError("$A.util.filter called on non-array.");
+        } 
+        
+        if (!util.isFunction(predicate)) {
+            throw new TypeError("$A.util.filter called with non-function predicate.");
+        } 
+        
+        var index, result = [];
+        for (index = 0; index < array.length; index++) {
+            if(predicate.call(that, array[index], index)) {
+                result.push(array[index]);
+            }
+        }
+        return result;
+    };
+}
+/**
  * Schedules the specified component to be asynchronously destroyed.
  * @param {Component} cmp 
  *          The component to be destroyed.

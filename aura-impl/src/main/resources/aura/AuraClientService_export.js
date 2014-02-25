@@ -29,5 +29,8 @@ exp(clientService,
     "setOutdated", clientService.setOutdated,
     "injectComponent", clientService.injectComponent,
     "isConnected", clientService.isConnected,
-	"setConnected", clientService.setConnected
+    "setConnected", clientService.setConnected,
+    "isActionInStorage", clientService.isActionInStorage,
+    "revalidateAction", clientService.revalidateAction,
+    "invalidateAction", clientService.invalidateAction
 );

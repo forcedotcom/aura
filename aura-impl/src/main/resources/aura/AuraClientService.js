@@ -20,11 +20,15 @@
  * @constructor
  */
 var AuraClientService = function() {
+    // #include aura.controller.Action
     // #include aura.controller.ActionCallbackGroup
     // #include aura.controller.ActionQueue
     // #include aura.controller.ActionCollector
+    // #include aura.model.ValueDef
     // #include aura.AuraClientService_private
-
+	
+    var NOOP = function() {};
+	
     var clientService = {
 
         /**
@@ -677,6 +681,84 @@ var AuraClientService = function() {
             return promise; 
         },
     
+        /**
+         * Gets whether or not the Aura "actions" cache exists.
+         * @returns {Boolean} true if the Aura "actions" cache exists.
+         */
+        hasActionStorage: function() {
+            return !!Action.getStorage();
+        },
+        
+        /**
+         * Checks to see if an action is currently being stored (by action descriptor and parameters).
+         * 
+         * @param descriptor {String} action descriptor.
+         * @param params {Object} map of keys to parameter values.
+         * @param callback {Function} called asynchronously after the action was looked up in the cache. Fired with a 
+         * single parameter, isInStorge {Boolean} - representing whether the action was found in the cache.
+         */
+        isActionInStorage : function(descriptor, params, callback) {
+            var storage = Action.getStorage();
+            callback = callback || NOOP;
+            
+            if (!$A.util.isString(descriptor) || !$A.util.isObject(params) || !storage) {
+                callback(false);
+                return;
+            }
+            
+            storage.get(Action.getStorageKey(descriptor, params), function(value, isExpired) {
+                callback(!!value && !isExpired);
+            });
+        },
+        
+        /**
+         * Resets the cache cleanup timer for an action. 
+         * 
+         * @param descriptor {String} action descriptor.
+         * @param params {Object} map of keys to parameter values.
+         * @param callback {Function} called asynchronously after the action was revalidated. Called with a single
+         * parameter, wasRevalidated {Boolean} - representing whether the action was found in the cache and 
+         * successfully revalidated.  
+         */
+        revalidateAction : function(descriptor, params, callback) {
+            var storage = Action.getStorage();
+            callback = callback || NOOP;
+            
+            if (!$A.util.isString(descriptor) || !$A.util.isObject(params) || !storage) {
+                callback(false);
+                return;
+            }
+            
+            var actionKey = Action.getStorageKey(descriptor, params);
+            storage.get(actionKey, function(value) {
+                if (!!value) {
+                    storage.put(actionKey, value);
+                }
+                callback(!!value);
+            });
+        },
+        
+        /**
+         * Clears an action out of the action cache. 
+         * 
+         * @param descriptor {String} action descriptor.
+         * @param params {Object} map of keys to parameter values.
+         * @param callback {Function} called after the action was invalidated. Called with true if the action was 
+         * successfully invalidated and false if the action was invalid or was not found in the cache.
+         */
+        invalidateAction : function(descriptor, params, callback) {
+            var storage = Action.getStorage();
+            callback = callback || NOOP;
+            
+            if (!$A.util.isString(descriptor) || !$A.util.isObject(params) || !storage) {
+                callback(false);
+                return;
+            }
+            
+            storage.remove(Action.getStorageKey(descriptor, params));
+            callback(true);
+        },
+        
         /**
          * process the current set of actions, looping if needed.
          *

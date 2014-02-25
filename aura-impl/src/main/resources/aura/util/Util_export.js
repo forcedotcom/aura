@@ -64,8 +64,17 @@ exp(p,
     "supportsTouchEvents", p.supportsTouchEvents,
     "estimateSize", p.estimateSize,
     "createPromise", p.createPromise,
-    "when", p.when
-
+    "when", p.when,
+    "map", p.map,
+    "reduce", p.reduce,
+    "forEach", p.forEach,
+    "merge", p.merge,
+    "every", p.every,
+    "some", p.some,
+    "filter", p.filter,
+    "keys", p.keys,
+    "bind", p.bind
+    
     //#if {"excludeModes" : ["PRODUCTION"]}
 	    ,
 	    "getDebugToolComponent", p.getDebugToolComponent,
@@ -76,3 +85,4 @@ exp(p,
 	    "errorBasedOnMode", p.errorBasedOnMode
     //#end
 );
+

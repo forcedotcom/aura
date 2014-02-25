@@ -99,20 +99,21 @@ AuraStorage.prototype.clear = function() {
  * @returns {Object} An item from storage.
  */
 AuraStorage.prototype.get = function(key, resultCallback) {
-	this.sweep();
+    this.sweep();
 
-	// This needs to also be asynchronous (callback) based to map to IndexedDB, WebSQL, SmartStore that are all async worlds
-	var that = this;
-	this.adapter.getItem(key, function(item) {
-		var value;
-		if (item && item.value) {
-			value = item.value;
-			
-			that.log("AuraStorage.get(): using action found in " + that.getName() + " storage", [key, item]);
-		}
-	
-		resultCallback(value);
-	});
+    // This needs to also be asynchronous (callback) based to map to IndexedDB, WebSQL, SmartStore that are all async worlds
+    var that = this;
+    this.adapter.getItem(key, function(item) {
+        var value, isExpired;
+        if (item && item.value) {
+            value = item.value;
+            isExpired = (new Date().getTime() > item.expires);
+            
+            that.log("AuraStorage.get(): using action found in " + that.getName() + " storage", [key, item]);
+        }
+    
+        resultCallback(value, isExpired);
+    });
 };
 
 /**

@@ -266,7 +266,7 @@ public class InputTextUITest extends WebDriverTestCase {
                         return null;
                     }
                 }
-            }, timeoutInSecs);
+            }, (timeoutInSecs * 3));
         } catch (TimeoutException e) {
             assertEquals("Model value is not what we expected", expectedValue, getCurrentModelValue());
             return getCurrentModelValue();

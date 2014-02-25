@@ -1,0 +1,33 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extensible="true" implements="ui:visible" support="PROTO">
+	<aura:attribute name="column" type="String" description="ApiName of column."/>
+	<aura:attribute name="type" type="String" description="{ SUM, AVG, MIN, MAX }"/>
+	<aura:attribute name="items" type="List"/>
+	<aura:attribute name="value" type="Integer"/>
+    <aura:attribute name="outputComponent" type="Aura.ComponentDefRef[]" description="Facet for rendering of value.">
+        <ui:outputText/>
+    </aura:attribute>   
+    <aura:attribute name="priv_outputComponent" type="Aura.Component[]"/>
+
+	<aura:handler name="init" value="{!this}" action="{!c.init}"/>
+	<aura:handler name="change" value="{!v.items}" action="{!c.handleItemsChange}"/>
+
+
+	<td class="{!v.class}">{! v.priv_outputComponent }</td>
+</aura:component>

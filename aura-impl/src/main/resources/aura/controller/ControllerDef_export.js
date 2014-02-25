@@ -17,5 +17,6 @@
 var p = ControllerDef.prototype;
 exp(p,
     "getValue", p.getValue,
+    "getActionDef", p.getActionDef,
     "auraType", p.auraType
 );

@@ -15,8 +15,15 @@
     limitations under the License.
 
 -->
-<aura:interface>
-    <aura:attribute name="columns" type="List"/>
-    <aura:attribute name="items" type="List"/>
-    <aura:attribute name="modelItemsKey" type="String" description="The AuraEnabled field name on the model representing the first page of items."/>
-</aura:interface>
+<aura:component extends="ui:dataGridActionColumn">
+	<aura:attribute name="selectAll" type="Boolean" description="Allows grid to control 'selectAll' visual state."/>
+
+	<aura:set attribute="header">
+		<ui:actionCheckbox name="dataGrid:select" value="{!v.selectAll}"/>
+	</aura:set>
+
+	<aura:attribute name="outputComponent" type="Aura.ComponentDefRef[]">
+		<!-- Wire 'row.selected' and 'index' into action. This is the secret sauce; action won't work without it. -->
+		<ui:actionCheckbox name="dataGrid:select" value="{!row.selected}" index="{!index}"/>
+	</aura:attribute>
+</aura:component>

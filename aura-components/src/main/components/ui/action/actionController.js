@@ -13,12 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*jslint sub: true */
-var p = PassthroughValue.prototype;
-exp(p,
-    "auraType", p.auraType,
-    "getValue", p.getValue,
-    "getComponent", p.getComponent,
-    "index", p.index,
-    "deIndex", p.deIndex
-);
+({
+	handleClick: function (cmp, evt) {
+		var el = cmp.getElement(), 
+			click; 
+
+		// Dispatch clicks within the action as clicks on the action itself. 
+		// Ignore clicks coming from its own element, those events will bubble correctly.
+		if (evt.target !== el) {
+			evt.stopPropagation();
+
+			click = new MouseEvent('click', {
+				bubbles: true
+			});
+
+			el.dispatchEvent(click);
+		}
+	}
+})

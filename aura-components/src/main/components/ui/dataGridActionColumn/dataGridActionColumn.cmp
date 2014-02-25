@@ -15,8 +15,14 @@
     limitations under the License.
 
 -->
-<aura:interface>
-    <aura:attribute name="columns" type="List"/>
-    <aura:attribute name="items" type="List"/>
-    <aura:attribute name="modelItemsKey" type="String" description="The AuraEnabled field name on the model representing the first page of items."/>
-</aura:interface>
+<aura:component extensible="true" support="PROTO">
+	<aura:attribute name="name" type="String"/>
+	<aura:attribute name="label" type="String"/>
+	<aura:attribute name="header" type="Aura.Component[]"/>
+	<aura:attribute name="outputComponent" type="Aura.ComponentDefRef[]"/>
+	<aura:attribute name="body" type="Aura.ComponentDefRef[]"/>
+
+	<aura:handler name="init" value="{!this}" action="{!c.init}"/>
+
+	<th>{!v.label} {!v.header}</th>
+</aura:component>

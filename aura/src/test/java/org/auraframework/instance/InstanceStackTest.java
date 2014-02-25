@@ -15,13 +15,21 @@
  */
 package org.auraframework.instance;
 
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
+
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.test.UnitTestCase;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.json.Json;
+import org.mockito.Mockito;
+
+import com.google.common.collect.Lists;
 
 /**
  * Unit tests for InstanceStack.java.
@@ -215,5 +223,76 @@ public class InstanceStackTest extends UnitTestCase {
         } catch (Exception expected) {
             assertExceptionMessage(expected, AuraRuntimeException.class, "missing clearAttributeIndex");
         }
+    }
+
+    private BaseComponent<?, ?> getComponentWithPath(final String path) {
+        BaseComponent<?, ?> comp = Mockito.mock(BaseComponent.class);
+        Mockito.when(comp.getPath()).thenReturn(path);
+        Mockito.when(comp.hasLocalDependencies()).thenReturn(true);
+        return comp;
+    }
+
+    public void testComponents() {
+        InstanceStack iStack = new InstanceStack();
+
+        Map<String, BaseComponent<?, ?>> comps = iStack.getComponents();
+        assertNotNull("Components should never be null", comps);
+        assertEquals("Components should empty", 0, comps.size());
+
+        BaseComponent<?, ?> x = getComponentWithPath("a");
+        iStack.registerComponent(x);
+        comps = iStack.getComponents();
+        assertNotNull("Components should never be null", comps);
+        assertEquals("Components should have one component", 1, comps.size());
+        assertEquals("Components should have x", x, comps.get("a"));
+
+        BaseComponent<?, ?> y = getComponentWithPath("b");
+        iStack.registerComponent(y);
+        comps = iStack.getComponents();
+        assertNotNull("Components should never be null", comps);
+        assertEquals("Components should have two components", 2, comps.size());
+        assertEquals("Components should have x", x, comps.get("a"));
+        assertEquals("Components should have y", y, comps.get("b"));
+    }
+
+    public void testNextId() {
+        InstanceStack iStack = new InstanceStack();
+        assertEquals("nextId should be initialized to 1", 1, iStack.getNextId());
+        assertEquals("nextId should increment", 2, iStack.getNextId());
+        assertEquals("nextId should increment again", 3, iStack.getNextId());
+    }
+
+    /**
+     * Verify registered components are serialized in alphabetical order
+     */
+    public void testSerializeAsPart() throws Exception {
+        InstanceStack iStack = new InstanceStack();
+
+        Json jsonMock = Mockito.mock(Json.class);
+        BaseComponent<?, ?> a = getComponentWithPath("a");
+        BaseComponent<?, ?> b = getComponentWithPath("b");
+        BaseComponent<?, ?> c = getComponentWithPath("c");
+        iStack.registerComponent(b);
+        iStack.registerComponent(c);
+        iStack.registerComponent(a);
+        iStack.serializeAsPart(jsonMock);
+
+        List<BaseComponent<?, ?>> sorted = Lists.newArrayList();
+        sorted.add(a);
+        sorted.add(b);
+        sorted.add(c);
+        verify(jsonMock).writeMapKey("components");
+        verify(jsonMock).writeArray(sorted);
+    }
+
+    /**
+     * Verify nothing serialized if no registered components
+     */
+    public void testSerializeAsPartNoComponents() throws Exception {
+        InstanceStack iStack = new InstanceStack();
+        Json jsonMock = Mockito.mock(Json.class);
+        iStack.serializeAsPart(jsonMock);
+        assertEquals("Components should empty when no registered components", 0, iStack.getComponents().size());
+        verifyZeroInteractions(jsonMock);
     }
 }

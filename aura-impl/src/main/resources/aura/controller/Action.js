@@ -141,8 +141,9 @@ Action.prototype.forceCreationPath = function(path) {
         // Only warn if this is not a top level path, to save developers from having
         // to know the internal implementation of aura (or deal with warnings)
         //
-        $A.warning("force path of "+newAbsPath+" from "+absPath
-            +" likely a use of returned component array without changing index");
+        // FIXME: re-enable when client side creation fixed.
+        //$A.warning("force path of "+newAbsPath+" from "+absPath
+            //+" likely a use of returned component array without changing index");
     }
     var pathEntry = { relPath: "~FORCED~", absPath:newAbsPath, idx: undefined, startIdx: undefined };
     this.pathStack.push(pathEntry);
@@ -240,7 +241,8 @@ Action.prototype.topPath = function() {
 Action.prototype.setCreationPathIndex = function(idx) {
     this.canCreate = true;
     if (this.pathStack.length < 1) {
-        $A.warning("Attempting to increment index on empty stack");
+        // FIXME: re-enable when client side creation fixed.
+        //$A.warning("Attempting to increment index on empty stack");
     }
     var top = this.pathStack[this.pathStack.length - 1];
     // establish starting index
@@ -249,7 +251,8 @@ Action.prototype.setCreationPathIndex = function(idx) {
         top.idx = idx;
     }
     else if (idx !== top.idx + 1) {
-        $A.warning("Improper index increment");
+        // FIXME: re-enable when client side creation fixed.
+        //$A.warning("Improper index increment");
     } else {
         top.idx = idx;
     }
@@ -262,14 +265,15 @@ Action.prototype.setCreationPathIndex = function(idx) {
  * @returns {String}
  */
 Action.prototype.getCurrentPath = function() {
-   var result = this.getId();
-   var size = this.pathStack.length;
+    var result = this.getId();
+    var size = this.pathStack.length;
 
-   if (!this.canCreate) {
-       $A.warning("Not ready to create. path: "+this.topPath());
-   }
-   this.canCreate = false; // this will cause next call to getCurrentPath to fail if not popped
-   return this.topPath();
+    if (!this.canCreate) {
+        // FIXME: re-enable when client side creation fixed.
+        //$A.warning("Not ready to create. path: "+this.topPath());
+    }
+    this.canCreate = false; // this will cause next call to getCurrentPath to fail if not popped
+    return this.topPath();
 };
 
 /**
@@ -538,8 +542,9 @@ Action.prototype.runDeprecated = function(evt) {
         this.state = "SUCCESS";
     } catch (e) {
         this.state = "FAILURE";
-        $A.warning("Action failed: " + this.cmp.getDef().getDescriptor().getQualifiedName() + " -> "
-                   + this.def.getName(), e);
+        // FIXME: re-enable when client side creation fixed.
+        //$A.warning("Action failed: " + this.cmp.getDef().getDescriptor().getQualifiedName() + " -> "
+                   //+ this.def.getName(), e);
     }
 };
 

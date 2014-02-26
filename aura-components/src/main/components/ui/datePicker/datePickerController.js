@@ -28,7 +28,6 @@
     },
     
     doInit: function(component, event, helper) {
-        helper.refreshYearSelection(component);
         helper.localizeToday(component);
         component._windowSize = $A.util.getWindowSize();
     },

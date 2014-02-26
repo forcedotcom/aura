@@ -24,6 +24,7 @@
     <aura:attribute name="minutes" type="Integer" description="The minute value of a date object."/>
     <aura:attribute name="value" type="Date" description="A date corresponding to a calendar day in the format yyyy-mm-dd."/>
     <aura:attribute name="visible" type="Boolean" default="false" description="Indicates if the date picker is displayed. Defaults to false, which hides the date picker."/>
+    <aura:attribute name="_yearListInitialized" type="Boolean" default="false" description="Indicates if the year list is initialized or not."/>
     <aura:registerevent name="selectDate" type="ui:selectDate" description="The event fired when a date is selected."/>
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
     <div aura:id="datePicker" class="{!v.class + (v.visible == true ? ' visible' : '') + ($Browser.isPhone == true ? ' phone' : '')}">
@@ -59,7 +60,7 @@
                     <h1 aria-live="assertive" aria-atomic="true" class="monthYear" aura:id="calTitle">
                         <ui:outputText aura:id="monthTitle" value=""/>
                         <ui:label label="year" for="yearTitle" labelDisplay="false"/>
-                        <ui:inputSelect aura:id="yearTitle" change="{!c.yearChange}"/>
+                        <select aura:id="yearTitle" onchange="{!c.yearChange}"/>
                     </h1>
                     <aura:set attribute="else">
                         <h1 aria-live="assertive" aria-atomic="true" class="monthYear" aura:id="calTitle"/>

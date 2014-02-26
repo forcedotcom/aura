@@ -303,27 +303,10 @@
             maxY = (new Date()).getFullYear() + 30;
         }
         var yearTitleCmp = component.find("yearTitle");
-        if (yearTitleCmp) {
-            var body = yearTitleCmp.getValue("v.body");
-            body.clear();
+        var selectElem = yearTitleCmp ? yearTitleCmp.getElement() : null;
+        if (selectElem) {
             for (var i = minY; i <= maxY; i++) {
-                $A.componentService.newComponentAsync(
-                    this,
-                    function(newcmp){
-            	        body.push(newcmp);
-                    },
-                    {
-                        "componentDef": "markup://ui:inputSelectOption",
-                        "attributes": {
-                            "values": { 
-                                "label": i + "",
-                                "value": false,
-                                "text": i + "",
-                                "disabled": false 
-                            }
-                        }
-                    }
-                );
+                selectElem.options[selectElem.options.length] = new Option(i+"", i+"");
             }
         }
     },
@@ -403,15 +386,9 @@
                 monthTitleCmp.setValue("v.value", monthLabels[m].fullName); 
             }
             var yearTitleCmp = component.find("yearTitle");
-            if (yearTitleCmp) {
-                yearTitleCmp.setValue("v.value", y+"");
-                // For some reason, ui:inputSelect doesn't refresh on mobile,
-                // so we have to directly set DOM value here.
-                var selectCmp = yearTitleCmp.find("select");
-                var selectElem = selectCmp ? selectCmp.getElement() : null;
-                if (selectElem) {
-                    selectElem.value = y + "";
-                }
+            var selectElem = yearTitleCmp ? yearTitleCmp.getElement() : null;
+            if (selectElem) {
+                selectElem.value = y + "";
             }   
         }
     },
@@ -423,7 +400,7 @@
             var e = grid.get("e.updateCalendar");
             if (e) {
                 var y = parseInt(grid.get("v.year"));
-                var selectedYear = parseInt(yearCmp.get("v.value"));
+                var selectedYear = parseInt(yearCmp.getElement().value);
                 e.setParams({monthChange: 0, yearChange: selectedYear - y, setFocus: false});
                 e.fire();
             }

@@ -32,7 +32,7 @@ import org.auraframework.util.json.JsonSerializer.NoneSerializer;
 public interface Action extends Instance<ActionDef> {
 
     public enum State {
-        ABORTED, ERROR, NEW, RUNNING, SUCCESS
+        ERROR, NEW, RUNNING, SUCCESS
     }
 
     public String getId();

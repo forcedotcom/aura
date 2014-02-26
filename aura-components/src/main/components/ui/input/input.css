@@ -42,3 +42,8 @@
 .uiInput:-moz-ui-invalid {
   box-shadow:none;
 }
+
+.uiInput::-ms-clear {
+  width : 0;
+  height: 0;
+}

@@ -17,6 +17,192 @@
 -->
 <aura:component>
     <aura:attribute name="caseToRender" type="String" default="full"/>
+      <!--Should Pass Since there are no headers -->   
+    <aura:if isTrue="{!v.caseToRender == 'testWithNoHeader'}">
+       <table>
+           <tr>
+             <td>January</td>
+             <td>2008</td>
+          </tr>
+       </table>
+    </aura:if>
+     <!--Should Pass since we are using scope but don't have TD--> 
+    <aura:if isTrue="{!v.caseToRender == 'testThWithScopeNoTD'}">
+       <table>
+           <tr>
+              <th scope="col">Month</th>
+              <th scope="col">Year</th>
+          </tr>
+       </table>
+    </aura:if>
+     <!--Should Pass since we are using scope--> 
+    <aura:if isTrue="{!v.caseToRender == 'testThWithIdNoTD'}">
+       <table>
+           <tr>
+              <th id="month">Month</th>
+              <th id="month">Year</th>
+          </tr>
+       </table>
+    </aura:if>
+    <!--Should Pass since we are using scope--> 
+    <aura:if isTrue="{!v.caseToRender == 'testTableHeaderWithScope'}">
+       <table>
+           <tr>
+              <th scope="col">Month</th>
+              <th scope="col">Year</th>
+          </tr>
+          <tr>
+              <td>January</td>
+              <td>2008</td>
+          </tr>
+       </table>
+    </aura:if>
+    <!--Should Pass since all td header attributes are associated with with th ids--> 
+    <aura:if isTrue="{!v.caseToRender == 'testTHandTDtagsAssociateCorrectly'}">            
+       <table> 
+             <tr> 
+               <th rowspan="2" id="h">Homework</th> 
+               <th colspan="3" id="e">Exams</th> 
+               <th colspan="3" id="p">Projects</th> 
+            </tr> 
+            <tr> 
+               <th id="e1" headers="e">1</th> 
+               <th id="e2" headers="e">2</th> 
+               <th id="ef" headers="e">Final</th> 
+               <th id="p1" headers="p">1</th> 
+               <th id="p2" headers="p">2</th> 
+               <th id="pf" headers="p">Final</th> 
+             </tr> 
+             <tr> 
+               <td headers="h">15%</td> 
+               <td headers="e e1">15%</td> 
+               <td headers="e e2">15%</td> 
+               <td headers="e ef">20%</td> 
+               <td headers="p p1">10%</td> 
+               <td headers="p p2">10%</td> 
+               <td headers="p pf">15%</td> 
+             </tr> 
+       </table>
+    </aura:if>
+    <!--Should fail since a TD has an invalid id in its headers--> 
+    <aura:if isTrue="{!v.caseToRender == 'testTDUsesWrongID'}">              
+       <table>
+             <tr> 
+               <th rowspan="2" id="h">Homework</th> 
+               <th colspan="3" id="e">Exams</th> 
+               <th colspan="3" id="p">Projects</th> 
+             </tr> 
+             <tr> 
+               <th id="e1" headers="e">1</th> 
+               <th id="e2" headers="e">2</th> 
+               <th id="ef" headers="e">Final</th> 
+               <th id="p1" headers="p">1</th> 
+               <th id="p2" headers="p">2</th> 
+               <th id="pf" headers="p">Final</th> 
+             </tr> 
+             <tr> 
+               <td headers="h">15%</td> 
+               <td headers="e e1">15%</td> 
+               <td headers="e e3">15%</td> 
+               <td headers="e ef">20%</td> 
+               <td headers="p p1">10%</td> 
+               <td headers="p p2">10%</td> 
+               <td headers="p pf">15%</td> 
+             </tr> 
+       </table>
+    </aura:if>
+     <!--Should fail since a TD does not have a header attribute--> 
+    <aura:if isTrue="{!v.caseToRender == 'testTDWithOutHeaderAttrib'}">
+       <table>
+             <tr> 
+               <th rowspan="2" id="h">Homework</th> 
+               <th colspan="3" id="e">Exams</th> 
+               <th colspan="3" id="p">Projects</th> 
+             </tr> 
+             <tr> 
+               <th id="e1" headers="e">1</th> 
+               <th id="e2" headers="e">2</th> 
+               <th id="ef" headers="e">Final</th> 
+               <th id="p1" headers="p">1</th> 
+               <th id="p2" headers="p">2</th> 
+               <th id="pf" headers="p">Final</th> 
+             </tr> 
+             <tr> 
+               <td headers="h">15%</td> 
+               <td headers="e e1">15%</td> 
+               <td headers="e e2">15%</td> 
+               <td headers="e ef">20%</td> 
+               <td>10%</td> 
+               <td headers="p p2">10%</td> 
+               <td headers="p pf">15%</td> 
+             </tr> 
+       </table>
+    </aura:if>
+        
+    
+    <!--Should fail since a TH does not have an id attribute--> 
+    <aura:if isTrue="{!v.caseToRender == 'testTableHeaderWoID'}">
+       <table>
+             <tr> 
+               <th rowspan="2" >Homework</th> 
+               <th colspan="3" id="e">Exams</th> 
+               <th colspan="3" id="p">Projects</th> 
+             </tr> 
+             <tr> 
+               <th id="e1" headers="e">1</th> 
+               <th id="e2" headers="e">2</th> 
+               <th id="ef" headers="e">Final</th> 
+               <th id="p1" headers="p">1</th> 
+               <th id="p2" headers="p">2</th> 
+               <th id="pf" headers="p">Final</th> 
+             </tr> 
+             <tr> 
+               <td headers="e">15%</td> 
+               <td headers="e e1">15%</td> 
+               <td headers="e e2">15%</td> 
+               <td headers="e ef">20%</td> 
+               <td headers="p p1">10%</td> 
+               <td headers="p p2">10%</td> 
+               <td headers="p pf">15%</td> 
+             </tr> 
+       </table>
+    </aura:if>
+    
+    <!--Should fail since a TH does not have id--> 
+    <aura:if isTrue="{!v.caseToRender == 'testTableHeadersWandWoScope'}">              
+       <table>
+             <tr>
+                <th scope="col">Month</th>
+                <th>Year</th>
+             </tr>
+             <tr>
+               <td>January</td>
+               <td>2008</td>
+             </tr>
+       </table>
+    </aura:if>
+    <!--Should fail since a TH does not have scope or id--> 
+    <aura:if isTrue="{!v.caseToRender == 'testThNoWoScope'}">
+       <table>
+             <tr>
+                <th>Month</th>
+             </tr>
+             <tr>                
+                 <td>January</td>
+             </tr>
+       </table>
+    </aura:if>
+    <!--Should fail since a TH has a wrong scope--> 
+    <aura:if isTrue="{!v.caseToRender == 'testScopeWithWrongVal'}">
+       <table>
+             <tr>
+                <th scope="column">Month</th>
+             </tr>
+             <tr>
+                <td>January</td>
+             </tr>
+       </table>
+    </aura:if>
     
     <!--Test for case where VF creates iframes but they dynamically add title after rendering. Test is to make sure that VF items are skipped-->
     <aura:if isTrue="{!v.caseToRender == 'skipIframeForVisForce'}">
@@ -93,22 +279,25 @@
     
     <!--Generic test. Making sure that all of these separate test modules find the correct errorneous items-->
     <aura:if isTrue="{!v.caseToRender == 'full'}">  
-        <table id="table1">
-            <th></th>
-            <tr><td>
-                <ui:block>
-                    <ui:inputText aura:id="first" placeholder="First name"/>
-                    <ui:inputText aura:id="mid" placeholder="Middle Name"/>
-                    <ui:inputText aura:id="last" placeholder="Last name"/>
-                 </ui:block>
-            </td></tr>
-            <tr><td><iframe title="Lets go to google" height="300px" width="50%" src="http://www.salesforce.com"></iframe></td></tr>
-        </table>
+        <div id="table1">
+	        <table>
+	            <th></th>
+	            <tr><td>
+	                <ui:block>
+	                    <ui:inputText aura:id="first" placeholder="First name"/>
+	                    <ui:inputText aura:id="mid" placeholder="Middle Name"/>
+	                    <ui:inputText aura:id="last" placeholder="Last name"/>
+	                 </ui:block>
+	            </td></tr>
+	            <tr><td><iframe title="Lets go to google" height="300px" width="50%" src="http://www.salesforce.com"></iframe></td></tr>
+	        </table>
+	     </div>
          <table>
             <th scope="row"></th>
             <tr><td>
                 <ui:label for="birthdayInput" label="Birthday"/>
                 <ui:inputDate aura:id="birthdayInput" displayDatePicker="true"/>
+
                 <fieldset id="field_set" class="field_set">
                       <span>what is your age range?</span>
                         <br/>

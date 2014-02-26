@@ -16,27 +16,91 @@
 ({
     //Excluding IE7/8 because this test will only work with modern browsers
     browsers:["-IE7","-IE8"],
+    
+    runTest : function(expected, errorMessage, element){
+	var output    = $A.devToolService.checkAccessibility(element);
+	var actual   =  output.split("\n")[0];
+	$A.test.assertEquals(expected, actual , errorMessage+output);
+    },
+    testWithNoHeader:{
+	attributes : {caseToRender : 'testWithNoHeader'},	
+	test: function(cmp){
+	        this.runTest("", "Unexpected return from CheckAccessibility, should not return errornous string. output: \n");
+	}
+    },
+    testThWithScopeNoTD:{
+	attributes : {caseToRender : 'testThWithScopeNoTD'},	
+	test: function(cmp){
+	    this.runTest("", "Unexpected return from CheckAccessibility, should not return errornous string. output: \n");
+	}
+    },
+    testThWithIdNoTD:{
+	attributes : {caseToRender : 'testThWithIdNoTD'},	
+	test: function(cmp){
+	    this.runTest("", "Unexpected return from CheckAccessibility, should not return errornous string. output: \n");
+	}
+    },
+    testTableHeaderWithScope:{
+	attributes : {caseToRender : 'testTableHeaderWithScope'},	
+	test: function(cmp){
+	    this.runTest("", "Unexpected return from CheckAccessibility, should not return errornous string. output: \n");
+	}
+    },
+    testTHandTDtagsAssociateCorrectly:{
+	attributes : {caseToRender : 'testTHandTDtagsAssociateCorrectly'},	
+	test: function(cmp){
+	    this.runTest("", "Unexpected return from CheckAccessibility, should not return errornous string. output: \n");
+	}
+    }, 
+    testTDUsesWrongID:{
+	attributes : {caseToRender : 'testTDUsesWrongID'},	
+	test: function(cmp){
+		 this.runTest("Total Number of Errors found: 1", "Unexpected return from CheckAccessibility, should return 1 error. output: \n");
+	}
+    },
+    testTDWithOutHeaderAttrib:{
+	attributes : {caseToRender : 'testTDWithOutHeaderAttrib'},	
+	test: function(cmp){        	
+	    this.runTest("Total Number of Errors found: 1", "Unexpected return from CheckAccessibility, should return 1 error. output: \n");
+	}
+    },
+    testTableHeaderWoID:{
+	attributes : {caseToRender : 'testTableHeaderWoID'},	
+	test: function(cmp){    
+	    this.runTest("Total Number of Errors found: 1", "Unexpected return from CheckAccessibility, should return 1 error. output: \n");
+	}
+    },
+    testTableHeadersWandWoScope:{
+	attributes : {caseToRender : 'testTableHeadersWandWoScope'},	
+	test: function(cmp){    
+	    this.runTest("Total Number of Errors found: 1", "Unexpected return from CheckAccessibility, should return 1 error. output: \n");
+	}
+    },
+    testThNoWoScope:{
+	attributes : {caseToRender : 'testThNoWoScope'},	
+	test: function(cmp){    
+	    this.runTest("Total Number of Errors found: 1", "Unexpected return from CheckAccessibility, should return 1 error. output: \n");
+	}
+    },
+    testScopeWithWrongVal:{
+	attributes : {caseToRender : 'testScopeWithWrongVal'},	
+	test: function(cmp){    	    	
+	    this.runTest("Total Number of Errors found: 1", "Unexpected return from CheckAccessibility, should return 1 error. output: \n");
+	}
+    },
     testFieldSetsWStyle:{
 	attributes : {caseToRender : 'fieldSetWithStyles'},	
 	test: function(cmp){    
 	    	cmp.get("field_set_W_style_and_legend").getElement().style.display="none";
 	    	cmp.get("field_set_field_style_no_legend").getElement().style.display="none";
 	    	
-		var expected = "Total Number of Errors found: 2";
-		var output    = $A.devToolService.checkAccessibility();
-		var actual   =  output.split("\n")[0];
-		$A.test.assertEquals(expected, actual , "Unexpected return from CheckAccessibility, should not return errornous string. output: \n"+output);
+	    	this.runTest("Total Number of Errors found: 2", "Unexpected return from CheckAccessibility, should return 2 error. output: \n");
 	}
     },
-
-    
     testButtonLabelValid:{
 	attributes : {caseToRender : 'buttonLabelValid'},
 	test: function(cmp){
-		var expected = "Total Number of Errors found: 3";
-		var output    = $A.devToolService.checkAccessibility();
-		var actual   =  output.split("\n")[0];
-		$A.test.assertEquals(expected, actual , "Unexpected return from CheckAccessibility, should not return errornous string. output: \n"+output);
+	    this.runTest("Total Number of Errors found: 3", "Unexpected return from CheckAccessibility, should return 3 error. output: \n");
 	}
     },
     testImageTagTest:{
@@ -51,156 +115,108 @@
     testHeadersCorrectOrder:{
 		attributes : {caseToRender : 'headersCorrectOrder'},
 		test: function(cmp){
-			var expected = "";
-			var output    = $A.devToolService.checkAccessibility();
-			var actual   =  output.split("\n")[0];
-			$A.test.assertEquals(expected, actual , "Unexpected return from CheckAccessibility, should not return errornous string. output: \n"+output);
+		    this.runTest("", "Unexpected return from CheckAccessibility, should not return errornous string. output: \n");
 		}
     },
     
     testHeadersWrongOrder:{
 		attributes : {caseToRender : 'headersWrongOrder'},
 		test: function(cmp){
-			var expected = "Total Number of Errors found: 2";
-			var output    = $A.devToolService.checkAccessibility();
-			var actual   =  output.split("\n")[0];
-			$A.test.assertEquals(expected, actual , "Unexpected return from CheckAccessibility, should return string with 2 errors. output: \n"+output);
+		    this.runTest("Total Number of Errors found: 2", "Unexpected return from CheckAccessibility, should return 2 error. output: \n");
 		}
     },
     
     testHeadersWrongOrderWrapAround:{
 		attributes : {caseToRender : 'headersWrongOrderWrapAround'},
 		test: function(cmp){
-			var expected = "Total Number of Errors found: 2";
-			var output    = $A.devToolService.checkAccessibility();
-			var actual   =  output.split("\n")[0];
-			$A.test.assertEquals(expected, actual , "Unexpected return from CheckAccessibility, should return string with 2 errors. output: \n"+output);
+		    this.runTest("Total Number of Errors found: 2", "Unexpected return from CheckAccessibility, should return 2 error. output: \n");
 		}
     },
     
     testHeadersWrongOrderReverse:{
 		attributes : {caseToRender : 'headersWrongOrderReverse'},
 		test: function(cmp){
-			var expected = "";
-			var output    = $A.devToolService.checkAccessibility();
-			var actual   =  output.split("\n")[0];
-			$A.test.assertEquals(expected, actual , "Unexpected return from CheckAccessibility, should not return errornous string. output: \n"+output);
+		    this.runTest("", "Unexpected return from CheckAccessibility, should not return errornous string. output: \n");
 		}
     },
     
     testAnchorWithInnerText:{
 		attributes : {caseToRender : 'anchorWInnerText'},
 		test: function(cmp){
-			var expected = "";
-			var output    = $A.devToolService.checkAccessibility();
-			var actual   =  output.split("\n")[0];
-			$A.test.assertEquals(expected, actual , "Unexpected return from CheckAccessibility, should not return errornous string. output: \n"+output);
+		    this.runTest("", "Unexpected return from CheckAccessibility, should not return errornous string. output: \n");
 		}
     },
     
     testAnchorWithOutInnerText:{
 		attributes : {caseToRender : 'anchorWOInnerText'},
 		test: function(cmp){
-			var expected = "Total Number of Errors found: 1";
-			var output    = $A.devToolService.checkAccessibility();
-			var actual   =  output.split("\n")[0];
-			$A.test.assertEquals(expected, actual , "Unexpected return from CheckAccessibility, should return string with 1 errors. output: \n"+output);
+		    this.runTest("Total Number of Errors found: 1", "Unexpected return from CheckAccessibility, should return 1 error. output: \n");
 		}
     },
 
     testAnchorInOutputURLInfo:{
 		attributes : {caseToRender : 'anchorInOutputURLInfo'},
 		test: function(cmp){
-			var expected = "";
-			var output    = $A.devToolService.checkAccessibility();
-			var actual   =  output.split("\n")[0];
-			$A.test.assertEquals(expected, actual , "Unexpected return from CheckAccessibility, should return string with 0 errors. output: \n"+output);
+		    this.runTest("", "Unexpected return from CheckAccessibility, should not return errornous string. output: \n");
 		}
     },
     
     testAnchorInOutputURLDeco:{
 		attributes : {caseToRender : 'anchorInOutputURLDeco'},
 		test: function(cmp){
-			var expected = "Total Number of Errors found: 2";
-			var output    = $A.devToolService.checkAccessibility();
-			var actual   =  output.split("\n")[0];
-			$A.test.assertEquals(expected, actual , "Unexpected return from CheckAccessibility, should return string with 2 errors. output: \n"+output);
+		    this.runTest("Total Number of Errors found: 2", "Unexpected return from CheckAccessibility, should return 2 error. output: \n");
 		}
     },
     
     testRadioIsInFieldSetError:{
 		attributes : {caseToRender : 'RadioErrors'},
 		test: function(cmp){
-			var expected = "Total Number of Errors found: 4";;
-			var output    = $A.devToolService.checkAccessibility();
-			var actual   =  output.split("\n")[0];
-			$A.test.assertEquals(expected, actual , "Unexpected return from CheckAccessibility, should return string with 4 errors. output: \n"+output);
+		    this.runTest("Total Number of Errors found: 4", "Unexpected return from CheckAccessibility, should return 4 error. output: \n");
 		}
     },
     
     testRadioIsInFieldSetNoError:{
 		attributes : {caseToRender : 'NoRadioErrors'},
 		test: function(cmp){
-			var expected = "";
-			var output    = $A.devToolService.checkAccessibility();
-			var actual   =  output.split("\n")[0];
-			$A.test.assertEquals(expected, actual , "Unexpected return from CheckAccessibility, should not return errornous string. output: \n"+output);
+		    this.runTest("", "Unexpected return from CheckAccessibility, should not return errornous string. output: \n");
 		}
     },
     
     testLabels:{
 		attributes : {caseToRender : 'labelTest'},
 		test: function(cmp){
-			var expected = "";
-			var actual   =  $A.devToolService.checkAccessibility().split("\n")[0];
-			$A.test.assertEquals(expected, actual , "Unexpected return from CheckAccessibility, should not return errornous string");
+		    this.runTest("", "Unexpected return from CheckAccessibility, should not return errornous string. output: \n");
 		}
     },
     
     testLabelsNotNeeded:{
 		attributes : {caseToRender : 'labelsNotNeeded'},
 		test: function(cmp){
-		        var expected = "Total Number of Errors found: 1";
-			var actual   =  $A.devToolService.checkAccessibility().split("\n")[0];
-			$A.test.assertEquals(expected, actual , "Unexpected return from CheckAccessibility, should return 1 error for input of type image with out an alt");
+		    this.runTest("Total Number of Errors found: 1", "Unexpected return from CheckAccessibility, should return 1 error. output: \n");
 		}
     },
     
     testAnchorMenuTest:{
 		attributes : {caseToRender : 'anchorMenuTest'},
 		test: function(cmp){
-			var expected = "";
-			var output    = $A.devToolService.checkAccessibility();
-			var actual   =  output.split("\n")[0];
-			$A.test.assertEquals(expected, actual , "Unexpected return from CheckAccessibility, should not return errornous string. output: \n"+output);
+		    this.runTest("", "Unexpected return from CheckAccessibility, should not return errornous string. output: \n");
 		}
     },
     
     testCKEditorTest:{
 		attributes : {caseToRender : 'ckeditor_test'},
 		test: function(cmp){
-			var expected = "";
-			var output    = $A.devToolService.checkAccessibility();
-			var actual   =  output.split("\n")[0];
-			$A.test.assertEquals(expected, actual , "Unexpected return from CheckAccessibility, should not return errornous string. output: \n"+output);
+		    this.runTest("", "Unexpected return from CheckAccessibility, should not return errornous string. output: \n");
 		}
     },
 
     testUseSpecificDomElement:{
 	attributes : {caseToRender : 'full'},
 	test: [function(cmp){
-	        var tableToUse    = document.getElementById("table1"); 
-		var expected = "Total Number of Errors found: 4";
-		var output    = $A.devToolService.checkAccessibility(tableToUse);
-		var actual   =  output.split("\n")[0];
-		$A.test.assertEquals(expected, actual , "Unexpected return from CheckAccessibility, should return errornous string with 4 errors. output: \n"+output);
+	        this.runTest("Total Number of Errors found: 4", "Unexpected return from CheckAccessibility, should return 4 error. output: \n", document.getElementById("table1"));
 	},
 	function(cmp){
-	        var fieldSetToUse = document.getElementById("field_set"); 
-		var expected = "Total Number of Errors found: 2";
-		var output    = $A.devToolService.checkAccessibility(fieldSetToUse);
-		var actual   =  output.split("\n")[0];
-		$A.test.assertEquals(expected, actual , "Unexpected return from CheckAccessibility, should return errornous with 2 errors string. output: \n"+output);
+	        this.runTest("Total Number of Errors found: 2", "Unexpected return from CheckAccessibility, should return 2 error. output: \n", document.getElementById("field_set"));
 	}]
 	
      },
@@ -208,28 +224,20 @@
      testNoElements:{
 		attributes : {caseToRender : 'None'},
 		test: function(cmp){
-			var expected = "";
-			var output    = $A.devToolService.checkAccessibility();
-			var actual   =  output.split("\n")[0];
-			$A.test.assertEquals(expected, actual , "Unexpected return from CheckAccessibility, should not return errornous string. output: \n"+output);
+		    this.runTest("", "Unexpected return from CheckAccessibility, should not return errornous string. output: \n");
 		}
      },
      testSkipVisualForceIframes : {
 	 attributes : {caseToRender : 'skipIframeForVisForce'},
 		test: function(cmp){
-			var expected = "Total Number of Errors found: 1";
-			var output    = $A.devToolService.checkAccessibility();
-			var actual   =  output.split("\n")[0];
-			$A.test.assertEquals(expected, actual , "Unexpected return from CheckAccessibility, should return errornous string with 1 errors. output: \n"+output);
+		    this.runTest("Total Number of Errors found: 1", "Unexpected return from CheckAccessibility, should return 1 error. output: \n");
 		}
      },
      
     //Full tests
     testCheckAccessibility:{
 		test: function(cmp){
-			var expected = "Total Number of Errors found: 10";
-			var actual   =  $A.devToolService.checkAccessibility().split("\n")[0];
-			$A.test.assertEquals(expected, actual , "Unexpected return from CheckAccessibility, should return string with 10 errors");
+		    this.runTest("Total Number of Errors found: 10", "Unexpected return from CheckAccessibility, should return 10 error. output: \n");
 		}
     },
   

@@ -365,6 +365,8 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
      * <li>...</li>
      * </ul>
      */
+    // TODO: Unadaptable since SFDC will have other preloaded namespaces. Remove unadaptable when preloads are removed.
+    @UnAdaptableTest
     public void testUidValue() throws Exception {
         StringBuilder buffer = new StringBuilder();
         String cmpName = "test:layoutNoLayout";

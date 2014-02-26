@@ -15,8 +15,19 @@
     limitations under the License.
 
 -->
-<aura:interface>
-    <aura:attribute name="columns" type="List"/>
-    <aura:attribute name="items" type="List"/>
-    <aura:attribute name="modelItemsKey" type="String" description="The AuraEnabled field name on the model representing the first page of items."/>
-</aura:interface>
+<aura:component extensible="true" support="PROTO">
+	<aura:attribute name="name" type="String"/>
+	<aura:attribute name="label" type="String"/>
+	<aura:attribute name="index" type="Integer"/>
+	<aura:attribute name="value" type="Object" description="Use this to bind some value to the action. Must be serializable {String, Number, Boolean}."/>
+
+	<span class="action" 
+		  data-action-global-id="{!globalId}"
+		  data-action-name="{!v.name}" 
+		  data-action-value="{!v.value}" 
+		  data-item-index="{!v.index}" 
+		  onclick="{!c.handleClick}">
+		
+		{!v.body}
+	</span>
+</aura:component>

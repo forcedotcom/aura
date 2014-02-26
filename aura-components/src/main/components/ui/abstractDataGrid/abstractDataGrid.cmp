@@ -1,0 +1,47 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component abstract="true" extensible="true" implements="ui:visible" support="PROTO">
+	
+	<!-- Public attributes -->
+	<aura:attribute name="items" type="List" description="Arbitrary list of objects to iterate over."/>
+	<aura:attribute name="itemShape" type="Object" description="Template object with null fields to describe item shape. If not set, then concrete should derive shape from columns facet."/>
+	<aura:attribute name="mode" type="String" default="VIEW" description="{ VIEW, VIEW_ONLY, EDIT, EDIT_ONLY }"/>
+	<aura:attribute name="state" type="String" default="idle" description="{ idle, loading, error }"/>
+	<aura:attribute name="sortable" type="Boolean" default="true" description="Toggle sorting by columns (via column header)."/>
+	<aura:attribute name="createable" type="Boolean" default="false" description="Describes whether the implementation should enable a creation pattern."/>
+	<aura:attribute name="selectedItems" type="List"/>
+	<aura:attribute name="sortBy" type="String" description="Comma-separated list of columns predicated by a '-' for descending."/>
+
+	<!-- Facets for advanced configuration -->
+	<aura:attribute name="dataProvider" type="Aura.Component[]" description="Facet for ui:dataProvider - responsible for fetching data."/>	
+	<aura:attribute name="dataWriter" type="Aura.Component[]" description="Facet for ui:dataWriter - responsible for writing data. Implementation TBD."/>	
+	<aura:attribute name="columns" type="Aura.Component[]" description="Configuration for columns."/>
+	<aura:attribute name="summaryRow" type="Aura.ComponentDefRef[]" description="Configuration for summary rows."/>
+	<aura:attribute name="actionDelegate" type="Aura.Component[]" description="Row action delegate."/>
+
+	<aura:registerEvent name="refresh" type="ui:refresh" description="Provides fresh data from the dataProvider."/>
+	<aura:registerEvent name="addRemove" type="ui:dataGridAddRemove" description="Command event for grid to insert or delete items as rows."/>
+
+	<aura:handler name="init" value="{!this}" action="{!c.init}"/>
+	<aura:handler name="change" value="{!v.mode}" action="{!c.handleModeChange}"/>
+	<aura:handler name="change" value="{!v.sortBy}" action="{!c.handleSortByChange}"/>
+	<aura:handler name="refresh" action="{!c.handleRefresh}"/>
+	<aura:handler name="addRemove" action="{!c.handleAddRemove}"/>
+
+	{!v.body}
+</aura:component>

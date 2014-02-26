@@ -15,8 +15,5 @@
     limitations under the License.
 
 -->
-<aura:interface>
-    <aura:attribute name="columns" type="List"/>
-    <aura:attribute name="items" type="List"/>
-    <aura:attribute name="modelItemsKey" type="String" description="The AuraEnabled field name on the model representing the first page of items."/>
-</aura:interface>
+<aura:event type="COMPONENT" support="PROTO" description="Command event to instruct a component to write its data to the server.">
+</aura:event>

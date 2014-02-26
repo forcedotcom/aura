@@ -70,7 +70,7 @@
 
 	updateCalculatedFields : function(component) {
 		component = component.getConcreteComponent();
-		
+
 		var pageSize = component.get("v.pageSize") || 0;
 		var totalItems = parseInt(component.get("v.totalItems"), 10);
 		if (pageSize > 0) {

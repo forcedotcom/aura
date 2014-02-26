@@ -13,12 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*jslint sub: true */
-var p = PassthroughValue.prototype;
-exp(p,
-    "auraType", p.auraType,
-    "getValue", p.getValue,
-    "getComponent", p.getComponent,
-    "index", p.index,
-    "deIndex", p.deIndex
-);
+({
+	handleRowModeChange: function (cmp, evt) {
+		cmp.setValue('v.mode', evt.getParam('value').getValue());
+	}
+})

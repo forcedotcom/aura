@@ -15,8 +15,6 @@
     limitations under the License.
 
 -->
-<aura:interface>
-    <aura:attribute name="columns" type="List"/>
-    <aura:attribute name="items" type="List"/>
-    <aura:attribute name="modelItemsKey" type="String" description="The AuraEnabled field name on the model representing the first page of items."/>
-</aura:interface>
+<aura:event type="COMPONENT" description="Generic event to notify of operation success or failure.">
+	<aura:attribute name="value" type="Object" description="Weakly typed response value. Put anything in here that may be useful."/>
+</aura:event>

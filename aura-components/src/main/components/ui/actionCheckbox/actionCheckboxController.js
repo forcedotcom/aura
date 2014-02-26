@@ -13,12 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*jslint sub: true */
-var p = PassthroughValue.prototype;
-exp(p,
-    "auraType", p.auraType,
-    "getValue", p.getValue,
-    "getComponent", p.getComponent,
-    "index", p.index,
-    "deIndex", p.deIndex
-);
+({
+	handleClick: function (cmp, evt) {
+		var cb = cmp.find('cb').getElement();
+
+		if (cb) {
+			// Propagate change.
+			cmp.getSuper().setValue('v.value', cb.checked); 
+		}
+	},
+
+	handleValueChange: function (cmp, evt) {
+		var cb = cmp.find('cb').getElement();
+		
+		if (cb) {
+			cb.checked = evt.getParam('value').getValue();	
+		}	
+	}
+})

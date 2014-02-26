@@ -44,4 +44,35 @@ PassthroughValue.prototype.getValue = function(key) {
     return this.cmp.getValue(key);
 };
 
+/** 
+ * Delegates indexing logic to the wrapped value provider. 
+ * Likely delegating to a wrapped component. 
+ */ 
+PassthroughValue.prototype.index = function () {
+    var valueProvider = this.getComponent();
+
+    // Potentially nested PassthroughValue objects.
+    while (valueProvider && !valueProvider.index) {
+        valueProvider = valueProvider.getComponent();
+    }
+
+    if (!valueProvider) {
+        return;
+    }
+
+    valueProvider.index.apply(valueProvider, arguments); 
+};
+
+/**
+ * Delegates de-indexing logic to the wrapped value provider. 
+ * Likely delegating to a wrapped component. 
+ */ 
+PassthroughValue.prototype.deIndex = function () {
+    var cmp = ivp.getComponent();
+
+    if (cmp) {
+        cmp.deIndex.apply(cmp, arguments);
+    }
+};
+
 //#include aura.value.PassthroughValue_export

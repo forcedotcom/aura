@@ -148,7 +148,11 @@ public class Hash {
         value = Arrays.copyOf(hash, hash.length);
     }
 
-    /** Consumes and closes a reader to generate its contents' hash. */
+    /**
+     * Consumes and closes a reader to generate its contents' hash.
+     *
+     * @param reader the reader for pulling content. Must be at the beginning of file.
+     */ 
     public void setHash(Reader reader) throws IOException, IllegalStateException {
         try {
             MessageDigest digest = MessageDigest.getInstance("MD5");
@@ -160,10 +164,11 @@ public class Hash {
                 digest.update(bytes);
                 cbuffer.clear();
             }
-            reader.close();
             setHash(digest.digest());
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException("MD5 is a required MessageDigest algorithm, but is not registered here.");
+        } finally {
+            reader.close();
         }
     }
 

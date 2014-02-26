@@ -57,7 +57,7 @@ public class JavaAction extends AbstractActionImpl<JavaActionDef> {
                 //
                 // This means that we have a broken definition.
                 //
-                addException(new AuraUnhandledException("Invalid parameter " + valueDef, qfe), State.ERROR, true,
+                addException(new AuraUnhandledException("Invalid parameter " + valueDef, qfe), State.ABORTED, true,
                         false);
                 return null;
             } catch (IllegalArgumentException iae) {
@@ -65,10 +65,10 @@ public class JavaAction extends AbstractActionImpl<JavaActionDef> {
                         false);
                 return null;
             } catch (AuraHandledException lhe) {
-                addException(lhe, State.ERROR, false, false);
+                addException(lhe, State.ABORTED, false, false);
                 return null;
             } catch (Exception e) {
-                addException(new AuraUnhandledException("Error on parameter " + valueDef, e), State.ERROR, false,
+                addException(new AuraUnhandledException("Error on parameter " + valueDef, e), State.ABORTED, false,
                         false);
                 return null;
             }

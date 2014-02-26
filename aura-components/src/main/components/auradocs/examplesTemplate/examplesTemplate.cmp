@@ -15,20 +15,6 @@
     limitations under the License.
 
 -->
-<aura:component>
-    <aura:attribute name="label" type="String" required="true"/>
-    <aura:attribute name="description" type="Aura.Component[]" required="true"/>
-    <aura:attribute name="descriptor" type="String" required="true"/>
-    
-    <aura:handler name="init" value="{!this}" action="{!c.init}" />
-    
-    <div class="container">
-    	<h3>{!v.label}</h3>
-    	
-    	<div class="description">{!v.description}</div>
-    
-		<hr/>
-		
-		<auradocs:viewer descriptor="{!v.descriptor}"/>
-	</div>
+<aura:component isTemplate="true" extends="auradocs:template" style="templateCss://auradocs.template">
+    <aura:set attribute="title" value="Aura Examples"/>
 </aura:component>

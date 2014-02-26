@@ -37,5 +37,9 @@
 		</p>
 	</aura:description>
 	
-	<aura:example name="example1" ref="uiExamples:dataProviderExample"/>
+	<aura:example name="example1" ref="uiExamples:dataProviderExample" label="Using ui:dataProvider">
+    	<p>A nice long description.  Multiple paragraphs, formatting--the whole deal.</p>
+    	
+    	<p>I mean, check out this code: <code>superCode</code>.</p>
+	</aura:example>
 </aura:documentation>

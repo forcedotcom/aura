@@ -40,6 +40,11 @@ public class ExampleDefImpl extends DefinitionImpl<ExampleDef> implements Exampl
         this.label = builder.label;
     }
 
+	@Override
+    public DefDescriptor<ComponentDef> getRef() {
+        return ref;
+    }
+	
     @Override
     public String getName() {
         return name;
@@ -49,26 +54,12 @@ public class ExampleDefImpl extends DefinitionImpl<ExampleDef> implements Exampl
     public String getLabel() {
         return label;
     }
-    
-    @Override
-    public DefDescriptor<ComponentDef> getRef() {
-        return ref;
-    }
         
     @Override
     public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
         super.appendDependencies(dependencies);
         dependencies.add(ref);
     }
-
-    @Override
-    public void serialize(Json json) throws IOException {
-        json.writeMapBegin();
-        json.writeMapEntry("name", getName());
-        json.writeMapEntry("description", getDescription());
-        json.writeMapEntry("label", getLabel());
-        json.writeMapEnd();
-    }    
 
     public static class Builder extends DefinitionImpl.BuilderImpl<ExampleDef> implements ExampleDefBuilder {
         
@@ -89,15 +80,26 @@ public class ExampleDefImpl extends DefinitionImpl<ExampleDef> implements Exampl
         }
 
         @Override
-        public ExampleDefBuilder setName(String name) {
-            this.name = name;
-            return this;
-        }
-
-        @Override
         public ExampleDefBuilder setRef(String qualifiedName) {
             this.ref = DefDescriptorImpl.getInstance(qualifiedName, ComponentDef.class);
             return this;
         }
+        
+        @Override
+        public ExampleDefBuilder setName(String name) {
+            this.name = name;
+            return this;
+        }
+        
+        public ExampleDefBuilder setLabel(String label) {
+            this.label = label;
+            return this;
+        }
+    }
+
+    @Override
+    public void serialize(Json json) throws IOException {
+        // TODO Auto-generated method stub
+        
     }
 }

@@ -20,4 +20,13 @@
     <aura:attribute name="defType" type="String" default="Component"/>
     
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+    
+    <aura:iteration items="{!m.metadata}" var="def">
+   		<div>descriptor : {!def.descriptor}</div>
+   		<div>name : {!def.name}</div>
+   		<div>label : {!def.label}</div>
+   		<div>description : {!def.description}</div>
+   		<div>ref : {!def.ref}</div> 
+   		<hr/>
+    </aura:iteration>
 </aura:component>

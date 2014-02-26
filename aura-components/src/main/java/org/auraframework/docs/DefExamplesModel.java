@@ -32,6 +32,7 @@ public class DefExamplesModel {
 
     private final List<Component> examples;
     private final List<String> exampleDescriptors;
+    private List<Map<String, String>> metadata;
 
     public DefExamplesModel() throws QuickFixException {
         AuraContext context = Aura.getContextService().getCurrentContext();
@@ -39,6 +40,9 @@ public class DefExamplesModel {
 
         examples = new ArrayList<Component>();
         exampleDescriptors = new ArrayList<String>();
+        metadata = new ArrayList<Map<String, String>>();
+        
+        // TODO: Just grab the DocDef directly, mein.
         
         String desc = (String) component.getAttributes().getValue("descriptor");        
         DefType defType = DefType.valueOf(((String) component.getAttributes().getValue("defType")).toUpperCase());
@@ -59,7 +63,16 @@ public class DefExamplesModel {
             
             if (exs != null) {
                 for (ExampleDef e : exs.values()) {
-                    exampleDescriptors.add(e.getRef().getDescriptorName());
+                    Map<String, String> map = new HashMap<String, String>();
+                    map.put("descriptor", e.getDescriptor().getQualifiedName());
+                    map.put("name", e.getName());
+                    map.put("label", e.getLabel());
+                    map.put("description", e.getDescription());
+                    map.put("ref", e.getRef().getDescriptorName());
+                    
+                    this.metadata.add(map);
+                    
+//                    exampleDescriptors.add(e.getRef().getDescriptorName());
 //                    Component c = Aura.getInstanceService().getInstance(e.getRef());
 //                    examples.add(c);
                 }
@@ -75,5 +88,10 @@ public class DefExamplesModel {
     @AuraEnabled
     public List<String> getExampleDescriptors() {
         return this.exampleDescriptors;
+    }
+    
+    @AuraEnabled
+    public List<Map<String, String>> getMetadata() {
+        return this.metadata;
     }
 }

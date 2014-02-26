@@ -21,9 +21,7 @@
 	
 	<aura:set attribute="title" value="Using ui:dataProvider"/>
     <aura:set attribute="description">
-    	<p>A nice long description.  Multiple paragraphs, external links--the whole deal.</p>
-    	
-    	<p>Not sure how the links should work just yet...</p>
+
     </aura:set>
     
 	<ui:button label="This is distinctly not a list, but you get the idea."></ui:button>

@@ -20,7 +20,7 @@
          locationChangeEvent="aura:locationChange"
          template="aura:template"
          renderer="js://aura.component, java://org.auraframework.renderer.ComponentRenderer"
-         access="public"
+         access="unauthenticated"
          securityProvider="java://org.auraframework.components.DefaultSecurityProvider"
          implements="aura:rootComponent"
          support="GA"

@@ -29,17 +29,13 @@ import org.auraframework.system.*;
 import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
-
 import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import com.google.common.collect.*;
 
 /**
  * Tests for DefinitionServiceImpl.
@@ -62,7 +58,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
                 ApplicationDef.class,
                 String.format(
                         baseApplicationTag,
-                        "access='PUBLIC' securityProvider='java://org.auraframework.java.securityProvider.LaxSecurityProvider'",
+                        "access='UNAUTHENTICATED' securityProvider='java://org.auraframework.java.securityProvider.LaxSecurityProvider'",
                         ""));
         Aura.getContextService().startContext(Mode.PROD, Format.HTML, Access.PUBLIC, desc);
         assertEquals(desc, Aura.getDefinitionService().getDefinition(desc).getDescriptor());
@@ -73,7 +69,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
                 ApplicationDef.class,
                 String.format(
                         baseApplicationTag,
-                        "access='PUBLIC' securityProvider='java://org.auraframework.java.securityProvider.LaxSecurityProvider'",
+                        "access='UNAUTHENTICATED' securityProvider='java://org.auraframework.java.securityProvider.LaxSecurityProvider'",
                         ""));
         Aura.getContextService().startContext(Mode.PROD, Format.HTML, Access.AUTHENTICATED, desc);
         assertEquals(desc, Aura.getDefinitionService().getDefinition(desc).getDescriptor());

@@ -35,12 +35,6 @@
 
     <div id="auraErrorMessage"/>
 
-    <script>
-    if (window.$A !== undefined) {
-    	throw new Error("Aura has already been initialized!");
-    }
-    </script>
-
     {!v.extraMetaTags}
     {!v.auraStyleTags}
     {!v.extraStyleTags}

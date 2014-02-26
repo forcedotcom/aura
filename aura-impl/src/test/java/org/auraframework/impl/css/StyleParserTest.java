@@ -22,6 +22,7 @@ import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.css.parser.StyleParser;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Client;
+import org.auraframework.test.client.UserAgent;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.throwable.quickfix.StyleParserException;
 import org.junit.Test;
@@ -183,9 +184,7 @@ public class StyleParserTest extends AuraImplTestCase {
                 StyleDef.class);
         Aura.getContextService()
                 .getCurrentContext()
-                .setClient(
-                        new Client(
-                                "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/28.0.1468.0 Safari/537.36"));
+                .setClient(new Client(UserAgent.GOOGLE_CHROME.getUserAgentString()));
         StyleDef style = descriptor.getDef();
         assertTrue(style.getName().equals("testStyleNamespaceTrueConditions"));
         goldFileText(style.getCode());
@@ -199,9 +198,7 @@ public class StyleParserTest extends AuraImplTestCase {
                 StyleDef.class);
         Aura.getContextService()
                 .getCurrentContext()
-                .setClient(
-                        new Client(
-                                "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/28.0.1468.0 Safari/537.36"));
+                .setClient(new Client(UserAgent.GOOGLE_CHROME.getUserAgentString()));
         StyleDef style = descriptor.getDef();
         assertTrue(style.getName().equals("testStyleNamespaceMediaAndConditions"));
         goldFileText(style.getCode());

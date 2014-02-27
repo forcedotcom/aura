@@ -17,24 +17,36 @@
     afterRender: function(component, helper) {
         var visible = component.get("v.visible");
         if (visible === true) {
+            if (component.get("v._yearListInitialized") === false) {
+                helper.refreshYearSelection(component);
+                component.setValue("v._yearListInitialized", true);
+            }
             helper.setGridInitialValue(component);
             helper.updateMonthYear(component, component.get("v.value"));
             helper.updateGlobalEventListeners(component);
         }
         var ret = this.superAfterRender();
-        helper.position(component);
+        if (visible === true) {
+            helper.position(component);
+        }
         return ret;
     },
 
     rerender: function(component, helper) {
         var visible = component.get("v.visible");
         if (visible === true) {
+            if (component.get("v._yearListInitialized") === false) {
+                helper.refreshYearSelection(component);
+                component.setValue("v._yearListInitialized", true);
+            }
             helper.setGridInitialValue(component);
             helper.updateMonthYear(component, component.get("v.value"));
             helper.updateGlobalEventListeners(component);
         }
         this.superRerender();
-        helper.position(component);
+        if (visible === true) {
+            helper.position(component);
+        }
         var isAndroid = $A.getGlobalValueProviders().get("$Browser.isAndroid");
         if (isAndroid == true) {
             var f = function(e) {

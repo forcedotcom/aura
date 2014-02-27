@@ -1,0 +1,106 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component support="BETA"
+    description="This component creates a scrollable view, complete with scroll bars and pull-to-refresh behaviors. The &lt;ui:scroller&gt; expands vertically to fill the space available within its parent component. You can set the width, and enable or disable both vertical and horizontal scrolling. Adding pull-to-refresh behavior is as simple as writing an action method to handle the event. Everything else is automatic. You can customize the status display for pull-to-refresh behavior, or accept the defaults.">
+    <aura:attribute name="hScroll" type="Boolean" default="false" description="Enables horizontal scrolling on the component. Default value is &quot;false&quot;."/>
+    <aura:attribute name="vScroll" type="Boolean" default="true" description="Enables vertical scrolling on the component. Default value is &quot;true&quot;."/>
+    <aura:attribute name="showScrollbars" type="Boolean" default="true" description="Shows or hides scroll bars. Default value is &quot;true&quot;, which shows the scroll bars."/>
+    <aura:attribute name="enabled" type="Boolean" default="true" description="Displays the scroller in an enabled state. Default value is &quot;true&quot;."/>
+    <aura:attribute name="useTransform" type="Boolean" default="true" description="Denotes whether to use transform scrollers and usually used with nested scrollers. Default value is &quot;true&quot;."/>
+    <aura:attribute name="useTransition" type="Boolean" default="true" description="Denotes whether to use css transition. Default value is &quot;false&quot;."/>
+    <aura:attribute name="snap" type="String" description="The CSS style used to display the snap area. Locks the scroller to predefined positions."/>
+    <aura:attribute name="width" type="String" description="The width of the scroll area in pixels (px) or percentage (%). Default value is &quot;100px&quot;."/>
+    <aura:attribute name="class" type="String" description="A CSS style to be attached to the scroll area. This style is added in addition to base styles output by the component."/>
+    <aura:attribute name="scrollContentClass" type="String" description="A CSS style to be attached to the scroll content area. This style is added in addition to base styles output by the component."/>
+	<aura:attribute name="onBeforeScrollStart" type="Aura.Action" description="The action invoked before the user starts scrolling."/>	
+    <aura:attribute name="onScrollStart" type="Aura.Action" description="The action invoked when the user starts scrolling."/>
+    <aura:attribute name="onScrollEnd" type="Aura.Action" description="The action invoked when the user stops scrolling."/>
+    <aura:attribute name="onScrollMove" type="Aura.Action" description="The action invoked when the user is scrolling."/>
+
+    <aura:attribute name="onScrollToBottom" type="Aura.Action" description="The action invoked when the user has reached the end of the scrolling area."/>
+    <aura:attribute name="scrollToBottomThreshold" type="Integer" default="10" description="When the user scrolls to this many pixels from the bottom of the scrollable area, the onScrollToBottom action is called."/>
+
+    <aura:attribute name="onPullToShowMore" type="Aura.Action" description="The action invoked when the user pulls from the bottom to load more.  The spacebar or Enter key also triggers a refresh."/>
+    <aura:attribute name="pullToShowMorePull" type="String" default="Pull up to show more..." description="The text to display in the bottom cell before the user pulls to show more content. Default value is &quot;Pull up to show more...&quot;."/>
+    <aura:attribute name="pullToShowMoreRelease" type="String" default="Release to show more..." description="The text to display in the revealed area below the scroller contents when the user pulls to show more content in the scroller area, but has not yet released the pull. Default value is &quot;Release to show more...&quot;."/>
+    <aura:attribute name="pullToShowMoreUpdating" type="String" default="Loading..." description="The text to display while the scroller component is updating after the user pulls to show more content in the scroller. Default value is &quot;Loading...&quot;."/>
+    <aura:attribute name="pullToShowMoreSubtitle" type="String" description="The text to display in the bottom cell when the user pulls the scroller area to show more content."/>
+    <aura:attribute name="canShowMore" type="Boolean" default="true" description="Whether this scroller can be invoked to show more content. Defaults to true."/>
+    
+    <aura:attribute name="onPullToRefresh" type="Aura.Action" description="The action invoked when the user pulls to refresh the scroller area.  The spacebar or Enter key also triggers a refresh."/>
+    <aura:attribute name="pullToRefreshPull" type="String" default="Pull down to refresh..." description="The text to display in the top cell before the user pulls to refresh the page. Default value is &quot;Pull down to refresh...&quot;."/>
+    <aura:attribute name="pullToRefreshRelease" type="String" default="Release to refresh..." description="The text to display in the revealed area above the scroller contents when the user pulls to refresh the scroller area, but has not yet released the pull. Default value is &quot;Release to refresh...&quot;."/>
+    <aura:attribute name="pullToRefreshUpdating" type="String" default="Loading..." description="The text to display while the scroller component is updating after the user pulls to refresh the scroller. Default value is &quot;Loading...&quot;."/>
+    <aura:attribute name="pullToRefreshSubtitle" type="String" description="The text to display in the top cell when the user pulls the scroller area to refresh the content."/>
+    <aura:attribute name="canRefresh" type="Boolean" default="true" description="Whether this scroller can be invoked to refresh its content. Defaults to true."/>
+    <aura:attribute name="extendedPullContent" type="Aura.Component[]" description="Add additional hidden content to be shown just above the starting scroll position"/>
+    
+    <aura:attribute name="stopEventPropagation" type="Boolean" default="false" description="Disables DOM event propagation. (This probably isn't something you want to enable.)"/>
+    <aura:attribute name="checkDOMChanges" type="Boolean" default="false" description="Refresh the scroller after DOM changes."/>
+    <aura:attribute name="bindEventsToScroller" type="Boolean" default="false" description="Set to true to bind the mouse or touch events to the scroller DOM element, otherwise, bind to the window object."/>
+
+    <aura:registerEvent name="refreshed" type="ui:scrollerRefreshed" description="The event fired when the scroller is refreshed."/>
+	<aura:handler event="aura:locationChange" action="{!c.locationChange}" description="The event fired when a location change occurs."/>    
+    <aura:registerEvent name="scrollTo" type="ui:scrollTo" description="The event fired when the scroller should move to a new destination."/>
+    <aura:handler name="scrollTo" action="{!c.scrollTo}" description="Catches the event fired when the scroller should move to a new destination."/>    
+    <aura:registerEvent name="scrollBy" type="ui:scrollBy" description="The event fired when the scroller should move to a new destination relative to its current position."/>
+    <aura:handler name="scrollBy" action="{!c.scrollBy}" description="Catches the event fired when the scroller should move to a new destination relative to its current position."/>
+    
+    <aura:handler name="change" value="{!v.canShowMore}" action="{!c.handleCanShowMoreChange}"/>
+    
+    <ui:resizeObserver onresize="{!c.refresh}"/>
+    
+    <div aura:id="scrollWrapper" class="{!v.class + ' scrollWrapper'}">
+        <div aura:id="scrollContent" class="{!v.scrollContentClass}">
+            <aura:renderIf isTrue="{!v.onPullToRefresh != null &amp;&amp; v.canRefresh}">
+                <div aura:id="pullDown" class="pullToRefresh pullDown">
+                    <span class="pullDownIcon"></span>
+                    <div>
+                        <div class="label pullLabel"><a onclick="{!v.onPullToRefresh}" href="javascript:void('scroller')">{!v.pullToRefreshPull}</a></div>
+                        <div class="label releaseLabel">{!v.pullToRefreshRelease}</div>
+                        <div class="label loadingLabel">{!v.pullToRefreshUpdating}</div>
+                        <span class="subtitle">{!v.pullToRefreshSubtitle}</span>
+                    </div>
+                </div>
+            </aura:renderIf>
+
+            <aura:renderIf isTrue="{!v.extendedPullContent != null &amp;&amp; v.extendedPullContent.length > 0}">
+                <div aura:id="pullContent" class="pullContent">
+                    {!v.extendedPullContent}
+                </div>
+            </aura:renderIf>
+
+            {!v.body}
+            
+            <aura:renderIf isTrue="{!v.onPullToShowMore != null &amp;&amp; v.canShowMore}">
+            	<div aura:id="shim"></div>
+            	
+                <div aura:id="pullUp" class="pullToRefresh pullDown">
+                    <span class="pullDownIcon"></span>
+                    <div>
+                        <div class="label pullLabel"><a onclick="{!v.onPullToShowMore}" href="javascript:void('scroller')">{!v.pullToShowMorePull}</a></div>
+                        <div class="label releaseLabel">{!v.pullToShowMoreRelease}</div>
+                        <div class="label loadingLabel">{!v.pullToShowMoreUpdating}</div>
+                        <span class="subtitle">{!v.pullToShowMoreSubtitle}</span>
+                    </div>
+                </div>
+            </aura:renderIf>
+
+        </div>
+    </div>
+</aura:component>

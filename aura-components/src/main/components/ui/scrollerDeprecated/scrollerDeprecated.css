@@ -1,0 +1,96 @@
+/*
+ * Copyright (C) 2013 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+.THIS {
+    position: relative;
+    height: 100%;
+}
+
+/* Pull down styles */
+.THIS .pullToRefresh {
+	position: relative;
+	z-index: 2;
+    display: block;
+    height: 40px;
+    padding: 10px;
+}
+
+.THIS .pullToRefresh .subtitle {
+    font-weight: normal;
+    font-size: 13px;
+}
+
+.THIS .pullToRefresh .label {
+    display: none;
+    font-weight: bold;
+    font-size: 14px;
+    padding-top: 5px;
+}
+
+.THIS .pullDown .pullLabel,
+.THIS .pullFlip .releaseLabel,
+.THIS .pullLoading .loadingLabel {
+    display: block;
+}
+
+.THIS .pullDownIcon  {
+    display: block;
+    float: left;
+    width: 40px;
+    height: 40px;
+    background: url(/auraFW/resources/aura/images/pull_down_icon.png) 0 0 no-repeat;
+    -webkit-transition-property: -webkit-transform;        
+    -webkit-transition-duration: 250ms;
+    transition-property: transform;        
+    transition-duration: 250ms;
+}
+
+.THIS .pullDown .pullDownIcon {	
+    -webkit-transform: rotate(0deg) translateZ(0);
+    transform: rotate(0deg) translateZ(0);
+}
+
+.THIS .pullFlip .pullDownIcon {	
+    -webkit-transform: rotate(-180deg) translateZ(0);
+    transform: rotate(-180deg) translateZ(0);
+}
+
+.THIS .pullLoading .pullDownIcon {
+    background-position: 0 100%;
+       
+    -webkit-transform: rotate(0deg) translateZ(0);    
+    -webkit-transition-duration: 0ms;
+    -webkit-animation-name: pullSpinner;
+    -webkit-animation-duration: .8s;
+    -webkit-animation-iteration-count: infinite;
+    -webkit-animation-timing-function: linear;
+    
+    transform: rotate(0deg) translateZ(0);
+    transition-duration: 0ms;
+    animation-name: pullSpinner;
+    animation-duration: .8s;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+}
+
+@-webkit-keyframes pullSpinner {
+    from { -webkit-transform: rotate(0deg) translateZ(0); }
+    to { -webkit-transform: rotate(360deg) translateZ(0); }
+}
+
+@keyframes pullSpinner {
+    from {transform: rotate(0deg) translateZ(0); }
+    to {transform: rotate(360deg) translateZ(0); }
+}

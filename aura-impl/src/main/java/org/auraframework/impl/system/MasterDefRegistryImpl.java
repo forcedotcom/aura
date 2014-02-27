@@ -171,12 +171,31 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     private SecurityProviderDef securityProvider;
     private DefDescriptor<? extends BaseComponentDef> lastRootDesc;
 
+    private final MasterDefRegistryImpl original;
+
+    /**
+     * Build a system def registry that is meant to be used as a shadowing registry.
+     *
+     * This builds a registry that will not add new defs to the def set, and will allow
+     * any access (the access checks MUST have been done before this is instantiated). Note
+     * that none of the defs built off of this will be sent to the client, so it should be
+     * safe to allow this access.
+     *
+     * @param original the registry that is the 'public' registry.
+     */
     public MasterDefRegistryImpl(MasterDefRegistryImpl original) {
         this.delegateRegistries = original.delegateRegistries;
+        this.original = original;
     }
 
+    /**
+     * Build a master def registry with a set of registries.
+     *
+     * This is the normal constructor for a master def registry.
+     */
     public MasterDefRegistryImpl(DefRegistry<?>... registries) {
-        delegateRegistries = new RegistryTrie(registries);
+        this.delegateRegistries = new RegistryTrie(registries);
+        this.original = null;
     }
 
     private boolean isCacheable(DefRegistry<?> reg) {
@@ -417,6 +436,24 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         }
     }
 
+    private boolean hasLocalDef(DefDescriptor<?> descriptor) {
+        return (original != null && original.defs.containsKey(descriptor)) || defs.containsKey(descriptor);
+    }
+
+    private <D extends Definition> D getLocalDef(DefDescriptor<D> descriptor) {
+        if (original != null && original.defs.containsKey(descriptor)) {
+            @SuppressWarnings("unchecked")
+            D origDef = (D) original.defs.get(descriptor);
+            return origDef;
+        }
+        if (defs.containsKey(descriptor)) {
+            @SuppressWarnings("unchecked")
+            D localDef = (D) defs.get(descriptor);
+            return localDef;
+        }
+        return null;
+    }
+
     /**
      * Fill a compiling def for a descriptor.
      * 
@@ -429,20 +466,23 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     private <D extends Definition> boolean fillCompilingDef(CompilingDef<D> compiling, AuraContext context)
             throws QuickFixException {
         assert compiling.def == null;
-        {
-            //
-            // First, check our local cached defs to see if we have a fully compiled version.
-            // in this case, we don't care about caching, since we are done.
-            //
-            @SuppressWarnings("unchecked")
-            D localDef = (D) defs.get(compiling.descriptor);
+
+        //
+        // First, check our local cached defs to see if we have a fully compiled version.
+        // in this case, we don't care about caching, since we are done.
+        //
+        if (hasLocalDef(compiling.descriptor)) {
+            D localDef = getLocalDef(compiling.descriptor);
             if (localDef != null) {
                 compiling.def = localDef;
+                // I think this is no longer possible.
                 compiling.built = !localDef.isValid();
                 if (compiling.built) {
                     localDef.validateDefinition();
                 }
                 return true;
+            } else {
+                return false;
             }
         }
 
@@ -751,10 +791,11 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         DefDescriptor<? extends BaseComponentDef> rootDesc;
        
         rootDesc = Aura.getContextService().getCurrentContext().getApplicationDescriptor();
-        if (!descriptor.equals(rootDesc) && rootDesc != null) {
+        if (!descriptor.equals(rootDesc) && rootDesc != null && !defs.containsKey(rootDesc) && original == null) {
             //
             // This is needed to make sure that we have already loaded up all our definitions,
-            // and don't need to re-fetch this half way through.
+            // and don't need to re-fetch this half way through. Note that we do this on the
+            // 'original' if we have one.
             //
             try {
                 getDef(rootDesc);
@@ -981,6 +1022,9 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         }
         rLock.lock();
         try {
+            if (hasLocalDef(descriptor)) {
+                return getLocalDef(descriptor);
+            }
             //
             // If our current context is not null, we always want to recurse
             // in to properly include the defs.
@@ -998,11 +1042,6 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                 // This is a bit ugly though.
                 //
                 return compileDef(descriptor, currentCC);
-            }
-            if (defs.containsKey(descriptor)) {
-                @SuppressWarnings("unchecked")
-                D def = (D) defs.get(descriptor);
-                return def;
             }
             DependencyEntry de = getDE(null, descriptor);
             if (de == null) {
@@ -1170,6 +1209,9 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
     @Override
     public void assertAccess(DefDescriptor<?> desc) throws QuickFixException {
+        if (original != null) {
+            return;
+        }
         rLock.lock();
         try {
         if (!accessCache.contains(desc)) {

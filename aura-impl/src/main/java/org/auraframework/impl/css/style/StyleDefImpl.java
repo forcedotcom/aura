@@ -60,7 +60,6 @@ public class StyleDefImpl extends DefinitionImpl<StyleDef> implements StyleDef {
     @Override
     public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
         dependencies.add(Aura.getDefinitionService().getDefDescriptor(descriptor.getNamespace(), NamespaceDef.class));
-        dependencies.add(Aura.getDefinitionService().getDefDescriptor("aura:styleDef", ComponentDef.class));
 
         if (!expressions.isEmpty()) {
             // we know that any expression means we have a dependency on a theme, but we can't determine here if that is
@@ -97,6 +96,7 @@ public class StyleDefImpl extends DefinitionImpl<StyleDef> implements StyleDef {
             /* TODONM remove this block */
             Map<String, Object> attributes = Maps.newHashMap();
             attributes.put("body", components);
+            Aura.getContextService().pushSystemContext();
             try {
                 Component cmp = Aura.getInstanceService().getInstance("aura:styleDef", ComponentDef.class, attributes);
                 StringBuilder sb = new StringBuilder();
@@ -104,6 +104,8 @@ public class StyleDefImpl extends DefinitionImpl<StyleDef> implements StyleDef {
                 return sb.toString();
             } catch (Exception e) {
                 throw new AuraRuntimeException(e);
+            } finally {
+                Aura.getContextService().popSystemContext();
             }
         }
 

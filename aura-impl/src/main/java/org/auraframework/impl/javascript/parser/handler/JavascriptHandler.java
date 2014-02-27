@@ -16,6 +16,7 @@
 package org.auraframework.impl.javascript.parser.handler;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.Map;
 import java.util.Set;
 
@@ -73,8 +74,10 @@ public abstract class JavascriptHandler<D extends Definition, T extends Definiti
     public T getDefinition() {
         JsonStreamReader in = null;
         Map<String, Object> map = null;
+        String contents = source.getContents();
+
         try {
-            in = new JsonStreamReader(source.getHashingReader(), getHandlerProvider());
+            in = new JsonStreamReader(new StringReader(contents), getHandlerProvider());
             try {
                 JsonConstant token = in.next();
                 if (token == JsonConstant.FUNCTION_ARGS_START) {
@@ -92,7 +95,7 @@ public abstract class JavascriptHandler<D extends Definition, T extends Definiti
                 }
             }
 
-            TextTokenizer tt = TextTokenizer.tokenize(source.getContents(), getLocation());
+            TextTokenizer tt = TextTokenizer.tokenize(contents, getLocation());
             tt.addExpressionRefs(this);
 
             return createDefinition(map);

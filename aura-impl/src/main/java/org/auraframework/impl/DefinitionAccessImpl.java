@@ -70,7 +70,7 @@ public class DefinitionAccessImpl implements DefinitionAccess {
 	}
 
 	@Override
-	public boolean isAccessible(AuraContext context) {
+	public boolean isAccessible() {
 		// TODO Auto-generated method stub
 		return false;
 	}

@@ -36,8 +36,8 @@ public interface DefinitionAccess {
     boolean isGlobal();
     boolean isPublic();
     boolean isPrivate();
-    // Access (to be evaluated via context)
-    boolean isAccessible(AuraContext context);
+    // Access (to be evaluated in current context)
+    boolean isAccessible();
     
     // Validation
     void validate(Set<BasicAccessType> allowed) throws InvalidAccessValueException ;

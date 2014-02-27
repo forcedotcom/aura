@@ -31,8 +31,6 @@ public interface ApplicationDef extends BaseComponentDef {
 
     DefDescriptor<LayoutsDef> getLayoutsDefDescriptor();
 
-    Access getAccess();
-
     DefDescriptor<EventDef> getLocationChangeEventDescriptor() throws QuickFixException;
 
     DefDescriptor<SecurityProviderDef> getSecurityProviderDefDescriptor() throws QuickFixException;

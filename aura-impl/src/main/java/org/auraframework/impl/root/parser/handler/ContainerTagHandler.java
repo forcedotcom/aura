@@ -15,20 +15,16 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-import javax.xml.stream.XMLStreamConstants;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.*;
 
-import org.auraframework.def.BaseComponentDef;
+import org.auraframework.Aura;
+import org.auraframework.def.*;
 import org.auraframework.def.BaseComponentDef.WhitespaceBehavior;
-import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.ComponentDefRef.Load;
-import org.auraframework.def.Definition;
-import org.auraframework.def.HtmlTag;
-import org.auraframework.def.RootDefinition;
 import org.auraframework.system.Location;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.quickfix.InvalidAccessValueException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
@@ -38,6 +34,7 @@ public abstract class ContainerTagHandler<T extends Definition> extends XMLHandl
     protected Location startLocation;
     protected WhitespaceBehavior whitespaceBehavior = BaseComponentDef.DefaultWhitespaceBehavior;
     public static final String SCRIPT_TAG = "script";
+    public static final String ATTRIBUTE_ACCESS = "access";
 
     public ContainerTagHandler() {
         super();
@@ -128,8 +125,26 @@ public abstract class ContainerTagHandler<T extends Definition> extends XMLHandl
     protected void readSystemAttributes() throws QuickFixException {
         // do nothing
     }
+    
+    protected DefinitionAccess readAccessAttribute() throws InvalidAccessValueException {
+        String access = getAttributeValue(ATTRIBUTE_ACCESS);
+        if (access != null) {
+        	DefinitionAccess a;
+			try {
+				a = Aura.getDefinitionParserAdapter().parseAccess(access);
+	        	a.validate(getAllowedAccessValues());
+			} catch (InvalidAccessValueException e) {
+				// re-throw with location
+				throw new InvalidAccessValueException(e.getMessage(), getLocation());
+			}
+        	return a;
+        }
+        else {
+        	return null;
+        }
+    }
 
-    /**
+	/**
      * @return this container's tag. May return a more generic term for the
      *         class of tag expected if more than one is handled. Not safe for
      *         tag comparisons, only for messaging. For comparisons, use

@@ -25,7 +25,6 @@ import org.auraframework.Aura;
 import org.auraframework.builder.RootDefinitionBuilder;
 import org.auraframework.def.*;
 import org.auraframework.def.BaseComponentDef.WhitespaceBehavior;
-import org.auraframework.def.ThemeDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.root.AttributeDefImpl;
 import org.auraframework.impl.root.AttributeDefRefImpl;
@@ -66,7 +65,7 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef> extend
                     ATTRIBUTE_ISTEMPLATE, ATTRIBUTE_IMPLEMENTS,
                     ATTRIBUTE_EXTENDS, ATTRIBUTE_STYLE, ATTRIBUTE_HELPER,
                     ATTRIBUTE_RENDERER, ATTRIBUTE_MODEL, ATTRIBUTE_CONTROLLER,
-                    ATTRIBUTE_WHITESPACE)
+                    ATTRIBUTE_WHITESPACE, ATTRIBUTE_ACCESS)
             .addAll(RootTagHandler.ALLOWED_ATTRIBUTES).build();
 
     private int innerCount = 0;
@@ -369,9 +368,11 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef> extend
                 : WhitespaceBehavior.valueOf(whitespaceVal.toUpperCase());
 
         builder.isTemplate = getBooleanAttributeValue(ATTRIBUTE_ISTEMPLATE);
+        
+        builder.setAccess(readAccessAttribute());
     }
 
-    public void setRender(String val) {
+	public void setRender(String val) {
         builder.render = val;
     }
 

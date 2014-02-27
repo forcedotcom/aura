@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:application access="public" model="java://org.auraframework.impl.java.model.TestJavaModel" controller="java://org.auraframework.impl.java.controller.JavaTestController">
+<aura:application access="unauthenticated" model="java://org.auraframework.impl.java.model.TestJavaModel" controller="java://org.auraframework.impl.java.controller.JavaTestController">
     <aura:attribute name="submitCount" type="integer"/>
 
     <div id="outSubmitCountDiv">

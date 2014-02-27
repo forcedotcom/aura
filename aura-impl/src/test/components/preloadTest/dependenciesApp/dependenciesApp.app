@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:application securityProvider="java://org.auraframework.java.securityProvider.LaxSecurityProvider" access="public" render="client">
+<aura:application securityProvider="java://org.auraframework.java.securityProvider.LaxSecurityProvider" access="unauthenticated" render="client">
     <ui:button label="UI Button" />
     <preloadTest:test_SpecialCharacter />
     <test:test_button label="test button" />

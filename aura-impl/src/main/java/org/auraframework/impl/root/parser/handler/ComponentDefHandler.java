@@ -17,6 +17,7 @@ package org.auraframework.impl.root.parser.handler;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -24,6 +25,7 @@ import javax.xml.stream.XMLStreamReader;
 import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefinitionAccess.BasicAccessType;
 import org.auraframework.impl.root.component.BaseComponentDefImpl.Builder;
 import org.auraframework.impl.root.component.ComponentDefImpl;
 import org.auraframework.instance.Component;
@@ -33,6 +35,7 @@ import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraError;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 
 /**
@@ -80,4 +83,14 @@ public class ComponentDefHandler extends BaseComponentDefHandler<ComponentDef> {
             throw new AuraError(x);
         }
     }
+    
+    @Override
+	public Set<BasicAccessType> getAllowedAccessValues() {
+		return ALLOWED_ACCESS_VALUES;
+	}
+
+    private final static Set<BasicAccessType> ALLOWED_ACCESS_VALUES = new ImmutableSet.Builder<BasicAccessType>()
+            .add(BasicAccessType.GLOBAL, BasicAccessType.PUBLIC, BasicAccessType.PREVIEW, 
+            		BasicAccessType.INTERNAL).build();
+
 }

@@ -15,89 +15,21 @@
  */
 package configuration;
 
-import org.auraframework.adapter.ConfigAdapter;
-import org.auraframework.adapter.ContextAdapter;
-import org.auraframework.adapter.ExceptionAdapter;
-import org.auraframework.adapter.FormatAdapter;
-import org.auraframework.adapter.GlobalValueProviderAdapter;
-import org.auraframework.adapter.JsonSerializerAdapter;
-import org.auraframework.adapter.LocalizationAdapter;
-import org.auraframework.adapter.LoggingAdapter;
-import org.auraframework.adapter.PrefixDefaultsAdapter;
-import org.auraframework.adapter.RegistryAdapter;
-import org.auraframework.adapter.StyleAdapter;
+import org.auraframework.adapter.*;
 import org.auraframework.clientlibrary.ClientLibraryService;
-import org.auraframework.impl.BuilderServiceImpl;
-import org.auraframework.impl.ClientServiceImpl;
-import org.auraframework.impl.ContextAdapterImpl;
-import org.auraframework.impl.DefinitionServiceImpl;
-import org.auraframework.impl.ExceptionAdapterImpl;
-import org.auraframework.impl.InstanceServiceImpl;
-import org.auraframework.impl.IntegrationServiceImpl;
-import org.auraframework.impl.LocalizationServiceImpl;
-import org.auraframework.impl.LoggingAdapterImpl;
-import org.auraframework.impl.LoggingServiceImpl;
-import org.auraframework.impl.RenderingServiceImpl;
-import org.auraframework.impl.SerializationServiceImpl;
-import org.auraframework.impl.ServerServiceImpl;
-import org.auraframework.impl.adapter.ConfigAdapterImpl;
-import org.auraframework.impl.adapter.GlobalValueProviderAdapterImpl;
-import org.auraframework.impl.adapter.JsonSerializerAdapterImpl;
-import org.auraframework.impl.adapter.StyleAdapterImpl;
-import org.auraframework.impl.adapter.format.css.ClientLibraryCSSFormatAdapter;
-import org.auraframework.impl.adapter.format.css.StyleDefCSSFormatAdapter;
-import org.auraframework.impl.adapter.format.css.ThrowableCSSFormatAdapter;
-import org.auraframework.impl.adapter.format.html.ApplicationDefHTMLFormatAdapter;
-import org.auraframework.impl.adapter.format.html.ApplicationHTMLFormatAdapter;
-import org.auraframework.impl.adapter.format.html.AuraContextHTMLFormatAdapter;
-import org.auraframework.impl.adapter.format.html.AuraQuickFixExceptionHTMLFormatAdapter;
-import org.auraframework.impl.adapter.format.html.ComponentDefHTMLFormatAdapter;
-import org.auraframework.impl.adapter.format.html.ComponentHTMLFormatAdapter;
-import org.auraframework.impl.adapter.format.html.TestSuiteDefHTMLFormatAdapter;
-import org.auraframework.impl.adapter.format.html.ThrowableHTMLFormatAdapter;
+import org.auraframework.impl.*;
+import org.auraframework.impl.adapter.*;
+import org.auraframework.impl.adapter.format.css.*;
+import org.auraframework.impl.adapter.format.html.*;
 import org.auraframework.impl.adapter.format.html.embedded.ApplicationDefEmbeddedHTMLFormatAdapter;
 import org.auraframework.impl.adapter.format.html.offline.ApplicationDefOfflineHTMLFormatAdapter;
-import org.auraframework.impl.adapter.format.js.ClientLibraryJSFormatAdapter;
-import org.auraframework.impl.adapter.format.js.ComponentDefJSFormatAdapter;
-import org.auraframework.impl.adapter.format.js.ThrowableJSFormatAdapter;
-import org.auraframework.impl.adapter.format.json.ActionJSONFormatAdapter;
-import org.auraframework.impl.adapter.format.json.AuraContextJSONFormatAdapter;
-import org.auraframework.impl.adapter.format.json.ClientSideEventExceptionJSONFormatAdapter;
-import org.auraframework.impl.adapter.format.json.ComponentDefJSONFormatAdapter;
-import org.auraframework.impl.adapter.format.json.ComponentDefRefJSONFormatAdapter;
-import org.auraframework.impl.adapter.format.json.ComponentJSONFormatAdapter;
-import org.auraframework.impl.adapter.format.json.ControllerDefJSONFormatAdapter;
-import org.auraframework.impl.adapter.format.json.EventDefJSONFormatAdapter;
-import org.auraframework.impl.adapter.format.json.MessageJSONFormatAdapter;
-import org.auraframework.impl.adapter.format.json.TestSuiteDefJSONFormatAdapter;
-import org.auraframework.impl.adapter.format.json.ThrowableJSONFormatAdapter;
+import org.auraframework.impl.adapter.format.js.*;
+import org.auraframework.impl.adapter.format.json.*;
 import org.auraframework.impl.clientlibrary.ClientLibraryServiceImpl;
-import org.auraframework.impl.context.AuraContextServiceImpl;
-import org.auraframework.impl.context.AuraPrefixDefaultsProviderImpl;
-import org.auraframework.impl.context.AuraRegistryProviderImpl;
-import org.auraframework.impl.context.LocalizationAdapterImpl;
+import org.auraframework.impl.context.*;
 import org.auraframework.impl.java.type.LocalizedConverter;
-import org.auraframework.impl.java.type.converter.LocalizedBigDecimalToStringConverter;
-import org.auraframework.impl.java.type.converter.LocalizedDateOnlyToStringConverter;
-import org.auraframework.impl.java.type.converter.LocalizedDateToStringConverter;
-import org.auraframework.impl.java.type.converter.LocalizedIntegerToStringConverter;
-import org.auraframework.impl.java.type.converter.LocalizedStringToBigDecimalConverter;
-import org.auraframework.impl.java.type.converter.LocalizedStringToDateConverter;
-import org.auraframework.impl.java.type.converter.LocalizedStringToDateOnlyConverter;
-import org.auraframework.impl.java.type.converter.LocalizedStringToDoubleConverter;
-import org.auraframework.impl.java.type.converter.LocalizedStringToIntegerConverter;
-import org.auraframework.impl.java.type.converter.LocalizedStringToLongConverter;
-import org.auraframework.service.BuilderService;
-import org.auraframework.service.ClientService;
-import org.auraframework.service.ContextService;
-import org.auraframework.service.DefinitionService;
-import org.auraframework.service.InstanceService;
-import org.auraframework.service.IntegrationService;
-import org.auraframework.service.LocalizationService;
-import org.auraframework.service.LoggingService;
-import org.auraframework.service.RenderingService;
-import org.auraframework.service.SerializationService;
-import org.auraframework.service.ServerService;
+import org.auraframework.impl.java.type.converter.*;
+import org.auraframework.service.*;
 import org.auraframework.util.ServiceLoaderImpl.AuraConfiguration;
 import org.auraframework.util.ServiceLoaderImpl.Impl;
 import org.auraframework.util.ServiceLoaderImpl.PrimaryImpl;
@@ -252,6 +184,11 @@ public class AuraImplConfig {
         return new LoggingAdapterImpl();
     }
 
+    @Impl
+    public static DefinitionParserAdapter auraImplDefinitionParserAdapter() {
+        return new DefinitionParserAdapterImpl();
+    }
+    
     @Impl
     public static LoggingService auraImplLoggingService() {
         return new LoggingServiceImpl();

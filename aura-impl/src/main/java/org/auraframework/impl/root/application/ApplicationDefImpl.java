@@ -16,20 +16,11 @@
 package org.auraframework.impl.root.application;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import org.auraframework.Aura;
 import org.auraframework.builder.ApplicationDefBuilder;
-import org.auraframework.def.ActionDef;
-import org.auraframework.def.ApplicationDef;
-import org.auraframework.def.ControllerDef;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.EventDef;
-import org.auraframework.def.LayoutsDef;
-import org.auraframework.def.SecurityProviderDef;
-import org.auraframework.def.ThemeDef;
+import org.auraframework.def.*;
 import org.auraframework.expression.Expression;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.AuraImpl;
@@ -39,7 +30,6 @@ import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.impl.util.TextTokenizer;
 import org.auraframework.instance.Action;
 import org.auraframework.system.AuraContext;
-import org.auraframework.system.AuraContext.Access;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -63,13 +53,6 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
         this.locationChangeEventDescriptor = builder.locationChangeEventDescriptor;
 
         this.layoutsDefDescriptor = builder.layoutsDefDescriptor;
-        String accessName = builder.access;
-        if (accessName == null) {
-            this.access = Access.AUTHENTICATED;
-        } else {
-            this.access = Access.valueOf(accessName.toUpperCase());
-        }
-
         this.securityProviderDescriptor = builder.securityProviderDescriptor;
         this.isAppcacheEnabled = builder.isAppcacheEnabled;
         this.additionalAppCacheURLs = builder.additionalAppCacheURLs;
@@ -83,7 +66,6 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
 
         public DefDescriptor<EventDef> locationChangeEventDescriptor;
         public DefDescriptor<LayoutsDef> layoutsDefDescriptor;
-        public String access;
         public Boolean isAppcacheEnabled;
         public Boolean isOnePageApp;
         public DefDescriptor<SecurityProviderDef> securityProviderDescriptor;
@@ -98,12 +80,6 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
         public ApplicationDefImpl build() {
             finish();
             return new ApplicationDefImpl(this);
-        }
-
-        @Override
-        public Builder setAccess(String access) {
-            this.access = access;
-            return this;
         }
 
         @Override
@@ -197,11 +173,6 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
         if (locationChangeEventDescriptor != null) {
         	dependencies.add(locationChangeEventDescriptor);
         }
-    }
-
-    @Override
-    public Access getAccess() {
-        return access;
     }
 
     @Override
@@ -329,7 +300,6 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
 
     private final DefDescriptor<EventDef> locationChangeEventDescriptor;
     private final DefDescriptor<LayoutsDef> layoutsDefDescriptor;
-    private final Access access;
     private final DefDescriptor<SecurityProviderDef> securityProviderDescriptor;
     private final DefDescriptor<ThemeDef> overrideThemeDescriptor;
     private final int hashCode;

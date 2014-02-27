@@ -25,11 +25,13 @@ import org.auraframework.def.AttributeDef;
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.def.TypeDef;
+import org.auraframework.def.DefinitionAccess.BasicAccessType;
 import org.auraframework.impl.root.AttributeDefImpl;
 import org.auraframework.impl.root.AttributeDefRefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.util.TextTokenizer;
 import org.auraframework.system.Source;
+import org.auraframework.throwable.quickfix.InvalidAccessValueException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
@@ -55,7 +57,7 @@ public class AttributeDefHandler<P extends RootDefinition> extends ParentedTagHa
     private static final String ATTRIBUTE_VISIBILITY = "visibility";
 
     private final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_DEFAULT, ATTRIBUTE_REQUIRED,
-            ATTRIBUTE_TYPE, ATTRIBUTE_NAME, ATTRIBUTE_DESCRIPTION, ATTRIBUTE_SERIALIZE_TO, ATTRIBUTE_VISIBILITY);
+            ATTRIBUTE_TYPE, ATTRIBUTE_NAME, ATTRIBUTE_DESCRIPTION, ATTRIBUTE_SERIALIZE_TO, ATTRIBUTE_VISIBILITY, ATTRIBUTE_ACCESS);
 
     private final AttributeDefImpl.Builder builder = new AttributeDefImpl.Builder();
     private final List<ComponentDefRef> body = Lists.newArrayList();
@@ -126,7 +128,12 @@ public class AttributeDefHandler<P extends RootDefinition> extends ParentedTagHa
         else {
             builder.setVisibility(AttributeDef.Visibility.PUBLIC);
         }
-
+        
+        try {
+			builder.setAccess(readAccessAttribute());
+		} catch (InvalidAccessValueException e) {
+			builder.setParseError(e);
+		}
     }
 
     @Override
@@ -172,4 +179,15 @@ public class AttributeDefHandler<P extends RootDefinition> extends ParentedTagHa
     @Override
     public void writeElement(AttributeDefImpl def, Appendable out) {
     }
+    
+    @Override
+	public Set<BasicAccessType> getAllowedAccessValues() {
+		return ALLOWED_ACCESS_VALUES;
+	}
+
+    private final static Set<BasicAccessType> ALLOWED_ACCESS_VALUES = new ImmutableSet.Builder<BasicAccessType>()
+            .add(BasicAccessType.GLOBAL, BasicAccessType.PUBLIC, BasicAccessType.PRIVATE, BasicAccessType.PREVIEW, 
+            		BasicAccessType.INTERNAL).build();
+
+
 }

@@ -21,10 +21,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.builder.RootDefinitionBuilder;
-import org.auraframework.def.AttributeDef;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.EventDef;
-import org.auraframework.def.EventType;
+import org.auraframework.def.*;
+import org.auraframework.def.DefinitionAccess.BasicAccessType;
 import org.auraframework.impl.root.AttributeDefImpl;
 import org.auraframework.impl.root.event.EventDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
@@ -42,7 +40,7 @@ public class EventDefHandler extends RootTagHandler<EventDef> {
     private static final String ATTRIBUTE_EXTENDS = "extends";
 
     protected final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_TYPE, ATTRIBUTE_EXTENDS,
-            RootTagHandler.ATTRIBUTE_DESCRIPTION, RootTagHandler.ATTRIBUTE_SUPPORT);
+            RootTagHandler.ATTRIBUTE_DESCRIPTION, RootTagHandler.ATTRIBUTE_SUPPORT, ATTRIBUTE_ACCESS);
 
     private final EventDefImpl.Builder builder = new EventDefImpl.Builder();
 
@@ -119,4 +117,14 @@ public class EventDefHandler extends RootTagHandler<EventDef> {
     protected RootDefinitionBuilder<EventDef> getBuilder() {
         return builder;
     }
+    
+    @Override
+    public Set<BasicAccessType> getAllowedAccessValues() {
+        return ALLOWED_ACCESS_VALUES;
+    }
+
+    private final static Set<BasicAccessType> ALLOWED_ACCESS_VALUES = new ImmutableSet.Builder<BasicAccessType>()
+            .add(BasicAccessType.GLOBAL, BasicAccessType.PUBLIC, BasicAccessType.PRIVATE, BasicAccessType.PREVIEW, 
+                    BasicAccessType.INTERNAL).build();
+
 }

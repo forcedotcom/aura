@@ -1,4 +1,4 @@
-markup://test:layoutNoLayout : G6Ct4YAQ5ETghGSPskB13w
+markup://test:layoutNoLayout : ybbWMqrhWLSCfVAFjNvXhA
 aura://Boolean : null
 aura://Integer : null
 aura://String : null
@@ -13,8 +13,6 @@ js://aura.expression : X5wsTN-zDgpDI_fTWCvuCA
 markup://aura:template : HBe0AnVX58DqRh7SP8SdOw
 aura://Map : null
 aura://Object : null
-java://org.auraframework.renderer.ComponentRenderer : null
-js://aura.component : sD0OgDfvvTtEajvmA37WZA
 markup://aura:componentEvent : At5WgyY1xuD6z3qK4DTJyQ
 markup://aura:expression : zKKC9CKkhSkXMi3keknAEA
 java://org.auraframework.renderer.HtmlRenderer : null
@@ -22,7 +20,6 @@ js://aura.html : yyK0J9BTVHw9HWSqUQVU0A
 js://aura.html : J53uV08Xlb92xmNmhN5k0A
 markup://aura : no-hash-value
 markup://aura:applicationEvent : HYCP0N2oaq145Ay1kQCqJA
-markup://aura:styleDef : 8nnVe2M9Oh-f4pskDVF7fQ
 markup://auradev:blankTemplate : -aKnrIJarVeokmKyxgpXaA
 markup://ui:baseDOMEvent : 3Ed5j-HTYzJmWI45X-RPRQ
 css://aura.placeholder : kvkyys3VNLeU066RaKQMbA
@@ -35,6 +32,8 @@ markup://ui:baseMouseEvent : eOZn6cKMXgseiSjw3aywyA
 aura://ComponentController : null
 aura://LabelController : null
 aura://TimeZoneInfoController : null
+java://org.auraframework.renderer.ComponentRenderer : null
+js://aura.component : sD0OgDfvvTtEajvmA37WZA
 markup://aura:asyncRerender : o56iEru1zKIPgY-fBf9X4w
 markup://aura:beforeLayoutChange : ggh8Ef3dfqrjDZjjU26IXQ
 markup://aura:clientOutOfSync : nTMq-fU5TtqfHqbZU_XhZQ
@@ -442,6 +441,7 @@ markup://aura:debug : KIG8_0c35sjG9-dNCrabRg
 markup://aura:embeddedTemplate : 7-fzI_5erPzKueCQE-HDdQ
 markup://aura:integrationServiceTemplate : -0iE2FDPu23AE5OcQKHIAA
 markup://aura:label : HymR8bfsBQEMaNtQUFf3_g
+markup://aura:styleDef : 8nnVe2M9Oh-f4pskDVF7fQ
 markup://aura:themedDeclaration : hXpoMcfbMiI8CCPbgKEsJw
 markup://ui:abstractDataGrid : yvCrO4uqXQFUoIucimXUkg
 markup://ui:actionCheckbox : Y7hcDvpQnhoBhojtkvTh_w

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-{
+({
 	updateSize: function(cmp, width, height) {
 		var w=width || cmp.get('v.priv_width'),
 			h=height || cmp.get('v.priv_height'),
@@ -43,14 +43,9 @@
 	selectPage: function(cmp, evt) {		
 		var selectedPage = evt.getParam('pageIndex'),
 			curPage = cmp.get('v.pageIndex'),
-			selectedItemCss = 'carousel-page-selected',
-			hiddenCssClass = 'hidden';
+			selectedItemCss = 'carousel-page-selected';			
 				    
-		if (selectedPage == curPage) {
-			var isCacheable = cmp.get('v.isCacheable');
-				parent = cmp.get('v.parent'),
-				pageModel = cmp.get('v.pageModel');
-				
+		if (selectedPage === curPage) {				
 			cmp.getValue('v.isSelected').setValue(true);
 			$A.util.addClass(cmp.getElement(), selectedItemCss);
 			this.showPage(cmp, selectedPage);
@@ -124,4 +119,4 @@
 			cmp.getElement().setAttribute('aria-expanded', 'false');
 		}
 	}
-}
+})

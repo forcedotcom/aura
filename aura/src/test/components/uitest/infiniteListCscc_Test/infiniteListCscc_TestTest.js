@@ -27,10 +27,11 @@
 		}, function(cmp) {
 			// more items should be fetched and displayed.
 			var btn = cmp.find("btnShowMore");
-			btn.get("e.press").fire();
-			$A.test.addWaitFor(50, function(){
-				return cmp.find("list").get("v.items").length;
-			});
+			btn.get("e.press").fire();			
+			$A.test.assertEquals(false, cmp.get("v.isDoneRendering"), "isDoneRendering should be false.");
+			$A.test.addWaitFor(50, function(){return cmp.find("list").get("v.items").length;}, function(){
+				$A.test.assertEquals(true, cmp.get("v.isDoneRendering"), "isDoneRendering should be true.");
+			});						
 		}]
 	}
 })

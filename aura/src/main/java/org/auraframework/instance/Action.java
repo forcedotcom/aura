@@ -35,14 +35,29 @@ public interface Action extends Instance<ActionDef> {
         ABORTED, ERROR, NEW, RUNNING, SUCCESS
     }
 
+    /**
+     * Get the ID for the action.
+     */
     public String getId();
 
+    /**
+     * Set the ID for the action.
+     */
     public void setId(String id);
 
+    /**
+     * run the action.
+     */
     public void run() throws AuraExecutionException;
 
+    /**
+     * Add actions to run after this one.
+     */
     public void add(List<Action> actions);
 
+    /**
+     * get the current list of actions run after this one.
+     */
     public List<Action> getActions();
 
     public Object getReturnValue();

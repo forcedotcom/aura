@@ -1,4 +1,4 @@
-markup://test:layoutNoLayout : ybbWMqrhWLSCfVAFjNvXhA
+markup://test:layoutNoLayout : JaeJtcNBjwGM-7qYzb0sXg
 aura://Boolean : null
 aura://Integer : null
 aura://String : null
@@ -218,7 +218,7 @@ css://ui.menuItemSeparator : zwrKpz3xExTsXtmluSXsPQ
 css://ui.menuList : iv0dKd1keFQMji4SwMGSnA
 css://ui.message : urKMN3JCMY7X-YClk45T5g
 css://ui.radioMenuItem : p1yTMFuGc_lcx8hLXu3Y3w
-css://ui.scroller : Ua5qks-WV5TVJayyR4EZ-Q
+css://ui.scrollerDeprecated : LFx-zGet6mIuzXmLTtwPAg
 css://ui.treeNode : 6bA_7emJ8_b4wsd62JCegg
 java://org.auraframework.component.ui.DatePickerModel : null
 java://org.auraframework.component.ui.ListProvider : null
@@ -265,9 +265,9 @@ js://ui.pager : fnBoV0FGhVzllLkoaDK_Vw
 js://ui.radioMenuItem : uSjhAWq2XTks86lDJ4sV-w
 js://ui.radioMenuItem : z4wbJ5TbZ8522YXYxLzpng
 js://ui.radioMenuItem : KAI2PUnLmbBhHjNQfp5ijg
-js://ui.scroller : Hyw78Ue-DL8F9KIWL2P8pw
-js://ui.scroller : 1KdMPgjGJSZVZunkq0JPdg
-js://ui.scroller : 2WyP3FVze77cR73zhADKSg
+js://ui.scrollerDeprecated : Hyw78Ue-DL8F9KIWL2P8pw
+js://ui.scrollerDeprecated : 1KdMPgjGJSZVZunkq0JPdg
+js://ui.scrollerDeprecated : 2WyP3FVze77cR73zhADKSg
 js://ui.treeNode : Y_ztNj1jYthBZLeqespcXw
 js://ui.treeNode : xbAGv8EbmDFykilhAvqLQQ
 js://ui.treeNode : 8quzBL5-j5GcYct2f-x0-Q
@@ -310,7 +310,9 @@ markup://ui:visitable : TwXu1l5a_IY3W8-On8gW3g
 css://ui.autocompleteOption : vOyxDy-g5UGjPuI-l1SL-g
 css://ui.calendar : XGyM4IBIVwNXmU9OXS3grg
 css://ui.carousel : _edDMcdy9KyqSo1yvzPZfg
+css://ui.carouselDeprecated : _edDMcdy9KyqSo1yvzPZfg
 css://ui.carouselPage : UkM57T1wxoC5knVlPdp0UA
+css://ui.carouselPageDeprecated : UkM57T1wxoC5knVlPdp0UA
 css://ui.checkboxMenuItem : p1yTMFuGc_lcx8hLXu3Y3w
 css://ui.dataGrid : hlhPsE4wmc9eFhsMxkFuRA
 css://ui.dataTable : pi1TjG_PEnqrbt1F3q54XQ
@@ -349,6 +351,7 @@ css://ui.outputTextArea : xg2HyViI9BnHJG3lSyY26A
 css://ui.outputURL : BC2xfUDd3oewwFGDR_xPuw
 css://ui.pagerJumpToPage : vUxfKNtEVvjVa00TdkeTKQ
 css://ui.pagerNextPrevious : yNkwunpCvCOzDCAkxzjanw
+css://ui.scroller : Ua5qks-WV5TVJayyR4EZ-Q
 css://ui.spinner : Q-S1D9R2G0FQDhzshUDznQ
 css://ui.stamp : sCDhSzoLTIYJczEb6pJPyw
 css://ui.toolbar : NAhrU2pwOrN0DzDFDV1lzw
@@ -368,9 +371,15 @@ js://ui.autocompleteOption : Pdhz_4Z6A5-0Fh5O-q--lw
 js://ui.carousel : IzO5X38BocviL87cAwPdcQ
 js://ui.carousel : AZbpMJ9YyoAXGp0blFlqYQ
 js://ui.carousel : QAXqt04Ks3gWdzTp0lTINw
+js://ui.carouselDeprecated : 2glS1nTg07Jahvbb3cHvBQ
+js://ui.carouselDeprecated : AZbpMJ9YyoAXGp0blFlqYQ
+js://ui.carouselDeprecated : QAXqt04Ks3gWdzTp0lTINw
 js://ui.carouselPage : 3nlk4Uf0dfsb0shRDK_Sxg
 js://ui.carouselPage : x7ZQ96mK_aiPy7LGPUMfBg
 js://ui.carouselPage : T4dVwQ5caAbVyafxUQysJw
+js://ui.carouselPageDeprecated : Rk9Wug0_-CHwos62AFj9jQ
+js://ui.carouselPageDeprecated : x7ZQ96mK_aiPy7LGPUMfBg
+js://ui.carouselPageDeprecated : T4dVwQ5caAbVyafxUQysJw
 js://ui.checkboxMenuItem : ftdc1cdAylxdSkCwuod7zg
 js://ui.checkboxMenuItem : SkSrfLDc4fmEUwpCBkvXXQ
 js://ui.checkboxMenuItem : KAI2PUnLmbBhHjNQfp5ijg
@@ -434,6 +443,9 @@ js://ui.outputURL : Y_yTuvtkPoYKaEpC61UOIA
 js://ui.pagerJumpToPage : I_PGJQ736O2CBf0GigkTag
 js://ui.pagerNextPrevious : tmgQlJWtJ4sd9UkXu9VXow
 js://ui.pagerPageSize : 76rgoKfcyb-glpg6_C3mjQ
+js://ui.scroller : Hyw78Ue-DL8F9KIWL2P8pw
+js://ui.scroller : 1KdMPgjGJSZVZunkq0JPdg
+js://ui.scroller : 2WyP3FVze77cR73zhADKSg
 js://ui.spinner : cpLRJAXdf2YYm_3qQE8f_g
 js://ui.tree : n-GC7d3wl9UUr-CabMQdaQ
 markup://aura:application : 9sbuNlFpiVJtYfQAUrmkbA
@@ -482,7 +494,7 @@ markup://ui:radioMenuItem : m4Ytm4b-5R-Z2mb0aUG-5w
 markup://ui:response : oUAu03ZkQQ5YGa02w4qTmg
 markup://ui:rowPress : wEHz9J43P4YOeRsFqXtylw
 markup://ui:scrollEnd : -Hvf0EgKmKBatXiVO7LMtA
-markup://ui:scroller : qY8DC5lbQb66J3GTtJmUvw
+markup://ui:scrollerDeprecated : qY8DC5lbQb66J3GTtJmUvw
 markup://ui:scrollerEmbeddable : AY31prznArDiGDJ_842B_w
 markup://ui:searchEvent : bauqziCLlI1jQvt0WavlaQ
 markup://ui:searchInterface : RS6wI8WqdbQzbBtHyWZNeA
@@ -499,8 +511,10 @@ markup://ui:actionMenuItem : Rjbb30UMEET8J-ARZ_mTvg
 markup://ui:autocomplete : 45DfDsdJIoLsyojhcZ8vfQ
 markup://ui:autocompleteOption : 8XfwG2sK3wM1Dckg_7b6ww
 markup://ui:calendar : OrCzZki-o_0dzXtlLnGRjg
-markup://ui:carousel : 2CxHtuQFlVo9TPWMaBizeQ
+markup://ui:carousel : FalO98aXuQxiBZxz6AP0cA
+markup://ui:carouselDeprecated : FalO98aXuQxiBZxz6AP0cA
 markup://ui:carouselPage : f63wxOkQMFBTXRPLkp5hsw
+markup://ui:carouselPageDeprecated : f63wxOkQMFBTXRPLkp5hsw
 markup://ui:checkboxMenuItem : bb6OH9DdLFaq4s8lFmxG6w
 markup://ui:column : jUsu2urrlldR2BsodGKkow
 markup://ui:dataGrid : FoVQ3YCprfVVK88frpGYKw
@@ -562,6 +576,7 @@ markup://ui:pagerJumpToPage : KQOvcE4V3j3HphUjLYbGIA
 markup://ui:pagerNextPrevious : h-QY9IFlll4jjRlarEkjdA
 markup://ui:pagerPageInfo : vTDK6DJofFSpgrfPRbKBWA
 markup://ui:pagerPageSize : mQl6ai3AEBvexiEvUdLXdw
+markup://ui:scroller : qY8DC5lbQb66J3GTtJmUvw
 markup://ui:spinner : _7_YGQcXj9BiHzj4fmq2NA
 markup://ui:stamp : iLhu81yiw48v_APjZ3ZJWg
 markup://ui:toolbar : LSWbyoCzcSkUqsrk_sj3eg

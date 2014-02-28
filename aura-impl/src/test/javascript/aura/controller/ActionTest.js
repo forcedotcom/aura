@@ -392,7 +392,6 @@ Test.Aura.Controller.ActionTest = function() {
 			Assert.Equal({
 				"SUCCESS" : expected,
 				"ERROR" : expected,
-				"ABORTED" : expected,
 				"INCOMPLETE" : expected
 			}, target.callbacks);
 		}
@@ -417,7 +416,6 @@ Test.Aura.Controller.ActionTest = function() {
 			Assert.Equal({
 				"SUCCESS" : expected,
 				"ERROR" : expected,
-				"ABORTED" : expected,
 				"INCOMPLETE" : expected
 			}, target.callbacks);
 		}

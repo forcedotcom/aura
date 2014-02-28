@@ -72,7 +72,7 @@
                         <phase>generate-resources</phase>
                         <configuration>
                             <target>
-                                <java classname="org.auraframework.tools.javascript.GenerateJavascript" classpathref="maven.runtime.classpath" fork="true" failonerror="true">
+                                <java classname="org.auraframework.tools.javascript.GenerateJavascript" classpathref="maven.runtime.classpath" fork="true" maxmemory="512m" failonerror="true">
                                     <jvmarg value="-Daura.home=${basedir}/.." />
                                 </java>
                             </target>

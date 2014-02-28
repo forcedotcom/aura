@@ -21,6 +21,7 @@ import java.net.URISyntaxException;
 import org.auraframework.test.WebDriverTestCase;
 import org.auraframework.test.WebDriverTestCase.TargetBrowsers;
 import org.auraframework.test.WebDriverUtil.BrowserType;
+import org.auraframework.test.annotation.UnAdaptableTest;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
@@ -29,6 +30,10 @@ import org.openqa.selenium.WebElement;
 /**
  * UI automation for ui:ListSorter.
  */
+/* UnAdaptable because issue with sfdc environments with sendkeys in iframes
+ * see W-1985839 and W-2009411
+ */
+@UnAdaptableTest
 @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.FIREFOX, BrowserType.IE7, BrowserType.SAFARI5,
         BrowserType.SAFARI })
 public class ListSorterUITest extends WebDriverTestCase {

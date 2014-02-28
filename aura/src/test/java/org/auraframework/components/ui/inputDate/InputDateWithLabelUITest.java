@@ -22,6 +22,7 @@ import java.util.GregorianCalendar;
 
 import org.auraframework.test.WebDriverTestCase;
 import org.auraframework.test.WebDriverUtil.BrowserType;
+import org.auraframework.test.annotation.UnAdaptableTest;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
@@ -309,7 +310,11 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
         element = findDomElement(By.cssSelector(OUTPUT_ST));
         assertEquals("Value Change event should not be fired", "Value Change Event Fired", element.getText());
     }
-
+    
+    /* UnAdaptable because issue with sfdc environments with sendkeys in iframes
+     * see W-1985839 and W-2009411
+     */
+    @UnAdaptableTest
     // Checking functionality of the shift tab button
     @ExcludeBrowsers({ BrowserType.IE9, BrowserType.IE10, BrowserType.SAFARI5, BrowserType.SAFARI,
             BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })

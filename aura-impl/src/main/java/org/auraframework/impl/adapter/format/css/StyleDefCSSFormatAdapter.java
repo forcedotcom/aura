@@ -36,26 +36,12 @@ public class StyleDefCSSFormatAdapter extends CSSFormatAdapter<StyleDef> {
     }
 
     @Override
-    public void writeCollection(Collection<? extends StyleDef> values, Appendable out) throws IOException,
-    QuickFixException {
-        Mode mode = Aura.getContextService().getCurrentContext().getMode();
-        boolean compress = !mode.prettyPrint();
-        StringBuilder sb = new StringBuilder();
-        Appendable accum;
-
-        if (compress) {
-            sb = new StringBuilder();
-            accum = sb;
-        } else {
-            accum = out;
-        }
+    public void writeCollection(Collection<? extends StyleDef> values, Appendable out)
+            throws IOException, QuickFixException {
         for (StyleDef def : values) {
             if (def != null) {
-                accum.append(def.getCode());
+                out.append(def.getCode());
             }
-        }
-        if (compress) {
-            out.append(compress(sb.toString()));
         }
     }
 }

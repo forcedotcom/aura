@@ -37,17 +37,7 @@ public class ClientLibraryCSSFormatAdapterTest extends AuraImplTestCase {
     
     public void testValuesAreCombinedAndCompressedInNonDevAndNonTestModes() throws Exception{
         Aura.getContextService().startContext(Mode.PTEST, Format.JSON, Access.AUTHENTICATED);
-        
-        ClientLibraryCSSFormatAdapter cssFormatAdapter = new ClientLibraryCSSFormatAdapter();
-        cssFormatAdapter = spy(cssFormatAdapter);
-        
-        StringBuffer out = new StringBuffer();
-        FakeCombinable c1 = new FakeCombinable("Contents of combinable 1.");
-        FakeCombinable c2 = new FakeCombinable("Contents of combinable 2.");
-        FakeCombinable c3 = new FakeCombinable("Contents of combinable 3.");
-        cssFormatAdapter.writeCollection(Lists.newArrayList(c1, c2, c3), out);
-        
-        verify(cssFormatAdapter).compress("Contents of combinable 1."+"Contents of combinable 2."+"Contents of combinable 3."); 
+        assertValuesAreNotCompressed();
     }
     
     public void testValuesAreNotCompressedInDevOrTestModes() throws Exception{
@@ -69,8 +59,6 @@ public class ClientLibraryCSSFormatAdapterTest extends AuraImplTestCase {
         FakeCombinable c3 = new FakeCombinable("Contents of combinable 3.");
         cssFormatAdapter.writeCollection(Lists.newArrayList(c1, c2, c3), out);
         assertEquals("Contents of combinable 1."+"Contents of combinable 2."+"Contents of combinable 3.", out.toString());
-        
-        verify(cssFormatAdapter, never()).compress("Contents of combinable 1."+"Contents of combinable 2."+"Contents of combinable 3."); 
     }
     
     private class FakeCombinable implements Combinable{

@@ -40,7 +40,7 @@ public class ClientLibraryCSSFormatAdapter extends CSSFormatAdapter<Combinable> 
     }
 
     /**
-     * Loops through combinables and gets their contents. Minifies if not DEV or TEST modes.
+     * Loops through combinables and gets their contents.
      *
      * @param values combinables
      * @param out appendable
@@ -48,28 +48,12 @@ public class ClientLibraryCSSFormatAdapter extends CSSFormatAdapter<Combinable> 
      * @throws QuickFixException
      */
     @Override
-    public void writeCollection(Collection<? extends Combinable> values, Appendable out) throws IOException,
-            QuickFixException {
-        AuraContext.Mode mode = Aura.getContextService().getCurrentContext().getMode();
-        boolean compress = !mode.prettyPrint();
-        StringBuilder sb = new StringBuilder();
-
-        Appendable accum;
-
-        if (compress) {
-            accum = sb;
-        } else {
-            accum = out;
-        }
-
+    public void writeCollection(Collection<? extends Combinable> values, Appendable out)
+            throws IOException, QuickFixException {
         for (Combinable c : values) {
             if (c != null) {
-                accum.append(c.getContents());
+                out.append(c.getContents());
             }
-        }
-
-        if (compress) {
-            out.append(compress(sb.toString()));
         }
     }
 }

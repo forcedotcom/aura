@@ -21,6 +21,6 @@
 	},
 
 	handleRerenderComplete: function(component) {
-		component.getAttributes().setValue("isDoneRendering", false);
+		component.getAttributes().setValue("isDoneRendering", true);
 	}
 })

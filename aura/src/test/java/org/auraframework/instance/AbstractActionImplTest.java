@@ -126,46 +126,6 @@ public class AbstractActionImplTest extends UnitTestCase {
         assertEquals("state should be able to change", Action.State.RUNNING, test.getState());
     }
 
-    private BaseComponent<?, ?> getComponentWithPath(final String path) {
-        BaseComponent<?, ?> comp = Mockito.mock(BaseComponent.class);
-
-        Mockito.when(comp.getPath()).thenReturn(path);
-        return comp;
-    }
-
-    public void testComponents() {
-        ActionDef def = Mockito.mock(ActionDef.class);
-        MyAction test = new MyAction(null, def, null);
-
-        Map<String, BaseComponent<?, ?>> comps = test.getInstanceStack().getComponents();
-        assertNotNull("Components should never be null", comps);
-        assertEquals("Components should empty", 0, comps.size());
-
-        BaseComponent<?, ?> x = getComponentWithPath("a");
-        test.getInstanceStack().registerComponent(x);
-        comps = test.getInstanceStack().getComponents();
-        assertNotNull("Components should never be null", comps);
-        assertEquals("Components should have one component", 1, comps.size());
-        assertEquals("Components should have x", x, comps.get("a"));
-
-        BaseComponent<?, ?> y = getComponentWithPath("b");
-        test.getInstanceStack().registerComponent(y);
-        comps = test.getInstanceStack().getComponents();
-        assertNotNull("Components should never be null", comps);
-        assertEquals("Components should have two components", 2, comps.size());
-        assertEquals("Components should have x", x, comps.get("a"));
-        assertEquals("Components should have y", y, comps.get("b"));
-    }
-
-    public void testNextId() {
-        ActionDef def = Mockito.mock(ActionDef.class);
-        Action test = new MyAction(null, def, null);
-
-        assertEquals("nextId should be initialized to 1", 1, test.getInstanceStack().getNextId());
-        assertEquals("nextId should increment", 2, test.getInstanceStack().getNextId());
-        assertEquals("nextId should increment again", 3, test.getInstanceStack().getNextId());
-    }
-
     public void testStorable() {
         ActionDef def = Mockito.mock(ActionDef.class);
         Action test = new MyAction(null, def, null);
@@ -219,13 +179,14 @@ public class AbstractActionImplTest extends UnitTestCase {
     public void testInstanceStack() {
         ActionDef def = Mockito.mock(ActionDef.class);
         Action test = new MyAction(null, def, null);
-        test.setId("expectedId");
         InstanceStack iStack = test.getInstanceStack();
         assertEquals("Instance stack should be initialized without action ID as path", "/*[0]", iStack.getPath());
+        assertEquals("Subsequent calls to getInstanceStack should return same InstanceStack", iStack,
+                test.getInstanceStack());
     }
 
     /**
-     * This used to throw an exception, no longer.
+     * Verify we can set an Id after we get an InstaceStack. Used to threw Exception, now valid.
      */
     public void testSetIdWithInstanceStackSet() {
         ActionDef def = Mockito.mock(ActionDef.class);

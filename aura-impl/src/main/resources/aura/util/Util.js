@@ -1634,9 +1634,16 @@ $A.ns.Util.prototype.isValue = function(obj) {
     return (!this.isUndefinedOrNull(obj) && !this.isUndefinedOrNull(obj.auraType) && obj.auraType === 'Value');
 };
 
-$A.ns.Util.prototype.supportsTouchEvents = function() {	 
-	// cache the result--it's not going to change
-	return this.supportsTouchEvents.cache || (this.supportsTouchEvents.cache = !$A.util.isUndefined('ontouchstart' in window || navigator.msPointerEnabled) && $A.getContext().getMode() !== 'PTEST' && $A.getContext().getMode() !== 'CADENCE' && $A.getContext().getMode() !== 'SELENIUM' && $A.getContext().getMode() !== 'SELENIUMDEBUG');
+$A.ns.Util.prototype.supportsTouchEvents = function() {
+    if (this.supportsTouchEvents.cache) {
+        return this.supportsTouchEvents.cache;
+    }
+    // cache the result--it's not going to change. 
+    this.supportsTouchEvents.cache = ('ontouchstart' in window || navigator.msMaxTouchPoints > 0
+            || navigator.maxTouchPoints > 0) && $A.getContext().getMode() !== 'PTEST'
+            && $A.getContext().getMode() !== 'CADENCE' && $A.getContext().getMode() !== 'SELENIUM'
+            && $A.getContext().getMode() !== 'SELENIUMDEBUG';
+    return this.supportsTouchEvents.cache;
 };
 
 /**

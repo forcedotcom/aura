@@ -134,18 +134,28 @@ function logError(msg, e){
 
 /**
  * Run the test
+ * 
+ * @param {String} name
+ *          The name of the test in the suite to run
+ * @param {String} code
+ *          The full test suite code
+ * @param {Integer} timeoutOverride
+ *          Optional. Use to increase the test timeout by specified time in seconds. If not set the test will
+ *          use a default timeout of 10 seconds.
+ * 
  * @private
  */
-function run(name, code, count){
+function run(name, code, timeoutOverride){
     // check if test has already started running, since frame loads from layouts may trigger multiple runs
     if(priv.inProgress >= 0){
         return;
     }
     priv.inProgress = 2;
-    priv.timeoutTime = new Date().getTime() + 5000 * count;
-    if(!count){
-        count = 1;
+    if(!timeoutOverride) {
+        timeoutOverride = 10;
     }
+    priv.timeoutTime = new Date().getTime() + 1000 * timeoutOverride;
+
     var cmp = $A.getRoot();
     var suite = aura.util.json.decode(code);
 

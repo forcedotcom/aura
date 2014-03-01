@@ -73,6 +73,11 @@
             <id>maven.auraframework.org-releases-snapshots</id>
             <url>http://maven.auraframework.org/libs-snapshot</url>
         </repository>
+        <repository>
+            <snapshots />
+            <id>maven.auraframework.org-ext-releases</id>
+            <url>http://maven.auraframework.org/ext-release-local</url>
+        </repository>
         
         <repository>
             <snapshots />

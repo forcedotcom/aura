@@ -82,7 +82,7 @@
         <!-- findInstancesOf cannot traverse if or renderIf -->
         <!--aura:if isTrue="{!m.documentation != null &amp;&amp; m.documentation.hasExamples}"--> 
 	        <auradocs:stretchTab title="Examples">
-	            <auradocs:defExamples descriptor="{!v.descriptor}" defType="{!v.defType}"/>
+	            <auradocs:examplesc name="{!v.descriptor}"/>
 	        </auradocs:stretchTab>
 	    <!--/aura:if-->
     </ui:tabSet>

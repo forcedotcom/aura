@@ -15,18 +15,15 @@
     limitations under the License.
 
 -->
-<aura:component extensible="true" model="java://org.auraframework.docs.DefExamplesModel">
-	<aura:attribute name="descriptor" type="String" required="true"/>
-    <aura:attribute name="defType" type="String" default="Component"/>
-    
-    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
-    
-    <aura:iteration items="{!m.metadata}" var="def">
-   		<div>descriptor : {!def.descriptor}</div>
-   		<div>name : {!def.name}</div>
-   		<div>label : {!def.label}</div>
-   		<div>description : {!def.description}</div>
-   		<div>ref : {!def.ref}</div> 
-   		<hr/>
-    </aura:iteration>
+<aura:component model="java://org.auraframework.docs.ExamplesModel">
+<aura:attribute name="name" type="String"/>
+
+	{!m.message}
+	<ul class="unstyledList">
+		<aura:iteration var="example" items="{!m.examples}">
+	  		<li>
+	   			<auradocs:example label="{!example.label}" description="{!example.description}" descriptor="{!example.ref}"/>
+	   		</li>
+	  	</aura:iteration>
+	</ul>
 </aura:component>

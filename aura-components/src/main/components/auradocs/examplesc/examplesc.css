@@ -1,0 +1,8 @@
+.THIS.unstyledList {
+	margin: 0;
+	padding: 0;
+}
+
+.THIS.unstyledList li {
+	list-style-type: none;
+}

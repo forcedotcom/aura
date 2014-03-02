@@ -91,6 +91,7 @@ public class ExampleDefImpl extends DefinitionImpl<ExampleDef> implements Exampl
             return this;
         }
         
+        @Override
         public ExampleDefBuilder setLabel(String label) {
             this.label = label;
             return this;

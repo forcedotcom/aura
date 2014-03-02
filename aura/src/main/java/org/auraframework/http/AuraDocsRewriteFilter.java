@@ -27,7 +27,7 @@ public class AuraDocsRewriteFilter implements Filter {
 
     private ServletContext servletContext;
 
-    private static final String uriPattern = "/aura?aura.tag=auradocs:docs&aura.format=HTML&aura.deftype=APPLICATION&aura.access=AUTHENTICATED&aura.mode=DEV";
+    private static final String uriPattern = "/aura?aura.tag=auradocs:docs&aura.format=HTML&aura.deftype=APPLICATION&aura.access=AUTHENTICATED&aura.mode=PROD";
 
     @Override
     public void destroy() {

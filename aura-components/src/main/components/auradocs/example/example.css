@@ -15,11 +15,10 @@
  */
 .THIS.container {
 	background-color: #f3f3f3;
-    border: 3px solid blue;
-    border-radius: 10px;
-    box-shadow: 10px 10px 5px #888888;
-    margin: 2em;
-    padding: 2em;
+    border: 1px solid blue;
+    border-radius: 5px;
+    margin: 5px;
+    padding: 1em;
 }
 
 .THIS h3 {

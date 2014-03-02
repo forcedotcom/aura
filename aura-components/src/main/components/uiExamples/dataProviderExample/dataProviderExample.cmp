@@ -15,14 +15,6 @@
     limitations under the License.
 
 -->
-<aura:component extends="auradocs:example">
-	<!-- there should be a way to do this automatically, but... -->
-	<aura:set attribute="descriptor" value="uiExamples:dataProviderExample"/>
-	
-	<aura:set attribute="title" value="Using ui:dataProvider"/>
-    <aura:set attribute="description">
-
-    </aura:set>
-    
+<aura:component>
 	<ui:button label="This is distinctly not a list, but you get the idea."></ui:button>
 </aura:component>

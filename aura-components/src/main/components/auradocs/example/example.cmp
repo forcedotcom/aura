@@ -20,12 +20,10 @@
     <aura:attribute name="description" type="Aura.Component[]" required="true"/>
     <aura:attribute name="descriptor" type="String" required="true"/>
     
-    <aura:handler name="init" value="{!this}" action="{!c.init}" />
-    
     <div class="container">
     	<h3>{!v.label}</h3>
     	
-    	<div class="description">{!v.description}</div>
+    	<div class="description"><aura:unescapedHtml value="{!v.description}"/></div>
     
 		<hr/>
 		

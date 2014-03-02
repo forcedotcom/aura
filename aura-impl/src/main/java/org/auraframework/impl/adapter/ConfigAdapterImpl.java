@@ -53,7 +53,9 @@ import org.auraframework.util.resource.FileGroup;
 import org.auraframework.util.resource.ResourceLoader;
 import org.auraframework.util.text.Hash;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 public class ConfigAdapterImpl implements ConfigAdapter {
 
@@ -61,7 +63,14 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     private static final String TIMESTAMP_PROPERTY = "aura.build.timestamp";
     private static final String VERSION_PROPERTY = "aura.build.version";
     private static final String VALIDATE_CSS_CONFIG = "aura.css.validate";
+    
+    private static final Set<String> SYSTEM_NAMESPACES = Sets.newHashSet("aura", "auraadmin", "auradev", "auradocs", 
+    		"aurajstest", "auraStorage", "auratest", "ui", "appCache", "provider", "test");
 
+    private static final Set<String> UNSECURED_PREFIXES = ImmutableSet.of("aura", "layout");
+    private static final Set<String> UNSECURED_NAMESPACES = ImmutableSet.of("aura", "ui", "auradev", "appcache",
+            "org.auraframework");
+    
     protected final Set<Mode> allModes = EnumSet.allOf(Mode.class);
     private final JavascriptGroup jsGroup;
     private final FileGroup resourcesGroup;
@@ -161,6 +170,26 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     public String getCSRFToken() {
         return "aura";
     }
+
+	@Override
+	public boolean isPrivilegedNamespace(String namespace) {
+		return SYSTEM_NAMESPACES.contains(namespace);
+	}
+
+	@Override
+	public String getDefaultNamespace() {
+		return null;
+	}
+	
+	@Override
+	public boolean isUnsecuredPrefix(String prefix) {
+		return UNSECURED_PREFIXES.contains(prefix);
+	}
+
+	@Override
+	public boolean isUnsecuredNamespace(String namespace) {
+		return UNSECURED_NAMESPACES.contains(namespace);
+	}
 
     @Override
     public synchronized void regenerateAuraJS() {

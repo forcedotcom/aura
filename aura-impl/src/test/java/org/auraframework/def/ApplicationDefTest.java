@@ -37,83 +37,6 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
         super(name, ApplicationDef.class, "aura:application");
     }
 
-    public void testGetSecurityProviderDefDescriptorDefault() throws Exception {
-        DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class, String.format(baseTag, "", ""));
-        ApplicationDef appdef = Aura.getDefinitionService().getDefinition(desc);
-        assertEquals("java://org.auraframework.components.DefaultSecurityProvider", appdef
-                .getSecurityProviderDefDescriptor().getQualifiedName());
-    }
-
-    public void testGetSecurityProviderDefDescriptorProvided() throws Exception {
-        DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class, String.format(baseTag,
-                "securityProvider='java://org.auraframework.components.security.SecurityProviderAlwaysAllows'", ""));
-        ApplicationDef appdef = Aura.getDefinitionService().getDefinition(desc);
-        assertEquals("java://org.auraframework.components.security.SecurityProviderAlwaysAllows", appdef
-                .getSecurityProviderDefDescriptor().getQualifiedName());
-    }
-
-    public void testGetSecurityProviderDefDescriptorEmpty() throws Exception {
-        DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class,
-                String.format(baseTag, "securityProvider=''", ""));
-        try {
-            Aura.getDefinitionService().getDefinition(desc);
-            fail("No AuraRuntimeException when securityProvider is empty string");
-        } catch (InvalidDefinitionException e) {
-            assertEquals("QualifiedName is required for descriptors", e.getMessage());
-        }
-    }
-
-    public void testGetSecurityProviderDefDescriptorInherited() throws Exception {
-        DefDescriptor<ApplicationDef> parentDesc = addSourceAutoCleanup(
-                ApplicationDef.class,
-                String.format(
-                        baseTag,
-                        "securityProvider='java://org.auraframework.components.security.SecurityProviderAlwaysAllows' extensible='true'",
-                        ""));
-        DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class,
-                String.format(baseTag, String.format("extends='%s'", parentDesc.getQualifiedName()), ""));
-        ApplicationDef appdef = Aura.getDefinitionService().getDefinition(desc);
-        assertEquals("java://org.auraframework.components.security.SecurityProviderAlwaysAllows", appdef
-                .getSecurityProviderDefDescriptor().getQualifiedName());
-    }
-
-    public void testGetSecurityProviderDefDescriptorGrandInherited() throws Exception {
-        DefDescriptor<ApplicationDef> grandparentDesc = addSourceAutoCleanup(
-                ApplicationDef.class,
-                String.format(
-                        baseTag,
-                        "securityProvider='java://org.auraframework.components.security.SecurityProviderAlwaysAllows' extensible='true'",
-                        ""));
-        DefDescriptor<ApplicationDef> parentDesc = addSourceAutoCleanup(
-                ApplicationDef.class,
-                String.format(baseTag,
-                        String.format("extends='%s' extensible='true'", grandparentDesc.getQualifiedName()), ""));
-        DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class,
-                String.format(baseTag, String.format("extends='%s'", parentDesc.getQualifiedName()), ""));
-        ApplicationDef appdef = Aura.getDefinitionService().getDefinition(desc);
-        assertEquals("java://org.auraframework.components.security.SecurityProviderAlwaysAllows", appdef
-                .getSecurityProviderDefDescriptor().getQualifiedName());
-    }
-
-    public void testGetSecurityProviderDefDescriptorOverride() throws Exception {
-        DefDescriptor<ApplicationDef> parentDesc = addSourceAutoCleanup(
-                ApplicationDef.class,
-                String.format(
-                        baseTag,
-                        "securityProvider='java://org.auraframework.components.security.SecurityProviderAlwaysAllows' extensible='true'",
-                        ""));
-        DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(
-                ApplicationDef.class,
-                String.format(
-                        baseTag,
-                        String.format(
-                                "extends='%s' securityProvider='java://org.auraframework.components.security.SecurityProviderAlwaysDenies'",
-                                parentDesc.getQualifiedName()), ""));
-        ApplicationDef appdef = Aura.getDefinitionService().getDefinition(desc);
-        assertEquals("java://org.auraframework.components.security.SecurityProviderAlwaysDenies", appdef
-                .getSecurityProviderDefDescriptor().getQualifiedName());
-    }
-
     /**
      * App will inherit useAppcache='false' from aura:application if attribute not specified
      */
@@ -174,7 +97,7 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
     @UnAdaptableTest
     @ThreadHostileTest("preloads namespace")
     public void testMultipleAppCache() throws Exception {
-        String appFormat = "<aura:application securityProvider='java://org.auraframework.components.security.SecurityProviderAlwaysAllows' useAppCache='true'>\n    <%s:%s />\n</aura:application>";
+        String appFormat = "<aura:application useAppCache='true'>\n    <%s:%s />\n</aura:application>";
         String componentText = "<aura:component>the body</aura:component>";
         DefDescriptor<ComponentDef> oldCompDesc = addSourceAutoCleanup(ComponentDef.class, componentText, "oldComp");
         StringSource<ComponentDef> oldComp = (StringSource<ComponentDef>) getSource(oldCompDesc);

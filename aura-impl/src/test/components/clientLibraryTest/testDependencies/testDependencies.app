@@ -1,4 +1,4 @@
-<aura:application render="client">
+<aura:application access="public" render="client">
     <aura:clientLibrary name="endofBody" url="http://likeaboss.com/topOfBody.js" type="JS"/>
     <clientLibraryTest:testChild/>
     <clientLibraryTest:testInterface implNumber="1"/>

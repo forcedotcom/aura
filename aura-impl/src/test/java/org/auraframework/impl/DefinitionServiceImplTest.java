@@ -43,7 +43,9 @@ import com.google.common.collect.*;
  * @see org.auraframework.impl.registry.RootDefFactoryTest
  */
 public class DefinitionServiceImplTest extends AuraImplTestCase {
-    public DefinitionServiceImplTest(String name) {
+    private static final String DEFINITION_SERVICE_IMPL_TEST_TARGET_COMPONENT = "definitionServiceImplTest:targetComponent";
+
+	public DefinitionServiceImplTest(String name) {
         super(name, false);
     }
 
@@ -58,7 +60,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
                 ApplicationDef.class,
                 String.format(
                         baseApplicationTag,
-                        "access='UNAUTHENTICATED' securityProvider='java://org.auraframework.java.securityProvider.LaxSecurityProvider'",
+                        "access='UNAUTHENTICATED'",
                         ""));
         Aura.getContextService().startContext(Mode.PROD, Format.HTML, Access.PUBLIC, desc);
         assertEquals(desc, Aura.getDefinitionService().getDefinition(desc).getDescriptor());
@@ -69,7 +71,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
                 ApplicationDef.class,
                 String.format(
                         baseApplicationTag,
-                        "access='UNAUTHENTICATED' securityProvider='java://org.auraframework.java.securityProvider.LaxSecurityProvider'",
+                        "access='UNAUTHENTICATED'",
                         ""));
         Aura.getContextService().startContext(Mode.PROD, Format.HTML, Access.AUTHENTICATED, desc);
         assertEquals(desc, Aura.getDefinitionService().getDefinition(desc).getDescriptor());
@@ -78,7 +80,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
     public void testGetDefinitionOfApplicationWithAuthenicatedAccessInPublicContext() throws QuickFixException {
         DefDescriptor<? extends BaseComponentDef> desc = addSourceAutoCleanup(
                 ApplicationDef.class, String.format(baseApplicationTag,
-                        "securityProvider='java://org.auraframework.java.securityProvider.LaxSecurityProvider'", ""));
+                        "", ""));
         Aura.getContextService().startContext(Mode.PROD, Format.HTML, Access.PUBLIC, desc);
         try {
             Aura.getDefinitionService().getDefinition(desc);
@@ -90,7 +92,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
     public void testGetDefinitionOfApplicationWithAuthenicatedAccessInAuthenticatedContext() throws QuickFixException {
         DefDescriptor<? extends BaseComponentDef> desc = addSourceAutoCleanup(
                 ApplicationDef.class, String.format(baseApplicationTag,
-                        "securityProvider='java://org.auraframework.java.securityProvider.LaxSecurityProvider'", ""));
+                        "", ""));
         Aura.getContextService().startContext(Mode.PROD, Format.HTML, Access.AUTHENTICATED, desc);
         assertEquals(desc, Aura.getDefinitionService().getDefinition(desc).getDescriptor());
     }
@@ -99,10 +101,11 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
      * ContextService.assertAccess is called during getDefinition(DefDescriptor).
      */
     public void testGetDefinition_DefDescriptor_assertAccess() throws QuickFixException {
-        Aura.getContextService().startContext(Mode.PROD, Format.HTML, Access.PUBLIC);
-        DefDescriptor<ComponentDef> desc = addSourceAutoCleanup(ComponentDef.class, "<aura:component></aura:component>");
+        Aura.getContextService().startContext(Mode.PROD, Format.HTML, Access.AUTHENTICATED);
+        DefDescriptor<ComponentDef> desc = Aura.getDefinitionService().getDefDescriptor(DEFINITION_SERVICE_IMPL_TEST_TARGET_COMPONENT, ComponentDef.class);
         try {
-            Aura.getDefinitionService().getDefinition(desc);
+            Definition def = definitionService.getDefinition(desc);
+            definitionService.getDefRegistry().assertAccess((String)null, def);
             fail("Expected NoAccessException from assertAccess");
         } catch (NoAccessException e) {
         }
@@ -112,10 +115,11 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
      * ContextService.assertAccess is called during getDefinition(String, Class).
      */
     public void testGetDefinition_StringClass_assertAccess() throws QuickFixException {
-        Aura.getContextService().startContext(Mode.PROD, Format.HTML, Access.PUBLIC);
-        DefDescriptor<ComponentDef> desc = addSourceAutoCleanup(ComponentDef.class, "<aura:component></aura:component>");
+        Aura.getContextService().startContext(Mode.PROD, Format.HTML, Access.AUTHENTICATED);
+        DefDescriptor<ComponentDef> desc = Aura.getDefinitionService().getDefDescriptor(DEFINITION_SERVICE_IMPL_TEST_TARGET_COMPONENT, ComponentDef.class);
         try {
-            Aura.getDefinitionService().getDefinition(desc.getName(), ComponentDef.class);
+            Definition def = Aura.getDefinitionService().getDefinition(desc.getQualifiedName(), ComponentDef.class);
+            definitionService.getDefRegistry().assertAccess((String)null, def);
             fail("Expected NoAccessException from assertAccess");
         } catch (NoAccessException e) {
         }
@@ -125,25 +129,11 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
      * ContextService.assertAccess is called during getDefinition(String, DefType...).
      */
     public void testGetDefinition_StringDefType_assertAccess() throws QuickFixException {
-        Aura.getContextService().startContext(Mode.PROD, Format.HTML, Access.PUBLIC);
-        DefDescriptor<ComponentDef> desc = addSourceAutoCleanup(ComponentDef.class, "<aura:component></aura:component>");
+        Aura.getContextService().startContext(Mode.PROD, Format.HTML, Access.AUTHENTICATED);
+        DefDescriptor<ComponentDef> desc = Aura.getDefinitionService().getDefDescriptor(DEFINITION_SERVICE_IMPL_TEST_TARGET_COMPONENT, ComponentDef.class);
         try {
-            Aura.getDefinitionService().getDefinition(desc.getName(), DefType.COMPONENT);
-            fail("Expected NoAccessException from assertAccess");
-        } catch (NoAccessException e) {
-        }
-    }
-
-    /**
-     * ContextService.assertAccess is called during save(Definition).
-     */
-    public void testSave_assertAccess() throws Exception {
-        Aura.getContextService().startContext(Mode.DEV, Format.HTML, Access.PUBLIC);
-        ComponentDef def = addSourceAutoCleanup(ComponentDef.class, "<aura:component></aura:component>").getDef();
-        Aura.getContextService().endContext();
-        Aura.getContextService().startContext(Mode.PROD, Format.HTML, Access.PUBLIC);
-        try {
-            Aura.getDefinitionService().save(def);
+            Definition def = Aura.getDefinitionService().getDefinition(desc.getQualifiedName(), DefType.COMPONENT);
+            definitionService.getDefRegistry().assertAccess((String)null, def);
             fail("Expected NoAccessException from assertAccess");
         } catch (NoAccessException e) {
         }

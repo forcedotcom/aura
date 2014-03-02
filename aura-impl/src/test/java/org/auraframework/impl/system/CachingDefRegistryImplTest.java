@@ -50,8 +50,7 @@ public class CachingDefRegistryImplTest extends AuraImplTestCase {
     public void setUp() throws Exception {
         super.setUp();
         // Establish a PROD context
-        Aura.getContextService().startContext(Mode.PROD, null, Format.JSON, Access.AUTHENTICATED, laxSecurityApp);
-
+        Aura.getContextService().startContext(Mode.PROD, null, Format.JSON, Access.PUBLIC, laxSecurityApp);
     }
 
     @Override
@@ -67,9 +66,12 @@ public class CachingDefRegistryImplTest extends AuraImplTestCase {
      * Automation to verify that, in test mode definitions are fetched fresh for each request.
      */
     public void testDefinitionsFetchingInTestMode() throws Exception {
+        Aura.getContextService().endContext();
+        Aura.getContextService().startContext(Mode.PROD, null, Format.JSON, Access.AUTHENTICATED);
+        
         // Obtain the definition of an application without layout and make sure the layoutsDefDescriptor is null
         ApplicationDef appWithNoLayout = addSourceAutoCleanup(ApplicationDef.class,
-                "<aura:application></aura:application>").getDef();
+                "<aura:application access=\"public\"></aura:application>").getDef();
         DefDescriptor<ApplicationDef> appDesc = appWithNoLayout.getDescriptor();
         assertNotNull("Test failed to retrieve definition of an application.", appWithNoLayout);
         assertNull("Application should not have had any layouts associted with it.",
@@ -130,7 +132,7 @@ public class CachingDefRegistryImplTest extends AuraImplTestCase {
         // Have to stop and start context because a given def is cached in MasterDefRegistry per request (context of the
         // request)
         Aura.getContextService().endContext();
-        Aura.getContextService().startContext(Mode.PROD, null, Format.JSON, Access.AUTHENTICATED, laxSecurityApp);
+        Aura.getContextService().startContext(Mode.PROD, null, Format.JSON, Access.AUTHENTICATED);
 
         StringSource<?> source = (StringSource<?>) getSource(dd);
         source.addOrUpdate(String.format(markup, "<aura:attribute type=\"String\" name=\"attr\"/>"));
@@ -166,7 +168,7 @@ public class CachingDefRegistryImplTest extends AuraImplTestCase {
         // Have to stop and start context because a given def is cached in MasterDefRegistry per request (context of the
         // request)
         Aura.getContextService().endContext();
-        Aura.getContextService().startContext(Mode.PROD, null, Format.JSON, Access.AUTHENTICATED, laxSecurityApp);
+        Aura.getContextService().startContext(Mode.PROD, null, Format.JSON, Access.PUBLIC, laxSecurityApp);
         StringSource<?> source = (StringSource<?>) getSource(dd);
         source.addOrUpdate(String.format(markup, "<aura:attribute type=\"String\" name=\"attr\"/>"));
         source.setLastModified(startTimeStamp + 5);

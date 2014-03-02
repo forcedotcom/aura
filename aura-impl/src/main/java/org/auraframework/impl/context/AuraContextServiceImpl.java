@@ -42,7 +42,6 @@ import org.auraframework.system.DefRegistry;
 import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.system.SourceLoader;
 import org.auraframework.throwable.NoContextException;
-import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.ServiceLocator;
 
 /**
@@ -180,12 +179,4 @@ public class AuraContextServiceImpl implements ContextService {
             throw new NoContextException();
         }
     }
-
-    @Override
-    public void assertAccess(DefDescriptor<?> desc) throws QuickFixException {
-        assertEstablished();
-
-        getCurrentContext().getDefRegistry().assertAccess(desc);
-    }
-
 }

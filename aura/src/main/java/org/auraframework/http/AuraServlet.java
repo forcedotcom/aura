@@ -229,6 +229,8 @@ public class AuraServlet extends AuraBaseServlet {
             curContext.setApplicationDescriptor(defDescriptor);
             definitionService.updateLoaded(defDescriptor);
             def = defDescriptor.getDef();
+            
+            assertAccess(def);
 
         } catch (RequestParam.InvalidParamException ipe) {
             handleServletException(new SystemErrorException(ipe), false, context, request, response, false);
@@ -260,7 +262,12 @@ public class AuraServlet extends AuraBaseServlet {
         }
     }
 
-    /**
+    private void assertAccess(BaseComponentDef def) throws QuickFixException {
+        String defaultNamespace = Aura.getConfigAdapter().getDefaultNamespace();
+		Aura.getDefinitionService().getDefRegistry().assertAccess(defaultNamespace, def);
+	}
+
+	/**
      * Allow the servlet to override page access.
      *
      * FIXME: this is totally bogus and should be handled by the security provider - GPO.

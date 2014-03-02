@@ -55,7 +55,7 @@ public abstract class BaseJavaDefFactory<D extends Definition> extends DefFactor
         return null;
     }
 
-    protected Class<?> getClazz(DefDescriptor<D> descriptor) {
+    protected Class<?> getClazz(DefDescriptor<D> descriptor) throws QuickFixException {
         Class<?> clazz;
         try {
             if (descriptor.getNamespace() == null) {
@@ -90,6 +90,7 @@ public abstract class BaseJavaDefFactory<D extends Definition> extends DefFactor
 
     @Override
     public D getDef(DefDescriptor<D> descriptor) throws QuickFixException {
+    	
         DefBuilder<?, ? extends D> builder;
         D def;
 

@@ -61,11 +61,6 @@
             </tr>
 
             <tr>
-                <td><code>securityProvider</code></td>
-                <td>The name of the Java class that controls access to the app. The default value is <code>java://org.auraframework.components.DefaultSecurityProvider</code>. For more information, see <auradocs:topicLink topic="securityProviders">Controlling Access with Security Providers</auradocs:topicLink>.</td>
-            </tr>
-
-            <tr>
                 <td><code>template</code></td>
                 <td>The name of the template used to bootstrap the loading of the Aura framework and the app. The default value is <code>aura:template</code>. You can customize the template by creating your own component that extends the default template. For example:
                 <p><code>&lt;aura:component extends="aura:template" ... &gt;</code></p></td>

@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.auraframework.Aura;
 import org.auraframework.builder.ComponentDefRefBuilder;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.AttributeDef.SerializeToType;
@@ -38,6 +39,8 @@ import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Component;
+import org.auraframework.service.DefinitionService;
+import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.AttributeNotFoundException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
@@ -144,6 +147,7 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
         RootDefinition rootDef = getComponentDef();
         Map<DefDescriptor<AttributeDef>, AttributeDef> atts = rootDef.getAttributeDefs();
         Map<String, RegisterEventDef> registeredEvents = rootDef.getRegisterEventDefs();
+        MasterDefRegistry registry = Aura.getDefinitionService().getDefRegistry();
         for (Entry<DefDescriptor<AttributeDef>, AttributeDefRef> entry : getAttributeValues().entrySet()) {
             DefDescriptor<AttributeDef> attributeDefDesc = entry.getKey();
             AttributeDef attributeDef = atts.get(attributeDefDesc);
@@ -156,10 +160,8 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
                             getLocation());
                 }
             } else {
-                if (attributeDef.getVisibility() == Visibility.PRIVATE) {
-                    throw new InvalidDefinitionException(String.format("Attribute '%s' is specified as private",
-                            attributeDef.getDescriptor()), getLocation());
-                }
+            	registry.assertAccess(descriptor, attributeDef);
+            	
                 // so it was an attribute, make sure to parse it
                 entry.getValue().parseValue(attributeDef.getTypeDef());
             }

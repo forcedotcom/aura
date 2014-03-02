@@ -41,11 +41,14 @@ import org.auraframework.instance.Action;
 import org.auraframework.instance.AttributeSet;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Component;
+import org.auraframework.instance.Instance;
+import org.auraframework.instance.InstanceStack;
 import org.auraframework.instance.Model;
 import org.auraframework.instance.ValueProvider;
 import org.auraframework.instance.ValueProviderType;
 import org.auraframework.service.LoggingService;
 import org.auraframework.system.AuraContext;
+import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.MissingRequiredAttributeException;
@@ -165,10 +168,14 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
         AuraContext context = Aura.getContextService().getCurrentContext();
         DefDescriptor<? extends RootDefinition> desc = null;
 
-        context.getInstanceStack().pushInstance(this);
+        // Insure that the parent is allowed to create an instace of this component
+        InstanceStack instanceStack = context.getInstanceStack();
+        Instance<?> parent = instanceStack.peek();
+		instanceStack.pushInstance(this);
+		
         this.descriptor = descriptor;
         this.originalDescriptor = descriptor;
-        this.path = context.getInstanceStack().getPath();
+        this.path = instanceStack.getPath();
 
         if (def == null) {
             try {
@@ -196,6 +203,11 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
             desc = descriptor;
         }
 
+        MasterDefRegistry defRegistry = Aura.getDefinitionService().getDefRegistry();
+		if (parent != null) {
+        	defRegistry.assertAccess(parent.getDescriptor(), desc.getDef());
+        }
+        
         LoggingService loggingService = Aura.getLoggingService();
         loggingService.startTimer(LoggingService.TIMER_COMPONENT_CREATION);
         try {
@@ -215,6 +227,10 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
             if (def != null) {
                 ControllerDef cd = def.getControllerDef();
                 if (cd != null) {
+                	if (parent != null) {
+                		defRegistry.assertAccess(parent.getDescriptor(), cd);
+                	}
+                	
                     this.valueProviders.put(ValueProviderType.CONTROLLER.getPrefix(), cd);
                 }
             }
@@ -269,6 +285,7 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
                     if (attributeSet.getValueProvider() != null) {
                         desc = attributeSet.getValueProvider().getDescriptor();
                     }
+                    
                     throw new MissingRequiredAttributeException(desc, attr.getName(), attr.getLocation());
                 }
             }
@@ -372,11 +389,13 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
      */
     private void createModel() throws QuickFixException {
         AuraContext context = Aura.getContextService().getCurrentContext();
-        context.setCurrentNamespace(descriptor.getNamespace());
+        context.setCurrentCaller(descriptor);
         BaseComponent<?, ?> oldComponent = context.setCurrentComponent(this);
         try {
             ModelDef modelDef = getComponentDef().getModelDef();
             if (modelDef != null) {
+            	Aura.getDefinitionService().getDefRegistry().assertAccess(descriptor, modelDef);
+            	
                 model = modelDef.newInstance();
                 if (modelDef.hasMembers()) {
                     hasLocalDependencies = true;

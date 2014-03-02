@@ -26,8 +26,6 @@ public interface ApplicationDefBuilder extends BaseComponentDefBuilder<Applicati
 
     ApplicationDefBuilder setLayouts(LayoutsDef layouts);
 
-    ApplicationDefBuilder setSecurityProviderDescriptor(String securityProvider);
-
     /**
      * Specifies the {@link ThemeDef} to use as the override theme. Vars specified in the override theme take precedence
      * over default var values within the whole application.

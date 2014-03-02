@@ -32,8 +32,9 @@ import org.auraframework.instance.Component;
  * @since 0.0.85
  */
 public class ForEachTest extends AuraImplTestCase {
-    final String forEachDescriptor = "markup://%s:%s/COMPONENT$aura:foreach";
-
+    public static String NAMESPACE = "forEachDefTest";
+    private static String FOREACH_DESCRIPTOR = "markup://%s:%s/COMPONENT$aura:foreach";
+    
     public ForEachTest(String name) {
         super(name);
     }
@@ -45,9 +46,8 @@ public class ForEachTest extends AuraImplTestCase {
      * @throws Exception
      */
     public void testIteratingListOfBasicDataType() throws Exception {
-        String namespace = "forEachDefTest";
         String cmpName = "basicDataType";
-        Component cmp = (Component) Aura.getInstanceService().getInstance(String.format("%s:%s", namespace, cmpName),
+        Component cmp = (Component) Aura.getInstanceService().getInstance(String.format("%s:%s", NAMESPACE, cmpName),
                 ComponentDef.class);
         assertNotNull("Failed to create an instance of the forEach test component.", cmp);
         // Obtain a list of all components enclosed in forEach blocks
@@ -77,10 +77,9 @@ public class ForEachTest extends AuraImplTestCase {
      * @throws Exception
      */
     public void testIteratingListOfBasicDataType_valueByReference() throws Exception {
-        String namespace = "forEachDefTest";
         String cmpName = "forEachDefParent";
         Component topLevelCmp = (Component) Aura.getInstanceService().getInstance(
-                String.format("%s:%s", namespace, cmpName), ComponentDef.class);
+                String.format("%s:%s", NAMESPACE, cmpName), ComponentDef.class);
         assertNotNull("Failed to create an instance of the forEach test component.", topLevelCmp);
 
         Component facet1 = null;
@@ -119,9 +118,8 @@ public class ForEachTest extends AuraImplTestCase {
      * @throws Exception
      */
     public void testIteratingListofCollections() throws Exception {
-        String namespace = "forEachDefTest";
         String cmpName = "collectionDataType";
-        Component cmp = (Component) Aura.getInstanceService().getInstance(String.format("%s:%s", namespace, cmpName),
+        Component cmp = (Component) Aura.getInstanceService().getInstance(String.format("%s:%s", NAMESPACE, cmpName),
                 ComponentDef.class);
         assertNotNull("Failed to create an instance of the forEach test component.", cmp);
 
@@ -183,7 +181,7 @@ public class ForEachTest extends AuraImplTestCase {
             if (c.getDescriptor()
                     .getQualifiedName()
                     .startsWith(
-                            String.format(forEachDescriptor, cmp.getDescriptor().getNamespace(), cmp.getDescriptor()
+                            String.format(FOREACH_DESCRIPTOR, cmp.getDescriptor().getNamespace(), cmp.getDescriptor()
                                     .getName()))) {
                 Object itemBody = c.getSuper().getAttributes().getValue("body");
                 Assert.assertNotNull(itemBody);

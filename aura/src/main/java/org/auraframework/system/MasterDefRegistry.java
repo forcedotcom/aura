@@ -101,9 +101,14 @@ public interface MasterDefRegistry {
     boolean namespaceExists(String ns);
 
     /**
-     * assert that we have access to the definition given by a descriptor.
+     * assert that the referencingDescriptor has access to the definition.
      */
-    void assertAccess(DefDescriptor<?> desc) throws QuickFixException;
+    <D extends Definition> void assertAccess(DefDescriptor<?> referencingDescriptor, D def) throws QuickFixException;
+
+    /**
+     * assert that the referencingNamespace has access to the definition.
+     */
+    <D extends Definition> void assertAccess(String referencingNamespace, D def) throws QuickFixException;
 
     /**
      * Filter our loaded set of dependencies on the preloads.

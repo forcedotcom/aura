@@ -171,7 +171,7 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef> extend
     @Override
     protected void readAttributes() throws QuickFixException {
         AuraContext context = Aura.getContextService().getCurrentContext();
-        context.setCurrentNamespace(builder.getDescriptor().getNamespace());
+        context.setCurrentCaller(builder.getDescriptor());
         Mode mode = context.getMode();
 
         super.readAttributes();

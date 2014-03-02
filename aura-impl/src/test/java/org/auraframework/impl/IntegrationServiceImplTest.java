@@ -58,9 +58,6 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
     private IntegrationService service;
     private final String simpleComponentTag = "ui:button";
 
-    // private final String laxSecurityProviderDesc =
-    // "java://org.auraframework.components.security.SecurityProviderAlwaysAllows";
-
     @Override
     public void setUp() throws Exception {
         super.setUp();
@@ -289,25 +286,6 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
         } catch (Exception unexpected) {
             fail("Failed to detect bad value provided for event handlers. Failed :" + unexpected.getMessage());
         }
-    }
-
-    /**
-     * Verify exceptions when components are restricted by SecurityProvider.
-     */
-    @Ignore("W-1495914")
-    public void testExceptionsDueToSecurityProvider() {
-        // Integration integration =
-        // service.createIntegration("java://org.auraframework.components.security.SecurityProviderAlwaysDenies",
-        // "" , Mode.UTEST);
-        // try{
-        // injectSimpleComponent(integration);
-        // fail("Failed to respect security provider restrictions.");
-        // }catch(NoAccessException expected){
-        // //Assert expected error message
-        // //TODO: But NoAccessException is a clientside exception. What would
-        // happen in the case of component injection?
-        // }catch(Exception
-        // allOthers){fail("Failed to respect security provider restrictions.");}
     }
 
     /**

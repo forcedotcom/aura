@@ -352,7 +352,6 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
 
         String appMarkup = String.format(baseApplicationTag,
                 "useAppcache=\"true\" render=\"client\"  preload=\"appCache\" " +
-                        "securityProvider=\"java://org.auraframework.java.securityProvider.LaxSecurityProvider\" " +
                         " controller=\"java://org.auraframework.impl.java.controller.TestController\" " +
                         "additionalAppCacheURLs=\"%s\"", "");
 

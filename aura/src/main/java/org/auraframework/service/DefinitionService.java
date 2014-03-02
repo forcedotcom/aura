@@ -131,7 +131,7 @@ public interface DefinitionService extends AuraService, SourceListener {
      * @param descriptor the descriptor to check.
      */
     long getLastMod(String uid) throws QuickFixException;
-
+    
     /**
      * Given a {@link DefDescriptor} that contains search patterns or wildcards,
      * return a set of Descriptors for all existing Definitions who have source

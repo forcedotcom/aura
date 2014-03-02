@@ -15,7 +15,12 @@
  */
 package org.auraframework.impl.adapter;
 
+import java.util.Set;
+
 import org.auraframework.adapter.MockConfigAdapter;
+import org.auraframework.impl.source.StringSourceLoader;
+
+import com.google.common.collect.ImmutableSortedSet;
 
 /**
  * ConfigAdapter for Aura tests.
@@ -24,7 +29,13 @@ import org.auraframework.adapter.MockConfigAdapter;
  * @since 0.0.178
  */
 public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConfigAdapter {
+    private static final Set<String> SYSTEM_TEST_NAMESPACES = new ImmutableSortedSet.Builder<String>(String.CASE_INSENSITIVE_ORDER).add(
+    		"auradev", "auratest", "actionsTest", "appCache", "attributesTest", "auraStorageTest", "gvpTest", "preloadTest", "clientLibraryTest", "clientApiTest", 
+    	"clientServiceTest", "cmpQueryLanguage", "componentTest", "docstest", "expressionTest", "forEachDefTest", "forEachTest", "handleEventTest", "ifTest", "iterationTest", 
+    	"layoutServiceTest", "listTest", "loadLevelTest", "performanceTest", "provider", "renderingTest", "setAttributesTest", "test", "themeSanityTest", "uitest", "utilTest", 
+    	"updateTest", "valueChange", "whitespaceBehaviorTest").build();
 
+    
     private Boolean isClientAppcacheEnabled = null;
     private Boolean isProduction = null;
     private Boolean isAuraJSStatic = null;
@@ -77,4 +88,16 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
     public boolean validateCss() {
         return (validateCss == null) ? super.validateCss() : validateCss;
     }
+
+	@Override
+	public boolean isPrivilegedNamespace(String namespace) {
+		Set<String> namespaces = StringSourceLoader.getInstance().getNamespaces();
+		return namespaces.contains(namespace) || SYSTEM_TEST_NAMESPACES.contains(namespace) || super.isPrivilegedNamespace(namespace);
+	}
+
+	@Override
+	public boolean isUnsecuredNamespace(String namespace) {
+		Set<String> namespaces = StringSourceLoader.getInstance().getNamespaces();
+		return namespaces.contains(namespace) || SYSTEM_TEST_NAMESPACES.contains(namespace) || super.isUnsecuredNamespace(namespace);
+	}
 }

@@ -185,7 +185,14 @@ public class InstanceStack {
     }
 
     /**
-     * Get the next 'id' for a component.
+     * get the top of the stack.
+     */
+    public Instance<?> peek() {
+        int size = stack.size();
+		return size > 0 ? stack.get(size - 1).instance : null;
+    }
+
+    /** Get the next 'id' for a component.
      *
      * This is actually only used for server side rendering, as these IDs are never
      * serialized to the client.

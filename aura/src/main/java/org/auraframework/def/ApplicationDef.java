@@ -33,8 +33,6 @@ public interface ApplicationDef extends BaseComponentDef {
 
     DefDescriptor<EventDef> getLocationChangeEventDescriptor() throws QuickFixException;
 
-    DefDescriptor<SecurityProviderDef> getSecurityProviderDefDescriptor() throws QuickFixException;
-
     Boolean isAppcacheEnabled() throws QuickFixException;
 
     List<String> getAdditionalAppCacheURLs() throws QuickFixException;

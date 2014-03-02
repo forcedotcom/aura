@@ -281,6 +281,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         for (DependencyDef def : dependencies) {
             def.validateReferences();
         }
+        
         for (AttributeDef att : this.attributeDefs.values()) {
             att.validateReferences();
         }
@@ -329,9 +330,11 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
                 throw new DefinitionNotFoundException(intf, getLocation());
             }
         }
+        
         for (RegisterEventDef def : events.values()) {
             def.validateReferences();
         }
+        
         for (EventHandlerDef def : eventHandlers) {
             def.validateReferences();
         }
@@ -728,7 +731,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             } else {
                 json.writeMapBegin();
                 json.writeMapEntry("descriptor", descriptor);
-                context.setCurrentNamespace(descriptor.getNamespace());
+                context.setCurrentCaller(descriptor);
                 RendererDef rendererDef = getRendererDef();
                 if (rendererDef != null && !rendererDef.isLocal()) {
                     json.writeMapEntry("rendererDef", rendererDef);
@@ -882,7 +885,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     @Override
     public ModelDef getModelDef() throws QuickFixException {
         AuraContext context = Aura.getContextService().getCurrentContext();
-        context.setCurrentNamespace(descriptor.getNamespace());
+        context.setCurrentCaller(descriptor);
         return modelDefDescriptor == null ? null : modelDefDescriptor.getDef();
     }
 

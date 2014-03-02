@@ -151,7 +151,6 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
             case STYLE:
             case RESOURCE:
             case TYPE:
-            case SECURITY_PROVIDER:
             case PROVIDER:
                 Matcher matcher = CLASS_PATTERN.matcher(qualifiedName);
                 if (matcher.matches()) {

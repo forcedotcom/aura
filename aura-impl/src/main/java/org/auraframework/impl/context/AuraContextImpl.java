@@ -40,6 +40,7 @@ import org.auraframework.instance.Action;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Event;
 import org.auraframework.instance.GlobalValueProvider;
+import org.auraframework.instance.Instance;
 import org.auraframework.instance.InstanceStack;
 import org.auraframework.instance.ValueProviderType;
 import org.auraframework.system.AuraContext;
@@ -257,7 +258,7 @@ public class AuraContextImpl implements AuraContext {
 
     private String num;
 
-    private String currentNamespace;
+    private DefDescriptor<?> currentCaller;
 
     private final Set<String> dynamicNamespaces = Sets.newLinkedHashSet();
 
@@ -380,9 +381,15 @@ public class AuraContextImpl implements AuraContext {
     }
 
     @Override
-    public String getCurrentNamespace() {
-        return currentNamespace;
+    public DefDescriptor<?> getCurrentCaller() {
+        return currentCaller;
     }
+
+	@Override
+	public String getCurrentNamespace() {
+        DefDescriptor<?> caller = getCurrentCaller();
+        return caller != null ? caller.getNamespace() : null;
+	}
 
     @Override
     public String getDefaultPrefix(DefType defType) {
@@ -523,10 +530,10 @@ public class AuraContextImpl implements AuraContext {
     }
 
     @Override
-    public void setCurrentNamespace(String namespace) {
-        this.currentNamespace = namespace;
+    public void setCurrentCaller(DefDescriptor<?> descriptor) {
+        this.currentCaller = descriptor;
     }
-
+    
     @Override
     public void setLastMod(String lastMod) {
         this.lastMod = lastMod;
@@ -664,4 +671,18 @@ public class AuraContextImpl implements AuraContext {
     public void setOverrideThemeDescriptor(DefDescriptor<ThemeDef> themeDescriptor) {
         this.overrideThemeDescriptor = themeDescriptor;
     }
+
+	@Override
+	public DefDescriptor<?> getCurrentDescriptor() {
+        DefDescriptor<?> caller = getCurrentCaller();
+        if (caller == null) {
+            InstanceStack istack = getInstanceStack();
+            Instance<?> instance = istack.peek();
+            if (instance != null) {
+                caller = instance.getDescriptor();
+            }
+        }
+		
+		return caller;
+	}
 }

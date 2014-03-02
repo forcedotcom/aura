@@ -19,7 +19,6 @@ package org.auraframework.def;
 
 import java.util.Set;
 
-import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.InvalidAccessValueException;
 
 // Holds compiled value of ACCESS attribute. 
@@ -32,10 +31,13 @@ public interface DefinitionAccess {
     
     // Authentication
     boolean requiresAuthentication();
+    
     // Scope
     boolean isGlobal();
     boolean isPublic();
     boolean isPrivate();
+    boolean isInternal();
+    
     // Access (to be evaluated in current context)
     boolean isAccessible();
     

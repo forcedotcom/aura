@@ -18,27 +18,16 @@ package org.auraframework.impl.root.component;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.auraframework.Aura;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.AttributeDefRef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.ComponentDefRef.Load;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.Definition.Visibility;
 import org.auraframework.def.InterfaceDef;
-import org.auraframework.def.TypeDef;
 import org.auraframework.impl.root.component.ComponentDefRefImpl.Builder;
-import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.DefinitionImplUnitTest;
-import org.auraframework.system.AuraContext.Access;
-import org.auraframework.system.AuraContext.Format;
-import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.system.Location;
-import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.mockito.Mockito;
-
-import com.google.common.collect.ImmutableMap;
 
 public class ComponentDefRefImplUnitTest extends
         DefinitionImplUnitTest<ComponentDefImpl, ComponentDef, ComponentDefRef, Builder> {
@@ -50,55 +39,6 @@ public class ComponentDefRefImplUnitTest extends
 
     public ComponentDefRefImplUnitTest(String name) {
         super(name);
-    }
-
-    public void testValidateReferencesPrivateAttribute() throws Exception {
-        setupValidateReferences();
-        testAuraContext = Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Access.AUTHENTICATED);
-        this.location = new Location("root", 0);
-        ComponentDef rootDef = this.descriptor.getDef();
-
-        DefDescriptor<AttributeDef> attrDesc = DefDescriptorImpl.getInstance("privateAttribute", AttributeDef.class);
-        AttributeDef attrDef = Mockito.mock(AttributeDef.class);
-        Mockito.doReturn(attrDesc).when(attrDef).getDescriptor();
-        Mockito.doReturn(Visibility.PRIVATE).when(attrDef).getVisibility();
-        Mockito.doReturn(ImmutableMap.of(attrDesc, attrDef)).when(rootDef).getAttributeDefs();
-        AttributeDefRef attrRef = Mockito.mock(AttributeDefRef.class);
-        this.attributeValues = ImmutableMap.of(attrDesc, attrRef);
-
-        try {
-            buildDefinition().validateReferences();
-            fail("Expected an exception when trying to set a private attribute");
-        } catch (Throwable t) {
-            assertExceptionMessage(t, InvalidDefinitionException.class,
-                    "Attribute 'privateAttribute' is specified as private");
-            // check that the reported location is the location of the ref
-            assertEquals(this.location, ((InvalidDefinitionException) t).getLocation());
-        }
-    }
-
-    public void testValidateReferencesPublicAttribute() throws Exception {
-        setupValidateReferences();
-        testAuraContext = Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Access.AUTHENTICATED);
-        this.location = new Location("root", 0);
-        ComponentDef rootDef = this.descriptor.getDef();
-
-        DefDescriptor<AttributeDef> attrDesc = DefDescriptorImpl.getInstance("privateAttribute", AttributeDef.class);
-        AttributeDef attrDef = Mockito.mock(AttributeDef.class);
-        TypeDef attrType = Mockito.mock(TypeDef.class);
-        Mockito.doReturn(attrDesc).when(attrDef).getDescriptor();
-        Mockito.doReturn(attrType).when(attrDef).getTypeDef();
-        Mockito.doReturn(Visibility.PUBLIC).when(attrDef).getVisibility();
-        Mockito.doReturn(ImmutableMap.of(attrDesc, attrDef)).when(rootDef).getAttributeDefs();
-        AttributeDefRef attrRef = Mockito.mock(AttributeDefRef.class);
-        this.attributeValues = ImmutableMap.of(attrDesc, attrRef);
-
-        Mockito.verifyZeroInteractions(attrRef);
-
-        buildDefinition().validateReferences();
-
-        Mockito.verify(attrRef).parseValue(attrType);
-        Mockito.verify(attrRef).validateReferences();
     }
 
     @Override

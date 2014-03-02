@@ -16,7 +16,6 @@
 package org.auraframework.impl.system;
 
 import java.lang.ref.WeakReference;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -30,13 +29,25 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.log4j.Logger;
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.AttributeDef;
+import org.auraframework.def.BaseComponentDef;
+import org.auraframework.def.ClientLibraryDef;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.Definition;
+import org.auraframework.def.DescriptorFilter;
 import org.auraframework.impl.root.DependencyDefImpl;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.service.LoggingService;
-import org.auraframework.system.*;
-import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.system.AuraContext;
+import org.auraframework.system.DefRegistry;
+import org.auraframework.system.Location;
+import org.auraframework.system.MasterDefRegistry;
+import org.auraframework.system.Source;
+import org.auraframework.system.SourceListener;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
@@ -44,8 +55,12 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.text.Hash;
 
 import com.google.common.base.Optional;
-import com.google.common.cache.*;
-import com.google.common.collect.*;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheStats;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 /**
  * Overall Master definition registry implementation, there be dragons here.
@@ -56,13 +71,6 @@ import com.google.common.collect.*;
  * 
  */
 public class MasterDefRegistryImpl implements MasterDefRegistry {
-    private static final Set<DefType> securedDefTypes = Sets.immutableEnumSet(DefType.APPLICATION, DefType.COMPONENT,
-            DefType.CONTROLLER, DefType.ACTION);
-    private static final Set<String> unsecuredPrefixes = ImmutableSet.of("aura");
-    private static final Set<String> unsecuredNamespaces = ImmutableSet.of("aura", "ui", "os", "auradev",
-            "org.auraframework");
-    private static final Set<String> unsecuredNonProductionNamespaces = ImmutableSet.of("auradev");
-
     private static final ReentrantReadWriteLock rwLock = new ReentrantReadWriteLock();
     private static final Lock rLock = rwLock.readLock();
     private static final Lock wLock = rwLock.writeLock();
@@ -70,6 +78,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     private final static int DEFINITION_CACHE_SIZE = 4096;
     private final static int DEPENDENCY_CACHE_SIZE = 100;
     private final static int STRING_CACHE_SIZE = 100;
+
     private static final Logger logger = Logger.getLogger(MasterDefRegistryImpl.class);
 
     /**
@@ -164,12 +173,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
     private Set<DefDescriptor<? extends Definition>> localDescs = null;
 
-    private final Set<DefDescriptor<?>> accessCache = Sets.newLinkedHashSet();
-
     private CompileContext currentCC;
-
-    private SecurityProviderDef securityProvider;
-    private DefDescriptor<? extends BaseComponentDef> lastRootDesc;
 
     private final MasterDefRegistryImpl original;
 
@@ -263,7 +267,6 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             case TYPE:
             case RESOURCE:
             case PROVIDER:
-            case SECURITY_PROVIDER:
                 qualifiedNamePattern = "%s://%s.%s";
                 break;
             case ATTRIBUTE:
@@ -536,7 +539,8 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         compiling.descriptor = canonical;
 
         currentCC.loggingService.incrementNum(LoggingService.DEF_COUNT);
-        context.setCurrentNamespace(canonical.getNamespace());
+        context.setCurrentCaller(canonical);
+
         compiling.def.validateDefinition();
         compiling.built = true;
         return true;
@@ -593,6 +597,10 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                 }
             }
 
+            if (parent != null) {
+            	assertAccess(parent.getDescriptor(), cd.def);
+            }
+            
             Set<DefDescriptor<?>> newDeps = Sets.newHashSet();
             cd.def.appendDependencies(newDeps);
 
@@ -612,9 +620,11 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                     }
                 }
             }
+            
             for (DefDescriptor<?> dep : newDeps) {
                 getHelper(dep, cc, stack, cd.def);
             }
+            
             return cd.def;
         } finally {
             cc.level -= 1;
@@ -641,9 +651,10 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         //
         do {
             compiling = Lists.newArrayList(currentCC.compiled.values());
+
             for (CompilingDef<?> cd : compiling) {
-                // FIXME: setting the current namespace on the context seems extremely hackish
-                currentCC.context.setCurrentNamespace(cd.descriptor.getNamespace());
+	            // FIXME: setting the current namespace on the context seems extremely hackish
+                currentCC.context.setCurrentCaller(cd.descriptor);
                 if (cd.built && !cd.validated) {
                     if (iteration != 0) {
                         logger.warn("Nested add of "+cd.descriptor+" during validation of "+currentCC.topLevel);
@@ -781,27 +792,6 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         if (currentCC != null) {
             throw new AuraRuntimeException("Ugh, nested compileDE/buildDE on "+currentCC.topLevel
                     +" trying to build "+descriptor);
-        }
-        //
-        // This is very ugly... it probably should not be done this way, but AFAICT we need to do this
-        // unfortunately, it also will break if anyone ever changes what happens. Our real problem is
-        // the roundabout routing and uncertainty therein. Going out to DefinitionService to get defs, then
-        // coming back through here is dangerous at best.
-        //
-        DefDescriptor<? extends BaseComponentDef> rootDesc;
-       
-        rootDesc = Aura.getContextService().getCurrentContext().getApplicationDescriptor();
-        if (!descriptor.equals(rootDesc) && rootDesc != null && !defs.containsKey(rootDesc) && original == null) {
-            //
-            // This is needed to make sure that we have already loaded up all our definitions,
-            // and don't need to re-fetch this half way through. Note that we do this on the
-            // 'original' if we have one.
-            //
-            try {
-                getDef(rootDesc);
-            } catch (QuickFixException qfe) {
-                // ignore this, we'll hit it later anyway.
-            }
         }
 
         try {
@@ -1020,6 +1010,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         if (descriptor == null) {
             return null;
         }
+        
         rLock.lock();
         try {
             if (hasLocalDef(descriptor)) {
@@ -1037,12 +1028,14 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                         return cd.def;
                     }
                 }
+                
                 //
                 // If we are nested, compileDef will do the right thing.
                 // This is a bit ugly though.
                 //
                 return compileDef(descriptor, currentCC);
             }
+
             DependencyEntry de = getDE(null, descriptor);
             if (de == null) {
                 for (DependencyEntry det : localDependencies.values()) {
@@ -1051,13 +1044,16 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                         break;
                     }
                 }
+            
                 if (de == null) {
                     compileDE(descriptor);
+                    
                     @SuppressWarnings("unchecked")
                     D def = (D) defs.get(descriptor);
                     return def;
                 }
             }
+            
             //
             // found an entry.
             // In this case, throw a QFE if we have one.
@@ -1065,10 +1061,12 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             if (de.qfe != null) {
                 throw de.qfe;
             }
+            
             //
             // Now we need to actually do the build..
             //
             buildDE(de, descriptor);
+            
             @SuppressWarnings("unchecked")
             D def = (D) defs.get(descriptor);
             return def;
@@ -1171,125 +1169,67 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         return delegateRegistries.getAllNamespaces().contains(ns);
     }
 
-    /**
-     * Get a security provider for the application.
-     * 
-     * This should probably catch the quick fix exception and simply treat it as a null security provider. This caches
-     * the security provider.
-     * 
-     * @return the sucurity provider for the application or null if none.
-     * @throws QuickFixException if there was a problem compiling.
-     */
-    private SecurityProviderDef getSecurityProvider() throws QuickFixException {
-        DefDescriptor<? extends BaseComponentDef> rootDesc = Aura.getContextService().getCurrentContext()
-                .getApplicationDescriptor();
-        if (securityProvider == null || !lastRootDesc.equals(rootDesc)) {
-            SecurityProviderDef securityProviderDef = null;
-            if (rootDesc != null && rootDesc.getDefType().equals(DefType.APPLICATION)) {
-                ApplicationDef root = null;
-                try {
-                    root = (ApplicationDef) getDef(rootDesc);
-                } catch (QuickFixException qfe) {
-                    // ignore, we get null
-                }
-                if (root != null) {
-                    DefDescriptor<SecurityProviderDef> securityDesc = root.getSecurityProviderDefDescriptor();
-                    if (securityDesc != null) {
-                        securityProviderDef = getDef(securityDesc);
-                    }
-                }
-            }
-            
-            securityProvider = securityProviderDef;
-            lastRootDesc = rootDesc;
-        }
-        
-        return securityProvider;
-    }
-
     @Override
-    public void assertAccess(DefDescriptor<?> desc) throws QuickFixException {
-        if (original != null) {
+    public <D extends Definition> void assertAccess(DefDescriptor<?> referencingDescriptor, D def) throws QuickFixException {
+    	String prefix = referencingDescriptor.getPrefix();
+		if (Aura.getConfigAdapter().isUnsecuredPrefix(prefix)) {
+    		return;
+    	}
+    	
+    	this.assertAccess(referencingDescriptor.getNamespace(), def);
+    }
+    
+	@Override
+	public <D extends Definition> void assertAccess(String referencingNamespace, D def) throws QuickFixException {
+    	// If the def is access="global" then anyone can see it
+    	if (!def.getAccess().isGlobal()) {
+			ConfigAdapter configAdapter = Aura.getConfigAdapter();
+			if (configAdapter.isPrivilegedNamespace(referencingNamespace)) {
+				return;
+			}
+			
+            DefDescriptor<? extends Definition> descriptor = def.getDescriptor();
+			if (configAdapter.isUnsecuredNamespace(descriptor.getNamespace()) || configAdapter.isUnsecuredPrefix(descriptor.getPrefix())) {
+				return;
+			}
+			
+	    	assertCallerRelativeAccess(referencingNamespace, def);
+    	}
+	}
+    
+    private void assertCallerRelativeAccess(String referencingNamespace, Definition def) throws QuickFixException {
+    	DefDescriptor<?> desc = def.getDescriptor();
+
+        String namespace;
+    	String target;
+    	if (def instanceof AttributeDef) {
+    		AttributeDef attributeDef = (AttributeDef) def;
+    		namespace = attributeDef.getParentDescriptor().getNamespace();
+    		target = String.format("%s.%s", attributeDef.getParentDescriptor().getQualifiedName(), desc.getName());
+    	} else {
+    		namespace = desc.getNamespace();
+    		target = desc.toString();
+    	}
+
+    	if (referencingNamespace == null || referencingNamespace.isEmpty()) {
+    		throw new NoAccessException(String.format("Access to '%s' disallowed by MasterDefRegistry.assertAccess(): referencing namespace was empty or null", desc));
+        }
+
+        ConfigAdapter configAdapter = Aura.getConfigAdapter();
+		if (configAdapter.isPrivilegedNamespace(referencingNamespace)) {
+            // The caller is in a system namespace let them through
+            return; 
+        }
+
+		if (referencingNamespace.equals(namespace)) { 
+            // The caller and the def are in the same namespace let them through
             return;
         }
-        rLock.lock();
-        try {
-        if (!accessCache.contains(desc)) {
-            Aura.getLoggingService().incrementNum("SecurityProviderCheck");
-            DefType defType = desc.getDefType();
-            String ns = desc.getNamespace();
-            AuraContext context = Aura.getContextService().getCurrentContext();
-            Mode mode = context.getMode();
-            String prefix = desc.getPrefix();
-            //
-            // This breaks encapsulation! -gordon
-            //
-            boolean isTopLevel = desc.equals(context.getApplicationDescriptor());
-
-            if (isTopLevel) {
-                //
-                // If we are trying to access the top level component, we need to ensure
-                // that it is _not_ abstract.
-                //
-                BaseComponentDef def = getDef(context.getApplicationDescriptor());
-                if (def != null && def.isAbstract() && def.getProviderDescriptor() == null) {
-                    throw new NoAccessException(String.format("Access to %s disallowed. Abstract definition.", desc));
-                }
-            }
-            //
-            // If this is _not_ the top level, we allow circumventing the security provider.
-            // This means that certain things will short-circuit, hopefully making checks faster...
-            // Not sure if this is premature optimization or not.
-            //
-            if (!isTopLevel || desc.getDefType().equals(DefType.COMPONENT)) {
-                if (!securedDefTypes.contains(defType)
-                        || unsecuredPrefixes.contains(prefix)
-                        || unsecuredNamespaces.contains(ns)
-                        || (mode != Mode.PROD && (!Aura.getConfigAdapter().isProduction()) && unsecuredNonProductionNamespaces
-                                .contains(ns))) {
-                    accessCache.add(desc);
-                    return;
-                }
-
-                if (ns != null && DefDescriptor.JAVA_PREFIX.equals(prefix)) {
-                    // handle java packages that have namespaces like aura.impl.blah
-                    for (String okNs : unsecuredNamespaces) {
-                        if (ns.startsWith(okNs)) {
-                            accessCache.add(desc);
-                            return;
-                        }
-                    }
-                }
-            }
-
-            SecurityProviderDef securityProviderDef = getSecurityProvider();
-            if (securityProviderDef == null) {
-                if (mode != Mode.PROD && !Aura.getConfigAdapter().isProduction()) {
-                    accessCache.add(desc);
-                    return;
-                } else {
-                    throw new NoAccessException(String.format("Access to %s disallowed.  No Security Provider found.",
-                            desc));
-                }
-            } else {
-                try {
-                    if (!securityProviderDef.isAllowed(desc)) {
-                        throw new NoAccessException(String.format("Access to %s disallowed by %s", desc,
-                                securityProviderDef.getDescriptor().getName()));
-                    }
-                } catch (NoAccessException e) {
-                    // Sometimes security providers throw instead of returning.  Rather than losing
-                    // the stack trace in the exception, we catch and re-throw with that information
-                    throw e;
-                }
-            }
-            accessCache.add(desc);
-        }
-        } finally {
-            rLock.unlock();
-        }
-    }
-
+		
+        String message = String.format("Access to '%s' from namespace '%s' disallowed by MasterDefRegistry.assertAccess()", target, referencingNamespace);
+		throw new NoAccessException(message);
+    }	
+    
     /**
      * only used by admin tools to view all registries
      */
@@ -1325,9 +1265,6 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             localDescs.clear();
         }
         localDependencies.clear();
-        accessCache.clear();
-        securityProvider = null;
-        lastRootDesc = null;
         depsCache.invalidateAll();
         defsCache.invalidateAll();
         existsCache.invalidateAll();

@@ -48,6 +48,7 @@ public class JavaProviderDefFactory extends BaseJavaDefFactory<ProviderDef> {
         if (providerClass == null) {
             return null;
         }
+        
         if (!providerClass.isAnnotationPresent(Provider.class)) {
             throw new InvalidDefinitionException(String.format(
                     "@Provider annotation is required on all Providers.  Not found on %s", descriptor), new Location(

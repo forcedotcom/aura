@@ -15,6 +15,6 @@
     limitations under the License.
 
 -->
-<aura:application useAppcache="true" render="client" securityProvider="java://org.auraframework.java.securityProvider.LaxSecurityProvider">
+<aura:application useAppcache="true" render="client">
     <div onclick="{!c.hialert}">cache for gold</div>
 </aura:application>

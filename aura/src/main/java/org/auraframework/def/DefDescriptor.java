@@ -53,7 +53,6 @@ public interface DefDescriptor<T extends Definition> extends JsonSerializable,
 		CONTROLLER(ControllerDef.class), //
 		MODEL(ModelDef.class), //
 		RENDERER(RendererDef.class), //
-		SECURITY_PROVIDER(SecurityProviderDef.class), //
 		ACTION(ActionDef.class), //
 		TYPE(TypeDef.class), //
 		STYLE(StyleDef.class), //

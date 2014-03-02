@@ -139,6 +139,7 @@ public class StringSourceLoader implements SourceLoader {
                 name = namePrefix.substring(idx + 1);
             }
         }
+        
         return descriptorInfo.getDescriptor(namespace, name + counter.incrementAndGet());
     }
 

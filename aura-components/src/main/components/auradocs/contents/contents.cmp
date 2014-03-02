@@ -131,7 +131,6 @@
                 <auradocs:contentsNode text="Using Layouts for Metadata-Driven Navigation" id="layouts"/>
             </auradocs:contentsNode>
             <auradocs:contentsNode text="Using AppCache" id="appcache" />
-            <auradocs:contentsNode text="Controlling App Access with Security Providers" id="securityProviders" />
         </auradocs:contentsNode>
 		 
         <auradocs:contentsNode text="Code" >

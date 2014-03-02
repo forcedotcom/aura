@@ -82,7 +82,7 @@ public class InterfaceDefHandler extends RootTagHandler<InterfaceDef> {
     @Override
     protected void readAttributes() throws QuickFixException {
         super.readAttributes();
-        Aura.getContextService().getCurrentContext().setCurrentNamespace(getDefDescriptor().getNamespace());
+        Aura.getContextService().getCurrentContext().setCurrentCaller(getDefDescriptor());
         String extendsNames = getAttributeValue(ATTRIBUTE_EXTENDS);
         if (extendsNames != null) {
             for (String extendsName : AuraTextUtil.splitSimple(",", extendsNames)) {

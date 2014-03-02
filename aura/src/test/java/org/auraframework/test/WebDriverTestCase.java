@@ -207,7 +207,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
         }
     }
 
-    private static String WRAPPER_APP = "<aura:application render=\"%s\"><%s/></aura:application>";
+    private static String WRAPPER_APP = "<aura:application access=\"GLOBAL\" render=\"%s\"><%s/></aura:application>";
 
     /**
      * Load a string as a component in an app.

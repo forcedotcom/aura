@@ -74,11 +74,6 @@ public interface Annotations {
     }
 
     @Retention(RetentionPolicy.RUNTIME)
-    @Target(ElementType.TYPE)
-    public @interface SecurityProvider {
-    }
-
-    @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.METHOD)
     public @interface Type {
         String value();

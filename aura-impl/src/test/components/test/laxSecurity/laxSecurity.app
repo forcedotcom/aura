@@ -15,6 +15,5 @@
     limitations under the License.
 
 -->
-<aura:application securityProvider="java://org.auraframework.java.securityProvider.LaxSecurityProvider" access="unauthenticated" render="client">
-
+<aura:application access="unauthenticated" render="client">
 </aura:application>

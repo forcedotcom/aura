@@ -53,7 +53,6 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
         this.locationChangeEventDescriptor = builder.locationChangeEventDescriptor;
 
         this.layoutsDefDescriptor = builder.layoutsDefDescriptor;
-        this.securityProviderDescriptor = builder.securityProviderDescriptor;
         this.isAppcacheEnabled = builder.isAppcacheEnabled;
         this.additionalAppCacheURLs = builder.additionalAppCacheURLs;
         this.isOnePageApp = builder.isOnePageApp;
@@ -68,7 +67,6 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
         public DefDescriptor<LayoutsDef> layoutsDefDescriptor;
         public Boolean isAppcacheEnabled;
         public Boolean isOnePageApp;
-        public DefDescriptor<SecurityProviderDef> securityProviderDescriptor;
         public String additionalAppCacheURLs;
         public DefDescriptor<ThemeDef> overrideThemeDescriptor;
 
@@ -85,17 +83,6 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
         @Override
         public Builder setLayouts(LayoutsDef layouts) {
             layoutsDefDescriptor = layouts.getDescriptor();
-            return this;
-        }
-
-        @Override
-        public ApplicationDefBuilder setSecurityProviderDescriptor(String securityProviderDescriptor) {
-            if (securityProviderDescriptor != null) {
-                this.securityProviderDescriptor = Aura.getDefinitionService().getDefDescriptor(
-                        securityProviderDescriptor, SecurityProviderDef.class);
-            } else {
-                this.securityProviderDescriptor = null;
-            }
             return this;
         }
 
@@ -167,9 +154,6 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
         if (overrideThemeDescriptor != null) {
             dependencies.add(overrideThemeDescriptor);
         }
-        if (securityProviderDescriptor != null) {
-        	dependencies.add(securityProviderDescriptor);
-        }
         if (locationChangeEventDescriptor != null) {
         	dependencies.add(locationChangeEventDescriptor);
         }
@@ -235,14 +219,6 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
                     locationChangeDef.getDescriptor()), getLocation());
         }
 
-        DefDescriptor<SecurityProviderDef> securityProviderDesc = getSecurityProviderDefDescriptor();
-        if (securityProviderDesc == null) {
-            throw new InvalidDefinitionException(String.format("Security provider is required on application %s",
-                    getName()), getLocation());
-        }
-        // Will throw quickfix exception if not found.
-        securityProviderDesc.getDef();
-
         // the override theme must not be a local theme. otherwise, it would allow users to circumvent var
         // cross-reference validation (regular themes enforce that cross references are defined in the same file,
         // but local themes allow cross references to the namespace-default file.)
@@ -263,17 +239,6 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
             ret.add(layoutsDefDescriptor);
         }
         return ret;
-    }
-
-    @Override
-    public DefDescriptor<SecurityProviderDef> getSecurityProviderDefDescriptor() throws QuickFixException {
-        if (securityProviderDescriptor == null && getExtendsDescriptor() != null) {
-            // going to the mdr to avoid security check, since this is used
-            // during security checks and would cause spin
-            return Aura.getContextService().getCurrentContext().getDefRegistry().getDef(getExtendsDescriptor())
-                    .getSecurityProviderDefDescriptor();
-        }
-        return securityProviderDescriptor;
     }
 
     @Override
@@ -300,7 +265,6 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
 
     private final DefDescriptor<EventDef> locationChangeEventDescriptor;
     private final DefDescriptor<LayoutsDef> layoutsDefDescriptor;
-    private final DefDescriptor<SecurityProviderDef> securityProviderDescriptor;
     private final DefDescriptor<ThemeDef> overrideThemeDescriptor;
     private final int hashCode;
 

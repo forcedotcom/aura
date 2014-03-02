@@ -21,7 +21,6 @@
          template="aura:template"
          renderer="js://aura.component, java://org.auraframework.renderer.ComponentRenderer"
          access="unauthenticated"
-         securityProvider="java://org.auraframework.components.DefaultSecurityProvider"
          implements="aura:rootComponent"
          support="GA"
          useAppcache="false"

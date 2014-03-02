@@ -31,7 +31,6 @@ import org.auraframework.impl.java.controller.JavaControllerDefFactory;
 import org.auraframework.impl.java.model.JavaModelDefFactory;
 import org.auraframework.impl.java.provider.JavaProviderDefFactory;
 import org.auraframework.impl.java.renderer.JavaRendererDefFactory;
-import org.auraframework.impl.java.securityProvider.JavaSecurityProviderDefFactory;
 import org.auraframework.impl.java.type.JavaTypeDefFactory;
 import org.auraframework.impl.root.RootDefFactory;
 import org.auraframework.impl.source.SourceFactory;
@@ -126,9 +125,6 @@ public class AuraRegistryProviderImpl implements RegistryAdapter {
                             new JavaControllerDefFactory(javaLoaders), DefType.CONTROLLER, DefDescriptor.JAVA_PREFIX),
                     AuraRegistryProviderImpl.<RendererDef> createDefRegistry(new JavaRendererDefFactory(javaLoaders),
                             DefType.RENDERER, DefDescriptor.JAVA_PREFIX),
-                    AuraRegistryProviderImpl.<SecurityProviderDef> createDefRegistry(
-                            new JavaSecurityProviderDefFactory(javaLoaders), DefType.SECURITY_PROVIDER,
-                            DefDescriptor.JAVA_PREFIX),
 
                     AuraRegistryProviderImpl.<ControllerDef> createJavascriptRegistry(jsSourceFactory,
                             DefType.CONTROLLER),

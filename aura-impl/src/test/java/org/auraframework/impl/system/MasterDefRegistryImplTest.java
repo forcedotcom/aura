@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedSet;
 import java.util.concurrent.TimeUnit;
 
 import org.auraframework.Aura;
@@ -36,7 +35,6 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
-
 import org.auraframework.def.HelperDef;
 import org.auraframework.def.LayoutsDef;
 import org.auraframework.def.NamespaceDef;
@@ -59,7 +57,6 @@ import org.auraframework.test.AuraTestingUtil;
 import org.auraframework.test.annotation.ThreadHostileTest;
 import org.auraframework.test.annotation.UnAdaptableTest;
 import org.auraframework.test.util.AuraPrivateAccessor;
-import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -70,7 +67,6 @@ import org.mockito.stubbing.Answer;
 
 import com.google.common.cache.Cache;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 /**
  * @see org.auraframework.impl.registry.RootDefFactoryTest
@@ -728,84 +724,6 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
                 checkDependenciesContains(deps, depCmpDesc1.getQualifiedName()));
         assertTrue("Explicitly declared dependency on top level component not found",
                 checkDependenciesContains(deps, depCmpDesc2.getQualifiedName()));
-    }
-
-    /**
-     * Check access assertion on abstract applications.
-     */
-    public void testAssertAcessAbstractApp() throws Exception {
-        DefDescriptor<ApplicationDef> abApp = addSourceAutoCleanup(ApplicationDef.class,
-                "<aura:application abstract=\"true\"/>");
-        DefDescriptor<ApplicationDef> app = addSourceAutoCleanup(ApplicationDef.class,
-                String.format("<aura:application extends=\"%s:%s\"/>", abApp.getNamespace(), abApp.getName()));
-        DefDescriptor<ApplicationDef> auraApp = Aura.getDefinitionService().getDefDescriptor(
-                "markup://aura:application", ApplicationDef.class);
-        MasterDefRegistryImpl mdr = getDefRegistry(false);
-        AuraContext context = Aura.getContextService().getCurrentContext();
-
-        //
-        // Check aura:application for failure first, as it will get put in the cache later.
-        //
-        context.setApplicationDescriptor(auraApp);
-        try {
-            mdr.assertAccess(auraApp);
-            fail("should fail to grant access to aura:application");
-        } catch (NoAccessException nae) {
-            assertTrue("exception should say something about abstract", nae.getMessage()
-                    .contains("Abstract definition"));
-        }
-
-        //
-        // Check for failure when abstract app is top level.
-        //
-        context.setApplicationDescriptor(abApp);
-        try {
-            mdr.assertAccess(abApp);
-            fail("should fail to grant access to an abstract application");
-        } catch (NoAccessException nae) {
-            assertTrue("exception should say something about abstract", nae.getMessage()
-                    .contains("Abstract definition"));
-        }
-        mdr.assertAccess(auraApp);
-
-        //
-        // Check for success when non-abstract app is top level.
-        //
-        context.setApplicationDescriptor(app);
-        mdr.assertAccess(app);
-        mdr.assertAccess(abApp);
-        mdr.assertAccess(auraApp);
-    }
-
-    /**
-     * Check access assertion on abstract components.
-     */
-    public void testAssertAcessAbstractComponent() throws Exception {
-        DefDescriptor<ComponentDef> abComp = addSourceAutoCleanup(ComponentDef.class,
-                "<aura:component abstract=\"true\"/>");
-        DefDescriptor<ComponentDef> comp = addSourceAutoCleanup(ComponentDef.class,
-                String.format("<aura:component extends=\"%s:%s\"/>", abComp.getNamespace(), abComp.getName()));
-        MasterDefRegistryImpl mdr = getDefRegistry(false);
-        AuraContext context = Aura.getContextService().getCurrentContext();
-
-        //
-        // Check for failure when abstract app is top level.
-        //
-        context.setApplicationDescriptor(abComp);
-        try {
-            mdr.assertAccess(abComp);
-            fail("should fail to grant access to an abstract component");
-        } catch (NoAccessException nae) {
-            assertTrue("exception should say something about abstract", nae.getMessage()
-                    .contains("Abstract definition"));
-        }
-
-        //
-        // Check for success when non-abstract app is top level.
-        //
-        context.setApplicationDescriptor(comp);
-        mdr.assertAccess(comp);
-        mdr.assertAccess(abComp);
     }
 
     /**

@@ -15,5 +15,5 @@
     limitations under the License.
 
 -->
-<aura:application extensible="true" securityProvider="java://org.auraframework.java.securityProvider.LaxSecurityProvider">
+<aura:application extensible="true">
 </aura:application>

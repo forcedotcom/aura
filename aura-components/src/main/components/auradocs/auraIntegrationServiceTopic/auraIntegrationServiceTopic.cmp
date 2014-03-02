@@ -78,7 +78,6 @@ integration.addPreload("MyNamespace");
 
 <p><b>See also:</b><br/>    
     <auradocs:topicLink topic="modesIntro">Modes</auradocs:topicLink><br/>
-    <auradocs:topicLink topic="securityProviders">Controlling Access with Security Providers</auradocs:topicLink><br/>
     <auradocs:topicLink topic="compIds">Component IDs</auradocs:topicLink>
 </p>
 

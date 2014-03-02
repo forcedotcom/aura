@@ -180,7 +180,6 @@
     <p><b>See also:</b><br/>
         <auradocs:topicLink topic="compBundle">Component Bundles</auradocs:topicLink><br/>
         <auradocs:topicLink topic="modesSetDefault">Setting the Default Mode</auradocs:topicLink><br/>
-        <auradocs:topicLink topic="securityProviders">Controlling Access with Security Providers</auradocs:topicLink><br/>
         <auradocs:topicLink topic="docTests">Testing Components</auradocs:topicLink>
     </p>
 

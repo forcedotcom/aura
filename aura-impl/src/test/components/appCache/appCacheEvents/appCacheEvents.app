@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:application useAppcache="true" render="client"  preload="appCache" securityProvider="java://org.auraframework.java.securityProvider.LaxSecurityProvider" >
+<aura:application useAppcache="true" render="client"  preload="appCache">
     <div>This should appear after the appcache has been populated.</div>
 </aura:application>
 <!-- This app is used by appCacheEventsTest.js to test AppCache events and should not be used by any other tests to

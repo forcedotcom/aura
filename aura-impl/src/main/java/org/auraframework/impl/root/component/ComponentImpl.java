@@ -68,6 +68,8 @@ public final class ComponentImpl extends BaseComponentImpl<ComponentDef, Compone
         if (!remoteProvider) {
             DefDescriptor<ComponentDef> superDefDescriptor = def.getExtendsDescriptor();
             if (superDefDescriptor != null) {
+            	Aura.getDefinitionService().getDefRegistry().assertAccess(descriptor, superDefDescriptor.getDef());
+            	
                 Component concrete = concreteComponent == null ? this : concreteComponent;
                 superComponent = new ComponentImpl(superDefDescriptor, this, this, concrete);
             }
@@ -79,7 +81,7 @@ public final class ComponentImpl extends BaseComponentImpl<ComponentDef, Compone
     protected void injectComponent() throws QuickFixException {
         if (this.intfDescriptor != null) {
             AuraContext context = Aura.getContextService().getCurrentContext();
-            context.setCurrentNamespace(descriptor.getNamespace());
+            context.setCurrentCaller(descriptor);
             BaseComponent<?, ?> oldComponent = context.setCurrentComponent(new ProtoComponentImpl(descriptor,
                     getGlobalId(), attributeSet));
             try {
@@ -119,6 +121,7 @@ public final class ComponentImpl extends BaseComponentImpl<ComponentDef, Compone
                                 throw new AuraRuntimeException(String.format("%s cannot be instantiated directly.",
                                         descriptor));
                             }
+                            
                             // new component may have its own controllerdef so add that one
                             ControllerDef cd = c.getControllerDef();
                             if (cd != null) {
@@ -130,7 +133,6 @@ public final class ComponentImpl extends BaseComponentImpl<ComponentDef, Compone
                         }
 
                         attributeSet.setRootDefDescriptor(descriptor);
-                        
 
                         Map<String, Object> providedAttributes = config.getAttributes();
                         if (providedAttributes != null) {

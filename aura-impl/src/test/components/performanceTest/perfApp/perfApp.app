@@ -1,6 +1,5 @@
 <aura:application render="client" model="java://org.auraframework.impl.java.model.TestIterationModel" 
-                                  controller="java://org.auraframework.impl.java.controller.TestController"
-                                  securityProvider="java://org.auraframework.java.securityProvider.TestingSecurityProvider">
+                                  controller="java://org.auraframework.impl.java.controller.TestController">
 
     <aura:attribute name="color" default="white" type="String"/>
     <ui:button class="{! 'bkgColor ' + v.color}" label="Change color by setting attribute value" press="{!c.changeBkgColor}" />

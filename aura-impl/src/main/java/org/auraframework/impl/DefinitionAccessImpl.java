@@ -15,10 +15,11 @@
  */
 package org.auraframework.impl;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import org.auraframework.def.DefinitionAccess;
-import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.InvalidAccessValueException;
 import org.auraframework.util.AuraTextUtil;
 
@@ -41,7 +42,7 @@ public class DefinitionAccessImpl implements DefinitionAccess {
 
 	}
 
-	static public DefinitionAccess  defaultAccess() {
+	static public DefinitionAccess defaultAccess() {
 		return new DefinitionAccessImpl(new HashSet<BasicAccessType>());
 	}
 
@@ -70,8 +71,13 @@ public class DefinitionAccessImpl implements DefinitionAccess {
 	}
 
 	@Override
+	public boolean isInternal() {
+		// Default is at least INTERNAL
+		return access.isEmpty() || access.contains(BasicAccessType.INTERNAL);
+	}
+
+	@Override
 	public boolean isAccessible() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
@@ -100,5 +106,4 @@ public class DefinitionAccessImpl implements DefinitionAccess {
             .add(BasicAccessType.GLOBAL, BasicAccessType.PUBLIC, BasicAccessType.PRIVATE).build();
 
 	private final Set<BasicAccessType> access;
-
 }

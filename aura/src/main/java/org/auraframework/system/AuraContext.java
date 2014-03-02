@@ -103,7 +103,7 @@ public interface AuraContext {
     }
 
     public static enum Access {
-        PUBLIC, AUTHENTICATED
+        PUBLIC, AUTHENTICATED, GLOBAL, INTERNAL
     }
 
     /**
@@ -170,16 +170,21 @@ public interface AuraContext {
      * Set the current namespace.
      *
      * FIXME: this is an anti-pattern. it is used inside calls to set the
-     * current namespace, but is never reset, so it persists in strange and
+     * current "calling" descr, but is never reset, so it persists in strange and
      * interesting ways. Figure out another way to do this?
      */
-    void setCurrentNamespace(String namespace);
+    void setCurrentCaller(DefDescriptor<?> descriptor);
 
     /**
-     * Get the current namespace.
+     * Get the current "calling" descriptor.
      */
-    String getCurrentNamespace();
+    DefDescriptor<?> getCurrentCaller();
 
+    /**
+     * Get the descriptor for either the current instance or current def (runtime versus compile time).
+     */
+	DefDescriptor<?> getCurrentDescriptor();
+    
     /**
      * If a qualifiedName for a DefDescriptor of the given type does not include
      * a prefix (apex:// or java://, etc...), this method on the context will be
@@ -430,6 +435,8 @@ public interface AuraContext {
      */
     InstanceStack getInstanceStack();
 
+	String getCurrentNamespace();
+	
     /**
      * Register a new component.
      *

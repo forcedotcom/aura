@@ -87,8 +87,6 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
     protected void readAttributes() throws QuickFixException {
         super.readAttributes();
 
-        appBuilder.setSecurityProviderDescriptor(getAttributeValue(ATTRIBUTE_SECURITY_PROVIDER));
-
         String locationChangeEvent = getAttributeValue(ATTRIBUTE_LOCATION_CHANGE_EVENT);
         if (!AuraTextUtil.isNullEmptyOrWhitespace(locationChangeEvent)) {
             appBuilder.locationChangeEventDescriptor = DefDescriptorImpl.getInstance(locationChangeEvent,
@@ -180,7 +178,6 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
     private static final String ATTRIBUTE_PRELOAD = "preload";
     private static final String ATTRIBUTE_LAYOUTS = "layouts";
     private static final String ATTRIBUTE_LOCATION_CHANGE_EVENT = "locationChangeEvent";
-    private static final String ATTRIBUTE_SECURITY_PROVIDER = "securityProvider";
     private static final String ATTRIBUTE_APPCACHE_ENABLED = "useAppcache";
     private static final String ATTRIBUTE_ADDITIONAL_APPCACHE_URLS = "additionalAppCacheURLs";
     private static final String ATTRIBUTE_IS_ONE_PAGE_APP = "isOnePageApp";
@@ -188,7 +185,7 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
 
     private final static Set<String> ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>()
             .add(ATTRIBUTE_PRELOAD, ATTRIBUTE_LAYOUTS, ATTRIBUTE_LOCATION_CHANGE_EVENT, ATTRIBUTE_PRELOAD,
-                    ATTRIBUTE_SECURITY_PROVIDER, ATTRIBUTE_APPCACHE_ENABLED,
+                    ATTRIBUTE_APPCACHE_ENABLED,
                     ATTRIBUTE_ADDITIONAL_APPCACHE_URLS, ATTRIBUTE_IS_ONE_PAGE_APP, ATTRIBUTE_OVERRIDE_THEME)
             .addAll(BaseComponentDefHandler.ALLOWED_ATTRIBUTES).build();
     

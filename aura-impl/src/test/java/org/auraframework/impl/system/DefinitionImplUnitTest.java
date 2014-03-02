@@ -23,6 +23,9 @@ import org.auraframework.def.Definition;
 import org.auraframework.def.Definition.Visibility;
 import org.auraframework.impl.system.DefinitionImpl.RefBuilderImpl;
 import org.auraframework.system.AuraContext;
+import org.auraframework.system.AuraContext.Access;
+import org.auraframework.system.AuraContext.Format;
+import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.Location;
 import org.auraframework.system.SubDefDescriptor;
 import org.auraframework.test.UnitTestCase;
@@ -175,6 +178,7 @@ public abstract class DefinitionImplUnitTest<I extends DefinitionImpl<D>, D exte
 
     // used to setup references to be validated by subclasses
     public void testValidateReferences() throws Exception {
+    	Aura.getContextService().startContext(Mode.PROD, Format.JS, Access.AUTHENTICATED);
         setupValidateReferences();
         buildDefinition().validateReferences();
     }

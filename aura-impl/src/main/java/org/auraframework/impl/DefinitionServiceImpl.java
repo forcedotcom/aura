@@ -22,7 +22,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.auraframework.Aura;
 import org.auraframework.def.ActionDef;
-import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
@@ -75,25 +74,18 @@ public class DefinitionServiceImpl implements DefinitionService {
     public <T extends Definition> T getDefinition(DefDescriptor<T> descriptor) throws QuickFixException {
         ContextService contextService = Aura.getContextService();
         contextService.assertEstablished();
-        contextService.assertAccess(descriptor);
 
-        T def = contextService.getCurrentContext().getDefRegistry().getDef(descriptor);
+        AuraContext context = Aura.getContextService().getCurrentContext();
+        T def = context.getDefRegistry().getDef(descriptor);
 
-        //
-        // Check authentication. All defs should really support this but right now
-        // it's specific to Applications, so putting this special case here until
-        // we have a more generic check on all defs.
-        //
-        if (def != null && def.getDescriptor().getDefType() == DefType.APPLICATION
-                && ((ApplicationDef) def).getAccess().requiresAuthentication()) {
-            AuraContext context = Aura.getContextService().getCurrentContext();
-            if (context.getAccess() != Access.AUTHENTICATED) {
-                def = null;
-            }
+        if (def != null && descriptor.getDefType() == DefType.APPLICATION && def.getAccess().requiresAuthentication() && context.getAccess() != Access.AUTHENTICATED) {
+            def = null;
         }
+        
         if (def == null) {
             throw new DefinitionNotFoundException(descriptor);
         }
+        
         return def;
     }
 
@@ -181,12 +173,14 @@ public class DefinitionServiceImpl implements DefinitionService {
 
     @Override
     public void save(Definition def) throws QuickFixException {
+        MasterDefRegistry defRegistry = Aura.getContextService().getCurrentContext().getDefRegistry();
+
         ContextService contextService = Aura.getContextService();
         contextService.assertEstablished();
         
         def.validateDefinition();
-        contextService.assertAccess(def.getDescriptor());
-        Aura.getContextService().getCurrentContext().getDefRegistry().save(def);
+        
+		defRegistry.save(def);
     }
 
     /**
@@ -261,7 +255,7 @@ public class DefinitionServiceImpl implements DefinitionService {
                     }
                     Set<DefDescriptor<?>> deps = mdr.getDependencies(uid);
                     loaded.addAll(deps);
-                    for (DefDescriptor x : prev) {
+                    for (DefDescriptor<?> x : prev) {
                         if (deps.contains(x)) {
                             if (remove == null) {
                                 remove = Sets.newHashSet();
@@ -320,5 +314,4 @@ public class DefinitionServiceImpl implements DefinitionService {
             }
         }
     }
-
 }

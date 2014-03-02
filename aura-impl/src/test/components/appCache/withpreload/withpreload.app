@@ -15,6 +15,6 @@
     limitations under the License.
 
 -->
-<aura:application useAppcache="true" render="client" preload="appCache" securityProvider="java://org.auraframework.java.securityProvider.LaxSecurityProvider">
+<aura:application useAppcache="true" render="client" preload="appCache">
     <appcache:slate/>
 </aura:application>

@@ -326,27 +326,27 @@ public class ClientLibraryServiceImplTest extends AuraImplTestCase {
                 "clientLibraryTest:testDependencies", ApplicationDef.class);
 
         Aura.getContextService().endContext();
-        Aura.getContextService().startContext(Mode.PTEST, Format.JSON, Access.AUTHENTICATED);
+        Aura.getContextService().startContext(Mode.PTEST, Format.JSON, Access.AUTHENTICATED, laxSecurityApp);
         Set<String> jsUrls = getClientLibraryUrls(appDesc, Type.JS);
         assertTrue("Missing library for PTEST mode", jsUrls.contains("http://likeaboss.com/mode.js"));
 
         Aura.getContextService().endContext();
-        Aura.getContextService().startContext(Mode.CADENCE, Format.JSON, Access.AUTHENTICATED);
+        Aura.getContextService().startContext(Mode.CADENCE, Format.JSON, Access.PUBLIC, laxSecurityApp);
         jsUrls = getClientLibraryUrls(appDesc, Type.JS);
         assertTrue("Missing library for CADENCE mode", jsUrls.contains("http://likeaboss.com/mode.js"));
 
         Aura.getContextService().endContext();
-        Aura.getContextService().startContext(Mode.DEV, Format.JSON, Access.AUTHENTICATED);
+        Aura.getContextService().startContext(Mode.DEV, Format.JSON, Access.PUBLIC, laxSecurityApp);
         jsUrls = getClientLibraryUrls(appDesc, Type.JS);
         assertTrue("Missing library for DEV mode", jsUrls.contains("http://likeaboss.com/mode.js"));
 
         Aura.getContextService().endContext();
-        Aura.getContextService().startContext(Mode.STATS, Format.JSON, Access.AUTHENTICATED);
+        Aura.getContextService().startContext(Mode.STATS, Format.JSON, Access.PUBLIC, laxSecurityApp);
         jsUrls = getClientLibraryUrls(appDesc, Type.JS);
         assertTrue("Missing library for STATS mode", jsUrls.contains("http://likeaboss.com/mode.js"));
 
         Aura.getContextService().endContext();
-        Aura.getContextService().startContext(Mode.JSTEST, Format.JSON, Access.AUTHENTICATED);
+        Aura.getContextService().startContext(Mode.JSTEST, Format.JSON, Access.PUBLIC, laxSecurityApp);
         jsUrls = getClientLibraryUrls(appDesc, Type.JS);
         assertFalse("Library should not be included for JSTEST mode", jsUrls.contains("http://likeaboss.com/mode.js"));
 

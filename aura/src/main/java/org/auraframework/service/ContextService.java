@@ -17,8 +17,10 @@ package org.auraframework.service;
 
 import java.util.Set;
 
+import org.auraframework.def.AttributeDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.Definition;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Format;
@@ -113,10 +115,4 @@ public interface ContextService extends AuraService {
      * Throw a RuntimeException if no context is currently established.
      */
     void assertEstablished();
-
-    /**
-     * Throws a NoAccessException if the current root application's security
-     * provider denies access to the def described by the given descriptor.
-     */
-    void assertAccess(DefDescriptor<?> desc) throws QuickFixException;
 }

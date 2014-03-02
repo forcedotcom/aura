@@ -18,7 +18,6 @@
 <aura:application
     template="auradocs:template"
     controller="java://org.auraframework.docs.DocsController"
-    securityProvider="java://org.auraframework.docs.DocsSecurityProvider"
     useAppcache="false"
     preload="auradocs,aurastorage"
     locationChangeEvent="auradocs:locationChange"

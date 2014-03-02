@@ -1,4 +1,4 @@
-markup://test:layoutNoLayout : JaeJtcNBjwGM-7qYzb0sXg
+markup://test:layoutNoLayout : e0N2j5fOBiByD2R2suqzPA
 aura://Boolean : null
 aura://Integer : null
 aura://String : null
@@ -224,7 +224,6 @@ java://org.auraframework.component.ui.DatePickerModel : null
 java://org.auraframework.component.ui.ListProvider : null
 java://org.auraframework.component.ui.PagerProvider : null
 java://org.auraframework.components.aura.ThemedDeclarationRenderer : null
-java://org.auraframework.components.DefaultSecurityProvider : null
 java://org.auraframework.components.ui.TreeNode : null
 java://org.auraframework.system.Location : null
 js://aura.debug : fwTR3eqdiDUCt-31IgNC_g
@@ -359,7 +358,6 @@ css://ui.tree : mVG-2wW3Hd8QhaBFmOSZ8w
 java://List<aura.components.ui.TreeNode> : null
 java://org.auraframework.component.ui.InputOptionProvider : null
 java://org.auraframework.impl.controller.TimeZoneInfoController : null
-java://org.auraframework.impl.integration.IntegrationServiceSecurityProvider : null
 js://ui.actionMenuItem : H7jGaFoVSIhec5hi_lwf9Q
 js://ui.actionMenuItem : DLnNFYpHd2zIMn_qNwVLZQ
 js://ui.autocomplete : 9XkbCuFo6YmHR4ggwl6oPg
@@ -448,7 +446,7 @@ js://ui.scroller : 1KdMPgjGJSZVZunkq0JPdg
 js://ui.scroller : 2WyP3FVze77cR73zhADKSg
 js://ui.spinner : cpLRJAXdf2YYm_3qQE8f_g
 js://ui.tree : n-GC7d3wl9UUr-CabMQdaQ
-markup://aura:application : 9sbuNlFpiVJtYfQAUrmkbA
+markup://aura:application : buA_Ie43jHlAd8nx7lIhgQ
 markup://aura:debug : KIG8_0c35sjG9-dNCrabRg
 markup://aura:embeddedTemplate : 7-fzI_5erPzKueCQE-HDdQ
 markup://aura:integrationServiceTemplate : -0iE2FDPu23AE5OcQKHIAA
@@ -504,7 +502,7 @@ markup://ui:toggleRichText : 0iHgJ1yiM2DQQ_5qoN-Ahg
 markup://ui:treeNode : D8RYM_W1CfhMFu2oBw5LyQ
 markup://ui:underConstruction : 47gIj4RQGQl28o9VPNqkzw
 markup://ui:write : vmZZxV1g-sxx9R7B9m3cJw
-markup://aura:integrationServiceApp : ip8X2dnKHK0JbWD4Hasmeg
+markup://aura:integrationServiceApp : LpKXIKstkFqoLNoOfg5INA
 markup://ui:actionButton : 9EuYC0ZIDGqxT8C0KjTn5A
 markup://ui:actionDelegate : yNW8S28iXj385M0imL8vcg
 markup://ui:actionMenuItem : Rjbb30UMEET8J-ARZ_mTvg

@@ -16,7 +16,6 @@
 
 -->
 <aura:application useAppcache="true" render="client"  preload="appCache" 
-    securityProvider="java://org.auraframework.java.securityProvider.LaxSecurityProvider" 
     controller="java://org.auraframework.impl.java.controller.TestController"
     additionalAppCacheURLs="{!c.getAppCacheUrls}">
     <div>This should appear after the appcache has been populated.</div>

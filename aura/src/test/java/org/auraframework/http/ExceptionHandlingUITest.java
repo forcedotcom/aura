@@ -44,7 +44,7 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
         super(name);
     }
 
-    private static final String baseAppTag = "<aura:application %s securityProvider='java://org.auraframework.components.security.SecurityProviderAlwaysAllows'>%s</aura:application>";
+    private static final String baseAppTag = "<aura:application %s>%s</aura:application>";
 
     private static final String errorBoxPath = "//div[@class='auraMsgMask auraForcedErrorBox']//div[@id='auraErrorMessage']";
 
@@ -284,13 +284,13 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
      */
     public void testAppThrowsWithFileName() throws Exception {
         setProdContextWithoutConfig();
-        // load the defination in the loader
+        // load the definition in the loader
         DefDescriptor<?> add = addSourceAutoCleanup(
                 ApplicationDef.class,
-                "<aura:application securityProvider='java://org.auraframework.components.security.SecurityProviderAlwaysAllows''></aura:application>");
+                "<aura:application '></aura:application>");
         openRaw(String.format("/%s/%s.app", add.getNamespace(), add.getName()));
         assertQuickFixStacktrace("org.auraframework.throwable.AuraUnhandledException: "
-                + String.format("markup://%s:%s:1,111: ParseError at [row,col]:[2,111]", add.getNamespace(),
+                + String.format("markup://%s:%s:1,19: ParseError at [row,col]:[2,19]", add.getNamespace(),
                         add.getName()));
     }
 

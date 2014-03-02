@@ -47,7 +47,6 @@
     <p>This is an example of using the <code>additionalAppCacheURLs</code> attribute in the application tag. In this example, the URLs in the attribute value are obtained from a server controller action.</p>
     <auradocs:codeblock>
     &lt;aura:application useAppcache="true" render="client"  preload="appCache" 
-      securityProvider="java://org.auraframework.java.securityProvider.LaxSecurityProvider" 
       controller="java://org.auraframework.impl.java.controller.TestController"
       additionalAppCacheURLs="<aura:text value="{!"></aura:text>c.getAppCacheUrls}">
     &lt;/aura:application>     

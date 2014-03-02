@@ -118,8 +118,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         createDef(
                 ApplicationDef.class,
                 String.format("%s:%s", namespace, appName),
-                String.format("<aura:application useAppcache='true' render='client' preload='%s'"
-                        + " securityProvider='java://org.auraframework.java.securityProvider.LaxSecurityProvider'>"
+                String.format("<aura:application useAppcache='true' render='client' preload='%s'>"
                         + "<%s:%s/>" + "</aura:application>", namespace, namespace, cmpDesc.getName()));
     }
 

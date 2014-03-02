@@ -22,6 +22,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.RendererDef;
 import org.auraframework.impl.java.BaseJavaDefFactory;
 import org.auraframework.system.SourceLoader;
+import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
  */
@@ -36,13 +37,14 @@ public class JavaRendererDefFactory extends BaseJavaDefFactory<RendererDef> {
     }
 
     @Override
-    protected DefBuilder<?, ? extends RendererDef> getBuilder(DefDescriptor<RendererDef> descriptor) {
+    protected DefBuilder<?, ? extends RendererDef> getBuilder(DefDescriptor<RendererDef> descriptor) throws QuickFixException {
         JavaRendererDef.Builder builder = new JavaRendererDef.Builder();
         Class<?> rendererClass = getClazz(descriptor);
 
         if (rendererClass == null) {
             return null;
         }
+        
         builder.setDescriptor(descriptor);
         builder.setLocation(rendererClass.getCanonicalName(), -1);
         builder.setRendererClass(rendererClass);

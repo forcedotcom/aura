@@ -178,7 +178,12 @@ public abstract class DefinitionImplUnitTest<I extends DefinitionImpl<D>, D exte
 
     // used to setup references to be validated by subclasses
     public void testValidateReferences() throws Exception {
-    	Aura.getContextService().startContext(Mode.PROD, Format.JS, Access.AUTHENTICATED);
+        if (testAuraContext != null) {
+            Aura.getContextService().endContext();
+        }
+        
+        testAuraContext = Aura.getContextService().startContext(Mode.PROD, Format.JS, Access.AUTHENTICATED);
+    	
         setupValidateReferences();
         buildDefinition().validateReferences();
     }

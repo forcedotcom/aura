@@ -76,9 +76,8 @@
         <repository>
             <snapshots />
             <id>maven.auraframework.org-ext-releases</id>
-            <url>http://maven.auraframework.org/ext-release-local</url>
+            <url>http://repo.auraframework.org/ext-release-local</url>
         </repository>
-        
         <repository>
             <snapshots />
             <id>repo.auraframework.org-chromedriver</id>

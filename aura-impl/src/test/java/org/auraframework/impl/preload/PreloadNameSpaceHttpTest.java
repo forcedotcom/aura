@@ -80,7 +80,7 @@ public class PreloadNameSpaceHttpTest extends AuraHttpTestCase {
 
     private String obtainResponseCheckStatus() throws Exception {
         String url = String.format("/aura?aura.tag=%s&aura.deftype=APPLICATION&aura.context=%s", "preloadTest:test_Preload_Cmp_SameNameSpace",
-            URLEncoder.encode(getContext(Mode.FTEST, Format.JSON, "preloadTest:test_Preload_Cmp_SameNameSpace",
+            URLEncoder.encode(getAuraTestingUtil().getContext(Mode.FTEST, Format.JSON, "preloadTest:test_Preload_Cmp_SameNameSpace",
                 ApplicationDef.class, false), "UTF-8"));
         HttpGet get = obtainGetMethod(url);
         HttpResponse httpResponse = perform(get);

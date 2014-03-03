@@ -164,7 +164,7 @@ public class AuraServletCacheInvalidationHttpTest extends AuraHttpTestCase {
         params.put("message", jsonMessage);
         params.put("aura.token", getCsrfToken());
 
-        String serContext = getSerializedAuraContextWithModifiedUID(ctx, modified);
+        String serContext = getAuraTestingUtil().getSerializedAuraContextWithModifiedUID(ctx, modified);
 
         params.put("aura.context", serContext);
 
@@ -182,7 +182,7 @@ public class AuraServletCacheInvalidationHttpTest extends AuraHttpTestCase {
     }
 
     private String getGetURIWithModifiedUID(AuraContext ctx, boolean modify) throws Exception {
-        String serContext = getSerializedAuraContextWithModifiedUID(ctx, modify);
+        String serContext = getAuraTestingUtil().getSerializedAuraContextWithModifiedUID(ctx, modify);
         return getGetURI(ctx.getApplicationDescriptor().getQualifiedName(), serContext);
     }
 

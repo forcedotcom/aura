@@ -23,7 +23,6 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.def.*;
 import org.auraframework.impl.documentation.ExampleDefImpl;
-import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.SubDefDescriptorImpl;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;

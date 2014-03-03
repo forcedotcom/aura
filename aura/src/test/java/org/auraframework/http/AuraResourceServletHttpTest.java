@@ -53,7 +53,8 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
      */
     @TestLabels("auraSanity")
     public void testCSSOrdering_AcrossFacets() throws Exception {
-        String modeAndContext = getContext(Mode.DEV, Format.CSS, "auratest:test_css_a", ComponentDef.class, false);
+        String modeAndContext = getAuraTestingUtil().getContext(Mode.DEV, Format.CSS,
+                "auratest:test_css_a", ComponentDef.class, false);
         String url = "/l/" + AuraTextUtil.urlencode(modeAndContext) + "/app.css";
         HttpGet get = obtainGetMethod(url);
         HttpResponse httpResponse = perform(get);
@@ -76,7 +77,7 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
 
     @TestLabels("auraSanity")
     public void testCSSOrdering_AcrossInheritance() throws Exception {
-        String modeAndContext = getContext(Mode.DEV, Format.CSS, "auratest:test_css_child", ComponentDef.class, false);
+        String modeAndContext = getAuraTestingUtil().getContext(Mode.DEV, Format.CSS, "auratest:test_css_child", ComponentDef.class, false);
         String url = "/l/" + AuraTextUtil.urlencode(modeAndContext) + "/app.css";
         HttpGet get = obtainGetMethod(url);
         HttpResponse httpResponse = perform(get);

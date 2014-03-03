@@ -15,9 +15,7 @@
  */
 package org.auraframework.impl.adapter.format.css;
 
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
 
 import java.io.IOException;
 

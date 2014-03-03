@@ -15,9 +15,6 @@
  */
 package org.auraframework.impl.adapter.format.css;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.auraframework.impl.adapter.format.BaseFormatAdapter;
 
 /**

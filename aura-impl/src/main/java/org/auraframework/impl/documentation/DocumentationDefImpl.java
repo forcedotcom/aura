@@ -16,7 +16,6 @@
 package org.auraframework.impl.documentation;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,8 +31,6 @@ import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.root.RootDefinitionImpl;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
-
-import com.google.common.collect.Lists;
 
 public class DocumentationDefImpl extends RootDefinitionImpl<DocumentationDef> implements DocumentationDef {
 

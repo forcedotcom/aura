@@ -20,9 +20,7 @@ import java.util.Collection;
 
 import javax.annotation.concurrent.ThreadSafe;
 
-import org.auraframework.Aura;
 import org.auraframework.def.StyleDef;
-import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**

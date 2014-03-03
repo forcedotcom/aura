@@ -249,7 +249,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
      */
     protected String getSimpleContext(Format format, boolean modified)
             throws Exception {
-        return getContext(Mode.DEV, format,
+        return getAuraTestingUtil().getContext(Mode.DEV, format,
                 "auratest:test_SimpleServerRenderedPage", ApplicationDef.class,
                 modified);
     }
@@ -401,8 +401,8 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
             urlparams.add(new BasicNameValuePair(entry.getKey(), entry
                     .getValue()));
         }
-        urlparams.add(new BasicNameValuePair("aura.context", getContext(mode,
-                format, desc, false)));
+        urlparams.add(new BasicNameValuePair("aura.context",
+                getAuraTestingUtil().getContext(mode, format, desc, false)));
         String query = URLEncodedUtils.format(urlparams, "UTF-8");
 
         // final url Request to be send to server

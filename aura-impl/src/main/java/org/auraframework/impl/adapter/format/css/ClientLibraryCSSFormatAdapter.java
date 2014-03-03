@@ -19,9 +19,7 @@ import java.io.IOException;
 import java.util.Collection;
 import javax.annotation.concurrent.ThreadSafe;
 
-import org.auraframework.Aura;
 import org.auraframework.clientlibrary.Combinable;
-import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**

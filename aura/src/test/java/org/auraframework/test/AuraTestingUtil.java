@@ -15,6 +15,7 @@
  */
 package org.auraframework.test;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
@@ -24,15 +25,20 @@ import java.util.concurrent.atomic.AtomicLong;
 import javax.annotation.Nullable;
 
 import org.auraframework.Aura;
+import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.impl.source.StringSourceLoader;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
+import org.auraframework.system.AuraContext.Access;
+import org.auraframework.system.AuraContext.Format;
+import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.Source;
 import org.auraframework.system.SourceListener;
 import org.auraframework.system.SourceListener.SourceMonitorEvent;
 import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.collect.Sets;
 
@@ -207,5 +213,103 @@ public class AuraTestingUtil {
             cleanUpDds = Sets.newHashSet();
         }
         cleanUpDds.add(desc);
+    }
+
+    /**
+     * Start a context and set up default values.
+     */
+    protected AuraContext setupContext(Mode mode, Format format, DefDescriptor<? extends BaseComponentDef> desc) 
+            throws QuickFixException {
+        AuraContext ctxt = Aura.getContextService().startContext(mode, format, Access.AUTHENTICATED, desc);
+        ctxt.setFrameworkUID(Aura.getConfigAdapter().getAuraFrameworkNonce());
+        String uid = ctxt.getDefRegistry().getUid(null, desc);
+        ctxt.addLoaded(desc, uid);
+        return ctxt;
+    }
+
+    /**
+     * Get a context for use with a get/post.
+     *
+     * @param mode the Aura mode to use.
+     * @param format the format (HTML vs JSON) to use
+     * @param desc the descriptor name to set as the primary object.
+     * @param type the type of descriptor.
+     * @param modified break the context uid.
+     */
+    public String getContext(Mode mode, Format format, String desc, Class<? extends BaseComponentDef> type,
+            boolean modified) throws QuickFixException {
+        return getContext(mode, format, Aura.getDefinitionService().getDefDescriptor(desc, type), modified);
+    }
+
+    /**
+     * Get a context as a string.
+     *
+     * @param mode the Aura mode to use.
+     * @param format the format (HTML vs JSON) to use
+     * @param desc the descriptor to set as the primary object.
+     * @param modified break the context uid.
+     */
+    public String getContext(Mode mode, Format format, DefDescriptor<? extends BaseComponentDef> desc,
+            boolean modified) throws QuickFixException {
+        AuraContext ctxt = setupContext(mode, format, desc);
+        String ctxtString;
+        if (modified) {
+            String uid = modifyUID(ctxt.getLoaded().get(desc));
+            ctxt.addLoaded(desc, uid);
+        }
+        ctxtString = getSerializedAuraContext(ctxt);
+        Aura.getContextService().endContext();
+        return ctxtString;
+    }
+
+    /**
+     * Get a serialized context with a possibly modified UID.
+     *
+     * FIXME: this should be cleaned out.
+     */
+    public String getSerializedAuraContextWithModifiedUID(AuraContext ctx, boolean modify) throws QuickFixException {
+        String uid = ctx.getDefRegistry().getUid(null, ctx.getApplicationDescriptor());
+        if (modify) {
+            uid = modifyUID(uid);
+        }
+        ctx.addLoaded(ctx.getApplicationDescriptor(), uid);
+        return getSerializedAuraContext(ctx);
+    }
+
+    /**
+     * Serialize a context.
+     *
+     * This simply runs the serialization and handles exceptions.
+     *
+     * @param ctx the context to serialize.
+     * @return the serialized context as a string
+     * @throws QuickFixException if the serialization service does (unlikely).
+     */
+    public String getSerializedAuraContext(AuraContext ctx) throws QuickFixException {
+        StringBuilder sb = new StringBuilder();
+        try {
+            Aura.getSerializationService().write(ctx, null, AuraContext.class, sb, "HTML");
+        } catch (IOException e) {
+            // This should never happen, stringbuilders don't throw IOException.
+            throw new AuraRuntimeException(e);
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Make a UID be incorrect.
+     */
+    protected String modifyUID(String old) {
+        StringBuilder sb = new StringBuilder(old);
+        char flip = sb.charAt(3);
+
+        // change the character.
+        if (flip == 'a') {
+            flip = 'b';
+        } else {
+            flip = 'a';
+        }
+        sb.setCharAt(3, flip);
+        return sb.toString();
     }
 }

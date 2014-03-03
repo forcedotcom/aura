@@ -25,7 +25,6 @@ import javax.xml.stream.XMLStreamReader;
 import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DefinitionAccess.BasicAccessType;
 import org.auraframework.impl.root.component.BaseComponentDefImpl.Builder;
 import org.auraframework.impl.root.component.ComponentDefImpl;
 import org.auraframework.instance.Component;
@@ -84,13 +83,4 @@ public class ComponentDefHandler extends BaseComponentDefHandler<ComponentDef> {
         }
     }
     
-    @Override
-	public Set<BasicAccessType> getAllowedAccessValues() {
-		return ALLOWED_ACCESS_VALUES;
-	}
-
-    private final static Set<BasicAccessType> ALLOWED_ACCESS_VALUES = new ImmutableSet.Builder<BasicAccessType>()
-            .add(BasicAccessType.GLOBAL, BasicAccessType.PUBLIC, BasicAccessType.PREVIEW, 
-            		BasicAccessType.INTERNAL).build();
-
 }

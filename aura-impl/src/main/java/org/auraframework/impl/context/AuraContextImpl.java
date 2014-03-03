@@ -244,7 +244,7 @@ public class AuraContextImpl implements AuraContext {
 
     private final Mode mode;
 
-    private final Access access;
+    private final Authentication access;
 
     private final MasterDefRegistry masterRegistry;
 
@@ -302,11 +302,11 @@ public class AuraContextImpl implements AuraContext {
     private DefDescriptor<ThemeDef> overrideThemeDescriptor;
 
     public AuraContextImpl(Mode mode, MasterDefRegistry masterRegistry, Map<DefType, String> defaultPrefixes,
-            Format format, Access access, JsonSerializationContext jsonContext,
+            Format format, Authentication access, JsonSerializationContext jsonContext,
             Map<ValueProviderType, GlobalValueProvider> globalProviders, boolean isDebugToolEnabled) {
 
         // TODO: remove preloads
-        if (access == Access.AUTHENTICATED) {
+        if (access == Authentication.AUTHENTICATED) {
             preloadedNamespaces.add("aura");
             preloadedNamespaces.add("ui");
             if (mode == Mode.DEV) {
@@ -346,7 +346,7 @@ public class AuraContextImpl implements AuraContext {
     }
 
     @Override
-    public Access getAccess() {
+    public Authentication getAccess() {
         return access;
     }
 

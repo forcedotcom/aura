@@ -26,7 +26,7 @@ import org.auraframework.impl.system.*;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.*;
-import org.auraframework.system.AuraContext.Access;
+import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.ClientOutOfSyncException;
@@ -62,7 +62,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
                         baseApplicationTag,
                         "access='UNAUTHENTICATED'",
                         ""));
-        Aura.getContextService().startContext(Mode.PROD, Format.HTML, Access.PUBLIC, desc);
+        Aura.getContextService().startContext(Mode.PROD, Format.HTML, Authentication.UNAUTHENTICATED, desc);
         assertEquals(desc, Aura.getDefinitionService().getDefinition(desc).getDescriptor());
     }
 
@@ -73,7 +73,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
                         baseApplicationTag,
                         "access='UNAUTHENTICATED'",
                         ""));
-        Aura.getContextService().startContext(Mode.PROD, Format.HTML, Access.AUTHENTICATED, desc);
+        Aura.getContextService().startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED, desc);
         assertEquals(desc, Aura.getDefinitionService().getDefinition(desc).getDescriptor());
     }
 
@@ -81,7 +81,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         DefDescriptor<? extends BaseComponentDef> desc = addSourceAutoCleanup(
                 ApplicationDef.class, String.format(baseApplicationTag,
                         "", ""));
-        Aura.getContextService().startContext(Mode.PROD, Format.HTML, Access.PUBLIC, desc);
+        Aura.getContextService().startContext(Mode.PROD, Format.HTML, Authentication.UNAUTHENTICATED, desc);
         try {
             Aura.getDefinitionService().getDefinition(desc);
             fail("Expected DefinitionNotFoundException from assertAccess");
@@ -93,7 +93,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         DefDescriptor<? extends BaseComponentDef> desc = addSourceAutoCleanup(
                 ApplicationDef.class, String.format(baseApplicationTag,
                         "", ""));
-        Aura.getContextService().startContext(Mode.PROD, Format.HTML, Access.AUTHENTICATED, desc);
+        Aura.getContextService().startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED, desc);
         assertEquals(desc, Aura.getDefinitionService().getDefinition(desc).getDescriptor());
     }
 
@@ -101,7 +101,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
      * ContextService.assertAccess is called during getDefinition(DefDescriptor).
      */
     public void testGetDefinition_DefDescriptor_assertAccess() throws QuickFixException {
-        Aura.getContextService().startContext(Mode.PROD, Format.HTML, Access.AUTHENTICATED);
+        Aura.getContextService().startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
         DefDescriptor<ComponentDef> desc = Aura.getDefinitionService().getDefDescriptor(DEFINITION_SERVICE_IMPL_TEST_TARGET_COMPONENT, ComponentDef.class);
         try {
             Definition def = definitionService.getDefinition(desc);
@@ -115,7 +115,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
      * ContextService.assertAccess is called during getDefinition(String, Class).
      */
     public void testGetDefinition_StringClass_assertAccess() throws QuickFixException {
-        Aura.getContextService().startContext(Mode.PROD, Format.HTML, Access.AUTHENTICATED);
+        Aura.getContextService().startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
         DefDescriptor<ComponentDef> desc = Aura.getDefinitionService().getDefDescriptor(DEFINITION_SERVICE_IMPL_TEST_TARGET_COMPONENT, ComponentDef.class);
         try {
             Definition def = Aura.getDefinitionService().getDefinition(desc.getQualifiedName(), ComponentDef.class);
@@ -129,7 +129,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
      * ContextService.assertAccess is called during getDefinition(String, DefType...).
      */
     public void testGetDefinition_StringDefType_assertAccess() throws QuickFixException {
-        Aura.getContextService().startContext(Mode.PROD, Format.HTML, Access.AUTHENTICATED);
+        Aura.getContextService().startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
         DefDescriptor<ComponentDef> desc = Aura.getDefinitionService().getDefDescriptor(DEFINITION_SERVICE_IMPL_TEST_TARGET_COMPONENT, ComponentDef.class);
         try {
             Definition def = Aura.getDefinitionService().getDefinition(desc.getQualifiedName(), DefType.COMPONENT);
@@ -143,7 +143,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
      * Client loaded set is still preloaded for null input
      */
     public void testUpdateLoadedInitialNull() throws Exception {
-        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Access.AUTHENTICATED);
+        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED);
         DefDescriptor<?> dummyDesc = DefDescriptorImpl.getInstance("uh:oh", ComponentDef.class);
         DefDescriptor<?> clientDesc = addSourceAutoCleanup(ComponentDef.class, String.format(baseComponentTag, "", ""));
         String clientUid = context.getDefRegistry().getUid(null, clientDesc);
@@ -175,7 +175,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
      * ClientOutOfSyncException thrown when context uid is not current.
      */
     public void testUpdateLoadedWithWrongUidInContext() throws Exception {
-        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Access.AUTHENTICATED);
+        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED);
         DefDescriptor<?> cmpDesc = addSourceAutoCleanup(ComponentDef.class, String.format(baseComponentTag, "", ""));
         Map<DefDescriptor<?>,String> clientLoaded = Maps.newHashMap();
         clientLoaded.put(cmpDesc, "expired");
@@ -193,7 +193,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
      * QFE expected from inner getUid.
      */
     public void testUpdateLoadedWithQuickFixException() throws Exception {
-        Aura.getContextService().startContext(Mode.PROD, Format.JSON, Access.AUTHENTICATED);
+        Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED);
         DefDescriptor<?> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "", "<invalid:thisbetternotexistorthistestwillfail/>"));
         try {
@@ -209,7 +209,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
      * DefinitionNotFoundException expected when non-loaded descriptor is not found in the registry.
      */
     public void testUpdateLoadedWithNonExistentDescriptor() throws Exception {
-        Aura.getContextService().startContext(Mode.PROD, Format.JSON, Access.AUTHENTICATED);
+        Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED);
         DefDescriptor<ComponentDef> testDesc = getAuraTestingUtil().createStringSourceDescriptor("garbage", ComponentDef.class);
         try {
             Aura.getDefinitionService().updateLoaded(testDesc);
@@ -224,7 +224,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
      * ClientOutOfSyncException thrown when def was deleted (not found).
      */
     public void testUpdateLoadedClientOutOfSyncTrumpsQuickFixException() throws Exception {
-        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Access.AUTHENTICATED);
+        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED);
         DefDescriptor<?> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "", "<invalid:thisbetternotexistorthistestwillfail/>"));
         Map<DefDescriptor<?>,String> clientLoaded = Maps.newHashMap();
@@ -243,7 +243,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
      * UID, for unloaded descriptor, added to empty loaded set.
      */
     public void testUpdateLoadedInitial() throws Exception {
-        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Access.AUTHENTICATED,
+        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED,
                 laxSecurityApp);
         DefDescriptor<?> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "", ""));
@@ -270,7 +270,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
      * Null descriptor shouldn't affect current loaded set.
      */
     public void testUpdateLoadedNullWithLoadedSet() throws Exception {
-        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Access.AUTHENTICATED,
+        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED,
                 laxSecurityApp);
         DefDescriptor<?> cmpDesc = addSourceAutoCleanup(ComponentDef.class, String.format(baseComponentTag, "", ""));
         String uid = context.getDefRegistry().getUid(null, cmpDesc);
@@ -295,7 +295,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
      * UID, for unloaded descriptor, added to non-empty loaded set.
      */
     public void testUpdateLoadedWithLoadedSet() throws Exception {
-        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Access.AUTHENTICATED,
+        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED,
                 laxSecurityApp);
         DefDescriptor<?> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "", ""));
@@ -320,7 +320,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
      * UID, for unloaded descriptor, added to non-empty loaded set.
      */
     public void testUpdateLoadedNotInPreloadedSet() throws Exception {
-        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Access.AUTHENTICATED,
+        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED,
                 laxSecurityApp);
         DefDescriptor<?> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "", ""));
@@ -342,7 +342,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
      * Preloads are empty if nothing loaded on client. 
      */
     public void testUpdateLoadedWithoutPreloads() throws Exception {
-        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Access.AUTHENTICATED);
+        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED);
         assertNull(context.getPreloadedDefinitions());
         Aura.getDefinitionService().updateLoaded(null);
         assertEquals(0,context.getPreloadedDefinitions().size());
@@ -352,7 +352,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
      * Dependencies should be added to preloads during updateLoaded.
      */
     public void testUpdateLoadedSpidersPreloadDependencies() throws Exception {
-        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Access.AUTHENTICATED,
+        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED,
                 laxSecurityApp);
         DefDescriptor<?> depDesc = addSourceAutoCleanup(ComponentDef.class, String.format(baseComponentTag, "", ""));
         DefDescriptor<?> clientDesc = addSourceAutoCleanup(ComponentDef.class,
@@ -372,7 +372,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
      * Def not validated and ClientOutOfSyncException.
      */
     public void testUpdateLoadedWithNullClientUID() throws Exception {
-        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Access.AUTHENTICATED,
+        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED,
                 laxSecurityApp);
         DefDescriptor<?> clientDesc = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "", "<invalid:thisbetternotexistorthistestwillfail/>"));
@@ -392,7 +392,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
      * Loaded dependencies are pruned from preloads
      */
     public void testUpdateLoadedUnloadsRedundancies() throws Exception {
-        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Access.AUTHENTICATED,
+        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED,
                 laxSecurityApp);
         DefDescriptor<?> depDesc = addSourceAutoCleanup(ComponentDef.class, String.format(baseComponentTag, "", ""));
         DefDescriptor<?> clientDesc = addSourceAutoCleanup(ComponentDef.class,
@@ -429,7 +429,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
      * Loaded dependencies are pruned from preloads even if before
      */
     public void testUpdateLoadedUnloadsRedundanciesBefore() throws Exception {
-        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Access.AUTHENTICATED,
+        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED,
                 laxSecurityApp);
         DefDescriptor<?> depDesc = addSourceAutoCleanup(ComponentDef.class, String.format(baseComponentTag, "", ""));
         DefDescriptor<?> clientDesc = addSourceAutoCleanup(ComponentDef.class,
@@ -466,7 +466,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
      * Check circular dependencies, keeping component.
      */
     public void testUpdateLoadedUnloadsCircularComp() throws Exception {
-        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Access.AUTHENTICATED,
+        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED,
                 laxSecurityApp);
         DefinitionService ds = Aura.getDefinitionService();
         DefDescriptor<?> compDesc = ds.getDefDescriptor("markup://aura:component", ComponentDef.class);
@@ -510,7 +510,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
      * Check circular dependencies, keeping template.
      */
     public void testUpdateLoadedUnloadsCircularTemp() throws Exception {
-        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Access.AUTHENTICATED,
+        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED,
                 laxSecurityApp);
         DefinitionService ds = Aura.getDefinitionService();
         DefDescriptor<?> compDesc = ds.getDefDescriptor("markup://aura:component", ComponentDef.class);
@@ -554,7 +554,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
      * Dependencies should be added to loaded set during updateLoaded.
      */
     public void _testUpdateLoadedWithImplicitDependency() throws Exception {
-        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Access.AUTHENTICATED,
+        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED,
                 laxSecurityApp);
         DefDescriptor<?> depDesc = addSourceAutoCleanup(ComponentDef.class, String.format(baseComponentTag, "", ""));
         DefDescriptor<?> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
@@ -581,7 +581,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
      * Test find(String) using regex's and look in different DefRegistry's for results.
      */
     public void testFindRegex() throws Exception {
-        Aura.getContextService().startContext(Mode.DEV, Format.HTML, Access.PUBLIC);
+        Aura.getContextService().startContext(Mode.DEV, Format.HTML, Authentication.UNAUTHENTICATED);
 
         String baseContents = "<aura:application></aura:application>";
 
@@ -631,7 +631,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
     public static class AuraTestRegistryProviderWithNulls extends AuraRegistryProviderImpl {
 
         @Override
-        public DefRegistry<?>[] getRegistries(Mode mode, Access access, Set<SourceLoader> extraLoaders) {
+        public DefRegistry<?>[] getRegistries(Mode mode, Authentication access, Set<SourceLoader> extraLoaders) {
             return new DefRegistry<?>[] { createDefRegistry(new TestTypeDefFactory(), DefType.TYPE, "test") };
         }
 

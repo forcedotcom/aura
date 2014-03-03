@@ -21,7 +21,7 @@ import org.auraframework.Aura;
 import org.auraframework.http.AuraBaseServlet;
 import org.auraframework.impl.source.StringSource;
 import org.auraframework.impl.system.DefDescriptorImpl;
-import org.auraframework.system.AuraContext.Access;
+import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.annotation.ThreadHostileTest;
 import org.auraframework.test.annotation.UnAdaptableTest;
@@ -114,7 +114,7 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
         oldApp.setLastModified(soon);
 
         Aura.getContextService().endContext();
-        Aura.getContextService().startContext(Mode.PROD, null, Access.AUTHENTICATED, oldAppDesc);
+        Aura.getContextService().startContext(Mode.PROD, null, Authentication.AUTHENTICATED, oldAppDesc);
         enablePreloads(oldAppDesc);
         //
         // The app should give us 'soon'
@@ -131,13 +131,13 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
 
         // Start a newerApp context in DEV mode so that we can update the
         // lastMod cache.
-        Aura.getContextService().startContext(Mode.DEV, null, Access.AUTHENTICATED, newerAppDesc);
+        Aura.getContextService().startContext(Mode.DEV, null, Authentication.AUTHENTICATED, newerAppDesc);
 
         // Sanity check that we get the expected answer in DEV mode.
         assertEquals("Sanity check DEV mode lastMod update", later, AuraBaseServlet.getLastMod());
 
         Aura.getContextService().endContext();
-        Aura.getContextService().startContext(Mode.PROD, null, Access.AUTHENTICATED, newerAppDesc);
+        Aura.getContextService().startContext(Mode.PROD, null, Authentication.AUTHENTICATED, newerAppDesc);
         enablePreloads(newerAppDesc);
 
         //
@@ -150,12 +150,12 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
         // we preload dependencies now not namespaces so changing the namespace won't have any effect.
         // should still be soon
         //
-        Aura.getContextService().startContext(Mode.DEV, null, Access.AUTHENTICATED, oldAppDesc);
+        Aura.getContextService().startContext(Mode.DEV, null, Authentication.AUTHENTICATED, oldAppDesc);
         enablePreloads(oldAppDesc);
         assertEquals("Expected first app to show up as soon second time", soon, AuraBaseServlet.getLastMod());
         Aura.getContextService().endContext();
 
-        Aura.getContextService().startContext(Mode.PROD, null, Access.AUTHENTICATED, newerAppDesc);
+        Aura.getContextService().startContext(Mode.PROD, null, Authentication.AUTHENTICATED, newerAppDesc);
         enablePreloads(newerAppDesc);
         assertEquals("Expected second app to show up as later second time", later, AuraBaseServlet.getLastMod());
         Aura.getContextService().endContext();

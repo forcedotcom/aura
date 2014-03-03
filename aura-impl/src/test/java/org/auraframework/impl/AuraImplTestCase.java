@@ -30,7 +30,7 @@ import org.auraframework.impl.test.util.AuraImplUnitTestingUtil;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Model;
 import org.auraframework.service.DefinitionService;
-import org.auraframework.system.AuraContext.Access;
+import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.AuraTestCase;
@@ -64,7 +64,7 @@ public abstract class AuraImplTestCase extends AuraTestCase {
     public void setUp() throws Exception {
         super.setUp();
         if (shouldSetupContext) {
-            Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Access.AUTHENTICATED);
+            Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);
         }
     }
 

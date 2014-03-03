@@ -17,18 +17,11 @@
 
 package org.auraframework.def;
 
-import java.util.Set;
-
 import org.auraframework.throwable.quickfix.InvalidAccessValueException;
 
 // Holds compiled value of ACCESS attribute. 
 public interface DefinitionAccess {
 	
-    public enum BasicAccessType {
-    	AUTHENTICATED, UNAUTHENTICATED, PUBLIC, GLOBAL, PRIVATE, 
-    	PREVIEW, INTERNAL
-    };
-    
     // Authentication
     boolean requiresAuthentication();
     
@@ -42,6 +35,6 @@ public interface DefinitionAccess {
     boolean isAccessible();
     
     // Validation
-    void validate(Set<BasicAccessType> allowed) throws InvalidAccessValueException ;
+    void validate(boolean allowAuth, boolean allowPrivate) throws InvalidAccessValueException ;
     
 }

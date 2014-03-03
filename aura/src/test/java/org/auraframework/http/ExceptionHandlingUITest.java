@@ -21,7 +21,7 @@ import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.InterfaceDef;
-import org.auraframework.system.AuraContext.Access;
+import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.WebDriverTestCase;
@@ -51,17 +51,17 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
     private void setProdConfig() throws Exception {
         ServletConfigController.setProductionConfig(true);
         Aura.getContextService().endContext();
-        Aura.getContextService().startContext(Mode.DEV, Format.HTML, Access.AUTHENTICATED);
+        Aura.getContextService().startContext(Mode.DEV, Format.HTML, Authentication.AUTHENTICATED);
     }
 
     private void setProdContextWithoutConfig() throws Exception {
         Aura.getContextService().endContext();
-        Aura.getContextService().startContext(Mode.PROD, Format.HTML, Access.AUTHENTICATED);
+        Aura.getContextService().startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
     }
 
     private void setDevContextWithoutConfig() throws Exception {
         Aura.getContextService().endContext();
-        Aura.getContextService().startContext(Mode.DEV, Format.HTML, Access.AUTHENTICATED);
+        Aura.getContextService().startContext(Mode.DEV, Format.HTML, Authentication.AUTHENTICATED);
     }
 
     private String getAppUrl(String attributeMarkup, String bodyMarkup) throws Exception {

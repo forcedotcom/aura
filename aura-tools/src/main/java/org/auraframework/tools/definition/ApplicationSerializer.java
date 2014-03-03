@@ -22,7 +22,7 @@ import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.service.*;
-import org.auraframework.system.AuraContext.Access;
+import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.util.IOUtil;
@@ -35,7 +35,7 @@ public class ApplicationSerializer {
         ContextService contextService = Aura.getContextService();
         DefinitionService definitionService = Aura.getDefinitionService();
         DefDescriptor<ApplicationDef> appDesc = definitionService.getDefDescriptor("aura:test", ApplicationDef.class);
-        contextService.startContext(Mode.PROD, Format.HTML, Access.AUTHENTICATED, appDesc);
+        contextService.startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED, appDesc);
 
         SerializationService serializationService = Aura.getSerializationService();
         try {

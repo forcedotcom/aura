@@ -22,7 +22,7 @@ import java.io.IOException;
 import org.auraframework.Aura;
 import org.auraframework.clientlibrary.Combinable;
 import org.auraframework.impl.AuraImplTestCase;
-import org.auraframework.system.AuraContext.Access;
+import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 
@@ -34,16 +34,16 @@ public class ClientLibraryCSSFormatAdapterTest extends AuraImplTestCase {
     }
     
     public void testValuesAreCombinedAndCompressedInNonDevAndNonTestModes() throws Exception{
-        Aura.getContextService().startContext(Mode.PTEST, Format.JSON, Access.AUTHENTICATED);
+        Aura.getContextService().startContext(Mode.PTEST, Format.JSON, Authentication.AUTHENTICATED);
         assertValuesAreNotCompressed();
     }
     
     public void testValuesAreNotCompressedInDevOrTestModes() throws Exception{
-        Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Access.AUTHENTICATED);
+        Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);
         assertValuesAreNotCompressed();
         Aura.getContextService().endContext();
         
-        Aura.getContextService().startContext(Mode.DEV, Format.JSON, Access.AUTHENTICATED);
+        Aura.getContextService().startContext(Mode.DEV, Format.JSON, Authentication.AUTHENTICATED);
         assertValuesAreNotCompressed();
     }    
         

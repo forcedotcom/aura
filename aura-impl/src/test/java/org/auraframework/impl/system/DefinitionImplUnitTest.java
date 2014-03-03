@@ -24,6 +24,7 @@ import org.auraframework.def.Definition.Visibility;
 import org.auraframework.impl.system.DefinitionImpl.RefBuilderImpl;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Access;
+import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.Location;
@@ -182,7 +183,7 @@ public abstract class DefinitionImplUnitTest<I extends DefinitionImpl<D>, D exte
             Aura.getContextService().endContext();
         }
         
-        testAuraContext = Aura.getContextService().startContext(Mode.PROD, Format.JS, Access.AUTHENTICATED);
+        testAuraContext = Aura.getContextService().startContext(Mode.PROD, Format.JS, Authentication.AUTHENTICATED);
     	
         setupValidateReferences();
         buildDefinition().validateReferences();

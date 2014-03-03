@@ -33,7 +33,7 @@ import org.auraframework.impl.system.SubDefDescriptorImpl;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
-import org.auraframework.system.AuraContext.Access;
+import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.system.SourceListener;
 import org.auraframework.throwable.AuraRuntimeException;
@@ -78,7 +78,8 @@ public class DefinitionServiceImpl implements DefinitionService {
         AuraContext context = Aura.getContextService().getCurrentContext();
         T def = context.getDefRegistry().getDef(descriptor);
 
-        if (def != null && descriptor.getDefType() == DefType.APPLICATION && def.getAccess().requiresAuthentication() && context.getAccess() != Access.AUTHENTICATED) {
+        if (def != null && descriptor.getDefType() == DefType.APPLICATION && def.getAccess().requiresAuthentication() && 
+        		context.getAccess() != Authentication.AUTHENTICATED) {
             def = null;
         }
         

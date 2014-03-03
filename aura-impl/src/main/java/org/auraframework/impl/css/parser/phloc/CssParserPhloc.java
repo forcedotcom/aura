@@ -32,7 +32,7 @@ import org.auraframework.expression.Expression;
 import org.auraframework.impl.AuraImpl;
 import org.auraframework.impl.root.component.ComponentDefRefImpl;
 import org.auraframework.system.AuraContext;
-import org.auraframework.system.AuraContext.Access;
+import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.Client;
@@ -563,7 +563,7 @@ public class CssParserPhloc extends DefaultCSSVisitor {
 
     public static void main(String[] args) {
         try {
-            AuraContext context = Aura.getContextService().startContext(Mode.DEV, Format.JSON, Access.AUTHENTICATED);
+            AuraContext context = Aura.getContextService().startContext(Mode.DEV, Format.JSON, Authentication.AUTHENTICATED);
             context.setClient(new Client("Mozilla/5.0 (Windows; U; MSIE 7.0; Windows NT 6.0; en-US)"));
             System.out.println(Aura.getDefinitionService().
                     getDefinition("ui.button", StyleDef.class).getCode());

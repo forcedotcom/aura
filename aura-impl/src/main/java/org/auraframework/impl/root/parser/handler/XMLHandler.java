@@ -89,10 +89,6 @@ public abstract class XMLHandler<T extends Definition> {
         return Collections.emptySet();
     }
     
-    public Set<DefinitionAccess.BasicAccessType> getAllowedAccessValues() {
-    	return Collections.emptySet();
-    }
-
     protected org.auraframework.system.Location getLocation() {
         return XMLParser.getLocation(xmlReader, source);
     }

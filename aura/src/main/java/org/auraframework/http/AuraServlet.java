@@ -230,7 +230,9 @@ public class AuraServlet extends AuraBaseServlet {
             definitionService.updateLoaded(defDescriptor);
             def = defDescriptor.getDef();
             
-            assertAccess(def);
+            if (!curContext.isTestMode() && !curContext.isDevMode()) {
+            	assertAccess(def);
+            }
 
         } catch (RequestParam.InvalidParamException ipe) {
             handleServletException(new SystemErrorException(ipe), false, context, request, response, false);

@@ -19,6 +19,7 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.test.WebDriverTestCase;
 import org.auraframework.test.WebDriverUtil.BrowserType;
+import org.auraframework.test.annotation.UnAdaptableTest;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
@@ -57,6 +58,7 @@ public class InputTextUITest extends WebDriverTestCase {
         value = assertModelValue(event); // value should have been updated
     }
 
+    @UnAdaptableTest
     @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.SAFARI5,
             BrowserType.SAFARI, BrowserType.IPHONE })
     // Change event not picked up on IOS devices
@@ -64,6 +66,7 @@ public class InputTextUITest extends WebDriverTestCase {
         doTestUpdateOnAttributeForNonIosAndroidDevice(TEST_CMP);
     }
 
+    @UnAdaptableTest
     @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.SAFARI5,
             BrowserType.SAFARI, BrowserType.IPHONE })
     // Change event not picked up on IOS devices
@@ -80,11 +83,13 @@ public class InputTextUITest extends WebDriverTestCase {
         assertModelValue(eventName);
     }
 
+    @UnAdaptableTest
     @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET })
     public void testUpdateOnAttribute() throws Exception {
         doTestUpdateOnAttribute(TEST_CMP);
     }
 
+    @UnAdaptableTest
     @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET })
     public void testUpdateOnAttributeWithLabels() throws Exception {
         doTestUpdateOnAttribute(TEST_CMP_WITH_LABELS);

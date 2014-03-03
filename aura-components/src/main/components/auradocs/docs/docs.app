@@ -16,6 +16,7 @@
 
 -->
 <aura:application
+	access="global"
     template="auradocs:template"
     controller="java://org.auraframework.docs.DocsController"
     useAppcache="false"

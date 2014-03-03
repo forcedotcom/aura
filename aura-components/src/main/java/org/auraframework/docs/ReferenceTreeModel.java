@@ -107,7 +107,7 @@ public class ReferenceTreeModel {
                 // Preload the def
                 try {
                     desc.getDef();
-                } catch (Exception e) {
+                } catch (Throwable t) {
                     // ignore problems, we were only trying to preload
                 }
 

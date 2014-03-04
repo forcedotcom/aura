@@ -23,7 +23,7 @@
 	</aura:set>
 
 	<aura:attribute name="outputComponent" type="Aura.ComponentDefRef[]">
-		<!-- Wire 'row.selected' and 'index' into action. This is the secret sauce; action won't work without it. -->
-		<ui:actionCheckbox name="dataGrid:select" value="{!row.selected}" index="{!index}"/>
+		<!-- Wire 'selected' and 'index' into action. This is the secret sauce; action won't work without it. -->
+		<ui:actionCheckbox name="dataGrid:select" value="{!selected}" index="{!index}"/>
 	</aura:attribute>
 </aura:component>

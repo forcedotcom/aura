@@ -15,7 +15,9 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:action">
-    <!-- TODO: make accessible; do NOT use ui:button -->
-    <button>{!v.label}</button>
+<aura:component extends="ui:dataProvider">
+    <aura:attribute name="sortBy" type="String"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+    <aura:handler name="provide" action="{!c.handleProvide}"/>
 </aura:component>

@@ -19,24 +19,27 @@
 	<aura:attribute name="name" type="String" description="Api name or field name on item. Can use dot notation."/>
 	<aura:attribute name="label" type="String" description="Human readable label displayed in column header."/>
 	<aura:attribute name="type" type="String" description="Data type."/>
+    <aura:attribute name="editable" type="Boolean"/>
 	<aura:attribute name="filterable" type="Boolean"/>
 	<aura:attribute name="sortable" type="Boolean"/>
 	<aura:attribute name="required" type="Boolean" default="false" description="Required field in current layout."/>
 	<aura:attribute name="direction" type="String" description="{ '', ascending, descending }"/>
 	<aura:attribute name="order" type="Integer" default="0" description="The ordering of the sort (non-zero applies to multilevel sort only)."/>
 	<aura:attribute name="scope" type="String" default="col" description="{ col, row, colgroup, rowgroup }"/>
+    <aura:attribute name="renderAs" type="String" default="text" description="Type override for formatting. { text, currency }"/>
 	<aura:attribute name="onsortchange" type="Aura.Action"/>
 
+    <!-- try not to use these, they are horribly slow --> 
 	<aura:attribute name="inputComponent" 
 					type="Aura.ComponentDefRef[]" 
-					description="Used by cells to render input. Default value is wired to item's name field.">
+					description="Used by cells to override render input. Default value is wired to item's name field.">
 		
 		<ui:inputText/>
 	</aura:attribute>
 	
 	<aura:attribute name="outputComponent" 
 					type="Aura.ComponentDefRef[]" 
-					description="Used by cells to render output. Default value is wired to item's name field.">
+					description="Used by cells to override render output. Default value is wired to item's name field.">
 		
 		<ui:outputText/>
 	</aura:attribute>

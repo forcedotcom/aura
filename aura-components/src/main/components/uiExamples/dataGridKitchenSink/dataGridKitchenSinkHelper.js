@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 ({
-	handleAction: function (cmp, evt) {
-		console.log(evt.getParams());
-	}
+    fireAddRemove: function (cmp, params) {
+        cmp.find('grid')
+            .getEvent('addRemove')
+            .setParams(params)
+            .fire();  
+    }
 })

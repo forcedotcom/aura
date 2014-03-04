@@ -34,6 +34,7 @@ import org.auraframework.impl.source.BaseSourceLoader;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.system.Parser.Format;
+import org.auraframework.system.PrivilegedNamespaceSourceLoader;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.AuraTextUtil;
@@ -45,7 +46,7 @@ import com.google.common.collect.Sets;
 
 /**
  */
-public class ResourceSourceLoader extends BaseSourceLoader {
+public class ResourceSourceLoader extends BaseSourceLoader implements PrivilegedNamespaceSourceLoader {
 
     protected final String packagePrefix;
     protected final String resourcePrefix;
@@ -201,4 +202,9 @@ public class ResourceSourceLoader extends BaseSourceLoader {
         }
     }
 
+	@Override
+	public boolean isPrivilegedNamespace(String namespace) {
+		// All resource based namespaces are considered system by default
+		return true;
+	}
 }

@@ -105,7 +105,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         DefDescriptor<ComponentDef> desc = Aura.getDefinitionService().getDefDescriptor(DEFINITION_SERVICE_IMPL_TEST_TARGET_COMPONENT, ComponentDef.class);
         try {
             Definition def = definitionService.getDefinition(desc);
-            definitionService.getDefRegistry().assertAccess((String)null, def);
+            definitionService.getDefRegistry().assertAccess(null, def);
             fail("Expected NoAccessException from assertAccess");
         } catch (NoAccessException e) {
         }
@@ -119,7 +119,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         DefDescriptor<ComponentDef> desc = Aura.getDefinitionService().getDefDescriptor(DEFINITION_SERVICE_IMPL_TEST_TARGET_COMPONENT, ComponentDef.class);
         try {
             Definition def = Aura.getDefinitionService().getDefinition(desc.getQualifiedName(), ComponentDef.class);
-            definitionService.getDefRegistry().assertAccess((String)null, def);
+            definitionService.getDefRegistry().assertAccess(null, def);
             fail("Expected NoAccessException from assertAccess");
         } catch (NoAccessException e) {
         }
@@ -133,7 +133,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         DefDescriptor<ComponentDef> desc = Aura.getDefinitionService().getDefDescriptor(DEFINITION_SERVICE_IMPL_TEST_TARGET_COMPONENT, ComponentDef.class);
         try {
             Definition def = Aura.getDefinitionService().getDefinition(desc.getQualifiedName(), DefType.COMPONENT);
-            definitionService.getDefRegistry().assertAccess((String)null, def);
+            definitionService.getDefRegistry().assertAccess(null, def);
             fail("Expected NoAccessException from assertAccess");
         } catch (NoAccessException e) {
         }

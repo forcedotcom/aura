@@ -64,8 +64,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     private static final String VERSION_PROPERTY = "aura.build.version";
     private static final String VALIDATE_CSS_CONFIG = "aura.css.validate";
     
-    private static final Set<String> SYSTEM_NAMESPACES = Sets.newHashSet("aura", "auraadmin", "auradev", "auradocs", 
-    		"aurajstest", "auraStorage", "auratest", "ui", "appCache", "provider", "test");
+    private static final Set<String> SYSTEM_NAMESPACES = Sets.newTreeSet(String.CASE_INSENSITIVE_ORDER);
 
     private static final Set<String> UNSECURED_PREFIXES = ImmutableSet.of("aura", "layout");
     private static final Set<String> UNSECURED_NAMESPACES = ImmutableSet.of("aura", "ui", "auradev", "appcache",
@@ -173,7 +172,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
 
 	@Override
 	public boolean isPrivilegedNamespace(String namespace) {
-		return SYSTEM_NAMESPACES.contains(namespace);
+		return namespace != null && SYSTEM_NAMESPACES.contains(namespace);
 	}
 
 	@Override
@@ -434,4 +433,9 @@ public class ConfigAdapterImpl implements ConfigAdapter {
             throw new AuraRuntimeException("Can't read Aura resources files", e);
         }
     }
+
+	@Override
+	public void addPrivilegedNamespace(String namespace) {
+		SYSTEM_NAMESPACES.add(namespace);
+	}
 }

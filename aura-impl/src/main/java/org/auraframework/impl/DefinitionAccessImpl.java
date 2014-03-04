@@ -15,6 +15,7 @@
  */
 package org.auraframework.impl;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.*;
@@ -22,6 +23,8 @@ import java.util.*;
 import org.auraframework.def.DefinitionAccess;
 import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Authentication;
+import org.auraframework.throwable.AuraException;
+import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.InvalidAccessValueException;
 import org.auraframework.util.AuraTextUtil;
 
@@ -107,23 +110,26 @@ public class DefinitionAccessImpl implements DefinitionAccess {
 
 	@Override
 	public boolean isGlobal() {
-		return access == Access.GLOBAL;
+		return getAccess() == Access.GLOBAL;
 	}
 
 	@Override
 	public boolean isPublic() {
-		return access == null || access == Access.PUBLIC;
+		//TODO default for non-system namespace only
+		Access acc = getAccess();
+		return acc == null || acc == Access.PUBLIC;
 	}
 
 	@Override
 	public boolean isPrivate() {
-		return access == Access.PRIVATE;
+		return getAccess() == Access.PRIVATE;
 	}
 
 	@Override
 	public boolean isInternal() {
-		// Default is at least INTERNAL
-		return access == null || access == Access.INTERNAL;
+		//TODO default for system namespace only
+		Access acc = getAccess();
+		return acc == null || acc == Access.INTERNAL;
 	}
 
 	@Override
@@ -140,7 +146,21 @@ public class DefinitionAccessImpl implements DefinitionAccess {
 		if (access == Access.PRIVATE  && !allowPrivate) {
 			throw new InvalidAccessValueException("Invalid access atttribute value \"" + access.name() + "\"");
 		}
+		//TODO:  no dynamic method if access const set
+		//TODO: filter by what is valid for system vs non-system namespace
 		
+	}
+
+	private Access getAccess() {
+		if (accessMethod != null) {
+			try {
+				return (Access) accessMethod.invoke(null);
+			} catch (Exception e) {
+				throw new AuraRuntimeException("invalid static method", e);  // todo fix this message
+			}
+		} else {
+			return access;
+		}
 	}
 
 	private Authentication authentication = null;

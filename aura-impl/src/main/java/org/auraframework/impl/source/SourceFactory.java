@@ -21,10 +21,13 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.auraframework.Aura;
+import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
 import org.auraframework.impl.util.AuraUtil;
+import org.auraframework.system.PrivilegedNamespaceSourceLoader;
 import org.auraframework.system.Source;
 import org.auraframework.system.SourceLoader;
 import org.auraframework.throwable.AuraRuntimeException;
@@ -49,9 +52,19 @@ public final class SourceFactory {
         Map<LoaderKey, SourceLoader> mutableLoaderMap = new HashMap<LoaderKey, SourceLoader>();
         Set<String> mutableNamespaces = new HashSet<String>();
 
+        ConfigAdapter configAdapter = Aura.getConfigAdapter();
         for (SourceLoader loader : loaders) {
             for (String namespace : loader.getNamespaces()) {
                 mutableNamespaces.add(namespace);
+                
+                // Track and system/privileged namespaces
+                if (loader instanceof PrivilegedNamespaceSourceLoader) {
+                	PrivilegedNamespaceSourceLoader privilegedLoader = (PrivilegedNamespaceSourceLoader)loader;
+	                if (privilegedLoader.isPrivilegedNamespace(namespace)) {
+	                	configAdapter.addPrivilegedNamespace(namespace);
+	                }
+                }
+
                 for (String prefix : loader.getPrefixes()) {
                     LoaderKey key = new LoaderKey(namespace, prefix);
                     if (mutableLoaderMap.containsKey(key)) {
@@ -65,6 +78,7 @@ public final class SourceFactory {
                 }
             }
         }
+        
         this.namespaces = AuraUtil.immutableSet(mutableNamespaces);
         this.loaders = AuraUtil.immutableMap(mutableLoaderMap);
     }

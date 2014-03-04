@@ -106,11 +106,6 @@ public interface MasterDefRegistry {
     <D extends Definition> void assertAccess(DefDescriptor<?> referencingDescriptor, D def) throws QuickFixException;
 
     /**
-     * assert that the referencingNamespace has access to the definition.
-     */
-    <D extends Definition> void assertAccess(String referencingNamespace, D def) throws QuickFixException;
-
-    /**
      * Filter our loaded set of dependencies on the preloads.
      * 
      * This filters the set of definitions currently loaded in the master def

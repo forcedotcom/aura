@@ -32,7 +32,7 @@ public interface SourceLoader {
      * @return List of names of namespaces that this SourceLoader handles.
      */
     Set<String> getNamespaces();
-
+    
     /**
      * Returns a list of prefixes (java/js/apex) for which this loader is
      * authoritative within the namespaces returned by getNamespaces.
@@ -61,5 +61,5 @@ public interface SourceLoader {
      */
     Set<DefDescriptor<?>> find(DescriptorFilter dm);
 
-    <T extends Definition> Set<DefDescriptor<T>> find(Class<T> primaryInterface, String prefix, String namespace);
+    <T extends Definition> Set<DefDescriptor<T>> find(Class<T> primaryInterface, String prefix, String namespace); 
 }

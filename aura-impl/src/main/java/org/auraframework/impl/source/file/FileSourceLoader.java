@@ -23,6 +23,7 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.impl.source.BaseSourceLoader;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Parser.Format;
+import org.auraframework.system.PrivilegedNamespaceSourceLoader;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.IOUtil;
 
@@ -30,7 +31,7 @@ import com.google.common.collect.Maps;
 
 /**
  */
-public class FileSourceLoader extends BaseSourceLoader {
+public class FileSourceLoader extends BaseSourceLoader implements PrivilegedNamespaceSourceLoader {
 
     private static final EnumMap<DefType, FileFilter> filters = new EnumMap<DefType, FileFilter>(DefType.class);
     protected final File base;
@@ -303,4 +304,10 @@ public class FileSourceLoader extends BaseSourceLoader {
         }
 
     }
+
+	@Override
+	public boolean isPrivilegedNamespace(String namespace) {
+		// All file based namespaces are considered system by default
+		return true;
+	}
 }

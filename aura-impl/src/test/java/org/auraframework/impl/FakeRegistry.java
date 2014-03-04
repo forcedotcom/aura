@@ -89,10 +89,6 @@ public class FakeRegistry implements MasterDefRegistry {
     public <D extends Definition> void assertAccess(DefDescriptor<?> referencingDescriptor, D def) throws QuickFixException {
     }
     
-	@Override
-	public <D extends Definition> void assertAccess(String referencingNamespace, D def) throws QuickFixException {
-	}
-
     @Override
     public Map<DefDescriptor<?>, Definition> filterRegistry(Set<DefDescriptor<?>> preloads) {
         return null;

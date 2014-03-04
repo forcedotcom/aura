@@ -39,6 +39,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
+import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.root.DependencyDefImpl;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.service.LoggingService;
@@ -176,6 +177,11 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     private CompileContext currentCC;
 
     private final MasterDefRegistryImpl original;
+    
+    private final static int ACCESS_CHECK_CACHE_SIZE = 4096;
+    private final Cache<String, String> accessCheckCache = CacheBuilder.newBuilder()
+            .initialCapacity(ACCESS_CHECK_CACHE_SIZE).maximumSize(ACCESS_CHECK_CACHE_SIZE).recordStats().softValues().build();
+
 
     /**
      * Build a system def registry that is meant to be used as a shadowing registry.
@@ -1169,66 +1175,76 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         return delegateRegistries.getAllNamespaces().contains(ns);
     }
 
-    @Override
+	@Override
     public <D extends Definition> void assertAccess(DefDescriptor<?> referencingDescriptor, D def) throws QuickFixException {
-    	String prefix = referencingDescriptor.getPrefix();
-		if (Aura.getConfigAdapter().isUnsecuredPrefix(prefix)) {
+		String referencingNamespace = null;
+		if (referencingDescriptor != null) {
+	    	String prefix = referencingDescriptor.getPrefix();
+			if (Aura.getConfigAdapter().isUnsecuredPrefix(prefix)) {
+	    		return;
+	    	}
+			
+			referencingNamespace = referencingDescriptor.getNamespace();
+		}
+		
+		// If the def is access="global" then anyone can see it
+    	if (def.getAccess().isGlobal()) {
     		return;
     	}
-    	
-    	this.assertAccess(referencingDescriptor.getNamespace(), def);
-    }
-    
-	@Override
-	public <D extends Definition> void assertAccess(String referencingNamespace, D def) throws QuickFixException {
-    	// If the def is access="global" then anyone can see it
-    	if (!def.getAccess().isGlobal()) {
-			ConfigAdapter configAdapter = Aura.getConfigAdapter();
-			if (configAdapter.isPrivilegedNamespace(referencingNamespace)) {
-				return;
-			}
+
+		DefDescriptor<?> desc = def.getDescriptor();
+		
+	    String namespace;
+		String target;
+		if (def instanceof AttributeDef) {
+			AttributeDef attributeDef = (AttributeDef) def;
+			DefDescriptor<? extends RootDefinition> parentDescriptor = attributeDef.getParentDescriptor();
+			namespace = parentDescriptor.getNamespace();
+			target = String.format("%s:%s.%s", namespace, parentDescriptor.getName(), desc.getName());
+		} else {
+			namespace = desc.getNamespace();
+			target = String.format("%s:%s", namespace, desc.getName());
+		}
+		
+		// Cache key is of the form "referencingNamespace>defNamespace:defName[.subDefName].defTypeOrdinal"
+		DefType defType = desc.getDefType();
+		String key = String.format("%s>%s.%d", referencingNamespace == null ? "" : referencingNamespace, target, defType.ordinal());
+		String status = accessCheckCache.getIfPresent(key);
+		if (status == null) {
+			status = "";
 			
-            DefDescriptor<? extends Definition> descriptor = def.getDescriptor();
-			if (configAdapter.isUnsecuredNamespace(descriptor.getNamespace()) || configAdapter.isUnsecuredPrefix(descriptor.getPrefix())) {
-				return;
-			}
+			// Protect against re-entry
+		    accessCheckCache.put(key, status);
 			
-	    	assertCallerRelativeAccess(referencingNamespace, def);
-    	}
+			// System.out.printf("** MDR.miss.assertAccess() cache miss for: %s\n", key);
+		    
+	    	ConfigAdapter configAdapter = Aura.getConfigAdapter();
+	    	
+	        // The caller is in a system namespace let them through
+			if (!configAdapter.isPrivilegedNamespace(referencingNamespace)) {
+				DefDescriptor<? extends Definition> descriptor = def.getDescriptor();
+				if (!configAdapter.isUnsecuredNamespace(descriptor.getNamespace()) && !configAdapter.isUnsecuredPrefix(descriptor.getPrefix())) {
+					if (referencingNamespace == null || referencingNamespace.isEmpty()) {
+						status = String.format("Access to %s '%s' disallowed by MasterDefRegistry.assertAccess(): referencing namespace was empty or null", defType, target);
+				    } else if (!referencingNamespace.equals(namespace)) {
+				    	// The caller and the def are not in the same namespace
+					    status = String.format("Access to %s '%s' from namespace '%s' disallowed by MasterDefRegistry.assertAccess()", defType, target, referencingNamespace);
+				    }
+				}
+			}
+
+			if (!status.isEmpty()) {
+				accessCheckCache.put(key, status);
+			}
+		} else {
+			// System.out.printf("** MDR.hit.assertAccesst() cache hit for: %s\n", key);
+		}
+		
+		if (!status.isEmpty()) {
+			throw new NoAccessException(status);
+		}
 	}
     
-    private void assertCallerRelativeAccess(String referencingNamespace, Definition def) throws QuickFixException {
-    	DefDescriptor<?> desc = def.getDescriptor();
-
-        String namespace;
-    	String target;
-    	if (def instanceof AttributeDef) {
-    		AttributeDef attributeDef = (AttributeDef) def;
-    		namespace = attributeDef.getParentDescriptor().getNamespace();
-    		target = String.format("%s.%s", attributeDef.getParentDescriptor().getQualifiedName(), desc.getName());
-    	} else {
-    		namespace = desc.getNamespace();
-    		target = desc.toString();
-    	}
-
-    	if (referencingNamespace == null || referencingNamespace.isEmpty()) {
-    		throw new NoAccessException(String.format("Access to '%s' disallowed by MasterDefRegistry.assertAccess(): referencing namespace was empty or null", desc));
-        }
-
-        ConfigAdapter configAdapter = Aura.getConfigAdapter();
-		if (configAdapter.isPrivilegedNamespace(referencingNamespace)) {
-            // The caller is in a system namespace let them through
-            return; 
-        }
-
-		if (referencingNamespace.equals(namespace)) { 
-            // The caller and the def are in the same namespace let them through
-            return;
-        }
-		
-        String message = String.format("Access to '%s' from namespace '%s' disallowed by MasterDefRegistry.assertAccess()", target, referencingNamespace);
-		throw new NoAccessException(message);
-    }	
     
     /**
      * only used by admin tools to view all registries

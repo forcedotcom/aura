@@ -155,6 +155,13 @@ public abstract class DefinitionImplUnitTest<I extends DefinitionImpl<D>, D exte
     	DefinitionAccess actual = buildDefinition().getAccess();
     	assertTrue(actual.isGlobal());
     }
+    
+    public void testAccessDefault() throws Exception {
+    	this.access = DefinitionAccessImpl.defaultAccess();
+    	DefinitionAccess actual = buildDefinition().getAccess();
+    	assertTrue(actual.isPublic());
+    }
+    
 
    public void testIsValid() throws Exception {
         boolean actual = buildDefinition().isValid();

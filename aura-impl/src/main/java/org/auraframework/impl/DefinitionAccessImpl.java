@@ -15,31 +15,33 @@
  */
 package org.auraframework.impl;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.*;
 
+import org.auraframework.Aura;
+import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.DefinitionAccess;
+import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Authentication;
-import org.auraframework.throwable.AuraException;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.InvalidAccessValueException;
 import org.auraframework.util.AuraTextUtil;
 
 public class DefinitionAccessImpl implements DefinitionAccess {
 	
-	static public DefinitionAccess  defaultAccess() {
+	static public DefinitionAccess defaultAccess() {
 		return new DefinitionAccessImpl();
 	}
 
 	public DefinitionAccessImpl(String access) throws InvalidAccessValueException {
 		parseAccess(access);
+		defaultAccess(isSystemNamespace());
 	}
 	
 	private DefinitionAccessImpl() {
-		accessMethod = null;
+		defaultAccess(isSystemNamespace());
 	}
 
 	private void parseAccess(String accessValue) throws InvalidAccessValueException {
@@ -115,9 +117,7 @@ public class DefinitionAccessImpl implements DefinitionAccess {
 
 	@Override
 	public boolean isPublic() {
-		//TODO default for non-system namespace only
-		Access acc = getAccess();
-		return acc == null || acc == Access.PUBLIC;
+		return getAccess() == Access.PUBLIC;
 	}
 
 	@Override
@@ -127,28 +127,49 @@ public class DefinitionAccessImpl implements DefinitionAccess {
 
 	@Override
 	public boolean isInternal() {
-		//TODO default for system namespace only
-		Access acc = getAccess();
-		return acc == null || acc == Access.INTERNAL;
+		return getAccess() == Access.INTERNAL;
 	}
 
 	@Override
 	public boolean isAccessible() {
-		return false;
+		return true;
 	}
 
 	@Override
 	public void validate(boolean allowAuth, boolean allowPrivate)
 			throws InvalidAccessValueException {
-		if (authentication != null && !allowAuth) {
+		boolean sysNamespace = isSystemNamespace();
+		if (authentication != null && (!allowAuth || !sysNamespace)) {
 			throw new InvalidAccessValueException("Invalid access atttribute value \"" + authentication.name() + "\"");
 		}
 		if (access == Access.PRIVATE  && !allowPrivate) {
 			throw new InvalidAccessValueException("Invalid access atttribute value \"" + access.name() + "\"");
 		}
-		//TODO:  no dynamic method if access const set
-		//TODO: filter by what is valid for system vs non-system namespace
+		if (access != null && accessMethod != null) {
+			throw new InvalidAccessValueException("Access attribute may not specify \"" + access.name() + "\" when a static method is also specified");
+		}
+ 		if (!sysNamespace && accessMethod != null) {
+			throw new InvalidAccessValueException("Access attribute may not use a static method");
+ 		}
 		
+	}
+
+	private void defaultAccess(boolean sysNamespace) {
+		// Default access if necessary
+ 		if (access == null && accessMethod == null) {
+ 			access = sysNamespace ? Access.INTERNAL : Access.PUBLIC;
+ 		}
+	}
+
+	protected boolean isSystemNamespace() {
+		ContextService contextService = Aura.getContextService();
+		if (contextService.isEstablished()) {
+			String namespace = contextService.getCurrentContext().getCurrentNamespace();
+			ConfigAdapter configAdapter = Aura.getConfigAdapter();
+			return configAdapter.isPrivilegedNamespace(namespace);
+		} else {
+			return false;  
+		}
 	}
 
 	private Access getAccess() {
@@ -156,7 +177,8 @@ public class DefinitionAccessImpl implements DefinitionAccess {
 			try {
 				return (Access) accessMethod.invoke(null);
 			} catch (Exception e) {
-				throw new AuraRuntimeException("invalid static method", e);  // todo fix this message
+				throw new AuraRuntimeException("Exception executing access-checking method " + 
+						accessMethod.getClass().getName() + "." + accessMethod.getName(), e); 
 			}
 		} else {
 			return access;
@@ -165,6 +187,6 @@ public class DefinitionAccessImpl implements DefinitionAccess {
 
 	private Authentication authentication = null;
 	private Access access = null;
-	private Method accessMethod;
+	private Method accessMethod = null;
 
 }

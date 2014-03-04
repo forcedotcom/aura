@@ -24,10 +24,7 @@
         var frame = cmp.find("frame").getElement();
         var cachebuster = Math.random() * 100000;
         var app = $A.getContext().getApp();
-        // Anyone know what the bit on the end does?  Examples.app works without it, breaks with it.
-        frame.src = url + "?aura.cb="+cachebuster + "&aura.mode=" + $A.getContext().getMode();// + (app?"&aura.app="+app:"");
-
-
+        frame.src = url + "?aura.cb="+cachebuster + "&aura.mode=" + $A.getContext().getMode() + (app?"&aura.app="+app:"");
 
         return ret;
     }

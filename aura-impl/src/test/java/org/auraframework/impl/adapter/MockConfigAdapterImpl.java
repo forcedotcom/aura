@@ -17,8 +17,12 @@ package org.auraframework.impl.adapter;
 
 import java.util.Set;
 
+import org.auraframework.Aura;
 import org.auraframework.adapter.MockConfigAdapter;
+import org.auraframework.def.Definition;
 import org.auraframework.impl.source.StringSourceLoader;
+import org.auraframework.test.TestContext;
+import org.auraframework.test.TestContextAdapter;
 
 import com.google.common.collect.ImmutableSortedSet;
 
@@ -92,7 +96,26 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
 	@Override
 	public boolean isPrivilegedNamespace(String namespace) {
 		Set<String> namespaces = StringSourceLoader.getInstance().getNamespaces();
-		return namespaces.contains(namespace) || SYSTEM_TEST_NAMESPACES.contains(namespace) || super.isPrivilegedNamespace(namespace);
+		if (namespaces.contains(namespace) || SYSTEM_TEST_NAMESPACES.contains(namespace) || super.isPrivilegedNamespace(namespace)) {
+			return true;
+		}
+		
+		// Check for any local defs with this namespace and consider that as an indicator that we have a privileged namespace
+		TestContextAdapter testContextAdapter = Aura.get(TestContextAdapter.class);
+		if (testContextAdapter != null) {
+	        TestContext testContext = testContextAdapter.getTestContext();
+	        if (testContext != null) {
+		        Set<Definition> localDefs = testContext.getLocalDefs();
+		        for (Definition def : localDefs) {
+		        	String ns = def.getDescriptor().getNamespace();
+					if (ns.equalsIgnoreCase(namespace)) {
+		        		return true;
+		        	}
+		        }
+	        }
+		}
+        
+        return false;
 	}
 
 	@Override

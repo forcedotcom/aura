@@ -254,7 +254,7 @@ $A.ns.ComponentDef.prototype.getStyleDef = function(){
 
 /**
  * Gets all the attribute definitions. Returns an AttributeDef object.
- * @returns {AttributeDef}
+ * @returns {AttributeDefSet}
  */
 $A.ns.ComponentDef.prototype.getAttributeDefs = function() {
     return this.attributeDefs;

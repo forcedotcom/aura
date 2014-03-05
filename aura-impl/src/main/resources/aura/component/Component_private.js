@@ -356,11 +356,11 @@ var ComponentPriv = (function() { // Scoping priv
 
     ComponentPriv.prototype.setupAttributes = function(config, cmp, localCreation) {
         var configAttributes = config || {};
-        this.attributes = this.componentDef.getAttributeDefs().createInstances(
-            configAttributes, cmp, true, localCreation);
+        this.attributes = new AttributeSet(configAttributes, configAttributes['valueProvider'],
+            this.componentDef.getAttributeDefs(), cmp, localCreation);
     };
 
-    ComponentPriv.prototype.validateAttributes = function(cmp, config) {
+    ComponentPriv.prototype.validateAttributes = function(cmp) {
         var attributeDefSet = this.componentDef.attributeDefs;
         if (attributeDefSet && attributeDefSet.each) {
             var compPriv = this;
@@ -634,28 +634,7 @@ var ComponentPriv = (function() { // Scoping priv
                     'No concrete implementation provided');
 
                 self.componentDef = realComponentDef;
-
-
-                /**
-                 * TODO: Fix injecting attributes. async and un-sync component creation
-                 *
-                 * client provided has to have the same attributes as current cmp
-                 * because injectComponent is called after setupAttributes. Thus,
-                 * attributes are already created for the component at this point.
-                 *
-                 */
-                if (attributes) {
-                    for ( var k in attributes) {
-                        var value = cmp.getAttributes().getValue(k, true);
-                        if (!value) {
-                            aura.assert(value, 'No attribute named ' + k
-                                + ' found but was returned by provider');
-                        }
-
-                        value.setValue(attributes[k]);
-                        value.commit();
-                    }
-                }
+                self.attributes.recreate(realComponentDef.getAttributeDefs(), attributes);
             };
 
 

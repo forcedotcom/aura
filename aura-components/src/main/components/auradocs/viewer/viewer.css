@@ -13,16 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.impl.documentation;
-
-import org.auraframework.def.DocumentationDef;
-import org.auraframework.impl.source.SourceFactory;
-import org.auraframework.impl.system.CacheableDefFactoryImpl;
-
-public class DocumentationDefFactory extends CacheableDefFactoryImpl<DocumentationDef> {
-
-    public DocumentationDefFactory(SourceFactory sourceFactory) {
-        super(sourceFactory);
-    }
-
+.THIS{
+    position: relative;
+}
+.THIS.uiTabset.displayTab{
+	height:360px;
+}
+.THIS .frame{
+    width: 100%;
 }

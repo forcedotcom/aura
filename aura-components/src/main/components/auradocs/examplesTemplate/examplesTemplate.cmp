@@ -15,15 +15,6 @@
     limitations under the License.
 
 -->
-<aura:component extensible="true">
-    <aura:attribute name="examples" type="Object"/>
-    
-    <h3>Examples</h3>
-    <!--ul>
-    <aura:foreach items="{!v.examples}" var="example">
-    	<li>
-    		{!example}
-    	</li>
-    </aura:foreach>
-    </ul-->
+<aura:component isTemplate="true" extends="auradocs:template" style="templateCss://auradocs.template">
+    <aura:set attribute="title" value="Aura Examples"/>
 </aura:component>

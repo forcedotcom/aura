@@ -16,21 +16,17 @@
 package org.auraframework.impl.documentation;
 
 import java.io.IOException;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.auraframework.builder.DocumentationDefBuilder;
-import org.auraframework.def.AttributeDef;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DescriptionDef;
-import org.auraframework.def.DocumentationDef;
-import org.auraframework.def.ExampleDef;
-import org.auraframework.def.RegisterEventDef;
-import org.auraframework.def.RootDefinition;
+import org.auraframework.def.*;
 import org.auraframework.impl.root.RootDefinitionImpl;
+import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
+
+import com.google.common.collect.Lists;
 
 public class DocumentationDefImpl extends RootDefinitionImpl<DocumentationDef> implements DocumentationDef {
 
@@ -55,15 +51,36 @@ public class DocumentationDefImpl extends RootDefinitionImpl<DocumentationDef> i
     public Map<DefDescriptor<AttributeDef>, AttributeDef> getAttributeDefs() throws QuickFixException {
     	throw new UnsupportedOperationException("DocumentationDef cannot contain AttributeDefs.");
     }
+
+    @Override
+    public List<DescriptionDef> getDescriptionDefs() {
+        return Lists.newArrayList(descriptionDefs.values());
+    }
     
     @Override
-    public Map<String, ? extends DescriptionDef> getDescriptionDefs() {
-            return descriptionDefs;
+    public Map<String, DescriptionDef> getDescriptionDefsAsMap() {
+        return descriptionDefs;
+    }
+    
+    @Override
+    public List<String> getDescriptions(){
+        ArrayList<String> ret = new ArrayList<String>();
+        
+        for (DescriptionDef descDef : descriptionDefs.values()) {
+            ret.add(descDef.getDescription());
+        }
+        
+        return ret;
     }
 
     @Override
-    public Map<String, ? extends ExampleDef> getExampleDefs() {
-            return exampleDefs;
+    public List<ExampleDef> getExampleDefs() {
+        return Lists.newArrayList(exampleDefs.values());
+    }
+    
+    @Override
+    public Map<String, ExampleDef> getExampleDefsAsMap() {
+        return exampleDefs;
     }
 
     @Override
@@ -73,14 +90,21 @@ public class DocumentationDefImpl extends RootDefinitionImpl<DocumentationDef> i
     
     @Override
     public boolean isInstanceOf(DefDescriptor<? extends RootDefinition> other) throws QuickFixException {
-        // TODO Auto-generated method stub
-        return false;
+        return DefDescriptorImpl.compare(descriptor, other) == 0;
     }
 
     @Override
     public void serialize(Json json) throws IOException {
         // TODO Auto-generated method stub
-
+    }
+    
+    @Override
+    public void validateDefinition() throws QuickFixException {
+        super.validateDefinition();
+        
+        if (descriptionDefs.isEmpty()) {
+            throw new InvalidDefinitionException("<aura:documentation> must contain at least one <aura:description>", getLocation());
+        }
     }
 
     public static class Builder extends RootDefinitionImpl.Builder<DocumentationDef> implements DocumentationDefBuilder {
@@ -100,13 +124,15 @@ public class DocumentationDefImpl extends RootDefinitionImpl<DocumentationDef> i
         }
         
         @Override
-        public void addDescription(String id, DescriptionDef description) {
+        public DocumentationDefBuilder addDescription(String id, DescriptionDef description) {
             this.descriptionMap.put(id, description);
+            return this;
         }
         
         @Override
-        public void addExample(String id, ExampleDef example) {
+        public DocumentationDefBuilder addExample(String id, ExampleDef example) {
             this.exampleMap.put(id, example);
+            return this;
         }
     }
 }

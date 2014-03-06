@@ -117,7 +117,9 @@ public class AuraRegistryProviderImpl implements RegistryAdapter {
             ret = new DefRegistry<?>[] {
                     AuraStaticTypeDefRegistry.INSTANCE,
                     AuraStaticControllerDefRegistry.INSTANCE,
+                    
                     createDefRegistry(new RootDefFactory(new SourceFactory(markupLoaders)), rootDefTypes, rootPrefixes),
+
                     AuraRegistryProviderImpl.<ControllerDef> createDefRegistry(new CompoundControllerDefFactory(),
                             DefType.CONTROLLER, DefDescriptor.COMPOUND_PREFIX),
                     AuraRegistryProviderImpl.<ControllerDef> createDefRegistry(

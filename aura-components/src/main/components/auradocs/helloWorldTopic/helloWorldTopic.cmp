@@ -28,7 +28,7 @@
 
     <p>The <b>Component source</b> tab shows the component markup in the <code>helloWorld.cmp</code> file.</p>
 
-    <auradocs:example descriptor="auradocs:helloWorld" />
+    <auradocs:viewer descriptor="auradocs:helloWorld" />
 
     <p>This is about as simple as a component can get.  It consists only of the enclosing <code>&lt;aura:component&gt;</code> tags, which appear at the beginning and end of every Aura component definition, wrapped around the "Hello world!" text.  Easy.</p>
 

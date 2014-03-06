@@ -29,7 +29,7 @@
 	border-bottom: 1px solid #fff;
 }
 
-.THIS a.tabHeader {
+.THIS > a.tabHeader {
 	margin: 0 2px 0 0;
 	color: #363c40;
 	padding: 3px 10px;
@@ -47,11 +47,11 @@
 	margin-left:-4px;
 }
 
-.THIS.active a.tabHeader {
+.THIS.active > a.tabHeader {
 	cursor: default;
 }
 
-.THIS div.tabBody {
+.THIS > div.tabBody {
 	position: absolute;
 	left:0;
 	right:0;
@@ -61,14 +61,14 @@
 	overflow:auto;
 }
 
-.THIS div.tabBody iframe{
+.THIS > div.tabBody iframe{
 	min-height:300px;
 }
 
-.THIS div.tabBody.scrolling {
+.THIS > div.tabBody.scrolling {
 	overflow: auto;
 }
 
-.THIS.active div.tabBody {
+.THIS.active > div.tabBody {
 	display: block;
 }

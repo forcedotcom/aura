@@ -18,7 +18,6 @@ package org.auraframework.impl.root.parser.handler;
 import java.io.IOException;
 import java.util.Set;
 
-import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
@@ -28,7 +27,6 @@ import org.auraframework.impl.documentation.DescriptionDefImpl;
 import org.auraframework.impl.system.SubDefDescriptorImpl;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.AuraTextUtil;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -36,13 +34,13 @@ public class DescriptionDefHandler<P> extends ParentedTagHandler<DescriptionDefI
 
     public static final String TAG = "aura:description";
 
-    private static final String ATTRIBUTE_ID = "id";
+    private static final String ATTRIBUTE_NAME = "name";
     
-    private final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_ID);
+    private final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_NAME);
 
     private final StringBuilder body = new StringBuilder();
     private final DescriptionDefImpl.Builder builder = new DescriptionDefImpl.Builder();
-
+    
     public DescriptionDefHandler(RootTagHandler<DocumentationDef> parentHandler, XMLStreamReader xmlReader, Source<?> source) {
         super(parentHandler, xmlReader, source);
     }
@@ -54,58 +52,23 @@ public class DescriptionDefHandler<P> extends ParentedTagHandler<DescriptionDefI
 
     @Override
     protected void readAttributes() {
-    	String id = getAttributeValue(ATTRIBUTE_ID);
-    	if (id == null) {
-    		id = ((DocumentationDefHandler) getParentHandler()).getNextId();
+    	String name = getAttributeValue(ATTRIBUTE_NAME);
+    	if (name == null) {
+    		name = ((DocumentationDefHandler) getParentHandler()).getNextId();
     	}
-        builder.setDescriptor(SubDefDescriptorImpl.getInstance(id, getParentHandler().defDescriptor, DescriptionDef.class));
-        builder.setId(id);
+        builder.setDescriptor(SubDefDescriptorImpl.getInstance(name, getParentHandler().defDescriptor, DescriptionDef.class));
+        builder.setName(name);
         builder.setLocation(getLocation());
     }
 
     @Override
     protected void handleChildTag() throws XMLStreamException, QuickFixException {
-    	String startTag = getTagName();
-    	
-    	body.append(String.format("<%s>", startTag));
-    	
-    	// TODO: this is only so DocDefs are usable for the doc blitz.
-    	// Finish the refactor to XMLHandler to allow handlers without Definitions.
-    	loop: while (xmlReader.hasNext()) {
-            int next = xmlReader.next();
-            switch (next) {
-            case XMLStreamConstants.START_ELEMENT:
-                handleChildTag();
-                break;
-            case XMLStreamConstants.CDATA:
-            case XMLStreamConstants.CHARACTERS:
-            case XMLStreamConstants.SPACE:
-                handleChildText();
-                break;
-            case XMLStreamConstants.END_ELEMENT:
-                if (!startTag.equalsIgnoreCase(getTagName())) {
-                    error("Expected end tag <%s> but found %s", startTag, getTagName());
-                }
-                // we hit our own end tag, so stop handling
-                break loop;
-            case XMLStreamConstants.ENTITY_REFERENCE:
-            case XMLStreamConstants.COMMENT:
-                break;
-            default:
-                error("found something of type: %s", next);
-            }
-        }
-    	
-    	body.append(String.format("</%s>", startTag));
+    	body.append(handleHTML());
     }
 
     @Override
     protected void handleChildText() throws XMLStreamException, QuickFixException {
-        String text = xmlReader.getText();
-
-        if (!AuraTextUtil.isNullEmptyOrWhitespace(text)) {
-            body.append(text);
-        }
+        body.append(handleHTMLText());
     }
 
     @Override
@@ -115,7 +78,7 @@ public class DescriptionDefHandler<P> extends ParentedTagHandler<DescriptionDefI
 
     @Override
     protected DescriptionDefImpl createDefinition() throws QuickFixException {
-        builder.setBody(body.toString());
+        builder.setDescription(body.toString());
         
         return builder.build();
     }

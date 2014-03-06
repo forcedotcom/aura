@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-    render : function ExampleRenderer(cmp){
+    render : function ViewerRenderer(cmp){
         var attributes = cmp.getAttributes();
         var desc = new DefDescriptor(attributes.getRawValue("descriptor"));
         var ret = this.superRender();
@@ -25,8 +25,6 @@
         var cachebuster = Math.random() * 100000;
         var app = $A.getContext().getApp();
         frame.src = url + "?aura.cb="+cachebuster + "&aura.mode=" + $A.getContext().getMode() + (app?"&aura.app="+app:"");
-
-
 
         return ret;
     }

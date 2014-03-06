@@ -31,13 +31,13 @@
     
     <p>Let's look at an example. Here is the <code>auradocs:sampleSetTagBase</code> component.</p>
     
-    <auradocs:example descriptor="auradocs:sampleSetTagBase" />
+    <auradocs:viewer descriptor="auradocs:sampleSetTagBase" />
 
     <p>Note that the <code>address1</code> and <code>body</code> attributes don't have values yet as they haven't been set.</p>
 
     <p>Here is the <code>auradocs:sampleSetTagEx</code> component that extends <code>auradocs:sampleSetTagBase</code>.</p>
     
-    <auradocs:example descriptor="auradocs:sampleSetTagEx" />
+    <auradocs:viewer descriptor="auradocs:sampleSetTagEx" />
     
     <p><code>sampleSetTagEx</code> sets a value for the <code>address1</code> attribute in the super component, <code>sampleSetTagBase</code>. Note that the <code><aura:text value="{!"/>v.address1}</code> expression in <code>auradocs:sampleSetTagEx</code> outputs an empty value as <code>aura:set</code> set the value in <code>sampleSetTagBase</code>. The <code>address1</code> attribute has a different value at each level of inheritance.</p>
 
@@ -45,7 +45,7 @@
     
     <p>If you are using a component by making a reference to it in your component, you can set the attribute value directly in the markup. For example, here is a component that makes a reference to <code>sampleSetTagEx</code> and sets the <code>address1</code> attribute directly without using <code>aura:set</code>.</p>
     
-    <auradocs:example descriptor="auradocs:sampleSetAttrRef" />
+    <auradocs:viewer descriptor="auradocs:sampleSetAttrRef" />
     
     <p><b>See also:</b><br/>
         <auradocs:topicLink topic="cmpBody">Component Body</auradocs:topicLink><br/>

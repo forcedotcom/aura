@@ -67,10 +67,6 @@
             <aura:if isTrue="{!m.events.length > 0}">
                 <auradocs:defMemberList title="Events" list="{!m.events}"/>
             </aura:if>
-            
-            <aura:if isTrue="{!m.documentation != null &amp;&amp; m.documentation.examples.length > 0}"> 
-        		<auradocs:defExamples examples="{!m.documentation.examples}"/>
-        	</aura:if>
         </auradocs:stretchTab>
 
         <auradocs:stretchEditorPanel title="source" descriptor="{!v.descriptor}" defType="{!v.defType}"/>
@@ -82,6 +78,13 @@
         <auradocs:stretchTab title="dependencies">
             <auradocs:defDependencies descriptor="{!v.descriptor}" defType="{!v.defType}"/>
         </auradocs:stretchTab>
+        
+        <!-- findInstancesOf cannot traverse if or renderIf -->
+        <!--aura:if isTrue="{!m.documentation != null &amp;&amp; m.documentation.hasExamples}"--> 
+	        <auradocs:stretchTab title="Examples">
+	            <auradocs:examplesc name="{!v.descriptor}"/>
+	        </auradocs:stretchTab>
+	    <!--/aura:if-->
     </ui:tabSet>
 
 </aura:component>

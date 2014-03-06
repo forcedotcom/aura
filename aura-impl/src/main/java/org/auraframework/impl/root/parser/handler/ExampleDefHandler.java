@@ -23,7 +23,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.def.*;
 import org.auraframework.impl.documentation.ExampleDefImpl;
-import org.auraframework.impl.system.SubDefDescriptorImpl;
+import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
@@ -34,17 +34,25 @@ public class ExampleDefHandler<P extends RootDefinition> extends ParentedTagHand
 
     public static final String TAG = "aura:example";
 
+    public static final String ATTRIBUTE_REF = "ref";
     public static final String ATTRIBUTE_NAME = "name";
     public static final String ATTRIBUTE_LABEL = "label";
-    public static final String ATTRIBUTE_DESCRIPTION = "description";
-    public static final String ATTRIBUTE_REF = "ref";
 
-    private final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_NAME, ATTRIBUTE_LABEL, ATTRIBUTE_DESCRIPTION, ATTRIBUTE_REF);
+    private final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_REF, ATTRIBUTE_NAME,
+            ATTRIBUTE_LABEL);
 
+    private final StringBuilder body = new StringBuilder();
+    
     private final ExampleDefImpl.Builder builder = new ExampleDefImpl.Builder();
 
     public ExampleDefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source) {
         super(parentHandler, xmlReader, source);
+
+        builder.setLocation(getLocation());
+
+        if (source != null) {
+            builder.setOwnHash(source.getHash());
+        }
     }
 
     @Override
@@ -54,24 +62,37 @@ public class ExampleDefHandler<P extends RootDefinition> extends ParentedTagHand
 
     @Override
     protected void readAttributes() {
-    	String name = getAttributeValue(ATTRIBUTE_NAME);    	
-    	
+        String ref = getAttributeValue(ATTRIBUTE_REF);
+        if (AuraTextUtil.isNullEmptyOrWhitespace(ref)) {
+            error("Attribute '%s' is required on <%s>", ATTRIBUTE_REF, TAG);
+        }
+        builder.setRef(ref);
+
+        String name = getAttributeValue(ATTRIBUTE_NAME);
         if (AuraTextUtil.isNullEmptyOrWhitespace(name)) {
             error("Attribute '%s' is required on <%s>", ATTRIBUTE_NAME, TAG);
         }
-    	
-    	builder.setDescriptor(SubDefDescriptorImpl.getInstance(name, getParentHandler().defDescriptor, ExampleDef.class));
-        builder.setLocation(getLocation());
-    }
+        builder.setName(name);
 
+        String label = getAttributeValue(ATTRIBUTE_LABEL);
+        if (AuraTextUtil.isNullEmptyOrWhitespace(label)) {
+            error("Attribute '%s' is required on <%s>", ATTRIBUTE_LABEL, TAG);
+        }
+        builder.setLabel(label);
+
+        DefDescriptor<P> parentDesc = getParentHandler().getDefDescriptor();
+        String exampleName = String.format("%s_%s", parentDesc.getDescriptorName(), name);
+        builder.setDescriptor(DefDescriptorImpl.getInstance(exampleName, ExampleDef.class));
+    }
+    
     @Override
     protected void handleChildTag() throws XMLStreamException, QuickFixException {
-        // TODO Auto-generated method stub
+        body.append(handleHTML());
     }
 
     @Override
     protected void handleChildText() throws XMLStreamException, QuickFixException {
-    	// TODO Auto-generated method stub
+        body.append(handleHTMLText());
     }
 
     @Override
@@ -81,13 +102,11 @@ public class ExampleDefHandler<P extends RootDefinition> extends ParentedTagHand
 
     @Override
     protected ExampleDefImpl createDefinition() throws QuickFixException {
-        // TODO Auto-generated method stub
+        builder.setDescription(body.toString());
+        
         return builder.build();
     }
 
     @Override
-    public void writeElement(ExampleDefImpl def, Appendable out) throws IOException {
-        // TODO Auto-generated method stub
-
-    }
+    public void writeElement(ExampleDefImpl def, Appendable out) throws IOException {}
 }

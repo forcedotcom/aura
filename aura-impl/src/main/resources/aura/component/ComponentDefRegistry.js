@@ -50,6 +50,7 @@ ComponentDefRegistry.prototype.isLocalStorageAvailable= (function() {
  * @returns a ComponentDef instance from registry, or config after adding to registry.
  */
 ComponentDefRegistry.prototype.getDef = function(config, noInit) {
+	
     $A.assert(config, "ComponentDef Config required for registration");
 
     // We don't re-register (or modify in any way) once we've registered

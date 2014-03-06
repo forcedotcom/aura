@@ -15,16 +15,22 @@
  */
 package org.auraframework.impl.context;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.AttributeDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.EventDef;
+import org.auraframework.def.EventType;
+import org.auraframework.def.TypeDef;
 import org.auraframework.impl.AuraImplTestCase;
+import org.auraframework.impl.root.AttributeDefImpl;
+import org.auraframework.impl.root.event.EventDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.instance.Event;
 
@@ -256,6 +262,28 @@ public class AuraContextImplTest extends AuraImplTestCase {
         context.addLoaded(added, "somegenerateduid");
         String res = Json.serialize(context, context.getJsonSerializationContext());
         goldFileJson(res);
+    }
+    
+    public void testSerializeWithUnPreLoadedEvent() throws Exception {
+    	AuraContext context = Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Access.PUBLIC);
+        context.setApplicationDescriptor(laxSecurityApp);
+        context.setSerializeLastMod(false);
+        context.getGlobalProviders().clear();
+
+        DefDescriptor<ComponentDef> added = DefDescriptorImpl.getInstance("auratest:iamloaded", ComponentDef.class);
+        context.addLoaded(added, "somegenerateduid");
+        
+        DefDescriptor<EventDef> eventDesc = DefDescriptorImpl.getInstance("fake:event", EventDef.class);
+        Map<DefDescriptor<AttributeDef>, AttributeDef> atts = new HashMap<DefDescriptor<AttributeDef>, AttributeDef>();
+        DefDescriptor<TypeDef> type = DefDescriptorImpl.getInstance("String", TypeDef.class);
+        atts.put(DefDescriptorImpl.getInstance("testString", AttributeDef.class), new AttributeDefImpl(
+                 DefDescriptorImpl.getInstance("testString", AttributeDef.class), null, type, null, true,
+                 AttributeDef.SerializeToType.BOTH, null, null));
+        EventDefImpl eventDef = vendor.makeEventDef(eventDesc, EventType.COMPONENT, atts, null, null);
+        
+        context.getDefRegistry().addLocalDef(eventDef);
+        String res = Json.serialize(context, context.getJsonSerializationContext());
+        assertTrue(res.contains("markup://fake:event"));
     }
     
     /**

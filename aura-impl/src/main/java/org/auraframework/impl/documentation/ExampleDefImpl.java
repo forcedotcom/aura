@@ -22,6 +22,9 @@ import org.auraframework.builder.ExampleDefBuilder;
 import org.auraframework.def.*;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.DefinitionImpl;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
 
 public class ExampleDefImpl extends DefinitionImpl<ExampleDef> implements ExampleDef {
@@ -59,6 +62,27 @@ public class ExampleDefImpl extends DefinitionImpl<ExampleDef> implements Exampl
     public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
         super.appendDependencies(dependencies);
         dependencies.add(ref);
+    }
+    
+    @Override
+    public void validateDefinition() throws QuickFixException {
+        super.validateDefinition();
+        
+        if (AuraTextUtil.isNullEmptyOrWhitespace(name)) {
+            throw new InvalidDefinitionException("<aura:example> must have attribute 'name'.", getLocation());
+        }
+        
+        if (AuraTextUtil.isNullEmptyOrWhitespace(label)) {
+            throw new InvalidDefinitionException("<aura:example> must have attribute 'label'.", getLocation());
+        }
+        
+        if (AuraTextUtil.isNullEmptyOrWhitespace(description)) {
+            throw new InvalidDefinitionException("<aura:example> must contain a description.", getLocation());
+        }
+        
+        if (!ref.exists()) {
+            throw new InvalidDefinitionException(String.format("<aura:example> reference component %s does not exist.", ref.toString()), getLocation());
+        }
     }
 
     public static class Builder extends DefinitionImpl.BuilderImpl<ExampleDef> implements ExampleDefBuilder {

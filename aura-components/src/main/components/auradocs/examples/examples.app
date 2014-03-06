@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:application template="auradocs:examplesTemplate">
+<aura:application template="auradocs:examplesTemplate" access="global">
 	<aura:attribute name="name" type="String"/>
 	
 	<ui:message title="Usage:" severity="info">

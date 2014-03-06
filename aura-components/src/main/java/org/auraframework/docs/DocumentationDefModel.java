@@ -18,12 +18,9 @@ package org.auraframework.docs;
 import java.io.IOException;
 import java.util.List;
 
-import org.auraframework.def.DescriptionDef;
 import org.auraframework.def.DocumentationDef;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonSerializable;
-
-import com.google.common.collect.Lists;
 
 public class DocumentationDefModel implements JsonSerializable {
 
@@ -38,13 +35,7 @@ public class DocumentationDefModel implements JsonSerializable {
 	}
 	
 	public List<String> getDescriptions() {
-		List<String> ret = Lists.newArrayList();
-		
-		for (DescriptionDef descDef : this.docDef.getDescriptionDefs().values()) {
-			ret.add(descDef.getBody());
-		}
-		
-		return ret;
+		return this.docDef.getDescriptions();
 	}
 	
 	public boolean getHasExamples() {

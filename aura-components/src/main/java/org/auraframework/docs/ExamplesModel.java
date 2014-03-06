@@ -36,26 +36,38 @@ public class ExamplesModel {
                 .getValue("name");
 
         if (name != null && !name.isEmpty()) {
-            Set<DefDescriptor<?>> descriptors = definitionService.find(new DescriptorFilter("markup://" + name));
+            Set<DefDescriptor<?>> descriptors = definitionService.find(new DescriptorFilter("markup://" + name, DefType.DOCUMENTATION.name()));
             if (descriptors.size() > 0) {
                 for (DefDescriptor<?> descriptor : descriptors) {
 
                     DefType type = descriptor.getDefType();
                     switch (type) {
                     case DOCUMENTATION:
-                        DocumentationDef docDef = (DocumentationDef)descriptor.getDef();
-
-                        Collection<ExampleDef> exampleDefs = docDef.getExampleDefs().values();
-                        
                         Map<String, String> m;
-                        for (ExampleDef example : exampleDefs) {
-                            m = new TreeMap<String, String>();
+                        
+                        try {
+                            DocumentationDef docDef = (DocumentationDef)descriptor.getDef();
+    
+                            Collection<ExampleDef> exampleDefs = docDef.getExampleDefs();
                             
-                            m.put("label", example.getLabel());
-                            m.put("description", example.getDescription());
-                            m.put("ref", example.getRef().getDescriptorName());
                             
-                            examples.add(m);
+                            for (ExampleDef example : exampleDefs) {
+                                m = new TreeMap<String, String>();
+                                
+                                m.put("label", example.getLabel());
+                                m.put("description", example.getDescription());
+                                m.put("ref", example.getRef().getDescriptorName());
+                                
+                                examples.add(m);
+                            }
+                        } catch (Exception e) {
+                            // only display errors in loading DocDefs in dev mode
+                            if (Aura.getContextService().getCurrentContext().isDevMode()) {
+                                m = new TreeMap<String, String>();
+                                m.put("error", e.toString());
+                                m.put("descriptor", descriptor.getDescriptorName());
+                                examples.add(m);
+                            }
                         }
                         
                         break;

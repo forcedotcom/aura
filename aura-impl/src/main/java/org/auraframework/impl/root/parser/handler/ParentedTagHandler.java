@@ -18,13 +18,10 @@ package org.auraframework.impl.root.parser.handler;
 import java.util.Collections;
 import java.util.List;
 
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.*;
 
 import org.auraframework.def.BaseComponentDef.WhitespaceBehavior;
-import org.auraframework.def.ComponentDefRef;
-import org.auraframework.def.Definition;
-import org.auraframework.def.RootDefinition;
+import org.auraframework.def.*;
 import org.auraframework.impl.util.TextTokenizer;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -63,5 +60,66 @@ public abstract class ParentedTagHandler<T extends Definition, P extends RootDef
             return tokenizer.asComponentDefRefs(parentHandler);
         }
         return Collections.emptyList();
+    }
+    
+    /*
+     * This method is essentially a generic HTML parser. If we ever refactor XMLHandler to allow handlers without
+     * Definitions, this should probably be pulled into its own handler.
+     */
+    protected String handleHTML() throws QuickFixException, XMLStreamException {
+        StringBuilder sb = new StringBuilder();
+        
+        String startTag = getTagName();
+        
+        if (HtmlTag.allowed(startTag)) {
+            StringBuilder attrs = new StringBuilder();
+            for (int i = 0; i < xmlReader.getAttributeCount(); i++) {
+                attrs.append(String.format(" %s=\"%s\"", xmlReader.getAttributeName(i), xmlReader.getAttributeValue(i)));
+            }
+            
+            sb.append(String.format("<%s%s>", startTag, attrs.toString()));
+        } else {
+            error("Found invalid tag <%s>", startTag);
+        }
+                
+        loop: while (xmlReader.hasNext()) {
+            int next = xmlReader.next();
+            switch (next) {
+            case XMLStreamConstants.START_ELEMENT:
+                sb.append(handleHTML());
+                break;
+            case XMLStreamConstants.CDATA:
+            case XMLStreamConstants.CHARACTERS:
+            case XMLStreamConstants.SPACE:
+                sb.append(handleHTMLText());
+                break;
+            case XMLStreamConstants.END_ELEMENT:
+                if (!startTag.equalsIgnoreCase(getTagName())) {
+                    error("Expected end tag <%s> but found %s", startTag, getTagName());
+                }
+                // we hit our own end tag, so stop handling
+                break loop;
+            case XMLStreamConstants.ENTITY_REFERENCE:
+            case XMLStreamConstants.COMMENT:
+                break;
+            default:
+                error("found something of type: %s", next);
+            }
+        }
+        
+        sb.append(String.format("</%s>", startTag));
+        return sb.toString();
+    }
+    
+    protected String handleHTMLText() {
+        String text = xmlReader.getText();
+        String ret = "";
+
+        if (!AuraTextUtil.isNullEmptyOrWhitespace(text)) {
+            ret = AuraTextUtil.replaceSimple(text,  new String[]{"<", ">"}, new String[]{"&lt;", "&gt;"});
+        }
+        
+        return ret;
+        
     }
 }

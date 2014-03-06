@@ -18,7 +18,8 @@ package org.auraframework.impl.root.parser.handler;
 import java.io.IOException;
 import java.util.Set;
 
-import javax.xml.stream.*;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.def.*;
 import org.auraframework.impl.documentation.ExampleDefImpl;
@@ -36,10 +37,9 @@ public class ExampleDefHandler<P extends RootDefinition> extends ParentedTagHand
     public static final String ATTRIBUTE_REF = "ref";
     public static final String ATTRIBUTE_NAME = "name";
     public static final String ATTRIBUTE_LABEL = "label";
-    public static final String ATTRIBUTE_DESCRIPTION = "description";
 
     private final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_REF, ATTRIBUTE_NAME,
-            ATTRIBUTE_LABEL, ATTRIBUTE_DESCRIPTION);
+            ATTRIBUTE_LABEL);
 
     private final StringBuilder body = new StringBuilder();
     
@@ -80,65 +80,19 @@ public class ExampleDefHandler<P extends RootDefinition> extends ParentedTagHand
         }
         builder.setLabel(label);
 
-        String description = getAttributeValue(ATTRIBUTE_DESCRIPTION);
-        if (!AuraTextUtil.isNullEmptyOrWhitespace(description)) {
-            builder.setDescription(description);
-        }
-
         DefDescriptor<P> parentDesc = getParentHandler().getDefDescriptor();
         String exampleName = String.format("%s_%s", parentDesc.getDescriptorName(), name);
         builder.setDescriptor(DefDescriptorImpl.getInstance(exampleName, ExampleDef.class));
     }
-
-    /*
-     * This method is essentially a generic HTML parser. If we ever refactor XMLHandler to allow handlers without
-     * Definitions, this should probably be pulled into its own handler.
-     */
+    
     @Override
     protected void handleChildTag() throws XMLStreamException, QuickFixException {
-        String startTag = getTagName();
-
-        if (!HtmlTag.allowed(startTag)) {
-            error("Invalid tag <%s>", startTag);
-        }
-
-        body.append(String.format("<%s>", startTag));
-
-        loop: while (xmlReader.hasNext()) {
-            int next = xmlReader.next();
-            switch (next) {
-            case XMLStreamConstants.START_ELEMENT:
-                handleChildTag();
-                break;
-            case XMLStreamConstants.CDATA:
-            case XMLStreamConstants.CHARACTERS:
-            case XMLStreamConstants.SPACE:
-                handleChildText();
-                break;
-            case XMLStreamConstants.END_ELEMENT:
-                if (!startTag.equalsIgnoreCase(getTagName())) {
-                    error("Expected end tag <%s> but found %s", startTag, getTagName());
-                }
-                // we hit our own end tag, so stop handling
-                break loop;
-            case XMLStreamConstants.ENTITY_REFERENCE:
-            case XMLStreamConstants.COMMENT:
-                break;
-            default:
-                error("found something of type: %s", next);
-            }
-        }
-
-        body.append(String.format("</%s>", startTag));
+        body.append(handleHTML());
     }
 
     @Override
     protected void handleChildText() throws XMLStreamException, QuickFixException {
-        String text = xmlReader.getText();
-
-        if (!AuraTextUtil.isNullEmptyOrWhitespace(text)) {
-            body.append(text);
-        }
+        body.append(handleHTMLText());
     }
 
     @Override

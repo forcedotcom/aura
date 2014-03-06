@@ -22,7 +22,14 @@
 	<ul class="unstyledList">
 		<aura:iteration var="example" items="{!m.examples}">
 	  		<li>
-	   			<auradocs:example label="{!example.label}" description="{!example.description}" descriptor="{!example.ref}"/>
+	  			<aura:if isTrue="{!example.label != null}">
+					<auradocs:example label="{!example.label}" description="{!example.description}" descriptor="{!example.ref}"/>
+				<aura:set attribute="else">
+					<aura:if isTrue="{!example.error != null}">
+						<ui:message title="{!'Error loading example for ' + example.descriptor}" severity="error">{!example.error}</ui:message>
+					</aura:if>
+				</aura:set>		  			
+	  			</aura:if>
 	   		</li>
 	  	</aura:iteration>
 	</ul>

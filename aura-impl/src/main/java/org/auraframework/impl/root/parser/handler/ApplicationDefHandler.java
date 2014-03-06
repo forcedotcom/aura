@@ -115,7 +115,7 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
                 ddb.setParentDescriptor(this.defDescriptor);
                 ddb.setLocation(getLocation());
                 ddb.setResource(preload);
-                ddb.setType("*");
+                ddb.setType("APPLICATION,COMPONENT,STYLE,EVENT");
                 appBuilder.addDependency(ddb.build());
             }
         }

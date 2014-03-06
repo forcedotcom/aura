@@ -75,8 +75,8 @@ public class DocumentationDefHandler extends RootTagHandler<DocumentationDef> {
         
         if (DescriptionDefHandler.TAG.equalsIgnoreCase(tag)) {
         	DescriptionDef desc = new DescriptionDefHandler<DocumentationDef>(this, xmlReader, source).getElement();
-        	String id = desc.getId();
-            builder.addDescription(id, desc);
+        	String name = desc.getName();
+            builder.addDescription(name, desc);
             
         } else if (ExampleDefHandler.TAG.equalsIgnoreCase(tag)) {
         	ExampleDef ex = new ExampleDefHandler<DocumentationDef>(this, xmlReader, source).getElement();

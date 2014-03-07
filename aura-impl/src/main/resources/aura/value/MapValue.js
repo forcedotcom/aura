@@ -74,11 +74,28 @@ MapValue.prototype.fire = function(name) {
     }
 };
 
+
+/**
+ * DO NOT USE THIS METHOD.
+ *
+ * @public
+ *
+ * @deprecated use Component.get(key) instead
+ */
+MapValue.prototype.getValue = function (key) {
+    //$A.warning("DEPRECATED USE OF mapValue.getValue(key). USE component.get(key) INSTEAD.",{key:key});
+    return this._getValue(key);
+};
+
 /**
  * Returns a SimpleValue for the specified key.
  * @param {String} k The key for whose value is to be fetched.
+ *
+ * TEMPORARILY INTERNALIZED TO GATE ACCESS
+ *
+ * @private
  */
-MapValue.prototype.getValue = function(k){
+MapValue.prototype._getValue = function(k){
     if ($A.util.isUndefined(this.value)) {
         return valueFactory.create(undefined, null, this.owner);
     }
@@ -93,6 +110,19 @@ MapValue.prototype.getValue = function(k){
     return ret;
 };
 
+
+/**
+ * DO NOT USE THIS METHOD.
+ *
+ * @public
+ *
+ * @deprecated use Component.set(key,newMap) instead
+ */
+MapValue.prototype.setValue = function (newMap) {
+    //$A.warning("DEPRECATED USE OF mapValue.setValue(newMap). USE component.set(key,newMap) INSTEAD.", {key: key,value:newMap});
+    this._setValue(newMap);
+};
+
 /**
  * Sets the map to newMap.
  *
@@ -105,8 +135,11 @@ MapValue.prototype.getValue = function(k){
  * construct a MapValue, then call this.
  *
  * @param {Object} newMap The new map.
+ *
+ * TEMPORARILY INTERNALIZED TO GATE ACCESS
+ * @private
  */
-MapValue.prototype.setValue = function(newMap) {
+MapValue.prototype._setValue = function(newMap) {
     var oldMap = this.value;  // Held to test for dirty replaced subobjects
     this.value = {};
     this.keys = {};
@@ -171,6 +204,20 @@ MapValue.prototype.get = function(key){
     //     return $A.expressionService.get(this.owner, key);
     // }
     // return value.unwrap();
+};
+
+/**
+ * Sets the value for the key.
+ *
+ * @param {String} key The key for the value to return.
+ */
+MapValue.prototype.set = function (key,value) {
+    var v = this._getValue(key);
+    if ($A.util.isUndefinedOrNull(v)) {
+        $A.error("Invalid key " + key);
+        return;
+    }
+    v._setValue(value);
 };
 
 /**

@@ -42,12 +42,26 @@ function ArrayValue(config, def, component) {
 ArrayValue.prototype.auraType = "Value";
 
 /**
+ * DO NOT USE THIS METHOD.
+ *
+ * @public
+ *
+ * @deprecated use Component.get(name)[i] instead
+ */
+ArrayValue.prototype.getValue = function (index) {
+    //$A.warning("DEPRECATED USE OF arrayValue.get(index). USE component.get(name)[index] INSTEAD.");
+    return this._getValue(index);
+};
+
+/**
  * Returns the value object at the specified index.
  * <code>getValue('length')</code> returns a value object representing the length of this array value.
  * Any other argument for getValue() will flag an error.
  * @param {Number} i The length of the array.
+ *
+ * @private
  */
-ArrayValue.prototype.getValue = function(i) {
+ArrayValue.prototype._getValue = function(i) {
     if (aura.util.isString(i)) {
         if ("length" === i) {
             // special case for length
@@ -78,11 +92,23 @@ ArrayValue.prototype.getArray = function() {
     return array;
 };
 
+
+/**
+ * DO NOT USE THIS METHOD.
+ *
+ * @public
+ *
+ * @deprecated use Component.get(name)[i] instead
+ */
+ArrayValue.prototype.get = function (index) {
+    //$A.warning("DEPRECATED USE OF arrayValue.get(index). USE component.get(name)[index] INSTEAD.");
+    return this._get(index);
+};
 /**
  * Returns the unwrapped value at the specified index. Shortcut for getValue(index).unwrap().
  * @param i The index for the value to retrieve
  */
-ArrayValue.prototype.get = function(i) {
+ArrayValue.prototype._get = function(i) {
     return $A.expressionService.get(this, String(i));
 };
 
@@ -95,7 +121,7 @@ ArrayValue.prototype.getLength = function() {
     if (arr) {
         return arr.length;
     }
-    
+
     return 0;
 };
 
@@ -128,12 +154,24 @@ ArrayValue.prototype.setIsOwner = function(isOwner) {
 
 
 /**
+ * DO NOT USE THIS METHOD.
+ *
+ * @public
+ *
+ * @deprecated use Component.set(name,value) instead
+ */
+ArrayValue.prototype.setValue = function (newArray, skipChange) {
+    //$A.warning("DEPRECATED USE OF arrayValue.setValue(newArray, skipChange). USE component.set(name,newArray) INSTEAD.",newArray);
+    this._setValue(newArray, skipChange);
+};
+
+/**
  * Sets the array to newArray.
  *
  * @param {Object} newArray The new array. This can be an array of literal JavaScript values or an array of value objects.
  * @param {Boolean} skipChange Set to true if you want to skip firing of the change event, which indicates that the content or state has changed. Or set to false if you want to fire the change event.
  */
-ArrayValue.prototype.setValue = function(newArray, skipChange) {
+ArrayValue.prototype._setValue = function(newArray, skipChange) {
     this.fireEvents = false;
     this.hasRealValue = (newArray !== null && newArray !== undefined);
 
@@ -397,7 +435,7 @@ ArrayValue.prototype.destroy = function(async) {
 //#if {"modes" : ["TESTING", "TESTINGDEBUG", "AUTOTESTING", "AUTOTESTINGDEBUG"]}
 	async = false; // Force synchronous destroy when in testing modes
 //#end
-	
+
     function destroy(a, async) {
         var array = a.dirty ? a.newArray : a.array;
         for (var i = 0; i < array.length; i++) {
@@ -490,11 +528,11 @@ ArrayValue.prototype.compare = function(arr) {
             }
         }
         if (arr[i].auraType === "Value") {
-            if (m[i].getValue() !== arr[i].getValue()) {
+            if (m[i]._getValue() !== arr[i]._getValue()) {
                 return false;
             }
         } else {
-            if (m[i].getValue() !== arr[i]) {
+            if (m[i]._getValue() !== arr[i]) {
                 return false;
             }
         }
@@ -678,7 +716,7 @@ ArrayValue.prototype.rerender = function(suppliedReferenceNode, appendChild, ins
                     ret.push(itemReferenceNode);
                 }
 
-                // When adding children and index is zero, referenceNode still points to parent, 
+                // When adding children and index is zero, referenceNode still points to parent,
                 // and we need to call insertFist(), not appendChild()
                 var asFirst = (j === 0);
                 insertElements(ret, referenceNode, !appendChild, asFirst);
@@ -719,7 +757,7 @@ ArrayValue.prototype.rerender = function(suppliedReferenceNode, appendChild, ins
             // nothing to render), make sure that we create one and put it
             // in the right spot. If there was nothing previously rendered
             // this isn't needed because we already have a locator.
-            // 
+            //
             referenceNode = this.createLocator(" array locator " + this.owner);
             insertElements([referenceNode], startReferenceNode, true);
             firstReferenceNode = referenceNode;

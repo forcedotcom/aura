@@ -178,6 +178,16 @@ $A.ns.Util.prototype.isEmpty = function(obj){
 };
 
 /**
+ * Coerces truthy and falsy values into native booleans
+ *
+ * @param {Object} val The object to check.
+ * @returns {Boolean} True if the object is truthy, or false otherwise.
+ */
+$A.ns.Util.prototype.getBooleanValue = function (val) {
+    return val !== undefined && val !== null && val !== false && val !== 0 && val !== "false" && val !== "" && val !== "f";
+};
+
+/**
  * Gets a DOM element by its id without any leading characters (e.g. #) unless the ID contains them.
  * 
  * @param {String} id The corresponding id of the DOM element.
@@ -1634,7 +1644,7 @@ $A.ns.Util.prototype.isValue = function(obj) {
     return (!this.isUndefinedOrNull(obj) && !this.isUndefinedOrNull(obj.auraType) && obj.auraType === 'Value');
 };
 
-$A.ns.Util.prototype.supportsTouchEvents = function() {
+$A.ns.Util.prototype.supportsTouchEvents = function() {	 
     if (this.supportsTouchEvents.cache) {
         return this.supportsTouchEvents.cache;
     }

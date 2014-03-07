@@ -31,16 +31,25 @@ var BaseValue = {
 
         var actionExpression = config["actionExpression"];
         var valueProvider = config["valueProvider"];
-
+if(actionExpression===undefined){
+    debugger;
+}
         if(aura.util.isString(actionExpression)){
             actionExpression = valueFactory.parsePropertyReference(actionExpression);
+        }
+        if (actionExpression === undefined) {
+            debugger;
         }
 
         /**
          * Returns a function that runs the event on the client Action.
          * Throws an error if the name of the client action is not found.
          */
+
         var actionRef = valueFactory.create(actionExpression);
+        if (actionRef.getValue() === undefined) {
+            debugger;
+        }
         return function(event){
             if (valueProvider.isValid && !valueProvider.isValid()) {
                 return;

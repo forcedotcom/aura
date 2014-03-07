@@ -35,7 +35,7 @@
 
     handleCanShowMoreChange: function (cmp, evt, hlp) {
     	var newValue = evt.getParam('value'),
-    		oldValue = cmp._getValue('v.canShowMore').oldValue;
+    		oldValue = cmp.getValue('v.canShowMore').oldValue;
 
     	// false => true ?
     	if (!oldValue && newValue) {

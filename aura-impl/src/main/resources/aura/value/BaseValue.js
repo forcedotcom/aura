@@ -31,14 +31,9 @@ var BaseValue = {
 
         var actionExpression = config["actionExpression"];
         var valueProvider = config["valueProvider"];
-if(actionExpression===undefined){
-    debugger;
-}
+
         if(aura.util.isString(actionExpression)){
             actionExpression = valueFactory.parsePropertyReference(actionExpression);
-        }
-        if (actionExpression === undefined) {
-            debugger;
         }
 
         /**
@@ -47,9 +42,7 @@ if(actionExpression===undefined){
          */
 
         var actionRef = valueFactory.create(actionExpression);
-        if (actionRef.getValue() === undefined) {
-            debugger;
-        }
+
         return function(event){
             if (valueProvider.isValid && !valueProvider.isValid()) {
                 return;

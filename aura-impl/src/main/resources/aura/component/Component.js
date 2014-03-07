@@ -1012,7 +1012,7 @@ Component.prototype.isDirty = function(expression){
  */
 Component.prototype.isValid = function(expression){
     // JBUCH TODO: TEMPORARY PASSTHROUGH TO HIDE SIMPLEVALUES; isValid("v.value") SHOULD BE HANDLED THROUGH ERROR EVENTS
-    if(value){
+    if(expression){
         var wrapper=this._getValue(expression);
         return wrapper&&wrapper.isValid()||false;
     }

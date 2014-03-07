@@ -199,6 +199,12 @@ SimpleValue.prototype._setValue = function(v, skipChange) {
         return;  // The observe also does an initial setvalue.
     }
 
+    // JBUCH TODO: VERIFY WE DON'T FIRE CHANGE EVENTS IF VALUE IS UNCHANGED
+    // DON'T CHANGE ME BRO! *CHAAAAAAAANNNNNNNNGEEEEEEEE*
+    if(this.value===v){
+        return;
+    }
+
     this.makeDirty();
     var list = null;
     if (!skipChange) {

@@ -366,7 +366,7 @@ ArrayValue.prototype.addValueHandlers = function(value){
  */
 ArrayValue.prototype.fire = function(name) {
     if (this.initialized && this.fireEvents){
-        BaseValue.fire(name, this, this.getEventDispatcher());
+        BaseValue.fire(name, this.unwrap(), this.getEventDispatcher());
     }
 };
 

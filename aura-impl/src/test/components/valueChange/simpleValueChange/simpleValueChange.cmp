@@ -29,7 +29,8 @@
     <aura:handler name="change" value="{!m.chained}" action="{!c.chainedChange}"/>
     <aura:handler name="change" value="{!m.unchained}" action="{!c.unchainedChange}"/>
 
-        <div aura:id="index" />
-        <div aura:id="value" />
+    <div aura:id="index" />
+    <div aura:id="value" />
+
     <test:ballot aura:id="ballot"/>
 </aura:component>

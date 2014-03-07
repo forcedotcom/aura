@@ -23,17 +23,12 @@ import org.apache.http.Header;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
-import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.message.BasicHeader;
-import org.auraframework.def.ComponentDef;
-import org.auraframework.system.AuraContext.Format;
-import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.AuraHttpTestCase;
 import org.auraframework.test.annotation.UnAdaptableTest;
 import org.auraframework.util.json.JsonReader;
 import org.json.JSONException;
-
-import com.google.common.collect.ImmutableMap;
 
 /**
  * Automation to check support for date and dateTimePicker for different Locales.
@@ -54,12 +49,12 @@ public class InputDateTimeLocaleHttpTest extends AuraHttpTestCase{
         super(name);
     }
 
-    private void checkValues(String dayOfWeek, String month, HttpGet auraGet) throws Exception {
-        HttpResponse httpResponse = perform(auraGet);
+    private void checkValues(String dayOfWeek, String month, HttpPost auraPost) throws Exception {
+        HttpResponse httpResponse = perform(auraPost);
 
         String response = getResponseBody(httpResponse);
         int statusCode = getStatusCode(httpResponse);
-        auraGet.releaseConnection();
+        auraPost.releaseConnection();
 
         if (HttpStatus.SC_OK != statusCode) {
             fail(String.format("Unexpected status code <%s>, expected <%s>, response:%n%s", statusCode,
@@ -71,9 +66,11 @@ public class InputDateTimeLocaleHttpTest extends AuraHttpTestCase{
         
         //Grab the object you are looking for from the json tree
         @SuppressWarnings("unchecked")
-        Map<String, Object> context = (Map<String, Object>) json.get("context");
+        List<Object> actions = (List<Object>) json.get("actions");
         @SuppressWarnings("unchecked")
-        List<Map<String,Object>> components = (List<Map<String,Object>>) context.get("components");
+        Map<String, Object> action = (Map<String, Object>) actions.get(0);
+        @SuppressWarnings("unchecked")
+        List<Map<String,Object>> components = (List<Map<String,Object>>) action.get("components");
         Map<String, Object>  num = null;
         
         /*
@@ -138,8 +135,9 @@ public class InputDateTimeLocaleHttpTest extends AuraHttpTestCase{
      */
     public void testCheckLocaleForDatePicker() throws Exception{
         Header[] headers = new Header[]{ new BasicHeader(HttpHeaders.ACCEPT_LANGUAGE, locale) };
-        HttpGet auraGet = this.obtainAuraGetMethod(Mode.DEV, Format.JSON, "uiTest:inputDate_Test", ComponentDef.class,
-                ImmutableMap.of("visible", "true"), headers);
-        checkValues(dayOfWeek, month, auraGet);
+        HttpPost auraPost = new ServerAction("aura://ComponentController/ACTION$getComponent", null)
+            .putParam("name", "uiTest:inputDate_Test").getPostMethod();
+        auraPost.setHeaders(headers);
+        checkValues(dayOfWeek, month, auraPost);
     }
 }

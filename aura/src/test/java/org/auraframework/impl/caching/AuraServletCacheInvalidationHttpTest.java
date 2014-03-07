@@ -15,13 +15,11 @@
  */
 package org.auraframework.impl.caching;
 
-import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.auraframework.Aura;
 import org.auraframework.def.BaseComponentDef;
@@ -49,51 +47,6 @@ public class AuraServletCacheInvalidationHttpTest extends AuraHttpTestCase {
 
     public AuraServletCacheInvalidationHttpTest(String name) {
         super(name);
-    }
-
-    /**
-     * Verify that AuraServlet returns an error code in the response body when
-     * a different UID.
-     * 
-     * @throws Exception
-     */
-    @TestLabels("auraSanity")
-    public void testGetRequestWithModifiedUID() throws Exception {
-        // When last mod time stamp is older than a year (400 days).
-        AuraContext ctx = startContext("auratest:test_TokenValidation", ComponentDef.class);
-        String uri = getGetURIWithModifiedUID(ctx, true);
-
-        HttpGet get = obtainGetMethod(uri);
-        HttpResponse httpResponse = perform(get);
-        int statusCode = getStatusCode(httpResponse);
-        String response = getResponseBody(httpResponse);
-        get.releaseConnection();
-
-        assertTrue("Aura servlet should return 200.", statusCode == HttpStatus.SC_OK);
-        assertOutdated(response);
-    }
-
-    /**
-     * Verify that AuraServlet returns usable content in the response body when
-     * valid lastmod timestamp is used in a GET request.
-     * 
-     * @throws Exception
-     */
-    @TestLabels("auraSanity")
-    public void testGetRequestWithValidTimeStamp() throws Exception {
-        // When last mod time stamp is older than a year.
-        AuraContext ctx = startContext("auratest:test_TokenValidation", ComponentDef.class);
-        String uri = getGetURIWithModifiedUID(ctx, false);
-
-        HttpGet get = obtainGetMethod(uri);
-        HttpResponse httpResponse = perform(get);
-        int statusCode = getStatusCode(httpResponse);
-        String response = getResponseBody(httpResponse);
-        get.releaseConnection();
-
-        assertTrue("Failed to reach aura servlet.", statusCode == HttpStatus.SC_OK);
-        assertTrue("AuraServlet failed to notify the client about invalid cache.",
-                response.startsWith(AuraBaseServlet.CSRF_PROTECT));
     }
 
     /**
@@ -174,16 +127,6 @@ public class AuraServletCacheInvalidationHttpTest extends AuraHttpTestCase {
     private AuraContext startContext(String qualifiedName, Class<? extends BaseComponentDef> clazz) {
         return Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED,
                 Aura.getDefinitionService().getDefDescriptor(qualifiedName, clazz));
-    }
-
-    private String getGetURI(String appQName, String serializedCtx) throws Exception {
-        return "/aura?aura.tag=" + appQName + "&aura.mode=FTEST&aura.format=JSON&" + "aura.context="
-                + URLEncoder.encode(serializedCtx, "UTF-8");
-    }
-
-    private String getGetURIWithModifiedUID(AuraContext ctx, boolean modify) throws Exception {
-        String serContext = getAuraTestingUtil().getSerializedAuraContextWithModifiedUID(ctx, modify);
-        return getGetURI(ctx.getApplicationDescriptor().getQualifiedName(), serContext);
     }
 
     @SuppressWarnings("unchecked")

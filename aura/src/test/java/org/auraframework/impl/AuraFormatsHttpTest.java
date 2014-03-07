@@ -101,14 +101,6 @@ public class AuraFormatsHttpTest extends AuraHttpTestCase {
         for (Format format : Format.values()) {
             switch (format) {
             case JSON:
-                // Valid component get request
-                getOnAuraServlet(format, this.componentTag);
-                // Quick fix exception
-                getOnAuraServlet(format, this.quickFixComponentTag);
-                // Non Quick fix exception, Not specifying component tag will
-                // cause RequestParam.MissingParamException
-                getOnAuraServlet(format, "");
-
                 // Valid component post request
                 postOnAuraServlet(format, false);
                 // Exception

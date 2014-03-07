@@ -131,7 +131,7 @@
 
     	if (this.hasLabel(component)) {
     		var el = component.getElement();
-    		element = el.getElementsByTagName('input')[0] ||  el.getElementsByTagName('select')[0] ||  el.getElementsByTagName('textarea')[0] || element;
+    		element = el.getElementsByTagName('input')[0] ||  el.getElementsByTagName('select')[0] ||  el.getElementsByTagName('textarea')[0] || el;
     	} else {
     		element = component.getElement();
     	}

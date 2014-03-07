@@ -265,7 +265,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
     }
     
     public void testSerializeWithUnPreLoadedEvent() throws Exception {
-    	AuraContext context = Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Access.PUBLIC);
+    	AuraContext context = Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Authentication.UNAUTHENTICATED);
         context.setApplicationDescriptor(laxSecurityApp);
         context.setSerializeLastMod(false);
         context.getGlobalProviders().clear();

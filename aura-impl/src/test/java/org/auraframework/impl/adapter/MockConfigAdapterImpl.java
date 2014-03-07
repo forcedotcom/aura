@@ -95,8 +95,7 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
 
 	@Override
 	public boolean isPrivilegedNamespace(String namespace) {
-		Set<String> namespaces = StringSourceLoader.getInstance().getNamespaces();
-		if (namespaces.contains(namespace) || SYSTEM_TEST_NAMESPACES.contains(namespace) || super.isPrivilegedNamespace(namespace)) {
+		if (StringSourceLoader.getInstance().isPrivilegedNamespace(namespace) || SYSTEM_TEST_NAMESPACES.contains(namespace) || super.isPrivilegedNamespace(namespace)) {
 			return true;
 		}
 		

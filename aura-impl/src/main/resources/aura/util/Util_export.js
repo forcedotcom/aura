@@ -74,7 +74,8 @@ exp(p,
     "some", p.some,
     "filter", p.filter,
     "keys", p.keys,
-    "bind", p.bind
+    "bind", p.bind,
+    "includeScript", p.includeScript
     
     //#if {"excludeModes" : ["PRODUCTION"]}
 	    ,

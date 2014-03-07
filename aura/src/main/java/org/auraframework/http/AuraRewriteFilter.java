@@ -30,7 +30,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.system.AuraContext.Access;
+import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Mode;
 
 /**
@@ -73,7 +73,7 @@ public class AuraRewriteFilter implements Filter {
         Matcher pubMatcher = publicPattern.matcher(path);
         if (pubMatcher.matches()) {
             newUri = createURI(pubMatcher.group(1), pubMatcher.group(2), DefType.APPLICATION.name(),
-                    Access.PUBLIC.name(), qs);
+                    Authentication.UNAUTHENTICATED.name(), qs);
         } else {
             Mode mode = AuraContextFilter.mode.get(request, Mode.PROD);
             String ns;
@@ -102,7 +102,7 @@ public class AuraRewriteFilter implements Filter {
                     ns = matcher.group(1);
                     name = matcher.group(2);
                 }
-                newUri = createURI(ns, name, type, Access.AUTHENTICATED.name(), qs);
+                newUri = createURI(ns, name, type, Authentication.AUTHENTICATED.name(), qs);
             }
 
         }

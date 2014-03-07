@@ -27,7 +27,7 @@
    </auradocs:codeblock>
   <p>To use a model on your labels, use the <code>label</code> and <code>value</code> attributes to retrieve the data from the model.</p>
   
-  <auradocs:example descriptor="auradocs:demoLabel" />
+  <auradocs:viewer descriptor="auradocs:demoLabel" />
   
   <h3><code>ui:label</code></h3>
    <p>Additionally, you can use the <code>ui:label</code> component to bind labels using the local ID, <code>aura:id</code>, of the input component. 

@@ -30,7 +30,7 @@
 
 <p>You can substitute the <code>{0}</code> parameter with an expression or a component. The previous example showed the use of an expression. This example shows the output and source of a label with a hardcoded expression value.</p>
 
-<auradocs:example descriptor="auradocs:sampleLabelParamSimple" />
+<auradocs:viewer descriptor="auradocs:sampleLabelParamSimple" />
 
 <p>Typically, your labels are defined in a separate file in your application, and your labels each have a unique name. You can access your label values by using the <code>$Label</code> dot notation, which uses your label adapter implementation. For example, to access a label named <code>Object.Title</code>, use the <code>$Label.Object.Title</code> expression.</p>
 
@@ -72,7 +72,7 @@
 
 <p>This example is similar to the previous one except that the label value is hardcoded and doesn't use the label provider. You can view the output, which is the label text containing a link.</p>
 
-<auradocs:example descriptor="auradocs:sampleLabelParam" />
+<auradocs:viewer descriptor="auradocs:sampleLabelParam" />
 
 <p>This is equivalent to embedding the HTML anchor tag:</p> 
 
@@ -98,7 +98,7 @@
 
 <p>This shows the output of a button that has an embedded label with the link parameter substitution. This example uses a hardcoded label value rather than a value from the label provider.</p> 
 
-<auradocs:example descriptor="auradocs:sampleLabelEmbedded" />
+<auradocs:viewer descriptor="auradocs:sampleLabelEmbedded" />
 
 <auradocs:info>See <auradocs:topicLink topic="dynamicLabel">Dynamically Constructing Labels</auradocs:topicLink> if you want to construct labels dynamically in JavaScript.</auradocs:info>
 <p><b>See also:</b><br/>   

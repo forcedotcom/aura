@@ -22,7 +22,6 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.builder.RootDefinitionBuilder;
 import org.auraframework.def.*;
-import org.auraframework.def.DefinitionAccess.BasicAccessType;
 import org.auraframework.impl.root.AttributeDefImpl;
 import org.auraframework.impl.root.event.EventDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
@@ -118,13 +117,9 @@ public class EventDefHandler extends RootTagHandler<EventDef> {
         return builder;
     }
     
-    @Override
-    public Set<BasicAccessType> getAllowedAccessValues() {
-        return ALLOWED_ACCESS_VALUES;
-    }
-
-    private final static Set<BasicAccessType> ALLOWED_ACCESS_VALUES = new ImmutableSet.Builder<BasicAccessType>()
-            .add(BasicAccessType.GLOBAL, BasicAccessType.PUBLIC, BasicAccessType.PRIVATE, BasicAccessType.PREVIEW, 
-                    BasicAccessType.INTERNAL).build();
-
+	@Override
+	protected boolean allowPrivateAttribute() {
+		return true;
+	}
+    
 }

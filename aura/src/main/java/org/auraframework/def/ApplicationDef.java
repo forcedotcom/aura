@@ -17,7 +17,7 @@ package org.auraframework.def;
 
 import java.util.List;
 
-import org.auraframework.system.AuraContext.Access;
+import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**

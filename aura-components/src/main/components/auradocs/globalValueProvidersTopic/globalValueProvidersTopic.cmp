@@ -94,7 +94,7 @@
  
 <p><b>Example</b></p>
 <p>This example shows how to get some <code>$Browser</code> attributes.</p>
-<auradocs:example descriptor="auradocs:sampleBrowser" />
+<auradocs:viewer descriptor="auradocs:sampleBrowser" />
 
 <h3><code>$Locale</code></h3>
 <p>Use the <code>$Locale</code> global value provider for information about the browser's locale. Here are the attributes for <code>$Locale</code>.
@@ -171,7 +171,7 @@
 </p>
 <p><b>Example</b></p>
 <p>This example shows how to get some <code>$Locale</code> attributes.</p>
-<auradocs:example descriptor="auradocs:demoLocale" />
+<auradocs:viewer descriptor="auradocs:demoLocale" />
 <p>Aura also provides localization support for input and output components. See <auradocs:topicLink topic="localization">Localization</auradocs:topicLink> for more information.</p> 
 <p><b>See also:</b><br/>   
     <auradocs:topicLink topic="labelParametersTopic">Setting Label Parameters</auradocs:topicLink><br/>

@@ -23,7 +23,7 @@
 		<p>The demo below shows commonly used components that extend <code>ui:input</code>.
 		For example, the <code>ui:inputText</code> demo calls a client-side controller action to return the input value in a <code>ui:outputText</code> component.
 			</p>
-    		<auradocs:example descriptor="auradocs:demoSubmitForm" />
+    		<auradocs:viewer descriptor="auradocs:demoSubmitForm" />
     	<p><code>ui:inputDate</code> binds an attribute value using <code>value="<aura:text value="{!"/>v.myDate}"</code>. You can also include a date picker with <code>ui:inputDate</code> and <code>ui:inputDateTime</code> by setting <code>displayDatePicker="true"</code>.</p>
     	
     	 <auradocs:info>See the <auradocs:defLink descriptor ="ui:input">ui:input</auradocs:defLink> component reference.</auradocs:info>

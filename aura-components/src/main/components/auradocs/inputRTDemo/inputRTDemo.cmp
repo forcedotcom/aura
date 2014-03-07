@@ -22,7 +22,7 @@
     	<p> <code>ui:inputRichText</code> is an input field for entering rich text.</p>  		
 		<p>The demo below shows a basic implementation of this component. When you press the Display button, the client-side controller action returns the input value in a <code>ui:outputRichText</code> component.
 		</p>
-    		<auradocs:example descriptor="auradocs:demoInputRT" />
+    		<auradocs:viewer descriptor="auradocs:demoInputRT" />
     	</aura:set>
     	<aura:set attribute="south">
     	<p>In this demo, the <code>isRichText="false"</code> attribute replaces the component with the <code>ui:inputTextArea</code> component.

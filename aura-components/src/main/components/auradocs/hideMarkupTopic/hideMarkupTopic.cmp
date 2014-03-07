@@ -25,7 +25,7 @@
 
 <h2>Code</h2>
 
-    <auradocs:example descriptor="auradocs:sampleHideMarkup" />
+    <auradocs:viewer descriptor="auradocs:sampleHideMarkup" />
 
 <h2>Discussion</h2>
 

@@ -22,7 +22,7 @@ import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.system.AuraContext;
-import org.auraframework.system.AuraContext.Access;
+import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.SourceLoader;
@@ -42,40 +42,40 @@ public interface ContextService extends AuraService {
     /**
      * Start a AuraContext with the given Mode, Format, and Access
      */
-    AuraContext startContext(Mode mode, Format format, Access access, DefDescriptor<? extends BaseComponentDef> appDesc);
+    AuraContext startContext(Mode mode, Format format, Authentication access, DefDescriptor<? extends BaseComponentDef> appDesc);
 
     /**
      * Start a AuraContext and include these extra source loaders
      * 
      * @throws QuickFixException
      */
-    AuraContext startContext(Mode mode, Set<SourceLoader> loaders, Format format, Access access,
+    AuraContext startContext(Mode mode, Set<SourceLoader> loaders, Format format, Authentication access,
             DefDescriptor<? extends BaseComponentDef> appDesc) throws QuickFixException;
 
     /**
      * Start a AuraContext with the given Mode, Format, and Access
      */
-    AuraContext startContext(Mode mode, Format format, Access access);
+    AuraContext startContext(Mode mode, Format format, Authentication access);
 
     /**
      * Start a AuraContext and include these extra source loaders
      * 
      * @throws QuickFixException
      */
-    AuraContext startContext(Mode mode, Set<SourceLoader> loaders, Format format, Access access)
+    AuraContext startContext(Mode mode, Set<SourceLoader> loaders, Format format, Authentication access)
             throws QuickFixException;
 
     /**
      * Start a AuraContext and include debug tool usage
      */
-    AuraContext startContext(Mode mode, Format format, Access access,
+    AuraContext startContext(Mode mode, Format format, Authentication access,
                     DefDescriptor<? extends BaseComponentDef> appDesc, boolean isDebugToolEnabled);
 	
     /**
      * Start a AuraContext and include extra source loaders and debug tool usage
      */
     AuraContext startContext(Mode mode, Set<SourceLoader> loaders,
-                    Format format, Access access,
+                    Format format, Authentication access,
                     DefDescriptor<? extends BaseComponentDef> appDesc,
                     boolean isDebugToolEnabled);
 	

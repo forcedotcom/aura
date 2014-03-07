@@ -24,7 +24,7 @@ import java.util.TreeMap;
 import org.auraframework.Aura;
 import org.auraframework.impl.root.parser.XMLWriter;
 import org.auraframework.impl.root.parser.handler.XMLHandler;
-import org.auraframework.system.AuraContext.Access;
+import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -44,7 +44,7 @@ public class RegistryAndSystemTagsJsonSerializer {
     }
 
     private static void serializeToFile() throws QuickFixException, IOException {
-        Aura.getContextService().startContext(Mode.PROD, Format.HTML, Access.AUTHENTICATED);
+        Aura.getContextService().startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
         Map<String, Map<String, Map<String, Map<String, String>>>> components = new TreeMap<String, Map<String, Map<String, Map<String, String>>>>();
         try {
             loadMetadataForSystemComponents(components);

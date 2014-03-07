@@ -18,6 +18,7 @@
         var tabs = cmp.find({
             instancesOf : "ui:tab"
         });
+        
         if (tabs && tabs.length) {
             var newActiveTab;
             for ( var i = 0; i < tabs.length; i++) {

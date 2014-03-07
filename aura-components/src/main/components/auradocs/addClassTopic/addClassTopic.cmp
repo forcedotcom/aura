@@ -23,7 +23,7 @@
     
     <h2>Code</h2>
     <p>The following demo shows how to append and remove a CSS style from an element.</p>
-    <auradocs:example descriptor="auradocs:demoCss" />
+    <auradocs:viewer descriptor="auradocs:demoCss" />
     
     <h2>Discussion</h2>
     <p>The buttons in this demo are wired to controller actions that append or remove the CSS styles. To append a CSS style to an element, use <code>$A.util.addClass(element, 'class');</code>.

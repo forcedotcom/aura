@@ -358,7 +358,7 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef> extend
         		builder.getDescriptor(), DocumentationDef.class, DefDescriptor.MARKUP_PREFIX);
 
         if (documentationDescriptor.exists()) {
-            builder.addDocumentation(documentationDescriptor.getQualifiedName());
+            builder.setDocumentation(documentationDescriptor.getQualifiedName());
         }
 
         builder.render = getAttributeValue(ATTRIBUTE_RENDER);

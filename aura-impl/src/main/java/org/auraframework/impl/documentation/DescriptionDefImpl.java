@@ -20,41 +20,43 @@ import java.io.IOException;
 import org.auraframework.builder.DescriptionDefBuilder;
 import org.auraframework.def.DescriptionDef;
 import org.auraframework.impl.system.DefinitionImpl;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
 
 public class DescriptionDefImpl extends DefinitionImpl<DescriptionDef> implements DescriptionDef {
 
 	private static final long serialVersionUID = 3677136390357266769L;
 
-	private String body;
-	private String id;
+	private String name;
 	
 	protected DescriptionDefImpl(Builder builder) {
         super(builder);
         
-        this.body = builder.body;
-        this.id = builder.id;
+        this.name = builder.name;
     }
-
+	
     @Override
-    public String getBody() {
-		return body;
-	}
-
-	@Override
-    public String getId() {
-		return id;
-	}
+    public String getName() {
+        return name;
+    }
+    
+    @Override
+    public void validateDefinition() throws QuickFixException {
+        super.validateDefinition();
+        if (AuraTextUtil.isNullEmptyOrWhitespace(description)) {
+            throw new InvalidDefinitionException("<aura:description> must contain a description.", getLocation());
+        }
+    }
 
 	@Override
     public void serialize(Json json) throws IOException {
         // TODO Auto-generated method stub
-        
     }
 
     public static class Builder extends DefinitionImpl.BuilderImpl<DescriptionDef> implements DescriptionDefBuilder {
-        private String body;
-		private String id;
+		private String name;
 
 		public Builder() {
             super(DescriptionDef.class);
@@ -69,13 +71,9 @@ public class DescriptionDefImpl extends DefinitionImpl<DescriptionDef> implement
         }
         
         @Override
-        public void setBody(String body) {
-            this.body = body;
-        }
-        
-        @Override
-        public void setId(String id) {
-            this.id = id;
+        public DescriptionDefBuilder setName(String name) {
+            this.name = name;
+            return this;
         }
     }
 }

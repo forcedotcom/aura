@@ -22,7 +22,6 @@ An alternative implementation could simply reuse the existing testSetRunner
 and dynamically set the scope based on a query string parameter,but this approach
 isolate our runner for any container specific work we may need to do
 -->
-<aura:application>
-<auratest:testSetRunnerC aura:load="lazy" scope="hybrid_container">
-</auratest:testSetRunnerC>
+<aura:application access="GLOBAL">
+	<auratest:testSetRunnerC aura:load="lazy" scope="hybrid_container"/>
 </aura:application>

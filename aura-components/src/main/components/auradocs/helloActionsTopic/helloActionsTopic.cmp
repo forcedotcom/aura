@@ -38,7 +38,7 @@
 
     <p>Let's start by looking at events on an HTML tag.  You can see the contents of <code>helloActions.cmp</code> in the <b>Component source</b> tab.</p>
 
-    <auradocs:example descriptor="auradocs:helloActions" />
+    <auradocs:viewer descriptor="auradocs:helloActions" />
 
     <p>If you know some JavaScript, you might be tempted to write something like the first "Flawed" button in <code>helloActions.cmp</code> because you know that HTML tags are first-class citizens.</p>
 

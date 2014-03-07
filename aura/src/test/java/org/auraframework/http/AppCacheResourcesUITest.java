@@ -32,7 +32,7 @@ import org.auraframework.def.NamespaceDef;
 import org.auraframework.def.StyleDef;
 import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext;
-import org.auraframework.system.AuraContext.Access;
+import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.Source;
@@ -344,7 +344,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         ContextService service = Aura.getContextService();
         AuraContext context = service.getCurrentContext();
         if (context == null) {
-            context = service.startContext(Mode.SELENIUM, Format.HTML, Access.AUTHENTICATED);
+            context = service.startContext(Mode.SELENIUM, Format.HTML, Authentication.AUTHENTICATED);
         }
         return Aura.getDefinitionService().getDefinition(
                 String.format("%s:%s", namespace, cmpName), ComponentDef.class);
@@ -461,7 +461,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         AuraContext context = service.getCurrentContext();
         if (context == null) {
             context = service.startContext(Mode.SELENIUM, Format.HTML,
-                    Access.AUTHENTICATED);
+                    Authentication.AUTHENTICATED);
         }
         Source<?> source = context.getDefRegistry().getSource(descriptor);
         String originalContent = source.getContents();

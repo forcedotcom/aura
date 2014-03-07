@@ -24,7 +24,7 @@ import org.auraframework.def.Definition;
 import org.auraframework.instance.*;
 import org.auraframework.service.*;
 import org.auraframework.system.*;
-import org.auraframework.system.AuraContext.Access;
+import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.util.ServiceLocator;
@@ -172,7 +172,7 @@ public class Aura {
      */
     public static void main(String[] args) {
         try {
-            Aura.getContextService().startContext(Mode.PROD, Format.HTML, Access.PUBLIC);
+            Aura.getContextService().startContext(Mode.PROD, Format.HTML, Authentication.UNAUTHENTICATED);
             String tag = args[0];
             Application app = Aura.getInstanceService().getInstance(tag, ApplicationDef.class);
             Aura.getRenderingService().render(app, System.out);

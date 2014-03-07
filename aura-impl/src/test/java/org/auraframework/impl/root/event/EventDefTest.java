@@ -46,8 +46,8 @@ public class EventDefTest extends AuraImplTestCase {
     public void testEventDef() throws Exception {
         DefDescriptor<EventDef> desc = DefDescriptorImpl.getInstance("fake:event", EventDef.class);
         Map<DefDescriptor<AttributeDef>, AttributeDef> atts = new HashMap<DefDescriptor<AttributeDef>, AttributeDef>();
-        DefDescriptor<TypeDef> type = DefDescriptorImpl.getInstance("apex://String", TypeDef.class);
-        DefDescriptor<TypeDef> type2 = DefDescriptorImpl.getInstance("apex://Integer", TypeDef.class);
+        DefDescriptor<TypeDef> type = DefDescriptorImpl.getInstance("String", TypeDef.class);
+        DefDescriptor<TypeDef> type2 = DefDescriptorImpl.getInstance("Integer", TypeDef.class);
         atts.put(DefDescriptorImpl.getInstance("testString", AttributeDef.class), new AttributeDefImpl(
                 DefDescriptorImpl.getInstance("testString", AttributeDef.class), null, type, null, true,
                 AttributeDef.SerializeToType.BOTH, null, null));
@@ -154,8 +154,8 @@ public class EventDefTest extends AuraImplTestCase {
     public void testGetAttributeDefs() throws Exception {
         DefDescriptor<EventDef> desc = DefDescriptorImpl.getInstance("fake:event", EventDef.class);
         Map<DefDescriptor<AttributeDef>, AttributeDef> atts = new HashMap<DefDescriptor<AttributeDef>, AttributeDef>();
-        DefDescriptor<TypeDef> type = DefDescriptorImpl.getInstance("apex://String", TypeDef.class);
-        DefDescriptor<TypeDef> type2 = DefDescriptorImpl.getInstance("apex://Integer", TypeDef.class);
+        DefDescriptor<TypeDef> type = DefDescriptorImpl.getInstance("String", TypeDef.class);
+        DefDescriptor<TypeDef> type2 = DefDescriptorImpl.getInstance("Integer", TypeDef.class);
         AttributeDefImpl att1 = new AttributeDefImpl(DefDescriptorImpl.getInstance("testString", AttributeDef.class),
                 null, type, null, true, AttributeDef.SerializeToType.BOTH, null, null);
         AttributeDefImpl att2 = new AttributeDefImpl(DefDescriptorImpl.getInstance("testInt", AttributeDef.class),

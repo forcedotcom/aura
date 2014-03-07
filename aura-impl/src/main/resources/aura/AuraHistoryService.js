@@ -23,20 +23,24 @@ var AuraHistoryService = function(){
     //#include aura.AuraHistoryService_private
 
     var historyService = {
-		/**
-	     * Sets the new location. For example, <code>$A.services.history.set("search")</code> sets the location to <code>#search</code>. 
-	     * @param {Object} token The provided token set to the current location hash
-	     * @memberOf AuraHistoryService
-	     * @public
-	     */
+        /**
+         * Sets the new location. For example, <code>$A.services.history.set("search")</code> sets the location to <code>#search</code>.
+         * Otherwise, use <code>$A.services.layout.changeLocation()</code> to override existing URL parameters.
+         * 
+         * Native Android browser doesn't completely support pushState so we force hash method for it
+         *
+         * @param {Object} token The provided token set to the current location hash
+         * @memberOf AuraHistoryService
+         * @public
+         */
         set : function(token){
-        	// Check for HTML5 window.history.pushState support
-        	if ('pushState' in window.history) {
-            	history.pushState(null, null, '#' + token);       	
-        	} else {
-        		location.hash = '#' + token;
-        	}
-        	
+            // Check for HTML5 window.history.pushState support
+            if ('pushState' in window.history && !this.isNativeAndroid()) {
+                history.pushState(null, null, '#' + token);
+            } else {
+                location.hash = '#' + token;
+            }
+
             priv.changeHandler();
         },
         
@@ -44,6 +48,7 @@ var AuraHistoryService = function(){
          * Parses the location. A token can be used here.
          * <p>Example:</p> 
          * <code>token == "newLayout";<br /> $A.historyService.get().token;</code>
+         * 
          * @memberOf AuraHistoryService
          * @public
          */
@@ -53,6 +58,7 @@ var AuraHistoryService = function(){
         
         /**
          * Loads the previous URL in the history list. Standard JavaScript <code>history.go()</code> method.
+         * 
          * @memberOf AuraHistoryService
          * @public
          */
@@ -63,6 +69,7 @@ var AuraHistoryService = function(){
         
         /**
          * Sets the title of the document.
+         * 
          * @param {String} title The new title
          * @memberOf AuraHistoryService
          * @public
@@ -73,6 +80,7 @@ var AuraHistoryService = function(){
         
         /**
          * Loads the next URL in the history list. Standard JavaScript <code>history.go()</code> method.
+         * 
          * @memberOf AuraHistoryService
          * @public
          */
@@ -80,46 +88,61 @@ var AuraHistoryService = function(){
             //history -> Standard javascript object
             history.go(1);
         },
+        
+        /**
+         * Checks user agent for native Android browser and stores in variable instead of checking every time
+         * 
+         * @private
+         */
+        isNativeAndroid : function() {
+            
+            if (this._isAndroid === undefined) {
+                var ua = navigator.userAgent;
+                this._isAndroid = ua.indexOf('Mozilla/5.0') > -1 && ua.indexOf('Android ') > -1 && ua.indexOf('AppleWebKit') > -1 && !(ua.indexOf('Chrome') > -1);
+            }
+            return this._isAndroid;
+        },
 
         /**
          * @private
          */
         init : function(){
-        	// Check for HTML5 window.history.pushState support
-        	if ('pushState' in window.history) {
+            // Check for HTML5 window.history.pushState support
+            if ('pushState' in window.history && !this.isNativeAndroid()) {
                 window.addEventListener("popstate", function(e) {
                     priv.changeHandler();
                 });
-        	} else {
-	            //Checks for existence of event, and also ie8 in ie7 mode (misreports existence)
-	            var docMode = document["documentMode"];
-	            var hasOnHashChangeEvent = 'onhashchange' in window && (docMode === undefined || docMode > 7);
-	
-	            if (hasOnHashChangeEvent) {
-	                window["onhashchange"] = function(){
-	                    priv.changeHandler();
-	                };
-	            }else{
-	                var hash = location["hash"];
-	                var watch = function(){
-	                    setTimeout(function(){
-	                        var newHash = location["hash"];
-	                        if (newHash !== hash) {
-	                            hash = newHash;
-	                            priv.changeHandler(hash);
-	                        }
-	                        watch();
-	                    }, 300);
-	                };
-	         
-	                watch();
-	            }
-        	}
-            
+            } else {
+                //Checks for existence of event, and also ie8 in ie7 mode (misreports existence)
+                var docMode = document["documentMode"];
+                var hasOnHashChangeEvent = 'onhashchange' in window && (docMode === undefined || docMode > 7);
+
+                if (hasOnHashChangeEvent) {
+                    window["onhashchange"] = function(){
+                        priv.changeHandler();
+                    };
+                }else{
+                    var hash = location["hash"];
+                    var watch = function(){
+                        setTimeout(function(){
+                            var newHash = location["hash"];
+                            if (newHash !== hash) {
+                                hash = newHash;
+                                priv.changeHandler(hash);
+                            }
+                            watch();
+                        }, 300);
+                    };
+
+                    watch();
+                }
+            }
+
             priv.changeHandler(location["hash"]);
             delete this.init;
         }
     };
-  //#include aura.AuraHistoryService_export
+    
+    //#include aura.AuraHistoryService_export
     return historyService;
 };

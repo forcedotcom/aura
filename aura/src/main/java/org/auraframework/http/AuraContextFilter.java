@@ -46,7 +46,7 @@ import org.auraframework.http.RequestParam.StringParam;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.service.LoggingService;
 import org.auraframework.system.AuraContext;
-import org.auraframework.system.AuraContext.Access;
+import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.Client;
@@ -71,8 +71,8 @@ public class AuraContextFilter implements Filter {
     private static final EnumParam<Format> format = new EnumParam<Format>(AuraServlet.AURA_PREFIX + "format", false,
             Format.class);
 
-    private static final EnumParam<Access> access = new EnumParam<Access>(AuraServlet.AURA_PREFIX + "access", false,
-            Access.class);
+    private static final EnumParam<Authentication> access = new EnumParam<Authentication>(AuraServlet.AURA_PREFIX + "access", false,
+            Authentication.class);
 
     private static final StringParam app = new StringParam(AuraServlet.AURA_PREFIX + "app", 0, false);
     private static final StringParam num = new StringParam(AuraServlet.AURA_PREFIX + "num", 0, false);
@@ -130,7 +130,7 @@ public class AuraContextFilter implements Filter {
         HttpServletRequest request = (HttpServletRequest) req;
 
         Format f = format.get(request, Format.JSON);
-        Access a = access.get(request, Access.AUTHENTICATED);
+        Authentication a = access.get(request, Authentication.AUTHENTICATED);
 
         Map<String, Object> configMap = getConfigMap(request);
         Mode m = getMode(request, configMap);

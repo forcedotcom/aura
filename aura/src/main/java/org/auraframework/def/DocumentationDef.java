@@ -15,9 +15,8 @@
  */
 package org.auraframework.def;
 
+import java.util.List;
 import java.util.Map;
-
-import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
  */
@@ -25,7 +24,23 @@ public interface DocumentationDef extends RootDefinition {
     @Override
     DefDescriptor<DocumentationDef> getDescriptor();
     
-    Map<String, ? extends DescriptionDef> getDescriptionDefs();
+    List<DescriptionDef> getDescriptionDefs();
     
-    Map<String, ? extends ExampleDef> getExampleDefs();
+    /**
+     * @return map from DescriptionDef name to DescriptionDef
+     */            
+    Map<String, DescriptionDef> getDescriptionDefsAsMap();
+    
+    /**
+     * Convenience method 
+     * @return list of description strings from this DocumentationDef's DescriptionDefs
+     */
+    List<String> getDescriptions();
+    
+    List<ExampleDef> getExampleDefs();
+    
+    /**
+     * @return map from ExampleDef name to ExampleDef
+     */
+    Map<String, ExampleDef> getExampleDefsAsMap();
 }

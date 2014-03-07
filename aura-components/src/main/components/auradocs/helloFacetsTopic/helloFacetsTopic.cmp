@@ -23,13 +23,13 @@
 
     <p>To define your own facet, add a <code>aura:attribute</code> tag of type <code>Aura.Component[]</code> to your component. For example, let's create a new component called <code>facetHeader.cmp</code>. The <b>Component source</b> tab shows the component markup.</p>
 
-    <auradocs:example descriptor="auradocs:facetHeader" />
+    <auradocs:viewer descriptor="auradocs:facetHeader" />
 
     <p>This component has a header facet. Note how we position the output of the header using the <code>v.header</code> expression.</p>
 
     <p>The component doesn't have any output when you access it directly as the <code>header</code> and <code>body</code> attributes aren't set. Look in <code>helloFacets.cmp</code> to see how we set these attributes.</p>
 
-    <auradocs:example descriptor="auradocs:helloFacets" />
+    <auradocs:viewer descriptor="auradocs:helloFacets" />
 
     <p><b>See also:</b><br/>
     <auradocs:topicLink topic="cmpBody">Component Body</auradocs:topicLink>

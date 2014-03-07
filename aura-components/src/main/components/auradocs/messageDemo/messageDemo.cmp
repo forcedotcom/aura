@@ -20,7 +20,7 @@
     <ui:vbox>
     	<aura:set attribute="north">
     	<p><code>ui:message</code> represents a message of varying severity levels.</p>
-    		<auradocs:example descriptor="auradocs:demoMessage" />
+    		<auradocs:viewer descriptor="auradocs:demoMessage" />
     	</aura:set>
     	<aura:set attribute="south">
     	<p>The <code>severity</code> attribute indicates a message's severity level and determines the style to use when displaying the message. 

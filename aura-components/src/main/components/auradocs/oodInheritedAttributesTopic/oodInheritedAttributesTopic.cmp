@@ -33,19 +33,19 @@
 
     <p><code>auradocs/sampleBase.cmp</code> is the base or super component. It inherently extends <code>&lt;aura:component&gt;</code>.</p>
 
-    <auradocs:example descriptor="auradocs:sampleBase" />
+    <auradocs:viewer descriptor="auradocs:sampleBase" />
 
     <p>You can only extend a component that has its <code>extensible</code> system attribute explicitly set to <code>true</code>. The <code>extensible</code> system attribute is defined in <code>&lt;aura:component&gt;</code>. <code>sampleBase.cmp</code> can be extended because it sets <code>extensible="true"</code>.</p>
 
     <p><code>auradocs/sampleBaseEx.cmp</code> extends <code>sampleBase.cmp</code> by setting <code>extends="auradocs:sampleBase"</code> in its <code>&lt;aura:component&gt;</code> tag.</p>
 
-    <auradocs:example descriptor="auradocs:sampleBaseEx" />
+    <auradocs:viewer descriptor="auradocs:sampleBaseEx" />
 
     <p><code>sampleBaseEx.cmp</code> sets the <code>body</code> attribute of its super component, <code>sampleBase.cmp</code>, to a <code>&lt;span&gt;</code> tag wrapped around "Added in sampleBaseEx:" and the <code>body</code> attribute of <code>sampleBaseEx.cmp</code>. So, when Aura renders <code>sampleBase.cmp</code>, the value of its <code>body</code> attribute differs from the <code>body</code> attribute of <code>sampleBaseEx.cmp</code>, even though <code>sampleBaseEx.cmp</code> extends <code>sampleBase.cmp</code>.</p>
 
     <p><code>auradocs/sampleExtension.cmp</code> contains a reference to <code>sampleBaseEx.cmp</code>.</p>
 
-    <auradocs:example descriptor="auradocs:sampleExtension" />
+    <auradocs:viewer descriptor="auradocs:sampleExtension" />
 
     <p>In <code>sampleExtension.cmp</code>, we set the <code>body</code> attribute of <code>sampleBaseEx.cmp</code> to <code>&lt;p&gt;Hello, extension!&lt;/p&gt;</code> so the <code>body</code> attribute of <code>sampleBase.cmp</code> is <code>&lt;span&gt;Added in sampleBaseEx: &lt;p&gt;Hello, extension!&lt;/p&gt;&lt;/span&gt;</code>.</p>
 

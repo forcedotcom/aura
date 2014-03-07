@@ -42,7 +42,7 @@ import org.auraframework.def.TestSuiteDef;
 import org.auraframework.def.StyleDef;
 import org.auraframework.impl.system.StaticDefRegistryImpl;
 import org.auraframework.service.DefinitionService;
-import org.auraframework.system.AuraContext.Access;
+import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.DefRegistry;
@@ -171,7 +171,7 @@ public class RegistrySerializer {
                 file.getParentFile().mkdirs();
             }
             file.createNewFile();
-            Aura.getContextService().startContext(Mode.PROD, Format.HTML, Access.AUTHENTICATED);
+            Aura.getContextService().startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
             FileOutputStream out = new FileOutputStream(file);
             write(out);
         } finally {

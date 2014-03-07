@@ -1177,6 +1177,11 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
 	@Override
     public <D extends Definition> void assertAccess(DefDescriptor<?> referencingDescriptor, D def) throws QuickFixException {
+		// If the def is access="global" then anyone can see it
+    	if (def.getAccess().isGlobal()) {
+    		return;
+    	}
+		
 		String referencingNamespace = null;
 		if (referencingDescriptor != null) {
 	    	String prefix = referencingDescriptor.getPrefix();
@@ -1187,11 +1192,6 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 			referencingNamespace = referencingDescriptor.getNamespace();
 		}
 		
-		// If the def is access="global" then anyone can see it
-    	if (def.getAccess().isGlobal()) {
-    		return;
-    	}
-
 		DefDescriptor<?> desc = def.getDescriptor();
 		
 	    String namespace;

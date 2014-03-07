@@ -31,7 +31,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext;
-import org.auraframework.system.AuraContext.Access;
+import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.annotation.UnAdaptableTest;
@@ -59,7 +59,7 @@ public class ClientLibraryServiceImplTest extends AuraImplTestCase {
         AuraContext context = contextService.getCurrentContext();
         if (context == null) {
             contextService.startContext(AuraContext.Mode.SELENIUM, AuraContext.Format.HTML,
-                    AuraContext.Access.AUTHENTICATED);
+                    AuraContext.Authentication.AUTHENTICATED);
         }
         clientLibraryService = Aura.getClientLibraryService();
     }
@@ -295,7 +295,7 @@ public class ClientLibraryServiceImplTest extends AuraImplTestCase {
     @UnAdaptableTest
     public void testGetUrlsChangesWithMode() throws Exception {
         Aura.getContextService().endContext();
-        Aura.getContextService().startContext(Mode.PTEST, Format.JSON, Access.AUTHENTICATED);
+        Aura.getContextService().startContext(Mode.PTEST, Format.JSON, Authentication.AUTHENTICATED);
         DefDescriptor<ApplicationDef> appDesc = Aura.getDefinitionService().getDefDescriptor(
                 "clientLibraryTest:clientLibraryTest", ApplicationDef.class);
         Set<String> jsUrls = getClientLibraryUrls(appDesc, Type.JS);
@@ -310,7 +310,7 @@ public class ClientLibraryServiceImplTest extends AuraImplTestCase {
 
     public void testCaseSensitiveName() throws Exception {
         Aura.getContextService().endContext();
-        Aura.getContextService().startContext(Mode.STATS, Format.JSON, Access.AUTHENTICATED);
+        Aura.getContextService().startContext(Mode.STATS, Format.JSON, Authentication.AUTHENTICATED);
         DefDescriptor<ApplicationDef> appDesc = Aura.getDefinitionService().getDefDescriptor(
                 "clientLibraryTest:clientLibraryTest", ApplicationDef.class);
         try {
@@ -326,27 +326,27 @@ public class ClientLibraryServiceImplTest extends AuraImplTestCase {
                 "clientLibraryTest:testDependencies", ApplicationDef.class);
 
         Aura.getContextService().endContext();
-        Aura.getContextService().startContext(Mode.PTEST, Format.JSON, Access.AUTHENTICATED, laxSecurityApp);
+        Aura.getContextService().startContext(Mode.PTEST, Format.JSON, Authentication.AUTHENTICATED, laxSecurityApp);
         Set<String> jsUrls = getClientLibraryUrls(appDesc, Type.JS);
         assertTrue("Missing library for PTEST mode", jsUrls.contains("http://likeaboss.com/mode.js"));
 
         Aura.getContextService().endContext();
-        Aura.getContextService().startContext(Mode.CADENCE, Format.JSON, Access.PUBLIC, laxSecurityApp);
+        Aura.getContextService().startContext(Mode.CADENCE, Format.JSON, Authentication.UNAUTHENTICATED, laxSecurityApp);
         jsUrls = getClientLibraryUrls(appDesc, Type.JS);
         assertTrue("Missing library for CADENCE mode", jsUrls.contains("http://likeaboss.com/mode.js"));
 
         Aura.getContextService().endContext();
-        Aura.getContextService().startContext(Mode.DEV, Format.JSON, Access.PUBLIC, laxSecurityApp);
+        Aura.getContextService().startContext(Mode.DEV, Format.JSON, Authentication.UNAUTHENTICATED, laxSecurityApp);
         jsUrls = getClientLibraryUrls(appDesc, Type.JS);
         assertTrue("Missing library for DEV mode", jsUrls.contains("http://likeaboss.com/mode.js"));
 
         Aura.getContextService().endContext();
-        Aura.getContextService().startContext(Mode.STATS, Format.JSON, Access.PUBLIC, laxSecurityApp);
+        Aura.getContextService().startContext(Mode.STATS, Format.JSON, Authentication.UNAUTHENTICATED, laxSecurityApp);
         jsUrls = getClientLibraryUrls(appDesc, Type.JS);
         assertTrue("Missing library for STATS mode", jsUrls.contains("http://likeaboss.com/mode.js"));
 
         Aura.getContextService().endContext();
-        Aura.getContextService().startContext(Mode.JSTEST, Format.JSON, Access.PUBLIC, laxSecurityApp);
+        Aura.getContextService().startContext(Mode.JSTEST, Format.JSON, Authentication.UNAUTHENTICATED, laxSecurityApp);
         jsUrls = getClientLibraryUrls(appDesc, Type.JS);
         assertFalse("Library should not be included for JSTEST mode", jsUrls.contains("http://likeaboss.com/mode.js"));
 

@@ -24,7 +24,7 @@ public class DefinitionParserAdapterImpl implements DefinitionParserAdapter {
 
     @Override
     public DefinitionAccess parseAccess(String access) throws InvalidAccessValueException {
-        return DefinitionAccessImpl.parseAccess(access);
+        return new DefinitionAccessImpl(access);
     }
 
 }

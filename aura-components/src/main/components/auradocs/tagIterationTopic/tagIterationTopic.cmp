@@ -86,7 +86,7 @@
 
        <p>This sample shows a dynamic iteration involving user input and view update using the controller file. The <b>Component source</b> tab shows the component markup,   <code>sampleIteration.cmp</code>. The <b>js://controller source</b> tab shows the component's client-side controller, <code>sampleIterationController.js</code></p>
 
-       <auradocs:example descriptor="auradocs:sampleIteration" />
+       <auradocs:viewer descriptor="auradocs:sampleIteration" />
 
        <p>The sample component iterates over a set of values retrieved from the model. You can update one of the entries and see the change rendered on the page.</p>
 

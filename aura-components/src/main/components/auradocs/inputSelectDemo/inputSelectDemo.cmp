@@ -24,7 +24,7 @@
    		
 		<p>The demo below shows a static and dynamic implementation of <code>ui:inputSelect</code>.
 		</p>
-    		<auradocs:example descriptor="auradocs:demoSelect" />
+    		<auradocs:viewer descriptor="auradocs:demoSelect" />
     	</aura:set>
     	<aura:set attribute="south">
     	<p>When working with <code>ui:inputSelect</code> to create a list of options, you can allow multiple selections by setting the <code>multiple</code> attribute to <code>true</code>.

@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extends="auradocs:example">
+<aura:component extends="auradocs:viewer">
     <aura:attribute name="descriptor" type="String" required="true"/>
     <ui:tabset class="displayTab">
         <auradocs:stretchTab title="Demo">

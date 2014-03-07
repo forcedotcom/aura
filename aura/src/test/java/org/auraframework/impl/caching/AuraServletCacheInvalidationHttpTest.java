@@ -28,7 +28,7 @@ import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.http.AuraBaseServlet;
 import org.auraframework.system.AuraContext;
-import org.auraframework.system.AuraContext.Access;
+import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.AuraHttpTestCase;
@@ -172,7 +172,7 @@ public class AuraServletCacheInvalidationHttpTest extends AuraHttpTestCase {
     }
 
     private AuraContext startContext(String qualifiedName, Class<? extends BaseComponentDef> clazz) {
-        return Aura.getContextService().startContext(Mode.PROD, Format.JSON, Access.AUTHENTICATED,
+        return Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED,
                 Aura.getDefinitionService().getDefDescriptor(qualifiedName, clazz));
     }
 

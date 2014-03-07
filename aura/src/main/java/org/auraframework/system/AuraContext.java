@@ -102,10 +102,14 @@ public interface AuraContext {
         MANIFEST, CSS, JS, JSON, HTML;
     }
 
-    public static enum Access {
-        PUBLIC, AUTHENTICATED, GLOBAL, INTERNAL
+    public static enum Authentication {
+        UNAUTHENTICATED, AUTHENTICATED
     }
-
+        
+    public static enum Access {
+    	PUBLIC, GLOBAL, PRIVATE, INTERNAL
+    }
+    
     /**
      * @return the master def registry
      */
@@ -245,7 +249,7 @@ public interface AuraContext {
 
     Format getFormat();
 
-    Access getAccess();
+    Authentication getAccess();
 
     Map<ValueProviderType, GlobalValueProvider> getGlobalProviders();
 

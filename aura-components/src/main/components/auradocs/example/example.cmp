@@ -15,15 +15,18 @@
     limitations under the License.
 
 -->
-<aura:component extensible="true">
+<aura:component>
+    <aura:attribute name="label" type="String" required="true"/>
+    <aura:attribute name="description" type="Aura.Component[]" required="true"/>
     <aura:attribute name="descriptor" type="String" required="true"/>
-    <ui:tabset class="displayTab">
-        <ui:tab title="Output">
-            <form action="javascript:void(null);" onsubmit="{!c.updateLocation}">
-                <input type="hidden" aura:id="locationBar"/>
-            </form>
-            <iframe aura:id="frame" class="frame" frameBorder="0" src="about:blank"/>
-        </ui:tab>
-        <auradocs:topicExample descriptor="{!v.descriptor}" defType="component"/>
-    </ui:tabset>
+    
+    <div class="container">
+    	<h3>{!v.label}</h3>
+    	
+    	<div class="description"><aura:unescapedHtml value="{!v.description}"/></div>
+    
+		<hr/>
+		
+		<auradocs:viewer descriptor="{!v.descriptor}"/>
+	</div>
 </aura:component>

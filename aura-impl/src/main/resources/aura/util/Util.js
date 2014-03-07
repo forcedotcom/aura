@@ -1748,6 +1748,38 @@ $A.ns.Util.prototype.estimateSize = function(obj) {
 	$A.ns.Util.prototype.errorBasedOnMode = function(msg) {
 		$A.error(msg);
 	};
+	
+	$A.ns.Util.prototype.includeScript = function(url, callback) {
+        if (this.isUndefined(this.includeScript.cache)) {
+        	this.includeScript.cache = {};
+        }
+        
+        var cache = this.includeScript.cache;
+
+        var script = cache[url]; 
+        
+        if (script) {
+        	if (script.state == "LOADED") {
+        		callback.call();
+        	} else {
+        		script.queue.push(callback);
+        	}
+        } else {
+        	cache[url] = { state: "LOADING", queue: [callback] };
+        	
+			var s = document.createElement("script");
+			s.src = url;
+			s.onload = function() {
+				cache[url].state = "LOADED";
+				var queue = cache[url].queue;
+				while(queue.length > 0) {
+					queue.shift().call();
+				}
+			}
+			
+			document.head.appendChild( s ).parentNode.removeChild( s );
+        }
+	};
 //#end
 
 //#include aura.storage.adapters.SizeEstimator

@@ -29,7 +29,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.EventType;
 import org.auraframework.def.RegisterEventDef;
 import org.auraframework.service.DefinitionService;
-import org.auraframework.system.AuraContext.Access;
+import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.AuraTestCase;
@@ -50,7 +50,7 @@ public class OutputComponentsTest extends AuraTestCase {
      */
     public void testValueRequired() throws Exception {
         List<String> failures = Lists.newLinkedList();
-        Aura.getContextService().startContext(Mode.PROD, Format.HTML, Access.AUTHENTICATED);
+        Aura.getContextService().startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
         for (ComponentDef def : getUiOutputComponents()) {
             String name = def.getName();
             AttributeDef value = def.getAttributeDef("value");
@@ -105,7 +105,7 @@ public class OutputComponentsTest extends AuraTestCase {
         events.put("keyup", "markup://ui:keyup");
         events.put("select", "markup://ui:select");
 
-        Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Access.AUTHENTICATED);
+        Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);
         ComponentDef def = getUiOutputComponent();
         Map<String, RegisterEventDef> registeredEvents = def.getRegisterEventDefs();
 
@@ -133,7 +133,7 @@ public class OutputComponentsTest extends AuraTestCase {
         List<String> events = new ArrayList<String>();
         events.add("change");
 
-        Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Access.AUTHENTICATED);
+        Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);
         ComponentDef def = getUiOutputComponent();
         Map<String, RegisterEventDef> registeredEvents = def.getRegisterEventDefs();
         RegisterEventDef registeredEvent;

@@ -36,7 +36,7 @@ import org.auraframework.def.TestCaseDef;
 import org.auraframework.def.TestSuiteDef;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
-import org.auraframework.system.AuraContext.Access;
+import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.WebDriverUtil.BrowserType;
@@ -86,7 +86,7 @@ public class ComponentJSTestSuiteTest extends TestSuite {
             boolean contextStarted = false;
             if (!contextService.isEstablished()) {
                 contextStarted = true;
-                contextService.startContext(Mode.JSTEST, Format.JSON, Access.AUTHENTICATED);
+                contextService.startContext(Mode.JSTEST, Format.JSON, Authentication.AUTHENTICATED);
             }
 
             Map<String, TestSuite> subSuites = new HashMap<String, TestSuite>();
@@ -160,7 +160,7 @@ public class ComponentJSTestSuiteTest extends TestSuite {
             ContextService contextService = Aura.getContextService();
             boolean isEstablished = contextService.isEstablished();
             if (!isEstablished) {
-                contextService.startContext(Mode.AUTOJSTEST, Format.JSON, Access.AUTHENTICATED);
+                contextService.startContext(Mode.AUTOJSTEST, Format.JSON, Authentication.AUTHENTICATED);
             }
             try {
                 return descriptor.getDef().getCode();

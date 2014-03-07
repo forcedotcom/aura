@@ -33,7 +33,7 @@ import org.auraframework.integration.UnsupportedUserAgentException;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
-import org.auraframework.system.AuraContext.Access;
+import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.Client;
@@ -176,7 +176,7 @@ public class IntegrationImpl implements Integration {
 
         AuraContext context;
         if (contextDepthCount == 0) {
-            context = contextService.startContext(mode, Format.JSON, Access.AUTHENTICATED, applicationDescriptor);
+            context = contextService.startContext(mode, Format.JSON, Authentication.AUTHENTICATED, applicationDescriptor);
         } else {
             context = contextService.getCurrentContext();
         }

@@ -17,7 +17,7 @@ package org.auraframework.adapter;
 
 import java.util.Set;
 
-import org.auraframework.system.AuraContext.Access;
+import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.DefRegistry;
 import org.auraframework.system.SourceLoader;
@@ -25,5 +25,5 @@ import org.auraframework.system.SourceLoader;
 /**
  */
 public interface RegistryAdapter extends AuraAdapter {
-    DefRegistry<?>[] getRegistries(Mode mode, Access access, Set<SourceLoader> extraLoaders);
+    DefRegistry<?>[] getRegistries(Mode mode, Authentication access, Set<SourceLoader> extraLoaders);
 }

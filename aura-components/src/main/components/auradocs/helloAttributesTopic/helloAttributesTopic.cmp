@@ -22,7 +22,7 @@
     <p>So far all the content we've seen is strictly static, which doesn't make for the most exciting web application.  Let's see how we can make this more dynamic by using attributes.</p>
 
     <p>If you look at <code>helloAttributes.cmp</code>, you should notice something new: our first component metadata tag.</p>
-    <auradocs:example descriptor="auradocs:helloAttributes" />
+    <auradocs:viewer descriptor="auradocs:helloAttributes" />
     <p>The <code>&lt;aura:attribute name="whom" type="String" default="world"/&gt;</code> tag may look like a component, but it's actually a special tag that describes an attribute available on this component.  </p>
     <auradocs:info>You'll see similar metadata tags later.  Though not a strict requirement, as a convention, these component metadata tags are usually the first things listed in a <code>.cmp</code> file, as it provides an easy way to read the component's shape at a glance.</auradocs:info>
 

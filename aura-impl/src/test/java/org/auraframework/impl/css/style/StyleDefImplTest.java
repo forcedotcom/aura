@@ -23,7 +23,7 @@ import org.auraframework.def.NamespaceDef;
 import org.auraframework.def.StyleDef;
 import org.auraframework.def.ThemeDef;
 import org.auraframework.impl.css.StyleTestCase;
-import org.auraframework.system.AuraContext.Access;
+import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -59,7 +59,7 @@ public class StyleDefImplTest extends StyleTestCase {
         // need to restart context because old context will not have the new
         // namespace registered
         Aura.getContextService().endContext();
-        Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Access.AUTHENTICATED);
+        Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);
 
         StyleDef styleDef = styleDesc.getDef();
         Set<DefDescriptor<?>> deps = Sets.newHashSet();

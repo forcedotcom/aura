@@ -132,7 +132,7 @@ public abstract class ContainerTagHandler<T extends Definition> extends XMLHandl
         	DefinitionAccess a;
 			try {
 				a = Aura.getDefinitionParserAdapter().parseAccess(access);
-	        	a.validate(getAllowedAccessValues());
+	        	a.validate(allowAuthenticationAttribute(), allowPrivateAttribute());;
 			} catch (InvalidAccessValueException e) {
 				// re-throw with location
 				throw new InvalidAccessValueException(e.getMessage(), getLocation());
@@ -143,6 +143,14 @@ public abstract class ContainerTagHandler<T extends Definition> extends XMLHandl
         	return null;
         }
     }
+
+	protected  boolean allowAuthenticationAttribute() {
+		return false;
+	}
+
+	protected boolean allowPrivateAttribute() {
+		return false;
+	}
 
 	/**
      * @return this container's tag. May return a more generic term for the

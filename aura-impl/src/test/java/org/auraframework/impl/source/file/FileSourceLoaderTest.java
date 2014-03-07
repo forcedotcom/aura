@@ -59,7 +59,8 @@ public class FileSourceLoaderTest extends AuraImplTestCase {
         try {
             new FileSourceLoader(new File("this_probably_doesnt_exist"));
             fail("Should have thrown AuraException(Base directory does not exist)");
-        } catch (AuraRuntimeException e) {
+        } catch (Exception e) {
+        	checkExceptionRegex(e, AuraRuntimeException.class, "Base directory.*.does not exist");
         }
     }
 
@@ -67,7 +68,8 @@ public class FileSourceLoaderTest extends AuraImplTestCase {
         try {
             new FileSourceLoader(null);
             fail("Should have thrown AuraException(Base directory does not exist)");
-        } catch (AuraRuntimeException e) {
+        } catch (Exception e) {
+        	checkExceptionRegex(e, AuraRuntimeException.class, "Base directory.*.does not exist");
         }
 
     }
@@ -91,8 +93,9 @@ public class FileSourceLoaderTest extends AuraImplTestCase {
                     reader.close();
                     fail("Did not get an exception for not reading the entire file");
                 } catch (IllegalStateException ise) {
-                    // expected, we didn't read the file.
-                } catch (IOException e) {
+                	// expected, we didn't read the file.
+                	checkExceptionFull(ise,IllegalStateException.class,"Closed a hashing file without reading the entire thing");
+                } catch (Exception e) {
                     fail(e.getMessage());
                 }
             }
@@ -125,7 +128,8 @@ public class FileSourceLoaderTest extends AuraImplTestCase {
                     fail("Did not get an exception for not reading the entire file");
                 } catch (IllegalStateException ise) {
                     // expected, we didn't read the file.
-                } catch (IOException e) {
+                	checkExceptionFull(ise,IllegalStateException.class,"Closed a hashing file without reading the entire thing");
+                } catch (Exception e) {
                     fail(e.getMessage());
                 }
             }

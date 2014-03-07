@@ -37,7 +37,7 @@ import org.auraframework.impl.source.file.*;
 import org.auraframework.impl.source.resource.*;
 import org.auraframework.impl.system.*;
 import org.auraframework.impl.type.AuraStaticTypeDefRegistry;
-import org.auraframework.system.AuraContext.Access;
+import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.*;
 import org.auraframework.util.ServiceLocator;
@@ -54,7 +54,7 @@ public class AuraRegistryProviderImpl implements RegistryAdapter {
             DefType.INTERFACE, DefType.EVENT, DefType.LAYOUTS, DefType.NAMESPACE, DefType.THEME, DefType.DOCUMENTATION);
 
     @Override
-    public DefRegistry<?>[] getRegistries(Mode mode, Access access, Set<SourceLoader> extraLoaders) {
+    public DefRegistry<?>[] getRegistries(Mode mode, Authentication access, Set<SourceLoader> extraLoaders) {
         DefRegistry<?>[] ret = registries;
 
         if (mode.isTestMode() || ret == null || (extraLoaders != null && !extraLoaders.isEmpty())) {
@@ -117,7 +117,9 @@ public class AuraRegistryProviderImpl implements RegistryAdapter {
             ret = new DefRegistry<?>[] {
                     AuraStaticTypeDefRegistry.INSTANCE,
                     AuraStaticControllerDefRegistry.INSTANCE,
+                    
                     createDefRegistry(new RootDefFactory(new SourceFactory(markupLoaders)), rootDefTypes, rootPrefixes),
+
                     AuraRegistryProviderImpl.<ControllerDef> createDefRegistry(new CompoundControllerDefFactory(),
                             DefType.CONTROLLER, DefDescriptor.COMPOUND_PREFIX),
                     AuraRegistryProviderImpl.<ControllerDef> createDefRegistry(

@@ -17,6 +17,7 @@ package org.auraframework.impl.root.parser.handler;
 
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.EventDef;
 import org.auraframework.def.RegisterEventDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.parser.XMLParser;
@@ -32,7 +33,7 @@ public class RegisterEventHandlerTest extends AuraImplTestCase {
         super(name);
     }
 
-    public void testRegisterEventHandler() throws Exception {
+    public void testSanity() throws Exception {
         XMLParser parser = XMLParser.getInstance();
         DefDescriptor<ComponentDef> descriptor = DefDescriptorImpl.getInstance("test:fakeparser", ComponentDef.class);
         StringSource<ComponentDef> source = new StringSource<ComponentDef>(
@@ -46,7 +47,7 @@ public class RegisterEventHandlerTest extends AuraImplTestCase {
         assertTrue(red.isGlobal());
     }
 
-    public void testRegisterEventHandlerPublicAccess() throws Exception {
+    public void testInvalidAccess() throws Exception {
         XMLParser parser = XMLParser.getInstance();
         DefDescriptor<ComponentDef> descriptor = DefDescriptorImpl.getInstance("test:fakeparser", ComponentDef.class);
         StringSource<ComponentDef> source = new StringSource<ComponentDef>(
@@ -62,7 +63,7 @@ public class RegisterEventHandlerTest extends AuraImplTestCase {
         }
     }
 
-    public void testRegisterEventHandlerWithTextBetweenTags() throws Exception {
+    public void testTextContent() throws Exception {
         XMLParser parser = XMLParser.getInstance();
         DefDescriptor<ComponentDef> descriptor = DefDescriptorImpl.getInstance("test:fakeparser", ComponentDef.class);
         StringSource<ComponentDef> source = new StringSource<ComponentDef>(
@@ -78,4 +79,52 @@ public class RegisterEventHandlerTest extends AuraImplTestCase {
         }
     }
 
+    public void testMissingType() throws Exception {
+        XMLParser parser = XMLParser.getInstance();
+        DefDescriptor<ComponentDef> descriptor = DefDescriptorImpl.getInstance("test:fakeparser", ComponentDef.class);
+        StringSource<ComponentDef> source = new StringSource<ComponentDef>(
+                descriptor,"<aura:component><aura:registerevent name='wheresthetype'/></aura:component>",
+                "myID", Format.XML);
+    	ComponentDef def = parser.parse(descriptor, source);
+        try {
+        	def.validateDefinition();
+            fail("Missing type for event should be flagged");
+        } catch (Exception e) {
+        	assertExceptionMessageEndsWith(e, InvalidDefinitionException.class, "type attribute is required on registerevent");
+        }
+    }
+
+    public void testMissingNameForComponentEvent() throws Exception {
+        XMLParser parser = XMLParser.getInstance();
+        DefDescriptor<EventDef> eventDesc = addSourceAutoCleanup(EventDef.class, "<aura:event type='COMPONENT'/>");
+        DefDescriptor<ComponentDef> descriptor = DefDescriptorImpl.getInstance("test:fakeparser", ComponentDef.class);
+        StringSource<ComponentDef> source = new StringSource<ComponentDef>(
+                descriptor,
+                String.format("<aura:component><aura:registerevent type='%s'/></aura:component>",eventDesc.getDescriptorName()),
+                "myID", Format.XML);
+    	ComponentDef def = parser.parse(descriptor, source);
+        try {
+        	def.validateDefinition();
+            fail("Missing name for component event should be flagged");
+        } catch (Exception e) {
+        	assertExceptionMessageEndsWith(e, InvalidDefinitionException.class, "name is a required attribute on tag registerevent");
+        }
+    }
+
+    public void testMissingNameForApplicationEvent() throws Exception {
+        XMLParser parser = XMLParser.getInstance();
+        DefDescriptor<EventDef> eventDesc = addSourceAutoCleanup(EventDef.class, "<aura:event type='APPLICATION'/>");
+        DefDescriptor<ComponentDef> descriptor = DefDescriptorImpl.getInstance("test:fakeparser", ComponentDef.class);
+        StringSource<ComponentDef> source = new StringSource<ComponentDef>(
+                descriptor,
+                String.format("<aura:component><aura:registerevent type='%s'/></aura:component>",eventDesc.getDescriptorName()),
+                "myID", Format.XML);
+    	ComponentDef def = parser.parse(descriptor, source);
+        try {
+        	def.validateDefinition();
+            fail("Missing name for application event should be flagged");
+        } catch (Exception e) {
+        	assertExceptionMessageEndsWith(e, InvalidDefinitionException.class, "name is a required attribute on tag registerevent");
+        }
+    }
 }

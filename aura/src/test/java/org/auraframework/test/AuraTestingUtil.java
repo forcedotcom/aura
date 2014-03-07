@@ -31,7 +31,7 @@ import org.auraframework.def.Definition;
 import org.auraframework.impl.source.StringSourceLoader;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
-import org.auraframework.system.AuraContext.Access;
+import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.Source;
@@ -220,7 +220,7 @@ public class AuraTestingUtil {
      */
     protected AuraContext setupContext(Mode mode, Format format, DefDescriptor<? extends BaseComponentDef> desc) 
             throws QuickFixException {
-        AuraContext ctxt = Aura.getContextService().startContext(mode, format, Access.AUTHENTICATED, desc);
+        AuraContext ctxt = Aura.getContextService().startContext(mode, format, Authentication.AUTHENTICATED, desc);
         ctxt.setFrameworkUID(Aura.getConfigAdapter().getAuraFrameworkNonce());
         String uid = ctxt.getDefRegistry().getUid(null, desc);
         ctxt.addLoaded(desc, uid);

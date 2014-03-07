@@ -20,7 +20,7 @@ import org.auraframework.adapter.ContextAdapter;
 import org.auraframework.impl.AuraImpl;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.service.ContextService;
-import org.auraframework.system.AuraContext.Access;
+import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 
@@ -40,7 +40,7 @@ public class AuraContextServiceImplTest extends AuraImplTestCase {
         ContextService contextService = Aura.getContextService();
         ContextAdapter p = AuraImpl.getContextAdapter();
         assertFalse(p.isEstablished());
-        contextService.startContext(Mode.DEV, Format.JSON, Access.AUTHENTICATED);
+        contextService.startContext(Mode.DEV, Format.JSON, Authentication.AUTHENTICATED);
         assertTrue(p.isEstablished());
         assertNotNull(p.getCurrentContext());
 

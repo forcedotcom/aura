@@ -39,7 +39,7 @@ import org.auraframework.service.ContextService;
 import org.auraframework.service.InstanceService;
 import org.auraframework.service.RenderingService;
 import org.auraframework.system.AuraContext;
-import org.auraframework.system.AuraContext.Access;
+import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.AuraRuntimeException;
@@ -148,7 +148,7 @@ public class ApplicationDefOfflineHTMLFormatAdapter extends OfflineHTMLFormatAda
                 auraInit.put("token", AuraServlet.getToken());
                 auraInit.put("host", context.getContextPath());
 
-                contextService.startContext(Mode.PROD, Format.HTML, Access.AUTHENTICATED, def.getDescriptor());
+                contextService.startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED, def.getDescriptor());
                 auraInit.put("context", contextService.getCurrentContext());
                 jsWriter.append("\n$A.initConfig($A.util.json.resolveRefs(");
                 Json.serialize(auraInit, jsWriter, context.getJsonSerializationContext());

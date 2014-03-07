@@ -43,7 +43,7 @@ import org.auraframework.impl.expression.PropertyReferenceImpl;
 import org.auraframework.impl.root.RootDefinitionImplUnitTest;
 import org.auraframework.impl.root.component.BaseComponentDefImpl.Builder;
 import org.auraframework.impl.system.DefDescriptorImpl;
-import org.auraframework.system.AuraContext.Access;
+import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.Location;
@@ -180,7 +180,7 @@ public abstract class BaseComponentDefImplUnitTest<I extends BaseComponentDefImp
         super.setupValidateReferences();
         this.interfaces = Sets.newHashSet();
         this.interfaces.add(BaseComponentDefImpl.ROOT_MARKER);
-        testAuraContext = Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Access.AUTHENTICATED);
+        testAuraContext = Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);
     }
 
     @Override

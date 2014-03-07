@@ -13,18 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.impl.adapter;
+package org.auraframework.test;
 
-import org.auraframework.adapter.DefinitionParserAdapter;
-import org.auraframework.def.DefinitionAccess;
-import org.auraframework.impl.DefinitionAccessImpl;
-import org.auraframework.throwable.quickfix.InvalidAccessValueException;
+import org.auraframework.system.AuraContext.Access;
 
-public class DefinitionParserAdapterImpl implements DefinitionParserAdapter {
-
-    @Override
-    public DefinitionAccess parseAccess(String access) throws InvalidAccessValueException {
-        return new DefinitionAccessImpl(access);
-    }
+/**
+ * Static Methods for testing access attribute 
+ */
+public class TestAccessMethods {
+	
+	public static Access allowGlobal() {
+		return Access.GLOBAL;
+	}
 
 }

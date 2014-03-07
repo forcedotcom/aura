@@ -22,7 +22,7 @@ import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.EventType;
 import org.auraframework.def.RegisterEventDef;
-import org.auraframework.system.AuraContext.Access;
+import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.AuraTestCase;
@@ -46,7 +46,7 @@ public class InputComponentsTest extends AuraTestCase {
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Access.AUTHENTICATED);
+        Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);
     }
 
     /**

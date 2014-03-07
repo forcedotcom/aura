@@ -33,7 +33,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext;
-import org.auraframework.system.AuraContext.Access;
+import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.annotation.IntegrationTest;
@@ -85,7 +85,7 @@ public abstract class IntegrationTestCase extends AuraTestCase {
     protected AuraContext setupContext(Mode mode, Format format, DefDescriptor<? extends BaseComponentDef> desc) 
             throws QuickFixException {
         ContextService contextService = Aura.getContextService();
-        AuraContext ctxt = contextService.startContext(mode, format, Access.AUTHENTICATED, desc);
+        AuraContext ctxt = contextService.startContext(mode, format, Authentication.AUTHENTICATED, desc);
         ctxt.setFrameworkUID(Aura.getConfigAdapter().getAuraFrameworkNonce());
         String uid = ctxt.getDefRegistry().getUid(null, desc);
         ctxt.addLoaded(desc, uid);

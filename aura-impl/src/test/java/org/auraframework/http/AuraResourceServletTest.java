@@ -57,7 +57,7 @@ public class AuraResourceServletTest extends AuraTestCase {
         // Start a context to fetch manifests; the other details don't matter
         // much 'cause we'll error out. Then try to fetch one, with that error:
         Aura.getContextService().startContext(AuraContext.Mode.UTEST, AuraContext.Format.MANIFEST,
-                AuraContext.Access.PUBLIC);
+                AuraContext.Authentication.UNAUTHENTICATED);
 
         HttpServletRequest request = new DummyHttpServletRequest() {
             @Override
@@ -90,7 +90,7 @@ public class AuraResourceServletTest extends AuraTestCase {
 
     public void testAddAppManifestCookie() throws Exception {
         Aura.getContextService().startContext(AuraContext.Mode.UTEST, AuraContext.Format.MANIFEST,
-                AuraContext.Access.PUBLIC);
+                AuraContext.Authentication.UNAUTHENTICATED);
 
         DefDescriptor<ApplicationDef> nopreload = DefDescriptorImpl.getInstance("appCache:nopreload",
                 ApplicationDef.class);
@@ -144,7 +144,7 @@ public class AuraResourceServletTest extends AuraTestCase {
         DefDescriptor<ApplicationDef> appDesc = DefDescriptorImpl.getInstance("appCache:withpreload",
                 ApplicationDef.class);
         AuraContext context = Aura.getContextService()
-                .startContext(Mode.DEV, AuraContext.Format.CSS, AuraContext.Access.AUTHENTICATED, appDesc);
+                .startContext(Mode.DEV, AuraContext.Format.CSS, AuraContext.Authentication.AUTHENTICATED, appDesc);
         final String uid = context.getDefRegistry().getUid(null, appDesc);
         context.addLoaded(appDesc, uid);
         Mode mode = context.getMode();
@@ -182,7 +182,7 @@ public class AuraResourceServletTest extends AuraTestCase {
         DefDescriptor<ApplicationDef> appDesc = DefDescriptorImpl.getInstance("appCache:withpreload",
                 ApplicationDef.class);
         AuraContext context = Aura.getContextService()
-                .startContext(Mode.DEV, AuraContext.Format.JS, AuraContext.Access.AUTHENTICATED, appDesc);
+                .startContext(Mode.DEV, AuraContext.Format.JS, AuraContext.Authentication.AUTHENTICATED, appDesc);
         final String uid = context.getDefRegistry().getUid(null, appDesc);
         context.addLoaded(appDesc, uid);
         Mode mode = context.getMode();
@@ -220,7 +220,7 @@ public class AuraResourceServletTest extends AuraTestCase {
         DefDescriptor<ApplicationDef> appDesc = DefDescriptorImpl.getInstance("appCache:withpreload",
                 ApplicationDef.class);
         AuraContext context = Aura.getContextService()
-                .startContext(Mode.DEV, AuraContext.Format.JS, AuraContext.Access.AUTHENTICATED, appDesc);
+                .startContext(Mode.DEV, AuraContext.Format.JS, AuraContext.Authentication.AUTHENTICATED, appDesc);
         final String uid = context.getDefRegistry().getUid(null, appDesc);
         context.addLoaded(appDesc, uid);
 
@@ -253,7 +253,7 @@ public class AuraResourceServletTest extends AuraTestCase {
         DefDescriptor<ApplicationDef> appDesc = DefDescriptorImpl.getInstance("preloadTest:test_SimpleApplication",
                 ApplicationDef.class);
         AuraContext context = Aura.getContextService()
-                .startContext(Mode.DEV, AuraContext.Format.CSS, AuraContext.Access.AUTHENTICATED, appDesc);
+                .startContext(Mode.DEV, AuraContext.Format.CSS, AuraContext.Authentication.AUTHENTICATED, appDesc);
         final String uid = context.getDefRegistry().getUid(null, appDesc);
         context.addLoaded(appDesc, uid);
 
@@ -288,7 +288,7 @@ public class AuraResourceServletTest extends AuraTestCase {
         DefDescriptor<ComponentDef> child2 = Aura.getDefinitionService()
                 .getDefDescriptor("setAttributesTest:anotherChild", ComponentDef.class);
         Aura.getContextService().startContext(AuraContext.Mode.DEV, AuraContext.Format.CSS,
-                AuraContext.Access.AUTHENTICATED, appDesc);
+                AuraContext.Authentication.AUTHENTICATED, appDesc);
 
         Set<DefDescriptor<?>> writable = Sets.newLinkedHashSet();
 
@@ -318,7 +318,7 @@ public class AuraResourceServletTest extends AuraTestCase {
         DefDescriptor<ComponentDef> appDesc = Aura.getDefinitionService()
                 .getDefDescriptor("clientApiTest:cssStyleTest", ComponentDef.class);
         AuraContext context = Aura.getContextService().startContext(AuraContext.Mode.DEV, AuraContext.Format.CSS,
-                AuraContext.Access.AUTHENTICATED, appDesc);
+                AuraContext.Authentication.AUTHENTICATED, appDesc);
         final String uid = context.getDefRegistry().getUid(null, appDesc);
         context.addLoaded(appDesc, uid);
 
@@ -338,7 +338,7 @@ public class AuraResourceServletTest extends AuraTestCase {
         DefDescriptor<ComponentDef> appDesc = Aura.getDefinitionService()
                 .getDefDescriptor("clientApiTest:cssStyleTest", ComponentDef.class);
         AuraContext context = Aura.getContextService().startContext(AuraContext.Mode.DEV, AuraContext.Format.CSS,
-                AuraContext.Access.AUTHENTICATED, appDesc);
+                AuraContext.Authentication.AUTHENTICATED, appDesc);
         final String uid = context.getDefRegistry().getUid(null, appDesc);
         context.addLoaded(appDesc, uid);
 

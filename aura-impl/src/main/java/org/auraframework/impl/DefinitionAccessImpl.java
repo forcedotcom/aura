@@ -15,95 +15,178 @@
  */
 package org.auraframework.impl;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.*;
 
+import org.auraframework.Aura;
+import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.DefinitionAccess;
+import org.auraframework.service.ContextService;
+import org.auraframework.system.AuraContext.Access;
+import org.auraframework.system.AuraContext.Authentication;
+import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.InvalidAccessValueException;
 import org.auraframework.util.AuraTextUtil;
 
-import com.google.common.collect.ImmutableSet;
-
 public class DefinitionAccessImpl implements DefinitionAccess {
 	
-	static public DefinitionAccess parseAccess(String access) throws InvalidAccessValueException {
-		List<String> items = AuraTextUtil.splitSimpleAndTrim(access, ",", 10);
-		Set<BasicAccessType> values = new HashSet<BasicAccessType>();
-		for (String item: items) {
-			try {
-				BasicAccessType at = BasicAccessType.valueOf(item.toUpperCase());
-				values.add(at);
-			} catch (IllegalArgumentException e) {
-				throw new InvalidAccessValueException("Invalid access atttribute value \"" + item + "\"");
-			}
-		}
-        return new DefinitionAccessImpl(values);          
-
-	}
-
 	static public DefinitionAccess defaultAccess() {
-		return new DefinitionAccessImpl(new HashSet<BasicAccessType>());
+		return new DefinitionAccessImpl();
 	}
 
-	private DefinitionAccessImpl(Set<BasicAccessType> values) {
-		access = values;
+	public DefinitionAccessImpl(String access) throws InvalidAccessValueException {
+		parseAccess(access);
+		defaultAccess(isSystemNamespace());
 	}
 	
+	private DefinitionAccessImpl() {
+		defaultAccess(isSystemNamespace());
+	}
+
+	private void parseAccess(String accessValue) throws InvalidAccessValueException {
+		List<String> items = AuraTextUtil.splitSimpleAndTrim(accessValue, ",", 10);
+		for (String item: items) {
+			parseAccessItem(item);
+		}
+	}
+	
+	protected void parseAccessItem(String item) throws InvalidAccessValueException {
+		// See if we have authentication
+		String ucItem = item.toUpperCase();
+		try {
+			Authentication auth = Authentication.valueOf(ucItem);
+			if (authentication != null && auth != authentication) {
+				throw new InvalidAccessValueException("Access attribute cannot specify both AUTHENTICATED and UNAUTHENTICATED");
+			}
+			authentication = auth;
+			return;
+		} catch (IllegalArgumentException e) {
+			// continue to try other possibilities
+		}
+		
+		// See if it is one of the scope constants
+		try {
+			Access acc = Access.valueOf(item.toUpperCase());
+			if (access != null && access != acc) {
+				throw new InvalidAccessValueException("Access attribute can only specifiy one of GLOBAL, PUBLIC, or PRIVATE"); // or internal
+			}
+			access = acc;
+			return;
+		} catch (IllegalArgumentException e) {
+			// continue to try other possibilities
+		}
+		
+		// Look for classname.methodname
+		int dotPos = item.lastIndexOf('.');
+		if (dotPos > 0) {
+			String className = item.substring(0, dotPos);
+			String methodName = item.substring(dotPos + 1);
+			try {
+				Class<?> clazz = Class.forName(className);
+				Method meth = clazz.getMethod(methodName, new Class[0]);
+                if (!Modifier.isStatic(meth.getModifiers())) {
+            		throw new InvalidAccessValueException("\"" + item + "\" must be a static method");
+                }
+                Class<?> retType = meth.getReturnType();
+                if (! Access.class.equals(retType)) {
+            		throw new InvalidAccessValueException("\"" + item + "\" must return a result of type " + 
+                        Access.class.getName());
+                }	
+                this.accessMethod = meth;
+                return;
+			} catch (ClassNotFoundException e) {
+			} catch (SecurityException e) {
+			} catch (NoSuchMethodException e) {
+			}
+    		throw new InvalidAccessValueException("\"" + item + "\" is not a valid public method reference");
+		}
+		
+		throw new InvalidAccessValueException("Invalid access atttribute value \"" + item + "\"");
+	}
+
 	@Override
 	public boolean requiresAuthentication() {
-		return !access.contains(BasicAccessType.UNAUTHENTICATED);   // default is authenticated
+		return authentication == null || authentication == Authentication.AUTHENTICATED;
 	}
 
 	@Override
 	public boolean isGlobal() {
-		return access.contains(BasicAccessType.GLOBAL);
+		return getAccess() == Access.GLOBAL;
 	}
 
 	@Override
 	public boolean isPublic() {
-		return !(access.contains(BasicAccessType.GLOBAL) || access.contains(BasicAccessType.PRIVATE));  // default is public
+		return getAccess() == Access.PUBLIC;
 	}
 
 	@Override
 	public boolean isPrivate() {
-		return access.contains(BasicAccessType.PRIVATE);
+		return getAccess() == Access.PRIVATE;
 	}
 
 	@Override
 	public boolean isInternal() {
-		// Default is at least INTERNAL
-		return access.isEmpty() || access.contains(BasicAccessType.INTERNAL);
+		return getAccess() == Access.INTERNAL;
 	}
 
 	@Override
 	public boolean isAccessible() {
-		return false;
+		return true;
 	}
 
 	@Override
-	public void validate(Set<BasicAccessType> allowed) throws InvalidAccessValueException {
-		// First make sure all the specified options are allowed for this definition
-		for (BasicAccessType a : access) {
-			if (!allowed.contains(a)) {
-				throw new InvalidAccessValueException("Invalid access atttribute value \"" + a.name() + "\"");
-			}
+	public void validate(boolean allowAuth, boolean allowPrivate)
+			throws InvalidAccessValueException {
+		boolean sysNamespace = isSystemNamespace();
+		if (authentication != null && (!allowAuth || !sysNamespace)) {
+			throw new InvalidAccessValueException("Invalid access atttribute value \"" + authentication.name() + "\"");
 		}
-		// Now check for invalid/contradictory combinations
-		if (access.contains(BasicAccessType.AUTHENTICATED) && access.contains(BasicAccessType.UNAUTHENTICATED)) {
-			throw new InvalidAccessValueException("Access attribute cannot specify both AUTHENTICATED and UNAUTHENTICATED");
+		if (access == Access.PRIVATE  && !allowPrivate) {
+			throw new InvalidAccessValueException("Invalid access atttribute value \"" + access.name() + "\"");
 		}
-
-		Set<BasicAccessType> scopes = new HashSet<BasicAccessType>(SCOPE_ACCESS_VALUES);
-		scopes.retainAll(access);   // intersection
-		if (scopes.size() > 1) {
-			throw new InvalidAccessValueException("Access attribute can only specifiy one of GLOBAL, PUBLIC, or PRIVATE");
+		if (access != null && accessMethod != null) {
+			throw new InvalidAccessValueException("Access attribute may not specify \"" + access.name() + "\" when a static method is also specified");
 		}
+ 		if (!sysNamespace && accessMethod != null) {
+			throw new InvalidAccessValueException("Access attribute may not use a static method");
+ 		}
 		
 	}
-	
-    private final static Set<BasicAccessType> SCOPE_ACCESS_VALUES = new ImmutableSet.Builder<BasicAccessType>()
-            .add(BasicAccessType.GLOBAL, BasicAccessType.PUBLIC, BasicAccessType.PRIVATE).build();
 
-	private final Set<BasicAccessType> access;
+	private void defaultAccess(boolean sysNamespace) {
+		// Default access if necessary
+ 		if (access == null && accessMethod == null) {
+ 			access = sysNamespace ? Access.INTERNAL : Access.PUBLIC;
+ 		}
+	}
+
+	protected boolean isSystemNamespace() {
+		ContextService contextService = Aura.getContextService();
+		if (contextService.isEstablished()) {
+			String namespace = contextService.getCurrentContext().getCurrentNamespace();
+			ConfigAdapter configAdapter = Aura.getConfigAdapter();
+			return configAdapter.isPrivilegedNamespace(namespace);
+		} else {
+			return false;  
+		}
+	}
+
+	private Access getAccess() {
+		if (accessMethod != null) {
+			try {
+				return (Access) accessMethod.invoke(null);
+			} catch (Exception e) {
+				throw new AuraRuntimeException("Exception executing access-checking method " + 
+						accessMethod.getClass().getName() + "." + accessMethod.getName(), e); 
+			}
+		} else {
+			return access;
+		}
+	}
+
+	private Authentication authentication = null;
+	private Access access = null;
+	private Method accessMethod = null;
+
 }

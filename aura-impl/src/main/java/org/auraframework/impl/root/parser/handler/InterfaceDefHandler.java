@@ -23,7 +23,6 @@ import javax.xml.stream.XMLStreamReader;
 import org.auraframework.Aura;
 import org.auraframework.builder.RootDefinitionBuilder;
 import org.auraframework.def.*;
-import org.auraframework.def.DefinitionAccess.BasicAccessType;
 import org.auraframework.impl.root.AttributeDefImpl;
 import org.auraframework.impl.root.event.RegisterEventDefImpl;
 import org.auraframework.impl.root.intf.InterfaceDefImpl;
@@ -137,12 +136,4 @@ public class InterfaceDefHandler extends RootTagHandler<InterfaceDef> {
         return builder;
     }
 
-    @Override
-    public Set<BasicAccessType> getAllowedAccessValues() {
-        return ALLOWED_ACCESS_VALUES;
-    }
-
-    private final static Set<BasicAccessType> ALLOWED_ACCESS_VALUES = new ImmutableSet.Builder<BasicAccessType>()
-            .add(BasicAccessType.GLOBAL, BasicAccessType.PUBLIC, BasicAccessType.PREVIEW, 
-                    BasicAccessType.INTERNAL).build();
 }

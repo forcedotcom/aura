@@ -25,7 +25,6 @@ import org.auraframework.def.AttributeDef;
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.def.TypeDef;
-import org.auraframework.def.DefinitionAccess.BasicAccessType;
 import org.auraframework.impl.root.AttributeDefImpl;
 import org.auraframework.impl.root.AttributeDefRefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
@@ -179,15 +178,10 @@ public class AttributeDefHandler<P extends RootDefinition> extends ParentedTagHa
     @Override
     public void writeElement(AttributeDefImpl def, Appendable out) {
     }
-    
-    @Override
-	public Set<BasicAccessType> getAllowedAccessValues() {
-		return ALLOWED_ACCESS_VALUES;
+
+	@Override
+	protected boolean allowPrivateAttribute() {
+		return true;
 	}
-
-    private final static Set<BasicAccessType> ALLOWED_ACCESS_VALUES = new ImmutableSet.Builder<BasicAccessType>()
-            .add(BasicAccessType.GLOBAL, BasicAccessType.PUBLIC, BasicAccessType.PRIVATE, BasicAccessType.PREVIEW, 
-            		BasicAccessType.INTERNAL).build();
-
-
+    
 }

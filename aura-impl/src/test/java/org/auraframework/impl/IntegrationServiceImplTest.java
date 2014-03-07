@@ -29,7 +29,7 @@ import org.auraframework.integration.IntegrationServiceObserver;
 import org.auraframework.integration.UnsupportedUserAgentException;
 import org.auraframework.service.IntegrationService;
 import org.auraframework.system.AuraContext;
-import org.auraframework.system.AuraContext.Access;
+import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.AuraRuntimeException;
@@ -350,7 +350,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
      * trim the preloads size by skipping the default preloads. 
      */
     public void testNoDefaultsPreloadInterfaceIsInGoodState(){
-        Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Access.AUTHENTICATED);
+        Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);
         DefDescriptor<InterfaceDef> noDefaultPreloadsInterfaceDef = definitionService.getDefDescriptor(IntegrationService.NO_DEFAULT_PRELOADS_INTERFACE, 
                 InterfaceDef.class);
         try{
@@ -367,7 +367,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
      */
     public void testObserverInvoked() throws Exception {
         IntegrationServiceObserver mockObserver = Mockito.mock(IntegrationServiceObserver.class);
-        AuraContext cntx = Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Access.AUTHENTICATED);
+        AuraContext cntx = Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);
         Integration integration = service.createIntegration("", Mode.UTEST, true, null, getNoDefaultPreloadsApp().getQualifiedName(), mockObserver);
         injectSimpleComponent(integration);
         Mockito.verify(mockObserver, Mockito.times(2)).contextEstablished(integration, cntx);

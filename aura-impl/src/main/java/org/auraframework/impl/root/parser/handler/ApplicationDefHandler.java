@@ -22,7 +22,6 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.Aura;
 import org.auraframework.def.*;
-import org.auraframework.def.DefinitionAccess.BasicAccessType;
 import org.auraframework.impl.root.DependencyDefImpl;
 import org.auraframework.impl.root.application.ApplicationDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
@@ -57,11 +56,6 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
     public Set<String> getAllowedAttributes() {
         return ALLOWED_ATTRIBUTES;
     }
-
-    @Override
-	public Set<BasicAccessType> getAllowedAccessValues() {
-		return ALLOWED_ACCESS_VALUES;
-	}
 
 	@Override
     protected ApplicationDefImpl.Builder createBuilder() {
@@ -175,7 +169,12 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
         }
     }
 
-    private static final String ATTRIBUTE_PRELOAD = "preload";
+    @Override
+	protected boolean allowAuthenticationAttribute() {
+    	return true;
+	}
+
+	private static final String ATTRIBUTE_PRELOAD = "preload";
     private static final String ATTRIBUTE_LAYOUTS = "layouts";
     private static final String ATTRIBUTE_LOCATION_CHANGE_EVENT = "locationChangeEvent";
     private static final String ATTRIBUTE_APPCACHE_ENABLED = "useAppcache";
@@ -189,9 +188,4 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
                     ATTRIBUTE_ADDITIONAL_APPCACHE_URLS, ATTRIBUTE_IS_ONE_PAGE_APP, ATTRIBUTE_OVERRIDE_THEME)
             .addAll(BaseComponentDefHandler.ALLOWED_ATTRIBUTES).build();
     
-    private final static Set<BasicAccessType> ALLOWED_ACCESS_VALUES = new ImmutableSet.Builder<BasicAccessType>()
-            .add(BasicAccessType.AUTHENTICATED, BasicAccessType.UNAUTHENTICATED, 
-                    BasicAccessType.GLOBAL, BasicAccessType.PUBLIC, 
-                    BasicAccessType.PREVIEW, BasicAccessType.INTERNAL).build();
-
 }

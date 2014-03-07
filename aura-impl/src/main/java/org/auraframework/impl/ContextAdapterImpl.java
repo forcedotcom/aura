@@ -27,7 +27,7 @@ import org.auraframework.impl.system.MasterDefRegistryImpl;
 import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.instance.ValueProviderType;
 import org.auraframework.system.AuraContext;
-import org.auraframework.system.AuraContext.Access;
+import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.MasterDefRegistry;
@@ -46,7 +46,7 @@ public class ContextAdapterImpl implements ContextAdapter {
 
     @Override
     public AuraContext establish(Mode mode, MasterDefRegistry masterRegistry, Map<DefType, String> defaultPrefixes,
-            Format format, Access access, JsonSerializationContext jsonContext,
+            Format format, Authentication access, JsonSerializationContext jsonContext,
             Map<ValueProviderType, GlobalValueProvider> globalProviders,
             DefDescriptor<? extends BaseComponentDef> appDesc) {
     	return establish(mode, masterRegistry, defaultPrefixes, format, access, jsonContext,
@@ -55,7 +55,7 @@ public class ContextAdapterImpl implements ContextAdapter {
 
     @Override
     public AuraContext establish(Mode mode, MasterDefRegistry masterRegistry,
-			Map<DefType, String> defaultPrefixes, Format format, Access access,
+			Map<DefType, String> defaultPrefixes, Format format, Authentication access,
 			JsonSerializationContext jsonContext,
 			Map<ValueProviderType, GlobalValueProvider> globalProviders,
 			DefDescriptor<? extends BaseComponentDef> appDesc,

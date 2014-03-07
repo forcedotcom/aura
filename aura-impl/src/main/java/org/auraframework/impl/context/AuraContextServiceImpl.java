@@ -35,7 +35,7 @@ import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.instance.ValueProviderType;
 import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext;
-import org.auraframework.system.AuraContext.Access;
+import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.DefRegistry;
@@ -64,12 +64,12 @@ public class AuraContextServiceImpl implements ContextService {
     }
 
     @Override
-    public AuraContext startContext(Mode mode, Format format, Access access) {
+    public AuraContext startContext(Mode mode, Format format, Authentication access) {
         return startContext(mode, null, format, access, null);
     }
 
     @Override
-    public AuraContext startContext(Mode mode, Set<SourceLoader> loaders, Format format, Access access) {
+    public AuraContext startContext(Mode mode, Set<SourceLoader> loaders, Format format, Authentication access) {
         // initialize logging context
         Aura.getLoggingService().establish();
         AuraContext context = AuraImpl.getContextAdapter().establish(mode, getDefRegistry(mode, access, loaders),
@@ -79,26 +79,26 @@ public class AuraContextServiceImpl implements ContextService {
     }
 
     @Override
-    public AuraContext startContext(Mode mode, Format format, Access access,
+    public AuraContext startContext(Mode mode, Format format, Authentication access,
             DefDescriptor<? extends BaseComponentDef> appDesc) {
         return startContext(mode, format, access, appDesc, false);
     }
     
     @Override
-    public AuraContext startContext(Mode mode, Format format, Access access,
+    public AuraContext startContext(Mode mode, Format format, Authentication access,
                     DefDescriptor<? extends BaseComponentDef> appDesc,
                     boolean isDebugToolEnabled) {
         return startContext(mode, null, format, access, appDesc, isDebugToolEnabled);
     }
 
     @Override
-    public AuraContext startContext(Mode mode, Set<SourceLoader> loaders, Format format, Access access,
+    public AuraContext startContext(Mode mode, Set<SourceLoader> loaders, Format format, Authentication access,
             DefDescriptor<? extends BaseComponentDef> appDesc) {
         return startContext(mode, loaders, format, access, appDesc, false);
     }
     
     @Override
-    public AuraContext startContext(Mode mode, Set<SourceLoader> loaders, Format format, Access access,
+    public AuraContext startContext(Mode mode, Set<SourceLoader> loaders, Format format, Authentication access,
             DefDescriptor<? extends BaseComponentDef> appDesc, boolean isDebugToolEnabled) {
         // initialize logging context
         Aura.getLoggingService().establish();
@@ -132,11 +132,11 @@ public class AuraContextServiceImpl implements ContextService {
         return ServiceLocator.get().get(PrefixDefaultsAdapter.class);
     }
 
-    private MasterDefRegistry getDefRegistry(Mode mode, Access access, Set<SourceLoader> loaders) {
+    private MasterDefRegistry getDefRegistry(Mode mode, Authentication access, Set<SourceLoader> loaders) {
         return new MasterDefRegistryImpl(getRegistries(mode, access, loaders));
     }
 
-    private DefRegistry<?>[] getRegistries(Mode mode, Access access, Set<SourceLoader> loaders) {
+    private DefRegistry<?>[] getRegistries(Mode mode, Authentication access, Set<SourceLoader> loaders) {
         List<DefRegistry<?>> ret = new ArrayList<DefRegistry<?>>();
         Collection<RegistryAdapter> providers = AuraImpl.getRegistryAdapters();
         for (RegistryAdapter provider : providers) {

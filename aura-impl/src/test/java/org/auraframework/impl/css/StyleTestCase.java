@@ -28,7 +28,7 @@ import org.auraframework.def.ThemeDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext;
-import org.auraframework.system.AuraContext.Access;
+import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -66,7 +66,7 @@ public abstract class StyleTestCase extends AuraImplTestCase {
         if (contextService.isEstablished()) {
             contextService.endContext();
         }
-        contextService.startContext(Mode.UTEST, Format.JSON, Access.AUTHENTICATED);
+        contextService.startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);
     }
 
     /** adds a {@link StyleDef} to the namespace with the given source */
@@ -153,7 +153,7 @@ public abstract class StyleTestCase extends AuraImplTestCase {
         if (contextService.isEstablished()) {
             contextService.endContext();
         }
-        AuraContext ctx = contextService.startContext(Mode.UTEST, Format.JSON, Access.AUTHENTICATED, appDesc);
+        AuraContext ctx = contextService.startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED, appDesc);
         ctx.setOverrideThemeDescriptor(appDesc.getDef().getOverrideThemeDescriptor());
         return appDesc;
     }

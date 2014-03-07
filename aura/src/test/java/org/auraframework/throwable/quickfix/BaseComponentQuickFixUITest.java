@@ -23,7 +23,7 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.StyleDef;
-import org.auraframework.system.AuraContext.Access;
+import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.WebDriverTestCase;
@@ -41,7 +41,7 @@ public abstract class BaseComponentQuickFixUITest extends WebDriverTestCase {
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        Aura.getContextService().startContext(Mode.SELENIUM, Format.JSON, Access.AUTHENTICATED);
+        Aura.getContextService().startContext(Mode.SELENIUM, Format.JSON, Authentication.AUTHENTICATED);
     }
 
     @Override

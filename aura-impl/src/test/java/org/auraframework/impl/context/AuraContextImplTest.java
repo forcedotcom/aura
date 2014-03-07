@@ -36,7 +36,7 @@ import org.auraframework.instance.Event;
 
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
-import org.auraframework.system.AuraContext.Access;
+import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.annotation.UnAdaptableTest;
@@ -66,7 +66,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
     public void testComponentDefSerializedFormat() throws Exception {
         DefDescriptor<ApplicationDef> appDesc = Aura.getDefinitionService().getDefDescriptor(
                 "preloadTest:dependenciesApp", ApplicationDef.class);
-        AuraContext context = Aura.getContextService().startContext(Mode.UTEST, Format.HTML, Access.AUTHENTICATED, appDesc);
+        AuraContext context = Aura.getContextService().startContext(Mode.UTEST, Format.HTML, Authentication.AUTHENTICATED, appDesc);
         DefinitionService ds = Aura.getDefinitionService();
         ApplicationDef appDef = ds.getDefinition("preloadTest:dependenciesApp", ApplicationDef.class);
         Map<DefDescriptor<?>,String> clientLoaded = Maps.newHashMap();
@@ -84,7 +84,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
         DefDescriptor<ApplicationDef> appDesc = Aura.getDefinitionService().getDefDescriptor(
                 "preloadTest:dependenciesApp", ApplicationDef.class);
         AuraContext context = Aura.getContextService()
-                .startContext(Mode.UTEST, Format.HTML, Access.AUTHENTICATED, appDesc);
+                .startContext(Mode.UTEST, Format.HTML, Authentication.AUTHENTICATED, appDesc);
         DefDescriptor<ComponentDef> dd = vendor.makeComponentDefDescriptor("test:test_button");
 
         Set<DefDescriptor<?>> preloaded = Sets.newHashSet();
@@ -111,7 +111,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
         DefDescriptor<ApplicationDef> desc = Aura.getDefinitionService().getDefDescriptor("arbitrary:appname",
                 ApplicationDef.class);
 
-        AuraContext ctx = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Access.PUBLIC, desc);
+        AuraContext ctx = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.UNAUTHENTICATED, desc);
         ctx.setSerializeLastMod(false);
         String res = Json.serialize(ctx, ctx.getJsonSerializationContext());
         goldFileJson(res);
@@ -125,7 +125,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
         DefDescriptor<ComponentDef> desc = Aura.getDefinitionService().getDefDescriptor("arbitrary:cmpname",
                 ComponentDef.class);
 
-        AuraContext ctx = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Access.PUBLIC, desc);
+        AuraContext ctx = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.UNAUTHENTICATED, desc);
         ctx.setSerializeLastMod(false);
         String res = Json.serialize(ctx, ctx.getJsonSerializationContext());
         goldFileJson(res);
@@ -136,7 +136,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
      */
     @UnAdaptableTest
     public void testSerializeWithoutApp() throws Exception {
-        AuraContext ctx = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Access.PUBLIC);
+        AuraContext ctx = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.UNAUTHENTICATED);
         ctx.setSerializeLastMod(false);
         String res = Json.serialize(ctx, ctx.getJsonSerializationContext());
         goldFileJson(res);
@@ -154,7 +154,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
         DefDescriptor<ComponentDef> descCmp = Aura.getDefinitionService().getDefDescriptor("arbitrary:cmpname",
                 ComponentDef.class);
 
-        AuraContext ctx = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Access.PUBLIC);
+        AuraContext ctx = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.UNAUTHENTICATED);
         ctx.setSerializeLastMod(false);
 
         ctx.setApplicationDescriptor(descCmp);
@@ -181,14 +181,14 @@ public class AuraContextImplTest extends AuraImplTestCase {
      */
     public void testAttachingEvents() throws Exception {
         // Verify that nulls are filtered
-        AuraContext lc = Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Access.PUBLIC);
+        AuraContext lc = Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Authentication.UNAUTHENTICATED);
 
         lc.addClientApplicationEvent(null);
         assertEquals("Should not be accepting null objects as events.", 0, lc.getClientEvents().size());
         Aura.getContextService().endContext();
 
         // Adding multiple contexts
-        lc = Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Access.AUTHENTICATED);
+        lc = Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);
         Event evt1 = Aura.getInstanceService().getInstance("markup://aura:applicationEvent", EventDef.class, null);
         lc.addClientApplicationEvent(evt1);
         Event evt2 = Aura.getInstanceService().getInstance("markup://aura:connectionLost", EventDef.class, null);
@@ -201,7 +201,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
 
         // Adding same event again should not cause an error, same event can be
         // fired with different parameters.
-        lc = Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Access.AUTHENTICATED);
+        lc = Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);
         Event evt3 = Aura.getInstanceService().getInstance("markup://handleEventTest:applicationEvent", EventDef.class,
                 null);
         lc.addClientApplicationEvent(evt3);
@@ -212,7 +212,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
         Aura.getContextService().endContext();
 
         // Verify component events are not acceptable
-        lc = Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Access.AUTHENTICATED);
+        lc = Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);
         Event evt4 = Aura.getInstanceService().getInstance("markup://handleEventTest:event", EventDef.class, null);
         try {
             lc.addClientApplicationEvent(evt4);
@@ -227,7 +227,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
      * Expect a map that doesn't include dropped descriptors.
      */
     public void testGetLoaded() throws Exception {
-        AuraContext context = Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Access.PUBLIC);
+        AuraContext context = Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Authentication.UNAUTHENTICATED);
         context.setApplicationDescriptor(laxSecurityApp);
 
         assertTrue("Nothing should be loaded", context.getLoaded().isEmpty());
@@ -253,7 +253,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
      * Loaded map contains the loaded descriptor.
      */
     public void testSerializeWithLoaded() throws Exception {
-        AuraContext context = Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Access.PUBLIC);
+        AuraContext context = Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Authentication.UNAUTHENTICATED);
         context.setApplicationDescriptor(laxSecurityApp);
         context.setSerializeLastMod(false);
         context.getGlobalProviders().clear();
@@ -265,7 +265,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
     }
     
     public void testSerializeWithUnPreLoadedEvent() throws Exception {
-    	AuraContext context = Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Access.PUBLIC);
+    	AuraContext context = Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Authentication.UNAUTHENTICATED);
         context.setApplicationDescriptor(laxSecurityApp);
         context.setSerializeLastMod(false);
         context.getGlobalProviders().clear();
@@ -290,7 +290,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
      * Loaded map contains deleted descriptors.
      */
     public void testSerializeWithDroppedLoaded() throws Exception {
-        AuraContext context = Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Access.PUBLIC);
+        AuraContext context = Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Authentication.UNAUTHENTICATED);
         context.setApplicationDescriptor(laxSecurityApp);
         context.setSerializeLastMod(false);
         context.getGlobalProviders().clear();
@@ -309,7 +309,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
             Aura.getContextService().endContext();
         }
         DefDescriptor<ApplicationDef> appDesc = Aura.getDefinitionService().getDefDescriptor("test:laxSecurity", ApplicationDef.class);
-        AuraContext cntx = Aura.getContextService().startContext(Mode.FTEST, Format.JSON, Access.AUTHENTICATED, appDesc);
+        AuraContext cntx = Aura.getContextService().startContext(Mode.FTEST, Format.JSON, Authentication.AUTHENTICATED, appDesc);
         assertEquals(appDesc, cntx.getApplicationDescriptor());
     }
     
@@ -321,7 +321,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
             Aura.getContextService().endContext();
         }
         DefDescriptor<ComponentDef> cmpDesc = Aura.getDefinitionService().getDefDescriptor("aura:text", ComponentDef.class);
-        AuraContext cntx = Aura.getContextService().startContext(Mode.FTEST, Format.JSON, Access.AUTHENTICATED, cmpDesc);
+        AuraContext cntx = Aura.getContextService().startContext(Mode.FTEST, Format.JSON, Authentication.AUTHENTICATED, cmpDesc);
         assertEquals(cmpDesc, cntx.getApplicationDescriptor());
     }
 }

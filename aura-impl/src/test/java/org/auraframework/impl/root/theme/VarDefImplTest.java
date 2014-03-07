@@ -19,7 +19,7 @@ import org.auraframework.Aura;
 import org.auraframework.def.VarDef;
 import org.auraframework.impl.root.theme.VarDefImpl.Builder;
 import org.auraframework.impl.system.DefinitionImplUnitTest;
-import org.auraframework.system.AuraContext.Access;
+import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
@@ -45,7 +45,7 @@ public class VarDefImplTest extends DefinitionImplUnitTest<VarDefImpl, VarDef, V
     @Override
     protected void setupValidateReferences() throws Exception {
         super.setupValidateReferences();
-        testAuraContext = Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Access.AUTHENTICATED);
+        testAuraContext = Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);
     }
 
     public void testEqualsWhenSame() throws Exception {

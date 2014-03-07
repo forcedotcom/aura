@@ -46,7 +46,7 @@ import org.auraframework.impl.source.StringSourceLoader;
 import org.auraframework.service.BuilderService;
 import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext;
-import org.auraframework.system.AuraContext.Access;
+import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.DefRegistry;
@@ -241,7 +241,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         if (contextService.isEstablished()) {
             contextService.endContext();
         }
-        contextService.startContext(Mode.UTEST, Format.JSON, Access.AUTHENTICATED);
+        contextService.startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);
         return contextService.getCurrentContext().getDefRegistry();
     }
 
@@ -739,7 +739,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         if (contextService.isEstablished()) {
             contextService.endContext();
         }
-        contextService.startContext(Mode.DEV, Format.JSON, Access.AUTHENTICATED);
+        contextService.startContext(Mode.DEV, Format.JSON, Authentication.AUTHENTICATED);
 
         MasterDefRegistryImpl mdr = getDefRegistry(false);
         DefDescriptor<ComponentDef> cmpDesc = Aura.getDefinitionService().getDefDescriptor("test:deleteMeAfterTest",

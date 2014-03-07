@@ -166,4 +166,16 @@ public class FileSourceLoaderTest extends AuraImplTestCase {
         found = loader.find(new DescriptorFilter("markup://test:doesntexist"));
         assertEquals("Should not have found any components", 0, found.size());
     }
+    
+    /**
+     * All namespaces loaded by FileSourceLoader are privileged, verify that FileSourceLoader says so.
+     */
+    public void testIsPrivilegedNamespace(){
+        FileSourceLoader loader = new FileSourceLoader(AuraImplFiles.TestComponents.asFile());
+        assertTrue("All namespaces loaded by FileSourceLoader are to be privileged", 
+                loader.isPrivilegedNamespace(null));
+        assertTrue("All namespaces loaded by FileSourceLoader are to be privileged," +
+        		"Regardless of the namespace.", loader.isPrivilegedNamespace("fooBared"));
+        assertTrue(loader.isPrivilegedNamespace("aura"));
+    }
 }

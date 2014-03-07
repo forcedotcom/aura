@@ -282,8 +282,9 @@ public class AuraServlet extends AuraBaseServlet {
 
     private void assertAccess(BaseComponentDef def) throws QuickFixException {
         String defaultNamespace = Aura.getConfigAdapter().getDefaultNamespace();
-        DefDescriptor<?> referencingDescriptor = defaultNamespace != null && !defaultNamespace.isEmpty() ? Aura.getDefinitionService().getDefDescriptor(
-        		String.format("%s:servletAccess", defaultNamespace), ApplicationDef.class) : null;
+        DefDescriptor<?> referencingDescriptor = (defaultNamespace != null && !defaultNamespace.isEmpty()) 
+                ? Aura.getDefinitionService().getDefDescriptor(String.format("%s:servletAccess", defaultNamespace), ApplicationDef.class) 
+                : null;
         Aura.getDefinitionService().getDefRegistry().assertAccess(referencingDescriptor, def);
     }
 

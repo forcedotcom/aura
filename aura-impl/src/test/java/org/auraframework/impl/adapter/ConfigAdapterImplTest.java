@@ -205,4 +205,29 @@ public class ConfigAdapterImplTest extends UnitTestCase {
         verify(spy, Mockito.never()).makeHash(anyString(), anyString());
         assertEquals("Framework uid is not correct", uid, "BJTaoiCDxoAF4Wbh0iC9lA");
     }
+    
+    public void testIsPrivilegedNamespacesWithBadArguments(){
+        ConfigAdapterImpl impl = new ConfigAdapterImpl();
+        assertFalse("null should not be a privileged namespace", impl.isPrivilegedNamespace(null));
+        assertFalse("Empty string should not be a privileged namespace", impl.isPrivilegedNamespace(""));
+        assertFalse("Wild characters should not be privileged namespace", impl.isPrivilegedNamespace("*"));
+        assertFalse(impl.isPrivilegedNamespace("?"));
+    }
+    
+    public void testIsPrivilegedNamespacesAfterRegistering(){
+        String namespace = this.getName() + System.currentTimeMillis();
+        ConfigAdapterImpl impl = new ConfigAdapterImpl();
+        impl.addPrivilegedNamespace(namespace);
+        assertTrue("Failed to register a privileged namespace.", impl.isPrivilegedNamespace(namespace));
+        assertTrue("Privileged namespace checks are case sensitive.", impl.isPrivilegedNamespace(namespace.toUpperCase()));
+    }
+    
+    public void testAddPrivilegedNamespacesWithBadArguments(){
+        ConfigAdapterImpl impl = new ConfigAdapterImpl();
+        impl.addPrivilegedNamespace(null);
+        assertFalse(impl.isPrivilegedNamespace(null));
+        
+        impl.addPrivilegedNamespace("");
+        assertFalse(impl.isPrivilegedNamespace(""));
+    }
 }

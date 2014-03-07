@@ -10,6 +10,16 @@
         <filter-name>AuraContextFilter</filter-name>
         <filter-class>org.auraframework.http.AuraContextFilter</filter-class>
     </filter>
+    
+    <filter>
+		<filter-name>AuraCSPFilter</filter-name>
+		<filter-class>org.auraframework.http.AuraCSPFilter</filter-class>
+	</filter>
+    <filter-mapping>
+        <filter-name>AuraCSPFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    
 
     <!-- Begin rewrite for docs.app mountpoint.  Force loading to prod mode. -->
 
@@ -113,6 +123,12 @@
         <servlet-name>AuraFrameworkServlet</servlet-name>
         <url-pattern>/auraFW/*</url-pattern>
     </servlet-mapping>
+   
+    <servlet>
+    	<servlet-name>CSPReporterServlet</servlet-name>
+    	<servlet-class>org.auraframework.http.CSPReporterServlet</servlet-class>
+        <load-on-startup>0</load-on-startup> <!-- ??? -->
+    </servlet>
     
     <!--  Begin Aura Validation Servlet -->
     
@@ -126,16 +142,12 @@
         <url-pattern>/qa/auraValidation/*</url-pattern> <!-- same pattern as SFDC servlet -->
     </servlet-mapping>
 
-    <!--  Begin CSP Filter -->
+    <!--  Begin Content Security Policy Servlet -->
 
-   	<filter>
-		<filter-name>AuraCSPFilter</filter-name>
-		<filter-class>org.auraframework.http.AuraCSPFilter</filter-class>
-	</filter>
-    <filter-mapping>
-        <filter-name>AuraCSPFilter</filter-name>
-        <url-pattern>/*</url-pattern>
-    </filter-mapping>
+    <servlet-mapping>
+        <servlet-name>CSPReporterServlet</servlet-name>
+        <url-pattern>/csp</url-pattern>
+    </servlet-mapping>
 
 </web-app>
 

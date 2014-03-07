@@ -113,7 +113,22 @@
         $A.popCreationPath("body");
         return ret;
     },
+    
+    createNewComponents: function(cmp, callback) {
+        var start = this.getStart(cmp);
+        var end = this.getEnd(cmp);
+        var atts = cmp.getAttributes();
+        var realbody = atts.getValue("realbody");
+        var body = atts.getValue("body");
+        var bodyLen = body.getLength();
+        if ((end - start) > (realbody.getLength()/bodyLen)) {
+            // now we don't have enough, create a new cmp at the end
+            var items = cmp.getValue("v.items");
+            this.createSelectiveComponentsForIndex(cmp, items, end - 1, false, callback);
+        }
+    },
 
+    
     createRealBody: function(cmp, doForce, callback) {
         var atts = cmp.getAttributes();
         var items = atts.getValue("items");
@@ -202,7 +217,50 @@
         
         return realbody;
     },
-
+    
+    createSelectiveComponentsForIndex: function(cmp, items, index, doForce, callback) {
+        var atts = cmp.getAttributes();
+        var varName = atts.get("var");
+        var indexVar = atts.get("indexVar");
+        var body = atts.getValue("body");
+        var extraProviders = {};
+        extraProviders[varName] = items.getValue(index);
+        if (indexVar) {
+            extraProviders[indexVar] = $A.expressionService.create(null, index);
+        }
+        var ivp;
+        var forceServer = cmp.getAttributes().getValue("forceServer").getValue();
+        var selectiveBodyCollector = {
+            realBodyList: [],
+            count: body.getLength(),
+            cmp: cmp,
+            callback: callback
+        };
+        for (var j = 0; j < body.getLength(); j++) {
+            var cdr = body.get(j);
+            if (!ivp) {
+                ivp = $A.expressionService.createPassthroughValue(extraProviders, cdr.valueProvider || atts.getValueProvider());
+            }
+            $A.setCreationPathIndex(j);
+            $A.componentService.newComponentAsync(this, this.createSelectiveComponentsCallback(selectiveBodyCollector, j), cdr, ivp, false, false, forceServer);
+        }
+    },
+    
+    createSelectiveComponentsCallback: function(selectiveBodyCollector, index) {
+        return function(newcmp) {
+            selectiveBodyCollector.realBodyList[index] = newcmp;
+            selectiveBodyCollector.count -= 1;
+            if (selectiveBodyCollector.count === 0) {
+                var accum = [];
+                var rbl = selectiveBodyCollector.realBodyList;
+                for (var i = 0; i < rbl.length; i++) {
+                    accum.push(rbl[i]);
+                }
+                selectiveBodyCollector.callback(accum);
+            }
+        };
+    },
+    
     rerenderEverything: function(cmp) {
         this.createRealBody(cmp, false, function(newBody) {
             if (cmp.isValid()) {
@@ -212,6 +270,103 @@
                 cmp.getEvent("rerenderComplete").fire();
             }
         });
+    },
+    
+    rerenderSelective: function(cmp) {
+        // optimized for insert/remove/push. if this is called as a result of a setValue then anything could change
+        var start = this.getStart(cmp);
+        var end = this.getEnd(cmp);
+        var atts = cmp.getAttributes();
+        var items = atts.getValue("items")
+        var realbody = atts.getValue("realbody");
+        var body = atts.getValue("body");
+        var bodyLen = body.getLength();
+        if (!realbody.isEmpty()) {
+            var varName = atts.get("var");
+            var indexVar = atts.get("indexVar");
+            var diffIndex = -1;
+            var data;
+            // look for a diff between the components we already created and the data
+            for (var i = 0; i < realbody.getLength(); i++) {
+                var bodycmp = realbody.getValue(i);
+                var vp = bodycmp.getAttributes().getValueProvider();
+                var index = vp.getValue(indexVar).unwrap();
+                data = vp.getValue(varName);
+                if (items.getValue(index) !== data) {
+                    // we have a diff
+                    diffIndex = index;
+                    break;
+                }
+            }
+            if (diffIndex !== -1) {
+                // something was added or removed at or before diffIndex
+                var cmparray = realbody.unwrap();
+                var nextItem = items.getValue(diffIndex + 1);
+                if (nextItem !== data) {
+                    // this item was removed, delete this item, re-number rest
+                    var removed = cmparray.splice(i, bodyLen);
+                    for (var k = 0; k < body.getLength(); k++) {
+                        removed[k].destroy();
+                    }
+                    this.incrementIndices(cmparray, i, indexVar, -1, bodyLen);
+                    realbody.setValue(cmparray);
+                    this.createNewComponents(cmp, function(newcmps) {
+                        for (var j = 0; j < newcmps.length; j++) {
+                            realbody.push(newcmps[j]);
+                        }
+                    });
+                } else {
+                    // item was added, instantiate new cmp, re-number rest
+                    this.incrementIndices(cmparray, i, indexVar, 1, bodyLen);
+                    this.createSelectiveComponentsForIndex(cmp, items, diffIndex, false, function(newcmps) {
+                        cmparray.splice.apply(cmparray, [i, 0].concat(newcmps));
+                        if (end - start < cmparray.length/bodyLen) {
+                            // now there is 1 too many, need to remove from the end
+                            for (var j = 0; j < bodyLen; j++) {
+                                var endcmp = cmparray.pop();
+                                endcmp.destroy();
+                            }
+                        }
+                        realbody.setValue(cmparray);
+                    });
+                }               
+            } else {
+                this.createNewComponents(cmp, function(newcmps) {
+                    for (var j = 0; j < newcmps.length; j++) {
+                        realbody.push(newcmps[j]);
+                    }
+                });
+            }
+        } else {
+            this.rerenderEverything(cmp);
+        }
+    },
+
+    incrementIndices: function(cmpArray, start, indexVar, change, bodyLen) {
+        for (var i = start; i < cmpArray.length; (bodyLen ? i+=bodyLen : i++)) {
+            var vp = cmpArray[i].getAttributes().getValueProvider();
+            var index = vp.getValue(indexVar);
+            index.setValue(index.unwrap() + change);
+        }
+    },
+
+    getStart: function(cmp) {
+        var start = cmp.get("v.start");
+        if (!$A.util.isEmpty(start)) {
+            return Math.max(0, this.getNumber(start));
+        } else {
+            return 0;
+        }
+    },
+
+    getEnd: function(cmp) {
+        var length = cmp.get("v.items.length");
+        var end = cmp.get("v.end");
+        if (!$A.util.isEmpty(end)) {
+            return Math.min(length, this.getNumber(end));
+        } else {
+            return length;
+        }
     },
 
     // temp workaround when strings get passed in until typedef takes care of this for us

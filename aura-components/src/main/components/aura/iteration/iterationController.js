@@ -21,7 +21,11 @@
     itemsChange: function(cmp, evt, helper) {
         var v = evt.getParam("value");
         if (v === cmp.getValue("v.items")) {
-            helper.rerenderEverything(cmp);
+            if (v.isDifferentArray()) {
+                helper.rerenderEverything(cmp);
+            } else {
+                helper.rerenderSelective(cmp);
+            }
         }
     },
 

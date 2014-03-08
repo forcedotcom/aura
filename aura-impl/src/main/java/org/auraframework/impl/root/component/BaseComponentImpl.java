@@ -168,7 +168,6 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
         AuraContext context = Aura.getContextService().getCurrentContext();
         DefDescriptor<? extends RootDefinition> desc = null;
 
-        // Insure that the parent is allowed to create an instace of this component
         InstanceStack instanceStack = context.getInstanceStack();
         Instance<?> parent = instanceStack.peek();
 		instanceStack.pushInstance(this);
@@ -183,11 +182,13 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
                 if (extender == null && (def.isAbstract() || def.getLocalProviderDef() != null)) {
                     this.intfDescriptor = def.getDescriptor();
                 }
+                
                 desc = descriptor;
             } catch (DefinitionNotFoundException e) {
                 if (!e.getDescriptor().equals(descriptor)) {
                     throw e;
                 }
+                
                 DefDescriptor<InterfaceDef> intfDescriptor = DefDescriptorImpl.getInstance(
                         descriptor.getQualifiedName(), InterfaceDef.class);
                 InterfaceDef intfDef = intfDescriptor.getDef();
@@ -205,6 +206,7 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
 
         MasterDefRegistry defRegistry = Aura.getDefinitionService().getDefRegistry();
 		if (parent != null) {
+	        // Insure that the parent is allowed to create an instance of this component
         	defRegistry.assertAccess(parent.getDescriptor(), desc.getDef());
         }
         
@@ -218,18 +220,15 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
             if (valueProviders != null) {
                 this.valueProviders.putAll(valueProviders);
             }
+            
             this.valueProviders.put(ValueProviderType.VIEW.getPrefix(), attributeSet);
             
-            //
-            // def can be null if a definition not found exception was thrown for that
-            // definition. Odd.
-            //
+            // def can be null if a definition not found exception was thrown for that definition. Odd.
             if (def != null) {
                 ControllerDef cd = def.getControllerDef();
                 if (cd != null) {
-                	if (parent != null) {
-                		defRegistry.assertAccess(parent.getDescriptor(), cd);
-                	}
+                    // Insure that this def is allowed to create an instance of the controller
+            		defRegistry.assertAccess(descriptor, cd);
                 	
                     this.valueProviders.put(ValueProviderType.CONTROLLER.getPrefix(), cd);
                 }

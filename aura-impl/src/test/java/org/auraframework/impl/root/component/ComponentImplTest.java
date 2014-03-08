@@ -30,7 +30,7 @@ public class ComponentImplTest extends AuraImplTestCase {
     }
 
     public void testComponentAttributeMap() throws Exception {
-        ComponentImpl cmp = vendor.makeComponent("test:child1", "meh");
+        Component cmp = vendor.makeComponent("test:child1", "meh");
         AttributeDefRef adr = vendor.makeAttributeDefRef("attr", "some value", new Location("meh", 0));
         cmp.getAttributes().set(Collections.singleton(adr));
 

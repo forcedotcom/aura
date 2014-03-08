@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.AttributeDef.SerializeToType;
@@ -71,6 +72,7 @@ import org.auraframework.impl.root.theme.ThemeDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.instance.BaseComponent;
+import org.auraframework.instance.Component;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.Location;
 import org.auraframework.system.SubDefDescriptor;
@@ -416,9 +418,9 @@ public ClientLibraryDef makeClientLibraryDef(String name, String url,
         return atBuilder.build();
     }
 
-    public ComponentImpl makeComponent(String name, String globalId)
+    public Component makeComponent(String name, String globalId)
                     throws QuickFixException {
-        return new ComponentImpl(DefDescriptorImpl.getInstance(name == null ? defaultComponentName : name,
+        return Aura.getInstanceService().getInstance(DefDescriptorImpl.getInstance(name == null ? defaultComponentName : name,
                                             ComponentDef.class), null);
     }
 

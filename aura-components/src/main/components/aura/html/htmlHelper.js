@@ -167,7 +167,7 @@
                     this.handler(event);
 
                     if (event.type == gesture.end) {
-                        this.preventGhostClick(this.startX, this.startY);
+                        FastClick.preventGhostClick(this.startX, this.startY);
                     }
                     this.reset();
                 },
@@ -177,15 +177,16 @@
 
                     this.startX = 0;
                     this.startY = 0;
-                },
-                preventGhostClick : function(x, y) {
-                    FastClick.clickbusterCoordinates.push(x, y);
-                    window.setTimeout(FastClick.pop, 2500);
-                },
-
-                pop : function() {
-                    FastClick.clickbusterCoordinates.splice(0, 2);
                 }
+            };
+
+            FastClick.preventGhostClick  = function(x, y) {
+                FastClick.clickbusterCoordinates.push(x, y);
+                window.setTimeout(FastClick.pop, 2500);
+            };
+
+            FastClick.pop = function() {
+                FastClick.clickbusterCoordinates.splice(0, 2);
             };
 
             FastClick.onClickBuster = function(event) {

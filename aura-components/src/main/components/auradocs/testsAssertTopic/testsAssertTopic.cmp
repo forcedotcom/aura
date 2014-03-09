@@ -63,11 +63,11 @@
             </tr>
             <tr>
                 <td><code>aura.test.assertEquals(arg1, arg2, assertMessage)</code></td>
-                <td>Checks that <code>arg1 === arg2</code> is <code>true</code>. If the two values are not equal, throws an error with the <code>assertMessage</code>.</td>
+                <td>Checks that <code>arg1 === arg2</code> is <code>true</code>, where <code>arg1</code> is the expected value, and <code>arg2</code> is the actual value. If the two values are not equal, throws an error with the <code>assertMessage</code>.</td>
             </tr>
             <tr>
                 <td><code>aura.test.assertNotEquals(arg1, arg2, assertMessage)</code></td>
-                <td>Checks that <code>arg1 === arg2</code> is <code>false</code>.  If the two values are equal, throws an error with the <code>assertMessage</code>.</td>
+                <td>Checks that <code>arg1 === arg2</code> is <code>false</code>, where <code>arg1</code> is the expected value, and <code>arg2</code> is the actual value.  If the two values are equal, throws an error with the <code>assertMessage</code>.</td>
             </tr>
             <tr>
                 <td><code>aura.test.fail(assertMessage)</code></td>

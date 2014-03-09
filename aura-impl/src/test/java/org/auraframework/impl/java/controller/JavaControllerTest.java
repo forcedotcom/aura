@@ -403,7 +403,7 @@ public class JavaControllerTest extends AuraImplTestCase {
         List<Map<String, Object>> logs;
         TestLoggingAdapterController.beginCapture();
         try {
-            Aura.getServerService().run(new Message<ComponentDef>(actions), null);
+            Aura.getServerService().run(new Message(actions), null);
         } finally {
             Aura.getLoggingService().doLog();
             logs = TestLoggingAdapterController.endCapture();

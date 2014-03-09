@@ -349,7 +349,7 @@ public class AuraServlet extends AuraBaseServlet {
             }
             context.setFrameworkUID(fwUID);
 
-            Message<?> message;
+            Message message;
 
             loggingService.startTimer(LoggingService.TIMER_DESERIALIZATION);
             try {
@@ -387,7 +387,7 @@ public class AuraServlet extends AuraBaseServlet {
                 }
             }
 
-            Message<?> result = serverService.run(message, context);
+            Message result = serverService.run(message, context);
             if (result != null) {
                 loggingService.startTimer(LoggingService.TIMER_SERIALIZATION);
                 loggingService.startTimer(LoggingService.TIMER_SERIALIZATION_AURA);

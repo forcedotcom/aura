@@ -119,7 +119,7 @@ public class IntegrationImpl implements Integration {
                 context.setCurrentAction(previous);
             }
 
-            Message<?> message = new Message<ComponentDef>(Lists.newArrayList(action));
+            Message message = new Message(Lists.newArrayList(action));
 
             try {
                 StringBuilder init = new StringBuilder();

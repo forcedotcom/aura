@@ -31,5 +31,5 @@ import org.auraframework.throwable.quickfix.QuickFixException;
  * </p>
  */
 public interface ServerService extends AuraService {
-    Message<?> run(Message<?> message, AuraContext context) throws QuickFixException, IOException;
+    Message run(Message message, AuraContext context) throws QuickFixException, IOException;
 }

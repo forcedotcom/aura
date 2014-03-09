@@ -35,14 +35,14 @@ public class ServerServiceImpl implements ServerService {
     private static final long serialVersionUID = -2779745160285710414L;
 
     @Override
-    public Message<?> run(final Message<?> message, final AuraContext context) {
-        Message<?> ret = null;
+    public Message run(final Message message, final AuraContext context) {
+        Message ret = null;
 
         if (message != null) {
             List<Action> actions = message.getActions();
             List<Event> clientEvents = Aura.getContextService().getCurrentContext().getClientEvents();
             actions = run(actions);
-            ret = new Message<BaseComponentDef>(actions, clientEvents);
+            ret = new Message(actions, clientEvents);
         }
 
         return ret;

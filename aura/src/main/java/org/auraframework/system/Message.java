@@ -17,11 +17,10 @@ package org.auraframework.system;
 
 import java.util.List;
 
-import org.auraframework.def.BaseComponentDef;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.Event;
 
-public class Message<T extends BaseComponentDef> {
+public class Message {
 
     private final List<Action> actions;
     private final List<Event> clientEvents;

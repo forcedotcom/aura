@@ -129,7 +129,7 @@ public class AuraContextFilter implements Filter {
             ServletException {
         HttpServletRequest request = (HttpServletRequest) req;
 
-        Format f = format.get(request, Format.JSON);
+        Format f = format.get(request);
         Authentication a = access.get(request, Authentication.AUTHENTICATED);
 
         Map<String, Object> configMap = getConfigMap(request);
@@ -140,6 +140,17 @@ public class AuraContextFilter implements Filter {
 
         if (componentDir != null) {
             System.setProperty("aura.componentDir", componentDir);
+        }
+        //
+        // FIXME: our usage of format should be revisited. Most URLs have
+        // a fixed format, so we should have a way of getting that.
+        //
+        if (f == null) {
+            if ("GET".equals(request.getMethod())) {
+                f = Format.HTML;
+            } else {
+                f = Format.JSON;
+            }
         }
         AuraContext context = Aura.getContextService().startContext(m, f, a, appDesc, d);
 

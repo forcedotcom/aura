@@ -16,7 +16,6 @@
 package org.auraframework.impl.source.file;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.Reader;
 import java.util.Set;
 

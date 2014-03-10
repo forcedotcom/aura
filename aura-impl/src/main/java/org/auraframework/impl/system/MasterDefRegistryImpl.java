@@ -1241,7 +1241,8 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 		}
 		
 		if (!status.isEmpty()) {
-			throw new NoAccessException(status);
+			String message = Aura.getConfigAdapter().isProduction() ? DefinitionNotFoundException.getMessage(defType, desc.getName()) : status;
+			throw new NoAccessException(message);
 		}
 	}
     

@@ -62,7 +62,7 @@ public class DefinitionNotFoundException extends AuraValidationException {
         return descriptor;
     }
 
-    private static String getMessage(DefType defType, String defName) {
+    public static String getMessage(DefType defType, String defName) {
         return String.format(messageFormat, defType, defName);
     }
 }

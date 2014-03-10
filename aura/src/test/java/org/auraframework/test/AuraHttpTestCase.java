@@ -418,6 +418,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
         private List<Object> errors;
         private HttpPost post;
         private String rawResponse;
+        private String contextValue;
 
         public ServerAction(String qualifiedName, Map<String, Object> actionParams) {
             this.qualifiedName = qualifiedName;
@@ -429,6 +430,11 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
                 actionParams = Maps.newHashMap();
             }
             actionParams.put(name, value);
+            return this;
+        }
+
+        public ServerAction setContext(String value) {
+            contextValue = value;
             return this;
         }
 
@@ -446,19 +452,19 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
                 params.put("message", jsonMessage);
                 params.put("aura.token", getTestServletConfig().getCsrfToken());
 
-                AuraContext context = Aura.getContextService().getCurrentContext();
-                if (context != null) {
-                    StringBuilder sb = new StringBuilder();
-                    context.setSerializeLastMod(false);
-                    context.setFrameworkUID(Aura.getConfigAdapter().getAuraFrameworkNonce());
-                    Aura.getSerializationService().write(context, null, AuraContext.class, sb, "HTML");
-                    params.put("aura.context", sb.toString());
+                if (contextValue != null) {
+                    params.put("aura.context", contextValue);
                 } else {
-                    //
-                    // We always need an fwuid or we'll reset.
-                    //
-                    params.put("aura.context", String.format("{'fwuid':'%s'}",
-                            Aura.getConfigAdapter().getAuraFrameworkNonce()));
+                    AuraContext context = Aura.getContextService().getCurrentContext();
+                    if (context != null) {
+                        StringBuilder sb = new StringBuilder();
+                        context.setSerializeLastMod(false);
+                        context.setFrameworkUID(Aura.getConfigAdapter().getAuraFrameworkNonce());
+                        Aura.getSerializationService().write(context, null, AuraContext.class, sb, "HTML");
+                        params.put("aura.context", sb.toString());
+                    } else {
+                        params.put("aura.context", getSimpleContext(Format.JSON, false));
+                    }
                 }
                 post = obtainPostMethod("/aura", params);
             }

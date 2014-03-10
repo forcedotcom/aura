@@ -17,10 +17,8 @@ package org.auraframework.service;
 
 import java.util.Set;
 
-import org.auraframework.def.AttributeDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.Definition;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;

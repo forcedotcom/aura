@@ -173,21 +173,14 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
                         URLEncoder.encode("http://any.host/m#someid?param=extra", "UTF-8")), "/m#someid?param=extra");
     }
 
-    public void testNoCacheNoValue() throws Exception {
+    public void testNoCacheNoTag() throws Exception {
         HttpGet get = obtainGetMethod("/aura?aura.tag&nocache");
         HttpResponse response = perform(get);
 
         assertEquals(HttpStatus.SC_OK, getStatusCode(response));
         String responseText = getResponseBody(response);
-        assertTrue(responseText.startsWith(
-                String.format("%s*/{\n  \"message\":\"Unable to process your request",
-                        AuraBaseServlet.CSRF_PROTECT))
-                ||
-                responseText.startsWith(
-                        String.format("%s*/{\n  \"message\":\"An internal server error has occurred",
-                                AuraBaseServlet.CSRF_PROTECT)));
-        assertTrue(responseText
-                .contains("org.auraframework.throwable.AuraRuntimeException: QualifiedName is required for descriptors"));
+        assertTrue("Expected tag error in: "+responseText,
+            responseText.contains("Invalid request, tag must not be empty"));
         get.releaseConnection();
     }
 

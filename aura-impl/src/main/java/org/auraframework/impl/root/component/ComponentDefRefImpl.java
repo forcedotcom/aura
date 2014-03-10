@@ -39,12 +39,10 @@ import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Component;
-import org.auraframework.service.DefinitionService;
 import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.AttributeNotFoundException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
-import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
@@ -251,8 +249,8 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
 
     @Override
     public List<Component> newInstance(BaseComponent<?, ?> valueProvider) throws QuickFixException {
-        return Lists.<Component> newArrayList(new ComponentImpl(getDescriptor(), getAttributeValueList(),
-                valueProvider, localId));
+        Component component = new ComponentImpl(getDescriptor(), getAttributeValueList(), valueProvider, localId);
+		return Lists.<Component> newArrayList(component);
     }
 
     public static class Builder extends DefinitionImpl.RefBuilderImpl<ComponentDef, ComponentDefRef> implements

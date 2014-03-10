@@ -18,27 +18,16 @@ package org.auraframework.system;
 import java.util.List;
 
 import org.auraframework.instance.Action;
-import org.auraframework.instance.Event;
 
 public class Message {
 
     private final List<Action> actions;
-    private final List<Event> clientEvents;
 
     public Message(List<Action> actions) {
-        this(actions, null);
-    }
-
-    public Message(List<Action> actions, List<Event> events) {
         this.actions = actions;
-        this.clientEvents = events;
     }
 
     public List<Action> getActions() {
         return actions;
-    }
-
-    public List<Event> getClientEvents() {
-        return clientEvents;
     }
 }

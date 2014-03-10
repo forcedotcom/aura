@@ -26,7 +26,6 @@ import javax.annotation.concurrent.ThreadSafe;
 import org.auraframework.Aura;
 import org.auraframework.def.ActionDef;
 import org.auraframework.instance.Action;
-import org.auraframework.instance.Event;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.Message;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -81,12 +80,6 @@ public class MessageJSONFormatAdapter extends JSONFormatAdapter<Message> {
 
         m.put("actions", message.getActions());
         m.put("context", c);
-        List<Event> clientEvents = message.getClientEvents();
-        if (clientEvents != null && !clientEvents.isEmpty()) {
-            m.put("events", clientEvents);
-        }
-
         Json.serialize(m, out, c.getJsonSerializationContext());
     }
-
 }

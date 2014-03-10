@@ -191,7 +191,7 @@ SimpleValue.prototype._setValue = function(v, skipChange) {
             this.unobserve(this.observing);  // Implicitly unlink by explicit assignment
         }
     }
-    
+
     if (v instanceof SimpleValue) {
         // The idiom foo.setValue(sv) used to be used to create a "tracking"
         // assignment, albeit buggily, so that semantic is preserved here.
@@ -219,7 +219,7 @@ SimpleValue.prototype._setValue = function(v, skipChange) {
         this.updatePendingValue("change", this);
         this.firePending("change", list);
     }
-    
+
     this.informObservers(this.value);
 };
 

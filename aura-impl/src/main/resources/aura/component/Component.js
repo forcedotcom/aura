@@ -268,8 +268,8 @@ Component.prototype.unwrap = function() {
  * @private
  */
 Component.prototype.findInstancesOf = function(type, ret, cmp){
-    cmp = cmp || this.getSuperest();   
-    
+    cmp = cmp || this.getSuperest();
+
     var body = cmp.get("v.body");
     if(body){
         for(var i=0;i<body.length;i++){
@@ -909,6 +909,10 @@ Component.prototype.set = function (key, value, ignoreChanges) {
         $A.error("Invalid key " + key);
         return;
     }
+    // JBUCH TODO: EXTRAPOLATE THIS TO ALL FACETS
+//    if(key==="v.body"){
+//        v.destroy();
+//    }
     v._setValue(value,ignoreChanges);
 };
 
@@ -1015,7 +1019,11 @@ Component.prototype.isValid = function(expression){
     // JBUCH TODO: TEMPORARY PASSTHROUGH TO HIDE SIMPLEVALUES; isValid("v.value") SHOULD BE HANDLED THROUGH ERROR EVENTS
     if(expression){
         var wrapper=this._getValue(expression);
-        return wrapper&&wrapper.isValid()||false;
+        if(wrapper){
+            if(!wrapper.isValid){return true;}
+            return wrapper.isValid();
+        }
+        return false;
     }
     return !this._scheduledForAsyncDestruction && this.priv;
 };
@@ -1028,7 +1036,7 @@ Component.prototype.isValid = function(expression){
 Component.prototype.setValid = function (expression,valid) {
     // JBUCH TODO: TEMPORARY PASSTHROUGH TO HIDE SIMPLEVALUES; setValid() SHOULD BE HANDLED THROUGH ERROR EVENTS
     var wrapper = this._getValue(expression);
-    if(wrapper){
+    if(wrapper&&wrapper.setValid){
         wrapper.setValid(valid);
     }
 };
@@ -1041,7 +1049,7 @@ Component.prototype.setValid = function (expression,valid) {
 Component.prototype.addErrors = function (expression, errors) {
     // JBUCH TODO: TEMPORARY PASSTHROUGH TO HIDE SIMPLEVALUES; addErrors() SHOULD BE HANDLED THROUGH ERROR EVENTS
     var wrapper = this._getValue(expression);
-    if (wrapper) {
+    if (wrapper&&wrapper.addErrors) {
         wrapper.addErrors(errors);
     }
 };
@@ -1054,7 +1062,7 @@ Component.prototype.addErrors = function (expression, errors) {
 Component.prototype.clearErrors = function (expression) {
     // JBUCH TODO: TEMPORARY PASSTHROUGH TO HIDE SIMPLEVALUES; clearErrors() SHOULD BE HANDLED THROUGH ERROR EVENTS
     var wrapper = this._getValue(expression);
-    if (wrapper) {
+    if (wrapper&&wrapper.clearErrors) {
         wrapper.clearErrors();
     }
 };

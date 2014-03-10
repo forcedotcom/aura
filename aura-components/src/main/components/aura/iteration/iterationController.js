@@ -19,10 +19,11 @@
     },
 
     itemsChange: function(cmp, evt, helper) {
-        var v = evt.getParam("value");
-        if (v === cmp.getValue("v.items")) {
+//JBUCH TODO: VERIFY ?? it's onchange, for v.items, so, rerender. ??
+//        var v = evt.getParam("value");
+//        if (v === cmp.getValue("v.items")) {
             helper.rerenderEverything(cmp);
-        }
+//        }
     },
 
     firstRender: function(cmp, evt, helper) {

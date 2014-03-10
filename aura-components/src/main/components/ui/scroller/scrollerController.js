@@ -15,16 +15,11 @@
  */
 ({
     refresh: function(component, event, helper) {
-        helper.refresh(component);
+       var scroller = helper.getScrollerInstance(component);
+        if (scroller) {
+            scroller.refresh();
+        }
     },
-    
-    locationChange: function(component, event) {
-		var scroller = component._scroller;
-		if (!$A.util.isUndefined(scroller)) {
-			scroller.unbindTransientHandlers();
-		}    	
-    },
-    
     scrollTo: function(component, event, helper) {
     	helper.handleScrollTo(component, event);
     },

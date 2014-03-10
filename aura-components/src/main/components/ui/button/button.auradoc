@@ -29,5 +29,10 @@
 			The visual appearance of buttons is highly configurable, as are text and accessibility attributes.
 		    
 		</p>
-	</aura:description>
+	</aura:description>	
+		<aura:example name="buttonExample" ref="uiExamples:buttonExample" label="Using ui:button">
+    	<p>This example shows a button that displays the input value you enter.</p>
+    	
+	</aura:example>
+	
 </aura:documentation>

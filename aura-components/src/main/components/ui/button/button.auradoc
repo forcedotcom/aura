@@ -30,7 +30,7 @@
 		    
 		</p>
 	</aura:description>	
-		<aura:example name="example" ref="uiExamples:buttonExample" label="Using ui:button">
+		<aura:example name="buttonExample" ref="uiExamples:buttonExample" label="Using ui:button">
     	<p>This example shows a button that displays the input value you enter.</p>
     	
 	</aura:example>

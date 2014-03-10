@@ -19,7 +19,7 @@
         $A.test.assertEquals(1, component._log.length, "unexpected number of change events recorded");
         $A.test.assertEquals(index, component._log[0].index, "unexpected index of change");
         if (value instanceof Array) {
-        	var actual = component._log[0].value.unwrap();
+        	var actual = component._log[0].value;
         	$A.test.assertEquals(value.length, actual.length, "Unexpected value of change length mismatch");
         	for (var i = 0; i < value.length; i++) {
         		// Deal with nested-array support if and when we need it.
@@ -27,7 +27,7 @@
         	}
         } else {
         	// We punt on map support until we need it.
-            $A.test.assertEquals(value, component._log[0].value.unwrap(), "unexpected value of change");
+            $A.test.assertEquals(value, component._log[0].value, "unexpected value of change");
         }
         component._log = undefined; // reset log
     },

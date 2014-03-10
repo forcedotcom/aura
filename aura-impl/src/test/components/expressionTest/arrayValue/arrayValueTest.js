@@ -18,8 +18,46 @@
         $A.test.assertTrue(undefined !== component._log, "change handler not invoked");
         $A.test.assertEquals(1, component._log.length, "unexpected number of change events recorded");
         $A.test.assertEquals(index, component._log[0].index, "unexpected index of change");
-        $A.test.assertEquals(value !== undefined ? value : component.getValue("v.array"), component._log[0].value, "unexpected value of change");
+        this.assertEquivalent(value !== undefined ? value : component.get("v.array"), component._log[0].value, "unexpected value of change");
         component._log = undefined; // reset log
+    },
+
+    assertEquivalent: function(arg1, arg2, msg) {
+        if (msg === undefined) {
+            msg = "";
+        } else {
+            msg = msg + ": ";
+        }
+        var i;
+
+        if (arg1 === undefined || arg2 === undefined) {
+            $A.test.assertEquals(arg1, arg2, msg + "undefined in one but not both");
+            return;
+        }
+        $A.test.assertEquals(arg1 instanceof Object, arg2 instanceof Object, msg + "objects should both be objects (or both not)");
+        $A.test.assertEquals(arg1 instanceof Array, arg2 instanceof Array, msg + "objects should both be arrays (or both not)");
+        if (arg1 instanceof Array) {
+            $A.test.assertEquals(arg1.length, arg2.length, msg + "arrays have different lenghts");
+            if (msg === "") {
+                msg = "array";
+            }
+            for (i = 0; i < arg1.length; ++i) {
+                this.assertEquivalent(arg1[i], arg2[i], msg + "[" + i + "]");
+            }
+        } else if (arg1 instanceof Object) {
+            if (msg === "") {
+                msg = "obj";
+            }
+            for (i in arg1) {
+                $A.test.assertTrue(arg2.hasOwnProperty(i), msg + "[" + i + "] is not in second");
+                this.assertEquivalent(arg1[i], arg2[i], msg + "[" + i + "]");
+            }
+            for (i in arg2) {
+                $A.test.assertTrue(arg1.hasOwnProperty(i), msg + "[" + i + "] is not in first");
+            }
+        } else {
+            $A.test.assertEquals(arg1, arg2, msg);
+        }
     },
 
     assertNoChangeEvent: function(component){
@@ -59,6 +97,7 @@
 	    $A.test.assertUndefinedOrNull(aval.getValue(99))
 	}]
     },
+
     testGetValueAcrossCommitAndRollback:{
 	test:[function(cmp){
 	    var aval = $A.expressionService.create(null, ["Banana"]);
@@ -329,8 +368,6 @@
             $A.test.assertEquals("SimpleValue", val0.toString());
             $A.test.assertEquals("a simple value", val0.unwrap());
             $A.test.assertFalse(val0.isDirty());  // Cleared during addHandlers
-            $A.test.assertEquals(1, component._dirty.length);
-            $A.test.assertEquals(0, component._dirty[0]);
             this.assertChangeEvent(component);
 
             // push onto non-empty array
@@ -341,8 +378,6 @@
             $A.test.assertEquals("MapValue", val1.toString());
             $A.test.assertEquals("some value", val1.get("somekey"));
             $A.test.assertFalse(val1.isDirty());
-            $A.test.assertEquals(1, component._dirty.length);
-            $A.test.assertEquals(1, component._dirty[0]);
             this.assertChangeEvent(component);
 
             // push again, why not?
@@ -355,8 +390,6 @@
             $A.test.assertEquals(2, val2.getLength());
             $A.test.assertEquals("first", val2.get(0));
             $A.test.assertEquals(true, val2.get(1));
-            $A.test.assertEquals(1, component._dirty.length);
-            $A.test.assertEquals(2, component._dirty[0]);
             this.assertChangeEvent(component);
 
             // push a SimpleValue (shouldn't get wrapped)
@@ -364,9 +397,6 @@
             $A.test.assertEquals(4, array.getLength());
             var val = array.getValue(3);
             $A.test.assertEquals("SimpleValue", val.toString());
-            $A.test.assertEquals(2, component._dirty.length);
-            $A.test.assertEquals(0, component._dirty[0]);
-            $A.test.assertEquals(3, component._dirty[1]);
             $A.test.assertEquals("a simple value", val.unwrap());
             this.assertChangeEvent(component);
 
@@ -377,8 +407,6 @@
             $A.test.assertEquals("SimpleValue", val.toString());
             $A.test.assertEquals(null, val.unwrap());
             $A.test.assertFalse(val.isDirty());
-            $A.test.assertEquals(1, component._dirty.length);
-            $A.test.assertEquals(4, component._dirty[0]);
             this.assertChangeEvent(component);
 
             // push undefined
@@ -388,18 +416,12 @@
             $A.test.assertEquals("SimpleValue", val.toString());
             $A.test.assertEquals(undefined, val.unwrap());
             $A.test.assertFalse(val.isDirty());
-            $A.test.assertEquals(1, component._dirty.length);
-            $A.test.assertEquals(5, component._dirty[0]);
             this.assertChangeEvent(component);
 
             array.push();
             $A.test.assertEquals(7, array.getLength());
             val = array.getValue(6);
-            $A.test.assertEquals("SimpleValue", val.toString());
             $A.test.assertEquals(undefined, val.unwrap());
-            $A.test.assertFalse(val.isDirty(), "newly pushed undef isn't dirty");
-            $A.test.assertEquals(1, component._dirty.length);
-            $A.test.assertEquals(6, component._dirty[0]);
             this.assertChangeEvent(component);
         }
     },
@@ -457,18 +479,13 @@
 
             // inserted subvalue, and higher ones, become dirty
             array.commit();  // Clear existing dirty bits
-            var subv = $A.expressionService.create(null, 3);
+            var subv = $A.expressionService.create(null, [ 'a' ]);
             $A.test.assertFalse(subv.isDirty(), "new value was already dirty");
             array.insert(1, subv);
             $A.test.assertFalse(array.getValue(0).isDirty(), "AV.insert dirtied unchanged item 0");
             $A.test.assertTrue(array.getValue(1).isDirty(), "AV.insert didn't dirty (or wrongly cleared) unowned item 1");
             $A.test.assertFalse(array.getValue(2).isDirty(), "AV.insert didn't un-dirty item 2");
             this.assertChangeEvent(component);
-            $A.test.assertEquals(4, component._dirty.length, "Wrong number of dirty subcomponents");
-            $A.test.assertEquals(1, component._dirty[0], "Wrong index of first dirty subcomponent");
-            $A.test.assertEquals(2, component._dirty[1], "Wrong index of first dirty subcomponent");
-            $A.test.assertEquals(3, component._dirty[2], "Wrong index of first dirty subcomponent");
-            $A.test.assertEquals(4, component._dirty[3], "Wrong index of first dirty subcomponent");
 
             array.clear();
             component._log = undefined;
@@ -539,8 +556,6 @@
             $A.test.assertEquals("w", array.get(1));
             $A.test.assertEquals("r", array.get(2));
             this.assertChangeEvent(component);
-            $A.test.assertEquals(1, component._dirty.length, "Removal left wrong number of dirty elements");
-            $A.test.assertEquals(2, component._dirty[0], "First dirty value wasn't index 2");
 
             // remove head
             array.remove(0);
@@ -638,7 +653,7 @@
             $A.log("for item setValue");
             var val = array.getValue(0);
             val.setValue("something");
-            this.assertChangeEvent(component, 0, val);
+            this.assertChangeEvent(component, 0, val.unwrap());
 
             $A.log("for insert");
             array.insert(0, "squeeze");
@@ -664,7 +679,7 @@
 
             $A.log("for updating existing simple value");
             val.setValue("wow");
-            this.assertChangeEvent(component, 0, val);
+            this.assertChangeEvent(component, 0, val.unwrap());
 
             $A.log("for removing existing simple value");
             array.remove(0);
@@ -691,19 +706,19 @@
 
             $A.log("for updating existing array value with push");
             val.push("oval");
-            this.assertChangeEvent(component, 0, val);
+            this.assertChangeEvent(component, 0, val.unwrap());
 
             $A.log("for updating existing array value with insert");
             val.insert(0, "ellipse");
-            this.assertChangeEvent(component, 0, val);
+            this.assertChangeEvent(component, 0, val.unwrap());
 
             $A.log("for updating existing array value with remove");
             val.remove(1);
-            this.assertChangeEvent(component, 0, val);
+            this.assertChangeEvent(component, 0, val.unwrap());
 
             $A.log("for updating existing array value with clear");
             val.clear();
-            this.assertChangeEvent(component, 0, val);
+            this.assertChangeEvent(component, 0, val.unwrap());
 
             $A.log("for removing existing array value");
             array.remove(0);
@@ -730,7 +745,7 @@
 
             $A.log("for updating existing map value with put");
             val.put("speed","20 kmph");
-            this.assertChangeEvent(component, "speed", val.getValue("speed"));
+            this.assertChangeEvent(component, "speed", val.getValue("speed").unwrap());
 
             // TODO: update map with merge should fire change event
 

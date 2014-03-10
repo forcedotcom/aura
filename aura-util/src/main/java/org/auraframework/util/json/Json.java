@@ -329,7 +329,7 @@ public class Json {
         return createJsonStream(out, new DefaultJsonSerializationContext(format, refSupport, nullValues));
     }
 
-    /**
+    /*
      * Creates a Json instance that is suitable for output streaming, one
      * element at a time. This can help avoid building up an entire JavaScript
      * AST all in memory before it gets serialized, which can help cut down
@@ -351,6 +351,20 @@ public class Json {
         }
         final Writer writer = new OutputStreamWriter(out, Charsets.UTF_8);
         return new Json(writer, out, context);
+    }
+
+    /*
+     * Creates a Json instance that is suitable for output streaming, one
+     * element at a time. This can help avoid building up an entire JavaScript
+     * AST all in memory before it gets serialized, which can help cut down
+     * memory use.<br>
+     *
+     * @param out The Appendable to which to write the serialized objects. This must not be null.
+     * @param context The JSON serialization context to use for output
+     * @return A new Json instance that you can use for streaming to the given appendable
+     */
+    public static Json createJsonStream(@Nonnull Appendable out, JsonSerializationContext context) {
+        return new Json(out, null, context);
     }
 
     /**
@@ -816,8 +830,7 @@ public class Json {
      * OutputStream returned by this method. After you do that, call
      * {@link #writeBinaryStreamEnd()}.
      * 
-     * @param streamLength The number of bytes that will exist in the output
-     *            before the ending backtick
+     * @param streamLength The number of bytes that will exist in the output before the ending backtick
      * @return The OutputStream that the caller can write its output to
      */
     public OutputStream writeBinaryStreamBegin(long streamLength) throws IOException {
@@ -830,14 +843,12 @@ public class Json {
         // Signal our binary stream's beginning
         validateBinaryStreamEnabledAndWriteBacktick();
 
-        // Flush the output stream writer to push all pending characters onto
-        // the OutputStream
+        // Flush the output stream writer to push all pending characters onto the OutputStream
         if (out instanceof Writer) {
             ((Writer) out).flush();
         }
 
-        // A JSON+binary stream begins with the length as a big endian 64-bit
-        // long
+        // A JSON+binary stream begins with the length as a big endian 64-bit long
         binaryOutput.writeLong(streamLength);
         currentBinaryStreamLength = streamLength;
 

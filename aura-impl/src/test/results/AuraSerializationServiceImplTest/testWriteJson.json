@@ -10,6 +10,9 @@
           "attr":"yo"
         }
       }
+    },
+    "model":{
+      "value":"yo"
     }
   }
 }

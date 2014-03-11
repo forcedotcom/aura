@@ -75,6 +75,21 @@
                             "serId":8,
                             "value":{
                               "descriptor":"markup://test:child1",
+                              "modelDef":{
+                                "serId":9,
+                                "value":{
+                                  "descriptor":"java://test.model.TestReinitializeModel",
+                                  "members":[
+                                    {
+                                      "serId":10,
+                                      "value":{
+                                        "name":"value",
+                                        "type":"java://java.lang.String"
+                                      }
+                                    }
+                                  ]
+                                }
+                              },
                               "superDef":{
                                 "serRefId":2
                               },
@@ -83,7 +98,7 @@
                                   "serRefId":3
                                 },
                                 {
-                                  "serId":9,
+                                  "serId":11,
                                   "value":{
                                     "descriptor":"attr",
                                     "typeDefDescriptor":"aura://String",
@@ -98,7 +113,27 @@
                                   "value":[
                                     {
                                       "componentDef":{
-                                        "serId":10,
+                                        "serId":12,
+                                        "value":"markup://aura:expression"
+                                      },
+                                      "attributes":{
+                                        "values":{
+                                          "value":{
+                                            "descriptor":"value",
+                                            "value":{
+                                              "exprType":"PROPERTY",
+                                              "path":[
+                                                "m",
+                                                "value"
+                                              ]
+                                            }
+                                          }
+                                        }
+                                      }
+                                    },
+                                    {
+                                      "componentDef":{
+                                        "serId":13,
                                         "value":{
                                           "descriptor":"markup://test:child2",
                                           "superDef":{
@@ -114,7 +149,8 @@
                                     }
                                   ]
                                 }
-                              ]
+                              ],
+                              "hasServerDeps":true
                             }
                           },
                           "attributes":{

@@ -100,4 +100,8 @@ public class ProtoComponentImpl implements Component {
     public String getPath() {
         return null;
     }
+
+	@Override
+	public void reinitializeModel() {
+	}
 }

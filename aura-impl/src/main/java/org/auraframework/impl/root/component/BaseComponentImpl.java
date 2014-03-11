@@ -510,6 +510,24 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
         return path;
     }
 
+    @Override
+    public void reinitializeModel() throws QuickFixException {
+    	createModel();
+    	
+    	I zuper = getSuper();
+    	if (zuper != null) {
+    		zuper.reinitializeModel();
+    	}
+    	
+    	@SuppressWarnings("unchecked")
+        List<BaseComponent<?, ?>> body = (List<BaseComponent<?, ?>>)getAttributes().getValue("body");
+        if (body != null) {
+            for (BaseComponent<?, ?> c : body) {
+            	c.reinitializeModel();
+            }
+        }
+    }
+
     protected final DefDescriptor<D> originalDescriptor;
     protected DefDescriptor<D> descriptor;
     protected DefDescriptor<? extends RootDefinition> intfDescriptor;

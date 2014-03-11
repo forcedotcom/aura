@@ -32,7 +32,7 @@ DefDescriptor.prototype.auraType = "DefDescriptor";
 
 /**
  * Gets the qualified name.
- * @returns {Object}
+ * @returns {String}
  */
 DefDescriptor.prototype.getQualifiedName = function(){
     return this.qualifiedName;
@@ -40,7 +40,7 @@ DefDescriptor.prototype.getQualifiedName = function(){
 
 /**
  * Gets the namespace.
- * @returns {Object} namespace
+ * @returns {String} namespace
  */
 DefDescriptor.prototype.getNamespace = function(){
     return this.namespace;
@@ -48,7 +48,7 @@ DefDescriptor.prototype.getNamespace = function(){
 
 /**
  * Gets the name part of the qualified name.
- * @returns {Object}
+ * @returns {String}
  */
 DefDescriptor.prototype.getName = function(){
     return this.name;
@@ -73,7 +73,7 @@ DefDescriptor.prototype.toString = function(){
 /**
  * Parses a definition descriptor to be split into prefix and names.
  * Not public.
- * @returns {Object}
+ * @returns {Array}
  * @private
  */
 DefDescriptor.prototype.parse = function(config){

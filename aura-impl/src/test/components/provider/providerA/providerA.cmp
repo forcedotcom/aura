@@ -16,5 +16,9 @@
 
 -->
 <aura:component extends="provider:providerBase" >
-  <div>This is provider A</div>
+    <aura:attribute name="attA" type="Boolean" default="false" />
+    <aura:attribute name="type" type="String" default="A" />
+    <div>This is providerA</div>
+    <div>parent attribute [type]: {!v.type}</div>
+    <div>own attribute [attA]: {!v.attA}</div>
 </aura:component>

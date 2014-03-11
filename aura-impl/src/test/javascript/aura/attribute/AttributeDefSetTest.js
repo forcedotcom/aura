@@ -61,22 +61,5 @@ Test.Aura.Attribute.AttributeDefSetTest = function(){
             Assert.True(actual[1] == "item2", "Second item of config not found at second index of array");
             Assert.True(actual[2] == "item3", "Third item of config not found at third index of array");
         }
-
-        [Fact]
-        function PushesBodyAtEndOfValuesArray(){
-            var config = [configItem("item1"), configItem("body"), configItem("item2"), configItem("item3")];
-            var actual;
-
-            mockAttributeDef(function(){
-                var defSet = new AttributeDefSet(null, config);
-                actual = defSet.valuesOrder;
-            });
-
-            Assert.True(actual.length == 4, "Wrong length for values array");
-            Assert.True(actual[0] == "item1", "item1 not found at first index of array");
-            Assert.True(actual[1] == "item2", "item2 not found at second index of array");
-            Assert.True(actual[2] == "item3", "item3 not found at third index of array");
-            Assert.True(actual[3] == "body", "body should be appended to end of array");
-        }
     }
 }

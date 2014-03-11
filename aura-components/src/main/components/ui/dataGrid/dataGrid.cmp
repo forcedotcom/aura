@@ -16,31 +16,8 @@
 
 -->
 <aura:component extensible="true" extends="ui:abstractDataGrid" support="PROTO">
-
-	<aura:attribute name="selectAll" type="Boolean" default="false" description="All selected."/>
-
-	<!-- Private attributes -->
 	<aura:attribute name="priv_rows" type="List" description="Rows constructed manually to wrap items."/>
-	<aura:attribute name="priv_summaryRow" type="Aura.Component[]" description="Row constructed manually to aggregate column items."/>
-	<aura:attribute name="priv_rowSwap" type="Boolean" default="false" description="Notify rows of mass row swap."/>
 
-	<!-- Template facets -->
-	<aura:attribute name="rowTemplate" 
-					type="Aura.ComponentDefRef[]" 
-					required="true" 
-					description="Magical facet which determines the row shape. Cells are injected into it.">
-
-		<ui:dataGridRow row="{!row}" index="{!index}" onitemchange="{!onitemchange}"/>
-	</aura:attribute>
-	
-	<aura:attribute name="cellTemplate" 
-					type="Aura.ComponentDefRef[]" 
-					required="true" 
-					description="Magical facet which determines the cell shape. Data is injected into it.">
-		
-		<ui:dataGridCell row="{!row}"/>
-	</aura:attribute>
-	
 	<aura:handler name="init" value="{!this}" action="{!c.init}"/>
 	<aura:handler name="change" value="{!v.items}" action="{!c.handleItemsChange}" description="This lives here due to a bug in value objects."/>
 
@@ -48,25 +25,14 @@
 	 ~ Default implementation is a table. Consider moving this logic to ui:dataTable 
 	 ~ A dataTable is potentially a concrete of a dataGrid.
 	 -->
-	<table class="{! v.class + ' ' + v.state + ' ' + v.mode + ' ' + v.selectAll }" onclick="{!c.handleClick}">
+	<table class="{! v.class + ' ' + v.state + ' ' + v.mode }" onclick="{!c.handleClick}">
 		<thead>
 			<tr>
 				{!v.columns}
 			</tr>
 		</thead>
-		<tbody>				
-			<aura:iteration aura:id="iteration" 
-							items="{!v.priv_rows}" 
-							var="row" 
-							indexVar="index" 
-							body="{!v.rowTemplate}"
-							rerenderComplete="{!c.handleRerenderComplete}"/>
-
-			<!-- If a summary row exists, render it -->
-			<aura:renderIf isTrue="{! v.priv_summaryRow.length > 0 }">
-				<tr>{! v.priv_summaryRow }</tr>
-			</aura:renderIf>
-		</tbody>
+		<tfoot aura:id="tfoot"></tfoot>
+		<tbody aura:id="tbody"></tbody>
 	</table>	
 
 </aura:component>

@@ -14,27 +14,15 @@
  * limitations under the License.
  */
 ({
-	handleClick: function (cmp, evt) {
-		var el = cmp.getElement(), 
-			click; 
+    afterRender: function (cmp) {
+        var el = cmp.getElement(),
+            attrs = cmp.getAttributes();
 
-		// Dispatch clicks within the action as clicks on the action itself. 
-		// Ignore clicks coming from its own element, those events will bubble correctly.
-		if (evt.target !== el) {
-			evt.stopPropagation();
+        $A.util.setDataAttribute(el, 'action-global-id', cmp.getGlobalId());
+        $A.util.setDataAttribute(el, 'action-name', attrs.getValue('name').getValue()); 
+        $A.util.setDataAttribute(el, 'action-value', attrs.getValue('value').getValue()); 
+        $A.util.setDataAttribute(el, 'item-index', attrs.getValue('index').getValue()); 
 
-			click = new MouseEvent('click', {
-				bubbles: true
-			});
-
-			el.dispatchEvent(click);
-		}
-	},
-
-	handleValueChange: function (cmp, evt) {
-		var el = cmp.getElement(),
-			value = evt.getParam('value').getValue();
-		
-		$A.util.setDataAttribute(el, 'action-value', value); 	
-	}
+        this.superAfterRender(); 
+    }
 })

@@ -34,31 +34,19 @@
 		if (items) {
 			cmp.setValue('v.items', items);	
 		}
-
-		// Dynamically build rowTemplate and rows.
-		hlp.initializeColumns(cmp);
-		hlp.constructSummaryRow(cmp);
-		hlp.deriveItemShape(cmp);
-		hlp.constructTable(cmp); 
-	},
-
-	handleRerenderComplete: function (cmp, evt, hlp) {
-		var concrete = cmp.getConcreteComponent();
 		
-		if (concrete._sorting) {
-			concrete._sorting = false;
-		}
+		hlp.initializeColumns(cmp);
+		hlp.initializeChildren(cmp);
+		hlp.initializeActionDelegate(cmp);
+		hlp.deriveItemShape(cmp);
 	},
 
 	handleItemsChange: function (cmp, evt, hlp) {
 		hlp.handleItemsChange(cmp, evt.getParams());
+
 		if (concrete._sorting) {
 			concrete._sorting = false;
 		}
-	},
-
-	handleItemsChange: function (cmp, evt, hlp) {
-		hlp.handleItemsChange(cmp, evt.getParams());
 	},
 
 	handleColumnSortChange: function (cmp, evt, hlp) {
@@ -68,7 +56,7 @@
 			concrete = cmp.getConcreteComponent();
 
 			concrete._sorting = true;
-			cmp.setValue('v.sortBy', evt);
+			cmp.getSuper().setValue('v.sortBy', evt);
 
 			// 'Fire' action to reset selection.
 			hlp.handleAction(concrete, {
@@ -79,32 +67,19 @@
 	},
 
 	handleClick: function (cmp, evt, hlp) {
-		var name, index, value, globalId, item;
+		var name;
 
-		if (evt.target && evt.target.className === 'action') {
-			hlp.handleAction(cmp, {
-				name 		: $A.util.getDataAttribute(evt.target, 'action-name'),
-				index   	: $A.util.getDataAttribute(evt.target, 'item-index'),
-				value 		: $A.util.getDataAttribute(evt.target, 'action-value'),
-				globalId 	: $A.util.getDataAttribute(evt.target, 'action-global-id')
-			});
-		}
-	},
+		if (evt.target) {
+			name = $A.util.getDataAttribute(evt.target, 'action-name'); 
 
-	onitemchange: function (cmp, evt, hlp) {
-		var item; 
-
-		if (evt) {
-			// Write through changed value.
-			item = cmp.getValue('v.items.' + evt.index);
-			item.getValue(evt.column).setValue(evt.value);
-
-			// TODO: check for required fields!
-
-			cmp.get('v.dataWriter')[0].getSuper().getValue('v.items').push({ 
-				operation	: 'save', 
-				record		: item.unwrap()
-			});
+			if (name) {
+				hlp.handleAction(cmp, {
+					name 		: name,
+					index   	: $A.util.getDataAttribute(evt.target, 'item-index'),
+					value 		: $A.util.getDataAttribute(evt.target, 'action-value'),
+					globalId 	: $A.util.getDataAttribute(evt.target, 'action-global-id')
+				});
+			}
 		}
 	}
 })

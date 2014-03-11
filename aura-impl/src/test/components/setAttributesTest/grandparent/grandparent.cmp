@@ -18,7 +18,8 @@
 <!-- THIS COMPONENT IS USED BY TESTS.  BE PREPARED TO FIX TEST FAILURES IF YOU CHANGE IT. -->
 <aura:component extensible="true" render="client">
 
-    <aura:attribute name="SimpleAttribute" type="string" default="grandparentX"/>
+    <!-- Bug fix make this explicitly java://String to avoid type problems -->
+    <aura:attribute name="SimpleAttribute" type="java://String" default="grandparentX"/>
     <div aura:id='simpleAttr_id'>The value of SimpleAttribute = {!v.SimpleAttribute}</div>
 
     <aura:attribute name="ComponentTypeAttribute" type="Aura.Component[]">

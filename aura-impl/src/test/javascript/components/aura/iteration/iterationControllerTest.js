@@ -90,20 +90,61 @@ Test.Aura.Iteration.ControllerTest = function(){
         	var expected = true;        	
         	var actual;
         	
+        	var passedinValue = {
+        	    isDifferentArray:function(){
+        	        return true;
+        	    }
+        	};
         	var targetCmp={
     			getValue:function(val){
-    				if(val=='v.items') return true;
+    				if(val=='v.items') return passedinValue;
     			}
         	};
         	
         	var targetEvent={
     			getParam:function(param){
-    				if(param=='value') return true;
+    				if(param=='value') return passedinValue;
     			}
         	};
         	
         	var targetHelper={	
     			rerenderEverything:function(cmp){
+    				if(cmp == targetCmp) actual = true;
+    			}    			
+    		};
+        	
+        	// Act
+			targetController.itemsChange(targetCmp, targetEvent, targetHelper);			
+			
+			// Assert
+			Assert.Equal(expected, actual);			
+        }
+        
+        [Fact]
+        function testRerenderSelectiveCalled(){
+        	// Arrange                	
+        	var expected = true;        	
+        	var actual;
+        	
+        	var passedinValue = {
+        	    isDifferentArray:function(){
+        	        return false;
+        	    }
+        	};
+        	var targetCmp={
+    			getValue:function(val){
+    				if(val=='v.items') return passedinValue;
+    			}
+        	};
+        	
+        	var targetEvent={
+    			getParam:function(param){
+    				if(param=='value') return passedinValue;
+    			}
+        	};
+        	
+        	var targetHelper={	
+    			rerenderSelective:function(cmp){
     				if(cmp == targetCmp) actual = true;
     			}    			
     		};

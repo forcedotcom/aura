@@ -236,8 +236,8 @@
 			$A.run(function(){cmp.getAttributes().getValue("list").push("x")});
 			$A.test.addWaitForWithFailureMessage(2, function(){return cmp.find("iterinst").length}, "number of iterations didn't increment");
 		}, function(cmp) {
-			this.assertCreationPath(cmp.find("iterinst")[0], "/*[0]");
-			this.assertCreationPath(cmp.find("iterinst")[0].find("output"), "/*[0]/$/*[0]");
+			this.assertCreationPath(cmp.find("iterinst")[0], "/*[0]/$/*[3]/+[0]/*[0]");
+			this.assertCreationPath(cmp.find("iterinst")[0].find("output"), "/*[0]/$/*[3]/+[0]/*[0]/$/*[0]");
 			this.assertCreationPath(cmp.find("iterinst")[1], "/*[0]");
 			this.assertCreationPath(cmp.find("iterinst")[1].find("output"), "/*[0]/$/*[0]");
 		}]
@@ -265,10 +265,10 @@
 			$A.run(function(){var list = cmp.getAttributes().getValue("list"); list.push("x"); list.push("x");});
 			$A.test.addWaitForWithFailureMessage(4, function(){return cmp.find("iterinst").length}, "number of iterations didn't increment");
 		}, function(cmp) {
-			this.assertCreationPath(cmp.find("iterinst")[0], "/*[0]");
-			this.assertCreationPath(cmp.find("iterinst")[0].find("output"), "/*[0]/$/*[0]");
-			this.assertCreationPath(cmp.find("iterinst")[1], "/*[0]");
-			this.assertCreationPath(cmp.find("iterinst")[1].find("output"), "/*[0]/$/*[0]");
+			this.assertCreationPath(cmp.find("iterinst")[0], "/*[0]/$/*[3]/+[0]/*[0]");
+			this.assertCreationPath(cmp.find("iterinst")[0].find("output"), "/*[0]/$/*[3]/+[0]/*[0]/$/*[0]");
+			this.assertCreationPath(cmp.find("iterinst")[1], "/*[0]/$/*[3]/+[1]/*[0]");
+			this.assertCreationPath(cmp.find("iterinst")[1].find("output"), "/*[0]/$/*[3]/+[1]/*[0]/$/*[0]");
 			this.assertCreationPath(cmp.find("iterinst")[2], "/*[0]");
 			this.assertCreationPath(cmp.find("iterinst")[2].find("output"), "/*[0]/$/*[0]");
 			this.assertCreationPath(cmp.find("iterinst")[3], "/*[0]");

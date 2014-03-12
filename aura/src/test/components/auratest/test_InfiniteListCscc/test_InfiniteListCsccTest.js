@@ -47,18 +47,18 @@
 
             // get collection of buttons
             var btns = component.find("aButton");
-
+            
             // verify initial component state
-            $A.test.assertStartsWith("isClose-false Client", $A.util.getText(btns[0].getElement()));
-            $A.test.assertStartsWith("isClose-false Server 0", $A.util.getText(btns[1].getElement()));
+            $A.test.assertStartsWith("isClose-false Client", $A.util.getText(btns[3].getElement()));
+            $A.test.assertStartsWith("isClose-false Server 0", $A.util.getText(btns[0].getElement()));
 
             // press the first button,  changing what the expression is dependent on
+            btns[3].get("myButton").get("e.press").fire();
             btns[0].get("myButton").get("e.press").fire();
-            btns[1].get("myButton").get("e.press").fire();
 
             // verify underlying data change is picked up
-            $A.test.assertStartsWith("isClosed-true Client", $A.util.getText(btns[0].getElement()));
-            $A.test.assertStartsWith("isClosed-true Server 0", $A.util.getText(btns[1].getElement()));
+            $A.test.assertStartsWith("isClosed-true Client", $A.util.getText(btns[3].getElement()));
+            $A.test.assertStartsWith("isClosed-true Server 0", $A.util.getText(btns[0].getElement()));
         }
     }
 })

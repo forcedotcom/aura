@@ -71,9 +71,9 @@ exp(dlp,
  * @class
  * @constructor
  */
-function Component(config, localCreation, componentCreationContext){
+function Component(config, localCreation, componentCreationContext, isClientCreated){
     this.ccc = componentCreationContext;
-    this.priv = new ComponentPriv(config, this, localCreation);
+    this.priv = new ComponentPriv(config, this, localCreation, isClientCreated);
     this._destroying = false;
     
     //#if {"modes" : ["TESTING","AUTOTESTING", "TESTINGDEBUG", "AUTOTESTINGDEBUG"]}

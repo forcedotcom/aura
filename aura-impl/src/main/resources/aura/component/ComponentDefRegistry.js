@@ -45,9 +45,9 @@ ComponentDefRegistry.prototype.isLocalStorageAvailable= (function() {
  * Returns a ComponentDef instance from registry, or config after adding to the registry.
  * Throws an error if config is not provided.
  * @param {Object} config Passes in a config, a ComponentDef, or the name of a ComponentDef.
- * @param {Object} noInit If set to false, try loading from cache first before
+ * @param {Boolean} noInit If set to false, try loading from cache first before
  * trying to write through of local storage cacheable componentDefs.
- * @returns a ComponentDef instance from registry, or config after adding to registry.
+ * @returns {ComponentDef} a ComponentDef instance from registry, or config after adding to registry.
  */
 ComponentDefRegistry.prototype.getDef = function(config, noInit) {
 	

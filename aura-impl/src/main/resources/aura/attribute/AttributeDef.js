@@ -68,7 +68,7 @@ AttributeDef.prototype.getDefault = function(){
 /**
  * Gets the type of the definition descriptor.
  * @private
- * @returns {Object}
+ * @returns {String}
  */
 AttributeDef.prototype.getTypeDefDescriptor = function(){
     return this.typeDefDescriptor;

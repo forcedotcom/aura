@@ -17,21 +17,21 @@
 -->
 <aura:component extensible="true" abstract="true" extends="ui:interactive"
     description="An abstract class that is extended by input components such as ui:inputCheckbox and ui:inputText." support="GA">
-    <aura:attribute name="required" type="Boolean" default="false" description="Specifies whether the input is required. Default value is &quot;false&quot;. Registers common user interface events such as cut, copy, paste, and field-level validation errors."/>
-    <aura:attribute name="updateOn" type="String" default="change" description="Updates the component's value binding if the updateOn attribute is set to the handled event. Default value is &quot;change&quot;."/>
-    <aura:attribute name="value" type="String" description="The value currently in the input field."/>
+    <aura:attribute name="required" type="Boolean" access="GLOBAL" default="false" description="Specifies whether the input is required. Default value is &quot;false&quot;. Registers common user interface events such as cut, copy, paste, and field-level validation errors."/>
+    <aura:attribute name="updateOn" type="String" access="GLOBAL" default="change" description="Updates the component's value binding if the updateOn attribute is set to the handled event. Default value is &quot;change&quot;."/>
+    <aura:attribute name="value" type="String" access="GLOBAL" description="The value currently in the input field."/>
     <aura:attribute name="type" type="String" description="Specifies the input type. Possible values: button, checkbox, file, hidden, image, password, radio, reset, submit, text, textarea. Corresponds to the type attribute of the rendered HTML input element. Override type in a component that extends this component to set it to a different HTML input type."/>
     <aura:attribute name="errorComponent" type="Aura.Component[]" description="A component that displays any error messages, such as validation errors, associated with the input field."/>
-	<aura:attribute name="label" type="String" description="The text of the label component" />
-	<aura:attribute name="labelClass" type="String" default="" description="The CSS class of the label component" />
-	<aura:attribute name="requiredIndicatorClass" type="String" default="" description="The CSS class of the required indicator component" />
+	<aura:attribute name="label" type="String" access="GLOBAL" description="The text of the label component" />
+	<aura:attribute name="labelClass" access="GLOBAL" type="String" default="" description="The CSS class of the label component" />
+	<aura:attribute name="requiredIndicatorClass" type="String" access="GLOBAL" default="" description="The CSS class of the required indicator component" />
 	<aura:attribute name="labelPosition" type="String" default="left" description="The position in which the label should be displayed. Possible values are &quot;left&quot;, &quot;top&quot;, &quot;right&quot;, &quot;bottom&quot;, and &quot;hidden&quot;. Default value is &quot;left&quot;." />
 		
-    <aura:registerEvent name="change" type="ui:change" description="The event fired when the user changes the content of the input."/>
+    <aura:registerEvent name="change" type="ui:change" access="GLOBAL" description="The event fired when the user changes the content of the input."/>
     <aura:registerEvent name="input" type="ui:inputEvent" description="The event fired when the user enters an input."/>
-    <aura:registerEvent name="copy" type="ui:copy" description="The event fired when the user copies content to the clipboard."/>
-    <aura:registerEvent name="cut" type="ui:cut" description="The event fired when the user cuts content to the clipboard."/>
-    <aura:registerEvent name="paste" type="ui:paste" description="The event fired when the user pastes content from the clipboard."/>
+    <aura:registerEvent name="copy" type="ui:copy" access="GLOBAL" description="The event fired when the user copies content to the clipboard."/>
+    <aura:registerEvent name="cut" type="ui:cut" access="GLOBAL" description="The event fired when the user cuts content to the clipboard."/>
+    <aura:registerEvent name="paste" type="ui:paste" access="GLOBAL" description="The event fired when the user pastes content from the clipboard."/>
 
     <aura:registerEvent name="onError" type="ui:validationError" description="The event fired when there is validation error(s) on the component."/>
     <aura:registerEvent name="onClearErrors" type="ui:clearErrors" description="The event fired when we should clean up the validation error(s)."/>

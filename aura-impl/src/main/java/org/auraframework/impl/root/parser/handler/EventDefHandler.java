@@ -97,6 +97,8 @@ public class EventDefHandler extends RootTagHandler<EventDef> {
         if (builder.eventType == null) {
             error("Event type attribute was invalid: %s", typeString);
         }
+        
+        builder.setAccess(readAccessAttribute());
     }
 
     @Override

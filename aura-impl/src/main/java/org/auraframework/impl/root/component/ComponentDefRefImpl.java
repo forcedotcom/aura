@@ -39,6 +39,7 @@ import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Component;
+import org.auraframework.system.AuraContext;
 import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.AttributeNotFoundException;
@@ -142,6 +143,9 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
      * @param specifiedAttributes the attributes specified in the comp
      */
     private void validateAttributesValues() throws QuickFixException, AttributeNotFoundException {
+        AuraContext context = Aura.getContextService().getCurrentContext();
+        DefDescriptor<?> referencingDesc = context.getCurrentCaller();
+        
         RootDefinition rootDef = getComponentDef();
         Map<DefDescriptor<AttributeDef>, AttributeDef> atts = rootDef.getAttributeDefs();
         Map<String, RegisterEventDef> registeredEvents = rootDef.getRegisterEventDefs();
@@ -158,7 +162,10 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
                             getLocation());
                 }
             } else {
-            	registry.assertAccess(descriptor, attributeDef);
+            	if (referencingDesc != null) {
+	            	// Validate that the referencing component has access to the attribute
+	            	registry.assertAccess(referencingDesc, attributeDef);
+            	}
             	
                 // so it was an attribute, make sure to parse it
                 entry.getValue().parseValue(attributeDef.getTypeDef());

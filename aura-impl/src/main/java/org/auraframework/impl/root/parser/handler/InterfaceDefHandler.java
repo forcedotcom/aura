@@ -104,6 +104,8 @@ public class InterfaceDefHandler extends RootTagHandler<InterfaceDef> {
                 builder.addProvider(apexDescriptor.getQualifiedName());
             }
         }
+        
+        builder.setAccess(readAccessAttribute());
     }
 
     @Override

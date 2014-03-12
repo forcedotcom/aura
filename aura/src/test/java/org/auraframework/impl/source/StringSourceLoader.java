@@ -33,6 +33,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
+import org.auraframework.def.DocumentationDef;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.HelperDef;
 import org.auraframework.def.InterfaceDef;
@@ -333,6 +334,7 @@ public class StringSourceLoader implements SourceLoader {
         RENDERER(RendererDef.class, Format.JS, DefDescriptor.JAVASCRIPT_PREFIX, "."),
         STYLE(StyleDef.class, Format.CSS, DefDescriptor.CSS_PREFIX, "."),
         TESTSUITE(TestSuiteDef.class, Format.JS, DefDescriptor.JAVASCRIPT_PREFIX, "."),
+        DOCUMENTATION(DocumentationDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
         THEME(ThemeDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":");
 
         private static Map<Class<? extends Definition>, DescriptorInfo> infoMap;

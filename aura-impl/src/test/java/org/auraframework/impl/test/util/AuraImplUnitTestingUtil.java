@@ -39,6 +39,7 @@ import org.auraframework.def.Definition;
 import org.auraframework.def.Definition.Visibility;
 import org.auraframework.def.DefinitionAccess;
 import org.auraframework.def.DependencyDef;
+import org.auraframework.def.DocumentationDef;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.EventHandlerDef;
 import org.auraframework.def.EventType;
@@ -130,6 +131,11 @@ public class AuraImplUnitTestingUtil {
             return DefDescriptorImpl.getInstance("test:fakeComponent",
                             ComponentDef.class);
     }
+    
+    public DefDescriptor<DocumentationDef> getDocumentationDefDescriptor() {
+        return DefDescriptorImpl.getInstance("test:fakeDoc",
+                        DocumentationDef.class);
+}
 
     public DefDescriptor<ComponentDef> getParentComponentDefDescriptor() {
             return DefDescriptorImpl.getInstance("test:fakeComponentParent",

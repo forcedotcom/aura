@@ -25,6 +25,7 @@ import java.util.Map;
 import org.auraframework.util.javascript.Literal;
 import org.auraframework.util.json.Json.Serialization;
 import org.auraframework.util.json.Json.Serialization.ReferenceType;
+import org.auraframework.util.json.Json.Serialization.ReferenceScope;
 
 public class DefaultJsonSerializer implements JsonSerializer<Object> {
     @Override
@@ -34,6 +35,15 @@ public class DefaultJsonSerializer implements JsonSerializer<Object> {
             return serialization.referenceType();
         }
         return ReferenceType.NONE;
+    }
+
+    @Override
+    public ReferenceScope getReferenceScope(Object value) {
+        Serialization serialization = value.getClass().getAnnotation(Serialization.class);
+        if (serialization != null) {
+            return serialization.referenceScope();
+        }
+        return ReferenceScope.ACTION;
     }
 
     /**

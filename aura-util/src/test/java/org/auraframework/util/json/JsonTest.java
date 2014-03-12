@@ -162,21 +162,6 @@ public class JsonTest extends UnitTestCase {
                 Json.serialize(objArray2, false, true));
     }
 
-    public void testSerializeEqualityReferenceType() throws IOException {
-        JsonEqualitySerializableTest obj1 = new JsonEqualitySerializableTest(1);
-        JsonEqualitySerializableTest obj2 = new JsonEqualitySerializableTest(1);
-        JsonEqualitySerializableTest obj3 = new JsonEqualitySerializableTest(2);
-        JsonEqualitySerializableTest[] objArray = { obj1, obj2 };
-        // Testing when obj1.equals(obj2)
-        assertEquals("[{\"serId\":1,\"value\":\"JsonEqualitySerializableTest serialized string\"},{\"serRefId\":1}]",
-                Json.serialize(objArray, false, true));
-        JsonEqualitySerializableTest[] objArray2 = { obj1, obj3 };
-        // Testing when !obj1.equals(obj3)
-        assertEquals(
-                "[{\"serId\":1,\"value\":\"JsonEqualitySerializableTest serialized string\"},{\"serId\":2,\"value\":\"JsonEqualitySerializableTest serialized string\"}]",
-                Json.serialize(objArray2, false, true));
-    }
-
     public void testWriteMapBegin() throws IOException {
         Json json = new Json(new StringBuilder(), false, false);
         json.writeMapBegin();

@@ -104,6 +104,10 @@ public class ServerServiceImpl implements ServerService {
             loggingService.startAction(aap);
             Action oldAction = context.setCurrentAction(action);
             try {
+                //
+                // We clear out action centric references here.
+                //
+                json.clearReferences();
                 // DCHASMAN TODO Look into a common base for Action
                 // implementations that we can move the call to
                 // context.setCurrentAction() into!

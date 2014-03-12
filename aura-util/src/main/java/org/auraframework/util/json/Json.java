@@ -43,6 +43,7 @@ import javax.annotation.Nonnull;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.UncloseableOutputStream;
 import org.auraframework.util.json.Json.Serialization.ReferenceType;
+import org.auraframework.util.json.Json.Serialization.ReferenceScope;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
@@ -155,8 +156,8 @@ public class Json {
     }
 
     private final JsonSerializationContext serializationContext;
-    private final Map<Object, Integer> equalityMap;
-    private final Map<Object, Integer> identityMap;
+    private final Map<Object, Integer> actionMap;
+    private final Map<Object, Integer> requestMap;
     private int lastRefId = 0;
     private final Appendable out;
     private final ArrayDeque<IndentEntry> indentStack = new ArrayDeque<IndentEntry>();
@@ -185,11 +186,11 @@ public class Json {
 
         // No need to create the maps if we're not doing the ref stuff
         if (this.serializationContext.refSupport()) {
-            equalityMap = new HashMap<Object, Integer>();
-            identityMap = new IdentityHashMap<Object, Integer>();
+            actionMap = new IdentityHashMap<Object, Integer>();
+            requestMap = new IdentityHashMap<Object, Integer>();
         } else {
-            equalityMap = null;
-            identityMap = null;
+            actionMap = null;
+            requestMap = null;
         }
 
         // Set binaryOutput to a DataOutputStream if applicable; otherwise, null
@@ -212,12 +213,6 @@ public class Json {
             NONE,
 
             /**
-             * If a.equals(b), just output serRefId=<the refId of the object>
-             * after the first time it's output
-             */
-            EQUALITY,
-
-            /**
              * If a == b, just output serRefId=<the refId of the object> after
              * the first time it's output
              */
@@ -225,6 +220,20 @@ public class Json {
         }
 
         ReferenceType referenceType() default ReferenceType.NONE;
+
+        public enum ReferenceScope {
+            /**
+             * the reference is available for the entire request.
+             */
+            REQUEST,
+
+            /**
+             * The reference is only internal tothe current action.
+             */
+            ACTION
+        }
+
+        ReferenceScope referenceScope() default ReferenceScope.ACTION;
     }
 
     /**
@@ -383,31 +392,42 @@ public class Json {
     /**
      * If refSupport is on, track the object for later equality/identity checks
      * 
-     * @param value
+     * @param rs the reference scope for the object.
+     * @param value the value for which we are storing a reference.
      * @return
      */
-    private Integer addReference(ReferenceType rt, Object value) {
+    private Integer addReference(ReferenceScope rs, Object value) {
         int ret = ++lastRefId;
-        Map<Object, Integer> m = rt == ReferenceType.IDENTITY ? identityMap : equalityMap;
+        Map<Object, Integer> m = (rs == ReferenceScope.ACTION) ? actionMap : requestMap;
         m.put(value, ret);
         return ret;
     }
 
     /**
-     * @param value
-     * @return The refId previously assigned to the value, or null if none has
-     *         been assigned yet.
+     * If refSupport is on, clear a set of objects from the references.
+     * 
+     * @param values the values to remove.
      */
-    protected Integer getRefId(ReferenceType rt, Object value) {
-        switch (rt) {
-        case EQUALITY:
-            return equalityMap.get(value);
-        case IDENTITY:
-            return identityMap.get(value);
-        case NONE:
-        default:
-            return null;
+    public void clearReferences() {
+        if (!serializationContext.refSupport()) {
+            return;
         }
+        actionMap.clear();
+    }
+
+    /**
+     * @param rs the scope for the reference
+     * @param value the value for which we want a reference.
+     * @return The refId previously assigned to the value, or null if none has been assigned yet.
+     */
+    protected Integer getRefId(ReferenceScope rs, Object value) {
+        switch (rs) {
+        case ACTION:
+            return actionMap.get(value);
+        case REQUEST:
+            return requestMap.get(value);
+        }
+        return null;
     }
 
     /**
@@ -629,13 +649,13 @@ public class Json {
         ReferenceType rt = serializationContext.refSupport() ? serializer.getReferenceType(value) : ReferenceType.NONE;
         if (rt != ReferenceType.NONE) {
             Integer refId;
-            if ((refId = getRefId(rt, value)) != null) {
+            if ((refId = getRefId(serializer.getReferenceScope(value), value)) != null) {
                 // Output a simple reference
                 writeMapBegin();
                 writeMapEntry(REF_INDICATOR, refId);
                 writeMapEnd();
             } else {
-                refId = addReference(rt, value);
+                refId = addReference(serializer.getReferenceScope(value), value);
                 // Now manually output this 2-element map to avoid loop
                 writeMapBegin();
                 writeMapEntry(ID_INDICATOR, refId);

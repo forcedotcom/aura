@@ -17,6 +17,15 @@
 -->
 <aura:component extends="auradocs:topicPanel">
     <aura:set attribute="title" value="Aura Demos"/>
+    <h2>TodoMVC</h2>
+    <p>The TodoMVC app demonstrates the core concepts of the Aura framework.</p>
+    <p>
+        <ui:outputURL value="https://github.com/forcedotcom/aura-todomvc" label="Get the source">Get the source</ui:outputURL>
+    </p>
+    
+     <p><ui:image src="/auraFW/resources/aura/images/todomvc.png" alt="TodoMVC App" /></p>
+    
+    <h2>Aura Note</h2>
 
     <p>Aura Note is a note-taking app showcasing the simplicity of building apps on Aura.</p>
     <p>
@@ -24,6 +33,8 @@
     </p>
    
     <p><ui:image src="/auraFW/resources/aura/images/auraNoteDemo.png" alt="Aura Note App" /></p>
-    <auradocs:info>For a full list of demos, see the <ui:outputURL value="/auradocs#demos" label="Demos tab"/>.</auradocs:info>
+    
+    
+    <auradocs:info>See the <ui:outputURL value="/auradocs#demos" label="Demos tab"/> for more demos.</auradocs:info>
 
 </aura:component>

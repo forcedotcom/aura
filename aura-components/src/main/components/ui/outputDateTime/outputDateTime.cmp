@@ -16,10 +16,10 @@
 
 -->
 <aura:component extends="ui:output" implements="ui:outputDateComponent" extensible="true" support="GA"
-    description="Displays a date, time in a specified or default format based on the user's locale.">
+    access="GLOBAL" description="Displays a date, time in a specified or default format based on the user's locale.">
       
-    <aura:attribute name="timezone" type="String" default="{!$Locale.timezone}" description="The timezone ID, for example, America/Los_Angeles."/>
-    <aura:attribute name="value" type="String" required="true" 
+    <aura:attribute name="timezone" type="String" default="{!$Locale.timezone}" access="GLOBAL" description="The timezone ID, for example, America/Los_Angeles."/>
+    <aura:attribute name="value" type="String" required="true" access="GLOBAL" 
                     description="An ISO8601-formatted string representing a date time."/>
     
     <span aura:id="span" class="{!v.class}"></span>

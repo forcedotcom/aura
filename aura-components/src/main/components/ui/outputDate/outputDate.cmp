@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:output" implements="ui:outputDateComponent" extensible="true" support="GA" description="Displays a date in the default or specified format based on the user's locale.">
-    <aura:attribute name="value" type="String" required="true" description="The output value of the date. It should be a date string in ISO-8601 format (YYYY-MM-DD)."/>
+<aura:component extends="ui:output" implements="ui:outputDateComponent" extensible="true" support="GA" access="GLOBAL" description="Displays a date in the default or specified format based on the user's locale.">
+    <aura:attribute name="value" type="String" required="true" access="GLOBAL" description="The output value of the date. It should be a date string in ISO-8601 format (YYYY-MM-DD)."/>
     <span aura:id="span" class="{!v.class}"></span>
 </aura:component>

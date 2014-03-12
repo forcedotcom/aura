@@ -16,6 +16,6 @@
 
 -->
 <aura:interface support="GA" description="Common interface across date components.">
-    <aura:attribute name="format" type="String" description="A string (pattern letters are defined in java.text.SimpleDateFormat) used to format the date and time of the value attribute."/>
-    <aura:attribute name="langLocale" type="String" description="The language locale used to format date value."/>
+    <aura:attribute name="format" type="String" access="GLOBAL" description="A string (pattern letters are defined in java.text.SimpleDateFormat) used to format the date and time of the value attribute."/>
+    <aura:attribute name="langLocale" type="String" access="GLOBAL" description="The language locale used to format date value."/>
 </aura:interface>

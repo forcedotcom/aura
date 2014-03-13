@@ -16,14 +16,39 @@
 package org.auraframework.test;
 
 import org.auraframework.system.AuraContext.Access;
+import org.auraframework.system.AuraContext.Authentication;
 
 /**
  * Static Methods for testing access attribute 
  */
 public class TestAccessMethods {
 	
+	public static String invalid() {
+		return "BLAH";
+	}
+	
 	public static Access allowGlobal() {
 		return Access.GLOBAL;
 	}
-
+	
+	public static Access allowPublic() {
+		return Access.PUBLIC;
+	}
+	
+	public static Access allowPrivate() {
+		return Access.PRIVATE;
+	}
+	
+	public static Access allowInternal() {
+		return Access.INTERNAL;
+	}
+	
+	public static Authentication allowAuthenticated() {
+		return Authentication.AUTHENTICATED;
+	}
+	
+	public static Authentication allowUnAuthenticated() {
+		return Authentication.UNAUTHENTICATED;
+	}
+	
 }

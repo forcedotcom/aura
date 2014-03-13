@@ -126,8 +126,22 @@ public class AuraTestingUtil {
      */
     public <T extends Definition> DefDescriptor<T> addSourceAutoCleanup(Class<T> defClass, String contents,
             String namePrefix) {
+        return addSourceAutoCleanup(defClass, contents, namePrefix, true);
+    }
+    
+    /**
+     * Convenience method to create a description and load a source in one shot.
+     * 
+     * @param defClass interface of the definition represented by this source
+     * @param contents source contents
+     * @param namePrefix package name prefix
+     * @param isPrivilegedNamespace if true, namespace is privileged
+     * @return the {@link DefDescriptor} for the created definition
+     */
+    public <T extends Definition> DefDescriptor<T> addSourceAutoCleanup(Class<T> defClass, String contents,
+            String namePrefix, boolean isPrivilegedNamespace) {
         StringSourceLoader loader = StringSourceLoader.getInstance();
-        DefDescriptor<T> descriptor = loader.addSource(defClass, contents, namePrefix).getDescriptor();
+        DefDescriptor<T> descriptor = loader.addSource(defClass, contents, namePrefix, isPrivilegedNamespace).getDescriptor();
         markForCleanup(descriptor);
         return descriptor;
     }

@@ -79,21 +79,18 @@
         	//open List Sorter
         	this.openListSorter(trigger,listSorter);
         }, function(cmp) {
-        	this.pressSortOrderButtonAndAssert(listSorter,"asc");
+        	this.selectSortByColumnAndAssert(listSorter, 1, "asc");
         }, function(cmp) {
-        	this.pressSortOrderButtonAndAssert(listSorter,"dec");
+        	this.selectSortByColumnAndAssert(listSorter, 2, "desc");
         }, function(cmp) {
-        	this.pressSortOrderButtonAndAssert(listSorter,"asc");
+        	this.selectSortByColumnAndAssert(listSorter, 4, "asc");
         }, function(cmp) {
-        	this.selectSortByColumnAndAssert(listSorter, 1);
-        }, function(cmp) {
-        	this.selectSortByColumnAndAssert(listSorter, 2);
-        }, function(cmp) {
-        	this.selectSortByColumnAndAssert(listSorter, 4);
-        }, function(cmp) {
-        	//Use cancel button to close the sorter
-        	this.closeSorter(listSorter);
-        	this.assertCancelEventFired(cmp);
+        	//click on Apply button
+        	this.pressApply(listSorter);
+        	var expectedSortOrder = "Column4 : A-Z";
+        	sortApplied = this.getSortOrderApplied(cmp,"defaultListSorter");
+        	$A.test.assertEquals(expectedSortOrder, sortApplied, "Sort not applied correctly after apply button was pressed.");
+        
     	}]
     },
     
@@ -137,10 +134,7 @@
         	this.openListSorter(trigger,listSorter);
         }, function(cmp) {
         	//Select column 4
-        	this.selectSortByColumnAndAssert(listSorter, 4);
-        }, function(cmp) {
-        	//Sort by order A-Z
-        	this.pressSortOrderButtonAndAssert(listSorter,"asc");
+        	this.selectSortByColumnAndAssert(listSorter, 4, "desc");
         }, function(cmp) {
         	//Use cancel button to close the sorter
         	this.closeSorter(listSorter);
@@ -188,63 +182,59 @@
      * Also make sure column selected is the active element on the page
      */
     verifyDefaultBehviour: function(listSorter){
-    	var sortOrderButton = listSorter.find("decBtn").getElement();
-    	//Verify Z-A buton selected
-    	$A.test.assertTrue($A.util.hasClass(sortOrderButton,"selected"), "By Defauly Z-A Button should be selected");
-    	//verify Sort Order label is correct
-    	var sortOrderLabelValue = this.getSortOrderLabel(listSorter);
+    	var menuItems =  this.getDisplayedColumns(listSorter);
+    	var selectedColumnAndSortOrder = this.getSelectedColumnsAndSortOrder(menuItems);
+    	var selectedColumn = selectedColumnAndSortOrder.split(":")[0];
+    	var selectedSortOrder = selectedColumnAndSortOrder.split(":")[1];
     	var defaultCoumn = "Column 2";
     	var defaultOrder = "Z-A"
     	var defaultSortOrder = defaultCoumn + ":" + defaultOrder;
-    	$A.test.assertEquals(defaultSortOrder, sortOrderLabelValue, "Default Sort order Label displayed is not correct");
-    	//column2 to should be selected by default
-    	var menuItems =  this.getDisplayedColumns(listSorter);
-    	var selectedColumn = this.getSelectedColumns(menuItems);
-    	$A.test.assertEquals(defaultCoumn, selectedColumn, "Default Selected column is not correct");
+    	//verify by default column2 Z-A is selected
+    	$A.test.assertEquals(defaultCoumn, selectedColumn, "Default Column selected is not correct");
+    	$A.test.assertEquals(defaultOrder, selectedSortOrder, "Default Sort Order selected is not correct");
     	//active element should be column 2
-    	$A.test.assertEquals(defaultCoumn, $A.test.getActiveElementText(), "Default column 2 should be active element");
+    	var activeElement = $A.test.getActiveElementText();
+    	$A.test.assertTrue(activeElement.indexOf(defaultCoumn) !=-1, "By Default column 2 should be active element");
     },
     
     /**
-     * select sortBy column and make sure its checked on the sort menu
+     * select sortBy column and Sort order and make sure its checked on the sort menu
+     * pass in sortOrder ="asc" for A-Z and "desc" for Z-A
      */
-    selectSortByColumnAndAssert: function(listSorter, columnNumber){
+    selectSortByColumnAndAssert: function(listSorter, columnNumber, sortOrder){
     	var menuItem = this.getMenuItemByColumnNumber(listSorter,columnNumber);
+    	var expectedSortOrder = "A-Z";
     	menuItem.get('e.click').fire();
     	var expectedColumn = "Column " + columnNumber;
+    	var menuItems =  this.getDisplayedColumns(listSorter);
+    	var selectedColumnAndSortOrder = this.getSelectedColumnsAndSortOrder(menuItems);
     	$A.test.addWaitForWithFailureMessage(expectedColumn, function(){
-			var actualSelectedItemOutput = $A.test.getText(listSorter.find("selectedItemOutput").getElement());
-    		return actualSelectedItemOutput;
+    		var selectedColumn = selectedColumnAndSortOrder.split(":")[0];
+        	return selectedColumn;
 			}, "Wrong Selected field displayed on Dialog");
-    	//TODO: Uncomment below line after W-1985179 is fix
-    	//$A.test.assertEquals(expectedColumn, $A.test.getActiveElementText(), expectedColumn + " should be focused");
+    	var isAscending = menuItem.getValue("v.isascending").getBooleanValue();
+		if(sortOrder.indexOf("desc") != -1){
+    		if(isAscending){
+    			//fire event so that it would change it to descending
+    			menuItem.get('e.click').fire();
+    		}
+    		expectedSortOrder = "Z-A";
+    	}else{
+    		if(!isAscending){
+    			//fire event on the item so that it will change it to ascending
+    			menuItem.get('e.click').fire();
+    		}
+        }
+    	menuItems =  this.getDisplayedColumns(listSorter);
+    	selectedColumnAndSortOrder = this.getSelectedColumnsAndSortOrder(menuItems);
+    	//verify sort order is selected properly
+    	$A.test.addWaitForWithFailureMessage(expectedSortOrder, function(){
+    		var actualSortOrder = selectedColumnAndSortOrder.split(":")[1];
+        	return actualSortOrder;
+			}, "Sort Order selected is not correct");
     },
     
-    /**
-     * Click on pressSortOrderButton, pass in sortOrder ="asc" for A-Z and "dec" for Z-A
-     */
-    pressSortOrderButtonAndAssert : function(listSorter, sortOrder) {
-    	var sortOrderButton = listSorter.find(sortOrder + "Btn").getElement();
-		$A.test.clickOrTouch(sortOrderButton);
-    	this.assertSortOrderOutput(listSorter, sortOrder);
-    	$A.test.assertTrue($A.util.hasClass(sortOrderButton,"selected"), sortOrder + "Button should be selected");
-    },
-	
 	/**
-	 * Assert correct order is displayed on the page
-	 */
-	assertSortOrderOutput: function(listSorter, sortOrder){
-		var expectedSortOrderOutput = "Z-A";
-		if(sortOrder == "asc"){
-			expectedSortOrderOutput = "A-Z";
-		}
-		$A.test.addWaitForWithFailureMessage(expectedSortOrderOutput, function(){
-			var actualSortOuput = $A.test.getText(listSorter.find("selectedSortOrderOutput").getElement());
-    		return actualSortOuput;
-			}, "Wrong Sort Order displayed on Dialog");
-	},
-	
-    /**
      * Return the field name and order which got applied after apply button was pressed
      */
     getSortOrderApplied: function(cmp, resultCmpId){
@@ -298,16 +288,6 @@
     },
     
     /**
-     * Return the sortOrderLabel which is SelectedItem:SortOrder
-     */
-    getSortOrderLabel: function(listSorter){
-    	var selectedField = $A.test.getText(listSorter.find("selectedItemOutput").getElement());
-    	var selectedSortOrderOutput = $A.test.getText(listSorter.find("selectedSortOrderOutput").getElement());
-    	var sortOrderLabel = selectedField + ":" + selectedSortOrderOutput;
-    	return sortOrderLabel;
-    },
-    
-    /**
      * Get all display columns including hidden one from the model
      */
     getColumnsFromModel: function(listSorter){
@@ -336,12 +316,14 @@
         return menuItems;
     },
     
-    getSelectedColumns: function(menuItems){
+    getSelectedColumnsAndSortOrder: function(menuItems){
     	var values = [];
         for (var i = 0; i < menuItems.getLength(); i++) {
             var c = menuItems.getValue(i);
             if (c.get("v.selected") === true) {
-                values.push(c.get("v.label"));
+            	var label = c.get("v.label");
+            	var selectedSortOrder = c.get("v.isascending") ? "A-Z" : "Z-A";
+            	values.push(label + ":" + selectedSortOrder);
             }
         }
         return values.join(",");
@@ -388,9 +370,5 @@
     	var hiddenColumnLabel = "Hidden Column";
     	$A.test.assertEquals(sortableColumnsFromModel.join(","), columnsFromUI.join(","), "Some columns are missing in UI Sorter which are sortable")
     	$A.test.assertFalse(hiddenColumnLabel.indexOf(columnsFromUI.join(",")) != -1, "Hidden Column should not be displayed on the page, list of columns diplayed:" + columnsFromUI.join(","))
-//    	this.getMenuItemByColumnNumber(listSorter,1);
-//    	this.getDefaultOrderByListFromModel(listSorter);
-//    	menuItems=  this.getDisplayedColumns(listSorter);
-//    	selectedColumn = this.getSelectedColumns(menuItems);
     }
 })

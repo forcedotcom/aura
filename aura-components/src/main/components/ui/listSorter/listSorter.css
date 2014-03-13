@@ -120,63 +120,13 @@
 	top: 42px;
 } 
 
-.THIS .sortOrderPicker {
-	margin: 0 auto;
-	padding: 28px 0;
-	text-align: center;
-	vertical-align: middle;
-	border-bottom: 1px solid #eceef0;	
-}
-
-.THIS .sortOrderPicker .output{	
-	padding-top: 14px;	
-}
-
-.THIS .sortOrderPicker .selectedOutput {
-	display: block;
-}
-
-.THIS .sortOrderPicker .ascButton, .THIS .sortOrderPicker .decButton {	
-	display: inline-block;	
-	width: 60px;
-	height: 40px;
-	line-height: 40px;
-}
-
-.THIS .sortOrderPicker .button {
-	border: 1px solid #bbc0c4;
-	border-radius: 5px;
-	background: -moz-linear-gradient(#ffffff,#f1f1f1);
-	background: -webkit-linear-gradient(#ffffff,#f1f1f1);
-	background: -ms-linear-gradient(#ffffff,#f1f1f1);
-	background: linear-gradient(#ffffff,#f1f1f1);
-	box-shadow: none;
-}
-
-.THIS .sortOrderPicker a:hover, .THIS .sortOrderPicker a.selected {
-	background: #e9e9e9;
-}
-
-.THIS .sortOrderPicker .ascButton {
-	border: 1px solid #BBC0C4;
-	border-radius: 2px 0 0 2px;
-}
-
-.THIS .sortOrderPicker .decButton {
-	border-top: 1px solid #BBC0C4;
-	border-right: 1px solid #BBC0C4;
-	border-bottom: 1px solid #BBC0C4;
-	border-radius: 0 2px 2px 0;
-}
-
 .THIS div.uiMenuList {
 	position: relative;	
-	box-shadow: none;		
+	box-shadow: none;
+	background-color: #f0f1f2;		
 }
 
 .THIS div.uiMenuList li a {
-	padding-top: 14px;
-	padding-bottom: 12px;
 	display: block;
 }
 
@@ -211,10 +161,4 @@
 	opacity: 0.7;
 	z-index: 9999;
     display: none;
-}
- 
-
-.THIS .uiRadioMenuItem a b {
-	float: right;
-	margin-left: 10px;
 }

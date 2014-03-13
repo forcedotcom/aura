@@ -14,14 +14,7 @@
  * limitations under the License.
  */
 ({
-    handleClick : function(component, event, helper) {
-    	var concrete = component.getConcreteComponent();
-        var concreteHelper = concrete.getDef().getHelper();
-        
-        concreteHelper.handleClick(concrete);
-
-        // Un-select the previously selected item
-        helper.uncheckSiblings(concrete);
-        helper.fireSelectEvent(component, event);
-    }
+	updateDirection: function(cmp, evt, helper) {
+		helper.updateDirection(cmp);
+	}
 })

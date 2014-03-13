@@ -512,18 +512,23 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
 
     @Override
     public void reinitializeModel() throws QuickFixException {
-    	createModel();
-    	
-    	I zuper = getSuper();
-    	if (zuper != null) {
-    		zuper.reinitializeModel();
-    	}
-    	
-    	@SuppressWarnings("unchecked")
-        List<BaseComponent<?, ?>> body = (List<BaseComponent<?, ?>>)getAttributes().getValue("body");
-        if (body != null) {
-            for (BaseComponent<?, ?> c : body) {
-            	c.reinitializeModel();
+        createModel();
+        
+        I zuper = getSuper();
+        if (zuper != null) {
+            zuper.reinitializeModel();
+        }
+        
+        Object body = getAttributes().getValue("body");
+        if (!(body instanceof List)) {
+            body = getAttributes().getValue("realBody");
+        }
+        
+        if (body instanceof List) {
+            @SuppressWarnings("unchecked")
+            List<BaseComponent<?, ?>> bodyList = (List<BaseComponent<?, ?>>)body;
+            for (BaseComponent<?, ?> c : bodyList) {
+                c.reinitializeModel();
             }
         }
     }

@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component>
+<aura:component access="global">
 	<div aura:id="changeIt">Change Me!</div><br />
 	<ui:button press="{!c.applyCSS}" label="Add Style" />
 	<ui:button press="{!c.removeCSS}" label="Remove Style" />

@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component>
+<aura:component access="global">
 	<aura:attribute name="myDate" type="Date" default="2013-02-28"/>
     <span>
     <p>Click the <b>Read input</b> button below.</p>

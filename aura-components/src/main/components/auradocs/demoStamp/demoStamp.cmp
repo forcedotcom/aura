@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component>
+<aura:component access="global">
      <ui:stamp>Default</ui:stamp><br/>
      <ui:stamp severity="success">Success</ui:stamp><br/>
      <ui:stamp severity="warning">Warning</ui:stamp><br/>

@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component render="client">
+<aura:component render="client" access="global">
     <aura:attribute name="simplevalue1" type="Object"/>
     <div>Dynamic label update: {!v.simplevalue1.value}</div>
     <ui:button press="{!c.getLabel}" label="Get Label" />

@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component>
+<aura:component access="global">
     <aura:attribute name="demo" type="String" required="true"/>
     <a href="{!'#demo?demo='+v.demo}">{!v.body}</a>
 </aura:component>

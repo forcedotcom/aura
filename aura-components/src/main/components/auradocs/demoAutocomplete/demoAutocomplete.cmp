@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component>
+<aura:component access="global">
 	<div>Autocomplete <br/>Type <code>hello world</code> to test this component.</div><br/>
 	<ui:autocomplete aura:id="autoComplete" optionVar="row" 
         matchDone="{!c.handleInputChangeAutoCompleteMatchDone}"

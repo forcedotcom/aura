@@ -15,6 +15,6 @@
     limitations under the License.
 
 -->
-<aura:component extends="auradocs:sampleBase">
+<aura:component extends="auradocs:sampleBase" access="global">
     <span>Added in sampleBaseEx: {!v.body}</span>
 </aura:component>

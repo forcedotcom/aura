@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component>
+<aura:component access="global">
 <div style="margin:20px;">
     <div style="display:inline-block;width:50%;vertical-align:top;">
         <code>ui:actionMenuItem</code>

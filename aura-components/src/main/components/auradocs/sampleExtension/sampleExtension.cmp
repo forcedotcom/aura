@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component>
+<aura:component access="global">
     <auradocs:sampleBaseEx>
         <p>Hello, extension!</p>
     </auradocs:sampleBaseEx>

@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extensible="true">
+<aura:component extensible="true" access="global">
     <aura:attribute name="address1" type="String" />
     
     sampleSetTagBase address1: {!v.address1}<br/>

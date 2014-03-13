@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component>
+<aura:component access="global">
 	<ui:block>
 	    <aura:set attribute="left">
 	    	<ui:inputTextArea class="box" aura:id="boxy" value="Work your magic here" type="textarea" labelPosition="top" 

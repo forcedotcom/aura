@@ -59,8 +59,10 @@
                 <aura:if isTrue="{!$Browser.formFactor != 'DESKTOP'}">
                     <h1 aria-live="assertive" aria-atomic="true" class="monthYear" aura:id="calTitle">
                         <ui:outputText aura:id="monthTitle" value=""/>
-                        <ui:label label="year" for="yearTitle" labelDisplay="false"/>
-                        <select aura:id="yearTitle" onchange="{!c.yearChange}"/>
+                        <label>
+                            <span class="assistiveText">year</span>
+                            <select aura:id="yearTitle" onchange="{!c.yearChange}"/>
+                        </label>
                     </h1>
                     <aura:set attribute="else">
                         <h1 aria-live="assertive" aria-atomic="true" class="monthYear" aura:id="calTitle"/>

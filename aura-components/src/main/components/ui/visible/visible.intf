@@ -16,7 +16,7 @@
 
 -->
 <aura:interface support="GA">
-    <aura:attribute name="class" type="String" description="A CSS style to be attached to the component. This style is added in addition to base styles output by the component."/>
+    <aura:attribute name="class" type="String" access="GLOBAL" description="A CSS style to be attached to the component. This style is added in addition to base styles output by the component."/>
     <aura:attribute name="dir" type="String" default="ltr" description="The direction in which the component should be read. Possible values are &quot;rtl&quot; (right to left) and &quot;ltr&quot; (left to right). Default value is &quot;ltr&quot;."/>
     <aura:attribute name="label" type="String" description="The text displayed on the component. In the rendered HTML output, where possible the label is associated with the HTML element to improve accessibility."/>
     <aura:attribute name="namespaceOverride" type="String" description="Overrides the namespace for this component with the supplied text."/>
@@ -26,11 +26,11 @@
     <aura:attribute name="value" type="Object" description="References the controller class variable that is associated with the component."/>
     <aura:attribute name="visible" type="Boolean" default="true" description="Controls the visibility of the component."/>
 
-    <aura:registerEvent name="click" type="ui:click" description="The event fired when the user clicks on the component." />
-    <aura:registerEvent name="dblclick" type="ui:dblclick" description="The event fired when the user double-clicks the component."/>
-    <aura:registerEvent name="mousedown" type="ui:mousedown" description="The event fired when the user clicks a mouse button over the component."/>
-    <aura:registerEvent name="mousemove" type="ui:mousemove" description="The event fired when the user moves the mouse pointer over the component."/>
-    <aura:registerEvent name="mouseout" type="ui:mouseout" description="The event fired when the user moves the mouse pointer away from the component."/>
-    <aura:registerEvent name="mouseover" type="ui:mouseover" description="The event fired when the user moves the mouse pointer over the component."/>
-    <aura:registerEvent name="mouseup" type="ui:mouseup" description="The event fired when the user releases the mouse button over the component."/>
+    <aura:registerEvent name="click" type="ui:click" access="GLOBAL" description="The event fired when the user clicks on the component." />
+    <aura:registerEvent name="dblclick" type="ui:dblclick" access="GLOBAL" description="The event fired when the user double-clicks the component."/>
+    <aura:registerEvent name="mousedown" type="ui:mousedown" access="GLOBAL" description="The event fired when the user clicks a mouse button over the component."/>
+    <aura:registerEvent name="mousemove" type="ui:mousemove" access="GLOBAL" description="The event fired when the user moves the mouse pointer over the component."/>
+    <aura:registerEvent name="mouseout" type="ui:mouseout" access="GLOBAL" description="The event fired when the user moves the mouse pointer away from the component."/>
+    <aura:registerEvent name="mouseover" type="ui:mouseover" access="GLOBAL" description="The event fired when the user moves the mouse pointer over the component."/>
+    <aura:registerEvent name="mouseup" type="ui:mouseup" access="GLOBAL" description="The event fired when the user releases the mouse button over the component."/>
 </aura:interface>

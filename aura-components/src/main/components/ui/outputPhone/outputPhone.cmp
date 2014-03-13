@@ -15,8 +15,8 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:output" extensible="true" support="GA" description="Displays the phone number in a URL link format.">
-    <aura:attribute name="value" type="String" required="true" description="The phone number displayed when this component is rendered."/>
+<aura:component extends="ui:output" extensible="true" support="GA" access="GLOBAL" description="Displays the phone number in a URL link format.">
+    <aura:attribute name="value" type="String" required="true" access="GLOBAL" description="The phone number displayed when this component is rendered."/>
     <aura:renderIf isTrue="{!and(v.value != null, v.value != '')}">
         <a aura:id='link' class="{!v.class}" href="{!'tel:' + v.value}">{!v.value}</a>
     </aura:renderIf>

@@ -16,13 +16,13 @@
 
 -->
 <aura:component extensible="true" abstract="true" implements="ui:visible" description="An abstract component which capsulates common events." support="GA">
-    <aura:attribute name="disabled" type="Boolean" default="false" description="Specifies whether the component should be displayed in a disabled state. Default value is &quot;false&quot;."/>
+    <aura:attribute name="disabled" type="Boolean" access="GLOBAL" default="false" description="Specifies whether the component should be displayed in a disabled state. Default value is &quot;false&quot;."/>
 	<aura:attribute name="disableDoubleClicks" type="Boolean" default="false" description="Disables double clicking the component within 350ms"/>
 
-    <aura:registerEvent name="blur" type="ui:blur" description="The event fired when the user moves off from the component."/>
-    <aura:registerEvent name="focus" type="ui:focus" description="The event fired when the user focuses on the component."/>
-    <aura:registerEvent name="keydown" type="ui:keydown" description="The event fired when the user presses a keyboard key on the component."/>
-    <aura:registerEvent name="keypress" type="ui:keypress" description="The event fired when the user presses or holds down a keyboard key on the component."/>
-    <aura:registerEvent name="keyup" type="ui:keyup" description="The event fired when the user releases a keyboard key on the component."/>
-    <aura:registerEvent name="select" type="ui:select" description="The event fired when the user selects some text."/>
+    <aura:registerEvent name="blur" type="ui:blur" access="GLOBAL" description="The event fired when the user moves off from the component."/>
+    <aura:registerEvent name="focus" type="ui:focus" access="GLOBAL" description="The event fired when the user focuses on the component."/>
+    <aura:registerEvent name="keydown" type="ui:keydown" access="GLOBAL" description="The event fired when the user presses a keyboard key on the component."/>
+    <aura:registerEvent name="keypress" type="ui:keypress" access="GLOBAL" description="The event fired when the user presses or holds down a keyboard key on the component."/>
+    <aura:registerEvent name="keyup" type="ui:keyup" access="GLOBAL" description="The event fired when the user releases a keyboard key on the component."/>
+    <aura:registerEvent name="select" type="ui:select" access="GLOBAL" description="The event fired when the user selects some text."/>
 </aura:component>

@@ -31,9 +31,6 @@ public interface DefinitionAccess {
     boolean isPrivate();
     boolean isInternal();
     
-    // Access (to be evaluated in current context)
-    boolean isAccessible();
-    
     // Validation
     void validate(boolean allowAuth, boolean allowPrivate) throws InvalidAccessValueException ;
     

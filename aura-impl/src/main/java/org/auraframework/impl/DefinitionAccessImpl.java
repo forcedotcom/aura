@@ -131,11 +131,6 @@ public class DefinitionAccessImpl implements DefinitionAccess {
 	}
 
 	@Override
-	public boolean isAccessible() {
-		return true;
-	}
-
-	@Override
 	public void validate(boolean allowAuth, boolean allowPrivate)
 			throws InvalidAccessValueException {
 		boolean sysNamespace = isSystemNamespace();
@@ -154,7 +149,7 @@ public class DefinitionAccessImpl implements DefinitionAccess {
 		
 	}
 
-	private void defaultAccess(boolean sysNamespace) {
+	protected void defaultAccess(boolean sysNamespace) {
 		// Default access if necessary
  		if (access == null && accessMethod == null) {
  			access = sysNamespace ? Access.INTERNAL : Access.PUBLIC;
@@ -172,7 +167,7 @@ public class DefinitionAccessImpl implements DefinitionAccess {
 		}
 	}
 
-	private Access getAccess() {
+	protected Access getAccess() {
 		if (accessMethod != null) {
 			try {
 				return (Access) accessMethod.invoke(null);
@@ -183,6 +178,10 @@ public class DefinitionAccessImpl implements DefinitionAccess {
 		} else {
 			return access;
 		}
+	}
+	
+	protected boolean isAccessSpecified() {
+		return access != null || accessMethod != null;
 	}
 
 	private Authentication authentication = null;

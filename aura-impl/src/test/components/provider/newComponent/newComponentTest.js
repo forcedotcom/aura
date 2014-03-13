@@ -25,7 +25,7 @@
     },
 
     /**
-     * Create client-side provided component with descriptor.
+     * Create client-side provided component with descriptor. ui:* is preloaded for application.
      */
     testClientProvidedDescriptor:{
         attributes:{ newDescriptor:"markup://provider:clientProvider", newAttributes:"{value:'ui:inputText'}"},
@@ -35,7 +35,37 @@
             $A.test.assertEquals("ui:inputText", creation.getElement().value);
         }
     },
-
+    
+    /**
+     * Create client-side provided component with descriptor. attributesTest:simpleValue is not preloaded, we add it as dependency
+     */
+    testClientProvidedDescriptorNotPreloaded:{
+        attributes:{ newDescriptor:"markup://provider:clientProvider", newAttributes:"{value:'attributesTest:simpleValue'}"},
+        test:function(cmp){
+            var creation = this.getLocallyCreatedComponent(cmp);
+            $A.test.assertEquals("markup://attributesTest:simpleValue", creation.getDef().getDescriptor().getQualifiedName());
+            $A.test.assertEquals("button", creation.getElement().getAttribute('type'));
+        }
+    },
+    
+    /**
+     * Create client-side provided component with descriptor. attributesTest:parent is not preloaded.
+     * this is different from the test for "arrested:development" down there as attributesTest:parent does exist
+     */
+    testClientProvidedDescriptorNotPreloadedError:{
+    	test:function(cmp){
+    	var config = { componentDef:"markup://provider:clientProvider", attributes:{ values:{ value:'attributesTest:parent'} } };
+        try{
+            $A.componentService.newComponentAsync(this, function(){}, config, null, true, false);
+            $A.test.fail("ERROR: Expecting exception when provider return non-loaded componentDef");
+        }
+        catch (e){
+                $A.test.assertEquals("Assertion Failed!: Unknown component markup://attributesTest:parent : false",
+                    e.message);
+            }
+        }
+    },
+      
     /**
      * Create client-side provided component with prefixed descriptor.
      */
@@ -47,6 +77,8 @@
             $A.test.assertEquals("markup://ui:outputText", $A.test.getText(creation.getElement()));
         }
     },
+    
+    
 
     /**
      * Create client-side provided provider component.  Luckily, this provider is a concrete component, as the provided provider will not provide again.

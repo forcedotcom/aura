@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extends="auradocs:demoPanel">
+<aura:component extends="auradocs:demoPanel" access="global">
     <aura:set attribute="title" value="ui:scroller"/>
     <ui:vbox>
     	<aura:set attribute="north">

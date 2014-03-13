@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extends="auradocs:sampleIfDemo">
+<aura:component extends="auradocs:sampleIfDemo" access="global">
 
 <aura:set attribute="show">
       <p>So this component from sampleIfDemo is rendered.</p>

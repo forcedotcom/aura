@@ -127,7 +127,6 @@
     <servlet>
     	<servlet-name>CSPReporterServlet</servlet-name>
     	<servlet-class>org.auraframework.http.CSPReporterServlet</servlet-class>
-        <load-on-startup>0</load-on-startup> <!-- ??? -->
     </servlet>
     
     <!--  Begin Aura Validation Servlet -->
@@ -146,7 +145,7 @@
 
     <servlet-mapping>
         <servlet-name>CSPReporterServlet</servlet-name>
-        <url-pattern>/csp</url-pattern>
+        <url-pattern>/_/csp</url-pattern> <!-- keep in sync with CSPReporterServlet.URL -->
     </servlet-mapping>
 
 </web-app>

@@ -19,21 +19,45 @@ import java.util.*;
 
 import com.google.common.collect.Lists;
 
+/**
+ * This class provides functionality for building Content Security Policy 1.0
+ * (CSP) HTTP response headers as described in <a href="http://www.w3.org/TR/CSP/">
+ * the W3C Content Security Policy 1.0 spec</a>.
+ * 
+ * Use PolicyBuilder to build a header value to attach to an HTTP response.
+ * 
+ * Example Usage:
+ * 
+ * To set a header that <em>only reports</em> all resource loading:
+ * <code>
+   PolicyBuilder p = new PolicyBuilder();
+   p
+   .default_src(CSP.NONE)
+   .report_uri(CSPReporterServlet.URL);
+   
+   response.setHeader(CSP.Header.REPORT_ONLY, p.build());
+ * </code>
+ *
+ * To set a header that <em>disallows</em> loading of scripts <em>except</em>
+ * from social network widgets:
+ * <code>
+   PolicyBuilder p = new PolicyBuilder();
+   p
+   .script_src(
+       "https://apis.google.com",
+       "https://platform.twitter.com")
+   .frame_src(
+       "https://plusone.google.com",
+       "https://facebook.com",
+       "https://platform.twitter.com");
+       
+   response.setHeader(CSP.Header.SECURE, p.build());
+ * </code>
+ */
 public class CSP {
-    public static enum Header {
-        SECURE("Content-Security-Policy"),
-        REPORT_ONLY("Content-Security-Policy-Report-Only");
-        
-        private String header;
-        
-        private Header(String header) {
-            this.header = header;
-        }
-
-        @Override
-        public String toString() {
-            return header;
-        }
+    public static final class Header {
+        public static final String SECURE = "Content-Security-Policy";
+        public static final String REPORT_ONLY = "Content-Security-Policy-Report-Only";
     }
     
     public static enum Directive {
@@ -61,12 +85,42 @@ public class CSP {
         }
     }
     
+    /**
+     * Special value for allowing a resource type from the same domain as
+     * served the initial response.
+     */
     public static final String SELF = "'self'";
+    
+    /**
+     * Special value for disallowing a resource type from any domain.
+     */
     public static final String NONE = "'none'";
+    
+    /**
+     * Special value for allowing a resource type from any domain.
+     */
     public static final String ALL = "*";
+    
+    /**
+     * Special value for allowing inline resource inclusion (such as
+     * &lt;style&gt; or &lt;script&gt;).
+     * 
+     * Not recommended. 
+     */
     public static final String UNSAFE_INLINE = "'unsafe-inline'";
+    
+    /**
+     * Special value for allowing <code>eval()</code> of JavaScript.
+     * 
+     * Not recommended. 
+     */
     public static final String UNSAFE_EVAL = "'unsafe-eval'";
     
+    /**
+     * Fluent interface for building Content Security Policy headers.
+     * 
+     * See {@link CSP} for example usage.
+     */
     public static class PolicyBuilder {
         public PolicyBuilder() {}
         

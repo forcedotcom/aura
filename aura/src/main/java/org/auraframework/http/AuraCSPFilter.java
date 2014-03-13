@@ -22,12 +22,12 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.auraframework.http.CSP.PolicyBuilder;
 
+/**
+ * Servlet filter for adding Content Security Policy headers,
+ * per the <a href="http://www.w3.org/TR/CSP/">W3C Content Security
+ * Policy 1.0 spec</a>.
+ */
 public class AuraCSPFilter implements Filter {
-
-    @Override
-    public void destroy() {
-        // TODO Auto-generated method stub
-    }
 
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException,
@@ -38,16 +38,17 @@ public class AuraCSPFilter implements Filter {
         PolicyBuilder p = new PolicyBuilder();
         p
         .default_src(CSP.NONE)
-        .report_uri("/csp");
+        .report_uri(CSPReporterServlet.URL);
         
-        response.setHeader(CSP.Header.REPORT_ONLY.toString(), p.build());
+        // TODO only set if not previously set?
+        response.setHeader(CSP.Header.REPORT_ONLY, p.build());
         
         chain.doFilter(req, res);
     }
 
     @Override
-    public void init(FilterConfig config) throws ServletException {
-        // TODO Auto-generated method stub
-    }
-
+    public void init(FilterConfig config) throws ServletException {}
+    
+    @Override
+    public void destroy() {}
 }

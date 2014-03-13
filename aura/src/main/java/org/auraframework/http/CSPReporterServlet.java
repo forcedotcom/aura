@@ -17,29 +17,39 @@ package org.auraframework.http;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.*;
 
+import org.auraframework.util.json.JsonReader;
+
+/**
+ * Endpoint for reporting Content Security Policy violations,
+ * per the <a href="http://www.w3.org/TR/CSP/">W3C Content Security
+ * Policy 1.0 spec</a>.
+ */
 public class CSPReporterServlet extends HttpServlet {
-    @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        // TODO Auto-generated method stub
-        super.doGet(req, resp);
-    }
+    // KEEP THIS IN SYNC WITH THE SERVLET'S URL-MAPPING ENTRY IN WEB.XML!
+    public static final String URL = "/_/csp";
     
+    private static final String JSON_NAME = "csp-report";
+    
+    @SuppressWarnings("unchecked")
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        StringBuffer jb = new StringBuffer();
-        String line = null;
+        
+        Map<String, String> report = null;
+        
         try {
           BufferedReader reader = req.getReader();
-          while ((line = reader.readLine()) != null)
-            jb.append(line);
+          Map<?, ?> map = (Map<?, ?>) new JsonReader().read(reader);
+
+          report = (Map<String, String>)map.get(JSON_NAME);
         } catch (Exception e) { /*report an error*/ }
 
-        System.err.println(jb.toString());
+        System.err.println(report.keySet());
         
-        // REPORT ALSO THE USER AGENT!
+        // TODO REPORT ALSO THE USER AGENT!
     }
 }

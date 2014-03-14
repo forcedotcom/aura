@@ -23,6 +23,9 @@ var AuraRenderingService = function AuraRenderingService(){
     //#include aura.AuraRenderingService_private
 
     var renderingService = {
+        /** State to avoid double-visiting components during rerender. */
+        visited : undefined,
+
             /**
              * @private
              */
@@ -70,7 +73,7 @@ var AuraRenderingService = function AuraRenderingService(){
                 //#if {"modes" : ["STATS"]}
                 var startTime = (new Date()).getTime();
                 //#end                     
-                
+
                 this.rerender(cmps);
 
                 //#if {"modes" : ["STATS"]}
@@ -133,17 +136,20 @@ var AuraRenderingService = function AuraRenderingService(){
                     // And put the constructed component back into the array.
                     array[x] = cmp;
                 }
-
-                if (cmp.isValid()) {
-                    var renderer = cmp.getRenderer();
-                    var elements = renderer.def.render(renderer.renderable) || [];
-    
-                    priv.finishRender(cmp, elements, ret, parent);
+                var priorSibling = cmp.getRenderPriorSibling();
+                var container = priv.push(cmp);
+                try {
+                    if (cmp.isValid()) {
+                        var renderer = cmp.getRenderer();
+                        var elements = renderer.def.render(renderer.renderable) || [];
+                        cmp.setRenderContainer(container, priorSibling);
+                        priv.finishRender(cmp, elements, ret, parent);
+                    }
+                } finally {
+                    priv.pop(cmp);
                 }
+                priv.insertElements(ret, parent);
             }
-
-            priv.insertElements(ret, parent);
-
             return ret;
         },
 
@@ -183,18 +189,39 @@ var AuraRenderingService = function AuraRenderingService(){
                 component = component._arrayValueRef;
             }
 
-            if (component.auraType === "Value" && component.toString() === "ArrayValue"){
-                component.rerender(referenceNode, appendChild, priv.insertElements);
-                return;
+            var topVisit = false;
+            if (this.visited === undefined) {
+                this.visited = {};
+                topVisit = true;
             }
+            try {
+                if (component.auraType === "Value" && component.toString() === "ArrayValue"){
+                    var visitMark = component.get(0);
+                    if (!visitMark || !this.visited[visitMark.getGlobalId()]) {
+                        component.rerender(referenceNode, appendChild, priv.insertElements);
+                    }
+                    return;
+                }
 
-            var array = priv.getArray(component);
-            for (var i = 0; i < array.length; i++){
-                var cmp = array[i];
-                if (cmp.isValid()) {
-                    var renderer = cmp.getRenderer();
-                    renderer.def.rerender(renderer.renderable);
-                    priv.cleanComponent(cmp.getGlobalId());
+                var array = priv.getArray(component);
+                array = priv.reorderForContainment(array);
+                for (var i = 0; i < array.length; i++){
+                    var cmp = array[i];
+                    if (cmp.isValid()) {
+                        visitMark = (cmp instanceof ArrayValue) ? cmp.get(0) : cmp;
+                        if (!visitMark || !this.visited[visitMark.getGlobalId()]) {
+                            if (visitMark) {
+                                this.visited[visitMark.getGlobalId()] = true;
+                            }
+                            var renderer = cmp.getRenderer();
+                            renderer.def.rerender(renderer.renderable);
+                        }
+                        priv.cleanComponent(cmp.getGlobalId());
+                    }
+                }
+            } finally {
+                if (topVisit) {
+                    this.visited = undefined;
                 }
             }
         },
@@ -272,7 +299,7 @@ var AuraRenderingService = function AuraRenderingService(){
                 }
             }
         }
-        
+
       //#if {"modes" : ["STATS"]}
         ,rerenderDirtyIndex : [],
 

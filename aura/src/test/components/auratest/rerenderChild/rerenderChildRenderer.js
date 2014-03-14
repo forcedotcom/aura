@@ -15,9 +15,10 @@
  */
 ({
     rerender : function(cmp){
-        var e = cmp.find("count").getElement();
-        var newCount = parseInt($A.util.getText(e)) + 1;
-        cmp.getAttributes().setValue("count", newCount);
+        if (Window.rerenderTestOrder === undefined) {
+            Window.rerenderTestOrder = [];
+        }
+        Window.rerenderTestOrder.push(cmp.getGlobalId());
         this.superRerender();
     }
 })

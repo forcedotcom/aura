@@ -43,5 +43,7 @@
     <auratest:rerenderChild aura:id="child2" title="child2">
         <auratest:rerenderChild aura:id="grandchild2" title="grandchild2">
         </auratest:rerenderChild>
+        <auratest:rerenderChild aura:id="grandchild2a" title="grandchild2a">
+        </auratest:rerenderChild>
     </auratest:rerenderChild>
 </aura:application>

@@ -438,4 +438,9 @@ public class ConfigAdapterImpl implements ConfigAdapter {
 	public void addPrivilegedNamespace(String namespace) {
 		SYSTEM_NAMESPACES.add(namespace);
 	}
+
+	@Override
+	public void removePrivilegedNamespace(String namespace) {
+        SYSTEM_NAMESPACES.remove(namespace);
+	}
 }

@@ -454,9 +454,6 @@ public class StringSourceLoader implements SourceLoader, PrivilegedNamespaceSour
     
     @Override
 	public boolean isPrivilegedNamespace(String namespace) {
-    	if(namespace != null && customNamespaces.containsKey(namespace)){
-			return false;
-		}
-    	return true;
+    	return namespace != null && namespaces.containsKey(namespace);
 	}
 }

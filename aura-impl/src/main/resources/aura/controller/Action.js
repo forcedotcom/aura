@@ -20,6 +20,7 @@
  * Action from a client-side controller.
  *
  * @constructor
+ * @class
  * @param {Object}
  *            def The definition of the Action.
  * @param {string}
@@ -136,14 +137,15 @@ Action.prototype.forceCreationPath = function(path) {
         }
         absPath = top.absPath;
     }
-    if (path.length < 2 || path.indexOf("/", 1) !== -1) {
+    if (this.topPath() !== newAbsPath && (path.length < 2 || path.indexOf("/", 1) !== -1)) {
         //
         // Only warn if this is not a top level path, to save developers from having
         // to know the internal implementation of aura (or deal with warnings)
         //
-        // FIXME: re-enable when client side creation fixed.
-        //$A.warning("force path of "+newAbsPath+" from "+absPath
-            //+" likely a use of returned component array without changing index");
+        // Top level should index the first index or /+[0] will fail as its expecting /+
+        //
+        $A.warning("force path of "+newAbsPath+" from "+absPath
+            +" likely a use of returned component array without changing index");
     }
     var pathEntry = { relPath: "~FORCED~", absPath:newAbsPath, idx: undefined, startIdx: undefined };
     this.pathStack.push(pathEntry);
@@ -241,8 +243,7 @@ Action.prototype.topPath = function() {
 Action.prototype.setCreationPathIndex = function(idx) {
     this.canCreate = true;
     if (this.pathStack.length < 1) {
-        // FIXME: re-enable when client side creation fixed.
-        //$A.warning("Attempting to increment index on empty stack");
+        $A.warning("Attempting to increment index on empty stack");
     }
     var top = this.pathStack[this.pathStack.length - 1];
     // establish starting index
@@ -250,9 +251,9 @@ Action.prototype.setCreationPathIndex = function(idx) {
         top.startIdx = idx;
         top.idx = idx;
     }
-    else if (idx !== top.idx + 1) {
-        // FIXME: re-enable when client side creation fixed.
-        //$A.warning("Improper index increment");
+    else if (idx !== 0 && idx !== top.idx + 1) {
+        // Warning if not next index and not resetting index
+        $A.warning("Improper index increment. Expected: " + (top.idx + 1) + ", Actual: " + idx);
     } else {
         top.idx = idx;
     }
@@ -265,12 +266,8 @@ Action.prototype.setCreationPathIndex = function(idx) {
  * @returns {String}
  */
 Action.prototype.getCurrentPath = function() {
-    var result = this.getId();
-    var size = this.pathStack.length;
-
     if (!this.canCreate) {
-        // FIXME: re-enable when client side creation fixed.
-        //$A.warning("Not ready to create. path: "+this.topPath());
+        $A.warning("Not ready to create. path: " + this.topPath());
     }
     this.canCreate = false; // this will cause next call to getCurrentPath to fail if not popped
     return this.topPath();
@@ -542,9 +539,8 @@ Action.prototype.runDeprecated = function(evt) {
         this.state = "SUCCESS";
     } catch (e) {
         this.state = "FAILURE";
-        // FIXME: re-enable when client side creation fixed.
-        //$A.warning("Action failed: " + this.cmp.getDef().getDescriptor().getQualifiedName() + " -> "
-                   //+ this.def.getName(), e);
+        $A.warning("Action failed: " + this.cmp.getDef().getDescriptor().getQualifiedName() + " -> "
+                   + this.def.getName(), e);
     }
 };
 
@@ -707,8 +703,7 @@ Action.prototype.getStored = function(storageName) {
  * Calls callbacks and fires events upon completion of the action.
  *
  * @private
- * @param {Object}
- *            context the context for pushing and popping the current action.
+ * @param {AuraContext} context the context for pushing and popping the current action.
  */
 Action.prototype.finishAction = function(context) {
     var previous = context.setCurrentAction(this);
@@ -724,7 +719,7 @@ Action.prototype.finishAction = function(context) {
 
             if (this.events.length > 0) {
                 for (var x = 0; x < this.events.length; x++) {
-                    this.parseAndFireEvent(this.events[x], this.cmp);
+                    this.parseAndFireEvent(this.events[x]);
                 }
             }
 

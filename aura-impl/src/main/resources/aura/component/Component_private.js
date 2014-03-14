@@ -18,7 +18,7 @@ var ComponentPriv = (function() { // Scoping priv
 
     var nextClientCreatedComponentId = 0;
 
-    var ComponentPriv = function ComponentPriv(config, cmp, localCreation) {
+    var ComponentPriv = function ComponentPriv(config, cmp, localCreation, isClientCreated) {
         cmp.priv = this;
 
         // setup some basic things
@@ -37,6 +37,8 @@ var ComponentPriv = (function() { // Scoping priv
 
         try {
             if (act) {
+                var currentPath = act.topPath();
+
                 if (config["creationPath"]) {
                     //
                     // This is a server side config, so we need to sync ourselves with it.
@@ -47,6 +49,12 @@ var ComponentPriv = (function() { // Scoping priv
                     //
                     this.creationPath = act.forceCreationPath(config["creationPath"]);
                     forcedPath = true;
+                } else if (!context.containsComponentConfig(currentPath) && (!!localCreation || !!isClientCreated)) {
+
+                    // skip creation path if the current top path is not in server returned
+                    // componentConfigs and localCreation or force client created
+
+                    this.creationPath = "client created";
                 } else {
                     this.creationPath = act.getCurrentPath();
                 }
@@ -335,8 +343,8 @@ var ComponentPriv = (function() { // Scoping priv
 
     ComponentPriv.prototype.setupDelegateValueProvider = function(config, localCreation, ccc) {
         if (config) {
-            if (config['globalId']) {
-                this.delegateValueProvider = componentService.get(config['globalId']);
+            if (config["globalId"]) {
+                this.delegateValueProvider = componentService.get(config["globalId"]);
             } else {
                 this.delegateValueProvider = config;
             }
@@ -356,7 +364,7 @@ var ComponentPriv = (function() { // Scoping priv
 
     ComponentPriv.prototype.setupAttributes = function(config, cmp, localCreation) {
         var configAttributes = config || {};
-        this.attributes = new AttributeSet(configAttributes, configAttributes['valueProvider'],
+        this.attributes = new AttributeSet(configAttributes, configAttributes["valueProvider"],
             this.componentDef.getAttributeDefs(), cmp, localCreation);
     };
 
@@ -408,7 +416,7 @@ var ComponentPriv = (function() { // Scoping priv
                     if (!valuesAlreadySet[facet["descriptor"]]) {
                         if (attributeDefs) {
                             var attributeDef = attributeDefs.getDef(facet["descriptor"]);
-                            if (attributeDef && attributeDef.getTypeDefDescriptor() !== 'aura://Aura.Component[]') {
+                            if (attributeDef && attributeDef.getTypeDefDescriptor() !== "aura://Aura.Component[]") {
                                 valuesAlreadySet[facet["descriptor"]] = true;
                             }
                         }
@@ -437,8 +445,8 @@ var ComponentPriv = (function() { // Scoping priv
                 self.superComponent = component;
                 if (component) {
                     var valueProviders = self.getValueProviders();
-                    if (!valueProviders['super']) {
-                        valueProviders['super'] = component;
+                    if (!valueProviders["super"]) {
+                        valueProviders["super"] = component;
                     }
                 }
             };
@@ -629,9 +637,9 @@ var ComponentPriv = (function() { // Scoping priv
         var self = this,
             setProvided = function(realComponentDef, attributes) {
                 $A.assert(realComponentDef
-                    && realComponentDef.auraType === 'ComponentDef'
+                    && realComponentDef.auraType === "ComponentDef"
                     && !realComponentDef.isAbstract(),
-                    'No concrete implementation provided');
+                    "No concrete implementation provided");
 
                 self.componentDef = realComponentDef;
                 self.attributes.recreate(realComponentDef.getAttributeDefs(), attributes);
@@ -653,7 +661,7 @@ var ComponentPriv = (function() { // Scoping priv
             } else {
                 var partialConfig = this.partialConfig;
                 $A.assert(partialConfig,
-                            'Abstract component without provider def cannot be instantiated : '
+                            "Abstract component without provider def cannot be instantiated : "
                             + componentDef);
                 setProvided(componentService.getDef(partialConfig["componentDef"]), null);
             }

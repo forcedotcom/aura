@@ -17,7 +17,7 @@ package org.auraframework.impl;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.*;
+import java.util.List;
 
 import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
@@ -140,6 +140,9 @@ public class DefinitionAccessImpl implements DefinitionAccess {
 		if (access == Access.PRIVATE  && !allowPrivate) {
 			throw new InvalidAccessValueException("Invalid access atttribute value \"" + access.name() + "\"");
 		}
+        if (access == Access.INTERNAL && !sysNamespace) {
+            throw new InvalidAccessValueException("Invalid access atttribute value \"" + access.name() + "\"");
+        }
 		if (access != null && accessMethod != null) {
 			throw new InvalidAccessValueException("Access attribute may not specify \"" + access.name() + "\" when a static method is also specified");
 		}

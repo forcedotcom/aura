@@ -99,6 +99,7 @@ var clientService;
 // #include aura.model.ValueDef
 // #include aura.l10n.AuraLocalizationContext
 // #include aura.AuraClientService
+// #include aura.AuraComponentContext
 // #include aura.AuraComponentService
 // #include aura.AuraSerializationService
 // #include aura.AuraRenderingService
@@ -140,6 +141,7 @@ $A.ns.Aura = function() {
     this.layoutService = new AuraLayoutService();
     this.localizationService = new AuraLocalizationService();
     this.storageService = new AuraStorageService();
+    this.componentStack = new $A.ns.AuraComponentContext();
 
     //#if {"excludeModes" : ["PRODUCTION"]}
     this.devToolService = new AuraDevToolService();

@@ -31,6 +31,11 @@ var ComponentPriv = (function() { // Scoping priv
         this.eventDispatcher = undefined;
         this.docLevelHandlers = undefined;
 
+        // Reference to "this" component's container, used to keep rendered elements
+        // right as they are conditionally changed.  But this is not EVER to be
+        // exposed to be referenced externally!
+        this.container = undefined;
+
         var context = $A.getContext();
         var act = context.getCurrentAction();
         var forcedPath = false;
@@ -763,6 +768,44 @@ var ComponentPriv = (function() { // Scoping priv
         });
         ret["__proto__"] = null;
         return ret;
+    };
+
+    /** @private@
+     * Used during render to be able to walk up, correcting rendered elements.
+     *
+     * Like getRenderContainer(), this cannot become public API, both because
+     * it would mess with encapsulation and because the (internal) renderer is
+     * what, by definition, "knows" the container.
+     *
+     * @param {Component} parent the parent component
+     * @param {Component} priorSibling the earlier child of parent, or undefined
+     */
+    Component.prototype.setRenderContainer = function(parent, priorSibling) {
+        this.priv.container = parent;
+        this.priv.priorSibling = priorSibling;
+    };
+
+    /** @private@
+     * Used during rerender to be able to walk up, correcting rendered elements.
+     *
+     * This cannot become public API of components without breaking encapsulation,
+     * tempting though it seems... a component cannot be aware of, or sensitive to,
+     * the context inside which it is used.
+     */
+    Component.prototype.getRenderContainer = function() {
+        return this.priv.container;
+    };
+
+    /** @private@
+     * Used during rerender to be able to walk laterally, to find where to add new
+     * elements if the component doesn't know where to insert itself.
+     *
+     * This cannot become public API of components without breaking encapsulation,
+     * tempting though it seems... a component cannot be aware of, or sensitive to,
+     * the context inside which it is used.
+     */
+    Component.prototype.getRenderPriorSibling = function() {
+        return this.priv.priorSibling;
     };
 
     ComponentPriv.prototype.outputArrayValue = function(value, avp, serialized, depth) {

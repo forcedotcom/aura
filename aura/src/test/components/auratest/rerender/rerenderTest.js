@@ -220,6 +220,62 @@
                 this.assertCounters(component, "1", "1", "0", "0", "2");
             }]
     },
+    
+    /** Tests rerender ordering. */
+    testRerenderOrder: {
+        attributes : { __layout: "#def" },
+        test: [function(component){
+            var child2 = component.find("child2");
+            var grandchild2a = component.find("grandchild2a");
+            var grandchild1 = component.find("grandchild1");
+            // Try to rerender all three of the above, but try to rerender grandchild2a
+            // before child2.  But rerender should insist on doing child2 before
+            // grandchild2a (and grandchild1 not in the middle, but before or after both).
+            Window.rerenderTestOrder = [];  // Reset order tracking
+            $A.rerender([grandchild2a, grandchild1, child2]);
+            $A.test.addWaitFor("1", function(){
+                return $A.test.getText(child2.find("counter").find("count").getElement());
+            });
+        }, function(component){
+            // Rerendering of child2 will also rerender grandchild2 (and 2a), thus:
+            debugger;
+            this.assertCounters(component, "0", "1", "1", "1");
+            var order = Window.rerenderTestOrder;
+            if (order.length === 5) {
+                // When run commandline, we get an extra leading rerender that we don't count, and
+                // that we DON'T see running by hand.  Account for that here:
+                for (var j = 0; j < order.length; ++j) {
+                    if (order[j].indexOf("1:") === 0) {
+                        order.splice(j, 1);
+                        break;
+                    }
+                }
+            }
+            var child2 = component.find("child2");
+            var grandchild2 = component.find("grandchild2");
+            var grandchild2a = component.find("grandchild2a");
+            var grandchild1 = component.find("grandchild1");
+            $A.test.assertEquals(4, order.length);
+            if (grandchild1.getGlobalId() === order[0]) {
+                $A.test.assertEquals(child2.getGlobalId(), order[1]);
+                if (grandchild2.getGlobalId() === order[2]) {
+                    $A.test.assertEquals(grandchild2a.getGlobalId(), order[3]);
+                } else {
+                    $A.test.assertEquals(grandchild2a.getGlobalId(), order[2]);
+                    $A.test.assertEquals(grandchild2.getGlobalId(), order[3]);
+                }
+            } else {
+                $A.test.assertEquals(child2.getGlobalId(), order[0]);
+                if (grandchild2.getGlobalId() === order[1]) {
+                    $A.test.assertEquals(grandchild2a.getGlobalId(), order[2]);
+                } else {
+                    $A.test.assertEquals(grandchild2a.getGlobalId(), order[1]);
+                    $A.test.assertEquals(grandchild2.getGlobalId(), order[2]);
+                }
+                $A.test.assertEquals(grandchild1.getGlobalId(), order[3]);
+            }
+        }]
+    },
 
     /**
      * Add component to empty array.

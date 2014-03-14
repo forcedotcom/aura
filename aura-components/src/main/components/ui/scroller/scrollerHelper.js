@@ -246,7 +246,7 @@
         }
     },
     deactivate: function(component) {
-        var scroller = this.getScrollerInstance();
+        var scroller = this.getScrollerInstance(component);
         if (scroller) {
             scroller.destroy();
         }

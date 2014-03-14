@@ -68,11 +68,18 @@ PassthroughValue.prototype.index = function () {
  * Likely delegating to a wrapped component. 
  */ 
 PassthroughValue.prototype.deIndex = function () {
-    var cmp = ivp.getComponent();
+    var valueProvider = this.getComponent();
 
-    if (cmp) {
-        cmp.deIndex.apply(cmp, arguments);
+    // Potentially nested PassthroughValue objects.
+    while (valueProvider && !valueProvider.deIndex) {
+        valueProvider = valueProvider.getComponent();
     }
+
+    if (!valueProvider) {
+        return;
+    }
+
+    valueProvider.deIndex.apply(valueProvider, arguments);
 };
 
 //#include aura.value.PassthroughValue_export

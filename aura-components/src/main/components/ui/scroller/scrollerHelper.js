@@ -1249,7 +1249,7 @@ _initSurfaceManagerPlugin: function () {
             var rawSurface   = w.document.createElement('div'),
                 surfaceStyle = rawSurface.style;
 
-            rawSurface.className = options.class ? 'surface ' + options.class : 'surface';
+            rawSurface.className = options['class'] ? 'surface ' + options['class'] : 'surface';
             surfaceStyle.height  = options.height && options.height + 'px';
             surfaceStyle.width   = options.width && options.width + 'px';
             surfaceStyle[STYLES.transform] = 'scale3d(0.0001, 0.0001, 1)';

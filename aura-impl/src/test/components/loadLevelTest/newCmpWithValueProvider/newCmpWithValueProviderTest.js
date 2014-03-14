@@ -40,9 +40,13 @@
      * Automation for W-1308292 - Passing localId in config for newCmp will invoke the fix
      */
     testPassThroughValueAsValueProvider:{
-        test:function(cmp){
+        test:[ function(cmp){
+            var avp;
+            
             $A.run(function(){
-                cmp.get('c.createCmpWithPassthroughValue').runDeprecated();
+                var a = cmp.get('c.createCmpWithPassthroughValue');
+                a.runDeprecated();
+                avp = a.getReturnValue();
             });
 
             //Verify that local ID can be used to find the component
@@ -52,7 +56,14 @@
             $A.test.assertEquals("markup://aura:text", newTextCmp.getDef().getDescriptor().getQualifiedName());
             $A.test.assertEquals("Washington", newTextCmp.getAttributes().getValue('value').getValue());
             $A.test.assertEquals("Washington", $A.test.getText(newTextCmp.getElement()));
-        }
+            cmp._avp = avp;
+        },
+        function(cmp) {
+            var newTextCmp = cmp.find("txt_Id");
+            // this should test the valueprovider fix.
+            cmp._avp.deIndex(newTextCmp);
+            newTextCmp.destroy();
+        }]
     },
 
     /**

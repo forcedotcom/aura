@@ -1191,6 +1191,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 	    	}
 			
 			referencingNamespace = referencingDescriptor.getNamespace();
+			
 	        // The caller is in a system namespace let them through
 			if (configAdapter.isPrivilegedNamespace(referencingNamespace)) {
 				return;
@@ -1224,12 +1225,12 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 			// System.out.printf("** MDR.miss.assertAccess() cache miss for: %s\n", key);
 		    	    	
 			DefDescriptor<? extends Definition> descriptor = def.getDescriptor();
-			if (!configAdapter.isUnsecuredNamespace(descriptor.getNamespace()) && !configAdapter.isUnsecuredPrefix(descriptor.getPrefix())) {
+			if (!configAdapter.isUnsecuredNamespace(namespace) && !configAdapter.isUnsecuredPrefix(descriptor.getPrefix())) {
 				if (referencingNamespace == null || referencingNamespace.isEmpty()) {
 					status = String.format("Access to %s '%s' disallowed by MasterDefRegistry.assertAccess(): referencing namespace was empty or null", defType, target);
 			    } else if (!referencingNamespace.equals(namespace)) {
 			    	// The caller and the def are not in the same namespace
-				    status = String.format("Access to %s '%s' from namespace '%s' disallowed by MasterDefRegistry.assertAccess()", defType, target, referencingNamespace);
+				    status = String.format("Access to %s '%s' from namespace '%s' disallowed by MasterDefRegistry.assertAccess()", defType.toString().toLowerCase(), target, referencingNamespace);
 			    }
 			}
 

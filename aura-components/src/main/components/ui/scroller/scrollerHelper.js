@@ -246,8 +246,10 @@
         }
     },
     deactivate: function(component) {
-       var scroller = component._scroller;
-       scroller.destroy();
+        var scroller = this.getScrollerInstance(component);
+        if (scroller) {
+            scroller.destroy();
+        }
 
        delete component._scroller;
     },
@@ -285,7 +287,7 @@ _bootstrapScroller: function () {
     this._initScrollerPlugins();
 },
 _initScrollerDependencies: function () {
-    !function(a){a.__S||(a.__S={plugins:{}}),a.DEBUG=function(b){return b?console:{warn:function(){a.console.warn.apply(console,arguments)},log:function(){}}}("#debug"===document.location.hash)}(window),function(a){Array.prototype.forEach||(Array.prototype.forEach=function(a){"use strict";if(void 0===this||null===this)throw new TypeError;var b=Object(this),c=b.length>>>0;if("function"!=typeof a)throw new TypeError;for(var d=arguments.length>=2?arguments[1]:void 0,e=0;c>e;e++)e in b&&a.call(d,b[e],e,b)});var b,c,d,e=a.__S||(a.__S={}),f=a.document.documentElement.style,g=["webkit","Moz","ms"],h=!1,i=!1;if("transition"in f)h=!0,c="";else for(d=0;d<g.length;d++)b=g[d]+"Transition","undefined"!==f.transform&&(h=!0,c=g[d]);if("undefined"!=typeof f.transform)i=!0;else for(d=0;d<g.length;d++)b=g[d]+"Transform","undefined"!=typeof f[b]&&(i=!0,c=g[d]);e.support={prefix:c,transition:h,transform:i,matrix:!(!a.WebKitCSSMatrix&&!a.MSCSSMatrix),touch:"ontouchstart"in a,pointers:a.navigator.msPointerEnabled}}(window),function(a){function b(b,c){for(var d=["Top","Right","Bottom","Left"],e=a.getComputedStyle(c),f="width"===b,g=f?1:0,h=0;4>g;g+=2)h+=parseInt(e["margin"+d[g]],10);return h+(f?c.offsetWidth:c.offsetHeight)}var c=a.__S||(a.__S={}),d=c.support,e=d&&d.prefix,f={};return d?(d.transition&&d.transform&&(f=""!==e?{transform:e+"Transform",transitionTimingFunction:e+"TransitionTimingFunction",transitionDuration:e+"TransitionDuration",transformOrigin:e+"TransformOrigin",boxSizing:e+"BoxSizing",matrix:d.matrix?a.WebKitCSSMatrix||a.MSCSSMatrix:null}:{transform:"transform",transitionTimingFunction:"transitionTimingFunction",transitionDuration:"transitionDuration",transformOrigin:"transformOrigin",boxSizing:"boxSizing",matrix:null}),f.getHeight=function(a){return b("height",a)},f.getWidth=function(a){return b("width",a)},void(c.styles=f)):void a.console.log("Scroller Dependency error! browser support detection needed")}(window),function(a){"use strict";var b=a.__S||(a.__S={}),c={simpleMerge:function(a,b){var c,d={};for(c in a)d[c]=a[c];for(c in b)d[c]=b[c];return d},parseDOM:function(b){var c;if(b)return"string"==typeof b?(c=a.document.createElement("div"),c.innerHTML=b,Array.prototype.slice.call(c.children,0)):b.length?Array.prototype.slice.call(b,0):[b]},bind:function(a,b,c,d){a.addEventListener(b,c,!!d)},unbind:function(a,b,c,d){a.removeEventListener(b,c,!!d)}};b.helpers=c}(window),function(a){for(var b=0,c=["ms","moz","webkit","o"],d=0;d<c.length&&!a.requestAnimationFrame;++d)a.requestAnimationFrame=a[c[d]+"RequestAnimationFrame"],a.cancelAnimationFrame=a[c[d]+"CancelAnimationFrame"]||a[c[d]+"CancelRequestAnimationFrame"];a.requestAnimationFrame||(a.requestAnimationFrame=function(c){var d=(new Date).getTime(),e=Math.max(0,16-(d-b)),f=a.setTimeout(function(){c(d+e)},e);return b=d+e,f}),a.cancelAnimationFrame||(a.cancelAnimationFrame=function(b){a.clearTimeout(b)})}(window),function(a){function b(a){if(this._element=a,a.className!=this._classCache){if(this._classCache=a.className,!this._classCache)return;var b,c=this._classCache.replace(/^\s+|\s+$/g,"").split(/\s+/);for(b=0;b<c.length;b++)h.call(this,c[b])}}function c(a,b){a.className=b.join(" ")}function d(a,b,c){Object.defineProperty?Object.defineProperty(a,b,{get:c}):a.__defineGetter__(b,c)}if(!("undefined"==typeof a.Element||"classList"in document.documentElement)){Array.prototype.indexOf||(Array.prototype.indexOf=function(a,b){for(var c=b||0,d=this.length;d>c;c++)if(this[c]===a)return c;return-1});var e=Array.prototype,f=e.indexOf,g=e.slice,h=e.push,i=e.splice,j=e.join;b.prototype={add:function(a){this.contains(a)||(h.call(this,a),c(this._element,g.call(this,0)))},contains:function(a){return-1!==f.call(this,a)},item:function(a){return this[a]||null},remove:function(a){var b=f.call(this,a);-1!==b&&(i.call(this,b,1),c(this._element,g.call(this,0)))},toString:function(){return j.call(this," ")},toggle:function(a){return this.contains(a)?this.remove(a):this.add(a),this.contains(a)}},window.DOMTokenList=b,d(Element.prototype,"classList",function(){return new b(this)})}}(window),function(a){"use strict";function b(a,b,c,e){function f(a,b){return 1-3*b+3*a}function g(a,b){return 3*b-6*a}function h(a){return 3*a}function i(a,b,c){return((f(b,c)*a+g(b,c))*a+h(b))*a}function j(a,b,c){return 3*f(b,c)*a*a+2*g(b,c)*a+h(b)}function k(b){var e,f,g,h=b,k=d;for(g=0;k>g;g++){if(e=j(h,a,c),0===e)return h;f=i(h,a,c)-b,h-=f/e}return h}var l;return l=function(d){return a==b&&c==e?d:i(k(d),b,e)},l.toString=function(){return"cubic-bezier("+a+", "+b+", "+c+", "+e+")"},l}var c=a.__S||(a.__S={}),d=4;c.CubicBezier=b}(window);
+    !function(a){a.__S||(a.__S={plugins:{}}),a.DEBUG=function(b){return b?console:{warn:function(){a.console.warn.apply(console,arguments)},log:function(){}}}("#debug"===document.location.hash)}(window),function(a){Array.prototype.forEach||(Array.prototype.forEach=function(a){"use strict";if(void 0===this||null===this)throw new TypeError;var b=Object(this),c=b.length>>>0;if("function"!=typeof a)throw new TypeError;for(var d=arguments.length>=2?arguments[1]:void 0,e=0;c>e;e++)e in b&&a.call(d,b[e],e,b)});var b,c,d,e=a.__S||(a.__S={}),f=a.document.documentElement.style,g=["webkit","Moz","ms"],h=!1,i=!1;if("transition"in f)h=!0,c="";else for(d=0;d<g.length;d++)b=g[d]+"Transition","undefined"!==f.transform&&(h=!0,c=g[d]);if("undefined"!=typeof f.transform)i=!0;else for(d=0;d<g.length;d++)b=g[d]+"Transform","undefined"!=typeof f[b]&&(i=!0,c=g[d]);e.support={prefix:c,transition:h,transform:i,matrix:!(!a.WebKitCSSMatrix&&!a.MSCSSMatrix),touch:"ontouchstart"in a,pointers:a.navigator.pointerEnabled,msPointers:a.navigator.msPointerEnabled}}(window),function(a){function b(b,c){for(var d=["Top","Right","Bottom","Left"],e=a.getComputedStyle(c),f="width"===b,g=f?1:0,h=0;4>g;g+=2)h+=parseInt(e["margin"+d[g]],10);return h+(f?c.offsetWidth:c.offsetHeight)}var c=a.__S||(a.__S={}),d=c.support,e=d&&d.prefix,f={};return d?(d.transition&&d.transform&&(f=""!==e?{transform:e+"Transform",transitionTimingFunction:e+"TransitionTimingFunction",transitionDuration:e+"TransitionDuration",transformOrigin:e+"TransformOrigin",boxSizing:e+"BoxSizing",matrix:d.matrix?a.WebKitCSSMatrix||a.MSCSSMatrix:null}:{transform:"transform",transitionTimingFunction:"transitionTimingFunction",transitionDuration:"transitionDuration",transformOrigin:"transformOrigin",boxSizing:"boxSizing",matrix:null}),f.getHeight=function(a){return b("height",a)},f.getWidth=function(a){return b("width",a)},void(c.styles=f)):void a.console.log("Scroller Dependency error! browser support detection needed")}(window),function(a){"use strict";var b=a.__S||(a.__S={}),c={simpleMerge:function(a,b){var c,d={};for(c in a)d[c]=a[c];for(c in b)d[c]=b[c];return d},parseDOM:function(b){var c;if(b)return"string"==typeof b?(c=a.document.createElement("div"),c.innerHTML=b,Array.prototype.slice.call(c.children,0)):b.length?Array.prototype.slice.call(b,0):[b]},bind:function(a,b,c,d){a.addEventListener(b,c,!!d)},unbind:function(a,b,c,d){a.removeEventListener(b,c,!!d)}};b.helpers=c}(window),function(a){for(var b=0,c=["ms","moz","webkit","o"],d=0;d<c.length&&!a.requestAnimationFrame;++d)a.requestAnimationFrame=a[c[d]+"RequestAnimationFrame"],a.cancelAnimationFrame=a[c[d]+"CancelAnimationFrame"]||a[c[d]+"CancelRequestAnimationFrame"];a.requestAnimationFrame||(a.requestAnimationFrame=function(c){var d=(new Date).getTime(),e=Math.max(0,16-(d-b)),f=a.setTimeout(function(){c(d+e)},e);return b=d+e,f}),a.cancelAnimationFrame||(a.cancelAnimationFrame=function(b){a.clearTimeout(b)})}(window),function(a){function b(a){if(this._element=a,a.className!=this._classCache){if(this._classCache=a.className,!this._classCache)return;var b,c=this._classCache.replace(/^\s+|\s+$/g,"").split(/\s+/);for(b=0;b<c.length;b++)h.call(this,c[b])}}function c(a,b){a.className=b.join(" ")}function d(a,b,c){Object.defineProperty?Object.defineProperty(a,b,{get:c}):a.__defineGetter__(b,c)}if(!("undefined"==typeof a.Element||"classList"in document.documentElement)){Array.prototype.indexOf||(Array.prototype.indexOf=function(a,b){for(var c=b||0,d=this.length;d>c;c++)if(this[c]===a)return c;return-1});var e=Array.prototype,f=e.indexOf,g=e.slice,h=e.push,i=e.splice,j=e.join;b.prototype={add:function(a){this.contains(a)||(h.call(this,a),c(this._element,g.call(this,0)))},contains:function(a){return-1!==f.call(this,a)},item:function(a){return this[a]||null},remove:function(a){var b=f.call(this,a);-1!==b&&(i.call(this,b,1),c(this._element,g.call(this,0)))},toString:function(){return j.call(this," ")},toggle:function(a){return this.contains(a)?this.remove(a):this.add(a),this.contains(a)}},window.DOMTokenList=b,d(Element.prototype,"classList",function(){return new b(this)})}}(window),function(a){"use strict";function b(a,b,c,e){function f(a,b){return 1-3*b+3*a}function g(a,b){return 3*b-6*a}function h(a){return 3*a}function i(a,b,c){return((f(b,c)*a+g(b,c))*a+h(b))*a}function j(a,b,c){return 3*f(b,c)*a*a+2*g(b,c)*a+h(b)}function k(b){var e,f,g,h=b,k=d;for(g=0;k>g;g++){if(e=j(h,a,c),0===e)return h;f=i(h,a,c)-b,h-=f/e}return h}var l;return l=function(d){return a==b&&c==e?d:i(k(d),b,e)},l.toString=function(){return"cubic-bezier("+a+", "+b+", "+c+", "+e+")"},l}var c=a.__S||(a.__S={}),d=4;c.CubicBezier=b}(window);
 },
 _initScrollerPlugins: function () {
     this._initSurfaceManagerPlugin();
@@ -325,9 +327,13 @@ _initScroller: function () {
             mousemove : 2,
             mouseup   : 2,
 
-            MSPointerDown : 3,
-            MSPointerMove : 3,
-            MSPointerUp   : 3
+            pointerdown : 3,
+            pointermove : 3,
+            pointerup   : 3,
+
+            MSPointerDown : 4,
+            MSPointerMove : 4,
+            MSPointerUp   : 4
         },
 
         SCROLL_VERTICAL      = 'vertical',
@@ -528,11 +534,18 @@ _initScroller: function () {
                 eventType(target,  'touchend',    this);
             } 
 
-            if (SUPPORT.pointers && !this.opts.disablePointers) {
-                eventType(wrapper, 'MSPointerDown',   this);
-                eventType(target,  'MSPointerMove',   this);
-                eventType(target,  'MSPointerCancel', this);
-                eventType(target,  'MSPointerUp',     this);
+            if ((SUPPORT.pointers || SUPPORT.msPointers) && !this.opts.disablePointers) {
+                if (SUPPORT.pointers) {
+                    eventType(wrapper, 'pointerdown',   this);
+                    eventType(target,  'pointermove',   this);
+                    eventType(target,  'pointercancel', this);
+                    eventType(target,  'pointerup',     this);
+                } else {
+                    eventType(wrapper, 'MSPointerDown',   this);
+                    eventType(target,  'MSPointerMove',   this);
+                    eventType(target,  'MSPointerCancel', this);
+                    eventType(target,  'MSPointerUp',     this);
+                }
                 pHandlers = true;
             }
 
@@ -587,19 +600,23 @@ _initScroller: function () {
         handleEvent: function (e) {
             switch ( e.type ) {
                 case 'touchstart':
+                case 'pointerdown':
                 case 'MSPointerDown':
                 case 'mousedown':
                     this._start(e);
                     break;
                 case 'touchmove':
+                case 'pointermove':
                 case 'MSPointerMove':
                 case 'mousemove':
                     this._move(e);
                     break;
                 case 'touchend':
+                case 'pointerup':
                 case 'MSPointerUp':
                 case 'mouseup':
                 case 'touchcancel':
+                case 'pointercancel':
                 case 'MSPointerCancel':
                 case 'mousecancel':
                     this._end(e);
@@ -2144,6 +2161,7 @@ _initPullToRefreshPlugin: function () {
     (function (w) {        
     // NAMESPACES
     var SCROLLER = w.__S || (w.__S = {}), 
+        RAF      = w.requestAnimationFrame,
         PLUGINS  = SCROLLER.plugins || (SCROLLER.plugins = {}),
 
         CONFIG_DEFAULTS = {
@@ -2289,7 +2307,10 @@ _initPullToRefreshPlugin: function () {
                 this.prependItems(data);
                 this._ptrTriggered = false;
                 this._setPTRLoadingState(false);
-                this._resetPosition(this._ptrSnapTime);
+
+                RAF(function() {
+                    self._resetPosition(self._ptrSnapTime);
+                });
             }
             
         },
@@ -2334,6 +2355,7 @@ _initPullToLoadMorePlugin: function () {
     (function (w) {        
 
     var SCROLLER = w.__S || (w.__S = {}), //NAMESPACE
+        RAF      = w.requestAnimationFrame,
         PLUGINS  = SCROLLER.plugins || (SCROLLER.plugins = {}),
 
         CONFIG_DEFAULTS = {
@@ -2517,7 +2539,10 @@ _initPullToLoadMorePlugin: function () {
                 this.appendItems(items);
                 this._ptlTriggered = false;
                 this._setPTLLoadingState(false);
-                this._resetPosition(this._ptlSnapTime);
+
+                RAF(function() {
+                    self._resetPosition(self._ptlSnapTime);
+                });
             }
         },
         /*

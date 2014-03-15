@@ -18,7 +18,7 @@ var ComponentPriv = (function() { // Scoping priv
 
     var nextClientCreatedComponentId = 0;
 
-    var ComponentPriv = function ComponentPriv(config, cmp, localCreation, isClientCreated) {
+    var ComponentPriv = function ComponentPriv(config, cmp, localCreation) {
         cmp.priv = this;
 
         // setup some basic things
@@ -54,7 +54,7 @@ var ComponentPriv = (function() { // Scoping priv
                     //
                     this.creationPath = act.forceCreationPath(config["creationPath"]);
                     forcedPath = true;
-                } else if (!context.containsComponentConfig(currentPath) && (!!localCreation || !!isClientCreated)) {
+                } else if (!context.containsComponentConfig(currentPath) && !!localCreation) {
 
                     // skip creation path if the current top path is not in server returned
                     // componentConfigs and localCreation or force client created

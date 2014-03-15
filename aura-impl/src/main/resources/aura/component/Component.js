@@ -70,10 +70,14 @@ exp(dlp,
  * @public
  * @class
  * @constructor
+ *
+ * @param {Object} config - component configuration
+ * @param {Boolean} [localCreation] - local creation
+ * @param {ComponentCreationContext} [componentCreationContext] - ccc used to create component
  */
-function Component(config, localCreation, componentCreationContext, isClientCreated){
+function Component(config, localCreation, componentCreationContext) {
     this.ccc = componentCreationContext;
-    this.priv = new ComponentPriv(config, this, localCreation, isClientCreated);
+    this.priv = new ComponentPriv(config, this, localCreation);
     this._destroying = false;
     
     //#if {"modes" : ["TESTING","AUTOTESTING", "TESTINGDEBUG", "AUTOTESTINGDEBUG"]}

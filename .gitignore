@@ -1,3 +1,4 @@
+.DS_Store
 .metadata/
 target
 .project
@@ -7,7 +8,6 @@ pom.xml.releaseBackup
 *.log
 .settings
 *.pyc
-.DS_Store
 .idea/*
 *.iml
 version.properties

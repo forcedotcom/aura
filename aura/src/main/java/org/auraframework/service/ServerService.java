@@ -17,9 +17,12 @@ package org.auraframework.service;
 
 import java.io.IOException;
 
+import java.io.Writer;
 import java.util.Map;
+import java.util.Set;
 
 import org.auraframework.Aura;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.Message;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -54,6 +57,31 @@ public interface ServerService extends AuraService {
      * @throws QuickFixException if there was a problem instantiating components.
      * @throws IOException if it is unable to write the output.
      */
-    void run(Message message, AuraContext context, Appendable out, Map<?,?> extras)
+    void run(Message message, AuraContext context, Writer out, Map<?,?> extras)
         throws QuickFixException, IOException;
+
+    /**
+     * write out CSS.
+     * 
+     * This writes out CSS for the preloads + app to the response.
+     * 
+     * @param out the appendable
+     * @throws IOException if unable to write to the response
+     * @throws QuickFixException if the definitions could not be compiled.
+     */
+    void writeAppCss(Set<DefDescriptor<?>> dependencies, Writer out) throws IOException, QuickFixException;
+
+    /**
+     * write out the complete set of definitions in JS.
+     * 
+     * This generates a complete set of definitions for an app in JS+JSON.
+     */
+    void writeDefinitions(Set<DefDescriptor<?>> dependencies, Writer out) throws IOException, QuickFixException;
+
+    /**
+     * Write out a set of components in JSON.
+     * 
+     * This writes out the entire set of components from the namespaces in JSON.
+     */
+    void writeComponents(Set<DefDescriptor<?>> dependencies, Writer out) throws IOException, QuickFixException;
 }

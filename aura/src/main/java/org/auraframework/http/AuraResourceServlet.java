@@ -17,9 +17,9 @@ package org.auraframework.http;
 
 import java.io.IOException;
 import java.io.StringWriter;
+
+import java.io.Writer;
 import java.net.URI;
-import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -35,26 +35,17 @@ import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
-import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.def.Definition;
-import org.auraframework.def.EventDef;
-import org.auraframework.def.StyleDef;
 import org.auraframework.instance.Component;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.service.InstanceService;
 import org.auraframework.system.AuraContext;
-import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.javascript.JavascriptProcessingError;
-import org.auraframework.util.javascript.JavascriptWriter;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 /**
  * The aura resource servlet.
@@ -77,45 +68,6 @@ public class AuraResourceServlet extends AuraBaseServlet {
     public static final String ORIG_REQUEST_URI = "aura.origRequestURI";
 
     private static ServletContext servletContext;
-
-    /**
-     * Provide a better way of distinguishing templates from styles..
-     * 
-     * This is used to apply the style definition filter for 'templates', but is getting rather further embedded in
-     * code.
-     * 
-     * TODO: W-1486762
-     */
-    private static interface TempFilter {
-        public boolean apply(DefDescriptor<?> descriptor);
-    }
-
-    private static <P extends Definition, D extends P> Set<DefDescriptor<D>> filterDependencies(
-            Class<D> defType, Set<DefDescriptor<?>> dependencies, TempFilter extraFilter)
-            throws QuickFixException {
-        Set<DefDescriptor<D>> out = Sets.newLinkedHashSet();
-
-        for (DefDescriptor<?> descriptor : dependencies) {
-            if (defType.isAssignableFrom(descriptor.getDefType().getPrimaryInterface())
-                    && (extraFilter == null || extraFilter.apply(descriptor))) {
-                @SuppressWarnings("unchecked")
-                DefDescriptor<D> dd = (DefDescriptor<D>) descriptor;
-                out.add(dd);
-            }
-        }
-        return out;
-    }
-
-    private static <P extends Definition, D extends P> Set<D> filterAndLoad(Class<D> defType,
-            Set<DefDescriptor<?>> dependencies, TempFilter extraFilter) throws QuickFixException {
-
-        Set<D> out = Sets.newLinkedHashSet();
-        Set<DefDescriptor<D>> filtered = filterDependencies(defType, dependencies, extraFilter);
-        for (DefDescriptor<D> dd : filtered) {
-            out.add(dd.getDef());
-        }
-        return out;
-    }
 
     /**
      * check the top level component/app.
@@ -346,11 +298,11 @@ public class AuraResourceServlet extends AuraBaseServlet {
     }
 
     private void writeCss(HttpServletRequest request, Set<DefDescriptor<?>> dependencies, AuraContext context,
-            Appendable out) throws IOException, QuickFixException {
+            Writer out) throws IOException, QuickFixException {
         if (isAppRequest(request)) {
-            writeAppCss(dependencies, out);
+            Aura.getServerService().writeAppCss(dependencies, out);
         } else {
-            writeResourcesCss(context, out);
+            Aura.getClientLibraryService().writeCss(context, out);
         }
     }
 
@@ -362,172 +314,13 @@ public class AuraResourceServlet extends AuraBaseServlet {
         return false;
     }
 
-    /**
-     * write out CSS.
-     * 
-     * This writes out CSS for the preloads + app to the response. Note that currently it only writes out the preloads
-     * because of the missing capability to do the apps will get fixed by W-1166679
-     * 
-     * @param out the appendable
-     * @throws IOException if unable to write to the response
-     * @throws QuickFixException if the definitions could not be compiled.
-     */
-    public static void writeAppCss(Set<DefDescriptor<?>> dependencies, Appendable out)
-            throws IOException, QuickFixException {
-        AuraContext context = Aura.getContextService().getCurrentContext();
-
-        Mode mode = context.getMode();
-        final boolean minify = !(mode.isTestMode() || mode.isDevMode());
-        final String mKey = minify ? "MIN:" : "DEV:";
-
-        DefDescriptor<?> appDesc = context.getLoadingApplicationDescriptor();
-
-        final String uid = context.getUid(appDesc);
-        final String key = "CSS:" + mKey + uid;
-
-        context.setPreloading(true);
-
-        if (context.getOverrideThemeDescriptor() == null && appDesc != null
-                && appDesc.getDefType() == DefType.APPLICATION) {
-            ApplicationDef app = ((ApplicationDef) appDesc.getDef());
-            context.setOverrideThemeDescriptor(app.getOverrideThemeDescriptor());
-        }
-
-        String cached = context.getDefRegistry().getCachedString(uid, appDesc, key);
-        if (cached == null) {
-            List<StyleDef> orderedStyleDefs = Lists.newArrayList();
-
-            for (DefDescriptor<?> dd : dependencies) {
-                if (dd.getDefType().equals(DefType.STYLE)) {
-                    @SuppressWarnings("unchecked")
-                    DefDescriptor<StyleDef> dds = (DefDescriptor<StyleDef>) dd;
-                    orderedStyleDefs.add(dds.getDef());
-                }
-            }
-            StringBuffer sb = new StringBuffer();
-            Aura.getSerializationService().writeCollection(orderedStyleDefs, StyleDef.class, sb, "CSS");
-            cached = sb.toString();
-            context.getDefRegistry().putCachedString(uid, appDesc, key, cached);
-        }
-        out.append(cached);
-    }
-
-    public static void writeResourcesCss(AuraContext context, Appendable out) throws IOException, QuickFixException {
-        Aura.getClientLibraryService().writeCss(context, out);
-    }
-
-    /**
-     * Write out a set of components in JSON.
-     * 
-     * This writes out the entire set of components from the namespaces in JSON.
-     */
-    private void writeComponents(Set<DefDescriptor<?>> dependencies, Appendable out)
-            throws ServletException, IOException, QuickFixException {
-        AuraContext context = Aura.getContextService().getCurrentContext();
-
-        context.setPreloading(true);
-        Aura.getSerializationService().writeCollection(filterAndLoad(BaseComponentDef.class, dependencies, null),
-                BaseComponentDef.class, out);
-    }
-
-    private static class AuraControllerFilter implements TempFilter {
-        @Override
-        public boolean apply(DefDescriptor<?> descriptor) {
-            return descriptor.getPrefix().equalsIgnoreCase("aura") && descriptor.getDefType() == DefType.CONTROLLER;
-        }
-    }
-
-    private static final AuraControllerFilter ACF = new AuraControllerFilter();
-
     private void writeJs(HttpServletRequest request, Set<DefDescriptor<?>> dependencies, AuraContext context,
-            Appendable out) throws IOException, QuickFixException {
+            Writer out) throws IOException, QuickFixException {
         if (isAppRequest(request)) {
-            writeDefinitions(dependencies, out);
+            Aura.getServerService().writeDefinitions(dependencies, out);
         } else {
-            writeResourcesJs(context, out);
+            Aura.getClientLibraryService().writeJs(context, out);
         }
-    }
-
-    private void writeResourcesJs(AuraContext context, Appendable out) throws IOException, QuickFixException {
-        Aura.getClientLibraryService().writeJs(context, out);
-    }
-
-    /**
-     * write out the complete set of definitions in JS.
-     * 
-     * This generates a complete set of definitions for an app in JS+JSON.
-     * 
-     */
-    public static void writeDefinitions(Set<DefDescriptor<?>> dependencies, Appendable out)
-            throws IOException, QuickFixException {
-        AuraContext context = Aura.getContextService().getCurrentContext();
-
-        Mode mode = context.getMode();
-        final boolean minify = !(mode.isTestMode() || mode.isDevMode());
-        final String mKey = minify ? "MIN:" : "DEV:";
-        //
-        // create a temp buffer in case anything bad happens while we're processing this.
-        // don't want to end up with a half a JS init function
-        //
-        // TODO: get rid of this buffering by adding functionality to Json.serialize that will help us
-        // make sure serialized JS is valid, non-error-producing syntax if an exception happens in the
-        // middle of serialization.
-        //
-
-        context.setPreloading(true);
-        DefDescriptor<?> applicationDescriptor = context.getLoadingApplicationDescriptor();
-        final String uid = context.getUid(applicationDescriptor);
-        final String key = "JS:" + mKey + uid;
-        String cached = context.getDefRegistry().getCachedString(uid, applicationDescriptor, key);
-
-        if (cached == null) {
-
-            StringBuilder sb = new StringBuilder();
-
-            sb.append("$A.clientService.initDefs({");
-
-            // append component definitions
-            sb.append("componentDefs:");
-            Collection<BaseComponentDef> defs = filterAndLoad(BaseComponentDef.class, dependencies, null);
-            Aura.getSerializationService().writeCollection(defs, BaseComponentDef.class, sb, "JSON");
-            sb.append(",");
-
-            // append event definitions
-            sb.append("eventDefs:");
-            Collection<EventDef> events = filterAndLoad(EventDef.class, dependencies, null);
-            Aura.getSerializationService().writeCollection(events, EventDef.class, sb, "JSON");
-            sb.append(",");
-
-            //
-            // append controller definitions
-            // Dunno how this got to be this way. The code in the Format adaptor was
-            // twisted and stupid,
-            // as it walked the namespaces looking up the same descriptor, with a
-            // string.format that had
-            // the namespace but did not use it. This ends up just getting a single
-            // controller.
-            //
-            sb.append("controllerDefs:");
-            Collection<ControllerDef> controllers = filterAndLoad(ControllerDef.class, dependencies, ACF);
-            Aura.getSerializationService().writeCollection(controllers, ControllerDef.class, sb, "JSON");
-
-            sb.append("});");
-
-            cached = sb.toString();
-            // only use closure compiler in prod mode, due to compile cost
-            if (minify) {
-                StringWriter sw = new StringWriter();
-                List<JavascriptProcessingError> errors = JavascriptWriter.CLOSURE_SIMPLE.compress(cached, sw, key);
-                if (errors == null || errors.isEmpty()) {
-                    // For now, just use the non-compressed version if we can't get
-                    // the compression to work.
-                    cached = sw.toString();
-                }
-            }
-            context.getDefRegistry().putCachedString(uid, applicationDescriptor, key, cached);
-        }
-
-        out.append(cached);
     }
 
     /**
@@ -617,7 +410,7 @@ public class AuraResourceServlet extends AuraBaseServlet {
                 return;
             }
             try {
-                writeComponents(topLevel, response.getWriter());
+                Aura.getServerService().writeComponents(topLevel, response.getWriter());
             } catch (Throwable t) {
                 handleServletException(t, true, context, request, response, true);
             }

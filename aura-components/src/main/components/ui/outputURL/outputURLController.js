@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{
+({
     click : function(cmp, event){
         var attributes = cmp.getAttributes();
 
@@ -38,4 +38,4 @@
         clickEvent.fire();
         return true;
     }
-}
+})

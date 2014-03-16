@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- {
+({
     testHrefPresent: {
         test: function(component) {
             var link = component.find("testLink");
@@ -29,4 +29,4 @@
             $A.test.assertEquals("javascript:void(0/*#anchor*/);", hrefValue); //in test mode we incldue original href value 
         }
     }
-}
+})

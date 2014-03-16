@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{
+({
     clearAll: function(cmp, evt) {
         if (confirm("Are you sure you want to clear all aura definitions out of every cache?")) {
             var a = cmp.get("c.clearAllRegistries");
@@ -28,4 +28,4 @@
         var val = cmp.getValue("v.mbeans");
         val.setValue(!val.getValue());
     }
-}
+})

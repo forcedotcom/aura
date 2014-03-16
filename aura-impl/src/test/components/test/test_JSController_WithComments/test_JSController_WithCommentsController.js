@@ -18,7 +18,7 @@
  * Special characters * # //
  */
 //Single line comments
-{
+({
     /**
      * Multiline comments before each action
      */
@@ -35,6 +35,6 @@
      */
     functionName2: function(args1, args2, args3) {
         var str = 'Still do Nothing';
-    },
+    }
 
-}
+})

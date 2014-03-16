@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{
+({
     open : function(cmp, event){
 
         event.preventDefault();
@@ -26,4 +26,4 @@
         });
         evt.fire();
     }
-}
+})

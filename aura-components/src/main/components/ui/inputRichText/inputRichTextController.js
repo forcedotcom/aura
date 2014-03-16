@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-{	
+({	
 	/**
 	 * Toggle between CKEditor and plain textarea
 	 * Triggered by the application event "ui:toggleRichText"
@@ -22,4 +22,4 @@
 	toggle : function(cmp, evt, helper) {
 		helper.toggle(cmp, evt.getParam('isRichText'));		
 	}
-}
+})

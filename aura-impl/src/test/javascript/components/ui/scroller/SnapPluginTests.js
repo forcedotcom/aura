@@ -227,7 +227,7 @@ Test.Components.Ui.Scroller.SnapPluginTests=function(){
 					"_computeMomentum":function(velocity,current){
 						return {
 							destination:data.destination,
-							time :10,
+							time :10
 						};
 					}
 				});

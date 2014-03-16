@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{
+({
     cssalert:function(c){
     	function getStyle(elem, style){
             var val = "";
@@ -32,4 +32,4 @@
         var style = getStyle(c.getElement(),"background-image");
         c.getValue("v.output").setValue('@@@TOKEN@@@' + style.substring(style.lastIndexOf('?')+1,style.lastIndexOf(')')) + ($A.test ? $A.test.dummyFunction() : "@@@TOKEN@@@"));
     }
-}
+})

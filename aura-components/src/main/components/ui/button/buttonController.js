@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{
+({
     handleKeydown : function(cmp, event){
         var keydownEvent = cmp.getEvent("keydown");
         keydownEvent.setParams({"domEvent": event});
@@ -45,4 +45,4 @@
         pressEvent.fire();
         return true;
     }
-}
+})

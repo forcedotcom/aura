@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{
+({
     updateText:function(c,e,h){
         c.getValue("v.text").setValue("modified");
         document.__PageModifiedTestFlag = true;
@@ -62,4 +62,4 @@
         var a = c.get("c.noArgs");
         $A.enqueueAction(a);
     }
-}
+})

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{
+({
     layoutChanged : function(cmp, event) {
         $A.log("layoutChange: "+event.getParam("prevTitle") + " -> "+event.getParam("title"));
         cmp._lastLayoutTitle = event.getParam("prevTitle");
@@ -27,4 +27,4 @@
         cmp._currTitle = event.getParam("title");
         $A.util.addClass(cmp.find("ready").getElement(),"titleChanged");
     }
-}
+})

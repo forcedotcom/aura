@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{
+({
     doAction : function(component) {
         var inputCmp = component.find("inputCmp");
         var simplevalue = inputCmp.getValue("v.value");
@@ -61,4 +61,4 @@
         var updateErrorEvent = inputCmp.getEvent("updateError");
         updateErrorEvent.fire();
     }
-}
+})

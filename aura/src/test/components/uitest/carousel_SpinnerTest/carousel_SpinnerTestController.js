@@ -13,8 +13,8 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-{
+({
 	loadPage : function(cmp, evt, helper) {
 		helper.showLoadingIndicator(cmp.getSuper());
 	}
-}
+})

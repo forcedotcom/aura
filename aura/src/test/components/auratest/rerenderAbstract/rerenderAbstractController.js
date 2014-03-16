@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{
+({
     toggleAbstract : function(cmp, event) {
         var val = cmp.getValue("v.toggleAbstract");
         val.setValue(!val.unwrap());
@@ -28,4 +28,4 @@
         var val = cmp.getValue("v.toggleInterface");
         val.setValue(!val.unwrap());
     }
-}
+})

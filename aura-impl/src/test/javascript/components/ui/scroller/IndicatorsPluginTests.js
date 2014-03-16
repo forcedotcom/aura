@@ -193,7 +193,7 @@ Test.Components.Ui.Scroller.IndicatorsPluginTests=function(){
 		   	    actual,
                 indicator = {
                 	wrapperHeight:0,
-                	virtualSizeY:0,
+                	virtualSizeY:0
 
                 },
         		scrollerWrapper = domStubAlias.GetNode({id:'scroller-wrapper'}, null, 
@@ -247,7 +247,7 @@ Test.Components.Ui.Scroller.IndicatorsPluginTests=function(){
 		   	    actual,
                 indicator = {
                 	wrapperHeight:0,
-                	virtualSizeY:0,
+                	virtualSizeY:0
 
                 },
         		scrollerWrapper = domStubAlias.GetNode({id:'scroller-wrapper'}, null, 

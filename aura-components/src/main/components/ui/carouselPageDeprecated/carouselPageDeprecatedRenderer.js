@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-{
+({
 	render: function(cmp, helper) {		
 		helper.setVisibility(cmp);
 		return this.superRender();
@@ -41,4 +41,4 @@
 			this.superRerender();
 		}
 	}
-}
+})

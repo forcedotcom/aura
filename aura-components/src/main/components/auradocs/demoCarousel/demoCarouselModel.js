@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-{
+({
     "data": [
      {
          "header" : "Page 1",
@@ -26,4 +26,4 @@
      }       
      ]
 	 
-}
+})

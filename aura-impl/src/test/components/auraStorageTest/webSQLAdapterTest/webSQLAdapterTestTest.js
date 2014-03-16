@@ -58,7 +58,7 @@
 				    storage.clear();
 				    $A.test.addWaitFor(0, function(){return storage.getSize()});
 				});
-		},
+		}
 		]
     },
     

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-{
+({
 	onPageSelected: function (cmp, evt) {
 		
         var currentPage = cmp.get("v.currentPage"),
@@ -46,4 +46,4 @@
         	cmp.getValue('v.currentPage').setValue(targetPage);        	
         }       
     } 
-}
+})

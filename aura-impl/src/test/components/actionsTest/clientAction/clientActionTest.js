@@ -55,7 +55,7 @@
 			});
 			$A.test.assertTrue(gotResponse, "Background Client Side Action was not called after enqueue.")
 		}
-	},
+	}
 
 	/**
 	 * Framework just logs the controller error.  No visible error message.

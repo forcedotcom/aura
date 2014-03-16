@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{
+({
     getSand: function(cmp, event) {
         var sandRef = cmp.find("actionref").getValue("c.sand");
         cmp.getValue("v.myActionRef").setValue(sandRef);
@@ -24,4 +24,4 @@
         var action = ref.unwrap();
         action.runDeprecated();
     }
-}
+})

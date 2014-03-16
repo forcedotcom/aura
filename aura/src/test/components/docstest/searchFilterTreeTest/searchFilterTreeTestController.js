@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{
+({
     doInit : function(cmp, evt, helper) {
       cmp.find('searchTree').getAttributes().setValue('tree', cmp.find('tree'));
     }
-}
+})

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{
+({
     similarActionNames: function(cmp, event) {
         var button = event.getSource();
         button.getAttributes().setValue("label", 'clientAction1'+apexActionReturnValue);
@@ -50,4 +50,4 @@
         });
         $A.enqueueAction(a);
     }
-}
+})

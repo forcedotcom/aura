@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{
+({
     /**
      * The initial setting of the tree is handled just like any other future
      * value change.
@@ -45,4 +45,4 @@
             helper.doUpdate(cmp);
         }
     }
-}
+})

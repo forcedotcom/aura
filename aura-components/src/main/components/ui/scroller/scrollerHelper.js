@@ -424,7 +424,7 @@ _initScroller: function () {
             },
             bounce : {
                 style : EASING_BOUNCE.toString(),
-                fn    : EASING_BOUNCE,
+                fn    : EASING_BOUNCE
             }
         },
         // Default options
@@ -1750,7 +1750,7 @@ _initSurfaceManagerPlugin: function () {
                 this._appendData(parsedData);
                 this._updateSurfaceManager();
             }
-        },
+        }
     };   
 
     SCROLLER.SurfaceManager = PLUGINS.SurfaceManager = SurfaceManager;
@@ -2174,7 +2174,7 @@ _initIndicatorsPlugin: function () {
             
             this._indicators.push(new Indicator(this, {
                 el          : scrollbar,
-                interactive : interactive,
+                interactive : interactive
             }));
         },
         _createDefaultScrollbar: function (vertical, interactive, customStyle) {
@@ -2892,7 +2892,7 @@ _initEndlessPlugin: function () {
             }
 
             this._setInfiniteScrollerSize();
-        },
+        }
         
     };   
 

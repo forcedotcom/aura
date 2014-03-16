@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{
+({
     toggleValue : function(cmp, event) {
         var toggle = cmp.getValue("v.value");
         toggle.setValue(toggle.unwrap() ? "" : "<b>some value</b>");
     }
-}
+})

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{
+({
     toggleParent : function(cmp, event) {
         var val = cmp.getValue("v.toggleParent");
         val.setValue(!val.unwrap());
@@ -23,4 +23,4 @@
         var val = cmp.getValue("m.booleanFalse");
         val.setValue(!val.unwrap());
     }
-}
+})

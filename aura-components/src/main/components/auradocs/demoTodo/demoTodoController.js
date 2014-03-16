@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{
+({
 	clearDone : function(cmp){
 		var items = cmp.getValue("m.items");
 		for(var i = items.getLength()-1; i >= 0; i--){
@@ -45,4 +45,4 @@
 		var elem = event.getSource().getElement();
 		$A.util.toggleClass(elem, "done");
 	}
-}
+})

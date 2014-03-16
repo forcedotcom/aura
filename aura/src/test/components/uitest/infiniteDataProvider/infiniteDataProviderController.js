@@ -47,7 +47,7 @@
         	for (var i=start; i<limit; i++) {
         		data.push({
         			index: i+1,
-        			char: String.fromCharCode(65 + (i%26))
+        			"char": String.fromCharCode(65 + (i%26))
         		});
         	}
         

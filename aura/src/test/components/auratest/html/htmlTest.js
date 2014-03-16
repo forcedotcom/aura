@@ -224,7 +224,7 @@
 	    this.fireTouchEndEventOnElement(component, targetElement);
 	    $A.test.addWaitFor(true, function(){return component._TouchEndHandler;},
 		    function(){$A.test.assertFalse(component._OnClickHandler);})
-	},
+	}
 	 //Only click handler defined
 //	 function(component){
 //	    var targetElement = component.find("onlyClickHandler").getElement();

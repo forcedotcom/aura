@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{
+({
     render : function(cmp, helper){
     	var enabled = helper.isEnabled(cmp);
 		cmp.getValue("v.enabled").setValue(enabled);
@@ -27,4 +27,4 @@
 		
     	return this.superRender(); 
     }
-}
+})

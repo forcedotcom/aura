@@ -50,4 +50,4 @@
         }
         return this.superRerender(cmp);
     }
-}
+})

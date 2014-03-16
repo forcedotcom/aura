@@ -13,12 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-{ 
-	/**
-	 * Handle pageSelected event from carousel
-	 */
-	onPageSelected: function(cmp, evt, helper) {	
+({
+    /**
+     * Handle pageSelected event from carousel
+     */
+    onPageSelected: function(cmp, evt, helper) {	
         helper.onPageSelected(cmp, evt);        
     },
         
@@ -39,5 +38,4 @@
         compEvent.setParams(evt.getParams());
         compEvent.fire();        
     }
-    
-}
+})

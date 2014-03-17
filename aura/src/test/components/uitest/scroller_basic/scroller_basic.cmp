@@ -20,6 +20,10 @@
 	description="A test scroller.">
 	<aura:handler name="init" value="{!this}" action="{!c.init}"/> 	
 	<style>
+		* {
+			box-sizing: border-box;
+		}
+		
 		body {
 			margin: 0;
 			padding: 0;
@@ -27,8 +31,9 @@
 		}
 	</style>
 	<div id="header" class="common">New Aura Scroller</div>
-		<ui:scroller class="scrollWrapper" onPullToRefresh="{!c.fetchData}">
-			<ul id="scrollableItemsContainer">
+		
+		<ui:scroller class="scrollWrapper" onPullToRefresh="{!c.fetchData}" onPullToShowMore="{!c.fetchData}">
+			<ul id="scrollableItemsContainer">	
 				<li>Pretty row 1</li>
 				<li>Pretty row 2</li>
 				<li>Pretty row 3</li>
@@ -131,6 +136,6 @@
 				<li>Pretty row 100</li>
 			</ul>
 		</ui:scroller>
-	
+		
 	<div id="footer" class="common">This is a footer</div>
 </aura:component>

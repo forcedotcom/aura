@@ -12,7 +12,7 @@
             	if (action.getState() === "SUCCESS") {
             		result = action.getReturnValue();
             		if(result == null){
-            			dom = [];
+            			dom = null;
             		}
             		for(var i in result){
             			li = document.createElement('li');
@@ -27,7 +27,7 @@
                     $A.log("Fail: " + action.getError()[0].message);
                 }
             };
-        
+        //debugger;
         act.setParams({"size":dataSize});
         act.setCallback(component, actionCallback);
         $A.run(function(){

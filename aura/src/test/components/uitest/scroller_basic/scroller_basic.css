@@ -44,7 +44,9 @@
 
 .THIS.scrollWrapper {
 	position:absolute; z-index:1;
-	top:45px; bottom:40px;
+	top: 45px;
+	bottom: 50px;
+	overflow: hidden;
 	background:#aaa;
 	width: 100%;
 }

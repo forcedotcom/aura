@@ -1176,7 +1176,12 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     }
 
 	@Override
-    public <D extends Definition> void assertAccess(DefDescriptor<?> referencingDescriptor, D def) throws QuickFixException {
+	public <D extends Definition> void assertAccess(DefDescriptor<?> referencingDescriptor, D def) throws QuickFixException {
+	    assertAccess(referencingDescriptor, def, accessCheckCache);
+	}
+	
+    <D extends Definition> void assertAccess(DefDescriptor<?> referencingDescriptor, D def, Cache<String, String> accessCheckCache) 
+            throws QuickFixException {
 		// If the def is access="global" then anyone can see it
     	if (def.getAccess().isGlobal()) {
     		return;
@@ -1238,7 +1243,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 				accessCheckCache.put(key, status);
 			}
 		} else {
-			// System.out.printf("** MDR.hit.assertAccesst() cache hit for: %s\n", key);
+			// System.out.printf("** MDR.hit.assertAccess() cache hit for: %s\n", key);
 		}
 		
 		if (!status.isEmpty()) {

@@ -436,7 +436,9 @@ public class ConfigAdapterImpl implements ConfigAdapter {
 
 	@Override
 	public void addPrivilegedNamespace(String namespace) {
-		SYSTEM_NAMESPACES.add(namespace);
+	    if(namespace != null && !namespace.isEmpty()){
+	        SYSTEM_NAMESPACES.add(namespace);
+	    }
 	}
 
 	@Override

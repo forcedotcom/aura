@@ -15,6 +15,11 @@
  */
 package org.auraframework.impl.system;
 
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.Collection;
@@ -34,6 +39,7 @@ import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
+import org.auraframework.def.DefinitionAccess;
 import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.HelperDef;
 import org.auraframework.def.LayoutsDef;
@@ -57,9 +63,11 @@ import org.auraframework.test.AuraTestingUtil;
 import org.auraframework.test.annotation.ThreadHostileTest;
 import org.auraframework.test.annotation.UnAdaptableTest;
 import org.auraframework.test.util.AuraPrivateAccessor;
+import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.internal.util.MockUtil;
 import org.mockito.invocation.InvocationOnMock;
@@ -72,6 +80,11 @@ import com.google.common.collect.Lists;
  * @see org.auraframework.impl.registry.RootDefFactoryTest
  */
 public class MasterDefRegistryImplTest extends AuraImplTestCase {
+    @Mock Definition globalDef;
+    @Mock DefinitionAccess defAccess;
+    @Mock DefDescriptor<ComponentDef> referencingDesc;
+    @Mock Cache<String, String> mockAccessCheckCache;
+    
     public MasterDefRegistryImplTest(String name) {
         super(name);
     }
@@ -916,7 +929,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
      * @throws Exception
      */
     public void testGetClientLibraries()throws Exception{
-        MasterDefRegistry mdr = Aura.getContextService().getCurrentContext().getDefRegistry();
+        MasterDefRegistry mdr = getAuraMDR();
         List<ClientLibraryDef> libDefs = mdr.getClientLibraries(null);
         assertNull(libDefs);
         
@@ -931,5 +944,73 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         //13 from clientLibraryTest:testDependencies and its dependencies + 4 from aura:component
         //Update this number when you add new aura:clientLibrary tags to these components
         assertEquals(17, libDefs.size());
+    }
+    
+    public void testAssertAccess_IfGlobalAccessThenPassesCheck() throws Exception{
+        when(globalDef.getAccess()).thenReturn(defAccess);
+        when(defAccess.isGlobal()).thenReturn(true);
+        MasterDefRegistry mdr = getAuraMDR();
+        mdr.assertAccess(null, globalDef);
+        
+        verify(globalDef).getAccess();
+        verify(defAccess).isGlobal();
+    }
+    
+    
+    public void testAssertAccess_IfReferencedByUnsecuredPrefixThenPassesCheck()throws Exception{
+        when(globalDef.getAccess()).thenReturn(defAccess);
+        when(defAccess.isGlobal()).thenReturn(false);
+        when(referencingDesc.getPrefix()).thenReturn("aura");
+        MasterDefRegistry mdr = getAuraMDR();
+        mdr.assertAccess(referencingDesc, globalDef);
+        
+        verify(referencingDesc).getPrefix();
+    }
+    
+    /**
+     * Verify that if access cache has a reason to block access, then MDR throws NoAccessException.
+     * @throws Exception
+     */
+    public void testAssertAccess_UsesCachedValueIfPresent_BlockAccess()throws Exception{
+        DefDescriptor<ComponentDef> desc = addSourceAutoCleanup(ComponentDef.class, String.format(baseComponentTag, "", ""));
+        when(mockAccessCheckCache.getIfPresent(anyString())).thenReturn("Error");
+        MasterDefRegistryImpl mdr = (MasterDefRegistryImpl)getAuraMDR();
+        try{
+            mdr.assertAccess(null, desc.getDef(), mockAccessCheckCache);
+            fail("Expected NoAccessException because accessCache has reason to block def");
+        }catch(Exception e){
+            this.assertExceptionMessageStartsWith(e, NoAccessException.class, "Error");
+        }
+        verify(mockAccessCheckCache).getIfPresent(anyString());
+    }
+    
+    /**
+     * Verify that if access cache doesn't have any message to block access, then access checks passes through.
+     * @throws Exception
+     */
+    public void testAssertAccess_UsesCachedValueIfPresent_AllowAccess()throws Exception{
+        DefDescriptor<ComponentDef> desc = addSourceAutoCleanup(ComponentDef.class, String.format(baseComponentTag, "", ""));
+        when(mockAccessCheckCache.getIfPresent(anyString())).thenReturn("");
+        MasterDefRegistryImpl mdr = (MasterDefRegistryImpl)getAuraMDR();
+        mdr.assertAccess(null, desc.getDef(), mockAccessCheckCache);
+        
+        verify(mockAccessCheckCache).getIfPresent(anyString());
+    }
+    
+    public void testAssertAccess_StoreAccessInfoInCacheIfNotPresent()throws Exception{
+        DefDescriptor<ComponentDef> desc = addSourceAutoCleanup(ComponentDef.class, String.format(baseComponentTag, "", ""));
+        when(mockAccessCheckCache.getIfPresent(anyString())).thenReturn(null);
+        
+        MasterDefRegistryImpl mdr = (MasterDefRegistryImpl)getAuraMDR();
+        mdr.assertAccess(null, desc.getDef(), mockAccessCheckCache);
+
+        verify(mockAccessCheckCache).put(anyString(),anyString());
+        
+        mdr.assertAccess(null, desc.getDef(), mockAccessCheckCache);
+        verify(mockAccessCheckCache, times(2)).getIfPresent(anyString());
+    }
+    
+    private MasterDefRegistry getAuraMDR(){
+        return Aura.getContextService().getCurrentContext().getDefRegistry();
     }
 }

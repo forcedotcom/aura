@@ -38,6 +38,7 @@ import org.auraframework.util.date.DateServiceImpl;
 import org.auraframework.util.javascript.Literal;
 import org.auraframework.util.json.Json.Serialization;
 import org.auraframework.util.json.Json.Serialization.ReferenceType;
+import org.auraframework.util.json.Json.Serialization.ReferenceScope;
 import org.auraframework.util.json.JsonSerializer.NoneSerializer;
 
 import com.google.common.collect.Maps;
@@ -109,6 +110,15 @@ public class JsonSerializers {
                 return serialization.referenceType();
             }
             return ReferenceType.NONE;
+        }
+
+        @Override
+        public final ReferenceScope getReferenceScope(JsonSerializable value) {
+            Serialization serialization = value.getClass().getAnnotation(Serialization.class);
+            if (serialization != null) {
+                return serialization.referenceScope();
+            }
+            return ReferenceScope.ACTION;
         }
 
         @Override

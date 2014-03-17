@@ -30,6 +30,7 @@ import org.auraframework.throwable.AuraExceptionInfo;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json.Serialization;
+import org.auraframework.util.json.Json.Serialization.ReferenceScope;
 import org.auraframework.util.json.Json.Serialization.ReferenceType;
 import org.auraframework.util.text.Hash;
 
@@ -38,7 +39,7 @@ import com.google.common.collect.Maps;
 /**
  * The implementation for a definition.
  */
-@Serialization(referenceType = ReferenceType.IDENTITY)
+@Serialization(referenceType = ReferenceType.IDENTITY, referenceScope = ReferenceScope.REQUEST)
 public abstract class DefinitionImpl<T extends Definition> implements Definition, Serializable {
 
     private static final long serialVersionUID = 5836732915093913670L;

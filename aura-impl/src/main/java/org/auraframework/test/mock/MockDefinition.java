@@ -25,12 +25,13 @@ import org.auraframework.system.SubDefDescriptor;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.*;
 import org.auraframework.util.json.Json.Serialization;
+import org.auraframework.util.json.Json.Serialization.ReferenceScope;
 import org.auraframework.util.json.Json.Serialization.ReferenceType;
 
 /**
  * A simple Definition.
  */
-@Serialization(referenceType = ReferenceType.IDENTITY)
+@Serialization(referenceType = ReferenceType.IDENTITY, referenceScope = ReferenceScope.REQUEST)
 public abstract class MockDefinition<D extends Definition> implements Definition {
     private static final long serialVersionUID = 9040467312474951787L;
     private final DefDescriptor<D> descriptor;

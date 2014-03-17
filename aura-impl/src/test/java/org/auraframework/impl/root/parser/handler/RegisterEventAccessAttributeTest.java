@@ -15,13 +15,13 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-public class ThemeAccessAttributeTest extends BaseAccessAttributeTest {
+public class RegisterEventAccessAttributeTest extends BaseAccessAttributeTest {
 
-	public ThemeAccessAttributeTest(String name) {
+	public RegisterEventAccessAttributeTest(String name) {
 		super(name);
-		testResource = TestResource.Theme;
+		testResource = TestResource.RegisterEvent;
 	}
-	
+
 	// Remove these when bugs are fixed.
 	@Override
 	public void testSimpleAccessInSystemNamespace() throws Exception {		

@@ -5,24 +5,33 @@
     
     fetchData : function(component, callback, helper) {
         var result,
-        	act = component.get("c.getItems");
-        	var foo=function(action){
+        	dataSize = (Math.floor(Math.random() * (2 - 0 + 1)) + 0),
+        	act = component.get("c.getItems"),
+        	dom = [],
+        	actionCallback = function(action){
             	if (action.getState() === "SUCCESS") {
             		result = action.getReturnValue();
+            		if(result == null){
+            			dom = [];
+            		}
+            		for(var i in result){
+            			li = document.createElement('li');
+            	    	li.textContent = result[i].label;
+            	    	li.id = result[i].value;
+            	    	dom.push(li);
+            		}
             		$A.log(result);
-            		var timestamp = new Date().getTime();
-            		callback(null,"<p>some data from server</p> "+timestamp);
+            		callback(null, dom);
             	}
             	else {
                     $A.log("Fail: " + action.getError()[0].message);
                 }
-            }
-        	
-        act.setParams({'keyboard':""});
-        act.setCallback(component, foo);
+            };
+        
+        act.setParams({"size":dataSize});
+        act.setCallback(component, actionCallback);
         $A.run(function(){
         	$A.enqueueAction(act);
         });
-        
     }
 })

@@ -7,12 +7,12 @@
         var result,
         	dataSize = (Math.floor(Math.random() * (2 - 0 + 1)) + 0),
         	act = component.get("c.getItems"),
-        	dom = [],
         	actionCallback = function(action){
+        		var dom = [];
             	if (action.getState() === "SUCCESS") {
             		result = action.getReturnValue();
             		if(result == null){
-            			dom = null;
+            			dom = null;//fails if dom=[] gives gack on the UI
             		}
             		for(var i in result){
             			li = document.createElement('li');

@@ -15,6 +15,7 @@
  */
 package org.auraframework.impl.java.controller;
 
+import java.io.StringWriter;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -401,10 +402,10 @@ public class JavaControllerTest extends AuraImplTestCase {
 
     private List<Map<String, Object>> runActionsAndReturnLogs(List<Action> actions) throws Exception {
         List<Map<String, Object>> logs;
-        StringBuffer sb = new StringBuffer();
+        StringWriter sw = new StringWriter();
         TestLoggingAdapterController.beginCapture();
         try {
-            Aura.getServerService().run(new Message(actions), Aura.getContextService().getCurrentContext(), sb, null);
+            Aura.getServerService().run(new Message(actions), Aura.getContextService().getCurrentContext(), sw, null);
         } finally {
             Aura.getLoggingService().doLog();
             logs = TestLoggingAdapterController.endCapture();

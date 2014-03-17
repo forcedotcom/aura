@@ -25,7 +25,6 @@ import org.auraframework.def.DefinitionAccess;
 import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.system.DefinitionImpl.RefBuilderImpl;
 import org.auraframework.system.AuraContext;
-import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;

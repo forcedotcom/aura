@@ -21,7 +21,6 @@ import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
-import org.auraframework.impl.root.component.ComponentImpl;
 import org.auraframework.instance.Component;
 
 /**

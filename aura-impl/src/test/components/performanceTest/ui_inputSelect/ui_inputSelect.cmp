@@ -1,0 +1,50 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component model='java://org.auraframework.impl.java.model.TestJavaModel'>
+	<aura:attribute name="count" type="int" required="false" description="The size of the data" default="1"/>
+	<aura:attribute name="componentCount" type="int" required="false" description="The number of components" default="1"/>
+    <ui:inputSelect options="{!m.perfOptions}" aura:id="InputSelectOptions"/>
+    <aura:if isTrue="{!v.componentCount > 9}">
+   		<ui:inputSelect options="{!m.perfOptions}" aura:id="InputSelectOptions1"/>
+   		<ui:inputSelect options="{!m.perfOptions}" aura:id="InputSelectOptions2"/>
+   		<ui:inputSelect options="{!m.perfOptions}" aura:id="InputSelectOptions3"/>
+   		<ui:inputSelect options="{!m.perfOptions}" aura:id="InputSelectOptions4"/>
+   		<ui:inputSelect options="{!m.perfOptions}" aura:id="InputSelectOptions5"/>
+   		<ui:inputSelect options="{!m.perfOptions}" aura:id="InputSelectOptions6"/>
+   		<ui:inputSelect options="{!m.perfOptions}" aura:id="InputSelectOptions7"/>
+   		<ui:inputSelect options="{!m.perfOptions}" aura:id="InputSelectOptions8"/>
+   		<ui:inputSelect options="{!m.perfOptions}" aura:id="InputSelectOptions9"/>
+   </aura:if>
+   <aura:if isTrue="{!v.componentCount > 24}">
+   		<ui:inputSelect options="{!m.perfOptions}" aura:id="InputSelectOptions10"/>
+   		<ui:inputSelect options="{!m.perfOptions}" aura:id="InputSelectOptions11"/>
+   		<ui:inputSelect options="{!m.perfOptions}" aura:id="InputSelectOptions12"/>
+   		<ui:inputSelect options="{!m.perfOptions}" aura:id="InputSelectOptions13"/>
+   		<ui:inputSelect options="{!m.perfOptions}" aura:id="InputSelectOptions14"/>
+   		<ui:inputSelect options="{!m.perfOptions}" aura:id="InputSelectOptions15"/>
+   		<ui:inputSelect options="{!m.perfOptions}" aura:id="InputSelectOptions16"/>
+   		<ui:inputSelect options="{!m.perfOptions}" aura:id="InputSelectOptions17"/>
+   		<ui:inputSelect options="{!m.perfOptions}" aura:id="InputSelectOptions18"/>
+   		<ui:inputSelect options="{!m.perfOptions}" aura:id="InputSelectOptions19"/>
+   		<ui:inputSelect options="{!m.perfOptions}" aura:id="InputSelectOptions20"/>
+   		<ui:inputSelect options="{!m.perfOptions}" aura:id="InputSelectOptions21"/>
+   		<ui:inputSelect options="{!m.perfOptions}" aura:id="InputSelectOptions22"/>
+   		<ui:inputSelect options="{!m.perfOptions}" aura:id="InputSelectOptions23"/>
+   		<ui:inputSelect options="{!m.perfOptions}" aura:id="InputSelectOptions24"/>
+   </aura:if>
+</aura:component>

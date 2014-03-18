@@ -1,0 +1,24 @@
+<aura:component render="client" model="java://org.auraframework.impl.java.model.TestJavaModel">
+    <aura:attribute name="tochange" type="Integer"/>
+    <aura:attribute name="newvalue" type="string"/>
+    <aura:attribute name="newEndIndex" type="Integer" default="26"/>
+    <aura:attribute name="inputValue" type="string"/>
+    <aura:attribute name="count" type="integer" required="false" default="1"/>
+
+	<aura:iteration aura:id="iteration" items="{!m.data}" var="stuff1" indexVar="index1" start="0" end="{!v.count}">
+	        <aura:iteration aura:id="innerIteration" items="{!m.data}" var="stuff" indexVar="index" start="0" end="{!v.newEndIndex}">
+	            <div aura:id="simple">#{!index}: <ui:outputText value="{!stuff.letters}"/></div>
+	        </aura:iteration>
+    </aura:iteration>
+
+   <div>
+        Change item #<ui:inputNumber value="{!v.tochange}"/> to <ui:inputText value="{!v.newvalue}"/>
+        <ui:button press="{!c.changeOneValue}" label="Go"/>
+    </div>
+    
+    <div>
+        Change endIndex to <ui:inputText value="{!v.inputValue}"/>
+        <ui:button press="{!c.changeEndIndex}" label="Go"/>
+    </div>
+
+</aura:component>

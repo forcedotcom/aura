@@ -8,17 +8,19 @@
         	dataSize = (Math.floor(Math.random() * (2 - 0 + 1)) + 0),
         	act = component.get("c.getItems"),
         	actionCallback = function(action){
-        		var dom = [];
+        		var dom = [],
+        			divItem;
             	if (action.getState() === "SUCCESS") {
             		result = action.getReturnValue();
             		if(result == null){
-            			dom = null;//fails if dom=[] gives gack on the UI
+            			dom = [];//fails if dom=[] gives gack on the UI
             		}
             		for(var i in result){
-            			li = document.createElement('li');
-            	    	li.textContent = result[i].label;
-            	    	li.id = result[i].value;
-            	    	dom.push(li);
+            			divItem = document.createElement('div');
+            			divItem.textContent = result[i].label;
+            			divItem.id = result[i].value;
+            			divItem.className = "item";
+            	    	dom.push(divItem);
             		}
             		$A.log(result);
             		callback(null, dom);

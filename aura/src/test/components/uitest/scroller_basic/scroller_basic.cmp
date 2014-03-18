@@ -33,108 +33,111 @@
 	<div id="header" class="common">New Aura Scroller</div>
 		
 		<ui:scroller class="scrollWrapper" onPullToRefresh="{!c.fetchData}" onPullToShowMore="{!c.fetchData}">
-			<ul id="scrollableItemsContainer">	
-				<li>Pretty row 1</li>
-				<li>Pretty row 2</li>
-				<li>Pretty row 3</li>
-				<li>Pretty row 4</li>
-				<li>Pretty row 5</li>
-				<li>Pretty row 6</li>
-				<li>Pretty row 7</li>
-				<li>Pretty row 8</li>
-				<li>Pretty row 9</li>
-				<li>Pretty row 10</li>
-				<li>Pretty row 11</li>
-				<li>Pretty row 12</li>
-				<li>Pretty row 13</li>
-				<li>Pretty row 14</li>
-				<li>Pretty row 15</li>
-				<li>Pretty row 16</li>
-				<li>Pretty row 17</li>
-				<li>Pretty row 18</li>
-				<li>Pretty row 19</li>
-				<li>Pretty row 20</li>
-				<li>Pretty row 21</li>
-				<li>Pretty row 22</li>
-				<li>Pretty row 23</li>
-				<li>Pretty row 24</li>
-				<li>Pretty row 25</li>
-				<li>Pretty row 26</li>
-				<li>Pretty row 27</li>
-				<li>Pretty row 28</li>
-				<li>Pretty row 29</li>
-				<li>Pretty row 30</li>
-				<li>Pretty row 31</li>
-				<li>Pretty row 32</li>
-				<li>Pretty row 33</li>
-				<li>Pretty row 34</li>
-				<li>Pretty row 35</li>
-				<li>Pretty row 36</li>
-				<li>Pretty row 37</li>
-				<li>Pretty row 38</li>
-				<li>Pretty row 39</li>
-				<li>Pretty row 40</li>
-				<li>Pretty row 41</li>
-				<li>Pretty row 42</li>
-				<li>Pretty row 43</li>
-				<li>Pretty row 44</li>
-				<li>Pretty row 45</li>
-				<li>Pretty row 46</li>
-				<li>Pretty row 47</li>
-				<li>Pretty row 48</li>
-				<li>Pretty row 49</li>
-				<li>Pretty row 50</li>
-				<li>Pretty row 51</li>
-				<li>Pretty row 52</li>
-				<li>Pretty row 53</li>
-				<li>Pretty row 54</li>
-				<li>Pretty row 55</li>
-				<li>Pretty row 56</li>
-				<li>Pretty row 57</li>
-				<li>Pretty row 58</li>
-				<li>Pretty row 59</li>
-				<li>Pretty row 60</li>
-				<li>Pretty row 61</li>
-				<li>Pretty row 62</li>
-				<li>Pretty row 63</li>
-				<li>Pretty row 64</li>
-				<li>Pretty row 65</li>
-				<li>Pretty row 66</li>
-				<li>Pretty row 67</li>
-				<li>Pretty row 68</li>
-				<li>Pretty row 69</li>
-				<li>Pretty row 70</li>
-				<li>Pretty row 71</li>
-				<li>Pretty row 72</li>
-				<li>Pretty row 73</li>
-				<li>Pretty row 74</li>
-				<li>Pretty row 75</li>
-				<li>Pretty row 76</li>
-				<li>Pretty row 77</li>
-				<li>Pretty row 78</li>
-				<li>Pretty row 79</li>
-				<li>Pretty row 80</li>
-				<li>Pretty row 81</li>
-				<li>Pretty row 82</li>
-				<li>Pretty row 83</li>
-				<li>Pretty row 84</li>
-				<li>Pretty row 85</li>
-				<li>Pretty row 86</li>
-				<li>Pretty row 87</li>
-				<li>Pretty row 88</li>
-				<li>Pretty row 89</li>
-				<li>Pretty row 90</li>
-				<li>Pretty row 91</li>
-				<li>Pretty row 92</li>
-				<li>Pretty row 93</li>
-				<li>Pretty row 94</li>
-				<li>Pretty row 95</li>
-				<li>Pretty row 96</li>
-				<li>Pretty row 97</li>
-				<li>Pretty row 98</li>
-				<li>Pretty row 99</li>
-				<li>Pretty row 100</li>
-			</ul>
+			<!-- <ul id="scrollableItemsContainer">
+					<li>Pretty row 1</li>
+					<li>Pretty row 2</li>
+				</ul> -->
+				
+				<div class="item">Pretty row 1</div>
+				<div class="item">Pretty row 2</div>
+				<div class="item">Pretty row 3</div>
+				<div class="item">Pretty row 4</div>
+				<div class="item">Pretty row 5</div>
+				<div class="item">Pretty row 6</div>
+				<div class="item">Pretty row 7</div>
+				<div class="item">Pretty row 8</div>
+				<div class="item">Pretty row 9</div>
+				<div class="item">Pretty row 10</div>
+				<div class="item">Pretty row 11</div>
+				<div class="item">Pretty row 12</div>
+				<div class="item">Pretty row 13</div>
+				<div class="item">Pretty row 14</div>
+				<div class="item">Pretty row 15</div>
+				<div class="item">Pretty row 16</div>
+				<div class="item">Pretty row 17</div>
+				<div class="item">Pretty row 18</div>
+				<div class="item">Pretty row 19</div>
+				<div class="item">Pretty row 20</div>
+				<div class="item">Pretty row 21</div>
+				<div class="item">Pretty row 22</div>
+				<div class="item">Pretty row 23</div>
+				<div class="item">Pretty row 24</div>
+				<div class="item">Pretty row 25</div>
+				<div class="item">Pretty row 26</div>
+				<div class="item">Pretty row 27</div>
+				<div class="item">Pretty row 28</div>
+				<div class="item">Pretty row 29</div>
+				<div class="item">Pretty row 30</div>
+				<div class="item">Pretty row 31</div>
+				<div class="item">Pretty row 32</div>
+				<div class="item">Pretty row 33</div>
+				<div class="item">Pretty row 34</div>
+				<div class="item">Pretty row 35</div>
+				<div class="item">Pretty row 36</div>
+				<div class="item">Pretty row 37</div>
+				<div class="item">Pretty row 38</div>
+				<div class="item">Pretty row 39</div>
+				<div class="item">Pretty row 40</div>
+				<div class="item">Pretty row 41</div>
+				<div class="item">Pretty row 42</div>
+				<div class="item">Pretty row 43</div>
+				<div class="item">Pretty row 44</div>
+				<div class="item">Pretty row 45</div>
+				<div class="item">Pretty row 46</div>
+				<div class="item">Pretty row 47</div>
+				<div class="item">Pretty row 48</div>
+				<div class="item">Pretty row 49</div>
+				<div class="item">Pretty row 50</div>
+				<div class="item">Pretty row 51</div>
+				<div class="item">Pretty row 52</div>
+				<div class="item">Pretty row 53</div>
+				<div class="item">Pretty row 54</div>
+				<div class="item">Pretty row 55</div>
+				<div class="item">Pretty row 56</div>
+				<div class="item">Pretty row 57</div>
+				<div class="item">Pretty row 58</div>
+				<div class="item">Pretty row 59</div>
+				<div class="item">Pretty row 60</div>
+				<div class="item">Pretty row 61</div>
+				<div class="item">Pretty row 62</div>
+				<div class="item">Pretty row 63</div>
+				<div class="item">Pretty row 64</div>
+				<div class="item">Pretty row 65</div>
+				<div class="item">Pretty row 66</div>
+				<div class="item">Pretty row 67</div>
+				<div class="item">Pretty row 68</div>
+				<div class="item">Pretty row 69</div>
+				<div class="item">Pretty row 70</div>
+				<div class="item">Pretty row 71</div>
+				<div class="item">Pretty row 72</div>
+				<div class="item">Pretty row 73</div>
+				<div class="item">Pretty row 74</div>
+				<div class="item">Pretty row 75</div>
+				<div class="item">Pretty row 76</div>
+				<div class="item">Pretty row 77</div>
+				<div class="item">Pretty row 78</div>
+				<div class="item">Pretty row 79</div>
+				<div class="item">Pretty row 80</div>
+				<div class="item">Pretty row 81</div>
+				<div class="item">Pretty row 82</div>
+				<div class="item">Pretty row 83</div>
+				<div class="item">Pretty row 84</div>
+				<div class="item">Pretty row 85</div>
+				<div class="item">Pretty row 86</div>
+				<div class="item">Pretty row 87</div>
+				<div class="item">Pretty row 88</div>
+				<div class="item">Pretty row 89</div>
+				<div class="item">Pretty row 90</div>
+				<div class="item">Pretty row 91</div>
+				<div class="item">Pretty row 92</div>
+				<div class="item">Pretty row 93</div>
+				<div class="item">Pretty row 94</div>
+				<div class="item">Pretty row 95</div>
+				<div class="item">Pretty row 96</div>
+				<div class="item">Pretty row 97</div>
+				<div class="item">Pretty row 98</div>
+				<div class="item">Pretty row 99</div>
+				<div class="item">Pretty row 100</div>
 		</ui:scroller>
 		
 	<div id="footer" class="common">This is a footer</div>

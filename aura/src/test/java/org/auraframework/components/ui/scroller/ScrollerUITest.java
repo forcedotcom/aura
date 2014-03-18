@@ -41,7 +41,7 @@ public class ScrollerUITest extends WebDriverTestCase{
         driver = this.getDriver();
         driver = IOSDriverAugmenter.getIOSDriver((RemoteWebDriver)driver);
         this.startFlick(0, -70, 1);
-        this.startFlick(0, -70, 1);
+        this.startFlick(0, -370, 1);
         this.startFlick(0, -70, 1);
     }
     

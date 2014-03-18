@@ -29,11 +29,7 @@
     },
     
     handleCanShowMoreChange: function (cmp, evt, hlp) {
-    	var newValue = evt.getParam('value').getValue(),
-    		oldValue = cmp.getValue('v.canShowMore').oldValue;
-
-    	if (oldValue !== newValue) {
-    		hlp.swapShowMore(cmp);	
-    	}
+    	var newValue = evt.getParam('value').getValue();
+    	hlp.swapShowMore(cmp, newValue);
     }
 })

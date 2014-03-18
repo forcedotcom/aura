@@ -36,7 +36,7 @@
     <aura:handler name="pressOnHighlighted" action="{!c.handlePressOnHighlighted}"/>
 
     <ul aura:id="list" class="{!v.class+' '+v.theme+(v.visible == true ? ' visible':'')}" role="presentation" 
-        onclick="{!c.handleClick}">
+        onclick="{!c.handleClick}" oncustomClick="{!c.handleClick}">
         <aura:iteration aura:id="iter" items="{!v.items}" var="{!v.itemVar}" body="{!v.itemTemplate}"/>
     </ul>
 </aura:component>

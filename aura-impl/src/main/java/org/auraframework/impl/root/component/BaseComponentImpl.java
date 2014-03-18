@@ -33,6 +33,7 @@ import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.ModelDef;
 import org.auraframework.def.RendererDef;
 import org.auraframework.def.RootDefinition;
+import org.auraframework.def.TypeDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.java.model.JavaModel;
 import org.auraframework.impl.root.AttributeSetImpl;
@@ -510,25 +511,37 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
         return path;
     }
 
+    static private DefDescriptor<TypeDef> componentArrType;
+
     @Override
     public void reinitializeModel() throws QuickFixException {
+        //
+        // This is a visitor pattern, implemented here with a hardwire.
+        //
+        BaseComponentDef def = descriptor.getDef();
+        if (componentArrType == null) {
+            componentArrType = Aura.getDefinitionService().getDefDescriptor("aura://Aura.Component[]", TypeDef.class);
+        }
+
         createModel();
-        
+
         I zuper = getSuper();
         if (zuper != null) {
             zuper.reinitializeModel();
         }
-        
-        Object body = getAttributes().getValue("body");
-        if (!(body instanceof List)) {
-            body = getAttributes().getValue("realBody");
-        }
-        
-        if (body instanceof List) {
-            @SuppressWarnings("unchecked")
-            List<BaseComponent<?, ?>> bodyList = (List<BaseComponent<?, ?>>)body;
-            for (BaseComponent<?, ?> c : bodyList) {
-                c.reinitializeModel();
+        //
+        // Walk all attributes, pushing the reinitialize model in to those as well.
+        //
+        for (Map.Entry<DefDescriptor<AttributeDef>, AttributeDef> foo : def.getAttributeDefs().entrySet()) {
+            if (componentArrType.equals(foo.getValue().getTypeDef().getDescriptor().getName())) {
+                Object val = getAttributes().getValue("body");
+                if (val instanceof List) {
+                    @SuppressWarnings("unchecked")
+                    List<BaseComponent<?, ?>> facet = (List<BaseComponent<?, ?>>)val;
+                    for (BaseComponent<?, ?> c : facet) {
+                        c.reinitializeModel();
+                    }
+                }
             }
         }
     }

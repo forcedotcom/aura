@@ -124,10 +124,18 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
     public void validateReferences() throws QuickFixException {
         RootDefinition rootDef = getComponentDef();
         if (rootDef == null) {
-            throw new DefinitionNotFoundException(getDescriptor());
+            throw new DefinitionNotFoundException(descriptor);
         }
+        
+        AuraContext context = Aura.getContextService().getCurrentContext();
+        DefDescriptor<?> referencingDesc = context.getCurrentCaller();
+    	if (referencingDesc != null) {
+	        MasterDefRegistry registry = Aura.getDefinitionService().getDefRegistry();
+	    	registry.assertAccess(referencingDesc, getComponentDef());
+    	}
 
-        validateAttributesValues();
+        validateAttributesValues(referencingDesc);
+
         // validateMissingAttributes();
 
         // TODO LOTS of validation here folks #W-689596
@@ -142,10 +150,7 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
      * @param rootDef the element being instantiated
      * @param specifiedAttributes the attributes specified in the comp
      */
-    private void validateAttributesValues() throws QuickFixException, AttributeNotFoundException {
-        AuraContext context = Aura.getContextService().getCurrentContext();
-        DefDescriptor<?> referencingDesc = context.getCurrentCaller();
-        
+    private void validateAttributesValues(DefDescriptor<?> referencingDesc) throws QuickFixException, AttributeNotFoundException {
         RootDefinition rootDef = getComponentDef();
         Map<DefDescriptor<AttributeDef>, AttributeDef> atts = rootDef.getAttributeDefs();
         Map<String, RegisterEventDef> registeredEvents = rootDef.getRegisterEventDefs();

@@ -15,12 +15,16 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:input" implements="ui:inputBaseOption" extensible="true" support="GA" description="Represents a checkbox. Its behavior can be configured using events such as click and change.">
-        
-    <aura:renderif isTrue="{!v.body.length == 0}">
-       <input aura:id="checkbox" id="{!v.domId}" class="{!v.class}" name="{!v.name}" type="checkbox" value="{!v.text}" checked="{!v.value == true}" disabled="{!v.disabled}"/>
-       <aura:set attribute="else">
-           {!v.body}
-       </aura:set>
-    </aura:renderif>
-</aura:component>
+<aura:documentation>
+	<aura:description>
+		<p>
+			A <code>ui:inputEmail</code> component represents an email input field, which is rendered as an HTML <code>input</code> tag of type <code>email</code>.
+			To render the output from a <code>ui:inputEmail</code> component, use the <code>ui:outputEmail</code> component. 
+		</p>
+		<p>
+			To provide a field label for accessibility, use the <code>label</code> attribute. You can hide the label from view by setting <code>labelPosition="hidden"</code> and still maintain accessibility.
+			
+    	</p>
+		
+	</aura:description>		
+</aura:documentation>

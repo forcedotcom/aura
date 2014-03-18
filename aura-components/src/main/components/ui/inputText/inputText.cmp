@@ -16,7 +16,7 @@
 
 -->
 <aura:component extends="ui:input" extensible="true" support="GA" access="GLOBAL"
-    description="This component displays an input field suitable for entering a single line of free-form text.">
+    description="Represents an input field suitable for entering a single line of free-form text.">
 
     <aura:attribute name="type" type="String" default="text" description="The input type of the string. Default value is &quot;text&quot;."/>
     <aura:attribute name="placeholder" type="String" access="GLOBAL" default="" description="Text that is displayed when the field is empty, to prompt the user for a valid entry."/>

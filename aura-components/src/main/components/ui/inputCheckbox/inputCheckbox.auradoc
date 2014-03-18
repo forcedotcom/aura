@@ -18,17 +18,13 @@
 <aura:documentation>
 	<aura:description>
 		<p>
-			A <code>ui:inputText</code> component represents a text input field, which is rendered as an HTML <code>input</code> tag of type <code>text</code>.
-			To render the output from a <code>ui:inputText</code> component, use the <code>ui:outputText</code> component.
+			A <code>ui:inputCheckbox</code> component represents a checkbox whose state is controlled by the <code>value</code> and <code>disabled</code> attributes. It's rendered as an HTML <code>input</code> tag of type <code>checkbox</code>.
+			To render the output from a <code>ui:inputCheckbox</code> component, use the <code>ui:outputCheckbox</code> component. 
 		</p>
 		<p>
 			To provide a field label for accessibility, use the <code>label</code> attribute. You can hide the label from view by setting <code>labelPosition="hidden"</code> and still maintain accessibility.
 			
     	</p>
 		
-	</aura:description>	
-		<aura:example name="innputTextExample" ref="uiExamples:inputTextExample" label="Using ui:inputText">
-    	<p>This example shows a <code>ui:inputText</code> component with the default error handling, and a corresponding <code>ui:outputText</code> component for text rendering.</p>
-	</aura:example>
-	
+	</aura:description>		
 </aura:documentation>

@@ -67,7 +67,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     private static final Set<String> SYSTEM_NAMESPACES = Sets.newTreeSet(String.CASE_INSENSITIVE_ORDER);
 
     private static final Set<String> UNSECURED_PREFIXES = new ImmutableSortedSet.Builder<String>(String.CASE_INSENSITIVE_ORDER).add("aura", "layout").build();
-    private static final Set<String> UNSECURED_NAMESPACES = new ImmutableSortedSet.Builder<String>(String.CASE_INSENSITIVE_ORDER).add("aura", "ui", "auradev", "appcache",
+    private static final Set<String> UNSECURED_NAMESPACES = new ImmutableSortedSet.Builder<String>(String.CASE_INSENSITIVE_ORDER).add("aura", "auradev", "appcache",
             "org.auraframework").build();
     
     protected final Set<Mode> allModes = EnumSet.allOf(Mode.class);

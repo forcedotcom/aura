@@ -603,10 +603,6 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                 }
             }
 
-            if (parent != null) {
-            	assertAccess(parent.getDescriptor(), cd.def);
-            }
-            
             Set<DefDescriptor<?>> newDeps = Sets.newHashSet();
             cd.def.appendDependencies(newDeps);
 

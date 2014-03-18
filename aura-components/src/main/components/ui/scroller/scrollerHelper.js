@@ -78,10 +78,11 @@
 
         scroller.scrollTo(scoller.x + deltaX, scroller.y + deltaY, time);
     },
-    swapShowMore: function (cmp) {
+    swapShowMore: function (cmp, newValue) {
         var scroller = this.getScrollerInstance(cmp);
         if (scroller && scroller.togglePullToLoadMore) {
-            scroller.togglePullToLoadMore();
+            scroller.opts.pullToLoadMore = newValue;
+            scroller.togglePullToLoadMore(newValue);
         }
     },
 /*

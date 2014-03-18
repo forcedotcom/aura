@@ -1195,7 +1195,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     	if (def.getAccess().isGlobal()) {
     		return null;
     	}
-		
+    	
 		ConfigAdapter configAdapter = Aura.getConfigAdapter();
 		String referencingNamespace = null;
 		if (referencingDescriptor != null) {

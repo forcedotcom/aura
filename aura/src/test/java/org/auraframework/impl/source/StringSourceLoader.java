@@ -72,7 +72,9 @@ import com.google.common.collect.Sets;
  */
 public class StringSourceLoader implements SourceLoader, PrivilegedNamespaceSourceLoader {
     public static final String DEFAULT_NAMESPACE = "string";
+    public static final String OTHER_NAMESPACE = "string1";
     public static final String DEFAULT_CUSTOM_NAMESPACE = "cstring";
+    public static final String OTHER_CUSTOM_NAMESPACE = "cstring1";
 
     private static final String DEFAULT_NAME_PREFIX = "thing";
     private static final Set<String> PREFIXES = ImmutableSet.of(
@@ -112,7 +114,12 @@ public class StringSourceLoader implements SourceLoader, PrivilegedNamespaceSour
     private StringSourceLoader() {
         namespaces.put(DEFAULT_NAMESPACE,
                 new ConcurrentHashMap<DefDescriptor<? extends Definition>, StringSource<? extends Definition>>());
+        namespaces.put(OTHER_NAMESPACE,
+                new ConcurrentHashMap<DefDescriptor<? extends Definition>, StringSource<? extends Definition>>());
+        
         customNamespaces.put(DEFAULT_CUSTOM_NAMESPACE,
+                new ConcurrentHashMap<DefDescriptor<? extends Definition>, StringSource<? extends Definition>>());
+        customNamespaces.put(OTHER_CUSTOM_NAMESPACE,
                 new ConcurrentHashMap<DefDescriptor<? extends Definition>, StringSource<? extends Definition>>());
     }
 
@@ -269,7 +276,7 @@ public class StringSourceLoader implements SourceLoader, PrivilegedNamespaceSour
 	            sourceMap = namespaces.get(namespace);
 	            Preconditions.checkState(sourceMap != null);
 	            Preconditions.checkState(sourceMap.remove(descriptor) != null);
-	            if (!DEFAULT_NAMESPACE.equals(namespace) && sourceMap.isEmpty()) {
+	            if (!DEFAULT_NAMESPACE.equals(namespace) && !OTHER_NAMESPACE.equals(namespace) && sourceMap.isEmpty()) {
 	                namespaces.remove(namespace);
 	            }
             }
@@ -277,7 +284,7 @@ public class StringSourceLoader implements SourceLoader, PrivilegedNamespaceSour
 	            sourceMap = customNamespaces.get(namespace);
 	            Preconditions.checkState(sourceMap != null);
 	            Preconditions.checkState(sourceMap.remove(descriptor) != null);
-	            if (!DEFAULT_CUSTOM_NAMESPACE.equals(namespace) && sourceMap.isEmpty()) {
+	            if (!DEFAULT_CUSTOM_NAMESPACE.equals(namespace) && !OTHER_CUSTOM_NAMESPACE.equals(namespace) && sourceMap.isEmpty()) {
 	            	customNamespaces.remove(namespace);
 	            }	
             }
@@ -454,6 +461,6 @@ public class StringSourceLoader implements SourceLoader, PrivilegedNamespaceSour
     
     @Override
 	public boolean isPrivilegedNamespace(String namespace) {
-    	return namespace != null && namespaces.containsKey(namespace);
+    	return namespace != null && namespaces.containsKey(namespace);		   
 	}
 }

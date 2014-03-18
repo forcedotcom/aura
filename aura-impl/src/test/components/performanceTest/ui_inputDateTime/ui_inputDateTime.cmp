@@ -1,0 +1,27 @@
+<aura:component>
+   <aura:attribute name="myDate" type="Date" default="2013-02-28"/>
+   <aura:attribute name="myDate1" type="Date" default="2013-02-27"/>
+   <aura:attribute name="myDate2" type="Date" default="2013-02-26"/>
+   <aura:attribute name="myDate3" type="Date" default="2013-02-25"/>
+   <aura:attribute name="myDate4" type="Date" default="2013-02-24"/>
+   <aura:attribute name="myDate5" type="Date" default="2013-02-23"/>
+   <aura:attribute name="myDate6" type="Date" default="2013-02-22"/>
+   <aura:attribute name="myDate7" type="Date" default="2013-02-21"/>
+   <aura:attribute name="myDate8" type="Date" default="2013-02-20"/>
+   <aura:attribute name="myDate9" type="Date" default="2013-02-19"/>
+   <aura:attribute name="count" type="int" required="false" default="1"/>
+   <ui:inputDateTime aura:id="dateInput" value="{!v.myDate}" displayDatePicker="true" />
+   <aura:if isTrue="{!v.count > 4}">
+   		<ui:inputDateTime aura:id="dateInput1" value="{!v.myDate1}" displayDatePicker="true" />
+   		<ui:inputDateTime aura:id="dateInput2" value="{!v.myDate2}" displayDatePicker="true" />
+   		<ui:inputDateTime aura:id="dateInput3" value="{!v.myDate3}" displayDatePicker="true" />
+   		<ui:inputDateTime aura:id="dateInput4" value="{!v.myDate4}" displayDatePicker="true" />
+   </aura:if>
+   <aura:if isTrue="{!v.count > 9}">
+   		<ui:inputDateTime aura:id="dateInput5" value="{!v.myDate5}" displayDatePicker="true" />
+   		<ui:inputDateTime aura:id="dateInput6" value="{!v.myDate6}" displayDatePicker="true" />
+   		<ui:inputDateTime aura:id="dateInput7" value="{!v.myDate7}" displayDatePicker="true" />
+   		<ui:inputDateTime aura:id="dateInput8" value="{!v.myDate8}" displayDatePicker="true" />
+   		<ui:inputDateTime aura:id="dateInput9" value="{!v.myDate9}" displayDatePicker="true" />
+   </aura:if>
+</aura:component>

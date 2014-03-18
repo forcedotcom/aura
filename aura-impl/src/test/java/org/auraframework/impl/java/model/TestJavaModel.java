@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -51,6 +52,10 @@ import com.google.common.collect.Maps;
 public class TestJavaModel {
     static ArrayList<InputOption> inputOptions = new ArrayList<InputOption>();
     static ArrayList<InputOption> moreInputOptions = new ArrayList<InputOption>();
+    static ArrayList<InputOption> perfInputOptions = new ArrayList<InputOption>();
+    static ArrayList<InputOption> morePerfInputOptions = new ArrayList<InputOption>();
+    static ArrayList<InputOption> evenMorePerfInputOptions = new ArrayList<InputOption>();
+    static List<Object> iterationData;
     static HashMap<String, ArrayList<InputOption>> optionMap = new LinkedHashMap<String, ArrayList<InputOption>>();
     static List<Item> items;
     static List<Item> itemsEmpty = new ArrayList<Item>();
@@ -73,6 +78,40 @@ public class TestJavaModel {
         for (InputOption i : inputOptions) {
             optionMap.put(i.getValue(), getSubCategory(i.getValue()));
         }
+    }
+    
+    //Options for perf testing /performanceTest/ui_inputSelect.cmp
+    static {
+    	InputOption firstOption = new InputOption("Option1", "Opt1", true, "option1");
+        perfInputOptions.add(firstOption);
+        morePerfInputOptions.add(firstOption);
+        evenMorePerfInputOptions.add(firstOption);
+        
+        for (int i = 2; i < 101; i++) {
+        	InputOption iOption = new InputOption("Option"+i, "Opt"+i, false, "option"+i);
+        	if (i < 21) {
+        		perfInputOptions.add(iOption);
+        	}
+        	if (i < 51) {
+        		morePerfInputOptions.add(iOption);
+        	}
+        	evenMorePerfInputOptions.add(iOption);
+        }
+
+    }
+    
+    @AuraEnabled
+    public ArrayList<InputOption> getPerfOptions() throws QuickFixException {
+    	Integer count = (Integer) Aura.getContextService().getCurrentContext().getCurrentComponent().getAttributes().getValue("count");
+    	if (count == null || count < 21) {
+    		return perfInputOptions;
+    	}
+    	else if (count < 51) {
+    		return morePerfInputOptions;
+    	}
+    	else {
+            return evenMorePerfInputOptions;	
+    	}
     }
 
     private static ArrayList<InputOption> getSubCategory(String option) {
@@ -117,6 +156,22 @@ public class TestJavaModel {
     	for (int i = 1; i <= 50; i++) {
     		itemsLarge.add(new Item("some one " + i, "id" + i));
         }
+    }
+    
+    static {
+        iterationData = new LinkedList<Object>();
+        for (int i = 0; i < 26; i++) {
+            Map<String, Object> theMap = new HashMap<String, Object>();
+            char c = (char) ('a' + i);
+            theMap.put("letters", "" + c + c + c);
+            iterationData.add(theMap);
+        }
+    }
+   
+
+    @AuraEnabled
+    public List<Object> getData() {
+        return iterationData;
     }
     
     public static class Item implements JsonSerializable {

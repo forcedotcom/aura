@@ -35,7 +35,7 @@ public class LayoutItemsUITest extends WebDriverTestCase {
      * Verify that navigating forward and backward works when underlying LayoutsDef has multiple layoutitems per layout.
      * Automation for W-954182
      */
-    public void testNavigationWhenLayoutHasMultipleLayoutItems() throws Exception {
+    public void _testNavigationWhenLayoutHasMultipleLayoutItems() throws Exception {
         By forwardButton = By.cssSelector(".Forward_Button");
         By backButton = By.cssSelector(".Back_Button");
         By layoutDone = By.cssSelector(".layoutDone");

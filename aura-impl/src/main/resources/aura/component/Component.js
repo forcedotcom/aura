@@ -825,6 +825,7 @@ Component.prototype.getValue = function (key) {
  *
  * @private
  *
+ * @deprecated use Component.get(key,value) instead
  */
 Component.prototype._getValue = function(key){
     // Should we deliberately break here?
@@ -1015,15 +1016,6 @@ Component.prototype.isDirty = function(expression){
  * Returns true if the component has not been destroyed.
  * @public
  */
-Component.prototype.isValid = function(expression){
-    // JBUCH TODO: TEMPORARY PASSTHROUGH TO HIDE SIMPLEVALUES; isValid("v.value") SHOULD BE HANDLED THROUGH ERROR EVENTS
-    if(expression){
-        var wrapper=this._getValue(expression);
-        if(wrapper){
-            if(!wrapper.isValid){return true;}
-            return wrapper.isValid();
-        }
-        return false;
     }
     return !this._scheduledForAsyncDestruction && this.priv;
 };

@@ -180,6 +180,22 @@ AttributeSet.prototype._set = function (name, value) {
 };
 
 /**
+ * Set the attribute of the given name to the given value.
+ * @param {String} name The name can be a path expression inside. E.g. {!xxx....}
+ * @param {Object} value The value to be set.
+ */
+AttributeSet.prototype.set = function (name, value) {
+    this.createDefault(name);
+
+    var ve = this.values.getValue(name);
+    if (ve.isExpression()) {
+        expressionService.setValue(this.getValueProvider(), ve, value);
+    } else {
+        ve.setValue(value);
+    }
+};
+
+/**
  * Destroys the component.
  * @private
  */

@@ -49,9 +49,7 @@ import org.auraframework.util.AuraTextUtil;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 
-public class ForEachDefHandler<P extends RootDefinition> extends ParentedTagHandler<ForEachDef, P> implements
-ExpressionContainerHandler {
-
+public class ForEachDefHandler<P extends RootDefinition> extends ParentedTagHandler<ForEachDef, P> implements ExpressionContainerHandler {
     public static final String TAG = "aura:foreach";
 
     private static final String ATTRIBUTE_REVERSE = "reverse";
@@ -71,6 +69,10 @@ ExpressionContainerHandler {
 
     protected ForEachDefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source) {
         super(parentHandler, xmlReader, source);
+        
+        if (!isInPrivilegedNamespace()) {
+        	// DCHASMAN TODO Throw appropriate unknown tag exception here!
+        }
     }
 
     @Override
@@ -80,7 +82,6 @@ ExpressionContainerHandler {
 
     @Override
     protected ForEachDef createDefinition() {
-
         ComponentDefImpl.Builder componentBuilder = new ComponentDefImpl.Builder();
         builder.setLocation(getLocation());
 
@@ -127,7 +128,6 @@ ExpressionContainerHandler {
 
     @Override
     protected void handleChildTag() throws XMLStreamException, QuickFixException {
-
         children.add(getDefRefHandler(getParentHandler()).getElement());
     }
 
@@ -163,14 +163,9 @@ ExpressionContainerHandler {
 
     @Override
     public void addExpressionReferences(Set<PropertyReference> propRefs) {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
     public void writeElement(ForEachDef def, Appendable out) {
-        // TODO Auto-generated method stub
-
     }
-
 }

@@ -19,6 +19,7 @@ import java.util.Set;
 
 import javax.xml.stream.XMLStreamReader;
 
+import org.auraframework.Aura;
 import org.auraframework.builder.RootDefinitionBuilder;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.RootDefinition;
@@ -37,22 +38,31 @@ public abstract class RootTagHandler<T extends RootDefinition> extends Container
         ExpressionContainerHandler {
 
     protected final DefDescriptor<T> defDescriptor;
+	protected final boolean isInPrivilegedNamespace;
 
     protected static final String ATTRIBUTE_SUPPORT = "support";
     protected static final String ATTRIBUTE_DESCRIPTION = "description";
-    protected final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_SUPPORT, ATTRIBUTE_DESCRIPTION);
+
+    protected static final Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_DESCRIPTION);
+	protected static final Set<String> PRIVILEGED_ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>().add(ATTRIBUTE_SUPPORT).addAll(ALLOWED_ATTRIBUTES).build();
 
     protected RootTagHandler() {
         super();
         this.defDescriptor = null;
+        this.isInPrivilegedNamespace = true;
     }
 
     protected RootTagHandler(DefDescriptor<T> defDescriptor, Source<?> source, XMLStreamReader xmlReader) {
         super(xmlReader, source);
         this.defDescriptor = defDescriptor;
+        this.isInPrivilegedNamespace = defDescriptor != null ? Aura.getConfigAdapter().isPrivilegedNamespace(defDescriptor.getNamespace()) : true;
     }
 
-    protected DefDescriptor<T> getDefDescriptor() {
+    public boolean isInPrivilegedNamespace() {
+		return isInPrivilegedNamespace;
+	}
+
+	protected DefDescriptor<T> getDefDescriptor() {
         return defDescriptor;
     }
 
@@ -65,10 +75,10 @@ public abstract class RootTagHandler<T extends RootDefinition> extends Container
 
     @Override
     public Set<String> getAllowedAttributes() {
-        return ALLOWED_ATTRIBUTES;
+        return isInPrivilegedNamespace ? PRIVILEGED_ALLOWED_ATTRIBUTES : ALLOWED_ATTRIBUTES;
     }
 
-    /**
+	/**
      * Determines whether HTML parsing will allow script tags to be embedded.
      * False by default, so must be overridden to allow embedded script tag.
      * 

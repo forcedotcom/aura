@@ -108,8 +108,6 @@
         <webdriver.browser.type>GOOGLECHROME</webdriver.browser.type> <!-- refer to org.auraframework.test.WebDriverUtil.BrowserType enums for valid values -->
         <sauce.record.video>false</sauce.record.video>
         <sauce.record.screenshots>false</sauce.record.screenshots>
-        <sauce.username>lumen</sauce.username>
-        <sauce.access.key>4df61bdf-1696-4f73-b869-ead4c7603dca</sauce.access.key>
         <xdisplay.exec>Xvfb</xdisplay.exec>
         <xdisplay.options>-ac</xdisplay.options>
         <xdisplay.size>960x640</xdisplay.size>

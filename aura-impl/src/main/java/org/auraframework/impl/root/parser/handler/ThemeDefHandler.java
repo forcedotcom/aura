@@ -58,6 +58,10 @@ public final class ThemeDefHandler extends RootTagHandler<ThemeDef> {
     public ThemeDefHandler(DefDescriptor<ThemeDef> defDescriptor, Source<ThemeDef> source, XMLStreamReader xmlReader) {
         super(defDescriptor, source, xmlReader);
         builder.setOwnHash(source.getHash());
+        
+        if (!isInPrivilegedNamespace()) {
+        	// DCHASMAN TODO Throw appropriate unknown tag exception here!
+        }
     }
 
     @Override

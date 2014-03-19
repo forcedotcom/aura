@@ -42,8 +42,10 @@ public class InterfaceDefHandler extends RootTagHandler<InterfaceDef> {
     private static final String ATTRIBUTE_PROVIDER = "provider";
     private static final String ATTRIBUTE_EXTENDS = "extends";
 
-    protected final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_PROVIDER, ATTRIBUTE_EXTENDS,
-            RootTagHandler.ATTRIBUTE_SUPPORT, RootTagHandler.ATTRIBUTE_DESCRIPTION, ATTRIBUTE_ACCESS);
+    protected static final Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_EXTENDS,
+            RootTagHandler.ATTRIBUTE_DESCRIPTION, ATTRIBUTE_ACCESS);
+	private static final Set<String> PRIVILEGED_ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>().add(
+			RootTagHandler.ATTRIBUTE_SUPPORT, ATTRIBUTE_PROVIDER).addAll(ALLOWED_ATTRIBUTES).build();
 
     private final InterfaceDefImpl.Builder builder = new InterfaceDefImpl.Builder();
 
@@ -60,7 +62,7 @@ public class InterfaceDefHandler extends RootTagHandler<InterfaceDef> {
 
     @Override
     public Set<String> getAllowedAttributes() {
-        return ALLOWED_ATTRIBUTES;
+        return isInPrivilegedNamespace ? PRIVILEGED_ALLOWED_ATTRIBUTES : ALLOWED_ATTRIBUTES;
     }
 
     @Override

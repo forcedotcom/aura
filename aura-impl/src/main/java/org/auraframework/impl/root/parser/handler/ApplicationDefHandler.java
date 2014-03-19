@@ -54,7 +54,7 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
 
     @Override
     public Set<String> getAllowedAttributes() {
-        return ALLOWED_ATTRIBUTES;
+        return isInPrivilegedNamespace ? PRIVILEGED_ALLOWED_ATTRIBUTES : ALLOWED_ATTRIBUTES;
     }
 
 	@Override
@@ -182,10 +182,11 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
     private static final String ATTRIBUTE_IS_ONE_PAGE_APP = "isOnePageApp";
     private static final String ATTRIBUTE_OVERRIDE_THEME = "overrideTheme";
 
-    private final static Set<String> ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>()
-            .add(ATTRIBUTE_PRELOAD, ATTRIBUTE_LAYOUTS, ATTRIBUTE_LOCATION_CHANGE_EVENT, ATTRIBUTE_PRELOAD,
-                    ATTRIBUTE_APPCACHE_ENABLED,
-                    ATTRIBUTE_ADDITIONAL_APPCACHE_URLS, ATTRIBUTE_IS_ONE_PAGE_APP, ATTRIBUTE_OVERRIDE_THEME)
+    private static final Set<String> ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>()
+            .add(ATTRIBUTE_APPCACHE_ENABLED)
             .addAll(BaseComponentDefHandler.ALLOWED_ATTRIBUTES).build();
     
+	private static final Set<String> PRIVILEGED_ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>().add(
+			ATTRIBUTE_PRELOAD, ATTRIBUTE_LAYOUTS, ATTRIBUTE_LOCATION_CHANGE_EVENT, ATTRIBUTE_PRELOAD,
+            ATTRIBUTE_ADDITIONAL_APPCACHE_URLS, ATTRIBUTE_IS_ONE_PAGE_APP, ATTRIBUTE_OVERRIDE_THEME).addAll(ALLOWED_ATTRIBUTES).addAll(BaseComponentDefHandler.PRIVILEGED_ALLOWED_ATTRIBUTES).build();
 }

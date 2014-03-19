@@ -59,14 +59,17 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef> extend
     private static final String ATTRIBUTE_CONTROLLER = "controller";
     private static final String ATTRIBUTE_WHITESPACE = "whitespace";
 
-    protected final static Set<String> ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>()
-            .add(ATTRIBUTE_RENDER, ATTRIBUTE_TEMPLATE, ATTRIBUTE_PROVIDER,
-                    ATTRIBUTE_EXTENSIBLE, ATTRIBUTE_ABSTRACT,
-                    ATTRIBUTE_ISTEMPLATE, ATTRIBUTE_IMPLEMENTS,
-                    ATTRIBUTE_EXTENDS, ATTRIBUTE_STYLE, ATTRIBUTE_HELPER,
-                    ATTRIBUTE_RENDERER, ATTRIBUTE_MODEL, ATTRIBUTE_CONTROLLER,
-                    ATTRIBUTE_WHITESPACE, ATTRIBUTE_ACCESS)
+    protected static final Set<String> ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>()
+            .add(ATTRIBUTE_IMPLEMENTS, ATTRIBUTE_ACCESS)
             .addAll(RootTagHandler.ALLOWED_ATTRIBUTES).build();
+    
+	protected static final Set<String> PRIVILEGED_ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>().add(
+			ATTRIBUTE_RENDER, ATTRIBUTE_TEMPLATE, ATTRIBUTE_PROVIDER,
+            ATTRIBUTE_EXTENSIBLE, ATTRIBUTE_ABSTRACT, ATTRIBUTE_ISTEMPLATE,
+            ATTRIBUTE_EXTENDS, ATTRIBUTE_STYLE, ATTRIBUTE_HELPER,
+            ATTRIBUTE_RENDERER, ATTRIBUTE_MODEL, ATTRIBUTE_CONTROLLER,
+            ATTRIBUTE_WHITESPACE).addAll(ALLOWED_ATTRIBUTES).addAll(RootTagHandler.PRIVILEGED_ALLOWED_ATTRIBUTES).build();
+    
 
     private int innerCount = 0;
     private final List<ComponentDefRef> body = Lists.newArrayList();
@@ -94,7 +97,7 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef> extend
 
     @Override
     public Set<String> getAllowedAttributes() {
-        return ALLOWED_ATTRIBUTES;
+        return isInPrivilegedNamespace ? PRIVILEGED_ALLOWED_ATTRIBUTES : ALLOWED_ATTRIBUTES;
     }
 
     @Override

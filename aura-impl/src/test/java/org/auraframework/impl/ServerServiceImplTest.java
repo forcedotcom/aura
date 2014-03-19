@@ -37,6 +37,8 @@ import org.auraframework.instance.AbstractActionImpl;
 import org.auraframework.instance.Action;
 import org.auraframework.service.ServerService;
 import org.auraframework.system.AuraContext;
+import org.auraframework.system.AuraContext.Authentication;
+import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.Location;
 import org.auraframework.system.Message;
@@ -52,7 +54,7 @@ import com.google.common.collect.Sets;
 
 public class ServerServiceImplTest extends AuraImplTestCase {
     public ServerServiceImplTest(String name) {
-        super(name, true);
+        super(name, false);
     }
 
     // Do not test for null message, it cannot legally be null.
@@ -223,6 +225,8 @@ public class ServerServiceImplTest extends AuraImplTestCase {
      * We carefully test only the parts that we care about for ServerService.
      */
     public void testSimpleAction() throws Exception {
+        Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);
+
         ServerService ss = Aura.getServerService();
         Action a = new EmptyAction();
         List<Action> actions = Lists.newArrayList(a);
@@ -238,6 +242,8 @@ public class ServerServiceImplTest extends AuraImplTestCase {
      * We carefully test only the parts that we care about for ServerService.
      */
     public void testSimpleActionWithExtras() throws Exception {
+        Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);
+    	
         ServerService ss = Aura.getServerService();
         Action a = new EmptyAction();
         List<Action> actions = Lists.newArrayList(a);
@@ -323,7 +329,6 @@ public class ServerServiceImplTest extends AuraImplTestCase {
     }
 
     public void testPreloadCSSDependencies() throws Exception {
-
         ServerService ss = Aura.getServerService();
         DefDescriptor<ComponentDef> appDesc = Aura.getDefinitionService()
                 .getDefDescriptor("clientApiTest:cssStyleTest", ComponentDef.class);

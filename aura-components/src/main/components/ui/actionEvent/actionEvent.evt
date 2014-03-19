@@ -17,6 +17,7 @@
 -->
 <aura:event type="COMPONENT" support="PROTO">
 	<aura:attribute name="name" type="String"/>
+    <aura:attribute name="index" type="Integer"/>
 	<aura:attribute name="value" type="String"/>
 	<aura:attribute name="item" type="Object"/>
 	<aura:attribute name="component" type="Aura.Component[]" description="ui:action which fired the event"/>

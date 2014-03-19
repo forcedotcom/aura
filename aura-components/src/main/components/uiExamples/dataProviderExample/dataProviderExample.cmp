@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component implements="ui:pagingInterface, ui:scrollerEmbeddable">
+<aura:component implements="ui:pagingInterface, ui:scrollerEmbeddable" access="global">
 	<ui:list aura:id="list" itemVar="row" currentPage="{!v.currentPage}" pageSize="{!v.pageSize}" totalItems="{!v.totalItems}">
 		<aura:set attribute="dataProvider">
 			<uitest:infiniteDataProvider currentPage="{!v.currentPage}" pageSize="{!v.pageSize}" totalItems="{!v.totalItems}"/>		

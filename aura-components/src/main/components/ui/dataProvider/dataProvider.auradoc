@@ -25,11 +25,6 @@
 		</p>
 		<p>
 			When a <code>ui:dataProvider</code> component has new data to report (e.g., when a server action has returned), it attaches the relevant data to the <code>ui:dataChanged</code> event.  <code>ui:dataProvider</code>'s helper provides a function <code>fireDataChangeEvent(dataProvider, data)</code> to surface this event.
-			For example, this code attaches the data to the <code>ui:dataChanged</code> event.
-	    </p>
-	    <p><code>
-         var data = action.getReturnValue(); <br/> this.fireDataChangeEvent(dataProvider, data); 
-        </code>
 		</p>
 		<p>
 			A <code>ui:dataProvider</code> can also be triggered by the wrapping component to provide data, via the <code>ui:dataProvide</code> event.  This event has a <code>parameters</code> attribute that can be used as input to the <code>ui:dataProvider</code>.
@@ -38,8 +33,12 @@
 	</aura:description>
 	
 	<aura:example name="example1" ref="uiExamples:dataProviderExample" label="Using ui:dataProvider">
-    	<p>A nice long description.  Multiple paragraphs, formatting--the whole deal.</p>
+    	<p>This example shows how to fetch data using <code>ui:dataProvider</code> in a <code>ui:list</code> component. The data provider is represented by the <code>uitest:infiniteDataProvider</code>component, which extends <code>ui:dataProvider</code>.</p>
     	
-    	<p>I mean, check out this code: <code>superCode</code>.</p>
+    	<p>When the list data is initialized, the <code>provide</code> handler is called, which runs the controller-side action. This action sets the callback using the <code>action.setCallback</code> method to return any new data. In the callback, this code attaches the data to the <code>ui:dataChanged</code> event.</p>
+    	<p><code>
+         data = action.getReturnValue();<br/>helper.fireDataChangeEvent(component, data);
+        </code>
+		</p>
 	</aura:example>
 </aura:documentation>

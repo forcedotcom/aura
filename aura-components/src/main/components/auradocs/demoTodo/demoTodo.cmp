@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component model="java://org.auraframework.docs.TodoModel">
+<aura:component model="java://org.auraframework.docs.TodoModel" access="global">
 	<ui:block aura:id="todosBlock" class="todosBlock">
 		<ui:inputText aura:id="newTodo" class="newTodo" updateOn="keyup" value="" placeholder="new to-do" keypress="{!c.createNewTodo}"/>
 		<ui:button aura:id="clearDone" buttonTitle="Clear done" class="clearDone" label="Clear done" press="{!c.clearDone}"/>

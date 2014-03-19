@@ -32,6 +32,7 @@ import org.auraframework.instance.Component;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraError;
+import org.auraframework.throwable.quickfix.InvalidAccessValueException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
@@ -57,6 +58,10 @@ public final class ThemeDefHandler extends RootTagHandler<ThemeDef> {
     public ThemeDefHandler(DefDescriptor<ThemeDef> defDescriptor, Source<ThemeDef> source, XMLStreamReader xmlReader) {
         super(defDescriptor, source, xmlReader);
         builder.setOwnHash(source.getHash());
+        
+        if (!isInPrivilegedNamespace()) {
+        	// DCHASMAN TODO Throw appropriate unknown tag exception here!
+        }
     }
 
     @Override
@@ -82,6 +87,13 @@ public final class ThemeDefHandler extends RootTagHandler<ThemeDef> {
         if (!AuraTextUtil.isNullEmptyOrWhitespace(parent)) {
             builder.setExtendsDescriptor(DefDescriptorImpl.getInstance(parent.trim(), ThemeDef.class));
         }
+        
+        try {
+            builder.setAccess(readAccessAttribute());
+        } catch (InvalidAccessValueException e) {
+            builder.setParseError(e);
+        }
+
     }
 
     @Override

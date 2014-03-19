@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component>
+<aura:component access="global">
 <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
 
 <div style="padding-bottom:10px;"><b>Single Selection</b></div>

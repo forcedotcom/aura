@@ -48,6 +48,10 @@ public abstract class ParentedTagHandler<T extends Definition, P extends RootDef
     protected RootTagHandler<P> getParentHandler() {
         return parentHandler;
     }
+    
+    protected boolean isInPrivilegedNamespace() {
+    	return parentHandler.isInPrivilegedNamespace();
+	}
 
     protected List<ComponentDefRef> tokenizeChildText() throws XMLStreamException, QuickFixException {
         String text = xmlReader.getText();

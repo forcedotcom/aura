@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:inputText" extensible="true" support="GA" description="An input field for entering a number, taking advantage of client input assistance and validation when available. Generates an input element of type number.">
+<aura:component extends="ui:inputText" extensible="true" support="GA" description="An input field for entering a number, taking advantage of client input assistance and validation when available.">
     <aura:attribute name="value" type="Decimal" description="The input value of the number."/>
     <aura:attribute name="max" type="Decimal" default="99999999999999" description="Specifies the maximum value allowed. Setting this higher than the default value can result in rounding of the value in some clients. Works with HTML5 only."/>
     <aura:attribute name="min" type="Decimal" default="-99999999999999" description="Specifies the minimum value allowed. Setting this lower than the default value can result in rounding of the value in some clients. Works with HTML5 only."/>

@@ -30,48 +30,5 @@
             var divChildren = scrlrDiv.children[0].children.length;
             $A.test.assertFalse(divChildren > 1, "User does not want to pull to refresh, there should not be a div for a spacer here");
         }
-    },
-    /*
-     * Making sure that the spacer in the scrollable areas' size is greater than zero since the
-     * amount of data does not take up all of the space in the scrollable area 
-     */
-    testDivSpacerSizeForFewItems: {
-	browsers: ["-IE7","-IE8"],
-        test: [function(cmp) {
-                 //Getting the parent div that should have a child with the name pullContent (pullContent get created because of extendedPullContent attribute)
-                  var scrlrParentDiv = cmp.find("scroller2").getElements()[1].children[0];
-                  aura.test.addWaitFor(true, function(){
-   	              return !$A.util.isUndefinedOrNull(aura.test.findChildWithClassName(scrlrParentDiv, "pullContent"))
-   	          });
-               },
-               function(cmp) {        	  
-                   var scrlrDiv = cmp.find("scroller2").getElements()[1];
-                   var scrlrChildren = scrlrDiv.children[0].children;
-            
-                   var cssText = $A.test.getStyle(scrlrChildren[3], 'height');
-                   var height = cssText.match( /\d+/g )[0];
-                   $A.test.assertTrue(height > 0, "height should be greater than zero for spacing, since there not enough list element");
-        }]
-    },
-    /*
-     * Making sure that the div padding in the scrollable area, when the amount of items takes 
-     * up all of the space, is zero. i.e. if you can scroll you shouldn't have padding
-     */
-    testDivSpacerSizeForMaxItems: {
-	browsers: ["-IE7","-IE8"],
-        test: [function(cmp) {
-            //Getting the parent div that should have a child with the name pullContent (pullContent get created because of extendedPullContent attribute)
-            var scrlrParentDiv = cmp.find("scroller2").getElements()[1].children[0];
-            aura.test.addWaitFor(true, function(){
-	              return !$A.util.isUndefinedOrNull(aura.test.findChildWithClassName(scrlrParentDiv, "pullContent"))
-	          });
-         },
-         function(cmp) {
-            var scrlrDiv = cmp.find("scroller1").getElements()[1];
-            var childrenWithStyle =  scrlrDiv.children[0].children[3];
-            $A.test.addWaitForWithFailureMessage("0", 
-        	    function(){return childrenWithStyle.style.cssText.match( /\d+/g )[0];},
-        	    "height of the space was not zero. List elements go past scrollable area, and should not need a spacer.");
-        }]
     }
 })

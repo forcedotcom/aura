@@ -1644,15 +1644,18 @@ $A.ns.Util.prototype.isValue = function(obj) {
     return (!this.isUndefinedOrNull(obj) && !this.isUndefinedOrNull(obj.auraType) && obj.auraType === 'Value');
 };
 
+/**
+ * Checks if touch events are supported. Cache the result, it shouldn't change.
+ * 
+ * @returns {Boolean} True if touch events are supported.
+ */
 $A.ns.Util.prototype.supportsTouchEvents = function() {
-    if (this.supportsTouchEvents.cache) {
-        return this.supportsTouchEvents.cache;
+    if ($A.util.isUndefined(this.supportsTouchEvents.cache)) {
+        this.supportsTouchEvents.cache = ('ontouchstart' in window || navigator.msMaxTouchPoints > 0
+            || navigator.maxTouchPoints > 0) && ($A.getContext().getMode() !== 'PTEST')
+            && ($A.getContext().getMode() !== 'CADENCE') && ($A.getContext().getMode() !== 'SELENIUM')
+            && ($A.getContext().getMode() !== 'SELENIUMDEBUG');
     }
-    // cache the result--it's not going to change. 
-    this.supportsTouchEvents.cache = ('ontouchstart' in window || navigator.msMaxTouchPoints > 0
-            || navigator.maxTouchPoints > 0) && $A.getContext().getMode() !== 'PTEST'
-            && $A.getContext().getMode() !== 'CADENCE' && $A.getContext().getMode() !== 'SELENIUM'
-            && $A.getContext().getMode() !== 'SELENIUMDEBUG';
     return this.supportsTouchEvents.cache;
 };
 

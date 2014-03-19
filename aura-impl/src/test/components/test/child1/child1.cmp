@@ -16,7 +16,10 @@
 
 -->
 <!-- THIS COMPONENT IS USED BY TESTS.  BE PREPARED TO FIX TEST FAILURES IF YOU CHANGE IT. -->
-<aura:component>
+<aura:component model="java://test.model.TestReinitializeModel">
     <aura:attribute name="attr" type="String"/>
+    
+    {!m.value}
+    
     <test:child2/>
 </aura:component>

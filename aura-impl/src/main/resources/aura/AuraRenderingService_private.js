@@ -18,6 +18,27 @@ var priv = {
     dirtyComponents : {},
     needsCleaning : false,
 
+    /**
+     * Starts a new context in $A.context for the given component.  Also records
+     * the component as a child of its parent, so that getPriorSibling() can know
+     * from the parent which component was an earlier sibling.
+     *
+     * @returns old context (i.e. current container) 
+     */
+    push : function (cmp) {
+        $A.componentStack.addNote('child', cmp);
+        return $A.componentStack.push(cmp);
+    },
+
+    /**
+     * Pops the existing $A.context frame.
+     */ 
+    pop : function(cmp) {
+        var i;
+        var top = $A.componentStack.pop(cmp);
+        $A.assert(top, "empty component context stack");
+    },
+
     cleanComponent : function(id) {
         var a = this.dirtyComponents[id];
         if (a) {
@@ -44,6 +65,126 @@ var priv = {
         }
 
         return things;
+    },
+
+    /**
+     * @private
+     * Reorders a list to render containers before contained, which we can then use to skip
+     * rerendering children that are rerendered by their parents also.  This can be a big
+     * performance win for rerender and unrender, but it isn't automatic, because some
+     * component rerenders try to be smart about NOT needlessly rerendering children, while
+     * others are more naive.  So we only rearrange, we don't remove.
+     *
+     * @param list {Array} components to be examined
+     * @param allMap {Object} all seen objects, mapped globalId to parent, used to
+     *        short circuit known traversals
+     * @param itemMap {Object} sorted tree of items from list, globalId to children,
+     *        used to emit the tree in parent-first order
+     * @returns a resorted list
+     */
+    reorderForContainment : function(list, allMap, itemMap) {
+        if (list.length > 1) {
+            // a list of length one or zero doesn't require thought... but longer ones do.
+            if (!allMap) {
+                allMap = {};
+            }
+            if (!itemMap) {
+                itemMap = {};
+                for (var i=0; i < list.length; ++i) {
+                    this.createGlobalIdMap(list[i], itemMap);
+                }
+            }
+            // We now have a map of all our elements.  Walk each thing, using first item for
+            // ArrayValues, testing whether its renderContainers are in that allMap.  If they
+            // are, defer them (because the container may do the job).  If not, we have a
+            // root to address early, and it might do our contained children too.
+            var early = [];
+            for (i=0; i < list.length; ++i) {
+                var item = list[i];
+                var test = item;
+                if (item instanceof ArrayValue) {
+                    var array = list.getArray();
+                    if (array.length === 0) {
+                        // keep empty arrays early, since we break abstraction to look for owner!
+                        early.push(item);
+                        continue;
+                    }
+                    test = array[0];
+                }
+
+                // Now, walk up from test until we either fall off the top (a root item) or find
+                // it is contained by another thing in item.  Every visited container can be put
+                // into allMap, to know what the answer is if we hit another child of that container.
+                var parents = [];
+                var container = test.getRenderContainer();
+                var gid = container ? container.getGlobalId() : undefined;
+                while (container && !(gid in allMap) && !itemMap[gid]) {
+                     parents.push(container);
+                     container = container.getRenderContainer();
+                     gid = container ? container.getGlobalId() : undefined;
+                }
+                if (gid in allMap) {
+                     // We found a parent we've already seen, and take the answer from it
+                     container = allMap[gid];  // this is an item from list
+                }
+                // Now item is the original item,
+                //     container is the nearest containing item from list, or undefined if uncontained
+                //     parents has all the intermediate containers (not in list)
+                if (container) {
+                    itemMap[container.getGlobalId()].push(item);
+                } else {
+                    early.push(item);  // else we walked off the top without finding one
+                }
+                // Any intermediate parents are contained by the same container (or also
+                // aren't contained by anything else in items, for container===undefined)
+                for (var k=0; k < parents.length; ++k) {
+                    allMap[parents[k].getGlobalId()] = container;
+                }
+            }
+            this.depthFirstSort(early, itemMap, list);
+        }
+        return list;
+    },
+
+    /**
+     * @private
+     * Makes a map entry for the given item, or children for arrayvalues, into the given map.
+     * Map entries are just empty arrays, which will be filled with child items (not just id's).
+     */
+    createGlobalIdMap : function(item, map) {
+        if (item instanceof ArrayValue) {
+            // Array values are special; we but need the array elements in allMap.
+            var sublist = item.getArray();
+            for (var i=0; i < sublist.length; i++) {
+                this.createGlobalIdMap(sublist[i], map);
+            }
+        } else {
+            map[item.getGlobalId()] = [];
+        }
+    },
+
+    /**
+     * @private
+     * Returns a depth-first ordering starting from the given roots, progressing down through
+     * the given tree structure.
+     * @param roots {Array} set of start nodes, some of which may be ArrayValues.
+     * @param tree {Object} map of globalId to contained components.
+     * @param sorted {Array} result list
+     * @param start {Integer} optional start index in sorted array
+     * @returns number of slots in sorted filled
+     */
+    depthFirstSort : function (roots, tree, sorted, start) {
+        if (start === undefined) {
+            start = 0;
+        }
+        var index = start;
+        for (var i = 0; i < roots.length; ++i) {
+            var root = roots[i];
+            sorted[index++] = root;
+            var children = (root instanceof ArrayValue) ? root.getArray() : tree[root.getGlobalId()];
+            index += this.depthFirstSort(children, tree, sorted, index);
+        }
+        return (index - start);
     },
 
     /**

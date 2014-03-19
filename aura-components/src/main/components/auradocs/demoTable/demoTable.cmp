@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component model="java://org.auraframework.docs.TableModel">
+<aura:component model="java://org.auraframework.docs.TableModel" access="global">
 
 
 <ui:dataTable items="{!m.data}">

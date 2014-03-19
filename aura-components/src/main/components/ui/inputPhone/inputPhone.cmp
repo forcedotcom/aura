@@ -15,6 +15,6 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:inputText" extensible="true" support="GA" description="An input field for entering a telephone number with type tel.">
+<aura:component extends="ui:inputText" extensible="true" support="GA" description="Represents an input field for entering a telephone number.">
     <aura:set attribute="type" value="tel"/>
 </aura:component>

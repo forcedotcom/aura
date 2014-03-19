@@ -16,5 +16,6 @@
 
 -->
 <aura:component extends="ui:action">
-	<ui:button label="{!v.label}"/>
+    <!-- TODO: make accessible; do NOT use ui:button -->
+    <button>{!v.label}</button>
 </aura:component>

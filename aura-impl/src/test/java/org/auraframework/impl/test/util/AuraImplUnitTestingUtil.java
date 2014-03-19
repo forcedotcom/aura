@@ -39,6 +39,7 @@ import org.auraframework.def.Definition;
 import org.auraframework.def.Definition.Visibility;
 import org.auraframework.def.DefinitionAccess;
 import org.auraframework.def.DependencyDef;
+import org.auraframework.def.DocumentationDef;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.EventHandlerDef;
 import org.auraframework.def.EventType;
@@ -63,7 +64,6 @@ import org.auraframework.impl.root.component.BaseComponentDefImpl;
 import org.auraframework.impl.root.component.BaseComponentDefImpl.Builder;
 import org.auraframework.impl.root.component.ComponentDefImpl;
 import org.auraframework.impl.root.component.ComponentDefRefImpl;
-import org.auraframework.impl.root.component.ComponentImpl;
 import org.auraframework.impl.root.event.EventDefImpl;
 import org.auraframework.impl.root.event.EventHandlerDefImpl;
 import org.auraframework.impl.root.event.RegisterEventDefImpl;
@@ -130,6 +130,11 @@ public class AuraImplUnitTestingUtil {
             return DefDescriptorImpl.getInstance("test:fakeComponent",
                             ComponentDef.class);
     }
+    
+    public DefDescriptor<DocumentationDef> getDocumentationDefDescriptor() {
+        return DefDescriptorImpl.getInstance("test:fakeDoc",
+                        DocumentationDef.class);
+}
 
     public DefDescriptor<ComponentDef> getParentComponentDefDescriptor() {
             return DefDescriptorImpl.getInstance("test:fakeComponentParent",
@@ -321,25 +326,25 @@ public class AuraImplUnitTestingUtil {
             return makeAttributeDef(null, null, null, false, null, null, null);
     }
 
-public ClientLibraryDef makeClientLibraryDef(String name, String url,
-                                             ClientLibraryDef.Type type,
-                                             Set<AuraContext.Mode> modes,
-                                             boolean combine,
-                                             DefDescriptor<? extends RootDefinition> parentDescriptor,
-                                             Location location) {
-    ClientLibraryDefImpl.Builder builder = new ClientLibraryDefImpl.Builder();
-
-    builder.setName(name);
-    builder.setUrl(url);
-    builder.setType(type);
-    builder.setModes(modes);
-    builder.setCombine(combine);
-
-    builder.setParentDescriptor(parentDescriptor);
-    builder.setLocation(location);
-
-    return builder.build();
-}
+    public ClientLibraryDef makeClientLibraryDef(String name, String url,
+                                                 ClientLibraryDef.Type type,
+                                                 Set<AuraContext.Mode> modes,
+                                                 boolean combine,
+                                                 DefDescriptor<? extends RootDefinition> parentDescriptor,
+                                                 Location location) {
+        ClientLibraryDefImpl.Builder builder = new ClientLibraryDefImpl.Builder();
+    
+        builder.setName(name);
+        builder.setUrl(url);
+        builder.setType(type);
+        builder.setModes(modes);
+        builder.setCombine(combine);
+    
+        builder.setParentDescriptor(parentDescriptor);
+        builder.setLocation(location);
+    
+        return builder.build();
+    }
 
     /**
      * A null parameter indicates you don't care what the value is, and thus it
@@ -447,8 +452,7 @@ public ClientLibraryDef makeClientLibraryDef(String name, String url,
 
             if (attributeDefs == null) {
                     attributeDefs = new HashMap<DefDescriptor<AttributeDef>, AttributeDef>();
-                    attributeDefs
-                                    .put(getAttributeDescriptor(),
+                    attributeDefs.put(getAttributeDescriptor(),
                                                     makeAttributeDef(null, null, null, false, null,
                                                                     null, null));
             }

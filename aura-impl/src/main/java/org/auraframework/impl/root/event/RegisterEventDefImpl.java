@@ -102,6 +102,7 @@ public final class RegisterEventDefImpl extends DefinitionImpl<EventDef> impleme
         if (event == null) {
             throw new InvalidDefinitionException("Cannot register event of type " + getEventDescriptor(), getLocation());
         }
+        
         if (!event.getEventType().canBeFired()) {
             throw new InvalidDefinitionException("Cannot fire event of type: " + getEventDescriptor(), getLocation());
         }

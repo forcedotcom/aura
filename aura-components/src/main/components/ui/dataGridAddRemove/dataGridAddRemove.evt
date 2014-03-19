@@ -16,10 +16,9 @@
 
 -->
 <aura:event type="COMPONENT" support="PROTO">
-    <aura:attribute name="index" type="Integer" description="Zero base index for where to insert rows."/>
-    <aura:attribute name="count" type="Integer" description="Row count to insert."/>
-    <aura:attribute name="first" type="Boolean"/>
-    <aura:attribute name="last" type="boolean"/>
-    <aura:attribute name="item" type="Object"/>
-    <aura:attribute name="remove" type="Boolean" description="TODO: split into two events?"/>
+    <aura:attribute name="index" type="Integer" description="Zero base index for where to add/remove rows."/>
+    <aura:attribute name="count" type="Integer" description="Row count to add/remove."/>
+    <aura:attribute name="last" type="Boolean" description="Alternative to index for simply pushing an item."/>
+    <aura:attribute name="items" type="Object[]" description="Items to insert. Empty rows are inserted not specified."/>
+    <aura:attribute name="remove" type="Boolean" description="Indicate removal"/>
 </aura:event>

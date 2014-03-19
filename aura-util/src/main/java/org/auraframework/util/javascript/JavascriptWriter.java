@@ -16,12 +16,17 @@
 package org.auraframework.util.javascript;
 
 import java.io.IOException;
+
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
+
+import org.auraframework.util.IOUtil;
 
 import com.google.common.collect.Lists;
 import com.google.javascript.jscomp.CommandLineRunner;
@@ -85,6 +90,26 @@ public enum JavascriptWriter {
         }
     },
 
+    /**
+     * A closure that should do almost nothing to the file.
+     */
+    CLOSURE_AURA_PASS {
+        @Override
+        public void setClosureOptions(CompilerOptions options) {
+            options.prettyPrint = true;
+            options.generatePseudoNames = false;
+            options.aliasKeywords = false;
+            options.reserveRawExports = true;
+            options.variableRenaming = VariableRenamingPolicy.OFF;
+            options.propertyRenaming = PropertyRenamingPolicy.OFF;
+        }
+
+        @Override
+        public boolean isSelfScoping() {
+            return true;
+        }
+    },
+
     CLOSURE_AURA_DEBUG {
         @Override
         public void setClosureOptions(CompilerOptions options) {
@@ -129,6 +154,12 @@ public enum JavascriptWriter {
         @Override
         public List<JavascriptProcessingError> compress(String in, Writer out, String filename) throws IOException {
             out.append(in);
+            return new ArrayList<JavascriptProcessingError>();
+        }
+
+        @Override
+        public List<JavascriptProcessingError> compress(InputStream in, Writer out, String filename) throws IOException {
+            IOUtil.copyStream(new InputStreamReader(in), out);
             return new ArrayList<JavascriptProcessingError>();
         }
     };
@@ -182,6 +213,20 @@ public enum JavascriptWriter {
     public List<JavascriptProcessingError> compress(Reader sourceFileReader, Writer compressedFileWriter, Writer sourceMapWriter,  String filename, Map<String, String> sourceMapLocationMapping) throws IOException {
         SourceFile input = SourceFile.fromReader(filename, sourceFileReader);
         return compress(input, compressedFileWriter, sourceMapWriter, filename, sourceMapLocationMapping);
+    }
+
+    /**
+     * InputStream base compression
+     *
+     * @param in source stream
+     * @param compressedFileWriter Compressed Javascript file writer
+     * @param filename Source javascript file name
+     * @return
+     * @throws IOException
+     */
+    public List<JavascriptProcessingError> compress(InputStream in, Writer out, String filename) throws IOException {
+        SourceFile input = SourceFile.fromInputStream(filename, in);
+        return compress(input, out, null, filename, null);
     }
 
     /**

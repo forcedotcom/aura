@@ -19,6 +19,7 @@
  *            can include a mode, such as "DEV" for development mode or "PROD" for production mode.
  * @constructor
  * @protected
+ * @class AuraContext
  * @param {Object}
  *      config the 'founding' config for the context from the server.
  */
@@ -85,7 +86,9 @@ AuraContext.prototype.getGlobalValueProviders = function() {
 };
 
 /**
+ * JSON representation of context for server requests
  * @private
+ * @return {String} json representation
  */
 AuraContext.prototype.encodeForServer = function() {
     var dn = this.getDynamicNamespaces();
@@ -102,7 +105,9 @@ AuraContext.prototype.encodeForServer = function() {
 };
 
 /**
+ * Array of dynamic namespaces
  * @private
+ * @return {Array} Array of dynamic namespaces
  */
 AuraContext.prototype.getDynamicNamespaces = function() {
     var dynamicNamespaces = [];
@@ -184,7 +189,7 @@ AuraContext.prototype.incrementRender = function() {
 
 /**
  * @private
- * @return transaction number
+ * @return {Number} incremented transaction number
  */
 AuraContext.prototype.incrementTransaction = function() {
     this.transaction = this.transaction + 1;
@@ -193,7 +198,7 @@ AuraContext.prototype.incrementTransaction = function() {
 
 /**
  * @private
- * @return gets the number of the current transaction
+ * @return {Number} gets the number of the current transaction
  */
 AuraContext.prototype.getTransaction = function() {
     return this.transaction;
@@ -210,7 +215,7 @@ AuraContext.prototype.updateTransactionName = function(_transactionName) {
 
 /**
  * @private
- * @return gets the name of the transaction
+ * @return {String} gets the name of the transaction
  */
 AuraContext.prototype.getTransactionName = function() {
     return this.transactionName;
@@ -225,10 +230,21 @@ AuraContext.prototype.clearTransactionName = function() {
 
 /**
  * @private
+ * @return {Number} Next global ID
  */
 AuraContext.prototype.getNextGlobalId = function() {
     this.lastGlobalId = this.lastGlobalId + 1;
     return this.lastGlobalId;
+};
+
+/**
+ * Returns components configs object
+ * @private
+ * @param {String} creationPath creation path to check
+ * @return {Boolean} Whether creation path is in component configs
+ */
+AuraContext.prototype.containsComponentConfig = function(creationPath) {
+    return this.componentConfigs.hasOwnProperty(creationPath);
 };
 
 /**
@@ -410,7 +426,7 @@ AuraContext.prototype.setCurrentAction = function(action) {
 /**
  * EBA - temporarily made public for helpers to obtain action - return to private when current visibility is determined
  * @public
- * @return the current action.
+ * @return {Action} the current action.
  */
 AuraContext.prototype.getCurrentAction = function() {
     return this.currentAction;

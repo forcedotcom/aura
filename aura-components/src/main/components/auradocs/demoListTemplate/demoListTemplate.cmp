@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component> 
+<aura:component access="global"> 
 	<aura:attribute name="label" type="String"/>
 	<div class="row">
 	{!v.label}

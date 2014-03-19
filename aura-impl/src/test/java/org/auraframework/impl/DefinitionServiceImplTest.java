@@ -16,26 +16,41 @@
 package org.auraframework.impl;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.BaseComponentDef;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.Definition;
+import org.auraframework.def.DescriptorFilter;
+import org.auraframework.def.TypeDef;
 import org.auraframework.impl.context.AuraRegistryProviderImpl;
-import org.auraframework.impl.system.*;
+import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.impl.system.DefFactoryImpl;
+import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.service.DefinitionService;
-import org.auraframework.system.*;
+import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.system.DefRegistry;
+import org.auraframework.system.SourceLoader;
 import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
-import com.google.common.collect.*;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 /**
  * Tests for DefinitionServiceImpl.
@@ -45,7 +60,7 @@ import com.google.common.collect.*;
 public class DefinitionServiceImplTest extends AuraImplTestCase {
     private static final String DEFINITION_SERVICE_IMPL_TEST_TARGET_COMPONENT = "definitionServiceImplTest:targetComponent";
 
-	public DefinitionServiceImplTest(String name) {
+    public DefinitionServiceImplTest(String name) {
         super(name, false);
     }
 
@@ -102,7 +117,8 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
      */
     public void testGetDefinition_DefDescriptor_assertAccess() throws QuickFixException {
         Aura.getContextService().startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
-        DefDescriptor<ComponentDef> desc = Aura.getDefinitionService().getDefDescriptor(DEFINITION_SERVICE_IMPL_TEST_TARGET_COMPONENT, ComponentDef.class);
+        DefDescriptor<ComponentDef> desc = Aura.getDefinitionService().getDefDescriptor(
+                DEFINITION_SERVICE_IMPL_TEST_TARGET_COMPONENT, ComponentDef.class);
         try {
             Definition def = definitionService.getDefinition(desc);
             definitionService.getDefRegistry().assertAccess(null, def);
@@ -116,7 +132,8 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
      */
     public void testGetDefinition_StringClass_assertAccess() throws QuickFixException {
         Aura.getContextService().startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
-        DefDescriptor<ComponentDef> desc = Aura.getDefinitionService().getDefDescriptor(DEFINITION_SERVICE_IMPL_TEST_TARGET_COMPONENT, ComponentDef.class);
+        DefDescriptor<ComponentDef> desc = Aura.getDefinitionService().getDefDescriptor(
+                DEFINITION_SERVICE_IMPL_TEST_TARGET_COMPONENT, ComponentDef.class);
         try {
             Definition def = Aura.getDefinitionService().getDefinition(desc.getQualifiedName(), ComponentDef.class);
             definitionService.getDefRegistry().assertAccess(null, def);
@@ -130,7 +147,8 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
      */
     public void testGetDefinition_StringDefType_assertAccess() throws QuickFixException {
         Aura.getContextService().startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
-        DefDescriptor<ComponentDef> desc = Aura.getDefinitionService().getDefDescriptor(DEFINITION_SERVICE_IMPL_TEST_TARGET_COMPONENT, ComponentDef.class);
+        DefDescriptor<ComponentDef> desc = Aura.getDefinitionService().getDefDescriptor(
+                DEFINITION_SERVICE_IMPL_TEST_TARGET_COMPONENT, ComponentDef.class);
         try {
             Definition def = Aura.getDefinitionService().getDefinition(desc.getQualifiedName(), DefType.COMPONENT);
             definitionService.getDefRegistry().assertAccess(null, def);
@@ -143,11 +161,12 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
      * Client loaded set is still preloaded for null input
      */
     public void testUpdateLoadedInitialNull() throws Exception {
-        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED);
+        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON,
+                Authentication.AUTHENTICATED);
         DefDescriptor<?> dummyDesc = DefDescriptorImpl.getInstance("uh:oh", ComponentDef.class);
         DefDescriptor<?> clientDesc = addSourceAutoCleanup(ComponentDef.class, String.format(baseComponentTag, "", ""));
         String clientUid = context.getDefRegistry().getUid(null, clientDesc);
-        context.setClientLoaded(ImmutableMap.<DefDescriptor<?>, String>of(clientDesc, clientUid));
+        context.setClientLoaded(ImmutableMap.<DefDescriptor<?>, String> of(clientDesc, clientUid));
 
         assertNull("No preloads initially", context.getPreloadedDefinitions());
 
@@ -175,9 +194,10 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
      * ClientOutOfSyncException thrown when context uid is not current.
      */
     public void testUpdateLoadedWithWrongUidInContext() throws Exception {
-        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED);
+        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON,
+                Authentication.AUTHENTICATED);
         DefDescriptor<?> cmpDesc = addSourceAutoCleanup(ComponentDef.class, String.format(baseComponentTag, "", ""));
-        Map<DefDescriptor<?>,String> clientLoaded = Maps.newHashMap();
+        Map<DefDescriptor<?>, String> clientLoaded = Maps.newHashMap();
         clientLoaded.put(cmpDesc, "expired");
         context.setClientLoaded(clientLoaded);
         try {
@@ -210,7 +230,8 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
      */
     public void testUpdateLoadedWithNonExistentDescriptor() throws Exception {
         Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED);
-        DefDescriptor<ComponentDef> testDesc = getAuraTestingUtil().createStringSourceDescriptor("garbage", ComponentDef.class);
+        DefDescriptor<ComponentDef> testDesc = getAuraTestingUtil().createStringSourceDescriptor("garbage",
+                ComponentDef.class);
         try {
             Aura.getDefinitionService().updateLoaded(testDesc);
             fail("Expected DefinitionNotFoundException");
@@ -224,10 +245,11 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
      * ClientOutOfSyncException thrown when def was deleted (not found).
      */
     public void testUpdateLoadedClientOutOfSyncTrumpsQuickFixException() throws Exception {
-        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED);
+        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON,
+                Authentication.AUTHENTICATED);
         DefDescriptor<?> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "", "<invalid:thisbetternotexistorthistestwillfail/>"));
-        Map<DefDescriptor<?>,String> clientLoaded = Maps.newHashMap();
+        Map<DefDescriptor<?>, String> clientLoaded = Maps.newHashMap();
         clientLoaded.put(cmpDesc, "expired");
         context.setClientLoaded(clientLoaded);
         try {
@@ -243,7 +265,8 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
      * UID, for unloaded descriptor, added to empty loaded set.
      */
     public void testUpdateLoadedInitial() throws Exception {
-        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED,
+        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON,
+                Authentication.AUTHENTICATED,
                 laxSecurityApp);
         DefDescriptor<?> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "", ""));
@@ -252,7 +275,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
 
         DefDescriptor<?> clientDesc = addSourceAutoCleanup(ComponentDef.class, String.format(baseComponentTag, "", ""));
         String clientUid = context.getDefRegistry().getUid(null, clientDesc);
-        context.setClientLoaded(ImmutableMap.<DefDescriptor<?>, String>of(clientDesc, clientUid));
+        context.setClientLoaded(ImmutableMap.<DefDescriptor<?>, String> of(clientDesc, clientUid));
 
         Map<DefDescriptor<?>, String> loaded = context.getLoaded();
         assertNull("Parent should not be loaded initially", loaded.get(cmpDesc));
@@ -270,7 +293,8 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
      * Null descriptor shouldn't affect current loaded set.
      */
     public void testUpdateLoadedNullWithLoadedSet() throws Exception {
-        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED,
+        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON,
+                Authentication.AUTHENTICATED,
                 laxSecurityApp);
         DefDescriptor<?> cmpDesc = addSourceAutoCleanup(ComponentDef.class, String.format(baseComponentTag, "", ""));
         String uid = context.getDefRegistry().getUid(null, cmpDesc);
@@ -295,7 +319,8 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
      * UID, for unloaded descriptor, added to non-empty loaded set.
      */
     public void testUpdateLoadedWithLoadedSet() throws Exception {
-        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED,
+        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON,
+                Authentication.AUTHENTICATED,
                 laxSecurityApp);
         DefDescriptor<?> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "", ""));
@@ -320,15 +345,16 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
      * UID, for unloaded descriptor, added to non-empty loaded set.
      */
     public void testUpdateLoadedNotInPreloadedSet() throws Exception {
-        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED,
+        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON,
+                Authentication.AUTHENTICATED,
                 laxSecurityApp);
         DefDescriptor<?> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "", ""));
         DefDescriptor<?> nextDesc = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "", ""));
         String nextUid = context.getDefRegistry().getUid(null, nextDesc);
-        context.setPreloadedDefinitions(ImmutableSet.<DefDescriptor<?>>of(cmpDesc));
-        
+        context.setPreloadedDefinitions(ImmutableSet.<DefDescriptor<?>> of(cmpDesc));
+
         Map<DefDescriptor<?>, String> loaded = context.getLoaded();
         assertEquals("Loaded set should be empty", 0, loaded.size());
 
@@ -339,27 +365,29 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
     }
 
     /**
-     * Preloads are empty if nothing loaded on client. 
+     * Preloads are empty if nothing loaded on client.
      */
     public void testUpdateLoadedWithoutPreloads() throws Exception {
-        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED);
+        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON,
+                Authentication.AUTHENTICATED);
         assertNull(context.getPreloadedDefinitions());
         Aura.getDefinitionService().updateLoaded(null);
-        assertEquals(0,context.getPreloadedDefinitions().size());
+        assertEquals(0, context.getPreloadedDefinitions().size());
     }
-    
+
     /**
      * Dependencies should be added to preloads during updateLoaded.
      */
     public void testUpdateLoadedSpidersPreloadDependencies() throws Exception {
-        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED,
+        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON,
+                Authentication.AUTHENTICATED,
                 laxSecurityApp);
         DefDescriptor<?> depDesc = addSourceAutoCleanup(ComponentDef.class, String.format(baseComponentTag, "", ""));
         DefDescriptor<?> clientDesc = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "", String.format("<%s/>", depDesc.getDescriptorName())));
         String uid = context.getDefRegistry().getUid(null, clientDesc);
 
-        context.setClientLoaded(ImmutableMap.<DefDescriptor<?>,String>of(clientDesc, uid));
+        context.setClientLoaded(ImmutableMap.<DefDescriptor<?>, String> of(clientDesc, uid));
         assertNull("Preloads shouldn't be set until update", context.getPreloadedDefinitions());
 
         Aura.getDefinitionService().updateLoaded(null);
@@ -372,11 +400,12 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
      * Def not validated and ClientOutOfSyncException.
      */
     public void testUpdateLoadedWithNullClientUID() throws Exception {
-        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED,
+        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON,
+                Authentication.AUTHENTICATED,
                 laxSecurityApp);
         DefDescriptor<?> clientDesc = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "", "<invalid:thisbetternotexistorthistestwillfail/>"));
-        Map<DefDescriptor<?>,String> clientLoaded = Maps.newHashMap();
+        Map<DefDescriptor<?>, String> clientLoaded = Maps.newHashMap();
         clientLoaded.put(clientDesc, null);
         context.setClientLoaded(clientLoaded);
 
@@ -387,12 +416,13 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
             // ok.
         }
     }
-    
+
     /**
      * Loaded dependencies are pruned from preloads
      */
     public void testUpdateLoadedUnloadsRedundancies() throws Exception {
-        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED,
+        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON,
+                Authentication.AUTHENTICATED,
                 laxSecurityApp);
         DefDescriptor<?> depDesc = addSourceAutoCleanup(ComponentDef.class, String.format(baseComponentTag, "", ""));
         DefDescriptor<?> clientDesc = addSourceAutoCleanup(ComponentDef.class,
@@ -402,7 +432,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
 
         // client has both parent and dependency loaded
         // in dependency last order
-        Map<DefDescriptor<?>,String> clientLoaded = Maps.newLinkedHashMap();
+        Map<DefDescriptor<?>, String> clientLoaded = Maps.newLinkedHashMap();
         clientLoaded.put(clientDesc, clientUid);
         clientLoaded.put(depDesc, depUid);
         context.setClientLoaded(clientLoaded);
@@ -411,7 +441,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         Map<DefDescriptor<?>, String> loaded = context.getLoaded();
         assertEquals("Parent missing from loaded set", clientUid, loaded.get(clientDesc));
         assertEquals("Dependency missing from loaded set", depUid, loaded.get(depDesc));
-        
+
         Aura.getDefinitionService().updateLoaded(null);
 
         // dependency is redundant with client set, so it should be removed from loaded set
@@ -424,12 +454,13 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         assertTrue("Preloads missing parent from client", preloads.contains(clientDesc));
         assertTrue("Preloads missing dependency from client", preloads.contains(depDesc));
     }
-    
+
     /**
      * Loaded dependencies are pruned from preloads even if before
      */
     public void testUpdateLoadedUnloadsRedundanciesBefore() throws Exception {
-        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED,
+        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON,
+                Authentication.AUTHENTICATED,
                 laxSecurityApp);
         DefDescriptor<?> depDesc = addSourceAutoCleanup(ComponentDef.class, String.format(baseComponentTag, "", ""));
         DefDescriptor<?> clientDesc = addSourceAutoCleanup(ComponentDef.class,
@@ -439,7 +470,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
 
         // client has both parent and dependency loaded
         // in dependency first order
-        Map<DefDescriptor<?>,String> clientLoaded = Maps.newLinkedHashMap();
+        Map<DefDescriptor<?>, String> clientLoaded = Maps.newLinkedHashMap();
         clientLoaded.put(depDesc, depUid);
         clientLoaded.put(clientDesc, clientUid);
         context.setClientLoaded(clientLoaded);
@@ -448,7 +479,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         Map<DefDescriptor<?>, String> loaded = context.getLoaded();
         assertEquals("Parent missing from loaded set", clientUid, loaded.get(clientDesc));
         assertEquals("Dependency missing from loaded set", depUid, loaded.get(depDesc));
-        
+
         Aura.getDefinitionService().updateLoaded(null);
 
         // dependency is redundant with client set, so it should be removed from loaded set
@@ -466,7 +497,8 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
      * Check circular dependencies, keeping component.
      */
     public void testUpdateLoadedUnloadsCircularComp() throws Exception {
-        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED,
+        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON,
+                Authentication.AUTHENTICATED,
                 laxSecurityApp);
         DefinitionService ds = Aura.getDefinitionService();
         DefDescriptor<?> compDesc = ds.getDefDescriptor("markup://aura:component", ComponentDef.class);
@@ -483,7 +515,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
                 context.getDefRegistry().getDependencies(tempUid).contains(compDesc));
 
         // client has both component and templage
-        Map<DefDescriptor<?>,String> clientLoaded = Maps.newLinkedHashMap();
+        Map<DefDescriptor<?>, String> clientLoaded = Maps.newLinkedHashMap();
         clientLoaded.put(compDesc, compUid);
         clientLoaded.put(tempDesc, tempUid);
         context.setClientLoaded(clientLoaded);
@@ -492,7 +524,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         Map<DefDescriptor<?>, String> loaded = context.getLoaded();
         assertEquals("Component missing from loaded set", compUid, loaded.get(compDesc));
         assertEquals("Template missing from loaded set", tempUid, loaded.get(tempDesc));
-        
+
         Aura.getDefinitionService().updateLoaded(null);
 
         // dependency is redundant with client set, so it should be removed from loaded set
@@ -505,12 +537,13 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         assertTrue("Preloads missing component from client", preloads.contains(compDesc));
         assertTrue("Preloads missing template from client", preloads.contains(tempDesc));
     }
-    
+
     /**
      * Check circular dependencies, keeping template.
      */
     public void testUpdateLoadedUnloadsCircularTemp() throws Exception {
-        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED,
+        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON,
+                Authentication.AUTHENTICATED,
                 laxSecurityApp);
         DefinitionService ds = Aura.getDefinitionService();
         DefDescriptor<?> compDesc = ds.getDefDescriptor("markup://aura:component", ComponentDef.class);
@@ -527,7 +560,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
                 context.getDefRegistry().getDependencies(tempUid).contains(compDesc));
 
         // client has both component and templage
-        Map<DefDescriptor<?>,String> clientLoaded = Maps.newLinkedHashMap();
+        Map<DefDescriptor<?>, String> clientLoaded = Maps.newLinkedHashMap();
         clientLoaded.put(tempDesc, tempUid);
         clientLoaded.put(compDesc, compUid);
         context.setClientLoaded(clientLoaded);
@@ -536,7 +569,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         Map<DefDescriptor<?>, String> loaded = context.getLoaded();
         assertEquals("Component missing from loaded set", compUid, loaded.get(compDesc));
         assertEquals("Template missing from loaded set", tempUid, loaded.get(tempDesc));
-        
+
         Aura.getDefinitionService().updateLoaded(null);
 
         // dependency is redundant with client set, so it should be removed from loaded set
@@ -549,12 +582,13 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         assertTrue("Preloads missing component from client", preloads.contains(compDesc));
         assertTrue("Preloads missing template from client", preloads.contains(tempDesc));
     }
-    
+
     /**
      * Dependencies should be added to loaded set during updateLoaded.
      */
     public void _testUpdateLoadedWithImplicitDependency() throws Exception {
-        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED,
+        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON,
+                Authentication.AUTHENTICATED,
                 laxSecurityApp);
         DefDescriptor<?> depDesc = addSourceAutoCleanup(ComponentDef.class, String.format(baseComponentTag, "", ""));
         DefDescriptor<?> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
@@ -606,9 +640,9 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
                 definitionService.find(new DescriptorFilter("markup://string:*notherecaptain")).size());
 
         // Look in NonCachingDefRegistry
-        assertEquals("find() should find a single component", 1,
+        assertEquals("find() should find 2 components (outputNumber.cmp and outputNumber.auradoc)", 2,
                 definitionService.find(new DescriptorFilter("markup://ui:outputNumber")).size());
-        assertEquals("find() fails with wildcard as prefix", 3,
+        assertEquals("find() fails with wildcard as prefix", 4,
                 definitionService.find(new DescriptorFilter("*://ui:outputNumber")).size());
         assertEquals("find() is finding non-existent items", 0,
                 definitionService.find(new DescriptorFilter("markup://ui:doesntexist")).size());

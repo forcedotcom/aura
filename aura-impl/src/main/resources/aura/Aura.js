@@ -99,6 +99,7 @@ var clientService;
 // #include aura.model.ValueDef
 // #include aura.l10n.AuraLocalizationContext
 // #include aura.AuraClientService
+// #include aura.AuraComponentContext
 // #include aura.AuraComponentService
 // #include aura.AuraSerializationService
 // #include aura.AuraRenderingService
@@ -140,6 +141,7 @@ $A.ns.Aura = function() {
     this.layoutService = new AuraLayoutService();
     this.localizationService = new AuraLocalizationService();
     this.storageService = new AuraStorageService();
+    this.componentStack = new $A.ns.AuraComponentContext();
 
     //#if {"excludeModes" : ["PRODUCTION"]}
     this.devToolService = new AuraDevToolService();
@@ -792,8 +794,10 @@ $A.ns.Aura.prototype.setRoot = function(root) {
 /**
  * Gets the current <code>AuraContext</code>. The context consists of the mode, descriptor, and namespaces to be loaded.
  * <p>See Also: <a href="#help?topic=modesReference">Modes Reference</a></p>
+ *
  * @public
  * @function
+ * @return {AuraContext} current context
  */
 $A.ns.Aura.prototype.getContext = function() {
     return this.context;

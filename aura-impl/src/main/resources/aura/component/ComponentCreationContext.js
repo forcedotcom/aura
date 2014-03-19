@@ -30,7 +30,7 @@
  * @param {Boolean} [forceClient]
  *
  * @protected
- * @class
+ * @class ComponentCreationContext
  * @constructor
  */
 $A.ns.ComponentCreationContext = function(config, scope, callback, attributeValueProvider,
@@ -75,8 +75,8 @@ $A.ns.ComponentCreationContext.prototype.loadComponent = function(config, attrib
                                                                   callback, isTop, forceServer, forceClient) {
 
     var configObj = $A.componentService.getComponentConfigs(config, attributeValueProvider),
-        def = configObj['definition'],
-        desc = configObj['descriptor'],
+        def = configObj["definition"],
+        desc = configObj["descriptor"],
         self = this,
         currentIndex = this.index;
 
@@ -102,19 +102,19 @@ $A.ns.ComponentCreationContext.prototype.loadComponent = function(config, attrib
         self.finished();
     };
 
-    config = configObj['configuration'];
+    config = configObj["configuration"];
 
     // increment component count
     this.count++;
     this.index++;
 
     // partial config
-    if (config['globalId']) {
+    if (config["creationPath"]) {
         forceClient = true;
     }
 
-    config['componentDef'] = {
-        'descriptor': desc
+    config["componentDef"] = {
+        "descriptor": desc
     };
 
     if (!forceClient && (!def || (def && def.hasRemoteDependencies())) || forceServer) {
@@ -136,7 +136,7 @@ $A.ns.ComponentCreationContext.prototype.loadComponent = function(config, attrib
  */
 $A.ns.ComponentCreationContext.prototype.loadComponentArray = function(configs, attributeValueProvider, localCreation,
                                                                        forceServer, forceClient) {
-    $A.assert($A.util.isArray(configs) && configs.length, 'configs should be array of component configurations');
+    $A.assert($A.util.isArray(configs) && configs.length, "configs should be array of component configurations");
 
     /**
     creating an array of components. Used in {@link $A.ns.ComponentCreationContext.finished}
@@ -158,9 +158,9 @@ $A.ns.ComponentCreationContext.prototype.loadComponentArray = function(configs, 
  * @param {Function} callback - callback
  */
 $A.ns.ComponentCreationContext.prototype.requestComponent = function(config, avp, callback) {
-    var action = $A.get('c.aura://ComponentController.getComponent'),
-        attributes = config['attributes'] ?
-            (config['attributes']['values'] ? config['attributes']['values'] : config['attributes'])
+    var action = $A.get("c.aura://ComponentController.getComponent"),
+        attributes = config["attributes"] ?
+            (config["attributes"]["values"] ? config["attributes"]["values"] : config["attributes"])
             : null,
         atts = {},
         doubleCall = false;
@@ -171,8 +171,8 @@ $A.ns.ComponentCreationContext.prototype.requestComponent = function(config, avp
     //
     for (var key in attributes) {
         var value = attributes[key];
-        if (value && value.hasOwnProperty('value')) {
-            value = value['value'];
+        if (value && value.hasOwnProperty("value")) {
+            value = value["value"];
         }
         // no def or component here, because we don't have one.
         var auraValue = valueFactory.create(value);
@@ -189,35 +189,35 @@ $A.ns.ComponentCreationContext.prototype.requestComponent = function(config, avp
         //
         if (doubleCall) {
             $A.assert(!doubleCall,
-                'Two callbacks from ' + a + ' means our component is not storable: ' + a.getReturnValue());
+                "Two callbacks from " + a + " means our component is not storable: " + a.getReturnValue());
             return;
         }
         doubleCall = true;
 
-        if (a.getState() === 'SUCCESS') {
+        if (a.getState() === "SUCCESS") {
             var returnedConfig = a.getReturnValue();
-            if (!returnedConfig['attributes']) {
-                returnedConfig['attributes'] = {};
+            if (!returnedConfig["attributes"]) {
+                returnedConfig["attributes"] = {};
             }
-            var merging = returnedConfig['attributes'];
-            if (merging.hasOwnProperty('values')) {
-                merging = merging['values'];
+            var merging = returnedConfig["attributes"];
+            if (merging.hasOwnProperty("values")) {
+                merging = merging["values"];
             }
             for (var mkey in attributes) {
                 merging[mkey] = attributes[mkey];
             }
-            returnedConfig['localId'] = config['localId'];
+            returnedConfig["localId"] = config["localId"];
 
             newComp = this.buildComponent(returnedConfig, avp, false);
         } else {
             // return text component with error message if something went wrong
             var errors = a.getError();
 
-            newComp = this.buildComponent('markup://aura:text');
+            newComp = this.buildComponent("markup://aura:text");
             if (errors) {
-                newComp.getValue('v.value').setValue(errors[0].message);
+                newComp.getValue("v.value").setValue(errors[0].message);
             } else {
-                newComp.getValue('v.value').setValue('unknown error');
+                newComp.getValue("v.value").setValue("unknown error");
             }
         }
         if ($A.util.isFunction(callback)) {
@@ -226,8 +226,8 @@ $A.ns.ComponentCreationContext.prototype.requestComponent = function(config, avp
     });
 
     action.setParams({
-        'name' : config['componentDef']['descriptor'],
-        'attributes' : atts
+        "name" : config["componentDef"]["descriptor"],
+        "attributes" : atts
     });
 
     $A.enqueueAction(action);
@@ -244,16 +244,16 @@ $A.ns.ComponentCreationContext.prototype.requestComponent = function(config, avp
  */
 $A.ns.ComponentCreationContext.prototype.buildComponent = function(config, attributeValueProvider, localCreation) {
     var configObj = $A.componentService.getComponentConfigs(config, attributeValueProvider),
-        def = configObj['definition'];
+        def = configObj["definition"];
 
-    $A.assert(def, 'Component definition required to create component');
+    $A.assert(def, "Component definition required to create component");
 
-    config = configObj['configuration'];
+    config = configObj["configuration"];
 
-    if(!config['creationPath']) {
+    if(!config["creationPath"]) {
         localCreation = true;
         // shouldn't need lazy or exclusive components
-        delete config['load'];
+        delete config["load"];
     }
 
     return new Component(config, localCreation, this);
@@ -279,8 +279,8 @@ $A.ns.ComponentCreationContext.prototype.finished = function() {
         // initialize components in reverse order
         for (var i = this.components.length; i--;) {
             var component = this.components[i];
-            $A.assert(component, 'Should have component');
-            component.fire('init');
+            $A.assert(component, "Should have component");
+            component.fire("init");
             // remove reference to ccc in component to prevent memory leaks
             component.ccc = undefined;
         }
@@ -288,7 +288,7 @@ $A.ns.ComponentCreationContext.prototype.finished = function() {
         var ret;
 
         if (!this.isArray) {
-            $A.assert(this.tops.length === 1, 'Should only have one top level component');
+            $A.assert(this.tops.length === 1, "Should only have one top level component");
             ret = this.tops[0];
         } else {
             ret = this.tops;

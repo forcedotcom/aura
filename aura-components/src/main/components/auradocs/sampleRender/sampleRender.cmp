@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extends="auradocs:sampleRenderMe">
+<aura:component extends="auradocs:sampleRenderMe" access="global">
 
   <aura:set attribute="desc">
       <p>Content from sampleRender</p>

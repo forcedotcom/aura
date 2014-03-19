@@ -18,7 +18,6 @@
         var e = cmp.find("count").getElement();
         var newCount = parseInt($A.util.getText(e)) + 1;
         cmp.getAttributes().setValue("count", newCount);
-        
         this.superRerender();
     }
 })

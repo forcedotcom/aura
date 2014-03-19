@@ -20,12 +20,13 @@
     },
 
     rerender : function(component, helper) {
+        var attributes = component.getAttributes(),
+            enabled    = attributes.getValue("enabled").getBooleanValue();
+
         this.superRerender();
 
-        var attributes = component.getAttributes();
-        var enabled = attributes.getValue("enabled").getBooleanValue();
         if (enabled) {
-            if ($A.util.isUndefined(component._scroller)) {
+            if (!component._scroller) {
                 helper.init(component);
             }
         } else {
@@ -35,7 +36,6 @@
 
     unrender : function(component, helper) {
         helper.deactivate(component);
-
         this.superUnrender();
     }
 })

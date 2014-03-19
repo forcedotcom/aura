@@ -53,6 +53,7 @@
                      };
         var avp = $A.expressionService.createPassthroughValue({}, cmp)
         helper.createComponentAndPushToBody(cmp,config, avp);
+        return avp;
     },
     /**
      * Create a component whose definition is not available at the client.

@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component>
+<aura:component access="global">
      <ui:tabset class="subtabs">
          <ui:tab title="Tab 1">Tab 1 contents</ui:tab>
          <ui:tab title="Tab 2" active="true">Tab 2 contents. This is the default tab.</ui:tab>

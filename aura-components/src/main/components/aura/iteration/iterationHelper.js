@@ -124,8 +124,7 @@
         if ((end - start) > (realbody.getLength()/bodyLen)) {
             // now we don't have enough, create a new cmp at the end
             var items = cmp.getValue("v.items");
-            //var cmps = this.createComponentsForIndex(cmp, items, realbody.getLength() + start, false);
-            this.createSelectiveComponentsForIndex(cmp, items, (realbody.getLength()/bodyLen) + start, false, callback);
+            this.createSelectiveComponentsForIndex(cmp, items, end - 1, false, callback);
         }
     },
 
@@ -237,7 +236,6 @@
             cmp: cmp,
             callback: callback
         };
-        cmp._currentSelectiveBodyCollector = selectiveBodyCollector;
         for (var j = 0; j < body.getLength(); j++) {
             var cdr = body.get(j);
             if (!ivp) {
@@ -258,14 +256,6 @@
                 for (var i = 0; i < rbl.length; i++) {
                     accum.push(rbl[i]);
                 }
-                
-                if (selectiveBodyCollector.cmp._currentSelectiveBodyCollector != selectiveBodyCollector) {
-                    for (var j = 0; j < accum.length; j++) {
-                        accum[j].destroy(true);
-                    }
-                    return;
-                }
-                selectiveBodyCollector.cmp._currentSelectiveBodyCollector = null;
                 selectiveBodyCollector.callback(accum);
             }
         };
@@ -284,21 +274,19 @@
     
     rerenderSelective: function(cmp) {
         // optimized for insert/remove/push. if this is called as a result of a setValue then anything could change
-        var helper = this;
         var start = this.getStart(cmp);
         var end = this.getEnd(cmp);
         var atts = cmp.getAttributes();
-        var items = atts.getValue("items");
+        var items = atts.getValue("items")
         var realbody = atts.getValue("realbody");
         var body = atts.getValue("body");
         var bodyLen = body.getLength();
         if (!realbody.isEmpty()) {
-            var exit = false;
             var varName = atts.get("var");
             var indexVar = atts.get("indexVar");
             var diffIndex = -1;
             var data;
-            // look for a diff between the old items and the new items
+            // look for a diff between the components we already created and the data
             for (var i = 0; i < realbody.getLength(); i++) {
                 var bodycmp = realbody.getValue(i);
                 var vp = bodycmp.getAttributes().getValueProvider();
@@ -323,49 +311,32 @@
                     this.incrementIndices(cmparray, i, indexVar, -1, bodyLen);
                     realbody.setValue(cmparray);
                     this.createNewComponents(cmp, function(newcmps) {
-                        if (exit === true) {
-                            helper.rerenderEverything(cmp);
-                        } else {
-                            for (var j = 0; j < newcmps.length; j++) {
-                                realbody.push(newcmps[j]);
-                            }
-                            cmp.getEvent("rerenderComplete").fire();
+                        for (var j = 0; j < newcmps.length; j++) {
+                            realbody.push(newcmps[j]);
                         }
                     });
                 } else {
                     // item was added, instantiate new cmp, re-number rest
                     this.incrementIndices(cmparray, i, indexVar, 1, bodyLen);
-                    //var newcmp = this.createComponentsForIndex(cmp, items, diffIndex, false)[0];
                     this.createSelectiveComponentsForIndex(cmp, items, diffIndex, false, function(newcmps) {
-                        if (exit === true) {
-                            helper.rerenderEverything(cmp);
-                        } else { // directly return
-                            cmparray.splice.apply(cmparray, [i, 0].concat(newcmps));
-                            if (end - start < cmparray.length/bodyLen) {
-                                // now there is 1 too many, need to remove from the end
-                                for (var j = 0; j < bodyLen; j++) {
-                                    var endcmp = cmparray.pop();
-                                    endcmp.destroy();
-                                }
+                        cmparray.splice.apply(cmparray, [i, 0].concat(newcmps));
+                        if (end - start < cmparray.length/bodyLen) {
+                            // now there is 1 too many, need to remove from the end
+                            for (var j = 0; j < bodyLen; j++) {
+                                var endcmp = cmparray.pop();
+                                endcmp.destroy();
                             }
-                            realbody.setValue(cmparray);
-                            cmp.getEvent("rerenderComplete").fire();
                         }
+                        realbody.setValue(cmparray);
                     });
                 }               
             } else {
                 this.createNewComponents(cmp, function(newcmps) {
-                    if (exit === true) {
-                        helper.rerenderEverything(cmp);
-                    } else {
-                        for (var j = 0; j < newcmps.length; j++) {
-                            realbody.push(newcmps[j]);
-                        }
-                        cmp.getEvent("rerenderComplete").fire();
+                    for (var j = 0; j < newcmps.length; j++) {
+                        realbody.push(newcmps[j]);
                     }
                 });
             }
-            exit = true;
         } else {
             this.rerenderEverything(cmp);
         }

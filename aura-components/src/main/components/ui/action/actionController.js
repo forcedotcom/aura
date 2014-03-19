@@ -29,5 +29,12 @@
 
 			el.dispatchEvent(click);
 		}
+	},
+
+	handleValueChange: function (cmp, evt) {
+		var el = cmp.getElement(),
+			value = evt.getParam('value').getValue();
+		
+		$A.util.setDataAttribute(el, 'action-value', value); 	
 	}
 })

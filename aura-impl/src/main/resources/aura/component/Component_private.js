@@ -31,12 +31,19 @@ var ComponentPriv = (function() { // Scoping priv
         this.eventDispatcher = undefined;
         this.docLevelHandlers = undefined;
 
+        // Reference to "this" component's container, used to keep rendered elements
+        // right as they are conditionally changed.  But this is not EVER to be
+        // exposed to be referenced externally!
+        this.container = undefined;
+
         var context = $A.getContext();
         var act = context.getCurrentAction();
         var forcedPath = false;
 
         try {
             if (act) {
+                var currentPath = act.topPath();
+
                 if (config["creationPath"]) {
                     //
                     // This is a server side config, so we need to sync ourselves with it.
@@ -47,6 +54,12 @@ var ComponentPriv = (function() { // Scoping priv
                     //
                     this.creationPath = act.forceCreationPath(config["creationPath"]);
                     forcedPath = true;
+                } else if (!context.containsComponentConfig(currentPath) && !!localCreation) {
+
+                    // skip creation path if the current top path is not in server returned
+                    // componentConfigs and localCreation or force client created
+
+                    this.creationPath = "client created";
                 } else {
                     this.creationPath = act.getCurrentPath();
                 }
@@ -335,8 +348,8 @@ var ComponentPriv = (function() { // Scoping priv
 
     ComponentPriv.prototype.setupDelegateValueProvider = function(config, localCreation, ccc) {
         if (config) {
-            if (config['globalId']) {
-                this.delegateValueProvider = componentService.get(config['globalId']);
+            if (config["globalId"]) {
+                this.delegateValueProvider = componentService.get(config["globalId"]);
             } else {
                 this.delegateValueProvider = config;
             }
@@ -356,11 +369,11 @@ var ComponentPriv = (function() { // Scoping priv
 
     ComponentPriv.prototype.setupAttributes = function(config, cmp, localCreation) {
         var configAttributes = config || {};
-        this.attributes = this.componentDef.getAttributeDefs().createInstances(
-            configAttributes, cmp, true, localCreation);
+        this.attributes = new AttributeSet(configAttributes, configAttributes["valueProvider"],
+            this.componentDef.getAttributeDefs(), cmp, localCreation);
     };
 
-    ComponentPriv.prototype.validateAttributes = function(cmp, config) {
+    ComponentPriv.prototype.validateAttributes = function(cmp) {
         var attributeDefSet = this.componentDef.attributeDefs;
         if (attributeDefSet && attributeDefSet.each) {
             var compPriv = this;
@@ -408,7 +421,7 @@ var ComponentPriv = (function() { // Scoping priv
                     if (!valuesAlreadySet[facet["descriptor"]]) {
                         if (attributeDefs) {
                             var attributeDef = attributeDefs.getDef(facet["descriptor"]);
-                            if (attributeDef && attributeDef.getTypeDefDescriptor() !== 'aura://Aura.Component[]') {
+                            if (attributeDef && attributeDef.getTypeDefDescriptor() !== "aura://Aura.Component[]") {
                                 valuesAlreadySet[facet["descriptor"]] = true;
                             }
                         }
@@ -437,8 +450,8 @@ var ComponentPriv = (function() { // Scoping priv
                 self.superComponent = component;
                 if (component) {
                     var valueProviders = self.getValueProviders();
-                    if (!valueProviders['super']) {
-                        valueProviders['super'] = component;
+                    if (!valueProviders["super"]) {
+                        valueProviders["super"] = component;
                     }
                 }
             };
@@ -629,33 +642,12 @@ var ComponentPriv = (function() { // Scoping priv
         var self = this,
             setProvided = function(realComponentDef, attributes) {
                 $A.assert(realComponentDef
-                    && realComponentDef.auraType === 'ComponentDef'
+                    && realComponentDef.auraType === "ComponentDef"
                     && !realComponentDef.isAbstract(),
-                    'No concrete implementation provided');
+                    "No concrete implementation provided");
 
                 self.componentDef = realComponentDef;
-
-
-                /**
-                 * TODO: Fix injecting attributes. async and un-sync component creation
-                 *
-                 * client provided has to have the same attributes as current cmp
-                 * because injectComponent is called after setupAttributes. Thus,
-                 * attributes are already created for the component at this point.
-                 *
-                 */
-                if (attributes) {
-                    for ( var k in attributes) {
-                        var value = cmp.getAttributes().getValue(k, true);
-                        if (!value) {
-                            aura.assert(value, 'No attribute named ' + k
-                                + ' found but was returned by provider');
-                        }
-
-                        value.setValue(attributes[k]);
-                        value.commit();
-                    }
-                }
+                self.attributes.recreate(realComponentDef.getAttributeDefs(), attributes);
             };
 
 
@@ -674,7 +666,7 @@ var ComponentPriv = (function() { // Scoping priv
             } else {
                 var partialConfig = this.partialConfig;
                 $A.assert(partialConfig,
-                            'Abstract component without provider def cannot be instantiated : '
+                            "Abstract component without provider def cannot be instantiated : "
                             + componentDef);
                 setProvided(componentService.getDef(partialConfig["componentDef"]), null);
             }
@@ -776,6 +768,44 @@ var ComponentPriv = (function() { // Scoping priv
         });
         ret["__proto__"] = null;
         return ret;
+    };
+
+    /** @private@
+     * Used during render to be able to walk up, correcting rendered elements.
+     *
+     * Like getRenderContainer(), this cannot become public API, both because
+     * it would mess with encapsulation and because the (internal) renderer is
+     * what, by definition, "knows" the container.
+     *
+     * @param {Component} parent the parent component
+     * @param {Component} priorSibling the earlier child of parent, or undefined
+     */
+    Component.prototype.setRenderContainer = function(parent, priorSibling) {
+        this.priv.container = parent;
+        this.priv.priorSibling = priorSibling;
+    };
+
+    /** @private@
+     * Used during rerender to be able to walk up, correcting rendered elements.
+     *
+     * This cannot become public API of components without breaking encapsulation,
+     * tempting though it seems... a component cannot be aware of, or sensitive to,
+     * the context inside which it is used.
+     */
+    Component.prototype.getRenderContainer = function() {
+        return this.priv.container;
+    };
+
+    /** @private@
+     * Used during rerender to be able to walk laterally, to find where to add new
+     * elements if the component doesn't know where to insert itself.
+     *
+     * This cannot become public API of components without breaking encapsulation,
+     * tempting though it seems... a component cannot be aware of, or sensitive to,
+     * the context inside which it is used.
+     */
+    Component.prototype.getRenderPriorSibling = function() {
+        return this.priv.priorSibling;
     };
 
     ComponentPriv.prototype.outputArrayValue = function(value, avp, serialized, depth) {

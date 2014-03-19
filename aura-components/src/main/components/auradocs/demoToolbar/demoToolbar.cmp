@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component>
+<aura:component access="global">
 	<ui:toolbar>
          <ui:button>
              <aura:set attribute="label" value="Button 1" />

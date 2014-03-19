@@ -603,10 +603,6 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                 }
             }
 
-            if (parent != null) {
-            	assertAccess(parent.getDescriptor(), cd.def);
-            }
-            
             Set<DefDescriptor<?>> newDeps = Sets.newHashSet();
             cd.def.appendDependencies(newDeps);
 
@@ -1176,20 +1172,31 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     }
 
 	@Override
-    public <D extends Definition> void assertAccess(DefDescriptor<?> referencingDescriptor, D def) throws QuickFixException {
+	public <D extends Definition> void assertAccess(DefDescriptor<?> referencingDescriptor, D def) throws QuickFixException {
+	    assertAccess(referencingDescriptor, def, accessCheckCache);
+	}
+	
+    <D extends Definition> void assertAccess(DefDescriptor<?> referencingDescriptor, D def, Cache<String, String> accessCheckCache) 
+            throws QuickFixException {
 		// If the def is access="global" then anyone can see it
     	if (def.getAccess().isGlobal()) {
     		return;
     	}
 		
+		ConfigAdapter configAdapter = Aura.getConfigAdapter();
 		String referencingNamespace = null;
 		if (referencingDescriptor != null) {
 	    	String prefix = referencingDescriptor.getPrefix();
-			if (Aura.getConfigAdapter().isUnsecuredPrefix(prefix)) {
+			if (configAdapter.isUnsecuredPrefix(prefix)) {
 	    		return;
 	    	}
 			
 			referencingNamespace = referencingDescriptor.getNamespace();
+			
+	        // The caller is in a system namespace let them through
+			if (configAdapter.isPrivilegedNamespace(referencingNamespace)) {
+				return;
+			}
 		}
 		
 		DefDescriptor<?> desc = def.getDescriptor();
@@ -1217,31 +1224,26 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 		    accessCheckCache.put(key, status);
 			
 			// System.out.printf("** MDR.miss.assertAccess() cache miss for: %s\n", key);
-		    
-	    	ConfigAdapter configAdapter = Aura.getConfigAdapter();
-	    	
-	        // The caller is in a system namespace let them through
-			if (!configAdapter.isPrivilegedNamespace(referencingNamespace)) {
-				DefDescriptor<? extends Definition> descriptor = def.getDescriptor();
-				if (!configAdapter.isUnsecuredNamespace(descriptor.getNamespace()) && !configAdapter.isUnsecuredPrefix(descriptor.getPrefix())) {
-					if (referencingNamespace == null || referencingNamespace.isEmpty()) {
-						status = String.format("Access to %s '%s' disallowed by MasterDefRegistry.assertAccess(): referencing namespace was empty or null", defType, target);
-				    } else if (!referencingNamespace.equals(namespace)) {
-				    	// The caller and the def are not in the same namespace
-					    status = String.format("Access to %s '%s' from namespace '%s' disallowed by MasterDefRegistry.assertAccess()", defType, target, referencingNamespace);
-				    }
-				}
+		    	    	
+			DefDescriptor<? extends Definition> descriptor = def.getDescriptor();
+			if (!configAdapter.isUnsecuredNamespace(namespace) && !configAdapter.isUnsecuredPrefix(descriptor.getPrefix())) {
+				if (referencingNamespace == null || referencingNamespace.isEmpty()) {
+					status = String.format("Access to %s '%s' disallowed by MasterDefRegistry.assertAccess(): referencing namespace was empty or null", defType, target);
+			    } else if (!referencingNamespace.equals(namespace)) {
+			    	// The caller and the def are not in the same namespace
+				    status = String.format("Access to %s '%s' from namespace '%s' disallowed by MasterDefRegistry.assertAccess()", defType.toString().toLowerCase(), target, referencingNamespace);
+			    }
 			}
 
 			if (!status.isEmpty()) {
 				accessCheckCache.put(key, status);
 			}
 		} else {
-			// System.out.printf("** MDR.hit.assertAccesst() cache hit for: %s\n", key);
+			// System.out.printf("** MDR.hit.assertAccess() cache hit for: %s\n", key);
 		}
 		
 		if (!status.isEmpty()) {
-			String message = Aura.getConfigAdapter().isProduction() ? DefinitionNotFoundException.getMessage(defType, desc.getName()) : status;
+			String message = configAdapter.isProduction() ? DefinitionNotFoundException.getMessage(defType, desc.getName()) : status;
 			throw new NoAccessException(message);
 		}
 	}

@@ -15,17 +15,12 @@
  */
 package org.auraframework.http;
 
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
-import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.AuraContext;
@@ -34,8 +29,6 @@ import org.auraframework.system.SourceListener;
 import org.auraframework.test.AuraTestCase;
 import org.auraframework.test.DummyHttpServletRequest;
 import org.auraframework.test.DummyHttpServletResponse;
-
-import com.google.common.collect.Sets;
 
 /**
  * Simple (non-integration) test case for {@link AuraResourceServlet}, most useful for exercising hard-to-reach error
@@ -213,153 +206,4 @@ public class AuraResourceServletTest extends AuraTestCase {
         assertNull("JS cache not cleared after source change event", jsCache);
     }
 
-    /**
-     * Sanity check to make sure that app.js doesn't blow up
-     */
-    public void testWriteDefinitionsWithoutDupes() throws Exception {
-        DefDescriptor<ApplicationDef> appDesc = DefDescriptorImpl.getInstance("appCache:withpreload",
-                ApplicationDef.class);
-        AuraContext context = Aura.getContextService()
-                .startContext(Mode.DEV, AuraContext.Format.JS, AuraContext.Authentication.AUTHENTICATED, appDesc);
-        final String uid = context.getDefRegistry().getUid(null, appDesc);
-        context.addLoaded(appDesc, uid);
-
-        Set<DefDescriptor<?>> dependencies = context.getDefRegistry().getDependencies(uid);
-
-        // prime def cache
-        StringBuilder output = new StringBuilder();
-        AuraResourceServlet.writeDefinitions(dependencies, output);
-        String text = output.toString();
-        final String dupeCheck = "$A.clientService.initDefs(";
-        if (text.indexOf(dupeCheck) != text.lastIndexOf(dupeCheck)) {
-            fail("found duplicated code in: " + text);
-        }
-
-        // now check that defs not re-written with unempty cache
-        output = new StringBuilder();
-        AuraResourceServlet.writeDefinitions(dependencies, output);
-        text = output.toString();
-        if (text.indexOf(dupeCheck) != text.lastIndexOf(dupeCheck)) {
-            fail("found duplicated code in: " + text);
-        }
-    }
-
-    /**
-     * Sanity check to make sure that app.css does not have duplicate copy of component CSS. Component CSS was being
-     * added twice, once because they were part of preload namespace and a second time because of component dependency.
-     * This test mocks such duplication. W-1588568
-     */
-    public void testWriteCssWithoutDupes() throws Exception {
-        DefDescriptor<ApplicationDef> appDesc = DefDescriptorImpl.getInstance("preloadTest:test_SimpleApplication",
-                ApplicationDef.class);
-        AuraContext context = Aura.getContextService()
-                .startContext(Mode.DEV, AuraContext.Format.CSS, AuraContext.Authentication.AUTHENTICATED, appDesc);
-        final String uid = context.getDefRegistry().getUid(null, appDesc);
-        context.addLoaded(appDesc, uid);
-
-        Set<DefDescriptor<?>> dependencies = context.getDefRegistry().getDependencies(uid);
-        
-        StringBuilder output = new StringBuilder();
-        AuraResourceServlet.writeAppCss(dependencies, output);
-
-        // A snippet of component css
-        String cssPiece = "AuraResourceServletTest-testWriteCssWithoutDupes";
-        Pattern pattern = Pattern.compile(cssPiece);
-        Matcher matcher = pattern.matcher(output.toString());
-        int count = 0;
-        while (matcher.find() && count < 3) {
-            count++;
-        }
-        assertEquals("Component CSS repeated", 1, count);
-    }
-
-    /**
-     * Verify that the css writer writes in the order given.
-     */
-    public void testCSSOrder() throws Exception {
-        DefDescriptor<ApplicationDef> appDesc = Aura.getDefinitionService()
-                .getDefDescriptor("auratest:test_SimpleServerRenderedPage", ApplicationDef.class);
-        DefDescriptor<ComponentDef> grandparent = Aura.getDefinitionService()
-                .getDefDescriptor("setAttributesTest:grandparent", ComponentDef.class);
-        DefDescriptor<ComponentDef> parent = Aura.getDefinitionService()
-                .getDefDescriptor("setAttributesTest:parent", ComponentDef.class);
-        DefDescriptor<ComponentDef> child1 = Aura.getDefinitionService()
-                .getDefDescriptor("setAttributesTest:child", ComponentDef.class);
-        DefDescriptor<ComponentDef> child2 = Aura.getDefinitionService()
-                .getDefDescriptor("setAttributesTest:anotherChild", ComponentDef.class);
-        Aura.getContextService().startContext(AuraContext.Mode.DEV, AuraContext.Format.CSS,
-                AuraContext.Authentication.AUTHENTICATED, appDesc);
-
-        Set<DefDescriptor<?>> writable = Sets.newLinkedHashSet();
-
-        writable.add(child1.getDef().getStyleDescriptor());
-        writable.add(grandparent.getDef().getStyleDescriptor());
-        writable.add(parent.getDef().getStyleDescriptor());
-        writable.add(child2.getDef().getStyleDescriptor());
-
-        StringBuilder output = new StringBuilder();
-        AuraResourceServlet.writeAppCss(writable, output);
-        String css = output.toString();
-
-        //
-        // order should be exactly that above.
-        // child1, grandparent, parent, child2
-        // 
-        assertTrue("parent CSS should be written before child CSS in: "+css,
-                css.indexOf(".setAttributesTestChild") < css.indexOf(".setAttributesTestGrandparent"));
-        assertTrue("grandparent CSS should be written before parent CSS in: "+css,
-                css.indexOf(".setAttributesTestGrandparent") < css.indexOf(".setAttributesTestParent"));
-        assertTrue("parent CSS should be written before another child CSS in: "+css,
-                css.indexOf(".setAttributesTestParent") < css.indexOf(".setAttributesTestAnotherChild"));
-    }
-
-    public void testPreloadCSSDependencies() throws Exception {
-
-        DefDescriptor<ComponentDef> appDesc = Aura.getDefinitionService()
-                .getDefDescriptor("clientApiTest:cssStyleTest", ComponentDef.class);
-        AuraContext context = Aura.getContextService().startContext(AuraContext.Mode.DEV, AuraContext.Format.CSS,
-                AuraContext.Authentication.AUTHENTICATED, appDesc);
-        final String uid = context.getDefRegistry().getUid(null, appDesc);
-        context.addLoaded(appDesc, uid);
-
-        Set<DefDescriptor<?>> dependencies = context.getDefRegistry().getDependencies(uid);
-
-        StringBuilder output = new StringBuilder();
-        AuraResourceServlet.writeAppCss(dependencies, output);
-
-        String sourceNoWhitespace = output.toString().replaceAll("\\s", "");
-        String preloaded1 = ".clientApiTestCssStyleTest{background-color:#eee}";
-        String preloaded2 = ".testTestValidCSS{color:#1797c0";
-        assertTrue("Does not have preloaded css", sourceNoWhitespace.contains(preloaded1));
-        assertTrue("Does not have preloaded css", sourceNoWhitespace.contains(preloaded2));
-    }
-
-    public void testPreloadJSDependencies() throws Exception {
-        DefDescriptor<ComponentDef> appDesc = Aura.getDefinitionService()
-                .getDefDescriptor("clientApiTest:cssStyleTest", ComponentDef.class);
-        AuraContext context = Aura.getContextService().startContext(AuraContext.Mode.DEV, AuraContext.Format.CSS,
-                AuraContext.Authentication.AUTHENTICATED, appDesc);
-        final String uid = context.getDefRegistry().getUid(null, appDesc);
-        context.addLoaded(appDesc, uid);
-
-        Set<DefDescriptor<?>> dependencies = context.getDefRegistry().getDependencies(uid);
-
-        StringBuilder output = new StringBuilder();
-        AuraResourceServlet.writeDefinitions(dependencies, output);
-
-        String sourceNoWhitespace = output.toString().replaceAll("\\s", "");
-
-        String[] preloads = new String[]{
-                "\"descriptor\":\"markup://aura:placeholder\",",
-                "\"descriptor\":\"markup://ui:input\",",
-                "\"descriptor\":\"markup://ui:inputText\",",
-                "\"descriptor\":\"markup://ui:output\",",
-                "\"descriptor\":\"markup://ui:outputText\",",
-                "\"descriptor\":\"markup://test:testValidCSS\","
-        };
-
-        for (String preload : preloads) {
-            assertTrue("Does not have preloaded component: (" + preload + ")" , sourceNoWhitespace.contains(preload));
-        }
-    }
 }

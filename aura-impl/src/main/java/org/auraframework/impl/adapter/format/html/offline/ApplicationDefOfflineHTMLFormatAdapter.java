@@ -31,7 +31,6 @@ import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
-import org.auraframework.http.AuraResourceServlet;
 import org.auraframework.http.AuraServlet;
 import org.auraframework.instance.Application;
 import org.auraframework.instance.Component;
@@ -103,7 +102,7 @@ public class ApplicationDefOfflineHTMLFormatAdapter extends OfflineHTMLFormatAda
             File css = new File(outputDir, String.format("%s.css", appName));
             FileWriter cssWriter = new FileWriter(css);
             try {
-                AuraResourceServlet.writeAppCss(dependencies, cssWriter);
+                Aura.getServerService().writeAppCss(dependencies, cssWriter);
             } finally {
                 cssWriter.close();
             }
@@ -138,7 +137,7 @@ public class ApplicationDefOfflineHTMLFormatAdapter extends OfflineHTMLFormatAda
             File js = new File(outputDir, String.format("%s.js", appName));
             FileWriter jsWriter = new FileWriter(js);
             try {
-                AuraResourceServlet.writeDefinitions(dependencies, jsWriter);
+                Aura.getServerService().writeDefinitions(dependencies, jsWriter);
 
                 // Write the app at the bottom of the same file
 

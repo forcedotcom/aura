@@ -39,6 +39,7 @@
                 $A.test.assertStartsWith("new! : readonly", $A.util.getText(cmps[3].getElement()));
                 $A.test.assertStartsWith("new! : readonly", $A.util.getText(cmps[4].getElement()));
             });
+            
         }
     },
 
@@ -85,8 +86,8 @@
                 return cmp.find("innerCmp").length;
             }, function() {
                 var renderCount = window.__testRenderCount;
-                // 14 total renders, 6 for initial load, 4 additional for each iteration
-                $A.test.assertEquals(14, renderCount, "Unexpected number of total items loaded after adding to list.");
+                // 8 total renders, 6 for initial load, 1 additional for each iteration
+                $A.test.assertEquals(8, renderCount, "Unexpected number of total items loaded after adding to list.");
             });
         }
     },

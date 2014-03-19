@@ -61,6 +61,7 @@ import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.instance.ValueProviderType;
 import org.auraframework.system.AuraContext;
+import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.AuraUnhandledException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
@@ -291,7 +292,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         }
 
         // TODO: lots more validation an stuff!!!!!!! #W-689596
-
+        MasterDefRegistry registry = Aura.getDefinitionService().getDefRegistry();
         if (extendsDescriptor != null) {
             T parentDef = extendsDescriptor.getDef();
 
@@ -309,6 +310,8 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
                         "%s cannot extend non-extensible component %s", getDescriptor(), extendsDescriptor),
                         getLocation());
             }
+            
+            registry.assertAccess(descriptor, parentDef);
 
             SupportLevel support = getSupport();
             DefDescriptor<T> extDesc = extendsDescriptor;
@@ -320,6 +323,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
                                     getDescriptor(),
                                     support, extDesc, extDef.getSupport()), getLocation());
                 }
+                
                 extDesc = (DefDescriptor<T>) extDef.getExtendsDescriptor();
             }
         }
@@ -329,14 +333,18 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             if (interfaze == null) {
                 throw new DefinitionNotFoundException(intf, getLocation());
             }
+            
+            registry.assertAccess(descriptor, interfaze);
         }
         
         for (RegisterEventDef def : events.values()) {
             def.validateReferences();
+            registry.assertAccess(descriptor, def);
         }
         
         for (EventHandlerDef def : eventHandlers) {
             def.validateReferences();
+            registry.assertAccess(descriptor, def);
         }
 
         // have to do all sorts of craaaazy checks here for dupes and matches
@@ -345,6 +353,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
 
         for (ClientLibraryDef def : this.clientLibraries) {
             def.validateReferences();
+            registry.assertAccess(descriptor, def);
         }
     }
 

@@ -15,8 +15,8 @@
     limitations under the License.
 
 -->
-<aura:component>
-    <aura:attribute name="setMeOnInit" type="String" default="default value" />
+<aura:component access="global">
+    <aura:attribute name="setMeOnInit" type="String" default="default value" access="global"/>
 
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
     

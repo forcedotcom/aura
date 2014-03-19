@@ -17,7 +17,6 @@ package org.auraframework.impl.root.parser.handler;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.Set;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -34,7 +33,6 @@ import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraError;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 
 /**

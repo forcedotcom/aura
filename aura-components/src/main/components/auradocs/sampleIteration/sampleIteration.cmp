@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component render="client" model="java://org.auraframework.docs.SampleIterationModel">
+<aura:component render="client" model="java://org.auraframework.docs.SampleIterationModel" access="global">
     <aura:attribute name="tochange" type="integer"/>
     <aura:attribute name="newvalue" type="string"/>
 

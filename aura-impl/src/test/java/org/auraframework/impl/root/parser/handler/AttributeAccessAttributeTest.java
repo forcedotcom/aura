@@ -13,8 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-({
-	handleAction: function (cmp, evt) {
-		console.log(evt.getParams());
+package org.auraframework.impl.root.parser.handler;
+
+public class AttributeAccessAttributeTest extends BaseAccessAttributeTest {
+
+	public AttributeAccessAttributeTest(String name) {
+		super(name);
+		testResource = TestResource.Attribute;
 	}
-})
+
+}

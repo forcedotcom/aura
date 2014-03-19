@@ -25,7 +25,6 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.auraframework.def.Definition;
-import org.auraframework.def.DefinitionAccess;
 import org.auraframework.impl.root.parser.XMLParser;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraRuntimeException;

@@ -19,11 +19,14 @@
     },
 
     itemsChange: function(cmp, evt, helper) {
-//JBUCH TODO: VERIFY ?? it's onchange, for v.items, so, rerender. ??
-//        var v = evt.getParam("value");
-//        if (v === cmp.getValue("v.items")) {
-            helper.rerenderEverything(cmp);
-//        }
+        var v = evt.getParam("value");
+        if (v === cmp.getValue("v.items")) {
+            if (v.isDifferentArray()) {
+                helper.rerenderEverything(cmp);
+            } else {
+                helper.rerenderSelective(cmp);
+            }
+        }
     },
 
     firstRender: function(cmp, evt, helper) {

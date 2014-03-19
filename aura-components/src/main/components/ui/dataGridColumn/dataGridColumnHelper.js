@@ -40,7 +40,8 @@
 	wireComponentDefRef: function (cmp, defRef) {
 		var name = cmp.get('v.name'),
 			namePath = name.split('.'),
-			propertyReference = this.createPropertyReference('value', ['row', 'item'].concat(namePath));
+			// propertyReference = this.createPropertyReference('value', ['row', 'item'].concat(namePath));
+			propertyReference = this.createPropertyReference('value', ['item'].concat(namePath));
 
 		defRef.attributes = {
 			values: {

@@ -282,8 +282,9 @@ public class AuraServlet extends AuraBaseServlet {
 
     private void assertAccess(BaseComponentDef def) throws QuickFixException {
         String defaultNamespace = Aura.getConfigAdapter().getDefaultNamespace();
-        DefDescriptor<?> referencingDescriptor = defaultNamespace != null && !defaultNamespace.isEmpty() ? Aura.getDefinitionService().getDefDescriptor(
-        		String.format("%s:servletAccess", defaultNamespace), ApplicationDef.class) : null;
+        DefDescriptor<?> referencingDescriptor = (defaultNamespace != null && !defaultNamespace.isEmpty()) 
+                ? Aura.getDefinitionService().getDefDescriptor(String.format("%s:servletAccess", defaultNamespace), ApplicationDef.class) 
+                : null;
         Aura.getDefinitionService().getDefRegistry().assertAccess(referencingDescriptor, def);
     }
 
@@ -321,14 +322,13 @@ public class AuraServlet extends AuraBaseServlet {
         AuraContext context = contextService.getCurrentContext();
         response.setCharacterEncoding(UTF_ENCODING);
         boolean written = false;
+        setNoCache(response);
 
         try {
-            setNoCache(response);
-
             if (context.getFormat() != Format.JSON) {
                 throw new AuraRuntimeException("Invalid request, post must use JSON");
             }
-            response.setContentType(getContentType(context.getFormat()));
+            response.setContentType(getContentType(Format.JSON));
             String msg = messageParam.get(request);
             if (msg == null) {
                 throw new AuraRuntimeException("Invalid request, no message");
@@ -349,7 +349,7 @@ public class AuraServlet extends AuraBaseServlet {
             }
             context.setFrameworkUID(fwUID);
 
-            Message<?> message;
+            Message message;
 
             loggingService.startTimer(LoggingService.TIMER_DESERIALIZATION);
             try {
@@ -387,27 +387,15 @@ public class AuraServlet extends AuraBaseServlet {
                 }
             }
 
-            Message<?> result = serverService.run(message, context);
-            if (result != null) {
-                loggingService.startTimer(LoggingService.TIMER_SERIALIZATION);
-                loggingService.startTimer(LoggingService.TIMER_SERIALIZATION_AURA);
-                try {
-                    PrintWriter out = response.getWriter();
-                    out.write(CSRF_PROTECT);
-                    written = true;
-
-                    Map<String, Object> attributes = null;
-                    if (isBootstrapAction) {
-                        attributes = Maps.newHashMap();
-                        attributes.put("token", getToken());
-                    }
-
-                    serializationService.write(result, attributes, out);
-                } finally {
-                    loggingService.stopTimer(LoggingService.TIMER_SERIALIZATION_AURA);
-                    loggingService.stopTimer(LoggingService.TIMER_SERIALIZATION);
-                }
+            Map<String, Object> attributes = null;
+            if (isBootstrapAction) {
+                attributes = Maps.newHashMap();
+                attributes.put("token", getToken());
             }
+            PrintWriter out = response.getWriter();
+            written = true;
+            out.write(CSRF_PROTECT);
+            serverService.run(message, context, out, attributes);
         } catch (RequestParam.InvalidParamException ipe) {
             handleServletException(new SystemErrorException(ipe), false, context, request, response, false);
             return;

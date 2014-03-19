@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 
+import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.EventHandlerDef;
@@ -76,12 +77,14 @@ public class EventHandlerDefImpl extends DefinitionImpl<EventDef> implements Eve
 
     @Override
     public void validateReferences() throws QuickFixException {
+    	EventDef event = null;
         if (name == null && descriptor != null) {
-            EventDef event = descriptor.getDef();
+            event = descriptor.getDef();
             if (event == null) {
                 throw new InvalidReferenceException(String.format("aura:handler has invalid event attribute value: %s",
                         descriptor), getLocation());
             }
+            
             if (!event.getEventType().equals(EventType.APPLICATION)) {
                 throw new InvalidReferenceException(
                         "A aura:handler that specifies an event=\"\" attribute must handle an application event. Either change the aura:event to have type=\"APPLICATION\" or alternately change the aura:handler to specify a name=\"\" attribute.",
@@ -90,18 +93,24 @@ public class EventHandlerDefImpl extends DefinitionImpl<EventDef> implements Eve
         } else if (name != null && descriptor == null && value == null) {
             RootDefinition parentDef = parentDescriptor.getDef();
             Map<String, RegisterEventDef> events = parentDef.getRegisterEventDefs();
-            RegisterEventDef event = events.get(name);
-            if (event == null) {
+            RegisterEventDef registerEvent = events.get(name);
+            if (registerEvent == null) {
                 throw new InvalidReferenceException(String.format("aura:handler has invalid name attribute value: %s",
                         name), getLocation());
             }
-            event.getDescriptor().getDef().getEventType();
-            if (!event.getDescriptor().getDef().getEventType().equals(EventType.COMPONENT)) {
+            
+            event = registerEvent.getDescriptor().getDef();
+            if (!event.getEventType().equals(EventType.COMPONENT)) {
                 throw new InvalidReferenceException(
                         "A aura:handler that specifies a name=\"\" attribute must handle a component event. Either change the aura:event to have type=\"COMPONENT\" or alternately change the aura:handler to specify an event=\"\" attribute.",
                         getLocation());
             }
         }
+        
+        if (event != null) {
+        	Aura.getDefinitionService().getDefRegistry().assertAccess(parentDescriptor, event);
+        }
+        
         // TODO(W-1508416): validate action attribute
     }
 

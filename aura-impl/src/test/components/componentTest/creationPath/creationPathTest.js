@@ -126,7 +126,7 @@
 			$A.run(function(){cmp.getAttributes().getValue("iftrue").setValue(true)});
 			$A.test.addWaitForWithFailureMessage(false, function(){return $A.util.isUndefined(cmp.find("truebody"))}, "'true' components not instantiated");
 		}, function(cmp) {
-			this.assertCreationPath(cmp.find("truebody"), "/*[0]/+[0]");
+			this.assertCreationPath(cmp.find("truebody"), "client created");
 			this.assertCreationPath(cmp.find("falsebody"), "/*[0]/$/*[2]/+[0]");
 		}]
 	},
@@ -138,7 +138,7 @@
 			$A.test.addWaitForWithFailureMessage(false, function(){return $A.util.isUndefined(cmp.find("falsebody"))}, "'false' components not instantiated");
 		}, function(cmp) {
 			this.assertCreationPath(cmp.find("truebody"), "/*[0]/$/*[2]/+[0]");
-			this.assertCreationPath(cmp.find("falsebody"), "/*[0]/+[0]");
+			this.assertCreationPath(cmp.find("falsebody"), "client created");
 		}]
 	},
 
@@ -161,48 +161,21 @@
 			this.assertCreationPath(cmp.find("iterinst")[2].find("output"), "/*[0]/$/*[3]/+[2]/*[0]/$/*[0]");
 		}
 	},
-	
-	/* W-2036263
-	Warning: Improper index increment aura_autodebug.js:10765
-    Improper index increment aura_autodebug.js:10769
-    stack aura_autodebug.js:10772
-	    at $A.$ns$.$Aura$.$warning$ (http://localhost:9090/auraFW/javascript/-yq3oCwGlxsZ49YUZMpO_g/aura_autodebug.js:10676:42) aura_autodebug.js:10774
-	    at Action.$setCreationPathIndex$ (http://localhost:9090/auraFW/javascript/-yq3oCwGlxsZ49YUZMpO_g/aura_autodebug.js:5758:10) aura_autodebug.js:10774
-	    at $setCreationPathIndex$ (http://localhost:9090/auraFW/javascript/-yq3oCwGlxsZ49YUZMpO_g/aura_autodebug.js:10529:9) aura_autodebug.js:10774
-	    at Object.$A.clientService.initDefs.componentDefs.value.helperDef.value.functions.createComponentsForIndex (http://localhost:9090/l/%7B%22mode%22%3A%22AUTOJSTESTDEBUG%22%2C%22app%22%3…erations%22%2C%22fwuid%22%3A%22-yq3oCwGlxsZ49YUZMpO_g%22%7D/app.js:4297:13) aura_autodebug.js:10774
-	    at Object.$A.clientService.initDefs.componentDefs.value.helperDef.value.functions.createRealBody (http://localhost:9090/l/%7B%22mode%22%3A%22AUTOJSTESTDEBUG%22%2C%22app%22%3…erations%22%2C%22fwuid%22%3A%22-yq3oCwGlxsZ49YUZMpO_g%22%7D/app.js:4448:31) aura_autodebug.js:10774
-	    at Object.$A.clientService.initDefs.componentDefs.value.helperDef.value.functions.rerenderEverything (http://localhost:9090/l/%7B%22mode%22%3A%22AUTOJSTESTDEBUG%22%2C%22app%22%3…erations%22%2C%22fwuid%22%3A%22-yq3oCwGlxsZ49YUZMpO_g%22%7D/app.js:4487:14) aura_autodebug.js:10774
-	    at Action.$A.clientService.initDefs.componentDefs.value.controllerDef.value.actionDefs.value.code [as $meth$] (http://localhost:9090/l/%7B%22mode%22%3A%22AUTOJSTESTDEBUG%22%2C%22app%22%3…erations%22%2C%22fwuid%22%3A%22-yq3oCwGlxsZ49YUZMpO_g%22%7D/app.js:4658:20) aura_autodebug.js:10774
-	    at Action.$runDeprecated$ (http://localhost:9090/auraFW/javascript/-yq3oCwGlxsZ49YUZMpO_g/aura_autodebug.js:5864:36) aura_autodebug.js:10774
-	    at http://localhost:9090/auraFW/javascript/-yq3oCwGlxsZ49YUZMpO_g/aura_autodebug.js:2494:20 
-	 */
+
 	testChangeIterationSize : {
 		attributes : { list : "x,x,x" },
 		test : [ function(cmp) {
 			$A.run(function(){cmp.find("iteration").getAttributes().getValue("start").setValue(1)});
 			$A.test.addWaitForWithFailureMessage(2, function(){return cmp.find("iterinst").length}, "number of iterations not reduced");
 		}, function(cmp) {
-			this.assertCreationPath(cmp.find("iterinst")[0], "/*[0]");
-			this.assertCreationPath(cmp.find("iterinst")[0].find("output"), "/*[0]/$/*[0]");
-			this.assertCreationPath(cmp.find("iterinst")[1], "/*[0]");
-			this.assertCreationPath(cmp.find("iterinst")[1].find("output"), "/*[0]/$/*[0]");
+            // client created
+			this.assertCreationPath(cmp.find("iterinst")[0], "client created");
+			this.assertCreationPath(cmp.find("iterinst")[0].find("output"), "client created");
+			this.assertCreationPath(cmp.find("iterinst")[1], "client created");
+			this.assertCreationPath(cmp.find("iterinst")[1].find("output"), "client created");
 		}]
 	},
-	
-	/* W-2036263
-	Warning: Improper index increment aura_autodebug.js:10765
-    Improper index increment aura_autodebug.js:10769
-    stack aura_autodebug.js:10772
-	    at $A.$ns$.$Aura$.$warning$ (http://localhost:9090/auraFW/javascript/-yq3oCwGlxsZ49YUZMpO_g/aura_autodebug.js:10676:42) aura_autodebug.js:10774
-	    at Action.$setCreationPathIndex$ (http://localhost:9090/auraFW/javascript/-yq3oCwGlxsZ49YUZMpO_g/aura_autodebug.js:5758:10) aura_autodebug.js:10774
-	    at $setCreationPathIndex$ (http://localhost:9090/auraFW/javascript/-yq3oCwGlxsZ49YUZMpO_g/aura_autodebug.js:10529:9) aura_autodebug.js:10774
-	    at Object.$A.clientService.initDefs.componentDefs.value.helperDef.value.functions.createComponentsForIndex (http://localhost:9090/l/%7B%22mode%22%3A%22AUTOJSTESTDEBUG%22%2C%22app%22%3…erations%22%2C%22fwuid%22%3A%22-yq3oCwGlxsZ49YUZMpO_g%22%7D/app.js:4297:13) aura_autodebug.js:10774
-	    at Object.$A.clientService.initDefs.componentDefs.value.helperDef.value.functions.createRealBody (http://localhost:9090/l/%7B%22mode%22%3A%22AUTOJSTESTDEBUG%22%2C%22app%22%3…erations%22%2C%22fwuid%22%3A%22-yq3oCwGlxsZ49YUZMpO_g%22%7D/app.js:4448:31) aura_autodebug.js:10774
-	    at Object.$A.clientService.initDefs.componentDefs.value.helperDef.value.functions.rerenderEverything (http://localhost:9090/l/%7B%22mode%22%3A%22AUTOJSTESTDEBUG%22%2C%22app%22%3…erations%22%2C%22fwuid%22%3A%22-yq3oCwGlxsZ49YUZMpO_g%22%7D/app.js:4487:14) aura_autodebug.js:10774
-	    at Action.$A.clientService.initDefs.componentDefs.value.controllerDef.value.actionDefs.value.code [as $meth$] (http://localhost:9090/l/%7B%22mode%22%3A%22AUTOJSTESTDEBUG%22%2C%22app%22%3…erations%22%2C%22fwuid%22%3A%22-yq3oCwGlxsZ49YUZMpO_g%22%7D/app.js:4658:20) aura_autodebug.js:10774
-	    at Action.$runDeprecated$ (http://localhost:9090/auraFW/javascript/-yq3oCwGlxsZ49YUZMpO_g/aura_autodebug.js:5864:36) aura_autodebug.js:10774
-	    at http://localhost:9090/auraFW/javascript/-yq3oCwGlxsZ49YUZMpO_g/aura_autodebug.js:2494:20 
-	 */
+
 	testAddInitialIteration : {
 		attributes : { list : "" },
 		test : [function(cmp) {
@@ -210,25 +183,11 @@
 			$A.run(function(){cmp.getAttributes().getValue("list").push("x")});
 			$A.test.addWaitForWithFailureMessage(false, function(){return $A.util.isUndefined(cmp.find("iterinst"))}, "iteration is still empty");
 		}, function(cmp) {
-			this.assertCreationPath(cmp.find("iterinst"), "/*[0]");
-			this.assertCreationPath(cmp.find("iterinst").find("output"), "/*[0]/$/*[0]");
+			this.assertCreationPath(cmp.find("iterinst"), "client created");
+			this.assertCreationPath(cmp.find("iterinst").find("output"), "client created");
 		}]
 	},
-	
-	/* W-2036263
-	Warning: Improper index increment aura_autodebug.js:10765
-    Improper index increment aura_autodebug.js:10769
-    stack aura_autodebug.js:10772
-	    at $A.$ns$.$Aura$.$warning$ (http://localhost:9090/auraFW/javascript/-yq3oCwGlxsZ49YUZMpO_g/aura_autodebug.js:10676:42) aura_autodebug.js:10774
-	    at Action.$setCreationPathIndex$ (http://localhost:9090/auraFW/javascript/-yq3oCwGlxsZ49YUZMpO_g/aura_autodebug.js:5758:10) aura_autodebug.js:10774
-	    at $setCreationPathIndex$ (http://localhost:9090/auraFW/javascript/-yq3oCwGlxsZ49YUZMpO_g/aura_autodebug.js:10529:9) aura_autodebug.js:10774
-	    at Object.$A.clientService.initDefs.componentDefs.value.helperDef.value.functions.createComponentsForIndex (http://localhost:9090/l/%7B%22mode%22%3A%22AUTOJSTESTDEBUG%22%2C%22app%22%3…erations%22%2C%22fwuid%22%3A%22-yq3oCwGlxsZ49YUZMpO_g%22%7D/app.js:4297:13) aura_autodebug.js:10774
-	    at Object.$A.clientService.initDefs.componentDefs.value.helperDef.value.functions.createRealBody (http://localhost:9090/l/%7B%22mode%22%3A%22AUTOJSTESTDEBUG%22%2C%22app%22%3…erations%22%2C%22fwuid%22%3A%22-yq3oCwGlxsZ49YUZMpO_g%22%7D/app.js:4448:31) aura_autodebug.js:10774
-	    at Object.$A.clientService.initDefs.componentDefs.value.helperDef.value.functions.rerenderEverything (http://localhost:9090/l/%7B%22mode%22%3A%22AUTOJSTESTDEBUG%22%2C%22app%22%3…erations%22%2C%22fwuid%22%3A%22-yq3oCwGlxsZ49YUZMpO_g%22%7D/app.js:4487:14) aura_autodebug.js:10774
-	    at Action.$A.clientService.initDefs.componentDefs.value.controllerDef.value.actionDefs.value.code [as $meth$] (http://localhost:9090/l/%7B%22mode%22%3A%22AUTOJSTESTDEBUG%22%2C%22app%22%3…erations%22%2C%22fwuid%22%3A%22-yq3oCwGlxsZ49YUZMpO_g%22%7D/app.js:4658:20) aura_autodebug.js:10774
-	    at Action.$runDeprecated$ (http://localhost:9090/auraFW/javascript/-yq3oCwGlxsZ49YUZMpO_g/aura_autodebug.js:5864:36) aura_autodebug.js:10774
-	    at http://localhost:9090/auraFW/javascript/-yq3oCwGlxsZ49YUZMpO_g/aura_autodebug.js:2494:20 
-	 */
+
 	testAddAdditionalIteration : {
 		attributes : { list : "x" },
 		test : [function(cmp) {
@@ -236,27 +195,13 @@
 			$A.run(function(){cmp.getAttributes().getValue("list").push("x")});
 			$A.test.addWaitForWithFailureMessage(2, function(){return cmp.find("iterinst").length}, "number of iterations didn't increment");
 		}, function(cmp) {
-			this.assertCreationPath(cmp.find("iterinst")[0], "/*[0]");
-			this.assertCreationPath(cmp.find("iterinst")[0].find("output"), "/*[0]/$/*[0]");
-			this.assertCreationPath(cmp.find("iterinst")[1], "/*[0]");
-			this.assertCreationPath(cmp.find("iterinst")[1].find("output"), "/*[0]/$/*[0]");
+			this.assertCreationPath(cmp.find("iterinst")[0], "/*[0]/$/*[3]/+[0]/*[0]");
+			this.assertCreationPath(cmp.find("iterinst")[0].find("output"), "/*[0]/$/*[3]/+[0]/*[0]/$/*[0]");
+			this.assertCreationPath(cmp.find("iterinst")[1], "client created");
+			this.assertCreationPath(cmp.find("iterinst")[1].find("output"), "client created");
 		}]
 	},
-	
-	/* W-2036263
-	Warning: Improper index increment aura_autodebug.js:10765
-    Improper index increment aura_autodebug.js:10769
-    stack aura_autodebug.js:10772
-	    at $A.$ns$.$Aura$.$warning$ (http://localhost:9090/auraFW/javascript/-yq3oCwGlxsZ49YUZMpO_g/aura_autodebug.js:10676:42) aura_autodebug.js:10774
-	    at Action.$setCreationPathIndex$ (http://localhost:9090/auraFW/javascript/-yq3oCwGlxsZ49YUZMpO_g/aura_autodebug.js:5758:10) aura_autodebug.js:10774
-	    at $setCreationPathIndex$ (http://localhost:9090/auraFW/javascript/-yq3oCwGlxsZ49YUZMpO_g/aura_autodebug.js:10529:9) aura_autodebug.js:10774
-	    at Object.$A.clientService.initDefs.componentDefs.value.helperDef.value.functions.createComponentsForIndex (http://localhost:9090/l/%7B%22mode%22%3A%22AUTOJSTESTDEBUG%22%2C%22app%22%3…erations%22%2C%22fwuid%22%3A%22-yq3oCwGlxsZ49YUZMpO_g%22%7D/app.js:4297:13) aura_autodebug.js:10774
-	    at Object.$A.clientService.initDefs.componentDefs.value.helperDef.value.functions.createRealBody (http://localhost:9090/l/%7B%22mode%22%3A%22AUTOJSTESTDEBUG%22%2C%22app%22%3…erations%22%2C%22fwuid%22%3A%22-yq3oCwGlxsZ49YUZMpO_g%22%7D/app.js:4448:31) aura_autodebug.js:10774
-	    at Object.$A.clientService.initDefs.componentDefs.value.helperDef.value.functions.rerenderEverything (http://localhost:9090/l/%7B%22mode%22%3A%22AUTOJSTESTDEBUG%22%2C%22app%22%3…erations%22%2C%22fwuid%22%3A%22-yq3oCwGlxsZ49YUZMpO_g%22%7D/app.js:4487:14) aura_autodebug.js:10774
-	    at Action.$A.clientService.initDefs.componentDefs.value.controllerDef.value.actionDefs.value.code [as $meth$] (http://localhost:9090/l/%7B%22mode%22%3A%22AUTOJSTESTDEBUG%22%2C%22app%22%3…erations%22%2C%22fwuid%22%3A%22-yq3oCwGlxsZ49YUZMpO_g%22%7D/app.js:4658:20) aura_autodebug.js:10774
-	    at Action.$runDeprecated$ (http://localhost:9090/auraFW/javascript/-yq3oCwGlxsZ49YUZMpO_g/aura_autodebug.js:5864:36) aura_autodebug.js:10774
-	    at http://localhost:9090/auraFW/javascript/-yq3oCwGlxsZ49YUZMpO_g/aura_autodebug.js:2494:20 
-	 */
+
 	testAddMultipleIterations : {
 		attributes : { list : "x,x" },
 		test : [function(cmp) {
@@ -265,14 +210,14 @@
 			$A.run(function(){var list = cmp.getAttributes().getValue("list"); list.push("x"); list.push("x");});
 			$A.test.addWaitForWithFailureMessage(4, function(){return cmp.find("iterinst").length}, "number of iterations didn't increment");
 		}, function(cmp) {
-			this.assertCreationPath(cmp.find("iterinst")[0], "/*[0]");
-			this.assertCreationPath(cmp.find("iterinst")[0].find("output"), "/*[0]/$/*[0]");
-			this.assertCreationPath(cmp.find("iterinst")[1], "/*[0]");
-			this.assertCreationPath(cmp.find("iterinst")[1].find("output"), "/*[0]/$/*[0]");
-			this.assertCreationPath(cmp.find("iterinst")[2], "/*[0]");
-			this.assertCreationPath(cmp.find("iterinst")[2].find("output"), "/*[0]/$/*[0]");
-			this.assertCreationPath(cmp.find("iterinst")[3], "/*[0]");
-			this.assertCreationPath(cmp.find("iterinst")[3].find("output"), "/*[0]/$/*[0]");
+			this.assertCreationPath(cmp.find("iterinst")[0], "/*[0]/$/*[3]/+[0]/*[0]");
+			this.assertCreationPath(cmp.find("iterinst")[0].find("output"), "/*[0]/$/*[3]/+[0]/*[0]/$/*[0]");
+			this.assertCreationPath(cmp.find("iterinst")[1], "/*[0]/$/*[3]/+[1]/*[0]");
+			this.assertCreationPath(cmp.find("iterinst")[1].find("output"), "/*[0]/$/*[3]/+[1]/*[0]/$/*[0]");
+			this.assertCreationPath(cmp.find("iterinst")[2], "client created");
+			this.assertCreationPath(cmp.find("iterinst")[2].find("output"), "client created");
+			this.assertCreationPath(cmp.find("iterinst")[3], "client created");
+			this.assertCreationPath(cmp.find("iterinst")[3].find("output"), "client created");
 		}]
 	},
 	
@@ -281,35 +226,21 @@
         	this.addComponent(cmp, cmp.find("iterinst"), "aura:text", "hi");
         }, function(cmp) {
         	$A.test.assertEquals("0 - hi", $A.test.getText(cmp.find("iterinst").find("output").getElement()));
-			this.assertCreationPath(cmp.find("iterinst").getAttributes().get("output")[0], "/*[0]");
+			this.assertCreationPath(cmp.find("iterinst").getAttributes().get("output")[0], "client created");
         }]
 	},
 
-	/* W-2036260
-	Warning: Not ready to create. path: 1.0/*[0] aura_autodebug.js:10765
-	Not ready to create. path: 1.0/*[0] aura_autodebug.js:10769
-	stack aura_autodebug.js:10772
-	    at $A.$ns$.$Aura$.$warning$ (http://localhost:9090/auraFW/javascript/ZlJXJMg4gWLUgcIfiU5dsg/aura_autodebug.js:10676:42) aura_autodebug.js:10774
-	    at Action.$getCurrentPath$ (http://localhost:9090/auraFW/javascript/ZlJXJMg4gWLUgcIfiU5dsg/aura_autodebug.js:5768:8) aura_autodebug.js:10774
-	    at new ComponentPriv (http://localhost:9090/auraFW/javascript/ZlJXJMg4gWLUgcIfiU5dsg/aura_autodebug.js:3847:37) aura_autodebug.js:10774
-	    at new Component (http://localhost:9090/auraFW/javascript/ZlJXJMg4gWLUgcIfiU5dsg/aura_autodebug.js:4480:17) aura_autodebug.js:10774
-	    at $A.$ns$.$ComponentCreationContext$.$buildComponent$ (http://localhost:9090/auraFW/javascript/ZlJXJMg4gWLUgcIfiU5dsg/aura_autodebug.js:7829:10) aura_autodebug.js:10774
-	    at $A.$ns$.$ComponentCreationContext$.$loadComponent$ (http://localhost:9090/auraFW/javascript/ZlJXJMg4gWLUgcIfiU5dsg/aura_autodebug.js:7758:24) aura_autodebug.js:10774
-	    at new $A.$ns$.$ComponentCreationContext$ (http://localhost:9090/auraFW/javascript/ZlJXJMg4gWLUgcIfiU5dsg/aura_autodebug.js:7727:10) aura_autodebug.js:10774
-	    at $A.$ns$.$AuraComponentService$.$newComponentAsync$ (http://localhost:9090/auraFW/javascript/ZlJXJMg4gWLUgcIfiU5dsg/aura_autodebug.js:7935:13) aura_autodebug.js:10774
-	    at Action.$A.clientService.initDefs.componentDefs.value.controllerDef.value.actionDefs.value.code [as $meth$] (http://localhost:9090/l/%7B%22mode%22%3A%22AUTOJSTESTDEBUG%22%2C%22app%22%3…lientCmp%22%2C%22fwuid%22%3A%22ZlJXJMg4gWLUgcIfiU5dsg%22%7D/app.js:6933:29) 
-	  */  
 	testAddMultipleClientCmp : {
         test : [function(cmp) {
         	this.addComponent(cmp, cmp.find("iterinst"), "aura:text", "a");
         }, function(cmp) {
         	$A.test.assertEquals("0 - a", $A.test.getText(cmp.find("iterinst").find("output").getElement()));
-			this.assertCreationPath(cmp.find("iterinst").getAttributes().get("output")[0], "/*[0]");
+			this.assertCreationPath(cmp.find("iterinst").getAttributes().get("output")[0], "client created");
 			
         	this.addComponent(cmp, cmp.find("iterinst"), "aura:text", "bb");
         }, function(cmp) {
         	$A.test.assertEquals("0 - abb", $A.test.getText(cmp.find("iterinst").find("output").getElement()));
-			this.assertCreationPath(cmp.find("iterinst").getAttributes().get("output")[1], "/*[0]");
+			this.assertCreationPath(cmp.find("iterinst").getAttributes().get("output")[1], "client created");
         }]
 	},
 

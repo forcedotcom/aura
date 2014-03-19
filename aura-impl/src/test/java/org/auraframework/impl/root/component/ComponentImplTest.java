@@ -19,9 +19,12 @@ import java.util.Collections;
 
 import org.auraframework.def.AttributeDefRef;
 import org.auraframework.impl.AuraImplTestCase;
+import org.auraframework.impl.expression.PropertyReferenceImpl;
+import org.auraframework.instance.AttributeSet;
 import org.auraframework.instance.Component;
 import org.auraframework.system.Location;
 import org.auraframework.throwable.quickfix.AttributeNotFoundException;
+import org.auraframework.throwable.quickfix.QuickFixException;
 
 public class ComponentImplTest extends AuraImplTestCase {
 
@@ -51,5 +54,29 @@ public class ComponentImplTest extends AuraImplTestCase {
         testComponent.getClass();
         serializeAndGoldFile(testComponent);
     }
+    
+    public void testReinitializeModel() throws Exception {
+        Component cmp = vendor.makeComponent("test:child1", "meh");
+
+        PropertyReferenceImpl propRef = new PropertyReferenceImpl("value", null);
+		assertEquals(null, cmp.getModel().getValue(propRef));
+        
+        setAttribute(cmp, "attr", "some value");
+
+		assertEquals(null, cmp.getModel().getValue(propRef));
+		
+		cmp.reinitializeModel();
+        assertEquals("some value", cmp.getModel().getValue(propRef));
+        
+        setAttribute(cmp, "attr", "some other value");
+		cmp.reinitializeModel();
+        assertEquals("some other value", cmp.getModel().getValue(propRef));
+    }
+
+	private void setAttribute(Component cmp, String name, String value) throws QuickFixException {
+		AttributeDefRef adr = vendor.makeAttributeDefRef(name, value, new Location("meh", 0));
+        AttributeSet attributes = cmp.getAttributes();
+		attributes.set(Collections.singleton(adr));
+	}
 
 }

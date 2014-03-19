@@ -38,8 +38,10 @@ public class EventDefHandler extends RootTagHandler<EventDef> {
     private static final String ATTRIBUTE_TYPE = "type";
     private static final String ATTRIBUTE_EXTENDS = "extends";
 
-    protected final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_TYPE, ATTRIBUTE_EXTENDS,
-            RootTagHandler.ATTRIBUTE_DESCRIPTION, RootTagHandler.ATTRIBUTE_SUPPORT, ATTRIBUTE_ACCESS);
+    private static final Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_TYPE,
+            RootTagHandler.ATTRIBUTE_DESCRIPTION, ATTRIBUTE_ACCESS, ATTRIBUTE_EXTENDS);
+	private static final Set<String> PRIVILEGED_ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>().add(
+			RootTagHandler.ATTRIBUTE_SUPPORT).addAll(ALLOWED_ATTRIBUTES).build();
 
     private final EventDefImpl.Builder builder = new EventDefImpl.Builder();
 
@@ -53,7 +55,7 @@ public class EventDefHandler extends RootTagHandler<EventDef> {
 
     @Override
     public Set<String> getAllowedAttributes() {
-        return ALLOWED_ATTRIBUTES;
+        return isInPrivilegedNamespace ? PRIVILEGED_ALLOWED_ATTRIBUTES : ALLOWED_ATTRIBUTES;
     }
 
     @Override
@@ -97,6 +99,8 @@ public class EventDefHandler extends RootTagHandler<EventDef> {
         if (builder.eventType == null) {
             error("Event type attribute was invalid: %s", typeString);
         }
+        
+        builder.setAccess(readAccessAttribute());
     }
 
     @Override

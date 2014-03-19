@@ -374,7 +374,7 @@ $A.ns.AuraComponentService.prototype.index = function(component){
 /**
  * Gets the component definition from the registry.
  * @param {Object} config The descriptor (<code>markup://ui:scroller</code>) or other component attributes that are provided during its initialization.
- * @param {Object} noInit
+ * @param {Boolean} noInit
  * @returns {ComponentDef}  The metadata of the component
  * @memberOf AuraComponentService
  * @public

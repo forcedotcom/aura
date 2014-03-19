@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component abstract="true" extends="auradocs:defLayout" provider="java://org.auraframework.docs.DemoPanelProvider, js://auradocs.demoPanel">
+<aura:component abstract="true" extends="auradocs:defLayout" provider="java://org.auraframework.docs.DemoPanelProvider, js://auradocs.demoPanel" access="global">
     <aura:attribute name="demo" type="String" />
     <aura:attribute name="example" type="Aura.Component[]" />
     <aura:set attribute="description">

@@ -83,7 +83,15 @@
         if (this.cachedGestures) {
             return this.cachedGestures;
         } else {
-            if (navigator.msPointerEnabled) {
+
+            if (navigator.pointerEnabled) {
+                g = {
+                        start : 'pointerDown',
+                        move : 'pointerMove',
+                        end : 'pointerUp' 
+                    };
+
+            } else if (navigator.msPointerEnabled) {
                 g = {
                         start : 'MSPointerDown',
                         move : 'MSPointerMove',
@@ -133,14 +141,17 @@
                 handleEvent : function (event) {
                     switch (event.type) {
                     case 'touchstart':
+                    case 'pointerDown':
                     case 'MSPointerDown':
                         this.onTouchStart(event);
                         break;
                     case 'touchmove':
+                    case 'pointerMove':
                     case 'MSPointerMove':
                         this.onTouchMove(event);
                         break;
                     case 'touchend':
+                    case 'pointerUp':
                     case 'MSPointerUp':
                         this.onClick(event);
                         break;
@@ -221,7 +232,7 @@
             valueExpression = htmlAttributes.getValue(eventName),
             onclickExpression;
 
-        if (eventName === 'touchend' || 'MSPointerUp') {
+        if (eventName === 'ontouchend' || eventName === 'onpointerUp' || eventName === 'onMSPointerUp') {
             // Validate that either onclick or ontouchend is wired up to an action never both simultaneously
             onclickExpression = htmlAttributes.getValue("onclick");
             if (onclickExpression.isDefined()) {

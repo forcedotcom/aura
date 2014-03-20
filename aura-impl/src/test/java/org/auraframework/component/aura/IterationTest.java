@@ -315,4 +315,29 @@ public class IterationTest extends AuraImplTestCase {
                     "Lazy Component References can only have attributes of simple types passed in (body is not simple)");
         }
     }
+    
+    /*
+     * Top component come with a model:TestReinitializeModel,
+     * m.item can be changed by modifying attribute:listToShow
+     * iteration on m.item
+     * this test to check if we change v.listToShow, iteration get updated or not
+     * enable this when W-2088677 is resolved
+     */
+    public void _testReinitializeModel() throws Exception {
+        String source = "<aura:iteration items='{!m.itemList}' var='x' indexVar='i'>{!x}</aura:iteration>";
+        Map<String, Object> attributes = Maps.newHashMap();
+        attributes.put("listToShow", Lists.newArrayList("q", "r", "s"));
+        DefDescriptor<ComponentDef> def = addSourceAutoCleanup(ComponentDef.class, String.format(
+                "<aura:component model=\"java://test.model.TestReinitializeModel\"><aura:attribute name='listToShow' type='List'/>%s</aura:component>", source));
+        Component iteration = Aura.getInstanceService().getInstance(def, attributes);
+        assertEquals("qrs", getRenderedBaseComponent(iteration));
+        //listToShow is qrs
+        iteration.reinitializeModel();
+        Map<String, Object> attributes2 = Maps.newHashMap();
+        attributes2.put("listToShow", Lists.newArrayList("a", "b", "c"));
+        iteration.getAttributes().set(attributes2);
+        iteration.reinitializeModel();
+        //listToShow is abc now
+        assertEquals("abc", getRenderedBaseComponent(iteration));
+    }
 }

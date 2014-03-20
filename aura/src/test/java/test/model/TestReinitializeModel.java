@@ -15,6 +15,8 @@
  */
 package test.model;
 
+import java.util.ArrayList;
+
 import org.auraframework.Aura;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Model;
@@ -22,8 +24,11 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 
 @Model
 public class TestReinitializeModel {
+	@SuppressWarnings("unchecked")
 	public TestReinitializeModel() throws QuickFixException {
 		this.value = (String) Aura.getContextService().getCurrentContext().getCurrentComponent().getAttributes().getValue("attr");
+		this.itemList = (ArrayList<String>) Aura.getContextService().getCurrentContext().
+                getCurrentComponent().getAttributes().getValue("listToShow");
 	}
 	
 	@AuraEnabled
@@ -31,5 +36,11 @@ public class TestReinitializeModel {
     	return value;
     }
 	
+	@AuraEnabled
+    public ArrayList<String> getItemList() {
+        return itemList;
+    }
+	
     private String value;
+    private ArrayList<String> itemList;
 }

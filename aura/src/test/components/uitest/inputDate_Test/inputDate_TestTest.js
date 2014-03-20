@@ -18,66 +18,65 @@
  	 * Opening date picker with no value set will open datePicker to todays date.
  	 */
  	testDatePickerOpensToToday : {
- 		test : function(cmp) {
- 			var today = new Date();
- 			var expectedDay = today.getDate();
-      		var expectedMonthYear = this.convertMonth(today.getMonth()) + " " + today.getFullYear();
+            test : function(cmp) {
+                        var today = new Date();
+                        var expectedDay = today.getDate();
+                        var expected = this.convertMonth(today.getMonth()) + " " + today.getFullYear();
       		
-      		this.openDatePicker(cmp);
-      		var curDate = $A.test.getActiveElement();
-      		$A.test.assertEquals(expectedDay.toString(), $A.util.getText(curDate), "Date picker did not open to todays day");
+                        this.openDatePicker(cmp);
+
+                        var curDate = $A.test.getElementByClass("todayDate")[0];
       		
-      		var title = cmp.find("datePickerTestCmp").find("datePicker").find("calTitle");
-      		var titleText = $A.util.getText(title.getElement());
-      		$A.test.assertEquals(expectedMonthYear, titleText, "Date picker did not open to todays month and year");
+                        $A.test.assertEquals(expectedDay.toString(), $A.util.getText(curDate), "Date picker did not open to todays day");
+
+                        var actual = this.getTextFromElm(cmp.find("datePickerTestCmp").find("datePicker"));
+                        $A.test.assertEquals(expected, actual, "Date picker did not open to todays month and year");
  		}
  	},
  	
  	/**
  	 * Clicking on a date on the datePicker will select the date and close the calendar.
  	 */
-	testClickonDayWorks : { 
-		attributes : {value : "2013-09-25"},
-  		test : [function(cmp) {
-      		this.openDatePicker(cmp);
-  		}, function(cmp) {
-  			var datePicker = cmp.find("datePickerTestCmp").find("datePicker").getElement();
-      		var curDate = $A.test.getActiveElement();
-      		var tbody = curDate.parentNode.parentNode.parentNode;
-      		var aboveCurrentDate = tbody.children[2].children[3].children[0];
-      		$A.test.clickOrTouch(aboveCurrentDate);
-      		$A.test.addWaitFor(false, function(){return $A.util.hasClass(datePicker, "visible")});
-  		}, function(cmp) {
-  			var dateValue = cmp.find("datePickerTestCmp").find("inputText").getElement().value;
-  			$A.test.assertEquals("2013-09-18", dateValue.toString(), "Clicking on one week prior to todays date did not render the correct result.");
-		}]
+	testClickOnDayWorks : { 
+            attributes : {value : "2013-09-25"},
+            test : [function(cmp) {
+                         this.openDatePicker(cmp);
+  		   }, function(cmp) {
+                         var datePicker = cmp.find("datePickerTestCmp").find("datePicker");
+                         var pastWeek   = datePicker.find("grid").find("17");
+                         pastWeek.getEvent("click").fire({});
+  			
+                         $A.test.addWaitFor(false, function(){return $A.util.hasClass(datePicker, "visible")});
+  			  
+                         var expected = "2013-09-18";
+                         var actual = cmp.find("datePickerTestCmp").find("inputText").getElement().value;
+                         $A.test.assertEquals(expected, actual.toString(), "Clicking on one week prior to todays date did not render the correct result.");
+		   }]	
     },
     
     /**
      * Testing that all 12 months, appear in the correct order
      */
     testValidateMonths :{
-        attributes : {value: "2245-01-01", format: "MM-dd-yyyy"},
+        attributes : {value: "2043-01-01", format: "MM-dd-yyyy"},
         test : [function(cmp) {
-  			this.openDatePicker(cmp);
+                     this.openDatePicker(cmp);
 		},function(cmp) {
+                     var actual = "";
+                     var expected = "";
+                     var datePicker = cmp.find("datePickerTestCmp").get('datePicker');
 
-		    var actual = "";
-	            var expected = "";
-	            var datePicker = cmp.find("datePickerTestCmp").get('datePicker');
+                     for(var i = 0; i<12; i++){
+                             expected = this.convertMonth(i) + " 2043";
+                             actual   = this.getTextFromElm(datePicker);	                
+                             $A.test.assertEquals(expected, actual, "Month year Combo incorrect incorrect");
+                             datePicker.get('c.goToNextMonth').runDeprecated({});
+                      }
 
-	            for(var i = 0; i<12; i++){
-	        	expected = this.convertMonth(i) + " 2245";
-	        	actual   = $A.util.getText(datePicker.get('calTitle').getElement());	                
-	        	$A.test.assertEquals(expected, actual, "Month year Combo incorrect incorrect");
-	        	datePicker.get('c.goToNextMonth').runDeprecated({});
-	            }
-
-	            expected = "January 2246";
-	            actual   = $A.util.getText(datePicker.get('calTitle').getElement());	 
-	            $A.test.assertEquals(expected, actual, "Month year Combo incorrect incorrect");
-
-	    }] 
+                      expected = "January 2044";
+                      actual   = this.getTextFromElm(datePicker);	 
+                      $A.test.assertEquals(expected, actual, "Month year Combo incorrect incorrect");
+	       }] 
     }, 
 
     /**
@@ -86,16 +85,16 @@
     testDecreaseMonthAndIncreaseYear :{
         attributes : {value: "2012-09-10", format: "MM-dd-yyyy"},
         test : [function(cmp) {
-		  this.openDatePicker(cmp);
-		},function(cmp) {
-	            var expected = "February 2017"
-	            var datePicker = cmp.find("datePickerTestCmp").get('datePicker');
+                      this.openDatePicker(cmp);
+		},function(cmp) {                     
+                      var datePicker = cmp.find("datePickerTestCmp").get('datePicker');
 
-	            this.iterateCal(7, 5, datePicker.get('c.goToPrevMonth'), datePicker.get('c.goToNextYear'));
-	            var actual   = $A.util.getText(datePicker.get('calTitle').getElement());
-
-	            $A.test.assertEquals(expected, actual, "Month year combo incorrect");       
-	    }] 
+                      this.iterateCal(7, 5, datePicker.get('c.goToPrevMonth'), datePicker.get('c.goToNextYear'));
+                      
+                      var expected = "February 2017";
+                      var actual   = this.getTextFromElm(datePicker);
+                      $A.test.assertEquals(expected, actual, "Month year combo incorrect");       
+	         }] 
     },
     
     /**
@@ -104,15 +103,14 @@
     testDecreaseMonthAndDecreaseYear :{
         attributes : {value: "2012-09-10", format: "MM-dd-yyyy"},
         test : [function(cmp) {
-    		this.openDatePicker(cmp);
+                      this.openDatePicker(cmp);
     		},function(cmp) {
-	            var expected = "February 1997"
-	                var datePicker = cmp.find("datePickerTestCmp").get('datePicker');
-	                this.iterateCal(7, 15, datePicker.get('c.goToPrevMonth'), datePicker.get('c.goToPrevYear'));
-	                var actual   = $A.util.getText(datePicker.get('calTitle').getElement());
-
-	                $A.test.assertEquals(expected, actual, "Initial value incorrect");       
-
+                       var datePicker = cmp.find("datePickerTestCmp").get('datePicker');
+                       this.iterateCal(7, 15, datePicker.get('c.goToPrevMonth'), datePicker.get('c.goToPrevYear'));
+                       
+                       var expected = "February 1997";
+                       var actual   = this.getTextFromElm(datePicker);
+                       $A.test.assertEquals(expected, actual, "Initial value incorrect");
 	    }] 
     },
     
@@ -122,15 +120,15 @@
     testIncreaseMonthAndDecreaseYear :{
         attributes : {value: "2038-09-10", format: "MM-dd-yyyy"},
         test : [function(cmp) {
-			this.openDatePicker(cmp);
+                      this.openDatePicker(cmp);
 		},function(cmp) {
-	            var expected = "September 2029"
-	                var datePicker = cmp.find("datePickerTestCmp").get('datePicker');
-	                this.iterateCal(12, 10, datePicker.get('c.goToNextMonth'), datePicker.get('c.goToPrevYear'));
-	                var actual   = $A.util.getText(datePicker.get('calTitle').getElement());
-
-	                $A.test.assertEquals(expected, actual, "Initial value incorrect");       
-
+                      var datePicker = cmp.find("datePickerTestCmp").get('datePicker');
+                      
+                      this.iterateCal(12, 10, datePicker.get('c.goToNextMonth'), datePicker.get('c.goToPrevYear'));
+                      
+                      var expected = "September 2029";
+                      var actual   = this.getTextFromElm(datePicker);
+	              $A.test.assertEquals(expected, actual, "Initial value incorrect");       
 	    }] 
     },
     
@@ -139,134 +137,161 @@
      */
     testAccessibile : {
     	attributes : {value: "2038-09-10", format: "MM-dd-yyyy"},
-    	        test : [function(cmp) {
-    	  			this.openDatePicker(cmp);
-    	    	}, function(cmp) {	
-    	    		$A.test.assertAccessible();
-    	    	}]
-    	    },
+    	test : [function(cmp) {
+                      this.openDatePicker(cmp);
+               },function(cmp) {
+    	    	      $A.test.assertAccessible();
+    	       }]
+    },
     /**
      * Testing arrow combination of increasing month, and year
      */
     testIncreaseMonthAndYear :{
         attributes : {value: "2012-09-10", format: "MM-dd-yyyy"},
         test : [function(cmp) {
-    			this.openDatePicker(cmp);
-    		},function(cmp) {
-	            var expected = "September 2023"
-	                var datePicker = cmp.find("datePickerTestCmp").get('datePicker');
-	                this.iterateCal(12, 10, datePicker.get('c.goToNextMonth'), datePicker.get('c.goToNextYear'));
-	                var actual   = $A.util.getText(datePicker.get('calTitle').getElement());
-
-	                $A.test.assertEquals(expected, actual, "Initial value incorrect");       
-
-	    }]
-
+                      this.openDatePicker(cmp);
+    		},function(cmp) {       
+    		        var datePicker = cmp.find("datePickerTestCmp").get('datePicker');
+    		        this.iterateCal(12, 10, datePicker.get('c.goToNextMonth'), datePicker.get('c.goToNextYear'));
+	                
+    		        var expected = "September 2023";
+    		        var actual   = this.getTextFromElm(datePicker);
+    		        $A.test.assertEquals(expected, actual, "Initial value incorrect");
+    		 }]
     },
     
     /**
      * On mobile there should be a inputSelect to choose year.
      */
-    testYearSelectorOnMobile : {
+    testYearSelector_Mobile : {
     	browsers : ["IPHONE"],
     	attributes : {value: "2012-12-10"},
     	test : function(cmp) {
-    		var yearTitle = cmp.find("datePickerTestCmp").get('datePicker').find("yearTitle");
-    		$A.test.assertFalse($A.util.isUndefinedOrNull(yearTitle), 
-    			"year input select not fond");
+    	             var yearTitle = cmp.find("datePickerTestCmp").get('datePicker').find("yearTitle");
+    	             $A.test.assertFalse($A.util.isUndefinedOrNull(yearTitle), "year input select not fond");
     	}
     },
     
     /**
      * On mobile incrementing month past December increments year selector to next year.
      */
-    testYearSelectorGoToNextYear : {
+    testYearSelectorGoToNextYear_Mobile : {
     	browsers : ["IPHONE"],
     	attributes : {value: "2012-12-10"},
-    	test : function(cmp) {
-    		var datePicker = cmp.find("datePickerTestCmp").get('datePicker');
-	        var yearTitle = cmp.find("datePickerTestCmp").get('datePicker').find("yearTitle");
-	        this.iterateCal(1, 0, datePicker.get('c.goToNextMonth'), datePicker.get('c.goToNextYear'));
-	        var actualGirdValue = datePicker.find("grid").get("v.year");        
-	        var actualSelectValue = yearTitle.get("v.value");
-	        $A.test.assertEquals("2013", actualGirdValue, "Grid value incorrect");     
-	        $A.test.assertEquals("2013", actualSelectValue, "Year select value incorrect");    
-    	}
+    	test :  [function(cmp) {
+    	               this.openDatePicker(cmp);
+		},function(cmp) {
+		       var datePicker = cmp.find("datePickerTestCmp").get('datePicker');
+		       var yearTitle = cmp.find("datePickerTestCmp").get('datePicker').find("yearTitle");
+	        
+                       this.iterateCal(1, 0, datePicker.get('c.goToNextMonth'), datePicker.get('c.goToNextYear'));
+                       var expected = "2013";
+                       var actualGirdValue = ""+datePicker.find("grid").get("v.year");        
+                       var actualSelectValue = ""+yearTitle.getElement().value;
+                       $A.test.assertEquals(expected, actualGirdValue, "Grid value incorrect"); 
+                       $A.test.assertEquals(expected, actualSelectValue, "Year select value incorrect");    
+    	}]
     },
-    
+    /**
+     * For iphone/ipad, when the date picker is up, it suppose to take the whole screen. there is no 'other place' you can 'touch'
+     */
     testDocumentLevelHandler:{
-        //For iphone/ipad:
-        //when the date picker is up, it suppose to take the whole screen. there is no 'other place' you can 'touch'
-		browsers: ["-IPHONE","-IPAD"],
-        test:function(component){
-        	var input_date = component.find("datePickerTestCmp");
-            var date_picker = input_date.find("datePicker");
-            date_picker.getValue("v.visible").setValue(true);
-            //this rerender is necessary: we need dataPickerRenderer to updateGlobalEventListeners
-            $A.rerender(component);
-            //date picker should disappear when click anywhere outside of it, like on the outputText
-            var output_text = document.getElementById("dlh_outputText");
-            //one event is enough to make date picker disappear, just to simulate mouse click, we have both here
-            $A.test.fireDomEvent(output_text, "mousedown");
-            $A.test.fireDomEvent(output_text, "mouseup");
-            $A.test.assertFalse(date_picker.get("v.visible"));
+        browsers: ["-IPHONE","-IPAD"],
+        test : function(component){
+                    var input_date = component.find("datePickerTestCmp");
+                    var date_picker = input_date.find("datePicker");
+                    date_picker.getValue("v.visible").setValue(true);
+                  
+                    //this rerender is necessary: we need dataPickerRenderer to updateGlobalEventListeners
+                    $A.rerender(component);
+                  
+                    //date picker should disappear when click anywhere outside of it, like on the outputText
+                    var output_text = document.getElementById("dlh_outputText");
+                  
+                    //one event is enough to make date picker disappear, just to simulate mouse click, we have both here
+                    $A.test.fireDomEvent(output_text, "mousedown");
+                    $A.test.fireDomEvent(output_text, "mouseup");
+                    $A.test.assertFalse(date_picker.get("v.visible"));
         }
     },
     
     iterateCal : function(monthIter, yearIter, monthButton, yearButton){
-          var i;
-          for(i = 0; i< monthIter; i++){
-              monthButton.runDeprecated({});
-          }
+                      var i;
+                      for(i = 0; i< monthIter; i++){
+                          monthButton.runDeprecated({});
+                      }
           
-          for(i = 0; i< yearIter; i++){
-             yearButton.runDeprecated({});
-          }
-          
+                      for(i = 0; i< yearIter; i++){
+                          yearButton.runDeprecated({});
+                      }
     },
     
-   openDatePicker : function(cmp) {
-    	var opener = cmp.find("datePickerTestCmp").find("datePickerOpener").getElement();
-		var inputBox = cmp.find("datePickerTestCmp").find("inputText").getElement();
-	    var datePicker = cmp.find("datePickerTestCmp").find("datePicker").getElement();
-	    if($A.util.isUndefinedOrNull(opener)) {
-	    	$A.test.clickOrTouch(inputBox);
-		} else {
-			$A.test.clickOrTouch(opener);
-		}
-		$A.test.addWaitFor(true, function(){return $A.util.hasClass(datePicker, "visible")});
+    openDatePicker : function(cmp) {
+                           var opener = cmp.find("datePickerTestCmp").find("datePickerOpener").getElement();
+                           var inputBox = cmp.find("datePickerTestCmp").find("inputText").getElement();
+                           var datePicker = cmp.find("datePickerTestCmp").find("datePicker").getElement();
+  
+                           if($A.util.isUndefinedOrNull(opener) || !this.isViewDesktop()) {
+                               $A.test.clickOrTouch(inputBox);
+                           } else {
+                               $A.test.clickOrTouch(opener);
+                           }
+                           $A.test.addWaitFor(true, function(){return $A.util.hasClass(datePicker, "visible")});
+     },
+    
+    /**
+     * Method allowing us to extract whether or not we are looking at a mobile device. Extracted from two functions because 
+     * depending on which mode we are in (Desktop or other), we either have a header with the Month Year combo or an outputText 
+     * and a select value
+     * 
+     */ 
+    isViewDesktop : function(){
+                         return $A.get('$Browser').formFactor.toLowerCase() === "desktop";
+    },
+    
+    /**
+     * We have to ways that we need to get elements. Either from a output/select combo or from a header tag  
+     */
+    getTextFromElm: function(cmp){
+	                 if(this.isViewDesktop()){
+	                     return $A.util.getText(cmp.find("calTitle").getElement());
+	                 }
+	
+                         var year = cmp.find("yearTitle").getElement().value;
+                         var month = $A.util.getText(cmp.find("monthTitle").getElement());
+		
+                         return month +" "+year;
     },
     
     convertMonth : function(intMonth) {
-    	if ($A.util.isUndefinedOrNull(intMonth)) {
-    		return intMonth;
-    	}
-    	
-    	if (intMonth == 0) {
-    		return "January";
-    	} else if (intMonth == 1) {
-    		return "February";
-    	} else if (intMonth == 2) {
-    		return "March";
-    	} else if (intMonth == 3) {
-    		return "April";
-    	} else if (intMonth == 4) {
-    		return "May";
-    	} else if (intMonth == 5) {
-    		return "June";
-    	} else if (intMonth == 6) {
-    		return "July";
-    	} else if (intMonth == 7) {
-    		return "August";
-    	} else if (intMonth == 8) {
-    		return "September";
-    	} else if (intMonth == 9) {
-    		return "October";
-    	} else if (intMonth == 10) {
-    		return "November";
-    	} else if (intMonth == 11) {
-    		return "December";
-    	}
+                         if ($A.util.isUndefinedOrNull(intMonth)) {
+                             return intMonth;
+                         }
+                         
+                         if (intMonth == 0) {
+                             return "January";
+                         } else if (intMonth == 1) {
+                             return "February";
+                         } else if (intMonth == 2) {
+                             return "March";
+                         } else if (intMonth == 3) {
+                             return "April";
+                         } else if (intMonth == 4) {
+                             return "May";
+                         } else if (intMonth == 5) {
+                             return "June";
+                         } else if (intMonth == 6) {
+                             return "July";
+                         } else if (intMonth == 7) {
+                             return "August";
+                         } else if (intMonth == 8) {
+                             return "September";
+                         } else if (intMonth == 9) {
+                             return "October";
+                         } else if (intMonth == 10) {
+                             return "November";
+                         } else if (intMonth == 11) {
+                             return "December";
+                         }
     }
-    
 })

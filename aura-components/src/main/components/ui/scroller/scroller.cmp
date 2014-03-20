@@ -21,6 +21,7 @@
     <aura:attribute name="scroll"               type="String"  default="vertical" description="Defines the scroll direction. The string values can be either horizontal or vertical"/>
     <aura:attribute name="enabled"              type="Boolean" default="true"     description="Sets the default state of the scroller"/>
     <aura:attribute name="useCSSTransition"     type="Boolean" default="false"    description="Denotes whether to use css transitions"/>
+    <aura:attribute name="preventDefaultOnMove" type="Boolean" default="false"    description="preventDefault native events on mouse move"/>
     <aura:attribute name="snap"                 type="Boolean" default="false"    description="Enable snap behaviour on the scroller (adds the Snap plugins to the scroller)"/>
     <aura:attribute name="endless"              type="Boolean" default="false"    description="Activates the endless plugin (gpuOptimization needs to be enable for this)"/>
     <aura:attribute name="snapType"             type="String"  default="soft"     description="Snap type. Values: sticky | soft"/>

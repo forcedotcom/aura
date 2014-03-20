@@ -1641,7 +1641,10 @@ $A.ns.Util.prototype.isValue = function(obj) {
  */
 $A.ns.Util.prototype.supportsTouchEvents = function() {
     if ($A.util.isUndefined(this.supportsTouchEvents.cache)) {
-        this.supportsTouchEvents.cache = ('ontouchstart' in window || navigator.msMaxTouchPoints > 0
+        this.supportsTouchEvents.cache = (
+            'ontouchstart' in window 
+            || ($A.get('$Browser.isWindowsPhone') && (navigator.pointerEnabled ||  navigator.msPointerEnabled))
+            || navigator.msMaxTouchPoints > 0 
             || navigator.maxTouchPoints > 0) && ($A.getContext().getMode() !== 'PTEST')
             && ($A.getContext().getMode() !== 'CADENCE') && ($A.getContext().getMode() !== 'SELENIUM')
             && ($A.getContext().getMode() !== 'SELENIUMDEBUG');

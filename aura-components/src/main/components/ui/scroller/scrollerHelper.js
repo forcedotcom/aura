@@ -35,9 +35,15 @@
         return component._scroller;
     },
     setScollerInstance: function (component, scrollerInstance) {
+        var helper = this;
         component._scroller = scrollerInstance;
+        
         component.getScrollerInstance = function () {
-            return this._scroller;
+            return helper.getScrollerInstance(this);
+        }
+
+        component.getScrollerNamespace = function () {
+            return helper.getScrollerNamespace(this);
         }
 
         // For debugging purposes...
@@ -220,10 +226,13 @@
             }
         }, timeout);
 
-        auraAction.run(function () {
-            triggered = true;
-            callback.apply(this, arguments);
+        $A.run(function () {
+            auraAction.run(function () {
+                triggered = true;
+                callback.apply(this, arguments);
+            });    
         });
+        
     },
     _bridgeScrollerAction: function (attrs, scrollerInstance, actionName) {
         var action = attrs.get(actionName);
@@ -233,6 +242,9 @@
             });
         }
     },
+    _preventDefault: function (e) {
+        e.preventDefault();
+    },
     _attachAuraEvents: function (component, scrollerInstance) {
         var attrs  = component.getAttributes(),
             events = [
@@ -240,14 +252,25 @@
                 'onScrollStart',
                 'onScrollMove',
                 'onScrollEnd'
-            ];
+            ], wrapper;
+
+        if (attrs.get('preventDefaultOnMove')) {
+            wrapper = this._getScrollerWrapper(component);
+            wrapper.addEventListener('touchmove', this._preventDefault, false);
+        }
 
         for (var i = 0; i < events.length; i++) {
             this._bridgeScrollerAction(attrs, scrollerInstance, events[i]);
         }
     },
     deactivate: function(component) {
-        var scroller = this.getScrollerInstance(component);
+        var scroller = this.getScrollerInstance(component),
+            wrapper  = this._getScrollerWrapper(component);
+
+        if (component.get('v.preventDefaultOnMove')) {
+            wrapper.removeEventListener('touchmove', this._preventDefault, false);
+        }
+
         if (scroller) {
             scroller.destroy();
         }

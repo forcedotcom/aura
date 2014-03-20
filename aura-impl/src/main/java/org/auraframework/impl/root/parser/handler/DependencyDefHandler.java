@@ -48,6 +48,11 @@ public class DependencyDefHandler<P extends RootDefinition> extends ParentedTagH
 
     public DependencyDefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source) {
         super(parentHandler, xmlReader, source);
+        
+        if (!isInPrivilegedNamespace()) {
+        	// DCHASMAN TODO W-2102534 Throw appropriate unknown tag exception here!
+        }
+
         this.builder = new DependencyDefImpl.Builder();
         this.builder.setLocation(getLocation());
         this.builder.setParentDescriptor(parentHandler.getDefDescriptor());

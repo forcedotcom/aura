@@ -17,6 +17,7 @@ package org.auraframework.components.ui.inputRichText;
 
 import org.auraframework.test.WebDriverTestCase;
 import org.auraframework.test.WebDriverUtil.BrowserType;
+import org.auraframework.test.annotation.ThreadHostileTest;
 import org.auraframework.test.annotation.UnAdaptableTest;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -75,6 +76,7 @@ public class InputRichTextUITest extends WebDriverTestCase {
     /* Issue with sendKeys in Safari https://code.google.com/p/selenium/issues/detail?id=4467 */
     @ExcludeBrowsers({ BrowserType.SAFARI, BrowserType.SAFARI5,
             BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET , BrowserType.IPAD})
+    @ThreadHostileTest("testHtmlContentEscaped is not thread-safe")
     public void testHtmlContentEscaped() throws Exception {
         open(URL);
         WebElement ckEditor = auraUITestingUtil.waitForElement(By.cssSelector(CK_EDITOR_LOCATOR));

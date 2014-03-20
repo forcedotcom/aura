@@ -60,14 +60,13 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef> extend
     private static final String ATTRIBUTE_WHITESPACE = "whitespace";
 
     protected static final Set<String> ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>()
-            .add(ATTRIBUTE_IMPLEMENTS, ATTRIBUTE_ACCESS)
+            .add(ATTRIBUTE_IMPLEMENTS, ATTRIBUTE_ACCESS, ATTRIBUTE_MODEL, ATTRIBUTE_CONTROLLER)
             .addAll(RootTagHandler.ALLOWED_ATTRIBUTES).build();
     
 	protected static final Set<String> PRIVILEGED_ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>().add(
 			ATTRIBUTE_RENDER, ATTRIBUTE_TEMPLATE, ATTRIBUTE_PROVIDER,
             ATTRIBUTE_EXTENSIBLE, ATTRIBUTE_ABSTRACT, ATTRIBUTE_ISTEMPLATE,
-            ATTRIBUTE_EXTENDS, ATTRIBUTE_STYLE, ATTRIBUTE_HELPER,
-            ATTRIBUTE_RENDERER, ATTRIBUTE_MODEL, ATTRIBUTE_CONTROLLER,
+            ATTRIBUTE_EXTENDS, ATTRIBUTE_STYLE, ATTRIBUTE_HELPER, ATTRIBUTE_RENDERER,
             ATTRIBUTE_WHITESPACE).addAll(ALLOWED_ATTRIBUTES).addAll(RootTagHandler.PRIVILEGED_ALLOWED_ATTRIBUTES).build();
     
 

@@ -22,6 +22,7 @@ import org.auraframework.Aura;
 import org.auraframework.def.*;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.instance.BaseComponent;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Model;
 import org.auraframework.system.*;
@@ -59,15 +60,21 @@ public class ComponentDefModel {
         String desc = (String) component.getAttributes().getValue("descriptor");
 
         DefType defType = DefType.valueOf(((String) component.getAttributes().getValue("defType")).toUpperCase());
-        descriptor = Aura.getDefinitionService().getDefDescriptor(desc, defType.getPrimaryInterface());
+        DefinitionService definitionService = Aura.getDefinitionService();
+        descriptor = definitionService.getDefDescriptor(desc, defType.getPrimaryInterface());
         definition = descriptor.getDef();
         String type = null;
+                
+        MasterDefRegistry registry = definitionService.getDefRegistry();
+        DefDescriptor<ApplicationDef> referencingDesc = ReferenceTreeModel.getReferencingDescriptor();
 
         if (definition instanceof RootDefinition) {
             RootDefinition rootDef = (RootDefinition) definition;
             for (AttributeDef attribute : rootDef.getAttributeDefs().values()) {
-                attributes.add(new AttributeModel(attribute));
-            }
+            	if (registry.hasAccess(referencingDesc, attribute) == null) {
+            		attributes.add(new AttributeModel(attribute));
+        		}
+        	}
             
             DocumentationDef docDef = rootDef.getDocumentationDef();
             if (docDef != null) {
@@ -81,9 +88,11 @@ public class ComponentDefModel {
                 for (RegisterEventDef reg : cmpDef.getRegisterEventDefs().values()) {
                     events.add(new AttributeModel(reg));
                 }
+                
                 for (EventHandlerDef handler : cmpDef.getHandlerDefs()) {
                     handledEvents.add(new AttributeModel(handler));
                 }
+                
                 for (DefDescriptor<InterfaceDef> intf : cmpDef.getInterfaces()) {
                     interfaces.add(intf.getNamespace() + ":" + intf.getName());
                 }
@@ -94,6 +103,7 @@ public class ComponentDefModel {
                 } else {
                     theSuper = null;
                 }
+                
                 isAbstract = cmpDef.isAbstract();
                 isExtensible = cmpDef.isExtensible();
 

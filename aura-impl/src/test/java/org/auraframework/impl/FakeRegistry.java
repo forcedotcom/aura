@@ -128,4 +128,10 @@ public class FakeRegistry implements MasterDefRegistry {
     public List<ClientLibraryDef> getClientLibraries(String uid) {
         return null;
     }
+
+	@Override
+	public <D extends Definition> String hasAccess(
+			DefDescriptor<?> referencingDescriptor, D def) {
+		return null;
+	}
 }

@@ -71,7 +71,7 @@ public class ForEachDefHandler<P extends RootDefinition> extends ParentedTagHand
         super(parentHandler, xmlReader, source);
         
         if (!isInPrivilegedNamespace()) {
-        	// DCHASMAN TODO Throw appropriate unknown tag exception here!
+        	// DCHASMAN TODO W-2102534 Throw appropriate unknown tag exception here!
         }
     }
 

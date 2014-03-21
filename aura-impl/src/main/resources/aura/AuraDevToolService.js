@@ -622,6 +622,19 @@ var AuraDevToolService = function() {
                      
                      return cmpName;
 	        },
+	     /**
+	      * Method that checks to that an element has the necessary functions to be able to grab data from it and format correct.
+	      * The only thing that this will stop is the ability to say which component rendered it.
+	      * @param elm        - component that we are making sure contains all of the necessary informaiton.
+	      * @return boolean   - True if all functions exist. False otherwise
+	      */
+	     containsNecessaryFunctions : function(elm){
+	         var checkExists = $A.util.isUndefinedOrNull;
+	         return  (!checkExists(elm)) && 
+		         ("getAttributes" in elm) && !checkExists(elm.getAttributes()) &&
+		         ("getValueProvider" in elm.getAttributes() && !checkExists(elm.getAttributes().getValueProvider())) && 
+		         ("getDef" in elm.getAttributes().getValueProvider() && !checkExists(elm.getAttributes().getValueProvider().getDef()));
+	     },   
             /**
              * Method grabs everything from the given array and prints out the error and the tag(s) that are the issue
              * @param   tagError - The error message for the given tag
@@ -629,67 +642,67 @@ var AuraDevToolService = function() {
              * @returns String - Either the empty string or a string representation of the error
              */
             formatOutput : function(tagError, errArray){
-        	if(errArray.length === 0){
-        	    return "";
-        	}
-        	
-        	var len = errArray.length;
-        	var data_aura_rendered_by = "";
-        	var compThatRenderedCmp = "";
-        	var cmpInfo = "";
-        	var cmpDesc = "";
-        	var nodeName = "";
-        	var cmp = "";
-        	var errStr = "\nIssue: "+tagError+"\n";
-
-        	var accessAideFuncs = aura.devToolService.accessbilityAide;
-        	accessAideFuncs.errorCount = len + accessAideFuncs.errorCount; 
-        	for(var i = 0; i<len; i++){
-        	    nodeName = errArray[i].nodeName.toLowerCase();
-        	    data_aura_rendered_by = $A.util.getElementAttributeValue(errArray[i], "data-aura-rendered-by");
-        	    
-        	    //Make sure it has a rendered by value
-        	    if($A.util.isUndefinedOrNull(data_aura_rendered_by) || data_aura_rendered_by === "" ){
-        		nodeName = errArray[i].nodeName.toLowerCase();
-        		cmpInfo = "No Aura information available";
-        		compThatRenderedCmp = cmpInfo;
+                    if(errArray.length === 0){
+                        return "";
         	    }
-        	    else{
-        		//Making sure that the cmp is rendered by Aura and a normal HTML tag
-        		//Making sure to grab the correct $A. Depending if you are using the debuggertool or not, $A will be different
-        		cmp = $A.getCmp(data_aura_rendered_by);
-
-        		if(!$A.util.isUndefinedOrNull(cmp) && !$A.util.isUndefinedOrNull(cmp.getAttributes()) ){
-        		    //If he component exists grab it descriptor
-        		    cmpDesc = cmp.getAttributes().getValueProvider().getDef().getDescriptor();
-        		
-        		    //Grab the namespace and name so that it is not viewed as a hyperlink
-        		    cmpInfo = cmpDesc.getNamespace()+":"+cmpDesc.getName();
-
-        		    //Grabbing the erroneous components value provider
-            		     cmpDesc = cmp.getAttributes().getValueProvider();
-        		    
-        		  //Making sure we are not at the app level and that we are not looking at a pass through value
-            		  if(!$A.util.isUndefinedOrNull(cmpDesc) && !$A.util.isUndefinedOrNull(cmpDesc.getAttributes()) && 
-				  !$A.util.isUndefinedOrNull(cmpDesc.getAttributes().getValueProvider()) && ("getDef" in cmpDesc.getAttributes().getValueProvider())){      		      
-		              cmpDesc = cmpDesc.getAttributes().getValueProvider();
-        		      cmpDesc = cmpDesc.getDef().getDescriptor();
-        		      compThatRenderedCmp = cmpDesc.getNamespace()+":"+cmpDesc.getName();
-        		  }
-        		  else{
-        		       //If the component does not have a valueprovider than we are at the app level
-        		       compThatRenderedCmp = cmpInfo;
-        		  }  
-        		}
-        		else{
-        		    cmpInfo = "This item does not have a data-aura-rendered-by attribute.";
-        		    compThatRenderedCmp = cmpInfo;
-        		}
-        	    }
-        	    
-        	    errStr = errStr+"Component markup: //"+cmpInfo+"\nFound in: //"+compThatRenderedCmp+"\nRendered Tag:   <"+nodeName+""+accessAideFuncs.attribStringVal(errArray[i].attributes)+">...</"+nodeName+">\n";     	    
-        	    errStr = errStr+"StackTrace:\n" + accessAideFuncs.getStackTrace(errArray[i], "           ");
-        	}
+                    var len = errArray.length;
+                    var data_aura_rendered_by = "";
+                    var compThatRenderedCmp = "";
+                    var cmpInfo = "";
+                    var cmpDesc = "";
+                    var nodeName = "";
+                    var cmp = "";
+                    var errStr = "\nIssue: "+tagError+"\n";
+                    var accessAideFuncs = aura.devToolService.accessbilityAide;
+                    accessAideFuncs.errorCount = len + accessAideFuncs.errorCount; 
+                    
+                    for(var i = 0; i<len; i++){
+                	nodeName = errArray[i].nodeName.toLowerCase();
+                	data_aura_rendered_by = $A.util.getElementAttributeValue(errArray[i], "data-aura-rendered-by");
+                	cmpInfo = "";
+                	cmpDesc = "";
+                	
+                	//Make sure it has a rendered by value
+                	if($A.util.isUndefinedOrNull(data_aura_rendered_by) || data_aura_rendered_by === "" ){
+                	    nodeName = errArray[i].nodeName.toLowerCase();
+                	    cmpInfo = "No Aura information available";
+                	    compThatRenderedCmp = cmpInfo;
+                	}
+                	else{
+                	    //Making sure that the cmp is rendered by Aura and a normal HTML tag
+                	    //Making sure to grab the correct $A. Depending if you are using the debuggertool or not, $A will be different
+                	    cmp = $A.getCmp(data_aura_rendered_by);
+                	    
+                	    if(accessAideFuncs.containsNecessaryFunctions(cmp)){
+                		//If he component exists grab it descriptor
+                		cmpDesc = cmp.getAttributes().getValueProvider().getDef().getDescriptor();
+                		
+                		//Grab the namespace and name so that it is not viewed as a hyperlink
+                		cmpInfo = cmpDesc.getNamespace()+":"+cmpDesc.getName();
+                		
+                		//Grabbing the erroneous components value provider
+                		cmpDesc = cmp.getAttributes().getValueProvider();
+                		
+                		//Making sure we are not at the app level and that we are not looking at a pass through value
+                		if(accessAideFuncs.containsNecessaryFunctions(cmpDesc)){                    
+                		    cmpDesc = cmpDesc.getAttributes().getValueProvider();
+                		    cmpDesc = cmpDesc.getDef().getDescriptor();
+                		    compThatRenderedCmp = cmpDesc.getNamespace()+":"+cmpDesc.getName();
+                	        }
+                		else{
+                		    //If the component does not have a valueprovider than we are at the app level, or the necessary information can't be found
+                		    compThatRenderedCmp = cmpInfo;
+                		}
+                	}
+                	else{
+                	    cmpInfo = "No Aura information available";
+                	    compThatRenderedCmp = cmpInfo;
+                	}
+                }
+                
+                errStr = errStr+"Component markup: //"+cmpInfo+"\nFound in: //"+compThatRenderedCmp+"\nRendered Tag:   <"+nodeName+""+accessAideFuncs.attribStringVal(errArray[i].attributes)+">...</"+nodeName+">\n";             
+                errStr = errStr+"StackTrace:\n" + accessAideFuncs.getStackTrace(errArray[i], "           ");
+            }
                 return errStr;
             },
             /**

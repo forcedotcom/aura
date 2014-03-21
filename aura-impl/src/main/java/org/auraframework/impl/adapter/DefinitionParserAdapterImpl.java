@@ -23,8 +23,8 @@ import org.auraframework.throwable.quickfix.InvalidAccessValueException;
 public class DefinitionParserAdapterImpl implements DefinitionParserAdapter {
 
     @Override
-    public DefinitionAccess parseAccess(String access) throws InvalidAccessValueException {
-        return new DefinitionAccessImpl(access);
+    public DefinitionAccess parseAccess(String namespace, String access) throws InvalidAccessValueException {
+        return new DefinitionAccessImpl(namespace, access);
     }
 
 }

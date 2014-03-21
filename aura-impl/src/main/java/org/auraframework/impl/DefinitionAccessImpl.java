@@ -31,17 +31,17 @@ import org.auraframework.util.AuraTextUtil;
 
 public class DefinitionAccessImpl implements DefinitionAccess {
 	
-	static public DefinitionAccess defaultAccess() {
-		return new DefinitionAccessImpl();
+	static public DefinitionAccess defaultAccess(String namespace) {
+		return new DefinitionAccessImpl(Aura.getConfigAdapter().isPrivilegedNamespace(namespace));
 	}
 
-	public DefinitionAccessImpl(String access) throws InvalidAccessValueException {
+	public DefinitionAccessImpl(String namespace, String access) throws InvalidAccessValueException {
 		parseAccess(access);
-		defaultAccess(isSystemNamespace());
+		defaultAccess(namespace);
 	}
 	
-	private DefinitionAccessImpl() {
-		defaultAccess(isSystemNamespace());
+	private DefinitionAccessImpl(boolean isPrivilegedNamespace) {
+		defaultAccess(isPrivilegedNamespace);
 	}
 
 	private void parseAccess(String accessValue) throws InvalidAccessValueException {
@@ -131,22 +131,22 @@ public class DefinitionAccessImpl implements DefinitionAccess {
 	}
 
 	@Override
-	public void validate(boolean allowAuth, boolean allowPrivate)
+	public void validate(String namespace, boolean allowAuth, boolean allowPrivate)
 			throws InvalidAccessValueException {
-		boolean sysNamespace = isSystemNamespace();
-		if (authentication != null && (!allowAuth || !sysNamespace)) {
+		boolean isPrivNamespace = Aura.getConfigAdapter().isPrivilegedNamespace(namespace);
+		if (authentication != null && (!allowAuth || !isPrivNamespace)) {
 			throw new InvalidAccessValueException("Invalid access atttribute value \"" + authentication.name() + "\"");
 		}
 		if (access == Access.PRIVATE  && !allowPrivate) {
 			throw new InvalidAccessValueException("Invalid access atttribute value \"" + access.name() + "\"");
 		}
-        if (access == Access.INTERNAL && !sysNamespace) {
+        if (access == Access.INTERNAL && !isPrivNamespace) {
             throw new InvalidAccessValueException("Invalid access atttribute value \"" + access.name() + "\"");
         }
 		if (access != null && accessMethod != null) {
 			throw new InvalidAccessValueException("Access attribute may not specify \"" + access.name() + "\" when a static method is also specified");
 		}
- 		if (!sysNamespace && accessMethod != null) {
+ 		if (!isPrivNamespace && accessMethod != null) {
 			throw new InvalidAccessValueException("Access attribute may not use a static method");
  		}
 		
@@ -157,17 +157,6 @@ public class DefinitionAccessImpl implements DefinitionAccess {
  		if (access == null && accessMethod == null) {
  			access = sysNamespace ? Access.INTERNAL : Access.PUBLIC;
  		}
-	}
-
-	protected boolean isSystemNamespace() {
-		ContextService contextService = Aura.getContextService();
-		if (contextService.isEstablished()) {
-			String namespace = contextService.getCurrentContext().getCurrentNamespace();
-			ConfigAdapter configAdapter = Aura.getConfigAdapter();
-			return configAdapter.isPrivilegedNamespace(namespace);
-		} else {
-			return false;  
-		}
 	}
 
 	protected Access getAccess() {

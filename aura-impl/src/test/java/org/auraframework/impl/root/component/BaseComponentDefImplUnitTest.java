@@ -92,7 +92,7 @@ public abstract class BaseComponentDefImplUnitTest<I extends BaseComponentDefImp
     
     static {
     	try {
-			GLOBAL_ACCESS = Aura.getDefinitionParserAdapter().parseAccess("GLOBAL");
+			GLOBAL_ACCESS = Aura.getDefinitionParserAdapter().parseAccess(null, "GLOBAL");
 		} catch (InvalidAccessValueException x) {
 			throw new AuraRuntimeException(x);
 		}

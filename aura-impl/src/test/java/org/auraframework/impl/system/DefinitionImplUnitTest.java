@@ -144,19 +144,19 @@ public abstract class DefinitionImplUnitTest<I extends DefinitionImpl<D>, D exte
     }
     
     public void testAccessGlobal() throws Exception {
-    	this.access = new DefinitionAccessImpl("global");
+    	this.access = new DefinitionAccessImpl(null, "global");
     	DefinitionAccess actual = buildDefinition().getAccess();
     	assertTrue(actual.isGlobal());
     }
 
     public void testAccessGlobalDynamic() throws Exception {
-    	this.access = new DefinitionAccessImpl("org.auraframework.test.TestAccessMethods.allowGlobal");
+    	this.access = new DefinitionAccessImpl(null, "org.auraframework.test.TestAccessMethods.allowGlobal");
     	DefinitionAccess actual = buildDefinition().getAccess();
     	assertTrue(actual.isGlobal());
     }
     
     public void testAccessDefault() throws Exception {
-    	this.access = DefinitionAccessImpl.defaultAccess();
+    	this.access = DefinitionAccessImpl.defaultAccess(null);
     	DefinitionAccess actual = buildDefinition().getAccess();
     	assertTrue(actual.isPublic());
     }

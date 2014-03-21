@@ -57,7 +57,7 @@ var ComponentPriv = (function() { // Scoping priv
                 } else if (!context.containsComponentConfig(currentPath) && !!localCreation) {
 
                     // skip creation path if the current top path is not in server returned
-                    // componentConfigs and localCreation or force client created
+                    // componentConfigs and localCreation
 
                     this.creationPath = "client created";
                 } else {

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-    failOnWarning : false, // Setting this to true will enable test failure on warnings so we can see any stack issues
+    failOnWarning : true,
 
     waitForLayoutChange : function(cmp) {
         var target = cmp;

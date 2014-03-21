@@ -4,7 +4,7 @@
 			divItem;
 		
 		if(resultSet == null){
-			dom = [];//fails if dom=[] gives gack on the UI
+			dom = [];
 		}
 		for(var i in resultSet){
 			divItem = document.createElement('div');
@@ -14,7 +14,6 @@
 	    	dom.push(divItem);
 		}
 		return dom;
-    },
-    
+    }
     
 })

@@ -22,9 +22,8 @@
         
         act.setParams({"size":2});
         act.setCallback(component, actionCallback);
-        //$A.run(function(){
-        	$A.enqueueAction(act);
-        //});
+        
+        $A.enqueueAction(act);
     },
 
     fetchDataPTL : function(component, callback, helper) {
@@ -46,15 +45,8 @@
         
         act.setParams({"size":4});
         act.setCallback(component, actionCallback);
-        //$A.run(function(){
-        	$A.enqueueAction(act);
-        //});
-    },
-    
-    
-    
-    animateBackground : function(component, callback, helper){
-    	
+        
+        $A.enqueueAction(act);
     }
     
 })

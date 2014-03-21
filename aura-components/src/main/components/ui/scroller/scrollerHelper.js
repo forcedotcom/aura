@@ -262,6 +262,36 @@
         for (var i = 0; i < events.length; i++) {
             this._bridgeScrollerAction(attrs, scrollerInstance, events[i]);
         }
+
+        this._stopNativeDragging(component);
+        this._captureClickEvents(component, scrollerInstance);
+    },
+    /*
+    * @_stopNativeDraggin
+    * Preventsthe native dragging functionality of for desktop browsers.
+    * Removes the undesired dragging effect if click happens within an anchor or li elements.
+    */
+    _stopNativeDragging: function (component) {
+        var wrapper = this._getScrollerWrapper(component);
+        wrapper.ondragstart = function () { return false; }; //testing
+    },
+    /*
+    * @_captureClickEvents:
+    *
+    * Due to the way aura handles click events (attaching the handler directly to the DOM element (no delegation mechanism))
+    * We need to handle the click event in the capture face, and if the scroller didn't move, let  the event flow and let aura handle the event.
+    * Otherwise a click will be fired even when you have moved the scroller which presents a huge usability issue.
+    * This function will make the click pointers and touch events work properly across devices/platforms
+    */
+    _captureClickEvents: function (component, scroller) {
+        var wrapper = this._getScrollerWrapper(component);
+
+        wrapper.addEventListener('click', function (e) {
+            if (scroller.moved) {
+                e.cancelBubble = true;
+                e.stopPropagation();
+            }
+        }, true)
     },
     deactivate: function(component) {
         var scroller = this.getScrollerInstance(component),
@@ -747,7 +777,7 @@ _initScroller: function () {
                 newX, newY,
                 absDistX, absDistY;
 
-            if (!this.moved) {
+            if (!this.moved && (deltaX || deltaY)) {
                 this.moved = true;
                 this._translate(this.x, this.y);
                 this._fire('scrollStart', ACTION_GESTURE_START);

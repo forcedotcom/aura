@@ -158,7 +158,8 @@
             $A.test.assertEquals("color:blue" , styleText);
             
             var a = component.find("specialAttributes_a").getElement();
-            $A.test.assertEquals("http://bazinga.com/" , a.getAttribute("href"), "Failed to render href attribute");
+            $A.test.assertTrue($A.test.contains(a.getAttribute("href"), "http://bazinga.com/"), 
+                "Failed to render href attribute for 'http://bazinga.com'");
             
             component.getAttributes().setValue("style", "color:green");
             component.getAttributes().setValue("dataName", "inputElement");
@@ -179,7 +180,8 @@
             $A.test.assertEquals("color:green" , styleText);
             
             a = component.find("specialAttributes_a").getElement();
-            $A.test.assertEquals("http://bbt.com/" , a.getAttribute("href"), "Failed to rerender href attribute");
+            $A.test.assertTrue($A.test.contains(a.getAttribute("href"), "http://bbt.com/"), 
+                "Failed to render href attribute for 'http://bbt.com'");
         }
     },
 

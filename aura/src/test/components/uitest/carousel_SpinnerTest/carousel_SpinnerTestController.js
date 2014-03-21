@@ -16,23 +16,5 @@
 {
 	loadPage : function(cmp, evt, helper) {
 		helper.showLoadingIndicator(cmp.getSuper());
-		
-		var doLoadPage = function() {
-			var curPage = cmp.get('v.priv_currentPage');
-	    	var pages = helper.getPageComponents(cmp);
-	    	
-	    	if (curPage > 0 && curPage <= pages.length) {
-		    	var e = cmp.get('e.loadPage'),
-		    		pageCmp = helper.getPageComponentFromIndex(cmp, curPage),
-		    		pageModel = helper.getPageModelFromIndex(cmp, curPage);
-		    	
-				e.setParams({pageModel: pageModel, pageComponent: pageCmp, pageIndex: curPage});    			
-				e.fire();
-			}
-	    	
-	    	helper.hideLoadingIndicator(cmp.getSuper());
-		}
-		
-		setTimeout(doLoadPage, 3000);
 	}
 }

@@ -25,4 +25,5 @@
 			<div style="border: 1px solid black">{!row.index} : {!row.char}</div>
 		</aura:set>
 	</ui:list>
+	<img src="http://shop.ctstore.com/store/pc/catalog/wiffle120D.jpg"/>
 </aura:component>

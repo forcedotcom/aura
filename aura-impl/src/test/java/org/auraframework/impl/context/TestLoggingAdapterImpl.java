@@ -83,11 +83,11 @@ public class TestLoggingAdapterImpl extends LoggingAdapterImpl implements TestLo
     public class TestLoggingContext extends LoggingContextImpl {
         
         @Override
-        protected void log(Map<String, Object> valueMap) {
+        protected void logRequestValuesMap(Map<String, Object> valueMap) {
             if (isCapturing) {
                 logs.add(Maps.newHashMap(valueMap));
             }
-            super.log(valueMap);//keep logging-adapter informed
+            super.logRequestValuesMap(valueMap);//keep logging-adapter informed
         }
 
     }

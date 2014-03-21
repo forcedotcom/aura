@@ -22,7 +22,11 @@ import java.util.Map;
 import javax.servlet.ServletException;
 import javax.servlet.http.*;
 
+import org.auraframework.Aura;
+import org.auraframework.service.LoggingService;
 import org.auraframework.util.json.JsonReader;
+
+import com.google.common.net.HttpHeaders;
 
 /**
  * Endpoint for reporting Content Security Policy violations,
@@ -31,25 +35,46 @@ import org.auraframework.util.json.JsonReader;
  */
 public class CSPReporterServlet extends HttpServlet {
     // KEEP THIS IN SYNC WITH THE SERVLET'S URL-MAPPING ENTRY IN WEB.XML!
+    // (or find a way to do it programmatically.)
     public static final String URL = "/_/csp";
-    
-    private static final String JSON_NAME = "csp-report";
+   
+    public static final String JSON_NAME = "csp-report";
+        
+    public static final String BLOCKED_URI = "blocked-uri";
+    public static final String COLUMN_NUMBER = "column-number";
+    public static final String DOCUMENT_URI = "document-uri";
+    public static final String LINE_NUMBER = "line-number";
+    public static final String ORIGINAL_POLICY = "original-policy";
+    public static final String REFERRER = "referrer";
+    public static final String SCRIPT_SAMPLE = "script-sample";
+    public static final String SOURCE_FILE = "source-file";
+    public static final String STATUS_CODE = "status-code";
+    public static final String VIOLATED_DIRECTIVE = "violated-directive";
     
     @SuppressWarnings("unchecked")
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         
-        Map<String, String> report = null;
+        Map<String, Object> report = null;
         
         try {
-          BufferedReader reader = req.getReader();
-          Map<?, ?> map = (Map<?, ?>) new JsonReader().read(reader);
+            BufferedReader reader = req.getReader();
+            report = (Map<String, Object>)new JsonReader().read(reader);
+        } catch (Exception e) {
+            /* TODO: report an error*/
+        }
 
-          report = (Map<String, String>)map.get(JSON_NAME);
-        } catch (Exception e) { /*report an error*/ }
-
-        System.err.println(report.keySet());
-        
-        // TODO REPORT ALSO THE USER AGENT!
+        // make sure we actually received a csp-report
+        if (report.containsKey(JSON_NAME)) {
+            report.put(HttpHeaders.USER_AGENT, req.getHeader(HttpHeaders.USER_AGENT));
+            
+            LoggingService ls = Aura.getLoggingService();
+            ls.establish();
+            try {
+                ls.logCSPReport(report);
+            } finally {
+                ls.release();
+            }
+        }
     }
 }

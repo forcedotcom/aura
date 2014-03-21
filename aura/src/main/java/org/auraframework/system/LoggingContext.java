@@ -15,6 +15,8 @@
  */
 package org.auraframework.system;
 
+import java.util.Map;
+
 /**
  * LoggingContext public interface
  */
@@ -44,7 +46,7 @@ public interface LoggingContext {
 
     void setValue(String name, Object value);
 
-    void log();
+    void logRequestValues();
     
     KeyValueLogger getKeyValueLogger(StringBuffer log);
 
@@ -55,4 +57,5 @@ public interface LoggingContext {
         public void log(String key, String value);
     }
 
+    void logCSPReport(Map<String, Object> report);
 }

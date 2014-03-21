@@ -20,9 +20,7 @@ import java.lang.reflect.Modifier;
 import java.util.List;
 
 import org.auraframework.Aura;
-import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.DefinitionAccess;
-import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.throwable.AuraRuntimeException;
@@ -37,7 +35,7 @@ public class DefinitionAccessImpl implements DefinitionAccess {
 
 	public DefinitionAccessImpl(String namespace, String access) throws InvalidAccessValueException {
 		parseAccess(namespace, access);
-		defaultAccess(namespace);
+		defaultAccess(Aura.getConfigAdapter().isPrivilegedNamespace(namespace));
 	}
 	
 	private DefinitionAccessImpl(boolean isPrivilegedNamespace) {

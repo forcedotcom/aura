@@ -22,9 +22,12 @@ import org.auraframework.system.AuraContext.Authentication;
  * Static Methods for testing access attribute 
  */
 public class TestAccessMethods {
-	
+
+    public TestAccessMethods(){
+        TestAccessMethods.privateMethod();
+    }
 	public static String invalid() {
-		return "BLAH";
+	    return "BLAH";
 	}
 	
 	public static Access allowGlobal() {
@@ -51,4 +54,15 @@ public class TestAccessMethods {
 		return Authentication.UNAUTHENTICATED;
 	}
 	
+	private static Access privateMethod(){
+	    return Access.GLOBAL;
+	}
+	
+	public Access nonStaticMethod(){
+	    return Access.GLOBAL;
+	}
+	
+	public static Access throwsException()throws Exception{
+	    throw new Exception();
+	}
 }

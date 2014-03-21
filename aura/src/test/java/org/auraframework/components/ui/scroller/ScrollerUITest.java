@@ -102,7 +102,13 @@ public class ScrollerUITest extends WebDriverTestCase{
     	((JavascriptExecutor) driver).executeScript(expressionFn);
     	return (Boolean) ((JavascriptExecutor) driver).executeScript(expression);
     }
-    //TO-DO
+    
+    //Thread.sleep is not a good practice, ideally should execute,
+    //something like auraUITestingUtil.waitUntil(ExpectedCondition)
+    //but that approach does not work here, since the ExpectedCondition
+    //will query the DOM (poll) frequently and that interferes with
+    //the scrolling making it jittery. so the only way is to hault
+    //WebDriver java calls until the DOM animation completes.
     private void pause(long timeout) throws InterruptedException{
     	Thread.sleep(timeout);
     }

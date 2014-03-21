@@ -44,6 +44,14 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
     private Boolean isProduction = null;
     private Boolean isAuraJSStatic = null;
     private Boolean validateCss = null;
+    
+    public MockConfigAdapterImpl() {
+        super();
+    }
+    
+    public MockConfigAdapterImpl(String resourceCacheDir) {
+        super(resourceCacheDir);
+    }
 
     @Override
     public void reset() {

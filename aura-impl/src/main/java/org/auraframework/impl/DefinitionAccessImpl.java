@@ -36,7 +36,7 @@ public class DefinitionAccessImpl implements DefinitionAccess {
 	}
 
 	public DefinitionAccessImpl(String namespace, String access) throws InvalidAccessValueException {
-		parseAccess(access);
+		parseAccess(namespace, access);
 		defaultAccess(namespace);
 	}
 	
@@ -44,14 +44,14 @@ public class DefinitionAccessImpl implements DefinitionAccess {
 		defaultAccess(isPrivilegedNamespace);
 	}
 
-	private void parseAccess(String accessValue) throws InvalidAccessValueException {
+	private void parseAccess(String namespace, String accessValue) throws InvalidAccessValueException {
 		List<String> items = AuraTextUtil.splitSimpleAndTrim(accessValue, ",", 10);
 		for (String item: items) {
-			parseAccessItem(item);
+			parseAccessItem(namespace, item);
 		}
 	}
 	
-	protected void parseAccessItem(String item) throws InvalidAccessValueException {
+	protected void parseAccessItem(String namespace, String item) throws InvalidAccessValueException {
 		// See if we have authentication
 		String ucItem = item.toUpperCase();
 		try {

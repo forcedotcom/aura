@@ -107,7 +107,7 @@ public class ScrollerUITest extends WebDriverTestCase{
     //something like auraUITestingUtil.waitUntil(ExpectedCondition)
     //but that approach does not work here, since the ExpectedCondition
     //will query the DOM (poll) frequently and that interferes with
-    //the scrolling making it jittery. so the only way is to hault
+    //the scrolling making it jittery. so the only way is to halt
     //WebDriver java calls until the DOM animation completes.
     private void pause(long timeout) throws InterruptedException{
     	Thread.sleep(timeout);

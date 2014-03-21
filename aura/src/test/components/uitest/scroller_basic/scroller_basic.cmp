@@ -18,6 +18,7 @@
 <aura:component
 	controller="java://org.auraframework.component.ui.UIScrollerDataProvider"
 	description="A test scroller.">
+
 	<aura:handler name="init" value="{!this}" action="{!c.init}"/> 	
 	<style>
 		* {
@@ -32,13 +33,9 @@
 	</style>
 	<div id="header" class="common">New Aura Scroller</div>
 		
-		<ui:scroller class="scrollWrapper" onPullToRefresh="{!c.fetchData}" onPullToShowMore="{!c.fetchData}">
-			<!-- <ul id="scrollableItemsContainer">
-					<li>Pretty row 1</li>
-					<li>Pretty row 2</li>
-				</ul> -->
-				
-				<div class="item">Pretty row 1</div>
+		<ui:scroller class="scrollWrapper" onPullToRefresh="{!c.fetchDataPTR}" onPullToShowMore="{!c.fetchDataPTL}" aura:id="test-scroller" showScrollbars="true">
+			
+				<div class="item" id="a1">Pretty row 1</div>
 				<div class="item">Pretty row 2</div>
 				<div class="item">Pretty row 3</div>
 				<div class="item">Pretty row 4</div>

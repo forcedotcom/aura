@@ -3,25 +3,15 @@
 		document.addEventListener('touchmove', function (e) { e.preventDefault(); }, false);
     },
     
-    fetchData : function(component, callback, helper) {
+    fetchDataPTR : function(component, callback, helper) {
         var result,
-        	dataSize = (Math.floor(Math.random() * (2 - 0 + 1)) + 0),
+        	dom,
         	act = component.get("c.getItems"),
         	actionCallback = function(action){
-        		var dom = [],
-        			divItem;
+        		
             	if (action.getState() === "SUCCESS") {
             		result = action.getReturnValue();
-            		if(result == null){
-            			dom = [];//fails if dom=[] gives gack on the UI
-            		}
-            		for(var i in result){
-            			divItem = document.createElement('div');
-            			divItem.textContent = result[i].label;
-            			divItem.id = result[i].value;
-            			divItem.className = "item";
-            	    	dom.push(divItem);
-            		}
+            		dom = helper.makeDOM(result, "onPTR");
             		$A.log(result);
             		callback(null, dom);
             	}
@@ -29,11 +19,42 @@
                     $A.log("Fail: " + action.getError()[0].message);
                 }
             };
-        //debugger;
-        act.setParams({"size":dataSize});
+        
+        act.setParams({"size":2});
         act.setCallback(component, actionCallback);
-        $A.run(function(){
+        //$A.run(function(){
         	$A.enqueueAction(act);
-        });
+        //});
+    },
+
+    fetchDataPTL : function(component, callback, helper) {
+        var result,
+        	dom,
+        	act = component.get("c.getItems"),
+        	actionCallback = function(action){
+        		
+            	if (action.getState() === "SUCCESS") {
+            		result = action.getReturnValue();
+            		dom = helper.makeDOM(result, "onPTL");
+            		$A.log(result);
+            		callback(null, dom);
+            	}
+            	else {
+                    $A.log("Fail: " + action.getError()[0].message);
+                }
+            };
+        
+        act.setParams({"size":4});
+        act.setCallback(component, actionCallback);
+        //$A.run(function(){
+        	$A.enqueueAction(act);
+        //});
+    },
+    
+    
+    
+    animateBackground : function(component, callback, helper){
+    	
     }
+    
 })

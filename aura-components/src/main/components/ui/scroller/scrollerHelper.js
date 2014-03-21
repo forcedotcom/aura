@@ -1073,11 +1073,11 @@ _initScroller: function () {
             var docfrag = w.document.createDocumentFragment(),
                 scrollerContainer = this.scroller,
                 ptrContainer = scrollerContainer.firstChild;
-            
-        	items.forEach(function (i) {
+
+            items.forEach(function (i) {
                 docfrag.appendChild(i);
-            }); 
-            
+            });    
+
             if (scrollerContainer.lastChild === ptrContainer) {
                 scrollerContainer.appendChild(docfrag);
             } else {
@@ -1179,9 +1179,6 @@ _initScroller: function () {
             this.scrollTo(x, y, time, easing);
         },
         prependItems: function (data) {
-        	//if(!(data instanceof Array && data.length)){
-        	//	return;
-        	//}
             var parsedData = HELPERS.parseDOM(data);
             if (parsedData) {
                 this._prependData(parsedData);

@@ -1170,17 +1170,30 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     public boolean namespaceExists(String ns) {
         return delegateRegistries.getAllNamespaces().contains(ns);
     }
+    
+    @Override
+    public <D extends Definition> void assertAccess(DefDescriptor<?> referencingDescriptor, D def) throws QuickFixException {
+    	assertAccess(referencingDescriptor, def, accessCheckCache);
+    }
+
+	<D extends Definition> void assertAccess(DefDescriptor<?> referencingDescriptor, D def, Cache<String, String> accessCheckCache) {
+    	String status = hasAccess(referencingDescriptor, def, accessCheckCache);   	
+		if (status != null) {
+			DefDescriptor<? extends Definition> descriptor = def.getDescriptor();
+			String message = Aura.getConfigAdapter().isProduction() ? DefinitionNotFoundException.getMessage(descriptor.getDefType(), descriptor.getName()) : status;
+			throw new NoAccessException(message);
+		}
+	}
 
 	@Override
-	public <D extends Definition> void assertAccess(DefDescriptor<?> referencingDescriptor, D def) throws QuickFixException {
-	    assertAccess(referencingDescriptor, def, accessCheckCache);
+	public <D extends Definition> String hasAccess(DefDescriptor<?> referencingDescriptor, D def) {
+	    return hasAccess(referencingDescriptor, def, accessCheckCache);
 	}
 	
-    <D extends Definition> void assertAccess(DefDescriptor<?> referencingDescriptor, D def, Cache<String, String> accessCheckCache) 
-            throws QuickFixException {
+    private <D extends Definition> String hasAccess(DefDescriptor<?> referencingDescriptor, D def, Cache<String, String> accessCheckCache) {
 		// If the def is access="global" then anyone can see it
     	if (def.getAccess().isGlobal()) {
-    		return;
+    		return null;
     	}
 		
 		ConfigAdapter configAdapter = Aura.getConfigAdapter();
@@ -1188,14 +1201,14 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 		if (referencingDescriptor != null) {
 	    	String prefix = referencingDescriptor.getPrefix();
 			if (configAdapter.isUnsecuredPrefix(prefix)) {
-	    		return;
+	    		return null;
 	    	}
 			
 			referencingNamespace = referencingDescriptor.getNamespace();
 			
 	        // The caller is in a system namespace let them through
 			if (configAdapter.isPrivilegedNamespace(referencingNamespace)) {
-				return;
+				return null;
 			}
 		}
 		
@@ -1242,10 +1255,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 			// System.out.printf("** MDR.hit.assertAccess() cache hit for: %s\n", key);
 		}
 		
-		if (!status.isEmpty()) {
-			String message = configAdapter.isProduction() ? DefinitionNotFoundException.getMessage(defType, desc.getName()) : status;
-			throw new NoAccessException(message);
-		}
+		return status.isEmpty() ? null : status;
 	}
     
     

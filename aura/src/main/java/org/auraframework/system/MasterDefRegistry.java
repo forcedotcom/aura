@@ -104,6 +104,11 @@ public interface MasterDefRegistry {
      * assert that the referencingDescriptor has access to the definition.
      */
     <D extends Definition> void assertAccess(DefDescriptor<?> referencingDescriptor, D def) throws QuickFixException;
+    
+    /**
+     * Returns null if the referencingDescriptor has access to the definition otherwise a specific access violation reason.
+     */
+    <D extends Definition> String hasAccess(DefDescriptor<?> referencingDescriptor, D def);    
 
     /**
      * Filter our loaded set of dependencies on the preloads.

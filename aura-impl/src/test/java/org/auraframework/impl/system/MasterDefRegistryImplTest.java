@@ -374,13 +374,11 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
      * <li>...</li>
      * </ul>
      */
-    // TODO: Unadaptable since SFDC will have other preloaded namespaces. Remove unadaptable when preloads are removed.
-    @UnAdaptableTest
     public void testUidValue() throws Exception {
         StringBuilder buffer = new StringBuilder();
-        String cmpName = "test:layoutNoLayout";
-        DefDescriptor<ApplicationDef> desc = Aura.getDefinitionService()
-                .getDefDescriptor(cmpName, ApplicationDef.class);
+        String cmpName = "ui:outputNumber";
+        DefDescriptor<ComponentDef> desc = Aura.getDefinitionService()
+                .getDefDescriptor(cmpName, ComponentDef.class);
         MasterDefRegistryImpl masterDefReg = getDefRegistry(false);
         String uid = masterDefReg.getUid(null, desc);
         assertNotNull("Could not retrieve UID for component " + cmpName, uid);

@@ -15,11 +15,11 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:input" implements="ui:inputDateComponent" extensible="true" support="BETA" 
+<aura:component extends="ui:input" implements="ui:inputDateComponent" extensible="true" support="GA" 
     controller="java://org.auraframework.impl.controller.TimeZoneInfoController"
     description="An input field for entering a date and time as specified by the format attribute. To display the date picker, set displayDatePicker=&quot;true&quot;.">    
-    <aura:attribute name="value" type="String" description="The input value of the date/time."/>
-    <aura:attribute name="placeholder" type="String" description="The text that is displayed by default."/>
+    <aura:attribute name="value" type="String" access="GLOBAL" description="The input value of the date/time."/>
+    <aura:attribute name="placeholder" type="String" description="The text that is displayed by default. Set during init based on the 'format' value."/>
     <aura:attribute name="timezone" type="String" description="The timezone ID, for example, America/Los_Angeles."/>
         
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>

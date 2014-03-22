@@ -402,7 +402,7 @@ ArrayValue.prototype.destroy = function(async) {
         var array = a.dirty ? a.newArray : a.array;
         for (var i = 0; i < array.length; i++) {
             var v = array[i];
-            if (v !== undefined) {
+            if (v !== undefined && v.destroy !== undefined) {
                 v.destroy(async);
             }
         }

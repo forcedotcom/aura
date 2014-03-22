@@ -19,8 +19,6 @@ import org.auraframework.def.DefinitionAccess;
 import org.auraframework.throwable.quickfix.InvalidAccessValueException;
 
 public interface DefinitionParserAdapter extends AuraAdapter {
-    
     /* parse the value of the ACCESS attribute */
-    DefinitionAccess parseAccess(String access) throws InvalidAccessValueException;
-
+    DefinitionAccess parseAccess(String namespace, String access) throws InvalidAccessValueException;
 }

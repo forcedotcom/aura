@@ -75,7 +75,7 @@ public abstract class DefinitionImpl<T extends Definition> implements Definition
         this.ownHash = ownHash;
         this.sourceHash = sourceHash;
         this.parseError = parseError;
-        this.access = access == null ? DefinitionAccessImpl.defaultAccess() : access;
+        this.access = access == null ? DefinitionAccessImpl.defaultAccess(descriptor != null ? descriptor.getNamespace() : null) : access;
     }
 
     /**

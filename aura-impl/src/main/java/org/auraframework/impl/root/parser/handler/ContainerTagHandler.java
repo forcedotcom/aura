@@ -21,6 +21,8 @@ import org.auraframework.Aura;
 import org.auraframework.def.*;
 import org.auraframework.def.BaseComponentDef.WhitespaceBehavior;
 import org.auraframework.def.ComponentDefRef.Load;
+import org.auraframework.service.ContextService;
+import org.auraframework.system.AuraContext;
 import org.auraframework.system.Location;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraRuntimeException;
@@ -131,8 +133,9 @@ public abstract class ContainerTagHandler<T extends Definition> extends XMLHandl
         if (access != null) {
         	DefinitionAccess a;
 			try {
-				a = Aura.getDefinitionParserAdapter().parseAccess(access);
-	        	a.validate(allowAuthenticationAttribute(), allowPrivateAttribute());;
+	        	String namespace = source.getDescriptor().getNamespace();
+				a = Aura.getDefinitionParserAdapter().parseAccess(namespace, access);
+	        	a.validate(namespace, allowAuthenticationAttribute(), allowPrivateAttribute());
 			} catch (InvalidAccessValueException e) {
 				// re-throw with location
 				throw new InvalidAccessValueException(e.getMessage(), getLocation());

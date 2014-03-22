@@ -16,7 +16,7 @@
 
 			$A.test.assertTruthy(simpleDeferBtn);	
 
-			simpleDeferBtn.getElement().click();
+                        $A.test.clickOrTouch(simpleDeferBtn.getElement());
 
 			$A.test.addWaitFor(42, function () {
 				return cmp.get('v.result');
@@ -27,7 +27,7 @@
 
 			$A.test.assertTruthy(chainedDeferBtn);	
 
-			chainedDeferBtn.getElement().click();
+                        $A.test.clickOrTouch(chainedDeferBtn.getElement());
 			
 			$A.test.addWaitFor(44, function () {
 				return cmp.get('v.result');
@@ -38,7 +38,7 @@
 
 			$A.test.assertTruthy(errorDeferBtn);	
 
-			errorDeferBtn.getElement().click();
+                        $A.test.clickOrTouch(errorDeferBtn.getElement());
 			
 			$A.test.addWaitFor('Foo', function () {
 				var err = cmp.get('v.error');
@@ -70,7 +70,7 @@
 
 			$A.test.assertTruthy(callbackWrappedDeferBtn);	
 
-			callbackWrappedDeferBtn.getElement().click();
+                        $A.test.clickOrTouch(callbackWrappedDeferBtn.getElement());
 			
 			$A.test.addWaitFor('Foo', function () {
 				return cmp.get('v.result');

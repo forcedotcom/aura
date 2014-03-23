@@ -13,58 +13,62 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.util.javascript;
+package org.auraframework.util.css;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 import javax.script.Invocable;
 
 import org.auraframework.util.IOUtil;
 import org.auraframework.util.validation.RhinoBasedValidator;
+import org.auraframework.util.validation.ValidationError;
 
 import com.google.common.collect.Lists;
 
 /**
- * validates javascript using jslint
+ * Validates .css using csslint
  */
-public class JavascriptValidator extends RhinoBasedValidator {
+public final class CSSLintValidator extends RhinoBasedValidator {
 
-    private static final Pattern newlinePattern = Pattern.compile("\\r?\\n");
+    public CSSLintValidator() throws IOException {
+        super("csslint");
 
-    public JavascriptValidator() throws IOException {
-        super("jslint");
+        // jdk < 1.7 doesn't run csslint.js well
+        String javaVersion = System.getProperty("java.version");
+        int sep = javaVersion.indexOf('.', javaVersion.indexOf('.') + 1);
+        float majorMinor = Float.parseFloat(javaVersion.substring(0, sep));
+        if (majorMinor < 1.7) {
+            throw new UnsupportedOperationException(
+                    "CSSLintValidator requires JDK 1.7 or greater, current is: " + javaVersion);
+        }
     }
 
-    public List<JavascriptProcessingError> validate(String filename, String source, boolean allowDebugger,
-            boolean allowUnfilteredForIn) {
-        if (source == null) {
-            source = "";
-        }
-
+    /**
+     * @param filename filename to use in the Validation errors generated
+     * @param source .css source to validate
+     * @param disableRulesForAura disables csslint rules that generate bogus for aura .css files (see
+     *            app/main/core/build/.csslintrc)
+     */
+    public List<ValidationError> validate(String filename, String source, boolean disableRulesForAura) {
+        List<ValidationError> errors = Lists.newArrayList();
         try {
-            List<JavascriptProcessingError> errors = Lists.newArrayList();
-            String[] src = newlinePattern.split(source);
-
             @SuppressWarnings("unchecked")
             List<Map<String, ?>> lintErrors = (List<Map<String, ?>>) ((Invocable) engine).invokeFunction(tool
                     + "Helper",
-                    src, allowDebugger, allowUnfilteredForIn);
+                    source, disableRulesForAura);
 
             for (int i = 0; i < lintErrors.size(); i++) {
                 Map<String, ?> error = lintErrors.get(i);
-                if (error != null) {
-                    errors.add(new JavascriptProcessingError(tool, filename, error));
-                }
+                errors.add(new ValidationError(tool, filename, error));
             }
-            return errors;
         } catch (Exception e) {
             // TODO: should be reported as a validation error
             throw new RuntimeException(e);
         }
+        return errors;
     }
 
     //
@@ -72,8 +76,8 @@ public class JavascriptValidator extends RhinoBasedValidator {
     public static void main(String[] args) throws Exception {
         String filename = args[0];
         String source = IOUtil.readTextFile(new File(filename));
-        List<JavascriptProcessingError> ret = new JavascriptValidator().validate(filename, source, false, false);
-        for (JavascriptProcessingError error : ret) {
+        List<ValidationError> ret = new CSSLintValidator().validate(filename, source, true);
+        for (ValidationError error : ret) {
             System.out.println(error);
         }
     }

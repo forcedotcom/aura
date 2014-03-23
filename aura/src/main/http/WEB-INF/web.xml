@@ -113,6 +113,18 @@
         <servlet-name>AuraFrameworkServlet</servlet-name>
         <url-pattern>/auraFW/*</url-pattern>
     </servlet-mapping>
+    
+    <!--  Begin Aura Validation Servlet -->
+    
+    <servlet>
+        <servlet-name>AuraValidationServlet</servlet-name>
+        <servlet-class>org.auraframework.impl.validation.AuraValidationServlet</servlet-class>
+    </servlet>
+    
+    <servlet-mapping>
+        <servlet-name>AuraValidationServlet</servlet-name>
+        <url-pattern>/qa/auraValidation/*</url-pattern> <!-- same pattern as SFDC servlet -->
+    </servlet-mapping>
 
 </web-app>
 

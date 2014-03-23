@@ -22,10 +22,8 @@
  * @param javaOptions A java map of options
  * @returns A java String[] of error messages or an empty array.
  */
-var JSLintHelper = function(javaSourceLines, allowDebugger, allowUnfilteredForIn){
-
+var jslintHelper = function(javaSourceLines, allowDebugger, allowUnfilteredForIn){
     var jsSourceLines = [];
-
 
     //Convert the java String[] into a javascript String[]
     for(var i=0;i<javaSourceLines.length;i++){
@@ -50,11 +48,10 @@ var JSLintHelper = function(javaSourceLines, allowDebugger, allowUnfilteredForIn
         var jsError = jsErrors[i];
         if(jsError){
             var javaError = new java.util.HashMap();
-            javaError.put("line", jsError.line);
-            javaError.put("character", jsError.character);
-            javaError.put("reason", jsError.reason);
-            javaError.put("evidence", jsError.evidence);
-
+            javaError.put("line", jsError.line + 1);
+            javaError.put("startColumn", jsError.character + 1);
+            javaError.put("message", jsError.reason);
+            javaError.put("evidence", new java.lang.String(jsError.evidence));
             javaErrors.add(javaError);
         }
     }

@@ -81,23 +81,6 @@ public final class ValidationClientHttpTest extends AuraHttpTestCase {
         List<String> errors = ValidationClient
                 .validate("../aura-impl/src/test/components/validationTest/basic");
 
-        assertEquals(5, errors.size());
-
-        ValidationTestUtil
-                .assertError(
-                        "basic.css [line 1, column 1] cssparser: CSS selector must begin with '.validationTestBasic' or '.THIS'",
-                        errors.get(0));
-        ValidationTestUtil
-                .assertError(
-                        "basic.css [line 2, column 5] csslint @ box-sizing: The box-sizing property isn't supported in IE6 and IE7",
-                        errors.get(1));
-        ValidationTestUtil.assertError("basicController.js [line 5, column 1] js/custom: Starting '(' missing",
-                errors.get(2));
-        ValidationTestUtil.assertError("basicController.js [line 7, column 20] jslint: Missing semicolon",
-                errors.get(3));
-        ValidationTestUtil
-                .assertError(
-                        "basic.cmp [line 1, column 1] cmp/custom: Abstract component markup://validationTest:basic must be extensible",
-                        errors.get(4));
+        ValidationTestUtil.verifyValidationTestBasicErrors(errors);
     }
 }

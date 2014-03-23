@@ -43,4 +43,28 @@ public final class ValidationTestUtil {
         for (ValidationError error : errors)
             System.out.println(error.toCommonFormat());
     }
+
+    public static void verifyValidationTestBasicErrors(List<String> errors) {
+        // csslint doesn't work when running with 1.6
+        boolean cssLintErrorsReported = !System.getProperty("java.version").startsWith("1.6");
+
+        Assert.assertEquals(cssLintErrorsReported ? 5 : 3, errors.size());
+
+        int errorNum = 0;
+        if (cssLintErrorsReported) {
+            assertError(
+                    "basic.css [line 1, column 1] cssparser: CSS selector must begin with '.validationTestBasic' or '.THIS'",
+                    errors.get(errorNum++));
+            assertError(
+                    "basic.css [line 2, column 5] csslint @ box-sizing: The box-sizing property isn't supported in IE6 and IE7",
+                    errors.get(errorNum++));
+        }
+        assertError("basicController.js [line 5, column 1] js/custom: Starting '(' missing",
+                errors.get(errorNum++));
+        assertError("basicController.js [line 7, column 20] jslint: Missing semicolon",
+                errors.get(errorNum++));
+        assertError(
+                "basic.cmp [line 1, column 1] cmp/custom: Abstract component markup://validationTest:basic must be extensible",
+                errors.get(errorNum++));
+    }
 }

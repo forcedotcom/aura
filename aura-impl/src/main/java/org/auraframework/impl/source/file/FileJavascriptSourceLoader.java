@@ -32,7 +32,7 @@ import com.google.common.collect.ImmutableSet;
 public class FileJavascriptSourceLoader extends FileSourceLoader {
 
     public static final Set<String> PREFIXES = ImmutableSet.of(DefDescriptor.JAVASCRIPT_PREFIX);
-    private static final EnumMap<DefType, String> extensions = new EnumMap<DefType, String>(DefType.class);
+    public static final EnumMap<DefType, String> extensions = new EnumMap<DefType, String>(DefType.class);
     private static final EnumMap<DefType, FileFilter> filters = new EnumMap<DefType, FileFilter>(DefType.class);
 
     static {

@@ -56,6 +56,7 @@
             <groupId>org.uiautomation</groupId>
             <artifactId>ios-client</artifactId>
             <version>0.6.5</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>

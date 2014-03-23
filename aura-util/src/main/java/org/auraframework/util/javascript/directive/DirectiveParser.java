@@ -140,7 +140,7 @@ public class DirectiveParser {
         JavascriptProcessingError e = new JavascriptProcessingError();
         e.setFilename(file.getName());
         e.setLine(lineNum);
-        e.setCharacter(0);
+        e.setStartColumn(0);
         e.setMessage(message);
         e.setEvidence(code);
         this.parseErrors.add(e);

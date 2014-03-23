@@ -228,10 +228,10 @@ public class FileSourceLoader extends BaseSourceLoader implements PrivilegedName
      * We need to do this because we don't know a-priory what the types are, and rather than redo all of that work, we
      * can simply do what we need to here.
      */
-    private static class AnyTypeFilter implements FileFilter {
+    protected static class AnyTypeFilter implements FileFilter {
         private final DescriptorFilter dm;
-        private final Set<DefDescriptor<?>> dset;
-        private String namespace;
+        protected final Set<DefDescriptor<?>> dset;
+        protected String namespace;
 
         /**
          * The constructor.
@@ -305,9 +305,14 @@ public class FileSourceLoader extends BaseSourceLoader implements PrivilegedName
 
     }
 
-	@Override
-	public boolean isPrivilegedNamespace(String namespace) {
-		// All file based namespaces are considered system by default
-		return true;
-	}
+    @Override
+    public boolean isPrivilegedNamespace(String namespace) {
+        // All file based namespaces are considered system by default
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + '[' + base.getAbsolutePath() + ']';
+    }
 }

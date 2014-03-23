@@ -37,23 +37,7 @@ import com.google.common.collect.Lists;
  */
 @Model
 public class ComponentDefModel {
-
-    private final DefDescriptor<?> descriptor;
-    private final Definition definition;
-    private final List<AttributeModel> attributes = Lists.newArrayList();
-    private final List<AttributeModel> handledEvents = Lists.newArrayList();
-    private final List<AttributeModel> events = Lists.newArrayList();
-    private final String support;
-    private final String theSuper;
-    private final String type;
-    private final boolean isExtensible;
-    private final boolean isAbstract;
-    private final List<String> interfaces = Lists.newArrayList();
-    private final List<DefModel> defs = Lists.newArrayList();
-    private final DocumentationDefModel doc;
-
     public ComponentDefModel() throws QuickFixException {
-
         AuraContext context = Aura.getContextService().getCurrentContext();
         BaseComponent<?, ?> component = context.getCurrentComponent();
 
@@ -63,38 +47,39 @@ public class ComponentDefModel {
         DefinitionService definitionService = Aura.getDefinitionService();
         descriptor = definitionService.getDefDescriptor(desc, defType.getPrimaryInterface());
         definition = descriptor.getDef();
-        String type = null;
-                
-        MasterDefRegistry registry = definitionService.getDefRegistry();
-        DefDescriptor<ApplicationDef> referencingDesc = ReferenceTreeModel.getReferencingDescriptor();
+        
+		ReferenceTreeModel.assertAccess(definition);
 
+        String type = null;
         if (definition instanceof RootDefinition) {
             RootDefinition rootDef = (RootDefinition) definition;
             for (AttributeDef attribute : rootDef.getAttributeDefs().values()) {
-            	if (registry.hasAccess(referencingDesc, attribute) == null) {
+            	if (ReferenceTreeModel.hasAccess(attribute)) {
             		attributes.add(new AttributeModel(attribute));
         		}
         	}
             
             DocumentationDef docDef = rootDef.getDocumentationDef();
-            if (docDef != null) {
-            	doc = new DocumentationDefModel(docDef);
-            } else {
-            	doc = null;
-            }
+            doc = docDef != null ? new DocumentationDefModel(docDef) : null;
             
             if (definition instanceof BaseComponentDef) {
                 BaseComponentDef cmpDef = (BaseComponentDef) definition;
                 for (RegisterEventDef reg : cmpDef.getRegisterEventDefs().values()) {
-                    events.add(new AttributeModel(reg));
+                	if (ReferenceTreeModel.hasAccess(reg)) {
+                		events.add(new AttributeModel(reg));
+                	}
                 }
                 
                 for (EventHandlerDef handler : cmpDef.getHandlerDefs()) {
-                    handledEvents.add(new AttributeModel(handler));
+                	if (ReferenceTreeModel.hasAccess(handler)) {
+                		handledEvents.add(new AttributeModel(handler));
+                	}
                 }
                 
                 for (DefDescriptor<InterfaceDef> intf : cmpDef.getInterfaces()) {
-                    interfaces.add(intf.getNamespace() + ":" + intf.getName());
+                	if (ReferenceTreeModel.hasAccess(intf.getDef())) {
+                		interfaces.add(intf.getNamespace() + ":" + intf.getName());
+                	}
                 }
                 
                 DefDescriptor<?> superDesc = cmpDef.getExtendsDescriptor();
@@ -124,6 +109,7 @@ public class ComponentDefModel {
                 isExtensible = true;
                 isAbstract = false;
             }
+            
             support = rootDef.getSupport().name();
 
             if (definition instanceof RootDefinition) {
@@ -132,7 +118,10 @@ public class ComponentDefModel {
                 for (DefDescriptor<?> dep : deps) {
                     // we already surface the documentation--users don't need to see the source for it.
                     if (dep.getDefType() != DefType.DOCUMENTATION) {
-                        defs.add(new DefModel(dep));
+                    	Definition def = dep.getDef();
+                    	if (ReferenceTreeModel.hasAccess(def)) {
+                    		defs.add(new DefModel(dep));
+                    	}
                     }
                 }
             }
@@ -329,4 +318,18 @@ public class ComponentDefModel {
         }
 
     }
+    
+    private final DefDescriptor<?> descriptor;
+    private final Definition definition;
+    private final List<AttributeModel> attributes = Lists.newArrayList();
+    private final List<AttributeModel> handledEvents = Lists.newArrayList();
+    private final List<AttributeModel> events = Lists.newArrayList();
+    private final String support;
+    private final String theSuper;
+    private final String type;
+    private final boolean isExtensible;
+    private final boolean isAbstract;
+    private final List<String> interfaces = Lists.newArrayList();
+    private final List<DefModel> defs = Lists.newArrayList();
+    private final DocumentationDefModel doc;
 }

@@ -41,25 +41,22 @@ import com.google.common.collect.Maps;
 
 @Model
 public class ReferenceTreeModel {
-    private List<TreeNode> tree;
-    
-    public static DefDescriptor<ApplicationDef> getReferencingDescriptor() {
-    	String defaultNamespace = Aura.getConfigAdapter().getDefaultNamespace();
-    	if (defaultNamespace == null) {
-    		defaultNamespace = "aura";
-    	}
-    	
+    public static boolean hasAccess(Definition def) throws QuickFixException {
     	DefinitionService definitionService = Aura.getDefinitionService();
-        return definitionService.getDefDescriptor(String.format("%s:application", defaultNamespace), ApplicationDef.class);
-    }
-    
+        MasterDefRegistry registry = definitionService.getDefRegistry();
+		return registry.hasAccess(getReferencingDescriptor(), def) == null;
+	}
+
+	public static void assertAccess(Definition def) throws QuickFixException {
+    	DefinitionService definitionService = Aura.getDefinitionService();
+        MasterDefRegistry registry = definitionService.getDefRegistry();
+		registry.assertAccess(getReferencingDescriptor(), def);
+	}
+
     private static final <E extends Definition> List<TreeNode> makeTreeNodes(String prefix, Class<E> type)
             throws QuickFixException {
         String sep = prefix.equals("markup") ? ":" : ".";
         DefinitionService definitionService = Aura.getDefinitionService();
-        MasterDefRegistry registry = definitionService.getDefRegistry();
-        DefDescriptor<ApplicationDef> referencingDesc = getReferencingDescriptor();
-
         List<TreeNode> ret = Lists.newArrayList();
 
         Map<String, TreeNode> namespaceTreeNodes = Maps.newHashMap();
@@ -71,7 +68,7 @@ public class ReferenceTreeModel {
 			if (configAdapter.isDocumentedNamespace(namespace)) {
             	try {
 	            	E def = desc.getDef();
-					if (registry.hasAccess(referencingDesc, def) == null) {
+					if (hasAccess(def)) {
 		            	TreeNode namespaceTreeNode = namespaceTreeNodes.get(desc.getNamespace());
 		                if (namespaceTreeNode == null) {
 		                    namespaceTreeNode = new TreeNode(null, namespace);
@@ -126,4 +123,17 @@ public class ReferenceTreeModel {
     	
         return tree;
     }
+    
+    
+    private static DefDescriptor<ApplicationDef> getReferencingDescriptor() {
+    	String defaultNamespace = Aura.getConfigAdapter().getDefaultNamespace();
+    	if (defaultNamespace == null) {
+    		defaultNamespace = "aura";
+    	}
+    	
+    	DefinitionService definitionService = Aura.getDefinitionService();
+        return definitionService.getDefDescriptor(String.format("%s:application", defaultNamespace), ApplicationDef.class);
+    }
+
+    private List<TreeNode> tree;
 }

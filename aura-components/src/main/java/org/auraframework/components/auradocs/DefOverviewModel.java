@@ -29,6 +29,7 @@ import org.auraframework.def.EventHandlerDef;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.RegisterEventDef;
 import org.auraframework.def.RootDefinition;
+import org.auraframework.docs.ReferenceTreeModel;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Model;
@@ -67,6 +68,9 @@ public class DefOverviewModel {
         DefType defType = DefType.valueOf(((String) component.getAttributes().getValue("defType")).toUpperCase());
         descriptor = Aura.getDefinitionService().getDefDescriptor(desc, defType.getPrimaryInterface());
         definition = descriptor.getDef();
+        
+		ReferenceTreeModel.assertAccess(definition);
+
         String type = null;
 
         if (definition instanceof RootDefinition) {

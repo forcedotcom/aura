@@ -22,6 +22,7 @@ import java.util.Set;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.auraframework.Aura;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
@@ -43,6 +44,7 @@ import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.util.TextTokenizer;
 import org.auraframework.system.Source;
 import org.auraframework.system.SubDefDescriptor;
+import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
@@ -67,11 +69,11 @@ public class ForEachDefHandler<P extends RootDefinition> extends ParentedTagHand
         super();
     }
 
-    protected ForEachDefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source) {
+    protected ForEachDefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source) throws DefinitionNotFoundException {
         super(parentHandler, xmlReader, source);
         
         if (!isInPrivilegedNamespace()) {
-        	// DCHASMAN TODO W-2102534 Throw appropriate unknown tag exception here!
+        	throw new DefinitionNotFoundException(Aura.getDefinitionService().getDefDescriptor(TAG, ComponentDef.class));
         }
     }
 

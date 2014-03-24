@@ -31,7 +31,9 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.auraframework.Aura;
+import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.RegistryAdapter;
+import org.auraframework.cache.Cache;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ClientLibraryDef;
 import org.auraframework.def.ComponentDef;
@@ -74,15 +76,13 @@ import org.mockito.internal.util.MockUtil;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
-//import com.google.common.cache.Cache;
-import org.auraframework.cache.Cache;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 
 /**
  * @see org.auraframework.impl.registry.RootDefFactoryTest
  */
+@ThreadHostileTest("Don't you go clearing my caches.")
 public class MasterDefRegistryImplTest extends AuraImplTestCase {
     @Mock Definition globalDef;
     @Mock DefinitionAccess defAccess;
@@ -104,7 +104,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
                 for (DefRegistry<?> reg : registries) {
                     Set<String> ns = reg.getNamespaces();
 
-                    if (ns != null && ns.contains("aura") || ns.contains("*")) {
+                    if (ns != null && (ns.contains("aura") || ns.contains("*"))) {
                         mdrregs.add(asMocks ? Mockito.spy(reg) : reg);
                     }
                 }
@@ -324,6 +324,20 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         assertNull("Found string in new MDR", masterDefReg.getCachedString(uid, houseboat, "test1"));
         masterDefReg.putCachedString(uid, houseboat, "test1", "value");
         assertEquals("value", masterDefReg.getCachedString(uid, houseboat, "test1"));
+    }
+
+    public void testNonPrivilegedStringCache() throws Exception {
+        String namespace = "testNonPrivilegedStringCache" + getAuraTestingUtil().getNonce();
+
+        ConfigAdapter configAdapter = Aura.getConfigAdapter();
+        assertFalse(namespace + "  should not have been isPriveleged", configAdapter.isPrivilegedNamespace(namespace));
+        DefDescriptor<ApplicationDef> houseboat = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class,
+                String.format(baseApplicationTag, "", ""), String.format("%s:houseboat", namespace), false);
+        MasterDefRegistryImpl masterDefReg = getDefRegistry(false);
+        String uid = masterDefReg.getUid(null, houseboat);
+        assertNull("Found string in new MDR", masterDefReg.getCachedString(uid, houseboat, "test1"));
+        masterDefReg.putCachedString(uid, houseboat, "test1", "value");
+        assertNull("Found string in new MDR", masterDefReg.getCachedString(uid, houseboat, "test1"));
     }
 
     public void testGetUidClientOutOfSync() throws Exception {
@@ -812,10 +826,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         String key = AuraPrivateAccessor.invoke(mdr, "makeGlobalKey", uid, cmpDesc);
         Object cacheReturn = dependencies.getIfPresent(key);
 
-        if (cacheReturn == null && !isInDefsCache(cmpDesc, mdr)) {
-            return true;
-        }
-        return false;
+        return cacheReturn == null && !isInDefsCache(cmpDesc, mdr);
     }
 
     /**
@@ -914,15 +925,27 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
         return map;
     }
-
-    private boolean isInDefsCache(DefDescriptor<?> dd, MasterDefRegistryImpl mdr) throws Exception {
-    	Cache<DefDescriptor<?>, Optional<? extends Definition>> defs = AuraPrivateAccessor.get(mdr, "defsCache");
-        Object cacheReturn = defs.getIfPresent(dd);
-
-        if (cacheReturn != null) {
-            return true;
+    
+    private boolean isInDescriptorFilterCache(DescriptorFilter filter, Set<DefDescriptor<?>> results, MasterDefRegistryImpl mdr) throws Exception {
+        //taking the long road in determining what is in the cache because the current key implementation for
+        //the descriptor cache is difficult to recreate.
+        Cache<String, Set<DefDescriptor<?>>> cache = AuraPrivateAccessor.get(mdr, "descriptorFilterCache");
+        for (String key : cache.getKeySet()) {
+            if (key.startsWith(filter.toString() + "|")) {
+                return results.equals(cache.getIfPresent(key));
+            }
         }
         return false;
+    }
+
+    private boolean isInDefsCache(DefDescriptor<?> dd, MasterDefRegistryImpl mdr) throws Exception {
+    	Cache<DefDescriptor<?>, Optional<? extends Definition>> cache = AuraPrivateAccessor.get(mdr, "defsCache");
+        return null != cache.getIfPresent(dd);
+    }
+
+    private boolean isInExistsCache(DefDescriptor<?> dd, MasterDefRegistryImpl mdr) throws Exception {
+        Cache<DefDescriptor<?>, Boolean> cache = AuraPrivateAccessor.get(mdr, "existsCache");
+        return Boolean.TRUE == cache.getIfPresent(dd);
     }
 
     /**
@@ -1011,6 +1034,278 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         
         mdr.assertAccess(desc, desc.getDef(), mockAccessCheckCache);
         verify(mockAccessCheckCache, times(2)).getIfPresent(anyString());
+    }
+    
+    public void testExistsCache() throws Exception {
+        ConfigAdapter configAdapter = Aura.getConfigAdapter();
+        MasterDefRegistry mdr = getAuraMDR();
+        MasterDefRegistryImpl mdri = (MasterDefRegistryImpl)mdr;
+        Map<DefType, DefDescriptor<?>> defs = addDefsToCaches(mdri);
+        Map<DefType, DefDescriptor<?>> nonPrivDefs = addNonPriveledgedDefsToMDR(mdri);
+        for (DefDescriptor dd : defs.values()) {
+            assertTrue(dd + " should exist.", dd.exists());
+        }
+        for (DefDescriptor dd : nonPrivDefs.values()) {
+            assertTrue(dd + " should exist.", dd.exists());
+        }
+
+        DefDescriptor nsDef = defs.get(DefType.NAMESPACE);
+        DefDescriptor layoutDef = defs.get(DefType.LAYOUTS);
+        DefDescriptor rendererDef = defs.get(DefType.RENDERER);
+        DefDescriptor appDef = defs.get(DefType.APPLICATION);
+        DefDescriptor controllerDef = defs.get(DefType.CONTROLLER);
+        DefDescriptor cmpDef = defs.get(DefType.COMPONENT);
+
+        DefDescriptor npNSDef = nonPrivDefs.get(DefType.NAMESPACE);
+        DefDescriptor npLayoutDef = nonPrivDefs.get(DefType.LAYOUTS);
+        DefDescriptor npRendererDef = nonPrivDefs.get(DefType.RENDERER);
+        DefDescriptor nsAppDef = nonPrivDefs.get(DefType.APPLICATION);
+        DefDescriptor nsControllerDef = nonPrivDefs.get(DefType.CONTROLLER);
+        DefDescriptor nsCmpDef = nonPrivDefs.get(DefType.COMPONENT);
+        
+        //only picking 3 defs to test the ns as they are mostly dupes
+        assertTrue(nsDef.getNamespace() + "  should have been isPriveleged", configAdapter.isPrivilegedNamespace(nsDef.getNamespace()));
+        assertTrue(layoutDef.getNamespace() + "  should have been isPriveleged", configAdapter.isPrivilegedNamespace(layoutDef.getNamespace()));
+        assertTrue(rendererDef.getNamespace() + "  should have been isPriveleged", configAdapter.isPrivilegedNamespace(rendererDef.getNamespace()));
+        
+        assertFalse(npLayoutDef.getNamespace() + "  should not have been isPriveleged", configAdapter.isPrivilegedNamespace(npLayoutDef.getNamespace()));
+        assertFalse(npNSDef.getNamespace() + "  should not have been isPriveleged", configAdapter.isPrivilegedNamespace(npNSDef.getNamespace()));
+        assertFalse(npRendererDef.getNamespace() + "  should not have been isPriveleged", configAdapter.isPrivilegedNamespace(npRendererDef.getNamespace()));
+        
+        MasterDefRegistry mdr2 = restartContextGetNewMDR();
+        MasterDefRegistryImpl mdri2 = (MasterDefRegistryImpl)mdr2;
+        
+        //objects wont be in eists cache yet, just defsCache, need to call exists to prime exists cache
+
+        for (DefDescriptor dd : defs.values()) {
+            assertTrue(dd + " should exist.", dd.exists());
+        }
+        assertTrue("nsDef is in cache", isInExistsCache(nsDef, mdri2));
+        assertTrue("LayoutsDef is in cache", isInExistsCache(defs.get(DefType.LAYOUTS), mdri2));
+        assertTrue("RendererDef is in cache", isInExistsCache(rendererDef, mdri2));
+        assertTrue("app is in cache", isInExistsCache(appDef, mdri2));
+        assertTrue("controller is in cache", isInExistsCache(controllerDef, mdri2));
+        assertTrue("cmp is in cache", isInExistsCache(cmpDef, mdri2));
+        
+        assertFalse("npNSDef is not in cache", isInExistsCache(npNSDef, mdri2));
+        assertFalse("npLayoutsDef is not in cache", isInExistsCache(npLayoutDef, mdri2));
+        assertFalse("npRendererDef is notin cache", isInExistsCache(npRendererDef, mdri2));
+        assertFalse("nsApp is not in cache", isInExistsCache(nsAppDef, mdri2));
+        assertFalse("nsController is not in cache", isInExistsCache(nsControllerDef, mdri2));
+        assertFalse("nsCmp is not in cache", isInExistsCache(nsCmpDef, mdri2));     
+        
+        
+        MasterDefRegistry mdr3 = restartContextGetNewMDR();
+        MasterDefRegistryImpl mdri3 = (MasterDefRegistryImpl)mdr2;
+        
+        assertTrue("nsDef is in cache", isInExistsCache(nsDef, mdri3));
+        assertTrue("LayoutsDef is in cache", isInExistsCache(defs.get(DefType.LAYOUTS), mdri3));
+        assertTrue("RendererDef is in cache", isInExistsCache(rendererDef, mdri3));
+        assertTrue("app is in cache", isInExistsCache(appDef, mdri3));
+        assertTrue("controller is in cache", isInExistsCache(controllerDef, mdri3));
+        assertTrue("cmp is in cache", isInExistsCache(cmpDef, mdri3));
+        
+        assertFalse("npNSDef is not in cache", isInExistsCache(npNSDef, mdri3));
+        assertFalse("npLayoutsDef is not in cache", isInExistsCache(npLayoutDef, mdri3));
+        assertFalse("npRendererDef is notin cache", isInExistsCache(npRendererDef, mdri3));
+        assertFalse("nsApp is not in cache", isInExistsCache(nsAppDef, mdri3));
+        assertFalse("nsController is not in cache", isInExistsCache(nsControllerDef, mdri3));
+        assertFalse("nsCmp is not in cache", isInExistsCache(nsCmpDef, mdri3));
+    }
+    
+    public void testDefsCache() throws Exception {
+        ConfigAdapter configAdapter = Aura.getConfigAdapter();
+        MasterDefRegistry mdr = getAuraMDR();
+        MasterDefRegistryImpl mdri = (MasterDefRegistryImpl)mdr;
+        Map<DefType, DefDescriptor<?>> defs = addDefsToCaches(mdri);
+        Map<DefType, DefDescriptor<?>> nonPrivDefs = addNonPriveledgedDefsToMDR(mdri);
+
+        DefDescriptor nsDef = defs.get(DefType.NAMESPACE);
+        DefDescriptor layoutDef = defs.get(DefType.LAYOUTS);
+        DefDescriptor rendererDef = defs.get(DefType.RENDERER);
+        DefDescriptor appDef = defs.get(DefType.APPLICATION);
+        DefDescriptor controllerDef = defs.get(DefType.CONTROLLER);
+        DefDescriptor cmpDef = defs.get(DefType.COMPONENT);
+
+        DefDescriptor npNSDef = nonPrivDefs.get(DefType.NAMESPACE);
+        DefDescriptor npLayoutDef = nonPrivDefs.get(DefType.LAYOUTS);
+        DefDescriptor npRendererDef = nonPrivDefs.get(DefType.RENDERER);
+        DefDescriptor nsAppDef = nonPrivDefs.get(DefType.APPLICATION);
+        DefDescriptor nsControllerDef = nonPrivDefs.get(DefType.CONTROLLER);
+        DefDescriptor nsCmpDef = nonPrivDefs.get(DefType.COMPONENT);
+        
+        //only picking 3 defs to test the ns as they are mostly dupes
+        assertTrue(nsDef.getNamespace() + "  should have been isPriveleged", configAdapter.isPrivilegedNamespace(nsDef.getNamespace()));
+        assertTrue(layoutDef.getNamespace() + "  should have been isPriveleged", configAdapter.isPrivilegedNamespace(layoutDef.getNamespace()));
+        assertTrue(rendererDef.getNamespace() + "  should have been isPriveleged", configAdapter.isPrivilegedNamespace(rendererDef.getNamespace()));
+        
+        assertFalse(npLayoutDef.getNamespace() + "  should not have been isPriveleged", configAdapter.isPrivilegedNamespace(npLayoutDef.getNamespace()));
+        assertFalse(npNSDef.getNamespace() + "  should not have been isPriveleged", configAdapter.isPrivilegedNamespace(npNSDef.getNamespace()));
+        assertFalse(npRendererDef.getNamespace() + "  should not have been isPriveleged", configAdapter.isPrivilegedNamespace(npRendererDef.getNamespace()));
+        
+
+        assertTrue("nsDef is in cache", isInDefsCache(nsDef, mdri));
+        assertTrue("LayoutsDef is in cache", isInDefsCache(layoutDef, mdri));
+        assertTrue("RendererDef is in cache", isInDefsCache(rendererDef, mdri));
+        assertTrue("app is in cache", isInDefsCache(appDef, mdri));
+        assertTrue("controller is in cache", isInDefsCache(controllerDef, mdri));
+        assertTrue("cmp is in cache", isInDefsCache(cmpDef, mdri));
+        
+        assertFalse("npNSDef is not in cache", isInDefsCache(npNSDef, mdri));
+        assertFalse("npLayoutsDef is not in cache", isInDefsCache(npLayoutDef, mdri));
+        assertFalse("npRendererDef is not in cache", isInDefsCache(npRendererDef, mdri));
+        assertFalse("nsApp is not in cache", isInDefsCache(nsAppDef, mdri));
+        assertFalse("nsController is not in cache", isInDefsCache(nsControllerDef, mdri));
+        assertFalse("nsCmp is not in cache", isInDefsCache(nsCmpDef, mdri));
+        
+        MasterDefRegistry mdr2 = restartContextGetNewMDR();
+        MasterDefRegistryImpl mdri2 = (MasterDefRegistryImpl)mdr2;
+        
+        assertTrue("nsDef is in cache", isInDefsCache(nsDef, mdri2));
+        assertTrue("LayoutsDef is in cache", isInDefsCache(defs.get(DefType.LAYOUTS), mdri2));
+        assertTrue("RendererDef is in cache", isInDefsCache(rendererDef, mdri2));
+        assertTrue("app is in cache", isInDefsCache(appDef, mdri2));
+        assertTrue("controller is in cache", isInDefsCache(controllerDef, mdri2));
+        assertTrue("cmp is in cache", isInDefsCache(cmpDef, mdri2));
+        
+        assertFalse("npNSDef is not in cache", isInDefsCache(npNSDef, mdri2));
+        assertFalse("npLayoutsDef is not in cache", isInDefsCache(npLayoutDef, mdri2));
+        assertFalse("npRendererDef is notin cache", isInDefsCache(npRendererDef, mdri2));
+        assertFalse("nsApp is not in cache", isInDefsCache(nsAppDef, mdri2));
+        assertFalse("nsController is not in cache", isInDefsCache(nsControllerDef, mdri2));
+        assertFalse("nsCmp is not in cache", isInDefsCache(nsCmpDef, mdri2));
+    }
+    
+    public void testDescriptorFilterCache() throws Exception {
+        ConfigAdapter configAdapter = Aura.getConfigAdapter();
+        MasterDefRegistry mdr = getAuraMDR();
+        MasterDefRegistryImpl mdri = (MasterDefRegistryImpl)mdr;
+        Map<DefType, DefDescriptor<?>> defs = addDefsToCaches(mdri);
+        Map<DefType, DefDescriptor<?>> nonPrivDefs = addNonPriveledgedDefsToMDR(mdri);
+
+        DefDescriptor nsDef = defs.get(DefType.NAMESPACE);
+        DefDescriptor layoutDef = defs.get(DefType.LAYOUTS);
+        DefDescriptor rendererDef = defs.get(DefType.RENDERER);
+
+        DefDescriptor npNSDef = nonPrivDefs.get(DefType.NAMESPACE);
+        DefDescriptor npLayoutDef = nonPrivDefs.get(DefType.LAYOUTS);
+        DefDescriptor npRendererDef = nonPrivDefs.get(DefType.RENDERER);
+        
+        //only picking 3 defs to test the ns as they are mostly dupes
+        assertTrue(nsDef.getNamespace() + "  should have been isPriveleged", configAdapter.isPrivilegedNamespace(nsDef.getNamespace()));
+        assertTrue(layoutDef.getNamespace() + "  should have been isPriveleged", configAdapter.isPrivilegedNamespace(layoutDef.getNamespace()));
+        assertTrue(rendererDef.getNamespace() + "  should have been isPriveleged", configAdapter.isPrivilegedNamespace(rendererDef.getNamespace()));
+        
+        assertFalse(npLayoutDef.getNamespace() + "  should not have been isPriveleged", configAdapter.isPrivilegedNamespace(npLayoutDef.getNamespace()));
+        assertFalse(npNSDef.getNamespace() + "  should not have been isPriveleged", configAdapter.isPrivilegedNamespace(npNSDef.getNamespace()));
+        assertFalse(npRendererDef.getNamespace() + "  should not have been isPriveleged", configAdapter.isPrivilegedNamespace(npRendererDef.getNamespace()));
+        
+        DescriptorFilter filter = new DescriptorFilter("*://test:*");
+        Set<DefDescriptor<?>> results = mdr.find(filter);
+        assertTrue("results should be cached", isInDescriptorFilterCache(filter, results, mdri));
+        DescriptorFilter filter2 = new DescriptorFilter("*://gvpTest:*");
+        Set<DefDescriptor<?>> results2 = mdr.find(filter2);
+        assertTrue("results2 should be cached", isInDescriptorFilterCache(filter2, results2, mdri));
+        
+        DescriptorFilter filter3 = new DescriptorFilter("*://cstring:*");
+        Set<DefDescriptor<?>> results3 = mdr.find(filter3);
+        assertFalse("results3 should not be cached", isInDescriptorFilterCache(filter3, results3, mdri));
+        DescriptorFilter filter4 = new DescriptorFilter("*://cstring1:*");
+        Set<DefDescriptor<?>> results4 = mdr.find(filter4);
+        assertFalse("results4 should be cached", isInDescriptorFilterCache(filter4, results4, mdri));
+        
+        DescriptorFilter filter5 = new DescriptorFilter("*://*:*");
+        Set<DefDescriptor<?>> results5 = mdr.find(filter5);
+        assertFalse("results5 should not be cached", isInDescriptorFilterCache(filter5, results5, mdri));
+//        DescriptorFilter filter6 = new DescriptorFilter("*://*test:*");
+//        Set<DefDescriptor<?>> results6 = mdr.find(filter6);
+//        assertFalse("results6 should be cached", isInDescriptorFilterCache(filter6, results6, mdri));
+      
+        
+        MasterDefRegistry mdr2 = restartContextGetNewMDR();
+        MasterDefRegistryImpl mdri2 = (MasterDefRegistryImpl)mdr2;
+        assertTrue("results should still be cached", isInDescriptorFilterCache(filter, results, mdri2));
+        assertTrue("results2 should still be cached", isInDescriptorFilterCache(filter2, results2, mdri2));
+        assertFalse("results3 should not be cached", isInDescriptorFilterCache(filter3, results3, mdri2));
+        assertFalse("results4 should not be cached", isInDescriptorFilterCache(filter4, results4, mdri2));
+        assertFalse("results5 should not be cached", isInDescriptorFilterCache(filter5, results5, mdri2));
+//        assertFalse("results6 should not be cached", isInDescriptorFilterCache(filter6, results6, mdri2));
+    }
+    
+    private MasterDefRegistry restartContextGetNewMDR() {
+        //simulate new request
+        MasterDefRegistry mdr = getAuraMDR();
+        AuraContext ctx = Aura.getContextService().getCurrentContext();
+        Mode mode = ctx.getMode();
+        Format format = ctx.getFormat();
+        Authentication access = ctx.getAccess();
+        Aura.getContextService().endContext();
+
+        Aura.getContextService().startContext(mode, format, access);
+        MasterDefRegistry mdr2 = getAuraMDR();
+        assertFalse("MasterDefRegistry should be different after restart of context", mdr == mdr2);
+        return mdr2;
+    }
+    
+    /**
+     * Create a set of DefDescriptors and add them to the MDR caches by calling getDef() on them.
+     * 
+     * @return List of DefDescriptors that have been added to the mdr caches.
+     */
+    private Map<DefType, DefDescriptor<?>> addNonPriveledgedDefsToMDR(MasterDefRegistryImpl mdr) throws Exception {
+        DefDescriptor<NamespaceDef> namespaceDef = DefDescriptorImpl.getInstance("cstring", NamespaceDef.class);
+        DefDescriptor<ComponentDef> cmpDef = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, 
+                "<aura:component>"
+                        + "<aura:attribute name='label' type='String'/>"
+                        + "<aura:attribute name='class' type='String'/>"
+                        + "<aura:registerevent name='press' type='test:test_press'/>"
+                        + "<div onclick='{!c.press}' class='{!v.class}'>{!v.label}</div>"
+                        + "</aura:component>", "cstring:test_button", false);
+        DefDescriptor<ControllerDef> cmpControllerDef = getAuraTestingUtil().addSourceAutoCleanup(ControllerDef.class,
+                "{    press : function(cmp, event){        cmp.getEvent('press').fire();    }}",
+                "cstring.test_button", false);
+        DefDescriptor<RendererDef> otherNamespaceDef = getAuraTestingUtil().addSourceAutoCleanup(RendererDef.class,
+                "({render: function(cmp) {"
+                        + "var gvp = $A.getGlobalValueProviders();"
+                        + "cmp.getValue('v.simplevalue1').setValue(gvp.getValue('$Label' + '.Related_Lists' + '.task_mode_today', cmp));"
+                        + "cmp.getValue('v.simplevalue2').setValue(gvp.getValue('$Label.DOESNT.EXIST', cmp));"
+                        + "cmp.getValue('v.simplevalue3').setValue(gvp.getValue('$Label.Related_Lists.DOESNTEXIST', cmp));"
+                        + "// Both section and name are required. This request will return undefined and no action is requested."
+                        + "cmp.getValue('v.simplevalue4').setValue(gvp.getValue('$Label.DOESNTEXIST', cmp));"
+                        + "// These requests are here to test that there are no multiple action requests for the same $Label"
+                        + "// See LabelValueProviderUITest.java"
+                        + "var tmt = gvp.getValue('$Label.Related_Lists.task_mode_today', cmp);"
+                        + "tmt = gvp.getValue('$Label.Related_Lists.task_mode_today', cmp);"
+                        + "tmt = gvp.getValue('$Label.Related_Lists.task_mode_today', cmp);"
+                        + "tmt = gvp.getValue('$Label.Related_Lists.task_mode_today', cmp);"
+                        + "tmt = gvp.getValue('$Label.Related_Lists.task_mode_today', cmp);"
+                        + "return this.superRender();"
+                        + "}})",
+                "cstring1.labelProvider", false);
+        DefDescriptor<ApplicationDef> appInLayoutsBundleDef = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class,
+                "<aura:application>    before    <div aura:id='content'/>    after</aura:application>",
+                "cstring:layouts", false);
+        DefDescriptor<LayoutsDef> layoutsDef = getAuraTestingUtil().addSourceAutoCleanup(LayoutsDef.class,
+                "<aura:layouts default='def'>"
+                        + "<aura:layout name='def'>"
+                        + "<aura:layoutItem container='target' action='{!c.act}'/>"
+                        + "</aura:layout>"
+                        + "</aura:layouts>", "cstring:nplayout", false);
+
+        Map<DefType, DefDescriptor<?>> map = new HashMap<DefType, DefDescriptor<?>>();
+        map.put(DefType.NAMESPACE, namespaceDef);
+        map.put(DefType.COMPONENT, cmpDef);
+        map.put(DefType.CONTROLLER, cmpControllerDef);
+        map.put(DefType.RENDERER, otherNamespaceDef);
+        map.put(DefType.APPLICATION, appInLayoutsBundleDef);
+        map.put(DefType.LAYOUTS, layoutsDef);
+
+        for (DefType defType : map.keySet()) {
+            DefDescriptor<?> dd = map.get(defType);
+            dd.getDef();
+        }
+
+        return map;
     }
     
     private MasterDefRegistry getAuraMDR(){

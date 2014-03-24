@@ -20,7 +20,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedSet;
 import java.util.concurrent.locks.Lock;
 
 import org.apache.log4j.Logger;
@@ -48,6 +47,7 @@ import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.text.GlobMatcher;
 import org.auraframework.util.text.Hash;
 
 import com.google.common.base.Optional;
@@ -152,6 +152,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
         rLock.lock();
         try {
+            boolean cacheable = shouldCache(matcher);
             for (DefRegistry<?> reg : registries) {
                 //
                 // This could be a little dangerous, but unless we force all of our
@@ -160,7 +161,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                 if (reg.hasFind()) {
                     Set<DefDescriptor<?>> registryResults = null;
 
-                    if (isCacheable(reg)) {
+                    if (cacheable && isCacheable(reg)) {
                         // cache results per registry
                         String cacheKey = filterKey + "|" + reg.toString();
                         registryResults = descriptorFilterCache.getIfPresent(cacheKey);
@@ -441,7 +442,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         // Now, check if we can cache the def later, as we won't have the registry to check at a later time.
         // If we can cache, look it up in the cache. If we find it, we have a built definition.
         //
-        if (isCacheable(registry)) {
+        if (isCacheable(registry) && shouldCache(compiling.descriptor)) {
             compiling.cacheable = true;
 
             @SuppressWarnings("unchecked")
@@ -611,7 +612,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             if (cd.def != null) {
                 defs.put(cd.descriptor, cd.def);
                 if (cd.built) {
-                    if (cd.cacheable) {
+                    if (cd.cacheable) { //false for non-privileged namespaces, or non-cacheable registries
                         defsCache.put(cd.descriptor, Optional.of(cd.def));
                     }
                     cd.def.markValid();
@@ -787,7 +788,9 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             // if (de == null) {
 
             de = new DependencyEntry(uid, Collections.unmodifiableSet(deps), lmt, clientLibs);
-            depsCache.put(makeGlobalKey(de.uid, descriptor), de);
+            if (shouldCache(descriptor)) {
+                depsCache.put(makeGlobalKey(de.uid, descriptor), de);
+            }
 
             // See localDependencies comment
             localDependencies.put(de.uid, de);
@@ -834,14 +837,18 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             if (de != null) {
                 return de;
             }
-            de = depsCache.getIfPresent(makeGlobalKey(uid, descriptor));
+            if (shouldCache(descriptor)) {
+                de = depsCache.getIfPresent(makeGlobalKey(uid, descriptor));
+            }
         } else {
             // See localDependencies comment
             de = localDependencies.get(key);
             if (de != null) {
                 return de;
             }
-            de = depsCache.getIfPresent(key);
+            if (shouldCache(descriptor)) {
+                de = depsCache.getIfPresent(key);
+            }
         }
         if (de != null) {
             // See localDependencies comment
@@ -1035,7 +1042,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         if (reg == null) {
             return false;
         }
-        cacheable = isCacheable(reg);
+        cacheable = isCacheable(reg) && shouldCache(descriptor);
         if (cacheable) {
             //
             // Try our various caches.
@@ -1058,7 +1065,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                 }
             }
         }
-            regExists = reg.exists(descriptor);
+        regExists = reg.exists(descriptor);
         if (cacheable) {
             Boolean cacheVal = Boolean.valueOf(regExists);
             existsCache.put(descriptor, cacheVal);
@@ -1227,10 +1234,12 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             localDescs.clear();
         }
         localDependencies.clear();
-        depsCache.invalidateAll();
-        defsCache.invalidateAll();
-        existsCache.invalidateAll();
-        descriptorFilterCache.invalidateAll();
+        if (shouldCache(descriptor)) {
+            depsCache.invalidateAll();
+            defsCache.invalidateAll();
+            existsCache.invalidateAll();
+            descriptorFilterCache.invalidateAll();
+        }
         return false;
     }
 
@@ -1240,20 +1249,24 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
     @Override
     public String getCachedString(String uid, DefDescriptor<?> descriptor, String key) {
-        DependencyEntry de = localDependencies.get(uid);
-
-        if (de != null) {
-            return stringsCache.getIfPresent(getKey(de, descriptor, key));
+        if (shouldCache(descriptor)) {
+            DependencyEntry de = localDependencies.get(uid);
+    
+            if (de != null) {
+                return stringsCache.getIfPresent(getKey(de, descriptor, key));
+            }
         }
         return null;
     }
 
     @Override
     public void putCachedString(String uid, DefDescriptor<?> descriptor, String key, String value) {
-        DependencyEntry de = localDependencies.get(uid);
-
-        if (de != null) {
-            stringsCache.put(getKey(de, descriptor, key), value);
+        if (shouldCache(descriptor)) {
+            DependencyEntry de = localDependencies.get(uid);
+    
+            if (de != null) {
+                stringsCache.put(getKey(de, descriptor, key), value);
+            }
         }
     }
 
@@ -1317,8 +1330,33 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     private String makeGlobalKey(String uid, DefDescriptor<?> descriptor) {
         return uid + "/" + makeLocalKey(descriptor);
     }
-
-
+    
+    /**
+     * Return true if the namespace of the provided descriptor supports caching.
+     */
+    private boolean shouldCache(DefDescriptor descriptor) {
+        if (descriptor == null) {
+            return false;
+        }
+        String namespace = descriptor.getNamespace();
+        return shouldCache(namespace);
+    }
+    
+    /**
+     * Return true if the descriptor filter meets all requirements for the 
+     * result of find to be cached
+     */
+    private boolean shouldCache(DescriptorFilter filter) {
+        GlobMatcher ns = filter.getNamespaceMatch();
+        return ns.isConstant() && shouldCache(ns.toString());
+    }
+    /**
+     * Return true if the namespace supports cacheing
+     */
+    private boolean shouldCache(String namespace) {
+        ConfigAdapter configAdapter = Aura.getConfigAdapter();
+        return configAdapter.isPrivilegedNamespace(namespace);
+    }
 
 //    public static Collection<Optional<? extends Definition>> getCachedDefs() {
 //        return defsCache.asMap().values();

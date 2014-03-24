@@ -166,10 +166,12 @@ public abstract class XMLHandler<T extends Definition> {
             return false;
         }
 
-        String fullName = name.getLocalPart();
+        String fullName;
         // namespaceURI normally seems to be empty string
         if (!namespaceURI.equals("")) {
             fullName = String.format("%s:%s", namespaceURI, name.getLocalPart());
+        } else {
+            fullName = name.getLocalPart();
         }
         return SYSTEM_TAGS.contains(fullName.toLowerCase());
     }

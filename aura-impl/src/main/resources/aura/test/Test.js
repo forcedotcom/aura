@@ -647,6 +647,38 @@ var Test = function(){
         },
 
         /**
+         * Assert that the two string values provided are equal ignoring whitespace.
+         *
+         * This is important when checking constructed strings, as browsers may handle them differently.
+         *
+         * @param {string} arg1
+         * 				The argument to evaluate against arg2
+         * @param {string} arg2
+         * 				The argument to evaluate against arg1
+         * @param {String} assertMessage
+         * 				The message that is returned if the two values are not equal
+         */
+        assertEqualsIgnoreWhitespace : function(arg1, arg2, assertMessage){
+            if (arg1 === arg2) {
+                return;
+            }
+            var arg1split = arg1.split(/\s+/);
+            var arg2split = arg2.split(/\s+/);
+            var arg1s = arg1split.join(' ');
+            var arg2s = arg2split.join(' ');
+            if(arg1s!==arg2s){
+                if(!assertMessage){
+                    assertMessage = "Values not equal";
+                }
+                assertMessage += "\nExpected: {"+arg1 +"} but Actual: {"+arg2+"}";
+                if(typeof arg1 !== typeof arg2){
+                    assertMessage += "\n. Type Mismatch.";
+                }
+                throw new Error(assertMessage);
+            }
+        },
+
+        /**
          * Assert that the a string starts with another.
          * @param {Object} start 
          * 				The start string.

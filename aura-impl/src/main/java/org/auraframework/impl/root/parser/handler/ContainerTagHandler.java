@@ -15,17 +15,23 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-import javax.xml.stream.*;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.BaseComponentDef.WhitespaceBehavior;
+import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.ComponentDefRef.Load;
-import org.auraframework.service.ContextService;
-import org.auraframework.system.AuraContext;
+import org.auraframework.def.Definition;
+import org.auraframework.def.DefinitionAccess;
+import org.auraframework.def.HtmlTag;
+import org.auraframework.def.RootDefinition;
 import org.auraframework.system.Location;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidAccessValueException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
@@ -179,7 +185,7 @@ public abstract class ContainerTagHandler<T extends Definition> extends XMLHandl
     protected abstract T createDefinition() throws QuickFixException;
 
     protected <P extends RootDefinition> ParentedTagHandler<? extends ComponentDefRef, ?> getDefRefHandler(
-            RootTagHandler<P> parentHandler) {
+            RootTagHandler<P> parentHandler) throws DefinitionNotFoundException {
         String tag = getTagName();
         if (HtmlTag.allowed(tag)) {
             if (!parentHandler.getAllowsScript() && SCRIPT_TAG.equals(tag.toLowerCase())) {

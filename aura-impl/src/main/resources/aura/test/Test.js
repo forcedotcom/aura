@@ -662,10 +662,8 @@ var Test = function(){
             if (arg1 === arg2) {
                 return;
             }
-            var arg1split = arg1.split(/\s+/);
-            var arg2split = arg2.split(/\s+/);
-            var arg1s = arg1split.join(' ');
-            var arg2s = arg2split.join(' ');
+            var arg1s = arg1.replace(/\s+/gm,' ').replace(/^ | $/gm,'');
+            var arg2s = arg2.replace(/\s+/gm,' ').replace(/^ | $/gm,'');
             if(arg1s!==arg2s){
                 if(!assertMessage){
                     assertMessage = "Values not equal";

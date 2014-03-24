@@ -33,6 +33,10 @@ public final class ValidationUtilTest extends AuraValidationTestCase {
     }
 
     public void testGetAllDescriptorsIn() throws Exception {
+        if (skipTestIfNotRunningWithAuraSource()) {
+            return;
+        }
+
         Set<DefDescriptor<?>> descriptors = ValidationUtil.getAllDescriptorsIn("src/test/components/validationTest");
         assertEquals(3, descriptors.size());
         assertTrue(descriptors.contains(definitionService.getDefDescriptor("validationTest:basic", ComponentDef.class)));
@@ -40,6 +44,10 @@ public final class ValidationUtilTest extends AuraValidationTestCase {
     }
 
     public void testFindComponentSourceDirs() {
+        if (skipTestIfNotRunningWithAuraSource()) {
+            return;
+        }
+
         File path = new File("src/test/components/validationTest/basic/basicController.js");
         List<File> roots = ValidationUtil.findComponentSourceDirs(path);
         assertEquals(1, roots.size());

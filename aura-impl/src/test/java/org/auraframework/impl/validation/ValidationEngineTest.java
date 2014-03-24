@@ -86,7 +86,7 @@ public final class ValidationEngineTest extends AuraValidationTestCase {
         List<ValidationError> errors = new ValidationEngine().validate(descriptor);
         assertEquals(1, errors.size());
         assertError(
-                "src/test/components/validationTest/basic/basic.cmp [line 1, column 1] cmp/custom: Abstract component markup://validationTest:basic must be extensible",
+                "/validationTest/basic/basic.cmp [line 1, column 1] cmp/custom: Abstract component markup://validationTest:basic must be extensible",
                 errors.get(0));
     }
 }

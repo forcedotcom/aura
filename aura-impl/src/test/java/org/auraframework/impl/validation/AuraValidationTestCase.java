@@ -15,10 +15,16 @@
  */
 package org.auraframework.impl.validation;
 
+import java.io.File;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.util.validation.ValidationError;
 
 abstract class AuraValidationTestCase extends AuraImplTestCase {
+
+    protected static final Log LOG = LogFactory.getLog(AuraValidationTestCase.class);
 
     public AuraValidationTestCase(String name) {
         super(name, false);
@@ -41,5 +47,13 @@ abstract class AuraValidationTestCase extends AuraImplTestCase {
 
     protected final void assertError(String expectedMessage, ValidationError error) {
         ValidationTestUtil.assertError(expectedMessage, error);
+    }
+
+    protected final boolean skipTestIfNotRunningWithAuraSource() {
+        if (!new File("src/test/components/validationTest").exists()) {
+            LOG.info("skipping test (not running with Aura source): " + getName());
+            return true;
+        }
+        return false;
     }
 }

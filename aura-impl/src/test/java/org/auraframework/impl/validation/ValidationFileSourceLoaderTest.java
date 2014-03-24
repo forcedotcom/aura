@@ -33,9 +33,12 @@ public final class ValidationFileSourceLoaderTest extends AuraValidationTestCase
     }
 
     public void testFindIn() {
+        if (skipTestIfNotRunningWithAuraSource()) {
+            return;
+        }
+
         // find in component folder
         File root = new File("src/test/components/validationTest/basic");
-        assertTrue(root.exists());
         ValidationFileSourceLoader loader = new ValidationFileSourceLoader(AuraImplFiles.TestComponents.asFile());
         Set<DefDescriptor<?>> found = loader.findIn(root);
         assertEquals(3, found.size());

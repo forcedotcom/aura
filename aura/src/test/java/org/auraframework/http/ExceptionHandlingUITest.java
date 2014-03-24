@@ -180,7 +180,7 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
         DefDescriptor<?> cdd = addSourceAutoCleanup(
                 InterfaceDef.class,
                 "<aura:interface provider='java://org.auraframework.impl.java.provider.TestProviderThrowsDuringProvide'></aura:interface>");
-        openRaw(getAppUrl("", String.format("<%s:%s/>", cdd.getNamespace(), cdd.getName())));
+        openRaw(getAppUrl("access='GLOBAL'", String.format("<%s:%s/>", cdd.getNamespace(), cdd.getName())));
         assertNoStacktrace();
     }
 
@@ -204,7 +204,7 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
         setProdConfig();
         DefDescriptor<?> cdd = addSourceAutoCleanup(ComponentDef.class,
                 "<aura:component model='java://org.auraframework.impl.java.model.TestModelThrowsDuringInstantiation'></aura:component>");
-        openRaw(getAppUrl("", String.format("<%s:%s/>", cdd.getNamespace(), cdd.getName())));
+        openRaw(getAppUrl("access='GLOBAL'", String.format("<%s:%s/>", cdd.getNamespace(), cdd.getName())));
         assertNoStacktrace();
     }
 
@@ -257,7 +257,7 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
         DefDescriptor<?> cdd = addSourceAutoCleanup(
                 ComponentDef.class,
                 "<aura:component renderer='java://org.auraframework.impl.renderer.sampleJavaRenderers.TestRendererThrowingException'></aura:component>");
-        openRaw(getAppUrl("", String.format("<%s:%s/>", cdd.getNamespace(), cdd.getName())));
+        openRaw(getAppUrl("access='GLOBAL'", String.format("<%s:%s/>", cdd.getNamespace(), cdd.getName())));
         assertNoStacktraceServerRendering();
     }
 

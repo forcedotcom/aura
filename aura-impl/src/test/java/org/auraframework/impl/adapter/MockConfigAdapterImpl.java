@@ -127,11 +127,6 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
 
 	@Override
 	public boolean isUnsecuredNamespace(String namespace) {
-		if (super.isUnsecuredNamespace(namespace) || SYSTEM_TEST_NAMESPACES.contains(namespace)) {
-			return true;
-		}
-		
-		Set<String> namespaces = StringSourceLoader.getInstance().getNamespaces();
-		return namespaces.contains(namespace);
+		return super.isUnsecuredNamespace(namespace) || SYSTEM_TEST_NAMESPACES.contains(namespace);
 	}
 }

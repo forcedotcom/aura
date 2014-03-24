@@ -996,15 +996,15 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
     }
     
     public void testAssertAccess_StoreAccessInfoInCacheIfNotPresent()throws Exception{
-        DefDescriptor<ComponentDef> desc = addSourceAutoCleanup(ComponentDef.class, String.format(baseComponentTag, "", ""));
+        DefDescriptor<ComponentDef> desc = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, String.format(baseComponentTag, "", ""), StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testComp", false);
         when(mockAccessCheckCache.getIfPresent(anyString())).thenReturn(null);
         
         MasterDefRegistryImpl mdr = (MasterDefRegistryImpl)getAuraMDR();
-        mdr.assertAccess(null, desc.getDef(), mockAccessCheckCache);
+        mdr.assertAccess(desc, desc.getDef(), mockAccessCheckCache);
 
         verify(mockAccessCheckCache).put(anyString(),anyString());
         
-        mdr.assertAccess(null, desc.getDef(), mockAccessCheckCache);
+        mdr.assertAccess(desc, desc.getDef(), mockAccessCheckCache);
         verify(mockAccessCheckCache, times(2)).getIfPresent(anyString());
     }
     

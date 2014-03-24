@@ -17,7 +17,7 @@
 	handleApplyPressed: function(cmp, list, outCmpName) {
 		//if list contains "-" then its descending order
 		var desc = "-";
-		list = list.toString();
+		list = list[0].sortBy.toString();
 		var sortOrder;
 		//ascending order
 		if(list.indexOf(desc) > -1){

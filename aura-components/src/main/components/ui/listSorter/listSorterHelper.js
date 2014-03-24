@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 ({
-	LABELS :{'ASC' : 'A-Z', 'DESC' : 'Z-A'},
 	CONSTANTS : {ASC: 'ASC', DESC: 'DESC', DESC_PREFIX: "-"},
 		
 	doInit : function(cmp) {
@@ -151,8 +150,8 @@
 			var selectedItems = this.getSelectedMenuItems(cmp);
 			for (var i=0; i < selectedItems.length; i++) {
 				// append prefix for descending order
-				order = cmp._sortOrderMap[selectedItems[i].fieldName].order === this.CONSTANTS.DESC ? this.CONSTANTS.DESC_PREFIX : '';
-				result.push(order + selectedItems[i].fieldName);
+				order = cmp._selectedItems[i].isAscending ? '' : this.CONSTANTS.DESC_PREFIX;
+				result.push({ sortBy: order + selectedItems[i].fieldName, label: selectedItems[i].label });
 			}			
 			action.runDeprecated(result);
 		}
@@ -160,17 +159,19 @@
 	
 	/**
 	 * Reset selected items and sort orders
+	 * 
 	 */
 	reset: function(cmp) {
 		//reset sort orders
-		var sMap = cmp._sortOrderMap;
+		/*var sMap = cmp._sortOrderMap;
 		for (var prop in sMap) {
 			if (sMap.hasOwnProperty(prop)) {
 				if (!sMap[prop].selected) {
-					sMap[prop].order = this.DEFAULT_SORT_ORDER;
+					//default to ASC order
+					sMap[prop].order = this.CONSTANTS.ASC;
 				}
 			}
-		}
+		}*/
 		//reset selected menu items
 		var menuItems = cmp.find('sorterMenuList').getValue('v.childMenuItems')		 
 		for (var i=0; i < menuItems.getLength(); i++) {			 
@@ -178,6 +179,7 @@
 			if (item.get('v.selected') === true) {
 				item.getValue('v.selected').setValue(false, true);
 			}
+			item.setValue('v.isAscending', true);
 		}
 	},
 	
@@ -239,44 +241,12 @@
 		}
 	},
 	
-	updateSelectedItemsSortOrder : function(cmp, order) {
-		var selectedItems = this.getSelectedMenuItems(cmp);
-		if (selectedItems) {
-			for (var i=0; i< selectedItems.length; i++) {
-				cmp._sortOrderMap[selectedItems[i].fieldName].order = order;
-			}
-		}
-	},
-	
-	updateSortOrderPicker : function(cmp, order) {
-		var selectedLabel = 'selected';
-		if (order == this.CONSTANTS.ASC) {
-			cmp.find('ascSelected').setValue('v.value', selectedLabel);
-			cmp.find('descSelected').setValue('v.value', '');
-			$A.util.addClass(cmp.find('ascBtn').getElement(), "selected");
-			$A.util.removeClass(cmp.find('decBtn').getElement(), "selected");			
-		} else if (order == this.CONSTANTS.DESC) {
-			cmp.find('descSelected').setValue('v.value', selectedLabel);
-			cmp.find('ascSelected').setValue('v.value', '');
-			$A.util.addClass(cmp.find('decBtn').getElement(), "selected");
-			$A.util.removeClass(cmp.find('ascBtn').getElement(), "selected");
-		}
-		cmp.find('selectedSortOrderOutput').getValue('v.value').setValue(this.LABELS[order]);
-	},
-	
-	updateSortedItemsLable : function(cmp) {
+	updateSortOrder : function(cmp) {
 		var selectedItems = this.getSelectedMenuItems(cmp);
 		if (selectedItems && selectedItems.length > 0) {
 			var values = [];
 			for (var i=0; i<selectedItems.length; i++) {
-				values.push(selectedItems[i].label);
-			}
-			values = values.join(',');
-			if (values.length > 0) {
-				$A.util.removeClass(cmp.find('separator').getElement(), 'hidden');
-				cmp.find('selectedItemOutput').getValue('v.value').setValue(values);
-			} else {
-				$A.util.addClass(cmp.find('separator').getElement(), 'hidden');
+				cmp._sortOrderMap[selectedItems[i].fieldName].order = selectedItems[i].isAscending ? this.CONSTANTS.ASC : this.CONSTANTS.DESC;
 			}
 		}
 	},
@@ -289,7 +259,7 @@
 			for (var i = 0; i < menuItems.getLength(); i++) {
 				var c = menuItems.getValue(i);
 			    if (c.get('v.selected') === true) {			    	
-			    	values.push({fieldName: c.get('v.value'), label: c.get('v.label'), index: i});
+			    	values.push({fieldName: c.get('v.value'), label: c.get('v.label'), index: i, isAscending: c.get('v.isAscending')});
 			    }
 			}
 	    }
@@ -314,12 +284,11 @@
 					item = menuItems.getValue(selectedItems[i].index);
 					if (item) {
 						item.setValue('v.selected', true);
+						item.setValue('v.isAscending', selectedItems[i].ascending);
 					}
 				}
 			}
-			this.updateSortedItemsLable(cmp);
-			//support single select only for now
-			this.updateSortOrderPicker(cmp, cmp._sortOrderMap[selectedItems[0].fieldName].order);
+			this.updateSortOrder(cmp);
 		}
 	},
 	
@@ -354,8 +323,7 @@
 		if (isPhone) {
 			var viewPort = $A.util.getWindowSize(),
 				header = cmp.find('headerBar').getElement(),
-				pickerCtEl = cmp.find('sortOrderPicker').getElement(),
-				menuListHeight = viewPort.height - header.offsetHeight - pickerCtEl.offsetHeight;
+				menuListHeight = viewPort.height - header.offsetHeight;
 			
 			//fill up the whole screen
 			$A.util.addClass(cmp.find('sorterContainer').getElement(), 'phone');
@@ -367,8 +335,7 @@
 		} else {
 			//update sorter menu size to fill up the rest of the screen with the menu list
 			var header = cmp.find('headerBar').getElement(),
-				pickerCtEl = cmp.find('sortOrderPicker').getElement(),
-				menuListHeight = containerEl.offsetHeight - header.offsetHeight - pickerCtEl.offsetHeight;
+				menuListHeight = containerEl.offsetHeight - header.offsetHeight;
 			
 			cmp.find('sorterMenuList').getElement().style.height = menuListHeight + 'px';
 		}
@@ -398,15 +365,10 @@
 		            	var container = cmp.find('sorterContainer').getElement(),
 		    			currentFocus = document.activeElement,
 		    			shiftPressed = event.shiftKey,
-		    			firstFocusable = cmp.find('ascBtn').getElement(),
 		    			applyBtn = cmp.find('set').getElement();  	
 	                    if (currentFocus === applyBtn && !shiftPressed) {
 	                        $A.util.squash(event, true);
-	                        firstFocusable.focus();
-	                    } else if (currentFocus === firstFocusable && shiftPressed) {
-	                        $A.util.squash(event, true);
-	                        applyBtn.focus();
-	                    }                   
+	                    }          
 		                break;
 	            }   	
 			}

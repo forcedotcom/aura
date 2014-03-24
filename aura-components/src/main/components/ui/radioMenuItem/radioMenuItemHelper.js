@@ -14,6 +14,13 @@
  * limitations under the License.
  */
 ({
+	handleClick : function(component) {
+		var current = component.get("v.selected");
+        if (current === false) {
+        	component.setValue("v.selected", !current);
+        }
+	},
+	
     setSelected : function(component) {
         var concreteCmp = component.getConcreteComponent();
         var selected = concreteCmp.get("v.selected");

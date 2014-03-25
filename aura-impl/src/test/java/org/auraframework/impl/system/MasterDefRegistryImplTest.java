@@ -56,6 +56,7 @@ import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.DefRegistry;
+import org.auraframework.system.DependencyEntry;
 import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.system.Source;
 import org.auraframework.system.SourceListener;
@@ -73,7 +74,10 @@ import org.mockito.internal.util.MockUtil;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
-import com.google.common.cache.Cache;
+//import com.google.common.cache.Cache;
+import org.auraframework.cache.Cache;
+
+import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 
 /**
@@ -804,9 +808,9 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
      */
     private boolean isMdrCacheCleared(DefDescriptor<ComponentDef> cmpDesc, MasterDefRegistryImpl mdr, String uid)
             throws Exception {
-        Object dependencies = AuraPrivateAccessor.get(MasterDefRegistryImpl.class, "depsCache");
+    	Cache<String, DependencyEntry> dependencies = AuraPrivateAccessor.get(mdr, "depsCache");
         String key = AuraPrivateAccessor.invoke(mdr, "makeGlobalKey", uid, cmpDesc);
-        Object cacheReturn = ((Cache<?, ?>) dependencies).getIfPresent(key);
+        Object cacheReturn = dependencies.getIfPresent(key);
 
         if (cacheReturn == null && !isInDefsCache(cmpDesc, mdr)) {
             return true;
@@ -824,7 +828,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
         Map<DefType, DefDescriptor<?>> defs = addDefsToCaches(mdr);
         DefDescriptor<?> cmpDef = defs.get(DefType.COMPONENT);
-        MasterDefRegistryImpl.notifyDependentSourceChange(Collections.<WeakReference<SourceListener>> emptySet(),
+        Aura.getCachingService().notifyDependentSourceChange(Collections.<WeakReference<SourceListener>> emptySet(),
                 cmpDef, SourceListener.SourceMonitorEvent.changed, null);
 
         assertFalse("ComponentDef not cleared from cache", isInDefsCache(defs.get(DefType.COMPONENT), mdr));
@@ -843,7 +847,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
         Map<DefType, DefDescriptor<?>> defs = addDefsToCaches(mdr);
         DefDescriptor<?> namespaceDef = defs.get(DefType.NAMESPACE);
-        MasterDefRegistryImpl.notifyDependentSourceChange(Collections.<WeakReference<SourceListener>> emptySet(),
+        Aura.getCachingService().notifyDependentSourceChange(Collections.<WeakReference<SourceListener>> emptySet(),
                 namespaceDef, SourceListener.SourceMonitorEvent.changed, null);
 
         assertFalse("NamespaceDef not cleared from cache", isInDefsCache(defs.get(DefType.NAMESPACE), mdr));
@@ -865,7 +869,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
         Map<DefType, DefDescriptor<?>> defs = addDefsToCaches(mdr);
         DefDescriptor<?> layoutsDef = defs.get(DefType.LAYOUTS);
-        MasterDefRegistryImpl.notifyDependentSourceChange(Collections.<WeakReference<SourceListener>> emptySet(),
+        Aura.getCachingService().notifyDependentSourceChange(Collections.<WeakReference<SourceListener>> emptySet(),
                 layoutsDef, SourceListener.SourceMonitorEvent.changed, null);
 
         assertFalse("LayoutsDef not cleared from cache", isInDefsCache(defs.get(DefType.LAYOUTS), mdr));
@@ -912,8 +916,8 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
     }
 
     private boolean isInDefsCache(DefDescriptor<?> dd, MasterDefRegistryImpl mdr) throws Exception {
-        Object dependencies = AuraPrivateAccessor.get(MasterDefRegistryImpl.class, "defsCache");
-        Object cacheReturn = ((Cache<?, ?>) dependencies).getIfPresent(dd);
+    	Cache<DefDescriptor<?>, Optional<? extends Definition>> defs = AuraPrivateAccessor.get(mdr, "defsCache");
+        Object cacheReturn = defs.getIfPresent(dd);
 
         if (cacheReturn != null) {
             return true;

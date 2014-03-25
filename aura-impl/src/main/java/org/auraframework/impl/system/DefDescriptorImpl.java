@@ -20,17 +20,18 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.cache.Cache;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.Definition;
+import org.auraframework.def.TypeDef;
 import org.auraframework.impl.type.AuraStaticTypeDefRegistry;
 import org.auraframework.impl.util.AuraUtil;
+import org.auraframework.service.CachingService;
 import org.auraframework.service.LoggingService;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
-
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
 
 /**
  */
@@ -77,9 +78,16 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
         }
     }
 
-    private static final Cache<DescriptorKey, DefDescriptor<? extends Definition>> cache = CacheBuilder.newBuilder()
-            .concurrencyLevel(20).initialCapacity(512).maximumSize(1024 * 10).build();
 
+    private static CachingService cSrv = Aura.getCachingService();
+    
+    private static final Cache<DescriptorKey, DefDescriptor<? extends Definition>> cache = 
+            cSrv.<DescriptorKey, DefDescriptor<? extends Definition>>getCacheBuilder()
+            .setInitialSize(512)
+            .setMaximumSize(1024 * 10)
+            .setConcurrencyLevel(20)
+            .build();
+    
     /**
      * Pattern for tag descriptors : foo:bar Group 0 = QName = foo:bar Group 1 = prefix Group 2 = namespace = foo Group
      * 3 = name = bar prefix = null

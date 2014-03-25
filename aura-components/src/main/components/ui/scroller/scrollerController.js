@@ -21,15 +21,19 @@
         }
     },
     scrollTo: function(component, event, helper) {
-    	helper.handleScrollTo(component, event);
+        helper.handleScrollTo(component, event);
     },
     
     scrollBy: function(component, event, helper) {
-    	helper.handleScrollBy(component, event);
+        helper.handleScrollBy(component, event);
     },
     
     handleCanShowMoreChange: function (cmp, evt, hlp) {
-    	var newValue = evt.getParam('value').getValue();
-    	hlp.swapShowMore(cmp, newValue);
+        var newValue = evt.getParam('value').getValue();
+        hlp.swapShowMore(cmp, newValue);
+    },
+    handleCanRefreshChange: function (cmp, evt, hlp) {
+        var newValue = evt.getParam('value').getValue();
+        hlp.swapRefresh(cmp, newValue);
     }
 })

@@ -25,13 +25,11 @@ public class RegisterEventAccessAttributeEnforcementTest extends
 		testResource = TestResource.RegisterEvent;
 	}		
 	
-	/* These tests fail because event registered in a component using registerEvent is accessible when access!=GLOBAL.
-	   We should throw exception here.*/	
 	/**
 	 * Verify Default access enforcement
 	 * @throws Exception
 	 */	
-	public void _testDefaultAccess() throws Exception {
+	public void testDefaultAccess() throws Exception {
 		testCase = TestCase.DEFAULT;
 		verifyAccess(consumers);
     }
@@ -40,7 +38,7 @@ public class RegisterEventAccessAttributeEnforcementTest extends
 	 * Verify Public access enforcement
 	 * @throws Exception
 	 */
-	public void _testPublicAccess() throws Exception {
+	public void testPublicAccess() throws Exception {
 		testCase = TestCase.PUBLIC;
 		verifyAccess(consumers);
     }

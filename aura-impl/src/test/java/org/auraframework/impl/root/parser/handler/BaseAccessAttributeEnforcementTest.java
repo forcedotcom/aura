@@ -81,12 +81,11 @@ public abstract class BaseAccessAttributeEnforcementTest extends AuraImplTestCas
 			String targetNamespace = getNamespaceValue(testResourceNamespace);			
 			
 			resourceSource = "<aura:component access='GLOBAL'>" +
-							 "<aura:registerEvent name='testevent' type='"+targetNamespace+":"+eventDescriptor.getName()+"' " + (access != null ? "access='" + access + "'" : "") + " />" +			
+							 "<aura:registerEvent name='testevent' type='" + targetNamespace + ":" + eventDescriptor.getName() +"' " + (access != null ? "access='" + access + "'" : "") + " />" +			
 							 "</aura:component> ";						
 								
 		} else{		
 			resourceSource = getResourceSource();
-								
 		}
 		
 		// target

@@ -68,8 +68,6 @@ public class EventAccessAttributeEnforcementTest extends
 		verifyAccess(new TestResource[]{TestResource.Component});
     }
 	
-	/* This test fails because event is access=GLOBAL and but we can't register it in a component. An other event can extend it though.
-	   We should not throw exception here. */
 	/**
 	 * Verify Global access enforcement when event is used in aura:registerEvent
 	 * @throws Exception

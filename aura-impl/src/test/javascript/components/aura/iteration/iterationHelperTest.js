@@ -1869,75 +1869,11 @@ Test.Aura.Iteration.HelperTest = function(){
     function createSelectiveComponentsForIndex(){    	    	    	        
     	                        
         [Fact]
-        function testBodyLengthZero(){
-        	// Arrange         	                      	
-        	var targetBody={
-    			getLength:function(){
-    				return 0;
-    			}
-        	};
-        	        	        	       
-        	var targetAttributes={
-        		get:function(att){
-        			if(att=="var") return "var";
-        			if(att=="indexVar") return false;        			
-        		},
-        		getValue:function(att){
-        			if(att=="body") return targetBody;
-        			if(att=="forceServer"){
-	        			return {
-	        				getValue:function(){					
-								return 'forceServer';
-							}
-						};
-        			}
-        		},
-        		getValueProvider:function(){
-        			return '';
-        		}
-        	};        	        	        	        	
-        	
-        	var targetCmp={
-    			getAttributes:function(){
-					return targetAttributes;
-				}		        			
-        	};
-        	
-        	var targetItems={
-    			getValue:function(index){
-					return 'Some Value';
-				},
-				getLength:function(){
-    				return 0;
-    			}	        			
-        	};
-        	
-        	var targetCallback;
-        	
-        	// Act
-			targetHelper.createSelectiveComponentsForIndex(targetCmp, targetItems, 0, false, targetCallback);
-			
-			/*
-			var mark = "";
-			for (var key in targetCmp) {
-			    if (targetCmp.hasOwnProperty(key)) {
-			        if (key.indexOf("_currentSelectiveBodyCollector") == 0) {
-			            mark = key;
-			        }
-			    }
-			}
-			
-			// Assert
-            Assert.Equal([], targetCmp[mark].realBodyList);
-            Assert.Equal(targetBody.getLength(), targetCmp[mark].count);
-            Assert.Equal(targetCmp, targetCmp[mark].cmp);
-            Assert.Equal(targetCallback, targetCmp[mark].callback);
-            */
-        }
-        
-        [Fact]
         function testExpressionServiceCreate(){
         	// Arrange         	                      	
+        	var expected = true;
+        	var actual;
+        	
         	var targetBody={
     			getLength:function(){
     				return 0;
@@ -1947,7 +1883,7 @@ Test.Aura.Iteration.HelperTest = function(){
         	var targetAttributes={
         		get:function(att){
         			if(att=="var") return "var";
-        			if(att=="indexVar") return false;        			
+        			if(att=="indexVar") return 1;        			
         		},
         		getValue:function(att){
         			if(att=="body") return targetBody;
@@ -1987,6 +1923,7 @@ Test.Aura.Iteration.HelperTest = function(){
 					create: function(valueProvider, config) {
 						if(valueProvider != null) throw new Error("Wrong valueProvider used");
 						if(config != 0) throw new Error("Wrong config used");
+						actual = true;
 						return 'iv'; 
 					}					
 	            }
@@ -1997,23 +1934,10 @@ Test.Aura.Iteration.HelperTest = function(){
 			mockContext(function(){	     
 				targetHelper.createSelectiveComponentsForIndex(targetCmp, targetItems, 0, false, targetCallback);
 			});
-			
-			/*
-			var mark = "";
-			for (var key in targetCmp) {
-			    if (targetCmp.hasOwnProperty(key)) {
-			        if (key.indexOf("_currentSelectiveBodyCollector") == 0) {
-			            mark = key;
-			        }
-			    }
-			}
-			
+						
 			// Assert
-            Assert.Equal([], targetCmp[mark].realBodyList);
-            Assert.Equal(targetBody.getLength(), targetCmp[mark].count);
-            Assert.Equal(targetCmp, targetCmp[mark].cmp);
-            Assert.Equal(targetCallback, targetCmp[mark].callback);
-            */
+            Assert.Equal(expected, actual);
+            
         }
         
         [Fixture]
@@ -2118,7 +2042,31 @@ Test.Aura.Iteration.HelperTest = function(){
             	if(targetBody.getLength() == 2 && (index != 0 && index != 1)) throw new Error("Wrong index used in createSelectiveComponentsCallback()");
             	targetCmp[mark] = selectiveBodyCollector;   		        		
         		return 'callback';    		
-        	});	        
+        	});	 
+        	
+        	[Fact]
+	        function testBodyLengthZero(){
+	        	// Arrange 
+	        	expected = 0;   
+	        	actual = 0;
+	        	ivpCalled = 0;
+	        	
+	        	targetBodyLength = 0;
+	        	targetItemsLength = 0;
+				 
+	            // Act								
+				mockContext(function(){
+					mockMethod(function(){
+						targetHelper.createSelectiveComponentsForIndex(targetCmp, targetItems, 0, false, targetCallback);
+					});
+				});
+				
+				// Assert
+				Assert.Equal(expected, actual);
+				Assert.Equal(0, ivpCalled);
+				Assert.Equal(undefined, targetCmp[mark]);
+	            
+	        }  
         
 	        [Fact]
 	        function testBodyLengthOne(){
@@ -2260,39 +2208,6 @@ Test.Aura.Iteration.HelperTest = function(){
 			Assert.Equal('', targetBodyCollector.callback);
         }
     	
-    	/*
-    	[Fact]
-        function callbackNotCalled(){
-        	// Arrange 
-        	var expected = false;
-        	var actual = ''; 
-        	
-        	var newCmp={
-        		destroy:function(flag){
-        			if(flag != true) throw new Error("Wrong flag used");
-        		}
-        	};        	        	        	
-        	
-        	var targetBodyCollector={
-    			realBodyList:[],
-    			count:1,
-    			callback:function(val){    				
-    				actual=true;
-    			},    			    			
-    			cmp:{
-    				__currentSelectiveBodyCollector:''
-    			}
-        	};        	        	        	        	      	        	
-        	
-        	// Act
-        	var callback = targetHelper.createSelectiveComponentsCallback(targetBodyCollector, 0);
-			callback(newCmp);
-			
-			// Assert
-			Assert.Equal(newCmp, targetBodyCollector.realBodyList[0]);
-			Assert.Equal(expected, actual);           
-        }    
-    	*/
     	[Fact]
         function callbackCalledRealBodyLengthOne(){
     		// Arrange 
@@ -2357,6 +2272,7 @@ Test.Aura.Iteration.HelperTest = function(){
 			Assert.Equal(expected, actual);           
         }    
     }
+    
     
     [Fixture]
     function rerenderEverything(){    	    	    	        
@@ -2448,7 +2364,7 @@ Test.Aura.Iteration.HelperTest = function(){
 			Assert.Equal(true, eventCalled);
         }
     }
-    
+        
     [Fixture]
     function rerenderSelective(){    	    	    	        
     	                        
@@ -2520,9 +2436,6 @@ Test.Aura.Iteration.HelperTest = function(){
     	[Fixture]
         function noDiffIndex(){
     		
-    		var expected = true;
-        	var actual = false;  
-        	        	
         	var targetValueProvider={
     			getValue:function(val){  
         			if(val == 1){
@@ -2547,12 +2460,6 @@ Test.Aura.Iteration.HelperTest = function(){
         			};
         		}
         	};  
-        	
-        	var targetEvent={
-    			fire:function(){
-    				actual = true;
-    			}
-        	};
         	
         	var targetItems={ 
     			getValue:function(index){
@@ -2599,9 +2506,6 @@ Test.Aura.Iteration.HelperTest = function(){
         	var targetCmp={
     			getAttributes:function(){
 					return targetAttributes;
-				},
-				getEvent:function(eve){
-					if(eve == 'rerenderComplete') return targetEvent;
 				}
         	};        	        
         	        	        	        	
@@ -2622,9 +2526,7 @@ Test.Aura.Iteration.HelperTest = function(){
         	
         	[Fact]
 	        function testWithRealBodyLengthOne(){
-	        	// Arrange                	
-	    		expected = true;
-	        	actual = false;	 
+	        	// Arrange 	
 	        	targetRealBodyLength = 0;
 	        	targetRealBody.value = [];
 	        	
@@ -2637,16 +2539,13 @@ Test.Aura.Iteration.HelperTest = function(){
 	        		});
 	        	});
 				
-				// Assert
-				//Assert.Equal(expected, actual);	
+				// Assert	
 				Assert.Equal(['a','b'], targetRealBody.value);
 	        }
     		
 	    	[Fact]
 	        function testWithRealBodyLengthOne(){
-	        	// Arrange                	
-	    		expected = true;
-	        	actual = false;	 
+	        	// Arrange	 
 	        	targetRealBodyLength = 1;
 	        	targetRealBody.value = [];
 	        	
@@ -2660,15 +2559,12 @@ Test.Aura.Iteration.HelperTest = function(){
 	        	});
 				
 				// Assert
-				//Assert.Equal(expected, actual);	
 				Assert.Equal(['a','b'], targetRealBody.value);
 	        }
 	    	
 	    	[Fact]
 	        function testWithRealBodyLengthTwo(){
-	        	// Arrange                	
-	        	expected = true;
-	        	actual = false;  
+	        	// Arrange
 	        	targetRealBodyLength = 2;
 	        	targetRealBody.value = [];
 	        	        		        	
@@ -2681,8 +2577,7 @@ Test.Aura.Iteration.HelperTest = function(){
 	        		});
 	        	});
 				
-				// Assert
-				//Assert.Equal(expected, actual);	
+				// Assert	
 				Assert.Equal(['a','b'], targetRealBody.value);
 	    	}
         }
@@ -2690,9 +2585,6 @@ Test.Aura.Iteration.HelperTest = function(){
     	[Fixture]
     	function invalidDiffIndex(){
     		
-    		var expected = true;
-        	var actual = false;  
-        	
         	var targetValueProvider1Data;
         	
         	var targetValueProvider1={
@@ -2745,12 +2637,6 @@ Test.Aura.Iteration.HelperTest = function(){
         		}
         	};
         	
-        	var targetEvent={
-    			fire:function(){
-    				actual = true;
-    			}
-        	};
-        	
         	var targetItems={ 
     			getValue:function(index){
     				if(index == -1) return 'data1';
@@ -2797,9 +2683,6 @@ Test.Aura.Iteration.HelperTest = function(){
         	var targetCmp={
     			getAttributes:function(){
 					return targetAttributes;
-				},
-				getEvent:function(eve){
-					if(eve == 'rerenderComplete') return targetEvent;
 				}
         	};        	        
         	        	        	        	
@@ -2820,9 +2703,7 @@ Test.Aura.Iteration.HelperTest = function(){
     	
 	    	[Fact]
 	        function testWithRealBodyLengthOne(){
-	        	// Arrange                	
-	    		expected = true;
-	        	actual = false; 
+	        	// Arrange
 	        	targetValueProvider1Data = 'data';
 	        	targetRealBodyLength = 1;
 	        	targetRealBody.value = [];
@@ -2837,15 +2718,12 @@ Test.Aura.Iteration.HelperTest = function(){
 	        	});
 				
 				// Assert
-				//Assert.Equal(expected, actual);	
 				Assert.Equal(['a','b'], targetRealBody.value);
 	        }
 	    	
 	    	[Fact]
 	        function testWithRealBodyLengthTwo(){
-	        	// Arrange                	
-	        	expected = true;
-	        	actual = false;  	        	
+	        	// Arrange  	        	
 	        	targetValueProvider1Data = 'data1';
 	        	targetRealBodyLength = 2;
 	        	targetRealBody.value = [];
@@ -2859,17 +2737,14 @@ Test.Aura.Iteration.HelperTest = function(){
 	        		});
 	        	});
 				
-				// Assert
-				//Assert.Equal(expected, actual);	
+				// Assert	
 				Assert.Equal(['a','b'], targetRealBody.value);
 	        }
     	}
     	
     	[Fixture]
         function validDiffIndexNextItemDifferent(){
-    		var expected = true;
-        	var actual = false;          	        	
-        	        	
+    		
         	var targetValueProvider={
     			getValue:function(val){  
         			if(val == 1){
@@ -2894,12 +2769,6 @@ Test.Aura.Iteration.HelperTest = function(){
         			};
         		}
         	};  
-        	
-        	var targetEvent={
-    			fire:function(){
-    				actual = true;
-    			}
-        	};
         	
         	var targetItems={ 
     			getValue:function(index){
@@ -2930,7 +2799,7 @@ Test.Aura.Iteration.HelperTest = function(){
 				setValue:function(val){
     				if(val != 'a') throw new Error("Wrong val used in targetRealBody.setValue()");
     				this.value = val; 
-    			},
+    			}
         	};
         	
         	var targetBodyLength;
@@ -2955,9 +2824,6 @@ Test.Aura.Iteration.HelperTest = function(){
         	var targetCmp={
     			getAttributes:function(){
 					return targetAttributes;
-				},
-				getEvent:function(eve){
-					if(eve == 'rerenderComplete') return targetEvent;
 				}
         	};        	        
         	        	        	        	
@@ -2986,10 +2852,7 @@ Test.Aura.Iteration.HelperTest = function(){
     	    	
 			[Fact]
 	        function testBodyLengthZero(){
-	        	// Arrange                	
-				expected = true;
-	        	actual = false;	
-	        		        	
+	        	// Arrange  	
 	        	targetRealBodyList = ['a'];
 	        	targetBodyLength = 0;
 	        	
@@ -3005,16 +2868,12 @@ Test.Aura.Iteration.HelperTest = function(){
 	        	});
 				
 				// Assert
-				//Assert.Equal(expected, actual);	
 				Assert.Equal(['a', 'b','c'], targetRealBody.value);
 	        }
     	
 	    	[Fact]
 	        function validDiffIndexNextItemDifferentBodyLengthOne(){
-	        	// Arrange                	
-	        	expected = true;
-	        	actual = false;  
-	        	
+	        	// Arrange
 	        	var targetObj={
 	    			destroy:function(){					
 					}
@@ -3035,17 +2894,13 @@ Test.Aura.Iteration.HelperTest = function(){
 	        	});
 				
 				// Assert
-				//Assert.Equal(expected, actual);	
 				Assert.Equal(['a','b','c'], targetRealBody.value);
 	        }
     	}
-    	
+        	
     	[Fixture]
     	function validDiffIndexNextItemSame(){
     		
-    		var expected = true;
-        	var actual = false;        	        	        	    	        	        
-        	
         	var targetValueProvider={
     			getValue:function(val){  
         			if(val == 1){
@@ -3070,13 +2925,7 @@ Test.Aura.Iteration.HelperTest = function(){
         			};
         		}
         	};  
-        	
-        	var targetEvent={
-    			fire:function(){
-    				actual = true;
-    			}
-        	};
-        	
+        	        	
         	var targetItems={ 
     			getValue:function(index){
     				if(index == 1) return "data1";
@@ -3101,7 +2950,7 @@ Test.Aura.Iteration.HelperTest = function(){
 				setValue:function(val){					
     				if(val[0] != '0' || val[1] != '1') throw new Error("Wrong val used");
     				this.value = val;
-    			},
+    			}
         	};
         	
         	var targetBody={
@@ -3125,9 +2974,6 @@ Test.Aura.Iteration.HelperTest = function(){
         	var targetCmp={
     			getAttributes:function(){
 					return targetAttributes;
-				},
-				getEvent:function(eve){
-					if(eve == 'rerenderComplete') return targetEvent;
 				}
         	};        	        
         	        	        	        	
@@ -3159,14 +3005,11 @@ Test.Aura.Iteration.HelperTest = function(){
         		
         		callback(['0']);
         	});	 
-    	
-    		
-	    	[fact]
+    	    		
+	    	[Fact]
 	        function testRealBodyLengthOne(){
 	        	// Arrange                	
-	    		expected = true;
-	        	actual = false;       	        	
-	        	
+	    		
 	        	// Act
 	        	mockCreateSelectiveComponentsForIndex(function(){
 		        	mockIncrementIndices(function(){
@@ -3179,16 +3022,12 @@ Test.Aura.Iteration.HelperTest = function(){
 	        	});
 				
 				// Assert
-				Assert.Equal(expected, actual);	
 				Assert.Equal(['0','1'], targetRealBody.value);
 	        }
     	
 	    	[Fact]
 	        function testRealBodyLengthTwo(){
-	        	// Arrange                	
-	        	expected = true;
-	        	actual = false;  
-	        	
+	        	// Arrange
 	        	targetRealBody={    
         			value:[],
         			isEmpty:function(){
@@ -3206,7 +3045,7 @@ Test.Aura.Iteration.HelperTest = function(){
     				setValue:function(val){					
         				if(val[0] != '0' || val[1] != '1' || val[2] != '2') throw new Error("Wrong val used");
         				this.value = val;
-        			},
+        			}
             	};
 	        	
 	        	// Act
@@ -3221,17 +3060,13 @@ Test.Aura.Iteration.HelperTest = function(){
 	        	});
 				
 				// Assert
-				Assert.Equal(expected, actual);	
 				Assert.Equal(['0','1', '2'], targetRealBody.value);
 	        }
     	}
-    	
+    
     	[Fixture]
-        function validDiffIndexNextItemSame(){
-    		// Arrange                	
-        	var expected;
-        	var actual; 
-        	
+        function validDiffIndexNextItemSameExtras(){
+    		// Arrange 
         	var targetObj={
     			destroy:function(){					
 				}
@@ -3262,12 +3097,6 @@ Test.Aura.Iteration.HelperTest = function(){
         		}
         	};  
         	
-        	var targetEvent={
-    			fire:function(){
-    				actual = true;
-    			}
-        	};
-        	
         	var targetItems={ 
     			getValue:function(index){
     				if(index == 1) return "data1";
@@ -3292,7 +3121,7 @@ Test.Aura.Iteration.HelperTest = function(){
 				setValue:function(val){
     				if(val != '0') throw new Error("Wrong val used");
     				this.value = val;
-    			},
+    			}
         	};
         	
         	var targetBody={
@@ -3316,9 +3145,6 @@ Test.Aura.Iteration.HelperTest = function(){
         	var targetCmp={
     			getAttributes:function(){
 					return targetAttributes;
-				},
-				getEvent:function(eve){
-					if(eve == 'rerenderComplete') return targetEvent;
 				}
         	};        	        
         	        	        	        	
@@ -3354,9 +3180,7 @@ Test.Aura.Iteration.HelperTest = function(){
 	    	[Fact]
 	        function testWithOneExtra(){
 	    		// Arrange
-	    		expected = true;
-	        	actual = false;
-	        	
+	    		
 	    		// Act
 	        	mockCreateSelectiveComponentsForIndex(function(){
 		        	mockIncrementIndices(function(){
@@ -3368,17 +3192,13 @@ Test.Aura.Iteration.HelperTest = function(){
 		        	});
 	        	});
 				
-				// Assert
-				//Assert.Equal(expected, actual);	
+				// Assert	
 				Assert.Equal(['0'], targetRealBody.value);
 	        }
 	    	
 	    	[Fact]
 	        function testWithTwoExtra(){
-	        	// Arrange                	
-	        	expected = true;
-	        	actual = false;  
-	        	
+	        	// Arrange
 	        	targetRealBody={    
         			value:[],
         			isEmpty:function(){
@@ -3396,7 +3216,7 @@ Test.Aura.Iteration.HelperTest = function(){
     				setValue:function(val){
         				if(val[0] != '0' || val[1] != '1') throw new Error("Wrong val used");
         				this.value = val;
-        			},
+        			}
             	};
 	        	
 	        	// Act
@@ -3410,8 +3230,7 @@ Test.Aura.Iteration.HelperTest = function(){
 		        	});
 	        	});
 				
-				// Assert
-				//Assert.Equal(expected, actual);	
+				// Assert	
 				Assert.Equal(['0', '1'], targetRealBody.value);
 	        } 
     	}

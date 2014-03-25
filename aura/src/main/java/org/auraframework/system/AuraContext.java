@@ -107,7 +107,10 @@ public interface AuraContext {
     }
         
     public static enum Access {
-    	PUBLIC, GLOBAL, PRIVATE, INTERNAL
+        PUBLIC,  
+        GLOBAL, 
+        PRIVATE,
+        INTERNAL
     }
     
     /**

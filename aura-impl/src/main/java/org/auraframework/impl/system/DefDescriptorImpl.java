@@ -331,6 +331,7 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
                 return result;
             }
         }
+        
         return new DefDescriptorImpl<E>(qualifiedName, defClass);
     }
 
@@ -345,17 +346,20 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
         if (name == null || defClass == null) {
             throw new AuraRuntimeException("descriptor is null");
         }
+        
         DescriptorKey dk = new DescriptorKey(name, defClass);
         @SuppressWarnings("unchecked")
         DefDescriptor<E> result = (DefDescriptor<E>) cache.getIfPresent(dk);
         if (result == null) {
             result = buildInstance(name, defClass);
+            
             // Our input names may not be qualified, but we should ensure that
             // the fully-qualified is properly cached to the same object.
             // I'd like an unqualified name to either throw or be resolved first,
             // but that's breaking or non-performant respectively.
             if (!dk.name.equals(result.getQualifiedName())) {
                 DescriptorKey fullDK = new DescriptorKey(result.getQualifiedName(), defClass);
+                
                 @SuppressWarnings("unchecked")
                 DefDescriptor<E> fullResult = (DefDescriptor<E>) cache.getIfPresent(fullDK);
                 if (fullResult == null) {
@@ -365,8 +369,10 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
                     result = fullResult;
                 }
             }
+            
             cache.put(dk, result);
         }
+        
         return result;
     }
 

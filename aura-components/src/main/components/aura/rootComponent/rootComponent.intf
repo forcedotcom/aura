@@ -15,4 +15,4 @@
     limitations under the License.
 
 -->
-<aura:interface support="GA" description="This is a marker interface for top-level components like aura:component, aura:expression, and aura:html"/>
+<aura:interface access="GLOBAL" support="GA" description="This is a marker interface for top-level components like aura:component, aura:expression, and aura:html"/>

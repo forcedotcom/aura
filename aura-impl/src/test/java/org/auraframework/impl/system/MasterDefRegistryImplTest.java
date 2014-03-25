@@ -962,6 +962,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
     public void testAssertAccess_IfReferencedByUnsecuredPrefixThenPassesCheck()throws Exception{
         when(globalDef.getAccess()).thenReturn(defAccess);
         when(defAccess.isGlobal()).thenReturn(false);
+        when(defAccess.requiresAuthentication()).thenReturn(true);
         when(referencingDesc.getPrefix()).thenReturn("aura");
         MasterDefRegistry mdr = getAuraMDR();
         mdr.assertAccess(referencingDesc, globalDef);

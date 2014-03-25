@@ -33,6 +33,7 @@ import org.auraframework.def.ClientLibraryDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
+import org.auraframework.def.DefinitionAccess;
 import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.root.DependencyDefImpl;
@@ -1121,9 +1122,10 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 	    return hasAccess(referencingDescriptor, def, accessCheckCache);
 	}
 	
-    private <D extends Definition> String hasAccess(DefDescriptor<?> referencingDescriptor, D def, Cache<String, String> accessCheckCache) {
-		// If the def is access="global" then anyone can see it
-    	if (def.getAccess().isGlobal()) {
+    <D extends Definition> String hasAccess(DefDescriptor<?> referencingDescriptor, D def, Cache<String, String> accessCheckCache) {
+		// If the def is access="global" or does not require authentication then anyone can see it
+    	DefinitionAccess access = def.getAccess();
+		if (access.isGlobal() || !access.requiresAuthentication()) {
     		return null;
     	}
     	

@@ -22,6 +22,7 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.auraframework.Aura;
+import org.auraframework.cache.Cache;
 import org.auraframework.clientlibrary.ClientLibraryResolver;
 import org.auraframework.clientlibrary.ClientLibraryResolverRegistry;
 import org.auraframework.clientlibrary.ClientLibraryService;
@@ -38,8 +39,11 @@ import org.auraframework.throwable.quickfix.ClientLibraryException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
+
+
+
+//import com.google.common.cache.Cache;
+//import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
@@ -48,14 +52,18 @@ import com.google.common.collect.Sets;
  */
 public class ClientLibraryServiceImpl implements ClientLibraryService {
 
-    private final static int CACHE_SIZE = 300;
 
-    private final static Cache<String, String> outputCache = CacheBuilder.newBuilder()
-            .initialCapacity(CACHE_SIZE).maximumSize(CACHE_SIZE).softValues().build();
+    private final Cache<String, String>  outputCache;
+    private final Cache<String, Set<String>>  urlsCache;
 
-    private final static Cache<String, Set<String>> urlsCache = CacheBuilder.newBuilder()
-            .initialCapacity(CACHE_SIZE).maximumSize(CACHE_SIZE).softValues().build();
 
+    public ClientLibraryServiceImpl() {
+    
+    	outputCache = Aura.getCachingService().getClientLibraryOutputCache();
+    
+        urlsCache = Aura.getCachingService().getClientLibraryUrlsCache();
+    }
+  
     /**
      * Gets resolver for resolution. Empty string if none
      *
@@ -371,8 +379,9 @@ public class ClientLibraryServiceImpl implements ClientLibraryService {
     private static class SourceNotifier implements SourceListener {
         @Override
         public void onSourceChanged(DefDescriptor<?> source, SourceMonitorEvent event, String filePath) {
-            outputCache.invalidateAll();
-            urlsCache.invalidateAll();
+        	
+            Aura.getCachingService().getClientLibraryOutputCache().invalidateAll();
+            Aura.getCachingService().getClientLibraryUrlsCache().invalidateAll();
         }
     }
 }

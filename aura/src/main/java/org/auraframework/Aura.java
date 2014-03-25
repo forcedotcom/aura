@@ -17,13 +17,30 @@ package org.auraframework;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.auraframework.adapter.*;
+import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.adapter.DefinitionParserAdapter;
+import org.auraframework.adapter.ExceptionAdapter;
+import org.auraframework.adapter.LocalizationAdapter;
+import org.auraframework.adapter.StyleAdapter;
 import org.auraframework.clientlibrary.ClientLibraryService;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.Definition;
-import org.auraframework.instance.*;
-import org.auraframework.service.*;
-import org.auraframework.system.*;
+import org.auraframework.instance.Application;
+import org.auraframework.instance.Component;
+import org.auraframework.instance.Instance;
+import org.auraframework.service.BuilderService;
+import org.auraframework.service.CachingService;
+import org.auraframework.service.ClientService;
+import org.auraframework.service.ContextService;
+import org.auraframework.service.DefinitionService;
+import org.auraframework.service.InstanceService;
+import org.auraframework.service.IntegrationService;
+import org.auraframework.service.LocalizationService;
+import org.auraframework.service.LoggingService;
+import org.auraframework.service.RenderingService;
+import org.auraframework.service.SerializationService;
+import org.auraframework.service.ServerService;
+import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
@@ -163,6 +180,15 @@ public class Aura {
         return Aura.get(ClientLibraryService.class);
     }
 
+    
+    /**
+     * Gets the caching service: a general service for setting and getting arbitrary blobs based on a key
+     * Encapsulates the access to aura's known caches.
+     */
+    public static CachingService getCachingService() {
+        return Aura.get(CachingService.class);
+    }
+    
     public static <T> T get(Class<T> type) {
         return ServiceLocator.get().get(type);
     }

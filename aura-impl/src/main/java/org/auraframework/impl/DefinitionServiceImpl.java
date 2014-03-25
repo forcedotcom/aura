@@ -28,7 +28,6 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
 import org.auraframework.impl.system.DefDescriptorImpl;
-import org.auraframework.impl.system.MasterDefRegistryImpl;
 import org.auraframework.impl.system.SubDefDescriptorImpl;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
@@ -299,7 +298,7 @@ public class DefinitionServiceImpl implements DefinitionService {
                 listeners.remove(i);
             }
         }
-        MasterDefRegistryImpl.notifyDependentSourceChange(listeners, source, event, filePath);
+        Aura.getCachingService().notifyDependentSourceChange(listeners, source, event, filePath);
     }
 
     @Override

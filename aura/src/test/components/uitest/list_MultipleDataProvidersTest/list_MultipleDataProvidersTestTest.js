@@ -99,6 +99,12 @@
 			// get data from another provider.
 			this.pushButton(cmp, "btnIndex", 25);
 		}, function(cmp) {
+			var errorMessage = "Index is out of bounds for list's data provider trigger.";
+            //$A.test.expectAuraError(errorMessage); TODO : This is failing?
+            var actual = $A.test.getAuraErrorMessage();
+            $A.test.assertTrue($A.test.contains(actual, errorMessage),
+                    "Expected '" + errorMessage+"', Got:'"+actual+"'");
+            
 			// verify data didnt change.
 			this.verifyItems(cmp, this.expectedDataProvider1Data);
 			// verify no loading indicator.

@@ -69,6 +69,7 @@
     <aura:registerEvent name="scrollBy" type="ui:scrollBy"     description="The event fired when the scroller should move to a new destination relative to its current position"/>
     <aura:handler       name="scrollBy" action="{!c.scrollBy}" description="Catches the event fired when the scroller should move to a new destination relative to its current position"/>
 
+    <aura:handler       name="change" value="{!v.canRefresh}" action="{!c.handleCanRefreshChange}" description="Handler called when the canShowMore attribute changes"/>
     <aura:handler       name="change" value="{!v.canShowMore}" action="{!c.handleCanShowMoreChange}" description="Handler called when the canShowMore attribute changes"/>
 
     <ui:resizeObserver onresize="{!c.refresh}"/>

@@ -91,6 +91,13 @@
             scroller.togglePullToLoadMore(newValue);
         }
     },
+    swapRefresh: function (cmp, newValue) {
+        var scroller = this.getScrollerInstance(cmp);
+        if (scroller && scroller.togglePullToRefresh) {
+            scroller.opts.pullToRefresh = newValue;
+            scroller.togglePullToRefresh(newValue);
+        }
+    },
 /*
 * ========================= 
 * PRIVATE HELPER METHODS
@@ -294,12 +301,17 @@
         }, true)
     },
     deactivate: function(component) {
-        var scroller = this.getScrollerInstance(component),
-            wrapper  = this._getScrollerWrapper(component);
+        var namespace = this.getScrollerNamespace(),
+            scroller  = this.getScrollerInstance(component),
+            wrapper   = this._getScrollerWrapper(component);
 
         if (component.get('v.preventDefaultOnMove')) {
             wrapper.removeEventListener('touchmove', this._preventDefault, false);
         }
+
+        // #if {"excludeModes" : ["PRODUCTION"]}
+        delete namespace.instances[component.getGlobalId()];
+        // #end
 
         if (scroller) {
             scroller.destroy();

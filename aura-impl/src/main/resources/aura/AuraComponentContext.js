@@ -41,9 +41,9 @@ $A.ns.AuraComponentContext.prototype.Frame = function(cmp) {
  * @returns old (covered-over) context component, or undefined at top of stack
  */
 $A.ns.AuraComponentContext.prototype.push = function(cmp) {
-    var prior = this.stack.length ? this.stack[this.stack.length - 1] : undefined;
+    var prior = this.stack.length ? this.stack[this.stack.length - 1].cmp : undefined;
     this.stack.push(new this.Frame(cmp));
-    return prior ? prior.cmp : undefined;
+    return prior;
 };
 
 /**
@@ -120,4 +120,3 @@ $A.ns.AuraComponentContext.prototype.clearNote = function(k) {
     }
     delete top[k];
 };
-

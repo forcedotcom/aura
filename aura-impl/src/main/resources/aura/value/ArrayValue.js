@@ -632,9 +632,6 @@ ArrayValue.prototype.rerender = function(suppliedReferenceNode, appendChild, ins
 
     var prevRendered = this.rendered || {};
     var rendered = {};
-    /** Since ArrayValue has no getElements, we'd better have rerender return them all */
-    var elems = [];
-
     //
     // These three variables are used to ensure that we do not lose our reference node when the
     // contents are removed. Basically, if the array is empty, we declare that we need a reference
@@ -664,55 +661,39 @@ ArrayValue.prototype.rerender = function(suppliedReferenceNode, appendChild, ins
 
             var globalId = item.getGlobalId();
             var itemReferenceNode;
-            var itemElems;
             if (!item.isRendered()) {
                 //
                 // If the item was not previously rendered, we render after the last element.
                 //
-                itemElems = $A.render(item);
-                if (itemElems.length > 0) {
+                var ret = $A.render(item);
+                if (ret.length > 0) {
                     // Just use the last element as the reference node
-                    itemReferenceNode = itemElems[itemElems.length - 1];
+                    itemReferenceNode = ret[ret.length - 1];
                 } else {
                     //
                     // If nothing was rendered put in a placeholder so that we
                     // can find the element. (FIXME W-1835211: this needs tests -- is it removed?.)
                     //
                     itemReferenceNode = this.createLocator(" item {rerendered, index:" + j + "} " + item);
-                    itemElems.push(itemReferenceNode);
+                    ret.push(itemReferenceNode);
                 }
 
                 // When adding children and index is zero, referenceNode still points to parent, 
                 // and we need to call insertFist(), not appendChild()
                 var asFirst = (j === 0);
-                insertElements(itemElems, referenceNode, !appendChild, asFirst);
+                insertElements(ret, referenceNode, !appendChild, asFirst);
 
                 $A.afterRender(item);
             } else {
-                itemElems = $A.rerender(item);
-                // Find the item reference node.  We have prevRendered, but can't trust it: the
-                // elem might have rerendered away.  So, go hunting....
-                if (itemElems) {
-                    // itemElems is an array, take the last one
-                    itemReferenceNode = itemElems[itemElems.length - 1];
-                } else {
-                    // Get the funky elements object, find the last
-                    itemElems = item.getElements();
-                    if (itemElems[0]) {
-                        for (var k = 0; itemElems[k]; ++k) {
-                            itemReferenceNode = itemElems[k];
-                        }
-                    } else {
-                        itemReferenceNode = itemElems['element'];
-                    }
+                $A.rerender(item);
+
+                itemReferenceNode = prevRendered[globalId];
+                if (!itemReferenceNode) {
+                    itemReferenceNode = item.getElement();
                 }
             }
             if (firstReferenceNode === null) {
                 firstReferenceNode = itemReferenceNode;
-            }
-            itemElems = item.getElements();
-            for (k = 0; itemElems[k]; ++k) {
-                elems.push(itemElems[k]);
             }
 
             //
@@ -751,18 +732,12 @@ ArrayValue.prototype.rerender = function(suppliedReferenceNode, appendChild, ins
             }
         }
     }
-    if (elems.length === 0 && firstReferenceNode) {
-        // Symmetrically to render(), if there are no "real" elements, use the
-        // reference node.
-        elems.unshift(firstReferenceNode);
-    }
     if (firstReferenceNode === null) {
         firstReferenceNode = startReferenceNode;
     }
     this.setReferenceNode(firstReferenceNode);
 
     this.rendered = rendered;
-    return elems;
 };
 
 /**

@@ -48,11 +48,13 @@ public class AuraStaticTypeDefRegistry extends StaticDefRegistryImpl<TypeDef> {
         defs.put("Aura.ComponentDefRef[]", new ComponentDefRefArrayTypeDef.Builder().build());
         // TODO: non array defref type
         defs.put("Aura.Action", new ActionTypeDef.Builder().build());
+
         JavaTypeDefFactory factory = new JavaTypeDefFactory(null);
         for (String baseType : baseTypes) {
             try {
                 defs.put(baseType, factory.getDef(DefDescriptorImpl.getInstance(String.format("aura://%s", baseType),
                         TypeDef.class)));
+                
                 String listType = String.format("List<%s>", baseType);
                 defs.put(listType, factory.getDef(DefDescriptorImpl.getInstance(String.format("aura://%s", listType),
                         TypeDef.class)));

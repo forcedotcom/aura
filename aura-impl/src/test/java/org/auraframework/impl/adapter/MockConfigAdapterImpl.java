@@ -37,7 +37,7 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
     		"auratest", "actionsTest", "attributesTest", "auraStorageTest", "gvpTest", "preloadTest", "clientLibraryTest", "clientApiTest", 
     	"clientServiceTest", "componentTest", "docstest", "expressionTest", "forEachDefTest", "forEachTest", "handleEventTest", "ifTest", "iterationTest", 
     	"layoutServiceTest", "listTest", "loadLevelTest", "performanceTest", "renderingTest", "setAttributesTest", "test", "themeSanityTest", "uitest", "utilTest", 
-    	"updateTest", "whitespaceBehaviorTest").build();
+    	"updateTest", "whitespaceBehaviorTest", "appCache").build();
 
     
     private Boolean isClientAppcacheEnabled = null;
@@ -124,7 +124,7 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
         
         return false;
 	}
-
+	
 	@Override
 	public boolean isUnsecuredNamespace(String namespace) {
 		return super.isUnsecuredNamespace(namespace) || SYSTEM_TEST_NAMESPACES.contains(namespace);

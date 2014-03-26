@@ -21,6 +21,7 @@
                 renderer="js://aura.component, java://org.auraframework.renderer.ComponentRenderer"
                 implements="aura:rootComponent"
                 support="GA"
+                access="GLOBAL"
                 description="The root of the component hierarchy. Provides a default rendering implementation.">
 
     <!-- required framework client libraries -->

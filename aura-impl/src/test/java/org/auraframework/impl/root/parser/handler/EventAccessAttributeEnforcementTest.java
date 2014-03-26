@@ -72,7 +72,7 @@ public class EventAccessAttributeEnforcementTest extends
 	 * Verify Global access enforcement when event is used in aura:registerEvent
 	 * @throws Exception
 	 */	
-	public void _testGlobalAccessForRegisterEvent() throws Exception {
+	public void testGlobalAccessForRegisterEvent() throws Exception {
 		testCase = TestCase.GLOBAL;
 		verifyAccess(new TestResource[]{TestResource.Component});
     }

@@ -82,9 +82,9 @@ RendererDef.prototype.rerender = function RendererDef$Rerender(component) {
     var renderer = component.getRenderer();
     if (this.rerenderMethod) {
         var helper = component.getDef().getHelper();
-        return this.rerenderMethod.call(renderer, component, helper);
+        this.rerenderMethod.call(renderer, component, helper);
     } else if (renderer["superRerender"]) {
-        return renderer["superRerender"]();
+        renderer["superRerender"]();
     }
 };
 

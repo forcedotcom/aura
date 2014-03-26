@@ -694,7 +694,7 @@ var ComponentPriv = (function() { // Scoping priv
             };
 
             renderer["superRerender"] = function() {
-                return superRenderer.def.rerender(superRenderer.renderable);
+                superRenderer.def.rerender(superRenderer.renderable);
             };
 
             renderer["superAfterRender"] = function() {
@@ -777,36 +777,12 @@ var ComponentPriv = (function() { // Scoping priv
      * it would mess with encapsulation and because the (internal) renderer is
      * what, by definition, "knows" the container.
      *
-     * We actually store only the global ID for parent and sibling, because
-     * otherwise we get components with large and even cyclic structures, and
-     * that does bad things to debug tools, json, etc.
-     *
      * @param {Component} parent the parent component
      * @param {Component} priorSibling the earlier child of parent, or undefined
      */
     Component.prototype.setRenderContainer = function(parent, priorSibling) {
-        $A.assert(parent !== this);
-        $A.assert(priorSibling !== this);
-
-//#if {"excludeModes" : ["PRODUCTION"]}
-        // This should be a needless loop cost, so let's leave it out in production.
-        // But I've found enough screwiness in nesting combinations of (re/un)render
-        // that in debug it might be worthwhile.  If a cycle IS created, you get a
-        // fun-to-debug infinite loop in AuraRenderingService_private.reorderForContainment,
-        // or an even more fun error about "Object has too long reference chain(must not
-        // be longer than 1000)" when something internal tries serializing the cycle. 
-        var cyclic = {};
-        cyclic[this.getGlobalId()] = this;
-        var dad = parent;
-        while (dad) {
-            $A.assert(!cyclic[dad.getGlobalId()], "cyclic parentage");
-            cyclic[dad.getGlobalId()] = dad;
-            dad = dad.getRenderContainer();
-        }
-//#end
-
-        this.priv.container = parent ? parent.getGlobalId() : undefined;
-        this.priv.priorSibling = priorSibling ? priorSibling.getGlobalId() : undefined;
+        this.priv.container = parent;
+        this.priv.priorSibling = priorSibling;
     };
 
     /** @private@
@@ -817,8 +793,7 @@ var ComponentPriv = (function() { // Scoping priv
      * the context inside which it is used.
      */
     Component.prototype.getRenderContainer = function() {
-        var id = this.priv.container;
-        return id ? $A.componentService.get(id) : undefined;
+        return this.priv.container;
     };
 
     /** @private@
@@ -830,121 +805,7 @@ var ComponentPriv = (function() { // Scoping priv
      * the context inside which it is used.
      */
     Component.prototype.getRenderPriorSibling = function() {
-        var id = this.priv.priorSibling;
-        return id ? $A.componentService.get(id) : undefined;
-    };
-
-    /** @private@
-     * Updates the elements for a contained component's re-render.
-     * Replaces in this components' elements, the "oldElems" list with "newElems,"
-     * assuming oldElems is found.  Sometimes oldElems has already been unrendered
-     * and destroyed, in which case newElems is spliced in to create a two-step
-     * replacement rather than a simple single-step one, but with the same net
-     * effect.
-     *
-     * @param prevElem {Element} undefined if there are no prior siblings, else
-     *                  the last DOM element *before* oldElems
-     * @param oldElems {Object} our funky almost-an-array cmp.priv.elements list
-     *                  of what should be (or perhaps has been) removed
-     * @param newElems {Object} a replacement for oldElems
-     *
-     * @returns true if a change was made, false if not found (which implies the
-     *    contained child's elements are not part of this component or its ancestors'
-     *    elements).
-     */
-    Component.prototype.updateElements = function(prevElem, oldElems, newElems) {
-        var start = 0;
-        var elems = this.getElements();
-        var i;
-
-        if (prevElem) {
-            // I really wish we used an Array for elements, not the Object-almost-an-array
-            // that we do use.  Anyway, this code is really just looking for prevElem in
-            // this.getElements(), returning false if not found, and otherwise splicing to
-            // replace oldElems with newElems and returning true.
-            for (start = 0; elems[start]; ++start) {
-                if (elems[start] === prevElem) {
-                    break;
-                }
-            }
-            if (!elems[start]) {  // Didn't find it
-                $A.error("Rerender couldn't find prior element to use when updating container");
-            }
-            start++;  // Move start to be an insertion point, after priorElem
-        }
-
-        // Check that, if any, ALL of oldElems are found.  It'd be weird to have a
-        // partial subset rather than all-of-nothing.
-        if (elems[start] === oldElems[0]) {
-            for (i = 1; oldElems[i]; ++i) {
-                $A.assert(oldElems[i] === elems[start + i],
-                        "Found too few stale elements (only " + i + ")");
-            }
-        } else {
-            // just pretend we're splicing from an empty oldElems
-            oldElems = {};
-        }
-        // And our splice... we need to know the new and old lengths, first
-        var newLen;
-        for (newLen = 0; newElems[newLen]; ++newLen) {
-            // count items in newElems
-        }
-        var oldLen;
-        for (oldLen = 0; oldElems[oldLen]; ++oldLen) {
-            // count items in oldElems
-        }
-        // Now, splice.
-        if (newLen <= oldLen) {
-            // Copy new onto old (it fits), then any extras fold down
-            for (i = 0; i < newLen; ++i) {
-                elems[start + i] = newElems[i];
-            }
-            for (; elems[i]; ++i) {
-                if (elems[start + oldLen + i]) {
-                    elems[start + i] = elems[start + oldLen + i];
-                } else {
-                    delete elems[start + i];
-                }
-            }
-        } else {
-            // New doesn't fit into old.  We need to move extra stuff up, top first, then copy.
-            for (i = 0; elems[i + 1]; ++i) {
-                // count i up to index of last *present* value
-            }
-            var delta = newLen - oldLen;
-            for (; i >= start + oldLen; --i) {
-                // from end backwards, copy post-oldElems items up by delta, stopping at end of oldElems sequence
-                elems[i + delta] = elems[i];
-            }
-            // Now we've made room, copy new into elems
-            for (i = 0; i < newLen; ++i) {
-                elems[start + i] = newElems[i];
-            }
-        }
-        // Splicing done.  elems[start] to elems[newLen] are now a match to newElems, replacing
-        // elems[start] to elems[oldLen] which WAS a match to oldElems.
-
-        // If elems.element happens to be one end or the other of the oldElems, replace it from
-        // the newElems, or if that's empty, from other bits of elems (or delete it).
-        if (elems.element === oldElems[0]) {
-            if (newLen > 0) {
-                elems.element = newElems[0];
-            } else if (start > 0) {
-                elems.element = elems[start - 1];
-            } else {
-                delete elems.element;
-            }
-        } else if (elems.element === oldElems[oldLen - 1]) {
-            if (newLen > 0) {
-                elems.element = newElems[newLen - 1];
-            } else if (elems[start]) {
-                elems.element = elems[start];
-            } else {
-                delete elems.element;
-            }
-        }
-
-        return true;
+        return this.priv.priorSibling;
     };
 
     ComponentPriv.prototype.outputArrayValue = function(value, avp, serialized, depth) {

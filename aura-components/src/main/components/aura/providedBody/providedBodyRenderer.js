@@ -27,7 +27,7 @@
 
     rerender: function(component){
         var body = component.getAttributes().getValue("realbody");
-        return $A.rerender(body);
+        $A.rerender(body);
     },
 
     unrender : function(component){

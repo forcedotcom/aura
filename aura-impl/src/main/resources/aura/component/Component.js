@@ -728,7 +728,6 @@ Component.prototype.associateElement = function(config){
         }
 
         priv.elements[config["name"]] = config["element"];
-
         priv.associateRenderedBy(this, config["element"]);
     }
 };

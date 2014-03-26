@@ -74,7 +74,12 @@ var AuraRenderingService = function AuraRenderingService(){
                 var startTime = (new Date()).getTime();
                 //#end                     
 
-                this.rerender(cmps);
+                priv.setNewRerenderContext();
+                try {
+                    this.rerender(cmps);
+                } finally {
+                    priv.clearNewRerenderContext();
+                }
 
                 //#if {"modes" : ["STATS"]}
                 if (cmps.length > 0) {
@@ -132,23 +137,21 @@ var AuraRenderingService = function AuraRenderingService(){
                 if (!cmp["getDef"]) {
                     // If someone passed a config in, construct it.
                     cmp = $A.componentService.newComponentDeprecated(cmp, null, false, true);
-
                     // And put the constructed component back into the array.
                     array[x] = cmp;
                 }
-                var priorSibling = cmp.getRenderPriorSibling();
+
                 var container = priv.push(cmp);
                 try {
                     if (cmp.isValid()) {
                         var renderer = cmp.getRenderer();
                         var elements = renderer.def.render(renderer.renderable) || [];
-                        cmp.setRenderContainer(container, priorSibling);
-                        priv.finishRender(cmp, elements, ret, parent);
+                        priv.finishRender(cmp, elements, ret);
+                        priv.insertElements(ret, parent);
                     }
                 } finally {
                     priv.pop(cmp);
                 }
-                priv.insertElements(ret, parent);
             }
             return ret;
         },
@@ -196,29 +199,80 @@ var AuraRenderingService = function AuraRenderingService(){
             }
             try {
                 if (component.auraType === "Value" && component.toString() === "ArrayValue"){
-                    var visitMark = component.get(0);
-                    if (!visitMark || !this.visited[visitMark.getGlobalId()]) {
-                        component.rerender(referenceNode, appendChild, priv.insertElements);
-                    }
-                    return;
+                    return component.rerender(referenceNode, appendChild, priv.insertElements);
                 }
 
+                var allElems = [];
                 var array = priv.getArray(component);
                 array = priv.reorderForContainment(array);
                 for (var i = 0; i < array.length; i++){
                     var cmp = array[i];
                     if (cmp.isValid()) {
-                        visitMark = (cmp instanceof ArrayValue) ? cmp.get(0) : cmp;
-                        if (!visitMark || !this.visited[visitMark.getGlobalId()]) {
-                            if (visitMark) {
-                                this.visited[visitMark.getGlobalId()] = true;
+                        if (this.visited[cmp.getGlobalId()]) {
+                            // we already visited this rerender; return the new elems per contract,
+                            // but skip the actual work:
+                            var startLen = allElems.length;
+                            var elems = cmp.getElements();
+                            for (var j = 0; j in elems; ++j) {
+                                allElems.push(elems[j]);
+                            }
+                            if (allElems.length === startLen && element in elems) {
+                                allElems.push(elems['element']);
+                            }
+                            continue;  // next item
+                        }
+
+                        // Otherwise, we're visiting a new-to-this-rerender component
+                        this.visited[cmp.getGlobalId()] = true;
+                        priv.push(cmp);
+                        try {
+                            // We use a copy of the old elements to decide whether we have a
+                            // DOM change.
+                            var oldElems = priv.copyElems(cmp);
+                            if (!oldElems) {
+                                oldElems = [];
                             }
                             var renderer = cmp.getRenderer();
-                            renderer.def.rerender(renderer.renderable);
+                            var newElems = renderer.def.rerender(renderer.renderable);
+                            if (!newElems) {
+                                newElems = priv.copyElems(cmp);
+                                if (!newElems) {
+                                    newElems = [];
+                                }
+                            }
+                            // Figure whether oldElems/newElems show a change
+                            var changed = (newElems.length !== oldElems.length);
+                            if (!changed) {
+                                // Length is equal, so walk to look for different members:
+                                for (var k = 0; newElems[k]; ++k) {
+                                    if (newElems[k] !== oldElems[k]) {
+                                        changed = true;
+                                        break;
+                                    }
+                                }
+                            }
+
+                            if (changed && newElems.length) {
+                                // finishRender is used here to associate elements and apply classes,
+                                // and also to ensure that post-RErender, the component is clean, just
+                                // like render does.  But we don't need it to accumulate a big return
+                                // array, so the last "ret" param is skipped.
+                                priv.finishRender(cmp, newElems);
+                            } else {
+                                // else we're okay for classes and such, but we still want to be clean
+                                priv.cleanComponent(cmp.getGlobalId());
+                            }
+                            if (newElems.length) {
+                                for (k = 0; newElems[k]; ++k) {
+                                    allElems.push(newElems[k]);
+                                }
+                            }
+                        } finally {
+                            priv.pop(cmp, oldElems);
                         }
-                        priv.cleanComponent(cmp.getGlobalId());
                     }
                 }
+                return allElems;
             } finally {
                 if (topVisit) {
                     this.visited = undefined;
@@ -247,13 +301,19 @@ var AuraRenderingService = function AuraRenderingService(){
             for (var i = 0; i < array.length; i++){
                 var c = array[i];
                 if (c.isValid() && c.isRendered()) {
-                    var renderer = c.getRenderer();
-                    c.setUnrendering(true);
+                    var oldElems = priv.copyElems(c);
                     try {
-                        renderer.def.unrender(renderer.renderable);
-                        c.setRendered(false);
+                        priv.push(c);
+                        var renderer = c.getRenderer();
+                        c.setUnrendering(true);
+                        try {
+                            renderer.def.unrender(renderer.renderable);
+                            c.setRendered(false);
+                        } finally {
+                            c.setUnrendering(false);
+                        }
                     } finally {
-                        c.setUnrendering(false);
+                        priv.pop(c, oldElems);
                     }
                 }
             }
@@ -292,7 +352,7 @@ var AuraRenderingService = function AuraRenderingService(){
                             break;
                         }
                     }
-                    
+
                     if (a.length === 0) {
                         delete priv.dirtyComponents[id];
                     }
@@ -304,9 +364,9 @@ var AuraRenderingService = function AuraRenderingService(){
         ,rerenderDirtyIndex : [],
 
         index : function(info) {
-        	this.rerenderDirtyIndex.push(info);
+            this.rerenderDirtyIndex.push(info);
         },
-        
+
         getRerenderingIndex : function() {
         	return this.rerenderDirtyIndex;
         }

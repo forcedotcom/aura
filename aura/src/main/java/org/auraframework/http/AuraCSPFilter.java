@@ -40,6 +40,8 @@ public class AuraCSPFilter implements Filter {
     private static final String FRAMEWORK_JS= ".*/aura_" + getFrameworkJsSuffixRegex() + "\\.js";
     
     private static final Set<String> INLINE_ALLOWED_URLS = ImmutableSet.of(APPLICATION, COMPONENT, FRAMEWORK_JS);
+    
+    private static final String CHROME_EXTENSION = "chrome-extension:";
 
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException,
@@ -76,12 +78,12 @@ public class AuraCSPFilter implements Filter {
         // note that chrome-extensions can cause violations, and we don't generally care.
         if (doesUrlAllowInline(url)) {
             p
-            .script_src(CSP.SELF, "chrome-extension:", CSP.UNSAFE_EVAL, CSP.UNSAFE_INLINE)
-            .style_src(CSP.SELF, "chrome-extension:", CSP.UNSAFE_INLINE);
+            .script_src(CSP.SELF, CHROME_EXTENSION, CSP.UNSAFE_EVAL, CSP.UNSAFE_INLINE)
+            .style_src(CSP.SELF, CHROME_EXTENSION, CSP.UNSAFE_INLINE);
         } else {
             p
-            .script_src(CSP.SELF, "chrome-extension:")
-            .style_src(CSP.SELF, "chrome-extension:");
+            .script_src(CSP.SELF, CHROME_EXTENSION)
+            .style_src(CSP.SELF, CHROME_EXTENSION);
         }
         
         return p.build();

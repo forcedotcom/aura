@@ -149,7 +149,7 @@
         <servlet-name>CSPReporterServlet</servlet-name>
         <url-pattern>/_/csp</url-pattern> <!-- keep in sync with CSPReporterServlet.URL -->
     </servlet-mapping>
-   	<!-- End Aura Content Security Policy Report Servlet -->
+   	<!-- End Content Security Policy Report Servlet -->
 
 </web-app>
 

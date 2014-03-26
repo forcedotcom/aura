@@ -16,7 +16,6 @@
 
 -->
 <aura:application controller="java://org.auraframework.impl.java.controller.JavaTestController">
-    <aura:attribute name="failOnWarnings" type="Boolean" default="true"/>
 
     <componentTest:hasBody aura:id="topbody">
         topbody

@@ -34,6 +34,33 @@ public abstract class BaseAccessAttributeEnforcementTest extends AuraImplTestCas
 	public BaseAccessAttributeEnforcementTest(String name) {
 		super(name);
 	}
+	
+	protected void verifyAccess() throws Exception {
+		ArrayList<String> failures = new ArrayList<String>();
+
+		for (TestNamespace targetNamespace : TestNamespace.values()) {
+			testResourceNamespace = targetNamespace;
+			
+			try {
+				runSimpleTestCase();
+			} catch (Throwable e) {
+				failures.add(e.getMessage());
+			}	
+			
+		}
+
+		if (!failures.isEmpty()) {
+			String message = "\n";
+			for (int i = 0; i < failures.size(); i++) {
+				message += failures.get(i);
+				if (i != failures.size() - 1) {
+					message += ",\n";
+				}
+			}
+
+			fail("Test failed with " + failures.size() + " errors:" + message);
+		}
+	}
 
 	protected void verifyAccess(TestResource[] consumers) throws Exception {
 		ArrayList<String> failures = new ArrayList<String>();
@@ -46,6 +73,7 @@ public abstract class BaseAccessAttributeEnforcementTest extends AuraImplTestCas
 
 				for (TestNamespace consumerNamespace : TestNamespace.values()) {					
 					testConsumerNamespace = consumerNamespace;
+					
 					try {
 						runTestCase();
 					} catch (Throwable e) {
@@ -115,6 +143,25 @@ public abstract class BaseAccessAttributeEnforcementTest extends AuraImplTestCas
 				fail("Should not have thrown Exception when " + testResourceNamespace + "." + testResource + " is " + testCase + " and used in "
 						+ testConsumerNamespace + "." + testConsumer);
 			}
+		}
+	}
+	
+	protected void runSimpleTestCase() throws Exception {								
+		String resourceSource = getResourceSource(testResource, null);
+		DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(getDefClass(testResource), resourceSource,
+				getDefDescriptorName(testResource, true),
+				(testResourceNamespace == TestNamespace.System || testResourceNamespace == TestNamespace.SystemOther ? true : false));
+		
+
+		Source<? extends Definition> source = StringSourceLoader.getInstance().getSource(descriptor);
+		try {
+			Definition def = parser.parse(descriptor, source);
+			def.validateDefinition();
+
+			descriptor.getDef();
+			
+		} catch (NoAccessException e) {
+			fail("Should not have thrown Exception when " + testResourceNamespace + "." + testResource + " is " + testCase);
 		}
 	}
 
@@ -202,13 +249,7 @@ public abstract class BaseAccessAttributeEnforcementTest extends AuraImplTestCas
 		} else if (testResource == TestResource.Event) {			
 			source = "<aura:event type='COMPONENT' " + (access != null ? "access='" + access + "'" : "") + " />";
 		} 
-		/*
-		else if (testResource == TestResource.RegisterEvent) {			
-			source = "<aura:component access='GLOBAL'>";
-			source += "<aura:registerEvent name='testevent' type='ui:change' " + (access != null ? "access='" + access + "'" : "") + " />";			
-			source += "</aura:component> ";			
-		}
-		*/
+		
 		return source;
 	}		
 
@@ -259,44 +300,32 @@ public abstract class BaseAccessAttributeEnforcementTest extends AuraImplTestCas
 
 		if (testCase.toString().contains("DEFAULT")) {
 			return null;
-		}
-
-		boolean isDynamic = false;
-		if (testCase.toString().endsWith("DYNAMIC")) {
-			isDynamic = true;
-		}
+		}		
 
 		if (testCase.toString().contains("GLOBAL")) {
-			if (!isDynamic) {
-				access.append("GLOBAL");
-			} else {
-				return "org.auraframework.test.TestAccessMethods.allowGlobal";
-			}
+			access.append("GLOBAL");
 		}
 
 		if (testCase.toString().contains("PUBLIC")) {
-			if (!isDynamic) {
-				access.append("PUBLIC");
-			} else {
-				return "org.auraframework.test.TestAccessMethods.allowPublic";
-			}
+			access.append("PUBLIC");
 		}
 
 		if (testCase.toString().contains("PRIVATE")) {
-			if (!isDynamic) {
-				access.append("PRIVATE");
-			} else {
-				return "org.auraframework.test.TestAccessMethods.allowPrivate";
-			}
+			access.append("PRIVATE");
 		}
 
 		if (testCase.toString().contains("INTERNAL")) {
-			if (!isDynamic) {
-				access.append("INTERNAL");
-			} else {
-				return "org.auraframework.test.TestAccessMethods.allowInternal";
-			}
+			access.append("INTERNAL");
 		}
+		
+		if(testCase.toString().contains("UNAUTHENTICATED")){
+			access.append("UNAUTHENTICATED");
+		}
+		else{					
+			if(testCase.toString().contains("AUTHENTICATED")){
+				access.append("AUTHENTICATED");
+			}
+		}	
 
 		return access.toString();
 	}
@@ -306,14 +335,7 @@ public abstract class BaseAccessAttributeEnforcementTest extends AuraImplTestCas
 
 		if (access == null) {
 			access = "PUBLIC";
-		}
-
-		if (access.startsWith("org.auraframework.test.TestAccessMethods.")) {
-			String[] vals = access.split("\\.");
-			String val = vals[vals.length - 1];
-
-			access = val.toUpperCase();
-		}
+		}		
 
 		if (testConsumerNamespace == TestNamespace.System || testConsumerNamespace == TestNamespace.SystemOther) {
 
@@ -326,7 +348,7 @@ public abstract class BaseAccessAttributeEnforcementTest extends AuraImplTestCas
 			// }
 
 		} else {
-			if (access.equals("GLOBAL")) {
+			if (access.equals("GLOBAL") || access.equals("UNAUTHENTICATED")) {
 				return true;
 			}
 

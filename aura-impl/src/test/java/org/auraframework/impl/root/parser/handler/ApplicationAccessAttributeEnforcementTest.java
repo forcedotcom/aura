@@ -15,16 +15,14 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-public class ComponentAccessAttributeEnforcementTest extends
+public class ApplicationAccessAttributeEnforcementTest extends
 		BaseAccessAttributeEnforcementTest {
-	
-	private TestResource[] consumers = new TestResource[]{TestResource.Application, TestResource.Component};
 
-	public ComponentAccessAttributeEnforcementTest(String name) {
+	public ApplicationAccessAttributeEnforcementTest(String name) {
 		super(name);
-		testResource = TestResource.Component;
+		testResource = TestResource.Application;
 	}
-	
+
 	/**
 	 * Verify Creating an application works
 	 * @throws Exception
@@ -32,32 +30,5 @@ public class ComponentAccessAttributeEnforcementTest extends
 	public void testAccess() throws Exception {
 		verifyAccess();
     }
-		
-	/**
-	 * Verify Default access enforcement
-	 * @throws Exception
-	 */
-	public void testDefaultAccess() throws Exception {
-		testCase = TestCase.DEFAULT;
-		verifyAccess(consumers);
-    }
 	
-	/**
-	 * Verify Public access enforcement
-	 * @throws Exception
-	 */
-	public void testPublicAccess() throws Exception {
-		testCase = TestCase.PUBLIC;
-		verifyAccess(consumers);
-    }
-	
-	/**
-	 * Verify Global access enforcement
-	 * @throws Exception
-	 */
-	public void testGlobalAccess() throws Exception {
-		testCase = TestCase.GLOBAL;
-		verifyAccess(consumers);
-    }			
-
 }

@@ -63,6 +63,9 @@ public class ConcreteProvider implements ComponentConfigProvider {
         } else if (whatToDo.equalsIgnoreCase("replaceNotFound")) {
             config.setDescriptor(DefDescriptorImpl.getInstance("test:test_Provider_Concrete_Sub_NotHere",
                     ComponentDef.class));
+        } else if (whatToDo.equalsIgnoreCase("provideTestModelParentCmp")) {
+            config.setDescriptor(DefDescriptorImpl.getInstance("auratest:test_Model_Parent",
+                    ComponentDef.class));
         }
         return config;
     }

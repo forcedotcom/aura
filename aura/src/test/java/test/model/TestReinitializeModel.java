@@ -27,6 +27,7 @@ public class TestReinitializeModel {
 	@SuppressWarnings("unchecked")
 	public TestReinitializeModel() throws QuickFixException {
 		this.value = (String) Aura.getContextService().getCurrentContext().getCurrentComponent().getAttributes().getValue("attr");
+		this.valueParent = (String) Aura.getContextService().getCurrentContext().getCurrentComponent().getAttributes().getValue("attrInParent");
 		this.itemList = (ArrayList<String>) Aura.getContextService().getCurrentContext().
                 getCurrentComponent().getAttributes().getValue("listToShow");
 	}
@@ -37,10 +38,16 @@ public class TestReinitializeModel {
     }
 	
 	@AuraEnabled
+    public String getValueParent() {
+    	return valueParent;
+    }
+	
+	@AuraEnabled
     public ArrayList<String> getItemList() {
         return itemList;
     }
 	
     private String value;
+    private String valueParent;
     private ArrayList<String> itemList;
 }

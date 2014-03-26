@@ -97,7 +97,7 @@ public class DefDescriptorImplTest extends AuraImplTestCase {
             testDescriptorNullTag = DefDescriptorImpl.getInstance(null, ComponentDef.class);
             fail("Should have thrown AuraException for null tag in ComponentDefDescriptor");
         } catch (AuraRuntimeException expected) {
-            assertEquals("descriptor is null", expected.getMessage());
+        	assertEquals("descriptor is null", expected.getMessage());
         }
 
         // test getInstance(name, null)
@@ -113,22 +113,22 @@ public class DefDescriptorImplTest extends AuraImplTestCase {
         // test getting type instances.
         // Why did qualified name EVER match?? --fka3
         
-        // It is uncetain why this fails. Here is a bug for investigation: W-2051904. 
+        // It is unncetain why this fails. Here is a bug for investigation: W-2051904. 
         // testDescriptor = DefDescriptorImpl.getInstance("Aura.Component", TypeDef.class);
-        // assertSame(testDescriptor, (DefDescriptorImpl.getInstance("aura://Aura.Component", TypeDef.class)));
+        // assertEquals(testDescriptor, (DefDescriptorImpl.getInstance("aura://Aura.Component", TypeDef.class)));
 
         testDescriptor = DefDescriptorImpl.getInstance("aura://Aura.Component[]", TypeDef.class);
-        assertSame(testDescriptor, (DefDescriptorImpl.getInstance("Aura.Component[]", TypeDef.class)));
+        assertEquals(testDescriptor, (DefDescriptorImpl.getInstance("Aura.Component[]", TypeDef.class)));
 
         testDescriptor = DefDescriptorImpl.getInstance("aura://List<String>", TypeDef.class);
-        assertSame(testDescriptor, (DefDescriptorImpl.getInstance("List<String>", TypeDef.class)));
+        assertEquals(testDescriptor, (DefDescriptorImpl.getInstance("List<String>", TypeDef.class)));
 
         testDescriptor = DefDescriptorImpl.getInstance("aura://List", TypeDef.class);
-        assertSame(testDescriptor, (DefDescriptorImpl.getInstance("List", TypeDef.class)));
+        assertEquals(testDescriptor, (DefDescriptorImpl.getInstance("List", TypeDef.class)));
 
         // no type validation for map sub-types
         testDescriptor = DefDescriptorImpl.getInstance("Map<Aura.Component>", TypeDef.class);
-        assertSame(testDescriptor, (DefDescriptorImpl.getInstance("Map<String>", TypeDef.class)));
+        assertEquals(testDescriptor, (DefDescriptorImpl.getInstance("Map<String>", TypeDef.class)));
     }
 
     public void testGetNamespace() throws Exception {

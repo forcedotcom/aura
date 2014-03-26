@@ -339,7 +339,6 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         
         for (RegisterEventDef def : events.values()) {
             def.validateReferences();
-            registry.assertAccess(descriptor, def);
         }
         
         for (EventHandlerDef def : eventHandlers) {

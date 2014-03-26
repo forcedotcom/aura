@@ -71,9 +71,7 @@ public class ComponentDefModel {
                 }
                 
                 for (EventHandlerDef handler : cmpDef.getHandlerDefs()) {
-                	if (ReferenceTreeModel.hasAccess(handler)) {
-                		handledEvents.add(new AttributeModel(handler));
-                	}
+            		handledEvents.add(new AttributeModel(handler));
                 }
                 
                 for (DefDescriptor<InterfaceDef> intf : cmpDef.getInterfaces()) {

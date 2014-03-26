@@ -53,6 +53,11 @@ public class ReferenceTreeModel {
 		registry.assertAccess(getReferencingDescriptor(), def);
 	}
 
+	public static boolean isRunningInPrivilegedNamespace() {
+		String ns = Aura.getConfigAdapter().getDefaultNamespace();
+		return ns != null ? Aura.getConfigAdapter().isPrivilegedNamespace(ns) : true;
+	}
+
     private static final <E extends Definition> List<TreeNode> makeTreeNodes(String prefix, Class<E> type)
             throws QuickFixException {
         String sep = prefix.equals("markup") ? ":" : ".";
@@ -111,7 +116,11 @@ public class ReferenceTreeModel {
 			tree.add(new TreeNode(null, "Components", makeTreeNodes("markup", ComponentDef.class), false));
 			tree.add(new TreeNode(null, "Interfaces", makeTreeNodes("markup", InterfaceDef.class), false));
 			tree.add(new TreeNode(null, "Events", makeTreeNodes("markup", EventDef.class), false));
-			tree.add(new TreeNode(null, "Tests", makeTreeNodes("js", TestSuiteDef.class), false));
+			
+			if (isRunningInPrivilegedNamespace()) {
+				tree.add(new TreeNode(null, "Tests", makeTreeNodes("js", TestSuiteDef.class), false));
+			}
+			
 			tree.add(new TreeNode(null, "JavaScript API", new ApiContentsModel().getNodes(), false));
 			
 			/* Javadoc not publicly accessible

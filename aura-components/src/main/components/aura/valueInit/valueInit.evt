@@ -16,5 +16,5 @@
 
 -->
 <aura:event type="VALUE" support="GA" access="GLOBAL" description="Indicates that a Value has been initialized.">
-    <aura:attribute name="value" type="Object" description="The value that initialized."/>
+    <aura:attribute name="value" type="Object" access="GLOBAL" description="The value that initialized."/>
 </aura:event>

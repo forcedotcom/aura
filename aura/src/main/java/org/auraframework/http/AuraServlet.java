@@ -375,15 +375,20 @@ public class AuraServlet extends AuraBaseServlet {
                 validateCSRF(csrfToken.get(request));
             }
 
-            if (context.getApplicationDescriptor() != null) {
+            DefDescriptor<? extends BaseComponentDef> applicationDescriptor = context.getApplicationDescriptor();
+			if (applicationDescriptor != null) {
                 // ClientOutOfSync will drop down.
                 try {
-                    Aura.getDefinitionService().updateLoaded(context.getApplicationDescriptor());
+                    Aura.getDefinitionService().updateLoaded(applicationDescriptor);
                 } catch (QuickFixException qfe) {
                     //
                     // ignore quick fix. If we got a 'new' quickfix, it will be thrown as
                     // a client out of sync exception, since the UID will not match.
                     //
+                }
+                
+                if (!context.isTestMode() && !context.isDevMode()) {
+                	assertAccess(applicationDescriptor.getDef());
                 }
             }
 
@@ -392,6 +397,7 @@ public class AuraServlet extends AuraBaseServlet {
                 attributes = Maps.newHashMap();
                 attributes.put("token", getToken());
             }
+            
             PrintWriter out = response.getWriter();
             written = true;
             out.write(CSRF_PROTECT);

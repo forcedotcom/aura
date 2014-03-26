@@ -15,5 +15,9 @@
     limitations under the License.
 
 -->
-<aura:event type="APPLICATION" support="GA" access="GLOBAL" description="Indicates that the initial rendering of the root application or root component has completed.">
-</aura:event>
+<aura:layouts default="reference" catchall="reference">
+    <aura:layout name="reference" title="Reference" match=".*:.*">
+        <aura:layoutItem container="sidebar" cache="loaded"><auradocs:referenceTree/></aura:layoutItem>
+        <aura:layoutItem container="content" action="{!c.getReference}"/>
+    </aura:layout>
+</aura:layouts>

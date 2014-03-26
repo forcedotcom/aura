@@ -1,0 +1,5 @@
+<aura:event type="APPLICATION">
+	<aura:attribute name="element" type="Object" description="DOM HTMLElement for positioning."/>
+	<aura:attribute name="value" type="String" description="Initial value for ui:datePicker."/>
+	<aura:attribute name="onselected" type="Aura.Action" description="Callback"/>
+</aura:event>

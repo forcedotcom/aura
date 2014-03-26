@@ -17,7 +17,8 @@
 -->
 <aura:component extends="ui:input" implements="ui:inputDateComponent" extensible="true" support="GA" access="GLOBAL" description="An input field for entering a date as specified by the format attribute. To display the date picker, set displayDatePicker=&quot;true&quot;."> 
     <aura:attribute name="placeholder" type="String" description="The hint for the date input format. Set during init based on the 'format' value."/>
-        
+    <aura:attribute name="loadDatePicker" type="Boolean" default="true"/>
+
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
     
     <aura:if isTrue="{!$Browser.isPhone || $Browser.isTablet}">
@@ -32,5 +33,8 @@
             <span class="assistiveText">Date Picker</span>
         </a>
     </aura:if>
-    <ui:datePicker aura:id="datePicker" selectDate="{!c.setValue}"/>
+
+    <aura:if isTrue="{! v.loadDatePicker }">
+        <ui:datePicker aura:id="datePicker" selectDate="{!c.setValue}"/>
+   </aura:if>
 </aura:component>

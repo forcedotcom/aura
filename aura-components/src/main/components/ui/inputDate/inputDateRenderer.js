@@ -17,14 +17,14 @@
     afterRender: function(component, helper) {
         var concreteCmp = component.getConcreteComponent();
         var _helper = concreteCmp.getDef().getHelper();
-        _helper.displayValue(concreteCmp);
+        _helper.displayValue(component);
         return this.superAfterRender();
 	},
 	
 	rerender: function(component, helper) {
         var concreteCmp = component.getConcreteComponent();
         var _helper = concreteCmp.getDef().getHelper();
-        _helper.displayValue(concreteCmp);
+        _helper.displayValue(component);
         return this.superRerender();
     }
 })

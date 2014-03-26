@@ -18,8 +18,10 @@ package org.auraframework.impl;
 import java.io.IOException;
 
 import java.io.StringWriter;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -61,6 +63,13 @@ public class ServerServiceImplTest extends AuraImplTestCase {
     
     private static class EmptyActionDef implements ActionDef {
 		private static final long serialVersionUID = 1L;
+		StringWriter sw;
+		String name;
+		
+		protected EmptyActionDef(StringWriter sw,String name) {
+			this.sw = sw;
+			this.name = name;
+		}
 
 		@Override
         public void validateDefinition() throws QuickFixException {
@@ -137,7 +146,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
 
         @Override
         public String getName() {
-            return null;
+            return this.name;
         }
 
         @Override
@@ -157,10 +166,27 @@ public class ServerServiceImplTest extends AuraImplTestCase {
     }
 
     private static class EmptyAction extends AbstractActionImpl<EmptyActionDef> {
-        public EmptyAction() {
-            super(null, new EmptyActionDef(), null);
-        }
+        private String returnValue="";
+        private Integer count=0;
+        private String parameter="";
+        
 
+        public EmptyAction(StringWriter sw, String name) {
+            super(null, new EmptyActionDef(sw,name), null);
+        }
+		
+		public EmptyAction() {
+            super(null, new EmptyActionDef(null,"simpleaction"), null);
+        }
+		
+		public Integer getCount() {
+			return this.count;
+		}
+
+		public String getName() {
+			return this.actionDef.getName();
+		}
+		
         @Override
         public DefDescriptor<ActionDef> getDescriptor() {
             return Aura.getDefinitionService().getDefDescriptor("java://aura.empty/ACTION$emptyAction", ActionDef.class);
@@ -168,12 +194,24 @@ public class ServerServiceImplTest extends AuraImplTestCase {
 
         @Override
         public void run() throws AuraExecutionException {
-            // do nothing.
+        	this.count++;
+        	if(this.actionDef.sw!=null) {
+        		this.returnValue = this.actionDef.sw.toString();
+        	} else {
+        		//do nothing
+        	}
+        	if(this.count>1) {
+        		setParameter("#"+this.count);
+        	}
         }
 
         @Override
         public Object getReturnValue() {
-            return null;
+            return this.returnValue;
+        }
+        
+        private void setParameter(String parameter) {
+        	this.parameter = parameter;
         }
 
         @Override
@@ -184,32 +222,36 @@ public class ServerServiceImplTest extends AuraImplTestCase {
         @Override
         public void serialize(Json json) throws IOException {
             Map<String,String> value = Maps.newHashMap();
-            value.put("action", "simpleaction");
+            String res=this.getName();
+            if(this.parameter!="") { res=res.concat("{"+this.parameter+"}"); }
+            value.put("action", res);
             json.writeValue(value);
         }
     };
 
 
     private static final Set<String> GLOBAL_IGNORE = Sets.newHashSet("context", "actions");
+    
 
     /**
      * Check that our EmptyAction is properly serialized.
      *
      * This does a positive and negative test, ensuring that we only serialize what we should.
      */
-    private Map<String,Object> validateEmptyActionSerialization(String serialized, Set<String> ignore) {
+    @SuppressWarnings("unchecked")
+    private Map<String,Object> validateEmptyActionSerialization(String serialized, Set<String> ignore, 
+    		List<String> actionNameList) {
+    	int actionNumber = actionNameList.size();
         Set<String> extras = Sets.newHashSet();
-
-        @SuppressWarnings("unchecked")
         Map<String, Object> json = (Map<String, Object>) new JsonReader().read(serialized);
-        @SuppressWarnings("unchecked")
         List<Object> actions = (List<Object>) json.get("actions");
-        assertTrue("expected one action, got: "+actions, actions != null && actions.size() == 1);
-        @SuppressWarnings("unchecked")
-        Map<String, Object> action = (Map<String, Object>) actions.get(0);
-        assertTrue("expected just the action serialization, but got: "+action, action != null && action.size() == 1);
-        assertEquals("expected simpleaction from "+action, "simpleaction", action.get("action"));
-
+        assertTrue(actions != null);
+        assertTrue("expected "+actionNumber+" action, but get "+actions.size(), actions.size() == actionNumber);
+        for(int i=0;i<actionNumber;i++) {
+            Map<String, Object> action = (Map<String, Object>) actions.get(i);
+        	assertEquals("didn't get expecting action on i:"+i, 
+        			actionNameList.get(i), action.get("action"));
+        }
         for (String key : json.keySet()) {
             if (!GLOBAL_IGNORE.contains(key) && (ignore == null || !ignore.contains(key))) {
                 extras.add(key);
@@ -217,6 +259,70 @@ public class ServerServiceImplTest extends AuraImplTestCase {
         }
         assertTrue("Expected no extra keys, found: "+extras+", in: "+json, extras.isEmpty());
         return json;
+    }
+    
+    /**
+     * This test is for W-2063110
+     * Test a list of actions.
+     * New Way : in ServerService, we serialize each action and write it into response (via a string writer) 
+     * right after it finish running. 
+     * in the SimpleAction above, we put whatever we have in the string writer as returnValue of the current action
+     * so when Action2 is running, we should have Action1 in string writer, 
+     * when Action3 is running, we should have both Action1 and Action2, ....
+     * Old Way: We used to run all actions, store the result in Message, then write them into response at once,
+     * in the old way we won't have anything in string writer/response until Action3 is finished.
+     */
+    public void testMultipleActions() throws Exception {
+    	Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);
+    	StringWriter sw = new StringWriter();
+        ServerService ss = Aura.getServerService();
+        Action a = new EmptyAction(sw,"first action");
+        Action b = new EmptyAction(sw,"second action");
+        Action c = new EmptyAction(sw,"third action");
+        List<Action> actions = Lists.newArrayList(a,b,c);
+        Message message = new Message(actions);
+        //run the list of actions. 
+        ss.run(message, Aura.getContextService().getCurrentContext(), sw, null);
+        String returnValuea = "{\"actions\":[";
+        String returnValueb = returnValuea+"{\"action\":\"firstaction\"}";
+        String returnValuec = returnValueb+",{\"action\":\"secondaction\"}";
+        
+        List<String> returnValueList = Arrays.asList(returnValuea,returnValueb,returnValuec);
+        for(int i=0;i<actions.size();i++) {
+        	Action act = actions.get(i);
+        	assertEquals("get different action return on i:"+i,
+        			returnValueList.get(i),((String)act.getReturnValue()).replaceAll("\\s+", ""));
+        }
+        
+        validateEmptyActionSerialization(sw.toString(), null, Arrays.asList("first action","second action","third action"));
+    }
+    
+    
+    /**
+     * This test is for W-2063110
+     * Running the same action twice in a list
+     * since we output right after the run, we can reuse the action. 
+     * the second run will over-write the previous run's returnValue(unless we change the run()), 
+     * but response keep the info from previous run, so we are good
+     */
+    public void testSameActionTwice() throws Exception {
+    	Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);
+    	StringWriter sw = new StringWriter();
+        ServerService ss = Aura.getServerService();
+        Action a = new EmptyAction(sw,"first action");
+        Action b = new EmptyAction(sw,"second action");
+        List<Action> actions = Lists.newArrayList(a,b,a,b);
+        Message message = new Message(actions);
+        ss.run(message, Aura.getContextService().getCurrentContext(), sw, null);
+        assertTrue(((EmptyAction)a).getCount()==2);
+        assertTrue(((EmptyAction)b).getCount()==2);
+        //in the old way since we output action info into response after all actions finish running, the previous run's info will get overwrited
+        //but this is not the case now
+        //we need to verify when same action run twice, and something about the action changed between the two runs --like the parameter, 
+        //the response has the action info for both times.
+        validateEmptyActionSerialization(sw.toString(), null, 
+        		Arrays.asList("first action","second action","first action{#2}","second action{#2}"));
+  
     }
 
     /**
@@ -233,7 +339,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
         Message message = new Message(actions);
         StringWriter sw = new StringWriter();
         ss.run(message, Aura.getContextService().getCurrentContext(), sw, null);
-        validateEmptyActionSerialization(sw.toString(), null);
+        validateEmptyActionSerialization(sw.toString(), null, Arrays.asList("simpleaction"));
     }
 
     /**
@@ -253,10 +359,9 @@ public class ServerServiceImplTest extends AuraImplTestCase {
         extras.put("this", "that");
         ss.run(message, Aura.getContextService().getCurrentContext(), sw, extras);
 
-        Map<String, Object> json = validateEmptyActionSerialization(sw.toString(), Sets.newHashSet("this"));
+        Map<String, Object> json = validateEmptyActionSerialization(sw.toString(), Sets.newHashSet("this"),Arrays.asList("simpleaction"));
         assertEquals("Expected extras to be in "+json, "that", json.get("this"));
     }
-
     /**
      * Sanity check to make sure that app.css does not have duplicate copy of component CSS. Component CSS was being
      * added twice, once because they were part of preload namespace and a second time because of component dependency.

@@ -517,7 +517,11 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
                 throw new AuraExecutionException(e, null);
             }
         }
-
+        
+        public String getrawResponse() {
+        	return this.rawResponse;
+        }
+        
         @Override
         public void add(List<Action> actions) {
             // Only 1 action supported for now

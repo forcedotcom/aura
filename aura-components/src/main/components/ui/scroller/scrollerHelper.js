@@ -76,7 +76,7 @@
         }
     },
     handleScrollBy: function (component, event) {
-        var scroller = this.getScrollerInstance(),
+        var scroller = this.getScrollerInstance(component),
             params   = event.getParams(),
             time     = params.time,
             deltaX   = params.deltaX || 0,
@@ -173,13 +173,14 @@
     },
     _mapAuraScrollerOptions: function (component) {
         var attributes            = component.getAttributes(),
+            device                = $A.get('$Browser'),
             // scroller properties check
             enabled               = attributes.get('enabled'),
             width                 = attributes.get('width'),
             height                = attributes.get('height'),
             scroll                = attributes.get('scroll'),
             scrollbars            = attributes.get('showScrollbars'),
-            useCSSTransition      = attributes.get('useCSSTransition'),
+            useCSSTransition      = attributes.get('useCSSTransition') || (device.isIOS || device.isAndroid),
             snap                  = attributes.get('snapType'),
             bindToWrapper         = attributes.get('bindToWrapper'),
             plugins               = this._getPlugins(attributes),
@@ -242,7 +243,9 @@
         
     },
     _bridgeScrollerAction: function (attrs, scrollerInstance, actionName) {
-        var action = attrs.get(actionName);
+        var attrActionName = 'on' + actionName.charAt(0).toUpperCase() + actionName.slice(1),
+            action = attrs.get(attrActionName);
+
         if (action) {
             scrollerInstance.on(actionName, function () {
                 action.run.apply(action, arguments);
@@ -255,10 +258,10 @@
     _attachAuraEvents: function (component, scrollerInstance) {
         var attrs  = component.getAttributes(),
             events = [
-                'onBeforeScrollStart',
-                'onScrollStart',
-                'onScrollMove',
-                'onScrollEnd'
+                'beforeScrollStart',
+                'scrollStart',
+                'scrollMove',
+                'scrollEnd'
             ], wrapper;
 
         if (attrs.get('preventDefaultOnMove')) {

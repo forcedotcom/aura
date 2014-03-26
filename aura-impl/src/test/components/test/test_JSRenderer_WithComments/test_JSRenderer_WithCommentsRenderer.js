@@ -35,6 +35,6 @@
      */
     rerender: function(cmp) {
         var str = 'Still do Nothing';
-    },
+    }
 
 })

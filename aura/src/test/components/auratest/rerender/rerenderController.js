@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{
+({
     pushText : function(cmp) {
         var v = cmp.getValue(cmp.get("v.whichArray"));
         if (!v) { return; }
@@ -84,4 +84,4 @@
         if (!v) { return; }
         v.clear();
     }
-}
+})

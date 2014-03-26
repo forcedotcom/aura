@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{
+({
     refresh : function(cmp, event){
         var frame = Ext.getCmp(cmp.find("frame").getElement().id).el.dom;
         frame.contentWindow.location.reload(true);
@@ -24,4 +24,4 @@
         var frame = cmp.find("frame").getElement();
         frame.contentWindow.location = locationBar.value;
     }
-}
+})

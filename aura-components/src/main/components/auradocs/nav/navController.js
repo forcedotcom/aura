@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{
+({
     /**
      * Update the currently selected location in the UI.
      */
@@ -40,4 +40,4 @@
         cmp._activeCmp = newLocationComp;
         cmp._activeCmp.getElement().setAttribute('active', true);
     }
-}
+})

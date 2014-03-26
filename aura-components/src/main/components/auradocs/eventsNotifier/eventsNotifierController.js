@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{
+({
     fireComponentEvent : function(cmp, event) {
         var attributes = cmp.getAttributes();
         var parentName = attributes.getValue("parentName").getValue();
@@ -33,4 +33,4 @@
         appEvent.setParams({ "context" : parentName });
         appEvent.fire();
     }
-}
+})

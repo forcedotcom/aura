@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{
+({
     sand: function(cmp, event) {
         var pants = cmp.getValue("v.pants");
         pants.setValue(pants.unwrap() + 1);
     }
-}
+})

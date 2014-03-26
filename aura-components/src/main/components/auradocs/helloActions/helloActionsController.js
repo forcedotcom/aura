@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{
+({
     handleClick : function(component, event) {
         var attributes = component.getAttributes();
         var attributeValue = attributes.getRawValue("text");
@@ -30,4 +30,4 @@
             attributes.setValue("text", event.target.value);
         }
     }
-}
+})

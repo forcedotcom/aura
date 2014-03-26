@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{
+({
     setHost : function(component, event, helper) {
         $A.clientService.initHost(component.get("v.host"));
     },
@@ -43,4 +43,4 @@
         var oldVal = val.getValue();
         val.setValue(oldVal + (oldVal == "" ? "" : " ") + event.getDef().getDescriptor().getName());
     }
-}
+})

@@ -13,10 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{
+({
     toggleView: function(cmp, event) {
         var val = cmp.getValue("v.expanded");
         val.setValue(!val.getValue());
     }
-
-}
+})

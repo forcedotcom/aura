@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{
+({
     functionName1: function(args1, args2) {
         var str = 'do Nothing';
     }
-}
+})

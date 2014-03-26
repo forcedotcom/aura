@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{
+({
     press: function(cmp, event) {
         // Add a sentinel value to the page to show we ran
         var div = cmp.find("resultsGoHere");
@@ -29,4 +29,4 @@
             div.getElement().innerHTML = "Chained push action ran";
         }
     }
-}
+})

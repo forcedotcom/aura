@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{
+({
 	columns : [{fieldName: 'first', label: 'First'}, {fieldName: 'second', label: 'Second', isSortable: false}, {fieldName: 'third', label: 'Third'}, {fieldName: 'forth', label: 'Forth'}],
 	defaultOrderByList : [{fieldName: 'first', ascending: true}]
-}
+})

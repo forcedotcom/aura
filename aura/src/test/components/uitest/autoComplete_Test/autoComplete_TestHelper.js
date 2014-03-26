@@ -45,5 +45,5 @@
     	var input = cmp.find(autoCompleteCmpName + "MatchSize");
     	input.setValue("v.value", event.getParam("size"));
         console.log("For " + autoCompleteCmpName + " There are " + event.getParam("size") + " matched options.");
-    },
+    }
 })

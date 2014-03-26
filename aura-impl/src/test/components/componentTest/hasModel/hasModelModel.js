@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 
-{
+({
     "data": ""
-}
+})

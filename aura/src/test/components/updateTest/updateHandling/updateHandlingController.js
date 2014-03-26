@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{
+({
     handleUpdate:function(c,e,h){
         var txt = c.getSuper().getValue("v.text");
         txt.setValue(txt.unwrap() + " properly");
     }
-}
+})

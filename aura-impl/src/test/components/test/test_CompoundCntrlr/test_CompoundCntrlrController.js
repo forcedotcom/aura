@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{
+({
     handleClick: function(cmp, event) {
         var a = $A.expressionService.get(cmp, "c.getString");
         a.setCallback(cmp, function(action) {
@@ -22,4 +22,4 @@
         });
         $A.enqueueAction(a);
     }
-}
+})

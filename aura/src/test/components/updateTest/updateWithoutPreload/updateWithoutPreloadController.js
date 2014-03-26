@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{
+({
     cssalert:function(c){
         var style = $A.test.getStyle(c.getElement(),"background-image");
         alert('@@@TOKEN@@@\n' + style.substring(style.lastIndexOf('?')+1,style.lastIndexOf(')')) + '\n' + $A.test.dummyFunction());
     }
-}
+})

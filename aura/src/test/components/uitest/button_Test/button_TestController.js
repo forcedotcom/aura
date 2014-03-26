@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{
+({
     handleIconAndLabel : function(cmp, event){
         cmp.getAttributes().setValue("iconAndLabelButtonPressedMessage", "Icon and label button was pressed!!!");
     },
@@ -34,4 +34,4 @@
     		cmp.getAttributes().setValue("isDomEventSet", true);
     	}
     }
-}
+})

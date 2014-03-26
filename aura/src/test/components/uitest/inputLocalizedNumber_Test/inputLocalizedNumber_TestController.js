@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{
+({
     submit : function(component, event) {
         var cmpType = component.get("v.cmpType");
         var inputCmpValue = component.get("inputValue").get("v.value");
@@ -34,4 +34,4 @@
 
         $A.enqueueAction(a);
     }
-}
+})

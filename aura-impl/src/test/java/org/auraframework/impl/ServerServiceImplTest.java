@@ -450,8 +450,8 @@ public class ServerServiceImplTest extends AuraImplTestCase {
         String sourceNoWhitespace = output.toString().replaceAll("\\s", "");
         String preloaded1 = ".clientApiTestCssStyleTest{background-color:#eee}";
         String preloaded2 = ".testTestValidCSS{color:#1797c0";
-        assertTrue("Does not have preloaded css", sourceNoWhitespace.contains(preloaded1));
-        assertTrue("Does not have preloaded css", sourceNoWhitespace.contains(preloaded2));
+        assertTrue("Does not have preloaded css (1) in "+output, sourceNoWhitespace.contains(preloaded1));
+        assertTrue("Does not have preloaded css (2) in "+output, sourceNoWhitespace.contains(preloaded2));
     }
 
     /**
@@ -503,12 +503,12 @@ public class ServerServiceImplTest extends AuraImplTestCase {
         String sourceNoWhitespace = output.toString().replaceAll("\\s", "");
 
         String[] preloads = new String[]{
-                "\"descriptor\":\"markup://aura:placeholder\",",
-                "\"descriptor\":\"markup://ui:input\",",
-                "\"descriptor\":\"markup://ui:inputText\",",
-                "\"descriptor\":\"markup://ui:output\",",
-                "\"descriptor\":\"markup://ui:outputText\",",
-                "\"descriptor\":\"markup://test:testValidCSS\","
+                "\"descriptor\":\"markup://aura:placeholder\"",
+                "\"descriptor\":\"markup://ui:input\"",
+                "\"descriptor\":\"markup://ui:inputText\"",
+                "\"descriptor\":\"markup://ui:output\"",
+                "\"descriptor\":\"markup://ui:outputText\"",
+                "\"descriptor\":\"markup://test:testValidCSS\""
         };
 
         for (String preload : preloads) {

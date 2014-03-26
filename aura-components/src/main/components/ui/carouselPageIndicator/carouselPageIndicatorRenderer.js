@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-{
+({
 	rerender: function(cmp) {
 		var pageCmp = cmp.getValue('v.pageComponents');
 		if (pageCmp.isDirty()) {
 			this.superRerender();
 		}
 	}	
-}
+})

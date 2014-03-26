@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- {
+({
  	doServerError : function(component, event) {
 		var a = component.get("c.throwsException");
 		a.setParams({
@@ -64,4 +64,4 @@
 	    value.addErrors(null);
 	   	component.find("outputStatus").getAttributes().setValue("value", "Cleared error");
 	}
-}
+})

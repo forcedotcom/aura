@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{
+({
     fillLocalStorage: function(component) {
         var ITERS_TO_TRIGGER_LOCAL_STORAGE_ERROR = 100000
         try{
@@ -29,4 +29,4 @@
         }
         $A.log('Unable to cause local storage to fill up..');
     }
-}
+})

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{
+({
     runTests : function(cmp, event, helper) {
         var testsProps = cmp.get("m.testsWithProps");
         var tt = [];
@@ -80,4 +80,4 @@
      toggleShowOnlyIntegrationTests: function(cmp, event, helper){
      	helper.updateDisplay(cmp, helper);
      }
-}
+})

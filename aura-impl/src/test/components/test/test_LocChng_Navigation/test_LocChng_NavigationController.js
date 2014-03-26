@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{
+({
     clientAction: function(cmp, event){
         cmp.getAttributes().setValue('locationChangeIndicator', 'start');
         //Client Action associated with the button
@@ -47,4 +47,4 @@
         cmp.getAttributes().setValue('locationChangeIndicator', 'start');
         $A.historyService.back();
     }
-}
+})

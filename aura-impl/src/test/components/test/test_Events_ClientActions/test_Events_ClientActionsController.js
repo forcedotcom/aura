@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{
+({
     changeLabel: function(cmp, event) {
             var componentForEventController = event.getSource();
             //Based on which event has been fired, the label for the inner component is changed
@@ -30,4 +30,4 @@
             }
 
     }
-}
+})

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{
+({
 	open : function(cmp, descriptor){
 		var evt = $A.get("e.auradocs:openDef");
 		evt.setParams({
@@ -23,5 +23,4 @@
 		evt.fire();
 		cmp.getDef().getHelper().createCodeMirror(cmp);
 	    }
-    }
-}
+})

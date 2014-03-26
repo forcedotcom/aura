@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- {
+({
  	handleError: function(component, event){
         var inputCmp = component.find("inputCmp");
         var errorsObj = event.getParam("errors");
@@ -95,4 +95,4 @@
 		var cleanErrorEvent = inputCmp.getEvent("onClearErrors");
 	    cleanErrorEvent.fire();
 	}
-}
+})

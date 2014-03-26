@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{
+({
 	showDialog: function(cmp, event) {
 		var msg = cmp.find('overlay');
 		var open = $A.get("e.ui:openDialog");
@@ -34,4 +34,4 @@
 		});
 		close.fire();
 	}
-}
+})

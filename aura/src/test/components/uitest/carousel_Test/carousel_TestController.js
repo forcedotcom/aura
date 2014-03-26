@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
- {
+({
  	updateOutput : function(cmp) {
  		var outOptions = { 
  			out1 : "i have something to say...",
@@ -71,4 +71,4 @@
  	changePageAction : function(cmp) {
  		cmp.getValue("v.isPageChangeActionCalled").setValue("true");
  	}
- }
+})

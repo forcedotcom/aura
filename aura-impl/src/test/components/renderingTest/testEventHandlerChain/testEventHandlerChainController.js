@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{
+({
     handler1:function(cmp,event){
         //Set String value to Paris
         cmp.getAttributes().setValue('stringValue',cmp.get('v.stringValue')+'Paris');
@@ -27,4 +27,4 @@
     handler3:function(cmp,event){
         cmp.getAttributes().setValue('stringValue',cmp.get('v.stringValue')+'Mercury');
     }
-}
+})

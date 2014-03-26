@@ -22,6 +22,14 @@ public class EventAccessAttributeEnforcementTest extends
 		super(name);
 		testResource = TestResource.Event;
 	}
+	
+	/**
+	 * Verify Creating an application works
+	 * @throws Exception
+	 */
+	public void testAccess() throws Exception {
+		verifyAccess();
+    }
 		
 	/**
 	 * Verify Default access enforcement

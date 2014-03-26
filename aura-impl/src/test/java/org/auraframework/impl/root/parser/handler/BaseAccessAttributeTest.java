@@ -23,7 +23,6 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.InterfaceDef;
-import org.auraframework.def.RegisterEventDef;
 import org.auraframework.def.ThemeDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.parser.XMLParser;
@@ -328,7 +327,7 @@ public abstract class BaseAccessAttributeTest extends AuraImplTestCase {
 		}
     }	
 		
-	private void runTestCase() throws Exception{
+	protected void runTestCase() throws Exception{
 		try{																	
 			DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(getDefClass(), getResourceSource(), getDefDescriptorName(), (testNamespace == TestNamespace.System? true: false));
 			Source<? extends Definition> source = StringSourceLoader.getInstance().getSource(descriptor);			
@@ -389,8 +388,8 @@ public abstract class BaseAccessAttributeTest extends AuraImplTestCase {
 		return name;		
 	}
 	
-	private Class<Definition> getDefClass(){
-		Class classDef = null;
+	private Class<? extends Definition> getDefClass(){
+		Class<? extends Definition> classDef = null;
 		switch(testResource){
 			case Application:
 				classDef =  ApplicationDef.class;
@@ -641,7 +640,7 @@ public abstract class BaseAccessAttributeTest extends AuraImplTestCase {
 		return true;
 	}
 	
-	private TestCase getTestCase(Access access, boolean isDynamic) {
+	protected TestCase getTestCase(Access access, boolean isDynamic) {
 		try{
 			String accessVal = access.toString();
 			
@@ -716,13 +715,13 @@ public abstract class BaseAccessAttributeTest extends AuraImplTestCase {
 	
 	XMLParser parser = XMLParser.getInstance();
 	
-	private TestCase testCase;
+	protected TestCase testCase;
 	protected TestResource testResource;
-	private TestNamespace testNamespace;
+	protected TestNamespace testNamespace;
 	
 	protected enum TestResource {Application, Component, Interface, Attribute, Event, Theme, RegisterEvent};
 	
-	private enum TestNamespace {System, Custom};
+	protected enum TestNamespace {System, Custom};
 	
 	private enum TestCase {EMPTY, DEFAULT, INVALID, GLOBAL, PUBLIC, PRIVATE, INTERNAL, AUTHENTICATED, UNAUTHENTICATED,
 							 INVALID_DYNAMIC, GLOBAL_DYNAMIC, PUBLIC_DYNAMIC, PRIVATE_DYNAMIC, INTERNAL_DYNAMIC, AUTHENTICATED_DYNAMIC, UNAUTHENTICATED_DYNAMIC,

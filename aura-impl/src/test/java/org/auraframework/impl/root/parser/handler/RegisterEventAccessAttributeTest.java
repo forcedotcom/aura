@@ -15,6 +15,10 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
+import java.util.ArrayList;
+
+import org.auraframework.system.AuraContext.Access;
+
 public class RegisterEventAccessAttributeTest extends BaseAccessAttributeTest {
 
 	public RegisterEventAccessAttributeTest(String name) {
@@ -22,16 +26,51 @@ public class RegisterEventAccessAttributeTest extends BaseAccessAttributeTest {
 		testResource = TestResource.RegisterEvent;
 	}
 
-	// Remove these when bugs are fixed.
+	// Remove these when W-2089618, W-2089642 are fixed.
 	@Override
 	public void testSimpleAccessInSystemNamespace() throws Exception {		
+		verifySimpleAccess(TestNamespace.System, false);
 	}
 
 	@Override
-	public void testSimpleAccessDynamicInSystemNamespace() throws Exception {		
+	public void testSimpleAccessDynamicInSystemNamespace() throws Exception {
+		
 	}
 	
 	@Override
-	public void testSimpleAccessInCustomNamespace() throws Exception {		
+	public void testSimpleAccessInCustomNamespace() throws Exception {
+		verifySimpleAccess(TestNamespace.Custom, false);
 	}
+	
+	private void verifySimpleAccess(TestNamespace namespace, boolean isDynamic) throws Exception {		
+		ArrayList<String> failures = new ArrayList<String>();		
+		for (Access access : Access.values()) {
+			if(access != Access.INTERNAL && access != Access.PRIVATE){
+				testCase = getTestCase(access, isDynamic);	
+				testNamespace = namespace;
+				if(testCase != null){	
+					try{					
+						runTestCase();
+					}
+					catch(Throwable e) {
+						failures.add(e.getMessage());
+					}
+				}
+				else{				
+					failures.add("TestCase not found for Access: " + access.toString());				
+				}
+			}
+		}
+		
+		if(!failures.isEmpty()){			
+			String message = "";
+			for(int i = 0; i < failures.size(); i++){
+				message += failures.get(i);
+				if(i != failures.size() - 1){
+					message += ", ";
+				}
+			}
+			fail("Test failed becuase: " + message);
+		}
+    }	
 }

@@ -14,52 +14,73 @@
  * limitations under the License.
  */
 ({
-    testOuterTrue: {
-        attributes : {outer : "true", inner: "false"},
-
-        test: function(component){
-            this.whatItIs(component, "Outer is True, inner false:", true, false);
-        }
+    clickAndWait: function(cmp, string) {
+        var button = cmp.find(string);
+        button.getElement().click();
+        $A.test.addWaitFor(true, function(){
+            var div = cmp.getElements()[1];
+            var t = $A.test.getText(div);
+            return t && (t.indexOf(string) >= 0);
+        });
     },
 
-    testOuterFalse: {
-        attributes : {outer : "false", inner : "true"},
-
-        test: function(component){
-            this.whatItIs(component, "Outer is false, inner true:", false, true);
-        }
+    checkOutput: function(cmp, string, msg) {
+        var div = cmp.getElements()[1];
+        var t = $A.test.getText(div);
+        $A.test.assertEquals(string, t, msg);
     },
 
-    testRerender: {
-        attributes : {outer : "true", inner : "false"},
-
-        test: function(component){
-            this.whatItIs(component, "Testing rerender, outer is true, inner false:", true, false);
-            component.getAttributes().setValue("outer", false);
-            component.getAttributes().setValue("inner", true);
-            $A.rerender(component);
-            this.whatItIs(component, "Testing rerender, outer is false, inner true:", false, true);
-        }
+    // Tests walking up the possible values, ensuring that each rerenders
+    // correctly, and then back down.  This once failed because references
+    // to "old" elements hung around in parents, and also exercises cases
+    // where a parent is unrendering and re-rendering without confusing the
+    // child state.
+    testWalkUpAndDown: {
+        test: [ function(cmp) {
+                this.checkOutput(cmp, "FF", "unexpected initial display");
+                this.clickAndWait(cmp, "FT");
+            }, function(cmp) {
+                this.clickAndWait(cmp, "TF");
+            }, function(cmp) {
+                this.clickAndWait(cmp, "TT");
+            }, function(cmp) {
+                this.clickAndWait(cmp, "TF");
+            }, function(cmp) {
+                this.clickAndWait(cmp, "FT");
+            }, function(cmp) {
+                this.clickAndWait(cmp, "FF");
+            }, function(cmp) {
+                // We're good
+            }]
     },
 
-    whatItIs : function(component, name, outervalue, innervalue){
-        if(outervalue){
-            aura.test.assertNotNull($A.test.getElementByClass("outerIsTrue"), name+"Outer renderIf was not displayed.");
-            aura.test.assertNull($A.test.getElementByClass("outerIsFalse"), name+"Outer else was displayed");
-        }else{
-            aura.test.assertNull($A.test.getElementByClass("outerIsTrue"), name+"Outer renderIf was displayed.");
-            aura.test.assertNotNull($A.test.getElementByClass("outerIsFalse"), name+"Outer else was not displayed");
-        }
-        if (innervalue) {
-            aura.test.assertNotNull($A.test.getElementByClass("itIsTrue"), name+"{!v.inner} didn't evaluate as true");
-            aura.test.assertNull($A.test.getElementByClass("itWishesItWasTrue"), name+"{!v.inner} evaluated as false");
-            aura.test.assertNull($A.test.getElementByClass("itIsNotTrue"), name+"{! !v.inner} evaluated as true");
-            aura.test.assertNotNull($A.test.getElementByClass("itWishesItWasNotTrue"), name+"{! !v.inner} didn't evaluate as false");
-        }else{
-            aura.test.assertNull($A.test.getElementByClass("itIsTrue"), name+"{!v.inner} evaluated as true");
-            aura.test.assertNotNull($A.test.getElementByClass("itWishesItWasTrue"), name+"{!v.inner} didn't evaluate as false");
-            aura.test.assertNotNull($A.test.getElementByClass("itIsNotTrue"), name+"{! !v.inner} didn't evaluate as true");
-            aura.test.assertNull($A.test.getElementByClass("itWishesItWasNotTrue"), name+"{! !v.inner} evaluated as false");
-        }
-    }
+    // Tests some "random" skipping around, and especially all the
+    // double-change permutations.
+    testSkipAround: {
+        test: [ function(cmp) {
+                this.checkOutput(cmp, "FF", "unexpected initial display");
+                this.clickAndWait(cmp, "TT");
+            }, function(cmp) {
+                this.clickAndWait(cmp, "TF");
+            }, function(cmp) {
+                this.clickAndWait(cmp, "FT");
+            }, function(cmp) {
+                this.clickAndWait(cmp, "TF");
+            }, function(cmp) {
+                this.clickAndWait(cmp, "TT");
+            }, function(cmp) {
+                this.clickAndWait(cmp, "FF");
+            }, function(cmp) {
+                // We're good
+            }]
+    },
+
+    // Tests initial render is good with non-default attributes
+    testInitialState: {
+        attributes : { outer: "true", inner: "true" },
+        test: [ function(cmp) {
+                this.checkOutput(cmp, "TT", "unexpected initial display");
+            } ]
+    },
+
 })

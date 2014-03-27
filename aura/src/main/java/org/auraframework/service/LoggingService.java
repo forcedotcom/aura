@@ -15,6 +15,8 @@
  */
 package org.auraframework.service;
 
+import java.util.Map;
+
 import org.auraframework.Aura;
 import org.auraframework.system.LoggingContext;
 import org.auraframework.system.LoggingContext.KeyValueLogger;
@@ -151,10 +153,16 @@ public interface LoggingService extends AuraService {
     /**
      * flush the logged values.
      */
-    void doLog();
+    void flush();
     
     /**
      * get a key value pair logger that appends to the buffer
      */
     KeyValueLogger getKeyValueLogger(StringBuffer log);
+    
+    /**
+     * write a Content Security Policy report to the logs
+     * @param report a deserialized JSON map
+     */
+    void logCSPReport(Map<String, Object> report);
 }

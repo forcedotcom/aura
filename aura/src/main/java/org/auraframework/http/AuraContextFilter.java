@@ -117,7 +117,7 @@ public class AuraContextFilter implements Filter {
                     } catch (Throwable t) {
                         // ignore.
                     }
-                    loggingService.doLog(); // flush out logging values
+                    loggingService.flush(); // flush out logging values
                 }
             } finally {
                 endContext();

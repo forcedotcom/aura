@@ -76,7 +76,7 @@
         }
     },
     handleScrollBy: function (component, event) {
-        var scroller = this.getScrollerInstance(),
+        var scroller = this.getScrollerInstance(component),
             params   = event.getParams(),
             time     = params.time,
             deltaX   = params.deltaX || 0,
@@ -173,25 +173,33 @@
     },
     _mapAuraScrollerOptions: function (component) {
         var attributes            = component.getAttributes(),
+            device                = $A.get('$Browser'),
+            cssTransition         = attributes.get('useCSSTransition'),
+            canRefresh            = attributes.get('canRefresh'),
+            canShowMore           = attributes.get('canShowMore'),
+
             // scroller properties check
             enabled               = attributes.get('enabled'),
             width                 = attributes.get('width'),
             height                = attributes.get('height'),
             scroll                = attributes.get('scroll'),
             scrollbars            = attributes.get('showScrollbars'),
-            useCSSTransition      = attributes.get('useCSSTransition'),
+            gpuOptimization       = attributes.get('gpuOptimization'),
+
+            // For now, default android and ios to use CSSTransitions
+            useCSSTransition      = typeof cssTransition === "boolean" ? cssTransition : (!gpuOptimization && (device.isIOS || device.isAndroid)),
+            
             snap                  = attributes.get('snapType'),
             bindToWrapper         = attributes.get('bindToWrapper'),
             plugins               = this._getPlugins(attributes),
-            gpuOptimization       = attributes.get('gpuOptimization'),
 
             auraOnPullToRefresh   = attributes.get('onPullToRefresh'),
             auraOnPullToLoadMore  = attributes.get('onPullToShowMore'),
             auraInfiniteLoading   = attributes.get('infiniteLoadingDataProvider'),
 
-            pullToRefresh         = auraOnPullToRefresh  || attributes.get('canRefresh'),
-            pullToLoadMore        = auraOnPullToLoadMore || attributes.get('canShowMore'),
-            infiniteLoading       = auraInfiniteLoading  && attributes.get('infiniteLoading'),
+            pullToRefresh         = typeof canRefresh === "boolean" ? canRefresh : !!auraOnPullToRefresh,
+            pullToLoadMore        = typeof canShowMore === "boolean" ? canShowMore : !!auraOnPullToLoadMore,
+            infiniteLoading       = auraInfiniteLoading && attributes.get('infiniteLoading'),
 
             pullToRefreshConfig   = pullToRefresh   && this._getPullToRefreshConfig(attributes),
             pullToLoadMoreConfig  = pullToLoadMore  && this._getPullToLoadMoreConfig(attributes),
@@ -207,8 +215,8 @@
             bindToWrapper         : bindToWrapper,
             gpuOptimization       : gpuOptimization,
 
-            pullToRefresh         : !!pullToRefresh,
-            pullToLoadMore        : !!pullToLoadMore,
+            pullToRefresh         : pullToRefresh,
+            pullToLoadMore        : pullToLoadMore,
             infiniteLoading       : !!infiniteLoading,
             
             onPullToRefresh       : auraOnPullToRefresh  && this._bind(this._bridgeScrollerCallback, component, auraOnPullToRefresh),
@@ -242,7 +250,9 @@
         
     },
     _bridgeScrollerAction: function (attrs, scrollerInstance, actionName) {
-        var action = attrs.get(actionName);
+        var attrActionName = 'on' + actionName.charAt(0).toUpperCase() + actionName.slice(1),
+            action = attrs.get(attrActionName);
+
         if (action) {
             scrollerInstance.on(actionName, function () {
                 action.run.apply(action, arguments);
@@ -255,10 +265,10 @@
     _attachAuraEvents: function (component, scrollerInstance) {
         var attrs  = component.getAttributes(),
             events = [
-                'onBeforeScrollStart',
-                'onScrollStart',
-                'onScrollMove',
-                'onScrollEnd'
+                'beforeScrollStart',
+                'scrollStart',
+                'scrollMove',
+                'scrollEnd'
             ], wrapper;
 
         if (attrs.get('preventDefaultOnMove')) {

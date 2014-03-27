@@ -30,6 +30,7 @@ import org.auraframework.Aura;
 import org.auraframework.def.ActionDef;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
+import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DefinitionAccess;
@@ -37,6 +38,8 @@ import org.auraframework.def.TypeDef;
 import org.auraframework.def.ValueDef;
 import org.auraframework.instance.AbstractActionImpl;
 import org.auraframework.instance.Action;
+import org.auraframework.instance.ActionDelegate;
+import org.auraframework.instance.Component;
 import org.auraframework.service.ServerService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
@@ -46,6 +49,7 @@ import org.auraframework.system.Location;
 import org.auraframework.system.Message;
 import org.auraframework.system.SubDefDescriptor;
 import org.auraframework.throwable.AuraExecutionException;
+import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonReader;
@@ -59,8 +63,9 @@ public class ServerServiceImplTest extends AuraImplTestCase {
         super(name, false);
     }
 
-    // Do not test for null message, it cannot legally be null.
+    private static final Set<String> GLOBAL_IGNORE = Sets.newHashSet("context", "actions");
     
+    // Do not test for null message, it cannot legally be null.
     private static class EmptyActionDef implements ActionDef {
 		private static final long serialVersionUID = 1L;
 		StringWriter sw;
@@ -164,13 +169,14 @@ public class ServerServiceImplTest extends AuraImplTestCase {
             return Lists.newArrayList();
         }
     }
+    
+   
 
     private static class EmptyAction extends AbstractActionImpl<EmptyActionDef> {
         private String returnValue="";
         private Integer count=0;
         private String parameter="";
         
-
         public EmptyAction(StringWriter sw, String name) {
             super(null, new EmptyActionDef(sw,name), null);
         }
@@ -229,9 +235,105 @@ public class ServerServiceImplTest extends AuraImplTestCase {
         }
     };
 
+    private static class ShareCmpAction extends ActionDelegate {
 
-    private static final Set<String> GLOBAL_IGNORE = Sets.newHashSet("context", "actions");
-    
+    	private Map<String,Object> componentAttributes = null;
+    	private Component sharedCmp = null;
+    	private Object returnValue = null;
+    	private String name="ShareCmpAction";
+    	
+    	public ShareCmpAction(String name, Action originalAction, Component sharedCmp, Map<String,Object> componentAttributes) {
+            super(originalAction);
+            this.sharedCmp = sharedCmp;
+            this.componentAttributes = componentAttributes;
+            this.name = name;
+        }
+    	
+		@Override
+		public void run() throws AuraExecutionException {
+			try {
+				sharedCmp.getAttributes().set(componentAttributes); 
+			} catch (QuickFixException e) {
+				throw new AuraExecutionException(e.getMessage(), e.getLocation());
+			}
+			super.run();
+			String whatIsInResponse = (String) super.getReturnValue();
+			int startPos = whatIsInResponse.lastIndexOf("shared_component");
+			if(startPos >=0 ) {
+				this.returnValue = whatIsInResponse.substring(startPos);
+			}
+		}
+
+		@Override
+		public Object getReturnValue() {
+			return this.returnValue;
+		}
+		
+		@Override
+		public void serialize(Json json) throws IOException {
+			System.out.println("ShareCmpAction.serialize:"+this.name);
+			Map<String,Object> value = Maps.newHashMap();
+			value.put("shared_component", this.sharedCmp);
+			value.put("action", this.name);
+            json.writeValue(value);
+		}
+    }
+
+    /**
+     * Test for W-2085617
+     * This test is to verify when we have shared component between actions, they get serialized into response correctly.
+     * 
+     * Test Setup: 
+     * EmptyAction a,b,c : when it run, it put whatever response has into their return value
+     * ShareCmpAction d,e,f: when it run, it update the attribute of shared component, run its delegate action(a,b orc),
+     * then get the latest shared_component(in Json format) from its delegate action's return value as its return value.
+     * 
+     * when b runs, a has finish running, so b will have shared_component of a
+     * e will have shared_component of a in its return value (with attrA)
+     * when c runs, b has finish running, so c will have shared_components of a & b
+     * e will have shared_component of b in its return value (with attrB)
+     * @throws Exception
+     */
+    public void testSharedCmp() throws Exception {
+    	Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);
+    	Map<String, Object> attributes = Maps.newHashMap();
+    	Map<String, Object> attributesA = Maps.newHashMap();
+    	attributesA.put("attr", "attrA");
+    	Map<String, Object> attributesB = Maps.newHashMap();
+    	attributesB.put("attr", "attrB");
+    	Map<String, Object> attributesC = Maps.newHashMap();
+    	attributesC.put("attr", "attrC");
+		Component sharedCmp = Aura.getInstanceService().getInstance("ifTest:testIfWithModel", ComponentDef.class,
+                attributes);
+    	StringWriter sw = new StringWriter();
+        ServerService ss = Aura.getServerService();
+        Action a = new EmptyAction(sw,"first action");
+        Action b = new EmptyAction(sw,"second action");
+        Action c = new EmptyAction(sw,"third action");
+        Action d = new ShareCmpAction("d",a,sharedCmp,attributesA);
+        Action e = new ShareCmpAction("e",b,sharedCmp,attributesB);
+        Action f = new ShareCmpAction("f",c,sharedCmp,attributesC);
+        List<Action> actions = Lists.newArrayList(d,e,f);
+        Message message = new Message(actions);
+        //run the list of actions. 
+        ss.run(message, Aura.getContextService().getCurrentContext(), sw, null);
+        
+        System.out.println(sw);
+        
+        //sanity check, sharedCmp should have the latest attribute value. 
+        //this has nothing to do with the fix though
+        assertEquals("attrC",sharedCmp.getAttributes().getValue("attr"));
+        //Here are the checks for fix
+        //returnValue of action e is going to have shared component from action d in Json format
+        String returne = (String) e.getReturnValue();
+        assertTrue(returne.contains("markup://ifTest:testIfWithModel"));
+        assertTrue(returne.contains("\"attr\":\"attrA\""));
+        //returnValue of action f is going to have shared component from action e in Json format
+        String returnf = (String) f.getReturnValue();
+        assertTrue(returnf.contains("markup://ifTest:testIfWithModel"));
+        assertTrue(returnf.contains("\"attr\":\"attrB\""));
+        
+    }
 
     /**
      * Check that our EmptyAction is properly serialized.

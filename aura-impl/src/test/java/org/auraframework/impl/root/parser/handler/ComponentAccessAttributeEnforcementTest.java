@@ -26,7 +26,7 @@ public class ComponentAccessAttributeEnforcementTest extends
 	}
 	
 	/**
-	 * Verify Creating an application works
+	 * Verify Creating an Component works
 	 * @throws Exception
 	 */
 	public void testAccess() throws Exception {

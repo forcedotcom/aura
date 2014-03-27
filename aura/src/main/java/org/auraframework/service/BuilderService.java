@@ -77,8 +77,9 @@ public interface BuilderService extends AuraService {
 
      /**
      * Retrieves a Builder suitable for defining a {@link Cache}
+     * @param <K>
      * 
      * @throws QuickFixException
      */
-    CacheBuilder getCacheBuilder() throws QuickFixException;
+	<K, V> CacheBuilder<K, V> getCacheBuilder() throws QuickFixException;
 }

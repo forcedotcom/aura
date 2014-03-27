@@ -938,6 +938,16 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         return false;
     }
 
+    private boolean isInDepsCache(DefDescriptor<?> dd, MasterDefRegistryImpl mdr) throws Exception {
+        Cache<String, ?> cache = AuraPrivateAccessor.get(mdr, "depsCache");
+        for (String key : cache.getKeySet()) {
+        	if (key.endsWith(dd.getDescriptorName())) {
+        		return cache.getIfPresent(key) != null;
+        	}
+        }
+        return false;
+    }
+
     private boolean isInDefsCache(DefDescriptor<?> dd, MasterDefRegistryImpl mdr) throws Exception {
     	Cache<DefDescriptor<?>, Optional<? extends Definition>> cache = AuraPrivateAccessor.get(mdr, "defsCache");
         return null != cache.getIfPresent(dd);
@@ -1042,26 +1052,26 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         MasterDefRegistryImpl mdri = (MasterDefRegistryImpl)mdr;
         Map<DefType, DefDescriptor<?>> defs = addDefsToCaches(mdri);
         Map<DefType, DefDescriptor<?>> nonPrivDefs = addNonPriveledgedDefsToMDR(mdri);
-        for (DefDescriptor dd : defs.values()) {
+        for (DefDescriptor<?> dd : defs.values()) {
             assertTrue(dd + " should exist.", dd.exists());
         }
-        for (DefDescriptor dd : nonPrivDefs.values()) {
+        for (DefDescriptor<?> dd : nonPrivDefs.values()) {
             assertTrue(dd + " should exist.", dd.exists());
         }
 
-        DefDescriptor nsDef = defs.get(DefType.NAMESPACE);
-        DefDescriptor layoutDef = defs.get(DefType.LAYOUTS);
-        DefDescriptor rendererDef = defs.get(DefType.RENDERER);
-        DefDescriptor appDef = defs.get(DefType.APPLICATION);
-        DefDescriptor controllerDef = defs.get(DefType.CONTROLLER);
-        DefDescriptor cmpDef = defs.get(DefType.COMPONENT);
+        DefDescriptor<?> nsDef = defs.get(DefType.NAMESPACE);
+        DefDescriptor<?> layoutDef = defs.get(DefType.LAYOUTS);
+        DefDescriptor<?> rendererDef = defs.get(DefType.RENDERER);
+        DefDescriptor<?> appDef = defs.get(DefType.APPLICATION);
+        DefDescriptor<?> controllerDef = defs.get(DefType.CONTROLLER);
+        DefDescriptor<?> cmpDef = defs.get(DefType.COMPONENT);
 
-        DefDescriptor npNSDef = nonPrivDefs.get(DefType.NAMESPACE);
-        DefDescriptor npLayoutDef = nonPrivDefs.get(DefType.LAYOUTS);
-        DefDescriptor npRendererDef = nonPrivDefs.get(DefType.RENDERER);
-        DefDescriptor nsAppDef = nonPrivDefs.get(DefType.APPLICATION);
-        DefDescriptor nsControllerDef = nonPrivDefs.get(DefType.CONTROLLER);
-        DefDescriptor nsCmpDef = nonPrivDefs.get(DefType.COMPONENT);
+        DefDescriptor<?> npNSDef = nonPrivDefs.get(DefType.NAMESPACE);
+        DefDescriptor<?> npLayoutDef = nonPrivDefs.get(DefType.LAYOUTS);
+        DefDescriptor<?> npRendererDef = nonPrivDefs.get(DefType.RENDERER);
+        DefDescriptor<?> nsAppDef = nonPrivDefs.get(DefType.APPLICATION);
+        DefDescriptor<?> nsControllerDef = nonPrivDefs.get(DefType.CONTROLLER);
+        DefDescriptor<?> nsCmpDef = nonPrivDefs.get(DefType.COMPONENT);
         
         //only picking 3 defs to test the ns as they are mostly dupes
         assertTrue(nsDef.getNamespace() + "  should have been isPriveleged", configAdapter.isPrivilegedNamespace(nsDef.getNamespace()));
@@ -1077,7 +1087,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         
         //objects wont be in eists cache yet, just defsCache, need to call exists to prime exists cache
 
-        for (DefDescriptor dd : defs.values()) {
+        for (DefDescriptor<?> dd : defs.values()) {
             assertTrue(dd + " should exist.", dd.exists());
         }
         assertTrue("nsDef is in cache", isInExistsCache(nsDef, mdri2));
@@ -1096,7 +1106,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         
         
         MasterDefRegistry mdr3 = restartContextGetNewMDR();
-        MasterDefRegistryImpl mdri3 = (MasterDefRegistryImpl)mdr2;
+        MasterDefRegistryImpl mdri3 = (MasterDefRegistryImpl)mdr3;
         
         assertTrue("nsDef is in cache", isInExistsCache(nsDef, mdri3));
         assertTrue("LayoutsDef is in cache", isInExistsCache(defs.get(DefType.LAYOUTS), mdri3));
@@ -1120,19 +1130,19 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         Map<DefType, DefDescriptor<?>> defs = addDefsToCaches(mdri);
         Map<DefType, DefDescriptor<?>> nonPrivDefs = addNonPriveledgedDefsToMDR(mdri);
 
-        DefDescriptor nsDef = defs.get(DefType.NAMESPACE);
-        DefDescriptor layoutDef = defs.get(DefType.LAYOUTS);
-        DefDescriptor rendererDef = defs.get(DefType.RENDERER);
-        DefDescriptor appDef = defs.get(DefType.APPLICATION);
-        DefDescriptor controllerDef = defs.get(DefType.CONTROLLER);
-        DefDescriptor cmpDef = defs.get(DefType.COMPONENT);
+        DefDescriptor<?> nsDef = defs.get(DefType.NAMESPACE);
+        DefDescriptor<?> layoutDef = defs.get(DefType.LAYOUTS);
+        DefDescriptor<?> rendererDef = defs.get(DefType.RENDERER);
+        DefDescriptor<?> appDef = defs.get(DefType.APPLICATION);
+        DefDescriptor<?> controllerDef = defs.get(DefType.CONTROLLER);
+        DefDescriptor<?> cmpDef = defs.get(DefType.COMPONENT);
 
-        DefDescriptor npNSDef = nonPrivDefs.get(DefType.NAMESPACE);
-        DefDescriptor npLayoutDef = nonPrivDefs.get(DefType.LAYOUTS);
-        DefDescriptor npRendererDef = nonPrivDefs.get(DefType.RENDERER);
-        DefDescriptor nsAppDef = nonPrivDefs.get(DefType.APPLICATION);
-        DefDescriptor nsControllerDef = nonPrivDefs.get(DefType.CONTROLLER);
-        DefDescriptor nsCmpDef = nonPrivDefs.get(DefType.COMPONENT);
+        DefDescriptor<?> npNSDef = nonPrivDefs.get(DefType.NAMESPACE);
+        DefDescriptor<?> npLayoutDef = nonPrivDefs.get(DefType.LAYOUTS);
+        DefDescriptor<?> npRendererDef = nonPrivDefs.get(DefType.RENDERER);
+        DefDescriptor<?> nsAppDef = nonPrivDefs.get(DefType.APPLICATION);
+        DefDescriptor<?> nsControllerDef = nonPrivDefs.get(DefType.CONTROLLER);
+        DefDescriptor<?> nsCmpDef = nonPrivDefs.get(DefType.COMPONENT);
         
         //only picking 3 defs to test the ns as they are mostly dupes
         assertTrue(nsDef.getNamespace() + "  should have been isPriveleged", configAdapter.isPrivilegedNamespace(nsDef.getNamespace()));
@@ -1183,13 +1193,13 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         Map<DefType, DefDescriptor<?>> defs = addDefsToCaches(mdri);
         Map<DefType, DefDescriptor<?>> nonPrivDefs = addNonPriveledgedDefsToMDR(mdri);
 
-        DefDescriptor nsDef = defs.get(DefType.NAMESPACE);
-        DefDescriptor layoutDef = defs.get(DefType.LAYOUTS);
-        DefDescriptor rendererDef = defs.get(DefType.RENDERER);
+        DefDescriptor<?> nsDef = defs.get(DefType.NAMESPACE);
+        DefDescriptor<?> layoutDef = defs.get(DefType.LAYOUTS);
+        DefDescriptor<?> rendererDef = defs.get(DefType.RENDERER);
 
-        DefDescriptor npNSDef = nonPrivDefs.get(DefType.NAMESPACE);
-        DefDescriptor npLayoutDef = nonPrivDefs.get(DefType.LAYOUTS);
-        DefDescriptor npRendererDef = nonPrivDefs.get(DefType.RENDERER);
+        DefDescriptor<?> npNSDef = nonPrivDefs.get(DefType.NAMESPACE);
+        DefDescriptor<?> npLayoutDef = nonPrivDefs.get(DefType.LAYOUTS);
+        DefDescriptor<?> npRendererDef = nonPrivDefs.get(DefType.RENDERER);
         
         //only picking 3 defs to test the ns as they are mostly dupes
         assertTrue(nsDef.getNamespace() + "  should have been isPriveleged", configAdapter.isPrivilegedNamespace(nsDef.getNamespace()));
@@ -1232,6 +1242,53 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 //        assertFalse("results6 should not be cached", isInDescriptorFilterCache(filter6, results6, mdri2));
     }
     
+    public void testDepsCache() throws Exception {
+    	String unprivilegedNamespace = getAuraTestingUtil().getNonce("alien");
+
+        // in privileged namespace
+        DefDescriptor<ComponentDef> privilegedCmp = getAuraTestingUtil().addSourceAutoCleanup(
+        		ComponentDef.class, String.format(baseComponentTag,"access='global'",""), null, true);
+        // in unprivileged namespace depending on privileged cmp
+        DefDescriptor<ComponentDef> unprivilegedCmp = getAuraTestingUtil().addSourceAutoCleanup(
+        		DefDescriptorImpl.getInstance(String.format("markup://%s:cmp", unprivilegedNamespace), ComponentDef.class),
+        		String.format(baseComponentTag, "access='global'", String.format("<%s/>", privilegedCmp.getDescriptorName())),
+        		false);
+        
+        // in privileged namespace depending on unprivileged cmp
+		DefDescriptor<ComponentDef> privilegedRoot = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+				String.format(baseComponentTag, "access='global'", String.format("<%s/>", unprivilegedCmp.getDescriptorName())),
+				null, true);
+        
+        ConfigAdapter configAdapter = Aura.getConfigAdapter();
+		assertTrue(configAdapter.isPrivilegedNamespace(privilegedCmp.getNamespace()));
+		assertFalse(configAdapter.isPrivilegedNamespace(unprivilegedCmp.getNamespace()));
+		assertTrue(configAdapter.isPrivilegedNamespace(privilegedRoot.getNamespace()));
+		
+        MasterDefRegistry mdr = Aura.getContextService().getCurrentContext().getDefRegistry();
+        MasterDefRegistryImpl mdri = (MasterDefRegistryImpl)mdr;
+        mdr.getDef(privilegedCmp);
+        assertTrue(isInDepsCache(privilegedCmp, mdri));
+        assertFalse(isInDepsCache(unprivilegedCmp, mdri));
+        assertFalse(isInDepsCache(privilegedRoot, mdri));
+        
+        mdr.invalidate(DefDescriptorImpl.getInstance("aura:component", ComponentDef.class)); // invalidate the world
+        mdr.getDef(unprivilegedCmp);
+        assertFalse(isInDepsCache(privilegedCmp, mdri));
+        assertFalse(isInDepsCache(unprivilegedCmp, mdri));
+        assertFalse(isInDepsCache(privilegedRoot, mdri));
+        
+        mdr.invalidate(DefDescriptorImpl.getInstance("aura:component", ComponentDef.class)); // invalidate the world
+		try {
+			mdr.getDef(privilegedRoot);
+			fail("Shouldn't be able to have a privileged cmp depend on an unprivileged cmp");
+		} catch (Throwable t) {
+			this.assertExceptionMessageStartsWith(t,
+					DefinitionNotFoundException.class, String.format(
+							"No COMPONENT named %s found",
+							unprivilegedCmp.getQualifiedName()));
+		}
+    }
+
     private MasterDefRegistry restartContextGetNewMDR() {
         //simulate new request
         MasterDefRegistry mdr = getAuraMDR();

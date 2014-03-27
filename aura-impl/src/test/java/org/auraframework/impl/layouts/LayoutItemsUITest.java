@@ -15,8 +15,6 @@
  */
 package org.auraframework.impl.layouts;
 
-import java.util.concurrent.TimeUnit;
-
 import org.auraframework.test.WebDriverTestCase;
 import org.openqa.selenium.By;
 

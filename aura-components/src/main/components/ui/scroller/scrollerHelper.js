@@ -82,7 +82,7 @@
             deltaX   = params.deltaX || 0,
             deltaY   = params.deltaY || 0;
 
-        scroller.scrollTo(scoller.x + deltaX, scroller.y + deltaY, time);
+        scroller.scrollTo(scroller.x + deltaX, scroller.y + deltaY, time);
     },
     swapShowMore: function (cmp, newValue) {
         var scroller = this.getScrollerInstance(cmp);

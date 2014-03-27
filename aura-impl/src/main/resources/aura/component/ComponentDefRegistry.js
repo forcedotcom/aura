@@ -21,6 +21,7 @@
  */
 function ComponentDefRegistry(){
     this.componentDefs = {};
+    this.dynamicNamespaces = [];
 }
 
 ComponentDefRegistry.prototype.auraType = "ComponentDefRegistry";
@@ -85,7 +86,11 @@ ComponentDefRegistry.prototype.getDef = function(config, noInit) {
         $A.assert(config !== undefined, "Unknown component "+descriptor);
 
         ret = new $A.ns.ComponentDef(config);
-        this.componentDefs[ret.getDescriptor().toString()] = ret;
+        var descString = ret.getDescriptor().toString();
+        this.componentDefs[descString] = ret;
+        if (descString.indexOf("layout://") === 0) {
+            this.dynamicNamespaces.push(ret.getDescriptor().getNamespace());
+        }
 
         if (useLocalStorage) {
             // Write through of local storage cacheable componentDefs

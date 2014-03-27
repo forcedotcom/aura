@@ -6,7 +6,7 @@
     fetchDataPTR : function(component, callback, helper) {
         var result,
         	dom,
-        	act = component.get("c.getItems"),
+        	act = component.get("c.getItemsPTR"),
         	actionCallback = function(action){
         		
             	if (action.getState() === "SUCCESS") {
@@ -29,7 +29,7 @@
     fetchDataPTL : function(component, callback, helper) {
         var result,
         	dom,
-        	act = component.get("c.getItems"),
+        	act = component.get("c.getItemsPTL"),
         	actionCallback = function(action){
         		
             	if (action.getState() === "SUCCESS") {
@@ -47,22 +47,5 @@
         act.setCallback(component, actionCallback);
         
         $A.enqueueAction(act);
-    },
-    
-    beforeScrollStartHandler: function(component, event, helper){
-    	$A.log("Executed fn beforeScrollStartHandler..");
-    },
-    
-    scrollStartHandler: function(component, event, helper){
-    	$A.log("Executed fn scrollStartHandler..");
-    },
-    
-    scrollEndHandler: function(component, event, helper){
-    	$A.log("Executed fn scrollEndHandler..");
-    },
-    
-    scrollMoveHandler: function(component, event, helper){
-    	$A.log("Executed fn scrollMoveHandler..");
-    }
-    
+    }  
 })

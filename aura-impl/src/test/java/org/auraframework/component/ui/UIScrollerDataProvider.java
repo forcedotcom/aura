@@ -27,18 +27,34 @@ import org.auraframework.util.json.JsonSerializable;
 @Controller
 public class UIScrollerDataProvider {
 
-	private static int COUNTER = -1;
+	private static int PTR_COUNTER = 0;
+	private static int PTL_COUNTER = 0;
 	
     @AuraEnabled
-    public static List<Item> getItems(@Key("size") int size) throws Exception {
+    public static List<Item> getItemsPTR(@Key("size") int size) throws Exception {
     	List<Item> l = null;
     	if(size > 0){
 	        l = new ArrayList<Item>(size);
 	        for (int i = 0; i < size; i++) {
-	        	int id = ++COUNTER;
-	            l.add(new Item("Pretty row " + id + " from server", Integer.toString(id)));
+	        	int id = ++PTR_COUNTER;
+	            l.add(new Item("After PTR, pretty row " + id + " from server", Integer.toString(id)));
 	        }
     	}
+    	PTR_COUNTER = 0;
+        return l;
+    }
+    
+    @AuraEnabled
+    public static List<Item> getItemsPTL(@Key("size") int size) throws Exception {
+    	List<Item> l = null;
+    	if(size > 0){
+	        l = new ArrayList<Item>(size);
+	        for (int i = 0; i < size; i++) {
+	        	int id = ++PTL_COUNTER;
+	            l.add(new Item("After PTL, pretty row " + id + " from server", Integer.toString(id)));
+	        }
+    	}
+    	PTL_COUNTER = 0;
         return l;
     }
     

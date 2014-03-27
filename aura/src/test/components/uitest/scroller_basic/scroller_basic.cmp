@@ -36,10 +36,6 @@
 		<ui:scroller class="scrollWrapper" 
 			onPullToRefresh="{!c.fetchDataPTR}" 
 			onPullToShowMore="{!c.fetchDataPTL}" 
-			onBeforeScrollStart="{!c.beforeScrollStartHandler}" 
-			onScrollStart="{!c.scrollStartHandler}" 
-			onScrollEnd="{!c.scrollEndHandler}" 
-			onScrollMove="{!c.scrollMoveHandler}" 
 			aura:id="test-scroller" showScrollbars="true">
 			
 				<div class="item" id="r1">Pretty row 1</div>

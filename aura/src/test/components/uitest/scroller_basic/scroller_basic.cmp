@@ -9,7 +9,7 @@
             http://www.apache.org/licenses/LICENSE-2.0
 
     Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "rS IS" BASIS,
+    distributed under the License is distributed on an "AS IS" BASIS,
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
     See the License for the specific language governing permissions and
     limitations under the License.
@@ -17,7 +17,7 @@
 -->
 <aura:component
 	controller="java://org.auraframework.component.ui.UIScrollerDataProvider"
-	description="r test scroller.">
+	description="A test scroller.">
 
 	<aura:handler name="init" value="{!this}" action="{!c.init}"/> 	
 	<style>
@@ -33,7 +33,14 @@
 	</style>
 	<div id="header" class="common">New Aura Scroller</div>
 		
-		<ui:scroller class="scrollWrapper" onPullToRefresh="{!c.fetchDataPTR}" onPullToShowMore="{!c.fetchDataPTL}" aura:id="test-scroller" showScrollbars="true">
+		<ui:scroller class="scrollWrapper" 
+			onPullToRefresh="{!c.fetchDataPTR}" 
+			onPullToShowMore="{!c.fetchDataPTL}" 
+			onBeforeScrollStart="{!c.beforeScrollStartHandler}" 
+			onScrollStart="{!c.scrollStartHandler}" 
+			onScrollEnd="{!c.scrollEndHandler}" 
+			onScrollMove="{!c.scrollMoveHandler}" 
+			aura:id="test-scroller" showScrollbars="true">
 			
 				<div class="item" id="r1">Pretty row 1</div>
 				<div class="item" id="r2">Pretty row 2</div>

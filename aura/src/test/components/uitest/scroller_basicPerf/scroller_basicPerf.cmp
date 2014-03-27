@@ -1,0 +1,50 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component
+	controller="java://org.auraframework.component.ui.UIScrollerDataProvider"
+	description="A test scroller for testing performance.">
+
+	<aura:handler name="init" value="{!this}" action="{!c.init}"/>
+	<aura:attribute name="rows" type="List"/>
+	<style>
+		* {
+			box-sizing: border-box;
+		}
+		
+		body {
+			margin: 0;
+			padding: 0;
+			overflow: scroll;
+		}
+	</style>
+	
+	 <div class="section">
+     	<div aura:id="scrollContainer" class="container">
+     		<ui:scroller aura:id="outer" class="scrollWrapper">
+     			<ui:scroller aura:id="inner" class="scrollWrapper">
+	        		<aura:iteration var="row" items="{!v.rows}">
+	          			<div class="item">
+				        	<ui:outputURL value="javascript:void(0);" label="{!row.text}" click="{!c.handleClick}"></ui:outputURL>
+				        </div>
+	        		</aura:iteration>
+	        	</ui:scroller>
+      		</ui:scroller>
+  		</div>
+  	</div>
+			
+</aura:component>

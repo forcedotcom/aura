@@ -1,0 +1,41 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:documentation>
+	<aura:description>
+		<p>
+			An expression is any set of literal values, variables, sub-expressions, or operators that can be resolved to a single value.
+			It is used for dynamic output or passing a value into components by assigning them to attributes.
+		</p>
+		<p>
+			The syntax for an expression is <code>{!expression}</code>. <code>expression</code> is evaluated and dynamically replaced when the component is rendered or when the value is used by the component.
+			The resulting value can be a primitive (integer, string, and so on), a boolean, a JavaScript or Aura object, an Aura component or collection, a controller method
+            such as an action method, and other useful results.
+		</p>
+		<p>
+			An expression uses a value provider to access data and can also use operators and functions for more complex expressions.
+			Value providers include <code>m</code> (data from model), <code>v</code>(attribute data from component), and <code>c</code> (controller action). 
+			This example show an expression <code>{!v.num}</code> whose value is resolved by the attribute <code>num</code>.
+<pre>
+&lt;aura:attribute name="num" type="integer" default="10"/>
+&lt;ui:inputNumber label="Enter age" aura:id="num" value="{!v.num}"/>
+</pre>
+		</p>
+	</aura:description>	
+		
+	
+</aura:documentation>

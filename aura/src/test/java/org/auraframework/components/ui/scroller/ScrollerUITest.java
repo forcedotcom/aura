@@ -48,7 +48,7 @@ public class ScrollerUITest extends WebDriverTestCase{
         pause(600);
         //after pull to refresh, we will get 2 data items from 
         //server which will be prepended to the DOM they will 
-        //have id's 0, 1. since it's prepend they will be in 
+        //have id's '1onPTR', '2onPTR'. since it's prepend they will be in 
         //viewport anyways, so we are not asserting verifyIfElementInViewport. 
         //we are just ensuring we have those 2 data items in the DOM.
         //if needed, you can assert if the items got correctly 
@@ -58,14 +58,14 @@ public class ScrollerUITest extends WebDriverTestCase{
         		2, verifyPullToRefreshData().size());
         //scroll down vertically and ensure it scrolls correctly by 
         //asserting elements that you got in pull to refresh
-        //are no longer in viewport now e.g. element with id 1
+        //are no longer in viewport now e.g. element with id '1onPTR'
         this.startFlick(0, -600);
         pause(2500);
         assertFalse("Seems like vertical scrolling did not work after pull to refresh", 
-        		verifyIfElementInViewport("1"));
+        		verifyIfElementInViewport("1onPTR"));
         //pull to show more
         //pull to show more will fetch 4 data items from the server 
-        //and they will be appended to the DOM they will have id's 2, 3, 4, 5 
+        //and they will be appended to the DOM they will have id's '1onPTL', '2onPTL', '3onPTL', '4onPTL' 
         //respectively. we are asserting if these 4 data items got appended to the DOM
         //if needed, you can assert if the items got correctly appended by 
         //querying div.items and looking for last four elements in it.
@@ -75,11 +75,11 @@ public class ScrollerUITest extends WebDriverTestCase{
         		4, verifyPullToShowMoreData().size());
         //scroll down vertically to get to elements after pull to 
         //show more and ensure they are in viewport. we are
-        //asserting for data item with id 5
+        //asserting for data item with id '4onPTL' to exist in viewport
         this.startFlick(0, -600);
         pause(600);
         assertTrue("Seems like vertical scrolling did not work", 
-        		verifyIfElementInViewport("5"));
+        		verifyIfElementInViewport("4onPTL"));
     }
     
     private void startFlick(int xOffset, int yOffset){
@@ -103,7 +103,9 @@ public class ScrollerUITest extends WebDriverTestCase{
     private boolean verifyIfElementInViewport(String elementId){
     	String expressionFn = "window.isElementInViewport = function(el) {" +
     	    "var rect = el.getBoundingClientRect();" +
-
+    	    "if(!rect) {" +
+    	    	"return false;" +
+    	    "}" +
     	    "return (" +
     	        "rect.top >= 0 &&" +
     	        "rect.left >= 0 &&"+

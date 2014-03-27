@@ -47,6 +47,22 @@
         act.setCallback(component, actionCallback);
         
         $A.enqueueAction(act);
+    },
+    
+    beforeScrollStartHandler: function(component, event, helper){
+    	$A.log("Executed fn beforeScrollStartHandler..");
+    },
+    
+    scrollStartHandler: function(component, event, helper){
+    	$A.log("Executed fn scrollStartHandler..");
+    },
+    
+    scrollEndHandler: function(component, event, helper){
+    	$A.log("Executed fn scrollEndHandler..");
+    },
+    
+    scrollMoveHandler: function(component, event, helper){
+    	$A.log("Executed fn scrollMoveHandler..");
     }
     
 })

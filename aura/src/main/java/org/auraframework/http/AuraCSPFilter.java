@@ -73,6 +73,7 @@ public class AuraCSPFilter implements Filter {
         p
         .default_src(CSP.SELF)
         .img_src(CSP.ALL)
+        .font_src(CSP.ALL)
         .report_uri(CSPReporterServlet.URL);
         
         // note that chrome-extensions can cause violations, and we don't generally care.
@@ -93,7 +94,8 @@ public class AuraCSPFilter implements Filter {
      * This is a (hopefully) temporary solution.
      * 
      * As the names imply, CSP strongly discourages use of unsafe-eval and unsafe-inline,
-     * but parts of the Aura client depend on inlining, in particular the initial page template.
+     * but parts of the Aura client depend on inlining, in particular the initial page template,
+     * and fixing this the last week of feature development is scary.
      * 
      * NOTE: this should be fixed sooner rather than later, because the initial template *is*
      * configurable by consumers, and is therefore a vector for attack.

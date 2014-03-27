@@ -617,10 +617,10 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         assertNotNull(registry.getDef(cmpDesc));
         Mockito.verify(registry, Mockito.times(0)).compileDE(Mockito.eq(cmpDesc));
 
-        // another getDef on other registry instance should re-compile the def
+        // another getDef on other registry instance should no longer re-compile the def since W-2106504
         registry = getDefRegistry(true);
         assertNotNull(registry.getDef(cmpDesc));
-        Mockito.verify(registry, Mockito.times(1)).compileDE(Mockito.eq(cmpDesc));
+        Mockito.verify(registry, Mockito.times(0)).compileDE(Mockito.eq(cmpDesc));
     }
 
     public void testGetDefDescriptorNull() throws Exception {

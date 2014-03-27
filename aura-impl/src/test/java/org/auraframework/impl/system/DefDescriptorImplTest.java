@@ -20,6 +20,7 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.HelperDef;
 import org.auraframework.def.LayoutsDef;
 import org.auraframework.def.TypeDef;
 import org.auraframework.impl.AuraImplTestCase;
@@ -210,9 +211,11 @@ public class DefDescriptorImplTest extends AuraImplTestCase {
         if (compareTo == 0) {
             assertTrue(x + " equals " + y, x.equals(y));
             assertEquals(x + " compareTo[" + compareTo + "] " + y, x.compareTo(y), compareTo);
+            assertEquals(x.hashCode(), y.hashCode());
         } else {
             assertFalse(x + " NOT equals " + y, x.equals(y));
             assertTrue(x + " compareTo[" + compareTo + "] " + y, x.compareTo(y) * compareTo > 0);
+            assertFalse(x.hashCode() == y.hashCode());
         }
     }
 
@@ -225,7 +228,13 @@ public class DefDescriptorImplTest extends AuraImplTestCase {
                 vendor.makeComponentDefDescriptor("fake:component"), 0);
         testEquals(DefDescriptorImpl.getInstance("aura:text", ComponentDef.class),
                 vendor.makeComponentDefDescriptor("aura:text"), 0);
-
+		testEquals(DefDescriptorImpl.getInstance("some:component", ComponentDef.class),
+				DefDescriptorImpl.getInstance("markup://some:component", ComponentDef.class), 0);
+		/* this class of descriptors does not default a prefix, which makes sense in some cases like for renderer, provider, etc.
+		testEquals(DefDescriptorImpl.getInstance("js://some.component", HelperDef.class),
+				DefDescriptorImpl.getInstance("some.component", HelperDef.class), 0);
+		 */
+		
         testEquals(DefDescriptorImpl.getInstance("aura:fakeComponent", ComponentDef.class),
                 vendor.makeComponentDefDescriptor("fake:component"), -1);
         testEquals(DefDescriptorImpl.getInstance("aura:fakeComponent", ComponentDef.class),

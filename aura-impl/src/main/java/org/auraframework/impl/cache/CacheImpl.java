@@ -15,173 +15,153 @@
  */
 package org.auraframework.impl.cache;
 
-//import java.io.IOException;
-//
-//import org.auraframework.throwable.quickfix.QuickFixException;
-
-
 import java.util.ArrayList;
 import java.util.Set;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
+import org.auraframework.cache.Cache;
 
+public class CacheImpl<K, T> implements Cache<K, T> {
 
-public class CacheImpl<K, T>  implements org.auraframework.cache.Cache<K,T> {
+	private com.google.common.cache.Cache<K, T> cache;
 
-    Cache<K, T> cache;
-    
+	CacheImpl(com.google.common.cache.Cache<K, T> cache) {
+		this.cache = cache;
+	}
 
-    public CacheImpl(int initialSize, int maxSize) {
-        cache = 
-                CacheBuilder.newBuilder()
-                    .initialCapacity(initialSize).maximumSize(maxSize).recordStats().softValues().build();
-    }
+	public CacheImpl(Builder<K, T> builder) {
+		// if builder.useSecondaryStorage is true, we should try to use a
+		// non-quava secondary-storage cache with streaming ability
 
-    public CacheImpl(Builder<K,T> builder) {
-        
-        // if builder.useSecondaryStorage is true, we should try to use a non-quava 
-        // secondary-storage cache with streaming ability
-        
-        CacheBuilder<Object, Object> cb = 
-                com.google.common.cache.CacheBuilder.newBuilder()
-            .initialCapacity(builder.initialCapacity)
-            .maximumSize(builder.maximumSize)
-            .concurrencyLevel(builder.concurrencyLevel);
-        	
+		com.google.common.cache.CacheBuilder<Object, Object> cb = com.google.common.cache.CacheBuilder
+				.newBuilder().initialCapacity(builder.initialCapacity)
+				.maximumSize(builder.maximumSize)
+				.concurrencyLevel(builder.concurrencyLevel);
 
-        if (builder.recordStats) {
-            cb = cb.recordStats();
-        }
-        
-        if (builder.softValues) {
-            cb = cb.softValues();
-        }
-        cache = cb.build();
-    }
+		if (builder.recordStats) {
+			cb = cb.recordStats();
+		}
 
+		if (builder.softValues) {
+			cb = cb.softValues();
+		}
+		cache = cb.build();
+	}
 
-    @Override
-    public T getIfPresent(K key)  {
-        return cache.getIfPresent(key);
-    }
-    
-    @Override
-    public void put(K key, T data) {
-        cache.put(key, data);
-        
-    }
+	@Override
+	public T getIfPresent(K key) {
+		return cache.getIfPresent(key);
+	}
 
-    @Override
-    public void invalidate(K key) {
-        cache.invalidate(key);
-        
-    }
+	@Override
+	public void put(K key, T data) {
+		cache.put(key, data);
 
-    @Override
-    public void invalidate(Iterable<K> keys) {
-        cache.invalidate(keys);
-    }
+	}
 
-    @Override
-    public void invalidateAll() {
-        cache.invalidateAll();
-    }
-    
-    @Override
-    public Set<K> getKeySet() {
-    	return cache.asMap().keySet();
-    }
-    
-    @Override
-    public void invalidatePartial(String partial) {
-        Set<K> set = cache.asMap().keySet();
-        ArrayList<K> invalidItems = new ArrayList<K>();
+	@Override
+	public void invalidate(K key) {
+		cache.invalidate(key);
 
-        // everything is a match if the match length is zero
-        if (partial.length() == 0) {
-            invalidateAll();
-            return;
-        }
-        
-        // add beginsWith matches to invalidItems
-        for (K key : set) {
-            if (key.toString().startsWith(partial)) {
-                invalidItems.add(key);
-            }
-        }
-        
-        // invalidate collected items
-        cache.invalidate(invalidItems);
-    }
-    
-    @Override
-    public Object getPrivateUnderlyingCache() {
-        return cache;
-    }
+	}
 
-    public static class Builder<K , T> implements org.auraframework.builder.CacheBuilder<K, T>  {
-        // builder defaults
-        public int initialCapacity = 128;
-        public int concurrencyLevel = 4;
-        public long maximumSize = 1024;
-        public boolean recordStats = false;
-        public boolean softValues = true;
-        public boolean useSecondaryStorage = false;
+	@Override
+	public void invalidate(Iterable<K> keys) {
+		cache.invalidate(keys);
+	}
 
-        public Builder() {
-            
-        }
-        
-        @Override
-        public Builder<K, T> setInitialSize(int initialCapacity)  {
-            this.initialCapacity = initialCapacity;
-            return this;
-        };
+	@Override
+	public void invalidateAll() {
+		cache.invalidateAll();
+	}
 
-        @Override
-        public Builder<K, T> setMaximumSize(long maximumSize) {
-            this.maximumSize = maximumSize;
-            return this;
-        };
+	@Override
+	public Set<K> getKeySet() {
+		return cache.asMap().keySet();
+	}
 
-        @Override
-        public Builder<K, T> setUseSecondaryStorage(boolean useSecondaryStorage) {
-            this.useSecondaryStorage = useSecondaryStorage;
-            return this;
-        }
+	@Override
+	public void invalidatePartial(String keyBeginsWith) {
+		// everything is a match if the match length is zero
+		if (keyBeginsWith == null || keyBeginsWith.length() == 0) {
+			invalidateAll();
+			return;
+		}
 
-        @Override
-        public Builder<K, T> setRecordStats(boolean recordStats) {
-            this.recordStats = recordStats;
-            return this;
-        }
+		// add beginsWith matches to invalidItems
+		Set<K> set = getKeySet();
+		ArrayList<K> invalidItems = new ArrayList<K>();
+		for (K key : set) {
+			if (key.toString().startsWith(keyBeginsWith)) {
+				invalidItems.add(key);
+			}
+		}
 
-        @Override
-        public Builder<K, T> setSoftValues(boolean softValues) {
-            this.softValues = softValues;
-            return this;
-        }
-        
-        @Override
-        public Builder<K, T> setConcurrencyLevel(int concurrencyLevel) {
-            this.concurrencyLevel = concurrencyLevel;
-            return this;
-        }
-         
-        
-//        @Override
-//        Builder setLoader(int maxSize);
+		// invalidate collected items
+		if (!invalidItems.isEmpty()) {
+			cache.invalidate(invalidItems);
+		}
+	}
 
-        @Override
-        public CacheImpl<K, T> build() {
-            return new CacheImpl<K, T>(this);
-        }
+	@Override
+	public Object getPrivateUnderlyingCache() {
+		return cache;
+	}
 
+	public static class Builder<K, T> implements
+			org.auraframework.builder.CacheBuilder<K, T> {
+		// builder defaults
+		public int initialCapacity = 128;
+		public int concurrencyLevel = 4;
+		public long maximumSize = 1024;
+		public boolean recordStats = false;
+		public boolean softValues = true;
+		public boolean useSecondaryStorage = false;
 
+		public Builder() {
 
-    }
+		}
 
+		@Override
+		public Builder<K, T> setInitialSize(int initialCapacity) {
+			this.initialCapacity = initialCapacity;
+			return this;
+		};
 
+		@Override
+		public Builder<K, T> setMaximumSize(long maximumSize) {
+			this.maximumSize = maximumSize;
+			return this;
+		};
+
+		@Override
+		public Builder<K, T> setUseSecondaryStorage(boolean useSecondaryStorage) {
+			this.useSecondaryStorage = useSecondaryStorage;
+			return this;
+		}
+
+		@Override
+		public Builder<K, T> setRecordStats(boolean recordStats) {
+			this.recordStats = recordStats;
+			return this;
+		}
+
+		@Override
+		public Builder<K, T> setSoftValues(boolean softValues) {
+			this.softValues = softValues;
+			return this;
+		}
+
+		@Override
+		public Builder<K, T> setConcurrencyLevel(int concurrencyLevel) {
+			this.concurrencyLevel = concurrencyLevel;
+			return this;
+		}
+
+		@Override
+		public CacheImpl<K, T> build() {
+			return new CacheImpl<K, T>(this);
+		}
+
+	}
 
 }

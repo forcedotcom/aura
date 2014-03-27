@@ -17,57 +17,59 @@ package org.auraframework.builder;
 
 import org.auraframework.cache.Cache;
 
-
-
 public interface CacheBuilder<K, T> {
-	
+
 	/**
-	 * Set a hint for initial cache size.   
+	 * Set a hint for initial cache size.
+	 * 
 	 * @param initialCapacity
 	 * @return the same CacheBuilder with this property set
 	 */
-    CacheBuilder<K, T> setInitialSize(int initialCapacity);
+	CacheBuilder<K, T> setInitialSize(int initialCapacity);
 
-    /**
-     * Set a hint for maximum cache size, before evictions occur
-     * @param maximumSize
-     * @return the same CacheBuilder with this property set
-     */
-    CacheBuilder<K, T> setMaximumSize(long maximumSize);
+	/**
+	 * Set a hint for maximum cache size, before evictions occur
+	 * 
+	 * @param maximumSize
+	 * @return the same CacheBuilder with this property set
+	 */
+	CacheBuilder<K, T> setMaximumSize(long maximumSize);
 
-    /**
-     * Set true to hint the cache to use a non-memory storage strategy, typically for large, 
-     * stable objects.  
-     * @param useSecondaryStorage
-     * @return the same CacheBuilder with this property set
-     */
-    CacheBuilder<K, T> setUseSecondaryStorage(boolean useSecondaryStorage);
+	/**
+	 * Set true to hint the cache to use a non-memory storage strategy,
+	 * typically for large, stable objects.
+	 * 
+	 * @param useSecondaryStorage
+	 * @return the same CacheBuilder with this property set
+	 */
+	CacheBuilder<K, T> setUseSecondaryStorage(boolean useSecondaryStorage);
 
-    /**
-     * Set true to hint that the cache should record statistics 
-     * @param recordStats
-     * @return the same CacheBuilder with this property set
-     */
-    CacheBuilder<K, T> setRecordStats(boolean recordStats);
+	/**
+	 * Set true to hint that the cache should record statistics
+	 * 
+	 * @param recordStats
+	 * @return the same CacheBuilder with this property set
+	 */
+	CacheBuilder<K, T> setRecordStats(boolean recordStats);
 
-    /**
-     * Set true to hint that the cache should wrap every value (not key) in a softReference
-     * @param softValues
-     * @return the same CacheBuilder with this property set
-     */
-    CacheBuilder<K, T> setSoftValues(boolean softValues);
-    
-    /**
-     * Set value to hint to indicated the desired concurrency level for update behavior
-     * Higher indicates more required concurrency.
-     * @param concurrencyLevel - default 4. not required.
-     * @return the same CacheBuilder with this property set
-     */
-     CacheBuilder<K, T> setConcurrencyLevel(int concurrencyLevel); 
+	/**
+	 * Set true to hint that the cache should wrap every value (not key) in a
+	 * softReference
+	 * 
+	 * @param softValues
+	 * @return the same CacheBuilder with this property set
+	 */
+	CacheBuilder<K, T> setSoftValues(boolean softValues);
 
-     // TODO - add a self-loading cache
-    //CacheBuilder setLoader(Loader loader);
+	/**
+	 * Set value to hint the desired concurrency level for update behavior
+	 * Higher indicates more required concurrency.
+	 * 
+	 * @param concurrencyLevel
+	 *            - default 4. not required.
+	 * @return the same CacheBuilder with this property set
+	 */
+	CacheBuilder<K, T> setConcurrencyLevel(int concurrencyLevel);
 
-    Cache<K, T> build();
-    
+	Cache<K, T> build();
 }

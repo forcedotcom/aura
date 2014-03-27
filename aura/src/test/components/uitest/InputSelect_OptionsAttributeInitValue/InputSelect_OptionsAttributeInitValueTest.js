@@ -16,9 +16,9 @@
 ({
     testValueDefSelectionExists: {
 	attributes :{whichToRender:"VDSE"},
-	test : function(cmp){	
+	test : function(cmp){
 		var inputSelect = cmp.find("Value_Def_Selection_Exists");
-		var value = inputSelect.getValue("v.value").getValue();
+		var value = inputSelect.get("v.value");
 		$A.test.assertEquals("Bear", value,"ValueDefSelectionExists failed to initialize, by using inputSelect options in the body");
 	}
     },
@@ -26,7 +26,7 @@
 	attributes :{whichToRender:"VUWND"},
 	test : function(cmp){
 		var inputSelect = cmp.find("Value_Undef_With_No_Default");
-		var value = inputSelect.getValue("v.value").getValue();
+		var value = inputSelect.get("v.value");
 		$A.test.assertEquals("Tiger", value,"ValueUndefWithNoDefault failed to initialize, by using inputSelect options in the body");
 	}
     },
@@ -34,16 +34,16 @@
 	attributes :{whichToRender:"VUWD"},
 	test : function(cmp){
 		var inputSelect = cmp.find("Value_Undef_With_Default");
-		var value = inputSelect.getValue("v.value").getValue();
+		var value = inputSelect.get("v.value");
 		$A.test.assertEquals("Lion", value,"ValueUndefWithDefault failed to initialize, by using inputSelect options in the body");
 	}
     },
-  
+
     testValueDefSelectionDNE: {
 	attributes :{whichToRender:"VDSDNE"},
 	test : function(cmp){
 		var inputSelect = cmp.find("Value_Def_Selection_DNE");
-		var value = inputSelect.getValue("v.value").getValue();
+		var value = inputSelect.get("v.value");
 		$A.test.assertEquals("Tiger", value,"ValueDefSelectionDNE failed to initialize, by using inputSelect options in the body");
 	}
     },
@@ -51,7 +51,7 @@
 	attributes :{whichToRender:"VNNO"},
 	test : function(cmp){
 		var inputSelect = cmp.find("Value_Null_No_Options");
-		var value = inputSelect.getValue("v.value").getValue();
+		var value = inputSelect.get("v.value");
 		$A.test.assertEquals("", value,"ValueNullNoOptions failed to initialize, by using inputSelect options in the body");
 	}
     },
@@ -59,7 +59,7 @@
 	attributes :{whichToRender:"VNWNNO"},
 	test : function(cmp){
 		var inputSelect = cmp.find("Value_Null_With_No_Null_Option");
-		var value = inputSelect.getValue("v.value").getValue();
+		var value = inputSelect.get("v.value");
 		$A.test.assertEquals("Tiger", value,"ValueNullWithNoNullOption failed to initialize, by using inputSelect options in the body");
 	}
     },
@@ -67,7 +67,7 @@
 	attributes :{whichToRender:"VNWNO"},
 	test : function(cmp){
 		var inputSelect = cmp.find("Value_Null_With_Null_Option");
-		var value = inputSelect.getValue("v.value").getValue();
+		var value = inputSelect.get("v.value");
 		$A.test.assertEquals("", value,"ValueNullWithNullOption failed to initialize, by using inputSelect options in the body");
 	}
     },
@@ -75,7 +75,7 @@
 	attributes :{whichToRender:"VNWDANO"},
 	test : function(cmp){
 		var inputSelect = cmp.find("Value_Null_With_Default_And_Null_Option");
-		var value = inputSelect.getValue("v.value").getValue();
+		var value = inputSelect.get("v.value");
 		$A.test.assertEquals("", value, "ValueNullWithDefaultAndNullOption failed to initialize, by using inputSelect options in the body");
 	}
     },
@@ -83,7 +83,7 @@
 	attributes :{whichToRender:"VNWDANNO"},
 	test : function(cmp){
 		var inputSelect = cmp.find("Value_Null_With_Default_And_No_Null_Option");
-		var value = inputSelect.getValue("v.value").getValue();
+		var value = inputSelect.get("v.value");
 		$A.test.assertEquals("Tiger", value,"ValueNullWithDefaultAndNoNullOption failed to initialize, by using inputSelect options in the body");
 	}
     }

@@ -1020,6 +1020,11 @@ Component.prototype.isDirty = function(expression){
  * Returns true if the component has not been destroyed.
  * @public
  */
+Component.prototype.isValid=function(expression){
+    // JBUCH TODO: TEMPORARY PASSTHROUGH TO HIDE SIMPLEVALUES; isValid() SHOULD BE HANDLED THROUGH ERROR EVENTS
+    if(expression){
+        var wrapper=this._getValue(expression);
+        return wrapper&&wrapper.isValid()||false;
     }
     return !this._scheduledForAsyncDestruction && this.priv;
 };

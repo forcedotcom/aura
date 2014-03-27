@@ -17,9 +17,9 @@
     render : function(component){
         var ret = document.createElement('div');
         ret.id = component.getGlobalId();
-        var label = component.getAttributes().getValue('label').getValue();
+        var label = component.get('v.label');
         ret.innerHTML = label;
-        var classIdentifier = component.getAttributes().getValue('classIdentifier').getValue();
+        var classIdentifier = component.get('v.classIdentifier');
         ret.className = classIdentifier;
         aura.util.on(ret,"click", function(ev) {
             var e = component.getEvent("testPress");
@@ -37,6 +37,6 @@
 
     rerender: function(component) {
         var div = component.getElement();
-        div.innerHTML = component.getAttributes().getValue('label').getValue();
+        div.innerHTML = component.get('v.label');
     }
 })

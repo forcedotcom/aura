@@ -16,6 +16,6 @@
 ({
     getLabel: function(cmp, event) {
         var gvp = $A.getGlobalValueProviders();
-        cmp.getValue("v.simplevalue1").setValue(gvp.getValue("$Label" + ".Related_Lists" + ".task_mode_today", cmp));
+        cmp.set("v.simplevalue1", gvp.getValue("$Label" + ".Related_Lists" + ".task_mode_today", cmp));
     }
 })

@@ -15,7 +15,7 @@
  */
 {
     updateText:function(c,e,h){
-        c.getValue("v.text").setValue("modified");
+        c.set("v.text", "modified");
         document.__PageModifiedTestFlag = true;
     },
 
@@ -38,7 +38,7 @@
 	                var repl;
 	                var orig = x.charAt(posn);
 	                var rposn = selection.indexOf(orig);
-	
+
 	                if (rposn > -1) {
 	                    repl = Math.floor(Math.random() * (selection.length-1));
 	                    if (repl >= rposn) {
@@ -58,7 +58,7 @@
         		loaded[q] = nl[q];
         	}
         }
-        c.getValue("v.text").setValue("i was updated");
+        c.set("v.text", "i was updated");
         var a = c.get("c.noArgs");
         $A.enqueueAction(a);
     }

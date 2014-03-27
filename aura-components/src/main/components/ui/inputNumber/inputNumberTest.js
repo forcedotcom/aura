@@ -27,7 +27,7 @@
     },
 
 	/**
-	 * Test max value. 
+	 * Test max value.
 	 */
     testMax: {
         attributes : {max : 9876.54321},
@@ -47,7 +47,7 @@
     },
 
     /**
-     * Test step. 
+     * Test step.
      */
     testStep: {
         attributes : {step : 1.23},
@@ -57,7 +57,7 @@
     },
 
     /**
-     * Test disabled. 
+     * Test disabled.
      */
     testDisabled: {
         attributes : {disabled : true},
@@ -67,7 +67,7 @@
     },
 
     /**
-     * Test value. 
+     * Test value.
      */
     testValue: {
         attributes : {value : 567},
@@ -77,7 +77,7 @@
     },
 
     /**
-     * Test decimal value. 
+     * Test decimal value.
      */
     testDecimalValue: {
         attributes : {value : 10.3249},
@@ -87,7 +87,7 @@
     },
 
     /**
-     * Test integer value 
+     * Test integer value
      */
     testIntValue: {
         attributes : {value : 100},
@@ -97,7 +97,7 @@
     },
 
     /**
-     * Test negative value. 
+     * Test negative value.
      */
     testNegativeValue: {
         attributes : {value : -5},
@@ -105,7 +105,7 @@
             $A.test.assertEquals(-5, component.get("v.value"), "value does not equal expected");
         }
     },
-    
+
     /**
      * Assign Negative value for attribute 'value' and special negative format
      */
@@ -119,7 +119,7 @@
     },
 
     /**
-     * Test small decimal value. 
+     * Test small decimal value.
      */
     testSmallValue: {
         attributes : {value : 0.000005},
@@ -129,7 +129,7 @@
     },
 
     /**
-     * Test large number 
+     * Test large number
      */
     testLargeValue: {
         attributes : {value : 99999999999999},
@@ -139,7 +139,7 @@
     },
 
     /**
-     * Test zero value. 
+     * Test zero value.
      */
     testZeroValue: {
         attributes : {value : 0},
@@ -149,7 +149,7 @@
     },
 
     /**
-     * Test when value is empty string 
+     * Test when value is empty string
      */
     testEmptyValue: {
         attributes : {value : ""},
@@ -157,9 +157,9 @@
             $A.test.assertEquals(undefined, component.get("v.value"), "value does not equal expected");
         }
     },
-    
+
     /**
-     * Test number formated correctly. 
+     * Test number formated correctly.
      */
     testNumberFormat: {
     	attributes : {value : 123, format : "#,#"},
@@ -169,9 +169,9 @@
     		$A.test.assertEquals("1,2,3", value, "Element value does not equal expected");
     	}
     },
-    
+
     /**
-     * Test number formated correctly when format is empty. 
+     * Test number formated correctly when format is empty.
      */
     testNumberFormatEmptyString: {
     	attributes : {value : 123, format : ""},
@@ -181,9 +181,9 @@
     		$A.test.assertEquals("123", value, "Element value does not equal expected");
     	}
     },
-    
+
     /**
-     * Test number formated correctly when format is invalid. 
+     * Test number formated correctly when format is invalid.
      */
     testNumberFormatInvalidFormat: {
     	attributes : {value : 123, format : "#.#,0"},
@@ -193,9 +193,9 @@
     		$A.test.assertEquals("Invalid format attribute", value, "Element value does not equal expected");
     	}
     },
-    
+
     /**
-     * Test number formated correctly when format is not of a recognizable type. 
+     * Test number formated correctly when format is not of a recognizable type.
      */
     testNumberFormatUnrecognizedFormat: {
     	attributes : {value : 123, format : "xyz"},
@@ -205,7 +205,7 @@
     		$A.test.assertEquals("123", value, "Element value does not equal expected");
     	}
     },
-    
+
     /**
     * Positive test case: Assign nothing to format value and verify default precision used to display decimal.
     */
@@ -217,7 +217,7 @@
            aura.test.assertEquals("123.45", value, " Element value not displayed as expected when format is not specified.");
        }
    },
-   
+
    /**
     * Verify Rounding up of lots of 9s
     */
@@ -245,7 +245,7 @@
     */
    testFormat2DecimalPlaces_RoundUp: {
        attributes : {value : 3.1459, format : '.00'},
-       test: function(component){    	   
+       test: function(component){
     	   var value = component.getElement().value;
            aura.test.assertEquals(3.1459, component.get("v.value"), "Cmp value: Decimal part of value was not rounded up based on format.");
            aura.test.assertEquals('3.15', value, "Element value: Decimal part of value was not rounded up based on format.");
@@ -286,7 +286,7 @@
    },
    /**
     * Test big value that is too large for a js number and is represented instead by a string
-    */    
+    */
    testBigDecimal:{
        attributes : {value : '1234567890123456789012345678901234567890.12', format : '.00'},
        test: function(component){
@@ -295,7 +295,7 @@
            aura.test.assertEquals('1234567890123456789012345678901234567890.12', value, "Element value: Unexpected value.");
        }
    },
-   
+
    /**
     * Verify that when the value changes it is rerendered with the unformated new value
     */
@@ -305,14 +305,14 @@
     	   var value = component.getElement().value;
     	   aura.test.assertEquals(22.7, component.get("v.value"), "Cmp: Value not formatted correctly.");
            aura.test.assertEquals('0,22.70', value, "Element: Value not formatted correctly.");
-           component.getValue("v.value").setValue(49322);
+           component.set("v.value", 49322);
            $A.rerender(component);
            value = component.getElement().value;
     	   aura.test.assertEquals(49322, component.get("v.value"), "Cmp: Value not formatted correctly.");
-           aura.test.assertEquals('49322', value, "Element: Value not formatted correctly.");           
+           aura.test.assertEquals('49322', value, "Element: Value not formatted correctly.");
        }
    },
-   
+
    /**
     * Verify that when the format changes it is not rerendered with the new format
     */
@@ -322,11 +322,11 @@
     	   var value = component.getElement().value;
     	   aura.test.assertEquals(22.7, component.get("v.value"), "Cmp: Value not formatted correctly.");
            aura.test.assertEquals('0,22.70', value, "Element: Value not formatted correctly.");
-           component.getValue("v.format").setValue('.000');
+           component.set("v.format", '.000');
            $A.rerender(component);
            value = component.getElement().value;
     	   aura.test.assertEquals(22.7, component.get("v.value"), "Cmp: Value not formatted correctly.");
-           aura.test.assertEquals('0,22.70', value, "Element: Value not formatted correctly.");           
+           aura.test.assertEquals('0,22.70', value, "Element: Value not formatted correctly.");
        }
    }
 })

@@ -18,6 +18,6 @@
 
 		var userInput = cmp.find("inputRT").get("v.value");
 		var output = cmp.find("outputRT");
-		output.getValue("v.value").setValue(userInput);
+		output.set("v.value", userInput);
 	}
 })

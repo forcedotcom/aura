@@ -3,7 +3,7 @@
 		var a = cmp.get("c.getString");
 		a.setParams({param : "" + new Date()});
 		a.setCallback(cmp, function(action){
-			cmp.getValue("m.secret").setValue(action.getReturnValue());
+			cmp.set("m.secret", action.getReturnValue());
 		});
                 $A.enqueueAction(a);
 	}

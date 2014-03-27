@@ -41,43 +41,43 @@
 		var outSize = cmp.find("outSize");
 		var outAppt = cmp.find("outAppt");
 
-		outName.getValue("v.value").setValue(fullName);
+		outName.set("v.value", fullName);
 		var emVal = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
 		if (email.search(emVal) === 0) {
-			outEmail.getValue("v.label").setValue(email);
-			outEmail.getValue("v.title").setValue(email);
-			outEmail.getValue("v.value").setValue(email);
-			cmp.getValue("v.invalidEmail").setValue(false);
+			outEmail.set("v.label", email);
+			outEmail.set("v.title", email);
+			outEmail.set("v.value", email);
+			cmp.set("v.invalidEmail", false);
 		} else {
-			cmp.getValue("v.invalidEmail").setValue(true);
+			cmp.set("v.invalidEmail", true);
 		}
 
 		if (pw.length >= 6) {
-			outPW.getValue("v.value").setValue(pw);
-			cmp.getValue("v.invalidPW").setValue(false);
+			outPW.set("v.value", pw);
+			cmp.set("v.invalidPW", false);
 		} else {
-			cmp.getValue("v.invalidPW").setValue(true);
+			cmp.set("v.invalidPW", true);
 		}
-		
+
 		var urlVal = /^(http[s]?:\/\/)(www\.){0,1}[a-zA-Z0-9\.\-]+\.[a-zA-Z]{2,5}[\.]{0,1}/;
 		if (website.search(urlVal) === 0) {
-			outURL.getValue("v.label").setValue(website);
-			outURL.getValue("v.value").setValue(website);
-			cmp.getValue("v.invalidURL").setValue(false);
+			outURL.set("v.label", website);
+			outURL.set("v.value", website);
+			cmp.set("v.invalidURL", false);
 
 		} else {
-			cmp.getValue("v.invalidURL").setValue(true);
+			cmp.set("v.invalidURL", true);
 		}
 
-		outDOB.getValue("v.value").setValue(dob);
-		outSize.getValue("v.value").setValue(size);
-		outAppt.getValue("v.value").setValue(appt);
+		outDOB.set("v.value", dob);
+		outSize.set("v.value", size);
+		outAppt.set("v.value", appt);
 
 		if (fName === "" || lName === "") {
-			cmp.getValue("v.filled").setValue(false);
+			cmp.set("v.filled", false);
 		} else {
-			cmp.getValue("v.filled").setValue(true);
+			cmp.set("v.filled", true);
 		}
-		
+
 	}
 })

@@ -106,11 +106,11 @@
     },
 
     assertClassUpdate : function(component, newValue) {
-        component.getValue("v.classValue").setValue(newValue);
+        component.set("v.classValue", newValue);
         $A.rerender(component);
         $A.test.assertEquals(newValue ? newValue : "", component.find("hasClass").getElement().className);
     },
-    
+
     /**
      * class attribute will be rerendered when initially not set
      */
@@ -156,14 +156,14 @@
                 styleText = input.style.cssText.replace(/[ ;]/g,"").toLowerCase();
             }
             $A.test.assertEquals("color:blue" , styleText);
-            
+
             var a = component.find("specialAttributes_a").getElement();
             $A.test.assertEquals("http://bazinga.com/" , a.getAttribute("href"), "Failed to render href attribute");
-            
+
             component.getAttributes().setValue("style", "color:green");
             component.getAttributes().setValue("dataName", "inputElement");
             component.getAttributes().setValue("href", "http://bbt.com/");
-            
+
             $A.rerender(component);
             input = component.find("specialAttributes_input").getElement();
             $A.test.assertEquals("inputElement" , input.getAttribute("data-name"), "Failed to rerender data attribute");
@@ -177,7 +177,7 @@
                 styleText = input.style.cssText.replace(/[ ;]/g,"").toLowerCase();
             }
             $A.test.assertEquals("color:green" , styleText);
-            
+
             a = component.find("specialAttributes_a").getElement();
             $A.test.assertEquals("http://bbt.com/" , a.getAttribute("href"), "Failed to rerender href attribute");
         }
@@ -206,17 +206,17 @@
 	browsers:["IPAD"],
 	labels : ["UnAdaptableTest"],
 	test: [
-	  //Both click handler and touch end handler defined     
+	  //Both click handler and touch end handler defined
 	  function(component){
 	    component._TouchEndHandler = false;
 	    component._OnClickHandler = false;
 	    var targetElement = component.find("bothTouchEndAndClickHandlers").getElement();
 	    this.fireTouchEndEventOnElement(component, targetElement);
-	    $A.test.addWaitFor(true, 
+	    $A.test.addWaitFor(true,
 		    function(){return component._TouchEndHandler},
 		    function(){ $A.test.assertFalse(component._OnClickHandler); });
 	},
-	  //Both touch end handler defined     
+	  //Both touch end handler defined
 	  function(component){
 	    var targetElement = component.find("onlyTouchEndHandler").getElement();
 	    this.fireTouchEndEventOnElement(component, targetElement);

@@ -27,7 +27,7 @@
                 } else {
                     $A.error("Action failed: " + name);
                 }
-                //var output =  cmp.find("outputValue").getAttributes().getValue("value").getValue();
+                //var output =  cmp.find("outputValue").get("v.value");
                 var output =  cmp.find("outputValue").get("v.value");
                 cmp.find("outputValue").getAttributes().setValue("value", output + retValue);
         });

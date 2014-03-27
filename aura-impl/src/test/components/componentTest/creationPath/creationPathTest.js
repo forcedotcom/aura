@@ -27,37 +27,37 @@
 
 	assertCreationPath : function(cmp, path, msg) {
 		var cp = cmp.creationPath;
-		$A.test.assertEquals(path, cp.substring(cp.indexOf("/")), msg); 
+		$A.test.assertEquals(path, cp.substring(cp.indexOf("/")), msg);
 	},
-	
+
 	addComponent : function(root, cmp, descriptor, value) {
 		var count = cmp.getAttributes().get("output").length;
-    	root.getAttributes().getValue("descriptor").setValue(descriptor);
-    	root.getAttributes().getValue("value").setValue(value);
+    	root.set("v.descriptor", descriptor);
+    	root.set("v.value", value);
     	cmp.find("trigger").get("e.press").fire();
     	$A.test.addWaitForWithFailureMessage(
     			count + 1,
     			function(){return cmp.getAttributes().get("output").length},
     			"waiting for output length to increment after adding component");
 	},
-	
+
     setUp: function(cmp) {
     	this.waitForLayoutChange(cmp);
     },
-    
+
 	testRoot : {
 		test : function(cmp) {
 			this.assertCreationPath(cmp, "/*[0]", "root is only body");
 		}
 	},
-	
+
 	testBody : {
 		test : function(cmp) {
 			this.assertCreationPath(cmp.find("topbody"), "/*[0]/$/*[0]", "body belongs to super's (first)");
 			this.assertCreationPath(cmp.find("topmodel"), "/*[0]/$/*[1]", "body belongs to super's (second)");
 		}
 	},
-	
+
 	testNested : {
 		test : function(cmp) {
 			this.assertCreationPath(cmp.find("nestingmodel"), "/*[0]/$/*[1]/*[1]");
@@ -67,7 +67,7 @@
 			this.assertCreationPath(cmp.find("nestestmodel"), "/*[0]/$/*[1]/*[1]/*[1]/*[2]");
 		}
 	},
-	
+
 	testFacet : {
 		test : function(cmp) {
 			this.assertCreationPath(cmp.find("headerbody"), "/*[0]/$/*[1]/headerComponents[0]");
@@ -76,14 +76,14 @@
 			this.assertCreationPath(cmp.find("innermodel2"), "/*[0]/$/*[1]/innerComponents[1]");
 		}
 	},
-	
+
 	testDefaultLayoutItem : {
 		test : function(cmp) {
 			$A.test.assertEquals("fromDefaultLayout", $A.test.getText(cmp.find("layoutTarget").getElement()));
 			this.assertCreationPath(cmp.find("layoutTarget").getAttributes().get("body")[0], "/*[0]");
 		}
 	},
-	
+
 	testActionLayoutItem : {
 		attributes : { __layout : "#action" },
 		test : function(cmp) {
@@ -91,7 +91,7 @@
 			this.assertCreationPath(cmp.find("layoutTarget").getAttributes().get("body")[0], "/*[0]");
 		}
 	},
-	
+
 	testChangeLayoutItem : {
 		attributes : { __layout : "#action" },
 		test : [ function(cmp) {
@@ -103,7 +103,7 @@
 			this.assertCreationPath(cmp.find("layoutTarget").getAttributes().get("body")[0], "/*[0]");
 		}]
 	},
-	
+
 	testIfTrue : {
 		attributes : { iftrue : true },
 		test : function(cmp) {
@@ -123,7 +123,7 @@
 	testIfChangedToTrue : {
 		attributes : { iftrue : false },
 		test : [ function(cmp) {
-			$A.run(function(){cmp.getAttributes().getValue("iftrue").setValue(true)});
+			$A.run(function(){cmp.set("v.iftrue", true)});
 			$A.test.addWaitForWithFailureMessage(false, function(){return $A.util.isUndefined(cmp.find("truebody"))}, "'true' components not instantiated");
 		}, function(cmp) {
 			this.assertCreationPath(cmp.find("truebody"), "client created");
@@ -134,7 +134,7 @@
 	testIfChangedToFalse : {
 		attributes : { iftrue : true },
 		test : [ function(cmp) {
-			$A.run(function(){cmp.getAttributes().getValue("iftrue").setValue(false)});
+			$A.run(function(){cmp.set("v.iftrue", false)});
 			$A.test.addWaitForWithFailureMessage(false, function(){return $A.util.isUndefined(cmp.find("falsebody"))}, "'false' components not instantiated");
 		}, function(cmp) {
 			this.assertCreationPath(cmp.find("truebody"), "/*[0]/$/*[2]/+[0]");
@@ -149,7 +149,7 @@
 			this.assertCreationPath(cmp.find("iterinst").find("output"), "/*[0]/$/*[3]/+[0]/*[0]/$/*[0]");
 		}
 	},
-	
+
 	testMultipleIteration : {
 		attributes : { list : "x,x,x" },
 		test : function(cmp) {
@@ -165,7 +165,7 @@
 	testChangeIterationSize : {
 		attributes : { list : "x,x,x" },
 		test : [ function(cmp) {
-			$A.run(function(){cmp.find("iteration").getAttributes().getValue("start").setValue(1)});
+			$A.run(function(){cmp.find("iteration").set("v.start", 1)});
 			$A.test.addWaitForWithFailureMessage(2, function(){return cmp.find("iterinst").length}, "number of iterations not reduced");
 		}, function(cmp) {
             // client created
@@ -220,7 +220,7 @@
 			this.assertCreationPath(cmp.find("iterinst")[3].find("output"), "client created");
 		}]
 	},
-	
+
 	testAddClientCmp : {
         test : [function(cmp) {
         	this.addComponent(cmp, cmp.find("iterinst"), "aura:text", "hi");
@@ -236,7 +236,7 @@
         }, function(cmp) {
         	$A.test.assertEquals("0 - a", $A.test.getText(cmp.find("iterinst").find("output").getElement()));
 			this.assertCreationPath(cmp.find("iterinst").getAttributes().get("output")[0], "client created");
-			
+
         	this.addComponent(cmp, cmp.find("iterinst"), "aura:text", "bb");
         }, function(cmp) {
         	$A.test.assertEquals("0 - abb", $A.test.getText(cmp.find("iterinst").find("output").getElement()));
@@ -259,7 +259,7 @@
         }, function(cmp) {
         	$A.test.assertEquals("0 - x footerdefault", $A.test.getText(cmp.find("iterinst").find("output").getElement()));
 			this.assertCreationPath(cmp.find("iterinst").getAttributes().get("output")[0], "/*[0]");
-			
+
         	this.addComponent(cmp, cmp.find("iterinst"), "componentTest:hasModel", "yy");
         }, function(cmp) {
         	$A.test.assertEquals("0 - x footerdefault yy footerdefault", $A.test.getText(cmp.find("iterinst").find("output").getElement()));

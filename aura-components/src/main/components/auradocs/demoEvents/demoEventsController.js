@@ -26,68 +26,68 @@
 			helper.getUnwrapped(cmp, "right click");
 		};
 	},
-	
+
 	inspMouseUp : function(cmp, event, helper){
 		var elem = cmp.find("boxy").getElement();
 		$A.util.removeClass(elem, "redText");
 		helper.getUnwrapped(cmp, "mouseup");
 	},
-	
+
 	inspFocus : function(cmp, event, helper){
 		var elem = cmp.find("boxy").getElement();
 		$A.util.addClass(elem, "whitebg");
 		helper.getUnwrapped(cmp, "focus");
 	},
-	
+
 	inspBlur : function(cmp, event, helper){
 		var elem = cmp.find("boxy").getElement();
 		$A.util.removeClass(elem, "whitebg");
 		helper.getUnwrapped(cmp, "blur");
 	},
-	
+
 	inspDblClick : function(cmp, event, helper){
 		var elem = cmp.find("boxy").getElement();
 		$A.util.toggleClass(elem, "blueText");
 		helper.getUnwrapped(cmp, "dbclick");
 	},
-	
+
 	inspMouseover : function(cmp, event, helper){
 		var elem = cmp.find("boxy").getElement();
 		$A.util.addClass(elem, "boldText");
 		helper.getUnwrapped(cmp, "mouseover");
 
 	},
-	
+
 	inspMouseout : function(cmp, event, helper){
 		var elem = cmp.find("boxy").getElement();
 		$A.util.removeClass(elem, "boldText");
 		helper.getUnwrapped(cmp, "mouseout");
 	},
-	
+
 	inspKey : function(cmp, event, helper){
 		var keyCodeValue =  event.getParam("keyCode");
 		helper.getUnwrapped(cmp, keyCodeValue);
 
 	},
-	
+
 	inspSelect : function(cmp, event, helper){
 		var len = window.getSelection().toString().length;
 		helper.getUnwrapped(cmp, "selected " + len + " chars");
 	},
-	
+
 	inspCut : function(cmp, event, helper){
 		helper.getUnwrapped(cmp, "cut");
 	},
-	
+
 	inspPaste : function(cmp, event, helper){
 		helper.getUnwrapped(cmp, "paste");
 	},
-	
+
 	inspCopy : function(cmp, event, helper){
 		helper.getUnwrapped(cmp, "copy");
 	},
-	
+
 	clearEvents : function(cmp, event){
-		cmp.find("outputValue").getValue("v.value").setValue("");
+		cmp.find("outputValue").set("v.value", "");
 	}
 }

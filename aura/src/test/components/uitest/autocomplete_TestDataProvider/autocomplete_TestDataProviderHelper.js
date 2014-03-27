@@ -18,10 +18,10 @@
     	var data;
 
     	$A.log("provide");
-        if (component.getValue("v.dataType").getValue() == "largeList") {
+        if (component.get("v.dataType") == "largeList") {
         	$A.log("listOf500Items");
             data = component.get("m.listOf500Items");
-        } else if (component.getValue("v.dataType").getValue() == "emptyList") {
+        } else if (component.get("v.dataType") == "emptyList") {
         	$A.log("emptyList");
             data = component.getValue("m.emptyList");
         } else {
@@ -29,7 +29,7 @@
             data = component.get("m.listOfData");
         }
 		$A.log(data);
-		
+
         var dataProvider = component.getConcreteComponent();
         this.fireDataChangeEvent(dataProvider, data);
     }

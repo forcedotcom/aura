@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-({ 
+({
     checkInput : function(cmp, evt) {
-     
-        
+
+
         var colorVal = cmp.find("color").getValue("v.value");
         var myColorVal = colorVal.getValue("v.value");
-        
+
         var myColor = cmp.find("color").get("v.value");
         var myOutput = cmp.find("outColor");
         var greet = "You entered: " + myColor;
-        myOutput.getValue("v.value").setValue(greet);
-        
+        myOutput.set("v.value", greet);
+
         if (!myColorVal) {
             colorVal.setValid(false);
             colorVal.addErrors([{message:"Enter some text"}]);

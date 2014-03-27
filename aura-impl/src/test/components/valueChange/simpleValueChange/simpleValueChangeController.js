@@ -48,7 +48,7 @@
 		cmp.find("index").getElement().innerHTML = (evt.getParam("index"));
 		cmp.find("value").getElement().innerHTML = value || 'undefined';
 		depth.setValue(depth.getValue() + 1);
-		cmp.getValue("m.recurseA").setValue("recursing(A): " + depth.getValue());
+		cmp.set("m.recurseA", "recursing(A): " + depth.getValue());
 		depth.setValue(depth.getValue() - 1);
 	},
 
@@ -62,7 +62,7 @@
 		cmp.find("index").getElement().innerHTML = (evt.getParam("index"));
 		cmp.find("value").getElement().innerHTML = value || 'undefined';
 		depth.setValue(depth.getValue() + 1);
-		cmp.getValue("m.recurseC").setValue("recursing(B): " + depth.getValue());
+		cmp.set("m.recurseC", "recursing(B): " + depth.getValue());
 		depth.setValue(depth.getValue() - 1);
 	},
 
@@ -76,7 +76,7 @@
 		cmp.find("index").getElement().innerHTML = (evt.getParam("index"));
 		cmp.find("value").getElement().innerHTML = value || 'undefined';
 		depth.setValue(depth.getValue() + 1);
-		cmp.getValue("m.recurseB").setValue("recursing(C): " + depth.getValue());
+		cmp.set("m.recurseB", "recursing(C): " + depth.getValue());
 		depth.setValue(depth.getValue() - 1);
 	},
 
@@ -88,7 +88,7 @@
 
 		cmp.find("index").getElement().innerHTML = (evt.getParam("index"));
 		cmp.find("value").getElement().innerHTML = value || 'undefined';;
-		cmp.getValue("m.unchained").setValue("finished");
+		cmp.set("m.unchained", "finished");
 	},
 
 	unchainedChange : function(cmp, evt) {

@@ -21,7 +21,7 @@
         var textAreaCmp = component.find("textAreaElem");
         var elem = textAreaCmp ? textAreaCmp.getElement() : null;
         if (elem) {
-            var value = component.getValue("v.value").getValue();
+            var value = component.get("v.value");
             if ($A.util.isUndefinedOrNull(value)) {
                 elem.value = "";
             } else {

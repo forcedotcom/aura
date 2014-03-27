@@ -162,7 +162,7 @@
 
         $A.util.removeClass(inputEl, "inputError");
 
-        if (errorCmp && errorCmp.getValue("v.value.length").getValue() > 0) {
+        if (errorCmp && errorCmp.get("v.value.length") > 0) {
             errorCmp.setValue("v.value", []);
         }
     },
@@ -187,7 +187,7 @@
             $A.componentService.newComponentAsync(
                 this,
                 function(errorCmp) {
-                	var ariaDesc = component.getValue("v.ariaDescribedby").getValue();
+                	var ariaDesc = component.get("v.ariaDescribedby");
                     ariaDesc = this.addTokenToString(ariaDesc, errorCmp.getGlobalId());
                 	component.setValue("v.errorComponent", errorCmp);
                 	this.setAttribute(component, {key: "ariaDescribedby", value: ariaDesc});

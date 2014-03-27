@@ -102,10 +102,10 @@
             headerRows.push(headerRow);
         }
         // Add the columns to the header, save the processed columns and fire the column ready event
-        listHeader.getValue("v.body").setValue(headerRows);
-        component.getValue("v.columns").setValue(allColumns);
-        component.getValue("v.dataColumns").setValue(dataColumns);
-        component.getValue("v.dataTemplates").setValue(templates.dataTemplates);
+        listHeader.set("v.body", headerRows);
+        component.set("v.columns", allColumns);
+        component.set("v.dataColumns", dataColumns);
+        component.set("v.dataTemplates", templates.dataTemplates);
         this.fireEvent(component, component, "oncolumnsready", "ListHeader");
     },
 
@@ -151,7 +151,7 @@
             var emptyMessage= helper.generateComponent("aura:unescapedHtml",{value:component.get("v.emptyMessage")});
             var emptyCell = helper.generateComponent("aura:html", {body:[emptyMessage], tag:"TD", HTMLAttributes:$A.expressionService.create(component, {"class":"emptyMessage", colSpan:dataTemplateCount || 1})});
             var row = helper.generateComponent("ui:listViewRow", {body:[emptyCell], "class":helper.getRowClass(component,0)});
-            listBody.getValue("v.body").setValue([row]);
+            listBody.set("v.body", [row]);
             helper.fireEvent(component, component, "onitemsready", "EmptyList");
         }
 
@@ -216,7 +216,7 @@
             // If there are more rows, queue next chunk
             if (index < itemCount)this.setImmediate(buildRowBlock);
 
-            listBody.getValue("v.body").setValue(rows);
+            listBody.set("v.body", rows);
 
             // DEBUG: Performance Marker
             $A.endMark("BlockRender" + component);
@@ -350,7 +350,7 @@
         if(!depth)depth=0;
         if(!nextId)nextId=0;
         if(!headers)headers=[];
-        else component.getValue("v.headers").setValue(headers.join(' '));
+        else component.set("v.headers", headers.join(' '));
         if (!listId)listId = component.find("listView:table").getValue("v.HtmlAttributes.id").getValue(component).getValue();
 
         var id=null;
@@ -375,7 +375,7 @@
 
                 // Generate header ids and add them to columns and accessibility headers
                 id = [listId,"header", depth, nextId++].join(':');
-                column.getValue("v.id").setValue(id);
+                column.set("v.id", id);
                 headers.push(id);
 
                 // Look for nested column templates recursively, then add our columns to the row

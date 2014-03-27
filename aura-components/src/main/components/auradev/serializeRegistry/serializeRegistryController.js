@@ -16,16 +16,16 @@
 ({
     serialize: function(cmp) {
         var serializeBtn = cmp.find("serializeBtn");
-        serializeBtn.getValue("v.disabled").setValue(true);
+        serializeBtn.set("v.disabled", true);
     	var a = cmp.get("c.serializeComponentRegistryToJson");
     	a.setCallback(cmp, function(action){
-    	    serializeBtn.getValue("v.disabled").setValue(false);
+    	    serializeBtn.set("v.disabled", false);
     	    if(action.getState() === "SUCCESS"){
     	    	alert("Registry Serialized to: "+action.getReturnValue());
     	    }
     	    else{
-    			alert("Oops something went wrong.");     
-    		}       
+    			alert("Oops something went wrong.");
+    		}
         });
         $A.enqueueAction(a);
     }

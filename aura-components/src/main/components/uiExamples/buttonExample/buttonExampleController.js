@@ -19,6 +19,6 @@
         var myName = cmp.find("name").get("v.value");
         var myText = cmp.find("outName");
         var greet = "Hi, " + myName;
-        myText.getValue("v.value").setValue(greet);
+        myText.set("v.value", greet);
     }
 })

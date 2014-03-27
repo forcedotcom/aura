@@ -23,7 +23,7 @@
         if (event.getSource) {
             // handling an Aura event
             target = event.getSource(); // this is an Aura Component object
-            attributes.setValue("text", target.getAttributes().getValue("label").getValue());
+            attributes.setValue("text", target.get("v.label"));
         } else {
             // handling a native browser event
             target = event.target.value; // this is a DOM element

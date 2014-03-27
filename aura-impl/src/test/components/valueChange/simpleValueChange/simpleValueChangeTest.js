@@ -36,14 +36,14 @@
 			var idxDiv = cmp.find("index").getElement();
 			var valDiv = cmp.find("value").getElement();
 
-			ballot.getValue("m.candidates.map").setValue(0);
+			ballot.set("m.candidates.map", 0);
 
 			cmp.getValue("m.map").put("hi", "there");
 			$A.test.assertEquals(1, ballot.get("m.candidates.map"));
 			$A.test.assertEquals("hi", $A.test.getText(idxDiv));
 			$A.test.assertEquals("there", $A.test.getText(valDiv));
 
-			cmp.getValue("m.map.hi").setValue("yo");
+			cmp.set("m.map.hi", "yo");
 
 			$A.test.assertEquals(2, ballot.get("m.candidates.map"));
 			$A.test.assertEquals("hi", $A.test.getText(idxDiv));
@@ -55,7 +55,7 @@
 			$A.test.assertEquals("hi", $A.test.getText(idxDiv));
 			$A.test.assertEquals("undefined", $A.test.getText(valDiv));
 
-			cmp.getValue("m.string").setValue("hi");
+			cmp.set("m.string", "hi");
 
 			$A.test.assertEquals(3, ballot.get("m.candidates.map"));
 			$A.test.assertEquals("undefined", $A.test.getText(idxDiv));
@@ -69,23 +69,23 @@
 			var idxDiv = cmp.find("index").getElement();
 			var valDiv = cmp.find("value").getElement();
 
-			ballot.getValue("m.candidates.string").setValue(0);
+			ballot.set("m.candidates.string", 0);
 			cmp.getValue("m.list").push("hey");
 			$A.test.assertEquals(1, ballot.get("m.candidates.list"));
 			$A.test.assertEquals("undefined", $A.test.getText(idxDiv));
 			$A.test.assertEquals("hey", $A.test.getText(valDiv));
 
-			cmp.getValue("m.list.0").setValue("yo");
+			cmp.set("m.list.0", "yo");
 
 			$A.test.assertEquals("0", $A.test.getText(idxDiv));
 			$A.test.assertEquals("yo", $A.test.getText(valDiv));
 			$A.test.assertEquals(2, ballot.get("m.candidates.list"));
 
-			cmp.getValue("m.string").setValue("hi");
+			cmp.set("m.string", "hi");
 
 			$A.test.assertEquals(2, ballot.get("m.candidates.list"));
 
-			cmp.getValue("m.list").setValue([ "yoeeee" ]);
+			cmp.set("m.list", [ "yoeeee" ]);
 			$A.test.assertEquals(3, ballot.get("m.candidates.list"));
 			cmp.getValue("m.list").push("hey");
 			$A.test.assertEquals(4, ballot.get("m.candidates.list"));
@@ -96,7 +96,7 @@
 
 	testSingleChain : {
 		test : function(cmp) {
-			cmp.getValue("m.chained").setValue("start");
+			cmp.set("m.chained", "start");
 
 			var idxDiv = cmp.find("index").getElement();
 			var valDiv = cmp.find("value").getElement();
@@ -115,7 +115,7 @@
 			var idxDiv = cmp.find("index").getElement();
 			var valDiv = cmp.find("value").getElement();
 
-			ballot.getValue("m.candidates.string").setValue(0);
+			ballot.set("m.candidates.string", 0);
 
 			/*
 			 * X:attrib Y:value case1.1: 1.1.1: make X observe Y 1.1.2: X's old
@@ -302,7 +302,7 @@
 	//
 	_testRecurseSimple : {
 		test : function(cmp) {
-			cmp.getValue("m.recurseA").setValue("start");
+			cmp.set("m.recurseA", "start");
 		}
 	},
 
@@ -314,7 +314,7 @@
 	//
 	_testRecursePingPong : {
 		test : function(cmp) {
-			cmp.getValue("m.recurseB").setValue("start");
+			cmp.set("m.recurseB", "start");
 		}
 	}
 })

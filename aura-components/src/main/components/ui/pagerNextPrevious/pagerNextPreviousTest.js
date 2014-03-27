@@ -30,7 +30,7 @@
         	$A.test.assertFalse($A.util.hasClass(last,"off"), "last Link should be enable");
         }
     },
-    
+
     /**
      * Tests to verify links on last page
      */
@@ -47,7 +47,7 @@
         	$A.test.assertTrue($A.util.hasClass(last,"off"), "last Link should be disable");
         }
     },
-    
+
     /**
      * Tests to verify links on middle page
      */
@@ -64,7 +64,7 @@
         	$A.test.assertFalse($A.util.hasClass(last,"off"), "last Link should be enable");
         }
     },
-    
+
     /**
      * Test to verify default behavior when no attribute values are set
      */
@@ -80,7 +80,7 @@
         	$A.test.assertTrue($A.util.hasClass(last,"off"), "last Link should be disable");
         }
     },
-    
+
     testFilterListWithJustOnePage: {
         attributes : {currentPage : 1, pageSize : 25 ,totalItems: 10},
         test: function(cmp){
@@ -94,7 +94,7 @@
         	$A.test.assertTrue($A.util.hasClass(last,"off"), "last Link should be disable");
         }
     },
-    
+
     /**
      * Test exception is thrown when negative values are passed
      */
@@ -104,44 +104,44 @@
         	//Should throw error: TODO: W-1562449
         }
     },
-    
+
     /**
      * Default Page size should be 25
      */
     testDefaultPageSize: {
         test: function(cmp){
-        	pageSize = cmp.getAttributes().getValue('pageSize').getValue();
+        	pageSize = cmp.get('v.pageSize');
         	aura.test.assertEquals(25, pageSize, "Default Page size should be 25");
         }
     },
-    
+
     /**
      * verify all calculated fields are correct
      */
     testCalculatedFieldsForFirstPage: {
     	attributes : {currentPage : 1, pageSize : 10, totalItems: 55},
         test: function(cmp){
-        	startIndex = cmp.getAttributes().getValue('startIndex').getValue();
+        	startIndex = cmp.get('v.startIndex');
         	aura.test.assertEquals(1, startIndex + 1, "Index of the first item on the page should be 1");
-        	
-            endIndex = cmp.getAttributes().getValue('endIndex').getValue();
+
+            endIndex = cmp.get('v.endIndex');
             aura.test.assertEquals(10, endIndex + 1, "Index of the last item on the page should be 10");
-            
-            pageCount = cmp.getAttributes().getValue('pageCount').getValue();
+
+            pageCount = cmp.get('v.pageCount');
         	aura.test.assertEquals(6, pageCount, "Total Number of pages should be 6");
         }
     },
-    
+
     testCalculatedFieldsForLastPage: {
     	attributes : {currentPage : 6, pageSize : 10, totalItems: 55},
         test: function(cmp){
-        	startIndex = cmp.getAttributes().getValue('startIndex').getValue();
+        	startIndex = cmp.get('v.startIndex');
         	aura.test.assertEquals(51, startIndex + 1, "Index of the first item on the page should be 51");
-        	
-            endIndex = cmp.getAttributes().getValue('endIndex').getValue();
+
+            endIndex = cmp.get('v.endIndex');
             aura.test.assertEquals(55, endIndex + 1, "Index of the last item on the page should be 55");
-            
-            pageCount = cmp.getAttributes().getValue('pageCount').getValue();
+
+            pageCount = cmp.get('v.pageCount');
         	aura.test.assertEquals(6, pageCount, "Total Number of pages should be 6");
         }
     }

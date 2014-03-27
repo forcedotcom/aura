@@ -19,7 +19,7 @@
      */
     testSettingValueOfAbstractParentsSimpleAttributes:{
         test:function(cmp){
-            aura.test.assertEquals('abstractExtensionX',cmp.getSuper().getValue('v.SimpleAttribute').getValue(), "Attribute value must have been overriden by aura:set tag");
+            aura.test.assertEquals('abstractExtensionX',cmp.getSuper().get('v.SimpleAttribute'), "Attribute value must have been overriden by aura:set tag");
             //UI verification to check that renderer used the right attribute value
             aura.test.assertEquals('The value of SimpleAttribute = abstractExtensionX',$A.test.getText(cmp.getSuper().find('simpleAttr_id').getElement()));
         }

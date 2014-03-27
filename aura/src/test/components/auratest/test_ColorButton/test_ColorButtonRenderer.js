@@ -17,9 +17,9 @@
     render : function(component){
         var ret = document.createElement('div');
         ret.id = component.getGlobalId();
-        ret.innerHTML = component.getAttributes().getValue('label').getValue();
-        ret.style.backgroundColor = component.getAttributes().getValue('color').getValue();
-        ret.className = component.getAttributes().getValue('class').getValue();
+        ret.innerHTML = component.get('v.label');
+        ret.style.backgroundColor = component.get('v.color');
+        ret.className = component.get('v.class');
         return [ret];
     },
     rerender : function(component){
@@ -35,9 +35,9 @@
                 rerenderCount = label.substring(label.indexOf('#') + 1);
             }
             rerenderCount++;
-            div.innerHTML = component.getAttributes().getValue('label').getValue() + '#' + rerenderCount;
-            div.className = component.getAttributes().getValue('class').getValue();
-            div.style.backgroundColor = component.getAttributes().getValue('color').getValue();
+            div.innerHTML = component.get('v.label') + '#' + rerenderCount;
+            div.className = component.get('v.class');
+            div.style.backgroundColor = component.get('v.color');
             $A.services.rendering.addDirtyValues(color);
         }
     }

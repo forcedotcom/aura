@@ -27,18 +27,18 @@
 
             $A.test.assertTruthy(cmp.getAttributes().getValue('intAttribute'),
                     "Initialized simple attribute should not be represented as undefined.");
-            $A.test.assertEquals(3, cmp.getAttributes().getValue('intAttribute').getValue(),
+            $A.test.assertEquals(3, cmp.get('v.intAttribute'),
             "Simple value object failed to retrieve assigned value.");
         }
     },
-    
+
     testSimpleValueIsValid: {
         test:function(cmp){
             var valueObj = cmp.getAttributes().getValue('strAttribute');
             $A.test.assertTruthy(valueObj.isValid());
         }
     },
-    
+
     testSimpleValueSetUnValid: {
         test:function(cmp){
             var valueObj = cmp.getAttributes().getValue('strAttribute');
@@ -46,7 +46,7 @@
             $A.test.assertTruthy(!valueObj.isValid());
         }
     },
-    
+
     testDerivedTypes:{
         test: function(cmp) {
             var valueObj = cmp.getAttributes().getValue('strAttribute');
@@ -71,7 +71,7 @@
                     "$A.util.instanceOf says strAttribute is a MapValue");
         }
     },
-    
+
     testErrorFunctionsOnSimpleValueObject:{
         attributes:{intAttribute:3},
         test:function(cmp){
@@ -107,7 +107,7 @@
             $A.test.assertTrue( $A.util.isObject(err[0]));
         }
     },
-    
+
     // dirty value in action should not get overwritten in rerender when evaluating functions
     testMakeDirtyIndirectly:{
     	attributes:{intAttribute:100},
@@ -119,7 +119,7 @@
     		var label = button.getValue("v.label");
     		$A.test.assertEquals(false, label.isDirty());
     		$A.test.assertEquals(100, label.unwrap());
-    		
+
     		button.get("e.press").fire();
     		$A.test.assertEquals(false, val.isDirty());
     		$A.test.assertEquals(101, val.unwrap());
@@ -133,7 +133,7 @@
     		$A.test.assertEquals(102, label.unwrap());
     	}
     },
-    
+
     verifyErrors:function(valueObj, expectedErrors){
         var err = valueObj.getErrors();
         $A.test.assertTrue($A.util.isArray(err));

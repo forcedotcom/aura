@@ -16,15 +16,15 @@
 ({
 	toggle : function(cmp) {
 		var isRichTextEnabled = cmp.find("rt").get("v.isRichText");
-		
+
 		var evt = $A.getEvt("ui:toggleRichText");
 		evt.setParams({isRichText:!isRichTextEnabled});
 		evt.fire();
-		
+
 		if (isRichTextEnabled == true) {
-			cmp.find("disableBtn").getValue("v.label").setValue("enable");
+			cmp.find("disableBtn").set("v.label", "enable");
 		} else {
-			cmp.find("disableBtn").getValue("v.label").setValue("disable");
+			cmp.find("disableBtn").set("v.label", "disable");
 		}
 	}
 })

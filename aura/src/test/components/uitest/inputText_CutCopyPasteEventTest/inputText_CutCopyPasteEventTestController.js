@@ -16,17 +16,17 @@
 ({
     doCopy: function(cmp) {
       $A.log('Copy Event Fired');
-      cmp.getValue("v.copyEventFired").setValue(true);
+      cmp.set("v.copyEventFired", true);
       cmp.find("outputStatus").getAttributes().setValue("value", "Copy Event Fired");
     },
     doCut: function(cmp) {
         $A.log('Cut Event Fired');
-        cmp.getValue("v.cutEventFired").setValue(true);
+        cmp.set("v.cutEventFired", true);
         cmp.find("outputStatus").getAttributes().setValue("value", "Cut Event Fired");
       },
     doPaste: function(cmp) {
         $A.log('Paste Event Fired');
-        cmp.getValue("v.pasteEventFired").setValue(true);
+        cmp.set("v.pasteEventFired", true);
         cmp.find("outputStatus").getAttributes().setValue("value", "Paste Event Fired");
     }
 })

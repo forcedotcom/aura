@@ -68,7 +68,7 @@
     updateSingleOption: function(optionCmp, newValues) {
         var selected = false;
         var updated = false;
-        if (!$A.util.isUndefinedOrNull(newValues)) { 
+        if (!$A.util.isUndefinedOrNull(newValues)) {
         	if ($A.util.isArray(newValues)) {
 	            for(var i=0;i<newValues.length;i++){
 	                if (newValues[i] === optionCmp.get("v.text")) {
@@ -114,7 +114,7 @@
     updateOptionsFromValue: function(cmp) {
         var value = cmp.getValue("v.value");
         var selectedOptions = this.getValueFromOptionCmps(cmp);
-        
+
         if (selectedOptions.found && value.getValue() === selectedOptions.optionValue) {
             return;
         }
@@ -131,7 +131,7 @@
          * 1: options attribute is supplied--we update the state of those option objects
          * 2: inputSelectOptions are passed as v.body--we update the state of those option components
          */
-        
+
         // the options attribute causes an iteration to generate a set of option components with the id "options"
         var generatedOptions = cmp.find("options");
         var optExists = false;
@@ -159,13 +159,13 @@
             }
             // Workaround to force rerender for multiselects.
             if (isMultiple) {
-            	cmp.getValue("v.options").setValue(optionsValue.unwrap());
+            	cmp.set("v.options", optionsValue.unwrap());
             }
             cmp._suspendChangeHandlers = false;
         } else {
         // case 2:
         	var body = cmp.getValue("v.body");
-        	
+
             if (body) {
                 for(var i = 0; i < body.getLength(); i++) {
                     var descriptor = body.getValue(i).getDef().getDescriptor();
@@ -205,7 +205,7 @@
         if (cmp._suspendChangeHandlers) {
         	return;
     	}
-        
+
         var value = cmp.getValue("v.value");
         var selectedOptions = this.getValueFromOptionCmps(cmp);
 
@@ -216,7 +216,7 @@
                 if (optionCmps.length > 0) {
                     // if no options are selected, set the select's value to the first option's value
                 	selectedOptions.optionValue = optionCmps[0].get("v.text");
-                    optionCmps[0].getValue("v.selected").setValue(true);
+                    optionCmps[0].set("v.selected", true);
                 }
             }
 

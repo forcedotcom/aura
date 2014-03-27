@@ -30,14 +30,14 @@
     showSystemErrorEvent: function(cmp, event) {
         $A.log(cmp);
         $A.log(event);
-        cmp.getValue("v.event").setValue(event.getDef().getDescriptor().getQualifiedName());
-        cmp.getValue("v.data").setValue(event.getParam("message"));
+        cmp.set("v.event", event.getDef().getDescriptor().getQualifiedName());
+        cmp.set("v.data", event.getParam("message"));
     },
 
     showLocalEvent: function(cmp, event) {
         $A.log(cmp);
         $A.log(event);
-        cmp.getValue("v.event").setValue(event.getDef().getDescriptor().getQualifiedName());
-        cmp.getValue("v.data").setValue(event.getParam("msg"));
+        cmp.set("v.event", event.getDef().getDescriptor().getQualifiedName());
+        cmp.set("v.data", event.getParam("msg"));
     }
 })

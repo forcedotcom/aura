@@ -251,9 +251,9 @@ $A.ns.AuraComponentService.prototype.requestComponent = function(callbackScope, 
 
             newComp = $A.newCmpDeprecated("markup://aura:text");
             if (errors) {
-                newComp.getValue("v.value").setValue(errors[0].message);
+                newComp.set("v.value", errors[0].message);
             } else {
-                newComp.getValue("v.value").setValue('unknown error');
+                newComp.set("v.value", 'unknown error');
             }
         }
         if ( $A.util.isFunction(callback) ) {
@@ -402,7 +402,7 @@ $A.ns.AuraComponentService.prototype.getActionDef = function(config){
 /**
  * Gets the model definition from the registry.
  * @private
- */       
+ */
 $A.ns.AuraComponentService.prototype.getModelDef = function(config){
     return this.modelDefRegistry.getDef(config);
 };
@@ -452,7 +452,7 @@ $A.ns.AuraComponentService.prototype.destroy = function(components){
  * Removes the index of the component.
  * @private
  */
-$A.ns.AuraComponentService.prototype.deIndex = function(globalId){ 
+$A.ns.AuraComponentService.prototype.deIndex = function(globalId){
     delete this.indexes.globalId[globalId];
 };
 

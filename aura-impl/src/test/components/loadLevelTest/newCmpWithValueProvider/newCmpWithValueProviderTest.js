@@ -42,7 +42,7 @@
     testPassThroughValueAsValueProvider:{
         test:[ function(cmp){
             var avp;
-            
+
             $A.run(function(){
                 var a = cmp.get('c.createCmpWithPassthroughValue');
                 a.runDeprecated();
@@ -54,7 +54,7 @@
             $A.test.assertTruthy(newTextCmp, "Failed to find new Component with its localId")
 
             $A.test.assertEquals("markup://aura:text", newTextCmp.getDef().getDescriptor().getQualifiedName());
-            $A.test.assertEquals("Washington", newTextCmp.getAttributes().getValue('value').getValue());
+            $A.test.assertEquals("Washington", newTextCmp.get('v.value'));
             $A.test.assertEquals("Washington", $A.test.getText(newTextCmp.getElement()));
             cmp._avp = avp;
         },
@@ -128,7 +128,7 @@
                 $A.run(function(){
                     cmp.get('c.createCmpWithEmptyValueProvider').runDeprecated();
                 });
-                
+
                 //Look at the c.createCmpWithEmptyValueProvider, it is providing {} as attribute value provider
                 $A.test.fail("Should have failed to resolve value provider for new component.");
             }catch(e){
@@ -144,7 +144,7 @@
     // TODO(W-1320706): Specifying bad attribute value providers should give a more informative message to user
     _testUndefinedAsValueProvider:{
         test:function(cmp){
-            
+
             try{
                 $A.run(function(){
                     cmp.get('c.createCmpWithUndefinedValueProvider').runDeprecated();

@@ -29,7 +29,7 @@
                 atts[key] = $A.componentService.computeValue(value, avp, true);
             });
         }
-        
+
         action.setCallback(this, function(a){
 
             var newBody;
@@ -40,9 +40,9 @@
                 var errors = a.getError();
                 newBody = $A.newCmpDeprecated("markup://aura:text", null, false, false);
                 if (errors) {
-                    newBody.getValue("v.value").setValue(errors[0].message);
+                    newBody.set("v.value", errors[0].message);
                 } else {
-                    newBody.getValue("v.value").setValue('unknown error');
+                    newBody.set("v.value", 'unknown error');
                 }
             }
             var body = cmp.getValue("v.body");
@@ -67,7 +67,7 @@
         });
 
         action.setExclusive(cmp.getValue("v.exclusive").getBooleanValue());
-        cmp.getValue("v.loaded").setValue(true);
+        cmp.set("v.loaded", true);
         $A.enqueueAction(action);
 
         this.superAfterRender();

@@ -16,7 +16,7 @@
 ({
     unrender: function(component) {
         var renderEvent = $A.get("e.auratest:renderEvent");
-        renderEvent.setParams({ "event" : "unrender " + component.getAttributes().getValue("name").getValue() });
+        renderEvent.setParams({ "event" : "unrender " + component.get("v.name") });
         renderEvent.fire();
         this.superUnrender();
     }

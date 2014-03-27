@@ -16,10 +16,10 @@
 ({
     testCaseInSensitivityOfLocalVariable:{
         test:function(cmp){
-            $A.test.assertEquals('parentY',cmp.getValue('v.SIMPLEAttribute').getValue(),
+            $A.test.assertEquals('parentY',cmp.get('v.SIMPLEAttribute'),
                     "Attribute expression should be case insensitive.");
             //Positive test case
-            $A.test.assertEquals('parentY',cmp.getValue('v.SimpleAttribute').getValue(),
+            $A.test.assertEquals('parentY',cmp.get('v.SimpleAttribute'),
             "Attribute expression not evaluated.");
         }
     }

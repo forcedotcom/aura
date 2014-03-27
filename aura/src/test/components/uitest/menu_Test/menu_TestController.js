@@ -19,7 +19,7 @@
         if (triggerCmp) {
             var source = event.getSource();
             var label = source.get("v.label");
-            triggerCmp.setValue("v.label", label); 
+            triggerCmp.setValue("v.label", label);
         }
     },
     updateLabel: function(cmp, event) {
@@ -27,7 +27,7 @@
         if (triggerCmp) {
             var source = event.getSource();
             var label = source.get("v.label");
-            triggerCmp.setValue("v.label", label); 
+            triggerCmp.setValue("v.label", label);
         }
     },
     clickMenu: function(cmp, event) {
@@ -40,7 +40,7 @@
         if (triggerCmp) {
             var source = event.getParam("selectedItem");
             var label = source.get("v.label");
-            triggerCmp.setValue("v.label", label); 
+            triggerCmp.setValue("v.label", label);
         }
     },
     getMenuSelected: function(cmp, event) {
@@ -83,11 +83,11 @@
         resultCmp.setValue("v.value", values.join(","));
     },
     menuCollapse: function(cmp){
-    	 cmp.getValue("v.collapseEventFired").setValue(true);
-    	 cmp.getValue("v.expandEventFired").setValue(false);
+    	 cmp.set("v.collapseEventFired", true);
+    	 cmp.set("v.expandEventFired", false);
     },
     menuExpand: function(cmp){
-   	 cmp.getValue("v.expandEventFired").setValue(true);
-   	 cmp.getValue("v.collapseEventFired").setValue(false);
+   	 cmp.set("v.expandEventFired", true);
+   	 cmp.set("v.collapseEventFired", false);
    }
 })

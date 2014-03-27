@@ -18,10 +18,10 @@
     _testCaseInSensitivityWhenSettingAttributesOfFacets:{
         test:function(cmp){
             var facet = cmp.find('facet');
-            $A.test.assertEquals('facetY', facet.getValue('v.SimpleAttribute').getValue(), "Failed to pass on value to facet, attribute name is case sensitive.");
+            $A.test.assertEquals('facetY', facet.get('v.SimpleAttribute'), "Failed to pass on value to facet, attribute name is case sensitive.");
 
             var facet2 = cmp.find('facetSetAttribute');
-            $A.test.assertEquals('facetZ', facet2.getValue('v.SimpleAttribute').getValue(), "Failed to pass on value to facet using aura:set, attribute name is case sensitive.");
+            $A.test.assertEquals('facetZ', facet2.get('v.SimpleAttribute'), "Failed to pass on value to facet using aura:set, attribute name is case sensitive.");
         }
     }
 })

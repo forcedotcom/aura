@@ -18,16 +18,16 @@
 	 * Returns the img tag in this component.
 	 */
 	getImageElement : function(cmp) {
-		var el = cmp.getElement();    		
+		var el = cmp.getElement();
 
     	if (this.isAnchorImage(cmp)) {
     		el = el.children[0];
     	}
     	return el;
 	},
-	
+
 	isAnchorImage : function(cmp) {
-		var href = cmp.getValue("v.href").getValue();
+		var href = cmp.get("v.href");
 		return !$A.util.isEmpty(href)
 	}
 })

@@ -215,9 +215,9 @@ $A.ns.ComponentCreationContext.prototype.requestComponent = function(config, avp
 
             newComp = this.buildComponent("markup://aura:text");
             if (errors) {
-                newComp.getValue("v.value").setValue(errors[0].message);
+                newComp.set("v.value", errors[0].message);
             } else {
-                newComp.getValue("v.value").setValue("unknown error");
+                newComp.set("v.value", "unknown error");
             }
         }
         if ($A.util.isFunction(callback)) {

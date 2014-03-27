@@ -22,7 +22,7 @@
 			};
 		};
 	},
-	
+
 	createNewTodo : function(cmp, event){
 		var keyCodeValue =  event.getParam("keyCode");
 		if(keyCodeValue===13){
@@ -30,17 +30,17 @@
 			var input = cmp.get("newTodo");
 			var text = input.getValue("v.value").value;
 			var newTodo = {
-					label: text, 
-					name: text, 
-					selected: false, 
-					value: text, 
+					label: text,
+					name: text,
+					selected: false,
+					value: text,
 					disabled: false
 			};
 			items.push(newTodo);
-			input.getValue("v.value").setValue("");
+			input.set("v.value", "");
 		};
 	},
-	
+
 	crossout : function(cmp, event){
 		var elem = event.getSource().getElement();
 		$A.util.toggleClass(elem, "done");

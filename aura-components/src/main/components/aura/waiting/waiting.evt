@@ -15,5 +15,5 @@
     limitations under the License.
 
 -->
-<aura:event type="APPLICATION" support="GA" description="Indicates that the client-side framework is currently awaiting a response to a server request.">
+<aura:event type="APPLICATION" support="GA" access="GLOBAL" description="Indicates that the client-side framework is currently awaiting a response to a server request.">
 </aura:event>

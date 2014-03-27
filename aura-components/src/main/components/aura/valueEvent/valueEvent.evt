@@ -15,4 +15,4 @@
     limitations under the License.
 
 -->
-<aura:event type="VALUE" support="GA" description="The root event of the event heirarchy for all events of type=&quot;VALUE&quot;"/>
+<aura:event type="VALUE" support="GA" access="GLOBAL" description="The root event of the event heirarchy for all events of type=&quot;VALUE&quot;"/>

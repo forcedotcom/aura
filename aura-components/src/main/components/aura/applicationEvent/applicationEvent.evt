@@ -15,4 +15,4 @@
     limitations under the License.
 
 -->
-<aura:event type="APPLICATION" support="GA" description="The root event of the event hierarchy for all events of type=&quot;APPLICATION&quot;"/>
+<aura:event type="APPLICATION" access="GLOBAL" support="GA" description="The root event of the event hierarchy for all events of type=&quot;APPLICATION&quot;"/>

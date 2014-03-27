@@ -43,6 +43,7 @@ import org.auraframework.system.DependencyEntry;
 import org.auraframework.system.Location;
 import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.system.Source;
+import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
@@ -789,7 +790,11 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
             de = new DependencyEntry(uid, Collections.unmodifiableSet(deps), lmt, clientLibs);
             if (shouldCache(descriptor)) {
+                // put UID-qualified descriptor key for dependency
                 depsCache.put(makeGlobalKey(de.uid, descriptor), de);
+
+                // put unqualified descriptor key for dependency
+                depsCache.put(makeNonUidGlobalKey(descriptor), de);
             }
 
             // See localDependencies comment
@@ -811,6 +816,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         return lastModTime;
     }
 
+   
     /**
      * Get a dependency entry for a given uid.
      * 
@@ -847,7 +853,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                 return de;
             }
             if (shouldCache(descriptor)) {
-                de = depsCache.getIfPresent(key);
+                de = depsCache.getIfPresent(makeNonUidGlobalKey(descriptor));
             }
         }
         if (de != null) {
@@ -1328,7 +1334,21 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
      * Creates a key for the global {@link #depsCache}, using UID, type, and FQN.
      */
     private String makeGlobalKey(String uid, DefDescriptor<?> descriptor) {
-        return uid + "/" + makeLocalKey(descriptor);
+    	return uid + "/" + makeLocalKey(descriptor);
+    }
+    
+    /**
+     * Creates a key for the global {@link #depsCache}, using only descriptor (and Mode internally).
+     * @param descriptor - the descriptor use for the key
+     */
+    private String makeNonUidGlobalKey(DefDescriptor<?> descriptor) {
+    	AuraContext context = this.currentCC == null 
+    			? Aura.getContextService().getCurrentContext() 
+    			: currentCC.context;
+   
+        //HACK - until AuraContextImpl no longer adds additional namespaces when mod==Mode.DEV
+        // we must distinguish DEV from non-DEV mode
+        return (context.getMode() == Mode.DEV ? "@/" : "#/") + makeLocalKey(descriptor);
     }
     
     /**
@@ -1358,6 +1378,9 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         return configAdapter.isPrivilegedNamespace(namespace);
     }
 
+// TODO - W-2105858 - re-enable with either the private implementation of the Cache used, or
+//  a least-common-denominator implementation
+    
 //    public static Collection<Optional<? extends Definition>> getCachedDefs() {
 //        return defsCache.asMap().values();
 //    }

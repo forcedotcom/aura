@@ -36,6 +36,10 @@
 		<ui:scroller class="scrollWrapper" 
 			onPullToRefresh="{!c.fetchDataPTR}" 
 			onPullToShowMore="{!c.fetchDataPTL}" 
+			onBeforeScrollStart="{!c.beforeScrollStartHandler}" 
+			onScrollStart="{!c.scrollStartHandler}" 
+			onScrollMove="{!c.scrollMoveHandler}" 
+			onScrollEnd="{!c.scrollEndHandler}"  
 			aura:id="test-scroller" showScrollbars="true">
 			
 				<div class="item" id="r1">Pretty row 1</div>
@@ -141,4 +145,10 @@
 		</ui:scroller>
 		
 	<div id="footer" class="common">This is a footer</div>
+	
+	<span id="beforeScrollStartHandlerCalled">0</span>
+	<span id="scrollStartHandlerCalled">0</span>
+	<span id="scrollMoveHandlerCalled">0</span>
+	<span id="scrollEndHandlerCalled">0</span>
+	
 </aura:component>

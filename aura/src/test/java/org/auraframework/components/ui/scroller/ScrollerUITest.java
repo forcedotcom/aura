@@ -80,6 +80,36 @@ public class ScrollerUITest extends WebDriverTestCase{
         pause(600);
         assertTrue("Seems like vertical scrolling did not work", 
         		verifyIfElementInViewport("4onPTL"));
+        
+        
+        //test for scrollTo and scrollBy events
+        //scrollTo top
+        evaluateEventExpression("scrollTo","{destination:'top'}");
+        pause(600);
+        assertTrue("Seems like vertical scrolling did not work on firing scrollTo", 
+        		verifyIfElementInViewport("1onPTR"));
+        //scrollTo bottom
+        evaluateEventExpression("scrollTo","{destination:'bottom'}");
+        pause(600);
+        assertTrue("Seems like vertical scrolling did not work", 
+        verifyIfElementInViewport("4onPTL"));
+        //scrollBy 
+        //evaluateEventExpression("scrollBy","{deltaX: 0, deltaY: 600, time: 0}");
+        //pause(600);
+        //assertTrue("Seems like vertical scrolling did not work", 
+        //verifyIfElementInViewport(..));
+        
+        
+        //test for events onBeforeScrollStart, onScrollStart,
+        //onScrollMove, onScrollEnd
+        //assert event onBeforeScrollStart fired
+        assertEquals("Seems like onBeforeScrollStart did not get fired", "1", getEventHandlerExecutionStatus("beforeScrollStartHandlerCalled"));
+        //assert event onScrollStart fired
+        assertEquals("Seems like onScrollStart did not get fired", "1", getEventHandlerExecutionStatus("scrollStartHandlerCalled"));
+        //assert event onScrollMove fired
+        assertEquals("Seems like onScrollMove did not get fired", "1", getEventHandlerExecutionStatus("scrollMoveHandlerCalled"));
+        //assert event onScrollEndStart fired
+        assertEquals("Seems like onScrollEndStart did not get fired", "1", getEventHandlerExecutionStatus("scrollEndHandlerCalled"));
     }
     
     private void startFlick(int xOffset, int yOffset){
@@ -127,6 +157,16 @@ public class ScrollerUITest extends WebDriverTestCase{
     //WebDriver java calls until the DOM animation completes.
     private void pause(long timeout) throws InterruptedException{
     	Thread.sleep(timeout);
+    }
+    
+    private String getEventHandlerExecutionStatus(String id){
+    	String expression = "return window.document.getElementById('"+id+"').textContent;";
+    	return (String) ((JavascriptExecutor) driver).executeScript(expression);
+    }
+    
+    private void evaluateEventExpression(String evt, String params){
+        String expression = "$A.getRoot().find('test-scroller').getEvent('"+evt+"').setParams("+params+").fire();";
+        ((JavascriptExecutor) driver).executeScript(expression);
     }
     
 }

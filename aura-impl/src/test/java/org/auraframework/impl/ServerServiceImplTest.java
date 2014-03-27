@@ -271,7 +271,6 @@ public class ServerServiceImplTest extends AuraImplTestCase {
 		
 		@Override
 		public void serialize(Json json) throws IOException {
-			System.out.println("ShareCmpAction.serialize:"+this.name);
 			Map<String,Object> value = Maps.newHashMap();
 			value.put("shared_component", this.sharedCmp);
 			value.put("action", this.name);
@@ -317,8 +316,6 @@ public class ServerServiceImplTest extends AuraImplTestCase {
         Message message = new Message(actions);
         //run the list of actions. 
         ss.run(message, Aura.getContextService().getCurrentContext(), sw, null);
-        
-        System.out.println(sw);
         
         //sanity check, sharedCmp should have the latest attribute value. 
         //this has nothing to do with the fix though

@@ -21,6 +21,13 @@ Test.Aura.Component.ComponentDefRegistryTest = function() {
             // #import aura.component.ComponentDefRegistry
     });
 
+    var makeDefDescriptor = function(name) {
+        return {
+            "toString" : function() { return name; },
+            "getNamespace" : function() { return "namespace:"+name; }
+        };
+    };
+
     [Fixture]
     function AuraType() {
 	[Fact]
@@ -154,17 +161,12 @@ Test.Aura.Component.ComponentDefRegistryTest = function() {
         var mockComponentDef = Mocks.GetMock(Object.Global(), "$A", {
                 ns : {
                     ComponentDef: function(config) {
-                        var def = {};
-                        def["config"] = config;
-                        var toString = function() {
-                            return config["descriptor"]
-                        };
-                        def["getDescriptor"] = function() {
-                            return {
-                                "toString" : toString
-                            };
+                        return {
+                            "config": config,
+                            "getDescriptor" : function() {
+                                return makeDefDescriptor(config["descriptor"]);
+                            }
                         }
-                        return def;
                     }
                 },
                 util : {
@@ -316,7 +318,7 @@ Test.Aura.Component.ComponentDefRegistryTest = function() {
 	function WritesConfigToLocalStorageIfNotCached() {
 	    //Arrange
 	    var target = new ComponentDefRegistry();
-	    var descriptor = "layout://foo:bar";
+            var descriptor = "layout://foo:bar";
 	    target.isLocalStorageAvailable = true;
 	    target.useLocalCache = function() {
 		return true;

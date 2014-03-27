@@ -91,36 +91,16 @@ AuraContext.prototype.getGlobalValueProviders = function() {
  * @return {String} json representation
  */
 AuraContext.prototype.encodeForServer = function() {
-    var dn = this.getDynamicNamespaces();
-
     return aura.util.json.encode({
         "mode" : this.mode,
         "loaded" : this.loaded,
+        "dn" : $A.services.component.getDynamicNamespaces(),
         "app" : this.app,
         "cmp" : this.cmp,
         "lastmod" : this.lastmod,
         "fwuid" : this.fwuid,
         "test" : this.test
     });
-};
-
-/**
- * Array of dynamic namespaces
- * @private
- * @return {Array} Array of dynamic namespaces
- */
-AuraContext.prototype.getDynamicNamespaces = function() {
-    var dynamicNamespaces = [];
-
-    var descriptors = $A.services.component.getRegisteredComponentDescriptors();
-    for ( var n = 0; n < descriptors.length; n++) {
-        var desc = descriptors[n];
-        if (desc.indexOf("layout://") === 0) {
-            dynamicNamespaces.push(new DefDescriptor(desc).getNamespace());
-        }
-    }
-
-    return dynamicNamespaces;
 };
 
 /**

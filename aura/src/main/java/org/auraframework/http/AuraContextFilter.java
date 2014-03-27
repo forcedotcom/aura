@@ -179,6 +179,13 @@ public class AuraContextFilter implements Filter {
                 }
             }
             getLoaded(context, configMap.get("loaded"));
+            @SuppressWarnings("unchecked")
+            List<Object> dns = (List<Object>) configMap.get("dn");
+            if (dns != null) {
+                for (Object dn : dns) {
+                    context.addDynamicNamespace((String) dn);
+                }
+            }
             context.setFrameworkUID((String) configMap.get("fwuid"));
         }
 

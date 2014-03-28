@@ -238,7 +238,6 @@
             });
         }, function(component){
             // Rerendering of child2 will also rerender grandchild2 (and 2a), thus:
-            debugger;
             this.assertCounters(component, "0", "1", "1", "1");
             var order = Window.rerenderTestOrder;
             if (order.length === 5) {

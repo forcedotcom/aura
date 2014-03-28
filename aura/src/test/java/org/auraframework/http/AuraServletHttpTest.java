@@ -34,7 +34,6 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.test.AuraHttpTestCase;
-import org.auraframework.test.AuraHttpTestCase.ServerAction;
 import org.auraframework.test.client.UserAgent;
 import org.auraframework.util.json.JsFunction;
 import org.auraframework.util.json.Json;

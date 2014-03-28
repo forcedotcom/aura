@@ -1354,7 +1354,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     /**
      * Return true if the namespace of the provided descriptor supports caching.
      */
-    private boolean shouldCache(DefDescriptor descriptor) {
+    private boolean shouldCache(DefDescriptor<?> descriptor) {
         if (descriptor == null) {
             return false;
         }

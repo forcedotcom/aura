@@ -48,7 +48,8 @@ public final class ValidationHttpTest extends AuraHttpTestCase {
         }
     }
 
-    public void testLintApp() throws Exception {
+    @SuppressWarnings("unchecked")
+	public void testLintApp() throws Exception {
         // http://localhost:9090/auradev/lint.app?name=...
         Map<String, Object> message = Maps.newHashMap();
         Map<String, Object> actionInstance = Maps.newHashMap();
@@ -77,7 +78,7 @@ public final class ValidationHttpTest extends AuraHttpTestCase {
         response = response.substring(response.indexOf('{'));
 
         Map<String, ?> json = (Map<String, ?>) new JsonReader().read(response);
-        Map<String, ?> value = (Map<String, ?>) ((Map<String, ?>) ((Map<String, ?>) ((ArrayList) json.get("actions"))
+        Map<String, ?> value = (Map<String, ?>) ((Map<String, ?>) ((Map<String, ?>) ((ArrayList<?>) json.get("actions"))
                 .get(0))
                 .get("returnValue"))
                 .get("value");

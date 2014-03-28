@@ -274,6 +274,11 @@
                 <version>v20130411</version>
             </dependency>
             <dependency>
+                 <groupId>org.uiautomation</groupId>
+                 <artifactId>ios-client</artifactId>
+                 <version>0.6.5</version>
+            </dependency>
+            <dependency>
                 <groupId>org.seleniumhq.selenium</groupId>
                 <artifactId>selenium-server</artifactId>
                 <version>${selenium.version}</version>

@@ -190,14 +190,14 @@ var AuraRenderingService = function AuraRenderingService(){
             }
 
             var topVisit = false;
-            if (this.visited === undefined) {
-                this.visited = {};
+            if ($A.renderingService.visited === undefined) {
+                $A.renderingService.visited = {};
                 topVisit = true;
             }
             try {
                 if (component.auraType === "Value" && component.toString() === "ArrayValue"){
                     var visitMark = component.get(0);
-                    if (!visitMark || !this.visited[visitMark.getGlobalId()]) {
+                    if (!visitMark || !$A.renderingService.visited[visitMark.getGlobalId()]) {
                         component.rerender(referenceNode, appendChild, priv.insertElements);
                     }
                     return;
@@ -209,9 +209,9 @@ var AuraRenderingService = function AuraRenderingService(){
                     var cmp = array[i];
                     if (cmp.isValid()) {
                         visitMark = (cmp instanceof ArrayValue) ? cmp.get(0) : cmp;
-                        if (!visitMark || !this.visited[visitMark.getGlobalId()]) {
+                        if (!visitMark || !$A.renderingService.visited[visitMark.getGlobalId()]) {
                             if (visitMark) {
-                                this.visited[visitMark.getGlobalId()] = true;
+                                $A.renderingService.visited[visitMark.getGlobalId()] = true;
                             }
                             var renderer = cmp.getRenderer();
                             renderer.def.rerender(renderer.renderable);
@@ -221,7 +221,7 @@ var AuraRenderingService = function AuraRenderingService(){
                 }
             } finally {
                 if (topVisit) {
-                    this.visited = undefined;
+                    $A.renderingService.visited = undefined;
                 }
             }
         },

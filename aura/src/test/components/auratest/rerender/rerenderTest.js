@@ -14,14 +14,21 @@
  * limitations under the License.
  */
 ({
+	getCounter : function(component) {
+		return $A.test.getText(component.find("counter").find("count").getElement());
+	},
+
+	assertCounter : function(component, count, msg) {
+        $A.test.assertEquals("" + count, this.getCounter(component), msg || "unexpected count");
+	},
+	
     assertChildCounters: function(component, count) {
-        count = "" + count;
-        $A.test.assertEquals(count, $A.test.getText(component.find("counter").find("count").getElement()), "unexpected child count");
-        $A.test.assertEquals(count, $A.test.getText(component.getSuper().find("counter").find("count").getElement()), "unexpected parent count");
-        $A.test.assertEquals(count, $A.test.getText(component.getSuper().getSuper().find("counter").find("count").getElement()), "unexpected abstract count");
+    	this.assertCounter(component, count, "unexpected child count");
+    	this.assertCounter(component.getSuper(), count, "unexpected parent count");
+    	this.assertCounter(component.getSuper().getSuper(), count, "unexpected abstract count");
     },
 
-    assertCounters: function(component, child1count, grandchild1count, child2count, grandchild2count, layoutItemCount){
+    assertCounters: function(component, child1count, grandchild1count, child2count, grandchild2count, grandchild2acount, greatgrandchild2count, layoutItemCount){
         var child1 = component.find("child1");
         this.assertChildCounters(child1, child1count);
         var grandchild1 = component.find("grandchild1");
@@ -30,6 +37,10 @@
         this.assertChildCounters(child2, child2count);
         var grandchild2 = component.find("grandchild2");
         this.assertChildCounters(grandchild2, grandchild2count);
+        var grandchild2a = component.find("grandchild2a");
+        this.assertChildCounters(grandchild2a, grandchild2acount);
+        var greatgrandchild2 = component.find("greatgrandchild2");
+        this.assertChildCounters(greatgrandchild2, greatgrandchild2count);
         if(layoutItemCount){
             var layoutItem = component.find("layoutTarget").get("v.body")[0];
             this.assertChildCounters(layoutItem, layoutItemCount);
@@ -46,24 +57,41 @@
         $A.test.assertEquals("", $A.test.getText(element), "placeholder isn't an empty string");
     },
 
+    addWaitForCounter : function(component, count) {
+    	var that = this;
+    	var cmp = component;
+        $A.test.addWaitFor("" + count, function(){
+            return that.getCounter(cmp);
+        });
+    },
+    
+    addWaitForLayoutItem : function(component, layoutItemText) {
+    	var cmp = component;
+    	var expected = layoutItemText;
+        $A.test.addWaitFor(true, function(){
+            var t = $A.test.getText(cmp.find("layoutTarget").getElement());
+            return t && (t.indexOf(expected) >= 0);
+        });    	
+    },
+    
+    toggleValue : function(component) {
+        var val = component.getValue("v.toggleChild");
+        val.setValue(!val.unwrap());
+    },
+    
     /**
      * Update attribute from abstract component.
      */
     testAbstractAttributeUpdated: {
         attributes : { __layout: "#def" },
         test: [function(component){
-                $A.test.addWaitFor(true, function(){
-                    var t = $A.test.getText(component.find("layoutTarget").getElement());
-                    return t && (t.indexOf("def layout item") >= 0);
-                });
+        		this.addWaitForLayoutItem(component, "def layout item");
             }, function(component){
                 var child1 = component.find("child1");
                 child1.getSuper().getSuper().find("toggleAbstract").get("e.press").fire();
-                $A.test.addWaitFor("1", function(){
-                    return $A.test.getText(child1.find("counter").find("count").getElement());
-                });
+                this.addWaitForCounter(child1, "1");
             }, function(component){
-                this.assertCounters(component, "1", "1", "0", "0", "1");
+                this.assertCounters(component, "1", "1", "0", "0", "0", "0", "1");
             }]
     },
 
@@ -73,18 +101,13 @@
     testAbstractModelUpdated: {
         attributes : { __layout: "#def" },
         test: [function(component){
-                $A.test.addWaitFor(true, function(){
-                    var t = $A.test.getText(component.find("layoutTarget").getElement());
-                    return t && (t.indexOf("def layout item") >= 0);
-                });
+        		this.addWaitForLayoutItem(component, "def layout item");
             }, function(component){
                 var child1 = component.find("child1");
                 child1.getSuper().getSuper().find("toggleAbstractModel").get("e.press").fire();
-                $A.test.addWaitFor("1", function(){
-                    return $A.test.getText(child1.find("counter").find("count").getElement());
-                });
+                this.addWaitForCounter(child1, "1");
             }, function(component){
-                this.assertCounters(component, "1", "1", "0", "0", "1");
+                this.assertCounters(component, "1", "1", "0", "0", "0", "0", "1");
             }]
     },
 
@@ -94,18 +117,13 @@
     testInterfaceAttributeUpdated: {
         attributes : { __layout: "#def" },
         test: [function(component){
-                $A.test.addWaitFor(true, function(){
-                    var t = $A.test.getText(component.find("layoutTarget").getElement());
-                    return t && (t.indexOf("def layout item") >= 0);
-                });
+        		this.addWaitForLayoutItem(component, "def layout item");
             }, function(component){
                 var child1 = component.find("child1");
                 child1.getSuper().getSuper().find("toggleInterface").get("e.press").fire();
-                $A.test.addWaitFor("1", function(){
-                    return $A.test.getText(child1.find("counter").find("count").getElement());
-                });
+                this.addWaitForCounter(child1, "1");
             }, function(component){
-                this.assertCounters(component, "1", "1", "0", "0", "1");
+                this.assertCounters(component, "1", "1", "0", "0", "0", "0", "1");
             }]
     },
 
@@ -117,11 +135,9 @@
         test: [function(component){
                 var child2 = component.find("child2");
                 child2.getSuper().find("toggleParent").get("e.press").fire();
-                $A.test.addWaitFor("1", function(){
-                    return $A.test.getText(child2.find("counter").find("count").getElement());
-                });
+                this.addWaitForCounter(child2, "1");
             }, function(component){
-                this.assertCounters(component, "0", "0", "1", "1");
+                this.assertCounters(component, "0", "0", "1", "1", "1", "1");
             }]
     },
 
@@ -133,11 +149,9 @@
         test: [function(component){
                 var child2 = component.find("child2");
                 child2.getSuper().find("toggleParentModel").get("e.press").fire();
-                $A.test.addWaitFor("1", function(){
-                    return $A.test.getText(child2.find("counter").find("count").getElement());
-                });
+                this.addWaitForCounter(child2, "1");
             }, function(component){
-                this.assertCounters(component, "0", "0", "1", "1");
+                this.assertCounters(component, "0", "0", "1", "1", "1", "1");
             }]
     },
 
@@ -149,11 +163,9 @@
         test: [function(component){
                 var child2 = component.find("child2");
                 child2.find("toggleChild").get("e.press").fire();
-                $A.test.addWaitFor("1", function(){
-                    return $A.test.getText(child2.find("counter").find("count").getElement());
-                });
+                this.addWaitForCounter(child2, "1");
             }, function(component){
-                this.assertCounters(component, "0", "0", "1", "1");
+                this.assertCounters(component, "0", "0", "1", "1", "1", "1");
             }]
     },
 
@@ -163,33 +175,23 @@
     testLayoutChange: {
         attributes : { __layout: "#def" },
         test: [function(component){
-                $A.test.addWaitFor(true, function(){
-                    var t = $A.test.getText(component.find("layoutTarget").getElement());
-                    return t && (t.indexOf("def layout item") >= 0);
-                });
+        		this.addWaitForLayoutItem(component, "def layout item");
             }, function(component){
                 var child1 = component.find("child1");
                 child1.getSuper().getSuper().find("toggleAbstract").get("e.press").fire();
                 child1.getSuper().find("toggleParent").get("e.press").fire();
-                $A.test.addWaitFor("2", function(){
-                    return $A.test.getText(child1.find("counter").find("count").getElement());
-                });
+                this.addWaitForCounter(child1, "2");
             }, function(component){
-                this.assertCounters(component, "2", "2", "0", "0", "2");
+                this.assertCounters(component, "2", "2", "0", "0", "0", "0", "2");
                 $A.layoutService.layout("death");
-                $A.test.addWaitFor(true, function(){
-                    var t = $A.test.getText(component.find("layoutTarget").getElement());
-                    return t && (t.indexOf("death layout item") >= 0);
-                });
+        		this.addWaitForLayoutItem(component, "death layout item");
             }, function(component){
-                this.assertCounters(component, "2", "2", "0", "0", "0");
+                this.assertCounters(component, "2", "2", "0", "0", "0", "0", "0");
                 var child1 = component.find("child1");
                 child1.find("toggleChild").get("e.press").fire();
-                $A.test.addWaitFor("3", function(){
-                    return $A.test.getText(child1.find("counter").find("count").getElement());
-                });
+                this.addWaitForCounter(child1, "3");
             }, function(component){
-                this.assertCounters(component, "3", "3", "0", "0", "1");
+                this.assertCounters(component, "3", "3", "0", "0", "0", "0", "1");
             }]
     },
 
@@ -199,28 +201,42 @@
     testLayoutItemAttributeUpdated: {
         attributes : { __layout: "#def" },
         test: [function(component){
-                $A.test.addWaitFor(true, function(){
-                    var t = $A.test.getText(component.find("layoutTarget").getElement());
-                    return t && (t.indexOf("def layout item") >= 0);
-                });
+        		this.addWaitForLayoutItem(component, "def layout item");
             }, function(component){
                 var child1 = component.find("child1");
                 child1.getSuper().getSuper().find("toggleAbstract").get("e.press").fire();
-                $A.test.addWaitFor("1", function(){
-                    return $A.test.getText(child1.find("counter").find("count").getElement());
-                });
+                this.addWaitForCounter(child1, "1");
             }, function(component){
-                this.assertCounters(component, "1", "1", "0", "0", "1");
+                this.assertCounters(component, "1", "1", "0", "0", "0", "0", "1");
                 var item = component.find("layoutTarget").get("v.body")[0].getSuper();
                 item.find("toggleParent").get("e.press").fire();
-                $A.test.addWaitFor("2", function(){
-                    return $A.test.getText(item.find("counter").find("count").getElement());
-                });
+                this.addWaitForCounter(item, "2");
             }, function(component){
-                this.assertCounters(component, "1", "1", "0", "0", "2");
+                this.assertCounters(component, "1", "1", "0", "0", "0", "0", "2");
             }]
     },
     
+    testRerenderOnceIfContainerRerenderedInEventLoop: {
+        attributes : { __layout: "#def" },
+        test: [function(component){
+    		this.addWaitForLayoutItem(component, "def layout item");
+        }, function(component){
+        	var cmp = component;
+        	var child2 = cmp.find("child2");
+            var that = this;
+            $A.run(function(){
+            	that.toggleValue(cmp.find("child2"));
+            	that.toggleValue(cmp.find("grandchild2"));
+            	that.toggleValue(cmp.find("greatgrandchild2"));
+            });
+            $A.test.addWaitFor("1", function(){
+                return that.getCounter(child2);
+            });
+        }, function(component){
+        	this.assertCounters(component, "0", "0", "1", "1", "1", "1");
+        }]
+    },
+
     /** Tests rerender ordering. */
     testRerenderOrder: {
         attributes : { __layout: "#def" },
@@ -233,14 +249,12 @@
             // grandchild2a (and grandchild1 not in the middle, but before or after both).
             Window.rerenderTestOrder = [];  // Reset order tracking
             $A.rerender([grandchild2a, grandchild1, child2]);
-            $A.test.addWaitFor("1", function(){
-                return $A.test.getText(child2.find("counter").find("count").getElement());
-            });
+            this.addWaitForCounter(child2, "1");
         }, function(component){
             // Rerendering of child2 will also rerender grandchild2 (and 2a), thus:
-            this.assertCounters(component, "0", "1", "1", "1");
+            this.assertCounters(component, "0", "1", "1", "1", "1", "1");
             var order = Window.rerenderTestOrder;
-            if (order.length === 5) {
+            if (order.length === 6) {
                 // When run commandline, we get an extra leading rerender that we don't count, and
                 // that we DON'T see running by hand.  Account for that here:
                 for (var j = 0; j < order.length; ++j) {
@@ -252,26 +266,33 @@
             }
             var child2 = component.find("child2");
             var grandchild2 = component.find("grandchild2");
+            var greatgrandchild2 = component.find("greatgrandchild2");
             var grandchild2a = component.find("grandchild2a");
             var grandchild1 = component.find("grandchild1");
-            $A.test.assertEquals(4, order.length);
+            $A.test.assertEquals(5, order.length);
+            // We have two "legal" variations in rerender order: grandchild1 could
+            // be before or after grandchild2.
             if (grandchild1.getGlobalId() === order[0]) {
                 $A.test.assertEquals(child2.getGlobalId(), order[1]);
                 if (grandchild2.getGlobalId() === order[2]) {
-                    $A.test.assertEquals(grandchild2a.getGlobalId(), order[3]);
+                    $A.test.assertEquals(greatgrandchild2.getGlobalId(), order[3]);
+                    $A.test.assertEquals(grandchild2a.getGlobalId(), order[4]);
                 } else {
                     $A.test.assertEquals(grandchild2a.getGlobalId(), order[2]);
                     $A.test.assertEquals(grandchild2.getGlobalId(), order[3]);
+                    $A.test.assertEquals(greatgrandchild2.getGlobalId(), order[4]);
                 }
             } else {
                 $A.test.assertEquals(child2.getGlobalId(), order[0]);
                 if (grandchild2.getGlobalId() === order[1]) {
-                    $A.test.assertEquals(grandchild2a.getGlobalId(), order[2]);
+                    $A.test.assertEquals(greatgrandchild2.getGlobalId(), order[2]);
+                    $A.test.assertEquals(grandchild2a.getGlobalId(), order[3]);
                 } else {
                     $A.test.assertEquals(grandchild2a.getGlobalId(), order[1]);
                     $A.test.assertEquals(grandchild2.getGlobalId(), order[2]);
+                    $A.test.assertEquals(greatgrandchild2.getGlobalId(), order[3]);
                 }
-                $A.test.assertEquals(grandchild1.getGlobalId(), order[3]);
+                $A.test.assertEquals(grandchild1.getGlobalId(), order[4]);
             }
         }]
     },
@@ -284,7 +305,7 @@
         test: [function(component){
                 var cmp = component.find("emptyArrayContainer");
                 this.assertChildCounters(cmp, 0);
-                this.assertCounters(component, "0", "0", "0", "0");
+                this.assertCounters(component, "0", "0", "0", "0", "0", "0");
                 this.assertPlaceholder(cmp);
                 component.find("pushComponent").get("e.press").fire();
                 $A.test.addWaitFor("markup://auratest:rerenderChild", function(){
@@ -295,7 +316,7 @@
                 var cmp = component.find("emptyArrayContainer");
                 // all components rerendered since array belongs to root
                 this.assertChildCounters(cmp, 1);
-                this.assertCounters(component, "1", "1", "1", "1");
+                this.assertCounters(component, "1", "1", "1", "1", "1", "1");
                 var added = cmp.get("v.body")[0].get("v.value")[0];
                 this.assertChildCounters(added, 0);
             }]
@@ -317,7 +338,7 @@
                 var cmp = component.find("emptyArrayContainer");
                 // expecting both events above to get processed at once
                 this.assertChildCounters(cmp, "1");
-                this.assertCounters(component, "1", "1", "1", "1");
+                this.assertCounters(component, "1", "1", "1", "1", "1", "1");
                 var added = cmp.get("v.body")[0].get("v.value")[1];
                 this.assertChildCounters(added, 0);
                 component.getValue("v.emptyArray").clear();
@@ -329,7 +350,7 @@
             }, function(component){
                 var cmp = component.find("emptyArrayContainer");
                 this.assertChildCounters(cmp, "2");
-                this.assertCounters(component, "2", "2", "2", "2");
+                this.assertCounters(component, "2", "2", "2", "2", "2", "2");
                 this.assertPlaceholder(cmp);
             }]
     },
@@ -350,7 +371,7 @@
                 var cmp = component.find("emptyArrayContainer");
                 // expecting both events above to get processed at once
                 this.assertChildCounters(cmp, "1");
-                this.assertCounters(component, "1", "1", "1", "1");
+                this.assertCounters(component, "1", "1", "1", "1", "1", "1");
 
                 // text comp before child comp
                 var textElem = cmp.get("v.body")[0].get("v.value")[0].getElement();
@@ -367,7 +388,7 @@
             }, function(component){
                 var cmp = component.find("emptyArrayContainer");
                 this.assertChildCounters(cmp, "2");
-                this.assertCounters(component, "2", "2", "2", "2");
+                this.assertCounters(component, "2", "2", "2", "2", "2", "2");
 
                 // text comp now after child comp
                 var textElem = cmp.get("v.body")[0].get("v.value")[1].getElement();
@@ -408,7 +429,7 @@
                 $A.test.assertEquals(undefined, cmp.getSuper().find("toggleParent").getElement(), "parent element wasn't unrendered");
 
                 $A.test.assertEquals("1", $A.test.getText(cmp.getSuper().getSuper().find("counter").find("count").getElement()), "unexpected abstract count");
-                this.assertCounters(component, "0", "0", "0", "0");
+                this.assertCounters(component, "0", "0", "0", "0", "0", "0");
             }]
     },
 
@@ -437,7 +458,7 @@
                 $A.test.assertTrue($A.util.hasClass(children[2], "auratestRerenderChild"), "unexpected child component element");
                 this.assertChildCounters(cmp, 1);
                 this.assertChildCounters(cmp.getSuper().get("v.body")[2], 0); // newly added child comp
-                this.assertCounters(component, "0", "0", "0", "0");
+                this.assertCounters(component, "0", "0", "0", "0", "0", "0");
 
                 component.find("reverse").get("e.press").fire();
                 component.find("pop").get("e.press").fire();
@@ -457,7 +478,7 @@
                 $A.test.assertEquals("2", $A.test.getText(cmp.getSuper().find("counter").find("count").getElement()), "unexpected parent count");
                 $A.test.assertEquals(undefined, cmp.find("counter").find("count").getElement(), "child count not unrendered");
                 this.assertChildCounters(cmp.getSuper().get("v.body")[0], 1); // moved child comp
-                this.assertCounters(component, "0", "0", "0", "0");
+                this.assertCounters(component, "0", "0", "0", "0", "0", "0");
             }]
     }
 })

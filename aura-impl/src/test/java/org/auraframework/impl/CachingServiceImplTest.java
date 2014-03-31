@@ -21,7 +21,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 
 import org.apache.log4j.AppenderSkeleton;
@@ -44,11 +43,9 @@ import org.auraframework.system.DependencyEntry;
 import org.auraframework.system.SourceListener;
 import org.auraframework.system.SourceListener.SourceMonitorEvent;
 import org.mockito.Mockito;
-import org.openqa.selenium.support.ui.FluentWait;
 
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
-import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
@@ -97,27 +94,25 @@ public class CachingServiceImplTest extends AuraImplTestCase {
 
 			// try to notify
 			service.notifyDependentSourceChange(null, null, null, null);
-			new FluentWait<List<LoggingEvent>>(events)
-					.withTimeout(1, TimeUnit.SECONDS)
-					.withMessage(
-							"Timed out waiting for error event due to unobtainable lock")
-					.until(new Predicate<List<LoggingEvent>>() {
-						@Override
-						public boolean apply(List<LoggingEvent> capturedEvents) {
-							if (capturedEvents.isEmpty()) {
-								return false;
-							}
-							assertEquals("Unexpected number of events", 1,
-									capturedEvents.size());
-							LoggingEvent event = capturedEvents.get(0);
-							assertEquals("Unexpected logging level",
-									Level.ERROR, event.getLevel());
-							assertEquals(
-									"Couldn't acquire cache clear lock in a reasonable time.  Cache may be stale until next clear.",
-									event.getMessage());
-							return true;
-						}
-					});
+			long start = System.nanoTime();
+			do {
+				if (!events.isEmpty()) {
+					assertEquals("Unexpected number of events", 1,
+							events.size());
+					LoggingEvent event = events.get(0);
+					assertEquals("Unexpected logging level", Level.ERROR,
+							event.getLevel());
+					assertEquals(
+							"Couldn't acquire cache clear lock in a reasonable time.  Cache may be stale until next clear.",
+							event.getMessage());
+					return;
+				}
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+				}
+			} while (System.nanoTime() - start < 10000000000L); // 10 secs from now
+			fail("Timed out waiting for error event due to unobtainable lock");
 		} finally {
 			lock.unlock();
 		}

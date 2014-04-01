@@ -1647,7 +1647,7 @@ $A.ns.Util.prototype.supportsTouchEvents = function() {
     * But we can get close to it for our use cases making some assumptions.
     */
     if ($A.util.isUndefined(this.supportsTouchEvents.cache)) {
-        this.supportsTouchEvents.cache =
+        this.supportsTouchEvents.cache = (
 
             // If we are on some sort of NON-DESKTOP device, we check wether it supports 'ontouchstart'
             // We do this because Chrome, IE and firefox will give false positives when checking this properties
@@ -1656,11 +1656,13 @@ $A.ns.Util.prototype.supportsTouchEvents = function() {
             // IE  will also give false positives, so we make sure that only enable pointer events when is a windowsPhone
             || ($A.get('$Browser.isWindowsPhone') && (navigator.pointerEnabled ||  navigator.msPointerEnabled))
             || navigator.msMaxTouchPoints > 0 
-            || navigator.maxTouchPoints > 0 && ($A.getContext().getMode() !== 'PTEST')
+            || navigator.maxTouchPoints > 0 
 
             // Aura internal testing
+            && ($A.getContext().getMode() !== 'PTEST')
             && ($A.getContext().getMode() !== 'CADENCE') && ($A.getContext().getMode() !== 'SELENIUM')
-            && ($A.getContext().getMode() !== 'SELENIUMDEBUG');
+            && ($A.getContext().getMode() !== 'SELENIUMDEBUG')
+        );
     }
     return this.supportsTouchEvents.cache;
 };

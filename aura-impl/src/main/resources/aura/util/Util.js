@@ -1640,12 +1640,14 @@ $A.ns.Util.prototype.isValue = function(obj) {
  * @returns {Boolean} True if touch events are supported.
  */
 $A.ns.Util.prototype.supportsTouchEvents = function() {
+    
     /*
-    * NOTE @dval:
+    * NOTE:
     * There is no perfect way to detect wether the browser supports touch events or not. 
-    * Nice summary here: http://www.stucox.com/blog/you-cant-detect-a-touchscreen/
+    * Nice summary here: http://www.stucox.com/blog/you-cant-detect-a-touchscreen
     * But we can get close to it for our use cases making some assumptions.
     */
+
     if ($A.util.isUndefined(this.supportsTouchEvents.cache)) {
         this.supportsTouchEvents.cache = (
 
@@ -1656,13 +1658,13 @@ $A.ns.Util.prototype.supportsTouchEvents = function() {
             // IE  will also give false positives, so we make sure that only enable pointer events when is a windowsPhone
             || ($A.get('$Browser.isWindowsPhone') && (navigator.pointerEnabled ||  navigator.msPointerEnabled))
             || navigator.msMaxTouchPoints > 0 
-            || navigator.maxTouchPoints > 0 
+            || navigator.maxTouchPoints > 0)
 
             // Aura internal testing
             && ($A.getContext().getMode() !== 'PTEST')
-            && ($A.getContext().getMode() !== 'CADENCE') && ($A.getContext().getMode() !== 'SELENIUM')
-            && ($A.getContext().getMode() !== 'SELENIUMDEBUG')
-        );
+            && ($A.getContext().getMode() !== 'CADENCE') 
+            && ($A.getContext().getMode() !== 'SELENIUM')
+            && ($A.getContext().getMode() !== 'SELENIUMDEBUG');
     }
     return this.supportsTouchEvents.cache;
 };

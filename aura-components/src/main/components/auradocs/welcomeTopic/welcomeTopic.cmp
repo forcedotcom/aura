@@ -22,11 +22,7 @@
         <aura:set attribute="left">
           <h4>What is Aura?</h4>
           <p>Aura is a UI framework for developing dynamic web apps for mobile and desktop devices. Aura provides a scalable long-lived lifecycle to support building apps engineered for growth.</p>
-          <p>Aura supports partitioned multi-tier component development that bridges the client and server. It uses JavaScript on the client side and Java on the server side.</p>
-          
-	      <p><a href="#help?topic=qsIntro">Get Started</a></p>
-	    	
-          <ui:image src="/auraFW/resources/aura/images/devices.png" alt="Aura is platform and device agnostic."/>
+          <p>Aura supports partitioned multi-tier component development that bridges the client and server. It uses JavaScript on the client side and Java on the server side.</p>    	
         </aura:set>
          <span class="why">
          <h4>Why Use Aura?</h4>
@@ -35,16 +31,13 @@
          </span>
     </ui:block>
     
-    <h4>Developing with Aura</h4>
-    
-    <p>You can build your user interface at a granular level and easily integrate with popular toolkits and libraries, such as jQuery. Aura's lightweight and scalable architecture uses two key building blocks: components and events.</p>
+    <p><ui:outputURL value="http://help.auraframework.org" label="Help" target="_blank" /> Read the doc to learn more about Aura</p><br/>
 
-    <p>Components use markup that looks similar to HTML. You can also use HTML or any other code that can execute within an HTML page. Components are encapsulated and their internals stay private. You can extend existing components to customize their behavior.</p>
+    <p><ui:outputURL value="https://github.com/forcedotcom/aura" label="Quick Start" target="_blank" /> Dive right in and build an Aura app</p><br/>
+ 
+    <p><ui:outputURL value="#reference" label="Reference" /> Look up the component reference and JavaScript API</p><br/>
+          
+    <p><ui:outputURL value="#demos" label="Demos" /> Check out some Aura demos</p><br/>       
+        
     
-    <p>The robust event model enables you to develop loosely coupled components. Once you define the events that interact with your components, your team can work on the components in parallel to quickly build a powerful app.</p>
-    
-    <p>Aura also supports a powerful expression language, embedded testing, performance, and security features.</p>
-    
-    <p>This guide shows you how to get started and then dig deeper into Aura. It assumes basic familiarity with HTML, CSS, JavaScript, and Java.</p>
-
 </aura:component>

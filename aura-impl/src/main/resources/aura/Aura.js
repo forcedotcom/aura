@@ -321,7 +321,7 @@ $A.ns.Aura = function() {
     };
 
     /**
-     * Client-side component creation. This method is replaced by newComponentAsync().
+     * Client-side component creation. This method is replaced by newCmpAsync().
      * @param {Object} config
      * @param {Object} attributeValueProvider
      * @param {Boolean} localCreation
@@ -330,7 +330,7 @@ $A.ns.Aura = function() {
         return this.componentService.newComponentDeprecated(config, attributeValueProvider, localCreation, doForce);
     };
     /**
-     * Previously known as newComponent(). This method is replaced by newComponentAsync().
+     * Previously known as newComponent(). This method is replaced by newCmpAsync().
      * @param {Object} config
      * @param {Object} attributeValueProvider
      * @param {Boolean} localCreation
@@ -347,11 +347,12 @@ $A.ns.Aura = function() {
      * @param {Function} callback The callback function, required for returning the newly created component
      * @param {Object} config Provides the component descriptor and attributes. Example:
      * <p><code>"componentDef": "markup://ui:button", "attributes": { "values": {label: "Submit"}}</code></p>
-     * @param {Object} attributeValueProvider
-     * @param {Boolean} localCreation
-     * @param {Boolean} doForce
-     * @param {Boolean} forceServer
+     * @param {Object} attributeValueProvider The value provider for the attribute.
+     * @param {Boolean} localCreation For internal use only. localCreation determines if the global id is used and defaults to false.
+     * @param {Boolean} doForce For internal use only. doForce enforces client-side creation and defaults to false.
+     * @param {Boolean} forceServer For internal use only. forceServer enforces server-side creation and defaults to false.
      */
+    
     this.newCmpAsync = function(callbackScope, callback, config, attributeValueProvider, localCreation, doForce, forceServer){
         return this.componentService.newComponentAsync(callbackScope, callback, config, attributeValueProvider, localCreation, doForce, forceServer);
     };

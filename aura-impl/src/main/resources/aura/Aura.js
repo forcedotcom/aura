@@ -347,11 +347,12 @@ $A.ns.Aura = function() {
      * @param {Function} callback The callback function, required for returning the newly created component
      * @param {Object} config Provides the component descriptor and attributes. Example:
      * <p><code>"componentDef": "markup://ui:button", "attributes": { "values": {label: "Submit"}}</code></p>
-     * @param {Object} attributeValueProvider The value provider for the attribute
-     * @param {Boolean} localCreation Determines the global id. Defaults to false.
-     * @param {Boolean} doForce Forces client-side creation. Defaults to false.
-     * @param {Boolean} forceServer Forces server-side creation. Defaults to false.
+     * @param {Object} attributeValueProvider The value provider for the attribute.
+     * @param {Boolean} localCreation For internal use only. localCreation determines if the global id is used and defaults to false.
+     * @param {Boolean} doForce For internal use only. doForce enforces client-side creation and defaults to false.
+     * @param {Boolean} forceServer For internal use only. forceServer enforces server-side creation and defaults to false.
      */
+    
     this.newCmpAsync = function(callbackScope, callback, config, attributeValueProvider, localCreation, doForce, forceServer){
         return this.componentService.newComponentAsync(callbackScope, callback, config, attributeValueProvider, localCreation, doForce, forceServer);
     };

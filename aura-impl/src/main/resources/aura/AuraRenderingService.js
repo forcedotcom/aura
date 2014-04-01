@@ -74,14 +74,14 @@ var AuraRenderingService = function AuraRenderingService(){
                 var startTime = (new Date()).getTime();
                 //#end                     
 
-                this.rerender(cmps);
-
-                //#if {"modes" : ["STATS"]}
                 if (cmps.length > 0) {
+	                this.rerender(cmps);
+	
+	                //#if {"modes" : ["STATS"]}
                 	cmpsWithWhy["renderingTime"] = (new Date()).getTime() - startTime;
                 	this.index(cmpsWithWhy);
+	                //#end
                 }
-                //#end                     
                 
                 $A.endMark(initialMarkName);
                 $A.get("e.aura:doneRendering").fire();
@@ -194,6 +194,7 @@ var AuraRenderingService = function AuraRenderingService(){
                 $A.renderingService.visited = {};
                 topVisit = true;
             }
+            
             try {
                 if (component.auraType === "Value" && component.toString() === "ArrayValue"){
                     var visitMark = component.get(0);

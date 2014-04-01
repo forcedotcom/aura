@@ -78,7 +78,7 @@ MapValue.prototype.fire = function(name) {
  * Returns a SimpleValue for the specified key.
  * @param {String} k The key for whose value is to be fetched.
  */
-MapValue.prototype.getValue = function(k){
+MapValue.prototype.getValue = function(k, returnUndefined){
     if ($A.util.isUndefined(this.value)) {
         return valueFactory.create(undefined, null, this.owner);
     }
@@ -86,7 +86,7 @@ MapValue.prototype.getValue = function(k){
     aura.assert(k, "Key is required for getValue on MapValue");
 
     var ret = this.value[k.toLowerCase()];
-    if ($A.util.isUndefined(ret)){
+    if ($A.util.isUndefined(ret) && !returnUndefined){
         ret = valueFactory.create(undefined, null, this.owner);
     }
 

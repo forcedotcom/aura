@@ -57,9 +57,13 @@ AttributeSet.prototype.hasAttribute = function(name) {
  * @returns {Object} Value of the attribute with the given name.
  */
 AttributeSet.prototype.getValue = function(name, raw) {
-    this.createDefault(name);
-
-    var ve = this.values.getValue(name);
+    var ve = this.values.getValue(name, true);
+    
+    if (!ve) {
+    	this.createDefault(name);
+        ve = this.values.getValue(name);
+    }
+    
     var value;
     if (!raw && ve && ve.isExpression()) {
         value = expressionService.getValue(this.getValueProvider(), ve);
@@ -97,9 +101,13 @@ AttributeSet.prototype.getRawValue = function(name) {
  * @param {Object} value The value to be set.
  */
 AttributeSet.prototype.setValue = function(name, value) {
-    this.createDefault(name);
-
-    var ve = this.values.getValue(name);
+    var ve = this.values.getValue(name, true);
+    
+    if (!ve) {
+    	this.createDefault(name);
+        ve = this.values.getValue(name);
+    }
+    
     if (ve.isExpression()) {
         expressionService.setValue(this.getValueProvider(), ve, value);
     } else {
@@ -206,7 +214,7 @@ AttributeSet.prototype.mergeValues = function(yourValues, overwrite) {
  * @private
  */
 AttributeSet.prototype.createDefault = function(name) {
-    if (!$A.util.isUndefinedOrNull(name) && !this.hasAttribute(name)) {
+    if (name && !this.hasAttribute(name)) {
         // Dynamically create the attribute now that something has asked for it
         var attributeDef = this.attributeDefSet.getDef(name.toLowerCase());
 
@@ -215,7 +223,6 @@ AttributeSet.prototype.createDefault = function(name) {
 
         if (attributeDef) {
             var defaultValue = attributeDef.getDefault();
-
             this.createAttribute(name, defaultValue, attributeDef);
         }
     }
@@ -395,6 +402,7 @@ AttributeSet.prototype.createAttribute = function(name, config, def) {
             valueConfig = {};
         }
     }
+    
     valueConfig = valueFactory.create(valueConfig, def, this.component);
     if (!hasRealValue) {
         // For maps and arrays that were null or undefined, we needed to make a

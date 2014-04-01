@@ -19,12 +19,13 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.def.*;
 import org.auraframework.system.Source;
+import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 
 public class RootTagHandlerFactory {
 
     @SuppressWarnings("unchecked")
     public static <T extends RootDefinition> RootTagHandler<T> newInstance(DefDescriptor<T> defDescriptor,
-            Source<T> source, XMLStreamReader xmlReader) {
+            Source<T> source, XMLStreamReader xmlReader) throws DefinitionNotFoundException {
         switch (defDescriptor.getDefType()) {
         case APPLICATION:
             return (RootTagHandler<T>) new ApplicationDefHandler((DefDescriptor<ApplicationDef>) defDescriptor,

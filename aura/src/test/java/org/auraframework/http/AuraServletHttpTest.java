@@ -34,6 +34,7 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.test.AuraHttpTestCase;
+import org.auraframework.test.AuraHttpTestCase.ServerAction;
 import org.auraframework.test.client.UserAgent;
 import org.auraframework.util.json.JsFunction;
 import org.auraframework.util.json.Json;
@@ -48,6 +49,24 @@ import org.auraframework.util.json.JsonReader;
 public class AuraServletHttpTest extends AuraHttpTestCase {
     public AuraServletHttpTest(String name) {
         super(name);
+    }
+    
+    /**
+     * Test for W-2063110
+     * this test is to verify the order of actions and context in the response
+     * we used to have context before actions, now it's the opposite
+     */
+    public void testPostRawResponseSimpleAction() throws Exception {
+    	Map<String, Object> actionParams = new HashMap<String, Object>();
+        actionParams.put("param", "some string");
+    	ServerAction a = new ServerAction(
+                "java://org.auraframework.impl.java.controller.JavaTestController/ACTION$getString",
+                actionParams);
+    	a.run();
+        String rawRes = a.getrawResponse();
+        Integer posActions = rawRes.indexOf("actions");
+        Integer posContex = rawRes.indexOf("context");
+        assertTrue(posActions<posContex);
     }
 
     /**

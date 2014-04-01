@@ -481,6 +481,13 @@ $A.ns.AuraComponentService.prototype.getRegisteredComponentDescriptors = functio
 };
 
 /**
+ * Get the dynamic namespaces defined by 'layout://name'
+ */
+$A.ns.AuraComponentService.prototype.getDynamicNamespaces = function(){
+    return this.registry.dynamicNamespaces;
+};
+
+/**
  * @memberOf AuraComponentService
  * @private
  */

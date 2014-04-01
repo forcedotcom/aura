@@ -50,23 +50,8 @@
 	},
 
 	onMenuSelected : function(cmp, evt, helper) {
-		var selectedValue = evt.getParam('selectedItem').get('v.value');
-
 		helper.setSelectedItems(cmp, helper.getSelectedMenuItems(cmp));
-		helper.updateSortedItemsLable(cmp);
-		helper.updateSortOrderPicker(cmp, cmp._sortOrderMap[selectedValue].order);
-	},
-
-	onAsc : function(cmp, evt, helper) {
-		var order = helper.CONSTANTS.ASC;
-		helper.updateSelectedItemsSortOrder(cmp, order);
-		helper.updateSortOrderPicker(cmp, order);
-	},
-
-	onDec : function(cmp, evt, helper) {
-		var order = helper.CONSTANTS.DESC;
-		helper.updateSelectedItemsSortOrder(cmp, order);
-		helper.updateSortOrderPicker(cmp, order);
+		helper.updateSortOrder(cmp);
 	},
 
 	onApply : function(cmp, evt, helper) {

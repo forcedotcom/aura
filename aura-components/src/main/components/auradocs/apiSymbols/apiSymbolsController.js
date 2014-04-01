@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{
+({
     /**
      * Scroll to the corresponding apiSymbol. We can't use hash fragment
      * scrolling because we use the hash fragment for navigation.
@@ -23,4 +23,4 @@
         var scrollTo = cmp.getGlobalId() + "_symbol_" + link.innerText;
         document.getElementById(scrollTo).scrollIntoView();
     }
-}
+})

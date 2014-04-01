@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.auraframework</groupId>
         <artifactId>aura-framework</artifactId>
-        <version>0.790-SNAPSHOT</version>
+        <version>0.858-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <dependencies>
@@ -93,8 +93,6 @@
         <sauce.record.screenshots>false</sauce.record.screenshots>
         <screenshots.directory>${project.build.directory}/screenshots</screenshots.directory>
         <screenshots.baseurl>file://${screenshots.directory}</screenshots.baseurl>
-        <sauce.username>lumen</sauce.username>
-        <sauce.access.key>4df61bdf-1696-4f73-b869-ead4c7603dca</sauce.access.key>
     </properties>
     <build>
         <plugins>

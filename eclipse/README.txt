@@ -59,7 +59,7 @@ This sets up the Aura copyright header for new Java files
 
 
 -- JS Code Templates (NOT covered by auraEclipsePrefs.epf)--
-* Window->Preferences->Javascript->Code Style->Code Templates->Import: eclipse/JS.xml
+* Window->Preferences->Javascript->Code Style->Code Templates->Import: eclipse/auraJSCodeTemplates.xml
 
 
 -- Save Actions (NOT covered by the import)--

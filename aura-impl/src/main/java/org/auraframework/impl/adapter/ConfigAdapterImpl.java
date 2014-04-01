@@ -67,8 +67,8 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     private static final Set<String> SYSTEM_NAMESPACES = Sets.newTreeSet(String.CASE_INSENSITIVE_ORDER);
 
     private static final Set<String> UNSECURED_PREFIXES = new ImmutableSortedSet.Builder<String>(String.CASE_INSENSITIVE_ORDER).add("aura", "layout").build();
-    private static final Set<String> UNSECURED_NAMESPACES = new ImmutableSortedSet.Builder<String>(String.CASE_INSENSITIVE_ORDER).add("aura", "auradev", "appcache",
-            "org.auraframework").build();
+    
+	private static final Set<String> UNDOCUMENTED_NAMESPACES = new ImmutableSortedSet.Builder<String>(String.CASE_INSENSITIVE_ORDER).add("auradocs").build();
     
     protected final Set<Mode> allModes = EnumSet.allOf(Mode.class);
     private final JavascriptGroup jsGroup;
@@ -187,7 +187,8 @@ public class ConfigAdapterImpl implements ConfigAdapter {
 
 	@Override
 	public boolean isUnsecuredNamespace(String namespace) {
-		return UNSECURED_NAMESPACES.contains(namespace);
+		// Deprecated stub will be removed once we remove the sfdc core usage
+		return false;
 	}
 
     @Override
@@ -444,5 +445,10 @@ public class ConfigAdapterImpl implements ConfigAdapter {
 	@Override
 	public void removePrivilegedNamespace(String namespace) {
         SYSTEM_NAMESPACES.remove(namespace);
+	}
+
+	@Override
+	public boolean isDocumentedNamespace(String namespace) {
+        return !UNDOCUMENTED_NAMESPACES.contains(namespace) && !namespace.toLowerCase().endsWith("test");
 	}
 }

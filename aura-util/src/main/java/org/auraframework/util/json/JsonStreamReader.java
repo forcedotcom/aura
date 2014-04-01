@@ -335,6 +335,10 @@ public class JsonStreamReader {
         assertCurrentToken(BINARY_STREAM);
         return ((LimitedLengthInputStream) current).getLength();
     }
+    
+    public int getCharNum() {
+        return charNum;
+    }
 
     public boolean hasNext() throws IOException {
         Character c = null;
@@ -979,7 +983,7 @@ public class JsonStreamReader {
         }
     }
 
-    private int getLineNum() {
+    public int getLineNum() {
         return lineNum;
     }
 

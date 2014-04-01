@@ -15,50 +15,43 @@
  */
 package org.auraframework.impl.system;
 
-import java.lang.ref.WeakReference;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.log4j.Logger;
 import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
-import org.auraframework.def.ApplicationDef;
+import org.auraframework.cache.Cache;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ClientLibraryDef;
-import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
+import org.auraframework.def.DefinitionAccess;
 import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.root.DependencyDefImpl;
-import org.auraframework.service.DefinitionService;
 import org.auraframework.service.LoggingService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.DefRegistry;
+import org.auraframework.system.DependencyEntry;
 import org.auraframework.system.Location;
 import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.system.Source;
-import org.auraframework.system.SourceListener;
+import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.text.GlobMatcher;
 import org.auraframework.util.text.Hash;
 
 import com.google.common.base.Optional;
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheStats;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -72,83 +65,27 @@ import com.google.common.collect.Sets;
  * 
  */
 public class MasterDefRegistryImpl implements MasterDefRegistry {
-    private static final ReentrantReadWriteLock rwLock = new ReentrantReadWriteLock();
-    private static final Lock rLock = rwLock.readLock();
-    private static final Lock wLock = rwLock.writeLock();
-
-    private final static int DEFINITION_CACHE_SIZE = 4096;
-    private final static int DEPENDENCY_CACHE_SIZE = 100;
-    private final static int STRING_CACHE_SIZE = 100;
+    private static Lock rLock = Aura.getCachingService().getReadLock();
+    private static Lock wLock = Aura.getCachingService().getWriteLock();
 
     private static final Logger logger = Logger.getLogger(MasterDefRegistryImpl.class);
 
-    /**
-     * A dependency entry for a uid+descriptor.
-     * 
-     * This entry is created for each descriptor that a context uses at the top level. It is cached globally and
-     * locally. The second version of the entry (with a quick fix) is only ever cached locally.
-     * 
-     * all values are final, and unmodifiable.
-     */
-    private static class DependencyEntry {
-        public final String uid;
-        public final long lastModTime;
-        public final Set<DefDescriptor<?>> dependencies;
-        public final List<ClientLibraryDef> clientLibraries;
-        public final QuickFixException qfe;
+    private final Cache<DefDescriptor<?>, Boolean> existsCache = Aura.getCachingService().getExistsCache();
+    private final Cache<DefDescriptor<?>, Optional<? extends Definition>> defsCache= Aura.getCachingService().getDefsCache();
+    private final Cache<String, DependencyEntry> depsCache= Aura.getCachingService().getDepsCache();
+    private final Cache<String, String> stringsCache = Aura.getCachingService().getStringsCache();
+    private final Cache<String, Set<DefDescriptor<?>>> descriptorFilterCache = Aura.getCachingService().getDescriptorFilterCache(); 
 
-        public DependencyEntry(String uid, Set<DefDescriptor<?>> dependencies, long lastModTime,
-                               List<ClientLibraryDef> clientLibraries) {
-            this.uid = uid;
-            this.dependencies = dependencies;
-            this.clientLibraries = Collections.unmodifiableList(clientLibraries);
-            this.lastModTime = lastModTime;
-            this.qfe = null;
-        }
 
-        public DependencyEntry(QuickFixException qfe) {
-            this.uid = null;
-            this.dependencies = null;
-            this.clientLibraries = null;
-            this.lastModTime = 0;
-            this.qfe = qfe;
-        }
-
-        @Override
-        public String toString() {
-            StringBuffer sb = new StringBuffer();
-
-            sb.append(uid);
-            sb.append(" : ");
-            if (qfe != null) {
-                sb.append(qfe);
-            } else {
-                sb.append("[");
-                sb.append(lastModTime);
-                sb.append("] :");
-                sb.append(dependencies);
-            }
-            return sb.toString();
-        }
-    }
-
-    private final static Cache<DefDescriptor<?>, Boolean> existsCache = CacheBuilder.newBuilder()
-            .initialCapacity(DEFINITION_CACHE_SIZE).maximumSize(DEFINITION_CACHE_SIZE).recordStats().softValues()
+    private final static int ACCESS_CHECK_CACHE_SIZE = 4096;
+    private final Cache<String, String> accessCheckCache =  
+            Aura.getCachingService().<String, String>getCacheBuilder()
+            .setInitialSize(ACCESS_CHECK_CACHE_SIZE)
+            .setMaximumSize(ACCESS_CHECK_CACHE_SIZE)
+            .setRecordStats(true)
+            .setSoftValues(true)
             .build();
 
-    private final static Cache<DefDescriptor<?>, Optional<? extends Definition>> defsCache = CacheBuilder.newBuilder()
-            .initialCapacity(DEFINITION_CACHE_SIZE).maximumSize(DEFINITION_CACHE_SIZE).recordStats().softValues()
-            .build();
-
-    private final static Cache<String, DependencyEntry> depsCache = CacheBuilder.newBuilder()
-            .initialCapacity(DEPENDENCY_CACHE_SIZE).maximumSize(DEPENDENCY_CACHE_SIZE).recordStats().softValues()
-            .build();
-
-    private final static Cache<String, String> stringsCache = CacheBuilder.newBuilder()
-            .initialCapacity(STRING_CACHE_SIZE).maximumSize(STRING_CACHE_SIZE).recordStats().softValues().build();
-
-    private final static Cache<String, Set<DefDescriptor<?>>> descriptorFilterCache = CacheBuilder.newBuilder()
-            .initialCapacity(DEPENDENCY_CACHE_SIZE).maximumSize(DEPENDENCY_CACHE_SIZE).recordStats().softValues().build();
 
     /**
      * A local dependencies cache.
@@ -178,10 +115,6 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
     private final MasterDefRegistryImpl original;
     
-    private final static int ACCESS_CHECK_CACHE_SIZE = 4096;
-    private final Cache<String, String> accessCheckCache = CacheBuilder.newBuilder()
-            .initialCapacity(ACCESS_CHECK_CACHE_SIZE).maximumSize(ACCESS_CHECK_CACHE_SIZE).recordStats().softValues().build();
-
 
     /**
      * Build a system def registry that is meant to be used as a shadowing registry.
@@ -220,6 +153,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
         rLock.lock();
         try {
+            boolean cacheable = shouldCache(matcher);
             for (DefRegistry<?> reg : registries) {
                 //
                 // This could be a little dangerous, but unless we force all of our
@@ -228,7 +162,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                 if (reg.hasFind()) {
                     Set<DefDescriptor<?>> registryResults = null;
 
-                    if (isCacheable(reg)) {
+                    if (cacheable && isCacheable(reg)) {
                         // cache results per registry
                         String cacheKey = filterKey + "|" + reg.toString();
                         registryResults = descriptorFilterCache.getIfPresent(cacheKey);
@@ -509,7 +443,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         // Now, check if we can cache the def later, as we won't have the registry to check at a later time.
         // If we can cache, look it up in the cache. If we find it, we have a built definition.
         //
-        if (isCacheable(registry)) {
+        if (isCacheable(registry) && shouldCache(compiling.descriptor)) {
             compiling.cacheable = true;
 
             @SuppressWarnings("unchecked")
@@ -679,7 +613,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             if (cd.def != null) {
                 defs.put(cd.descriptor, cd.def);
                 if (cd.built) {
-                    if (cd.cacheable) {
+                    if (cd.cacheable) { //false for non-privileged namespaces, or non-cacheable registries
                         defsCache.put(cd.descriptor, Optional.of(cd.def));
                     }
                     cd.def.markValid();
@@ -855,7 +789,13 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             // if (de == null) {
 
             de = new DependencyEntry(uid, Collections.unmodifiableSet(deps), lmt, clientLibs);
-            depsCache.put(makeGlobalKey(de.uid, descriptor), de);
+            if (shouldCache(descriptor)) {
+                // put UID-qualified descriptor key for dependency
+                depsCache.put(makeGlobalKey(de.uid, descriptor), de);
+
+                // put unqualified descriptor key for dependency
+                depsCache.put(makeNonUidGlobalKey(descriptor), de);
+            }
 
             // See localDependencies comment
             localDependencies.put(de.uid, de);
@@ -876,6 +816,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         return lastModTime;
     }
 
+   
     /**
      * Get a dependency entry for a given uid.
      * 
@@ -902,14 +843,18 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             if (de != null) {
                 return de;
             }
-            de = depsCache.getIfPresent(makeGlobalKey(uid, descriptor));
+            if (shouldCache(descriptor)) {
+                de = depsCache.getIfPresent(makeGlobalKey(uid, descriptor));
+            }
         } else {
             // See localDependencies comment
             de = localDependencies.get(key);
             if (de != null) {
                 return de;
             }
-            de = depsCache.getIfPresent(key);
+            if (shouldCache(descriptor)) {
+                de = depsCache.getIfPresent(makeNonUidGlobalKey(descriptor));
+            }
         }
         if (de != null) {
             // See localDependencies comment
@@ -1103,7 +1048,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         if (reg == null) {
             return false;
         }
-        cacheable = isCacheable(reg);
+        cacheable = isCacheable(reg) && shouldCache(descriptor);
         if (cacheable) {
             //
             // Try our various caches.
@@ -1126,7 +1071,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                 }
             }
         }
-            regExists = reg.exists(descriptor);
+        regExists = reg.exists(descriptor);
         if (cacheable) {
             Boolean cacheVal = Boolean.valueOf(regExists);
             existsCache.put(descriptor, cacheVal);
@@ -1176,26 +1121,40 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 	    assertAccess(referencingDescriptor, def, accessCheckCache);
 	}
 	
-    <D extends Definition> void assertAccess(DefDescriptor<?> referencingDescriptor, D def, Cache<String, String> accessCheckCache) 
-            throws QuickFixException {
-		// If the def is access="global" then anyone can see it
-    	if (def.getAccess().isGlobal()) {
-    		return;
+	<D extends Definition> void assertAccess(DefDescriptor<?> referencingDescriptor, D def, Cache<String, String> accessCheckCache) {
+    	String status = hasAccess(referencingDescriptor, def, accessCheckCache);   	
+		if (status != null) {
+			DefDescriptor<? extends Definition> descriptor = def.getDescriptor();
+			String message = Aura.getConfigAdapter().isProduction() ? DefinitionNotFoundException.getMessage(descriptor.getDefType(), descriptor.getName()) : status;
+			throw new NoAccessException(message);
+		}
+	}
+
+	@Override
+	public <D extends Definition> String hasAccess(DefDescriptor<?> referencingDescriptor, D def) {
+	    return hasAccess(referencingDescriptor, def, accessCheckCache);
+	}
+	
+    <D extends Definition> String hasAccess(DefDescriptor<?> referencingDescriptor, D def, Cache<String, String> accessCheckCache) {
+		// If the def is access="global" or does not require authentication then anyone can see it
+    	DefinitionAccess access = def.getAccess();
+		if (access.isGlobal() || !access.requiresAuthentication()) {
+    		return null;
     	}
-		
+    	
 		ConfigAdapter configAdapter = Aura.getConfigAdapter();
 		String referencingNamespace = null;
 		if (referencingDescriptor != null) {
 	    	String prefix = referencingDescriptor.getPrefix();
 			if (configAdapter.isUnsecuredPrefix(prefix)) {
-	    		return;
+	    		return null;
 	    	}
 			
 			referencingNamespace = referencingDescriptor.getNamespace();
 			
 	        // The caller is in a system namespace let them through
 			if (configAdapter.isPrivilegedNamespace(referencingNamespace)) {
-				return;
+				return null;
 			}
 		}
 		
@@ -1242,10 +1201,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 			// System.out.printf("** MDR.hit.assertAccess() cache hit for: %s\n", key);
 		}
 		
-		if (!status.isEmpty()) {
-			String message = configAdapter.isProduction() ? DefinitionNotFoundException.getMessage(defType, desc.getName()) : status;
-			throw new NoAccessException(message);
-		}
+		return status.isEmpty() ? null : status;
 	}
     
     
@@ -1284,10 +1240,12 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             localDescs.clear();
         }
         localDependencies.clear();
-        depsCache.invalidateAll();
-        defsCache.invalidateAll();
-        existsCache.invalidateAll();
-        descriptorFilterCache.invalidateAll();
+        if (shouldCache(descriptor)) {
+            depsCache.invalidateAll();
+            defsCache.invalidateAll();
+            existsCache.invalidateAll();
+            descriptorFilterCache.invalidateAll();
+        }
         return false;
     }
 
@@ -1297,20 +1255,24 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
     @Override
     public String getCachedString(String uid, DefDescriptor<?> descriptor, String key) {
-        DependencyEntry de = localDependencies.get(uid);
-
-        if (de != null) {
-            return stringsCache.getIfPresent(getKey(de, descriptor, key));
+        if (shouldCache(descriptor)) {
+            DependencyEntry de = localDependencies.get(uid);
+    
+            if (de != null) {
+                return stringsCache.getIfPresent(getKey(de, descriptor, key));
+            }
         }
         return null;
     }
 
     @Override
     public void putCachedString(String uid, DefDescriptor<?> descriptor, String key, String value) {
-        DependencyEntry de = localDependencies.get(uid);
-
-        if (de != null) {
-            stringsCache.put(getKey(de, descriptor, key), value);
+        if (shouldCache(descriptor)) {
+            DependencyEntry de = localDependencies.get(uid);
+    
+            if (de != null) {
+                stringsCache.put(getKey(de, descriptor, key), value);
+            }
         }
     }
 
@@ -1372,121 +1334,70 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
      * Creates a key for the global {@link #depsCache}, using UID, type, and FQN.
      */
     private String makeGlobalKey(String uid, DefDescriptor<?> descriptor) {
-        return uid + "/" + makeLocalKey(descriptor);
+    	return uid + "/" + makeLocalKey(descriptor);
     }
-
+    
     /**
-     * The driver for cache-consistency management in response to source changes. MDR drives the process, will notify
-     * all registered listeners while write blocking, then invalidate it's own caches. If this routine can't acquire the
-     * lock , it will log it as an non-fatal error, as it only results in staleness.
-     * 
-     * @param listeners - collections of listeners to notify of source changes
-     * @param source - DefDescriptor that changed - for granular cache clear (currently not considered here, but other
-     *            listeners may make use of it)
-     * @param event - what type of event triggered the change
+     * Creates a key for the global {@link #depsCache}, using only descriptor (and Mode internally).
+     * @param descriptor - the descriptor use for the key
      */
-    public static void notifyDependentSourceChange(Collection<WeakReference<SourceListener>> listeners,
-            DefDescriptor<?> source, SourceListener.SourceMonitorEvent event, String filePath) {
-        boolean haveLock = false;
-
-        try {
-            // We have now eliminated all known deadlocks, but for production safety, we never want to block forever
-            haveLock = wLock.tryLock(5, TimeUnit.SECONDS);
-
-            // If this occurs, we have a new deadlock. But it only means temporary cache staleness, so it is not fatal
-            if (!haveLock) {
-                logger.error("Couldn't acquire cache clear lock in a reasonable time.  Cache may be stale until next clear.");
-                return;
-            }
-
-            // successfully acquired the lock, start clearing caches
-            // notify provided listeners, presumably to clear caches
-            for (WeakReference<SourceListener> i : listeners) {
-                SourceListener sl = i.get();
-
-                if (sl != null) {
-                    sl.onSourceChanged(source, event, filePath);
-                }
-            }
-            // lastly, clear MDR's static caches
-            invalidateStaticCaches(source);
-
-        } catch (InterruptedException e) {
-        } finally {
-            if (haveLock) {
-                wLock.unlock();
-            }
-        }
+    private String makeNonUidGlobalKey(DefDescriptor<?> descriptor) {
+    	AuraContext context = this.currentCC == null 
+    			? Aura.getContextService().getCurrentContext() 
+    			: currentCC.context;
+   
+        //HACK - until AuraContextImpl no longer adds additional namespaces when mod==Mode.DEV
+        // we must distinguish DEV from non-DEV mode
+        return (context.getMode() == Mode.DEV ? "@/" : "#/") + makeLocalKey(descriptor);
     }
-
-    private static void invalidateStaticCaches(DefDescriptor<?> descriptor) {
-
-        depsCache.invalidateAll();
-        descriptorFilterCache.invalidateAll();
-        stringsCache.invalidateAll();
-
+    
+    /**
+     * Return true if the namespace of the provided descriptor supports caching.
+     */
+    private boolean shouldCache(DefDescriptor descriptor) {
         if (descriptor == null) {
-            defsCache.invalidateAll();
-            existsCache.invalidateAll();
-        } else {
-            DefinitionService ds = Aura.getDefinitionService();
-            DefDescriptor<ComponentDef> cdesc = ds.getDefDescriptor(descriptor, "markup", ComponentDef.class);
-            DefDescriptor<ApplicationDef> adesc = ds.getDefDescriptor(descriptor, "markup", ApplicationDef.class);
-
-            defsCache.invalidate(descriptor);
-            existsCache.invalidate(descriptor);
-            defsCache.invalidate(cdesc);
-            existsCache.invalidate(cdesc);
-            defsCache.invalidate(adesc);
-            existsCache.invalidate(adesc);
-
-            // invalidate all DDs with the same namespace if its a namespace DD
-            if (descriptor.getDefType() == DefType.NAMESPACE) {
-                invalidateScope(descriptor, true, false);
-            }
-
-            if (descriptor.getDefType() == DefType.LAYOUTS) {
-                invalidateScope(descriptor, true, true);
-            }
+            return false;
         }
+        String namespace = descriptor.getNamespace();
+        return shouldCache(namespace);
+    }
+    
+    /**
+     * Return true if the descriptor filter meets all requirements for the 
+     * result of find to be cached
+     */
+    private boolean shouldCache(DescriptorFilter filter) {
+        GlobMatcher ns = filter.getNamespaceMatch();
+        return ns.isConstant() && shouldCache(ns.toString());
+    }
+    /**
+     * Return true if the namespace supports cacheing
+     */
+    private boolean shouldCache(String namespace) {
+        ConfigAdapter configAdapter = Aura.getConfigAdapter();
+        return configAdapter.isPrivilegedNamespace(namespace);
     }
 
-    private static void invalidateScope(DefDescriptor<?> descriptor, boolean clearNamespace, boolean clearName) {
-        final ConcurrentMap<DefDescriptor<?>, Optional<? extends Definition>> defsMap = defsCache.asMap();
-        final String namespace = descriptor.getNamespace();
-        final String name = descriptor.getName();
-
-        for (DefDescriptor<?> dd : defsMap.keySet()) {
-            boolean sameNamespace = namespace.equals(dd.getNamespace());
-            boolean sameName = name.equals(dd.getName());
-            boolean shouldClear = (clearNamespace && clearName) ?
-                    (clearNamespace && sameNamespace) && (clearName && sameName) :
-                    (clearNamespace && sameNamespace) || (clearName && sameName);
-
-            if (shouldClear) {
-                defsCache.invalidate(dd);
-                existsCache.invalidate(dd);
-            }
-        }
-    }
-
-    public static Collection<Optional<? extends Definition>> getCachedDefs() {
-        return defsCache.asMap().values();
-    }
-
-    public static CacheStats getDefsCacheStats() {
-        return defsCache.stats();
-    }
-
-    public static CacheStats getExistsCacheStats() {
-        return existsCache.stats();
-    }
-
-    public static CacheStats getStringsCacheStats() {
-        return stringsCache.stats();
-    }
-
-    public static CacheStats getDescriptorFilterCacheStats() {
-        return descriptorFilterCache.stats();
-    }
+// TODO - W-2105858 - re-enable with either the private implementation of the Cache used, or
+//  a least-common-denominator implementation
+    
+//    public static Collection<Optional<? extends Definition>> getCachedDefs() {
+//        return defsCache.asMap().values();
+//    }
+//
+//    public static CacheStats getDefsCacheStats() {
+//        return defsCache.stats();
+//    }
+//
+//    public static CacheStats getExistsCacheStats() {
+//        return existsCache.stats();
+//    }
+//
+//    public static CacheStats getStringsCacheStats() {
+//        return stringsCache.stats();
+//    }
+//
+//    public static CacheStats getDescriptorFilterCacheStats() {
+//        return descriptorFilterCache.stats();
+//    }
 }

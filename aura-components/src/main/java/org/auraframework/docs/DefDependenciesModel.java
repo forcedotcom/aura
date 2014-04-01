@@ -44,7 +44,6 @@ public class DefDependenciesModel {
     private final List<Map<String, Object>> dependencies = Lists.newArrayList();
 
     public DefDependenciesModel() throws QuickFixException {
-
         AuraContext context = Aura.getContextService().getCurrentContext();
         BaseComponent<?, ?> component = context.getCurrentComponent();
 
@@ -54,6 +53,7 @@ public class DefDependenciesModel {
         DefDescriptor<?> descriptor = Aura.getDefinitionService().getDefDescriptor(desc, defType.getPrimaryInterface());
 
         Definition def = descriptor.getDef();
+        ReferenceTreeModel.assertAccess(def);
 
         Map<DefType, List<DefModel>> depsMap = Maps.newEnumMap(DefType.class);
 
@@ -62,15 +62,17 @@ public class DefDependenciesModel {
         def.appendDependencies(deps);
 
         for (DefDescriptor<?> dep : deps) {
-            DefType type = dep.getDefType();
-
-            List<DefModel> depsList = depsMap.get(type);
-            if (depsList == null) {
-                depsList = Lists.newArrayList();
-                depsMap.put(type, depsList);
-            }
-            depsList.add(new DefModel(dep));
-
+        	if (ReferenceTreeModel.hasAccess(dep.getDef())) {
+	            DefType type = dep.getDefType();
+	
+	            List<DefModel> depsList = depsMap.get(type);
+	            if (depsList == null) {
+	                depsList = Lists.newArrayList();
+	                depsMap.put(type, depsList);
+	            }
+	            
+	            depsList.add(new DefModel(dep));
+        	}
         }
 
         for (Entry<DefType, List<DefModel>> entry : depsMap.entrySet()) {

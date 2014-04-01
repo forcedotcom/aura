@@ -167,7 +167,7 @@
 		if (!rows[rowIndex]) {
 			rows[rowIndex] = {
 				input  : null,
-				output : null,
+				output : null
 			};
 		}
 		else {

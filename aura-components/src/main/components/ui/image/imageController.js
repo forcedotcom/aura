@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{
+({
 	init: function(cmp) {
     	var imageType = cmp.get('v.imageType'),
     		altText = cmp.get('v.alt') || '',
@@ -25,4 +25,4 @@
     		$A.error('component: ' + id + ': "alt" attribute should be empty for decorative image');
     	}
     }
-}
+})

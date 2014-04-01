@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{
+({
 	applyCSS: function(cmp, event) {
 		var el = cmp.find('changeIt');
 		$A.util.addClass(el.getElement(), 'changeMe');
@@ -23,4 +23,4 @@
 		var el = cmp.find('changeIt');
 		$A.util.removeClass(el.getElement(), 'changeMe');
 	}
-}
+})

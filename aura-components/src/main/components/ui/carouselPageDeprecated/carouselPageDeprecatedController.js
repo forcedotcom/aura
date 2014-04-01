@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-{
+({	
 	onInit: function(cmp, evt, helper) {
 		//populate pageId with component's globalId
 		cmp.set('v.priv_pageId', cmp.getGlobalId());
@@ -42,4 +42,4 @@
 			helper.updateSize(cmp, size.width, size.height);
 		}
 	}
-}
+})

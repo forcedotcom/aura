@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{
+({
     forward:function(cmp){
         $A.util.removeClass(cmp.find("ready").getElement(),"layoutDone");
         if($A.historyService.get().token === 'Step1'){
@@ -39,4 +39,4 @@
 	cmp._layoutChanging = true ;
         cmp._beforeLayoutChangeEvt = event;
     }
-}
+})

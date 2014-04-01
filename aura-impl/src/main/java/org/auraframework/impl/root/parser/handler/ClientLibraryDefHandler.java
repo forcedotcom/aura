@@ -23,11 +23,14 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.commons.lang3.StringUtils;
+import org.auraframework.Aura;
 import org.auraframework.def.ClientLibraryDef;
+import org.auraframework.def.ComponentDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.clientlibrary.ClientLibraryDefImpl;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.Source;
+import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
@@ -53,8 +56,13 @@ public class ClientLibraryDefHandler<P extends RootDefinition> extends ParentedT
 
     private ClientLibraryDefImpl.Builder builder;
 
-    public ClientLibraryDefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source) {
+    public ClientLibraryDefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source) throws DefinitionNotFoundException {
         super(parentHandler, xmlReader, source);
+        
+        if (!isInPrivilegedNamespace()) {
+        	throw new DefinitionNotFoundException(Aura.getDefinitionService().getDefDescriptor(TAG, ComponentDef.class));
+        }
+        
         this.builder = new ClientLibraryDefImpl.Builder();
         this.builder.setLocation(getLocation());
         this.builder.setParentDescriptor(parentHandler.getDefDescriptor());

@@ -15,6 +15,6 @@
     limitations under the License.
 
 -->
-<aura:event type="APPLICATION" support="GA" description="Indicates that a requested resource is not accessible due to security constraints on that resource.">
-    <aura:attribute type="String" name="redirectURL" description="A url that the server says the application should redirect the browser to when this event fires."/>
+<aura:event type="APPLICATION" support="GA" access="GLOBAL" description="Indicates that a requested resource is not accessible due to security constraints on that resource.">
+    <aura:attribute type="String" name="redirectURL" access="GLOBAL" description="A url that the server says the application should redirect the browser to when this event fires."/>
 </aura:event>

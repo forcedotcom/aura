@@ -107,7 +107,7 @@ public abstract class MockDefinition<D extends Definition> implements Definition
     
     @Override
     public DefinitionAccess getAccess() {
-    	return DefinitionAccessImpl.defaultAccess();
+    	return DefinitionAccessImpl.defaultAccess(descriptor.getNamespace());
     }
 
     @Override

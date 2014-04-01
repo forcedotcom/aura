@@ -16,10 +16,10 @@
 
 -->
 <aura:interface>
-    <aura:attribute name="name" type="String" description="The name of the component."/>
-    <aura:attribute name="label" type="String" description="The text displayed on the component."/>
+    <aura:attribute name="name" type="String" access="GLOBAL" description="The name of the component."/>
+    <aura:attribute name="label" type="String" access="GLOBAL" description="The text displayed on the component."/>
     <!-- The boolean value indicating the status (selected or not) of the option -->
-    <aura:attribute name="value" type="Boolean" default="false" description="Indicates whether the status of the option is selected. Default value is &#8220;false&#8221;."/>
+    <aura:attribute name="value" type="Boolean" default="false" access="GLOBAL" description="Indicates whether the status of the option is selected. Default value is &#8220;false&#8221;."/>
     <!-- The markup element's value attribute -->
-    <aura:attribute name="text" type="String" description="The input value attribute."/>
+    <aura:attribute name="text" type="String" access="GLOBAL" description="The input value attribute."/>
 </aura:interface>

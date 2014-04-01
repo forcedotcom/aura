@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{
+({
   getInput: function(cmp, event) {
         var textI = cmp.find("textI");
 
@@ -49,4 +49,4 @@
    	   var buttonValue =  event.getParam("button");
        cmp.find("outputValue").set("v.value", buttonValue);
      }
-}
+})

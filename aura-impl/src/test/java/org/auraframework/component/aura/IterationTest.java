@@ -315,4 +315,6 @@ public class IterationTest extends AuraImplTestCase {
                     "Lazy Component References can only have attributes of simple types passed in (body is not simple)");
         }
     }
+    
+   
 }

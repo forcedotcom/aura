@@ -15,5 +15,5 @@
     limitations under the License.
 
 -->
-<aura:event type="APPLICATION" support="GA" description="Indicates that the initial rendering of the root application or root component has completed.">
+<aura:event type="APPLICATION" support="GA" access="GLOBAL" description="Indicates that the initial rendering of the root application or root component has completed.">
 </aura:event>

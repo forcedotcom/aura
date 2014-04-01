@@ -15,25 +15,25 @@
     limitations under the License.
 
 -->
-<aura:component extensible="true" support="GA"
+<aura:component extensible="true" support="GA" access="GLOBAL" 
     description="Represents a button element.">
 
     <aura:attribute name="theme" type="String" default="default" description="The default CSS style used to display the button."/>
-    <aura:attribute name="buttonTitle" type="String" description="The text displayed in a tooltip when the mouse pointer hovers over the button."/>
-    <aura:attribute name="buttonType" type="String" default="button" description="Specifies the type attribute in the HTML input element. Default value is &quot;button&quot;."/>
-    <aura:attribute name="class" type="String" default="" description="A CSS style to be attached to the button. This style is added in addition to base styles output by the component."/>
-    <aura:attribute name="label" type="String" required="true" description="The text displayed on the button. Corresponds to the value attribute of the rendered HTML input element."/>
-    <aura:attribute name="labelClass" type="String" default="" description="A CSS style to be attached to the label. This style is added in addition to base styles output by the component."/>
+    <aura:attribute name="buttonTitle" type="String" access="GLOBAL" description="The text displayed in a tooltip when the mouse pointer hovers over the button."/>
+    <aura:attribute name="buttonType" type="String" default="button" access="GLOBAL" description="Specifies the type attribute in the HTML input element. Default value is &quot;button&quot;."/>
+    <aura:attribute name="class" type="String" default="" access="GLOBAL" description="A CSS style to be attached to the button. This style is added in addition to base styles output by the component."/>
+    <aura:attribute name="label" type="String" required="true" access="GLOBAL" description="The text displayed on the button. Corresponds to the value attribute of the rendered HTML input element."/>
+    <aura:attribute name="labelClass" type="String" default="" access="GLOBAL" description="A CSS style to be attached to the label. This style is added in addition to base styles output by the component."/>
     <aura:attribute name="labelDisplay" type="Boolean" default="true" description="Specifies whether the label is displayed. If not, we add a hidden text for accessibility purpose."/>
     <aura:attribute name="iconImgSrc" type="String" default="" description="The absolute or relative URL of the icon to display on the button. The image's alt attribute is set to the value of the button’s label attribute."/>
     <aura:attribute name="iconClass" type="String" default="" description="A CSS style to be attached to the button's icon. This style is added in addition to base styles output by the component."/>
-    <aura:attribute name="disabled" type="Boolean" default="false" description="Specifies whether this button should be displayed in a disabled state. Disabled buttons can't be clicked. Default value is &quot;false&quot;."/>
-    <aura:attribute name="accesskey" type="String" default="" description="The keyboard access key that puts the button in focus. When the button is in focus, pressing Enter clicks the button."/>
+    <aura:attribute name="disabled" type="Boolean" default="false" access="GLOBAL" description="Specifies whether this button should be displayed in a disabled state. Disabled buttons can't be clicked. Default value is &quot;false&quot;."/>
+    <aura:attribute name="accesskey" type="String" default="" access="GLOBAL" description="The keyboard access key that puts the button in focus. When the button is in focus, pressing Enter clicks the button."/>
     <aura:attribute name="labelDir" type="String" default="ltr" description="The direction in which the label should be read. Possible values are &quot;rtl&quot; (right to left) and &quot;ltr&quot; (left to right). Default value is &quot;ltr&quot;."/>
     <aura:attribute name="stopPropagation" type="Boolean" default="false" description="Prevents the click event from bubbling up the DOM tree, preventing any parent handlers from being notified of the event."/>
 
     <aura:registerevent name="keydown" type="ui:keydown" description="The controller method that runs when a key is pressed down on the button."/>
-    <aura:registerevent name="press" type="ui:press" description="The controller method that runs when the button is clicked. For example, press=&quot;{!c.showMsg}&quot; references the showMsg method in the controller."/>
+    <aura:registerevent name="press" type="ui:press" access="GLOBAL" description="The controller method that runs when the button is clicked. For example, press=&quot;{!c.showMsg}&quot; references the showMsg method in the controller."/>
 
     <button type="{!v.buttonType}" aura:id="button" class="{!v.class +' '+v.theme+' uiBlock'}" onclick="{!c.press}" onkeydown="{!c.handleKeydown}" disabled="{!v.disabled}" accesskey="{!v.accesskey}" title="{!v.buttonTitle}">
         <aura:if isTrue="{!v.iconImgSrc != '' || v.iconClass != ''}">

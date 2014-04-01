@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-{
+({
 	onInit: function(cmp, evt, helper) {
 		var pageCmp = cmp.get('v.priv_pageComponent'),
 			title = 'Page ' + cmp.get('v.pageIndex'), //TODO: localize
@@ -75,4 +75,4 @@
     		cmp.set("v.priv_selectedClass", "");
     	}
     }
-}
+})

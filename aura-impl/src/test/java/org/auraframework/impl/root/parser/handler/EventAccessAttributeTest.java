@@ -21,5 +21,4 @@ public class EventAccessAttributeTest extends BaseAccessAttributeTest {
 		super(name);
 		testResource = TestResource.Event;
 	}
-
 }

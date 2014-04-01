@@ -40,6 +40,8 @@ public class ListSorterUITest extends WebDriverTestCase {
 
     public static final String APP = "/uitest/listSorter_Test.cmp";
     private final String ACTIVE_ELEMENT = "return $A.test.getActiveElement()";
+    private final String SORT_TRIGGER = "defaultListSorterTrigger";
+    private final String SORTER = "defaultListSorter";
 
     public ListSorterUITest(String name) {
         super(name);
@@ -77,17 +79,11 @@ public class ListSorterUITest extends WebDriverTestCase {
     private void verifyTabOutAndEscBehaviour(Keys keysToSend, boolean isOpen) throws MalformedURLException,
             URISyntaxException {
         open(APP);
-        String trigger = "defaultListSorterTrigger";
-        String sorter = "defaultListSorter";
         WebDriver driver = this.getDriver();
-        WebElement listTrigger = driver.findElement(By.className(trigger));
-        WebElement listSorter = driver.findElement(By.className(sorter));
+        WebElement listSorter = driver.findElement(By.className(SORTER));
         // List Sorter dialog should be closed
         assertFalse("list Sorter Dialog should not be visible", listSorter.getAttribute("class").contains("open"));
-        // click on Trigger
-        listTrigger.click();
-        // check menu list is visible after the click
-        assertTrue("list Sorter Dialog should be visible", listSorter.getAttribute("class").contains("open"));
+        openListSorter();
         WebElement activeElement = (WebElement) auraUITestingUtil.getEval(ACTIVE_ELEMENT);
         activeElement.sendKeys(keysToSend);
         if (isOpen) {
@@ -98,5 +94,13 @@ public class ListSorterUITest extends WebDriverTestCase {
             assertFalse("list Sorter Dialog should not be visible after pressing ESC", listSorter.getAttribute("class")
                     .contains("open"));
         }
+    }
+
+	private void openListSorter() {
+		WebDriver driver = this.getDriver();
+		WebElement listTrigger = driver.findElement(By.className(SORT_TRIGGER));
+		WebElement listSorter = driver.findElement(By.className(SORTER));
+        listTrigger.click();
+		assertTrue("list Sorter Dialog should be visible", listSorter.getAttribute("class").contains("open"));
     }
 }

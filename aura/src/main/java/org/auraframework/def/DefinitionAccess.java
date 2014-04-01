@@ -32,6 +32,5 @@ public interface DefinitionAccess {
     boolean isInternal();
     
     // Validation
-    void validate(boolean allowAuth, boolean allowPrivate) throws InvalidAccessValueException ;
-    
+    void validate(String namespace, boolean allowAuth, boolean allowPrivate) throws InvalidAccessValueException;
 }

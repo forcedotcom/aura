@@ -17,7 +17,8 @@ package org.auraframework.impl.javascript.model;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import org.auraframework.Aura;
@@ -57,7 +58,9 @@ public class JavascriptModel implements Model {
 
     @SuppressWarnings("unchecked")
     private Object clone(Object val) {
-        if (val == null || val instanceof Map) {
+        if (val == null) {
+            return null;
+        } else if (val instanceof Map) {
             return clone((Map<String, Object>) val);
         } else if (val instanceof List) {
             // Array

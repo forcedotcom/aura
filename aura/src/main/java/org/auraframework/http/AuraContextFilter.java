@@ -117,7 +117,7 @@ public class AuraContextFilter implements Filter {
                     } catch (Throwable t) {
                         // ignore.
                     }
-                    loggingService.doLog(); // flush out logging values
+                    loggingService.flush(); // flush out logging values
                 }
             } finally {
                 endContext();
@@ -179,6 +179,13 @@ public class AuraContextFilter implements Filter {
                 }
             }
             getLoaded(context, configMap.get("loaded"));
+            @SuppressWarnings("unchecked")
+            List<Object> dns = (List<Object>) configMap.get("dn");
+            if (dns != null) {
+                for (Object dn : dns) {
+                    context.addDynamicNamespace((String) dn);
+                }
+            }
             context.setFrameworkUID((String) configMap.get("fwuid"));
         }
 

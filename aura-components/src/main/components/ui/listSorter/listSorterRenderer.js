@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-{
+({
 	afterRender: function(cmp, helper) {
 		this.superAfterRender();
 		//workaround for datasource late binding
@@ -25,4 +25,4 @@
 			helper.setVisible(cmp, true);
 		}
 	}
-}
+})

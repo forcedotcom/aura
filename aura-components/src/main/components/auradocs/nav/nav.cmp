@@ -16,17 +16,20 @@
 
 -->
 <aura:component>
+	<aura:attribute name="referenceOnly" type="boolean" default="false"/>
     <aura:handler event="auradocs:locationChange" action="{!c.handleLocationChange}" />
     <nav role="navigation" class="navbar">
         <div class="logo">
             <a href="#"><ui:image src="/auraFW/resources/aura/images/logo.png" imageType="informational" alt="Aura"/></a>
         </div>
-        <ul class="navList">
-            <li aura:id="help"><auradocs:navLink location="help">Help</auradocs:navLink></li>
-            <li aura:id="reference"><auradocs:navLink location="reference">Reference</auradocs:navLink></li>
-            <li aura:id="demos"><auradocs:navLink location="demos">Demos</auradocs:navLink></li>
-        </ul>
-        <div class="fuelGauge"><auraStorage:fuelGauge storageName="actions"/></div>
+        <aura:if isTrue="{!v.referenceOnly != true}">
+	        <ul class="navList">
+	            <li aura:id="help"><auradocs:navLink location="help">Help</auradocs:navLink></li>
+	            <li aura:id="reference"><auradocs:navLink location="reference">Reference</auradocs:navLink></li>
+	            <li aura:id="demos"><auradocs:navLink location="demos">Demos</auradocs:navLink></li>
+	        </ul>
+	        <div class="fuelGauge"><auraStorage:fuelGauge storageName="actions"/></div>
+        </aura:if>
         <ui:image class="spinner" imageType="decorative"/>
     </nav>
 </aura:component>

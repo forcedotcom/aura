@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{
+({
     /* This examines what element inside a data table row was clicked on, and decides if we should bubble the event
      * up to rowPress or not. If an "A" was clicked, then we don't fire rowPress.
      */
@@ -28,4 +28,4 @@
         }
         cmp.getEvent("rowPress").fire();
     }
-}
+})

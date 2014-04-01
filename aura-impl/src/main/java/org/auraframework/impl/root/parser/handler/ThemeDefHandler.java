@@ -32,6 +32,7 @@ import org.auraframework.instance.Component;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraError;
+import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidAccessValueException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
@@ -55,13 +56,14 @@ public final class ThemeDefHandler extends RootTagHandler<ThemeDef> {
         super();
     }
 
-    public ThemeDefHandler(DefDescriptor<ThemeDef> defDescriptor, Source<ThemeDef> source, XMLStreamReader xmlReader) {
+    public ThemeDefHandler(DefDescriptor<ThemeDef> defDescriptor, Source<ThemeDef> source, XMLStreamReader xmlReader) throws DefinitionNotFoundException {
         super(defDescriptor, source, xmlReader);
-        builder.setOwnHash(source.getHash());
         
         if (!isInPrivilegedNamespace()) {
-        	// DCHASMAN TODO Throw appropriate unknown tag exception here!
+        	throw new DefinitionNotFoundException(defDescriptor);
         }
+        
+        builder.setOwnHash(source.getHash());
     }
 
     @Override

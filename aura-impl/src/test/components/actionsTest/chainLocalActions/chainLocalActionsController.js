@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{
+({
     handleClick:function(cmp){
         var multiply = cmp.get("c.multiply");
         multiply.setParams({
@@ -59,4 +59,4 @@
         });
         $A.enqueueAction(a);
     }
-}
+})

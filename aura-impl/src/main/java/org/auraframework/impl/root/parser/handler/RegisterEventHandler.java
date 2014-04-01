@@ -21,6 +21,7 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.EventDef;
 import org.auraframework.impl.root.event.RegisterEventDefImpl;
@@ -28,6 +29,7 @@ import org.auraframework.impl.root.event.RegisterEventDefImpl.Builder;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Location;
 import org.auraframework.system.Source;
+import org.auraframework.throwable.quickfix.InvalidAccessValueException;
 import org.auraframework.util.AuraTextUtil;
 
 import com.google.common.collect.ImmutableSet;
@@ -62,17 +64,20 @@ public class RegisterEventHandler extends XMLHandler<RegisterEventDefImpl> {
     }
 
     @Override
-    public RegisterEventDefImpl getElement() throws XMLStreamException {
+    public RegisterEventDefImpl getElement() throws XMLStreamException, InvalidAccessValueException {
         String name = getAttributeValue(ATTRIBUTE_NAME);
         String type = getAttributeValue(ATTRIBUTE_TYPE);
         if (AuraTextUtil.isNullEmptyOrWhitespace(type)) {
             error("type attribute is required on registerevent");
         }
+        
         if (AuraTextUtil.isNullEmptyOrWhitespace(name)) {
             error("name is a required attribute on tag registerevent");
         }
+        
         Location location = getLocation();
         DefDescriptor<EventDef> eventDefDescriptor = DefDescriptorImpl.getInstance(type, EventDef.class);
+        
         // validation on descriptor and such.
         String access = getAttributeValue(ATTRIBUTE_ACCESS);
         boolean isGlobal = false;
@@ -83,15 +88,28 @@ public class RegisterEventHandler extends XMLHandler<RegisterEventDefImpl> {
                 error("Invalid access type [%s] for event %s", access, type);
             }
         }
+        
         builder.setDescription(getAttributeValue(RootTagHandler.ATTRIBUTE_DESCRIPTION));
         int next = xmlReader.next();
         if (next != XMLStreamConstants.END_ELEMENT || !TAG.equalsIgnoreCase(getTagName())) {
             error("expected end of %s tag", TAG);
         }
+        
         builder.setLocation(location);
         builder.setIsGlobal(isGlobal);
         builder.setDescriptor(eventDefDescriptor);
         builder.setAttName(name);
+        
+        if (access != null) {
+	        try {
+	            String namespace = source.getDescriptor().getNamespace();
+				builder.setAccess(Aura.getDefinitionParserAdapter().parseAccess(namespace, access));
+			} catch (InvalidAccessValueException e) {
+				// re-throw with location
+				throw new InvalidAccessValueException(e.getMessage(), getLocation());
+			}
+        }
+        
         return builder.build();
     }
 

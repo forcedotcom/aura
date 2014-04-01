@@ -166,6 +166,8 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
                     throw new AttributeNotFoundException(rootDef.getDescriptor(), attributeDefDesc.getName(),
                             getLocation());
                 }
+                
+            	registry.assertAccess(referencingDesc, registeredEvent);
             } else {
             	if (referencingDesc != null) {
 	            	// Validate that the referencing component has access to the attribute
@@ -175,6 +177,7 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
                 // so it was an attribute, make sure to parse it
                 entry.getValue().parseValue(attributeDef.getTypeDef());
             }
+            
             entry.getValue().validateReferences();
             // heres where some type validation would go
         }

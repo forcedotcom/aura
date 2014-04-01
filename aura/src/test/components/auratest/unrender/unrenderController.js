@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{
+({
     logRenderEvent : function(cmp, event) {
         var evtToken = event.getParam("event")
         var log = cmp.find("log").getElement();
@@ -28,4 +28,4 @@
         var targetCmp = cmp.find("root");
         targetCmp && targetCmp.destroy();
     }
-}
+})

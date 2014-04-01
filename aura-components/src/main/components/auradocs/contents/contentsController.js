@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{
+({
     /**
      * Wire the real tree to the decorators.
      */
@@ -24,4 +24,4 @@
         searchTree.getAttributes().setValue('tree', tree);
         topicTree.getAttributes().setValue('tree', tree);
     }
-}
+})

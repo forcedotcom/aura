@@ -71,7 +71,7 @@ Test.Components.Ui.Carousel.CarouselHelperTest=function(){
 				getValue : function(expression) {
 					if (expression === "v.pageComponents") {
 						return {
-							setValue : function(value, boolean) {
+							setValue : function(value, bool) {
 								actual = value;
 							}
 						};
@@ -130,7 +130,7 @@ Test.Components.Ui.Carousel.CarouselHelperTest=function(){
 				getValue : function(expression) {
 					if (expression === "v.pageComponents") {
 						return {
-							setValue : function(value, boolean) {
+							setValue : function(value, bool) {
 								actual = value;
 							}
 						};

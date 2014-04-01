@@ -1,4 +1,4 @@
-{
+({
 	getServerString : function(cmp){
 		var a = cmp.get("c.getString");
 		a.setParams({param : "" + new Date()});
@@ -7,4 +7,4 @@
 		});
                 $A.enqueueAction(a);
 	}
-}
+})

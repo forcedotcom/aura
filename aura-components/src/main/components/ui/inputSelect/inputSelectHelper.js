@@ -139,8 +139,9 @@
         // case 1:
             var optionsValue = cmp.getValue("v.options");
             var valIsArray = $A.util.isArray(newValues);
+            var reset = false;
             cmp._suspendChangeHandlers = true;
-
+            
             for (var i = 0, len = optionsValue.getLength(); i < len; i++) {
                 var optionValue = optionsValue.getValue(i);
                 var val = optionValue.get("value");
@@ -150,16 +151,20 @@
                     optExists = true;
                     // Workaround to force rerender on option. Bugged on multiselects.
                     if (!isMultiple) {
-                    	optionsValue.remove(i);
-                        optionsValue.insert(i, optionValue.unwrap());
+                        if (i == 0) {
+                            reset = true;
+                        } else {
+                            optionsValue.remove(i);
+                            optionsValue.insert(i, optionValue.unwrap());    
+                        }
                     }
                 } else {
                     optionValue.put("selected", false);
                 }
             }
-            // Workaround to force rerender for multiselects.
-            if (isMultiple) {
-            	cmp.set("v.options", optionsValue.unwrap());
+            // Workaround to force rerender for multiselects or singleselect with change on the first item.
+            if (isMultiple || reset === true) {
+            	optionsValue.setValue(optionsValue.unwrap());
             }
             cmp._suspendChangeHandlers = false;
         } else {

@@ -90,8 +90,7 @@
 	
 	/** Test when index for data providers is out of bound. 
 	 */
-	// TODO : @ctatlah -- uncomment after fixing bug# W-2051486
-	_testMulitpleDataProvidersIndexOutOfBound : {
+	testMulitpleDataProvidersIndexOutOfBound : {
 		test: [function(cmp) {
 			// waiting for intial items of list to load.
 			this.waitForItems(cmp, 25);
@@ -99,13 +98,17 @@
 			// get data from another provider.
 			this.pushButton(cmp, "btnIndex", 25);
 		}, function(cmp) {
+			var errorMessage = "Index is out of bounds for list's data provider trigger.";
+            var actual = $A.test.getAuraErrorMessage();
+            $A.test.assertTrue($A.test.contains(actual, errorMessage),
+                    "Expected '" + errorMessage+"', Got:'"+actual+"'");
+            
 			// verify data didnt change.
 			this.verifyItems(cmp, this.expectedDataProvider1Data);
 			// verify no loading indicator.
 			var listElement = cmp.find("list").getElement();
 			$A.test.assertFalse($A.util.hasClass(listElement, "loading"), 
 				"Loading indicator is still present");
-			
 		}]
 	},
 	

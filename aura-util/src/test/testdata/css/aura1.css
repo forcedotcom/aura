@@ -1,0 +1,15 @@
+.THIS .uiButton.default:disabled,
+.THIS .uiButton.default {
+    background: #EDEDED;
+}
+
+/* @ie7hover remove */
+.THIS .uiButton.default[disabled]:focus {
+    background: #EDEDED;
+    background: linear-gradient(#FEFEFE,#EDEDED);
+}
+
+.THIS.headerBar {
+    box-sizing: border-box;
+    height: 60px;
+}

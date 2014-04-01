@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{
+({
     tokenize : function(base, vPattern, vEndPattern) {
         var elems = [];
         var matchPos = base.search(vPattern);
@@ -40,4 +40,4 @@
         }
         return elems;
     }
-}
+})

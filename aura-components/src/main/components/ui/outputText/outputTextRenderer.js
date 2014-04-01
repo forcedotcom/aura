@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-{
+({
     render: function(cmp, helper) {
         var value = cmp.get('v.value');     
         var ret = this.superRender();       
@@ -50,4 +50,4 @@
         this.superRerender();
     }
 
-}
+})

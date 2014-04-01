@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{
+({
     clicked: function(cmp, event){
         aura.assert(false, "Assert failed in test_ErrorMsg_AssertController!");
     }
-}
+})

@@ -105,6 +105,14 @@
 
         if (index >= 0 && index < component._dataProviders.length) {
             component._dataProviders[index].get("e.provide").fire();
+        } else {
+        	this.showLoading(component, false);
+        	this.handleError(component, "Index is out of bounds for list's data provider trigger.")
         }
+    },
+    
+    handleError: function(cmp, errorMsg) {
+    	cmp.getConcreteComponent()._refreshing = false;
+    	$A.error(errorMsg);
     }
 })

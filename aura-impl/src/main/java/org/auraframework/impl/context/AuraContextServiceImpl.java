@@ -152,7 +152,7 @@ public class AuraContextServiceImpl implements ContextService {
 
     private Map<ValueProviderType, GlobalValueProvider> getGlobalProviders() {
         // load any @Primary GlobalValueProviderAdatper first, to give it's
-        // implementations percedence
+        // implementations precedence
         GlobalValueProviderAdapter primaryFactory = ServiceLocator.get().get(GlobalValueProviderAdapter.class);
         Map<ValueProviderType, GlobalValueProvider> instances = new EnumMap<ValueProviderType, GlobalValueProvider>(
                 ValueProviderType.class);

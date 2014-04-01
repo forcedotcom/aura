@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{
+({
     layoutChanged : function(cmp, event) {
         var elem = cmp.find("layoutTitle").getElement();
         elem.innerHTML = event.getParam("title");
         $A.util.addClass(elem,"layoutChanged");
     }
-}
+})

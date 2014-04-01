@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{
+({
 	inspMouseDown : function(cmp, event, helper){
 		var buttonValue =  event.getParam("button");
 		if(buttonValue===0){
@@ -90,4 +90,4 @@
 	clearEvents : function(cmp, event){
 		cmp.find("outputValue").set("v.value", "");
 	}
-}
+})

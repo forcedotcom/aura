@@ -15,6 +15,8 @@
  */
 package org.auraframework.impl;
 
+import java.util.Map;
+
 import org.auraframework.adapter.LoggingAdapter;
 import org.auraframework.service.LoggingService;
 import org.auraframework.system.LoggingContext;
@@ -147,12 +149,12 @@ public class LoggingServiceImpl implements LoggingService {
     }
 
     @Override
-    public void doLog() {
+    public void flush() {
         LoggingContext lc = getLoggingContext();
         if (lc != null) {
             stopTimer(LoggingService.TIMER_AURA);
             stopTimer(LoggingService.TIMER_TOTAL);
-            lc.log();
+            lc.logRequestValues();
         }
     }
 
@@ -174,5 +176,13 @@ public class LoggingServiceImpl implements LoggingService {
             return lc.getKeyValueLogger(log);
         }
         return null;
+    }
+
+    @Override
+    public void logCSPReport(Map<String, Object> report) {
+        LoggingContext lc = getLoggingContext();
+        if (lc != null) {
+            lc.logCSPReport(report);
+        }
     }
 }

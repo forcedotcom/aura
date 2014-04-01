@@ -14,7 +14,5 @@
  * limitations under the License.
  */
 ({
-	handleRowModeChange: function (cmp, evt) {
-		cmp.setValue('v.mode', evt.getParam('value').getValue());
-	}
+	
 })

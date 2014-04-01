@@ -533,8 +533,8 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
         // Walk all attributes, pushing the reinitialize model in to those as well.
         //
         for (Map.Entry<DefDescriptor<AttributeDef>, AttributeDef> foo : def.getAttributeDefs().entrySet()) {
-            if (componentArrType.equals(foo.getValue().getTypeDef().getDescriptor().getName())) {
-                Object val = getAttributes().getValue("body");
+            if (componentArrType.equals(foo.getValue().getTypeDef().getDescriptor())) {
+                Object val = getAttributes().getValue(foo.getKey().getName());
                 if (val instanceof List) {
                     @SuppressWarnings("unchecked")
                     List<BaseComponent<?, ?>> facet = (List<BaseComponent<?, ?>>)val;

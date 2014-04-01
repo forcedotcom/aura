@@ -168,7 +168,7 @@ public class LoggingContextImpl implements LoggingContext {
      * do the logging.
      */
     @Override
-    public void log() {
+    public void logRequestValues() {
         for (Map.Entry<String, Timer> entry : timers.entrySet()) {
             loggingValues.put(entry.getKey(), entry.getValue().getTime());
         }
@@ -176,7 +176,7 @@ public class LoggingContextImpl implements LoggingContext {
             loggingValues.put(entry.getKey(), entry.getValue().get());
         }
         loggingValues.putAll(values);
-        log(loggingValues);
+        logRequestValuesMap(loggingValues);
         logActions(loggingValues);
     }
 
@@ -188,15 +188,8 @@ public class LoggingContextImpl implements LoggingContext {
     /**
      * do the logging.
      */
-    protected void log(Map<String, Object> valueMap) {
-        StringBuilder buffer = new StringBuilder();
-
-        for (Map.Entry<String, Object> entry : valueMap.entrySet()) {
-            if (entry.getValue() != null) {
-                buffer.append(entry.getKey() + ": " + entry.getValue().toString() + ";");
-            }
-        }
-        logger.info(buffer);
+    protected void logRequestValuesMap(Map<String, Object> valueMap) {
+        log(valueMap);
     }
     
     protected void logActions(Map<String, Object> valueMap) {
@@ -345,6 +338,22 @@ public class LoggingContextImpl implements LoggingContext {
             startTime = -1L;
             totalTime = -1L;
         }
+    }
+
+    protected void log(Map<String, Object> valueMap) {
+        StringBuilder buffer = new StringBuilder();
+
+        for (Map.Entry<String, Object> entry : valueMap.entrySet()) {
+            if (entry.getValue() != null) {
+                buffer.append(entry.getKey() + ": " + entry.getValue().toString() + ";");
+            }
+        }
+        logger.info(buffer);
+    }
+
+    @Override
+    public void logCSPReport(Map<String, Object> report) {
+        log(report);
     }
 
 }

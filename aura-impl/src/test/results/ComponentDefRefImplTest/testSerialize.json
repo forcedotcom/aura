@@ -83,7 +83,21 @@
                                     {
                                       "serId":10,
                                       "value":{
+                                        "name":"itemList",
+                                        "type":"java://java.util.ArrayList"
+                                      }
+                                    },
+                                    {
+                                      "serId":11,
+                                      "value":{
                                         "name":"value",
+                                        "type":"java://java.lang.String"
+                                      }
+                                    },
+                                    {
+                                      "serId":12,
+                                      "value":{
+                                        "name":"valueParent",
                                         "type":"java://java.lang.String"
                                       }
                                     }
@@ -98,7 +112,7 @@
                                   "serRefId":3
                                 },
                                 {
-                                  "serId":11,
+                                  "serId":13,
                                   "value":{
                                     "descriptor":"attr",
                                     "typeDefDescriptor":"aura://String",
@@ -113,7 +127,7 @@
                                   "value":[
                                     {
                                       "componentDef":{
-                                        "serId":12,
+                                        "serId":14,
                                         "value":"markup://aura:expression"
                                       },
                                       "attributes":{
@@ -133,7 +147,7 @@
                                     },
                                     {
                                       "componentDef":{
-                                        "serId":13,
+                                        "serId":15,
                                         "value":{
                                           "descriptor":"markup://test:child2",
                                           "superDef":{

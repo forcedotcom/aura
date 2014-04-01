@@ -170,6 +170,8 @@ public class AuraResourceServletTest extends AuraTestCase {
 
     /**
      * Verify cache of Javascript definitions is cleared on source change in DEV mode.
+     *
+     * FIXME: this test should not be here.... it should be on MDR.
      */
     public void testJsCacheClearedOnSourceChange() throws Exception {
         DefDescriptor<ApplicationDef> appDesc = DefDescriptorImpl.getInstance("appCache:withpreload",

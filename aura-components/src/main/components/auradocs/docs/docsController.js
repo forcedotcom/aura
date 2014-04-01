@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{
+({
     updateAuraAssist : function(cmp, event){
         var a = cmp.get("c.updateAuraAssistServer");
 
@@ -43,4 +43,4 @@
     refreshEnd : function(cmp, event, helper){
         helper.hideRefreshing(cmp);
     }
-}
+})

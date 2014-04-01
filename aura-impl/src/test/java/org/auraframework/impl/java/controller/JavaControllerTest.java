@@ -407,7 +407,7 @@ public class JavaControllerTest extends AuraImplTestCase {
         try {
             Aura.getServerService().run(new Message(actions), Aura.getContextService().getCurrentContext(), sw, null);
         } finally {
-            Aura.getLoggingService().doLog();
+            Aura.getLoggingService().flush();
             logs = TestLoggingAdapterController.endCapture();
             assertNotNull(logs);
         }

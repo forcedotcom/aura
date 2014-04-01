@@ -31,6 +31,7 @@ import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.InvalidAccessValueException;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 
 public abstract class BaseAccessAttributeTest extends AuraImplTestCase {
 
@@ -44,25 +45,25 @@ public abstract class BaseAccessAttributeTest extends AuraImplTestCase {
         runTestCase();
     }
 	
-	public void _testEmptyAccess() throws Exception {
+	public void testEmptyAccess() throws Exception {
 		testCase = TestCase.EMPTY;		 
 		testNamespace = TestNamespace.System;
         runTestCase();
     }
 	
-	public void _testInvalidAccess() throws Exception {
+	public void testInvalidAccess() throws Exception {
 		testCase = TestCase.INVALID;
 		testNamespace = TestNamespace.System;
         runTestCase();
     }
 	
-	public void _testInvalidAccessDynamic() throws Exception {
+	public void testInvalidAccessDynamic() throws Exception {
 		testCase = TestCase.INVALID;
 		testNamespace = TestNamespace.System;
         runTestCase();
     }
 	
-	public void _testInvalidValidAccess() throws Exception {
+	public void testInvalidValidAccess() throws Exception {
 		ArrayList<String> failures = new ArrayList<String>();		
 		for (Access access : Access.values()) {
 			testCase = getTestCase(access, "INVALID");	
@@ -92,7 +93,7 @@ public abstract class BaseAccessAttributeTest extends AuraImplTestCase {
 		}
     }
 	
-	public void _testInvalidValidAuthentication() throws Exception {
+	public void testInvalidValidAuthentication() throws Exception {
 		ArrayList<String> failures = new ArrayList<String>();		
 		for (Authentication authentication : Authentication.values()) {
 			testCase = getTestCase(authentication, "INVALID");	
@@ -122,83 +123,91 @@ public abstract class BaseAccessAttributeTest extends AuraImplTestCase {
 		}
     }
 	
-	public void _testAccessValueAndStaticMethod() throws Exception {
+	public void testAccessValueAndStaticMethod() throws Exception {
 		testCase = TestCase.VALUE_METHOD;
 		testNamespace = TestNamespace.System;
         runTestCase();
     }
 	
-	public void _testSimpleAccessInSystemNamespace() throws Exception {
+	public void testStaticMethodAndAuthentication() throws Exception {
+		testCase = TestCase.METHOD_AUTHENTICATION;
+		testNamespace = TestNamespace.System;
+        runTestCase();
+    }
+	
+	public void testSimpleAccessInSystemNamespace() throws Exception {
 		verifySimpleAccess(TestNamespace.System, false);
 	}
 	
-	public void _testSimpleAccessDynamicInSystemNamespace() throws Exception {
+	public void testSimpleAccessDynamicInSystemNamespace() throws Exception {
 		verifySimpleAccess(TestNamespace.System, true);
 	}
 	
-	public void _testCombinationAccessInSystemNamespace() throws Exception {
+	public void testCombinationAccessInSystemNamespace() throws Exception {
 		verifyCombinationAccess(TestNamespace.System);
 	}
 	
-	public void _testSimpleAuthenticationInSystemNamespace() throws Exception {
+	public void testSimpleAuthenticationInSystemNamespace() throws Exception {
 		verifySimpleAuthentication(TestNamespace.System, false);
 	}
 	
-	public void _testSimpleAuthenticationDynamicInSystemNamespace() throws Exception {
+	public void testSimpleAuthenticationDynamicInSystemNamespace() throws Exception {
 		verifySimpleAuthentication(TestNamespace.System, true);
 	}
 	
-	public void _testCombinationAuthenticationInSystemNamespace() throws Exception {
+	public void testCombinationAuthenticationInSystemNamespace() throws Exception {
 		verifyCombinationAuthentication(TestNamespace.System);
 	}
 	
-	public void _testAccessAuthenticationInSystemNamespace() throws Exception {
+	public void testAccessAuthenticationInSystemNamespace() throws Exception {
 		verifyAccessAuthentication(TestNamespace.System);
 	}
 	
-	public void _testSimpleAccessInCustomNamespace() throws Exception {
+	public void testSimpleAccessInCustomNamespace() throws Exception {
 		verifySimpleAccess(TestNamespace.Custom, false);
 	}
 	
-	public void _testSimpleAccessDynamicInCustomNamespace() throws Exception {
+	public void testSimpleAccessDynamicInCustomNamespace() throws Exception {
 		verifySimpleAccess(TestNamespace.Custom, true);
 	}
 	
-	public void _testCombinationAccessInCustomNamespace() throws Exception {
+	public void testCombinationAccessInCustomNamespace() throws Exception {
 		verifyCombinationAccess(TestNamespace.Custom);
     }				
 	
-	public void _testSimpleAuthenticationInCustomNamespace() throws Exception {
+	public void testSimpleAuthenticationInCustomNamespace() throws Exception {
 		verifySimpleAuthentication(TestNamespace.Custom, false);
 	}
 	
-	public void _testSimpleAuthenticationDynamicInCustomNamespace() throws Exception {
+	public void testSimpleAuthenticationDynamicInCustomNamespace() throws Exception {
 		verifySimpleAuthentication(TestNamespace.Custom, true);
 	}
 	
-	public void _testCombinationAuthenticationInCustomNamespace() throws Exception {
+	public void testCombinationAuthenticationInCustomNamespace() throws Exception {
 		verifyCombinationAuthentication(TestNamespace.Custom);
 	}
 	
-	public void _testAccessAuthenticationInCustomNamespace() throws Exception {
+	public void testAccessAuthenticationInCustomNamespace() throws Exception {
 		verifyAccessAuthentication(TestNamespace.Custom);
 	}
 	
 	private void verifySimpleAccess(TestNamespace namespace, boolean isDynamic) throws Exception {		
 		ArrayList<String> failures = new ArrayList<String>();		
 		for (Access access : Access.values()) {
-			testCase = getTestCase(access, isDynamic);	
-			testNamespace = namespace;
-			if(testCase != null){	
-				try{
-					runTestCase();
+			if(!(isDynamic && access == Access.PRIVATE)){ // TODO W-2085835
+				testCase = getTestCase(access, isDynamic);	
+				testNamespace = namespace;
+				if(testCase != null){	
+					try{					
+						runTestCase();
+					}
+					catch(Throwable e) {
+						failures.add(e.getMessage());
+					}
 				}
-				catch(Throwable e) {
-					failures.add(e.getMessage());
+				else{				
+					failures.add("TestCase not found for Access: " + access.toString());				
 				}
-			}
-			else{				
-				failures.add("TestCase not found for Access: " + access.toString());				
 			}
 		}
 		
@@ -313,23 +322,28 @@ public abstract class BaseAccessAttributeTest extends AuraImplTestCase {
 					message += ", ";
 				}
 			}
-			fail("Test failed becuase: " + message);
+			
+			fail("Test failed because: " + message);
 		}
     }	
 		
-	private void runTestCase() throws Exception{
-		try{														
-			//DefDescriptor<? extends Definition> descriptor = DefDescriptorImpl.getInstance(getDefDescriptorName(), getDefClass());
+	protected void runTestCase() throws Exception{
+		try{																	
 			DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(getDefClass(), getResourceSource(), getDefDescriptorName(), (testNamespace == TestNamespace.System? true: false));
 			Source<? extends Definition> source = StringSourceLoader.getInstance().getSource(descriptor);			
 			Definition def = parser.parse(descriptor, source);
-			def.validateDefinition();
+			def.validateDefinition();			
 			
 			if(!isValidTestCase()) {
 				fail("Should have thrown Exception for access: " + getAccess());
 			}
 		}
 		catch(InvalidAccessValueException e){
+			if(isValidTestCase()){
+				fail("Should not have thrown Exception for access: " + getAccess());
+			}
+		}
+		catch(InvalidDefinitionException e){
 			if(isValidTestCase()){
 				fail("Should not have thrown Exception for access: " + getAccess());
 			}
@@ -362,6 +376,7 @@ public abstract class BaseAccessAttributeTest extends AuraImplTestCase {
 				break;
 				
 			case Event:
+			case RegisterEvent:	
 				name = namespace + ":testevent";
 				break;
 				
@@ -373,8 +388,8 @@ public abstract class BaseAccessAttributeTest extends AuraImplTestCase {
 		return name;		
 	}
 	
-	private Class<Definition> getDefClass(){
-		Class classDef = null;
+	private Class<? extends Definition> getDefClass(){
+		Class<? extends Definition> classDef = null;
 		switch(testResource){
 			case Application:
 				classDef =  ApplicationDef.class;
@@ -392,7 +407,10 @@ public abstract class BaseAccessAttributeTest extends AuraImplTestCase {
 				classDef =  EventDef.class;
 				break;
 			case Theme:
-				classDef =  ThemeDef.class;				
+				classDef =  ThemeDef.class;		
+				break;
+			case RegisterEvent:
+				classDef =  ComponentDef.class;	
 		}
 		
 		return classDef;		
@@ -418,6 +436,11 @@ public abstract class BaseAccessAttributeTest extends AuraImplTestCase {
 		}
 		else if(testResource == TestResource.Theme){
 			source = "<aura:theme " + (access!= null?"access='" + access+ "'" : "") + " />";
+		}
+		else if(testResource == TestResource.RegisterEvent){
+			source = "<aura:component>";
+			source += "<aura:registerEvent name='testevent' type='ui:keydown' description='For QA' " + (access!= null?"access='" +access+ "'" : "") + " />";
+			source += "</aura:component> ";
 		}
 		
 		return source;
@@ -448,6 +471,10 @@ public abstract class BaseAccessAttributeTest extends AuraImplTestCase {
 		
 		if(testCase == TestCase.VALUE_METHOD){
 			return "GLOBAL,org.auraframework.test.TestAccessMethods.allowGlobal";
+		}
+		
+		if(testCase == TestCase.METHOD_AUTHENTICATION){
+			return "org.auraframework.test.TestAccessMethods.allowGlobal,AUTHENTICATED";
 		}
 		
 		if(testCase.toString().contains("INVALID")){
@@ -613,7 +640,7 @@ public abstract class BaseAccessAttributeTest extends AuraImplTestCase {
 		return true;
 	}
 	
-	private TestCase getTestCase(Access access, boolean isDynamic) {
+	protected TestCase getTestCase(Access access, boolean isDynamic) {
 		try{
 			String accessVal = access.toString();
 			
@@ -688,13 +715,13 @@ public abstract class BaseAccessAttributeTest extends AuraImplTestCase {
 	
 	XMLParser parser = XMLParser.getInstance();
 	
-	private TestCase testCase;
+	protected TestCase testCase;
 	protected TestResource testResource;
-	private TestNamespace testNamespace;
+	protected TestNamespace testNamespace;
 	
-	protected enum TestResource {Application, Component, Interface, Attribute, Event, Theme};
+	protected enum TestResource {Application, Component, Interface, Attribute, Event, Theme, RegisterEvent};
 	
-	private enum TestNamespace {System, Custom};
+	protected enum TestNamespace {System, Custom};
 	
 	private enum TestCase {EMPTY, DEFAULT, INVALID, GLOBAL, PUBLIC, PRIVATE, INTERNAL, AUTHENTICATED, UNAUTHENTICATED,
 							 INVALID_DYNAMIC, GLOBAL_DYNAMIC, PUBLIC_DYNAMIC, PRIVATE_DYNAMIC, INTERNAL_DYNAMIC, AUTHENTICATED_DYNAMIC, UNAUTHENTICATED_DYNAMIC,
@@ -706,7 +733,7 @@ public abstract class BaseAccessAttributeTest extends AuraImplTestCase {
 							 PUBLIC_PRIVATE, PUBLIC_INTERNAL,
 							 PRIVATE_INTERNAL,
 							 AUTHENTICATED_UNAUTHENTICATED,
-							 VALUE_METHOD,
+							 VALUE_METHOD, METHOD_AUTHENTICATION,
 							 INVALID_GLOBAL, INVALID_PUBLIC, INVALID_PRIVATE, INVALID_INTERNAL, INVALID_AUTHENTICATED, INVALID_UNAUTHENTICATED}; 
 			 							 
 }

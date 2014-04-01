@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{
+({
     handleComponentEventFired : function(cmp, event) {
         var attributes = cmp.getAttributes();
 
@@ -33,4 +33,4 @@
         var numApplicationEventsHandled = parseInt(attributes.getValue("numApplicationEventsHandled").getValue()) + 1;
         attributes.setValue("numApplicationEventsHandled", numApplicationEventsHandled);
     }
-}
+})

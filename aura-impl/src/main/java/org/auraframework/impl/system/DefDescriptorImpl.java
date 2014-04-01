@@ -20,17 +20,18 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.cache.Cache;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.Definition;
+import org.auraframework.def.TypeDef;
 import org.auraframework.impl.type.AuraStaticTypeDefRegistry;
 import org.auraframework.impl.util.AuraUtil;
+import org.auraframework.service.CachingService;
 import org.auraframework.service.LoggingService;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
-
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
 
 /**
  */
@@ -77,9 +78,16 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
         }
     }
 
-    private static final Cache<DescriptorKey, DefDescriptor<? extends Definition>> cache = CacheBuilder.newBuilder()
-            .concurrencyLevel(20).initialCapacity(512).maximumSize(1024 * 10).build();
 
+    private static CachingService cSrv = Aura.getCachingService();
+    
+    private static final Cache<DescriptorKey, DefDescriptor<? extends Definition>> cache = 
+            cSrv.<DescriptorKey, DefDescriptor<? extends Definition>>getCacheBuilder()
+            .setInitialSize(512)
+            .setMaximumSize(1024 * 10)
+            .setConcurrencyLevel(20)
+            .build();
+    
     /**
      * Pattern for tag descriptors : foo:bar Group 0 = QName = foo:bar Group 1 = prefix Group 2 = namespace = foo Group
      * 3 = name = bar prefix = null
@@ -323,6 +331,7 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
                 return result;
             }
         }
+        
         return new DefDescriptorImpl<E>(qualifiedName, defClass);
     }
 
@@ -337,17 +346,20 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
         if (name == null || defClass == null) {
             throw new AuraRuntimeException("descriptor is null");
         }
+        
         DescriptorKey dk = new DescriptorKey(name, defClass);
         @SuppressWarnings("unchecked")
         DefDescriptor<E> result = (DefDescriptor<E>) cache.getIfPresent(dk);
         if (result == null) {
             result = buildInstance(name, defClass);
+            
             // Our input names may not be qualified, but we should ensure that
             // the fully-qualified is properly cached to the same object.
             // I'd like an unqualified name to either throw or be resolved first,
             // but that's breaking or non-performant respectively.
             if (!dk.name.equals(result.getQualifiedName())) {
                 DescriptorKey fullDK = new DescriptorKey(result.getQualifiedName(), defClass);
+                
                 @SuppressWarnings("unchecked")
                 DefDescriptor<E> fullResult = (DefDescriptor<E>) cache.getIfPresent(fullDK);
                 if (fullResult == null) {
@@ -357,8 +369,10 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
                     result = fullResult;
                 }
             }
+            
             cache.put(dk, result);
         }
+        
         return result;
     }
 

@@ -16,38 +16,33 @@
 package org.auraframework.util.javascript;
 
 import java.util.List;
+import java.util.Map;
+
+import org.auraframework.util.validation.ValidationError;
 
 /**
  * javascript ouchies
  */
-public class JavascriptProcessingError {
+public final class JavascriptProcessingError extends ValidationError {
 
     public enum Level {
         Warning, Error;
     }
 
-    private String message;
-    private int line;
-    private int character;
-    private String filename;
-    private String evidence;
-    private Level level;
-
     public JavascriptProcessingError() {
-        this.level = Level.Error;
+        super("js/custom", Level.Error);
+    }
+
+    JavascriptProcessingError(String tool, String filename, Map<String, ?> error) {
+        super(tool, filename, error);
     }
 
     public JavascriptProcessingError(String message, int line, int character, String filename, String evidence,
             Level level) {
-        this.message = message;
-        this.line = line;
-        this.character = character;
-        this.filename = filename;
-        this.evidence = evidence;
-        this.level = level;
+        super("js/custom", filename, line, character, message, evidence, level, null);
     }
 
-    public static JavascriptProcessingError make(List<JavascriptProcessingError> errorsList, String message, int line,
+    private static JavascriptProcessingError make(List<JavascriptProcessingError> errorsList, String message, int line,
             int character, String filename, String evidence, Level level) {
         JavascriptProcessingError msg = new JavascriptProcessingError(message, line, character, filename, evidence,
                 level);
@@ -63,65 +58,17 @@ public class JavascriptProcessingError {
     public static JavascriptProcessingError makeError(List<JavascriptProcessingError> errorsList, String message,
             int line, int character, String filename, String evidence) {
         return make(errorsList, message, line, character, filename, evidence, Level.Error);
-
-    }
-
-    public String getMessage() {
-        return this.message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public int getLine() {
-        return this.line;
-    }
-
-    public void setLine(int line) {
-        this.line = line;
-    }
-
-    public int getCharacter() {
-        return this.character;
-    }
-
-    public void setCharacter(int character) {
-        this.character = character;
-    }
-
-    public String getFilename() {
-        return filename;
-    }
-
-    public void setFilename(String filename) {
-        this.filename = filename;
-    }
-
-    public String getEvidence() {
-        return evidence;
-    }
-
-    public void setEvidence(String evidence) {
-        this.evidence = evidence;
-    }
-
-    public Level getLevel() {
-        return level;
-    }
-
-    public void setLevel(Level l) {
-        this.level = l;
     }
 
     @Override
     public String toString() {
-        if (evidence == null || evidence.length() == 0) {
-            return String.format("JS Processing %s: %s (line %s, char %s) : %s\n", level, filename, line, character,
-                    message);
-        } else {
-            return String.format("JS Processing %s: %s (line %s, char %s) : %s \n %s\n", level, filename, line,
-                    character, message, evidence);
+        String s = String.format("JS Processing %s: %s (line %s, char %s) : %s", getLevel(), getFilename(), getLine(),
+                getStartColumn(), getMessage());
+        String evidence = getEvidence();
+        if (evidence != null && evidence.length() > 0) {
+            s += String.format(" \n %s", evidence);
         }
+        s += '\n';
+        return s;
     }
 }

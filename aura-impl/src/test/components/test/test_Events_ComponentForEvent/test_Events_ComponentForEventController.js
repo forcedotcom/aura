@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{
+({
     changeLabel: function(cmp, event) {
     /*This function should never be called because its a controller on the component that has registered the event.*/
         var componentForEventController = event.getSource();
         componentForEventController.getAttributes().setValue("label", "invisibleText");
         $A.rerender(componentForEventController);
     }
-}
+})

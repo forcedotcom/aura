@@ -20,7 +20,8 @@
     <!-- Exposed attributes -->
     <aura:attribute name="scroll"               type="String"  default="vertical" description="Defines the scroll direction. The string values can be either horizontal or vertical"/>
     <aura:attribute name="enabled"              type="Boolean" default="true"     description="Sets the default state of the scroller"/>
-    <aura:attribute name="useCSSTransition"     type="Boolean" default="false"    description="Denotes whether to use css transitions"/>
+    <aura:attribute name="useCSSTransition"     type="Boolean"                    description="Denotes whether to use css transitions. By default scroller will decide depending on the platform"/>
+    <aura:attribute name="preventDefaultOnMove" type="Boolean" default="false"    description="preventDefault native events on mouse move"/>
     <aura:attribute name="snap"                 type="Boolean" default="false"    description="Enable snap behaviour on the scroller (adds the Snap plugins to the scroller)"/>
     <aura:attribute name="endless"              type="Boolean" default="false"    description="Activates the endless plugin (gpuOptimization needs to be enable for this)"/>
     <aura:attribute name="snapType"             type="String"  default="soft"     description="Snap type. Values: sticky | soft"/>
@@ -28,8 +29,8 @@
     <aura:attribute name="gpuOptimization"      type="Boolean" default="false"    description="Activate Surface Mannager to create GPU accelerate surfaces for better performace."/>
     <aura:attribute name="bindEventsToScroller" type="Boolean" default="false"    description="Binds mouse or touch events to the scroller DOM container, otherwise will be attached to the window object"/>
     <aura:attribute name="showScrollbars"       type="Boolean" default="false"    description="Enable scrollbars"/>
-    <aura:attribute name="canShowMore"          type="Boolean" default="false"    description="Whether this scroller can be invoked to show more content"/>
-    <aura:attribute name="canRefresh"           type="Boolean" default="false"    description="Whether this scroller can be invoked to refresh its content"/>
+    <aura:attribute name="canShowMore"          type="Boolean"                    description="Whether this scroller can be invoked to show more content"/>
+    <aura:attribute name="canRefresh"           type="Boolean"                    description="Whether this scroller can be invoked to refresh its content"/>
     <aura:attribute name="width"                type="String"                     description="The width of the scroll area in pixels"/>
     <aura:attribute name="height"               type="String"                     description="The height of the scroll area in pixels"/>
     <aura:attribute name="class"                type="String"                     description="A CSS style to be attached to the scroll area"/>
@@ -68,6 +69,7 @@
     <aura:registerEvent name="scrollBy" type="ui:scrollBy"     description="The event fired when the scroller should move to a new destination relative to its current position"/>
     <aura:handler       name="scrollBy" action="{!c.scrollBy}" description="Catches the event fired when the scroller should move to a new destination relative to its current position"/>
 
+    <aura:handler       name="change" value="{!v.canRefresh}" action="{!c.handleCanRefreshChange}" description="Handler called when the canShowMore attribute changes"/>
     <aura:handler       name="change" value="{!v.canShowMore}" action="{!c.handleCanShowMoreChange}" description="Handler called when the canShowMore attribute changes"/>
 
     <ui:resizeObserver onresize="{!c.refresh}"/>

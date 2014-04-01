@@ -47,5 +47,37 @@
         act.setCallback(component, actionCallback);
         
         $A.enqueueAction(act);
-    }  
+    },
+    
+    beforeScrollStartHandler: function(component, event, helper){
+    	var span = document.getElementById('beforeScrollStartHandlerCalled');
+    	
+    	if(span.textContent.trim() === "0"){
+    		span.textContent = "1";
+    	}
+    },
+    
+    scrollStartHandler: function(component, event, helper){
+    	var span = document.getElementById('scrollStartHandlerCalled');
+    	
+    	if(span.textContent.trim() === "0"){
+    		span.textContent = "1";
+    	}
+    },
+    
+    scrollMoveHandler: function(component, event, helper){
+    	var span = document.getElementById('scrollMoveHandlerCalled');
+    	
+    	if(span.textContent.trim() === "0"){
+    		span.textContent = "1";
+    	}
+    },
+    
+    scrollEndHandler: function(component, event, helper){
+    	var span = document.getElementById('scrollEndHandlerCalled');
+    	
+    	if(span.textContent.trim() === "0"){
+    		span.textContent = "1";
+    	}
+    }
 })

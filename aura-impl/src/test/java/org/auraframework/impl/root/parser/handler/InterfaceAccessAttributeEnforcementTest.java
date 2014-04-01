@@ -15,6 +15,8 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
+import java.util.ArrayList;
+
 public class InterfaceAccessAttributeEnforcementTest extends
 		BaseAccessAttributeEnforcementTest {
 	
@@ -23,7 +25,40 @@ public class InterfaceAccessAttributeEnforcementTest extends
 	public InterfaceAccessAttributeEnforcementTest(String name) {
 		super(name);
 		testResource = TestResource.Interface;
-	}		
+	}
+	
+	/**
+	 * Verify Extending aura:rootComponent interface
+	 * @throws Exception
+	 */
+	public void testExtendRootComponentInterface() throws Exception {
+		String resourceSource = "<aura:interface extends='aura:rootComponent' />";
+		
+		ArrayList<String> failures = new ArrayList<String>();
+
+		for (TestNamespace targetNamespace : TestNamespace.values()) {
+			testResourceNamespace = targetNamespace;
+			
+			try {
+				runSimpleTestCase(resourceSource);
+			} catch (Throwable e) {
+				failures.add(e.getMessage());
+			}	
+			
+		}
+
+		if (!failures.isEmpty()) {
+			String message = "\n";
+			for (int i = 0; i < failures.size(); i++) {
+				message += failures.get(i);
+				if (i != failures.size() - 1) {
+					message += ",\n";
+				}
+			}
+
+			fail("Test failed with " + failures.size() + " errors:" + message);
+		}
+    }
 	
 	/**
 	 * Verify Default access enforcement

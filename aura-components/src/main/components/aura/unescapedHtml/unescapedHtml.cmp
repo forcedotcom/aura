@@ -22,6 +22,6 @@
         Warning: this component outputs "value" string as a piece of unescaped HTML codes and
         the caller has to make sure it doesn't create any security concern.
     -->
-    <aura:attribute name="body" type="Aura.Component[]" description="The body of &lt;aura:unescapedHtml&gt; is ignored and won't be rendered."/>
-    <aura:attribute name="value" type="String" description="The string that should be rendered as unescaped HTML."/>
+    <aura:attribute name="body" type="Aura.Component[]" access="GLOBAL" description="The body of &lt;aura:unescapedHtml&gt; is ignored and won't be rendered."/>
+    <aura:attribute name="value" type="String" access="GLOBAL" description="The string that should be rendered as unescaped HTML."/>
 </aura:component>

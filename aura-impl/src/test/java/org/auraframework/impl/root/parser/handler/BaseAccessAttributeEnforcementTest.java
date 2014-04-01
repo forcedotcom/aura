@@ -42,7 +42,8 @@ public abstract class BaseAccessAttributeEnforcementTest extends AuraImplTestCas
 			testResourceNamespace = targetNamespace;
 			
 			try {
-				runSimpleTestCase();
+				String resourceSource = getResourceSource(testResource, null);
+				runSimpleTestCase(resourceSource);
 			} catch (Throwable e) {
 				failures.add(e.getMessage());
 			}	
@@ -146,13 +147,11 @@ public abstract class BaseAccessAttributeEnforcementTest extends AuraImplTestCas
 		}
 	}
 	
-	protected void runSimpleTestCase() throws Exception {								
-		String resourceSource = getResourceSource(testResource, null);
+	protected void runSimpleTestCase(String resourceSource) throws Exception {								
 		DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(getDefClass(testResource), resourceSource,
 				getDefDescriptorName(testResource, true),
 				(testResourceNamespace == TestNamespace.System || testResourceNamespace == TestNamespace.SystemOther ? true : false));
 		
-
 		Source<? extends Definition> source = StringSourceLoader.getInstance().getSource(descriptor);
 		try {
 			Definition def = parser.parse(descriptor, source);
@@ -161,7 +160,7 @@ public abstract class BaseAccessAttributeEnforcementTest extends AuraImplTestCas
 			descriptor.getDef();
 			
 		} catch (NoAccessException e) {
-			fail("Should not have thrown Exception when " + testResourceNamespace + "." + testResource + " is " + testCase);
+			fail("Should not have thrown Exception when " + testResourceNamespace + "." + testResource);
 		}
 	}
 

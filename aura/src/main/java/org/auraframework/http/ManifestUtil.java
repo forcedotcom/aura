@@ -79,7 +79,7 @@ public abstract class ManifestUtil {
      */
     public static boolean isManifestEnabled(HttpServletRequest request) {
     	final String userAgent = request.getHeader(HttpHeaders.USER_AGENT);
-        if (userAgent != null && !userAgent.contains("AppleWebKit")) {
+        if (userAgent != null && !userAgent.toLowerCase().contains("applewebkit")) {
             return false;
         }
 

@@ -20,7 +20,6 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.def.HelperDef;
 import org.auraframework.def.LayoutsDef;
 import org.auraframework.def.TypeDef;
 import org.auraframework.impl.AuraImplTestCase;

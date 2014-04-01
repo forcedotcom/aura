@@ -37,7 +37,11 @@ var ComponentPriv = (function() { // Scoping priv
         this.container = undefined;
 
         var context = $A.getContext();
-        var act = context.getCurrentAction();
+
+        // allows components to skip creation path checks if it's doing something weird
+        // such as wrapping server created components in client created one
+
+        var act = config["skipCreationPath"] ? null : context.getCurrentAction();
         var forcedPath = false;
 
         try {
@@ -70,7 +74,7 @@ var ComponentPriv = (function() { // Scoping priv
             this.setupGlobalId(config["globalId"], localCreation);
 
             var partialConfig = undefined;
-            if (this.creationPath) {
+            if (this.creationPath && this.creationPath !== "client created") {
                 partialConfig = context.getComponentConfig(this.creationPath);
             }
             if (partialConfig) {
@@ -96,7 +100,7 @@ var ComponentPriv = (function() { // Scoping priv
                         $A.log("Configs at error");
                         $A.log(config);
                         $A.log(partialConfig);
-                        $A.error("Mismatch at " + this.globalId
+                        $A.warning("Mismatch at " + this.globalId
                                 + " client expected " + configCD
                                 + " but got original " + partialConfigO
                                 + " providing " + partialConfigCD + " from server "
@@ -107,7 +111,7 @@ var ComponentPriv = (function() { // Scoping priv
                         $A.log("Configs at error");
                         $A.log(config);
                         $A.log(partialConfig);
-                        $A.error("Mismatch at " + this.globalId
+                        $A.warning("Mismatch at " + this.globalId
                                 + " client expected " + configCD + " but got "
                                 + partialConfigCD + " from server "
                                 +" for creationPath = "+this.creationPath);

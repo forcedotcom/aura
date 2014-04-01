@@ -301,5 +301,214 @@ Test.Aura.UtilTest=function(){
             });
         }
     }
+
+    [Fixture]
+    function supportsTouchEvents() {
+        var mockIsUndefinedReturnsFalse = Mocks.GetMock(Object.Global(), "$A", {
+            util: {
+                isUndefined: function() {
+                    return false;
+                }
+            }
+        });
+
+        [Fact] 
+        function ReturnsCachedResultIfExistsAndTruthy() {
+            var actual;
+            var expected = true;
+            targetUtil.supportsTouchEvents.cache = expected;
+
+            mockIsUndefinedReturnsFalse(function() {
+                actual = targetUtil.supportsTouchEvents();
+            });
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact] 
+        function ReturnsCachedResultIfExistsAndFalsy() {
+            var actual;
+            var expected = false;
+            targetUtil.supportsTouchEvents.cache = expected;
+
+            mockIsUndefinedReturnsFalse(function() {
+                actual = targetUtil.supportsTouchEvents();
+            });
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact] 
+        function ReturnsTrueWhenOnTouchStartInWindow() {
+            var actual;
+            var expected = true;
+            var mockItAll = Mocks.GetMocks(Object.Global(), {
+                $A: {
+                    util: {
+                        isUndefined: function() {
+                            return true;
+                        }
+                    },
+                    getContext: function() {
+                        return {
+                            getMode: function() {
+                                return "NonBlacklistedMode";
+                            }
+                        }
+                    }
+                },
+                window: {
+                    ontouchstart: true
+                }
+            });
+
+            mockItAll(function() {
+                actual = targetUtil.supportsTouchEvents();
+            });
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact] 
+        function ReturnsTrueForWindowsPhone() {
+            var actual;
+            var expected = true;
+            var mockItAll = Mocks.GetMocks(Object.Global(), {
+                $A: {
+                    util: {
+                        isUndefined: function() {
+                            return true;
+                        }
+                    },
+                    getContext: function() {
+                        return {
+                            getMode: function() {
+                                return "NonBlacklistedMode";
+                            }
+                        }
+                    },
+                    get: function() {
+                        return true;
+                    }
+                },
+                window: {},
+                navigator: {
+                    msPointerEnabled: true
+                }
+            });
+
+            mockItAll(function() {
+                actual = targetUtil.supportsTouchEvents();
+            });
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact] 
+        function ReturnsTrueForMaxTouchPoints() {
+            var actual;
+            var expected = true;
+            var mockItAll = Mocks.GetMocks(Object.Global(), {
+                $A: {
+                    util: {
+                        isUndefined: function() {
+                            return true;
+                        }
+                    },
+                    getContext: function() {
+                        return {
+                            getMode: function() {
+                                return "NonBlacklistedMode";
+                            }
+                        }
+                    },
+                    get: function() {
+                        return false;
+                    }
+                },
+                window: {},
+                navigator: {
+                    msPointerEnabled: false,
+                    msMaxTouchPoints: 10
+                }
+            });
+
+            mockItAll(function() {
+                actual = targetUtil.supportsTouchEvents();
+            });
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact] 
+        function ReturnsFalseForBlacklistedMode() {
+            var actual;
+            var expected = false;
+            var mockItAll = Mocks.GetMocks(Object.Global(), {
+                $A: {
+                    util: {
+                        isUndefined: function() {
+                            return true;
+                        }
+                    },
+                    getContext: function() {
+                        return {
+                            getMode: function() {
+                                return "PTEST";
+                            }
+                        }
+                    }
+                },
+                window: {
+                    ontouchstart: true
+                }
+            });
+
+            mockItAll(function() {
+                actual = targetUtil.supportsTouchEvents();
+            });
+ 
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact] 
+        // This case covers non-touch IE11 where msPointerEnabled is true
+        function ReturnsFalseForPointerEnabledNotWindowsPhone() {
+            var actual;
+            var expected = false;
+            var mockItAll = Mocks.GetMocks(Object.Global(), {
+                $A: {
+                    util: {
+                        isUndefined: function() {
+                            return true;
+                        }
+                    },
+                    getContext: function() {
+                        return {
+                            getMode: function() {
+                                return "NonBlacklistedMode";
+                            }
+                        }
+                    },
+                    get: function() {
+                        return false;
+                    }
+                },
+                window: {},
+                navigator: {
+                    msPointerEnabled: true,
+                    pointerEnabled: true,
+                    msMaxTouchPoints: 0,
+                    maxTouchPoints:0
+                }
+            });
+
+            mockItAll(function() {
+                actual = targetUtil.supportsTouchEvents();
+            });
+
+            Assert.Equal(expected, actual);
+        }
+    }
 }
  

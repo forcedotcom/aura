@@ -15,6 +15,8 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
+import java.util.ArrayList;
+
 public class EventAccessAttributeEnforcementTest extends
 		BaseAccessAttributeEnforcementTest {
 		
@@ -24,7 +26,112 @@ public class EventAccessAttributeEnforcementTest extends
 	}
 	
 	/**
-	 * Verify Creating an application works
+	 * Verify Creating a events of different types works
+	 * @throws Exception
+	 */
+	public void testCreateAuraEventTypes() throws Exception {
+		ArrayList<String> failures = new ArrayList<String>();
+		verifyCreateAuraEventTypes("APPLICATION", failures);
+		verifyCreateAuraEventTypes("COMPONENT", failures);
+		verifyCreateAuraEventTypes("VALUE", failures);
+		
+		if (!failures.isEmpty()) {
+			String message = "\n";
+			for (int i = 0; i < failures.size(); i++) {
+				message += failures.get(i);
+				if (i != failures.size() - 1) {
+					message += ",\n";
+				}
+			}
+
+			fail("Test failed with " + failures.size() + " errors:" + message);
+		}
+	}
+	
+	private void verifyCreateAuraEventTypes(String type, ArrayList<String> failures) throws Exception {
+		String resourceSource = "<aura:event type='"+type+"' />";
+
+		for (TestNamespace targetNamespace : TestNamespace.values()) {
+			testResourceNamespace = targetNamespace;
+			
+			try {
+				runSimpleTestCase(resourceSource);
+			} catch (Throwable e) {
+				failures.add(e.getMessage());
+			}	
+			
+		}
+		
+    }
+	
+	/**
+	 * Verify Extending an Application Event works
+	 * @throws Exception
+	 */
+	public void testExtendsAuraApplicationEvents() throws Exception {
+		ArrayList<String> failures = new ArrayList<String>();
+		verifyExtendsAuraEvents("APPLICATION", "aura:doneRendering", failures);
+		verifyExtendsAuraEvents("APPLICATION", "aura:doneWaiting", failures);
+		verifyExtendsAuraEvents("APPLICATION", "aura:locationChange", failures);
+		verifyExtendsAuraEvents("APPLICATION", "aura:noAccess", failures);
+		verifyExtendsAuraEvents("APPLICATION", "aura:systemError", failures);
+		verifyExtendsAuraEvents("APPLICATION", "aura:waiting", failures);
+		
+		if (!failures.isEmpty()) {
+			String message = "\n";
+			for (int i = 0; i < failures.size(); i++) {
+				message += failures.get(i);
+				if (i != failures.size() - 1) {
+					message += ",\n";
+				}
+			}
+
+			fail("Test failed with " + failures.size() + " errors:" + message);
+		}
+		
+	}
+	
+	/**
+	 * Verify Extending a Value Event works
+	 * @throws Exception
+	 */
+	public void testExtendsAuraValueEvents() throws Exception {
+		ArrayList<String> failures = new ArrayList<String>();
+		
+		verifyExtendsAuraEvents("VALUE", "aura:valueChange", failures);		
+		verifyExtendsAuraEvents("VALUE", "aura:valueInit", failures);
+		
+		if (!failures.isEmpty()) {
+			String message = "\n";
+			for (int i = 0; i < failures.size(); i++) {
+				message += failures.get(i);
+				if (i != failures.size() - 1) {
+					message += ",\n";
+				}
+			}
+
+			fail("Test failed with " + failures.size() + " errors:" + message);
+		}
+
+	}
+	
+	private void verifyExtendsAuraEvents(String type, String baseEvent, ArrayList<String> failures) throws Exception {
+		String resourceSource = "<aura:event type='"+type+"' extends='"+baseEvent+"' />";
+		
+		for (TestNamespace targetNamespace : TestNamespace.values()) {
+			testResourceNamespace = targetNamespace;
+			
+			try {
+				runSimpleTestCase(resourceSource);
+			} catch (Throwable e) {
+				failures.add(e.getMessage());
+			}	
+			
+		}
+    }
+	
+	/**
+	 * Verify Creating a Component works
 	 * @throws Exception
 	 */
 	public void testAccess() throws Exception {

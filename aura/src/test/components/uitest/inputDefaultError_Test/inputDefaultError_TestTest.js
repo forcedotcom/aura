@@ -31,7 +31,7 @@
         test:function(cmp){
             var ul = $A.test.getElementByClass("uiInputDefaultError");
             $A.test.assertEquals(ul.length, 1, "uiInputDefaultError unordered list was not found");
-            $A.test.assertEquals(ul[0].children.length, 2, "The unordered list has to many items in it");
+            $A.test.assertEquals(ul[0].children.length, 2, "The unordered list has too many items in it");
             
         }
     } 

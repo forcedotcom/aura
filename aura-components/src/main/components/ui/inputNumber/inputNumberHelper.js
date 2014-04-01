@@ -16,7 +16,8 @@
 ({
     formatValue: function(cmp) {
     	// number fields only format the initial value
-        this.setAttribute(cmp, {key: 'doFormat', value: false});
+        this.setAttribute(cmp, { key: 'doFormat', value: false, commit: true });
+        
         var f = cmp.get("v.format");
         var num = this.getNumber(cmp);
         if (!$A.util.isUndefinedOrNull(num)) {

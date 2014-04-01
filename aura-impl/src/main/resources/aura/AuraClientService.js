@@ -596,7 +596,11 @@ var AuraClientService = function() {
                     }
                 }
 
-                root.getValue("v.body").push(c);
+                var body = root.getValue("v.body");
+                body.push(c);
+                
+                // Do not let Aura consider this initial setting into the surrogate app as a candiadate for rerendering
+                body.commit();          
 
                 $A.render(c, element);
 

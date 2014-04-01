@@ -21,7 +21,8 @@
         <aura:layoutItem container="content" action="{!c.getReference}"/>
     </aura:layout>
     <aura:layout name="help" title="Help" match=".*Topic">
-        <aura:layoutItem container="sidebar" cache="loaded"><auradocs:tutorialsNav/></aura:layoutItem>
+        <!-- <aura:layoutItem container="sidebar" cache="loaded"><auradocs:tutorialsNav/></aura:layoutItem>  -->
+        <aura:layoutItem container="sidebar" cache="loaded"><auradocs:empty/></aura:layoutItem>
         <aura:layoutItem container="content" action="{!c.getTopic}"/>
     </aura:layout>
     <aura:layout name="demos" title="Demos">

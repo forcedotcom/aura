@@ -74,8 +74,8 @@
         });    	
     },
     
-    toggleValue : function(component) {
-        var val = component.getValue("v.toggleChild");
+    toggleValue : function(component, targetExpression) {
+        var val = component.getValue(targetExpression);
         val.setValue(!val.unwrap());
     },
     
@@ -133,6 +133,8 @@
     testParentAttributeUpdated: {
         attributes : { __layout: "#def" },
         test: [function(component){
+	    		this.addWaitForLayoutItem(component, "def layout item");
+	        }, function(component){
                 var child2 = component.find("child2");
                 child2.getSuper().find("toggleParent").get("e.press").fire();
                 this.addWaitForCounter(child2, "1");
@@ -147,6 +149,8 @@
     testParentModelUpdated: {
         attributes : { __layout: "#def" },
         test: [function(component){
+	    		this.addWaitForLayoutItem(component, "def layout item");
+	        }, function(component){
                 var child2 = component.find("child2");
                 child2.getSuper().find("toggleParentModel").get("e.press").fire();
                 this.addWaitForCounter(child2, "1");
@@ -161,6 +165,8 @@
     testChildtAttributeUpdated: {
         attributes : { __layout: "#def" },
         test: [function(component){
+				this.addWaitForLayoutItem(component, "def layout item");
+		    }, function(component){
                 var child2 = component.find("child2");
                 child2.find("toggleChild").get("e.press").fire();
                 this.addWaitForCounter(child2, "1");
@@ -219,82 +225,126 @@
     testRerenderOnceIfContainerRerenderedInEventLoop: {
         attributes : { __layout: "#def" },
         test: [function(component){
-    		this.addWaitForLayoutItem(component, "def layout item");
-        }, function(component){
-        	var cmp = component;
-        	var child2 = cmp.find("child2");
-            var that = this;
-            $A.run(function(){
-            	that.toggleValue(cmp.find("child2"));
-            	that.toggleValue(cmp.find("grandchild2"));
-            	that.toggleValue(cmp.find("greatgrandchild2"));
-            });
-            $A.test.addWaitFor("1", function(){
-                return that.getCounter(child2);
-            });
-        }, function(component){
-        	this.assertCounters(component, "0", "0", "1", "1", "1", "1");
-        }]
+	    		this.addWaitForLayoutItem(component, "def layout item");
+	        }, function(component){
+	        	var cmp = component;
+	        	var child2 = cmp.find("child2");
+	            var that = this;
+	            $A.run(function(){
+	            	that.toggleValue(cmp.find("child2"), "v.toggleChild");
+	            	that.toggleValue(cmp.find("grandchild2"), "v.toggleChild");
+	            	that.toggleValue(cmp.find("greatgrandchild2"), "v.toggleChild");
+	            });
+	            $A.test.addWaitFor("1", function(){
+	                return that.getCounter(child2);
+	            });
+	        }, function(component){
+	        	this.assertCounters(component, "0", "0", "1", "1", "1", "1");
+	        }]
+    },
+
+    testRerenderOnceForNonConcreteComponentsIfContainerRerenderedInEventLoop: {
+        attributes : { __layout: "#def" },
+        test: [function(component){
+	    		this.addWaitForLayoutItem(component, "def layout item");
+	        }, function(component){
+	        	var cmp = component;
+	        	var child2 = cmp.find("child2");
+	            var that = this;
+	            $A.run(function(){
+	            	that.toggleValue(cmp.find("greatgrandchild2").getSuper().getSuper(), "v.toggleInterface");
+	            	that.toggleValue(cmp.find("child2").getSuper(), "v.toggleParent");
+	            	that.toggleValue(cmp.find("grandchild2").getSuper().getSuper(), "v.toggleAbstract");
+	            });
+	            $A.test.addWaitFor("1", function(){
+	                return that.getCounter(child2);
+	            });
+	        }, function(component){
+	        	this.assertCounters(component, "0", "0", "1", "1", "1", "1");
+	        }]
+    },
+
+    testRerenderOnceForSetOfEnqueuedClientActions: {
+        attributes : { __layout: "#def" },
+        test: [function(component){
+	    		this.addWaitForLayoutItem(component, "def layout item");
+	        }, function(component){
+	            $A.enqueueAction(component.find("grandchild2").getSuper().get("c.toggleParent"));
+	            $A.enqueueAction(component.find("child2").getSuper().getSuper().get("c.toggleAbstract"));
+	            $A.enqueueAction(component.find("greatgrandchild2").getSuper().getSuper().get("c.toggleInterface"));
+	
+	            $A.run(function(){ /* run queued actions */ });
+	
+	            var child2 = component.find("child2");
+	            var that = this;
+	            $A.test.addWaitFor("1", function(){
+	                return that.getCounter(child2);
+	            });
+	        }, function(component){
+	        	this.assertCounters(component, "0", "0", "1", "1", "1", "1");
+	        }]
+    },
+
+    testRerenderOnceForSetOfEnqueuedClientActionCallbacks: {
+        attributes : { __layout: "#def", whichArray : "" },
+        test: [function(component){
+	    		this.addWaitForLayoutItem(component, "def layout item");
+	        }, function(component){
+	        	var cmp = component;
+	            var that = this;
+	        	var a1 = component.get("c.clear");
+	        	a1.setCallback(this, function(){
+	        		that.toggleValue(cmp.find("child2").getSuper().getSuper(), "v.toggleInterface");
+	        	});
+	        	$A.enqueueAction(a1);
+	        	var a2 = component.get("c.clear");
+	        	a2.setCallback(this, function(){
+	        		that.toggleValue(cmp.find("greatgrandchild2").getSuper(), "v.toggleParent");
+	        	});
+	        	$A.enqueueAction(a2);
+	        	var a3 = component.get("c.clear");
+	        	a3.setCallback(this, function(){
+	        		that.toggleValue(cmp.find("grandchild2").getSuper().getSuper(), "v.toggleAbstract");
+	        	});
+	        	$A.enqueueAction(a3);
+	        	
+	            $A.run(function(){ /* run queued actions */ });
+	
+	            var child2 = component.find("child2");
+	            var that = this;
+	            $A.test.addWaitFor("1", function(){
+	                return that.getCounter(child2);
+	            });
+	        }, function(component){
+	        	this.assertCounters(component, "0", "0", "1", "1", "1", "1");
+	        }]
     },
 
     /** Tests rerender ordering. */
     testRerenderOrder: {
         attributes : { __layout: "#def" },
         test: [function(component){
-            var child2 = component.find("child2");
-            var grandchild2a = component.find("grandchild2a");
-            var grandchild1 = component.find("grandchild1");
-            // Try to rerender all three of the above, but try to rerender grandchild2a
-            // before child2.  But rerender should insist on doing child2 before
-            // grandchild2a (and grandchild1 not in the middle, but before or after both).
-            Window.rerenderTestOrder = [];  // Reset order tracking
-            $A.rerender([grandchild2a, grandchild1, child2]);
-            this.addWaitForCounter(child2, "1");
-        }, function(component){
-            // Rerendering of child2 will also rerender grandchild2 (and 2a), thus:
-            this.assertCounters(component, "0", "1", "1", "1", "1", "1");
-            var order = Window.rerenderTestOrder;
-            if (order.length === 6) {
-                // When run commandline, we get an extra leading rerender that we don't count, and
-                // that we DON'T see running by hand.  Account for that here:
-                for (var j = 0; j < order.length; ++j) {
-                    if (order[j].indexOf("1:") === 0) {
-                        order.splice(j, 1);
-                        break;
-                    }
-                }
-            }
-            var child2 = component.find("child2");
-            var grandchild2 = component.find("grandchild2");
-            var greatgrandchild2 = component.find("greatgrandchild2");
-            var grandchild2a = component.find("grandchild2a");
-            var grandchild1 = component.find("grandchild1");
-            $A.test.assertEquals(5, order.length);
-            // We have two "legal" variations in rerender order: grandchild1 could
-            // be before or after grandchild2.
-            if (grandchild1.getGlobalId() === order[0]) {
-                $A.test.assertEquals(child2.getGlobalId(), order[1]);
-                if (grandchild2.getGlobalId() === order[2]) {
-                    $A.test.assertEquals(greatgrandchild2.getGlobalId(), order[3]);
-                    $A.test.assertEquals(grandchild2a.getGlobalId(), order[4]);
-                } else {
-                    $A.test.assertEquals(grandchild2a.getGlobalId(), order[2]);
-                    $A.test.assertEquals(grandchild2.getGlobalId(), order[3]);
-                    $A.test.assertEquals(greatgrandchild2.getGlobalId(), order[4]);
-                }
-            } else {
-                $A.test.assertEquals(child2.getGlobalId(), order[0]);
-                if (grandchild2.getGlobalId() === order[1]) {
-                    $A.test.assertEquals(greatgrandchild2.getGlobalId(), order[2]);
-                    $A.test.assertEquals(grandchild2a.getGlobalId(), order[3]);
-                } else {
-                    $A.test.assertEquals(grandchild2a.getGlobalId(), order[1]);
-                    $A.test.assertEquals(grandchild2.getGlobalId(), order[2]);
-                    $A.test.assertEquals(greatgrandchild2.getGlobalId(), order[3]);
-                }
-                $A.test.assertEquals(grandchild1.getGlobalId(), order[4]);
-            }
-        }]
+	    		this.addWaitForLayoutItem(component, "def layout item");
+	        }, function(component){
+	            var child2 = component.find("child2");
+	            var grandchild2a = component.find("grandchild2a");
+	            var grandchild1 = component.find("grandchild1");
+	            // Try to rerender all three of the above, but try to rerender grandchild2a
+	            // before child2.  But rerender should insist on doing child2 before
+	            // grandchild2a (and grandchild1 not in the middle, but before or after both).
+	            Window.rerenderTestOrder = [];  // Reset order tracking
+	            $A.rerender([grandchild2a, grandchild1, child2]);
+	            this.addWaitForCounter(child2, "1");
+	        }, function(component){
+	            // Rerendering of child2 will also rerender grandchild2 (and 2a), thus:
+	            this.assertCounters(component, "0", "1", "1", "1", "1", "1");
+	            var order = Window.rerenderTestOrder;
+	            var strOrder = order.join(",");
+	            if (strOrder != "grandchild1,def layout item,child2,grandchild2,greatgrandchild2,grandchild2a"
+	            	&& strOrder != "child2,grandchild2,greatgrandchild2,grandchild2a,grandchild1,def layout item") {
+	            	$A.test.fail("Unexpected rendering order: " + strOrder);
+	            }
+	        }]
     },
 
     /**
@@ -303,6 +353,8 @@
     _testAddComponentToEmptyArray: {
         attributes : { whichArray: "v.emptyArray" },
         test: [function(component){
+	    		this.addWaitForLayoutItem(component, "def layout item");
+	        }, function(component){
                 var cmp = component.find("emptyArrayContainer");
                 this.assertChildCounters(cmp, 0);
                 this.assertCounters(component, "0", "0", "0", "0", "0", "0");
@@ -328,6 +380,8 @@
     _testClearArray: {
         attributes : { whichArray: "v.emptyArray" },
         test: [function(component){
+	    		this.addWaitForLayoutItem(component, "def layout item");
+	        }, function(component){
                 component.find("pushText").get("e.press").fire();
                 component.find("pushComponent").get("e.press").fire();
                 $A.test.addWaitFor(true, function(){
@@ -361,6 +415,8 @@
     _testReverseArray: {
         attributes : { whichArray: "v.emptyArray" },
         test: [function(component){
+	    		this.addWaitForLayoutItem(component, "def layout item");
+	        }, function(component){
                 component.find("pushText").get("e.press").fire();
                 component.find("pushComponent").get("e.press").fire();
                 $A.test.addWaitFor(true, function(){
@@ -406,6 +462,8 @@
     _testClearBody: {
         attributes : { whichArray: "emptyArrayContainer.super.super.v.body" },
         test: [function(component){
+	    		this.addWaitForLayoutItem(component, "def layout item");
+	        }, function(component){
                 var cmp = component.find("emptyArrayContainer");
                 // quick check elements are alive by checking properties exist
                 $A.test.assertEquals("BUTTON", cmp.find("toggleChild").getElement().tagName.toUpperCase(), "unexpected child element");
@@ -439,6 +497,8 @@
     _testUpdateBody: {
         attributes : { whichArray: "emptyArrayContainer.super.v.body" },
         test: [function(component){
+	    		this.addWaitForLayoutItem(component, "def layout item");
+	        }, function(component){
                 var cmp = component.find("emptyArrayContainer");
                 var children = cmp.getElement().firstChild.firstChild.childNodes;
                 var origCount = children.length;

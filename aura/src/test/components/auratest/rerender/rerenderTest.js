@@ -47,16 +47,6 @@
         }
     },
 
-    assertPlaceholder: function(component) {
-        var body = component.get("v.body");
-        $A.test.assertEquals(1, body.length, "container should only have an expression.cmp");
-        $A.test.assertEquals("markup://aura:expression", body[0].getDef().getDescriptor().getQualifiedName(), "unexpected body component");
-        var element = body[0].getElements().element;
-        $A.test.assertEquals(true, (element !== null) && (element !== undefined), "placeholder is not alone");
-        $A.test.assertEquals(3, element.nodeType, "placeholder not a text node");
-        $A.test.assertEquals("", $A.test.getText(element), "placeholder isn't an empty string");
-    },
-
     addWaitForCounter : function(component, count) {
     	var that = this;
     	var cmp = component;
@@ -350,25 +340,21 @@
     /**
      * Add component to empty array.
      */
-    _testAddComponentToEmptyArray: {
+    testAddComponentToEmptyArray: {
         attributes : { whichArray: "v.emptyArray" },
         test: [function(component){
 	    		this.addWaitForLayoutItem(component, "def layout item");
 	        }, function(component){
                 var cmp = component.find("emptyArrayContainer");
                 this.assertChildCounters(cmp, 0);
-                this.assertCounters(component, "0", "0", "0", "0", "0", "0");
-                this.assertPlaceholder(cmp);
                 component.find("pushComponent").get("e.press").fire();
                 $A.test.addWaitFor("markup://auratest:rerenderChild", function(){
                     var added = cmp.get("v.body")[0].get("v.value")[0];
-                    return added.isRendered() && added.getDef().getDescriptor().getQualifiedName();
+                    return added && added.isRendered() && added.getDef().getDescriptor().getQualifiedName();
                 });
             }, function(component){
                 var cmp = component.find("emptyArrayContainer");
-                // all components rerendered since array belongs to root
                 this.assertChildCounters(cmp, 1);
-                this.assertCounters(component, "1", "1", "1", "1", "1", "1");
                 var added = cmp.get("v.body")[0].get("v.value")[0];
                 this.assertChildCounters(added, 0);
             }]
@@ -377,7 +363,7 @@
     /**
      * Clear an array.
      */
-    _testClearArray: {
+    testClearArray: {
         attributes : { whichArray: "v.emptyArray" },
         test: [function(component){
 	    		this.addWaitForLayoutItem(component, "def layout item");
@@ -390,22 +376,19 @@
                 });
             }, function(component){
                 var cmp = component.find("emptyArrayContainer");
-                // expecting both events above to get processed at once
-                this.assertChildCounters(cmp, "1");
-                this.assertCounters(component, "1", "1", "1", "1", "1", "1");
+                this.assertChildCounters(cmp, "2");
                 var added = cmp.get("v.body")[0].get("v.value")[1];
                 this.assertChildCounters(added, 0);
-                component.getValue("v.emptyArray").clear();
-                $A.rerender(component);
-                var suite = this;
+                var root = component;
+                $A.run(function(){
+                    root.getValue("v.emptyArray").clear();
+                });
                 $A.test.addWaitFor(0, function(){
                     return component.find("emptyArrayContainer").get("v.body")[0].get("v.value").length;
                 });
             }, function(component){
                 var cmp = component.find("emptyArrayContainer");
-                this.assertChildCounters(cmp, "2");
-                this.assertCounters(component, "2", "2", "2", "2", "2", "2");
-                this.assertPlaceholder(cmp);
+                this.assertChildCounters(cmp, "3");
             }]
     },
 
@@ -425,9 +408,7 @@
                 });
             }, function(component){
                 var cmp = component.find("emptyArrayContainer");
-                // expecting both events above to get processed at once
-                this.assertChildCounters(cmp, "1");
-                this.assertCounters(component, "1", "1", "1", "1", "1", "1");
+                this.assertChildCounters(cmp, "2");
 
                 // text comp before child comp
                 var textElem = cmp.get("v.body")[0].get("v.value")[0].getElement();
@@ -443,8 +424,7 @@
                 });
             }, function(component){
                 var cmp = component.find("emptyArrayContainer");
-                this.assertChildCounters(cmp, "2");
-                this.assertCounters(component, "2", "2", "2", "2", "2", "2");
+                this.assertChildCounters(cmp, "3");
 
                 // text comp now after child comp
                 var textElem = cmp.get("v.body")[0].get("v.value")[1].getElement();
@@ -459,7 +439,7 @@
     /**
      * Clear component body.
      */
-    _testClearBody: {
+    testClearBody: {
         attributes : { whichArray: "emptyArrayContainer.super.super.v.body" },
         test: [function(component){
 	    		this.addWaitForLayoutItem(component, "def layout item");
@@ -475,19 +455,17 @@
 
                 // clear the array
                 component.find("clear").get("e.press").fire();
-                $A.test.addWaitFor(true, function(){
-                    var elem = cmp.getElement().firstChild.firstChild;
-                    return (elem.nodeType === 3) && ($A.test.getText(elem) == ""); //wait for placeholder, instead of original div that just got unrendered at this position
+                $A.test.addWaitFor(8, function(){
+                    return cmp.getElement().firstChild.firstChild.nodeType; //wait for placeholder, instead of original div that just got unrendered at this position
                 });
             }, function(component){
                 var cmp = component.find("emptyArrayContainer");
 
                 // quick check that elements from original body components are no longer present
-                $A.test.assertEquals(undefined, cmp.find("toggleChild").getElement(), "child element wasn't unrendered");
-                $A.test.assertEquals(undefined, cmp.getSuper().find("toggleParent").getElement(), "parent element wasn't unrendered");
+                $A.test.assertEquals(null, cmp.find("toggleChild").getElement(), "child element wasn't unrendered");
+                $A.test.assertEquals(null, cmp.getSuper().find("toggleParent").getElement(), "parent element wasn't unrendered");
 
-                $A.test.assertEquals("1", $A.test.getText(cmp.getSuper().getSuper().find("counter").find("count").getElement()), "unexpected abstract count");
-                this.assertCounters(component, "0", "0", "0", "0", "0", "0");
+                this.assertCounter(cmp.getSuper().getSuper(), "1", "unexpected abstract count");
             }]
     },
 
@@ -516,9 +494,8 @@
                 $A.test.assertTrue($A.util.hasClass(children[0], "boxed"), "unexpected original child");
                 $A.test.assertEquals("PUSHED.", $A.test.getText(children[1]), "unexpected text component");
                 $A.test.assertTrue($A.util.hasClass(children[2], "auratestRerenderChild"), "unexpected child component element");
-                this.assertChildCounters(cmp, 1);
+                this.assertChildCounters(cmp, 2);
                 this.assertChildCounters(cmp.getSuper().get("v.body")[2], 0); // newly added child comp
-                this.assertCounters(component, "0", "0", "0", "0", "0", "0");
 
                 component.find("reverse").get("e.press").fire();
                 component.find("pop").get("e.press").fire();
@@ -538,7 +515,6 @@
                 $A.test.assertEquals("2", $A.test.getText(cmp.getSuper().find("counter").find("count").getElement()), "unexpected parent count");
                 $A.test.assertEquals(undefined, cmp.find("counter").find("count").getElement(), "child count not unrendered");
                 this.assertChildCounters(cmp.getSuper().get("v.body")[0], 1); // moved child comp
-                this.assertCounters(component, "0", "0", "0", "0", "0", "0");
             }]
     }
 })

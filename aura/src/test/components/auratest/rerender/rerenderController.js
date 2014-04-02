@@ -43,7 +43,7 @@
         var v = cmp.getValue(cmp.get("v.whichArray"));
         if (!v) { return; }
         var array = v.unwrap();
-        $A.componentService.newComponentAsyn(
+        $A.componentService.newComponentAsync(
             this,
             function (newcmp) {
                 array.push(newcmp);

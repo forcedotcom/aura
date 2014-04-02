@@ -100,7 +100,7 @@ var ComponentPriv = (function() { // Scoping priv
                         $A.log("Configs at error");
                         $A.log(config);
                         $A.log(partialConfig);
-                        $A.warning("Mismatch at " + this.globalId
+                        $A.error("Mismatch at " + this.globalId
                                 + " client expected " + configCD
                                 + " but got original " + partialConfigO
                                 + " providing " + partialConfigCD + " from server "
@@ -111,7 +111,7 @@ var ComponentPriv = (function() { // Scoping priv
                         $A.log("Configs at error");
                         $A.log(config);
                         $A.log(partialConfig);
-                        $A.warning("Mismatch at " + this.globalId
+                        $A.error("Mismatch at " + this.globalId
                                 + " client expected " + configCD + " but got "
                                 + partialConfigCD + " from server "
                                 +" for creationPath = "+this.creationPath);

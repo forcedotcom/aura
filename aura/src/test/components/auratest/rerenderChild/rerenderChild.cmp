@@ -18,6 +18,9 @@
 <aura:component extends="auratest:rerenderParent">
     <aura:attribute name="title" type="String"/>
     <aura:attribute name="toggleChild" type="Boolean"/>
+    <aura:attribute name="toggleDummy" type="Boolean"/>
+
+    <aura:handler name="change" value="{!v.toggleChild}" action="{!c.toggleDummy}"/>
 
     <div class="boxed">
         <ui:outputText value="{!v.title}" aura:id="title"/>

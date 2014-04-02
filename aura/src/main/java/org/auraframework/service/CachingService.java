@@ -24,8 +24,7 @@ import org.auraframework.builder.CacheBuilder;
 import org.auraframework.cache.Cache;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
-import org.auraframework.system.DependencyEntry;
-import org.auraframework.system.SourceListener;
+import org.auraframework.system.*;
 import org.auraframework.system.SourceListener.SourceMonitorEvent;
 
 import com.google.common.base.Optional;
@@ -65,11 +64,14 @@ public interface CachingService extends AuraService {
     
     Cache<String, Set<String>>  getClientLibraryUrlsCache();
 	
-	Lock getReadLock();
+    Cache<DefDescriptor.DescriptorKey, DefDescriptor<? extends Definition>> getDefDescriptorByNameCache();
+
+    Lock getReadLock();
 	
 	Lock getWriteLock();
 	
 	void notifyDependentSourceChange(
 			Collection<WeakReference<SourceListener>> listeners,
 			DefDescriptor<?> source, SourceMonitorEvent event, String filePath);
+
 }

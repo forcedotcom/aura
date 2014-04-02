@@ -43,6 +43,45 @@ public interface DefDescriptor<T extends Definition> extends JsonSerializable,
 	public static final String COMPOUND_PREFIX = "compound";
 	public static final String JAVA_PREFIX = "java";
 
+    public static final class DescriptorKey {
+        private final String name;
+        private final Class<? extends Definition> clazz;
+
+        public DescriptorKey(String name, Class<? extends Definition> clazz) {
+            // FIXME: this case flattening would remove the extra copies of
+            // definitions.
+            // If we go case sensitive, we won't want it though.
+            // this.qualifiedName = qualifiedName.toLowerCase();
+            this.name = name;
+            this.clazz = clazz;
+        }
+
+        @Override
+        public int hashCode() {
+            return this.getName().hashCode() + this.getClazz().hashCode();
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (!(obj instanceof DescriptorKey)) {
+                return false;
+            }
+            DescriptorKey dk = (DescriptorKey) obj;
+            return dk.getClazz().equals(this.getClazz()) && dk.getName().equals(this.getName());
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public Class<? extends Definition> getClazz() {
+            return clazz;
+        }
+    }
+    
 	public static enum DefType {
 		ATTRIBUTE(AttributeDef.class), //
 		APPLICATION(ApplicationDef.class), //
@@ -71,8 +110,9 @@ public interface DefDescriptor<T extends Definition> extends JsonSerializable,
 		NAMESPACE(NamespaceDef.class),
         RESOURCE(ResourceDef.class);
 
+		
 		private static Map<Class<? extends Definition>, DefType> defTypeMap;
-
+		
 		private final Class<? extends Definition> clz;
 
 		private DefType(Class<? extends Definition> clz) {

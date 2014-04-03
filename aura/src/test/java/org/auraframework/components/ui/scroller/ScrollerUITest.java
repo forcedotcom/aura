@@ -113,7 +113,9 @@ public class ScrollerUITest extends WebDriverTestCase{
     }
     
     private void startFlick(int xOffset, int yOffset){
-    	int yOffsetByDevice = 0;
+    	//for iPhone
+    	int yOffsetByDevice = yOffset;
+    	
     	if(this.getBrowserType() == BrowserType.IPAD){
     		yOffsetByDevice = yOffset * 2;
     	}

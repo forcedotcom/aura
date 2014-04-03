@@ -25,8 +25,11 @@
     <aura:attribute name="value" type="Date" description="A date corresponding to a calendar day in the format yyyy-mm-dd."/>
     <aura:attribute name="visible" type="Boolean" default="false" description="Indicates if the date picker is displayed. Defaults to false, which hides the date picker."/>
     <aura:attribute name="_yearListInitialized" type="Boolean" default="false" description="Indicates if the year list is initialized or not."/>
+    <aura:attribute name="managed" type="Boolean" default="false" description="Indicates whether this component is managed by ui:datePickerManager."/>
+
     <aura:registerevent name="selectDate" type="ui:selectDate" description="The event fired when a date is selected."/>
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+
     <div aura:id="datePicker" class="{!v.class + (v.visible == true ? ' visible' : '') + ($Browser.isPhone == true ? ' phone' : '')}">
         <div class="scroller" aura:id="scroller">
             <aura:if isTrue="{!v.hasTime}">

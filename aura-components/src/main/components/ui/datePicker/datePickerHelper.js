@@ -267,8 +267,10 @@
         var elem = divCmp ? divCmp.getElement() : null;
         var visible = component.get("v.visible");
         var viewPort = $A.util.getWindowSize();
+
         if (elem && visible) {
             var isPhone = $A.get("$Browser.isPhone");
+            
             if (isPhone === true) {
                 this.attachToDocumentBody(component);
                 var scrollerDivCmp = component.find("scroller");
@@ -282,11 +284,12 @@
                     }
                 }
             } else {
-                elem.style.top = "auto";
                 var elemRect = elem.getBoundingClientRect();
+                
                 if (elemRect.bottom > viewPort.height) { // no enough space below
                     elem.style.top = 0 - (elemRect.bottom - viewPort.height) + "px"; // Move it up a bit
-                } else {
+                } 
+                else {
                     elem.style.top = "auto"; 
                 }
             }

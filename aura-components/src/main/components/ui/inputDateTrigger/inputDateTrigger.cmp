@@ -1,0 +1,4 @@
+<aura:component extends="ui:inputDate">
+	<aura:set attribute="displayDatePicker" value="true"/>
+	<aura:set attribute="loadDatePicker" value="false"/>
+</aura:component>

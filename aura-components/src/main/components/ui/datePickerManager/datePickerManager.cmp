@@ -1,0 +1,5 @@
+<aura:component>	
+	<aura:handler event="ui:showDatePicker" action="{!c.handleShowDatePicker}"/>
+
+	<ui:datePicker aura:id="datePicker" managed="true" selectDate="{!c.handleDateSelected}"/>
+</aura:component>

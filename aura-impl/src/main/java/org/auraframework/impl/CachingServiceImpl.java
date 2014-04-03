@@ -19,19 +19,15 @@ import java.lang.ref.WeakReference;
 import java.util.Collection;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.locks.*;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 import org.apache.log4j.Logger;
 import org.auraframework.Aura;
 import org.auraframework.builder.CacheBuilder;
 import org.auraframework.cache.Cache;
-import org.auraframework.def.ApplicationDef;
-import org.auraframework.def.ComponentDef;
-import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.*;
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.def.Definition;
 import org.auraframework.impl.cache.CacheImpl;
 import org.auraframework.service.CachingService;
 import org.auraframework.service.DefinitionService;
@@ -56,14 +52,15 @@ public class CachingServiceImpl implements CachingService {
 		return new CacheImpl.Builder<K, T>();
 	}
 
-	private final org.auraframework.cache.Cache<DefDescriptor<?>, Boolean> existsCache;
-	private final org.auraframework.cache.Cache<DefDescriptor<?>, Optional<? extends Definition>> defsCache;
-	private final org.auraframework.cache.Cache<String, String> stringsCache;
-	private final org.auraframework.cache.Cache<String, Set<DefDescriptor<?>>> descriptorFilterCache;
-	private final org.auraframework.cache.Cache<String, DependencyEntry> depsCache;
-	private final org.auraframework.cache.Cache<String, String> clientLibraryOutputCache;
-	private final org.auraframework.cache.Cache<String, Set<String>> clientLibraryUrlsCache;
-
+	private final Cache<DefDescriptor<?>, Boolean> existsCache;
+	private final Cache<DefDescriptor<?>, Optional<? extends Definition>> defsCache;
+	private final Cache<String, String> stringsCache;
+	private final Cache<String, Set<DefDescriptor<?>>> descriptorFilterCache;
+	private final Cache<String, DependencyEntry> depsCache;
+	private final Cache<String, String> clientLibraryOutputCache;
+	private final Cache<String, Set<String>> clientLibraryUrlsCache;
+	private final Cache<DefDescriptor.DescriptorKey, DefDescriptor<? extends Definition>> defDescriptorByNameCache;
+	
 	private static final Logger logger = Logger
 			.getLogger(CachingServiceImpl.class);
 
@@ -105,6 +102,12 @@ public class CachingServiceImpl implements CachingService {
 				.setMaximumSize(CLIENT_LIB_CACHE_SIZE).setSoftValues(true)
 				.setRecordStats(true).build();
 
+		defDescriptorByNameCache = 
+	            this.<DefDescriptor.DescriptorKey, DefDescriptor<? extends Definition>>getCacheBuilder()
+	            .setInitialSize(512)
+	            .setMaximumSize(1024 * 10)
+	            .setConcurrencyLevel(20)
+	            .build();
 	}
 
 	@Override
@@ -142,6 +145,12 @@ public class CachingServiceImpl implements CachingService {
 		return clientLibraryUrlsCache;
 	}
 
+	   @Override
+	    public final Cache<DefDescriptor.DescriptorKey, DefDescriptor<? extends Definition>> 
+	         getDefDescriptorByNameCache() {
+	        return defDescriptorByNameCache;
+	    }
+	
 	@Override
 	public Lock getReadLock() {
 		return rwLock.readLock();

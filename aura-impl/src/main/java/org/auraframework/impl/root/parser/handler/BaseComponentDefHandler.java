@@ -114,7 +114,7 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef> extend
             builder.getAttributeDefs().put(attributeDef.getDescriptor(),
                     attributeDef);
         } else if (RegisterEventHandler.TAG.equalsIgnoreCase(tag)) {
-            RegisterEventDefImpl regDef = new RegisterEventHandler(xmlReader,
+            RegisterEventDefImpl regDef = new RegisterEventHandler<T>(this, xmlReader,
                     source).getElement();
             if (builder.events.containsKey(regDef.getAttributeName())) {
                 error("Multiple events registered with name %s on tag %s",

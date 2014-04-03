@@ -110,14 +110,14 @@ public class DefinitionAccessImplTest extends AuraImplTestCase {
                 "org.auraframework.test.TestAccessMethods.allowAuthenticated", //Return type is not Access
                 "java://org.auraframework.test.TestAccessMethods.allowGlobal",
                 "org.auraframework.test.TestAccessMethods.nonStaticMethod",
-                //"org.auraframework.test.TestAccessMethods.allowGlobal, org.auraframework.test.TestAccessMethods.allowPrivate", W-2107455, takes the last one
+                "org.auraframework.test.TestAccessMethods.allowGlobal, org.auraframework.test.TestAccessMethods.allowPrivate",
                 "org.auraframework.test.TestAccessMethods.lostSoul",
                 "org.auraframework.test.LostParent.lostSoul",
                 })
         {
             try{
                 definitionParser.parseAccess(null, s);
-                fail("Should have failed cause this access method is unusable :"+ s);
+                fail("Should have failed because this access method is unusable :"+ s);
             }catch(InvalidAccessValueException expected){
                 //Expected
             }

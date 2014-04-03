@@ -3,9 +3,9 @@
             var button = cmp.find("button1");
             var mark="ui button label change time";
             //Set the text value in the ui:outputText component
-             $A.mark(mark);
+             $A.Perf.mark(mark);
               button.getValue("v.label").setValue("clicked");
-             $A.endMark(mark);
+             $A.Perf.endMark(mark);
 	}
 
 })

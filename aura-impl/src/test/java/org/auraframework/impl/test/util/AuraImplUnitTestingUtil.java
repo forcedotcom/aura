@@ -53,6 +53,7 @@ import org.auraframework.def.StyleDef;
 import org.auraframework.def.ThemeDef;
 import org.auraframework.def.TypeDef;
 import org.auraframework.expression.PropertyReference;
+import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.clientlibrary.ClientLibraryDefImpl;
 import org.auraframework.impl.root.AttributeDefImpl;
 import org.auraframework.impl.root.AttributeDefRefImpl;
@@ -76,6 +77,7 @@ import org.auraframework.instance.Component;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.Location;
 import org.auraframework.system.SubDefDescriptor;
+import org.auraframework.throwable.quickfix.InvalidAccessValueException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
@@ -939,7 +941,13 @@ public class AuraImplUnitTestingUtil {
             builder.setDescriptor(eventDescriptor == null ? getEventDefDescriptor()
                             : eventDescriptor);
             builder.setAttName("fakey");
-            builder.setIsGlobal(isGlobal);
+            DefinitionAccessImpl access;
+			try {
+				access = new DefinitionAccessImpl(null, isGlobal ? "global" : "public");
+			} catch (InvalidAccessValueException e) {
+				access = null;
+			}
+			builder.setAccess(access);
             builder.setLocation((location == null) ? getLocation() : location);
             return builder.build();
     }
@@ -951,7 +959,13 @@ public class AuraImplUnitTestingUtil {
             RegisterEventDefImpl.Builder builder = new RegisterEventDefImpl.Builder();
             builder.setDescriptor(eventDescriptor);
             builder.setAttName("fakey");
-            builder.setIsGlobal(isGlobal);
+            DefinitionAccessImpl access;
+			try {
+				access = new DefinitionAccessImpl(null, isGlobal ? "global" : "public");
+			} catch (InvalidAccessValueException e) {
+				access = null;
+			}
+            builder.setAccess(access);
             builder.setLocation((location == null) ? getLocation() : location);
             return builder.build();
     }

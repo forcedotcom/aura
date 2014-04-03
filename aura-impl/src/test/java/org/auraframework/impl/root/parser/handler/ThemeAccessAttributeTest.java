@@ -22,12 +22,16 @@ public class ThemeAccessAttributeTest extends BaseAccessAttributeTest {
 		testResource = TestResource.Theme;
 	}
 	
-	// Stub out non-sensical combination (Themes not supported in custom, non-privileged, namespaces at this time)
+	// Stub out nonsensical combination (Themes not supported in custom, non-privileged, namespaces at this time)
 
 	@Override
 	public void testSimpleAccessDynamicInCustomNamespace() throws Exception {
 	}
 
+	@Override
+	public void testSimpleAccessInCustomNamespace() throws Exception {
+	}
+	
 	@Override
 	public void testCombinationAccessInCustomNamespace() throws Exception {
 	}
@@ -48,17 +52,4 @@ public class ThemeAccessAttributeTest extends BaseAccessAttributeTest {
 	public void testAccessAuthenticationInCustomNamespace() throws Exception {
 	}
 	
-		
-	// Remove these when bugs are fixed.
-	@Override
-	public void testSimpleAccessInSystemNamespace() throws Exception {		
-	}
-
-	@Override
-	public void testSimpleAccessDynamicInSystemNamespace() throws Exception {		
-	}
-	
-	@Override
-	public void testSimpleAccessInCustomNamespace() throws Exception {		
-	}
 }

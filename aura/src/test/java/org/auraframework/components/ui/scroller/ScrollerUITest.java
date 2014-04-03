@@ -113,7 +113,11 @@ public class ScrollerUITest extends WebDriverTestCase{
     }
     
     private void startFlick(int xOffset, int yOffset){
-		new TouchActions(driver).flick(xOffset, yOffset).build().perform();
+    	int yOffsetByDevice = 0;
+    	if(this.getBrowserType() == BrowserType.IPAD){
+    		yOffsetByDevice = yOffset * 2;
+    	}
+		new TouchActions(driver).flick(xOffset, yOffsetByDevice).build().perform();
 	}
     
     private void augmentDriver(){
@@ -132,17 +136,17 @@ public class ScrollerUITest extends WebDriverTestCase{
     
     private boolean verifyIfElementInViewport(String elementId){
     	String expressionFn = "window.isElementInViewport = function(el) {" +
-    	    "var rect = el.getBoundingClientRect();" +
-    	    "if(!rect) {" +
+    		"if(!el) {" +
     	    	"return false;" +
     	    "}" +
+    		"var rect = el.getBoundingClientRect();" +
     	    "return (" +
     	        "rect.top >= 0 &&" +
     	        "rect.left >= 0 &&"+
     	        "rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&"+
     	        "rect.right <= (window.innerWidth || document.documentElement.clientWidth)"+
     	    ");" +
-    	"}";
+    	"};";
     	String expression = "return window.isElementInViewport(document.getElementById('"+elementId+"'));";
     	
     	((JavascriptExecutor) driver).executeScript(expressionFn);

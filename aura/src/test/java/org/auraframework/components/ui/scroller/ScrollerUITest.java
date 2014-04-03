@@ -137,7 +137,7 @@ public class ScrollerUITest extends WebDriverTestCase{
     private boolean verifyIfElementInViewport(String elementId){
     	String expressionFn = "window.isElementInViewport = function(el) {" +
     		"if(!el) {" +
-    	    	"return false;" +
+    	    	"return 'Element was not found in the DOM.';" +
     	    "}" +
     		"var rect = el.getBoundingClientRect();" +
     	    "return (" +

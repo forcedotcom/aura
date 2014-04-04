@@ -28,6 +28,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.InterfaceDef;
+import org.auraframework.def.LibraryDef;
 import org.auraframework.def.TestSuiteDef;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Annotations.AuraEnabled;
@@ -48,6 +49,7 @@ public class TopicsModel {
     private final List<Node> components;
     private final List<Node> interfaces;
     private final List<Node> events;
+    private final List<Node> librariesList;
     private final List<Node> tests;
 
     public TopicsModel() throws QuickFixException {
@@ -56,6 +58,7 @@ public class TopicsModel {
         components = makeNodes("markup", ComponentDef.class);
         interfaces = makeNodes("markup", InterfaceDef.class);
         events = makeNodes("markup", EventDef.class);
+        librariesList = makeNodes("markup", LibraryDef.class);
         tests = makeNodes("js", TestSuiteDef.class);
     }
 
@@ -100,6 +103,11 @@ public class TopicsModel {
     @AuraEnabled
     public List<Node> getEvents() {
         return this.events;
+    }
+    
+    @AuraEnabled
+    public List<Node> getLibraries() {
+        return this.librariesList;
     }
 
     @AuraEnabled

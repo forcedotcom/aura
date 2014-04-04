@@ -41,6 +41,7 @@ public class FileSourceListener implements FileListener {
         extensions.put(DefDescriptor.DefType.APPLICATION, ".app");
         extensions.put(DefDescriptor.DefType.COMPONENT, ".cmp");
         extensions.put(DefDescriptor.DefType.EVENT, ".evt");
+        extensions.put(DefDescriptor.DefType.LIBRARY, ".lib");
         extensions.put(DefDescriptor.DefType.INTERFACE, ".intf");
         extensions.put(DefDescriptor.DefType.STYLE, ".css");
         extensions.put(DefDescriptor.DefType.LAYOUTS, "Layouts.xml");

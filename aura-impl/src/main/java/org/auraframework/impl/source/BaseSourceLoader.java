@@ -39,6 +39,7 @@ public abstract class BaseSourceLoader implements SourceLoader {
         extensions.put(DefType.APPLICATION, ".app");
         extensions.put(DefType.COMPONENT, ".cmp");
         extensions.put(DefType.EVENT, ".evt");
+        extensions.put(DefType.LIBRARY, ".lib");
         extensions.put(DefType.INTERFACE, ".intf");
         extensions.put(DefType.STYLE, ".css");
         extensions.put(DefType.LAYOUTS, "Layouts.xml");

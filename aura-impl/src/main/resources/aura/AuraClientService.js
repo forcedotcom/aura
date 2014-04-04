@@ -128,6 +128,13 @@ var AuraClientService = function() {
             }
             $A.Perf.endMark("Registered Events [" + evtConfigs.length + "]");
 
+            var libraryConfigs = aura.util.json.resolveRefs(config["libraryDefs"]);
+            $A.Perf.mark("Registered Libraries [" + libraryConfigs.length + "]");
+            for (j = 0; j < libraryConfigs.length; j++) {
+                componentService.getLibraryDef(libraryConfigs[j]);
+            }
+            $A.Perf.endMark("Registered Libraries [" + libraryConfigs.length + "]");
+            
             var controllerConfigs = aura.util.json.resolveRefs(config["controllerDefs"]);
             $A.Perf.mark("Registered Controllers [" + controllerConfigs.length + "]");
             for (j = 0; j < controllerConfigs.length; j++) {

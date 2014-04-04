@@ -1,0 +1,5 @@
+<aura:library>
+    <aura:include name="Dependency" />
+    <aura:include name="TestInclude" imports="Dependency" />
+    <aura:include name="tp" exports="tp" />
+</aura:library>

@@ -72,7 +72,11 @@
         <auradocs:stretchEditorPanel title="Source" descriptor="{!v.descriptor}" defType="{!v.defType}"/>
 
         <aura:forEach items="{!m.defs}" var="def">
-            <auradocs:stretchEditorPanel title="{!def.name}" descriptor="{!def.descriptor}" defType="{!def.defType}"/>
+            <auradocs:stretchEditorPanel title="{!def.name}" descriptor="{!def.descriptor}" defType="{!def.defType}" includeDefName="{! def.includeDefName}"/>
+        </aura:forEach>
+        
+        <aura:forEach items="{!m.includeDefs}" var="def">
+            <auradocs:stretchEditorPanel title="{!def.includeDefName + '.js'}" descriptor="{!def.descriptor}" defType="{!def.defType}" includeDefName="{! def.includeDefName}"/>
         </aura:forEach>
 
         <auradocs:stretchTab title="Dependencies">

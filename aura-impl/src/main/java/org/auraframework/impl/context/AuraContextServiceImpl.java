@@ -149,7 +149,7 @@ public class AuraContextServiceImpl implements ContextService {
         }
         return ret.toArray(new DefRegistry[ret.size()]);
     }
-
+    
     private Map<ValueProviderType, GlobalValueProvider> getGlobalProviders() {
         // load any @Primary GlobalValueProviderAdatper first, to give it's
         // implementations precedence

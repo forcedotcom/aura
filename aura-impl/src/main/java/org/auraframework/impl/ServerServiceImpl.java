@@ -31,6 +31,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.EventDef;
+import org.auraframework.def.LibraryDef;
 import org.auraframework.def.StyleDef;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.Event;
@@ -206,6 +207,12 @@ public class ServerServiceImpl implements ServerService {
             sb.append("eventDefs:");
             Collection<EventDef> events = filterAndLoad(EventDef.class, dependencies, null);
             Aura.getSerializationService().writeCollection(events, EventDef.class, sb, "JSON");
+            sb.append(",");
+
+            // append library definitions
+            sb.append("libraryDefs:");
+            Collection<LibraryDef> libraries = filterAndLoad(LibraryDef.class, dependencies, null);
+            Aura.getSerializationService().writeCollection(libraries, LibraryDef.class, sb, "JSON");
             sb.append(",");
 
             //

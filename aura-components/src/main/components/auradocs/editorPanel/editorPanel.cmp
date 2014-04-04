@@ -19,6 +19,7 @@
     <aura:attribute name="title" type="String" required="true"/>
     <aura:attribute name="descriptor" type="String" required="true"/>
     <aura:attribute name="defType" type="String" default="Component"/>
+    <aura:attribute name="includeDefName" type="String" required="false"/>
     <aura:attribute name="region" type="String" default="center"/>
     <aura:registerevent name="open" type="auradocs:openDef"/>
 

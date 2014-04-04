@@ -272,6 +272,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             case COMPONENT:
             case INTERFACE:
             case EVENT:
+            case LIBRARY:
             case DOCUMENTATION:
             case LAYOUTS:
             case NAMESPACE:

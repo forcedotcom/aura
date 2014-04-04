@@ -18,7 +18,9 @@ Function.RegisterNamespace("Test.Aura");
 [Fixture]
 Test.Aura.AuraComponentServiceTest = function(){
     var $A = {
-        ns : {},
+        ns : {
+            "LibraryDefRegistry": function(){}
+        },
         assert: function(condition, message) {
             if (!condition) {
                 var error = new Error(message);

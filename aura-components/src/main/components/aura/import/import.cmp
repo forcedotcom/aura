@@ -1,0 +1,26 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component support="BETA" description="Allows a component to import reusable Javascript library modules. Imported modules are attached to the component's helper.">
+    <aura:import library="aura:library" property="importedLibrary" />
+    <aura:handler name="init" value="this" action="{!c.initialize}"/>
+    
+	<aura:attribute name="library" type="String" required="true" access="GLOBAL" description="The location of the Javascript library to import in the form namespace:libraryName."/>
+	<aura:attribute name="property" type="String" required="true" access="GLOBAL" description="Specifies the property name where the imported library code will be attached to the component's helper."/>
+	<aura:attribute name="body" type="Aura.Component[]" required="false" access="GLOBAL" description="aura:import tags do not support any body markup " />
+	
+</aura:component>

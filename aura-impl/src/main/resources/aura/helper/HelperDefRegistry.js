@@ -30,9 +30,10 @@ HelperDefRegistry.prototype.auraType = "HelperDefRegistry";
  * @param {Object} componentDefDescriptor Required. The descriptor for the componentDef object.
  * @param {Object} config Passes in a config, a HelperDef, or the name of a HelperDef.
  * @param {ComponentDef} componentDef If provided, resolves the HelperDefs in the component's hierarchy.
+ * @param {Object} mapping of imports to library definitions.
  * @returns {HelperDef} HelperDef instance or config after adding to the registry
  */
-HelperDefRegistry.prototype.getDef = function(componentDefDescriptor, config, componentDef){
+HelperDefRegistry.prototype.getDef = function(componentDefDescriptor, config, componentDef, libraries){
     aura.assert(componentDefDescriptor, "ComponentDef Descriptor is required");
     var ret = this.helperDefs[componentDefDescriptor];
     if(!ret && componentDef){
@@ -42,7 +43,7 @@ HelperDefRegistry.prototype.getDef = function(componentDefDescriptor, config, co
             superHelper = zuper.getHelper();
         }
         if (config || superHelper) {
-            ret = new HelperDef(config || {}, superHelper);
+            ret = new HelperDef(config || {}, superHelper, libraries);
             this.helperDefs[componentDefDescriptor] = ret;
         }
     }

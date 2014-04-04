@@ -53,6 +53,14 @@ public interface BaseComponentDef extends RootDefinition {
      * @throws QuickFixException
      */
     Collection<EventHandlerDef> getHandlerDefs() throws QuickFixException;
+    
+    /**
+     * Get the library import statements for the component.
+     * 
+     * @return all library requirements on this component, including those inherited
+     * @throws QuickFixException
+     */
+	Collection<ImportDef> getImportDefs() throws QuickFixException;
 
     DefDescriptor<ModelDef> getLocalModelDefDescriptor();
 

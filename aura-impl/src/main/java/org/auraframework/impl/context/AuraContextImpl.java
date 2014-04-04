@@ -205,6 +205,7 @@ public class AuraContextImpl implements AuraContext {
                 if (defMap.size() > 0) {
                     List<Definition> componentDefs = Lists.newArrayList();
                     List<Definition> eventDefs = Lists.newArrayList();
+                    List<Definition> libraryDefs = Lists.newArrayList();
 
                     for (Map.Entry<DefDescriptor<? extends Definition>, Definition> entry : defMap.entrySet()) {
                         DefDescriptor<? extends Definition> desc = entry.getKey();
@@ -219,11 +220,14 @@ public class AuraContextImpl implements AuraContext {
                                 componentDefs.add(d);
                             } else if (DefType.EVENT.equals(dt)) {
                                 eventDefs.add(d);
+                            } else if (DefType.LIBRARY.equals(dt)) {
+                                libraryDefs.add(d);
                             }
                         }
                     }
                     writeDefs(json, "componentDefs", componentDefs);
                     writeDefs(json, "eventDefs", eventDefs);
+                    writeDefs(json, "libraryDefs", libraryDefs);
                 }
                 ctx.serializeAsPart(json);
             }
@@ -385,11 +389,11 @@ public class AuraContextImpl implements AuraContext {
         return currentCaller;
     }
 
-	@Override
-	public String getCurrentNamespace() {
+    @Override
+    public String getCurrentNamespace() {
         DefDescriptor<?> caller = getCurrentCaller();
         return caller != null ? caller.getNamespace() : null;
-	}
+    }
 
     @Override
     public String getDefaultPrefix(DefType defType) {

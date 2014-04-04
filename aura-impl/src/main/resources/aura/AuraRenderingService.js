@@ -33,8 +33,8 @@ var AuraRenderingService = function AuraRenderingService(){
             if (priv.needsCleaning) {
                 var num = aura.getContext().incrementRender();
                 var initialMarkName = "Rerendering-" + num;
-                $A.mark(initialMarkName);
-                $A.mark("Fired aura:doneRendering event");
+                $A.Perf.mark(initialMarkName);
+                $A.Perf.mark("Fired aura:doneRendering event");
                 priv.needsCleaning = false;
 
                 //#if {"modes" : ["STATS"]}
@@ -83,9 +83,9 @@ var AuraRenderingService = function AuraRenderingService(){
 	                //#end
                 }
                 
-                $A.endMark(initialMarkName);
+                $A.Perf.endMark(initialMarkName);
                 $A.get("e.aura:doneRendering").fire();
-                $A.endMark("Fired aura:doneRendering event");
+                $A.Perf.endMark("Fired aura:doneRendering event");
                 
                 // update the mark info after the fact to avoid unnecessary hits early to get cmp info
                 // #if {"modes" : ["PTEST"]}
@@ -100,7 +100,7 @@ var AuraRenderingService = function AuraRenderingService(){
                         }
                     }
                     markDescription += "]";
-                    $A.updateMarkName(initialMarkName, markDescription);
+                    $A.Perf.updateMarkName(initialMarkName, markDescription);
                 // #end
             }
         },

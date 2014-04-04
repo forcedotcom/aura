@@ -17,8 +17,7 @@
 
 // //#exportSymbols $A.ns.Aura
 $A.ns.Aura.prototype["initAsync"] = $A.ns.Aura.prototype.initAsync;
-$A.ns.Aura.prototype["initConfig"] = $A.ns.Aura.prototype.initConfig;
-$A.ns.Aura.prototype["init"] = $A.ns.Aura.prototype.init;
+$A.ns.Aura.prototype["initConfig"] = $A.ns.Aura.prototype.initConfig;   
 $A.ns.Aura.prototype["error"] = $A.ns.Aura.prototype.error;
 $A.ns.Aura.prototype["warning"] = $A.ns.Aura.prototype.warning;
 $A.ns.Aura.prototype["message"] = $A.ns.Aura.prototype.message;
@@ -35,22 +34,20 @@ $A.ns.Aura.prototype["log"] = $A.ns.Aura.prototype.log;
 $A.ns.Aura.prototype["logf"] = $A.ns.Aura.prototype.logf;
 $A.ns.Aura.prototype["trace"] = $A.ns.Aura.prototype.trace;
 $A.ns.Aura.prototype["getGlobalValueProviders"] = $A.ns.Aura.prototype.getGlobalValueProviders;
-$A.ns.Aura.prototype["mark"] = $A.ns.Aura.prototype.mark;
-$A.ns.Aura.prototype["endMark"] = $A.ns.Aura.prototype.endMark;
-$A.ns.Aura.prototype["startTransaction"] = $A.ns.Aura.prototype.startTransaction;
-$A.ns.Aura.prototype["endTransaction"] = $A.ns.Aura.prototype.endTransaction;
-$A.ns.Aura.prototype["pageReady"] = $A.ns.Aura.prototype.pageReady;
-$A.ns.Aura.prototype["updateTransaction"] = $A.ns.Aura.prototype.updateTransaction;
-$A.ns.Aura.prototype["toJson"] = $A.ns.Aura.prototype.toJson;
-$A.ns.Aura.prototype["setBeaconData"] = $A.ns.Aura.prototype.setBeaconData;
-$A.ns.Aura.prototype["getBeaconData"] = $A.ns.Aura.prototype.getBeaconData;
-$A.ns.Aura.prototype["clearBeaconData"] = $A.ns.Aura.prototype.clearBeaconData;
-$A.ns.Aura.prototype["removeStats"] = $A.ns.Aura.prototype.removeStats;
-$A.ns.Aura.prototype["onLoadFired"] = $A.ns.Aura.prototype.onLoadFired;
-$A.ns.Aura.prototype["logLevel"] = $A.ns.Aura.prototype.logLevel;
 $A.ns.Aura.prototype["fitTo"] = $A.ns.Aura.prototype.fitTo;
-$A.ns.Aura.prototype["updateMarkName"] = $A.ns.Aura.prototype.updateMarkName;
+// Perf
 $A.ns.Aura.prototype["Perf"] = $A.ns.Aura.prototype.Perf;
+$A.ns.Aura.prototype["mark"] = $A.ns.Aura.prototype.Perf.mark;
+$A.ns.Aura.prototype["endMark"] = $A.ns.Aura.prototype.Perf.endMark;
+$A.ns.Aura.prototype["startTransaction"] = $A.ns.Aura.prototype.Perf.startTransaction;
+$A.ns.Aura.prototype["endTransaction"] = $A.ns.Aura.prototype.Perf.endTransaction;
+$A.ns.Aura.prototype["updateTransaction"] = $A.ns.Aura.prototype.Perf.updateTransaction;
+$A.ns.Aura.prototype["toJson"] = $A.ns.Aura.prototype.Perf.toJson;
+$A.ns.Aura.prototype["setBeaconData"] = $A.ns.Aura.prototype.Perf.setBeaconData;
+$A.ns.Aura.prototype["getBeaconData"] = $A.ns.Aura.prototype.Perf.getBeaconData;
+$A.ns.Aura.prototype["clearBeaconData"] = $A.ns.Aura.prototype.Perf.clearBeaconData;
+$A.ns.Aura.prototype["removeStats"] = $A.ns.Aura.prototype.Perf.removeStats;
+$A.ns.Aura.prototype["isLoadFired"] = $A.ns.Aura.prototype.Perf.isLoadFired;
 // //#end
 
 //#if {"excludeModes" : ["PRODUCTION"]}

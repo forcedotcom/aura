@@ -153,10 +153,12 @@ Test.Aura.Component.ComponentDefRegistryTest = function() {
 			throw error;
 		    }
 	    },
-	    mark : function() {
-	    },
-	    endMark : function() {
-	    }
+        Perf: {
+            mark: function () {
+            },
+            endMark: function () {
+            }
+        }
 	});
         var mockComponentDef = Mocks.GetMock(Object.Global(), "$A", {
                 ns : {
@@ -185,9 +187,11 @@ Test.Aura.Component.ComponentDefRegistryTest = function() {
                             throw error;
                         }
                 },
-                mark : function() {
-                },
-                endMark : function() {
+                Perf: {
+                    mark: function () {
+                    },
+                    endMark: function () {
+                    }
                 }
             });
 	[Fact]
@@ -644,19 +648,21 @@ Test.Aura.Component.ComponentDefRegistryTest = function() {
 	function UpdatesLocalStorageWithJsonEncodedDefIfAvailable() {
 	    // Arrange
 	    var storage = {};
-	    var mockAuraUtil = Mocks.GetMock(Object.Global(), "$A", {
-                warning : function(message, error){
-                },
-		util : {
-		    json : {
-			encode : function(s) {
-			    return s;
-			}
-		    }
-		},
-		endMark : function() {
-		}
-	    });
+        var mockAuraUtil = Mocks.GetMock(Object.Global(), "$A", {
+            warning: function (message, error) {
+            },
+            util: {
+                json: {
+                    encode: function (s) {
+                        return s;
+                    }
+                }
+            },
+            Perf: {
+                endMark: function () {
+                }
+            }
+        });
 	    var mockLocalStorage = Mocks.GetMock(Object.Global(),
 		    "localStorage", {
 			setItem : function(key, value) {
@@ -691,19 +697,21 @@ Test.Aura.Component.ComponentDefRegistryTest = function() {
 	function UpdatesLocalStorageWithCatalogIfAvailable() {
 	    // Arrange
 	    var storage = {};
-	    var mockAuraUtil = Mocks.GetMock(Object.Global(), "$A", {
-                warning : function(message, error){
-                },
-		util : {
-		    json : {
-			encode : function(s) {
-			    return s;
-			}
-		    }
-		},
-		endMark : function() {
-		}
-	    });
+        var mockAuraUtil = Mocks.GetMock(Object.Global(), "$A", {
+            warning: function (message, error) {
+            },
+            util: {
+                json: {
+                    encode: function (s) {
+                        return s;
+                    }
+                }
+            },
+            Perf: {
+                endMark: function () {
+                }
+            }
+        });
 	    var mockLocalStorage = Mocks.GetMock(Object.Global(),
 		    "localStorage", {
 			setItem : function(key, value) {

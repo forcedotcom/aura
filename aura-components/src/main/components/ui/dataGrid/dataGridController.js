@@ -44,6 +44,8 @@
 	handleItemsChange: function (cmp, evt, hlp) {
 		hlp.handleItemsChange(cmp, evt.getParams());
 
+		var concrete = cmp.getConcreteComponent();
+		
 		if (concrete._sorting) {
 			concrete._sorting = false;
 		}

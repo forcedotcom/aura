@@ -85,23 +85,20 @@ public final class ValidationClient {
     }
 
     List<String> performValidation() throws Exception {
-        URL baseUrl = getBaseUrl();
         String absolutePath = new File(path).getAbsolutePath();
-
-        // "http://localhost:9090/auradev/validation?path=..." to get the context
-
-        StringBuilder url = new StringBuilder(baseUrl.toString());
-        url.append("qa/auraValidation?path=");
-        url.append(URLEncoder.encode(absolutePath, "UTF-8"));
+        StringBuilder request = new StringBuilder();
+        request.append("/qa/auraValidation?path=");
+        request.append(URLEncoder.encode(absolutePath, "UTF-8"));
         if (report != null) {
-            url.append("&report=");
-            url.append(URLEncoder.encode(new File(report).getAbsolutePath(), "UTF-8"));
+            request.append("&report=");
+            request.append(URLEncoder.encode(new File(report).getAbsolutePath(), "UTF-8"));
         }
         if (exit) {
-            url.append("&exit=true");
+            request.append("&exit=true");
         }
 
-        URLConnection connection = new URL(url.toString()).openConnection();
+        String url = getBaseUrl().toURI().resolve(request.toString()).toString();
+        URLConnection connection = new URL(url).openConnection();
         Reader reader = new InputStreamReader(connection.getInputStream());
         try {
             if (report != null) {

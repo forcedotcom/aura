@@ -98,6 +98,12 @@
                 if (!helper.isElementInComponent(component, event.target)) {
                     // Hide the component
                     component.setValue("v.visible", false);
+                    
+                    //Since we are no longer going into the rerender function, updateGlobalEventListeners does not get called and the listeners will never get turned off
+                    var concreteCmp = component.getConcreteComponent();
+                    concreteCmp._clickStart.setEnabled(false);
+                    concreteCmp._clickEnd.setEnabled(false);
+                    
                     var divCmp = component.find("datePicker");
                     if (divCmp) {
                         var elem = divCmp.getElement();

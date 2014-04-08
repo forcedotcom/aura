@@ -87,14 +87,12 @@
     swapShowMore: function (cmp, newValue) {
         var scroller = this.getScrollerInstance(cmp);
         if (scroller && scroller.togglePullToLoadMore) {
-            scroller.opts.pullToLoadMore = newValue;
             scroller.togglePullToLoadMore(newValue);
         }
     },
     swapRefresh: function (cmp, newValue) {
         var scroller = this.getScrollerInstance(cmp);
         if (scroller && scroller.togglePullToRefresh) {
-            scroller.opts.pullToRefresh = newValue;
             scroller.togglePullToRefresh(newValue);
         }
     },
@@ -197,8 +195,8 @@
             auraOnPullToLoadMore  = attributes.get('onPullToShowMore'),
             auraInfiniteLoading   = attributes.get('infiniteLoadingDataProvider'),
 
-            pullToRefresh         = typeof canRefresh === "boolean" ? canRefresh : !!auraOnPullToRefresh,
-            pullToLoadMore        = typeof canShowMore === "boolean" ? canShowMore : !!auraOnPullToLoadMore,
+            pullToRefresh         = canRefresh,
+            pullToLoadMore        = canShowMore,
             infiniteLoading       = auraInfiniteLoading && attributes.get('infiniteLoading'),
 
             pullToRefreshConfig   = pullToRefresh   && this._getPullToRefreshConfig(attributes),
@@ -500,8 +498,8 @@ _initScroller: function () {
                 PullToRefresh  = PLUGINS.PullToRefresh,
                 PullToLoadMore = PLUGINS.PullToLoadMore,
                 enableSM       = !this.opts.useCSSTransition && this.opts.gpuOptimization,
-                enablePTR      = this.opts.pullToRefresh,
-                enablePTL      = this.opts.pullToLoadMore;
+                enablePTR      = this.opts.onPullToRefresh,
+                enablePTL      = this.opts.onPullToLoadMore;
             
             if (enablePTR && PullToRefresh)  this.plug(PullToRefresh);
             if (enablePTL && PullToLoadMore) this.plug(PullToLoadMore);
@@ -1053,10 +1051,8 @@ _initScroller: function () {
 
             if (this._customResetPosition()) {
                 if (this.opts.pullToRefresh && this.isTriggeredPTR()) {
-                    console.log('triggeredPTR');
                     custom = this.getResetPositionPTR();
                 } else if (this.opts.pullToLoadMore && this.isTriggeredPTL()) {
-                    console.log('triggeredPTL');
                     custom = this.resetPositionPTL();
                 }
             }
@@ -2352,14 +2348,16 @@ _initPullToRefreshPlugin: function () {
             this.ptrIcon  = ptr_container.getElementsByClassName(CLASS_ICON)[0];
             this.ptrLabel = ptr_container.getElementsByClassName(CLASS_LABEL)[0];
 
-            this._ptrEnabled    = true;
             this._ptrThreshold  = ptr_container.offsetHeight; //relayout
             this._ptrSnapTime   = PULL_TO_SNAP_TIME;
+
+            this.togglePullToRefresh(this.opts.pullToRefresh, true);
         },
         _onResetPositionPTR: function (time) {
             if (this._ptrTriggered) {
                 var y    = this._getPTRSize();
-                var time = this._getPTRSnapTime();
+
+                time = time || this._getPTRSnapTime();
                 this._scrollTo(0, y, time);
             } else {
                 this._resetPosition(time, true);
@@ -2412,20 +2410,20 @@ _initPullToRefreshPlugin: function () {
                 this._setPullState(true);
             }
         },
-        _ptrToggle: function (action) {
+        _ptrToggle: function (action, force) {
             var ptr = this.ptrDOM;
 
             if (!ptr) return;
 
-            if (this._ptrEnabled && action === 'disable') {
+            if (action === 'disable' && (this.opts.pullToRefresh || force)) {
                 ptr.style.display = 'none';
                 this._ptrThreshold = 0;
-                this._ptrEnabled = false;
+                this.opts.pullToRefresh = false;
 
-            } else if (!this._ptrEnabled && action === 'enable') {
+            } else if (action === 'enable' && (!this.opts.pullToRefresh || force)) {
                 ptr.style.display = ''; 
                 this._ptrThreshold = ptr.offsetHeight;
-                this._ptrEnabled = true;
+                this.opts.pullToRefresh = true;
             }
         },
         _ptrExecTrigger: function () {
@@ -2494,14 +2492,14 @@ _initPullToRefreshPlugin: function () {
                 time : this.getPTRSnapTime()
             };
         },
-        togglePullToRefresh: function (enabled) {
+        togglePullToRefresh: function (enabled, force) {
             var hasToggleArg = enabled !== undefined,
                 toggleStr = hasToggleArg ? enabled ? 'enable' : 'disable' : '';
 
             if (hasToggleArg) {
-                this._ptrToggle(toggleStr);
+                this._ptrToggle(toggleStr, force);
             } else {
-                this._ptrToggle(this._ptrEnabled ? 'disable' : 'enable');
+                this._ptrToggle(this.opts.pullToRefresh ? 'disable' : 'enable', force);
             }
         }
     };   
@@ -2573,13 +2571,15 @@ _initPullToLoadMorePlugin: function () {
             return ptl_spacer;
         },
         _sizePullToShowMore: function () {
-            if (this.ptlSpacerSize <= 0) return;
-
             var spacer = this.ptlSpacer;
                 diff   = this.wrapperHeight - spacer.offsetTop;
 
-            this.ptlSpacerSize = diff > 0 ? diff: 0;
-            spacer.style.height = this.ptlSpacerSize + 'px';
+            diff = diff > 0 ? diff: 0;
+
+            if (diff !== this.ptlSpacerSize) {
+                this.ptlSpacerSize = diff;   
+                spacer.style.height = this.ptlSpacerSize + 'px';
+            }
         },
         _appendPullToLoad: function () {
             var ptl_container = this._createPullToLoadMarkup();
@@ -2595,7 +2595,7 @@ _initPullToLoadMorePlugin: function () {
 
             this._ptlThreshold  = ptl_container.offsetHeight;
             this._ptlSnapTime   = PULL_TO_SNAP_TIME; 
-            this._ptlEnabled    = true;
+            this.togglePullToLoadMore(this.opts.pullToLoadMore, true);
 
             this._setSize();
         },
@@ -2615,22 +2615,22 @@ _initPullToLoadMorePlugin: function () {
             }
         },
         _ptlIsEnabled: function () {
-            return this._ptlEnabled;
+            return this.opts.pullToLoadMore;
         },
-        _ptlToggle: function (action) {
+        _ptlToggle: function (action, force) {
             var ptl = this.ptlDOM;
 
             if (!ptl) return;
 
-            if (this._ptlEnabled && action === 'disable') {
+            if (action === 'disable' && (this.opts.pullToLoadMore || force)) {
                 ptl.style.display = 'none';
                 this._ptlThreshold = 0;
-                this._ptlEnabled = false;
+                this.opts.pullToLoadMore = false;
 
-            } else if (!this._ptlEnabled && action === 'enable') {
+            } else if (action === 'enable' && (!this.opts.pullToLoadMore || force)) {
                 ptl.style.display = ''; 
                 this._ptlThreshold = ptl.offsetHeight;
-                this._ptlEnabled = true;
+                this.opts.pullToLoadMore = true;
             }
         },
         _onScrollMovePTL: function (action, x, y) {
@@ -2639,7 +2639,7 @@ _initPullToLoadMorePlugin: function () {
             }
         },
         _needsPullToLoadMore: function (ypos) {
-            if (!this._ptlEnabled) return;
+            if (!this.opts.pullToLoadMore) return;
             var threshold = this.maxScrollY - this._ptlThreshold;
 
             if (this._ptlTriggered && ypos > threshold) {
@@ -2748,14 +2748,14 @@ _initPullToLoadMorePlugin: function () {
                 time : this.getPTLSnapTime()
             };    
         },
-        togglePullToLoadMore: function (enabled) {
+        togglePullToLoadMore: function (enabled, force) {
             var hasToggleArg = enabled !== undefined,
                 toggleStr = hasToggleArg ? enabled ? 'enable' : 'disable' : '';
 
             if (hasToggleArg) {
-                this._ptlToggle(toggleStr);
+                this._ptlToggle(toggleStr, force);
             } else {
-                this._ptlToggle(this._ptlEnabled ? 'disable' : 'enable');
+                this._ptlToggle(this.opts.pullToLoadMore ? 'disable' : 'enable', force);
             }
         }
     };   

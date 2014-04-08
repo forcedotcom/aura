@@ -20,7 +20,7 @@
 * PUBLIC HELPER METHODS
 * =========================
 */
-	init : function(component) {
+    init : function(component) {
         var scrollerWrapperDOM  = this._getScrollerWrapper(component),
             scrollerOptions     = this._mapAuraScrollerOptions(component),
             scrollerNamespace   = this.getScrollerNamespace(component),
@@ -30,7 +30,7 @@
         this._attachAuraEvents(component, scrollerInstance);
         this.setScollerInstance(component, scrollerInstance);
 
-	},
+    },
     getScrollerInstance: function (component) {
         return component._scroller;
     },
@@ -87,14 +87,12 @@
     swapShowMore: function (cmp, newValue) {
         var scroller = this.getScrollerInstance(cmp);
         if (scroller && scroller.togglePullToLoadMore) {
-            scroller.opts.pullToLoadMore = newValue;
             scroller.togglePullToLoadMore(newValue);
         }
     },
     swapRefresh: function (cmp, newValue) {
         var scroller = this.getScrollerInstance(cmp);
         if (scroller && scroller.togglePullToRefresh) {
-            scroller.opts.pullToRefresh = newValue;
             scroller.togglePullToRefresh(newValue);
         }
     },
@@ -197,8 +195,8 @@
             auraOnPullToLoadMore  = attributes.get('onPullToShowMore'),
             auraInfiniteLoading   = attributes.get('infiniteLoadingDataProvider'),
 
-            pullToRefresh         = typeof canRefresh === "boolean" ? canRefresh : !!auraOnPullToRefresh,
-            pullToLoadMore        = typeof canShowMore === "boolean" ? canShowMore : !!auraOnPullToLoadMore,
+            pullToRefresh         = canRefresh,
+            pullToLoadMore        = canShowMore,
             infiniteLoading       = auraInfiniteLoading && attributes.get('infiniteLoading'),
 
             pullToRefreshConfig   = pullToRefresh   && this._getPullToRefreshConfig(attributes),
@@ -416,6 +414,7 @@ _initScroller: function () {
         SCROLL_HORIZONTAL    = 'horizontal',
 
         ACTION_RESET         = 'reset',
+        ACTION_LOCK          = 'lock',
         ACTION_GESTURE_START = 'gestureStart',
         ACTION_GESTURE_MOVE  = 'gestureMove',
         ACTION_ANIM_MOVING   = 'animationMove',
@@ -434,24 +433,27 @@ _initScroller: function () {
             },
             bounce : {
                 style : EASING_BOUNCE.toString(),
-                fn    : EASING_BOUNCE
+                fn    : EASING_BOUNCE,
             }
         },
         // Default options
         DEFAULTS = {
-            enabled              : true,
-            bounceTime           : 600,
-            useCSSTransition     : false,
-            dualListeners        : false,
-            itemHeight           : null,
-            itemWidth            : null,
-            bindToWrapper        : false,
-            scroll               : SCROLL_VERTICAL,
-            pullToRefresh        : false,
-            pullToLoadMore       : false,
-            scrollbars           : false,
-            infiniteLoading      : false,
-            gpuOptimization      : true
+            enabled               : true,
+            bounceTime            : 600,
+            useCSSTransition      : false,
+            dualListeners         : false,
+            minThreshold          : 5,     // It should be in the [0, 10] range
+            minDirectionThreshold : 2,    // It should be smaller than minThreshold
+            lockOnDirection       : null,
+            itemHeight            : null,
+            itemWidth             : null,
+            bindToWrapper         : false,
+            scroll                : SCROLL_VERTICAL,
+            pullToRefresh         : false,
+            pullToLoadMore        : false,
+            scrollbars            : false,
+            infiniteLoading       : false,
+            gpuOptimization       : true
         },
 
         ACCELERATION_CONSTANT = 0.0005,
@@ -484,6 +486,7 @@ _initScroller: function () {
     Scroller.SCROLL_HORIZONTAL     = SCROLL_HORIZONTAL;
     Scroller.MOUSE_WHEEL_SPEED     = MOUSE_WHEEL_SPEED;
     Scroller.MOUSE_WHEEL_INVERTED  = MOUSE_WHEEL_INVERTED;
+    Scroller.plugins               = PLUGINS;
 
     Scroller.prototype = {
         _initialize: function () {
@@ -495,8 +498,8 @@ _initScroller: function () {
                 PullToRefresh  = PLUGINS.PullToRefresh,
                 PullToLoadMore = PLUGINS.PullToLoadMore,
                 enableSM       = !this.opts.useCSSTransition && this.opts.gpuOptimization,
-                enablePTR      = this.opts.pullToRefresh,
-                enablePTL      = this.opts.pullToLoadMore;
+                enablePTR      = this.opts.onPullToRefresh,
+                enablePTL      = this.opts.onPullToLoadMore;
             
             if (enablePTR && PullToRefresh)  this.plug(PullToRefresh);
             if (enablePTL && PullToLoadMore) this.plug(PullToLoadMore);
@@ -509,14 +512,7 @@ _initScroller: function () {
             }
         },
         _initializeEvents: function () {
-            this._events = {
-                'beforescrollStart': [],
-                'scrollStart'      : [],
-                'beforeScrollMove' : [],
-                'scrollMove'       : [],
-                'scrollEnd'        : [],
-                'destroy'          : []
-            };
+            this._events = {};
         },
         _mergeConfigOptions: function (cfg, toMerge) {
             return HELPERS.simpleMerge(cfg, toMerge);
@@ -562,6 +558,7 @@ _initScroller: function () {
             var ptl_offset = this._ptlThreshold || 0;
 
             this._setWrapperSize();
+            this._sizePullToShowMore();
 
             this.scrollerWidth  = this.scroller.offsetWidth;
             this.scrollerHeight = this.opts.pullToLoadMore ? this.scroller.offsetHeight - ptl_offset : this.scroller.offsetHeight;
@@ -569,17 +566,15 @@ _initScroller: function () {
             this.maxScrollX     = this.wrapperWidth  - this.scrollerWidth;
             this.maxScrollY     = this.wrapperHeight - this.scrollerHeight;
 
+            this.maxScrollX     = this.maxScrollX > 0 ? 0 : this.maxScrollX;
+            this.maxScrollY     = this.maxScrollY > 0 ? 0 : this.maxScrollY;
+
             this.hasScrollX     = this.maxScrollX < 0;
             this.hasScrollY     = this.maxScrollY < 0;
 
-            this.testPullToShowMore();
         },
-        testPullToShowMore: function () {
-            // pullToShowMore may be disabled if the content was not enough at the beggining
-            // Check if now there is room enough to enable it
-            if (this.opts.pullToLoadMore && this.togglePullToLoadMore) {
-                this.togglePullToLoadMore(this.hasScrollY);
-            }
+        _sizePullToShowMore: function () {
+            // To be overriden by pull-to-show-more plugin
         },
         _destroy: function () {
             this._handleEvents('unbind');
@@ -734,10 +729,11 @@ _initScroller: function () {
             var point = e.touches ? e.touches[0] : e,
                 pos;
 
-            this._initiated  = EVENT_TYPE[e.type]; // for onMove mouse check and other contexts
-            this.moved       = false;  // for onMove threshold check
-            this.distX       = 0;
-            this.distY       = 0;
+            this._initiated      = EVENT_TYPE[e.type]; // for onMove mouse check and other contexts
+            this.moved           = false;  // for onMove threshold check
+            this.distX           = 0;
+            this.distY           = 0;
+            this.scrollDirection = null;
 
             this._transitionTime();   // removes time on transition (reset CSS timing)
             this._isAnimating = false; // reset animation
@@ -771,9 +767,27 @@ _initScroller: function () {
         _endMoveRAF: function () {
             CAF(this._rafMoving);
         },
-
         _update: function () {
             this._fire('_update');
+        },
+
+        _needsLocking: function () {
+            return  this.opts.lockOnDirection &&
+                    this.scrollDirection &&
+                    this.opts.lockOnDirection === this.scrollDirection;
+        },
+        lockScroller: function () {
+            this._initiated = false;
+            this._fire(ACTION_LOCK, this.scrollDirection);
+        },
+        _getScollDirection: function (absX, absY) {
+            var treshold = this.opts.minDirectionThreshold;
+            this.scrollDirection =
+                (absX > absY + treshold) ? SCROLL_HORIZONTAL : 
+                (absY > absX + treshold) ? SCROLL_VERTICAL :
+                null;
+
+            return this.scrollDirection;
         },
         _isOutOfScroll: function (x, y) {
             return this.scrollVertical ? (y > 0 || y < this.maxScrollY) : (x > 0 || x < this.maxScrollX);
@@ -788,7 +802,7 @@ _initScroller: function () {
             }
         },
         _move: function (e) {
-            if ( !this.enabled || (EVENT_TYPE[e.type] !== this._initiated) ) {
+            if (!this.enabled || (EVENT_TYPE[e.type] !== this._initiated)) {
                 return;
             }
 
@@ -796,8 +810,7 @@ _initScroller: function () {
                 deltaX    = point.pageX - this.pointX,
                 deltaY    = point.pageY - this.pointY,
                 timestamp = NOW(),
-                newX, newY,
-                absDistX, absDistY;
+                newX, newY, absDistX, absDistY;
 
             if (!this.moved && (deltaX || deltaY)) {
                 this.moved = true;
@@ -808,13 +821,27 @@ _initScroller: function () {
                 }
             }
 
-            this.pointX   = point.pageX;
-            this.pointY   = point.pageY;
-            this.distX    += deltaX;
-            this.distY    += deltaY;
+            this.pointX  = point.pageX;
+            this.pointY  = point.pageY;
+            this.distX   = this.distX + deltaX;
+            this.distY   = this.distY + deltaY;
+            absDistX     = Math.abs(this.distX);
+            absDistY     = Math.abs(this.distY);
+            newX         = this.x + deltaX;
+            newY         = this.y + deltaY;
 
-            newX = this.x + deltaX;
-            newY = this.y + deltaY;
+            // If there is minThrehold do not start moving until the distance is over it.
+            if (this.opts.minThreshold && (absDistX < this.opts.minThreshold && absDistY < this.opts.minThreshold)) {
+                this._fire('scrollMove', ACTION_GESTURE_MOVE, this.x, this.y);
+                return;
+            }
+
+            // Calculate and expose the gesture direction
+            e.scrollDirection = this.scrollDirection || this._getScollDirection(absDistX, absDistY);
+
+            if (this._needsLocking()) {
+                this.lockScroller();
+            }
 
             // Reduce scrollability (slowdown) when dragging beyond the scroll limits
             if (this._isOutOfScroll(newX, newY)) {
@@ -822,7 +849,7 @@ _initScroller: function () {
                 newX = this.x + deltaX / 3;
             }
 
-            // scroll one direction at the time
+            // Scroll one direction at the time (set zero values on the other direction)
             this._setNormalizedXY(newX, newY);
 
             if (this.opts.useCSSTransition) {
@@ -832,14 +859,14 @@ _initScroller: function () {
             }
 
             // This is to reduce variability and to keep track only on the recent past of the gesture
-            if ( timestamp - this.startTime > 300 ) {
+            if (timestamp - this.startTime > 300) {
                 this.startTime = timestamp;
                 this.startX = this.x;
                 this.startY = this.y;
             }
         },
         _end: function (e) {
-            if ( !this.enabled || EVENT_TYPE[e.type] !== this._initiated ) {
+            if (!this.enabled || EVENT_TYPE[e.type] !== this._initiated) {
                 return;
             }
             //reset move
@@ -1670,7 +1697,7 @@ _initSurfaceManagerPlugin: function () {
                 items      = this.items,
                 size       = this.scrollVertical ? this.wrapperHeight : this.wrapperWidth,
                 ptlEnabled = this.opts.pullToLoadMore && this._ptlIsEnabled(),
-                lastPos    = ptlEnabled ? positioned.length - 2 : positioned.length - 1,
+                lastPos    = ptlEnabled ? positioned.length - 3 : positioned.length - 1,
                 last       = positioned[lastPos],
                 itemsSize  = this.opts.pullToLoadMore ? items.length - 1 : items.length,
                 itemsLeft, offset, ptrSize;
@@ -1679,19 +1706,41 @@ _initSurfaceManagerPlugin: function () {
                 return;
             }
 
-            itemsLeft = last.contentIndex < itemsSize - 1;
+            itemsLeft = last.contentIndex < itemsSize - 2;
             offset    = last.offset + (this.scrollVertical ? last.height : last.width);
 
             if (this.scrollVertical) {
                 this.maxScrollY = itemsLeft ? Number.NEGATIVE_INFINITY : size - offset;
+                this.maxScrollY = this.maxScrollY > 0 ? 0 : this.maxScrollY;
             } else {
                 this.maxScrollX = itemsLeft ? Number.NEGATIVE_INFINITY : size - offset;
+                this.maxScrollX = this.maxScrollX > 0 ? 0 : this.maxScrollX;
             }
 
             this.hasScrollY = this.maxScrollY < 0;
             this.hasScrollX = this.maxScrollX < 0;
 
-            this.testPullToShowMore();
+            if (ptlEnabled) {
+                this._setInfinitePullToShowMoreSpacer(offset);
+            }
+        },
+         _setInfinitePullToShowMoreSpacer: function (bottomOffset) {
+            if (this.ptlSpacerSize <= 0) {
+                return;
+            }
+            var diff        = this.wrapperHeight - bottomOffset,
+                spaceBottom = diff > 0,
+                positioned  = this.surfacesPositioned,
+                last        = positioned[positioned.length -1],
+                surface     = last && last.dom;
+
+            this.ptlSpacerSize = spaceBottom ? diff : 0;
+            this.ptlSpacer.style.height = this.ptlSpacerSize + 'px';
+
+            if (surface) {
+                diff = spaceBottom ? this.wrapperHeight : bottomOffset;
+                surface.style[STYLES.transform] = 'matrix3d(1,0,0,0,0,1,0,0,0,0,1,0,0,' + diff + ', 0, 1)';
+            }
         },
         _appendPullToLoad: function () {
             var ptr_container = this._createPullToLoadMarkup();
@@ -1729,11 +1778,13 @@ _initSurfaceManagerPlugin: function () {
             }
         },
         _appendData: function (data) {
-            var ptl, item, i;
+            var ptl, item, i, spacer;
 
             //remove pulltoLoadMoreSurface
             if (this.opts.pullToLoadMore) {
-                ptl = this.items.pop();
+                ptl    = this.items.pop();
+                this._positionedSurfacesPop();
+                spacer = this.items.pop();
                 this._positionedSurfacesPop();
             }
 
@@ -1741,11 +1792,12 @@ _initSurfaceManagerPlugin: function () {
                 item = {dom: data[i]};
                 this.items.push(item);
             }
+
             if (this.opts.pullToLoadMore) {
                 //add the back as the last item again
-                this.items.push(ptl);    
+                this.items.push(spacer);
+                this.items.push(ptl);
             }
-            
         },
         prependItems: function (items) {
             var parsedData = HELPERS.parseDOM(items);
@@ -1760,7 +1812,7 @@ _initSurfaceManagerPlugin: function () {
                 this._appendData(parsedData);
                 this._updateSurfaceManager();
             }
-        }
+        },
     };   
 
     SCROLLER.SurfaceManager = PLUGINS.SurfaceManager = SurfaceManager;
@@ -2184,7 +2236,7 @@ _initIndicatorsPlugin: function () {
             
             this._indicators.push(new Indicator(this, {
                 el          : scrollbar,
-                interactive : interactive
+                interactive : interactive,
             }));
         },
         _createDefaultScrollbar: function (vertical, interactive, customStyle) {
@@ -2296,14 +2348,16 @@ _initPullToRefreshPlugin: function () {
             this.ptrIcon  = ptr_container.getElementsByClassName(CLASS_ICON)[0];
             this.ptrLabel = ptr_container.getElementsByClassName(CLASS_LABEL)[0];
 
-            this._ptrEnabled    = true;
             this._ptrThreshold  = ptr_container.offsetHeight; //relayout
             this._ptrSnapTime   = PULL_TO_SNAP_TIME;
+
+            this.togglePullToRefresh(this.opts.pullToRefresh, true);
         },
         _onResetPositionPTR: function (time) {
             if (this._ptrTriggered) {
                 var y    = this._getPTRSize();
-                var time = this._getPTRSnapTime();
+
+                time = time || this._getPTRSnapTime();
                 this._scrollTo(0, y, time);
             } else {
                 this._resetPosition(time, true);
@@ -2356,20 +2410,20 @@ _initPullToRefreshPlugin: function () {
                 this._setPullState(true);
             }
         },
-        _ptrToggle: function (action) {
+        _ptrToggle: function (action, force) {
             var ptr = this.ptrDOM;
 
             if (!ptr) return;
 
-            if (this._ptrEnabled && action === 'disable') {
+            if (action === 'disable' && (this.opts.pullToRefresh || force)) {
                 ptr.style.display = 'none';
                 this._ptrThreshold = 0;
-                this._ptrEnabled = false;
+                this.opts.pullToRefresh = false;
 
-            } else if (!this._ptrEnabled && action === 'enable') {
+            } else if (action === 'enable' && (!this.opts.pullToRefresh || force)) {
                 ptr.style.display = ''; 
                 this._ptrThreshold = ptr.offsetHeight;
-                this._ptrEnabled = true;
+                this.opts.pullToRefresh = true;
             }
         },
         _ptrExecTrigger: function () {
@@ -2438,14 +2492,14 @@ _initPullToRefreshPlugin: function () {
                 time : this.getPTRSnapTime()
             };
         },
-        togglePullToRefresh: function (enabled) {
+        togglePullToRefresh: function (enabled, force) {
             var hasToggleArg = enabled !== undefined,
                 toggleStr = hasToggleArg ? enabled ? 'enable' : 'disable' : '';
 
             if (hasToggleArg) {
-                this._ptrToggle(toggleStr);
+                this._ptrToggle(toggleStr, force);
             } else {
-                this._ptrToggle(this._ptrEnabled ? 'disable' : 'enable');
+                this._ptrToggle(this.opts.pullToRefresh ? 'disable' : 'enable', force);
             }
         }
     };   
@@ -2510,26 +2564,45 @@ _initPullToLoadMorePlugin: function () {
             ptl_container.className = CLASS_PTL;
             return ptl_container;
         },
+        _createPullToLoadSpacer: function () {
+            var ptl_spacer = w.document.createElement('div');
+            ptl_spacer.classList.add('spacer-pull-to-load-more');
+
+            return ptl_spacer;
+        },
+        _sizePullToShowMore: function () {
+            var spacer = this.ptlSpacer;
+                diff   = this.wrapperHeight - spacer.offsetTop;
+
+            diff = diff > 0 ? diff: 0;
+
+            if (diff !== this.ptlSpacerSize) {
+                this.ptlSpacerSize = diff;   
+                spacer.style.height = this.ptlSpacerSize + 'px';
+            }
+        },
         _appendPullToLoad: function () {
             var ptl_container = this._createPullToLoadMarkup();
+                ptl_spacer    = this._createPullToLoadSpacer();
+
+            this.scroller.appendChild(ptl_spacer);
             this.scroller.appendChild(ptl_container);
 
-            this.ptlDOM   = ptl_container;
-            this.ptlIcon  = ptl_container.firstChild;
-            this.ptlLabel = ptl_container.getElementsByClassName(CLASS_LABEL)[0];
+            this.ptlSpacer = ptl_spacer;
+            this.ptlDOM    = ptl_container;
+            this.ptlIcon   = ptl_container.firstChild;
+            this.ptlLabel  = ptl_container.getElementsByClassName(CLASS_LABEL)[0];
 
             this._ptlThreshold  = ptl_container.offsetHeight;
             this._ptlSnapTime   = PULL_TO_SNAP_TIME; 
-            this._ptlEnabled    = true;
+            this.togglePullToLoadMore(this.opts.pullToLoadMore, true);
 
-            if (this.maxScrollY >= 0) {
-                this._ptlToggle('disable');
-            }
+            this._setSize();
         },
         _appendData: function (items) {
             var docfrag = w.document.createDocumentFragment(),
                 scrollerContainer = this.scroller,
-                ptlContainer = this.ptlDOM;
+                ptlContainer = this.ptlSpacer;
 
             items.forEach(function (i) {
                 docfrag.appendChild(i);
@@ -2542,22 +2615,22 @@ _initPullToLoadMorePlugin: function () {
             }
         },
         _ptlIsEnabled: function () {
-            return this._ptlEnabled;
+            return this.opts.pullToLoadMore;
         },
-        _ptlToggle: function (action) {
+        _ptlToggle: function (action, force) {
             var ptl = this.ptlDOM;
 
             if (!ptl) return;
 
-            if (this._ptlEnabled && action === 'disable') {
+            if (action === 'disable' && (this.opts.pullToLoadMore || force)) {
                 ptl.style.display = 'none';
                 this._ptlThreshold = 0;
-                this._ptlEnabled = false;
+                this.opts.pullToLoadMore = false;
 
-            } else if (!this._ptlEnabled && action === 'enable') {
+            } else if (action === 'enable' && (!this.opts.pullToLoadMore || force)) {
                 ptl.style.display = ''; 
                 this._ptlThreshold = ptl.offsetHeight;
-                this._ptlEnabled = true;
+                this.opts.pullToLoadMore = true;
             }
         },
         _onScrollMovePTL: function (action, x, y) {
@@ -2566,8 +2639,7 @@ _initPullToLoadMorePlugin: function () {
             }
         },
         _needsPullToLoadMore: function (ypos) {
-            if (!this._ptlEnabled) return;
-
+            if (!this.opts.pullToLoadMore) return;
             var threshold = this.maxScrollY - this._ptlThreshold;
 
             if (this._ptlTriggered && ypos > threshold) {
@@ -2676,14 +2748,14 @@ _initPullToLoadMorePlugin: function () {
                 time : this.getPTLSnapTime()
             };    
         },
-        togglePullToLoadMore: function (enabled) {
+        togglePullToLoadMore: function (enabled, force) {
             var hasToggleArg = enabled !== undefined,
                 toggleStr = hasToggleArg ? enabled ? 'enable' : 'disable' : '';
 
             if (hasToggleArg) {
-                this._ptlToggle(toggleStr);
+                this._ptlToggle(toggleStr, force);
             } else {
-                this._ptlToggle(this._ptlEnabled ? 'disable' : 'enable');
+                this._ptlToggle(this.opts.pullToLoadMore ? 'disable' : 'enable', force);
             }
         }
     };   
@@ -2902,7 +2974,7 @@ _initEndlessPlugin: function () {
             }
 
             this._setInfiniteScrollerSize();
-        }
+        },
         
     };   
 

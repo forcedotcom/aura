@@ -46,11 +46,10 @@ Test.Components.Ui.Scroller.PullToLoadMoreTests=function(){
 						return config;
 					},
 					"on": function(event,action){
-						//TODO Fix this test
 						action.call(PTLplugin);
 					},
 					_setSize: function(){
-					
+
 					},
 					scroller: {
 						appendChild: function(item){

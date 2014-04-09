@@ -47,7 +47,10 @@ Test.Components.Ui.Scroller.PullToLoadMoreTests=function(){
 					},
 					"on": function(event,action){
 						//TODO Fix this test
-						//action.call(PTLplugin);
+						action.call(PTLplugin);
+					},
+					_setSize: function(){
+					
 					},
 					scroller: {
 						appendChild: function(item){
@@ -61,10 +64,10 @@ Test.Components.Ui.Scroller.PullToLoadMoreTests=function(){
 				});
 			});
 			
-			Assert.True(true);
-						//PTLplugin._ptlIsEnabled() // && 
-						//PTLsurfaceItem.innerHTML && 
-						//PTLsurfaceItem.className === 'pullToLoadMore');
+			Assert.True(
+						PTLplugin._ptlIsEnabled()  && 
+						PTLsurfaceItem.innerHTML && 
+						PTLsurfaceItem.className === 'pullToLoadMore');
 		}
 	}
 

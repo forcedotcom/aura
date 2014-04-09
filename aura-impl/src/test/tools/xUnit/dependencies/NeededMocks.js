@@ -48,6 +48,7 @@ Test.Mocks.NeededMocks={
 					},
 					createElement:function(tagName){
 						return Test.Stubs.Aura.Dom.GetNode({
+							classList:{add:function(className){}},
 							style:{height:'',width:''},
 							tagName:tagName,
 							getElementsByClassName:function(_class){

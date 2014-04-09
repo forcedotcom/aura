@@ -794,7 +794,8 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                 depsCache.put(makeGlobalKey(de.uid, descriptor), de);
 
                 // put unqualified descriptor key for dependency
-                depsCache.put(makeNonUidGlobalKey(descriptor), de);
+                // disable non-uid-deps cache until we fix tests: testDataBaseDefsProtectedByOrgPerm, testDeployAuraNote, testCreateAuraBundleWithoutNamespace
+                //depsCache.put(makeNonUidGlobalKey(descriptor), de);
             }
 
             // See localDependencies comment

@@ -618,9 +618,10 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         Mockito.verify(registry, Mockito.times(0)).compileDE(Mockito.eq(cmpDesc));
 
         // another getDef on other registry instance should no longer re-compile the def since W-2106504
+        // TODO - change times(1) to times(0) when depsCache for non-uid-deps are reenabled
         registry = getDefRegistry(true);
         assertNotNull(registry.getDef(cmpDesc));
-        Mockito.verify(registry, Mockito.times(0)).compileDE(Mockito.eq(cmpDesc));
+        Mockito.verify(registry, Mockito.times(1)).compileDE(Mockito.eq(cmpDesc));
     }
 
     public void testGetDefDescriptorNull() throws Exception {

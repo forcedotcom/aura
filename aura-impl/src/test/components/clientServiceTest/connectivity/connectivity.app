@@ -27,7 +27,7 @@
     <aura:handler name="init" value="{!this}" action="{!c.setHost}"/>
     <aura:handler name="change" value="{!v.host}" action="{!c.setHost}"/>
 
-    <ui:inputText aura:id="inputHost" value="{!v.host}"/>
+    <ui:inputText aura:id="inputHost" label="inputTextForConnection" labelPosition="hidden" value="{!v.host}"/>
     <ui:button aura:id="testConnection" label="test connection" press="{!c.testConnection}"/><br/>
     <ui:button aura:id="setConnectedFalseButton" label="set connected false" press="{!c.setConnectedFalse}"/><br/>
     <ui:button aura:id="setConnectedTrueButton" label="set connected true" press="{!c.setConnectedTrue}"/><br/>

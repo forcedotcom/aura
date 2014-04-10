@@ -289,7 +289,7 @@ var JSLINT = (function () {
             bitwise   : true,
             browser   : true,
             closure   : true,
-            continue  : true,
+            'continue'  : true,
             couch     : true,
             debug     : true,
             devel     : true,
@@ -1348,12 +1348,12 @@ klass:              do {
 // when reusing an exception variable name.
 
             if (master) {
-                if (master.function === funct) {
+                if (master['function'] === funct) {
                     if (master.kind !== 'exception' || kind !== 'exception' ||
                             !master.dead) {
                         token.warn('already_defined', name);
                     }
-                } else if (master.function !== global_funct) {
+                } else if (master['function'] !== global_funct) {
                     if (kind === 'var') {
                         token.warn('redefinition_a_b', name, master.line);
                     }
@@ -1485,7 +1485,7 @@ klass:              do {
         prev_token = token;
         token = next_token;
         next_token = lookahead.shift() || lex.token();
-        next_token.function = funct;
+        next_token['function'] = funct;
         tokens.push(next_token);
     }
 
@@ -2461,7 +2461,7 @@ klass:              do {
                 if (typeof writeable === 'boolean') {
                     global_scope[name] = master = {
                         dead: false,
-                        function: global_funct,
+                        'function': global_funct,
                         kind: 'var',
                         string: name,
                         writeable: writeable
@@ -2487,11 +2487,11 @@ klass:              do {
                         this.warn('a_scope');
                     }
                     master.used += 1;
-                    if (master.function !== funct) {
-                        if (master.function === global_funct) {
+                    if (master['function'] !== funct) {
+                        if (master['function'] === global_funct) {
                             funct.global.push(name);
                         } else {
-                            master.function.closure.push(name);
+                            master['function'].closure.push(name);
                             funct.outer.push(name);
                         }
                     }
@@ -3111,7 +3111,7 @@ klass:              do {
     function function_parameters() {
         var id, parameters = [], paren = next_token;
         advance('(');
-        token.function = funct;
+        token['function'] = funct;
         step_in();
         no_space();
         if (next_token.id !== ')') {
@@ -3149,7 +3149,7 @@ klass:              do {
             scope: scope
         };
         funct.parameter = function_parameters();
-        func.function = funct;
+        func['function'] = funct;
         option = Object.create(old_option);
         functions.push(funct);
         if (name) {
@@ -3201,8 +3201,8 @@ klass:              do {
                 if (funct.loopage) {
                     get.warn('function_loop');
                 }
-                if (get.function.parameter.length) {
-                    get.warn('parameter_a_get_b', get.function.parameter[0], i);
+                if (get['function'].parameter.length) {
+                    get.warn('parameter_a_get_b', get['function'].parameter[0], i);
                 }
                 comma();
                 set = next_token;
@@ -3219,11 +3219,11 @@ klass:              do {
                 if (set.block.length === 0) {
                     token.warn('missing_a', 'throw');
                 }
-                if (set.function.parameter.length === 0) {
+                if (set['function'].parameter.length === 0) {
                     set.stop('parameter_set_a', 'value');
-                } else if (set.function.parameter[0] !== 'value') {
+                } else if (set['function'].parameter[0] !== 'value') {
                     set.stop('expected_a_b', 'value',
-                        set.function.parameter[0]);
+                        set['function'].parameter[0]);
                 }
                 name.first = [get, set];
             } else {
@@ -3379,7 +3379,7 @@ klass:              do {
         }
         do_function(that, id);
         if (name) {
-            name.function = that.function;
+            name['function'] = that['function'];
         }
         if (funct.loopage) {
             that.warn('function_loop');
@@ -3428,11 +3428,11 @@ klass:              do {
             one_space();
             if (next_token.id === 'if') {
                 next_token.elif = true;
-                this.else = statement(true);
+                this['else'] = statement(true);
             } else {
-                this.else = block('else');
+                this['else'] = block('else');
             }
-            if (this.else.disrupt && this.block.disrupt) {
+            if (this['else'].disrupt && this.block.disrupt) {
                 this.disrupt = true;
             }
         }
@@ -3605,7 +3605,7 @@ klass:              do {
             }
             this.second.push(the_case);
         }
-        if (this.break) {
+        if (this['break']) {
             this.disrupt = false;
         }
         spaces();
@@ -3674,7 +3674,7 @@ klass:              do {
                 if (!master) {
                     value.stop('bad_in_a');
                 }
-                if (master.kind !== 'var' || master.function !== funct ||
+                if (master.kind !== 'var' || master['function'] !== funct ||
                         !master.writeable || master.dead) {
                     value.warn('bad_in_a');
                 }
@@ -3687,7 +3687,7 @@ klass:              do {
                 blok = block('for');
                 if (!option.forin) {
                     if (blok.length === 1 && typeof blok[0] === 'object') {
-                        if (blok[0].id === 'if' && !blok[0].else) {
+                        if (blok[0].id === 'if' && !blok[0]['else']) {
                             filter = blok[0].first;
                             while (filter.id === '&&') {
                                 filter = filter.first;
@@ -3780,19 +3780,19 @@ klass:              do {
         var label = next_token.string,
             master;
         that.arity = 'statement';
-        if (!funct.breakage || (!option.continue && that.id === 'continue')) {
+        if (!funct.breakage || (!option['continue'] && that.id === 'continue')) {
             that.warn('unexpected_a');
         } else if (next_token.identifier && token.line === next_token.line) {
             one_space_only();
             master = scope[label];
             if (!master || master.kind !== 'label') {
                 next_token.warn('not_a_label');
-            } else if (master.dead || master.function !== funct) {
+            } else if (master.dead || master['function'] !== funct) {
                 next_token.warn('not_a_scope');
             } else {
                 master.used += 1;
                 if (that.id === 'break') {
-                    master.statement.break = true;
+                    master.statement['break'] = true;
                 }
                 if (funct.breakage[funct.breakage.length - 1] === master.statement) {
                     next_token.warn('unexpected_a');
@@ -3802,7 +3802,7 @@ klass:              do {
             advance();
         } else {
             if (that.id === 'break') {
-                funct.breakage[funct.breakage.length - 1].break = true;
+                funct.breakage[funct.breakage.length - 1]['break'] = true;
             }
         }
         return that;
@@ -4102,7 +4102,7 @@ klass:              do {
                 line: the_function.line,
                 level: the_function.level,
                 parameter: the_function.parameter,
-                var: [],
+                'var': [],
                 exception: [],
                 closure: unique(the_function.closure),
                 outer: unique(the_function.outer),
@@ -4111,7 +4111,7 @@ klass:              do {
             };
             the_scope = the_function.scope;
             Object.keys(the_scope).forEach(selects);
-            function_data.var.sort();
+            function_data['var'].sort();
             function_data.exception.sort();
             function_data.label.sort();
             data.functions.push(function_data);
@@ -4193,7 +4193,7 @@ klass:              do {
                     '><address>line ' + String(the_function.line) +
                     '</address>' + the_function.name.entityify());
                 detail('parameter', the_function.parameter);
-                detail('variable', the_function.var);
+                detail('variable', the_function['var']);
                 detail('exception', the_function.exception);
                 detail('closure', the_function.closure);
                 detail('outer', the_function.outer);
@@ -4251,14 +4251,14 @@ klass:              do {
             from = data_token.from;
             line = data_token.line;
             thru = data_token.thru;
-            level = data_token.function.level;
+            level = data_token['function'].level;
             do {
                 thru = data_token.thru;
                 data_token = data.tokens[i];
                 i += 1;
             } while (data_token && data_token.line === line &&
                     data_token.from - thru < 5 &&
-                    level === data_token.function.level);
+                    level === data_token['function'].level);
             result.push({
                 line: line,
                 level: level,

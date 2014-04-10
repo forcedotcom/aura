@@ -841,6 +841,11 @@ var JSLINT = (function () {
                 character += length;
                 return first;
             }
+            if (source_row.length == 0) {
+                // rss: happens on empty blank lines
+                source_row = undefined;
+                return '';
+            }
             for (;;) {
                 if (!source_row) {
                     if (!option.white) {

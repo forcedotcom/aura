@@ -29,6 +29,11 @@ import javax.script.ScriptException;
  */
 public abstract class RhinoBasedValidator {
 
+    static {
+        // reduces script execution time to less than half with respect to the -1 default
+        System.setProperty("rhino.opt.level", "0");
+    }
+
     protected final String tool;
     protected final ScriptEngine engine = new ScriptEngineManager().getEngineByName("js");
 

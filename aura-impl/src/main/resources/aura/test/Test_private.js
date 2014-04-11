@@ -185,7 +185,7 @@ function run(name, code, timeoutOverride){
         }
         try{
             if(suite["tearDown"]){
-                suite["tearDown"].call(suite, cmp);
+                suite["tearDown"](cmp);
             }
             setTimeout(function(){priv.inProgress--;}, 100);
         }catch(e){
@@ -208,8 +208,6 @@ function run(name, code, timeoutOverride){
     
     /** @inner */
     var continueWhenReady = function() {
-        var i;
-
         if(priv.inProgress < 2){
             return;
         }
@@ -295,7 +293,7 @@ function run(name, code, timeoutOverride){
     };
     try {
         if(suite["setUp"]){
-            suite["setUp"].call(suite, cmp);
+            suite["setUp"](cmp);
         }
     }catch(e){
         logError("Error during setUp", e);
@@ -317,7 +315,7 @@ function getDump() {
         var actual;
         try {
             actual = priv.waits[0].actual();
-        } catch (e) {}
+        } catch (ignore) {}
         var failureMessage = "";
         if(!$A.util.isUndefinedOrNull(priv.waits[0].failureMessage)){
         	failureMessage = " Failure Message: {" + priv.waits[0].failureMessage + "}";

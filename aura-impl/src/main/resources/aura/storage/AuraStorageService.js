@@ -79,7 +79,7 @@ var AuraStorageService = function(){
         		$A.error("StorageService.registerAdapter() adapter '" + name + "' already registered!");
         	}
         	
-        	adapters[name] = config;
+        	adapters[name] = adapterClass;
         },
 
         getAdapterConfig : function(adapter) {
@@ -131,7 +131,8 @@ var AuraStorageService = function(){
         	// Find the best match for the specific implementation based on the requested configuration 
 
         	var candidates = [];
-        	for (var name in adapters) {
+        	var name;
+        	for (name in adapters) {
         		var adapter = adapters[name];
         		
             	// If secure is required then find all secure adapters otherwise use any adapter
@@ -147,10 +148,10 @@ var AuraStorageService = function(){
         	// Now take the set of candidates and weed out any non-persistent if persistence is requested (not required)
         	var match;
         	for (var n = 0; !match && n < candidates.length; n++) {
-        		adapter = candidates[n];
-        		var adapterIsPersistent = adapter["persistent"];
-        		if ((persistent && adapterIsPersistent === true) || (!persistent && !adapterIsPersistent)) {
-        			match = adapter;
+        		var candidate = candidates[n];
+        		var candidateIsPersistent = candidate["persistent"];
+        		if ((persistent && candidateIsPersistent === true) || (!persistent && !candidateIsPersistent)) {
+        			match = candidate;
         		}
         	}
         	

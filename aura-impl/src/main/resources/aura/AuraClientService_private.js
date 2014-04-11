@@ -81,7 +81,6 @@ var priv = {
             return null;
         }
 
-        var storage = Action.prototype.getStorage();
         var e;
 
         // failure to communicate with server
@@ -133,7 +132,7 @@ var priv = {
                 // if we encountered an exception once the response was committed
                 // ignore the malformed JSON
                 text = "/*" + text;
-            } else if (!noStrip === true && text.charAt(0) == "w") {
+            } else if (noStrip === false && text.charAt(0) == "w") {
                 //
                 // strip off the while(1) at the beginning
                 //
@@ -182,7 +181,7 @@ var priv = {
         //
         // strip off the while(1) at the beginning
         //
-        if (!noStrip === true && text.charAt(0) == "w") {
+        if (noStrip === false && text.charAt(0) == "w") {
             text = "//" + text;
         }
 
@@ -250,7 +249,6 @@ var priv = {
      */
     singleAction : function(action, noAbort, actionResponse) {
         var key = action.getStorageKey();
-        var that = this;
 
         $A.run(function() {
             var storage, toStore, needUpdate;
@@ -297,9 +295,7 @@ var priv = {
         var responseMessage = this.checkAndDecodeResponse(response);
         var that = this;
         var noAbort = (abortableId === this.actionQueue.getLastAbortableTransactionId());
-        var i;
 
-        var errors = [];
         //
         // Note that this is a very specific assertion. We can either be called back from an empty stack
         // (the normal case, after an XHR has gone to the server), or we can be called back from inside
@@ -313,14 +309,14 @@ var priv = {
         }
         
         var stackName = "actionCallback["; 
-        var actions = collector.getActionsToSend(); 
-        for (var n = 0; n < actions.length; n++) { 
-        	var action = actions[n]; 
+        var actionsToSend = collector.getActionsToSend(); 
+        for (var n = 0; n < actionsToSend.length; n++) { 
+        	var actionToSend = actionsToSend[n]; 
         	if (n > 0) { 
         		stackName += ", "; 
     		}
 
-        	stackName += action.getStorageKey(); 
+        	stackName += actionToSend.getStorageKey(); 
     	}
         stackName += "]";
 

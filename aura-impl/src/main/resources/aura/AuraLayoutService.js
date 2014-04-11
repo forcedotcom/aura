@@ -22,8 +22,6 @@ var AuraLayoutService = function(){
 
     //#include aura.AuraLayoutService_private
 
-    var markName = "";
-
     var layoutService = {
         /**
          * @private

@@ -28,7 +28,7 @@ var Transport = function() {
             } catch (e) {
                 try {
                     return new ActiveXObject("Microsoft.XMLHTTP");
-                } catch (e2) {
+                } catch (ignore) {
                 }
             }
         }

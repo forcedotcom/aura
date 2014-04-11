@@ -50,7 +50,7 @@ IndexedDBStorageAdapter.prototype.clear = function(key) {
 };
 
 IndexedDBStorageAdapter.prototype.getExpired = function(resultCallback) {
-	var now = new Date().getTime();
+	// var now = new Date().getTime();
 	var expired = [];
 
 	// DCHASMAN TODO

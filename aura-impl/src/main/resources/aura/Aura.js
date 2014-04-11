@@ -1000,7 +1000,7 @@ $A.ns.Aura.prototype.logf = function() {
  * @param {Number} size The length of the output string.
  */
 $A.ns.Aura.prototype.fitTo = function(value, size) {
-    if (typeof (value) != "string") {
+    if (typeof value != "string") {
         if ($A.util.isUndefinedOrNull(value)) {
             return null;
         }

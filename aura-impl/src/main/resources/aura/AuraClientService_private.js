@@ -531,12 +531,24 @@ var priv = {
         }
     },
 
+    isBB10 : function() {
+        var ua = navigator.userAgent;
+        return (ua.indexOf("BB10") > 0 && ua.indexOf("AppleWebKit") > 0);
+    },
+
     hardRefresh : function() {
         var url = location.href;
         if (!priv.isManifestPresent() || url.indexOf("?nocache=") > -1) {
             location.reload(true);
             return;
         }
+
+        // if BB10 and using application cache
+        if (priv.isBB10() && window.applicationCache
+            && window.applicationCache.status !== window.applicationCache.UNCACHED) {
+            url = location.protocol + "//" + location.host + location.pathname + "?b=" + Date.now();
+        }
+
         var params = "?nocache=" + encodeURIComponent(url);
         // insert nocache param here for hard refresh
         var hIndex = url.indexOf("#");
@@ -645,6 +657,19 @@ var priv = {
                 && (window.applicationCache.status === window.applicationCache.UNCACHED || window.applicationCache.status === window.applicationCache.OBSOLETE)) {
         	return;
         }
+
+        /**
+         * BB10 triggers appcache ERROR when the current manifest is a 404.
+         * Other browsers triggers OBSOLETE and we refresh the page to get
+         * the new manifest.
+         *
+         * For BB10, we append cache busting param to url to force BB10 browser
+         * not to use cached HTML via hardRefresh
+         */
+        if (priv.isBB10()) {
+            priv.hardRefresh();
+        }
+
         var manifestURL = priv.getManifestURL();
         if (priv.isDevMode()) {
             priv.showProgress(-1);

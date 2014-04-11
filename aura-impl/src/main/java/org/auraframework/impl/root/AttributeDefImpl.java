@@ -78,6 +78,10 @@ public final class AttributeDefImpl extends DefinitionImpl<AttributeDef> impleme
         return typeDefDescriptor.getDef();
     }
 
+    public DefDescriptor<TypeDef> getTypeDesc() {
+        return typeDefDescriptor;
+    }
+
     /**
      * @return The default value to be used for instances of this AttributeDef that do not have a Value explicitly set
      */

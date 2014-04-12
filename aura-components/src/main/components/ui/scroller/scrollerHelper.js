@@ -188,7 +188,7 @@
             useCSSTransition      = typeof cssTransition === "boolean" ? cssTransition : (!gpuOptimization && (device.isIOS || device.isAndroid)),
             
             snap                  = attributes.get('snapType'),
-            bindToWrapper         = attributes.get('bindToWrapper'),
+            bindToWrapper         = attributes.get('bindEventsToScroller'),
             plugins               = this._getPlugins(attributes),
 
             auraOnPullToRefresh   = attributes.get('onPullToRefresh'),

@@ -132,7 +132,7 @@ var priv = {
                 // if we encountered an exception once the response was committed
                 // ignore the malformed JSON
                 text = "/*" + text;
-            } else if (noStrip === false && text.charAt(0) == "w") {
+            } else if (!noStrip === true && text.charAt(0) == "w") {
                 //
                 // strip off the while(1) at the beginning
                 //
@@ -181,7 +181,7 @@ var priv = {
         //
         // strip off the while(1) at the beginning
         //
-        if (noStrip === false && text.charAt(0) == "w") {
+        if (!noStrip === true && text.charAt(0) == "w") {
             text = "//" + text;
         }
 

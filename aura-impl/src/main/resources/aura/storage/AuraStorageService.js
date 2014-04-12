@@ -73,13 +73,12 @@ var AuraStorageService = function(){
         
         registerAdapter : function(config) {
         	var name = config["name"];
-        	var adapterClass = config["adapterClass"];
         	
         	if (adapters[name]) {
         		$A.error("StorageService.registerAdapter() adapter '" + name + "' already registered!");
         	}
         	
-        	adapters[name] = adapterClass;
+        	adapters[name] = config;
         },
 
         getAdapterConfig : function(adapter) {
@@ -131,8 +130,7 @@ var AuraStorageService = function(){
         	// Find the best match for the specific implementation based on the requested configuration 
 
         	var candidates = [];
-        	var name;
-        	for (name in adapters) {
+        	for (var name in adapters) {
         		var adapter = adapters[name];
         		
             	// If secure is required then find all secure adapters otherwise use any adapter

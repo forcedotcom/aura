@@ -2152,7 +2152,9 @@ klass:              do {
                 node.warn('unexpected_a');
                 break;
             case '!':
-                node.warn('confusing_a');
+                if (!option.confusingNot) {
+                    node.warn('confusing_a');
+                }
                 break;
             }
             break;
@@ -3001,7 +3003,9 @@ klass:              do {
                     if (left.second.string === 'call' ||
                             (left.second.string === 'apply' && (p.length === 1 ||
                             (p[1].arity === 'prefix' && p[1].id === '[')))) {
-                        left.second.warn('unexpected_a');
+                        if (!option.unexpectedCall) {
+                            left.second.warn('unexpected_a');
+                        }
                     }
                 }
                 if (left.second.string === 'toString') {

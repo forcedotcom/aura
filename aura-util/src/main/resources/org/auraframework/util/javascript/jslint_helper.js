@@ -82,7 +82,9 @@ var jslintHelper = function(javaSourceLines, allowDebugger, allowUnfilteredForIn
                         unused: false,
                         reserved: false,
                         stringConcat: true,
-                        unexpectedTypeof: true
+                        unexpectedTypeof: true,
+                        confusingNot: true,
+                        unexpectedCall: true
                     };
 
     JSLINT(jsSourceLines, jsOptions);

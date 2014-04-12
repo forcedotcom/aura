@@ -277,7 +277,7 @@ $A.ns.ComponentCreationContext.prototype.finished = function() {
         }
 
         // initialize components in reverse order
-        for (var i = this.components.length; i >= 0; i--) {
+        for (var i = this.components.length - 1; i >= 0; i--) {
             var component = this.components[i];
             $A.assert(component, "Should have component");
             component.fire("init");

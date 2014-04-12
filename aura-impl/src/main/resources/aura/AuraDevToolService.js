@@ -790,7 +790,7 @@ var AuraDevToolService = function() {
               			 }
               			 
               			 if(!(rcName in dict) ){
-              			     dict[rcName] = [];
+              			     dict[""+rcName] = [];
               			 }
               			 
               			 dict[rcName].push(inputTag);

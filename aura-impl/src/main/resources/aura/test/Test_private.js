@@ -185,7 +185,7 @@ function run(name, code, timeoutOverride){
         }
         try{
             if(suite["tearDown"]){
-                suite["tearDown"](cmp);
+                suite["tearDown"].call(suite, cmp);
             }
             setTimeout(function(){priv.inProgress--;}, 100);
         }catch(e){
@@ -293,7 +293,7 @@ function run(name, code, timeoutOverride){
     };
     try {
         if(suite["setUp"]){
-            suite["setUp"](cmp);
+            suite["setUp"].call(suite, cmp);
         }
     }catch(e){
         logError("Error during setUp", e);

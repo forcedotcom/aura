@@ -535,7 +535,7 @@ Action.prototype.runDeprecated = function(evt) {
     this.state = "RUNNING";
     try {
         var helper = this.cmp.getDef().getHelper();
-        this.returnValue = this.meth(this.cmp, evt, helper);
+        this.returnValue = this.meth.call(this, this.cmp, evt, helper);
         this.state = "SUCCESS";
     } catch (e) {
         this.state = "FAILURE";

@@ -269,6 +269,25 @@
 // value is the JSLINT function itself. That function is also an object that
 // can contain data and other functions.
 
+Object.create = Object.create || function (o) {
+    function F() {}
+    F.prototype = o;
+    return new F();
+};
+
+Array.isArray = Array.isArray || function (o) {
+    return Object.prototype.toString.call(o) === '[object Array]';
+}
+
+Object.keys = Object.keys || function(o) {  
+    var result = [];  
+    for(var name in o) {  
+        if (o.hasOwnProperty(name))  
+          result.push(name);  
+    }  
+    return result;  
+}
+
 var JSLINT = (function () {
     'use strict';
 
@@ -665,9 +684,11 @@ var JSLINT = (function () {
 
 
     function add_to_predefined(group) {
-        Object.keys(group).forEach(function (name) {
+        var keys = Object.keys(group);
+        for (var i = 0; i < keys.length; i++) {
+            var name = keys[i];
             predefined[name] = group[name];
-        });
+        }
     }
 
 
@@ -1384,7 +1405,7 @@ klass:              do {
 
         var found, slot = 0;
 
-        distance = distance || 0;
+        distance = (distance !== undefined)? distance : 0;
         while (slot <= distance) {
             found = lookahead[slot];
             if (!found) {
@@ -1897,7 +1918,9 @@ klass:              do {
         },
         warn: function (code, a, b, c, d) {
             if (!this.warning) {
-                this.warning = warn(code, this.line || 0, this.from || 0,
+                var line = (this.line !== undefined)? this.line : 0;
+                var from = (this.from !== undefined)? this.from : 0;
+                this.warning = warn(code, line, from,
                     a || artifact(this), b, c, d);
             }
         },
@@ -1917,7 +1940,7 @@ klass:              do {
         if (!x) {
             x = Object.create(protosymbol);
             x.id = x.string = s;
-            x.lbp = bp || 0;
+            x.lbp = (bp !== undefined)? bp : 0;
             syntax[s] = x;
         }
         return x;
@@ -2447,9 +2470,9 @@ klass:              do {
         if (kind !== 'catch' && array.length === 0 && !option.debug && !option.emptyBlock) {
             curly.warn('empty_block');
         }
-        block_var.forEach(function (name) {
-            scope[name].dead = true;
-        });
+        for (var i = 0; i < block_var.length; i++) {
+            scope[block_var[i]].dead = true;
+        }
         block_var = old_block_var;
         in_block = old_in_block;
         return array;
@@ -3201,8 +3224,9 @@ klass:              do {
         func.writeable = false;
         one_space();
         func.block = block('function');
-        Object.keys(scope).forEach(function (name) {
-            var master = scope[name];
+        var keys = Object.keys(scope);
+        for (var i = 0; i < keys.length; i++) {
+            var master = scope[keys[i]];
             if (!master.used && master.kind !== 'exception' &&
                     (master.kind !== 'parameter' || !option.unparam)) {
                 if (!option.unused) {
@@ -3211,7 +3235,7 @@ klass:              do {
             } else if (!master.init) {
                 master.warn('uninitialized_a');
             }
-        });
+        }
         funct = old_funct;
         option = old_option;
         scope = old_scope;
@@ -3607,7 +3631,9 @@ klass:              do {
                 advance('case');
                 one_space();
                 particular = expression(0);
-                cases.forEach(find_duplicate_case);
+                for (var i = 0; i < cases.length; i++) {
+                    find_duplicate_case(cases[i]);
+                }
                 cases.push(particular);
                 the_case.first.push(particular);
                 if (particular.id === 'NaN') {
@@ -4039,8 +4065,8 @@ klass:              do {
         } else {
             option = Object.create(null);
         }
-        option.indent = +option.indent || 4;
-        option.maxerr = +option.maxerr || 50;
+        option.indent = (option.indent !== undefined)? +option.index : 4;
+        option.maxerr = (option.maxerr !== undefined)? +option.maxerr : 50;
         global_scope = scope = Object.create(null);
         global_funct = funct = {
             scope: scope,
@@ -4102,8 +4128,8 @@ klass:              do {
             if (e) {        // ~~
                 itself.errors.push({
                     reason    : e.message,
-                    line      : e.line || next_token.line,
-                    character : e.character || next_token.from
+                    line      : (e.line !== undefined)? e.line : next_token.line,
+                    character : (e.character !== undefined)? e.character : next_token.from
                 }, null);
             }
         }
@@ -4163,7 +4189,9 @@ klass:              do {
                 label: []
             };
             the_scope = the_function.scope;
-            Object.keys(the_scope).forEach(selects);
+            for (var i = 0; i < the_scope.length; i++) {
+                selects(the_scope[i]);
+            }
             function_data['var'].sort();
             function_data.exception.sort();
             function_data.label.sort();
@@ -4208,10 +4236,10 @@ klass:              do {
             var comma_needed = false;
             if (array.length) {
                 output.push("<dt>" + h + "</dt><dd>");
-                array.forEach(function (item) {
-                    output.push((comma_needed ? ', ' : '') + item);
+                for (var i = 0; i < array.length; i++) {
+                    output.push((comma_needed ? ', ' : '') + array[i]);
                     comma_needed = true;
-                });
+                }
                 output.push("</dd>");
             }
         }

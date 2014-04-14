@@ -17,13 +17,7 @@ package org.auraframework.impl.java.controller;
 
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
@@ -32,10 +26,8 @@ import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.BackgroundAction;
 import org.auraframework.system.Annotations.Controller;
 import org.auraframework.system.Annotations.Key;
-import org.auraframework.system.Location;
-import org.auraframework.throwable.AuraHandledException;
-import org.auraframework.throwable.AuraRuntimeException;
-import org.auraframework.throwable.GenericEventException;
+import org.auraframework.system.*;
+import org.auraframework.throwable.*;
 import org.auraframework.util.date.DateOnly;
 
 import com.google.common.collect.ImmutableMap;
@@ -49,11 +41,24 @@ public class JavaTestController {
     }
 
     @AuraEnabled
-    public static Object getComponents(@Key("token") String token, @Key("input") String input) throws Exception {
+    public static Object getComponents(@Key("token") String token) throws Exception {
+        
+        // token?input=1 -> ['token', 'input=1'] -> ['input', '1']
+        final String[] tokenPair = token.split("\\?");
+        final String input;
+        
+        if(tokenPair.length > 1) {
+            final String[] queryPair = tokenPair[1].split("=");
+            input = (queryPair.length == 2) ? queryPair[1] : null;
+            
+        } else {
+            input = null;
+        }
+        
         int count = input == null ? 1 : Integer.parseInt(input);
         List<Component> cmps = new LinkedList<Component>();
         while (count-- > 0) {
-            Object val = token + ":java:" + count;
+            Object val = tokenPair[0] + ":java:" + count;
             Map<String, Object> atts = ImmutableMap.of("value", val);
             Component cmp = Aura.getInstanceService().getInstance("auratest:text", ComponentDef.class, atts);
             cmps.add(cmp);

@@ -39,6 +39,8 @@ var AuraLayoutService = function(){
             var token = event.getParam("token");
             if(!token){
                 token = priv.layouts.getDefault().getName();
+            } else {
+            	token = token.split("?")[0];
             }
 
             // The presence of a semaphore in here makes me think a class-level markName might cause trouble, but...

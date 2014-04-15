@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.auraframework</groupId>
         <artifactId>aura-framework</artifactId>
-        <version>0.872-SNAPSHOT</version>
+        <version>0.899-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <dependencies>
@@ -54,11 +54,6 @@
             <scope>runtime</scope>
         </dependency>
         <dependency>
-             <groupId>org.uiautomation</groupId>
-             <artifactId>ios-client</artifactId>
-             <scope>runtime</scope>
-        </dependency>
-        <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-server</artifactId>
             <scope>runtime</scope>
@@ -82,6 +77,11 @@
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-chrome-driver</artifactId>
             <scope>runtime</scope>
+        </dependency>
+        <dependency>
+             <groupId>org.uiautomation</groupId>
+             <artifactId>ios-client</artifactId>
+             <scope>test</scope>
         </dependency>
     </dependencies>
     <properties>

@@ -48,6 +48,9 @@ Test.Components.Ui.Scroller.PullToLoadMoreTests=function(){
 					"on": function(event,action){
 						action.call(PTLplugin);
 					},
+					_setSize: function(){
+
+					},
 					scroller: {
 						appendChild: function(item){
 							PTLsurfaceItem = item;
@@ -60,7 +63,8 @@ Test.Components.Ui.Scroller.PullToLoadMoreTests=function(){
 				});
 			});
 			
-			Assert.True(PTLplugin._ptlIsEnabled()  && 
+			Assert.True(
+						PTLplugin._ptlIsEnabled()  && 
 						PTLsurfaceItem.innerHTML && 
 						PTLsurfaceItem.className === 'pullToLoadMore');
 		}
@@ -189,14 +193,14 @@ Test.Components.Ui.Scroller.PullToLoadMoreTests=function(){
 
 			windowMock(function(){
 				PTLplugin = new plugins.PullToLoadMore();
+				PTLplugin.opts = {pullToLoadMore: false};
 				PTLplugin.ptlDOM={style:{display:'none'},offsetHeight:1},
-				PTLplugin._ptlEnabled=false,
 				PTLplugin._ptlThreshold;
 
 				PTLplugin.togglePullToLoadMore(true);
 			});
 
-			Assert.True(PTLplugin.ptlDOM.style.display === '' && PTLplugin._ptlEnabled);
+			Assert.True(PTLplugin.ptlDOM.style.display === '' && PTLplugin.opts.pullToLoadMore);
 		}
 
 		[Fact]
@@ -206,7 +210,7 @@ Test.Components.Ui.Scroller.PullToLoadMoreTests=function(){
 			windowMock(function(){
 				PTLplugin = new plugins.PullToLoadMore();
 				PTLplugin.ptlDOM={style:{display:''}},
-				PTLplugin._ptlEnabled=true,
+				PTLplugin.opts = {pullToLoadMore: true};
 				PTLplugin._ptlThreshold;
 
 				PTLplugin.togglePullToLoadMore(false);
@@ -214,7 +218,7 @@ Test.Components.Ui.Scroller.PullToLoadMoreTests=function(){
 
 			Assert.True(PTLplugin.ptlDOM.style.display === 'none' && 
 						!PTLplugin._ptlEnabled 					  &&
-						!PTLplugin._ptlThreshold);
+						!PTLplugin.opts.pullToLoadMore);
 		}
 	}
 }

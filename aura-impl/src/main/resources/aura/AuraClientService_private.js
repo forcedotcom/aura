@@ -390,7 +390,7 @@ var priv = {
                     }
                 }
             }
-            $A.endMark("Completed Action Callback - XHR " + collector.getNum());
+            $A.Perf.endMark("Completed Action Callback - XHR " + collector.getNum());
             priv.fireDoneWaiting();
         }, stackName);
 
@@ -429,8 +429,8 @@ var priv = {
      *            the flight counter under which the actions should be run.
      */
     request : function(actions, flightCounter) {
-        $A.mark("AuraClientService.request");
-        $A.mark("Action Request Prepared");
+        $A.Perf.mark("AuraClientService.request");
+        $A.Perf.mark("Action Request Prepared");
         var that = this;
         //
         // NOTE: this is done here, before the callback to avoid a race condition of someone else queueing up
@@ -441,7 +441,7 @@ var priv = {
             that.finishRequest(collector, flightCounter, abortableId);
         });
         collector.process();
-        $A.mark("Action Group " + collector.getCollectorId() + " enqueued");
+        $A.Perf.mark("Action Group " + collector.getCollectorId() + " enqueued");
     },
 
     /**
@@ -507,19 +507,19 @@ var priv = {
                     "aura.num" : collector.getNum()
                     // #if {"modes" : ["PTEST"]}
                     ,
-                    "beaconData" : $A.getBeaconData()
+                    "beaconData" : $A.Perf.getBeaconData()
                 // #end
                 },
                 "markDescription" : markDescription
             };
-            $A.endMark("Action Group " + collector.getCollectorId() + " enqueued");
+            $A.Perf.endMark("Action Group " + collector.getCollectorId() + " enqueued");
 
             // clear the beaconData
             // #if {"modes" : ["PTEST"]}
-            $A.clearBeaconData();
+            $A.Perf.clearBeaconData();
             // #end
 
-            $A.endMark("Action Request Prepared");
+            $A.Perf.endMark("Action Request Prepared");
             $A.util.transport.request(requestConfig);
 
             setTimeout(function() {
@@ -531,12 +531,24 @@ var priv = {
         }
     },
 
+    isBB10 : function() {
+        var ua = navigator.userAgent;
+        return (ua.indexOf("BB10") > 0 && ua.indexOf("AppleWebKit") > 0);
+    },
+
     hardRefresh : function() {
         var url = location.href;
         if (!priv.isManifestPresent() || url.indexOf("?nocache=") > -1) {
             location.reload(true);
             return;
         }
+
+        // if BB10 and using application cache
+        if (priv.isBB10() && window.applicationCache
+            && window.applicationCache.status !== window.applicationCache.UNCACHED) {
+            url = location.protocol + "//" + location.host + location.pathname + "?b=" + Date.now();
+        }
+
         var params = "?nocache=" + encodeURIComponent(url);
         // insert nocache param here for hard refresh
         var hIndex = url.indexOf("#");
@@ -645,6 +657,19 @@ var priv = {
                 && (window.applicationCache.status === window.applicationCache.UNCACHED || window.applicationCache.status === window.applicationCache.OBSOLETE)) {
         	return;
         }
+
+        /**
+         * BB10 triggers appcache ERROR when the current manifest is a 404.
+         * Other browsers triggers OBSOLETE and we refresh the page to get
+         * the new manifest.
+         *
+         * For BB10, we append cache busting param to url to force BB10 browser
+         * not to use cached HTML via hardRefresh
+         */
+        if (priv.isBB10()) {
+            priv.hardRefresh();
+        }
+
         var manifestURL = priv.getManifestURL();
         if (priv.isDevMode()) {
             priv.showProgress(-1);

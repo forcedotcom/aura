@@ -21,9 +21,7 @@ import java.util.regex.Pattern;
 
 import org.auraframework.Aura;
 import org.auraframework.cache.Cache;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.Definition;
-import org.auraframework.def.TypeDef;
+import org.auraframework.def.*;
 import org.auraframework.impl.type.AuraStaticTypeDefRegistry;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.service.CachingService;
@@ -47,46 +45,10 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
 
     private final int hashCode;
 
-    private static final class DescriptorKey {
-        private final String name;
-        private final Class<? extends Definition> clazz;
 
-        public DescriptorKey(String name, Class<? extends Definition> clazz) {
-            // FIXME: this case flattening would remove the extra copies of
-            // definitions.
-            // If we go case sensitive, we won't want it though.
-            // this.qualifiedName = qualifiedName.toLowerCase();
-            this.name = name;
-            this.clazz = clazz;
-        }
-
-        @Override
-        public int hashCode() {
-            return this.name.hashCode() + this.clazz.hashCode();
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (this == obj) {
-                return true;
-            }
-            if (!(obj instanceof DescriptorKey)) {
-                return false;
-            }
-            DescriptorKey dk = (DescriptorKey) obj;
-            return dk.clazz.equals(this.clazz) && dk.name.equals(this.name);
-        }
-    }
 
 
     private static CachingService cSrv = Aura.getCachingService();
-    
-    private static final Cache<DescriptorKey, DefDescriptor<? extends Definition>> cache = 
-            cSrv.<DescriptorKey, DefDescriptor<? extends Definition>>getCacheBuilder()
-            .setInitialSize(512)
-            .setMaximumSize(1024 * 10)
-            .setConcurrencyLevel(20)
-            .build();
     
     /**
      * Pattern for tag descriptors : foo:bar Group 0 = QName = foo:bar Group 1 = prefix Group 2 = namespace = foo Group
@@ -348,6 +310,11 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
         }
         
         DescriptorKey dk = new DescriptorKey(name, defClass);
+        
+        Cache<DescriptorKey, DefDescriptor<? extends Definition>> cache = 
+                cSrv.getDefDescriptorByNameCache();
+
+        
         @SuppressWarnings("unchecked")
         DefDescriptor<E> result = (DefDescriptor<E>) cache.getIfPresent(dk);
         if (result == null) {
@@ -357,7 +324,7 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
             // the fully-qualified is properly cached to the same object.
             // I'd like an unqualified name to either throw or be resolved first,
             // but that's breaking or non-performant respectively.
-            if (!dk.name.equals(result.getQualifiedName())) {
+            if (!dk.getName().equals(result.getQualifiedName())) {
                 DescriptorKey fullDK = new DescriptorKey(result.getQualifiedName(), defClass);
                 
                 @SuppressWarnings("unchecked")

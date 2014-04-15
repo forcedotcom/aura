@@ -355,6 +355,9 @@ Test.Aura.UtilTest=function(){
                                 return "NonBlacklistedMode";
                             }
                         }
+                    },
+                    get: function() {
+                        return true;
                     }
                 },
                 window: {
@@ -457,10 +460,13 @@ Test.Aura.UtilTest=function(){
                                 return "PTEST";
                             }
                         }
+                    },
+                    get: function (query) {
+                        return false;
                     }
                 },
                 window: {
-                    ontouchstart: true
+                    ontouchstart: false
                 }
             });
 
@@ -499,7 +505,7 @@ Test.Aura.UtilTest=function(){
                     msPointerEnabled: true,
                     pointerEnabled: true,
                     msMaxTouchPoints: 0,
-                    maxTouchPoints:0
+                    maxTouchPoints: 0
                 }
             });
 

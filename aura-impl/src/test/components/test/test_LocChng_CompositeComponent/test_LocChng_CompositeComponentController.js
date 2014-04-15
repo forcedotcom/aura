@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 ({
-    clientAction: function(cmp, event){
+    clientAction: function(cmp, event, helper){
         //Client Action associated with the button
         //Get the current token, if this is the first time the page was loaded, token will be null
-        var locator = $A.historyService.get().locator;
+        var token = $A.historyService.get().token;
+        var locator = helper.getSearchParameters(token).locator;
+        
         //Increment the value of num
         if(locator){
             $A.historyService.set("ButtonClickedCompositeComponent?locator="+((locator*1)+1));
@@ -26,9 +28,9 @@
         }
     },
 
-    clicked: function(cmp, event){
-        //Action associated with handler for location change event(test:test_LocChng_Event2) in this component
-        if(event.getParam('locator')){
+    clicked: function(cmp, event, helper){
+        //Action associated with handler for location change event(test:test_LocChng_Event2) in this component    	
+        if('locator' in event.getDef().getAttributeDefs()){
             //Since location change event is triggered on page load and we dont want to change the button name until it is clicked
             //Change the button once clientAction() is invoked. clientAction() sets the location (URL) to ButtonClickedSimpleComponent?locator=1
             var button = cmp.find("compositeButton");
@@ -37,9 +39,9 @@
             }
         }
     },
-    innerClicked: function(cmp, event){
-        //Action associated with handler for location change event(test:test_LocChng_Event) in inner simple component
-        if(event.getParam('num')){ //Since location change event is triggered on page load and we dont want to change the button name until it is clicked
+    innerClicked: function(cmp, event, helper){
+        //Action associated with handler for location change event(test:test_LocChng_Event) in inner simple component    	
+        if('num' in event.getDef().getAttributeDefs()){ //Since location change event is triggered on page load and we dont want to change the button name until it is clicked
             //Change the button once clientAction() is invoked. clientAction() sets the location (URL) to ButtonClickedSimpleComponent?num=1
             var button = cmp.find("compositeButton");
             if(button){

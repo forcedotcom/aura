@@ -618,9 +618,10 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         Mockito.verify(registry, Mockito.times(0)).compileDE(Mockito.eq(cmpDesc));
 
         // another getDef on other registry instance should no longer re-compile the def since W-2106504
+        // TODO - change times(1) to times(0) when depsCache for non-uid-deps are reenabled
         registry = getDefRegistry(true);
         assertNotNull(registry.getDef(cmpDesc));
-        Mockito.verify(registry, Mockito.times(0)).compileDE(Mockito.eq(cmpDesc));
+        Mockito.verify(registry, Mockito.times(1)).compileDE(Mockito.eq(cmpDesc));
     }
 
     public void testGetDefDescriptorNull() throws Exception {
@@ -940,8 +941,9 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
     private boolean isInDepsCache(DefDescriptor<?> dd, MasterDefRegistryImpl mdr) throws Exception {
         Cache<String, ?> cache = AuraPrivateAccessor.get(mdr, "depsCache");
+        String ddKey = dd.getDescriptorName().toLowerCase();
         for (String key : cache.getKeySet()) {
-        	if (key.endsWith(dd.getDescriptorName())) {
+        	if (key.endsWith(ddKey)) {
         		return cache.getIfPresent(key) != null;
         	}
         }
@@ -1287,6 +1289,22 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 							"No COMPONENT named %s found",
 							unprivilegedCmp.getQualifiedName()));
 		}
+    }
+    
+    public void testJavaProtocolIsCached() throws Exception {
+        DefDescriptor<ControllerDef> controllerDef = DefDescriptorImpl.getInstance("java://org.auraframework.java.controller.TestController", ControllerDef.class);
+        ControllerDef dd = controllerDef.getDef();
+        String prefix = controllerDef.getPrefix();
+        assertEquals(prefix, "java");
+        
+
+        ConfigAdapter configAdapter = Aura.getConfigAdapter();
+        assertFalse(configAdapter.isPrivilegedNamespace(controllerDef.getNamespace()));
+        
+        MasterDefRegistry mdr = Aura.getContextService().getCurrentContext().getDefRegistry();
+        mdr.getDef(controllerDef);
+        MasterDefRegistryImpl mdri = (MasterDefRegistryImpl)mdr;
+        assertTrue(isInDepsCache(controllerDef, mdri));
     }
 
     private MasterDefRegistry restartContextGetNewMDR() {

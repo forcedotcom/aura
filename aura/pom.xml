@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.auraframework</groupId>
         <artifactId>aura-framework</artifactId>
-        <version>0.872-SNAPSHOT</version>
+        <version>0.899-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -55,7 +55,6 @@
         <dependency>
             <groupId>org.uiautomation</groupId>
             <artifactId>ios-client</artifactId>
-            <version>0.6.5</version>
             <scope>test</scope>
         </dependency>
         <dependency>

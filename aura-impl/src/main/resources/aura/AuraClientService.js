@@ -62,8 +62,8 @@ var AuraClientService = function() {
          * @private
          */
         init : function(config, token, callback, container) {
-            $A.mark("Initial Component Created");
-            $A.mark("Initial Component Rendered");
+            $A.Perf.mark("Initial Component Created");
+            $A.Perf.mark("Initial Component Rendered");
             var body = document.body;
             
             //
@@ -84,12 +84,12 @@ var AuraClientService = function() {
                 // NOTE: no creation path here, we are at the top level
                 var component = componentService.newComponentDeprecated(config, null, false, true);
 
-                $A.endMark("Initial Component Created");
+                $A.Perf.endMark("Initial Component Created");
 
                 renderingService.render(component, container || body);
                 renderingService.afterRender(component);
 
-                $A.endMark("Initial Component Rendered");
+                $A.Perf.endMark("Initial Component Rendered");
                 callback(component);
 
                 // not on in dev modes to preserve stacktrace in debug tools
@@ -122,27 +122,27 @@ var AuraClientService = function() {
          */
         initDefs : function(config) {
             var evtConfigs = aura.util.json.resolveRefs(config["eventDefs"]);
-            $A.mark("Registered Events [" + evtConfigs.length + "]");
+            $A.Perf.mark("Registered Events [" + evtConfigs.length + "]");
             for ( var j = 0; j < evtConfigs.length; j++) {
                 eventService.getEventDef(evtConfigs[j]);
             }
-            $A.endMark("Registered Events [" + evtConfigs.length + "]");
+            $A.Perf.endMark("Registered Events [" + evtConfigs.length + "]");
 
             var controllerConfigs = aura.util.json.resolveRefs(config["controllerDefs"]);
-            $A.mark("Registered Controllers [" + controllerConfigs.length + "]");
+            $A.Perf.mark("Registered Controllers [" + controllerConfigs.length + "]");
             for (j = 0; j < controllerConfigs.length; j++) {
                 componentService.getControllerDef(controllerConfigs[j]);
             }
-            $A.endMark("Registered Controllers [" + controllerConfigs.length + "]");
+            $A.Perf.endMark("Registered Controllers [" + controllerConfigs.length + "]");
 
             var comConfigs = aura.util.json.resolveRefs(config["componentDefs"]);
-            $A.mark("Registered Components [" + comConfigs.length + "]");
+            $A.Perf.mark("Registered Components [" + comConfigs.length + "]");
             for ( var i = 0; i < comConfigs.length; i++) {
                 componentService.getDef(comConfigs[i]);
             }
-            $A.endMark("Registered Components [" + comConfigs.length + "]");
+            $A.Perf.endMark("Registered Components [" + comConfigs.length + "]");
 
-            $A.endMark("PageStart");
+            $A.Perf.endMark("PageStart");
 
             // Let any interested parties know that defs have been initialized
             for ( var n = 0; n < priv.initDefsObservers.length; n++) {
@@ -280,7 +280,7 @@ var AuraClientService = function() {
                             }
                         }
 
-                        $A.endMark("Sending XHR " + $A.getContext().getNum());
+                        $A.Perf.endMark("Sending XHR " + $A.getContext().getNum());
                     });
 
                     clientService.enqueueAction(action);
@@ -596,7 +596,11 @@ var AuraClientService = function() {
                     }
                 }
 
-                root.getValue("v.body").push(c);
+                var body = root.getValue("v.body");
+                body.push(c);
+                
+                // Do not let Aura consider this initial setting into the surrogate app as a candiadate for rerendering
+                body.commit();          
 
                 $A.render(c, element);
 

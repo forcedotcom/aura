@@ -95,7 +95,7 @@ MapValue.prototype.getValue = function (key) {
  *
  * @private
  */
-MapValue.prototype._getValue = function(k){
+MapValue.prototype.getValue = function(k, returnUndefined){
     if ($A.util.isUndefined(this.value)) {
         return valueFactory.create(undefined, null, this.owner);
     }
@@ -103,7 +103,7 @@ MapValue.prototype._getValue = function(k){
     aura.assert(k, "Key is required for getValue on MapValue");
 
     var ret = this.value[k.toLowerCase()];
-    if ($A.util.isUndefined(ret)){
+    if ($A.util.isUndefined(ret) && !returnUndefined){
         ret = valueFactory.create(undefined, null, this.owner);
     }
 

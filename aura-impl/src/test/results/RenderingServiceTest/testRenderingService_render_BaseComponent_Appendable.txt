@@ -1,8 +1,0 @@
-
-	First Text
-	
-		Second Text
-		
-		Third Text
-	
-	Fourth Text

@@ -98,6 +98,12 @@
                 if (!helper.isElementInComponent(component, event.target)) {
                     // Hide the component
                     component.setValue("v.visible", false);
+                    
+                    //Since we are no longer going into the rerender function, updateGlobalEventListeners does not get called and the listeners will never get turned off
+                    var concreteCmp = component.getConcreteComponent();
+                    concreteCmp._clickStart.setEnabled(false);
+                    concreteCmp._clickEnd.setEnabled(false);
+                    
                     var divCmp = component.find("datePicker");
                     if (divCmp) {
                         var elem = divCmp.getElement();
@@ -267,8 +273,10 @@
         var elem = divCmp ? divCmp.getElement() : null;
         var visible = component.get("v.visible");
         var viewPort = $A.util.getWindowSize();
+
         if (elem && visible) {
             var isPhone = $A.get("$Browser.isPhone");
+            
             if (isPhone === true) {
                 this.attachToDocumentBody(component);
                 var scrollerDivCmp = component.find("scroller");
@@ -282,11 +290,12 @@
                     }
                 }
             } else {
-                elem.style.top = "auto";
                 var elemRect = elem.getBoundingClientRect();
+                
                 if (elemRect.bottom > viewPort.height) { // no enough space below
                     elem.style.top = 0 - (elemRect.bottom - viewPort.height) + "px"; // Move it up a bit
-                } else {
+                } 
+                else {
                     elem.style.top = "auto"; 
                 }
             }

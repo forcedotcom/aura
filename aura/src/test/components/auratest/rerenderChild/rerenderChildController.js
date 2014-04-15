@@ -17,5 +17,10 @@
     toggleChild : function(cmp, event) {
         var val = cmp.getValue("v.toggleChild");
         val.setValue(!val.unwrap());
+    },
+    
+    toggleDummy : function(cmp, event) {
+        var val = cmp.getValue("v.toggleDummy");
+        val.setValue(!val.unwrap());
     }
 })

@@ -18,7 +18,7 @@
         if (Window.rerenderTestOrder === undefined) {
             Window.rerenderTestOrder = [];
         }
-        Window.rerenderTestOrder.push(cmp.getGlobalId());
+        Window.rerenderTestOrder.push(cmp.get("v.title"));
         this.superRerender();
     }
 })

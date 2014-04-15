@@ -69,9 +69,9 @@ ComponentDefRegistry.prototype.getDef = function(config, noInit) {
     if ((!noInit) && !ret) {
         var useLocalStorage = this.useLocalCache(descriptor);
         if (useLocalStorage) {
-            $A.mark("ComponentDefRegistry.localStorageCache");
-            $A.mark("Cleared localStorage (out of space) ");
-            $A.mark("Wrote " + descriptor);
+            $A.Perf.mark("ComponentDefRegistry.localStorageCache");
+            $A.Perf.mark("Cleared localStorage (out of space) ");
+            $A.Perf.mark("Wrote " + descriptor);
 
             // Try to load from cache
             var cachedConfig = this.getConfigFromLocalCache(descriptor);
@@ -80,7 +80,7 @@ ComponentDefRegistry.prototype.getDef = function(config, noInit) {
                 useLocalStorage = false;
             }
 
-            $A.endMark("ComponentDefRegistry.localStorageCache");
+            $A.Perf.endMark("ComponentDefRegistry.localStorageCache");
         }
 
         $A.assert(config !== undefined, "Unknown component "+descriptor);
@@ -99,7 +99,7 @@ ComponentDefRegistry.prototype.getDef = function(config, noInit) {
             } catch (e) {
                 // Clear localStorage and try one more time to write through
                 localStorage.clear();
-                $A.endMark("Cleared localStorage (out of space) ");
+                $A.Perf.endMark("Cleared localStorage (out of space) ");
 
                 try {
                     this.writeToCache(descriptor, config);
@@ -162,6 +162,6 @@ ComponentDefRegistry.prototype.writeToCache = function(descriptor, config) {
         // Write out the componentDef
         localStorage.setItem(this.cacheName + "." + descriptor, $A.util.json.encode(config));
 
-        $A.endMark("Wrote " + descriptor);
+        $A.Perf.endMark("Wrote " + descriptor);
     }
 };

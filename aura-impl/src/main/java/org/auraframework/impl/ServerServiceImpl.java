@@ -145,9 +145,8 @@ public class ServerServiceImpl implements ServerService {
         final String mKey = minify ? "MIN:" : "DEV:";
 
         DefDescriptor<?> appDesc = context.getLoadingApplicationDescriptor();
-
         final String uid = context.getUid(appDesc);
-        final String key = "CSS:" + mKey + uid;
+        final String key = "CSS:" + context.getClient().getType() + "$" + mKey + uid;
 
         context.setPreloading(true);
 

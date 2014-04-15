@@ -15,6 +15,7 @@
  */
 package org.auraframework.impl.validation.http;
 
+import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
@@ -27,11 +28,17 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.auraframework.impl.validation.ValidationTestUtil;
 import org.auraframework.test.AuraHttpTestCase;
+import org.auraframework.test.annotation.UnAdaptableTest;
+import org.auraframework.util.AuraFiles;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.validation.ValidationError;
 
 import com.google.common.base.Charsets;
 
+/**
+ * Testing validation tool functionality. UnAdaptableTest because requires source to check present in file system.
+ */
+@UnAdaptableTest
 public final class AuraValidationServletHttpTest extends AuraHttpTestCase {
 
     private HttpRequestBase method;
@@ -53,7 +60,9 @@ public final class AuraValidationServletHttpTest extends AuraHttpTestCase {
     }
 
     public void testServlet() throws Exception {
-        method = obtainGetMethod("/qa/auraValidation?path=../aura-impl/src/test/components/validationTest/basic");
+        String path = AuraFiles.Core.getPath() + "/aura-impl/src/test/components/validationTest/basic";
+        assertTrue(path, new File(path).exists());
+        method = obtainGetMethod("/qa/auraValidation?path=" + path);
         HttpResponse response = perform(method);
         assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
         String contentType = response.getFirstHeader(HttpHeaders.CONTENT_TYPE).getValue();
@@ -70,9 +79,10 @@ public final class AuraValidationServletHttpTest extends AuraHttpTestCase {
      * Same as testServlet(), but only uses JDK classes
      */
     public void testServletStandalone() throws Exception {
-        URL url = new URL(getTestServletConfig().getBaseUrl()
-                + "qa/auraValidation?path=../aura-impl/src/test/components/validationTest/basic");
-        InputStream stream = url.openStream();
+        String path = AuraFiles.Core.getPath() + "/aura-impl/src/test/components/validationTest/basic";
+        assertTrue(path, new File(path).exists());
+        String url = getTestServletConfig().getBaseUrl().toURI().resolve("/qa/auraValidation?path=" + path).toString();
+        InputStream stream = new URL(url).openStream();
         List<String> errors = ValidationError.parseErrors(new InputStreamReader(stream));
 
         ValidationTestUtil.verifyValidationTestBasicErrors(errors);

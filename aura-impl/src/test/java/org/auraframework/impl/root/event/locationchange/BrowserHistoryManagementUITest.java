@@ -18,7 +18,7 @@ package org.auraframework.impl.root.event.locationchange;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 
-import org.auraframework.test.WebDriverTestCase;
+import org.auraframework.test.*;
 import org.auraframework.test.WebDriverTestCase.ExcludeBrowsers;
 import org.auraframework.test.WebDriverUtil.BrowserType;
 import org.openqa.selenium.By;
@@ -66,9 +66,8 @@ public class BrowserHistoryManagementUITest extends WebDriverTestCase {
                 "Location change event failed to evoke the right client action",
                 "test_LocChng_SimpleComponent#aura:locationChange".equals(findByCssSelector(".SimpleComponent")
                         .getText()));
-        assertEquals("ButtonClickedSimpleComponent",
+        assertEquals("ButtonClickedSimpleComponent?num=1",
                 auraUITestingUtil.getEval("return window.aura.historyService.get().token"));
-        assertEquals("1", auraUITestingUtil.getEval("return window.aura.historyService.get().num"));
     }
 
     /**
@@ -89,9 +88,8 @@ public class BrowserHistoryManagementUITest extends WebDriverTestCase {
          * "test_LocChng_SimpleComponent#test:test_LocChng_Event2"
          * .equals(this.getText("//div[contains(@class,'SimpleComponent')]"))
          */
-        assertEquals("ButtonClickedCompositeComponent",
+        assertEquals("ButtonClickedCompositeComponent?locator=1",
                 auraUITestingUtil.getEval("return window.aura.historyService.get().token"));
-        assertEquals("1", auraUITestingUtil.getEval("return window.aura.historyService.get().locator"));
 
     }
 
@@ -113,9 +111,8 @@ public class BrowserHistoryManagementUITest extends WebDriverTestCase {
         assertEquals("Location change event failed to evoke the right client action",
                 "test_LocChng_SimpleComponent#test:test_LocChng_Event2",
                 findByCssSelector(".SimpleComponent").getText());
-        assertEquals("ButtonClickedSimpleComponent",
+        assertEquals("ButtonClickedSimpleComponent?locator=1",
                 auraUITestingUtil.getEval("return window.aura.historyService.get().token"));
-        assertEquals("1", auraUITestingUtil.getEval("return window.aura.historyService.get().locator"));
 
     }
 
@@ -147,8 +144,8 @@ public class BrowserHistoryManagementUITest extends WebDriverTestCase {
         i--;
         // 3
         waitForElementPresent(findByCssSelector(locationChangeIndicator));
-        assertEquals("ButtonClicked", auraUITestingUtil.getEval("return window.aura.historyService.get().token"));
-        assertEquals(Integer.toString(i), auraUITestingUtil.getEval("return window.aura.historyService.get().num"));
+        assertEquals("ButtonClicked?num=" + Integer.toString(i), auraUITestingUtil.getEval("return window.aura.historyService.get().token"));
+        //assertEquals(Integer.toString(i), auraUITestingUtil.getEval("return window.aura.historyService.get().num"));
         assertEquals(Integer.toString(i), findByCssSelector(displayLocator).getText());
         findByCssSelector(backLocator).click();
         i--;
@@ -237,8 +234,8 @@ public class BrowserHistoryManagementUITest extends WebDriverTestCase {
         findByCssSelector(".SimpleComponent").click();
         index++;
         waitForElementPresent(findByCssSelector(".complete"));
-        assertEquals("ButtonClicked", auraUITestingUtil.getEval("return window.aura.historyService.get().token"));
-        assertEquals(Integer.toString(index), auraUITestingUtil.getEval("return window.aura.historyService.get().num"));
+        assertEquals("ButtonClicked?num=" + Integer.toString(index), auraUITestingUtil.getEval("return window.aura.historyService.get().token"));
+        //assertEquals(Integer.toString(index), auraUITestingUtil.getEval("return window.aura.historyService.get().num"));
         assertEquals(Integer.toString(index), findByCssSelector(".id").getText());
         return index;
     }

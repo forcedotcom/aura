@@ -38,12 +38,12 @@ import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.root.DependencyDefImpl;
 import org.auraframework.service.LoggingService;
 import org.auraframework.system.AuraContext;
+import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.DefRegistry;
 import org.auraframework.system.DependencyEntry;
 import org.auraframework.system.Location;
 import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.system.Source;
-import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
@@ -794,7 +794,8 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                 depsCache.put(makeGlobalKey(de.uid, descriptor), de);
 
                 // put unqualified descriptor key for dependency
-                depsCache.put(makeNonUidGlobalKey(descriptor), de);
+                // disable non-uid-deps cache until we fix tests: testDataBaseDefsProtectedByOrgPerm, testDeployAuraNote, testCreateAuraBundleWithoutNamespace
+                //depsCache.put(makeNonUidGlobalKey(descriptor), de);
             }
 
             // See localDependencies comment
@@ -1358,8 +1359,9 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         if (descriptor == null) {
             return false;
         }
+        String prefix = descriptor.getPrefix();
         String namespace = descriptor.getNamespace();
-        return shouldCache(namespace);
+        return shouldCache(prefix, namespace);
     }
     
     /**
@@ -1367,13 +1369,25 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
      * result of find to be cached
      */
     private boolean shouldCache(DescriptorFilter filter) {
+        GlobMatcher p = filter.getPrefixMatch();
+        String prefix = ((p.isConstant()) ? p.toString() : null);
+        
         GlobMatcher ns = filter.getNamespaceMatch();
-        return ns.isConstant() && shouldCache(ns.toString());
+        String namespace = ((ns.isConstant()) ? ns.toString() : null);
+        
+        return (prefix != null || ns != null) && shouldCache(prefix, namespace);
     }
+    
     /**
      * Return true if the namespace supports cacheing
      */
-    private boolean shouldCache(String namespace) {
+    private boolean shouldCache(String prefix, String namespace) {
+        if ("java".equals(prefix)) {
+            return true;
+        }
+        if (namespace == null) {
+            return false;
+        }
         ConfigAdapter configAdapter = Aura.getConfigAdapter();
         return configAdapter.isPrivilegedNamespace(namespace);
     }

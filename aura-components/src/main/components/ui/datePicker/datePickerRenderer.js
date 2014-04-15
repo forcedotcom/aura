@@ -15,39 +15,54 @@
  */
 ({
     afterRender: function(component, helper) {
-        var visible = component.get("v.visible");
+        var visible = component.get("v.visible"),
+            managed = component.get('v.managed');
+
         if (visible === true) {
             if (component.get("v._yearListInitialized") === false) {
                 helper.refreshYearSelection(component);
                 component.setValue("v._yearListInitialized", true);
             }
+
             helper.setGridInitialValue(component);
             helper.updateMonthYear(component, component.get("v.value"));
             helper.updateGlobalEventListeners(component);
         }
-        var ret = this.superAfterRender();
-        if (visible === true) {
+
+        // If this picker is not 'managed' (consumed by ui:dataPickerManager), 
+        // then positioning should be taken into account.
+        if (visible === true && !managed) {
             helper.position(component);
         }
-        return ret;
+
+        this.superAfterRender();
     },
 
     rerender: function(component, helper) {
-        var visible = component.get("v.visible");
+        var visible = component.get("v.visible"),
+            managed = component.get('v.managed');
+
         if (visible === true) {
             if (component.get("v._yearListInitialized") === false) {
                 helper.refreshYearSelection(component);
                 component.setValue("v._yearListInitialized", true);
             }
+
             helper.setGridInitialValue(component);
             helper.updateMonthYear(component, component.get("v.value"));
             helper.updateGlobalEventListeners(component);
         }
+
         this.superRerender();
-        if (visible === true) {
+        
+        // If this picker is not 'managed' (consumed by ui:dataPickerManager), 
+        // then positioning should be taken into account.
+        if (visible === true && !managed) {
             helper.position(component);
         }
+        
         var isAndroid = $A.getGlobalValueProviders().get("$Browser.isAndroid");
+        
         if (isAndroid == true) {
             var f = function(e) {
                 helper.handleWinResize(component, e);
@@ -58,9 +73,5 @@
                 $A.util.removeOn(window, "resize", f);
             }
         }
-    },
-    
-    unrender: function(component, helper) {
-        this.superUnrender();
     }
 })

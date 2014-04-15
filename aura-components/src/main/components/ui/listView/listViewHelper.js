@@ -142,7 +142,7 @@
             buildEmptyMessage(this);
         }else{
             // DEBUG: Performance Marker
-            $A.mark("startBlockRender" + component);
+            $A.Perf.mark("startBlockRender" + component);
             // Start component chain to build items
             buildRowBlock();
         }
@@ -219,7 +219,7 @@
             listBody.set("v.body", rows);
 
             // DEBUG: Performance Marker
-            $A.endMark("BlockRender" + component);
+            $A.Perf.endMark("BlockRender" + component);
 
             // If the final item/block has been drawn, reset container height to allow proper overflow and fire the items ready event
             if(index>=itemCount-1){
@@ -227,7 +227,7 @@
                 this.fireEvent(component, component, "onitemsready", "PopulatedList");
 
                 // DEBUG: Performance Marker
-                $A.endMark("FullRender" + component);
+                $A.Perf.endMark("FullRender" + component);
             }
         }
     },

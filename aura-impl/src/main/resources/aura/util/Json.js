@@ -78,12 +78,12 @@ Json.prototype.decodeString = function(value) {
  *            obj The object to resolve
  */
 Json.prototype.resolveRefs = function(obj) {
-    $A.mark("Json.resolveRefs");
+    $A.Perf.mark("Json.resolveRefs");
 
     var config = aura.util.isArray(obj) ? obj : [obj];
     this._resolveRefs(config, {}, null, null);
 
-    $A.endMark("Json.resolveRefs");
+    $A.Perf.endMark("Json.resolveRefs");
 
     return obj;
 };

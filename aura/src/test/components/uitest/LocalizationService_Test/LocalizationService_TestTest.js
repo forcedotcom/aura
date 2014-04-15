@@ -369,7 +369,14 @@
         }
     },
     
+    /*
+     * this test is excluded from ipad and iphone because safari on them treat daylight saving differently. as a result, 
+     * we get "unvalid date time" error on autobuild safari-ios (W-2123968)
+     * //browsers: ["-IPAD","-IPHONE"],
+     */
+    
     testDaylightSavingTime: {
+    	browsers: ["-IPAD","-IPHONE"],
         test:function(component){
             var expected1 = "Nov 3, 2013 12:01:00 AM";
             var expected2 = "Nov 3, 2013 1:01:00 AM";

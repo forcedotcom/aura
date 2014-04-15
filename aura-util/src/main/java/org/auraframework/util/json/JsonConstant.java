@@ -95,6 +95,17 @@ public enum JsonConstant {
     public char getToken() {
         return token;
     }
+    
+    /**
+     * @return Returns a reasonable representation.
+     */
+    public String getRepresentation() {
+        if (token != null) {
+            return String.valueOf(token);
+        } else {
+            return toString();
+        }
+    }
 
     public static JsonConstant valueOf(Character c) {
 

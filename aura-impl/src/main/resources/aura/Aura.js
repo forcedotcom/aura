@@ -651,7 +651,7 @@ $A.ns.Aura.prototype.error = function(msg, e){
             var stk = e.stack;
             e = new Error("caught " + e.message);
             if (stk) {
-                e.stack = e.stk;
+                e.stack = stk;
             }
         } else {
             e = new Error("caught " + $A.util.json.encode(e));

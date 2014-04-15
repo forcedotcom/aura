@@ -26,6 +26,7 @@ import static org.auraframework.util.json.JsonConstant.FUNCTION;
 import static org.auraframework.util.json.JsonConstant.FUNCTION_ARGS_END;
 import static org.auraframework.util.json.JsonConstant.FUNCTION_ARGS_START;
 import static org.auraframework.util.json.JsonConstant.FUNCTION_BODY;
+import static org.auraframework.util.json.JsonConstant.LITERAL;
 import static org.auraframework.util.json.JsonConstant.LITERAL_START;
 import static org.auraframework.util.json.JsonConstant.MULTICOMMENT_DELIM;
 import static org.auraframework.util.json.JsonConstant.NULL;
@@ -55,6 +56,8 @@ import org.auraframework.util.json.JsonHandler.JsonValidationException;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+
+import edu.umd.cs.findbugs.annotations.NonNull;
 
 /**
  * Reads a stream of json-formatted objects. Call next() to parse the next thing
@@ -127,9 +130,11 @@ public class JsonStreamReader {
     private JsonConstant currentToken;
     private Object current;
     private int charNum = 0;
-    private int colNum = 0; // current parse column number
+    private int colNum = 1; // current parse column number
     private int prevColNum = 0; // max colNum of previously parsed line
-    private int lineNum = 0; // current parse line number
+    private int lineNum = 1; // current parse line number (start at 1)
+    private int lastLineNum = 0;        // the line number before the last token.
+    private int lastColNum = 0;         // the column number before the last token.
     private JsonHandlerProvider provider;
     private final DataInputStream binaryInput;
     private boolean recursiveRead = true;
@@ -361,6 +366,18 @@ public class JsonStreamReader {
         }
     }
 
+    /**
+     * get the next token.
+     *
+     * Note that hint here has 3 useful values:
+     * <ul>
+     *   <li>FUNCTION_BODY: treat an object as a function body.</li>
+     *   <li>STRING: treat most literals as strings (really only for map keys)</li>
+     *   <li>LITERAL: look for a proper literal (identifier)</li>
+     * </ul>
+     *
+     * @param hint a hint as to what we want.
+     */
     private JsonConstant next(JsonConstant hint) throws IOException, JsonEndOfStreamException {
         // If we have a binary stream, then ensure that it is closed first.
         // Closing it consumes it if it hasn't been
@@ -375,6 +392,9 @@ public class JsonStreamReader {
         } catch (JsonEndOfStreamException e) {
             return WHITESPACE;
         }
+        markPosition(0);
+        int startLine = getLineNum();
+        int startCol = getColNum();
 
         // Read and dispatch the next character
         char c = readChar();
@@ -410,38 +430,46 @@ public class JsonStreamReader {
             throw new JsonStreamParseException("Illegal '*' token");
         case LITERAL_START:
             unreadChar(c);
-            if (hint == STRING) {
-                current = readLiteralString();
-                token = STRING;
-            } else {
-                switch (c) {
-                case 't':
-                    current = readTrue();
+            if (hint == STRING || Character.isJavaIdentifierStart(c)) {
+                String result = readLiteralString();
+                token = null;
+                // FIXME: we should probably check for more key words here.
+                if (result.equals("true")) {
+                    current = Boolean.TRUE;
                     token = BOOLEAN;
-                    break;
-                case 'f':
-                    c = readChar();
-                    char c2 = readChar();
-                    unreadChar(c2);
-                    unreadChar(c);
-                    if (c2 == 'u') {
-                        current = readFunction();
-                        token = FUNCTION;
-                        break;
-                    } else {
-                        current = readFalse();
-                        token = BOOLEAN;
-                        break;
-                    }
-                case 'n':
-                    current = readNull();
+                } else if (result.equals("false")) {
+                    current = Boolean.FALSE;
+                    token = BOOLEAN;
+                } else if (result.equals("function")) {
+                    current = readFunction();
+                    token = FUNCTION;
+                } else if (result.equals("null")) {
+                    current = null;
                     token = NULL;
-                    break;
-                default:
-                    current = readNumber();
+                } else if (result.equals("class")) {
+                    // Doh!
+                    throw new JsonStreamParseException("Reserved word used as a literal", result);
+                } else if (result.equals("Infinity")) {
+                    current = Double.POSITIVE_INFINITY;
                     token = NUMBER;
-                    break;
+                } else if (result.equals("NaN")) {
+                    current = Double.NaN;
+                    token = NUMBER;
+                } 
+                if (hint == STRING || hint == LITERAL) {
+                    if (token != null) {
+                        // Guaranteed to fail.
+                        assertTokenType(STRING, token);
+                    }
+                    current = result;
+                    token = STRING;
                 }
+                if (token == null) {
+                    throw new JsonStreamParseException("Invalid literal value", result);
+                }
+            } else {
+                current = readNumber();
+                token = NUMBER;
             }
             break;
         case FUNCTION_ARGS_START:
@@ -454,16 +482,16 @@ public class JsonStreamReader {
             break;
         case BINARY_STREAM: {
             if (binaryInput != null) {
-                current = new LimitedLengthInputStream(binaryInput, binaryInput.readLong(),
-                        BINARY_STREAM_FINISHED_LISTENER);
+                current = new LimitedLengthInputStream(binaryInput, binaryInput.readLong(), BINARY_STREAM_FINISHED_LISTENER);
             } else {
-                throw new IllegalStateException(
+                throw new JsonStreamParseException(
                         "Binary data encountered in a JsonStreamReader that was not constructed to support binary data");
             }
         }
         default:
         }
 
+        setPosition(startLine, startCol);
         currentToken = token;
         return token;
     }
@@ -561,13 +589,18 @@ public class JsonStreamReader {
         JsonObjectHandler handler = provider.getObjectHandler();
 
         JsonConstant token;
+        // Hint 'string' so that we parse numbers as strings, this is a little odd, but not unreasonable.
         while ((token = next(STRING)) == STRING) {
 
             // key
             String key = (String) current;
 
             // colon
-            token = next();
+            try {
+                token = next();
+            } catch (JsonStreamParseException jspe) {
+                throw new JsonStreamParseException("Expected ':'", jspe.orig, jspe.line, jspe.col);
+            }
             assertTokenType(OBJECT_SEPARATOR, token);
 
             // value
@@ -581,7 +614,7 @@ public class JsonStreamReader {
             setHandlerProvider(provider);
 
             // comma
-            token = next();
+            token = readComma(OBJECT_END);
             if (token != ENTRY_SEPARATOR) {
                 break;
             }
@@ -609,16 +642,24 @@ public class JsonStreamReader {
 
         JsonConstant token;
         setHandlerProvider(provider.getArrayEntryHandlerProvider());
+        int line = getLineNum();
+        int col = getColNum();
+
         while ((token = next()) != ARRAY_END) {
+            if (token == WHITESPACE) {
+                // whoops. unterminated array.
+                throw new JsonStreamParseException(String.format("Unterminated array at %d:%d", getLineNum(), getColNum()),
+                        line, col);
+            }
             // Any value
             try {
                 handler.add(current);
             } catch (JsonValidationException e) {
-                throw new JsonStreamParseException(e);
+                throw new JsonStreamParseException(e.getMessage(), String.valueOf(current), getLineNum(), getColNum(), e);
             }
 
             // comma
-            token = next();
+            token = readComma(ARRAY_END);
             if (token != ENTRY_SEPARATOR) {
                 break;
             }
@@ -630,12 +671,28 @@ public class JsonStreamReader {
         return handler.getValue();
     }
 
+    @NonNull
+    private JsonConstant readComma(@NonNull JsonConstant alternate) throws IOException {
+        JsonConstant token;
+
+        try {
+            token = next();
+        } catch (JsonStreamParseException jspe) {
+            // Ignore this, we were expecting a comma, so let someone know.
+            throw new JsonStreamParseException(String.format("Expected ',' or '%s'", alternate.getRepresentation()),
+                    jspe.orig, jspe.line, jspe.col);
+        }
+        if (token != ENTRY_SEPARATOR && token != alternate) {
+            throw new JsonStreamParseException(String.format("Expected ',' or '%s', got %s", alternate.getRepresentation(),
+                    token.toString()), String.valueOf(current), getLineNum(), getColNum());
+        }
+        return token;
+    }
+
     private String readString(JsonConstant delim, boolean keepEscapers) throws IOException, JsonEndOfStreamException {
         StringBuilder sb = new StringBuilder();
         boolean isEscaped = false;
-        int line = getLineNum();
-        int col = getColNum();
-
+        markPosition(1);
         try {
             while (true) {
                 char c = readChar();
@@ -644,6 +701,9 @@ public class JsonStreamReader {
                         // We consume the delimiter and call it a day.
                         break;
                     }
+                }
+                if (!isEscaped && c == '\n') {
+                    throw new JsonStreamParseException("Unterminated string", sb.toString(), getLineNum(), getColNum());
                 }
                 // A backslash might togle isEscaped; anything else clears it.
                 if (c == '\\') {
@@ -658,20 +718,9 @@ public class JsonStreamReader {
                 sb.append(c);
             }
         } catch (JsonEndOfStreamException e) {
-            throw new JsonStreamParseException(String.format("Unterminated string at line %d, column %d: '%s'", line,
-                    col, sb));
+            throw new JsonStreamParseException("Unterminated string", sb.toString(), getLineNum(), getColNum());
         }
         return sb.toString();
-    }
-
-    private boolean readTrue() throws IOException, JsonEndOfStreamException {
-        consumeWord("true");
-        return true;
-    }
-
-    private boolean readFalse() throws IOException, JsonEndOfStreamException {
-        consumeWord("false");
-        return false;
     }
 
     /**
@@ -687,8 +736,7 @@ public class JsonStreamReader {
      *             comment, or if a multi-line comment is not closed.
      */
     private JsComment readComment() throws IOException, JsonEndOfStreamException {
-        int line = getLineNum();
-        int col = getColNum();
+        markPosition(0);
         char delim = readChar();
         boolean isMulti = false;
 
@@ -720,18 +768,17 @@ public class JsonStreamReader {
         } catch (JsonEndOfStreamException e) {
             if (isMulti) {
                 // We finished the stream before reaching end-of-comment!
-                throw new JsonStreamParseException(String.format("Unclosed comment beginning at line=%d, colum=%d",
-                        line, col));
+                throw new JsonStreamParseException("Unclosed comment");
             }
         }
-        return new JsComment(sb.toString(), line, col);
+        return new JsComment(sb.toString(), getLineNum(), getColNum());
     }
 
     private JsFunction readFunction() throws IOException, JsonEndOfStreamException {
-        int line = getLineNum();
-        int col = getColNum();
-        consumeWord("function");
-        JsonConstant next = next(STRING);
+        int line = lineNum;
+        int col = colNum;
+        // We hint 'literal' to let the parser know that arbitrary literals are ok.
+        JsonConstant next = next(LITERAL);
         String functionName = null;
         if (next == STRING) {
             functionName = (String) current;
@@ -743,8 +790,11 @@ public class JsonStreamReader {
 
         JsonConstant token;
         while (true) {
-            token = next(STRING);
+            token = next(LITERAL);
             if (token == FUNCTION_ARGS_END) {
+                if (args.size() != 0) {
+                    throw new JsonStreamParseException("Unexpected comma before ')'");
+                }
                 break;
             }
 
@@ -753,7 +803,7 @@ public class JsonStreamReader {
             args.add((String) current);
 
             // comma
-            token = next();
+            token = readComma(FUNCTION_ARGS_END);
             if (token != ENTRY_SEPARATOR) {
                 break;
             }
@@ -811,12 +861,6 @@ public class JsonStreamReader {
         return sb.toString();
     }
 
-    private Object readNull() throws IOException, JsonEndOfStreamException {
-        consumeWord("null");
-
-        return null;
-    }
-
     private Number readNumber() throws IOException, JsonEndOfStreamException {
         StringBuilder sb = new StringBuilder();
         while (hasNext()) {
@@ -843,8 +887,7 @@ public class JsonStreamReader {
             ret = new BigDecimal(sb.toString());
 
         } catch (NumberFormatException e) {
-            throw new JsonStreamParseException("Attempted to convert \"" + sb.toString() + "\" to BigDecimal\r\n"
-                    + e.toString());
+            throw new JsonStreamParseException("Could not parse a number", sb.toString(), getLineNum(), getColNum(), e);
         }
         return ret;
     }
@@ -858,16 +901,20 @@ public class JsonStreamReader {
      */
     private String readLiteralString() throws IOException, JsonEndOfStreamException {
         StringBuilder sb = new StringBuilder();
-        while (true) {
-            char c = readChar();
-            JsonConstant token = JsonConstant.valueOf(c);
-            if (token != LITERAL_START) {
-                unreadChar(c);
-                break;
-            } else if (c == '\\') {
-                c = readEscapedChar();
+        try {
+            while (true) {
+                char c = readChar();
+                JsonConstant token = JsonConstant.valueOf(c);
+                if (token != LITERAL_START) {
+                    unreadChar(c);
+                    break;
+                } else if (c == '\\') {
+                    c = readEscapedChar();
+                }
+                sb.append(c);
             }
-            sb.append(c);
+        } catch (JsonEndOfStreamException eof) {
+            // ignore, just return what we have.
         }
         return sb.toString();
     }
@@ -895,7 +942,7 @@ public class JsonStreamReader {
         if (c == '\n') {
             prevColNum = colNum;
             lineNum++;
-            colNum = 0;
+            colNum = 1;
         } else {
             colNum++;
         }
@@ -933,6 +980,8 @@ public class JsonStreamReader {
     private char readUnicodeEscapedChar() throws IOException, JsonEndOfStreamException {
 
         // Read the next 4 hex digits.
+        int line = lineNum;
+        int col = colNum;
         StringBuilder sb = new StringBuilder(4);
         for (int i = 0; i < 4; i++) {
             sb.append(readChar());
@@ -941,7 +990,7 @@ public class JsonStreamReader {
         try {
             c = (char) Integer.parseInt(sb.toString(), 16);
         } catch (NumberFormatException e) {
-            throw new JsonStreamParseException(e);
+            throw new JsonStreamParseException(e.getMessage(), sb.toString(), line, col, e);
         }
         return c;
     }
@@ -950,45 +999,34 @@ public class JsonStreamReader {
         reader.close();
     }
 
-    private void consumeWord(String word) throws IOException, JsonEndOfStreamException {
-        for (char d : word.toCharArray()) {
-            assertChar(d, readChar());
-        }
-        try {
-            char c = readChar();
-            if (Character.isLetterOrDigit(c)) {
-                throw new JsonStreamParseException(String.format("Unexpected char %s found", c));
-            }
-            unreadChar(c);
-        } catch (JsonEndOfStreamException e) {
-            // ignore
-        }
-    }
-
-    private void assertChar(char expected, char actual) {
-        if (expected != actual) {
-            throw new JsonStreamParseException(String.format("Expected %s, found %s", expected, actual));
-        }
-    }
-
     private void assertTokenType(JsonConstant expected, JsonConstant actual) {
         if (expected != actual) {
-            throw new JsonStreamParseException(String.format("Expected %s, found %s", expected, actual));
+            throw new JsonStreamParseException(String.format("Expected '%s', found '%s'", expected.getRepresentation(), actual.getRepresentation()));
         }
     }
 
     private void assertCurrentToken(JsonConstant expected) {
         if (currentToken != expected) {
-            throw new JsonStreamParseException(String.format("Current Token is %s, not %s", currentToken, expected));
+            throw new JsonStreamParseException(String.format("Current Token is '%s', not '%s'", currentToken.getRepresentation(), expected.getRepresentation()));
         }
     }
 
+    private void setPosition(int line, int col) {
+        lastLineNum = line;
+        lastColNum = col;
+    }
+
+    private void markPosition(int offset) {
+        lastLineNum = lineNum;
+        lastColNum = colNum-offset;
+    }
+
     public int getLineNum() {
-        return lineNum;
+        return lastLineNum;
     }
 
     private int getColNum() {
-        return colNum;
+        return lastColNum;
     }
 
     /**
@@ -999,13 +1037,36 @@ public class JsonStreamReader {
     public class JsonStreamParseException extends JsonParseException {
 
         private static final long serialVersionUID = -455507772693955451L;
+        public final int line;
+        public final int col;
+        public final String orig;
+
+        public JsonStreamParseException(String msg, String orig, int line, int col, Throwable cause) {
+            super(((orig == null)?String.format("%s [%d, %d]", msg, line, col)
+                    :String.format("%s [%d, %d]: '%s'", msg, line, col, orig)), cause);
+            this.line = line;
+            this.col = col;
+            this.orig = orig;
+        }
+
+        public JsonStreamParseException(String msg, String orig, int line, int col) {
+            this(msg, orig, line, col, null);
+        }
+
+        public JsonStreamParseException(String msg, int line, int col) {
+            this(msg, null, line, col, null);
+        }
+
+        public JsonStreamParseException(String msg, String orig) {
+            this(msg, orig, getLineNum(), getColNum(), null);
+        }
 
         public JsonStreamParseException(String msg) {
-            super(String.format("%s [%s, %s]", msg, getLineNum(), getColNum()));
+            this(msg, null, getLineNum(), getColNum(), null);
         }
 
         public JsonStreamParseException(Throwable cause) {
-            super(String.format("[%s, %s]", getLineNum(), getColNum()), cause);
+            this(cause.getMessage(), (current == null)?null:String.valueOf(current), getLineNum(), getColNum(), cause);
         }
     }
 

@@ -19,7 +19,7 @@
       */
       testClass: {
 	  browsers:["IPAD", "IPHONE"], 
-        attributes : {class : "Hello"}, 
+        attributes : {'class' : "Hello"}, 
         test : function(component){
             $A.test.assertEquals("Hello", component.get("v.class"), "class does not equal expected");
         }

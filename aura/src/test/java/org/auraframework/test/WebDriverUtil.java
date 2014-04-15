@@ -74,7 +74,9 @@ public final class WebDriverUtil {
         ANDROID_PHONE(DesiredCapabilities.android(), "4", "Linux", ExtraCapability.PHONE, ExtraCapability.PORTRAIT),
         ANDROID_TABLET(DesiredCapabilities.android(), "4", "Linux", ExtraCapability.TABLET, ExtraCapability.LANDSCAPE),
         IPHONE(DesiredCapabilities.iphone(), "6", "Mac 10.8"),
-        IPAD(DesiredCapabilities.ipad(), "6", "Mac 10.8");
+        IPAD(DesiredCapabilities.ipad(), "6", "Mac 10.8"),
+        IPAD7(DesiredCapabilities.ipad(),"7.1","OS X 10.9",ExtraCapability.PORTRAIT),
+        IPHONE7(DesiredCapabilities.iphone(),"7.1","OS X 10.9",ExtraCapability.PORTRAIT);
 
         private final DesiredCapabilities capability;
         private final String version;

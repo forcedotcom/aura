@@ -89,7 +89,7 @@ public abstract class BaseAccessAttributeTest extends AuraImplTestCase {
 					message += ", ";
 				}
 			}
-			fail("Test failed becuase: " + message);
+			fail("Test failed because: " + message);
 		}
     }
 	
@@ -119,7 +119,7 @@ public abstract class BaseAccessAttributeTest extends AuraImplTestCase {
 					message += ", ";
 				}
 			}
-			fail("Test failed becuase: " + message);
+			fail("Test failed because: " + message);
 		}
     }
 	
@@ -219,7 +219,7 @@ public abstract class BaseAccessAttributeTest extends AuraImplTestCase {
 					message += ", ";
 				}
 			}
-			fail("Test failed becuase: " + message);
+			fail("Test failed because: " + message);
 		}
     }		
 	
@@ -252,7 +252,7 @@ public abstract class BaseAccessAttributeTest extends AuraImplTestCase {
 					message += ", ";
 				}
 			}
-			fail("Test failed becuase: " + message);
+			fail("Test failed because: " + message);
 		}
     }
 	
@@ -281,7 +281,7 @@ public abstract class BaseAccessAttributeTest extends AuraImplTestCase {
 					message += ", ";
 				}
 			}
-			fail("Test failed becuase: " + message);
+			fail("Test failed because: " + message);
 		}
     }
 	

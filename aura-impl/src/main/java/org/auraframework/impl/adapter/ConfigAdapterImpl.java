@@ -53,6 +53,7 @@ import org.auraframework.util.resource.FileGroup;
 import org.auraframework.util.resource.ResourceLoader;
 import org.auraframework.util.text.Hash;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -64,11 +65,13 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     private static final String VERSION_PROPERTY = "aura.build.version";
     private static final String VALIDATE_CSS_CONFIG = "aura.css.validate";
     
-    private static final Set<String> SYSTEM_NAMESPACES = Sets.newTreeSet(String.CASE_INSENSITIVE_ORDER);
+    private static final Set<String> SYSTEM_NAMESPACES = Sets.newHashSet();
 
     private static final Set<String> UNSECURED_PREFIXES = new ImmutableSortedSet.Builder<String>(String.CASE_INSENSITIVE_ORDER).add("aura", "layout").build();
     
-	private static final Set<String> UNDOCUMENTED_NAMESPACES = new ImmutableSortedSet.Builder<String>(String.CASE_INSENSITIVE_ORDER).add("auradocs").build();
+    private static final Set<String> UNDOCUMENTED_NAMESPACES = new ImmutableSortedSet.Builder<String>(String.CASE_INSENSITIVE_ORDER).add("auradocs").build();
+    
+    private static final Set<String> CACHEABLE_PREFIXES = ImmutableSet.of("aura", "java");
     
     protected final Set<Mode> allModes = EnumSet.allOf(Mode.class);
     private final JavascriptGroup jsGroup;
@@ -172,7 +175,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
 
 	@Override
 	public boolean isPrivilegedNamespace(String namespace) {
-		return namespace != null && SYSTEM_NAMESPACES.contains(namespace);
+		return namespace != null && SYSTEM_NAMESPACES.contains(namespace.toLowerCase());
 	}
 
 	@Override
@@ -438,17 +441,22 @@ public class ConfigAdapterImpl implements ConfigAdapter {
 	@Override
 	public void addPrivilegedNamespace(String namespace) {
 	    if(namespace != null && !namespace.isEmpty()){
-	        SYSTEM_NAMESPACES.add(namespace);
+	        SYSTEM_NAMESPACES.add(namespace.toLowerCase());
 	    }
 	}
 
 	@Override
 	public void removePrivilegedNamespace(String namespace) {
-        SYSTEM_NAMESPACES.remove(namespace);
+        SYSTEM_NAMESPACES.remove(namespace.toLowerCase());
 	}
 
 	@Override
 	public boolean isDocumentedNamespace(String namespace) {
         return !UNDOCUMENTED_NAMESPACES.contains(namespace) && !namespace.toLowerCase().endsWith("test");
 	}
+
+    @Override
+    public boolean isCacheablePrefix(String prefix) {
+        return CACHEABLE_PREFIXES.contains(prefix);
+    }
 }

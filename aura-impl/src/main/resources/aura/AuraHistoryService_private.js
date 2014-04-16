@@ -16,6 +16,7 @@
 /*jslint sub: true */
 var priv = {
     evt : null,
+
     getEvent : function(){
         if (!this.evt){
             this.evt = $A.getRoot().getDef().getLocationChangeEvent();
@@ -40,6 +41,21 @@ var priv = {
             location = location["substring"](1);
         }
 
-        return {"token" : decodeURIComponent(location) };
+        if (location["indexOf"]('=') > -1){
+            var split = location["split"]('?');
+            if(split.length == 1){
+                return decodeURIComponent(split[0]);
+            }
+
+            if(split.length == 2){
+                var ret = $A.util.urlDecode(split[1]);
+                ret["token"] = split[0];
+                return ret;
+            }
+
+            throw new Error("Invalid location");
+        } else{
+            return {"token" : location};
+        }
     }
 };

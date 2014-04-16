@@ -39,7 +39,7 @@ public class EventImpl implements Event {
     public EventImpl(DefDescriptor<EventDef> eventDefDescriptor, Map<String, Object> attributes,
             BaseComponent<?, ?> valueProvider) throws QuickFixException {
     	InstanceStack iStack = Aura.getContextService().getCurrentContext().getInstanceStack();
-    	iStack.pushInstance(this);
+    	iStack.pushInstance(this, eventDefDescriptor);
         this.path = iStack.getPath();
         this.eventDefDescriptor = eventDefDescriptor;
         this.attributeSet = new AttributeSetImpl(eventDefDescriptor, valueProvider, this);

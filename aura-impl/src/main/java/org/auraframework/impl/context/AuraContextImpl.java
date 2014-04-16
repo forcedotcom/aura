@@ -15,6 +15,18 @@
  */
 package org.auraframework.impl.context;
 
+import java.io.IOException;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -41,9 +53,12 @@ import org.auraframework.instance.InstanceStack;
 import org.auraframework.instance.ValueProviderType;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.Client;
+
+import org.auraframework.system.LoggingContext.KeyValueLogger;
 import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.test.TestContext;
 import org.auraframework.test.TestContextAdapter;
+import org.auraframework.throwable.SystemErrorException;
 import org.auraframework.throwable.quickfix.InvalidEventTypeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.BaseJsonSerializationContext;
@@ -53,17 +68,7 @@ import org.auraframework.util.json.JsonSerializer;
 import org.auraframework.util.json.JsonSerializer.NoneSerializer;
 import org.auraframework.util.json.JsonSerializers;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Deque;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
 
 public class AuraContextImpl implements AuraContext {
     private static final Logger logger = Logger.getLogger(AuraContextImpl.class);
@@ -147,7 +152,7 @@ public class AuraContextImpl implements AuraContext {
             }
 
             if (ctx.getRequestedLocales() != null) {
-                List<String> locales = new ArrayList<String>();
+                List<String> locales = new ArrayList<>();
                 for (Locale locale : ctx.getRequestedLocales()) {
                     locales.add(locale.toString());
                 }
@@ -264,7 +269,7 @@ public class AuraContextImpl implements AuraContext {
     // serializer just for passing context in a url
     public static final Serializer HTML_SERIALIZER = new Serializer(false, true);
 
-    private final Set<DefDescriptor<?>> staleChecks = new HashSet<DefDescriptor<?>>();
+    private final Set<DefDescriptor<?>> staleChecks = new HashSet<>();
 
     private final Mode mode;
 
@@ -322,6 +327,9 @@ public class AuraContextImpl implements AuraContext {
     private MutableThemeList themes = new ThemeListImpl();
 
     private Deque<DefDescriptor<?>> callingDescriptorStack = Lists.newLinkedList();
+
+    private static final int MAX_COMPONENT_COUNT        = 10000;
+    private int componentCount;
 
     public AuraContextImpl(Mode mode, MasterDefRegistry masterRegistry, Map<DefType, String> defaultPrefixes,
             Format format, Authentication access, JsonSerializationContext jsonContext,
@@ -654,9 +662,46 @@ public class AuraContextImpl implements AuraContext {
         }
     }
 
+    private static class SBKeyValueLogger implements KeyValueLogger {
+        private StringBuffer sb;
+        private String comma = "";
+
+        public SBKeyValueLogger(StringBuffer sb) {
+            this.sb = sb;
+        }
+
+        @Override
+        public void log(String key, String value) {
+            sb.append(comma);
+            sb.append(key);
+            sb.append("=");
+            sb.append(value);
+            comma = ",";
+        }
+    };
+
     @Override
     public void registerComponent(BaseComponent<?, ?> component) {
-        getInstanceStack().registerComponent(component);
+        InstanceStack iStack = getInstanceStack();
+        if (iStack.isUnprivileged()) {
+            if (componentCount++ > MAX_COMPONENT_COUNT) {
+                //
+                // This is bad, try to give the poor user an idea of what happened.
+                //
+                Action tmp = getCurrentAction();
+                StringBuffer sb = new StringBuffer();
+                if (tmp != null) {
+                    sb.append(tmp);
+                    sb.append("(");
+                    tmp.logParams(new SBKeyValueLogger(sb));
+                    sb.append(")");
+                } else {
+                    sb.append("request");
+                }
+                throw new SystemErrorException("Too many components for "+sb.toString());
+            }
+        }
+        iStack.registerComponent(component);
     }
 
     @Override
@@ -710,6 +755,7 @@ public class AuraContextImpl implements AuraContext {
                 caller = instance.getDescriptor();
             }
         }
+        
         return caller;
     }
 }

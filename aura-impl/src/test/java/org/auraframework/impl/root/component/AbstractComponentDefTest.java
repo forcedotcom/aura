@@ -26,6 +26,7 @@ import org.auraframework.def.EventDef;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.RegisterEventDef;
 import org.auraframework.impl.AuraImplTestCase;
+import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.root.event.RegisterEventDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.throwable.AuraRuntimeException;
@@ -108,7 +109,7 @@ public class AbstractComponentDefTest extends AuraImplTestCase {
         RegisterEventDefImpl.Builder regBuilder = new RegisterEventDefImpl.Builder();
         regBuilder.setDescriptor(DefDescriptorImpl.getInstance("test:anevent", EventDef.class));
         regBuilder.setAttName("fakey");
-        regBuilder.setIsGlobal(false);
+        regBuilder.setAccess(new DefinitionAccessImpl(null, "public"));
 
         eventDefs.put("fakey", regBuilder.build());
         ComponentDefImpl.Builder builder = createAbstractBuilder();

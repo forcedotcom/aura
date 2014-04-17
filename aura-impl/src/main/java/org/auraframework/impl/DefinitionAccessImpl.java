@@ -91,6 +91,9 @@ public class DefinitionAccessImpl implements DefinitionAccess {
             		throw new InvalidAccessValueException("\"" + item + "\" must return a result of type " + 
                         Access.class.getName());
                 }	
+                if (this.accessMethod != null) {
+            		throw new InvalidAccessValueException("Access attribute may not specify more than one static method");
+                }
                 this.accessMethod = meth;
                 return;
 			} catch (ClassNotFoundException e) {

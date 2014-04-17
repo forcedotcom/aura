@@ -54,24 +54,23 @@
         test: [
             function (cmp) {
 
-                $A.getGlobalValueProviders().get("$Label.Related_Lists.task_mode_today", cmp, function (res) {
+                $A.get("$Label.Related_Lists.task_mode_today", cmp, function (res) {
                     $A.test.assertEquals("Today", res, "Failed: Wrong label value in callback");
                 });
             },
 
             function (cmp) {
 
-                var tmt = $A.getGlobalValueProviders().getValue("$Label.Related_Lists.task_mode_today", cmp, function (res) {
+                var tmt = $A.get("$Label.Related_Lists.task_mode_today", function (res) {
 
-                    $A.test.assertEquals("Today", res.getValue(), "Failed: Wrong label value in callback");
-                    $A.test.assertEquals("SimpleValue", res.toString(), "Failed: Return value not a SimpleValue");
+                    $A.test.assertEquals("Today", res, "Failed: Wrong label value in callback");
                 });
 
                 $A.test.addWaitFor(
                     false,
                     $A.test.isActionPending,
                     function () {
-                        $A.test.assertEquals("Today", tmt.getValue(), "Label should already be context so it should be the return value");
+                        $A.test.assertEquals("Today", $A.get("$Label.Related_Lists.task_mode_today"), "Label should already be context so it should be the return value");
                     }
                 );
             }
@@ -80,7 +79,7 @@
 
     testInvalidGVPExpressions: {
         test: function (cmp) {
-            var result = $A.getGlobalValueProviders().get("v.simplevalue3");
+            var result = $A.get("v.simplevalue3");
             $A.test.assertEquals(undefined, result, "Invalid GVP expression should return undefined");
         }
     },
@@ -96,14 +95,12 @@
             },
             //Section and name missing from label expression
             function (cmp) {
-                var gvp = $A.getGlobalValueProviders();
-                var labels = gvp.getValue("$Label");
+                var labels = $A.get("$Label");
                 $A.test.assertUndefinedOrNull(labels, "$Label should be undefined");
             },
             //Expression without Name missing but valid section
             function (cmp) {
-                var gvp = $A.getGlobalValueProviders();
-                var section = gvp.getValue("$Label.Related_Lists");
+                var section = $A.get("$Label.Related_Lists");
                 $A.test.assertUndefinedOrNull(section, "$Label.Related_Lists should be undefined");
             },
             //Expression without an invalid section only
@@ -126,22 +123,20 @@
 
     testNonGVP: {
         test: function (cmp) {
-            var gvp = $A.getGlobalValueProviders();
-            $A.test.assertUndefinedOrNull(gvp.getValue("undefined"));
-            $A.test.assertUndefinedOrNull(gvp.getValue(""));
-            $A.test.assertUndefinedOrNull(gvp.getValue("$Foo.bar"));
-            $A.test.assertUndefinedOrNull(gvp.getValue({}));
-            $A.test.assertUndefinedOrNull(gvp.getValue([]));
-            $A.test.assertUndefinedOrNull(gvp.getValue());
-            $A.test.assertUndefinedOrNull(gvp.getValue(null));
+            $A.test.assertUndefinedOrNull($A.get("undefined"));
+            $A.test.assertUndefinedOrNull($A.get(""));
+            $A.test.assertUndefinedOrNull($A.get("$Foo.bar"));
+            $A.test.assertUndefinedOrNull($A.get({}));
+            $A.test.assertUndefinedOrNull($A.get([]));
+            $A.test.assertUndefinedOrNull($A.get());
+            $A.test.assertUndefinedOrNull($A.get(null));
         }
     },
     testGetWithCallback: {
         test: [
             //Fetch a new label from server
             function (cmp) {
-                var gvp = $A.getGlobalValueProviders();
-                gvp.get("$Label.Related_Lists.FooBar", undefined,
+                $A.get("$Label.Related_Lists.FooBar",
                     function (label) {
                         cmp._callBack = true;
                         cmp._label = label;
@@ -163,8 +158,7 @@
             //Fetch existing GVPs at client
             function (cmp) {
                 cmp._callBack = false;
-                var gvp = $A.getGlobalValueProviders();
-                gvp.get("$Label.Related_Lists.FooBar", undefined,
+                $A.get("$Label.Related_Lists.FooBar",
                     function (label) {
                         cmp._callBack = true;
                         cmp._label = label;
@@ -179,12 +173,11 @@
             }
         ]
     },
-    
+
     testGetWithNonFunctionCallback: {
     	test : function (cmp) {
-            var gvp = $A.getGlobalValueProviders();
-            $A.test.addWaitFor("Today + Overdue", function(){return gvp.get("$Label.Related_Lists.task_mode_today_overdue",undefined,"Mary Poppins")});
-            $A.test.addWaitFor("Today + Overdue", function(){return gvp.get("$Label.Related_Lists.task_mode_today_overdue",undefined,"undefined")});
+            $A.test.addWaitFor("Today + Overdue", function(){return $A.get("$Label.Related_Lists.task_mode_today_overdue","Mary Poppins")});
+            $A.test.addWaitFor("Today + Overdue", function(){return $A.get("$Label.Related_Lists.task_mode_today_overdue","undefined")});
     	}
     }
 })

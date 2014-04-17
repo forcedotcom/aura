@@ -23,17 +23,17 @@
     scrollTo: function(component, event, helper) {
         helper.handleScrollTo(component, event);
     },
-    
+
     scrollBy: function(component, event, helper) {
         helper.handleScrollBy(component, event);
     },
-    
+
     handleCanShowMoreChange: function (cmp, evt, hlp) {
-        var newValue = evt.getParam('value').getValue();
+        var newValue = evt.getParam('value');
         hlp.swapShowMore(cmp, newValue);
     },
     handleCanRefreshChange: function (cmp, evt, hlp) {
-        var newValue = evt.getParam('value').getValue();
+        var newValue = evt.getParam('value');
         hlp.swapRefresh(cmp, newValue);
     }
 })

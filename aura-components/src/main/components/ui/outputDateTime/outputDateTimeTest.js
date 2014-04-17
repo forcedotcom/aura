@@ -148,7 +148,7 @@
         attributes: {value: '2004-09-23T16:30:00.000Z', timezone: '', format: 'M/dd/yy h:mm A', langLocale: 'en'},
         test: function(component){
         	aura.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
-        		var timezone = $A.getGlobalValueProviders().get("$Locale.timezone");
+        		var timezone = $A.get("$Locale.timezone");
         		if(timezone  == "GMT"){
 	        		aura.test.assertEquals("9/23/04 4:30 PM", $A.test.getText(component.find('span').getElement()), "Should have used default as default timezone.");
 	        	}
@@ -190,7 +190,7 @@
         attributes: {value : '2004-09-23T16:30:00.000Z', timezone: 'sasquatch', format: 'M/dd/yy h:mm A', langLocale: 'en'},
         test: function(component){
         	aura.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
-        		var timezone = $A.getGlobalValueProviders().get("$Locale.timezone");
+        		var timezone = $A.get("$Locale.timezone");
         		if(timezone  == "GMT"){
 	        		aura.test.assertEquals("9/23/04 4:30 PM", $A.test.getText(component.find('span').getElement()), "Should have used default as default timezone.");
 	        	}

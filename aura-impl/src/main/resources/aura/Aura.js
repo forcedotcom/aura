@@ -334,7 +334,7 @@ $A.ns.Aura = function() {
      * @param {Object} config
      * @param {Object} attributeValueProvider
      * @param {Boolean} localCreation
-     * @param {Boolean} doForce 
+     * @param {Boolean} doForce
      */
     this.newCmpDeprecated = function(config, attributeValueProvider, localCreation, doForce) {
         return this.componentService.newComponentDeprecated(config, attributeValueProvider, localCreation, doForce);
@@ -352,7 +352,7 @@ $A.ns.Aura = function() {
      * @param {Boolean} doForce For internal use only. doForce enforces client-side creation and defaults to false.
      * @param {Boolean} forceServer For internal use only. forceServer enforces server-side creation and defaults to false.
      */
-    
+
     this.newCmpAsync = function(callbackScope, callback, config, attributeValueProvider, localCreation, doForce, forceServer){
         return this.componentService.newComponentAsync(callbackScope, callback, config, attributeValueProvider, localCreation, doForce, forceServer);
     };
@@ -385,7 +385,7 @@ $A.ns.Aura = function() {
      */
     this.popCreationPath = function(creationPath) {
     	var ctx = this.getContext();
-    	if (!ctx) { 
+    	if (!ctx) {
             return;
     	}
     	var act = ctx.getCurrentAction();
@@ -413,7 +413,7 @@ $A.ns.Aura = function() {
     	act.setCreationPathIndex(idx);
     };
 
-    
+
     /**
      * Equivalent to <code>$A.eventService.newEvent()</code>.
      * <p>See Also: <a href="#reference?topic="AuraEventService">AuraEventService</a></p>
@@ -618,7 +618,7 @@ $A.ns.Aura.prototype.finishInit = function(doNotCallUIPerfOnLoad) {
  * @description <p>Example:</p>
  * <pre>
  * testDuplicate : {
-   exceptionsAllowedDuringInit : ["Duplicate found!"], 
+   exceptionsAllowedDuringInit : ["Duplicate found!"],
      attributes : {
  *     dupCmp : true
  *   },
@@ -748,9 +748,10 @@ $A.ns.Aura.prototype.message = function(msg) {
  * @public
  * @function
  * @param {String} key The data key to look up on element, for example, <code>$A.get("root.v.mapAttring.key")</code>.
+ * @param {Function} callback The method to call with the result if a server trip is expected.
  */
-$A.ns.Aura.prototype.get = function(key) {
-    return this.expressionService.get($A.services, key);
+$A.ns.Aura.prototype.get = function(key, callback) {
+    return this.expressionService.get($A.services, key, callback);
 };
 
 /**
@@ -812,14 +813,14 @@ $A.ns.Aura.prototype.run = function(func, name) {
     $A.services.client.pushStack(name);
     try {
     	//console.log("$A.run()", name);
-    	
+
         return func();
     } catch (e) {
         $A.error("Error while running "+name, e);
     } finally {
         $A.services.client.popStack(name);
     }
-    
+
     return undefined;
 };
 
@@ -944,7 +945,7 @@ $A.ns.Aura.prototype.logInternal = function(type, message, error, trace) {
             }
         }
     }
-    
+
     // sending logging info to debug tool if enabled
     if(!$A.util.isUndefinedOrNull($A.util.getDebugToolComponent())) {
         if ($A.util.isUndefinedOrNull(stringVersion)) {
@@ -1085,6 +1086,8 @@ $A.ns.Aura.prototype.setMode = function(mode) {
 /**
  * Get GVP directly.
  * @return {GlobalValueProviders} The global value provider, such as $Label, $Browser, $Locale, etc.
+ *
+ * @private
  */
 $A.ns.Aura.prototype.getGlobalValueProviders = function() {
     return this.getContext().getGlobalValueProviders();

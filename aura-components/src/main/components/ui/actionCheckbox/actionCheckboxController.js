@@ -19,15 +19,15 @@
 
 		if (cb) {
 			// Propagate change.
-			cmp.getSuper().setValue('v.value', cb.checked); 
+			cmp.getSuper().setValue('v.value', cb.checked);
 		}
 	},
 
 	handleValueChange: function (cmp, evt) {
 		var cb = cmp.find('cb').getElement();
-		
+
 		if (cb) {
-			cb.checked = evt.getParam('value').getValue();	
-		}	
+			cb.checked = evt.getParam('value');
+		}
 	}
 })

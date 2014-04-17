@@ -20,17 +20,17 @@
 
     itemsChange: function(cmp, evt, helper) {
         var v = evt.getParam("value");
-        if (v === cmp.getValue("v.items")) {
-            if (v.isDifferentArray()) {
+//        if (v === cmp.getValue("v.items")) {
+//            if (v.isDifferentArray()) {
                 helper.rerenderEverything(cmp);
-            } else {
-                helper.rerenderSelective(cmp);
-            }
-        }
+ //           } else {
+  //              helper.rerenderSelective(cmp);
+    //        }
+        //}
     },
 
     firstRender: function(cmp, evt, helper) {
-        if (cmp.getValue("v.realbody").unwrap().length === 0) {
+        if (cmp.get("v.realbody").length === 0) {
             helper.rerenderEverything(cmp);
         }
     }

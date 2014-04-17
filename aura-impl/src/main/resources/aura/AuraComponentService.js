@@ -210,6 +210,8 @@ $A.ns.AuraComponentService.prototype.newComponentAsync = function(callbackScope,
  */
 $A.ns.AuraComponentService.prototype.requestComponent = function(callbackScope, callback, config, avp) {
     var action = $A.get("c.aura://ComponentController.getComponent");
+
+    // JBUCH: Where is this coming from in mixed form? Why do we tolerate this?
     var attributes = config["attributes"] ?
             (config["attributes"]["values"] ? config["attributes"]["values"] : config["attributes"])
             : null;
@@ -274,6 +276,8 @@ $A.ns.AuraComponentService.prototype.requestComponent = function(callbackScope, 
  * @param {Object} valueObj Value Object
  * @param {Object} valueProvider value provider
  * @param {Boolean} raw
+ *
+ * @deprecated JBUCH: MUST GO AWAY
  * @returns {*}
  */
 $A.ns.AuraComponentService.prototype.computeValue = function(valueObj, valueProvider, raw) {

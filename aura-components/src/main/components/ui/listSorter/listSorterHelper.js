@@ -159,7 +159,7 @@
 
 	/**
 	 * Reset selected items and sort orders
-	 * 
+	 *
 	 */
 	reset: function(cmp) {
 		//reset sort orders
@@ -319,7 +319,7 @@
      */
     updateSize : function(cmp) {
     	var containerEl = cmp.find('sorterContainer').getElement();
-		var isPhone = $A.getGlobalValueProviders().get("$Browser.isPhone");
+		var isPhone = $A.get("$Browser.isPhone");
 		if (isPhone) {
 			var viewPort = $A.util.getWindowSize(),
 				header = cmp.find('headerBar').getElement(),
@@ -368,7 +368,7 @@
 		    			applyBtn = cmp.find('set').getElement();
 	                    if (currentFocus === applyBtn && !shiftPressed) {
 	                        $A.util.squash(event, true);
-	                    }          
+	                    }
 		                break;
 	            }
 			}

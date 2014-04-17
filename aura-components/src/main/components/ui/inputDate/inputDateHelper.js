@@ -33,7 +33,7 @@
         var elem = component.find("inputText").getElement();
         elem.value = displayValue ? $A.localizationService.translateToLocalizedDigits(displayValue) : '';
     },
-    
+
     displayDatePicker: function(component) {
         var datePicker = component.find("datePicker");
         if (datePicker && datePicker.get("v.visible") === false) {
@@ -46,7 +46,7 @@
             datePicker.setValue("v.visible", true);
         }
     },
-    
+
     /**
      * Override ui:input.
      *
@@ -57,7 +57,7 @@
         if (value) {
             var format = component.get("v.format");
             if (!format) { // use default format
-                format = $A.getGlobalValueProviders().get("$Locale.dateformat");
+                format = $A.get("$Locale.dateformat");
             }
             var langLocale = component.get("v.langLocale");
             var d = $A.localizationService.parseDateTimeUTC(v, format, langLocale);
@@ -68,7 +68,7 @@
         }
         component.setValue("v.value", ret);
     },
-    
+
     getDateString: function(date) {
         return date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
     }

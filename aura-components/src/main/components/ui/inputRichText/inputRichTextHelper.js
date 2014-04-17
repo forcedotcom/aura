@@ -143,7 +143,7 @@
 	},
 
 	getLocale : function(cmp) {
-		return $A.getGlobalValueProviders().get("$Locale.langLocale");
+		return $A.get("$Locale.langLocale");
 	},
 
 	/**

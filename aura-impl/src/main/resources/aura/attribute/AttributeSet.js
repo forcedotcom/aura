@@ -76,12 +76,12 @@ AttributeSet.prototype.hasAttribute = function(name) {
  */
 AttributeSet.prototype._getValue = function(name, raw) {
     var ve = this.values.getValue(name, true);
-    
+
     if (!ve) {
     	this.createDefault(name);
         ve = this.values.getValue(name);
     }
-    
+
     var value;
     if (!raw && ve && ve.isExpression()) {
         value = expressionService.getValue(this.getValueProvider(), ve);
@@ -155,7 +155,7 @@ AttributeSet.prototype.setValue = function (name,value) {
 AttributeSet.prototype._setValue = function(name, value) {
     this.createDefault(name);
 
-    var ve = this.values._getValue(name);
+    var ve = this.values.getValue(name);
     if (ve.isExpression()) {
         expressionService.setValue(this.getValueProvider(), ve, value);
     } else {
@@ -499,7 +499,7 @@ AttributeSet.prototype.createAttribute = function(name, config, def) {
             valueConfig = {};
         }
     }
-    
+
     valueConfig = valueFactory.create(valueConfig, def, this.component);
     if (!hasRealValue) {
         // For maps and arrays that were null or undefined, we needed to make a

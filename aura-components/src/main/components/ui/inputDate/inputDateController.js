@@ -20,23 +20,23 @@
         var _helper = concreteCmp.getDef().getHelper();
         _helper.displayDatePicker(component);
     },
-    
+
     doInit: function(component, event, helper) {
         // Set placeholder
         var concreteCmp = component.getConcreteComponent();
         var format = concreteCmp.get("v.format");
         if (!format) {
-            format = $A.getGlobalValueProviders().get("$Locale.dateformat");
+            format = $A.get("$Locale.dateformat");
         }
         component.setValue("v.placeholder", format);
     },
-    
+
     openDatePicker: function(component, event, helper) {
         var concreteCmp = component.getConcreteComponent();
         var _helper = concreteCmp.getDef().getHelper();
         _helper.displayDatePicker(component);
     },
-    
+
     setValue: function(component, event, helper) {
         var dateValue = event.getParam("value");
         if (dateValue) {

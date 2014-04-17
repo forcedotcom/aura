@@ -73,7 +73,7 @@ public class InterfaceDefHandler extends RootTagHandler<InterfaceDef> {
             builder.addAttributeDef(DefDescriptorImpl.getInstance(attributeDef.getName(), AttributeDef.class),
                     attributeDef);
         } else if (RegisterEventHandler.TAG.equalsIgnoreCase(tag)) {
-            RegisterEventDefImpl regDef = new RegisterEventHandler(xmlReader, source).getElement();
+            RegisterEventDefImpl regDef = new RegisterEventHandler<InterfaceDef>(this, xmlReader, source).getElement();
             builder.events.put(regDef.getAttributeName(), regDef);
         } else {
             error("Found unexpected tag %s", tag);

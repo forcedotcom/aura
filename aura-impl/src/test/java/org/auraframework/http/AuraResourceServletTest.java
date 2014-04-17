@@ -25,10 +25,13 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.system.Client.Type;
+import org.auraframework.system.Client;
 import org.auraframework.system.SourceListener;
 import org.auraframework.test.AuraTestCase;
 import org.auraframework.test.DummyHttpServletRequest;
 import org.auraframework.test.DummyHttpServletResponse;
+import org.auraframework.test.client.UserAgent;
 
 /**
  * Simple (non-integration) test case for {@link AuraResourceServlet}, most useful for exercising hard-to-reach error
@@ -128,6 +131,57 @@ public class AuraResourceServletTest extends AuraTestCase {
         }
     }
 
+    /*
+     * for W-2136514 
+     * this test is to verify we cache CSS by appDescriptor+browserType, 
+     * so when different browser request on the same page, they don't get each other's cache one
+     * server cache CSS for cmp too.
+     */
+    public void runTestRequestFromDifferentBrowserOnSamePage(String ua, Type uaType, String browserType, String cssMsgToVerify) throws Exception {
+    	String cmpname = "appCache:withpreload";
+    	String cmporapp = "app";
+    	DefDescriptor<ApplicationDef> appDesc = DefDescriptorImpl.getInstance(cmpname,
+    			ApplicationDef.class);
+        AuraContext context = Aura.getContextService()
+                .startContext(Mode.DEV, AuraContext.Format.CSS, AuraContext.Authentication.AUTHENTICATED, appDesc);
+        Client clientWEBKIT = new Client(ua);
+        assertEquals(uaType,clientWEBKIT.getType());
+		context.setClient(clientWEBKIT);
+		final String uid = context.getDefRegistry().getUid(null, appDesc);
+        context.addLoaded(appDesc, uid);
+        Mode mode = context.getMode();
+        final boolean minify = !(mode.isTestMode() || mode.isDevMode());
+        final String mKey = minify ? "MIN:" : "DEV:";
+
+        DummyHttpServletRequest request = new DummyHttpServletRequest(){
+            @Override
+            public long getDateHeader(String name) {
+                return -1;
+            }
+        };
+        request.setQueryParam(AuraResourceRewriteFilter.TYPE_PARAM, cmporapp);
+        HttpServletResponse response = new DummyHttpServletResponse();
+        AuraResourceServlet servlet = new AuraResourceServlet();
+        servlet.doGet(request, response);
+
+        final String key = "CSS:" + context.getClient().getType() + "$" + mKey + uid;
+        // Verify something was actually added to cache
+        String cssCache = context.getDefRegistry().getCachedString(uid, appDesc, key);
+        assertNotNull("Nothing added to CSS cache", cssCache);
+        if(cssMsgToVerify!="") {
+        	assertTrue(cssCache.contains(cssMsgToVerify));
+        }
+        
+        Aura.getContextService().endContext();
+    }
+    
+    public void testRequestFromDifferentBrowserOnSamePage() throws Exception {
+    	runTestRequestFromDifferentBrowserOnSamePage(UserAgent.IE9.getUserAgentString(),Type.IE9,"IE9","");
+    	//ui:button has special session for IE7 in button.css under @if (IE7){...}
+    	runTestRequestFromDifferentBrowserOnSamePage(UserAgent.IE7.getUserAgentString(),Type.IE7,"IE7","display:inline; zoom:1; overflow:visible!important");
+    }
+    
+    
     /**
      * Verify the CSS cache is cleared in DEV mode after a source change. Usually this would be picked up by the file
      * source monitor, but we'll just emulate a source change for the sake of speed and simplicity. Original dev caching

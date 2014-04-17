@@ -119,8 +119,8 @@ public class BrowserValueProviderTest extends AuraImplTestCase {
 
     // sample some user agents
     public void testGetValue() throws Exception {
-        assertBrowserProperties(null, false, false, false, "DESKTOP", false, false, false, false);
-        assertBrowserProperties(UserAgent.EMPTY, false, false, false, "DESKTOP", false, false, false, false);
+        assertBrowserProperties(null, false, false, false, "", false, false, false, false);
+        assertBrowserProperties(UserAgent.EMPTY, false, false, false, "", false, false, false, false);
         assertBrowserProperties(UserAgent.GOOGLE_CHROME, false, false, false, "DESKTOP", false, false, false, false);
         assertBrowserProperties(UserAgent.IE6, false, false, false, "DESKTOP", false, false, false, false);
         assertBrowserProperties(UserAgent.IE7, false, false, false, "DESKTOP", false, false, false, false);

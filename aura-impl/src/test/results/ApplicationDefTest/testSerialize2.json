@@ -41,6 +41,15 @@
               "required":false,
               "visibility":"PUBLIC"
             }
+          },
+          "querystring":{
+            "serId":7,
+            "value":{
+              "descriptor":"querystring",
+              "typeDefDescriptor":"aura://String",
+              "required":false,
+              "visibility":"PUBLIC"
+            }
           }
         }
       }

@@ -17,4 +17,5 @@
 -->
 <aura:event type="APPLICATION" support="GA" access="GLOBAL" description="Indicates that the hash part of the url in the brower's location bar has been modified.">
     <aura:attribute name="token" type="String" access="GLOBAL" description="The new hash part of the url"/>
+    <aura:attribute name="querystring" type="String" access="GLOBAL" description="The query string portion of the hash that is stripped off and applied to the event as parameters."/>
 </aura:event>

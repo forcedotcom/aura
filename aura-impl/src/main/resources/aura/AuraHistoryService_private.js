@@ -29,8 +29,25 @@ var priv = {
         var loc = location["hash"];
         var event = eventService.newEvent(this.getEvent());
         
+        if(!event) {
+        	throw new Error("The event specified on the app for the locationChange (" + this.getEvent() + ") was not found.");
+        }
+        
         if (loc) {
-            event.setParams(this.parseLocation(loc));
+        	//
+        	// Its possible that more querystring parameters where specified in the hash
+        	// then are defined on the event. In this case do specify them as parameters
+        	// of the event. 
+        	//
+        	var parsedHash = this.parseLocation(loc); 
+        	var parameters = {}; 
+        	var attributes = event.getDef().getAttributeDefs();
+        	for(var attribute in attributes) {
+        		if(attributes["hasOwnProperty"](attribute) && parsedHash["hasOwnProperty"](attribute)) {
+        			parameters[attribute] = parsedHash[attribute];
+        		}
+        	}
+            event.setParams(parameters);
         }
         
         event.fire();
@@ -44,18 +61,19 @@ var priv = {
         if (location["indexOf"]('=') > -1){
             var split = location["split"]('?');
             if(split.length == 1){
-                return decodeURIComponent(split[0]);
+                return { "token": split[0], "querystring": "" };
             }
 
             if(split.length == 2){
                 var ret = $A.util.urlDecode(split[1]);
                 ret["token"] = split[0];
+                ret["querystring"] = split[1];
                 return ret;
             }
 
             throw new Error("Invalid location");
         } else{
-            return {"token" : location};
+            return {"token" : location, "querystring": "" };
         }
     }
 };

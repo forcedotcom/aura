@@ -302,6 +302,7 @@ public class ValidationError implements JsonSerializable {
      * @return List of ValidationErrors parsed from the json input
      */
     public static List<ValidationError> parseJsonErrors(Reader input) {
+        @SuppressWarnings("unchecked")
         List<Map<String, ?>> jsonErrors = (List<Map<String, ?>>) new JsonReader().read(input);
         List<ValidationError> errors = Lists.newArrayListWithCapacity(jsonErrors.size());
         for (Map<String, ?> jsonError : jsonErrors) {

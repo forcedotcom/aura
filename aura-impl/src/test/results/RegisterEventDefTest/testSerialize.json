@@ -20,19 +20,16 @@
           "att1":{
             "serId":4,
             "value":{
-              "descriptor":"att1",
-              "typeDefDescriptor":"aura://String",
-              "required":false,
-              "visibility":"PUBLIC"
+              "name":"att1",
+              "type":"aura://String"
             }
           },
           "att2":{
             "serId":5,
             "value":{
-              "descriptor":"att2",
-              "typeDefDescriptor":"aura://Boolean",
-              "required":true,
-              "visibility":"PUBLIC"
+              "name":"att2",
+              "type":"aura://Boolean",
+              "required":true
             }
           }
         }

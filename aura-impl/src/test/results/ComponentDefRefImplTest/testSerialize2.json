@@ -11,19 +11,15 @@
         {
           "serId":3,
           "value":{
-            "descriptor":"body",
-            "typeDefDescriptor":"aura://Aura.Component[]",
-            "required":false,
-            "visibility":"PUBLIC"
+            "name":"body",
+            "type":"aura://Aura.Component[]"
           }
         },
         {
           "serId":4,
           "value":{
-            "descriptor":"value",
-            "typeDefDescriptor":"aura://String",
-            "required":false,
-            "visibility":"PUBLIC"
+            "name":"value",
+            "type":"aura://String"
           }
         }
       ],
@@ -50,6 +46,9 @@
                 "serId":6,
                 "value":{
                   "descriptor":"markup://test:parent",
+                  "superDef":{
+                    "serRefId":2
+                  },
                   "styleDef":{
                     "serId":7,
                     "value":{
@@ -57,9 +56,6 @@
                       "code":"",
                       "className":"testParent"
                     }
-                  },
-                  "superDef":{
-                    "serRefId":2
                   },
                   "attributeDefs":[
                     {
@@ -114,10 +110,8 @@
                                 {
                                   "serId":13,
                                   "value":{
-                                    "descriptor":"attr",
-                                    "typeDefDescriptor":"aura://String",
-                                    "required":false,
-                                    "visibility":"PUBLIC"
+                                    "name":"attr",
+                                    "type":"aura://String"
                                   }
                                 }
                               ],
@@ -134,13 +128,7 @@
                                         "values":{
                                           "value":{
                                             "descriptor":"value",
-                                            "value":{
-                                              "exprType":"PROPERTY",
-                                              "path":[
-                                                "m",
-                                                "value"
-                                              ]
-                                            }
+                                            "value":"{!m.value}"
                                           }
                                         }
                                       }

@@ -17,19 +17,17 @@
       "testString":{
         "serId":3,
         "value":{
-          "descriptor":"testString",
-          "typeDefDescriptor":"aura://String",
-          "required":true,
-          "serializeTo":"BOTH"
+          "name":"testString",
+          "type":"aura://String",
+          "required":true
         }
       },
       "testInt":{
         "serId":4,
         "value":{
-          "descriptor":"testInt",
-          "typeDefDescriptor":"aura://Integer",
-          "required":true,
-          "serializeTo":"BOTH"
+          "name":"testInt",
+          "type":"aura://Integer",
+          "required":true
         }
       }
     }

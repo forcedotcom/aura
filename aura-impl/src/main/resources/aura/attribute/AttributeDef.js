@@ -20,13 +20,10 @@
  * @param {Object} config
  */
 function AttributeDef(config){
-    this.descriptor = new DefDescriptor(config["descriptor"]);
-    this.typeDefDescriptor = config["typeDefDescriptor"];
-    //this.typeDef = null,//FIXME - look up in TypeDefRegistry
-    if (config["defaultValue"] !== undefined) {
-        this.defaultValue = config["defaultValue"]["value"];
-    }
-    this.required = config["required"];
+    this.descriptor = new DefDescriptor(config["name"]);
+    this.typeDefDescriptor = config["type"];
+    this.defaultValue = config["default"];
+    this.required = config["required"] === true;
 }
 
 AttributeDef.prototype.auraType = "AttributeDef";

@@ -73,4 +73,6 @@ public interface ConfigAdapter extends AuraAdapter {
 	void removePrivilegedNamespace(String namespace);
 
 	boolean isDocumentedNamespace(String namespace);
+	
+	boolean isCacheablePrefix(String prefix);
 }

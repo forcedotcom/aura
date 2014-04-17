@@ -477,7 +477,6 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         @SuppressWarnings("unchecked")
         DefDescriptor<D> canonical = (DefDescriptor<D>) compiling.def.getDescriptor();
         compiling.descriptor = canonical;
-
         currentCC.loggingService.incrementNum(LoggingService.DEF_COUNT);
         context.setCurrentCaller(canonical);
 
@@ -769,7 +768,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                 sb.append("|");
                 String hash = cd.def.getOwnHash();
                 if (hash != null) {
-                    sb.append(hash.toString());
+                    sb.append(hash);
                 }
                 sb.append(",");
                 globalBuilder.addString(sb.toString());
@@ -1382,14 +1381,22 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
      * Return true if the namespace supports cacheing
      */
     private boolean shouldCache(String prefix, String namespace) {
-        if ("java".equals(prefix)) {
-            return true;
-        }
+        boolean cacheable = false;
         if (namespace == null) {
-            return false;
+            if (prefix == null) {
+                cacheable = false;
+            } else {
+                ConfigAdapter configAdapter = Aura.getConfigAdapter();
+                cacheable = configAdapter.isCacheablePrefix(prefix);
+            }
+        } else if (prefix == null) {
+            ConfigAdapter configAdapter = Aura.getConfigAdapter();
+            cacheable = configAdapter.isPrivilegedNamespace(namespace);
+        } else {
+            ConfigAdapter configAdapter = Aura.getConfigAdapter();
+            cacheable = configAdapter.isCacheablePrefix(prefix) || configAdapter.isPrivilegedNamespace(namespace);
         }
-        ConfigAdapter configAdapter = Aura.getConfigAdapter();
-        return configAdapter.isPrivilegedNamespace(namespace);
+        return cacheable;
     }
 
 // TODO - W-2105858 - re-enable with either the private implementation of the Cache used, or

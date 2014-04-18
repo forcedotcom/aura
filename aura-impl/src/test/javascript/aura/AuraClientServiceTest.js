@@ -867,4 +867,43 @@ Test.Aura.AuraClientServiceTest = function() {
             });
         }
     }
+
+    [Fixture]
+    function isBB10() {
+        [Fact]
+        function ReturnsTrueForZ10() {
+            var target;
+            mockGlobal(function() {
+                target = new AuraClientService();
+            });
+            var mockUserAgent = Mocks.GetMock(Object.Global(), "navigator", {
+                userAgent: "Mozilla/5.0 (BB10; Touch) AppleWebKit/537.10+ (KHTML, like Gecko) Version/10.0.9.2372 Mobile Safari/537.10+"
+            });
+
+            var actual;
+            mockUserAgent(function(){
+                actual = target.priv.isBB10();
+            });
+
+            Assert.Equal(true, actual);
+        }
+
+        [Fact]
+        function ReturnsFalseForNonBB10Blackberry() {
+            var target;
+            mockGlobal(function() {
+                target = new AuraClientService();
+            });
+            var mockUserAgent = Mocks.GetMock(Object.Global(), "navigator", {
+                userAgent: "Mozilla/5.0 (BlackBerry; U; BlackBerry 9900; en-US) AppleWebKit/534.11+ (KHTML, like Gecko) Version/7.0.0 Mobile Safari/534.11+"
+            });
+
+            var actual;
+            mockUserAgent(function(){
+                actual = target.priv.isBB10();
+            });
+
+            Assert.Equal(false, actual);
+        }
+    }
 }

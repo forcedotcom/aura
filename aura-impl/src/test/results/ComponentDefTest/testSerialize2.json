@@ -10,10 +10,8 @@
       {
         "serId":3,
         "value":{
-          "descriptor":"body",
-          "typeDefDescriptor":"aura://Aura.Component[]",
-          "required":false,
-          "visibility":"PUBLIC"
+          "name":"body",
+          "type":"aura://Aura.Component[]"
         }
       }
     ]

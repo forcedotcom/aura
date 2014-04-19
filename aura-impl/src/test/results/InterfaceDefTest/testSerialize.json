@@ -6,9 +6,7 @@
       "Fake Attribute":{
         "serId":2,
         "value":{
-          "descriptor":"Fake Attribute",
-          "required":false,
-          "serializeTo":"BOTH"
+          "name":"Fake Attribute"
         }
       }
     },

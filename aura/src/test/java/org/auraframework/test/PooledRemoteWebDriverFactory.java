@@ -31,7 +31,6 @@ import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicNameValuePair;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
-import org.openqa.selenium.remote.RemoteWebDriver;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -48,7 +47,7 @@ public class PooledRemoteWebDriverFactory extends RemoteWebDriverFactory {
         super(serverUrl);
     }
 
-    public class PooledRemoteWebDriver extends RemoteWebDriver {
+    public class PooledRemoteWebDriver extends AdaptiveWebElementDriver {
         /**
          * The pool containing this web driver instance.
          */

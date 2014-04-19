@@ -89,11 +89,18 @@ public class ResourceSourceLoader extends BaseSourceLoader implements Privileged
                                 name = testSuiteMatcher.group(1);
                             }
                         }
-                        if (defType == DefType.STYLE) {
+                        if (defType == null) {
+                            //unrecognized entry in index, skip it
+                            continue;
+                        }
+                        switch(defType) {
+                        case STYLE:
                             name = "css://" + AuraTextUtil.replaceChar(name, ':', ".");
-                        } else if (defType == DefType.TESTSUITE) {
+                            break;
+                        case TESTSUITE:
                             name = "js://" + AuraTextUtil.replaceChar(name, ':', ".");
-                        } else {
+                            break;
+                        default:
                             name = "markup://" + name;
                         }
 

@@ -106,12 +106,17 @@ public final class AttributeDefImpl extends DefinitionImpl<AttributeDef> impleme
     @Override
     public void serialize(Json json) throws IOException {
         json.writeMapBegin();
-        json.writeMapEntry("descriptor", descriptor);
-        json.writeMapEntry("typeDefDescriptor", typeDefDescriptor);
-        json.writeMapEntry("defaultValue", defaultValue);
-        json.writeMapEntry("required", required);
-        json.writeMapEntry("serializeTo", serializeTo);
-        json.writeMapEntry("visibility",visibility);
+        json.writeMapEntry("name", descriptor);
+        json.writeMapEntry("type", typeDefDescriptor);
+        
+        if (defaultValue != null) {
+        	json.writeMapEntry("default", defaultValue.getValue());
+        }
+        
+        if (required) {
+        	json.writeMapEntry("required", true);
+        }
+        
         json.writeMapEnd();
     }
 
@@ -120,6 +125,7 @@ public final class AttributeDefImpl extends DefinitionImpl<AttributeDef> impleme
         if (defaultValue != null) {
             defaultValue.appendDependencies(dependencies);
         }
+        
         dependencies.add(typeDefDescriptor);
     }
 

@@ -155,7 +155,7 @@ public class BrowserInfo {
         platformType = 0;
         browserType = 0;
 
-        if (userAgentString == null || userAgentString == "") { //this is WRONG should be .equals but that changes behavior, will fix early in next release cycle.
+        if (userAgentString == null || "".equals(userAgentString)) {
             return;
         }
 

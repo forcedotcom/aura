@@ -98,6 +98,11 @@ public final class ThemeDefHandler extends RootTagHandler<ThemeDef> {
 
     }
 
+	@Override
+	protected boolean allowPrivateAttribute() {
+		return true;
+	}
+	
     @Override
     protected void handleChildTag() throws XMLStreamException, QuickFixException {
         String tag = getTagName();

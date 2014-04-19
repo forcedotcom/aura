@@ -10,10 +10,8 @@
       {
         "serId":3,
         "value":{
-          "descriptor":"body",
-          "typeDefDescriptor":"aura://Aura.Component[]",
-          "required":false,
-          "visibility":"PUBLIC"
+          "name":"body",
+          "type":"aura://Aura.Component[]"
         }
       }
     ],
@@ -36,10 +34,15 @@
           "token":{
             "serId":6,
             "value":{
-              "descriptor":"token",
-              "typeDefDescriptor":"aura://String",
-              "required":false,
-              "visibility":"PUBLIC"
+              "name":"token",
+              "type":"aura://String"
+            }
+          },
+          "querystring":{
+            "serId":7,
+            "value":{
+              "name":"querystring",
+              "type":"aura://String"
             }
           }
         }

@@ -19,4 +19,5 @@
 	<aura:attribute name="output" type="String"/>
     <div class="clickableme" onclick="{!c.cssalert}">@@@TOKEN@@@</div>
     <div class="attroutput">{!v.output}</div>
+    <ui:button label="button for css cache test on browsers"/>
 </aura:component>

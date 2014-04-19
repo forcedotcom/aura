@@ -17,7 +17,7 @@
 /**
  * creates the right value object based on whats passed in
  */
-var valueFactory = {
+var valueFactory = { 
     create: function create(valueConfig, def, component) {
         if (aura.util.isObject(valueConfig)) {
             if (valueConfig.auraType) {
@@ -35,6 +35,10 @@ var valueFactory = {
             }
         } else if (aura.util.isArray(valueConfig)) {
             return new ArrayValue(valueConfig, def, component);
+        } else if (valueConfig && valueConfig.indexOf && valueConfig.indexOf("{!") === 0) {
+        	// Property expressions
+        	valueConfig = valueConfig.substring(2, valueConfig.length - 1);
+            return new PropertyReferenceValue(valueConfig.split("."));
         } else {
             return new SimpleValue(valueConfig, def, component);
         }

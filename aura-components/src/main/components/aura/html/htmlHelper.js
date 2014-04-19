@@ -300,19 +300,19 @@
 
             var isHash = value && value.indexOf && value.indexOf("#") === 0;
             if (name.toLowerCase() === "href" && ret.tagName && ret.tagName.toLowerCase() === "a" && value && (isHash || this.supportsTouchEvents())) {
+            	var HTMLAttributes = component.getValue("v.HTMLAttributes");
+                var target = HTMLAttributes.getValue("target");
+                if (target) {
+                    if (target.isExpression()) {
+                        target = $A.expressionService.getValue(valueProvider, target);
+                    }
+                    target = target.unwrap();
+                }
                 this.createFastClickHandler(ret, function() {
                     if (isHash) {
                         $A.run(function () { $A.historyService.set(value.substring(1)); })
                     } else {
                         // Make sure that non-hash style hrefs work fine even when fast clicking is engaged
-                        var HTMLAttributes = component.getValue("v.HTMLAttributes");
-                        var target = HTMLAttributes.getValue("target");
-                        if (target) {
-                            if (target.isExpression()) {
-                                target = $A.expressionService.getValue(valueProvider, target);
-                            }
-                            target = target.unwrap();
-                        }
                         window.open(value, target ? target : "_self");
                     }
                 });

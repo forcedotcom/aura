@@ -1,8 +1,9 @@
 ({
     //WebSQL is supported in only these modern browsers. http://caniuse.com/sql-storage
-    // TODO(W-1766465): Currently we hardcode the size of the websql database. This pops up a box in Safari that we
-    //                  can't accept or override from the test.
-    browsers:["GOOGLECHROME", "IPAD", "IPHONE", "ANDROID_PHONE", "ANDROID_TABLET"],
+    // TODO(W-1766465): Currently we hardcode the size of the websql database. This pops up a box in Safari(Desktop, iPhone & iPad) that we
+    //                  can't accept or override from the test. Once this bug is fixed, the below list of browsers can be enabled.
+    // browsers:["GOOGLECHROME", "IPAD", "IPHONE", "ANDROID_PHONE", "ANDROID_TABLET"],
+    browsers:["GOOGLECHROME", "ANDROID_PHONE", "ANDROID_TABLET"],
     setUp : function(cmp) {
 		$A.test.overrideFunction($A.storageService, "selectAdapter", function() {
 			return "websql";});

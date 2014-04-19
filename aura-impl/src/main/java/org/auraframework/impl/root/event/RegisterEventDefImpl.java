@@ -45,7 +45,7 @@ public final class RegisterEventDefImpl extends DefinitionImpl<EventDef> impleme
 
     protected RegisterEventDefImpl(Builder builder) {
         super(builder);
-        this.isGlobal = builder.isGlobal;
+        this.isGlobal = builder.getAccess() != null && builder.getAccess().isGlobal();
         this.attName = builder.attName;
         this.hashCode = createHashCode();
     }
@@ -139,20 +139,11 @@ public final class RegisterEventDefImpl extends DefinitionImpl<EventDef> impleme
             super(EventDef.class);
         }
 
-        private boolean isGlobal;
         private String attName;
 
         @Override
         public RegisterEventDefImpl build() {
             return new RegisterEventDefImpl(this);
-        }
-
-        /**
-         * Sets whether or not this instance is isGlobal.
-         */
-        public Builder setIsGlobal(boolean isGlobal) {
-            this.isGlobal = isGlobal;
-            return this;
         }
 
         /**

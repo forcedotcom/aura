@@ -375,7 +375,7 @@ AttributeSet.prototype.createInstances = function(config){
 
             var hasValue = !$A.util.isUndefined(value);
             if (!hasValue && !this.hasAttribute(name)) {
-                // We cannot defer creation of default facets because they must be recreated in server order on the cli
+                // We cannot defer creation of default facets because they must be recreated in server order on the client
                 var isFacet = attributeDef.getTypeDefDescriptor() === "aura://Aura.Component[]";
                 if (isFacet) {
                     value = attributeDef.getDefault();

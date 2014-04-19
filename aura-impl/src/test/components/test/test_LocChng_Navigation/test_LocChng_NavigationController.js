@@ -14,27 +14,26 @@
  * limitations under the License.
  */
 ({
-    clientAction: function(cmp, event, helper){
+    clientAction: function(cmp, event){
         cmp.getAttributes().setValue('locationChangeIndicator', 'start');
         //Client Action associated with the button
         //Get the current token, if this is the first time the page was loaded, token will be null
-        var num = helper.getSearchParameters($A.historyService.get().token).num;
+        var num = $A.historyService.get().num;
         //Increment the value of num
         if(num){
-            $A.historyService.set("ButtonClicked?num=" + (num * 1 + 1));
+            $A.historyService.set("ButtonClicked?num=" + (Number(num) + 1));
         }else{
             $A.historyService.set("ButtonClicked?num=1");
         }
     },
-    locationChange: function(cmp, event, helper){
+    locationChange: function(cmp, event){
         var buttonTextIndex;
         //Action associated with the handler for the location change event specified for this component-> test:test_LocChng_Event
-        var num = helper.getSearchParameters($A.historyService.get().token).num;
-        if(num){
+        if(event.getParam('num')){
             //Find the output on the page where the current state will be displayed
             var displayText = cmp.find("display");
             if(displayText){
-                    displayText.getAttributes().setValue('value', num);
+                    displayText.getAttributes().setValue('value',event.getParam('num'));
                     $A.rerender(displayText);
             }
         }

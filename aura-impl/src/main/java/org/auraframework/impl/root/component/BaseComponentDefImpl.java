@@ -749,10 +749,13 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
                     json.writeMapEntry("helperDef", helperDef);
                 }
 
-                json.writeMapEntry("styleDef", getStyleDef());
+                
                 json.writeMapEntry("controllerDef", getControllerDef());
                 json.writeMapEntry("modelDef", getModelDef());
                 json.writeMapEntry("superDef", getSuperDef());
+
+                json.writeMapEntry("styleDef", getStyleDef());
+
                 if (preloading) {
                     json.writeMapEntry("isCSSPreloaded", preloading);
                 }
@@ -761,25 +764,31 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
                 if (!attrDefs.isEmpty()) {
                     json.writeMapEntry("attributeDefs", attrDefs);
                 }
+                
                 Set<DefDescriptor<InterfaceDef>> allInterfaces = getAllInterfaces();
                 if (allInterfaces != null && !allInterfaces.isEmpty()) {
                     json.writeMapEntry("interfaces", allInterfaces);
                 }
+                
                 Collection<RegisterEventDef> regevents = getRegisterEventDefs().values();
                 if (!regevents.isEmpty()) {
                     json.writeMapEntry("registerEventDefs", regevents);
                 }
+                
                 Collection<EventHandlerDef> handlers = getHandlerDefs();
                 if (!handlers.isEmpty()) {
                     json.writeMapEntry("handlerDefs", handlers);
                 }
+                
                 if (!facets.isEmpty()) {
                     json.writeMapEntry("facets", facets);
                 }
+                
                 boolean local = hasLocalDependencies();
                 if (local) {
                     json.writeMapEntry("hasServerDeps", true);
                 }
+                
                 if (isAbstract) {
                     json.writeMapEntry("isAbstract", isAbstract);
                 }
@@ -796,6 +805,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
                 if (mode.equals(Mode.AUTOJSTEST)) {
                     json.writeMapEntry("testSuiteDef", getTestSuiteDef());
                 }
+                
                 serializeFields(json);
                 json.writeMapEnd();
             }

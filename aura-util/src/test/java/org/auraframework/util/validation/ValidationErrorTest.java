@@ -28,6 +28,7 @@ public final class ValidationErrorTest extends UnitTestCase {
         ValidationError error = new ValidationError("tool", "/file/name", 11, 3, "message", "evidence",
                 Level.Error, "rule");
         String json = Json.serialize(error);
+        @SuppressWarnings("unchecked")
         ValidationError dError = ValidationError.deserialize((Map<String, ?>) new JsonReader().read(json));
         assertEquals(error.toCommonFormat(), dError.toCommonFormat());
     }

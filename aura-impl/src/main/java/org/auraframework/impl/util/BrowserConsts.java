@@ -36,28 +36,48 @@ public interface BrowserConsts {
     public static final int XBROWSER_IECV_9 = 10009010;
     public static final int XBROWSER_IE_10 = 10010000;
     public static final int XBROWSER_IEM_10 = 10010001;
+    public static final int XBROWSER_IETAB_10 = 10010003;
     public static final int XBROWSER_IECV_10 = 10010010;
     public static final int XBROWSER_IET_10 = 10010100;
     public static final int XBROWSER_IEMT_10 = 10010101;
+    public static final int XBROWSER_IETABT_10 = 10010103;
     public static final int XBROWSER_IETCV_10 = 10010110;
     public static final int XBROWSER_IEMCV_10 = 10010011;
     public static final int XBROWSER_IEMTCV_10 = 10010111;
+    public static final int XBROWSER_IETABTCV_10 = 10010113;
     public static final int XBROWSER_IE_11 = 10011000;
     public static final int XBROWSER_IEM_11 = 10011001;
+    public static final int XBROWSER_IETAB_11 = 10011003;
     public static final int XBROWSER_IECV_11 = 10011010;
     public static final int XBROWSER_IET_11 = 10011100;
     public static final int XBROWSER_IEMT_11 = 10011101;
+    public static final int XBROWSER_IETABT_11 = 10011103;
     public static final int XBROWSER_IETCV_11 = 10011110;
     public static final int XBROWSER_IEMCV_11 = 10011011;
     public static final int XBROWSER_IEMTCV_11 = 10011111;
+    public static final int XBROWSER_IETABTCV_11 = 10011113;
     public static final int XBROWSER_IE_12 = 10012000;
     public static final int XBROWSER_IEM_12 = 10012001;
+    public static final int XBROWSER_IETAB_12 = 10012003;
     public static final int XBROWSER_IECV_12 = 10012010;
     public static final int XBROWSER_IET_12 = 10012100;
     public static final int XBROWSER_IEMT_12 = 10012101;
+    public static final int XBROWSER_IETABT_12 = 10012103;
     public static final int XBROWSER_IETCV_12 = 10012110;
     public static final int XBROWSER_IEMCV_12 = 10012011;
     public static final int XBROWSER_IEMTCV_12 = 10012111;
+    public static final int XBROWSER_IETABTCV_12 = 10012113;
+    public static final int XBROWSER_IE_13 = 10013000;
+    public static final int XBROWSER_IEM_13 = 10013001;
+    public static final int XBROWSER_IETAB_13 = 10013003;
+    public static final int XBROWSER_IECV_13 = 10013010;
+    public static final int XBROWSER_IET_13 = 10013100;
+    public static final int XBROWSER_IEMT_13 = 10013101;
+    public static final int XBROWSER_IETABT_13 = 10013103;
+    public static final int XBROWSER_IETCV_13 = 10013110;
+    public static final int XBROWSER_IEMCV_13 = 10013011;
+    public static final int XBROWSER_IEMTCV_13 = 10013111;
+    public static final int XBROWSER_IETABTCV_13 = 10013113;
     /**
      * Firefox and Firefox Mobile, Phone, and Tablet
      */
@@ -144,6 +164,46 @@ public interface BrowserConsts {
     public static final int XBROWSER_FFM_25 = 11025001;
     public static final int XBROWSER_FFP_25 = 11025002;
     public static final int XBROWSER_FFT_25 = 11025003;
+    public static final int XBROWSER_FF_26 = 11026000;
+    public static final int XBROWSER_FFM_26 = 11026001;
+    public static final int XBROWSER_FFP_26 = 11026002;
+    public static final int XBROWSER_FFT_26 = 11026003;
+    public static final int XBROWSER_FF_27 = 11027000;
+    public static final int XBROWSER_FFM_27 = 11027001;
+    public static final int XBROWSER_FFP_27 = 11027002;
+    public static final int XBROWSER_FFT_27 = 11027003;
+    public static final int XBROWSER_FF_28 = 11028000;
+    public static final int XBROWSER_FFM_28 = 11028001;
+    public static final int XBROWSER_FFP_28 = 11028002;
+    public static final int XBROWSER_FFT_28 = 11028003;
+    public static final int XBROWSER_FF_29 = 11029000;
+    public static final int XBROWSER_FFM_29 = 11029001;
+    public static final int XBROWSER_FFP_29 = 11029002;
+    public static final int XBROWSER_FFT_29 = 11029003;
+    public static final int XBROWSER_FF_30 = 11030000;
+    public static final int XBROWSER_FFM_30 = 11030001;
+    public static final int XBROWSER_FFP_30 = 11030002;
+    public static final int XBROWSER_FFT_30 = 11030003;
+    public static final int XBROWSER_FF_31 = 11031000;
+    public static final int XBROWSER_FFM_31 = 11031001;
+    public static final int XBROWSER_FFP_31 = 11031002;
+    public static final int XBROWSER_FFT_31 = 11031003;
+    public static final int XBROWSER_FF_32 = 11032000;
+    public static final int XBROWSER_FFM_32 = 11032001;
+    public static final int XBROWSER_FFP_32 = 11032002;
+    public static final int XBROWSER_FFT_32 = 11032003;
+    public static final int XBROWSER_FF_33 = 11033000;
+    public static final int XBROWSER_FFM_33 = 11033001;
+    public static final int XBROWSER_FFP_33 = 11033002;
+    public static final int XBROWSER_FFT_33 = 11033003;
+    public static final int XBROWSER_FF_34 = 11034000;
+    public static final int XBROWSER_FFM_34 = 11034001;
+    public static final int XBROWSER_FFP_34 = 11034002;
+    public static final int XBROWSER_FFT_34 = 11034003;
+    public static final int XBROWSER_FF_35 = 11035000;
+    public static final int XBROWSER_FFM_35 = 11035001;
+    public static final int XBROWSER_FFP_35 = 11035002;
+    public static final int XBROWSER_FFT_35 = 11035003;
     /**
      * Google Chrome Frame
      */
@@ -576,6 +636,16 @@ public interface BrowserConsts {
     public static final int XBROWSER_SAFARIP_10 = 14010002;
     public static final int XBROWSER_SAFARIT_10 = 14010003;
     public static final int XBROWSER_SAFARID_10 = 14010004;
+    public static final int XBROWSER_SAFARI_11 = 14011000;
+    public static final int XBROWSER_SAFARIM_11 = 14011001;
+    public static final int XBROWSER_SAFARIP_11 = 14011002;
+    public static final int XBROWSER_SAFARIT_11 = 14011003;
+    public static final int XBROWSER_SAFARID_11 = 14011004;
+    public static final int XBROWSER_SAFARI_12 = 14012000;
+    public static final int XBROWSER_SAFARIM_12 = 14012001;
+    public static final int XBROWSER_SAFARIP_12 = 14012002;
+    public static final int XBROWSER_SAFARIT_12 = 14012003;
+    public static final int XBROWSER_SAFARID_12 = 14012004;
     /**
      * Opera, Opera Mobile (M), Opera Mini (N)
      */
@@ -631,22 +701,29 @@ public interface BrowserConsts {
     public static final int XBROWSER_OPERAM_20 = 15020001;
     public static final int XBROWSER_OPERAN_20 = 15020006;
     /**
-     * Android (netbooks/tablets) and Android Mobile (phones/tablets)
+     * Android (netbooks/tablets) and Android Mobile - flags 003=Tablet, 001=Mobile
      */
     public static final int XBROWSER_ANDROID = 16000000;
     public static final int XBROWSER_ANDROIDM = 16000001;
+    public static final int XBROWSER_ANDROIDT = 16000003;
     public static final int XBROWSER_ANDROID_1 = 16001000;
     public static final int XBROWSER_ANDROIDM_1 = 16001001;
+    public static final int XBROWSER_ANDROIDT_1 = 16001003;
     public static final int XBROWSER_ANDROID_2 = 16002000;
     public static final int XBROWSER_ANDROIDM_2 = 16002001;
+    public static final int XBROWSER_ANDROIDT_2 = 16002003;
     public static final int XBROWSER_ANDROID_3 = 16003000;
     public static final int XBROWSER_ANDROIDM_3 = 16003001;
+    public static final int XBROWSER_ANDROIDT_3 = 16003003;
     public static final int XBROWSER_ANDROID_4 = 16004000;
     public static final int XBROWSER_ANDROIDM_4 = 16004001;
+    public static final int XBROWSER_ANDROIDT_4 = 16004003;
     public static final int XBROWSER_ANDROID_5 = 16005000;
     public static final int XBROWSER_ANDROIDM_5 = 16005001;
+    public static final int XBROWSER_ANDROIDT_5 = 16005003;
     public static final int XBROWSER_ANDROID_6 = 16006000;
     public static final int XBROWSER_ANDROIDM_6 = 16006001;
+    public static final int XBROWSER_ANDROIDT_6 = 16006003;
     /**
      * Netscape
      */
@@ -661,10 +738,11 @@ public interface BrowserConsts {
     public static final int XBROWSER_NS_8 = 17008000;
     public static final int XBROWSER_NS_9 = 17009000;
     /**
-     * Other/unknown Webkit compatible, and Webkit mobile compatible
+     * Other/unknown Webkit compatible, and Webkit mobile compatible (001) and tablet (003)
      */
     public static final int XBROWSER_WEBKIT = 18000000;
     public static final int XBROWSER_WEBKITM = 18000001;
+    public static final int XBROWSER_WEBKITT = 18000003;
     /**
      * Other/unknown Gecko compatible, and Gecko mobile compatible
      */
@@ -675,9 +753,54 @@ public interface BrowserConsts {
      */
     public static final int XBROWSER_KHTML = 20000000;
     /**
-     * Other/unknown Mobile clients
+     * Other/unknown Mobile clients 003=Tablet, 001=Mobile
      */
     public static final int XBROWSER_MOBILE = 21000001;
+    public static final int XBROWSER_MOBILET = 21000003;
+    /**
+     * Salesforce Desktop
+     */
+    public static final int XBROWSER_SFDESKTOP_1 = 22001000;
+    public static final int XBROWSER_SFDESKTOP_2 = 22002000;
+    public static final int XBROWSER_SFDESKTOP_3 = 22003000;
+    public static final int XBROWSER_SFDESKTOP_4 = 22004000;
+    public static final int XBROWSER_SFDESKTOP_5 = 22005000;
+    /**
+     * Modern Blackberry 001=mobile,003=tablet,000=unknown
+     */
+    public static final int XBROWSER_BLACKBERRY_10 = 23010000;
+    public static final int XBROWSER_BLACKBERRYM_10 = 23010001;
+    public static final int XBROWSER_BLACKBERRYT_10 = 23010003;
+    public static final int XBROWSER_BLACKBERRY_11 = 23011000;
+    public static final int XBROWSER_BLACKBERRYM_11 = 23011001;
+    public static final int XBROWSER_BLACKBERRYT_11 = 23011003;
+    public static final int XBROWSER_BLACKBERRY_12 = 23012000;
+    public static final int XBROWSER_BLACKBERRYM_12 = 23012001;
+    public static final int XBROWSER_BLACKBERRYT_12 = 23012003;
+    public static final int XBROWSER_BLACKBERRY_13 = 23013000;
+    public static final int XBROWSER_BLACKBERRYM_13 = 23013001;
+    public static final int XBROWSER_BLACKBERRYT_13 = 23013003;
+    public static final int XBROWSER_BLACKBERRY_14 = 23014000;
+    public static final int XBROWSER_BLACKBERRYM_14 = 23014001;
+    public static final int XBROWSER_BLACKBERRYT_14 = 23014003;
+    public static final int XBROWSER_BLACKBERRY_15 = 23015000;
+    public static final int XBROWSER_BLACKBERRYM_15 = 23015001;
+    public static final int XBROWSER_BLACKBERRYT_15 = 23015003;
+    public static final int XBROWSER_BLACKBERRY_16 = 23016000;
+    public static final int XBROWSER_BLACKBERRYM_16 = 23016001;
+    public static final int XBROWSER_BLACKBERRYT_16 = 23016003;
+    public static final int XBROWSER_BLACKBERRY_17 = 23017000;
+    public static final int XBROWSER_BLACKBERRYM_17 = 23017001;
+    public static final int XBROWSER_BLACKBERRYT_17 = 23017003;
+    public static final int XBROWSER_BLACKBERRY_18 = 23018000;
+    public static final int XBROWSER_BLACKBERRYM_18 = 23018001;
+    public static final int XBROWSER_BLACKBERRYT_18 = 23018003;
+    public static final int XBROWSER_BLACKBERRY_19 = 23019000;
+    public static final int XBROWSER_BLACKBERRYM_19 = 23019001;
+    public static final int XBROWSER_BLACKBERRYT_19 = 23019003;
+    public static final int XBROWSER_BLACKBERRY_20 = 23020000;
+    public static final int XBROWSER_BLACKBERRYM_20 = 23020001;
+    public static final int XBROWSER_BLACKBERRYT_20 = 23020003;
     /**
      * 1000..1199 reserved for future IE versions
      */
@@ -1180,9 +1303,12 @@ public interface BrowserConsts {
     public static final int PLATFORM_WIN_7 = 1010;
     public static final int PLATFORM_WIN_8 = 1011;
     public static final int PLATFORM_WIN_RT = 1012;
+    public static final int PLATFORM_WIN_8_1 = 1013;
+    public static final int PLATFORM_WIN_RT_8_1 = 1014;
     public static final int PLATFORM_WINPH_7 = 1030;
     public static final int PLATFORM_WINPH_7_5 = 1031;
     public static final int PLATFORM_WINPH_8 = 1032;
+    public static final int PLATFORM_WINPH_8_1 = 1033;
     public static final int PLATFORM_WIN_MAX = 1999;
     public static final int PLATFORM_MAC = 2000;
     public static final int PLATFORM_MAC_68K = 2001;
@@ -1201,6 +1327,10 @@ public interface BrowserConsts {
     public static final int PLATFORM_ANDROID = 5005;
     public static final int PLATFORM_IPHONE = 5006;
     public static final int PLATFORM_IPAD = 5007;
+    /**
+     * ios or mac network library call *
+     */
+    public static final int PLATFORM_DARWIN_CFNETWORK = 5008;
     /**
      * never logged--used for Android versioning arithmetic *
      */

@@ -14,9 +14,9 @@
  * limitations under the License.
  */
  ({
- 	/**
- 	 *  Test cancel link closes datePicker and does not perform any selection of date/time.
- 	 */
+    /**
+      *  Test cancel link closes datePicker and does not perform any selection of date/time.
+      */
     testCancelLink : {
     	attributes : {value: "2012-09-10 11:23", format: "MM-dd-yyyy hh:mm"},
     	test : [function(cmp) {
@@ -40,8 +40,8 @@
     },
     
     /**
- 	 *  Test set link sets the appropriate date/time.
- 	 */
+      *  Test set link sets the appropriate date/time.
+      */
     // TODO : @ctatlah - figure out why time is different when test runs on autobuilds
     _testSetLink : {
     	attributes : {format: "MM/dd/yyyy hh:mm"},
@@ -66,6 +66,7 @@
     		$A.test.assertEquals(expectedDate, setDate, "Incorrect datetime was set.");
     	}]
     },
+    
     /**
      * Acessibility test, making sure that any functionality added is still accessible
      */
@@ -77,32 +78,66 @@
     	    		$A.test.assertAccessible();
     	}]
      },
+     
     /**
- 	 *  If value is set for date/time when opening up dateTimePicker it opens to the date of set value.
- 	 */
+      *  If value is set for date/time when opening up dateTimePicker it opens to the date of set value.
+      */
     testCalendarWithTimeValuePreSet : {
-    	attributes : {value: "2012-09-10 11:23", format: "MM-dd-yyyy hh:mm"},
+    	attributes : {value: '09-10-2012T11:23Z', format: 'MM/dd/yyyy HH:mm', timezone: 'GMT'},
     	test : function(cmp) {
-    		this.openDatePicker(cmp);
-    		var expectedText = "September 2012";
-    		var title = cmp.find("dateTimePickerTest").find("datePicker").find("calTitle");
-    		var titleText = $A.test.getText(title.getElement());
-	    	$A.test.assertEquals(expectedText, titleText);
-	    	var domValue = $A.util.getText($A.test.getElementByClass("monthYear")[0]);
-    		$A.test.assertEquals(expectedText, domValue, "DOM value incorrect");
+		this.openDatePicker(cmp);
+    		var expected = "September 2012";
+    		var datepicker = cmp.find("dateTimePickerTest").find("datePicker");
+    		var actual = this.getTextFromElm(datepicker);
+    		
+    		$A.test.assertEquals(expected, actual, "Month year of datePicker is not valid");
+    		actual = $A.util.getText($A.test.getElementByClass("selectedDate")[0]);
+    		$A.test.assertEquals("10", actual, "Day of month that is not correct");
+		
+    		//Grabbing timepicker values to make sure that everything is set correctly
+    		var timePicker = datepicker.find("time");
+    		var hours = timePicker.find("hours").getElement().value;
+    		var minutes = timePicker.find("minutes").getElement().value;
+    		
+    		actual = hours +":"+minutes;
+    		$A.test.assertEquals("11:23", actual, "The default value put in the inputText box, is not the value in the timePicker");
     	}
+    },
+    
+    /**
+     * Method allowing us to extract whether or not we are looking at a mobile device. Extracted from two functions because 
+     * depending on which mode we are in (Desktop or other), we either have a header with the Month Year combo or an outputText 
+     * and a select value
+     * 
+     */ 
+    isViewDesktop : function(){
+    	return $A.get('$Browser').formFactor.toLowerCase() === "desktop";
+    },
+    
+    /**
+     * We have to ways that we need to get elements. Either from a output/select combo or from a header tag  
+     */
+    getTextFromElm: function(cmp){
+    	if(this.isViewDesktop()){
+        	return $A.util.getText(cmp.find("calTitle").getElement());
+        }
+	
+    	var year = cmp.find("yearTitle").getElement().value;
+    	var month = $A.util.getText(cmp.find("monthTitle").getElement());
+		
+    	return month +" "+year;
     },
     
     openDatePicker : function(cmp) {
     	var opener = cmp.find("dateTimePickerTest").find("datePickerOpener").getElement();
-		var inputBox = cmp.find("dateTimePickerTest").find("inputText").getElement();
-	    var datePicker = cmp.find("dateTimePickerTest").find("datePicker").getElement();
-	    if($A.util.isUndefinedOrNull(opener)) {
-	    	$A.test.clickOrTouch(inputBox);
-		} else {
-			$A.test.clickOrTouch(opener);
-		}
-		$A.test.addWaitFor(true, function(){return $A.util.hasClass(datePicker, "visible")});
+    	var inputBox = cmp.find("dateTimePickerTest").find("inputText").getElement();
+	var datePicker = cmp.find("dateTimePickerTest").find("datePicker").getElement();
+	if($A.util.isUndefinedOrNull(opener)) {
+            $A.test.clickOrTouch(inputBox);
+	} else {
+            $A.test.clickOrTouch(opener);
+	}
+	$A.test.addWaitFor(true, function(){return $A.util.hasClass(datePicker, "visible")});
     },
     
     getCleanDate : function(dateValue, hasTime) {
@@ -111,7 +146,7 @@
     	var someDate = dateValue ? new Date(dateValue) : new Date();
     	var retDate = (someDate.getMonth()+1) + dateSep +
     		someDate.getDate() + dateSep +
-    		someDate.getFullYear()
+    		someDate.getFullYear();
     	if (hasTime) {
     		retDate += " " + someDate.getHours() + timeSep +
     			someDate.getMinutes();

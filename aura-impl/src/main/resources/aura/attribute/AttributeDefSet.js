@@ -16,12 +16,11 @@
 /*jslint sub: true */
 /**
  * @namespace Creates a new AttributeDefSet instance.
- * @param {Object} parent
  * @param {Object} configs For each configs object provided, a new AttributeDef instance is added
  * @constructor
  * @protected
  */
-function AttributeDefSet(parent, configs) {
+function AttributeDefSet(configs) {
     if (configs) {
         this.values = {};
         // maintain attribute order

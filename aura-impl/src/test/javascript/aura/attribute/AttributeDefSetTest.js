@@ -52,7 +52,7 @@ Test.Aura.Attribute.AttributeDefSetTest = function(){
             var actual;
 
             mockAttributeDef(function(){
-                var defSet = new AttributeDefSet(null, config);
+                var defSet = new AttributeDefSet(config);
                 actual = defSet.valuesOrder;
             });
 

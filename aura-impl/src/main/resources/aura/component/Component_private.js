@@ -422,14 +422,16 @@ var ComponentPriv = (function() { // Scoping priv
             if (facets) {
                 for (var j = 0; j < facets.length; j++) {
                     var facet = facets[j];
-                    if (!valuesAlreadySet[facet["descriptor"]]) {
+                    var facetName = facet["descriptor"];
+                    if (!valuesAlreadySet[facetName]) {
                         if (attributeDefs) {
-                            var attributeDef = attributeDefs.getDef(facet["descriptor"]);
+                            var attributeDef = attributeDefs.getDef(facetName);
                             if (attributeDef && attributeDef.getTypeDefDescriptor() !== "aura://Aura.Component[]") {
-                                valuesAlreadySet[facet["descriptor"]] = true;
+                                valuesAlreadySet[facetName] = true;
                             }
                         }
-                        attributeValues[facet["descriptor"]] = facet["value"];
+                        
+                        attributeValues[facetName] = facet["value"];
                     }
                 }
             }

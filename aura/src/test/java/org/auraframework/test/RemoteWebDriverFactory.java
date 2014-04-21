@@ -22,7 +22,6 @@ import java.util.logging.Logger;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
-import org.openqa.selenium.remote.RemoteWebDriver;
 
 /**
  * Basic provider of RemoteWebDrivers.
@@ -43,7 +42,7 @@ public class RemoteWebDriverFactory implements WebDriverProvider {
         return retry(new Callable<WebDriver>() {
             @Override
             public WebDriver call() throws Exception {
-                return new RemoteWebDriver(serverUrl, capabilities);
+                return new AdaptiveWebElementDriver(serverUrl, capabilities);
             }
         }, MAX_GET_RETRIES, "Failed to get a new RemoteWebDriver");
     }

@@ -52,7 +52,6 @@ FunctionCallValue.prototype.isDirty = function(){
  */
 FunctionCallValue.prototype.getValue = function(vp){
     aura.assert(vp, "no value provider to resolve against");
-    var str = "";
     var dirty = false;
     var resolvedArgs = [];
     for (var i = 0; i < this.args.length; i++) {

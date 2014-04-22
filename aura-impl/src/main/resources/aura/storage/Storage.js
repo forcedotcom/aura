@@ -159,7 +159,7 @@ AuraStorage.prototype.sweep = function() {
 	if (!this._sweepingSuspended) {
 		// Check simple expirations
 		var removedSomething;
-		var now = new Date().getTime();
+		// var now = new Date().getTime();
 		var that = this;
 		this.adapter.getExpired(function(expired) {
 			for (var n = 0; n < expired.length; n++) {

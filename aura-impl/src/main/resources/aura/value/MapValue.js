@@ -399,7 +399,7 @@ MapValue.prototype.addHandler = function(config){
     var keys = this.keys;
     for(var k in values){
         var v = values[k];
-        var key = this.keys[k] !== undefined ? this.keys[k]:k;
+        var key = keys[k] !== undefined ? keys[k]:k;
         BaseValue.addValueHandler(key, v, config);
     }
 
@@ -430,7 +430,6 @@ MapValue.prototype.destroyHandlers = function(globalId){
     }
 
     var values = this.value;
-    var keys = this.keys;
     for(var k in values){
         var v = values[k];
         if (v.destroyHandlers) {

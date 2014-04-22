@@ -196,8 +196,9 @@ var AuraRenderingService = function AuraRenderingService(){
             }
             
             try {
+                var visitMark;
                 if (component.auraType === "Value" && component.toString() === "ArrayValue"){
-                    var visitMark = component.get(0);
+                    visitMark = component.get(0);
                     if (!visitMark || !$A.renderingService.visited[visitMark.getGlobalId()]) {
                         component.rerender(referenceNode, appendChild, priv.insertElements);
                     }

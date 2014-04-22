@@ -48,7 +48,7 @@ public final class ValidationEngineTest extends AuraValidationTestCase {
         error = errors.get(1);
         filename = error.getFilename();
         assertEquals("jslint", error.getValidatingTool());
-        assertEquals("Missing semicolon", error.getMessage());
+        assertEquals("Expected ';' and instead saw '}'", error.getMessage());
         assertTrue(filename, filename.endsWith("/validationTest/basic/basicController.js"));
         assertEquals(7, error.getLine());
         assertEquals(20, error.getStartColumn());

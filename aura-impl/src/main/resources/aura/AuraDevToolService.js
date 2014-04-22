@@ -843,7 +843,6 @@ var AuraDevToolService = function() {
                   */
                  checkTables : function(tables, tableErrorMsg){
                      var headerDict = {};
-                     var allThsAreCorrect = [];
                      var ths = [];
                      var scopeVal = "";
                      var idVals = "";
@@ -978,7 +977,6 @@ var AuraDevToolService = function() {
                    var hdrs3 = domElem.getElementsByTagName("h3");
                    var hdrs4 = domElem.getElementsByTagName("h4");
                    var hdrs5 = domElem.getElementsByTagName("h5");
-                   var hdrs6 = domElem.getElementsByTagName("h6");
 
                    errArray = errArray.concat(accessAideFuncs.findNextHeader(hdrs1, "h2", {"h2":"", "h3":"", "h4":"", "h5":"", "h6":""}));
                    errArray = errArray.concat(accessAideFuncs.findNextHeader(hdrs2, "h3", {"h3":"", "h4":"", "h5":"", "h6":""}));

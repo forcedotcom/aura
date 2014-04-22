@@ -21,6 +21,7 @@
     <aura:attribute name="scroll"               type="String"  default="vertical" description="Defines the scroll direction. The string values can be either horizontal or vertical"/>
     <aura:attribute name="enabled"              type="Boolean" default="true"     description="Sets the default state of the scroller"/>
     <aura:attribute name="useCSSTransition"     type="Boolean"                    description="Denotes whether to use css transitions. By default scroller will decide depending on the platform"/>
+    <aura:attribute name="useNativeScroller"    type="Boolean" default="false"    description="Leverage native scrolling"/>
     <aura:attribute name="preventDefaultOnMove" type="Boolean" default="false"    description="preventDefault native events on mouse move"/>
     <aura:attribute name="snap"                 type="Boolean" default="false"    description="Enable snap behaviour on the scroller (adds the Snap plugins to the scroller)"/>
     <aura:attribute name="endless"              type="Boolean" default="false"    description="Activates the endless plugin (gpuOptimization needs to be enable for this)"/>
@@ -50,6 +51,7 @@
     <aura:attribute name="infiniteLoadingDataProvider" type="Aura.Action" description="The action invoked when the user has reached the end of the scrolling area"/>
 
     <!--Labels pullToShowMore -->
+    <aura:attribute name="pullToShowMoreClick"    type="String" default="Tap to show more"           description="The text before the user pulls clicks to refresh content"/>
     <aura:attribute name="pullToShowMorePull"     type="String" default="Pull up to show more..."    description="The text before the user pulls to show more content"/>
     <aura:attribute name="pullToShowMoreRelease"  type="String" default="Release to show more..."    description="The text when the user pulls to show more content in the scroller area"/>
     <aura:attribute name="pullToShowMoreUpdating" type="String" default="Loading..."                 description="The text to display while the scroller component is updating"/>
@@ -57,6 +59,7 @@
     <aura:attribute name="pullToShowMoreError"    type="String" default="Error on Pull to load more" description="The text to display while the scroller component is updating"/>
 
     <!--Labels pullToLoadMore -->
+    <aura:attribute name="pullToRefreshClick"     type="String" default="Tap to refresh"           description="The text to display in the top cell before the user clicks to refresh the page"/>
     <aura:attribute name="pullToRefreshPull"      type="String" default="Pull down to refresh..."  description="The text to display in the top cell before the user pulls to refresh the page"/>
     <aura:attribute name="pullToRefreshRelease"   type="String" default="Release to refresh..."    description="The text to display in the revealed area above the scroller"/>
     <aura:attribute name="pullToRefreshUpdating"  type="String" default="Loading..."               description="The text to display while the scroller component is updating"/>
@@ -74,7 +77,7 @@
 
     <ui:resizeObserver onresize="{!c.refresh}"/>
     
-    <div aura:id="scrollWrapper" class="{!v.class + ' scrollWrapper'}">
+    <div aura:id="scrollWrapper" class="{!v.class + ' scrollWrapper' + (v.useNativeScroller ? ' native' : '') }">
         <div aura:id="scrollContent" class="{!v.scrollContentClass}">
             {!v.body}
         </div>

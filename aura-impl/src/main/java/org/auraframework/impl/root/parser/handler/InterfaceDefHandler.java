@@ -56,7 +56,9 @@ public class InterfaceDefHandler extends RootTagHandler<InterfaceDef> {
     public InterfaceDefHandler(DefDescriptor<InterfaceDef> descriptor, Source<?> source, XMLStreamReader xmlReader) {
         super(descriptor, source, xmlReader);
         builder.events = new HashMap<String, RegisterEventDef>();
-        builder.setOwnHash(source.getHash());
+        if (source != null) {
+            builder.setOwnHash(source.getHash());
+        }
         builder.extendsDescriptors = new HashSet<DefDescriptor<InterfaceDef>>();
     }
 

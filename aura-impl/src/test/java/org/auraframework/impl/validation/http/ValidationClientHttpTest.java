@@ -21,11 +21,11 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.util.List;
 
-import org.auraframework.impl.validation.ValidationTestUtil;
 import org.auraframework.test.AuraHttpTestCase;
 import org.auraframework.test.annotation.UnAdaptableTest;
 import org.auraframework.util.AuraFiles;
 import org.auraframework.util.validation.ValidationClient;
+import org.auraframework.util.validation.ValidationTestUtil;
 
 import com.google.common.collect.Lists;
 
@@ -85,6 +85,7 @@ public final class ValidationClientHttpTest extends AuraHttpTestCase {
     }
 
     public void testValidate() throws Exception {
+        getTestServletConfig().getBaseUrl(); // make sure the jetty server is started
         String path = AuraFiles.Core.getPath() + "/aura-impl/src/test/components/validationTest/basic";
         List<String> errors = ValidationClient.validate(path);
         ValidationTestUtil.verifyValidationTestBasicErrors(errors);

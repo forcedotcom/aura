@@ -604,6 +604,9 @@ public enum UserAgent {
             if (!ua.contains(UA.APPLE_WEBKIT)){
                 // not other webkit
                 return false;
+            } else if (ua.contains(UA.IPAD) || ua.contains(UA.IPHONE)) {
+                //ios UIWebView
+                return true;
             }
             // else, webkit but not the more specific: safari, chrome, stock android, BB10+, or S1 Desktop
             return (!ua.contains(UA.CHROME)

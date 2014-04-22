@@ -161,7 +161,7 @@ public class BrowserInfo {
         isWebkit = false;
         isFirefox = false;
         isWindowsPhone = false;
-        formFactor = "";
+        formFactor = FormFactor.DESKTOP.toString();
         platformType = 0;
         browserType = 0;
 

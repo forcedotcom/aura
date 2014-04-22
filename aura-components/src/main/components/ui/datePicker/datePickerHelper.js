@@ -336,7 +336,7 @@
         }
 
         // set initial value to time picker if hasTime is true
-        var hasTime = component.getValue("v.hasTime").getBooleanValue();
+        var hasTime = $A.util.getBooleanValue(component.get("v.hasTime"));
         if (hasTime) {
             var timePickerCmp = component.find("time");
             if (timePickerCmp) {

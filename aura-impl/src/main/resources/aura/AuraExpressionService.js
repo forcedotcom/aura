@@ -58,6 +58,10 @@ var AuraExpressionService = function AuraExpressionService(){
                 return expression.getValue(valueProvider);
             }
 
+            if (!$A.util.instanceOf(expression, PropertyReferenceValue)){
+                return null;
+            }
+
             // use gvp; supports existing usage of $A.get and $A.expressionService.get
             if (expression.getRoot().charAt(0) === '$'){
                 var gvp = $A.getGlobalValueProviders();
@@ -96,7 +100,9 @@ var AuraExpressionService = function AuraExpressionService(){
          * @memberOf AuraExpressionService
          */
         get : function(valueProvider, expression, callback){
-            return $A.unwrap(this.getValue(valueProvider, expression, callback));
+            return $A.unwrap(this.getValue(valueProvider, expression, $A.util.isFunction(callback)?function(value){
+                callback($A.unwrap(value));
+            }:null));
         },
 
         /**

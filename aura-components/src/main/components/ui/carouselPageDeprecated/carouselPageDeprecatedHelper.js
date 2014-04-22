@@ -91,7 +91,7 @@
 
 	showPage: function(cmp, pageIndex) {
 		var curPage = cmp.get('v.pageIndex'),
-			isVisible = cmp.getValue('v.priv_visible').getBooleanValue(),
+			isVisible = $A.util.getBooleanValue(cmp.get('v.priv_visible')),
 			hiddenClass = 'hidden';
 
 		if (pageIndex == curPage && !isVisible) {
@@ -104,7 +104,7 @@
 	hidePage: function(cmp, pageIndex) {
 
 		var curPage = cmp.get('v.pageIndex'),
-			isVisible = cmp.getValue('v.priv_visible').getBooleanValue(),
+			isVisible = $A.util.getBooleanValue(cmp.get('v.priv_visible')),
 			hiddenClass = 'hidden';
 
 		if (pageIndex == curPage && isVisible) {

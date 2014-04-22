@@ -39,7 +39,7 @@
                     for(var j = 0; j < body.getLength(); j++) {
                         var desc = body.getValue(j).getDef().getDescriptor();
                         if ((desc.getNamespace() + ":" + desc.getName()) === "ui:inputSelectOption") {
-                            if (body.getValue(j).getValue("v.value").getBooleanValue() === true) {
+                            if ($A.util.getBooleanValue(body.getValue(j).get("v.value")) === true) {
                                 var txt = body.getValue(j).get("v.text");
                                 if(txt !== undefined){
                                     selectedOptions.push(txt);
@@ -50,7 +50,7 @@
                     }
                 }
             } else if ((descriptor.getNamespace() + ":" + descriptor.getName()) === "ui:inputSelectOption") {
-                if (opts[i].getValue("v.value").getBooleanValue() === true) {
+                if ($A.util.getBooleanValue(opts[i].get("v.value")) === true) {
                     var text = opts[i].get("v.text");
                     if(text !== undefined){
                         selectedOptions.push(text);
@@ -84,7 +84,7 @@
         		}
         	}
         }
-        var originalStatus = optionCmp.getValue("v.value").getBooleanValue();
+        var originalStatus = $A.util.getBooleanValue(optionCmp.get("v.value"));
         if (originalStatus !== selected) {
             optionCmp.setValue("v.value", selected);
         }
@@ -120,7 +120,7 @@
         }
 
         var newValues = cmp.get("v.value") || "";
-        var isMultiple = cmp.getValue("v.multiple").getBooleanValue();
+        var isMultiple = $A.util.getBooleanValue(cmp.get("v.multiple"));
         if (isMultiple) {
         	newValues = newValues.split(";");
         } else {
@@ -141,7 +141,7 @@
             var valIsArray = $A.util.isArray(newValues);
             var reset = false;
             cmp._suspendChangeHandlers = true;
-            
+
             for (var i = 0, len = optionsValue.getLength(); i < len; i++) {
                 var optionValue = optionsValue.getValue(i);
                 var val = optionValue.get("value");
@@ -155,7 +155,7 @@
                             reset = true;
                         } else {
                             optionsValue.remove(i);
-                            optionsValue.insert(i, optionValue.unwrap());    
+                            optionsValue.insert(i, optionValue.unwrap());
                         }
                     }
                 } else {
@@ -216,7 +216,7 @@
 
         if (!selectedOptions.found || value.getValue() !== selectedOptions.optionValue) {
 
-            if (!cmp.getValue("v.multiple").getBooleanValue() && selectedOptions.optionValue === "") {
+            if (!$A.util.getBooleanValue(cmp.get("v.multiple")) && selectedOptions.optionValue === "") {
                 var optionCmps = this.getOptionCmps(cmp);
                 if (optionCmps.length > 0) {
                     // if no options are selected, set the select's value to the first option's value

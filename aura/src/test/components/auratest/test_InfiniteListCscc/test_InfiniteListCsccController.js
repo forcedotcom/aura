@@ -22,12 +22,12 @@
             Id: "Client"
         };
 
-        list.getValue('v.items').insert(0, task);
+        list.getValue('v.items').push(task);
     },
     remove: function (cmp) {
         var list = cmp.find('list');
 
-        list.getValue('v.items').remove(1);
+        list.getValue('v.items').pop();
     }
 
 })

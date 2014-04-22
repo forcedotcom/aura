@@ -245,7 +245,7 @@ AttributeSet.prototype.merge = function(yourMap, overwrite) {
     var keys = yourMap.value;
 
     for (var key in keys) {
-        var yourvalue = yourMap._getValue(key);
+        var yourvalue = yourMap.getValue(key);
         if (overwrite || !(key in my)) {
             my[key] = yourvalue;
         }

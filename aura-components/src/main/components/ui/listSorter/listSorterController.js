@@ -19,9 +19,8 @@
 	},
 
 	handleDataChange : function(cmp, evt, helper) {
-		var value = evt.getParam('value');
-		if (value) {
-			var items = value.unwrap();
+		var items = evt.getParam('value');
+		if (items) {
 			cmp.set('v.items', items);
         	this.initSelectedItems(cmp, items);
 		}
@@ -59,7 +58,7 @@
 	},
 
 	onVisible : function(cmp, evt, helper) {
-		var visible = evt.getParam('value').unwrap();
+		var visible = evt.getParam('value');
 		if (visible) {
 			helper.attachEventHandler(cmp);
 		} else {

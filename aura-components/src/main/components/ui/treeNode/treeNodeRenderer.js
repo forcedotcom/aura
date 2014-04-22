@@ -22,24 +22,23 @@
         if (active) {
             cmp.getElement().setAttribute('active', 'true');
         }
-        
+
         return this.superAfterRender(cmp);
     },
-    
+
     /**
      * When the active node changes, we may need to scroll it into view.
      * Expansion changes and the like mean we must wait until rerender time to
      * react to this event.
      */
     rerender : function(cmp) {
-        var activeAttr = cmp.getAttributes().getValue("active");
-        if (activeAttr.isDirty()) {
-            var active = activeAttr.getBooleanValue();
+        if (cmp.isDirty("v.active")) {
+            var active = $A.util.getBooleanValue(cmp.get("v.active"));
             var elem = cmp.getElement();
             if (active) {
                 elem.setAttribute('active', 'true');
                 if(elem.scrollIntoViewIfNeeded){
-	                elem.scrollIntoViewIfNeeded();                
+	                elem.scrollIntoViewIfNeeded();
                 }
                 else{
 					elem.scrollIntoView(false);

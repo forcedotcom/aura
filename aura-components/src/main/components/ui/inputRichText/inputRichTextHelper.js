@@ -78,7 +78,7 @@
 	 *
 	 */
 	initEditor : function(cmp) {
-		if (cmp.getValue('v.isRichText').getBooleanValue()) {
+		if ($A.util.getBooleanValue(cmp.get('v.isRichText'))) {
 			var editorInstance = this.getEditorInstance(cmp);
 
 			if (!editorInstance) {

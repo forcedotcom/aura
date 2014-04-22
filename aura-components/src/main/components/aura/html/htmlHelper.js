@@ -77,7 +77,7 @@
         "track" : true,
         "wbr" : true
     },
-    
+
     GESTURE: function (){
         var g;
         if (this.cachedGestures) {
@@ -88,16 +88,16 @@
                 g = {
                         start : 'pointerDown',
                         move : 'pointerMove',
-                        end : 'pointerUp' 
+                        end : 'pointerUp'
                     };
 
             } else if (navigator.msPointerEnabled) {
                 g = {
                         start : 'MSPointerDown',
                         move : 'MSPointerMove',
-                        end : 'MSPointerUp' 
+                        end : 'MSPointerUp'
                     };
-                
+
             } else {
                 g = {
                         start : 'touchstart',
@@ -286,7 +286,8 @@
                     if (value && value.auraType === "Value") {
                         if (aura.util.arrayIndexOf(this.SPECIAL_BOOLEANS, name.toLowerCase()) > -1) {
                             // TODO: values should someday know their type and do the right thing with getValue()
-                            value = value.getBooleanValue();
+                            // JBUCH: FIXME TEMPORARY FIX FOR HALO
+                            value = $A.util.getBooleanValue(value.getValue());
                         } else {
                             value = value.getValue();
                         }

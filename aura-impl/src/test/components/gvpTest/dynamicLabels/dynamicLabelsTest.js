@@ -39,9 +39,10 @@
                         //Verify that label is available
                         $A.test.assertEquals("Today", $A.get("$Label.Related_Lists.task_mode_today"),
                     	    "Failed to fetch label from server dynamically");
-                        //Varify that temporary label value is updated once the actual label is fetched from server
-                        $A.test.assertEquals("Today", tempLabel.getValue(),
-                    	    "LabelValueProvider did not update temp label value");
+// JBUCH: HALO: THIS ASSERTION IS NO LONGER VALUABLE; DELETE ONCE VALUEWRAPPERS GO AWAY
+                        //Verify that temporary label value is updated once the actual label is fetched from server
+//                        $A.test.assertEquals("Today", tempLabel.getValue(),
+//                    	    "LabelValueProvider did not update temp label value");
                     }
                 );
     },

@@ -20,13 +20,15 @@
 
     itemsChange: function(cmp, evt, helper) {
         var v = evt.getParam("value");
-//        if (v === cmp.getValue("v.items")) {
-//            if (v.isDifferentArray()) {
+        //JBUCH: FIXME: THIS IS A HUGE WRONG: THIS IS FIRING WHEN ATTRIBUTES OTHER THAN ITEMS ARE CHANGED
+        if($A.util.isArray(v)){
+            if (v === cmp._items) {
+                helper.rerenderSelective(cmp);
+            } else {
                 helper.rerenderEverything(cmp);
- //           } else {
-  //              helper.rerenderSelective(cmp);
-    //        }
-        //}
+                cmp._items = v;
+            }
+        }
     },
 
     firstRender: function(cmp, evt, helper) {

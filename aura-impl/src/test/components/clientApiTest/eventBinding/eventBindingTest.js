@@ -24,12 +24,12 @@
 
             $A.test.fireDomEvent(input, "focus");
             $A.test.addWaitForWithFailureMessage(true, function() {
-                return cmp.getAttributes().getValue("focusEvent").getBooleanValue();
+                return $A.util.getBooleanValue(cmp.get("v.focusEvent"));
             }, "Did not pick up focus event on html element");
 
             $A.test.fireDomEvent(input, "blur");
             $A.test.addWaitForWithFailureMessage(true, function() {
-                return cmp.getAttributes().getValue("blurEvent").getBooleanValue();
+                return $A.util.getBooleanValue(cmp.get("v.blurEvent"));
             }, "Did not pick up blur event on html element");
         }
     }

@@ -17,7 +17,7 @@
     cancel: function(component, event, helper) {
         component.setValue("v.visible", false);
     },
-    
+
     closeOnTab: function(component, event, helper) {
         helper.handleESCKey(component, event);
         var keyCode = event.keyCode;
@@ -26,12 +26,12 @@
             component.setValue("v.visible", false);
         }
     },
-    
+
     doInit: function(component, event, helper) {
         helper.localizeToday(component);
         component._windowSize = $A.util.getWindowSize();
     },
-    
+
     focusDateOnTab: function(component, event, helper) {
         helper.handleESCKey(component, event);
         var keyCode = event.keyCode;
@@ -41,11 +41,11 @@
             helper.focusDate(component);
         }
     },
-	
+
 	goToPrevYear: function(component, event, helper) {
 	    helper.goToPrevYear(component);
 	},
-	
+
 	goToPrevMonth: function(component, event, helper) {
         var grid = component.find("grid");
         var e = grid.get("e.updateCalendar");
@@ -54,7 +54,7 @@
             e.fire();
         }
     },
-    
+
     goToNextMonth: function(component, event, helper) {
         var grid = component.find("grid");
         var e = grid.get("e.updateCalendar");
@@ -63,15 +63,15 @@
             e.fire();
         }
     },
-    
+
     goToNextYear: function(component, event, helper) {
         helper.goToNextYear(component);
     },
-    
+
     handleKeydown: function(component, event, helper) {
         helper.handleESCKey(component, event);
     },
-    
+
     handleTabToday: function(component, event, helper) {
         var domEvent = event.getParam("domEvent");
         if (domEvent) {
@@ -86,7 +86,7 @@
             }
         }
     },
-    
+
     handleTouchEnd: function(component, event, helper) {
         var startX = component._onTouchStartX;
         var endX = component._onTouchEndX;
@@ -101,7 +101,7 @@
             helper.goToPrevYear(component);
         }
     },
-    
+
     handleTouchMove: function(component, event, helper) {
         event.preventDefault();
         event.stopPropagation();
@@ -116,11 +116,11 @@
         }
         if (touchIdFound) {
             component._onTouchEndX = touch.clientX;
-            component._onTouchEndY = touch.clientY; // On Android (Samsung GT), we can't get the position of touchend, 
+            component._onTouchEndY = touch.clientY; // On Android (Samsung GT), we can't get the position of touchend,
                                                     // so we have to record it here.
         }
     },
-    
+
     handleTouchStart: function(component, event, helper) {
         var touch = event.changedTouches[0];
         // record the ID to ensure it's the same finger on a multi-touch device
@@ -128,11 +128,11 @@
         component._onTouchStartX = touch.clientX;
         component._onTouchStartY = touch.clientY;
     },
-    
+
     hide: function(component, event, helper) {
         component.setValue("v.visible", false);
     },
-    
+
     selectDate: function(component, event, helper) {
         var selectedDate = event.getParam("value");
         var selectDateEvent = component.getEvent("selectDate");
@@ -140,7 +140,7 @@
         selectDateEvent.fire();
         component.setValue("v.visible", false);
     },
-    
+
     selectToday: function(component, event, helper) {
         var mDate = moment();
         var selectDateEvent = component.getEvent("selectDate");
@@ -148,7 +148,7 @@
         selectDateEvent.fire();
         component.setValue("v.visible", false);
     },
-    
+
     set: function(component, event, helper) {
         var setDateTimeEvent = component.getEvent("selectDate");
         if (setDateTimeEvent) {
@@ -158,10 +158,10 @@
                 return;
             }
             var date = gridCmp.get("v.year") + "-" + (gridCmp.get("v.month") + 1) + "-" + gridCmp.get("v.date");
-            
+
             // Get time value
             var timeCmp = component.find("time");
-            if (!timeCmp || (timeCmp.getValue("v.isValid").getBooleanValue() === false)) {
+            if (!timeCmp || ($A.util.getBooleanValue(timeCmp.get("v.isValid")) === false)) {
                 return;
             }
             setDateTimeEvent.setParams({
@@ -173,13 +173,13 @@
         }
         component.setValue("v.visible", false);
     },
-	
+
 	updateCalendarTitle: function(component, event, helper) {
         var date = new Date();
         date.setFullYear(event.getParam("year"), event.getParam("month"));
         helper.updateMonthYear(component, date.getTime());
     },
-    
+
     yearChange: function(component, event, helper) {
         helper.yearChange(component);
     }

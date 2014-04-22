@@ -15,7 +15,7 @@
  */
 ({
     afterRender : function(cmp){
-        if (cmp.getValue("v.loaded").getBooleanValue()){
+        if ($A.util.getBooleanValue(cmp.get("v.loaded"))){
             return this.superAfterRender();
         }
 
@@ -66,7 +66,7 @@
             "attributes" : atts
         });
 
-        action.setExclusive(cmp.getValue("v.exclusive").getBooleanValue());
+        action.setExclusive($A.util.getBooleanValue(cmp.get("v.exclusive")));
         cmp.set("v.loaded", true);
         $A.enqueueAction(action);
 

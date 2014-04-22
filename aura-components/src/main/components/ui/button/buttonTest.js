@@ -37,7 +37,7 @@
 
             aura.test.assertTrue(!component.get('v.buttonTitle'), "Button should not have a default value for title");
 
-            aura.test.assertFalse(component.getAttributes().getValue('disabled').getBooleanValue(), "Button should not be disabled by default");
+            aura.test.assertFalse($A.util.getBooleanValue(component.get('v.disabled')), "Button should not be disabled by default");
             aura.test.assertFalse(element.disabled, "By default dom element for ui:button should not be disabled");
 
             aura.test.assertEquals('ltr', component.get('v.labelDir'), "Button label should be left to right by default");

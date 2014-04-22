@@ -203,8 +203,7 @@
 			var selectedPage = this.getPageOnCarousel(carousel,
 					expectedDefaultPage);
 
-			$A.test.assertTrue(selectedPage.getValue('v.isSelected')
-					.getBooleanValue(), "Selected page should be selected");
+			$A.test.assertTrue($A.util.getBooleanValue(selectedPage.get('v.isSelected')), "Selected page should be selected");
 
 			this.assertPageVisibility(selectedPage, true);
 
@@ -220,8 +219,7 @@
 			// page #2 that was supposed to be default should not have selected
 			// css
 			var pageCmp = this.getPageOnCarousel(carousel, 2);
-			$A.test.assertFalse(pageCmp.getValue('v.isSelected')
-					.getBooleanValue(), "Selected page should NOT be selected");
+			$A.test.assertFalse($A.util.getBooleanValue(pageCmp.get('v.isSelected')), "Selected page should NOT be selected");
 			this.assertPageVisibility(pageCmp, false);
 		}
 	},
@@ -405,8 +403,7 @@
 				function(cmp) {
 					// verify parent carousel is on the correct page
 					var carousel = cmp.find("pgChangeAction");
-					var isPageChangeActionCalled = cmp.getValue(
-							"v.isPageChangeActionCalled").getBooleanValue();
+					var isPageChangeActionCalled = $A.util.getBooleanValue(cmp.get("v.isPageChangeActionCalled"));
 					$A.test.assertTrue(isPageChangeActionCalled,
 							"Expected custom page change action to be called");
 					carousel.set("v.isPageChangeActionCalled",
@@ -480,14 +477,14 @@
 
 	assertPageSelected : function(page, isSelected, pageNum) {
 		if (isSelected) {
-			$A.test.assertTrue(page.getValue('v.isSelected').getBooleanValue(),
+			$A.test.assertTrue($A.util.getBooleanValue(page.get('v.isSelected')),
 					"Selected page at " + pageNum
 							+ " should have 'selected' css");
 			this.assertPageVisibility(page, true);
 			this.assertAriaExpanded(page.getElement(), true);
 		} else {
 			$A.test.assertFalse(
-					page.getValue('v.isSelected').getBooleanValue(),
+                $A.util.getBooleanValue(page.get('v.isSelected')),
 					"UnSelected page at " + pageNum
 							+ " should NOT have 'selected' css");
 			this.assertPageVisibility(page, false);
@@ -556,7 +553,7 @@
 
 	assertPageVisibility : function(pageCmp, isVisible) {
 		$A.test.addWaitForWithFailureMessage(isVisible, function() {
-			return pageCmp.getValue('v.priv_visible').getBooleanValue();
+			return $A.util.getBooleanValue(pageCmp.get('v.priv_visible'));
 		}, "Selected page should be visible");
 	},
 

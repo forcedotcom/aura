@@ -20,11 +20,9 @@
         keydownEvent.fire();
         return true;
     },
-     
-    press : function(cmp, event){
-        var attributes = cmp.getAttributes();
 
-        if (attributes.getValue("stopPropagation").getBooleanValue()) {
+    press : function(cmp, event){
+        if ($A.util.getBooleanValue(cmp.get("v.stopPropagation"))) {
             //IE9 & Other Browsers
             if (event.stopPropagation) {
               event.stopPropagation();
@@ -35,11 +33,11 @@
             }
         }
 
-        if (attributes.getValue("disabled").getBooleanValue()) {
+        if ($A.util.getBooleanValue(cmp.get("v.disabled"))) {
             event.preventDefault();
             return false;
         }
-        
+
         var pressEvent = cmp.getEvent("press");
         pressEvent.setParams({"domEvent": event});
         pressEvent.fire();

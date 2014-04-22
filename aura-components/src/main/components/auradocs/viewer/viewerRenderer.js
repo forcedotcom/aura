@@ -18,14 +18,13 @@
         var attributes = cmp.getAttributes();
         var desc = new DefDescriptor(attributes.getRawValue("descriptor"));
         var ret = this.superRender();
-        var url = "/"+desc.getNamespace()+"/"+desc.getName()+".cmp";
+        var def = desc.getNamespace()+":"+desc.getName();
+        var url = "/auradocs/outputViewer.app";
         var locationBar = cmp.find("locationBar").getElement();
         locationBar.value = url;
         var frame = cmp.find("frame").getElement();
         var cachebuster = Math.random() * 100000;
-        var app = $A.getContext().getApp();
-        frame.src = url + "?aura.cb="+cachebuster + "&aura.mode=" + $A.getContext().getMode() + (app?"&aura.app="+app:"");
-
+        frame.src = url + "?aura.cb="+cachebuster + "&aura.mode=" + $A.getContext().getMode()  + "&def="+ def;
         return ret;
     }
 })

@@ -643,8 +643,6 @@ ArrayValue.prototype.rerender = function(suppliedReferenceNode, appendChild, ins
     var needReference = false;
     var referenceNode = (appendChild || !this.referenceNode) ? suppliedReferenceNode : this.referenceNode;
     if (!this.isEmpty()) {
-
-        var renderer;
         var array = this.getArray();
         var len = array.length;
         for (var j = 0; j < len; j++) {

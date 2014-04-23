@@ -49,7 +49,7 @@ public final class ValidationHttpTest extends AuraHttpTestCase {
     }
 
     @SuppressWarnings("unchecked")
-	public void testLintApp() throws Exception {
+    public void testLintApp() throws Exception {
         // http://localhost:9090/auradev/lint.app?name=...
         Map<String, Object> message = Maps.newHashMap();
         Map<String, Object> actionInstance = Maps.newHashMap();
@@ -74,16 +74,23 @@ public final class ValidationHttpTest extends AuraHttpTestCase {
         assertEquals(200, getStatusCode(httpResponse));
 
         String response = getResponseBody(httpResponse);
-        // remote starting: while(1);
-        response = response.substring(response.indexOf('{'));
+        List<Map<String, ?>> errors = null;
 
-        Map<String, ?> json = (Map<String, ?>) new JsonReader().read(response);
-        Map<String, ?> value = (Map<String, ?>) ((Map<String, ?>) ((Map<String, ?>) ((ArrayList<?>) json.get("actions"))
-                .get(0))
-                .get("returnValue"))
-                .get("value");
-        List<Map<String, ?>> errors = (List<Map<String, ?>>) ((Map<String, ?>) ((Map<String, ?>) value).get("model"))
-                .get("errors");
+        try {
+            // remote starting: while(1);
+            response = response.substring(response.indexOf('{'));
+            Map<String, ?> json = (Map<String, ?>) new JsonReader().read(response);
+            Map<String, ?> value = (Map<String, ?>) ((Map<String, ?>) ((Map<String, ?>) ((ArrayList<?>) json
+                    .get("actions"))
+                    .get(0))
+                    .get("returnValue"))
+                    .get("value");
+            errors = (List<Map<String, ?>>) ((Map<String, ?>) ((Map<String, ?>) value)
+                    .get("model"))
+                    .get("errors");
+        } catch (Exception ex) {
+            fail(String.valueOf(ex) + " parsing unexpected response: " + response);
+        }
 
         assertEquals(2, errors.size());
         Map<String, ?> error = errors.get(0);
@@ -93,6 +100,7 @@ public final class ValidationHttpTest extends AuraHttpTestCase {
         error = errors.get(1);
         errorMessage = (String) error.get("ErrorMessage");
         assertEquals("lintTest:basic", error.get("CompName"));
-        assertTrue(errorMessage, errorMessage.contains("basicController.js (line 7, char 20) : Missing semicolon"));
+        assertTrue(errorMessage,
+                errorMessage.contains("basicController.js (line 7, char 20) : Expected ';' and instead saw '}'"));
     }
 }

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*jslint bitwise: false*/
+/*jslint bitwise: true*/
 /**
  * A representation of a set of individual bits, addressable as if organized as
  * an array.
@@ -22,7 +22,7 @@
  * @constructor
  */
 function Bitset(str) {
-    if (typeof (str) != "string") {
+    if (typeof str != "string") {
         str = "";
     }
     Bitset.init();

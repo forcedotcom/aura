@@ -34,7 +34,6 @@ var priv = {
      * Pops the existing $A.context frame.
      */ 
     pop : function(cmp) {
-        var i;
         var top = $A.componentStack.pop(cmp);
         $A.assert(top, "empty component context stack");
     },

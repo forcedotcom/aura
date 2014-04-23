@@ -772,8 +772,6 @@ var AuraClientService = function() {
          */
         processActions : function() {
             var actions;
-            var backgroundIdx;
-            var backgroundAction;
             var processedActions = false;
             var action;
 

@@ -117,7 +117,7 @@ $A.ns.ComponentCreationContext.prototype.loadComponent = function(config, attrib
         "descriptor": desc
     };
 
-    if (!forceClient && (!def || (def && def.hasRemoteDependencies())) || forceServer) {
+    if ((!forceClient && (!def || (def && def.hasRemoteDependencies()))) || forceServer) {
         this.requestComponent(config, attributeValueProvider, wrapper);
     } else {
         var newComp = this.buildComponent(config, attributeValueProvider, localCreation);
@@ -277,7 +277,7 @@ $A.ns.ComponentCreationContext.prototype.finished = function() {
         }
 
         // initialize components in reverse order
-        for (var i = this.components.length; i--;) {
+        for (var i = this.components.length - 1; i >= 0; i--) {
             var component = this.components[i];
             $A.assert(component, "Should have component");
             component.fire("init");

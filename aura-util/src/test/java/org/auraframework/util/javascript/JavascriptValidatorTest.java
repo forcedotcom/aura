@@ -33,7 +33,7 @@ public final class JavascriptValidatorTest extends UnitTestCase {
         assertEquals(2, error.getLine());
         assertEquals(8, error.getStartColumn());
         assertEquals("jslint", error.getValidatingTool());
-        assertEquals("Missing semicolon", error.getMessage());
+        assertEquals("Expected ';' and instead saw 'index'", error.getMessage());
         assertEquals("index++", error.getEvidence());
         assertEquals(Level.Error, error.getLevel());
         assertNull(error.getRule());

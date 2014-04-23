@@ -86,9 +86,9 @@
 
             if (navigator.pointerEnabled) {
                 g = {
-                        start : 'pointerDown',
-                        move : 'pointerMove',
-                        end : 'pointerUp' 
+                        start : 'pointerdown',
+                        move : 'pointermove',
+                        end : 'pointerup' 
                     };
 
             } else if (navigator.msPointerEnabled) {
@@ -141,17 +141,17 @@
                 handleEvent : function (event) {
                     switch (event.type) {
                     case 'touchstart':
-                    case 'pointerDown':
+                    case 'pointerdown':
                     case 'MSPointerDown':
                         this.onTouchStart(event);
                         break;
                     case 'touchmove':
-                    case 'pointerMove':
+                    case 'pointermove':
                     case 'MSPointerMove':
                         this.onTouchMove(event);
                         break;
                     case 'touchend':
-                    case 'pointerUp':
+                    case 'pointerup':
                     case 'MSPointerUp':
                         this.onClick(event);
                         break;
@@ -232,7 +232,7 @@
             valueExpression = htmlAttributes.getValue(eventName),
             onclickExpression;
 
-        if (eventName === 'ontouchend' || eventName === 'onpointerUp' || eventName === 'onMSPointerUp') {
+        if (eventName === 'ontouchend' || eventName === 'onpointerup' || eventName === 'onMSPointerUp') {
             // Validate that either onclick or ontouchend is wired up to an action never both simultaneously
             onclickExpression = htmlAttributes.getValue("onclick");
             if (onclickExpression.isDefined()) {

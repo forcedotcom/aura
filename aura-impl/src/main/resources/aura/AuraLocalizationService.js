@@ -832,7 +832,7 @@ var AuraLocalizationService = function AuraLocalizationService() {
         }
                 try {
                     ret = WallTime["WallTimeToUTC"](timezone, d);
-                } catch (ee) {}
+                } catch (ignore) {}
             }
             return ret;
         },
@@ -853,7 +853,7 @@ var AuraLocalizationService = function AuraLocalizationService() {
                 }
                 try {
                     ret = WallTime["UTCToWallTime"](d, timezone)["wallTime"];
-                } catch (ee) {}
+                } catch (ignore) {}
             }
             return ret;
         },

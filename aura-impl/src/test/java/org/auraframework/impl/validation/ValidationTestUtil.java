@@ -61,7 +61,7 @@ public final class ValidationTestUtil {
         }
         assertError("basicController.js [line 5, column 1] js/custom: Starting '(' missing",
                 errors.get(errorNum++));
-        assertError("basicController.js [line 7, column 20] jslint: Missing semicolon",
+        assertError("basicController.js [line 7, column 20] jslint: Expected ';' and instead saw '}'",
                 errors.get(errorNum++));
         assertError(
                 "basic.cmp [line 1, column 1] cmp/custom: Abstract component markup://validationTest:basic must be extensible",

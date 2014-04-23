@@ -33,8 +33,6 @@ import com.google.common.collect.Maps;
 
 /**
  * $Browser global value provider, backed by data from BrowserInfo
- * 
- * @author eanderson
  */
 public class BrowserValueProvider implements GlobalValueProvider {
     public static final String IS_TABLET = "isTablet";

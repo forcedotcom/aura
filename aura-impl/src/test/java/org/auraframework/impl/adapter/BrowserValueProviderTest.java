@@ -119,8 +119,8 @@ public class BrowserValueProviderTest extends AuraImplTestCase {
 
     // sample some user agents
     public void testGetValue() throws Exception {
-        assertBrowserProperties(null, false, false, false, "", false, false, false, false);
-        assertBrowserProperties(UserAgent.EMPTY, false, false, false, "", false, false, false, false);
+        assertBrowserProperties(null, false, false, false, "DESKTOP", false, false, false, false);
+        assertBrowserProperties(UserAgent.EMPTY, false, false, false, "DESKTOP", false, false, false, false);
         assertBrowserProperties(UserAgent.GOOGLE_CHROME, false, false, false, "DESKTOP", false, false, false, false);
         assertBrowserProperties(UserAgent.IE6, false, false, false, "DESKTOP", false, false, false, false);
         assertBrowserProperties(UserAgent.IE7, false, false, false, "DESKTOP", false, false, false, false);
@@ -140,14 +140,13 @@ public class BrowserValueProviderTest extends AuraImplTestCase {
         assertBrowserProperties(UserAgent.ANDROID1_6, false, true, true, "PHONE", false, false, false, false);
         assertBrowserProperties(UserAgent.ANDROID2_3, false, true, true, "PHONE", false, false, false, false);
         assertBrowserProperties(UserAgent.ANDROID4_2, false, true, true, "PHONE", false, false, false, false);
-        assertBrowserProperties(UserAgent.KINDLE_FIRE, false, false, false, "DESKTOP", false, false, false, false);
-        assertBrowserProperties(UserAgent.PLAYBOOK, false, false, false, "DESKTOP", false, false, false, false);
-        assertBrowserProperties(UserAgent.NOKIA_N95, false, false, false, "DESKTOP", false, false, false, false);
+        assertBrowserProperties(UserAgent.KINDLE_FIRE, true, false, false, "TABLET", false, false, false, false);
+        assertBrowserProperties(UserAgent.PLAYBOOK, true, false, false, "TABLET", false, false, false, false);
+        assertBrowserProperties(UserAgent.NOKIA_N95, false, true, false, "PHONE", false, false, false, false);
         assertBrowserProperties(UserAgent.NOKIA_920, false, true, false, "PHONE", false, false, false, true);
         assertBrowserProperties(UserAgent.WINDOWS_PHONE_8, false, true, false, "PHONE", false, false, false, true);
-        // TODO(W-1488922): Blackberry not detected as a phone
-        // assertBrowserProperties(UserAgent.BLACKBERRY_10, false, true, false, "PHONE", false, false, false, false);
-        // assertBrowserProperties(UserAgent.BLACKBERRY_7, false, true, false, "PHONE", false, false, false, false);
+        assertBrowserProperties(UserAgent.BLACKBERRY_10, false, true, false, "PHONE", false, false, false, false);
+        assertBrowserProperties(UserAgent.BLACKBERRY_7, false, true, false, "PHONE", false, false, false, false);
     }
 
     public void testGetValueUndefinedProperty() throws Exception {

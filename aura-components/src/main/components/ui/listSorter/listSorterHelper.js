@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-	CONSTANTS : {ASC: 'ASC', DESC: 'DESC', DESC_PREFIX: "-"},
+	CONSTANTS : {ASC: 'ASC', DESC: 'DESC', DESC_PREFIX: "-", CONTAINER_ELEMENT_ID: 'listSorter'},
 		
 	doInit : function(cmp) {
 		this.initSorterTrigger(cmp);
@@ -124,6 +124,7 @@
 			}			
 		}
 		cmp.setValue('v.visible', true);
+		this.appendElementToBody(cmp);
 		this.updateSize(cmp);
 	},
 	
@@ -306,12 +307,28 @@
         $A.util.removeOn(window, 'orientationchange', this.getOrientationChangeHandler(cmp));
 	},
 	
-	position : function(cmp) { 
-    	if (cmp.get('v.modal')) {
-    		//attach the dom to the document body as a modal dialog    		
-    		document.body.appendChild(cmp.find('mask').getElement());
-    		document.body.appendChild(cmp.find('sorterContainer').getElement());
-    	}
+	appendElementToBody : function(cmp) {
+		if (!cmp.get('v.modal')) {
+			return;
+		}
+		
+		var id = this.CONSTANTS.CONTAINER_ELEMENT_ID;
+		var containerEl = document.getElementById(id);
+		var maskEl = cmp.find('mask').getElement();
+		var sorterEl = cmp.find('sorterContainer').getElement();
+		
+		if (!containerEl) {
+			//attach the dom to the document body as a modal dialog
+    		containerEl = document.createElement('div');
+    		containerEl.setAttribute('id', id);
+    		$A.util.addClass(containerEl, cmp.getConcreteComponent().getDef().getStyleClassName());
+    		containerEl.appendChild(maskEl);
+    		containerEl.appendChild(sorterEl);    		
+    		document.getElementsByTagName("body")[0].appendChild(containerEl);
+		} else if (!$A.util.contains(containerEl, sorterEl)) {
+			containerEl.appendChild(maskEl);
+			containerEl.appendChild(sorterEl);
+		}
     },
     
     /**
@@ -491,5 +508,12 @@
 	    } while(currentNode);
 	
 	    return false;
+    },
+    
+    unrender: function(cmp) {
+    	var containerEl = document.getElementById(this.CONSTANTS.CONTAINER_ELEMENT_ID);
+    	if (containerEl) {
+    		$A.util.removeElement(containerEl);
+    	}
     }
 })

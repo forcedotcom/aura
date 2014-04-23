@@ -15,6 +15,6 @@
  */
 ({
     getLabel: function(cmp, event) {
-        cmp.set("v.simplevalue1", $A.get("$Label" + ".Related_Lists" + ".task_mode_today"));
+    	$A.get("$Label" + ".Related_Lists" + ".task_mode_today", function(label) { cmp.set("v.simplevalue1", label) });
     }
 })

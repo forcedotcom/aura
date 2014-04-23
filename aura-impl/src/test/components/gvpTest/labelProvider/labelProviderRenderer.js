@@ -1,8 +1,8 @@
 ({
     render: function(cmp) {
-        cmp.set("v.simplevalue1", $A.get("$Label" + ".Related_Lists" + ".task_mode_today"));
-        cmp.set("v.simplevalue2", $A.get("$Label.DOESNT.EXIST"));
-        cmp.set("v.simplevalue3", $A.get("$Label.Related_Lists.DOESNTEXIST"));
+    	$A.get("$Label" + ".Related_Lists" + ".task_mode_today", function(label) { cmp.set("v.simplevalue1", label) });
+    	$A.get("$Label.DOESNT.EXIST", function(label) { cmp.set("v.simplevalue2", label) });
+    	$A.get("$Label.Related_Lists.DOESNTEXIST", function(label) { cmp.set("v.simplevalue3", label) });
 
         // Both section and name are required. This request will return undefined and no action is requested.
         cmp.set("v.simplevalue4", $A.get("$Label.DOESNTEXIST"));

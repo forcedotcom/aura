@@ -26,12 +26,12 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpRequestBase;
-import org.auraframework.impl.validation.ValidationTestUtil;
 import org.auraframework.test.AuraHttpTestCase;
 import org.auraframework.test.annotation.UnAdaptableTest;
 import org.auraframework.util.AuraFiles;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.validation.ValidationError;
+import org.auraframework.util.validation.ValidationTestUtil;
 
 import com.google.common.base.Charsets;
 

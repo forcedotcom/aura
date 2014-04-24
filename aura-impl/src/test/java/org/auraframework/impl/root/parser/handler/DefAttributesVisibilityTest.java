@@ -75,6 +75,7 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
         public RootDefAttributesVisibilityTest(String name){
             super(name);
         }
+        @Override
         XMLHandler<?> getHandler(boolean b)throws DefinitionNotFoundException{
             return getHandler(b, clazz);
         }
@@ -154,6 +155,7 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
             expectedAttrsInPrivilegedNS = Sets.newHashSet("serializeTo", "visibility");//TODO support?
             expectedAttrsInPrivilegedNS.addAll(expectedAttrsInCustomNS);
         }
+        @Override
         @SuppressWarnings("unchecked")
         XMLHandler<?> getHandler(boolean isCustomNamespace) throws DefinitionNotFoundException{
             return new AttributeDefHandler<ApplicationDef>(
@@ -193,6 +195,7 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
             expectedAttrsInPrivilegedNS = Sets.newHashSet();
             expectedAttrsInPrivilegedNS.addAll(expectedAttrsInCustomNS);
         }
+        @Override
         @SuppressWarnings("unchecked")
         XMLHandler<?> getHandler(boolean isCustomNamespace) throws DefinitionNotFoundException{
             return new AttributeDefRefHandler<ApplicationDef>(
@@ -212,6 +215,7 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
             expectedAttrsInPrivilegedNS = Sets.newHashSet();
             expectedAttrsInPrivilegedNS.addAll(expectedAttrsInCustomNS);
         }
+        @Override
         @SuppressWarnings("unchecked")
         XMLHandler<?> getHandler(boolean isCustomNamespace) throws DefinitionNotFoundException{
             return new EventHandlerDefHandler(

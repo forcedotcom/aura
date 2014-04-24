@@ -38,7 +38,10 @@ public class ClientTest extends AuraImplTestCase {
         pairs.put(UserAgent.IE8.getUserAgentString(), Type.IE8);
         pairs.put(UserAgent.IE9.getUserAgentString(), Type.IE9);
         pairs.put(UserAgent.IE10.getUserAgentString(), Type.IE10);
-        pairs.put(UserAgent.WINDOWS_PHONE_8.getUserAgentString(), Type.IE10);
+        pairs.put(UserAgent.IE10_WINDOWS_PHONE_8.getUserAgentString(), Type.IE10);
+        pairs.put(UserAgent.IE10_WINDOWS_RT_8.getUserAgentString(), Type.IE10);
+        pairs.put(UserAgent.IE11_WINDOWS_PHONE_8_1.getUserAgentString(), Type.IE11);
+        pairs.put(UserAgent.IE11_WINDOWS_RT_8_1.getUserAgentString(), Type.IE11);
         pairs.put(UserAgent.IE11.getUserAgentString(), Type.IE11);
         pairs.put(UserAgent.IE11_NET_FRAMEWORK.getUserAgentString(), Type.IE11);
         pairs.put(UserAgent.FIREFOX.getUserAgentString(), Type.FIREFOX);
@@ -53,6 +56,8 @@ public class ClientTest extends AuraImplTestCase {
         pairs.put(UserAgent.ANDROID4_2.getUserAgentString(), Type.WEBKIT);
         pairs.put(UserAgent.BLACKBERRY_7.getUserAgentString(), Type.WEBKIT);
         pairs.put(UserAgent.BLACKBERRY_10.getUserAgentString(), Type.WEBKIT);
+        pairs.put(UserAgent.GOOD_IPHONE.getUserAgentString(), Type.WEBKIT);
+        pairs.put(UserAgent.GOOD_ANDROID.getUserAgentString(), Type.WEBKIT);
         pairs.put(UserAgent.OPERA12.getUserAgentString(), Type.OTHER);
         pairs.put(UserAgent.OPERA_MINI.getUserAgentString(), Type.OTHER);
         pairs.put(UserAgent.NETSCAPE.getUserAgentString(), Type.OTHER);

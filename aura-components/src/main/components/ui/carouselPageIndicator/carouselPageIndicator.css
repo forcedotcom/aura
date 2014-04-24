@@ -45,3 +45,20 @@
 	clip: rect(1px 1px 1px 1px);
 	clip: rect(1px, 1px, 1px, 1px);
 }
+
+.THIS.tabs {
+	margin: 0;
+	padding: 0;
+}
+
+.THIS.tabs li {
+	margin: 5px 0;
+	/* NOTE GIVEN THAT IS A DEPRECATED CMP AND IT WILL GO AWAY WE DO THIS HACK*/
+	width: 33.333%;
+	max-width: 33.333%;
+}
+
+.THIS.tabs li a {
+	width: 100%;
+	height: auto;
+}

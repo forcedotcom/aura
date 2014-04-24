@@ -31,6 +31,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.expression.Expression;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.AuraImpl;
+import org.auraframework.impl.expression.PropertyReferenceImpl;
 import org.auraframework.impl.root.AttributeDefRefImpl;
 import org.auraframework.impl.root.component.ComponentDefRefImpl;
 import org.auraframework.impl.root.parser.handler.ExpressionContainerHandler;
@@ -62,6 +63,9 @@ public class TextTokenizer implements Iterable<TextTokenizer.Token> {
     private static final Pattern CURLY_BANG_INVERSION_PATTERN = Pattern.compile("(!\\{+" + "[^}]+?\\" + END + ")",
             Pattern.DOTALL | Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
 
+    private static final Pattern LABEL_GVP_PATTERN = Pattern.compile("(\\$Label\\.\\w+\\.\\w+)",
+            Pattern.DOTALL | Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
+    
     public static enum TokenType {
         PLAINTEXT(DefDescriptorImpl.getInstance("aura:text", ComponentDef.class)), EXPRESSION(DefDescriptorImpl
                 .getInstance("aura:expression", ComponentDef.class));
@@ -161,14 +165,13 @@ public class TextTokenizer implements Iterable<TextTokenizer.Token> {
                     location);
         }
 
-        tokens.add(new Token(TokenType.PLAINTEXT, begin, end));
+        Token token = new Token(TokenType.PLAINTEXT, begin, end);
+		tokens.add(token);
     }
 
     public void addExpressionRefs(ExpressionContainerHandler handler) throws AuraValidationException {
         for (Token token : tokens) {
-            if (token.type == TokenType.EXPRESSION) {
-                token.createValue(handler);
-            }
+            token.createValue(handler);
         }
     }
 
@@ -244,16 +247,35 @@ public class TextTokenizer implements Iterable<TextTokenizer.Token> {
          * notifying the parent componentdef whenever an expression is found
          */
         private Object createValue(ExpressionContainerHandler cmpHandler) throws AuraValidationException {
+        	Object result;
             String raw = getRawValue();
+            Set<PropertyReference> propRefs = null;
             if (type == TokenType.EXPRESSION) {
+            	propRefs = Sets.newHashSetWithExpectedSize(2);
                 Expression e = AuraImpl.getExpressionAdapter().buildExpression(unwrap(raw), location);
-                Set<PropertyReference> propRefs = Sets.newHashSetWithExpectedSize(2);
                 e.gatherPropertyReferences(propRefs);
-                cmpHandler.addExpressionReferences(propRefs);
-                return e;
+                result = e;
             } else {
-                return raw;
+                // Let's see if we can find any "naked" $Label.section.name references in the plain text
+                Matcher matcher = LABEL_GVP_PATTERN.matcher(raw);
+                while (matcher.find()) {
+        	        String labelRef = matcher.group();
+        	        
+        	        if (propRefs == null) {
+                    	propRefs = Sets.newHashSet();
+        	        }
+        	        
+					propRefs.add(new PropertyReferenceImpl(labelRef, location));
+                }
+            	
+                result = raw;
             }
+            
+            if (propRefs != null) {
+            	cmpHandler.addExpressionReferences(propRefs);
+            }
+            
+            return result;
         }
 
         /**

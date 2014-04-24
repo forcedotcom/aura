@@ -55,7 +55,7 @@ public class LabelValueProviderUITest extends WebDriverTestCase {
             }
         }
         assertTrue("Fail: LabelController should be called", isLabelControllerCalled);
-        assertTrue("Fail: There should be three calls to LabelController", callCount == 3L);
+        assertTrue("Fail: There should be two calls to LabelController", callCount == 2L);
     }
 
 }

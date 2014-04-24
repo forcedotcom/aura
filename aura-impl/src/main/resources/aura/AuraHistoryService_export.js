@@ -20,5 +20,6 @@ exp(p,
     "get", p.get,
     "back", p.back,
     "setTitle", p.setTitle,
-    "forward", p.forward
+    "forward", p.forward,
+    "reset", p.reset
 );

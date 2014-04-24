@@ -42,18 +42,21 @@ public class TestContextAdapterImpl implements TestContextAdapter {
         if (context == null){
             context = new TestContextImpl(name);
             allContexts.put(name, context);
-        }
+        } 
         testContext.set(context);
         return context;
     }
 
     @Override
-    public void release() {
+    public void release(boolean discardContext) {
         TestContext context = testContext.get();
         if (context != null) {
-            allContexts.remove(context.getName());
+            if(discardContext) {
+            	allContexts.remove(context.getName());
+            	context.getLocalDefs().clear();
+            }
             testContext.set(null);
-            context.getLocalDefs().clear();
         }
     }
+    
 }

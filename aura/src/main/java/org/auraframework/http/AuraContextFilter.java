@@ -163,7 +163,6 @@ public class AuraContextFilter implements Filter {
         context.setNum(num.get(request));
         context.setRequestedLocales(Collections.list(request.getLocales()));
         context.setClient(new Client(request.getHeader(HttpHeaders.USER_AGENT)));
-
         if (configMap != null) {
             String lastMod = (String) configMap.get("lastmod");
             if (lastMod != null && !lastMod.isEmpty()) {
@@ -207,7 +206,7 @@ public class AuraContextFilter implements Filter {
                         MasterDefRegistry registry = context.getDefRegistry();
                         Set<Definition> mocks = testContext.getLocalDefs();
                         if (mocks != null) {
-                            boolean doReset = testReset.get(request);
+                        	boolean doReset = testReset.get(request);
                             for (Definition def : mocks) {
                                 if (doReset && def instanceof Resettable) {
                                     ((Resettable) def).reset();
@@ -217,8 +216,7 @@ public class AuraContextFilter implements Filter {
                         }
                     }
                 } else {
-                    // if this thread was recycled from a prior test (mostly dev mode), clear out the old context
-                    testContextAdapter.release();
+                    testContextAdapter.release(false);
                 }
             }
         }

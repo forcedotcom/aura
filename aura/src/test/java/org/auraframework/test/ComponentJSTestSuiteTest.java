@@ -235,8 +235,7 @@ public class ComponentJSTestSuiteTest extends TestSuite {
         public void testRun() throws Throwable {
             Set<Definition> mocks = caseDef.getLocalDefs();
             if (mocks != null && !mocks.isEmpty()) {
-                Aura.get(TestContextAdapter.class).getTestContext()
-                        .getLocalDefs().addAll(mocks);
+            	Aura.get(TestContextAdapter.class).getTestContext().getLocalDefs().addAll(mocks);
                 AuraTestingUtil.clearCachedDefs(mocks);
             }
 
@@ -246,7 +245,7 @@ public class ComponentJSTestSuiteTest extends TestSuite {
                     "return window.aura.test.run('%s', '%s', 30)",
                     AuraTextUtil.escapeForJavascriptString(caseDef.getName()),
                     AuraTextUtil.escapeForJavascriptString(suite.getCode())));
-
+           
             if (ret != null && !"null".equals(ret)) {
                 @SuppressWarnings("unchecked")
                 Map<String, Object> e = (Map<String, Object>) new JsonReader()

@@ -15,6 +15,8 @@
  */
 package org.auraframework.test;
 
+import org.auraframework.Aura;
+
 /**
  * Provide TestContexts to persist the state of tests across multiple requests.
  */
@@ -40,7 +42,12 @@ public interface TestContextAdapter {
 
 
 	/**
-	 * Stop persisting the current TestContext.
+	 * clear current TestContext.
+	 * Aura.get(TestContextAdapter.class).getTestContext() will return null after this.
+	 * but testContext for the current test is still in the context map, which means we can get it by getTextContext(testname). 
+	 * unless we call this with discardContext=true
+	 * @param discardContext 
+	 * set to true if we want the testContext for current test to be removed from context map
 	 */
-    void release();
+	void release(boolean discardContext);
 }

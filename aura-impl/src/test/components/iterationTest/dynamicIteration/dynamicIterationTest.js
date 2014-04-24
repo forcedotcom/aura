@@ -104,8 +104,8 @@
             $A.test.assertEquals("9:jjj", $A.test.getText(newchildren[0]));
             $A.test.assertEquals("10:really?", $A.test.getText(newchildren[1]));
             $A.test.assertEquals("11:kkk", $A.test.getText(newchildren[2]));
-            //$A.test.assertEquals(children[0], newchildren[0], "preceding element not preserved");
-            //$A.test.assertEquals(children[1], newchildren[2], "following element not preserved");
+            $A.test.assertEquals(children[0], newchildren[0], "preceding element not preserved");
+            $A.test.assertEquals(children[1], newchildren[2], "following element not preserved");
         }
     },
 
@@ -130,8 +130,8 @@
             $A.test.assertEquals("9:jjj", $A.test.getText(newchildren[0]));
             $A.test.assertEquals("10:lll", $A.test.getText(newchildren[1]));
             $A.test.assertEquals("11:mmm", $A.test.getText(newchildren[2]));
-            //$A.test.assertEquals(children[0], newchildren[0], "preceding element not preserved");
-            //$A.test.assertEquals(children[2], newchildren[1], "following element not preserved");
+            $A.test.assertEquals(children[0], newchildren[0], "preceding element not preserved");
+            $A.test.assertEquals(children[2], newchildren[1], "following element not preserved");
         }
     },
 

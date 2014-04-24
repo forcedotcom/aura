@@ -17,10 +17,14 @@ package org.auraframework.components.ui.carousel;
 
 import java.util.List;
 
-import org.auraframework.test.*;
+import org.auraframework.test.WebDriverTestCase;
 import org.auraframework.test.WebDriverTestCase.ExcludeBrowsers;
 import org.auraframework.test.WebDriverUtil.BrowserType;
-import org.openqa.selenium.*;
+import org.auraframework.util.test.perf.PerfTest;
+import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 
@@ -51,7 +55,7 @@ public class CarouselUITest extends WebDriverTestCase {
      */
     /* Excluding safari because safari driver has issues with element.sendkeys(Keys.TAB) */
     @ExcludeBrowsers({ BrowserType.IE7, BrowserType.IE8, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET,
-        BrowserType.IPAD, BrowserType.IPHONE, BrowserType.SAFARI })
+            BrowserType.IPAD, BrowserType.IPHONE, BrowserType.SAFARI })
     public void testTabIntoCarouselPage() throws Exception {
         open(URL);
         WebDriver driver = getDriver();
@@ -123,7 +127,7 @@ public class CarouselUITest extends WebDriverTestCase {
      */
     /* Excluding safari because safari driver has issues with element.sendkeys(Keys.TAB) */
     @ExcludeBrowsers({ BrowserType.IE7, BrowserType.IE8, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET,
-        BrowserType.IPAD, BrowserType.IPHONE, BrowserType.SAFARI })
+            BrowserType.IPAD, BrowserType.IPHONE, BrowserType.SAFARI })
     public void testTabOutOfCarousel() throws Exception {
         open(URL);
         WebDriver driver = getDriver();
@@ -147,7 +151,7 @@ public class CarouselUITest extends WebDriverTestCase {
      */
     /* Excluding safari because safari driver has issues with element.sendkeys(Keys.TAB) */
     @ExcludeBrowsers({ BrowserType.IE7, BrowserType.IE8, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET,
-        BrowserType.IPAD, BrowserType.IPHONE, BrowserType.SAFARI })
+            BrowserType.IPAD, BrowserType.IPHONE, BrowserType.SAFARI })
     public void testShiftTabOutOfCarousel() throws Exception {
         open(URL);
         WebDriver driver = getDriver();
@@ -167,6 +171,7 @@ public class CarouselUITest extends WebDriverTestCase {
     /**
      * Using keyboard arrow keys to get to next page.
      */
+    @PerfTest
     public void testGoToNextPage() throws Exception {
         open(URL);
         WebDriver driver = getDriver();
@@ -250,31 +255,31 @@ public class CarouselUITest extends WebDriverTestCase {
         moveToCarousel(d, carousel);
         return carousel;
     }
-    
+
     /*
-     * WebDriver.moveToElement() does not work in safari - https://code.google.com/p/selenium/issues/detail?id=4136
-     * This is a workaround for that.
+     * WebDriver.moveToElement() does not work in safari - https://code.google.com/p/selenium/issues/detail?id=4136 This
+     * is a workaround for that.
      */
     private boolean moveToCarousel(WebDriver d, WebElement c)
-	{
-		boolean result = false;
-		
-		try {
-			new Actions(d).moveToElement(c).perform();
-			result = true;
-		} catch (Exception e) {
-			String mouseOverScript = "if(document.createEvent){" +
-					"var evObj = document.createEvent('MouseEvents');" +
-					"evObj.initEvent('mouseover', true, false);" +
-					"arguments[0].dispatchEvent(evObj);" +
-					"} else if(document.createEventObject) {" +
-					"arguments[0].fireEvent('onmouseover');}";
-			auraUITestingUtil.getEval(mouseOverScript, c);
-			result = true;
-		}
-		
-		return result;
-	}
+    {
+        boolean result = false;
+
+        try {
+            new Actions(d).moveToElement(c).perform();
+            result = true;
+        } catch (Exception e) {
+            String mouseOverScript = "if(document.createEvent){" +
+                    "var evObj = document.createEvent('MouseEvents');" +
+                    "evObj.initEvent('mouseover', true, false);" +
+                    "arguments[0].dispatchEvent(evObj);" +
+                    "} else if(document.createEventObject) {" +
+                    "arguments[0].fireEvent('onmouseover');}";
+            auraUITestingUtil.getEval(mouseOverScript, c);
+            result = true;
+        }
+
+        return result;
+    }
 
     private List<WebElement> getPagesOnCarousel(WebElement c) {
         return c.findElements(By.cssSelector(CAROUSEL_PAGE_SELECTOR));

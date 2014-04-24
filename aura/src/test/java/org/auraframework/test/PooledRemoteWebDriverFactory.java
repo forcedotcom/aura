@@ -79,14 +79,13 @@ public class PooledRemoteWebDriverFactory extends RemoteWebDriverFactory {
                 url = url.substring(0, qLoc);
             }
 
-            List<NameValuePair> newParams = Lists.newArrayList();
-            URLEncodedUtils.parse(newParams, new Scanner(qs), "UTF-8");
-
             // update query with a nonce
-
-            newParams.add(new BasicNameValuePair("browser.nonce", String.valueOf(System.currentTimeMillis())));
-
-            url = url + "?" + URLEncodedUtils.format(newParams, "UTF-8") + hash;
+            if (!"about:blank".equals(url)) {
+                List<NameValuePair> newParams = Lists.newArrayList();
+                URLEncodedUtils.parse(newParams, new Scanner(qs), "UTF-8");
+                newParams.add(new BasicNameValuePair("browser.nonce", String.valueOf(System.currentTimeMillis())));
+                url = url + "?" + URLEncodedUtils.format(newParams, "UTF-8") + hash;
+            }
 
             super.get(url);
         }

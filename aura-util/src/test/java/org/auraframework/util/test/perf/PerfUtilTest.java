@@ -13,28 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.util.test;
+package org.auraframework.util.test.perf;
 
-import java.io.IOException;
-import java.net.URL;
+import org.auraframework.test.UnitTestCase;
 
-public interface DiffUtils<T> {
+public final class PerfUtilTest extends UnitTestCase {
 
-    public URL getUrl();
-
-    /**
-     * @param testResults actual test results
-     * @param sb assertion message to use
-     */
-    public void assertDiff(T testResults, StringBuilder sb) throws Exception;
-
-    /**
-     * @param testResults results to write to the gold file
-     */
-    public void writeGoldFile(T testResults) throws IOException;
-
-    /**
-     * @return the results in the gold file
-     */
-    public T readGoldFile() throws IOException;
+    public void testElapsedMicros() {
+        assertEquals(872, PerfUtil.elapsedMicros("1.397600335105528E12", "1.397600335106401E12"));
+    }
 }

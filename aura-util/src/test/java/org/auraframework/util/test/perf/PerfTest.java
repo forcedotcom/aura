@@ -13,28 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.util.test;
+package org.auraframework.util.test.perf;
 
-import java.io.IOException;
-import java.net.URL;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-public interface DiffUtils<T> {
-
-    public URL getUrl();
-
-    /**
-     * @param testResults actual test results
-     * @param sb assertion message to use
-     */
-    public void assertDiff(T testResults, StringBuilder sb) throws Exception;
-
-    /**
-     * @param testResults results to write to the gold file
-     */
-    public void writeGoldFile(T testResults) throws IOException;
-
-    /**
-     * @return the results in the gold file
-     */
-    public T readGoldFile() throws IOException;
+/**
+ * Annotation used to mark WebDriver tests for perf regression testing
+ */
+@Retention(RetentionPolicy.RUNTIME)
+@Inherited
+@Target({ ElementType.TYPE, ElementType.METHOD })
+public @interface PerfTest {
 }

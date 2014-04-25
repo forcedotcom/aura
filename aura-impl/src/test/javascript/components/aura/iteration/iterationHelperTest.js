@@ -2776,16 +2776,16 @@ Test.Aura.Iteration.HelperTest = function(){
     				if(index == 2) return 'data2';
     			}
         	};
-        	        	
+
         	var targetRealBodyList = [];
         	
         	var targetRealBody={    
     			value:[],
     			push:function(val){
-    				this.value.push(val);
+    				this.unwrap().push(val);
     			},
     			isEmpty:function(){
-					return false;
+					return this.unwrap().length === 0;
 				},
 				getLength:function(){
 					return this.unwrap().length;
@@ -2796,46 +2796,45 @@ Test.Aura.Iteration.HelperTest = function(){
 				unwrap:function(){
 					return targetRealBodyList;
 				},
-				setValue:function(val){
-    				if(val != 'a') throw new Error("Wrong val used in targetRealBody.setValue()");
-    				this.value = val; 
-    			}
+				remove: function(i, len) {
+					return this.unwrap().splice(i, len);
+				}
         	};
         	
         	var targetBodyLength;
         	var targetBody={
     			getLength:function(){
 					return targetBodyLength;
-				}		        			
+				}
         	};  
         	
         	var targetAttributes={
         		get:function(att){
         			if(att=="var") return "var";
-        			if(att=="indexVar") return 1;        			
+        			if(att=="indexVar") return 1;
         		},
         		getValue:function(att){
         			if(att=="items") return targetItems;
         			if(att=="realbody") return targetRealBody; 
-        			if(att=="body") return targetBody;        			
+        			if(att=="body") return targetBody;
         		}
-        	};        	        	        	        	
+        	};
         	
         	var targetCmp={
     			getAttributes:function(){
 					return targetAttributes;
 				}
-        	};        	        
-        	        	        	        	
-        	var mockGetStart = Mocks.GetMock(targetHelper, "getStart", function(cmp){       
-        		if(cmp != targetCmp) throw new Error("Wrong cmp used");        		        		      		        		
-        		return 0;    		
-        	});	
+        	};
+
+        	var mockGetStart = Mocks.GetMock(targetHelper, "getStart", function(cmp){
+        		if(cmp != targetCmp) throw new Error("Wrong cmp used");
+        		return 0;
+        	});
         	
-        	var mockGetEnd = Mocks.GetMock(targetHelper, "getEnd", function(cmp){       
-        		if(cmp != targetCmp) throw new Error("Wrong cmp used");        		        		      		        		
-        		return 0;    		
-        	});	 
+        	var mockGetEnd = Mocks.GetMock(targetHelper, "getEnd", function(cmp){
+        		if(cmp != targetCmp) throw new Error("Wrong cmp used");
+        		return 0;
+        	}); 
         	
         	var mockIncrementIndices = Mocks.GetMock(targetHelper, "incrementIndices", function(cmpArray, start, indexVar, change, bodyLen){       
         		if(cmpArray != 'a') throw new Error("Wrong cmpArray used");
@@ -2849,18 +2848,18 @@ Test.Aura.Iteration.HelperTest = function(){
         		if(cmp != targetCmp) throw new Error("Wrong cmp used in createNewComponents()");          		
         		callback(['b','c']);
         	});
-    	    	
-			[Fact]
+
+        	[Fact]
 	        function testBodyLengthZero(){
 	        	// Arrange  	
-	        	targetRealBodyList = ['a'];
+	        	targetRealBodyList.push('a');
 	        	targetBodyLength = 0;
-	        	
+
 	        	// Act
 	        	mockCreateNewComponents(function(){
 		        	mockIncrementIndices(function(){
 		        		mockGetEnd(function(){
-		        			mockGetStart(function(){        		
+		        			mockGetStart(function(){
 		        				targetHelper.rerenderSelective(targetCmp);
 		        			});
 		        		});
@@ -2868,7 +2867,7 @@ Test.Aura.Iteration.HelperTest = function(){
 	        	});
 				
 				// Assert
-				Assert.Equal(['a', 'b','c'], targetRealBody.value);
+				Assert.Equal(['a', 'b','c'], targetRealBodyList);
 	        }
     	
 	    	[Fact]
@@ -2894,7 +2893,7 @@ Test.Aura.Iteration.HelperTest = function(){
 	        	});
 				
 				// Assert
-				Assert.Equal(['a','b','c'], targetRealBody.value);
+				Assert.Equal(['a','b','c'], targetRealBodyList);
 	        }
     	}
         	

@@ -48,7 +48,7 @@ public class TestContextAdapterImpl implements TestContextAdapter {
     }
 
     @Override
-    public void release(boolean discardContext) {
+    public void clear(boolean discardContext) {
         TestContext context = testContext.get();
         if (context != null) {
             if(discardContext) {
@@ -57,6 +57,11 @@ public class TestContextAdapterImpl implements TestContextAdapter {
             }
             testContext.set(null);
         }
+    }
+    
+    @Override
+    public void release() {
+    	clear(true);
     }
     
 }

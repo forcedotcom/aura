@@ -49,5 +49,11 @@ public interface TestContextAdapter {
 	 * @param discardContext 
 	 * set to true if we want the testContext for current test to be removed from context map
 	 */
-	void release(boolean discardContext);
+	void clear(boolean discardContext);
+
+	/**
+	 * old release() function. 
+	 * it will call clear(true)
+	 */
+	void release();
 }

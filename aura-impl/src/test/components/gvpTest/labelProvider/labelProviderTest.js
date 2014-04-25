@@ -151,7 +151,7 @@
                         $A.test.assertTrue(
                             cmp._label === "FIXME - LocalizationAdapter.getLabel() needs implementation!" ||
                             cmp._label === "__MISSING LABEL__ PropertyFile - val FooBar not found in section Related_Lists",
-                            "$Label.Related_Lists.FooBar should have error value"
+                            "$Label.Related_Lists." + "FooBar should have error value"
                         );
                     })
             },
@@ -168,12 +168,12 @@
                 $A.test.assertTrue(
                     cmp._label === "FIXME - LocalizationAdapter.getLabel() needs implementation!" ||
                         cmp._label === "__MISSING LABEL__ PropertyFile - val FooBar not found in section Related_Lists",
-                    "$Label.Related_Lists.FooBar should have error value"
+                    "$Label.Related_Lists." + "FooBar should have error value"
                 );
             }
         ]
     },
-
+    
     testGetWithNonFunctionCallback: {
     	test : function (cmp) {
             $A.test.addWaitFor("Today + Overdue", function(){return $A.get("$Label.Related_Lists.task_mode_today_overdue","Mary Poppins")});

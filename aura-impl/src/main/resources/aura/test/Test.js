@@ -493,7 +493,7 @@ var Test = function(){
                 return "undefined";
             } else if (value === null) {
                 return "null";
-            } else if ("string" == typeof(value)) {
+            } else if ("string" == typeof value) {
                 return '"' + value + '"';
             } else {
                 return value.toString();
@@ -852,7 +852,7 @@ var Test = function(){
          * 				The prototype of the specified object
          */
         getPrototype : function(instance){
-            return instance && (Object.getPrototypeOf && Object.getPrototypeOf(instance)) || instance.__proto || instance.constructor.prototype;
+            return (instance && (Object.getPrototypeOf && Object.getPrototypeOf(instance))) || instance.__proto || instance.constructor.prototype;
         },
 
         /**
@@ -881,8 +881,9 @@ var Test = function(){
             // Now lets see if there is a corresponding private (obfuscated) version that we also need to mock
             var nonExportedFunctionName;
             for (var key in instance) {
+                var f;
                 try {
-                    var f = instance[key];
+                    f = instance[key];
                 } catch (e) {
                     // IE: Handle "Unspecified error" for properties like "fileCreatedDate"
                     continue;

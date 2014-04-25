@@ -278,17 +278,15 @@ public class JavascriptParserTest extends AuraImplTestCase {
      * @throws Exception
      */
     public void testInvalidJSController() throws Exception {
-        DefDescriptor<ControllerDef> descriptor = DefDescriptorImpl
-                .getInstance("js://test.testInvalidJSController",
-                        ControllerDef.class);
+        DefDescriptor<ControllerDef> descriptor = DefDescriptorImpl.getInstance("js://test.testInvalidJSController",
+                ControllerDef.class);
         Source<?> source = getJavascriptSourceLoader().getSource(descriptor);
         ControllerDef cd = parser.parse(descriptor, source);
         try {
             cd.validateDefinition();
             fail("Javascript controller must only contain functions");
         } catch (Exception e) {
-        	this.checkExceptionContains(e, InvalidDefinitionException.class,
-                    "Attempted to convert \"global=\" to BigDecimal");
+            this.checkExceptionContains(e, InvalidDefinitionException.class, "Expected ':'");
         }
     }
 

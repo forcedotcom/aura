@@ -22,6 +22,7 @@ import org.auraframework.test.WebDriverTestCase;
 import org.auraframework.test.WebDriverTestCase.TargetBrowsers;
 import org.auraframework.test.WebDriverUtil.BrowserType;
 import org.auraframework.test.annotation.UnAdaptableTest;
+import org.auraframework.util.test.perf.PerfTest;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
@@ -30,8 +31,8 @@ import org.openqa.selenium.WebElement;
 /**
  * UI automation for ui:ListSorter.
  */
-/* UnAdaptable because issue with sfdc environments with sendkeys in iframes
- * see W-1985839 and W-2009411
+/*
+ * UnAdaptable because issue with sfdc environments with sendkeys in iframes see W-1985839 and W-2009411
  */
 @UnAdaptableTest
 @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.FIREFOX, BrowserType.IE7, BrowserType.SAFARI5,
@@ -53,6 +54,7 @@ public class ListSorterUITest extends WebDriverTestCase {
      * @throws MalformedURLException
      * @throws URISyntaxException
      */
+    @PerfTest
     public void testTabOutOfListSorter() throws MalformedURLException, URISyntaxException {
         verifyTabOutAndEscBehaviour(Keys.TAB, true);
     }
@@ -96,11 +98,11 @@ public class ListSorterUITest extends WebDriverTestCase {
         }
     }
 
-	private void openListSorter() {
-		WebDriver driver = this.getDriver();
-		WebElement listTrigger = driver.findElement(By.className(SORT_TRIGGER));
-		WebElement listSorter = driver.findElement(By.className(SORTER));
+    private void openListSorter() {
+        WebDriver driver = this.getDriver();
+        WebElement listTrigger = driver.findElement(By.className(SORT_TRIGGER));
+        WebElement listSorter = driver.findElement(By.className(SORTER));
         listTrigger.click();
-		assertTrue("list Sorter Dialog should be visible", listSorter.getAttribute("class").contains("open"));
+        assertTrue("list Sorter Dialog should be visible", listSorter.getAttribute("class").contains("open"));
     }
 }

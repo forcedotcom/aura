@@ -98,19 +98,37 @@ public final class ValidationClient {
         }
 
         String url = getBaseUrl().toURI().resolve(request.toString()).toString();
-        URLConnection connection = new URL(url).openConnection();
-        Reader reader = new InputStreamReader(connection.getInputStream());
-        try {
-            if (report != null) {
-                // errors only sent back if report is null
-                System.out.println(new BufferedReader(reader).readLine());
-                return null;
-            } else {
-                return parseErrors(reader);
+        log("connecting to Aura server at: " + url);
+
+        int sleepSeconds = 10;
+        for (int numTrials = 4; numTrials >= 0; numTrials--) {
+            Reader reader = null;
+            try {
+                URLConnection connection = new URL(url).openConnection();
+                reader = new InputStreamReader(connection.getInputStream());
+                if (report != null) {
+                    // errors only sent back if report is null
+                    log(new BufferedReader(reader).readLine());
+                    return null;
+                } else {
+                    return parseErrors(reader);
+                }
+            } catch (IOException e) {
+                if (numTrials > 0) {
+                    // wait for aura to start
+                    log("sleeping " + sleepSeconds + " seconds waiting for Aura to start");
+                    Thread.sleep(sleepSeconds * 1000);
+                    sleepSeconds *= 2;
+                    continue;
+                }
+                throw new IOException(e.toString() + ": " + url, e);
+            } finally {
+                if (reader != null) {
+                    reader.close();
+                }
             }
-        } finally {
-            reader.close();
         }
+        throw new RuntimeException("unreachable");
     }
 
     //
@@ -136,5 +154,9 @@ public final class ValidationClient {
             }
         }
         return new URL("http", host, port, "/");
+    }
+
+    private static void log(String message) {
+        System.out.println("ValidationClient: " + message);
     }
 }

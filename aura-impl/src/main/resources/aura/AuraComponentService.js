@@ -198,6 +198,7 @@ $A.ns.AuraComponentService.prototype.newComponentAsync = function(callbackScope,
     $A.assert($A.util.isFunction(callback),"newComponentAsync requires a function as the callback parameter");
 
     // compiler error if not assigned to variable
+    /*jslint unused: true */
     var ccc = new $A.ns.ComponentCreationContext(config, callbackScope, callback, attributeValueProvider, localCreation, forceServer, doForce);
 };
 
@@ -467,9 +468,10 @@ $A.ns.AuraComponentService.prototype.deIndex = function(globalId){
  */
 $A.ns.AuraComponentService.prototype.getRegisteredComponentDescriptors = function(){
     var ret = [];
+    var name;
 
     var componentDefs = this.registry.componentDefs;
-    for (var name in componentDefs) {
+    for (name in componentDefs) {
         ret.push(name);
     }
 

@@ -826,6 +826,7 @@ var ComponentPriv = (function() { // Scoping priv
     };
 
     ComponentPriv.prototype.outputComponent = function(cmp, serialized, depth) {
+        /*jslint reserved: true */
         if (cmp) {
             var ret = {
                 __proto__ : null
@@ -856,9 +857,10 @@ var ComponentPriv = (function() { // Scoping priv
             var that = this;
             attributeDefs.each(function(attributeDef) {
                 var key = attributeDef.getDescriptor().toString();
+                var val;
                 try {
-                    var val = attributes.getRawValue(key);
-                } catch (e) {
+                    val = attributes.getRawValue(key);
+                } catch (ignore) {
                 }
                 ret.attributes[key] = that.output(val, attributes
                                 .getValueProvider(), serialized, depth);

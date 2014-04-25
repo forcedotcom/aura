@@ -37,3 +37,21 @@
 .THIS .carousel-nav-item-selected {
 	background: #2d95d6;
 }
+
+.THIS.tab a {
+	width: 100%;
+	height: auto;
+}
+
+.THIS.tab a.carousel-nav-item {
+	background: none;
+	box-shadow: none;
+	text-transform: uppercase;
+}
+
+.THIS.tab span {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	display: block;
+	margin: 0 10px; 
+}

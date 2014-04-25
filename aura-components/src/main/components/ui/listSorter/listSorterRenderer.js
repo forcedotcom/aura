@@ -20,9 +20,14 @@
 		//workaround for datasource late binding
 		cmp.find('sorterMenu').get('e.refresh').fire();
 		var visible = cmp.get('v.visible');
-		helper.position(cmp);
+		
 		if (visible) {
 			helper.setVisible(cmp, true);
 		}
+	},
+	
+	unrender: function(cmp, helper) {
+		this.superUnrender();
+		helper.unrender(cmp);		
 	}
 })

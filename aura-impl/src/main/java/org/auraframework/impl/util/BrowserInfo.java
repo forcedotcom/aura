@@ -27,16 +27,23 @@ import static org.auraframework.impl.util.BrowserConsts.PLATFORM_MAC;
 import static org.auraframework.impl.util.BrowserConsts.PLATFORM_MAC_68K;
 import static org.auraframework.impl.util.BrowserConsts.PLATFORM_MAC_OSX;
 import static org.auraframework.impl.util.BrowserConsts.PLATFORM_MAC_PPC;
+import static org.auraframework.impl.util.BrowserConsts.PLATFORM_RIM;
 import static org.auraframework.impl.util.BrowserConsts.PLATFORM_WIN;
 import static org.auraframework.impl.util.BrowserConsts.PLATFORM_WINPH_7;
 import static org.auraframework.impl.util.BrowserConsts.PLATFORM_WINPH_7_5;
 import static org.auraframework.impl.util.BrowserConsts.PLATFORM_WINPH_8;
+import static org.auraframework.impl.util.BrowserConsts.PLATFORM_WINPH_8_1;
 import static org.auraframework.impl.util.BrowserConsts.PLATFORM_WIN_MAX;
 import static org.auraframework.impl.util.BrowserConsts.PLATFORM_WIN_NT;
 import static org.auraframework.impl.util.UserAgent.ANDROID_WEBKIT;
+import static org.auraframework.impl.util.UserAgent.BLACKBERRY;
 import static org.auraframework.impl.util.UserAgent.CHROME;
+import static org.auraframework.impl.util.UserAgent.LEGACY_CUTOFF;
 import static org.auraframework.impl.util.UserAgent.OTHER_WEBKIT;
 import static org.auraframework.impl.util.UserAgent.SAFARI;
+import static org.auraframework.impl.util.UserAgent.VERSIONED_CUTOFF;
+
+import org.auraframework.impl.util.UserAgent.UA;
 
 
 
@@ -69,9 +76,8 @@ public class BrowserInfo {
     private boolean isIE8;
     private boolean isIE9;
     private boolean isIE10;
+    private boolean isIE11;
     private boolean isWindowsPhone;
-
-    public static final String TOUCH_CONTAINER = "SalesforceTouchContainer";
 
     public BrowserInfo(String userAgentString) {
         if (userAgentString == null) {
@@ -141,6 +147,10 @@ public class BrowserInfo {
         return isIE10;
     }
 
+    public boolean isIE11() {
+        return isIE11;
+    }
+
     private void parseUserAgent() {
         // set initial values
         isTablet = false;
@@ -151,7 +161,7 @@ public class BrowserInfo {
         isWebkit = false;
         isFirefox = false;
         isWindowsPhone = false;
-        formFactor = "";
+        formFactor = FormFactor.DESKTOP.toString();
         platformType = 0;
         browserType = 0;
 
@@ -162,8 +172,6 @@ public class BrowserInfo {
         platformType = BrowserUserAgent.parsePlatform(userAgentString);
         browserType = BrowserUserAgent.parseBrowser(userAgentString);
 
-        isTablet = isTabletClient();
-        isPhone = isSmartPhoneClient();
         isAndroid = isPlatformAndroid();
         isIPad = isPlatformIPad();
         isIPhone = isPlatformIPhone();
@@ -174,11 +182,17 @@ public class BrowserInfo {
         isIE8 = isBrowserIE8();
         isIE9 = isBrowserIE9();
         isIE10 = isBrowserIE10();
+        isIE11 = isBrowserIE11();
         isWindowsPhone = isPlatformWindowsPhone();
         formFactor = getHardwareFormFactor().toString();
+        isTablet = isTabletClient();
+        isPhone = isSmartPhoneClient();
 
     }
 
+    private boolean isBrowserIE11() {
+        return isBrowser(UserAgent.IE, 11);
+    }
     private boolean isBrowserIE10() {
         return isBrowser(UserAgent.IE, 10);
     }
@@ -334,6 +348,7 @@ public class BrowserInfo {
      */
     public boolean isBrowserWebkit() {
         return isBrowser(CHROME) || isBrowser(SAFARI) || isBrowser(ANDROID_WEBKIT) || isBrowser(OTHER_WEBKIT)
+                || this.isBrowser(BLACKBERRY)
                 || this.browserType == BROWSER_WEBKIT_UNK;
     }
 
@@ -353,9 +368,11 @@ public class BrowserInfo {
      * 
      * @return true if a Mac, false otherwise
      */
-    public boolean isPlatformMac(int platformType) {
-        return platformType == PLATFORM_MAC_OSX || platformType == PLATFORM_MAC_PPC
-                || platformType == PLATFORM_MAC_68K || platformType == PLATFORM_MAC;
+    public boolean isPlatformMac() {
+        return (this.platformType == PLATFORM_MAC_OSX
+                || this.platformType == PLATFORM_MAC_PPC
+                || this.platformType == PLATFORM_MAC_68K
+                || this.platformType == PLATFORM_MAC );
     }
 
     /**
@@ -379,7 +396,8 @@ public class BrowserInfo {
     public boolean isPlatformWindowsPhone() {
         return this.platformType == PLATFORM_WINPH_7
                 || this.platformType == PLATFORM_WINPH_7_5
-                || this.platformType == PLATFORM_WINPH_8;
+                || this.platformType == PLATFORM_WINPH_8
+                || this.platformType == PLATFORM_WINPH_8_1;
     }
 
     /**
@@ -410,6 +428,15 @@ public class BrowserInfo {
      */
     public boolean isPlatformMobileWebkit() {
         return (isPlatformIPhone() || (isPlatformAndroid() && this.isBrowserMobile()));
+    }
+
+    /**
+     * Checks if this is a BlackBerry - Back in the day, BlackBerry was named RIM (Research In Motion)
+     * 
+     * @return true if a match, false otherwise
+     */
+    public boolean isPlatformBlackBerry() {
+        return this.platformType == PLATFORM_RIM;
     }
 
     /**
@@ -464,9 +491,8 @@ public class BrowserInfo {
      */
     public boolean isBrowserMobile() {
         // in the 182+ code, it's a simple check
-        if (this.browserType > UserAgent.LEGACY_CUTOFF && this.browserType < UserAgent.VERSIONED_CUTOFF) {
-            // last digit = 0 means desktop/notebook; anything else is mobile of
-            // some sort
+        if (this.browserType > LEGACY_CUTOFF && this.browserType < VERSIONED_CUTOFF) {
+            // last digit = 0 means desktop/notebook; anything else is mobile of some sort
             return (this.browserType % 10 != 0);
         } else {
             // pre 182 we itemize across known mobile stuff
@@ -498,27 +524,16 @@ public class BrowserInfo {
      * @return true if it is a phone, false if anything else
      */
     public boolean isSmartPhoneClient() {
-        return this.isPlatformIPhone() || this.isPlatformMobileWebkit() || this.isPlatformAndroid()
-                || this.isPlatformAndroid22OrGreater() || this.isPlatformWindowsPhone()
-                || this.isBrowser(UserAgent.OTHER_MOBILE);
+        return FormFactor.PHONE == getHardwareFormFactor();
     }
 
     /**
-     * Infers from the user agent string if the client is a tablet.
-     * 
-     * Note: As of 182 this is actually &quot;Is it an iPad or an Android 2.2 or higher tablet?&quot;
-     * 
-     * This definition will likely expand as new tablets with other operating systems are released.
+     * Tries to infers from the user agent string if the client is a tablet.
      * 
      * @return true if it is, false if anything else
      */
     public boolean isTabletClient() {
-        /*
-         * TODO: What about these? - Windows RT (not detected) - Kindle (rejected because it is a mobile clients) -
-         * Opera Mini/Mobile on Android (rejected because they are mobile clients)
-         */
-        boolean isAndroidTablet = this.isPlatformAndroid22OrGreater() && !this.isMobileClient();
-        return this.isPlatformIPad() || isAndroidTablet;
+        return FormFactor.TABLET == getHardwareFormFactor();
     }
 
     /**
@@ -533,13 +548,24 @@ public class BrowserInfo {
      * @return a FormFactor value
      */
     public FormFactor getHardwareFormFactor() {
-        if (isTabletClient()) {
-            return FormFactor.TABLET;
-        } else if (isSmartPhoneClient()) {
-            return FormFactor.PHONE;
-        } else {
+        if (this.isBrowserMobile()) {
+            // iOS devices are the most common and fastest to check, so do first
+            if (isPlatformIPhone()) {
+                return FormFactor.PHONE;
+            } else if (isPlatformIPad()) {
+                return FormFactor.TABLET;
+            } else if (this.browserType>LEGACY_CUTOFF && this.browserType%10==UA.TABLET_FLAG) {
+                // last digit of user agent flags catches most others, including WinRT
+                return FormFactor.TABLET;
+            } else if (this.isPlatformAndroid22OrGreater() && !this.isMobileClient()) {
+                // Android tablet, isMobileClient slowest check, do last
+                return FormFactor.TABLET;
+            } else {
+                // mobile, but not a known tablet, assume phone
+                return FormFactor.PHONE;
+            }
+        }
+        // default
             return FormFactor.DESKTOP;
         }
     }
-
-}

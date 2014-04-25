@@ -19,7 +19,14 @@
 	<aura:description>
 		<p>
 			A <code>ui:inputNumber</code> component represents a number input field, which is rendered as an HTML <code>input</code> tag of type <code>text</code>.
-			To render the output from a <code>ui:inputNumber</code> component, use the <code>ui:inputNumber</code> component.
+			To render the output from a <code>ui:inputNumber</code> component, use the <code>ui:inputNumber</code> component. When providing a number value with commas, use <code>type="integer"</code>. This example returns <code>100,000</code>.
+<pre>&lt;aura:attribute name="number" type="integer" default="100,000"/>
+&lt;ui:inputNumber label="Number" value="{!v.number}"/></pre>
+		</p>
+		<p>For <code>type="string"</code>, provide the number without commas for the output to be formatted accordingly. This example also returns <code>100,000</code>.
+<pre>&lt;aura:attribute name="number" type="string" default="100000"/>
+&lt;ui:inputNumber label="Number" value="{!v.number}"/>
+</pre>
 		</p>
 		<p>
 			To provide a field label for accessibility, use the <code>label</code> attribute. You can hide the label from view by setting <code>labelPosition="hidden"</code> and still maintain accessibility.

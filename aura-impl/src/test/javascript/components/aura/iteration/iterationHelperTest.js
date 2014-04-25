@@ -17,53 +17,53 @@ Function.RegisterNamespace("Test.Aura.Iteration");
 
 [Fixture]
 Test.Aura.Iteration.HelperTest = function(){
-	var targetHelper;
-
+	var targetHelper;	
+	
 	// Aura Files need to be loaded as Json, to catch the object they contain
 	ImportJson("aura.iteration.iterationHelper",function(path,result){
 		targetHelper=result;
 	});
-
+		
     [Fixture]
-    function createAddComponentCallback(){
-
+    function createAddComponentCallback(){    	    	    	        
+    	
         [Fact]
         function callbackNotSet(){
-        	// Arrange
+        	// Arrange                	
         	var expected = '123';
-
+        	
         	var targetBodyCollector={
     			count:0,
     			callback:''
         	};
-
-        	var targetIndexCollector={
+        	
+        	var targetIndexCollector={	
     			body:[],
     			bodyCollector:targetBodyCollector
     		};
-
+        	
         	// Act
 			var callback = targetHelper.createAddComponentCallback(targetIndexCollector, 0);
 			callback(expected);
-
+			
 			// Assert
-			Assert.Equal(expected, targetIndexCollector.body[0]);
+			Assert.Equal(expected, targetIndexCollector.body[0]);			
         }
-
+                
         [Fact]
         function callbackNotCalled(){
-        	// Arrange
+        	// Arrange 
         	var expected = '123';
-        	var actual = '';
-
+        	var actual = ''; 
+        	
         	var targetObj={
         		destroy:function(flag){
         			if(flag != true) throw new Error("Wrong flag used");
         		}
         	};
-
+        	        	
         	var targetRealBodyList=[targetObj];
-
+        	
         	var targetBodyCollector={
     			count:1,
     			callback:function(val){
@@ -75,30 +75,30 @@ Test.Aura.Iteration.HelperTest = function(){
     			cmp:{
     				_currentBodyCollector:''
     			}
-        	};
-
-        	var targetIndexCollector={
+        	};        	        	        	
+        	
+        	var targetIndexCollector={	
     			body:[],
     			bodyCollector:targetBodyCollector
-    		};
-
+    		};        	        	
+        	
         	// Act
-			var callback = targetHelper.createAddComponentCallback(targetIndexCollector, 0);
+			var callback = targetHelper.createAddComponentCallback(targetIndexCollector, 0);			
 			callback(expected);
-
+			
 			// Assert
-			Assert.Equal(expected, targetIndexCollector.body[0]);
-			Assert.Equal('', actual);
-        }
-
+			Assert.Equal(expected, targetIndexCollector.body[0]);			
+			Assert.Equal('', actual);           
+        }         
+        
         [Fact]
         function callbackCalled(){
-        	// Arrange
-        	var expected = '123';
-        	var actual = '';
-
+        	// Arrange 
+        	var expected = '123';           	        	
+        	var actual = '';        
+        	
         	var targetRealBodyList=[expected];
-
+        	
         	var targetBodyCollector={
     			count:1,
     			callback:function(val){
@@ -110,33 +110,33 @@ Test.Aura.Iteration.HelperTest = function(){
     			cmp:{
     				_currentBodyCollector:''
     			}
-        	};
-
-        	var targetIndexCollector={
+        	};        	        	        	
+        	
+        	var targetIndexCollector={	
     			body:[],
     			bodyCollector:targetBodyCollector
-    		};
-
+    		};  
+        	
         	targetBodyCollector.cmp._currentBodyCollector = targetBodyCollector;
-
+        	
         	// Act
-			var callback = targetHelper.createAddComponentCallback(targetIndexCollector, 0);
+			var callback = targetHelper.createAddComponentCallback(targetIndexCollector, 0);			
 			callback(expected);
-
+			
 			// Assert
 			Assert.Equal(expected, targetIndexCollector.body[0]);
 			Assert.Equal(expected, actual);
-        }
-
+        }    
+        
         [Fact]
         function callbackCalledWithRealBodyLenghtTwo(){
-        	// Arrange
-        	var expected = ['123','456'];
-        	var actual = '';
-
+        	// Arrange 
+        	var expected = ['123','456'];           	        	
+        	var actual = '';        
+        	
         	var targetRealBodyList1=['123'];
         	var targetRealBodyList2=['456'];
-
+        	
         	var targetBodyCollector={
     			count:1,
     			callback:function(val){
@@ -148,32 +148,32 @@ Test.Aura.Iteration.HelperTest = function(){
     			cmp:{
     				_currentBodyCollector:''
     			}
-        	};
-
-        	var targetIndexCollector={
+        	};        	        	        	
+        	
+        	var targetIndexCollector={	
     			body:[],
     			bodyCollector:targetBodyCollector
-    		};
-
+    		};  
+        	
         	targetBodyCollector.cmp._currentBodyCollector = targetBodyCollector;
-
+        	
         	// Act
-			var callback = targetHelper.createAddComponentCallback(targetIndexCollector, 0);
+			var callback = targetHelper.createAddComponentCallback(targetIndexCollector, 0);			
 			callback(expected);
-
+			
 			// Assert
 			Assert.Equal(expected, targetIndexCollector.body[0]);
 			Assert.Equal(expected, actual);
-        }
-
+        }    
+        
         [Fact]
         function callbackCalledWithRealBodyListTwo(){
-        	// Arrange
-        	var expected = ['123','456'];
-        	var actual = '';
-
+        	// Arrange 
+        	var expected = ['123','456'];           	        	
+        	var actual = '';        
+        	
         	var targetRealBodyList=['123', '456'];
-
+        	
         	var targetBodyCollector={
     			count:1,
     			callback:function(val){
@@ -185,49 +185,49 @@ Test.Aura.Iteration.HelperTest = function(){
     			cmp:{
     				_currentBodyCollector:''
     			}
-        	};
-
-        	var targetIndexCollector={
+        	};        	        	        	
+        	
+        	var targetIndexCollector={	
     			body:[],
     			bodyCollector:targetBodyCollector
-    		};
-
+    		};  
+        	
         	targetBodyCollector.cmp._currentBodyCollector = targetBodyCollector;
-
+        	
         	// Act
-			var callback = targetHelper.createAddComponentCallback(targetIndexCollector, 0);
+			var callback = targetHelper.createAddComponentCallback(targetIndexCollector, 0);			
 			callback(expected);
-
+			
 			// Assert
 			Assert.Equal(expected, targetIndexCollector.body[0]);
 			Assert.Equal(expected, actual);
-        }
+        }    
     }
-
+    
     [Fixture, Skip("JBUCH: HALO: THESE TESTS NEED RETHINKING")]
-    function createComponentsForIndex(){
-
+    function createComponentsForIndex(){    	    	    	        
+    	                        
         [Fact]
         function testBodyLengthZero(){
-        	// Arrange
-        	var expected = 0;
-
+        	// Arrange 
+        	var expected = 0;                	
+        	
         	var targetBody={
     			getLength:function(){
     				return 0;
     			}
         	};
-
+        	        	        	       
         	var targetAttributes={
         		get:function(att){
         			if(att=="var") return "var";
-        			if(att=="indexVar") return false;
+        			if(att=="indexVar") return false;        			
         		},
         		getValue:function(att){
         			if(att=="body") return targetBody;
         			if(att=="forceServer"){
 	        			return {
-	        				getValue:function(){
+	        				getValue:function(){					
 								return 'forceServer';
 							}
 						};
@@ -236,55 +236,55 @@ Test.Aura.Iteration.HelperTest = function(){
         		getValueProvider:function(){
         			return '';
         		}
-        	};
+        	};        	        	        	
 
-        	var targetBodyCollector={
+        	var targetBodyCollector={	
     			count:0,
     			realBodyList:[]
     		};
-
+        	
         	var targetCmp={
     			getAttributes:function(){
 					return targetAttributes;
-				}
+				}		        			
         	};
-
+        	
         	var targetItems={
     			getValue:function(index){
 					return 'Some Value';
-				}
+				}		        			
         	};
-
+        	
         	// Act
 			var actual = targetHelper.createComponentsForIndex(targetBodyCollector, targetCmp, targetItems, 0, false);
-
+			
 			// Assert
             Assert.Equal(expected, actual);
             Assert.Equal(targetBody.getLength()-1, targetBodyCollector.count);
         }
-
+        
         [Fact]
         function testExpressionServiceCreate(){
-        	// Arrange
-        	var expected = 0;
+        	// Arrange 
+        	var expected = 0; 
         	var actual;
-
+        	
         	var targetBody={
     			getLength:function(){
     				return 0;
     			}
         	};
-
+        	        	        	       
         	var targetAttributes={
         		get:function(att){
         			if(att=="var") return "var";
-        			if(att=="indexVar") return true;
+        			if(att=="indexVar") return true;        			
         		},
         		getValue:function(att){
         			if(att=="body") return targetBody;
         			if(att=="forceServer"){
 	        			return {
-	        				getValue:function(){
+	        				getValue:function(){					
 								return 'forceServer';
 							}
 						};
@@ -293,69 +293,69 @@ Test.Aura.Iteration.HelperTest = function(){
         		getValueProvider:function(){
         			return '';
         		}
-        	};
+        	};        	        	        	
 
-        	var targetBodyCollector={
+        	var targetBodyCollector={	
     			count:0,
     			realBodyList:[]
     		};
-
+        	
         	var targetCmp={
     			getAttributes:function(){
 					return targetAttributes;
-				}
+				}		        			
         	};
-
+        	
         	var targetItems={
     			getValue:function(index){
     				if(index != 0) throw new Error("Wrong index used");
 					return 'Some Value';
-				}
+				}		        			
         	};
-
-        	var mockContext = Mocks.GetMock(Object.Global(), "$A", {
-        		expressionService: {
+        	
+        	var mockContext = Mocks.GetMock(Object.Global(), "$A", {                                
+        		expressionService: {   
 					create: function(valueProvider, config) {
 						if(valueProvider != null) throw new Error("Wrong valueProvider used");
 						if(config != 0) throw new Error("Wrong config used");
-						return 'iv';
-					}
+						return 'iv'; 
+					}					
 	            }
-	        });
-
-            // Act
-			mockContext(function(){
+	        });												
+			 
+            // Act									
+			mockContext(function(){	       
 				actual = targetHelper.createComponentsForIndex(targetBodyCollector, targetCmp, targetItems, 0, false);
 			});
-
+			
 			// Assert
             Assert.Equal(expected, actual);
             Assert.Equal(targetBody.getLength()-1, targetBodyCollector.count);
         }
-
+        
         [Fixture, Skip("JBUCH: HALO: THESE NEED RETHINKING")]
         function testBodyLengthAndAttValueProvider(){
             // JBUCH: FIXME: THESE TESTS NEED RETHINKING
-        	var expected;
+        	var expected;   
         	var actual;
         	var ivpCalled = 0;
         	var compCreated = 0;
-
+        	
         	var targetConfig={
     			valueProvider:'vp'
         	};
-
+        	
         	var targetBodyLength;
-
+        	
         	var targetBody=[];
-
+        	
         	var targetAttributeValueProvider = '';
-
-        	var targetBodyCollector={
+        	
+        	var targetBodyCollector={	
     			count:0,
     			realBodyList:[]
     		};
-
+        	
         	var targetCmp={
                 get:function(att){
                     if (att == "v.var") return 'var';
@@ -363,302 +363,302 @@ Test.Aura.Iteration.HelperTest = function(){
                     if (att == "v.body") return targetBody;
                     if (att == "v.forceServer")return 'forceServer';
                 },
-                getAttributes:function(){
+    			getAttributes:function(){
                     return {
                         getValueProvider: function () {
                             return targetAttributeValueProvider;
                         }
-                    }
+				}		        			
                 }
         	};
-
+        	
         	var targetItems={
     			getValue:function(index){
     				if(index != 0) throw new Error("Wrong index used");
 					return 'Some Value';
-				}
+				}		        			
         	};
-
-        	var mockContext = Mocks.GetMock(Object.Global(), "$A", {
-        		expressionService: {
-        			createPassthroughValue: function(primaryProviders, cmp) {
-        				if(primaryProviders['var'] != 'Some Value') throw new Error("Wrong primaryProviders used");
+        	
+        	var mockContext = Mocks.GetMock(Object.Global(), "$A", {                                
+        		expressionService: {   
+        			createPassthroughValue: function(primaryProviders, cmp) { 
+        				if(primaryProviders['var'] != 'Some Value') throw new Error("Wrong primaryProviders used");        				
     					if(cmp != 'vp') throw new Error("Wrong cmp used");
-
+    					
     					ivpCalled += 1;
-        				return 'ivp';
-    				}
+        				return 'ivp'; 
+    				}					
 	            },
-	            componentService: {
-	            	newComponentAsync: function(callbackScope, callback, config, attributeValueProvider, localCreation, doForce, forceServer) {
-	            		if(callback != 'callback') throw new Error("Wrong Callback used");
+	            componentService: {   
+	            	newComponentAsync: function(callbackScope, callback, config, attributeValueProvider, localCreation, doForce, forceServer) { 
+	            		if(callback != 'callback') throw new Error("Wrong Callback used");   
 	            		if(config != targetConfig) throw new Error("Wrong Config used");
 	            		if(attributeValueProvider != 'ivp') throw new Error("Wrong AttributeValueProvider used");
 	            		if(localCreation != false) throw new Error("Wrong localCreation used");
 	            		if(doForce != false) throw new Error("Wrong doForce used"); // TODO fix this
-	            		if(forceServer != 'forceServer') throw new Error("Wrong forceServer used");
-
+	            		if(forceServer != 'forceServer') throw new Error("Wrong forceServer used"); 
+	            		
 	            		compCreated += 1;
-        			}
+        			}					
 	            }
-	        });
-
-        	var mockMethod = Mocks.GetMock(targetHelper, "createAddComponentCallback", function(indexCollector, index){
-        		if(indexCollector.bodyCollector != targetBodyCollector) throw new Error("Wrong BodyCollector used");
+	        });		
+        	
+        	var mockMethod = Mocks.GetMock(targetHelper, "createAddComponentCallback", function(indexCollector, index){       
+        		if(indexCollector.bodyCollector != targetBodyCollector) throw new Error("Wrong BodyCollector used");        		        		
         		if(targetBody.length == 1 && index != 0) throw new Error("Wrong Index used");
         		if(targetBody.length == 2 && (index != 0 && index != 1)) throw new Error("Wrong Index used");
-        		return 'callback';
+        		return 'callback';    		
         	});
-
+        	
 	        [Fact]
 	        function testBodyLengthOne(){
-	        	// Arrange
-	        	expected = 1;
+	        	// Arrange 
+	        	expected = 1;   
 	        	actual = 0;
 	        	ivpCalled = 0;
 	        	compCreated = 0;
-
+	        	
 	        	targetBody = [{}];
 	        	targetBodyCollector.count = 0;
-
-	            // Act
+				 
+	            // Act								
 				mockContext(function(){
 					mockMethod(function(){
 						actual = targetHelper.createComponentsForIndex(targetBodyCollector, targetCmp, targetItems, 0, false);
 					});
 				});
-
+				
 				// Assert
-	            Assert.Equal(expected, actual);
+	            Assert.Equal(expected, actual);            
 	            Assert.Equal(targetBody.length-1, targetBodyCollector.count);
 	            Assert.Equal(1, ivpCalled);
 	            Assert.Equal(1, compCreated);
 	        }
-
+	        
 	        [Fact]
 	        function testBodyLengthTwo(){
-	        	// Arrange
-	        	expected = 2;
+	        	// Arrange 
+	        	expected = 2;   
 	        	actual = 0;
 	        	ivpCalled = 0;
-	        	compCreated = 0;
-
+	        	compCreated = 0; 
+	        	
 	        	targetBody = [{},{}];
 	        	targetBodyCollector.count = 0;
-
-	        	// Act
+	        	
+	        	// Act								
 				mockContext(function(){
 					mockMethod(function(){
 						actual = targetHelper.createComponentsForIndex(targetBodyCollector, targetCmp, targetItems, 0, false);
 					});
 				});
-
+				
 				// Assert
 	            Assert.Equal(expected, actual);
 	            Assert.Equal(targetBody.length-1, targetBodyCollector.count);
 	            Assert.Equal(1, ivpCalled);
 	            Assert.Equal(2, compCreated);
-	        }
-
+	        }        
+	        
 	        [Fact]
 	        function testOneAttValueProvider(){
-	        	// Arrange
-	        	expected = 1;
+	        	// Arrange 
+	        	expected = 1;   
 	        	actual = 0;
 	        	ivpCalled = 0;
 	        	compCreated = 0;
-
+	        	
 	        	targetBody= [{}];
 	        	targetBodyCollector.count = 0;
-
+	        	
 	        	targetConfig={
 	    			valueProvider:undefined
 	        	};
-
+	        	
 	        	targetAttributeValueProvider = 'vp';
-
-	            // Act
+				 
+	            // Act								
 				mockContext(function(){
 					mockMethod(function(){
 						actual = targetHelper.createComponentsForIndex(targetBodyCollector, targetCmp, targetItems, 0, false);
 					});
 				});
-
+				
 				// Assert
-	            Assert.Equal(expected, actual);
+	            Assert.Equal(expected, actual);            
 	            Assert.Equal(targetBody.length-1, targetBodyCollector.count);
 	            Assert.Equal(1, ivpCalled);
 	            Assert.Equal(1, compCreated);
 	        }
-
+	        
 	        [Fact]
 	        function testTwoAttValueProvider(){
-	        	// Arrange
-	        	expected = 2;
+	        	// Arrange 
+	        	expected = 2;   
 	        	actual = 0;
 	        	ivpCalled = 0;
-	        	compCreated = 0;
-
+	        	compCreated = 0; 
+	        	
 	        	targetBodyLength = [{},{}];
 	        	targetBodyCollector.count = 0;
-
+	        	
 	        	targetConfig={
 	    			valueProvider:undefined
 	        	};
-
+	        	
 	        	targetAttributeValueProvider = 'vp';
-
-	        	// Act
+	        	
+	        	// Act								
 				mockContext(function(){
 					mockMethod(function(){
 						actual = targetHelper.createComponentsForIndex(targetBodyCollector, targetCmp, targetItems, 0, false);
 					});
 				});
-
+				
 				// Assert
 	            Assert.Equal(expected, actual);
 	            Assert.Equal(targetBody.length-1, targetBodyCollector.count);
 	            Assert.Equal(1, ivpCalled);
 	            Assert.Equal(2, compCreated);
 	        }
-        }
+        }                
     }
-
+    
     [Fixture, Skip("JBUCH: HALO: THESE TESTS NEED RETHINKING")]
-    function createComponentsForIndexFromServer(){
-
+    function createComponentsForIndexFromServer(){    	    	    	        
+    	                        
         [Fact]
         function testBodyLengthZero(){
-        	// Arrange
-        	var expected = 0;
+        	// Arrange 
+        	var expected = 0;    
         	var actual;
-
+        	
         	var targetBody={
     			getLength:function(){
     				return 0;
     			}
         	};
-
+        	        	        	       
         	var targetAttributes={
         		get:function(att){
         			if(att=="var") return "var";
-        			if(att=="indexVar") return false;
+        			if(att=="indexVar") return false;        			
         		},
         		getValue:function(att){
-        			if(att=="body") return targetBody;
+        			if(att=="body") return targetBody;        			
         		}
-        	};
-
+        	};        	        	        	        	
+        	
         	var targetCmp={
     			getAttributes:function(){
 					return targetAttributes;
-				}
+				}		        			
         	};
-
+        	
         	var targetItems={
     			getValue:function(index){
 					return 'Some Value';
-				}
+				}		        			
         	};
-
-        	var mockContext = Mocks.GetMock(Object.Global(), "$A", {
-        		setCreationPathIndex: function(index) {
-    				if(index != 0) throw new Error("Wrong index used");
+        	
+        	var mockContext = Mocks.GetMock(Object.Global(), "$A", {                                        		  
+        		setCreationPathIndex: function(index) { 
+    				if(index != 0) throw new Error("Wrong index used");        									
 				},
-        		pushCreationPath: function(body) {
-    				if(body != 'body') throw new Error("Wrong body used in push");
+        		pushCreationPath: function(body) { 
+    				if(body != 'body') throw new Error("Wrong body used in push");        									
 				},
-				popCreationPath: function(body) {
-    				if(body != 'body') throw new Error("Wrong body used in pop");
+				popCreationPath: function(body) { 
+    				if(body != 'body') throw new Error("Wrong body used in pop");        									
 				}
-        	});
-
-            // Act
-        	mockContext(function(){
+        	});	
+			 
+            // Act								
+        	mockContext(function(){       
 				actual = targetHelper.createComponentsForIndexFromServer(targetCmp, targetItems, 0, false);
 			});
-
+			
 			// Assert
             Assert.Equal(expected, actual.length);
         }
-
+        
         [Fact]
         function testExpressionServiceCreate(){
-        	// Arrange
-        	var expected = 0;
+        	// Arrange 
+        	var expected = 0;    
         	var actual;
-
+        	
         	var targetBody={
     			getLength:function(){
     				return 0;
     			}
         	};
-
+        	        	        	       
         	var targetAttributes={
         		get:function(att){
         			if(att=="var") return "var";
-        			if(att=="indexVar") return true;
+        			if(att=="indexVar") return true;        			
         		},
         		getValue:function(att){
-        			if(att=="body") return targetBody;
+        			if(att=="body") return targetBody;        			
         		},
         		getValueProvider:function(){
         			return '';
         		}
-        	};
-
+        	};        	        	        	        	
+        	
         	var targetCmp={
     			getAttributes:function(){
 					return targetAttributes;
-				}
+				}		        			
         	};
-
+        	
         	var targetItems={
     			getValue:function(index){
 					return 'Some Value';
-				}
+				}		        			
         	};
-
-        	var mockContext = Mocks.GetMock(Object.Global(), "$A", {
-        		setCreationPathIndex: function(index) {
-    				if(index != 0) throw new Error("Wrong index used");
+        	
+        	var mockContext = Mocks.GetMock(Object.Global(), "$A", {                                        		  
+        		setCreationPathIndex: function(index) { 
+    				if(index != 0) throw new Error("Wrong index used");        									
 				},
-        		pushCreationPath: function(body) {
-    				if(body != 'body') throw new Error("Wrong body used in push");
+        		pushCreationPath: function(body) { 
+    				if(body != 'body') throw new Error("Wrong body used in push");        									
 				},
-				popCreationPath: function(body) {
-    				if(body != 'body') throw new Error("Wrong body used in pop");
+				popCreationPath: function(body) { 
+    				if(body != 'body') throw new Error("Wrong body used in pop");        									
 				},
-				expressionService: {
+				expressionService: {   
 					create: function(valueProvider, config) {
 						if(valueProvider != null) throw new Error("Wrong valueProvider used");
 						if(config != 0) throw new Error("Wrong config used");
-						return 'iv';
-					}
+						return 'iv'; 
+					}					
 	            }
-        	});
-
-            // Act
-        	mockContext(function(){
+        	});										
+			 
+            // Act					  								
+        	mockContext(function(){       
 				actual = targetHelper.createComponentsForIndexFromServer(targetCmp, targetItems, 0, false);
         	});
-
+			
 			// Assert
             Assert.Equal(expected, actual.length);
         }
-
+        
         [Fixture]
         function testBodyLengthAndAttValueProvider(){
-
-        	var expected = 1;
+        	
+        	var expected = 1;    
         	var actual;
-
+        	
         	var targetConfig={
     			valueProvider:'vp'
         	};
-
+        	
         	var targetBodyLength;
-
+        	
         	var targetBody={
     			getLength:function(){
     				return targetBodyLength;
@@ -669,239 +669,239 @@ Test.Aura.Iteration.HelperTest = function(){
     				return targetConfig;
     			}
         	};
-
+        	
         	var targetAttributeValueProvider = '';
-
+        	        	        	       
         	var targetAttributes={
         		get:function(att){
         			if(att=="var") return "var";
-        			if(att=="indexVar") return false;
+        			if(att=="indexVar") return false;        			
         		},
         		getValue:function(att){
-        			if(att=="body") return targetBody;
+        			if(att=="body") return targetBody;        			
         		},
         		getValueProvider:function(){
         			return targetAttributeValueProvider;
         		}
-        	};
-
+        	};        	        	        	        	
+        	
         	var targetCmp={
     			getAttributes:function(){
 					return targetAttributes;
-				}
+				}		        			
         	};
-
+        	
         	var targetItems={
     			getValue:function(index){
 					return 'Some Value';
-				}
+				}		        			
         	};
-
-        	var mockContext = Mocks.GetMock(Object.Global(), "$A", {
-        		setCreationPathIndex: function(index) {
+        	
+        	var mockContext = Mocks.GetMock(Object.Global(), "$A", {                                        		  
+        		setCreationPathIndex: function(index) { 
     				if(targetBody.getLength() == 1 && index != 0) throw new Error("Wrong index used");
     				if(targetBody.getLength() == 2 && (index != 0 && index != 1)) throw new Error("Wrong index used");
 				},
-        		pushCreationPath: function(body) {
-    				if(body != 'body') throw new Error("Wrong body used in push");
+        		pushCreationPath: function(body) { 
+    				if(body != 'body') throw new Error("Wrong body used in push");        									
 				},
-				popCreationPath: function(body) {
-    				if(body != 'body') throw new Error("Wrong body used in pop");
-				},
-        		expressionService: {
-        			createPassthroughValue: function(primaryProviders, cmp) {
-        				if(primaryProviders['var'] != 'Some Value') throw new Error("Wrong primaryProviders used");
+				popCreationPath: function(body) { 
+    				if(body != 'body') throw new Error("Wrong body used in pop");        									
+				},                              
+        		expressionService: {   
+        			createPassthroughValue: function(primaryProviders, cmp) { 
+        				if(primaryProviders['var'] != 'Some Value') throw new Error("Wrong primaryProviders used");        				
     					if(cmp != 'vp') throw new Error("Wrong cmp used");
-        				return 'ivp';
-    				}
+        				return 'ivp'; 
+    				}					
 	            },
-	            componentService: {
+	            componentService: {   
 	            	newComponentDeprecated: function(config, attributeValueProvider, localCreation, doForce) {
 	            		if(config != targetConfig) throw new Error("Wrong Config used");
 	            		if(attributeValueProvider != 'ivp') throw new Error("Wrong AttributeValueProvider used");
 	            		if(localCreation != false) throw new Error("Wrong localCreation used");
 	            		if(doForce != false) throw new Error("Wrong doForce used"); // TODO fix this
-
+	            		
 	            		return 'ret';
-        			}
+        			}					
 	            }
-	        });
-
+	        });	       
+        
 	        [Fact]
 	        function testBodyLengthOne(){
-	        	// Arrange
-	        	expected = 1;
+	        	// Arrange 
+	        	expected = 1;    
 	        	actual;
 	        	targetBody= [{}];
-
-	            // Act
-	        	mockContext(function(){
+				 
+	            // Act						
+	        	mockContext(function(){      
 	        		actual = targetHelper.createComponentsForIndexFromServer(targetCmp, targetItems, 0, false);
 				});
-
+				
 				// Assert
 	            Assert.Equal(expected, actual.length);
 	            Assert.Equal('ret', actual[0]);
 	        }
-
+	        
 	        [Fact]
 	        function testBodyLengthTwo(){
-	        	// Arrange
-	        	expected = 2;
+	        	// Arrange 
+	        	expected = 2;    
 	        	actual;
 	        	targetBody = [{},{}];
-
-	            // Act
-	        	mockContext(function(){
+	        	
+	            // Act						
+	        	mockContext(function(){      
 	        		actual = targetHelper.createComponentsForIndexFromServer(targetCmp, targetItems, 0, false);
 				});
-
+				
 				// Assert
 	            Assert.Equal(expected, actual.length);
 	            Assert.Equal('ret', actual[0]);
 	            Assert.Equal('ret', actual[1]);
-	        }
-
+	        }        
+        
 	        [Fact]
 	        function testOneAttValueProvider(){
-	        	// Arrange
-	        	expected = 1;
+	        	// Arrange 
+	        	expected = 1;    
 	        	actual;
 	        	targetBody = [{}];
-
+	        	
 	        	targetConfig={
 	    			valueProvider:undefined
 	        	};
-
-	        	targetAttributeValueProvider = 'vp';
-
-	            // Act
-	        	mockContext(function(){
+	        	
+	        	targetAttributeValueProvider = 'vp';        	        	
+				 
+	            // Act						
+	        	mockContext(function(){      
 	        		actual = targetHelper.createComponentsForIndexFromServer(targetCmp, targetItems, 0, false);
 				});
-
+				
 				// Assert
 	            Assert.Equal(expected, actual.length);
 	            Assert.Equal('ret', actual[0]);
 	        }
-
+	        
 	        [Fact]
 	        function testTwoAttValueProvider(){
-	        	// Arrange
-	        	expected = 2;
+	        	// Arrange 
+	        	expected = 2;    
 	        	actual;
 	        	targetBody = [{},{}];
-
+	        	
 	        	targetConfig={
 	    			valueProvider:undefined
 	        	};
-
+	        	
 	        	targetAttributeValueProvider = 'vp';
-
-	            // Act
-	        	mockContext(function(){
+	        	
+	            // Act						
+	        	mockContext(function(){      
 	        		actual = targetHelper.createComponentsForIndexFromServer(targetCmp, targetItems, 0, false);
 				});
-
+				
 				// Assert
 	            Assert.Equal(expected, actual.length);
 	            Assert.Equal('ret', actual[0]);
 	            Assert.Equal('ret', actual[1]);
 	        }
-        }
+        }           
     }
-
+    
     [Fixture]
-    function createNewComponents(){
-
-    	var expected = false;
+    function createNewComponents(){    	    	    	        
+    	                     
+    	var expected = false;    
     	var actual = false;
-
+    	
     	var targetRealBody={
 			getLength:function(){
 				return 1;
 			}
     	};
-
+    	
     	var targetBody={
 			getLength:function(){
 				return 1;
 			}
     	};
-
+    	        	        	       
     	var targetAttributes={
     		get:function(att){
     			if(att=="var") return "var";
-    			if(att=="indexVar") return false;
+    			if(att=="indexVar") return false;        			
     		},
     		getValue:function(att){
-    			if(att=="realbody") return targetRealBody;
-    			if(att=="body") return targetBody;
+    			if(att=="realbody") return targetRealBody; 
+    			if(att=="body") return targetBody;        			
     		}
-    	};
-
+    	};   
+    	
     	var targetItems;
-
+    	
     	var targetCmp={
 			getAttributes:function(){
 				return targetAttributes;
-			},
-			getValue:function(att){
-    			if(att=="v.items") return targetItems;
+			},			
+			getValue:function(att){        			
+    			if(att=="v.items") return targetItems;   
     		}
     	};
-
+    	
     	var targetCallback;
-
-    	var mockGetStart = Mocks.GetMock(targetHelper, "getStart", function(cmp){
-    		if(cmp != targetCmp) throw new Error("Wrong cmp used");
-    		return 1;
+    	        	        	        	
+    	var mockGetStart = Mocks.GetMock(targetHelper, "getStart", function(cmp){       
+    		if(cmp != targetCmp) throw new Error("Wrong cmp used");        		        		      		        		
+    		return 1;    		
     	});
-
+    	
         [Fact]
         function testDontCreate(){
-        	// Arrange
-        	expected = false;
-        	actual = false;
-
-        	var mockGetEnd = Mocks.GetMock(targetHelper, "getEnd", function(cmp){
-        		if(cmp != targetCmp) throw new Error("Wrong cmp used");
-        		return 2;
-        	});
-
-            // Act
+        	// Arrange 
+        	expected = false;    
+        	actual = false;	
+        	
+        	var mockGetEnd = Mocks.GetMock(targetHelper, "getEnd", function(cmp){       
+        		if(cmp != targetCmp) throw new Error("Wrong cmp used");        		        		      		        		
+        		return 2;    		
+        	});	
+			 
+            // Act								
         	mockGetStart(function(){
         		mockGetEnd(function(){
         			targetHelper.createNewComponents(targetCmp, targetCallback);
         		});
 			});
-
+			
 			// Assert
             Assert.Equal(expected, actual);
         }
-
+        
         [Fact]
         function testCreate(){
-        	// Arrange
-        	expected = true;
-        	actual = false;
-
-        	var mockGetEnd = Mocks.GetMock(targetHelper, "getEnd", function(cmp){
-        		if(cmp != targetCmp) throw new Error("Wrong cmp used");
-        		return 3;
-        	});
-
-        	var mockCreateSelectiveComponentsForIndex = Mocks.GetMock(targetHelper, "createSelectiveComponentsForIndex", function(cmp, items, index, doForce, callback){
-        		if(cmp != targetCmp) throw new Error("Wrong cmp used");
+        	// Arrange 
+        	expected = true;    
+        	actual = false;        	        	
+        	
+        	var mockGetEnd = Mocks.GetMock(targetHelper, "getEnd", function(cmp){       
+        		if(cmp != targetCmp) throw new Error("Wrong cmp used");        		        		      		        		
+        		return 3;    		
+        	});	
+        	
+        	var mockCreateSelectiveComponentsForIndex = Mocks.GetMock(targetHelper, "createSelectiveComponentsForIndex", function(cmp, items, index, doForce, callback){       
+        		if(cmp != targetCmp) throw new Error("Wrong cmp used");        		        		      		        		
         		if(items != targetItems) throw new Error("Wrong items used");
         		if(index != 2) throw new Error("Wrong index used");
         		if(doForce != false) throw new Error("Wrong doForce used");
         		if(callback != targetCallback) throw new Error("Wrong callback used");
-
-        		actual = true;
-        	});
-
-            // Act
+        		
+        		actual = true;        		
+        	});	
+			 
+            // Act								
         	mockGetStart(function(){
         		mockGetEnd(function(){
         			mockCreateSelectiveComponentsForIndex(function(){
@@ -909,23 +909,23 @@ Test.Aura.Iteration.HelperTest = function(){
         			});
         		});
 			});
-
+			
 			// Assert
             Assert.Equal(expected, actual);
         }
     }
-
+    
     [Fixture]
-    function createRealBody(){
-
+    function createRealBody(){ 
+    	
     	[Fixture]
         function testCallbackCalled(){
-
-        	var expected = true;
+        	
+        	var expected = true;    
         	var actual = false;
         	var isLiteral;
         	var isEmpty;
-
+        	
         	var targetItems={
     			getLength:function(){
     				return 1;
@@ -937,35 +937,35 @@ Test.Aura.Iteration.HelperTest = function(){
     				return isEmpty;
     			}
         	};
-
-        	var targetAttributes={
+        	        	        	       
+        	var targetAttributes={        		
         		getValue:function(att){
-        			if(att=="items") return targetItems;
+        			if(att=="items") return targetItems;         			       			
         		}
-        	};
-
+        	};        	        	        	        	
+        	
         	var targetCmp={
     			_currentBodyCollector:'',
     			getAttributes:function(){
 					return targetAttributes;
-				}
+				}		        			
         	};
-
+        	
         	var targetCallback = function(arg){
         		actual = true;
-        	};
-
+        	};        	        	        	        	        	        				             
+    	
 	    	[Fact]
 	        function testWithBoth(){
-	        	// Arrange
-	        	expected = true;
+	        	// Arrange 
+	        	expected = true;    
 	        	actual = false;
 	        	isLiteral = true;
-	        	isEmpty = true;
-
-	            // Act
+	        	isEmpty = true;        	
+	        	        	        	        	        				 
+	            // Act								        
 				targetHelper.createRealBody(targetCmp, true, targetCallback);
-
+	        	
 				// Assert
 	            Assert.Equal(expected, actual);
 	            Assert.Equal([], targetCmp._currentBodyCollector.realBodyList);
@@ -974,18 +974,18 @@ Test.Aura.Iteration.HelperTest = function(){
 	            Assert.Equal(targetCmp, targetCmp._currentBodyCollector.cmp);
 	            Assert.Equal(0, targetCmp._currentBodyCollector.offset);
 	        }
-
+	    	                        
 	        [Fact]
 	        function testWithEmpty(){
-	        	// Arrange
-	        	expected = true;
+	        	// Arrange 
+	        	expected = true;    
 	        	actual = false;
 	        	isLiteral = false;
-	        	isEmpty = true;
-
-	            // Act
+	        	isEmpty = true;        	        	
+	        	        	        	        	        				 
+	            // Act								        
 				targetHelper.createRealBody(targetCmp, true, targetCallback);
-
+	        	
 				// Assert
 	            Assert.Equal(expected, actual);
 	            Assert.Equal([], targetCmp._currentBodyCollector.realBodyList);
@@ -994,18 +994,18 @@ Test.Aura.Iteration.HelperTest = function(){
 	            Assert.Equal(targetCmp, targetCmp._currentBodyCollector.cmp);
 	            Assert.Equal(0, targetCmp._currentBodyCollector.offset);
 	        }
-
+	        
 	        [Fact]
 	        function testWithLiteral(){
-	        	// Arrange
-	        	expected = true;
+	        	// Arrange 
+	        	expected = true;    
 	        	actual = false;
 	        	isLiteral = true;
-	        	isEmpty = false;
-
-	            // Act
+	        	isEmpty = false;        	 
+	        	        	        	        	        				 
+	            // Act								        
 				targetHelper.createRealBody(targetCmp, true, targetCallback);
-
+	        	
 				// Assert
 	            Assert.Equal(expected, actual);
 	            Assert.Equal([], targetCmp._currentBodyCollector.realBodyList);
@@ -1013,30 +1013,30 @@ Test.Aura.Iteration.HelperTest = function(){
 	            Assert.Equal(targetItems.getLength(), targetCmp._currentBodyCollector.count);
 	            Assert.Equal(targetCmp, targetCmp._currentBodyCollector.cmp);
 	            Assert.Equal(0, targetCmp._currentBodyCollector.offset);
-	        }
+	        }  
     	}
-
+        
         [Fixture]
         function testBodyNotCreated(){
-        	var expected = true;
+        	var expected = true;    
         	var actual = false;
         	var isEnd;
-        	var isStart;
-
+        	var isStart;        	
+        	
         	var targetEnd={
     			isDefined:function(){
     				return isEnd;
     			}
         	};
-
+        	
         	var targetStart={
     			isDefined:function(){
     				return isStart;
     			}
         	};
-
+        	
         	var targetItemsLength;
-
+        	
         	var targetItems={
     			getLength:function(){
     				return targetItemsLength;
@@ -1048,161 +1048,161 @@ Test.Aura.Iteration.HelperTest = function(){
     				return false;
     			}
         	};
-
-        	var targetAttributes={
+        	        	        	       
+        	var targetAttributes={        		
         		getValue:function(att){
-        			if(att=="items") return targetItems;
+        			if(att=="items") return targetItems;  
         			if(att=="start") return targetStart;
         			if(att=="end") return targetEnd;
         		}
-        	};
-
+        	};        	        	        	        	
+        	
         	var targetCmp={
     			_currentBodyCollector:'',
     			getAttributes:function(){
 					return targetAttributes;
-				}
+				}		        			
         	};
-
+        	
         	var targetCallback = function(arg){
         		actual = true;
-        	};
-
+        	};   
+        	
         	[Fact]
 	        function testBothNotDefined(){
-	        	// Arrange
-	        	expected = true;
+	        	// Arrange 
+	        	expected = true;    
 	        	actual = false;
 	        	isEnd = false;
 	        	isStart = false;
 	        	targetItemsLength = 0;
-
-	        	// Act
+	        	
+	        	// Act								        
 				targetHelper.createRealBody(targetCmp, true, targetCallback);
-
+	        	
 				// Assert
 	            Assert.Equal(expected, actual);
         	}
-
+        
 	        [Fact]
 	        function testStartDefined(){
-	        	// Arrange
-	        	expected = true;
+	        	// Arrange 
+	        	expected = true;    
 	        	actual = false;
 	        	isEnd = false;
 	        	isStart = true;
 	        	targetItemsLength = 0;
-
-	        	var mockGetNumber = Mocks.GetMock(targetHelper, "getNumber", function(start){
-	        		if(start != targetStart) throw new Error("Wrong start used");
-
-	        		return 0;
-	        	});
-
-	            // Act
+	        	
+	        	var mockGetNumber = Mocks.GetMock(targetHelper, "getNumber", function(start){       
+	        		if(start != targetStart) throw new Error("Wrong start used");        		        		      		        		        		        		
+	        		
+	        		return 0;        		
+	        	});	
+	        	        	        	        	        				 
+	            // Act		
 	        	mockGetNumber(function(){
 	        		targetHelper.createRealBody(targetCmp, true, targetCallback);
 	        	});
-
+	        	
 				// Assert
 	            Assert.Equal(expected, actual);
 	        }
-
+	        
 	        [Fact]
 	        function testStartDefinedGreater(){
-	        	// Arrange
-	        	expected = true;
-	        	actual = false;
+	        	// Arrange 
+	        	expected = true;    
+	        	actual = false;  
 	        	isEnd = false;
 	        	isStart = true;
 	        	targetItemsLength = 0;
-
-	        	var mockGetNumber = Mocks.GetMock(targetHelper, "getNumber", function(start){
-	        		if(start != targetStart) throw new Error("Wrong start used");
-
-	        		return 1;
-	        	});
-
-	            // Act
+	        	
+	        	var mockGetNumber = Mocks.GetMock(targetHelper, "getNumber", function(start){       
+	        		if(start != targetStart) throw new Error("Wrong start used");        		        		      		        		        		        		
+	        		
+	        		return 1;        		
+	        	});	
+	        	        	        	        	        				 
+	            // Act		
 	        	mockGetNumber(function(){
 	        		targetHelper.createRealBody(targetCmp, true, targetCallback);
 	        	});
-
+	        	
 				// Assert
 	            Assert.Equal(expected, actual);
-	        }
-
+	        }        
+        
 	        [Fact]
 	        function testEndDefined(){
-	        	// Arrange
-	        	expected = true;
+	        	// Arrange 
+	        	expected = true;    
 	        	actual = false;
 	        	isEnd = true;
 	        	isStart = false;
-	        	targetItemsLength = 0;
-
-	        	var mockGetNumber = Mocks.GetMock(targetHelper, "getNumber", function(end){
-	        		if(end != targetEnd) throw new Error("Wrong end used");
-
-	        		return 0;
-	        	});
-
-	            // Act
+	        	targetItemsLength = 0;        	   
+	        	
+	        	var mockGetNumber = Mocks.GetMock(targetHelper, "getNumber", function(end){       
+	        		if(end != targetEnd) throw new Error("Wrong end used");        		        		      		        		        		        		
+	        		
+	        		return 0;        		
+	        	});	
+	        	        	        	        	        				 
+	            // Act		
 	        	mockGetNumber(function(){
 	        		targetHelper.createRealBody(targetCmp, true, targetCallback);
 	        	});
-
+	        	
 				// Assert
 	            Assert.Equal(expected, actual);
 	        }
-
+	        
 	        [Fact]
 	        function testEndDefinedLesser(){
-	        	// Arrange
-	        	expected = true;
+	        	// Arrange 
+	        	expected = true;    
 	        	actual = false;
 	        	isEnd = true;
 	        	isStart = false;
-	        	targetItemsLength = 1;
-
-	        	var mockGetNumber = Mocks.GetMock(targetHelper, "getNumber", function(end){
-	        		if(end != targetEnd) throw new Error("Wrong end used");
-
-	        		return 0;
-	        	});
-
-	            // Act
+	        	targetItemsLength = 1;        		              	  
+	        	
+	        	var mockGetNumber = Mocks.GetMock(targetHelper, "getNumber", function(end){       
+	        		if(end != targetEnd) throw new Error("Wrong end used");        		        		      		        		        		        		
+	        		
+	        		return 0;        		
+	        	});	
+	        	        	        	        	        				 
+	            // Act		
 	        	mockGetNumber(function(){
 	        		targetHelper.createRealBody(targetCmp, true, targetCallback);
 	        	});
-
+	        	
 				// Assert
 	            Assert.Equal(expected, actual);
 	        }
         }
-
+        
         [Fixture]
         function testBodyNotCreatedBothDefined(){
-
-        	var expected = true;
+        	
+        	var expected = true;    
         	var actual = false;
-
+        	
         	var targetEnd={
     			type:'e',
     			isDefined:function(){
     				return true;
     			}
         	};
-
+        	
         	var targetStart={
-        		type:'s',
+        		type:'s',	
     			isDefined:function(){
     				return true;
     			}
         	};
-
+        	
         	var targetItemsLength;
-
+        	
         	var targetItems={
     			getLength:function(){
     				return targetItemsLength;
@@ -1214,28 +1214,28 @@ Test.Aura.Iteration.HelperTest = function(){
     				return false;
     			}
         	};
-
-        	var targetAttributes={
+        	        	        	       
+        	var targetAttributes={        		
         		getValue:function(att){
-        			if(att=="items") return targetItems;
+        			if(att=="items") return targetItems;  
         			if(att=="start") return targetStart;
         			if(att=="end") return targetEnd;
         		}
-        	};
-
+        	};        	        	        	        	
+        	
         	var targetCmp={
     			_currentBodyCollector:'',
     			getAttributes:function(){
 					return targetAttributes;
-				}
+				}		        			
         	};
-
+        	
         	var targetCallback = function(arg){
         		actual = true;
-        	};
-
-        	var mockGetNumber = Mocks.GetMock(targetHelper, "getNumber", function(num){
-        		if(num != targetStart && num != targetEnd) throw new Error("Wrong num used");
+        	};    
+        	
+        	var mockGetNumber = Mocks.GetMock(targetHelper, "getNumber", function(num){       
+        		if(num != targetStart && num != targetEnd) throw new Error("Wrong num used");        		
         		if(num == targetStart){
         			if(targetItems.getLength() == 0)return 0;
         			if(targetItems.getLength() == 2)return 1;
@@ -1243,63 +1243,63 @@ Test.Aura.Iteration.HelperTest = function(){
         		if(num == targetEnd){
         			if(targetItems.getLength() == 0)return 0;
         			if(targetItems.getLength() == 2)return 1;
-        		}
-        	});
-
+        		}        		
+        	});	
+        
 	        [Fact]
 	        function testBothSame(){
-	        	// Arrange
-	        	expected = true;
+	        	// Arrange 
+	        	expected = true;    
 	        	actual = false;
 	        	targetItemsLength = 0;
-
-	            // Act
+	        	        	        	        	        				 
+	            // Act		
 	        	mockGetNumber(function(){
 	        		targetHelper.createRealBody(targetCmp, true, targetCallback);
 	        	});
-
+	        	
 				// Assert
 	            Assert.Equal(expected, actual);
 	        }
-
+	        
 	        [Fact]
 	        function testBothDifferent(){
-	        	// Arrange
-	        	expected = true;
-	        	actual = false;
+	        	// Arrange 
+	        	expected = true;    
+	        	actual = false; 
 	        	targetItemsLength = 2;
-
-	            // Act
+	        	        	        	        	        				 
+	            // Act		
 	        	mockGetNumber(function(){
 	        		targetHelper.createRealBody(targetCmp, true, targetCallback);
 	        	});
-
+	        	
 				// Assert
 	            Assert.Equal(expected, actual);
 	        }
         }
-
+        
         [Fixture]
         function testBodyCreated(){
-
-        	var expected;
+        
+        	var expected;    
         	var actual;
         	var callbackCalled;
-
+        	
         	var targetEnd={
     			isDefined:function(){
     				return false;
     			}
         	};
-
+        	
         	var targetStart={
     			isDefined:function(){
     				return false;
     			}
         	};
-
+        	
         	var targetItemsLength;
-
+        	
         	var targetItems={
     			getLength:function(){
     				return targetItemsLength;
@@ -1311,87 +1311,87 @@ Test.Aura.Iteration.HelperTest = function(){
     				return false;
     			}
         	};
-
-        	var targetAttributes={
+        	        	        	       
+        	var targetAttributes={        		
         		getValue:function(att){
-        			if(att=="items") return targetItems;
+        			if(att=="items") return targetItems;  
         			if(att=="start") return targetStart;
         			if(att=="end") return targetEnd;
         		}
-        	};
-
+        	};        	        	        	        	
+        	
         	var targetCmp={
     			_currentBodyCollector:'',
     			getAttributes:function(){
 					return targetAttributes;
-				}
+				}		        			
         	};
-
+        	
         	var targetCallback = function(arg){
         		actual = true;
-        	};
-
-        	var mockCreateComponentsForIndex = Mocks.GetMock(targetHelper, "createComponentsForIndex", function(bodyCollector, cmp, items, index, doForce){
+        	};      
+        	
+        	var mockCreateComponentsForIndex = Mocks.GetMock(targetHelper, "createComponentsForIndex", function(bodyCollector, cmp, items, index, doForce){       
         		if(bodyCollector.count != targetItems.getLength()) throw new Error("Wrong bodyCollector used");
         		if(cmp != targetCmp) throw new Error("Wrong cmp used");
         		if(items != targetItems) throw new Error("Wrong items used");
         		if(targetItems.getLength() == 1 && index != 0) throw new Error("Wrong index used");
         		if(targetItems.getLength() == 2 && index != 0 && index != 1) throw new Error("Wrong index used");
         		if(doForce != true) throw new Error("Wrong doForce used");
-
-        		actual += 1;
+        		   
+        		actual += 1;        		
         		return 1;
-        	});
-
+        	});	
+        
 	        [Fact]
 	        function testCreatedOnce(){
-	        	// Arrange
-	        	expected = 1;
+	        	// Arrange 
+	        	expected = 1;    
 	        	actual = 0;
 	        	callbackCalled= false;
 	        	targetItemsLength = 1;
-
-	            // Act
-	        	mockCreateComponentsForIndex(function(){
+	        	        	        	        	        				 
+	            // Act		
+	        	mockCreateComponentsForIndex(function(){								        
 	        		targetHelper.createRealBody(targetCmp, true, targetCallback);
 	        	});
-
+	        	
 				// Assert
 	            Assert.Equal(expected, actual);
 	            Assert.Equal(false, callbackCalled);
 	        }
-
+	        
 	        [Fact]
 	        function testCreatedTwice(){
-	        	// Arrange
-	        	expected = 2;
+	        	// Arrange 
+	        	expected = 2;    
 	        	actual = 0;
-	        	callbackCalled= false;
+	        	callbackCalled= false;  
 	        	targetItemsLength = 2;
-
-	            // Act
-	        	mockCreateComponentsForIndex(function(){
+	        	        	        	        	        				 
+	            // Act		
+	        	mockCreateComponentsForIndex(function(){								        
 	        		targetHelper.createRealBody(targetCmp, true, targetCallback);
 	        	});
-
+	        	
 				// Assert
 	            Assert.Equal(expected, actual);
 	            Assert.Equal(false, callbackCalled);
 	        }
         }
     }
-
+    
     [Fixture]
-    function createRealBodyServer(){
-
+    function createRealBodyServer(){  
+    	
     	[Fixture]
         function testChecks(){
-	    	var expected = [];
+	    	var expected = [];    
 	    	var actual;
 	    	var isLiteral;
 	    	var isEmpty;
-
-	    	var targetItems={
+	    	
+	    	var targetItems={    			
 				isLiteral:function(){
 					return isLiteral;
 				},
@@ -1399,91 +1399,91 @@ Test.Aura.Iteration.HelperTest = function(){
 					return isEmpty;
 				}
 	    	};
-
-	    	var targetAttributes={
+	    	        	        	       
+	    	var targetAttributes={        		
 	    		getValue:function(att){
-	    			if(att=="items") return targetItems;
+	    			if(att=="items") return targetItems;         			       			
 	    		}
-	    	};
-
-	    	var targetCmp={
+	    	};        	        	        	        	
+	    	
+	    	var targetCmp={    			
 				getAttributes:function(){
 					return targetAttributes;
-				}
-	    	};
-
+				}		        			
+	    	};        	    
+    	
 	    	[Fact]
 	        function testBoth(){
-	        	// Arrange
-	        	expected = [];
+	        	// Arrange 
+	        	expected = [];    
 	        	actual;
 	        	isLiteral = true;
-		    	isEmpty = true;
-
-	            // Act
+		    	isEmpty = true;        	        	
+	        	        	        	        	        				 
+	            // Act								        
 				actual = targetHelper.createRealBodyServer(targetCmp, true);
-
+	        	
 				// Assert
 	            Assert.Equal(expected, actual);
 	        }
-
+	    	
 	    	[Fact]
 	        function testOnlyEmpty(){
-	        	// Arrange
-	        	expected = [];
+	        	// Arrange 
+	        	expected = [];    
 	        	actual;
 	        	isLiteral = false;
-		    	isEmpty = true;
-
-	            // Act
+		    	isEmpty = true;         	      	    
+	        	        	        	        	        				 
+	            // Act								        
 				actual = targetHelper.createRealBodyServer(targetCmp, true);
-
+	        	
 				// Assert
 	            Assert.Equal(expected, actual);
 	        }
-
+	    	
 	    	[Fact]
 	        function testOnlyLiteral(){
-	        	// Arrange
-	        	expected = [];
+	        	// Arrange 
+	        	expected = [];    
 	        	actual;
 	        	isLiteral = true;
-		    	isEmpty = false;
-
-	            // Act
+		    	isEmpty = false; 
+	        	        	        	        				 
+	            // Act								        
 				actual = targetHelper.createRealBodyServer(targetCmp, true);
-
+	        	
 				// Assert
 	            Assert.Equal(expected, actual);
 	        }
     	}
-
+    	    	    	
     	[Fixture]
         function testBodyNotCreated(){
-
-    		var expected = [];
+    		
+    		var expected = [];    
         	var actual;
         	var isEnd;
         	var isStart;
-
+        	
         	var targetEnd={
     			isDefined:function(){
     				return isEnd;
     			}
         	};
-
+        	
         	var targetStart={
     			isDefined:function(){
     				return isStart;
     			}
         	};
-
+        	        	   
         	var targetItemsLength;
-
+        	
         	var targetItems={
     			getLength:function(){
     				return targetItemsLength;
-    			},
+    			},        	    			
     			isLiteral:function(){
     				return false;
     			},
@@ -1491,178 +1491,178 @@ Test.Aura.Iteration.HelperTest = function(){
     				return false;
     			}
         	};
-
-        	var targetAttributes={
+        	        	        	       
+        	var targetAttributes={        		
         		getValue:function(att){
         			if(att=="items") return targetItems;
         			if(att=="start") return targetStart;
         			if(att=="end") return targetEnd;
         		}
-        	};
-
-        	var targetCmp={
+        	};        	        	        	        	
+        	
+        	var targetCmp={    			
     			getAttributes:function(){
 					return targetAttributes;
-				}
-        	};
-
-        	var mockContext = Mocks.GetMock(Object.Global(), "$A", {
-        		pushCreationPath: function(body) {
-    				if(body != 'realbody') throw new Error("Wrong body used in push");
+				}		        			
+        	}; 
+        	
+        	var mockContext = Mocks.GetMock(Object.Global(), "$A", {                                        		          		
+        		pushCreationPath: function(body) { 
+    				if(body != 'realbody') throw new Error("Wrong body used in push");        									
 				},
-				popCreationPath: function(body) {
-    				if(body != 'realbody') throw new Error("Wrong body used in pop");
+				popCreationPath: function(body) { 
+    				if(body != 'realbody') throw new Error("Wrong body used in pop");        									
 				}
-        	});
-
+        	});	       
+        	
         	[Fact]
             function testBodyNotCreatedStartEndNotDefined(){
-        		// Arrange
-        		expected = [];
+        		// Arrange 
+        		expected = [];    
             	actual;
             	isStart = false;
 	        	isEnd = false;
 	        	targetItemsLength = 0;
-
-	        	// Act
-	        	mockContext(function(){
+	        	
+	        	// Act								
+	        	mockContext(function(){								        
 	        		actual = targetHelper.createRealBodyServer(targetCmp, true);
 	        	});
-
+	        	
 				// Assert
 	            Assert.Equal(expected, actual);
         	}
-
+    	
 	    	[Fact]
 	        function testStartDefined(){
-	        	// Arrange
-	    		expected = [];
-	        	actual;
+	        	// Arrange 
+	    		expected = [];    
+	        	actual;	        	
 	        	isStart = true;
 	        	isEnd = false;
 	        	targetItemsLength = 0;
-
-	        	var mockGetNumber = Mocks.GetMock(targetHelper, "getNumber", function(start){
-	        		if(start != targetStart) throw new Error("Wrong start used");
-
-	        		return 0;
-	        	});
-
-	            // Act
+	        	
+	        	var mockGetNumber = Mocks.GetMock(targetHelper, "getNumber", function(start){       
+	        		if(start != targetStart) throw new Error("Wrong start used");        		        		      		        		        		        		
+	        		
+	        		return 0;        		
+	        	});	
+				 
+	            // Act								
 	        	mockContext(function(){
 	        		mockGetNumber(function(){
 	        			actual = targetHelper.createRealBodyServer(targetCmp, true);
 	        		});
 	        	});
-
+	        	
 				// Assert
 	            Assert.Equal(expected, actual);
 	        }
-
+	    	
 	    	[Fact]
 	        function testStartDefinedGreater(){
-	        	// Arrange
-	        	expected = [];
-	        	actual;
+	        	// Arrange 
+	        	expected = [];    
+	        	actual;	        	
 	        	isStart = true;
 	        	isEnd = false;
 	        	targetItemsLength = 0;
-
-	        	var mockGetNumber = Mocks.GetMock(targetHelper, "getNumber", function(start){
-	        		if(start != targetStart) throw new Error("Wrong start used");
-
-	        		return 1;
-	        	});
-
-	            // Act
+	        	
+	        	var mockGetNumber = Mocks.GetMock(targetHelper, "getNumber", function(start){       
+	        		if(start != targetStart) throw new Error("Wrong start used");        		        		      		        		        		        		
+	        		
+	        		return 1;        		
+	        	});	
+	        	
+	            // Act								
 	        	mockContext(function(){
 	        		mockGetNumber(function(){
 	        			actual = targetHelper.createRealBodyServer(targetCmp, true);
 	        		});
 	        	});
-
+	        	
 				// Assert
 	            Assert.Equal(expected, actual);
-	    	}
-
+	    	}    	        	        	
+    	    
 	    	[Fact]
 	        function testEndDefined(){
-	        	// Arrange
-	    		expected = [];
+	        	// Arrange 
+	    		expected = [];    
 	        	actual;
 	        	isStart = false;
-	        	isEnd = true;
+	        	isEnd = true;	        	
 	        	targetItemsLength = 0;
-
-	        	var mockGetNumber = Mocks.GetMock(targetHelper, "getNumber", function(end){
-	        		if(end != targetEnd) throw new Error("Wrong end used");
-
-	        		return 0;
+	        	
+	        	var mockGetNumber = Mocks.GetMock(targetHelper, "getNumber", function(end){       
+	        		if(end != targetEnd) throw new Error("Wrong end used");        		        		      		        		        		        		
+	        		
+	        		return 0;        		
 	        	});
-
-	            // Act
+				 
+	            // Act								
 	        	mockContext(function(){
 	        		mockGetNumber(function(){
 	        			actual = targetHelper.createRealBodyServer(targetCmp, true);
 	        		});
 	        	});
-
+	        	
 				// Assert
 	            Assert.Equal(expected, actual);
 	        }
-
+	    	
 	    	[Fact]
 	        function testEndDefinedLesser(){
-	        	// Arrange
-	        	expected = [];
-	        	actual;
+	        	// Arrange 
+	        	expected = [];    
+	        	actual;   
 	        	isStart = false;
 	        	isEnd = true;
 	        	targetItemsLength = 1;
-
-	        	var mockGetNumber = Mocks.GetMock(targetHelper, "getNumber", function(end){
-	        		if(end != targetEnd) throw new Error("Wrong end used");
-
-	        		return 0;
+	        	
+	        	var mockGetNumber = Mocks.GetMock(targetHelper, "getNumber", function(end){       
+	        		if(end != targetEnd) throw new Error("Wrong end used");        		        		      		        		        		        		
+	        		
+	        		return 0;        		
 	        	});
-
-	            // Act
+				 
+	            // Act								
 	        	mockContext(function(){
 	        		mockGetNumber(function(){
 	        			actual = targetHelper.createRealBodyServer(targetCmp, true);
 	        		});
 	        	});
-
+	        	
 				// Assert
 	            Assert.Equal(expected, actual);
 	        }
     	}
-
+    	
     	[Fixture]
         function testBodyNotCreatedBothDefined(){
-
-    		var expected;
+    		
+    		var expected;    
         	var actual;
-
+        	
         	var targetEnd={
     			type:'e',
     			isDefined:function(){
     				return true;
     			}
         	};
-
+        	
         	var targetStart={
-        		type:'s',
+        		type:'s',	
     			isDefined:function(){
     				return true;
     			}
         	};
-
+        	
         	var targetItemsLength;
         	var targetItems={
     			getLength:function(){
     				return targetItemsLength;
-    			},
+    			},        	    			
     			isLiteral:function(){
     				return false;
     			},
@@ -1670,31 +1670,31 @@ Test.Aura.Iteration.HelperTest = function(){
     				return false;
     			}
         	};
-
-        	var targetAttributes={
+        	        	        	       
+        	var targetAttributes={        		
         		getValue:function(att){
         			if(att=="items") return targetItems;
         			if(att=="start") return targetStart;
         			if(att=="end") return targetEnd;
         		}
-        	};
-
-        	var targetCmp={
+        	};        	        	        	        	
+        	
+        	var targetCmp={    			
     			getAttributes:function(){
 					return targetAttributes;
-				}
-        	};
-
-        	var mockContext = Mocks.GetMock(Object.Global(), "$A", {
-        		pushCreationPath: function(body) {
-    				if(body != 'realbody') throw new Error("Wrong body used in push");
+				}		        			
+        	}; 
+        	
+        	var mockContext = Mocks.GetMock(Object.Global(), "$A", {                                        		          		
+        		pushCreationPath: function(body) { 
+    				if(body != 'realbody') throw new Error("Wrong body used in push");        									
 				},
-				popCreationPath: function(body) {
-    				if(body != 'realbody') throw new Error("Wrong body used in pop");
+				popCreationPath: function(body) { 
+    				if(body != 'realbody') throw new Error("Wrong body used in pop");        									
 				}
-        	});
-
-        	var mockGetNumber = Mocks.GetMock(targetHelper, "getNumber", function(num){
+        	});	
+        	
+        	var mockGetNumber = Mocks.GetMock(targetHelper, "getNumber", function(num){       
         		if(num != targetStart && num != targetEnd) throw new Error("Wrong num used");
         		if(num == targetStart){
         			if(targetItems.getLength() == 0) return 0;
@@ -1702,71 +1702,71 @@ Test.Aura.Iteration.HelperTest = function(){
         		}
         		if(num == targetEnd) {
         			if(targetItems.getLength() == 0) return 0;
-        			if(targetItems.getLength() == 2) return 1;
+        			if(targetItems.getLength() == 2) return 1;        		
         		}
-        	});
-
+        	});	
+    	
 	    	[Fact]
 	        function testBothSame(){
-	        	// Arrange
-	        	expected = [];
+	        	// Arrange 
+	        	expected = [];    
 	        	actual;
 	        	targetItemsLength = 0;
-
-	            // Act
-	        	mockContext(function(){
+	        	
+	            // Act								
+	        	mockContext(function(){								        
 	        		mockGetNumber(function(){
 	        			actual = targetHelper.createRealBodyServer(targetCmp, true);
 	        		});
 	        	});
-
+	        	
 				// Assert
 	            Assert.Equal(expected, actual);
 	        }
-
+	    	
 	    	[Fact]
 	        function testBothDifferent(){
-	        	// Arrange
-	        	expected = [];
+	        	// Arrange 
+	        	expected = [];    
 	        	actual;
 	        	targetItemsLength = 2;
-
-	            // Act
-	        	mockContext(function(){
+	        	
+	            // Act								
+	        	mockContext(function(){								        
 	        		mockGetNumber(function(){
 	        			actual = targetHelper.createRealBodyServer(targetCmp, true);
 	        		});
 	        	});
-
+	        	
 				// Assert
 	            Assert.Equal(expected, actual);
 	        }
     	}
-
-
+    	
+    	
     	[Fixture]
         function testBodyCreation(){
-
-    		var expected;
+    		
+    		var expected;    
         	var actual;
-
-        	var targetEnd={
+        	
+        	var targetEnd={    			
     			isDefined:function(){
     				return false;
     			}
         	};
-
-        	var targetStart={
+        	
+        	var targetStart={        			
     			isDefined:function(){
     				return false;
     			}
         	};
-
+        	
         	var targetItemsLength;
         	var targetItems={
     			getLength:function(){
     				return targetItemsLength;
-    			},
+    			},        	    			
     			isLiteral:function(){
     				return false;
     			},
@@ -1774,103 +1774,103 @@ Test.Aura.Iteration.HelperTest = function(){
     				return false;
     			}
         	};
-
-        	var targetAttributes={
+        	        	        	       
+        	var targetAttributes={        		
         		getValue:function(att){
         			if(att=="items") return targetItems;
         			if(att=="start") return targetStart;
         			if(att=="end") return targetEnd;
         		}
-        	};
-
-        	var targetCmp={
+        	};        	        	        	        	
+        	
+        	var targetCmp={    			
     			getAttributes:function(){
 					return targetAttributes;
-				}
-        	};
-
-        	var mockContext = Mocks.GetMock(Object.Global(), "$A", {
-        		pushCreationPath: function(body) {
-    				if(body != 'realbody') throw new Error("Wrong body used in push");
+				}		        			
+        	}; 
+        	
+        	var mockContext = Mocks.GetMock(Object.Global(), "$A", {                                        		          		
+        		pushCreationPath: function(body) { 
+    				if(body != 'realbody') throw new Error("Wrong body used in push");        									
 				},
-				popCreationPath: function(body) {
-    				if(body != 'realbody') throw new Error("Wrong body used in pop");
+				popCreationPath: function(body) { 
+    				if(body != 'realbody') throw new Error("Wrong body used in pop");        									
 				}
-        	});
-
-        	var mockCreateComponentsForIndexFromServer = Mocks.GetMock(targetHelper, "createComponentsForIndexFromServer", function(cmp, items, index, doForce){
+        	});	   
+        	
+        	var mockCreateComponentsForIndexFromServer = Mocks.GetMock(targetHelper, "createComponentsForIndexFromServer", function(cmp, items, index, doForce){               		
         		if(cmp != targetCmp) throw new Error("Wrong cmp used");
         		if(items != targetItems) throw new Error("Wrong items used");
         		if(targetItems.getLength() == 1 && index != 0) throw new Error("Wrong index used");
         		if(targetItems.getLength() == 2 && (index != 0 && index != 1)) throw new Error("Wrong index used");
         		if(doForce != true) throw new Error("Wrong doForce used");
-
+        		            		
         		return [index + 1];
-        	});
-
+        	});	
+    	
 	    	[Fact]
 	        function testCreatedOnce(){
-	        	// Arrange
-	    		expected = [1];
+	        	// Arrange 
+	    		expected = [1];    
 	        	actual;
 	        	targetItemsLength = 1;
-
-	            // Act
+				 
+	            // Act								
 	        	mockContext(function(){
 	        		mockCreateComponentsForIndexFromServer(function(){
 	        			actual = targetHelper.createRealBodyServer(targetCmp, true);
 	        		});
 	        	});
-
+	        	
 				// Assert
 	            Assert.Equal(expected, actual);
 	        }
-
+	    	
 	    	[Fact]
 	        function testCreatedTwice(){
-	        	// Arrange
-	        	expected = [1,2];
-	        	actual;
+	        	// Arrange 
+	        	expected = [1,2];    
+	        	actual;     
 	        	targetItemsLength = 2;
-
-	            // Act
+				 
+	            // Act								
 	        	mockContext(function(){
 	        		mockCreateComponentsForIndexFromServer(function(){
 	        			actual = targetHelper.createRealBodyServer(targetCmp, true);
 	        		});
 	        	});
-
+	        	
 				// Assert
-	            Assert.Equal(expected, actual);
+	            Assert.Equal(expected, actual);            
 	        }
     	}
     }
-
+    
     [Fixture, Skip("JBUCH: HALO: THESE TESTS NEED RETHINKING")]
-    function createSelectiveComponentsForIndex(){
-
+    function createSelectiveComponentsForIndex(){    	    	    	        
+    	                        
         [Fact]
         function testExpressionServiceCreate(){
-        	// Arrange
+        	// Arrange         	                      	
         	var expected = true;
         	var actual;
-
+        	
         	var targetBody={
     			getLength:function(){
     				return 0;
     			}
         	};
-
+        	        	        	       
         	var targetAttributes={
         		get:function(att){
         			if(att=="var") return "var";
-        			if(att=="indexVar") return 1;
+        			if(att=="indexVar") return 1;        			
         		},
         		getValue:function(att){
         			if(att=="body") return targetBody;
         			if(att=="forceServer"){
 	        			return {
-	        				getValue:function(){
+	        				getValue:function(){					
 								return 'forceServer';
 							}
 						};
@@ -1879,59 +1879,59 @@ Test.Aura.Iteration.HelperTest = function(){
         		getValueProvider:function(){
         			return '';
         		}
-        	};
-
+        	};        	        	        	        	
+        	
         	var targetCmp={
     			_currentSelectiveBodyCollector:'',
     			getAttributes:function(){
 					return targetAttributes;
-				}
+				}		        			
         	};
-
+        	
         	var targetItems={
     			getValue:function(index){
 					return 'Some Value';
 				},
 				getLength:function(){
     				return 0;
-    			}
+    			}	        			
         	};
-
+        	
         	var targetCallback;
-
-        	var mockContext = Mocks.GetMock(Object.Global(), "$A", {
-        		expressionService: {
+        	
+        	var mockContext = Mocks.GetMock(Object.Global(), "$A", {                                
+        		expressionService: {   
 					create: function(valueProvider, config) {
 						if(valueProvider != null) throw new Error("Wrong valueProvider used");
 						if(config != 0) throw new Error("Wrong config used");
 						actual = true;
-						return 'iv';
-					}
+						return 'iv'; 
+					}					
 	            }
-	        });
-
+	        });												
+			 
             // Act
-
-			mockContext(function(){
+									
+			mockContext(function(){	     
 				targetHelper.createSelectiveComponentsForIndex(targetCmp, targetItems, 0, false, targetCallback);
 			});
-
+						
 			// Assert
             Assert.Equal(expected, actual);
-
+            
         }
-
+        
         [Fixture]
         function testBodyLengthAndAttValueProvider(){
-
-        	var expected;
+        	
+        	var expected;   
         	var actual;
         	var ivpCalled;
-
+        	
         	var targetConfig={
     			valueProvider:'vp'
         	};
-
+        	
         	var targetBodyLength;
         	var targetBody={
     			getLength:function(){
@@ -1943,18 +1943,18 @@ Test.Aura.Iteration.HelperTest = function(){
     				return targetConfig;
     			}
         	};
-
+        	        	        
         	var targetAttributeValueProvider = '';
         	var targetAttributes={
         		get:function(att){
         			if(att=="var") return 'var';
-        			if(att=="indexVar") return false;
+        			if(att=="indexVar") return false;        			
         		},
         		getValue:function(att){
         			if(att=="body") return targetBody;
         			if(att=="forceServer"){
 	        			return {
-	        				getValue:function(){
+	        				getValue:function(){					
 								return 'forceServer';
 							}
 						};
@@ -1963,14 +1963,14 @@ Test.Aura.Iteration.HelperTest = function(){
         		getValueProvider:function(){
         			return targetAttributeValueProvider;
         		}
-        	};
-
+        	};        	        	        	        	
+        	
         	var targetCmp={
     			getAttributes:function(){
 					return targetAttributes;
-				}
+				}		        			
         	};
-
+        	
         	var targetItemsLength;
         	var targetItems={
     			getValue:function(index){
@@ -1981,91 +1981,91 @@ Test.Aura.Iteration.HelperTest = function(){
 				    return targetItemsLength;
 				}
         	};
-
+        	
         	var targetCallback;
-
-        	var mockContext = Mocks.GetMock(Object.Global(), "$A", {
-        		expressionService: {
-        			createPassthroughValue: function(primaryProviders, cmp) {
-        				if(primaryProviders['var'] != 'Some Value') throw new Error("Wrong primaryProviders used");
+        	
+        	var mockContext = Mocks.GetMock(Object.Global(), "$A", {                                
+        		expressionService: {   
+        			createPassthroughValue: function(primaryProviders, cmp) { 
+        				if(primaryProviders['var'] != 'Some Value') throw new Error("Wrong primaryProviders used");        				
     					if(cmp != 'vp') throw new Error("Wrong cmp used");
-
+    					
     					ivpCalled += 1;
-        				return 'ivp';
-    				}
+        				return 'ivp'; 
+    				}					
 	            },
-	            componentService: {
-	            	newComponentAsync: function(callbackScope, callback, config, attributeValueProvider, localCreation, doForce, forceServer) {
-	            		if(callback != 'callback') throw new Error("Wrong Callback used");
+	            componentService: {   
+	            	newComponentAsync: function(callbackScope, callback, config, attributeValueProvider, localCreation, doForce, forceServer) { 
+	            		if(callback != 'callback') throw new Error("Wrong Callback used");   
 	            		if(config != targetConfig) throw new Error("Wrong Config used");
 	            		if(attributeValueProvider != 'ivp') throw new Error("Wrong AttributeValueProvider used");
 	            		if(localCreation != false) throw new Error("Wrong localCreation used");
 	            		if(doForce != false) throw new Error("Wrong doForce used"); // TODO fix this
-	            		if(forceServer != 'forceServer') throw new Error("Wrong forceServer used");
-
+	            		if(forceServer != 'forceServer') throw new Error("Wrong forceServer used"); 
+	            		
 	            		actual += 1;
-        			}
+        			}					
 	            },
 	            setCreationPathIndex:function(index){
 	            	if(targetBody.getLength() == 1 && index != 0) throw new Error("Wrong index used in setCreationPathIndex()");
 	            	if(targetBody.getLength() == 2 && (index != 0 && index != 1)) throw new Error("Wrong index used in setCreationPathIndex()");
 	            }
-	        });
-
+	        });		
+	        
 	        var mark = "_currentSelectiveBodyCollector" + "timestamp";
-
-        	var mockMethod = Mocks.GetMock(targetHelper, "createSelectiveComponentsCallback", function(selectiveBodyCollector, index){
+        	
+        	var mockMethod = Mocks.GetMock(targetHelper, "createSelectiveComponentsCallback", function(selectiveBodyCollector, index){       
         		if(selectiveBodyCollector.realBodyList.length != 0) throw new Error("Wrong selectiveBodyCollector.realBodyList used");
         		if(selectiveBodyCollector.count != targetBody.getLength()) throw new Error("Wrong selectiveBodyCollector.count used");
         		if(selectiveBodyCollector.cmp != targetCmp) throw new Error("Wrong selectiveBodyCollector.cmp used");
-        		if(selectiveBodyCollector.callback != targetCallback) throw new Error("Wrong selectiveBodyCollector.callback used");
+        		if(selectiveBodyCollector.callback != targetCallback) throw new Error("Wrong selectiveBodyCollector.callback used");        		
         		if(targetBody.getLength() == 1 && index != 0) throw new Error("Wrong index used in createSelectiveComponentsCallback()");
             	if(targetBody.getLength() == 2 && (index != 0 && index != 1)) throw new Error("Wrong index used in createSelectiveComponentsCallback()");
-            	targetCmp[mark] = selectiveBodyCollector;
-        		return 'callback';
-        	});
-
+            	targetCmp[mark] = selectiveBodyCollector;   		        		
+        		return 'callback';    		
+        	});	 
+        	
         	[Fact]
 	        function testBodyLengthZero(){
-	        	// Arrange
-	        	expected = 0;
+	        	// Arrange 
+	        	expected = 0;   
 	        	actual = 0;
 	        	ivpCalled = 0;
-
+	        	
 	        	targetBodyLength = 0;
 	        	targetItemsLength = 0;
-
-	            // Act
+				 
+	            // Act								
 				mockContext(function(){
 					mockMethod(function(){
 						targetHelper.createSelectiveComponentsForIndex(targetCmp, targetItems, 0, false, targetCallback);
 					});
 				});
-
+				
 				// Assert
 				Assert.Equal(expected, actual);
 				Assert.Equal(0, ivpCalled);
 				Assert.Equal(undefined, targetCmp[mark]);
-
-	        }
-
+	            
+	        }  
+        
 	        [Fact]
 	        function testBodyLengthOne(){
-	        	// Arrange
-	        	expected = 1;
+	        	// Arrange 
+	        	expected = 1;   
 	        	actual = 0;
 	        	ivpCalled = 0;
-
+	        	
 	        	targetBodyLength = 1;
 	        	targetItemsLength = 1;
-
-	            // Act
+				 
+	            // Act								
 				mockContext(function(){
 					mockMethod(function(){
 						targetHelper.createSelectiveComponentsForIndex(targetCmp, targetItems, 0, false, targetCallback);
 					});
 				});
-
+				
 				// Assert
 				Assert.Equal(expected, actual);
 				Assert.Equal(1, ivpCalled);
@@ -2073,56 +2073,56 @@ Test.Aura.Iteration.HelperTest = function(){
 	            Assert.Equal(targetBody.getLength(), targetCmp[mark].count);
 	            Assert.Equal(targetCmp, targetCmp[mark].cmp);
 	            Assert.Equal(targetCallback, targetCmp[mark].callback);
-	        }
-
+	        }      
+	        
 	        [Fact]
 	        function testBodyLengthTwo(){
-	        	// Arrange
-	        	expected = 2;
+	        	// Arrange 
+	        	expected = 2;   
 	        	actual = 0;
-	        	ivpCalled = 0;
-
+	        	ivpCalled = 0;    
+	        	
 	        	targetBodyLength = 2;
 	        	targetItemsLength = 2;
-
-	            // Act
+				 
+	            // Act								
 				mockContext(function(){
 					mockMethod(function(){
 						targetHelper.createSelectiveComponentsForIndex(targetCmp, targetItems, 0, false, targetCallback);
 					});
 				});
-
+				
 				// Assert
 				Assert.Equal(expected, actual);
-				Assert.Equal(1, ivpCalled);
+				Assert.Equal(1, ivpCalled);			
 				Assert.Equal([], targetCmp[mark].realBodyList);
 	            Assert.Equal(targetBody.getLength(), targetCmp[mark].count);
 	            Assert.Equal(targetCmp, targetCmp[mark].cmp);
 	            Assert.Equal(targetCallback, targetCmp[mark].callback);
-	        }
-
+	        }        
+        
 	        [Fact]
 	        function testOneAttValueProvider(){
-	        	// Arrange
-	        	expected = 1;
+	        	// Arrange 
+	        	expected = 1;   
 	        	actual = 0;
 	        	ivpCalled = 0;
 	        	targetBodyLength = 1;
 	        	targetItemsLength = 1;
-
+	        	
 	        	targetConfig={
 	    			valueProvider:undefined
 	        	};
-
-	        	targetAttributeValueProvider = 'vp';
-
-	            // Act
+	        	
+	        	targetAttributeValueProvider = 'vp';        	        	
+				 
+	            // Act								
 				mockContext(function(){
 					mockMethod(function(){
 						targetHelper.createSelectiveComponentsForIndex(targetCmp, targetItems, 0, false, targetCallback);
 					});
 				});
-
+				
 				// Assert
 				Assert.Equal(expected, actual);
 				Assert.Equal(1, ivpCalled);
@@ -2131,29 +2131,29 @@ Test.Aura.Iteration.HelperTest = function(){
 	            Assert.Equal(targetCmp, targetCmp[mark].cmp);
 	            Assert.Equal(targetCallback, targetCmp[mark].callback);
 	        }
-
+	        
 	        [Fact]
 	        function testTwoAttValueProvider(){
-	        	// Arrange
-	        	expected = 2;
+	        	// Arrange 
+	        	expected = 2;   
 	        	actual = 0;
 	        	ivpCalled = 0;
 	        	targetBodyLength = 2;
 	        	targetItemsLength = 2;
-
+	        	
 	        	targetConfig={
 	    			valueProvider:undefined
 	        	};
-
-	        	targetAttributeValueProvider = 'vp';
-
-	            // Act
+	        	
+	        	targetAttributeValueProvider = 'vp';        	        	
+				 
+	            // Act								
 				mockContext(function(){
 					mockMethod(function(){
 						targetHelper.createSelectiveComponentsForIndex(targetCmp, targetItems, 0, false, targetCallback);
 					});
 				});
-
+				
 				// Assert
 				Assert.Equal(expected, actual);
 				Assert.Equal(1, ivpCalled);
@@ -2163,107 +2163,107 @@ Test.Aura.Iteration.HelperTest = function(){
 	            Assert.Equal(targetCallback, targetCmp[mark].callback);
 	        }
         }
-
+                
     }
-
+    
     [Fixture]
-    function createSelectiveComponentsCallback(){
-
+    function createSelectiveComponentsCallback(){    	    	    	        
+    	                        
     	[Fact]
         function callbackNotSet(){
-        	// Arrange
+        	// Arrange                	
         	var expected = '123';
-
+        	
         	var targetBodyCollector={
-    			realBodyList:[],
+    			realBodyList:[],	
     			count:0,
     			callback:''
-        	};
-
+        	};        	        	
+        	
         	// Act
 			var callback = targetHelper.createSelectiveComponentsCallback(targetBodyCollector, 0);
 			callback(expected);
-
+			
 			// Assert
 			Assert.Equal(expected, targetBodyCollector.realBodyList[0]);
 			Assert.Equal('', targetBodyCollector.callback);
         }
-
+    	
     	[Fact]
         function callbackCalledRealBodyLengthOne(){
-    		// Arrange
+    		// Arrange 
         	var expected = ['123'];
-        	var actual = '';
-
+        	var actual = ''; 
+        	
         	var newCmp = '123';
-
+        	
         	var targetBodyCollector={
     			realBodyList:[],
     			count:1,
     			callback:function(val){
     				if(val[0] != '123') throw new Error("Wrong val used");
     				actual=expected;
-    			},
+    			},    			    			
     			cmp:{
     				__currentSelectiveBodyCollector:''
     			},
     			timestamp: "timestamp"
-        	};
-
+        	};   
+        	
         	targetBodyCollector.cmp["_currentSelectiveBodyCollector" + "timestamp"] = targetBodyCollector;
-
+        	
         	// Act
         	var callback = targetHelper.createSelectiveComponentsCallback(targetBodyCollector, 0);
 			callback(newCmp);
-
+			
 			// Assert
 			Assert.Equal(newCmp, targetBodyCollector.realBodyList[0]);
-			Assert.Equal(expected, actual);
-        }
-
+			Assert.Equal(expected, actual);  
+        }    
+    	
     	[Fact]
         function callbackCalledRealBodyLengthTwo(){
-        	// Arrange
+        	// Arrange 
         	var expected = ['123','456'];
-        	var actual = '';
-
+        	var actual = '';    
+        	
         	var newCmp = '456';
-
+        	
         	var targetBodyCollector={
     			realBodyList:['123'],
     			count:1,
     			callback:function(val){
     				if(val[0] != '123' && val[1] != '456') throw new Error("Wrong val used");
     				actual=expected;
-    			},
+    			},    			    			
     			cmp:{
     				__currentSelectiveBodyCollector:''
     			},
     			timestamp: "timestamp"
-        	};
-
+        	};   
+        	
         	targetBodyCollector.cmp["_currentSelectiveBodyCollector" + "timestamp"] = targetBodyCollector;
-
+        	
         	// Act
         	var callback = targetHelper.createSelectiveComponentsCallback(targetBodyCollector, 1);
 			callback(newCmp);
-
+			
 			// Assert
 			Assert.Equal(newCmp, targetBodyCollector.realBodyList[1]);
-			Assert.Equal(expected, actual);
-        }
+			Assert.Equal(expected, actual);           
+        }    
     }
-
-
+    
+    
     [Fixture]
-    function rerenderEverything(){
-
+    function rerenderEverything(){    	    	    	        
+    	                        
     	[Fact]
         function cmpInvalid(){
-        	// Arrange
+        	// Arrange                	
         	var expected = false;
-        	var actual = false;
-
+        	var actual = false;        	        	
+        	
         	var targetCmp={
     			isValid:function(){
     				return false;
@@ -2271,38 +2271,38 @@ Test.Aura.Iteration.HelperTest = function(){
     			getValue:function(att){
     				actual = true;
     			}
-        	};
-
-        	var mockMethod = Mocks.GetMock(targetHelper, "createRealBody", function(cmp, doForce, callback){
+        	};   
+        	
+        	var mockMethod = Mocks.GetMock(targetHelper, "createRealBody", function(cmp, doForce, callback){       
         		if(cmp != targetCmp) throw new Error("Wrong cmp used");
-        		if(doForce != false) throw new Error("Wrong doForce used");
-        	});
-
+        		if(doForce != false) throw new Error("Wrong doForce used");             		        		   
+        	});	
+        	
         	// Act
         	mockMethod(function(){
         		targetHelper.rerenderEverything(targetCmp);
         	});
-
+			
 			// Assert
-			Assert.Equal(expected, actual);
+			Assert.Equal(expected, actual);			
         }
-
+    	
     	[Fact]
         function cmpValid(){
-        	// Arrange
+        	// Arrange                	
         	var expected = true;
         	var actual = false;
-
+        	
         	var destroyCalled;
         	var eventCalled;
         	var setBodyCalled;
-
+        	
         	var targetEvent={
     			fire:function(){
     				eventCalled = true;
     			}
         	};
-
+        	
         	var targetBody={
     			destroy:function(){
     				destroyCalled = true;
@@ -2312,7 +2312,7 @@ Test.Aura.Iteration.HelperTest = function(){
     				setBodyCalled = true;
     			}
         	};
-
+        	
         	var targetCmp={
     			isValid:function(){
     				return true;
@@ -2323,106 +2323,106 @@ Test.Aura.Iteration.HelperTest = function(){
     			getEvent:function(ev){
     				if(ev == 'rerenderComplete') return targetEvent;
     			}
-        	};
-
-        	var mockMethod = Mocks.GetMock(targetHelper, "createRealBody", function(cmp, doForce, callback){
+        	};   
+        	
+        	var mockMethod = Mocks.GetMock(targetHelper, "createRealBody", function(cmp, doForce, callback){       
         		if(cmp != targetCmp) throw new Error("Wrong cmp used");
-        		if(doForce != false) throw new Error("Wrong doForce used");
-
+        		if(doForce != false) throw new Error("Wrong doForce used");   
+        		
         		callback('new');
         		actual = true;
-        	});
-
+        	});	
+        	
         	// Act
         	mockMethod(function(){
         		targetHelper.rerenderEverything(targetCmp);
         	});
-
+			
 			// Assert
-			Assert.Equal(expected, actual);
+			Assert.Equal(expected, actual);	
 			Assert.Equal(true, destroyCalled);
 			Assert.Equal(true, setBodyCalled);
 			Assert.Equal(true, eventCalled);
         }
     }
-
+        
     [Fixture]
-    function rerenderSelective(){
-
+    function rerenderSelective(){    	    	    	        
+    	                        
     	[Fact]
         function realBodyIsEmpty(){
-        	// Arrange
+        	// Arrange                	
         	var expected = true;
-        	var actual = false;
-
-        	var targetItems={
+        	var actual = false;    
+        	
+        	var targetItems={    					        			
         	};
-
+        	
         	var targetRealBody={
     			isEmpty:function(){
 					return true;
-				}
+				}		        			
         	};
-
+        	
         	var targetBody={
     			getLength:function(){
 					return 0;
-				}
-        	};
-
-        	var targetAttributes={
+				}		        			
+        	};  
+        	
+        	var targetAttributes={        		
         		getValue:function(att){
         			if(att=="items") return targetItems;
-        			if(att=="realbody") return targetRealBody;
-        			if(att=="body") return targetBody;
+        			if(att=="realbody") return targetRealBody; 
+        			if(att=="body") return targetBody;        			
         		}
-        	};
-
+        	};        	        	        	        	
+        	
         	var targetCmp={
     			getAttributes:function(){
 					return targetAttributes;
-				}
-        	};
-
-        	var mockGetStart = Mocks.GetMock(targetHelper, "getStart", function(cmp){
-        		if(cmp != targetCmp) throw new Error("Wrong cmp used");
-        		return 0;
-        	});
-
-        	var mockGetEnd = Mocks.GetMock(targetHelper, "getEnd", function(cmp){
-        		if(cmp != targetCmp) throw new Error("Wrong cmp used");
-        		return 0;
-        	});
-
-
-        	var mockRerenderEverything = Mocks.GetMock(targetHelper, "rerenderEverything", function(cmp){
-        		if(cmp != targetCmp) throw new Error("Wrong cmp used");
-
+				}		        			
+        	};        	        
+        	        	        	        	
+        	var mockGetStart = Mocks.GetMock(targetHelper, "getStart", function(cmp){       
+        		if(cmp != targetCmp) throw new Error("Wrong cmp used");        		        		      		        		
+        		return 0;    		
+        	});	
+        	
+        	var mockGetEnd = Mocks.GetMock(targetHelper, "getEnd", function(cmp){       
+        		if(cmp != targetCmp) throw new Error("Wrong cmp used");        		        		      		        		
+        		return 0;    		
+        	});	
+    			 
+        	
+        	var mockRerenderEverything = Mocks.GetMock(targetHelper, "rerenderEverything", function(cmp){       
+        		if(cmp != targetCmp) throw new Error("Wrong cmp used");  
+        		
         		actual = true;
-        	});
-
+        	});	
+        	
         	// Act
         	mockRerenderEverything(function(){
         		mockGetEnd(function(){
-        			mockGetStart(function(){
+        			mockGetStart(function(){        		
         				targetHelper.rerenderSelective(targetCmp);
         			});
         		});
         	});
-
+			
 			// Assert
-			Assert.Equal(expected, actual);
-        }
-
+			Assert.Equal(expected, actual);			
+        }    	    	
+    	
     	[Fixture]
         function noDiffIndex(){
-
+    		
         	var targetValueProvider={
-    			getValue:function(val){
+    			getValue:function(val){  
         			if(val == 1){
 	    				return {
 	        				unwrap:function(){
-			        			return 1;
+			        			return 1;        			
 			        		}
 	        			};
         			}
@@ -2431,25 +2431,25 @@ Test.Aura.Iteration.HelperTest = function(){
         			}
         		}
         	};
-
+        	
         	var targetBodyCmp={
-        		getAttributes:function(){
+        		getAttributes:function(){  
         			return {
         				getValueProvider:function(){
-		        			return targetValueProvider;
+		        			return targetValueProvider;        			
 		        		}
         			};
         		}
-        	};
-
-        	var targetItems={
+        	};  
+        	
+        	var targetItems={ 
     			getValue:function(index){
     				if(index == 1) return 'data';
     			}
         	};
-
+        	
         	var targetRealBodyLength;
-
+        	
         	var targetRealBody={
     			value:[],
     			push:function(val){
@@ -2465,115 +2465,115 @@ Test.Aura.Iteration.HelperTest = function(){
 					if(index == 0 || index == 1) return targetBodyCmp;
 				}
         	};
-
+        	
         	var targetBody={
     			getLength:function(){
 					return 0;
-				}
-        	};
-
+				}		        			
+        	};  
+        	
         	var targetAttributes={
         		get:function(att){
         			if(att=="var") return "var";
-        			if(att=="indexVar") return 1;
+        			if(att=="indexVar") return 1;        			
         		},
         		getValue:function(att){
         			if(att=="items") return targetItems;
-        			if(att=="realbody") return targetRealBody;
-        			if(att=="body") return targetBody;
+        			if(att=="realbody") return targetRealBody; 
+        			if(att=="body") return targetBody;        			
         		}
-        	};
-
+        	};        	        	        	        	
+        	
         	var targetCmp={
     			getAttributes:function(){
 					return targetAttributes;
 				}
-        	};
-
-        	var mockGetStart = Mocks.GetMock(targetHelper, "getStart", function(cmp){
-        		if(cmp != targetCmp) throw new Error("Wrong cmp used");
-        		return 0;
-        	});
-
-        	var mockGetEnd = Mocks.GetMock(targetHelper, "getEnd", function(cmp){
-        		if(cmp != targetCmp) throw new Error("Wrong cmp used");
-        		return 0;
-        	});
-
-        	var mockCreateNewComponents = Mocks.GetMock(targetHelper, "createNewComponents", function(cmp, callback){
-        		if(cmp != targetCmp) throw new Error("Wrong cmp used in createNewComponents()");
+        	};        	        
+        	        	        	        	
+        	var mockGetStart = Mocks.GetMock(targetHelper, "getStart", function(cmp){       
+        		if(cmp != targetCmp) throw new Error("Wrong cmp used");        		        		      		        		
+        		return 0;    		
+        	});	
+        	
+        	var mockGetEnd = Mocks.GetMock(targetHelper, "getEnd", function(cmp){       
+        		if(cmp != targetCmp) throw new Error("Wrong cmp used");        		        		      		        		
+        		return 0;    		
+        	});	    			         	
+        	
+        	var mockCreateNewComponents = Mocks.GetMock(targetHelper, "createNewComponents", function(cmp, callback){       
+        		if(cmp != targetCmp) throw new Error("Wrong cmp used in createNewComponents()");          		
         		callback(['a','b']);
         	});
-
+        	
         	[Fact]
 	        function testWithRealBodyLengthOne(){
-	        	// Arrange
+	        	// Arrange 	
 	        	targetRealBodyLength = 0;
 	        	targetRealBody.value = [];
-
+	        	
 	        	// Act
 	        	mockCreateNewComponents(function(){
 	        		mockGetEnd(function(){
-	        			mockGetStart(function(){
+	        			mockGetStart(function(){        		
 	        				targetHelper.rerenderSelective(targetCmp);
 	        			});
 	        		});
 	        	});
-
-				// Assert
+				
+				// Assert	
 				Assert.Equal(['a','b'], targetRealBody.value);
 	        }
-
+    		
 	    	[Fact]
 	        function testWithRealBodyLengthOne(){
-	        	// Arrange
+	        	// Arrange	 
 	        	targetRealBodyLength = 1;
 	        	targetRealBody.value = [];
-
+	        	
 	        	// Act
 	        	mockCreateNewComponents(function(){
 	        		mockGetEnd(function(){
-	        			mockGetStart(function(){
+	        			mockGetStart(function(){        		
 	        				targetHelper.rerenderSelective(targetCmp);
 	        			});
 	        		});
 	        	});
-
+				
 				// Assert
 				Assert.Equal(['a','b'], targetRealBody.value);
 	        }
-
+	    	
 	    	[Fact]
 	        function testWithRealBodyLengthTwo(){
 	        	// Arrange
 	        	targetRealBodyLength = 2;
 	        	targetRealBody.value = [];
-
+	        	        		        	
 	        	// Act
 	        	mockCreateNewComponents(function(){
 	        		mockGetEnd(function(){
-	        			mockGetStart(function(){
+	        			mockGetStart(function(){        		
 	        				targetHelper.rerenderSelective(targetCmp);
 	        			});
 	        		});
 	        	});
-
-				// Assert
+				
+				// Assert	
 				Assert.Equal(['a','b'], targetRealBody.value);
 	    	}
         }
-
+    	
     	[Fixture]
     	function invalidDiffIndex(){
-
+    		
         	var targetValueProvider1Data;
-
+        	
         	var targetValueProvider1={
-    			getValue:function(val){
+    			getValue:function(val){  
         			if(val == -1){
 	    				return {
 	        				unwrap:function(){
-			        			return -1;
+			        			return -1;        			
 			        		}
 	        			};
         			}
@@ -2582,23 +2582,23 @@ Test.Aura.Iteration.HelperTest = function(){
         			}
         		}
         	};
-
+        	
         	var targetBodyCmp1={
-        		getAttributes:function(){
+        		getAttributes:function(){  
         			return {
         				getValueProvider:function(){
-		        			return targetValueProvider1;
+		        			return targetValueProvider1;        			
 		        		}
         			};
         		}
-        	};
-
+        	};        	        	
+        	
         	var targetValueProvider2={
-    			getValue:function(val){
+    			getValue:function(val){  
         			if(val == -1){
 	    				return {
 	        				unwrap:function(){
-			        			return -1;
+			        			return -1;        			
 			        		}
 	        			};
         			}
@@ -2607,25 +2607,25 @@ Test.Aura.Iteration.HelperTest = function(){
         			}
         		}
         	};
-
+        	
         	var targetBodyCmp2={
-        		getAttributes:function(){
+        		getAttributes:function(){  
         			return {
         				getValueProvider:function(){
-		        			return targetValueProvider2;
+		        			return targetValueProvider2;        			
 		        		}
         			};
         		}
         	};
-
-        	var targetItems={
+        	
+        	var targetItems={ 
     			getValue:function(index){
     				if(index == -1) return 'data1';
     			}
         	};
-
+        	
         	var targetRealBodyLength;
-
+        	
         	var targetRealBody={
     			value:[],
     			push:function(val){
@@ -2642,96 +2642,96 @@ Test.Aura.Iteration.HelperTest = function(){
 					if(index == 1) return targetBodyCmp2;
 				}
         	};
-
+        	
         	var targetBody={
     			getLength:function(){
 					return 0;
-				}
-        	};
-
+				}		        			
+        	};  
+        	
         	var targetAttributes={
         		get:function(att){
         			if(att=="var") return "var";
-        			if(att=="indexVar") return -1;
+        			if(att=="indexVar") return -1;        			
         		},
         		getValue:function(att){
         			if(att=="items") return targetItems;
-        			if(att=="realbody") return targetRealBody;
-        			if(att=="body") return targetBody;
+        			if(att=="realbody") return targetRealBody; 
+        			if(att=="body") return targetBody;        			
         		}
-        	};
-
+        	};        	        	        	        	
+        	
         	var targetCmp={
     			getAttributes:function(){
 					return targetAttributes;
 				}
-        	};
-
-        	var mockGetStart = Mocks.GetMock(targetHelper, "getStart", function(cmp){
-        		if(cmp != targetCmp) throw new Error("Wrong cmp used");
-        		return 0;
-        	});
-
-        	var mockGetEnd = Mocks.GetMock(targetHelper, "getEnd", function(cmp){
-        		if(cmp != targetCmp) throw new Error("Wrong cmp used");
-        		return 0;
-        	});
-
-        	var mockCreateNewComponents = Mocks.GetMock(targetHelper, "createNewComponents", function(cmp, callback){
-        		if(cmp != targetCmp) throw new Error("Wrong cmp used in createNewComponents()");
+        	};        	        
+        	        	        	        	
+        	var mockGetStart = Mocks.GetMock(targetHelper, "getStart", function(cmp){       
+        		if(cmp != targetCmp) throw new Error("Wrong cmp used");        		        		      		        		
+        		return 0;    		
+        	});	
+        	
+        	var mockGetEnd = Mocks.GetMock(targetHelper, "getEnd", function(cmp){       
+        		if(cmp != targetCmp) throw new Error("Wrong cmp used");        		        		      		        		
+        		return 0;    		
+        	});	    			         	
+        	
+        	var mockCreateNewComponents = Mocks.GetMock(targetHelper, "createNewComponents", function(cmp, callback){       
+        		if(cmp != targetCmp) throw new Error("Wrong cmp used in createNewComponents()");          		
         		callback(['a','b']);
-        	});
-
+        	});	     		
+    	
 	    	[Fact]
 	        function testWithRealBodyLengthOne(){
 	        	// Arrange
 	        	targetValueProvider1Data = 'data';
 	        	targetRealBodyLength = 1;
 	        	targetRealBody.value = [];
-
+	        	
 	        	// Act
 	        	mockCreateNewComponents(function(){
 	        		mockGetEnd(function(){
-	        			mockGetStart(function(){
+	        			mockGetStart(function(){        		
 	        				targetHelper.rerenderSelective(targetCmp);
 	        			});
 	        		});
 	        	});
-
+				
 				// Assert
 				Assert.Equal(['a','b'], targetRealBody.value);
 	        }
-
+	    	
 	    	[Fact]
 	        function testWithRealBodyLengthTwo(){
-	        	// Arrange
+	        	// Arrange  	        	
 	        	targetValueProvider1Data = 'data1';
 	        	targetRealBodyLength = 2;
 	        	targetRealBody.value = [];
-
+	        	
 	        	// Act
 	        	mockCreateNewComponents(function(){
 	        		mockGetEnd(function(){
-	        			mockGetStart(function(){
+	        			mockGetStart(function(){        		
 	        				targetHelper.rerenderSelective(targetCmp);
 	        			});
 	        		});
 	        	});
-
-				// Assert
+				
+				// Assert	
 				Assert.Equal(['a','b'], targetRealBody.value);
 	        }
     	}
-
+    	
     	[Fixture]
         function validDiffIndexNextItemDifferent(){
-
+    		
         	var targetValueProvider={
-    			getValue:function(val){
+    			getValue:function(val){  
         			if(val == 1){
 	    				return {
 	        				unwrap:function(){
-			        			return 1;
+			        			return 1;        			
 			        		}
 	        			};
         			}
@@ -2740,33 +2740,33 @@ Test.Aura.Iteration.HelperTest = function(){
         			}
         		}
         	};
-
+        	
         	var targetBodyCmp={
-        		getAttributes:function(){
+        		getAttributes:function(){  
         			return {
         				getValueProvider:function(){
-		        			return targetValueProvider;
+		        			return targetValueProvider;        			
 		        		}
         			};
         		}
-        	};
-
-        	var targetItems={
+        	};  
+        	
+        	var targetItems={ 
     			getValue:function(index){
     				if(index == 1) return 'data1';
     				if(index == 2) return 'data2';
     			}
         	};
-
+        	        	
         	var targetRealBodyList = [];
-
-        	var targetRealBody={
+        	
+        	var targetRealBody={    
     			value:[],
     			push:function(val){
-    				this.value.push(val);
+    				this.unwrap().push(val);
     			},
     			isEmpty:function(){
-					return false;
+					return this.unwrap().length === 0;
 				},
 				getLength:function(){
 					return this.unwrap().length;
@@ -2777,117 +2777,116 @@ Test.Aura.Iteration.HelperTest = function(){
 				unwrap:function(){
 					return targetRealBodyList;
 				},
-				setValue:function(val){
-    				if(val != 'a') throw new Error("Wrong val used in targetRealBody.setValue()");
-    				this.value = val;
+				remove: function(i, len) {
+					return this.unwrap().splice(i, len);
     			}
         	};
-
+        	
         	var targetBodyLength;
         	var targetBody={
     			getLength:function(){
 					return targetBodyLength;
-				}
-        	};
-
+				}		        			
+        	};  
+        	
         	var targetAttributes={
         		get:function(att){
         			if(att=="var") return "var";
-        			if(att=="indexVar") return 1;
+        			if(att=="indexVar") return 1;        			
         		},
         		getValue:function(att){
         			if(att=="items") return targetItems;
-        			if(att=="realbody") return targetRealBody;
-        			if(att=="body") return targetBody;
+        			if(att=="realbody") return targetRealBody; 
+        			if(att=="body") return targetBody;        			
         		}
-        	};
-
+        	};        	        	        	        	
+        	
         	var targetCmp={
     			getAttributes:function(){
 					return targetAttributes;
 				}
-        	};
-
-        	var mockGetStart = Mocks.GetMock(targetHelper, "getStart", function(cmp){
-        		if(cmp != targetCmp) throw new Error("Wrong cmp used");
-        		return 0;
-        	});
-
-        	var mockGetEnd = Mocks.GetMock(targetHelper, "getEnd", function(cmp){
-        		if(cmp != targetCmp) throw new Error("Wrong cmp used");
-        		return 0;
-        	});
-
-        	var mockIncrementIndices = Mocks.GetMock(targetHelper, "incrementIndices", function(cmpArray, start, indexVar, change, bodyLen){
+        	};        	        
+        	        	        	        	
+        	var mockGetStart = Mocks.GetMock(targetHelper, "getStart", function(cmp){       
+        		if(cmp != targetCmp) throw new Error("Wrong cmp used");        		        		      		        		
+        		return 0;    		
+        	});	
+        	
+        	var mockGetEnd = Mocks.GetMock(targetHelper, "getEnd", function(cmp){       
+        		if(cmp != targetCmp) throw new Error("Wrong cmp used");        		        		      		        		
+        		return 0;    		
+        	});	 
+        	
+        	var mockIncrementIndices = Mocks.GetMock(targetHelper, "incrementIndices", function(cmpArray, start, indexVar, change, bodyLen){       
         		if(cmpArray != 'a') throw new Error("Wrong cmpArray used");
         		if(start != 0) throw new Error("Wrong start used");
         		if(indexVar != 1) throw new Error("Wrong indexVar used");
         		if(change != -1) throw new Error("Wrong change used");
         		if(bodyLen != targetBody.getLength()) throw new Error("Wrong bodyLen used");
-        	});
-
-        	var mockCreateNewComponents = Mocks.GetMock(targetHelper, "createNewComponents", function(cmp, callback){
-        		if(cmp != targetCmp) throw new Error("Wrong cmp used in createNewComponents()");
+        	});	
+        	
+        	var mockCreateNewComponents = Mocks.GetMock(targetHelper, "createNewComponents", function(cmp, callback){       
+        		if(cmp != targetCmp) throw new Error("Wrong cmp used in createNewComponents()");          		
         		callback(['b','c']);
         	});
-
+    	    	
 			[Fact]
 	        function testBodyLengthZero(){
-	        	// Arrange
-	        	targetRealBodyList = ['a'];
+	        	// Arrange  	
+	        	targetRealBodyList.push('a');
 	        	targetBodyLength = 0;
-
+	        	
 	        	// Act
 	        	mockCreateNewComponents(function(){
 		        	mockIncrementIndices(function(){
 		        		mockGetEnd(function(){
-		        			mockGetStart(function(){
+		        			mockGetStart(function(){        		
 		        				targetHelper.rerenderSelective(targetCmp);
 		        			});
 		        		});
 		        	});
 	        	});
-
+				
 				// Assert
-				Assert.Equal(['a', 'b','c'], targetRealBody.value);
+				Assert.Equal(['a', 'b','c'], targetRealBodyList);
 	        }
-
+    	
 	    	[Fact]
 	        function validDiffIndexNextItemDifferentBodyLengthOne(){
 	        	// Arrange
 	        	var targetObj={
-	    			destroy:function(){
+	    			destroy:function(){					
 					}
-	        	};
-
-	        	targetRealBodyList = [targetObj, 'a'];
+	        	}; 
+	        		        	
+	        	targetRealBodyList = [targetObj, 'a'];	        		        	        	        		        		        
 	        	targetBodyLength = 1;
-
+	        	        	
 	        	// Act
 	        	mockCreateNewComponents(function(){
 		        	mockIncrementIndices(function(){
 		        		mockGetEnd(function(){
-		        			mockGetStart(function(){
+		        			mockGetStart(function(){        		
 		        				targetHelper.rerenderSelective(targetCmp);
 		        			});
 		        		});
 		        	});
 	        	});
-
+				
 				// Assert
-				Assert.Equal(['a','b','c'], targetRealBody.value);
+				Assert.Equal(['a','b','c'], targetRealBodyList);
 	        }
     	}
-
+        	
     	[Fixture]
     	function validDiffIndexNextItemSame(){
-
+    		
         	var targetValueProvider={
-    			getValue:function(val){
+    			getValue:function(val){  
         			if(val == 1){
 	    				return {
 	        				unwrap:function(){
-			        			return 1;
+			        			return 1;        			
 			        		}
 	        			};
         			}
@@ -2896,25 +2895,25 @@ Test.Aura.Iteration.HelperTest = function(){
         			}
         		}
         	};
-
+        	
         	var targetBodyCmp={
-        		getAttributes:function(){
+        		getAttributes:function(){  
         			return {
         				getValueProvider:function(){
-		        			return targetValueProvider;
+		        			return targetValueProvider;        			
 		        		}
         			};
         		}
-        	};
-
-        	var targetItems={
+        	};  
+        	        	
+        	var targetItems={ 
     			getValue:function(index){
     				if(index == 1) return "data1";
     				if(index == 2) return "data";
     			}
         	};
-
-        	var targetRealBody={
+        	
+        	var targetRealBody={    
     			value:[],
     			isEmpty:function(){
 					return false;
@@ -2928,88 +2927,88 @@ Test.Aura.Iteration.HelperTest = function(){
 				unwrap:function(){
 					return ['1'];
 				},
-				setValue:function(val){
+				setValue:function(val){					
     				if(val[0] != '0' || val[1] != '1') throw new Error("Wrong val used");
     				this.value = val;
     			}
         	};
-
+        	
         	var targetBody={
     			getLength:function(){
 					return 0;
-				}
-        	};
-
+				}		        			
+        	};  
+        	
         	var targetAttributes={
         		get:function(att){
         			if(att=="var") return "var";
-        			if(att=="indexVar") return 1;
+        			if(att=="indexVar") return 1;        			
         		},
         		getValue:function(att){
         			if(att=="items") return targetItems;
-        			if(att=="realbody") return targetRealBody;
-        			if(att=="body") return targetBody;
+        			if(att=="realbody") return targetRealBody; 
+        			if(att=="body") return targetBody;        			
         		}
-        	};
-
+        	};        	        	        	        	
+        	
         	var targetCmp={
     			getAttributes:function(){
 					return targetAttributes;
 				}
-        	};
-
-        	var mockGetStart = Mocks.GetMock(targetHelper, "getStart", function(cmp){
-        		if(cmp != targetCmp) throw new Error("Wrong cmp used");
-        		return 0;
-        	});
-
-        	var mockGetEnd = Mocks.GetMock(targetHelper, "getEnd", function(cmp){
-        		if(cmp != targetCmp) throw new Error("Wrong cmp used");
-        		return 3;
-        	});
-
-        	var mockIncrementIndices = Mocks.GetMock(targetHelper, "incrementIndices", function(cmpArray, start, indexVar, change, bodyLen){
+        	};        	        
+        	        	        	        	
+        	var mockGetStart = Mocks.GetMock(targetHelper, "getStart", function(cmp){       
+        		if(cmp != targetCmp) throw new Error("Wrong cmp used");        		        		      		        		
+        		return 0;    		
+        	});	
+        	
+        	var mockGetEnd = Mocks.GetMock(targetHelper, "getEnd", function(cmp){       
+        		if(cmp != targetCmp) throw new Error("Wrong cmp used");        		        		      		        		
+        		return 3;    		
+        	});	 
+        	
+        	var mockIncrementIndices = Mocks.GetMock(targetHelper, "incrementIndices", function(cmpArray, start, indexVar, change, bodyLen){       
         		if(cmpArray.length == 1 && cmpArray[0] != '1') throw new Error("Wrong cmpArray used");
         		if(cmpArray.length == 2 && (cmpArray[0] != '1' && cmpArray[1] != '2')) throw new Error("Wrong cmpArray used");
         		if(start != 0) throw new Error("Wrong start used");
         		if(indexVar != 1) throw new Error("Wrong indexVar used");
         		if(change != 1) throw new Error("Wrong change used");
         		if(bodyLen != 0) throw new Error("Wrong bodyLen used");
-
-        	});
-
-        	var mockCreateSelectiveComponentsForIndex = Mocks.GetMock(targetHelper, "createSelectiveComponentsForIndex", function(cmp, items, index, doForce, callback){
-        		if(cmp != targetCmp) throw new Error("Wrong cmp used in createSelectiveComponentsForIndex()");
+        		        		
+        	});	
+        	
+        	var mockCreateSelectiveComponentsForIndex = Mocks.GetMock(targetHelper, "createSelectiveComponentsForIndex", function(cmp, items, index, doForce, callback){       
+        		if(cmp != targetCmp) throw new Error("Wrong cmp used in createSelectiveComponentsForIndex()");  
         		if(items != targetItems) throw new Error("Wrong items used in createSelectiveComponentsForIndex()");
         		if(index != 1) throw new Error("Wrong index used in createSelectiveComponentsForIndex()");
-        		if(doForce != false) throw new Error("Wrong doForce used in createSelectiveComponentsForIndex()");
-
+        		if(doForce != false) throw new Error("Wrong doForce used in createSelectiveComponentsForIndex()");        		        		
+        		
         		callback(['0']);
-        	});
-
+        	});	 
+    	    		
 	    	[Fact]
 	        function testRealBodyLengthOne(){
-	        	// Arrange
-
+	        	// Arrange                	
+	    		
 	        	// Act
 	        	mockCreateSelectiveComponentsForIndex(function(){
 		        	mockIncrementIndices(function(){
 		        		mockGetEnd(function(){
-		        			mockGetStart(function(){
+		        			mockGetStart(function(){        		
 		        				targetHelper.rerenderSelective(targetCmp);
 		        			});
 		        		});
 		        	});
 	        	});
-
+				
 				// Assert
 				Assert.Equal(['0','1'], targetRealBody.value);
 	        }
-
+    	
 	    	[Fact]
 	        function testRealBodyLengthTwo(){
 	        	// Arrange
-	        	targetRealBody={
+	        	targetRealBody={    
         			value:[],
         			isEmpty:function(){
     					return false;
@@ -3023,42 +3022,42 @@ Test.Aura.Iteration.HelperTest = function(){
     				unwrap:function(){
     					return ['1', '2'];
     				},
-    				setValue:function(val){
+    				setValue:function(val){					
         				if(val[0] != '0' || val[1] != '1' || val[2] != '2') throw new Error("Wrong val used");
         				this.value = val;
         			}
             	};
-
+	        	
 	        	// Act
 	        	mockCreateSelectiveComponentsForIndex(function(){
 		        	mockIncrementIndices(function(){
 		        		mockGetEnd(function(){
-		        			mockGetStart(function(){
+		        			mockGetStart(function(){        		
 		        				targetHelper.rerenderSelective(targetCmp);
 		        			});
 		        		});
 		        	});
 	        	});
-
+				
 				// Assert
 				Assert.Equal(['0','1', '2'], targetRealBody.value);
 	        }
     	}
-
+    
     	[Fixture]
         function validDiffIndexNextItemSameExtras(){
-    		// Arrange
+    		// Arrange 
         	var targetObj={
-    			destroy:function(){
+    			destroy:function(){					
 				}
-        	};
-
+        	}; 
+        	
         	var targetValueProvider={
-    			getValue:function(val){
+    			getValue:function(val){  
         			if(val == 1){
 	    				return {
 	        				unwrap:function(){
-			        			return 1;
+			        			return 1;        			
 			        		}
 	        			};
         			}
@@ -3067,25 +3066,25 @@ Test.Aura.Iteration.HelperTest = function(){
         			}
         		}
         	};
-
+        	
         	var targetBodyCmp={
-        		getAttributes:function(){
+        		getAttributes:function(){  
         			return {
         				getValueProvider:function(){
-		        			return targetValueProvider;
+		        			return targetValueProvider;        			
 		        		}
         			};
         		}
-        	};
-
-        	var targetItems={
+        	};  
+        	
+        	var targetItems={ 
     			getValue:function(index){
     				if(index == 1) return "data1";
     				if(index == 2) return "data";
     			}
         	};
-
-        	var targetRealBody={
+        	
+        	var targetRealBody={    
     			value:[],
     			isEmpty:function(){
 					return false;
@@ -3104,83 +3103,83 @@ Test.Aura.Iteration.HelperTest = function(){
     				this.value = val;
     			}
         	};
-
+        	
         	var targetBody={
     			getLength:function(){
 					return 1;
-				}
-        	};
-
+				}		        			
+        	};  
+        	
         	var targetAttributes={
         		get:function(att){
         			if(att=="var") return "var";
-        			if(att=="indexVar") return 1;
+        			if(att=="indexVar") return 1;        			
         		},
         		getValue:function(att){
         			if(att=="items") return targetItems;
-        			if(att=="realbody") return targetRealBody;
-        			if(att=="body") return targetBody;
+        			if(att=="realbody") return targetRealBody; 
+        			if(att=="body") return targetBody;        			
         		}
-        	};
-
+        	};        	        	        	        	
+        	
         	var targetCmp={
     			getAttributes:function(){
 					return targetAttributes;
 				}
-        	};
-
-        	var mockGetStart = Mocks.GetMock(targetHelper, "getStart", function(cmp){
-        		if(cmp != targetCmp) throw new Error("Wrong cmp used");
-        		return 0;
-        	});
-
-        	var mockGetEnd = Mocks.GetMock(targetHelper, "getEnd", function(cmp){
-        		if(cmp != targetCmp) throw new Error("Wrong cmp used");
-        		return 1;
-        	});
-
-        	var mockIncrementIndices = Mocks.GetMock(targetHelper, "incrementIndices", function(cmpArray, start, indexVar, change, bodyLen){
+        	};        	        
+        	        	        	        	
+        	var mockGetStart = Mocks.GetMock(targetHelper, "getStart", function(cmp){       
+        		if(cmp != targetCmp) throw new Error("Wrong cmp used");        		        		      		        		
+        		return 0;    		
+        	});	
+        	
+        	var mockGetEnd = Mocks.GetMock(targetHelper, "getEnd", function(cmp){       
+        		if(cmp != targetCmp) throw new Error("Wrong cmp used");        		        		      		        		
+        		return 1;    		
+        	});	 
+        	
+        	var mockIncrementIndices = Mocks.GetMock(targetHelper, "incrementIndices", function(cmpArray, start, indexVar, change, bodyLen){       
         		if(cmpArray.length == 1 && cmpArray[0] != targetObj) throw new Error("Wrong cmpArray used");
         		if(cmpArray.length == 2 && (cmpArray[0] != '1' && cmpArray[1] != targetObj)) throw new Error("Wrong cmpArray used");
         		if(start != 0) throw new Error("Wrong start used");
         		if(indexVar != 1) throw new Error("Wrong indexVar used");
         		if(change != 1) throw new Error("Wrong change used");
         		if(bodyLen != 1) throw new Error("Wrong bodyLen used");
-
-        	});
-
-        	var mockCreateSelectiveComponentsForIndex = Mocks.GetMock(targetHelper, "createSelectiveComponentsForIndex", function(cmp, items, index, doForce, callback){
-        		if(cmp != targetCmp) throw new Error("Wrong cmp used in createSelectiveComponentsForIndex()");
+        		        		
+        	});	
+        	
+        	var mockCreateSelectiveComponentsForIndex = Mocks.GetMock(targetHelper, "createSelectiveComponentsForIndex", function(cmp, items, index, doForce, callback){       
+        		if(cmp != targetCmp) throw new Error("Wrong cmp used in createSelectiveComponentsForIndex()");  
         		if(items != targetItems) throw new Error("Wrong items used in createSelectiveComponentsForIndex()");
         		if(index != 1) throw new Error("Wrong index used in createSelectiveComponentsForIndex()");
-        		if(doForce != false) throw new Error("Wrong doForce used in createSelectiveComponentsForIndex()");
-
+        		if(doForce != false) throw new Error("Wrong doForce used in createSelectiveComponentsForIndex()");        		        		
+        		
         		callback(['0']);
-        	});
-
+        	});	        	        	        	        	    	
+    	
 	    	[Fact]
 	        function testWithOneExtra(){
 	    		// Arrange
-
+	    		
 	    		// Act
 	        	mockCreateSelectiveComponentsForIndex(function(){
 		        	mockIncrementIndices(function(){
 		        		mockGetEnd(function(){
-		        			mockGetStart(function(){
+		        			mockGetStart(function(){        		
 		        				targetHelper.rerenderSelective(targetCmp);
 		        			});
 		        		});
 		        	});
 	        	});
-
-				// Assert
+				
+				// Assert	
 				Assert.Equal(['0'], targetRealBody.value);
 	        }
-
+	    	
 	    	[Fact]
 	        function testWithTwoExtra(){
 	        	// Arrange
-	        	targetRealBody={
+	        	targetRealBody={    
         			value:[],
         			isEmpty:function(){
     					return false;
@@ -3199,447 +3198,447 @@ Test.Aura.Iteration.HelperTest = function(){
         				this.value = val;
         			}
             	};
-
+	        	
 	        	// Act
 	        	mockCreateSelectiveComponentsForIndex(function(){
 		        	mockIncrementIndices(function(){
 		        		mockGetEnd(function(){
-		        			mockGetStart(function(){
+		        			mockGetStart(function(){        		
 		        				targetHelper.rerenderSelective(targetCmp);
 		        			});
 		        		});
 		        	});
 	        	});
-
-				// Assert
+				
+				// Assert	
 				Assert.Equal(['0', '1'], targetRealBody.value);
-	        }
+	        } 
     	}
     }
-
+    
     [Fixture]
-    function incrementIndices(){
-
+    function incrementIndices(){   
+    	
     	var indexVar = 'indexVar';
-    	var change = 'Up';
-
+    	var change = 'Up';        	
+    	
     	var targetIndex1={
-    		value:'',
-			setValue:function(val){
+    		value:'',	
+			setValue:function(val){          			
     			this.value = val;
     		},
-    		unwrap:function(){
+    		unwrap:function(){          			
     			return 'val1';
     		}
     	};
-
+    	
     	var targetIndex2={
-    		value:'',
-			setValue:function(val){
+    		value:'',	
+			setValue:function(val){          			
     			this.value = val;
     		},
-    		unwrap:function(){
+    		unwrap:function(){          			
     			return 'val2';
     		}
     	};
-
+    	
     	var targetValueProvider1={
-			getValue:function(val){
+			getValue:function(val){  
     			if(val != indexVar) throw new Error("Wrong val used in targetValueProvider.getValue()");
     			return targetIndex1;
     		}
     	};
-
+    	
     	var targetValueProvider2={
-			getValue:function(val){
+			getValue:function(val){  
     			if(val != indexVar) throw new Error("Wrong val used in targetValueProvider.getValue()");
     			return targetIndex2;
     		}
     	};
-
-    	var targetCmp1={
-			getAttributes:function(){
+    	
+    	var targetCmp1={	
+			getAttributes:function(){  
     			return {
     				getValueProvider:function(){
-	        			return targetValueProvider1;
+	        			return targetValueProvider1;        			
 	        		}
     			};
     		}
 		};
-
-    	var targetCmp2={
-			getAttributes:function(){
+    	
+    	var targetCmp2={	
+			getAttributes:function(){  
     			return {
     				getValueProvider:function(){
-	        			return targetValueProvider2;
+	        			return targetValueProvider2;        			
 	        		}
     			};
     		}
 		};
-
+    	
     	[Fact]
         function noIncrement(){
-        	// Arrange
-        	var expected = '';
+        	// Arrange                	
+        	var expected = '';        	        	        	
         	targetIndex1.value = '';
         	var cmpArray = [];
-
+        	
         	// Act
-			targetHelper.incrementIndices(cmpArray, 1, indexVar, change, undefined);
-
+			targetHelper.incrementIndices(cmpArray, 1, indexVar, change, undefined);			
+			
 			// Assert
-			Assert.Equal(expected, targetIndex1.value);
+			Assert.Equal(expected, targetIndex1.value);			
         }
-
+    	
     	[Fact]
         function noIncrementStart(){
-        	// Arrange
-        	var expected = '';
+        	// Arrange                	
+        	var expected = '';        	        	        	
         	targetIndex1.value = '';
         	var cmpArray = [targetCmp1];
-
+        	
         	// Act
-			targetHelper.incrementIndices(cmpArray, 1, indexVar, change, undefined);
-
+			targetHelper.incrementIndices(cmpArray, 1, indexVar, change, undefined);			
+			
 			// Assert
-			Assert.Equal(expected, targetIndex1.value);
+			Assert.Equal(expected, targetIndex1.value);			
         }
-
+    	    	    	
         [Fact]
         function oneIncrement(){
-        	// Arrange
-        	var expected = 'val1Up';
+        	// Arrange                	
+        	var expected = 'val1Up';        	        	        	
         	targetIndex1.value = '';
         	var cmpArray = [targetCmp1];
-
+        	
         	// Act
-			targetHelper.incrementIndices(cmpArray, 0, indexVar, change, undefined);
-
+			targetHelper.incrementIndices(cmpArray, 0, indexVar, change, undefined);			
+			
 			// Assert
-			Assert.Equal(expected, targetIndex1.value);
+			Assert.Equal(expected, targetIndex1.value);			
         }
-
+        
         [Fact]
         function twoIncrement(){
-        	// Arrange
-        	var expected = ['val1Up', 'val2Up'];
+        	// Arrange                	
+        	var expected = ['val1Up', 'val2Up'];        	
         	targetIndex1.value = '';
-        	targetIndex2.value = '';
+        	targetIndex2.value = '';        	
         	var cmpArray = [targetCmp1, targetCmp2];
-
+        	
         	// Act
-			targetHelper.incrementIndices(cmpArray, 0, indexVar, change, undefined);
-
+			targetHelper.incrementIndices(cmpArray, 0, indexVar, change, undefined);			
+			
 			// Assert
 			Assert.Equal(expected[0], targetIndex1.value);
 			Assert.Equal(expected[1], targetIndex2.value);
         }
-
+        
         [Fact]
         function IncrementUsingBodyLen(){
-        	// Arrange
-        	var expected = ['val1Up', 'val2Up'];
+        	// Arrange                	
+        	var expected = ['val1Up', 'val2Up'];        	
         	targetIndex1.value = '';
-        	targetIndex2.value = '';
+        	targetIndex2.value = '';        	
         	var cmpArray = [targetCmp1, targetCmp2];
-
+        	
         	// Act
-			targetHelper.incrementIndices(cmpArray, 0, indexVar, change, 1);
-
+			targetHelper.incrementIndices(cmpArray, 0, indexVar, change, 1);			
+			
 			// Assert
 			Assert.Equal(expected[0], targetIndex1.value);
 			Assert.Equal(expected[1], targetIndex2.value);
         }
-
+        
         [Fact]
         function skipIncrementUsingBodyLen(){
-        	// Arrange
-        	var expected = ['val1Up', ''];
+        	// Arrange                	
+        	var expected = ['val1Up', ''];        	
         	targetIndex1.value = '';
-        	targetIndex2.value = '';
+        	targetIndex2.value = '';        	
         	var cmpArray = [targetCmp1, targetCmp2];
-
+        	
         	// Act
-			targetHelper.incrementIndices(cmpArray, 0, indexVar, change, 2);
-
+			targetHelper.incrementIndices(cmpArray, 0, indexVar, change, 2);			
+			
 			// Assert
 			Assert.Equal(expected[0], targetIndex1.value);
 			Assert.Equal(expected[1], targetIndex2.value);
         }
     }
-
+    
     [Fixture]
-    function getStart(){
-
+    function getStart(){ 
+    	
     	var expected;
     	var value;
     	var actual;
     	var isEmpty;
-
-    	var targetCmp={
-			get:function(att){
+    	
+    	var targetCmp={	
+			get:function(att){  
     			if(att=='v.start') return value;
     		}
-		};
-
-    	var mockContext = Mocks.GetMock(Object.Global(), "$A", {
+		};   
+    	        	
+    	var mockContext = Mocks.GetMock(Object.Global(), "$A", {                                
     		util:{
-        		isEmpty: function(val) {
-					if(val != value) throw new Error("Wrong val used in isEmpty()");
-					return isEmpty;
+        		isEmpty: function(val) { 
+					if(val != value) throw new Error("Wrong val used in isEmpty()"); 
+					return isEmpty; 
 				}
-			}
-        });
-
-    	var mockGetNumber = Mocks.GetMock(targetHelper, "getNumber", function(val){
-    		if(val != value) throw new Error("Wrong val used in getNumber()");
-    		return value;
-    	});
-
+			}	            		            				
+        });	
+    	
+    	var mockGetNumber = Mocks.GetMock(targetHelper, "getNumber", function(val){       
+    		if(val != value) throw new Error("Wrong val used in getNumber()");        		        		      		        		
+    		return value;    		
+    	});	    	
+    	
     	[Fact]
         function testEmpty(){
-        	// Arrange
+        	// Arrange                	
         	expected = 0;
         	value = '';
         	actual = '';
-        	isEmpty = true;
-
+        	isEmpty = true;        	        	
+        	
         	// Act
         	mockContext(function(){
         		actual = targetHelper.getStart(targetCmp);
         	});
-
+			
 			// Assert
-			Assert.Equal(expected, actual);
+			Assert.Equal(expected, actual);			
         }
-
+    	
     	[Fact]
         function testNegativeValue(){
-        	// Arrange
+        	// Arrange                	
         	expected = 0;
         	value = -1;
-        	actual = '';
-        	isEmpty = false;
-
+        	actual = '';        	
+        	isEmpty = false;         		
+        	
         	// Act
         	mockContext(function(){
         		mockGetNumber(function(){
         			actual = targetHelper.getStart(targetCmp);
         		});
         	});
-
+			
 			// Assert
-        	Assert.Equal(expected, actual);
+        	Assert.Equal(expected, actual);			
         }
-
+    	
     	[Fact]
         function testPositiveValue(){
-        	// Arrange
+        	// Arrange                	
         	expected = 1;
         	value = 1;
         	actual = '';
-        	isEmpty = false;
-
+        	isEmpty = false; 
+        	
         	// Act
         	mockContext(function(){
         		mockGetNumber(function(){
         			actual = targetHelper.getStart(targetCmp);
         		});
         	});
-
+			
 			// Assert
-        	Assert.Equal(expected, actual);
+        	Assert.Equal(expected, actual);			
         }
     }
-
+    
     [Fixture]
-    function getEnd(){
-
+    function getEnd(){       	
+    	
     	var expected;
     	var value;
-    	var actual;
+    	var actual;    	
     	var isEmpty;
-
-    	var targetCmp={
-			get:function(att){
+    	
+    	var targetCmp={	
+			get:function(att){  
     			if(att=='v.end') return value;
     			if(att=='v.items.length') return 0;
     		}
-		};
-
-    	var mockContext = Mocks.GetMock(Object.Global(), "$A", {
+		};   
+    	        	
+    	var mockContext = Mocks.GetMock(Object.Global(), "$A", {                                
     		util:{
-        		isEmpty: function(val) {
-					if(val != value) throw new Error("Wrong val used in isEmpty()");
-					return isEmpty;
+        		isEmpty: function(val) { 
+					if(val != value) throw new Error("Wrong val used in isEmpty()"); 
+					return isEmpty; 
 				}
-			}
-        });
-
-    	var mockGetNumber = Mocks.GetMock(targetHelper, "getNumber", function(val){
-    		if(val != value) throw new Error("Wrong val used in getNumber()");
-    		return value;
-    	});
-
+			}	            		            				
+        });	
+    	
+    	var mockGetNumber = Mocks.GetMock(targetHelper, "getNumber", function(val){       
+    		if(val != value) throw new Error("Wrong val used in getNumber()");        		        		      		        		
+    		return value;    		
+    	});	
+    	
     	[Fact]
         function testEmpty(){
-        	// Arrange
+        	// Arrange                	
         	expected = 0;
         	value = '';
-        	actual = '';
+        	actual = ''; 
         	isEmpty = true;
-
+        	
         	// Act
         	mockContext(function(){
         		actual = targetHelper.getEnd(targetCmp);
         	});
-
+			
 			// Assert
-			Assert.Equal(expected, actual);
+			Assert.Equal(expected, actual);			
         }
-
+    	
     	[Fact]
         function testNegativeValue(){
-        	// Arrange
+        	// Arrange                	
         	expected = -1;
         	value = -1;
-        	actual = '';
+        	actual = '';  
         	isEmpty = false;
-
+        	
         	// Act
         	mockContext(function(){
         		mockGetNumber(function(){
         			actual = targetHelper.getEnd(targetCmp);
         		});
         	});
-
+			
 			// Assert
-        	Assert.Equal(expected, actual);
+        	Assert.Equal(expected, actual);			
         }
-
+    	
     	[Fact]
         function testPositiveValue(){
-        	// Arrange
+        	// Arrange                	
         	expected = 0;
         	value = 1;
-        	actual = '';
+        	actual = ''; 
         	isEmpty = false;
-
+        	
         	// Act
         	mockContext(function(){
         		mockGetNumber(function(){
         			actual = targetHelper.getEnd(targetCmp);
         		});
         	});
-
+			
 			// Assert
-        	Assert.Equal(expected, actual);
+        	Assert.Equal(expected, actual);			
         }
     }
-
+    
     [Fixture]
     function getNumber(){
-
-    	var expected;
+    	
+    	var expected;        	
     	var actual;
-    	var isString = false;
+    	var isString = false;    	
     	var targetValue;
-
-    	var mockContext = Mocks.GetMock(Object.Global(), "aura", {
+    	
+    	var mockContext = Mocks.GetMock(Object.Global(), "aura", {                                
     		util:{
-        		isString: function(val) {
+        		isString: function(val) { 
 					if(typeof targetValue.unwrap == 'function'){
 						if(val != targetValue.unwrap()) throw new Error("Wrong val used in isString()1");
 					}
 					else{
 						if(val != targetValue) throw new Error("Wrong val used in isString()2");
 					}
-					return isString;
+					return isString; 
 				}
-			}
-        });
-
+			}	            		            				
+        });	
+    	
     	[Fact]
         function testEmpty(){
-        	// Arrange
-        	expected = '';
-        	actual = '';
-        	targetValue='';
+        	// Arrange                	
+        	expected = '';        	
+        	actual = '';        	
+        	targetValue='';   
         	isString = false;
-
+        	
         	// Act
         	mockContext(function(){
         		actual = targetHelper.getNumber(targetValue);
         	});
-
+			
 			// Assert
-			Assert.Equal(expected, actual);
-        }
-
+			Assert.Equal(expected, actual);			
+        }    	    	
+    	
     	[Fact]
         function testWrongType(){
-        	// Arrange
-        	actual = '';
+        	// Arrange                	        	        	
+        	actual = '';  
         	isString = false;
-
-        	targetValue={
+        	
+        	targetValue={	
     			auraType:''
-    		};
-
+    		};           	        	        	
+        	
         	// Act
         	mockContext(function(){
         		actual = targetHelper.getNumber(targetValue);
         	});
-
+			
 			// Assert
-			Assert.Equal(targetValue, actual);
+			Assert.Equal(targetValue, actual);			
         }
-
+    	
     	[Fact]
         function testString(){
-        	// Arrange
-        	expected = 1;
+        	// Arrange                	
+        	expected = 1;        	
         	actual = '';
-        	isString = true;
-
-        	targetValue={
+        	isString = true;        	
+        	
+        	targetValue={	
     			auraType:'Value',
     			unwrap:function(){
     				return '1';
     			}
-    		};
-
+    		};           	        	        	
+        	
         	// Act
         	mockContext(function(){
         		actual = targetHelper.getNumber(targetValue);
         	});
-
+			
 			// Assert
-			Assert.Equal(expected, actual);
+			Assert.Equal(expected, actual);			
         }
-
+    	
     	[Fact]
         function testNumber(){
-        	// Arrange
-        	expected = 1;
-        	actual ='';
+        	// Arrange                	
+        	expected = 1;        	
+        	actual ='';    
         	isString = false;
-
-        	targetValue={
+        	
+        	targetValue={	
     			auraType:'Value',
     			unwrap:function(){
     				return 1;
     			}
-    		};
-
+    		};   
+        	
         	// Act
         	mockContext(function(){
         		actual = targetHelper.getNumber(targetValue);
         	});
-
+			
 			// Assert
-			Assert.Equal(expected, actual);
+			Assert.Equal(expected, actual);			
         }
     }
-
+    
 }

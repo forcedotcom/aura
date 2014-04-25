@@ -208,8 +208,6 @@ function run(name, code, timeoutOverride){
     
     /** @inner */
     var continueWhenReady = function() {
-        var i;
-
         if(priv.inProgress < 2){
             return;
         }
@@ -317,7 +315,7 @@ function getDump() {
         var actual;
         try {
             actual = priv.waits[0].actual();
-        } catch (e) {}
+        } catch (ignore) {}
         var failureMessage = "";
         if(!$A.util.isUndefinedOrNull(priv.waits[0].failureMessage)){
         	failureMessage = " Failure Message: {" + priv.waits[0].failureMessage + "}";

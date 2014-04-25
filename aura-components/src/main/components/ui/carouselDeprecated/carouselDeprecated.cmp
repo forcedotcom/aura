@@ -22,6 +22,7 @@
 		<aura:attribute name="width" type="Integer" description="Width of the carousel in pixels" />
 		<aura:attribute name="height" type="Integer" description="Height of the carousel in pixels" />
 		<aura:attribute name="useTransition" type="Boolean" default="true" description="" />
+		<aura:attribute name="navigationTabs" type="Boolean" default="false" description="Enable navigational tabs on the pageIndicator"/>
 		
 		<aura:attribute name="pageIndicatorPosition" type="String" default="top" description="Position of the page indicator. Acceptable values are 'top' and 'bottom'. " />
 		<aura:attribute name="continuousFlow" type="Boolean" default="false" description="Set to true if the carousel pages should flow continuously. The default is 'false'." />		
@@ -57,7 +58,7 @@
 				
 				<aura:if isTrue="{!v.continuousFlow != true &amp;&amp; v.pageIndicatorPosition == 'top'}" >
 					<nav aura:id="navContainer" class="{!'carousel-nav-container carousel-nav-position-' + v.pageIndicatorPosition}" role="tablist">        		 
-	        			<ui:carouselPageIndicator />        		 
+	        			<ui:carouselPageIndicator navigationTabs="{!v.navigationTabs}"/>        		 
 					</nav>					
 				</aura:if>
 					        

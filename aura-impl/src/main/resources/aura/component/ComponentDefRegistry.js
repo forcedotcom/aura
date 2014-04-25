@@ -35,7 +35,7 @@ ComponentDefRegistry.prototype.isLocalStorageAvailable= (function() {
             window.localStorage.setItem("test", "test");
             window.localStorage.removeItem("test");
             return true;
-        } catch(e) {
+        } catch(ignore) {
         }
     }
 
@@ -103,7 +103,7 @@ ComponentDefRegistry.prototype.getDef = function(config, noInit) {
 
                 try {
                     this.writeToCache(descriptor, config);
-                } catch(e2) {
+                } catch(ignore) {
                     // Nothing we can do at this point - give up.
                 }
             }

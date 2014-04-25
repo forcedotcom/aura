@@ -18,14 +18,14 @@
     -webkit-overflow-scrolling: touch;
 }
 
-.THIS.open.listSorterContainer {	
+.THIS .open.listSorterContainer {	
 	border-radius: 8px 8px 0 0;
 	width: 320px;
 	margin: 42px auto;
 	box-shadow: 0 1px 5px rgba(0, 0, 0, .75);
 }
 
-.THIS.open.phone.listSorterContainer {
+.THIS .open.phone.listSorterContainer {
 	margin: 0;	
 }
 
@@ -33,17 +33,17 @@
 	visibility: hidden;
 }
  
-.THIS.listSorterContainer {	
+.THIS .listSorterContainer {	
 	background: #fff;
 	height: auto;	
 	display: none;
 }
 
-.THIS.open.listSorterContainer {
+.THIS .open.listSorterContainer {
 	display: block;	
 }
 
-.THIS.open.modal {
+.THIS .open.modal {
 	position: absolute;	
 	right: 0;
 	left: 0;
@@ -115,7 +115,7 @@
 	background-image: -o-linear-gradient(top, #2891d3, #1983c5);	
 }
 
-.THIS.listSorterContainer .body {
+.THIS .listSorterContainer .body {
 	position: relative;
 	top: 42px;
 } 
@@ -147,11 +147,11 @@
 	margin: -12px;	
 }
 
-.THIS.open.listSorterMask {
+.THIS .open.listSorterMask {
 	display: block;
 }
 
-.THIS.listSorterMask {
+.THIS .listSorterMask {
     position: absolute;
     top:0;
     left:0;

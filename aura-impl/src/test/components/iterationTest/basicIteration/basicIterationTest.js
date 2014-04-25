@@ -199,15 +199,47 @@
     /**
      * Iteration with decimal start value is treated as integer
      */
-    // W-1299463 start/end values not handled the same on server (intValue)
-    _testStartDecimal:{
-        attributes:{ items:"alhpa,beta", start: 0.000001 },
+    testStartDecimal:{
+        attributes:{ items:"alpha,beta", start: 0.000001 },
         test:function(cmp){
             this.assertBodyComponentDefRef(cmp);
             var realbody = cmp.find("iteration").getValue("v.realbody");
-            $A.test.assertEquals(1, realbody.getLength());
+            $A.test.assertEquals(2, realbody.getLength());
             value = realbody.get(0);
-            $A.test.assertEquals("0:alpha,1:beta,", value.get("v.value"));
+            $A.test.assertEquals("0:alpha,", value.get("v.value"));
+            value = realbody.get(1);
+            $A.test.assertEquals("1:beta,", value.get("v.value"));
         }
+    },
+ 
+    /** Iteration rerender stays stable */
+    testEmptyAndFill:{
+        attributes:{ items:"alpha,beta" },
+        test:[function(cmp) {
+            var items = cmp.getValue("v.items");
+            items.remove(0);
+        },
+        function(cmp) {
+            var items = cmp.getValue("v.items");
+            items.remove(0);
+        },
+        function(cmp) {
+            var items = cmp.getValue("v.items");
+            items.push("xyz");
+        },
+        function(cmp) {
+            var realbody = cmp.find("iteration").getValue("v.realbody");
+            // This assertion isn't the big one; it doesn't show the render state.
+            // But we do want to be sure it's right:
+            $A.test.assertEquals(1, realbody.getLength());
+            $A.test.assertEquals("0:xyz,", realbody.get(0).get("v.value"));
+
+            // Now, this is the more useful part:
+            var refNode = realbody.getReferenceNode();
+            $A.test.assertTrue(refNode !== undefined, "No reference node found!");
+            $A.test.assertTruthy(refNode.parentElement, "Reference has no parent");
+            $A.test.assertEquals("BODY", refNode.parentElement.tagName,
+                    "Reference parent isn't right component");
+        }]
     }
 })

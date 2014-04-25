@@ -15,8 +15,6 @@
  */
 package org.auraframework.test;
 
-import junit.framework.AssertionFailedError;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
@@ -33,9 +31,13 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import junit.framework.AssertionFailedError;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.NameValuePair;
@@ -49,8 +51,15 @@ import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.WebDriverUtil.BrowserType;
 import org.auraframework.test.annotation.FreshBrowserInstance;
 import org.auraframework.test.annotation.WebDriverTest;
+import org.auraframework.test.perf.PerfMetricsCollector;
+import org.auraframework.test.perf.PerfWebDriverUtil;
 import org.auraframework.util.AuraUITestingUtil;
 import org.auraframework.util.AuraUtil;
+import org.auraframework.util.test.perf.PerfUtil;
+import org.auraframework.util.test.perf.data.PerfMetrics;
+import org.auraframework.util.test.perf.data.PerfRunsCollector;
+import org.auraframework.util.test.perf.rdp.RDPNotification;
+import org.eclipse.jetty.util.log.Log;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
@@ -85,6 +94,8 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
     private WebDriver currentDriver = null;
     BrowserType currentBrowserType = null;
     protected AuraUITestingUtil auraUITestingUtil;
+    protected PerfWebDriverUtil perfWebDriverUtil;
+    private Mode currentAuraMode;
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ ElementType.TYPE, ElementType.METHOD })
@@ -115,7 +126,6 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
      */
     @Override
     public void tearDown() throws Exception {
-        currentDriver = null;
         super.tearDown();
     }
 
@@ -124,16 +134,14 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
      */
     public void perBrowserSetUp() {
         // re-initialize driver pointer here because test analysis might need it after perBrowserTearDown
-        currentDriver = null;
-        // W-1475510: instantiating it inorder to expose certain Util methods.
-        auraUITestingUtil = new AuraUITestingUtil(this.getDriver());
+        getDriver();
     }
 
     /**
      * TearDown specific to a test run against a particular browser. Run once per test case, per browser.
      */
-
-    public void perBrowserTearDown() {
+    protected void perBrowserTearDown() {
+        perfWebDriverUtil = null;
     }
 
     private void superRunTest() throws Throwable {
@@ -148,11 +156,10 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
         } finally {
             perBrowserTearDown();
         }
-
     }
 
     @SuppressWarnings("serial")
-    private class AggregateFailure extends AssertionFailedError {
+    private static class AggregateFailure extends AssertionFailedError {
         private final Collection<Throwable> failures;
 
         private AggregateFailure(Collection<Throwable> failures) {
@@ -176,15 +183,14 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
                 this.getExcludedBrowsers())) {
             try {
                 runTestWithBrowser(browser);
+                if (failures.size() == 0) {
+                    // run perf regression only if there were no functional failures
+                    runPerfTests();
+                }
             } catch (Throwable t) {
                 failures.add(addAuraInfoToTestFailure(t));
             } finally {
-                if (currentDriver != null) {
-                    try {
-                        currentDriver.quit();
-                    } catch (Exception e) {
-                    }
-                }
+                quitDriver();
             }
         }
         // Aggregate results across browser runs, if more than one failure was encountered
@@ -196,10 +202,101 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
         }
     }
 
+    // Perf: START
+
+    protected static final boolean RUN_PERF_TESTS = System.getProperty("runPerfTests") != null;
+
+    /** true if currently running a test for perf */
+    protected boolean inPerfRun;
+
+    protected final boolean isPerfTest() {
+        return RUN_PERF_TESTS && PerfUtil.hasPerfTestAnnotation(this);
+    }
+
+    /**
+     * Override to change
+     */
+    protected int numPerfTimelineRuns() {
+        return 5;
+    }
+
+    /**
+     * Adds capabilities that request WebDriver performance logs<br/>
+     * See https://sites.google.com/a/chromium.org/chromedriver/logging/performance-log
+     */
+    private void addPerfCapabilities(DesiredCapabilities capabilities) {
+        if (isPerfTest()) {
+            PerfWebDriverUtil.addLoggingCapabilities(capabilities);
+        }
+    }
+
+    private void runPerfTests() throws Throwable {
+        // TODO: check the browser can be run in perf mode
+        if (!isPerfTest()) {
+            return;
+        }
+
+        // TODO: split into timeline/aura-stats mode runs
+        runTestWithBrowserAsPerf();
+    }
+
+    private void runTestWithBrowserAsPerf() throws Throwable {
+        // TODO: switch to run in whatever mode is better for perf?
+
+        int numPerfTimelineRuns = numPerfTimelineRuns();
+
+        if (numPerfTimelineRuns > 0) {
+            PerfRunsCollector collector = new PerfRunsCollector();
+            for (int i = 0; i < numPerfTimelineRuns; i++) {
+                try {
+                    // reset WebDriver for perf run
+                    quitDriver();
+                    getDriver();
+
+                    inPerfRun = true;
+                    perBrowserSetUp();
+
+                    PerfMetricsCollector perfData = new PerfMetricsCollector(this);
+                    perfData.startCollecting();
+
+                    superRunTest();
+
+                    collector.addRun(perfData.stopCollecting());
+                } finally {
+                    perBrowserTearDown();
+                    inPerfRun = false;
+                }
+            }
+            PerfMetrics median = collector.getMedianMetrics();
+            if (logger.isLoggable(Level.INFO)) {
+                logger.info("perf metrics for " + this);
+                median.logInfo(logger);
+            }
+            assertGoldMetrics(median);
+        }
+    }
+
+    public final List<RDPNotification> getRDPNotifications() {
+        return perfWebDriverUtil.getRDPNotifications();
+    }
+
+    // UIPerf: note that UIPerf is only loaded in PTEST (and CADENCE) modes.
+
+    protected void clearUIPerfStats() {
+        perfWebDriverUtil.clearUIPerfStats();
+    }
+
+    public Map<String, String> getUIPerfStats(
+            List<String> transactionsToGather) {
+        return perfWebDriverUtil.getUIPerfStats(null, transactionsToGather);
+    }
+
+    // Perf: END
+
     /**
      * Wrapper for non-asserted failures
      */
-    private class UnexpectedError extends Error {
+    private static class UnexpectedError extends Error {
         private static final long serialVersionUID = 1L;
 
         UnexpectedError(String description, Throwable cause) {
@@ -439,7 +536,10 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
             } catch (NoSuchMethodException e) {
                 // happens for dynamic tests
             }
+
             capabilities.setCapability(WebDriverProvider.REUSE_BROWSER_PROPERTY, reuseBrowser);
+
+            addPerfCapabilities(capabilities);
 
             logger.info(String.format("Requesting: %s", capabilities));
             currentDriver = provider.get(capabilities);
@@ -447,8 +547,21 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
                 fail("Failed to get webdriver for " + currentBrowserType);
             }
             logger.info(String.format("Received: %s", currentDriver));
+            auraUITestingUtil = new AuraUITestingUtil(currentDriver);
+            perfWebDriverUtil = new PerfWebDriverUtil(currentDriver, auraUITestingUtil);
         }
         return currentDriver;
+    }
+
+    protected final void quitDriver() {
+        if (currentDriver != null) {
+            try {
+                currentDriver.quit();
+            } catch (Exception e) {
+                Log.warn(currentDriver.toString(), e);
+            }
+            currentDriver = null;
+        }
     }
 
     private URI getAbsoluteURI(String url) throws MalformedURLException, URISyntaxException {
@@ -495,6 +608,13 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
         return Mode.SELENIUM;
     }
 
+    /**
+     * @return the Aura.Mode actually used for the current test
+     */
+    public Mode getCurrentAuraMode() {
+        return currentAuraMode;
+    }
+
     protected void open(DefDescriptor<? extends BaseComponentDef> dd) throws MalformedURLException, URISyntaxException {
         open(getUrl(dd));
     }
@@ -510,6 +630,8 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
     }
 
     protected void open(String url, Mode mode, boolean waitForInit) throws MalformedURLException, URISyntaxException {
+        currentAuraMode = mode;
+
         // save any fragment
         int hashLoc = url.indexOf('#');
         String hash = "";

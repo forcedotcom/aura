@@ -60,7 +60,7 @@ Json.prototype.decode = function(json, refSupport) {
  * @returns {Function|Array|Object} The converted value
  */
 Json.prototype.decodeString = function(value) {
-    var valueType = typeof (value);
+    var valueType = typeof value;
     if (valueType === "function") {
         return value;
     } else if (valueType === "string") {
@@ -148,7 +148,7 @@ Json.prototype._resolveRefs = function(config, cache, parent, property) {
  *            for tab
  */
 Json.prototype.encode = function(obj, replacer, whiteSpace) {
-    if (typeof (JSON) !== "undefined") {
+    if (typeof JSON !== "undefined") {
         // Protect ourselves from the evils of libraries like Prototype.js that decorate Array with extra methods such as .toJSON() and do the wrong thing!
         var oldArrayToJSON = Array.prototype.toJSON;
         try {

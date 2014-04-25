@@ -29,6 +29,7 @@
 	afterRender: function(component, helper) {
         this.superAfterRender();
 		helper.addInputClass(component);
+
         var concreteCmp = component.getConcreteComponent();
         var concreteHelper = concreteCmp.getDef().getHelper();
         concreteHelper.addInputDomEvents(component);
@@ -56,8 +57,8 @@
                 el.value = concreteHelper.formatValue(concreteCmp);
             }
         }
-        helper.addInputClass(component);
-        
+
         this.superRerender();
+        helper.addInputClass(component);
     }
 })

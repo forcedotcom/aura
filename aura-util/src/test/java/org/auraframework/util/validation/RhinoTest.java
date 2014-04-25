@@ -29,17 +29,17 @@ public final class RhinoTest extends UnitTestCase {
         ScriptEngine engine = new ScriptEngineManager().getEngineByName("js");
 
         // non-|| equivalents that work with JDK 1.6:
-        engine.eval("var ret = (5 !== undefined)? 5 : -1;");
-        assertEquals(5.0, engine.get("ret"));
-        engine.eval("var ret = (undefined !== undefined)? undefined : -1;");
-        assertEquals(-1.0, engine.get("ret"));
+        engine.eval("var ret = (5 !== undefined)? 5 : -1;"); // equiv to: 5 || -1
+        assertEquals(5, ((Number) engine.get("ret")).intValue());
+        engine.eval("var ret = (undefined !== undefined)? undefined : -1;"); // equiv to: undefined || -1
+        assertEquals(-1, ((Number) engine.get("ret")).intValue());
 
         if (!System.getProperty("java.version").startsWith("1.6")) {
             // those fail with 1.6
             engine.eval("var ret = 5 || -1;");
-            assertEquals(5.0, engine.get("ret")); // ret is "true" in JDK 1.6
+            assertEquals(5, ((Number) engine.get("ret")).intValue()); // ret is "true" in JDK 1.6
             engine.eval("var ret = undefined || -1;");
-            assertEquals(-1.0, engine.get("ret"));
+            assertEquals(-1, ((Number) engine.get("ret")).intValue());
         }
     }
 }

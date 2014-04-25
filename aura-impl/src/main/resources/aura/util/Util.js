@@ -790,7 +790,6 @@ $A.ns.Util.prototype.getSelectValue = function(select) {
     }
     else {
         var list = [];
-        var first = true;
         var options = select.options;
         for (var i=0; i<options.length; i++) {
             var option = options[i];
@@ -1100,7 +1099,7 @@ if (!!Array.prototype.indexOf) {
      *            searchElement The element to locate in the array.
      */
 	$A.ns.Util.prototype.arrayIndexOf = function(array, searchElement /*, fromIndex */) {
-        /*jslint bitwise: false */
+        /*jslint bitwise: true, useStrict: true */
         "use strict";
         if (array === null) {
             throw new TypeError();
@@ -1130,8 +1129,7 @@ if (!!Array.prototype.indexOf) {
         if (n >= len) {
             return -1;
         }
-        var k = n >= 0 ? n : Math.max(len - Math.abs(n), 0);
-        for (; k < len; k++) {
+        for (var k = n >= 0 ? n : Math.max(len - Math.abs(n), 0); k < len; k++) {
             if (k in t && t[k] === searchElement) {
                 return k;
             }
@@ -1752,6 +1750,7 @@ $A.ns.Util.prototype.estimateSize = function(obj) {
 	    } else {
 	    	// chrome, safari, IE have this
 	        t = node.innerText;
+	        t = this.trim(t);
 
 			// FF & chrome with visibility set to false
 	        if (node.textContent !== undefined) {

@@ -36,7 +36,11 @@ public class JavascriptValidator extends RhinoBasedValidator {
     private static final Pattern newlinePattern = Pattern.compile("\\r?\\n");
 
     public JavascriptValidator() throws IOException {
-        super("jslint");
+        this(false);
+    }
+
+    public JavascriptValidator(boolean use2009JSLint) throws IOException {
+        super(use2009JSLint ? "jslint2009" : "jslint");
     }
 
     public List<JavascriptProcessingError> validate(String filename, String source, boolean allowDebugger,

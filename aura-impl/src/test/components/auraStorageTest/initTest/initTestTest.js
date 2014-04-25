@@ -899,9 +899,7 @@
     /**
      * Refresh error not stored, so subsequent refresh will still replay.
      */
-    //Test Flapper: This test passes when run in JSTEST mode but fails when run as a WebDriver test from test set runner.
-    //W-2136767
-    _testRefreshErrorResponseNotStored : {
+    testRefreshErrorResponseNotStored : {
         mocks : [{
             type : "ACTION",
                 stubs : [{
@@ -928,6 +926,8 @@
             a.setParams({testName : "testRefreshErrorResponseNotStored"});
             a.setStorable();
             a.setCallback(cmp, function(action){
+            	//sanity check
+            	$A.test.assertEquals(action.getReturnValue(),"anything really","we are not using the stub");
                 cmp.getDef().getHelper().findAndSetText(cmp, "callbackCounter",
                     parseInt(cmp.find("callbackCounter").getElement().innerHTML)+1);
             });

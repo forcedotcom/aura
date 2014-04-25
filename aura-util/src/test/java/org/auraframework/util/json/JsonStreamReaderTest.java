@@ -21,10 +21,11 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
-import java.io.StringReader;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
+
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +37,8 @@ import org.auraframework.util.json.JsonStreamReader.JsonParseException;
 import org.auraframework.util.json.JsonStreamReader.JsonStreamParseException;
 
 import com.google.common.base.Charsets;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 
 /**
  * @hierarchy Aura.Unit Tests.Json StreamReader
@@ -86,25 +89,206 @@ public class JsonStreamReaderTest extends UnitTestCase {
         assertTrue(obj.getValue() instanceof List);
     }
 
+    private static final ParseFailure [] literal_failures = {
+        new ParseFailure("class as key", "class", 1, 1, "class", "Reserved word used as a literal"),
+    };
+
+    private static final ParseSuccess [] literal_successes = {
+        new ParseSuccess("null", "null", null),
+        new ParseSuccess("empty", "", null),
+    };
+
     /**
      * Passing a literal to a Json reader should throw an exception
      */
     public void testLiteral() throws Exception {
-        try {
-            this.parseAndRetrieve("literal");
-            fail("Trying to parse a literal should throw an exception");
-        } catch (JsonStreamParseException expected) {
-            // Expected to throw an exception
-        }
-
-        try {
-            this.parseAndRetrieve("nuller");
-            fail("Should not have mistaken this input for null");
-        } catch (JsonStreamParseException expected) {
-            // Expected to throw an exception
-        }
-
+        runParseFailures(literal_failures);
+        runParseSuccesses(literal_successes);
     }
+
+    private static final ParseFailure [] boolean_failures = {
+    };
+    private static final ParseSuccess [] boolean_successes = {
+        new ParseSuccess("true", "true", Boolean.TRUE),
+        new ParseSuccess("false", "false", Boolean.FALSE),
+    };
+    public void testBoolean() throws Exception {
+        runParseFailures(boolean_failures);
+        runParseSuccesses(boolean_successes);
+
+        checkGetters(JsonConstant.BOOLEAN, "true");
+        checkGetters(JsonConstant.BOOLEAN, "false");
+    }
+
+    private static final ParseFailure [] number_failures = {
+        new ParseFailure("invalid number", "30xyz", 1, 1, null, "Could not parse a number"),
+    };
+    private static final ParseSuccess [] number_successes = {
+        new ParseSuccess("integer", "30", new BigDecimal(30)),
+        new ParseSuccess("positive integer", "+30", new BigDecimal(30)),
+        new ParseSuccess("negative integer", "-30", new BigDecimal(-30)),
+        new ParseSuccess("negaitive exp", "-1.2E-20", BigDecimal.valueOf(-1.2E-20)),
+        new ParseSuccess("exp", "1.2E-20", BigDecimal.valueOf(1.2E-20)),
+        new ParseSuccess("positive exp", "1.2E-20", BigDecimal.valueOf(1.2E-20)),
+        new ParseSuccess("float", "123.456", BigDecimal.valueOf(123.456)),
+        new ParseSuccess("positive float", "+123.456", BigDecimal.valueOf(123.456)),
+        new ParseSuccess("negative float", "-123.456", BigDecimal.valueOf(-123.456)),
+        // Ooh! Fun!
+        new ParseSuccess("negative infinity", "-Infinity", Double.NEGATIVE_INFINITY),
+        // Ooh! Fun!
+        new ParseSuccess("positive infinity", "Infinity", Double.POSITIVE_INFINITY),
+
+        new ParseSuccess("not-a-number", "NaN", Double.NaN),
+    };
+    public void testNumber() throws Exception {
+        runParseFailures(number_failures);
+        runParseSuccesses(number_successes);
+
+        checkGetters(JsonConstant.NUMBER, "30");
+    }
+
+
+    private static final ParseFailure [] string_failures = {
+        new ParseFailure("mismatched quotes", "\"string\'", 1, 1, null, "Unterminated string"),
+        new ParseFailure("mismatched quotes", "\'string\"", 1, 1, null, "Unterminated string"),
+        new ParseFailure("newline", "\"string\n\"", 1, 1, null, "Unterminated string"),
+    };
+    private static final ParseSuccess [] string_successes = {
+        new ParseSuccess("doubleslash in string", "\" // \""," // "),
+        new ParseSuccess("comment in string", "\" /*  * *  */ \""," /*  * *  */ "),
+        new ParseSuccess("string plus whitespace", "'a'\b","a"),
+        new ParseSuccess("simple string", "\"a\"","a"),
+        new ParseSuccess("newline", "\"\\n\"","\n"),
+        new ParseSuccess("tab", "\"\\t\"","\t"),
+        new ParseSuccess("backslashes", "\"\\\\\"","\\"),
+        new ParseSuccess("backspace", "\"\\b\"","\b"),
+        new ParseSuccess("form-feed", "\"\\f\"","\f"),
+        new ParseSuccess("return", "\"\\r\"","\r"),
+        new ParseSuccess("double quote", "\"\\\"\"","\""),
+        new ParseSuccess("slash", "\"\\/\"","/"),
+        new ParseSuccess("e-umlaut", "\"ë\"","ë"),
+        new ParseSuccess("chinese", "\"分\"","分"),
+        new ParseSuccess("different chinese", "\"本\"","本"),
+        new ParseSuccess("japanese", "\"조\"","조"),
+        new ParseSuccess("unicode 1111", "\"ᄑ\"","\u1111"),
+        new ParseSuccess("unicode 2111", "\"\u2111\"","\u2111"),
+        new ParseSuccess("single quote", "\"\\'\"","'"),
+        new ParseSuccess("backslash + quote", "\"\\\\\\'\"","\\'"),
+        new ParseSuccess("many backslashes", "\"\\\\\\\\\"","\\\\"),
+        new ParseSuccess("unicode <", "\"\\u003C\"","<"),
+        new ParseSuccess("unicode >", "\"\\u003E\"",">"),
+        new ParseSuccess("unicode !", "\"\\u0021--\"","!--"),
+        new ParseSuccess("unicode ! plus quote", "'\\\"\\u0021--\\\"'","\"!--\""),
+        new ParseSuccess("random chars", "\"    ! @#$%^&*()_+-=|}{[]:;?.,`~\"","    ! @#$%^&*()_+-=|}{[]:;?.,`~"),
+        new ParseSuccess("many chinese", "\"速い茶色のキツネは怠け者の犬を跳び越えました。 福克斯布朗的快速跳过懒狗。 위를 건너뛰었습니다. 게으르고 개 \"","速い茶色のキツネは怠け者の犬を跳び越えました。 福克斯布朗的快速跳过懒狗。 위를 건너뛰었습니다. 게으르고 개 "),
+        new ParseSuccess("russian, german, hebrew", "\"Быстрый Браун Фокс выросло за ленивый собака. Die schnelle Braun Fuchs sprang über den faulen Hund. השועל החום המהיר קפץ מעל הכלב העצלן.\"","Быстрый Браун Фокс выросло за ленивый собака. Die schnelle Braun Fuchs sprang über den faulen Hund. השועל החום המהיר קפץ מעל הכלב העצלן."),
+
+    };
+    public void testString() throws Exception {
+        runParseFailures(string_failures);
+        runParseSuccesses(string_successes);
+
+        checkGetters(JsonConstant.STRING, "'test'");
+    }
+
+    private static final ParseFailure [] array_failures = {
+        new ParseFailure("unclosed", "[1,", 1, 1, null, "Unterminated array"),
+        new ParseFailure("unclosed, no comma", "[1", 1, 2, null, "Expected ',' or ']'"),
+        new ParseFailure("mismatched quote", "['hi', \"ho']", 1, 8, null, "Unterminated string"),
+        new ParseFailure("missing comma (1)", "[ 'a' 'b' ]", 1, 7, "b", "Expected ',' or ']'"),
+        new ParseFailure("missing comma (2)", "[ 'a' }", 1, 7, null, "Expected ',' or ']'"),
+
+    };
+
+    @SuppressWarnings("unchecked")
+    private static final ParseSuccess [] array_successes = {
+        new ParseSuccess("empty array", "[]", Lists.newArrayList()),
+        new ParseSuccess("one element array", "[\"test1\"]", Lists.newArrayList("test1")),
+        new ParseSuccess("two element array", "[\"test1\",\"test2\"]", Lists.newArrayList("test1", "test2")),
+        new ParseSuccess("multi-type element array", "[\"test1\", 1.0 ]", Lists.newArrayList("test1", BigDecimal.valueOf(1.0))),
+    };
+
+    /**
+     * Tests to verify parsing of Arrays.
+     */
+    public void testArray() throws Exception {
+        runParseFailures(array_failures);
+        runParseSuccesses(array_successes);
+
+        checkGetters(JsonConstant.ARRAY, "['test']");
+    }
+
+    private static class ParseObjectSuccess {
+        public ParseObjectSuccess(String name, String input, int count, List<String> keys) {
+            this.name = name;
+            this.input = input;
+            this.count = count;
+            if (keys == null) {
+                keys = Lists.newArrayList();
+            } else {
+                Collections.sort(keys);
+            }
+            this.keys = ImmutableList.copyOf(keys);
+        }
+
+        public final String name;
+        public final String input;
+        public final int count;
+        public final List<String> keys;
+    }
+
+
+    private static final ParseObjectSuccess [] object_successes = {
+        new ParseObjectSuccess("empty", "{}", 0, null),
+        new ParseObjectSuccess("simple string", "{key:\"value\"}", 1, Lists.newArrayList("key")),
+        new ParseObjectSuccess("single quoted key", "{'key':\"value\"}", 1, Lists.newArrayList("key")),
+        new ParseObjectSuccess("double quoted key", "{\"key\":\"value\"}", 1, Lists.newArrayList("key")),
+        new ParseObjectSuccess("empty function", "{key:function() {}}", 1, Lists.newArrayList("key")),
+        new ParseObjectSuccess("space in key", "{\"key with space\":function() {}}", 1, Lists.newArrayList("key with space")),
+    };
+
+    private static final ParseFailure [] object_failures = {
+        new ParseFailure("missing comma: object (1)", "{key:function() { } bad", 1, 21, "bad", "Expected ',' or '}'"),
+
+        new ParseFailure("missing comma: object (2)", "{key:function() { }  {", 1, 22, null, "Expected ',' or '}'"),
+
+        new ParseFailure("missing comma: object (3)", "{key:function() { } \n{", 2, 1, null, "Expected ',' or '}'"),
+
+        new ParseFailure("missing colon: object", "{key function() { } bad", 1, 6, null, "Expected ':'"),
+
+        // Note the odd 'matching' here, making the error occur at character 13.
+        new ParseFailure("mismatched quotes (1)", "{\"objName\':\"string\"}", 1, 13, null, "Expected ':'"),
+
+        new ParseFailure("mismatched quotes (2)", "{\'objName\":\"string\"}", 1, 2, null, "Unterminated string"),
+
+        new ParseFailure("unmatched quotes (1)", "{\"objName\n\":\"string\"}", 1, 2, null, "Unterminated string"),
+
+        new ParseFailure("bad space in key", "{obj Name:\"string\"}", 1, 6, null, "Expected ':'"),
+
+        new ParseFailure("class as key", "{key:\"string\", class:\"string\"}", 1, 16, "class", "Reserved word used as a literal"),
+
+    };
+
+    public void testObject() throws Exception {
+        for (ParseObjectSuccess pos : object_successes) {
+            @SuppressWarnings("unchecked")
+            Map<String,Object> m = (Map<String,Object>)parseAndRetrieve(pos.input);
+
+            // ordering of keys not guaranteed
+            List<String> keys = Lists.newArrayList(m.keySet());
+            Collections.sort(keys);
+
+            assertEquals("Test Case: "+pos.name+" must match length", pos.count, m.size());
+            assertEquals("Test Case: "+pos.name+" expected keys", pos.keys, keys);
+        }
+        runParseFailures(object_failures);
+        checkGetters(JsonConstant.OBJECT, "{'test':'test2'}");
+    }
+    
+    //
+    // The tests after this point probably need an audit.
+    //
+
 
     /**
      * Positive and negative tests for {@link JsonStreamReader#getList()} for
@@ -159,7 +343,7 @@ public class JsonStreamReaderTest extends UnitTestCase {
         } catch (JsonStreamParseException expected) {
             // Make sure the exception was because of mis-match between expected
             // token and actual token
-            assertTrue(expected.getMessage().startsWith("Current Token is STRING, not ARRAY"));
+            assertTrue(expected.getMessage().startsWith("Current Token is 'STRING', not 'ARRAY'"));
         } finally {
             jsonStreamReader.close();
         }
@@ -229,117 +413,6 @@ public class JsonStreamReaderTest extends UnitTestCase {
         }
     }
 
-    /**
-     * Positive and Negative test for {@link JsonStreamReader#getBoolean()}.
-     */
-    public void testGetBoolean() throws Exception {
-
-        jsonStreamReader = new JsonStreamReader("1");
-        try {
-            jsonStreamReader.next();
-            jsonStreamReader.getBoolean();
-            fail("Trying to get a boolean by passing a string should have failed.");
-        } catch (JsonParseException expected) {
-            // Make sure the exception was because of mis-match between expected
-            // token
-            // and actual token
-            assertTrue(expected.getMessage().startsWith("Current Token is NUMBER, not BOOLEAN"));
-        } finally {
-            jsonStreamReader.close();
-        }
-
-        jsonStreamReader = new JsonStreamReader("true1");
-        try {
-            assertEquals(JsonConstant.BOOLEAN, jsonStreamReader.next());
-            jsonStreamReader.getBoolean();
-            fail("JsonStreamReader should have treated this input as a literal");
-        } catch (JsonParseException expected) {
-        } finally {
-            jsonStreamReader.close();
-        }
-
-        jsonStreamReader = new JsonStreamReader(new StringReader("true"));
-        try {
-            assertEquals(JsonConstant.BOOLEAN, jsonStreamReader.next());
-            assertTrue(jsonStreamReader.getBoolean());
-        } finally {
-            jsonStreamReader.close();
-        }
-        jsonStreamReader = new JsonStreamReader(new StringReader("false"));
-        try {
-            assertEquals(JsonConstant.BOOLEAN, jsonStreamReader.next());
-            assertFalse(jsonStreamReader.getBoolean());
-        } finally {
-            jsonStreamReader.close();
-        }
-    }
-
-    /**
-     * Positive and Negative test for {@link JsonStreamReader#getNumber()}.
-     */
-    public void testGetNumber() throws Exception {
-        try {
-            jsonStreamReader = new JsonStreamReader(new StringReader("\"string\""));
-            jsonStreamReader.next();
-            jsonStreamReader.getNumber();
-            fail("Trying to get a number by passing a string should have failed.");
-        } catch (JsonStreamParseException expected) {
-            // Make sure the exception was because of mis-match between expected
-            // token and actual token
-            assertTrue(expected.getMessage().startsWith("Current Token is STRING, not NUMBER"));
-        }
-        /**
-         * Negative test case 2: Pass a valid literal and expect a number
-         */
-        try {
-            jsonStreamReader = new JsonStreamReader("true");
-            jsonStreamReader.next();
-            jsonStreamReader.getNumber();
-            fail("Trying to get a boolean by passing a string should have failed.");
-        } catch (JsonStreamParseException expected) {
-            // Make sure the exception was because of mis-match between expected
-            // token and actual token
-            assertTrue(expected.getMessage().startsWith("Current Token is BOOLEAN, not NUMBER"));
-        }
-        /*
-         * Negative test case 3: Pass an invalid number and expect a
-         * numberformat exception
-         */
-        try {
-            jsonStreamReader = new JsonStreamReader("30xyz");
-            jsonStreamReader.next();
-            fail("Should have recognized the fake number like input");
-        } catch (JsonStreamParseException expected) {
-            // expected to throw this exception
-        } finally {
-            jsonStreamReader.close();
-        }
-
-        jsonStreamReader = new JsonStreamReader("30");
-        try {
-            jsonStreamReader.next();
-            assertEquals("Failed to read the right number", jsonStreamReader.getNumber().doubleValue(), 30.0);
-        } finally {
-            jsonStreamReader.close();
-        }
-
-        jsonStreamReader = new JsonStreamReader(new StringReader("-1.2E-20"));
-        try {
-            jsonStreamReader.next();
-            assertEquals("Failed to read the right number", jsonStreamReader.getNumber().doubleValue(), -1.2e-20);
-        } finally {
-            jsonStreamReader.close();
-        }
-
-        jsonStreamReader = new JsonStreamReader(new StringReader("1.2e-20"));
-        try {
-            jsonStreamReader.next();
-            assertEquals("Failed to read the right number", jsonStreamReader.getNumber().doubleValue(), 1.2e-20);
-        } finally {
-            jsonStreamReader.close();
-        }
-    }
-
     private static interface JsonStreamGetObjectOrArrayTestConfig {
         JsonStreamReader createJsonStreamReader(String json);
 
@@ -399,12 +472,12 @@ public class JsonStreamReaderTest extends UnitTestCase {
         jsonStreamReader.next();
         try {
             jsonStreamReader.getObject();
-            fail("Expeccting an object when a string representing an array is passed.");
+            fail("Expecting an object when a string representing an array is passed.");
         } catch (JsonStreamParseException expected) {
             // Make sure the exception was because of mis-match between expected
             // token and actual token
             assertTrue(expected.getMessage().startsWith(
-                    "Current Token is ARRAY" + (config.isRecursiveReadEnabled() ? "" : "_START") + ", not OBJECT"));
+                    "Current Token is '" + (config.isRecursiveReadEnabled() ? "ARRAY" : "[") + "', not 'OBJECT'"));
         } finally {
             jsonStreamReader.close();
         }
@@ -453,36 +526,11 @@ public class JsonStreamReaderTest extends UnitTestCase {
 
     /**
      * Test method for {@link JsonStreamReader#next()}.
+     *
+     * FIXME: this test is a random amalgamation of stuff, we could do better with individual tests.
      */
     @SuppressWarnings("unchecked")
     public void testNext() throws IOException {
-        jsonStreamReader = new JsonStreamReader("{\"objName\':\"string\"}");
-        try {
-            jsonStreamReader.next();
-            fail("String represented with single quote and double quote should not be accepted");
-        } catch (JsonStreamParseException expected) {
-            // Expect this exception because of unterminated string
-        } finally {
-            jsonStreamReader.close();
-        }
-        jsonStreamReader = new JsonStreamReader("{obj Name:\"string\"}");
-        try {
-            jsonStreamReader.next();
-            fail("Object key with a space ");
-        } catch (JsonStreamParseException expected) {
-            // Expect this exception because Object key with a space
-        } finally {
-            jsonStreamReader.close();
-        }
-        jsonStreamReader = new JsonStreamReader("{\"obj Name\":\"string\"}");
-        try {
-            jsonStreamReader.next();
-            Map<String, Object> obj = jsonStreamReader.getObject();
-            assertTrue(obj.containsKey("obj Name"));
-            assertTrue(obj.get("obj Name").equals("string"));
-        } finally {
-            jsonStreamReader.close();
-        }
         
         String func = "function(arg1, arg2) {   /*comment\n\n\n*/var str = \"\\\"\"; var str2 = '\\'vads\\nadf' var foo = {\n}; var func = function(){ var foo = {};var str = \"{\";};}";
         jsonStreamReader = new JsonStreamReader("  { " + "'foo' : 'bar', " + "'baz' : 'qux', "
@@ -582,21 +630,21 @@ public class JsonStreamReaderTest extends UnitTestCase {
         assertTrue(functionAsStringInList instanceof List);
         assertTrue(((List<?>) functionAsStringInList).get(0) instanceof String);
 
-        func = "{key:function(101, 280) {var str = 'do nothing';}}";
+        func = "{key:function(a101, a280) {var str = 'do nothing';}}";
         Object functionLiteralArgs = this.parseAndRetrieve(func);
         assertTrue(functionLiteralArgs instanceof Map);
         assertTrue(((Map<?, ?>) functionLiteralArgs).get("key") instanceof JsFunction);
         JsFunction functionLiteralArgs1 = (JsFunction) ((Map<?, ?>) functionLiteralArgs).get("key");
         assertTrue(functionLiteralArgs1.getArguments().size() == 2);
-        assertEquals(functionLiteralArgs1.getArguments().get(0), "101");
+        assertEquals("a101", functionLiteralArgs1.getArguments().get(0));
         assertEquals("var str = \'do nothing\';", functionLiteralArgs1.getBody());
 
-        func = "function(101, 280) {var str = 'do nothing';}";
+        func = "function(a101, a280) {var str = 'do nothing';}";
         Object functionAsLiteral1 = this.parseAndRetrieve(func);
         assertTrue(functionAsLiteral1 instanceof JsFunction);
         JsFunction functionLiteralArgs2 = (JsFunction) (functionAsLiteral1);
         assertTrue(functionLiteralArgs2.getArguments().size() == 2);
-        assertEquals(functionLiteralArgs2.getArguments().get(0), "101");
+        assertEquals("a101", functionLiteralArgs2.getArguments().get(0));
         assertEquals("var str = 'do nothing';", functionLiteralArgs2.getBody());
 
         func = "{key:function foo(arg1, arg2) { var str = 'do nothing';}}";
@@ -614,6 +662,8 @@ public class JsonStreamReaderTest extends UnitTestCase {
 
     /**
      * Test for reading Strings.
+     *
+     * FIXME: this is a mess.
      */
     @SuppressWarnings("unchecked")
     public void testReadString() throws Exception {
@@ -648,26 +698,6 @@ public class JsonStreamReaderTest extends UnitTestCase {
             parseAndRetrieve("\"halfstring");
             fail("Unterminated String should not pass.");
         } catch (JsonParseException e) {
-            // should fail.
-        }
-    }
-
-    /**
-     * Tests to verify parsing of Arrays.
-     */
-    @SuppressWarnings("unchecked")
-    public void testReadArray() throws IOException {
-        String json = "[\"test1\",\"test2\"]";
-        Object o = parseAndRetrieve(json);
-        assertTrue(o instanceof List);
-        List<String> list = (List<String>) o;
-        assertEquals("JsonStreamReader should have extracted only 2 items", 2, list.size());
-        assertEquals("JsonStreamReader has extracted the wrong string or disordered the elements", "test1", list.get(0));
-        assertEquals("JsonStreamReader has extracted the wrong string or disordered the elements", "test2", list.get(1));
-        try {
-            parseAndRetrieve("[1");
-            fail("Unterminated Array should not pass.");
-        } catch (JsonStreamReader.JsonStreamParseException e) {
             // should fail.
         }
     }
@@ -715,86 +745,6 @@ public class JsonStreamReaderTest extends UnitTestCase {
         assertEquals(1.2E21, ((BigDecimal) parseAndRetrieve("1.2E21")).doubleValue());
         assertEquals(-1.2E-20, ((BigDecimal) parseAndRetrieve("-1.2E-20")).doubleValue());
         assertEquals(1.2, ((BigDecimal) parseAndRetrieve("+1.2")).doubleValue());
-    }
-
-    /**
-     * Tests to verify all accepted forms of string values mentioned in
-     * http://www.json.org and in {@link JsonStreamReader}
-     */
-    public void testReadStrings() throws IOException {
-        assertEquals(null, parseAndRetrieve(""));
-
-        assertEquals(null, parseAndRetrieve("null"));
-        assertEquals(" // ", parseAndRetrieve("\" // \"")); // Single line
-                                                            // comment
-                                                            // characters with
-                                                            // in quotes are not
-                                                            // treated specially
-        assertEquals(" /*  * \n *  */ ", parseAndRetrieve("\" /*  * \n *  */ \"")); // multi
-                                                                                    // line
-                                                                                    // comment
-                                                                                    // characters
-                                                                                    // with
-                                                                                    // in
-                                                                                    // quotes
-                                                                                    // are
-                                                                                    // not
-                                                                                    // treated
-                                                                                    // specially
-        assertEquals("a", parseAndRetrieve("'a'\b")); // Single quote string
-        assertEquals("a", parseAndRetrieve("\"a\""));
-        assertEquals("\n", parseAndRetrieve("\"\\n\""));
-        assertEquals("\t", parseAndRetrieve("\"\\t\""));
-        assertEquals("\\", parseAndRetrieve("\"\\\\\""));
-        assertEquals("\b", parseAndRetrieve("\"\\b\""));
-        assertEquals("\f", parseAndRetrieve("\"\\f\""));
-        assertEquals("\r", parseAndRetrieve("\"\\r\""));
-        assertEquals("\"", parseAndRetrieve("\"\\\"\""));
-        assertEquals("/", parseAndRetrieve("\"\\/\""));
-        assertEquals("ë", parseAndRetrieve("\"ë\""));
-        assertEquals("分", parseAndRetrieve("\"分\"")); // Chinese
-        assertEquals("本", parseAndRetrieve("\"本\"")); // Japanese
-        assertEquals("조", parseAndRetrieve("\"조\"")); // Korean
-        assertEquals("\u1111", parseAndRetrieve("\"ᄑ\""));
-        assertEquals("\u2111", parseAndRetrieve("\"\u2111\""));
-        assertEquals("'", parseAndRetrieve("\"\\'\""));
-        assertEquals("\\'", parseAndRetrieve("\"\\\\\\'\""));
-        assertEquals("\\\\", parseAndRetrieve("\"\\\\\\\\\""));
-        assertEquals("<", parseAndRetrieve("\"\\u003C\""));
-        assertEquals(">", parseAndRetrieve("\"\\u003E\""));
-        assertEquals("!--", parseAndRetrieve("\"\\u0021--\""));
-        assertEquals("\"!--\"", parseAndRetrieve("'\\\"\\u0021--\\\"'"));
-        // Parsing strings which look like a key word throw an exception
-        try {
-            parseAndRetrieve("functioneer");
-            fail("Should have thrown an exception on encountering key word like words");
-        } catch (JsonStreamParseException expected) {
-        }
-        assertEquals("    ! @#$%^&*()_+-=|}{[]:;?.,`~", parseAndRetrieve("\"    ! @#$%^&*()_+-=|}{[]:;?.,`~\""));
-        // Japanese, Chinese, Korean
-        assertEquals("速い茶色のキツネは怠け者の犬を跳び越えました。 福克斯布朗的快速跳过懒狗。 위를 건너뛰었습니다. 게으르고 개 ",
-                parseAndRetrieve("\"速い茶色のキツネは怠け者の犬を跳び越えました。 福克斯布朗的快速跳过懒狗。 위를 건너뛰었습니다. 게으르고 개 \""));
-        // Russian, German, Hebrew
-        assertEquals(
-                "Быстрый Браун Фокс выросло за ленивый собака. Die schnelle Braun Fuchs sprang über den faulen Hund. השועל החום המהיר קפץ מעל הכלב העצלן.",
-                parseAndRetrieve("\"Быстрый Браун Фокс выросло за ленивый собака. Die schnelle Braun Fuchs sprang über den faulen Hund. השועל החום המהיר קפץ מעל הכלב העצלן.\""));
-
-    }
-
-    /**
-     * Tests to verify Json strings with boolean values
-     */
-    public void testReadBooleans() throws IOException {
-        String json = "true";
-        Object o = parseAndRetrieve(json);
-        assertTrue(o instanceof Boolean);
-        Boolean bool = (Boolean) o;
-        assertTrue(bool);
-        json = "false";
-        o = parseAndRetrieve(json);
-        assertTrue(o instanceof Boolean);
-        bool = (Boolean) o;
-        assertFalse(bool);
     }
 
     /**
@@ -976,26 +926,6 @@ public class JsonStreamReaderTest extends UnitTestCase {
     }
 
     /**
-     * A convenience method to verify the functioning of JsonStreamReader. All
-     * this method does is accepts a String, creates a stream with this and
-     * creates a JsonStreamReader object to accept this stream.
-     * 
-     * @param s Json String
-     * @return
-     */
-    private Object parseAndRetrieve(String s) throws IOException {
-        jsonStreamReader = new JsonStreamReader(s);
-        try {
-            jsonStreamReader.next();
-            Object temp = jsonStreamReader.getValue();
-            return temp;
-        } finally {
-            jsonStreamReader.close();
-
-        }
-    }
-
-    /**
      * Ensures that down-the-middle JSON+binary works properly
      */
     public void testJsonPlusBinary() throws Exception {
@@ -1082,4 +1012,157 @@ public class JsonStreamReaderTest extends UnitTestCase {
         reader = new JsonStreamReader(new ByteArrayInputStream("['hello, world']".getBytes(Charsets.UTF_8)));
         reader.disableLengthLimitsBecauseIAmStreamingAndMyMemoryUseIsNotProportionalToTheStreamLength();
     }
+
+    /**
+     * A convenience method to verify the functioning of JsonStreamReader. All
+     * this method does is accepts a String, creates a stream with this and
+     * creates a JsonStreamReader object to accept this stream.
+     * 
+     * @param s Json String
+     * @return
+     */
+    private Object parseAndRetrieve(String s) throws IOException {
+        jsonStreamReader = new JsonStreamReader(s);
+        try {
+            jsonStreamReader.next();
+            Object temp = jsonStreamReader.getValue();
+            return temp;
+        } finally {
+            jsonStreamReader.close();
+
+        }
+    }
+
+    /**
+     * A static class to represent a simple test success.
+     */
+    private static class ParseSuccess {
+        /**
+         * @param name the name of the test
+         * @param input the input that should fail.
+         * @param value the value expected.
+         */
+        public ParseSuccess(String name, String input, Object value) {
+            this.name = name;
+            this.input = input;
+            this.value = value;
+        }
+
+        public final String name;
+        public final String input;
+        public final Object value;
+    };
+
+    /**
+     * Check all the given success cases to ensure that they are valid.
+     */
+    private void runParseSuccesses(ParseSuccess [] pss) throws Exception {
+        for (ParseSuccess ps : pss) {
+            try {
+                Object o = parseAndRetrieve(ps.input);
+                assertEquals(ps.value, o);
+            } catch (JsonStreamParseException jspe) {
+                fail("Got parse exception on "+ps.name+": error "+jspe.getMessage());
+            }
+        }
+    }
+
+    /**
+     * A parser error case.
+     */
+    private static class ParseFailure {
+        /**
+         * @param name the name of the test
+         * @param input the input that should fail.
+         * @param line the line number of the failure.
+         * @param col the column number of the failure.
+         * @param orig the 'original' string.
+         * @param startsWith the beginning of the error message.
+         */
+        public ParseFailure(String name, String input, int line, int col, String orig, String startsWith) {
+            this.name = name;
+            this.input = input;
+            this.line = line;
+            this.col = col;
+            this.orig = orig;
+            this.startsWith = startsWith;
+        }
+
+        public final String name;
+        public final String input;
+        public final int line;
+        public final int col;
+        public final String orig;
+        public final String startsWith;
+    };
+
+    private void runParseFailures(ParseFailure [] pfs) throws Exception {
+        for (ParseFailure pf : pfs) {
+            try {
+                parseAndRetrieve(pf.input);
+                fail("Test case: "+pf.name+" should have failed with an exception");
+            } catch (JsonStreamParseException jspe) {
+                String base = "Test case: "+pf.name;
+                if (pf.startsWith != null) {
+                    assertTrue(String.format("%s: expected '%s' in '%s'", base, pf.startsWith, jspe.getMessage()),
+                            jspe.getMessage().startsWith(pf.startsWith));
+                }
+                if (pf.orig != null) {
+                    assertEquals(base+" orig mismatch", pf.orig, jspe.orig);
+                }
+                assertEquals(base+" line number mismatch", pf.line, jspe.line);
+                assertEquals(base+" column number mismatch", pf.col, jspe.col);
+            }
+        }
+    }
+
+    private static final List<JsonConstant> allGetters = new ImmutableList.Builder<JsonConstant>()
+        .add(JsonConstant.OBJECT)
+        .add(JsonConstant.ARRAY)
+        .add(JsonConstant.NUMBER)
+        .add(JsonConstant.STRING)
+        .add(JsonConstant.BOOLEAN)
+        .build();
+
+    private void checkGetters(JsonConstant expected, String input) throws Exception {
+        for (JsonConstant curr : allGetters) {
+            try {
+                JsonStreamReader jsp = new JsonStreamReader(input);
+                jsp.next();
+                switch (curr) {
+                case OBJECT:
+                    jsp.getObject();
+                    break;
+                case ARRAY:
+                    jsp.getList();
+                    break;
+                case NUMBER:
+                    jsp.getNumber();
+                    break;
+                case STRING:
+                    jsp.getString();
+                    break;
+                case BOOLEAN:
+                    jsp.getBoolean();
+                    break;
+                case BINARY_STREAM:
+                    jsp.getBinaryStream();
+                    break;
+                default:
+                    fail("Invalid type "+curr);
+                }
+                if (curr != expected) {
+                    fail(String.format("Should have failed because '%s' is not '%s' input = '%s'", curr, expected, input));
+                }
+            } catch (JsonStreamParseException jspe) {
+                if (curr == expected) {
+                    fail(String.format("Should not have failed with '%s' on '%s'", curr, input));
+                } else {
+                    assertTrue("did not get expected error message: "+jspe.getMessage(),
+                            jspe.getMessage().startsWith(String.format("Current Token is '%s', not '%s'", expected, curr)));
+                }
+            }
+        }
+    }
+
 }

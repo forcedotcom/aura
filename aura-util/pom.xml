@@ -47,6 +47,10 @@
             <artifactId>icu4j</artifactId>
         </dependency>
         <dependency>
+            <groupId>findbugs</groupId>
+            <artifactId>annotations</artifactId>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <exclusions>

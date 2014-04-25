@@ -132,7 +132,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
     /**
      * Setup specific to a test run against a particular browser. Run once per test case, per browser.
      */
-    protected void perBrowserSetUp() {
+    public void perBrowserSetUp() {
         // re-initialize driver pointer here because test analysis might need it after perBrowserTearDown
         getDriver();
     }
@@ -148,7 +148,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
         super.runTest();
     }
 
-    private void runTestWithBrowser(BrowserType browserType) throws Throwable {
+    public void runTestWithBrowser(BrowserType browserType) throws Throwable {
         currentBrowserType = browserType;
         try {
             perBrowserSetUp();

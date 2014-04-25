@@ -29,6 +29,7 @@
 		
 		<aura:attribute name="pageModels" type="Object[]" description="The model used to create a carousel page." />
 		<aura:attribute name="pageComponents" type="Aura.Component[]" description="Carousel page components that is rendered as carousel pages." />
+		<aura:attribute name="navigationTabs" type="Boolean" default="false" description="Enable navigational tabs on the pageIndicator"/>
 		
 		<aura:attribute name="onPageChange" type="Aura.Action" description="The action invoked when the carousel changes to a different page." />
 		<aura:attribute name="spinner" type="Aura.Component[]" description="Spinner component used during asynchronous loading. Must fire and handle a 'toggle' event with an isVisible attribute." />
@@ -57,7 +58,7 @@
 				
 				<aura:if isTrue="{!v.continuousFlow != true &amp;&amp; v.pageIndicatorPosition == 'top'}" >
 					<nav aura:id="navContainer" class="{!'carousel-nav-container carousel-nav-position-' + v.pageIndicatorPosition}" role="tablist">        		 
-	        			<ui:carouselPageIndicator />        		 
+	        			<ui:carouselPageIndicator navigationTabs="{!v.navigationTabs}" />        		 
 					</nav>					
 				</aura:if>
 					        

@@ -16,6 +16,7 @@
 package org.auraframework.components.ui.tabset;
 
 import org.auraframework.test.WebDriverTestCase;
+import org.auraframework.util.test.perf.PerfTest;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -27,6 +28,7 @@ public class TabsetUITest extends WebDriverTestCase {
         super(name);
     }
 
+    @PerfTest
     public void testTabSwitching() throws Exception {
         open(URL);
 
@@ -66,7 +68,8 @@ public class TabsetUITest extends WebDriverTestCase {
             auraUITestingUtil.assertClassNameDoesNotContain(tab, "active");
             assertFalse("Since tab is inactive should not be able to read tab body: " + tabBody,
                     tabBodyActual.contains(tabBody));
-            assertFalse("Since tab is inactive link should not have aria set (for accessability)",Boolean.valueOf(tabLinkAria));
+            assertFalse("Since tab is inactive link should not have aria set (for accessability)",
+                    Boolean.valueOf(tabLinkAria));
         }
 
     }

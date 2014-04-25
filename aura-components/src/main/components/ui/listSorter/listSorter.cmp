@@ -36,28 +36,29 @@
 
 	<aura:handler name="init" value="{!this}" action="{!c.init}" />	
 	<aura:handler name="change" value="{!v.visible}" action="{!c.onVisible}" />
-	
 	<div>
-        {!v.trigger}
-    </div>      
-    <div aura:id="sorterContainer" class="{!v.class + ' listSorterContainer'}">
-    	<div class="body">            	           
-			<ui:menu aura:id="sorterMenu" closeOnClickOutside="false" class="sorterMenu">
-				<ui:menuList aura:id="sorterMenuList" closeOnTabKey="false" visible="{!v.visible}" class="sorterMenuList scrollable" menuSelect="{!c.onMenuSelected}" menuExpand="{!c.onMenuExpand}" menuCollapse="{!c.onMenuCollapse}">										 
-					<aura:iteration items="{!v.items}" var="{!v.rowVar}" body="{!v.rowDef}"/>
-		    	</ui:menuList>
-			</ui:menu>
+		<div aura:id="trigger">
+	        {!v.trigger}
+	    </div>      
+	    <div aura:id="sorterContainer" class="{!v.class + ' listSorterContainer'}">
+	    	<div class="body">            	           
+				<ui:menu aura:id="sorterMenu" closeOnClickOutside="false" class="sorterMenu">
+					<ui:menuList aura:id="sorterMenuList" closeOnTabKey="false" visible="{!v.visible}" class="sorterMenuList scrollable" menuSelect="{!c.onMenuSelected}" menuExpand="{!c.onMenuExpand}" menuCollapse="{!c.onMenuCollapse}">										 
+						<aura:iteration items="{!v.items}" var="{!v.rowVar}" body="{!v.rowDef}"/>
+			    	</ui:menuList>
+				</ui:menu>
+			</div>
+			<div aura:id="headerBar" class="headerBar">
+	            <a aura:id="cancel" onclick="{!c.onCancel}" class="cancel button" href="javascript:void(0);">Cancel
+	            </a>
+	            <span aura:id="title" class="title">{!v.title}</span>
+	            <a aura:id="set" onclick="{!c.onApply}" class="apply button" href="javascript:void(0);">Apply
+	            </a>
+	        </div>
 		</div>
-		<div aura:id="headerBar" class="headerBar">
-            <a aura:id="cancel" onclick="{!c.onCancel}" class="cancel button" href="javascript:void(0);">Cancel
-            </a>
-            <span aura:id="title" class="title">{!v.title}</span>
-            <a aura:id="set" onclick="{!c.onApply}" class="apply button" href="javascript:void(0);">Apply
-            </a>
-        </div>
+		<aura:if isTrue="{!v.modal}">
+			<div aura:id="mask" class="listSorterMask">&nbsp;</div>
+		</aura:if>
 	</div>
-	<aura:if isTrue="{!v.modal}">
-		<div aura:id="mask" class="listSorterMask">&nbsp;</div>
-	</aura:if>	  
 	 
 </aura:component>

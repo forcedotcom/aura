@@ -139,7 +139,15 @@ public final class ValidationEngine {
             // fix, but report a ValidationError also
             int charNum = jreader.getCharNum();
             sourceCode = "var actions=\n" + sourceCode.substring(charNum - 1);
-            lineOffset = jreader.getLineNum() - 1;
+            //
+            // We do some fancy footwork here to get the line number right.
+            // (1) we take off 1 to remove the (first line = 1) from the reader.
+            // (2) we take off 1 for the '\n' just above in the fixup.
+            // (3) we add back two when creating the error to make the line correct
+            //     here while having the line offset adjusted correctly.
+            // A little confusing, but it does do the right thing.
+            //
+            lineOffset = jreader.getLineNum() - 2;
             customError = new JavascriptProcessingError("Starting '(' missing", lineOffset + 2, 1,
                     sourceUrl,
                     null, Level.Error);

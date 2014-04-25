@@ -15,7 +15,22 @@
  */
 package org.auraframework.util.test;
 
-public class GoldFileUtils {
+import java.io.FileNotFoundException;
+import java.net.URL;
+
+import junit.framework.AssertionFailedError;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.auraframework.util.test.perf.PerfDiffUtils;
+import org.auraframework.util.test.perf.data.PerfMetrics;
+
+public final class GoldFileUtils {
+
+    private static final Log LOG = LogFactory.getLog(GoldFileUtils.class);
+
+    private static final boolean SKIP_GOLD_FILE_UPDATE = System.getProperty("skipGoldFileUpdate") != null;
+
     public void assertTextDiff(Class<?> testClass, String resultsBaseFilename, String testResults) throws Exception {
         TextDiffUtils diff = new TextDiffUtils(testClass, resultsBaseFilename);
         assertDiffInternal(testResults, diff);
@@ -26,12 +41,38 @@ public class GoldFileUtils {
         assertDiffInternal(testResults, diff);
     }
 
+    public void assertPerfDiff(Class<?> testClass, String resultsBaseFilename, PerfMetrics actual) throws Exception {
+        PerfDiffUtils diff = new PerfDiffUtils(testClass, resultsBaseFilename);
+        assertDiffInternal(actual, diff);
+    }
+
     private <T> void assertDiffInternal(T testResults, DiffUtils<T> diff) throws Exception {
+        URL url = diff.getUrl();
+        Throwable exceptionFound = null;
+        String message = null;
+
         try {
             diff.assertDiff(testResults, null);
-            return;
+        } catch (FileNotFoundException e) {
+            exceptionFound = e;
+            message = String.format("Created missing gold file, review new gold file before committing: %s", url);
         } catch (Throwable t) {
-            diff.writeGoldFile(testResults);
+            exceptionFound = t;
+            message = String.format(
+                    "Gold file differences found, review updated gold file before committing: %s", url);
+            message += "\nDifferences:\n" + t.getMessage();
+        }
+
+        if (exceptionFound != null) {
+            LOG.info("writing log file: " + url);
+            if (exceptionFound instanceof FileNotFoundException || !SKIP_GOLD_FILE_UPDATE) {
+                diff.writeGoldFile(testResults);
+            }
+
+            // add info about creating/updating log file in the message
+            Error error = new AssertionFailedError(message);
+            error.setStackTrace(exceptionFound.getStackTrace());
+            throw error;
         }
     }
 }

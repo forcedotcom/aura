@@ -245,7 +245,7 @@
             $A.componentService.newComponentAsync(this, this.createSelectiveComponentsCallback(selectiveBodyCollector, j), cdr, ivp, false, false, forceServer);
         }
     },
-    
+
     createSelectiveComponentsCallback: function(selectiveBodyCollector, index) {
         return function(newcmp) {
             selectiveBodyCollector.realBodyList[index] = newcmp;
@@ -260,7 +260,7 @@
             }
         };
     },
-    
+
     rerenderEverything: function(cmp) {
         this.createRealBody(cmp, false, function(newBody) {
             if (cmp.isValid()) {
@@ -271,7 +271,7 @@
             }
         });
     },
-    
+
     rerenderSelective: function(cmp) {
         // optimized for insert/remove/push. if this is called as a result of a setValue then anything could change
         var start = this.getStart(cmp);
@@ -300,16 +300,16 @@
             }
             if (diffIndex !== -1) {
                 // something was added or removed at or before diffIndex
-                var cmparray = realbody.unwrap();
+                var cmparray;
                 var nextItem = items.getValue(diffIndex + 1);
                 if (nextItem !== data) {
                     // this item was removed, delete this item, re-number rest
-                    var removed = cmparray.splice(i, bodyLen);
+                    var removed = realbody.remove(i, bodyLen);
+                    cmparray = realbody.unwrap();
+                    this.incrementIndices(cmparray, i, indexVar, -1, bodyLen);
                     for (var k = 0; k < body.getLength(); k++) {
                         removed[k].destroy();
                     }
-                    this.incrementIndices(cmparray, i, indexVar, -1, bodyLen);
-                    realbody.setValue(cmparray);
                     this.createNewComponents(cmp, function(newcmps) {
                         for (var j = 0; j < newcmps.length; j++) {
                             realbody.push(newcmps[j]);
@@ -317,6 +317,7 @@
                     });
                 } else {
                     // item was added, instantiate new cmp, re-number rest
+                    cmparray = realbody.unwrap();
                     this.incrementIndices(cmparray, i, indexVar, 1, bodyLen);
                     this.createSelectiveComponentsForIndex(cmp, items, diffIndex, false, function(newcmps) {
                         cmparray.splice.apply(cmparray, [i, 0].concat(newcmps));
@@ -329,7 +330,7 @@
                         }
                         realbody.setValue(cmparray);
                     });
-                }               
+                }
             } else {
                 this.createNewComponents(cmp, function(newcmps) {
                     for (var j = 0; j < newcmps.length; j++) {

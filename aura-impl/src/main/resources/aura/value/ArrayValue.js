@@ -279,13 +279,18 @@ ArrayValue.prototype.insert = function(index, config) {
 };
 
 /**
- * Removes from the array the item at the specified index and returns the removed item.
+ * Removes from the array the item(s) at the specified index and returns the removed item(s).
+ * Largely for back compatibility, remove(i) will return the removed item, but remove(i,m)
+ * will return an array of removed items (perhaps only one item, for m=1).
+ *
  * @param {Number} index The array index of the item to be removed
+ * @param {Number} count The number of items to remove.  If undefined, one item is removed,
+ *     and the return is NOT an array.
  */
-ArrayValue.prototype.remove = function(index) {
+ArrayValue.prototype.remove = function(index, count) {
     if ($A.util.isNumber(index) && index >= 0 && index < this.getLength()) {
         var ar = this.getArray();
-        var removed = ar.splice(index, 1)[0];
+        var removed = ar.splice(index, count === undefined ? 1 : count);
         this.makeDirty();
         for (var i = index; i < ar.length; i++) {
             if (ar[i].makeDirty) {
@@ -295,12 +300,41 @@ ArrayValue.prototype.remove = function(index) {
         var handlers = this.handlers;
         if (handlers) {
             for (var globalId in handlers) {
-                removed.destroyHandlers(globalId);
+                for (i = 0; i < removed.length; i++) {
+                    removed[i].destroyHandlers(globalId);
+                }
             }
         }
-
+        // Ensure that we keep a reference node, or that we create a new locator
+        if (this.referenceNode) {
+            i = 0;
+            while (i < removed.length) {
+                if (removed[i].getElement && removed[i].getElement() === this.referenceNode) {
+                    break;   // We removed our reference
+                }
+                i++;
+            }
+            // First removed item with an element might have been the reference node
+            if (removed[i] && removed[i].getElement && this.referenceNode === removed[i].getElement()) {
+                // Oops, it's not anymore.  So, check if we still have one to use, or make one.
+                i = 0;
+                while (i < ar.length) {
+                    if (ar[i].getElement && ar[i].getElement()) {
+                        break;  // Found a viable reference node instead
+                    }
+                    i++;
+                }
+                if (i < ar.length) {
+                    this.referenceNode = ar[i].getElement();
+                } else {
+                    var newRef = this.createLocator("array locator " + this.owner);
+                    $A.util.insertBefore(newRef, this.referenceNode);
+                    this.referenceNode = newRef;
+                }
+            }
+        }
         this.fire("change");
-        return removed;
+        return count === undefined ? removed[0] : removed;
     }
     return null;
 };

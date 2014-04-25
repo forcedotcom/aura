@@ -26,7 +26,7 @@ var priv = {
     },
 
     changeHandler : function(){
-        var loc = location["hash"];
+    	var loc = location["hash"] || (history["state"] && history["state"]["hash"]);
         var event = eventService.newEvent(this.getEvent());
         
         if(!event) {

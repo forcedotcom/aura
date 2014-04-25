@@ -15,32 +15,16 @@
  */
 package org.auraframework.util.test;
 
-import junit.framework.Assert;
-
-import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.Reader;
-import java.net.URL;
+
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.auraframework.util.AuraUtil;
-import org.auraframework.util.adapter.SourceControlAdapter;
+import junit.framework.Assert;
+
 import org.xml.sax.SAXException;
 
 public class TextDiffUtils extends BaseDiffUtils<String> {
-
-    public static class NewGoldFileException extends RuntimeException {
-        private static final long serialVersionUID = -5288394880186418728L;
-
-        private NewGoldFileException(URL url) {
-            super(String.format("Differences were found. Review new gold file before committing: %s", url));
-        }
-    }
 
     public TextDiffUtils(Class<?> testClass, String goldName) throws Exception {
         super(testClass, goldName);
@@ -68,42 +52,11 @@ public class TextDiffUtils extends BaseDiffUtils<String> {
 
     @Override
     public void writeGoldFile(String results) {
-        URL url = getDestUrl();
-        SourceControlAdapter sca = AuraUtil.getSourceControlAdapter();
-        try {
-            File f = new File(url.getFile());
-            boolean existed = f.exists();
-            if (existed && !f.canWrite() && sca.canCheckout()) {
-                sca.checkout(f);
-            }
-            if (!f.getParentFile().exists()) {
-                f.getParentFile().mkdirs();
-            }
-            OutputStreamWriter fw = new OutputStreamWriter(new FileOutputStream(f), "UTF-8");
-            fw.write(results);
-            fw.close();
-
-            if (!existed && sca.canCheckout()) {
-                sca.add(f);
-            }
-        } catch (Throwable t) {
-            throw new RuntimeException("Failed to write gold file: " + url.toString(), t);
-        }
-        throw new NewGoldFileException(url);
+        writeGoldFileContent(results);
     }
 
     @Override
     public String readGoldFile() throws IOException {
-        int READ_BUFFER = 4096;
-
-        Reader br = new BufferedReader(new InputStreamReader(getUrl().openStream(), "UTF-8"));
-        char[] buff = new char[READ_BUFFER];
-        int read = -1;
-        StringBuffer sb = new StringBuffer(READ_BUFFER);
-        while ((read = br.read(buff, 0, READ_BUFFER)) != -1) {
-            sb.append(buff, 0, read);
-        }
-        br.close();
-        return sb.toString();
+        return readGoldFileContent();
     }
 }

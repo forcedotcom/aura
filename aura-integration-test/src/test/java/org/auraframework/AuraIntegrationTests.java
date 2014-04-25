@@ -31,13 +31,14 @@ import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
 import org.auraframework.test.TestExecutor;
-import org.auraframework.test.WebDriverProvider;
 import org.auraframework.test.TestExecutor.TestRun;
 import org.auraframework.test.TestInventory;
 import org.auraframework.test.TestInventory.Type;
+import org.auraframework.test.WebDriverProvider;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.AuraUtil;
 import org.auraframework.util.ServiceLocator;
+import org.auraframework.util.test.perf.PerfUtil;
 
 import com.google.common.collect.Lists;
 
@@ -46,6 +47,8 @@ import com.google.common.collect.Lists;
  * 
  * If the "testNameContains" system property is set, filter tests to run only those tests containing the provided string
  * (case-insensitive).
+ * 
+ * If the "runPerfTests" system property is set, it will run the tests that are annotated with @PerfTest
  */
 public class AuraIntegrationTests extends TestSuite {
     public static final boolean TEST_SHUFFLE = Boolean.parseBoolean(System.getProperty("testShuffle", "false"));
@@ -53,6 +56,7 @@ public class AuraIntegrationTests extends TestSuite {
     private static final Logger logger = Logger.getLogger(AuraIntegrationTests.class.getName());
 
     private final String nameFragment;
+    private static final boolean RUN_PERF_TESTS = System.getProperty("runPerfTests") != null;
 
     static {
         int numIterations = 0;
@@ -84,6 +88,9 @@ public class AuraIntegrationTests extends TestSuite {
         logger.info("Building test inventories");
         if (nameFragment != null) {
             logger.info("Filtering by test names containing: " + nameFragment);
+        }
+        if (RUN_PERF_TESTS) {
+            logger.info("Filtering only test annotated with @PerfTest");
         }
         Set<TestInventory> inventories = ServiceLocator.get().getAll(TestInventory.class);
         List<Callable<TestResult>> queue = Lists.newLinkedList();
@@ -143,6 +150,11 @@ public class AuraIntegrationTests extends TestSuite {
                 String testName = test.getClass().getName().toLowerCase() + "."
                         + ((TestCase) test).getName().toLowerCase();
                 if (!testName.contains(nameFragment)) {
+                    return;
+                }
+            }
+            if (RUN_PERF_TESTS) {
+                if (!PerfUtil.hasPerfTestAnnotation((TestCase) test)) {
                     return;
                 }
             }

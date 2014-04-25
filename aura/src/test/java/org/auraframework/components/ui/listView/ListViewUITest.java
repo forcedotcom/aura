@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.auraframework.test.WebDriverTestCase;
 import org.auraframework.test.WebDriverUtil.BrowserType;
+import org.auraframework.util.test.perf.PerfTest;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -90,6 +91,7 @@ public class ListViewUITest extends WebDriverTestCase {
         assertTrue("tfoot element should contain no rows", tFootElement.findElements(By.tagName("tr")).size() == 0);
     }
 
+    @PerfTest
     public void testListGeneratedColumns() throws Exception {
         open(URL);
         WebDriver driver = this.getDriver();

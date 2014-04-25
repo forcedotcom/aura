@@ -36,6 +36,7 @@ import org.auraframework.util.IOUtil;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonSerializationContext;
 import org.auraframework.util.test.GoldFileUtils;
+import org.auraframework.util.test.perf.data.PerfMetrics;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
@@ -149,6 +150,10 @@ public abstract class UnitTestCase extends TestCase {
 
     protected void serializeAndGoldFile(Object actual, String suffix) throws Exception {
         goldFileJson(toJson(actual), suffix);
+    }
+
+    protected final void assertGoldMetrics(PerfMetrics actual) throws Exception {
+        goldFileUtils.assertPerfDiff(this.getClass(), getGoldFileName() + ".json", actual);
     }
 
     protected void serializeAndGoldFile(Object actual) throws Exception {

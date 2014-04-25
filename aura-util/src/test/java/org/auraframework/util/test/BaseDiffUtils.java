@@ -22,7 +22,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.Reader;
 import java.net.URL;
+
+import org.auraframework.util.AuraUtil;
+import org.auraframework.util.adapter.SourceControlAdapter;
 
 public abstract class BaseDiffUtils<T> implements DiffUtils<T> {
 
@@ -30,7 +34,7 @@ public abstract class BaseDiffUtils<T> implements DiffUtils<T> {
     private URL destUrl;
 
     public BaseDiffUtils(Class<?> testClass, String goldName) throws Exception {
-        String resourceName = "/results/" + testClass.getSimpleName() + (goldName.startsWith("/") ? "" : "/")
+        String resourceName = getResultsFolder() + testClass.getSimpleName() + (goldName.startsWith("/") ? "" : "/")
                 + goldName;
         srcUrl = testClass.getResource(resourceName);
         if (srcUrl == null) {
@@ -57,6 +61,13 @@ public abstract class BaseDiffUtils<T> implements DiffUtils<T> {
             // also if reading from jars and no gold included (shouldn't happen)
             srcUrl = destUrl;
         }
+    }
+
+    /**
+     * Override to change it
+     */
+    protected String getResultsFolder() {
+        return "/results/";
     }
 
     @Override
@@ -112,5 +123,43 @@ public abstract class BaseDiffUtils<T> implements DiffUtils<T> {
         } finally {
             reader.close();
         }
+    }
+
+    protected final void writeGoldFileContent(String content) {
+        URL url = getDestUrl();
+        SourceControlAdapter sca = AuraUtil.getSourceControlAdapter();
+        try {
+            File f = new File(url.getFile());
+            boolean existed = f.exists();
+            if (existed && !f.canWrite() && sca.canCheckout()) {
+                sca.checkout(f);
+            }
+            if (!f.getParentFile().exists()) {
+                f.getParentFile().mkdirs();
+            }
+            OutputStreamWriter fw = new OutputStreamWriter(new FileOutputStream(f), "UTF-8");
+            fw.write(content);
+            fw.close();
+
+            if (!existed && sca.canCheckout()) {
+                sca.add(f);
+            }
+        } catch (Throwable t) {
+            throw new RuntimeException("Failed to write gold file: " + url.toString(), t);
+        }
+    }
+
+    protected final String readGoldFileContent() throws IOException {
+        final int READ_BUFFER = 4096;
+
+        Reader br = new BufferedReader(new InputStreamReader(getUrl().openStream(), "UTF-8"));
+        char[] buff = new char[READ_BUFFER];
+        int read = -1;
+        StringBuffer sb = new StringBuffer(READ_BUFFER);
+        while ((read = br.read(buff, 0, READ_BUFFER)) != -1) {
+            sb.append(buff, 0, read);
+        }
+        br.close();
+        return sb.toString();
     }
 }

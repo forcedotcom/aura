@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.auraframework.test.WebDriverTestCase;
 import org.auraframework.test.WebDriverUtil.BrowserType;
+import org.auraframework.util.test.perf.PerfTest;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
@@ -26,10 +27,10 @@ import org.openqa.selenium.support.ui.Select;
 public class InputMultiSelectUITest extends WebDriverTestCase {
     private final String[] URL = new String[] { "/uitest/inputMultiSelect_Test.cmp",
             "/uitest/inputMultiSelect_NestedOptionsTest.cmp" };
-    private By outputLocator = By.xpath("//span[@class='uiOutputText']");
-    private By selectLocator = By.xpath("//select[1]");
-    private By submitLocator = By.xpath("//button");
-    private String optionLocatorString = "//select[1]/option[text()='%s']";
+    private final By outputLocator = By.xpath("//span[@class='uiOutputText']");
+    private final By selectLocator = By.xpath("//select[1]");
+    private final By submitLocator = By.xpath("//button");
+    private final String optionLocatorString = "//select[1]/option[text()='%s']";
 
     public InputMultiSelectUITest(String name) {
         super(name);
@@ -81,6 +82,7 @@ public class InputMultiSelectUITest extends WebDriverTestCase {
     /**
      * Select one. Choose one option. Deselect one. Deselect one option.
      */
+    @PerfTest
     public void testInputSelectSingle() throws Exception {
         for (int i = 0; i < URL.length; i++) {
             openTestPage(i);

@@ -47,7 +47,7 @@
             <artifactId>icu4j</artifactId>
         </dependency>
         <dependency>
-            <groupId>findbugs</groupId>
+            <groupId>net.sourceforge.findbugs</groupId>
             <artifactId>annotations</artifactId>
         </dependency>
         <dependency>

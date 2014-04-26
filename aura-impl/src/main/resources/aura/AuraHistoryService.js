@@ -36,7 +36,12 @@ var AuraHistoryService = function(){
         set : function(token){
             // Check for HTML5 window.history.pushState support
             if ('pushState' in window.history && !this.isNativeAndroid()) {
-                history.pushState(null, null, '#' + token);
+            	//
+            	// Need to pass in the token to the state as
+            	// windows phone doesn't persist the hash
+            	// after using the back button.
+            	//
+                history.pushState({"hash":token}, null, '#' + token);
             } else {
                 location.hash = '#' + token;
             }
@@ -53,7 +58,12 @@ var AuraHistoryService = function(){
          * @public
          */
         get : function(){
-            return priv.parseLocation(location.hash);
+        	// 
+        	// Windows phone doesn't save the hash after navigating backwards. 
+        	// So get it from the history state. 
+        	//
+        	var token = location["hash"] || (window.history["state"] && window.history["state"]["hash"]) || "";
+            return priv.parseLocation(token);
         },
         
         /**
@@ -128,7 +138,7 @@ var AuraHistoryService = function(){
                             var newHash = location["hash"];
                             if (newHash !== hash) {
                                 hash = newHash;
-                                priv.changeHandler(hash);
+                                priv.changeHandler();
                             }
                             watch();
                         }, 300);
@@ -138,7 +148,7 @@ var AuraHistoryService = function(){
                 }
             }
 
-            priv.changeHandler(location["hash"]);
+            priv.changeHandler();
             delete this.init;
         }
     };

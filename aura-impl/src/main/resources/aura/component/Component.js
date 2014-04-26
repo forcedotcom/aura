@@ -1013,7 +1013,7 @@ Component.prototype.fire = function(name) {
 Component.prototype.isDirty = function(expression){
     // JBUCH TODO: TEMPORARY PASSTHROUGH TO HIDE SIMPLEVALUES; isDirty() SHOULD BE HANDLED AUTOMATICALLY
     var wrapper=this._getValue(expression);
-    return wrapper&&wrapper.isDirty()||false;
+    return (wrapper&&wrapper.isDirty())||false;
 };
 
 /**
@@ -1024,7 +1024,7 @@ Component.prototype.isValid=function(expression){
     // JBUCH TODO: TEMPORARY PASSTHROUGH TO HIDE SIMPLEVALUES; isValid() SHOULD BE HANDLED THROUGH ERROR EVENTS
     if(expression){
         var wrapper=this._getValue(expression);
-        return wrapper&&wrapper.isValid()||false;
+        return (wrapper&&wrapper.isValid())||false;
     }
     return !this._scheduledForAsyncDestruction && this.priv;
 };

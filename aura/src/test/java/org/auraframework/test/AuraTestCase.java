@@ -75,7 +75,7 @@ public abstract class AuraTestCase extends UnitTestCase {
         }
         TestContextAdapter testContextAdapter = Aura.get(TestContextAdapter.class);
         if (testContextAdapter != null) {
-            testContextAdapter.release();
+            testContextAdapter.clear(true);
         }
         if (auraTestingUtil != null) {
             auraTestingUtil.tearDown();

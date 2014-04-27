@@ -14,97 +14,97 @@
  * limitations under the License.
  */
 /*jslint sub: true */
-var p = Test;
-exp(p,
-	// asserts
-    "assert", p.assert,
-    "assertTruthy", p.assertTruthy,
-    "assertFalsy", p.assertFalsy,
-    "assertEquals", p.assertEquals,
-    "assertEqualsIgnoreWhitespace", p.assertEqualsIgnoreWhitespace,
-    "assertNotEquals", p.assertNotEquals,
-    "assertDefined", p.assertDefined,
-    "assertTrue", p.assertTrue,
-    "assertFalse", p.assertFalse,
-    "assertUndefined", p.assertUndefined,
-    "assertUndefinedOrNull", p.assertUndefinedOrNull,
-    "assertNotUndefinedOrNull", p.assertNotUndefinedOrNull,
-    "assertNull", p.assertNull,
-    "assertNotNull", p.assertNotNull,
-    "assertStartsWith", p.assertStartsWith,
-    "assertAccessible", p.assertAccessible,
-    
-    // test flow/state
-    "fail", p.fail,
-    "isComplete", p.isComplete,
-    "addWaitFor", p.addWaitFor,
-    "addWaitForAction", p.addWaitForAction,
-    "addWaitForWithFailureMessage", p.addWaitForWithFailureMessage,
-    "runAfterIf", p.runAfterIf,
-    "setTestTimeout", p.setTestTimeout,
-    "getErrors", p.getErrors,
-    "addCleanup", p.addCleanup,
-    "expectAuraError", p.expectAuraError,
-    "expectAuraWarning", p.expectAuraWarning,
-    "getAuraErrorMessage", p.getAuraErrorMessage,
-    
-    // DOM
-    "getOuterHtml", p.getOuterHtml,
-    "getText", p.getText,
-    "getTextByComponent", p.getTextByComponent,
-    "getStyle", p.getStyle,
-    "getNonCommentNodes", p.getNonCommentNodes,
-    "isNodeDeleted", p.isNodeDeleted,
-    "select", p.select,
-    "getActiveElement", p.getActiveElement,
-    "getActiveElementText", p.getActiveElementText,
-    "getElementByClass", p.getElementByClass,
-    "findChildWithClassName",p.findChildWithClassName,
-    "fireDomEvent",	p.fireDomEvent,
-    "isInstanceOfText", p.isInstanceOfText,
-    "isInstanceOfAnchorElement", p.isInstanceOfAnchorElement,
-    "isInstanceOfInputElement", p.isInstanceOfInputElement,
-    "isInstanceOfLiElement", p.isInstanceOfLiElement,
-    "isInstanceOfParagraphElement", p.isInstanceOfParagraphElement,
-    "isInstanceOfButtonElement", p.isInstanceOfButtonElement,
-    "isInstanceOfImageElement", p.isInstanceOfImageElement,
-    "isInstanceOfDivElement", p.isInstanceOfDivElement,
-    "isInstanceOfSpanElement", p.isInstanceOfSpanElement,
-    "isInstanceOf", p.isInstanceOf,
-    "getElementAttributeValue", p.getElementAttributeValue,
-    "clickOrTouch", p.clickOrTouch,
-    
-    // javascript
-    "getPrototype", p.getPrototype,
-    "overrideFunction", p.overrideFunction,
-    "addFunctionHandler", p.addFunctionHandler,
-    "objectKeys", p.objectKeys,
-    
-    // actions
-    "callServerAction", p.callServerAction,
-    "isActionPending", p.isActionPending,
-    "markForCompletion", p.markForCompletion,
-    "isComplete", p.isComplete,
-    "isSuccessfullyComplete", p.isSuccessfullyComplete,
-    "clearCompletion", p.clearCompletion,
-    "getAction", p.getAction,
-    "getExternalAction", p.getExternalAction,
-    "blockRequests", p.blockRequests,
-    "releaseRequests", p.releaseRequests,
-    "getSentRequestCount", p.getSentRequestCount,
-    "enqueueAction", p.enqueueAction,
-    "runActionsAsTransaction", p.runActionsAsTransaction,
-    "clearAndAssertComponentConfigs", p.clearAndAssertComponentConfigs,
 
-    // events
-    "addEventHandler", p.addEventHandler,
-    
-    // internal functions
-    "run", run,
-    "getDump", getDump,
-    "dummyFunction", p.dummyFunction,
-    
-    // appcache
-    "getAppCacheEvents", p.getAppCacheEvents
-    
-);
+// //#exportSymbols $A.ns.Test
+
+// asserts
+$A.ns.Test.prototype["assert"] = $A.ns.Test.prototype.assert;
+$A.ns.Test.prototype["assertTruthy"] = $A.ns.Test.prototype.assertTruthy;
+$A.ns.Test.prototype["assertFalsy"] = $A.ns.Test.prototype.assertFalsy;
+$A.ns.Test.prototype["assertEquals"] = $A.ns.Test.prototype.assertEquals;
+$A.ns.Test.prototype["assertEqualsIgnoreWhitespace"] = $A.ns.Test.prototype.assertEqualsIgnoreWhitespace;
+$A.ns.Test.prototype["assertNotEquals"] = $A.ns.Test.prototype.assertNotEquals;
+$A.ns.Test.prototype["assertDefined"] = $A.ns.Test.prototype.assertDefined;
+$A.ns.Test.prototype["assertTrue"] = $A.ns.Test.prototype.assertTrue;
+$A.ns.Test.prototype["assertFalse"] = $A.ns.Test.prototype.assertFalse;
+$A.ns.Test.prototype["assertUndefined"] = $A.ns.Test.prototype.assertUndefined;
+$A.ns.Test.prototype["assertUndefinedOrNull"] = $A.ns.Test.prototype.assertUndefinedOrNull;
+$A.ns.Test.prototype["assertNotUndefinedOrNull"] = $A.ns.Test.prototype.assertNotUndefinedOrNull;
+$A.ns.Test.prototype["assertNull"] = $A.ns.Test.prototype.assertNull;
+$A.ns.Test.prototype["assertNotNull"] = $A.ns.Test.prototype.assertNotNull;
+$A.ns.Test.prototype["assertStartsWith"] = $A.ns.Test.prototype.assertStartsWith;
+$A.ns.Test.prototype["assertAccessible"] = $A.ns.Test.prototype.assertAccessible;
+
+// test flow/state
+$A.ns.Test.prototype["fail"] = $A.ns.Test.prototype.fail;
+$A.ns.Test.prototype["isComplete"] = $A.ns.Test.prototype.isComplete;
+$A.ns.Test.prototype["addWaitFor"] = $A.ns.Test.prototype.addWaitFor;
+$A.ns.Test.prototype["addWaitForAction"] = $A.ns.Test.prototype.addWaitForAction;
+$A.ns.Test.prototype["addWaitForWithFailureMessage"] = $A.ns.Test.prototype.addWaitForWithFailureMessage;
+$A.ns.Test.prototype["runAfterIf"] = $A.ns.Test.prototype.runAfterIf;
+$A.ns.Test.prototype["setTestTimeout"] = $A.ns.Test.prototype.setTestTimeout;
+$A.ns.Test.prototype["getErrors"] = $A.ns.Test.prototype.getErrors;
+$A.ns.Test.prototype["addCleanup"] = $A.ns.Test.prototype.addCleanup;
+$A.ns.Test.prototype["expectAuraError"] = $A.ns.Test.prototype.expectAuraError;
+$A.ns.Test.prototype["expectAuraWarning"] = $A.ns.Test.prototype.expectAuraWarning;
+$A.ns.Test.prototype["getAuraErrorMessage"] = $A.ns.Test.prototype.getAuraErrorMessage;
+
+// DOM
+$A.ns.Test.prototype["getOuterHtml"] = $A.ns.Test.prototype.getOuterHtml;
+$A.ns.Test.prototype["getText"] = $A.ns.Test.prototype.getText;
+$A.ns.Test.prototype["getTextByComponent"] = $A.ns.Test.prototype.getTextByComponent;
+$A.ns.Test.prototype["getStyle"] = $A.ns.Test.prototype.getStyle;
+$A.ns.Test.prototype["getNonCommentNodes"] = $A.ns.Test.prototype.getNonCommentNodes;
+$A.ns.Test.prototype["isNodeDeleted"] = $A.ns.Test.prototype.isNodeDeleted;
+$A.ns.Test.prototype["select"] = $A.ns.Test.prototype.select;
+$A.ns.Test.prototype["getActiveElement"] = $A.ns.Test.prototype.getActiveElement;
+$A.ns.Test.prototype["getActiveElementText"] = $A.ns.Test.prototype.getActiveElementText;
+$A.ns.Test.prototype["getElementByClass"] = $A.ns.Test.prototype.getElementByClass;
+$A.ns.Test.prototype["findChildWithClassName"] = $A.ns.Test.prototype.findChildWithClassName;
+$A.ns.Test.prototype["fireDomEvent"] = $A.ns.Test.prototype.fireDomEvent;
+$A.ns.Test.prototype["isInstanceOfText"] = $A.ns.Test.prototype.isInstanceOfText;
+$A.ns.Test.prototype["isInstanceOfAnchorElement"] = $A.ns.Test.prototype.isInstanceOfAnchorElement;
+$A.ns.Test.prototype["isInstanceOfInputElement"] = $A.ns.Test.prototype.isInstanceOfInputElement;
+$A.ns.Test.prototype["isInstanceOfLiElement"] = $A.ns.Test.prototype.isInstanceOfLiElement;
+$A.ns.Test.prototype["isInstanceOfParagraphElement"] = $A.ns.Test.prototype.isInstanceOfParagraphElement;
+$A.ns.Test.prototype["isInstanceOfButtonElement"] = $A.ns.Test.prototype.isInstanceOfButtonElement;
+$A.ns.Test.prototype["isInstanceOfImageElement"] = $A.ns.Test.prototype.isInstanceOfImageElement;
+$A.ns.Test.prototype["isInstanceOfDivElement"] = $A.ns.Test.prototype.isInstanceOfDivElement;
+$A.ns.Test.prototype["isInstanceOfSpanElement"] = $A.ns.Test.prototype.isInstanceOfSpanElement;
+$A.ns.Test.prototype["isInstanceOf"] = $A.ns.Test.prototype.isInstanceOf;
+$A.ns.Test.prototype["getElementAttributeValue"] = $A.ns.Test.prototype.getElementAttributeValue;
+$A.ns.Test.prototype["clickOrTouch"] = $A.ns.Test.prototype.clickOrTouch;
+
+// javascript
+$A.ns.Test.prototype["getPrototype"] = $A.ns.Test.prototype.getPrototype;
+$A.ns.Test.prototype["overrideFunction"] = $A.ns.Test.prototype.overrideFunction;
+$A.ns.Test.prototype["addFunctionHandler"] = $A.ns.Test.prototype.addFunctionHandler;
+$A.ns.Test.prototype["objectKeys"] = $A.ns.Test.prototype.objectKeys;
+
+// actions
+$A.ns.Test.prototype["callServerAction"] = $A.ns.Test.prototype.callServerAction;
+$A.ns.Test.prototype["isActionPending"] = $A.ns.Test.prototype.isActionPending;
+$A.ns.Test.prototype["markForCompletion"] = $A.ns.Test.prototype.markForCompletion;
+$A.ns.Test.prototype["isComplete"] = $A.ns.Test.prototype.isComplete;
+$A.ns.Test.prototype["isSuccessfullyComplete"] = $A.ns.Test.prototype.isSuccessfullyComplete;
+$A.ns.Test.prototype["clearCompletion"] = $A.ns.Test.prototype.clearCompletion;
+$A.ns.Test.prototype["getAction"] = $A.ns.Test.prototype.getAction;
+$A.ns.Test.prototype["getExternalAction"] = $A.ns.Test.prototype.getExternalAction;
+$A.ns.Test.prototype["blockRequests"] = $A.ns.Test.prototype.blockRequests;
+$A.ns.Test.prototype["releaseRequests"] = $A.ns.Test.prototype.releaseRequests;
+$A.ns.Test.prototype["getSentRequestCount"] = $A.ns.Test.prototype.getSentRequestCount;
+$A.ns.Test.prototype["enqueueAction"] = $A.ns.Test.prototype.enqueueAction;
+$A.ns.Test.prototype["runActionsAsTransaction"] = $A.ns.Test.prototype.runActionsAsTransaction;
+$A.ns.Test.prototype["clearAndAssertComponentConfigs"] = $A.ns.Test.prototype.clearAndAssertComponentConfigs;
+
+// events
+$A.ns.Test.prototype["addEventHandler"] = $A.ns.Test.prototype.addEventHandler;
+
+// internal functions
+$A.ns.Test.prototype["run"] = $A.ns.Test.prototype.run;
+$A.ns.Test.prototype["getDump"] = $A.ns.Test.prototype.getDump;
+$A.ns.Test.prototype["dummyFunction"] = $A.ns.Test.prototype.dummyFunction;
+
+// appcache
+$A.ns.Test.prototype["getAppCacheEvents"] = $A.ns.Test.prototype.getAppCacheEvents;
+// //#end

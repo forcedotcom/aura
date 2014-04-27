@@ -127,7 +127,7 @@ $A.ns.Aura = function() {
     this.util = new $A.ns.Util();
     this["util"] = this.util;
     //#if {"modes" : ["TESTING","AUTOTESTING", "TESTINGDEBUG", "AUTOTESTINGDEBUG"]}
-    this.test = new Test();
+    this.test = new $A.ns.Test();
     this["test"] = this.test;
     //#end
 

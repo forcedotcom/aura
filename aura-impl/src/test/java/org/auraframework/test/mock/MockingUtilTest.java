@@ -33,8 +33,6 @@ import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.WebDriverTestCase;
-import org.auraframework.test.WebDriverTestCase.TargetBrowsers;
-import org.auraframework.test.WebDriverUtil.BrowserType;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.mockito.Mockito;
 import org.openqa.selenium.By;
@@ -42,11 +40,7 @@ import org.openqa.selenium.By;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 
-/*
- * TODO(W-2049499): Figure out why exactly this isn't working on browsers besides Chrome
- */
 @Controller
-@TargetBrowsers({ BrowserType.GOOGLECHROME })
 public class MockingUtilTest extends WebDriverTestCase {
 
     private MockingUtil mockingUtil;

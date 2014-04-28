@@ -18,9 +18,9 @@ package org.auraframework.util.test.perf;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.auraframework.util.test.perf.data.PerfMetrics;
 import org.json.JSONException;
 
@@ -29,7 +29,7 @@ import org.json.JSONException;
  */
 public final class PlotUtil {
 
-    private static final Log LOG = LogFactory.getLog(PlotUtil.class);
+    private static final Logger LOG = Logger.getLogger(PlotUtil.class.getSimpleName());
 
     private static final File PLOTS_DIR = new File("target/plot").getAbsoluteFile();
 
@@ -42,7 +42,7 @@ public final class PlotUtil {
             props.store(new FileOutputStream(file), null);
             LOG.info("wrote plot file: " + file);
         } catch (Exception e) {
-            LOG.warn("error writing " + file, e);
+            LOG.log(Level.WARNING, "error writing " + file, e);
         }
     }
 

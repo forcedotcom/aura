@@ -15,42 +15,55 @@
  */
 package org.auraframework.util.test.perf.data;
 
+import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.auraframework.util.test.perf.rdp.TimelineEvent;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Sets;
+import com.google.common.collect.Maps;
 
 /**
  * Compares actual and expected PerfMetrics values
  */
 public final class PerfMetricsComparator {
 
-    private static final Log LOG = LogFactory.getLog(PerfMetricsComparator.class);
+    // NOTE: test framework classes seem to use java.util.logging
+    // and using this logger the log messages do appear in the jenkins console output
+    private static final Logger LOG = Logger.getLogger(PerfMetricsComparator.class.getSimpleName());
 
     private static final float ALLOWED_VARIABILITY = .2f;
 
     private static final Set<String> UNITS_TO_EXCLUDE = ImmutableSet.of("milliseconds");
 
-    private static final Set<String> METRICS_TO_EXCLUDE;
+    private static final Map<String, String> METRICS_TO_EXCLUDE; // value is reason for exclusion
 
     static {
-        Set<String> metricsToExclude = Sets.newHashSet();
+        Map<String, String> map = Maps.newHashMap();
 
         // add loading events as those are summarized in the Network. metrics
-        metricsToExclude.addAll(TimelineEvent.getCategoryMetricNames(TimelineEvent.Category.Loading));
+        for (String metric : TimelineEvent.getCategoryMetricNames(TimelineEvent.Category.Loading)) {
+            map.put(metric, "summarized in Network metrics");
+        }
+        map.put("Timeline.Loading.ParseHTML", "different when running ui vs mvn");
 
-        metricsToExclude.add("Timeline.Scripting.GCEvent"); // kind of random now
-        metricsToExclude.add("Timeline.Other.Program"); // fluctuates
-        metricsToExclude.add("Timeline.Scripting.FunctionCall"); // fluctuates
-        metricsToExclude.add("Timeline.Scripting.XHRReadyStateChange"); // fluctuates
-        metricsToExclude.add("Timeline.Scripting.TimerFire"); // fluctuates
-        metricsToExclude.add("Timeline.Scripting.TimerRemove"); // fluctuates
+        map.put("Timeline.Scripting.GCEvent", "kind of random");
+        map.put("Timeline.Other.Program", "fluctuates");
+        map.put("Timeline.Scripting.FunctionCall", "fluctuates");
+        map.put("Timeline.Scripting.XHRReadyStateChange", "fluctuates");
+        map.put("Timeline.Scripting.TimerFire", "fluctuates");
+        map.put("Timeline.Scripting.TimerRemove", "fluctuates");
 
-        METRICS_TO_EXCLUDE = ImmutableSet.copyOf(metricsToExclude);
+        map.put("Timeline.Painting.CompositeLayers", "N/A in aura jenkins googlechrome");
+        map.put("Timeline.Painting.PaintSetup", "N/A in aura jenkins googlechrome");
+        map.put("Timeline.Rendering.ActivateLayerTree", "N/A in aura jenkins googlechrome");
+        map.put("Timeline.Rendering.DrawFrame", "N/A in aura jenkins googlechrome");
+        map.put("Timeline.Rendering.RequestMainThreadFrame", "N/A in aura jenkins googlechrome");
+        map.put("Timeline.Rendering.BeginFrame", "smaller in aura jenkins googlechrome");
+
+        METRICS_TO_EXCLUDE = ImmutableMap.copyOf(map);
     }
 
     // TODO: find out why metrics are different mvn vs testSetRunner.app
@@ -64,14 +77,13 @@ public final class PerfMetricsComparator {
     public String compare(PerfMetrics expectedMetrics, PerfMetrics actualMetrics) {
         StringBuilder em = new StringBuilder();
         StringBuilder log = new StringBuilder();
+        Set<String> expectedMetricNames = expectedMetrics.getAllMetricNames();
+        int numMetrics = expectedMetricNames.size();
         int numMetricsCompared = 0;
 
-        for (String name : expectedMetrics.getAllMetricNames()) {
+        for (String name : expectedMetricNames) {
             PerfMetric expected = expectedMetrics.getMetric(name);
             PerfMetric actual = actualMetrics.getMetric(name);
-
-            boolean excludeFromComparison = METRICS_TO_EXCLUDE.contains(name)
-                    || UNITS_TO_EXCLUDE.contains(expected.getUnits());
 
             int expectedValue = expected.getIntValue();
             int actualValue = (actual != null) ? actual.getIntValue() : -1;
@@ -79,21 +91,34 @@ public final class PerfMetricsComparator {
             if (ALLOWED_VARIABILITY > 0 && allowed_variability == 0)
                 allowed_variability = 1; // allow at least 1 if non-zero %
 
-            numMetricsCompared++;
-            log.append("\n    " + name + '[' + expectedValue);
+            StringBuilder logLine = new StringBuilder(name + '[' + expectedValue);
+            char logLineMark; // '=' metric in bounds, '*' metric out-of-bounds/missing, ' ' metric excluded
             if (actual == null || expectedValue != actualValue) {
-                log.append("->");
+                logLine.append("->");
             }
             if (actual != null && expectedValue != actualValue) {
-                log.append(actualValue);
+                logLine.append(actualValue);
+                if (actual instanceof MedianPerfMetric) {
+                    logLine.append(' ');
+                    logLine.append(((MedianPerfMetric) actual).toSequenceString());
+                }
             }
+            logLine.append(']');
 
-            if (excludeFromComparison) {
-                log.append(" excluded");
+            if (METRICS_TO_EXCLUDE.containsKey(name)) {
+                logLineMark = ' ';
+                logLine.append(" excluded: " + METRICS_TO_EXCLUDE.get(name));
+            } else if (UNITS_TO_EXCLUDE.contains(expected.getUnits())) {
+                logLineMark = ' ';
+                logLine.append(" excluded");
             } else if (actual == null) {
+                logLineMark = '*';
+                numMetricsCompared++;
                 em.append("actual perf metric missing: " + name + '\n');
-                log.append("{missing}");
+                logLine.append(" MISSING");
             } else if (Math.abs(expectedValue - actualValue) > allowed_variability) {
+                logLineMark = '*';
+                numMetricsCompared++;
                 em.append("perf metric out of range: " + name);
                 String units = expected.getUnits();
                 if (units != null) {
@@ -117,9 +142,12 @@ public final class PerfMetricsComparator {
                     em.append('\n');
                 }
 
-                log.append('*'); // to mark is out of bounds
+                logLine.append(" OUT-OF-RANGE");
+            } else {
+                logLineMark = '=';
+                numMetricsCompared++;
             }
-            log.append(']');
+            log.append("\n    " + logLineMark + ' ' + logLine);
 
             // TODO: fail if there are new metrics or some metrics have now details?
             // (this way the gold files will be updated with the extra info)
@@ -132,7 +160,8 @@ public final class PerfMetricsComparator {
         // log a message showing what was really compared, i.e.:
         // "3 metrics compared allowing 20% variability: Paint[8->9*]
         String percent = String.valueOf(Math.round(ALLOWED_VARIABILITY * 100)) + "% variability";
-        String logMessage = String.valueOf(numMetricsCompared) + " metrics compared allowing " + percent + ": " + log;
+        String logMessage = String.valueOf(numMetricsCompared) + '/' + numMetrics + " metrics compared allowing "
+                + percent + ": " + log;
         LOG.info(logMessage);
 
         return differences;

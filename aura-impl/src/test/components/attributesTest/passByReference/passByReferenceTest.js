@@ -23,14 +23,14 @@
 		},
 		testSettingValueInInnerComponent:{
 			test: function(cmp){
-				cmp.find("innerCmp").getValue("v.intAttribute").setValue(5565);
+				cmp.find("innerCmp").set("v.intAttribute", 5565);
 				$A.test.assertEquals(5565, cmp.get("v.attrByReference"));
 				$A.test.assertEquals(5565, cmp.find("innerCmp").get("v.intAttribute"));
 			}
 		},
 		testSettingValueOnParentComponent:{
 			test: function(cmp){
-				cmp.getValue("v.attrByReference").setValue(9999);
+				cmp.set("v.attrByReference", 9999);
 				$A.test.assertEquals(9999, cmp.get("v.attrByReference"));
 				$A.test.assertEquals(9999, cmp.find("innerCmp").get("v.intAttribute"));
 			}

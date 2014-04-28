@@ -29,7 +29,7 @@
             helper.updateGlobalEventListeners(component);
         }
 
-        // If this picker is not 'managed' (consumed by ui:dataPickerManager), 
+        // If this picker is not 'managed' (consumed by ui:dataPickerManager),
         // then positioning should be taken into account.
         if (visible === true && !managed) {
             helper.position(component);
@@ -54,15 +54,15 @@
         }
 
         this.superRerender();
-        
-        // If this picker is not 'managed' (consumed by ui:dataPickerManager), 
+
+        // If this picker is not 'managed' (consumed by ui:dataPickerManager),
         // then positioning should be taken into account.
         if (visible === true && !managed) {
             helper.position(component);
         }
-        
-        var isAndroid = $A.getGlobalValueProviders().get("$Browser.isAndroid");
-        
+
+        var isAndroid = $A.get("$Browser.isAndroid");
+
         if (isAndroid == true) {
             var f = function(e) {
                 helper.handleWinResize(component, e);

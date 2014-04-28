@@ -20,17 +20,19 @@
 
     itemsChange: function(cmp, evt, helper) {
         var v = evt.getParam("value");
-        if (v === cmp.getValue("v.items")) {
-            if (v.isDifferentArray()) {
-                helper.rerenderEverything(cmp);
-            } else {
+        //JBUCH: FIXME: THIS IS A HUGE WRONG: THIS IS FIRING WHEN ATTRIBUTES OTHER THAN ITEMS ARE CHANGED
+        if($A.util.isArray(v)){
+            if (v === cmp._items) {
                 helper.rerenderSelective(cmp);
+            } else {
+                helper.rerenderEverything(cmp);
+                cmp._items = v;
             }
         }
     },
 
     firstRender: function(cmp, evt, helper) {
-        if (cmp.getValue("v.realbody").unwrap().length === 0) {
+        if (cmp.get("v.realbody").length === 0) {
             helper.rerenderEverything(cmp);
         }
     }

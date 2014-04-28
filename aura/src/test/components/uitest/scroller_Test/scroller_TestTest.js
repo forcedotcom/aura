@@ -26,7 +26,7 @@
                 $A.test.assertNotNull(pullUpDiv, "There should be a 'pullUp' div");
 
                 // Toggle canShowMore dynamiclly
-                scrollerCmp.getValue("v.canShowMore").setValue(false);
+                scrollerCmp.set("v.canShowMore", false);
 
             },
             function(component) {
@@ -37,9 +37,9 @@
                     displayNone = pullUpDiv.style.display === 'none';
 
                 $A.test.assertTrue(displayNone, "There should NOT be a 'pullUp' div");
-            
+
                 // Toggle canShowMore again
-                scrollerCmp.getValue("v.canShowMore").setValue(true);
+                scrollerCmp.set("v.canShowMore", true);
 
             },
             function(component) {

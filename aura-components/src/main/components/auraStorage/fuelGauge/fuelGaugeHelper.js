@@ -17,18 +17,18 @@
 	getStorage: function(cmp) {
 		return $A.storageService.getStorage(cmp.get("v.storageName"));
 	},
-	
+
 	isEnabled: function(cmp) {
 	    var mode = $A.getContext().getMode();
 	    return !$A.util.isUndefinedOrNull(this.getStorage(cmp)) && (mode !== "PROD");
 	},
-	
+
 	update: function(cmp){
     	if (this.isEnabled(cmp)) {
     		var storage = this.getStorage(cmp);
 	    	var size = storage.getSize();
 	    	var maxSize = storage.getMaxSize();
-	    	
+
 	    	var severity;
 	    	if (size < maxSize / 2) {
 	    		severity = "success";
@@ -37,11 +37,11 @@
 	    	} else {
 	    		severity = "important";
 	    	}
-	    	
+
 	    	var stamp = cmp.find("stamp");
-	    	stamp.getValue("v.severity").setValue(severity);
-	    	
-	    	cmp.getValue("v.value").setValue(Math.round(size * 100) / 100);
+	    	stamp.set("v.severity", severity);
+
+	    	cmp.set("v.value", Math.round(size * 100) / 100);
     	}
     }
 })

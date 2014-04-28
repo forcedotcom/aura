@@ -16,7 +16,7 @@
 /*jslint sub: true */
 /**
  * An abstract base class for attribute Value implementations.
- * 
+ *
  * Attribute values may be simple (String, integer, etc.) or compound (Map or
  * Array).  When an attribute is changed, it fires a single changeEvent for the
  * modification; compound attributes must collect several sub-element
@@ -83,9 +83,9 @@ $A.ns.AttributeValue = function () {
    this.pending = undefined;
 };
 
-/** Static to convert simple names to qualified. 
+/** Static to convert simple names to qualified.
  * @param {String} simpleName The simple name to be converted to a qualified name with the format prefix://namespace:name.
- * 
+ *
  */
 $A.ns.AttributeValue.getQName = function (simpleName) {
     var eventDef = BaseValue.getEventDef(simpleName);
@@ -105,7 +105,7 @@ $A.ns.AttributeValue.prototype.addHandlers = function(config) {
  * Initiates observation of a different value by this one, so that future changes
  * will automatically be reflected here also.  Because assignment is type-specific,
  * however, this method does NOT assign any initial value; it should be extended
- * in specific subtypes to do that. 
+ * in specific subtypes to do that.
  *
  * @param target the value to observe.  Errors in case of type mismatch.
  * @protected
@@ -131,7 +131,7 @@ $A.ns.AttributeValue.prototype.observe = function(target) {
             return;  // Already observing
         }
     }
-    target.observers.push(this); 
+    target.observers.push(this);
     this.observing = target;
     this.setValue(target);
 };
@@ -255,6 +255,10 @@ $A.ns.AttributeValue.prototype.hasPending = function(eventQName) {
  * @protected
  */
 $A.ns.AttributeValue.prototype.updatePendingValue = function(eventName, value) {
+    // JBUCH TODO: TEMPORARY HACK FOR EXTERNAL CHANGE OBSERVERS
+    if(value&&value.unwrap){
+        value=value.unwrap();
+    }
     var eventQName = $A.ns.AttributeValue.getQName(eventName);
     if (this.hasPending(eventQName)) {
         this.getOrMakePending(eventQName).setParams({value: value});
@@ -269,7 +273,7 @@ $A.ns.AttributeValue.prototype.updatePendingValue = function(eventName, value) {
                 newValue = [];
                 newValue[key] = value;
             } else {
-                newValue = { key : value }; 
+                newValue = { key : value };
             }
             value = newValue;
 
@@ -288,7 +292,7 @@ $A.ns.AttributeValue.prototype.updatePendingValue = function(eventName, value) {
  * and all parents up to either the top level or the first level with an
  * already-pending change.  Any layers WITHOUT handlers are skipped from that
  * maximal return list.
- * 
+ *
  * @param {String} The event name
  *
  * @protected
@@ -299,7 +303,7 @@ $A.ns.AttributeValue.prototype.prepare = function(eventName) {
     var pointer = this;
     while (pointer) {
         if (pointer.hasPending(eventQName)) {
-            break;  // We're done if we reach a level that's already pending. 
+            break;  // We're done if we reach a level that's already pending.
         }
         if (pointer.getEventHandler(eventQName)) {
             newEvents.push(pointer.getOrMakePending(eventQName));
@@ -321,7 +325,7 @@ $A.ns.AttributeValue.prototype.prepare = function(eventName) {
 $A.ns.AttributeValue.prototype.firePending = function(eventName, eventList) {
     if (eventList) {
     	$A.assert($A.util.isArray(eventList), "Expected a list of events, but instead got: " + eventList);
-    	
+
         // Walk up the tree, clearing events, until top or list is empty.  There
         // may be more pending events above this list's scope, but those aren't
         // done yet (we're just firing for some of their subvalues changing).

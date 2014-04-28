@@ -13,33 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-({	
-	updateAttribute: function(cmp){  
-		
-        var forVal = cmp.getAttributes().getValue("for").getValue();
-        if (forVal) {      
+({
+	updateAttribute: function(cmp){
+
+        var forVal = cmp.get("v.for");
+        if (forVal) {
         	var gId;
         	if ($A.util.isString(forVal)) {
                 var valueProvider = cmp.getAttributes().getValueProvider();
                 //try find the target component for the "for" attribute from valueProvider
                 var refCmp = valueProvider.find(forVal);
-                
+
                 if (refCmp) {
                 	//use first one in the list if there are multiples
-                	refCmp = refCmp.length ? refCmp[0] : refCmp;                 	
+                	refCmp = refCmp.length ? refCmp[0] : refCmp;
                 	gId = refCmp.getGlobalId();
                 } else {
                 	//try as globalId
-                	gId = $A.componentService.get(forVal) ? forVal : null;	                	
+                	gId = $A.componentService.get(forVal) ? forVal : null;
                 }
-        	} else if ($A.util.isObject(forVal) && forVal.getGlobalId) {            		
-        		gId = forVal.getGlobalId();            		
+        	} else if ($A.util.isObject(forVal) && forVal.getGlobalId) {
+        		gId = forVal.getGlobalId();
         	}
-        	
+
         	if (!$A.util.isEmpty(gId)) {
         		//update dom element directly
             	cmp.getElement().setAttribute("for", gId);
             }
-        }         
+        }
     }
 })

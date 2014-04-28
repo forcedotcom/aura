@@ -18,7 +18,7 @@
         var testsProps = cmp.get("m.testsWithProps");
         var tt = [];
         cmp.getValue("m.testsWithProps").each(function(map){
-            if(map.getValue("selected").getBooleanValue() && map.get("isHidden") === ''){
+            if($A.util.getBooleanValue(map.get("selected")) && map.get("isHidden") === ''){
                 tt.push(map.get("name"));
                 map.getValue("status").setValue("ENQUEUEING");
                 map.getValue("exception").setValue("");
@@ -76,7 +76,7 @@
      toggleShowFailedTests : function(cmp, event, helper){
      	helper.updateDisplay(cmp, helper);
      },
-     
+
      toggleShowOnlyIntegrationTests: function(cmp, event, helper){
      	helper.updateDisplay(cmp, helper);
      }

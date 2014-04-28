@@ -28,7 +28,7 @@
 		
 		if (trigger && trigger.length > 0) {
 			if (triggerLabel) {
-				trigger[0].getValue("v.label").setValue(triggerLabel);
+				trigger[0].set("v.label", triggerLabel);
 			}
 			trigger[0].addHandler('click', cmp, 'c.onOpen');
 		} else {
@@ -42,7 +42,7 @@
 	            	}
 	            }});			
 			menuTrigger.addHandler('click', cmp, 'c.onOpen');
-			cmp.getValue('v.trigger').setValue(menuTrigger);
+			cmp.set('v.trigger', menuTrigger);
 		}
 	},
 	
@@ -95,7 +95,7 @@
 			}
 			
 			cmp._selectedItems = sList;
-			cmp.getValue('v.items').setValue(filteredItems);
+			cmp.set('v.items', filteredItems);
 		}
 	},
 	
@@ -131,7 +131,7 @@
 	handleOnCancel : function(cmp) {
 		this.removeEventHandler(cmp);
 		this.reset(cmp);
-		cmp.getValue('v.visible').setValue(false, true);
+		cmp.set('v.visible', false, true);
 		this.setVisible(cmp, false);
 		
 		var action = cmp.get('v.onCancel');
@@ -142,7 +142,7 @@
 	
 	handleApply : function(cmp) {
 		this.removeEventHandler(cmp);
-		cmp.getValue('v.visible').setValue(false, true);
+		cmp.set('v.visible', false, true);
 		this.setVisible(cmp, false);
 		
 		var action = cmp.get('v.onApply');
@@ -178,7 +178,7 @@
 		for (var i=0; i < menuItems.getLength(); i++) {			 
 			var item = menuItems.getValue(i);
 			if (item.get('v.selected') === true) {
-				item.getValue('v.selected').setValue(false, true);
+				item.set('v.selected', false, true);
 			}
 			item.setValue('v.isAscending', true);
 		}
@@ -318,7 +318,7 @@
 		var sorterEl = cmp.find('sorterContainer').getElement();
 		
 		if (!containerEl) {
-			//attach the dom to the document body as a modal dialog
+    		//attach the dom to the document body as a modal dialog    		
     		containerEl = document.createElement('div');
     		containerEl.setAttribute('id', id);
     		$A.util.addClass(containerEl, cmp.getConcreteComponent().getDef().getStyleClassName());
@@ -328,7 +328,7 @@
 		} else if (!$A.util.contains(containerEl, sorterEl)) {
 			containerEl.appendChild(maskEl);
 			containerEl.appendChild(sorterEl);
-		}
+    	}
     },
     
     /**
@@ -336,7 +336,7 @@
      */
     updateSize : function(cmp) {
     	var containerEl = cmp.find('sorterContainer').getElement(); 
-		var isPhone = $A.getGlobalValueProviders().get("$Browser.isPhone");
+		var isPhone = $A.get("$Browser.isPhone");
 		if (isPhone) {
 			var viewPort = $A.util.getWindowSize(),
 				header = cmp.find('headerBar').getElement(),

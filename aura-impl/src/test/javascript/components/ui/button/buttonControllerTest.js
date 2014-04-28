@@ -13,41 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 Function.RegisterNamespace("Test.Components.Ui.Button");
 
 [Fixture]
 Test.Components.Ui.Button.ButtonControllerTest=function(){
 	var targetController = null;
-	
+
 	ImportJson("ui.button.buttonController",function(path,result){
 		targetController=result;
 	});
-	
+
+    var mockAura=Mocks.GetMock(Object.Global(),"$A",{
+        util:{
+            getBooleanValue:function(value){
+                return value;
+            }
+        }
+    });
+
 	[Fixture]
     function press(){
     	[Fact]
 		function ButtonIsDisabled(){
 			// Arrange
-			var mockedComponent={
-				getAttributes : function(){
-					return {
-						getValue : function(attributeName){
-                            if(attributeName == "disabled"){
-                                return {
-                                    getBooleanValue : function(){
-                                        return true;
-                                    }
-                                }
-                            } else if(attributeName == "stopPropagation"){
-                                return {
-                                    getBooleanValue : function(){
-                                        return false;
-                                    }
-                                }
-                            }
-						}
-					}
+			var stubComponent={
+                get: function(attributeName){
+                    if(attributeName == "v.disabled"){
+                        return true;
+                    } else if(attributeName == "v.stopPropagation"){
+                        return false;
+                    }
 				},
 				getEvent : function(){
 					return {
@@ -58,43 +54,33 @@ Test.Components.Ui.Button.ButtonControllerTest=function(){
 					}
 				}
 			};
-			var mockedEvent={
+			var stubEvent={
 				preventDefault : function(){
 					actual = true;
 				}
 			}
 			var actual=false;
-			
+
 			// Act
-			targetController.press(mockedComponent, mockedEvent);
-			
+			mockAura(function(){
+                targetController.press(stubComponent, stubEvent);
+            });
+
 			// Assert
 			Assert.True(actual);
 		}
-		
+
 		[Fact]
 		function ButtonIsEnabled(){
 			// Arrange
-			var mockedComponent={
-				getAttributes : function(){
-					return {
-						getValue : function(attributeName){
-							if(attributeName == "disabled"){
-								return {
-									getBooleanValue : function(){
-										return false;
-									}
-								}
-							} else if(attributeName == "stopPropagation"){
-                                return {
-                                    getBooleanValue : function(){
-                                        return false;
-                                    }
-                                }
-                            }
-						}
-					}
-				},
+			var stubComponent={
+				get : function(attributeName){
+                    if(attributeName == "v.disabled"){
+                        return false;
+                    } else if(attributeName == "v.stopPropagation"){
+                        return false;
+                    }
+                },
 				getEvent : function(){
 					return {
 						setParams : function(params){},
@@ -104,14 +90,16 @@ Test.Components.Ui.Button.ButtonControllerTest=function(){
 					}
 				}
 			};
-			var mockedEvent={
+			var stubEvent={
 				preventDefault : function(){}
 			}
 			var actual=false;
-			
+
 			// Act
-			targetController.press(mockedComponent, mockedEvent);
-			
+			mockAura(function(){
+                targetController.press(stubComponent, stubEvent);
+            });
+
 			// Assert
 			Assert.True(actual);
 		}

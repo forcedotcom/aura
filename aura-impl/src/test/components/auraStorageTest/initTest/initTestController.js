@@ -1,5 +1,5 @@
 ({
-	
+
 	forceActionAtServer: function(cmp, evt, helper){
 		var _testName = cmp._testName;
 		var actionName = "c.fetchDataRecord";
@@ -7,7 +7,7 @@
 			testName: (!_testName?"fetchCounterValue":_testName)
 		};
 		helper.executeAction(cmp, actionName, param);
-	}, 
+	},
 	runActionAtServerAndStore:function(cmp, evt, helper){
 		var _testName = cmp._testName;
 		var actionName = "c.fetchDataRecord";
@@ -34,19 +34,19 @@
 		helper.resetCounters(cmp);
 	},
 	waiting:function(cmp, evt, helper){
-		helper.findAndSetText(cmp, "waiting", "waiting"); 
+		helper.findAndSetText(cmp, "waiting", "waiting");
 		helper.findAndSetText(cmp, "doneWaiting", "");
 	},
 	doneWaiting:function(cmp, evt, helper){
-		helper.findAndSetText(cmp, "waiting", ""); 
+		helper.findAndSetText(cmp, "waiting", "");
 		helper.findAndSetText(cmp, "doneWaiting", "doneWaiting");
 	},
 	refreshBegin:function(cmp, evt, helper){
-		helper.findAndSetText(cmp, "refreshBegin", "refreshBegin"); 
+		helper.findAndSetText(cmp, "refreshBegin", "refreshBegin");
 		helper.findAndSetText(cmp, "refreshEnd", "");
 	},
 	refreshEnd:function(cmp, evt, helper){
-		helper.findAndSetText(cmp, "refreshBegin", ""); 
+		helper.findAndSetText(cmp, "refreshBegin", "");
 		helper.findAndSetText(cmp, "refreshEnd", "refreshEnd");
 	},
 	storageModified:function(cmp, evt, helper){
@@ -56,11 +56,11 @@
         $A.clientService.initHost(component.get("v.host"));
     },
     testConnection: function(component, event, helper) {
-        component.getValue("v.actionStatus").setValue("");
+        component.set("v.actionStatus", "");
         var a = component.get("c.getInt");
         a.setParams({ param : 66 });
         a.setCallback(this, function(action){
-            component.getValue("v.actionStatus").setValue(action.getState());
+            component.set("v.actionStatus", action.getState());
         });
         $A.enqueueAction(a);
     }

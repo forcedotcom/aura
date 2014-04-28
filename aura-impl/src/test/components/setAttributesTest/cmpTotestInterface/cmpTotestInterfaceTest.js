@@ -25,7 +25,7 @@
             aura.test.assertNotNull(testCmp);
             //It should actually be the implementing component because the provider would have injected the implementation.
             aura.test.assertEquals('markup://setAttributesTest:implementation',testCmp.getDef().getDescriptor().getQualifiedName());
-            aura.test.assertEquals('implementationX',testCmp.getValue('v.SimpleAttribute').getValue());
+            aura.test.assertEquals('implementationX',testCmp.get('v.SimpleAttribute'));
             //Verify the content of the HTML element
             aura.test.assertEquals('The value of SimpleAttribute = implementationX',$A.test.getText(testCmp.getElement()));
         }

@@ -22,18 +22,18 @@
                         var today = new Date();
                         var expectedDay = today.getDate();
                         var expected = this.convertMonth(today.getMonth()) + " " + today.getFullYear();
-      		
+
                         this.openDatePicker(cmp);
 
                         var curDate = $A.test.getElementByClass("todayDate")[0];
-      		
+
                         $A.test.assertEquals(expectedDay.toString(), $A.util.getText(curDate), "Date picker did not open to todays day");
 
                         var actual = this.getTextFromElm(cmp.find("datePickerTestCmp").find("datePicker"));
                         $A.test.assertEquals(expected, actual, "Date picker did not open to todays month and year");
  		}
  	},
- 	
+
  	/**
  	 * Clicking on a date on the datePicker will select the date and close the calendar.
  	 */
@@ -53,7 +53,7 @@
                          $A.test.assertEquals(expected, actual.toString(), "Clicking on one week prior to todays date did not render the correct result.");
 		   }]	
     },
-    
+
     /**
      * Testing that all 12 months, appear in the correct order
      */
@@ -96,7 +96,7 @@
                       $A.test.assertEquals(expected, actual, "Month year combo incorrect");       
 	         }] 
     },
-    
+
     /**
      * Testing arrow combination of decrease month, and increasing year
      */
@@ -111,9 +111,9 @@
                        var expected = "February 1997";
                        var actual   = this.getTextFromElm(datePicker);
                        $A.test.assertEquals(expected, actual, "Initial value incorrect");
-	    }] 
+	    }]
     },
-    
+
     /**
      * Testing arrow combination of increasing month, and  decrease year
      */
@@ -129,9 +129,9 @@
                       var expected = "September 2029";
                       var actual   = this.getTextFromElm(datePicker);
 	              $A.test.assertEquals(expected, actual, "Initial value incorrect");       
-	    }] 
+	    }]
     },
-    
+
     /**
      * Acessibility test, making sure that any functionality added is still accessible
      */
@@ -159,7 +159,7 @@
     		        $A.test.assertEquals(expected, actual, "Initial value incorrect");
     		 }]
     },
-    
+
     /**
      * On mobile there should be a inputSelect to choose year.
      */
@@ -171,7 +171,7 @@
     	             $A.test.assertFalse($A.util.isUndefinedOrNull(yearTitle), "year input select not fond");
     	}
     },
-    
+
     /**
      * On mobile incrementing month past December increments year selector to next year.
      */
@@ -214,13 +214,13 @@
                     $A.test.assertFalse(date_picker.get("v.visible"));
         }
     },
-    
+
     iterateCal : function(monthIter, yearIter, monthButton, yearButton){
                       var i;
                       for(i = 0; i< monthIter; i++){
                           monthButton.runDeprecated({});
                       }
-          
+
                       for(i = 0; i< yearIter; i++){
                           yearButton.runDeprecated({});
                       }
@@ -248,7 +248,7 @@
     isViewDesktop : function(){
                          return $A.get('$Browser').formFactor.toLowerCase() === "desktop";
     },
-    
+
     /**
      * We have to ways that we need to get elements. Either from a output/select combo or from a header tag  
      */
@@ -262,7 +262,7 @@
 		
                          return month +" "+year;
     },
-    
+
     convertMonth : function(intMonth) {
                          if ($A.util.isUndefinedOrNull(intMonth)) {
                              return intMonth;

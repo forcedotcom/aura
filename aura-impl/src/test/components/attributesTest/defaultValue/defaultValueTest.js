@@ -101,7 +101,7 @@
 					"markup://attributesTest:defaultValue",
 					null, null, null
 			);
-			
+
 		}
 	},
 
@@ -130,7 +130,7 @@
 		$A.test.assertEquals("Aura", testCmp.getAttributes().get("strAttributeWithDefaultValue"),
 				"Failed to see default value of String attribute.");
 		// The other way of accessing a attribute value.
-		$A.test.assertEquals("Aura", testCmp.getAttributes().getValue("strAttributeWithDefaultValue").getValue());
+		$A.test.assertEquals("Aura", testCmp.get("v.strAttributeWithDefaultValue"));
 		$A.test.assertFalsy(testCmp.getAttributes().get("strAttributeWithNoDefaultValue"),
 				"Attributes without default value should have undefined as value");
 	},
@@ -178,7 +178,7 @@
 
 	verifyChangingAttributeValues : function(testCmp) {
 		testCmp.getAttributes().setValue("strAttributeWithDefaultValue", "nemuL");
-		$A.test.assertEquals("nemuL", testCmp.getAttributes().getValue("strAttributeWithDefaultValue").getValue(),
+		$A.test.assertEquals("nemuL", testCmp.get("v.strAttributeWithDefaultValue"),
 				"Failed to change value of attribute.");
 
 		testCmp.getAttributes().setValue("strAttributeWithNoDefaultValue", "Saturday Night Live");

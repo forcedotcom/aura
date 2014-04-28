@@ -14,81 +14,87 @@
  * limitations under the License.
  */
 ({
-    stringChange : function(cmp, evt){
-                var val = (evt.getParam("value") === undefined)?'undefined':evt.getParam("value").getValue();
-                cmp.find("index").getElement().innerHTML = (evt.getParam("index"));
-                cmp.find("value").getElement().innerHTML = val;
-        $A.get("e.test:vote").setParams({candidate : 'string'}).fire();
-    },
+	stringChange : function(cmp, evt) {
+		var value = evt.getParam("value");
+		cmp.find("index").getElement().innerHTML = (evt.getParam("index"));
+		cmp.find("value").getElement().innerHTML = value || 'undefined';
+		$A.get("e.test:vote").setParams({
+			candidate : 'string'
+		}).fire();
+	},
 
-    mapChange : function(cmp, evt){
-                var val = (evt.getParam("value") === undefined)?'undefined':evt.getParam("value").getValue();
-                cmp.find("index").getElement().innerHTML = (evt.getParam("index"));
-                cmp.find("value").getElement().innerHTML = val;
-        $A.get("e.test:vote").setParams({candidate : 'map'}).fire();
-    },
+	mapChange : function(cmp, evt) {
+		var value = evt.getParam("value");
+		cmp.find("index").getElement().innerHTML = (evt.getParam("index"));
+		cmp.find("value").getElement().innerHTML = value || 'undefined';
+		$A.get("e.test:vote").setParams({
+			candidate : 'map'
+		}).fire();
+	},
 
-    listChange : function(cmp, evt){
-                var val = (evt.getParam("value") === undefined)?'undefined':evt.getParam("value").unwrap();
-                cmp.find("index").getElement().innerHTML = (evt.getParam("index"));
-                cmp.find("value").getElement().innerHTML = val;
-        $A.get("e.test:vote").setParams({candidate : 'list'}).fire();
-    },
+	listChange : function(cmp, evt) {
+		var value = evt.getParam("value");
+		cmp.find("index").getElement().innerHTML = (evt.getParam("index"));
+		cmp.find("value").getElement().innerHTML = value || 'undefined';
+		$A.get("e.test:vote").setParams({
+			candidate : 'list'
+		}).fire();
+	},
 
-    recurseAChange : function(cmp, evt){
-                var val = (evt.getParam("value") === undefined)?'undefined':evt.getParam("value").getValue();
-                var depth = cmp.getValue("m.recurseADepth");
+	recurseAChange : function(cmp, evt) {
+		var value = evt.getParam("value");
+		var depth = cmp.getValue("m.recurseADepth");
 
-                cmp.find("index").getElement().innerHTML = (evt.getParam("index"));
-                cmp.find("value").getElement().innerHTML = val;
-                depth.setValue(depth.getValue()+1);
-                cmp.getValue("m.recurseA").setValue("recursing(A): "+depth.getValue());
-                depth.setValue(depth.getValue()-1);
-    },
+		cmp.find("index").getElement().innerHTML = (evt.getParam("index"));
+		cmp.find("value").getElement().innerHTML = value || 'undefined';
+		depth.setValue(depth.getValue() + 1);
+		cmp.set("m.recurseA", "recursing(A): " + depth.getValue());
+		depth.setValue(depth.getValue() - 1);
+	},
 
-        //
-        // This is a ping-pong recursion with recurseCChange.
-        //
-    recurseBChange : function(cmp, evt){
-                var val = (evt.getParam("value") === undefined)?'undefined':evt.getParam("value").getValue();
-                var depth = cmp.getValue("m.recurseBDepth");
+	//
+	// This is a ping-pong recursion with recurseCChange.
+	//
+	recurseBChange : function(cmp, evt) {
+		var value = evt.getParam("value");
+		var depth = cmp.getValue("m.recurseBDepth");
 
-                cmp.find("index").getElement().innerHTML = (evt.getParam("index"));
-                cmp.find("value").getElement().innerHTML = val;
-                depth.setValue(depth.getValue()+1);
-                cmp.getValue("m.recurseC").setValue("recursing(B): "+depth.getValue());
-                depth.setValue(depth.getValue()-1);
-    },
+		cmp.find("index").getElement().innerHTML = (evt.getParam("index"));
+		cmp.find("value").getElement().innerHTML = value || 'undefined';
+		depth.setValue(depth.getValue() + 1);
+		cmp.set("m.recurseC", "recursing(B): " + depth.getValue());
+		depth.setValue(depth.getValue() - 1);
+	},
 
-        //
-        // This is a ping-pong recursion with recurseBChange.
-        //
-    recurseCChange : function(cmp, evt){
-                var val = (evt.getParam("value") === undefined)?'undefined':evt.getParam("value").getValue();
-                var depth = cmp.getValue("m.recurseCDepth");
+	//
+	// This is a ping-pong recursion with recurseBChange.
+	//
+	recurseCChange : function(cmp, evt) {
+		var value = evt.getParam("value");
+		var depth = cmp.getValue("m.recurseCDepth");
 
-                cmp.find("index").getElement().innerHTML = (evt.getParam("index"));
-                cmp.find("value").getElement().innerHTML = val;
-                depth.setValue(depth.getValue()+1);
-                cmp.getValue("m.recurseB").setValue("recursing(C): "+depth.getValue());
-                depth.setValue(depth.getValue()-1);
-    },
+		cmp.find("index").getElement().innerHTML = (evt.getParam("index"));
+		cmp.find("value").getElement().innerHTML = value || 'undefined';
+		depth.setValue(depth.getValue() + 1);
+		cmp.set("m.recurseB", "recursing(C): " + depth.getValue());
+		depth.setValue(depth.getValue() - 1);
+	},
 
-        //
-        // Chain a single change through to 'unchained'
-        //
-    chainedChange : function(cmp, evt){
-                var val = (evt.getParam("value") === undefined)?'undefined':evt.getParam("value").getValue();
+	//
+	// Chain a single change through to 'unchained'
+	//
+	chainedChange : function(cmp, evt) {
+		var value = evt.getParam("value");
 
-                cmp.find("index").getElement().innerHTML = (evt.getParam("index"));
-                cmp.find("value").getElement().innerHTML = val;
-                cmp.getValue("m.unchained").setValue("finished");
-    },
+		cmp.find("index").getElement().innerHTML = (evt.getParam("index"));
+		cmp.find("value").getElement().innerHTML = value || 'undefined';;
+		cmp.set("m.unchained", "finished");
+	},
 
-    unchainedChange : function(cmp, evt){
-                var val = (evt.getParam("value") === undefined)?'undefined':evt.getParam("value").getValue();
+	unchainedChange : function(cmp, evt) {
+		var value = evt.getParam("value");
 
-                cmp.find("index").getElement().innerHTML = (evt.getParam("index"));
-                cmp.find("value").getElement().innerHTML = val;
-    }
+		cmp.find("index").getElement().innerHTML = (evt.getParam("index"));
+		cmp.find("value").getElement().innerHTML = value || 'undefined';
+	}
 })

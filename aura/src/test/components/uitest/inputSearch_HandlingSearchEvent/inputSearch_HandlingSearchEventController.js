@@ -16,6 +16,6 @@
 ({
     doSearch: function(cmp) {
       $A.log('do search called');
-      cmp.getValue("v.searched").setValue(true);
+      cmp.set("v.searched", true);
     }
 })

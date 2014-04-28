@@ -72,7 +72,7 @@
         }
     },
     getStyleElementText : function(element) {
-        var browser = $A.getGlobalValueProviders().get("$Browser");
+        var browser = $A.get("$Browser");
         if (browser.isIE7 || browser.isIE8 || browser.isIE9 || browser.isIE10) {
             return element.styleSheet.cssText;
         }

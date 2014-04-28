@@ -23,6 +23,6 @@
         }
         var test = tests[index];
         test.getDef().getHelper().loadTest(test);
-        cmp.getValue("v.index").setValue(index + 1);
+        cmp.set("v.index", index + 1);
     }
 })

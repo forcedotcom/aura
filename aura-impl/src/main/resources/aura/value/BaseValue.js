@@ -40,7 +40,9 @@ var BaseValue = {
          * Returns a function that runs the event on the client Action.
          * Throws an error if the name of the client action is not found.
          */
+
         var actionRef = valueFactory.create(actionExpression);
+
         return function(event){
             if (valueProvider.isValid && !valueProvider.isValid()) {
                 return;

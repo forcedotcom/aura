@@ -836,8 +836,8 @@
                     if (targetDescriptor == "ui:listViewRow")expected = component;
                     return component;
                 });
-                var mockSetValue=this.getMock(target.getValue("v.body"),"setValue",function(targetBody){
-                    actual=targetBody[0];
+                var mockSetValue=this.getMock(target,"set",function(key,targetBody){
+                    if(key==="v.body")actual=targetBody[0];
                 });
                 var templates = [helper.generateComponent("ui:listViewColumn", {title:'Title', fieldName:'FieldName'})];
                 var expected = null;

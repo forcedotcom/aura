@@ -21,7 +21,7 @@
 
     rerender : function(component, helper) {
         var attributes = component.getAttributes(),
-            enabled    = attributes.getValue("enabled").getBooleanValue();
+            enabled    = $A.util.getBooleanValue(attributes.get("enabled"));
 
         this.superRerender();
 

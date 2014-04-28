@@ -15,16 +15,16 @@
  */
 ({
 	showMore: function(component, event, helper) {
-		var currentPageValue = component.get("v.currentPage"); 
-	
+		var currentPageValue = component.get("v.currentPage");
+
     	var currentPage = parseInt(currentPageValue, 10);
 		var targetPage = currentPage + 1;
-        
-        component.getValue("v.currentPage").setValue(targetPage, true);
-        
+
+        component.set("v.currentPage", targetPage, true);
+
         helper.triggerDataProvider(component.getSuper());
 	},
-	
+
 	rerenderComplete: function(component, event, helper) {
         helper.showLoading(component, false);
         component.getEvent("rerenderComplete").fire();

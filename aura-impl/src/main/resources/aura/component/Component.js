@@ -79,16 +79,16 @@ function Component(config, localCreation, componentCreationContext) {
     this.ccc = componentCreationContext;
     this.priv = new ComponentPriv(config, this, localCreation);
     this._destroying = false;
-    
+
     //#if {"modes" : ["TESTING","AUTOTESTING", "TESTINGDEBUG", "AUTOTESTINGDEBUG"]}
     this["creationPath"] = this.priv.creationPath;
     //#end
 }
 
 /**
- * The Component type. 
+ * The Component type.
  * <p>Examples:</p>
- * <p><code>//Checks if the component value is of this type<br />cmp.getValue("v.value").auraType === "Component"</code></p> 
+ * <p><code>//Checks if the component value is of this type<br />obj.auraType === "Component"</code></p>
  * <p><code>//Checks if the elements in the body is of this type<br />
  * var body = cmp.get("v.body");<br />
  * var child = body[i];<br />
@@ -242,7 +242,7 @@ Component.prototype.find = function(name){
 Component.prototype.findValue = function(name){
     var zuper = this;
     while(zuper){
-        var value = zuper.getAttributes().getValue(name, true);
+        var value = zuper._getAttributes()._getValue(name, true);
         if(value){
             if(value.isDefined){
                 if(value.isDefined()){
@@ -258,7 +258,7 @@ Component.prototype.findValue = function(name){
 };
 
 /**
- * Returns the Component instance. For example, <code>component.getValue("v.metadata").unwrap()</code>.
+ * Returns the Component instance. For example, <code>component.unwrap()</code>.
  */
 Component.prototype.unwrap = function() {
     return this;
@@ -272,8 +272,8 @@ Component.prototype.unwrap = function() {
  * @private
  */
 Component.prototype.findInstancesOf = function(type, ret, cmp){
-    cmp = cmp || this.getSuperest();   
-    
+    cmp = cmp || this.getSuperest();
+
     var body = cmp.get("v.body");
     if(body){
         for(var i=0;i<body.length;i++){
@@ -374,7 +374,7 @@ Component.prototype.addHandler = function(eventName, valueProvider, actionExpres
 Component.prototype.addValueHandler = function(config){
     var value = config["value"];
     if($A.util.isString(value) || value.toString() === "PropertyReferenceValue"){
-        value = this.getValue(value);
+        value = this._getValue(value);
     }
 
     if(value){
@@ -389,6 +389,7 @@ Component.prototype.addValueHandler = function(config){
             valueConfig["eventName"] = config["event"];
             valueConfig["valueProvider"] = this;
             valueConfig["actionExpression"] = config["action"];
+            valueConfig["method"] = config ["method"];
 
             value.addHandler(valueConfig);
             var priv = this.priv;
@@ -464,7 +465,13 @@ Component.prototype.finishDestroy = function(){
  * @param {Boolean} async Set to true if component should be destroyed asychronously. The default value is true.
  * @public
  */
-Component.prototype.destroy = function(async){
+Component.prototype.destroy = function(async,value){
+    // JBUCH TODO: TEMPORARY PASSTHROUGH TO HIDE SIMPLEVALUES; DESTROY SHOULD BE CONSIDERED IMPLICIT ON ARRAYVALUE/FACET .set()
+    if(value){
+        var attribute=this._getValue(value);
+        attribute.destroy();
+        return;
+    }
     var i;
 
     //#if {"modes" : ["TESTING", "TESTINGDEBUG", "AUTOTESTING", "AUTOTESTINGDEBUG"]}
@@ -477,7 +484,7 @@ Component.prototype.destroy = function(async){
         /*if (async === undefined) {
         	async = true;
         }*/
-        
+
         var key;
 
         if (this.priv.docLevelHandlers !== undefined) {
@@ -488,31 +495,31 @@ Component.prototype.destroy = function(async){
                 }
             }
         }
-        
+
         if (async) {
         	this._scheduledForAsyncDestruction = true;
-        	
+
             for (key in this.priv.elements){
                 var element = this.priv.elements[key];
                 if (element && element.style) {
                     element.style.display = "none";
                 }
             }
-            
+
             $A.util.destroyAsync(this);
 
             return null;
         }
-        
+
         var priv = this.priv;
 
         this._destroying = true;
-        
+
         var componentDef = this.getDef();
         var zuper = this.getSuper();
-        
+
         var globalId = priv.globalId;
-        
+
         $A.renderingService.unrender(this);
 
         // Track some useful debugging information for InvalidComponent's use
@@ -520,15 +527,15 @@ Component.prototype.destroy = function(async){
         this._globalId = globalId;
         this._componentDef = componentDef;
         //#end
-                
+
         // Swap in InvalidComponent prototype to keep us from having to add validity checks all over the place
         $A.util.apply(this, InvalidComponent.prototype, true);
-        
+
         priv.elements = undefined;
-        
+
         priv.deIndex();
         $A.componentService.deIndex(globalId);
-                
+
         var vp = priv.valueProviders;
         if (vp) {
             for (var k in vp) {
@@ -591,7 +598,7 @@ Component.prototype.destroy = function(async){
                     for(var j=0;j<vals.length;j++){
                         delete vals[j];
                     }
-                    
+
                     delete eventDispatcher[key];
                 }
             }
@@ -612,7 +619,7 @@ Component.prototype.destroy = function(async){
         this.priv = undefined;
         return globalId;
     }
-    
+
     return null;
 };
 
@@ -778,22 +785,53 @@ Component.prototype.getElement = function(){
 };
 
 /**
+ * DO NOT USE THIS METHOD.
+ *
+ * @public
+ *
+ * @deprecated use Component.get(key) and Component.set(key,value) instead
+ */
+Component.prototype.getAttributes = function () {
+    //$A.warning("DEPRECATED USE OF component.getAttributes(key). USE component.get(key) AND component.set(key,value) INSTEAD.");
+    return this._getAttributes();
+};
+
+/**
  * Returns the collection of attributes for this component.
  * See <a href="#help?topic=hideMarkup">Dynamically Showing or Hiding Markup</a> for an example.
  * Shorthand : <code>get("v")</code>
+ *
+ * TEMPORARILY INTERNALIZED TO GATE ACCESS
+ *
+ * @private
  */
-Component.prototype.getAttributes = function() {
+Component.prototype._getAttributes = function() {
     return this.priv.attributes;
+};
+
+/**
+ * DO NOT USE THIS METHOD.
+ *
+ * @public
+ *
+ * @deprecated use Component.get(key) instead
+ */
+Component.prototype.getValue = function (key) {
+    //$A.warning("DEPRECATED USE OF component.getValue(key). USE component.get(key) INSTEAD.",key);
+    return this._getValue(key);
 };
 
 /**
  * Returns the wrapped value referenced using property syntax.
  * If you do not need the wrapper, use <code>get()</code> instead.
+ * Temporarily internalized to gate access.
  * @param {String} key The data key to look up on the Component. E.g. <code>$A.get("root.v.mapAttring.key")</code>
  *
- * @public
+ * @private
+ *
+ * @deprecated use Component.get(key,value) instead
  */
-Component.prototype.getValue = function(key){
+Component.prototype._getValue = function(key){
     // Should we deliberately break here?
     if (!this.isValid() || $A.util.isUndefinedOrNull(key)) {
         return undefined;
@@ -820,19 +858,33 @@ Component.prototype.getValue = function(key){
 };
 
 /**
+ * DO NOT USE THIS METHOD.
+ *
+ * @public
+ *
+ * @deprecated use Component.set(key,value) instead
+ */
+Component.prototype.setValue = function (key,value) {
+    //$A.warning("DEPRECATED USE OF component.setValue(key,value). USE component.set(key, value) INSTEAD.", {key:key,value:value});
+    return this._setValue(key,value);
+};
+
+/**
  * Gets the wrapped value referenced using property syntax and sets the value object's value.
  * @param {String} key The data key to look up on the Component. E.g. <code>$A.get("root.v.mapAttring.key")</code>
  * @param {Object} value The value to set
  *
- * @public
+ * TEMPORARILY INTERNALIZED TO GATE ACCESS
+ *
+ * @private
  */
-Component.prototype.setValue = function(key, value){
-    var v = this.getValue(key);
+Component.prototype._setValue = function(key, value){
+    var v = this._getValue(key);
     if ($A.util.isUndefinedOrNull(v)) {
         $A.error("Invalid key "+key);
         return;
     }
-    v.setValue(value);
+    v._setValue(value);
 };
 
 
@@ -847,6 +899,26 @@ Component.prototype.setValue = function(key, value){
  */
 Component.prototype.get = function(key){
     return $A.expressionService.get(this, key);
+};
+
+/**
+ * Gets the wrapped value referenced using property syntax and sets the value object's value.
+ * @param {String} key The data key to look up on the Component. E.g. <code>$A.get("root.v.mapAttring.key")</code>
+ * @param {Object} value The value to set
+ *
+ * @public
+ */
+Component.prototype.set = function (key, value, ignoreChanges) {
+    var v = this._getValue(key);
+    if ($A.util.isUndefinedOrNull(v)) {
+        $A.error("Invalid key " + key);
+        return;
+    }
+    // JBUCH TODO: EXTRAPOLATE THIS TO ALL FACETS
+//    if(key==="v.body"){
+//        v.destroy();
+//    }
+    v._setValue(value,ignoreChanges);
 };
 
 /**
@@ -933,11 +1005,81 @@ Component.prototype.fire = function(name) {
 };
 
 /**
+ * Looks up the specified value and checks if it is currently dirty.
+ * @returns true if the value is dirty, and false if it is clean or does not exist.
+ * @public
+ * @deprecated TEMPORARY WORKAROUND
+ */
+Component.prototype.isDirty = function(expression){
+    // JBUCH TODO: TEMPORARY PASSTHROUGH TO HIDE SIMPLEVALUES; isDirty() SHOULD BE HANDLED AUTOMATICALLY
+    var wrapper=this._getValue(expression);
+    return (wrapper&&wrapper.isDirty())||false;
+};
+
+/**
  * Returns true if the component has not been destroyed.
  * @public
  */
-Component.prototype.isValid = function(){
+Component.prototype.isValid=function(expression){
+    // JBUCH TODO: TEMPORARY PASSTHROUGH TO HIDE SIMPLEVALUES; isValid() SHOULD BE HANDLED THROUGH ERROR EVENTS
+    if(expression){
+        var wrapper=this._getValue(expression);
+        return (wrapper&&wrapper.isValid())||false;
+    }
     return !this._scheduledForAsyncDestruction && this.priv;
+};
+
+/**
+ * Looks up the specified value and sets it to valid or invalid.
+ * @public
+ * @deprecated TEMPORARY WORKAROUND
+ */
+Component.prototype.setValid = function (expression,valid) {
+    // JBUCH TODO: TEMPORARY PASSTHROUGH TO HIDE SIMPLEVALUES; setValid() SHOULD BE HANDLED THROUGH ERROR EVENTS
+    var wrapper = this._getValue(expression);
+    if(wrapper&&wrapper.setValid){
+        wrapper.setValid(valid);
+    }
+};
+
+/**
+ * Looks up the specified value and adds errors to it.
+ * @public
+ * @deprecated TEMPORARY WORKAROUND
+ */
+Component.prototype.addErrors = function (expression, errors) {
+    // JBUCH TODO: TEMPORARY PASSTHROUGH TO HIDE SIMPLEVALUES; addErrors() SHOULD BE HANDLED THROUGH ERROR EVENTS
+    var wrapper = this._getValue(expression);
+    if (wrapper&&wrapper.addErrors) {
+        wrapper.addErrors(errors);
+    }
+};
+
+/**
+ * Looks up the specified value and clears errors on it.
+ * @public
+ * @deprecated TEMPORARY WORKAROUND
+ */
+Component.prototype.clearErrors = function (expression) {
+    // JBUCH TODO: TEMPORARY PASSTHROUGH TO HIDE SIMPLEVALUES; clearErrors() SHOULD BE HANDLED THROUGH ERROR EVENTS
+    var wrapper = this._getValue(expression);
+    if (wrapper&&wrapper.clearErrors) {
+        wrapper.clearErrors();
+    }
+};
+
+
+/**
+ * Looks up the specified value and gets errors on it.
+ * @public
+ * @deprecated TEMPORARY WORKAROUND
+ */
+Component.prototype.getErrors = function (expression) {
+    // JBUCH TODO: TEMPORARY PASSTHROUGH TO HIDE SIMPLEVALUES; getErrors() SHOULD BE HANDLED THROUGH ERROR EVENTS
+    var wrapper = this._getValue(expression);
+    if (wrapper) {
+        wrapper.getErrors();
+    }
 };
 
 /**
@@ -981,10 +1123,10 @@ Component.prototype.addClass = function(clz) {
         oldClz = $A.util.trim(oldClz);
         if (oldClz) {
             if ((' ' + oldClz + ' ').indexOf(' ' + clz + ' ') == -1) {
-                this.setValue("v.class", oldClz + ' ' + clz);
+                this._setValue("v.class", oldClz + ' ' + clz);
             }
         } else {
-            this.setValue("v.class", clz);
+            this._setValue("v.class", clz);
         }
     }
 };
@@ -1011,7 +1153,7 @@ Component.prototype.removeClass = function(clz) {
         }
     }
     if (found) {
-        this.setValue("v.class", newClass.join(' '));
+        this._setValue("v.class", newClass.join(' '));
     }
 };
 
@@ -1053,13 +1195,13 @@ Component.prototype.getFacets = function() {
         // grab the names of each of the facets from the ComponentDef
         var facetNames = [];
         var attributeDefs = this.getDef().getAttributeDefs();
-        
+
         attributeDefs.each(function(attrDef) {
             if (attrDef.getTypeDefDescriptor() === "aura://Aura.Component[]") {
                 facetNames.push(attrDef.getDescriptor().getName());
             }
         });
-        
+
         // cache the names--they're not going to change
         this.getFacets.cachedFacetNames = facetNames;
     }
@@ -1069,7 +1211,7 @@ Component.prototype.getFacets = function() {
     var facets = [];
 
     for (var i=0, len=names.length; i<len; i++) {
-        facets.push(this.getValue("v." + names[i]));
+        facets.push(this._getValue("v." + names[i]));
     }
     return facets;
 };

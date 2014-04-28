@@ -211,6 +211,8 @@ $A.ns.AuraComponentService.prototype.newComponentAsync = function(callbackScope,
  */
 $A.ns.AuraComponentService.prototype.requestComponent = function(callbackScope, callback, config, avp) {
     var action = $A.get("c.aura://ComponentController.getComponent");
+
+    // JBUCH: Where is this coming from in mixed form? Why do we tolerate this?
     var attributes = config["attributes"] ?
             (config["attributes"]["values"] ? config["attributes"]["values"] : config["attributes"])
             : null;
@@ -252,9 +254,9 @@ $A.ns.AuraComponentService.prototype.requestComponent = function(callbackScope, 
 
             newComp = $A.newCmpDeprecated("markup://aura:text");
             if (errors) {
-                newComp.getValue("v.value").setValue(errors[0].message);
+                newComp.set("v.value", errors[0].message);
             } else {
-                newComp.getValue("v.value").setValue('unknown error');
+                newComp.set("v.value", 'unknown error');
             }
         }
         if ( $A.util.isFunction(callback) ) {
@@ -275,6 +277,8 @@ $A.ns.AuraComponentService.prototype.requestComponent = function(callbackScope, 
  * @param {Object} valueObj Value Object
  * @param {Object} valueProvider value provider
  * @param {Boolean} raw
+ *
+ * @deprecated JBUCH: MUST GO AWAY
  * @returns {*}
  */
 $A.ns.AuraComponentService.prototype.computeValue = function(valueObj, valueProvider, raw) {
@@ -403,7 +407,7 @@ $A.ns.AuraComponentService.prototype.getActionDef = function(config){
 /**
  * Gets the model definition from the registry.
  * @private
- */       
+ */
 $A.ns.AuraComponentService.prototype.getModelDef = function(config){
     return this.modelDefRegistry.getDef(config);
 };
@@ -453,7 +457,7 @@ $A.ns.AuraComponentService.prototype.destroy = function(components){
  * Removes the index of the component.
  * @private
  */
-$A.ns.AuraComponentService.prototype.deIndex = function(globalId){ 
+$A.ns.AuraComponentService.prototype.deIndex = function(globalId){
     delete this.indexes.globalId[globalId];
 };
 

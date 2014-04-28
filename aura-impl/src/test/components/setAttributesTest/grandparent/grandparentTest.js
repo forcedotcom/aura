@@ -19,7 +19,7 @@
      */
     testSimpleAttributeValue:{
         test:function(cmp){
-            aura.test.assertEquals('grandparentX',cmp.getValue('v.SimpleAttribute').getValue(), "Value of attribute has the wrong default value.");
+            aura.test.assertEquals('grandparentX',cmp.get('v.SimpleAttribute'), "Value of attribute has the wrong default value.");
             //UI verification to check that renderer used the right attribute value
             aura.test.assertEquals('The value of SimpleAttribute = grandparentX',$A.test.getText(cmp.find('simpleAttr_id').getElement()));
         }

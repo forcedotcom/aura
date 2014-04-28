@@ -20,8 +20,7 @@
         function(cmp){
             //Fetch the label using gvp, which causes a server action
             $A.test.setTestTimeout(15000);
-            var gvp = $A.getGlobalValueProviders();
-            gvp.get("$Label" + ".Related_Lists" + ".task_mode_today");
+            $A.get("$Label" + ".Related_Lists" + ".task_mode_today");
             $A.test.assertTrue($A.test.isActionPending(),
                 "Test Setup Failure: test expects the label to be fetched from server");
             $A.test.addWaitFor(
@@ -29,7 +28,7 @@
                 $A.test.isActionPending,
                 function(){
                     //Verify that label is available
-                    $A.test.assertEquals("Today", gvp.get("$Label.Related_Lists.task_mode_today"), 
+                    $A.test.assertEquals("Today", $A.get("$Label.Related_Lists.task_mode_today"),
                         "Failed to fetch label from server dynamically");
                     //Check for GVPs in Storage
                     var storage = $A.storageService.getStorage("actions");
@@ -43,19 +42,9 @@
                 }
             );
             $A.test.addWaitForWithFailureMessage(
-                true, 
+                true,
                 function(){return cmp._foundGvps},
                 "Failed to store global value providers in storage"
-            );
-        },
-        function(cmp){
-            var gvp = $A.getGlobalValueProviders();
-            //Force the loading of GVPs from storage service
-            gvp.loadFromStorage();
-            $A.test.addWaitForWithFailureMessage(
-                "Yesterday", 
-                function(){ return gvp.get("$Label.Related_Lists.task_mode_today")},
-                "Failed to load GVPs from storage"
             );
         }
     ]}

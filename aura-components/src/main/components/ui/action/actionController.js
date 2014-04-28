@@ -15,10 +15,10 @@
  */
 ({
 	handleClick: function (cmp, evt) {
-		var el = cmp.getElement(), 
-			click; 
+		var el = cmp.getElement(),
+			click;
 
-		// Dispatch clicks within the action as clicks on the action itself. 
+		// Dispatch clicks within the action as clicks on the action itself.
 		// Ignore clicks coming from its own element, those events will bubble correctly.
 		if (evt.target !== el) {
 			evt.stopPropagation();
@@ -33,8 +33,8 @@
 
 	handleValueChange: function (cmp, evt) {
 		var el = cmp.getElement(),
-			value = evt.getParam('value').getValue();
-		
-		$A.util.setDataAttribute(el, 'action-value', value); 	
+			value = evt.getParam('value');
+
+		$A.util.setDataAttribute(el, 'action-value', value);
 	}
 })

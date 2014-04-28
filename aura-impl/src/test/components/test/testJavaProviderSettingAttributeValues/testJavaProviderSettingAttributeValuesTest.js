@@ -18,13 +18,13 @@
         attributes : {a1 : 'a1', a2 : "a2", value : "aura"},
 
         test: function(component){
-            aura.test.assertEquals('a1Provider', component.getAttributes().getValue('a1').getValue(), "a1 should have been overriden by provider");
-            aura.test.assertTrue(component.getAttributes().getValue('a2').getValue()===undefined, "a2 should have been made undefined by provider");
-            aura.test.assertEquals('b1Provider', component.getAttributes().getValue('b1').getValue(), "b1 should have been set by provider");
-            aura.test.assertEquals('aura', component.getAttributes().getValue('value').getValue(), "value should have been passed through");
+            aura.test.assertEquals('a1Provider', component.get('v.a1'), "a1 should have been overriden by provider");
+            aura.test.assertTrue(component.get('v.a2')===undefined, "a2 should have been made undefined by provider");
+            aura.test.assertEquals('b1Provider', component.get('v.b1'), "b1 should have been set by provider");
+            aura.test.assertEquals('aura', component.get('v.value'), "value should have been passed through");
             //using something order than a simple string
             aura.test.assertEquals('ar1Provider1', component.getAttributes().getValue('ar1').get(1), "ar1 should have been set by provider");
-            aura.test.assertTrue(component.getAttributes().getValue('b2').getValue()===undefined, "b2 should have been undefined");
+            aura.test.assertTrue(component.get('v.b2')===undefined, "b2 should have been undefined");
         }
     },
 
@@ -32,7 +32,7 @@
         attributes : {'a3' : "a3", value : "aura"},
         test: function(component){
             //Provider sets an attribute on the concrete component based on a3
-           aura.test.assertEquals('b2Provider', component.getAttributes().getValue('b2').getValue(), "b2 should have been set by provider");
+           aura.test.assertEquals('b2Provider', component.get('v.b2'), "b2 should have been set by provider");
         }
     }
 })

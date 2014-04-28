@@ -286,7 +286,8 @@
                     if (value && value.auraType === "Value") {
                         if (aura.util.arrayIndexOf(this.SPECIAL_BOOLEANS, name.toLowerCase()) > -1) {
                             // TODO: values should someday know their type and do the right thing with getValue()
-                            value = value.getBooleanValue();
+                            // JBUCH: FIXME TEMPORARY FIX FOR HALO
+                            value = $A.util.getBooleanValue(value.getValue());
                         } else {
                             value = value.getValue();
                         }

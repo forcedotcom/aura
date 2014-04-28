@@ -27,7 +27,7 @@
             tag = "div";
         }
         var HTMLAttributes = attributes.getValue("HTMLAttributes");
-        
+
         //Fix for name being read only attribute on IE7
         var isIE7 = $A.get("$Browser.isIE7");
         if(isIE7 ===  true && tag == "input"){
@@ -87,7 +87,8 @@
                             var oldValue = element[helper.caseAttribute(lowerName)];
 
                             if (aura.util.arrayIndexOf(helper.SPECIAL_BOOLEANS, lowerName) > -1) {
-                                newValue = value.getBooleanValue();
+                                // JBUCH: TEMPORARY FIX FOR HALO
+                                newValue = $A.util.getBooleanValue(value.getValue());
                             } else {
                                 newValue = value.unwrap();
                             }

@@ -82,7 +82,7 @@
     },
     /**
      * Negative test case: Assign an invalid format value for attribute 'format'.
-     */    
+     */
     testInvalidFormat  : {
         attributes : {value : 123.450, format : ',,'},
         test: function(component){
@@ -145,7 +145,7 @@
     },
     /**
      * Test big value that is too large for a js number and is represented instead by a string
-     */    
+     */
     testBigDecimal:{
         attributes : {value : '1234567890123456789012345678901234567890.12', format : '.00'},
         test: function(component){
@@ -160,12 +160,12 @@
         attributes : {value : 22.7, format : '##,#0,00.00#####'},
         test: function(component){
             aura.test.assertEquals('0,22.70', $A.test.getText(component.find('span').getElement()), "Value not formatted correctly");
-            component.getValue("v.value").setValue(49322);
+            component.set("v.value", 49322);
             $A.rerender(component);
             aura.test.assertEquals('4,93,22.00', $A.test.getText(component.find('span').getElement()), "Value not updated after changed");
         }
     },
-    
+
     /**
      * Verify that when the value doesn't change it is rerendered with the same value
      */
@@ -173,7 +173,7 @@
         attributes : {value : 22.7, format : '##,#0,00.00#####'},
         test: function(component){
             aura.test.assertEquals('0,22.70', $A.test.getText(component.find('span').getElement()), "Value not formatted correctly");
-            component.getValue("v.value").setValue(22.7);
+            component.set("v.value", 22.7);
             $A.rerender(component);
             aura.test.assertEquals('0,22.70', $A.test.getText(component.find('span').getElement()), "Value not updated after changed");
         }
@@ -186,12 +186,12 @@
         attributes : {value : 22.7, format : '##,#0,00.00#####'},
         test: function(component){
             aura.test.assertEquals('0,22.70', $A.test.getText(component.find('span').getElement()), "Value not formatted correctly");
-            component.getValue("v.format").setValue("meh #.#");
+            component.set("v.format", "meh #.#");
             $A.rerender(component);
             aura.test.assertEquals('meh 22.7', $A.test.getText(component.find('span').getElement()), "Value not updated after format changed");
         }
     },
-    
+
     /**
      * Verify that when the format doesn't change it is rerendered using the same format
      */
@@ -199,7 +199,7 @@
         attributes : {value : 22.7, format : '##,#0,00.00#####'},
         test: function(component){
             aura.test.assertEquals('0,22.70', $A.test.getText(component.find('span').getElement()), "Value not formatted correctly");
-            component.getValue("v.format").setValue("##,#0,00.00#####");
+            component.set("v.format", "##,#0,00.00#####");
             $A.rerender(component);
             aura.test.assertEquals('0,22.70', $A.test.getText(component.find('span').getElement()), "Value not updated after format changed");
         }

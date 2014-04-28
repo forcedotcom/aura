@@ -17,13 +17,13 @@
  	handleError: function(component, event){
         var inputCmp = component.find("inputCmp");
         var errorsObj = event.getParam("errors");
-     
+
         if (errorsObj) {
             var errMsgs = [];
             for (var i = 0; i < errorsObj.length; i++) {
                 errMsgs.push("Custom Error Msg: " + errorsObj[i].message);
             }
-         
+
             // uncomment after bug: W-1412621
             /*
             errorCmp = $A.componentService.newComponentDeprecated({
@@ -34,45 +34,45 @@
                     }
                 }
             });
-            
+
             inputCmp.setValue("v.errorComponent", errorCmp);
             $A.rerender(inputCmp);
-            
+
             // test infrastructure expects error css set
             var element = inputCmp.getElement();
         	var htmlCmp = $A.componentService.getRenderingComponentForElement(element);
         	var valueProvider = htmlCmp.getAttributes().getComponentValueProvider();
             valueProvider.addClass("inputError");
             */
-            component.getValue("v.errorMessage").setValue(errMsgs.join(";"));
+            component.set("v.errorMessage", errMsgs.join(";"));
             component.find("outputStatus").getAttributes().setValue("value", "Got Error");
         }
     },
- 
+
     handleClearError: function(component, event) {
         var inputCmp = component.find("inputCmp");
         // uncomment after bug: W-1412621
         /*
         inputCmp.setValue("v.errorComponent", "");
-        
+
         // test infrastructure expects error css cleared
         var element = inputCmp.getElement();
         var htmlCmp = $A.componentService.getRenderingComponentForElement(element);
         var valueProvider = htmlCmp.getAttributes().getComponentValueProvider();
         valueProvider.removeClass("inputError");
-        
+
         $A.rerender(inputCmp);
         */
-        component.getValue("v.errorMessage").setValue("");
+        component.set("v.errorMessage", "");
         component.find("outputStatus").getAttributes().setValue("value", "Cleared error");
     },
-    
+
     doServerErrorFireOnErrorEvent : function(component, event) {
 		var a = component.get("c.throwsException");
 		a.setParams({
             errorMsg : "Error Happens!"
         });
-		
+
         a.setCallback(component, function(action){
         	if (action.getState() === "SUCCESS") {
         		var retValue = action.getReturnValue();
@@ -80,16 +80,16 @@
 	        } else {
 	        	var errors = action.getError();
 	        	var inputCmp = component.find("inputCmp");
-	        	
+
 	        	var errorEvent = inputCmp.getEvent("onError");
 	        	errorEvent.setParams({ "errors" : errors});
                 errorEvent.fire();
 	        }
         });
-        
+
         $A.enqueueAction(a);
 	},
-	
+
 	clearErrorFireOnClearErrorsEvent : function(component, event) {
 		var inputCmp = component.find("inputCmp");
 		var cleanErrorEvent = inputCmp.getEvent("onClearErrors");

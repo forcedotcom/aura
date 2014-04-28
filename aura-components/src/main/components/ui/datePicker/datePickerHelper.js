@@ -51,26 +51,26 @@
         fullName: "December",
         shortName: "Dec"
     }],
-    
+
     attachToDocumentBody: function(component) {
         var body = document.getElementsByTagName("body")[0];
         var elem = component.getElement();
         body.appendChild(elem);
     },
-    
+
     focusDate: function(component) {
         var grid = component.find("grid");
         var e = grid.get("e.focus");
         e.fire();
     },
-    
+
     getOnClickEndFunction : function(component) {
         if ($A.util.isUndefined(component._onClickEndFunc)) {
             var helper = this;
             var f = function(event) {
                 // ignore gestures/swipes; only run the click handler if it's a click or tap
                 var clickEndEvent;
-            
+
                 if (helper.getOnClickEventProp("isTouchDevice")) {
                     var touchIdFound = false;
                     for (var i = 0; i < event.changedTouches.length; i++) {
@@ -80,30 +80,30 @@
                             break;
                         }
                     }
-                
+
                     if (helper.getOnClickEventProp("isTouchDevice") && !touchIdFound) {
                         return;
                     }
                 } else {
                     clickEndEvent = event;
                 }
-            
+
                 var startX = component._onStartX, startY = component._onStartY;
                 var endX = clickEndEvent.clientX, endY = clickEndEvent.clientY;
 
                 if (Math.abs(endX - startX) > 0 || Math.abs(endY - startY) > 0) {
                     return;
                 }
-            
+
                 if (!helper.isElementInComponent(component, event.target)) {
                     // Hide the component
                     component.setValue("v.visible", false);
-                    
+
                     //Since we are no longer going into the rerender function, updateGlobalEventListeners does not get called and the listeners will never get turned off
                     var concreteCmp = component.getConcreteComponent();
                     concreteCmp._clickStart.setEnabled(false);
                     concreteCmp._clickEnd.setEnabled(false);
-                    
+
                     var divCmp = component.find("datePicker");
                     if (divCmp) {
                         var elem = divCmp.getElement();
@@ -115,7 +115,7 @@
         }
         return component._onClickEndFunc;
     },
-    
+
     getOnClickEventProp: function(prop) {
         // create the cache
         if ($A.util.isUndefined(this.getOnClickEventProp.cache)) {
@@ -139,7 +139,7 @@
         }
         return this.getOnClickEventProp.cache[prop];
     },
-    
+
     getOnClickStartFunction: function(component) {
         if ($A.util.isUndefined(component._onClickStartFunc)) {
             var helper = this;
@@ -159,7 +159,7 @@
         }
         return component._onClickStartFunc;
     },
-    
+
     goToNextYear: function(component) {
         var grid = component.find("grid");
         var e = grid.get("e.updateCalendar");
@@ -168,7 +168,7 @@
             e.fire();
         }
     },
-    
+
     goToPrevYear: function(component) {
 	    var grid = component.find("grid");
 	    var e = grid.get("e.updateCalendar");
@@ -177,14 +177,14 @@
 	        e.fire();
 	    }
 	},
-    
+
     handleESCKey: function(component, event) {
         var keyCode = event.keyCode;
         if (keyCode == 27) { // Esc key is pressed
             component.setValue("{!v.visible}", false);
         }
     },
-    
+
     isElementInComponent : function(component, targetElem) {
         var componentElements = [];
 
@@ -209,7 +209,7 @@
 
         return false;
     },
-    
+
     localizeToday: function(component) {
         var todayCmp = component.find("today");
         if (!todayCmp) {
@@ -221,7 +221,7 @@
         }
         todayCmp.setValue("v.label", todayLabel);
     },
-    
+
     getNormalizedLang: function(component) {
         var ret = 'en';
         var lang = [];
@@ -242,7 +242,7 @@
         } else {
             lang.push("en");
         }
-        
+
         if (lang[0] === "zh") {
             ret = lang[0] + "-" + lang[1];
         } else {
@@ -250,7 +250,7 @@
         }
         return ret;
     },
-    
+
     handleWinResize: function(component, e) {
         if (!component || !component.isValid()) {
             return;
@@ -267,7 +267,7 @@
             }
         }
     },
-    
+
     position: function(component) {
         var divCmp = component.find("datePicker");
         var elem = divCmp ? divCmp.getElement() : null;
@@ -276,13 +276,13 @@
 
         if (elem && visible) {
             var isPhone = $A.get("$Browser.isPhone");
-            
+
             if (isPhone === true) {
                 this.attachToDocumentBody(component);
                 var scrollerDivCmp = component.find("scroller");
                 var scrollerElem = scrollerDivCmp ? scrollerDivCmp.getElement() : null;
                 if (scrollerElem) { // Set scroller div height to make it scrollable.
-                    var isAndroid = $A.getGlobalValueProviders().get("$Browser.isAndroid");
+                    var isAndroid = $A.get("$Browser.isAndroid");
                     if (isAndroid == true) {
                         scrollerElem.style.height = component._windowSize.height + "px";
                     } else {
@@ -291,17 +291,17 @@
                 }
             } else {
                 var elemRect = elem.getBoundingClientRect();
-                
+
                 if (elemRect.bottom > viewPort.height) { // no enough space below
                     elem.style.top = 0 - (elemRect.bottom - viewPort.height) + "px"; // Move it up a bit
-                } 
+                }
                 else {
-                    elem.style.top = "auto"; 
+                    elem.style.top = "auto";
                 }
             }
-        }     
+        }
     },
-    
+
     refreshYearSelection: function(component) {
         var minY = component.get("v.minYear");
         if (!minY) {
@@ -319,7 +319,7 @@
             }
         }
     },
-    
+
     setGridInitialValue: function(component) {
         var initialDate = new Date();
         var value = component.get("v.value");
@@ -334,9 +334,9 @@
             grid.setValue("v.month", initialDate.getMonth());
             grid.setValue("v.year", initialDate.getFullYear());
         }
-        
+
         // set initial value to time picker if hasTime is true
-        var hasTime = component.getValue("v.hasTime").getBooleanValue();
+        var hasTime = $A.util.getBooleanValue(component.get("v.hasTime"));
         if (hasTime) {
             var timePickerCmp = component.find("time");
             if (timePickerCmp) {
@@ -346,7 +346,7 @@
             }
         }
     },
-    
+
     updateGlobalEventListeners: function(component) {
         var concreteCmp = component.getConcreteComponent();
         var visible = concreteCmp.get("v.visible");
@@ -360,7 +360,7 @@
             concreteCmp._clickEnd.setEnabled(visible);
         }
     },
-    
+
     updateMonthYear: function(component, value) {
         var isDesktop = $A.get("$Browser.formFactor") == "DESKTOP";
         if (!isDesktop) { // mobile
@@ -383,7 +383,7 @@
             }
         }
     },
-    
+
     updateMobileMonthYear: function(component, value) {
         var grid = component.find("grid");
         if (grid) {
@@ -392,16 +392,16 @@
             var monthTitleCmp = component.find("monthTitle");
             if (monthTitleCmp) {
                 var monthLabels = component.get("m.monthLabels");
-                monthTitleCmp.setValue("v.value", monthLabels[m].fullName); 
+                monthTitleCmp.setValue("v.value", monthLabels[m].fullName);
             }
             var yearTitleCmp = component.find("yearTitle");
             var selectElem = yearTitleCmp ? yearTitleCmp.getElement() : null;
             if (selectElem) {
                 selectElem.value = y + "";
-            }   
+            }
         }
     },
-    
+
     yearChange: function(component) {
         var grid = component.find("grid");
         var yearCmp = component.find("yearTitle");

@@ -24,7 +24,7 @@
         var ret = document.createElement('div');
         ret.className = 'button';
         ret.id = component.getGlobalId();
-        ret.innerHTML = component.getAttributes().getValue('label').getValue();
+        ret.innerHTML = component.get('v.label');
         return [ret];
     },
     /*Multi line Comments
@@ -32,6 +32,6 @@
     //Single line Comments
     rerender: function(component) {
         var div = component.getElements().element;
-        div.innerHTML = component.getAttributes().getValue('label').getValue();
+        div.innerHTML = component.get('v.label');
     }
 })

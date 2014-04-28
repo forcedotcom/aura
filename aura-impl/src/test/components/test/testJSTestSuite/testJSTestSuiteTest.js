@@ -33,7 +33,7 @@
 
         test: function(component){
             /*Comments*/
-            aura.test.assertTrue(component.getAttributes().getValue('num').getValue() == 2, "very bad things.");
+            aura.test.assertTrue(component.get('v.num') == 2, "very bad things.");
         }
     },
     /*Multi line Comments

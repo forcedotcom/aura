@@ -22,8 +22,7 @@
     rerender : function(component, helper) {
         this.superRerender();
 
-        var attributes = component.getAttributes();
-        var enabled = attributes.getValue("enabled").getBooleanValue();
+        var enabled = $A.util.getBooleanValue(component.get("v.enabled"));
         if (enabled) {
             if ($A.util.isUndefined(component._scroller)) {
                 helper.init(component);

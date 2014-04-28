@@ -30,9 +30,9 @@
         }
         return hours;
     },
-    
+
     localizeAmpmLabel: function(component) {
-        var is24HourFormat = component.getValue("v.is24HourFormat").getBooleanValue();
+        var is24HourFormat = $A.util.getBooleanValue(component.get("v.is24HourFormat"));
         if (is24HourFormat === false) {
             // Localize am/pm label
             var localizedData = $A.localizationService.getLocalizedDateTimeLabels();
@@ -40,19 +40,19 @@
             if (ampm) {
                 var amOptCmp = component.find("amOpt");
                 if (amOptCmp) {
-                    amOptCmp.setValue("v.label", ampm.am); 
+                    amOptCmp.setValue("v.label", ampm.am);
                 }
                 var pmOptCmp = component.find("pmOpt");
                 if (pmOptCmp) {
-                    pmOptCmp.setValue("v.label", ampm.pm); 
-                } 
+                    pmOptCmp.setValue("v.label", ampm.pm);
+                }
             }
         }
     },
-    
+
     renderTime: function(component) {
         // set hours based on 24/12 hour format
-        var is24HourFormat = component.getValue("v.is24HourFormat").getBooleanValue();
+        var is24HourFormat = $A.util.getBooleanValue(component.get("v.is24HourFormat"));
         var hours = component.get("v.hours");
         hours %= 24;
         if (is24HourFormat === false) {
@@ -62,7 +62,7 @@
         if (hoursCmp) {
             hoursCmp.setValue("v.value", hours);
         }
-        
+
         // set minutes
         var minutes = component.get("v.minutes");
         minutes %= 60;
@@ -75,9 +75,9 @@
             minutesCmp.setValue("v.value", minutes);
         }
     },
-    
+
     updateHourValue: function(component, hours) {
-        var is24HourFormat = component.getValue("v.is24HourFormat").getBooleanValue();
+        var is24HourFormat = $A.util.getBooleanValue(component.get("v.is24HourFormat"));
         var hoursValue = component.getValue("v.hours");
         if (is24HourFormat === true) {
             hoursValue.setValue(hours);
@@ -93,12 +93,12 @@
             }
         }
     },
-    
+
     updateMinuteValue: function(component, minutes) {
         var minutesValue = component.getValue("v.minutes");
         minutesValue.setValue(minutes);
     },
-    
+
     validateNumber: function(value, min, max) {
         var intRegex = /^\d+$/; // nonnegative integer
         if (intRegex.test(value)) {
@@ -107,9 +107,9 @@
         }
         return false;
     },
-    
+
     validateHours: function(component) {
-        var is24HourFormat = component.getValue("v.is24HourFormat").getBooleanValue();
+        var is24HourFormat = $A.util.getBooleanValue(component.get("v.is24HourFormat"));
         var hoursCmp = component.find("hours");
         var errorCmp = component.find("hourError");
         if (hoursCmp && errorCmp) {
@@ -142,14 +142,14 @@
         }
         return false;
     },
-    
+
     validateMinutes: function(component) {
         var minutesCmp = component.find("minutes");
         var errorCmp = component.find("minuteError");
         if (minutesCmp && errorCmp) {
             var minutes = minutesCmp.get("v.value");
             if (this.validateNumber(minutes, 0, 59)) {
-                minutesCmp.removeClass("error"); 
+                minutesCmp.removeClass("error");
                 errorCmp.setValue("v.value", []);
                 errorCmp.addClass("hide");
                 return true;
@@ -162,5 +162,5 @@
         }
         return false;
     }
-    
+
 })

@@ -24,23 +24,23 @@
             matchEvt.fire();
         }
     },
-    
+
     handleSelectOption: function(cmp, event, autoCompleteCmpName) {
     	var optionCmp = event.getParam("option");
     	var accCmp = cmp.find(autoCompleteCmpName);
         var input = accCmp.find("input");
         var list = accCmp.find("list");
         var value = "";
-        
+
       //  if (optionCmp.isInstanceOf("uitest:autoComplete_CustomTemplate")) {
-      //  	value = optionCmp.getValue("v.value").getValue();
+      //  	value = optionCmp.get("v.value");
       if (optionCmp.isInstanceOf("ui:autocompleteOption")) {
-        	value = optionCmp.getValue("v.label").getValue();
-        } 
+        	value = optionCmp.get("v.label");
+        }
         input.setValue("v.value", value);
         list.setValue("v.visible", false);
     },
-    
+
     handleMatchDone: function(cmp, event, autoCompleteCmpName) {
     	var input = cmp.find(autoCompleteCmpName + "MatchSize");
     	input.setValue("v.value", event.getParam("size"));

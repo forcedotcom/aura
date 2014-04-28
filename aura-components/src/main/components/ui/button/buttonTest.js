@@ -32,17 +32,17 @@
         attributes : {label : 'Ok'},
         test:function(component){
             var element = component.getElement();
-            aura.test.assertEquals('button', component.getAttributes().getValue('buttonType').getValue(), "default value of buttonType attribute should be 'button'")
+            aura.test.assertEquals('button', component.get('v.buttonType'), "default value of buttonType attribute should be 'button'")
             aura.test.assert('button',element.getAttribute('type'), "By default ui:button should create a button element of type 'Button'");
 
-            aura.test.assertTrue(!component.getAttributes().getValue('buttonTitle').getValue(), "Button should not have a default value for title");
+            aura.test.assertTrue(!component.get('v.buttonTitle'), "Button should not have a default value for title");
 
-            aura.test.assertFalse(component.getAttributes().getValue('disabled').getBooleanValue(), "Button should not be disabled by default");
+            aura.test.assertFalse($A.util.getBooleanValue(component.get('v.disabled')), "Button should not be disabled by default");
             aura.test.assertFalse(element.disabled, "By default dom element for ui:button should not be disabled");
 
-            aura.test.assertEquals('ltr', component.getAttributes().getValue('labelDir').getValue(), "Button label should be left to right by default");
+            aura.test.assertEquals('ltr', component.get('v.labelDir'), "Button label should be left to right by default");
 
-            aura.test.assertEquals("", component.getAttributes().getValue('accesskey').getValue(), "Button should have no shortcut key by default");
+            aura.test.assertEquals("", component.get('v.accesskey'), "Button should have no shortcut key by default");
             aura.test.assertEquals("", element.accessKey, "By default dom element for ui:button should have no shortcut key");
         }
     },

@@ -21,7 +21,7 @@
         attributes : {value: "Initial value"},
         test: function(component){
             aura.test.assertEquals("Initial value", component.getElement().value, "Textarea value not correctly initialized.");
-            component.getValue("v.value").setValue("Changed value");
+            component.set("v.value", "Changed value");
             $A.rerender(component);
             aura.test.assertEquals("Changed value", component.getElement().value, "Textarea value not correctly changed.");
         }
@@ -33,7 +33,7 @@
         attributes : {disabled: true},
         test: function(component){
             aura.test.assertTrue(component.getElement().disabled, "Textarea not correctly disabled");
-            component.getValue("v.disabled").setValue(false);
+            component.set("v.disabled", false);
             $A.rerender(component);
             aura.test.assertFalse(component.getElement().disabled, "Textarea disabled attribute not correct after switching.");
         }
@@ -45,7 +45,7 @@
         attributes : {disabled: false},
         test: function(component){
             aura.test.assertFalse(component.getElement().disabled, "Textarea not correctly enabled");
-            component.getValue("v.disabled").setValue(true);
+            component.set("v.disabled", true);
             $A.rerender(component);
             aura.test.assertTrue(component.getElement().disabled, "Textarea disabled attribute not correct after switching.");
         }
@@ -57,7 +57,7 @@
         attributes : {readonly: 'true'},
         test: function(component){
             aura.test.assertTrue(component.getElement().readOnly, "Textarea readonly attribute not correct");
-            component.getValue("v.readonly").setValue(false);
+            component.set("v.readonly", false);
             $A.rerender(component);
             aura.test.assertFalse(component.getElement().readOnly, "Textarea readonly attribute not correct after switching.");
         }
@@ -69,7 +69,7 @@
         attributes : {readonly: 'false'},
         test: function(component){
             aura.test.assertFalse(component.getElement().readOnly, "Textarea readonly attribute not correct");
-            component.getValue("v.readonly").setValue(true);
+            component.set("v.readonly", true);
             $A.rerender(component);
             aura.test.assertTrue(component.getElement().readOnly, "Textarea readonly attribute not correct after switching.");
         }
@@ -104,7 +104,7 @@
         	if (textarea.hasAttribute("resizable")) {
         		// resizable is supported
             	aura.test.assertEquals('both', $A.util.style.getCSSProperty(component.getElement(),'resize'), "Textarea not correctly resizable");
-                component.getValue("v.resizable").setValue(false);
+                component.set("v.resizable", false);
                 $A.rerender(component);
                 aura.test.assertEquals('none', $A.util.style.getCSSProperty(component.getElement(),'resize'), "Textarea resizable attribute not correct after switching.");
             }

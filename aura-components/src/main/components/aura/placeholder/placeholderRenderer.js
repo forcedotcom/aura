@@ -15,7 +15,7 @@
  */
 ({
     afterRender : function(cmp){
-        if (cmp.getValue("v.loaded").getBooleanValue()){
+        if ($A.util.getBooleanValue(cmp.get("v.loaded"))){
             return this.superAfterRender();
         }
 
@@ -29,7 +29,7 @@
                 atts[key] = $A.componentService.computeValue(value, avp, true);
             });
         }
-        
+
         action.setCallback(this, function(a){
 
             var newBody;
@@ -40,9 +40,9 @@
                 var errors = a.getError();
                 newBody = $A.newCmpDeprecated("markup://aura:text", null, false, false);
                 if (errors) {
-                    newBody.getValue("v.value").setValue(errors[0].message);
+                    newBody.set("v.value", errors[0].message);
                 } else {
-                    newBody.getValue("v.value").setValue('unknown error');
+                    newBody.set("v.value", 'unknown error');
                 }
             }
             var body = cmp.getValue("v.body");
@@ -66,8 +66,8 @@
             "attributes" : atts
         });
 
-        action.setExclusive(cmp.getValue("v.exclusive").getBooleanValue());
-        cmp.getValue("v.loaded").setValue(true);
+        action.setExclusive($A.util.getBooleanValue(cmp.get("v.exclusive")));
+        cmp.set("v.loaded", true);
         $A.enqueueAction(action);
 
         this.superAfterRender();

@@ -22,7 +22,7 @@
 
     changeEndIndex: function(cmp, evt) {
         var inputValue = cmp.get("v.inputValue");
-        cmp.getValue("v.newEndIndex").setValue(inputValue);
+        cmp.set("v.newEndIndex", inputValue);
         //var endIndex = cmp.find("innerIteration").getAttributes().getValue("end");
         //endIndex.setValue(5);
  }

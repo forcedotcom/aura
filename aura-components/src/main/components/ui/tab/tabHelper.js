@@ -20,7 +20,7 @@
         if (a && tabBody) {
             var elementA = a.getElement();
             var elementT = tabBody.getElement();
-            var active = cmp.getAttributes().getValue("active").getBooleanValue();
+            var active = $A.util.getBooleanValue(cmp.get("v.active"));
             if (active) {
                 elementA.setAttribute("aria-selected", "true");
                 elementT.setAttribute("aria-expanded", "true");

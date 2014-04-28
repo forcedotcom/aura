@@ -18,35 +18,35 @@
      * TODO::make pagination work with more than one data provider.
      *
      */
-    handlePageChange: function(component, event, helper) {      
+    handlePageChange: function(component, event, helper) {
         var currentPage = event.getParam("currentPage");
         var pageSize = event.getParam("pageSize");
-        
-        component.getValue("v.currentPage").setValue(currentPage, true);
-        component.getValue("v.pageSize").setValue(pageSize);
-        
+
+        component.set("v.currentPage", currentPage, true);
+        component.set("v.pageSize", pageSize);
+
         helper.triggerDataProvider(component);
     },
-    
+
     handleDataChange: function(component, event, helper) {
     	component = component.getConcreteComponent();
     	helper = component.getDef().getHelper();
 
     	if (component._refreshing) {
     		helper.beforeRefresh(component, event);
-    		
+
     		component._refreshing = false;
     	}
-    	
+
     	helper.handleDataChange(component, event);
     },
-    
+
     init: function(component, event, helper) {
         helper.init(component);
-        
+
         helper.initTriggerDataProviders(component);
     },
-    
+
     // TODO: Support refresh-all behavior
     refresh: function(component, event, helper) {
     	var params = event.getParam("parameters");
@@ -54,14 +54,14 @@
     	if (params) {
     		index = params.index;
     	}
-    	
-    	component.getConcreteComponent().getValue("v.currentPage").setValue(1, true);
-    	
+
+    	component.getConcreteComponent().set("v.currentPage", 1, true);
+
     	component.getConcreteComponent()._refreshing = true;
 
     	helper.triggerDataProvider(component, index);
     },
-    
+
     triggerDataProvider: function(component, event, helper) {
     	var params = event.getParam("parameters");
     	var index = 0;

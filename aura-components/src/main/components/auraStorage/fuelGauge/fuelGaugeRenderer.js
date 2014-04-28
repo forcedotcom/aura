@@ -16,15 +16,15 @@
 ({
     render : function(cmp, helper){
     	var enabled = helper.isEnabled(cmp);
-		cmp.getValue("v.enabled").setValue(enabled);
-		
+		cmp.set("v.enabled", enabled);
+
 		if (enabled) {
     		var storage = helper.getStorage(cmp);
-			cmp.getValue("v.implementation").setValue(storage.getName());
-			
+			cmp.set("v.implementation", storage.getName());
+
 	    	helper.update(cmp);
 		}
-		
-    	return this.superRender(); 
+
+    	return this.superRender();
     }
 })

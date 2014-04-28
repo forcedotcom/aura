@@ -33,7 +33,7 @@
             aura.test.assertEquals("Invalid date time value", $A.test.getText(component.find('span').getElement()), "Value must be an ISO8601-formatted string or a number of milliseconds from Epoch.");
         }
     },
-    
+
     /**
      * Verify behavior when 'format' attribute is assigned an empty string.
      */
@@ -45,7 +45,7 @@
         	});
         }
     },
-    
+
     /**
      * Verify behavior when 'format' is given a valid time format.
      */
@@ -57,7 +57,7 @@
         	});
       }
     },
-    
+
     /**
      * Verify behavior when 'format' attribute is assigned a garbage value.
      */
@@ -69,7 +69,7 @@
         	});
       }
     },
-    
+
     /**
      * Verify AM/PM in a non-English language.
      */
@@ -78,11 +78,11 @@
         test: function(component){
             aura.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
                 aura.test.assertEquals("9/24/04 12:30 上午", $A.test.getText(component.find('span').getElement()), "Incorrect formatted datetime string.");
-            });                        
+            });
 
         }
     },
-    
+
     /**
      * Verify behavior when 'langLocale' attribute is changed and component is rerendered.
      */
@@ -90,78 +90,78 @@
     	attributes: {value : '2004-09-23T16:30:00.000Z', format: 'M/dd/yy h:mm A', langLocale: 'zh_CN', timezone: 'Asia/Shanghai'},
         test: function(component){
             aura.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
-                aura.test.assertEquals("9/24/04 12:30 上午", $A.test.getText(component.find('span').getElement()), "Incorrect formatted datetime string.");                
-                component.getValue("v.langLocale").setValue("en");
-                $A.rerender(component);                                
+                aura.test.assertEquals("9/24/04 12:30 上午", $A.test.getText(component.find('span').getElement()), "Incorrect formatted datetime string.");
+                component.set("v.langLocale", "en");
+                $A.rerender(component);
                 aura.test.assertEquals("9/24/04 12:30 AM", $A.test.getText(component.find('span').getElement()), "Incorrect formatted datetime string.");
-            });                        
+            });
 
         }
     },
-    
+
     /**
      * Verify behavior when 'langLocale' is not provided.
      */
     testDefaultLangLocale:{
 	attributes : {value:'2004-09-23T16:30:00.000Z', timezone: 'GMT'},
-	test: function(component){	        
+	test: function(component){
 	        aura.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
 	        	var outputDateStr  = $A.test.getText(component.find('span').getElement());
 		        var dt            = 'Sep 23, 2004 4:30:00 PM';
-	    		aura.test.assertEquals(dt, outputDateStr, "Should have used Default langLocale.");	        	
-	        });	
+	    		aura.test.assertEquals(dt, outputDateStr, "Should have used Default langLocale.");
+	        });
         }
-    },        
-    
+    },
+
     /**
      * Verify behavior when 'langLocale' is assigned a empty string.
      */
     testEmptyStringLangLocale:{
 	attributes : {value:'2004-09-23T16:30:00.000Z', timezone: 'GMT', langLocale: ''},
-	test: function(component){	        
+	test: function(component){
 	        aura.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
 	        	var outputDateStr  = $A.test.getText(component.find('span').getElement());
 		        var dt            = 'Sep 23, 2004 4:30:00 PM';
-	    		aura.test.assertEquals(dt, outputDateStr, "Should have used Default langLocale.");	        	
-	        });	
+	    		aura.test.assertEquals(dt, outputDateStr, "Should have used Default langLocale.");
+	        });
         }
     },
-    
+
     /**
      * Verify behavior when 'langLocale' is assigned garbage.
      */
     testInvalidLangLocale:{
- 	attributes : {value:'2004-09-23T16:30:00.000Z', timezone: 'GMT', langLocale: 'kk'},	
-	test: function(component){	        
+ 	attributes : {value:'2004-09-23T16:30:00.000Z', timezone: 'GMT', langLocale: 'kk'},
+	test: function(component){
 	        aura.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
 	        	var outputDateStr  = $A.test.getText(component.find('span').getElement());
 		        var dt            = 'Sep 23, 2004 4:30:00 PM';
-	    		aura.test.assertEquals(dt, outputDateStr, "Should have used Default langLocale.");	        	
-	        });	
+	    		aura.test.assertEquals(dt, outputDateStr, "Should have used Default langLocale.");
+	        });
         }
     },
-    
+
     /**
      * Verify behavior when 'timezone' attribute is assigned an empty string.
      */
     testEmptyStringForTimeZone:{
         attributes: {value: '2004-09-23T16:30:00.000Z', timezone: '', format: 'M/dd/yy h:mm A', langLocale: 'en'},
         test: function(component){
-        	aura.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){        		
-        		var timezone = $A.getGlobalValueProviders().get("$Locale.timezone");
+        	aura.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
+        		var timezone = $A.get("$Locale.timezone");
         		if(timezone  == "GMT"){
 	        		aura.test.assertEquals("9/23/04 4:30 PM", $A.test.getText(component.find('span').getElement()), "Should have used default as default timezone.");
 	        	}
 	        	else if(timezone  == "America/Los_Angeles"){
 	        		aura.test.assertEquals("9/23/04 9:30 AM", $A.test.getText(component.find('span').getElement()), "Should have used default as default timezone.");
-	        	} 
+	        	}
 	        	else{// For any other time zone we just make sure it has some value
-	        		aura.test.assertTrue($A.test.getText(component.find('span').getElement()).length > 0, "Should have used default as default timezone.");	        		
+	        		aura.test.assertTrue($A.test.getText(component.find('span').getElement()).length > 0, "Should have used default as default timezone.");
 	        	}
         	});
         }
     },
-    
+
     /**
      * Verify behavior when 'timezone' is assigned a valid time zone.
      */
@@ -173,7 +173,7 @@
         	});
       }
     },
-    
+
     testTimezoneObeysDayLightSaving: {
         attributes: {value : '2004-09-23T16:30:00.000Z', timezone: 'America/Los_Angeles', format: 'M/dd/yy h:mm A', langLocale: 'en'},
         test: function(component){
@@ -182,7 +182,7 @@
         	});
       }
     },
-    
+
     /**
      * Verify behavior when 'timezone' attribute is assigned a garbage value.
      */
@@ -190,20 +190,20 @@
         attributes: {value : '2004-09-23T16:30:00.000Z', timezone: 'sasquatch', format: 'M/dd/yy h:mm A', langLocale: 'en'},
         test: function(component){
         	aura.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
-        		var timezone = $A.getGlobalValueProviders().get("$Locale.timezone");
+        		var timezone = $A.get("$Locale.timezone");
         		if(timezone  == "GMT"){
 	        		aura.test.assertEquals("9/23/04 4:30 PM", $A.test.getText(component.find('span').getElement()), "Should have used default as default timezone.");
 	        	}
 	        	else if(timezone  == "America/Los_Angeles"){
 	        		aura.test.assertEquals("9/23/04 9:30 AM", $A.test.getText(component.find('span').getElement()), "Should have used default as default timezone.");
-	        	} 
+	        	}
 	        	else{// For any other time zone we just make sure it has some value
-	        		aura.test.assertTrue($A.test.getText(component.find('span').getElement()).length > 0, "Should have used default as default timezone.");	        		
+	        		aura.test.assertTrue($A.test.getText(component.find('span').getElement()).length > 0, "Should have used default as default timezone.");
 	        	}
         	});
         }
     },
-    
+
     /**
      * Verify behavior when 'format' has milliseconds..
      */

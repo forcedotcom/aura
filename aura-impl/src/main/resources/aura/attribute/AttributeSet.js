@@ -39,6 +39,19 @@ function AttributeSet(config, valueProvider, attributeDefSet, component, localCr
 
 AttributeSet.prototype.auraType = "AttributeSet";
 
+
+/**
+ * DO NOT USE THIS METHOD.
+ *
+ * @public
+ *
+ * @deprecated use Component.get(name) instead
+ */
+AttributeSet.prototype.getValue = function (name, raw) {
+    //$A.warning("DEPRECATED USE OF attributes.getValue(name). USE component.get(\"v.name\") INSTEAD.");
+    return this._getValue(name,raw);
+};
+
 /**
  * Whether attribute exists
  *
@@ -55,15 +68,20 @@ AttributeSet.prototype.hasAttribute = function(name) {
  * @param {String} name The name of the attribute.
  * @param {Boolean} [raw] If raw is set to false, evaluate expressions in the form {!xxx}.
  * @returns {Object} Value of the attribute with the given name.
+ *
+ * TEMPORARILY INTERNALIZED TO GATE ACCESS
+ *
+ * @private
+ *
  */
-AttributeSet.prototype.getValue = function(name, raw) {
+AttributeSet.prototype._getValue = function(name, raw) {
     var ve = this.values.getValue(name, true);
-    
+
     if (!ve) {
     	this.createDefault(name);
         ve = this.values.getValue(name);
     }
-    
+
     var value;
     if (!raw && ve && ve.isExpression()) {
         value = expressionService.getValue(this.getValueProvider(), ve);
@@ -75,24 +93,107 @@ AttributeSet.prototype.getValue = function(name, raw) {
 };
 
 /**
- * Returns the raw value referenced using property syntax.
- * @param {String} key The data key to look up on the Attribute.
+ * DO NOT USE THIS METHOD.
+ *
+ * @public
+ *
+ * @deprecated use Component.get(name) instead
  */
 AttributeSet.prototype.get = function(key) {
     return $A.expressionService.get(this, key);
 };
 
 /**
+ * Returns the raw value referenced using property syntax.
+ * @param {String} key The data key to look up on the Attribute.
+ *
+ * TEMPORARILY INTERNALIZED TO GATE ACCESS
+ *
+ * @private
+ *
+ */
+AttributeSet.prototype._get = function (key) {
+    return $A.expressionService.get(this, key);
+};
+
+
+/**
  * Returns the raw value based on the given name.
  * @param {String} name The name of the attribute.
  */
 AttributeSet.prototype.getRawValue = function(name) {
-    var ret = this.getValue(name);
-    if (ret && ret.getValue && !ret.getRawValue) {
-        ret = ret.getValue();
+    var ret = this._getValue(name);
+    if (ret && ret._getValue && !ret.getRawValue) {
+        ret = ret._getValue();
     }
 
     return ret;
+};
+
+/**
+ * DO NOT USE THIS METHOD.
+ *
+ * @public
+ *
+ * @deprecated use Component.set(name,value) instead
+ */
+AttributeSet.prototype.setValue = function (name,value) {
+    //$A.warning("DEPRECATED USE OF attributes.setValue(name,value). USE component.set(name,value) INSTEAD.");
+    this._setValue(name,value);
+};
+
+/**
+ * Set the attribute of the given name to the given value.
+ * @param {String} name The name can be a path expression inside. E.g. {!xxx....}
+ * @param {Object} value The value to be set.
+ *
+ * TEMPORARILY INTERNALIZED TO GATE ACCESS
+ *
+ * @private
+ *
+ */
+AttributeSet.prototype._setValue = function(name, value) {
+    this.createDefault(name);
+
+    var ve = this.values.getValue(name);
+    if (ve.isExpression()) {
+        expressionService.setValue(this.getValueProvider(), ve, value);
+    } else {
+        ve.setValue(value);
+    }
+};
+
+/**
+ * DO NOT USE THIS METHOD.
+ *
+ * @public
+ *
+ * @deprecated use Component.set(name,value) instead
+ */
+AttributeSet.prototype.set= function (name, value) {
+    //$A.warning("DEPRECATED USE OF attributes.set(name,value). USE component.set(name,value) INSTEAD.");
+    this._set(name, value);
+};
+
+/**
+ * Set the attribute of the given name to the given value.
+ * @param {String} name The name can be a path expression inside. E.g. {!xxx....}
+ * @param {Object} value The value to be set.
+ *
+ * TEMPORARILY INTERNALIZED TO GATE ACCESS
+ *
+ * @private
+ *
+ */
+AttributeSet.prototype._set = function (name, value) {
+    this.createDefault(name);
+
+    var ve = this.values._getValue(name);
+    if (ve.isExpression()) {
+        expressionService.setValue(this.getValueProvider(), ve, value);
+    } else {
+        ve.setValue(value);
+    }
 };
 
 /**
@@ -100,14 +201,10 @@ AttributeSet.prototype.getRawValue = function(name) {
  * @param {String} name The name can be a path expression inside. E.g. {!xxx....}
  * @param {Object} value The value to be set.
  */
-AttributeSet.prototype.setValue = function(name, value) {
-    var ve = this.values.getValue(name, true);
-    
-    if (!ve) {
-    	this.createDefault(name);
-        ve = this.values.getValue(name);
-    }
-    
+AttributeSet.prototype.set = function (name, value) {
+    this.createDefault(name);
+
+    var ve = this.values.getValue(name);
     if (ve.isExpression()) {
         expressionService.setValue(this.getValueProvider(), ve, value);
     } else {
@@ -203,7 +300,7 @@ AttributeSet.prototype.mergeValues = function(yourValues, overwrite) {
     for (var key in yourValues) {
         var yourvalue = yourValues[key];
         if (overwrite || !(key in my)) {
-            this.getValue(key).setValue(yourvalue);
+            this._getValue(key).setValue(yourvalue);
         }
     }
 };
@@ -402,7 +499,7 @@ AttributeSet.prototype.createAttribute = function(name, config, def) {
             valueConfig = {};
         }
     }
-    
+
     valueConfig = valueFactory.create(valueConfig, def, this.component);
     if (!hasRealValue) {
         // For maps and arrays that were null or undefined, we needed to make a

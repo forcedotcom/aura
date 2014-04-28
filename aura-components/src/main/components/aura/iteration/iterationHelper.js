@@ -67,7 +67,7 @@
         }
         var ivp;
         var len = body.getLength();
-        var forceServer = cmp.getAttributes().getValue("forceServer").getValue();
+        var forceServer = cmp.get("v.forceServer");
         //
         // Take off our index, but add the number of components that we will create.
         //
@@ -95,7 +95,7 @@
             extraProviders[indexVar] = $A.expressionService.create(null, index);
         }
         var ivp;
-        
+
         $A.setCreationPathIndex(index);
         $A.pushCreationPath("body");
         //
@@ -109,11 +109,11 @@
             }
             ret.push( $A.componentService.newComponentDeprecated(cdr, ivp, false, doForce) );
         }
-        
+
         $A.popCreationPath("body");
         return ret;
     },
-    
+
     createNewComponents: function(cmp, callback) {
         var start = this.getStart(cmp);
         var end = this.getEnd(cmp);
@@ -128,7 +128,7 @@
         }
     },
 
-    
+
     createRealBody: function(cmp, doForce, callback) {
         var atts = cmp.getAttributes();
         var items = atts.getValue("items");
@@ -214,10 +214,10 @@
             }
             $A.popCreationPath("realbody");
         }
-        
+
         return realbody;
     },
-    
+
     createSelectiveComponentsForIndex: function(cmp, items, index, doForce, callback) {
         var atts = cmp.getAttributes();
         var varName = atts.get("var");
@@ -229,7 +229,7 @@
             extraProviders[indexVar] = $A.expressionService.create(null, index);
         }
         var ivp;
-        var forceServer = cmp.getAttributes().getValue("forceServer").getValue();
+        var forceServer = cmp.get("v.forceServer");
         var selectiveBodyCollector = {
             realBodyList: [],
             count: body.getLength(),

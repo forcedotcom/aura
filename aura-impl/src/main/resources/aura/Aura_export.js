@@ -17,7 +17,7 @@
 
 // //#exportSymbols $A.ns.Aura
 $A.ns.Aura.prototype["initAsync"] = $A.ns.Aura.prototype.initAsync;
-$A.ns.Aura.prototype["initConfig"] = $A.ns.Aura.prototype.initConfig;   
+$A.ns.Aura.prototype["initConfig"] = $A.ns.Aura.prototype.initConfig;
 $A.ns.Aura.prototype["error"] = $A.ns.Aura.prototype.error;
 $A.ns.Aura.prototype["warning"] = $A.ns.Aura.prototype.warning;
 $A.ns.Aura.prototype["message"] = $A.ns.Aura.prototype.message;
@@ -33,7 +33,7 @@ $A.ns.Aura.prototype["userAssert"] = $A.ns.Aura.prototype.userAssert;
 $A.ns.Aura.prototype["log"] = $A.ns.Aura.prototype.log;
 $A.ns.Aura.prototype["logf"] = $A.ns.Aura.prototype.logf;
 $A.ns.Aura.prototype["trace"] = $A.ns.Aura.prototype.trace;
-$A.ns.Aura.prototype["getGlobalValueProviders"] = $A.ns.Aura.prototype.getGlobalValueProviders;
+//$A.ns.Aura.prototype["getGlobalValueProviders"] = $A.ns.Aura.prototype.getGlobalValueProviders;
 $A.ns.Aura.prototype["fitTo"] = $A.ns.Aura.prototype.fitTo;
 // Perf
 $A.ns.Aura.prototype["Perf"] = $A.ns.Aura.prototype.Perf;

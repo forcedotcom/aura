@@ -39,7 +39,7 @@ function SimpleValue(config, def, component) {
         /** Name of this object */
         this.name = def.getDescriptor().getQualifiedName();
     }
-    
+
 //#end
 
     /** Set "true" during a change. */
@@ -65,10 +65,26 @@ $A.ns.Util.derivePrototype(SimpleValue, $A.ns.AttributeValue);
 SimpleValue.prototype.auraType = "Value";
 
 /**
+ * DO NOT USE THIS METHOD.
+ *
+ * @public
+ *
+ * @deprecated use Component.get(key) instead
+ */
+SimpleValue.prototype.getValue = function () {
+    //$A.warning("DEPRECATED USE OF simpleValue.getValue(). USE component.get(key) INSTEAD.", {key: this.name, value: this.value});
+    return this._getValue();
+};
+
+/**
  * Returns the unwrapped value. This is the underlying value that is wrapped in the value object. The last value set will always be returned,
  * committed or not.
+ *
+ * TEMPORARILY INTERNALIZED TO GATE ACCESS
+ *
+ * @private
  */
-SimpleValue.prototype.getValue = function() {
+SimpleValue.prototype._getValue = function() {
     return this.value;
 };
 
@@ -76,7 +92,7 @@ SimpleValue.prototype.getValue = function() {
  * Returns the unwrapped value.
  */
 SimpleValue.prototype.unwrap = function() {
-    return this.getValue();
+    return this._getValue();
 };
 
 /**
@@ -92,27 +108,42 @@ SimpleValue.prototype.merge = function(sv, overwrite) {
     if (!$A.util.instanceOf(sv, SimpleValue)) {
         throw new Error("Cannot merge a " + (typeof sv) + " into a SimpleValue");
     }
-    
+
     if (overwrite) {
-        this.setValue(sv.getValue());
+        this._setValue(sv._getValue());
         this.commit();
     }
 };
 
 /**
- * Coerces the wrapped value into a boolean value.
+ * DO NOT USE THIS METHOD.
+ *
+ * @public
+ *
+ * @deprecated use $A.util.getBooleanValue(Component.get(key)) instead
  */
-SimpleValue.prototype.getBooleanValue = function() {
-    var val = this.getValue();
-    return val !== undefined && val !== null && val !== false && val !== 0
-            && val !== "false" && val !== "" && val !== "f";
+SimpleValue.prototype.getBooleanValue = function () {
+    //$A.warning("DEPRECATED USE OF simpleValue.getBooleanValue(). USE $A.util.getBooleanValue(component.get(key)) INSTEAD.", {key: this.name, value:this.value});
+    return this._getBooleanValue();
+};
+
+/**
+ * Coerces the wrapped value into a boolean value.
+ *
+ * TEMPORARILY INTERNALIZED TO GATE ACCESS
+ *
+ * @private
+ */
+SimpleValue.prototype._getBooleanValue = function() {
+    var val = this._getValue();
+    return val !== undefined && val !== null && val !== false && val !== 0 && val !== "false" && val !== "" && val !== "f";
 };
 
 /**
  * Returns true if the value is not undefined. An undefined value object has not been assigned a value.
  */
 SimpleValue.prototype.isDefined = function() {
-    var val = this.getValue();
+    var val = this._getValue();
     return val !== undefined;
 };
 
@@ -126,17 +157,33 @@ SimpleValue.prototype.getPreviousValue = function() {
 };
 
 /**
+ * DO NOT USE THIS METHOD.
+ *
+ * @public
+ *
+ * @deprecated use Component.set(name,value) instead
+ */
+SimpleValue.prototype.setValue = function (v, skipChange) {
+    //$A.warning("DEPRECATED USE OF simpleValue.setValue(name,value). USE component.set(name,value) INSTEAD.");
+    this._setValue(v, skipChange);
+};
+
+/**
  * Sets the wrapped value. This causes isDirty to return true until commit() is
  * called.
  *
  * @param {Object} v The value to be set.
  * @param {Boolean} skipChange Set to true if you want to skip firing of the change event, which indicates that the content or state has changed. Or set to false if you want to fire the change event.
+ *
+ * TEMPORARILY INTERNALIZED TO GATE ACCESS
+ *
+ * @private
  */
-SimpleValue.prototype.setValue = function(v, skipChange) {
+SimpleValue.prototype._setValue = function(v, skipChange) {
     if (this.observing) {
         if (this.observing === v) {
             if (this.value !== v.value) {
-                this.setValue(v.value);
+                this._setValue(v.value);
             }
             return;  // Already done; nothing to do here
         }
@@ -144,6 +191,7 @@ SimpleValue.prototype.setValue = function(v, skipChange) {
             this.unobserve(this.observing);  // Implicitly unlink by explicit assignment
         }
     }
+
     if (v instanceof SimpleValue) {
         // The idiom foo.setValue(sv) used to be used to create a "tracking"
         // assignment, albeit buggily, so that semantic is preserved here.
@@ -152,19 +200,26 @@ SimpleValue.prototype.setValue = function(v, skipChange) {
         return;  // The observe also does an initial setvalue.
     }
 
+    // JBUCH TODO: VERIFY WE DON'T FIRE CHANGE EVENTS IF VALUE IS UNCHANGED
+    // DON'T CHANGE ME BRO! *CHAAAAAAAANNNNNNNNGEEEEEEEE*
+    if(this.value===v){
+        return;
+    }
+
     this.makeDirty();
     var list = null;
     if (!skipChange) {
         list = this.prepare("change");
     }
-    
+
     this.oldValue = this.value;
     this.value = v;
-    
+
     if (!skipChange) {
         this.updatePendingValue("change", this);
         this.firePending("change", list);
     }
+
     this.informObservers(this.value);
 };
 
@@ -324,7 +379,7 @@ SimpleValue.prototype.destroy = function(async) {
  * @private
  */
 SimpleValue.prototype.fire = function(name) {
-    BaseValue.fire(name, this, this.getEventDispatcher());
+    BaseValue.fire(name, this.unwrap(), this.getEventDispatcher());
 };
 
 /**

@@ -50,7 +50,7 @@
             component.setValue('{!v.label}' , 'newLabel');
             var labelValueThroughComponentApi = component.getValue('{!v.label}').getValue();
             var labelValueByExpression = $A.expressionService.getValue(component, "{!v.label}").getValue();
-            var labelValueThruComponent = component.getAttributes().getValue('label').getValue();
+            var labelValueThruComponent = component.get('v.label');
 
             //Verify that all of them see the same value
             aura.test.assertEquals(labelValueThruComponent,'newLabel');
@@ -60,7 +60,7 @@
             $A.expressionService.setValue(component, "{!v.label}" , 'AttributeDefault');
             var labelValueThroughComponentApi = component.getValue('{!v.label}').getValue();
             var labelValueByExpression = $A.expressionService.getValue(component, "{!v.label}").getValue();
-            var labelValueThruComponent = component.getAttributes().getValue('label').getValue();
+            var labelValueThruComponent = component.get('v.label');
 
             //Verify that all of them see the same value
             aura.test.assertEquals(labelValueThruComponent,'AttributeDefault');
@@ -70,7 +70,7 @@
             component.getAttributes().setValue('label','newLabel');
             var labelValueThroughComponentApi = component.getValue('{!v.label}').getValue();
             var labelValueByExpression = $A.expressionService.getValue(component, "{!v.label}").getValue();
-            var labelValueThruComponent = component.getAttributes().getValue('label').getValue();
+            var labelValueThruComponent = component.get('v.label');
 
             //Verify that all of them see the same value
             aura.test.assertEquals(labelValueThruComponent,'newLabel');
@@ -99,7 +99,7 @@
 
     /**
      * Verify behavior of setting the value of an attribute that does not exist.
-     * 
+     *
      * Currently setting a non-existent attribute is a no-op, but after W-795118 is fixed, we should throw an Error.
      */
     testVerifySetValueNonExistentAttributes:{

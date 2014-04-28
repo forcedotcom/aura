@@ -33,7 +33,7 @@
         	this.assertCancelEventFired(cmp);
     	}]
     },
-    
+
     /**
  	 *  Test Apply button.
  	 */
@@ -54,7 +54,7 @@
         	$A.test.assertEquals(defaultSortOrder, sortApplied, "Sort not applied correctly after apply button was pressed.");
         }]
     },
-    
+
     /**
      * Test title of Sort modal
      */
@@ -65,7 +65,7 @@
             $A.test.assertEquals("Sort Panel", $A.test.getText(listSorter.find("title").getElement()));
         }
     },
-    
+
     /**
  	 *  Test sortOrderPicker and output(selectedItemOutput,selectedSortOrderOutput) of listSort dialog
  	 */
@@ -90,10 +90,10 @@
         	var expectedSortOrder = "Column4 : A-Z";
         	sortApplied = this.getSortOrderApplied(cmp,"defaultListSorter");
         	$A.test.assertEquals(expectedSortOrder, sortApplied, "Sort not applied correctly after apply button was pressed.");
-        
+
     	}]
     },
-    
+
     /**
      * Test to verify all sortable columns present in the Sort dialog
      * and none of the hidden column visible
@@ -116,17 +116,17 @@
         	this.assertCancelEventFired(cmp);
     	}]
     },
-    
+
     /**
-     * Test to check after pressing cancel and reopening list sorter resets 
+     * Test to check after pressing cancel and reopening list sorter resets
      * sorter state to default behavior.
-     * 
+     *
      */
     testPressCancelResetsSorterToDefaultState : {
     	test: [function(cmp) {
     		listSorter = cmp.find("defaultListSorter");
         	trigger = cmp.find("defaultListSorterTrigger");
-        	
+
         	//check sorter not visible
         	this.assertUISorterPresent(listSorter, false);
         }, function(cmp) {
@@ -161,7 +161,7 @@
     	test: [function(cmp) {
     		listSorter = cmp.find("defaultListSorter");
         	trigger = cmp.find("defaultListSorterTrigger");
-        	
+
         	//check sorter not visible
         	this.assertUISorterPresent(listSorter, false);
         }, function(cmp) {
@@ -175,7 +175,7 @@
         	this.assertCancelEventFired(cmp);
     	}]
     },
-    
+
     /**
      * Verify default Sort order and default Column is selected when
      * List Sorter is opened
@@ -196,7 +196,7 @@
     	var activeElement = $A.test.getActiveElementText();
     	$A.test.assertTrue(activeElement.indexOf(defaultCoumn) !=-1, "By Default column 2 should be active element");
     },
-    
+
     /**
      * select sortBy column and Sort order and make sure its checked on the sort menu
      * pass in sortOrder ="asc" for A-Z and "desc" for Z-A
@@ -212,7 +212,7 @@
     		var selectedColumn = selectedColumnAndSortOrder.split(":")[0];
         	return selectedColumn;
 			}, "Wrong Selected field displayed on Dialog");
-    	var isAscending = menuItem.getValue("v.isascending").getBooleanValue();
+    	var isAscending = $A.util.getBooleanValue(menuItem.get("v.isascending"));
 		if(sortOrder.indexOf("desc") != -1){
     		if(isAscending){
     			//fire event so that it would change it to descending
@@ -233,7 +233,7 @@
         	return actualSortOrder;
 			}, "Sort Order selected is not correct");
     },
-    
+
 	/**
      * Return the field name and order which got applied after apply button was pressed
      */
@@ -241,7 +241,7 @@
     	var output = cmp.find(resultCmpId+"Result");
     	return output.get("v.value");
     },
-    
+
     /**
      * Click on trigger so that sorter is visible
      */
@@ -249,7 +249,7 @@
     	trigger.get("e.click").fire();
     	this.assertUISorterPresent(listSorter, true);
     },
-    
+
     /**
      * Click on Apply
      */
@@ -258,7 +258,7 @@
 		$A.test.clickOrTouch(applyButton);
     	this.assertUISorterPresent(listSorter, false);
 	},
-	
+
     /**
      * Close the sorter by clicking on cancel
      */
@@ -267,14 +267,14 @@
 		$A.test.clickOrTouch(cancelButton);
     	this.assertUISorterPresent(listSorter, false);
     },
-    
+
     /**
      * Verify cancel event did get fired
      */
     assertCancelEventFired : function(cmp)	{
     	$A.test.assertTrue(cmp.get('v.cancelEventFired'),"Cancel event did not get fired");
     },
-    
+
     /**
      * check if sorter is visible on the page
      */
@@ -286,18 +286,18 @@
     		$A.test.addWaitForWithFailureMessage(isPresent, function(){return $A.util.hasClass(listSorter.find("sorterContainer").getElement(),"open");}, "List Sorter should not be visible");
         }
     },
-    
+
     /**
      * Get all display columns including hidden one from the model
      */
     getColumnsFromModel: function(listSorter){
     	return listSorter.getValue("v.dataProvider").get(0).get("m.columns");
     },
-    
+
     getDefaultOrderByListFromModel: function(listSorter){
     	return listSorter.getValue("v.dataProvider").get(0).get("m.defaultOrderByList");
     },
-    
+
     defaultSortOrder: function(listSorter){
     	var defaultOrderObj = this.getDefaultOrderByListFromModel(listSorter)
     	var defaultOrder = [];
@@ -309,13 +309,13 @@
         }
         return defaultOrder.join(",");
     },
-    
+
     getDisplayedColumns: function(listSorter){
     	var menuCmp = listSorter.find("sorterMenuList");
         var menuItems = menuCmp.getValue("v.childMenuItems");
         return menuItems;
     },
-    
+
     getSelectedColumnsAndSortOrder: function(menuItems){
     	var values = [];
         for (var i = 0; i < menuItems.getLength(); i++) {
@@ -328,7 +328,7 @@
         }
         return values.join(",");
     },
-    
+
     getAllColumnsLabel: function(menuItems){
     	var values = [];
         for (var i = 0; i < menuItems.getLength(); i++) {
@@ -337,7 +337,7 @@
         }
         return values;
     },
-    
+
     /**
      * Get menuItem component given columnNumber
      * First column = 1, 2nd Column = 2..
@@ -347,9 +347,9 @@
     	if (!$A.util.isUndefinedOrNull(menuItems.getValue(columnNumber - 1))) {
                 return menuItems.getValue(columnNumber - 1);
     	}
-    	$A.test.fail("Test fail! Column not present in the Sort Menu");    
+    	$A.test.fail("Test fail! Column not present in the Sort Menu");
     },
-    
+
     getOnlySortableColumnsFromModel: function(listSorter){
     	var columns = this.getColumnsFromModel(listSorter);
     	var sortableColumns = [];
@@ -362,7 +362,7 @@
         }
         return sortableColumns;
     },
-    
+
     verifyAllColumnsPresent: function(listSorter){
     	var sortableColumnsFromModel = this.getOnlySortableColumnsFromModel(listSorter);
     	var menuItems = this.getDisplayedColumns(listSorter);

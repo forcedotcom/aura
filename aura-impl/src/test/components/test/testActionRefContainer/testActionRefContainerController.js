@@ -16,7 +16,7 @@
 ({
     getSand: function(cmp, event) {
         var sandRef = cmp.find("actionref").getValue("c.sand");
-        cmp.getValue("v.myActionRef").setValue(sandRef);
+        cmp.set("v.myActionRef", sandRef);
     },
 
     runSand: function(cmp, event) {

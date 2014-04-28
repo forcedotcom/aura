@@ -75,7 +75,7 @@
             $A.test.assertNotNull(component.renderHelper, "Helper not passed into render()");
             $A.test.assertNotNull(component.afterRenderHelper, "Helper not passed into afterRender()");
             //Components won't rerender unless they are actually dirty, so forcing it.
-            component.getValue("v.dirty").setValue("1");
+            component.set("v.dirty", "1");
             $A.rerender(component);
             $A.test.assertNotNull(component.rerenderHelper, "Helper not passed into rerender()");
             $A.test.assertEquals("func A", component.rerenderHelper.a());
@@ -107,7 +107,7 @@
         }
 
     },
-    /** 
+    /**
      * Assert that helper are not exposed as global functions.
      */
     testHelpersAreNotExposedGlobally: {
@@ -117,7 +117,7 @@
 	    $A.test.assertFalse($A.util.isFunction(window.methodWithArgs), "Helper methods exposed on window");
 	    $A.test.assertFalse($A.util.isFunction(window.setFocus), "Helper methods exposed on window");
 	    $A.test.assertTrue($A.util.isFunction(helper.setFocus));
-	    $A.test.assertEquals("Set Focus", helper.setFocus()); 
+	    $A.test.assertEquals("Set Focus", helper.setFocus());
 	}
     }
 })

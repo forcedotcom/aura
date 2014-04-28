@@ -36,10 +36,10 @@
 			var scroller = component._scroller;
 			if (!$A.util.isUndefined(scroller)) {
 				scroller.refresh();
-								
-				var compEvents = component.getEvent("refreshed");						
+
+				var compEvents = component.getEvent("refreshed");
 				compEvents.fire();
-				
+
 				// Goose the x position to insure that onScrollEnd() fires with the correct page fully revealed
 //				if (component.get("v.snap")) {
 //					scroller.scrollTo(scroller.maxScrollX, 0, 0);
@@ -49,20 +49,20 @@
 			component._refreshing = false;
 		}
 	},
-		
+
 	swapShowMore: function (cmp) {
 		// Timeout to allow for rendering of new element.
-		setTimeout(function () { 
+		setTimeout(function () {
 			cmp._pullUpEl = cmp.find('pullUp').getElement();;
 		}, 100);
 	},
-	
+
 	handleScrollTo : function(component, event) {
 		var scroller = component._scroller,
 			scrollWrapper = component.find("scrollWrapper").getElement(),
 			scrollContent = component.find("scrollContent").getElement(),
 			offset;
-		
+
 		switch (event.getParam("destination")) {
 			case "top" :
 				offset = component.find("pullDown").getElement();
@@ -75,7 +75,7 @@
 			case "left" :
 				scroller.scrollTo(0, 0, event.getParam("time"));
 				break;
-			case "right" :	
+			case "right" :
 				scroller.scrollTo(0 - (scrollContent.offsetHeight - scrollWrapper.offsetHeight), 0, event.getParam("time"));
 				break;
 			case "custom" :
@@ -83,7 +83,7 @@
 				scroller.scrollTo(event.getParam("xcoord"), event.getParam("ycoord") - offset.offsetHeight, event.getParam("time"));
 		}
 	},
-	
+
 	handleScrollBy : function(component, event) {
 		component._scroller.scrollTo(event.getParam("deltaX"), event.getParam("deltaY"), event.getParam("time"), true);
 	},
@@ -111,23 +111,23 @@
 
 	init : function(component) {
 		var attributes = component.getAttributes();
-		var enabled = attributes.getValue("enabled").getBooleanValue();
+		var enabled = $A.util.getBooleanValue(attributes.get("enabled"));
 		var scroller = component.find("scrollWrapper").getElement();
 
 		if (scroller) {
-			
+
 			this.initWidth(component);
-			
+
 			if (enabled) {
 				if ($A.util.isUndefined(component._scroller)) {
 					var snap = attributes.get("snap");
-					var hScroll = attributes.getValue("hscroll").getBooleanValue();
-					var vScroll = attributes.getValue("vscroll").getBooleanValue();
-					var showScrollbars = attributes.getValue("showscrollbars").getBooleanValue();
-					var useTransform = attributes.getValue("useTransform").getBooleanValue();
-					var useTransition = attributes.getValue("useTransition").getBooleanValue();
-                    var checkDOMChanges = attributes.getValue("checkDOMChanges").getBooleanValue();
-                    var bindEventsToScroller = attributes.getValue("bindEventsToScroller").getBooleanValue();
+					var hScroll = $A.util.getBooleanValue(attributes.get("hscroll"));
+					var vScroll = $A.util.getBooleanValue(attributes.get("vscroll"));
+					var showScrollbars = $A.util.getBooleanValue(attributes.get("showscrollbars"));
+					var useTransform = $A.util.getBooleanValue(attributes.get("useTransform"));
+					var useTransition = $A.util.getBooleanValue(attributes.get("useTransition"));
+                    var checkDOMChanges = $A.util.getBooleanValue(attributes.get("checkDOMChanges"));
+                    var bindEventsToScroller = $A.util.getBooleanValue(attributes.get("bindEventsToScroller"));
 
                     var onScrollToBottomAction = attributes.get("onScrollToBottom");
                     var scrollToBottomThreshold = attributes.get("scrollToBottomThreshold");
@@ -135,17 +135,17 @@
 					var pullToRefreshAction = component.get("v.onPullToRefresh");
 					var canRefresh = component.get("v.canRefresh");
 					var pullDownOffset = 0;
-					
+
 					if (pullToRefreshAction && canRefresh) {
 						var pullDownComponent = component.find("pullDown");
 						var pullDownEl = pullDownComponent.getElement();
 						//offsetHeight is unreliable.  Calculate from computed styles.
 						pullDownOffset = this.heightOffsetHelper(pullDownComponent);
 					}
-					
+
 					var pullToShowMoreAction = component.get("v.onPullToShowMore");
 					var pullUpOffset = 0;
-					
+
 					if (pullToShowMoreAction && component.get('v.canShowMore')) {
 						var shim = component.find("shim").getElement();
 						var pullUpComponent = component.find("pullUp");
@@ -168,10 +168,10 @@
 					}
 
 					this.trackActiveInstance(component);
-					
+
 					iScroll.prototype._getEventTarget = function(type, el) {
 						var target;
-						
+
 						if (type === this.RESIZE_EV) {
 							target = window;
 						} else if (this.options.bindEventsToScroller) {
@@ -179,21 +179,21 @@
 						} else {
 							target = el || this.scroller;
 						}
-						
+
 						return target;
 					};
 
-					//START override iScroll to have the option to bind the events to the scroller itself					
-					iScroll.prototype._bind = function(type, el, bubble) {						
+					//START override iScroll to have the option to bind the events to the scroller itself
+					iScroll.prototype._bind = function(type, el, bubble) {
 						var target = this._getEventTarget(type, el);
 						$A.util.on(target, type, this, !!bubble);
 					};
-					
+
 					iScroll.prototype._unbind = function(type, el, bubble) {
-						var target = this._getEventTarget(type, el);	
-						$A.util.removeOn(target, type, this, !!bubble);						 
+						var target = this._getEventTarget(type, el);
+						$A.util.removeOn(target, type, this, !!bubble);
 					};
-					
+
 					//Stop propagating the event to children if scrolling is canceled by tapping on the scroller while it's still scrolling
 					iScroll.prototype._getEventBuster = function(scroller) {
 						if (!this._eventBuster) {
@@ -202,12 +202,12 @@
 									$A.util.squash(e, true);
 									scroller._resetPos(200);
 								}
-							}							
+							}
 						}
 						return this._eventBuster;
 					};
-					//END 
-					
+					//END
+
 					component._scroller = new iScroll(scroller, {
 						hScroll : hScroll,
 						hScrollbar : hScroll && !snap && showScrollbars,
@@ -231,17 +231,17 @@
 
                         checkDOMChanges : checkDOMChanges,
                         bindEventsToScroller : bindEventsToScroller,
-                        
+
 						onBeforeScrollStart : function(e) {
 							var target = e.target.nodeName.toLowerCase();
 							if ("input" != target && "textarea" != target && "select" != target) {
 								e.preventDefault();
 							}
 
-							if (component.getValue("v.stopEventPropagation").getBooleanValue()) {
+							if ($A.util.getBooleanValue(component.get("v.stopEventPropagation"))) {
 								e.stopPropagation();
 							}
-							
+
 							var action = component.get("v.onBeforeScrollStart");
 							if (action) {
 								action.runDeprecated(e);
@@ -257,7 +257,7 @@
 
 						onScrollMove : function(e) {
 							var PULL_DISTANCE = 5; // how far to pull past a pull indicator to activate it
-							
+
 							if (pullToRefreshAction && canRefresh) {
 								if (this.y > PULL_DISTANCE && $A.util.hasClass(pullDownEl, 'pullDown')) {
 									$A.util.swapClass(pullDownEl, 'pullDown', 'pullFlip');
@@ -267,10 +267,10 @@
 									this.minScrollY = -pullDownOffset;
 								}
 							}
-														
+
 							if (pullToShowMoreAction && component.get('v.canShowMore')) {
 								var threshold = this.bottomY - PULL_DISTANCE;
-								
+
 								if (this.y < threshold && $A.util.hasClass(component._pullUpEl, 'pullDown')) {
 									$A.util.swapClass(component._pullUpEl, 'pullDown', 'pullFlip');
 									this.maxScrollY = this.bottomY;
@@ -278,8 +278,8 @@
 									$A.util.swapClass(component._pullUpEl, 'pullFlip', 'pullDown');
 									this.maxScrollY = this.bottomYWithoutPullUp;
 								}
-							}							
-							
+							}
+
 							var action = component.get("v.onScrollMove");
 							if (action) {
 								action.runDeprecated(e);
@@ -296,7 +296,7 @@
 
 								}
 							}
-							
+
 							if (pullToShowMoreAction && component.get('v.canShowMore')) {
 								if ($A.util.hasClass(component._pullUpEl, 'pullFlip')) {
 									$A.util.swapClass(component._pullUpEl, 'pullFlip', 'pullLoading');
@@ -321,7 +321,7 @@
                             }
 						},
 
-						onRefresh : function() {							
+						onRefresh : function() {
 							if (pullToRefreshAction && canRefresh) {
 								// keep the "loading" styling as it animates up
 								// then replace with the "pull down" styling
@@ -329,38 +329,38 @@
 									$A.util.swapClass(pullDownEl, 'pullLoading', 'pullDown');
 								}, 50);
 							}
-							
+
 							if (pullToShowMoreAction && component.get('v.canShowMore')) {
 								// keep the "loading" styling as it animates up
 								// then replace with the "pull down" styling
 								setTimeout(function() {
 									$A.util.swapClass(component._pullUpEl, 'pullLoading', 'pullDown');
 								}, 50);
-							
+
 								// TODO: this could all possibly be more efficient
 								shim.style.height = "0";
 								var actualContentHeight = scroller.children[0].offsetHeight;
 								var heightAdjustments = pullUpOffset + pullDownOffset + pullContentOffset;
 								var adjustedContentHeight = actualContentHeight - heightAdjustments;
 								var leftoverSpace = scroller.offsetHeight - adjustedContentHeight;
-								
+
 								if (leftoverSpace > 0) {
 									shim.style.height = leftoverSpace + "px";
 								}
-								
+
 								/* bottomY is the scroller's y value when the bottom of the scroller content
 								 * (including the "load more" affordance) meets the bottom of the scroller's wrapper
 								 * (i.e., when the very bottom of all content is reached).
-								 * 
+								 *
 								 * bottomYWithoutPullUp is the scroller's y value when the bottom of the scroller content
 								 * (*NOT* including the "load more" affordance) meets the bottom of the scroller's wrapper.
-								 * 
+								 *
 								 * These are not native iScroll properties and are used only for our benefit when
 								 * calculating pullToLoadMore behaviour.
 								 */
 								this.bottomY = this.wrapperH - this.scroller.offsetHeight;
 								this.bottomYWithoutPullUp = this.bottomY + pullUpOffset;
-								
+
 								this.maxScrollY = this.bottomYWithoutPullUp;
 							}
 						}
@@ -372,7 +372,7 @@
 			}
 		}
 	},
-	
+
 	trackActiveInstance: function(component) {
 		if (this._activeInstances) {
 			// Ask any existing scrollers to unbind any existing transient event handlers
@@ -387,7 +387,7 @@
 
 		this._activeInstances[component.getGlobalId()] = component;
 	},
-	
+
 	initImageOnload : function(component) {
 		// Add onload listener to all <img> elements in the content to detect
 		// async size changes from images loading after
@@ -409,7 +409,7 @@
 			}
 		}
 	},
-	
+
 	initWidth : function(component) {
 		var width = component.get("v.width");
 		if (width) {
@@ -454,7 +454,7 @@
 			var c = $A.getCmp(globalId);
 
 			// Only check rendered and enabled scrollers
-			if (c.isValid() && c.isRendered() && c.getValue('v.enabled').getBooleanValue()) {
+			if (c.isValid() && c.isRendered() && $A.util.getBooleanValue(c.get('v.enabled'))) {
 				if ($A.util.isUndefined(c._scroller)) {
 					// Check for uninitialized iScroll (typically resulting from
 					// incorrectly implemented afterRender() in the parent)
@@ -539,7 +539,7 @@
 				return window.cancelRequestAnimationFrame || window.webkitCancelAnimationFrame || window.webkitCancelRequestAnimationFrame
 						|| window.mozCancelRequestAnimationFrame || window.oCancelRequestAnimationFrame || window.msCancelRequestAnimationFrame || clearTimeout;
 			})(),
-			
+
 			// Helpers
 			translateZ = has3d ? ' translateZ(0)' : '',
 
@@ -650,16 +650,16 @@
 
 				that._bind(RESIZE_EV, window);
 				that._bind(START_EV);
-				
+
 				$A.util.on(that.wrapper, END_EV, that._getEventBuster(that), true); //capture phase
-				
+
 				if (!hasTouch) {
 					if (that.options.wheelAction != 'none') {
 						that._bind('DOMMouseScroll');
 						that._bind('mousewheel');
 					}
 				}
-				
+
 				if (that.options.checkDOMChanges)
 					that.checkDOMTime = setInterval(function() {
 						that._checkDOMChanges();
@@ -682,18 +682,18 @@
 
 				handleEvent : function(e) {
 					var that = this;
-					
+
 					switch (e.type) {
 					case START_EV:
 						if (!hasTouch && e.button !== 0)
 							return;
-						
+
 						that._start(e);
 						break;
 					case MOVE_EV:
 						that._move(e);
 						break;
-					case END_EV:	
+					case END_EV:
 					case CANCEL_EV:
 						that._end(e);
 						break;
@@ -851,10 +851,10 @@
 				_start : function(e) {
 					var that = this, point = hasTouch ? e.touches[0] : e, matrix, x, y, c1, c2;
 					that._transitionCanceled = false;
-					
+
 					if (that.options.onBeforeScrollStart)
 						that.options.onBeforeScrollStart.call(that, e);
-					
+
 					if (!that.enabled)
 						return;
 
@@ -862,7 +862,7 @@
 		                // DCHASMAN skipping because we're animating a snap to page - w/out this much flickering and other weirdness ensues!!!
 		                return;
 		            }
-					
+
 					if (that.options.useTransition || that.options.zoom)
 						that._transitionTime(0);
 
@@ -906,7 +906,7 @@
 								that._unbind(TRNEND_EV);
 							else
 								cancelFrame(that.aniTime);
-							
+
 							that._transitionCanceled = true;
 							that.steps = [];
 							that._pos(x, y);
@@ -935,20 +935,20 @@
 
 				_move : function(e) {
 					this._transitioning = true;
-					
+
 				    var tagName = e.target.nodeName.toLowerCase();
 				    // ssun don't scroll if we are in a textarea since it is hard
 				    // to scroll the textarea and the page at the same time.
                     if ("textarea" == tagName) {
                         return;
                     }
-                     
+
 					var that = this, point = hasTouch ? e.touches[0] : e, deltaX = point.pageX - that.pointX, deltaY = point.pageY - that.pointY, newX = that.x
 							+ deltaX, newY = that.y + deltaY, c1, c2, scale, timestamp = e.timeStamp || Date.now();
 
 					if (that.options.onBeforeScrollMove)
 						that.options.onBeforeScrollMove.call(that, e);
-					
+
 					if (!e.ignorePreventDefault && e.defaultPrevented) {
 						return;
 					}
@@ -1039,9 +1039,9 @@
 						dist : 0,
 						time : 0
 					}, duration = (e.timeStamp || Date.now()) - that.startTime, newPosX = that.x, newPosY = that.y, distX, distY, newDuration, snap, scale;
-					
+
 					that.unbindTransientHandlers();
-					
+
 					if (that.options.onBeforeScrollEnd)
 						that.options.onBeforeScrollEnd.call(that, e);
 
@@ -1192,8 +1192,8 @@
 					if (resetX == that.x && resetY == that.y) {
 						if (that.moved) {
 							that.moved = false;
-							if (that.options.onScrollEnd) 
-								that.options.onScrollEnd.call(that); 
+							if (that.options.onScrollEnd)
+								that.options.onScrollEnd.call(that);
 						}
 
 						if (that.hScrollbar && that.options.hideScrollbar) {
@@ -1281,9 +1281,9 @@
 				},
 
 				/**
-				 * 
+				 *
 				 * Utilities
-				 * 
+				 *
 				 */
 				_startAni : function() {
 					var that = this, startX = that.x, startY = that.y, startTime = Date.now(), step, easeOut, animate;
@@ -1409,11 +1409,11 @@
 							break;
 						}
 					}
-					
+
 					if (page == that.currPageX && page > 0 && that.dirX < 0) {
 						page--;
 					}
-					
+
 					x = that.pagesX[page];
 					sizeX = m.abs(x - that.pagesX[that.currPageX]);
 					sizeX = sizeX ? m.abs(that.x - x) / sizeX * 500 : 0;
@@ -1427,11 +1427,11 @@
 							break;
 						}
 					}
-					
+
 					if (page == that.currPageY && page > 0 && that.dirY < 0) {
 						page--;
 					}
-					
+
 					y = that.pagesY[page];
 					sizeY = m.abs(y - that.pagesY[that.currPageY]);
 					sizeY = sizeY ? m.abs(that.y - y) / sizeY * 500 : 0;
@@ -1453,9 +1453,9 @@
 				},
 
 				/**
-				 * 
+				 *
 				 * Public methods
-				 * 
+				 *
 				 */
 				destroy : function() {
 					var that = this;
@@ -1474,7 +1474,7 @@
 					that._unbind(MOVE_EV, window);
 					that._unbind(END_EV, window);
 					that._unbind(CANCEL_EV, window);
-					
+
 					$A.util.removeOn(that.scroller, END_EV, that._getEventBuster(that), true);
 
 					if (!that.options.hasTouch) {
@@ -1646,7 +1646,7 @@
 					this._unbind(END_EV, window);
 					this._unbind(CANCEL_EV, window);
 				},
-				
+
 				disable : function() {
 					this.stop();
 					this._resetPos(0);

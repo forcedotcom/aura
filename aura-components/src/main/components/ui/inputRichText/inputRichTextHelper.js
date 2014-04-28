@@ -15,43 +15,43 @@
  */
 
 ({
-	
+
 	/**
 	 * @Override
 	 */
-	addDomHandler : function(cmp, event) {		
+	addDomHandler : function(cmp, event) {
 		var	editorInstance = this.getEditorInstance(cmp);
 
-		if (editorInstance) {			
+		if (editorInstance) {
 			editorInstance.on(event, this.editorEventHandler, cmp);
 		} else {
 			var el = this.getInputElement(cmp);
 	        $A.util.on(el, event, this.domEventHandler);
 		}
 	},
-	
+
 	/**
 	 * @Override
 	 */
 	handleUpdate : function(cmp, event) {
 		var helper = cmp.getDef().getHelper();
         var updateOn = helper.getUpdateOn(cmp);
-        var editorInstance = this.getEditorInstance(cmp); 
+        var editorInstance = this.getEditorInstance(cmp);
         // if this is an event we're supposed to update on
         if ($A.util.arrayIndexOf(updateOn, event.name || event.type) > -1) {
         	var value = cmp.get('v.value');
         	var content = helper.getContent(cmp);
         	if (value !== content) {
-        		cmp.getValue('v.value').setValue(content);
+        		cmp.set('v.value', content);
         	}
         }
 	},
-	
-	editorEventHandler : function(event) {	
+
+	editorEventHandler : function(event) {
 		var cmp = this.getConcreteComponent();
 		if (cmp.isValid()) {
 			var helper = cmp.getDef().getHelper();
-		        
+
 	        if (!helper) {
 	            return;
 	        }
@@ -65,43 +65,43 @@
 			if (e) {
 				e.fire();
 			}
-		}		
+		}
 	},
-	
-	
+
+
 	/**
 	 * Retrieve editor config and instantiate CKEditor instance.
 	 * Also creates a CKEditor-based event listener to update
 	 * the value attribute onchange of CKEditor contents.
-	 * 
+	 *
 	 * Called from renderer (afterRender) and controller (toggle)
 	 *
 	 */
 	initEditor : function(cmp) {
-		if (cmp.getValue('v.isRichText').getBooleanValue()) {
+		if ($A.util.getBooleanValue(cmp.get('v.isRichText'))) {
 			var editorInstance = this.getEditorInstance(cmp);
-			
-			if (!editorInstance) {			
+
+			if (!editorInstance) {
 				var helper = cmp.getConcreteComponent().getDef().getHelper() || this;
 				editorInstance = CKEDITOR.replace(helper.getEditorId(cmp),  helper.getEditorConfig(cmp));
 			}
 		}
 	},
-		
+
 	toggle : function(cmp, isRichText) {
 		var editorInstance = this.getEditorInstance(cmp);
-		
+
 		if (isRichText && !cmp.get('v.isRichText')) {
-			cmp.getValue('v.isRichText').setValue(isRichText);
+			cmp.set('v.isRichText', isRichText);
 			if (!editorInstance) {
 				this.initEditor(cmp);
 			}
 		}
 		else if (!isRichText && cmp.get('v.isRichText')) {
 			var plainText;
-							
-			cmp.getValue('v.isRichText').setValue(isRichText);
-			
+
+			cmp.set('v.isRichText', isRichText);
+
 			if (editorInstance) {
 				//Get the plain text before destroy
 				plainText = editorInstance.document.getBody().getText();
@@ -109,22 +109,22 @@
 			} else {
 				plainText = cmp.get('v.value');
 			}
-			
+
 			// TODO: determine if we want the <p></p> surrounding plain text when we toggle to rich text
 			// Set the textarea contents to be the plaintext b/c ckeditor doesn't
 			document.getElementById(this.getEditorId(cmp)).value = plainText;
-			cmp.getValue('v.value').setValue(plainText);
+			cmp.set('v.value', plainText);
 		}
 	},
-		
+
 	getEditorId : function(cmp) {
 		return cmp.getConcreteComponent().get('v.domId');
 	},
-	
+
 	getEditorInstance : function (cmp) {
 		return CKEDITOR ? CKEDITOR.instances[this.getEditorId(cmp)] : null;
 	},
-	
+
 	/**
 	 * Retrieves the CKEditor (or textarea if toggled off) contents
 	 * Called by the onchange listener to save contents to the value attribute
@@ -134,42 +134,42 @@
 		var editorInstance = this.getEditorInstance(cmp);
 		return editorInstance ? editorInstance.getData() : this.getDomElementValue(this.getInputElement(cmp)) || '';
 	},
-	
+
 	setContent : function(cmp, content) {
 		var editorInstance = this.getEditorInstance(cmp);
 		if (editorInstance) {
 			editorInstance.setData(content);
 		}
 	},
-	
+
 	getLocale : function(cmp) {
-		return $A.getGlobalValueProviders().get("$Locale.langLocale");
+		return $A.get("$Locale.langLocale");
 	},
-	
+
 	/**
 	 * Main config method that creates CKEditor config object
 	 * Called from renderer and controller (toggle)
 	 * Returns a config object
 	 */
-	getEditorConfig : function(cmp) {		
+	getEditorConfig : function(cmp) {
 		var toolbarConfig = this.getToolbarConfig(cmp),
 			locale = this.getLocale(cmp),
 			width = cmp.get('v.width'),
 			height = cmp.get('v.height'),
 			toolbarLocation = cmp.get('v.toolbarLocation');
-			 
+
 		var config = {
 				skin : 'aura',
 				language : locale,
 				width: width,
 				height: height,
-				bodyClass: 'inputRichTextBody',				
+				bodyClass: 'inputRichTextBody',
 				toolbar : toolbarConfig,
-				toolbarLocation : toolbarLocation, 
+				toolbarLocation : toolbarLocation,
 				toolbarCanCollapse : false,
 				resize_enabled : false,
 				forcePasteAsPlainText : false,
-	    		forceSimpleAmpersand : true,	    		
+	    		forceSimpleAmpersand : true,
 	    		extraPlugins : 'onchange',
 	    		/*
 	    	     * Deactivate:
@@ -179,21 +179,21 @@
 	    	     */
 	    		removePlugins : 'elementspath,maximize,resize,about,liststyle,tabletools,scayt,menubutton,contextmenu',
 	    		/*
-	    	     * Hide some dialog tabs:	    	    
+	    	     * Hide some dialog tabs:
 	    	     * - Link dialog: advanced and target tabs
 	    	     */
 	    		removeDialogTabs : 'link:advanced;image:advanced;table:advanced;tableProperties:advanced',
-	    		
+
 	    		enterMode : CKEDITOR.ENTER_BR, //to use <br/> instead of <p> each enter
 				shiftEnterMode : CKEDITOR.ENTER_P,
-				
+
 				forcePasteAsPlainText : false,
-	    		forceSimpleAmpersand : true    	 
+	    		forceSimpleAmpersand : true
 			};
-		
+
 		return config;
 	},
-	
+
 	/**
 	 * Copies all the properties of source to target if they don't already exist.
 	 */
@@ -201,16 +201,16 @@
         var property;
 
         if (target) {
-            for (property in source) {               
-            	target[property] = source[property];                
+            for (property in source) {
+            	target[property] = source[property];
             }
         }
 
         return target;
     },
-	
+
 	/**
-	 * Get toolbar config based on value of toolbar attribute. 
+	 * Get toolbar config based on value of toolbar attribute.
 	 * Called by getEditorConfig()
 	 */
 	getToolbarConfig : function(cmp) {
@@ -220,14 +220,14 @@
 		case 'basic':
 			if (!this.basicToolbarConfig) {
 				this.basicToolbarConfig = [
-	               	 {name: 'basicstyles', items : ['Bold', 'Italic', 'Underline', 'Strike']},			               	 
+	               	 {name: 'basicstyles', items : ['Bold', 'Italic', 'Underline', 'Strike']},
 	               	 {name: 'links', items : ['Link']},
-	               	 {name: 'insert', items : ['Image']},			               	 
+	               	 {name: 'insert', items : ['Image']},
 	               	 {name: 'paragraph', items : ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'Indent', 'Outdent']},
 	               	 {name: 'list', items : ['BulletedList', 'NumberedList']}
-		            ]; 
+		            ];
 			}
-			toolbarConfig = this.basicToolbarConfig;	
+			toolbarConfig = this.basicToolbarConfig;
 			break;
 		case 'standard':
 			if (!this.standardToolbarConfig) {
@@ -237,9 +237,9 @@
 	               	 {name: 'insert', items : ['Image']},
 	               	 {name: 'paragraph', items : ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'Indent', 'Outdent', 'BulletedList', 'NumberedList']},
 	               	 {name: 'styles', items : [ 'Styles','Format','Font','FontSize' ] }
-	            ]; 
+	            ];
 			}
-			toolbarConfig = this.standardToolbarConfig;			 
+			toolbarConfig = this.standardToolbarConfig;
 			break;
 		case 'full' :
 			if (!this.fullToolbarConfig) {
@@ -266,16 +266,16 @@
 	               	 {name: 'format', items : ['Font', 'FontSize']},
 	               	 {name: 'basicstyles', items : ['Bold','Italic','Underline']},
 	               	 {name: 'paragraph', items : ['JustifyLeft','JustifyCenter', 'JustifyRight','BulletedList', 'NumberedList', 'Indent', 'Outdent']}
-	            ]; 
+	            ];
 			}
-			toolbarConfig = this.emailToolbarConfig;			 
+			toolbarConfig = this.emailToolbarConfig;
 			break;
 		default:
 			toolbarConfig = toolbar;
 		}
 		return toolbarConfig;
 	},
-	
+
 	unrender : function(cmp) {
 		var editorInstance = this.getEditorInstance(cmp);
 		if (editorInstance) {

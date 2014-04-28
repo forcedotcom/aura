@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-({  
+({
     displayDatePicker: function(component) {
         var datePicker = component.find("datePicker");
         if (!datePicker || datePicker.get("v.visible") === true) {
@@ -21,23 +21,23 @@
         }
         var now = new Date(); // local date
         // Later on, we will use getUTC... methods to get year/month/date
-        var currentDate = new Date(Date.UTC(now.getFullYear(), 
-                                            now.getMonth(), 
-                                            now.getDate(), 
-                                            now.getHours(), 
-                                            now.getMinutes(), 
-                                            now.getSeconds(), 
+        var currentDate = new Date(Date.UTC(now.getFullYear(),
+                                            now.getMonth(),
+                                            now.getDate(),
+                                            now.getHours(),
+                                            now.getMinutes(),
+                                            now.getSeconds(),
                                             now.getMilliseconds()));
         var outputCmp = component.find("inputText");
         var elem = outputCmp ? outputCmp.getElement() : null;
         var value = elem ? elem.value : null;
         var format = component.get("v.format");
         if (!format) { // use default format
-            format = $A.getGlobalValueProviders().get("$Locale.datetimeformat");
+            format = $A.get("$Locale.datetimeformat");
         }
         var langLocale = component.get("v.langLocale");
         if (!langLocale) {
-            langLocale = $A.getGlobalValueProviders().get("$Locale.langLocale");
+            langLocale = $A.get("$Locale.langLocale");
         }
         if (value) {
             var d = $A.localizationService.parseDateTimeUTC(value, format, langLocale);
@@ -47,7 +47,7 @@
         }
         this.popUpDatePicker(component, currentDate);
     },
-    
+
     /**
      * This can be overridden by extended component.
      */
@@ -58,7 +58,7 @@
             elem.value = $A.localizationService.translateToLocalizedDigits(displayValue);
         }
     },
-    
+
     /**
      * Override ui:input.
      *
@@ -69,11 +69,11 @@
         if (value) {
             var format = component.get("v.format");
             if (!format) { // use default format
-                format = $A.getGlobalValueProviders().get("$Locale.datetimeformat");
+                format = $A.get("$Locale.datetimeformat");
             }
             var langLocale = component.get("v.langLocale");
             if (!langLocale) {
-                langLocale = $A.getGlobalValueProviders().get("$Locale.langLocale");
+                langLocale = $A.get("$Locale.langLocale");
             }
             var d = $A.localizationService.parseDateTimeUTC(v, format, langLocale);
             if (d) {
@@ -87,7 +87,7 @@
             }
         }
     },
-    
+
     formatDateTime: function(component) {
         var concreteCmp = component.getConcreteComponent();
         var _helper = concreteCmp.getDef().getHelper();
@@ -114,23 +114,23 @@
             _helper.displayDateTime(component, value);
         }
     },
-    
+
     getDateString: function(date) {
         return date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
     },
-    
+
     getUTCDateString: function(date) {
         return date.getUTCFullYear() + "-" + (date.getUTCMonth() + 1) + "-" + date.getUTCDate();
     },
-    
+
     is24HourFormat: function(component) {
         var format = component.get("v.format");
         if (!format) {
-            format = $A.getGlobalValueProviders().get("$Locale.datetimeformat");
+            format = $A.get("$Locale.datetimeformat");
         }
         return !($A.localizationService.isPeriodTimeView(format));
     },
-    
+
     popUpDatePicker: function(component, date) {
         var datePicker = component.find("datePicker");
         if (datePicker) {

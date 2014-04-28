@@ -20,10 +20,10 @@
     testSettingValueOfInheritedSimpleAttributes:{
         test:function(cmp){
             //<aura:set> sets the value of the attribute on the Parent and not the child.
-            aura.test.assertEquals('parentX', cmp.getSuper().getValue('v.SimpleAttribute').getValue(), "Attribute value must have been overriden by aura:set tag");
+            aura.test.assertEquals('parentX', cmp.getSuper().get('v.SimpleAttribute'), "Attribute value must have been overriden by aura:set tag");
 
             //Another way of accessing attributes
-            aura.test.assertEquals('parentX', cmp.getSuper().getAttributes().getValue('SimpleAttribute').getValue());
+            aura.test.assertEquals('parentX', cmp.getSuper().get('v.SimpleAttribute'));
 
             //UI verification to check that renderer used the right attribute value
             aura.test.assertEquals('The value of SimpleAttribute = parentX', $A.test.getText(cmp.getSuper().find('simpleAttr_id').getElement()));

@@ -21,7 +21,7 @@
         test:function(cmp){
             aura.log(cmp);
 
-            aura.test.assertEquals('childX',cmp.getSuper().getValue('v.SimpleAttribute').getValue(), "Attribute value should have been overriden in child component.");
+            aura.test.assertEquals('childX',cmp.getSuper().get('v.SimpleAttribute'), "Attribute value should have been overriden in child component.");
 
             //UI verification to check that renderer used the right attribute value
             aura.test.assertEquals('The value of SimpleAttribute = childX', $A.test.getText(cmp.getSuper().getSuper().find('simpleAttr_id').getElement()));
@@ -35,8 +35,8 @@
     _testSettingValueOfInheritedComponentAttribute_SecondLevelInheritance:{
         test:function(cmp){
             /**TODO: Should verify the value of attribute through API too.
-             * aura.test.assertEquals('Component',cmp.getValue('v.ComponentTypeAttribute').getValue()[0].auraType, "Attribute value was expected to be a component.")
-            var attrValue = cmp.getValue('v.ComponentTypeAttribute').getValue()[0];
+             * aura.test.assertEquals('Component',cmp.get('v.ComponentTypeAttribute')[0].auraType, "Attribute value was expected to be a component.")
+            var attrValue = cmp.get('v.ComponentTypeAttribute')[0];
             aura.test.assertEquals('markup://test:test_button',attrValue.getDef().getDescriptor().getQualifiedName(), "Attribute should have been a button.")
             aura.test.assertEquals('childX_Button',$A.test.getText(attrValue.getElement()), "ComponentTypeAttribute should have been assigned a button with label: childX_Button.");
             */

@@ -9,12 +9,10 @@
 
         // These requests are here to test that there are no multiple action requests for the same $Label
         // See LabelValueProviderUITest.java
-        var tmt = $A.get("$Label.Related_Lists.task_mode_today");
-        tmt = $A.get("$Label.Related_Lists.task_mode_today");
-        tmt = $A.get("$Label.Related_Lists.task_mode_today");
-        tmt = $A.get("$Label.Related_Lists.task_mode_today");
-        tmt = $A.get("$Label.Related_Lists.task_mode_today");
-
+        for (var i = 0; i < 5; i++) {
+	        $A.get("$Label.Related_Lists." + "task_mode_today");
+        }
+        
         return this.superRender();
     }
 })

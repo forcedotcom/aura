@@ -18,9 +18,9 @@ package org.auraframework.test.perf;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.WebDriverTestCase;
 import org.auraframework.util.test.perf.data.PerfMetric;
@@ -36,7 +36,7 @@ import org.json.JSONArray;
  */
 public final class PerfMetricsCollector {
 
-    private static final Log LOG = LogFactory.getLog(PerfMetricsCollector.class);
+    private static final Logger LOG = Logger.getLogger(PerfMetricsCollector.class.getSimpleName());
 
     private final WebDriverTestCase test;
     private long startMillis;
@@ -92,7 +92,7 @@ public final class PerfMetricsCollector {
                 metrics.setMetric(metric);
             }
         } catch (Exception e) {
-            LOG.warn(test.getName(), e);
+            LOG.log(Level.WARNING, test.getName(), e);
         }
         return metrics;
     }

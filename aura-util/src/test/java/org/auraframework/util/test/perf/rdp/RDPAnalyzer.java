@@ -17,9 +17,9 @@ package org.auraframework.util.test.perf.rdp;
 
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.auraframework.util.test.perf.PerfUtil;
 import org.auraframework.util.test.perf.data.PerfMetric;
 import org.auraframework.util.test.perf.rdp.RDP.Domain;
@@ -36,7 +36,7 @@ import com.google.common.collect.Maps;
  */
 public final class RDPAnalyzer {
 
-    protected static final Log LOG = LogFactory.getLog(RDPAnalyzer.class);
+    protected static final Logger LOG = Logger.getLogger(RDPAnalyzer.class.getSimpleName());
 
     private final List<RDPNotification> notifications;
     private Map<String, TimelineEventStats> timelineEventsStats;
@@ -62,7 +62,7 @@ public final class RDPAnalyzer {
                     addTimelineEvent(notification.getParams().getJSONObject("record"));
                 }
             } catch (Exception e) {
-                LOG.warn(notification, e);
+                LOG.log(Level.WARNING, notification.toString(), e);
             }
         }
         return timelineEventsStats;
@@ -115,7 +115,7 @@ public final class RDPAnalyzer {
         // requestWillBeSent: timestamp requestId params.documentURL
         // responseReceived: timestamp params.requestId params.response.timing?
         // dataReceived+: timestamp params.requestId params.dataLength params.encodedDataLength
-        // loadingFinished: timestamp params.requestId params.encodedDataLength
+        // loadingFinished: timestamp params.requestId params.encodedDataLength?
 
         // collect the following metrics:
         // numRequests: details: documentURL + size
@@ -133,21 +133,34 @@ public final class RDPAnalyzer {
                     JSONObject detail = new JSONObject();
                     detail.put("url", request.getString("url"));
                     detail.put("method", request.getString("method"));
+                    detail.put("encodedDataLength", 0);
                     requestIdToDetail.put(params.getString("requestId"), detail);
+                } else if (Network.dataReceived.equals(method)) {
+                    JSONObject detail = requestIdToDetail.get(params.getString("requestId"));
+                    int encodedDataLength = params.getInt("encodedDataLength");
+                    detail.put("encodedDataLength", detail.getInt("encodedDataLength") + encodedDataLength);
                 } else if (Network.loadingFinished.equals(method)) {
                     JSONObject detail = requestIdToDetail.get(params.getString("requestId"));
                     if (detail == null) {
                         // spurious first events?
                         continue;
                     }
-                    int encodedDataLength = params.getInt("encodedDataLength");
+                    if (params.has("encodedDataLength")) {
+                        // some chromedriver versions don't have encodedDataLength in loadingFinished
+                        // if there, check that matches the one in dataReceived
+                        int finishedEncodedDataLength = params.getInt("encodedDataLength");
+                        int encodedDataLength = detail.getInt("encodedDataLength");
+                        if (finishedEncodedDataLength != encodedDataLength) {
+                            LOG.log(Level.WARNING, "encodedDataLength doesn't match: " + finishedEncodedDataLength
+                                    + " != " + encodedDataLength);
+                        }
+                    }
                     numRequests++;
-                    totalEncodedDataLength += encodedDataLength;
-                    detail.put("encodedDataLength", encodedDataLength);
+                    totalEncodedDataLength += detail.getInt("encodedDataLength");
                     details.put(detail);
                 }
             } catch (Exception e) {
-                LOG.warn(timelineEvent, e);
+                LOG.log(Level.WARNING, timelineEvent.toDetailString(), e);
             }
         }
 

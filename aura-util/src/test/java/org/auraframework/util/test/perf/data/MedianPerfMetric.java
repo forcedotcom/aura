@@ -43,14 +43,14 @@ public final class MedianPerfMetric extends PerfMetric {
     }
 
     /**
-     * @return "bytes 5 [3 5 5 6 7]"
+     * @return "name 5 [3 5 5 6 7]"
      */
     @Override
     public String toShortText() {
         return super.toShortText() + ' ' + toSequenceString();
     }
 
-    String toSequenceString() {
+    public String toSequenceString() {
         StringBuilder sb = new StringBuilder();
         sb.append('[');
         for (PerfMetric metric : runsMetric) {

@@ -22,9 +22,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.auraframework.util.AuraUITestingUtil;
 import org.auraframework.util.json.JsonReader;
 import org.auraframework.util.test.perf.rdp.RDPNotification;
@@ -48,7 +47,7 @@ import com.google.common.collect.Maps;
  */
 public final class PerfWebDriverUtil {
 
-    private static final Log LOG = LogFactory.getLog(PerfWebDriverUtil.class);
+    private static final Logger LOG = Logger.getLogger(PerfWebDriverUtil.class.getSimpleName());
 
     private static final LoggingPreferences PERFORMANCE_LOGGING_PREFS;
 
@@ -100,8 +99,8 @@ public final class PerfWebDriverUtil {
         List<LogEntry> logEntries = getLogEntries(LogType.PERFORMANCE);
         List<RDPNotification> events = Lists.newArrayList();
         for (LogEntry logEntry : logEntries) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("ENTRY: " + logEntry);
+            if (LOG.isLoggable(Level.FINE)) {
+                LOG.fine("LOG_ENTRY: " + logEntry);
             }
             String message = logEntry.getMessage();
             // logMessage is: {"message":{"method":"Timeline.eventRecorded","params":{...
@@ -111,7 +110,7 @@ public final class PerfWebDriverUtil {
                 String webview = json.getString("webview");
                 events.add(new RDPNotification(event, webview));
             } catch (JSONException e) {
-                LOG.warn(message, e);
+                LOG.log(Level.WARNING, message, e);
             }
         }
         return events;
@@ -133,7 +132,7 @@ public final class PerfWebDriverUtil {
         } catch (WebDriverException ignore) {
             // i.e. log type 'profiler' not found
         } catch (Exception e) {
-            LOG.warn(type, e);
+            LOG.log(Level.WARNING, type, e);
         }
         return NO_ENTRIES;
     }

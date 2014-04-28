@@ -368,9 +368,14 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
             }
         }
         description.append(String.format("\nBrowser: %s", currentBrowserType));
+        if (auraUITestingUtil != null) {
+            description.append("\nUser-Agent: " + auraUITestingUtil.getUserAgent());
+        }
         if (currentDriver == null) {
             description.append("\nTest failed before WebDriver was initialized");
         } else {
+            description
+                    .append("\nWebDriver: " + currentDriver);
             description.append("\nJS state: ");
             try {
                 String dump = (String) auraUITestingUtil

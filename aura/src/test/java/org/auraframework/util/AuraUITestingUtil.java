@@ -60,7 +60,7 @@ public class AuraUITestingUtil {
      * An internal class to wait for and retrieve an element from the driver.
      */
     private static class WaitAndRetrieve implements ExpectedCondition<Boolean> {
-        private By locator;
+        private final By locator;
         private WebElement found = null;
 
         public WaitAndRetrieve(By locator) {
@@ -84,16 +84,16 @@ public class AuraUITestingUtil {
 
         @Override
         public String toString() {
-            return "WaitAndRetrieve: "+this.locator+" found "+this.found;
+            return "WaitAndRetrieve: " + this.locator + " found " + this.found;
         }
     }
 
     /**
      * Waits for element with matching locator to appear in dom.
-     *
-     * This will wait for at least one element with the locator to appear in the dom,
-     * and it will return the first element found. If there are more than one element
-     * that match the locator, this will succeed when the first one appears.
+     * 
+     * This will wait for at least one element with the locator to appear in the dom, and it will return the first
+     * element found. If there are more than one element that match the locator, this will succeed when the first one
+     * appears.
      * 
      * @param msg Error message on timeout.
      * @param locator By of element waiting for.
@@ -109,9 +109,9 @@ public class AuraUITestingUtil {
 
     /**
      * Waits for element with matching locator to appear in dom.
-     *
+     * 
      * Convenience routine to supply a message.
-     *
+     * 
      * @param locator By of element waiting for.
      */
     public WebElement waitForElement(By locator) {
@@ -292,6 +292,17 @@ public class AuraUITestingUtil {
     }
 
     /**
+     * @return the User-Agent for the browser we are running tests on
+     */
+    public String getUserAgent() {
+        try {
+            return (String) getRawEval("return window.navigator.userAgent;");
+        } catch (Exception e) {
+            return "error getting User-Agent: " + e;
+        }
+    }
+
+    /**
      * Process the results from $A.test.getErrors(). If there were any errors, then fail the test accordingly.
      * 
      * @param errors the raw results from invoking $A.test.getErrors()
@@ -420,11 +431,11 @@ public class AuraUITestingUtil {
 
     /**
      * Get an error message from the error div.
-     *
-     * FIXME: this is _not_ a quick fix message. This is the error box that is used by $A.error.
-     * Also note that this does not check if the box is visible. This box should always be present,
-     * and may contain old text that is no longer relevant. Please don't use this!
-     *
+     * 
+     * FIXME: this is _not_ a quick fix message. This is the error box that is used by $A.error. Also note that this
+     * does not check if the box is visible. This box should always be present, and may contain old text that is no
+     * longer relevant. Please don't use this!
+     * 
      * @return the error message.
      */
     @Deprecated
@@ -438,10 +449,10 @@ public class AuraUITestingUtil {
 
     /**
      * Get the current aura error message.
-     *
-     * This will fail the test if the div is not found (which means that the page did
-     * not load at all). If the box is not displayed, it returns an empty string.
-     *
+     * 
+     * This will fail the test if the div is not found (which means that the page did not load at all). If the box is
+     * not displayed, it returns an empty string.
+     * 
      * @return any error message that is displayed.
      */
     public String getAuraErrorMessage() {
@@ -478,7 +489,7 @@ public class AuraUITestingUtil {
 
     /**
      * Get any 'cause' message from a quick fix exception
-     *
+     * 
      * @return the quick fix cause exception.
      */
     public String getQuickFixCause() {

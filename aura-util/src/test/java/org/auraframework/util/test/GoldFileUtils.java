@@ -17,17 +17,16 @@ package org.auraframework.util.test;
 
 import java.io.FileNotFoundException;
 import java.net.URL;
+import java.util.logging.Logger;
 
 import junit.framework.AssertionFailedError;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.auraframework.util.test.perf.PerfDiffUtils;
 import org.auraframework.util.test.perf.data.PerfMetrics;
 
 public final class GoldFileUtils {
 
-    private static final Log LOG = LogFactory.getLog(GoldFileUtils.class);
+    private static final Logger LOG = Logger.getLogger(GoldFileUtils.class.getSimpleName());
 
     private static final boolean SKIP_GOLD_FILE_UPDATE = System.getProperty("skipGoldFileUpdate") != null;
 

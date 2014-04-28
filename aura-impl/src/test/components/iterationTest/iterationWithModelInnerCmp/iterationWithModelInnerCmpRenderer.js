@@ -15,6 +15,8 @@
  */
 ({
     afterRender : function(cmp){
+    	this.superAfterRender();
+    	
         // Track how many total times this component is rendered.
         if (!window.__testRenderCount) {
             window.__testRenderCount = 1;

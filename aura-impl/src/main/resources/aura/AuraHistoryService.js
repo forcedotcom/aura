@@ -33,7 +33,7 @@ var AuraHistoryService = function() {
          * Otherwise, use <code>$A.services.layout.changeLocation()</code> to override existing URL parameters.
          * 
          * Native Android browser doesn't completely support pushState so we force hash method for it
-         * IOS UIWebView also has weirdness when using appcache and history so force onhashchange as well
+         * IOS7 UIWebView also has weirdness when using appcache and history so force onhashchange as well
          *
          * @param {Object} token The provided token set to the current location hash
          * @memberOf AuraHistoryService
@@ -81,8 +81,6 @@ var AuraHistoryService = function() {
         /**
          * Loads the previous URL in the history list. Standard JavaScript <code>history.go()</code> method.
          *
-         * IOS UIWebView has issues with appcache and history so
-         * keep track of history ourselves and change hash instead
          * 
          * @memberOf AuraHistoryService
          * @public
@@ -92,14 +90,15 @@ var AuraHistoryService = function() {
                 //history -> Standard javascript object
                 window.history.go(-1);
             } else {
-                var historyCount = this.history.length;
-                if (historyCount > 0 && this.currentIndex > 0) {
+                // IOS7 UIWebView has issues with appcache and history so
+                // keep track of history ourselves and change hash instead
+                if (this.currentIndex > 0) {
                     // move pointer and get previous hash location
                     var hash = this.history[--this.currentIndex];
                     window.location.hash = "#" + hash;
                 } else {
-                    // in case pointer has moved passed all history then just start over
-                    this.currentIndex = -1;
+                    // in case pointer has moved passed all history then reset to push new history
+                    this.reset();
                     window.location.hash = "";
                 }
             }
@@ -118,9 +117,6 @@ var AuraHistoryService = function() {
         
         /**
          * Loads the next URL in the history list. Standard JavaScript <code>history.go()</code> method.
-         *
-         * IOS UIWebView has issues with appcache and history so
-         * keep track of history ourselves and change hash instead
          * 
          * @memberOf AuraHistoryService
          * @public
@@ -130,9 +126,11 @@ var AuraHistoryService = function() {
                 //history -> Standard javascript object
                 window.history.go(1);
             } else {
+                // IOS7 UIWebView has issues with appcache and history so
+                // keep track of history ourselves and change hash instead
                 var historyLength = this.history.length;
                 if (this.currentIndex < (historyLength - 1)) {
-                    // there is forward history
+                    // if there's forward history, go forward one
                     window.location.hash = "#" + this.history[++this.currentIndex];
                 }
             }
@@ -151,7 +149,7 @@ var AuraHistoryService = function() {
         /**
          * Whether to use pushState.
          * Native Android browser has issues with pushState
-         * IOS UIWebView has issues with pushState and history
+         * IOS7 UIWebView has issues with pushState and history
          * @returns {boolean} true if pushState should be used
          * @private
          */
@@ -163,14 +161,14 @@ var AuraHistoryService = function() {
                     !!window.history.pushState &&
                     // NOT native Android browser
                     !(ua.indexOf("Android ") > -1 && ua.indexOf("Mozilla/5.0") > -1 && ua.indexOf("AppleWebKit") > -1 && ua.indexOf("Chrome") == -1) &&
-                    // NOT IOS UIWebView (native app webview)
+                    // NOT IOS7 UIWebView (native app webview)
                     !this.isIOSWebView();
             }
             return this._usePushState;
         },
 
         /**
-         * Whether IOS UIWebView
+         * Whether IOS7 UIWebView
          * @returns {boolean} true if IOS UIWebView
          * @private
          */

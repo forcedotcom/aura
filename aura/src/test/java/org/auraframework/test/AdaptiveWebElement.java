@@ -47,6 +47,12 @@ public class AdaptiveWebElement extends RemoteWebElement {
     }
 
     @Override
+    public void click(){
+        scrollIntoView();
+        super.click();
+    }
+    
+    @Override
     public void sendKeys(CharSequence... keysToSend) {
         scrollIntoView();
         super.sendKeys(keysToSend);

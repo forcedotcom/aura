@@ -34,8 +34,7 @@ public class LayoutItemsUITest extends WebDriverTestCase {
      * Automation for W-954182
      */
     public void testNavigationWhenLayoutHasMultipleLayoutItems() throws Exception {
-    	/*
-        By forwardButton = By.cssSelector(".Forward_Button");
+    	By forwardButton = By.cssSelector(".Forward_Button");
         By backButton = By.cssSelector(".Back_Button");
         By layoutDone = By.cssSelector(".layoutDone");
         By removeLayoutDone = By.cssSelector(".Remove_Layout_Done");
@@ -43,12 +42,12 @@ public class LayoutItemsUITest extends WebDriverTestCase {
         open("/layoutServiceTest/multipleLayoutItems.app");
 
         // might take a while for initial layout to load
-        getDriver().manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
+        auraUITestingUtil.waitForElement(layoutDone);
         findDomElement(layoutDone);
         verifyExpectedResultsForInitialLayout();
 
         // subsequent layouts should NOT take that long to load
-        getDriver().manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+        auraUITestingUtil.waitForElement(layoutDone);
         findDomElement(forwardButton).click();
         findDomElement(layoutDone);
         verifyExpectedResultsForLayout1();
@@ -78,7 +77,6 @@ public class LayoutItemsUITest extends WebDriverTestCase {
         auraUITestingUtil.getEval("window.history.forward()");
         findDomElement(layoutDone);
         verifyExpectedResultsForLayout1();
-        */
     }
 
     private void verifyExpectedResultsForInitialLayout() throws Exception {

@@ -18,8 +18,8 @@
 		
 	doInit : function(cmp) {
 		this.initSorterTrigger(cmp);
-		this.initDataProvider(cmp);		
-		this.triggerDataProvider(cmp);
+		this.initDataProvider(cmp);
+		this.initItems(cmp, cmp.get('v.items'), cmp.get('v.defaultSelectedItem'));
 	},
 	
 	initSorterTrigger : function(cmp) {		
@@ -50,16 +50,12 @@
         var dataProviders = cmp.getValue("v.dataProvider").unwrap();
         
         if ($A.util.isArray(dataProviders)) {
-        	var items, selectedItems;
         	cmp._dataProviders = dataProviders;
             for (var i = 0; i < dataProviders.length; i++) {
-            	//get initial values from dataprovider
-            	items = dataProviders[i].get('v.columns');            	 
-            	this.initItems(cmp, items, this.parseSortBy(cmp, dataProviders[i].get('v.sortBy')));
             	//add handler
                 dataProviders[i].addHandler("onchange", cmp, "c.handleDataChange");
             }
-        }        
+        }
     },
     
     initItems : function(cmp, items, selectedItems) {
@@ -95,18 +91,21 @@
 			}
 			
 			cmp._selectedItems = sList;
+			cmp.set('v.defaultSelectedItems', selectedItems);
 			cmp.set('v.items', filteredItems);
+			this.updateMenuList(cmp);
 		}
 	},
+
 	
 	handleOnOpen : function(cmp) {
-		var items = cmp.getValue('v.items');		
+		var items = cmp.get('v.items');		
 		if (cmp.get('v.visible')) {
 			return;
 		}		
 		this.attachEventHandler(cmp);		
 		var selected = this.getDefaultSortBy(cmp);
-		if (selected && selected.length > 0 && items && items.getLength() > 0) {
+		if (selected && selected.length > 0 && items && items.length > 0) {
 			//update selected item sort orders
 			for (var i=0; i< selected.length; i++) {
 				if (cmp._sortOrderMap[selected[i].fieldName]) {
@@ -119,7 +118,7 @@
 			this.selectMenuItem(cmp, selected);
 			//focus on the first selected default item 
 			var index = selected[0].index;
-			if (items.unwrap()[index]) {
+			if (items[index]) {
 				cmp.find('sorterMenuList').set("v.focusItemIndex", index);
 			}			
 		}
@@ -151,7 +150,7 @@
 			var selectedItems = this.getSelectedMenuItems(cmp);
 			for (var i=0; i < selectedItems.length; i++) {
 				// append prefix for descending order
-				order = cmp._selectedItems[i].isAscending ? '' : this.CONSTANTS.DESC_PREFIX;
+				order = selectedItems[i].isAscending ? '' : this.CONSTANTS.DESC_PREFIX;
 				result.push({ sortBy: order + selectedItems[i].fieldName, label: selectedItems[i].label });
 			}			
 			action.runDeprecated(result);
@@ -189,7 +188,7 @@
 	 */
 	getDefaultSortBy: function(cmp) {		
 	    	//TODO: need to support multiple data providers
-		var sortBy = this.parseSortBy(cmp, cmp._dataProviders[0].get('v.sortBy'));
+		var sortBy = this.parseSortBy(cmp, cmp.get('v.defaultSelectedItems'));
 		for (var i=0; i< sortBy.length; i++) {
 			if (cmp._sortOrderMap[sortBy[i].fieldName]) {
 				//update item index
@@ -311,14 +310,13 @@
 		if (!cmp.get('v.modal')) {
 			return;
 		}
-		
 		var id = this.CONSTANTS.CONTAINER_ELEMENT_ID;
 		var containerEl = document.getElementById(id);
 		var maskEl = cmp.find('mask').getElement();
 		var sorterEl = cmp.find('sorterContainer').getElement();
 		
 		if (!containerEl) {
-    		//attach the dom to the document body as a modal dialog    		
+			//attach the dom to the document body as a modal dialog
     		containerEl = document.createElement('div');
     		containerEl.setAttribute('id', id);
     		$A.util.addClass(containerEl, cmp.getConcreteComponent().getDef().getStyleClassName());
@@ -328,7 +326,7 @@
 		} else if (!$A.util.contains(containerEl, sorterEl)) {
 			containerEl.appendChild(maskEl);
 			containerEl.appendChild(sorterEl);
-    	}
+		}
     },
     
     /**
@@ -421,7 +419,6 @@
                 // ignore gestures/swipes; only run the click handler if it's a
 				// click or tap
                 var clickEndEvent;
-            
                 if (helper.getOnClickEventProp("isTouchDevice")) {
                     var touchIdFound = false;
                     for (var i = 0; i < event.changedTouches.length; i++) {
@@ -431,26 +428,21 @@
                             break;
                         }
                     }
-                
                     if (helper.getOnClickEventProp("isTouchDevice") && !touchIdFound) {
                         return;
                     }
                 } else {
                     clickEndEvent = event;
                 }
-            
                 var startX = component._onStartX, startY = component._onStartY;
                 var endX = clickEndEvent.clientX, endY = clickEndEvent.clientY;
-
                 if (Math.abs(endX - startX) > 0 || Math.abs(endY - startY) > 0) {
                     return;
                 }
-             
                 if (!helper.isElementInComponent(component.find('sorterContainer'), event.target)) {                	
                     // Collapse the sorter
                 	helper.handleOnCancel(component);
                 }
-                
             };
             component._onClickEndFunc = f;
         }
@@ -462,13 +454,11 @@
         if ($A.util.isUndefined(this.getOnClickEventProp.cache)) {
             this.getOnClickEventProp.cache = {};
         }
-
         // check the cache
         var cached = this.getOnClickEventProp.cache[prop];
         if (!$A.util.isUndefined(cached)) {
             return cached;
         }
-
         // fill the cache
         this.getOnClickEventProp.cache["isTouchDevice"] = !$A.util.isUndefined(document.ontouchstart);
         if (this.getOnClickEventProp.cache["isTouchDevice"]) {
@@ -485,9 +475,7 @@
 		if (!component || !targetElem) {
 			return false;
 		}
-		
 	    var componentElements = [];
-	
 	    // grab all the siblings
 	    var elements = component.getElements();
 	    for(var index in elements) {
@@ -495,18 +483,15 @@
 	            componentElements.push(elements[index]);
 	        }
 	    }
-	
 	    // go up the chain until it hits either a sibling or the root
 	    var currentNode = targetElem;
-	
 	    do {
 	        for (var index = 0; index < componentElements.length ; index++) {
 	            if (componentElements[index] === currentNode) { return true; }
 	        }
-	
 	        currentNode = currentNode.parentNode;
 	    } while(currentNode);
-	
+
 	    return false;
     },
     
@@ -515,5 +500,71 @@
     	if (containerEl) {
     		$A.util.removeElement(containerEl);
     	}
-    }
+    },
+    
+    refreshMenu : function(cmp) {
+    	var sorterMenu = cmp.find('sorterMenu');
+    	if (sorterMenu) {
+    		sorterMenu.get('e.refresh').fire();
+    	}
+	},
+	
+	updateMenuList: function(cmp) {
+		//this is a workaround for the aura:iteration rerendering issue
+		var items = cmp.get('v.items');
+		var menuList = cmp.find('sorterMenuList');
+		var onFinish = function(newItems) {
+			var menuListBody = menuList.getValue('v.body');
+			menuListBody.each(function(item){
+				//until we get rid of the parent attribute in the menuItem, which is anti-pattern
+				//need to reset v.parent attribute to empty array, otherwise, the parent component will be destroyed also
+				var v = item.getValue('v.parent');
+				v.setValue([], true);
+				v.commit();
+			});
+			menuListBody.destroy(true);
+			menuList.set('v.body', newItems);
+		};
+		this._createMenuItems(cmp, items, onFinish);
+	},
+
+	_createMenuItems: function(cmp, items, onFinish) {
+		var rowFacet = cmp.get('v.rowDef');
+		var rowVar = cmp.get('rowVar') || 'item';
+		
+		if (!$A.util.isArray(items) || !rowFacet) {
+			return;
+		}
+		var total = items.length;
+		var helper = this;
+		var doFinish = function(newCmps){
+			if (typeof onFinish === 'function') {
+				onFinish(newCmps);
+				helper.refreshMenu(cmp);
+			}
+		};
+		var retVal = []
+		var doInsert = function(index) {
+			total--;
+			return function(newCmp) {
+				retVal.push(newCmp);
+				if (total == 0) {
+					doFinish(retVal);
+				}
+			}
+		}
+		for (var i=0, len=items.length; i < len; i++) {
+			var rowContext = {};
+			var itemVal = $A.expressionService.create(null, {'label': items[i].label, 'fieldName': items[i].fieldName});
+			rowContext[rowVar] = itemVal;			
+			var vp = $A.expressionService.createPassthroughValue(rowContext, cmp);
+			
+			$A.componentService.newComponentAsync(
+	            this,
+	            doInsert(i),
+	            rowFacet[0],
+	            vp
+	        )
+        }
+    }  
 })

@@ -25,7 +25,7 @@ import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.ModelDef;
-import org.auraframework.impl.java.model.JavaModelDef;
+import org.auraframework.impl.java.model.JavaModelDefImpl;
 import org.auraframework.impl.test.util.AuraImplUnitTestingUtil;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Model;
@@ -91,7 +91,7 @@ public abstract class AuraImplTestCase extends AuraTestCase {
     // TODO: W-1478576 Must consolidate such methods in a util.
     protected Model getJavaModelByQualifiedName(String qualifiedName) throws Exception {
         ModelDef javaModelDef = definitionService.getDefinition(qualifiedName, ModelDef.class);
-        assertTrue(javaModelDef instanceof JavaModelDef);
+        assertTrue(javaModelDef instanceof JavaModelDefImpl);
         Model model = javaModelDef.newInstance();
         assertNotNull("Failed to retrieve model instance of " + qualifiedName, model);
         return model;

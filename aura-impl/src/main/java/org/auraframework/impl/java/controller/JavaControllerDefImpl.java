@@ -17,12 +17,16 @@ package org.auraframework.impl.java.controller;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Set;
+
+import org.auraframework.Aura;
 
 import org.auraframework.def.ActionDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
+import org.auraframework.def.JavaControllerDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.system.SubDefDescriptorImpl;
@@ -30,31 +34,50 @@ import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.instance.Action;
 import org.auraframework.system.SubDefDescriptor;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
+import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
 /**
- * A definition for a Java Controller definition.
+ * The default implementation for a java controller def.
  */
-public class JavaControllerDef extends DefinitionImpl<ControllerDef> implements ControllerDef {
+public class JavaControllerDefImpl extends DefinitionImpl<ControllerDef> implements JavaControllerDef {
     private static final long serialVersionUID = -8294844909051767366L;
     private final Class<?> controllerClass;
+    private final boolean bean;
     private final Map<String, JavaActionDef> actionMap;
 
-    protected JavaControllerDef(Builder builder) {
+    protected JavaControllerDefImpl(Builder builder) {
         super(builder);
         this.controllerClass = builder.controllerClass;
         this.actionMap = AuraUtil.immutableMap(builder.actionMap);
+        this.bean = builder.bean;
+    }
+
+    @Override
+    public void validateDefinition() throws QuickFixException {
+        super.validateDefinition();
+        if (this.bean) {
+            Aura.getBeanAdapter().validateControllerBean(this);
+        }
     }
 
     /**
+     * Add our dependencies to the set.
+     */
+    @Override
+    public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
+        super.appendDependencies(dependencies);
+        // FIXME: put all of our action dependencies in here...
+    }
+    /**
      * used by the controller itself to get the type
      */
-    protected Class<?> getJavaType() {
+    @Override
+    public Class<?> getJavaType() {
         return this.controllerClass;
     }
 
     @SuppressWarnings("unchecked")
-    @Override
     public <D extends Definition> D getSubDefinition(SubDefDescriptor<D, ?> sddesc) {
         if (sddesc.getDefType() == DefType.ACTION) {
             return (D) getSubDefinition(sddesc.getName());
@@ -84,10 +107,14 @@ public class JavaControllerDef extends DefinitionImpl<ControllerDef> implements 
     public Action createAction(String actionName, Map<String, Object> paramValues) throws DefinitionNotFoundException {
     	JavaActionDef actionDef = actionMap.get(actionName);
     	if(actionDef == null){
-    		DefDescriptor<ActionDef> desc = SubDefDescriptorImpl.getInstance(actionName, getDescriptor(), ActionDef.class);
-    		throw new DefinitionNotFoundException(desc);
+            DefDescriptor<ActionDef> desc = SubDefDescriptorImpl.getInstance(actionName, getDescriptor(), ActionDef.class);
+            throw new DefinitionNotFoundException(desc);
         }
-        return new JavaAction(getDescriptor(), actionDef, paramValues);
+        Object controller = null;
+        if (bean) {
+            controller = Aura.getBeanAdapter().getControllerBean(this);
+        }
+        return new JavaAction(getDescriptor(), actionDef, controller, paramValues);
     }
 
     @Override
@@ -103,10 +130,11 @@ public class JavaControllerDef extends DefinitionImpl<ControllerDef> implements 
 
         private Class<?> controllerClass;
         private Map<String, JavaActionDef> actionMap;
+        private boolean bean;
 
         @Override
-        public JavaControllerDef build() {
-            return new JavaControllerDef(this);
+        public JavaControllerDefImpl build() {
+            return new JavaControllerDefImpl(this);
         }
 
         /**
@@ -114,6 +142,10 @@ public class JavaControllerDef extends DefinitionImpl<ControllerDef> implements 
          */
         public void setControllerClass(Class<?> controllerClass) {
             this.controllerClass = controllerClass;
+        }
+
+        public void setBean(boolean bean) {
+            this.bean = bean;
         }
 
         /**

@@ -15,8 +15,6 @@
  */
 package org.auraframework.test;
 
-import org.auraframework.Aura;
-
 /**
  * Provide TestContexts to persist the state of tests across multiple requests.
  */

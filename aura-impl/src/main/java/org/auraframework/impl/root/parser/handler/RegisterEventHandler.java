@@ -17,15 +17,12 @@ package org.auraframework.impl.root.parser.handler;
 
 import java.util.Set;
 
-import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.RootDefinition;
-import org.auraframework.impl.root.AttributeDefImpl;
 import org.auraframework.impl.root.event.RegisterEventDefImpl;
 import org.auraframework.impl.root.event.RegisterEventDefImpl.Builder;
 import org.auraframework.impl.system.DefDescriptorImpl;

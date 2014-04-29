@@ -61,11 +61,13 @@ public interface Annotations {
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.TYPE)
     public @interface Controller {
+        boolean bean() default false;
     }
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.TYPE)
     public @interface Model {
+        boolean bean() default false;
     }
 
     @Retention(RetentionPolicy.RUNTIME)

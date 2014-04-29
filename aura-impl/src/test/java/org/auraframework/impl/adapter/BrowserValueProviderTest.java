@@ -144,9 +144,14 @@ public class BrowserValueProviderTest extends AuraImplTestCase {
         assertBrowserProperties(UserAgent.PLAYBOOK, true, false, false, "TABLET", false, false, false, false);
         assertBrowserProperties(UserAgent.NOKIA_N95, false, true, false, "PHONE", false, false, false, false);
         assertBrowserProperties(UserAgent.NOKIA_920, false, true, false, "PHONE", false, false, false, true);
-        assertBrowserProperties(UserAgent.WINDOWS_PHONE_8, false, true, false, "PHONE", false, false, false, true);
+        assertBrowserProperties(UserAgent.IE10_WINDOWS_PHONE_8, false, true, false, "PHONE", false, false, false, true);
+        assertBrowserProperties(UserAgent.IE10_WINDOWS_RT_8, true, false, false, "TABLET", false, false, false, false);
+        assertBrowserProperties(UserAgent.IE11_WINDOWS_PHONE_8_1, false, true, false, "PHONE", false, false, false, true);
+        assertBrowserProperties(UserAgent.IE11_WINDOWS_RT_8_1, true, false, false, "TABLET", false, false, false, false);
         assertBrowserProperties(UserAgent.BLACKBERRY_10, false, true, false, "PHONE", false, false, false, false);
         assertBrowserProperties(UserAgent.BLACKBERRY_7, false, true, false, "PHONE", false, false, false, false);
+        assertBrowserProperties(UserAgent.GOOD_IPHONE, false, true, false, "PHONE", false, true, true, false);
+        assertBrowserProperties(UserAgent.GOOD_ANDROID, false, true, true, "PHONE", false, false, false, false);
     }
 
     public void testGetValueUndefinedProperty() throws Exception {

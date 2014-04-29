@@ -27,8 +27,11 @@ public enum UserAgent {
     IE10("Mozilla/4.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/5.0)"),
     IE11("Mozilla/5.0 (Windows NT 6.3; Trident/7.0; rv:11.0) like Gecko"),
     IE11_NET_FRAMEWORK("Mozilla/5.0 (Windows NT 6.3; Trident/7.0; .NET4.0E; .NET4.0C; rv:11.0) like Gecko"),
-    // Nokia Lumia 928 using IE10
-    WINDOWS_PHONE_8("Mozilla/5.0 (compatible; MSIE 10.0; Windows Phone 8.0; Trident/6.0; IEMobile/10.0; ARM; Touch; NOKIA; Lumia 928)"),
+    // Nokia Lumia 928
+    IE10_WINDOWS_PHONE_8("Mozilla/5.0 (compatible; MSIE 10.0; Windows Phone 8.0; Trident/6.0; IEMobile/10.0; ARM; Touch; NOKIA; Lumia 928)"),
+    IE10_WINDOWS_RT_8("Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; ARM; Trident/6.0 Touch)"),
+    IE11_WINDOWS_PHONE_8_1("Mozilla/5.0 (Windows Phone 8.1; ARM; Trident/7.0;Touch; rv:11.0; IEMobile/11.0; Microsoft; Virtual) like Gecko"),
+    IE11_WINDOWS_RT_8_1("Mozilla/5.0 (compatible; MSIE 11.0; Windows NT 6.3; ARM; Trident/7.0)"),
     FIREFOX("Mozilla/6.0 (Windows NT 6.2; WOW64; rv:16.0.1) Gecko/20121011 Firefox/16.0.1"),
     SAFARI6("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_5) AppleWebKit/537.73.11 (KHTML, like Gecko) Version/6.1.1 Safari/537.73.11"),
     IPHONE4("Mozilla/5.0 (iPhone; CPU iPhone OS 5_0 like Mac OS X) AppleWebKit/534.46 (KHTML, like Gecko) Version/5.1 Mobile/9A334 Safari/7534.48.3"),
@@ -40,6 +43,9 @@ public enum UserAgent {
     ANDROID4_2("Mozilla/5.0 (Linux; Android 4.2.1; Nexus 4 Build/JOP40D) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.166 Mobile Safari/535.19"),
     // Blackberry Z10
     BLACKBERRY_10("Mozilla/5.0 (BB10; Touch) AppleWebKit/537.10+ (KHTML, like Gecko) Version/10.0.9.2372 Mobile Safari/537.10+"),
+    GOOD_IPHONE("Mozilla/5.0 (iPhone; CPU iPhone OS 7_1 like Mac OS X) AppleWebKit/.537.51.2 (KHTML, like Gecko) Mobile/11D167 Safari/8536.25 GoodAccess/1.1.333.302"),
+    GOOD_ANDROID("Mozilla/5.0 (Linux; Android 4.1.1; SAMSUNG-SGH-1747 Build/JRO03L) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/28.0.1500.45 Mobile Safari/537.36 Good Access/1.0.21.304"),
+
     IPOD("Mozilla/5.0 (iPod; U; CPU iPhone OS 4_3_3 like Mac OS X; ja-jp) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8J2 Safari/6533.18.5"),
     SAFARI5_MAC("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_8) AppleWebKit/537.13+ (KHTML, like Gecko) Version/5.1.7 Safari/534.57.2"),
     SAFARI5_WINDOWS("Mozilla/5.0 (Windows; U; Windows NT 6.1; tr-TR) AppleWebKit/533.20.25 (KHTML, like Gecko) Version/5.0.4 Safari/533.20.27"),

@@ -22,6 +22,7 @@ import java.util.logging.Logger;
 import junit.framework.AssertionFailedError;
 
 import org.auraframework.util.test.perf.PerfDiffUtils;
+import org.auraframework.util.test.perf.PerfGoldFilesUtil;
 import org.auraframework.util.test.perf.data.PerfMetrics;
 
 public final class GoldFileUtils {
@@ -63,9 +64,12 @@ public final class GoldFileUtils {
         }
 
         if (exceptionFound != null) {
-            LOG.info("writing log file: " + url);
             if (exceptionFound instanceof FileNotFoundException || !SKIP_GOLD_FILE_UPDATE) {
+                LOG.info("writing log file: " + url);
                 diff.writeGoldFile(testResults);
+            }
+            if (testResults instanceof PerfMetrics) {
+                LOG.info("new gold file contents:\n" + PerfGoldFilesUtil.toGoldFileText((PerfMetrics) testResults));
             }
 
             // add info about creating/updating log file in the message

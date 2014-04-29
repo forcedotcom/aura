@@ -113,7 +113,7 @@ public class PooledRemoteWebDriverFactory extends RemoteWebDriverFactory {
         public void quit() {
             dismissAlerts();
             // close up to 10 windows, except the final window
-            for (int i = 0; (getWindowHandles().size() > 1) && (i < 10); i--) {
+            for (int i = 0; (getWindowHandles().size() > 1) && (i < 10); i++) {
                 super.close();
                 dismissAlerts();
             }

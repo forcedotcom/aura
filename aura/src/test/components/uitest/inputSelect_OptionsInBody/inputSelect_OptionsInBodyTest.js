@@ -125,13 +125,13 @@
 			// dont have any options that should be ignored for deselect so 
 			// go ahead and deselect
 			if ($A.util.isUndefinedOrNull(doNotDeselectTheseOptions)){
-				selectedOptions[i].getAttributes().setValue("value", false);
+				selectedOptions[i].set("v.value", false);
 			} else {
 			// there are some options that should not be deselected
 				// if this selected option is NOT in 
 				// doNotDeselectTheseOptions list deselect
 				if (!this.isOptionRestricted(selectedOptions[i], doNotDeselectTheseOptions)) {
-					selectedOptions[i].getAttributes().setValue("value", false);
+					selectedOptions[i].set("v.value", false);
 				}
 			}
 		}
@@ -147,7 +147,7 @@
 			for (var k=0; k<optionCmps.length; k++) {
 				if (newOptionsText[j] == optionCmps[k].get("v.text")) {
 					// found new option to seleact in list of all options so select
-					optionCmps[k].getAttributes().setValue("value", true);
+					optionCmps[k].set("v.value", true);
 					break;
 				}
 			}

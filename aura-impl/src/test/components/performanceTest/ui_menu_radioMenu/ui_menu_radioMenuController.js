@@ -4,7 +4,7 @@
 	        if (triggerCmp) {
 	            var source = event.getSource();
 	            var label = source.get("v.label");
-	            triggerCmp.setValue("v.label", label);
+	            triggerCmp.set("v.label", label);
 	        }
 	 }
 })

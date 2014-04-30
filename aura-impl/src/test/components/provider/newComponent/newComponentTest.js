@@ -88,7 +88,7 @@
         test:function(cmp){
             var creation = this.getLocallyCreatedComponent(cmp);
             $A.test.assertEquals("markup://provider:clientProvider", creation.getDef().getDescriptor().getQualifiedName());
-            $A.test.assertEquals("provider:clientProvider", creation.getAttributes().get("value"));
+            $A.test.assertEquals("provider:clientProvider", creation.get("v.value"));
         }
     },
 
@@ -124,7 +124,7 @@
         test:function(cmp){
             var creation = this.getLocallyCreatedComponent(cmp);
             $A.test.assertEquals("markup://provider:clientProvider", creation.getDef().getDescriptor().getQualifiedName());
-            $A.test.assertEquals("baconbringerhomer", creation.getAttributes().get("value"));
+            $A.test.assertEquals("baconbringerhomer", creation.get("v.value"));
         }
     },
 
@@ -154,7 +154,7 @@
                 this,
                 function(newCmp){
                     $A.test.assertEquals("markup://provider:clientProvider", newCmp.getDef().getDescriptor().getQualifiedName());
-                    $A.test.assertEquals(null, newCmp.getAttributes().get("value"));
+                    $A.test.assertEquals(null, newCmp.get("v.value"));
                 },
                 config, null, true, false
             );
@@ -171,7 +171,7 @@
                 this,
                 function(newCmp){
                     $A.test.assertEquals("markup://provider:clientProvider", newCmp.getDef().getDescriptor().getQualifiedName());
-                    $A.test.assertEquals(undefined, newCmp.getAttributes().get("value"));
+                    $A.test.assertEquals(undefined, newCmp.get("v.value"));
                 },
                 config, null, true, false
             );

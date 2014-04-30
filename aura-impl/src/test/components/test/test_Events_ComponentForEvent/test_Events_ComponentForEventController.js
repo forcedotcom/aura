@@ -17,7 +17,7 @@
     changeLabel: function(cmp, event) {
     /*This function should never be called because its a controller on the component that has registered the event.*/
         var componentForEventController = event.getSource();
-        componentForEventController.getAttributes().setValue("label", "invisibleText");
+        componentForEventController.set("v.label", "invisibleText");
         $A.rerender(componentForEventController);
     }
 })

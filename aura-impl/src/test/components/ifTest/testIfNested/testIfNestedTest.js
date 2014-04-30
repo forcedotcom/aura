@@ -35,8 +35,8 @@
         
         test: function(component){
             this.whatItIs(component, "Testing rerender, outer is true, inner false:", true, false);
-            component.getAttributes().setValue("outer", false);
-            component.getAttributes().setValue("inner", true);
+            component.set("v.outer", false);
+            component.set("v.inner", true);
             $A.rerender(component);
             this.whatItIs(component, "Testing rerender, outer is false, inner true:", false, true);
         }

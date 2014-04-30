@@ -29,7 +29,7 @@
                 }
                 //var output =  cmp.find("outputValue").get("v.value");
                 var output =  cmp.find("outputValue").get("v.value");
-                cmp.find("outputValue").getAttributes().setValue("value", output + retValue);
+                cmp.find("outputValue").set("v.value", output + retValue);
         });
         return a;
     }

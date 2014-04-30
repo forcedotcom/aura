@@ -1,13 +1,13 @@
 ({
     changeBkgColor:function(cmp){
         if(cmp.get("v.color") === "white"){
-            cmp.getAttributes().setValue("color", "grey");
+            cmp.set("v.color", "grey");
         }else{
-            cmp.getAttributes().setValue("color", "white");
+            cmp.set("v.color", "white");
         }
     },
     by2:function(cmp){
-        cmp.getAttributes().setValue("end", 10)
+        cmp.set("v.end", 10)
     },
     simpleServerAction:function(cmp){
 	cmp._simpleServerActionComplete = false;

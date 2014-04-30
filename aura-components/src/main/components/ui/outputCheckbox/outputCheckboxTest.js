@@ -46,7 +46,7 @@
             aura.test.assertTrue($A.util.hasClass(expectedElem, "uiOutputCheckbox"), "missing class: uiOutputCheckbox");
             aura.test.assertUndefinedOrNull(component.find("img1"), "img1 shouldn't be rendered");
 
-            component.getAttributes().setValue("value",true);
+            component.set("v.value",true);
             $A.renderingService.rerender(component);
 
             expectedElem = component.find("img1").getElement();
@@ -73,7 +73,7 @@
             aura.test.assertTrue($A.util.hasClass(expectedElem, "uiOutputCheckbox"), "missing class: uiOutputCheckbox");
             aura.test.assertUndefinedOrNull(component.find("img2"), "img2 shouldn't be rendered");
 
-            component.getAttributes().setValue("value",false);
+            component.set("v.value",false);
             $A.renderingService.rerender(component);
 
             expectedElem = component.find("img2").getElement();

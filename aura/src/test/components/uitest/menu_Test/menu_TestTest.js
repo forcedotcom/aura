@@ -43,7 +43,7 @@
 	        	$A.test.assertTrue($A.util.hasClass(actionMenu.getElement(),"visible"), "Class name should be uiMenuList visible");
 	        	
 	        	//disable ActionItem1
-	        	cmp.find("actionItem1").getAttributes().setValue("disabled", true);
+	        	cmp.find("actionItem1").set("v.disabled", true);
 	        	var disableAttrValue = cmp.find("actionItem1").get("v.disabled");
 	            $A.test.assertTrue(disableAttrValue,"Menu item 1 should not be clickable");
 	            

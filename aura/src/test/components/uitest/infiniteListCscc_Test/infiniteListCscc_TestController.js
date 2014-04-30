@@ -15,12 +15,12 @@
  */
 ({
 	showMore: function(component) {
-		component.getAttributes().setValue("isDoneRendering", false);
+		component.set("v.isDoneRendering", false);
         var list = component.find("list");
         list.get("e.showMore").fire();
 	},
 
 	handleRerenderComplete: function(component) {
-		component.getAttributes().setValue("isDoneRendering", true);
+		component.set("v.isDoneRendering", true);
 	}
 })

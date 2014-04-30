@@ -149,8 +149,8 @@
             var imgElement = cmp.getElement();
             $A.test.assertTrue($A.test.isInstanceOfImageElement(imgElement))
             $A.test.assertEquals("",imgElement.alt, "Expected a empty alt text for all image tags.");
-            cmp.getAttributes().setValue("alt",'Help Accessibility');
-            cmp.getAttributes().setValue("src",'http://www.google.com/intl/en_com/images/srpr/logo3w.png');
+            cmp.set("v.alt",'Help Accessibility');
+            cmp.set("v.src",'http://www.google.com/intl/en_com/images/srpr/logo3w.png');
             $A.renderingService.rerender(cmp);
 
             imgElement = cmp.getElement();

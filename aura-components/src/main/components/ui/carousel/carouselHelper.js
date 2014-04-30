@@ -663,7 +663,7 @@
 	 * Spinner controls
 	 */
 	showLoadingIndicator: function (cmp) {
-		var spinner = cmp.getAttributes().get("spinner")[0];
+		var spinner = cmp.get("v.spinner")[0];
 		if (!$A.util.isUndefinedOrNull(spinner)) {
 			var evt = spinner.getEvent("toggle");
 			if (!$A.util.isUndefinedOrNull(evt)) {
@@ -674,7 +674,7 @@
     },
 
     hideLoadingIndicator: function (cmp) {
-    	var spinner = cmp.getAttributes().get("spinner")[0];
+    	var spinner = cmp.get("v.spinner")[0];
 		if (!$A.util.isUndefinedOrNull(spinner)) {
 			var evt = spinner.getEvent("toggle");
 			if (!$A.util.isUndefinedOrNull(evt)) {

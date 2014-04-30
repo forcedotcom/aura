@@ -22,10 +22,10 @@
             },
         	{
                 componentDef: {
-                    descriptor: cmp.getAttributes().get("descriptor")
+                    descriptor: cmp.get("v.descriptor")
                 },
                 attributes: {
-                    values: { value : cmp.getAttributes().get("value") }
+                    values: { value : cmp.get("v.value") }
                 }
             }, null, null, null
         );

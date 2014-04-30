@@ -28,7 +28,7 @@
         if (!format) {
             format = $A.get("$Locale.dateformat");
         }
-        component.setValue("v.placeholder", format);
+        component.set("v.placeholder", format);
     },
 
     openDatePicker: function(component, event, helper) {
@@ -41,7 +41,7 @@
         var dateValue = event.getParam("value");
         if (dateValue) {
             var concreteCmp = component.getConcreteComponent();
-            component.setValue("v.value", dateValue);
+            component.set("v.value", dateValue);
         }
     }
 })

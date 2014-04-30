@@ -5,7 +5,7 @@
         for (var i = 0; i < body.getLength(); i++) {
             var c = body.getValue(i);
             if (c.getDef().getAttributeDefs().getDef("parent")) {
-                c.setValue("v.parent", [component]);
+                c.set("v.parent", [component]);
             }
         }
     }

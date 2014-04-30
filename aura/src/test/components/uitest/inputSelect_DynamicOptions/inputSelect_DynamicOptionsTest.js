@@ -40,7 +40,7 @@
 		test : function(cmp) {
 			var inputSelectCmp = cmp.find("dynamicSelect");
 			
-			inputSelectCmp.setValue("v.value", "Option4");
+			inputSelectCmp.set("v.value", "Option4");
 			
 			var optionCmps = inputSelectCmp.find("options");
 			this.verifySelectedOption(optionCmps, "Option4", this.optionComponentSelected);
@@ -51,7 +51,7 @@
 		test : function(cmp) {
 			var inputSelectCmp = cmp.find("dynamicSelect");
 			
-			inputSelectCmp.setValue("v.value", "Option4");
+			inputSelectCmp.set("v.value", "Option4");
 			
 			var optionCmps = inputSelectCmp.find("options");
 			this.verifySelectedOption(optionCmps, "Option4", this.optionDOMSelected);

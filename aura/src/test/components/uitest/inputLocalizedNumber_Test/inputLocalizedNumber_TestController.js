@@ -29,7 +29,7 @@
             } else {
                 retValue = action.getError().message;
             }
-            component.find("outputValue").getAttributes().setValue("value", retValue);
+            component.find("outputValue").set("v.value", retValue);
         });
 
         $A.enqueueAction(a);

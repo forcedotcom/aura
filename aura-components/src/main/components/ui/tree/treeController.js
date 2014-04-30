@@ -44,7 +44,7 @@
         
         // Unset the old active node if we had one.
         if (cmp._activeNode) {
-            cmp._activeNode.getAttributes().setValue("active", false);
+            cmp._activeNode.set("v.active", false);
         }
         
         cmp._activeNode = activeNode;

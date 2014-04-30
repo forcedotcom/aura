@@ -37,10 +37,10 @@
 			var selectedOption = this.getSelectedOption(optionCmps);
 			$A.test.assertFalse($A.util.isUndefinedOrNull(selectedOption),
 				"Expected option to be selected");
-			selectedOption.getAttributes().setValue("value", false);
+			selectedOption.set("v.value", false);
 			
 			// select 1st option
-			optionCmps[0].getAttributes().setValue("value", true);
+			optionCmps[0].set("v.value", true);
 			
 			// fire change event;
 			inputSelectCmp.get("e.change").fire();

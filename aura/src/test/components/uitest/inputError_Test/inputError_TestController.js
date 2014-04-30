@@ -23,7 +23,7 @@
         a.setCallback(component, function(action){
         	if (action.getState() === "SUCCESS") {
         		var retValue = action.getReturnValue();
-	        	component.find("outputStatus").getAttributes().setValue("value", "EXPECTED ERROR but got: " + retValue);
+	        	component.find("outputStatus").set("v.value", "EXPECTED ERROR but got: " + retValue);
 	        } else {
 	        	var errors = action.getError();
 	        	var inputCmp = component.find("inputCmp");
@@ -32,7 +32,7 @@
 	        	value.setValid(false);
                 value.addErrors(errors);
                 
-                component.find("outputStatus").getAttributes().setValue("value", "Got Error");
+                component.find("outputStatus").set("v.value", "Got Error");
 	        }
         });
         
@@ -43,25 +43,25 @@
 		var value = component.find("inputCmp").getValue("v.value");
 		value.setValid(false);
 		value.addErrors([{message:"Error Happens!"}]);
-		component.find("outputStatus").getAttributes().setValue("value", "Got Error");
+		component.find("outputStatus").set("v.value", "Got Error");
 	},
 	
 	clearErrorNoEventFire : function(component) {
 		var value = component.find("inputCmp").getValue("v.value");
 	    value.setValid(true);
-	   	component.find("outputStatus").getAttributes().setValue("value", "Cleared error");
+	   	component.find("outputStatus").set("v.value", "Cleared error");
 	},
 	
 	doErrorNoErrorMsg : function(component) {
 		var value = component.find("inputCmp").getValue("v.value");
 		value.setValid(false);
-		component.find("outputStatus").getAttributes().setValue("value", "Got Error");
+		component.find("outputStatus").set("v.value", "Got Error");
 	},
 	
 	clearErrorNullErrorMsg : function(component) {
 		var value = component.find("inputCmp").getValue("v.value");
 	    value.setValid(true);
 	    value.addErrors(null);
-	   	component.find("outputStatus").getAttributes().setValue("value", "Cleared error");
+	   	component.find("outputStatus").set("v.value", "Cleared error");
 	}
 })

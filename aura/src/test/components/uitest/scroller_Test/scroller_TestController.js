@@ -42,6 +42,6 @@
     
     handleScrollToBottomUpdate : function (cmp) {
     	var count = cmp.get("v.scrollToBottomCount") + 1;
-    	cmp.getAttributes().setValue("scrollToBottomCount", count);
+    	cmp.set("v.scrollToBottomCount", count);
     }
 })

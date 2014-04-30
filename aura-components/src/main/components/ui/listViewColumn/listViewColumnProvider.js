@@ -15,7 +15,7 @@
  */
 ({
     provide:function(component) {
-        var type=component.getAttributes().get("type")||'';
+        var type=component.get("v.type")||'';
         var typeMap=getTypeMap();
         var typeDescriptor=(type.indexOf(':')>-1)?type:typeMap[type];
         if(typeDescriptor!=null)return typeDescriptor;

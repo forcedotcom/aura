@@ -20,7 +20,7 @@
         var outer = label[0] === "T";
         var inner = label[1] === "T";
 
-        cmp.setValue("v.outer", outer);
-        cmp.setValue("v.inner", inner);
+        cmp.set("v.outer", outer);
+        cmp.set("v.inner", inner);
     }
 });

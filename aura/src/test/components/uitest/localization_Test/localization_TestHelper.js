@@ -21,7 +21,7 @@
         if (!submitCount) {
             submitCount = 0
         }
-        component.find("outSubmitCount").getAttributes().setValue("value", ++submitCount);
+        component.find("outSubmitCount").set("v.value", ++submitCount);
         submitCountCmp.setValue(submitCount);
     },
 
@@ -38,7 +38,7 @@
                 $A.log("Success!\nValue from server:");
                 var retValue = action.getReturnValue();
                 $A.log(retValue);
-                component.find("out" + cmpName).getAttributes().setValue("value", retValue);
+                component.find("out" + cmpName).set("v.value", retValue);
 
                 var value = component.find("in" + cmpName).getValue("v.value");
                 value.setValid(true);

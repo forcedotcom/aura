@@ -15,7 +15,7 @@
  */
 ({
     render : function(cmp){
-        return cmp.getAttributes().get("value");
+        return cmp.get("v.value");
     },
 
     rerender : function(cmp){

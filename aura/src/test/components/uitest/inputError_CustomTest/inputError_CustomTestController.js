@@ -35,7 +35,7 @@
                 }
             });
 
-            inputCmp.setValue("v.errorComponent", errorCmp);
+            inputCmp.set("v.errorComponent", errorCmp);
             $A.rerender(inputCmp);
 
             // test infrastructure expects error css set
@@ -45,7 +45,7 @@
             valueProvider.addClass("inputError");
             */
             component.set("v.errorMessage", errMsgs.join(";"));
-            component.find("outputStatus").getAttributes().setValue("value", "Got Error");
+            component.find("outputStatus").set("v.value", "Got Error");
         }
     },
 
@@ -53,7 +53,7 @@
         var inputCmp = component.find("inputCmp");
         // uncomment after bug: W-1412621
         /*
-        inputCmp.setValue("v.errorComponent", "");
+        inputCmp.set("v.errorComponent", "");
 
         // test infrastructure expects error css cleared
         var element = inputCmp.getElement();
@@ -64,7 +64,7 @@
         $A.rerender(inputCmp);
         */
         component.set("v.errorMessage", "");
-        component.find("outputStatus").getAttributes().setValue("value", "Cleared error");
+        component.find("outputStatus").set("v.value", "Cleared error");
     },
 
     doServerErrorFireOnErrorEvent : function(component, event) {
@@ -76,7 +76,7 @@
         a.setCallback(component, function(action){
         	if (action.getState() === "SUCCESS") {
         		var retValue = action.getReturnValue();
-	        	component.find("outputStatus").getAttributes().setValue("value", "EXPECTED ERROR but got: " + retValue);
+	        	component.find("outputStatus").set("v.value", "EXPECTED ERROR but got: " + retValue);
 	        } else {
 	        	var errors = action.getError();
 	        	var inputCmp = component.find("inputCmp");

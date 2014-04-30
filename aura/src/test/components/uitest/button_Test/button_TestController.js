@@ -15,23 +15,23 @@
  */
 ({
     handleIconAndLabel : function(cmp, event){
-        cmp.getAttributes().setValue("iconAndLabelButtonPressedMessage", "Icon and label button was pressed!!!");
+        cmp.set("v.iconAndLabelButtonPressedMessage", "Icon and label button was pressed!!!");
     },
 
     handleLabelOnly : function(cmp, event){
-        cmp.getAttributes().setValue("labelOnlyButtonPressedMessage", "Label only button was pressed!!!");
+        cmp.set("v.labelOnlyButtonPressedMessage", "Label only button was pressed!!!");
     },
 
     handleIconOnly : function(cmp, event){
-        cmp.getAttributes().setValue("iconOnlyButtonPressedMessage", "Icon only button was pressed!!!");
+        cmp.set("v.iconOnlyButtonPressedMessage", "Icon only button was pressed!!!");
     },
     
     checkDomEventSet : function(cmp, event){
     	var domEvent = event.getParam("domEvent");
     	if ($A.util.isUndefinedOrNull(domEvent)) {
-    		cmp.getAttributes().setValue("isDomEventSet", false);
+    		cmp.set("v.isDomEventSet", false);
     	} else {
-    		cmp.getAttributes().setValue("isDomEventSet", true);
+    		cmp.set("v.isDomEventSet", true);
     	}
     }
 })

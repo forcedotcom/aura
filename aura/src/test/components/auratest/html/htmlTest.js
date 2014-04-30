@@ -161,9 +161,9 @@
             $A.test.assertTrue($A.test.contains(a.getAttribute("href"), "http://bazinga.com/"), 
                 "Failed to render href attribute for 'http://bazinga.com'");
 
-            component.getAttributes().setValue("style", "color:green");
-            component.getAttributes().setValue("dataName", "inputElement");
-            component.getAttributes().setValue("href", "http://bbt.com/");
+            component.set("v.style", "color:green");
+            component.set("v.dataName", "inputElement");
+            component.set("v.href", "http://bbt.com/");
 
             $A.rerender(component);
             input = component.find("specialAttributes_input").getElement();
@@ -193,7 +193,7 @@
         test:function(component){
             var input = component.find("specialAttributes_input").getElement();
             $A.test.assertEquals("text" , input.getAttribute("type"), "Failed to render type attribute");
-            component.getAttributes().setValue("type", "input");
+            component.set("v.type", "input");
             $A.rerender(component);
             input = component.find("specialAttributes_input").getElement();
             $A.test.assertEquals("input" , input.getAttribute("type"), "Failed to rerender type attribute");

@@ -18,7 +18,7 @@
         var a = $A.expressionService.get(cmp, "c.getString");
         a.setCallback(cmp, function(action) {
             var actionReturnValue = action.getReturnValue();
-            cmp.getAttributes().setValue("label", actionReturnValue);
+            cmp.set("v.label", actionReturnValue);
         });
         $A.enqueueAction(a);
     }

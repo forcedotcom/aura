@@ -40,14 +40,14 @@
 
 	testCaseSensitivity : {
 		test : function(cmp) {
-			$A.test.assertEquals("Aura", cmp.getAttributes().get("strATTRIBUTEWithDefaultValue"));
-			$A.test.assertFalsy(cmp.getAttributes().get("strATTRIBUTEWithNODefaultValue"));
+			$A.test.assertEquals("Aura", cmp.get("v.strATTRIBUTEWithDefaultValue"));
+			$A.test.assertFalsy(cmp.get("v.strATTRIBUTEWithNODefaultValue"));
 		}
 	},
 
 	testDefaultValueOfNonExistingAttribute : {
 		test : function(cmp) {
-			$A.test.assertFalsy(cmp.getAttributes().get("fooBar"),
+			$A.test.assertFalsy(cmp.get("v.fooBar"),
 					"Should not be able to read non existing attributes.");
 			try {
 				$A.test.assertFalsy(cmp.getAttributes().getValue(undefined));
@@ -127,20 +127,20 @@
 	},
 
 	verifyDefaultValuesOfBasicDataType : function(testCmp) {
-		$A.test.assertEquals("Aura", testCmp.getAttributes().get("strAttributeWithDefaultValue"),
+		$A.test.assertEquals("Aura", testCmp.get("v.strAttributeWithDefaultValue"),
 				"Failed to see default value of String attribute.");
 		// The other way of accessing a attribute value.
 		$A.test.assertEquals("Aura", testCmp.get("v.strAttributeWithDefaultValue"));
-		$A.test.assertFalsy(testCmp.getAttributes().get("strAttributeWithNoDefaultValue"),
+		$A.test.assertFalsy(testCmp.get("v.strAttributeWithNoDefaultValue"),
 				"Attributes without default value should have undefined as value");
 	},
 
 	verifyDefaultValuesOfObjectDataType : function(testCmp) {
-		$A.test.assertEquals("['red','green','blue']", testCmp.getAttributes().get("objAttributeWithDefaultValue"),
+		$A.test.assertEquals("['red','green','blue']", testCmp.get("v.objAttributeWithDefaultValue"),
 				"Failed to see default value of object attribute.");
 		$A.test.assertEquals("['red','green','blue']", testCmp.getAttributes().getValue("objAttributeWithDefaultValue")
 				.getValue());
-		$A.test.assertFalsy(testCmp.getAttributes().get("objAttributeWithNoDefaultValue"),
+		$A.test.assertFalsy(testCmp.get("v.objAttributeWithNoDefaultValue"),
 				"Attributes without default value should have undefined as value");
 	},
 
@@ -157,7 +157,7 @@
         $A.test.assertTrue(a.isUnset());
         $A.test.assertTrue(a.toString() === "ArrayValue");
         $A.test.assertEquals(0, a.getLength());
-        a = testCmp.getAttributes().get("listAttributeWithNoDefaultValue");
+        a = testCmp.get("v.listAttributeWithNoDefaultValue");
         $A.test.assertTrue($A.util.isArray(a));
 		$A.test.assertEquals(0, a.length, "Array type attributes without default value should have empty as value");
 
@@ -177,20 +177,20 @@
 	},
 
 	verifyChangingAttributeValues : function(testCmp) {
-		testCmp.getAttributes().setValue("strAttributeWithDefaultValue", "nemuL");
+		testCmp.set("v.strAttributeWithDefaultValue", "nemuL");
 		$A.test.assertEquals("nemuL", testCmp.get("v.strAttributeWithDefaultValue"),
 				"Failed to change value of attribute.");
 
-		testCmp.getAttributes().setValue("strAttributeWithNoDefaultValue", "Saturday Night Live");
+		testCmp.set("v.strAttributeWithNoDefaultValue", "Saturday Night Live");
 		$A.test.assertEquals("Saturday Night Live", testCmp.getAttributes().getValue("strAttributeWithNoDefaultValue")
 				.getValue(), "Failed to change value of attribute.");
 
-		testCmp.getAttributes().setValue("objAttributeWithDefaultValue", "['white','black']")
-		$A.test.assertEquals("['white','black']", testCmp.getAttributes().get("objAttributeWithDefaultValue"),
+		testCmp.set("v.objAttributeWithDefaultValue", "['white','black']")
+		$A.test.assertEquals("['white','black']", testCmp.get("v.objAttributeWithDefaultValue"),
 				"Failed to change value of attribute.");
 
-		testCmp.getAttributes().setValue("fooBar", "Jacked")
-		$A.test.assertFalsy(testCmp.getAttributes().get("fooBar"),
+		testCmp.set("v.fooBar", "Jacked")
+		$A.test.assertFalsy(testCmp.get("v.fooBar"),
 				"Should not be able to create and set values for unidentified attributes.");
 	}
 })

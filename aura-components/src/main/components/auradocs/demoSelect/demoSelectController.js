@@ -21,18 +21,18 @@
             { "class": "optionClass", label: "Option3", value: "opt3" }
 
         ];
-        cmp.find("InputSelectDynamic").setValue("v.options", opts);
+        cmp.find("InputSelectDynamic").set("v.options", opts);
     },
 
 	onSingleSelectChange: function(cmp, evt) {
 	         var selectCmp = cmp.find("InputSelectSingle"),
 	             resultCmp = cmp.find("singleResult");
-	         resultCmp.setValue("v.value", selectCmp.get("v.value"));
+	         resultCmp.set("v.value", selectCmp.get("v.value"));
 	 },
 
 	 onMultiSelectChange: function(cmp, evt) {
 	         var selectCmp = cmp.find("InputSelectMultiple"),
 	         resultCmp = cmp.find("multiResult");
-	         resultCmp.setValue("v.value", selectCmp.get("v.value"));
+	         resultCmp.set("v.value", selectCmp.get("v.value"));
 	 }
 })

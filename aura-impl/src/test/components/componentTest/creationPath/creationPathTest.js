@@ -31,9 +31,9 @@
     },
     
     addComponent : function(root, cmp, descriptor, value) {
-        var count = cmp.getAttributes().get("output").length;
-        root.getAttributes().getValue("descriptor").setValue(descriptor);
-        root.getAttributes().getValue("value").setValue(value);
+        var count = cmp.get("v.output").length;
+        root.set("v.descriptor", descriptor);
+        root.set("v.value", value);
         cmp.find("trigger").get("e.press").fire();
         $A.test.addWaitForWithFailureMessage(
                 count + 1,
@@ -127,7 +127,7 @@
     testIfChangedToTrue : {
         attributes : { iftrue : false },
         test : [ function(cmp) {
-            $A.run(function(){cmp.getAttributes().getValue("iftrue").setValue(true)});
+            $A.run(function(){cmp.set("v.iftrue", true)});
             $A.test.addWaitForWithFailureMessage(false, function(){return $A.util.isUndefined(cmp.find("truebody"))}, "'true' components not instantiated");
         }, function(cmp) {
             this.assertCreationPath(cmp.find("truebody"), "client created");
@@ -138,7 +138,7 @@
     testIfChangedToFalse : {
         attributes : { iftrue : true },
         test : [ function(cmp) {
-            $A.run(function(){cmp.getAttributes().getValue("iftrue").setValue(false)});
+            $A.run(function(){cmp.set("v.iftrue", false)});
             $A.test.addWaitForWithFailureMessage(false, function(){return $A.util.isUndefined(cmp.find("falsebody"))}, "'false' components not instantiated");
         }, function(cmp) {
             this.assertCreationPath(cmp.find("truebody"), "/*[0]/$/*[2]/+[0]");
@@ -169,7 +169,7 @@
     testChangeIterationSize : {
         attributes : { list : "x,x,x" },
         test : [ function(cmp) {
-            $A.run(function(){cmp.find("iteration").getAttributes().getValue("start").setValue(1)});
+            $A.run(function(){cmp.find("iteration").set("v.start", 1)});
             $A.test.addWaitForWithFailureMessage(2, function(){return cmp.find("iterinst").length}, "number of iterations not reduced");
         }, function(cmp) {
             // client created

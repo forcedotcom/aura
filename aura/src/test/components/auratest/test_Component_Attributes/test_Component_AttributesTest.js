@@ -48,7 +48,7 @@
              * This test verifies that all 3 ways can change the values.
              */
             component.setValue('{!v.label}' , 'newLabel');
-            var labelValueThroughComponentApi = component.getValue('{!v.label}').getValue();
+            var labelValueThroughComponentApi = component.get("v.label");
             var labelValueByExpression = $A.expressionService.getValue(component, "{!v.label}").getValue();
             var labelValueThruComponent = component.get('v.label');
 
@@ -58,7 +58,7 @@
             aura.test.assertEquals(labelValueThruComponent,labelValueByExpression);
 
             $A.expressionService.setValue(component, "{!v.label}" , 'AttributeDefault');
-            var labelValueThroughComponentApi = component.getValue('{!v.label}').getValue();
+            var labelValueThroughComponentApi = component.get("v.label");
             var labelValueByExpression = $A.expressionService.getValue(component, "{!v.label}").getValue();
             var labelValueThruComponent = component.get('v.label');
 
@@ -68,7 +68,7 @@
             aura.test.assertEquals(labelValueThruComponent,labelValueByExpression);
 
             component.getAttributes().setValue('label','newLabel');
-            var labelValueThroughComponentApi = component.getValue('{!v.label}').getValue();
+            var labelValueThroughComponentApi = component.get("v.label");
             var labelValueByExpression = $A.expressionService.getValue(component, "{!v.label}").getValue();
             var labelValueThruComponent = component.get('v.label');
 

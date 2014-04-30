@@ -17,19 +17,19 @@
 	inspectKeyEvent: function(cmp,event) {
 		var keyCodeValue =  event.getParam("keyCode");
 		$A.log("keyboard Event Fired");
-		cmp.find("outputValue").getAttributes().setValue("value", keyCodeValue);
+		cmp.find("outputValue").set("v.value", keyCodeValue);
     },
     inspectMouseEvent: function(cmp,event) {
     	var buttonValue =  event.getParam("button");
 		$A.log("Mouse Event Fired");
-        cmp.find("outputValue").getAttributes().setValue("value", buttonValue);
+        cmp.find("outputValue").set("v.value", buttonValue);
     },
     checkDomEventSet: function(cmp,event) {
     	var domEvent = event.getParam("domEvent");
     	if ($A.util.isUndefinedOrNull(domEvent)) {
-    		cmp.getAttributes().setValue("isDomEventSet", false);
+    		cmp.set("v.isDomEventSet", false);
     	} else {
-    		cmp.getAttributes().setValue("isDomEventSet", true);
+    		cmp.set("v.isDomEventSet", true);
     	}
     }
 })

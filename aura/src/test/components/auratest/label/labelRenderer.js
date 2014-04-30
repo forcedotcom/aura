@@ -15,8 +15,8 @@
  */
 ({
     render : function(cmp, helper){
-        cmp.getAttributes().setValue("noll", null);
-        cmp.getAttributes().setValue("undef", undefined);
+        cmp.set("v.noll", null);
+        cmp.set("v.undef", undefined);
         return this.superRender();
     }
 })

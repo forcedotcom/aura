@@ -103,14 +103,14 @@
         test : [ function(cmp) {
                 var a = $A.test.getAction(cmp, "c.errorInForeground", null,
                       function(action) {
-                          cmp.getAttributes().setValue("errorMessage", action.error[0].message);
+                          cmp.set("v.errorMessage", action.error[0].message);
                       });
                 $A.clientService.runActions([ a ], cmp);
                 $A.test.addWaitFor(true, function() {
-                        return cmp.getAttributes().get("errorMessage") !== undefined;
+                        return cmp.get("v.errorMessage") !== undefined;
                     });
             }, function(cmp) {
-                 var message = cmp.getAttributes().get("errorMessage");
+                 var message = cmp.get("v.errorMessage");
                  $A.test.assertTrue(message != undefined, "No error message from server at all");
                  $A.test.assertTrue(message.indexOf("ArrayIndexOutOfBoundsException: 42") > 0,
                      "Wrong message received from server: " + message);

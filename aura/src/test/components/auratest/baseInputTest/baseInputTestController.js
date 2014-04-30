@@ -42,7 +42,7 @@
 		        	value.setValid(false);
 		        	value.addErrors(action.getError());
 		        }
-		        component.find("outputValue").getAttributes().setValue("value", retValue);
+		        component.find("outputValue").set("v.value", retValue);
 	        });
         } catch(e) {
         	$A.test.fail("Test fail! Unexpected error: " + e.message);       

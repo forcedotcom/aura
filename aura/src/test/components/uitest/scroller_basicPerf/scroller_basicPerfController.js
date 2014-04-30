@@ -21,7 +21,7 @@
     	for(var i=0; i<500; i++){
     		collection.push({text: "Pretty row " + (i+1)});
     	}
-		component.setValue("v.rows", collection);
+		component.set("v.rows", collection);
     },
     
     handleClick: function(component, event, helper){

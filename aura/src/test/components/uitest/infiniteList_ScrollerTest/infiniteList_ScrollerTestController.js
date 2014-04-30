@@ -20,7 +20,7 @@
                     this,
                     function (newcmp) {
                         array.push(newcmp);
-                        component.setValue("v.extendedPullAtrib",array);
+                        component.set("v.extendedPullAtrib",array);
                     },
                     {
                         "componentDef": {

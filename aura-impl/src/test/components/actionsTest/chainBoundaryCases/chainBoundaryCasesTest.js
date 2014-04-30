@@ -137,7 +137,7 @@
                         cmp.getAttributes().setValue('responseOrder', "1");
                 });
             this.enqueueServerActionAndFireEvent(cmp, add);
-            $A.test.addWaitFor("2", function(){return cmp.getAttributes().get('responseOrder');});
+            $A.test.addWaitFor("2", function(){return cmp.get('v.responseOrder');});
         }
     },
 

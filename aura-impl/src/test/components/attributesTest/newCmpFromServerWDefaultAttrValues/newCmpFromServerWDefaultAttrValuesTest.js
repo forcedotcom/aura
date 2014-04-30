@@ -30,9 +30,9 @@
                 var newCmp = body[0];
                 $A.test.assertEquals("markup://attributesTest:defaultValue", newCmp.getDef().getDescriptor().getQualifiedName(),
                         "Failed to create new component: markup://attributesTest:defaultValue");
-                $A.test.assertEquals("Aura", newCmp.getAttributes().get("strAttributeWithDefaultValue"),
+                $A.test.assertEquals("Aura", newCmp.get("v.strAttributeWithDefaultValue"),
                         "Failed to set default value of simple attributes on client side component");
-                $A.test.assertEquals("['red','green','blue']", newCmp.getAttributes().get("objAttributeWithDefaultValue"));
+                $A.test.assertEquals("['red','green','blue']", newCmp.get("v.objAttributeWithDefaultValue"));
                 var listAttr = newCmp.getAttributes().getValue("listAttributeWithDefaultValue");
                 $A.test.assertTrue(listAttr.toString() === "ArrayValue",
                         "Expected to find attribute of ArrayValue type but found"+listAttr.constructor);
@@ -42,11 +42,11 @@
                 $A.test.assertEquals("true", listAttr.getValue(2).getValue());
 
                 // Verify attributes without a default value
-                $A.test.assertFalsy(newCmp.getAttributes().get("strAttributeWithNoDefaultValue"),
+                $A.test.assertFalsy(newCmp.get("v.strAttributeWithNoDefaultValue"),
                     "Attributes without default value should have undefined as value");
-                $A.test.assertFalsy(newCmp.getAttributes().get("objAttributeWithNoDefaultValue"),
+                $A.test.assertFalsy(newCmp.get("v.objAttributeWithNoDefaultValue"),
                     "Attributes without default value should have undefined as value");
-                var a = newCmp.getAttributes().get("listAttributeWithNoDefaultValue");
+                var a = newCmp.get("v.listAttributeWithNoDefaultValue");
                 $A.test.assertTrue($A.util.isArray(a));
                 $A.test.assertEquals(0, a.length,
                         "Array type attributes without default value should have empty as value");

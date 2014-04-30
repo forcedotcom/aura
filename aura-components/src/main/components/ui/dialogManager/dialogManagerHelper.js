@@ -37,7 +37,7 @@
 
         this.applyHandlers(handlerConfig);
         this.toggleDisplay(true, dialog, autoFocus, isModal, handlerConfig);
-        manager.getAttributes().setValue("_activeDialog", dialog);
+        manager.set("v._activeDialog", dialog);
         atts.setValue("_handlerConfig", handlerConfig);
 
     },
@@ -63,7 +63,7 @@
 
         this.removeHandlers(handlerConfig);
         this.toggleDisplay(false, dialog, autoFocus, isModal, handlerConfig);
-        manager.getAttributes().setValue("_activeDialog", null);
+        manager.set("v._activeDialog", null);
         atts.setValue("_handlerConfig", null);
 
     },

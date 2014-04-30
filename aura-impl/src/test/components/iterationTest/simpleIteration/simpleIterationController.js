@@ -15,6 +15,6 @@
  */
 ({
     theaction: function(cmp, event) {
-        cmp.find('outputText').getAttributes().setValue("value", "action run by " + event.target.className);
+        cmp.find('outputText').set("v.value", "action run by " + event.target.className);
     }
 })

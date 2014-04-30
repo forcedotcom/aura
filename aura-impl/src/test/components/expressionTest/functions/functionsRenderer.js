@@ -15,14 +15,14 @@
  */
 ({
     render : function(cmp, helper){
-        cmp.getAttributes().setValue("integer", 7);
-        cmp.getAttributes().setValue("double", 3.1);
-        cmp.getAttributes().setValue("doubleString", "2.1");
-        cmp.getAttributes().setValue("string", "Component");
-        cmp.getAttributes().setValue("emptyString", "");
-        cmp.getAttributes().setValue("Infinity", Infinity);
-        cmp.getAttributes().setValue("NegativeInfinity", -Infinity);
-        cmp.getAttributes().setValue("NaN", NaN);
+        cmp.set("v.integer", 7);
+        cmp.set("v.double", 3.1);
+        cmp.set("v.doubleString", "2.1");
+        cmp.set("v.string", "Component");
+        cmp.set("v.emptyString", "");
+        cmp.set("v.Infinity", Infinity);
+        cmp.set("v.NegativeInfinity", -Infinity);
+        cmp.set("v.NaN", NaN);
         return this.superRender();
     }
 })

@@ -55,7 +55,7 @@
     testErrorMessagesPeriodHours : {
         attributes : {"is24HourFormat" : false},
         test : function(cmp) {
-            cmp.get("hours").setValue("v.value", 100);
+            cmp.get("hours").set("v.value", 100);
             var evt = {
             "getSource" : function() {
                 return cmp.get("hours")
@@ -71,7 +71,7 @@
     testErrorMessagesPeriodMinutes : {
         attributes : { "is24HourFormat" : false},
         test : function(cmp) {
-            cmp.get("minutes").setValue("v.value", 100);
+            cmp.get("minutes").set("v.value", 100);
             var evt = {
             "getSource" : function() {
                 return cmp.get("minutes")
@@ -89,7 +89,7 @@
     testErrorMessages24hrHours : {
         attributes : {"is24HourFormat" : true},
         test : function(cmp) {
-            cmp.get("hours").setValue("v.value", 25);
+            cmp.get("hours").set("v.value", 25);
             var evt = {
                 "getSource" : function() {
                 return cmp.get("hours")
@@ -105,7 +105,7 @@
     testErrorMessages24hrMinutes : {
         attributes : { "is24HourFormat" : true},
         test : function(cmp) {
-            cmp.get("minutes").setValue("v.value", 60);
+            cmp.get("minutes").set("v.value", 60);
             var evt = {
             "getSource" : function() {
                 return cmp.get("minutes")
@@ -192,7 +192,7 @@
     testInvalidTimeForPeriodOnAfterAlreadyRendered : {
         attributes : {"is24HourFormat" : false},
         test : function(cmp) {
-            cmp.get("hours").setValue("v.value", 14);
+            cmp.get("hours").set("v.value", 14);
             var evt = {
             "getSource" : function() {
                 return cmp.get("hours")
@@ -209,7 +209,7 @@
     testErrorMessages24hrHoursWithSpecialChar : {
         attributes : {"is24HourFormat" : true},
         test : function(cmp) {
-            cmp.get("hours").setValue("v.value", "$25");
+            cmp.get("hours").set("v.value", "$25");
             var evt = {
                 "getSource" : function() {
                 return cmp.get("hours")
@@ -225,7 +225,7 @@
     testErrorMessages24hrHoursWithDecimal : {
         attributes : {"is24HourFormat" : true},
         test : function(cmp) {
-            cmp.get("hours").setValue("v.value", "4.0");
+            cmp.get("hours").set("v.value", "4.0");
             var evt = {
                 "getSource" : function() {
                 return cmp.get("hours")
@@ -241,7 +241,7 @@
     testErrorMessages24hrHoursWithEmptyString : {
         attributes : {"is24HourFormat" : true},
         test : function(cmp) {
-            cmp.get("hours").setValue("v.value", "");
+            cmp.get("hours").set("v.value", "");
             var evt = {
                 "getSource" : function() {
                 return cmp.get("hours")
@@ -257,7 +257,7 @@
     testErrorMessagesMinutesWithSpecialCharWithNum : {
         attributes : { "is24HourFormat" : true},
         test : function(cmp) {
-            cmp.get("minutes").setValue("v.value", "$25");
+            cmp.get("minutes").set("v.value", "$25");
             var evt = {
             "getSource" : function() {
                 return cmp.get("minutes")
@@ -273,7 +273,7 @@
     testErrorMessagesMinutesWithDecimal : {
         attributes : { "is24HourFormat" : true},
         test : function(cmp) {
-            cmp.get("minutes").setValue("v.value", "4.0");
+            cmp.get("minutes").set("v.value", "4.0");
             var evt = {
             "getSource" : function() {
                 return cmp.get("minutes")
@@ -289,7 +289,7 @@
     testErrorMessagesMinutesWithEmptyString : {
         attributes : { "is24HourFormat" : true},
         test : function(cmp) {
-            cmp.get("minutes").setValue("v.value", "");
+            cmp.get("minutes").set("v.value", "");
             var evt = {
             "getSource" : function() {
                 return cmp.get("minutes")
@@ -331,7 +331,7 @@
     testInvalidTimeFor24HourAfterAlreadyRendered : {
         attributes : {"is24HourFormat" : true,"hours" : 48,"minutes" : 61},
         test : function(cmp) {
-            cmp.get("hours").setValue("v.value", 14);
+            cmp.get("hours").set("v.value", 14);
             var evt = {
             "getSource" : function() {
                 return cmp.get("hours")

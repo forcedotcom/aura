@@ -19,7 +19,7 @@
         var element = cmp.find("span").getElement();
         var delimiter = cmp.get("v.delimiter");
 
-        var value = cmp.getAttributes().get("value");
+        var value = cmp.get("v.value");
         if($A.util.isArray(value)){
             value = value.join(delimiter);
         }

@@ -19,7 +19,7 @@
 			globalId = component.getGlobalId();			
         
 		if (!domId) {
-			component.setValue("v.domId", globalId);
+			component.set("v.domId", globalId);
 		}
 	}
 })

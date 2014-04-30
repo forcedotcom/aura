@@ -37,7 +37,7 @@
         cmp.find("trigger").get("e.press").fire();
         $A.test.addWaitForWithFailureMessage(
                 count + 1,
-                function(){return cmp.getAttributes().get("output").length},
+                function(){return cmp.get("v.output").length},
                 "waiting for output length to increment after adding component");
     },
     
@@ -80,7 +80,7 @@
     testDefaultLayoutItem : {
         test : function(cmp) {
             $A.test.assertEquals("fromDefaultLayout", $A.test.getText(cmp.find("layoutTarget").getElement()));
-            this.assertCreationPath(cmp.find("layoutTarget").getAttributes().get("body")[0], "/*[0]");
+            this.assertCreationPath(cmp.find("layoutTarget").get("v.body")[0], "/*[0]");
         }
     },
     
@@ -88,7 +88,7 @@
         attributes : { __layout : "#action" },
         test : function(cmp) {
             $A.test.assertEquals("action:java:0", $A.test.getText(cmp.find("layoutTarget").getElement()));
-            this.assertCreationPath(cmp.find("layoutTarget").getAttributes().get("body")[0], "/*[0]");
+            this.assertCreationPath(cmp.find("layoutTarget").get("v.body")[0], "/*[0]");
         }
     },
     
@@ -100,7 +100,7 @@
             this.waitForLayoutChange(cmp);
         }, function(cmp){
             $A.test.assertEquals("fromDefaultLayout", $A.test.getText(cmp.find("layoutTarget").getElement()));
-            this.assertCreationPath(cmp.find("layoutTarget").getAttributes().get("body")[0], "/*[0]");
+            this.assertCreationPath(cmp.find("layoutTarget").get("v.body")[0], "/*[0]");
         }]
     },
 
@@ -241,7 +241,7 @@
             this.addComponent(cmp, cmp.find("iterinst"), "aura:text", "hi");
         }, function(cmp) {
             $A.test.assertEqualsIgnoreWhitespace("0 - hi", $A.test.getText(cmp.find("iterinst").find("output").getElement()));
-            this.assertCreationPath(cmp.find("iterinst").getAttributes().get("output")[0], "client created");
+            this.assertCreationPath(cmp.find("iterinst").get("v.output")[0], "client created");
         }]
     },
 
@@ -250,12 +250,12 @@
             this.addComponent(cmp, cmp.find("iterinst"), "aura:text", "a");
         }, function(cmp) {
             $A.test.assertEqualsIgnoreWhitespace("0 - a", $A.test.getText(cmp.find("iterinst").find("output").getElement()));
-            this.assertCreationPath(cmp.find("iterinst").getAttributes().get("output")[0], "client created");
+            this.assertCreationPath(cmp.find("iterinst").get("v.output")[0], "client created");
             
             this.addComponent(cmp, cmp.find("iterinst"), "aura:text", "bb");
         }, function(cmp) {
             $A.test.assertEqualsIgnoreWhitespace("0 - abb", $A.test.getText(cmp.find("iterinst").find("output").getElement()));
-            this.assertCreationPath(cmp.find("iterinst").getAttributes().get("output")[1], "client created");
+            this.assertCreationPath(cmp.find("iterinst").get("v.output")[1], "client created");
         }]
     },
 
@@ -264,7 +264,7 @@
             this.addComponent(cmp, cmp.find("iterinst"), "componentTest:hasModel", "bye");
         }, function(cmp) {
             $A.test.assertEqualsIgnoreWhitespace("0 - bye footerdefault", $A.test.getText(cmp.find("iterinst").find("output").getElement()));
-            this.assertCreationPath(cmp.find("iterinst").getAttributes().get("output")[0], "/*[0]");
+            this.assertCreationPath(cmp.find("iterinst").get("v.output")[0], "/*[0]");
         }]
     },
 
@@ -273,12 +273,12 @@
             this.addComponent(cmp, cmp.find("iterinst"), "componentTest:hasModel", "x");
         }, function(cmp) {
             $A.test.assertEqualsIgnoreWhitespace("0 - x footerdefault", $A.test.getText(cmp.find("iterinst").find("output").getElement()));
-            this.assertCreationPath(cmp.find("iterinst").getAttributes().get("output")[0], "/*[0]");
+            this.assertCreationPath(cmp.find("iterinst").get("v.output")[0], "/*[0]");
             
             this.addComponent(cmp, cmp.find("iterinst"), "componentTest:hasModel", "yy");
         }, function(cmp) {
             $A.test.assertEqualsIgnoreWhitespace("0 - x footerdefault yy footerdefault", $A.test.getText(cmp.find("iterinst").find("output").getElement()));
-            this.assertCreationPath(cmp.find("iterinst").getAttributes().get("output")[1], "/*[0]");
+            this.assertCreationPath(cmp.find("iterinst").get("v.output")[1], "/*[0]");
         }]
     }
 })

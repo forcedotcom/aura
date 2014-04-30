@@ -16,18 +16,18 @@
 ({
     render : function(cmp, helper){
         var ret = this.superRender();
-        var expected = eval(cmp.getAttributes().get("expected"));
+        var expected = eval(cmp.get("v.expected"));
         var expectedType = typeof(expected);
         if(expectedType!=="number"){
         	expected = $A.util.json.encode(expected);
         }
-        var actual = cmp.getAttributes().get("expression");
+        var actual = cmp.get("v.expression");
         var actualType = typeof(actual);
         if(actualType!=="number"){
         	actual = $A.util.json.encode(actual);
         }
         if(actual !== expected && (!(actualType==="number" && expectedType==="number" && isNaN(actual) && isNaN(expected)))){
-            return document.createTextNode("{expression:\"" + cmp.getAttributes().get("exprText") + "\", expected:" + expected + ", actual:" + actual + "}\n");
+            return document.createTextNode("{expression:\"" + cmp.get("v.exprText") + "\", expected:" + expected + ", actual:" + actual + "}\n");
         }
         return ret;
     }

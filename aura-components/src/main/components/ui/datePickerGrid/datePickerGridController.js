@@ -33,7 +33,7 @@
     handleBlur: function(component, event, helper) {
         var source = event.getSource();
         if (source) {
-            source.setValue("v.ariaSelected", false);            
+            source.set("v.ariaSelected", false);            
         }
     },
     
@@ -44,7 +44,7 @@
     handleFocus: function(component, event, helper) {
         var source = event.getSource();
         if (source) {
-            source.setValue("v.ariaSelected", true);            
+            source.set("v.ariaSelected", true);            
         }
     },
     
@@ -61,7 +61,7 @@
         var yearChange = event.getParam("yearChange");
         var setFocus = event.getParam("setFocus");
         if (setFocus === false) {
-            component.setValue("v._setFocus", setFocus);
+            component.set("v._setFocus", setFocus);
         }
         helper.changeMonthYear(component, monthChange, yearChange, date);
     }

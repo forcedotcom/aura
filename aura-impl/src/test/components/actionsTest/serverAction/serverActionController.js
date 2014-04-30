@@ -11,7 +11,7 @@
         cErrorInForeground : function(component) {
              var serverAction = component.get("c.errorInForeground");
              serverAction.setCallback(this, function(action) {
-                 component.getAttributes().setValue("errorMessage", action.error[0].message);
+                 component.set("v.errorMessage", action.error[0].message);
              });
 
              $A.enqueueAction(serverAction);

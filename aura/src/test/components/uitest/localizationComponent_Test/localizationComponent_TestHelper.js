@@ -21,7 +21,7 @@
         if (!submitCount) {
             submitCount = 0
         }
-        component.find("outSubmitCount").getAttributes().setValue("value", ++submitCount);
+        component.find("outSubmitCount").set("v.value", ++submitCount);
         submitCountCmp.setValue(submitCount);
     },
 
@@ -39,7 +39,7 @@
                 var outputCmpName = "out" + cmpName;
                 $A.log("Success! Value from server:"+retValue+" typeof(value):"+typeof(retValue));
 
-                component.find(outputCmpName).getAttributes().setValue("value", retValue);
+                component.find(outputCmpName).set("v.value", retValue);
 
             } else {
                 $A.test.fail("Fail: " + action.getError().message);

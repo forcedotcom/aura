@@ -27,7 +27,7 @@
         if (!format) {
             format = $A.get("$Locale.datetimeformat");
         }
-        component.setValue("v.placeholder", format);
+        component.set("v.placeholder", format);
     },
 
     openDatePicker: function(component, event, helper) {
@@ -69,7 +69,7 @@
 
         var timezone = component.get("v.timezone");
         $A.localizationService.WallTimeToUTC(d, timezone, function(utcDate) {
-            component.setValue("v.value", $A.localizationService.toISOString(utcDate));
+            component.set("v.value", $A.localizationService.toISOString(utcDate));
         });
     }
 })

@@ -10,6 +10,6 @@
             }
         }
         var resultCmp = cmp.find("result");
-        resultCmp.setValue("v.value", values.join(","));
+        resultCmp.set("v.value", values.join(","));
     }	
 })

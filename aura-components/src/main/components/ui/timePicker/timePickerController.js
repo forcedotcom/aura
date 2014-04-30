@@ -19,9 +19,9 @@
         var hours = component.get("v.hours");
         if (amPmCmp) {
             if (amPmCmp.get("v.value") == "am") {
-                component.setValue("v.hours", parseInt(hours) - 12);
+                component.set("v.hours", parseInt(hours) - 12);
             } else {
-                component.setValue("v.hours", parseInt(hours) + 12);
+                component.set("v.hours", parseInt(hours) + 12);
             }
         }
     },
@@ -31,11 +31,11 @@
             var hoursCmp = event.getSource();
             if (hoursCmp) {
                 helper.updateHourValue(component, hoursCmp.get("v.value"));
-                component.setValue("v.isValid", true);
+                component.set("v.isValid", true);
                 return;
             }
         }
-        component.setValue("v.isValid", false);
+        component.set("v.isValid", false);
     },
     
     updateMinutes: function(component, event, helper) {
@@ -43,10 +43,10 @@
             var minutesCmp = event.getSource();
             if (minutesCmp) {
                 helper.updateMinuteValue(component, minutesCmp.get("v.value"));
-                component.setValue("v.isValid", true);
+                component.set("v.isValid", true);
                 return;
             }
         }
-        component.setValue("v.isValid", false);
+        component.set("v.isValid", false);
     }
 })

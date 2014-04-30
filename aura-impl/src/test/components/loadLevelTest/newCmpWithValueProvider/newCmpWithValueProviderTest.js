@@ -107,7 +107,7 @@
                     "Failed to create new component: markup://loadLevelTest:displayMap");
                 $A.test.assertEquals("barFoo", mapCmp.get('v.map.propRef'), "Wrong value for v.map.propRef");
                 $A.test.assertEquals("barFoo", mapCmp.get('v.map.map2.propRef'), "Wrong value for v.map.map2.propRef");
-                mapCmp.setValue("v.stringAttribute", "fooBar");
+                mapCmp.set("v.stringAttribute", "fooBar");
                 $A.test.assertEquals("fooBar", mapCmp.get('v.map.propRef'), "Wrong value for v.map.propRef. Should be updated");
                 $A.test.assertEquals("fooBar", mapCmp.get('v.map.map2.propRef'), "Wrong value for v.map.map2.propRef. Should be updated");
 

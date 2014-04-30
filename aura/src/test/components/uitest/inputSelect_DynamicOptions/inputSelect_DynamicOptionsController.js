@@ -20,6 +20,6 @@
 		            { "label": "Option3", "value": "Option3", "class": "option" },
 		            { "label": "Option4", "value": "Option4", "class": "option" }];
 		
-		cmp.find("dynamicSelect").setValue("v.options", opts);
+		cmp.find("dynamicSelect").set("v.options", opts);
 	}
 })

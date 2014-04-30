@@ -16,7 +16,7 @@
 ({
     replaceBodyContent : function(component, event){
         //Update the content
-        var value = component.find("content").setValue("v.value", "new content");
+        var value = component.find("content").set("v.value", "new content");
         var scroller = component.find("pullToRefresh");
         
         //Call the refresh action on ui:scroller

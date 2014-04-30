@@ -21,7 +21,7 @@
         attributes : {value: ""},
         test: function(component){
             aura.test.assertEquals("", $A.test.getText(component.getElement()), "value not expected");
-//            component.getAttributes().setValue("value", "newness");
+//            component.set("v.value", "newness");
 //            $A.renderingService.rerender(component);
 //            aura.test.assertEquals("newness", $A.test.getText(component.getElement()), "value not expected");
         }
@@ -34,7 +34,7 @@
         attributes : {value: "easy peasy"},
         test: function(component){
             aura.test.assertEquals("easy peasy", $A.test.getText(component.getElement()), "value not expected");
-//            component.getAttributes().setValue("value", "");
+//            component.set("v.value", "");
 //            $A.renderingService.rerender(component);
 //            aura.test.assertEquals("", $A.test.getText(component.getElement()), "value not expected");
         }

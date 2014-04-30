@@ -21,7 +21,7 @@
         if (visible === true) {
             if (component.get("v._yearListInitialized") === false) {
                 helper.refreshYearSelection(component);
-                component.setValue("v._yearListInitialized", true);
+                component.set("v._yearListInitialized", true);
             }
 
             helper.setGridInitialValue(component);
@@ -45,7 +45,7 @@
         if (visible === true) {
             if (component.get("v._yearListInitialized") === false) {
                 helper.refreshYearSelection(component);
-                component.setValue("v._yearListInitialized", true);
+                component.set("v._yearListInitialized", true);
             }
 
             helper.setGridInitialValue(component);

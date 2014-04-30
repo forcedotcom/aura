@@ -16,17 +16,17 @@
 ({
     testAttributeValuesAtClientSideAreOfDeclaredDataType:{
         test:function(cmp){
-            aura.test.assertEquals('number', typeof cmp.getAttributes().get('intName'), "Integer type attribute should be provided as a number");
-            aura.test.assertEquals('number',  typeof cmp.getAttributes().get('longName'), "Long type attribute should be provided as a number");
-            aura.test.assertEquals('number', typeof cmp.getAttributes().get('doubleName'), "Double type attribute should be provided as a number");
-            aura.test.assertEquals('number', typeof cmp.getAttributes().get('decimalName'), "Decimal type attribute should be provided as a number");
-            aura.test.assertEquals('boolean', typeof cmp.getAttributes().get('boolName'), "Boolean attribute should be provided as a boolean");
-            aura.test.assertEquals('string', typeof cmp.getAttributes().get('stringName'), "String type attribute should be provided as a string");
-            aura.test.assertEquals('string', typeof cmp.getAttributes().get('objectName'), "Object type attribute assigned a string value should be provided as a string");
-            aura.test.assertEquals('object', typeof cmp.getAttributes().get('mapName'), "Map type attribute should be provided as a object");
-            aura.test.assertEquals('object', typeof cmp.getAttributes().get('listName'), "List type attribute should be provided as a object");
-            aura.test.assertEquals('object', typeof cmp.getAttributes().get('setName'), "Set type attribute should be provided as a object");
-            var cmpAttribute = cmp.getAttributes().get('componentArrayName');
+            aura.test.assertEquals('number', typeof cmp.get('v.intName'), "Integer type attribute should be provided as a number");
+            aura.test.assertEquals('number',  typeof cmp.get('v.longName'), "Long type attribute should be provided as a number");
+            aura.test.assertEquals('number', typeof cmp.get('v.doubleName'), "Double type attribute should be provided as a number");
+            aura.test.assertEquals('number', typeof cmp.get('v.decimalName'), "Decimal type attribute should be provided as a number");
+            aura.test.assertEquals('boolean', typeof cmp.get('v.boolName'), "Boolean attribute should be provided as a boolean");
+            aura.test.assertEquals('string', typeof cmp.get('v.stringName'), "String type attribute should be provided as a string");
+            aura.test.assertEquals('string', typeof cmp.get('v.objectName'), "Object type attribute assigned a string value should be provided as a string");
+            aura.test.assertEquals('object', typeof cmp.get('v.mapName'), "Map type attribute should be provided as a object");
+            aura.test.assertEquals('object', typeof cmp.get('v.listName'), "List type attribute should be provided as a object");
+            aura.test.assertEquals('object', typeof cmp.get('v.setName'), "Set type attribute should be provided as a object");
+            var cmpAttribute = cmp.get('v.componentArrayName');
             aura.test.assertEquals('object', typeof cmpAttribute, "Aura Component array type attribute should be provided as a object");
             aura.test.assertEquals(1, cmpAttribute.length)
             aura.test.assertEquals('Component', cmpAttribute[0].auraType);

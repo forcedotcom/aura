@@ -22,7 +22,7 @@
             $A.componentService.newComponentAsync(
                 this,
                 function(newCmp) {
-                    cmp.setValue("v.newCmp", newCmp);
+                    cmp.set("v.newCmp", newCmp);
                     $A.rerender(cmp);
                 },
                 {
@@ -51,7 +51,7 @@
         test:function(cmp) {
             $A.run(function(){
                 $A.componentService.newComponentAsync(this, function(newCmp){
-                    cmp.setValue("v.newCmp", newCmp);
+                    cmp.set("v.newCmp", newCmp);
                     $A.rerender(cmp);
                 }, {
                     "componentDef": "markup://iterationTest:arrayIterationNotPreloaded",

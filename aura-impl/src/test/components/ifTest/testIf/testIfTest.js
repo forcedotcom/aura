@@ -75,7 +75,7 @@
         
         test: function(component){
             this.whatItIs(component, "Testing Renrender: true", true);
-            component.getAttributes().setValue("thang", false);
+            component.set("v.thang", false);
             $A.rerender(component);
             this.whatItIs(component, "Testing Rerender: false", false);
         }

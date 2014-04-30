@@ -78,7 +78,7 @@
     matchText: function(component, event, helper) {
         var listCmp = component.find("list");
         if (listCmp) {
-            listCmp.setValue("v.keyword", event.getParam("keyword"));
+            listCmp.set("v.keyword", event.getParam("keyword"));
             listCmp.get("e.matchText").fire();
         }
     },

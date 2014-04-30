@@ -36,11 +36,11 @@
                 } else {
                     active = false;
                 }
-                tab.getAttributes().setValue("active", active);
+                tab.set("v.active", active);
             }
 
             if (!newActiveTab) {
-                tabs[0].getAttributes().setValue("active", true);
+                tabs[0].set("v.active", true);
             }
 
             setTimeout(function() {

@@ -15,6 +15,6 @@
  */
 ({
 	valueChange: function(cmp, evt, helper) {
-		cmp.find("outputStatus").getAttributes().setValue("value", "Value Change Event Fired");
+		cmp.find("outputStatus").set("v.value", "Value Change Event Fired");
 	}
 })

@@ -22,7 +22,7 @@
             paramValue: cmp.get("v.eventParamValue")
         });
         a.setCallback(cmp, function(action){
-            cmp.getAttributes().setValue("response", action);
+            cmp.set("v.response", action);
         });
         $A.enqueueAction(a);
     },

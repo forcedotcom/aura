@@ -521,7 +521,7 @@
 		// Loaded once is meant to ensure the first data loaded doesn't break.
 		if (!cmp._hasDataProvider || cmp._loadedOnce) {
 			if (!params.index) {
-				length = params.value.getLength();
+				length = params.value.length;
 
 				// Check for a larger or smaller list.
 				if (cmp._rowValueProviders.length !== length) {

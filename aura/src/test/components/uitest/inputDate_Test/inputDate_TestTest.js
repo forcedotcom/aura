@@ -200,7 +200,7 @@
         test : function(component){
                     var input_date = component.find("datePickerTestCmp");
                     var date_picker = input_date.find("datePicker");
-                    date_picker.getValue("v.visible").setValue(true);
+                    date_picker.set("v.visible", true);
                   
                     //this rerender is necessary: we need dataPickerRenderer to updateGlobalEventListeners
                     $A.rerender(component);

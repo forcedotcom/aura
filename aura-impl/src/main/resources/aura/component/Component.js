@@ -1077,9 +1077,7 @@ Component.prototype.clearErrors = function (expression) {
 Component.prototype.getErrors = function (expression) {
     // JBUCH TODO: TEMPORARY PASSTHROUGH TO HIDE SIMPLEVALUES; getErrors() SHOULD BE HANDLED THROUGH ERROR EVENTS
     var wrapper = this._getValue(expression);
-    if (wrapper) {
-        wrapper.getErrors();
-    }
+    return wrapper ? wrapper.getErrors() : [];
 };
 
 /**

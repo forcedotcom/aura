@@ -2325,7 +2325,7 @@ _initPullToRefreshPlugin: function () {
         CONFIG_DEFAULTS = {
             labelPull     : 'Pull down to refresh...',
             labelRelease  : 'Release to refresh...',
-            labelUpdate   : 'Updating...',
+            labelUpdate   : 'Loading...',
             labelSubtitle : '',
             labelError    : 'Error on pull to refresh'
         },

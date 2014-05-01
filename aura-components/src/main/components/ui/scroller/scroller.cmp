@@ -54,7 +54,7 @@
     <aura:attribute name="pullToShowMoreClick"    type="String" default="Tap to show more"           description="The text before the user pulls clicks to refresh content"/>
     <aura:attribute name="pullToShowMorePull"     type="String" default="Pull up to show more..."    description="The text before the user pulls to show more content"/>
     <aura:attribute name="pullToShowMoreRelease"  type="String" default="Release to show more..."    description="The text when the user pulls to show more content in the scroller area"/>
-    <aura:attribute name="pullToShowMoreUpdating" type="String" default="Loading..."                 description="The text to display while the scroller component is updating"/>
+    <aura:attribute name="pullToShowMoreUpdating" type="String" default="Updating..."                description="The text to display while the scroller component is updating"/>
     <aura:attribute name="pullToShowMoreSubtitle" type="String" default= ""                          description="The text to display in the bottom cell"/>
     <aura:attribute name="pullToShowMoreError"    type="String" default="Error on Pull to load more" description="The text to display while the scroller component is updating"/>
 

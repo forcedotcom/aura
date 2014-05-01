@@ -1,0 +1,16 @@
+<aura:component>
+    <aura:attribute name="item" type="Object"/>
+    <aura:attribute name="readonly" type="boolean" default="false"/>
+
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+
+    <li id="{!v.item}">
+        <aura:renderIf isTrue="{!v.readonly}">
+            <ui:outputText value="{!v.item}"/>
+            <aura:set attribute="else">
+                <ui:outputURL label="{!v.item}" value="" linkClick="{!c.linkClick}"/>
+            </aura:set>
+        </aura:renderIf>
+
+    </li>
+</aura:component>

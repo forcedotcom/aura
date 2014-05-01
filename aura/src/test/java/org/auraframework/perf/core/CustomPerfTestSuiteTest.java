@@ -14,30 +14,31 @@ import org.auraframework.util.ServiceLocator;
 
 @UnAdaptableTest
 @PerfTestSuite
-public class FrameworkPerfTestSuiteTest extends TestSuite {
+public class CustomPerfTestSuiteTest extends TestSuite {
 	public static TestSuite suite() throws Exception {
 		TestSuite suite = new TestSuite();
-		if (System.getProperty("skipFrameworkPerfTests") != null) {
-			System.out.println("Skipping Framework Perf Tests");
+		if (System.getProperty("skipCustomPerfTests") != null) {
+			System.out.println("Skipping Custom Perf Tests");
 			return suite;
 		}
-		System.out.println("Bootstrapping Framework Perf Tests");
+		
+		System.out.println("Bootstrapping Custom Perf Tests");
 		Set<TestInventory> inventories = ServiceLocator.get().getAll(TestInventory.class);
 		
 		// Get all the performance tests that extend from the framework class
 		for (TestInventory inventory : inventories) {
-            TestSuite child = inventory.getTestSuite(Type.PERFCMP);
+            TestSuite child = inventory.getTestSuite(Type.PERFCUSTOM);
             if (child != null ) {
                 for (Enumeration<?> tests = child.tests(); tests.hasMoreElements();) {
                 	Test next = (Test)tests.nextElement();
                 	if (FrameworkPerfAbstractTestCase.class.isAssignableFrom(next.getClass())) {
-                		System.out.println("Adding Framework TestCase:" + next.toString());
+                		System.out.println("Adding Custom TestCase:" + next.toString());
                 		suite.addTest(next);
                 	}
                 }
             }
         }
-        suite.setName("Framework Perf tests");
+        suite.setName("Custom Perf tests");
         return suite;
     }
 }

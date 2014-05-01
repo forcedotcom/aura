@@ -28,6 +28,11 @@ import org.auraframework.util.ServiceLocator;
 @PerfTestSuite
 public class ComponentPerfSuiteTest extends TestSuite {
     public static TestSuite suite() throws Exception {
+    	if (System.getProperty("skipCmpPerfTests") != null) {
+    		System.out.println("Skipping Components Perf Tests");
+			return new TestSuite();
+		}
+    	
         TestSuite suite = new NamespacePerfTestSuite("ui");
         suite.setName("Component Perf tests");
         return suite;

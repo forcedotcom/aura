@@ -37,6 +37,7 @@ import junit.framework.TestSuite;
 import org.auraframework.test.annotation.HybridContainerTest;
 import org.auraframework.test.annotation.IntegrationTest;
 import org.auraframework.test.annotation.PerfCmpTest;
+import org.auraframework.test.annotation.PerfCustomTest;
 import org.auraframework.test.annotation.PerfFrameworkTest;
 import org.auraframework.test.annotation.PerfTestSuite;
 import org.auraframework.test.annotation.UnitTest;
@@ -53,7 +54,7 @@ public class TestInventory {
     public static final EnumSet<Type> CONTAINERLESS_TYPE_TESTS = EnumSet.complementOf(CONTAINER_TYPE_TESTS);
 
     public enum Type {
-        UNIT, WEB, INTEGRATION, IGNORED, HYBRID_CONTAINER, PERFSUITE, PERFCMP, PERFFRAMEWORK;
+        UNIT, WEB, INTEGRATION, IGNORED, HYBRID_CONTAINER, PERFSUITE, PERFCMP, PERFFRAMEWORK, PERFCUSTOM;
     }
 
     private URI rootUri;
@@ -135,6 +136,8 @@ public class TestInventory {
             target = Type.HYBRID_CONTAINER;
         } else if (testClass.getAnnotation(PerfTestSuite.class) != null) {
         	target = Type.PERFSUITE;
+        } else if (testClass.getAnnotation(PerfCustomTest.class) != null) {
+        	target = Type.PERFCUSTOM;
         } else if (testClass.getAnnotation(PerfCmpTest.class) != null) {
         	target = Type.PERFCMP;
         } else if (testClass.getAnnotation(PerfFrameworkTest.class) != null) {

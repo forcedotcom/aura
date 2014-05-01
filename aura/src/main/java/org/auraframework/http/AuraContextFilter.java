@@ -216,7 +216,7 @@ public class AuraContextFilter implements Filter {
                         }
                     }
                 } else {
-                    testContextAdapter.clear(false);
+                    testContextAdapter.clear();
                 }
             }
         }

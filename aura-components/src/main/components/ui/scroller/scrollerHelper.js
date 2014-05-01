@@ -1736,7 +1736,7 @@ _initSurfaceManagerPlugin: function () {
                 return;
             }
 
-            itemsLeft = last.contentIndex < itemsSize - 2;
+            itemsLeft = last.contentIndex < itemsSize - (ptlEnabled ? 2 : 1);
             offset    = last.offset + (this.scrollVertical ? last.height : last.width);
 
             if (this.scrollVertical) {
@@ -2323,9 +2323,9 @@ _initPullToRefreshPlugin: function () {
         PLUGINS  = SCROLLER.plugins || (SCROLLER.plugins = {}),
 
         CONFIG_DEFAULTS = {
-            labelPull     : 'Pull down to Refresh...',
-            labelRelease  : 'Pull down to Release...',
-            labelUpdate   : 'Loading...',
+            labelPull     : 'Pull down to refresh...',
+            labelRelease  : 'Release to refresh...',
+            labelUpdate   : 'Updating...',
             labelSubtitle : '',
             labelError    : 'Error on pull to refresh'
         },
@@ -2548,7 +2548,7 @@ _initPullToLoadMorePlugin: function () {
         CONFIG_DEFAULTS = {
             labelPull     : 'Pull up to show more',
             labelRelease  : 'Release to show more',
-            labelUpdate   : 'Loading...',
+            labelUpdate   : 'Updating...',
             labelSubtitle : '',
             labelError    : 'Error on pull to load more'
         },

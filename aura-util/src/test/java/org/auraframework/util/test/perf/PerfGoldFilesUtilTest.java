@@ -28,7 +28,7 @@ public final class PerfGoldFilesUtilTest extends UnitTestCase {
         metric1.setDetails(new JSONArray("[{\"bytes\":\"3\"}]"));
         metrics.setMetric(metric1);
         metrics.setMetric(new PerfMetric("{name: \"metric2\", value: 2}"));
-        String text = PerfGoldFilesUtil.toGoldFileText(metrics);
+        String text = PerfGoldFilesUtil.toGoldFileText(metrics, true);
 
         PerfMetrics readMetrics = PerfGoldFilesUtil.fromGoldFileText(text);
         assertEquals(2, readMetrics.size());

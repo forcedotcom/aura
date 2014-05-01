@@ -29,9 +29,10 @@ import org.json.JSONObject;
 public final class PerfGoldFilesUtil {
 
     /**
+     * @param addDetails if true adds the metric details to the gold file
      * @return text describing the metrics in a format convenient for the gold file
      */
-    public static String toGoldFileText(PerfMetrics metrics) {
+    public static String toGoldFileText(PerfMetrics metrics, boolean addDetails) {
         StringBuilder sb = new StringBuilder();
         Set<String> names = metrics.getAllMetricNames();
         for (String name : names) {
@@ -43,15 +44,17 @@ public final class PerfGoldFilesUtil {
             sb.append(metrics.getMetric(name));
             sb.append('\n');
             if (details != null) {
-                // puts details in a separate line
-                JSONObject json = new JSONObject();
-                try {
-                    json.put(name + ".details", details);
-                } catch (JSONException e) {
-                    throw new RuntimeException(e);
+                if (addDetails) {
+                    // puts details in a separate line
+                    JSONObject json = new JSONObject();
+                    try {
+                        json.put(name + ".details", details);
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
+                    }
+                    sb.append(json);
+                    sb.append('\n');
                 }
-                sb.append(json);
-                sb.append('\n');
                 metric.setDetails(details);
             }
         }

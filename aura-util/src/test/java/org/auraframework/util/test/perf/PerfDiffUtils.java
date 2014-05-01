@@ -19,6 +19,7 @@ import java.io.IOException;
 
 import junit.framework.Assert;
 
+import org.auraframework.test.UnitTestCase;
 import org.auraframework.util.test.BaseDiffUtils;
 import org.auraframework.util.test.perf.data.PerfMetrics;
 import org.auraframework.util.test.perf.data.PerfMetricsComparator;
@@ -28,8 +29,11 @@ import org.auraframework.util.test.perf.data.PerfMetricsComparator;
  */
 public final class PerfDiffUtils extends BaseDiffUtils<PerfMetrics> {
 
-    public PerfDiffUtils(Class<?> testClass, String goldName) throws Exception {
-        super(testClass, goldName);
+    private final UnitTestCase test;
+
+    public PerfDiffUtils(UnitTestCase test, String goldName) throws Exception {
+        super(test, goldName);
+        this.test = test;
     }
 
     @Override
@@ -53,7 +57,7 @@ public final class PerfDiffUtils extends BaseDiffUtils<PerfMetrics> {
 
     @Override
     public void writeGoldFile(PerfMetrics testResults) throws IOException {
-        writeGoldFileContent(PerfGoldFilesUtil.toGoldFileText(testResults));
+        writeGoldFileContent(PerfGoldFilesUtil.toGoldFileText(testResults, test.storeDetailsInGoldFile()));
     }
 
     @Override

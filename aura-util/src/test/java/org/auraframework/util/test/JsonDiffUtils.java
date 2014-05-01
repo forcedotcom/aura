@@ -21,14 +21,15 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import junit.framework.Assert;
 
+import org.auraframework.test.UnitTestCase;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonReader;
 import org.xml.sax.SAXException;
 
 public class JsonDiffUtils extends TextDiffUtils {
 
-    public JsonDiffUtils(Class<?> testClass, String goldName) throws Exception {
-        super(testClass, goldName);
+    public JsonDiffUtils(UnitTestCase test, String goldName) throws Exception {
+        super(test, goldName);
     }
 
     @Override

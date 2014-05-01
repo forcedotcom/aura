@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.EnumSet;
 import java.util.Enumeration;
 import java.util.Map;
+import java.util.Vector;
 import java.util.jar.JarEntry;
 
 import junit.framework.JUnit4TestAdapter;
@@ -35,6 +36,9 @@ import junit.framework.TestSuite;
 
 import org.auraframework.test.annotation.HybridContainerTest;
 import org.auraframework.test.annotation.IntegrationTest;
+import org.auraframework.test.annotation.PerfCmpTest;
+import org.auraframework.test.annotation.PerfFrameworkTest;
+import org.auraframework.test.annotation.PerfTestSuite;
 import org.auraframework.test.annotation.UnitTest;
 import org.auraframework.test.annotation.WebDriverTest;
 import org.auraframework.util.ServiceLocator;
@@ -49,11 +53,12 @@ public class TestInventory {
     public static final EnumSet<Type> CONTAINERLESS_TYPE_TESTS = EnumSet.complementOf(CONTAINER_TYPE_TESTS);
 
     public enum Type {
-        UNIT, WEB, INTEGRATION, IGNORED, HYBRID_CONTAINER;
+        UNIT, WEB, INTEGRATION, IGNORED, HYBRID_CONTAINER, PERFSUITE, PERFCMP, PERFFRAMEWORK;
     }
 
     private URI rootUri;
     private final Map<Type, TestSuite> suites = Maps.newHashMap();
+    private final Map<Type, Vector<Class<? extends Test>>> classes = Maps.newHashMap();
 
     public TestInventory(Class<?> classInModule) {
         suites.put(Type.IGNORED, new TestSuite());
@@ -79,6 +84,27 @@ public class TestInventory {
         }
         return suites.get(type);
     }
+    public Vector<Class<? extends Test>> getTestClasses(Type type) {
+    	if (classes.isEmpty() || !classes.containsKey(type)) {
+    		loadTestClasses(type);
+    	}
+    	return classes.get(type);
+    }
+    
+    public void loadTestClasses(Type type) {
+    	TestFilter filter = ServiceLocator.get().get(TestFilter.class);
+    	Vector<Class<? extends Test>> vector = new Vector<Class <? extends Test>>();
+    	for (String className : getClassNames(rootUri)) {
+            Class<? extends Test> testClass = filter.applyTo(getTestClass(className));
+            if (testClass != null) {
+            	Type target = getAnnotationType(testClass);
+            	if (target == type) {
+            		vector.add(testClass);
+            	}
+            }
+    	}
+    	classes.put(type, vector);
+    }
 
     public void loadTestSuites(Type type) {
         TestFilter filter = ServiceLocator.get().get(TestFilter.class);
@@ -86,38 +112,41 @@ public class TestInventory {
         suites.put(type, suite);
 
         System.out.println(String.format("Loading %s tests from %s", type, rootUri));
+        
         for (String className : getClassNames(rootUri)) {
             Class<? extends Test> testClass = filter.applyTo(getTestClass(className));
-            if (testClass == null) {
-                continue;
-            }
-
-            Type target = null;
-            if (testClass.getAnnotation(HybridContainerTest.class) != null) {
-                target = Type.HYBRID_CONTAINER;
-            } else if (testClass.getAnnotation(WebDriverTest.class) != null) {
-                target = Type.WEB;
-            } else if (testClass.getAnnotation(IntegrationTest.class) != null) {
-                target = Type.INTEGRATION;
-            } else if (testClass.getAnnotation(UnitTest.class) != null) {
-                target = Type.UNIT;
-            } else {
-                continue;
-            }
-
-            if (target != type) {
-                continue;
-            }
-
-            try {
-                addTest(suite, filter, (Test) testClass.getMethod("suite").invoke(null));
-            } catch (Exception e) {
-            }
-            try {
-                addTest(suite, filter, new TestSuite(testClass.asSubclass(TestCase.class)));
-            } catch (ClassCastException cce) {
+            if (testClass != null) {
+            	Type target = getAnnotationType(testClass);
+            	if (target == type) {
+            		try {
+                        addTest(suite, filter, (Test) testClass.getMethod("suite").invoke(null));
+                    } catch (Exception e) {}
+                    try {
+                        addTest(suite, filter, new TestSuite(testClass.asSubclass(TestCase.class)));
+                    } catch (ClassCastException cce) {}
+            	}
             }
         }
+    }
+    
+    private Type getAnnotationType (Class<? extends Test> testClass) {
+    	Type target = null;
+        if (testClass.getAnnotation(HybridContainerTest.class) != null) {
+            target = Type.HYBRID_CONTAINER;
+        } else if (testClass.getAnnotation(PerfTestSuite.class) != null) {
+        	target = Type.PERFSUITE;
+        } else if (testClass.getAnnotation(PerfCmpTest.class) != null) {
+        	target = Type.PERFCMP;
+        } else if (testClass.getAnnotation(PerfFrameworkTest.class) != null) {
+        	target = Type.PERFFRAMEWORK;
+        } else if (testClass.getAnnotation(WebDriverTest.class) != null) {
+            target = Type.WEB;
+        } else if (testClass.getAnnotation(IntegrationTest.class) != null) {
+            target = Type.INTEGRATION;
+        } else if (testClass.getAnnotation(UnitTest.class) != null) {
+            target = Type.UNIT;
+        }
+        return target;
     }
 
     private void addTest(TestSuite suite, TestFilter filter, Test test) {

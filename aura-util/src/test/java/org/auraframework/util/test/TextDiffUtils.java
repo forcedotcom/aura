@@ -22,12 +22,13 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import junit.framework.Assert;
 
+import org.auraframework.test.UnitTestCase;
 import org.xml.sax.SAXException;
 
 public class TextDiffUtils extends BaseDiffUtils<String> {
 
-    public TextDiffUtils(Class<?> testClass, String goldName) throws Exception {
-        super(testClass, goldName);
+    public TextDiffUtils(UnitTestCase test, String goldName) throws Exception {
+        super(test, goldName);
     }
 
     @Override

@@ -48,12 +48,12 @@ import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.perf.core.PerfMetricsCollector;
+import org.auraframework.perf.utils.PerfWebDriverUtil;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.WebDriverUtil.BrowserType;
 import org.auraframework.test.annotation.FreshBrowserInstance;
 import org.auraframework.test.annotation.WebDriverTest;
-import org.auraframework.test.perf.PerfMetricsCollector;
-import org.auraframework.test.perf.PerfWebDriverUtil;
 import org.auraframework.util.AuraUITestingUtil;
 import org.auraframework.util.AuraUtil;
 import org.auraframework.util.test.perf.PerfUtil;
@@ -62,6 +62,7 @@ import org.auraframework.util.test.perf.data.PerfRunsCollector;
 import org.auraframework.util.test.perf.rdp.RDPNotification;
 import org.eclipse.jetty.util.log.Log;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
@@ -210,7 +211,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
     /** true if currently running a test for perf */
     protected boolean inPerfRun;
 
-    protected final boolean isPerfTest() {
+    protected boolean isPerfTest() {
         return RUN_PERF_TESTS && PerfUtil.hasPerfTestAnnotation(this);
     }
 
@@ -219,6 +220,13 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
      */
     protected int numPerfTimelineRuns() {
         return 5;
+    }
+
+    /**
+     * @return non-null to specify a desired window size to be set when a new driver is created
+     */
+    protected Dimension getWindowSize() {
+        return null;
     }
 
     /**
@@ -551,6 +559,10 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
             currentDriver = provider.get(capabilities);
             if (currentDriver == null) {
                 fail("Failed to get webdriver for " + currentBrowserType);
+            }
+            Dimension windowSize = getWindowSize();
+            if (windowSize != null) {
+                currentDriver.manage().window().setSize(windowSize);
             }
             logger.info(String.format("Received: %s", currentDriver));
             auraUITestingUtil = new AuraUITestingUtil(currentDriver);

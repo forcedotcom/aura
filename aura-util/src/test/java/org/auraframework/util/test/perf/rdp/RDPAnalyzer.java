@@ -115,7 +115,7 @@ public final class RDPAnalyzer {
         // requestWillBeSent: timestamp requestId params.documentURL
         // responseReceived: timestamp params.requestId params.response.timing?
         // dataReceived+: timestamp params.requestId params.dataLength params.encodedDataLength
-        // loadingFinished: timestamp params.requestId params.encodedDataLength?
+        // loadingFinished/Failed: timestamp params.requestId params.encodedDataLength?
 
         // collect the following metrics:
         // numRequests: details: documentURL + size
@@ -135,16 +135,21 @@ public final class RDPAnalyzer {
                     detail.put("method", request.getString("method"));
                     detail.put("encodedDataLength", 0);
                     requestIdToDetail.put(params.getString("requestId"), detail);
-                } else if (Network.dataReceived.equals(method)) {
-                    JSONObject detail = requestIdToDetail.get(params.getString("requestId"));
+                    continue;
+                }
+
+                String requestId = params.getString("requestId");
+                JSONObject detail = requestIdToDetail.get(requestId);
+                if (detail == null) {
+                    LOG.log(Level.WARNING, "no matching requestWillBeSent found for: " + timelineEvent.toJSONString());
+                    // spurious first events?
+                    continue;
+                }
+
+                if (Network.dataReceived.equals(method)) {
                     int encodedDataLength = params.getInt("encodedDataLength");
                     detail.put("encodedDataLength", detail.getInt("encodedDataLength") + encodedDataLength);
                 } else if (Network.loadingFinished.equals(method)) {
-                    JSONObject detail = requestIdToDetail.get(params.getString("requestId"));
-                    if (detail == null) {
-                        // spurious first events?
-                        continue;
-                    }
                     if (params.has("encodedDataLength")) {
                         // some chromedriver versions don't have encodedDataLength in loadingFinished
                         // if there, check that matches the one in dataReceived
@@ -158,10 +163,30 @@ public final class RDPAnalyzer {
                     numRequests++;
                     totalEncodedDataLength += detail.getInt("encodedDataLength");
                     details.put(detail);
+                    requestIdToDetail.remove(requestId);
+                } else if (Network.loadingFailed.equals(method)) {
+                    // count also pages that fail to load
+                    detail.put("loadingFailed", "true");
+                    String errorText = params.has("errorText") ? params.getString("errorText") : null;
+                    if (errorText != null && errorText.trim().length() > 0) {
+                        detail.put("errorText", errorText);
+                    }
+                    numRequests++;
+                    details.put(detail);
+                    requestIdToDetail.remove(requestId);
                 }
             } catch (Exception e) {
-                LOG.log(Level.WARNING, timelineEvent.toDetailString(), e);
+                LOG.log(Level.WARNING, timelineEvent.toJSONString(), e);
             }
+        }
+
+        // count also request that don't have a matching loadingFinished/Failed
+        // (the final aura POST fails in this category)
+        for (String requestId : requestIdToDetail.keySet()) {
+            JSONObject detail = requestIdToDetail.get(requestId);
+            LOG.log(Level.INFO, "no matching loadingFinished/Failed found for: " + detail.toString());
+            numRequests++;
+            details.put(detail);
         }
 
         PerfMetric numRequestsMetric = new PerfMetric("Network.numRequests", numRequests);

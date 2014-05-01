@@ -112,6 +112,13 @@ public abstract class UnitTestCase extends TestCase {
         tearDownSteps.push(toRun);
     }
 
+    /**
+     * @return to get metric details stored in gold file (i.e. for perf metrics)
+     */
+    public boolean storeDetailsInGoldFile() {
+        return true;
+    }
+
     protected String getGoldFileName() {
         return getName();
     }
@@ -131,7 +138,7 @@ public abstract class UnitTestCase extends TestCase {
             suffix = suffix + ".txt";
         }
 
-        goldFileUtils.assertTextDiff(this.getClass(), getGoldFileName() + suffix, actual);
+        goldFileUtils.assertTextDiff(this, getGoldFileName() + suffix, actual);
     }
 
     protected void goldFileJson(String actual, String suffix) throws Exception {
@@ -141,7 +148,7 @@ public abstract class UnitTestCase extends TestCase {
             suffix = suffix + ".json";
         }
 
-        goldFileUtils.assertJsonDiff(this.getClass(), getGoldFileName() + suffix, actual);
+        goldFileUtils.assertJsonDiff(this, getGoldFileName() + suffix, actual);
     }
 
     protected void goldFileJson(String actual) throws Exception {
@@ -153,7 +160,7 @@ public abstract class UnitTestCase extends TestCase {
     }
 
     protected final void assertGoldMetrics(PerfMetrics actual) throws Exception {
-        goldFileUtils.assertPerfDiff(this.getClass(), getGoldFileName() + ".json", actual);
+        goldFileUtils.assertPerfDiff(this, getGoldFileName() + ".json", actual);
     }
 
     protected void serializeAndGoldFile(Object actual) throws Exception {

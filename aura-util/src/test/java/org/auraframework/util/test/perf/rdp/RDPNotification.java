@@ -74,7 +74,7 @@ public final class RDPNotification {
         return "RDPNotification[" + method + ']';
     }
 
-    public String toDetailString() {
-        return "RDPNotification[" + json + ']';
+    public String toJSONString() {
+        return json.toString();
     }
 }

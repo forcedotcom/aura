@@ -119,8 +119,9 @@
     },
     
     _getPullToRefreshConfig: function (attrs) {
+        var nativeScroller = attrs.get('useNativeScroller');
         return {
-            labelPull     : attrs.get("pullToRefreshPull"),
+            labelPull     : nativeScroller ? attrs.get('pullToRefreshClick'): attrs.get("pullToRefreshPull"),
             labelRelease  : attrs.get("pullToRefreshRelease"),
             labelUpdate   : attrs.get("pullToRefreshUpdating"),
             labelSubtitle : attrs.get("pullToRefreshSubtitle"),
@@ -128,8 +129,9 @@
         }
     },
     _getPullToLoadMoreConfig: function (attrs) {
+        var nativeScroller = attrs.get('useNativeScroller');
         return {
-            labelPull     : attrs.get("pullToShowMorePull"),
+            labelPull     : nativeScroller ? attrs.get('pullToShowMoreClick') : attrs.get("pullToShowMorePull"),
             labelRelease  : attrs.get("pullToShowMoreRelease"),
             labelUpdate   : attrs.get("pullToShowMoreUpdating"),
             labelSubtitle : attrs.get("pullToShowMoreSubtitle"),
@@ -177,13 +179,14 @@
             canShowMore           = attributes.get('canShowMore'),
 
             // scroller properties check
+            useNativeScroller     = attributes.get('useNativeScroller'),
             enabled               = attributes.get('enabled'),
             width                 = attributes.get('width'),
             height                = attributes.get('height'),
             scroll                = attributes.get('scroll'),
             scrollbars            = attributes.get('showScrollbars'),
             gpuOptimization       = attributes.get('gpuOptimization'),
-
+           
             // For now, default android and ios to use CSSTransitions
             useCSSTransition      = typeof cssTransition === "boolean" ? cssTransition : (!gpuOptimization && (device.isIOS || device.isAndroid)),
             
@@ -199,12 +202,13 @@
             pullToLoadMore        = canShowMore,
             infiniteLoading       = auraInfiniteLoading && attributes.get('infiniteLoading'),
 
-            pullToRefreshConfig   = pullToRefresh   && this._getPullToRefreshConfig(attributes),
-            pullToLoadMoreConfig  = pullToLoadMore  && this._getPullToLoadMoreConfig(attributes),
-            infiniteLoadingConfig = infiniteLoading && this._getInfiniteLoadingConfig(attributes);
+            pullToRefreshConfig   = this._getPullToRefreshConfig(attributes),
+            pullToLoadMoreConfig  = this._getPullToLoadMoreConfig(attributes),
+            infiniteLoadingConfig = this._getInfiniteLoadingConfig(attributes);
         
         return {
-            enabled               : enabled,
+            enabled               : useNativeScroller ? false : enabled,
+            useNativeScroller     : useNativeScroller,
             itemWidth             : width,
             itemHeight            : height,
             scroll                : scroll,
@@ -274,6 +278,10 @@
             wrapper.addEventListener('touchmove', this._preventDefault, false);
         }
 
+        if (attrs.get('useNativeScroller')) {
+            this._attachClickEventsToPullsTo(component, attrs, scrollerInstance);
+        }
+
         for (var i = 0; i < events.length; i++) {
             this._bridgeScrollerAction(attrs, scrollerInstance, events[i]);
         }
@@ -281,6 +289,28 @@
         this._stopNativeDragging(component);
         this._captureClickEvents(component, scrollerInstance);
     },
+    /*
+    * If we use native scrolling pullToShowMore and pullToRefresh will render as part of the scroller
+    * We need to attach the click events so we can trigger the same funcionality
+    */
+    _attachClickEventsToPullsTo: function (cmp, attrs, scrollerInstance) {
+        var wrapper        = scrollerInstance.wrapper,
+            pullToRefresh  = wrapper.getElementsByClassName('pullToRefresh')[0],
+            pullToLoadMore = wrapper.getElementsByClassName('pullToLoadMore')[0];
+
+        if (pullToRefresh) {
+            pullToRefresh.addEventListener('click', function () {
+                scrollerInstance.triggerPTR();
+            }, false);
+        }
+
+        if (pullToLoadMore) {
+            pullToLoadMore.addEventListener('click', function () {
+                scrollerInstance._triggerPTL();
+            }, false);
+        }
+    },
+
     /*
     * @_stopNativeDraggin
     * Preventsthe native dragging functionality of for desktop browsers.
@@ -1706,7 +1736,7 @@ _initSurfaceManagerPlugin: function () {
                 return;
             }
 
-            itemsLeft = last.contentIndex < itemsSize - 2;
+            itemsLeft = last.contentIndex < itemsSize - (ptlEnabled ? 2 : 1);
             offset    = last.offset + (this.scrollVertical ? last.height : last.width);
 
             if (this.scrollVertical) {
@@ -2293,8 +2323,8 @@ _initPullToRefreshPlugin: function () {
         PLUGINS  = SCROLLER.plugins || (SCROLLER.plugins = {}),
 
         CONFIG_DEFAULTS = {
-            labelPull     : 'Pull down to Refresh...',
-            labelRelease  : 'Pull down to Release...',
+            labelPull     : 'Pull down to refresh...',
+            labelRelease  : 'Release to refresh...',
             labelUpdate   : 'Loading...',
             labelSubtitle : '',
             labelError    : 'Error on pull to refresh'
@@ -2518,7 +2548,7 @@ _initPullToLoadMorePlugin: function () {
         CONFIG_DEFAULTS = {
             labelPull     : 'Pull up to show more',
             labelRelease  : 'Release to show more',
-            labelUpdate   : 'Loading...',
+            labelUpdate   : 'Updating...',
             labelSubtitle : '',
             labelError    : 'Error on pull to load more'
         },

@@ -67,7 +67,7 @@
             aura.test.assertEquals(labelValueThruComponent,labelValueThroughComponentApi);
             aura.test.assertEquals(labelValueThruComponent,labelValueByExpression);
 
-            component.getAttributes().setValue('label','newLabel');
+            component.set('v.label','newLabel');
             var labelValueThroughComponentApi = component.get("v.label");
             var labelValueByExpression = $A.expressionService.getValue(component, "{!v.label}").getValue();
             var labelValueThruComponent = component.get('v.label');

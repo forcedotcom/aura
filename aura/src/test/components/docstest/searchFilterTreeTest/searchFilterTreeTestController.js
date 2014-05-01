@@ -15,6 +15,6 @@
  */
 ({
     doInit : function(cmp, evt, helper) {
-      cmp.find('searchTree').getAttributes().setValue('tree', cmp.find('tree'));
+      cmp.find('searchTree').set('v.tree', cmp.find('tree'));
     }
 })

@@ -16,15 +16,15 @@
 ({
     handler1:function(cmp,event){
         //Set String value to Paris
-        cmp.getAttributes().setValue('stringValue',cmp.get('v.stringValue')+'Paris');
+        cmp.set('v.stringValue',cmp.get('v.stringValue')+'Paris');
         //Fire a event, this should trigger handler 3
         cmp.getEvent("A").fire();
     },
     handler2:function(cmp,event){
-        cmp.getAttributes().setValue('stringValue',cmp.get('v.stringValue')+'Tokyo');
+        cmp.set('v.stringValue',cmp.get('v.stringValue')+'Tokyo');
 
     },
     handler3:function(cmp,event){
-        cmp.getAttributes().setValue('stringValue',cmp.get('v.stringValue')+'Mercury');
+        cmp.set('v.stringValue',cmp.get('v.stringValue')+'Mercury');
     }
 })

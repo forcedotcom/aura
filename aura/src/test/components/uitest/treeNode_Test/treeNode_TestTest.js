@@ -115,9 +115,9 @@
      */
     testVisitShortCircuit : {
         test : function(cmp) {
-            cmp.find('B').getAttributes().setValue('expanded', true);
-            cmp.find('D').getAttributes().setValue('expanded', true);
-            cmp.find('F').getAttributes().setValue('expanded', true);
+            cmp.find('B').set('v.expanded', true);
+            cmp.find('D').set('v.expanded', true);
+            cmp.find('F').set('v.expanded', true);
 
             var ExpandedOnlyVisitor = function() {
                 this.nodes = [];

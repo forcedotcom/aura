@@ -132,7 +132,7 @@
 
     afterRender : function(component, helper) {
         if (helper.canHaveBody(component)) {
-            $A.afterRender(component.getAttributes().getValue("body"));
+            $A.afterRender(component.get("v.body"));
         }
     },
 
@@ -141,9 +141,7 @@
         // TODO: this should use attribute type checking and iterate through all attributes, not just body
 
         if (helper.canHaveBody(component)) {
-            var attributes = component.getAttributes();
-            var value = attributes.getValue('body');
-            $A.unrender(value);
+            $A.unrender(component.get("v.body"));
         }
 
         var elements = component.getElements();

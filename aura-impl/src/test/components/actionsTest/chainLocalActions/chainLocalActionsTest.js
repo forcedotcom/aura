@@ -24,7 +24,7 @@
                                                         function(action){
                                                             //If the call backs are in order, then this attribute will have the value set by c.add's call back
                                                             $A.test.assertEquals("1", cmp.get('v.responseOrder'), "Action chaining did not preserve order at client.");
-                                                            cmp.getAttributes().setValue('responseOrder', "2");
+                                                            cmp.set('v.responseOrder', "2");
                                                         });
             multiply.setChained();
 
@@ -32,7 +32,7 @@
                                                         function(action){
                                                             //If the call backs are in order, then this attribute will have the value set by c.multiply's call back
                                                             $A.test.assertEquals("2", cmp.get('v.responseOrder'), "Action chaining did not preserve order at client.");
-                                                            cmp.getAttributes().setValue('responseOrder', "3");
+                                                            cmp.set('v.responseOrder', "3");
                                                     });
             subtract.setChained();
 
@@ -44,7 +44,7 @@
                                     },function(action){
                                             //If the call backs are in order, then this attribute will have the default value
                                             $A.test.assertEquals("", cmp.get('v.responseOrder'), "Action chaining did not preserve order at client.");
-                                            cmp.getAttributes().setValue('responseOrder', "1");
+                                            cmp.set('v.responseOrder', "1");
                                     });
             $A.enqueueAction(add);
             cmp.getEvent("press").fire();

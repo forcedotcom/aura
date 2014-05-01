@@ -21,17 +21,17 @@
     },
 
     afterRender: function(component){
-        var body = component.getAttributes().getValue("body");
+        var body = component.get("v.body");
         $A.afterRender(body);
     },
 
     rerender: function(component){
-        var body = component.getAttributes().getValue("body");
+        var body = component.get("v.body");
         $A.rerender(body);
     },
 
     unrender : function(component){
-        var body = component.getAttributes().getValue("body");
+        var body = component.get("v.body");
         $A.unrender(body);
 
         var elements = component.getElements();

@@ -16,13 +16,13 @@
 ({
     incermentSubmitCount : function(component) {
         // calculate and save number of times submit has been clicked
-        var submitCountCmp = component.getAttributes().getValue("submitCount");
-        var submitCount = submitCountCmp.getValue("value");
+        var submitCount = component.get("v.submitCount");
         if (!submitCount) {
             submitCount = 0
         }
         component.find("outSubmitCount").set("v.value", ++submitCount);
-        submitCountCmp.setValue(submitCount);
+        
+        component.set("v.submitCount", submitCount);
     },
 
     goToServer : function(controller, component, event, cmpName, inValue) {

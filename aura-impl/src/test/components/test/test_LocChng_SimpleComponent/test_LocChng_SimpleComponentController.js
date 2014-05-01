@@ -44,7 +44,7 @@
             //Change the button once clientAction() is invoked. clientAction() sets the location (URL) to ButtonClickedSimpleComponent?num=1
             var button = cmp.find("button");
             if(button){
-                button.getAttributes().setValue('label','test_LocChng_SimpleComponent#test:test_LocChng_Event');
+                button.set('v.label','test_LocChng_SimpleComponent#test:test_LocChng_Event');
             }
         }
     },
@@ -54,7 +54,7 @@
             //The 'locator' is defined for test:test_LocChng_Event2
             var button = cmp.find("button");
             if(button){
-                button.getAttributes().setValue('label','test_LocChng_SimpleComponent#test:test_LocChng_Event2');
+                button.set('v.label','test_LocChng_SimpleComponent#test:test_LocChng_Event2');
             }
         }
     },
@@ -63,7 +63,7 @@
         if(event.getParam('num')){
             var button = cmp.find("button");
             if(button){
-                button.getAttributes().setValue('label','test_LocChng_SimpleComponent#aura:locationChange');
+                button.set('v.label','test_LocChng_SimpleComponent#aura:locationChange');
             }
         }
     }

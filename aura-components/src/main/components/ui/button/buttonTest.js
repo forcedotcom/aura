@@ -131,9 +131,9 @@
             aura.test.assertEquals('Like', $A.test.getText(component.find("div").getElement()), "Label not correct");
             aura.test.assertFalse(component.find("button").getElement().disabled, "Button was rendered in disabled state");
 
-            component.getAttributes().setValue('disabled', true);
-            component.getAttributes().setValue('label', 'clear');
-            component.getAttributes().setValue('iconImgSrc', '/auraFW/resources/aura/images/clear.png');
+            component.set('v.disabled', true);
+            component.set('v.label', 'clear');
+            component.set('v.iconImgSrc', '/auraFW/resources/aura/images/clear.png');
             $A.renderingService.rerender(component);
 
             aura.test.assertEquals('clear', $A.test.getText(component.find("div").getElement()), "New label not rerendered");

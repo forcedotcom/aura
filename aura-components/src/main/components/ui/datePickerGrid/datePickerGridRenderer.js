@@ -23,10 +23,11 @@
         var attributes = component.getDef().getAttributeDefs();
         attributes.each(function(attributeDef) {
             var name = attributeDef.getDescriptor().getName();
-            if (name !== "date" && component.getAttributes().getValue(name).isDirty()) { // if only date changes, no need to rerender
+            if (name !== "date" && component.isDirty("v." + name)) { // if only date changes, no need to rerender
                 shouldRender = true;
             }
         });
+        
         if (shouldRender) {
             helper.renderGrid(component);
             this.superRerender();

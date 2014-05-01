@@ -110,8 +110,7 @@
 	},
 
 	init : function(component) {
-		var attributes = component.getAttributes();
-		var enabled = $A.util.getBooleanValue(attributes.get("enabled"));
+		var enabled = $A.util.getBooleanValue(component.get("v.enabled"));
 		var scroller = component.find("scrollWrapper").getElement();
 
 		if (scroller) {
@@ -120,17 +119,17 @@
 
 			if (enabled) {
 				if ($A.util.isUndefined(component._scroller)) {
-					var snap = attributes.get("snap");
-					var hScroll = $A.util.getBooleanValue(attributes.get("hscroll"));
-					var vScroll = $A.util.getBooleanValue(attributes.get("vscroll"));
-					var showScrollbars = $A.util.getBooleanValue(attributes.get("showscrollbars"));
-					var useTransform = $A.util.getBooleanValue(attributes.get("useTransform"));
-					var useTransition = $A.util.getBooleanValue(attributes.get("useTransition"));
-                    var checkDOMChanges = $A.util.getBooleanValue(attributes.get("checkDOMChanges"));
-                    var bindEventsToScroller = $A.util.getBooleanValue(attributes.get("bindEventsToScroller"));
+					var snap = component.get("v.snap");
+					var hScroll = $A.util.getBooleanValue(component.get("v.hscroll"));
+					var vScroll = $A.util.getBooleanValue(component.get("v.vscroll"));
+					var showScrollbars = $A.util.getBooleanValue(component.get("v.showscrollbars"));
+					var useTransform = $A.util.getBooleanValue(component.get("v.useTransform"));
+					var useTransition = $A.util.getBooleanValue(component.get("v.useTransition"));
+                    var checkDOMChanges = $A.util.getBooleanValue(component.get("v.checkDOMChanges"));
+                    var bindEventsToScroller = $A.util.getBooleanValue(component.get("v.bindEventsToScroller"));
 
-                    var onScrollToBottomAction = attributes.get("onScrollToBottom");
-                    var scrollToBottomThreshold = attributes.get("scrollToBottomThreshold");
+                    var onScrollToBottomAction = component.get("v.onScrollToBottom");
+                    var scrollToBottomThreshold = component.get("v.scrollToBottomThreshold");
 
 					var pullToRefreshAction = component.get("v.onPullToRefresh");
 					var canRefresh = component.get("v.canRefresh");

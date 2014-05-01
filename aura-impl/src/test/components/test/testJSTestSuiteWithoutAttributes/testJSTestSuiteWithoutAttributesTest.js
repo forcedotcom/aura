@@ -17,7 +17,7 @@
     testHelloWorld: {
         attributes : {num : '2'},
         test: function(component){
-            aura.test.assertTrue(component.getAttributes().getRawValue('num') == 2, "very bad things.");
+            aura.test.assertTrue(component.get('v.num') == 2, "very bad things.");
         }
     },
 

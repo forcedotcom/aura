@@ -15,7 +15,7 @@
  */
 ({
     changeOneValue: function(cmp, evt) {
-        var data = cmp.find("iteration").getAttributes().getValue("items");
+        var data = cmp.find("iteration").getValue("v.items");
         var val = data.getValue(cmp.get("v.tochange")).getValue("letters");
         val.setValue(cmp.get("v.newvalue"));
     },
@@ -23,7 +23,7 @@
     changeEndIndex: function(cmp, evt) {
         var inputValue = cmp.get("v.inputValue");
         cmp.set("v.newEndIndex", inputValue);
-        //var endIndex = cmp.find("innerIteration").getAttributes().getValue("end");
+        //var endIndex = cmp.find("innerIteration").getValue("v.end");
         //endIndex.setValue(5);
  }
 })

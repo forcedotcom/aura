@@ -84,7 +84,7 @@
     // FIXME: W-1563175
     _testGetWithPropertyReference:{
         test:function(component){
-            var newMap = component.find('htmlDiv').getAttributes().getValue('htmlattributes');
+            var newMap = component.find('htmlDiv').getValue('v.htmlattributes');
             $A.test.assertEquals("MapValue", newMap.toString());
             try{
                 $A.test.assertEquals("false", newMap.get("disabled"), "failed to resolve propertyReferenceValue");
@@ -118,7 +118,7 @@
      */
     testSetValueMapValueWithPropertyReferences:{
         test:function(component){
-            var newMap = component.find('htmlDiv').getAttributes().getValue('htmlattributes');
+            var newMap = component.find('htmlDiv').getValue('v.htmlattributes');
             $A.test.assertEquals("MapValue", newMap.toString());
             var setval = $A.expressionService.create(component.find('htmlDiv'), {});
             try{

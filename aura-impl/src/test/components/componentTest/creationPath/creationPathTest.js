@@ -184,7 +184,7 @@
         attributes : { list : "" },
         test : [function(cmp) {
             $A.test.assertUndefined(cmp.find("iterinst"));
-            $A.run(function(){cmp.getAttributes().getValue("list").push("x")});
+            $A.run(function(){cmp.getValue("v.list").push("x")});
             $A.test.addWaitForWithFailureMessage(false, function(){return $A.util.isUndefined(cmp.find("iterinst"))}, "iteration is still empty");
         }, function(cmp) {
             this.assertCreationPath(cmp.find("iterinst"), "client created");
@@ -196,7 +196,7 @@
         attributes : { list : "x" },
         test : [function(cmp) {
             this.assertCreationPath(cmp.find("iterinst"), "/*[0]/$/*[3]/+[0]/*[0]");
-            $A.run(function(){cmp.getAttributes().getValue("list").push("x")});
+            $A.run(function(){cmp.getValue("v.list").push("x")});
             $A.test.addWaitForWithFailureMessage(2, function(){return cmp.find("iterinst").length}, "number of iterations didn't increment");
         }, function(cmp) {
             // DCHASMAN TODO W-2164228 Reintroduce validation of smart rerendering of arrays into tests
@@ -216,7 +216,7 @@
         test : [function(cmp) {
             this.assertCreationPath(cmp.find("iterinst")[0], "/*[0]/$/*[3]/+[0]/*[0]");
             this.assertCreationPath(cmp.find("iterinst")[1], "/*[0]/$/*[3]/+[1]/*[0]");
-            $A.run(function(){var list = cmp.getAttributes().getValue("list"); list.push("x"); list.push("x");});
+            $A.run(function(){var list = cmp.getValue("v.list"); list.push("x"); list.push("x");});
             $A.test.addWaitForWithFailureMessage(4, function(){return cmp.find("iterinst").length}, "number of iterations didn't increment");
         }, function(cmp) {
             // DCHASMAN TODO W-2164228 Reintroduce validation of smart rerendering of arrays into tests

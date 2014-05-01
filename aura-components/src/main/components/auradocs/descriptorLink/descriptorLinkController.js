@@ -17,7 +17,7 @@
     open : function(cmp, event){
 
         event.preventDefault();
-        var defModel = cmp.getAttributes().getValue("defModel");
+        var defModel = cmp.getValue("v.defModel");
 
         var evt = $A.get("e.auraide:openDef");
         evt.setParams({

@@ -215,8 +215,8 @@
         attributes: {label: "link", value : 'www.salesforce.com', alt : "wrongAlt", iconClass : "somethingSomethingDarkSide"},
         test:function(component){
             var renderedBy = component.getElement().children[0].getAttribute("data-aura-rendered-by");
-            var imageType  = $A.getCmp(renderedBy).getAttributes().getValueProvider().get('v.imageType');
-            var alt        = $A.getCmp(renderedBy).getAttributes().getValueProvider().get('v.alt');
+            var imageType  = $A.getCmp(renderedBy).getAttributeValueProvider().get('v.imageType');
+            var alt        = $A.getCmp(renderedBy).getAttributeValueProvider().get('v.alt');
             aura.test.assertEquals(alt, "", "Alt is set incorrectly");
             aura.test.assertEquals(imageType, "decorative", "Image is not set to type decorative");
 
@@ -226,8 +226,8 @@
         attributes: {value : 'www.salesforce.com', alt : "Alt Should exist", iconClass : "somethingSomethingComplete"},
         test:function(component){
             var renderedBy = component.getElement().children[0].getAttribute("data-aura-rendered-by");
-            var imageType  = $A.getCmp(renderedBy).getAttributes().getValueProvider().get('v.imageType');
-            var alt        = $A.getCmp(renderedBy).getAttributes().getValueProvider().get('v.alt');
+            var imageType  = $A.getCmp(renderedBy).getAttributeValueProvider().get('v.imageType');
+            var alt        = $A.getCmp(renderedBy).getAttributeValueProvider().get('v.alt');
             aura.test.assertEquals(alt, "Alt Should exist", "Alt is set incorrectly");
             aura.test.assertEquals(imageType, "informational", "Image is not set to type informational");
 

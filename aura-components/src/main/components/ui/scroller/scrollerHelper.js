@@ -118,27 +118,27 @@
         return component.find('scrollWrapper').getElement();
     },
     
-    _getPullToRefreshConfig: function (attrs) {
+    _getPullToRefreshConfig: function (component) {
         return {
-            labelPull     : attrs.get("pullToRefreshPull"),
-            labelRelease  : attrs.get("pullToRefreshRelease"),
-            labelUpdate   : attrs.get("pullToRefreshUpdating"),
-            labelSubtitle : attrs.get("pullToRefreshSubtitle"),
-            labelError    : attrs.get("pullToRefreshError")
+            labelPull     : component.get("v.pullToRefreshPull"),
+            labelRelease  : component.get("v.pullToRefreshRelease"),
+            labelUpdate   : component.get("v.pullToRefreshUpdating"),
+            labelSubtitle : component.get("v.pullToRefreshSubtitle"),
+            labelError    : component.get("v.pullToRefreshError")
         }
     },
-    _getPullToLoadMoreConfig: function (attrs) {
+    _getPullToLoadMoreConfig: function (component) {
         return {
-            labelPull     : attrs.get("pullToShowMorePull"),
-            labelRelease  : attrs.get("pullToShowMoreRelease"),
-            labelUpdate   : attrs.get("pullToShowMoreUpdating"),
-            labelSubtitle : attrs.get("pullToShowMoreSubtitle"),
-            labelError    : attrs.get("pullToShowMoreError")
+            labelPull     : component.get("v.pullToShowMorePull"),
+            labelRelease  : component.get("v.pullToShowMoreRelease"),
+            labelUpdate   : component.get("v.pullToShowMoreUpdating"),
+            labelSubtitle : component.get("v.pullToShowMoreSubtitle"),
+            labelError    : component.get("v.pullToShowMoreError")
         }
     },
-    _getInfiniteLoadingConfig: function (attrs) {
+    _getInfiniteLoadingConfig: function (component) {
         var self               = this,
-            auraDataProvider   = attrs.get('infiniteLoadingDataProvider'),
+            auraDataProvider   = component.get('v.infiniteLoadingDataProvider'),
             dataProviderBridge = function (callback) {
                 if (auraDataProvider) {
                     auraDataProvider.run(callback);
@@ -148,18 +148,18 @@
             };
 
         return {
-            threshold    : attrs.get('infiniteLoadingThreshold'),
+            threshold    : component.get('v.infiniteLoadingThreshold'),
             dataProvider : dataProviderBridge
         }
     },
-    _getPlugins: function (attr) {
-        var rawPlugins      = attr.get('plugins') || '',
+    _getPlugins: function (component) {
+        var rawPlugins      = component.get('v.plugins') || '',
             plugins         = (rawPlugins && rawPlugins.split(',')) || [],
             corePlugins     = [],
-            scrollbars      = attr.get('showScrollbars'),
-            snap            = attr.get('snap'),
-            endless         = attr.get('endless'),
-            infiniteLoading = attr.get('infiniteLoading');
+            scrollbars      = component.get('v.showScrollbars'),
+            snap            = component.get('v.snap'),
+            endless         = component.get('v.endless'),
+            infiniteLoading = component.get('v.infiniteLoading');
 
         // If the attributes are true add the core plugins to the scroller plugin array
         scrollbars      && corePlugins.push('Indicators');
@@ -170,38 +170,37 @@
         return corePlugins.concat(plugins);
     },
     _mapAuraScrollerOptions: function (component) {
-        var attributes            = component.getAttributes(),
-            device                = $A.get('$Browser'),
-            cssTransition         = attributes.get('useCSSTransition'),
-            canRefresh            = attributes.get('canRefresh'),
-            canShowMore           = attributes.get('canShowMore'),
+        var device                = $A.get('$Browser'),
+            cssTransition         = component.get('v.useCSSTransition'),
+            canRefresh            = component.get('v.canRefresh'),
+            canShowMore           = component.get('v.canShowMore'),
 
             // scroller properties check
-            enabled               = attributes.get('enabled'),
-            width                 = attributes.get('width'),
-            height                = attributes.get('height'),
-            scroll                = attributes.get('scroll'),
-            scrollbars            = attributes.get('showScrollbars'),
-            gpuOptimization       = attributes.get('gpuOptimization'),
+            enabled               = component.get('v.enabled'),
+            width                 = component.get('v.width'),
+            height                = component.get('v.height'),
+            scroll                = component.get('v.scroll'),
+            scrollbars            = component.get('v.showScrollbars'),
+            gpuOptimization       = component.get('v.gpuOptimization'),
 
             // For now, default android and ios to use CSSTransitions
             useCSSTransition      = typeof cssTransition === "boolean" ? cssTransition : (!gpuOptimization && (device.isIOS || device.isAndroid)),
             
-            snap                  = attributes.get('snapType'),
-            bindToWrapper         = attributes.get('bindEventsToScroller'),
-            plugins               = this._getPlugins(attributes),
+            snap                  = component.get('v.snapType'),
+            bindToWrapper         = component.get('v.bindEventsToScroller'),
+            plugins               = this._getPlugins(component),
 
-            auraOnPullToRefresh   = attributes.get('onPullToRefresh'),
-            auraOnPullToLoadMore  = attributes.get('onPullToShowMore'),
-            auraInfiniteLoading   = attributes.get('infiniteLoadingDataProvider'),
+            auraOnPullToRefresh   = component.get('v.onPullToRefresh'),
+            auraOnPullToLoadMore  = component.get('v.onPullToShowMore'),
+            auraInfiniteLoading   = component.get('v.infiniteLoadingDataProvider'),
 
             pullToRefresh         = canRefresh,
             pullToLoadMore        = canShowMore,
-            infiniteLoading       = auraInfiniteLoading && attributes.get('infiniteLoading'),
+            infiniteLoading       = auraInfiniteLoading && component.get('v.infiniteLoading'),
 
-            pullToRefreshConfig   = pullToRefresh   && this._getPullToRefreshConfig(attributes),
-            pullToLoadMoreConfig  = pullToLoadMore  && this._getPullToLoadMoreConfig(attributes),
-            infiniteLoadingConfig = infiniteLoading && this._getInfiniteLoadingConfig(attributes);
+            pullToRefreshConfig   = pullToRefresh   && this._getPullToRefreshConfig(component),
+            pullToLoadMoreConfig  = pullToLoadMore  && this._getPullToLoadMoreConfig(component),
+            infiniteLoadingConfig = infiniteLoading && this._getInfiniteLoadingConfig(component);
         
         return {
             enabled               : enabled,
@@ -247,9 +246,9 @@
         });
         
     },
-    _bridgeScrollerAction: function (attrs, scrollerInstance, actionName) {
+    _bridgeScrollerAction: function (component, scrollerInstance, actionName) {
         var attrActionName = 'on' + actionName.charAt(0).toUpperCase() + actionName.slice(1),
-            action = attrs.get(attrActionName);
+            action = component.get("v." + attrActionName);
 
         if (action) {
             scrollerInstance.on(actionName, function () {
@@ -261,21 +260,20 @@
         e.preventDefault();
     },
     _attachAuraEvents: function (component, scrollerInstance) {
-        var attrs  = component.getAttributes(),
-            events = [
+        var events = [
                 'beforeScrollStart',
                 'scrollStart',
                 'scrollMove',
                 'scrollEnd'
             ], wrapper;
 
-        if (attrs.get('preventDefaultOnMove')) {
+        if (component.get('v.preventDefaultOnMove')) {
             wrapper = this._getScrollerWrapper(component);
             wrapper.addEventListener('touchmove', this._preventDefault, false);
         }
 
         for (var i = 0; i < events.length; i++) {
-            this._bridgeScrollerAction(attrs, scrollerInstance, events[i]);
+            this._bridgeScrollerAction(component, scrollerInstance, events[i]);
         }
 
         this._stopNativeDragging(component);

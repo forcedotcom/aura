@@ -57,5 +57,7 @@ exp(p,
     "getHandledEvents", p.getHandledEvents,
     "hasEventHandler", p.hasEventHandler,
     "addValueHandler", p.addValueHandler,
-    "getFacets", p.getFacets
+    "getFacets", p.getFacets,
+    "getAttributeValueProvider", p.getAttributeValueProvider,
+    "getComponentValueProvider", p.getComponentValueProvider
 );

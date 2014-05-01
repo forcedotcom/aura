@@ -21,8 +21,7 @@
     },
     
     init: function(cmp) {
-    	var attrs = cmp.getAttributes(),	
-    	labelPos = attrs.get('labelPosition');
+    	labelPos = cmp.get('v.labelPosition');
     		
     	if ($A.util.arrayIndexOf(['top', 'right', 'bottom', 'left', 'hidden'], labelPos) < 0) {
     		//once W-1419175 is fixed, then we can set default labelPosition instead of throwing error    		

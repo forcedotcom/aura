@@ -33,7 +33,7 @@
                 $A.test.assertEquals("Aura", newCmp.get("v.strAttributeWithDefaultValue"),
                         "Failed to set default value of simple attributes on client side component");
                 $A.test.assertEquals("['red','green','blue']", newCmp.get("v.objAttributeWithDefaultValue"));
-                var listAttr = newCmp.getAttributes().getValue("listAttributeWithDefaultValue");
+                var listAttr = newCmp.getValue("v.listAttributeWithDefaultValue");
                 $A.test.assertTrue(listAttr.toString() === "ArrayValue",
                         "Expected to find attribute of ArrayValue type but found"+listAttr.constructor);
                 $A.test.assertEquals("Value", listAttr.auraType);

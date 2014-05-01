@@ -889,6 +889,25 @@ Component.prototype._setValue = function(key, value){
 
 
 /**
+ * Returns the value provider.
+ * @return {Object} value provider
+ */
+Component.prototype.getAttributeValueProvider = function() {
+    // DCHASMAN TODO: TEMPORARY PASSTHROUGH TO HIDE GETATTRIBUTES()
+	return this._getAttributes().getValueProvider();
+};
+
+/**
+ * Returns the value provider of the component.
+ * @return {Object} component or value provider
+ */
+Component.prototype.getComponentValueProvider = function() {
+    // DCHASMAN TODO: TEMPORARY PASSTHROUGH TO HIDE GETATTRIBUTES()
+	return this._getAttributes().getComponentValueProvider();
+};
+
+
+/**
  * Returns the raw value referenced using property syntax.
  * <code>get()</code> calls <code>getValue()</code> and unwraps the value.
  * If you need the wrapper, which can be used for things like

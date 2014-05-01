@@ -123,7 +123,7 @@
 			 */
 			var attrib = cmp.getValue("m.string");
 			$A.test.assertEquals("hey", attrib.getValue());
-			var value = cmp.getAttributes().getValue("observed");
+			var value = cmp.getValue("v.observed");
 			attrib.setValue(value); // implicitly tracks value in m.string
 			$A.test.assertEquals("first", attrib.getValue());
 			$A.test.assertEquals("first", $A.test.getText(valDiv));
@@ -193,9 +193,9 @@
 				valueC.setValue(sameValue);
 			}
 			var attrib = cmp.getValue("m.string");
-			var valueA = cmp.getAttributes().getValue("observed");
-			var valueB = cmp.getAttributes().getValue("observedB");
-			var valueC = cmp.getAttributes().getValue("observedC");
+			var valueA = cmp.getValue("v.observed");
+			var valueB = cmp.getValue("v.observedB");
+			var valueC = cmp.getValue("v.observedC");
 			/*
 			 * X:attrib A:valueA. case 2.1: loop, two value try to watch each
 			 * other. same thing will happen if the loop contains more than two

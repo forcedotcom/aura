@@ -41,7 +41,7 @@
             // test infrastructure expects error css set
             var element = inputCmp.getElement();
         	var htmlCmp = $A.componentService.getRenderingComponentForElement(element);
-        	var valueProvider = htmlCmp.getAttributes().getComponentValueProvider();
+        	var valueProvider = htmlCmp.getComponentValueProvider();
             valueProvider.addClass("inputError");
             */
             component.set("v.errorMessage", errMsgs.join(";"));
@@ -58,7 +58,7 @@
         // test infrastructure expects error css cleared
         var element = inputCmp.getElement();
         var htmlCmp = $A.componentService.getRenderingComponentForElement(element);
-        var valueProvider = htmlCmp.getAttributes().getComponentValueProvider();
+        var valueProvider = htmlCmp.getComponentValueProvider();
         valueProvider.removeClass("inputError");
 
         $A.rerender(inputCmp);

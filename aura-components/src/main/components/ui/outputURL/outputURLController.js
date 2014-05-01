@@ -15,9 +15,7 @@
  */
 ({
     click : function(cmp, event){
-        var attributes = cmp.getAttributes();
-
-        if ($A.util.getBooleanValue(attributes.get("stopPropagation"))) {
+        if ($A.util.getBooleanValue(cmp.get("v.stopPropagation"))) {
             //IE9 & Other Browsers
             if (event.stopPropagation) {
               event.stopPropagation();
@@ -28,7 +26,7 @@
             }
         }
 
-        if ($A.util.getBooleanValue(attributes.get("disabled"))) {
+        if ($A.util.getBooleanValue(cmp.get("v.disabled"))) {
             event.preventDefault();
             return false;
         }

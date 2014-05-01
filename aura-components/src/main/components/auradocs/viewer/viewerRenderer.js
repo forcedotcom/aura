@@ -15,8 +15,7 @@
  */
 ({
     render : function ViewerRenderer(cmp){
-        var attributes = cmp.getAttributes();
-        var desc = new DefDescriptor(attributes.getRawValue("descriptor"));
+        var desc = new DefDescriptor(cmp.get("v.descriptor"));
         var ret = this.superRender();
         var url = "/"+desc.getNamespace()+"/"+desc.getName()+".cmp";
         var locationBar = cmp.find("locationBar").getElement();

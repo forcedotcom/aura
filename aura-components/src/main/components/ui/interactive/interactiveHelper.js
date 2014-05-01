@@ -45,7 +45,7 @@
     domEventHandler : function (event) {
         var element = event.target;
         var htmlCmp = $A.componentService.getRenderingComponentForElement(element);
-        var component = htmlCmp.getAttributes().getComponentValueProvider().getConcreteComponent();
+        var component = htmlCmp.getComponentValueProvider().getConcreteComponent();
         var helper = component.getDef().getHelper();
 
         if (!helper || component._recentlyClicked) {

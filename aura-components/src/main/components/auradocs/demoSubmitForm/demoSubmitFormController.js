@@ -16,9 +16,7 @@
 ({
 	doInit : function(cmp) {
 		var newdate = new Date();
-		var attributes = cmp.getAttributes();
-		attributes.setValue('myDate', newdate.getFullYear() + "-"
-				+ (newdate.getMonth() + 1) + "-" + newdate.getDate());
+		cmp.set('v.myDate', newdate.getFullYear() + "-" + (newdate.getMonth() + 1) + "-" + newdate.getDate());
 	},
 
 	getInput : function(cmp, event) {

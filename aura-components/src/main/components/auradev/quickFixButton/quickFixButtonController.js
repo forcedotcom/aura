@@ -15,7 +15,7 @@
  */
 ({
     fix : function(cmp, evt){
-        var quickFix = cmp.getAttributes().getValue("quickFix");
+        var quickFix = cmp.getValue("v.quickFix");
         var ui = quickFix.getValue("ui");
         if (ui) {
             $A.newCmpAsync(

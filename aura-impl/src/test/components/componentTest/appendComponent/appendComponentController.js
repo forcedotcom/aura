@@ -18,7 +18,7 @@
         $A.componentService.newComponentAsync(
             this,
             function(newCmp) {
-            	cmp.getAttributes().getValue("output").push(newCmp);
+            	cmp.getValue("v.output").push(newCmp);
             },
         	{
                 componentDef: {

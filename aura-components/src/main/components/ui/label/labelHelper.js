@@ -20,7 +20,7 @@
         if (forVal) {
         	var gId;
         	if ($A.util.isString(forVal)) {
-                var valueProvider = cmp.getAttributes().getValueProvider();
+                var valueProvider = cmp.getAttributeValueProvider();
                 //try find the target component for the "for" attribute from valueProvider
                 var refCmp = valueProvider.find(forVal);
 

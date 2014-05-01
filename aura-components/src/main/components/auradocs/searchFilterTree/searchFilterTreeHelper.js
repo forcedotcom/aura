@@ -73,15 +73,13 @@
 
                 if (!record.match) {
                     // Collapse a node if it doesn't match
-                    var atts = node.getAttributes();
-                    atts.setValue('expanded', false);
+                    node.set('v.expanded', false);
                 } else {
                     var title = node.get('v.item.title') || '' + node.get('v.title') || '';
                     // If a node matches then expand and show it.
-                    var atts = node.getAttributes();
-                    atts.setValue('expanded', true);
+                    node.set('v.expanded', true);
                     // This is not strictly necessary until we start hiding on non-matches.
-                    atts.setValue('hidden', false);
+                    node.set('v.hidden', false);
 
                     // If a child matches, then it's parent also matches.
                     // By induction, the path of nodes from the root to this

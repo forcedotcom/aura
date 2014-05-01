@@ -400,8 +400,7 @@
 
 	getAttributes : function(component) {
 		var attributeMap = {};
-		var attributeSet = component.getAttributes();
-		var attributeDelegate = this.getAttribute.bind(this, attributeSet, attributeMap);
+		var attributeDelegate = this.getAttribute.bind(this, component.getAttributes(), attributeMap);
 		component.getDef().getAttributeDefs().each(attributeDelegate);
 		return attributeMap;
 	},
@@ -616,15 +615,15 @@
 	parseExpressions : function(component, attributes) {
 		if (!component || !attributes)
 			return;
-		var attributeMap = component.getAttributes();
 		for ( var field in attributes) {
 			if (attributes.hasOwnProperty(field)) {
 				var value = attributes[field];
 				var expression = this.getExpression(value);
 				if (expression) {
 					value = $A.expressionService.getValue(component, expression);
-					if (value)
-						attributeMap.getValue(field).setValue(value.getValue());
+					if (value) {
+						component.set("v." + field, value.getValue());
+					}
 				}
 			}
 		}

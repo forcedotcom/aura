@@ -6,7 +6,7 @@
             // TODO: This returns a mock data provider component,
             // It covers most of list component such ui:list, ui:autocompleteList, ui:infiniteList, ui:autocomplete
             // We may need to provide different mock Component as we expand our test.
-            this.createComponent("performanceTest:registeredComponentsDataProvider", null, function(newCmp) {
+            this.createComponent("perf:registeredComponentsDataProvider", null, function(newCmp) {
                 // relies on the fact, this component is created synchronously.
                 cmp = newCmp;
             });

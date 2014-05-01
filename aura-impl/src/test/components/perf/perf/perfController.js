@@ -24,7 +24,7 @@
         }
         else {
             // If no component descriptor specified, list all registered components.
-            helper.createComponent('performanceTest:registeredComponents', {}, callback);
+            helper.createComponent('perf:registeredComponents', {}, callback);
         }
     }
 })

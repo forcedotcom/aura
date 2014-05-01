@@ -1,4 +1,4 @@
-<aura:application preload="aura,ui,performanceTest">
+<aura:application preload="aura,ui,perf">
     <aura:handler event="aura:locationChange" action="{!c.locationChange}" />
     <aura:handler event="aura:doneRendering" action="{!c.doneRendering}" />
 

@@ -1,0 +1,12 @@
+<aura:component>
+    <div id="componentsList">
+        <ui:list aura:id="list1" itemVar="item">
+            <aura:set attribute="itemTemplate">
+                <perf:registeredComponentsItem item="{!item}" />
+            </aura:set>
+            <aura:set attribute="dataProvider">
+                <perf:registeredComponentsDataProvider/>
+            </aura:set>
+        </ui:list>
+    </div>
+</aura:component>

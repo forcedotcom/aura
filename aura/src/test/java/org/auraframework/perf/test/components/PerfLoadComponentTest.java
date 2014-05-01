@@ -21,7 +21,7 @@ public final class PerfLoadComponentTest extends ComponentPerfAbstractTestCase {
         // 10:14:42.223 ERROR - JS:MIN:5sKHt1bcEBLRhRYVTA8MzA:3787: ERROR - Parse error. invalid property id
         // char: String.fromCharCode(65 + (i%26))
         // plus some metrics are bigger than in DEV mode
-        String relativeUrl = "/performanceTest/perf.app#" +
+        String relativeUrl = "/perf/perf.app#" +
                 URLEncoder.encode("{\"componentDef\":\"" + descriptor + "\"}", "UTF-8");
         String url = getAbsoluteURI(relativeUrl).toString();
         logger.info("testRun: " + url);

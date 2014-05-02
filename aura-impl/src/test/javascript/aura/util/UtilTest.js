@@ -39,7 +39,52 @@ Test.Aura.UtilTest=function(){
 	auraMock(function(){
 		targetUtil = new $A.ns.Util();
 	});
-	
+
+    [Fixture]
+    function isIOSWebView(){
+        [Fact]
+        function ReturnsTrueForIOS7WebView(){
+            var actual;
+            var mockUserAgentIOS7WebView = Mocks.GetMock(Object.Global(), "window", {
+                navigator: {
+                    userAgent: "iPhone OS/7.1 (iPhone) Salesforce1/3001899 XBranding/1.0 SalesforceTouchContainer/2.0 Mozilla/5.0 (iPhone; CPU iPhone OS 7_1 like Mac OS X) AppleWebKit/537.51.2 (KHTML, like Gecko) Mobile/11D167 (241664608)"
+                }
+            });
+            // Create fresh instance of Util.js since we store isIOSWebView return value on object
+            var targetUtil;
+            auraMock(function(){
+                targetUtil = new $A.ns.Util();
+            });
+
+            mockUserAgentIOS7WebView(function(){
+                actual = targetUtil.isIOSWebView();
+            });
+
+            Assert.True(actual);
+        }
+
+        [Fact]
+        function ReturnsFalseForIOS7_1Safari(){
+            var actual;
+            var mockUserAgentIOS7Safari = Mocks.GetMock(Object.Global(), "window", {
+                navigator: {
+                    userAgent: "Mozilla/5.0 (iPhone; CPU iPhone OS 7_1 like Mac OS X) AppleWebKit/537.51.2 (KHTML, like Gecko) Version/7.0 Mobile/11D5145e Safari/9537.53"
+                }
+            });
+            // Create fresh instance of Util.js since we store isIOSWebView return value on object
+            var targetUtil;
+            auraMock(function(){
+                targetUtil = new $A.ns.Util();
+            });
+
+            mockUserAgentIOS7Safari(function(){
+                actual = targetUtil.isIOSWebView(); 
+            })
+
+            Assert.False(actual);
+        }
+    }
+
 	[Fixture]
 	function stripTags(){
 		

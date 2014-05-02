@@ -47,6 +47,18 @@ $A.ns.Util = function() {
 $A.ns.Util.prototype.isIE = (navigator.userAgent.indexOf("MSIE") != -1) || (navigator.userAgent.indexOf("Trident/") != -1);
 
 /**
+ * Whether IOS7 UIWebView
+ * @returns {boolean} true if IOS UIWebView
+ */
+$A.ns.Util.prototype.isIOSWebView = function() {
+    if (this._isIOSWebView === undefined) {
+        var ua = window.navigator.userAgent;
+        this._isIOSWebView = /(iPad|iPhone|iPod);.*CPU.*OS 7_\d.*AppleWebKit/i.test(ua) && ua.indexOf("Safari") == -1;
+    }
+    return this._isIOSWebView;
+};
+
+/**
  * evals code globally, without enclosing the current scope
  *
  * @private

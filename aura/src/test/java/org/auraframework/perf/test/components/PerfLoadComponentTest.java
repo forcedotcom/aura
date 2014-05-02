@@ -1,11 +1,12 @@
 package org.auraframework.perf.test.components;
 
-import java.net.URLEncoder;
-import java.util.logging.Logger;
-
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.perf.core.ComponentPerfAbstractTestCase;
+import org.openqa.selenium.By;
+
+import java.net.URLEncoder;
+import java.util.logging.Logger;
 
 public final class PerfLoadComponentTest extends ComponentPerfAbstractTestCase {
 
@@ -21,6 +22,11 @@ public final class PerfLoadComponentTest extends ComponentPerfAbstractTestCase {
                 URLEncoder.encode("{\"componentDef\":\"" + descriptor + "\"}", "UTF-8");
         String url = getAbsoluteURI(relativeUrl).toString();
         logger.info("testRun: " + url);
+
         openRaw(url);
+
+        String componentName = descriptor.getName();
+        waitForElementAppear("Container div[data-app-rendered-component] element for thecomponent not present",
+                By.cssSelector(String.format("[data-app-rendered-component='%s']", componentName)));
     }
 }

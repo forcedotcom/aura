@@ -787,7 +787,7 @@ Component.prototype.getElement = function(){
 /**
  * DO NOT USE THIS METHOD.
  *
- * @public
+ * @private
  *
  * @deprecated use Component.get(key) and Component.set(key,value) instead
  */
@@ -838,7 +838,7 @@ Component.prototype._getValue = function(key){
     }
 
     // this getValue is special, the only one that accepts an expression or just a key
-    if (key.toString() === "PropertyReferenceValue" || key.indexOf(".") != -1) {
+    if (key.toString() === "PropertyReferenceValue" || key.indexOf(".") !== -1) {
         // then we got an expression, lets deal with it
         return expressionService.getValue(this, key);
     }

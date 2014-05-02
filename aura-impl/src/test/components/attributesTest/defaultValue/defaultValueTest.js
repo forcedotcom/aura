@@ -45,33 +45,6 @@
 		}
 	},
 
-	testDefaultValueOfNonExistingAttribute : {
-		test : function(cmp) {
-			$A.test.assertFalsy(cmp.get("v.fooBar"),
-					"Should not be able to read non existing attributes.");
-			try {
-				$A.test.assertFalsy(cmp.getAttributes().getValue(undefined));
-				$A.test.fail("Should not be able to use undefined in getValue()");
-			} catch (e) {
-				$A.test.assertEquals("Assertion Failed!: Key is required for getValue on MapValue : undefined",
-						e.message)
-			}
-			try {
-				$A.test.assertFalsy(cmp.getAttributes().getValue(null));
-				$A.test.fail("Should not be able to use null in getValue()");
-			} catch (e) {
-				$A.test.assertEquals("Assertion Failed!: Key is required for getValue on MapValue : null", e.message)
-			}
-			try {
-				$A.test.assertFalsy(cmp.getAttributes().getValue());
-				$A.test.fail("Should not be able to use null in getValue()");
-			} catch (e) {
-				$A.test.assertEquals("Assertion Failed!: Key is required for getValue on MapValue : undefined",
-						e.message)
-			}
-		}
-	},
-
 	/**
 	 * Verify that a locally created component has the same set of default attribute values. In this case the component
 	 * being creates already has its def at the client.

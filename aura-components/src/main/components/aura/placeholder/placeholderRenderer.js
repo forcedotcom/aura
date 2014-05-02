@@ -31,11 +31,14 @@
         }
 
         action.setCallback(this, function(a){
-
             var newBody;
             if (a.getState() === "SUCCESS"){
                 newBody = $A.newCmpDeprecated(a.getReturnValue(), avp, false, false);
-                newBody.getAttributes().merge(attributes, true);
+                
+                // Merge in the actual attributes
+                for (var key in attributes) {
+                	newBody.set("v." + key, attributes.get(key));
+                }
             } else {
                 var errors = a.getError();
                 newBody = $A.newCmpDeprecated("markup://aura:text", null, false, false);
@@ -45,10 +48,8 @@
                     newBody.set("v.value", 'unknown error');
                 }
             }
-            var body = cmp.getValue("v.body");
-
-            body.destroy();
-            body.setValue(newBody);
+            
+            var body = cmp.set("v.body", newBody);
 
             $A.rerender(cmp);
 

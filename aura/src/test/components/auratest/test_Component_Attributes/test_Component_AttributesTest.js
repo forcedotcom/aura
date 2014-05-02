@@ -103,7 +103,6 @@
         test: function(component){
             var newValue = component.get('v.nonExistingAttribute');
             $A.test.assertFalse(newValue !== undefined, 'A defined Value object was created');
-            // TODO(W-795118): AttributeSet.setValues should assert that the attribute exists
             // try {
                 component.set('v.nonExistingAttribute', 'blahhh');
                 // $A.test.fail("Setting a non-existent attribute should throw error.");

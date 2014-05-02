@@ -26,7 +26,17 @@
     box-sizing: border-box;
 }
 
-.uiScroller.scrollWrapper {}
+/* CSS Native scrolling Classes */
+.uiScroller.native {
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.uiScroller.native > .scroller > .pullToRefresh,
+.uiScroller.native > .scroller > .pullToLoadMore {
+    position: relative;
+    top: 0;
+}
 
 .uiScroller > .scroller {
     position: absolute;

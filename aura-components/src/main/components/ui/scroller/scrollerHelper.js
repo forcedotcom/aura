@@ -119,8 +119,9 @@
     },
     
     _getPullToRefreshConfig: function (component) {
+        var nativeScroller = component.get('v.useNativeScroller');
         return {
-            labelPull     : component.get("v.pullToRefreshPull"),
+            labelPull     : nativeScroller ? component.get('v.pullToRefreshClick'): component.get("v.pullToRefreshPull"),
             labelRelease  : component.get("v.pullToRefreshRelease"),
             labelUpdate   : component.get("v.pullToRefreshUpdating"),
             labelSubtitle : component.get("v.pullToRefreshSubtitle"),
@@ -128,8 +129,9 @@
         }
     },
     _getPullToLoadMoreConfig: function (component) {
+        var nativeScroller = component.get('v.useNativeScroller');
         return {
-            labelPull     : component.get("v.pullToShowMorePull"),
+            labelPull     : nativeScroller ? component.get('v.pullToShowMoreClick') : component.get("v.pullToShowMorePull"),
             labelRelease  : component.get("v.pullToShowMoreRelease"),
             labelUpdate   : component.get("v.pullToShowMoreUpdating"),
             labelSubtitle : component.get("v.pullToShowMoreSubtitle"),
@@ -176,6 +178,7 @@
             canShowMore           = component.get('v.canShowMore'),
 
             // scroller properties check
+            useNativeScroller     = component.get('v.useNativeScroller'),
             enabled               = component.get('v.enabled'),
             width                 = component.get('v.width'),
             height                = component.get('v.height'),
@@ -198,12 +201,13 @@
             pullToLoadMore        = canShowMore,
             infiniteLoading       = auraInfiniteLoading && component.get('v.infiniteLoading'),
 
-            pullToRefreshConfig   = pullToRefresh   && this._getPullToRefreshConfig(component),
-            pullToLoadMoreConfig  = pullToLoadMore  && this._getPullToLoadMoreConfig(component),
-            infiniteLoadingConfig = infiniteLoading && this._getInfiniteLoadingConfig(component);
+            pullToRefreshConfig   = this._getPullToRefreshConfig(component),
+            pullToLoadMoreConfig  = this._getPullToLoadMoreConfig(component),
+            infiniteLoadingConfig = this._getInfiniteLoadingConfig(component);
         
         return {
-            enabled               : enabled,
+            enabled               : useNativeScroller ? false : enabled,
+            useNativeScroller     : useNativeScroller,
             itemWidth             : width,
             itemHeight            : height,
             scroll                : scroll,
@@ -272,6 +276,10 @@
             wrapper.addEventListener('touchmove', this._preventDefault, false);
         }
 
+        if (attrs.get('useNativeScroller')) {
+            this._attachClickEventsToPullsTo(component, attrs, scrollerInstance);
+        }
+
         for (var i = 0; i < events.length; i++) {
             this._bridgeScrollerAction(component, scrollerInstance, events[i]);
         }
@@ -279,6 +287,28 @@
         this._stopNativeDragging(component);
         this._captureClickEvents(component, scrollerInstance);
     },
+    /*
+    * If we use native scrolling pullToShowMore and pullToRefresh will render as part of the scroller
+    * We need to attach the click events so we can trigger the same funcionality
+    */
+    _attachClickEventsToPullsTo: function (cmp, attrs, scrollerInstance) {
+        var wrapper        = scrollerInstance.wrapper,
+            pullToRefresh  = wrapper.getElementsByClassName('pullToRefresh')[0],
+            pullToLoadMore = wrapper.getElementsByClassName('pullToLoadMore')[0];
+
+        if (pullToRefresh) {
+            pullToRefresh.addEventListener('click', function () {
+                scrollerInstance.triggerPTR();
+            }, false);
+        }
+
+        if (pullToLoadMore) {
+            pullToLoadMore.addEventListener('click', function () {
+                scrollerInstance._triggerPTL();
+            }, false);
+        }
+    },
+
     /*
     * @_stopNativeDraggin
     * Preventsthe native dragging functionality of for desktop browsers.
@@ -1704,7 +1734,7 @@ _initSurfaceManagerPlugin: function () {
                 return;
             }
 
-            itemsLeft = last.contentIndex < itemsSize - 2;
+            itemsLeft = last.contentIndex < itemsSize - (ptlEnabled ? 2 : 1);
             offset    = last.offset + (this.scrollVertical ? last.height : last.width);
 
             if (this.scrollVertical) {
@@ -2291,8 +2321,8 @@ _initPullToRefreshPlugin: function () {
         PLUGINS  = SCROLLER.plugins || (SCROLLER.plugins = {}),
 
         CONFIG_DEFAULTS = {
-            labelPull     : 'Pull down to Refresh...',
-            labelRelease  : 'Pull down to Release...',
+            labelPull     : 'Pull down to refresh...',
+            labelRelease  : 'Release to refresh...',
             labelUpdate   : 'Loading...',
             labelSubtitle : '',
             labelError    : 'Error on pull to refresh'
@@ -2516,7 +2546,7 @@ _initPullToLoadMorePlugin: function () {
         CONFIG_DEFAULTS = {
             labelPull     : 'Pull up to show more',
             labelRelease  : 'Release to show more',
-            labelUpdate   : 'Loading...',
+            labelUpdate   : 'Updating...',
             labelSubtitle : '',
             labelError    : 'Error on pull to load more'
         },

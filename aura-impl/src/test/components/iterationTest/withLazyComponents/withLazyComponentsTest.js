@@ -93,31 +93,32 @@
             var helper = cmp.getDef().getHelper();
             var iteration = cmp.find("iterationWithAttributes");
             var items = cmp.find("lazyWithAttributes");
-            $A.test.assertEquals(4,items.length, "Expeted 4 items in iteration.");
+            $A.test.assertEquals(4,items.length, "Expected 4 items in iteration.");
             //Verify that all items are initially represented by placeholder
             for(var i = 0, n = items.length; i < n; i++) {
                 var item = items[i];
                 $A.test.assertEquals("placeholder", item.getDef().getDescriptor().getName(),
                 "Expected a placeholder for lazy loading component.");
             }
+            
             helper.resumeGateId(cmp, "withAttributes");
 
             //Verify first item is replaced by expected value
             $A.test.addWaitFor('markup://aura:expression', function(){
-                    return  cmp.find('lazyWithAttributes')[0].getDef().getDescriptor().getQualifiedName();
+                    return cmp.find('lazyWithAttributes')[0].getDef().getDescriptor().getQualifiedName();
                 },
                 function(){
                     $A.test.assertEquals(cmp.get('m.innerData')[0],$A.test.getTextByComponent(cmp.find("lazyWithAttributes")[0]),
-                        "Failed to provide value for lazy component in iteration block");
+                        "Failed to provide value for lazy component in iteration block [loc1]");
                 });
 
             //Verify last item is replaced by expected value
             $A.test.addWaitFor('markup://aura:expression', function(){
-                    return  cmp.find('lazyWithAttributes')[3].getDef().getDescriptor().getQualifiedName();
+                    return cmp.find('lazyWithAttributes')[3].getDef().getDescriptor().getQualifiedName();
                 },
                 function(){
                     $A.test.assertEquals(cmp.get('m.innerData')[3],$A.test.getTextByComponent(cmp.find("lazyWithAttributes")[3]),
-                        "Failed to provide value for lazy component in iteration block");
+                        "Failed to provide value for lazy component in iteration block [loc2]");
                 });
         }
     }

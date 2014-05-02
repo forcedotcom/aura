@@ -906,6 +906,14 @@ Component.prototype.getComponentValueProvider = function() {
 	return this._getAttributes().getComponentValueProvider();
 };
 
+/**
+ * Merge attributes from another map value.
+ * @param {Object} yourMap The map to merge with this AttributeSet.
+ */
+Component.prototype.mergeAttributes = function(yourMap, overwrite) {
+    // DCHASMAN TODO: TEMPORARY PASSTHROUGH TO HIDE GETATTRIBUTES()
+	return this._getAttributes().merge(yourMap, overwrite);
+};
 
 /**
  * Returns the raw value referenced using property syntax.

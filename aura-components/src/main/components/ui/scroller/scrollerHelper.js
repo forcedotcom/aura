@@ -276,8 +276,8 @@
             wrapper.addEventListener('touchmove', this._preventDefault, false);
         }
 
-        if (attrs.get('useNativeScroller')) {
-            this._attachClickEventsToPullsTo(component, attrs, scrollerInstance);
+        if (component.get('v.useNativeScroller')) {
+            this._attachClickEventsToPullsTo(component, scrollerInstance);
         }
 
         for (var i = 0; i < events.length; i++) {
@@ -291,7 +291,7 @@
     * If we use native scrolling pullToShowMore and pullToRefresh will render as part of the scroller
     * We need to attach the click events so we can trigger the same funcionality
     */
-    _attachClickEventsToPullsTo: function (cmp, attrs, scrollerInstance) {
+    _attachClickEventsToPullsTo: function (cmp, scrollerInstance) {
         var wrapper        = scrollerInstance.wrapper,
             pullToRefresh  = wrapper.getElementsByClassName('pullToRefresh')[0],
             pullToLoadMore = wrapper.getElementsByClassName('pullToLoadMore')[0];

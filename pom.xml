@@ -652,6 +652,7 @@
                                             <include name="**/*.css" />
                                             <include name="**/*.theme" />
                                             <include name="**/*Test.js" />
+                                            <include name="**/*.auradoc" />
                                         </fileset>
                                     </path>
                                     <pathconvert property="definitionList" refid="definitions" pathsep=",">
@@ -679,6 +680,7 @@
                                             <include name="**/*.css" />
                                             <include name="**/*.theme" />
                                             <include name="**/*Test.js" />
+											<include name="**/*.auradoc" />
                                         </fileset>
                                     </path>
                                     <pathconvert property="definitionList" refid="definitions" pathsep=",">

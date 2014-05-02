@@ -15,13 +15,11 @@
  */
 package org.auraframework.impl.css.style;
 
+import java.util.Map;
 import java.util.Set;
 
 import org.auraframework.Aura;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.NamespaceDef;
-import org.auraframework.def.StyleDef;
-import org.auraframework.def.ThemeDef;
+import org.auraframework.def.*;
 import org.auraframework.impl.css.StyleTestCase;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
@@ -29,6 +27,8 @@ import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.throwable.quickfix.ThemeValueNotFoundException;
 import org.auraframework.util.AuraTextUtil;
+import org.auraframework.util.json.Json;
+import org.auraframework.util.json.JsonReader;
 
 import com.google.common.collect.Sets;
 
@@ -128,5 +128,44 @@ public class StyleDefImplTest extends StyleTestCase {
         DefDescriptor<StyleDef> style = addStyleDef(".THIS {color: red }");
         String expected = style.getNamespace() + AuraTextUtil.initCap(style.getName());
         assertEquals(expected, style.getDef().getClassName());
+    }
+    /**
+     * Verify that if already preloaded, StyleDef doesn't include code when serialized.
+     * @throws Exception
+     */
+    public void testDefSerializationWhenPreloaded()throws Exception{
+        DefDescriptor<StyleDef> styleDesc = addStyleDef(".THIS {color: red }");
+        Aura.getContextService().getCurrentContext().setPreloading(false);
+        Set<DefDescriptor<?>> preloaded = Sets.newHashSet();
+        preloaded.add(styleDesc);
+        Aura.getContextService().getCurrentContext().setPreloadedDefinitions(preloaded);
+        verifyStyleDefSerialization(styleDesc, false);
+    }
+    
+    /**
+     * Verify that if not preloaded, StyleDef includes code when serialized.
+     * @throws Exception
+     */
+    public void testDefSerializationWhenNotPreloaded()throws Exception{
+        DefDescriptor<StyleDef> styleDesc = addStyleDef(".THIS {color: green }");
+        Aura.getContextService().getCurrentContext().setPreloading(false);
+        Set<DefDescriptor<?>> preloaded = Sets.newHashSet();
+        Aura.getContextService().getCurrentContext().setPreloadedDefinitions(preloaded);
+        verifyStyleDefSerialization(styleDesc, true);
+    }
+    
+    @SuppressWarnings("unchecked")
+    private void verifyStyleDefSerialization(DefDescriptor<StyleDef> styleDesc, Boolean expectCode)throws Exception{
+        String serialized = Json.serialize(styleDesc.getDef());
+        Object o = new JsonReader().read(serialized);
+        assertTrue(o instanceof Map);
+        Map<String, Object> outerMap = (Map<String, Object>) o;
+        assertEquals(styleDesc.toString(), outerMap.get("descriptor"));
+        assertEquals(styleDesc.getNamespace() + AuraTextUtil.initCap(styleDesc.getName()), outerMap.get("className"));
+        if(expectCode){
+            assertEquals("StyleDef content not included.", styleDesc.getDef().getCode(),outerMap.get("code"));
+        }else{
+            assertNull("StyleDef content should not be included.", outerMap.get("code"));
+        }
     }
 }

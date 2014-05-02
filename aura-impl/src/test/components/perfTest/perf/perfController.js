@@ -43,7 +43,7 @@
             helper.createComponent(descriptor.componentDef, descriptor.attributes && descriptor.attributes.values, callback);
         } else {
             //$A.log('No component specified, listing components');
-            helper.createComponent('perf:registeredComponents', {}, callback);
+            helper.createComponent('perfTest:registeredComponents', {}, callback);
         }
     }
 })

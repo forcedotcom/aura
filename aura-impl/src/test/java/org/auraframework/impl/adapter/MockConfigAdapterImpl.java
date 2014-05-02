@@ -36,7 +36,7 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
     private static final Set<String> SYSTEM_TEST_NAMESPACES = new ImmutableSortedSet.Builder<String>(String.CASE_INSENSITIVE_ORDER).add(
     		"auratest", "actionsTest", "attributesTest", "auraStorageTest", "gvpTest", "preloadTest", "clientLibraryTest", "clientApiTest", 
     	"clientServiceTest", "componentTest", "docstest", "expressionTest", "forEachDefTest", "forEachTest", "handleEventTest", "ifTest", "iterationTest", 
-    	"layoutServiceTest", "listTest", "loadLevelTest", "performanceTest", "renderingTest", "setAttributesTest", "test", "themeSanityTest", "uitest", "utilTest", 
+    	"layoutServiceTest", "listTest", "loadLevelTest", "perfTest", "performanceTest", "renderingTest", "setAttributesTest", "test", "themeSanityTest", "uitest", "utilTest",
     	"updateTest", "whitespaceBehaviorTest", "appCache").build();
 
     

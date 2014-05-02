@@ -15,9 +15,7 @@
  */
 ({
     replaceBodyContent : function(cmp, event){
-        var oldBody = cmp.getAttributes().getValue("body");
-        oldBody.destroy();
-        oldBody.setValue("new content");
+        cmp.set("v.body", "new content");
     },
     
     scrollToTop : function(cmp, event, helper) {

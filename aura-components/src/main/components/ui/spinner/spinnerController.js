@@ -15,7 +15,6 @@
  */
 ({
     toggleSpinner: function (cmp, event, helper) {
-        var attributes = cmp.getAttributes();
         var isVisible = event.getParam("isVisible");
         if (isVisible) {
             $A.util.removeClass(cmp.find("spinner").getElement(), "hideEl");

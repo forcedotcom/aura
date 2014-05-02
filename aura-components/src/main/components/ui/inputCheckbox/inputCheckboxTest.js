@@ -106,10 +106,10 @@
             aura.test.assertEquals("my value", component.find("checkbox").getElement().value, "Value attribute not correctly set");
             aura.test.assertFalse(component.find("checkbox").getElement().disabled, "Element not correctly enabled");
             aura.test.assertFalse(component.find("checkbox").getElement().checked, "Element not correctly unselected");
-            component.getAttributes().setValue('disabled', true);
-            component.getAttributes().setValue('text', 'your value');
-            component.getAttributes().setValue('value', true);
-            component.getAttributes().setValue('label', "I want a pony");
+            component.set('v.disabled', true);
+            component.set('v.text', 'your value');
+            component.set('v.value', true);
+            component.set('v.label', "I want a pony");
             $A.rerender(component);
             aura.test.assertEquals("your value", component.find("checkbox").getElement().value, "After rerender, value attribute not correctly set with new value");
             aura.test.assertTrue(component.find("checkbox").getElement().disabled, "After rerender, element not disabled");

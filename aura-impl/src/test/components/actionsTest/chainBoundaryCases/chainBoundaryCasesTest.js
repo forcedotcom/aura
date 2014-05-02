@@ -123,7 +123,7 @@
                     $A.test.assertEquals(200, action.getReturnValue(), "Exclusive action should not be executed before parent action.");
                     //If the call backs are in order, then this attribute will have value set by c.add's call back
                     $A.test.assertEquals("1", cmp.get('v.responseOrder'), "Action chaining did not preserve order at client.");
-                    cmp.getAttributes().setValue('responseOrder', "2");
+                    cmp.set('v.responseOrder', "2");
                 });
             multiply.setChained();
             multiply.setExclusive(true);
@@ -134,7 +134,7 @@
                         $A.test.assertEquals(100, action.getReturnValue(), "Chained action was executed before parent action.");
                         //If the call backs are in order, then this attribute will have the default value
                         $A.test.assertEquals("", cmp.get('v.responseOrder'), "Action chaining did not preserve order at client.");
-                        cmp.getAttributes().setValue('responseOrder', "1");
+                        cmp.set('v.responseOrder', "1");
                 });
             this.enqueueServerActionAndFireEvent(cmp, add);
             $A.test.addWaitFor("2", function(){return cmp.get('v.responseOrder');});
@@ -160,7 +160,7 @@
                         $A.test.assertEquals("SUCCESS",action.getState());
                         $A.test.assertEquals(200*cmp.get('v.callbackCount'),
                             action.getReturnValue());
-                        cmp.getAttributes().setValue('callbackCount',
+                        cmp.set('v.callbackCount',
                             cmp.get('v.callbackCount')+1);
                     });
                 multiply.setChained();
@@ -172,7 +172,7 @@
                                         },function(action){
                                             $A.test.assertEquals("SUCCESS",action.getState());
                                             $A.test.assertEquals(100, action.getReturnValue(), "Chained action was executed before parent action.");
-                                            cmp.getAttributes().setValue('callbackCount', 1);
+                                            cmp.set('v.callbackCount', 1);
                                         });
                 this.enqueueServerActionAndFireEvent(cmp, add);
                 //Chaining same action multiple times failed.

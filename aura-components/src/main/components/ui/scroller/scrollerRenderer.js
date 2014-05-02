@@ -20,8 +20,7 @@
     },
 
     rerender : function(component, helper) {
-        var attributes = component.getAttributes(),
-            enabled    = $A.util.getBooleanValue(attributes.get("enabled"));
+        var enabled = $A.util.getBooleanValue(component.get("v.enabled"));
 
         this.superRerender();
 

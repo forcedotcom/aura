@@ -91,8 +91,7 @@
 
 unrender: function(component) {
         // recursively unrender facets
-        var attributes = component.getAttributes();
-        var value = attributes.getValue("value");
+        var value = component.getValue("v.value");
         if (value && (value.auraType === "Component" || !value.isLiteral())) {
             // the result is a ComponentDefRef
             $A.unrender(value);

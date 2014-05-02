@@ -128,7 +128,7 @@
         var toExpand = cmp._parentMap[cmp._activeCmp.getGlobalId()];
         // Follow parent uplinks and expand until we reach the root.
         while (toExpand) {
-            toExpand.getAttributes().setValue('expanded', true);
+            toExpand.set('v.expanded', true);
             toExpand = cmp._parentMap[toExpand.getGlobalId()];
         }
     },
@@ -138,7 +138,7 @@
      * necessary.
      */
     highlightActive : function(cmp) {
-        cmp._activeCmp.getAttributes().setValue('active', 'true');
+        cmp._activeCmp.set('v.active', 'true');
     },
 
     /**

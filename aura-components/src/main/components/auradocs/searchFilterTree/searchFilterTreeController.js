@@ -68,7 +68,7 @@
                         "traverser" : "PostOrderTraverser",
                         "callback" : function(args) {
                             args.visitor.funcToApply = function(node) {
-                                node.getAttributes().setValue('hidden', false)
+                                node.set('v.hidden', false)
                             };
                             root.getEvent("traverse").setParams(args).fire();
                         }

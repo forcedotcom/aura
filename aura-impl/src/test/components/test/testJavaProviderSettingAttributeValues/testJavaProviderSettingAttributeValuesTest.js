@@ -23,7 +23,7 @@
             aura.test.assertEquals('b1Provider', component.get('v.b1'), "b1 should have been set by provider");
             aura.test.assertEquals('aura', component.get('v.value'), "value should have been passed through");
             //using something order than a simple string
-            aura.test.assertEquals('ar1Provider1', component.getAttributes().getValue('ar1').get(1), "ar1 should have been set by provider");
+            aura.test.assertEquals('ar1Provider1', component.get('v.ar1')[1], "ar1 should have been set by provider");
             aura.test.assertTrue(component.get('v.b2')===undefined, "b2 should have been undefined");
         }
     },

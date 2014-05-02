@@ -15,13 +15,12 @@
  */
 ({
     afterRender: function (cmp) {
-        var el = cmp.getElement(),
-            attrs = cmp.getAttributes();
+        var el = cmp.getElement();
 
         $A.util.setDataAttribute(el, 'action-global-id', cmp.getGlobalId());
-        $A.util.setDataAttribute(el, 'action-name', attrs.getValue('name').getValue()); 
-        $A.util.setDataAttribute(el, 'action-value', attrs.getValue('value').getValue()); 
-        $A.util.setDataAttribute(el, 'item-index', attrs.getValue('index').getValue()); 
+        $A.util.setDataAttribute(el, 'action-name', cmp.get('v.name')); 
+        $A.util.setDataAttribute(el, 'action-value', cmp.get('v.value')); 
+        $A.util.setDataAttribute(el, 'item-index', cmp.get('v.index')); 
 
         this.superAfterRender(); 
     }

@@ -17,7 +17,7 @@
     fix : function(cmp, evt){
         var values = aura.util.formToMap(cmp.find("form").getElement());
         var a = cmp.get("c.doFix");
-        var quickFix = cmp.getAttributes().getValue("quickFix");
+        var quickFix = cmp.getValue("v.quickFix");
         a.setParams({
             name: quickFix.getValue("name").getValue(),
             attributes: values

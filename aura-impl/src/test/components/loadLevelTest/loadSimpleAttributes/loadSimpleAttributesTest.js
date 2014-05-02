@@ -69,9 +69,9 @@
             });
         },function(cmp){
             $A.run(function() {
-                    cmp.getAttributes().setValue('stringAttribute','postLoading');
-                    cmp.getAttributes().setValue('integerAttribute',100 );
-                    cmp.getAttributes().setValue('booleanAttribute', false );
+                    cmp.set('v.stringAttribute','postLoading');
+                    cmp.set('v.integerAttribute',100 );
+                    cmp.set('v.booleanAttribute', false );
                 })
 
             $A.test.assertEquals("postLoading",$A.test.getTextByComponent(cmp.find("stringAttribute")), "Failed to rerender dirty string value, could also be a problem with aura:test rerender.");

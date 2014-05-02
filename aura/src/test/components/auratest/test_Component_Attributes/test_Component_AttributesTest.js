@@ -26,10 +26,7 @@
             var stringValueByExpression = $A.expressionService.getValue(component, "{!v.label}");
             aura.test.assertNotNull(stringValueByExpression,"Cound not retrieve attribute using expression service");
 
-            var attributeSet = component.getAttributes();
-            aura.test.assertTrue(attributeSet.values.auraType ==='Value', 'aura type for attribute set is not set');
-
-            var attribute = component.getAttributes().getValue('label');
+            var attribute = component.getValue('v.label');
             aura.test.assertNotNull(attribute,"Cound not retrieve component's attribute");
             //Attributes are value objects but the auraType is changed to Attribute. see
             aura.test.assertTrue(attribute.auraType ==='Value', 'aura type for attribute not set');
@@ -67,7 +64,7 @@
             aura.test.assertEquals(labelValueThruComponent,labelValueThroughComponentApi);
             aura.test.assertEquals(labelValueThruComponent,labelValueByExpression);
 
-            component.getAttributes().setValue('label','newLabel');
+            component.set('v.label','newLabel');
             var labelValueThroughComponentApi = component.get("v.label");
             var labelValueByExpression = $A.expressionService.getValue(component, "{!v.label}").getValue();
             var labelValueThruComponent = component.get('v.label');
@@ -84,15 +81,15 @@
             /**Attributes of a Component are stored as value objects
              * Verify that such value objects can be committed
              */
-            var stringValue = component.getAttributes().getValue('label');
+            var stringValue = component.getValue('v.label');
             aura.test.assertTrue(stringValue.getValue()==="AttributeDefault", "Value mis match between attribute value and retrieved value");
             stringValue.setValue('newString');
 
             aura.test.assertTrue(stringValue.getValue()==='newString', "getValue is not retrieving the latest value");
-            aura.test.assertTrue(component.getAttributes().getValue('label').getPreviousValue()==='AttributeDefault', "getPreviousValue is not retrieving the previous value");
+            aura.test.assertTrue(component.getValue('v.label').getPreviousValue()==='AttributeDefault', "getPreviousValue is not retrieving the previous value");
             //Commit a value
-            component.getAttributes().getValue('label').commit();
-            aura.test.assertTrue(component.getAttributes().getValue('label').getPreviousValue()==="newString", "Value was not committed");
+            component.getValue('v.label').commit();
+            aura.test.assertTrue(component.getValue('v.label').getPreviousValue()==="newString", "Value was not committed");
         }
 
     },
@@ -104,29 +101,17 @@
      */
     testVerifySetValueNonExistentAttributes:{
         test: function(component){
-            var attributeSet = component.getAttributes();
-            var newValue = attributeSet.getValue('nonExistingAttribute');
-            $A.test.assertFalse(newValue.isDefined(), 'A defined Value object was created');
+            var newValue = component.get('v.nonExistingAttribute');
+            $A.test.assertFalse(newValue !== undefined, 'A defined Value object was created');
             // TODO(W-795118): AttributeSet.setValues should assert that the attribute exists
             // try {
-                attributeSet.setValue('nonExistingAttribute', 'blahhh');
+                component.set('v.nonExistingAttribute', 'blahhh');
                 // $A.test.fail("Setting a non-existent attribute should throw error.");
             // } catch (e) {
                 // $A.test.assertTrue(e.message.indexOf("Assertion Failed!: Unknown attribute") != -1,
                 //        "Setting non-existent attribute did not throw expected Error.");
-                $A.test.assertFalse(attributeSet.getValue('nonExistingAttribute').isDefined());
+                $A.test.assertFalse(component.get('v.nonExistingAttribute') !== undefined);
             // }
         }
-    },
-
-    testInvalidUseOfGetAttributes:{
-        test: function(component){
-            var attributeSet = component.getAttributes();
-            var attrValue = attributeSet.getValue('label');
-            //attrValue.getValue() is the actual usage of a wrapped value object
-            var newBlankValue = attrValue.getValue('blah');
-            aura.test.assertDefined(newBlankValue, 'A Value was not created');
-        }
     }
-
 })

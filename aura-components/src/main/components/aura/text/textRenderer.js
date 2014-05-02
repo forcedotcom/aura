@@ -21,13 +21,16 @@
         } else if (!$A.util.isString(value)) {
             value = String(value);
         }
+        
         var trunc = component.get("v.truncate");
-        var truncateByWord = component.getAttributes().getValue("truncateByWord").getBooleanValue();
-        var ellipsis = component.getAttributes().getValue("ellipsis").getBooleanValue();
+        var truncateByWord = $A.util.getBooleanValue(component.get("v.truncateByWord"));
+        var ellipsis = $A.util.getBooleanValue(component.get("v.ellipsis"));
+        
         if(trunc){
             trunc = 1 * trunc;
             value = aura.util.truncate(value, trunc, ellipsis, truncateByWord);
         }
+        
         return document.createTextNode(value);
     }
 })

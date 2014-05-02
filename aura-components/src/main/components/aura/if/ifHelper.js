@@ -16,13 +16,12 @@
 ({
     createRealBody: function(cmp, isTrue, doForce) {
         var realbody = [];
-        var atts = cmp.getAttributes();
         var facet;
         if (isTrue) {
-            facet = atts.getValue("body");
+            facet = cmp.getValue("v.body");
             //console.log("truth " + cmp.getGlobalId());
         } else {
-            facet = atts.getValue("else");
+            facet = cmp.getValue("v.else");
             //console.log("fiction " + cmp.getGlobalId());
         }
 
@@ -30,7 +29,7 @@
         for (var i = 0, length = facet.getLength(); i < length; i++) {
         	$A.setCreationPathIndex(i);
             var cdr = facet.get(i);
-            var cmps = $A.componentService.newComponentDeprecated(cdr, cdr.valueProvider || atts.getValueProvider(), false, doForce);
+            var cmps = $A.componentService.newComponentDeprecated(cdr, cdr.valueProvider || cmp.getAttributeValueProvider(), false, doForce);
             if ($A.util.isArray(cmps)) {
                 throw new Error("foreach inside of an if doesn't work yet");
             } else {

@@ -15,41 +15,41 @@
  */
 ({
     setOriginalItems: function(cmp, evt) {
-        var data = cmp.find("iteration").getAttributes().getValue("items");
+        var data = cmp.find("iteration").getValue("v.items");
         var other = cmp.getValue("v.list");
         data.setValue(other);
     },
 
     setItems: function(cmp, evt) {
-        var data = cmp.find("iteration").getAttributes().getValue("items");
+        var data = cmp.find("iteration").getValue("v.items");
         var other = cmp.getValue("m.data");
         data.setValue(other);
     },
 
     setCapitalItems: function(cmp, evt) {
-        var data = cmp.find("iteration").getAttributes().getValue("items");
+        var data = cmp.find("iteration").getValue("v.items");
         var other = cmp.getValue("m.capitaldata");
         data.setValue(other);
     },
 
     changeOneValue: function(cmp, evt) {
-        var data = cmp.find("iteration").getAttributes().getValue("items");
+        var data = cmp.find("iteration").getValue("v.items");
         var val = data.getValue(cmp.get("v.tochange")).getValue("stringy");
         val.setValue(cmp.get("v.newvalue"));
     },
 
     pushOneValue: function(cmp, evt) {
-        var data = cmp.find("iteration").getAttributes().getValue("items");
+        var data = cmp.find("iteration").getValue("v.items");
         data.push({stringy:cmp.get("v.newvalue")});
     },
 
     insertOneValue: function(cmp, evt) {
-        var data = cmp.find("iteration").getAttributes().getValue("items");
+        var data = cmp.find("iteration").getValue("v.items");
         data.insert(parseInt(cmp.get("v.tochange"), 10), {stringy:cmp.get("v.newvalue")});
     },
 
     deleteOneValue: function(cmp, evt) {
-        var data = cmp.find("iteration").getAttributes().getValue("items");
+        var data = cmp.find("iteration").getValue("v.items");
         data.remove(parseInt(cmp.get("v.tochange"), 10));
     }
 })

@@ -49,19 +49,13 @@
 
         a.setCallback(component, function(action){
             if (action.getState() === "SUCCESS") {
-                var bodyValue = currentCmp.getAttributes().getValue("body");
-                bodyValue.destroy();
-
                 var is = $A.services.component.newComponentDeprecated(action.getReturnValue());
 
-                var outputNumberCmp = is.getAttributes().getValue("value");
-
-                if (outputNumberCmp) {
-                    bodyValue.setValue(is);
-                } else {
+                if (!is.get("v.value")) {
                     $A.log("None received");
-                    bodyValue.setValue(is);
                 }
+                
+            	currentCmp.set("v.body", is);
             }
             else {
                 $A.log("ERROR");

@@ -30,13 +30,13 @@
 	},
 
 	log : function(cmp, msg) {
-		cmp.getAttributes().getValue("log").push(msg);
+		cmp.getValue("v.log").push(msg);
 	},
 
 	waitForLog : function(cmp, index, content) {
         var actual;
         $A.test.addWaitFor(false, function() {
-            actual = cmp.getAttributes().getValue("log").getValue(index);
+            actual = cmp.getValue("v.log").getValue(index);
             if (actual !== undefined) {
                 actual = actual.unwrap();
             }
@@ -683,7 +683,7 @@
 				$A.enqueueAction(a);
 			});
 			$A.test.addWaitFor(true, function() {
-				var val = cmp.getAttributes().getValue("log").getValue(0);
+				var val = cmp.getValue("v.log").getValue(0);
 				if (val) {
 					val = val.unwrap();
 					if (val.indexOf("prime:false:") == 0) {
@@ -721,7 +721,7 @@
 			// both callbacks with refreshed value executed
 			// ordering is not guaranteed
 			$A.test.addWaitFor(true, function() {
-				var logs = cmp.getAttributes().getValue("log");
+				var logs = cmp.getValue("v.log");
 				var val1 = logs.getValue(3);
 				var val2 = logs.getValue(4);
 				if (!val1 || !val2) {

@@ -15,7 +15,7 @@
  */
 ({
     updateHref: function(cmp){
-        if (cmp.getAttributes().getValue("value")) {
+        if (cmp.getValue("v.value")) {
             var value = cmp.get("v.value");
 
             if (value) {

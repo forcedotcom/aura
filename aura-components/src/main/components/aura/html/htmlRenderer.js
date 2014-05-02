@@ -16,17 +16,16 @@
 ({
     render : function(component, helper) {
     	var placeholder = "auraplaceholder";
-        var attributes = component.getAttributes();
-        var valueProvider = attributes.getValueProvider();
+        var valueProvider = component.getAttributeValueProvider();
         var replacements = {};
         var ret;
 
-        var tag = attributes.get("tag");
+        var tag = component.get("v.tag");
         if ($A.util.isUndefinedOrNull(tag)) {
             $A.error("Undefined tag attribute for "+component.getGlobalId());
             tag = "div";
         }
-        var HTMLAttributes = attributes.getValue("HTMLAttributes");
+        var HTMLAttributes = component.getValue("v.HTMLAttributes");
 
         //Fix for name being read only attribute on IE7
         var isIE7 = $A.get("$Browser.isIE7");
@@ -54,7 +53,7 @@
         }
 
         if (helper.canHaveBody(component)) {
-            var body = attributes.getValue("body");
+            var body = component.getValue("v.body");
             $A.render(body, ret);
         }
 
@@ -62,15 +61,14 @@
     },
 
     rerender : function(component, helper) {
-        var attributes = component.getAttributes();
-        var valueProvider = attributes.getValueProvider();
         var element = component.getElement();
         if (!element) {
             return;
         }
 
+        var valueProvider = component.getAttributeValueProvider();
         var expressionService = $A.expressionService;
-        var HTMLAttributes = attributes.getValue("HTMLAttributes");
+        var HTMLAttributes = component.getValue("v.HTMLAttributes");
         if (HTMLAttributes && HTMLAttributes.each) {
             HTMLAttributes.each(function(name, ve) {
                 // TODO: what if this isn't an expression and changes? doesn't
@@ -125,14 +123,14 @@
         }
 
         if (helper.canHaveBody(component)) {
-            var body = attributes.getValue("body");
+            var body = component.getValue("v.body");
             $A.rerender(body, element, true);
         }
     },
 
     afterRender : function(component, helper) {
         if (helper.canHaveBody(component)) {
-            $A.afterRender(component.getAttributes().getValue("body"));
+            $A.afterRender(component.get("v.body"));
         }
     },
 
@@ -141,9 +139,7 @@
         // TODO: this should use attribute type checking and iterate through all attributes, not just body
 
         if (helper.canHaveBody(component)) {
-            var attributes = component.getAttributes();
-            var value = attributes.getValue('body');
-            $A.unrender(value);
+            $A.unrender(component.get("v.body"));
         }
 
         var elements = component.getElements();

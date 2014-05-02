@@ -19,23 +19,17 @@
  * 
  */
 ({
-    openDialog : function(cmp, evt) {
-        var openEvent = $A.get("e.ui:openDialog");
-        openEvent.setParams({
-            dialog : cmp.find("dialogBoxId"),
-            triggerEvent : evt
-        });
-        openEvent.fire();
-    },  
+	openDialog : function(cmp, evt) {
+		var openEvent = $A.get("e.ui:openDialog");
+		openEvent.setParams({
+			dialog : cmp.find("dialogBoxId"),
+			triggerEvent : evt
+		});
+		openEvent.fire();
+	},
 
-   closeDialog : function(cmp, evt) { 
-       var lblAttrib = cmp.find("resultLabel").getAttributes();
-       
-       if(evt.getParam("confirmClicked")){
-	   lblAttrib.setValue("value", "Data Submited");
-       }
-       else{
-	   lblAttrib.setValue("value", "Data Not Submitted");      
-       }
-   }
+	closeDialog : function(cmp, evt) {
+		var value = evt.getParam("confirmClicked") ? "Data Submited" : "Data Not Submitted";
+		cmp.find("resultLabel").set("v.value", value);
+	}
 })

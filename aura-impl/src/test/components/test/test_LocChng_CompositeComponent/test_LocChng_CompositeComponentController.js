@@ -33,7 +33,7 @@
             //Change the button once clientAction() is invoked. clientAction() sets the location (URL) to ButtonClickedSimpleComponent?locator=1
             var button = cmp.find("compositeButton");
             if(button){
-                button.getAttributes().setValue('label','test_LocChng_Composite:test:test_LocChng_Event2');
+                button.set('v.label','test_LocChng_Composite:test:test_LocChng_Event2');
             }
         }
     },
@@ -43,7 +43,7 @@
             //Change the button once clientAction() is invoked. clientAction() sets the location (URL) to ButtonClickedSimpleComponent?num=1
             var button = cmp.find("compositeButton");
             if(button){
-                button.getAttributes().setValue('label','test_LocChng_Composite:test:test_LocChng_Event');
+                button.set('v.label','test_LocChng_Composite:test:test_LocChng_Event');
             }
         }
     }

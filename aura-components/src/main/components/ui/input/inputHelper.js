@@ -145,7 +145,7 @@
     setErrorComponent : function(component, value) {
         var element = component.getElement();
         var htmlCmp = $A.componentService.getRenderingComponentForElement(element);
-        var valueProvider = htmlCmp.getAttributes().getComponentValueProvider();
+        var valueProvider = htmlCmp.getComponentValueProvider();
         if (value.isValid()) {
             this.validate(component, valueProvider);
         } else {
@@ -251,14 +251,13 @@
     },
 
     setAttribute: function(cmp, attr) {
-        var attrs = cmp.getAttributes(),
         concreteCmp = cmp.getConcreteComponent(),
         parentCmp = concreteCmp.getSuper();
 
-        concreteCmp.getAttributes().setValue(attr.key, attr.value);
+        concreteCmp.set("v." + attr.key, attr.value);
         //need to traverse up the hierarchy and set the attributes, since attribute lookup is not hierarchical once initialized
         while(parentCmp) {
-        	parentCmp.getAttributes().setValue(attr.key, attr.value);
+        	parentCmp.set("v." + attr.key, attr.value);
         	parentCmp = parentCmp.getSuper();
         }
     },

@@ -226,17 +226,16 @@
         var eventName       = "on" + event.type,
             element         = event.currentTarget,
             ownerComponent  = $A.componentService.getRenderingComponentForElement(element),
-            attributes      = ownerComponent.getAttributes(),
-            valueProvider   = attributes.getValueProvider(),
-            htmlAttributes  = attributes.getValue("HTMLAttributes"),
+            valueProvider   = ownerComponent.getAttributeValueProvider(),
+            htmlAttributes  = ownerComponent.getValue("v.HTMLAttributes"),
             valueExpression = htmlAttributes.getValue(eventName),
             onclickExpression;
 
         if (eventName === 'ontouchend' || eventName === 'onpointerup' || eventName === 'onMSPointerUp') {
             // Validate that either onclick or ontouchend is wired up to an action never both simultaneously
-            onclickExpression = htmlAttributes.getValue("onclick");
-            if (onclickExpression.isDefined()) {
-                if (!valueExpression.isDefined()) {
+        	 onclickExpression = htmlAttributes.getValue("onclick");
+             if (onclickExpression.isDefined()) {
+                 if (!valueExpression.isDefined()) {
                     // Map from touch event to onclick
                     valueExpression = onclickExpression;
                 }
@@ -261,8 +260,7 @@
     createHtmlAttribute: function(name, ve, config) {
         var ret           = config.ret,
             component     = config.component,
-            attributes    = component.getAttributes(),
-            valueProvider = attributes.getValueProvider(),
+            valueProvider = component.getAttributeValueProvider(),
             on            = $A.util.on,
             value;
 

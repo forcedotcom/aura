@@ -37,7 +37,7 @@
 	initSize : function(cmp) {
 		var carouselSize = this.getCarouselSize(cmp);
 		cmp._width = carouselSize.width;
-		cmp.getAttributes().setValue('priv_carouselStyle', this.getSizeStyle(carouselSize.width, carouselSize.height));
+		cmp.set('v.priv_carouselStyle', this.getSizeStyle(carouselSize.width, carouselSize.height));
 	},
 
 	initScroller: function(cmp) {
@@ -54,7 +54,7 @@
 			if (cmp._width) {
 				//set scroller width
 				var totalWidth = cmp._width * pageCmps.length;
-				cmp.getAttributes().setValue('priv_scrollerWidth',	totalWidth + 'px');
+				cmp.set('v.priv_scrollerWidth',	totalWidth + 'px');
 			}
 		}
 	},
@@ -463,7 +463,7 @@
 
 			me.firePageSelectedEventToPageIndicator(cmp, curPageCmp, pageIndex);
 
-			cmp.getAttributes().setValue('priv_currentPage', pageIndex);
+			cmp.set('v.priv_currentPage', pageIndex);
 			me.firePageSelectedEventToPage(prePageCmp, pageIndex);
 			me.firePageSelectedEventToPage(curPageCmp, pageIndex);
 			var pageModel = me.getPageModelFromIndex(cmp, pageIndex);

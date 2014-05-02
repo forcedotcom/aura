@@ -28,7 +28,7 @@
             aura.test.assertEquals("aura", component.get("v.value"), "value should have been passed through");
 
             // using something order than a simple string
-            aura.test.assertEquals("ar1Provider1", component.getAttributes().getValue("ar1").get(1), "ar1 should have been set by provider");
+            aura.test.assertEquals("ar1Provider1", component.getValue("v.ar1").get(1), "ar1 should have been set by provider");
             aura.test.assertTrue(component.get("v.b2")===undefined, "b2 should have been undefined");
 
             $A.test.assertEquals("aura [value]", $A.test.getText(component.find("value").getElement()));

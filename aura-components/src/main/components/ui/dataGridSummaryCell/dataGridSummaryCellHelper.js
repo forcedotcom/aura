@@ -44,10 +44,9 @@
 	 * this function. 
 	 */
 	calculate: function (cmp) {
-		var attributes 	= cmp.getAttributes(),
-			items		= attributes.getValue('items'),
-			column		= attributes.get('column'),
-			type 		= attributes.get('type'), 
+		var items		= cmp.getValue('v.items'),
+			column		= cmp.get('v.column'),
+			type 		= cmp.get('v.type'), 
 			aggregate	= 0,
 			fn 			= this['aggregate_' + type.toLowerCase()];
 

@@ -17,7 +17,7 @@
     testSimpleValueProperties:{
         attributes:{intAttribute:3},
         test:function(cmp){
-            var valueObj = cmp.getAttributes().getValue('strAttribute');
+            var valueObj = cmp.getValue('v.strAttribute');
             $A.test.assertTruthy(valueObj, "Simple attribute is not defined by a value object.");
             $A.test.assertEquals('SimpleValue', valueObj.toString(),
                     "Simple attribute should be represented using SimpleValue");
@@ -25,7 +25,7 @@
                     "Simple value object has wrong value for auraType attribute");
             $A.test.assertFalsy(valueObj.getValue(), "Uninitialized simple attribute should be represented as undefined.");
 
-            $A.test.assertTruthy(cmp.getAttributes().getValue('intAttribute'),
+            $A.test.assertTruthy(cmp.get('v.intAttribute'),
                     "Initialized simple attribute should not be represented as undefined.");
             $A.test.assertEquals(3, cmp.get('v.intAttribute'),
             "Simple value object failed to retrieve assigned value.");
@@ -34,14 +34,13 @@
 
     testSimpleValueIsValid: {
         test:function(cmp){
-            var valueObj = cmp.getAttributes().getValue('strAttribute');
-            $A.test.assertTruthy(valueObj.isValid());
+            $A.test.assertTruthy(cmp.isValid('v.strAttribute'));
         }
     },
 
     testSimpleValueSetUnValid: {
         test:function(cmp){
-            var valueObj = cmp.getAttributes().getValue('strAttribute');
+            var valueObj = cmp.getValue('v.strAttribute');
             valueObj.setValid(false);
             $A.test.assertTruthy(!valueObj.isValid());
         }
@@ -49,7 +48,7 @@
 
     testDerivedTypes:{
         test: function(cmp) {
-            var valueObj = cmp.getAttributes().getValue('strAttribute');
+            var valueObj = cmp.getValue('v.strAttribute');
             var mval = $A.expressionService.create(null,
                      {"string":"something","integer":23,"boolean":true});
             // Because the types aren't exported, getting the constructors is a bit awkward:
@@ -64,7 +63,6 @@
             }
             $A.test.assertTrue($A.util.instanceOf(valueObj, simpleValue),
                      "$A.util.instanceOf says strAttribute is not a SimpleValue");
-            debugger;
             $A.test.assertTrue($A.util.instanceOf(valueObj, attributeValue),
                     "$A.util.instanceOf says strAttribute is not an AttributeValue");
             $A.test.assertFalse($A.util.instanceOf(valueObj, mapValue),
@@ -76,7 +74,7 @@
         attributes:{intAttribute:3},
         test:function(cmp){
             //Attribute with no default value
-            var valueObj = cmp.getAttributes().getValue('strAttribute');
+            var valueObj = cmp.getValue('v.strAttribute');
             valueObj.clearErrors();
             this.verifyErrors(valueObj,[]);
 
@@ -87,7 +85,7 @@
             this.verifyErrors(valueObj,[]);
 
             //Attribute with default value
-            valueObj = cmp.getAttributes().getValue('intAttribute');
+            valueObj = cmp.getValue('v.intAttribute');
             valueObj.clearErrors();
 
             //Add 1 valid error message

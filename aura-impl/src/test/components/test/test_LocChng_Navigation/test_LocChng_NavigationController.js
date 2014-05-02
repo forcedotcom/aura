@@ -15,7 +15,7 @@
  */
 ({
     clientAction: function(cmp, event){
-        cmp.getAttributes().setValue('locationChangeIndicator', 'start');
+        cmp.set('v.locationChangeIndicator', 'start');
         //Client Action associated with the button
         //Get the current token, if this is the first time the page was loaded, token will be null
         var num = $A.historyService.get().num;
@@ -33,18 +33,18 @@
             //Find the output on the page where the current state will be displayed
             var displayText = cmp.find("display");
             if(displayText){
-                    displayText.getAttributes().setValue('value',event.getParam('num'));
+                    displayText.set('v.value',event.getParam('num'));
                     $A.rerender(displayText);
             }
         }
-        cmp.getAttributes().setValue('locationChangeIndicator', 'complete');
+        cmp.set('v.locationChangeIndicator', 'complete');
     },
     next:function(cmp){
-        cmp.getAttributes().setValue('locationChangeIndicator', 'start');
+        cmp.set('v.locationChangeIndicator', 'start');
         $A.historyService.forward();
     },
     back:function(cmp){
-        cmp.getAttributes().setValue('locationChangeIndicator', 'start');
+        cmp.set('v.locationChangeIndicator', 'start');
         $A.historyService.back();
     }
 })

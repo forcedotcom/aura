@@ -15,22 +15,22 @@
  */
 ({
     render: function LabelRenderer(component, helper){
-        var attributes = component.getAttributes();
-        var base = attributes.getRawValue('value');
+        var base = component.get('v.value');
         var vPattern = new RegExp("\\{(0|[1-9][0-9]*)\\}"); // match {#}
         var vEndPattern = new RegExp("\\}"); // match }
         if (!(base && base.search(vPattern) > -1)) { // nothing to replace
             return document.createTextNode(base);
         }
 
-        var body = attributes.getValue("body");
-        if (!body.isEmpty()) { // render the body content to components
+        var body = component.get("v.body");
+        if (body && body.length > 0) { // render the body content to components
             var items = [];
-            for (var i = 0; i < body.getLength(); i++) {
-                var child = body.get(i);
+            for (var i = 0; i < body.length; i++) {
+                var child = body[i];
                 if (child.getDef().getDescriptor().getQualifiedName() === "markup://aura:text") {
                     continue;
                 }
+                
                 items.push($A.render(child));
             }
 

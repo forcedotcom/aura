@@ -51,7 +51,7 @@
     getEventSourceComponent: function(component, event) {
         var element = event.target || event.srcElement;
         var htmlCmp = $A.componentService.getRenderingComponentForElement(element);
-        return htmlCmp.getAttributes().getComponentValueProvider().getConcreteComponent();
+        return htmlCmp.getComponentValueProvider().getConcreteComponent();
     },
 
     getNextVisibleOption: function(iters, k) {

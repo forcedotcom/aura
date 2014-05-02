@@ -18,12 +18,12 @@
         var ret = document.createElement('div');
         ret.className = 'button';
         ret.id = component.getGlobalId();
-        var label = component.getAttributes().getValue('label');
+        var label = component.getValue('v.label');
         return [ret];
     },
 
     donotrerender: function(component) {
         var div = component.getElements().element;
-        div.innerHTML = component.getAttributes().getValue('label');
+        div.innerHTML = component.getValue('v.label');
     }
 })

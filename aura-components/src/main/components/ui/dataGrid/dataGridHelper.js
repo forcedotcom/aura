@@ -732,7 +732,7 @@
 	 * @return {HTMLElement} null if no summary row is defined
 	 */
 	createSummaryRow: function (concrete) {
-		var vp = concrete.getAttributes().getValueProvider(), 
+		var vp = concrete.getAttributeValueProvider(), 
 			summaryRow = concrete.getValue('v.summaryRow'), 
 			self = this, doc, tr, priv_rows, summaries, colspan;
 

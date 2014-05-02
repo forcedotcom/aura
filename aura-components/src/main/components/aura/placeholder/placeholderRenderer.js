@@ -22,7 +22,7 @@
         var action = $A.get("c.aura://ComponentController.getComponent");
         var attributes = cmp.getValue("v.attributes");
         var atts = {};
-        var avp = cmp.getAttributes().getValueProvider();
+        var avp = cmp.getAttributeValueProvider();
 
         if(attributes.each){
             attributes.each(function(key, value){
@@ -55,7 +55,7 @@
             //reindex
             var localId = cmp.getLocalId();
             if(localId){
-                var cvp = cmp.getAttributes().getComponentValueProvider();
+                var cvp = cmp.getComponentValueProvider();
                 cvp.deIndex(localId, cmp.getGlobalId());
                 cvp.index(localId, newBody.getGlobalId());
             }

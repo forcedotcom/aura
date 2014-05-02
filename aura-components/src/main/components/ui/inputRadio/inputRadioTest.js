@@ -37,6 +37,7 @@
      * Verify radio button is clickable
      */
     testClick: {
+    	browsers : ["-IPHONE", "-IPAD"],
     	attributes : {name: "testRadio"},
     	test: function(component){
     		radioElement = component.find("radio").getElement();

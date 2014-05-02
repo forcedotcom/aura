@@ -19,10 +19,10 @@ import java.util.List;
 
 import org.auraframework.test.UnitTestCase;
 
-public final class TimelineEventTest extends UnitTestCase {
+public final class TimelineEventUtilTest extends UnitTestCase {
 
     public void testGetCategoryMetricNames() {
-        List<String> types = TimelineEvent.getCategoryMetricNames(TimelineEvent.Category.Loading);
+        List<String> types = TimelineEventUtil.getCategoryMetricNames(TimelineEventUtil.Category.Loading);
         assertEquals(7, types.size());
         assertTrue(types.toString(), types.contains("Timeline.Loading.ResourceReceivedData"));
     }

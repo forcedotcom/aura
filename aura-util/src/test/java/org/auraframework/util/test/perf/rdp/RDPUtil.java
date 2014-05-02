@@ -17,10 +17,17 @@ package org.auraframework.util.test.perf.rdp;
 
 import java.util.List;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import com.google.common.collect.Lists;
 
 public final class RDPUtil {
 
+    /**
+     * @return true if the notifications list contains a notification with method (i.e. Timeline.eventRecorded)
+     */
     public static boolean containsMethod(List<RDPNotification> notifications, String method) {
         for (RDPNotification notification : notifications) {
             if (notification.getMethod().equals(method)) {
@@ -41,5 +48,68 @@ public final class RDPUtil {
             }
         }
         return domainNotifications;
+    }
+
+    /**
+     * @return flattened list of all timeline events (i.e. including children events)
+     */
+    public static List<JSONObject> flattenedTimelineEvents(List<RDPNotification> notifications) {
+        List<JSONObject> events = Lists.newArrayList();
+        for (RDPNotification notification : notifications) {
+            if (notification.isTimelineEvent()) {
+                try {
+                    addTimelineEvent(events, notification.getTimelineEvent());
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+        return events;
+    }
+
+    private static void addTimelineEvent(List<JSONObject> events, JSONObject timelineEvent) throws JSONException {
+        events.add(timelineEvent);
+
+        // add also the nested records
+        if (timelineEvent.has("children")) {
+            JSONArray children = timelineEvent.getJSONArray("children");
+            for (int i = 0; i < children.length(); i++) {
+                addTimelineEvent(events, children.getJSONObject(i));
+            }
+        }
+    }
+
+    /**
+     * @return timeline events between MARK_TIMELINE_START and MARK_TIMELINE_END (if they exist, otherwise return the
+     *         whole timeline)
+     */
+    public static List<JSONObject> eventsBetweenTimelineMarks(List<JSONObject> timelineEvents,
+            String startStamp, String endStamp) {
+        List<JSONObject> filtered = Lists.newArrayList();
+        boolean skip = containsTimelineStamp(timelineEvents, startStamp);
+        for (JSONObject event : timelineEvents) {
+            if (skip && TimelineEventUtil.isTimelineTimeStamp(event, startStamp)) {
+                skip = false;
+            }
+            if (!skip) {
+                filtered.add(event);
+                if (TimelineEventUtil.isTimelineTimeStamp(event, endStamp)) {
+                    break;
+                }
+            }
+        }
+        return filtered;
+    }
+
+    public static boolean containsTimelineStamp(List<JSONObject> timelineEvents, String timeStamp) {
+        if (timeStamp == null) {
+            return false;
+        }
+        for (JSONObject event : timelineEvents) {
+            if (TimelineEventUtil.isTimelineTimeStamp(event, timeStamp)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

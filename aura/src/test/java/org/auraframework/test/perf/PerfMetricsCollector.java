@@ -27,7 +27,7 @@ import org.auraframework.util.test.perf.data.PerfMetric;
 import org.auraframework.util.test.perf.data.PerfMetrics;
 import org.auraframework.util.test.perf.rdp.RDPAnalyzer;
 import org.auraframework.util.test.perf.rdp.RDPNotification;
-import org.auraframework.util.test.perf.rdp.TimelineEvent;
+import org.auraframework.util.test.perf.rdp.TimelineEventUtil;
 import org.auraframework.util.test.perf.rdp.TimelineEventStats;
 import org.json.JSONArray;
 
@@ -83,7 +83,7 @@ public final class PerfMetricsCollector {
             Map<String, TimelineEventStats> timelineEventsStats = analyzer.analyzeTimelineDomain();
             for (TimelineEventStats stats : timelineEventsStats.values()) {
                 PerfMetric metric = new PerfMetric();
-                metric.setName(TimelineEvent.toMetricName(stats.getType()));
+                metric.setName(TimelineEventUtil.toMetricName(stats.getType()));
                 metric.setValue(stats.getCount());
                 JSONArray details = stats.getDetails();
                 if (details != null) {

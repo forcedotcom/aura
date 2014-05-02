@@ -18,6 +18,9 @@ package org.auraframework.util.test.perf.rdp;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -26,7 +29,7 @@ import com.google.common.collect.Maps;
  * 
  * @See https://developers.google.com/chrome-developer-tools/docs/protocol/tot/timeline#type-TimelineEvent
  */
-public class TimelineEvent {
+public class TimelineEventUtil {
 
     public enum Category {
         Loading, Scripting, Rendering, Painting, Idle, Other;
@@ -132,5 +135,19 @@ public class TimelineEvent {
             }
         }
         return types;
+    }
+
+    public static boolean isTimelineTimeStamp(JSONObject timelineEvent, String message) {
+        if (message == null) {
+            return false;
+        }
+        try {
+            if (!"TimeStamp".equals(timelineEvent.getString("type"))) {
+                return false;
+            }
+            return message.equals(timelineEvent.getJSONObject("data").getString("message"));
+        } catch (JSONException e) {
+            throw new RuntimeException(timelineEvent.toString(), e);
+        }
     }
 }

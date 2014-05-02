@@ -36,13 +36,24 @@ import com.google.common.collect.Maps;
  */
 public final class RDPAnalyzer {
 
+    // public static final String MARK_TIMELINE_START = "START:cmpCreate";
+    // public static final String MARK_TIMELINE_END = "END:cmpRender";
+    // TODO: not using marks yet, start mark shows almost at end of timeline
+    public static final String MARK_TIMELINE_START = null;
+    public static final String MARK_TIMELINE_END = null;
+
     protected static final Logger LOG = Logger.getLogger(RDPAnalyzer.class.getSimpleName());
 
     private final List<RDPNotification> notifications;
+    private final List<JSONObject> timelineEvents;
     private Map<String, TimelineEventStats> timelineEventsStats;
 
     public RDPAnalyzer(List<RDPNotification> notifications) {
         this.notifications = notifications;
+        List<JSONObject> allTimelineEvents = RDPUtil.flattenedTimelineEvents(notifications);
+        this.timelineEvents = RDPUtil.eventsBetweenTimelineMarks(allTimelineEvents, MARK_TIMELINE_START,
+                MARK_TIMELINE_END);
+        LOG.info("num timeline events: " + allTimelineEvents.size() + ", num filtered: " + this.timelineEvents.size());
     }
 
     /**
@@ -54,15 +65,11 @@ public final class RDPAnalyzer {
         }
 
         timelineEventsStats = Maps.newHashMap();
-        for (RDPNotification notification : notifications) {
+        for (JSONObject timelineEvent : timelineEvents) {
             try {
-                // System.out.println(notification.getJSON().toString(2));
-                String method = notification.getMethod();
-                if (RDP.Timeline.eventRecorded.equals(method)) {
-                    addTimelineEvent(notification.getParams().getJSONObject("record"));
-                }
+                analyzeTimelineEvent(timelineEvent);
             } catch (Exception e) {
-                LOG.log(Level.WARNING, notification.toString(), e);
+                LOG.log(Level.WARNING, String.valueOf(timelineEvent), e);
             }
         }
         return timelineEventsStats;
@@ -72,7 +79,7 @@ public final class RDPAnalyzer {
      * @param timeline event, see
      *            https://developers.google.com/chrome-developer-tools/docs/protocol/tot/timeline#type-TimelineEvent
      */
-    private void addTimelineEvent(JSONObject timelineEvent) throws JSONException {
+    private void analyzeTimelineEvent(JSONObject timelineEvent) throws JSONException {
         // add event itself
         String type = timelineEvent.getString("type");
 
@@ -96,14 +103,6 @@ public final class RDPAnalyzer {
         JSONObject details = timelineEvent.getJSONObject("data");
         if (details != null && details.length() > 0) {
             stats.addDetails(timelineEvent.getJSONObject("data"));
-        }
-
-        // add also the nested records
-        if (timelineEvent.has("children")) {
-            JSONArray children = timelineEvent.getJSONArray("children");
-            for (int i = 0; i < children.length(); i++) {
-                addTimelineEvent(children.getJSONObject(i));
-            }
         }
     }
 

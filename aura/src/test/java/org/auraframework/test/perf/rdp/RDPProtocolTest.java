@@ -65,14 +65,14 @@ public final class RDPProtocolTest extends WebDriverTestCase {
         // check requestsMetric
         PerfMetric requestsMetric = networkMetrics.get(0);
         assertEquals("Network.numRequests", requestsMetric.getName());
-        assertEquals(6, requestsMetric.getIntValue());
+        assertEquals(7, requestsMetric.getIntValue());
         // check bytes metric
         PerfMetric bytesMetric = networkMetrics.get(1);
         assertEquals("Network.encodedDataLength", bytesMetric.getName());
         assertEquals("bytes", bytesMetric.getUnits());
         assertTrue(bytesMetric.toString(), bytesMetric.getIntValue() > 100000);
         JSONArray requests = bytesMetric.getDetails();
-        assertTrue("num requests: " + requests.length(), requests.length() == 6);
+        assertTrue("num requests: " + requests.length(), requests.length() == 7);
         JSONObject request = requests.getJSONObject(0);
         assertTrue(request.toString(), request.getString("url").contains("/ui/label.cmp?label=foo"));
         int encodedDataLength = Integer.parseInt(request.getString("encodedDataLength"));
@@ -89,36 +89,26 @@ public final class RDPProtocolTest extends WebDriverTestCase {
         assertEquals(0, getRDPNotifications().size());
     }
 
-    public void testAddTimelineTimeStamp() throws Exception {
+    public void testTimelineTimeStamp() throws Exception {
         if (!RUN_PERF_TESTS) {
             return;
         }
 
-        open("/ui/label.cmp?label=foo");
-        perfWebDriverUtil.addTimelineTimeStamp("TIMELINE STAMP");
+        openRaw("/ui/label.cmp?label=foo");
 
-        // Above just shows as a Timeline.eventRecorded "Program" event:
-        // Timeline.eventRecorded: {
-        // "method": "Timeline.eventRecorded",
-        // "params": {"record": {
-        // "children": [{
-        // "children": [{
-        // "data": {"message": "BEFORE TEST"},
-        // ...
-        // "type": "Program",
-        // "usedHeapSizeDelta": 77136
-        // }}
-        // }
+        // TODO:
 
-        for (RDPNotification timelineEvent : RDPUtil.filterNotifications(getRDPNotifications(),
-                RDP.Domain.Timeline)) {
-            JSONObject event = timelineEvent.getJSON();
-            try {
-                if ("Program".equals(event.getString("type"))) {
-                    // TODO:
-                }
-            } catch (Exception ignore) {
-            }
-        }
+        final String startStamp = RDPAnalyzer.MARK_TIMELINE_START;
+        final String endStamp = RDPAnalyzer.MARK_TIMELINE_END;
+
+        // UC: timeline without time stamps
+        // List<RDPNotification> notifications = getRDPNotifications();
+
+        // UC: timeline with time stamps
+        // openRaw("/perfTest/perf.app#%7B%22componentDef%22%3A%22markup%3A%2F%2Fui%3Abutton%22%7D");
+        // notifications = getRDPNotifications();
+        // assertTrue(RDPUtil.containsTimelineStamp(notifications, startStamp));
+        // filtered = RDPUtil.notificationsBetweenTimelineMarks(notifications, startStamp, endStamp);
+        // assertEquals(notifications.size(), filtered.size());
     }
 }

@@ -15,7 +15,7 @@
  */
 package org.auraframework.util.test.perf.rdp;
 
-import org.auraframework.util.test.perf.rdp.TimelineEvent.Category;
+import org.auraframework.util.test.perf.rdp.TimelineEventUtil.Category;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -32,7 +32,7 @@ public final class TimelineEventStats {
 
     public TimelineEventStats(String type) {
         this.type = type;
-        category = TimelineEvent.toCategory(type);
+        category = TimelineEventUtil.toCategory(type);
     }
 
     public String getType() {

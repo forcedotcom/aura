@@ -19,7 +19,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import org.auraframework.util.test.perf.rdp.TimelineEvent;
+import org.auraframework.util.test.perf.rdp.TimelineEventUtil;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -44,7 +44,7 @@ public final class PerfMetricsComparator {
         Map<String, String> map = Maps.newHashMap();
 
         // add loading events as those are summarized in the Network. metrics
-        for (String metric : TimelineEvent.getCategoryMetricNames(TimelineEvent.Category.Loading)) {
+        for (String metric : TimelineEventUtil.getCategoryMetricNames(TimelineEventUtil.Category.Loading)) {
             map.put(metric, "summarized in Network metrics");
         }
         map.put("Timeline.Loading.ParseHTML", "different when running ui vs mvn");
@@ -160,8 +160,9 @@ public final class PerfMetricsComparator {
         // log a message showing what was really compared, i.e.:
         // "3 metrics compared allowing 20% variability: Paint[8->9*]
         String percent = String.valueOf(Math.round(ALLOWED_VARIABILITY * 100)) + "% variability";
+        String legend = "\n    (first column: '=' metric within bounds, '*' metric out of bounds or missing, ' ' metric not compared)";
         String logMessage = String.valueOf(numMetricsCompared) + '/' + numMetrics + " metrics compared allowing "
-                + percent + ": " + log;
+                + percent + ": " + legend + log;
         LOG.info(logMessage);
 
         return differences;

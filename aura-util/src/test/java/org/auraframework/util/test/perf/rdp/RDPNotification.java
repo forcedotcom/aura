@@ -77,4 +77,18 @@ public final class RDPNotification {
     public String toJSONString() {
         return json.toString();
     }
+
+    // Timeline:
+
+    public JSONObject getTimelineEvent() {
+        try {
+            return getParams().getJSONObject("record");
+        } catch (JSONException e) {
+            throw new RuntimeException(toJSONString(), e);
+        }
+    }
+
+    public boolean isTimelineEvent() {
+        return RDP.Timeline.eventRecorded.equals(getMethod());
+    }
 }

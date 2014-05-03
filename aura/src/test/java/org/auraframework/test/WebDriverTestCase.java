@@ -250,8 +250,6 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
     }
 
     private void runTestWithBrowserAsPerf() throws Throwable {
-        // TODO: switch to run in whatever mode is better for perf?
-
         int numPerfTimelineRuns = numPerfTimelineRuns();
 
         if (numPerfTimelineRuns > 0) {
@@ -281,8 +279,15 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
                 logger.info("perf metrics for " + this);
                 median.logInfo(logger);
             }
-            assertGoldMetrics(median);
+            perfMetricsTearDown(median);
         }
+    }
+
+    /**
+     * Default behavior is to compare the measured metrics with the gold file ones.
+     */
+    protected void perfMetricsTearDown(PerfMetrics median) throws Exception {
+        assertGoldMetrics(median);
     }
 
     public final List<RDPNotification> getRDPNotifications() {

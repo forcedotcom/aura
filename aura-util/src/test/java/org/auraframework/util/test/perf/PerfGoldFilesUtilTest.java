@@ -24,10 +24,10 @@ public final class PerfGoldFilesUtilTest extends UnitTestCase {
 
     public void testPerfMetricsSerialization() throws Exception {
         PerfMetrics metrics = new PerfMetrics();
-        PerfMetric metric1 = new PerfMetric("{name: \"metric1\", value: 1}");
+        PerfMetric metric1 = new PerfMetric("metric1", 1);
         metric1.setDetails(new JSONArray("[{\"bytes\":\"3\"}]"));
         metrics.setMetric(metric1);
-        metrics.setMetric(new PerfMetric("{name: \"metric2\", value: 2}"));
+        metrics.setMetric(new PerfMetric("metric2", 2));
         String text = PerfGoldFilesUtil.toGoldFileText(metrics, true);
 
         PerfMetrics readMetrics = PerfGoldFilesUtil.fromGoldFileText(text);

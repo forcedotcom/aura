@@ -29,6 +29,9 @@ public final class PerfMetrics {
 
     private final Map<String, PerfMetric> metrics = Maps.newHashMap();
 
+    public PerfMetrics() {
+    }
+
     /**
      * @return the PerfMetric for the given metric name
      */
@@ -49,6 +52,10 @@ public final class PerfMetrics {
 
     public void setMetric(PerfMetric metric) {
         metrics.put(metric.getName(), metric);
+    }
+
+    public void setMetric(String name, Object value) {
+        metrics.put(name, new PerfMetric(name, value));
     }
 
     public void logInfo(Logger logger) {

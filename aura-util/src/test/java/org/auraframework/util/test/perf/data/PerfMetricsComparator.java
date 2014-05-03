@@ -34,7 +34,7 @@ public final class PerfMetricsComparator {
     // and using this logger the log messages do appear in the jenkins console output
     private static final Logger LOG = Logger.getLogger(PerfMetricsComparator.class.getSimpleName());
 
-    private static final float ALLOWED_VARIABILITY = .2f;
+    private static final float DEFAULT_ALLOWED_VARIABILITY = .2f;
 
     private static final Set<String> UNITS_TO_EXCLUDE = ImmutableSet.of("milliseconds");
 
@@ -66,7 +66,15 @@ public final class PerfMetricsComparator {
         METRICS_TO_EXCLUDE = ImmutableMap.copyOf(map);
     }
 
-    // TODO: find out why metrics are different mvn vs testSetRunner.app
+    private final float allowedVariability;
+
+    public PerfMetricsComparator() {
+        this(DEFAULT_ALLOWED_VARIABILITY);
+    }
+
+    public PerfMetricsComparator(float allowedVariability) {
+        this.allowedVariability = allowedVariability;
+    }
 
     /**
      * Compares expected and actual metrics
@@ -87,8 +95,8 @@ public final class PerfMetricsComparator {
 
             int expectedValue = expected.getIntValue();
             int actualValue = (actual != null) ? actual.getIntValue() : -1;
-            int allowed_variability = Math.round(expectedValue * ALLOWED_VARIABILITY);
-            if (ALLOWED_VARIABILITY > 0 && allowed_variability == 0)
+            int allowed_variability = Math.round(expectedValue * allowedVariability);
+            if (allowedVariability > 0 && allowed_variability == 0)
                 allowed_variability = 1; // allow at least 1 if non-zero %
 
             StringBuilder logLine = new StringBuilder(name + '[' + expectedValue);
@@ -159,7 +167,7 @@ public final class PerfMetricsComparator {
 
         // log a message showing what was really compared, i.e.:
         // "3 metrics compared allowing 20% variability: Paint[8->9*]
-        String percent = String.valueOf(Math.round(ALLOWED_VARIABILITY * 100)) + "% variability";
+        String percent = String.valueOf(Math.round(allowedVariability * 100)) + "% variability";
         String legend = "\n    (first column: '=' metric within bounds, '*' metric out of bounds or missing, ' ' metric not compared)";
         String logMessage = String.valueOf(numMetricsCompared) + '/' + numMetrics + " metrics compared allowing "
                 + percent + ": " + legend + log;

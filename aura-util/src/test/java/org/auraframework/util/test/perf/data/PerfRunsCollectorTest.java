@@ -23,14 +23,14 @@ public final class PerfRunsCollectorTest extends UnitTestCase {
 
     public void testGetMedian() throws Exception {
         PerfMetrics run1 = new PerfMetrics();
-        run1.setMetric(new PerfMetric("{name: \"paints\", value: 10}"));
-        run1.setMetric(new PerfMetric("{name: \"bytes\", value: 3}"));
+        run1.setMetric("paints", 10);
+        run1.setMetric("bytes", 3);
         PerfMetrics run2 = new PerfMetrics();
-        run2.setMetric(new PerfMetric("{name: \"paints\", value: 9}"));
-        run2.setMetric(new PerfMetric("{name: \"bytes\", value: 4}"));
+        run2.setMetric("paints", 9);
+        run2.setMetric("bytes", 4);
         PerfMetrics run3 = new PerfMetrics();
-        run3.setMetric(new PerfMetric("{name: \"paints\", value: 9}"));
-        run3.setMetric(new PerfMetric("{name: \"bytes\", value: 2}"));
+        run3.setMetric("paints", 9);
+        run3.setMetric("bytes", 2);
 
         PerfRunsCollector collector = new PerfRunsCollector();
         collector.addRun(run1);

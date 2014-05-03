@@ -1,9 +1,17 @@
 package org.auraframework.perf.core;
 
+import java.net.URLEncoder;
+import java.util.logging.Logger;
+
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.test.WebDriverTestCase;
+import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 
 public abstract class AbstractPerfTestCase extends WebDriverTestCase {
+
+    private static final Logger logger = Logger.getLogger(AbstractPerfTestCase.class.getSimpleName());
 
     String testName;
 
@@ -43,5 +51,19 @@ public abstract class AbstractPerfTestCase extends WebDriverTestCase {
     protected final Dimension getWindowSize() {
         // use same size as OnePhoneContext.java: 548x320 (1/2 iPhone 5?)
         return new Dimension(320, 548);
+    }
+
+    protected final void runWithPerfApp(DefDescriptor<ComponentDef> descriptor) throws Exception {
+        String relativeUrl = "/perfTest/perf.app#" +
+                URLEncoder.encode("{\"componentDef\":\"" + descriptor + "\"}", "UTF-8");
+        String url = getAbsoluteURI(relativeUrl).toString();
+        logger.info("testRun: " + url);
+
+        openRaw(url);
+
+        String componentName = descriptor.getName();
+        waitForElementAppear("Container div[data-app-rendered-component] element for the component not present: "
+                + componentName,
+                By.cssSelector(String.format("[data-app-rendered-component='%s']", componentName)));
     }
 }

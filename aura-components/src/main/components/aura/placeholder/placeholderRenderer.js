@@ -31,11 +31,10 @@
         }
 
         action.setCallback(this, function(a){
-
             var newBody;
             if (a.getState() === "SUCCESS"){
                 newBody = $A.newCmpDeprecated(a.getReturnValue(), avp, false, false);
-                newBody.getAttributes().merge(attributes, true);
+                newBody.mergeAttributes(attributes, true);
             } else {
                 var errors = a.getError();
                 newBody = $A.newCmpDeprecated("markup://aura:text", null, false, false);
@@ -45,10 +44,8 @@
                     newBody.set("v.value", 'unknown error');
                 }
             }
-            var body = cmp.getValue("v.body");
-
-            body.destroy();
-            body.setValue(newBody);
+            
+            cmp.set("v.body", newBody);
 
             $A.rerender(cmp);
 
@@ -60,6 +57,7 @@
                 cvp.index(localId, newBody.getGlobalId());
             }
         });
+        
         var desc = cmp.get("v.refDescriptor");
         action.setParams({
             "name" : desc,

@@ -511,5 +511,3 @@ AttributeSet.prototype.createAttribute = function(name, config, def) {
     this.values.put(name, valueConfig);
 
 };
-
-//#include aura.attribute.AttributeSet_export

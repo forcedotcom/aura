@@ -218,14 +218,19 @@ Test.Aura.Iteration.HelperTest = function(){
     			}
         	};
         	        	        	       
-        	var targetAttributes={
+        	var targetBodyCollector={	
+    			count:0,
+    			realBodyList:[]
+    		};
+        	
+        	var targetCmp={
         		get:function(att){
-        			if(att=="var") return "var";
-        			if(att=="indexVar") return false;        			
+        			if(att=="v.var") return "var";
+        			if(att=="v.indexVar") return false;        			
         		},
         		getValue:function(att){
-        			if(att=="body") return targetBody;
-        			if(att=="forceServer"){
+        			if(att=="v.body") return targetBody;
+        			if(att=="v.forceServer"){
 	        			return {
 	        				getValue:function(){					
 								return 'forceServer';
@@ -233,20 +238,9 @@ Test.Aura.Iteration.HelperTest = function(){
 						};
         			}
         		},
-        		getValueProvider:function(){
+        		getAttributeValueProvider:function(){
         			return '';
         		}
-        	};        	        	        	
-
-        	var targetBodyCollector={	
-    			count:0,
-    			realBodyList:[]
-    		};
-        	
-        	var targetCmp={
-    			getAttributes:function(){
-					return targetAttributes;
-				}		        			
         	};
         	
         	var targetItems={
@@ -275,14 +269,19 @@ Test.Aura.Iteration.HelperTest = function(){
     			}
         	};
         	        	        	       
-        	var targetAttributes={
+        	var targetBodyCollector={	
+    			count:0,
+    			realBodyList:[]
+    		};
+        	
+        	var targetCmp={
         		get:function(att){
-        			if(att=="var") return "var";
-        			if(att=="indexVar") return true;        			
+        			if(att=="v.var") return "var";
+        			if(att=="v.indexVar") return true;        			
         		},
         		getValue:function(att){
-        			if(att=="body") return targetBody;
-        			if(att=="forceServer"){
+        			if(att=="v.body") return targetBody;
+        			if(att=="v.forceServer"){
 	        			return {
 	        				getValue:function(){					
 								return 'forceServer';
@@ -290,20 +289,9 @@ Test.Aura.Iteration.HelperTest = function(){
 						};
         			}
         		},
-        		getValueProvider:function(){
+        		getAttributeValueProvider:function(){
         			return '';
         		}
-        	};        	        	        	
-
-        	var targetBodyCollector={	
-    			count:0,
-    			realBodyList:[]
-    		};
-        	
-        	var targetCmp={
-    			getAttributes:function(){
-					return targetAttributes;
-				}		        			
         	};
         	
         	var targetItems={
@@ -539,20 +527,14 @@ Test.Aura.Iteration.HelperTest = function(){
     			}
         	};
         	        	        	       
-        	var targetAttributes={
+        	var targetCmp={
         		get:function(att){
-        			if(att=="var") return "var";
-        			if(att=="indexVar") return false;        			
+        			if(att=="v.var") return "var";
+        			if(att=="v.indexVar") return false;        			
         		},
         		getValue:function(att){
-        			if(att=="body") return targetBody;        			
+        			if(att=="v.body") return targetBody;        			
         		}
-        	};        	        	        	        	
-        	
-        	var targetCmp={
-    			getAttributes:function(){
-					return targetAttributes;
-				}		        			
         	};
         	
         	var targetItems={
@@ -594,23 +576,17 @@ Test.Aura.Iteration.HelperTest = function(){
     			}
         	};
         	        	        	       
-        	var targetAttributes={
+        	var targetCmp={
         		get:function(att){
-        			if(att=="var") return "var";
-        			if(att=="indexVar") return true;        			
+        			if(att=="v.var") return "var";
+        			if(att=="v.indexVar") return true;        			
         		},
         		getValue:function(att){
-        			if(att=="body") return targetBody;        			
+        			if(att=="v.body") return targetBody;        			
         		},
-        		getValueProvider:function(){
+        		getAttributeValueProvider:function(){
         			return '';
         		}
-        	};        	        	        	        	
-        	
-        	var targetCmp={
-    			getAttributes:function(){
-					return targetAttributes;
-				}		        			
         	};
         	
         	var targetItems={
@@ -672,23 +648,17 @@ Test.Aura.Iteration.HelperTest = function(){
         	
         	var targetAttributeValueProvider = '';
         	        	        	       
-        	var targetAttributes={
+        	var targetCmp={
         		get:function(att){
-        			if(att=="var") return "var";
-        			if(att=="indexVar") return false;        			
+        			if(att=="v.var") return "var";
+        			if(att=="v.indexVar") return false;        			
         		},
         		getValue:function(att){
-        			if(att=="body") return targetBody;        			
+        			if(att=="v.body") return targetBody;        			
         		},
-        		getValueProvider:function(){
+        		getAttributeValueProvider:function(){
         			return targetAttributeValueProvider;
         		}
-        	};        	        	        	        	
-        	
-        	var targetCmp={
-    			getAttributes:function(){
-					return targetAttributes;
-				}		        			
         	};
         	
         	var targetItems={
@@ -829,24 +799,16 @@ Test.Aura.Iteration.HelperTest = function(){
 			}
     	};
     	        	        	       
-    	var targetAttributes={
-    		get:function(att){
-    			if(att=="var") return "var";
-    			if(att=="indexVar") return false;        			
-    		},
-    		getValue:function(att){
-    			if(att=="realbody") return targetRealBody; 
-    			if(att=="body") return targetBody;        			
-    		}
-    	};   
-    	
     	var targetItems;
     	
     	var targetCmp={
-			getAttributes:function(){
-				return targetAttributes;
-			},			
-			getValue:function(att){        			
+    		get:function(att){
+    			if(att=="v.var") return "var";
+    			if(att=="v.indexVar") return false;        			
+    		},
+    		getValue:function(att){
+    			if(att=="v.realbody") return targetRealBody; 
+    			if(att=="v.body") return targetBody;        			
     			if(att=="v.items") return targetItems;   
     		}
     	};
@@ -938,17 +900,11 @@ Test.Aura.Iteration.HelperTest = function(){
     			}
         	};
         	        	        	       
-        	var targetAttributes={        		
-        		getValue:function(att){
-        			if(att=="items") return targetItems;         			       			
-        		}
-        	};        	        	        	        	
-        	
         	var targetCmp={
     			_currentBodyCollector:'',
-    			getAttributes:function(){
-					return targetAttributes;
-				}		        			
+        		getValue:function(att){
+        			if(att=="v.items") return targetItems;		       			
+        		}
         	};
         	
         	var targetCallback = function(arg){
@@ -1049,19 +1005,13 @@ Test.Aura.Iteration.HelperTest = function(){
     			}
         	};
         	        	        	       
-        	var targetAttributes={        		
-        		getValue:function(att){
-        			if(att=="items") return targetItems;  
-        			if(att=="start") return targetStart;
-        			if(att=="end") return targetEnd;
-        		}
-        	};        	        	        	        	
-        	
         	var targetCmp={
     			_currentBodyCollector:'',
-    			getAttributes:function(){
-					return targetAttributes;
-				}		        			
+        		getValue:function(att){
+        			if(att=="v.items") return targetItems;  
+        			if(att=="v.start") return targetStart;
+        			if(att=="v.end") return targetEnd;
+        		}
         	};
         	
         	var targetCallback = function(arg){
@@ -1215,19 +1165,13 @@ Test.Aura.Iteration.HelperTest = function(){
     			}
         	};
         	        	        	       
-        	var targetAttributes={        		
-        		getValue:function(att){
-        			if(att=="items") return targetItems;  
-        			if(att=="start") return targetStart;
-        			if(att=="end") return targetEnd;
-        		}
-        	};        	        	        	        	
-        	
         	var targetCmp={
     			_currentBodyCollector:'',
-    			getAttributes:function(){
-					return targetAttributes;
-				}		        			
+        		getValue:function(att){
+        			if(att=="v.items") return targetItems;  
+        			if(att=="v.start") return targetStart;
+        			if(att=="v.end") return targetEnd;
+        		}
         	};
         	
         	var targetCallback = function(arg){
@@ -1312,19 +1256,13 @@ Test.Aura.Iteration.HelperTest = function(){
     			}
         	};
         	        	        	       
-        	var targetAttributes={        		
-        		getValue:function(att){
-        			if(att=="items") return targetItems;  
-        			if(att=="start") return targetStart;
-        			if(att=="end") return targetEnd;
-        		}
-        	};        	        	        	        	
-        	
         	var targetCmp={
     			_currentBodyCollector:'',
-    			getAttributes:function(){
-					return targetAttributes;
-				}		        			
+        		getValue:function(att){
+        			if(att=="v.items") return targetItems;  
+        			if(att=="v.start") return targetStart;
+        			if(att=="v.end") return targetEnd;
+        		}
         	};
         	
         	var targetCallback = function(arg){
@@ -1400,16 +1338,10 @@ Test.Aura.Iteration.HelperTest = function(){
 				}
 	    	};
 	    	        	        	       
-	    	var targetAttributes={        		
-	    		getValue:function(att){
-	    			if(att=="items") return targetItems;         			       			
-	    		}
-	    	};        	        	        	        	
-	    	
 	    	var targetCmp={    			
-				getAttributes:function(){
-					return targetAttributes;
-				}		        			
+	    		getValue:function(att){
+	    			if(att=="v.items") return targetItems;         			       			
+	    		}
 	    	};        	    
     	
 	    	[Fact]
@@ -1492,18 +1424,12 @@ Test.Aura.Iteration.HelperTest = function(){
     			}
         	};
         	        	        	       
-        	var targetAttributes={        		
-        		getValue:function(att){
-        			if(att=="items") return targetItems;
-        			if(att=="start") return targetStart;
-        			if(att=="end") return targetEnd;
-        		}
-        	};        	        	        	        	
-        	
         	var targetCmp={    			
-    			getAttributes:function(){
-					return targetAttributes;
-				}		        			
+        		getValue:function(att){
+        			if(att=="v.items") return targetItems;
+        			if(att=="v.start") return targetStart;
+        			if(att=="v.end") return targetEnd;
+        		}
         	}; 
         	
         	var mockContext = Mocks.GetMock(Object.Global(), "$A", {                                        		          		
@@ -1671,18 +1597,12 @@ Test.Aura.Iteration.HelperTest = function(){
     			}
         	};
         	        	        	       
-        	var targetAttributes={        		
-        		getValue:function(att){
-        			if(att=="items") return targetItems;
-        			if(att=="start") return targetStart;
-        			if(att=="end") return targetEnd;
-        		}
-        	};        	        	        	        	
-        	
         	var targetCmp={    			
-    			getAttributes:function(){
-					return targetAttributes;
-				}		        			
+        		getValue:function(att){
+        			if(att=="v.items") return targetItems;
+        			if(att=="v.start") return targetStart;
+        			if(att=="v.end") return targetEnd;
+        		}
         	}; 
         	
         	var mockContext = Mocks.GetMock(Object.Global(), "$A", {                                        		          		
@@ -1775,18 +1695,12 @@ Test.Aura.Iteration.HelperTest = function(){
     			}
         	};
         	        	        	       
-        	var targetAttributes={        		
-        		getValue:function(att){
-        			if(att=="items") return targetItems;
-        			if(att=="start") return targetStart;
-        			if(att=="end") return targetEnd;
-        		}
-        	};        	        	        	        	
-        	
         	var targetCmp={    			
-    			getAttributes:function(){
-					return targetAttributes;
-				}		        			
+        		getValue:function(att){
+        			if(att=="v.items") return targetItems;
+        			if(att=="v.start") return targetStart;
+        			if(att=="v.end") return targetEnd;
+        		}
         	}; 
         	
         	var mockContext = Mocks.GetMock(Object.Global(), "$A", {                                        		          		
@@ -1861,14 +1775,15 @@ Test.Aura.Iteration.HelperTest = function(){
     			}
         	};
         	        	        	       
-        	var targetAttributes={
+        	var targetCmp={
+    			_currentSelectiveBodyCollector:'',
         		get:function(att){
-        			if(att=="var") return "var";
-        			if(att=="indexVar") return 1;        			
+        			if(att=="v.var") return "var";
+        			if(att=="v.indexVar") return 1;        			
         		},
         		getValue:function(att){
-        			if(att=="body") return targetBody;
-        			if(att=="forceServer"){
+        			if(att=="v.body") return targetBody;
+        			if(att=="v.forceServer"){
 	        			return {
 	        				getValue:function(){					
 								return 'forceServer';
@@ -1876,16 +1791,9 @@ Test.Aura.Iteration.HelperTest = function(){
 						};
         			}
         		},
-        		getValueProvider:function(){
+        		getAttributeValueProvider:function(){
         			return '';
         		}
-        	};        	        	        	        	
-        	
-        	var targetCmp={
-    			_currentSelectiveBodyCollector:'',
-    			getAttributes:function(){
-					return targetAttributes;
-				}		        			
         	};
         	
         	var targetItems={
@@ -1945,14 +1853,15 @@ Test.Aura.Iteration.HelperTest = function(){
         	};
         	        	        
         	var targetAttributeValueProvider = '';
-        	var targetAttributes={
+        	
+        	var targetCmp={
         		get:function(att){
-        			if(att=="var") return 'var';
-        			if(att=="indexVar") return false;        			
+        			if(att=="v.var") return 'var';
+        			if(att=="v.indexVar") return false;        			
         		},
         		getValue:function(att){
-        			if(att=="body") return targetBody;
-        			if(att=="forceServer"){
+        			if(att=="v.body") return targetBody;
+        			if(att=="v.forceServer"){
 	        			return {
 	        				getValue:function(){					
 								return 'forceServer';
@@ -1960,15 +1869,9 @@ Test.Aura.Iteration.HelperTest = function(){
 						};
         			}
         		},
-        		getValueProvider:function(){
+        		getAttributeValueProvider:function(){
         			return targetAttributeValueProvider;
         		}
-        	};        	        	        	        	
-        	
-        	var targetCmp={
-    			getAttributes:function(){
-					return targetAttributes;
-				}		        			
         	};
         	
         	var targetItemsLength;
@@ -2370,18 +2273,12 @@ Test.Aura.Iteration.HelperTest = function(){
 				}		        			
         	};  
         	
-        	var targetAttributes={        		
-        		getValue:function(att){
-        			if(att=="items") return targetItems;
-        			if(att=="realbody") return targetRealBody; 
-        			if(att=="body") return targetBody;        			
-        		}
-        	};        	        	        	        	
-        	
         	var targetCmp={
-    			getAttributes:function(){
-					return targetAttributes;
-				}		        			
+        		getValue:function(att){
+        			if(att=="v.items") return targetItems;
+        			if(att=="v.realbody") return targetRealBody; 
+        			if(att=="v.body") return targetBody;        			
+        		}
         	};        	        
         	        	        	        	
         	var mockGetStart = Mocks.GetMock(targetHelper, "getStart", function(cmp){       
@@ -2433,12 +2330,8 @@ Test.Aura.Iteration.HelperTest = function(){
         	};
         	
         	var targetBodyCmp={
-        		getAttributes:function(){  
-        			return {
-        				getValueProvider:function(){
-		        			return targetValueProvider;        			
-		        		}
-        			};
+				getAttributeValueProvider:function(){
+        			return targetValueProvider;        			
         		}
         	};  
         	
@@ -2472,22 +2365,16 @@ Test.Aura.Iteration.HelperTest = function(){
 				}		        			
         	};  
         	
-        	var targetAttributes={
+        	var targetCmp={
         		get:function(att){
-        			if(att=="var") return "var";
-        			if(att=="indexVar") return 1;        			
+        			if(att=="v.var") return "var";
+        			if(att=="v.indexVar") return 1;        			
         		},
         		getValue:function(att){
-        			if(att=="items") return targetItems;
-        			if(att=="realbody") return targetRealBody; 
-        			if(att=="body") return targetBody;        			
+        			if(att=="v.items") return targetItems;
+        			if(att=="v.realbody") return targetRealBody; 
+        			if(att=="v.body") return targetBody;        			
         		}
-        	};        	        	        	        	
-        	
-        	var targetCmp={
-    			getAttributes:function(){
-					return targetAttributes;
-				}
         	};        	        
         	        	        	        	
         	var mockGetStart = Mocks.GetMock(targetHelper, "getStart", function(cmp){       
@@ -2584,12 +2471,8 @@ Test.Aura.Iteration.HelperTest = function(){
         	};
         	
         	var targetBodyCmp1={
-        		getAttributes:function(){  
-        			return {
-        				getValueProvider:function(){
-		        			return targetValueProvider1;        			
-		        		}
-        			};
+				getAttributeValueProvider:function(){
+        			return targetValueProvider1;        			
         		}
         	};        	        	
         	
@@ -2609,12 +2492,8 @@ Test.Aura.Iteration.HelperTest = function(){
         	};
         	
         	var targetBodyCmp2={
-        		getAttributes:function(){  
-        			return {
-        				getValueProvider:function(){
-		        			return targetValueProvider2;        			
-		        		}
-        			};
+				getAttributeValueProvider:function(){
+        			return targetValueProvider2;        			
         		}
         	};
         	
@@ -2648,23 +2527,17 @@ Test.Aura.Iteration.HelperTest = function(){
 					return 0;
 				}		        			
         	};  
-        	
-        	var targetAttributes={
+
+        	var targetCmp={
         		get:function(att){
-        			if(att=="var") return "var";
-        			if(att=="indexVar") return -1;        			
+        			if(att=="v.var") return "var";
+        			if(att=="v.indexVar") return -1;        			
         		},
         		getValue:function(att){
-        			if(att=="items") return targetItems;
-        			if(att=="realbody") return targetRealBody; 
-        			if(att=="body") return targetBody;        			
+        			if(att=="v.items") return targetItems;
+        			if(att=="v.realbody") return targetRealBody; 
+        			if(att=="v.body") return targetBody;        			
         		}
-        	};        	        	        	        	
-        	
-        	var targetCmp={
-    			getAttributes:function(){
-					return targetAttributes;
-				}
         	};        	        
         	        	        	        	
         	var mockGetStart = Mocks.GetMock(targetHelper, "getStart", function(cmp){       
@@ -2742,12 +2615,8 @@ Test.Aura.Iteration.HelperTest = function(){
         	};
         	
         	var targetBodyCmp={
-        		getAttributes:function(){  
-        			return {
-        				getValueProvider:function(){
-		        			return targetValueProvider;        			
-		        		}
-        			};
+				getAttributeValueProvider:function(){
+        			return targetValueProvider;        			
         		}
         	};  
         	
@@ -2789,22 +2658,16 @@ Test.Aura.Iteration.HelperTest = function(){
 				}		        			
         	};  
         	
-        	var targetAttributes={
+        	var targetCmp={
         		get:function(att){
-        			if(att=="var") return "var";
-        			if(att=="indexVar") return 1;        			
+        			if(att=="v.var") return "var";
+        			if(att=="v.indexVar") return 1;        			
         		},
         		getValue:function(att){
-        			if(att=="items") return targetItems;
-        			if(att=="realbody") return targetRealBody; 
-        			if(att=="body") return targetBody;        			
+        			if(att=="v.items") return targetItems;
+        			if(att=="v.realbody") return targetRealBody; 
+        			if(att=="v.body") return targetBody;        			
         		}
-        	};        	        	        	        	
-        	
-        	var targetCmp={
-    			getAttributes:function(){
-					return targetAttributes;
-				}
         	};        	        
         	        	        	        	
         	var mockGetStart = Mocks.GetMock(targetHelper, "getStart", function(cmp){       
@@ -2897,12 +2760,8 @@ Test.Aura.Iteration.HelperTest = function(){
         	};
         	
         	var targetBodyCmp={
-        		getAttributes:function(){  
-        			return {
-        				getValueProvider:function(){
-		        			return targetValueProvider;        			
-		        		}
-        			};
+				getAttributeValueProvider:function(){
+        			return targetValueProvider;        			
         		}
         	};  
         	        	
@@ -2939,22 +2798,16 @@ Test.Aura.Iteration.HelperTest = function(){
 				}		        			
         	};  
         	
-        	var targetAttributes={
+        	var targetCmp={
         		get:function(att){
-        			if(att=="var") return "var";
-        			if(att=="indexVar") return 1;        			
+        			if(att=="v.var") return "var";
+        			if(att=="v.indexVar") return 1;        			
         		},
         		getValue:function(att){
-        			if(att=="items") return targetItems;
-        			if(att=="realbody") return targetRealBody; 
-        			if(att=="body") return targetBody;        			
+        			if(att=="v.items") return targetItems;
+        			if(att=="v.realbody") return targetRealBody; 
+        			if(att=="v.body") return targetBody;        			
         		}
-        	};        	        	        	        	
-        	
-        	var targetCmp={
-    			getAttributes:function(){
-					return targetAttributes;
-				}
         	};        	        
         	        	        	        	
         	var mockGetStart = Mocks.GetMock(targetHelper, "getStart", function(cmp){       
@@ -3068,12 +2921,8 @@ Test.Aura.Iteration.HelperTest = function(){
         	};
         	
         	var targetBodyCmp={
-        		getAttributes:function(){  
-        			return {
-        				getValueProvider:function(){
-		        			return targetValueProvider;        			
-		        		}
-        			};
+				getAttributeValueProvider:function(){
+        			return targetValueProvider;        			
         		}
         	};  
         	
@@ -3110,22 +2959,16 @@ Test.Aura.Iteration.HelperTest = function(){
 				}		        			
         	};  
         	
-        	var targetAttributes={
+        	var targetCmp={
         		get:function(att){
-        			if(att=="var") return "var";
-        			if(att=="indexVar") return 1;        			
+        			if(att=="v.var") return "var";
+        			if(att=="v.indexVar") return 1;        			
         		},
         		getValue:function(att){
-        			if(att=="items") return targetItems;
-        			if(att=="realbody") return targetRealBody; 
-        			if(att=="body") return targetBody;        			
+        			if(att=="v.items") return targetItems;
+        			if(att=="v.realbody") return targetRealBody; 
+        			if(att=="v.body") return targetBody;        			
         		}
-        	};        	        	        	        	
-        	
-        	var targetCmp={
-    			getAttributes:function(){
-					return targetAttributes;
-				}
         	};        	        
         	        	        	        	
         	var mockGetStart = Mocks.GetMock(targetHelper, "getStart", function(cmp){       
@@ -3257,22 +3100,14 @@ Test.Aura.Iteration.HelperTest = function(){
     	};
     	
     	var targetCmp1={	
-			getAttributes:function(){  
-    			return {
-    				getValueProvider:function(){
-	        			return targetValueProvider1;        			
-	        		}
-    			};
+			getAttributeValueProvider:function(){
+    			return targetValueProvider1;        			
     		}
 		};
     	
     	var targetCmp2={	
-			getAttributes:function(){  
-    			return {
-    				getValueProvider:function(){
-	        			return targetValueProvider2;        			
-	        		}
-    			};
+			getAttributeValueProvider:function(){
+    			return targetValueProvider2;        			
     		}
 		};
     	

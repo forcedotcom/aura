@@ -51,10 +51,9 @@
 
     createComponentsForIndex: function(bodyCollector, cmp, items, index, doForce) {
         var ret = [];
-        var atts = cmp.getAttributes();
-        var varName = atts.get("var");
-        var indexVar = atts.get("indexVar");
-        var body = atts.getValue("body");
+        var varName = cmp.get("v.var");
+        var indexVar = cmp.get("v.indexVar");
+        var body = cmp.get("v.body");
         var extraProviders = {};
         var indexCollector = {
             body:ret,
@@ -66,16 +65,16 @@
             extraProviders[indexVar] = $A.expressionService.create(null, index);
         }
         var ivp;
-        var len = body.getLength();
+        var len = body.length;
         var forceServer = cmp.get("v.forceServer");
         //
         // Take off our index, but add the number of components that we will create.
         //
         bodyCollector.count += len - 1;
-        for (var j = 0; j < body.getLength(); j++) {
-            var cdr = body.get(j);
+        for (var j = 0; j < len; j++) {
+            var cdr = body[j];
             if (!ivp) {
-                ivp = $A.expressionService.createPassthroughValue(extraProviders, cdr.valueProvider || atts.getValueProvider());
+                ivp = $A.expressionService.createPassthroughValue(extraProviders, cdr.valueProvider || cmp.getAttributeValueProvider());
             }
             ret[j] = null;
             $A.componentService.newComponentAsync(this, this.createAddComponentCallback(indexCollector, j), cdr, ivp, false, false, forceServer);
@@ -85,10 +84,9 @@
 
     createComponentsForIndexFromServer: function(cmp, items, index, doForce) {
         var ret = [];
-        var atts = cmp.getAttributes();
-        var varName = atts.get("var");
-        var indexVar = atts.get("indexVar");
-        var body = atts.getValue("body");
+        var varName = cmp.get("v.var");
+        var indexVar = cmp.get("v.indexVar");
+        var body = cmp.get("v.body");
         var extraProviders = {};
         extraProviders[varName] = items.getValue(index);
         if (indexVar) {
@@ -101,11 +99,11 @@
         //
         // Take off our index, but add the number of components that we will create.
         //
-        for (var j = 0; j < body.getLength(); j++) {
+        for (var j = 0; j < body.length; j++) {
             $A.setCreationPathIndex(j);
-            var cdr = body.get(j);
+            var cdr = body[j];
             if (!ivp) {
-                ivp = $A.expressionService.createPassthroughValue(extraProviders, cdr.valueProvider || atts.getValueProvider());
+                ivp = $A.expressionService.createPassthroughValue(extraProviders, cdr.valueProvider || cmp.getAttributeValueProvider());
             }
             ret.push( $A.componentService.newComponentDeprecated(cdr, ivp, false, doForce) );
         }
@@ -117,9 +115,8 @@
     createNewComponents: function(cmp, callback) {
         var start = this.getStart(cmp);
         var end = this.getEnd(cmp);
-        var atts = cmp.getAttributes();
-        var realbody = atts.getValue("realbody");
-        var body = atts.getValue("body");
+        var realbody = cmp.getValue("v.realbody");
+        var body = cmp.getValue("v.body");
         var bodyLen = body.getLength();
         if ((end - start) > (realbody.getLength()/bodyLen)) {
             // now we don't have enough, create a new cmp at the end
@@ -128,17 +125,14 @@
         }
     },
 
-
     createRealBody: function(cmp, doForce, callback) {
-        var atts = cmp.getAttributes();
-        var items = atts.getValue("items");
-        //
+        var items = cmp.getValue("v.items");
+        
         // The collector for the components.
         // Note that we put the count of items in our count, and
         // decrement for each one when we add the subitems on. This protects
         // us from 'instant' callbacks which occur inline (and would cause us
         // to think we had finished after the first item was processed).
-        //
         var bodyCollector = {
             realBodyList:[],
             count: (items && items.getLength) ? items.getLength() : 0, // items length if exists else zero
@@ -151,7 +145,7 @@
         if (items && items.getLength && !items.isLiteral() && !items.isEmpty()) {
             var realstart = 0;
             var realend = items.getLength();
-            var start = atts.getValue("start");
+            var start = cmp.getValue("v.start");
             if (start.isDefined()) {
                 start = this.getNumber(start);
                 if (start > realstart) {
@@ -159,7 +153,7 @@
                     bodyCollector.offset = realstart;
                 }
             }
-            var end = atts.getValue("end");
+            var end = cmp.getValue("v.end");
             if (end.isDefined()) {
                 end = this.getNumber(end);
                 if (end < realend) {
@@ -186,22 +180,21 @@
 
     createRealBodyServer: function(cmp, doForce) {
         var realbody = [];
-        var atts = cmp.getAttributes();
-        var items = atts.getValue("items");
+        var items = cmp.getValue("v.items");
 
         if (items && !items.isLiteral() && !items.isEmpty()) {
             $A.pushCreationPath("realbody");
 
             var realstart = 0;
             var realend = items.getLength();
-            var start = atts.getValue("start");
+            var start = cmp.getValue("v.start");
             if (start.isDefined()) {
                 start = this.getNumber(start);
                 if (start > realstart) {
                     realstart = start;
                 }
             }
-            var end = atts.getValue("end");
+            var end = cmp.getValue("v.end");
             if (end.isDefined()) {
                 end = this.getNumber(end);
                 if (end < realend) {
@@ -219,10 +212,9 @@
     },
 
     createSelectiveComponentsForIndex: function(cmp, items, index, doForce, callback) {
-        var atts = cmp.getAttributes();
-        var varName = atts.get("var");
-        var indexVar = atts.get("indexVar");
-        var body = atts.getValue("body");
+        var varName = cmp.get("v.var");
+        var indexVar = cmp.get("v.indexVar");
+        var body = cmp.get("v.body");
         var extraProviders = {};
         extraProviders[varName] = items.getValue(index);
         if (indexVar) {
@@ -232,14 +224,14 @@
         var forceServer = cmp.get("v.forceServer");
         var selectiveBodyCollector = {
             realBodyList: [],
-            count: body.getLength(),
+            count: body.length,
             cmp: cmp,
             callback: callback
         };
-        for (var j = 0; j < body.getLength(); j++) {
-            var cdr = body.get(j);
+        for (var j = 0; j < body.length; j++) {
+            var cdr = body[j];
             if (!ivp) {
-                ivp = $A.expressionService.createPassthroughValue(extraProviders, cdr.valueProvider || atts.getValueProvider());
+                ivp = $A.expressionService.createPassthroughValue(extraProviders, cdr.valueProvider || cmp.getAttributeValueProvider());
             }
             $A.setCreationPathIndex(j);
             $A.componentService.newComponentAsync(this, this.createSelectiveComponentsCallback(selectiveBodyCollector, j), cdr, ivp, false, false, forceServer);
@@ -276,20 +268,19 @@
         // optimized for insert/remove/push. if this is called as a result of a setValue then anything could change
         var start = this.getStart(cmp);
         var end = this.getEnd(cmp);
-        var atts = cmp.getAttributes();
-        var items = atts.getValue("items")
-        var realbody = atts.getValue("realbody");
-        var body = atts.getValue("body");
+        var items = cmp.getValue("v.items")
+        var realbody = cmp.getValue("v.realbody");
+        var body = cmp.getValue("v.body");
         var bodyLen = body.getLength();
         if (!realbody.isEmpty()) {
-            var varName = atts.get("var");
-            var indexVar = atts.get("indexVar");
+            var varName = cmp.get("v.var");
+            var indexVar = cmp.get("v.indexVar");
             var diffIndex = -1;
             var data;
             // look for a diff between the components we already created and the data
             for (var i = 0; i < realbody.getLength(); i++) {
                 var bodycmp = realbody.getValue(i);
-                var vp = bodycmp.getAttributes().getValueProvider();
+                var vp = bodycmp.getAttributeValueProvider();
                 var index = vp.getValue(indexVar).unwrap();
                 data = vp.getValue(varName);
                 if (items.getValue(index) !== data) {
@@ -345,7 +336,7 @@
 
     incrementIndices: function(cmpArray, start, indexVar, change, bodyLen) {
         for (var i = start; i < cmpArray.length; (bodyLen ? i+=bodyLen : i++)) {
-            var vp = cmpArray[i].getAttributes().getValueProvider();
+            var vp = cmpArray[i].getAttributeValueProvider();
             var index = vp.getValue(indexVar);
             index.setValue(index.unwrap() + change);
         }

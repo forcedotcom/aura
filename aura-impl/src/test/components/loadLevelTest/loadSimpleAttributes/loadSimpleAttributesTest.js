@@ -29,6 +29,7 @@
                                       });
         }]
     },
+    
     testInitialValues:{
         attributes:{'stringAttribute':'lazyLoading',integerAttribute:'99',booleanAttribute:true,'waitId':'loadSimpleAttributesInitial'},
         test:[function(cmp){
@@ -58,28 +59,29 @@
             );
         }]
     },
+    
     testRerenderDirtyValuesOnLazyComponents:{
-        attributes:{'stringAttribute':'lazyLoading',integerAttribute:'99',booleanAttribute:true,'waitId':'loadSimpleAttributesDirty'},
+        attributes:{'stringAttribute':'lazyLoading', integerAttribute:'99', booleanAttribute:true, 'waitId':'loadSimpleAttributesDirty'},
         test:[function(cmp){
             var helper = cmp.getDef().getHelper();
-            helper.resumeGateId(cmp, "loadSimpleAttributesDirty");
+            helper.resumeGateId(cmp, 'loadSimpleAttributesDirty');
 
             $A.test.addWaitFor('markup://aura:expression', function(){
-                return  cmp.find('stringAttribute').getDef().getDescriptor().getQualifiedName();
+                return cmp.find('stringAttribute').getDef().getDescriptor().getQualifiedName();
             });
         },function(cmp){
             $A.run(function() {
-                    cmp.set('v.stringAttribute','postLoading');
-                    cmp.set('v.integerAttribute',100 );
-                    cmp.set('v.booleanAttribute', false );
-                })
-
-            $A.test.assertEquals("postLoading",$A.test.getTextByComponent(cmp.find("stringAttribute")), "Failed to rerender dirty string value, could also be a problem with aura:test rerender.");
-            $A.test.assertEquals("100",$A.test.getTextByComponent(cmp.find("integerAttribute")), "Failed to rerender dirty integer value, could also be a problem with lumeh:html rerender.");
+                cmp.set('v.stringAttribute', 'postLoading');
+                cmp.set('v.integerAttribute', 100);
+                cmp.set('v.booleanAttribute', false);
+            });
+            
+            $A.test.assertEquals("postLoading", $A.test.getTextByComponent(cmp.find("stringAttribute")), "Failed to rerender dirty string value, could also be a problem with aura:test rerender.");
+            $A.test.assertEquals("100", $A.test.getTextByComponent(cmp.find("integerAttribute")), "Failed to rerender dirty integer value, could also be a problem with aura:html rerender.");
             //Currently there is a bug here with aura:renderif. Though new elements are created and rendered on screen, component still has reference to old dom elements and not new ones.
 
             // trim() to pass tests in IE9/IE10
-            $A.test.assertEquals("False",$A.util.trim($A.test.getTextByComponent(cmp.find("booleanWrapper"))), "Failed to rerender dirty boolean value.");
+            $A.test.assertEquals("False", $A.util.trim($A.test.getTextByComponent(cmp.find("booleanWrapper"))), "Failed to rerender dirty boolean value.");
         }]
     }
 })

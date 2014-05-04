@@ -67,15 +67,15 @@
     testExtendedComponentHasItsOwnAttributes: {
         test: function(cmp) {
             var providerA = cmp.find("provider3"),
-                attrsA = providerA.getAttributes(),
                 providerB = cmp.find("provider4"),
-                attrsB = providerB.getAttributes(),
                 defs = providerB.getDef().getAttributeDefs();
 
-            $A.test.assertEquals("A", attrsA.getRawValue("type"), "providerA should have value set by itself");
-            $A.test.assertFalse(attrsA.getRawValue("attA"), "providerA should have own attribute and value");
-            $A.test.assertEquals("b", attrsB.getRawValue("type"), "providerB should have value set by parent");
-            $A.test.assertTrue(attrsB.getRawValue("attB"), "providerB should have own attribute and value");
+            $A.test.assertEquals("A", providerA.get("v.type"), "providerA should have value set by itself");
+            $A.test.assertFalse(providerA.get("v.attA"), "providerA should have own attribute and value");
+            
+            $A.test.assertEquals("b", providerB.get("v.type"), "providerB should have value set by parent");
+            $A.test.assertTrue(providerB.get("v.attB"), "providerB should have own attribute and value");
+            
             $A.test.assertNotUndefinedOrNull(defs.getDef("new1"), "new1 attribute should exist");
             $A.test.assertNotUndefinedOrNull(defs.getDef("new2"), "new2 attribute should exist");
             $A.test.assertNotUndefinedOrNull(defs.getDef("new3"), "new3 attribute should exist");

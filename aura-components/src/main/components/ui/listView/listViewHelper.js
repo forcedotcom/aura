@@ -400,17 +400,16 @@
 
 	getAttributes : function(component) {
 		var attributeMap = {};
-		var attributeDelegate = this.getAttribute.bind(this, component.getAttributes(), attributeMap);
+		var attributeDelegate = this.getAttribute.bind(this, component, attributeMap);
+		
 		component.getDef().getAttributeDefs().each(attributeDelegate);
+		
 		return attributeMap;
 	},
 
-	getAttribute : function(attributeSet, attributeMap, value) {
+	getAttribute : function(component, attributeMap, value) {
 		var attribute = value.getDescriptor().getName();
-		var attributeValue = attributeSet.getValue(attribute);
-		if (attributeValue && attributeValue.unwrap) {
-			attributeValue = attributeValue.unwrap();
-		}
+		var attributeValue = component.get("v." + attribute);
 		attributeMap[attribute] = attributeValue;
 	},
 

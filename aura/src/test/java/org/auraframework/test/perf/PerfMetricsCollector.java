@@ -27,10 +27,13 @@ import org.auraframework.util.test.perf.data.PerfMetric;
 import org.auraframework.util.test.perf.data.PerfMetrics;
 import org.auraframework.util.test.perf.rdp.RDPAnalyzer;
 import org.auraframework.util.test.perf.rdp.RDPNotification;
+import org.auraframework.util.test.perf.rdp.RDPUtil;
 import org.auraframework.util.test.perf.rdp.TimelineEventStats;
 import org.auraframework.util.test.perf.rdp.TimelineEventUtil;
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import com.google.common.collect.Lists;
 
 /**
  * Collects and holds raw perf metrics data for a test case
@@ -98,15 +101,42 @@ public final class PerfMetricsCollector {
         return metrics;
     }
 
-    public JSONArray getDevToolsLog() {
-        JSONArray devToolsLog = new JSONArray();
+    public List<JSONObject> getDevToolsLog() {
+        List<JSONObject> devToolsLog = Lists.newArrayList();
         for (RDPNotification notification : notifications) {
             if (notification.isTimelineEvent()) {
                 JSONObject devToolsMessage = notification.getTimelineEvent();
-                devToolsLog.put(devToolsMessage);
+                devToolsLog.add(devToolsMessage);
             }
         }
         return devToolsLog;
+    }
+
+    /**
+     * @return the log between our timeline marks only
+     */
+    public List<JSONObject> getDevToolsLogBetweenMarks() {
+        List<JSONObject> all = getDevToolsLog();
+
+        // return full timeline if there are no marks
+        if (!RDPUtil.containsTimelineStamp(all, RDPAnalyzer.MARK_TIMELINE_START)) {
+            return all;
+        }
+
+        List<JSONObject> trimmed = Lists.newArrayList();
+        boolean between = false;
+        for (JSONObject event : all) {
+            if (!between) {
+                between = TimelineEventUtil.hasTimelineTimeStamp(event, RDPAnalyzer.MARK_TIMELINE_START);
+            }
+            if (between) {
+                trimmed.add(event);
+                if (TimelineEventUtil.hasTimelineTimeStamp(event, RDPAnalyzer.MARK_TIMELINE_END)) {
+                    break;
+                }
+            }
+        }
+        return trimmed;
     }
 
     private Map<String, String> getAllUIPerfStats() {

@@ -31,7 +31,6 @@ import org.auraframework.test.WebDriverTestCase;
 import org.auraframework.util.AuraUITestingUtil;
 import org.auraframework.util.json.JsonReader;
 import org.auraframework.util.test.perf.rdp.RDPNotification;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.JavascriptExecutor;
@@ -209,7 +208,7 @@ public final class PerfWebDriverUtil {
      * Writes the dev tools log for a perf test run to
      * System.getProperty("java.io.tmpdir")/perf/devToolsLogs/testName_runNumber.json
      */
-    public static void writeDevToolsLog(JSONArray devToolsLog, WebDriverTestCase test, int runNumber,
+    public static void writeDevToolsLog(List<JSONObject> devToolsLog, WebDriverTestCase test, int runNumber,
             String userAgent) {
         String path = System.getProperty("java.io.tmpdir") + "/perf/devToolsLogs/" + test.getName() + '_' + runNumber
                 + ".json";
@@ -222,17 +221,17 @@ public final class PerfWebDriverUtil {
         }
     }
 
-    public static void writeDevToolsLog(JSONArray devToolsLog, File file, String userAgent) throws Exception {
+    public static void writeDevToolsLog(List<JSONObject> devToolsLog, File file, String userAgent) throws Exception {
         BufferedWriter out = null;
         try {
             file.getParentFile().mkdirs();
             out = new BufferedWriter(new FileWriter(file));
             out.write('[');
             out.write(JSONObject.quote(userAgent));
-            for (int i = 0; i < devToolsLog.length(); i++) {
+            for (JSONObject entry : devToolsLog) {
                 out.write(',');
                 out.newLine();
-                out.write(devToolsLog.get(i).toString());
+                out.write(entry.toString());
             }
             out.write("]");
             out.newLine();

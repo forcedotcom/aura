@@ -18,6 +18,7 @@ package org.auraframework.util.test.perf.rdp;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -151,10 +152,37 @@ public class TimelineEventUtil {
         }
     }
 
+    /**
+     * @return true if the timelineEvent is a time stamp one with the given message
+     */
     public static boolean isTimelineTimeStamp(JSONObject timelineEvent, String message) {
         if (message == null) {
             return false;
         }
         return message.equals(isTimelineTimeStamp(timelineEvent));
+    }
+
+    /**
+     * @return true if the timelineEvent or one of its descendants is a time stamp one with the given message
+     */
+    public static boolean hasTimelineTimeStamp(JSONObject timelineEvent, String message) {
+        if (isTimelineTimeStamp(timelineEvent, message)) {
+            return true;
+        }
+
+        if (timelineEvent.has("children")) {
+            try {
+                JSONArray children = timelineEvent.getJSONArray("children");
+                for (int i = 0; i < children.length(); i++) {
+                    if (hasTimelineTimeStamp(children.getJSONObject(i), message)) {
+                        return true;
+                    }
+                }
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        return false;
     }
 }

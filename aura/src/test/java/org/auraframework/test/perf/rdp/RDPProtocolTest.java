@@ -100,7 +100,7 @@ public final class RDPProtocolTest extends AbstractPerfTestCase {
         List<RDPNotification> notifications = getRDPNotifications();
         RDPAnalyzer analyzer = new RDPAnalyzer(notifications);
 
-        // UC: check the marks are there
+        // UC: check the marks exists and in the right order
         List<String> marks = Lists.newArrayList();
         for (JSONObject timelineEvent : analyzer.getFlattenedTimelineEvents()) {
             String mark = TimelineEventUtil.isTimelineTimeStamp(timelineEvent);
@@ -116,7 +116,21 @@ public final class RDPProtocolTest extends AbstractPerfTestCase {
         metricsCollector.startCollecting();
         runWithPerfApp(getDefDescriptor("ui:button"));
         metricsCollector.stopCollecting();
-        JSONArray devToolsLog = metricsCollector.getDevToolsLog();
-        assertTrue(devToolsLog.length() > 10);
+
+        // UC: whole dev tools log
+        List<JSONObject> fulDevToolsLog = metricsCollector.getDevToolsLog();
+        int fullSize = fulDevToolsLog.size();
+        assertTrue(fulDevToolsLog.size() > 10);
+
+        // UC: dev tools log between marks
+        List<JSONObject> trimmedDevToolsLog = metricsCollector.getDevToolsLogBetweenMarks();
+        int trimmedSize = trimmedDevToolsLog.size();
+        assertTrue("full " + fullSize + ", trimmed " + trimmedSize, trimmedSize < fullSize);
+        JSONObject firstEntry = trimmedDevToolsLog.get(0);
+        JSONObject lastEntry = trimmedDevToolsLog.get(trimmedSize - 1);
+        assertTrue(firstEntry.toString(),
+                TimelineEventUtil.hasTimelineTimeStamp(firstEntry, RDPAnalyzer.MARK_TIMELINE_START));
+        assertTrue(lastEntry.toString(),
+                TimelineEventUtil.hasTimelineTimeStamp(lastEntry, RDPAnalyzer.MARK_TIMELINE_END));
     }
 }

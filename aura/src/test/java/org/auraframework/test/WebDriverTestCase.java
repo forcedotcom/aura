@@ -61,7 +61,7 @@ import org.auraframework.util.test.perf.data.PerfMetrics;
 import org.auraframework.util.test.perf.data.PerfRunsCollector;
 import org.auraframework.util.test.perf.rdp.RDPNotification;
 import org.eclipse.jetty.util.log.Log;
-import org.json.JSONArray;
+import org.json.JSONObject;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Keys;
@@ -257,7 +257,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
                     superRunTest();
 
                     runsCollector.addRun(metricsCollector.stopCollecting());
-                    JSONArray devToolsLog = metricsCollector.getDevToolsLog();
+                    List<JSONObject> devToolsLog = metricsCollector.getDevToolsLogBetweenMarks();
                     PerfWebDriverUtil.writeDevToolsLog(devToolsLog, this, i, auraUITestingUtil.getUserAgent());
                 } finally {
                     perBrowserTearDown();

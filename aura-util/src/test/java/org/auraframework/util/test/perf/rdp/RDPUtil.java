@@ -106,7 +106,7 @@ public final class RDPUtil {
             return false;
         }
         for (JSONObject event : timelineEvents) {
-            if (TimelineEventUtil.isTimelineTimeStamp(event, timeStamp)) {
+            if (TimelineEventUtil.hasTimelineTimeStamp(event, timeStamp)) {
                 return true;
             }
         }

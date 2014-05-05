@@ -3,6 +3,7 @@ package org.auraframework.perf.core;
 import java.net.URLEncoder;
 import java.util.logging.Logger;
 
+import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.test.WebDriverTestCase;
@@ -65,5 +66,9 @@ public abstract class AbstractPerfTestCase extends WebDriverTestCase {
         waitForElementAppear("Container div[data-app-rendered-component] element for the component not present: "
                 + componentName,
                 By.cssSelector(String.format("[data-app-rendered-component]", componentName)));
+    }
+
+    protected static final DefDescriptor<ComponentDef> getDefDescriptor(String qualifiedName) {
+        return Aura.getDefinitionService().getDefDescriptor(qualifiedName, ComponentDef.class);
     }
 }

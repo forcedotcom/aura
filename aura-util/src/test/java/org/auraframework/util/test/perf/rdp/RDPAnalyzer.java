@@ -36,24 +36,26 @@ import com.google.common.collect.Maps;
  */
 public final class RDPAnalyzer {
 
-    // public static final String MARK_TIMELINE_START = "START:cmpCreate";
-    // public static final String MARK_TIMELINE_END = "END:cmpRender";
-    // TODO: not using marks yet, start mark shows almost at end of timeline
-    public static final String MARK_TIMELINE_START = null;
-    public static final String MARK_TIMELINE_END = null;
+    public static final String MARK_TIMELINE_START = "START:cmpCreate";
+    public static final String MARK_TIMELINE_END = "END:cmpRender";
 
     protected static final Logger LOG = Logger.getLogger(RDPAnalyzer.class.getSimpleName());
 
     private final List<RDPNotification> notifications;
-    private final List<JSONObject> timelineEvents;
+    private final List<JSONObject> flattenedTimelineEvents;
     private Map<String, TimelineEventStats> timelineEventsStats;
 
     public RDPAnalyzer(List<RDPNotification> notifications) {
         this.notifications = notifications;
         List<JSONObject> allTimelineEvents = RDPUtil.flattenedTimelineEvents(notifications);
-        this.timelineEvents = RDPUtil.eventsBetweenTimelineMarks(allTimelineEvents, MARK_TIMELINE_START,
+        this.flattenedTimelineEvents = RDPUtil.eventsBetweenTimelineMarks(allTimelineEvents, MARK_TIMELINE_START,
                 MARK_TIMELINE_END);
-        LOG.info("num timeline events: " + allTimelineEvents.size() + ", num filtered: " + this.timelineEvents.size());
+        LOG.info("num timeline events: " + allTimelineEvents.size() + ", num filtered: "
+                + this.flattenedTimelineEvents.size());
+    }
+
+    public List<JSONObject> getFlattenedTimelineEvents() {
+        return flattenedTimelineEvents;
     }
 
     /**
@@ -65,7 +67,7 @@ public final class RDPAnalyzer {
         }
 
         timelineEventsStats = Maps.newHashMap();
-        for (JSONObject timelineEvent : timelineEvents) {
+        for (JSONObject timelineEvent : flattenedTimelineEvents) {
             try {
                 analyzeTimelineEvent(timelineEvent);
             } catch (Exception e) {

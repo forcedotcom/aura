@@ -27,9 +27,10 @@ import org.auraframework.util.test.perf.data.PerfMetric;
 import org.auraframework.util.test.perf.data.PerfMetrics;
 import org.auraframework.util.test.perf.rdp.RDPAnalyzer;
 import org.auraframework.util.test.perf.rdp.RDPNotification;
-import org.auraframework.util.test.perf.rdp.TimelineEventUtil;
 import org.auraframework.util.test.perf.rdp.TimelineEventStats;
+import org.auraframework.util.test.perf.rdp.TimelineEventUtil;
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 /**
  * Collects and holds raw perf metrics data for a test case
@@ -95,6 +96,17 @@ public final class PerfMetricsCollector {
             LOG.log(Level.WARNING, test.getName(), e);
         }
         return metrics;
+    }
+
+    public JSONArray getDevToolsLog() {
+        JSONArray devToolsLog = new JSONArray();
+        for (RDPNotification notification : notifications) {
+            if (notification.isTimelineEvent()) {
+                JSONObject devToolsMessage = notification.getTimelineEvent();
+                devToolsLog.put(devToolsMessage);
+            }
+        }
+        return devToolsLog;
     }
 
     private Map<String, String> getAllUIPerfStats() {

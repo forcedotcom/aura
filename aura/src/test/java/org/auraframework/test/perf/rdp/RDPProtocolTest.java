@@ -20,14 +20,18 @@ import java.util.Map;
 
 import org.auraframework.perf.core.AbstractPerfTestCase;
 import org.auraframework.test.annotation.FreshBrowserInstance;
+import org.auraframework.test.perf.PerfMetricsCollector;
 import org.auraframework.util.test.perf.data.PerfMetric;
 import org.auraframework.util.test.perf.rdp.RDP;
 import org.auraframework.util.test.perf.rdp.RDPAnalyzer;
 import org.auraframework.util.test.perf.rdp.RDPNotification;
 import org.auraframework.util.test.perf.rdp.RDPUtil;
 import org.auraframework.util.test.perf.rdp.TimelineEventStats;
+import org.auraframework.util.test.perf.rdp.TimelineEventUtil;
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import com.google.common.collect.Lists;
 
 public final class RDPProtocolTest extends AbstractPerfTestCase {
 
@@ -77,7 +81,7 @@ public final class RDPProtocolTest extends AbstractPerfTestCase {
         assertTrue(request.toString(), encodedDataLength > 5000 && encodedDataLength < 15000);
         assertEquals("GET", request.getString("method"));
 
-        // UC: extract/everify Timeline event metrics
+        // UC: extract/verify Timeline event metrics
         Map<String, TimelineEventStats> timelineEventsStats = analyzer.analyzeTimelineDomain();
         TimelineEventStats paintStats = timelineEventsStats.get("Paint");
         assertTrue("num paints: " + paintStats.getCount(), paintStats.getCount() >= 2);
@@ -87,26 +91,32 @@ public final class RDPProtocolTest extends AbstractPerfTestCase {
         assertEquals(0, getRDPNotifications().size());
     }
 
-    public void testTimelineTimeStamp() throws Exception {
-        if (!RUN_PERF_TESTS) {
-            return;
+    /**
+     * Checks the timeline has the marks we are adding
+     */
+    public void testTimelineMarks() throws Exception {
+        runWithPerfApp(getDefDescriptor("ui:button"));
+
+        List<RDPNotification> notifications = getRDPNotifications();
+        RDPAnalyzer analyzer = new RDPAnalyzer(notifications);
+
+        // UC: check the marks are there
+        List<String> marks = Lists.newArrayList();
+        for (JSONObject timelineEvent : analyzer.getFlattenedTimelineEvents()) {
+            String mark = TimelineEventUtil.isTimelineTimeStamp(timelineEvent);
+            if (mark != null) {
+                marks.add(mark);
+            }
         }
+        assertEquals("[START:cmpCreate, END:cmpCreate, START:cmpRender, END:cmpRender]", marks.toString());
+    }
 
-        openRaw("/ui/label.cmp?label=foo");
-
-        // TODO:
-
-        final String startStamp = RDPAnalyzer.MARK_TIMELINE_START;
-        final String endStamp = RDPAnalyzer.MARK_TIMELINE_END;
-
-        // UC: timeline without time stamps
-        // List<RDPNotification> notifications = getRDPNotifications();
-
-        // UC: timeline with time stamps
-        // openRaw("/perfTest/perf.app#%7B%22componentDef%22%3A%22markup%3A%2F%2Fui%3Abutton%22%7D");
-        // notifications = getRDPNotifications();
-        // assertTrue(RDPUtil.containsTimelineStamp(notifications, startStamp));
-        // filtered = RDPUtil.notificationsBetweenTimelineMarks(notifications, startStamp, endStamp);
-        // assertEquals(notifications.size(), filtered.size());
+    public void testGetDevToolsLog() throws Exception {
+        PerfMetricsCollector metricsCollector = new PerfMetricsCollector(this);
+        metricsCollector.startCollecting();
+        runWithPerfApp(getDefDescriptor("ui:button"));
+        metricsCollector.stopCollecting();
+        JSONArray devToolsLog = metricsCollector.getDevToolsLog();
+        assertTrue(devToolsLog.length() > 10);
     }
 }

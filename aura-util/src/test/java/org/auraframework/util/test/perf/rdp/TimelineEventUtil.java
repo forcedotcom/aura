@@ -137,17 +137,24 @@ public class TimelineEventUtil {
         return types;
     }
 
+    /**
+     * @return null if it is not a time stamp, else the message in the time stamp
+     */
+    public static String isTimelineTimeStamp(JSONObject timelineEvent) {
+        try {
+            if (!"TimeStamp".equals(timelineEvent.getString("type"))) {
+                return null;
+            }
+            return timelineEvent.getJSONObject("data").getString("message");
+        } catch (JSONException e) {
+            throw new RuntimeException(timelineEvent.toString(), e);
+        }
+    }
+
     public static boolean isTimelineTimeStamp(JSONObject timelineEvent, String message) {
         if (message == null) {
             return false;
         }
-        try {
-            if (!"TimeStamp".equals(timelineEvent.getString("type"))) {
-                return false;
-            }
-            return message.equals(timelineEvent.getJSONObject("data").getString("message"));
-        } catch (JSONException e) {
-            throw new RuntimeException(timelineEvent.toString(), e);
-        }
+        return message.equals(isTimelineTimeStamp(timelineEvent));
     }
 }

@@ -15,6 +15,9 @@
  */
 package org.auraframework.test.perf;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,9 +27,11 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.auraframework.test.WebDriverTestCase;
 import org.auraframework.util.AuraUITestingUtil;
 import org.auraframework.util.json.JsonReader;
 import org.auraframework.util.test.perf.rdp.RDPNotification;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.JavascriptExecutor;
@@ -196,5 +201,46 @@ public final class PerfWebDriverUtil {
         str1 = new String(str1Arr);
         str2 = new String(str2Arr);
         return str1.equals(str2);
+    }
+
+    // dev tools log
+
+    /**
+     * Writes the dev tools log for a perf test run to
+     * System.getProperty("java.io.tmpdir")/perf/devToolsLogs/testName_runNumber.json
+     */
+    public static void writeDevToolsLog(JSONArray devToolsLog, WebDriverTestCase test, int runNumber,
+            String userAgent) {
+        String path = System.getProperty("java.io.tmpdir") + "/perf/devToolsLogs/" + test.getName() + '_' + runNumber
+                + ".json";
+        File file = new File(path);
+        try {
+            writeDevToolsLog(devToolsLog, file, userAgent);
+            LOG.info("wrote " + file.getAbsolutePath());
+        } catch (Exception e) {
+            LOG.log(Level.WARNING, "error writing " + file.getAbsolutePath(), e);
+        }
+    }
+
+    public static void writeDevToolsLog(JSONArray devToolsLog, File file, String userAgent) throws Exception {
+        BufferedWriter out = null;
+        try {
+            file.getParentFile().mkdirs();
+            out = new BufferedWriter(new FileWriter(file));
+            out.write('[');
+            out.write(JSONObject.quote(userAgent));
+            for (int i = 0; i < devToolsLog.length(); i++) {
+                out.write(',');
+                out.newLine();
+                out.write(devToolsLog.get(i).toString());
+            }
+            out.write("]");
+            out.newLine();
+        } finally {
+            if (out != null) {
+                out.flush();
+                out.close();
+            }
+        }
     }
 }

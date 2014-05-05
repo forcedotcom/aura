@@ -17,6 +17,7 @@
 var p = $A.ns.Util.prototype;
 exp(p,
     "isIE", p.isIE,
+    "isIOSWebView", p.isIOSWebView,
     "isArray", p.isArray,
     "isBoolean", p.isBoolean,
     "isObject", p.isObject,

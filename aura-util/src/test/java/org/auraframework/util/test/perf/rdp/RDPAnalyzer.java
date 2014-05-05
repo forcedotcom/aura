@@ -156,7 +156,7 @@ public final class RDPAnalyzer {
                         int encodedDataLength = detail.getInt("encodedDataLength");
                         if (finishedEncodedDataLength != encodedDataLength) {
                             LOG.log(Level.WARNING, "encodedDataLength doesn't match: " + finishedEncodedDataLength
-                                    + " != " + encodedDataLength);
+                                    + " (from loadingFinished) != " + encodedDataLength + " (from dataReceived)");
                         }
                     }
                     numRequests++;

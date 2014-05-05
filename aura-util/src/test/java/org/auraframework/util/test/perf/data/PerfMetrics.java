@@ -17,7 +17,6 @@ package org.auraframework.util.test.perf.data;
 
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Logger;
 
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Maps;
@@ -58,14 +57,16 @@ public final class PerfMetrics {
         metrics.put(name, new PerfMetric(name, value));
     }
 
-    public void logInfo(Logger logger) {
+    public String toLongString() {
+        StringBuilder sb = new StringBuilder();
         for (String name : getAllMetricNames()) {
             PerfMetric metric = getMetric(name);
-            logger.info("  " + metric.toShortText());
+            sb.append("  " + metric.toShortText());
             String details = metric.toDetailsText(name);
             if (details != null) {
-                logger.info(details);
+                sb.append('\n' + details);
             }
         }
+        return sb.toString();
     }
 }

@@ -18,9 +18,8 @@ package org.auraframework.test.perf.rdp;
 import java.util.List;
 import java.util.Map;
 
-import org.auraframework.test.WebDriverTestCase;
+import org.auraframework.perf.core.AbstractPerfTestCase;
 import org.auraframework.test.annotation.FreshBrowserInstance;
-import org.auraframework.util.test.perf.PerfTest;
 import org.auraframework.util.test.perf.data.PerfMetric;
 import org.auraframework.util.test.perf.rdp.RDP;
 import org.auraframework.util.test.perf.rdp.RDPAnalyzer;
@@ -30,8 +29,7 @@ import org.auraframework.util.test.perf.rdp.TimelineEventStats;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-@PerfTest
-public final class RDPProtocolTest extends WebDriverTestCase {
+public final class RDPProtocolTest extends AbstractPerfTestCase {
 
     public RDPProtocolTest(String name) {
         super(name);

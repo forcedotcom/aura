@@ -18,10 +18,10 @@ package org.auraframework.test.perf;
 import java.util.List;
 import java.util.Map;
 
-import org.auraframework.test.WebDriverTestCase;
+import org.auraframework.perf.core.AbstractPerfTestCase;
 import org.auraframework.test.WebDriverTestCase.TargetBrowsers;
 import org.auraframework.test.WebDriverUtil.BrowserType;
-import org.auraframework.util.test.perf.PerfTest;
+import org.auraframework.util.test.perf.data.PerfMetric;
 import org.auraframework.util.test.perf.data.PerfMetrics;
 import org.auraframework.util.test.perf.data.PerfRunsCollector;
 
@@ -29,16 +29,49 @@ import org.auraframework.util.test.perf.data.PerfRunsCollector;
  * Miscellaneous tests for the perf framework.
  */
 @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.IPHONE })
-@PerfTest
-public final class PerfFrameworkTest extends WebDriverTestCase {
+public final class MiscPerfFrameworkTest extends AbstractPerfTestCase {
 
-    public PerfFrameworkTest(String name) {
+    public MiscPerfFrameworkTest(String name) {
         super(name);
     }
 
     @Override
     protected int numPerfTimelineRuns() {
         return 0; // so it only runs once in functional mod
+    }
+
+    public void testPageRefresh() throws Exception {
+        PerfMetricsCollector metricsCollector = new PerfMetricsCollector(this);
+        metricsCollector.startCollecting();
+        openRaw("/ui/label.cmp?label=foo");
+        PerfMetrics metrics = metricsCollector.stopCollecting();
+        System.out.println("METRICS (first):\n" + metrics.toLongString());
+        PerfMetric paint = metrics.getMetric("Timeline.Painting.Paint");
+        assertEquals(6, paint.getIntValue()); // TODO: why is 6 the first time?
+        int bytes = metrics.getMetric("Network.encodedDataLength").getIntValue();
+        assertTrue("nothing cached: " + bytes, bytes > 100000);
+
+        // do a page refresh
+        metricsCollector = new PerfMetricsCollector(this);
+        metricsCollector.startCollecting();
+        currentDriver.navigate().refresh();
+        metrics = metricsCollector.stopCollecting();
+        System.out.println("METRICS (refresh):\n" + metrics.toLongString());
+        paint = metrics.getMetric("Timeline.Painting.Paint");
+        assertEquals(2, paint.getIntValue()); // refresh on browser gives 2 also
+        bytes = metrics.getMetric("Network.encodedDataLength").getIntValue();
+        assertTrue("most cached: " + bytes, bytes < 20000);
+
+        // go to the same page instead of refreshing
+        metricsCollector = new PerfMetricsCollector(this);
+        metricsCollector.startCollecting();
+        openRaw("/ui/label.cmp?label=foo");
+        metrics = metricsCollector.stopCollecting();
+        System.out.println("METRICS (revisit):\n" + metrics.toLongString());
+        paint = metrics.getMetric("Timeline.Painting.Paint");
+        assertEquals(2, paint.getIntValue()); // refresh on browser gives 2 also
+        bytes = metrics.getMetric("Network.encodedDataLength").getIntValue();
+        assertTrue("most cached: " + bytes, bytes < 20000);
     }
 
     public void testResourceTimingAPI() throws Exception {

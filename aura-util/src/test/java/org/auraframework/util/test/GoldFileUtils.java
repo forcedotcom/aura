@@ -59,8 +59,10 @@ public final class GoldFileUtils {
             message = String.format("Created missing gold file, review new gold file before committing: %s", url);
         } catch (Throwable t) {
             exceptionFound = t;
-            message = String.format(
-                    "Gold file differences found, review updated gold file before committing: %s", url);
+            message = "Gold file differences found";
+            if (!SKIP_GOLD_FILE_UPDATE) {
+                message += String.format(", review updated gold file before committing: %s", url);
+            }
             message += "\nDifferences:\n" + t.getMessage();
         }
 

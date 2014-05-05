@@ -93,7 +93,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
     }
 
     protected int timeoutInSecs = Integer.parseInt(System.getProperty("webdriver.timeout", "30"));
-    private WebDriver currentDriver = null;
+    protected WebDriver currentDriver = null;
     BrowserType currentBrowserType = null;
     protected AuraUITestingUtil auraUITestingUtil;
     protected PerfWebDriverUtil perfWebDriverUtil;
@@ -143,7 +143,6 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
      * TearDown specific to a test run against a particular browser. Run once per test case, per browser.
      */
     protected void perBrowserTearDown() {
-        perfWebDriverUtil = null;
     }
 
     private void superRunTest() throws Throwable {
@@ -185,7 +184,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
                 this.getExcludedBrowsers())) {
             try {
                 runTestWithBrowser(browser);
-                if (failures.size() == 0) {
+                if (isPerfTest() && failures.size() == 0) {
                     // run perf regression only if there were no functional failures
                     runPerfTests();
                 }
@@ -208,9 +207,6 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
 
     protected static final boolean RUN_PERF_TESTS = System.getProperty("runPerfTests") != null;
 
-    /** true if currently running a test for perf */
-    protected boolean inPerfRun;
-
     protected boolean isPerfTest() {
         return RUN_PERF_TESTS && PerfUtil.hasPerfTestAnnotation(this);
     }
@@ -220,13 +216,6 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
      */
     protected int numPerfTimelineRuns() {
         return 5;
-    }
-
-    /**
-     * @return non-null to specify a desired window size to be set when a new driver is created
-     */
-    protected Dimension getWindowSize() {
-        return null;
     }
 
     /**
@@ -241,52 +230,50 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
 
     private void runPerfTests() throws Throwable {
         // TODO: check the browser can be run in perf mode
-        if (!isPerfTest()) {
-            return;
-        }
 
-        // TODO: split into timeline/aura-stats mode runs
-        runTestWithBrowserAsPerf();
+        runTimelinePerfTests();
+        // TODO: runs for other metrics (aura-stats, ...)
     }
 
-    private void runTestWithBrowserAsPerf() throws Throwable {
+    private void runTimelinePerfTests() throws Throwable {
         int numPerfTimelineRuns = numPerfTimelineRuns();
 
         if (numPerfTimelineRuns > 0) {
-            PerfRunsCollector collector = new PerfRunsCollector();
+            PerfRunsCollector runsCollector = new PerfRunsCollector();
             for (int i = 0; i < numPerfTimelineRuns; i++) {
                 try {
-                    // reset WebDriver for perf run
-                    quitDriver();
-                    getDriver();
+                    if (i == 0) {
+                        // get fresh browser for perf runs
+                        quitDriver();
+                        getDriver();
+                    }
 
-                    inPerfRun = true;
                     perBrowserSetUp();
 
-                    PerfMetricsCollector perfData = new PerfMetricsCollector(this);
-                    perfData.startCollecting();
+                    PerfMetricsCollector metricsCollector = new PerfMetricsCollector(this);
+                    metricsCollector.startCollecting();
 
                     superRunTest();
 
-                    collector.addRun(perfData.stopCollecting());
+                    runsCollector.addRun(metricsCollector.stopCollecting());
                 } finally {
                     perBrowserTearDown();
-                    inPerfRun = false;
                 }
             }
-            PerfMetrics median = collector.getMedianMetrics();
+            PerfMetrics median = runsCollector.getMedianMetrics();
             if (logger.isLoggable(Level.INFO)) {
                 logger.info("perf metrics for " + this);
-                median.logInfo(logger);
+                logger.info(median.toLongString());
             }
-            perfMetricsTearDown(median);
+            perfTearDown(median, runsCollector);
         }
     }
 
     /**
-     * Default behavior is to compare the measured metrics with the gold file ones.
+     * Invoked after all perf metrics have been collected. Default behavior is to compare the measured metrics with the
+     * gold file ones.
      */
-    protected void perfMetricsTearDown(PerfMetrics median) throws Exception {
+    protected void perfTearDown(PerfMetrics median, PerfRunsCollector collector) throws Exception {
         assertGoldMetrics(median);
     }
 
@@ -547,6 +534,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
             } else {
                 capabilities = currentBrowserType.getCapability();
             }
+
             boolean reuseBrowser = true;
             try {
                 Class<?> clazz = getClass();
@@ -555,7 +543,9 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
             } catch (NoSuchMethodException e) {
                 // happens for dynamic tests
             }
-
+            if (isPerfTest()) {
+                reuseBrowser = false;
+            }
             capabilities.setCapability(WebDriverProvider.REUSE_BROWSER_PROPERTY, reuseBrowser);
 
             addPerfCapabilities(capabilities);
@@ -565,15 +555,24 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
             if (currentDriver == null) {
                 fail("Failed to get webdriver for " + currentBrowserType);
             }
+
             Dimension windowSize = getWindowSize();
             if (windowSize != null) {
                 currentDriver.manage().window().setSize(windowSize);
             }
+
             logger.info(String.format("Received: %s", currentDriver));
             auraUITestingUtil = new AuraUITestingUtil(currentDriver);
             perfWebDriverUtil = new PerfWebDriverUtil(currentDriver, auraUITestingUtil);
         }
         return currentDriver;
+    }
+
+    /**
+     * @return non-null to specify a desired window size to be set when a new driver is created
+     */
+    protected Dimension getWindowSize() {
+        return null;
     }
 
     protected final void quitDriver() {

@@ -64,6 +64,6 @@ public abstract class AbstractPerfTestCase extends WebDriverTestCase {
         String componentName = descriptor.getName();
         waitForElementAppear("Container div[data-app-rendered-component] element for the component not present: "
                 + componentName,
-                By.cssSelector(String.format("[data-app-rendered-component='%s']", componentName)));
+                By.cssSelector(String.format("[data-app-rendered-component]", componentName)));
     }
 }

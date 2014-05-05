@@ -20,8 +20,8 @@
             callback   = function (newCmp) {
                 $A.log("Start rendering component: " + JSON.stringify(descriptor));
 
-                // Wait 300ms to stabilize the browser
-                $A.PERFCORE.later(300, function (t) {
+                // Wait 50ms to stabilize the browser
+                $A.PERFCORE.later(50, function (t) {
                     // Create the context for Aura
                     $A.run(function () {
                         // Start timming 

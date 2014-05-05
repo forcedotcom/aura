@@ -27,7 +27,7 @@
 			element  	: el,
 			value      	: self.getDateString(currentDate),
 			onselected 	: function (evt) {
-				component.setValue('v.value', evt.getParam('value'));
+				component.set('v.value', evt.getParam('value'));
 			}
 		}).fire();
 	}			

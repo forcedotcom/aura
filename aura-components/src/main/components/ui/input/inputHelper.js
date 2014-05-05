@@ -86,7 +86,7 @@
      * This hook allows extensions of ui:input to augment or override update behaviour
      */
     doUpdate : function(component, value) {
-        component.setValue("v.value", value);
+        component.set("v.value", value);
     },
 
     /**
@@ -163,7 +163,7 @@
         $A.util.removeClass(inputEl, "inputError");
 
         if (errorCmp && errorCmp.get("v.value.length") > 0) {
-            errorCmp.setValue("v.value", []);
+            errorCmp.set("v.value", []);
         }
     },
 
@@ -182,14 +182,14 @@
         }
         var errorCmp = component.get("v.errorComponent")[0];
         if (errorCmp) {
-            errorCmp.setValue("v.value", m);
+            errorCmp.set("v.value", m);
         } else {
             $A.componentService.newComponentAsync(
                 this,
                 function(errorCmp) {
                 	var ariaDesc = component.get("v.ariaDescribedby");
                     ariaDesc = this.addTokenToString(ariaDesc, errorCmp.getGlobalId());
-                	component.setValue("v.errorComponent", errorCmp);
+                	component.set("v.errorComponent", errorCmp);
                 	this.setAttribute(component, {key: "ariaDescribedby", value: ariaDesc});
                 },
                 {

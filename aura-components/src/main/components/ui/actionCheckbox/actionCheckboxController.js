@@ -19,7 +19,7 @@
 
 		if (cb) {
 			// Propagate change.
-			cmp.getSuper().setValue('v.value', cb.checked);
+			cmp.getSuper().set('v.value', cb.checked);
 		}
 	},
 

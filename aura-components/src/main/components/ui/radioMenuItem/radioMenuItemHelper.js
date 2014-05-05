@@ -17,7 +17,7 @@
 	handleClick : function(component) {
 		var current = component.get("v.selected");
         if (current === false) {
-        	component.setValue("v.selected", !current);
+        	component.set("v.selected", !current);
         }
 	},
 
@@ -49,7 +49,7 @@
                 if (c.isInstanceOf("ui:radioMenuItem") &&
                     $A.util.getBooleanValue(c.get("v.selected")) &&
                     c.getGlobalId() != component.getGlobalId()) {
-                    c.setValue("v.selected", false);
+                    c.set("v.selected", false);
                     break;
                 }
             }

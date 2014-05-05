@@ -23,15 +23,20 @@
         if (isReallyTrue !== wasReallyTrue) {
             // so it reallyChanged™, swap out the components and store the old ones in either _true or _false
             var realbody = cmp.getValue("v.realbody");
+            
             var oldcmps = realbody.unwrap();
             var switchTo = "_" + isReallyTrue;
             var switchFrom = "_" + wasReallyTrue;
+            
             cmp[switchFrom] = oldcmps;
+            
             var newcmps = cmp[switchTo];
+            
             // undefined means we haven't ever instantiated this facet
             if ($A.util.isUndefined(newcmps)) {
                 newcmps = cmp[switchTo] = helper.createRealBody(cmp, isReallyTrue, false);
             }
+            
             realbody.setValue(newcmps);
         }
     }

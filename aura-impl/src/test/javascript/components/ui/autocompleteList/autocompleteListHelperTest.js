@@ -49,7 +49,7 @@ Test.Components.Ui.AutocompleteList.AutocompleteListHelperTest=function(){
 						return "label";
 					}
 				},
-				setValue : function(expression, value) {
+				set : function(expression, value) {
 					if (expression === "v.items") {
 						actual = value;	
 					}
@@ -94,7 +94,7 @@ Test.Components.Ui.AutocompleteList.AutocompleteListHelperTest=function(){
 						return "label";
 					}
 				},
-				setValue : function(expression, value) {
+				set : function(expression, value) {
 					if (expression === "v.items") {
 						actual = value;	
 					}
@@ -139,7 +139,7 @@ Test.Components.Ui.AutocompleteList.AutocompleteListHelperTest=function(){
 						return "label";
 					}
 				},
-				setValue : function(expression, value) {
+				set : function(expression, value) {
 					if (expression === "v.items") {
 						actual = value;	
 					}
@@ -180,7 +180,7 @@ Test.Components.Ui.AutocompleteList.AutocompleteListHelperTest=function(){
 						return "label";
 					}
 				},
-				setValue : function(expression, value) {
+				set : function(expression, value) {
 					if (expression === "v.items") {
 						actual = value;	
 					}
@@ -225,7 +225,7 @@ Test.Components.Ui.AutocompleteList.AutocompleteListHelperTest=function(){
 						return "custom";
 					}
 				},
-				setValue : function(expression, value) {
+				set : function(expression, value) {
 					if (expression === "v.items") {
 						actual = value;	
 					}

@@ -60,7 +60,7 @@
 				concrete._columnOrder[name] = i;
 				concrete._columns[name] = c; 
 
-				c.setValue('v.onsortchange', handleColumnSortChange);
+				c.set('v.onsortchange', handleColumnSortChange);
 			}
 
 			if (c.isInstanceOf('ui:dataGridSelectionColumn')) {
@@ -435,7 +435,7 @@
 		$A.rerender(concrete._allChildren);
 
 		// Set the state back to 'idle'.
-		concrete.setValue('v.state', 'idle');
+		concrete.set('v.state', 'idle');
 	},
 
 	/**
@@ -553,12 +553,12 @@
 				var name = c.get('v.name'),
 					direction = sort[name] || '';
 
-				c.setValue('v.direction', direction);
+				c.set('v.direction', direction);
 			});
 
 			// Reset selection columns.
 			for (var i = 0; i < concrete._selectionColumns.length; i++) {
-				concrete._selectionColumns[i].setValue('v.selectAll', false);
+				concrete._selectionColumns[i].set('v.selectAll', false);
 			}
 		}
 
@@ -661,7 +661,7 @@
 		var ctxs = cmp._rowValueProviders;
 
 		// Set attribute for 'global' select all.
-		cmp.setValue('v.selectAll', value);
+		cmp.set('v.selectAll', value);
 
 		// Iterate over rows contexts and set 'selected'.
 		for (var i = 0; i < ctxs.length; i++) {
@@ -693,11 +693,11 @@
 				};
 
 				setKeys();
-				concrete.setValue('v.selectedItems', items);
+				concrete.set('v.selectedItems', items);
 			}
 			else {
 				setKeys();
-				concrete.setValue('v.selectedItems', replace(value ? items : []));
+				concrete.set('v.selectedItems', replace(value ? items : []));
 			}
 		}
 

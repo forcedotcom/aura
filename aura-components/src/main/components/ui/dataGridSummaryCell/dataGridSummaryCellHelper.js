@@ -62,10 +62,10 @@
 
 			// Do NOT allow undefined to be set.
 			if (val) {
-				cmp.setValue('v.value', val);
+				cmp.set('v.value', val);
 			}
 			else {
-				cmp.setValue('v.value', undefined);
+				cmp.set('v.value', undefined);
 			}
 		}
 		else {

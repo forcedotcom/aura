@@ -16,31 +16,32 @@
 ({
 	output : function(cmp, name, msg, purgeOldData) {
 		var oldOutput = "";
-		if(purgeOldData !== true){
-		    oldOutput = cmp.getValue("v."+name).getValue() + "\n";
+		if (purgeOldData !== true) {
+			oldOutput = cmp.get("v." + name).getValue() + "\n";
 		}
-		
-		cmp.getValue("v."+name).setValue(oldOutput + msg);
+
+		cmp.set("v." + name, oldOutput + msg);
 		$A.rerender(cmp);
+		
 		this.scrollToBottom(cmp, name);
 	},
-	
+
 	scrollToBottom : function(cmp, name) {
 		var tabBody = cmp.find(name.replace("Data", "Tab")).find("tabBody");
 		var elem = tabBody.getElement();
 		elem.scrollTop = elem.scrollHeight;
 	},
-	
+
 	getAuraStats : function(cmp, viewName) {
 		var output = "# of " + viewName + " = ";
 		var results = opener.$A.getQueryStatement().from(viewName).query();
-		
+
 		if (!$A.util.isUndefinedOrNull(results)) {
 			output += results.rows.length + "\n";
 		} else {
 			output += "Could not retrieve statistics.\n"
 		}
-		
+
 		return output;
 	}
 })

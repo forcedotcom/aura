@@ -54,7 +54,7 @@
             }
         } else {
             $A.util.removeClass(elem, "visible");
-            concreteCmp.setValue("v.focusItemIndex", 0);
+            concreteCmp.set("v.focusItemIndex", 0);
         }
         this.handleGlobalClick(concreteCmp, visible);
     },

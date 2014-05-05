@@ -52,9 +52,9 @@
         if (daysInMonth < date) { // The target month doesn't have the current date. Just set it to the last date.
             date = daysInMonth;
         }
-        component.setValue("v.year", targetDate.getFullYear());
-        component.setValue("v.month", targetDate.getMonth());
-        component.setValue("v.date", date);
+        component.set("v.year", targetDate.getFullYear());
+        component.set("v.month", targetDate.getMonth());
+        component.set("v.date", date);
         this.updateTitle(component, targetDate.getMonth(), targetDate.getFullYear());
     },
 
@@ -136,24 +136,24 @@
                 }
                 if (this.dateEquals(d, selectedDate)) {
                     clazz += " selectedDate"
-                    cellCmp.setValue("v.tabIndex", 0);
+                    cellCmp.set("v.tabIndex", 0);
                 } else {
-                    cellCmp.setValue("v.tabIndex", -1);
+                    cellCmp.set("v.tabIndex", -1);
                 }
-                cellCmp.setValue("v.class", clazz);
-                cellCmp.setValue("v.label", d.getDate());
-                cellCmp.setValue("v.value", d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate());
+                cellCmp.set("v.class", clazz);
+                cellCmp.set("v.label", d.getDate());
+                cellCmp.set("v.value", d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate());
 
                 var setFocus = component.get("v._setFocus");
                 if (this.dateEquals(d, date) && setFocus === true) {
                     cellCmp.getElement().focus();
                 } else {
-                    cellCmp.setValue("v.ariaSelected", false);
+                    cellCmp.set("v.ariaSelected", false);
                 }
             }
             d.setDate(d.getDate() + 1);
         }
-        component.setValue("v._setFocus", true);
+        component.set("v._setFocus", true);
     },
 
     getEventTarget: function(e) {
@@ -165,7 +165,7 @@
         var targetId = date.getDay();
         var targetCellCmp = component.find(targetId);
         targetCellCmp.getElement().focus();
-        component.setValue("v.date", 1);
+        component.set("v.date", 1);
     },
 
     goToLastOfMonth: function(component, localId) {
@@ -173,7 +173,7 @@
         var targetCellCmp = this.findDateComponent(component, date);
         if (targetCellCmp) {
             targetCellCmp.getElement().focus();
-            component.setValue("v.date", targetCellCmp.get("v.label"));
+            component.set("v.date", targetCellCmp.get("v.label"));
         }
     },
 
@@ -184,14 +184,14 @@
         var date = new Date(currentYear, currentMonth, cellCmp.get("v.label"));
         var targetDate = new Date(date.getFullYear(), date.getMonth(), date.getDate() + deltaDays);
         if (targetDate.getFullYear() != currentYear || targetDate.getMonth() != currentMonth) {
-            component.setValue("v.year", targetDate.getFullYear());
-            component.setValue("v.month", targetDate.getMonth());
-            component.setValue("v.date", targetDate.getDate());
+            component.set("v.year", targetDate.getFullYear());
+            component.set("v.month", targetDate.getMonth());
+            component.set("v.date", targetDate.getDate());
             this.updateTitle(component, targetDate.getMonth(), targetDate.getFullYear());
         } else {
             var targetCellCmp = component.find(parseInt(localId) + deltaDays);
             targetCellCmp.getElement().focus();
-            component.setValue("v.date", targetCellCmp.get("v.label"));
+            component.set("v.date", targetCellCmp.get("v.label"));
         }
     },
 
@@ -274,20 +274,20 @@
             var currentDate = source.get("v.label");
             if (currentId < firstDateId) { // previous month
                 var targetDate = new Date(component.get("v.year"), component.get("v.month") - 1, currentDate);
-                component.setValue("v.year", targetDate.getFullYear());
-                component.setValue("v.month", targetDate.getMonth());
-                component.setValue("v.date", targetDate.getDate());
+                component.set("v.year", targetDate.getFullYear());
+                component.set("v.month", targetDate.getMonth());
+                component.set("v.date", targetDate.getDate());
                 this.updateTitle(component, targetDate.getMonth(), targetDate.getFullYear());
             } else if (currentId > lastDateId) { // next month
                 var targetDate = new Date(component.get("v.year"), component.get("v.month") + 1, currentDate);
-                component.setValue("v.year", targetDate.getFullYear());
-                component.setValue("v.month", targetDate.getMonth());
-                component.setValue("v.date", targetDate.getDate());
+                component.set("v.year", targetDate.getFullYear());
+                component.set("v.month", targetDate.getMonth());
+                component.set("v.date", targetDate.getDate());
                 this.updateTitle(component, targetDate.getMonth(), targetDate.getFullYear());
             } else {
-                component.setValue("v.date", currentDate);
+                component.set("v.date", currentDate);
             }
-            component.setValue("v.selectedDate", component.get("v.year") + "-" + (component.get("v.month") + 1) + "-" + component.get("v.date"));
+            component.set("v.selectedDate", component.get("v.year") + "-" + (component.get("v.month") + 1) + "-" + component.get("v.date"));
         } else { // fire selectdate event
             var selectDateEvent = component.getEvent("selectDate");
             selectDateEvent.setParams({"value": source.get("v.value")});

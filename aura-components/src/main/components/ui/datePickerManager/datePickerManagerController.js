@@ -31,8 +31,8 @@
 		cmp._onselected = params.onselected;
 
 		// Set value and show datePicker.
-		datePicker.setValue('v.value', params.value);
-		datePicker.setValue('v.visible', true);
+		datePicker.set('v.value', params.value);
+		datePicker.set('v.visible', true);
 	},
 
 	handleDateSelected: function (cmp, evt) {

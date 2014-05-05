@@ -18,7 +18,7 @@
         if (value) {
             value = value.replace(/%+$/g, '');
         }
-        component.setValue("v.value", value);
+        component.set("v.value", value);
     },
 
     getNumber: function(cmp) {

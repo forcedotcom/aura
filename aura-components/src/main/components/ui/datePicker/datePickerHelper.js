@@ -97,7 +97,7 @@
 
                 if (!helper.isElementInComponent(component, event.target)) {
                     // Hide the component
-                    component.setValue("v.visible", false);
+                    component.set("v.visible", false);
 
                     //Since we are no longer going into the rerender function, updateGlobalEventListeners does not get called and the listeners will never get turned off
                     var concreteCmp = component.getConcreteComponent();
@@ -219,7 +219,7 @@
         if (!todayLabel) {
             todayLabel = "Today";
         }
-        todayCmp.setValue("v.label", todayLabel);
+        todayCmp.set("v.label", todayLabel);
     },
 
     getNormalizedLang: function(component) {
@@ -329,10 +329,10 @@
         }
         var grid = component.find("grid");
         if (grid) {
-            grid.setValue("v.selectedDate", initialDate.getFullYear() + "-" + (initialDate.getMonth() + 1) + "-" + initialDate.getDate());
-            grid.setValue("v.date", initialDate.getDate());
-            grid.setValue("v.month", initialDate.getMonth());
-            grid.setValue("v.year", initialDate.getFullYear());
+            grid.set("v.selectedDate", initialDate.getFullYear() + "-" + (initialDate.getMonth() + 1) + "-" + initialDate.getDate());
+            grid.set("v.date", initialDate.getDate());
+            grid.set("v.month", initialDate.getMonth());
+            grid.set("v.year", initialDate.getFullYear());
         }
 
         // set initial value to time picker if hasTime is true
@@ -340,9 +340,9 @@
         if (hasTime) {
             var timePickerCmp = component.find("time");
             if (timePickerCmp) {
-                timePickerCmp.setValue("v.hours", component.get("v.hours"));
-                timePickerCmp.setValue("v.is24HourFormat", component.get("v.is24HourFormat"));
-                timePickerCmp.setValue("v.minutes", component.get("v.minutes"));
+                timePickerCmp.set("v.hours", component.get("v.hours"));
+                timePickerCmp.set("v.is24HourFormat", component.get("v.is24HourFormat"));
+                timePickerCmp.set("v.minutes", component.get("v.minutes"));
             }
         }
     },
@@ -392,7 +392,7 @@
             var monthTitleCmp = component.find("monthTitle");
             if (monthTitleCmp) {
                 var monthLabels = component.get("m.monthLabels");
-                monthTitleCmp.setValue("v.value", monthLabels[m].fullName);
+                monthTitleCmp.set("v.value", monthLabels[m].fullName);
             }
             var yearTitleCmp = component.find("yearTitle");
             var selectElem = yearTitleCmp ? yearTitleCmp.getElement() : null;

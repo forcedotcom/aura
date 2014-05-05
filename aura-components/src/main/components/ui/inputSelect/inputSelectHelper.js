@@ -86,7 +86,7 @@
         }
         var originalStatus = $A.util.getBooleanValue(optionCmp.get("v.value"));
         if (originalStatus !== selected) {
-            optionCmp.setValue("v.value", selected);
+            optionCmp.set("v.value", selected);
         }
         return updated;
     },

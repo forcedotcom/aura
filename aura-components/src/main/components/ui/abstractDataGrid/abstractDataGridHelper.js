@@ -77,7 +77,7 @@
 	 * @param {Component} concrete component
 	 */ 
     handleDataChange: function (concrete, data) {
-    	concrete.setValue('v.items', data);
+    	concrete.set('v.items', data);
     },
 
     /**
@@ -86,7 +86,7 @@
 	 * @param {Component} concrete component
 	 */ 
     handleDataChange: function (concrete, data) {
-    	concrete.setValue('v.items', data);
+    	concrete.set('v.items', data);
     },
 
 	/** 

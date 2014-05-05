@@ -51,7 +51,7 @@
     
         var result = root.innerHTML;
         if (result != value) {
-            component.setValue("v.value", result);
+            component.set("v.value", result);
         }
         $A.util.removeElement(root);
     },

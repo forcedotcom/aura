@@ -80,10 +80,10 @@
                 var timezone = component.get("v.timezone");
                 $A.localizationService.WallTimeToUTC(d, timezone, function(utcDate) {
                     utcDate = $A.localizationService.translateFromOtherCalendar(utcDate);
-                    component.setValue("v.value", $A.localizationService.toISOString(utcDate));
+                    component.set("v.value", $A.localizationService.toISOString(utcDate));
                 });
             } else {
-                component.setValue("v.value", ret);
+                component.set("v.value", ret);
             }
         }
     },
@@ -134,11 +134,11 @@
     popUpDatePicker: function(component, date) {
         var datePicker = component.find("datePicker");
         if (datePicker) {
-            datePicker.setValue("v.value", this.getUTCDateString(date));
-            datePicker.setValue("v.hours", date.getUTCHours());
-            datePicker.setValue("v.minutes", date.getUTCMinutes());
-            datePicker.setValue("v.is24HourFormat", this.is24HourFormat(component));
-            datePicker.setValue("v.visible", true);
+            datePicker.set("v.value", this.getUTCDateString(date));
+            datePicker.set("v.hours", date.getUTCHours());
+            datePicker.set("v.minutes", date.getUTCMinutes());
+            datePicker.set("v.is24HourFormat", this.is24HourFormat(component));
+            datePicker.set("v.visible", true);
         }
     }
 })

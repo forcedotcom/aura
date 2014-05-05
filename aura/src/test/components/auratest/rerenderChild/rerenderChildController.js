@@ -15,12 +15,12 @@
  */
 ({
     toggleChild : function(cmp, event) {
-        var val = cmp.getValue("v.toggleChild");
-        val.setValue(!val.unwrap());
+        var val = cmp.get("v.toggleChild");
+        cmp.set("v.toggleChild", !val);
     },
     
     toggleDummy : function(cmp, event) {
-        var val = cmp.getValue("v.toggleDummy");
-        val.setValue(!val.unwrap());
+        var val = cmp.get("v.toggleDummy");
+        cmp.set("v.toggleDummy", !val);
     }
 })

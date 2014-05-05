@@ -132,7 +132,7 @@
                 }
                 if (clickOutside === true) {
                     // Collapse the menu
-                    component.setValue("v.visible", false);
+                    component.set("v.visible", false);
                 }
             };
             component._onClickEndFunc = f;
@@ -213,7 +213,7 @@
     },
 
     handleEsckeydown: function(component, event) {
-        component.setValue("v.visible", false);
+        component.set("v.visible", false);
     },
 
     handleKeydown: function(component, event) {
@@ -248,10 +248,10 @@
             }
             if (activeIndex >= 0 && activeIndex < iters.getLength() && activeIndex != highlightedIndex) {
                 if (highlightedIndex >= 0) {
-                    iters.getValue(highlightedIndex).setValue("v.highlighted", false);
+                    iters.getValue(highlightedIndex).set("v.highlighted", false);
                 }
                 var highlightedCmp = iters.getValue(activeIndex);
-                highlightedCmp.setValue("v.highlighted", true);
+                highlightedCmp.set("v.highlighted", true);
                 this.updateAriaAttributes(component, highlightedCmp);
             }
         }
@@ -274,7 +274,7 @@
     },
 
     handleTabkeydown: function(component, event) {
-        component.setValue("v.visible", false);
+        component.set("v.visible", false);
     },
 
     /**
@@ -313,7 +313,7 @@
                 items[i].visible = false;
             }
         }
-        component.setValue("v.items", items);
+        component.set("v.items", items);
         this.fireMatchDoneEvent(component, items);
         this.toggleListVisibility(component, items);
         this.showLoading(component, false);
@@ -327,7 +327,7 @@
                 break;
             }
         }
-        component.setValue("v.visible", hasVisibleOption);
+        component.set("v.visible", hasVisibleOption);
     },
 
     updateAriaAttributes: function(component, highlightedCmp) {

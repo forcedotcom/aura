@@ -184,7 +184,7 @@ Test.Ui.OutputRichText.HelperTest = function(){
     				if(attribute=="v.value") return this.value;
     				if(attribute=="v.supportedTags") return null;
     			},
-    			setValue:function(attribute, val){
+    			set:function(attribute, val){
     				if(attribute=="v.value") this.value = val;
     			}
     		};           	             	    
@@ -237,7 +237,7 @@ Test.Ui.OutputRichText.HelperTest = function(){
     				if(attribute=="v.value") return this.value;
     				if(attribute=="v.supportedTags") return null;
     			},
-    			setValue:function(attribute, val){
+    			set:function(attribute, val){
     				if(attribute=="v.value") this.value = val;
     			}
     		};           	        	    	    
@@ -292,7 +292,7 @@ Test.Ui.OutputRichText.HelperTest = function(){
     				if(attribute=="v.value") return this.value;
     				if(attribute=="v.supportedTags") return null;
     			},
-    			setValue:function(attribute, val){
+    			set:function(attribute, val){
     				if(attribute=="v.value") this.value = val;
     			}
     		};           	        	
@@ -347,7 +347,7 @@ Test.Ui.OutputRichText.HelperTest = function(){
     				if(attribute=="v.value") return this.value;
     				if(attribute=="v.supportedTags") return 'script';
     			},
-    			setValue:function(attribute, val){
+    			set:function(attribute, val){
     				if(attribute=="v.value") this.value = val;
     			}
     		};           	        	  

@@ -28,6 +28,6 @@
 			sortOrder = list + " : A-Z"
 		}
 		var resultCmp = cmp.find(outCmpName);
-        resultCmp.setValue("v.value", sortOrder);
+        resultCmp.set("v.value", sortOrder);
     }
 })

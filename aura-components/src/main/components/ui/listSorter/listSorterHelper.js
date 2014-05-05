@@ -120,10 +120,10 @@
 			//focus on the first selected default item 
 			var index = selected[0].index;
 			if (items.unwrap()[index]) {
-				cmp.find('sorterMenuList').setValue("v.focusItemIndex", index);
+				cmp.find('sorterMenuList').set("v.focusItemIndex", index);
 			}			
 		}
-		cmp.setValue('v.visible', true);
+		cmp.set('v.visible', true);
 		this.appendElementToBody(cmp);
 		this.updateSize(cmp);
 	},
@@ -180,7 +180,7 @@
 			if (item.get('v.selected') === true) {
 				item.set('v.selected', false, true);
 			}
-			item.setValue('v.isAscending', true);
+			item.set('v.isAscending', true);
 		}
 	},
 	
@@ -284,8 +284,8 @@
 				if (typeof selectedItems[i].index != 'undefined') {
 					item = menuItems.getValue(selectedItems[i].index);
 					if (item) {
-						item.setValue('v.selected', true);
-						item.setValue('v.isAscending', selectedItems[i].ascending);
+						item.set('v.selected', true);
+						item.set('v.isAscending', selectedItems[i].ascending);
 					}
 				}
 			}

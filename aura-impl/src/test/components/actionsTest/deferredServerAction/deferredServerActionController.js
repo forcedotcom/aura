@@ -59,7 +59,7 @@
 
 		function check() {
 			if (firstResult && secondResult) {
-				cmp.setValue('v.result', 'Foo');
+				cmp.set('v.result', 'Foo');
 			}
 		}
 	}

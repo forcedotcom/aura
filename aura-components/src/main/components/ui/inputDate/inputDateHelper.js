@@ -42,8 +42,8 @@
             if (value) {
                 currentDate = $A.localizationService.parseDateTime(value, "yyyy-MM-dd");
             }
-            datePicker.setValue("v.value", this.getDateString(currentDate));
-            datePicker.setValue("v.visible", true);
+            datePicker.set("v.value", this.getDateString(currentDate));
+            datePicker.set("v.visible", true);
         }
     },
 
@@ -66,7 +66,7 @@
                 ret = $A.localizationService.formatDateUTC(d, "YYYY-MM-DD");
             }
         }
-        component.setValue("v.value", ret);
+        component.set("v.value", ret);
     },
 
     getDateString: function(date) {

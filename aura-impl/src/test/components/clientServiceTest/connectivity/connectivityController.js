@@ -39,8 +39,7 @@
     },
 
     logEvent: function(component, event, helper) {
-        var val = component.getValue("v.eventsFired");
-        var oldVal = val.getValue();
-        val.setValue(oldVal + (oldVal == "" ? "" : " ") + event.getDef().getDescriptor().getName());
+        var oldVal = component.get("v.eventsFired");
+        component.set("v.eventsFired", oldVal + (oldVal == "" ? "" : " ") + event.getDef().getDescriptor().getName());
     }
 })

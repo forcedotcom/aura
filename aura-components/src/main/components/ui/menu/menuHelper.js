@@ -141,7 +141,7 @@
 	                if (!helper.isElementInComponent(menuComponent, event.target) && 
 	                        !helper.isElementInComponent(triggerComponent, event.target)) {
 	                    // Collapse the menu
-	                	 menuComponent.setValue("v.visible", false); 
+	                	 menuComponent.set("v.visible", false); 
 	                     var divCmp = helper.findMenuListDiv(menuComponent);
 	                     if (divCmp) {
 	                         var elem = divCmp.getElement();
@@ -181,8 +181,8 @@
     
     toggleMenuVisible : function(component, index) {
     	var c = this.getMenuComponent(component);
-        c.setValue("v.focusItemIndex", index);
+        c.set("v.focusItemIndex", index);
         var menuVisible = c.get("v.visible");
-        c.setValue("v.visible", !menuVisible);
+        c.set("v.visible", !menuVisible);
     }
 })

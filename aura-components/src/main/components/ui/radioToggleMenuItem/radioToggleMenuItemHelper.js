@@ -17,7 +17,7 @@
 	handleClick: function(cmp) {
 		var current = cmp.get("v.selected");
         if (current === false) {
-        	cmp.setValue("v.selected", !current);
+        	cmp.set("v.selected", !current);
         } else {
         	this.toggleState(cmp);
         }

@@ -76,7 +76,7 @@
     	var concreteParentCmp = parent.getConcreteComponent();
         if (concreteParentCmp) {
             if (concreteParentCmp.get("v.visible") === true) {
-                concreteParentCmp.setValue("v.visible", false);
+                concreteParentCmp.set("v.visible", false);
                 if (component.get("v.disabled") === true) {
                     // for disabled menu item, no Aura event gets fired, so we have to directly deal with DOM.
                     var devCmp = parent.find("menu");
@@ -113,7 +113,7 @@
         var concreteParentCmp = parent.getConcreteComponent();
         if (concreteParentCmp && closeOnTab) {
             if (concreteParentCmp.get("v.visible") === true) {
-                concreteParentCmp.setValue("v.visible", false);
+                concreteParentCmp.set("v.visible", false);
                 if (component.get("v.disabled") === true) {
                     // for disabled menu item, no Aura event gets fired, so we have to directly deal with DOM.
                     var devCmp = parent.find("menu");

@@ -25,7 +25,7 @@
         var options = event.getParam("parameters");
         var listCmp = component.find("list");
         if (listCmp) {
-            listCmp.setValue("v.keyword", options.keyword);
+            listCmp.set("v.keyword", options.keyword);
         }
         
         // fire dataProvide event
@@ -59,7 +59,7 @@
     hideList: function(component) {
         var list = component.find("list");
         if (list && list.get("v.visible") === true) {
-            list.setValue("v.visible", false);
+            list.set("v.visible", false);
         }
     },
     
@@ -129,7 +129,7 @@
         var listCmp = component.find("list");
         if (inputCmp && listCmp) {
             var elems = inputCmp.getElements();
-            listCmp.setValue("v.elementsToIgnoreClicking", elems);
+            listCmp.set("v.elementsToIgnoreClicking", elems);
         }
     },
     

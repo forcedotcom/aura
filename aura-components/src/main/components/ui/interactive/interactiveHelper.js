@@ -145,7 +145,7 @@
      * @param {String} disabledCss Optional css class to apply when disabled, and remove when enabled.
      */
     setDisabled: function(component, disabled, disabledCss) {
-        component.setValue('v.disabled', disabled);
+        component.set('v.disabled', disabled);
         if (disabledCss) {
             var fn = disabled ? component.addClass : component.removeClass;
             fn.call(component, disabledCss);

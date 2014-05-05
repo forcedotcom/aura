@@ -32,7 +32,7 @@
 		// Set the initial items and then fire provide against 
 		// the dataProvider to configure paging.
 		if (items) {
-			cmp.setValue('v.items', items);	
+			cmp.set('v.items', items);	
 		}
 		
 		hlp.initializeColumns(cmp);
@@ -58,7 +58,7 @@
 			concrete = cmp.getConcreteComponent();
 
 			concrete._sorting = true;
-			cmp.getSuper().setValue('v.sortBy', evt);
+			cmp.getSuper().set('v.sortBy', evt);
 
 			// 'Fire' action to reset selection.
 			hlp.handleAction(concrete, {

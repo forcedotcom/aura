@@ -36,7 +36,7 @@ Test.Components.Ui.InputCurrency.InputCurrencyHelperTest=function(){
 			var actual = null;
 			
 			var targetComponent = {			 
-				setValue : function(expression, value) {
+				set : function(expression, value) {
 					if (expression === "v.value") {
 						actual = value;	
 					}
@@ -65,7 +65,7 @@ Test.Components.Ui.InputCurrency.InputCurrencyHelperTest=function(){
 			var inValue = "1234";
 			
 			var targetComponent = {			 
-				setValue : function(expression, value) {
+				set : function(expression, value) {
 					if (expression === "v.value") {
 						actual = value;	
 					}

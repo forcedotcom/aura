@@ -37,13 +37,13 @@
         } else if (optionCmp.isInstanceOf("ui:autocompleteOption")) {
         	value = optionCmp.get("v.label");
         }
-        input.setValue("v.value", value);
-        list.setValue("v.visible", false);
+        input.set("v.value", value);
+        list.set("v.visible", false);
     },
 
     handleMatchDone: function(cmp, event, autoCompleteCmpName) {
     	var input = cmp.find(autoCompleteCmpName + "MatchSize");
-    	input.setValue("v.value", event.getParam("size"));
+    	input.set("v.value", event.getParam("size"));
         console.log("For " + autoCompleteCmpName + " There are " + event.getParam("size") + " matched options.");
     }
 })

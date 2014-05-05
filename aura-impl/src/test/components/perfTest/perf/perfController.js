@@ -11,7 +11,7 @@
 
         if (def) {
             // Add a data attribute(data-app-rendered-component) to know when the app provided in the url have done rendering.
-            $A.util.setDataAttribute(component.getElement(), 'app-rendered-component', def.substr(def.lastIndexOf(':') + 1));
+            $A.util.setDataAttribute(component.getElement(), 'app-render-component', def.substr(def.lastIndexOf(':') + 1));$A.util.setDataAttribute(component.getElement(), 'app-render-component', def.substr(def.lastIndexOf(':') + 1));
         }
     },
 
@@ -24,7 +24,6 @@
                 $A.PERFCORE.later(300, function (t) {
                     // Create the context for Aura
                     $A.run(function () {
-
                         // Start timming 
                         $A.PERFCORE.mark('START:cmpRender');
                         helper.renderComponent(component.find('container'), newCmp);
@@ -32,6 +31,7 @@
                         // Use RAF to wait till the browser updates and paints
                         $A.PERFCORE.raf(function (t) {
                             $A.PERFCORE.mark('END:cmpRender');
+                            $A.util.setDataAttribute(component.getElement(), 'app-rendered-component', 'true');
                         });
                     });
                 });

@@ -278,13 +278,14 @@
 
         if (component.get('v.useNativeScroller')) {
             this._attachClickEventsToPullsTo(component, scrollerInstance);
+        } else {
+            this._stopNativeDragging(component);
         }
 
         for (var i = 0; i < events.length; i++) {
             this._bridgeScrollerAction(component, scrollerInstance, events[i]);
         }
 
-        this._stopNativeDragging(component);
         this._captureClickEvents(component, scrollerInstance);
     },
     /*
@@ -304,7 +305,7 @@
 
         if (pullToLoadMore) {
             pullToLoadMore.addEventListener('click', function () {
-                scrollerInstance._triggerPTL();
+                scrollerInstance.triggerPTL();
             }, false);
         }
     },
@@ -2323,7 +2324,7 @@ _initPullToRefreshPlugin: function () {
         CONFIG_DEFAULTS = {
             labelPull     : 'Pull down to refresh...',
             labelRelease  : 'Release to refresh...',
-            labelUpdate   : 'Loading...',
+            labelUpdate   : 'Updating...',
             labelSubtitle : '',
             labelError    : 'Error on pull to refresh'
         },
@@ -2504,12 +2505,15 @@ _initPullToRefreshPlugin: function () {
             return this._ptrSnapTime;
         },
         triggerPTR: function () {
+            if (!this._ptrLoading) {
+                this._setPTRLoadingState(true);
+            }
             this._ptrExecTrigger();
         },
         getResetPositionPTR: function () {
             if (!this._triggerPTRAfterReset) {
-                this._triggerPTRAfterReset = true;
                 this._setPTRLoadingState(true);
+                this._triggerPTRAfterReset = true;
             } else {
                 this._triggerPTRAfterReset = false;
                 this.triggerPTR();
@@ -2573,9 +2577,11 @@ _initPullToLoadMorePlugin: function () {
             this.opts.pullToLoadMoreConfig = this._mergeConfigOptions(CONFIG_DEFAULTS, this.opts.pullToLoadMoreConfig);
         },
         
-        _triggerPTL: function () {
+        triggerPTL: function () {
             //set waiting state
-            this._setPTLLoadingState(true);
+            if (!this._ptlLoading) {
+                this._setPTLLoadingState(true);
+            }
             this._ptlExecTrigger();
         },
         _createPullToLoadMarkup: function () {
@@ -2764,11 +2770,11 @@ _initPullToLoadMorePlugin: function () {
         },
         resetPositionPTL: function () {
             if (!this._triggerPTLAfterReset) {
-                this._triggerPTLAfterReset = true;
                 this._setPTLLoadingState(true);
+                this._triggerPTLAfterReset = true;
             } else {
                 this._triggerPTLAfterReset = false;
-                this._triggerPTL();
+                this.triggerPTL();
             }
             return {
                 x    : this.x,

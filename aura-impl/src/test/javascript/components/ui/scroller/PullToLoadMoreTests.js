@@ -97,7 +97,7 @@ Test.Components.Ui.Scroller.PullToLoadMoreTests=function(){
 				});
 
 				neededMocks(function(){
-					PTLplugin._triggerPTL();
+					PTLplugin.triggerPTL();
 				});
 			});
 
@@ -137,7 +137,7 @@ Test.Components.Ui.Scroller.PullToLoadMoreTests=function(){
 				});
 
 				neededMocks(function(){
-					PTLplugin._triggerPTL();
+					PTLplugin.triggerPTL();
 					callback(0,[1,2]);
 				});
 			});
@@ -176,7 +176,7 @@ Test.Components.Ui.Scroller.PullToLoadMoreTests=function(){
 				});
 
 				neededMocks(function(){
-					PTLplugin._triggerPTL();
+					PTLplugin.triggerPTL();
 				});
 			});
 

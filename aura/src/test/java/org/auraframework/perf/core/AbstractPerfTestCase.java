@@ -41,11 +41,11 @@ public abstract class AbstractPerfTestCase extends WebDriverTestCase {
     }
 
     /**
-     * @return 3 only to run a little faster
+     * @return 5 runs (3 was too little)
      */
     @Override
     protected int numPerfTimelineRuns() {
-        return 3;
+        return 5;
     }
 
     @Override

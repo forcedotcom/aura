@@ -81,9 +81,9 @@ AttributeSet.prototype._getValue = function(name, raw) {
     	this.createDefault(name);
         ve = this.values.getValue(name);
     }
-
+    
     var value;
-    if (!raw && ve && ve.isExpression()) {
+    if (!raw && ve && ve.isExpression && ve.isExpression()) {
         value = expressionService.getValue(this.getValueProvider(), ve);
     } else {
         value = ve;

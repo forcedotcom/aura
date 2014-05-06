@@ -17,11 +17,12 @@
 -->
 <aura:component extensible="true" description="This component provides the user selected items with sort order based on the data from the data provider.">
 
-	<aura:attribute name="dataProvider" type="Aura.Component[]" required="true" description="A list of data provider components. Use a ui:dataProvider component to provide list data."/>	
+	<aura:attribute name="dataProvider" type="Aura.Component[]" description="A list of data provider components. Use a ui:dataProvider component to provide list data."/>	
 	<aura:attribute name="class" type="String" description="A CSS style to be attached to the component. This style is added in addition to base styles output by the component." />
 	<aura:attribute name="title" type="String" default="Sort" description="The title of this component." />
 	<aura:attribute name="visible" type="Boolean" default="false" description="Controls the visibility of the component."/>		
 	<aura:attribute name="items" type="Object[]" description="An array of arbitrary map objects representing the rows of data in the list." />
+	<aura:attribute name="defaultSelectedItems" type="Object" description="Default selected row item." />
 	<aura:attribute name="triggerLabel" type="String" description="The text displayed on the trigger component." />
 	<aura:attribute name="ascendingLabel" type="String" default="Ascending" description="Assistive text label for the ascending button" />
 	<aura:attribute name="descendingLabel" type="String" default="Descending" description="Assistive text label for the descending button" />
@@ -33,9 +34,13 @@
 	<aura:attribute name="onApply" type="Aura.Action" description="The action invoked when the user click on the apply button. The selected items are passed in as the argument. If the sort order is descending, the prefix '-' is appended to the the item." />
 	<aura:attribute name="onOpen" type="Aura.Action" description="The action invoked when the user click on the trigger to open the sorter component." />
 	<aura:attribute name="onCancel" type="Aura.Action" description="The action invoked when the user click on the cancel button or hit ESC key to close the listSorter component." />
-
+	
+	<aura:registerEvent name="refresh" type="ui:refresh"/>
+	
 	<aura:handler name="init" value="{!this}" action="{!c.init}" />	
 	<aura:handler name="change" value="{!v.visible}" action="{!c.onVisible}" />
+	<aura:handler name="refresh" action="{!c.refresh}" />
+	
 	<div>
 		<div aura:id="trigger">
 	        {!v.trigger}
@@ -44,7 +49,7 @@
 	    	<div class="body">            	           
 				<ui:menu aura:id="sorterMenu" closeOnClickOutside="false" class="sorterMenu">
 					<ui:menuList aura:id="sorterMenuList" closeOnTabKey="false" visible="{!v.visible}" class="sorterMenuList scrollable" menuSelect="{!c.onMenuSelected}" menuExpand="{!c.onMenuExpand}" menuCollapse="{!c.onMenuCollapse}">										 
-						<aura:iteration items="{!v.items}" var="{!v.rowVar}" body="{!v.rowDef}"/>
+
 			    	</ui:menuList>
 				</ui:menu>
 			</div>

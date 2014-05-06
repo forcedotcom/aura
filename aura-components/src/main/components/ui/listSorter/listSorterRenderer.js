@@ -17,10 +17,7 @@
 ({
 	afterRender: function(cmp, helper) {
 		this.superAfterRender();
-		//workaround for datasource late binding
-		cmp.find('sorterMenu').get('e.refresh').fire();
 		var visible = cmp.get('v.visible');
-		
 		if (visible) {
 			helper.setVisible(cmp, true);
 		}

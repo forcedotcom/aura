@@ -2,18 +2,6 @@
     init: function (component, event, helper) {
         helper.bootstrapPerfFramework(component);
     },
-    /**
-     * Action executed after app shell has done Rendering
-     */
-    doneRendering: function (component, event, helper) {
-        var config = helper.getDescriptorFromUrl(),
-            def    = config && config.componentDef;
-
-        if (def) {
-            // Add a data attribute(data-app-rendered-component) to know when the app provided in the url have done rendering.
-            $A.util.setDataAttribute(component.getElement(), 'app-render-component', def.substr(def.lastIndexOf(':') + 1));$A.util.setDataAttribute(component.getElement(), 'app-render-component', def.substr(def.lastIndexOf(':') + 1));
-        }
-    },
 
     locationChange: function (component, event, helper) {
         var descriptor = helper.getDescriptorFromUrl(),

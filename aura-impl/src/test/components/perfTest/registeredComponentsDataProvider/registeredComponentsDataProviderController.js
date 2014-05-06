@@ -1,6 +1,6 @@
 ({
     provide: function(component, event, helper){
-        var LISTED_NAMESPACES = ['ui']
+        var LISTED_NAMESPACES = ['aura', 'ui', 'force', 'one'];
         var descriptors = $A.componentService.getRegisteredComponentDescriptors();
         var data = [];
 

@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.auraframework.perf.core.AbstractPerfTestCase;
-import org.auraframework.test.annotation.FreshBrowserInstance;
 import org.auraframework.test.perf.PerfMetricsCollector;
 import org.auraframework.util.test.perf.data.PerfMetric;
 import org.auraframework.util.test.perf.rdp.RDP;
@@ -44,12 +43,7 @@ public final class RDPProtocolTest extends AbstractPerfTestCase {
         return 0; // so it only runs once in functional mode
     }
 
-    // request new browser to make sure cache is clean
-    @FreshBrowserInstance
     public void testProtocol() throws Exception {
-        if (!RUN_PERF_TESTS) {
-            return;
-        }
         // run WebDriver test
         openRaw("/ui/label.cmp?label=foo");
 
@@ -67,14 +61,15 @@ public final class RDPProtocolTest extends AbstractPerfTestCase {
         // check requestsMetric
         PerfMetric requestsMetric = networkMetrics.get(0);
         assertEquals("Network.numRequests", requestsMetric.getName());
-        assertEquals(7, requestsMetric.getIntValue());
+        int numRequests = requestsMetric.getIntValue();
+        assertTrue("numRequests: " + numRequests, numRequests >= 6);
         // check bytes metric
         PerfMetric bytesMetric = networkMetrics.get(1);
         assertEquals("Network.encodedDataLength", bytesMetric.getName());
         assertEquals("bytes", bytesMetric.getUnits());
         assertTrue(bytesMetric.toString(), bytesMetric.getIntValue() > 100000);
         JSONArray requests = bytesMetric.getDetails();
-        assertTrue("num requests: " + requests.length(), requests.length() == 7);
+        assertTrue("num requests: " + requests.length(), requests.length() == numRequests);
         JSONObject request = requests.getJSONObject(0);
         assertTrue(request.toString(), request.getString("url").contains("/ui/label.cmp?label=foo"));
         int encodedDataLength = Integer.parseInt(request.getString("encodedDataLength"));
@@ -84,7 +79,7 @@ public final class RDPProtocolTest extends AbstractPerfTestCase {
         // UC: extract/verify Timeline event metrics
         Map<String, TimelineEventStats> timelineEventsStats = analyzer.analyzeTimelineDomain();
         TimelineEventStats paintStats = timelineEventsStats.get("Paint");
-        assertTrue("num paints: " + paintStats.getCount(), paintStats.getCount() >= 2);
+        assertTrue("num paints: " + paintStats.getCount(), paintStats.getCount() >= 1);
 
         // UC: getTimeline() gets info from last getTimeline() call
         // we shouldn't get any more events in the timeline at this point

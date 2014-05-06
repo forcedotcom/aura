@@ -12,7 +12,7 @@ import org.openqa.selenium.Dimension;
 
 public abstract class AbstractPerfTestCase extends WebDriverTestCase {
 
-    private static final Logger logger = Logger.getLogger(AbstractPerfTestCase.class.getSimpleName());
+    protected static final Logger logger = Logger.getLogger(AbstractPerfTestCase.class.getSimpleName());
 
     String testName;
 

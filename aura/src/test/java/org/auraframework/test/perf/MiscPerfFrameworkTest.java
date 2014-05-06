@@ -37,7 +37,7 @@ public final class MiscPerfFrameworkTest extends AbstractPerfTestCase {
 
     @Override
     protected int numPerfTimelineRuns() {
-        return 0; // so it only runs once in functional mod
+        return 0; // only run once (the first functional run)
     }
 
     public void testPageRefresh() throws Exception {
@@ -45,9 +45,9 @@ public final class MiscPerfFrameworkTest extends AbstractPerfTestCase {
         metricsCollector.startCollecting();
         openRaw("/ui/label.cmp?label=foo");
         PerfMetrics metrics = metricsCollector.stopCollecting();
-        System.out.println("METRICS (first):\n" + metrics.toLongString());
+        logger.info("METRICS (first):\n" + metrics.toLongString());
         PerfMetric paint = metrics.getMetric("Timeline.Painting.Paint");
-        assertEquals(6, paint.getIntValue()); // TODO: why is 6 the first time?
+        assertTrue("paints: " + paint.getValue(), paint.getIntValue() >= 4); // TODO: why is bigger the first time?
         int bytes = metrics.getMetric("Network.encodedDataLength").getIntValue();
         assertTrue("nothing cached: " + bytes, bytes > 100000);
 
@@ -56,7 +56,7 @@ public final class MiscPerfFrameworkTest extends AbstractPerfTestCase {
         metricsCollector.startCollecting();
         currentDriver.navigate().refresh();
         metrics = metricsCollector.stopCollecting();
-        System.out.println("METRICS (refresh):\n" + metrics.toLongString());
+        logger.info("METRICS (refresh):\n" + metrics.toLongString());
         paint = metrics.getMetric("Timeline.Painting.Paint");
         assertEquals(2, paint.getIntValue()); // refresh on browser gives 2 also
         bytes = metrics.getMetric("Network.encodedDataLength").getIntValue();
@@ -67,7 +67,7 @@ public final class MiscPerfFrameworkTest extends AbstractPerfTestCase {
         metricsCollector.startCollecting();
         openRaw("/ui/label.cmp?label=foo");
         metrics = metricsCollector.stopCollecting();
-        System.out.println("METRICS (revisit):\n" + metrics.toLongString());
+        logger.info("METRICS (revisit):\n" + metrics.toLongString());
         paint = metrics.getMetric("Timeline.Painting.Paint");
         assertEquals(2, paint.getIntValue()); // refresh on browser gives 2 also
         bytes = metrics.getMetric("Network.encodedDataLength").getIntValue();
@@ -75,10 +75,6 @@ public final class MiscPerfFrameworkTest extends AbstractPerfTestCase {
     }
 
     public void testResourceTimingAPI() throws Exception {
-        if (!RUN_PERF_TESTS) {
-            return;
-        }
-
         open("/ui/label.cmp?label=foo");
 
         // check the data is returned and has expected fields
@@ -98,10 +94,6 @@ public final class MiscPerfFrameworkTest extends AbstractPerfTestCase {
     }
 
     public void testMultipleRunsReuseWebDriver() throws Exception {
-        if (!RUN_PERF_TESTS) {
-            return;
-        }
-
         PerfRunsCollector runs = new PerfRunsCollector();
         for (int i = 0; i < 5; i++) {
             PerfMetricsCollector perfData = new PerfMetricsCollector(this);
@@ -114,10 +106,6 @@ public final class MiscPerfFrameworkTest extends AbstractPerfTestCase {
     }
 
     public void testMultipleRunsNewWebDriver() throws Exception {
-        if (!RUN_PERF_TESTS) {
-            return;
-        }
-
         PerfRunsCollector runs = new PerfRunsCollector();
         for (int i = 0; i < 5; i++) {
             getDriver();

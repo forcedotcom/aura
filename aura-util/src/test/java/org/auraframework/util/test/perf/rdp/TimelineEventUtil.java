@@ -153,7 +153,7 @@ public class TimelineEventUtil {
     }
 
     /**
-     * @return true if the timelineEvent is a time stamp one with the given message
+     * @return true if the timelineEvent is a time stamp with the given message
      */
     public static boolean isTimelineTimeStamp(JSONObject timelineEvent, String message) {
         if (message == null) {
@@ -163,7 +163,7 @@ public class TimelineEventUtil {
     }
 
     /**
-     * @return true if the timelineEvent or one of its descendants is a time stamp one with the given message
+     * @return true if the timelineEvent or one of its descendants is a time stamp with the given message
      */
     public static boolean hasTimelineTimeStamp(JSONObject timelineEvent, String message) {
         if (isTimelineTimeStamp(timelineEvent, message)) {

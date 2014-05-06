@@ -105,6 +105,8 @@
         <xunit.js.format>xml</xunit.js.format>
         <xunit.js.console>${basedir}/src/test/tools/xUnit/xUnit.js.Console.js</xunit.js.console>
         <xunit.js.report>${project.build.directory}/surefire-reports/TEST-xunit.xml</xunit.js.report>
+        <xunit.js.gen-test-files>${project.build.directory}/xunitjs/xunitTests</xunit.js.gen-test-files>
+        <xunit.js.testPath/>
     </properties>
     <build>
         <resources>
@@ -186,6 +188,17 @@
             </build>
         </profile>
         <profile>
+            <id>runSinglexunitTest</id>
+            <activation>
+                <property>
+                    <name>xunitTestPath</name>
+                </property>
+            </activation>
+            <properties>
+                <xunit.js.testPath>${xunitTestPath}_doc.js</xunit.js.testPath>
+            </properties>
+        </profile>
+        <profile>
             <id>xunit.js</id>
             <activation>
                 <property>
@@ -232,7 +245,7 @@
                                                     <arg value="/output:${xunit.js.format}" />
                                                     <arg value="/strict:false" />
                                                     <arg value="/dependency:${basedir}/src/test/tools/xUnit/dependencies/" />
-                                                    <arg value="${project.build.directory}/xunitjs/xunitTests" />
+                                                    <arg value="${xunit.js.gen-test-files}/${xunit.js.testPath}" />
                                                </java>
                                            </case>
                                            <default>

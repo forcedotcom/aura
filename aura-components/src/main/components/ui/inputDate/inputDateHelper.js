@@ -31,7 +31,12 @@
                 }
             }
         }
-        var elem = concCmp.find("inputText").getElement();
+        
+        /**This instance of the component variable was left in because in cases when we are extending inputDate,
+         * getting the concreteComponent will give us the lowest hanging fruit, which does not include an 
+         * element with an id of inputText. By leaving this variable in, it will work in both cases.
+         */
+        var elem = component.find("inputText").getElement();
         elem.value = displayValue ? $A.localizationService.translateToLocalizedDigits(displayValue) : '';
     },
 

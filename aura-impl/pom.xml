@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.auraframework</groupId>
         <artifactId>aura-framework</artifactId>
-        <version>0.953-SNAPSHOT</version>
+        <version>0.953</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <dependencies>
@@ -106,7 +106,7 @@
         <xunit.js.console>${basedir}/src/test/tools/xUnit/xUnit.js.Console.js</xunit.js.console>
         <xunit.js.report>${project.build.directory}/surefire-reports/TEST-xunit.xml</xunit.js.report>
         <xunit.js.gen-test-files>${project.build.directory}/xunitjs/xunitTests</xunit.js.gen-test-files>
-        <xunit.js.testPath/>
+        <xunit.js.testPath />
     </properties>
     <build>
         <resources>

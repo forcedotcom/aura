@@ -13,26 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.test.perf;
+package org.auraframework.test.perf.core;
 
-import org.auraframework.test.WebDriverTestCase;
-import org.auraframework.test.annotation.PerfTest;
+import org.auraframework.test.annotation.PerfFrameworkTest;
 
 /**
- * Example PerfTests.
+ * Base class for Aura WebDriver tests.
  */
-@PerfTest
-public final class PerfUITest extends WebDriverTestCase {
-
-    public PerfUITest(String name) {
+@PerfFrameworkTest
+public abstract class FrameworkPerfAbstractTestCase extends AbstractPerfTestCase {
+    public FrameworkPerfAbstractTestCase(String name) {
         super(name);
-    }
-
-    public void testLabel() throws Exception {
-        openRaw("/ui/label.cmp?label=foo");
-    }
-
-    public void testButton() throws Exception {
-        openRaw("/ui/button.cmp?label=Push");
     }
 }

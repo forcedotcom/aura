@@ -13,26 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.test.perf;
+package org.auraframework.test.annotation;
 
-import org.auraframework.test.WebDriverTestCase;
-import org.auraframework.test.annotation.PerfTest;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * Example PerfTests.
+ * Annotation used to mark WebDriver tests for perf regression testing
  */
-@PerfTest
-public final class PerfUITest extends WebDriverTestCase {
-
-    public PerfUITest(String name) {
-        super(name);
-    }
-
-    public void testLabel() throws Exception {
-        openRaw("/ui/label.cmp?label=foo");
-    }
-
-    public void testButton() throws Exception {
-        openRaw("/ui/button.cmp?label=Push");
-    }
+@Retention(RetentionPolicy.RUNTIME)
+@Inherited
+@Target({ ElementType.TYPE, ElementType.METHOD })
+public @interface PerfTest {
 }

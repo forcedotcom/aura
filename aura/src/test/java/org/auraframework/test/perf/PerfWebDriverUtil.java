@@ -28,9 +28,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.auraframework.test.WebDriverTestCase;
+import org.auraframework.test.perf.rdp.RDPNotification;
 import org.auraframework.util.AuraUITestingUtil;
 import org.auraframework.util.json.JsonReader;
-import org.auraframework.util.test.perf.rdp.RDPNotification;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.JavascriptExecutor;

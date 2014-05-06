@@ -18,15 +18,15 @@ package org.auraframework.test.perf.rdp;
 import java.util.List;
 import java.util.Map;
 
-import org.auraframework.perf.core.AbstractPerfTestCase;
-import org.auraframework.test.perf.PerfMetricsCollector;
-import org.auraframework.util.test.perf.data.PerfMetric;
-import org.auraframework.util.test.perf.rdp.RDP;
-import org.auraframework.util.test.perf.rdp.RDPAnalyzer;
-import org.auraframework.util.test.perf.rdp.RDPNotification;
-import org.auraframework.util.test.perf.rdp.RDPUtil;
-import org.auraframework.util.test.perf.rdp.TimelineEventStats;
-import org.auraframework.util.test.perf.rdp.TimelineEventUtil;
+import org.auraframework.test.perf.core.AbstractPerfTestCase;
+import org.auraframework.test.perf.metrics.PerfMetric;
+import org.auraframework.test.perf.metrics.PerfMetricsCollector;
+import org.auraframework.test.perf.rdp.RDP;
+import org.auraframework.test.perf.rdp.RDPAnalyzer;
+import org.auraframework.test.perf.rdp.RDPNotification;
+import org.auraframework.test.perf.rdp.RDPUtil;
+import org.auraframework.test.perf.rdp.TimelineEventStats;
+import org.auraframework.test.perf.rdp.TimelineEventUtil;
 import org.json.JSONArray;
 import org.json.JSONObject;
 

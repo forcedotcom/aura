@@ -1,10 +1,10 @@
 package org.auraframework.test.perf;
 
-import org.auraframework.perf.core.AbstractPerfTestCase;
+import org.auraframework.test.perf.core.AbstractPerfTestCase;
+import org.auraframework.test.perf.metrics.PerfMetrics;
+import org.auraframework.test.perf.metrics.PerfMetricsComparator;
+import org.auraframework.test.perf.metrics.PerfRunsCollector;
 import org.auraframework.util.AuraTextUtil;
-import org.auraframework.util.test.perf.data.PerfMetrics;
-import org.auraframework.util.test.perf.data.PerfMetricsComparator;
-import org.auraframework.util.test.perf.data.PerfRunsCollector;
 import org.openqa.selenium.By;
 
 /**

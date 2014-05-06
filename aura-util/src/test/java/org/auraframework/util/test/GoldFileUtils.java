@@ -22,9 +22,7 @@ import java.util.logging.Logger;
 import junit.framework.AssertionFailedError;
 
 import org.auraframework.test.UnitTestCase;
-import org.auraframework.util.test.perf.PerfDiffUtils;
-import org.auraframework.util.test.perf.PerfGoldFilesUtil;
-import org.auraframework.util.test.perf.data.PerfMetrics;
+import org.auraframework.test.perf.metrics.PerfMetrics;
 
 public final class GoldFileUtils {
 

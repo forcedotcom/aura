@@ -32,11 +32,11 @@ import junit.framework.TestCase;
 
 import org.auraframework.test.annotation.TestLabels;
 import org.auraframework.test.annotation.UnitTest;
+import org.auraframework.test.perf.metrics.PerfMetrics;
 import org.auraframework.util.IOUtil;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonSerializationContext;
 import org.auraframework.util.test.GoldFileUtils;
-import org.auraframework.util.test.perf.data.PerfMetrics;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 

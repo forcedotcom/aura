@@ -34,11 +34,11 @@ import org.auraframework.test.TestExecutor;
 import org.auraframework.test.TestExecutor.TestRun;
 import org.auraframework.test.TestInventory;
 import org.auraframework.test.TestInventory.Type;
+import org.auraframework.test.perf.PerfUtil;
 import org.auraframework.test.WebDriverProvider;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.AuraUtil;
 import org.auraframework.util.ServiceLocator;
-import org.auraframework.util.test.perf.PerfUtil;
 
 import com.google.common.collect.Lists;
 

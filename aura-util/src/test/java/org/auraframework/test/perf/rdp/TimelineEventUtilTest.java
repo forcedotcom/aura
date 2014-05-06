@@ -13,26 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.test.perf;
+package org.auraframework.test.perf.rdp;
 
-import org.auraframework.test.WebDriverTestCase;
-import org.auraframework.test.annotation.PerfTest;
+import java.util.List;
 
-/**
- * Example PerfTests.
- */
-@PerfTest
-public final class PerfUITest extends WebDriverTestCase {
+import org.auraframework.test.UnitTestCase;
 
-    public PerfUITest(String name) {
-        super(name);
-    }
+public final class TimelineEventUtilTest extends UnitTestCase {
 
-    public void testLabel() throws Exception {
-        openRaw("/ui/label.cmp?label=foo");
-    }
-
-    public void testButton() throws Exception {
-        openRaw("/ui/button.cmp?label=Push");
+    public void testGetCategoryMetricNames() {
+        List<String> types = TimelineEventUtil.getCategoryMetricNames(TimelineEventUtil.Category.Loading);
+        assertEquals(7, types.size());
+        assertTrue(types.toString(), types.contains("Timeline.Loading.ResourceReceivedData"));
     }
 }

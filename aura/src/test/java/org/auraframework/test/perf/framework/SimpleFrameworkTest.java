@@ -13,18 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.test.perf;
+package org.auraframework.test.perf.framework;
 
-import org.auraframework.test.WebDriverTestCase;
-import org.auraframework.test.annotation.PerfTest;
+import org.auraframework.test.perf.core.FrameworkPerfAbstractTestCase;
 
 /**
- * Example PerfTests.
+ * Example FrameworkPerfTests.
  */
-@PerfTest
-public final class PerfUITest extends WebDriverTestCase {
+public final class SimpleFrameworkTest extends FrameworkPerfAbstractTestCase {
 
-    public PerfUITest(String name) {
+    public SimpleFrameworkTest(String name) {
         super(name);
     }
 

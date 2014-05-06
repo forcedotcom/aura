@@ -15,24 +15,11 @@
  */
 package org.auraframework.test.perf;
 
-import org.auraframework.test.WebDriverTestCase;
-import org.auraframework.test.annotation.PerfTest;
+import org.auraframework.test.UnitTestCase;
 
-/**
- * Example PerfTests.
- */
-@PerfTest
-public final class PerfUITest extends WebDriverTestCase {
+public final class PerfUtilTest extends UnitTestCase {
 
-    public PerfUITest(String name) {
-        super(name);
-    }
-
-    public void testLabel() throws Exception {
-        openRaw("/ui/label.cmp?label=foo");
-    }
-
-    public void testButton() throws Exception {
-        openRaw("/ui/button.cmp?label=Push");
+    public void testElapsedMicros() {
+        assertEquals(872, PerfUtil.elapsedMicros("1.397600335105528E12", "1.397600335106401E12"));
     }
 }

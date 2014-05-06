@@ -15,7 +15,15 @@
  */
 package org.auraframework.components.ui.inputSelect;
 
+<<<<<<< HEAD
 import org.auraframework.util.test.perf.PerfTest;
+=======
+import java.util.List;
+
+import org.auraframework.test.WebDriverTestCase;
+import org.auraframework.test.WebDriverUtil.BrowserType;
+import org.auraframework.test.annotation.PerfTest;
+>>>>>>> Moved perf tests classes around to match aura conventions
 import org.openqa.selenium.By;
 
 public class InputSelectUITest  extends BaseInputSelectUI{

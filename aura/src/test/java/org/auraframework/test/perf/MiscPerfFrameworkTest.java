@@ -18,12 +18,13 @@ package org.auraframework.test.perf;
 import java.util.List;
 import java.util.Map;
 
-import org.auraframework.perf.core.AbstractPerfTestCase;
 import org.auraframework.test.WebDriverTestCase.TargetBrowsers;
 import org.auraframework.test.WebDriverUtil.BrowserType;
-import org.auraframework.util.test.perf.data.PerfMetric;
-import org.auraframework.util.test.perf.data.PerfMetrics;
-import org.auraframework.util.test.perf.data.PerfRunsCollector;
+import org.auraframework.test.perf.core.AbstractPerfTestCase;
+import org.auraframework.test.perf.metrics.PerfMetric;
+import org.auraframework.test.perf.metrics.PerfMetrics;
+import org.auraframework.test.perf.metrics.PerfMetricsCollector;
+import org.auraframework.test.perf.metrics.PerfRunsCollector;
 
 /**
  * Miscellaneous tests for the perf framework.

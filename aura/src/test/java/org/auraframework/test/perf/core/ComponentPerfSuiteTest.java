@@ -75,9 +75,10 @@ public class ComponentPerfSuiteTest extends TestSuite {
                 Set<DefDescriptor<ComponentDef>> descriptors = definitionService.find(matcher);
 
                 for (DefDescriptor<ComponentDef> descriptor : descriptors) {
-                    // if (!descriptor.toString().equals("markup://ui:button")) {
-                    // continue;
-                    // }
+                    if (descriptor.getDef().isAbstract()) {
+                        continue;
+                    }
+
                     Test test;
                     try {
                         test = new ComponentSuiteTest(descriptor);

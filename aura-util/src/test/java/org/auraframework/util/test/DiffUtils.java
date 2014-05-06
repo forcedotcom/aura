@@ -18,9 +18,16 @@ package org.auraframework.util.test;
 import java.io.IOException;
 import java.net.URL;
 
+import org.auraframework.test.UnitTestCase;
+
 public interface DiffUtils<T> {
 
     public URL getUrl();
+
+    /**
+     * @return the test this DiffUtils is used for
+     */
+    public UnitTestCase getTest();
 
     /**
      * @param testResults actual test results

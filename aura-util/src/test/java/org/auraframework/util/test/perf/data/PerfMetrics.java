@@ -61,6 +61,9 @@ public final class PerfMetrics {
         StringBuilder sb = new StringBuilder();
         for (String name : getAllMetricNames()) {
             PerfMetric metric = getMetric(name);
+            if (sb.length() > 0) {
+                sb.append('\n');
+            }
             sb.append("  " + metric.toShortText());
             String details = metric.toDetailsText(name);
             if (details != null) {

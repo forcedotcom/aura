@@ -73,7 +73,8 @@ public final class GoldFileUtils {
             }
             if (testResults instanceof PerfMetrics) {
                 LOG.info("new gold file contents:\n"
-                        + PerfGoldFilesUtil.toGoldFileText((PerfMetrics) testResults, true));
+                        + PerfGoldFilesUtil.toGoldFileText((PerfMetrics) testResults, diff.getTest()
+                                .storeDetailsInGoldFile()));
             }
 
             // add info about creating/updating log file in the message

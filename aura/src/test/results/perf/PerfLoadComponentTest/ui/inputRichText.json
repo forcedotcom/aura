@@ -17,7 +17,7 @@
 {"name":"Timeline.Rendering.RequestMainThreadFrame","value":2}
 {"name":"Timeline.Rendering.ScheduleStyleRecalculation","value":1}
 {"name":"Timeline.Scripting.EvaluateScript","value":3}
-{"name":"Timeline.Scripting.EventDispatch","value":1}
+{"name":"Timeline.Scripting.EventDispatch","value":3}
 {"name":"Timeline.Scripting.FireAnimationFrame","value":2}
 {"name":"Timeline.Scripting.FunctionCall","value":4}
 {"name":"Timeline.Scripting.RequestAnimationFrame","value":2}

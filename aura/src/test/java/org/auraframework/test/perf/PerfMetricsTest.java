@@ -113,19 +113,16 @@ public final class PerfMetricsTest extends AbstractPerfTestCase {
 
     //
 
+    /**
+     * Verifies that we report at least 10 paints for the dummyPerf.cmp
+     */
     public void testDummyPerf() throws Exception {
         runWithPerfApp(getDefDescriptor("perfTest:dummyPerf"));
     }
 
     private void verifyDummyPerf(PerfMetrics median) {
-        // check expected metrics
-        PerfMetrics expected = new PerfMetrics();
-        expected.setMetric("Timeline.Painting.Paint", 10);
-
-        String differentMessage = new PerfMetricsComparator(0).compare(expected, median);
-        if (differentMessage != null) {
-            fail(differentMessage);
-        }
+        int numPaints = median.getMetric("Timeline.Painting.Paint").getIntValue();
+        assertTrue("expected at least 10 paints, found " + numPaints, numPaints >= 10);
     }
 
     // TODO: add some complicated component that has more complicated metrics

@@ -61,6 +61,7 @@ import org.auraframework.test.perf.rdp.RDPNotification;
 import org.auraframework.util.AuraUITestingUtil;
 import org.auraframework.util.AuraUtil;
 import org.eclipse.jetty.util.log.Log;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
@@ -282,6 +283,19 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
 
     public final List<RDPNotification> getRDPNotifications() {
         return perfWebDriverUtil.getRDPNotifications();
+    }
+
+    /**
+     * @return the current browser JS heap size in bytes
+     */
+    public final int getBrowserJSHeapSize() {
+        Map data = perfWebDriverUtil.takeHeapSnapshot();
+        JSONObject summary = PerfWebDriverUtil.analyzeHeapSnapshot(data);
+        try {
+            return summary.getInt("total_size");
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     // UIPerf: note that UIPerf is only loaded in PTEST (and CADENCE) modes.

@@ -23,8 +23,6 @@ import java.util.logging.Logger;
 
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.WebDriverTestCase;
-import org.auraframework.test.perf.metrics.PerfMetric;
-import org.auraframework.test.perf.metrics.PerfMetrics;
 import org.auraframework.test.perf.rdp.RDPAnalyzer;
 import org.auraframework.test.perf.rdp.RDPNotification;
 import org.auraframework.test.perf.rdp.RDPUtil;
@@ -40,13 +38,17 @@ import com.google.common.collect.Lists;
  */
 public final class PerfMetricsCollector {
 
+    private static final boolean MEASURE_JS_HEAP = false; // slow
+
     private static final Logger LOG = Logger.getLogger(PerfMetricsCollector.class.getSimpleName());
 
     private final WebDriverTestCase test;
     private long startMillis;
+    private int startBrowserJSHeapSizeBytes;
 
     // the perf metrics collected:
     private long elapsedMillis;
+    private int deltaBrowserJSHeapSizeBytes;
     private Map<String, String> uiPerfStats;
     private List<RDPNotification> notifications;
 
@@ -59,11 +61,25 @@ public final class PerfMetricsCollector {
     public void startCollecting() {
         startMillis = System.currentTimeMillis();
         test.getRDPNotifications(); // to reset logs
+        if (MEASURE_JS_HEAP) {
+            startBrowserJSHeapSizeBytes = test.getBrowserJSHeapSize();
+        }
     }
 
     public PerfMetrics stopCollecting() {
         elapsedMillis = System.currentTimeMillis() - startMillis;
-        collectUIPerfMetrics();
+
+        if (MEASURE_JS_HEAP) {
+            deltaBrowserJSHeapSizeBytes = test.getBrowserJSHeapSize() - startBrowserJSHeapSizeBytes;
+        }
+
+        // get timeline before anything else so only events from the test appear
+        notifications = test.getRDPNotifications();
+        Mode mode = test.getCurrentAuraMode();
+        if (mode == Mode.PTEST || mode == Mode.CADENCE) {
+            uiPerfStats = test.getUIPerfStats(new ArrayList<String>());
+        }
+
         return analyze();
     }
 
@@ -94,6 +110,11 @@ public final class PerfMetricsCollector {
                     metric.setDetails(details);
                 }
                 metrics.setMetric(metric);
+            }
+
+            // memory metrics
+            if (MEASURE_JS_HEAP) {
+                metrics.setMetric(new PerfMetric("Browser.JavaScript.Heap", deltaBrowserJSHeapSizeBytes, "bytes"));
             }
         } catch (Exception e) {
             LOG.log(Level.WARNING, test.getName(), e);
@@ -137,19 +158,6 @@ public final class PerfMetricsCollector {
             }
         }
         return trimmed;
-    }
-
-    private Map<String, String> getAllUIPerfStats() {
-        return test.getUIPerfStats(new ArrayList<String>());
-    }
-
-    private void collectUIPerfMetrics() {
-        // get timeline before anything else so only events from the test appear
-        notifications = test.getRDPNotifications();
-        Mode mode = test.getCurrentAuraMode();
-        if (mode == Mode.PTEST || mode == Mode.CADENCE) {
-            uiPerfStats = getAllUIPerfStats();
-        }
     }
 
     @Override

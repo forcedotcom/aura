@@ -26,6 +26,7 @@ import org.auraframework.test.perf.metrics.PerfMetric;
 import org.auraframework.test.perf.metrics.PerfMetrics;
 import org.auraframework.test.perf.metrics.PerfMetricsCollector;
 import org.auraframework.test.perf.metrics.PerfRunsCollector;
+import org.json.JSONObject;
 
 /**
  * Miscellaneous tests for the perf framework.
@@ -49,6 +50,21 @@ public final class MiscPerfFrameworkTest extends AbstractPerfTestCase {
         PerfWebDriverUtil.showHeapSnapshot(data);
         PerfWebDriverUtil.writeHeapSnapshot(data, new File(System.getProperty("java.io.tmpdir")
                 + "/perf/heap/wd.heapsnapshot"));
+
+        JSONObject summary = PerfWebDriverUtil.analyzeHeapSnapshot(data);
+        int nodeCount = summary.getInt("node_count");
+        int totalSize = summary.getInt("total_size");
+        assertTrue("node_count: " + nodeCount, nodeCount > 10000);
+        assertTrue("total_size: " + totalSize, totalSize > 1000000);
+    }
+
+    public void testJSMemoryUsage() throws Exception {
+        int startSize = getBrowserJSHeapSize();
+
+        openRaw("/ui/label.cmp?label=foo");
+
+        int delta = getBrowserJSHeapSize() - startSize;
+        assertTrue("delta js heap size: " + delta, delta > 1000000);
     }
 
     public void testResourceTimingAPI() throws Exception {
@@ -101,6 +117,8 @@ public final class MiscPerfFrameworkTest extends AbstractPerfTestCase {
         metrics = metricsCollector.stopCollecting();
         logger.info("METRICS (revisit):\n" + metrics.toLongString());
         paint = metrics.getMetric("Timeline.Painting.Paint");
+        int numPaintsGet = paint.getIntValue();
+        assertTrue("get: " + numPaintsGet, numPaintsGet < numPaintsInit);
         assertEquals(numPaintsRefresh, paint.getIntValue()); // refresh on browser gives 2 also
         bytes = metrics.getMetric("Network.encodedDataLength").getIntValue();
         assertTrue("most cached: " + bytes, bytes < 20000);

@@ -250,12 +250,37 @@ public final class PerfWebDriverUtil {
     // JS heap snapshot
 
     /**
-     * See https://code.google.com/p/chromedriver/issues/detail?id=519
+     * See https://code.google.com/p/chromedriver/issues/detail?id=519<br/>
+     * Note: slow, each call takes a couple of seconds
      * 
      * @return JS heap snapshot
      */
     public Map takeHeapSnapshot() {
         return (Map) ((JavascriptExecutor) driver).executeScript(":takeHeapSnapshot");
+    }
+
+    /**
+     * Analyzes the data in the snapshot and returns summary data
+     */
+    public static JSONObject analyzeHeapSnapshot(Map data) {
+        Map metadata = (Map) data.get("snapshot");
+        int nodeCount = ((Number) metadata.get("node_count")).intValue();
+
+        // "node_fields": ["type","name","id","self_size","edge_count"]
+        List<Number> nodes = (List<Number>) data.get("nodes");
+        int totalSize = 0;
+        for (int i = 0; i < nodeCount; i++) {
+            totalSize += nodes.get(5 * i + 3).intValue();
+        }
+
+        JSONObject json = new JSONObject();
+        try {
+            json.put("node_count", nodeCount);
+            json.put("total_size", totalSize);
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+        return json;
     }
 
     /**

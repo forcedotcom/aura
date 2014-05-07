@@ -136,20 +136,22 @@ var AuraRenderingService = function AuraRenderingService(){
                     // And put the constructed component back into the array.
                     array[x] = cmp;
                 }
-                var priorSibling = cmp.getRenderPriorSibling();
-                var container = priv.push(cmp);
-                try {
-                    if (cmp.isValid()) {
-                        var renderer = cmp.getRenderer();
-                        var elements = renderer.def.render(renderer.renderable) || [];
+                
+                if (cmp.isValid()) {
+	                var priorSibling = cmp.getRenderPriorSibling();
+	                var container = priv.push(cmp);
+	                try {
+                        var elements = cmp.render();
                         cmp.setRenderContainer(container, priorSibling);
                         priv.finishRender(cmp, elements, ret, parent);
-                    }
-                } finally {
-                    priv.pop(cmp);
+	                } finally {
+	                    priv.pop(cmp);
+	                }
                 }
+                
                 priv.insertElements(ret, parent);
             }
+            
             return ret;
         },
 

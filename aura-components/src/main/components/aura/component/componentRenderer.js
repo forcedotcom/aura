@@ -15,9 +15,8 @@
  */
 ({
     render: function(component){
-        var body = component.getValue("v.body");
         var rendering = component.getRendering();
-        return rendering ? rendering : $A.render(body);
+        return rendering ? rendering : $A.render(component.getValue("v.body"));
     },
 
     afterRender: function(component){
@@ -32,6 +31,7 @@
 
     unrender : function(component){
         var body = component.get("v.body");
+        
         $A.unrender(body);
 
         var elements = component.getElements();

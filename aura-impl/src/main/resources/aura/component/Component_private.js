@@ -681,7 +681,7 @@ var ComponentPriv = (function() { // Scoping priv
 
     ComponentPriv.prototype.setupRenderer = function(cmp) {
         var rd = this.componentDef.getRenderingDetails();
-        $A.assert(rd !== undefined, "Instantiating "+this.componentDef.getDescriptor()+" which has no renderer");
+        $A.assert(rd !== undefined, "Instantiating " + this.componentDef.getDescriptor() + " which has no renderer");
         var renderable = cmp;
         for (var i = 0; i < rd.distance; i++) {
             renderable = renderable.getSuper();
@@ -711,6 +711,7 @@ var ComponentPriv = (function() { // Scoping priv
                 superRenderer.def.unrender(superRenderer.renderable);
             };
         }
+        
         this.renderer = renderer;
     };
 

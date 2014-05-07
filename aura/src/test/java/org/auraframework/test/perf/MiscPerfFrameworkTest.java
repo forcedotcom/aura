@@ -15,6 +15,7 @@
  */
 package org.auraframework.test.perf;
 
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 
@@ -41,46 +42,21 @@ public final class MiscPerfFrameworkTest extends AbstractPerfTestCase {
         return 0; // only run once (the first functional run)
     }
 
-    public void testPageRefresh() throws Exception {
-        PerfMetricsCollector metricsCollector = new PerfMetricsCollector(this);
-        metricsCollector.startCollecting();
+    public void testTakeHeapSnapshot() throws Exception {
         openRaw("/ui/label.cmp?label=foo");
-        PerfMetrics metrics = metricsCollector.stopCollecting();
-        logger.info("METRICS (first):\n" + metrics.toLongString());
-        PerfMetric paint = metrics.getMetric("Timeline.Painting.Paint");
-        assertTrue("paints: " + paint.getValue(), paint.getIntValue() >= 4); // TODO: why is bigger the first time?
-        int bytes = metrics.getMetric("Network.encodedDataLength").getIntValue();
-        assertTrue("nothing cached: " + bytes, bytes > 100000);
 
-        // do a page refresh
-        metricsCollector = new PerfMetricsCollector(this);
-        metricsCollector.startCollecting();
-        currentDriver.navigate().refresh();
-        metrics = metricsCollector.stopCollecting();
-        logger.info("METRICS (refresh):\n" + metrics.toLongString());
-        paint = metrics.getMetric("Timeline.Painting.Paint");
-        assertEquals(2, paint.getIntValue()); // refresh on browser gives 2 also
-        bytes = metrics.getMetric("Network.encodedDataLength").getIntValue();
-        assertTrue("most cached: " + bytes, bytes < 20000);
-
-        // go to the same page instead of refreshing
-        metricsCollector = new PerfMetricsCollector(this);
-        metricsCollector.startCollecting();
-        openRaw("/ui/label.cmp?label=foo");
-        metrics = metricsCollector.stopCollecting();
-        logger.info("METRICS (revisit):\n" + metrics.toLongString());
-        paint = metrics.getMetric("Timeline.Painting.Paint");
-        assertEquals(2, paint.getIntValue()); // refresh on browser gives 2 also
-        bytes = metrics.getMetric("Network.encodedDataLength").getIntValue();
-        assertTrue("most cached: " + bytes, bytes < 20000);
+        Map data = perfWebDriverUtil.takeHeapSnapshot();
+        PerfWebDriverUtil.showHeapSnapshot(data);
+        PerfWebDriverUtil.writeHeapSnapshot(data, new File(System.getProperty("java.io.tmpdir")
+                + "/perf/heap/wd.heapsnapshot"));
     }
 
     public void testResourceTimingAPI() throws Exception {
-        open("/ui/label.cmp?label=foo");
+        openRaw("/ui/label.cmp?label=foo");
 
         // check the data is returned and has expected fields
         List<Map<String, Object>> data = perfWebDriverUtil.getResourceTimingData();
-        assertEquals(6, data.size());
+        assertEquals(5, data.size());
         Map<String, Object> entry = data.get(0);
         assertTrue(entry.containsKey("startTime"));
         assertTrue(entry.containsKey("connectStart"));
@@ -92,6 +68,42 @@ public final class MiscPerfFrameworkTest extends AbstractPerfTestCase {
         assertTrue(entry.containsKey("responseStart"));
 
         // PerfWebDriverUtil.showResourceTimingData(data);
+    }
+
+    public void testPageRefresh() throws Exception {
+        PerfMetricsCollector metricsCollector = new PerfMetricsCollector(this);
+        metricsCollector.startCollecting();
+        openRaw("/ui/label.cmp?label=foo");
+        PerfMetrics metrics = metricsCollector.stopCollecting();
+        logger.info("METRICS (first):\n" + metrics.toLongString());
+        PerfMetric paint = metrics.getMetric("Timeline.Painting.Paint");
+        int numPaintsInit = paint.getIntValue();
+        assertTrue("init: " + numPaintsInit, numPaintsInit >= 4); // TODO: why is bigger the first time?
+        int bytes = metrics.getMetric("Network.encodedDataLength").getIntValue();
+        assertTrue("nothing cached: " + bytes, bytes > 100000);
+
+        // do a page refresh
+        metricsCollector = new PerfMetricsCollector(this);
+        metricsCollector.startCollecting();
+        currentDriver.navigate().refresh();
+        metrics = metricsCollector.stopCollecting();
+        logger.info("METRICS (refresh):\n" + metrics.toLongString());
+        paint = metrics.getMetric("Timeline.Painting.Paint");
+        int numPaintsRefresh = paint.getIntValue();
+        assertTrue("refresh: " + numPaintsRefresh, numPaintsRefresh < numPaintsInit);
+        bytes = metrics.getMetric("Network.encodedDataLength").getIntValue();
+        assertTrue("most cached: " + bytes, bytes < 20000);
+
+        // go to the same page instead of refreshing
+        metricsCollector = new PerfMetricsCollector(this);
+        metricsCollector.startCollecting();
+        openRaw("/ui/label.cmp?label=foo");
+        metrics = metricsCollector.stopCollecting();
+        logger.info("METRICS (revisit):\n" + metrics.toLongString());
+        paint = metrics.getMetric("Timeline.Painting.Paint");
+        assertEquals(numPaintsRefresh, paint.getIntValue()); // refresh on browser gives 2 also
+        bytes = metrics.getMetric("Network.encodedDataLength").getIntValue();
+        assertTrue("most cached: " + bytes, bytes < 20000);
     }
 
     public void testMultipleRunsReuseWebDriver() throws Exception {

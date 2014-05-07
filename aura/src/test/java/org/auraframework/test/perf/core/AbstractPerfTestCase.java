@@ -9,6 +9,8 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.test.WebDriverTestCase;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 
 public abstract class AbstractPerfTestCase extends WebDriverTestCase {
 
@@ -62,10 +64,14 @@ public abstract class AbstractPerfTestCase extends WebDriverTestCase {
 
         openRaw(url);
 
-        String componentName = descriptor.getName();
-        waitForElementAppear("Container div[data-app-rendered-component] element for the component not present: "
-                + componentName,
-                By.cssSelector(String.format("[data-app-rendered-component]", componentName)));
+        // Fail with timeout if the component is not available on the page or there is an error rendering it.
+        auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
+            @Override
+            public Boolean apply(WebDriver d) {
+                return d.findElements(By.cssSelector("[data-app-rendered-component]")).size() > 0
+                        && !d.findElement(By.className("auraErrorBox")).isDisplayed();
+            }
+        }, String.format("Error rendering component : %s", descriptor.getName()));
     }
 
     protected static final DefDescriptor<ComponentDef> getDefDescriptor(String qualifiedName) {

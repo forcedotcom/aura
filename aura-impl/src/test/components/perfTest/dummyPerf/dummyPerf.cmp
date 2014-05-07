@@ -16,5 +16,5 @@
 
 -->
 <aura:component render="client">
-	<p>Dummy Perf</p>
+	<div class="ball"></div>
 </aura:component>

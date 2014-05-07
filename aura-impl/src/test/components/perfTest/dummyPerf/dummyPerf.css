@@ -1,0 +1,12 @@
+.THIS {
+    margin: 10px;
+    width : 100px;
+    height: 100px;
+    background: yellow;
+    border-radius: 50px;
+    transition: background 1s;
+}
+
+.THIS.highlight {
+    background: red;
+}

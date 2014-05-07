@@ -27,13 +27,15 @@ public final class MeasuredPerfMetricsTest extends AbstractPerfTestCase {
     protected void perfTearDown(PerfMetrics median, PerfRunsCollector collector) throws Exception {
         String testName = getName();
         if (testName.equals("testButtonOpenRaw")) {
-            verifyTestButtonOpenRaw(median, collector);
-        } else if (testName.equals("testButtonPerfApp")) {
-            verifyTestButtonPerfApp(median, collector);
-        } else if (testName.equals("testLabelPerfApp")) {
-            verifyTestLabelPerfApp(median);
+            verifyButtonOpenRaw(median, collector);
+        } else if (testName.equals("testButton")) {
+            verifyButton(median, collector);
+        } else if (testName.equals("testLabel")) {
+            verifyLabel(median);
+        } else if (testName.equals("testDummyPerf")) {
+            verifyDummyPerf(median);
         } else {
-            fail("TODO: " + testName);
+            fail("TODO: " + testName + ": " + median.toLongString());
         }
     }
 
@@ -46,14 +48,7 @@ public final class MeasuredPerfMetricsTest extends AbstractPerfTestCase {
         openRaw("/ui/button.cmp?label=" + AuraTextUtil.urlencode(LABEL_MOCK));
     }
 
-    /**
-     * Test loading component using /perfTest/perf.app
-     */
-    public void testButtonPerfApp() throws Exception {
-        runWithPerfApp(getDefDescriptor("ui:button"));
-    }
-
-    private void verifyTestButtonOpenRaw(PerfMetrics median, PerfRunsCollector collector) {
+    private void verifyButtonOpenRaw(PerfMetrics median, PerfRunsCollector collector) {
         PerfMetrics expected = new PerfMetrics();
         expected.setMetric("Timeline.Scripting.MarkDOMContent", 1);
         // TODO: why different?
@@ -67,7 +62,14 @@ public final class MeasuredPerfMetricsTest extends AbstractPerfTestCase {
         verifyTestButton(median, expected, collector);
     }
 
-    private void verifyTestButtonPerfApp(PerfMetrics median, PerfRunsCollector collector) {
+    /**
+     * Test loading component using /perfTest/perf.app
+     */
+    public void testButton() throws Exception {
+        runWithPerfApp(getDefDescriptor("ui:button"));
+    }
+
+    private void verifyButton(PerfMetrics median, PerfRunsCollector collector) {
         PerfMetrics expected = new PerfMetrics();
         expected.setMetric("Timeline.Rendering.Layout", 1);
         expected.setMetric("Timeline.Painting.Paint", 1);
@@ -89,11 +91,11 @@ public final class MeasuredPerfMetricsTest extends AbstractPerfTestCase {
 
     // ui:label: perf.app was not showing the label in the page
 
-    public void testLabelPerfApp() throws Exception {
+    public void testLabel() throws Exception {
         runWithPerfApp(getDefDescriptor("ui:label"));
     }
 
-    private void verifyTestLabelPerfApp(PerfMetrics median) {
+    private void verifyLabel(PerfMetrics median) {
         // check expected metrics
         PerfMetrics expected = new PerfMetrics();
         expected.setMetric("Timeline.Rendering.Layout", 1);
@@ -107,6 +109,23 @@ public final class MeasuredPerfMetricsTest extends AbstractPerfTestCase {
         // verify the component was loaded
         // TODO: assertEquals("label loaded", LABEL_MOCK,
         // currentDriver.findElement(By.cssSelector(".uiLabel")).getText());
+    }
+
+    //
+
+    public void testDummyPerf() throws Exception {
+        runWithPerfApp(getDefDescriptor("perfTest:dummyPerf"));
+    }
+
+    private void verifyDummyPerf(PerfMetrics median) {
+        // check expected metrics
+        PerfMetrics expected = new PerfMetrics();
+        expected.setMetric("Timeline.Painting.Paint", 10);
+
+        String differentMessage = new PerfMetricsComparator(0).compare(expected, median);
+        if (differentMessage != null) {
+            fail(differentMessage);
+        }
     }
 
     // TODO: add some complicated component that has more complicated metrics

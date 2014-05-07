@@ -159,7 +159,7 @@
 
         var attrValues = {};
         componentDef.getAttributeDefs().each(function(attrDef) {
-            if(attrDef.isRequired()) {
+            if(this.needsAttrMocking(attrDef)) {
                 attrValues[attrDef.getDescriptor().getName()] = this.getAttributeMockValue(attrDef);
             }
         }.bind(this));
@@ -178,6 +178,16 @@
 
     isArrayType: function(type) {
         if(type && type.indexOf('[]') === type.length - 2) {
+            return true;
+        }
+        return false;
+    },
+
+    needsAttrMocking: function(attrDef) {
+        if(attrDef.getTypeDefDescriptor() == "aura://String" && !attrDef.getDefault()){
+            return true;
+        }
+        if(attrDef.isRequired()) {
             return true;
         }
         return false;

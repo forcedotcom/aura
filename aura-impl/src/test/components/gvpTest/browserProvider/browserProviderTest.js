@@ -6,13 +6,13 @@
 	}
     },
     testIOSBrowser: {
-	browsers: [ 'IPAD', 'IPHONE'],
+	browsers: [ 'IPAD', 'IPHONE', 'IPAD_IOS_DRIVER', 'IPHONE_IOS_DRIVER'],
 	test:function(cmp){
 	    $A.test.assertTrue($A.get("$Browser.isios"));
 	}
     },
     testIsPhone: {
-	browsers: [ 'IPHONE', 'ANDROID_PHONE'],
+	browsers: [ 'IPHONE', 'IPHONE_IOS_DRIVER', 'ANDROID_PHONE'],
 	test:function(cmp){
 	    $A.test.assertTrue($A.get("$Browser.isphone"));
 	    $A.test.assertFalse($A.get("$Browser.istablet"));
@@ -26,7 +26,7 @@
 	}
     },
     testIsTablet: {
-	browsers: [ 'ANDROID_TABLET', 'IPAD'],
+	browsers: [ 'ANDROID_TABLET', 'IPAD', 'IPAD_IOS_DRIVER'],
 	test:function(cmp){
 	    $A.test.assertTrue($A.get("$Browser.istablet"));
 	    $A.test.assertFalse($A.get("$Browser.isphone"));

@@ -65,7 +65,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
      * Controller.
      */
     // Click is unsupported in these touch based platforms
-    @ExcludeBrowsers({ BrowserType.IPAD, BrowserType.IPHONE })
+    @ExcludeBrowsers({ BrowserType.IPAD, BrowserType.IPHONE, BrowserType.IPAD_IOS_DRIVER, BrowserType.IPHONE_IOS_DRIVER })
     public void testSimpleComponentWithModelAndController() throws Exception {
         DefDescriptor<ComponentDef> cmpToInject = setupSimpleComponentWithModelAndController();
         Map<String, Object> attributes = Maps.newHashMap();
@@ -180,7 +180,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
      * Verify use of integration service to inject a component and initialize events with javascript function handlers.
      */
     // Click is unsupported in these touch based platforms
-    @ExcludeBrowsers({ BrowserType.IPAD, BrowserType.IPHONE })
+    @ExcludeBrowsers({ BrowserType.IPAD, BrowserType.IPHONE, BrowserType.IPAD_IOS_DRIVER, BrowserType.IPHONE_IOS_DRIVER })
     public void testComponentWithRegisteredEvents() throws Exception {
         String bodyMarkup = "<aura:attribute name='attr' type='String' default='Oranges'/> "
                 + "<aura:registerevent name='press' type='ui:press'/>" +

@@ -30,7 +30,8 @@ public class LocalizationAppUITest extends WebDriverTestCase {
 
     // Checking functionality of the inputDate/outputDate components
     @ExcludeBrowsers({ BrowserType.IE9, BrowserType.IE10, BrowserType.SAFARI5, BrowserType.SAFARI,
-            BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
+            BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE,
+            BrowserType.IPAD_IOS_DRIVER, BrowserType.IPHONE_IOS_DRIVER })
     public void testDateComponents() throws Exception {
         open(URL);
 

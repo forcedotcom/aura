@@ -33,6 +33,7 @@ public class InputCutCopyPasteUITest extends WebDriverTestCase {
     }
 
     @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE,
+            BrowserType.IPAD_IOS_DRIVER, BrowserType.IPHONE_IOS_DRIVER,
             BrowserType.SAFARI5, BrowserType.SAFARI })
     public void testCutCopyPasteEvents() throws Exception {
         if (System.getProperty("os.name").startsWith("Mac")) {

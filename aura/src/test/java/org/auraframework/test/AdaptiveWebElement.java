@@ -15,6 +15,7 @@
  */
 package org.auraframework.test;
 
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.RemoteWebElement;
@@ -42,16 +43,22 @@ public class AdaptiveWebElement extends RemoteWebElement {
     }
 
     public WebElement scrollIntoView() {
-        getCoordinates().inViewPort();
+        try {
+            getCoordinates().inViewPort();
+        } catch (Exception ex) {
+            // TODO ios-driver: NullPointerException at RemoteWebElement$1.inViewPort(RemoteWebElement.java:362)
+            // Ignore Exception and try a different approach
+        }
+        ((JavascriptExecutor) getWrappedDriver()).executeScript("return arguments[0].scrollIntoView(true);", this);
         return this;
     }
 
     @Override
-    public void click(){
+    public void click() {
         scrollIntoView();
         super.click();
     }
-    
+
     @Override
     public void sendKeys(CharSequence... keysToSend) {
         scrollIntoView();

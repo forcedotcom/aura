@@ -12,9 +12,9 @@ import org.openqa.selenium.By;
  * values in this test class and then have this test class verify that our automated ways of getting the metrics get the
  * exact same values.
  */
-public final class MeasuredPerfMetricsTest extends AbstractPerfTestCase {
+public final class PerfMetricsTest extends AbstractPerfTestCase {
 
-    public MeasuredPerfMetricsTest(String name) {
+    public PerfMetricsTest(String name) {
         super(name);
     }
 

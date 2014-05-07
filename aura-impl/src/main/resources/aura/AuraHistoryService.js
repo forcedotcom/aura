@@ -224,11 +224,28 @@ $A.ns.AuraHistoryService.prototype.getEvent = function(){
  * @private
  */
 $A.ns.AuraHistoryService.prototype.changeHandler = function(){
-    var loc = location["hash"];
+    var loc = location["hash"] || (history["state"] && history["state"]["hash"]);
     var event = eventService.newEvent(this.getEvent());
 
+    if(!event) {
+        throw new Error("The event specified on the app for the locationChange (" + this.getEvent() + ") was not found.");
+    }
+
     if (loc) {
-        event.setParams(this.parseLocation(loc));
+        //
+        // Its possible that more querystring parameters where specified in the hash
+        // then are defined on the event. In this case do specify them as parameters
+        // of the event.
+        //
+        var parsedHash = this.parseLocation(loc);
+        var parameters = {};
+        var attributes = event.getDef().getAttributeDefs();
+        for(var attribute in attributes) {
+            if(attributes["hasOwnProperty"](attribute) && parsedHash["hasOwnProperty"](attribute)) {
+                parameters[attribute] = parsedHash[attribute];
+            }
+        }
+        event.setParams(parameters);
     }
 
     event.fire();

@@ -35,7 +35,7 @@ import org.openqa.selenium.support.ui.ExpectedCondition;
  * as Actions.moveToElement() yet. Excluded from IE7/8 because uses HTML5 features such as nav.
  */
 @ExcludeBrowsers({ BrowserType.IE7, BrowserType.IE8, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET,
-        BrowserType.IPAD, BrowserType.IPHONE })
+        BrowserType.IPAD, BrowserType.IPHONE, BrowserType.IPAD_IOS_DRIVER, BrowserType.IPHONE_IOS_DRIVER })
 public class CarouselUITest extends WebDriverTestCase {
 
     private final String URL = "/uitest/carousel_Test.cmp";

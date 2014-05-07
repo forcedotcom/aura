@@ -15,74 +15,36 @@
  */
 /*jslint sub:true */
 
-var priv = {
-        /* Complete and errors are used in case Tests invoke actions on the server. Such actions have callback functions. These
-         * two variables help in accounting for assertions in the call back functions.
-         */
-        waits : [],
-        cleanups : [],
-        completed : {}, // A map of action name to boolean for 'named' actions that have been queued
-        inProgress : -1, // -1:uninitialized, 0:complete, 1:tearing down, 2:running, 3+:waiting
-        errors : [],
-        preErrors : [],
-        preWarnings : [],
-        expectedErrors : [],
-        expectedWarnings : [],
-        failOnWarning : false,
-        timeoutTime : 0,
-        appCacheEvents : [], // AppCache events in order, as they are picked up
-
-        handleAppcacheChecking : function() {
-            priv.appCacheEvents.push("checking");
-        },
-
-        handleAppcacheProgress : function() {
-            priv.appCacheEvents.push("progress");
-        },
-
-        handleAppcacheDownloading: function() {
-            priv.appCacheEvents.push("downloading");
-        },
-
-        handleAppcacheCached: function() {
-            priv.appCacheEvents.push("cached");
-        },
-
-        handleAppcacheError: function() {
-            priv.appCacheEvents.push("error");
-        },
-
-        putMessage: function(pre, expected, msg) {
-            for (var i = 0; i < expected.length; i++) {
-                if (expected[i] === undefined) {
-                    continue;
-                }
-                if (msg.indexOf(expected[i]) === 0) {
-                    expected[i] = undefined;
-                    return true;
-                }
-            }
-            if (pre !== null) {
-                pre.push(msg);
-                return true;
-            }
-            return false;
-        },
-
-        expectMessage: function(pre, expected, msg) {
-            if (pre !== null) {
-                for (var i = 0; i < pre.length; i++) {
-                    if (pre[i] === undefined) {
-                        continue;
-                    }
-                    if (pre[i].indexOf(msg) === 0) {
-                        pre[i] = undefined;
-                        return;
-                    }
-                }
-            }
-            expected.push(msg);
+$A.ns.Test.prototype.putMessage = function(pre, expected, msg) {
+    for (var i = 0; i < expected.length; i++) {
+        if (expected[i] === undefined) {
+            continue;
         }
+        if (msg.indexOf(expected[i]) === 0) {
+            expected[i] = undefined;
+            return true;
+        }
+    }
+    if (pre !== null) {
+        pre.push(msg);
+        return true;
+    }
+    return false;
+};
+
+$A.ns.Test.prototype.expectMessage = function(pre, expected, msg) {
+    if (pre !== null) {
+        for (var i = 0; i < pre.length; i++) {
+            if (pre[i] === undefined) {
+                continue;
+            }
+            if (pre[i].indexOf(msg) === 0) {
+                pre[i] = undefined;
+                return;
+            }
+        }
+    }
+    expected.push(msg);
 };
 
 /**
@@ -100,7 +62,7 @@ window.onerror = (function(){
         if(line){
             error["line"] = line;
         }
-        priv.errors.push(error);
+        $A.ns.Test.prototype.errors.push(error);
     };
 
     if(origHandler) {
@@ -114,7 +76,8 @@ window.onerror = (function(){
  * Used to keep track of errors happening in test modes.
  * @private
  */
-function logError(msg, e){
+$A.ns.Test.prototype.logError = function(msg, e){
+    var errors = $A.ns.Test.prototype.errors;
     var err;
     var p;
 
@@ -129,211 +92,217 @@ function logError(msg, e){
     } else {
         err = { "message": msg };
     }
-    priv.errors.push(err);
-}
+    errors.push(err);
+};
 
 /**
- * Run the test
- * 
- * @param {String} name
- *          The name of the test in the suite to run
- * @param {String} code
- *          The full test suite code
- * @param {Integer} timeoutOverride
- *          Optional. Use to increase the test timeout by specified time in seconds. If not set the test will
- *          use a default timeout of 10 seconds.
- * 
+ * Tear down a test.
+ *
  * @private
  */
-function run(name, code, timeoutOverride){
-    // check if test has already started running, since frame loads from layouts may trigger multiple runs
-    if(priv.inProgress >= 0){
+$A.ns.Test.prototype.doTearDown = function() {
+    var i;
+
+    // check if already tearing down
+    if(this.inProgress > 1){
+        this.inProgress = 1;
+    }else {
         return;
     }
-    priv.inProgress = 2;
-    if(!timeoutOverride) {
-        timeoutOverride = 10;
-    }
-    priv.timeoutTime = new Date().getTime() + 1000 * timeoutOverride;
-
-    var cmp = $A.getRoot();
-    var suite = aura.util.json.decode(code);
-
-    var suiteFailOnWarning = suite["failOnWarning"] || false;
-    var failOnWarning = suite[name]["failOnWarning"];
-    priv.failOnWarning = $A.util.isUndefined(failOnWarning) ? suiteFailOnWarning : failOnWarning;
-
-    var stages = suite[name]["test"];
-    stages = $A.util.isArray(stages) ? stages : [stages];
-
-    /** @inner */
-    var doTearDown = function() {
-        var i;
-
-        // check if already tearing down
-        if(priv.inProgress > 1){
-            priv.inProgress = 1;
-        }else {
-            return;
-        }
-        try {
-            for (i = 0; i < priv.cleanups.length; i++) {
-                priv.cleanups[i]();
-            }
-        } catch(ce){
-            logError("Error during cleanup", ce);
-        }
-        try{
-            if(suite["tearDown"]){
-                suite["tearDown"].call(suite, cmp);
-            }
-            setTimeout(function(){priv.inProgress--;}, 100);
-        }catch(e){
-            logError("Error during tearDown", e);
-            priv.inProgress = 0;
-        }
-    };
-
-    var logErrors = function(fn, label, errorArray) {
-        var i;
-
-        if (errorArray !== null && errorArray.length > 0) {
-            for (i = 0; i < errorArray.length; i++) {
-                if (errorArray[i] !== undefined) {
-                    fn(label+errorArray[i]);
-                }
-            }
-        }
-    };
-    
-    /** @inner */
-    var continueWhenReady = function() {
-        if(priv.inProgress < 2){
-            return;
-        }
-        if(priv.errors.length > 0){
-            doTearDown();
-            return;
-        }
-        try{
-            if((priv.inProgress > 1) && (new Date().getTime() > priv.timeoutTime)){
-                if(priv.waits.length > 0){
-                    var texp = priv.waits[0].expected;
-                    if($A.util.isFunction(texp)){
-                        texp = texp().toString();
-                    }
-                    var tact = priv.waits[0].actual;
-                    var val = tact;
-                    if($A.util.isFunction(tact)){
-                        val = tact().toString();
-                        tact = tact.toString();
-                    }
-                    var failureMessage = "";
-                    if(!$A.util.isUndefinedOrNull(priv.waits[0].failureMessage)){
-                    	failureMessage = "; Failure Message: " + priv.waits[0].failureMessage;
-                    }
-                    throw new Error("Test timed out waiting for: " + tact + "; Expected: " + texp + "; Actual: " + val + failureMessage);
-                }else{
-                    throw new Error("Test timed out");
-                }
-            }
-            if(priv.inProgress > 2){
-                setTimeout(continueWhenReady, 200);
-            }else{
-                if(priv.waits.length > 0){
-                    var exp = priv.waits[0].expected;
-                    if($A.util.isFunction(exp)){
-                        exp = exp();
-                    }
-                    var act = priv.waits[0].actual;
-                    if($A.util.isFunction(act)){
-                        act = act();
-                    }
-                    if(exp === act){
-                        var callback = priv.waits[0].callback;
-                        if(callback){
-                            //Set the suite as scope for callback function.
-                            //Helpful to expose test suite as 'this' in callbacks for addWaitFor
-                            callback.call(suite);
-                        }
-                        priv.waits.shift();
-                        setTimeout(continueWhenReady, 1);
-                    }else{
-                        setTimeout(continueWhenReady, 200);
-                    }
-                } else {
-                    logErrors(logError, "Did not receive expected error:",priv.expectedErrors);
-                    priv.expectedErrors = [];
-
-                    logErrors(logError, "Did not receive expected warning:",priv.expectedWarnings);
-                    priv.expectedWarnings = [];
-
-                    if (stages.length === 0){
-                        doTearDown();
-                    } else {
-                        priv.lastStage = stages.shift();
-                        priv.lastStage.call(suite, cmp);
-                        setTimeout(continueWhenReady, 1);
-                    }
-
-                    logErrors(logError, "Received unexpected error:",priv.preErrors);
-                    priv.preErrors = null;
-
-                    logErrors(priv.failOnWarning ? logError : function(str) { $A.log(str); }, "Received unexpected warning:",priv.preWarnings);
-                    priv.preWarnings = null;
-                }
-            }
-        }catch(e){
-            if(priv.lastStage) {
-                e["lastStage"] = priv.lastStage;
-            }
-            logError("Test error", e);
-            doTearDown();
-        }
-    };
     try {
-        if(suite["setUp"]){
-            suite["setUp"].call(suite, cmp);
+        for (i = 0; i < this.cleanups.length; i++) {
+            this.cleanups[i]();
+        }
+    } catch(ce){
+        this.logError("Error during cleanup", ce);
+    }
+    try{
+        if(this.suite["tearDown"]){
+            this.suite["tearDown"].call(this.suite, this.cmp);
+        }
+        var that = this;
+        setTimeout(function(){that.inProgress--;}, 100);
+    }catch(e){
+        this.logError("Error during tearDown", e);
+        this.inProgress = 0;
+    }
+};
+
+$A.ns.Test.prototype.logErrors = function(error, label, errorArray) {
+    var i;
+
+    if (errorArray !== null && errorArray.length > 0) {
+        for (i = 0; i < errorArray.length; i++) {
+            if (errorArray[i] !== undefined) {
+                if (error) {
+                    this.logError(label+errorArray[i]);
+                } else {
+                    $A.log(label+errorArray[i]);
+                }
+            }
+        }
+    }
+};
+    
+/**
+ * Periodic callback to handle continuing operations.
+ *
+ * @private
+ */
+$A.ns.Test.prototype.continueWhenReady = function() {
+    var that = this;
+    var internalCWR = function () {
+        that.continueWhenReady();
+    };
+    if (this.inProgress < 2) {
+        return;
+    }
+    var errors = $A.ns.Test.prototype.errors;
+    if(errors.length > 0){
+        this.doTearDown();
+        return;
+    }
+    try{
+        if((this.inProgress > 1) && (new Date().getTime() > this.timeoutTime)){
+            if(this.waits.length > 0){
+                var texp = this.waits[0].expected;
+                if($A.util.isFunction(texp)){
+                    texp = texp().toString();
+                }
+                var tact = this.waits[0].actual;
+                var val = tact;
+                if($A.util.isFunction(tact)){
+                    val = tact().toString();
+                    tact = tact.toString();
+                }
+                var failureMessage = "";
+                if(!$A.util.isUndefinedOrNull(this.waits[0].failureMessage)){
+                    failureMessage = "; Failure Message: " + this.waits[0].failureMessage;
+                }
+                throw new Error("Test timed out waiting for: " + tact + "; Expected: " + texp + "; Actual: " + val + failureMessage);
+            }else{
+                throw new Error("Test timed out");
+            }
+        }
+        if(this.inProgress > 2){
+            setTimeout(internalCWR, 200);
+        }else{
+            if(this.waits.length > 0){
+                var exp = this.waits[0].expected;
+                if($A.util.isFunction(exp)){
+                    exp = exp();
+                }
+                var act = this.waits[0].actual;
+                if($A.util.isFunction(act)){
+                    act = act();
+                }
+                if(exp === act){
+                    var callback = this.waits[0].callback;
+                    if(callback){
+                        //Set the suite as scope for callback function.
+                        //Helpful to expose test suite as 'this' in callbacks for addWaitFor
+                        callback.call(this.suite, this.cmp);
+                    }
+                    this.waits.shift();
+                    setTimeout(internalCWR, 1);
+                }else{
+                    setTimeout(internalCWR, 200);
+                }
+            } else {
+                this.logErrors(true, "Did not receive expected error:",this.expectedErrors);
+                this.expectedErrors = [];
+
+                this.logErrors(true, "Did not receive expected warning:",this.expectedWarnings);
+                this.expectedWarnings = [];
+
+                if (this.stages.length === 0){
+                    this.doTearDown();
+                } else {
+                    this.lastStage = this.stages.shift();
+                    this.lastStage.call(this.suite, this.cmp);
+                    setTimeout(internalCWR, 1);
+                }
+
+                this.logErrors(true, "Received unexpected error:",this.preErrors);
+                this.preErrors = null;
+
+                this.logErrors(this.failOnWarning, "Received unexpected warning:",this.preWarnings);
+                this.preWarnings = null;
+            }
         }
     }catch(e){
-        logError("Error during setUp", e);
-        doTearDown();
+        if(this.lastStage) {
+            e["lastStage"] = this.lastStage;
+        }
+        this.logError("Test error", e);
+        this.doTearDown();
     }
-    setTimeout(continueWhenReady, 1);
-}
+};
+
 
 /**
  * Provide some information about the current state of the test.
+ *
+ * This is used by webdriver to get information to display.
+ *
  * @private
  */
-function getDump() {
+$A.ns.Test.prototype.getDump = function() {
     var status = "";
-    if (priv.errors.length > 0) {
+    var errors = $A.ns.Test.prototype.errors;
+    if (errors.length > 0) {
         status += "errors {" + $A.test.print($A.test.getErrors()) + "} ";
     }
-    if (priv.waits.length > 0 ) {
+    if (this.waits.length > 0 ) {
         var actual;
         try {
-            actual = priv.waits[0].actual();
+            actual = this.waits[0].actual();
         } catch (ignore) {}
         var failureMessage = "";
-        if(!$A.util.isUndefinedOrNull(priv.waits[0].failureMessage)){
-        	failureMessage = " Failure Message: {" + priv.waits[0].failureMessage + "}";
+        if(!$A.util.isUndefinedOrNull(this.waits[0].failureMessage)){
+        	failureMessage = " Failure Message: {" + this.waits[0].failureMessage + "}";
         }
-        status += "waiting for {" + $A.test.print(priv.waits[0].expected) + "} currently {" + $A.test.print(actual) + "}" + failureMessage + " from {" + $A.test.print(priv.waits[0].actual) + "} after {" + $A.test.print(priv.lastStage) + "} ";
-    } else if (!$A.util.isUndefinedOrNull(priv.lastStage)) {
-        status += "executing {" + $A.test.print(priv.lastStage) + "} ";
+        status += "waiting for {" + $A.test.print(this.waits[0].expected) + "} currently {" + $A.test.print(actual) + "}" + failureMessage + " from {" + $A.test.print(this.waits[0].actual) + "} after {" + $A.test.print(this.lastStage) + "} ";
+    } else if (!$A.util.isUndefinedOrNull(this.lastStage)) {
+        status += "executing {" + $A.test.print(this.lastStage) + "} ";
     }
     return status;
-}
+};
 
 /**
  * Set up AppCache event listeners. Not a complete set of events, but all the ones we care about in our current tests.
  */
-if (window.applicationCache && window.applicationCache.addEventListener) {
-    window.applicationCache.addEventListener("checking", priv.handleAppcacheChecking, false);
-    window.applicationCache.addEventListener("progress", priv.handleAppcacheProgress, false);
-    window.applicationCache.addEventListener("downloading", priv.handleAppcacheDownloading, false);
-    window.applicationCache.addEventListener("cached", priv.handleAppcacheCached, false);
-    window.applicationCache.addEventListener("error", priv.handleAppcacheError, false);
-}
+$A.ns.Test.prototype.appCacheEvents = (function() {
+    var appCacheEvents = [];
+
+    var handleAppcacheChecking = function() {
+        appCacheEvents.push("checking");
+    };
+
+    var handleAppcacheProgress = function() {
+        appCacheEvents.push("progress");
+    };
+
+    var handleAppcacheDownloading = function() {
+        appCacheEvents.push("downloading");
+    };
+
+    var handleAppcacheCached = function() {
+        appCacheEvents.push("cached");
+    };
+
+    var handleAppcacheError = function() {
+        appCacheEvents.push("error");
+    };
+
+    if (window.applicationCache && window.applicationCache.addEventListener) {
+        window.applicationCache.addEventListener("checking", handleAppcacheChecking, false);
+        window.applicationCache.addEventListener("progress", handleAppcacheProgress, false);
+        window.applicationCache.addEventListener("downloading", handleAppcacheDownloading, false);
+        window.applicationCache.addEventListener("cached", handleAppcacheCached, false);
+        window.applicationCache.addEventListener("error", handleAppcacheError, false);
+    }
+
+    return appCacheEvents;
+})();
+

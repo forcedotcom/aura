@@ -463,7 +463,7 @@
                 expectedComponents.push(component.find("listView:header"));
                 var mockDomEvent = { target:targetCell.getElement() };
                 this.verifyListViewEventSourceComponents(component, expectedComponents, mockDomEvent,
-                        $A.test.assertEquals, "Expected event source component did not match actual");
+                        "Expected event source component did not match actual");
             }
         }
     },
@@ -489,7 +489,7 @@
 
                     var mockDomEvent = { target:targetCell.getElement() };
                     this.verifyListViewEventSourceComponents(component, expectedComponents, mockDomEvent,
-                            $A.test.assertEquals, "Expected event source component did not match actual");
+                            "Expected event source component did not match actual");
                 }
             }
         }
@@ -501,7 +501,7 @@
     testClickEventFired: {
     	browsers : ["-IPHONE", "-IPAD"],
         test: function(app) {
-            this.verifyDomEventFiresListViewEvents(app.find("test-list-generated-columns"), "click", $A.test.assertTrue,
+            this.verifyDomEventFiresListViewEvents(app.find("test-list-generated-columns"), "click",
                     "DOM event firing did not result in call to helper->fireEvents");
         }
     },
@@ -511,7 +511,7 @@
      */
     testDoubleClickEventFired: {
         test: function(app) {
-            this.verifyDomEventFiresListViewEvents(app.find("test-list-generated-columns"), "dblclick", $A.test.assertTrue,
+            this.verifyDomEventFiresListViewEvents(app.find("test-list-generated-columns"), "dblclick",
                     "DOM event firing did not result in call to helper->fireEvents");
         }
     },
@@ -521,7 +521,7 @@
      */
     testMouseDownEventFired: {
         test: function(app) {
-            this.verifyDomEventFiresListViewEvents(app.find("test-list-generated-columns"), "mousedown", $A.test.assertTrue,
+            this.verifyDomEventFiresListViewEvents(app.find("test-list-generated-columns"), "mousedown",
                     "DOM event firing did not result in call to helper->fireEvents");
         }
     },
@@ -531,7 +531,7 @@
      */
     testMouseUpEventFired: {
         test: function(app) {
-            this.verifyDomEventFiresListViewEvents(app.find("test-list-generated-columns"), "mouseup", $A.test.assertTrue,
+            this.verifyDomEventFiresListViewEvents(app.find("test-list-generated-columns"), "mouseup",
                     "DOM event firing did not result in call to helper->fireEvents");
         }
     },
@@ -541,7 +541,7 @@
      */
     testMouseOverEventFired: {
         test: function(app) {
-            this.verifyDomEventFiresListViewEvents(app.find("test-list-generated-columns"), "mouseover", $A.test.assertTrue,
+            this.verifyDomEventFiresListViewEvents(app.find("test-list-generated-columns"), "mouseover",
                     "DOM event firing did not result in call to helper->fireEvents");
         }
     },
@@ -551,7 +551,7 @@
      */
     testMouseOutEventFired: {
         test: function(app) {
-            this.verifyDomEventFiresListViewEvents(app.find("test-list-generated-columns"), "mouseout", $A.test.assertTrue,
+            this.verifyDomEventFiresListViewEvents(app.find("test-list-generated-columns"), "mouseout",
                     "DOM event firing did not result in call to helper->fireEvents");
         }
     },
@@ -561,7 +561,7 @@
      */
     testKeyDownEventFired: {
         test: function(app) {
-            this.verifyDomEventFiresListViewEvents(app.find("test-list-generated-columns"), "keydown", $A.test.assertTrue,
+            this.verifyDomEventFiresListViewEvents(app.find("test-list-generated-columns"), "keydown",
                     "DOM event firing did not result in call to helper->fireEvents");
         }
     },
@@ -571,7 +571,7 @@
      */
     testKeyUpEventFired: {
         test: function(app) {
-            this.verifyDomEventFiresListViewEvents(app.find("test-list-generated-columns"), "keyup", $A.test.assertTrue,
+            this.verifyDomEventFiresListViewEvents(app.find("test-list-generated-columns"), "keyup",
                     "DOM event firing did not result in call to helper->fireEvents");
         }
     },
@@ -581,7 +581,7 @@
      */
     testKeyPressEventFired: {
         test: function(app) {
-            this.verifyDomEventFiresListViewEvents(app.find("test-list-generated-columns"), "keypress", $A.test.assertTrue,
+            this.verifyDomEventFiresListViewEvents(app.find("test-list-generated-columns"), "keypress",
                     "DOM event firing did not result in call to helper->fireEvents");
         }
     },
@@ -593,7 +593,7 @@
     testTouchStartEventFired: {
     	browsers: ["-IE7","-IE8"],
         test: function(app) {
-            this.verifyDomEventFiresListViewEvents(app.find("test-list-generated-columns"), "touchstart", $A.test.assertTrue,
+            this.verifyDomEventFiresListViewEvents(app.find("test-list-generated-columns"), "touchstart",
                     "DOM event firing did not result in call to helper->fireEvents");
         }
     },
@@ -605,7 +605,7 @@
     testTouchEndEventFired: {
     	browsers: ["-IE7","-IE8"],
         test: function(app) {
-            this.verifyDomEventFiresListViewEvents(app.find("test-list-generated-columns"), "touchend", $A.test.assertTrue,
+            this.verifyDomEventFiresListViewEvents(app.find("test-list-generated-columns"), "touchend",
                     "DOM event firing did not result in call to helper->fireEvents");
         }
     },
@@ -617,7 +617,7 @@
     testTouchMoveEventFired: {
     	browsers: ["-IE7","-IE8"],
         test: function(app) {
-            this.verifyDomEventFiresListViewEvents(app.find("test-list-generated-columns"), "touchmove", $A.test.assertTrue,
+            this.verifyDomEventFiresListViewEvents(app.find("test-list-generated-columns"), "touchmove",
                     "DOM event firing did not result in call to helper->fireEvents");
         }
     },
@@ -625,7 +625,7 @@
     /**
      * Verifier method for tests that validate DOM-level triggering a call to helper-fireEvents()
      */
-    verifyDomEventFiresListViewEvents: function(component, eventName, truthVerifier, failureMessage) {
+    verifyDomEventFiresListViewEvents: function(component, eventName, failureMessage) {
         var helper = component.getDef().getHelper();
         var fireEventsCalled = false;
 
@@ -637,13 +637,13 @@
         var element = this.getTableBodyCellComponentAt(component, 0, 0).getElement();
         $A.test.fireDomEvent(element, eventName);
 
-        truthVerifier(fireEventsCalled, failureMessage + ": " + eventName);
+        $A.test.assertTrue(fireEventsCalled, failureMessage + ": " + eventName);
     },
 
     /**
      * Verify that firing a dom event results in list view events fired targetting expected components.
      */
-    verifyListViewEventSourceComponents : function(component, expectedComponents, mockDomEvent, equalsVerifier, failureMessage) {
+    verifyListViewEventSourceComponents : function(component, expectedComponents, mockDomEvent, failureMessage) {
         var actualComponents = [];
         var helper = component.getDef().getHelper();
 
@@ -660,7 +660,7 @@
         for (var i = 0; i < expectedComponents.length; ++i) {
             var expected = expectedComponents[i];
             var actual = actualComponents[i];
-            equalsVerifier(expected, actual, failureMessage)
+            $A.test.assertEquals(expected, actual, failureMessage)
         }
     },
 

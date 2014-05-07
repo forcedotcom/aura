@@ -17,7 +17,7 @@
                         helper.renderComponent(component.find('container'), newCmp);
 
                         // Use RAF to wait till the browser updates and paints
-                        $A.PERFCORE.raf(function (t) {
+                        $A.PERFCORE.later(300, function (t) {
                             $A.PERFCORE.mark('END:cmpRender');
                             $A.util.setDataAttribute(component.getElement(), 'app-rendered-component', 'true');
                         });

@@ -21,12 +21,6 @@ import java.util.Map;
 import org.auraframework.test.perf.core.AbstractPerfTestCase;
 import org.auraframework.test.perf.metrics.PerfMetric;
 import org.auraframework.test.perf.metrics.PerfMetricsCollector;
-import org.auraframework.test.perf.rdp.RDP;
-import org.auraframework.test.perf.rdp.RDPAnalyzer;
-import org.auraframework.test.perf.rdp.RDPNotification;
-import org.auraframework.test.perf.rdp.RDPUtil;
-import org.auraframework.test.perf.rdp.TimelineEventStats;
-import org.auraframework.test.perf.rdp.TimelineEventUtil;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -107,7 +101,7 @@ public final class RDPProtocolTest extends AbstractPerfTestCase {
     }
 
     public void testGetDevToolsLog() throws Exception {
-        PerfMetricsCollector metricsCollector = new PerfMetricsCollector(this);
+        PerfMetricsCollector metricsCollector = new PerfMetricsCollector(this, true);
         metricsCollector.startCollecting();
         runWithPerfApp(getDefDescriptor("ui:button"));
         metricsCollector.stopCollecting();

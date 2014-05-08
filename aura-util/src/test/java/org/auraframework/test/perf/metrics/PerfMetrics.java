@@ -26,6 +26,30 @@ import com.google.common.collect.Maps;
  */
 public final class PerfMetrics {
 
+    /**
+     * Combines the metrics from multiple metrics objects into a single one. If a metric appears in more than one metric
+     * object the first metric value found is used.
+     */
+    public static PerfMetrics combine(PerfMetrics... metricsList) {
+        PerfMetrics combined = null;
+        for (PerfMetrics metrics : metricsList) {
+            if (metrics != null) {
+                if (combined == null) {
+                    // so we return null of all metrics in metricsList are null
+                    combined = new PerfMetrics();
+                }
+                for (String name : metrics.getAllMetricNames()) {
+                    if (!combined.hasMetric(name)) {
+                        combined.setMetric(metrics.getMetric(name));
+                    }
+                }
+            }
+        }
+        return combined;
+    }
+
+    // instance:
+
     private final Map<String, PerfMetric> metrics = Maps.newHashMap();
 
     public PerfMetrics() {
@@ -55,6 +79,10 @@ public final class PerfMetrics {
 
     public void setMetric(String name, Object value) {
         metrics.put(name, new PerfMetric(name, value));
+    }
+
+    public boolean hasMetric(String name) {
+        return metrics.containsKey(name);
     }
 
     public String toLongString() {

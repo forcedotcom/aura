@@ -99,7 +99,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
     BrowserType currentBrowserType = null;
     protected AuraUITestingUtil auraUITestingUtil;
     protected PerfWebDriverUtil perfWebDriverUtil;
-    private Mode currentAuraMode;
+    protected Mode currentAuraMode;
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ ElementType.TYPE, ElementType.METHOD })
@@ -209,6 +209,8 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
 
     protected static final boolean RUN_PERF_TESTS = System.getProperty("runPerfTests") != null;
 
+    protected boolean isPerfRunForAuraStats;
+
     protected boolean isPerfTest() {
         return RUN_PERF_TESTS && PerfUtil.hasPerfTestAnnotation(this);
     }
@@ -218,6 +220,13 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
      */
     protected int numPerfTimelineRuns() {
         return 5;
+    }
+
+    /**
+     * Override to change
+     */
+    protected int numPerfAuraRuns() {
+        return 0;
     }
 
     /**
@@ -239,37 +248,69 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
 
     private void runTimelinePerfTests() throws Throwable {
         int numPerfTimelineRuns = numPerfTimelineRuns();
+        int numPerfAuraRuns = numPerfAuraRuns();
+        PerfMetrics timelineMetrics = null;
+        PerfMetrics auraMetrics = null;
 
+        // get fresh browser for perf runs
+        quitDriver();
+        getDriver();
+
+        // runs to collect Dev Tools performance metrics
         if (numPerfTimelineRuns > 0) {
             PerfRunsCollector runsCollector = new PerfRunsCollector();
             for (int i = 0; i < numPerfTimelineRuns; i++) {
                 try {
-                    if (i == 0) {
-                        // get fresh browser for perf runs
-                        quitDriver();
-                        getDriver();
-                    }
-
                     perBrowserSetUp();
 
-                    PerfMetricsCollector metricsCollector = new PerfMetricsCollector(this);
+                    PerfMetricsCollector metricsCollector = new PerfMetricsCollector(this, true);
                     metricsCollector.startCollecting();
 
                     superRunTest();
 
                     runsCollector.addRun(metricsCollector.stopCollecting());
+                    // TODO: maybe the devToolsLog should be optional for optimization
                     List<JSONObject> devToolsLog = metricsCollector.getDevToolsLogBetweenMarks();
                     PerfWebDriverUtil.writeDevToolsLog(devToolsLog, this, i, auraUITestingUtil.getUserAgent());
                 } finally {
                     perBrowserTearDown();
                 }
             }
-            PerfMetrics median = runsCollector.getMedianMetrics();
+            timelineMetrics = runsCollector.getMedianMetrics();
+        }
+
+        // runs to collect Aura stats metrics
+        if (numPerfAuraRuns > 0) {
+            // collecting them in separate runs as they need PTEST or CADENCE modes
+            PerfRunsCollector runsCollector = new PerfRunsCollector();
+            for (int i = 0; i < numPerfAuraRuns; i++) {
+                try {
+                    isPerfRunForAuraStats = true;
+                    perBrowserSetUp();
+
+                    // TODO: collector that only collects aura metrics
+                    PerfMetricsCollector metricsCollector = new PerfMetricsCollector(this, false);
+                    metricsCollector.startCollecting();
+
+                    superRunTest();
+
+                    runsCollector.addRun(metricsCollector.stopCollecting());
+                } finally {
+                    isPerfRunForAuraStats = false;
+                    perBrowserTearDown();
+                }
+            }
+            auraMetrics = runsCollector.getMedianMetrics();
+        }
+
+        PerfMetrics allMetrics = PerfMetrics.combine(timelineMetrics, auraMetrics);
+
+        if (allMetrics != null) {
             if (logger.isLoggable(Level.INFO)) {
                 logger.info("perf metrics for " + this);
-                logger.info(median.toLongString());
+                logger.info(allMetrics.toLongString());
             }
-            perfTearDown(median, runsCollector);
+            perfTearDown(allMetrics);
         }
     }
 
@@ -277,7 +318,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
      * Invoked after all perf metrics have been collected. Default behavior is to compare the measured metrics with the
      * gold file ones.
      */
-    protected void perfTearDown(PerfMetrics median, PerfRunsCollector collector) throws Exception {
+    protected void perfTearDown(PerfMetrics median) throws Exception {
         assertGoldMetrics(median);
     }
 

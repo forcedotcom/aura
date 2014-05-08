@@ -3,8 +3,6 @@ package org.auraframework.test.perf;
 import org.auraframework.test.perf.core.AbstractPerfTestCase;
 import org.auraframework.test.perf.metrics.PerfMetrics;
 import org.auraframework.test.perf.metrics.PerfMetricsComparator;
-import org.auraframework.test.perf.metrics.PerfRunsCollector;
-import org.auraframework.util.AuraTextUtil;
 import org.openqa.selenium.By;
 
 /**
@@ -20,16 +18,19 @@ public final class PerfMetricsTest extends AbstractPerfTestCase {
 
     private static final String LABEL_MOCK = "Mock value for 'label' attribute";
 
+    @Override
+    protected int numPerfAuraRuns() {
+        return getName().equals("testButton") ? 5 : 0;
+    }
+
     /**
      * Overriding to check the expected metrics are meaused
      */
     @Override
-    protected void perfTearDown(PerfMetrics median, PerfRunsCollector collector) throws Exception {
+    protected void perfTearDown(PerfMetrics median) throws Exception {
         String testName = getName();
-        if (testName.equals("testButtonOpenRaw")) {
-            verifyButtonOpenRaw(median, collector);
-        } else if (testName.equals("testButton")) {
-            verifyButton(median, collector);
+        if (testName.equals("testButton")) {
+            verifyButton(median);
         } else if (testName.equals("testLabel")) {
             verifyLabel(median);
         } else if (testName.equals("testDummyPerf")) {
@@ -42,45 +43,20 @@ public final class PerfMetricsTest extends AbstractPerfTestCase {
     // ui:button: basic simple ref case
 
     /**
-     * Test loading component directly
-     */
-    public void testButtonOpenRaw() throws Exception {
-        openRaw("/ui/button.cmp?label=" + AuraTextUtil.urlencode(LABEL_MOCK));
-    }
-
-    private void verifyButtonOpenRaw(PerfMetrics median, PerfRunsCollector collector) {
-        PerfMetrics expected = new PerfMetrics();
-        expected.setMetric("Timeline.Scripting.MarkDOMContent", 1);
-        // TODO: why different?
-        if (System.getProperty("os.name").startsWith("Mac")) {
-            expected.setMetric("Timeline.Rendering.Layout", 2);
-            expected.setMetric("Timeline.Painting.Paint", 1);
-        } else {
-            expected.setMetric("Timeline.Rendering.Layout", 3);
-            expected.setMetric("Timeline.Painting.Paint", 2);
-        }
-        verifyTestButton(median, expected, collector);
-    }
-
-    /**
      * Test loading component using /perfTest/perf.app
      */
     public void testButton() throws Exception {
         runWithPerfApp(getDefDescriptor("ui:button"));
     }
 
-    private void verifyButton(PerfMetrics median, PerfRunsCollector collector) {
+    private void verifyButton(PerfMetrics median) {
         PerfMetrics expected = new PerfMetrics();
-        expected.setMetric("Timeline.Rendering.Layout", 1);
-        expected.setMetric("Timeline.Painting.Paint", 1);
-        verifyTestButton(median, expected, collector);
-    }
+        // Timeline metrics
+        expected.setMetric("Timeline.Rendering.Layout", 2);
+        expected.setMetric("Timeline.Painting.Paint", 2); // button + image
 
-    private void verifyTestButton(PerfMetrics median, PerfMetrics expected, PerfRunsCollector collector) {
-        String differentMessage = new PerfMetricsComparator(0).compare(expected, median);
-        if (differentMessage != null) {
-            fail(differentMessage);
-        }
+        // Aura Stats metrics (this metric fluctuates between 2/3)
+        assertNotNull(median.getMetric("Aura.InitialComponentCreated"));
 
         // verify the component was loaded
         assertEquals("button loaded", LABEL_MOCK, currentDriver.findElement(By.cssSelector(".uiButton")).getText());
@@ -107,8 +83,8 @@ public final class PerfMetricsTest extends AbstractPerfTestCase {
         }
 
         // verify the component was loaded
-        // TODO: assertEquals("label loaded", LABEL_MOCK,
-        // currentDriver.findElement(By.cssSelector(".uiLabel")).getText());
+        assertEquals("label loaded", LABEL_MOCK,
+                currentDriver.findElement(By.cssSelector(".uiLabel")).getText());
     }
 
     //

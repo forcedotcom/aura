@@ -6,6 +6,7 @@ import java.util.logging.Logger;
 import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.WebDriverTestCase;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
@@ -57,8 +58,10 @@ public abstract class AbstractPerfTestCase extends WebDriverTestCase {
     }
 
     protected final void runWithPerfApp(DefDescriptor<ComponentDef> descriptor) throws Exception {
-        String relativeUrl = "/perfTest/perf.app?aura.mode=PROD#" +
-                URLEncoder.encode("{\"componentDef\":\"" + descriptor + "\"}", "UTF-8");
+        String relativeUrl = "/perfTest/perf.app?";
+        currentAuraMode = isPerfRunForAuraStats ? Mode.CADENCE : Mode.PROD;
+        relativeUrl += "aura.mode=" + currentAuraMode;
+        relativeUrl += "#" + URLEncoder.encode("{\"componentDef\":\"" + descriptor + "\"}", "UTF-8");
         String url = getAbsoluteURI(relativeUrl).toString();
         logger.info("testRun: " + url);
 

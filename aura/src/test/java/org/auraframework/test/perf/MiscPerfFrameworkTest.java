@@ -87,7 +87,7 @@ public final class MiscPerfFrameworkTest extends AbstractPerfTestCase {
     }
 
     public void testPageRefresh() throws Exception {
-        PerfMetricsCollector metricsCollector = new PerfMetricsCollector(this);
+        PerfMetricsCollector metricsCollector = new PerfMetricsCollector(this, true);
         metricsCollector.startCollecting();
         openRaw("/ui/label.cmp?label=foo");
         PerfMetrics metrics = metricsCollector.stopCollecting();
@@ -99,7 +99,7 @@ public final class MiscPerfFrameworkTest extends AbstractPerfTestCase {
         assertTrue("nothing cached: " + bytes, bytes > 100000);
 
         // do a page refresh
-        metricsCollector = new PerfMetricsCollector(this);
+        metricsCollector = new PerfMetricsCollector(this, true);
         metricsCollector.startCollecting();
         currentDriver.navigate().refresh();
         metrics = metricsCollector.stopCollecting();
@@ -111,7 +111,7 @@ public final class MiscPerfFrameworkTest extends AbstractPerfTestCase {
         assertTrue("most cached: " + bytes, bytes < 20000);
 
         // go to the same page instead of refreshing
-        metricsCollector = new PerfMetricsCollector(this);
+        metricsCollector = new PerfMetricsCollector(this, true);
         metricsCollector.startCollecting();
         openRaw("/ui/label.cmp?label=foo");
         metrics = metricsCollector.stopCollecting();
@@ -127,7 +127,7 @@ public final class MiscPerfFrameworkTest extends AbstractPerfTestCase {
     public void testMultipleRunsReuseWebDriver() throws Exception {
         PerfRunsCollector runs = new PerfRunsCollector();
         for (int i = 0; i < 5; i++) {
-            PerfMetricsCollector perfData = new PerfMetricsCollector(this);
+            PerfMetricsCollector perfData = new PerfMetricsCollector(this, true);
             perfData.startCollecting();
             open("/ui/label.cmp?label=foo");
             PerfMetrics metrics = perfData.stopCollecting();
@@ -140,7 +140,7 @@ public final class MiscPerfFrameworkTest extends AbstractPerfTestCase {
         PerfRunsCollector runs = new PerfRunsCollector();
         for (int i = 0; i < 5; i++) {
             getDriver();
-            PerfMetricsCollector perfData = new PerfMetricsCollector(this);
+            PerfMetricsCollector perfData = new PerfMetricsCollector(this, true);
             perfData.startCollecting();
             open("/ui/label.cmp?label=foo");
             PerfMetrics metrics = perfData.stopCollecting();

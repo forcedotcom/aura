@@ -38,8 +38,6 @@ import com.google.common.collect.Lists;
  */
 public final class PerfMetricsCollector {
 
-    private static final boolean MEASURE_JS_HEAP = false; // slow
-
     private static final Logger LOG = Logger.getLogger(PerfMetricsCollector.class.getSimpleName());
 
     private final WebDriverTestCase test;
@@ -52,16 +50,22 @@ public final class PerfMetricsCollector {
     private Map<String, String> uiPerfStats;
     private List<RDPNotification> notifications;
 
-    public PerfMetricsCollector(WebDriverTestCase test) {
+    private final boolean captureTimelineMetrics;
+    private static final boolean captureJSHeapMetrics = false; // slow
+
+    public PerfMetricsCollector(WebDriverTestCase test, boolean captureTimelineMetrics) {
         this.test = test;
+        this.captureTimelineMetrics = captureTimelineMetrics;
     }
 
     // events
 
     public void startCollecting() {
         startMillis = System.currentTimeMillis();
-        test.getRDPNotifications(); // to reset logs
-        if (MEASURE_JS_HEAP) {
+        if (captureTimelineMetrics) {
+            test.getRDPNotifications(); // to reset logs
+        }
+        if (captureJSHeapMetrics) {
             startBrowserJSHeapSizeBytes = test.getBrowserJSHeapSize();
         }
     }
@@ -69,14 +73,16 @@ public final class PerfMetricsCollector {
     public PerfMetrics stopCollecting() {
         elapsedMillis = System.currentTimeMillis() - startMillis;
 
-        if (MEASURE_JS_HEAP) {
+        if (captureJSHeapMetrics) {
             deltaBrowserJSHeapSizeBytes = test.getBrowserJSHeapSize() - startBrowserJSHeapSizeBytes;
         }
 
-        // get timeline before anything else so only events from the test appear
-        notifications = test.getRDPNotifications();
-        Mode mode = test.getCurrentAuraMode();
-        if (mode == Mode.PTEST || mode == Mode.CADENCE) {
+        if (captureTimelineMetrics) {
+            // get timeline before anything else so only events from the test appear
+            notifications = test.getRDPNotifications();
+        }
+
+        if (hasAuraStats()) {
             uiPerfStats = test.getUIPerfStats(new ArrayList<String>());
         }
 
@@ -89,32 +95,43 @@ public final class PerfMetricsCollector {
      * Analyzes the raw perf data and returns relevant metrics
      */
     private PerfMetrics analyze() {
-        RDPAnalyzer analyzer = new RDPAnalyzer(notifications);
         PerfMetrics metrics = new PerfMetrics();
         try {
             metrics.setMetric(new PerfMetric("WallTime", elapsedMillis, "milliseconds"));
 
-            // add "Network..." metrics:
-            for (PerfMetric metric : analyzer.analyzeNetworkDomain()) {
-                metrics.setMetric(metric);
-            }
+            if (captureTimelineMetrics) {
+                RDPAnalyzer analyzer = new RDPAnalyzer(notifications);
 
-            // add "Timeline..." metrics:
-            Map<String, TimelineEventStats> timelineEventsStats = analyzer.analyzeTimelineDomain();
-            for (TimelineEventStats stats : timelineEventsStats.values()) {
-                PerfMetric metric = new PerfMetric();
-                metric.setName(TimelineEventUtil.toMetricName(stats.getType()));
-                metric.setValue(stats.getCount());
-                JSONArray details = stats.getDetails();
-                if (details != null) {
-                    metric.setDetails(details);
+                // add "Network..." metrics:
+                for (PerfMetric metric : analyzer.analyzeNetworkDomain()) {
+                    metrics.setMetric(metric);
                 }
-                metrics.setMetric(metric);
+
+                // add "Timeline..." metrics:
+                Map<String, TimelineEventStats> timelineEventsStats = analyzer.analyzeTimelineDomain();
+                for (TimelineEventStats stats : timelineEventsStats.values()) {
+                    PerfMetric metric = new PerfMetric();
+                    metric.setName(TimelineEventUtil.toMetricName(stats.getType()));
+                    metric.setValue(stats.getCount());
+                    JSONArray details = stats.getDetails();
+                    if (details != null) {
+                        metric.setDetails(details);
+                    }
+                    metrics.setMetric(metric);
+                }
             }
 
             // memory metrics
-            if (MEASURE_JS_HEAP) {
+            if (captureJSHeapMetrics) {
                 metrics.setMetric(new PerfMetric("Browser.JavaScript.Heap", deltaBrowserJSHeapSizeBytes, "bytes"));
+            }
+
+            // aura stats
+            if (hasAuraStats()) {
+                // TODO: get the right Aura stats metrics
+                if (uiPerfStats.containsKey("Initial Component Created")) {
+                    metrics.setMetric("Aura.InitialComponentCreated", uiPerfStats.get("Initial Component Created"));
+                }
             }
         } catch (Exception e) {
             LOG.log(Level.WARNING, test.getName(), e);
@@ -122,12 +139,16 @@ public final class PerfMetricsCollector {
         return metrics;
     }
 
+    private boolean hasAuraStats() {
+        Mode mode = test.getCurrentAuraMode();
+        return mode == Mode.PTEST || mode == Mode.CADENCE;
+    }
+
     public List<JSONObject> getDevToolsLog() {
         List<JSONObject> devToolsLog = Lists.newArrayList();
         for (RDPNotification notification : notifications) {
             if (notification.isTimelineEvent()) {
-                JSONObject devToolsMessage = notification.getTimelineEvent();
-                devToolsLog.add(devToolsMessage);
+                devToolsLog.add(notification.getTimelineEvent());
             }
         }
         return devToolsLog;

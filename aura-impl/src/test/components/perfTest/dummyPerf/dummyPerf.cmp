@@ -16,5 +16,31 @@
 
 -->
 <aura:component render="client">
-	<div class="ball"></div>
+	<div class="toast"> 
+		<span>Perf rocks!</span> <span>Perf rocks!</span> <span>Perf rocks!</span> <span>Perf rocks!</span>
+		<span>Perf rocks!</span> <span>Perf rocks!</span> <span>Perf rocks!</span> <span>Perf rocks!</span>
+		<span>Perf rocks!</span> <span>Perf rocks!</span> <span>Perf rocks!</span> <span>Perf rocks!</span>
+		<span>Perf rocks!</span> <span>Perf rocks!</span> <span>Perf rocks!</span> <span>Perf rocks!</span>
+		<span>Perf rocks!</span> <span>Perf rocks!</span> <span>Perf rocks!</span> <span>Perf rocks!</span>
+		<span>Perf rocks!</span> <span>Perf rocks!</span> <span>Perf rocks!</span> <span>Perf rocks!</span>
+		<span>Perf rocks!</span> <span>Perf rocks!</span> <span>Perf rocks!</span> <span>Perf rocks!</span>
+		<span>Perf rocks!</span> <span>Perf rocks!</span> <span>Perf rocks!</span> <span>Perf rocks!</span>
+		<span>Perf rocks!</span> <span>Perf rocks!</span> <span>Perf rocks!</span> <span>Perf rocks!</span>
+		<span>Perf rocks!</span> <span>Perf rocks!</span> <span>Perf rocks!</span> <span>Perf rocks!</span>
+		<span>Perf rocks!</span> <span>Perf rocks!</span> <span>Perf rocks!</span> <span>Perf rocks!</span>
+		<span>Perf rocks!</span> <span>Perf rocks!</span> <span>Perf rocks!</span> <span>Perf rocks!</span>
+		<span>Perf rocks!</span> <span>Perf rocks!</span> <span>Perf rocks!</span> <span>Perf rocks!</span>
+		<span>Perf rocks!</span> <span>Perf rocks!</span> <span>Perf rocks!</span> <span>Perf rocks!</span>
+		<span>Perf rocks!</span> <span>Perf rocks!</span> <span>Perf rocks!</span> <span>Perf rocks!</span>
+		<span>Perf rocks!</span> <span>Perf rocks!</span> <span>Perf rocks!</span> <span>Perf rocks!</span>
+		<span>Perf rocks!</span> <span>Perf rocks!</span> <span>Perf rocks!</span> <span>Perf rocks!</span>
+		<span>Perf rocks!</span> <span>Perf rocks!</span> <span>Perf rocks!</span> <span>Perf rocks!</span>
+		<span>Perf rocks!</span> <span>Perf rocks!</span> <span>Perf rocks!</span> <span>Perf rocks!</span>
+		<span>Perf rocks!</span> <span>Perf rocks!</span> <span>Perf rocks!</span> <span>Perf rocks!</span>
+		<span>Perf rocks!</span> <span>Perf rocks!</span> <span>Perf rocks!</span> <span>Perf rocks!</span>
+		<span>Perf rocks!</span> <span>Perf rocks!</span> <span>Perf rocks!</span> <span>Perf rocks!</span>
+		<span>Perf rocks!</span> <span>Perf rocks!</span> <span>Perf rocks!</span> <span>Perf rocks!</span>
+		<span>Perf rocks!</span> <span>Perf rocks!</span> <span>Perf rocks!</span> <span>Perf rocks!</span>
+		<span>Perf rocks!</span> <span>Perf rocks!</span> <span>Perf rocks!</span> <span>Perf rocks!</span>
+	</div>
 </aura:component>

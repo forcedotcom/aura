@@ -288,7 +288,6 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
                     isPerfRunForAuraStats = true;
                     perBrowserSetUp();
 
-                    // TODO: collector that only collects aura metrics
                     PerfMetricsCollector metricsCollector = new PerfMetricsCollector(this, false);
                     metricsCollector.startCollecting();
 
@@ -318,8 +317,8 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
      * Invoked after all perf metrics have been collected. Default behavior is to compare the measured metrics with the
      * gold file ones.
      */
-    protected void perfTearDown(PerfMetrics median) throws Exception {
-        assertGoldMetrics(median);
+    protected void perfTearDown(PerfMetrics actual) throws Exception {
+        assertGoldMetrics(actual);
     }
 
     public final List<RDPNotification> getRDPNotifications() {

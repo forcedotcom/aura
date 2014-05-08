@@ -27,16 +27,16 @@ public final class PerfMetricsTest extends AbstractPerfTestCase {
      * Overriding to check the expected metrics are meaused
      */
     @Override
-    protected void perfTearDown(PerfMetrics median) throws Exception {
+    protected void perfTearDown(PerfMetrics actual) throws Exception {
         String testName = getName();
         if (testName.equals("testButton")) {
-            verifyButton(median);
+            verifyButton(actual);
         } else if (testName.equals("testLabel")) {
-            verifyLabel(median);
+            verifyLabel(actual);
         } else if (testName.equals("testDummyPerf")) {
-            verifyDummyPerf(median);
+            verifyDummyPerf(actual);
         } else {
-            fail("TODO: " + testName + ": " + median.toLongString());
+            fail("TODO: " + testName + ": " + actual.toLongString());
         }
     }
 
@@ -49,14 +49,15 @@ public final class PerfMetricsTest extends AbstractPerfTestCase {
         runWithPerfApp(getDefDescriptor("ui:button"));
     }
 
-    private void verifyButton(PerfMetrics median) {
+    private void verifyButton(PerfMetrics actual) {
         PerfMetrics expected = new PerfMetrics();
         // Timeline metrics
         expected.setMetric("Timeline.Rendering.Layout", 2);
         expected.setMetric("Timeline.Painting.Paint", 2); // button + image
+        assertMetrics(expected, actual);
 
         // Aura Stats metrics (this metric fluctuates between 2/3)
-        assertNotNull(median.getMetric("Aura.InitialComponentCreated"));
+        assertNotNull(actual.getMetric("Aura.InitialComponentCreated"));
 
         // verify the component was loaded
         assertEquals("button loaded", LABEL_MOCK, currentDriver.findElement(By.cssSelector(".uiButton")).getText());
@@ -71,35 +72,40 @@ public final class PerfMetricsTest extends AbstractPerfTestCase {
         runWithPerfApp(getDefDescriptor("ui:label"));
     }
 
-    private void verifyLabel(PerfMetrics median) {
+    private void verifyLabel(PerfMetrics actual) {
         // check expected metrics
         PerfMetrics expected = new PerfMetrics();
         expected.setMetric("Timeline.Rendering.Layout", 1);
         expected.setMetric("Timeline.Painting.Paint", 1);
-
-        String differentMessage = new PerfMetricsComparator(0).compare(expected, median);
-        if (differentMessage != null) {
-            fail(differentMessage);
-        }
+        assertMetrics(expected, actual);
 
         // verify the component was loaded
         assertEquals("label loaded", LABEL_MOCK,
                 currentDriver.findElement(By.cssSelector(".uiLabel")).getText());
     }
 
-    //
+    // perf:dummyPerf
 
     /**
      * Verifies that we report at least 10 paints for the dummyPerf.cmp
      */
     public void testDummyPerf() throws Exception {
-        runWithPerfApp(getDefDescriptor("perfTest:dummyPerf"));
+        runWithPerfApp(getDefDescriptor("perf:dummyPerf"));
     }
 
-    private void verifyDummyPerf(PerfMetrics median) {
-        int numPaints = median.getMetric("Timeline.Painting.Paint").getIntValue();
-        assertTrue("expected at least 10 paints, found " + numPaints, numPaints >= 10);
+    private void verifyDummyPerf(PerfMetrics actual) {
+        PerfMetrics expected = new PerfMetrics();
+        expected.setMetric("Timeline.Rendering.Layout", 2);
+        expected.setMetric("Timeline.Painting.Paint", 3);
+        assertMetrics(expected, actual);
     }
 
-    // TODO: add some complicated component that has more complicated metrics
+    // util
+
+    private void assertMetrics(PerfMetrics expected, PerfMetrics actual) {
+        String differentMessage = new PerfMetricsComparator(0).compare(expected, actual);
+        if (differentMessage != null) {
+            fail(differentMessage);
+        }
+    }
 }

@@ -1,4 +1,4 @@
-<aura:application preload="aura,ui,perfTest">
+<aura:application preload="aura,ui,perf">
 	<aura:handler name="init" value="{!this}" action="{!c.init}"/>
     <aura:handler event="aura:locationChange" action="{!c.locationChange}" />
 

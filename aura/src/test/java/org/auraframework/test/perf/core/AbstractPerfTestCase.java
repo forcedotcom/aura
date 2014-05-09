@@ -67,14 +67,24 @@ public abstract class AbstractPerfTestCase extends WebDriverTestCase {
 
         openRaw(url);
 
-        // Fail with timeout if the component is not available on the page or there is an error rendering it.
-        auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
+        // wait for component loaded or aura error message
+        final By componentLoaded = By.cssSelector("[data-app-rendered-component]");
+        final By auraErrorMessage = By.id("auraErrorMessage");
+        By locatorFound = auraUITestingUtil.waitUntil(new ExpectedCondition<By>() {
             @Override
-            public Boolean apply(WebDriver d) {
-                return d.findElements(By.cssSelector("[data-app-rendered-component]")).size() > 0
-                        && !d.findElement(By.className("auraErrorBox")).isDisplayed();
+            public By apply(WebDriver d) {
+                if (d.findElement(auraErrorMessage).isDisplayed()) {
+                    return auraErrorMessage;
+                }
+                if (d.findElement(componentLoaded) != null) {
+                    return componentLoaded;
+                }
+                return null;
             }
-        }, String.format("Error rendering component : %s", descriptor.getName()));
+        }, String.format("Error loading %s", descriptor.getName()));
+        if (locatorFound == auraErrorMessage) {
+            fail("Error loading " + descriptor.getName() + ": " + currentDriver.findElement(auraErrorMessage).getText());
+        }
     }
 
     protected static final DefDescriptor<ComponentDef> getDefDescriptor(String qualifiedName) {

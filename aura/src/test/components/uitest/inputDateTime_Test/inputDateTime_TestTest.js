@@ -42,10 +42,10 @@
     /**
       *  Test set link sets the appropriate date/time.
       */
-    // TODO : @ctatlah - figure out why time is different when test runs on autobuilds
-    _testSetLink : {
+    testSetLink : {
     	attributes : {format: "MM/dd/yyyy hh:mm"},
     	test : [function(cmp) {
+    	   
     		var input = cmp.find("dateTimePickerTest").find("inputText").getElement();
     		$A.test.assertNotNull(input, "input not visible");
     		
@@ -54,6 +54,7 @@
     		
     		this.openDatePicker(cmp);
     	}, function(cmp) {
+    	 
     		var datePicker = cmp.find("dateTimePickerTest").find("datePicker");
     		var setLink = datePicker.find("set").getElement();
     		
@@ -62,7 +63,8 @@
     		
     		var expectedDate = this.getCleanDate(null, true);
     		var value = cmp.find("dateTimePickerTest").get("v.value");
-    		var setDate = this.getCleanDate(value, true);
+    		var setDate = cmp.find("dateTimePickerTest").find("inputText").getElement().value;
+
     		$A.test.assertEquals(expectedDate, setDate, "Incorrect datetime was set.");
     	}]
     },
@@ -140,16 +142,27 @@
 	$A.test.addWaitFor(true, function(){return $A.util.hasClass(datePicker, "visible")});
     },
     
+    /*
+     *  Checking for numbers that are less than 10, if it is adding in a 0 to the front 
+     */
+    twoDigitFormat : function(num){
+	num = "" + num;
+	if(num.length < 2){
+	    return "0" + num;
+	}
+	
+	return "" + num;
+    },
+    
     getCleanDate : function(dateValue, hasTime) {
-    	var dateSep = "-";
+    	var dateSep = "/";
     	var timeSep = ":";
     	var someDate = dateValue ? new Date(dateValue) : new Date();
-    	var retDate = (someDate.getMonth()+1) + dateSep +
-    		someDate.getDate() + dateSep +
+    	var retDate = this.twoDigitFormat(someDate.getMonth()+1) + dateSep +
+    		this.twoDigitFormat(someDate.getDate()) + dateSep +
     		someDate.getFullYear();
-    	if (hasTime) {
-    		retDate += " " + someDate.getHours() + timeSep +
-    			someDate.getMinutes();
+    	if (hasTime) {	
+		retDate += " " + this.twoDigitFormat(someDate.getHours()%12) + timeSep + this.twoDigitFormat(someDate.getMinutes());	
     	}
     	return retDate;
     }

@@ -15,13 +15,14 @@
  */
 ({
     displayValue: function(component) {
-        var value = component.get("v.value");
+	var concCmp = component.getConcreteComponent();
+        var value = concCmp.get("v.value");
         var displayValue = value;
         if (value) {
             var d = $A.localizationService.parseDateTimeUTC(value, "yyyy-MM-dd");
             if (d) {
-                var format = component.get("v.format");
-                var langLocale = component.get("v.langLocale");
+                var format = concCmp.get("v.format");
+                var langLocale = concCmp.get("v.langLocale");
                 try {
                     d = $A.localizationService.translateToOtherCalendar(d);
                     displayValue = $A.localizationService.formatDateUTC(d, format, langLocale);
@@ -30,15 +31,16 @@
                 }
             }
         }
-        var elem = component.find("inputText").getElement();
+        var elem = concCmp.find("inputText").getElement();
         elem.value = displayValue ? $A.localizationService.translateToLocalizedDigits(displayValue) : '';
     },
 
     displayDatePicker: function(component) {
-        var datePicker = component.find("datePicker");
+	var concCmp = component.getConcreteComponent();
+        var datePicker = concCmp.find("datePicker");
         if (datePicker && datePicker.get("v.visible") === false) {
             var currentDate = new Date();
-            var value = component.get("v.value");
+            var value = concCmp.get("v.value");
             if (value) {
                 currentDate = $A.localizationService.parseDateTime(value, "yyyy-MM-dd");
             }
@@ -52,21 +54,22 @@
      *
      */
     doUpdate : function(component, value) {
+	var concCmp = component.getConcreteComponent();
         var v = $A.localizationService.translateFromLocalizedDigits(value);
         var ret = v;
         if (value) {
-            var format = component.get("v.format");
+            var format = concCmp.get("v.format");
             if (!format) { // use default format
                 format = $A.get("$Locale.dateformat");
             }
-            var langLocale = component.get("v.langLocale");
+            var langLocale = concCmp.get("v.langLocale");
             var d = $A.localizationService.parseDateTimeUTC(v, format, langLocale);
             if (d) {
                 d = $A.localizationService.translateFromOtherCalendar(d);
                 ret = $A.localizationService.formatDateUTC(d, "YYYY-MM-DD");
             }
         }
-        component.set("v.value", ret);
+        concCmp.set("v.value", ret);
     },
 
     getDateString: function(date) {

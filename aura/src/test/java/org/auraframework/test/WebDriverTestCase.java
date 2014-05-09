@@ -70,6 +70,7 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.interactions.Action;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -236,6 +237,12 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
     private void addPerfCapabilities(DesiredCapabilities capabilities) {
         if (isPerfTest()) {
             PerfWebDriverUtil.addLoggingCapabilities(capabilities);
+
+            if (currentBrowserType == BrowserType.GOOGLECHROME) {
+                ChromeOptions options = new ChromeOptions();
+                options.addArguments("--ignore-gpu-blacklist");
+                capabilities.setCapability(ChromeOptions.CAPABILITY, options);
+            }
         }
     }
 

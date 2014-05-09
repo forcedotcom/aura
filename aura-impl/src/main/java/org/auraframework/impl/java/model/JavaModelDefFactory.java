@@ -52,7 +52,7 @@ public class JavaModelDefFactory extends BaseJavaDefFactory<ModelDef> {
                     descriptor.getName(), 0));
         }
 
-        JavaModelDef.Builder builder = new JavaModelDef.Builder();
+        JavaModelDefImpl.Builder builder = new JavaModelDefImpl.Builder();
         builder.setDescriptor(descriptor);
         builder.setLocation(descriptor.getName(), 0);
         builder.setModelClass(c);

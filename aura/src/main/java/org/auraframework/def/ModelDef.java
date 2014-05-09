@@ -19,6 +19,7 @@ import org.auraframework.instance.Model;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
+ * A definition for a generic model.
  */
 public interface ModelDef extends Definition {
     @Override
@@ -52,5 +53,4 @@ public interface ModelDef extends Definition {
      * @throws QuickFixException
      */
     TypeDef getType(String s) throws QuickFixException;
-
 }

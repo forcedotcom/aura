@@ -40,9 +40,21 @@ import com.google.common.collect.Lists;
  * A server side java based action.
  */
 public class JavaAction extends AbstractActionImpl<JavaActionDef> {
+    /**
+     * The constructor for an action.
+     *
+     * Note that if the bean parameter is non-null, this action is invoked as an instance
+     * method on the bean, otherwise, it must be static.
+     *
+     * @param controllerDescriptor the descriptor for the owning controller.
+     * @param actionDef the definition for this action.
+     * @param bean The controller bean, if there is one, otherwise null.
+     * @param paramValues the parameter values.
+     */
     public JavaAction(DefDescriptor<ControllerDef> controllerDescriptor, JavaActionDef actionDef,
-            Map<String, Object> paramValues) {
+            Object bean, Map<String, Object> paramValues) {
         super(controllerDescriptor, actionDef, paramValues);
+        this.bean = bean;
     }
 
     private Object[] getArgs() {
@@ -121,7 +133,7 @@ public class JavaAction extends AbstractActionImpl<JavaActionDef> {
         loggingService.startTimer("java");
         try {
             loggingService.incrementNum("JavaCallCount");
-            this.returnValue = this.actionDef.getMethod().invoke(null, args);
+            this.returnValue = this.actionDef.getMethod().invoke(bean, args);
             this.state = State.SUCCESS;
         } catch (InvocationTargetException e) {
             // something bad happened in the body of the action itself
@@ -157,4 +169,5 @@ public class JavaAction extends AbstractActionImpl<JavaActionDef> {
 
     private Object returnValue;
     private final List<Object> errors = Lists.newArrayList();
+    private final Object bean;
 }

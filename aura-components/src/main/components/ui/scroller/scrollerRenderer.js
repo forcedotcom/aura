@@ -16,7 +16,7 @@
 ({
     afterRender : function(component, helper) {
         this.superAfterRender();
-        helper.init(component);
+        helper.initAfterRender(component);
     },
 
     rerender : function(component, helper) {
@@ -26,7 +26,7 @@
 
         if (enabled) {
             if (!component._scroller) {
-                helper.init(component);
+                helper.initAfterRender(component);
             }
         } else {
             helper.deactivate(component);

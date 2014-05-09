@@ -20,12 +20,57 @@
 * PUBLIC HELPER METHODS
 * =========================
 */
-    init : function(component) {
-        var scrollerWrapperDOM  = this._getScrollerWrapper(component),
+    /*
+    * This method attach helper-functions:
+    * Those functions are referenced-copied in the component 
+    * so users can register a plugin.
+    */
+    initialize: function (component) {
+        var helper = this;
+
+        component.registerPlugin = function () {
+            return helper.registerPlugin.apply(helper, arguments);
+        };
+
+        component.setPluginConfig = function (config) {
+            return helper.setPluginConfig(component, config);
+        };
+
+        component.getScrollerNamespace = function () {
+            return helper.getScrollerNamespace();
+        };
+
+        component.getScrollerInstance = function () {
+            return helper.getScrollerInstance(this);
+        };
+
+        component.isPluginRegistered = function (name) {
+            return helper.isPluginRegistered(name);
+        }
+    },
+    isPluginRegistered: function (name) {
+        return !!this.getScrollerNamespace().plugins[name];
+    },
+    registerPlugin: function (name, constructor) {
+        var NS      = this.getScrollerNamespace(),
+            plugins =  NS.plugins;
+
+        if (!plugins[name]) {
+            plugins[name] = constructor;
+        }
+    },
+    setPluginConfig: function (component, config) {
+        var sh = this.getScrollerNamespace().helpers;
+        component._pluginConfig = sh.simpleMerge(component._pluginConfig, config);
+    },
+    initAfterRender: function(component) {
+        var scrollerNamespace   = this.getScrollerNamespace(),
+            scrollerHelpers     = scrollerNamespace.helpers,
+            scrollerWrapperDOM  = this._getScrollerWrapper(component),
             scrollerOptions     = this._mapAuraScrollerOptions(component),
-            scrollerNamespace   = this.getScrollerNamespace(component),
+            mergedOptions       = scrollerHelpers.simpleMerge(scrollerOptions, component._pluginConfig);
             ScrollerConstructor = scrollerNamespace.constructor,
-            scrollerInstance    = new ScrollerConstructor(scrollerWrapperDOM, scrollerOptions);
+            scrollerInstance    = new ScrollerConstructor(scrollerWrapperDOM, mergedOptions);
         
         this._attachAuraEvents(component, scrollerInstance);
         this.setScollerInstance(component, scrollerInstance);
@@ -37,14 +82,6 @@
     setScollerInstance: function (component, scrollerInstance) {
         var helper = this;
         component._scroller = scrollerInstance;
-        
-        component.getScrollerInstance = function () {
-            return helper.getScrollerInstance(this);
-        }
-
-        component.getScrollerNamespace = function () {
-            return helper.getScrollerNamespace(this);
-        }
 
         // For debugging purposes...
        // #if {"excludeModes" : ["PRODUCTION"]}
@@ -53,7 +90,7 @@
             instances[component.getGlobalId()] = scrollerInstance;
         // #end
     },
-    getScrollerNamespace: function (component) {
+    getScrollerNamespace: function () {
         if (typeof window.__S === "undefined") {
             this._bootstrapScroller();
         }

@@ -60,6 +60,14 @@
     text-size-adjust: none;
 }
 
+.uiScroller.native > .scroller {
+    -webkit-touch-callout: default;
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+}
+
 .uiScroller > .scroll-vertical, .uiScroller > .scroll-vertical .surface {
     width: 100%;
 }

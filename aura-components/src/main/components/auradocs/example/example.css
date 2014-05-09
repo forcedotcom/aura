@@ -14,9 +14,6 @@
  * limitations under the License.
  */
 .THIS.container {
-	background-color: #f3f3f3;
-    border: 1px solid blue;
-    border-radius: 5px;
     margin: 5px;
     padding: 1em;
 }
@@ -40,6 +37,5 @@
 }
 
 .THIS .uiTabset.displayTab{
-	border: 1px solid #c3c3c3;
 	height: 460px;
 }

@@ -16,23 +16,20 @@
 .THIS {
 	float: left;
 	list-style: none;
-	background: -webkit-linear-gradient(#fff,#eee);
-	background: -moz-linear-gradient(#fff,#eee);
-	border: 1px solid #cecece;
-	box-shadow: inset 0 1px 1px #fff;
+	background: #eee;
+	border-bottom: 1px solid #eee;
 	border-radius: 5px 5px 0 0;
-	margin-right:-1px;
+	margin-right: 2px;
 }
 .THIS.active{
-	background: -webkit-linear-gradient(#eee,#fff);
-	background: -moz-linear-gradient(#eee,#fff);
+	background: #dc595c;
 	border-bottom: 1px solid #fff;
 }
 
 .THIS > a.tabHeader {
-	margin: 0 2px 0 0;
+	margin: 0px;
 	color: #363c40;
-	padding: 3px 10px;
+	padding: 5px 10px;
 	cursor: pointer;
 	display:block;
 	text-decoration: none;
@@ -49,6 +46,7 @@
 
 .THIS.active > a.tabHeader {
 	cursor: default;
+	color: #fff;
 }
 
 .THIS > div.tabBody {

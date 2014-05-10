@@ -107,8 +107,6 @@ public final class MiscPerfFrameworkTest extends AbstractPerfTestCase {
         paint = metrics.getMetric("Timeline.Painting.Paint");
         int numPaintsRefresh = paint.getIntValue();
         assertTrue("refresh: " + numPaintsRefresh, numPaintsRefresh < numPaintsInit);
-        bytes = metrics.getMetric("Network.encodedDataLength").getIntValue();
-        assertTrue("most cached: " + bytes, bytes < 20000);
 
         // go to the same page instead of refreshing
         metricsCollector = new PerfMetricsCollector(this, true);
@@ -120,8 +118,6 @@ public final class MiscPerfFrameworkTest extends AbstractPerfTestCase {
         int numPaintsGet = paint.getIntValue();
         assertTrue("get: " + numPaintsGet, numPaintsGet < numPaintsInit);
         assertEquals(numPaintsRefresh, paint.getIntValue()); // refresh on browser gives 2 also
-        bytes = metrics.getMetric("Network.encodedDataLength").getIntValue();
-        assertTrue("most cached: " + bytes, bytes < 20000);
     }
 
     public void testMultipleRunsReuseWebDriver() throws Exception {

@@ -24,6 +24,7 @@ import java.util.Set;
 import junit.framework.Assert;
 
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.auraframework.test.SauceUtil;
 import org.auraframework.util.json.JsonReader;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
@@ -51,6 +52,10 @@ public class AuraUITestingUtil {
 
     public AuraUITestingUtil(WebDriver driver) {
         this.driver = driver;
+        if (SauceUtil.areTestsRunningOnSauce()) {
+            // things are slower in SauceLabs
+            timeoutInSecs = 120;
+        }
     }
 
     public void setTimeoutInSecs(long timeoutInSecs) {

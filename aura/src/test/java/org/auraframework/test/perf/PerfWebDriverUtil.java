@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.auraframework.test.SauceUtil;
 import org.auraframework.test.WebDriverTestCase;
 import org.auraframework.test.perf.rdp.RDPNotification;
 import org.auraframework.util.AuraUITestingUtil;
@@ -256,6 +257,9 @@ public final class PerfWebDriverUtil {
      * @return JS heap snapshot
      */
     public Map takeHeapSnapshot() {
+        if (SauceUtil.areTestsRunningOnSauce()) {
+            throw new UnsupportedOperationException("required 2.10 chromedriver still not available in SauceLabs");
+        }
         return (Map) ((JavascriptExecutor) driver).executeScript(":takeHeapSnapshot");
     }
 

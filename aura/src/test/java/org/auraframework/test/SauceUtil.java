@@ -98,6 +98,15 @@ public final class SauceUtil {
             capabilities.setCapability("build", buildId);
         }
 
+        // request specific platform/version for some browsers
+        switch (browserType) {
+        case GOOGLECHROME:
+            capabilities.setCapability("platform", "OS X 10.9");
+            capabilities.setCapability("version", "34");
+            capabilities.setCapability("chromedriver-version", "2.9");
+            break;
+        }
+
         // adding timeouts to prevent jobs to run for too long when problems
         // occur:
         // see http://saucelabs.com/docs/ondemand/additional-config#timeouts

@@ -237,12 +237,6 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
     private void addPerfCapabilities(DesiredCapabilities capabilities) {
         if (isPerfTest()) {
             PerfWebDriverUtil.addLoggingCapabilities(capabilities);
-
-            if (currentBrowserType == BrowserType.GOOGLECHROME) {
-                ChromeOptions options = new ChromeOptions();
-                options.addArguments("--ignore-gpu-blacklist");
-                capabilities.setCapability(ChromeOptions.CAPABILITY, options);
-            }
         }
     }
 
@@ -614,15 +608,28 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
 
             addPerfCapabilities(capabilities);
 
+            Dimension windowSize = getWindowSize();
+            if (currentBrowserType == BrowserType.GOOGLECHROME) {
+                ChromeOptions options = new ChromeOptions();
+                List<String> arguments = Lists.newArrayList();
+                arguments.add("--ignore-gpu-blacklist");
+                if (windowSize != null) {
+                    arguments.add("window-size=" + windowSize.width + ',' + windowSize.height);
+                }
+                options.addArguments(arguments);
+                capabilities.setCapability(ChromeOptions.CAPABILITY, options);
+            }
+
             logger.info(String.format("Requesting: %s", capabilities));
             currentDriver = provider.get(capabilities);
             if (currentDriver == null) {
                 fail("Failed to get webdriver for " + currentBrowserType);
             }
 
-            Dimension windowSize = getWindowSize();
             if (windowSize != null) {
-                currentDriver.manage().window().setSize(windowSize);
+                if (currentBrowserType != BrowserType.GOOGLECHROME) {
+                    currentDriver.manage().window().setSize(windowSize);
+                }
             }
 
             logger.info(String.format("Received: %s", currentDriver));

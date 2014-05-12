@@ -179,6 +179,7 @@ public class AuraServlet extends AuraBaseServlet {
             response.setCharacterEncoding(UTF_ENCODING);
             context = Aura.getContextService().getCurrentContext();
             response.setContentType(getContentType(context.getFormat()));
+            definitionService = Aura.getDefinitionService();
         } catch (RuntimeException re) {
             //
             // If we can't get this far, log the exception and bolt.
@@ -189,6 +190,9 @@ public class AuraServlet extends AuraBaseServlet {
             send404(request, response);
             return;
         }
+
+        DefDescriptor<? extends BaseComponentDef> defDescriptor;
+        BaseComponentDef def;
 
         //
         // Now check and fetch parameters.
@@ -218,6 +222,9 @@ public class AuraServlet extends AuraBaseServlet {
             if (context.getFormat() != Format.HTML) {
                 throw new AuraRuntimeException("Invalid request, GET must use HTML");
             }
+
+            defDescriptor = definitionService.getDefDescriptor(tagName,
+                    defType == DefType.APPLICATION ? ApplicationDef.class : ComponentDef.class);
         } catch (RequestParam.InvalidParamException ipe) {
             handleServletException(new SystemErrorException(ipe), false, context, request, response, false);
             return;
@@ -228,18 +235,14 @@ public class AuraServlet extends AuraBaseServlet {
             handleServletException(new SystemErrorException(t), false, context, request, response, false);
             return;
         }
-
-        DefDescriptor<? extends BaseComponentDef> defDescriptor;
-        BaseComponentDef def;
+        
 
         try {
             context.setFrameworkUID(Aura.getConfigAdapter().getAuraFrameworkNonce());
-            definitionService = Aura.getDefinitionService();
-            defDescriptor = definitionService.getDefDescriptor(tagName, defType == DefType.APPLICATION ? ApplicationDef.class : ComponentDef.class);
 
             context.setApplicationDescriptor(defDescriptor);
             definitionService.updateLoaded(defDescriptor);
-            def = defDescriptor.getDef();
+            def = definitionService.getDefinition(defDescriptor);
             
             if (!context.isTestMode() && !context.isDevMode()) {
             	assertAccess(def);

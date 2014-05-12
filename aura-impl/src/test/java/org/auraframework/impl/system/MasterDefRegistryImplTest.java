@@ -15,12 +15,23 @@
  */
 package org.auraframework.impl.system;
 
+import java.util.concurrent.locks.Lock;
+
+import org.auraframework.def.TypeDef;
+
+import org.auraframework.service.CachingService;
+
+import org.auraframework.test.ServiceLocatorMocker;
+
+import org.auraframework.util.ServiceLoader;
+
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.Collection;
 import java.util.Collections;
@@ -51,6 +62,7 @@ import org.auraframework.def.StyleDef;
 import org.auraframework.impl.AuraImpl;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.source.StringSourceLoader;
+import org.auraframework.instance.BaseComponent;
 import org.auraframework.service.BuilderService;
 import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext;
@@ -59,9 +71,11 @@ import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.DefRegistry;
 import org.auraframework.system.DependencyEntry;
+import org.auraframework.system.Location;
 import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.system.Source;
 import org.auraframework.system.SourceListener;
+import org.auraframework.system.SubDefDescriptor;
 import org.auraframework.test.AuraTestingUtil;
 import org.auraframework.test.annotation.ThreadHostileTest;
 import org.auraframework.test.annotation.UnAdaptableTest;
@@ -70,6 +84,7 @@ import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.json.Json;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.internal.util.MockUtil;
@@ -78,6 +93,7 @@ import org.mockito.stubbing.Answer;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 /**
  * @see org.auraframework.impl.registry.RootDefFactoryTest
@@ -822,7 +838,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
      */
     private boolean isMdrCacheCleared(DefDescriptor<ComponentDef> cmpDesc, MasterDefRegistryImpl mdr, String uid)
             throws Exception {
-    	Cache<String, DependencyEntry> dependencies = AuraPrivateAccessor.get(mdr, "depsCache");
+        Cache<String, DependencyEntry> dependencies = AuraPrivateAccessor.get(mdr, "depsCache");
         String key = AuraPrivateAccessor.invoke(mdr, "makeGlobalKey", uid, cmpDesc);
         Object cacheReturn = dependencies.getIfPresent(key);
 
@@ -943,15 +959,15 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         Cache<String, ?> cache = AuraPrivateAccessor.get(mdr, "depsCache");
         String ddKey = dd.getDescriptorName().toLowerCase();
         for (String key : cache.getKeySet()) {
-        	if (key.endsWith(ddKey)) {
-        		return cache.getIfPresent(key) != null;
-        	}
+            if (key.endsWith(ddKey)) {
+                return cache.getIfPresent(key) != null;
+            }
         }
         return false;
     }
 
     private boolean isInDefsCache(DefDescriptor<?> dd, MasterDefRegistryImpl mdr) throws Exception {
-    	Cache<DefDescriptor<?>, Optional<? extends Definition>> cache = AuraPrivateAccessor.get(mdr, "defsCache");
+        Cache<DefDescriptor<?>, Optional<? extends Definition>> cache = AuraPrivateAccessor.get(mdr, "defsCache");
         return null != cache.getIfPresent(dd);
     }
 
@@ -1245,26 +1261,26 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
     }
 
     public void testDepsCache() throws Exception {
-    	String unprivilegedNamespace = getAuraTestingUtil().getNonce("alien");
+        String unprivilegedNamespace = getAuraTestingUtil().getNonce("alien");
 
         // in privileged namespace
         DefDescriptor<ComponentDef> privilegedCmp = getAuraTestingUtil().addSourceAutoCleanup(
-        		ComponentDef.class, String.format(baseComponentTag,"access='global'",""), null, true);
+                ComponentDef.class, String.format(baseComponentTag,"access='global'",""), null, true);
         // in unprivileged namespace depending on privileged cmp
         DefDescriptor<ComponentDef> unprivilegedCmp = getAuraTestingUtil().addSourceAutoCleanup(
-        		DefDescriptorImpl.getInstance(String.format("markup://%s:cmp", unprivilegedNamespace), ComponentDef.class),
-        		String.format(baseComponentTag, "access='global'", String.format("<%s/>", privilegedCmp.getDescriptorName())),
-        		false);
+                DefDescriptorImpl.getInstance(String.format("markup://%s:cmp", unprivilegedNamespace), ComponentDef.class),
+                String.format(baseComponentTag, "access='global'", String.format("<%s/>", privilegedCmp.getDescriptorName())),
+                false);
 
         // in privileged namespace depending on unprivileged cmp
-		DefDescriptor<ComponentDef> privilegedRoot = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-				String.format(baseComponentTag, "access='global'", String.format("<%s/>", unprivilegedCmp.getDescriptorName())),
-				null, true);
+        DefDescriptor<ComponentDef> privilegedRoot = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+                String.format(baseComponentTag, "access='global'", String.format("<%s/>", unprivilegedCmp.getDescriptorName())),
+                null, true);
 
         ConfigAdapter configAdapter = Aura.getConfigAdapter();
-		assertTrue(configAdapter.isPrivilegedNamespace(privilegedCmp.getNamespace()));
-		assertFalse(configAdapter.isPrivilegedNamespace(unprivilegedCmp.getNamespace()));
-		assertTrue(configAdapter.isPrivilegedNamespace(privilegedRoot.getNamespace()));
+        assertTrue(configAdapter.isPrivilegedNamespace(privilegedCmp.getNamespace()));
+        assertFalse(configAdapter.isPrivilegedNamespace(unprivilegedCmp.getNamespace()));
+        assertTrue(configAdapter.isPrivilegedNamespace(privilegedRoot.getNamespace()));
 
         MasterDefRegistry mdr = Aura.getContextService().getCurrentContext().getDefRegistry();
         MasterDefRegistryImpl mdri = (MasterDefRegistryImpl)mdr;
@@ -1280,15 +1296,15 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         assertFalse(isInDepsCache(privilegedRoot, mdri));
 
         mdr.invalidate(DefDescriptorImpl.getInstance("aura:component", ComponentDef.class)); // invalidate the world
-		try {
-			mdr.getDef(privilegedRoot);
-			fail("Shouldn't be able to have a privileged cmp depend on an unprivileged cmp");
-		} catch (Throwable t) {
-			this.assertExceptionMessageStartsWith(t,
-					DefinitionNotFoundException.class, String.format(
-							"No COMPONENT named %s found",
-							unprivilegedCmp.getQualifiedName()));
-		}
+        try {
+            mdr.getDef(privilegedRoot);
+            fail("Shouldn't be able to have a privileged cmp depend on an unprivileged cmp");
+        } catch (Throwable t) {
+            this.assertExceptionMessageStartsWith(t,
+                    DefinitionNotFoundException.class, String.format(
+                            "No COMPONENT named %s found",
+                            unprivilegedCmp.getQualifiedName()));
+        }
     }
 
     public void testJavaProtocolIsCached() throws Exception {
@@ -1384,5 +1400,389 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
     private MasterDefRegistry getAuraMDR(){
         return Aura.getContextService().getCurrentContext().getDefRegistry();
+    }
+
+    /**
+     * A fake type def, this could probably be a mock, the tricky part being isValid().
+     */
+    @SuppressWarnings("serial")
+    private static class FakeTypeDef implements TypeDef {
+        private boolean valid;
+        DefDescriptor<TypeDef> desc;
+
+        public FakeTypeDef(DefDescriptor<TypeDef> desc) {
+            this.desc = desc;
+        }
+
+        @Override
+        public void validateDefinition() throws QuickFixException {
+        }
+
+        @Override
+        public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
+        }
+
+        @Override
+        public void validateReferences() throws QuickFixException {
+        }
+
+        @Override
+        public void markValid() {
+            valid = true;
+        }
+
+        @Override
+        public boolean isValid() {
+            return valid;
+        }
+
+        @Override
+        public String getName() {
+            return "name";
+        }
+
+        @Override
+        public Location getLocation() {
+            return null;
+        }
+
+        @Override
+        public Visibility getVisibility() {
+            return Visibility.PRIVATE;
+        }
+
+        @Override
+        public DefinitionAccess getAccess() {
+            return null;
+        }
+
+        @Override
+        public <D extends Definition> D getSubDefinition( SubDefDescriptor<D, ?> descriptor) {
+            return null;
+        }
+
+        @Override
+        public void retrieveLabels() throws QuickFixException {
+        }
+
+        @Override
+        public String getDescription() {
+            return "description";
+        }
+
+        @Override
+        public String getOwnHash() {
+            return "aaaa";
+        }
+
+        @Override
+        public void appendSupers(Set<DefDescriptor<?>> supers) throws QuickFixException {
+        }
+
+        @Override
+        public void serialize(Json json) throws IOException {
+            
+        }
+
+        @Override
+        public DefDescriptor<TypeDef> getDescriptor() {
+            return desc;
+        }
+
+        @Override
+        public Object valueOf(Object stringRep) {
+            return null;
+        }
+
+        @Override
+        public Object wrap(Object o) {
+            return null;
+        }
+
+        @Override
+        public Object getExternalType(String prefix) throws QuickFixException {
+            return null;
+        }
+
+        @Override
+        public Object initialize(Object config, BaseComponent<?, ?> valueProvider) throws QuickFixException {
+            return null;
+        }
+
+        @Override
+        public void appendDependencies(Object instance, Set<DefDescriptor<?>> deps) {
+        }
+    }
+
+    /**
+     * A fake registry to check locking as we call.
+     */
+    @SuppressWarnings("serial")
+	private static class FakeRegistry implements DefRegistry<TypeDef> {
+        public DefDescriptor<TypeDef> desc;
+        public TypeDef def;
+        private Lock rLock;
+        private Lock wLock;
+
+        public FakeRegistry(Lock rLock, Lock wLock) {
+            this.desc = Aura.getDefinitionService().getDefDescriptor("java://fake.type", TypeDef.class);
+            this.def = new FakeTypeDef(desc);
+            this.rLock = rLock;
+            this.wLock = wLock;
+        }
+
+        @Override
+        public TypeDef getDef(DefDescriptor<TypeDef> descriptor) throws QuickFixException {
+            Mockito.verify(rLock, Mockito.times(1)).lock();
+            Mockito.verify(rLock, Mockito.never()).unlock();
+            if (descriptor.equals(desc)) {
+                return def;
+            }
+            return null;
+        }
+
+        @Override
+        public boolean hasFind() {
+            return true;
+        }
+
+        @Override
+        public Set<DefDescriptor<TypeDef>> find(DefDescriptor<TypeDef> matcher) {
+            Mockito.verify(rLock, Mockito.times(1)).lock();
+            Mockito.verify(rLock, Mockito.never()).unlock();
+			Set<DefDescriptor<TypeDef>> found = Sets.newHashSet();
+            found.add(desc);
+            return found;
+        }
+
+        @Override
+        public Set<DefDescriptor<?>> find(DescriptorFilter matcher) {
+            Mockito.verify(rLock, Mockito.times(1)).lock();
+            Mockito.verify(rLock, Mockito.never()).unlock();
+			Set<DefDescriptor<?>> found = Sets.newHashSet();
+            found.add(desc);
+            return found;
+        }
+
+        @Override
+        public void save(TypeDef def) {
+            Mockito.verify(wLock, Mockito.times(1)).lock();
+            Mockito.verify(wLock, Mockito.never()).unlock();
+        }
+
+        @Override
+        public boolean exists(DefDescriptor<TypeDef> descriptor) {
+            Mockito.verify(rLock, Mockito.times(1)).lock();
+            Mockito.verify(rLock, Mockito.never()).unlock();
+            return desc.equals(descriptor);
+        }
+
+        @Override
+        public Set<DefType> getDefTypes() {
+			Set<DefType> types = Sets.newHashSet();
+            types.add(DefType.TYPE);
+            return types;
+        }
+
+        @Override
+        public Set<String> getPrefixes() {
+            Set<String> prefixes = Sets.newHashSet();
+            prefixes.add("java");
+            return prefixes;
+        }
+
+        @Override
+        public Set<String> getNamespaces() {
+            Set<String> prefixes = Sets.newHashSet();
+            prefixes.add("fake");
+            return prefixes;
+        }
+
+        @Override
+        public Source<TypeDef> getSource(DefDescriptor<TypeDef> descriptor) {
+            return null;
+        }
+
+        @Override
+        public void clear() {
+            Mockito.verify(wLock, Mockito.times(1)).lock();
+            Mockito.verify(wLock, Mockito.never()).unlock();
+        }
+
+        @Override
+        public boolean isCacheable() {
+            return true;
+        }
+
+        @Override
+        public boolean isStatic() {
+            return false;
+        }
+    }
+
+    /**
+     * A private class to hold all the info for a lock test.
+     *
+     * This sets up the mocks so that we can test locking, if it is instantiated,
+     * you _must_ call clear() in a finally block. The locking is not real here,
+     * so have a care.
+     */
+    private static class LockTestInfo {
+        public final MasterDefRegistryImpl mdr;
+        public final FakeRegistry reg;
+        public final Lock rLock;
+        public final Lock wLock;
+
+        public LockTestInfo() {
+            ServiceLoader sl = ServiceLocatorMocker.spyOnServiceLocator();
+            this.rLock = Mockito.mock(Lock.class, "rLock");
+            this.wLock = Mockito.mock(Lock.class, "wLock");
+            CachingService acs = Mockito.spy(sl.get(CachingService.class));
+            Mockito.stub(sl.get(CachingService.class)).toReturn(acs);
+            Mockito.stub(acs.getReadLock()).toReturn(rLock);
+            Mockito.stub(acs.getWriteLock()).toReturn(wLock);
+            this.reg = new FakeRegistry(rLock, wLock);
+            this.mdr = new MasterDefRegistryImpl(reg);
+        }
+
+        public void clear() {
+            ServiceLocatorMocker.unmockServiceLocator();
+        }
+    }
+
+    /**
+     * Test getDef to ensure locking is minimized.
+     *
+     * This asserts that within an MDR we only lock once for any number of
+     * getDef calls for a single def.
+     */
+    public void testGetDefLocking() throws Exception {
+        LockTestInfo lti = null;
+
+        lti = new LockTestInfo();
+        try {
+            assertEquals(lti.reg.def, lti.mdr.getDef(lti.reg.desc));
+            Mockito.verify(lti.rLock, Mockito.times(1)).lock();
+            Mockito.verify(lti.rLock, Mockito.times(1)).unlock();
+            assertEquals(lti.reg.def, lti.mdr.getDef(lti.reg.desc));
+            Mockito.verify(lti.rLock, Mockito.times(1)).lock();
+            Mockito.verify(lti.rLock, Mockito.times(1)).unlock();
+            Mockito.verify(lti.wLock, Mockito.never()).lock();
+            Mockito.verify(lti.wLock, Mockito.never()).unlock();
+        } finally {
+            lti.clear();
+        }
+    }
+
+    /**
+     * Test save to ensure locking is minimized.
+     *
+     * This asserts that within an MDR we lock with a write lock for a save.
+     */
+    public void testSaveLocking() throws Exception {
+        LockTestInfo lti = null;
+
+        lti = new LockTestInfo();
+        try {
+            lti.mdr.save(lti.reg.def);
+            Mockito.verify(lti.wLock, Mockito.times(1)).lock();
+            Mockito.verify(lti.wLock, Mockito.times(1)).unlock();
+            Mockito.verify(lti.rLock, Mockito.never()).lock();
+            Mockito.verify(lti.rLock, Mockito.never()).unlock();
+        } finally {
+            lti.clear();
+        }
+    }
+
+    /**
+     * Test find(desc) to ensure locking is minimized.
+     *
+     * This asserts that within an MDR we only lock once for a call to find.
+     */
+    public void testFindDescLocking() throws Exception {
+        LockTestInfo lti = null;
+
+        lti = new LockTestInfo();
+        try {
+            lti.mdr.find(lti.reg.desc);
+            Mockito.verify(lti.rLock, Mockito.times(1)).lock();
+            Mockito.verify(lti.rLock, Mockito.times(1)).unlock();
+            Mockito.verify(lti.wLock, Mockito.never()).lock();
+            Mockito.verify(lti.wLock, Mockito.never()).unlock();
+        } finally {
+            lti.clear();
+        }
+    }
+
+    /**
+     * Test find(matcher) to ensure locking is minimized.
+     *
+     * This asserts that within an MDR we only lock once for a call to find.
+     */
+    public void testFindMatcherLocking() throws Exception {
+        LockTestInfo lti = null;
+
+        lti = new LockTestInfo();
+        try {
+            lti.mdr.find(new DescriptorFilter("bah:humbug"));
+            Mockito.verify(lti.rLock, Mockito.times(1)).lock();
+            Mockito.verify(lti.rLock, Mockito.times(1)).unlock();
+            lti.mdr.find(new DescriptorFilter("bah:humbug"));
+            // we always lock, so we cannot check for a single lock here.
+            Mockito.verify(lti.rLock, Mockito.times(2)).lock();
+            Mockito.verify(lti.rLock, Mockito.times(2)).unlock();
+            Mockito.verify(lti.wLock, Mockito.never()).lock();
+            Mockito.verify(lti.wLock, Mockito.never()).unlock();
+        } finally {
+            lti.clear();
+        }
+    }
+
+    /**
+     * Test exists to ensure locking is minimized.
+     *
+     * This asserts that within an MDR we only lock once for any number
+     * of calls to exists.
+     */
+    public void testExistsLocking() throws Exception {
+        LockTestInfo lti = null;
+
+        lti = new LockTestInfo();
+        try {
+            lti.mdr.exists(lti.reg.desc);
+            Mockito.verify(lti.rLock, Mockito.times(1)).lock();
+            Mockito.verify(lti.rLock, Mockito.times(1)).unlock();
+            lti.mdr.exists(lti.reg.desc);
+            Mockito.verify(lti.rLock, Mockito.times(1)).lock();
+            Mockito.verify(lti.rLock, Mockito.times(1)).unlock();
+            Mockito.verify(lti.wLock, Mockito.never()).lock();
+            Mockito.verify(lti.wLock, Mockito.never()).unlock();
+        } finally {
+            lti.clear();
+        }
+    }
+
+    /**
+     * Test getUid for locking.
+     *
+     * getUid always takes the lock, maybe we should avoid this?
+     */
+    public void testGetUidLocking() throws Exception {
+        LockTestInfo lti = null;
+
+        lti = new LockTestInfo();
+        try {
+            lti.mdr.getUid(null, lti.reg.desc);
+            Mockito.verify(lti.rLock, Mockito.times(1)).lock();
+            Mockito.verify(lti.rLock, Mockito.times(1)).unlock();
+            lti.mdr.getUid(null, lti.reg.desc);
+            // We lock every time here. Probably should not.
+            Mockito.verify(lti.rLock, Mockito.times(2)).lock();
+            Mockito.verify(lti.rLock, Mockito.times(2)).unlock();
+            Mockito.verify(lti.wLock, Mockito.never()).lock();
+            Mockito.verify(lti.wLock, Mockito.never()).unlock();
+        } finally {
+            lti.clear();
+        }
     }
 }

@@ -46,13 +46,14 @@ public final class SauceUtil {
 
     private static final boolean TUNNEL_SELENIUM_COMMANDS_THROUGH_SAUCE_CONNECT = false;
     static final String SAUCELABS_SERVER_URL = "saucelabs.com";
-    private static final String SAUCE_USERNAME = System.getProperty("sauce.username", "[saunce.username undefined]");
+    private static final String SAUCE_USERNAME = System.getProperty("sauce.username", "[sauce.username undefined]");
     private static final String SAUCE_ACCESS_KEY = System.getProperty("sauce.access.key",
             "[sauce.access.key undefined]");
     private static final String SAUCE_WEB_DRIVER_URL = "http://" + SAUCE_USERNAME + ':' + SAUCE_ACCESS_KEY
             + "@saucelabs.com:4444/wd/hub";
     private static final String SAUCE_CONNECT_HOST = System.getProperty("sauce.connect.host",
             "[sauce.connect.host undefined]");
+    private static final String SAUCE_PARENT_TUNNEL = System.getProperty("sauce.parent.tunnel");
     private static final String SAUCE_CONNECT_URL = "http://" + SAUCE_USERNAME + ':' + SAUCE_ACCESS_KEY + "@"
             + SAUCE_CONNECT_HOST + "/wd/hub";
     static final String SAUCE_ONDEMAND_HOST = "ondemand.saucelabs.com";
@@ -101,7 +102,8 @@ public final class SauceUtil {
         // request specific platform/version for some browsers
         switch (browserType) {
         case GOOGLECHROME:
-            capabilities.setCapability("platform", "OS X 10.9");
+            // capabilities.setCapability("platform", "OS X 10.9");
+            capabilities.setCapability("platform", "Windows 8.1");
             capabilities.setCapability("version", "34");
             capabilities.setCapability("chromedriver-version", "2.9");
             break;
@@ -116,6 +118,11 @@ public final class SauceUtil {
 
         capabilities.setCapability("record-video", System.getProperty("sauce.record.video", "false"));
         capabilities.setCapability("record-screenshots", System.getProperty("sauce.record.screenshots", "false"));
+
+        if (SAUCE_PARENT_TUNNEL != null && SAUCE_PARENT_TUNNEL.length() > 0) {
+            capabilities.setCapability("parent-tunnel", SAUCE_PARENT_TUNNEL);
+        }
+
         return capabilities;
     }
 

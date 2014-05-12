@@ -94,7 +94,7 @@ public final class MiscPerfFrameworkTest extends AbstractPerfTestCase {
         logger.info("METRICS (first):\n" + metrics.toLongString());
         PerfMetric paint = metrics.getMetric("Timeline.Painting.Paint");
         int numPaintsInit = paint.getIntValue();
-        assertTrue("init: " + numPaintsInit, numPaintsInit >= 4); // TODO: why is bigger the first time?
+        assertTrue("init: " + numPaintsInit, numPaintsInit >= 3); // TODO: why is bigger the first time?
         int bytes = metrics.getMetric("Network.encodedDataLength").getIntValue();
         assertTrue("nothing cached: " + bytes, bytes > 100000);
 
@@ -122,7 +122,7 @@ public final class MiscPerfFrameworkTest extends AbstractPerfTestCase {
 
     public void testMultipleRunsReuseWebDriver() throws Exception {
         PerfRunsCollector runs = new PerfRunsCollector();
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 2; i++) {
             PerfMetricsCollector perfData = new PerfMetricsCollector(this, true);
             perfData.startCollecting();
             open("/ui/label.cmp?label=foo");
@@ -134,7 +134,7 @@ public final class MiscPerfFrameworkTest extends AbstractPerfTestCase {
 
     public void testMultipleRunsNewWebDriver() throws Exception {
         PerfRunsCollector runs = new PerfRunsCollector();
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 2; i++) {
             getDriver();
             PerfMetricsCollector perfData = new PerfMetricsCollector(this, true);
             perfData.startCollecting();

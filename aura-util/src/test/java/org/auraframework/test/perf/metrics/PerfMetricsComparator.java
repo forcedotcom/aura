@@ -49,19 +49,18 @@ public final class PerfMetricsComparator {
         }
         map.put("Timeline.Loading.ParseHTML", "different when running ui vs mvn");
 
-        map.put("Timeline.Scripting.GCEvent", "kind of random");
+        map.put("Timeline.Scripting.GCEvent", "fluctuates");
         map.put("Timeline.Other.Program", "fluctuates");
         map.put("Timeline.Scripting.FunctionCall", "fluctuates");
         map.put("Timeline.Scripting.XHRReadyStateChange", "fluctuates");
         map.put("Timeline.Scripting.TimerFire", "fluctuates");
         map.put("Timeline.Scripting.TimerRemove", "fluctuates");
 
-        map.put("Timeline.Painting.CompositeLayers", "N/A in aura jenkins googlechrome");
-        map.put("Timeline.Painting.PaintSetup", "N/A in aura jenkins googlechrome");
-        map.put("Timeline.Rendering.ActivateLayerTree", "N/A in aura jenkins googlechrome");
-        map.put("Timeline.Rendering.DrawFrame", "N/A in aura jenkins googlechrome");
-        map.put("Timeline.Rendering.RequestMainThreadFrame", "N/A in aura jenkins googlechrome");
-        map.put("Timeline.Rendering.BeginFrame", "smaller in aura jenkins googlechrome");
+        map.put("Timeline.Painting.PaintSetup", "ignored");
+        map.put("Timeline.Rendering.ActivateLayerTree", "ignored");
+        map.put("Timeline.Rendering.DrawFrame", "ignored");
+        map.put("Timeline.Rendering.RequestMainThreadFrame", "ignored");
+        map.put("Timeline.Rendering.BeginFrame", "ignored");
 
         METRICS_TO_EXCLUDE = ImmutableMap.copyOf(map);
     }

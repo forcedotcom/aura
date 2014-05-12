@@ -36,8 +36,8 @@ import com.google.common.collect.Maps;
  */
 public final class RDPAnalyzer {
 
-    public static final String MARK_TIMELINE_START = "START:cmpCreate";
-    public static final String MARK_TIMELINE_END = "END:cmpRender";
+    public static final String MARK_TIMELINE_START = "PERF:start";
+    public static final String MARK_TIMELINE_END = "PERF:end";
 
     protected static final Logger LOG = Logger.getLogger(RDPAnalyzer.class.getSimpleName());
 

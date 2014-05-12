@@ -4,34 +4,35 @@
     },
 
     locationChange: function (component, event, helper) {
-        var descriptor = helper.getDescriptorFromUrl(),
-            callback   = function (newCmp) {
-                $A.log("Start rendering component: " + JSON.stringify(descriptor));
+        var values,
+            obj         = helper.parseObjectFromUrl(),
+            cmp         = helper.getCmpDef(obj),
+            perfConfig  = $A.PERFCORE.setConfig(obj);
 
-                // Wait 50ms to stabilize the browser
-                $A.PERFCORE.later(50, function (t) {
-                    // Create the context for Aura
-                    $A.run(function () {
-                        // Start timming 
-                        $A.PERFCORE.mark('START:cmpRender');
-                        helper.renderComponent(component.find('container'), newCmp);
-
-                        // Use RAF to wait till the browser updates and paints
-                        $A.PERFCORE.later(300, function (t) {
-                            $A.PERFCORE.mark('END:cmpRender');
-                            $A.util.setDataAttribute(component.getElement(), 'app-rendered-component', 'true');
-                        });
-                    });
-                });
-                
-            };
-
-        if (descriptor) {
-            //$A.log("Loading component for " + JSON.stringify(descriptor));
-            helper.createComponent(descriptor.componentDef, descriptor.attributes && descriptor.attributes.values, callback);
+        if (!cmp.def) {
+            // LOAD DEFAULT PERF COMPONENT TO LIST OTHER COMPONENTS
+            helper.createComponent('perfTest:registeredComponents', {}, function (newCmp) {
+                component.find('container').set('v.body', newCmp);
+            });
         } else {
-            //$A.log('No component specified, listing components');
-            helper.createComponent('perfTest:registeredComponents', {}, callback);
+
+            // FRAMEWORK RUN:
+            // 1. Create cmp
+            // 2. Render cmp
+            // 3. After render (Paint cmp) (brwoser)
+
+            $A.PERFCORE.mark('PERF:start'); //Start!
+            // 1.
+            helper.perfCreateComponent(component, cmp, function (newCmp) {
+                // 2.
+                helper.perfRenderComponent(component, newCmp, function () {
+                    // 3.
+                    helper.perfAfterRender(component, newCmp, function () {
+                        // We are done! let the framework know.
+                        $A.util.setDataAttribute(component.getElement(), 'app-rendered-component', 'true');
+                   });
+                });
+            });
         }
     }
 })

@@ -1,4 +1,9 @@
 ({
+    /* 
+    * =====================================
+    * MOCKS 
+    * =====================================
+    */
     attributeMockValueProvider: {
         'Aura.Component': function(attrDef) {
             var cmp,
@@ -63,6 +68,70 @@
             return "Mock value for '" + attrDef.getDescriptor().getName() + "' attribute";
         }
     },
+    getAttributeMockValue: function(attributeDef) {
+        var type = attributeDef.getTypeDefDescriptor().substring(7); //trim prefix 'aura://'
+        var isArrayType = this.isArrayType(type);
+
+        if(isArrayType) { // Eg. String[]
+            type = type.substring(0, type.length - 2);
+        }
+        var valueProvider = this.attributeMockValueProvider[type];
+
+        if(!valueProvider) {
+            return $A.error("Value provider for type:'" + type + "' is not defined");
+        }
+
+        var value = valueProvider.call(this, attributeDef);
+        return isArrayType ? [value] : value;
+    },
+
+    getComponentMockValues: function(cmpName) {
+        var componentDef = $A.componentService.getDef(cmpName);
+
+        if(!componentDef) {
+            return $A.error("Unknown component descriptor name: " + cmpName);
+        }
+
+        var attrValues = {};
+        componentDef.getAttributeDefs().each(function(attrDef) {
+            if(this.needsAttrMocking(attrDef)) {
+                attrValues[attrDef.getDescriptor().getName()] = this.getAttributeMockValue(attrDef);
+            }
+        }.bind(this));
+
+        return attrValues;
+    },
+
+    parseObjectFromUrl: function () {
+        var hash = window.location.hash;
+
+        if (hash.length) {
+            return JSON.parse(decodeURIComponent(hash.substring(1)));
+        }
+        return {};
+    },
+
+    isArrayType: function(type) {
+        if(type && type.indexOf('[]') === type.length - 2) {
+            return true;
+        }
+        return false;
+    },
+
+    needsAttrMocking: function(attrDef) {
+        if(attrDef.getTypeDefDescriptor() == "aura://String" && !attrDef.getDefault()){
+            return true;
+        }
+        if(attrDef.isRequired()) {
+            return true;
+        }
+        return false;
+    },
+    /* 
+    * =====================================
+    * PERF CORE
+    * =====================================
+    */
     _rafPolyfill: function () {
         if (!Date.now) Date.now = function() { return new Date().getTime(); };
 
@@ -104,10 +173,46 @@
                     setTimeout(function () {
                         RAF(callback);
                     }, time);
+                },
+                setConfig: function (cfg) {
+                    var perf = (cfg && cfg.perfConfig) || {};
+                        cfg  = {
+                            startDelay: perf.startDelay || 300,
+                            waitTime  : perf.waitTime   || 300
+                        };
+
+                    this.config = cfg;
+                    return cfg;
                 }
             };
         }());
     },
+    getCmpDef: function (obj) {
+        return {
+            def  : obj.componentDef,
+            attr : obj.attributes && obj.attributes.values
+        };
+    },
+    /* 
+    * =====================================
+    * PERF HELPERS
+    * =====================================
+    */
+    perfCreateComponent: function (appCmp, cmp, callback) {
+        var self = this;
+        // Hook for executing perf stuff before
+        this.beforeCreateComponent(appCmp);
+
+        // Start cmp creation (measures start/end inside)
+        this.createComponent(cmp.def, cmp.attr, function (newCmp) {
+            // Hook for executing after creating perf stuff
+            self.afterCreateComponent(appCmp);
+            callback(newCmp);
+        });
+    },
+    
+    beforeCreateComponent: function (cmp) {},
+    afterCreateComponent: function (cmp) {},
 
     createComponent: function (componentDef, attributeValues, callback) {
         var payload;
@@ -143,69 +248,52 @@
         });
     },
 
-    getAttributeMockValue: function(attributeDef) {
-        var type = attributeDef.getTypeDefDescriptor().substring(7); //trim prefix 'aura://'
-        var isArrayType = this.isArrayType(type);
+    perfRenderComponent: function (appCmp, newCmp, callback) {
+        var self = this;
+        // Wait some window of time(ms) to stabilize the browser
+        $A.PERFCORE.later(50, function (t) {
+            // Create the context for Aura
+            $A.run(function () {
+                var container = appCmp.find('container');
 
-        if(isArrayType) { // Eg. String[]
-            type = type.substring(0, type.length - 2);
-        }
-        var valueProvider = this.attributeMockValueProvider[type];
+                // Before render (possibly execute some coql for some tests)
+                self.beforeRenderComponent(appCmp, newCmp);
+                // Render
+                self.renderComponent(container, newCmp);
 
-        if(!valueProvider) {
-            return $A.error("Value provider for type:'" + type + "' is not defined");
-        }
+                // After render code to possibly mark some changes
+                self.afterRenderComponent(appCmp);
 
-        var value = valueProvider.call(this, attributeDef);
-        return isArrayType ? [value] : value;
+                callback();
+            });
+        });
+    },
+    beforeRenderComponent: function (cmp) {/* TODO */},
+    afterRenderComponent: function (cmp) {/* TODO */},
+
+    /* 
+    * NOTE: The mark [END:cmpRender] does not mark the JS time 
+    * for rendering the component neither the browser time to paint
+    * This is just so we can isolate times for perf postprocessing
+    */
+    renderComponent: function (container, newCmp) {
+        $A.PERFCORE.mark('START:cmpRender'); 
+        $A.render(newCmp, container && container.getElement());
+        $A.afterRender(newCmp);
+        $A.PERFCORE.mark('END:cmpRender');
     },
 
-    getComponentMockValues: function(cmpName) {
-        var componentDef = $A.componentService.getDef(cmpName);
-
-        if(!componentDef) {
-            return $A.error("Unknown component descriptor name: " + cmpName);
-        }
-
-        var attrValues = {};
-        componentDef.getAttributeDefs().each(function(attrDef) {
-            if(this.needsAttrMocking(attrDef)) {
-                attrValues[attrDef.getDescriptor().getName()] = this.getAttributeMockValue(attrDef);
-            }
-        }.bind(this));
-
-        return attrValues;
+    perfAfterRender: function (appCmp, newCmp, callback) {
+        var self = this;
+         // Use RAF to wait till the browser updates and paints
+        $A.PERFCORE.later(500, function (t) {                    
+            $A.PERFCORE.mark('PERF:end'); //mark so we can 
+            // After render code to possibly mark some changes
+            self.afterRender(appCmp, newCmp);
+            // Mark the DOM to tell webdriver we are done
+            callback();
+        });
     },
-
-    getDescriptorFromUrl: function () {
-        var hash = window.location.hash;
-
-        if (hash.length) {
-            return JSON.parse(decodeURIComponent(hash.substring(1)));
-        }
-        return null;
-    },
-
-    isArrayType: function(type) {
-        if(type && type.indexOf('[]') === type.length - 2) {
-            return true;
-        }
-        return false;
-    },
-
-    needsAttrMocking: function(attrDef) {
-        if(attrDef.getTypeDefDescriptor() == "aura://String" && !attrDef.getDefault()){
-            return true;
-        }
-        if(attrDef.isRequired()) {
-            return true;
-        }
-        return false;
-    },
-
-    renderComponent: function (parentCmp, childCmp) {
-        var body = parentCmp.getValue('v.body');
-        body.destroy();
-        body.setValue(childCmp);
-    }
+    afterRender: function (appCmp, newCmp) {/* TODO */}
+    
 })

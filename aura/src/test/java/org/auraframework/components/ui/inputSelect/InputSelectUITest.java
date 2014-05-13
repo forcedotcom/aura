@@ -26,7 +26,7 @@ import org.openqa.selenium.support.ui.Select;
 
 public class InputSelectUITest extends WebDriverTestCase {
 
-    private final String URL = "/uitest/inputSelect_DynamicOptions.cmp";
+    private final String URL = "/uitest/inputSelect_DynamicOptionsTest.cmp";
     private final By selectLocator = By.xpath("//select[1]");
     private final String optionLocatorString = "//select[1]/option[text()='%s']";
 

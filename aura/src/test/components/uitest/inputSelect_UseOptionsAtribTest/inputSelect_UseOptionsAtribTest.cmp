@@ -16,5 +16,8 @@
 
 -->
 <aura:component model='java://org.auraframework.impl.java.model.TestJavaModel'>
-    <ui:inputSelect options="{!m.selectOptions}" aura:id="InputSelectOptions"/>
+    
+	<aura:handler name="init" value="{!this}" action="{!c.init}"/>
+    <ui:inputSelect aura:id="dynamicSelect"/>
+    <ui:inputSelect options="{!m.selectOptions}" aura:id="dynamicSelectModel"/>
 </aura:component>

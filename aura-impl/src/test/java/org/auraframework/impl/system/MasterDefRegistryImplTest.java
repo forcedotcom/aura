@@ -16,34 +16,60 @@
 package org.auraframework.impl.system;
 
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.RegistryAdapter;
 import org.auraframework.cache.Cache;
-import org.auraframework.def.*;
+import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.ClientLibraryDef;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.ControllerDef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.Definition;
+import org.auraframework.def.DefinitionAccess;
+import org.auraframework.def.DescriptorFilter;
+import org.auraframework.def.HelperDef;
+import org.auraframework.def.LayoutsDef;
+import org.auraframework.def.NamespaceDef;
+import org.auraframework.def.RendererDef;
+import org.auraframework.def.StyleDef;
 import org.auraframework.impl.AuraImpl;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.source.StringSourceLoader;
 import org.auraframework.service.BuilderService;
 import org.auraframework.service.ContextService;
-import org.auraframework.system.*;
+import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.system.DefRegistry;
+import org.auraframework.system.DependencyEntry;
+import org.auraframework.system.MasterDefRegistry;
+import org.auraframework.system.Source;
+import org.auraframework.system.SourceListener;
 import org.auraframework.test.AuraTestingUtil;
 import org.auraframework.test.annotation.ThreadHostileTest;
 import org.auraframework.test.annotation.UnAdaptableTest;
 import org.auraframework.test.util.AuraPrivateAccessor;
 import org.auraframework.throwable.NoAccessException;
-import org.auraframework.throwable.quickfix.*;
+import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+import org.auraframework.throwable.quickfix.QuickFixException;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.internal.util.MockUtil;
@@ -591,11 +617,10 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         assertNotNull(registry.getDef(cmpDesc));
         Mockito.verify(registry, Mockito.times(0)).compileDE(Mockito.eq(cmpDesc));
 
-        // another getDef on other registry instance should no longer re-compile the def since W-2106504
-        // TODO - change times(1) to times(0) when depsCache for non-uid-deps are reenabled
+        // another getDef on other registry instance should now compile zero additional times 
         registry = getDefRegistry(true);
         assertNotNull(registry.getDef(cmpDesc));
-        Mockito.verify(registry, Mockito.times(1)).compileDE(Mockito.eq(cmpDesc));
+        Mockito.verify(registry, Mockito.times(0)).compileDE(Mockito.eq(cmpDesc));
     }
 
     public void testGetDefDescriptorNull() throws Exception {
@@ -906,6 +931,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         //the descriptor cache is difficult to recreate.
         Cache<String, Set<DefDescriptor<?>>> cache = AuraPrivateAccessor.get(mdr, "descriptorFilterCache");
         for (String key : cache.getKeySet()) {
+            System.out.println(key.toString());
             if (key.startsWith(filter.toString() + "|")) {
                 return results.equals(cache.getIfPresent(key));
             }

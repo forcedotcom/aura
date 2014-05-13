@@ -15,53 +15,42 @@
  */
 ({
 	/**
-	 * Verify initial values are loaded correctly from model. 
+	 * Verify dynamic value change in init
 	 */
-	testInitialOptionSelected : {
+	testChangeSelectionDynamic : {
 		test : function(cmp) {
-			var inputSelectCmp = cmp.find("InputSelectOptions");
-			var optionCmps = inputSelectCmp.find("options");
-			this.verifySelectedOption(optionCmps, "Option2");
+			var inputSelectCmp = cmp.find("dynamicSelect");
+			this.validateComponentOptions(inputSelectCmp, "Option4")
 		}
 	},
-	
 	/**
-	 * Verify can change selected option to another option. 
+	 * Verify value change through model. In this case the component should have everything when it 
+	 * is actually hit the first time
 	 */
-	testChangeSelection : {
+	testChangeSelectionDynamicUsingModel : {
 		test : function(cmp) {
-			var inputSelectCmp = cmp.find("InputSelectOptions");
-			var optionCmps = inputSelectCmp.find("options");
-			
-			// deselect selected option
-			var selectedOption = this.getSelectedOption(optionCmps);
-			$A.test.assertFalse($A.util.isUndefinedOrNull(selectedOption),
-				"Expected option to be selected");
-			selectedOption.set("v.value", false);
-			
-			// select 1st option
-			optionCmps[0].set("v.value", true);
-			
-			// fire change event;
-			inputSelectCmp.get("e.change").fire();
-			
-			this.verifySelectedOption(optionCmps, "Option1");
+			var inputSelectCmp = cmp.find("dynamicSelectModel");
+			this.validateComponentOptions(inputSelectCmp, "Option1")
 		}
 	},
-	
+	validateComponentOptions : function(cmp, option) {
+	        cmp.set("v.value", option);
+		var optionCmps = cmp.getElement().children;
+		this.verifySelectedOption(optionCmps, option);
+	},
 	verifySelectedOption : function(options, selectedLabel) {
 		var selectedOptionLabel = "None Selected";
 		var selectedOption = this.getSelectedOption(options);
 		if (!$A.util.isUndefinedOrNull(selectedOption)) {
-			selectedOptionLabel = selectedOption.get("v.label");
+			selectedOptionLabel = $A.test.getText(selectedOption);
 		}
 		$A.test.assertEquals(selectedLabel, selectedOptionLabel, 
-			"Incorrect option selected");
+			"Incorrect option selected; Comparing by \"Match by DOM Element\".");
 	},
-	
-	getSelectedOption : function(options) {
+
+	getSelectedOption : function(options){
 		for (var i=0; i<options.length; i++) {
-			if (options[i].get("v.value") === true) {
+			if (options[i].selected) {
 				return options[i];
 			}
 		}

@@ -61,6 +61,9 @@ public final class PerfMetricsComparator {
         map.put("Timeline.Rendering.DrawFrame", "ignored");
         map.put("Timeline.Rendering.RequestMainThreadFrame", "ignored");
         map.put("Timeline.Rendering.BeginFrame", "ignored");
+        map.put("Timeline.Scripting.TimeStamp", "we put those");
+
+        map.put("Timeline.Painting.CompositeLayers", "ignored until we recreate gold files"); // TODO
 
         METRICS_TO_EXCLUDE = ImmutableMap.copyOf(map);
     }

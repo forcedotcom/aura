@@ -89,6 +89,16 @@ public final class RDPProtocolTest extends AbstractPerfTestCase {
         List<RDPNotification> notifications = getRDPNotifications();
         RDPAnalyzer analyzer = new RDPAnalyzer(notifications);
 
+        // UC: check start and end mark are at beginning/end of filtered timeline
+        List<JSONObject> filteredTimeline = analyzer.getFlattenedTimelineEvents();
+        int filteredSize = filteredTimeline.size();
+        JSONObject firstEntry = filteredTimeline.get(0);
+        JSONObject lastEntry = filteredTimeline.get(filteredSize - 1);
+        assertTrue(firstEntry.toString(),
+                TimelineEventUtil.hasTimelineTimeStamp(firstEntry, RDPAnalyzer.MARK_TIMELINE_START));
+        assertTrue(lastEntry.toString(),
+                TimelineEventUtil.hasTimelineTimeStamp(lastEntry, RDPAnalyzer.MARK_TIMELINE_END));
+
         // UC: check the marks exists and in the right order
         List<String> marks = Lists.newArrayList();
         for (JSONObject timelineEvent : analyzer.getFlattenedTimelineEvents()) {
@@ -97,7 +107,8 @@ public final class RDPProtocolTest extends AbstractPerfTestCase {
                 marks.add(mark);
             }
         }
-        assertEquals("[START:cmpCreate, END:cmpCreate, START:cmpRender, END:cmpRender]", marks.toString());
+        assertEquals("[PERF:start, START:cmpCreate, END:cmpCreate, START:cmpRender, END:cmpRender, PERF:end]",
+                marks.toString());
     }
 
     public void testGetDevToolsLog() throws Exception {

@@ -177,7 +177,7 @@
                 setConfig: function (cfg) {
                     var perf = (cfg && cfg.perfConfig) || {};
                         cfg  = {
-                            startDelay: perf.startDelay || 300,
+                            startDelay: perf.startDelay || 100,
                             waitTime  : perf.waitTime   || 300
                         };
 
@@ -271,12 +271,12 @@
     beforeRenderComponent: function (cmp) {/* TODO */},
     afterRenderComponent: function (cmp) {/* TODO */},
 
-    /* 
-    * NOTE: The mark [END:cmpRender] does not mark the JS time 
-    * for rendering the component neither the browser time to paint
-    * This is just so we can isolate times for perf postprocessing
-    */
     renderComponent: function (container, newCmp) {
+        /* 
+        * NOTE: The mark [END:cmpRender] does not mark the JS time 
+        * for rendering the component neither the browser time to paint
+        * This is just so we can isolate times for perf postprocessing
+        */
         $A.PERFCORE.mark('START:cmpRender'); 
         $A.render(newCmp, container && container.getElement());
         $A.afterRender(newCmp);

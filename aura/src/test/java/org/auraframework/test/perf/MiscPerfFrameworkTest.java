@@ -22,7 +22,6 @@ import java.util.Map;
 import org.auraframework.test.WebDriverTestCase.TargetBrowsers;
 import org.auraframework.test.WebDriverUtil.BrowserType;
 import org.auraframework.test.perf.core.AbstractPerfTestCase;
-import org.auraframework.test.perf.metrics.PerfMetric;
 import org.auraframework.test.perf.metrics.PerfMetrics;
 import org.auraframework.test.perf.metrics.PerfMetricsCollector;
 import org.auraframework.test.perf.metrics.PerfRunsCollector;
@@ -84,40 +83,6 @@ public final class MiscPerfFrameworkTest extends AbstractPerfTestCase {
         assertTrue(entry.containsKey("responseStart"));
 
         // PerfWebDriverUtil.showResourceTimingData(data);
-    }
-
-    public void testPageRefresh() throws Exception {
-        PerfMetricsCollector metricsCollector = new PerfMetricsCollector(this, true);
-        metricsCollector.startCollecting();
-        openRaw("/ui/label.cmp?label=foo");
-        PerfMetrics metrics = metricsCollector.stopCollecting();
-        logger.info("METRICS (first):\n" + metrics.toLongString());
-        PerfMetric paint = metrics.getMetric("Timeline.Painting.Paint");
-        int numPaintsInit = paint.getIntValue();
-        assertTrue("init: " + numPaintsInit, numPaintsInit >= 3); // TODO: why is bigger the first time?
-        int bytes = metrics.getMetric("Network.encodedDataLength").getIntValue();
-        assertTrue("nothing cached: " + bytes, bytes > 100000);
-
-        // do a page refresh
-        metricsCollector = new PerfMetricsCollector(this, true);
-        metricsCollector.startCollecting();
-        currentDriver.navigate().refresh();
-        metrics = metricsCollector.stopCollecting();
-        logger.info("METRICS (refresh):\n" + metrics.toLongString());
-        paint = metrics.getMetric("Timeline.Painting.Paint");
-        int numPaintsRefresh = paint.getIntValue();
-        assertTrue("refresh: " + numPaintsRefresh, numPaintsRefresh < numPaintsInit);
-
-        // go to the same page instead of refreshing
-        metricsCollector = new PerfMetricsCollector(this, true);
-        metricsCollector.startCollecting();
-        openRaw("/ui/label.cmp?label=foo");
-        metrics = metricsCollector.stopCollecting();
-        logger.info("METRICS (revisit):\n" + metrics.toLongString());
-        paint = metrics.getMetric("Timeline.Painting.Paint");
-        int numPaintsGet = paint.getIntValue();
-        assertTrue("get: " + numPaintsGet, numPaintsGet < numPaintsInit);
-        assertEquals(numPaintsRefresh, paint.getIntValue()); // refresh on browser gives 2 also
     }
 
     public void testMultipleRunsReuseWebDriver() throws Exception {

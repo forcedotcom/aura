@@ -12,6 +12,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 public abstract class AbstractPerfTestCase extends WebDriverTestCase {
 
@@ -70,7 +71,9 @@ public abstract class AbstractPerfTestCase extends WebDriverTestCase {
         // wait for component loaded or aura error message
         final By componentLoaded = By.cssSelector("[data-app-rendered-component]");
         final By auraErrorMessage = By.id("auraErrorMessage");
-        By locatorFound = auraUITestingUtil.waitUntil(new ExpectedCondition<By>() {
+
+        // don't use the AuraUITestingUtil wait that does extra checks/processing
+        ExpectedCondition<By> condition = new ExpectedCondition<By>() {
             @Override
             public By apply(WebDriver d) {
                 if (d.findElement(auraErrorMessage).isDisplayed()) {
@@ -81,7 +84,10 @@ public abstract class AbstractPerfTestCase extends WebDriverTestCase {
                 }
                 return null;
             }
-        }, String.format("Error loading %s", descriptor.getName()));
+        };
+        By locatorFound = new WebDriverWait(currentDriver, 60).withMessage("Error loading " + descriptor).until(
+                condition);
+
         if (locatorFound == auraErrorMessage) {
             fail("Error loading " + descriptor.getName() + ": " + currentDriver.findElement(auraErrorMessage).getText());
         }

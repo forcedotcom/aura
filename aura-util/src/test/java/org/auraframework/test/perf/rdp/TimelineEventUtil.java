@@ -165,7 +165,7 @@ public class TimelineEventUtil {
     /**
      * @return true if the timelineEvent or one of its descendants is a time stamp with the given message
      */
-    public static boolean hasTimelineTimeStamp(JSONObject timelineEvent, String message) {
+    public static boolean containsTimelineTimeStamp(JSONObject timelineEvent, String message) {
         if (isTimelineTimeStamp(timelineEvent, message)) {
             return true;
         }
@@ -174,7 +174,7 @@ public class TimelineEventUtil {
             try {
                 JSONArray children = timelineEvent.getJSONArray("children");
                 for (int i = 0; i < children.length(); i++) {
-                    if (hasTimelineTimeStamp(children.getJSONObject(i), message)) {
+                    if (containsTimelineTimeStamp(children.getJSONObject(i), message)) {
                         return true;
                     }
                 }

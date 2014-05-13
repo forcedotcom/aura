@@ -26,9 +26,9 @@ import org.json.JSONObject;
 
 import com.google.common.collect.Lists;
 
-public final class RDPProtocolTest extends AbstractPerfTestCase {
+public final class RDPAnalyzerTest extends AbstractPerfTestCase {
 
-    public RDPProtocolTest(String name) {
+    public RDPAnalyzerTest(String name) {
         super(name);
     }
 
@@ -90,18 +90,18 @@ public final class RDPProtocolTest extends AbstractPerfTestCase {
         RDPAnalyzer analyzer = new RDPAnalyzer(notifications);
 
         // UC: check start and end mark are at beginning/end of filtered timeline
-        List<JSONObject> filteredTimeline = analyzer.getFlattenedTimelineEvents();
+        List<JSONObject> filteredTimeline = analyzer.getFilteredFlattenedTimelineEvents();
         int filteredSize = filteredTimeline.size();
         JSONObject firstEntry = filteredTimeline.get(0);
         JSONObject lastEntry = filteredTimeline.get(filteredSize - 1);
         assertTrue(firstEntry.toString(),
-                TimelineEventUtil.hasTimelineTimeStamp(firstEntry, RDPAnalyzer.MARK_TIMELINE_START));
+                TimelineEventUtil.containsTimelineTimeStamp(firstEntry, RDPAnalyzer.MARK_TIMELINE_START));
         assertTrue(lastEntry.toString(),
-                TimelineEventUtil.hasTimelineTimeStamp(lastEntry, RDPAnalyzer.MARK_TIMELINE_END));
+                TimelineEventUtil.containsTimelineTimeStamp(lastEntry, RDPAnalyzer.MARK_TIMELINE_END));
 
         // UC: check the marks exists and in the right order
         List<String> marks = Lists.newArrayList();
-        for (JSONObject timelineEvent : analyzer.getFlattenedTimelineEvents()) {
+        for (JSONObject timelineEvent : analyzer.getFilteredFlattenedTimelineEvents()) {
             String mark = TimelineEventUtil.isTimelineTimeStamp(timelineEvent);
             if (mark != null) {
                 marks.add(mark);
@@ -116,21 +116,22 @@ public final class RDPProtocolTest extends AbstractPerfTestCase {
         metricsCollector.startCollecting();
         runWithPerfApp(getDefDescriptor("ui:button"));
         metricsCollector.stopCollecting();
+        RDPAnalyzer analyzer = metricsCollector.getRDPAnalyzer();
 
         // UC: whole dev tools log
-        List<JSONObject> fulDevToolsLog = metricsCollector.getDevToolsLog();
+        List<JSONObject> fulDevToolsLog = analyzer.getDevToolsLog();
         int fullSize = fulDevToolsLog.size();
         assertTrue(fulDevToolsLog.size() > 10);
 
         // UC: dev tools log between marks
-        List<JSONObject> trimmedDevToolsLog = metricsCollector.getDevToolsLogBetweenMarks();
+        List<JSONObject> trimmedDevToolsLog = analyzer.getFilteredDevToolsLog();
         int trimmedSize = trimmedDevToolsLog.size();
         assertTrue("full " + fullSize + ", trimmed " + trimmedSize, trimmedSize < fullSize);
         JSONObject firstEntry = trimmedDevToolsLog.get(0);
         JSONObject lastEntry = trimmedDevToolsLog.get(trimmedSize - 1);
         assertTrue(firstEntry.toString(),
-                TimelineEventUtil.hasTimelineTimeStamp(firstEntry, RDPAnalyzer.MARK_TIMELINE_START));
+                TimelineEventUtil.containsTimelineTimeStamp(firstEntry, RDPAnalyzer.MARK_TIMELINE_START));
         assertTrue(lastEntry.toString(),
-                TimelineEventUtil.hasTimelineTimeStamp(lastEntry, RDPAnalyzer.MARK_TIMELINE_END));
+                TimelineEventUtil.containsTimelineTimeStamp(lastEntry, RDPAnalyzer.MARK_TIMELINE_END));
     }
 }

@@ -42,20 +42,30 @@ public final class RDPAnalyzer {
     protected static final Logger LOG = Logger.getLogger(RDPAnalyzer.class.getSimpleName());
 
     private final List<RDPNotification> notifications;
-    private final List<JSONObject> flattenedTimelineEvents;
+    private final List<RDPNotification> filteredNotifications;
+    private final List<JSONObject> filteredFlattenedTimelineEvents;
     private Map<String, TimelineEventStats> timelineEventsStats;
 
     public RDPAnalyzer(List<RDPNotification> notifications) {
         this.notifications = notifications;
-        List<JSONObject> allTimelineEvents = RDPUtil.flattenedTimelineEvents(notifications);
-        this.flattenedTimelineEvents = RDPUtil.eventsBetweenTimelineMarks(allTimelineEvents, MARK_TIMELINE_START,
+        filteredNotifications = RDPUtil.filteredNotifications(notifications, MARK_TIMELINE_START,
                 MARK_TIMELINE_END);
-        LOG.info("num timeline events: " + allTimelineEvents.size() + ", num filtered: "
-                + this.flattenedTimelineEvents.size());
+
+        List<JSONObject> flattenedTimelineEvents = RDPUtil.flattenedTimelineEvents(notifications);
+        this.filteredFlattenedTimelineEvents = RDPUtil.filteredTimeline(flattenedTimelineEvents,
+                MARK_TIMELINE_START,
+                MARK_TIMELINE_END);
+
+        LOG.info("num timeline events: " + flattenedTimelineEvents.size() + ", num filtered: "
+                + this.filteredFlattenedTimelineEvents.size());
     }
 
-    public List<JSONObject> getFlattenedTimelineEvents() {
-        return flattenedTimelineEvents;
+    public List<RDPNotification> getFilteredNotifications() {
+        return filteredNotifications;
+    }
+
+    public List<JSONObject> getFilteredFlattenedTimelineEvents() {
+        return filteredFlattenedTimelineEvents;
     }
 
     /**
@@ -67,9 +77,9 @@ public final class RDPAnalyzer {
         }
 
         timelineEventsStats = Maps.newHashMap();
-        for (JSONObject timelineEvent : flattenedTimelineEvents) {
+        for (JSONObject timelineEvent : filteredFlattenedTimelineEvents) {
             try {
-                analyzeTimelineEvent(timelineEvent);
+                collectTimelineEvent(timelineEvent);
             } catch (Exception e) {
                 LOG.log(Level.WARNING, String.valueOf(timelineEvent), e);
             }
@@ -81,7 +91,7 @@ public final class RDPAnalyzer {
      * @param timeline event, see
      *            https://developers.google.com/chrome-developer-tools/docs/protocol/tot/timeline#type-TimelineEvent
      */
-    private void analyzeTimelineEvent(JSONObject timelineEvent) throws JSONException {
+    private void collectTimelineEvent(JSONObject timelineEvent) throws JSONException {
         // add event itself
         String type = timelineEvent.getString("type");
 
@@ -125,10 +135,10 @@ public final class RDPAnalyzer {
         int numRequests = 0;
         int totalEncodedDataLength = 0;
         JSONArray details = new JSONArray();
-        for (RDPNotification timelineEvent : RDPUtil.filterNotifications(notifications, Domain.Network)) {
+        for (RDPNotification notification : RDPUtil.filterNotifications(filteredNotifications, Domain.Network)) {
             try {
-                String method = timelineEvent.getMethod();
-                JSONObject params = timelineEvent.getParams();
+                String method = notification.getMethod();
+                JSONObject params = notification.getParams();
                 if (Network.requestWillBeSent.equals(method)) {
                     JSONObject request = params.getJSONObject("request");
                     JSONObject detail = new JSONObject();
@@ -142,7 +152,7 @@ public final class RDPAnalyzer {
                 String requestId = params.getString("requestId");
                 JSONObject detail = requestIdToDetail.get(requestId);
                 if (detail == null) {
-                    LOG.log(Level.WARNING, "no matching requestWillBeSent found for: " + timelineEvent.toJSONString());
+                    LOG.log(Level.WARNING, "no matching requestWillBeSent found for: " + notification.toJSONString());
                     // spurious first events?
                     continue;
                 }
@@ -177,7 +187,7 @@ public final class RDPAnalyzer {
                     requestIdToDetail.remove(requestId);
                 }
             } catch (Exception e) {
-                LOG.log(Level.WARNING, timelineEvent.toJSONString(), e);
+                LOG.log(Level.WARNING, notification.toJSONString(), e);
             }
         }
 
@@ -197,5 +207,30 @@ public final class RDPAnalyzer {
         encodedDataLengthMetric.setDetails(details);
 
         return Lists.newArrayList(numRequestsMetric, encodedDataLengthMetric);
+    }
+
+    // dev tools log
+
+    public List<JSONObject> getDevToolsLog() {
+        List<JSONObject> devToolsLog = Lists.newArrayList();
+        for (RDPNotification notification : notifications) {
+            if (notification.isTimelineEvent()) {
+                devToolsLog.add(notification.getTimelineEvent());
+            }
+        }
+        return devToolsLog;
+    }
+
+    /**
+     * @return the log between our timeline marks only
+     */
+    public List<JSONObject> getFilteredDevToolsLog() {
+        List<JSONObject> devToolsLog = Lists.newArrayList();
+        for (RDPNotification notification : filteredNotifications) {
+            if (notification.isTimelineEvent()) {
+                devToolsLog.add(notification.getTimelineEvent());
+            }
+        }
+        return devToolsLog;
     }
 }

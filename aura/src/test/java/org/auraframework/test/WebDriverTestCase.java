@@ -271,7 +271,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
 
                     runsCollector.addRun(metricsCollector.stopCollecting());
                     // TODO: maybe the devToolsLog should be optional for optimization
-                    List<JSONObject> devToolsLog = metricsCollector.getDevToolsLogBetweenMarks();
+                    List<JSONObject> devToolsLog = metricsCollector.getRDPAnalyzer().getFilteredDevToolsLog();
                     PerfWebDriverUtil.writeDevToolsLog(devToolsLog, this, i, auraUITestingUtil.getUserAgent());
                 } finally {
                     perBrowserTearDown();

@@ -64,6 +64,8 @@ public final class PerfMetricsComparator {
         map.put("Timeline.Scripting.TimeStamp", "we put those");
 
         map.put("Timeline.Painting.CompositeLayers", "ignored until we recreate gold files"); // TODO
+        map.put("Network.encodedDataLength", "ignored until we recreate gold files"); // TODO
+        map.put("Network.numRequests", "ignored until we recreate gold files"); // TODO
 
         METRICS_TO_EXCLUDE = ImmutableMap.copyOf(map);
     }

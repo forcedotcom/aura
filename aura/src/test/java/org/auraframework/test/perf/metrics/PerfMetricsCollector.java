@@ -25,13 +25,9 @@ import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.WebDriverTestCase;
 import org.auraframework.test.perf.rdp.RDPAnalyzer;
 import org.auraframework.test.perf.rdp.RDPNotification;
-import org.auraframework.test.perf.rdp.RDPUtil;
 import org.auraframework.test.perf.rdp.TimelineEventStats;
 import org.auraframework.test.perf.rdp.TimelineEventUtil;
 import org.json.JSONArray;
-import org.json.JSONObject;
-
-import com.google.common.collect.Lists;
 
 /**
  * Collects and holds raw perf metrics data for a test case
@@ -50,12 +46,17 @@ public final class PerfMetricsCollector {
     private Map<String, String> uiPerfStats;
     private List<RDPNotification> notifications;
 
+    private RDPAnalyzer rdpAnalyzer;
     private final boolean captureTimelineMetrics;
     private static final boolean captureJSHeapMetrics = false; // slow
 
     public PerfMetricsCollector(WebDriverTestCase test, boolean captureTimelineMetrics) {
         this.test = test;
         this.captureTimelineMetrics = captureTimelineMetrics;
+    }
+
+    public RDPAnalyzer getRDPAnalyzer() {
+        return rdpAnalyzer;
     }
 
     // events
@@ -100,15 +101,15 @@ public final class PerfMetricsCollector {
             metrics.setMetric(new PerfMetric("WallTime", elapsedMillis, "milliseconds"));
 
             if (captureTimelineMetrics) {
-                RDPAnalyzer analyzer = new RDPAnalyzer(notifications);
+                rdpAnalyzer = new RDPAnalyzer(notifications);
 
                 // add "Network..." metrics:
-                for (PerfMetric metric : analyzer.analyzeNetworkDomain()) {
+                for (PerfMetric metric : rdpAnalyzer.analyzeNetworkDomain()) {
                     metrics.setMetric(metric);
                 }
 
                 // add "Timeline..." metrics:
-                Map<String, TimelineEventStats> timelineEventsStats = analyzer.analyzeTimelineDomain();
+                Map<String, TimelineEventStats> timelineEventsStats = rdpAnalyzer.analyzeTimelineDomain();
                 for (TimelineEventStats stats : timelineEventsStats.values()) {
                     PerfMetric metric = new PerfMetric();
                     metric.setName(TimelineEventUtil.toMetricName(stats.getType()));
@@ -142,43 +143,6 @@ public final class PerfMetricsCollector {
     private boolean hasAuraStats() {
         Mode mode = test.getCurrentAuraMode();
         return mode == Mode.PTEST || mode == Mode.CADENCE;
-    }
-
-    public List<JSONObject> getDevToolsLog() {
-        List<JSONObject> devToolsLog = Lists.newArrayList();
-        for (RDPNotification notification : notifications) {
-            if (notification.isTimelineEvent()) {
-                devToolsLog.add(notification.getTimelineEvent());
-            }
-        }
-        return devToolsLog;
-    }
-
-    /**
-     * @return the log between our timeline marks only
-     */
-    public List<JSONObject> getDevToolsLogBetweenMarks() {
-        List<JSONObject> all = getDevToolsLog();
-
-        // return full timeline if there are no marks
-        if (!RDPUtil.containsTimelineStamp(all, RDPAnalyzer.MARK_TIMELINE_START)) {
-            return all;
-        }
-
-        List<JSONObject> trimmed = Lists.newArrayList();
-        boolean between = false;
-        for (JSONObject event : all) {
-            if (!between) {
-                between = TimelineEventUtil.hasTimelineTimeStamp(event, RDPAnalyzer.MARK_TIMELINE_START);
-            }
-            if (between) {
-                trimmed.add(event);
-                if (TimelineEventUtil.hasTimelineTimeStamp(event, RDPAnalyzer.MARK_TIMELINE_END)) {
-                    break;
-                }
-            }
-        }
-        return trimmed;
     }
 
     @Override

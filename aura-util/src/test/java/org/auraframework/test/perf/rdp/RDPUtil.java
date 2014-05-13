@@ -80,10 +80,34 @@ public final class RDPUtil {
     }
 
     /**
+     * @return notifications between MARK_TIMELINE_START and MARK_TIMELINE_END (if they exist, otherwise return all
+     *         notifications)
+     */
+    public static List<RDPNotification> filteredNotifications(List<RDPNotification> notifications,
+            String startStamp, String endStamp) {
+        List<RDPNotification> filtered = Lists.newArrayList();
+        boolean skip = notificationsContainTimelineStamp(notifications, startStamp);
+        for (RDPNotification notification : notifications) {
+            if (skip && notification.isTimelineEvent()
+                    && TimelineEventUtil.containsTimelineTimeStamp(notification.getTimelineEvent(), startStamp)) {
+                skip = false;
+            }
+            if (!skip) {
+                filtered.add(notification);
+                if (notification.isTimelineEvent()
+                        && TimelineEventUtil.containsTimelineTimeStamp(notification.getTimelineEvent(), endStamp)) {
+                    break;
+                }
+            }
+        }
+        return filtered;
+    }
+
+    /**
      * @return timeline events between MARK_TIMELINE_START and MARK_TIMELINE_END (if they exist, otherwise return the
      *         whole timeline)
      */
-    public static List<JSONObject> eventsBetweenTimelineMarks(List<JSONObject> timelineEvents,
+    public static List<JSONObject> filteredTimeline(List<JSONObject> timelineEvents,
             String startStamp, String endStamp) {
         List<JSONObject> filtered = Lists.newArrayList();
         boolean skip = containsTimelineStamp(timelineEvents, startStamp);
@@ -101,12 +125,25 @@ public final class RDPUtil {
         return filtered;
     }
 
-    public static boolean containsTimelineStamp(List<JSONObject> timelineEvents, String timeStamp) {
+    private static boolean containsTimelineStamp(List<JSONObject> timelineEvents, String timeStamp) {
         if (timeStamp == null) {
             return false;
         }
         for (JSONObject event : timelineEvents) {
-            if (TimelineEventUtil.hasTimelineTimeStamp(event, timeStamp)) {
+            if (TimelineEventUtil.containsTimelineTimeStamp(event, timeStamp)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean notificationsContainTimelineStamp(List<RDPNotification> notifications, String timeStamp) {
+        if (timeStamp == null) {
+            return false;
+        }
+        for (RDPNotification notification : notifications) {
+            if (notification.isTimelineEvent()
+                    && TimelineEventUtil.containsTimelineTimeStamp(notification.getTimelineEvent(), timeStamp)) {
                 return true;
             }
         }

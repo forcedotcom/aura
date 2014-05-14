@@ -122,15 +122,15 @@
     optionsStrategy: {
     	// If an option is in newValues, we want to select it
     	updateOptions : function(options, newValues) {
-    		var isMultiple = $A.util.isArray(newValues);
+    		var isMultiple = newValues.length > 1;
     		var updated = false;
 
     		$A.util.forEach(options, function(option) {
     			var val = option.value;
     			var selectOption = (isMultiple && aura.util.arrayIndexOf(newValues, val) > -1) || newValues[0] == val.toString();
     			
+    			updated = updated || (option.selected != selectOption);
     			option.selected = selectOption;
-    			updated = updated || selectOption;
     		}, this);
     		
     		return updated;

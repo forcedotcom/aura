@@ -672,8 +672,8 @@ public class AuraContextImpl implements AuraContext {
         this.overrideThemeDescriptor = themeDescriptor;
     }
 
-	@Override
-	public DefDescriptor<?> getCurrentDescriptor() {
+    @Override
+    public DefDescriptor<?> getCurrentDescriptor() {
         DefDescriptor<?> caller = getCurrentCaller();
         if (caller == null) {
             InstanceStack istack = getInstanceStack();
@@ -682,7 +682,6 @@ public class AuraContextImpl implements AuraContext {
                 caller = instance.getDescriptor();
             }
         }
-		
-		return caller;
-	}
+        return caller;
+    }
 }

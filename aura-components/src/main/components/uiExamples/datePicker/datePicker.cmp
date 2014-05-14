@@ -15,16 +15,14 @@
     limitations under the License.
 
 -->
-<aura:component access="global">
-    <aura:attribute name="label" type="String" required="true"/>
-    <aura:attribute name="description" type="Aura.Component[]" required="true"/>
-    <aura:attribute name="descriptor" type="String" required="true"/>
-    
-    <div class="container">
-    	<h3>{!v.label}</h3>
-    	
-    	<div class="description"><aura:unescapedHtml value="{!v.description}"/></div>
-    
-		<auradocs:viewer descriptor="{!v.descriptor}"/>
-	</div>
+<aura:component>
+	<ul>
+		<li><ui:inputDateTrigger/></li>
+		<li><ui:inputDateTrigger/></li>
+		<li><ui:inputDateTrigger/></li>
+		<li><ui:inputDateTrigger/></li>
+		<li><ui:inputDateTrigger/></li>
+	</ul>	
+	
+	<ui:datePickerManager/>
 </aura:component>

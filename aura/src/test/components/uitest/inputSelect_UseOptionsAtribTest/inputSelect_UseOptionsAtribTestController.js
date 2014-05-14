@@ -14,27 +14,12 @@
  * limitations under the License.
  */
 ({
-    afterRender : function(component, helper) {
-        this.superAfterRender();
-        helper.initAfterRender(component);
-    },
-
-    rerender : function(component, helper) {
-        var enabled = $A.util.getBooleanValue(component.get("v.enabled"));
-
-        this.superRerender();
-
-        if (enabled) {
-            if (!component._scroller) {
-                helper.initAfterRender(component);
-            }
-        } else {
-            helper.deactivate(component);
-        }
-    },
-
-    unrender : function(component, helper) {
-        helper.deactivate(component);
-        this.superUnrender();
-    }
+	init : function(cmp) {
+		var opts = [{ "label": "Option1", "value": "Option1", "class": "option" },
+		            { "label": "Option2", "value": "Option2", "class": "option", "selected": true },
+		            { "label": "Option3", "value": "Option3", "class": "option" },
+		            { "label": "Option4", "value": "Option4", "class": "option" }];
+		
+		cmp.find("dynamicSelect").set("v.options", opts);
+	}
 })

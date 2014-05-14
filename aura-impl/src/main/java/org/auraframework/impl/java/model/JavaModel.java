@@ -24,6 +24,8 @@ import java.util.Map;
 import org.auraframework.Aura;
 import org.auraframework.def.*;
 import org.auraframework.expression.PropertyReference;
+
+import org.auraframework.impl.adapter.BeanAdapterImpl;
 import org.auraframework.impl.java.type.JavaValueProvider;
 import org.auraframework.instance.InstanceStack;
 import org.auraframework.instance.Model;
@@ -36,27 +38,41 @@ import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
 
 /**
+ * A java model.
+ *
+ * A java model can have a 'bean' flag similar to a controller, but the meaning here is subtly different.
+ * If you set the bean flag on a model, it goes through the bean adapter just like a controller. This should
+ * not be depended on in stand-alone aura, as a given implementation may change the semantics of BeanAdapter.
+ *
+ * In the event that you do not set the flag, the model is directly instantiated from the class (unlike controllers
+ * which are static).
  */
 public class JavaModel implements Model {
     private final Object bean;
-    private final JavaModelDef modelDef;
+    private final JavaModelDefImpl modelDef;
     private final String path;
 
-    public JavaModel(JavaModelDef modelDef) {
+    /**
+     * The constructor.
+     *
+     * @param modelDef the definition for the model.
+     */
+    public JavaModel(JavaModelDefImpl modelDef) {
         this.modelDef = modelDef;
         InstanceStack iStack = Aura.getContextService().getCurrentContext().getInstanceStack();
         iStack.pushInstance(this);
         iStack.setAttributeName("m");
         this.path = iStack.getPath();
-        Class<?> clazz = this.modelDef.getJavaType();
         try {
-            this.bean = clazz.newInstance();
-        } catch (InstantiationException e) {
-            throw new AuraRuntimeException(e);
-        } catch (IllegalAccessException e) {
-            throw new AuraRuntimeException(e);
+            if (modelDef.isBean()) {
+                this.bean = Aura.getBeanAdapter().getModelBean(modelDef);
+            } else {
+                this.bean = BeanAdapterImpl.buildValidatedClass(modelDef.getJavaType());
+            }
+        } catch (AuraRuntimeException are) {
+            throw are;
         } catch(Exception e){
-        	throw makeException(e.getMessage(),e,this.modelDef);
+            throw makeException(e.getMessage(),e,this.modelDef);
         }
         iStack.clearAttributeName("m");
         iStack.popInstance(this);
@@ -138,8 +154,7 @@ public class JavaModel implements Model {
                     int i;
 
                     try {
-                        i = Integer.parseInt(part); // NumberFormatException
-                                                    // will be caught below
+                        i = Integer.parseInt(part); // NumberFormatException will be caught below
                     } catch (NumberFormatException nfe) {
                         throw makeException(nfe.getMessage(), nfe, def);
                     }

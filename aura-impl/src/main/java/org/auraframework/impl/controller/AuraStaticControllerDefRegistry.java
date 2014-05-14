@@ -21,7 +21,7 @@ import java.util.Set;
 import org.auraframework.Aura;
 import org.auraframework.def.*;
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.impl.java.controller.JavaControllerDef.Builder;
+import org.auraframework.impl.java.controller.JavaControllerDefImpl.Builder;
 import org.auraframework.impl.java.controller.JavaControllerDefFactory;
 import org.auraframework.impl.system.StaticDefRegistryImpl;
 import org.auraframework.throwable.AuraUnhandledException;
@@ -81,7 +81,7 @@ public class AuraStaticControllerDefRegistry extends StaticDefRegistryImpl<Contr
 
         Builder builder = new Builder();
         try {
-            builder.setActionMap(JavaControllerDefFactory.createActions(controller, controllerDesc));
+            builder.setActionMap(JavaControllerDefFactory.createActions(controller, controllerDesc, false));
         } catch (QuickFixException qfe) {
             throw new AuraUnhandledException("Broken Controller: " + qualifiedName, qfe);
         }

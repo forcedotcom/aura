@@ -17,6 +17,7 @@ package org.auraframework;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.auraframework.adapter.BeanAdapter;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.adapter.ExceptionAdapter;
@@ -187,6 +188,13 @@ public class Aura {
      */
     public static CachingService getCachingService() {
         return Aura.get(CachingService.class);
+    }
+
+    /**
+     * Get the bean adapter for aura to create controller/model beans.
+     */
+    public static BeanAdapter getBeanAdapter() {
+        return Aura.get(BeanAdapter.class);
     }
     
     public static <T> T get(Class<T> type) {

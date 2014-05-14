@@ -16,6 +16,7 @@
 package org.auraframework.impl.java.model;
 
 import java.io.IOException;
+
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Collection;
@@ -23,10 +24,15 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import org.auraframework.Aura;
+
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.JavaModelDef;
 import org.auraframework.def.ModelDef;
 import org.auraframework.def.TypeDef;
 import org.auraframework.def.ValueDef;
+
+import org.auraframework.impl.adapter.BeanAdapterImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
@@ -43,17 +49,46 @@ import org.auraframework.util.json.Json;
  * 
  * The framework imposes a two stage construction/validation framework onto
  */
-public class JavaModelDef extends DefinitionImpl<ModelDef> implements ModelDef {
-    public JavaModelDef(Builder builder) {
+public class JavaModelDefImpl extends DefinitionImpl<ModelDef> implements JavaModelDef {
+    public JavaModelDefImpl(Builder builder) {
         super(builder);
         this.modelClass = builder.modelClass;
         this.memberMap = AuraUtil.immutableMap(builder.memberMap);
+        this.bean = builder.bean;
+    }
+
+    @Override
+    public void validateDefinition() throws QuickFixException {
+        super.validateDefinition();
+        if (this.bean) {
+            Aura.getBeanAdapter().validateModelBean(this);
+        } else {
+            BeanAdapterImpl.validateConstructor(this.modelClass);
+        }
+    }
+
+    /**
+     * Add our dependencies to the set.
+     */
+    @Override
+    public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
+        super.appendDependencies(dependencies);
+        // FIXME: put all of our method dependencies in here...
+    }
+
+
+    /**
+     * is this model meant to be instantiated by the bean service.
+     */
+    public boolean isBean() {
+        return bean;
     }
 
     /**
      * protected method used by the model itself to get the type
      */
-    protected Class<?> getJavaType() {
+    @Override
+    public Class<?> getJavaType() {
         return this.modelClass;
     }
 
@@ -74,18 +109,6 @@ public class JavaModelDef extends DefinitionImpl<ModelDef> implements ModelDef {
     @Override
     public TypeDef getType(String s) throws QuickFixException {
         return getMemberByName(s).getType();
-    }
-
-    /**
-     * Add our dependencies to the set.
-     */
-    @Override
-    public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
-        // FIXME: put all of our method dependencies in here...
-        // Note that we have a chicken and egg problem, as we can't
-        // ensure that the type is available until after the call to
-        // validateDependencies.
-        //
     }
 
     @Override
@@ -126,7 +149,7 @@ public class JavaModelDef extends DefinitionImpl<ModelDef> implements ModelDef {
             return DefDescriptorImpl.getInstance(type.value(), TypeDef.class);
         }
     }
-
+    
     public static class Builder extends DefinitionImpl.BuilderImpl<ModelDef> {
 
         public Builder() {
@@ -135,6 +158,7 @@ public class JavaModelDef extends DefinitionImpl<ModelDef> implements ModelDef {
 
         private Class<?> modelClass;
         private Map<String, JavaValueDef> memberMap;
+        private boolean bean;
 
         public Builder setModelClass(Class<?> c) {
             this.modelClass = c;
@@ -145,28 +169,36 @@ public class JavaModelDef extends DefinitionImpl<ModelDef> implements ModelDef {
             String name = JavaValueDef.getMemberName(method.getName());
             DefDescriptor<TypeDef> typeDescriptor = getReturnTypeDescriptor(method);
 
-            JavaValueDef member = new JavaValueDef(name, method, typeDescriptor, new Location(this.modelClass.getName()
-                    + "." + name, 0));
+            JavaValueDef member = new JavaValueDef(name, method, typeDescriptor,
+                    new Location(this.modelClass.getName() + "." + name, 0));
             this.memberMap.put(name, member);
         }
 
+        public void setBean(boolean bean) {
+            this.bean = bean;
+        }
+        
         @Override
-        public JavaModelDef build() {
+        public JavaModelDefImpl build() {
             this.memberMap = new TreeMap<String, JavaValueDef>();
             for (Method method : this.modelClass.getMethods()) {
                 if (method.getAnnotation(AuraEnabled.class) != null) {
                     try {
-						addMethod(method);
-					} catch (QuickFixException e) {
-						setParseError(e);
-					}
+                        addMethod(method);
+                    } catch (QuickFixException e) {
+                        setParseError(e);
+                    }
                 }
             }
-            return new JavaModelDef(this);
+
+            // FIXME: check for init.
+
+            return new JavaModelDefImpl(this);
         }
     }
 
     private static final long serialVersionUID = -1808570833698749554L;
     private final Class<?> modelClass;
     private final Map<String, JavaValueDef> memberMap;
+    private final boolean bean;
 }

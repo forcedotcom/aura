@@ -13,29 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.THIS.container {
-    margin: 5px;
-    padding: 1em;
-}
+package org.auraframework.def;
 
-.THIS h3 {
-	font-size: 26px;
-	font-weight: 800;
-	color: #2f3438;
-	margin-top: 14px;
-	margin-bottom: 14px;
-}
-
-.THIS p {
-	font-size: 13px;
-	line-height: 1.4;
-	margin-bottom: 1.1em;
-}
-
-.THIS .description {
-	padding: 1em;
-}
-
-.THIS .uiTabset.displayTab{
-	height: 460px;
+public interface JavaModelDef extends ModelDef {
+    Class<?> getJavaType();
 }

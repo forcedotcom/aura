@@ -14,27 +14,13 @@
  * limitations under the License.
  */
 ({
-    afterRender : function(component, helper) {
-        this.superAfterRender();
-        helper.initAfterRender(component);
-    },
-
-    rerender : function(component, helper) {
-        var enabled = $A.util.getBooleanValue(component.get("v.enabled"));
-
-        this.superRerender();
-
-        if (enabled) {
-            if (!component._scroller) {
-                helper.initAfterRender(component);
-            }
-        } else {
-            helper.deactivate(component);
-        }
-    },
-
-    unrender : function(component, helper) {
-        helper.deactivate(component);
-        this.superUnrender();
-    }
+	afterRender: function(cmp, helper) {
+		helper.renderOptions(cmp);
+		this.superAfterRender();
+	},
+	
+	rerender: function(cmp, helper) {
+		helper.renderOptions(cmp);
+		this.superRerender();
+	}
 })

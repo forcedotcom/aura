@@ -76,6 +76,7 @@
     <aura:handler       name="change" value="{!v.canShowMore}" action="{!c.handleCanShowMoreChange}" description="Handler called when the canShowMore attribute changes"/>
 
     <ui:resizeObserver onresize="{!c.refresh}"/>
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
     
     <div aura:id="scrollWrapper" class="{!v.class + ' scrollWrapper' + (v.useNativeScroller ? ' native' : '') }">
         <div aura:id="scrollContent" class="{!v.scrollContentClass}">

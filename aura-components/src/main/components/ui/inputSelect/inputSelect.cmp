@@ -31,17 +31,16 @@
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
     <aura:handler name="change" value="{!v.value}" action="{!c.valueChange}"/>
     <aura:handler name="change" value="{!v.options}" action="{!c.optionsChange}"/>
-	
+    
     <select aura:id="select"
-    	    id="{!v.domId}"
-    	    class="{!v.class}"
-    	    name="{!v.name}"
-    	    size="{!v.size}"
-    	    disabled="{!v.disabled}"
-    	    multiple="{!v.multiple}">
-        <aura:iteration items="{!v.options}" var="option">
-            <ui:inputSelectOption aura:id="options" class="{!option.class}" label="{!option.label}" value="{!option.selected}" text="{!option.value}" disabled="{!option.disabled}"/>
-        </aura:iteration>
-        {!v.body}
+            id="{!v.domId}"
+            class="{!v.class}"
+            name="{!v.name}"
+            size="{!v.size}"
+            disabled="{!v.disabled}"
+            multiple="{!v.multiple}">
+            <aura:if isTrue="{!v.options.length == 0}">
+                {!v.body}
+            </aura:if>
     </select>
 </aura:component>

@@ -51,7 +51,7 @@
         </aura:if>
     </aura:set>
     <ui:tabSet class="subtabs">
-        <auradocs:stretchTab title="overview">
+        <auradocs:stretchTab title="Overview">
         	<aura:if isTrue="{!m.documentation != null &amp;&amp; m.documentation.descriptions.length > 0}"> 
         		<auradocs:defDescription descriptions="{!m.documentation.descriptions}"/>
         	</aura:if>
@@ -69,13 +69,13 @@
             </aura:if>
         </auradocs:stretchTab>
 
-        <auradocs:stretchEditorPanel title="source" descriptor="{!v.descriptor}" defType="{!v.defType}"/>
+        <auradocs:stretchEditorPanel title="Source" descriptor="{!v.descriptor}" defType="{!v.defType}"/>
 
         <aura:forEach items="{!m.defs}" var="def">
             <auradocs:stretchEditorPanel title="{!def.name}" descriptor="{!def.descriptor}" defType="{!def.defType}"/>
         </aura:forEach>
 
-        <auradocs:stretchTab title="dependencies">
+        <auradocs:stretchTab title="Dependencies">
             <auradocs:defDependencies descriptor="{!v.descriptor}" defType="{!v.defType}"/>
         </auradocs:stretchTab>
         

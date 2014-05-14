@@ -20,6 +20,10 @@
         <script src="/auraFW/resources/codemirror/js/codemirror.js"></script>
     </aura:set>
     <aura:set attribute="title" value="Aura Documentation"/>
+    
+    <aura:set attribute="extraMetaTags">
+		<meta name="description" content="Aura is a UI framework for developing dynamic web apps for mobile and desktop devices. It comes with a rich and extensible component set to kick start building apps." />
+	</aura:set>
 
     <aura:set attribute="auraPreInitBlock">
         <auraStorage:init name="actions" maxSize="4096" defaultExpiration="3600" secure="true" persistent="false"

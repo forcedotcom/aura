@@ -15,6 +15,7 @@
  */
 package configuration;
 
+import org.auraframework.adapter.BeanAdapter;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ContextAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
@@ -42,6 +43,7 @@ import org.auraframework.impl.LoggingServiceImpl;
 import org.auraframework.impl.RenderingServiceImpl;
 import org.auraframework.impl.SerializationServiceImpl;
 import org.auraframework.impl.ServerServiceImpl;
+import org.auraframework.impl.adapter.BeanAdapterImpl;
 import org.auraframework.impl.adapter.ConfigAdapterImpl;
 import org.auraframework.impl.adapter.DefinitionParserAdapterImpl;
 import org.auraframework.impl.adapter.GlobalValueProviderAdapterImpl;
@@ -418,6 +420,11 @@ public class AuraImplConfig {
     @PrimaryImpl
     public static ClientLibraryService auraImplclientLibraryService() {
         return new ClientLibraryServiceImpl();
+    }
+
+    @Impl
+    public static BeanAdapter auraImplBeanAdapter() {
+        return new BeanAdapterImpl();
     }
 
     @Impl

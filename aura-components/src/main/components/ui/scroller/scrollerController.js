@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 ({
+    init: function (component, event, helper) {
+        helper.initialize(component);
+    },
     refresh: function(component, event, helper) {
        var scroller = helper.getScrollerInstance(component);
         if (scroller) {

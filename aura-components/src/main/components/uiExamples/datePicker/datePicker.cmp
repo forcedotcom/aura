@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:application>
+<aura:component>
 	<ul>
 		<li><ui:inputDateTrigger/></li>
 		<li><ui:inputDateTrigger/></li>
@@ -25,4 +25,4 @@
 	</ul>	
 	
 	<ui:datePickerManager/>
-</aura:application>
+</aura:component>

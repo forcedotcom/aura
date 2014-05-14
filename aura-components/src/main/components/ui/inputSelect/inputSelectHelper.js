@@ -122,12 +122,11 @@
     optionsStrategy: {
     	// If an option is in newValues, we want to select it
     	updateOptions : function(options, newValues) {
-    		var isMultiple = newValues.length > 1;
     		var updated = false;
 
     		$A.util.forEach(options, function(option) {
     			var val = option.value;
-    			var selectOption = (isMultiple && aura.util.arrayIndexOf(newValues, val) > -1) || newValues[0] == val.toString();
+    			var selectOption = (newValues.length > 1 && aura.util.arrayIndexOf(newValues, val) > -1) || newValues[0] == val.toString();
     			
     			updated = updated || (option.selected != selectOption);
     			option.selected = selectOption;
@@ -170,15 +169,10 @@
      */
     bodyStrategy: {
     	// Updates options based on their existence in newValues
-    	updateOptions : function(options, newValues) {
-    		var parameters = { newValues : newValues,
-    						   valueIsArray : $A.util.isArray(newValues),
-    						   isUndefinedOrNull : $A.util.isUndefinedOrNull(newValues)
-    		}
-    		
+    	updateOptions : function(options, newValues) {    		
             var result = { updated : false };
             // Perform single option update function on all of our options
-    		this.performOperationOnCmps(options, this.updateOption, result, parameters);
+    		this.performOperationOnCmps(options, this.updateOption, result, newValues);
     		return result.updated;
     	},
     	getSelected : function(bodyCmps) {
@@ -203,7 +197,7 @@
     		cmp.set("v.body", options);
     	},
     	// Performs op on every ui:inputSelectOption in opts, where op = function(optionCmp, resultsObject, optionalArguments)
-    	performOperationOnCmps : function(opts, op, result, opParams) {
+    	performOperationOnCmps : function(opts, op, result, newValues) {
     		$A.util.forEach(opts, function(cmp) {
         		var descriptor = cmp.getDef().getDescriptor();
         		var cmpName = descriptor.getNamespace() + ":" + descriptor.getName();
@@ -213,34 +207,26 @@
         				$A.util.forEach(groupBody, function(groupBodyCmp) {
         					var descriptor = groupBodyCmp.getDef().getDescriptor();
         					if ((descriptor.getNamespace() + ":" + descriptor.getName()) === "ui:inputSelectOption") {
-        						op(groupBodyCmp, result, opParams);
+        						op(groupBodyCmp, result, newValues);
         					}
         				}, this);
         			}
         		} else if (cmpName = "ui:inputSelectOption") {
-    				op(cmp, result, opParams);
+    				op(cmp, result, newValues);
     			}
         	}, this);
         },
         // Helper function for updateOptions
         // Update optionCmp if it exists in newValues; passes result back in result object
-        updateOption : function(optionCmp, result, params) {
-            if (!params.isUndefinedOrNull) { 
-            	if (params.valueIsArray) {
-    	            for(var i=0;i<params.newValues.length;i++){
-    	                if (params.newValues[i] === optionCmp.get("v.text")) {
-    	                    result.updated = true;
-    	                    break;
-    	                }
-    	            }
-            	} else if (params.newValues === optionCmp.get("v.text")) {
-            		result.updated = true;       		
-            	}
-            }
-            var originalStatus = $A.util.getBooleanValue(optionCmp.get("v.value"));
-            if (originalStatus !== result.updated) {
-                optionCmp.set("v.value", result.updated);
-            }
+        updateOption : function(optionCmp, result, newValues) {
+        	var text = optionCmp.get("v.text");
+			var selectOption = (newValues.length > 1 && aura.util.arrayIndexOf(newValues, text) > -1) || newValues[0] === text;
+			
+			if ($A.util.getBooleanValue(optionCmp.get("v.value")) != selectOption) {
+				result.updated = true;
+				optionCmp.set("v.value", selectOption);
+			}
+
         },
         // Helper function for getValues
         // Push optionCmp's value into valueList if selected

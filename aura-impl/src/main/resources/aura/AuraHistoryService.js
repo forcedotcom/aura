@@ -254,26 +254,27 @@ $A.ns.AuraHistoryService.prototype.changeHandler = function(){
 /**
  * @private
  */
-$A.ns.AuraHistoryService.prototype.parseLocation = function(location){
-    if (location["indexOf"]("#") === 0){
+$A.ns.AuraHistoryService.prototype.parseLocation = function(location) {
+    if (location["indexOf"]("#") === 0) {
         location = location["substring"](1);
     }
 
-    if (location["indexOf"]('=') > -1){
+    if (location["indexOf"]('=') > -1) {
         var split = location["split"]('?');
         if(split.length == 1){
-            return decodeURIComponent(split[0]);
+            return { "token": split[0], "querystring": "" };
         }
 
-        if(split.length == 2){
+        if (split.length == 2) {
             var ret = $A.util.urlDecode(split[1]);
             ret["token"] = split[0];
+            ret["querystring"] = split[1];
             return ret;
         }
 
         throw new Error("Invalid location");
-    } else{
-        return {"token" : location};
+    } else {
+        return {"token" : location, "querystring": "" };
     }
 };
 

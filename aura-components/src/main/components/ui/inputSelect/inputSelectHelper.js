@@ -90,7 +90,7 @@
         if (!selectedOptions.found || value !== selectedOptions.optionValue) {
         	if (!isMultiple && !selectedOptions.found) {
         		selectedOptions.optionValue = optionsPack.strategy.getValue(optionsPack.options, 0);
-        		optionsPack.strategy.setOption(optionsPack.options, 0, true);
+        		optionsPack.strategy.setOptionSelected(optionsPack.options, 0, true);
         		
         		cmp._suspendChangeHandlers = true;
             	optionsPack.strategy.persistOptions(cmp, optionsPack.options);
@@ -112,7 +112,7 @@
      *   getValues(options) - returns a ';'-concatenated String of selected values and whether a selected value was found
      *   	Used for seeing which options are selected from the perspective of the options
      *   getText(options, index) - returns the internal text of options[index]
-     *   setOption(options, index, selected) - equivalent to options[index].selected = selected
+     *   setOptionSelected(options, index, selected) - equivalent to options[index].selected = selected
      *   persistOptions(cmp, options) - persists the array of options into the appropriate component attribute
      */
     
@@ -152,7 +152,7 @@
     		}
     		return undefined;
     	},
-    	setOption : function(options, index, selected) {
+    	setOptionSelected : function(options, index, selected) {
     		if (!$A.util.isUndefinedOrNull(options[index])) {
     			options[index].selected = selected;
     		} else {
@@ -186,7 +186,7 @@
     		}
     		return undefined;
     	},
-    	setOption : function(options, index, selected) {
+    	setOptionSelected : function(options, index, selected) {
     		if (!$A.util.isUndefinedOrNull(options[index])) {
     			options[index].set("v.value", selected);
     		} else {

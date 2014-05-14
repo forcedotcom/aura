@@ -148,10 +148,17 @@
     		return { found : (values.length > 0), optionValue : values.join(";") };
     	},
     	getValue : function(options, index) {
-    		return options[index].value;
+    		if (!$A.util.isUndefinedOrNull(options[index])) {
+    			return options[index].value;
+    		}
+    		return undefined;
     	},
     	setOption : function(options, index, selected) {
-    		options[index].selected = selected;
+    		if (!$A.util.isUndefinedOrNull(options[index])) {
+    			options[index].selected = selected;
+    		} else {
+    			// TODO: somehow expose that the option couldn't be set.
+    		}
     	},
     	persistOptions : function(cmp, options) {
     		cmp.set("v.options", options);
@@ -180,10 +187,17 @@
     		return { found : (values.length > 0), optionValue : values.join(";") };
     	},
     	getValue : function(options, index) {
-    		return options[index].get("v.text");
+    		if (!$A.util.isUndefinedOrNull(options[index])) {
+    			return options[index].get("v.text");
+    		}
+    		return undefined;
     	},
     	setOption : function(options, index, selected) {
-    		options[index].set("v.value", selected);
+    		if (!$A.util.isUndefinedOrNull(options[index])) {
+    			options[index].set("v.value", selected);
+    		} else {
+    			// TODO: somehow expose that the option couldn't be set.
+    		}
     	},
     	persistOptions : function(cmp, options) {
     		cmp.set("v.body", options);

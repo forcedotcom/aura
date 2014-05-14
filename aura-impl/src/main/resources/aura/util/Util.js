@@ -1084,6 +1084,17 @@ $A.ns.Util.prototype.isElement = function(obj) {
 };
 
 /**
+ * Attach the element to the HTML body
+ * @param {DOMElement} element
+ */
+$A.ns.Util.prototype.attachToDocumentBody = function(element) {
+	if (element) {
+        var body = document.getElementsByTagName("body")[0];
+        body.appendChild(element);
+	}
+};
+
+/**
  * Define util.arrayIndexOf based on the availability of array.indexOf.
  *
  * array.indexOf is only available in Javascript 1.6+ (it is missing in IE8 and below).

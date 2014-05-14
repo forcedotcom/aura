@@ -179,9 +179,10 @@
         return this.getOnClickEventProp.cache[prop];
     },
     
-    toggleMenuVisible : function(component, index) {
+    toggleMenuVisible : function(component, index, event) {
     	var c = this.getMenuComponent(component);
         c.set("v.focusItemIndex", index);
+        c.set("v.referenceElement", event.getSource().getElement());
         var menuVisible = c.get("v.visible");
         c.set("v.visible", !menuVisible);
     }

@@ -60,11 +60,16 @@
     },
     
     position: function(component) {
-        var divCmp = component.find("menu");
+    	var attachToBody = component.getConcreteComponent().get("v.attachToBody");
+    	if (attachToBody === true) {
+    		this.positionAsBodyChild(component);
+    		return;
+    	}
+    	var divCmp = component.find("menu");
         var elem = divCmp ? divCmp.getElement() : null;
         if (elem) {
             elem.style.top = "auto";
-            var visible = component.get("v.visible");
+            var visible = component.getConcreteComponent().get("v.visible");
             if (visible) {
             	var autoPosition = component.get('v.autoPosition');
                 var elemRect = elem.getBoundingClientRect();
@@ -75,6 +80,51 @@
                 	elem.style.top = 0 - height + "px";
                 } else {
                     elem.style.top = "auto";
+                }
+            }
+        }
+    },
+    
+    positionAsBodyChild: function(component) {
+        var divCmp = component.find("menu");
+        var elem = divCmp ? divCmp.getElement() : null;
+        var referenceElem = component.getConcreteComponent().get("v.referenceElement");
+        if (elem && referenceElem) {
+            var visible = component.getConcreteComponent().get("v.visible");
+            if (visible) {
+            	$A.util.attachToDocumentBody(component.getElement());
+            	var referenceElemRect = referenceElem.getBoundingClientRect();
+                var elemRect = elem.getBoundingClientRect();
+                var viewPort = $A.util.getWindowSize();
+                
+                // Vertical alignment
+                // getBoundingClientRect method does not return height and width in IE7 and Ie8
+                var height = typeof elemRect.height != 'undefined' ? elemRect.height : elemRect.bottom - elemRect.top;
+                if ((viewPort.height - referenceElemRect.bottom) < height) { // no enough space below
+                	if (referenceElemRect.top < height) { // no enough space above either. Put it in the middle then
+                		elem.style.top = window.scrollY + "px";
+                	} else { // put it above
+                		elem.style.top = (referenceElemRect.top - height) + window.scrollY + "px";
+                	}
+                } else { // put it below
+                    elem.style.top = referenceElemRect.bottom + window.scrollY + "px";
+                }
+                
+                // Horizontal alignment
+                // getBoundingClientRect method does not return height and width in IE7 and Ie8
+                var width = typeof elemRect.width != 'undefined' ? elemRect.width : elemRect.right - elemRect.left;
+                if (referenceElemRect.left < 0) {
+                	elem.style.left = window.scrollX + "px";
+                } else {
+                    if ((viewPort.width - referenceElemRect.left) < width) { // no enough space to the right
+                	    if (referenceElemRect.right < width) { // no enough space to the left either. Put it in the middle then.
+                		    elem.style.left = (viewPort.width - width) + window.scrollX + "px";
+                	    } else { // align at the right
+                		    elem.style.right = referenceElemRect.right + window.scrollX + "px";
+                	    }
+                    } else { // align at the left
+                        elem.style.left = referenceElemRect.left + window.scrollX + "px";
+                    }
                 }
             }
         }

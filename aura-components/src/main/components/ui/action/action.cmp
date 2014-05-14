@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extensible="true" support="PROTO">
+<aura:component extensible="true" support="PROTO" abstract="true">
 	<aura:attribute name="name" type="String"/>
 	<aura:attribute name="label" type="String"/>
 	<aura:attribute name="index" type="Integer"/>

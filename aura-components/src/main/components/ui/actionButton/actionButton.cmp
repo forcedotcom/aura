@@ -15,7 +15,6 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:action">
-    <!-- TODO: make accessible; do NOT use ui:button -->
-    <button>{!v.label}</button>
+<aura:component extends="ui:action" support="PROTO">
+    <ui:button label="{!v.label}" press="{!c.handleClick}"/>
 </aura:component>

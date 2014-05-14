@@ -118,6 +118,10 @@
         return false;
     },
 
+     isStatsMode: function() {
+         return $A.getContext().getMode() == 'STATS';
+     },
+
     needsAttrMocking: function(attrDef) {
         if(attrDef.getTypeDefDescriptor() == "aura://String" && !attrDef.getDefault()){
             return true;
@@ -154,10 +158,14 @@
         }
     },
     bootstrapPerfFramework: function (component) {
-        this._rafPolyfill();
+        var helper = this;
+
+        helper._rafPolyfill();
+
         component.perf = $A.PERFCORE = (function () {
             var WAIT_TIME = 100,
-                timestamp = !!console.timeStamp;
+                timestamp = !!console.timeStamp,
+                resultSets = {};
             return {
                 raf : function (callback) {
                     return window.requestAnimationFrame(callback);
@@ -183,6 +191,81 @@
 
                     this.config = cfg;
                     return cfg;
+                },
+                /**
+                 * Api to record and retrieve aura stats.
+                 * It only works in aura.mode='STATS', no-op or return empty date otherwise.
+                 */
+                stats: {
+                    /**
+                     * Take a snapshot of Aura stats.
+                     * @param {!string} name
+                     */
+                    start: function(name) {
+                        if(!helper.isStatsMode()) {
+                            return;
+                        }
+                        $A.assert(name, "Aura stat tracking name can't be empty");
+                        $A.assert(!resultSets[name], "Duplicate Aura stat tracking name");
+
+                        resultSets[name] = {};
+                        for(var view in helper.queries) {
+                            resultSets[name][view] = helper.queries[view]();
+                        }
+                    },
+
+                    /**
+                     * Take a snapshot of Aura stats diffs since the beginning of the capture with the same name.
+                     *
+                     * @param {!string} name
+                     */
+                    end: function(name) {
+                        if(!helper.isStatsMode()) {
+                            return;
+                        }
+                        $A.assert(name, "Aura stat tracking name can't be empty");
+                        $A.assert(resultSets[name], "Should start stat first");
+
+                        for(var view in helper.queries) {
+                            resultSets[name][view] = helper.queries[view]().diff(resultSets[name][view]);
+                        }
+                    },
+
+                    /**
+                     * Get all Aura stats measurements added or removed since the beginning of page load.
+                     *
+                     * @returns {Object}
+                     * {'my snapshot name':
+                     *  {"component":{"added":[{"descriptor":"markup://ui:button"}],"removed":[]},
+                     *  {"event":{"added":[{"descriptor":"markup://aura:doneRendering","startTime":1399684437957,"endTime":1399684437957}],"removed":[]},
+                     *  {"afterRender":{"added":[],"removed":[]},
+                     *  {"rerender":{"added":[{"descriptor":"markup://ui:button {0:c}","startTime":1399684437956,"endTime":1399684437957}],"removed":[]},
+                     *  {"unrender":{"added":[],"removed":[]},
+                     *  {"render":{"added":[],"removed":[]}}
+                     * }
+                     */
+                    get: function() {
+                        if(!helper.isStatsMode()) {
+                            return {};
+                        }
+
+                        var stat,
+                            data = {}
+
+                        for(var name in resultSets) {
+                            data[name] = {};
+                            for(var view in resultSets[name]) {
+                                stat = resultSets[name][view];
+                                if(stat.added && stat.removed) {
+                                    data[name][view] = {
+                                        added: stat.added.rows,
+                                        removed: stat.removed.rows
+                                    };
+                                }
+                            }
+                        }
+                        return data;
+                    }
                 }
             };
         }());
@@ -211,8 +294,12 @@
         });
     },
     
-    beforeCreateComponent: function (cmp) {},
-    afterCreateComponent: function (cmp) {},
+    beforeCreateComponent: function (cmp) {
+        $A.PERFCORE.stats.start('CreateComponent');
+    },
+    afterCreateComponent: function (cmp) {
+        $A.PERFCORE.stats.end('CreateComponent');
+    },
 
     createComponent: function (componentDef, attributeValues, callback) {
         var payload;
@@ -268,8 +355,12 @@
             });
         });
     },
-    beforeRenderComponent: function (cmp) {/* TODO */},
-    afterRenderComponent: function (cmp) {/* TODO */},
+    beforeRenderComponent: function (cmp) {
+        $A.PERFCORE.stats.start('RenderComponent');
+    },
+    afterRenderComponent: function (cmp) {
+        $A.PERFCORE.stats.end('RenderComponent');
+    },
 
     renderComponent: function (container, newCmp) {
         /* 
@@ -294,6 +385,74 @@
             callback();
         });
     },
-    afterRender: function (appCmp, newCmp) {/* TODO */}
+    afterRender: function (appCmp, newCmp) {/* TODO */},
+
+    /*
+    * =====================================
+    * Aura stats mode COQL queries
+    * =====================================
+    */
+    /**
+     * COQL queries to get various aura stats.
+     * Use $A.PERFCORE.stat to record perf profiling and reading recorded stats.
+     */
+    queries: {
+        component: function() {
+            // [{descriptor: "markup://aura:expression"}]
+            return $A.getQueryStatement()
+                .field("descriptor", function(resultSet){return resultSet.getDef().getDescriptor().toString();})
+                .from('component')
+                .query();
+        },
+
+        event: function() {
+            // [{startTime: 1399596806222, endTime: 1399596806228, descriptor: "markup://ui:press"}]
+            return $A.getQueryStatement()
+                .field("descriptor", function(resultSet){return resultSet.event.getDef().getDescriptor().toString();})
+                .fields("startTime,endTime")
+                .from('event')
+                .query();
+        },
+
+        afterRender: function() {
+            // [{"startTime":1399675188180,"endTime":1399675188181,"descriptor":"markup://aura:text {0:c}"}]
+            return $A.getQueryStatement()
+                .field("descriptor",function(resultSet){return resultSet.component.toString();})
+                .fields("startTime,endTime,type")
+                .from("renderings")
+                .where("type=='afterRender'")
+                .query();
+        },
+
+        render: function() {
+            // [{"startTime":1399675188180,"endTime":1399675188181,"descriptor":"markup://aura:text {0:c}"}]
+            return $A.getQueryStatement()
+                .field("descriptor",function(resultSet){return resultSet.component.toString();})
+                .fields("startTime,endTime,type")
+                .from("renderings")
+                .where("type=='render'")
+                .query();
+        },
+
+        rerender: function() {
+            // [{"startTime":1399675188180,"endTime":1399675188181,"descriptor":"markup://aura:text {0:c}"}]
+            return $A.getQueryStatement()
+                .field("descriptor",function(resultSet){return resultSet.component.toString();})
+                .fields("startTime,endTime,type")
+                .from("renderings")
+                .where("type=='rerender'")
+                .query();
+        },
+
+        unrender: function() {
+            // [{"startTime":1399675188180,"endTime":1399675188181,"descriptor":"markup://aura:text {0:c}"}]
+            return $A.getQueryStatement()
+                .field("descriptor",function(resultSet){return resultSet.component.toString();})
+                .fields("startTime,endTime,type")
+                .from("renderings")
+                .where("type=='unrender'")
+                .query();
+        }
+    }
     
 })

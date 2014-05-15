@@ -26,6 +26,7 @@ import org.auraframework.util.test.perf.PerfTest;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 
 public class ListViewUITest extends WebDriverTestCase {
 
@@ -212,8 +213,8 @@ public class ListViewUITest extends WebDriverTestCase {
         WebElement tBodyElement = tableElement.findElement(By.tagName("tbody"));
         tBodyElement.findElement(By.tagName("tr")).findElement(By.tagName("td")).click();
 
-        assertTrue("Test component's cell click handler was not invoked after click event",
-                isGlobalVariableDefinedInWindow("cellClickFired"));
+        waitForGlobalVariableDefinedInWindow("cellClickFired",
+                "Test component's cell click handler was not invoked after click event");
     }
 
     // For some reason Android doesn't want to click on the header element. This test isn't really relevant to Android
@@ -227,8 +228,8 @@ public class ListViewUITest extends WebDriverTestCase {
         WebElement tHeadElement = tableElement.findElement(By.tagName("thead"));
         tHeadElement.findElement(By.tagName("tr")).findElement(By.tagName("th")).click();
 
-        assertTrue("Test component's header click handler was not invoked after click event",
-                isGlobalVariableDefinedInWindow("headerClickFired"));
+        waitForGlobalVariableDefinedInWindow("headerClickFired",
+                "Test component's header click handler was not invoked after click event");
     }
 
     /**
@@ -237,9 +238,15 @@ public class ListViewUITest extends WebDriverTestCase {
      * @param variableName name of the variable we're looking for
      * @return true if the variable is present, false otherwise
      */
-    private boolean isGlobalVariableDefinedInWindow(String variableName) {
-        String script = "return !(typeof " + variableName + " === 'undefined')";
-        return (Boolean) auraUITestingUtil.getRawEval(script);
+    private void waitForGlobalVariableDefinedInWindow(final String variableName, final String errorMsg) {
+        auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
+            String script = "return !(typeof " + variableName + " === 'undefined')";
+
+            @Override
+            public Boolean apply(WebDriver d) {
+                return (Boolean) auraUITestingUtil.getRawEval(script);
+            }
+        }, errorMsg);
     }
 
     /**

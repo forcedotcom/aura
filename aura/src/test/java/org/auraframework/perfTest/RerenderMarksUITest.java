@@ -29,16 +29,17 @@ import com.google.common.collect.Maps;
  * Automation to verify UIPerf marks for rerender cycle.
  */
 public class RerenderMarksUITest extends PerfMetricsTestCase {
-    public RerenderMarksUITest(String name){
+    public RerenderMarksUITest(String name) {
         super(name);
     }
-    
+
     /**
-     * Simple scenario where a top level attribute change initiates a rerender cycle.
-     * Subsequent rerender of the same component should also be logged in UIPerf.
+     * Simple scenario where a top level attribute change initiates a rerender cycle. Subsequent rerender of the same
+     * component should also be logged in UIPerf.
+     * 
      * @throws Exception
      */
-    public void testRerenderMarksHaveComponentName() throws Exception{
+    public void testRerenderMarksHaveComponentName() throws Exception {
         Map<String, String> logStats = Maps.newHashMap();
         open("/performanceTest/ui_button.cmp", Mode.CADENCE);
         clearUIPerfStats();
@@ -50,53 +51,53 @@ public class RerenderMarksUITest extends PerfMetricsTestCase {
         assertFalse("Did not find UIPerf marks with component information for Rerender cycle.",
                 logStats.isEmpty());
         logStats.clear();
-        
+
         button.click();
         logStats.putAll(getUIPerfStats(Lists.newArrayList("Rerendering-3: ['markup://ui:button']")));
         assertFalse("Did not mark multiple Rerender of same component.",
                 logStats.isEmpty());
     }
-    
+
     /**
-     * Scenario where 
-     * 1. Top level attribute change causes a rerender
-     * 2. Attribute value change causes multiple component rerender 
-     * 3. Server action where no component rerender is caused.
-     * @throws Exception
+     * Scenario where 1. Top level attribute change causes a rerender 2. Attribute value change causes multiple
+     * component rerender 3. Server action where no component rerender is caused.
      * 
-     * Re-enable after bug W-1935316 is fixed
+     * @throws Exception
      */
-    public void testRerenderMarksHaveAllComponentNames() throws Exception{
+    public void testRerenderMarksHaveAllComponentNames() throws Exception {
         Map<String, String> logStats = Maps.newHashMap();
         open("/performanceTest/perfApp.app", Mode.CADENCE);
         clearUIPerfStats();
-        
-        //Mark an attribute as dirty at the root component
+
+        // Mark an attribute as dirty at the root component
         WebElement button = getDriver().findElement(By.cssSelector("button[class~='bkgColor']"));
         button.click();
-        waitForElementPresent(getDriver().findElement(By.cssSelector("tr[class~='grey']")));
+        waitForElementAppear(By.cssSelector("tr[class~='grey']"));
 
         logStats.putAll(getUIPerfStats(Lists.newArrayList("Rerendering-3: ['markup://performanceTest:perfApp']")));
         assertFalse("Rerender of root component not marked in UIPerf.",
                 logStats.isEmpty());
         logStats.clear();
-        
-        //Make a value change to cause multiple component rerender, the UIPerf mark should have qualified names of the components
+
+        // Make a value change to cause multiple component rerender, the UIPerf mark should have qualified names of the
+        // components
         WebElement innerButton = getDriver().findElement(By.cssSelector("button[class~='changeIteratonIndex']"));
         innerButton.click();
-        logStats.putAll(getUIPerfStats(Lists.newArrayList("Rerendering-4: ['markup://performanceTest:perfApp','markup://aura:iteration','markup://aura:iteration','markup://aura:iteration']")));
+        logStats.putAll(getUIPerfStats(Lists
+                .newArrayList("Rerendering-4: ['markup://performanceTest:perfApp','markup://aura:iteration','markup://aura:iteration','markup://aura:iteration']")));
         assertFalse("Multiple component Rerender should be marked with all componentNames.",
                 logStats.isEmpty());
         logStats.clear();
-        
-        //An action that does not result in a component rerender
+
+        // An action that does not result in a component rerender
         innerButton = getDriver().findElement(By.cssSelector("button[class~='simpleServerAction']"));
         innerButton.click();
         waitForCondition("return $A.getRoot()._simpleServerActionComplete");
         logStats.putAll(getUIPerfStats(Lists.newArrayList("Rerendering-5: []")));
-        assertFalse("Server action that causes no components to rerender should be logged but with no component names.",
+        assertFalse(
+                "Server action that causes no components to rerender should be logged but with no component names.",
                 logStats.isEmpty());
-        //Server action should cause no rerender and hence rerender mark should be 0
+        // Server action should cause no rerender and hence rerender mark should be 0
         assertEquals("0", logStats.get("Rerendering-5: []"));
         logStats.clear();
     }

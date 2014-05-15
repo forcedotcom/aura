@@ -52,12 +52,6 @@
         shortName: "Dec"
     }],
 
-    attachToDocumentBody: function(component) {
-        var body = document.getElementsByTagName("body")[0];
-        var elem = component.getElement();
-        body.appendChild(elem);
-    },
-
     focusDate: function(component) {
         var grid = component.find("grid");
         var e = grid.get("e.focus");
@@ -278,7 +272,7 @@
             var isPhone = $A.get("$Browser.isPhone");
 
             if (isPhone === true) {
-                this.attachToDocumentBody(component);
+                $A.util.attachToDocumentBody(component.getElement());
                 var scrollerDivCmp = component.find("scroller");
                 var scrollerElem = scrollerDivCmp ? scrollerDivCmp.getElement() : null;
                 if (scrollerElem) { // Set scroller div height to make it scrollable.

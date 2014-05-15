@@ -423,7 +423,14 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
     private List<Request> loadMonitorAndValidateApp(final String markupToken, String jsToken, String cssToken,
             String fwToken) throws Exception {
         TestLoggingAdapterController.beginCapture();
-        open(String.format("/%s/%s.app", namespace, appName));
+
+        // Opening a page through WebDriverTestCase adds a nonce to ensure fresh resources. In this case we want to see
+        // what's cached, so build our URL and call WebDriver.get() directly.
+        String url = String.format("/%s/%s.app", namespace, appName);
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("aura.mode", getAuraModeForCurrentBrowser().toString());
+        url = addUrlParams(url, params);
+        getDriver().get(getAbsoluteURI(url).toString());
 
         WebElement elem = auraUITestingUtil
                 .waitUntil(new Function<WebDriver, WebElement>() {

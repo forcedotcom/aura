@@ -95,6 +95,9 @@
             },
             'ui:outputSelect': {
                 value: "Mock value for 'outputSelect.value' attribute"
+            },
+            'ui:dataGridSummaryCell': {
+                type: "MAX"
             }
         }
     },

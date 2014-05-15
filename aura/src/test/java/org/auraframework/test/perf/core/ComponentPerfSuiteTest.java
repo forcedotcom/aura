@@ -25,8 +25,15 @@ import org.auraframework.test.annotation.PerfTestSuite;
 import org.auraframework.test.annotation.UnAdaptableTest;
 import org.auraframework.util.ServiceLocator;
 
+import com.google.common.collect.ImmutableSet;
+
 @PerfTestSuite
 public class ComponentPerfSuiteTest extends TestSuite {
+    // List components that we can't able to instantiate from client side.
+    // The reason could be a dependency to a server side model. Eg. ui:inputDate
+    // ui:action cmp shold be abstract?
+    private static final Set<String> BLACKLISTED_COMPONENTS = ImmutableSet.of("markup://ui:inputDate", "markup://ui:action");
+
     public static TestSuite suite() throws Exception {
         if (System.getProperty("skipCmpPerfTests") != null) {
             System.out.println("Skipping Components Perf Tests");
@@ -77,7 +84,7 @@ public class ComponentPerfSuiteTest extends TestSuite {
                 Set<DefDescriptor<ComponentDef>> descriptors = definitionService.find(matcher);
 
                 for (DefDescriptor<ComponentDef> descriptor : descriptors) {
-                    if (descriptor.getDef().isAbstract()) {
+                    if (descriptor.getDef().isAbstract() || BLACKLISTED_COMPONENTS.contains(descriptor.getQualifiedName())) {
                         continue;
                     }
 

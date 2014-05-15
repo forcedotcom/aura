@@ -81,6 +81,9 @@
             // Components that inherit from ui:output abstract cmp should have overridden
             // value attribute to the right concrete type.
             // Eg. ui:outputLabel, value attr type should be a String instead of Object.
+            'ui:outputEmail': {
+                value: "outputEmail@mock.value"
+            },
             'ui:outputLabel': {
                 value: "Mock value for 'outputLabel.value' attribute"
             },

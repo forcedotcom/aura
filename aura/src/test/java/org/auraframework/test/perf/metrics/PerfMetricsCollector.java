@@ -147,11 +147,6 @@ public final class PerfMetricsCollector {
                         }
                     }
                 }
-
-                // TODO: get the right Aura stats metrics
-                // if (uiPerfStats.containsKey("Initial Component Created")) {
-                // metrics.setMetric("Aura.InitialComponentCreated", uiPerfStats.get("Initial Component Created"));
-                // }
             }
         } catch (Exception e) {
             LOG.log(Level.WARNING, test.getName(), e);

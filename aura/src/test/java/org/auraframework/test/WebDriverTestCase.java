@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.concurrent.Semaphore;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -182,6 +183,27 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
 
     @Override
     public void runTest() throws Throwable {
+        // sometimes the first set of parallel WebDriver tests that run have problems,
+        // this may be due to the extra steps that happen when everything is initialized
+        // here we force the first test to execute single threaded and also initialize
+        // aura before invoking that first test
+        try {
+            LOCK_FIRST_TEST_SEMAPHORE.acquire();
+            if (numWebDriverTestsExecuted == 0) {
+                perform(obtainGetMethod("/uitest/testApp.app", true, null));
+            }
+            runTestImpl();
+        } finally {
+            numWebDriverTestsExecuted++;
+            // release enough permits to run in parallel after first
+            LOCK_FIRST_TEST_SEMAPHORE.release(TestExecutor.NUM_THREADS);
+        }
+    }
+
+    private static int numWebDriverTestsExecuted;
+    private static final Semaphore LOCK_FIRST_TEST_SEMAPHORE = new Semaphore(1);
+
+    private void runTestImpl() throws Throwable {
         List<Throwable> failures = Lists.newArrayList();
         for (BrowserType browser : WebDriverUtil.getBrowserListForTestRun(this.getTargetBrowsers(),
                 this.getExcludedBrowsers())) {

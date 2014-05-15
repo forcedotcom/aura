@@ -30,7 +30,6 @@ public final class PerfGoldFilesUtilTest extends UnitTestCase {
         metrics.setMetric(metric1);
         metrics.setMetric(new PerfMetric("metric2", 2));
         String text = PerfGoldFilesUtil.toGoldFileText(metrics, true);
-        System.out.println("text: " + text);
 
         // check the gold file is json-parseable
         JSONArray json = new JSONArray(text);

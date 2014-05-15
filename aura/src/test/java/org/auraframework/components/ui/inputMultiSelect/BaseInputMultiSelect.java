@@ -75,19 +75,14 @@ public class BaseInputMultiSelect extends WebDriverTestCase {
         }
     }
     
-
-    public void testTemp (){
-        assertTrue(true);
-    }
     /**
      * Select one. Choose one option. Deselect one. Deselect one option.
      */
     @PerfTest
-    public void _testInputSelectSingle() throws Exception {
+    public void testInputSelectSingle() throws Exception {
             open(URL);
 
             // select
-            focusSelectElement();
             selectOption("Option1");
             verifyOptionDeselected("Option2");
             verifyOptionDeselected("Option3");
@@ -99,7 +94,6 @@ public class BaseInputMultiSelect extends WebDriverTestCase {
             verifyOptionDeselected("Option3");
 
             // deselect
-            focusSelectElement();
             deselectOption("Option1");
             selectOption("Option3");
             verifyOptionDeselected("Option2");
@@ -114,14 +108,14 @@ public class BaseInputMultiSelect extends WebDriverTestCase {
     /**
      * Select multiple. Choose multiple options. Deselect multiple. Deselect multiple options.
      */
-    public void _testInputSelectDeselectMultiple() throws Exception {
+    public void testInputSelectDeselectMultiple() throws Exception {
         open(URL);
             // select multiple
-            focusSelectElement();
             selectOption("Option1");
             selectOption("Option2");
             verifyOptionDeselected("Option3");
-
+            
+            // find the element a 2nd time which helps get around the IE hover issues by focusing the element         
             findDomElement(submitLocator).click();
             auraUITestingUtil.waitForElementText(outputLocator, "option1;option2", true);
             verifyOptionSelected("Option1");
@@ -134,22 +128,21 @@ public class BaseInputMultiSelect extends WebDriverTestCase {
             }
             deselectOption("Option2");
             verifyOptionSelected("Option1");
-
+            
             findDomElement(submitLocator).click();
             auraUITestingUtil.waitForElementText(outputLocator, "option1", true);
             verifyOptionSelected("Option1");
             verifyOptionDeselected("Option2");
     }
 
+
     /**
      * Select all. Select all options. Deselect all. Deselect all options.
      */
-    public void _testInputSelectDeselectAll() throws Exception {
-        open(URL);
-
+    public void testInputSelectDeselectAll() throws Exception {
+           open(URL);
+           
             // select all
-            focusSelectElement();
-            selectOption("Option1");
             selectOption("Option1");
             selectOption("Option2");
             selectOption("Option3");
@@ -185,9 +178,6 @@ public class BaseInputMultiSelect extends WebDriverTestCase {
             for (int i = 0; i < selectedOptions.size(); i++) {
                 getInputSelect().selectByVisibleText(selectedOptions.get(i).getText());
             }
-        }
-        else{
-            auraUITestingUtil.getEval("document.getElementsByTagName('select')[0].focus()");
         }
     }
 }

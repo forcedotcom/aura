@@ -14,29 +14,19 @@
  * limitations under the License.
  */
 package org.auraframework.components.ui.inputSelect;
-
-import org.auraframework.util.test.perf.PerfTest;
 import org.openqa.selenium.By;
 
-public class InputSelectUITest  extends BaseInputSelectUI{
+//TODO: ADD CASE FOR OPTIONS IN BODY AS WELL SINCE OPTIONS IN BODY AND OPTION IN v.options GO THROUGH DIFFERENT PATHS
+public class InputSelectBodyUITest   extends BaseInputSelectUI{
 
-    public InputSelectUITest() {
-        super("/uitest/inputSelect_DynamicOptionsTest.cmp", By.xpath("//select[1]"), 
-              "//select[1]/option[text()='%s']", new String[]{"Option1", "Option2", "Option3", "Option4"},
-              "dynamicSelect");
-    }
-
-    /**
-     * Selecting any option should work only want this test running for this test Class
-     * 
-     * @throws Exception
-     */
-    @PerfTest
-    public void testSelectingOption() throws Exception {
-
-        open(getURL());
-        bodyOfTest("Option2", "Option3");
-    }
-
+  public InputSelectBodyUITest() {
+      super("/uitest/InputSelect_OptionsInBodyInitValue.cmp", 
+            By.xpath("//select[1]"), 
+            "//select[1]/option[@value='%s']", 
+            new String[]{"Tiger", "Lion", "Bear", "Moose"},
+            "Value_Undef_With_Default");
+  }
+  
+  
 }
    

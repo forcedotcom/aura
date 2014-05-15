@@ -15,11 +15,7 @@
  */
 package org.auraframework.impl.context;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.TimeZone;
+import java.util.*;
 
 import org.auraframework.Aura;
 import org.auraframework.adapter.LocalizationAdapter;
@@ -63,6 +59,27 @@ public class LocalizationAdapterImpl implements LocalizationAdapter {
         todayLabels.put("zh_CN", "今天+逾期");
         todayLabels.put("zh_TW", "今天+逾期");
         labels.put("task_mode_today_overdue", todayLabels);
+        
+        Map<String, String> tomorrowLabels = new HashMap<String, String>();
+        tomorrowLabels.put("en_US", "Tomorrow");
+        labels.put("task_mode_tomorrow", tomorrowLabels);
+        
+        Map<String, String> yesterdayLabels = new HashMap<String, String>();
+        yesterdayLabels.put("en_US", "Yesterday");
+        labels.put("yesterday", yesterdayLabels);
+        
+        Map<String, String> controllerLabels = new HashMap<String, String>();
+        controllerLabels.put("en_US", "Controller");
+        labels.put("controller", controllerLabels);
+        Map<String, String> helperLabels = new HashMap<String, String>();
+        helperLabels.put("en_US", "Helper");
+        labels.put("helper", helperLabels);
+        Map<String, String> rendererLabels = new HashMap<String, String>();
+        rendererLabels.put("en_US", "Renderer");
+        labels.put("renderer", rendererLabels);
+        Map<String, String> providerLabels = new HashMap<String, String>();
+        providerLabels.put("en_US", "Provider");
+        labels.put("provider", providerLabels);
     }
 
     public LocalizationAdapterImpl() {

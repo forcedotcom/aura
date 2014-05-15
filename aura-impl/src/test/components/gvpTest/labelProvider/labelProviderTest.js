@@ -179,5 +179,13 @@
             $A.test.addWaitFor("Today + Overdue", function(){return $A.get("$Label.Related_Lists.task_mode_today_overdue","Mary Poppins")});
             $A.test.addWaitFor("Today + Overdue", function(){return $A.get("$Label.Related_Lists.task_mode_today_overdue","undefined")});
     	}
+    },
+    /**
+     * Verify that label expressions with the expression delimiter is evaluated by $A.get() 
+     */
+    testGetWithExpressionDelimiters: {
+    	test : function (cmp) {
+            $A.test.addWaitFor("Today + Overdue", function(){return $A.get("{!$Label.Related_Lists.task_mode_today_overdue}")});
+    	}
     }
 })

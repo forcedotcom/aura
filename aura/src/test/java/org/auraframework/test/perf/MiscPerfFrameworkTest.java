@@ -19,6 +19,7 @@ import java.io.File;
 import java.util.List;
 import java.util.Map;
 
+import org.auraframework.test.SauceUtil;
 import org.auraframework.test.WebDriverTestCase.TargetBrowsers;
 import org.auraframework.test.WebDriverUtil.BrowserType;
 import org.auraframework.test.perf.core.AbstractPerfTestCase;
@@ -43,6 +44,11 @@ public final class MiscPerfFrameworkTest extends AbstractPerfTestCase {
     }
 
     public void testTakeHeapSnapshot() throws Exception {
+        if (SauceUtil.areTestsRunningOnSauce()) {
+            // TODO: test needs chromedriver 2.10
+            logger.warning("skipping test still not running in SauceLabs: " + getName());
+            return;
+        }
         openRaw("/ui/label.cmp?label=foo");
 
         Map data = perfWebDriverUtil.takeHeapSnapshot();
@@ -58,6 +64,12 @@ public final class MiscPerfFrameworkTest extends AbstractPerfTestCase {
     }
 
     public void testJSMemoryUsage() throws Exception {
+        if (SauceUtil.areTestsRunningOnSauce()) {
+            // TODO: test needs chromedriver 2.10
+            logger.warning("skipping test still not running in SauceLabs: " + getName());
+            return;
+        }
+        
         int startSize = getBrowserJSHeapSize();
 
         openRaw("/ui/label.cmp?label=foo");

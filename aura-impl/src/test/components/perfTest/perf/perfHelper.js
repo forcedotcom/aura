@@ -68,7 +68,44 @@
             return "Mock value for '" + attrDef.getDescriptor().getName() + "' attribute";
         }
     },
-    getAttributeMockValue: function(attributeDef) {
+    predefinedAttributeMocks: {
+        blacklist: {
+            'ui:carousel': ['priv_snap'],
+            'ui:carouselDeprecated': ['priv_snap'],
+            'ui:scroller': ['snap', 'plugins'],
+            'ui:scrollerDeprecated': ['snap']
+        },
+
+        whitelist: {
+            // We wouldn't need this output* whitelist attribute if
+            // Components that inherit from ui:output abstract cmp should have overridden
+            // value attribute to the right concrete type.
+            // Eg. ui:outputLabel, value attr type should be a String instead of Object.
+            'ui:outputLabel': {
+                value: "Mock value for 'outputLabel.value' attribute"
+            },
+            'ui:outputTextArea': {
+                value: "Mock value for 'outputTextArea.value' attribute"
+            },
+            'ui:outputRichText': {
+                value: "Mock value for 'outputRichText.value' attribute"
+            },
+            'ui:outputSelect': {
+                value: "Mock value for 'outputSelect.value' attribute"
+            }
+        }
+    },
+    getAttributeMockValue: function(componentDef, attributeDef) {
+        var cmpName = this.getComponentDescriptorFullName(componentDef);
+        var attrName = attributeDef.getDescriptor().getName();
+        var whitelistedAttrs = this.predefinedAttributeMocks.whitelist[cmpName];
+        var retValue;
+        if(whitelistedAttrs && (retValue = whitelistedAttrs[attrName]) != undefined) {
+            return retValue;
+        }
+
+        // If attribute value is not predefined in whitelisted components list
+        // use the attribute descriptor type to generate a random value.
         var type = attributeDef.getTypeDefDescriptor().substring(7); //trim prefix 'aura://'
         var isArrayType = this.isArrayType(type);
 
@@ -78,13 +115,16 @@
         var valueProvider = this.attributeMockValueProvider[type];
 
         if(!valueProvider) {
-            return $A.error("Value provider for type:'" + type + "' is not defined");
+            return $A.error("[perf.app:perfHelper.js]: Value provider for type:'" + type + "' is not defined");
         }
 
-        var value = valueProvider.call(this, attributeDef);
-        return isArrayType ? [value] : value;
+        retValue = valueProvider.call(this, attributeDef);
+        return isArrayType ? [retValue] : retValue;
     },
-
+    getComponentDescriptorFullName: function(componentDef) {
+        var qualifiedName = componentDef.getDescriptor().getQualifiedName();
+        return qualifiedName.substring(9);//trim prefix 'markup://'
+    },
     getComponentMockValues: function(cmpName) {
         var componentDef = $A.componentService.getDef(cmpName);
 
@@ -94,8 +134,8 @@
 
         var attrValues = {};
         componentDef.getAttributeDefs().each(function(attrDef) {
-            if(this.needsAttrMocking(attrDef)) {
-                attrValues[attrDef.getDescriptor().getName()] = this.getAttributeMockValue(attrDef);
+            if(this.needsAttrMocking(componentDef, attrDef)) {
+                attrValues[attrDef.getDescriptor().getName()] = this.getAttributeMockValue(componentDef, attrDef);
             }
         }.bind(this));
 
@@ -118,13 +158,25 @@
         return false;
     },
 
-     isStatsMode: function() {
-         return $A.getContext().getMode() == 'STATS';
-     },
+    isStatsMode: function() {
+        return $A.getContext().getMode() == 'STATS';
+    },
 
-    needsAttrMocking: function(attrDef) {
-        if(attrDef.getTypeDefDescriptor() == "aura://String" && !attrDef.getDefault()){
-            return true;
+    isAttributeBlacklisted: function(componentDef, attrDef) {
+        var cmpName = this.getComponentDescriptorFullName(componentDef);
+        var attrName = attrDef.getDescriptor().getName();
+        var blacklistedAttrs = this.predefinedAttributeMocks.blacklist[cmpName];
+
+        return blacklistedAttrs && blacklistedAttrs.indexOf(attrName) != -1;
+    },
+
+    needsAttrMocking: function(componentDef, attrDef) {
+        if(this.isAttributeBlacklisted(componentDef, attrDef)) {
+            return false;
+        }
+        if(attrDef.getTypeDefDescriptor() == "aura://String"
+            && !attrDef.getDefault()) {
+                return true;
         }
         if(attrDef.isRequired()) {
             return true;

@@ -34,7 +34,7 @@ public class LayoutItemsUITest extends WebDriverTestCase {
      * Automation for W-954182
      */
     public void testNavigationWhenLayoutHasMultipleLayoutItems() throws Exception {
-    	By forwardButton = By.cssSelector(".Forward_Button");
+        By forwardButton = By.cssSelector(".Forward_Button");
         By backButton = By.cssSelector(".Back_Button");
         By layoutDone = By.cssSelector(".layoutDone");
         By removeLayoutDone = By.cssSelector(".Remove_Layout_Done");
@@ -80,20 +80,20 @@ public class LayoutItemsUITest extends WebDriverTestCase {
     }
 
     private void verifyExpectedResultsForInitialLayout() throws Exception {
-    	waitForElementText(findDomElement(resultBtn1), "Ready to party?", true, 3);
+        waitForElementTextPresent(findDomElement(resultBtn1), "Ready to party?");
         assertEquals("", findDomElement(resultBtn2).getText());
     }
 
     private void verifyExpectedResultsForLayout1() throws Exception {
         assertEquals("Step1", getHashToken());
-        assertEquals("Step 1a. Wear a Suit", findDomElement(resultBtn1).getText());
+        waitForElementTextPresent(findDomElement(resultBtn1), "Step 1a. Wear a Suit");
         assertEquals("Step 1b. Wear a Jacket", findDomElement(resultBtn2).getText());
 
     }
 
     private void verifyExpectedResultForLayout2() throws Exception {
         assertEquals("Step2", getHashToken());
-        assertEquals("Step 2a. Start your car", findDomElement(resultBtn1).getText());
+        waitForElementTextPresent(findDomElement(resultBtn1), "Step 2a. Start your car");
         assertEquals("Step 2b. Go party", findDomElement(resultBtn2).getText());
     }
 

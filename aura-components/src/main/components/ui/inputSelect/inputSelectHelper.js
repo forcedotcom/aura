@@ -65,7 +65,7 @@
         
         var newValues = (cmp.get("v.value") || "").split(";");
 
-        if (!optionsPack.strategy.updateOptions(optionsPack.options, newValues)) {
+        if (!optionsPack.strategy.updateOptions(optionsPack.options, newValues) && !($A.util.getBooleanValue(cmp.get("v.multiple")) && value == "")) {
         	this.updateValueFromOptions(cmp, optionsPack);
         } else {
         	cmp._suspendChangeHandlers = true;
@@ -122,17 +122,17 @@
     optionsStrategy: {
     	// If an option is in newValues, we want to select it
     	updateOptions : function(options, newValues) {
-    		var updated = false;
+    		var found = false;
 
     		$A.util.forEach(options, function(option) {
     			var val = option.value;
     			var selectOption = (newValues.length > 1 && aura.util.arrayIndexOf(newValues, val) > -1) || newValues[0] == val.toString();
     			
-    			updated = updated || (option.selected != selectOption);
+    			found = found || selectOption;
     			option.selected = selectOption;
     		}, this);
     		
-    		return updated;
+    		return found;
     	},
     	// If an option is selected, we want to aggregate it into our list
     	getSelected : function(options) {
@@ -170,10 +170,10 @@
     bodyStrategy: {
     	// Updates options based on their existence in newValues
     	updateOptions : function(options, newValues) {    		
-            var result = { updated : false };
+            var result = { found : false };
             // Perform single option update function on all of our options
     		this.performOperationOnCmps(options, this.updateOption, result, newValues);
-    		return result.updated;
+    		return result.found;
     	},
     	getSelected : function(bodyCmps) {
     		var values = [];
@@ -222,10 +222,8 @@
         	var text = optionCmp.get("v.text");
 			var selectOption = (newValues.length > 1 && aura.util.arrayIndexOf(newValues, text) > -1) || newValues[0] === text;
 			
-			if ($A.util.getBooleanValue(optionCmp.get("v.value")) != selectOption) {
-				result.updated = true;
-				optionCmp.set("v.value", selectOption);
-			}
+			result.found = result.found || selectOption;
+			optionCmp.set("v.value", selectOption);
 
         },
         // Helper function for getValues

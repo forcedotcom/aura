@@ -23,13 +23,20 @@ import org.json.JSONArray;
 public final class PerfGoldFilesUtilTest extends UnitTestCase {
 
     public void testPerfMetricsSerialization() throws Exception {
+        // generate metrics gold file
         PerfMetrics metrics = new PerfMetrics();
         PerfMetric metric1 = new PerfMetric("metric1", 1);
         metric1.setDetails(new JSONArray("[{\"bytes\":\"3\"}]"));
         metrics.setMetric(metric1);
         metrics.setMetric(new PerfMetric("metric2", 2));
         String text = PerfGoldFilesUtil.toGoldFileText(metrics, true);
+        System.out.println("text: " + text);
 
+        // check the gold file is json-parseable
+        JSONArray json = new JSONArray(text);
+        assertEquals(3, json.length());
+
+        // read metrics back
         PerfMetrics readMetrics = PerfGoldFilesUtil.fromGoldFileText(text);
         assertEquals(2, readMetrics.size());
         metric1 = readMetrics.getMetric("metric1");

@@ -15,7 +15,6 @@
  */
 package org.auraframework.test.perf.metrics;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -28,6 +27,7 @@ import org.auraframework.test.perf.rdp.RDPNotification;
 import org.auraframework.test.perf.rdp.TimelineEventStats;
 import org.auraframework.test.perf.rdp.TimelineEventUtil;
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 /**
  * Collects and holds raw perf metrics data for a test case
@@ -43,8 +43,8 @@ public final class PerfMetricsCollector {
     // the perf metrics collected:
     private long elapsedMillis;
     private int deltaBrowserJSHeapSizeBytes;
-    private Map<String, String> uiPerfStats;
     private List<RDPNotification> notifications;
+    private Map<String, Map<String, Map<String, List<Object>>>> auraStats;
 
     private RDPAnalyzer rdpAnalyzer;
     private final boolean captureTimelineMetrics;
@@ -84,7 +84,7 @@ public final class PerfMetricsCollector {
         }
 
         if (hasAuraStats()) {
-            uiPerfStats = test.getUIPerfStats(new ArrayList<String>());
+            auraStats = test.getAuraStats();
         }
 
         return analyze();
@@ -129,10 +129,29 @@ public final class PerfMetricsCollector {
 
             // aura stats
             if (hasAuraStats()) {
-                // TODO: get the right Aura stats metrics
-                if (uiPerfStats.containsKey("Initial Component Created")) {
-                    metrics.setMetric("Aura.InitialComponentCreated", uiPerfStats.get("Initial Component Created"));
+                // "CreateComponent": {
+                // "afterRender": {
+                // "added": [],
+                // "removed": []
+                // }
+                if (LOG.isLoggable(Level.INFO)) {
+                    LOG.info("collected aura stats: " + new JSONObject(auraStats).toString(2));
                 }
+                for (String name : auraStats.keySet()) {
+                    Map<String, Map<String, List<Object>>> nameValue = auraStats.get(name);
+                    for (String method : nameValue.keySet()) {
+                        Map<String, List<Object>> methodValue = nameValue.get(method);
+                        for (String what : methodValue.keySet()) {
+                            List<Object> value = methodValue.get(what);
+                            metrics.setMetric("Aura." + name + '.' + method + '.' + what, value.size());
+                        }
+                    }
+                }
+
+                // TODO: get the right Aura stats metrics
+                // if (uiPerfStats.containsKey("Initial Component Created")) {
+                // metrics.setMetric("Aura.InitialComponentCreated", uiPerfStats.get("Initial Component Created"));
+                // }
             }
         } catch (Exception e) {
             LOG.log(Level.WARNING, test.getName(), e);
@@ -142,7 +161,7 @@ public final class PerfMetricsCollector {
 
     private boolean hasAuraStats() {
         Mode mode = test.getCurrentAuraMode();
-        return mode == Mode.PTEST || mode == Mode.CADENCE;
+        return mode == Mode.STATS;
     }
 
     @Override
@@ -151,7 +170,6 @@ public final class PerfMetricsCollector {
         sb.append(test.getName());
         sb.append(",elapsed=" + elapsedMillis);
         sb.append(",RDP=" + ((notifications != null) ? notifications : 0));
-        sb.append(",#statsEntries=" + ((uiPerfStats != null) ? uiPerfStats.size() : 0));
         sb.append(']');
         return sb.toString();
     }

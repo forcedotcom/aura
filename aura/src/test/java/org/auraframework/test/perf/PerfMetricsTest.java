@@ -20,7 +20,7 @@ public final class PerfMetricsTest extends AbstractPerfTestCase {
 
     @Override
     protected int numPerfAuraRuns() {
-        return getName().equals("testButton") ? 5 : 0;
+        return getName().equals("testButton") ? 1 : 0;
     }
 
     /**
@@ -54,10 +54,10 @@ public final class PerfMetricsTest extends AbstractPerfTestCase {
         // Timeline metrics
         expected.setMetric("Timeline.Rendering.Layout", 2);
         expected.setMetric("Timeline.Painting.Paint", 2); // button + image
+        // Aura Stats metrics:
+        expected.setMetric("Aura.CreateComponent.component.added", 9);
+        expected.setMetric("Aura.RenderComponent.rerender.removed", 0);
         assertMetrics(expected, actual);
-
-        // Aura Stats metrics (this metric fluctuates between 2/3)
-        assertNotNull(actual.getMetric("Aura.InitialComponentCreated"));
 
         // verify the component was loaded
         assertEquals("button loaded", LABEL_MOCK, currentDriver.findElement(By.cssSelector(".uiButton")).getText());

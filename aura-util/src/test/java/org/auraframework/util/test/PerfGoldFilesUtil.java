@@ -33,18 +33,23 @@ public final class PerfGoldFilesUtil {
      * @return text describing the metrics in a format convenient for the gold file
      */
     public static String toGoldFileText(PerfMetrics metrics, boolean addDetails) {
+        // write in a format that is both parseable as json and easy to see diffs
         StringBuilder sb = new StringBuilder();
+        sb.append('[');
         Set<String> names = metrics.getAllMetricNames();
         for (String name : names) {
+            if (sb.length() > 1) {
+                sb.append("\n,");
+            }
             PerfMetric metric = metrics.getMetric(name);
             JSONArray details = metric.getDetails();
             if (details != null) {
                 metric.remove(PerfMetric.DETAILS);
             }
             sb.append(metrics.getMetric(name));
-            sb.append('\n');
             if (details != null) {
                 if (addDetails) {
+                    sb.append("\n,");
                     // puts details in a separate line
                     JSONObject json = new JSONObject();
                     try {
@@ -53,11 +58,11 @@ public final class PerfGoldFilesUtil {
                         throw new RuntimeException(e);
                     }
                     sb.append(json);
-                    sb.append('\n');
                 }
                 metric.setDetails(details);
             }
         }
+        sb.append(']');
         return sb.toString();
     }
 
@@ -71,6 +76,10 @@ public final class PerfGoldFilesUtil {
         PerfMetric lastMetric = null;
         while ((line = reader.readLine()) != null) {
             try {
+                line = line.substring(1);
+                if (line.endsWith("]")) {
+                    line = line.substring(0, line.length() - 1);
+                }
                 if (lastMetric != null && line.startsWith("{\"" + lastMetric.getName() + ".details\":")) {
                     JSONObject details = new JSONObject(line);
                     lastMetric.setDetails(details.getJSONArray(lastMetric.getName() + ".details"));

@@ -227,7 +227,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
      * Override to change
      */
     protected int numPerfAuraRuns() {
-        return 0;
+        return 1; // metrics don't change from run to run
     }
 
     /**
@@ -337,6 +337,11 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public final Map<String, Map<String, Map<String, List<Object>>>> getAuraStats() {
+        return (Map<String, Map<String, Map<String, List<Object>>>>) auraUITestingUtil
+                .getRawEval("return $A.PERFCORE.stats.get();");
     }
 
     // UIPerf: note that UIPerf is only loaded in PTEST (and CADENCE) modes.

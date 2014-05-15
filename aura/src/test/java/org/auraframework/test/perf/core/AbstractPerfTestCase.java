@@ -60,7 +60,7 @@ public abstract class AbstractPerfTestCase extends WebDriverTestCase {
 
     protected final void runWithPerfApp(DefDescriptor<ComponentDef> descriptor) throws Exception {
         String relativeUrl = "/perfTest/perf.app?";
-        currentAuraMode = isPerfRunForAuraStats ? Mode.CADENCE : Mode.PROD;
+        currentAuraMode = isPerfRunForAuraStats ? Mode.STATS : Mode.PROD;
         relativeUrl += "aura.mode=" + currentAuraMode;
         relativeUrl += "#" + URLEncoder.encode("{\"componentDef\":\"" + descriptor + "\"}", "UTF-8");
         String url = getAbsoluteURI(relativeUrl).toString();

@@ -40,7 +40,9 @@ public class InputTextUITest extends WebDriverTestCase {
         super(name);
     }
 
-    @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET })
+    // Exclude on ios-driver because the driver hides the keyboard after send keys which triggers a blur event
+    @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD_IOS_DRIVER,
+            BrowserType.IPHONE_IOS_DRIVER })
     public void testUpdateOnAttribute_UsingStringSource() throws Exception {
         String event = "blur";
         String baseTag = "<aura:component  model=\"java://org.auraframework.impl.java.model.TestJavaModel\"> "
@@ -53,10 +55,10 @@ public class InputTextUITest extends WebDriverTestCase {
         String value = getCurrentModelValue();
         WebElement input = auraUITestingUtil.findElementAndTypeEventNameInIt(event);
         WebElement outputDiv = findDomElement(By.id("output"));
-        assertModelValue(value); // value shouldn't be updated yet
+        assertModelValue(value, "Value shouldn't be updated yet.");
         input.click();
         outputDiv.click();// to simulate tab behavior for touch browsers
-        value = assertModelValue(event); // value should have been updated
+        assertModelValue(event); // value should have been updated
     }
 
     @UnAdaptableTest
@@ -102,7 +104,7 @@ public class InputTextUITest extends WebDriverTestCase {
         WebElement outputDiv = findDomElement(By.id("output"));
         String eventName = "blur";
         WebElement input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
-        assertModelValue(value); // value shouldn't be updated yet
+        assertModelValue(value, "Value shouldn't be updated yet.");
         input.click();
         outputDiv.click(); // to simulate tab behavior for touch browsers
         value = assertModelValue(eventName); // value should have been updated
@@ -161,28 +163,28 @@ public class InputTextUITest extends WebDriverTestCase {
 
         String eventName = "dblclick";
         WebElement input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
-        assertModelValue(value);
+        assertModelValue(value, "Value shouldn't be updated yet.");
         a.doubleClick(input).build().perform();
         value = assertModelValue(eventName);
         assertDomEventSet();
 
         eventName = "mousemove";
         input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
-        assertModelValue(value);
+        assertModelValue(value, "Value shouldn't be updated yet.");
         a.moveToElement(input).moveByOffset(0, 100).build().perform();
         value = assertModelValue(eventName);
         assertDomEventSet();
 
         eventName = "mouseout";
         input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
-        assertModelValue(value);
+        assertModelValue(value, "Value shouldn't be updated yet.");
         a.moveToElement(input).moveToElement(outputDiv).build().perform();
         value = assertModelValue(eventName);
         assertDomEventSet();
 
         eventName = "mouseover";
         input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
-        assertModelValue(value);
+        assertModelValue(value, "Value shouldn't be updated yet.");
         outputDiv.click();
         a.moveToElement(input).build().perform();
         value = assertModelValue(eventName);
@@ -190,14 +192,14 @@ public class InputTextUITest extends WebDriverTestCase {
 
         eventName = "mouseup";
         input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
-        assertModelValue(value);
+        assertModelValue(value, "Value shouldn't be updated yet.");
         input.click();
         value = assertModelValue(eventName);
         assertDomEventSet();
 
         eventName = "select";
         input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
-        assertModelValue(value);
+        assertModelValue(value, "Value shouldn't be updated yet.");
         a.doubleClick(input).build().perform();
         value = assertModelValue(eventName);
     }
@@ -230,7 +232,7 @@ public class InputTextUITest extends WebDriverTestCase {
         input.click();
         input.sendKeys(eventName);
 
-        assertModelValue(value);
+        assertModelValue(value, "Value shouldn't be updated yet.");
         input.click();
         String expected = value + eventName;
         // When we click the input on Firefox the cursor is at the beginning of the text.
@@ -262,6 +264,10 @@ public class InputTextUITest extends WebDriverTestCase {
     }
 
     private String assertModelValue(final String expectedValue) {
+        return assertModelValue(expectedValue, "Model value is not what we expected");
+    }
+
+    private String assertModelValue(final String expectedValue, final String errorMsg) {
         try {
             return auraUITestingUtil.waitUntil(new ExpectedCondition<String>() {
                 @Override
@@ -275,7 +281,7 @@ public class InputTextUITest extends WebDriverTestCase {
                 }
             }, (timeoutInSecs * 3));
         } catch (TimeoutException e) {
-            assertEquals("Model value is not what we expected", expectedValue, getCurrentModelValue());
+            assertEquals(errorMsg, expectedValue, getCurrentModelValue());
             return getCurrentModelValue();
         }
     }
@@ -366,13 +372,15 @@ public class InputTextUITest extends WebDriverTestCase {
         assertEquals("Value of Input text shoud be updated", inputText, actualText);
     }
 
-    @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET })
+    // Exclude on ios-driver because the driver hides the keyboard after send keys which triggers a blur event
+    @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD_IOS_DRIVER,
+            BrowserType.IPHONE_IOS_DRIVER })
     public void testInputTextWithEmptyLabel() throws Exception {
         open(TEST_CMP_WITH_LABELS);
         String value = getCurrentModelValue();
         WebElement outputDiv = findDomElement(By.id("output"));
         WebElement input = auraUITestingUtil.findElementAndTypeEventNameInIt("empty");
-        assertModelValue(value); // value shouldn't be updated yet
+        assertModelValue(value, "Value should not be updated yet.");
         input.click();
         outputDiv.click(); // to simulate tab behavior for touch browsers
         assertModelValue("empty"); // value should have been updated

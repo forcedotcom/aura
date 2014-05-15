@@ -17,9 +17,7 @@ package org.auraframework.components.ui.button;
 
 import org.auraframework.test.WebDriverTestCase;
 import org.auraframework.util.test.perf.PerfTest;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -39,19 +37,8 @@ public class ButtonUITest extends WebDriverTestCase {
         wait.until(new ExpectedCondition<Boolean>() {
             @Override
             public Boolean apply(WebDriver d) {
-                return auraUITestingUtil.getQuickFixMessage().contains(errorMsg);
+                return auraUITestingUtil.getAuraErrorMessage().contains(errorMsg);
             }
         });
-    }
-
-    public void testDomEventAttributeOnPressEvent() throws Exception {
-        open("/uitest/button_Test.cmp");
-        WebElement btn = findDomElement(By.cssSelector(".testDomEventBtn"));
-        btn.click();
-
-        String valueExpression = auraUITestingUtil.getValueFromRootExpr("v.isDomEventSet");
-        valueExpression = auraUITestingUtil.prepareReturnStatement(valueExpression);
-        assertTrue("domEvent attribute on event should have been set",
-                auraUITestingUtil.getBooleanEval(valueExpression));
     }
 }

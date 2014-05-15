@@ -45,7 +45,7 @@ public class InputRichTextUITest extends WebDriverTestCase {
      */
     /* Excluding ipad and safari because safari driver has issues with element.sendkeys(Keys.TAB) */
     @ExcludeBrowsers({ BrowserType.SAFARI, BrowserType.SAFARI5,
-            BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET ,BrowserType.IPAD})
+            BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD })
     public void testRichTextTabbing() throws Exception {
         open(URL);
         WebElement beforeLink = auraUITestingUtil.waitForElement(By.cssSelector(LINKBEFORE_LOCATOR));
@@ -73,9 +73,11 @@ public class InputRichTextUITest extends WebDriverTestCase {
     /**
      * Test html content is escaped.
      */
-    /* Issue with sendKeys in Safari https://code.google.com/p/selenium/issues/detail?id=4467 */
+    // Issue with sendKeys in Safari https://code.google.com/p/selenium/issues/detail?id=4467.
+    // ios-driver fails to send the '/' key
     @ExcludeBrowsers({ BrowserType.SAFARI, BrowserType.SAFARI5,
-            BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET , BrowserType.IPAD})
+            BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPAD_IOS_DRIVER,
+            BrowserType.IPHONE_IOS_DRIVER })
     @ThreadHostileTest("testHtmlContentEscaped is not thread-safe")
     public void testHtmlContentEscaped() throws Exception {
         open(URL);

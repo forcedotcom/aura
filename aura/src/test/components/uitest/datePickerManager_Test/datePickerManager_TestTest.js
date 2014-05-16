@@ -45,24 +45,6 @@
                        $A.test.assertNotEquals(inputWDefaultValue, inputWODefaultValue, "The dates in the inputText should not be equal");
                    }]
     },
-    /**
-     * Test verifying that the inputText takes in input
-     * 
-     * Ignores iphone/ipad because those are going to be readonly fields
-     */
-    testDatepickerOpensToCorrectValue : {
-	browsers: ["-ANDROID_PHONE", "-ANDROID_TABLET", "-IPHONE", "-IPAD"],
-        test : [function(cmp) {
-            	     cmp.find(this.noDefValueID).set("v.value", "2013-09-25");
-            	     this.openDatePicker(cmp, this.noDefValueID);
-		   }, function(cmp){
-                       var pastWeek   = this.getDatePicker(cmp).find("grid").find("17");
-                       pastWeek.getEvent("click").fire({});
-                       
-                       var inputValue = cmp.find(this.defValueID).getElement().value;
-                       $A.test.assertEquals(inputValue, "2013-09-25", "The dates in the inputText should not be equal");
-		   }]
-    },
     
     /**
      * Test verifying that each datepicker opens up on the safe y-axis as the input 

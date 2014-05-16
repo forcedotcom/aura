@@ -103,7 +103,7 @@ public final class PerfMetricsTest extends AbstractPerfTestCase {
     // util
 
     private void assertMetrics(PerfMetrics expected, PerfMetrics actual) {
-        String differentMessage = new PerfMetricsComparator(0).compare(expected, actual);
+        String differentMessage = new PerfMetricsComparator(null).compare(expected, actual);
         if (differentMessage != null) {
             fail(differentMessage);
         }

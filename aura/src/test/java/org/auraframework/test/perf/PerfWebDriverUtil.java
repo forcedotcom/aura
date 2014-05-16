@@ -256,18 +256,18 @@ public final class PerfWebDriverUtil {
      * 
      * @return JS heap snapshot
      */
-    public Map takeHeapSnapshot() {
+    public Map<String, ?> takeHeapSnapshot() {
         if (SauceUtil.areTestsRunningOnSauce()) {
             throw new UnsupportedOperationException("required 2.10 chromedriver still not available in SauceLabs");
         }
-        return (Map) ((JavascriptExecutor) driver).executeScript(":takeHeapSnapshot");
+        return (Map<String, ?>) ((JavascriptExecutor) driver).executeScript(":takeHeapSnapshot");
     }
 
     /**
      * Analyzes the data in the snapshot and returns summary data
      */
-    public static JSONObject analyzeHeapSnapshot(Map data) {
-        Map metadata = (Map) data.get("snapshot");
+    public static JSONObject analyzeHeapSnapshot(Map<String, ?> data) {
+        Map<String, ?> metadata = (Map<String, ?>) data.get("snapshot");
         int nodeCount = ((Number) metadata.get("node_count")).intValue();
 
         // "node_fields": ["type","name","id","self_size","edge_count"]
@@ -290,7 +290,7 @@ public final class PerfWebDriverUtil {
     /**
      * Writes the heap snapshot into a file, this file can be loaded into chrome dev tools -> Profiles -> Load
      */
-    public static void writeHeapSnapshot(Map data, File file) throws Exception {
+    public static void writeHeapSnapshot(Map<String, ?> data, File file) throws Exception {
         BufferedWriter writer = null;
         try {
             file.getParentFile().mkdirs();
@@ -355,7 +355,7 @@ public final class PerfWebDriverUtil {
         }
     }
 
-    public static void showHeapSnapshot(Map data) throws JSONException {
+    public static void showHeapSnapshot(Map<String, ?> data) throws JSONException {
         for (Object key : data.keySet()) {
             System.out.println(key + ": " + data.get(key).getClass());
         }

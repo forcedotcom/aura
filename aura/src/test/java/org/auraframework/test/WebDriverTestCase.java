@@ -304,7 +304,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
 
         // runs to collect Aura stats metrics
         if (numPerfAuraRuns > 0) {
-            // collecting them in separate runs as they need PTEST or CADENCE modes
+            // collecting them in separate runs as they need STATS mode
             PerfRunsCollector runsCollector = new PerfRunsCollector();
             for (int i = 0; i < numPerfAuraRuns; i++) {
                 try {
@@ -352,7 +352,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
      * @return the current browser JS heap size in bytes
      */
     public final int getBrowserJSHeapSize() {
-        Map data = perfWebDriverUtil.takeHeapSnapshot();
+        Map<String, ?> data = perfWebDriverUtil.takeHeapSnapshot();
         JSONObject summary = PerfWebDriverUtil.analyzeHeapSnapshot(data);
         try {
             return summary.getInt("total_size");

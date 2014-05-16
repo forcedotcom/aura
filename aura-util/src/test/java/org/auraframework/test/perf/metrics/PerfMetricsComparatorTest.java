@@ -21,8 +21,8 @@ public final class PerfMetricsComparatorTest extends UnitTestCase {
 
     public void testCompare() throws Exception {
         PerfMetrics expected = new PerfMetrics();
-        expected.setMetric("metric1", 10);
-        expected.setMetric("metric2", 10);
+        expected.setMetric("Timeline.metric", 10);
+        expected.setMetric("Aura.metric", 10);
 
         PerfMetricsComparator comparator = new PerfMetricsComparator();
         PerfMetrics actual;
@@ -30,54 +30,59 @@ public final class PerfMetricsComparatorTest extends UnitTestCase {
 
         // UC: no message if exactly the same
         actual = new PerfMetrics();
-        actual.setMetric("metric1", 10);
-        actual.setMetric("metric2", 10);
+        actual.setMetric("Timeline.metric", 10);
+        actual.setMetric("Aura.metric", 10);
         message = comparator.compare(expected, actual);
         assertNull(message, message);
 
         // UC: no message if within bounds
         actual = new PerfMetrics();
-        actual.setMetric("metric1", 9);
-        actual.setMetric("metric2", 11);
+        actual.setMetric("Timeline.metric", 9);
+        actual.setMetric("Aura.metric", 10);
         message = comparator.compare(expected, actual);
         assertNull(message, message);
 
         // UC: message if not within bounds
         actual = new PerfMetrics();
-        actual.setMetric("metric1", 5);
-        actual.setMetric("metric2", 10);
+        actual.setMetric("Timeline.metric", 5);
+        actual.setMetric("Aura.metric", 10);
         message = comparator.compare(expected, actual);
-        assertEquals("perf metric out of range: metric1 - expected 10, actual 5", message);
+        assertEquals("perf metric out of range: Timeline.metric - expected 10, actual 5", message);
+        actual = new PerfMetrics();
+        actual.setMetric("Timeline.metric", 9);
+        actual.setMetric("Aura.metric", 9);
+        message = comparator.compare(expected, actual);
+        assertEquals("perf metric out of range: Aura.metric - expected 10, actual 9", message);
 
         // UC: message if metric missing
         actual = new PerfMetrics();
-        actual.setMetric("metric1", 10);
+        actual.setMetric("Timeline.metric", 10);
         message = comparator.compare(expected, actual);
-        assertEquals("actual perf metric missing: metric2", message);
+        assertEquals("actual perf metric missing: Aura.metric", message);
 
         // UC: allow at least 1 for small ints
         expected = new PerfMetrics();
-        expected.setMetric("metric1", 3);
+        expected.setMetric("Timeline.metric", 3);
         actual = new PerfMetrics();
-        actual.setMetric("metric1", 2);
+        actual.setMetric("Timeline.metric", 2);
         message = comparator.compare(expected, actual);
         assertNull(message, message);
 
         // UC: show non-sorted sequence for MedianPerfMetrics
         expected = new PerfMetrics();
-        expected.setMetric("bytes", 0);
+        expected.setMetric("Network.bytes", 0);
         PerfMetrics run1 = new PerfMetrics();
-        run1.setMetric("bytes", 3);
+        run1.setMetric("Network.bytes", 3);
         PerfMetrics run2 = new PerfMetrics();
-        run2.setMetric("bytes", 4);
+        run2.setMetric("Network.bytes", 4);
         PerfMetrics run3 = new PerfMetrics();
-        run3.setMetric("bytes", 2);
+        run3.setMetric("Network.bytes", 2);
         PerfRunsCollector collector = new PerfRunsCollector();
         collector.addRun(run1);
         collector.addRun(run2);
         collector.addRun(run3);
         actual = collector.getMedianMetrics();
         message = comparator.compare(expected, actual);
-        assertEquals("perf metric out of range: bytes - expected 0, actual 3 [3 4 2]", message);
+        assertEquals("perf metric out of range: Network.bytes - expected 0, actual 3 [3 4 2]", message);
     }
 }

@@ -34,8 +34,8 @@ public final class PerfMetricsComparator {
     // and using this logger the log messages do appear in the jenkins console output
     private static final Logger LOG = Logger.getLogger(PerfMetricsComparator.class.getSimpleName());
 
-    private static final float DEFAULT_ALLOWED_VARIABILITY = .2f;
-
+    private static final Map<String, Integer> ALLOWED_VARIABILITY = ImmutableMap.of("Timeline", 20, "Aura", 0,
+            "Network", 20);
     private static final Set<String> UNITS_TO_EXCLUDE = ImmutableSet.of("milliseconds");
 
     private static final Map<String, String> METRICS_TO_EXCLUDE; // value is reason for exclusion
@@ -66,13 +66,13 @@ public final class PerfMetricsComparator {
         METRICS_TO_EXCLUDE = ImmutableMap.copyOf(map);
     }
 
-    private final float allowedVariability;
+    private final Map<String, Integer> allowedVariability;
 
     public PerfMetricsComparator() {
-        this(DEFAULT_ALLOWED_VARIABILITY);
+        this(ALLOWED_VARIABILITY);
     }
 
-    public PerfMetricsComparator(float allowedVariability) {
+    public PerfMetricsComparator(Map<String, Integer> allowedVariability) {
         this.allowedVariability = allowedVariability;
     }
 
@@ -95,9 +95,19 @@ public final class PerfMetricsComparator {
 
             int expectedValue = expected.getIntValue();
             int actualValue = (actual != null) ? actual.getIntValue() : -1;
-            int allowed_variability = Math.round(expectedValue * allowedVariability);
-            if (allowedVariability > 0 && allowed_variability == 0)
-                allowed_variability = 1; // allow at least 1 if non-zero %
+            int dot = name.indexOf('.');
+            String metricCat = (dot != -1) ? name.substring(0, name.indexOf('.')) : name;
+
+            int allowedDelta = 0;
+            if (allowedVariability != null) {
+                Integer allowedPercent = allowedVariability.get(metricCat);
+                if (allowedPercent != null) {
+                    allowedDelta = Math.round((expectedValue * allowedPercent) / 100);
+                    if (allowedDelta == 0 && allowedPercent > 0) {
+                        allowedDelta = 1; // allow at least 1 if non-zero %
+                    }
+                }
+            }
 
             StringBuilder logLine = new StringBuilder(name + '[' + expectedValue);
             char logLineMark; // '=' metric in bounds, '*' metric out-of-bounds/missing, ' ' metric excluded
@@ -124,7 +134,7 @@ public final class PerfMetricsComparator {
                 numMetricsCompared++;
                 em.append("actual perf metric missing: " + name + '\n');
                 logLine.append(" MISSING");
-            } else if (Math.abs(expectedValue - actualValue) > allowed_variability) {
+            } else if (Math.abs(expectedValue - actualValue) > allowedDelta) {
                 logLineMark = '*';
                 numMetricsCompared++;
                 em.append("perf metric out of range: " + name);
@@ -167,7 +177,7 @@ public final class PerfMetricsComparator {
 
         // log a message showing what was really compared, i.e.:
         // "3 metrics compared allowing 20% variability: Paint[8->9*]
-        String percent = String.valueOf(Math.round(allowedVariability * 100)) + "% variability";
+        String percent = String.valueOf(allowedVariability) + "% variability";
         String legend = "\n    (first column: '=' metric within bounds, '*' metric out of bounds or missing, ' ' metric not compared)";
         String logMessage = String.valueOf(numMetricsCompared) + '/' + numMetrics + " metrics compared allowing "
                 + percent + ": " + legend + log;

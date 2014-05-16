@@ -18,6 +18,17 @@
 <aura:component>
     <!--
         Checking for case when no default value is given in inputSelect, 
+        and inputSelectOption is set to true for Lion. Lion should be chosen
+     -->
+    <ui:inputSelect aura:id="Value_Undef_With_Default">
+        <ui:inputSelectOption text="Tiger" label="Tiger"/>
+        <ui:inputSelectOption text="Lion"  label="Lion" value="true"/>
+        <ui:inputSelectOption text="Bear"  label="Bear"/>
+        <ui:inputSelectOption text="Moose"  label="Moose"/>
+    </ui:inputSelect>
+    <br/>
+    <!--
+        Checking for case when no default value is given in inputSelect, 
         and not inputSelectOption is chosen result should Tiger is default
         element chosen
      -->
@@ -27,16 +38,7 @@
         <ui:inputSelectOption text="Bear"  label="Bear"/>
     </ui:inputSelect>
     <br/>
-      <!--
-        Checking for case when no default value is given in inputSelect, 
-        and inputSelectOption is set to true for Lion. Lion should be chosen
-     -->
-    <ui:inputSelect aura:id="Value_Undef_With_Default">
-        <ui:inputSelectOption text="Tiger" label="Tiger"/>
-        <ui:inputSelectOption text="Lion"  label="Lion" value="true"/>
-        <ui:inputSelectOption text="Bear"  label="Bear"/>
-    </ui:inputSelect>
-    <br/>
+      
     <!--
         Checking for case when default for input select is Bear, result 
         should be bear is the initial item shown

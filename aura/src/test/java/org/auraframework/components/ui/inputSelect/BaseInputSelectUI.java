@@ -1,9 +1,6 @@
 package org.auraframework.components.ui.inputSelect;
 
-import java.util.List;
-
 import org.auraframework.test.WebDriverTestCase;
-import org.auraframework.test.WebDriverUtil.BrowserType;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
@@ -42,20 +39,17 @@ public class BaseInputSelectUI extends WebDriverTestCase{
         String newOption = options[2];
         
         open(URL);
-        focusSelectElement();
         // There should be 4 options with Option2 as selected
         assertEquals(4, selectOptionsSize());
         verifyOptionSelected(oldOption);
         
-        String aura_selected_item = auraUITestingUtil.getValueFromCmpExpression(SELECT_ID, "v.value");
-        assertEquals(aura_selected_item, oldOption);
+        String aura_selected_item =  auraUITestingUtil.getValueFromCmpRootExpression(SELECT_ID, "v.value");
+        assertEquals(auraUITestingUtil.getEval(aura_selected_item), oldOption);
         // Select Option1
         selectOption(newOption);
 
-        verifyOptionSelected(newOption);        
-        aura_selected_item = auraUITestingUtil.getValueFromCmpExpression(SELECT_ID, "v.value");
-        
-        assertEquals(aura_selected_item, newOption);          
+        verifyOptionSelected(newOption);         
+        assertEquals(auraUITestingUtil.getEval(aura_selected_item), newOption);          
     }
     /**
      * Selecting first option should work
@@ -65,7 +59,6 @@ public class BaseInputSelectUI extends WebDriverTestCase{
     public void testSelectingFirstOption() throws Exception {
 
         open(URL);
-        focusSelectElement();
         bodyOfTest(options[1], options[0]);
     }
 
@@ -77,7 +70,6 @@ public class BaseInputSelectUI extends WebDriverTestCase{
     public void testSelectingLastOption() throws Exception {
 
         open(URL);
-        focusSelectElement();
         bodyOfTest(options[1], options[3]);
     }
 
@@ -126,22 +118,6 @@ public class BaseInputSelectUI extends WebDriverTestCase{
             assertTrue("Option '" + optionLabel + "' should be selected", option.isSelected());
         } else {
             assertFalse("Option '" + optionLabel + "' should be deselected", option.isSelected());
-        }
-    }
-
-    /**
-     * Only for IE10 we need to explicitly bring focus on to select input. selectBy() does not do it. But clicking on
-     * select element corrupts selected/unselected options so we need to preserve the state
-     */
-    protected void focusSelectElement() {
-        if (BrowserType.IE10.equals(getBrowserType())) {
-            List<WebElement> selectedOptions = getInputSelect().getAllSelectedOptions();
-            findDomElement(SELECT_LOCATOR).click();
-
-            getInputSelect().deselectAll();
-            for (int i = 0; i < selectedOptions.size(); i++) {
-                getInputSelect().selectByVisibleText(selectedOptions.get(i).getText());
-            }
         }
     }
 

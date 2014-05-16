@@ -15,10 +15,7 @@
  */
 package org.auraframework.components.ui.inputMultiSelect;
 
-import java.util.List;
-
 import org.auraframework.test.WebDriverTestCase;
-import org.auraframework.test.WebDriverUtil.BrowserType;
 import org.auraframework.util.test.perf.PerfTest;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -122,10 +119,6 @@ public class BaseInputMultiSelect extends WebDriverTestCase {
             verifyOptionSelected("Option2");
             verifyOptionDeselected("Option3");
 
-            // deselect
-            if (BrowserType.IE10.equals(getBrowserType())) {
-                focusSelectElement();
-            }
             deselectOption("Option2");
             verifyOptionSelected("Option1");
             
@@ -163,21 +156,5 @@ public class BaseInputMultiSelect extends WebDriverTestCase {
 
             findDomElement(submitLocator).click();
             auraUITestingUtil.waitForElementText(outputLocator, "", true);
-    }
-
-    /**
-     * Only for IE10 we need to explicitly bring focus on to select input. selectBy() does not do it. But clicking on
-     * select element corrupts selected/unselected options so we need to preserve the state
-     */
-    private void focusSelectElement() {
-        if (BrowserType.IE10.equals(getBrowserType())) {
-            List<WebElement> selectedOptions = getInputSelect().getAllSelectedOptions();
-            findDomElement(selectLocator).click();
-
-            getInputSelect().deselectAll();
-            for (int i = 0; i < selectedOptions.size(); i++) {
-                getInputSelect().selectByVisibleText(selectedOptions.get(i).getText());
-            }
-        }
     }
 }

@@ -20,10 +20,11 @@
  * @constructor
  * @protected
  * @class AuraContext
- * @param {Object}
- *      config the 'founding' config for the context from the server.
+ * @param {Object} config the 'founding' config for the context from the server.
+ * @param {Function} initCallback an optional callback invoked after the config has finished its
+ *  asynchronous initialization.
  */
-function AuraContext(config) {
+function AuraContext(config, initCallback) {
     var i, defs, length;
 
     this.mode = config["mode"];
@@ -44,24 +45,31 @@ function AuraContext(config) {
     this.app = config["app"];
     this.cmp = config["cmp"];
     this.test = config["test"];
-    this.globalValueProviders = new $A.ns.GlobalValueProviders(config["globalValueProviders"]);
-    // Careful now, the def is null, this fake action sets up our paths.
-    this.currentAction = new Action(null, ""+this.num, null, null, false, null, false);
-    if (config["componentDefs"]) {
-        defs = config["componentDefs"];
-        length = defs.length;
-        for (i = 0; i < length; i++) {
-            $A.services.component.getDef(defs[i]);
+
+    var that = this;
+    this.globalValueProviders = new $A.ns.GlobalValueProviders(config["globalValueProviders"], function() {
+        // Careful now, the def is null, this fake action sets up our paths.
+        that.currentAction = new Action(null, ""+that.num, null, null, false, null, false);
+        if (config["componentDefs"]) {
+            defs = config["componentDefs"];
+            length = defs.length;
+            for (i = 0; i < length; i++) {
+                $A.services.component.getDef(defs[i]);
+            }
         }
-    }
-    if (config["eventDefs"]) {
-        defs = config["eventDefs"];
-        length = defs.length;
-        for (i = 0; i < length; i++) {
-            $A.services.event.getEventDef(defs[i]);
+        if (config["eventDefs"]) {
+            defs = config["eventDefs"];
+            length = defs.length;
+            for (i = 0; i < length; i++) {
+                $A.services.event.getEventDef(defs[i]);
+            }
         }
-    }
-    this.joinComponentConfigs(config["components"], this.currentAction.getId());
+        that.joinComponentConfigs(config["components"], that.currentAction.getId());
+
+        if (initCallback) {
+            initCallback();
+        }
+    });
 }
 
 /**
@@ -357,14 +365,14 @@ AuraContext.prototype.joinLoaded = function(loaded) {
     }
     if (loaded) {
         for ( var i in loaded) {
-        	if (loaded.hasOwnProperty(i) && !($A.util.isFunction(i))) {
-	            var newL = loaded[i];
-	            if (newL === 'deleted') {
-	                delete this.loaded[i];
-	            } else {
-	                this.loaded[i] = newL;
-	            }
-        	}
+            if (loaded.hasOwnProperty(i) && !($A.util.isFunction(i))) {
+                var newL = loaded[i];
+                if (newL === 'deleted') {
+                    delete this.loaded[i];
+                } else {
+                    this.loaded[i] = newL;
+                }
+            }
         }
     }
 };

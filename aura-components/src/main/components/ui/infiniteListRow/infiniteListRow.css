@@ -1,0 +1,25 @@
+.THIS {
+	display: block;
+	position: relative;
+	width: 100%; 
+}
+
+.THIS {
+	transition: all .3s;
+}
+
+.THIS > div.body {
+	width: 100%;
+}
+
+.THIS > div.swipeBody {
+	position: absolute;
+	width: 100%;
+	top: 0;	
+	bottom: 0;
+	transform: translate3d(100%, 0, 0);
+}
+
+.THIS.open {
+	transform: translate3d(-80%, 0, 0);
+}

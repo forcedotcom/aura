@@ -71,7 +71,6 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.interactions.Action;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -637,14 +636,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
 
             Dimension windowSize = getWindowSize();
             if (currentBrowserType == BrowserType.GOOGLECHROME) {
-                ChromeOptions options = new ChromeOptions();
-                List<String> arguments = Lists.newArrayList();
-                arguments.add("--ignore-gpu-blacklist");
-                if (windowSize != null) {
-                    arguments.add("window-size=" + windowSize.width + ',' + windowSize.height);
-                }
-                options.addArguments(arguments);
-                capabilities.setCapability(ChromeOptions.CAPABILITY, options);
+                WebDriverUtil.addChromeOptions(capabilities, windowSize);
             }
 
             logger.info(String.format("Requesting: %s", capabilities));

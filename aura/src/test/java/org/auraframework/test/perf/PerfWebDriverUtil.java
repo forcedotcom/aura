@@ -61,6 +61,8 @@ public final class PerfWebDriverUtil {
     private static final LoggingPreferences PERFORMANCE_LOGGING_PREFS;
 
     static {
+        // NOTE: need to create single LoggingPreferences object to be reused as LoggingPreferences
+        // doesn't implement hashCode()/equals() correctly
         PERFORMANCE_LOGGING_PREFS = new LoggingPreferences();
         PERFORMANCE_LOGGING_PREFS.enable(LogType.PERFORMANCE, Level.INFO);
         // logPrefs.enable(LogType.BROWSER, Level.ALL);

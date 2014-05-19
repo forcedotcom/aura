@@ -14,14 +14,37 @@
  * limitations under the License.
  */
 ({
-    updateAmpm: function(component, event, helper) {
-        var amPmCmp = component.find("ampm");
-        var hours = component.get("v.hours");
-        if (amPmCmp) {
-            if (amPmCmp.get("v.value") == "am") {
-                component.set("v.hours", parseInt(hours) - 12);
+	updateAmpm: function(component, event, helper) {
+    	var amPmCmp = component.find("ampm");
+        var isAndroid = $A.getGlobalValueProviders().get("$Browser.isAndroid");
+        if (isAndroid === true) { // On Android, if hour field is changed and then ampm select is clicked, 
+        	                      // the focus is still in hour field. That is, the hour value doesn't get updated.
+            var hoursCmp = component.find("hours");
+            var currentHourValue = hoursCmp.getElement().value;
+            hoursCmp.setValue("v.value", currentHourValue);
+            if (helper.validateHours(component)) {
+                if (amPmCmp) { // it must be in 12 hour format
+                    if (amPmCmp.get("v.value") == "am") {
+                        component.setValue("v.hours", parseInt(currentHourValue));
+                    } else {
+                        component.setValue("v.hours", parseInt(currentHourValue) + 12);
+                    }
+                }
+                component.setValue("v.isValid", true);
             } else {
-                component.set("v.hours", parseInt(hours) + 12);
+            	component.setValue("v.isValid", false);
+            }
+            return;
+        }
+        
+        if (component.get("v.isValid") === true) {
+            var hours = component.get("v.hours");
+            if (amPmCmp) {
+                if (amPmCmp.get("v.value") == "am") {
+                    component.setValue("v.hours", parseInt(hours) - 12);
+                } else {
+                    component.setValue("v.hours", parseInt(hours) + 12);
+                }
             }
         }
     },

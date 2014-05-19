@@ -27,7 +27,14 @@
 	refreshScroller : function(component) {
 		var width = component.get("v.width");
 		if (width) {
-			component.find("scrollContent").getElement().style.width = width;
+			var contentelement = component.find("scrollContent").getElement();
+			//
+			// May not be present if we switch screen really quickly.
+			// Resize is done asyncronously, so sometimes it just doesn't exist.
+			//
+			if(contentelement) {
+				contentelement.style.width = width;
+			}
 		}
 
 		if (!component._refreshing) {

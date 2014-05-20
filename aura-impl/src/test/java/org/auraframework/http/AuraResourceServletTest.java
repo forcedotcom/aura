@@ -137,7 +137,7 @@ public class AuraResourceServletTest extends AuraTestCase {
      * so when different browser request on the same page, they don't get each other's cache one
      * server cache CSS for cmp too.
      */
-    public void runTestRequestFromDifferentBrowserOnSamePage(String ua, Type uaType, String browserType, String cssMsgToVerify) throws Exception {
+    private void runTestRequestFromDifferentBrowserOnSamePage(String ua, Type uaType, String browserType, String cssMsgToVerify) throws Exception {
     	String cmpname = "appCache:withpreload";
     	String cmporapp = "app";
     	DefDescriptor<ApplicationDef> appDesc = DefDescriptorImpl.getInstance(cmpname,
@@ -168,7 +168,7 @@ public class AuraResourceServletTest extends AuraTestCase {
         // Verify something was actually added to cache
         String cssCache = context.getDefRegistry().getCachedString(uid, appDesc, key);
         assertNotNull("Nothing added to CSS cache", cssCache);
-        if(cssMsgToVerify!="") {
+        if(!cssMsgToVerify.isEmpty()) {
         	assertTrue(cssCache.contains(cssMsgToVerify));
         }
         

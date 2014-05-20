@@ -102,19 +102,24 @@ public class InputTextUITest extends WebDriverTestCase {
         open(url);
         String value = getCurrentModelValue();
         WebElement outputDiv = findDomElement(By.id("output"));
-        String eventName = "blur";
-        WebElement input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
-        assertModelValue(value, "Value shouldn't be updated yet.");
-        input.click();
-        outputDiv.click(); // to simulate tab behavior for touch browsers
-        value = assertModelValue(eventName); // value should have been updated
-        assertDomEventSet();
 
-        eventName = "click";
-        input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
+        // ios-driver sends a blur event during sendKeys so skip that event check
+        if (!BrowserType.IPAD_IOS_DRIVER.equals(getBrowserType())
+                && !BrowserType.IPHONE_IOS_DRIVER.equals(getBrowserType())) {
+            String eventName = "blur";
+            WebElement input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
+            assertModelValue(value, "Value shouldn't be updated yet.");
+            input.click();
+            outputDiv.click(); // to simulate tab behavior for touch browsers
+            value = assertModelValue(eventName); // value should have been updated
+            assertDomEventSet();
+        }
+
+        String eventName = "click";
+        WebElement input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
         assertModelValue(value);
         outputDiv.click();
-        assertModelValue(value);
+        assertModelValue(value, "Clicking an element without the updateOn attribute should not change the value");
         input.click();
         value = assertModelValue(eventName);
         assertDomEventSet();

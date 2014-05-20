@@ -47,6 +47,7 @@ import com.google.common.collect.Lists;
 public class AuraUITestingUtil {
     private final WebDriver driver;
     private long timeoutInSecs = 30;
+    private int rerunCount = 0;
 
     public AuraUITestingUtil(WebDriver driver) {
         this.driver = driver;
@@ -251,7 +252,7 @@ public class AuraUITestingUtil {
         /**
          * Wrap the given javascript to evaluate and then check for any collected errors. Then, return the result and
          * errors back to the WebDriver. We must return as an array because
-         * {@link JavascriptExecutor#executeScript(String, Object...) cannot handle Objects as return values."
+         * {@link JavascriptExecutor#executeScript(String, Object...)} cannot handle Objects as return values."
          */
         String escapedJavascript = StringEscapeUtils.escapeEcmaScript(javascript);
         String wrapper = "var ret,scriptExecException;"
@@ -272,6 +273,7 @@ public class AuraUITestingUtil {
                     + "Arguments: (" + Arrays.toString(args) + ")\n" + "Script:\n" + javascript + "\n", exception);
             String errors = (String) wrapResult.get(1);
             assertJsTestErrors(errors);
+            rerunCount = 0;
             return wrapResult.get(0);
         } catch (WebDriverException e) {
             // shouldn't come here that often as we are also wrapping the js
@@ -279,6 +281,14 @@ public class AuraUITestingUtil {
             Assert.fail("Script execution failed.\n" + "Failure Message: " + e.getMessage() + "\n" + "Arguments: ("
                     + Arrays.toString(args) + ")\n" + "Script:\n" + javascript + "\n");
             throw e;
+        } catch (NullPointerException npe) {
+            // Although it should never happen, ios-driver is occasionally returning null when trying to execute the
+            // wrapped javascript. Re-run the script a couple more times before failing.
+            if (++rerunCount > 2) {
+                Assert.fail("Script execution failed.\n" + "Failure Message: " + npe.getMessage() + "\n"
+                        + "Arguments: (" + Arrays.toString(args) + ")\n" + "Script:\n" + javascript + "\n");
+            }
+            return getEval(javascript, args);
         }
     }
 
@@ -308,6 +318,10 @@ public class AuraUITestingUtil {
      * @param errors the raw results from invoking $A.test.getErrors()
      */
     public void assertJsTestErrors(String errors) {
+        if (errors == null) {
+            return;
+        }
+
         if (!errors.isEmpty()) {
             @SuppressWarnings("unchecked")
             List<Map<String, Object>> errorsList = (List<Map<String, Object>>) new JsonReader().read(errors);

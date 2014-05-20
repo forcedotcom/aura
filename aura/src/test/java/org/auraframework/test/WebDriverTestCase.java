@@ -860,6 +860,28 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
     }
 
     /**
+     * Waits for element with matching locator to disappear from the screen.
+     * 
+     * @param msg Error message on timeout.
+     * @param locator By of element waiting for.
+     */
+    public void waitForElementDisappear(String msg, final By locator) {
+        WebDriverWait wait = new WebDriverWait(getDriver(), timeoutInSecs);
+        wait.withMessage(msg);
+        wait.until(new ExpectedCondition<Boolean>() {
+            @Override
+            public Boolean apply(WebDriver d) {
+                return !isElementPresent(locator);
+            }
+        });
+    }
+
+    public void waitForElementDisappear(By locator) {
+        String msg = "Element with locator \'" + locator.toString() + "\' never disappeared";
+        waitForElementDisappear(msg, locator);
+    }
+
+    /**
      * Overriding wait to wait until the dialog box closes, Since we are using the class variable to check for the
      * Dialog box, it changes from dialog modal medium uiDialog slideUp -> dialog modal medium uiDialog-> dialog hidden
      * modal medium uiDialog (this is the state that we want to make sure to grab)

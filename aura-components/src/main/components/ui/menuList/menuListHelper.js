@@ -120,7 +120,7 @@
                 	    if (referenceElemRect.right < width) { // no enough space to the left either. Put it in the middle then.
                 		    elem.style.left = (viewPort.width - width) + window.scrollX + "px";
                 	    } else { // align at the right
-                		    elem.style.right = referenceElemRect.right + window.scrollX + "px";
+                		    elem.style.left = referenceElemRect.right - width + window.scrollX + "px";
                 	    }
                     } else { // align at the left
                         elem.style.left = referenceElemRect.left + window.scrollX + "px";

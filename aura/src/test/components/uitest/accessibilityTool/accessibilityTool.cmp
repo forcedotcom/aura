@@ -516,4 +516,13 @@
           <h6>6thHeader</h6>
           <h4>4thHeader</h4>      
     </aura:if>
+    <!--Test that will make sure that the accessibility tool can handle empty tags that do not have any attributes-->
+    <aura:if isTrue="{!v.caseToRender == 'tagsWithoutAttributes'}">
+        <input/>
+        <a/>
+        <img/>
+        <button/>
+        <iframe/>
+    </aura:if>
+    
 </aura:component>

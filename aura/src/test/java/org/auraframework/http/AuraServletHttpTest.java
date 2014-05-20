@@ -49,23 +49,22 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
     public AuraServletHttpTest(String name) {
         super(name);
     }
-    
+
     /**
-     * Test for W-2063110
-     * this test is to verify the order of actions and context in the response
-     * we used to have context before actions, now it's the opposite
+     * Test for W-2063110 this test is to verify the order of actions and context in the response we used to have
+     * context before actions, now it's the opposite
      */
     public void testPostRawResponseSimpleAction() throws Exception {
-    	Map<String, Object> actionParams = new HashMap<String, Object>();
+        Map<String, Object> actionParams = new HashMap<String, Object>();
         actionParams.put("param", "some string");
-    	ServerAction a = new ServerAction(
+        ServerAction a = new ServerAction(
                 "java://org.auraframework.impl.java.controller.JavaTestController/ACTION$getString",
                 actionParams);
-    	a.run();
+        a.run();
         String rawRes = a.getrawResponse();
         Integer posActions = rawRes.indexOf("actions");
         Integer posContex = rawRes.indexOf("context");
-        assertTrue(posActions<posContex);
+        assertTrue(posActions < posContex);
     }
 
     /**
@@ -197,8 +196,8 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
 
         assertEquals(HttpStatus.SC_OK, getStatusCode(response));
         String responseText = getResponseBody(response);
-        assertTrue("Expected tag error in: "+responseText,
-            responseText.contains("Invalid request, tag must not be empty"));
+        assertTrue("Expected tag error in: " + responseText,
+                responseText.contains("Invalid request, tag must not be empty"));
         get.releaseConnection();
     }
 
@@ -351,7 +350,25 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         HttpResponse httpResponse = perform(get);
         assertEquals(HttpStatus.SC_OK, getStatusCode(httpResponse));
         String response = getResponseBody(httpResponse);
-        assertTrue("Expected null descriptor error message but got: " + response, response.contains("descriptor is null"));
+        assertTrue("Expected null descriptor error message but got: " + response,
+                response.contains("descriptor is null"));
+        get.releaseConnection();
+    }
+
+    /**
+     * Verify providing invalid DefDescriptor format to the aura.tag param results in the proper handled Exception and
+     * not an AuraUnhandledException, which results in a Gack on SFDC.
+     */
+    public void testInvalidDefDescriptorFormat() throws Exception {
+        String url = String.format("/aura?aura.tag=foo:bar:baz");
+        HttpGet get = obtainGetMethod(url);
+        HttpResponse httpResponse = perform(get);
+        assertEquals(HttpStatus.SC_OK, getStatusCode(httpResponse));
+        String response = getResponseBody(httpResponse);
+        assertTrue("Expected 'SystemErrorException: Invalid Descriptor Format' but got: " + response,
+                response.contains("SystemErrorException: Invalid Descriptor Format: foo:bar:baz"));
+        assertFalse("Invalid aura.tag input should not result in an AuraUnhandledException. " + response,
+                response.contains("AuraUnhandledException: Unable to process your request"));
         get.releaseConnection();
     }
 }

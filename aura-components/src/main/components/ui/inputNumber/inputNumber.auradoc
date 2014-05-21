@@ -30,8 +30,9 @@
 		</p>
 		<p>
 			To provide a field label for accessibility, use the <code>label</code> attribute. You can hide the label from view by setting <code>labelPosition="hidden"</code> and still maintain accessibility.
-			
-    	</p>
-		
+    	</p>	
 	</aura:description>		
+	<aura:example name="inputExample" ref="uiExamples:inputExample" label="Using ui:inputNumber">
+    		This example shows how you can use <code>ui:inputNumber</code> to get user input.
+    </aura:example>
 </aura:documentation>

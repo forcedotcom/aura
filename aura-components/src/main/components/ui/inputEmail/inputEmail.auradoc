@@ -25,6 +25,8 @@
 			To provide a field label for accessibility, use the <code>label</code> attribute. You can hide the label from view by setting <code>labelPosition="hidden"</code> and still maintain accessibility.
 			
     	</p>
-		
-	</aura:description>		
+	</aura:description>	
+	<aura:example name="inputExample" ref="uiExamples:inputExample" label="Using ui:inputEmail">
+    		This example shows how you can use <code>ui:inputEmail</code> to get user input.
+    </aura:example>	
 </aura:documentation>

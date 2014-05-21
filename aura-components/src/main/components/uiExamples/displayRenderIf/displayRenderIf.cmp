@@ -1,0 +1,11 @@
+<aura:component>
+
+    <aura:attribute name="display" type="Boolean" default="true"/>
+    
+    <uiExamples:renderIfExample  display="{!v.display || v.display}"/>
+
+    <br/><br/>
+
+    <ui:button label="Toggle" press="{!c.toggle}"/>
+
+</aura:component>

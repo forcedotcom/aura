@@ -1,0 +1,13 @@
+<aura:component>
+
+    <aura:attribute name="display" type="Boolean" default="true"/>
+
+    <aura:renderif isTrue="{!v.display}">
+        True
+
+        <aura:set attribute="else">
+          False
+        </aura:set>
+    </aura:renderif>
+
+</aura:component>

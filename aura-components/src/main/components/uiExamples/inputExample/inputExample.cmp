@@ -18,7 +18,7 @@
 <aura:component>
 	<aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
 	<aura:attribute name="today" type="Date" default=""/>
-	<aura:attribute name="deadline" type="Date" default="May 16, 2014 2:22:00 PM"/>
+	<aura:attribute name="deadline" type="Date" />
 	<aura:attribute name="display" type="Boolean" default="false"/>
 	
     <div class="section">
@@ -42,7 +42,7 @@
 			Email: <ui:outputEmail aura:id="oEmail" value="Email" /><br/>
 			Phone: <ui:outputPhone aura:id="oPhone" value="" /><br/>
 			Date: <ui:outputDate aura:id="oDate" value="" /><br/>
-			Deadline: <ui:outputDateTime aura:id="oDateTime" value="" /><br/>
+			Deadline: <ui:outputDateTime aura:id="oDateTime" value="" format="MMM dd, yyy hh:mm:ss A" /><br/>
 			Reimbursed? <ui:outputCheckbox aura:id="oCheckbox" value=""/>
 		</aura:renderIf>
 	</div>

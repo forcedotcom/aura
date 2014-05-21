@@ -17,8 +17,7 @@
 	doInit : function(component, event, helper) {
 		var today = new Date();
 		component.set('v.today', today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate());
-		var deadline = new Date();
-		component.set('v.deadline', deadline.getFullYear() + "-" + (deadline.getMonth() + 2) + "-" + deadline.getDate());
+		component.set('v.deadline', today);
 	},
 	
     newEntry : function(component, event, helper) {

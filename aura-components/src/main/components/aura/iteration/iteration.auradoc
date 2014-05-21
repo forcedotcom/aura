@@ -1,0 +1,27 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:documentation>
+	<aura:description>
+		<p><code>aura:iteration</code> iterates over a collection of items and renders the body of the tag for each item.
+		   Data changes in the collection are rerendered automatically on the page. It also supports iterations containing components that are created exlusively on the client-side or components that have server-side dependencies.
+	 	</p>
+	</aura:description>	
+	<aura:example name="iterationExample" ref="uiExamples:iterationExample" label="Using aura:iteration">
+		<p>This example shows a basic way to use <code>aura:iteration</code> exclusively on the client-side.</p>
+	</aura:example>
+</aura:documentation>

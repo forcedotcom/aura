@@ -37,6 +37,9 @@
         
         if ($A.util.isEmpty(opts)) {
         	opts = cmp.get("v.body");
+        	if ($A.util.isEmpty(opts)) {
+        		return null;
+        	}
         	strat = this.bodyStrategy;
         }
 
@@ -253,11 +256,14 @@
     	optFrag = document.createDocumentFragment();
     	for (var i = 0; i < options.length; i++) {
     		option = document.createElement("option");
-    		internalText = ($A.util.isEmpty(options[i].label) ? options[i].value : options[i].label);
+    		internalText = ($A.util.isEmpty(options[i].label) ? options[i].value : options[i].label) || "";
     		
-    		option.label = options[i].label;
-    		option.value = options[i].value;
-    		option.setAttribute("class", options[i]["class"]);
+    		option.label = options[i].label || internalText;
+    		option.value = options[i].value || internalText;
+    		
+    		if (options[i]["class"]) {
+    			option.setAttribute("class", options[i]["class"]);
+    		}
 
     		if (options[i].selected) {
     			option.selected = "selected";

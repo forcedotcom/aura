@@ -788,12 +788,7 @@
 		} ]
 	},
 
-	/*
-	 * W-1755876: currently failing because the aborted in-flight action is still resulting in the storage of the returned value
-	 * (seen as the replay value in the following storable call)
-	 * 
-	 */
-	_testAbortInFlightStorable : {
+	testAbortInFlightStorable : {
 		test : [ function(cmp) {
 			var that = this;
 			$A.run(function() {
@@ -816,7 +811,7 @@
 				a.setStorable();
 				$A.enqueueAction(a);
 			});
-			// queue up storable
+            // queue up second storable
 			$A.run(function() {
 				var a = that.getAction(cmp, "c.execute", "WAIT;READ;", function(a) {
 					that.log(cmp, "store2:" + a.isFromStorage() + ":" + a.getReturnValue());
@@ -830,9 +825,10 @@
 				$A.enqueueAction(that.getAction(cmp, "c.executeBackground", "APPEND release2;RESUME;"));
 			});
 
-			// "release1" should have been eaten by in-flight storable, but callback should have been aborted
 			this.waitForLog(cmp, 1, "store1:true:initial");
-			this.waitForLog(cmp, 2, "store2:true:initial");
+            // since the first action is already in flight when it is aborted, the return value is still stored in
+            // storage (release1), we just don't call the callback
+			this.waitForLog(cmp, 2, "store2:true:release1");
 			this.waitForLog(cmp, 3, "store2:false:release2");
 		} ]
 	},

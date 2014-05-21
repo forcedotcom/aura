@@ -33,16 +33,14 @@
 	</style>
 	<div id="header" class="common">New Aura Scroller</div>
 		
-		<ui:scroller class="scrollWrapper" 
-			canRefresh = "true"
-			canShowMore = "true"
-			onPullToRefresh="{!c.fetchDataPTR}" 
-			onPullToShowMore="{!c.fetchDataPTL}" 
-			onBeforeScrollStart="{!c.beforeScrollStartHandler}" 
-			onScrollStart="{!c.scrollStartHandler}" 
-			onScrollMove="{!c.scrollMoveHandler}" 
-			onScrollEnd="{!c.scrollEndHandler}"  
-			aura:id="test-scroller" showScrollbars="true">
+		<ui:scroller class="scrollWrapper"
+			snap="true"
+			canShowMore="true"
+			infiniteLoading="true"
+			infiniteLoadingThreshold="4"
+			infiniteLoadingDataProvider="{!c.infiniteLoad}"
+			aura:id="test-scroller"
+			>
 			
 				<div class="item" id="r1">Pretty row 1</div>
 				<div class="item" id="r2">Pretty row 2</div>
@@ -104,53 +102,9 @@
 				<div class="item" id="r58">Pretty row 58</div>
 				<div class="item" id="r59">Pretty row 59</div>
 				<div class="item" id="r60">Pretty row 60</div>
-				<div class="item" id="r61">Pretty row 61</div>
-				<div class="item" id="r62">Pretty row 62</div>
-				<div class="item" id="r63">Pretty row 63</div>
-				<div class="item" id="r64">Pretty row 64</div>
-				<div class="item" id="r65">Pretty row 65</div>
-				<div class="item" id="r66">Pretty row 66</div>
-				<div class="item" id="r67">Pretty row 67</div>
-				<div class="item" id="r68">Pretty row 68</div>
-				<div class="item" id="r69">Pretty row 69</div>
-				<div class="item" id="r70">Pretty row 70</div>
-				<div class="item" id="r71">Pretty row 71</div>
-				<div class="item" id="r72">Pretty row 72</div>
-				<div class="item" id="r73">Pretty row 73</div>
-				<div class="item" id="r74">Pretty row 74</div>
-				<div class="item" id="r75">Pretty row 75</div>
-				<div class="item" id="r76">Pretty row 76</div>
-				<div class="item" id="r77">Pretty row 77</div>
-				<div class="item" id="r78">Pretty row 78</div>
-				<div class="item" id="r79">Pretty row 79</div>
-				<div class="item" id="r80">Pretty row 80</div>
-				<div class="item" id="r81">Pretty row 81</div>
-				<div class="item" id="r82">Pretty row 82</div>
-				<div class="item" id="r83">Pretty row 83</div>
-				<div class="item" id="r84">Pretty row 84</div>
-				<div class="item" id="r85">Pretty row 85</div>
-				<div class="item" id="r86">Pretty row 86</div>
-				<div class="item" id="r87">Pretty row 87</div>
-				<div class="item" id="r88">Pretty row 88</div>
-				<div class="item" id="r89">Pretty row 89</div>
-				<div class="item" id="r90">Pretty row 90</div>
-				<div class="item" id="r91">Pretty row 91</div>
-				<div class="item" id="r92">Pretty row 92</div>
-				<div class="item" id="r93">Pretty row 93</div>
-				<div class="item" id="r94">Pretty row 94</div>
-				<div class="item" id="r95">Pretty row 95</div>
-				<div class="item" id="r96">Pretty row 96</div>
-				<div class="item" id="r97">Pretty row 97</div>
-				<div class="item" id="r98">Pretty row 98</div>
-				<div class="item" id="r99">Pretty row 99</div>
-				<div class="item" id="r100">Pretty row 100</div>
+				
 		</ui:scroller>
 		
 	<div id="footer" class="common">This is a footer</div>
-	
-	<span id="beforeScrollStartHandlerCalled">0</span>
-	<span id="scrollStartHandlerCalled">0</span>
-	<span id="scrollMoveHandlerCalled">0</span>
-	<span id="scrollEndHandlerCalled">0</span>
 	
 </aura:component>

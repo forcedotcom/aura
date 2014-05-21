@@ -29,7 +29,7 @@ public class UIScrollerDataProvider {
 
 	private static int PTR_COUNTER = 0;
 	private static int PTL_COUNTER = 0;
-	
+	private static int INF_COUNTER = 0;
     @AuraEnabled
     public static List<Item> getItemsPTR(@Key("size") int size) throws Exception {
     	List<Item> l = null;
@@ -58,6 +58,20 @@ public class UIScrollerDataProvider {
         return l;
     }
     
+    @AuraEnabled
+    public static List<Item> getItemsInfinite(@Key("size") int size) throws Exception {
+    	List<Item> l = null;
+    	if(size > 0){
+	        l = new ArrayList<Item>(size);
+	        for (int i = 0; i < size; i++) {
+	        	int id = ++INF_COUNTER;
+	            l.add(new Item("After INF, pretty row " + id + " from server", Integer.toString(id)));
+	        }
+    	}
+    	INF_COUNTER = 0;
+        return l;
+    }
+
     public static class Item implements JsonSerializable {
         private String label;
         private String value;

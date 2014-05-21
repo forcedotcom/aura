@@ -36,6 +36,7 @@ import org.auraframework.def.RootDefinition;
 import org.auraframework.def.TypeDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.java.model.JavaModel;
+import org.auraframework.impl.root.AttributeDefImpl;
 import org.auraframework.impl.root.AttributeSetImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.instance.Action;
@@ -533,7 +534,16 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
         // Walk all attributes, pushing the reinitialize model in to those as well.
         //
         for (Map.Entry<DefDescriptor<AttributeDef>, AttributeDef> foo : def.getAttributeDefs().entrySet()) {
-            if (componentArrType.equals(foo.getValue().getTypeDef().getDescriptor())) {
+            AttributeDef attr = foo.getValue();
+            DefDescriptor<?> typeDesc;
+            if (attr instanceof AttributeDefImpl) {
+                AttributeDefImpl attri = (AttributeDefImpl)attr;
+                typeDesc = attri.getTypeDesc();
+            } else {
+                // bad.
+                typeDesc = attr.getTypeDef().getDescriptor();
+            }
+            if (componentArrType.equals(typeDesc)) {
                 Object val = getAttributes().getValue(foo.getKey().getName());
                 if (val instanceof List) {
                     @SuppressWarnings("unchecked")

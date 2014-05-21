@@ -15,8 +15,13 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:abstractList" implements="ui:scrollerEmbeddable" support="proto"
-    provider="java://org.auraframework.component.ui.ListProvider, js://ui.list" description="A list component that iterates over and displays the items in the ui:dataProvider component.">
+<aura:component extends="ui:abstractList" 
+				implements="ui:scrollerEmbeddable" 
+				support="GA"
+    			provider="java://org.auraframework.component.ui.ListProvider, js://ui.list" 
+    			description="A list component that iterates over and displays the items in the ui:dataProvider component.">
+
+    <aura:attribute name="enableRowSwipe" type="Boolean" default="false" description="Toggles touch event handlers to open and close rows."/>
     
     <!-- This event should probably become part of the base component definition, so any asynchronously
          created component can announce its completion -->
@@ -25,8 +30,9 @@
     <aura:handler name="showMore" action="{!c.showMore}"/>
 
 	<ul class="{!v.class}">
-	<aura:iteration items="{!v.items}" var="{!v.itemVar}" body="{!v.itemTemplate}" rerenderComplete="{!c.rerenderComplete}">
-		
-	</aura:iteration>
+		<aura:iteration items="{!v.items}" 
+						var="{!v.itemVar}" 
+						body="{!v.itemTemplate}" 
+						rerenderComplete="{!c.rerenderComplete}"/>
 	</ul>
 </aura:component>

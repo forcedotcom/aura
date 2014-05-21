@@ -133,6 +133,10 @@ public interface DefDescriptor<T extends Definition> extends JsonSerializable,
 		public Class<? extends Definition> getPrimaryInterface() {
 			return clz;
 		}
+		
+		public boolean isRoot() {
+		    return RootDefinition.class.isAssignableFrom(getPrimaryInterface());
+		}
 
 		public static boolean hasDefType(Class<?> primaryInterface) {
 			return defTypeMap.containsKey(primaryInterface);

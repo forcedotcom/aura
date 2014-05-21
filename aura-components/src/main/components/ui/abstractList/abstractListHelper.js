@@ -45,7 +45,7 @@
 
     initDataProvider: function(component) {
         var dataProviders = component.getValue("v.dataProvider").unwrap();
-
+        
         if (dataProviders && dataProviders.length && dataProviders.length > 0) {
             for (var i = 0; i < dataProviders.length; i++) {
                 dataProviders[i].addHandler("onchange", component, "c.handleDataChange");
@@ -99,6 +99,7 @@
 
     triggerDataProvider: function(component, index) {
         this.showLoading(component, true);
+        
         if (!index) {
             index = 0;
         }

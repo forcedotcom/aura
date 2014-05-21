@@ -1,0 +1,43 @@
+<aura:component isTemplate="true" extensible="true" extends="aura:template">
+
+    <aura:set attribute="auraPreInitBlock">
+        <script>
+            // a global place so tests can inspect the adapter
+            window.mockStorageAdapter = window.mockStorageAdapter || { getItem: {} };
+
+            // implement the simplest storage adapter so we can customize the behavior of getItem
+            // for these tests.
+            var MockStorageAdapter = function MockStorageAdapter(config) {  this.name = config['name']; };
+            MockStorageAdapter.NAME = "mock";
+            MockStorageAdapter.prototype.getName = function() { return MockStorageAdapter.NAME; };
+            MockStorageAdapter.prototype.getSize = function() { return 0; }
+            MockStorageAdapter.prototype.getItem = function(key, resultCallback) {
+                // use setTimeout() to trigger a context switch. 1500 is chosen because it's
+                // long enough for aura to initialize if it's not correctly waiting for the callback.
+                setTimeout(function() {
+                    // record which keys had their callbacks invoked
+                    window.mockStorageAdapter.getItem[key] = true;
+                    resultCallback();
+                }, 1500);
+            };
+            MockStorageAdapter.prototype.setItem = function(key, item) { };
+            MockStorageAdapter.prototype.removeItem = function(key) { };
+            MockStorageAdapter.prototype.clear = function(key) { };
+            MockStorageAdapter.prototype.getExpired = function(resultCallback) { resultCallback([]); };
+
+            // register the mock adapter
+            $A.storageService.registerAdapter({
+                "name": MockStorageAdapter.NAME,
+                "adapterClass": MockStorageAdapter,
+                "secure": true,
+                "persistent": true
+            });
+
+            // create the magic "actions" store. the requested attributes (notably persistence) will
+            // cause our mock adapter to be selected
+            $A.storageService.initStorage("actions", true, true, 1024, 200, 300, true, true);
+        </script>
+    </aura:set>
+
+    {!v.containerScripts}
+</aura:component>

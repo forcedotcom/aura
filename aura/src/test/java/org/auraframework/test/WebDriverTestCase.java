@@ -30,6 +30,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
@@ -569,19 +570,34 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
         }
     }
 
-    private URI getAbsoluteURI(String url) throws MalformedURLException, URISyntaxException {
+    protected URI getAbsoluteURI(String url) throws MalformedURLException, URISyntaxException {
         return getTestServletConfig().getBaseUrl().toURI().resolve(url);
     }
 
     /**
-     * Open a URI without any additional handling.
+     * Append a query param to avoid possible browser caching of pages
      */
-    protected void openRaw(URI uri) {
-        getDriver().get(uri.toString());
+    private String addBrowserNonce(String url) {
+        if (!url.startsWith("about:blank")) {
+            Map<String, String> params = new HashMap<String, String>();
+            params.put("browser.nonce", String.valueOf(System.currentTimeMillis()));
+            url = addUrlParams(url, params);
+        }
+        return url;
     }
 
     /**
-     * Open a URL without any additional handling.
+     * Open a URI without any additional handling. This will, however, add a nonce to the URL to prevent caching of the
+     * page.
+     */
+    protected void openRaw(URI uri) {
+        String url = addBrowserNonce(uri.toString());
+        getDriver().get(url);
+    }
+
+    /**
+     * Open a URI without any additional handling. This will, however, add a nonce to the URL to prevent caching of the
+     * page.
      */
     protected void openRaw(String url) throws MalformedURLException, URISyntaxException {
         openRaw(getAbsoluteURI(url));
@@ -637,6 +653,30 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
     protected void open(String url, Mode mode, boolean waitForInit) throws MalformedURLException, URISyntaxException {
         currentAuraMode = mode;
 
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("aura.mode", mode.name());
+        params.put("aura.test", getQualifiedName());
+        url = addUrlParams(url, params);
+
+        auraUITestingUtil.getRawEval("document._waitingForReload = true;");
+        try {
+            openAndWait(url, waitForInit);
+        } catch (TimeoutException e) {
+            // Hack to avoid timeout issue for IE7 and IE8. Appears that tests fail for the first time when we run the
+            // test in new vm session on Sauce.
+            if (currentBrowserType == BrowserType.IE7 || currentBrowserType == BrowserType.IE8) {
+                openAndWait(url, waitForInit);
+            } else {
+                throw e;
+            }
+        }
+    }
+
+    /**
+     * Add additional parameters to the URL. These paremeters will be added after the query string, and before a hash
+     * (if present).
+     */
+    protected String addUrlParams(String url, Map<String, String> params) {
         // save any fragment
         int hashLoc = url.indexOf('#');
         String hash = "";
@@ -653,26 +693,14 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
             url = url.substring(0, qLoc);
         }
 
+        // add any additional params
         List<NameValuePair> newParams = Lists.newArrayList();
         URLEncodedUtils.parse(newParams, new Scanner(qs), "UTF-8");
-
-        // update query with a nonce
-        newParams.add(new BasicNameValuePair("aura.mode", mode.name()));
-        newParams.add(new BasicNameValuePair("aura.test", getQualifiedName()));
-        url = url + "?" + URLEncodedUtils.format(newParams, "UTF-8") + hash;
-
-        auraUITestingUtil.getRawEval("document._waitingForReload = true;");
-        try {
-            openAndWait(url, waitForInit);
-        } catch (TimeoutException e) {
-            // Hack to avoid timeout issue for IE7 and IE8. Appears that tests fail for the first time when we run the
-            // test in new vm session on Sauce.
-            if (currentBrowserType == BrowserType.IE7 || currentBrowserType == BrowserType.IE8) {
-                openAndWait(url, waitForInit);
-            } else {
-                throw e;
-            }
+        for (String key : params.keySet()) {
+            newParams.add(new BasicNameValuePair(key, params.get(key)));
         }
+
+        return url + "?" + URLEncodedUtils.format(newParams, "UTF-8") + hash;
     }
 
     private void openAndWait(String url, boolean waitForInit) throws MalformedURLException, URISyntaxException {
@@ -763,7 +791,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
             public Boolean apply(WebDriver d) {
                 return isPresent == text.equals(e.getText());
             }
-        }, timeoutInSecs);
+        }, timeout);
     }
 
     protected void waitForElementAbsent(String msg, final WebElement e) {

@@ -352,7 +352,6 @@ $A.ns.Aura = function() {
      * @param {Boolean} doForce For internal use only. doForce enforces client-side creation and defaults to false.
      * @param {Boolean} forceServer For internal use only. forceServer enforces server-side creation and defaults to false.
      */
-
     this.newCmpAsync = function(callbackScope, callback, config, attributeValueProvider, localCreation, doForce, forceServer){
         return this.componentService.newComponentAsync(callbackScope, callback, config, attributeValueProvider, localCreation, doForce, forceServer);
     };
@@ -366,15 +365,15 @@ $A.ns.Aura = function() {
      * @public
      */
     this.pushCreationPath = function(creationPath) {
-    	var ctx = this.getContext();
-    	if (!ctx) {
+        var ctx = this.getContext();
+        if (!ctx) {
             return;
-    	}
-    	var act = ctx.getCurrentAction();
-    	if (!act) {
+        }
+        var act = ctx.getCurrentAction();
+        if (!act) {
             return;
-    	}
-    	act.pushCreationPath(creationPath);
+        }
+        act.pushCreationPath(creationPath);
     };
 
     /**
@@ -384,15 +383,15 @@ $A.ns.Aura = function() {
      * @public
      */
     this.popCreationPath = function(creationPath) {
-    	var ctx = this.getContext();
-    	if (!ctx) {
+        var ctx = this.getContext();
+        if (!ctx) {
             return;
-    	}
-    	var act = ctx.getCurrentAction();
-    	if (!act) {
+        }
+        var act = ctx.getCurrentAction();
+        if (!act) {
             return;
-    	}
-    	act.popCreationPath(creationPath);
+        }
+        act.popCreationPath(creationPath);
     };
 
     /**
@@ -402,15 +401,15 @@ $A.ns.Aura = function() {
      * @public
      */
     this.setCreationPathIndex = function(idx) {
-    	var ctx = this.getContext();
-    	if (!ctx) {
+        var ctx = this.getContext();
+        if (!ctx) {
             return;
-    	}
-    	var act = ctx.getCurrentAction();
-    	if (!act) {
+        }
+        var act = ctx.getCurrentAction();
+        if (!act) {
             return;
-    	}
-    	act.setCreationPathIndex(idx);
+        }
+        act.setCreationPathIndex(idx);
     };
 
 
@@ -505,14 +504,14 @@ $A.ns.Aura.prototype.initAsync = function(config) {
     // we don't handle components that come back here. This is used in the case where there
     // are none.
     //
-    $A.context = new AuraContext(config["context"]);
-    clientService.initHost(config["host"]);
-    clientService.loadComponent(config["descriptor"], config["attributes"], function(resp) {
-        $A.initPriv(resp);
-        $A.Perf.endMark("Component Load Complete");
-    }, config["deftype"]);
-
-    $A.Perf.endMark("Component Load Initiated");
+    $A.context = new AuraContext(config["context"], function() {
+        clientService.initHost(config["host"]);
+        clientService.loadComponent(config["descriptor"], config["attributes"], function(resp) {
+            $A.initPriv(resp);
+            $A.Perf.endMark("Component Load Complete");
+        }, config["deftype"]);
+        $A.Perf.endMark("Component Load Initiated");
+    });
 };
 
 /**
@@ -530,7 +529,10 @@ $A.ns.Aura.prototype.initConfig = function(config, useExisting, doNotInitializeS
 
     if (!useExisting || $A.util.isUndefined($A.getContext())) {
         clientService.initHost(config["host"]);
-        // creating context.
+
+        // FIXME: AuraContext accepts a callback because its init is async (eg loading of the GVP
+        // from persistent storage). Only AIS uses this setup method and AIS doesn't use persistent
+        // storage with an async fetch (eg Smart Store Adapter).
         $A.context = new AuraContext(config["context"]);
         this.initPriv($A.util.json.resolveRefs(config["instance"]), config["token"], null, doNotInitializeServices, doNotCallUIPerfOnLoad);
         $A.context.finishComponentConfigs($A.context.getCurrentAction().getId());
@@ -722,7 +724,7 @@ $A.ns.Aura.prototype.error = function(msg, e){
 $A.ns.Aura.prototype.warning = function(w, e) {
     $A.logInternal("Warning",w, e, this.getStackTrace(e));
     if ($A.test) {
-    	$A.test.auraWarning(w);
+        $A.test.auraWarning(w);
     }
 };
 
@@ -812,7 +814,7 @@ $A.ns.Aura.prototype.run = function(func, name) {
 
     $A.services.client.pushStack(name);
     try {
-    	//console.log("$A.run()", name);
+        //console.log("$A.run()", name);
 
         return func();
     } catch (e) {
@@ -954,9 +956,9 @@ $A.ns.Aura.prototype.logInternal = function(type, message, error, trace) {
             }
             stringVersion = this.stringVersion(logMsg, error, trace);
         }
-    	var debugLogEvent = $A.util.getDebugToolsAuraInstance().get("e.aura:debugLog");
-		debugLogEvent.setParams({"type" : type, "message" : stringVersion});
-    	debugLogEvent.fire();
+        var debugLogEvent = $A.util.getDebugToolsAuraInstance().get("e.aura:debugLog");
+        debugLogEvent.setParams({"type" : type, "message" : stringVersion});
+        debugLogEvent.fire();
     }
     //#end
 };

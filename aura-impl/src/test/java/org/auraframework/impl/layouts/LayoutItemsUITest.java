@@ -69,11 +69,13 @@ public class LayoutItemsUITest extends WebDriverTestCase {
         verifyExpectedResultsForLayout1();
 
         findDomElement(removeLayoutDone).click();
+        waitForElementDisappear("'layoutDone' class never removed from div", layoutDone);
         auraUITestingUtil.getEval("window.history.back()");
         findDomElement(layoutDone);
         verifyExpectedResultsForInitialLayout();
 
         findDomElement(removeLayoutDone).click();
+        waitForElementDisappear("'layoutDone' class never removed from div", layoutDone);
         auraUITestingUtil.getEval("window.history.forward()");
         findDomElement(layoutDone);
         verifyExpectedResultsForLayout1();

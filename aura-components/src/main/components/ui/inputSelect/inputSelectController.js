@@ -14,29 +14,32 @@
  * limitations under the License.
  */
 ({
-    doInit: function(cmp, evt, helper) {    
-        var currentValue = cmp.getValue("v.value");
-
+    doInit: function(cmp, evt, helper) {
+        var concreteCmp = cmp.getConcreteComponent();
+        var currentValue = concreteCmp.getValue("v.value");
+        
         if (currentValue.isDefined()) {
             // if a "value" attribute is specified on initial render, it should win over what the individual options report
-            helper.updateOptionsFromValue(cmp);
+            helper.updateOptionsFromValue(concreteCmp);
         } else {
             // otherwise update the "value" attribute based on the options that claim to be selected
-            helper.updateValueFromOptions(cmp);
+            helper.updateValueFromOptions(concreteCmp);
         }
     },
 
     valueChange: function(cmp, evt, helper) {
-        helper.updateOptionsFromValue(cmp);
+        var concreteCmp = cmp.getConcreteComponent();
+        helper.updateOptionsFromValue(concreteCmp);
     },
 
     // Update options from the current value if flag is set
     optionsChange: function(cmp, evt, helper) {
-    	if (cmp._initOptionsFromValue) {
-    		cmp._initOptionsFromValue = false;
-    		helper.updateOptionsFromValue(cmp);
+    	var concreteCmp = cmp.getConcreteComponent();
+    	if (concreteCmp._initOptionsFromValue) {
+    	    concreteCmp._initOptionsFromValue = false;
+    	    helper.updateOptionsFromValue(concreteCmp);
     	} else {
-    		helper.updateValueFromOptions(cmp);
+    	    helper.updateValueFromOptions(concreteCmp);
     	}
     }
 })

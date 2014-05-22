@@ -20,92 +20,92 @@
         Checking for case when no default value is given in inputSelect, 
         and inputSelectOption is set to true for Lion. Lion should be chosen
      -->
-    <ui:inputSelect aura:id="Value_Undef_With_Default">
+    <uitest:inputSelect_Extend aura:id="Value_Undef_With_Default">
         <ui:inputSelectOption text="Tiger" label="Tiger"/>
         <ui:inputSelectOption text="Lion"  label="Lion" value="true"/>
         <ui:inputSelectOption text="Bear"  label="Bear"/>
         <ui:inputSelectOption text="Moose"  label="Moose"/>
-    </ui:inputSelect>
+    </uitest:inputSelect_Extend>
     <br/>
     <!--
         Checking for case when no default value is given in inputSelect, 
         and not inputSelectOption is chosen result should Tiger is default
         element chosen
      -->
-    <ui:inputSelect aura:id="Value_Undef_With_No_Default">
+    <uitest:inputSelect_Extend aura:id="Value_Undef_With_No_Default">
         <ui:inputSelectOption text="Tiger" label="Tiger"/>
         <ui:inputSelectOption text="Lion"  label="Lion"/>
         <ui:inputSelectOption text="Bear"  label="Bear"/>
-    </ui:inputSelect>
+    </uitest:inputSelect_Extend> 
     <br/>
       
     <!--
         Checking for case when default for input select is Bear, result 
         should be bear is the initial item shown
      -->
-    <ui:inputSelect aura:id="Value_Def_Selection_Exists" value="Bear">
+    <uitest:inputSelect_Extend aura:id="Value_Def_Selection_Exists" value="Bear">
         <ui:inputSelectOption text="Tiger" label="Tiger"/>
         <ui:inputSelectOption text="Lion"  label="Lion"/>
         <ui:inputSelectOption text="Bear"  label="Bear"/>
-    </ui:inputSelect>
+    </uitest:inputSelect_Extend> 
     <br/>
    <!--
         Checking for case when default for input select is Moose, result 
         should be Moose but it doesn't exist as an option so default goes 
         to the first element
      -->
-    <ui:inputSelect aura:id="Value_Def_Selection_DNE" value="Moose">
+    <uitest:inputSelect_Extend aura:id="Value_Def_Selection_DNE" value="Moose">
         <ui:inputSelectOption text="Tiger" label="Tiger"/>
         <ui:inputSelectOption text="Lion"  label="Lion"/>
         <ui:inputSelectOption text="Bear"  label="Bear"/>
-    </ui:inputSelect>
+    </uitest:inputSelect_Extend> 
     <br/>
     <!--
         Checking for case when default for input select is null, and there are no inputSelectOptions
         result should be that nothing is selected
      -->
-    <ui:inputSelect aura:id="Value_Null_No_Options" value="">
-    </ui:inputSelect>
+    <uitest:inputSelect_Extend aura:id="Value_Null_No_Options" value="">
+    </uitest:inputSelect_Extend> 
     <br/>
     <!--
         Checking for case when default for input select is Null, result 
         should be the first element is selected
      -->
-    <ui:inputSelect aura:id="Value_Null_With_No_Null_Option" value="">
+    <uitest:inputSelect_Extend aura:id="Value_Null_With_No_Null_Option" value="">
         <ui:inputSelectOption text="Tiger" label="Tiger"/>
         <ui:inputSelectOption text="Lion"  label="Lion"/>
         <ui:inputSelectOption text="Bear"  label="Bear"/>
-    </ui:inputSelect>
+    </uitest:inputSelect_Extend> 
     <br/>
      <!--
         Checking for case when default for input select is Null, result 
         should be the first element is selected, where first elements text is null
      -->
-    <ui:inputSelect aura:id="Value_Null_With_Null_Option" value="">
+    <uitest:inputSelect_Extend aura:id="Value_Null_With_Null_Option" value="">
         <ui:inputSelectOption text="" label="None"/>
         <ui:inputSelectOption text="Tiger" label="Tiger"/>
         <ui:inputSelectOption text="Lion"  label="Lion"/>
         <ui:inputSelectOption text="Bear"  label="Bear"/>
-    </ui:inputSelect>
+    </uitest:inputSelect_Extend> 
     <br/>
      <!--
         Checking for case when default for input select is Null, and an inputSelectOption
         is selected, result should be the first element is selected
      -->
-    <ui:inputSelect aura:id="Value_Null_With_Default_And_Null_Option" value="">
+    <uitest:inputSelect_Extend aura:id="Value_Null_With_Default_And_Null_Option" value="">
         <ui:inputSelectOption text="" label="None"/>
         <ui:inputSelectOption text="Tiger" label="Tiger"/>
         <ui:inputSelectOption text="Lion"  label="Lion" value="true"/>
         <ui:inputSelectOption text="Bear"  label="Bear"/>
-    </ui:inputSelect>
+    </uitest:inputSelect_Extend> 
     <br/>
     <!--
         Checking for case when default for input select is Null, and an inputSelectOption
         is selected, result should be the first element is selected
      -->
-    <ui:inputSelect aura:id="Value_Null_With_Default_And_No_Null_Option" value="">
+    <uitest:inputSelect_Extend aura:id="Value_Null_With_Default_And_No_Null_Option" value="">
         <ui:inputSelectOption text="Tiger" label="Tiger"/>
         <ui:inputSelectOption text="Lion"  label="Lion"/>
         <ui:inputSelectOption text="Bear"  label="Bear" value="true"/>
-    </ui:inputSelect>
+    </uitest:inputSelect_Extend> 
 </aura:component>

@@ -1,0 +1,4 @@
+<aura:component extends="ui:inputSelect">
+    <aura:handler name="change" value="{!v.value}" action="{!c.valueChange}"/>
+    <aura:handler name="change" value="{!v.options}" action="{!c.optionsChange}"/>
+</aura:component>

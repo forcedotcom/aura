@@ -49,7 +49,7 @@ public final class MiscPerfFrameworkTest extends AbstractPerfTestCase {
             logger.warning("skipping test still not running in SauceLabs: " + getName());
             return;
         }
-        openRaw("/ui/label.cmp?label=foo");
+        openTotallyRaw("/ui/label.cmp?label=foo");
 
         Map data = perfWebDriverUtil.takeHeapSnapshot();
         PerfWebDriverUtil.showHeapSnapshot(data);
@@ -69,17 +69,17 @@ public final class MiscPerfFrameworkTest extends AbstractPerfTestCase {
             logger.warning("skipping test still not running in SauceLabs: " + getName());
             return;
         }
-        
+
         int startSize = getBrowserJSHeapSize();
 
-        openRaw("/ui/label.cmp?label=foo");
+        openTotallyRaw("/ui/label.cmp?label=foo");
 
         int delta = getBrowserJSHeapSize() - startSize;
         assertTrue("delta js heap size: " + delta, delta > 1000000);
     }
 
     public void testResourceTimingAPI() throws Exception {
-        openRaw("/ui/label.cmp?label=foo");
+        openTotallyRaw("/ui/label.cmp?label=foo");
 
         // check the data is returned and has expected fields
         List<Map<String, Object>> data = perfWebDriverUtil.getResourceTimingData();

@@ -27,10 +27,10 @@ public final class SimpleFrameworkTest extends FrameworkPerfAbstractTestCase {
     }
 
     public void testLabel() throws Exception {
-        openRaw("/ui/label.cmp?label=foo");
+        openTotallyRaw("/ui/label.cmp?label=foo");
     }
 
     public void testButton() throws Exception {
-        openRaw("/ui/button.cmp?label=Push");
+        openTotallyRaw("/ui/button.cmp?label=Push");
     }
 }

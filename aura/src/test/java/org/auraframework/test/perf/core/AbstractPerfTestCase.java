@@ -66,7 +66,7 @@ public abstract class AbstractPerfTestCase extends WebDriverTestCase {
         String url = getAbsoluteURI(relativeUrl).toString();
         logger.info("testRun: " + url);
 
-        openRaw(url);
+        openTotallyRaw(url);
 
         // wait for component loaded or aura error message
         final By componentLoaded = By.cssSelector("[data-app-rendered-component]");

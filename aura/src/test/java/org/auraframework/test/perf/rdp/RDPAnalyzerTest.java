@@ -39,7 +39,7 @@ public final class RDPAnalyzerTest extends AbstractPerfTestCase {
 
     public void testProtocol() throws Exception {
         // run WebDriver test
-        openRaw("/ui/label.cmp?label=foo");
+        openTotallyRaw("/ui/label.cmp?label=foo");
 
         // UC: verify raw protocol notifications:
         List<RDPNotification> notifications = getRDPNotifications();

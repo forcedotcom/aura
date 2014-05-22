@@ -710,6 +710,13 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
     }
 
     /**
+     * Open a url without any additional handling, not even a browser.nonce
+     */
+    protected void openTotallyRaw(String url) {
+        getDriver().get(url);
+    }
+
+    /**
      * Open a URL without the usual waitForAuraInit().
      */
     protected void openNoAura(String url) throws MalformedURLException, URISyntaxException {

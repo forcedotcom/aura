@@ -96,4 +96,12 @@ public abstract class AbstractPerfTestCase extends WebDriverTestCase {
     protected static final DefDescriptor<ComponentDef> getDefDescriptor(String qualifiedName) {
         return Aura.getDefinitionService().getDefDescriptor(qualifiedName, ComponentDef.class);
     }
+
+    protected void profileStart(String name) {
+        auraUITestingUtil.getRawEval(String.format("$A.PERFCORE.profileStart('%s');", name));
+    }
+
+    protected void profileEnd(String name) {
+        auraUITestingUtil.getRawEval(String.format("$A.PERFCORE.profileEnd('%s');", name));
+    }
 }

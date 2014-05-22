@@ -240,6 +240,14 @@
                         RAF(callback);
                     }, time);
                 },
+                profileStart: function(name) {
+                    timestamp && console.timeStamp(name + ":start");
+                    $A.PERFCORE.stats.start(name);
+                },
+                profileEnd: function(name) {
+                    timestamp && console.timeStamp(name + ":end");
+                    $A.PERFCORE.stats.end(name);
+                },
                 setConfig: function (cfg) {
                     var perf = (cfg && cfg.perfConfig) || {};
                         cfg  = {
@@ -264,7 +272,7 @@
                             return;
                         }
                         $A.assert(name, "Aura stat tracking name can't be empty");
-                        $A.assert(!resultSets[name], "Duplicate Aura stat tracking name");
+                        $A.assert(!resultSets[name], "Duplicate Aura stat tracking name: " + name);
 
                         resultSets[name] = {};
                         for(var view in helper.queries) {
@@ -436,7 +444,7 @@
         var self = this;
          // Use RAF to wait till the browser updates and paints
         $A.PERFCORE.later(500, function (t) {                    
-            $A.PERFCORE.mark('PERF:end'); //mark so we can 
+            $A.PERFCORE.mark('PERF:end'); //mark so we can
             // After render code to possibly mark some changes
             self.afterRender(appCmp, newCmp);
             // Mark the DOM to tell webdriver we are done

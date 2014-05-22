@@ -712,8 +712,8 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
     /**
      * Open a url without any additional handling, not even a browser.nonce
      */
-    protected void openTotallyRaw(String url) {
-        getDriver().get(url);
+    protected void openTotallyRaw(String url) throws MalformedURLException, URISyntaxException {
+        getDriver().get(getAbsoluteURI(url).toString());
     }
 
     /**

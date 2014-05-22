@@ -34,6 +34,11 @@
 	            //Check if secondItem in the menu is disabled
 	            $A.test.addWaitForWithFailureMessage(true, function(){return cmp.find("actionItem2").get("v.disabled");}, "Check if Item2 in the menu is disabled");
 			}, function(cmp) {
+				//make sure menuItem is not attached to body directly and its attached to uiMenu instead
+				//Test case for W-2181713
+				var actionMenuParentClassName = actionMenu.getElement().parentNode.className;
+				$A.test.assertTrue($A.test.contains(actionMenuParentClassName,"uiMenu"), "Menu Item List not attached to correct uiMenu");
+	    		
 				var disableAttrValue = cmp.find("actionItem1").get("v.disabled");
 				$A.test.assertFalse(disableAttrValue,"Menu item 1 should be clickable");
 				

@@ -284,16 +284,13 @@ public abstract class ManifestUtil {
         String contextPath = context.getContextPath();
         String ret = "";
 
-        boolean serLastMod = context.getSerializeLastMod();
         StringBuilder defs = new StringBuilder(contextPath).append("/l/");
         StringBuilder sb = new StringBuilder();
-        context.setSerializeLastMod(false);
         try {
             Aura.getSerializationService().write(context, null, AuraContext.class, sb, "HTML");
         } catch (IOException e) {
             throw new AuraRuntimeException(e);
         }
-        context.setSerializeLastMod(serLastMod);
         String contextJson = AuraTextUtil.urlencode(sb.toString());
         defs.append(contextJson);
         defs.append("/app.manifest");

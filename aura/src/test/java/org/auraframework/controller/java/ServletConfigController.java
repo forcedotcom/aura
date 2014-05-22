@@ -16,7 +16,6 @@
 package org.auraframework.controller.java;
 
 import org.auraframework.Aura;
-import org.auraframework.http.AuraBaseServlet;
 import org.auraframework.system.Annotations.Key;
 import org.auraframework.test.AuraTestCase;
 
@@ -51,13 +50,6 @@ public class ServletConfigController {
      */
     public static void setAppCacheDisabled(@Key("isDisabled") Boolean isDisabled) {
         AuraTestCase.getMockConfigAdapter().setIsClientAppcacheEnabled(!isDisabled);
-    }
-
-    /**
-     * Get the servlet's current last modification timestamp.
-     */
-    public static long getLastMod() throws Exception {
-        return AuraBaseServlet.getLastMod();
     }
 
     public static long getBuildTimestamp() throws Exception {

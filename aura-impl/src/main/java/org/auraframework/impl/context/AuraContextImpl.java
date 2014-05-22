@@ -42,7 +42,6 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.EventType;
 import org.auraframework.def.ThemeDef;
-import org.auraframework.http.AuraBaseServlet;
 import org.auraframework.impl.css.ThemeListImpl;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.BaseComponent;
@@ -104,10 +103,6 @@ public class AuraContextImpl implements AuraContext {
         private final boolean forClient;
 
         private Serializer(boolean forClient) {
-            this(forClient, false);
-        }
-
-        private Serializer(boolean forClient, boolean serializeLastMod) {
             this.forClient = forClient;
         }
 
@@ -174,9 +169,6 @@ public class AuraContextImpl implements AuraContext {
             if (loadedStrings.size() > 0) {
                 json.writeMapKey("loaded");
                 json.writeMap(loadedStrings);
-            }
-            if (ctx.getSerializeLastMod()) {
-                json.writeMapEntry("lastmod", Long.toString(AuraBaseServlet.getLastMod()));
             }
 
             TestContextAdapter testContextAdapter = Aura.get(TestContextAdapter.class);
@@ -266,7 +258,7 @@ public class AuraContextImpl implements AuraContext {
     public static final Serializer URL_SERIALIZER = new Serializer(false);
 
     // serializer just for passing context in a url
-    public static final Serializer HTML_SERIALIZER = new Serializer(false, true);
+    public static final Serializer HTML_SERIALIZER = new Serializer(false);
 
     private final Set<DefDescriptor<?>> staleChecks = new HashSet<>();
 
@@ -299,8 +291,6 @@ public class AuraContextImpl implements AuraContext {
 
     private String contextPath = "";
 
-    private boolean serializeLastMod = true;
-
     private boolean serializeThemes = false; // only needed for CSS urls
 
     private boolean preloading = false;
@@ -312,8 +302,6 @@ public class AuraContextImpl implements AuraContext {
     private List<Locale> requestedLocales;
 
     private Client client = Client.OTHER;
-
-    private String lastMod = "";
 
     private final List<Event> clientEvents = Lists.newArrayList();
 
@@ -444,11 +432,6 @@ public class AuraContextImpl implements AuraContext {
     }
 
     @Override
-    public String getLastMod() {
-        return lastMod;
-    }
-
-    @Override
     public Mode getMode() {
         return mode;
     }
@@ -461,11 +444,6 @@ public class AuraContextImpl implements AuraContext {
     @Override
     public List<Locale> getRequestedLocales() {
         return requestedLocales;
-    }
-
-    @Override
-    public boolean getSerializeLastMod() {
-        return serializeLastMod;
     }
 
     @Override
@@ -546,11 +524,6 @@ public class AuraContextImpl implements AuraContext {
     }
 
     @Override
-    public void setLastMod(String lastMod) {
-        this.lastMod = lastMod;
-    }
-
-    @Override
     public void setNum(String num) {
         this.num = num;
     }
@@ -568,11 +541,6 @@ public class AuraContextImpl implements AuraContext {
     @Override
     public void setRequestedLocales(List<Locale> requestedLocales) {
         this.requestedLocales = requestedLocales;
-    }
-
-    @Override
-    public void setSerializeLastMod(boolean serializeLastMod) {
-        this.serializeLastMod = serializeLastMod;
     }
 
     @Override

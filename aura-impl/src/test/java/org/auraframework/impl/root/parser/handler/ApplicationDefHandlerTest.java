@@ -15,7 +15,6 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.def.ApplicationDef;
@@ -32,7 +31,6 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 
 public class ApplicationDefHandlerTest extends AuraImplTestCase {
     XMLStreamReader xmlReader;
-    XMLInputFactory xmlInputFactory;
     ApplicationDefHandler cdHandler;
 
     public ApplicationDefHandlerTest(String name) {
@@ -47,9 +45,7 @@ public class ApplicationDefHandlerTest extends AuraImplTestCase {
                         + vendor.getParentComponentDefDescriptor() + "' implements='"
                         + vendor.getInterfaceDefDescriptor()
                         + "' abstract='true'>Child Text<aura:foo/></aura:application>", "myID", Format.XML);
-        xmlInputFactory = XMLInputFactory.newInstance();
-        xmlInputFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, false);
-        xmlReader = xmlInputFactory.createXMLStreamReader(source.getSystemId(), source.getHashingReader());
+        xmlReader = XMLParser.getInstance().createXMLStreamReader(source.getHashingReader());
         xmlReader.next();
         cdHandler = new ApplicationDefHandler(vendor.getApplicationDefDescriptor(), source, xmlReader);
     }

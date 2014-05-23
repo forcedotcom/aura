@@ -109,7 +109,10 @@ public class DocumentationDefHandlerTest extends AuraImplTestCase {
 				"<aura:documentation> must contain at least one <aura:description>"},
 				//no closing tag
 				{"<aura:documentation>",
-				"XML document structures must start and end within the same entity"},
+                // sjsxp: "XML document structures must start and end within the same entity"
+                // woodstox: "was expecting a close tag for element <aura:documentation>"
+                // no common parser error message. using " " to verify that qfe is occuring
+				" "},
 				//disallowed markup which isn't escaped
 				{"<aura:documentation><aura:description><ui:inputText/></aura:description></aura:documentation>",
 				"Found invalid tag <ui:inputText>"},

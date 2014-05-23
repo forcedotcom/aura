@@ -15,14 +15,13 @@
  */
 package org.auraframework.impl.root.component;
 
-import java.util.List;
-
 import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.instance.Component;
 import org.auraframework.throwable.quickfix.AttributeNotFoundException;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 
 /**
  * Test validation of attribute names in component markup.
@@ -89,25 +88,11 @@ public class ComponentAttributeNameValidationTest extends AuraImplTestCase {
      * 
      * @expectedResults AttributeNotFoundException thrown
      */
-    // TODO(W-942303): attribute validation ignores name prefix.
-    // fails with type error since it thinks other:body == body
-    public void _testInlineUnknownAttributePrefix() throws Exception {
+    public void testInlineUnknownAttributePrefix() throws Exception {
         DefDescriptor<ComponentDef> myCmp = addSourceAutoCleanup(ComponentDef.class, "<aura:component/>");
         assertAttributeNotFoundException(
                 String.format("<aura:component><%s other:body=''/></aura:component>", myCmp.getDescriptorName()),
                 "other:body");
-    }
-
-    /**
-     * Unknown attribute prefix from aura:set tag
-     * 
-     * @expectedResults AttributeNotFoundException thrown
-     */
-    // TODO(W-1231888, W-942303): aura:set doesn't work on self / attribute
-    // validation ignores name prefix
-    public void _testSetUnknownAttributePrefix() throws Exception {
-        assertAttributeNotFoundException(
-                "<aura:component><aura:set attribute='other:body' value=''/></aura:component>", "unknown");
     }
 
     /**
@@ -124,96 +109,17 @@ public class ComponentAttributeNameValidationTest extends AuraImplTestCase {
     }
 
     /**
-     * Simple attribute name may be referenced with "aura" prefix on component tag
-     * 
-     * @expectedResults attribute value is retrieved
-     */
-    // TODO(W-942303): attribute validation ignores name prefix.
-    // fails since attribute was not set
-    public void _testInlineDefaultAttributePrefix() throws Exception {
-        DefDescriptor<ComponentDef> myCmp = addSourceAutoCleanup(ComponentDef.class,
-                "<aura:component><aura:attribute name='title' type='String'/></aura:component>");
-        Component cmp = getComponentInstance(String.format(
-                "<aura:component><%s aura:title='new title'/></aura:component>", myCmp.getDescriptorName()));
-        @SuppressWarnings("unchecked")
-        Component innerCmp = ((List<Component>) cmp.getSuper().getAttributes().getValue("body")).get(0);
-        assertEquals("new title", innerCmp.getAttributes().getValue("title"));
-    }
-
-    /**
-     * Simple attribute name may be referenced with "aura" prefix from aura:set tag
-     * 
-     * @expectedResults attribute value is retrieved
-     */
-    // TODO(W-1231888, W-942303): aura:set doesn't work on self / attribute
-    // validation ignores name prefix
-    // fails since attribute was not set
-    public void _testSetDefaultAttributePrefix() throws Exception {
-        Component cmp = getComponentInstance("<aura:component><aura:set attribute='aura:body'>hi</aura:set></aura:component>");
-        @SuppressWarnings("unchecked")
-        Component innerCmp = ((List<Component>) cmp.getSuper().getAttributes().getValue("body")).get(0);
-        assertEquals("hi", innerCmp.getAttributes().getValue("value"));
-    }
-
-    /**
-     * Simple attribute name may be referenced with "aura" prefix from aura:set tag on nested component
-     * 
-     * @expectedResults attribute value is retrieved
-     */
-    // TODO(W-1231888, W-942303): aura:set doesn't work on self / attribute
-    // validation ignores name prefix
-    // fails with attribute aura:value not found
-    public void _testSetDefaultAttributePrefixInNestedComponent() throws Exception {
-        DefDescriptor<ComponentDef> myCmp = addSourceAutoCleanup(ComponentDef.class,
-                "<aura:component><aura:attribute name='value' type='String'/></aura:component>");
-        Component cmp = getComponentInstance(String.format(
-                "<aura:component><%1$s><aura:set attribute='aura:value' value='oops'/></%1$s></aura:component>",
-                myCmp.getDescriptorName()));
-        @SuppressWarnings("unchecked")
-        Component innerCmp = ((List<Component>) cmp.getSuper().getAttributes().getValue("body")).get(0);
-        assertEquals("oops", innerCmp.getAttributes().getValue("value"));
-    }
-
-    /**
      * Prefixed attribute name must be referenced with prefix on component tag
-     * 
+     *
      * @expectedResults attribute value is retrieved
      */
-    // TODO(W-942303): attribute validation ignores name prefix.
-    // fails for all cases since prefix is not included when validating on
-    // instance creation
     @SuppressWarnings("unchecked")
-    public void _testInlineAttributePrefix() throws Exception {
-        DefDescriptor<ComponentDef> myCmp = addSourceAutoCleanup(ComponentDef.class, "<aura:component>"
-                + "<aura:attribute name='aura:special1' type='String' default='hi'/>"
-                + "<aura:attribute name='other:special2' type='String' default='bye'/>" + "</aura:component>");
-        Component cmp = getComponentInstance(String.format(
-                "<aura:component><%s other:special2='down'/></aura:component>", myCmp.getDescriptorName()));
-        Component innerCmp = ((List<Component>) cmp.getSuper().getAttributes().getValue("body")).get(0);
-        assertEquals("down", innerCmp.getAttributes().getValue("other:special2"));
-
-        cmp = getComponentInstance("<aura:component><string:myCmp aura:special1='up'/></aura:component>");
-        innerCmp = ((List<Component>) cmp.getSuper().getAttributes().getValue("body")).get(0);
-        assertEquals("up", innerCmp.getAttributes().getValue("aura:special1"));
-    }
-
-    /**
-     * Prefixed attribute name must be referenced with prefix from aura:set tag
-     * 
-     * @expectedResults attribute value is retrieved
-     */
-    // TODO(W-1231888, W-942303): aura:set doesn't work on self / attribute
-    // validation ignores name prefix
-    // fails for all cases since attribute is not set on instance
-    public void _testSetAttributePrefix() throws Exception {
-        Component cmp = getComponentInstance("<aura:component>"
-                + "<aura:attribute name='other:special' type='String'/>"
-                + "<aura:set attribute='other:special' value='bye'/>" + "</aura:component>");
-        assertEquals("bye", cmp.getSuper().getAttributes().getValue("other:special"));
-
-        cmp = getComponentInstance("<aura:component>" + "<aura:attribute name='aura:special' type='String'/>"
-                + "<aura:set attribute='aura:special' value='bye'/>" + "</aura:component>");
-        assertEquals("bye", cmp.getSuper().getAttributes().getValue("aura:special"));
+    public void testInvalidAttributePrefix() throws Exception {
+        try {
+            getComponentInstance("<aura:component><aura:attribute name='aura:special1' type='String' default='hi'/></aura:component>");
+        } catch (Exception e) {
+            checkExceptionContains(e, InvalidDefinitionException.class, "Invalid attribute name: 'aura:special1'");
+        }
     }
 
 }

@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
@@ -38,6 +37,7 @@ import org.auraframework.impl.util.TextTokenizer;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.AuraTextUtil;
 
 /**
  * Handles all references to other components. Note that while the reference to
@@ -86,8 +86,8 @@ public class ComponentDefRefHandler<P extends RootDefinition> extends ParentedTa
         super.readSystemAttributes();
         builder.setLocalId(getSystemAttributeValue("id"));
         String load = getSystemAttributeValue("load");
-        if (load != null) {
-            Load loadVal = null;
+        if (!AuraTextUtil.isNullEmptyOrWhitespace(load)) {
+            Load loadVal;
             try {
                 loadVal = Load.valueOf(load.toUpperCase());
             } catch (IllegalArgumentException e) {
@@ -110,7 +110,12 @@ public class ComponentDefRefHandler<P extends RootDefinition> extends ParentedTa
 
         for (int i = 0; i < xmlReader.getAttributeCount(); i++) {
             String attName = xmlReader.getAttributeLocalName(i);
-            if (!"aura".equalsIgnoreCase(xmlReader.getAttributePrefix(i))) {
+            String prefix = xmlReader.getAttributePrefix(i);
+            if (!XMLHandler.isSystemPrefixed(attName, prefix)) {
+                // W-2316503: remove compatibility code for both SJSXP and Woodstox
+                if (!AuraTextUtil.isNullEmptyOrWhitespace(prefix) && !attName.contains(":")) {
+                    attName = prefix + ":" + attName;
+                }
                 DefDescriptor<AttributeDef> att = DefDescriptorImpl.getInstance(attName, AttributeDef.class);
 
                 String attValue = xmlReader.getAttributeValue(i);

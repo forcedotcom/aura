@@ -73,8 +73,10 @@ public class ThemeDefImplTest extends StyleTestCase {
             addSeparateTheme("<aura:theme><aura:var name='one' value='1' />").getDef();
             fail("Bad markup should be caught");
         } catch (Exception e) {
-            checkExceptionContains(e, InvalidDefinitionException.class,
-                    "XML document structures must start and end within the same entity");
+            // sjsxp: XML document structures must start and end within the same entity
+            // woodstox: was expecting a close tag for element <aura:theme>
+            // no common message so asserting correct exception for now
+            checkExceptionContains(e, InvalidDefinitionException.class, " ");
         }
     }
 

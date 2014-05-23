@@ -15,33 +15,37 @@
     limitations under the License.
 
 -->
-<aura:component>
-    <aura:attribute name="outer" type="Boolean"/>
-    <aura:attribute name="inner" type="Boolean"/>
+<aura:component description="The content container, holding individual components contained in a scroller that can be loaded dynamically">
 
-    <span aura:id="whatIsIt">
-        <aura:renderif isTrue="{!v.outer}">
-            <span class="outerIsTrue">
-                <aura:renderif isTrue="{!v.inner}">
-                    <span class="itIsTrue">It is true.</span>
-                    <aura:set attribute="else">
-                        <span class="itWishesItWasTrue">It wishes it was true.</span>
-                    </aura:set>
-                </aura:renderif>
-                <aura:renderif isTrue="{! !v.inner}">
-                    <span class="itIsNotTrue">It is not true.</span>
-                    <aura:set attribute="else">
-                        <span class="itWishesItWasNotTrue">It wishes it was not true.</span>
-                    </aura:set>
-                </aura:renderif>
-            </span>
+    <!-- Default Hostable interface attributes -->
+    <aura:attribute name="outer" type="Boolean" default="false"/>
+    <aura:attribute name="inner" type="Boolean" default="false"/>
+    
+    <div class="controls">
+        <ui:button aura:id="TT" label="Item TT" press="{!c.click}"/>
+        <ui:button aura:id="TF" label="Item TF" press="{!c.click}"/>
+        <ui:button aura:id="FT" label="Item FT" press="{!c.click}"/>
+        <ui:button aura:id="FF" label="Item FF" press="{!c.click}"/>
+    </div>
+
+    <div class="view">
+        <aura:renderIf isTrue="{!v.outer}">
+            <aura:renderif isTrue="{!v.inner}">
+                <span>TT</span>
+                <aura:set attribute="else">
+                    <span>TF</span>
+                </aura:set>
+            </aura:renderif>
 
             <aura:set attribute="else">
-                <span class="outerIsFalse">
-                    <test:testRenderIfElse thang="{!v.inner}"/>
-                </span>
-            </aura:set>
-        </aura:renderif>
-    </span>
 
+                <aura:renderif isTrue="{!v.inner}">
+                    <span>FT</span>
+                    <aura:set attribute="else">
+                        <span>FF</span>
+                    </aura:set>
+                </aura:renderif>
+            </aura:set>
+        </aura:renderIf>
+    </div>
 </aura:component>

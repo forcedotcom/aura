@@ -18,6 +18,10 @@
         helper.handleInputChange(cmp, event, "autoComplete");
     },
     
+    handleKeyDown: function(cmp, event, helper) {
+    	cmp.find("outputLabel").set("v.value", "KeyDown Event Fired");
+    },
+    
     handleInputChangeNoData: function(cmp, event, helper) {
         helper.handleInputChange(cmp, event, "autoCompleteNoData");
     },

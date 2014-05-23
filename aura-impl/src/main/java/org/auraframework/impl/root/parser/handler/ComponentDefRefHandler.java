@@ -110,7 +110,7 @@ public class ComponentDefRefHandler<P extends RootDefinition> extends ParentedTa
 
         for (int i = 0; i < xmlReader.getAttributeCount(); i++) {
             String attName = xmlReader.getAttributeLocalName(i);
-            if (!"aura".equalsIgnoreCase(xmlReader.getAttributePrefix(i))) {
+            if (!XMLHandler.isSystemPrefixed(attName)) {
                 DefDescriptor<AttributeDef> att = DefDescriptorImpl.getInstance(attName, AttributeDef.class);
 
                 String attValue = xmlReader.getAttributeValue(i);

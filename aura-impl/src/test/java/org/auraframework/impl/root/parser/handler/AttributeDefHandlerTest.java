@@ -18,7 +18,6 @@ package org.auraframework.impl.root.parser.handler;
 import java.util.List;
 
 import javax.xml.stream.FactoryConfigurationError;
-import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
@@ -33,6 +32,7 @@ import org.auraframework.def.Definition.Visibility;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.AttributeDefImpl;
+import org.auraframework.impl.root.parser.XMLParser;
 import org.auraframework.impl.root.parser.handler.XMLHandler.InvalidSystemAttributeException;
 import org.auraframework.impl.source.StringSource;
 import org.auraframework.system.Parser.Format;
@@ -228,11 +228,7 @@ public class AttributeDefHandlerTest extends AuraImplTestCase {
 
     private XMLStreamReader getXmlReader(StringSource<AttributeDef> attributeSource) throws FactoryConfigurationError,
             XMLStreamException {
-        XMLStreamReader xmlReader = null;
-        XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
-        xmlInputFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, false);
-        xmlReader = xmlInputFactory.createXMLStreamReader(attributeSource.getSystemId(),
-                attributeSource.getHashingReader());
+        XMLStreamReader xmlReader = XMLParser.getInstance().createXMLStreamReader(attributeSource.getHashingReader());
         xmlReader.next();
         return xmlReader;
     }

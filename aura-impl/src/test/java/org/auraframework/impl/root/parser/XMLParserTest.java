@@ -32,8 +32,8 @@ import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Location;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.system.Source;
+import org.auraframework.throwable.AuraException;
 import org.auraframework.throwable.AuraUnhandledException;
-
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 
 public class XMLParserTest extends AuraImplTestCase {
@@ -87,11 +87,13 @@ public class XMLParserTest extends AuraImplTestCase {
         try {
             cd.validateDefinition();
             fail("Parsing invalid source should throw exception");
-        } catch (InvalidDefinitionException e) {
+        } catch (AuraException e) {
             Location location = e.getLocation();
             assertTrue("Wrong filename.", location.getFileName().endsWith("parserFragment.cmp"));
+            checkExceptionContains(e, InvalidDefinitionException.class,
+                    "Expected start tag <aura:component> but found aura:parent");
             assertEquals(18, location.getLine());
-            assertEquals(15, location.getColumn());
+            assertEquals(1, location.getColumn());
         }
     }
 

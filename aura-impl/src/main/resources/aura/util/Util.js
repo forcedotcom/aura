@@ -1227,6 +1227,34 @@ if (!!(Object && Object.keys)) {
 }
 
 /**
+ * Performs a series of 'safe' sequential lookup of nested properies.
+ * 
+ * Example: a safe lookup for "VALUE" in: object: {
+ *    first: {
+ *       second: [
+ *           "VALUE"
+ *       ]
+ *    }
+ * }
+ * 
+ * Can be done via: $A.util.lookup(object, "first", "second", 0); 
+ * Instead of: object && object.first && object.first.second && object.first.second[0]
+ * 
+ * @param {Object} root object or array to sequentially lookup properties from.
+ * @param {String} var-args of string property names. 
+ * @return {Any} the looked-up property or undefined if any properties along the way were not found.
+ */
+$A.ns.Util.prototype.lookup = function(object /*, var-args of arrays*/) {
+    var properties = Array.prototype.slice.call(arguments, 1),
+        util = this instanceof $A.ns.Util ? this : new $A.ns.Util();
+    
+    return util.reduce(properties, function(current, property) {
+        return current && current[property];
+    }, object);  
+};
+
+
+/**
  * Does an in-place merge of any number of array into the first.
  * @param {Array} array to receive the elements of subsequent arrays.
  * @param {Array} var-args of arrays that will have their elements copied into the first.
@@ -1259,17 +1287,18 @@ $A.ns.Util.prototype.merge = function(first /*, var-args of arrays*/) {
     return first;
 };
 
-/**
- * Runs a function over each element in an array.
- * @param {Array} array to loop over.
- * @param {Function} method to call for each element.
- * @param {Any} the 'this' instance inside the scope of provided method.
- */
+/** forEach: see documentation below (attached to last definition so that it is picked up for doc generation). */
 if (!!Array.prototype.forEach) {
     $A.ns.Util.prototype.forEach = function(array, method, that) {
         array.forEach(method, that);
     };
 } else {
+    /**
+     * Runs a function over each element in an array.
+     * @param {Array} array to loop over.
+     * @param {Function} method to call for each element.
+     * @param {Any} the 'this' instance inside the scope of provided method.
+     */
     $A.ns.Util.prototype.forEach = function(array, method, that) {
         var util = this instanceof $A.ns.Util ? this : new $A.ns.Util();
         
@@ -1288,19 +1317,20 @@ if (!!Array.prototype.forEach) {
     };
 }
 
-/**
- * Returns an array containing the return value of the provided function over every element of the input array.
- * @param {Array} array to loop over.
- * @param {Function} tranforms an element from the input array to an element in the output array.
- * @param {Any} the 'this' instance inside the scope of provided transformation method.
- * @returns {Array} where every element is a result of the transformation function
- * applied to the element (at the same index) from the input array.
- */
+/** map: see documentation below (attached to last definition so that it is picked up for doc generation). */
 if (!!Array.prototype.map) {
     $A.ns.Util.prototype.map = function(array, method, that) {
         return array.map(method, that);
     };
 } else {
+    /**
+     * Returns an array containing the return value of the provided function over every element of the input array.
+     * @param {Array} array to loop over.
+     * @param {Function} tranforms an element from the input array to an element in the output array.
+     * @param {Any} the 'this' instance inside the scope of provided transformation method.
+     * @returns {Array} where every element is a result of the transformation function
+     * applied to the element (at the same index) from the input array.
+     */
     $A.ns.Util.prototype.map = function(array, method, that) {
         var util = this instanceof $A.ns.Util ? this : new $A.ns.Util();
         
@@ -1320,20 +1350,21 @@ if (!!Array.prototype.map) {
     };
 }
 
-/**
- * Loops over an array, calling a function that provides the returned result of calling the function on the 
- * previous element.  
- * @param {Array} array to loop over.
- * @param {Function} reduction method that takes the resturned result from the previous call, the current element from 
- * the input array and index. 
- * @param {Any} the initial object passed to the first element in the array's reduction method.
- * @returns {Any} the final value returned from calling the reduction method on the last element.
- */
+/** reduce: see documentation below (attached to last definition so that it is picked up for doc generation). */
 if (!!Array.prototype.reduce) {
     $A.ns.Util.prototype.reduce = function(array, method, initial) {
         return array.reduce(method, initial);
     };
 } else {
+    /**
+     * Loops over an array, calling a function that provides the returned result of calling the function on the 
+     * previous element.  
+     * @param {Array} array to loop over.
+     * @param {Function} reduction method that takes the resturned result from the previous call, the current element from 
+     * the input array and index. 
+     * @param {Any} the initial object passed to the first element in the array's reduction method.
+     * @returns {Any} the final value returned from calling the reduction method on the last element.
+     */
     $A.ns.Util.prototype.reduce = function(array, method, initial) {
         var util = this instanceof $A.ns.Util ? this : new $A.ns.Util();
         
@@ -1353,18 +1384,19 @@ if (!!Array.prototype.reduce) {
     };
 }
 
-/**
- * Loops over an array, calling a function that returns some boolean. Returns true if all calls return a truthy result.
- * @param {Array} array to loop over.
- * @param {Function} predicate that returns a boolean result based on the current array element.
- * @param {Any} the 'this' instance inside the scope of provided transformation method.
- * @returns {Boolean} true if all elements of the array satisfy the predicate.
- */
+/** every: see documentation below (attached to last definition so that it is picked up for doc generation). */
 if (!!Array.prototype.every) {
     $A.ns.Util.prototype.every = function(array, predicate, that) {
         return array.every(predicate, that);
     };
 } else {
+    /**
+     * Loops over an array, calling a function that returns some boolean. Returns true if all calls return a truthy result.
+     * @param {Array} array to loop over.
+     * @param {Function} predicate that returns a boolean result based on the current array element.
+     * @param {Any} the 'this' instance inside the scope of provided transformation method.
+     * @returns {Boolean} true if all elements of the array satisfy the predicate.
+     */
     $A.ns.Util.prototype.every = function(array, predicate, that) {
         var util = this instanceof $A.ns.Util ? this : new $A.ns.Util();
         
@@ -1386,18 +1418,19 @@ if (!!Array.prototype.every) {
     };
 }
 
-/**
- * Loops over an array, calling a function that returns some boolean. Returns true if any calls return a truthy result.
- * @param {Array} array to loop over.
- * @param {Function} predicate that returns a boolean result based on the current array element.
- * @param {Any} the 'this' instance inside the scope of provided transformation method.
- * @returns {Boolean} true if any of the elements of the array satisfy the predicate.
- */
+/** some: see documentation below (attached to last definition so that it is picked up for doc generation). */
 if (!!Array.prototype.some) {
     $A.ns.Util.prototype.some = function(array, predicate, that) {
         return array.some(predicate, that);
     };
 } else {
+    /**
+     * Loops over an array, calling a function that returns some boolean. Returns true if any calls return a truthy result.
+     * @param {Array} array to loop over.
+     * @param {Function} predicate that returns a boolean result based on the current array element.
+     * @param {Any} the 'this' instance inside the scope of provided transformation method.
+     * @returns {Boolean} true if any of the elements of the array satisfy the predicate.
+     */
     $A.ns.Util.prototype.some = function(array, predicate, that) {
         var util = this instanceof $A.ns.Util ? this : new $A.ns.Util();
         
@@ -1419,18 +1452,19 @@ if (!!Array.prototype.some) {
     };
 }
 
-/**
- * Loops over an array, constructing a new array with the elements that pass the filter predicate.
- * @param {Function} predicate that returns a boolean result based on the current array element the result of which
- *                   indicates whether the element will be returned in the filter result array.
- * @param {Any} the 'this' instance inside the scope of provided predicate.
- * @returns {Array} ordered array of elements that pass the predicate.
- */
+/** filter: see documentation below (attached to last definition so that it is picked up for doc generation). */
 if (!!Array.prototype.filter) {
     $A.ns.Util.prototype.filter = function(array, predicate, that) {
         return array.filter(predicate, that);
     };
 } else {
+    /**
+     * Loops over an array, constructing a new array with the elements that pass the filter predicate.
+     * @param {Function} predicate that returns a boolean result based on the current array element the result of which
+     *                   indicates whether the element will be returned in the filter result array.
+     * @param {Any} the 'this' instance inside the scope of provided predicate.
+     * @returns {Array} ordered array of elements that pass the predicate.
+     */
     $A.ns.Util.prototype.filter = function(array, predicate, that) {
         var util = this instanceof $A.ns.Util ? this : new $A.ns.Util();
         

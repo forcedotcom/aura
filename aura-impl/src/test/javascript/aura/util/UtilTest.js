@@ -561,5 +561,67 @@ Test.Aura.UtilTest=function(){
             Assert.Equal(expected, actual);
         }
     }
+    
+    [Fixture]
+    function lookup() {
+        [Fact]
+        function looksUpNestedObjectProperties() {
+            var structure = {
+                wrong: {},
+                first: {
+                    wrong: {},
+                    second: {
+                        wrong: {},
+                        third: "VALUE"
+                    }
+                }
+            };
+            
+            auraMock(function() {
+                Assert.Equal("VALUE", new $A.ns.Util().lookup(structure, "first", "second", "third"));
+            });
+        }
+        
+        [Fact]
+        function looksUpNestedArrayProperties() {
+            var structure = ["WRONG", ["WRONG", ["VALUE", "WRONG"]]];
+            
+            auraMock(function() {
+                Assert.Equal("VALUE", new $A.ns.Util().lookup(structure, 1, 1, 0));
+            });
+        }
+        
+        [Fact]
+        function looksUpNestedMixedProperties() {
+            var structure = {
+                wrong: {},
+                first: ["WRONG", ["WRONG", [{result: "VALUE"}, "WRONG"]]]
+            };
+            
+            auraMock(function() {
+                Assert.Equal("VALUE", new $A.ns.Util().lookup(structure, "first", 1, 1, 0, "result"));
+            });
+        }
+        
+        [Fact]
+        function handlesUnfoundProperties() {
+            var structure = {
+                wrong: {},
+                first: ["WRONG", ["WRONG", [{result: "VALUE"}, "WRONG"]]]
+            };
+            
+            auraMock(function() {
+                var util = new $A.ns.Util(); 
+                
+                var found = 0;
+                found += util.lookup(structure, "second", 1, 4, 3, "result") === undefined ? 0 : 1;
+                found += util.lookup(structure, "first", 2, 4, 3, "result") === undefined ? 0 : 1;
+                found += util.lookup(structure, "first", 1, 1, 1, "result") === undefined ? 0 : 1;
+                found += util.lookup(structure, "first", 1, 1, 0, "resultMispelled") === undefined ? 0 : 1;
+                
+                Assert.Equal(0, found);
+            });
+        }
+    }
 }
  

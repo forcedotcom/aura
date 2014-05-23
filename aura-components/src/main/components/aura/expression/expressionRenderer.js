@@ -53,7 +53,7 @@
             if (value.auraType === "Component" || !value.isLiteral()) {
                 var last = component.lastRenderedValue;
                 if (last !== value) {
-                    var referenceNode = value.getReferenceNode() || last.getReferenceNode();
+                    var referenceNode = last.getReferenceNode();
                     $A.assert(referenceNode, "referenceNode is required");
 
                     // We are about to blow away the current reference node so let's create a temporary one
@@ -72,8 +72,9 @@
                     component.lastRenderedValue = value;
 
                     $A.afterRender(value);
+                    return ret;
                 } else {
-                    $A.rerender(value);
+                    return $A.rerender(value);
                 }
             } else {
                 if (value.isDirty()){
@@ -87,7 +88,7 @@
                 }
             }
         }
-	       },
+    },
 
 unrender: function(component) {
         // recursively unrender facets

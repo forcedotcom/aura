@@ -194,7 +194,7 @@ ArrayValue.prototype._setValue = function(newArray, skipChange) {
 
     this.fireEvents = true;
     if (!skipChange) {
-    	this.fire("change");
+        this.fire("change");
     }
 };
 
@@ -467,7 +467,7 @@ ArrayValue.prototype.destroy = function(async) {
 //#end
 
 //#if {"modes" : ["TESTING", "TESTINGDEBUG", "AUTOTESTING", "AUTOTESTINGDEBUG"]}
-	async = false; // Force synchronous destroy when in testing modes
+    async = false; // Force synchronous destroy when in testing modes
 //#end
 
     function destroy(a, async) {
@@ -528,7 +528,7 @@ ArrayValue.prototype.unwrap = function(){
     // instead of getValue("v.body");
     var ret = [];
     this.each(function(v) {
-        ret.push(v.unwrap());
+        ret.push(v.unwrap ? v.unwrap() : v);
     });
 
     // establish a back ref from the array to the ArrayValue for those times when someone has stripped off the
@@ -672,7 +672,7 @@ ArrayValue.prototype.render = function(parent, insertElements){
     this.setReferenceNode(referenceNode);
 
     if (parent) {
-    	insertElements(ret, parent);
+        insertElements(ret, parent);
     }
 
     this.hasBeenRendered = true;

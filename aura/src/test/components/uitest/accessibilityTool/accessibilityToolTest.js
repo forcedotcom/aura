@@ -106,10 +106,7 @@
     testImageTagTest:{
 	attributes : {caseToRender : 'imageTagTest'},
 	test: function(cmp){
-		var expected = "Total Number of Errors found: 8";;
-		var output    = $A.devToolService.checkAccessibility();
-		var actual   =  output.split("\n")[0];
-		$A.test.assertEquals(expected, actual , "Unexpected return from CheckAccessibility, should not return errornous string. output: \n"+output);
+		this.runTest("Total Number of Errors found: 9","Unexpected return from CheckAccessibility, should not return errornous string. output: \n" );
 	}
     },
     testHeadersCorrectOrder:{

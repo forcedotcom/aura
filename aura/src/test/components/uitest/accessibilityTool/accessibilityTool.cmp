@@ -227,6 +227,7 @@
          <ui:image src="9" alt="  UnDeFiNeD  " imageType="informational"/>
          <ui:image src="10" alt="  EMPTY  " imageType="informational"/>
          <ui:image src="11" alt="  NuLl  " imageType="informational"/>
+         <div aura:id="injectableDiv"></div>
     </aura:if>
   
     <!--Test for buttons. Making sure that the label attribute is set correctly-->  

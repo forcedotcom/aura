@@ -107,6 +107,10 @@ public abstract class AuraTestCase extends UnitTestCase {
     protected <T extends Definition> DefDescriptor<T> addSourceAutoCleanup(Class<T> defClass, String contents) {
         return getAuraTestingUtil().addSourceAutoCleanup(defClass, contents);
     }
+    
+    protected void updateStringSource(DefDescriptor<?> desc, String content) {
+        getAuraTestingUtil().updateSource(desc, content);
+    }
 
     protected <T extends Definition> DefDescriptor<T> addSourceAutoCleanup(DefDescriptor<T> descriptor, String contents) {
         return getAuraTestingUtil().addSourceAutoCleanup(descriptor, contents);

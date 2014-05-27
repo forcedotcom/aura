@@ -29,7 +29,6 @@ import org.auraframework.def.NamespaceDef;
 import org.auraframework.def.ProviderDef;
 import org.auraframework.def.RendererDef;
 import org.auraframework.def.StyleDef;
-import org.auraframework.system.Source;
 import org.auraframework.test.WebDriverTestCase;
 import org.auraframework.test.annotation.ThreadHostileTest;
 import org.openqa.selenium.By;
@@ -53,11 +52,6 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         super.perBrowserSetUp();
         // these tests trigger server recompilation which can take a bit of time
         auraUITestingUtil.setTimeoutInSecs(60);
-    }
-
-    private void updateStringSource(DefDescriptor<?> desc, String content) {
-        Source<?> src = getSource(desc);
-        src.addOrUpdate(content);
     }
 
     private DefDescriptor<ComponentDef> setupTriggerComponent(String attrs, String body) {

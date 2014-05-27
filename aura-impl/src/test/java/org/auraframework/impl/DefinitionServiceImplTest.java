@@ -189,14 +189,49 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         Set<DefDescriptor<?>> preloadsAgain = context.getPreloadedDefinitions();
         assertTrue("Preloaded set should not have changed", Sets.difference(preloads, preloadsAgain).isEmpty());
     }
-
+    
     /**
-     * ClientOutOfSyncException thrown when context uid is not current.
-     */
+     * Uid mismatch will trigger COOSE .
+     * Update test according what I learned from W-2176923
+     * ApexPages​AuraContext.​java doesn't have the source for app, but it go ahead and create app 
+     * definition with its own (fake) builder, then add it to localDef:
+     * ComponentDef cmpDef = (ComponentDef) Aura.getDefinitionService().getDefinition(cmpDesc);
+     * context.getDefRegistry().addLocalDef(cmpDef);
+     * this will make context.ClientLoaded associate appDefDesc with wrong UID, later when the request hit the server, 
+     * server build the appDef with the correct source, this will give us a different uid, which trigger the COOSE
+    */
     public void testUpdateLoadedWithWrongUidInContext() throws Exception {
+    	AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON,
+                Authentication.AUTHENTICATED);
+    	//build the cmpDesc with empty content
+        DefDescriptor<?> cmpDesc = addSourceAutoCleanup(ComponentDef.class, String.format(baseComponentTag, "", ""));
+        String tuid = context.getDefRegistry().getUid(null, cmpDesc);
+        Map<DefDescriptor<?>, String> clientLoaded = Maps.newHashMap();
+        clientLoaded.put(cmpDesc, tuid);
+        context.setClientLoaded(clientLoaded);
+        //update string source with some content
+        updateStringSource(cmpDesc,String.format(baseComponentTag, "", "something"));
+        context.getDefRegistry().invalidate(cmpDesc);
+        try {
+        	Aura.getDefinitionService().updateLoaded(cmpDesc);
+        	fail("Expected ClientOutOfSyncException when context from client request contains different uid for some cmp");
+        } catch (ClientOutOfSyncException e) {
+            checkExceptionStart(e, ClientOutOfSyncException.class,
+                    String.format("%s: mismatched UIDs ", cmpDesc.getQualifiedName()));
+        }
+    }
+    
+    /**
+     * ClientOutOfSyncException thrown when def was deleted (not found).
+     * though this one throw COOSE with "mismatched UIDs" as well, it's different from the test
+     * above : testUpdateLoadedWithWrongUidInContext
+     * as we actually catch the QuickFixException "broke", then throw a COOSE instead
+     */
+    public void testUpdateLoadedClientOutOfSyncTrumpsQuickFixException() throws Exception {
         AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON,
                 Authentication.AUTHENTICATED);
-        DefDescriptor<?> cmpDesc = addSourceAutoCleanup(ComponentDef.class, String.format(baseComponentTag, "", ""));
+        DefDescriptor<?> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
+                String.format(baseComponentTag, "", "<invalid:thisbetternotexistorthistestwillfail/>"));
         Map<DefDescriptor<?>, String> clientLoaded = Maps.newHashMap();
         clientLoaded.put(cmpDesc, "expired");
         context.setClientLoaded(clientLoaded);
@@ -206,6 +241,25 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         } catch (ClientOutOfSyncException e) {
             checkExceptionStart(e, ClientOutOfSyncException.class,
                     String.format("%s: mismatched UIDs ", cmpDesc.getQualifiedName()));
+        }
+    }
+
+    /**
+     * Null Uid of clientDesc trigger ClientOutOfSyncException.
+     */
+    public void testUpdateLoadedWithNullClientUID() throws Exception {
+        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON,
+                Authentication.AUTHENTICATED,
+                laxSecurityApp);
+        DefDescriptor<?> clientDesc = addSourceAutoCleanup(ComponentDef.class,String.format(baseComponentTag, "", ""));
+        Map<DefDescriptor<?>, String> clientLoaded = Maps.newHashMap();
+        clientLoaded.put(clientDesc, null);
+        context.setClientLoaded(clientLoaded);
+        try {
+            Aura.getDefinitionService().updateLoaded(clientDesc);
+            fail("Expected ClientOutOfSyncException when client has load some cmp with null uid");
+        } catch (ClientOutOfSyncException coose) {
+        	checkExceptionStart(coose, ClientOutOfSyncException.class, clientDesc.getQualifiedName()+": missing UID");
         }
     }
 
@@ -241,25 +295,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         }
     }
 
-    /**
-     * ClientOutOfSyncException thrown when def was deleted (not found).
-     */
-    public void testUpdateLoadedClientOutOfSyncTrumpsQuickFixException() throws Exception {
-        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON,
-                Authentication.AUTHENTICATED);
-        DefDescriptor<?> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
-                String.format(baseComponentTag, "", "<invalid:thisbetternotexistorthistestwillfail/>"));
-        Map<DefDescriptor<?>, String> clientLoaded = Maps.newHashMap();
-        clientLoaded.put(cmpDesc, "expired");
-        context.setClientLoaded(clientLoaded);
-        try {
-            Aura.getDefinitionService().updateLoaded(cmpDesc);
-            fail("Expected ClientOutOfSyncException");
-        } catch (ClientOutOfSyncException e) {
-            checkExceptionStart(e, ClientOutOfSyncException.class,
-                    String.format("%s: mismatched UIDs ", cmpDesc.getQualifiedName()));
-        }
-    }
+    
 
     /**
      * UID, for unloaded descriptor, added to empty loaded set.
@@ -396,26 +432,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         assertTrue("Preloads missing dependency of client", preloads.contains(depDesc));
     }
 
-    /**
-     * Def not validated and ClientOutOfSyncException.
-     */
-    public void testUpdateLoadedWithNullClientUID() throws Exception {
-        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON,
-                Authentication.AUTHENTICATED,
-                laxSecurityApp);
-        DefDescriptor<?> clientDesc = addSourceAutoCleanup(ComponentDef.class,
-                String.format(baseComponentTag, "", "<invalid:thisbetternotexistorthistestwillfail/>"));
-        Map<DefDescriptor<?>, String> clientLoaded = Maps.newHashMap();
-        clientLoaded.put(clientDesc, null);
-        context.setClientLoaded(clientLoaded);
-
-        try {
-            Aura.getDefinitionService().updateLoaded(clientDesc);
-            fail("expected a client out of sync");
-        } catch (ClientOutOfSyncException coose) {
-            // ok.
-        }
-    }
+   
 
     /**
      * Loaded dependencies are pruned from preloads

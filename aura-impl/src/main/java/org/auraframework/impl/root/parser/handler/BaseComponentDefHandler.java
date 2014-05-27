@@ -23,8 +23,26 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.Aura;
 import org.auraframework.builder.RootDefinitionBuilder;
-import org.auraframework.def.*;
+
+import org.auraframework.def.AttributeDef;
+import org.auraframework.def.AttributeDefRef;
+import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.BaseComponentDef.WhitespaceBehavior;
+
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.ComponentDefRef;
+import org.auraframework.def.ControllerDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DocumentationDef;
+import org.auraframework.def.HelperDef;
+import org.auraframework.def.InterfaceDef;
+import org.auraframework.def.ModelDef;
+import org.auraframework.def.ProviderDef;
+import org.auraframework.def.RendererDef;
+import org.auraframework.def.ResourceDef;
+import org.auraframework.def.StyleDef;
+import org.auraframework.def.TestSuiteDef;
+import org.auraframework.def.ThemeDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.root.AttributeDefImpl;
 import org.auraframework.impl.root.AttributeDefRefImpl;
@@ -33,12 +51,21 @@ import org.auraframework.impl.root.event.RegisterEventDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.SubDefDescriptorImpl;
 import org.auraframework.impl.util.TextTokenizer;
-import org.auraframework.system.*;
+
+import org.auraframework.system.AuraContext;
+
 import org.auraframework.system.AuraContext.Mode;
+
+import org.auraframework.system.MasterDefRegistry;
+import org.auraframework.system.Source;
+import org.auraframework.system.SubDefDescriptor;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
-import com.google.common.collect.*;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 /**
  */
@@ -173,6 +200,7 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef> extend
     @Override
     protected void readAttributes() throws QuickFixException {
         AuraContext context = Aura.getContextService().getCurrentContext();
+        MasterDefRegistry mdr = context.getDefRegistry();
         context.setCurrentCaller(builder.getDescriptor());
         Mode mode = context.getMode();
 
@@ -188,7 +216,7 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef> extend
                     AuraTextUtil.initCap(defDescriptor.getName()));
             DefDescriptor<ControllerDef> apexDescriptor = DefDescriptorImpl
                     .getInstance(apexControllerName, ControllerDef.class);
-            if (apexDescriptor.exists()) {
+            if (mdr.exists(apexDescriptor)) {
                 controllerDescriptor = apexDescriptor;
             }
         }
@@ -206,7 +234,7 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef> extend
                     defDescriptor.getNamespace(), defDescriptor.getName());
             DefDescriptor<ModelDef> jsDescriptor = DefDescriptorImpl
                     .getInstance(jsModelName, ModelDef.class);
-            if (jsDescriptor.exists()) {
+            if (mdr.exists(jsDescriptor)) {
                 builder.modelDefDescriptor = jsDescriptor;
             } else {
                 String apexModelName = String.format("apex://%s.%sModel",
@@ -214,7 +242,7 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef> extend
                         AuraTextUtil.initCap(defDescriptor.getName()));
                 DefDescriptor<ModelDef> apexDescriptor = DefDescriptorImpl
                         .getInstance(apexModelName, ModelDef.class);
-                if (apexDescriptor.exists()) {
+                if (mdr.exists(apexDescriptor)) {
                     builder.modelDefDescriptor = apexDescriptor;
                 }
             }
@@ -225,7 +253,7 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef> extend
                 defDescriptor.getNamespace(), defDescriptor.getName());
         DefDescriptor<ControllerDef> jsDescriptor = DefDescriptorImpl
                 .getInstance(jsDescriptorName, ControllerDef.class);
-        if (jsDescriptor.exists()) {
+        if (mdr.exists(jsDescriptor)) {
             builder.controllerDescriptors.add(jsDescriptor);
         }
 
@@ -245,7 +273,7 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef> extend
             // See if there is a clientRenderer that has the same qname.
             DefDescriptor<RendererDef> jsRendererDescriptor = DefDescriptorImpl
                     .getInstance(jsDescriptorName, RendererDef.class);
-            if (jsRendererDescriptor.exists()) {
+            if (mdr.exists(jsRendererDescriptor)) {
                 builder.addRenderer(jsRendererDescriptor.getQualifiedName());
             }
         }
@@ -262,14 +290,14 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef> extend
             // See if there is a helper that has the same qname.
             DefDescriptor<HelperDef> jsHelperDescriptor = DefDescriptorImpl
                     .getInstance(jsDescriptorName, HelperDef.class);
-            if (jsHelperDescriptor.exists()) {
+            if (mdr.exists(jsHelperDescriptor)) {
                 builder.addHelper(jsHelperDescriptor.getQualifiedName());
             }
         }
 
         DefDescriptor<ResourceDef> jsResourceDescriptor = DefDescriptorImpl
                 .getInstance(jsDescriptorName, ResourceDef.class);
-        if (jsResourceDescriptor.exists()) {
+        if (mdr.exists(jsResourceDescriptor)) {
             builder.addResource(jsResourceDescriptor.getQualifiedName());
         }
 
@@ -281,19 +309,19 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef> extend
         }
         DefDescriptor<StyleDef> cssDescriptor = DefDescriptorImpl.getInstance(
                 styleName, StyleDef.class);
-        if (cssDescriptor.exists()) {
+        if (mdr.exists(cssDescriptor)) {
             builder.styleDescriptor = cssDescriptor;
         }
 
         DefDescriptor<ResourceDef> cssResourceDescriptor = DefDescriptorImpl.getInstance(styleName, ResourceDef.class);
-        if (cssResourceDescriptor.exists()) {
+        if (mdr.exists(cssResourceDescriptor)) {
             builder.addResource(cssResourceDescriptor.getQualifiedName());
         }
 
         // See if there is a themedef that has the same qname. todo -- add localTheme attr as well?
         String themeName = String.format("%s:%s", defDescriptor.getNamespace(), defDescriptor.getName());
         DefDescriptor<ThemeDef> themeDesc = DefDescriptorImpl.getInstance(themeName, ThemeDef.class);
-        if (themeDesc.exists()) {
+        if (mdr.exists(themeDesc)) {
             builder.localThemeDescriptor = themeDesc;
         }
 
@@ -302,7 +330,7 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef> extend
             // See if there is a test suite that has the same qname.
             DefDescriptor<TestSuiteDef> jsTestSuiteDescriptor = DefDescriptorImpl
                     .getInstance(jsDescriptorName, TestSuiteDef.class);
-            if (jsTestSuiteDescriptor.exists()) {
+            if (mdr.exists(jsTestSuiteDescriptor)) {
                 builder.testSuiteDefDescriptor = jsTestSuiteDescriptor;
             }
         }
@@ -345,7 +373,7 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef> extend
                     AuraTextUtil.initCap(defDescriptor.getName()));
             DefDescriptor<ProviderDef> apexDescriptor = DefDescriptorImpl
                     .getInstance(apexProviderName, ProviderDef.class);
-            if (apexDescriptor.exists()) {
+            if (mdr.exists(apexDescriptor)) {
                 builder.addProvider(apexDescriptor.getQualifiedName());
             }
         }
@@ -359,7 +387,7 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef> extend
         DefDescriptor<DocumentationDef> documentationDescriptor = DefDescriptorImpl.getAssociateDescriptor(
         		builder.getDescriptor(), DocumentationDef.class, DefDescriptor.MARKUP_PREFIX);
 
-        if (documentationDescriptor.exists()) {
+        if (mdr.exists(documentationDescriptor)) {
             builder.setDocumentation(documentationDescriptor.getQualifiedName());
         }
 

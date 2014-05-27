@@ -405,7 +405,7 @@ var AuraDevToolService = function() {
         	
                 for(var j =0; j<labels.length; j++){
                     atrib = $A.util.getElementAttributeValue(labels[j], attribute);
-            	    if(!aura.util.isUndefinedOrNull(atrib)){
+            	    if(!$A.util.isEmpty(atrib)){
             	       dict[atrib] = true;
             	    }
                  }
@@ -436,7 +436,7 @@ var AuraDevToolService = function() {
         	     data_aura_rendered_by = $A.util.getElementAttributeValue(allImgTags[index], "data-aura-rendered-by");
         	     
         	    // Will more than likely have a rendered by value but double checking 
-         	    if(data_aura_rendered_by === null || data_aura_rendered_by === "" ){
+         	    if($A.util.isEmpty(data_aura_rendered_by)){
          		nonAuraImg.push(allImgTags[index]);
          	    }
          	    else{
@@ -461,7 +461,7 @@ var AuraDevToolService = function() {
          		if($A.util.isUndefinedOrNull(imgType)){
          		    
          		    imgType = "informational";
-         		    if($A.util.isUndefinedOrNull(htmlAlt)){
+         		    if($A.util.isEmpty(htmlAlt)){
          			alt="";
          		    }
          		    else{
@@ -516,12 +516,12 @@ var AuraDevToolService = function() {
   	        for (var index = 0; index < inputTags.length; index++){
   	            inputTag = inputTags[index];
   	            type = $A.util.getElementAttributeValue(inputTag, "type");
-  	            if(!$A.util.isUndefinedOrNull(type) && inputTypes.indexOf(type)> -1){
+  	            if(!$A.util.isEmpty(type) && inputTypes.indexOf(type)> -1){
 	        	continue;
 	            }
 	            else if (type == "image"){
 	        	var alt = $A.util.getElementAttributeValue(inputTag, "alt");
-	        	if($A.util.isUndefinedOrNull(alt) || alt.replace(/[\s\t\r\n]/g,'') === ""){
+	        	if($A.util.isEmpty(alt) || alt.replace(/[\s\t\r\n]/g,'') === ""){
 	        	  errorArray.push(inputTag); 
        		        }
 	            }
@@ -549,7 +549,7 @@ var AuraDevToolService = function() {
 	        
 	        for(var i=0; i<tags.length; i++){
 	                atrib = $A.util.getElementAttributeValue(tags[i], attribute);
-	        	if(aura.util.isUndefinedOrNull(atrib) || evalFunc(atrib.toLowerCase(), errorVal)){
+	        	if($A.util.isEmpty(atrib) || evalFunc(atrib.toLowerCase(), errorVal)){
 	        	    errorArray.push(tags[i]);
 	        	}
 	        }
@@ -594,7 +594,7 @@ var AuraDevToolService = function() {
                          data_aura_rendered_by = $A.util.getElementAttributeValue(tag, "data-aura-rendered-by");
         
                          //Make sure it has a rendered by value
-                         if(!$A.util.isUndefinedOrNull(data_aura_rendered_by) && data_aura_rendered_by !== "" ){
+                         if(!$A.util.isEmpty(data_aura_rendered_by)){
                              cmp = $A.getCmp(data_aura_rendered_by);
                              if(!$A.util.isUndefinedOrNull(cmp)){
                                  cmp = cmp.getAttributes().getValueProvider();
@@ -663,7 +663,7 @@ var AuraDevToolService = function() {
                 	cmpDesc = "";
                 	
                 	//Make sure it has a rendered by value
-                	if($A.util.isUndefinedOrNull(data_aura_rendered_by) || data_aura_rendered_by === "" ){
+                	if($A.util.isEmpty(data_aura_rendered_by)){
                 	    nodeName = errArray[i].nodeName.toLowerCase();
                 	    cmpInfo = "No Aura information available";
                 	    compThatRenderedCmp = cmpInfo;
@@ -729,7 +729,7 @@ var AuraDevToolService = function() {
         	    
         	    for(var i =0; i<imgs.length; i++){
         		alt = $A.util.getElementAttributeValue(imgs[i], "alt");
-        		if(!$A.util.isUndefinedOrNull(alt) && alt.replace(/[\s\t\r\n]/g,'') !== ""){
+        		if(!$A.util.isEmpty(alt) && alt.replace(/[\s\t\r\n]/g,'') !== ""){
         		   return false;    
         		}
         	    }
@@ -755,7 +755,7 @@ var AuraDevToolService = function() {
     	        	    // Temporary fix for ckeditor. current issue is that ckeditor set "=" which causes innerText to not return the correct value
     	        	    // Work-around will be temporary and should be removed when ckeditor is updated.
     	        	    // Bug to track removal: W-1979552
-    	        	    if($A.util.isUndefinedOrNull(anchorId) || anchorId.indexOf("cke_") !== 0 ){
+    	        	    if($A.util.isEmpty(anchorId) || anchorId.indexOf("cke_") !== 0 ){
     	        	    	 //Text should not be undefined or null at any point since $A.test.getText will always return something
         	        	    text = $A.util.getText(anchor).replace(/[\s\t\r\n]/g,'');
         	        	                        
@@ -785,7 +785,7 @@ var AuraDevToolService = function() {
               		     inputType = $A.util.getElementAttributeValue(inputTag, 'type').toLowerCase();
               		     if(inputType === "radio" || inputType === "checkbox"){
               			 rcName = $A.util.getElementAttributeValue(inputTag, 'name');
-              			 if($A.util.isUndefinedOrNull(rcName)){
+              			 if($A.util.isEmpty(rcName)){
               			     continue;
               			 }
               			 
@@ -867,7 +867,7 @@ var AuraDevToolService = function() {
                              scopeVal = $A.util.getElementAttributeValue(ths[i], "scope");
                              idVals = $A.util.getElementAttributeValue(ths[i], "id");
                              //If Scope exists
-                             if(!$A.util.isUndefinedOrNull(scopeVal)){
+                             if(!$A.util.isEmpty(scopeVal)){
                             	 if(!(scopeVal in validScopes) || $A.util.trim(scopeVal) === ""){
                             	    errorArray.push(ths[i]);
                             	 }
@@ -875,7 +875,7 @@ var AuraDevToolService = function() {
                             	 skipTDCheck = true;
                             	
                              }
-                             else if(!$A.util.isUndefinedOrNull(idVals)){
+                             else if(!$A.util.isEmpty(idVals)){
                         	 headerDict[idVals] = true;
                              }
                              else{
@@ -898,7 +898,7 @@ var AuraDevToolService = function() {
                          }
                          for(i = 0; i<tds.length; i++){
                              idVals = $A.util.getElementAttributeValue(tds[i], "headers");
-                             if($A.util.isUndefinedOrNull(idVals)){
+                             if($A.util.isEmpty(idVals)){
                         	 errorArray.push(tds[i]);
                         	 continue;
                              }

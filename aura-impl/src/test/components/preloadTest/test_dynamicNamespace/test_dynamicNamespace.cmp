@@ -15,9 +15,8 @@
     limitations under the License.
 
 -->
+<!-- this component is used by PreloadNameSpaceHttpTest.testDynamicNamespace -->
 <aura:component provider="java://org.auraframework.impl.java.provider.ConcreteProvider" extensible="true" render="client">
-    <aura:attribute name="whatToDo" type="String" default="" />
-    <aura:attribute name="name" type="String" default="nothing!" />
-    <h1>{!v.name}</h1>
+    <aura:attribute name="whatToDo" type="String" default="mockRecordLayout" />
     {!v.body}
 </aura:component>

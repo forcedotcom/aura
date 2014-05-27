@@ -162,7 +162,12 @@ public class AuraUITestingUtil {
         String exp = "window.$A.getRoot().find('" + cmp + "')";
         return exp;
     }
-
+    
+    public String getEncodedContextForServer() {
+    	String exp = "window.$A.getContext().encodeForServer()";
+    	return exp;
+    }
+    
     /**
      * Very useful to get handle on the component passing globalId
      * 

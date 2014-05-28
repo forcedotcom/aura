@@ -84,7 +84,8 @@ var AuraRenderingService = function AuraRenderingService(){
 
 	                //#if {"modes" : ["STATS"]}
                 	cmpsWithWhy["renderingTime"] = (new Date()).getTime() - startTime;
-                	$A.renderingService.index(cmpsWithWhy);
+
+                    $A.renderingService.statsIndex["rerenderDirty"].push(cmpsWithWhy);
 	                //#end
                 }
                 
@@ -120,15 +121,27 @@ var AuraRenderingService = function AuraRenderingService(){
          * @public
          */
         render: function AuraRenderingService$Render(component, parent) {
+            //#if {"modes" : ["STATS"]}
+            var startTime = (new Date()).getTime();
+            //#end
+
             if (component._arrayValueRef) {
                 component = component._arrayValueRef;
             }
 
+            var ret = [];
+
             if (component.auraType === "Value" && component.toString() === "ArrayValue"){
-                return component.render(parent, priv.insertElements);
+                ret = component.render(parent, priv.insertElements);
+
+                //#if {"modes" : ["STATS"]}
+                $A.renderingService.statsIndex["render"].push({'component': component, 'startTime': startTime, 'endTime': (new Date()).getTime()});
+                //#end
+
+                return ret;
             }
 
-            var ret = [];
+
             var array = priv.getArray(component);
 
             for (var x=0; x < array.length; x++){
@@ -140,7 +153,7 @@ var AuraRenderingService = function AuraRenderingService(){
                     // And put the constructed component back into the array.
                     array[x] = cmp;
                 }
-                
+
                 if (cmp.isValid()) {
 	                var priorSibling = cmp.getRenderPriorSibling();
 	                var container = priv.push(cmp);
@@ -152,10 +165,14 @@ var AuraRenderingService = function AuraRenderingService(){
 	                    priv.pop(cmp);
 	                }
                 }
-                
+
                 priv.insertElements(ret, parent);
             }
-            
+
+            //#if {"modes" : ["STATS"]}
+            $A.renderingService.statsIndex["render"].push({'component': component, 'startTime': startTime, 'endTime': (new Date()).getTime()});
+            //#end
+
             return ret;
         },
 
@@ -167,6 +184,10 @@ var AuraRenderingService = function AuraRenderingService(){
          * @public
          */
         afterRender: function(component){
+            //#if {"modes" : ["STATS"]}
+            var startTime = (new Date()).getTime();
+            //#end
+
             var array = priv.getArray(component);
             for(var i=0;i<array.length;i++){
                 var cmp = array[i];
@@ -176,6 +197,9 @@ var AuraRenderingService = function AuraRenderingService(){
                 }
             }
 
+            //#if {"modes" : ["STATS"]}
+            $A.renderingService.statsIndex["afterRender"].push({'component': component, 'startTime': startTime, 'endTime': (new Date()).getTime()});
+            //#end
         },
 
         /**
@@ -191,6 +215,10 @@ var AuraRenderingService = function AuraRenderingService(){
          * @public
          */
         rerender: function(component, referenceNode, appendChild) {
+            //#if {"modes" : ["STATS"]}
+            var startTime = (new Date()).getTime();
+            //#end
+
             if (component._arrayValueRef) {
                 component = component._arrayValueRef;
             }
@@ -202,11 +230,17 @@ var AuraRenderingService = function AuraRenderingService(){
             }
             
             try {
+                var allElems = [];
                 if (component.auraType === "Value" && component.toString() === "ArrayValue"){
-                    return component.rerender(referenceNode, appendChild, priv.insertElements);
+                    allElems = component.rerender(referenceNode, appendChild, priv.insertElements);
+
+                    //#if {"modes" : ["STATS"]}
+                    $A.renderingService.statsIndex["rerender"].push({'component': component, 'startTime': startTime, 'endTime': (new Date()).getTime()});
+                    //#end
+
+                    return allElems;
                 }
 
-                var allElems = [];
                 var array = priv.getArray(component);
                 array = priv.reorderForContainment(array);
                 for (var i = 0; i < array.length; i++){
@@ -277,6 +311,11 @@ var AuraRenderingService = function AuraRenderingService(){
                         }
                     }
                 }
+
+                //#if {"modes" : ["STATS"]}
+                $A.renderingService.statsIndex["rerender"].push({'component': component, 'startTime': startTime, 'endTime': (new Date()).getTime()});
+                //#end
+
                 return allElems;
             } finally {
                 if (topVisit) {
@@ -297,6 +336,10 @@ var AuraRenderingService = function AuraRenderingService(){
             if (!component){
                 return;
             }
+
+            //#if {"modes" : ["STATS"]}
+            var startTime = (new Date()).getTime();
+            //#end
 
             if (component.auraType === "Value" && component.toString() === "ArrayValue"){
                 component.unrender();
@@ -322,6 +365,10 @@ var AuraRenderingService = function AuraRenderingService(){
                     }
                 }
             }
+
+            //#if {"modes" : ["STATS"]}
+            $A.renderingService.statsIndex["unrender"].push({'component': component, 'startTime': startTime, 'endTime': (new Date()).getTime()});
+            //#end
         },
 
         /**
@@ -365,17 +412,15 @@ var AuraRenderingService = function AuraRenderingService(){
             }
         }
 
-      //#if {"modes" : ["STATS"]}
-        ,rerenderDirtyIndex : [],
-
-        index : function(info) {
-            $A.renderingService.rerenderDirtyIndex.push(info);
-        },
-
-        getRerenderingIndex : function() {
-        	return $A.renderingService.rerenderDirtyIndex;
+        //#if {"modes" : ["STATS"]}
+        ,statsIndex : {
+            "afterRender": [],
+            "render": [],
+            "rerender": [],
+            "rerenderDirty": [],
+            "unrender": []
         }
-    //#end        
+        //#end
     };
     
     //#include aura.AuraRenderingService_export

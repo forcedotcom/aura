@@ -167,7 +167,27 @@ var AuraDevToolService = function() {
                 return flattenRegistry(ret);
             },
             "rerenderings" : function(){
-                return renderingService.getRerenderingIndex();
+                return renderingService.statsIndex["rerenderDirty"];
+            },
+
+            "renderings": function() {
+                var aggregate = [];
+                var types = ["render", "afterRender", "rerender", "unrender"];
+
+                for(var i = 0; i < types.length; i++) {
+                    var type = types[i];
+                    var stat = renderingService.statsIndex[type];
+
+                    for(var j = 0; j < stat.length; j++) {
+                        stat[j].type = type;
+                        aggregate.push(stat[j]);
+                    }
+                }
+                return aggregate;
+            },
+
+            "event": function() {
+                return Event.prototype.statsIndex;
             }
 //#end
         },

@@ -357,6 +357,32 @@
             </build>
         </profile>
         <profile>
+            <id>perfTests</id>
+            <activation>
+                <property>
+                    <name>perfTests</name>
+                </property>
+            </activation>
+            <properties>
+               <testClasses>**/*PerfTests.java</testClasses>
+                <testPhase>integration-test</testPhase>
+                <testSetupPhase>pre-integration-test</testSetupPhase>
+                <testTeardownPhase>post-integration-test</testTeardownPhase>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>build-helper-maven-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
             <id>runOnlyIntTests</id>
             <activation>
                 <property>

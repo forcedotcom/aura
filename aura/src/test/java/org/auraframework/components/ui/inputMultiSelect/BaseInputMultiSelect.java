@@ -18,7 +18,7 @@ package org.auraframework.components.ui.inputMultiSelect;
 import org.auraframework.test.WebDriverTestCase;
 import org.auraframework.test.WebDriverTestCase.ExcludeBrowsers;
 import org.auraframework.test.WebDriverUtil.BrowserType;
-import org.auraframework.util.test.perf.PerfTest;
+import org.auraframework.test.annotation.PerfTest;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;

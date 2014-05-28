@@ -1,0 +1,5 @@
+<aura:component>
+   <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+
+   <ui:datePicker aura:id="datePicker" visible="true"/>
+</aura:component>

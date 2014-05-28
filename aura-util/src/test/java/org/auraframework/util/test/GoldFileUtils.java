@@ -21,9 +21,8 @@ import java.util.logging.Logger;
 
 import junit.framework.AssertionFailedError;
 
-import org.auraframework.util.test.perf.PerfDiffUtils;
-import org.auraframework.util.test.perf.PerfGoldFilesUtil;
-import org.auraframework.util.test.perf.data.PerfMetrics;
+import org.auraframework.test.UnitTestCase;
+import org.auraframework.test.perf.metrics.PerfMetrics;
 
 public final class GoldFileUtils {
 
@@ -31,18 +30,18 @@ public final class GoldFileUtils {
 
     private static final boolean SKIP_GOLD_FILE_UPDATE = System.getProperty("skipGoldFileUpdate") != null;
 
-    public void assertTextDiff(Class<?> testClass, String resultsBaseFilename, String testResults) throws Exception {
-        TextDiffUtils diff = new TextDiffUtils(testClass, resultsBaseFilename);
+    public void assertTextDiff(UnitTestCase test, String resultsBaseFilename, String testResults) throws Exception {
+        TextDiffUtils diff = new TextDiffUtils(test, resultsBaseFilename);
         assertDiffInternal(testResults, diff);
     }
 
-    public void assertJsonDiff(Class<?> testClass, String resultsBaseFilename, String testResults) throws Exception {
-        TextDiffUtils diff = new JsonDiffUtils(testClass, resultsBaseFilename);
+    public void assertJsonDiff(UnitTestCase test, String resultsBaseFilename, String testResults) throws Exception {
+        TextDiffUtils diff = new JsonDiffUtils(test, resultsBaseFilename);
         assertDiffInternal(testResults, diff);
     }
 
-    public void assertPerfDiff(Class<?> testClass, String resultsBaseFilename, PerfMetrics actual) throws Exception {
-        PerfDiffUtils diff = new PerfDiffUtils(testClass, resultsBaseFilename);
+    public void assertPerfDiff(UnitTestCase test, String resultsBaseFilename, PerfMetrics actual) throws Exception {
+        PerfDiffUtils diff = new PerfDiffUtils(test, resultsBaseFilename);
         assertDiffInternal(actual, diff);
     }
 
@@ -58,8 +57,10 @@ public final class GoldFileUtils {
             message = String.format("Created missing gold file, review new gold file before committing: %s", url);
         } catch (Throwable t) {
             exceptionFound = t;
-            message = String.format(
-                    "Gold file differences found, review updated gold file before committing: %s", url);
+            message = "Gold file differences found";
+            if (!SKIP_GOLD_FILE_UPDATE) {
+                message += String.format(", review updated gold file before committing: %s", url);
+            }
             message += "\nDifferences:\n" + t.getMessage();
         }
 
@@ -69,7 +70,9 @@ public final class GoldFileUtils {
                 diff.writeGoldFile(testResults);
             }
             if (testResults instanceof PerfMetrics) {
-                LOG.info("new gold file contents:\n" + PerfGoldFilesUtil.toGoldFileText((PerfMetrics) testResults));
+                LOG.info("new gold file contents:\n"
+                        + PerfGoldFilesUtil.toGoldFileText((PerfMetrics) testResults, diff.getTest()
+                                .storeDetailsInGoldFile()));
             }
 
             // add info about creating/updating log file in the message

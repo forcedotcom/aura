@@ -1,0 +1,3 @@
+<aura:component extends="ui:dataProvider" description="A test data provider to test per-component perf test.">
+     <aura:handler name="provide" action="{!c.provide}"/>
+</aura:component>

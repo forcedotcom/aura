@@ -85,5 +85,20 @@
                 </testResources>
             </build>
         </profile>
+        <profile>
+            <id>perfTests</id>
+            <activation>
+                <property>
+                    <name>perfTests</name>
+                </property>
+            </activation>
+            <build>
+                <testResources>
+                    <testResource>
+                        <directory>src/test/resources</directory>
+                    </testResource>
+                </testResources>
+            </build>
+        </profile>
     </profiles>
 </project>

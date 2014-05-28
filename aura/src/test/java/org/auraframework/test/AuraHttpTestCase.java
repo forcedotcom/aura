@@ -32,14 +32,12 @@ import org.apache.http.client.CookieStore;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.params.HttpClientParams;
 import org.apache.http.client.protocol.ClientContext;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.cookie.Cookie;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.cookie.BasicClientCookie;
 import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
@@ -307,32 +305,6 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
     }
 
     /**
-     * Sets up get request method for httpclient. Includes ability to follow redirects and set request headers
-     *
-     * @param path
-     * @param followRedirects
-     * @param headers
-     * @return
-     * @throws MalformedURLException
-     * @throws URISyntaxException
-     */
-    protected HttpGet obtainGetMethod(String path, boolean followRedirects,
-            Header[] headers) throws MalformedURLException, URISyntaxException {
-        String url = getTestServletConfig().getBaseUrl().toURI().resolve(path)
-                .toString();
-
-        HttpGet get = new HttpGet(url);
-        HttpParams params = get.getParams();
-        HttpClientParams.setRedirecting(params, followRedirects);
-
-        if (headers != null) {
-            get.setHeaders(headers);
-        }
-
-        return get;
-    }
-
-    /**
      * Build a URL for a get from the given parameters with all the standard parameters set.
      *
      * This is a convenience function to make gets more consistent. It sets:
@@ -566,7 +538,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
             return null;
         }
 
-        private InstanceStack instanceStack = new InstanceStack();
+        private final InstanceStack instanceStack = new InstanceStack();
 
         @Override
         public InstanceStack getInstanceStack() {

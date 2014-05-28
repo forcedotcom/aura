@@ -16,16 +16,21 @@
 package org.auraframework.test;
 
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
 import junit.framework.Assert;
 
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Platform;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.internal.BuildInfo;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.uiautomation.ios.IOSCapabilities;
+
+import com.google.common.collect.Lists;
 
 /**
  * Utility methods related to WebDriver
@@ -202,5 +207,17 @@ public final class WebDriverUtil {
             }
         }
         return SELENIUM_VERSION;
+    }
+
+    public static synchronized ChromeOptions addChromeOptions(DesiredCapabilities capabilities, Dimension windowSize) {
+        ChromeOptions options = new ChromeOptions();
+        List<String> arguments = Lists.newArrayList();
+        arguments.add("--ignore-gpu-blacklist");
+        if (windowSize != null) {
+            arguments.add("window-size=" + windowSize.width + ',' + windowSize.height);
+        }
+        options.addArguments(arguments);
+        capabilities.setCapability(ChromeOptions.CAPABILITY, options);
+        return options;
     }
 }

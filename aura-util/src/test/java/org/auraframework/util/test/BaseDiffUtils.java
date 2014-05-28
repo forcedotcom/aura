@@ -25,15 +25,19 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.net.URL;
 
+import org.auraframework.test.UnitTestCase;
 import org.auraframework.util.AuraUtil;
 import org.auraframework.util.adapter.SourceControlAdapter;
 
 public abstract class BaseDiffUtils<T> implements DiffUtils<T> {
 
+    private final UnitTestCase test;
     private URL srcUrl;
     private URL destUrl;
 
-    public BaseDiffUtils(Class<?> testClass, String goldName) throws Exception {
+    public BaseDiffUtils(UnitTestCase test, String goldName) throws Exception {
+        this.test = test;
+        Class<? extends UnitTestCase> testClass = test.getClass();
         String resourceName = getResultsFolder() + testClass.getSimpleName() + (goldName.startsWith("/") ? "" : "/")
                 + goldName;
         srcUrl = testClass.getResource(resourceName);
@@ -61,6 +65,11 @@ public abstract class BaseDiffUtils<T> implements DiffUtils<T> {
             // also if reading from jars and no gold included (shouldn't happen)
             srcUrl = destUrl;
         }
+    }
+
+    @Override
+    public final UnitTestCase getTest() {
+        return test;
     }
 
     /**

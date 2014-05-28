@@ -16,14 +16,19 @@
 package org.auraframework.test;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpRequestBase;
-
+import org.apache.http.client.params.HttpClientParams;
 import org.apache.http.entity.ContentType;
+import org.apache.http.params.HttpParams;
 import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
@@ -82,7 +87,7 @@ public abstract class IntegrationTestCase extends AuraTestCase {
     /**
      * Start a context and set up default values.
      */
-    protected AuraContext setupContext(Mode mode, Format format, DefDescriptor<? extends BaseComponentDef> desc) 
+    protected AuraContext setupContext(Mode mode, Format format, DefDescriptor<? extends BaseComponentDef> desc)
             throws QuickFixException {
         ContextService contextService = Aura.getContextService();
         AuraContext ctxt = contextService.startContext(mode, format, Authentication.AUTHENTICATED, desc);
@@ -90,6 +95,32 @@ public abstract class IntegrationTestCase extends AuraTestCase {
         String uid = ctxt.getDefRegistry().getUid(null, desc);
         ctxt.addLoaded(desc, uid);
         return ctxt;
+    }
+
+    /**
+     * Sets up get request method for httpclient. Includes ability to follow redirects and set request headers
+     * 
+     * @param path
+     * @param followRedirects
+     * @param headers
+     * @return
+     * @throws MalformedURLException
+     * @throws URISyntaxException
+     */
+    protected HttpGet obtainGetMethod(String path, boolean followRedirects,
+            Header[] headers) throws MalformedURLException, URISyntaxException {
+        String url = getTestServletConfig().getBaseUrl().toURI().resolve(path)
+                .toString();
+
+        HttpGet get = new HttpGet(url);
+        HttpParams params = get.getParams();
+        HttpClientParams.setRedirecting(params, followRedirects);
+
+        if (headers != null) {
+            get.setHeaders(headers);
+        }
+
+        return get;
     }
 
     /**

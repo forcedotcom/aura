@@ -25,6 +25,7 @@ import java.util.concurrent.Callable;
 import javax.annotation.concurrent.GuardedBy;
 
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 import com.google.common.collect.Maps;
@@ -35,7 +36,7 @@ import com.google.common.collect.Maps;
  * @since 0.0.178
  */
 public class PooledRemoteWebDriverFactory extends RemoteWebDriverFactory {
-    private final Map<DesiredCapabilities, Queue<PooledRemoteWebDriver>> pools = Maps.newConcurrentMap();
+    private final Map<String, Queue<PooledRemoteWebDriver>> pools = Maps.newConcurrentMap();
 
     public PooledRemoteWebDriverFactory(URL serverUrl) {
         super(serverUrl);
@@ -104,11 +105,11 @@ public class PooledRemoteWebDriverFactory extends RemoteWebDriverFactory {
             return super.get(capabilities);
         }
 
-        Queue<PooledRemoteWebDriver> pool = pools.get(capabilities);
+        Queue<PooledRemoteWebDriver> pool = pools.get(toKeyWorkaround(capabilities));
 
         if (pool == null) {
             pool = new LinkedList<PooledRemoteWebDriver>();
-            pools.put(capabilities, pool);
+            pools.put(toKeyWorkaround(capabilities), pool);
         }
 
         if (pool.size() > 0) {
@@ -122,6 +123,27 @@ public class PooledRemoteWebDriverFactory extends RemoteWebDriverFactory {
                 }
             }, MAX_GET_RETRIES, "Failed to get a new PooledRemoteWebDriver");
         }
+    }
+
+    /**
+     * Using DesiredCapabilities as the key doesn't work if ChromeOptions are used, ChromeOptions.toJson() modifies the
+     * object and after that equals() is broken. WebDriverUtilTest.testChromeOptionsIsFixed() will start failing once
+     * this workaround is no longer needed
+     */
+    private static String toKeyWorkaround(DesiredCapabilities capabilities) {
+        ChromeOptions options = (ChromeOptions) capabilities.getCapability(ChromeOptions.CAPABILITY);
+        if (options == null) {
+            return String.valueOf(capabilities.hashCode());
+        }
+        capabilities.setCapability(ChromeOptions.CAPABILITY, (ChromeOptions) null);
+        String key;
+        try {
+            key = capabilities.hashCode() + ':' + options.toJson().toString();
+        } catch (Exception e) {
+            throw new RuntimeException(String.valueOf(capabilities));
+        }
+        capabilities.setCapability(ChromeOptions.CAPABILITY, options);
+        return key;
     }
 
     @Override

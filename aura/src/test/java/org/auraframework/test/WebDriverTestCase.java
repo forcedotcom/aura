@@ -262,13 +262,6 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
     }
 
     private void runPerfTests() throws Throwable {
-        // TODO: check the browser can be run in perf mode
-
-        runTimelinePerfTests();
-        // TODO: runs for other metrics (aura-stats, ...)
-    }
-
-    private void runTimelinePerfTests() throws Throwable {
         int numPerfTimelineRuns = numPerfTimelineRuns();
         int numPerfAuraRuns = numPerfAuraRuns();
         PerfMetrics timelineMetrics = null;

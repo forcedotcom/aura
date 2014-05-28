@@ -93,6 +93,10 @@ Event.prototype.getParams = function(){
     return this.params;
 };
 
+//#if {"modes" : ["STATS"]}
+Event.prototype.statsIndex = [];
+//#end
+
 /**
  * Fires the Event. Checks if the Event has already been fired before firing.
  * Returns null if a handler has destroyed the component.
@@ -103,6 +107,11 @@ Event.prototype.fire = function() {
         // could pass around a different object instead
         aura.assert(false, "event has already been fired, silly");
     }
+
+    //#if {"modes" : ["STATS"]}
+    var startTime = (new Date()).getTime();
+    //#end
+
     var stackname = this.eventDef.getDescriptor().getQualifiedName();
     var that = this;
 
@@ -198,6 +207,10 @@ Event.prototype.fire = function() {
             }
     	}
     }
+    //#end
+
+    //#if {"modes" : ["STATS"]}
+    Event.prototype.statsIndex.push({'event': this, 'startTime': startTime, 'endTime': (new Date()).getTime()});
     //#end
 };
 

@@ -29,7 +29,6 @@ import org.auraframework.def.NamespaceDef;
 import org.auraframework.def.ProviderDef;
 import org.auraframework.def.RendererDef;
 import org.auraframework.def.StyleDef;
-import org.auraframework.system.Source;
 import org.auraframework.test.WebDriverTestCase;
 import org.auraframework.test.annotation.ThreadHostileTest;
 import org.openqa.selenium.By;
@@ -53,11 +52,6 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         super.perBrowserSetUp();
         // these tests trigger server recompilation which can take a bit of time
         auraUITestingUtil.setTimeoutInSecs(60);
-    }
-
-    private void updateStringSource(DefDescriptor<?> desc, String content) {
-        Source<?> src = getSource(desc);
-        src.addOrUpdate(content);
     }
 
     private DefDescriptor<ComponentDef> setupTriggerComponent(String attrs, String body) {
@@ -111,9 +105,8 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         addSourceAutoCleanup(styleDesc, String.format(".%s {font-style:italic;}", className));
         addSourceAutoCleanup(
                 Aura.getDefinitionService().getDefDescriptor(
-                        String.format("%s://%s", DefDescriptor.MARKUP_PREFIX, styleDesc.getNamespace(),
-                                DefDescriptor.MARKUP_PREFIX, styleDesc.getNamespace()), NamespaceDef.class),
-                "<aura:namespace/>");
+                        String.format("%s://%s", DefDescriptor.MARKUP_PREFIX, styleDesc.getNamespace()),
+                        NamespaceDef.class), "<aura:namespace/>");
         open(cmpDesc);
         assertEquals("italic",
                 auraUITestingUtil.findDomElement(By.cssSelector("." + className)).getCssValue("font-style"));
@@ -153,12 +146,22 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         open(cmpDesc);
         assertNull(auraUITestingUtil.getEval("return window.tempVar;"));
         auraUITestingUtil.findDomElement(By.cssSelector("#click")).click();
-        assertEquals("inconsequential", auraUITestingUtil.getEval("return window.tempVar;"));
+        auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
+            @Override
+            public Boolean apply(WebDriver d) {
+                return "inconsequential".equals(auraUITestingUtil.getEval("return window.tempVar;"));
+            }
+        });
         updateStringSource(controllerDesc, "{clicked:function(){window.tempVar='meaningful'}}");
         open(cmpDesc);
         assertNull(auraUITestingUtil.getEval("return window.tempVar;"));
         auraUITestingUtil.findDomElement(By.cssSelector("#click")).click();
-        assertEquals("meaningful", auraUITestingUtil.getEval("return window.tempVar;"));
+        auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
+            @Override
+            public Boolean apply(WebDriver d) {
+                return "meaningful".equals(auraUITestingUtil.getEval("return window.tempVar;"));
+            }
+        });
     }
 
     public void testGetClientRenderingAfterJsProviderChange() throws Exception {
@@ -293,9 +296,8 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         addSourceAutoCleanup(styleDesc, String.format(".%s {font-style:italic;}", className));
         addSourceAutoCleanup(
                 Aura.getDefinitionService().getDefDescriptor(
-                        String.format("%s://%s", DefDescriptor.MARKUP_PREFIX, styleDesc.getNamespace(),
-                                DefDescriptor.MARKUP_PREFIX, styleDesc.getNamespace()), NamespaceDef.class),
-                "<aura:namespace/>");
+                        String.format("%s://%s", DefDescriptor.MARKUP_PREFIX, styleDesc.getNamespace()),
+                        NamespaceDef.class), "<aura:namespace/>");
         open(cmpDesc);
         assertEquals("italic",
                 auraUITestingUtil.findDomElement(By.cssSelector("." + className)).getCssValue("font-style"));
@@ -325,9 +327,8 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         addSourceAutoCleanup(styleDesc, String.format(".%s {font-style:italic;}", className));
         addSourceAutoCleanup(
                 Aura.getDefinitionService().getDefDescriptor(
-                        String.format("%s://%s", DefDescriptor.MARKUP_PREFIX, styleDesc.getNamespace(),
-                                DefDescriptor.MARKUP_PREFIX, styleDesc.getNamespace()), NamespaceDef.class),
-                "<aura:namespace/>");
+                        String.format("%s://%s", DefDescriptor.MARKUP_PREFIX, styleDesc.getNamespace()),
+                        NamespaceDef.class), "<aura:namespace/>");
         open(cmpDesc);
         assertEquals("italic",
                 auraUITestingUtil.findDomElement(By.cssSelector("." + className)).getCssValue("font-style"));
@@ -394,14 +395,17 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         open(cmpDesc);
         assertNull(auraUITestingUtil.getEval("return window.tempVar;"));
         auraUITestingUtil.findDomElement(By.cssSelector("#click")).click();
-        assertEquals("inconsequential",
-                auraUITestingUtil.getEval("return window.tempVar;"));
+        auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
+            @Override
+            public Boolean apply(WebDriver d) {
+                return "inconsequential".equals(auraUITestingUtil.getEval("return window.tempVar;"));
+            }
+        });
         updateStringSource(
                 controllerDesc,
                 "{post:function(c){var a=c.get('c.getString');a.setParams({param:'dummy'});$A.enqueueAction(a);},clicked:function(){window.tempVar='meaningful'}}");
         triggerServerAction();
-        // wait for page to reload by checking that our tempVar is undefined
-        // again
+        // wait for page to reload by checking that our tempVar is undefined again
         auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
             @Override
             public Boolean apply(WebDriver input) {
@@ -413,8 +417,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
             @Override
             public Boolean apply(WebDriver input) {
-                return "meaningful".equals(auraUITestingUtil
-                        .getEval("return window.tempVar;"));
+                return "meaningful".equals(auraUITestingUtil.getEval("return window.tempVar;"));
             }
         });
     }

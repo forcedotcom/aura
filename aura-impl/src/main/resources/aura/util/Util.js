@@ -1002,7 +1002,9 @@ $A.ns.Util.prototype.getElementAttributeValue = function(element,attributeName){
         //If it doesn't exist, we will return null per Mozzilla Standards and how the getAttribute method works normally
         if(!$A.util.isUndefinedOrNull(attrValue)){
             attrValue = attrValue.nodeValue;
-        } else {
+        } else if(!$A.util.isUndefinedOrNull(element[attributeName])) {
+            attrValue = element[attributeName];
+        } else{
             attrValue = null;
         }
     }

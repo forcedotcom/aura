@@ -16,11 +16,15 @@
 package org.auraframework.components.ui.inputMultiSelect;
 
 import org.auraframework.test.WebDriverTestCase;
-import org.auraframework.util.test.perf.PerfTest;
+import org.auraframework.test.WebDriverTestCase.ExcludeBrowsers;
+import org.auraframework.test.WebDriverUtil.BrowserType;
+import org.auraframework.test.annotation.PerfTest;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 
+// TODO(W-2233222): ios-driver cannot select or deselect options from ui:inputSelect options
+@ExcludeBrowsers({ BrowserType.IPAD_IOS_DRIVER, BrowserType.IPHONE_IOS_DRIVER })
 public class BaseInputMultiSelect extends WebDriverTestCase {
     private final String URL;
     private final By outputLocator = By.xpath("//span[@class='uiOutputText']");
@@ -71,35 +75,35 @@ public class BaseInputMultiSelect extends WebDriverTestCase {
             assertFalse("Option '" + optionLabel + "' should be deselected", option.isSelected());
         }
     }
-    
+
     /**
      * Select one. Choose one option. Deselect one. Deselect one option.
      */
     @PerfTest
     public void testInputSelectSingle() throws Exception {
-            open(URL);
+        open(URL);
 
-            // select
-            selectOption("Option1");
-            verifyOptionDeselected("Option2");
-            verifyOptionDeselected("Option3");
+        // select
+        selectOption("Option1");
+        verifyOptionDeselected("Option2");
+        verifyOptionDeselected("Option3");
 
-            findDomElement(submitLocator).click();
-            auraUITestingUtil.waitForElementText(outputLocator, "option1", true);
-            verifyOptionSelected("Option1");
-            verifyOptionDeselected("Option2");
-            verifyOptionDeselected("Option3");
+        findDomElement(submitLocator).click();
+        auraUITestingUtil.waitForElementText(outputLocator, "option1", true);
+        verifyOptionSelected("Option1");
+        verifyOptionDeselected("Option2");
+        verifyOptionDeselected("Option3");
 
-            // deselect
-            deselectOption("Option1");
-            selectOption("Option3");
-            verifyOptionDeselected("Option2");
+        // deselect
+        deselectOption("Option1");
+        selectOption("Option3");
+        verifyOptionDeselected("Option2");
 
-            findDomElement(submitLocator).click();
-            auraUITestingUtil.waitForElementText(outputLocator, "option3", true);
-            verifyOptionSelected("Option3");
-            verifyOptionDeselected("Option1");
-            verifyOptionDeselected("Option2");
+        findDomElement(submitLocator).click();
+        auraUITestingUtil.waitForElementText(outputLocator, "option3", true);
+        verifyOptionSelected("Option3");
+        verifyOptionDeselected("Option1");
+        verifyOptionDeselected("Option2");
     }
 
     /**
@@ -107,54 +111,53 @@ public class BaseInputMultiSelect extends WebDriverTestCase {
      */
     public void testInputSelectDeselectMultiple() throws Exception {
         open(URL);
-            // select multiple
-            selectOption("Option1");
-            selectOption("Option2");
-            verifyOptionDeselected("Option3");
-            
-            // find the element a 2nd time which helps get around the IE hover issues by focusing the element         
-            findDomElement(submitLocator).click();
-            auraUITestingUtil.waitForElementText(outputLocator, "option1;option2", true);
-            verifyOptionSelected("Option1");
-            verifyOptionSelected("Option2");
-            verifyOptionDeselected("Option3");
+        // select multiple
+        selectOption("Option1");
+        selectOption("Option2");
+        verifyOptionDeselected("Option3");
 
-            deselectOption("Option2");
-            verifyOptionSelected("Option1");
-            
-            findDomElement(submitLocator).click();
-            auraUITestingUtil.waitForElementText(outputLocator, "option1", true);
-            verifyOptionSelected("Option1");
-            verifyOptionDeselected("Option2");
+        // find the element a 2nd time which helps get around the IE hover issues by focusing the element
+        findDomElement(submitLocator).click();
+        auraUITestingUtil.waitForElementText(outputLocator, "option1;option2", true);
+        verifyOptionSelected("Option1");
+        verifyOptionSelected("Option2");
+        verifyOptionDeselected("Option3");
+
+        deselectOption("Option2");
+        verifyOptionSelected("Option1");
+
+        findDomElement(submitLocator).click();
+        auraUITestingUtil.waitForElementText(outputLocator, "option1", true);
+        verifyOptionSelected("Option1");
+        verifyOptionDeselected("Option2");
     }
-
 
     /**
      * Select all. Select all options. Deselect all. Deselect all options.
      */
     public void testInputSelectDeselectAll() throws Exception {
-           open(URL);
-           
-            // select all
-            selectOption("Option1");
-            selectOption("Option2");
-            selectOption("Option3");
+        open(URL);
 
-            findDomElement(submitLocator).click();
-            auraUITestingUtil.waitForElementText(outputLocator, "option1;option2;option3", true);
-            verifyOptionSelected("Option1");
-            verifyOptionSelected("Option2");
-            verifyOptionSelected("Option3");
+        // select all
+        selectOption("Option1");
+        selectOption("Option2");
+        selectOption("Option3");
 
-            // deselect all
-            deselectOption("Option1");
-            deselectOption("Option2");
-            deselectOption("Option3");
-            verifyOptionDeselected("Option1");
-            verifyOptionDeselected("Option2");
-            verifyOptionDeselected("Option3");
+        findDomElement(submitLocator).click();
+        auraUITestingUtil.waitForElementText(outputLocator, "option1;option2;option3", true);
+        verifyOptionSelected("Option1");
+        verifyOptionSelected("Option2");
+        verifyOptionSelected("Option3");
 
-            findDomElement(submitLocator).click();
-            auraUITestingUtil.waitForElementText(outputLocator, "", true);
+        // deselect all
+        deselectOption("Option1");
+        deselectOption("Option2");
+        deselectOption("Option3");
+        verifyOptionDeselected("Option1");
+        verifyOptionDeselected("Option2");
+        verifyOptionDeselected("Option3");
+
+        findDomElement(submitLocator).click();
+        auraUITestingUtil.waitForElementText(outputLocator, "", true);
     }
 }

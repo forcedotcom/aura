@@ -194,7 +194,7 @@ ArrayValue.prototype._setValue = function(newArray, skipChange) {
 
     this.fireEvents = true;
     if (!skipChange) {
-    	this.fire("change");
+        this.fire("change");
     }
 };
 
@@ -467,7 +467,7 @@ ArrayValue.prototype.destroy = function(async) {
 //#end
 
 //#if {"modes" : ["TESTING", "TESTINGDEBUG", "AUTOTESTING", "AUTOTESTINGDEBUG"]}
-	async = false; // Force synchronous destroy when in testing modes
+    async = false; // Force synchronous destroy when in testing modes
 //#end
 
     function destroy(a, async) {
@@ -528,7 +528,7 @@ ArrayValue.prototype.unwrap = function(){
     // instead of getValue("v.body");
     var ret = [];
     this.each(function(v) {
-        ret.push(v.unwrap());
+        ret.push(v.unwrap ? v.unwrap() : v);
     });
 
     // establish a back ref from the array to the ArrayValue for those times when someone has stripped off the
@@ -672,7 +672,7 @@ ArrayValue.prototype.render = function(parent, insertElements){
     this.setReferenceNode(referenceNode);
 
     if (parent) {
-    	insertElements(ret, parent);
+        insertElements(ret, parent);
     }
 
     this.hasBeenRendered = true;
@@ -704,6 +704,9 @@ ArrayValue.prototype.rerender = function(suppliedReferenceNode, appendChild, ins
 
     var prevRendered = this.rendered || {};
     var rendered = {};
+    /** Since ArrayValue has no getElements, we'd better have rerender return them all */
+    var elems = [];
+
     //
     // These three variables are used to ensure that we do not lose our reference node when the
     // contents are removed. Basically, if the array is empty, we declare that we need a reference
@@ -731,46 +734,65 @@ ArrayValue.prototype.rerender = function(suppliedReferenceNode, appendChild, ins
 
             var globalId = item.getGlobalId();
             var itemReferenceNode;
+            var itemElems;
             if (!item.isRendered()) {
                 //
                 // If the item was not previously rendered, we render after the last element.
                 //
-                var ret = $A.render(item);
-                if (ret.length > 0) {
+                itemElems = $A.render(item);
+                if (itemElems.length > 0) {
                     // Just use the last element as the reference node
-                    itemReferenceNode = ret[ret.length - 1];
+                    itemReferenceNode = itemElems[itemElems.length - 1];
                 } else {
                     //
                     // If nothing was rendered put in a placeholder so that we
                     // can find the element. (FIXME W-1835211: this needs tests -- is it removed?.)
                     //
                     itemReferenceNode = this.createLocator(" item {rerendered, index:" + j + "} " + item);
-                    ret.push(itemReferenceNode);
+                    itemElems.push(itemReferenceNode);
                 }
 
                 // When adding children and index is zero, referenceNode still points to parent,
                 // and we need to call insertFist(), not appendChild()
                 var asFirst = (j === 0);
-                insertElements(ret, referenceNode, !appendChild, asFirst);
+                insertElements(itemElems, referenceNode, !appendChild, asFirst);
 
                 $A.afterRender(item);
             } else {
-                $A.rerender(item);
-
-                itemReferenceNode = prevRendered[globalId];
-                if (!itemReferenceNode) {
-                    itemReferenceNode = item.getElement();
+                itemElems = $A.rerender(item);
+                // Find the item reference node.  We have prevRendered, but can't trust it: the
+                // elem might have rerendered away.  So, go hunting....
+                if (itemElems) {
+                    // itemElems is an array, take the last one
+                    itemReferenceNode = itemElems[itemElems.length - 1];
+                } else {
+                    // Get the funky elements object, find the last
+                    itemElems = item.getElements();
+                    if (itemElems[0]) {
+                        for (var k = 0; itemElems[k]; ++k) {
+                            itemReferenceNode = itemElems[k];
+                        }
+                    } else {
+                        itemReferenceNode = itemElems['element'];
+                    }
                 }
             }
+            // We have prevRendered, but can't trust it: the elem might have rerendered away.
+            itemElems = item.getElements();
+            itemReferenceNode = itemElems[0] ? itemElems[0] : itemElems['element'];
             if (firstReferenceNode === null) {
                 firstReferenceNode = itemReferenceNode;
+            }
+            itemElems = item.getElements();
+            for (k = 0; itemElems[k]; ++k) {
+                elems.push(itemElems[k]);
             }
 
             //
             // Next iteration of the loop will use this component's ref node as its "top"
             // FIXME W-1835211: this may remove elements...
             //
-            referenceNode = itemReferenceNode;
+            referenceNode = itemElems[k - 1];
             this.setReferenceNode(referenceNode);
 
             appendChild = false;
@@ -802,12 +824,21 @@ ArrayValue.prototype.rerender = function(suppliedReferenceNode, appendChild, ins
             }
         }
     }
+    if (elems.length === 0 && firstReferenceNode) {
+        // Symmetrically to render(), if there are no "real" elements, use the
+        // reference node.
+        elems.unshift(firstReferenceNode);
+    }
     if (firstReferenceNode === null) {
         firstReferenceNode = startReferenceNode;
     }
     this.setReferenceNode(firstReferenceNode);
-
+    // Symmetrically to render(), if there aren't any "real" elements, use the locator comment
+    if (elems.length === 0 && firstReferenceNode) {
+        elems.unshift(firstReferenceNode);
+    }
     this.rendered = rendered;
+    return elems;
 };
 
 /**

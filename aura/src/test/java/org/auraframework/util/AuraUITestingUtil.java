@@ -24,6 +24,7 @@ import java.util.Set;
 import junit.framework.Assert;
 
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.auraframework.test.SauceUtil;
 import org.auraframework.util.json.JsonReader;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
@@ -51,6 +52,10 @@ public class AuraUITestingUtil {
 
     public AuraUITestingUtil(WebDriver driver) {
         this.driver = driver;
+        if (SauceUtil.areTestsRunningOnSauce()) {
+            // things are slower in SauceLabs
+            timeoutInSecs = 120;
+        }
     }
 
     public void setTimeoutInSecs(long timeoutInSecs) {
@@ -162,7 +167,12 @@ public class AuraUITestingUtil {
         String exp = "window.$A.getRoot().find('" + cmp + "')";
         return exp;
     }
-
+    
+    public String getEncodedContextForServer() {
+    	String exp = "window.$A.getContext().encodeForServer()";
+    	return exp;
+    }
+    
     /**
      * Very useful to get handle on the component passing globalId
      * 
@@ -366,6 +376,17 @@ public class AuraUITestingUtil {
      */
     public String getActiveElementText() {
         return (String) getEval("return $A.test.getActiveElementText()");
+    }
+    
+    /**
+     * Return Bounding Rectangle Property for given Element
+     * @param elementLocalId
+     * @param position = "top, left, right, and bottom"
+     * @return
+     */
+    public String getBoundingRectPropOfElement(String elementLocalId, String position) {
+    		String element = getCmpExpr(elementLocalId) + ".getElement().getBoundingClientRect()." + position;
+    		return getEval(prepareReturnStatement(element)).toString();
     }
 
     /**

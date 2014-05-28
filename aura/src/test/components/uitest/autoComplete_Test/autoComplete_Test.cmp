@@ -36,7 +36,7 @@
     <ui:autocomplete aura:id="autoCompleteNoData" optionVar="row" 
         matchDone="{!c.handleInputChangeNoDataMatchDone}"
         inputChange="{!c.handleInputChangeNoData}" 
-        selectListOption="{!c.handleSelectOptionNoData}">
+        selectListOption="{!c.handleSelectOptionNoData}" keydown="{!c.handleKeyDown}">
         <aura:set attribute="dataProvider">
             <uitest:autocomplete_TestDataProvider dataType="emptyList"/>
         </aura:set>
@@ -93,5 +93,6 @@
         </aura:set>
     </ui:autocomplete>
     Match Count: <ui:outputText aura:id="autoCompleteCustomOptionMatchSize" value=""/> <br/><br/>
-    
+    <br/><br/>
+	Event Fired: <ui:outputText aura:id="outputLabel" class="outputLabel" value=""/> <br/><br/>
 </aura:component>

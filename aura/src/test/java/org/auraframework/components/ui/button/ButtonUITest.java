@@ -16,7 +16,8 @@
 package org.auraframework.components.ui.button;
 
 import org.auraframework.test.WebDriverTestCase;
-import org.auraframework.util.test.perf.PerfTest;
+import org.auraframework.test.annotation.PerfTest;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;

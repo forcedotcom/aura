@@ -1,0 +1,32 @@
+<aura:component>
+	<aura:attribute name="outterEvent" type="String" default=""/>
+	<aura:attribute name="middleEvent" type="String" default=""/>
+	<aura:attribute name="innerEvent" type="String" default=""/>
+
+	
+	<div onclick="{!c.outter}" class="outter">
+	    <ui:outputText value="This is the outter area"/>
+	
+	    <div onclick="{!c.middle}" class="middle">
+	        <ui:outputText value="This is the middle area"/>
+
+	        <div onclick="{!c.inner}" class="inner">
+	        	<ui:outputText value="This is the inner area"/>
+	        	<fieldset>
+			    	<legend>Gender Select:</legend>
+		            <ui:inputRadio name="gender" value="male" label="Male"/>
+		            <br/>
+		            <ui:inputRadio name="gender" value="female" label="Female"/>
+		        </fieldset>
+	        </div>
+		
+	    </div>
+
+	</div>
+	
+	outter: <ui:outputText value="{!v.outterEvent}"/> <br/>
+	middle: <ui:outputText value="{!v.middleEvent}"/> <br/>
+	inner: <ui:outputText value="{!v.innerEvent}"/>  <br/>
+	<ui:button aura:id="clearBtn" label="clear" press="{!c.clearOutput}"/>
+	
+</aura:component>

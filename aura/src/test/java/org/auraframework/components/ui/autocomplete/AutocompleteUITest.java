@@ -36,6 +36,7 @@ public class AutocompleteUITest extends WebDriverTestCase {
     private final String URL = "/uitest/autoComplete_Test.cmp";
     private final String INPUT_SELECTOR = "input[class*='uiInput']";
     private final String OUTPUT_SELECTOR = "span[class*='uiOutputText']";
+    private final String EVENT_OUTPUT_SELECTOR = "span[class*='outputLabel']";
     private final String AUTOCOMPLETE_LIST_SELECTOR = "div[class*='uiAutocompleteList']";
     private final String AUTOCOMPLETE_OPTION_SELECTOR = "li[class*='uiAutocompleteOption']";
     private final String AUTOCOMPLETE_CUSTOM_TEMPLATE_OPTION_SELECTOR = "div[class*='uitestAutoComplete_CustomTemplate']";
@@ -107,6 +108,19 @@ public class AutocompleteUITest extends WebDriverTestCase {
         WebElement list = getAutoCompleteList(driver, AUTOCOMPLETE_COMPONENT.get("Empty"));
         List<WebElement> options = getAutoCompleteListOptions(list);
         assertEquals("Autocomplete with no data should not have any options", 0, options.size());
+    }
+    
+    /**
+     * Test to check support for keydown event.
+     * Test case for W-2227931
+     */
+    public void testAutoCompleteKeyDownEventSupport() throws Exception {
+        open(URL);
+        WebDriver driver = getDriver();
+        WebElement input = getAutoCompleteInput(driver, AUTOCOMPLETE_COMPONENT.get("Empty"));
+        auraUITestingUtil.pressEnter(input);
+        WebElement output = driver.findElement(By.cssSelector(EVENT_OUTPUT_SELECTOR));
+        waitForElementTextPresent(output, "KeyDown Event Fired");
     }
 
     /**

@@ -26,7 +26,7 @@
 
     rerender: function(component){
         var body = component.get("v.body");
-        $A.rerender(body);
+        return $A.rerender(body);
     },
 
     unrender : function(component){

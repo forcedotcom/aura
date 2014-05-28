@@ -237,8 +237,14 @@
             // Now, this is the more useful part:
             var refNode = realbody.getReferenceNode();
             $A.test.assertTrue(refNode !== undefined, "No reference node found!");
-            $A.test.assertTruthy(refNode.parentElement, "Reference has no parent");
-            $A.test.assertEquals("BODY", refNode.parentElement.tagName,
+            var parent;
+            if ($A.util.isIE) {
+                parent = refNode.parentNode;
+            } else {
+                parent = refNode.parentElement;
+            }
+            $A.test.assertTruthy(parent, "Reference has no parent");
+            $A.test.assertEquals("BODY", parent.tagName,
                     "Reference parent isn't right component");
         }]
     }

@@ -27,6 +27,7 @@ exp(p,
         ,
         "getNum", p.getNum,
         "getLoaded", p.getLoaded,
-        "getPreloadedNamespaces", p.getPreloadedNamespaces
+        "getPreloadedNamespaces", p.getPreloadedNamespaces,
+        "encodeForServer", p.encodeForServer
     //#end
 );

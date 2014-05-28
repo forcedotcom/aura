@@ -15,7 +15,7 @@
  */
 package org.auraframework.components.ui.inputSelect;
 
-import org.auraframework.util.test.perf.PerfTest;
+import org.auraframework.test.annotation.PerfTest;
 import org.openqa.selenium.By;
 
 public class InputSelectUITest  extends BaseInputSelectUI{

@@ -19,8 +19,8 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.test.WebDriverTestCase;
 import org.auraframework.test.WebDriverUtil.BrowserType;
+import org.auraframework.test.annotation.PerfTest;
 import org.auraframework.test.annotation.UnAdaptableTest;
-import org.auraframework.util.test.perf.PerfTest;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
@@ -103,7 +103,8 @@ public class InputTextUITest extends WebDriverTestCase {
         String value = getCurrentModelValue();
         WebElement outputDiv = findDomElement(By.id("output"));
 
-        // ios-driver sends a blur event during sendKeys so skip that event check
+        // ios-driver sends a blur event during sendKeys so skip blur check. It also seems to send a delayed click event
+        // when doing a WebElement.clear() and WebElement.sendKeys() in sequence so skip click check.
         if (!BrowserType.IPAD_IOS_DRIVER.equals(getBrowserType())
                 && !BrowserType.IPHONE_IOS_DRIVER.equals(getBrowserType())) {
             String eventName = "blur";
@@ -113,19 +114,19 @@ public class InputTextUITest extends WebDriverTestCase {
             outputDiv.click(); // to simulate tab behavior for touch browsers
             value = assertModelValue(eventName); // value should have been updated
             assertDomEventSet();
+
+            eventName = "click";
+            input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
+            assertModelValue(value);
+            outputDiv.click();
+            assertModelValue(value, "Clicking an element without the updateOn attribute should not change the value");
+            input.click();
+            value = assertModelValue(eventName);
+            assertDomEventSet();
         }
 
-        String eventName = "click";
+        String eventName = "focus";
         WebElement input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
-        assertModelValue(value);
-        outputDiv.click();
-        assertModelValue(value, "Clicking an element without the updateOn attribute should not change the value");
-        input.click();
-        value = assertModelValue(eventName);
-        assertDomEventSet();
-
-        eventName = "focus";
-        input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
         outputDiv.click();
         input.click();
         value = assertModelValue(eventName);

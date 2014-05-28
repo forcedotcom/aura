@@ -233,6 +233,13 @@
 		    this.runTest("Total Number of Errors found: 1", "Unexpected return from CheckAccessibility, should return 1 error. output: \n");
 		}
      },
+     testTagsWithoutAttributes : {
+	attributes : { caseToRender : 'tagsWithoutAttributes' },
+	        test: function(cmp){
+	            this.runTest("Total Number of Errors found: 5", "Unexpected return from CheckAccessibility, should return 5 errors. output: \n");
+	       }
+	
+     },
      
     //Full tests
     testCheckAccessibility:{

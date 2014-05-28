@@ -13,17 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 ({
-    afterRender : function(cmp, helper){
-        this.superAfterRender();
-        helper.setActive(cmp, {"index": cmp._tabCollection.getActiveTabIndex()});
-    },
-    
-    unrender: function(cmp, helper) {
-    	try {
-    		helper.unrender(cmp);
-    	} finally {
-    		this.superUnrender();
-    	}
-    }
+	/**
+	 * Handler for event that's fired programtically
+	 */
+	activateTab: function(cmp, evt, helper) {
+		var active = evt.getParam("active");
+		helper.setActive(cmp, active);
+	},
+	/**
+	 * Handler for event that's fired when user clicks on tab to activate
+	 */
+	onTabActivated: function(cmp, evt, helper) {
+		if(!cmp._isActive) {
+			helper.setActive(cmp, true);
+			cmp.get('e.onActivate').fire();
+		}
+	},
+	
+	close: function(cmp, evt, helper) {
+		cmp.get("e.onClose").fire();
+		$A.util.squash(evt, true);
+	}
 })

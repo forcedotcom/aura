@@ -13,17 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-({
-    afterRender : function(cmp, helper){
-        this.superAfterRender();
-        helper.setActive(cmp, {"index": cmp._tabCollection.getActiveTabIndex()});
-    },
-    
-    unrender: function(cmp, helper) {
-    	try {
-    		helper.unrender(cmp);
-    	} finally {
-    		this.superUnrender();
-    	}
-    }
-})
+ 
+.THIS {
+    background: #eee;
+    list-style: none;
+    border-radius: 5px 5px 0 0;
+    margin-right: 2px;
+    list-style: none;
+    white-space: nowrap;
+}
+
+.THIS .tabHeader {
+    margin: 0px;
+    color: #363c40;
+    padding: 5px 10px;  
+    display: block;
+    text-decoration: none;
+}
+
+.THIS .close {
+	float: right;
+	display: inline-block;
+	width: 15px;
+	height: 15px;
+	position: relative;
+	text-align: center;
+	margin-left: 10px;
+}
+
+.THIS.active {
+	background: #dc595c;
+}

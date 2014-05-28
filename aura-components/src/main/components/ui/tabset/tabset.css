@@ -13,19 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.THIS {
-	width:100%;
-    height: 100%;
-	display: inline-block;
+
+.THIS.left, .THIS.right {
+    display: table;	
 }
 
-.THIS .tabLabels {
-	z-index: 1;
-	position:relative;
-	top:0;
-	width: 100%;
-	height:100%;
-	display: block;
-	padding:0;
-	margin:0;
+.THIS.left > .tabBar, .THIS.left > .tabBody.active, .THIS.right > .tabBar, .THIS.right > .tabBody.active{
+	display: table-cell;
+	vertical-align: top;
 }

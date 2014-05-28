@@ -17,9 +17,7 @@ package org.auraframework.components.ui.tabset;
 
 import org.auraframework.test.WebDriverTestCase;
 import org.auraframework.test.annotation.PerfTest;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 
 public class TabsetUITest extends WebDriverTestCase {
     private final String URL = "/uitest/tabset_Test.cmp";
@@ -33,20 +31,22 @@ public class TabsetUITest extends WebDriverTestCase {
         open(URL);
 
         WebDriver d = getDriver();
-        WebElement tab1 = d.findElement(By.cssSelector("ul[class='tabLabels'] li:first-child"));
-        WebElement tab2 = d.findElement(By.cssSelector("ul[class='tabLabels'] li:first-child+li"));
+        WebElement tab1 = d.findElement(By.cssSelector(".tabset1 ul[class='tabList'] li:first-child"));
+        WebElement tab2 = d.findElement(By.cssSelector(".tabset1 ul[class='tabList'] li:first-child+li"));
+        WebElement activeTabBody = d.findElement(By.cssSelector(".tabset1 section[class*='active']"));
+//        WebElement tab2Body = d.findElement(By.cssSelector(".tabset1 section[class*='tabBody']"));
 
         // verify initial setup
-        verifyTab(tab1, "tab 1 contents", true);
-        verifyTab(tab2, "tab 2 contents", false);
+//        verifyTab(tab1, "tab 1 contents", false);
+//        verifyTab(tab2, "tab 2 contents", false);
 
         // switch tabs by clicking on the anchor (to make this test cross
         // browser).
         tab2.findElement(By.tagName("a")).click();
 
         // verify switched
-        verifyTab(tab1, "tab 1 contents", false);
-        verifyTab(tab2, "tab 2 contents", true);
+        verifyTab(activeTabBody, "tab 1 contents", false);
+        verifyTab(activeTabBody, "tab 2 contents", true);
     }
 
     private void verifyTab(WebElement tab, String tabBody, boolean isActive) {

@@ -13,26 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.THIS {
-	float: left;
-	list-style: none;
-	background: #eee;
-	border-bottom: 1px solid #eee;
-	border-radius: 5px 5px 0 0;
-	margin-right: 2px;
-}
-.THIS.active{
-	background: #dc595c;
-	border-bottom: 1px solid #fff;
-}
 
-.THIS > a.tabHeader {
-	margin: 0px;
-	color: #363c40;
-	padding: 5px 10px;
-	cursor: pointer;
-	display:block;
-	text-decoration: none;
+.THIS.active{
+	border-bottom: 1px solid #fff;
 }
 
 .THIS > .icon{
@@ -44,29 +27,24 @@
 	margin-left:-4px;
 }
 
+.THIS.scrolling {
+	overflow: auto;
+}
+
 .THIS.active > a.tabHeader {
 	cursor: default;
 	color: #fff;
 }
 
-.THIS > div.tabBody {
-	position: absolute;
-	left:0;
-	right:0;
-	top:27px;
-	bottom:27px;
+.THIS.tabBody {	
 	display: none;
-	overflow:auto;
 }
 
-.THIS > div.tabBody iframe{
-	min-height:300px;
-}
-
-.THIS > div.tabBody.scrolling {
-	overflow: auto;
-}
-
-.THIS.active > div.tabBody {
+.THIS.top.active.tabBody, .THIS.bottom.active.tabBody, .THIS.active {
 	display: block;
+}
+
+.THIS.left.active.tabBody, .THIS.right.active.tabBody {
+    display: inline-block;
+    vertical-align: top;
 }

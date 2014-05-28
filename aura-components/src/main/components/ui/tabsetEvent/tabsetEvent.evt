@@ -15,6 +15,10 @@
     limitations under the License.
 
 -->
-<aura:event type="COMPONENT" support="BETA" description="Indicates that a tab has been activated.">
-    <aura:attribute name="component" type="Aura.Component" description="The tab that was activated."/>
+<aura:event type="COMPONENT" description="Event for ui:tabset component.">
+    <aura:attribute name="index" type="Integer" description="The index position of the tab."/>
+    <aura:attribute name="name" type="String" description="The internal name of the tab."/>
+    <aura:attribute name="tab" type="Object" description="The tab configuration object for adding tab to the tabset."/>
+    <aura:attribute name="active" type="Boolean" description="The tab is active."/>
+    <aura:attribute name="callback" type="Object" description="A callback function." />
 </aura:event>

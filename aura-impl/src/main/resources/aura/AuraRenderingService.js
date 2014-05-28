@@ -230,17 +230,17 @@ var AuraRenderingService = function AuraRenderingService(){
             }
             
             try {
+                var allElems = [];
                 if (component.auraType === "Value" && component.toString() === "ArrayValue"){
-                    component.rerender(referenceNode, appendChild, priv.insertElements);
+                    allElems = component.rerender(referenceNode, appendChild, priv.insertElements);
 
                     //#if {"modes" : ["STATS"]}
                     $A.renderingService.statsIndex["rerender"].push({'component': component, 'startTime': startTime, 'endTime': (new Date()).getTime()});
                     //#end
 
-                    return;
+                    return allElems;
                 }
 
-                var allElems = [];
                 var array = priv.getArray(component);
                 array = priv.reorderForContainment(array);
                 for (var i = 0; i < array.length; i++){

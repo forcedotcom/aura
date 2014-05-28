@@ -1,5 +1,6 @@
 package org.auraframework.test.perf;
 
+import org.auraframework.test.SauceUtil;
 import org.auraframework.test.perf.core.AbstractPerfTestCase;
 import org.auraframework.test.perf.metrics.PerfMetrics;
 import org.auraframework.test.perf.metrics.PerfMetricsComparator;
@@ -94,6 +95,10 @@ public final class PerfMetricsTest extends AbstractPerfTestCase {
     }
 
     private void verifyDummyPerf(PerfMetrics actual) {
+        if (!SauceUtil.areTestsRunningOnSauce()) {
+            logger.warning("skipping test because not running in SauceLabs: " + getName());
+            return;
+        }
         PerfMetrics expected = new PerfMetrics();
         expected.setMetric("Timeline.Rendering.Layout", 2);
         expected.setMetric("Timeline.Painting.Paint", 3);

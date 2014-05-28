@@ -17,6 +17,7 @@ package org.auraframework.test.perf.rdp;
 
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -31,6 +32,8 @@ import com.google.common.collect.Maps;
  * @See https://developers.google.com/chrome-developer-tools/docs/protocol/tot/timeline#type-TimelineEvent
  */
 public class TimelineEventUtil {
+
+    protected static final Logger LOG = Logger.getLogger(TimelineEventUtil.class.getSimpleName());
 
     public enum Category {
         Loading, Scripting, Rendering, Painting, Idle, Other;
@@ -98,8 +101,8 @@ public class TimelineEventUtil {
      */
     public static Category toCategory(String type) {
         if (!typeToCategory.containsKey(type)) {
-
-            throw new IllegalArgumentException(type);
+            LOG.info("unknown category for: " + type);
+            return Category.Other;
         }
         return typeToCategory.get(type);
     }

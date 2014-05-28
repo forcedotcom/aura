@@ -372,6 +372,17 @@ public class AuraUITestingUtil {
     public String getActiveElementText() {
         return (String) getEval("return $A.test.getActiveElementText()");
     }
+    
+    /**
+     * Return Bounding Rectangle Property for given Element
+     * @param elementLocalId
+     * @param position = "top, left, right, and bottom"
+     * @return
+     */
+    public String getBoundingRectPropOfElement(String elementLocalId, String position) {
+    		String element = getCmpExpr(elementLocalId) + ".getElement().getBoundingClientRect()." + position;
+    		return getEval(prepareReturnStatement(element)).toString();
+    }
 
     /**
      * Check for uncaught Aura or Javascript errors after executing a particular WebDriver function.

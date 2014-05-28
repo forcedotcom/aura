@@ -13,21 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*jslint sub: true */
-var p = AuraContext.prototype;
-exp(p,
-    "getMode", p.getMode,
-    "incrementTransaction", p.incrementTransaction,
-    "getApp", p.getApp,
-    "getCurrentAction", p.getCurrentAction,
-    "setCurrentAction", p.setCurrentAction,
-    "getGlobalValueProviders", p.getGlobalValueProviders,
-    "clearComponentConfigs", p.clearComponentConfigs
-    //#if {"excludeModes" : ["PRODUCTION"]}
-        ,
-        "getNum", p.getNum,
-        "getLoaded", p.getLoaded,
-        "getPreloadedNamespaces", p.getPreloadedNamespaces,
-        "encodeForServer", p.encodeForServer
-    //#end
-);
+package org.auraframework.dynamicnamespace;
+
+import org.auraframework.test.WebDriverTestCase;
+
+public class DynamicnamespaceUITest extends WebDriverTestCase {
+
+	public DynamicnamespaceUITest(String name) {
+		super(name);
+	}
+	
+	public void testEncodeToServer() throws Exception {
+		open("/preloadTest/test_dynamicNamespace.cmp?aura.mode=DEV");
+        String res = (String)auraUITestingUtil.getEval(auraUITestingUtil.prepareReturnStatement(auraUITestingUtil.getEncodedContextForServer()));
+        assertTrue(res.contains("\"dn\":[\"rl_001_VIEW_ACCOUNT_HASH\"]"));
+	}
+
+}

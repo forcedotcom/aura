@@ -15,6 +15,9 @@
  */
 package org.auraframework.impl.preload;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 
 import java.util.List;
@@ -24,12 +27,16 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpPost;
 import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.ComponentDef;
 import org.auraframework.http.AuraBaseServlet;
+import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.AuraHttpTestCase;
 import org.auraframework.test.annotation.TestLabels;
 import org.auraframework.util.json.JsonReader;
+
+import com.google.common.collect.Maps;
 
 /**
  * Basic HTTP retrieve test for checking preloaded namespaces and componentDefs.
@@ -104,5 +111,51 @@ public class PreloadNameSpaceHttpTest extends AuraHttpTestCase {
         assertTrue("Failed to reach aura servlet", statusCode == HttpStatus.SC_OK);
 
         return response;
+    }
+    
+    
+    /*
+     * Test for W-2109463
+     * This test send a post request to server with dynamic-namespace (layout://rl_001_VIEW_ACCOUNT_HASH.c) in context, 
+     * in response, the server consider layout://rl_001_VIEW_ACCOUNT_HASH.c as "preloaded" 
+     * then serialize just the component's description into context, without putting down superDef/attributeDefs/etc
+     */
+    private String obtainResponseCheckStatusDN() throws Exception {
+        String cmp = "preloadTest:test_dynamicNamespace";
+        Map<String, Object> attribute = Maps.newHashMap();
+        Object val = "mockRecordLayout"; 
+        attribute.put("whatToDo", val); 
+        String ctx = getAuraTestingUtil().getContext(Mode.DEV, Format.JSON, cmp, ComponentDef.class, false);
+        String newctx = ctx.replace("\"dn\":[]", "\"dn\":[\"rl_001_VIEW_ACCOUNT_HASH\"]");
+        HttpPost post = new ServerAction("aura://ComponentController/ACTION$getComponent", null)
+            .putParam("name", cmp).putParam("attributes", attribute)
+            .setContext(newctx)
+            .getPostMethod();
+        HttpResponse httpResponse = perform(post);
+        int statusCode = getStatusCode(httpResponse);
+        String response = getResponseBody(httpResponse);
+        post.releaseConnection();
+        assertTrue("Failed to reach aura servlet", statusCode == HttpStatus.SC_OK);
+
+        return response;
+    }
+    
+    @SuppressWarnings("unchecked")
+	public void testDynamicNamespace() throws Exception {
+    	String response = obtainResponseCheckStatusDN();
+    	String componentInJson = response.substring(AuraBaseServlet.CSRF_PROTECT.length());
+        Map<String, Object> outerMap;
+        try {
+            outerMap = (Map<String, Object>) new JsonReader().read(componentInJson);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to parse: "+componentInJson, e);
+        }
+        Map<String,Object> context = (Map<String,Object>) outerMap.get("context");
+        List<Object> componentDefs = (List<Object>) context.get("componentDefs");
+        Map<String,Object> componentDef = (Map<String,Object>)componentDefs.get(0);
+        Object value = componentDef.get("value");
+        if(value instanceof String) {
+        	assertEquals((String)value,"layout://rl_001_VIEW_ACCOUNT_HASH.c");
+        }
     }
 }

@@ -26,28 +26,15 @@
     },
     
     rerender: function(cmp, helper) {       
-        var value = cmp.getValue('v.value');        
-        var dirty = true;
-        var unwrapped = "";
-
-        //
-        // Very careful with value here, if it is unset, we don't want
-        // to fail in an ugly way.
-        //
-        if (value) {
-            dirty = value.isDirty();
-            if (dirty) {
-                unwrapped = value.getValue();
-            }
-        } else {
-            $A.warning("Component has v.value unset: "+cmp.getGlobalId());
-        }
-        if (dirty) {
+        if (cmp.isDirty("v.value")) {
             var span = cmp.find('span').getElement();
-            helper.removeChildren(span);                
-            helper.appendTextElements(unwrapped, span);
+            helper.removeChildren(span);
+            
+            var value = cmp.get('v.value');        
+
+            helper.appendTextElements(value, span);
         }
+        
         this.superRerender();
     }
-
 })

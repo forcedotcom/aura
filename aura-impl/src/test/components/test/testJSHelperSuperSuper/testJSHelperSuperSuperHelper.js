@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 ({
-    superSuperz : function(){
+    superSuperZ : function(){
         return "func superSuperZ on Super Super";
     },
+
     superSuperY : function(){
         return "func superSuperY on Super Super";
     }

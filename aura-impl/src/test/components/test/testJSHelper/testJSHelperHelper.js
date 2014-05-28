@@ -21,10 +21,12 @@
     b : function(){
         return "func B";
     },
+
     methodWithArgs : function(arg1){
         return "Argument passed="+arg1;
     },
+
     setFocus : function(){
-	return "Set Focus";
+        return "Set Focus";
     }
 })

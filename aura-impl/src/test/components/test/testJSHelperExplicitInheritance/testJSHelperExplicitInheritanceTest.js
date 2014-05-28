@@ -21,10 +21,10 @@
     testAvailableHelper: {
         test: function(component){
             var helper = component.getDef().getHelper();
-            aura.test.assertNotNull(helper);
-            aura.test.assertNotNull(helper.z);
-            aura.test.assertNotNull(!helper.superSuperz);
-            aura.test.assertNotNull(!helper.superSupery);
+            $A.test.assertNotNull(helper);
+            $A.test.assertNotNull(helper.z);
+            $A.test.assertUndefinedOrNull(helper.superSuperZ);
+            $A.test.assertUndefinedOrNull(helper.superSuperY);
         }
     }
 })

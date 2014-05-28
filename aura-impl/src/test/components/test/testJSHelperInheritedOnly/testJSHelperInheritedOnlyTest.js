@@ -18,38 +18,32 @@
      * Assert that component has a helper inherited from parent.
      */
     testGetHelper: {
-        attributes : {},
-
         test: function(component){
             var helper = component.getDef().getHelper();
-            aura.test.assert(helper);
+            $A.test.assertNotUndefinedOrNull(helper);
         }
     },
     /**
      * Assert characteristics of helper inherited from parent.
      */
     testGetHelperDef: {
-        attributes : {},
-
         test: function(component){
             var helperDef = component.getDef().getHelperDef();
-            aura.test.assert(helperDef);
-            aura.test.assert(helperDef.getFunctions);
-            aura.test.assert(helperDef.getFunctions());
-            aura.test.assertEquals(helperDef.auraType, "HelperDef");
+            $A.test.assertNotUndefinedOrNull(helperDef);
+            $A.test.assertNotUndefinedOrNull(helperDef.getFunctions);
+            $A.test.assertNotUndefinedOrNull(helperDef.getFunctions());
+            $A.test.assertEquals(helperDef.auraType, "HelperDef");
         }
     },
     /**
      * Assert that helper functions inherited from parent are usable.
      */
     testInheritedFunctions: {
-        attributes : {},
-
         test: function(component){
             var helper = component.getDef().getHelper();
-            aura.test.assert(helper);
-            aura.test.assertEquals("func Z", helper.z(), "helper method should have been inherited from parent.");
-            aura.test.assertEquals("func superSuperZ on Super Super", helper.superSuperz(), "helper method should have been inherited from parent's parent.");
+            $A.test.assertNotUndefinedOrNull(helper);
+            $A.test.assertEquals("func Z", helper.z(), "helper method should have been inherited from parent.");
+            $A.test.assertEquals("func superSuperZ on Super Super", helper.superSuperZ(), "helper method should have been inherited from parent's parent.");
         }
     }
 })

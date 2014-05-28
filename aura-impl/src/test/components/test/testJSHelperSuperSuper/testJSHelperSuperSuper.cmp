@@ -15,6 +15,12 @@
     limitations under the License.
 
 -->
-<aura:component abstract='true' extensible='true'>
+<aura:component extensible='true'>
+    <aura:attribute name="attr" type="String" default="Default value from parent" />
+
+    <ui:button aura:id="parentButton" label="Call method on parent" press="{!c.buttonPress}" />
+    <ui:outputText aura:id="output" value="{!v.attr}"/>
+
+    {!v.body}
 </aura:component>
 <!-- this component is used by test:testJSHelperSuper-->

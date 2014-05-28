@@ -108,8 +108,8 @@
         <sauce.record.video>false</sauce.record.video>
         <sauce.record.screenshots>false</sauce.record.screenshots>
         <xdisplay.exec>Xvfb</xdisplay.exec>
-        <xdisplay.options>-ac</xdisplay.options>
-        <xdisplay.size>960x640</xdisplay.size>
+        <xdisplay.size>960x640x16</xdisplay.size>
+        <xdisplay.options>-ac -screen 0 ${xdisplay.size}</xdisplay.options>
     </properties>
     <build>
         <pluginManagement>

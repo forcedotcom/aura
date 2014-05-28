@@ -1,0 +1,19 @@
+.THIS .outter {
+    margin: 20px;
+    border: 1px solid grey;
+    padding: 20px;
+}
+
+.THIS .middle {
+    margin: 20px;
+    border: 1px solid grey;
+    border-radius: 5px;
+    padding: 20px;
+}
+
+.THIS .inner {
+    margin-top: 20px;
+    border: 1px solid grey;
+    border-radius: 20px;
+    padding: 20px;
+}

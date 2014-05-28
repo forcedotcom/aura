@@ -192,11 +192,6 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         return false;
     }
 
-    private void updateStringSource(DefDescriptor<?> desc, String content) {
-        Source<?> src = StringSourceLoader.getInstance().getSource(desc);
-        src.addOrUpdate(content);
-    }
-
     public void testFindRegex() throws Exception {
         String namespace = "testFindRegex" + getAuraTestingUtil().getNonce();
         DefDescriptor<ApplicationDef> houseboat = addSourceAutoCleanup(ApplicationDef.class,

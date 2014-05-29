@@ -13,10 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.THIS div.tabBody {
-	bottom: auto;
-}
-
 .THIS .uiTab div.tabBody iframe {
 	min-height: 300px;
 }

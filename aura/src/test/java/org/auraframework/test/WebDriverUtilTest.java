@@ -1,7 +1,9 @@
 package org.auraframework.test;
 
+import org.auraframework.test.annotation.UnAdaptableTest;
 import org.openqa.selenium.chrome.ChromeOptions;
 
+@UnAdaptableTest
 public final class WebDriverUtilTest extends UnitTestCase {
 
     /**

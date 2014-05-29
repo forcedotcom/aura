@@ -22,3 +22,8 @@
 .THIS .frame{
     width: 100%;
 }
+
+.THIS div.tabBody {
+    bottom: auto;
+    padding-top: 20px;
+}

@@ -242,7 +242,7 @@
      * Render the options directly to the DOM for performance
      */
     renderOptions: function(cmp) {
-    	var options = cmp.get("v.options"),
+    	var options = cmp.getConcreteComponent().get("v.options"),
 			select = cmp.find("select").getElement(),
 			optFrag, option, internalText;
 		

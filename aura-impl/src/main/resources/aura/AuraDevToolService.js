@@ -443,72 +443,71 @@ var AuraDevToolService = function() {
         	 var accessAideFuncs = aura.devToolService.accessbilityAide;
                	
         	 var data_aura_rendered_by = "";
-        	 var nonAuraImg = [];
         	 var informationErrorArray = [];
         	 var decorationalErrorArray  = [];
         	 var wrongAltErrorArray  = [];
-        	 var errorMsg = "No component information Available";
+        	 var htmlAlt = "";
+        	 var errorMsg = "";
         	 
         	 var imgType = "";
         	 var alt = "";
         	
         	 for(var index = 0; index < allImgTags.length; index++){
         	     data_aura_rendered_by = $A.util.getElementAttributeValue(allImgTags[index], "data-aura-rendered-by");
+        	     htmlAlt = $A.util.getElementAttributeValue(allImgTags[index], "alt");
+        	     imgType = null;
+        	     alt = null;
         	     
-        	    // Will more than likely have a rendered by value but double checking 
-         	    if($A.util.isEmpty(data_aura_rendered_by)){
-         		nonAuraImg.push(allImgTags[index]);
-         	    }
-         	    else{
+
+        	    // Checking for the data_aura_rendered_by attribute 
+         	    if(!$A.util.isEmpty(data_aura_rendered_by)){
          		imgType = $A.getCmp(data_aura_rendered_by).getAttributes().getValueProvider().get('v.imageType');	
-         		alt     = $A.getCmp(data_aura_rendered_by).getAttributes().getValueProvider().get('v.alt');
-         		htmlAlt = $A.util.getElementAttributeValue(allImgTags[index], "alt");
-         		
-         		/**
-         		 * For the case that we are not looking at a ui:image component the imageType attribute will be undefined
-         		 * This if block will replace the alt with the html attributes alt tag or the empty string. By default we 
-         		 * are going to assume that every tag that is not through ui:image is going to be of type informational.
-         		 * 
-         		 * Once we have the item set, we will make sure that everything is stripped of spaces, and lowercased to make
-         		 * all of the data flat. 
-         		 * 
-         		 * Then three checks
-         		 * 1) make sure that the keywords "undefined", "null", "empty" are not the sole value of the alt
-         		 * 2) if the item is of type informational, make sure that the alt is not the empty string
-         		 * 3) if the item is of type decorative, make sure that the alt is the empty string.
-         		 * 
-         		 */
-         		if($A.util.isUndefinedOrNull(imgType)){
-         		    
-         		    imgType = "informational";
-         		    if($A.util.isEmpty(htmlAlt)){
-         			alt="";
-         		    }
-         		    else{
-         			alt = htmlAlt;
-         		    }         		    
-         		}
-         		
-         		if($A.util.isUndefinedOrNull(alt)){
-         		    alt="";
-         		}
-         		
-         		alt = alt.toLowerCase().replace(/[\s\t\r\n]/g,'');
-         		
-         		if(alt==="undefined" || alt==="null" || alt ==="empty"){
-         		        wrongAltErrorArray.push(allImgTags[index]);
-         		}
-         		else if(imgType === "informational" &&  ($A.util.isUndefinedOrNull(alt) || alt === "")){
-         			informationErrorArray.push(allImgTags[index]);
-         		}
-         		else if(imgType === "decorative" && (!$A.util.isUndefinedOrNull(alt) && alt !== "")){
-         			 decorationalErrorArray.push(allImgTags[index]);
-         		}
+         		alt     = $A.getCmp(data_aura_rendered_by).getAttributes().getValueProvider().get('v.alt');		 
          	    }
+         	    
+     		    /**
+     		     * For the case that we are not looking at a ui:image component the imageType attribute will be undefined
+     		     * This if block will replace the alt with the html attributes alt tag or the empty string. By default we 
+     		     * are going to assume that every tag that is not through ui:image is going to be of type informational.
+     		     * 
+     		     * Once we have the item set, we will make sure that everything is stripped of spaces, and lowercased to make
+     		     * all of the data flat. 
+     		     * 
+     		     * Then three checks
+     		     * 1) make sure that the keywords "undefined", "null", "empty" are not the sole value of the alt
+     		     * 2) if the item is of type informational, make sure that the alt is not the empty string
+     		     * 3) if the item is of type decorative, make sure that the alt is the empty string.
+     		     * 
+     		     */
+     		     if($A.util.isUndefinedOrNull(imgType)){
+     		    
+     		        imgType = "informational";
+     		        if($A.util.isUndefinedOrNull(htmlAlt)){
+     			   alt="";
+     		        }
+     		        else{
+     			   alt = htmlAlt;
+     		        }         		    
+     		      }
+     		
+     		      if($A.util.isUndefinedOrNull(alt)){
+     		          alt="";
+     		      }
+     		
+     		      alt = alt.toLowerCase().replace(/[\s\t\r\n]/g,'');
+     		
+     		      if(alt==="undefined" || alt==="null" || alt ==="empty"){
+     		          wrongAltErrorArray.push(allImgTags[index]);
+     		      }
+     		      else if(imgType === "informational" &&  ($A.util.isUndefinedOrNull(alt) || alt === "")){
+     			  informationErrorArray.push(allImgTags[index]);
+     		      }
+     		      else if(imgType === "decorative" && (!$A.util.isUndefinedOrNull(alt) && alt !== "")){
+     			  decorationalErrorArray.push(allImgTags[index]);
+     		      }
         	 }
         	 
-        	 errorMsg = accessAideFuncs.formatOutput(errorMsg, nonAuraImg);
-        	 errorMsg = errorMsg + accessAideFuncs.formatOutput(imgErrorMsg+altError, wrongAltErrorArray);
+        	 errorMsg = accessAideFuncs.formatOutput(imgErrorMsg+altError, wrongAltErrorArray);
         	 errorMsg = errorMsg + accessAideFuncs.formatOutput(imgErrorMsg+infoMsg, informationErrorArray);
         	 errorMsg = errorMsg + accessAideFuncs.formatOutput(imgErrorMsg+decoMsg, decorationalErrorArray);
         	 

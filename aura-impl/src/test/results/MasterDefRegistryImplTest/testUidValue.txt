@@ -1,4 +1,4 @@
-markup://ui:outputNumber : TBmjWg4rwi0sBsi_rdON4g
+markup://ui:outputNumber : nOQzLBFO9whlesud6zrq6g
 aura://Boolean : null
 aura://Integer : null
 aura://String : null
@@ -11,14 +11,13 @@ java://org.auraframework.renderer.ExpressionRenderer : null
 js://aura.expression : Tk_SncPBrgd0fvczaHYvXQ
 js://aura.expression : kQEGAV4XKNYZFvMa1_bU0w
 markup://aura:template : HBe0AnVX58DqRh7SP8SdOw
-aura://Map : null
 aura://Object : null
 markup://aura:componentEvent : gYnH9lMloAg2pF5xzNNf1A
 markup://aura:expression : Otn-jk-35CkD2WhrlxcqfA
+aura://Map : null
 java://org.auraframework.renderer.HtmlRenderer : null
 js://aura.html : buHZFUzhloEpRD-ZUnM67g
 js://aura.html : WvbusZ70m9Q7XQucIOnJnA
-markup://aura : no-hash-value
 markup://aura:applicationEvent : o2iboZiE9E-Up-cxMvDhwQ
 markup://auradev:blankTemplate : -aKnrIJarVeokmKyxgpXaA
 markup://ui:baseDOMEvent : 3Ed5j-HTYzJmWI45X-RPRQ
@@ -71,7 +70,6 @@ markup://ui:keypress : iCfU2A1q4lZpHOEtfc3WbQ
 markup://ui:keyup : TKn52QtEPDn7w4VLIOCzqw
 markup://ui:select : iuvU8dusDt3Ku-zIJntvPg
 markup://ui:visible : _6cbltysuoEp_cHYOg3n2g
-markup://ui : no-hash-value
 markup://ui:interactive : SUDPP3CAlEQR6qwEgCANNA
 aura://Decimal : null
 css://ui.outputNumber : 8bm_8b0q-ftoIJVkYGSIMA

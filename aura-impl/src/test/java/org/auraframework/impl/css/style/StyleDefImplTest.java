@@ -19,11 +19,10 @@ import java.util.Map;
 import java.util.Set;
 
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.StyleDef;
+import org.auraframework.def.ThemeDef;
 import org.auraframework.impl.css.StyleTestCase;
-import org.auraframework.system.AuraContext.Authentication;
-import org.auraframework.system.AuraContext.Format;
-import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.throwable.quickfix.ThemeValueNotFoundException;
 import org.auraframework.util.AuraTextUtil;
@@ -40,34 +39,6 @@ import com.google.common.collect.Sets;
 public class StyleDefImplTest extends StyleTestCase {
     public StyleDefImplTest(String name) {
         super(name);
-    }
-
-    /**
-     * TODONM remove
-     * 
-     * StyleDef must have a dependency on a NamespaceDef.
-     */
-    public void testAppendDependenciesHasNamespaceDef() throws Exception {
-        String name = String.format("%s.someStyle", getAuraTestingUtil().getNonce(getName()));
-        DefDescriptor<StyleDef> styleDesc = Aura.getDefinitionService().getDefDescriptor(name, StyleDef.class);
-        addSourceAutoCleanup(styleDesc, ".THIS {}");
-
-        DefDescriptor<NamespaceDef> namespaceDesc = Aura.getDefinitionService().getDefDescriptor(
-                String.format("%s://%s", DefDescriptor.MARKUP_PREFIX, styleDesc.getNamespace()), NamespaceDef.class);
-        addSourceAutoCleanup(namespaceDesc, "<aura:namespace></aura:namespace>");
-
-        // need to restart context because old context will not have the new
-        // namespace registered
-        Aura.getContextService().endContext();
-        Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);
-
-        StyleDef styleDef = styleDesc.getDef();
-        Set<DefDescriptor<?>> deps = Sets.newHashSet();
-        styleDef.appendDependencies(deps);
-
-        DefDescriptor<NamespaceDef> nsDesc = Aura.getDefinitionService().getDefDescriptor(styleDesc.getNamespace(),
-                NamespaceDef.class);
-        assertTrue("NamespaceDef missing from StyleDef dependencies", deps.contains(nsDesc));
     }
 
     public void testThemeDependenciesNsThemeOnly() throws QuickFixException {

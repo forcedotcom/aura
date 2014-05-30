@@ -256,8 +256,6 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             return;
         }
 
-        // TODONM should themeDescriptor be added here?(but in app def impl not here)
-
         if (providerDescriptors != null) {
             boolean hasRemote = providerDescriptors.isEmpty();
             for (DefDescriptor<ProviderDef> providerDescriptor : providerDescriptors) {

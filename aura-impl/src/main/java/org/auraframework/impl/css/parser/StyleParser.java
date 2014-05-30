@@ -25,8 +25,6 @@ import org.auraframework.def.ResourceDef;
 import org.auraframework.def.StyleDef;
 import org.auraframework.impl.clientlibrary.handler.ResourceDefHandler;
 import org.auraframework.impl.css.parser.CssPreprocessor.ParserResult;
-import org.auraframework.impl.css.parser.phloc.CssParserPhloc;
-import org.auraframework.impl.css.parser.phloc.CssParserStrategy;
 import org.auraframework.impl.css.style.StyleDefImpl;
 import org.auraframework.system.Client;
 import org.auraframework.system.Parser;
@@ -75,7 +73,7 @@ public class StyleParser implements Parser {
     @SuppressWarnings("unchecked")
     @Override
     public <D extends Definition> D parse(DefDescriptor<D> descriptor, Source<?> source) throws StyleParserException,
-            QuickFixException {
+    QuickFixException {
 
         DefDescriptor<StyleDef> styleDefDesc = (DefDescriptor<StyleDef>) descriptor;
 
@@ -87,26 +85,17 @@ public class StyleParser implements Parser {
             builder.setClassName(className);
             builder.setOwnHash(source.getHash());
 
-            if (CssParserStrategy.omakase()) {
-                ParserResult result = CssPreprocessor
-                        .initial()
-                        .source(source.getContents())
-                        .resourceName(source.getSystemId())
-                        .componentClass(className, shouldValidate(descriptor.getName()))
-                        .allowedConditions(allowedConditions)
-                        .themes(styleDefDesc)
-                        .parse();
+            ParserResult result = CssPreprocessor
+                    .initial()
+                    .source(source.getContents())
+                    .resourceName(source.getSystemId())
+                    .componentClass(className, shouldValidate(descriptor.getName()))
+                    .allowedConditions(allowedConditions)
+                    .themes(styleDefDesc)
+                    .parse();
 
-                builder.setContent(result.content());
-                builder.setThemeExpressions(result.themeExpressions());
-            } else {
-                /* TODONM remove */
-                CssParserPhloc parser = new CssParserPhloc(descriptor.getNamespace(), descriptor.getName(),
-                        shouldValidate(descriptor.getName()), className, source.getContents(), allowedConditions,
-                        source.getSystemId());
-                builder.setComponents(parser.parse());
-                builder.setThemeExpressions(parser.getThemeReferences());
-            }
+            builder.setContent(result.content());
+            builder.setThemeExpressions(result.themeExpressions());
 
             return (D) builder.build();
         } else if (descriptor.getDefType() == DefType.RESOURCE) {

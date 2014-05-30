@@ -19,10 +19,17 @@
     },
 
     itemsChange: function(cmp, evt, helper) {
+        if ($A.getContext().getMode() === 'PTEST') {
+            $A.mark("itemChange starts but before rerenderEverything " + cmp.getGlobalId());
+        }
         var v = evt.getParam("value");
         //JBUCH: FIXME: THIS IS A HUGE WRONG: THIS IS FIRING WHEN ATTRIBUTES OTHER THAN ITEMS ARE CHANGED
         if($A.util.isArray(v)){
             if (v === cmp._items) {
+                if ($A.getContext().getMode() === 'PTEST') {
+                    $A.endMark("itemChange starts but before rerenderEverything " + cmp.getGlobalId());
+                    $A.mark("iteration rerenderEverything " + cmp.getGlobalId());
+                }
                 helper.rerenderSelective(cmp);
             } else {
                 helper.rerenderEverything(cmp);
@@ -33,6 +40,9 @@
 
     firstRender: function(cmp, evt, helper) {
         if (cmp.get("v.realbody").length === 0) {
+            if ($A.getContext().getMode() === 'PTEST') {
+                $A.mark("rerenderEverything in firstRender " + cmp.getGlobalId());
+            }
             helper.rerenderEverything(cmp);
         }
     }

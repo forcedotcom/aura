@@ -51,6 +51,20 @@ Test.Aura.Iteration.ControllerTest = function(){
 
     [Fixture]
     function itemsChange(){
+    	
+    	var mockContext = Mocks.GetMock(Object.Global(), "$A", {                                
+    		getContext: function() {
+    			return {
+    				getMode: function() {
+    					return "";
+    				}
+    			}
+    		},
+    		
+    		mark: function(str){},
+    		
+            endMark: function(str){}    		            				
+        });
 
     	[Fact, Skip("Need to understand this test relative to ValueWrapper changes")]
         function testRerenderNotCalled(){
@@ -77,7 +91,9 @@ Test.Aura.Iteration.ControllerTest = function(){
     		};
 
         	// Act
-			targetController.itemsChange(targetCmp, targetEvent, targetHelper);
+        	mockContext(function(){	       
+			    targetController.itemsChange(targetCmp, targetEvent, targetHelper);
+        	});
 
 			// Assert
 			Assert.Equal(expected, actual);
@@ -108,9 +124,25 @@ Test.Aura.Iteration.ControllerTest = function(){
     				if(cmp == targetCmp) actual = true;
     			}
     		};
-            var mockAura = Mocks.GetMock(Object.Global(), "$A", {util: {isArray: function () {
-                return true;
-            }}});
+            var mockAura = Mocks.GetMock(Object.Global(), "$A", {
+            	util: {
+            		isArray: function () {
+                        return true;
+                    }
+                },
+                
+                getContext: function() {
+        			return {
+        				getMode: function() {
+        					return "";
+        				}
+        			}
+        		},
+        		
+        		mark: function(str){},
+        		
+                endMark: function(str){}
+            });
 
             // Act
             mockAura(function(){
@@ -151,7 +183,9 @@ Test.Aura.Iteration.ControllerTest = function(){
     		};
 
         	// Act
-			targetController.itemsChange(targetCmp, targetEvent, targetHelper);
+        	mockContext(function(){
+			    targetController.itemsChange(targetCmp, targetEvent, targetHelper);
+        	});
 
 			// Assert
 			Assert.Equal(expected, actual);
@@ -160,6 +194,19 @@ Test.Aura.Iteration.ControllerTest = function(){
 
     [Fixture]
     function firstRender(){
+    	var mockContext = Mocks.GetMock(Object.Global(), "$A", {                                
+    		getContext: function() {
+    			return {
+    				getMode: function() {
+    					return "";
+    				}
+    			}
+    		},
+    		
+    		mark: function(str){},
+    		
+            endMark: function(str){}       		            				
+        });
 
     	[Fact]
         function testRerenderNotCalled(){
@@ -184,7 +231,9 @@ Test.Aura.Iteration.ControllerTest = function(){
     		};
 
         	// Act
-			targetController.firstRender(targetCmp, targetEvent, targetHelper);
+        	mockContext(function(){
+			    targetController.firstRender(targetCmp, targetEvent, targetHelper);
+        	});
 
 			// Assert
 			Assert.Equal(expected, actual);
@@ -213,7 +262,9 @@ Test.Aura.Iteration.ControllerTest = function(){
     		};
 
         	// Act
-			targetController.firstRender(targetCmp, targetEvent, targetHelper);
+        	mockContext(function(){
+			    targetController.firstRender(targetCmp, targetEvent, targetHelper);
+        	});
 
 			// Assert
 			Assert.Equal(expected, actual);

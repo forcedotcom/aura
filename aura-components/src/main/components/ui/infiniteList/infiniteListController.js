@@ -15,6 +15,10 @@
  */
 ({
 	showMore: function(component, event, helper) {
+        if ($A.getContext().getMode() === 'PTEST') {
+            $A.mark("infiniteList showMore " + component.getGlobalId());
+        }
+		
 		var currentPageValue = component.get("v.currentPage");
 
     	var currentPage = parseInt(currentPageValue, 10);
@@ -26,7 +30,11 @@
 	},
 
 	rerenderComplete: function(component, event, helper) {
-        helper.showLoading(component, false);
+        if ($A.getContext().getMode() === 'PTEST') {
+            $A.endMark("infiniteList showMore " + component.getGlobalId());
+        }
+		
+		helper.showLoading(component, false);
         component.getEvent("rerenderComplete").fire();
 	}
 })

@@ -25,7 +25,21 @@ Test.Aura.Iteration.HelperTest = function(){
 	});
 		
     [Fixture]
-    function createAddComponentCallback(){    	    	    	        
+    function createAddComponentCallback(){    	    
+    	
+        var mockContext = Mocks.GetMock(Object.Global(), "$A", {                                
+            getContext: function() {
+                return {
+                    getMode: function() {
+                        return "";
+                    }
+                }
+            },
+    
+            mark: function(str){},
+ 
+            endMark: function(str){}    		            				
+        });
     	
         [Fact]
         function callbackNotSet(){
@@ -43,8 +57,10 @@ Test.Aura.Iteration.HelperTest = function(){
     		};
         	
         	// Act
-			var callback = targetHelper.createAddComponentCallback(targetIndexCollector, 0);
-			callback(expected);
+        	mockContext(function(){	
+			    var callback = targetHelper.createAddComponentCallback(targetIndexCollector, 0);
+			    callback(expected);
+        	});
 			
 			// Assert
 			Assert.Equal(expected, targetIndexCollector.body[0]);			
@@ -83,8 +99,10 @@ Test.Aura.Iteration.HelperTest = function(){
     		};        	        	
         	
         	// Act
-			var callback = targetHelper.createAddComponentCallback(targetIndexCollector, 0);			
-			callback(expected);
+        	mockContext(function(){	
+			    var callback = targetHelper.createAddComponentCallback(targetIndexCollector, 0);			
+			    callback(expected);
+        	});
 			
 			// Assert
 			Assert.Equal(expected, targetIndexCollector.body[0]);			
@@ -120,8 +138,10 @@ Test.Aura.Iteration.HelperTest = function(){
         	targetBodyCollector.cmp._currentBodyCollector = targetBodyCollector;
         	
         	// Act
-			var callback = targetHelper.createAddComponentCallback(targetIndexCollector, 0);			
-			callback(expected);
+        	mockContext(function(){	
+			    var callback = targetHelper.createAddComponentCallback(targetIndexCollector, 0);			
+			    callback(expected);
+        	});
 			
 			// Assert
 			Assert.Equal(expected, targetIndexCollector.body[0]);
@@ -158,8 +178,10 @@ Test.Aura.Iteration.HelperTest = function(){
         	targetBodyCollector.cmp._currentBodyCollector = targetBodyCollector;
         	
         	// Act
-			var callback = targetHelper.createAddComponentCallback(targetIndexCollector, 0);			
-			callback(expected);
+        	mockContext(function(){	
+			    var callback = targetHelper.createAddComponentCallback(targetIndexCollector, 0);			
+			    callback(expected);
+        	});
 			
 			// Assert
 			Assert.Equal(expected, targetIndexCollector.body[0]);
@@ -195,8 +217,10 @@ Test.Aura.Iteration.HelperTest = function(){
         	targetBodyCollector.cmp._currentBodyCollector = targetBodyCollector;
         	
         	// Act
-			var callback = targetHelper.createAddComponentCallback(targetIndexCollector, 0);			
-			callback(expected);
+        	mockContext(function(){	
+			    var callback = targetHelper.createAddComponentCallback(targetIndexCollector, 0);			
+			    callback(expected);
+        	});
 			
 			// Assert
 			Assert.Equal(expected, targetIndexCollector.body[0]);
@@ -880,6 +904,20 @@ Test.Aura.Iteration.HelperTest = function(){
     [Fixture]
     function createRealBody(){ 
     	
+    	var mockContext = Mocks.GetMock(Object.Global(), "$A", {                                
+    		getContext: function() {
+    			return {
+    				getMode: function() {
+    					return "";
+    				}
+    			}
+    		},
+    		
+    		mark: function(str){},
+    		
+            endMark: function(str){}    		            				
+        });
+    	
     	[Fixture]
         function testCallbackCalled(){
         	
@@ -919,8 +957,10 @@ Test.Aura.Iteration.HelperTest = function(){
 	        	isLiteral = true;
 	        	isEmpty = true;        	
 	        	        	        	        	        				 
-	            // Act								        
-				targetHelper.createRealBody(targetCmp, true, targetCallback);
+	            // Act		
+	        	mockContext(function(){	
+				    targetHelper.createRealBody(targetCmp, true, targetCallback);
+	        	});
 	        	
 				// Assert
 	            Assert.Equal(expected, actual);
@@ -939,8 +979,10 @@ Test.Aura.Iteration.HelperTest = function(){
 	        	isLiteral = false;
 	        	isEmpty = true;        	        	
 	        	        	        	        	        				 
-	            // Act								        
-				targetHelper.createRealBody(targetCmp, true, targetCallback);
+	            // Act			
+	        	mockContext(function(){	
+				    targetHelper.createRealBody(targetCmp, true, targetCallback);
+	        	});
 	        	
 				// Assert
 	            Assert.Equal(expected, actual);
@@ -959,8 +1001,10 @@ Test.Aura.Iteration.HelperTest = function(){
 	        	isLiteral = true;
 	        	isEmpty = false;        	 
 	        	        	        	        	        				 
-	            // Act								        
-				targetHelper.createRealBody(targetCmp, true, targetCallback);
+	            // Act			
+	        	mockContext(function(){	
+				    targetHelper.createRealBody(targetCmp, true, targetCallback);
+	        	});
 	        	
 				// Assert
 	            Assert.Equal(expected, actual);
@@ -1027,8 +1071,10 @@ Test.Aura.Iteration.HelperTest = function(){
 	        	isStart = false;
 	        	targetItemsLength = 0;
 	        	
-	        	// Act								        
-				targetHelper.createRealBody(targetCmp, true, targetCallback);
+	        	// Act	
+	        	mockContext(function(){	
+				    targetHelper.createRealBody(targetCmp, true, targetCallback);
+	        	});
 	        	
 				// Assert
 	            Assert.Equal(expected, actual);
@@ -1050,8 +1096,10 @@ Test.Aura.Iteration.HelperTest = function(){
 	        	});	
 	        	        	        	        	        				 
 	            // Act		
-	        	mockGetNumber(function(){
-	        		targetHelper.createRealBody(targetCmp, true, targetCallback);
+	        	mockContext(function(){	
+	        	    mockGetNumber(function(){
+	        		    targetHelper.createRealBody(targetCmp, true, targetCallback);
+	        	    });
 	        	});
 	        	
 				// Assert
@@ -1073,9 +1121,11 @@ Test.Aura.Iteration.HelperTest = function(){
 	        		return 1;        		
 	        	});	
 	        	        	        	        	        				 
-	            // Act		
-	        	mockGetNumber(function(){
-	        		targetHelper.createRealBody(targetCmp, true, targetCallback);
+	            // Act	
+	        	mockContext(function(){	
+	        	    mockGetNumber(function(){
+	        		    targetHelper.createRealBody(targetCmp, true, targetCallback);
+	        	    });
 	        	});
 	        	
 				// Assert
@@ -1097,9 +1147,11 @@ Test.Aura.Iteration.HelperTest = function(){
 	        		return 0;        		
 	        	});	
 	        	        	        	        	        				 
-	            // Act		
-	        	mockGetNumber(function(){
-	        		targetHelper.createRealBody(targetCmp, true, targetCallback);
+	            // Act	
+	        	mockContext(function(){	
+	        	    mockGetNumber(function(){
+	        		    targetHelper.createRealBody(targetCmp, true, targetCallback);
+	        	    });
 	        	});
 	        	
 				// Assert
@@ -1121,9 +1173,11 @@ Test.Aura.Iteration.HelperTest = function(){
 	        		return 0;        		
 	        	});	
 	        	        	        	        	        				 
-	            // Act		
-	        	mockGetNumber(function(){
-	        		targetHelper.createRealBody(targetCmp, true, targetCallback);
+	            // Act	
+	        	mockContext(function(){	
+	        	    mockGetNumber(function(){
+	        		    targetHelper.createRealBody(targetCmp, true, targetCallback);
+	        	    });
 	        	});
 	        	
 				// Assert
@@ -1198,8 +1252,10 @@ Test.Aura.Iteration.HelperTest = function(){
 	        	targetItemsLength = 0;
 	        	        	        	        	        				 
 	            // Act		
-	        	mockGetNumber(function(){
-	        		targetHelper.createRealBody(targetCmp, true, targetCallback);
+	        	mockContext(function(){	
+	        	    mockGetNumber(function(){
+	        		    targetHelper.createRealBody(targetCmp, true, targetCallback);
+	        	    });
 	        	});
 	        	
 				// Assert
@@ -1213,9 +1269,11 @@ Test.Aura.Iteration.HelperTest = function(){
 	        	actual = false; 
 	        	targetItemsLength = 2;
 	        	        	        	        	        				 
-	            // Act		
-	        	mockGetNumber(function(){
-	        		targetHelper.createRealBody(targetCmp, true, targetCallback);
+	            // Act
+	        	mockContext(function(){	
+	        	    mockGetNumber(function(){
+	        		    targetHelper.createRealBody(targetCmp, true, targetCallback);
+	        	    });
 	        	});
 	        	
 				// Assert
@@ -1289,9 +1347,11 @@ Test.Aura.Iteration.HelperTest = function(){
 	        	callbackCalled= false;
 	        	targetItemsLength = 1;
 	        	        	        	        	        				 
-	            // Act		
-	        	mockCreateComponentsForIndex(function(){								        
-	        		targetHelper.createRealBody(targetCmp, true, targetCallback);
+	            // Act
+	        	mockContext(function(){	
+	        	    mockCreateComponentsForIndex(function(){								        
+	        		    targetHelper.createRealBody(targetCmp, true, targetCallback);
+	        	    });
 	        	});
 	        	
 				// Assert
@@ -1308,8 +1368,10 @@ Test.Aura.Iteration.HelperTest = function(){
 	        	targetItemsLength = 2;
 	        	        	        	        	        				 
 	            // Act		
-	        	mockCreateComponentsForIndex(function(){								        
-	        		targetHelper.createRealBody(targetCmp, true, targetCallback);
+	        	mockContext(function(){	
+	        	    mockCreateComponentsForIndex(function(){								        
+	        		    targetHelper.createRealBody(targetCmp, true, targetCallback);
+	        	    });
 	        	});
 	        	
 				// Assert
@@ -2159,7 +2221,21 @@ Test.Aura.Iteration.HelperTest = function(){
     
     
     [Fixture]
-    function rerenderEverything(){    	    	    	        
+    function rerenderEverything(){    
+    	
+    	var mockContext = Mocks.GetMock(Object.Global(), "$A", {                                
+    		getContext: function() {
+    			return {
+    				getMode: function() {
+    					return "";
+    				}
+    			}
+    		},
+    		
+    		mark: function(str){},
+    		
+            endMark: function(str){}    		            				
+        });
     	                        
     	[Fact]
         function cmpInvalid(){
@@ -2237,8 +2313,10 @@ Test.Aura.Iteration.HelperTest = function(){
         	});	
         	
         	// Act
-        	mockMethod(function(){
-        		targetHelper.rerenderEverything(targetCmp);
+        	mockContext(function(){
+        	    mockMethod(function(){
+        		    targetHelper.rerenderEverything(targetCmp);
+        	    });
         	});
 			
 			// Assert

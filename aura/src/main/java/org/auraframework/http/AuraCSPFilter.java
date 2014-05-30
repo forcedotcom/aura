@@ -41,7 +41,7 @@ public class AuraCSPFilter implements Filter {
     
     private static final Set<String> INLINE_ALLOWED_URLS = ImmutableSet.of(APPLICATION, COMPONENT, FRAMEWORK_JS);
     
-    private static final String CHROME_EXTENSION = "chrome-extension:";
+    protected static final String CHROME_EXTENSION = "chrome-extension:";
 
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException,
@@ -100,7 +100,7 @@ public class AuraCSPFilter implements Filter {
      * NOTE: this should be fixed sooner rather than later, because the initial template *is*
      * configurable by consumers, and is therefore a vector for attack.
      */
-    private boolean doesUrlAllowInline(String url) {
+    protected final boolean doesUrlAllowInline(String url) {
         for (String pattern : INLINE_ALLOWED_URLS) {
             if (url.matches(pattern)) {
                 return true;

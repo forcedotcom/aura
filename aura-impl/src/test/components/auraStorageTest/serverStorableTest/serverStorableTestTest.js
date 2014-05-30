@@ -221,7 +221,7 @@
             $A.test.setTestTimeout(30000);
             this.resetCounter(cmp, "testComponentsFromStoredServerAction");
     	}, function(cmp){
-            //Run the action that sets up other actions to be storable
+    		//Run the action that sets up other actions to be storable
             this.initiateServerAction(cmp, "testComponentsFromStoredServerAction", 
                 ["java://org.auraframework.java.controller.ServerStorableActionController/ACTION$getComponent"]);
             $A.test.addWaitFor(false, $A.test.isActionPending,
@@ -231,7 +231,7 @@
                     var storageKey = storedAction.getStorageKey();
                     //Check if storage service has the expected action
                     $A.storageService.getStorage("actions").get(storageKey, function(response){
-                        if(response){
+                    	if(response){
                             //If the action was stored, make sure it succeeded and return value is correct
                             $A.test.assertEquals("SUCCESS", response.state);
                         }else{
@@ -244,7 +244,7 @@
     	}, 
     	// Verify that components can be created with cached action response
     	function(cmp){
-            //Run the action which is stored, create a component with the response
+    		//Run the action which is stored, create a component with the response
             var action = cmp.get("c.getComponent");
             action.setParams({testName: "testComponentsFromStoredServerAction"});
             action.setStorable();
@@ -252,9 +252,8 @@
                     $A.newCmpAsync(
                         this,
                         function(newComponent){
-                            cmp.find("facet").getValue("v.body").clear();
-                            //Insert newly fetched component
-                            cmp.find("facet").getValue("v.body").push(newComponent);
+                			//Insert newly fetched component
+                			cmp.find("facet").set("v.body", newComponent);
                         },
                         a.getReturnValue()
                     );
@@ -262,10 +261,10 @@
             $A.run(function() { $A.enqueueAction(action); });
             $A.test.addWaitFor("SUCCESS", function(){return action.getState()},
                 function(){
-                    $A.test.assertTrue(action.isFromStorage(), "Should have cached the action response.");
+            		$A.test.assertTrue(action.isFromStorage(), "Should have cached the action response.");
                 });
             $A.test.addWaitFor("National League",function(){
-                    var facet = cmp.get("facet").get('v.body')[0];
+                    var facet = cmp.find("facet").get('v.body')[0];
                     // now that we are async, the facet might not be there.
                     if (facet) {
                         return $A.test.getTextByComponent(facet.find("Division"));
@@ -283,8 +282,10 @@
                     $A.newCmpAsync(
                         this,
                         function(secondNewComponent){
-                            //push newly fetched component
-                            cmp.find("facet").getValue("v.body").push(secondNewComponent);
+                        	//push newly fetched component
+                        	var body = cmp.find("facet").get("v.body"); 
+                            body.push(secondNewComponent);
+                            cmp.find("facet").set("v.body", body);
                         },
                         a.getReturnValue()
                     );

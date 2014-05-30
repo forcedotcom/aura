@@ -41,7 +41,7 @@
 	_testCaseSensitivity : {
 		test : function(cmp) {
 			$A.test.assertEquals("Aura", cmp.get("v.strATTRIBUTEWithDefaultValue"));
-			$A.test.assertFalsy(cmp.get("v.strATTRIBUTEWithNODefaultValue"));
+			$A.test.assertUndefined(cmp.get("v.strATTRIBUTEWithNODefaultValue"));
 		}
 	},
 
@@ -113,7 +113,8 @@
 		$A.test.assertEquals("true", listAttr[2]);
 
 		var a = testCmp.get("v.listAttributeWithNoDefaultValue");
-        $A.test.assertFalsy(a, "Array type attributes without default value should have undefined as value");
+		$A.test.assertTrue($A.util.isArray(a));
+		$A.test.assertTrue($A.util.isEmpty(a), "Array type attributes without default value should have empty array as value");
 	},
 	
 	verifyDefaultValuesOfMapDataType : function(testCmp) {
@@ -121,7 +122,8 @@
 		$A.test.assertTrue($A.util.isObject(mapAttr), "Expected to find attribute of Map(Object)");
 		$A.test.assertEquals(1, mapAttr.a);
 		var a = testCmp.get("v.mapAttributeWithNoDefaultValue");
-		$A.test.assertFalsy(a, "Expected no-default map to be an undefined");
+		$A.test.assertTrue($A.util.isObject(a));
+		$A.test.assertEquals(0, $A.util.keys(a).length, "Expected no-default map to be an empty object");
 	},
 	
 	verifyChangingAttributeValues : function(testCmp) {

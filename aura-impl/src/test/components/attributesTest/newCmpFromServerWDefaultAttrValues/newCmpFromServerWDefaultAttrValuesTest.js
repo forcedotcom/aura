@@ -20,7 +20,9 @@
 	            $A.componentService.newComponentAsync(
 	                this,
 	                function(newCmp){
-	                    cmp.get("v.body").push(newCmp);
+	                	var body = cmp.get("v.body");
+	                	body.push(newCmp);
+	                	cmp.set("v.body", body);
 	                },
 	                "attributesTest:defaultValue"
 	            );
@@ -50,7 +52,8 @@
                     "Attributes without default value should have undefined as value");
                 
                 var a = newCmp.get("v.listAttributeWithNoDefaultValue");
-                $A.test.assertFalsy(a, "Attribute of type list with no default value should be undefined");
+                $A.test.assertTrue($A.util.isArray(a));
+        		$A.test.assertTrue($A.util.isEmpty(a), "Array type attributes without default value should have empty array as value");
             });
         }
     }

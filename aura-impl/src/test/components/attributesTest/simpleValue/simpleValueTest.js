@@ -18,7 +18,7 @@
         attributes:{intAttribute:3},
         test:function(cmp){
         	var value = cmp.get('v.strAttribute');
-            $A.test.assertFalsy(value, "Uninitialized simple attribute should be represented as undefined.");
+            $A.test.assertUndefined(value, "Uninitialized simple attribute should be represented as undefined.");
 
             $A.test.assertTruthy(cmp.get('v.intAttribute'),
                     "Initialized simple attribute should not be represented as undefined.");
@@ -29,15 +29,15 @@
 
     testSimpleValueIsValid: {
         test:function(cmp){
-            $A.test.assertTruthy(cmp.isValid('v.strAttribute'));
+        	$A.test.assertTruthy(cmp.isValid('v.strAttribute'));
         }
     },
 
-    testSimpleValueSetUnValid: {
+    testSimpleValueSetInValid: {
         test:function(cmp){
         	var valueObj = cmp.get('v.strAttribute');
             cmp.setValid('v.strAttribute', false);
-            $A.test.assertTruthy(!cmp.isValid('v.strAttribute'));
+            $A.test.assertFalse(cmp.isValid('v.strAttribute'));
         }
     },
 
@@ -48,11 +48,11 @@
         test: function(cmp) {
         	var simpleValue = $A.expressionService.create(null,
                     "something");
-        	$A.test.assertTrue($A.util.isString(simpleValue), "Expression service could not create a simple value");
+        	$A.test.assertTrue($A.util.isString(simpleValue.unwrap()), "Expression service could not create a simple value");
             
         	var mapValue = $A.expressionService.create(null,
                      {"string":"something","integer":23,"boolean":true});
-            $A.test.assertTrue($A.util.isObject(mapValue),
+            $A.test.assertTrue($A.util.isObject(mapValue.unwrap()),
                     "Expression service could not create a map value(object)");
         }
     },

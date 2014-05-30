@@ -84,6 +84,9 @@
 
 	clear : function(cmp) {
 		var whichArray = cmp.get("v.whichArray");
+		if(!whichArray){
+			return;
+		}
 		cmp.set(whichArray, []);
 	}
 })

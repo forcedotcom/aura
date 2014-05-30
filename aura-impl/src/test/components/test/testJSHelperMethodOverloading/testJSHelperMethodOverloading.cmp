@@ -16,4 +16,5 @@
 
 -->
 <aura:component extends="test:testJSHelperSuperSuper">
+    <ui:button aura:id="childButton" label="Call method on child" press="{!c.buttonPress}" />
 </aura:component>

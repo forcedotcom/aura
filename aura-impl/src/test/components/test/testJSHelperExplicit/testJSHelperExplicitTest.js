@@ -20,9 +20,10 @@
     testInheritedHelper :{
         test: function(component){
             var helper = component.getDef().getHelper();
-            aura.test.assertNotNull(helper);
-            aura.test.assertEquals("func Z", helper.z() , "Failed to inherit and invoke helper method of parent.");
-            aura.test.assertEquals("func superSuperZ on Super Super", helper.superSuperz(), "Failed to inherit and invoke helper method of parent over 2 levels of inheritance." );
+            $A.test.assertNotUndefinedOrNull(helper);
+            $A.test.assertEquals("func Z", helper.z() , "Failed to inherit and invoke helper method of parent.");
+            $A.test.assertEquals("func superSuperZ on Super Super", helper.superSuperZ(),
+                    "Failed to inherit and invoke helper method of parent over 2 levels of inheritance.");
         }
     },
     /**
@@ -31,8 +32,9 @@
     testExplicitHelper : {
         test: function(component){
             var helper = component.getDef().getHelper();
-            aura.test.assertNotNull(helper);
-            aura.test.assertEquals("method A of simple helper", helper.methodAOfSimpleHelper(), "Failed to invoke helper method of helper specified using helper directive in component mark up");
+            $A.test.assertNotUndefinedOrNull(helper);
+            $A.test.assertEquals("method A of simple helper", helper.methodAOfSimpleHelper(),
+                    "Failed to invoke helper method of helper specified using helper directive in component mark up");
         }
 
     },
@@ -42,8 +44,9 @@
     testHelperLocalToComponent:{
         test:function(component){
             var helper = component.getDef().getHelper();
-            aura.test.assertNotNull(helper);
-            aura.test.assert(!helper.localMethodFortestJSHelperExplicit, "Should not be able to see local helper methods when helper is explicitly defined on component." );
+            $A.test.assertNotUndefinedOrNull(helper);
+            $A.test.assertUndefinedOrNull(helper.localMethodFortestJSHelperExplicit,
+                    "Should not be able to see local helper methods when helper is explicitly defined on component.");
         }
     }
 

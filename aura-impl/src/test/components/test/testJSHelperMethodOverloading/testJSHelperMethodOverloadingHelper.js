@@ -17,9 +17,10 @@
     /**
      * Overriding helper method on parent's helper Def
      */
-    superSuperz : function(){
+    superSuperZ : function(){
         return "func superSuperZ in child component";
     },
+
     /**
      * Overloading parents's helper method.
      */
@@ -33,6 +34,7 @@
     localX : function(arg1){
         return "func x on component, with one argument";
     },
+ 
     /**
      * Overloading helper methods.
      */

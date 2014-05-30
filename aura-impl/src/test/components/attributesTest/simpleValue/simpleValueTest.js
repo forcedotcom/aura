@@ -17,13 +17,8 @@
     testSimpleValueProperties:{
         attributes:{intAttribute:3},
         test:function(cmp){
-            var valueObj = cmp.getValue('v.strAttribute');
-            $A.test.assertTruthy(valueObj, "Simple attribute is not defined by a value object.");
-            $A.test.assertEquals('SimpleValue', valueObj.toString(),
-                    "Simple attribute should be represented using SimpleValue");
-            $A.test.assertEquals('Value', valueObj.auraType,
-                    "Simple value object has wrong value for auraType attribute");
-            $A.test.assertFalsy(valueObj.getValue(), "Uninitialized simple attribute should be represented as undefined.");
+        	var value = cmp.get('v.strAttribute');
+            $A.test.assertFalsy(value, "Uninitialized simple attribute should be represented as undefined.");
 
             $A.test.assertTruthy(cmp.get('v.intAttribute'),
                     "Initialized simple attribute should not be represented as undefined.");
@@ -40,67 +35,57 @@
 
     testSimpleValueSetUnValid: {
         test:function(cmp){
-            var valueObj = cmp.getValue('v.strAttribute');
-            valueObj.setValid(false);
-            $A.test.assertTruthy(!valueObj.isValid());
+        	var valueObj = cmp.get('v.strAttribute');
+            cmp.setValid('v.strAttribute', false);
+            $A.test.assertTruthy(!cmp.isValid('v.strAttribute'));
         }
     },
 
+    /**
+     * Values derived using expression service should be of the right native javascript type.
+     */
     testDerivedTypes:{
         test: function(cmp) {
-            var valueObj = cmp.getValue('v.strAttribute');
-            var mval = $A.expressionService.create(null,
+        	var simpleValue = $A.expressionService.create(null,
+                    "something");
+        	$A.test.assertTrue($A.util.isString(simpleValue), "Expression service could not create a simple value");
+            
+        	var mapValue = $A.expressionService.create(null,
                      {"string":"something","integer":23,"boolean":true});
-            // Because the types aren't exported, getting the constructors is a bit awkward:
-            var simpleValue = valueObj.constructor;
-            var mapValue = mval.constructor;
-            var attributeValue;  // This is the tricky one, since it's obfuscated!
-            for (var key in valueObj) {
-                if (!valueObj.hasOwnProperty(key) && typeof(valueObj[key]) === "object" && valueObj[key].constructor) {
-                    attributeValue = valueObj[key].constructor;
-                    break;
-                }
-            }
-            $A.test.assertTrue($A.util.instanceOf(valueObj, simpleValue),
-                     "$A.util.instanceOf says strAttribute is not a SimpleValue");
-            $A.test.assertTrue($A.util.instanceOf(valueObj, attributeValue),
-                    "$A.util.instanceOf says strAttribute is not an AttributeValue");
-            $A.test.assertFalse($A.util.instanceOf(valueObj, mapValue),
-                    "$A.util.instanceOf says strAttribute is a MapValue");
+            $A.test.assertTrue($A.util.isObject(mapValue),
+                    "Expression service could not create a map value(object)");
         }
     },
 
     testErrorFunctionsOnSimpleValueObject:{
         attributes:{intAttribute:3},
         test:function(cmp){
-            //Attribute with no default value
-            var valueObj = cmp.getValue('v.strAttribute');
-            valueObj.clearErrors();
-            this.verifyErrors(valueObj,[]);
-
+        	//Attribute with no default value
+            cmp.clearErrors('v.strAttribute');
+            this.verifyErrors(cmp, 'v.strAttribute' ,[]);
+            
             //Boundary cases for argument
-            valueObj.addErrors(undefined);
-            valueObj.addErrors();
-            valueObj.addErrors(null);
-            this.verifyErrors(valueObj,[]);
+            cmp.addErrors('v.strAttribute', undefined);
+            cmp.addErrors('v.strAttribute');
+            cmp.addErrors('v.strAttribute',null);
+            //TODO W-2248499
+            //this.verifyErrors(cmp, 'v.strAttribute',[]);
 
             //Attribute with default value
-            valueObj = cmp.getValue('v.intAttribute');
-            valueObj.clearErrors();
-
+            cmp.clearErrors('v.intAttribute');
             //Add 1 valid error message
-            valueObj.addErrors('Something went wrong!');
-            this.verifyErrors(valueObj,['Something went wrong!']);
+            cmp.addErrors('v.intAttribute','Something went wrong!');
+            this.verifyErrors(cmp,'v.intAttribute', ['Something went wrong!']);
 
             //Add multiple error messages
-            valueObj.clearErrors();
-            valueObj.addErrors(['I know what went wrong!', 'fooBared']);
-            this.verifyErrors(valueObj,['I know what went wrong!', 'fooBared']);
+            cmp.clearErrors('v.intAttribute');
+            cmp.addErrors('v.intAttribute', ['I know what went wrong!', 'fooBared']);
+            this.verifyErrors(cmp, 'v.intAttribute', ['I know what went wrong!', 'fooBared']);
 
             //Add a non-literal, non-array error message
-            valueObj.clearErrors();
-            valueObj.addErrors({1:'I know what went wrong!', 2:'fooBared'});
-            var err = valueObj.getErrors();
+            cmp.clearErrors('v.intAttribute');
+            cmp.addErrors('v.intAttribute', {1:'I know what went wrong!', 2:'fooBared'});
+            var err = cmp.getErrors('v.intAttribute');
             $A.test.assertEquals( err.length, 1);
             $A.test.assertTrue( $A.util.isObject(err[0]));
         }
@@ -111,29 +96,28 @@
     	attributes:{intAttribute:100},
     	test:function(cmp){
     		var button = cmp.find("button");
-    		var val = cmp.getValue("v.intAttribute");
-    		$A.test.assertEquals(false, val.isDirty());
-    		$A.test.assertEquals(100, val.unwrap());
-    		var label = button.getValue("v.label");
-    		$A.test.assertEquals(false, label.isDirty());
-    		$A.test.assertEquals(100, label.unwrap());
+    		$A.test.assertEquals(false, cmp.isDirty("v.intAttribute"));
+    		$A.test.assertEquals(100, cmp.get("v.intAttribute"));
+    		
+    		$A.test.assertEquals(false, button.isDirty("v.label"));
+    		$A.test.assertEquals(100, button.get("v.label"));
 
     		button.get("e.press").fire();
-    		$A.test.assertEquals(false, val.isDirty());
-    		$A.test.assertEquals(101, val.unwrap());
-    		$A.test.assertEquals(false, label.isDirty());
-    		$A.test.assertEquals(101, label.unwrap());
+    		$A.test.assertEquals(false, cmp.isDirty("v.intAttribute"));
+    		$A.test.assertEquals(101, cmp.get("v.intAttribute"));
+    		$A.test.assertEquals(false, button.isDirty("v.label"));
+    		$A.test.assertEquals(101, button.get("v.label"));
 
     		button.get("e.press").fire();
-    		$A.test.assertEquals(false, val.isDirty());
-    		$A.test.assertEquals(102, val.unwrap());
-    		$A.test.assertEquals(false, label.isDirty());
-    		$A.test.assertEquals(102, label.unwrap());
+    		$A.test.assertEquals(false, cmp.isDirty("v.intAttribute"));
+    		$A.test.assertEquals(102, cmp.get("v.intAttribute"));
+    		$A.test.assertEquals(false, button.isDirty("v.label"));
+    		$A.test.assertEquals(102, button.get("v.label"));
     	}
     },
 
-    verifyErrors:function(valueObj, expectedErrors){
-        var err = valueObj.getErrors();
+    verifyErrors:function(cmp, expression, expectedErrors){
+        var err = cmp.getErrors(expression);
         $A.test.assertTrue($A.util.isArray(err));
         $A.test.assertEquals( expectedErrors.length, err.length);
         for(var i in expectedErrors){

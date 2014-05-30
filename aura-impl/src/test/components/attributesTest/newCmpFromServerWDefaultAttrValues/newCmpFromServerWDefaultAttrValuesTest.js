@@ -16,40 +16,41 @@
 ({
     testNewComponentFromServerWithDefaultValues:{
         test:function(cmp){
-            $A.componentService.newComponentAsync(
-                this,
-                function(newCmp){
-                    cmp.getValue("v.body").push(newCmp);
-                },
-                "attributesTest:defaultValue"
-            );
-            $A.eventService.finishFiring();
-
+        	$A.run(function(){
+	            $A.componentService.newComponentAsync(
+	                this,
+	                function(newCmp){
+	                    cmp.get("v.body").push(newCmp);
+	                },
+	                "attributesTest:defaultValue"
+	            );
+            })
+            
             $A.test.addWaitFor(false, $A.test.isActionPending, function(){
-                var body = cmp.get('v.body');
+            	var body = cmp.get('v.body');
                 var newCmp = body[0];
                 $A.test.assertEquals("markup://attributesTest:defaultValue", newCmp.getDef().getDescriptor().getQualifiedName(),
                         "Failed to create new component: markup://attributesTest:defaultValue");
+                
                 $A.test.assertEquals("Aura", newCmp.get("v.strAttributeWithDefaultValue"),
                         "Failed to set default value of simple attributes on client side component");
                 $A.test.assertEquals("['red','green','blue']", newCmp.get("v.objAttributeWithDefaultValue"));
-                var listAttr = newCmp.getValue("v.listAttributeWithDefaultValue");
-                $A.test.assertTrue(listAttr.toString() === "ArrayValue",
-                        "Expected to find attribute of ArrayValue type but found"+listAttr.constructor);
-                $A.test.assertEquals("Value", listAttr.auraType);
-                $A.test.assertEquals("true", listAttr.getValue(0).getValue());
-                $A.test.assertEquals("false", listAttr.getValue(1).getValue());
-                $A.test.assertEquals("true", listAttr.getValue(2).getValue());
-
+                
+                var listAttr = newCmp.get("v.listAttributeWithDefaultValue");
+                $A.test.assertTrue($A.util.isArray(listAttr),
+                        "Expected to find attribute of Array type but found something else");
+                $A.test.assertEquals("true", listAttr[0]);
+                $A.test.assertEquals("false", listAttr[1]);
+                $A.test.assertEquals("true", listAttr[2]);
+                
                 // Verify attributes without a default value
                 $A.test.assertFalsy(newCmp.get("v.strAttributeWithNoDefaultValue"),
                     "Attributes without default value should have undefined as value");
                 $A.test.assertFalsy(newCmp.get("v.objAttributeWithNoDefaultValue"),
                     "Attributes without default value should have undefined as value");
+                
                 var a = newCmp.get("v.listAttributeWithNoDefaultValue");
-                $A.test.assertTrue($A.util.isArray(a));
-                $A.test.assertEquals(0, a.length,
-                        "Array type attributes without default value should have empty as value");
+                $A.test.assertFalsy(a, "Attribute of type list with no default value should be undefined");
             });
         }
     }

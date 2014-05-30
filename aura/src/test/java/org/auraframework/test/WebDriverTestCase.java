@@ -154,11 +154,16 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
 
     public void runTestWithBrowser(BrowserType browserType) throws Throwable {
         currentBrowserType = browserType;
-        try {
-            perBrowserSetUp();
-            superRunTest();
-        } finally {
-            perBrowserTearDown();
+
+        if (isPerfTest()) {
+            runPerfTests();
+        } else {
+            try {
+                perBrowserSetUp();
+                superRunTest();
+            } finally {
+                perBrowserTearDown();
+            }
         }
     }
 
@@ -208,10 +213,6 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
                 this.getExcludedBrowsers())) {
             try {
                 runTestWithBrowser(browser);
-                if (isPerfTest() && failures.size() == 0) {
-                    // run perf regression only if there were no functional failures
-                    runPerfTests();
-                }
             } catch (Throwable t) {
                 failures.add(addAuraInfoToTestFailure(t));
             } finally {
@@ -266,10 +267,6 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
         int numPerfAuraRuns = numPerfAuraRuns();
         PerfMetrics timelineMetrics = null;
         PerfMetrics auraMetrics = null;
-
-        // get fresh browser for perf runs
-        quitDriver();
-        getDriver();
 
         // runs to collect Dev Tools performance metrics
         if (numPerfTimelineRuns > 0) {
@@ -639,12 +636,18 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
             }
 
             if (windowSize != null) {
-                if (currentBrowserType != BrowserType.GOOGLECHROME) {
+                // SauceLabs doesn't support window-size in ChromeOptions yet
+                if (currentBrowserType != BrowserType.GOOGLECHROME || SauceUtil.areTestsRunningOnSauce()) {
                     currentDriver.manage().window().setSize(windowSize);
                 }
             }
 
-            logger.info(String.format("Received: %s", currentDriver));
+            String driverInfo = "Received: " + currentDriver;
+            if (SauceUtil.areTestsRunningOnSauce()) {
+                driverInfo += "\n      running in SauceLabs at " + SauceUtil.getLinkToPublicJobInSauce(currentDriver);
+            }
+            logger.info(driverInfo);
+
             auraUITestingUtil = new AuraUITestingUtil(currentDriver);
             perfWebDriverUtil = new PerfWebDriverUtil(currentDriver, auraUITestingUtil);
         }

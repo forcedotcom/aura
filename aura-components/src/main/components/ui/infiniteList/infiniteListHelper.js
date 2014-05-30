@@ -39,6 +39,10 @@
 	 * Concats the new items to the list of existing items.
 	 */
     handleDataChange: function(cmp, evt) {
+        if ($A.getContext().getMode() === 'PTEST') {
+            $A.mark("infiniteList handleDataChange " + component.getGlobalId());
+        }
+        
     	var newData = evt.getParam("data"),
     		items = cmp.getConcreteComponent().getValue("v.items"),
     		actualItems = items.unwrap();
@@ -48,6 +52,10 @@
         }
         
         items.setValue(actualItems);
+        
+        if ($A.getContext().getMode() === 'PTEST') {
+            $A.endMark("infiniteList handleDataChange " + component.getGlobalId());
+        }
     },
     
     /**

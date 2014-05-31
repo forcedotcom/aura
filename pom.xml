@@ -463,7 +463,7 @@
                         <jspx>XML_STYLE</jspx>
                     </mapping>
                     <header>${aura.home}/aura/src/test/resources/header.txt</header>
-                    <failIfMissing>false</failIfMissing>
+                    <failIfMissing>true</failIfMissing>
                     <aggregate>true</aggregate>
                     <properties>
                         <owner>salesforce.com, inc.</owner>

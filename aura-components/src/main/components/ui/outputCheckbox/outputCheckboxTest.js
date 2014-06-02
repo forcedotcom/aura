@@ -21,7 +21,6 @@
         	var expectedElem = component.find("img1").getElement();
             aura.test.assertTrue($A.util.hasClass(expectedElem, "checked"), "missing class: checked");
             aura.test.assertTrue($A.util.hasClass(expectedElem, "uiOutputCheckbox"), "missing class: uiOutputCheckbox");
-            aura.test.assertFalse(component.find("img2").isRendered(), "img2 shouldn't be rendered");
         }
     },
 
@@ -29,10 +28,9 @@
     testUnchecked: {
         attributes : {value : false},
         test: function(component){
-            var expectedElem = component.find("img2").getElement();
+            var expectedElem = component.find("img1").getElement();
             aura.test.assertTrue($A.util.hasClass(expectedElem, "unchecked"), "missing class: unchecked");
             aura.test.assertTrue($A.util.hasClass(expectedElem, "uiOutputCheckbox"), "missing class: uiOutputCheckbox");
-            aura.test.assertFalse(component.find("img1").isRendered(), "img1 shouldn't be rendered");
         }
     },
 
@@ -40,20 +38,16 @@
     testRerenderChecked: {
         attributes : {value : false},
         test: function(component){
-        	var expectedElem = component.find("img2").getElement();
+        	var expectedElem = component.find("img1").getElement();
             aura.test.assertTrue($A.util.hasClass(expectedElem, "unchecked"), "missing class: unchecked");
             aura.test.assertTrue($A.util.hasClass(expectedElem, "uiOutputCheckbox"), "missing class: uiOutputCheckbox");
-            aura.test.assertFalse(component.find("img1").isRendered(), "img1 shouldn't be rendered");
-
+            
             component.set("v.value",true);
             $A.renderingService.rerender(component);
 
             expectedElem = component.find("img1").getElement();
             aura.test.assertTrue($A.util.hasClass(expectedElem, "checked"), "missing class: checked");
             aura.test.assertTrue($A.util.hasClass(expectedElem, "uiOutputCheckbox"), "missing class: uiOutputCheckbox");
-            //check to see if img2 is not rendered on the page after checkbox is checked
-            var oldElem = component.find("img2");
-            aura.test.assertFalse(oldElem.isRendered(), "img2 shouldn't be rendered");
         }
     },
 
@@ -64,17 +58,13 @@
             var expectedElem = component.find("img1").getElement();
             aura.test.assertTrue($A.util.hasClass(expectedElem, "checked"), "missing class: checked");
             aura.test.assertTrue($A.util.hasClass(expectedElem, "uiOutputCheckbox"), "missing class: uiOutputCheckbox");
-            aura.test.assertFalse(component.find("img2").isRendered(), "img2 shouldn't be rendered");
-
+            
             component.set("v.value",false);
             $A.renderingService.rerender(component);
 
-            expectedElem = component.find("img2").getElement();
+            expectedElem = component.find("img1").getElement();
             aura.test.assertTrue($A.util.hasClass(expectedElem, "unchecked"), "missing class: unchecked");
             aura.test.assertTrue($A.util.hasClass(expectedElem, "uiOutputCheckbox"), "missing class: uiOutputCheckbox");
-            //check to see if img1 is not rendered on the page after checkbox is unchecked
-            var oldElem = component.find("img1");
-            aura.test.assertFalse(oldElem.isRendered(), "img1 shouldn't be rendered");
       }
     }
 })

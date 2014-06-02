@@ -19,10 +19,6 @@
     <aura:attribute name="value" type="Boolean" required="true" access="GLOBAL" description="Specifies whether the checkbox is checked."/>
     <aura:attribute name="altChecked" type="String" default="checkbox checked" access="GLOBAL" description="The alternate text description when the checkbox is checked. Default value is &#8220;checkbox checked&#8221;."/>
     <aura:attribute name="altUnchecked" type="String" default="checkbox unchecked" access="GLOBAL" description="The alternate text description when the checkbox is unchecked. Default value is &#8220;checkbox unchecked&#8221;."/>
-    <aura:renderIf isTrue="{!v.value}">
-        <ui:image class="{!v.class + ' checked'}" aura:id="img1" alt="{!v.altChecked}"/>
-        <aura:set attribute="else">
-            <ui:image class="{!v.class + ' unchecked'}" aura:id="img2" alt="{!v.altUnchecked}"/>
-        </aura:set>
-    </aura:renderIf>
+    <ui:image class="{!v.value == true ? v.class + ' checked' : v.class + ' unchecked'}"
+    	aura:id="img1" alt="{!v.value == true ? v.altChecked : v.altUnchecked}"/>
 </aura:component>

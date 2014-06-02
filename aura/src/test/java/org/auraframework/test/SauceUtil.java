@@ -107,7 +107,10 @@ public final class SauceUtil {
             capabilities.setCapability("version", "34");
             capabilities.setCapability("chromedriver-version", "2.9");
             break;
+        default: //explicit no-op
         }
+    
+            
 
         // adding timeouts to prevent jobs to run for too long when problems
         // occur:

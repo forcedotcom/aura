@@ -4,11 +4,7 @@ import org.auraframework.test.perf.core.CustomPerfAbstractTestCase;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
-import java.util.logging.Logger;
-
 public final class DatePickerComponentTest extends CustomPerfAbstractTestCase {
-
-    private static final Logger logger = Logger.getLogger(DatePickerComponentTest.class.getSimpleName());
 
     public DatePickerComponentTest(String name) {
         super(name);

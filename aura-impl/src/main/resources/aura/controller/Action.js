@@ -548,7 +548,14 @@ Action.prototype.runDeprecated = function(evt) {
  * Gets the current state of the Action.
  *
  * @public
- * @returns {string} Possible values are "NEW", "RUNNING", and "FAILURE".
+ * @returns {string} The possible action states are:
+ *   "NEW": The action was created but is not in progress yet
+ *   "RUNNING": The action is in progress    
+ *   "SUCCESS": The action executed successfully
+ *   "FAILURE": Deprecated. ERROR is returned instead. The action failed. This state is only valid for client-side actions. 
+ *   "ERROR": The server returned an error
+ *   "INCOMPLETE": The server didn't return a response. The server might be down or the client might be offline.
+ *   "ABORTED": The action was aborted
  */
 Action.prototype.getState = function() {
     return this.state;
@@ -564,10 +571,23 @@ Action.prototype.getReturnValue = function() {
 };
 
 /**
- * Returns an error object with a message field, or in development modes, a stack field. For server-side Actions only.
- * <p>
- * For example, <code>$A.message(action.getError().message);</code> logs the error message.
- * </p>
+ * Returns an array of error objects only for server-side actions.
+ * Each error object has a message field.
+ * In any mode except PROD mode, each object also has a stack field, which is a list
+ * describing the execution stack when the error occurred.
+ * 
+ * For example, to log any errors:
+ * <pre><code>
+ * var errors = a.getError();
+ * if (errors)  {
+ *     $A.logf("Errors", errors);
+ *     if (errors[0] && errors[0].message) {
+ *         $A.error("Error message: " + errors[0].message);
+ *     }
+ * } else {
+ *     $A.error("Unknown error");
+ * }
+ * </code></pre>
  *
  * @public
  */

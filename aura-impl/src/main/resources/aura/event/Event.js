@@ -31,7 +31,9 @@ function Event(config) {
 Event.prototype.auraType = "Event";
 
 /**
- * Gets the source component associated with this Event.
+ * Gets the source component that fired this component event.
+ * This method doesn't work for application events.
+ * 
  * @returns {Object}
  */
 Event.prototype.getSource = function() {

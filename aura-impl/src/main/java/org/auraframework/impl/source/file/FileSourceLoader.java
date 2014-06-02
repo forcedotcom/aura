@@ -50,6 +50,7 @@ public class FileSourceLoader extends BaseSourceLoader implements PrivilegedName
         filters.put(DefType.APPLICATION, new SourceFileFilter(DefType.APPLICATION));
         filters.put(DefType.COMPONENT, new SourceFileFilter(DefType.COMPONENT));
         filters.put(DefType.EVENT, new SourceFileFilter(DefType.EVENT));
+        filters.put(DefType.LIBRARY, new SourceFileFilter(DefType.LIBRARY));
         filters.put(DefType.INTERFACE, new SourceFileFilter(DefType.INTERFACE));
         filters.put(DefType.STYLE, new SourceFileFilter(DefType.STYLE));
         filters.put(DefType.LAYOUTS, new SourceFileFilter(DefType.LAYOUTS));

@@ -35,7 +35,7 @@ import org.auraframework.impl.ClientServiceImpl;
 import org.auraframework.impl.ContextAdapterImpl;
 import org.auraframework.impl.DefinitionServiceImpl;
 import org.auraframework.impl.ExceptionAdapterImpl;
-import org.auraframework.impl.InstanceServiceImpl; 
+import org.auraframework.impl.InstanceServiceImpl;
 import org.auraframework.impl.IntegrationServiceImpl;
 import org.auraframework.impl.LocalizationServiceImpl;
 import org.auraframework.impl.LoggingAdapterImpl;
@@ -73,6 +73,7 @@ import org.auraframework.impl.adapter.format.json.ComponentDefRefJSONFormatAdapt
 import org.auraframework.impl.adapter.format.json.ComponentJSONFormatAdapter;
 import org.auraframework.impl.adapter.format.json.ControllerDefJSONFormatAdapter;
 import org.auraframework.impl.adapter.format.json.EventDefJSONFormatAdapter;
+import org.auraframework.impl.adapter.format.json.LibraryDefJSONFormatAdapter;
 import org.auraframework.impl.adapter.format.json.MessageJSONFormatAdapter;
 import org.auraframework.impl.adapter.format.json.TestSuiteDefJSONFormatAdapter;
 import org.auraframework.impl.adapter.format.json.ThrowableJSONFormatAdapter;
@@ -205,6 +206,11 @@ public class AuraImplConfig {
     @Impl
     public static FormatAdapter<?> eventDefJSONFormatAdapter() {
         return new EventDefJSONFormatAdapter();
+    }
+    
+    @Impl
+    public static FormatAdapter<?> libraryDefJSONFormatAdapter() {
+        return new LibraryDefJSONFormatAdapter();
     }
 
     @Impl

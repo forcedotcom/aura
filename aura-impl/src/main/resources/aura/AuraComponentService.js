@@ -29,6 +29,7 @@ $A.ns.AuraComponentService = function(actions, finishedCallback) {
     this.providerDefRegistry = new ProviderDefRegistry();
     this.rendererDefRegistry = new RendererDefRegistry();
     this.helperDefRegistry = new HelperDefRegistry();
+    this.libraryDefRegistry = new $A.ns.LibraryDefRegistry();
     this.indexes = { globalId : {} };
     this.renderedBy = "auraRenderedBy";
 };
@@ -432,8 +433,16 @@ $A.ns.AuraComponentService.prototype.getRendererDef = function(componentDefDescr
  * Gets the helper definition from the registry.
  * @private
  */
-$A.ns.AuraComponentService.prototype.getHelperDef = function(componentDefDescriptor, config, componentDef){
-    return this.helperDefRegistry.getDef(componentDefDescriptor, config, componentDef);
+$A.ns.AuraComponentService.prototype.getHelperDef = function(componentDefDescriptor, config, componentDef, libraries){
+    return this.helperDefRegistry.getDef(componentDefDescriptor, config, componentDef, libraries);
+};
+
+/**
+ * Gets the helper module from the registry.
+ * @private
+ */
+$A.ns.AuraComponentService.prototype.getLibraryDef = function(descriptor, libraryDef){
+    return this.libraryDefRegistry.getDef(descriptor, libraryDef);
 };
 
 /**

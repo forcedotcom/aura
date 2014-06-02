@@ -23,6 +23,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.InterfaceDef;
+import org.auraframework.def.LibraryDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.parser.XMLParser;
 import org.auraframework.impl.source.StringSourceLoader;
@@ -221,6 +222,9 @@ public abstract class BaseAccessAttributeEnforcementTest extends AuraImplTestCas
 		case Event:
 			classDef = EventDef.class;
 			break;
+		case Library:
+			classDef = LibraryDef.class;
+			break;
 		case RegisterEvent:
 			classDef = ComponentDef.class;
 		}
@@ -384,7 +388,7 @@ public abstract class BaseAccessAttributeEnforcementTest extends AuraImplTestCas
 	protected TestNamespace testConsumerNamespace;
 
 	protected enum TestResource {
-		Application, Component, Interface, Attribute, Event, RegisterEvent
+		Application, Component, Interface, Attribute, Event, RegisterEvent, Library
 	};
 
 	protected enum TestNamespace {

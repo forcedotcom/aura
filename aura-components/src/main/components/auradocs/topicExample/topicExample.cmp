@@ -22,4 +22,8 @@
     <aura:forEach items="{!m.defs}" var="def">
         <auradocs:editorPanel title="{!def.name+' source'}" descriptor="{!def.descriptor}" defType="{!def.defType}"/>
     </aura:forEach>
+    
+    <aura:forEach items="{!m.includeDefs}" var="def">
+        <auradocs:stretchEditorPanel title="{!def.includeDefName + '.js'}" descriptor="{!def.descriptor}" defType="{!def.defType}" includeDefName="{! def.includeDefName}"/>
+    </aura:forEach>
 </aura:component>

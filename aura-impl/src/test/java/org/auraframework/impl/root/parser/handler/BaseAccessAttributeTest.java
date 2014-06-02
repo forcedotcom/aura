@@ -23,6 +23,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.InterfaceDef;
+import org.auraframework.def.LibraryDef;
 import org.auraframework.def.ThemeDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.parser.XMLParser;
@@ -406,6 +407,9 @@ public abstract class BaseAccessAttributeTest extends AuraImplTestCase {
 			case Event:
 				classDef =  EventDef.class;
 				break;
+			case Module:
+				classDef =  LibraryDef.class;
+				break;
 			case Theme:
 				classDef =  ThemeDef.class;		
 				break;
@@ -719,7 +723,7 @@ public abstract class BaseAccessAttributeTest extends AuraImplTestCase {
 	protected TestResource testResource;
 	protected TestNamespace testNamespace;
 	
-	protected enum TestResource {Application, Component, Interface, Attribute, Event, Theme, RegisterEvent};
+	protected enum TestResource {Application, Component, Interface, Attribute, Event, Theme, RegisterEvent, Module};
 	
 	protected enum TestNamespace {System, Custom};
 	

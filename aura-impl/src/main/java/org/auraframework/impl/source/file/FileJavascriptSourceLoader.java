@@ -18,14 +18,17 @@ package org.auraframework.impl.source.file;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.IncludeDef;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -43,6 +46,7 @@ public class FileJavascriptSourceLoader extends FileSourceLoader {
         extensions.put(DefType.HELPER, "Helper.js");
         extensions.put(DefType.MODEL, "Model.js");
         extensions.put(DefType.RESOURCE, "Resource.js");
+        extensions.put(DefType.INCLUDE, ".js");
 
         filters.put(DefType.CONTROLLER, new SourceFileFilter(DefType.CONTROLLER));
         filters.put(DefType.RENDERER, new SourceFileFilter(DefType.RENDERER));
@@ -51,6 +55,7 @@ public class FileJavascriptSourceLoader extends FileSourceLoader {
         filters.put(DefType.HELPER, new SourceFileFilter(DefType.HELPER));
         filters.put(DefType.MODEL, new SourceFileFilter(DefType.MODEL));
         filters.put(DefType.RESOURCE, new SourceFileFilter(DefType.RESOURCE));
+        filters.put(DefType.INCLUDE, new LibraryFilter());
     }
 
     public FileJavascriptSourceLoader(File base) {
@@ -59,7 +64,23 @@ public class FileJavascriptSourceLoader extends FileSourceLoader {
 
     @Override
     public <D extends Definition> FileSource<D> getSource(DefDescriptor<D> descriptor) {
-
+        if (descriptor.getDefType() == DefType.INCLUDE) {
+            try {
+                IncludeDef def = (IncludeDef) descriptor.getDef();
+                String jsFilename = String.format("%s/%s/%s%s", descriptor.getNamespace(), descriptor.getName(),
+                    def.getLibraryName(), ".js");
+                File jsFile = new File(base, jsFilename);
+                String path = jsFile.getCanonicalPath();
+                return new FileLibrarySource<D>(descriptor, path, jsFile, null);
+            } catch (QuickFixException e) {
+        	     // do nothing.
+     	    } catch (IOException ex) {
+        	     // do nothing;
+            }
+            
+            return null;
+        }
+        
         String jsFilename = String.format("%s/%s/%s%s", descriptor.getNamespace(), descriptor.getName(),
                 descriptor.getName(), extensions.get(descriptor.getDefType()));
         File jsFile = new File(base, jsFilename);
@@ -89,6 +110,7 @@ public class FileJavascriptSourceLoader extends FileSourceLoader {
         Set<DefDescriptor<T>> ret = new HashSet<DefDescriptor<T>>();
         for (File file : files) {
             String name = file.getName();
+            System.err.println("[" + name + "]");
             if (name.endsWith(ext)) {
                 name = name.substring(0, name.length() - ext.length());
             }
@@ -108,6 +130,36 @@ public class FileJavascriptSourceLoader extends FileSourceLoader {
         @Override
         public boolean accept(File file) {
             return file.isDirectory() || file.getName().endsWith(extensions.get(defType));
+        }
+    }
+    
+    private static class LibraryFilter implements FileFilter {
+        @Override
+        public boolean accept(File file) {
+            if (file.isDirectory() || !file.getName().endsWith(".js")) {
+                return false;
+            }
+            
+            boolean isInLibrary = false;
+            
+            for (File siblng : file.getParentFile().listFiles()) {
+            	if (siblng.getName().endsWith(".lib")) {
+            		isInLibrary = true;
+            		break;
+            	}
+            }
+            
+            if (!isInLibrary) {
+            	return false;
+            }
+            
+            File folder = file.getParentFile();
+            if (folder != null) {
+                String libraryName = folder.getName();
+                return Arrays.asList(folder.list()).contains(libraryName);
+            } else {
+                return false;
+            }
         }
     }
 

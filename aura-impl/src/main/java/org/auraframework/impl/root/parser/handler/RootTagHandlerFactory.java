@@ -36,6 +36,9 @@ public class RootTagHandlerFactory {
         case EVENT:
             return (RootTagHandler<T>) new EventDefHandler((DefDescriptor<EventDef>) defDescriptor,
                     (Source<EventDef>) source, xmlReader);
+        case LIBRARY:
+            return (RootTagHandler<T>) new LibraryDefHandler((DefDescriptor<LibraryDef>) defDescriptor,
+                    (Source<LibraryDef>) source, xmlReader);
         case INTERFACE:
             return (RootTagHandler<T>) new InterfaceDefHandler((DefDescriptor<InterfaceDef>) defDescriptor,
                     (Source<InterfaceDef>) source, xmlReader);

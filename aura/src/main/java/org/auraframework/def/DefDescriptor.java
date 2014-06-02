@@ -91,6 +91,8 @@ public interface DefDescriptor<T extends Definition> extends JsonSerializable,
 		INTERFACE(InterfaceDef.class), //
 		CONTROLLER(ControllerDef.class), //
 		MODEL(ModelDef.class), //
+		LIBRARY(LibraryDef.class), //
+		INCLUDE(IncludeDef.class), //
 		RENDERER(RendererDef.class), //
 		ACTION(ActionDef.class), //
 		TYPE(TypeDef.class), //

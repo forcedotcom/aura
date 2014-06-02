@@ -116,6 +116,7 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef> extend
         builder.events = Maps.newHashMap();
         builder.interfaces = Sets.newLinkedHashSet();
         builder.eventHandlers = Lists.newArrayList();
+        builder.imports = Lists.newArrayList();
         builder.controllerDescriptors = Lists.newArrayList();
         builder.facets = Lists.newArrayList();
         builder.expressionRefs = Sets.newHashSet();
@@ -150,6 +151,9 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef> extend
             builder.events.put(regDef.getAttributeName(), regDef);
         } else if (EventHandlerDefHandler.TAG.equalsIgnoreCase(tag)) {
             builder.eventHandlers.add(new EventHandlerDefHandler(this,
+                    xmlReader, source).getElement());
+        } else if (ImportDefHandler.TAG.equalsIgnoreCase(tag)) {
+            builder.imports.add(new ImportDefHandler(this,
                     xmlReader, source).getElement());
         } else if (AttributeDefRefHandler.TAG.equalsIgnoreCase(tag)) {
             builder.facets.add(new AttributeDefRefHandler<T>(this, xmlReader,

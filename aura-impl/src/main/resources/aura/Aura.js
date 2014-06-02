@@ -76,6 +76,7 @@ var clientService;
 // #include aura.renderer.RendererDef
 // #include aura.provider.ProviderDef
 // #include aura.helper.HelperDefRegistry
+// #include aura.library.LibraryDefRegistry
 // #include aura.event.EventDefRegistry
 // #include aura.event.EventDef
 // #include aura.event.Event

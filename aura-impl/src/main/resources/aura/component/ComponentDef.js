@@ -21,119 +21,127 @@
  * @protected
  */
 $A.ns.ComponentDef = function ComponentDef(config) {
-	var descriptor = new DefDescriptor(config["descriptor"]);
-	this.descriptor = descriptor;
-	if (config["hasServerDeps"]) {
-		this.hasRemoteDeps = true;
-	}
+    var descriptor = new DefDescriptor(config["descriptor"]);
+    this.descriptor = descriptor;
+    if (config["hasServerDeps"]) {
+        this.hasRemoteDeps = true;
+    }
 
-	this.superDef = this.initSuperDef(config["superDef"]);
-	this.styleDef = config["styleDef"] ? new StyleDef(config["styleDef"]) : undefined;
+    this.superDef = this.initSuperDef(config["superDef"]);
+    this.styleDef = config["styleDef"] ? new StyleDef(config["styleDef"]) : undefined;
 
-	this.controllerDef = config["controllerDef"] ? componentService.getControllerDef(config["controllerDef"]) : undefined;
-	this.modelDef = config["modelDef"] ? componentService.getModelDef(config["modelDef"]) : undefined;
+    this.controllerDef = config["controllerDef"] ? componentService.getControllerDef(config["controllerDef"]) : undefined;
+    this.modelDef = config["modelDef"] ? componentService.getModelDef(config["modelDef"]) : undefined;
 
-	this.interfaces = {};
-	var intfConfig = config["interfaces"];
-	if (intfConfig) {
-		for (var m = 0; m < intfConfig.length; m++) {
-			var intf = new DefDescriptor(intfConfig[m]);
-			var intfName = intf.getNamespace() + ":" + intf.getName();
-			this.interfaces[intfName] = true;
-		}
-	}
+    this.interfaces = {};
+    var intfConfig = config["interfaces"];
+    if (intfConfig) {
+        for (var m = 0; m < intfConfig.length; m++) {
+            var intf = new DefDescriptor(intfConfig[m]);
+            var intfName = intf.getNamespace() + ":" + intf.getName();
+            this.interfaces[intfName] = true;
+        }
+    }
 
-	var appHandlerDefs;
-	var cmpHandlerDefs;
-	var valueHandlerDefs;
+    var appHandlerDefs;
+    var cmpHandlerDefs;
+    var valueHandlerDefs;
 
-	this.facets = config["facets"];
-	this.isAbs = !!config["isAbstract"];
-	if (config["layouts"]) {
-		this.layouts = new LayoutsDef(config["layouts"]);
-	} else {
-		this.layouts = null;
-	}
+    this.facets = config["facets"];
+    this.isAbs = !!config["isAbstract"];
+    if (config["layouts"]) {
+        this.layouts = new LayoutsDef(config["layouts"]);
+    } else {
+        this.layouts = null;
+    }
 
-	if (config["locationChangeEventDef"]) {
-		this.locationChangeEventDef = eventService.getEventDef(config["locationChangeEventDef"]);
-	} else {
-		this.locationChangeEventDef = null;
-	}
+    if (config["locationChangeEventDef"]) {
+        this.locationChangeEventDef = eventService.getEventDef(config["locationChangeEventDef"]);
+    } else {
+        this.locationChangeEventDef = null;
+    }
 
-	var registerEventDefs = {};
-	this.registerEventDefs = registerEventDefs;
-	var allEvents = [];
-	this.allEvents = allEvents;
-	var cred = config["registerEventDefs"];
-	if (cred) {
-		for (var i = 0; i < cred.length; i++) {
-			var regConfig = cred[i];
-			var name = regConfig["attributeName"];
-			allEvents.push(name);
-			registerEventDefs[name] = eventService.getEventDef(regConfig["eventDef"]);
-		}
-	}
-	
-	var handlerDefConfigs = config["handlerDefs"];
-	if (handlerDefConfigs) {
-		for (var j = 0; j < handlerDefConfigs.length; j++) {
-			var handlerConfig = handlerDefConfigs[j];
-			if (handlerConfig["eventDef"]) {
-				//
-				// We cannot modify handlerConfig here, as it is sometimes
-				// stored
-				// in localStorage. We used to replace eventDef with the actual
-				// eventDef, but the json serialize-deserialize loses the object
-				// prototype.
-				//
-				appHandlerConfig = {
-					"action" : handlerConfig["action"],
-					"eventDef" : eventService.getEventDef(handlerConfig["eventDef"])
-				};
-				if (!appHandlerDefs) {
-					appHandlerDefs = [];
-				}
-				appHandlerDefs.push(appHandlerConfig);
-			} else if (handlerConfig["value"]) {
-				if (!valueHandlerDefs) {
-					valueHandlerDefs = [];
-				}
-				valueHandlerDefs.push(handlerConfig);
-			} else {
-				if (!cmpHandlerDefs) {
-					cmpHandlerDefs = [];
-				}
-				cmpHandlerDefs.push(handlerConfig);
-			}
+    var registerEventDefs = {};
+    this.registerEventDefs = registerEventDefs;
+    var allEvents = [];
+    this.allEvents = allEvents;
+    var cred = config["registerEventDefs"];
+    if (cred) {
+        for (var i = 0; i < cred.length; i++) {
+            var regConfig = cred[i];
+            var name = regConfig["attributeName"];
+            allEvents.push(name);
+            registerEventDefs[name] = eventService.getEventDef(regConfig["eventDef"]);
+        }
+    }
+    
+    var handlerDefConfigs = config["handlerDefs"];
+    if (handlerDefConfigs) {
+        for (var j = 0; j < handlerDefConfigs.length; j++) {
+            var handlerConfig = handlerDefConfigs[j];
+            if (handlerConfig["eventDef"]) {
+                //
+                // We cannot modify handlerConfig here, as it is sometimes
+                // stored
+                // in localStorage. We used to replace eventDef with the actual
+                // eventDef, but the json serialize-deserialize loses the object
+                // prototype.
+                //
+                appHandlerConfig = {
+                    "action" : handlerConfig["action"],
+                    "eventDef" : eventService.getEventDef(handlerConfig["eventDef"])
+                };
+                if (!appHandlerDefs) {
+                    appHandlerDefs = [];
+                }
+                appHandlerDefs.push(appHandlerConfig);
+            } else if (handlerConfig["value"]) {
+                if (!valueHandlerDefs) {
+                    valueHandlerDefs = [];
+                }
+                valueHandlerDefs.push(handlerConfig);
+            } else {
+                if (!cmpHandlerDefs) {
+                    cmpHandlerDefs = [];
+                }
+                cmpHandlerDefs.push(handlerConfig);
+            }
 
-		}
-	}
-	var subDefs = config["subDefs"];
-	if (subDefs) {
-		for (var k = 0; k < subDefs.length; k++) {
-			componentService.getDef(subDefs[k]);
-		}
-	}
+        }
+    }
+    var subDefs = config["subDefs"];
+    if (subDefs) {
+        for (var k = 0; k < subDefs.length; k++) {
+            componentService.getDef(subDefs[k]);
+        }
+    }
+    
+    var imports = config["imports"];
+    if (imports) {
+        this.libraryDefs = $A.util.reduce(imports, function(libraryDefs, imported) {
+            libraryDefs[imported["property"]] = componentService.getLibraryDef(imported.name, imported["libraryDef"]);
+            return libraryDefs;
+        }, {});
+    }
 
-	this.appHandlerDefs = appHandlerDefs || null;
-	this.cmpHandlerDefs = cmpHandlerDefs || null;
-	this.valueHandlerDefs = valueHandlerDefs || null;
-	this.isCSSPreloaded = config["isCSSPreloaded"] || false;
+    this.appHandlerDefs = appHandlerDefs || null;
+    this.cmpHandlerDefs = cmpHandlerDefs || null;
+    this.valueHandlerDefs = valueHandlerDefs || null;
+    this.isCSSPreloaded = config["isCSSPreloaded"] || false;
 
-	this.attributeDefs = new AttributeDefSet(config["attributeDefs"]);
-	
-	this.rendererDef = componentService.getRendererDef(descriptor, config["rendererDef"]);
-	this.initRenderer();
-	
-	this.helperDef = componentService.getHelperDef(descriptor, config["helperDef"], this);
+    this.attributeDefs = new AttributeDefSet(config["attributeDefs"]);
+    
+    this.rendererDef = componentService.getRendererDef(descriptor, config["rendererDef"]);
+    this.initRenderer();
+    
+    this.helperDef = componentService.getHelperDef(descriptor, config["helperDef"], this, this.libraryDefs);
 
-	var providerDef = config["providerDef"];
-	if (providerDef) {
-		this.providerDef = componentService.getProviderDef(descriptor, providerDef);
-	} else {
-		this.providerDef = null;
-	}
+    var providerDef = config["providerDef"];
+    if (providerDef) {
+        this.providerDef = componentService.getProviderDef(descriptor, providerDef);
+    } else {
+        this.providerDef = null;
+    }
 };
 
 $A.ns.ComponentDef.prototype.auraType = "ComponentDef";
@@ -145,7 +153,7 @@ $A.ns.ComponentDef.prototype.auraType = "ComponentDef";
  *          and name.
  */
 $A.ns.ComponentDef.prototype.getDescriptor = function() {
-	return this.descriptor;
+    return this.descriptor;
 };
 
 /**
@@ -155,7 +163,7 @@ $A.ns.ComponentDef.prototype.getDescriptor = function() {
  * @returns {Boolean} True if component is abstract, or false otherwise.
  */
 $A.ns.ComponentDef.prototype.isAbstract = function() {
-	return this.isAbs;
+    return this.isAbs;
 };
 
 /**
@@ -165,7 +173,7 @@ $A.ns.ComponentDef.prototype.isAbstract = function() {
  * @return {ComponentDef} The ComponentDef for the immediate super type
  */
 $A.ns.ComponentDef.prototype.getSuperDef = function() {
-	return this.superDef;
+    return this.superDef;
 };
 
 /**
@@ -174,7 +182,7 @@ $A.ns.ComponentDef.prototype.getSuperDef = function() {
  * @returns {HelperDef}
  */
 $A.ns.ComponentDef.prototype.getHelperDef = function() {
-	return this.helperDef;
+    return this.helperDef;
 };
 
 /**
@@ -183,11 +191,11 @@ $A.ns.ComponentDef.prototype.getHelperDef = function() {
  * @returns {Helper}
  */
 $A.ns.ComponentDef.prototype.getHelper = function() {
-	var def = this.getHelperDef();
-	if (def) {
-		return def.getFunctions();
-	}
-	return def;
+    var def = this.getHelperDef();
+    if (def) {
+        return def.getFunctions();
+    }
+    return def;
 };
 
 /**
@@ -196,7 +204,7 @@ $A.ns.ComponentDef.prototype.getHelper = function() {
  * @returns {RendererDef}
  */
 $A.ns.ComponentDef.prototype.getRendererDef = function() {
-	return this.rendererDef;
+    return this.rendererDef;
 };
 
 /**
@@ -206,14 +214,14 @@ $A.ns.ComponentDef.prototype.getRendererDef = function() {
  * @returns {Boolean} True if remote dependencies exist, or false otherwise.
  */
 $A.ns.ComponentDef.prototype.hasRemoteDependencies = function() {
-	return this.hasRemoteDeps;
+    return this.hasRemoteDeps;
 };
 
 /**
  * @private
  */
 $A.ns.ComponentDef.prototype.getRenderingDetails = function() {
-	return this.renderingDetails;
+    return this.renderingDetails;
 };
 
 /**
@@ -222,7 +230,7 @@ $A.ns.ComponentDef.prototype.getRenderingDetails = function() {
  * @returns {ProviderDef}
  */
 $A.ns.ComponentDef.prototype.getProviderDef = function() {
-	return this.providerDef;
+    return this.providerDef;
 };
 
 /**
@@ -232,7 +240,7 @@ $A.ns.ComponentDef.prototype.getProviderDef = function() {
  * @returns {StyleDef}
  */
 $A.ns.ComponentDef.prototype.getAllStyleDefs = function() {
-	return this.allStyleDefs;
+    return this.allStyleDefs;
 };
 
 /**
@@ -245,25 +253,25 @@ $A.ns.ComponentDef.prototype.getAllStyleDefs = function() {
  * @returns {String} The style class name
  */
 $A.ns.ComponentDef.prototype.getStyleClassName = function() {
-	var className = this.styleClassName;
-	if (!className) {
-		className = "";
-		var styleDefs = this.getAllStyleDefs();
-		if (styleDefs) {
-			var styleDefLen = styleDefs.length;
-			for (var t = 0; t < styleDefLen; t++) {
-				var styleDef = styleDefs[t];
-				className = className + styleDef.getClassName() + " ";
-				// Preloaded CSS should already be included in app.css
-				if (!this.isCSSPreloaded) {
-					styleDef.apply();
-				}
-			}
+    var className = this.styleClassName;
+    if (!className) {
+        className = "";
+        var styleDefs = this.getAllStyleDefs();
+        if (styleDefs) {
+            var styleDefLen = styleDefs.length;
+            for (var t = 0; t < styleDefLen; t++) {
+                var styleDef = styleDefs[t];
+                className = className + styleDef.getClassName() + " ";
+                // Preloaded CSS should already be included in app.css
+                if (!this.isCSSPreloaded) {
+                    styleDef.apply();
+                }
+            }
 
-		}
-		this.styleClassName = className;
-	}
-	return className;
+        }
+        this.styleClassName = className;
+    }
+    return className;
 };
 
 /**
@@ -272,7 +280,7 @@ $A.ns.ComponentDef.prototype.getStyleClassName = function() {
  * @returns {StyleDef}
  */
 $A.ns.ComponentDef.prototype.getStyleDef = function() {
-	return this.styleDef;
+    return this.styleDef;
 };
 
 /**
@@ -281,7 +289,7 @@ $A.ns.ComponentDef.prototype.getStyleDef = function() {
  * @returns {AttributeDefSet}
  */
 $A.ns.ComponentDef.prototype.getAttributeDefs = function() {
-	return this.attributeDefs;
+    return this.attributeDefs;
 };
 
 /**
@@ -290,7 +298,7 @@ $A.ns.ComponentDef.prototype.getAttributeDefs = function() {
  * @returns {Object}
  */
 $A.ns.ComponentDef.prototype.getFacets = function() {
-	return this.facets;
+    return this.facets;
 };
 
 /**
@@ -299,7 +307,7 @@ $A.ns.ComponentDef.prototype.getFacets = function() {
  * @returns {ControllerDef}
  */
 $A.ns.ComponentDef.prototype.getControllerDef = function() {
-	return this.controllerDef;
+    return this.controllerDef;
 };
 
 /**
@@ -308,7 +316,7 @@ $A.ns.ComponentDef.prototype.getControllerDef = function() {
  * @returns {ModelDef}
  */
 $A.ns.ComponentDef.prototype.getModelDef = function() {
-	return this.modelDef;
+    return this.modelDef;
 };
 
 /**
@@ -321,11 +329,11 @@ $A.ns.ComponentDef.prototype.getModelDef = function() {
  * @returns{Object}
  */
 $A.ns.ComponentDef.prototype.getEventDef = function(name, includeValueEvents) {
-	var ret = this.registerEventDefs[name];
-	if (!ret && includeValueEvents) {
-		ret = BaseValue.getEventDef(name);
-	}
-	return ret;
+    var ret = this.registerEventDefs[name];
+    if (!ret && includeValueEvents) {
+        ret = BaseValue.getEventDef(name);
+    }
+    return ret;
 };
 
 /**
@@ -341,12 +349,12 @@ $A.ns.ComponentDef.prototype.getEventDef = function(name, includeValueEvents) {
  * @protected
  */
 $A.ns.ComponentDef.prototype.getEventNameByDescriptor = function(descriptor) {
-	for (var name in this.registerEventDefs) {
-		if (this.registerEventDefs[name] && this.registerEventDefs[name].descriptor && this.registerEventDefs[name].descriptor.qualifiedName === descriptor) {
-			return name;
-		}
-	}
-	return null;
+    for (var name in this.registerEventDefs) {
+        if (this.registerEventDefs[name] && this.registerEventDefs[name].descriptor && this.registerEventDefs[name].descriptor.qualifiedName === descriptor) {
+            return name;
+        }
+    }
+    return null;
 };
 
 /**
@@ -355,7 +363,7 @@ $A.ns.ComponentDef.prototype.getEventNameByDescriptor = function(descriptor) {
  * @returns {Object}
  */
 $A.ns.ComponentDef.prototype.getAllEvents = function() {
-	return this.allEvents;
+    return this.allEvents;
 };
 
 /**
@@ -364,7 +372,7 @@ $A.ns.ComponentDef.prototype.getAllEvents = function() {
  * @returns {Object}
  */
 $A.ns.ComponentDef.prototype.getAppHandlerDefs = function() {
-	return this.appHandlerDefs;
+    return this.appHandlerDefs;
 };
 
 /**
@@ -373,7 +381,7 @@ $A.ns.ComponentDef.prototype.getAppHandlerDefs = function() {
  * @returns {Object}
  */
 $A.ns.ComponentDef.prototype.getCmpHandlerDefs = function() {
-	return this.cmpHandlerDefs;
+    return this.cmpHandlerDefs;
 };
 
 /**
@@ -382,7 +390,7 @@ $A.ns.ComponentDef.prototype.getCmpHandlerDefs = function() {
  * @returns {Object}
  */
 $A.ns.ComponentDef.prototype.getValueHandlerDefs = function() {
-	return this.valueHandlerDefs;
+    return this.valueHandlerDefs;
 };
 
 /**
@@ -391,7 +399,7 @@ $A.ns.ComponentDef.prototype.getValueHandlerDefs = function() {
  * @returns {String}
  */
 $A.ns.ComponentDef.prototype.toString = function() {
-	return this.getDescriptor().getQualifiedName();
+    return this.getDescriptor().getQualifiedName();
 };
 
 /**
@@ -405,14 +413,14 @@ $A.ns.ComponentDef.prototype.toString = function() {
  * @returns {Boolean} True if the Component is an instance, or false otherwise.
  */
 $A.ns.ComponentDef.prototype.isInstanceOf = function(name) {
-	var thisName = this.descriptor.getNamespace() + ":" + this.descriptor.getName();
-	if (thisName === name || this.implementsDirectly(name)) {
-		return true;
-	}
-	if (this.superDef) {
-		return this.superDef.isInstanceOf(name);
-	}
-	return false;
+    var thisName = this.descriptor.getNamespace() + ":" + this.descriptor.getName();
+    if (thisName === name || this.implementsDirectly(name)) {
+        return true;
+    }
+    if (this.superDef) {
+        return this.superDef.isInstanceOf(name);
+    }
+    return false;
 };
 
 /**
@@ -421,7 +429,7 @@ $A.ns.ComponentDef.prototype.isInstanceOf = function(name) {
  * @private
  */
 $A.ns.ComponentDef.prototype.implementsDirectly = function(type) {
-	return !$A.util.isUndefined(this.interfaces[type]);
+    return !$A.util.isUndefined(this.interfaces[type]);
 };
 
 /**
@@ -429,27 +437,27 @@ $A.ns.ComponentDef.prototype.implementsDirectly = function(type) {
  * the format <code>markup://aura:locationChange</code>.
  */
 $A.ns.ComponentDef.prototype.getLocationChangeEvent = function() {
-	var evt = this.locationChangeEventDef;
-	if (evt) {
-		return evt.getDescriptor().getQualifiedName();
-	}
-	return "markup://aura:locationChange";
+    var evt = this.locationChangeEventDef;
+    if (evt) {
+        return evt.getDescriptor().getQualifiedName();
+    }
+    return "markup://aura:locationChange";
 };
 
 $A.ns.ComponentDef.prototype.getLayouts = function() {
-	return this.layouts;
+    return this.layouts;
 };
 
 /**
  * @private
  */
 $A.ns.ComponentDef.prototype.initSuperDef = function(config) {
-	if (config) {
-		var sdef = $A.componentService.getDef(config);
-		$A.assert(sdef, "Super def undefined for " + this.descriptor + " value = " + config["descriptor"]);
-		return sdef;
-	}
-	return null;
+    if (config) {
+        var sdef = $A.componentService.getDef(config);
+        $A.assert(sdef, "Super def undefined for " + this.descriptor + " value = " + config["descriptor"]);
+        return sdef;
+    }
+    return null;
 };
 
 /**
@@ -461,38 +469,38 @@ $A.ns.ComponentDef.prototype.initSuperDef = function(config) {
  * @private
  */
 $A.ns.ComponentDef.prototype.initRenderer = function() {
-	var rd = {
-		distance : 0,
-		rendererDef : this.rendererDef
-	};
-	this.allStyleDefs = [];
-	var s = this.superDef;
-	if (s) {
-		if (!this.rendererDef) {
-			// no rendererdef, get the superdefs
-			var superStuff = s.getRenderingDetails();
-			if (superStuff) {
-				rd.rendererDef = superStuff.rendererDef;
-				rd.distance = superStuff.distance + 1;
-			}
-		}
-		var superStyles = s.getAllStyleDefs();
-		if (superStyles) {
-			this.allStyleDefs = this.allStyleDefs.concat(superStyles);
-		}
-	}
-	if (this.styleDef) {
-		this.allStyleDefs.push(this.styleDef);
-	}
-	if (!rd.rendererDef) {
-		//
-		// If we don't have a renderer, make sure we mark that here. Note
-		// that we can't assert that we have a renderer, because sometimes
-		// there are component defs that don't, maybe the server shouldn't
-		// send them down, as they cannot be instantiated on the client.
-		//
-		rd = undefined;
-	}
-	this.renderingDetails = rd;
+    var rd = {
+        distance : 0,
+        rendererDef : this.rendererDef
+    };
+    this.allStyleDefs = [];
+    var s = this.superDef;
+    if (s) {
+        if (!this.rendererDef) {
+            // no rendererdef, get the superdefs
+            var superStuff = s.getRenderingDetails();
+            if (superStuff) {
+                rd.rendererDef = superStuff.rendererDef;
+                rd.distance = superStuff.distance + 1;
+            }
+        }
+        var superStyles = s.getAllStyleDefs();
+        if (superStyles) {
+            this.allStyleDefs = this.allStyleDefs.concat(superStyles);
+        }
+    }
+    if (this.styleDef) {
+        this.allStyleDefs.push(this.styleDef);
+    }
+    if (!rd.rendererDef) {
+        //
+        // If we don't have a renderer, make sure we mark that here. Note
+        // that we can't assert that we have a renderer, because sometimes
+        // there are component defs that don't, maybe the server shouldn't
+        // send them down, as they cannot be instantiated on the client.
+        //
+        rd = undefined;
+    }
+    this.renderingDetails = rd;
 };
 // #include aura.component.ComponentDef_export

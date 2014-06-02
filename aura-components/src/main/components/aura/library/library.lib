@@ -1,0 +1,4 @@
+<aura:library support="BETA" description="Represents a collection of reusable Javascript modules that are bundled together to make up a single resource. Library can be imported by components and are attached by a specified property to its helper.">
+    <aura:include name="MyDependency" imports="uiExamples:libraryExternal:jsfile"/>
+    <aura:include name="MyLib" imports="MyDependency" />
+</aura:library>

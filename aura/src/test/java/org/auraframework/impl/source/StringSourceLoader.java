@@ -20,7 +20,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
-
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -39,6 +38,7 @@ import org.auraframework.def.EventDef;
 import org.auraframework.def.HelperDef;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.LayoutsDef;
+import org.auraframework.def.LibraryDef;
 import org.auraframework.def.ModelDef;
 import org.auraframework.def.NamespaceDef;
 import org.auraframework.def.ProviderDef;
@@ -81,8 +81,8 @@ public class StringSourceLoader implements SourceLoader, PrivilegedNamespaceSour
             DefDescriptor.MARKUP_PREFIX, DefDescriptor.JAVASCRIPT_PREFIX,
             DefDescriptor.CSS_PREFIX, DefDescriptor.TEMPLATE_CSS_PREFIX);
     private static final Set<DefType> DEFTYPES = ImmutableSet.of(
-            DefType.APPLICATION, DefType.COMPONENT, DefType.EVENT,
-            DefType.INTERFACE, DefType.LAYOUTS, DefType.CONTROLLER,
+            DefType.APPLICATION, DefType.COMPONENT, DefType.EVENT, DefType.LIBRARY,
+            DefType.INCLUDE, DefType.INTERFACE, DefType.LAYOUTS, DefType.CONTROLLER,
             DefType.HELPER, DefType.NAMESPACE, DefType.RENDERER, DefType.STYLE,
             DefType.TESTSUITE, DefType.RESOURCE);
 
@@ -402,6 +402,7 @@ public class StringSourceLoader implements SourceLoader, PrivilegedNamespaceSour
         APPLICATION(ApplicationDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
         COMPONENT(ComponentDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
         EVENT(EventDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
+        LIBRARY(LibraryDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
         INTERFACE(InterfaceDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
         LAYOUTS(LayoutsDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
         NAMESPACE(NamespaceDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ""),

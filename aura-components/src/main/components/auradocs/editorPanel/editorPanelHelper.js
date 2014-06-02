@@ -31,7 +31,7 @@
 		} else if (descriptor.indexOf("java://") == 0) {
 			parserFile = ["../contrib/java/js/tokenizejava.js", "../contrib/java/js/parsejava.js"];
 			stylesheet = "/auraFW/resources/codemirror/contrib/java/css/javacolors.css";
-		} else if (descriptor.indexOf("js://") == 0) {
+		} else if (descriptor.indexOf("js://") == 0 || descriptor.indexOf("markup://aura:library") == 0) {
 			parserFile = ["tokenizejavascript.js", "parsejavascript.js"];
 			stylesheet = "/auraFW/resources/codemirror/css/jscolors.css";
 		} else if (descriptor.indexOf("css://") == 0) {

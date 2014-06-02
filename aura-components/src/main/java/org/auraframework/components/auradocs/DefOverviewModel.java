@@ -27,6 +27,7 @@ import org.auraframework.def.Definition;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.EventHandlerDef;
 import org.auraframework.def.InterfaceDef;
+import org.auraframework.def.LibraryDef;
 import org.auraframework.def.RegisterEventDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.docs.ReferenceTreeModel;
@@ -69,7 +70,7 @@ public class DefOverviewModel {
         descriptor = Aura.getDefinitionService().getDefDescriptor(desc, defType.getPrimaryInterface());
         definition = descriptor.getDef();
         
-		ReferenceTreeModel.assertAccess(definition);
+        ReferenceTreeModel.assertAccess(definition);
 
         String type = null;
 
@@ -109,6 +110,10 @@ public class DefOverviewModel {
 
                 type = eventDef.getEventType().name();
                 isExtensible = true;
+                isAbstract = false;
+            } else if (definition instanceof LibraryDef) {
+                theSuper = null;
+                isExtensible = false;
                 isAbstract = false;
             } else {
                 theSuper = null;

@@ -51,7 +51,8 @@ public class AuraRegistryProviderImpl implements RegistryAdapter {
 
     private static final Set<String> rootPrefixes = ImmutableSet.of(DefDescriptor.MARKUP_PREFIX);
     private static final Set<DefType> rootDefTypes = EnumSet.of(DefType.APPLICATION, DefType.COMPONENT,
-            DefType.INTERFACE, DefType.EVENT, DefType.LAYOUTS, DefType.NAMESPACE, DefType.THEME, DefType.DOCUMENTATION);
+            DefType.INTERFACE, DefType.EVENT, DefType.LIBRARY, DefType.LAYOUTS, DefType.NAMESPACE, DefType.THEME, 
+            DefType.DOCUMENTATION, DefType.INCLUDE);
 
     @Override
     public DefRegistry<?>[] getRegistries(Mode mode, Authentication access, Set<SourceLoader> extraLoaders) {
@@ -62,6 +63,7 @@ public class AuraRegistryProviderImpl implements RegistryAdapter {
 
             List<SourceLoader> markupLoaders = Lists.newArrayList();
             List<SourceLoader> jsLoaders = Lists.newArrayList();
+            List<SourceLoader> libraryLoaders = Lists.newArrayList();
             List<SourceLoader> styleLoaders = Lists.newArrayList();
             List<SourceLoader> javaLoaders = Lists.newArrayList();
 
@@ -82,6 +84,7 @@ public class AuraRegistryProviderImpl implements RegistryAdapter {
                             continue;
                         }
                         jsLoaders.add(new FileJavascriptSourceLoader(location.getComponentSourceDir()));
+                        libraryLoaders.add(new FileJavascriptSourceLoader(location.getComponentSourceDir()));
                         styleLoaders.add(new FileStyleSourceLoader(location.getComponentSourceDir()));
                         markupLoaders.add(new FileSourceLoader(location.getComponentSourceDir()));
                         File javaBase = new File(location.getComponentSourceDir().getParent(), "java");
@@ -113,6 +116,7 @@ public class AuraRegistryProviderImpl implements RegistryAdapter {
             }
 
             SourceFactory jsSourceFactory = new SourceFactory(jsLoaders);
+            SourceFactory librarySourceFactory = new SourceFactory(libraryLoaders);
 
             ret = new DefRegistry<?>[] {
                     AuraStaticTypeDefRegistry.INSTANCE,
@@ -136,6 +140,7 @@ public class AuraRegistryProviderImpl implements RegistryAdapter {
                     AuraRegistryProviderImpl.<ProviderDef> createJavascriptRegistry(jsSourceFactory, DefType.PROVIDER),
                     AuraRegistryProviderImpl.<ModelDef> createJavascriptRegistry(jsSourceFactory, DefType.MODEL),
                     AuraRegistryProviderImpl.<ResourceDef> createJavascriptRegistry(jsSourceFactory, DefType.RESOURCE),
+                    AuraRegistryProviderImpl.<IncludeDef> createJavascriptRegistry(librarySourceFactory, DefType.INCLUDE),
 
                     createDefRegistry(new StyleDefFactory(new SourceFactory(styleLoaders)),
                             Sets.newHashSet(DefType.STYLE, DefType.RESOURCE),

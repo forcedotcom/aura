@@ -153,12 +153,14 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
             case TESTCASE:
             case VAR:
             case THEME_DEF_REF:
+            case INCLUDE:
                 name = qualifiedName;
                 break;
             case APPLICATION:
             case COMPONENT:
             case INTERFACE:
             case EVENT:
+            case LIBRARY:
             case DOCUMENTATION:
             case EXAMPLE:
             case LAYOUTS:

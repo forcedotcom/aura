@@ -1,0 +1,129 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:documentation>
+    <aura:description>
+        <p>
+            Libraries allow for the bundling of related resources, which encapsulate modular and reusable Javascript code.
+            A library can then be imported by a component via the <code>aura:import</code> tag. The resources files will the be
+            attached to the component's helper (using a specifiable property name). 
+        </p>
+        <p>
+            Every library is part of a namespace. For example, the <code>MyLib</code> library is saved as <code>MyLib</code> in the <code>jsLibraries</code> namespace can be referenced in another component
+            with the syntax <code>&lt;aura:import library="jsLibraries:MyLib" property="MyLib"/&gt;</code>, where
+            <code>library="jsLibraries:MyLib"</code> specifies the location of the Library and
+            <code>property="MyLib"</code> specifies that the files modules include in MyLib are accessible via <code>helper.MyLib</code>.
+        </p>
+        <p>
+            To create a library, follow this syntax.
+<pre>
+&lt;aura:library&gt;
+  &lt;!-- Here fileName.js depends on the file dependency.js --&gt;
+  &lt;!-- also note that the name field is specified without the .js suffix --&gt;
+  &lt;aura:include name="dependency"&gt;
+  &lt;aura:include name="fileName" import="dependency"&gt; 
+&lt;/aura:library&gt;
+
+</pre>
+        </p>
+      
+    <br />
+    <p>
+        <h3>Supported Tags</h3>
+        <table class="bordered striped">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <a href="#reference?descriptor=aura:include&amp;defType=component">
+                            aura:include
+                        </a>
+                    </td>
+                    <td>Allows for the specification of which Javascript files are loaded and which modules depend on which.</td>
+                </tr>
+            </tbody>
+        </table>
+    </p>
+    <br />
+    <p>
+        <h3>Javascript file format</h3>
+        <p> 
+            Importable javascript files must be functions. The return value of these functions is what is attached to the helper when
+            the library is imported by a component.
+            
+            If the Javascript module requires another file in the library, provide a comma separated list of file names (without the .js) in the
+            <code>aura:include</code> tag. The imported modules will be passed in as arguments to the module's function.
+        </p>
+        
+        <p>
+            <h5>Example:</h5>
+            <p> 
+                Here there are two files: MyLib.js and MyDependency.js. MyLib.js requires MyDependency.js.
+                The includes in the .lib file look like this:
+                <p>
+                    <code>
+                        &lt;aura:include name="MyDependency" import="namespace:library:jsfile"&gt;
+                    </code>
+                </p>
+                <p>
+                    <code>
+                        &lt;aura:include name="MyLib" import="MyDependency"&gt;
+                    </code>
+                </p>
+                
+                Here, the both files define an object with a getId method and MyLib's getValue method includes
+                the result of it's dependency's getValue method. MyDependency imports and uses the jsfile
+                include in the namespace:library library bundle (in the live example the file is located in the
+                uiExamples:libraryExternal bundle).
+            <pre>
+/** MyDependency.js */           
+function() {
+    var MyDependency = {
+        getValue: function(jsfile) {
+            return "MyDependency and externally: " + jsfile;
+        }
+    };
+    
+    return MyDependency;
+}
+            </pre> 
+            <pre>
+/** MyLib.js */
+function(MyDependency) {
+    var MyLib = {
+        getValue: function() {
+            return "MyLib (parend Id: " + MyDependency.getValue() + ")";
+        }
+    };
+    
+    return MyLib;
+}
+            </pre>
+            </p>
+        </p>
+    </p>
+    
+    </aura:description>
+    <aura:example name="libraryExample" ref="uiExamples:libraryExample" label="Using aura:library">
+        <p>This example shows a basic way to use <code>aura:library</code>.</p>
+    </aura:example>
+</aura:documentation>

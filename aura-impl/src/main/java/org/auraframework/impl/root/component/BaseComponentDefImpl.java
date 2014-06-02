@@ -43,10 +43,12 @@ import org.auraframework.def.DependencyDef;
 import org.auraframework.def.EventHandlerDef;
 import org.auraframework.def.HelperDef;
 import org.auraframework.def.InterfaceDef;
+import org.auraframework.def.LibraryDef;
 import org.auraframework.def.ModelDef;
 import org.auraframework.def.ProviderDef;
 import org.auraframework.def.RegisterEventDef;
 import org.auraframework.def.RendererDef;
+import org.auraframework.def.ImportDef;
 import org.auraframework.def.ResourceDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.def.StyleDef;
@@ -61,8 +63,8 @@ import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.instance.ValueProviderType;
 import org.auraframework.system.AuraContext;
-import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.throwable.AuraUnhandledException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
@@ -99,6 +101,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
 
     private final Map<String, RegisterEventDef> events;
     private final List<EventHandlerDef> eventHandlers;
+    private final List<ImportDef> imports;
     private final List<AttributeDefRef> facets;
     private final Set<PropertyReference> expressionRefs;
 
@@ -131,6 +134,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         this.templateDefDescriptor = builder.templateDefDescriptor;
         this.events = AuraUtil.immutableMap(builder.events);
         this.eventHandlers = AuraUtil.immutableList(builder.eventHandlers);
+        this.imports = AuraUtil.immutableList(builder.imports);
         this.styleDescriptor = builder.styleDescriptor;
         this.rendererDescriptors = builder.rendererDescriptors;
         this.helperDescriptors = builder.helperDescriptors;
@@ -185,6 +189,9 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             def.validateDefinition();
         }
         for (EventHandlerDef def : eventHandlers) {
+            def.validateDefinition();
+        }
+        for (ImportDef def : imports) {
             def.validateDefinition();
         }
 
@@ -344,6 +351,10 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         for (EventHandlerDef def : eventHandlers) {
             def.validateReferences();
         }
+        
+        for (ImportDef def : imports) {
+            def.validateReferences();
+        }
 
         // have to do all sorts of craaaazy checks here for dupes and matches
         // and bah
@@ -425,7 +436,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
      * from source.
      * 
      * @param dependencies A Set that this method will append RootDescriptors to for every RootDef that this
-     *            ComponentDef requires
+     *            ComponentDef imports
      * @throws QuickFixException
      */
     @Override
@@ -482,6 +493,12 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
 
         if (localThemeDescriptor != null) {
             dependencies.add(localThemeDescriptor);
+        }
+        
+        if (imports != null) {
+        	for (ImportDef imported : imports) {
+        		dependencies.add(imported.getDescriptor());
+        	}
         }
 
         for (DependencyDef dep : this.dependencies) {
@@ -550,6 +567,16 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     @Override
     public Collection<EventHandlerDef> getHandlerDefs() throws QuickFixException {
         return eventHandlers;
+    }
+    
+
+    /**
+     * @return all the library imports from this component, including those inherited
+     * @throws QuickFixException
+     */
+    @Override
+    public Collection<ImportDef> getImportDefs() throws QuickFixException {
+        return imports;
     }
 
     /**
@@ -749,13 +776,10 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
                     json.writeMapEntry("helperDef", helperDef);
                 }
 
-                
+                json.writeMapEntry("styleDef", getStyleDef());
                 json.writeMapEntry("controllerDef", getControllerDef());
                 json.writeMapEntry("modelDef", getModelDef());
                 json.writeMapEntry("superDef", getSuperDef());
-
-                json.writeMapEntry("styleDef", getStyleDef());
-
                 if (preloading) {
                     json.writeMapEntry("isCSSPreloaded", preloading);
                 }
@@ -778,6 +802,10 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
                 Collection<EventHandlerDef> handlers = getHandlerDefs();
                 if (!handlers.isEmpty()) {
                     json.writeMapEntry("handlerDefs", handlers);
+                }
+                Collection<ImportDef> imports = getImportDefs();
+                if (!imports.isEmpty()) {
+                    json.writeMapEntry("imports", imports);
                 }
                 
                 if (!facets.isEmpty()) {
@@ -954,6 +982,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         public List<DefDescriptor<ControllerDef>> controllerDescriptors;
         public Map<String, RegisterEventDef> events;
         public List<EventHandlerDef> eventHandlers;
+        public List<ImportDef> imports;
         public Set<PropertyReference> expressionRefs;
         public String render;
         public WhitespaceBehavior whitespaceBehavior;

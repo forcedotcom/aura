@@ -61,7 +61,8 @@ public final class RDPAnalyzerTest extends AbstractPerfTestCase {
         PerfMetric bytesMetric = networkMetrics.get(1);
         assertEquals("Network.encodedDataLength", bytesMetric.getName());
         assertEquals("bytes", bytesMetric.getUnits());
-        assertTrue(bytesMetric.toString(), bytesMetric.getIntValue() > 100000);
+        assertTrue("bytes: " + bytesMetric.getIntValue() + ": " + bytesMetric.toString(),
+                bytesMetric.getIntValue() > 100000);
         JSONArray requests = bytesMetric.getDetails();
         assertTrue("num requests: " + requests.length(), requests.length() == numRequests);
         JSONObject request = requests.getJSONObject(0);

@@ -37,9 +37,19 @@ public abstract class BaseDiffUtils<T> implements DiffUtils<T> {
 
     public BaseDiffUtils(UnitTestCase test, String goldName) throws Exception {
         this.test = test;
+
         Class<? extends UnitTestCase> testClass = test.getClass();
-        String resourceName = getResultsFolder() + testClass.getSimpleName() + (goldName.startsWith("/") ? "" : "/")
+        String relativeResourceName = testClass.getSimpleName() + (goldName.startsWith("/") ? "" : "/")
                 + goldName;
+
+        String explicitResultsFolder = test.getExplicitGoldResultsFolder();
+        if (explicitResultsFolder != null) {
+            srcUrl = destUrl = new URL("file://" + explicitResultsFolder + '/' + relativeResourceName);
+            return;
+        }
+
+        // auto-detect gold file location logic:
+        String resourceName = getResultsFolder() + relativeResourceName;
         srcUrl = testClass.getResource(resourceName);
         if (srcUrl == null) {
             // gold file not found, but try to identify expected gold file location based on the test class location

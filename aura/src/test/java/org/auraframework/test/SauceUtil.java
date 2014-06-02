@@ -69,6 +69,7 @@ public final class SauceUtil {
             5 * SAUCE_CMD_TIMEOUT);
 
     public static boolean areTestsRunningOnSauce() {
+        // TODO: when running in SFDC this returns false even if running on SauceLabs
         return "saucelabs.com".equals(System.getProperty(WebDriverProvider.WEBDRIVER_SERVER_PROPERTY));
     }
 

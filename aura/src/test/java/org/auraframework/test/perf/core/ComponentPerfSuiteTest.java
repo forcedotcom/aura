@@ -1,13 +1,30 @@
+/*
+ * Copyright (C) 2013 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.auraframework.test.perf.core;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import junit.framework.Test;
+import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import org.auraframework.Aura;
@@ -25,8 +42,11 @@ import org.auraframework.test.annotation.PerfTestSuite;
 import org.auraframework.test.annotation.UnAdaptableTest;
 import org.auraframework.util.ServiceLocator;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Maps;
 
+@UnAdaptableTest
 @PerfTestSuite
 public class ComponentPerfSuiteTest extends TestSuite {
     // List components that we can't able to instantiate from client side.
@@ -36,40 +56,54 @@ public class ComponentPerfSuiteTest extends TestSuite {
             "markup://ui:action"
             , "markup://perf:dummyPerf");
 
-    public static TestSuite suite() throws Exception {
-        if (System.getProperty("skipCmpPerfTests") != null) {
-            System.out.println("Skipping Components Perf Tests");
-            return new TestSuite();
-        }
+    private static final Logger LOG = Logger.getLogger(ComponentPerfSuiteTest.class.getSimpleName());
 
-        TestSuite suite = new TestSuite();
-        suite.setName("Component Perf tests");
-        suite.addTest(new NamespacePerfTestSuite("ui"));
-        suite.addTest(new NamespacePerfTestSuite("perf"));
-        return suite;
+    public ComponentPerfSuiteTest() throws Exception {
+        this("Component Perf tests");
     }
 
-    private static class FailTestCase extends WebDriverTestCase {
-        private final Throwable cause;
+    public ComponentPerfSuiteTest(String name) throws Exception {
+        setName(name);
+        createTestCases();
+    }
 
-        private FailTestCase(DefDescriptor<?> descriptor, Throwable cause) {
-            super(descriptor.getQualifiedName());
-            this.cause = cause;
+    /**
+     * @return the list of namespaces to create tests for
+     */
+    protected List<String> getNamespaces() {
+        return ImmutableList.of("ui", "perf");
+    }
+
+    protected void createTestCases() throws Exception {
+        if (System.getProperty("skipCmpPerfTests") != null) {
+            LOG.info("Skipping Components Perf Tests");
+            return;
         }
 
-        @Override
-        public void runTest() throws Throwable {
-            throw cause;
+        for (String namespace : getNamespaces()) {
+            addTest(new NamespacePerfTestSuite(namespace));
         }
+    }
+
+    public static TestSuite suite() throws Exception {
+        return new ComponentPerfSuiteTest();
+    }
+
+    /**
+     * Override to patch the test case, i.e. for SFDC core
+     */
+    protected TestCase patchPerfComponentTestCase(ComponentPerfAbstractTestCase test,
+            DefDescriptor<ComponentDef> descriptor) throws Exception {
+        test.setTestName("perf_" + test.getClass().getSimpleName() + '_' + descriptor.getDescriptorName());
+        return test;
     }
 
     @UnAdaptableTest
-    public static class NamespacePerfTestSuite extends TestSuite {
+    public final class NamespacePerfTestSuite extends TestSuite {
         public NamespacePerfTestSuite(String namespace) throws Exception {
             super(namespace);
             ContextService contextService = Aura.getContextService();
             DefinitionService definitionService = Aura.getDefinitionService();
-            System.out.println("Bootstrapping Components Perf Tests");
 
             boolean contextStarted = false;
             if (!contextService.isEstablished()) {
@@ -77,7 +111,7 @@ public class ComponentPerfSuiteTest extends TestSuite {
                 contextService.startContext(Mode.PTEST, Format.JSON, Authentication.AUTHENTICATED);
             }
 
-            Map<String, TestSuite> subSuites = new HashMap<String, TestSuite>();
+            Map<String, TestSuite> subSuites = Maps.newHashMap();
 
             try {
                 DefDescriptor<ComponentDef> matcher = definitionService.getDefDescriptor(
@@ -112,8 +146,7 @@ public class ComponentPerfSuiteTest extends TestSuite {
                     }
                 }
             } catch (Throwable t) {
-                System.err.println("Failed to load component tests for namespace: " + namespace);
-                t.printStackTrace();
+                LOG.log(Level.WARNING, "Failed to load component tests for namespace: " + namespace, t);
             } finally {
                 if (contextStarted) {
                     contextService.endContext();
@@ -122,34 +155,37 @@ public class ComponentPerfSuiteTest extends TestSuite {
         }
     }
 
-    public static class ComponentSuiteTest extends TestSuite {
-
-        public ComponentSuiteTest(DefDescriptor<ComponentDef> descriptor) {
+    private class ComponentSuiteTest extends TestSuite {
+        ComponentSuiteTest(DefDescriptor<ComponentDef> descriptor) {
+            super(descriptor.getName());
             TestInventory inventory = ServiceLocator.get().get(TestInventory.class, "auraTestInventory");
             Vector<Class<? extends Test>> testClasses = inventory.getTestClasses(Type.PERFCMP);
-            TestSuite suite = new TestSuite();
 
             for (Class<? extends Test> testClass : testClasses) {
                 try {
                     Constructor<? extends Test> constructor = testClass.getConstructor(String.class,
                             DefDescriptor.class);
-                    ComponentPerfAbstractTestCase t = (ComponentPerfAbstractTestCase) constructor.newInstance(
+                    ComponentPerfAbstractTestCase test = (ComponentPerfAbstractTestCase) constructor.newInstance(
                             "testRun", descriptor);
-                    String testName = "perf_" + testClass.getSimpleName() + '_' + descriptor.getNamespace() + '_'
-                            + descriptor.getName();
-                    t.testName = testName;
-                    suite.addTest(t);
-                } catch (NoSuchMethodException e) {
-                    suite.getName();
-                } catch (InvocationTargetException e) {
-                    suite.getName();
-                } catch (IllegalAccessException e) {
-                    suite.getName();
-                } catch (InstantiationException e) {
-                    suite.getName();
+                    addTest(patchPerfComponentTestCase(test, descriptor));
+                } catch (Exception e) {
+                    LOG.log(Level.WARNING, "exception instantiating " + testClass.getName(), e);
                 }
             }
-            addTest(suite);
+        }
+    }
+
+    private static class FailTestCase extends WebDriverTestCase {
+        private final Throwable cause;
+
+        private FailTestCase(DefDescriptor<?> descriptor, Throwable cause) {
+            super(descriptor.getQualifiedName());
+            this.cause = cause;
+        }
+
+        @Override
+        public void runTest() throws Throwable {
+            throw cause;
         }
     }
 }

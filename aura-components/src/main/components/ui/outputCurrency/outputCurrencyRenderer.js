@@ -56,16 +56,12 @@
     },
 
     rerender: function outputNumberRerenderer(cmp, helper) {
-        var val = cmp.getValue("v.value");
-        var f = cmp.getValue("v.format");
-        var currencyCode = cmp.getValue("v.currencyCode");
-        var currencySymbol = cmp.getValue("v.currencySymbol");
-        if (val.isDirty() || f.isDirty() || currencyCode.isDirty() || currencySymbol.isDirty()) {
-            var formatted = '';
-            f = f.unwrap();
-            val = val.unwrap();
-            currencyCode = currencyCode.unwrap();
-            currencySymbol = currencySymbol.unwrap() || currencyCode;
+        if (cmp.isDirty("v.value") || cmp.isDirty("v.format") || cmp.isDirty("v.currencyCode") || cmp.isDirty("v.currencySymbol")) {
+        	var formatted = '';
+            var f = cmp.get("v.format");
+            var val = cmp.get("v.value");
+            var currencyCode = cmp.get("v.currencyCode");
+            var currencySymbol = cmp.get("v.currencySymbol") || currencyCode;
             if (($A.util.isNumber(val) || $A.util.isString(val)) && !$A.util.isEmpty(val)) {
                 var hasFormat = !$A.util.isEmpty(f);
                 if (hasFormat || currencySymbol) {

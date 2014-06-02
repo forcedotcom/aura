@@ -18,7 +18,9 @@
         $A.componentService.newComponentAsync(
             this,
             function(newCmp) {
-            	cmp.getValue("v.output").push(newCmp);
+            	var outputAtrr = cmp.get("v.output");
+            	outputAtrr.push(newCmp);
+            	cmp.set("v.output", outputAtrr);
             },
         	{
                 componentDef: {

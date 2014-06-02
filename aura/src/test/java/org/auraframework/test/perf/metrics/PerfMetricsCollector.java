@@ -120,6 +120,9 @@ public final class PerfMetricsCollector {
                     }
                     metrics.setMetric(metric);
                 }
+
+                // keep the corresponding Dev Tools Log for the metrics
+                metrics.setDevToolsLog(rdpAnalyzer.getFilteredDevToolsLog());
             }
 
             // memory metrics

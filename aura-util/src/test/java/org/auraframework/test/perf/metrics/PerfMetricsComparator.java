@@ -91,7 +91,7 @@ public final class PerfMetricsComparator {
 
         for (String name : expectedMetricNames) {
             PerfMetric expected = expectedMetrics.getMetric(name);
-            PerfMetric actual = actualMetrics.getMetric(name);
+            PerfMetric actual = actualMetrics.getNonnullMetric(name);
 
             int expectedValue = expected.getIntValue();
             int actualValue = (actual != null) ? actual.getIntValue() : -1;
@@ -129,15 +129,10 @@ public final class PerfMetricsComparator {
             } else if (UNITS_TO_EXCLUDE.contains(expected.getUnits())) {
                 logLineMark = ' ';
                 logLine.append(" excluded");
-            } else if (actual == null) {
-                logLineMark = '*';
-                numMetricsCompared++;
-                em.append("actual perf metric missing: " + name + '\n');
-                logLine.append(" MISSING");
             } else if (Math.abs(expectedValue - actualValue) > allowedDelta) {
                 logLineMark = '*';
                 numMetricsCompared++;
-                em.append("perf metric out of range: " + name);
+                em.append("--> perf metric out of range: " + name);
                 String units = expected.getUnits();
                 if (units != null) {
                     em.append(' ' + units);

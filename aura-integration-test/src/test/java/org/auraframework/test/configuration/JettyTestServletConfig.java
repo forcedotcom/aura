@@ -18,6 +18,8 @@ package org.auraframework.test.configuration;
 import java.net.InetAddress;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.HttpClient;
@@ -35,6 +37,9 @@ import org.eclipse.jetty.server.Server;
  * @since 0.0.59
  */
 public class JettyTestServletConfig implements TestServletConfig {
+
+    private static final Logger LOG = Logger.getLogger(JettyTestServletConfig.class.getSimpleName());
+
     private final URL baseUrl;
 
     public JettyTestServletConfig() throws Exception {
@@ -50,10 +55,11 @@ public class JettyTestServletConfig implements TestServletConfig {
                 try {
                     host = InetAddress.getLocalHost().getHostName();
                 } catch (UnknownHostException e) {
+                    LOG.log(Level.WARNING, e.toString(), e);
                     host = "localhost";
                 }
             }
-            System.out.println(String.format("Starting Jetty on %s:%s", host, port));
+            LOG.info(String.format("Starting Jetty on %s:%s", host, port));
             server.start();
         } else {
             port = Integer.parseInt(System.getProperty("jetty.port", "9090"));
@@ -62,12 +68,13 @@ public class JettyTestServletConfig implements TestServletConfig {
                 try {
                     host = InetAddress.getLocalHost().getHostName();
                 } catch (UnknownHostException e) {
+                    LOG.log(Level.WARNING, e.toString(), e);
                     host = "localhost";
                 }
             }
         }
         baseUrl = new URL("http", host, port, "/");
-        System.out.println(String.format("BaseUrl: %s", baseUrl));
+        LOG.info("BaseUrl: " + baseUrl);
     }
 
     @Override

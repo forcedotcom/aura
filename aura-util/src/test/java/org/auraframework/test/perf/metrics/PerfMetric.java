@@ -19,6 +19,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.google.common.base.Objects;
+
 /**
  * Represents a performance metric
  */
@@ -156,6 +158,29 @@ public class PerfMetric extends JSONObject implements Comparable<PerfMetric> {
             }
         }
         return sb.toString();
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+        if (!(other instanceof PerfMetric)) {
+            return false;
+        }
+        PerfMetric otherMetric = (PerfMetric) other;
+        if (!getName().equals(otherMetric.getName())) {
+            return false;
+        }
+        if (!getValue().equals(otherMetric.getValue())) {
+            return false;
+        }
+        return Objects.equal(getUnits(), otherMetric.getUnits());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(getName(), getValue(), getUnits());
     }
 
     @Override

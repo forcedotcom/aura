@@ -15,8 +15,11 @@
  */
 package org.auraframework.test.perf.metrics;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.json.JSONObject;
 
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Maps;
@@ -32,8 +35,12 @@ public final class PerfMetrics {
      */
     public static PerfMetrics combine(PerfMetrics... metricsList) {
         PerfMetrics combined = null;
+        List<JSONObject> devToolsLog = null;
         for (PerfMetrics metrics : metricsList) {
             if (metrics != null) {
+                if (devToolsLog == null) {
+                    devToolsLog = metrics.getDevToolsLog();
+                }
                 if (combined == null) {
                     // so we return null of all metrics in metricsList are null
                     combined = new PerfMetrics();
@@ -45,12 +52,14 @@ public final class PerfMetrics {
                 }
             }
         }
+        combined.setDevToolsLog(devToolsLog);
         return combined;
     }
 
     // instance:
 
     private final Map<String, PerfMetric> metrics = Maps.newHashMap();
+    private List<JSONObject> devToolsLog;
 
     public PerfMetrics() {
     }
@@ -60,6 +69,28 @@ public final class PerfMetrics {
      */
     public PerfMetric getMetric(String name) {
         return metrics.get(name);
+    }
+
+    /**
+     * @return the Dev Tools log corresponding to the timeline metrics in this object
+     */
+    public List<JSONObject> getDevToolsLog() {
+        return devToolsLog;
+    }
+
+    public void setDevToolsLog(List<JSONObject> devToolsLog) {
+        this.devToolsLog = devToolsLog;
+    }
+
+    /**
+     * @return the PerfMetric for a given metric name, if non existing it will return a metric object with a 0 value
+     */
+    public PerfMetric getNonnullMetric(String name) {
+        PerfMetric metric = getMetric(name);
+        if (metric == null) {
+            metric = new PerfMetric(name, 0);
+        }
+        return metric;
     }
 
     /**
@@ -99,5 +130,23 @@ public final class PerfMetrics {
             }
         }
         return sb.toString();
+    }
+
+    @Override
+    public String toString() {
+        return metrics.toString();
+    }
+
+    /**
+     * @return number of metrics that are the same as the ones in the other PerfMetrics object
+     */
+    public int numSame(PerfMetrics other) {
+        int numSame = 0;
+        for (String name : metrics.keySet()) {
+            if (getMetric(name).equals(other.getMetric(name))) {
+                numSame++;
+            }
+        }
+        return numSame;
     }
 }

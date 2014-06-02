@@ -280,15 +280,20 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
 
                     superRunTest();
 
-                    runsCollector.addRun(metricsCollector.stopCollecting());
-                    // TODO: maybe the devToolsLog should be optional for optimization
-                    List<JSONObject> devToolsLog = metricsCollector.getRDPAnalyzer().getFilteredDevToolsLog();
-                    PerfWebDriverUtil.writeDevToolsLog(devToolsLog, this, i, auraUITestingUtil.getUserAgent());
+                    PerfMetrics metrics = metricsCollector.stopCollecting();
+                    runsCollector.addRun(metrics);
+
+                    if (logger.isLoggable(Level.FINE)) {
+                        logger.fine("writing dev tools log for each run");
+                        PerfWebDriverUtil.writeDevToolsLog(metrics.getDevToolsLog(), getName() + '_' + (i + 1),
+                                auraUITestingUtil.getUserAgent());
+                    }
                 } finally {
                     perBrowserTearDown();
                 }
             }
-            timelineMetrics = runsCollector.getMedianMetrics();
+            // use the median run for timeline metrics so individual metrics and dev tools log a
+            timelineMetrics = runsCollector.getMedianRun();
         }
 
         // runs to collect Aura stats metrics
@@ -314,12 +319,15 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
             auraMetrics = runsCollector.getMedianMetrics();
         }
 
+        // combine all metrics, log/write results, perform tests
         PerfMetrics allMetrics = PerfMetrics.combine(timelineMetrics, auraMetrics);
-
         if (allMetrics != null) {
             if (logger.isLoggable(Level.INFO)) {
-                logger.info("perf metrics for " + this);
-                logger.info(allMetrics.toLongString());
+                logger.info("perf metrics for " + this + '\n' + allMetrics.toLongString());
+            }
+            List<JSONObject> devToolsLog = allMetrics.getDevToolsLog();
+            if (devToolsLog != null) {
+                PerfWebDriverUtil.writeDevToolsLog(devToolsLog, getName(), auraUITestingUtil.getUserAgent());
             }
             perfTearDown(allMetrics);
         }

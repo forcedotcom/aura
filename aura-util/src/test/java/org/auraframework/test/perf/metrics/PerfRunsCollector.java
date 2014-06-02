@@ -19,6 +19,7 @@ import java.io.PrintStream;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import org.json.JSONException;
 
@@ -31,6 +32,8 @@ import com.google.common.collect.Sets;
  */
 public final class PerfRunsCollector {
 
+    private static final Logger LOG = Logger.getLogger(PerfRunsCollector.class.getSimpleName());
+
     private final List<PerfMetrics> allMetricsRuns = Lists.newArrayList();
 
     public void addRun(PerfMetrics metrics) {
@@ -38,32 +41,63 @@ public final class PerfRunsCollector {
     }
 
     /**
+     * @return metrics for the run that more closely represents the median metrics, it returns a new PerfMetrics object
+     *         with extra info regarding the other runs in the set this run belongs to
+     */
+    public PerfMetrics getMedianRun() throws JSONException {
+        PerfMetrics medianMetrics = getMedianMetrics();
+
+        // find run with more metrics that match the median ones
+        PerfMetrics bestMatch = null;
+        int numSameBestMatch = -1;
+        int medianRunNumber = -1;
+        for (int i = 0; i < allMetricsRuns.size(); i++) {
+            PerfMetrics metricsRun = allMetricsRuns.get(i);
+            int numSame = metricsRun.numSame(medianMetrics);
+            if (numSameBestMatch < numSame) {
+                numSameBestMatch = numSame;
+                bestMatch = metricsRun;
+                medianRunNumber = i + 1;
+            }
+        }
+
+        // store runs info by creating MedianPerfMetric for each metric
+        PerfMetrics medianRunMetrics = new PerfMetrics();
+        for (String metricName : getAllMetricNamesSeen()) {
+            List<PerfMetric> metricRuns = Lists.newArrayList();
+            for (PerfMetrics run : allMetricsRuns) {
+                metricRuns.add(run.getNonnullMetric(metricName));
+            }
+            medianRunMetrics.setMetric(new MedianPerfMetric(bestMatch.getNonnullMetric(metricName), metricRuns));
+        }
+
+        // transfer info to the new metrics object that represents the median run
+        medianRunMetrics.setDevToolsLog(bestMatch.getDevToolsLog());
+
+        LOG.info("median run was run " + medianRunNumber + '/' + allMetricsRuns.size());
+        return medianRunMetrics;
+    }
+
+    /**
      * @return the median metric from the runs
      */
-    public PerfMetrics getMedianMetrics() {
+    public PerfMetrics getMedianMetrics() throws JSONException {
         PerfMetrics medianMetrics = new PerfMetrics();
         for (String metricName : getAllMetricNamesSeen()) {
             List<PerfMetric> metricRuns = Lists.newArrayList();
             for (PerfMetrics run : allMetricsRuns) {
-                PerfMetric metric = run.getMetric(metricName);
-                if (metric != null) {
-                    metricRuns.add(metric);
-                }
+                metricRuns.add(run.getNonnullMetric(metricName));
             }
             medianMetrics.setMetric(getMedian(metricRuns));
         }
         return medianMetrics;
     }
 
-    private PerfMetric getMedian(List<PerfMetric> runs) {
+    private PerfMetric getMedian(List<PerfMetric> runs) throws JSONException {
         List<PerfMetric> sortedRuns = Lists.newArrayList(runs);
         Collections.sort(sortedRuns);
         PerfMetric medianMetric = sortedRuns.get((runs.size() - 1) / 2);
-        try {
-            return new MedianPerfMetric(medianMetric, runs);
-        } catch (JSONException e) {
-            throw new RuntimeException(e);
-        }
+        return new MedianPerfMetric(medianMetric, runs);
     }
 
     private Set<String> getAllMetricNamesSeen() {

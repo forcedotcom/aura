@@ -31,7 +31,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.auraframework.test.SauceUtil;
-import org.auraframework.test.WebDriverTestCase;
 import org.auraframework.test.perf.rdp.RDPNotification;
 import org.auraframework.util.AuraUITestingUtil;
 import org.auraframework.util.json.JsonReader;
@@ -213,12 +212,10 @@ public final class PerfWebDriverUtil {
 
     /**
      * Writes the dev tools log for a perf test run to
-     * System.getProperty("java.io.tmpdir")/perf/devToolsLogs/testName_runNumber.json
+     * System.getProperty("java.io.tmpdir")/perf/devToolsLogs/testName.json
      */
-    public static void writeDevToolsLog(List<JSONObject> devToolsLog, WebDriverTestCase test, int runNumber,
-            String userAgent) {
-        String path = System.getProperty("java.io.tmpdir") + "/perf/devToolsLogs/" + test.getName() + '_' + runNumber
-                + ".json";
+    public static void writeDevToolsLog(List<JSONObject> devToolsLog, String fileName, String userAgent) {
+        String path = System.getProperty("java.io.tmpdir") + "/perf/devToolsLogs/" + fileName + ".json";
         File file = new File(path);
         try {
             writeDevToolsLog(devToolsLog, file, userAgent);

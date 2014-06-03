@@ -19,8 +19,7 @@
 	 * Handler for event that's fired programtically
 	 */
 	activateTab: function(cmp, evt, helper) {
-		var active = evt.getParam("active");
-		helper.setActive(cmp, active);
+		helper.setActive(cmp, evt.getParam("active"), evt.getParam("focus"));
 	},
 	/**
 	 * Handler for event that's fired when user clicks on tab to activate

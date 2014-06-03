@@ -47,7 +47,7 @@
      * @param {Number} [index] The index of the new tab to insert to.
      * @param {Object} tab The configuration for the new tab. If the "componentDef" is not defined, "ui:tab" is used. 
      */
-    addTab: function(cmp, index, tab) {
+    addTab: function(cmp, index, tab, callback) {
     	var self = this, size = cmp._tabCollection.getSize();
     	if ($A.util.isUndefined(index) || index < 0 || index > size) {
     		index = size;
@@ -61,6 +61,9 @@
         	e.setParams({"index": index, "active": active, "tab": self.getTabItemConfig(cmp, newTab)}).fire();
         	if (newTab.get("v.active")) {
         	    this.setActiveTabBody(cmp, {"tab": newTab, "active": true});
+        	}
+        	if (typeof callback === "function") {
+        	    callback({"tab": newTab});
         	}
     	});
     },
@@ -306,16 +309,11 @@
      */
     renderTabBody: function(cmp, tabComponent) {
     	var container = cmp.find("tabContainer").getElement(),
-    		tabPos = cmp.get("v.tabPosition"),
     		docFrag = document.createDocumentFragment();
 
     	$A.render(tabComponent, docFrag);
 		$A.afterRender(tabComponent);
-		if (tabPos === "top" || tabPos === "left") {
-			container.appendChild(docFrag);
-		} else if (tabPos === "bottom" || tabPos === "right") {
-			container.insertBefore(docFrag, container.firstChild);
-		}
+		container.appendChild(docFrag);
      },
      /**
      * Clean up

@@ -26,5 +26,9 @@
         $A.util.swapClass(rerun,["pass", "fail"], "spin");
         var win = frame.contentWindow?frame.contentWindow:frame.contentDocument.window;
         win.location.reload(true);
+    },
+    
+    onActivate: function(cmp, evt, helper) {
+        helper.loadTest(cmp);
     }
 })

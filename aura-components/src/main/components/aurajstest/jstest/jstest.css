@@ -13,6 +13,63 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+ @-webkit-keyframes jstestCaseThrob {
+  from,to {
+    box-shadow: inset 4px 4px 16px #FFFF0F;
+  }
+  50% {
+    box-shadow: inset 4px 4px 4px #FF800F;
+  }
+}
+.THIS.jstestTabset {
+	display: table;
+}
+.THIS.jstestTabset .tabBody.active {
+	display: table-cell;
+	width: 100%;
+}
+
+.THIS .rerun.fail{
+    background-color: #FF0F0F;
+    box-shadow: inset 4px 4px 8px #FFFF0F;
+    -webkit-animation-iteration-count:infinite;
+    -webkit-animation-name: jstestCaseThrob;
+    -webkit-animation-duration:1s;
+    -webkit-animation-timing-function:linear;
+}
+.THIS .rerun.pass{
+    background-color: #0FFF0F;
+    background-color: green;
+    box-shadow: inset 4px 4px 4px #10FF10;
+}
+
+.THIS .rerun{
+    background-color: #FFFF0F;
+    box-shadow: inset 1px 2px 2px #000000;
+    border-radius : 10px;
+    display:inline-block;
+    width:16px;
+    height:16px;
+    margin: 4px 4px 0 0;
+    float:left;
+}
+
+@-webkit-keyframes jstestCaseSpin {
+  from {
+    -webkit-transform: rotate(0deg);
+    
+  }
+  to {
+    -webkit-transform: rotate(360deg);
+  }
+} 
+.THIS .spin{
+    -webkit-animation-iteration-count:infinite;
+    -webkit-animation-name: jstestCaseSpin;
+    -webkit-animation-duration:1s;
+    -webkit-animation-timing-function:linear;
+}
+ 
 .aurajstestJstest.uiTabset {
     height: auto;
 }
@@ -25,14 +82,13 @@
 }
 
 .aurajstestJstest ul {
-    width: auto;
     height: auto;
     margin: 0;
     padding: 0;
     list-style: none;
 }
 
-.aurajstestJstest ul li.uiTab {
+.aurajstestJstest ul li.uiTabItem {
     width: 220px;
     float: none;
     border: 0;
@@ -41,7 +97,7 @@
     display: block;
 }
 
-.aurajstestJstest ul li.uiTab > a.tabHeader {
+.aurajstestJstest ul li.uiTabItem > a.tabHeader {
     background-color: #616975;
     background-image: -webkit-gradient(linear, left top, left bottom, from(rgb(114, 122, 134)),to(rgb(80, 88, 100)));
     background-image: -webkit-linear-gradient(top, rgb(114, 122, 134), rgb(80, 88, 100));
@@ -65,7 +121,6 @@
 .aurajstestJstest ul li a {
     background: #fff;
     border-bottom: 1px solid #efeff0;
-    width: 100%;
     height: 2em;
     line-height: 2em;
     display: block;
@@ -78,7 +133,7 @@
     white-space: nowrap;
 }
 
-.aurajstestJstest h1, .aurajstestJstest ul li.uiTab > a.tabHeader:hover {
+.aurajstestJstest h1, .aurajstestJstest ul li.uiTabItem > a.tabHeader:hover {
     background-color: #35afe3;
     background-image: -webkit-gradient(linear, left top, left bottom, from(rgb(69, 199, 235)),to(rgb(38, 152, 219)));
     background-image: -webkit-linear-gradient(top, rgb(69, 199, 235), rgb(38, 152, 219));
@@ -93,7 +148,7 @@
     box-shadow: inset 0px 1px 0px 0px #6ad2ef;
 }
 
-.aurajstestJstest ul li.uiTab.active > a.tabHeader {
+.aurajstestJstest ul li.uiTabItem.active > a.tabHeader {
     color: #333;
     background: #ffa84c; /* Old browsers */
     background: -moz-linear-gradient(top, #ffa84c 0%, #ff7b0d 100%); /* FF3.6+ */
@@ -105,7 +160,7 @@
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffa84c', endColorstr='#ff7b0d',GradientType=0 ); /* IE6-9 */
 }
 
-.aurajstestJstest ul li.uiTab > a.tabHeader:hover {
+.aurajstestJstest ul li.uiTabItem > a.tabHeader:hover {
     overflow: visible;
     color: #333;
     z-index: 100;
@@ -114,24 +169,21 @@
 .aurajstestJstest h1 {
     height: 2em;
     line-height: 2em;
-    display: block;
     color: #fff;
     padding-left: 10px;
-    width: auto;
     font-weight: 400;
     font-size: 0.923em;
     position: relative;
 }
 
-.aurajstestJstest li.uiTab div.tabBody {
+.aurajstestJstest li.uiTabItem div.tabBody {
     top: 0;
     left: 241px;
     height: auto;
 }
 
-
 .aurajstestJstest section div.testContent {
-    height: 100%;
+    height: 500px;
 }
 
 .aurajstestJstest iframe {
@@ -146,11 +198,11 @@
 }
 
 .aurajstestJstest section.content {
-	height: 500px;
 	width: 100%;
 	resize: vertical;
 }
 .aurajstestJstest section.results {
+	overflow: auto;
 	height: 220px;
 }
 

@@ -27,18 +27,18 @@
     },
     
     addTab: function(cmp, evt, helper) {
-    	helper.addTab(cmp, evt.getParam("index"), evt.getParam("tab"));
+    	helper.addTab(cmp, evt.getParam("index"), evt.getParam("tab"), evt.getParam("callback"));
     },
     
     getActiveTab: function(cmp, evt, helper) {
     	var tab = helper.getActiveTab(cmp);
     	var callback = evt.getParam("callback");
     	if (typeof callback === "function") {
-    	    callback(tab);
+    	    callback({"tab": tab});
     	}
     },
     
-    setActiveTab: function(cmp, evt, helper) {
+    activateTab: function(cmp, evt, helper) {
         helper.setActive(cmp, {"index": helper.getTabIndexFromEvent(cmp, evt)});
     },
     

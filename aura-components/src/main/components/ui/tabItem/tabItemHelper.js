@@ -15,7 +15,7 @@
  */
 
 ({
-	setActive: function(cmp, active) {
+	setActive: function(cmp, active, focus) {
 		var containerEl = cmp.find("li").getElement(),
 			itemEl = cmp.find("tabItem").getElement(),
 			closeEl = cmp.find("close").getElement();
@@ -29,7 +29,9 @@
 			if (closeEl) {
 			    closeEl.setAttribute("tabindex", 0);
 			}
-			itemEl.focus();
+			if (focus) {
+			    itemEl.focus();
+			}
 		} else {
 			$A.util.removeClass(containerEl, "active");
 			itemEl.setAttribute("aria-selected", false);

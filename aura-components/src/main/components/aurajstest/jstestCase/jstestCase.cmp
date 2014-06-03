@@ -24,11 +24,12 @@
     <aura:set attribute="title" value="{!v.case.name}"/>
 
     <aura:registerevent name="done" type="aurajstest:testStatus"/>
-
-    <aura:set attribute="icon">
+    <aura:set attribute="icon">    
         <a href="javascript:void(0);" onclick="{!c.rerun}" class="rerun spin" aura:id="rerun"></a>
     </aura:set>
 
+    <aura:handler name="onActivated" action="{!c.onActivate}" />
+    
     <aura:set attribute="body">
         <section class="content">
             <h1>Content</h1>

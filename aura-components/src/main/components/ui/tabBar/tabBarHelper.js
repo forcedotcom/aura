@@ -15,11 +15,11 @@
  */
 
 ({
-	activateTab:  function(cmp, index) {
+	activateTab:  function(cmp, index, focus) {
 		if ($A.util.isNumber(index) && cmp._tabItems[index]) {
 			var tab = cmp._tabItems[index];
 			this.deactivateTab(cmp, tab);
-			tab.get("e.activateTab").setParams({active: true}).fire();
+			tab.get("e.activateTab").setParams({"active": true, "focus": focus}).fire();
 		}
 	},
 	
@@ -103,7 +103,7 @@
 	        }
 	        var nextTab = cmp._tabItems[index];
 	        this.deactivateTab(cmp, nextTab);
-	        this.activateTab(cmp, index);
+	        this.activateTab(cmp, index, true);
 	        cmp.get('e.onTabActivated').setParams({"index": index}).fire();	
 	        $A.util.squash(domEvent, true);
 		}

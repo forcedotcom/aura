@@ -19,7 +19,6 @@
     margin:0;
 }
 
-.THIS.top .tabList .tabItem, .THIS.bottom .tabList .tabItem {
+.THIS .tabList .tabItem {
     display: inline-block;
 }
- 

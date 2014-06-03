@@ -27,36 +27,16 @@
             </ui:tab>
             <ui:tab title="Dashboards">
                     Contents in tab7
-                    <iframe id="myIframe" src="http://salesforce.com" height="200" width="500">
+                    <iframe id="myIframe" src="http://www.salesforce.com" height="200" width="500">
                         <p>This is my iframe</p>
                     </iframe>
             </ui:tab> 
         </ui:tabset>
     </div>
     <div class="block">
-        <h1 class="header">tabPosition: bottom</h1>
-        <ui:tabset aura:id="tabset3" tabPosition="bottom">
-            <aura:iteration items="{!m.items}" var="item" indexVar="index">     
-                <ui:tab title="{!item.title}">
-                    <div>testing {!index}</div>
-                </ui:tab>
-            </aura:iteration>
-        </ui:tabset>
-    </div>
-    <div class="block">
         <h1 class="header">tabPosition: left</h1>
         <ui:tabset aura:id="tabset3" tabPosition="left">
            <aura:iteration items="{!m.items}" var="item" indexVar="index">     
-                <ui:tab title="{!item.title}">
-                    <div>testing {!index}</div>
-                </ui:tab>
-            </aura:iteration>
-        </ui:tabset>
-    </div>
-    <div class="block">
-        <h1 class="header">tabPosition: right</h1>
-        <ui:tabset aura:id="tabset3" tabPosition="right">
-            <aura:iteration items="{!m.items}" var="item" indexVar="index">     
                 <ui:tab title="{!item.title}">
                     <div>testing {!index}</div>
                 </ui:tab>
@@ -89,7 +69,7 @@
             </ui:tab>
             <ui:tab title="Dashboards">
                     <div>embedded IFrame</div>
-                    <iframe id="myIframe" src="http://salesforce.com" height="200" width="500">
+                    <iframe id="myIframe" src="http://www.salesforce.com" height="200" width="500">
                         <p>This is my iframe</p>
                     </iframe>
             </ui:tab> 

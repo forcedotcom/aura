@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:input" extensible="true" support="GA" description="An HTML select element that creates a drop-down list containing &lt;ui:inputSelectOption&gt; components. Allows multiple selection if multiple=&quot;true&quot;e.">
+<aura:component extends="ui:input" extensible="true" support="GA" description="Represents a drop-down list with options.">
     <!-- Could be needed in form -->
     <aura:attribute name="name" type="String" description="The name of the component."/>
 

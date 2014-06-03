@@ -18,6 +18,7 @@
         var concreteCmp = component.getConcreteComponent();
         var _helper = concreteCmp.getDef().getHelper();
         _helper.displayValue(component);
+        _helper.toggleClearButton(component);
         return this.superAfterRender();
 	},
 	
@@ -25,6 +26,7 @@
         var concreteCmp = component.getConcreteComponent();
         var _helper = concreteCmp.getDef().getHelper();
         _helper.displayValue(component);
+        _helper.toggleClearButton(component);
         return this.superRerender();
     }
 })

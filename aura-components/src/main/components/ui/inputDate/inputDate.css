@@ -22,3 +22,23 @@
     height: 15px;
     background: url('/auraFW/resources/aura/images/icon_openCalendar.png') no-repeat 0 0;
 }
+
+.THIS + .datePicker-openIcon + .clearIcon,
+.THIS + .clearIcon {
+    position: relative;
+    top: 2px;
+    left: -22px;
+    display: none;
+    width: 15px;
+    height: 15px;
+    background: url('/auraFW/resources/aura/images/clear.png') no-repeat 0 0;
+}
+
+.THIS + .datePicker-openIcon + .clearIcon.display,
+.THIS + .clearIcon.display {
+	display: inline-block;
+}
+
+.THIS + .datePicker-openIcon.hide {
+	display: none;
+}

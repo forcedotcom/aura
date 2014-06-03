@@ -140,5 +140,30 @@
             datePicker.set("v.is24HourFormat", this.is24HourFormat(component));
             datePicker.set("v.visible", true);
         }
+    },
+    
+    toggleClearButton: function(component) {
+        if (($A.get("$Browser.isPhone") === true) || ($A.get("$Browser.isTablet") === true)) {
+            var inputCmp = component.find("inputText");
+            var inputElem = inputCmp ? inputCmp.getElement() : null;
+            var clearCmp = component.find("clear");
+            var clearElem = clearCmp ? clearCmp.getElement() : null;
+            if (inputElem && clearElem) {
+                var openIconCmp = component.find("datePickerOpener");
+                var openIconElem = openIconCmp ? openIconCmp.getElement() : null;
+        	    var currentValue = inputElem.value;
+        	    if ($A.util.isUndefinedOrNull(currentValue) || $A.util.isEmpty(currentValue)) { // remove clear icon
+        	    	$A.util.removeClass(clearElem, "display");
+                    if (openIconElem) {
+                    	$A.util.removeClass(openIconElem, "hide");
+                    }
+        	    } else {
+        	    	$A.util.addClass(clearElem, "display");
+        	    	if (openIconElem) {
+                        $A.util.addClass(openIconElem, "hide");
+                    }
+        	    }
+            }
+        }
     }
 })

@@ -234,7 +234,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
 
     protected boolean isPerfRunForAuraStats;
 
-    protected boolean isPerfTest() {
+    public boolean isPerfTest() {
         return RUN_PERF_TESTS && PerfUtil.hasPerfTestAnnotation(this);
     }
 
@@ -644,10 +644,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
             }
 
             if (windowSize != null) {
-                // SauceLabs doesn't support window-size in ChromeOptions yet
-                if (currentBrowserType != BrowserType.GOOGLECHROME || SauceUtil.areTestsRunningOnSauce()) {
-                    currentDriver.manage().window().setSize(windowSize);
-                }
+                currentDriver.manage().window().setSize(windowSize);
             }
 
             String driverInfo = "Received: " + currentDriver;
@@ -669,7 +666,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
         return null;
     }
 
-    protected final void quitDriver() {
+    public final void quitDriver() {
         if (currentDriver != null) {
             try {
                 currentDriver.quit();

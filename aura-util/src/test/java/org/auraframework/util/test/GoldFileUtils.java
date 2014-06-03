@@ -66,7 +66,7 @@ public final class GoldFileUtils {
 
         if (exceptionFound != null) {
             if (exceptionFound instanceof FileNotFoundException || !SKIP_GOLD_FILE_UPDATE) {
-                LOG.info("writing log file: " + url);
+                LOG.info("writing gold file: " + url);
                 diff.writeGoldFile(testResults);
             }
             if (testResults instanceof PerfMetrics) {

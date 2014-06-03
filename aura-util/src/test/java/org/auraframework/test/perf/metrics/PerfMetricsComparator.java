@@ -34,7 +34,7 @@ public final class PerfMetricsComparator {
     // and using this logger the log messages do appear in the jenkins console output
     private static final Logger LOG = Logger.getLogger(PerfMetricsComparator.class.getSimpleName());
 
-    private static final Map<String, Integer> ALLOWED_VARIABILITY = ImmutableMap.of("Timeline", 20, "Aura", 0,
+    private static final Map<String, Integer> ALLOWED_VARIABILITY = ImmutableMap.of("Timeline", 20, "Aura", 5,
             "Network", 20);
     private static final Set<String> UNITS_TO_EXCLUDE = ImmutableSet.of("milliseconds");
 

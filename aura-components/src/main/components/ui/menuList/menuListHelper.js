@@ -86,13 +86,13 @@
     },
     
     positionAsBodyChild: function(component) {
-    	$A.util.attachToDocumentBody(component.getElement());
         var divCmp = component.find("menu");
         var elem = divCmp ? divCmp.getElement() : null;
         var referenceElem = component.getConcreteComponent().get("v.referenceElement");
         if (elem && referenceElem) {
             var visible = component.getConcreteComponent().get("v.visible");
             if (visible) {
+            	$A.util.attachToDocumentBody(component.getElement());
             	var referenceElemRect = referenceElem.getBoundingClientRect();
                 var elemRect = elem.getBoundingClientRect();
                 var viewPort = $A.util.getWindowSize();

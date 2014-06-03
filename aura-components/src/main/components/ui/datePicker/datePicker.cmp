@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extensible="true" implements="ui:visible" model="java://org.auraframework.component.ui.DatePickerModel" description="A date picker that is used within ui:inputDate and ui:inputDateTime.">
+<aura:component extensible="true" implements="ui:visible" model="java://org.auraframework.component.ui.DatePickerModel" description="Represents a date picker, which can be used in input components such as ui:inputDate and ui:inputDateTime.">
     <aura:attribute name="hasTime" type="Boolean" default="false" description="Indicate if the parent datePicker component supports time picker."/>
     <aura:attribute name="hours" type="Integer" description="The hour value of a date object, which is always in 24 hour format."/>
     <aura:attribute name="is24HourFormat" type="Boolean" default="true" description="Indicate if it is set to 24 hour or 12-hour with am/pm."/>
@@ -25,7 +25,7 @@
     <aura:attribute name="value" type="Date" description="A date corresponding to a calendar day in the format yyyy-mm-dd."/>
     <aura:attribute name="visible" type="Boolean" default="false" description="Indicates if the date picker is displayed. Defaults to false, which hides the date picker."/>
     <aura:attribute name="_yearListInitialized" type="Boolean" default="false" description="Indicates if the year list is initialized or not."/>
-    <aura:attribute name="managed" type="Boolean" default="false" description="Indicates whether this component is managed by ui:datePickerManager."/>
+    <aura:attribute name="managed" type="Boolean" default="false" description="Indicates whether this component is managed by ui:datePickerManager. Defaults to 'false'."/>
 
     <aura:registerevent name="selectDate" type="ui:selectDate" description="The event fired when a date is selected."/>
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>

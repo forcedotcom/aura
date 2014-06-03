@@ -50,9 +50,9 @@ public final class PerfMetricsComparatorTest extends UnitTestCase {
         assertEquals("--> perf metric out of range: Timeline.metric - expected 10, actual 5", message);
         actual = new PerfMetrics();
         actual.setMetric("Timeline.metric", 9);
-        actual.setMetric("Aura.metric", 9);
+        actual.setMetric("Aura.metric", 8);
         message = comparator.compare(expected, actual);
-        assertEquals("--> perf metric out of range: Aura.metric - expected 10, actual 9", message);
+        assertEquals("--> perf metric out of range: Aura.metric - expected 10, actual 8", message);
 
         // UC: message if metric missing
         actual = new PerfMetrics();

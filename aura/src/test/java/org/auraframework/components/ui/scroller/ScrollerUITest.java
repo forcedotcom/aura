@@ -32,8 +32,8 @@ import org.uiautomation.ios.client.uiamodels.impl.augmenter.IOSDriverAugmenter;
 public class ScrollerUITest extends WebDriverTestCase{
 	
 private static final String SCROLLER_CMP1 = "/uitest/scroller_basic.cmp";
-private static final String SCROLLER_CMP2 = "/uitest/scrollerEndless.cmp";
-private static final String SCROLLER_CMP3 = "/uitest/scrollerSnap.cmp";
+//private static final String SCROLLER_CMP2 = "/uitest/scrollerEndless.cmp";
+//private static final String SCROLLER_CMP3 = "/uitest/scrollerSnap.cmp";
 private WebDriver driver;
 
 public ScrollerUITest(String name) {
@@ -48,7 +48,7 @@ public void testScrollingWorkflow() throws Exception {
     open(SCROLLER_CMP1);
     driver = this.getDriver();
     augmentDriver();
-    /*
+    /* disable due to W-2233861
     //attempting pull to refresh
     this.startFlick(0, 50);
     pause(600);
@@ -79,7 +79,7 @@ public void testScrollingWorkflow() throws Exception {
     pause(2500);
     assertFalse("Seems like vertical scrolling did not work after pull to refresh", 
     		verifyIfElementInViewport("1onPTR"));
-    /*
+    /* disable due to W-2233861
     //attempting to pull to show more when canShowMore attribute is false
     this.startFlick(0, -50);
     pause(2500);
@@ -141,7 +141,7 @@ public void testScrollingWorkflow() throws Exception {
     //assert event onScrollEndStart fired
     assertEquals("Seems like onScrollEndStart did not get fired", "1", getEventHandlerExecutionStatus("scrollEndHandlerCalled"));
 }
-/*
+/* disable due to W-2233861
 public void testScrollingEndlessHorizontal() throws Exception {
     open(SCROLLER_CMP2);
     driver = this.getDriver();
@@ -256,7 +256,7 @@ private void evaluateEventExpression(String evt, String params){
     String expression = "$A.getRoot().find('test-scroller').getEvent('"+evt+"').setParams("+params+").fire();";
     auraUITestingUtil.getEval(expression);
 }
-/*
+/* disable due to W-2233861
 private void evaluateTogglePTLPTR(String evt){
     String expression = "$A.getRoot().find('test-scroller').getScrollerInstance().toggle"+evt+"()";
     auraUITestingUtil.getEval(expression);

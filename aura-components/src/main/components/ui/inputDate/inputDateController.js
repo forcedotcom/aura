@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 ({
-    click: function(component, event, helper) {
+	clearValue: function(component, event, helper) {
+		component.set("v.value", "");
+	},
+	
+	click: function(component, event, helper) {
         event.preventDefault();
         var concreteCmp = component.getConcreteComponent();
         var _helper = concreteCmp.getDef().getHelper();

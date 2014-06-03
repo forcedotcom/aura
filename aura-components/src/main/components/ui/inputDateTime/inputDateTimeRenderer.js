@@ -16,13 +16,19 @@
 ({
     afterRender: function(component, helper) {
         var ret = this.superAfterRender();
-        helper.formatDateTime(component);
+        var concreteCmp = component.getConcreteComponent();
+        var _helper = concreteCmp.getDef().getHelper();
+        _helper.formatDateTime(component);
+        _helper.toggleClearButton(component);
         return ret; 
     },
     
     rerender: function(component, helper) {
         var ret = this.superRerender();
-        helper.formatDateTime(component);
+        var concreteCmp = component.getConcreteComponent();
+        var _helper = concreteCmp.getDef().getHelper();
+        _helper.formatDateTime(component);
+        _helper.toggleClearButton(component);
         return ret;   
     }
 })

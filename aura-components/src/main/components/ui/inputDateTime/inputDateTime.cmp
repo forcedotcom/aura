@@ -36,5 +36,8 @@
             <span class="assistiveText">Date Picker</span>
         </a>
     </aura:if>
+    <a aura:id="clear" class="clearIcon" onclick="{!c.clearValue}">
+        <span class="assistiveText">Clear Button</span>
+    </a>
     <ui:datePicker aura:id="datePicker" selectDate="{!c.setValue}" hasTime="true"/>
 </aura:component>

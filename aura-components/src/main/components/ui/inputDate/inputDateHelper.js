@@ -15,7 +15,7 @@
  */
 ({
     displayValue: function(component) {
-	var concCmp = component.getConcreteComponent();
+        var concCmp = component.getConcreteComponent();
         var value = concCmp.get("v.value");
         var displayValue = value;
         if (value) {
@@ -41,7 +41,7 @@
     },
 
     displayDatePicker: function(component) {
-	var concCmp = component.getConcreteComponent();
+        var concCmp = component.getConcreteComponent();
         var datePicker = concCmp.find("datePicker");
         if (datePicker && datePicker.get("v.visible") === false) {
             var currentDate = new Date();
@@ -59,7 +59,7 @@
      *
      */
     doUpdate : function(component, value) {
-	var concCmp = component.getConcreteComponent();
+        var concCmp = component.getConcreteComponent();
         var v = $A.localizationService.translateFromLocalizedDigits(value);
         var ret = v;
         if (value) {
@@ -79,5 +79,30 @@
 
     getDateString: function(date) {
         return date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
+    },
+    
+    toggleClearButton: function(component) {
+        if (($A.get("$Browser.isPhone") === true) || ($A.get("$Browser.isTablet") === true)) {
+            var inputCmp = component.find("inputText");
+            var inputElem = inputCmp ? inputCmp.getElement() : null;
+            var clearCmp = component.find("clear");
+            var clearElem = clearCmp ? clearCmp.getElement() : null;
+            if (inputElem && clearElem) {
+                var openIconCmp = component.find("datePickerOpener");
+                var openIconElem = openIconCmp ? openIconCmp.getElement() : null;
+        	    var currentValue = inputElem.value;
+        	    if ($A.util.isUndefinedOrNull(currentValue) || $A.util.isEmpty(currentValue)) { // remove clear icon
+        	    	$A.util.removeClass(clearElem, "display");
+                    if (openIconElem) {
+                    	$A.util.removeClass(openIconElem, "hide");
+                    }
+        	    } else {
+        	    	$A.util.addClass(clearElem, "display");
+        	    	if (openIconElem) {
+                        $A.util.addClass(openIconElem, "hide");
+                    }
+        	    }
+            }
+        }
     }
 })

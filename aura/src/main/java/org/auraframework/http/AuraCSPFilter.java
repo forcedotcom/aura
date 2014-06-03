@@ -70,21 +70,19 @@ public class AuraCSPFilter implements Filter {
     
     protected String getPolicy(String url) { 
         PolicyBuilder p = new PolicyBuilder();
-        p
-        .default_src(CSP.SELF)
-        .img_src(CSP.ALL)
-        .font_src(CSP.ALL)
-        .report_uri(CSPReporterServlet.URL);
+        p.connect_src(CSP.SELF)
+            .default_src(CSP.SELF)
+            .img_src(CSP.ALL)
+            .font_src(CSP.ALL)
+            .report_uri(CSPReporterServlet.URL);
         
         // note that chrome-extensions can cause violations, and we don't generally care.
         if (doesUrlAllowInline(url)) {
-            p
-            .script_src(CSP.SELF, CHROME_EXTENSION, CSP.UNSAFE_EVAL, CSP.UNSAFE_INLINE)
-            .style_src(CSP.SELF, CHROME_EXTENSION, CSP.UNSAFE_INLINE);
+            p.script_src(CSP.SELF, CHROME_EXTENSION, CSP.UNSAFE_EVAL, CSP.UNSAFE_INLINE)
+                .style_src(CSP.SELF, CHROME_EXTENSION, CSP.UNSAFE_INLINE);
         } else {
-            p
-            .script_src(CSP.SELF, CHROME_EXTENSION)
-            .style_src(CSP.SELF, CHROME_EXTENSION);
+            p.script_src(CSP.SELF, CHROME_EXTENSION)
+                .style_src(CSP.SELF, CHROME_EXTENSION);
         }
         
         return p.build();

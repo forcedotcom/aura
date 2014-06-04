@@ -655,15 +655,17 @@ public class AuraContextImpl implements AuraContext {
             }
 
             if (app != null) {
-                DefDescriptor<ThemeDef> theme = app.getThemeDescriptor();
-                if (theme != null) {
-                    // the app theme conceptually precedes themes explicitly added to the ctx,
-                    // which means ctx-specified themes should be consulted first, according to the
-                    // "last one wins" contract
-                    if (!themes.contains(theme)) {
-                        themes.add(0, theme.getDef().getConcreteDescriptor());
+                List<DefDescriptor<ThemeDef>> appThemes = Lists.newArrayList();
+                for (DefDescriptor<ThemeDef> theme : app.getThemeDescriptors()) {
+                    DefDescriptor<ThemeDef> concrete = theme.getDef().getConcreteDescriptor();
+                    if (!themes.contains(concrete)) {
+                        appThemes.add(concrete);
                     }
                 }
+                // the app theme conceptually precedes themes explicitly added to the ctx,
+                // which means ctx-specified themes should be consulted first, according to the
+                // "last one wins" contract
+                themes.addAll(0, appThemes);
             }
         }
     }

@@ -438,7 +438,6 @@ public class AuraContextImplTest extends AuraImplTestCase {
         assertEquals(t1, explicit.get(2));
     }
 
-    @UnAdaptableTest
     public void testSerializeWithThemes() throws Exception {
         AuraContext ctx = Aura.getContextService()
                 .startContext(Mode.UTEST, Format.JSON, Authentication.UNAUTHENTICATED);
@@ -450,6 +449,33 @@ public class AuraContextImplTest extends AuraImplTestCase {
         ctx.appendThemeDescriptor(t1);
         ctx.appendThemeDescriptor(t2);
         ctx.appendThemeDescriptor(t3);
+        String res = Json.serialize(ctx, ctx.getJsonSerializationContext());
+        goldFileJson(res);
+    }
+
+    public void testSerializeWithAppAndExplicitThemes() throws Exception {
+        DefDescriptor<ApplicationDef> app = DefDescriptorImpl.getInstance("test:fakeThemeApp", ApplicationDef.class);
+
+        AuraContext ctx = Aura.getContextService()
+                .startContext(Mode.UTEST, Format.JSON, Authentication.UNAUTHENTICATED, app);
+        ctx.setSerializeLastMod(false);
+
+        DefDescriptor<ThemeDef> explicit = vendor.getThemeDefDescriptor2();
+        ctx.appendThemeDescriptor(explicit);
+        ctx.addAppThemeDescriptors();
+
+        String res = Json.serialize(ctx, ctx.getJsonSerializationContext());
+        goldFileJson(res);
+    }
+
+    public void testSerializeWithMultipleAppThemes() throws Exception {
+        DefDescriptor<ApplicationDef> app = DefDescriptorImpl.getInstance("test:fakeThemeApp2", ApplicationDef.class);
+
+        AuraContext ctx = Aura.getContextService()
+                .startContext(Mode.UTEST, Format.JSON, Authentication.UNAUTHENTICATED, app);
+        ctx.setSerializeLastMod(false);
+        ctx.addAppThemeDescriptors();
+
         String res = Json.serialize(ctx, ctx.getJsonSerializationContext());
         goldFileJson(res);
     }

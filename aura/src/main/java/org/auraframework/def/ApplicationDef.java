@@ -39,7 +39,7 @@ public interface ApplicationDef extends BaseComponentDef {
     Boolean isOnePageApp() throws QuickFixException;
 
     /**
-     * Gets the application-wide theme, if present.
+     * Gets the application-wide override themes, if present.
      * <p>
      * Note that this differs from the "component theme" ({@link #getCmpTheme()}), as this is specifically the
      * application-wide override theme. In contrast, the component theme is applicable only to its component/app
@@ -47,6 +47,8 @@ public interface ApplicationDef extends BaseComponentDef {
      * value.
      * <p>
      * In other words, this is the value from the "theme" attribute on the app tag.
+     * 
+     * @return The list of override themes, or an empty list if none specified.
      */
-    DefDescriptor<ThemeDef> getThemeDescriptor();
+    List<DefDescriptor<ThemeDef>> getThemeDescriptors();
 }

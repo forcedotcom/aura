@@ -15,8 +15,6 @@
  */
 package org.auraframework.impl.adapter;
 
-import static com.google.common.base.Preconditions.checkState;
-
 import java.util.List;
 
 import org.auraframework.Aura;
@@ -35,9 +33,9 @@ public final class StyleAdapterImpl implements StyleAdapter {
     }
 
     @Override
-    public ThemeValueProvider getThemeValueProvider(DefDescriptor<StyleDef> descriptor, DefDescriptor<ThemeDef> override)
-            throws QuickFixException {
-        return new ThemeValueProviderImpl(descriptor, override);
+    public ThemeValueProvider getThemeValueProvider(DefDescriptor<StyleDef> descriptor,
+            List<DefDescriptor<ThemeDef>> overrideThemes) throws QuickFixException {
+        return new ThemeValueProviderImpl(descriptor, overrideThemes);
     }
 
     @Override
@@ -46,13 +44,7 @@ public final class StyleAdapterImpl implements StyleAdapter {
         return new ThemeValueProviderImpl(descriptor, null);
     }
 
-    private static DefDescriptor<ThemeDef> overrides() throws QuickFixException {
-        List<DefDescriptor<ThemeDef>> themes = Aura.getContextService().getCurrentContext()
-                .getThemeDescriptorsOrdered();
-        if (!themes.isEmpty()) {
-            checkState(themes.size() == 1, "only one theme override supported right now");
-            return themes.get(0);
-        }
-        return null;
+    private static List<DefDescriptor<ThemeDef>> overrides() throws QuickFixException {
+        return Aura.getContextService().getCurrentContext().getThemeDescriptorsOrdered();
     }
 }

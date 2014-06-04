@@ -17,6 +17,8 @@ package org.auraframework.impl.css;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.List;
+
 import org.auraframework.css.ThemeValueProvider;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
@@ -32,6 +34,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.throwable.quickfix.ThemeValueNotFoundException;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
 
 /**
  * Responsible for taking a String reference to a theme variable and finding the applicable value.
@@ -43,16 +46,30 @@ public final class ThemeValueProviderImpl implements ThemeValueProvider {
 
     private final DefDescriptor<ThemeDef> cmpTheme;
     private final DefDescriptor<ThemeDef> namespaceTheme;
-    private final DefDescriptor<ThemeDef> overrideTheme;
+    private final List<DefDescriptor<ThemeDef>> overrideThemes;
 
-    public ThemeValueProviderImpl(DefDescriptor<StyleDef> scope, DefDescriptor<ThemeDef> overrideTheme)
+    /**
+     * Creates a new {@link ThemeValueProvider}.
+     * 
+     * @param scope Provide vars for this {@link StyleDef}.
+     * @param overrideThemes The list of themes that override the default var values. This should be ordered correctly.
+     */
+    public ThemeValueProviderImpl(DefDescriptor<StyleDef> scope, List<DefDescriptor<ThemeDef>> overrideThemes)
             throws QuickFixException {
         checkNotNull(scope, "scope cannot be null");
 
         DefDescriptor<ThemeDef> cmpTheme = Themes.getCmpTheme(scope);
         this.cmpTheme = cmpTheme.exists() ? cmpTheme : null;
+
         this.namespaceTheme = Themes.getNamespaceDefaultTheme(scope);
-        this.overrideTheme = overrideTheme != null ? overrideTheme.getDef().getConcreteDescriptor() : null;
+
+        ImmutableList.Builder<DefDescriptor<ThemeDef>> builder = ImmutableList.builder();
+        if (overrideThemes != null) {
+            for (DefDescriptor<ThemeDef> override : overrideThemes) {
+                builder.add(override.getDef().getConcreteDescriptor());
+            }
+        }
+        this.overrideThemes = builder.build();
     }
 
     @Override
@@ -84,8 +101,8 @@ public final class ThemeValueProviderImpl implements ThemeValueProvider {
         Optional<Object> value = Optional.absent();
 
         // check from an override
-        if (overrideTheme != null) {
-            value = overrideTheme.getDef().getVar(reference.getRoot());
+        for (DefDescriptor<ThemeDef> override : overrideThemes) {
+            value = override.getDef().getVar(reference.getRoot());
             if (value.isPresent()) {
                 return value;
             }

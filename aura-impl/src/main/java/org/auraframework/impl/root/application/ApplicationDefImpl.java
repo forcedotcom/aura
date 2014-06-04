@@ -16,11 +16,19 @@
 package org.auraframework.impl.root.application;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 import org.auraframework.Aura;
 import org.auraframework.builder.ApplicationDefBuilder;
-import org.auraframework.def.*;
+import org.auraframework.def.ActionDef;
+import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.ControllerDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.EventDef;
+import org.auraframework.def.LayoutsDef;
+import org.auraframework.def.ThemeDef;
 import org.auraframework.expression.Expression;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.AuraImpl;
@@ -56,19 +64,18 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
         this.isAppcacheEnabled = builder.isAppcacheEnabled;
         this.additionalAppCacheURLs = builder.additionalAppCacheURLs;
         this.isOnePageApp = builder.isOnePageApp;
-        this.themeDescriptor = builder.themeDescriptor;
+        this.themeDescriptors = AuraUtil.immutableList(builder.themeDescriptors);
 
-        this.hashCode = AuraUtil.hashCode(super.hashCode(), themeDescriptor);
+        this.hashCode = AuraUtil.hashCode(super.hashCode(), themeDescriptors);
     }
 
     public static class Builder extends BaseComponentDefImpl.Builder<ApplicationDef> implements ApplicationDefBuilder {
-
         public DefDescriptor<EventDef> locationChangeEventDescriptor;
         public DefDescriptor<LayoutsDef> layoutsDefDescriptor;
         public Boolean isAppcacheEnabled;
         public Boolean isOnePageApp;
         public String additionalAppCacheURLs;
-        public DefDescriptor<ThemeDef> themeDescriptor;
+        public List<DefDescriptor<ThemeDef>> themeDescriptors = Lists.newArrayList();
 
         public Builder() {
             super(ApplicationDef.class);
@@ -87,8 +94,8 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
         }
 
         @Override
-        public ApplicationDefBuilder setThemeDescriptor(DefDescriptor<ThemeDef> themeDescriptor) {
-            this.themeDescriptor = themeDescriptor;
+        public ApplicationDefBuilder appendThemeDescriptor(DefDescriptor<ThemeDef> themeDescriptor) {
+            themeDescriptors.add(themeDescriptor);
             return this;
         }
     }
@@ -151,9 +158,10 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
             dependencies.add(layoutsDefDescriptor);
         }
 
-        if (themeDescriptor != null) {
+        for (DefDescriptor<ThemeDef> themeDescriptor : themeDescriptors) {
             dependencies.add(themeDescriptor);
         }
+
         if (locationChangeEventDescriptor != null) {
             dependencies.add(locationChangeEventDescriptor);
         }
@@ -219,14 +227,16 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
                     locationChangeDef.getDescriptor()), getLocation());
         }
 
-        // the theme must not be a component theme. otherwise, it would allow users to circumvent var
-        // cross-reference validation (regular themes enforce that cross references are defined in the same file,
-        // but cmp themes allow cross references to the namespace-default file.)
-        if (themeDescriptor != null && themeDescriptor.getDef().isCmpTheme()) {
-            throw new InvalidDefinitionException(
-                    String.format(
-                            "%s must not specify a component-specific or app-specific theme as the main app theme",
-                            getName()), getLocation());
+        for (DefDescriptor<ThemeDef> themeDescriptor : themeDescriptors) {
+            // the theme must not be a component theme. otherwise, it would allow users to circumvent var
+            // cross-reference validation (regular themes enforce that cross references are defined in the same file,
+            // but cmp themes allow cross references to the namespace-default file.)
+            if (themeDescriptor.getDef().isCmpTheme()) {
+                throw new InvalidDefinitionException(
+                        String.format(
+                                "%s must not specify a component-specific or app-specific theme as the main app theme",
+                                getName()), getLocation());
+            }
         }
     }
 
@@ -241,8 +251,8 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
     }
 
     @Override
-    public DefDescriptor<ThemeDef> getThemeDescriptor() {
-        return themeDescriptor;
+    public List<DefDescriptor<ThemeDef>> getThemeDescriptors() {
+        return themeDescriptors;
     }
 
     @Override
@@ -256,7 +266,7 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
             ApplicationDefImpl other = (ApplicationDefImpl) obj;
 
             return super.equals(obj)
-                    && Objects.equal(this.themeDescriptor, other.themeDescriptor);
+                    && Objects.equal(this.themeDescriptors, other.themeDescriptors);
         }
 
         return false;
@@ -264,7 +274,7 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
 
     private final DefDescriptor<EventDef> locationChangeEventDescriptor;
     private final DefDescriptor<LayoutsDef> layoutsDefDescriptor;
-    private final DefDescriptor<ThemeDef> themeDescriptor;
+    private final List<DefDescriptor<ThemeDef>> themeDescriptors;
     private final int hashCode;
 
     private final Boolean isAppcacheEnabled;

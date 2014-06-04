@@ -81,17 +81,34 @@ public class ApplicationDefHandlerTest extends AuraImplTestCase {
             ad.validateDefinition();
             fail("Should have thrown Exception. Two attributes with the same name cannot exist");
         } catch (Exception e) {
-            checkExceptionContains(e, InvalidDefinitionException.class, "Duplicate definitions for attribute implNumber");
+            checkExceptionContains(e, InvalidDefinitionException.class,
+                    "Duplicate definitions for attribute implNumber");
         }
     }
 
     public void testReadThemeAttribute() throws QuickFixException {
-        DefDescriptor<ThemeDef> override = addSourceAutoCleanup(ThemeDef.class, "<aura:theme></aura:theme>");
+        DefDescriptor<ThemeDef> theme = addSourceAutoCleanup(ThemeDef.class, "<aura:theme></aura:theme>");
 
         String src = String.format("<aura:application theme=\"%s\"></aura:application>",
-                override.getDescriptorName());
+                theme.getDescriptorName());
 
         DefDescriptor<ApplicationDef> app = addSourceAutoCleanup(ApplicationDef.class, src);
-        assertEquals(override, app.getDef().getThemeDescriptor());
+        assertEquals(1, app.getDef().getThemeDescriptors().size());
+        assertEquals(theme, app.getDef().getThemeDescriptors().get(0));
+    }
+
+    public void testReadThemeAttributeMultiple() throws QuickFixException {
+        DefDescriptor<ThemeDef> t1 = addSourceAutoCleanup(ThemeDef.class, "<aura:theme></aura:theme>");
+        DefDescriptor<ThemeDef> t2 = addSourceAutoCleanup(ThemeDef.class, "<aura:theme></aura:theme>");
+        DefDescriptor<ThemeDef> t3 = addSourceAutoCleanup(ThemeDef.class, "<aura:theme></aura:theme>");
+
+        String src = String.format("<aura:application theme=\"%s, %s, %s\"></aura:application>",
+                t1.getDescriptorName(), t2.getDescriptorName(), t3.getDescriptorName());
+
+        DefDescriptor<ApplicationDef> app = addSourceAutoCleanup(ApplicationDef.class, src);
+        assertEquals(3, app.getDef().getThemeDescriptors().size());
+        assertEquals(t1, app.getDef().getThemeDescriptors().get(0));
+        assertEquals(t2, app.getDef().getThemeDescriptors().get(1));
+        assertEquals(t3, app.getDef().getThemeDescriptors().get(2));
     }
 }

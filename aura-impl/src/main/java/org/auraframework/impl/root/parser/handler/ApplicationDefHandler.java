@@ -41,6 +41,7 @@ import org.auraframework.throwable.AuraError;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
+import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 
@@ -65,7 +66,7 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
         return isInPrivilegedNamespace ? PRIVILEGED_ALLOWED_ATTRIBUTES : ALLOWED_ATTRIBUTES;
     }
 
-	@Override
+    @Override
     protected ApplicationDefImpl.Builder createBuilder() {
         return new ApplicationDefImpl.Builder();
     }
@@ -139,17 +140,21 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
             appBuilder.isOnePageApp = false;
         }
 
-        String theme = getAttributeValue(ATTRIBUTE_THEME);
-        if (theme != null) {
+        String themeNames = getAttributeValue(ATTRIBUTE_THEME);
+        if (themeNames != null) {
             // an empty string is a valid value, and it means don't use any theme.
             // this is a way to opt-out of the implicit default (below)
-            if (!AuraTextUtil.isNullEmptyOrWhitespace(theme)) {
-                appBuilder.setThemeDescriptor(DefDescriptorImpl.getInstance(theme, ThemeDef.class));
+            if (!AuraTextUtil.isNullEmptyOrWhitespace(themeNames)) {
+                for (String name : Splitter.on(',').trimResults().omitEmptyStrings().split(themeNames)) {
+                    appBuilder.appendThemeDescriptor(DefDescriptorImpl.getInstance(name, ThemeDef.class));
+                }
             }
         } else {
             // the implicit theme override for an app is the namespace-default theme, if it exists
-            DefDescriptor<ThemeDef> desc = Themes.getNamespaceDefaultTheme(defDescriptor);
-            appBuilder.setThemeDescriptor(desc.exists() ? desc : null);
+            DefDescriptor<ThemeDef> namespaceTheme = Themes.getNamespaceDefaultTheme(defDescriptor);
+            if (namespaceTheme.exists()) {
+                appBuilder.appendThemeDescriptor(namespaceTheme);
+            }
         }
     }
 
@@ -170,11 +175,11 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
     }
 
     @Override
-	protected boolean allowAuthenticationAttribute() {
-    	return true;
-	}
+    protected boolean allowAuthenticationAttribute() {
+        return true;
+    }
 
-	private static final String ATTRIBUTE_PRELOAD = "preload";
+    private static final String ATTRIBUTE_PRELOAD = "preload";
     private static final String ATTRIBUTE_LAYOUTS = "layouts";
     private static final String ATTRIBUTE_LOCATION_CHANGE_EVENT = "locationChangeEvent";
     private static final String ATTRIBUTE_APPCACHE_ENABLED = "useAppcache";
@@ -185,8 +190,11 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
     private static final Set<String> ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>()
             .add(ATTRIBUTE_APPCACHE_ENABLED)
             .addAll(BaseComponentDefHandler.ALLOWED_ATTRIBUTES).build();
-    
-	private static final Set<String> PRIVILEGED_ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>().add(
-			ATTRIBUTE_PRELOAD, ATTRIBUTE_LAYOUTS, ATTRIBUTE_LOCATION_CHANGE_EVENT, 
-            ATTRIBUTE_ADDITIONAL_APPCACHE_URLS, ATTRIBUTE_IS_ONE_PAGE_APP, ATTRIBUTE_THEME).addAll(ALLOWED_ATTRIBUTES).addAll(BaseComponentDefHandler.PRIVILEGED_ALLOWED_ATTRIBUTES).build();
+
+    private static final Set<String> PRIVILEGED_ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>().add(
+            ATTRIBUTE_PRELOAD, ATTRIBUTE_LAYOUTS, ATTRIBUTE_LOCATION_CHANGE_EVENT,
+            ATTRIBUTE_ADDITIONAL_APPCACHE_URLS, ATTRIBUTE_IS_ONE_PAGE_APP, ATTRIBUTE_THEME)
+            .addAll(ALLOWED_ATTRIBUTES)
+            .addAll(BaseComponentDefHandler.PRIVILEGED_ALLOWED_ATTRIBUTES)
+            .build();
 }

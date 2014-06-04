@@ -8,7 +8,9 @@
             $A.componentService.newComponentAsync(
                 this,
                 function(newCmp){
-                    cmp.find("container").getValue('v.body').push(newCmp);
+                	var body = cmp.find("container").get('v.body'); 
+                    body.push(newCmp);
+                    cmp.find("container").set('v.body', body)
                 },
                 a.getReturnValue()
             );

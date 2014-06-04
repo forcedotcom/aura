@@ -17,6 +17,7 @@
 -->
 <aura:component model="java://org.auraframework.impl.java.model.TestJavaModel">
     <aura:attribute name="map" type="Map" />
+    <aura:handler name="change" value="{!v.map}" action="{!c.onValueChange}"/>
     <aura:handler name="change" value="{!m.map}" action="{!c.onValueChange}"/>
     
     <aura:attribute name="fribble" type="Boolean" default="false"/>

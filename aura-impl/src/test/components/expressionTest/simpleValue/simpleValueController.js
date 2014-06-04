@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 ({
-	//W-2256422 - Some sections in component markup are disabled, enable those too
-    testEvaluations: {
-        test: function(component){
-            component.getDef().getHelper().checkForErrors(component);
+    onValueChange : function(cmp, evt, helper){
+        if(cmp._log===undefined){
+            cmp._log=[];
         }
+        cmp._log.push(evt.getParams());
     }
 })

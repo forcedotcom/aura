@@ -414,15 +414,8 @@ Action.prototype.setCallback = function(scope, callback, name) {
             fn : callback,
             s : scope
         };
-        // FIXME: this is rather horrific, as it is not what it claims, but it is currently
-        // depended on. This callback is only called when the server has a problem with the
-        // arguments, which seems less than obvious
-        this.callbacks["ABORTED"] = {
-            fn : callback,
-            s : scope
-        };
     } else {
-        if (name !== "SUCCESS" && name !== "ERROR" && name !== "ABORTED" && name !== "INCOMPLETE") {
+        if (name !== "SUCCESS" && name !== "ERROR" && name !== "INCOMPLETE") {
             $A.error("Illegal name " + name);
             return;
         }

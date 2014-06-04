@@ -22,7 +22,7 @@
 			The button can be created in several ways.
 		</p>
 		<p>
-			A text-only button has only the required <code>label</code> attribute set on it. An image-only button has the required <code>label</code> attribute set on it and the <code>labelDisplay</code> attribute set to <code>false</code>.
+			A text-only button has only the required <code>label</code> attribute set on it.
 			To create a button with both image and text, use the <code>label</code> attribute and add styles for the button.
 		</p>
 		<p>

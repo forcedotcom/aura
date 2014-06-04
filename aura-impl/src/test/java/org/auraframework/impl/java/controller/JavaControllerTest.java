@@ -30,9 +30,7 @@ import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.Action.State;
-
 import org.auraframework.service.DefinitionService;
-
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Controller;
 import org.auraframework.system.LoggingContext.KeyValueLogger;
@@ -149,7 +147,33 @@ public class JavaControllerTest extends AuraImplTestCase {
     }
 
     /**
-     * Test to ensure that parameters get passed correectly.
+     * Verify correct errors are thrown when invalid parameters are passed to the controller.
+     */
+    public void testActionWithParametersError() throws Exception {
+        ControllerDef controller = getJavaController("java://org.auraframework.impl.java.controller.TestControllerWithParameters");
+        Map<String, Object> args = new HashMap<String, Object>();
+
+        // A custom type parameter without a converter for what's passed to it (String)
+        args.put("a", "x");
+        checkFailAction(controller, "customParam", args, State.ERROR, AuraUnhandledException.class,
+                "Error on parameter a: java://org.auraframework.impl.java.controller.TestControllerWithParameters$CustomParam");
+
+        // No parameters to a controller method that requires params
+        args.clear();
+        checkFailAction(controller, "sumValues", args, State.ERROR, AuraUnhandledException.class,
+                "org.auraframework.throwable.AuraExecutionException: " +
+                        "java://org.auraframework.impl.java.controller.TestControllerWithParameters: " +
+                        "java.lang.NullPointerException");
+
+        // Passing the wrong type (Strings instead of Integers)
+        args.put("a", "x");
+        args.put("b", "y");
+        checkFailAction(controller, "sumValues", args, State.ERROR, AuraUnhandledException.class,
+                "Invalid value for a: java://java.lang.Integer");
+    }
+
+    /**
+     * Test to ensure that parameters get passed correctly.
      */
     public void testActionWithParameters() throws Exception {
         ControllerDef controller = getJavaController("java://org.auraframework.impl.java.controller.TestControllerWithParameters");
@@ -166,17 +190,6 @@ public class JavaControllerTest extends AuraImplTestCase {
         args.put("a", new Integer(1));
         args.put("b", new Integer(2));
         checkPassAction(controller, "sumValues", args, State.SUCCESS, new Integer(3));
-
-        args.clear();
-        checkFailAction(controller, "sumValues", args, State.ERROR, AuraUnhandledException.class,
-                "org.auraframework.throwable.AuraExecutionException: " +
-                        "java://org.auraframework.impl.java.controller.TestControllerWithParameters: " +
-                        "java.lang.NullPointerException");
-
-        args.put("a", "x");
-        args.put("b", "y");
-        checkFailAction(controller, "sumValues", args, State.ERROR, AuraUnhandledException.class,
-                "Invalid value for a: java://java.lang.Integer");
 
         args.put("a", "1");
         args.put("b", "2");
@@ -433,17 +446,18 @@ public class JavaControllerTest extends AuraImplTestCase {
     }
 
     private void checkInvalidBeanConstructor(Class<?> clazz, String message) {
-        DefDescriptor<ControllerDef> desc = DefDescriptorImpl.getInstance("java://"+clazz.getName(), ControllerDef.class);
+        DefDescriptor<ControllerDef> desc = DefDescriptorImpl.getInstance("java://" + clazz.getName(),
+                ControllerDef.class);
         DefinitionService definitionService = Aura.getDefinitionService();
         try {
             definitionService.getDefinition(desc);
             fail("Expected exception");
         } catch (Exception e) {
-            checkExceptionStart(e, InvalidDefinitionException.class, message, "java://"+clazz.getCanonicalName());
+            checkExceptionStart(e, InvalidDefinitionException.class, message, "java://" + clazz.getCanonicalName());
         }
     }
 
-    @Controller(bean=true)
+    @Controller(bean = true)
     public static class BadBeanControllerConstructor {
         public BadBeanControllerConstructor(String value) {
         }
@@ -454,7 +468,7 @@ public class JavaControllerTest extends AuraImplTestCase {
         checkInvalidBeanConstructor(BadBeanControllerConstructor.class, "No default constructor found");
     }
 
-    @Controller(bean=true)
+    @Controller(bean = true)
     public static class PrivateBeanControllerConstructor {
         private PrivateBeanControllerConstructor() {
         }
@@ -465,7 +479,7 @@ public class JavaControllerTest extends AuraImplTestCase {
         checkInvalidBeanConstructor(PrivateBeanControllerConstructor.class, "Default constructor is not public");
     }
 
-    @Controller(bean=true)
+    @Controller(bean = true)
     public static class ProtectedBeanControllerConstructor {
         protected ProtectedBeanControllerConstructor() {
         }
@@ -476,7 +490,7 @@ public class JavaControllerTest extends AuraImplTestCase {
         checkInvalidBeanConstructor(ProtectedBeanControllerConstructor.class, "Default constructor is not public");
     }
 
-    @Controller(bean=true)
+    @Controller(bean = true)
     public static class StaticBeanControllerMethod {
         public StaticBeanControllerMethod() {
         }

@@ -448,6 +448,7 @@
                         <intf>XML_STYLE</intf>
                         <evt>XML_STYLE</evt>
                         <auradoc>XML_STYLE</auradoc>
+                        <lib>XML_STYLE</lib>
                         <apt>DOUBLETILDE_STYLE</apt>
                         <properties>SCRIPT_STYLE</properties>
                         <sh>SCRIPT_STYLE</sh>

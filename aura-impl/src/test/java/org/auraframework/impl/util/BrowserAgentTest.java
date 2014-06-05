@@ -32,7 +32,7 @@ public class BrowserAgentTest extends TestSuite{
 
     public static TestSuite suite() throws Throwable {
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
-        InputStream is = cl.getResourceAsStream("org/auraframework/impl/util/BrowserAgentTest.csv");
+        InputStream is = cl.getResourceAsStream("/results/BrowserAgentTest/BrowserAgentTest.csv");
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));
         TestSuite suite = new TestSuite("BrowserAgentTestSuite");
         try {

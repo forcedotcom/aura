@@ -16,25 +16,25 @@
 .THIS {
 	display: block;
 	position: relative;
-	width: 100%; 
-}
-
-.THIS {
-	transition: all .3s;
+	width: 100%;
+	z-index: 1;
 }
 
 .THIS > div.body {
+	transition: all .3s;
 	width: 100%;
 }
 
 .THIS > div.swipeBody {
+	height: 100%;
+	padding-left: 20%;
 	position: absolute;
-	width: 100%;
 	top: 0;	
-	bottom: 0;
-	transform: translate3d(100%, 0, 0);
+	width: 100%;
+	z-index: -1;
+	overflow: hidden;
 }
 
-.THIS.open {
+.THIS.open > div.body {
 	transform: translate3d(-80%, 0, 0);
 }

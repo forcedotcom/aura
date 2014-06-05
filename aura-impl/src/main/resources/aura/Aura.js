@@ -477,6 +477,18 @@ $A.ns.Aura = function() {
             }
     );
 
+    
+    this.eventService.addHandler({
+        event : 'aura:clientRedirect',
+        "globalId" : "Aura",
+        "handler" : function(evt) {
+        	var url = evt.getParam('url');
+        	if (url != null) {
+        		window.location = url; 
+        	}
+        }
+    });
+        
     this.eventService.addHandler({
         event : 'aura:systemError',
         "globalId" : "Aura",

@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:input" support="proto" description="This component suggests a list of values from the data provider as you type in input components such as ui:inputText and ui:inputTextArea. To set the list options, use the ui:autocompleteOption component in the listOption attribute. The behaviors for a text match, input change, and option display can be customized using the matchText, inputChange, and selectListOption events respectively.">
+<aura:component extends="ui:input" support="proto" description="Represents an input field that suggests a list of values from the data provider as you type.">
     <aura:attribute name="dataProvider" type="Aura.Component[]" required="true" description="A list of data provider components"/>
     <aura:attribute name="inputClass" type="String" description="The css class for input component."/>
     <aura:attribute name="inputType" type="String" default="inputText" description="The type of input component. We support inputText and inputTextArea for now."/>

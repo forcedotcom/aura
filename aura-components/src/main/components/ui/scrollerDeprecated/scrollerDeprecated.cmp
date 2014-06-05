@@ -16,7 +16,7 @@
 
 -->
 <aura:component support="BETA"
-    description="This component creates a scrollable view, complete with scroll bars and pull-to-refresh behaviors. The &lt;ui:scroller&gt; expands vertically to fill the space available within its parent component. You can set the width, and enable or disable both vertical and horizontal scrolling. Adding pull-to-refresh behavior is as simple as writing an action method to handle the event. Everything else is automatic. You can customize the status display for pull-to-refresh behavior, or accept the defaults.">
+    description="Deprecated and replaced by ui:scroller.">
     <aura:attribute name="hScroll" type="Boolean" default="false" description="Enables horizontal scrolling on the component. Default value is &quot;false&quot;."/>
     <aura:attribute name="vScroll" type="Boolean" default="true" description="Enables vertical scrolling on the component. Default value is &quot;true&quot;."/>
     <aura:attribute name="showScrollbars" type="Boolean" default="true" description="Shows or hides scroll bars. Default value is &quot;true&quot;, which shows the scroll bars."/>

@@ -1,0 +1,36 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:documentation>
+	<aura:description>
+		 <p>
+	        <code>ui:scroller</code> expands vertically to fill the space available within its parent component. You can set the width, and enable or disable both vertical and horizontal scrolling. 
+	        Handle pull-to-refresh event in an action method. You can customize the status display for pull-to-refresh behavior, or accept the defaults.
+	    </p>
+	     <p>
+	        For large or dynamic data sets, you can embed menu and list components in the scroller and take advantage of its pull-to-refresh behavior to retrieve new data.
+	    </p>
+	</aura:description>	
+		<aura:example name="scroller" ref="auradocs:demoScroller" label="Using ui:scroller">
+    	  <p>This example shows how to use the pull-to-refresh behavior on the scroller.</p>
+	    </aura:example>	
+		<aura:example name="listScroller" ref="auradocs:demoList" label="Embedding Lists in ui:scroller">
+    	  <p>This example shows you can use a scroller to retrieve list data. To load new data, either pull to refresh or click the Show More button.</p>
+	    </aura:example>
+	   
+	
+</aura:documentation>

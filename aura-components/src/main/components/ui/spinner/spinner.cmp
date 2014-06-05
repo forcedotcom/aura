@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component description="Loading spinner to be used as a component body while the real component body is being loaded" support="BETA">
+<aura:component description="A loading spinner to be used while the real component body is being loaded" support="BETA">
     <aura:attribute name="isVisible" type="Boolean" default="true"/>
     <aura:registerEvent name="toggle" type="ui:toggleLoadingIndicator"/>
     <aura:handler name="toggle" action="{!c.toggleSpinner}"/>

@@ -20,6 +20,7 @@
         var scroller = component.find("pullToRefresh");
         
         //Call the refresh action on ui:scroller
-        $A.run(function() { scroller.get("c.refresh").runDeprecated(); });
+        var refresh = scroller.get("c.refresh");
+        $A.enqueueAction(refresh);
     }
 })

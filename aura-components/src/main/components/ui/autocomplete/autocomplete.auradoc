@@ -1,0 +1,41 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:documentation>
+	<aura:description>
+		<p>
+		    <code>ui:autocomplete</code> displays suggestions as users type in a text field. Data for this component is provided by a server-side model. This component provides its own text field and text area component.
+		    The default is a text field but you can change it to a text area by setting <code>inputType="inputTextArea"</code>.
+		</p>
+		<p>
+			To set the list options, use the <code>ui:autocompleteOption</code> component in the <code>listOption</code> attribute. 
+			The behaviors for a text match, input change, and option display can be customized using the <code>matchText</code>, <code>inputChange</code>, and <code>selectListOption</code> events respectively.
+		</p>
+		<p>
+			Clicking a list option fires the <code>selectListOption</code> event. You can retrieve the number of matches by using the <code>size</code> parameter in the <code>matchDone</code> event. The number of matches
+			is displayed after <code>matchDone</code> is fired.
+		</p>
+		<p>
+			
+    	</p>
+	</aura:description>	
+		<aura:example name="autocomplete" ref="auradocs:demoAutocomplete" label="Using ui:autocomplete">
+    	<p>This example shows how to use <code>ui:autocomplete</code> with a data provider and events like <code>matchDone</code>, <code>inputChange</code>, and <code>selectListOption</code>.</p>
+	   </aura:example>
+	   
+	
+</aura:documentation>

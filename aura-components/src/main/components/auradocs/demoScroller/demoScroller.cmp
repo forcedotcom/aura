@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component access="global">
+<aura:component>
 	<ui:block>
 		<aura:set attribute="left">
 			<div class="scrollArea">
@@ -26,7 +26,7 @@
     	</aura:set>
     	<aura:set attribute="right">
 			<div class="scrollArea">
-				<ui:scroller>
+				<ui:scroller showScrollbars="true">
 				Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse eu diam tortor, sodales venenatis est. Sed blandit eros sed neque tincidunt pulvinar. 
 				Praesent egestas aliquam nisl nec hendrerit. Donec lacinia tempus enim, ac tincidunt dolor laoreet eget. Nulla facilisi. 
 				Etiam dapibus leo feugiat risus pharetra eu gravida neque porttitor. Suspendisse aliquam dolor sit amet massa lobortis tristique posuere lorem feugiat. 
@@ -37,5 +37,6 @@
 				</ui:scroller>
 			</div>
 	</aura:set>
+	
 	</ui:block>
 </aura:component>

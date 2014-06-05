@@ -1,0 +1,34 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:documentation>
+	<aura:description>
+		 <p>
+	        To toggle the spinner, use <code>cmp.get("e.toggle")</code> and set the <code>isVisible</code> parameter to <code>true</code> or <code>false</code>.
+	        The <code>ui:spinner</code> component fires the <code>toggle</code> event.
+	    </p>
+	     <p>
+	        <code>cmp.get("e.toggle")</code> is used to retrieve the toggle event, while <code>isVisible</code> is a parameter on the <code>toggle</code> event. 
+	        Finally, call <code>evt.fire();</code> to fire the event. 
+	    </p>
+	</aura:description>	
+		<aura:example name="spinner" ref="auradocs:demoSpinner" label="Using ui:message">
+    	<p>This example shows messages in varying severity levels.</p>
+	   </aura:example>
+	   
+	
+</aura:documentation>

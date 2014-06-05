@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component support="BETA" extensible="true" description="The scroller!">
+<aura:component support="BETA" extensible="true" description="A scrollable view with scroll bars and pull-to-refresh support">
 
     <!-- Exposed attributes -->
     <aura:attribute name="scroll"               type="String"  default="vertical" description="Defines the scroll direction. The string values can be either horizontal or vertical"/>

@@ -1,0 +1,40 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:documentation>
+	<aura:description>
+		<p>
+		    By default, <code>ui:inputRichText</code> renders a WYSIWYG editor for entering rich text. 
+		    Setting <code>isRichText="false"</code> uses the <code>ui:inputTextArea</code> component instead of a WYSIWYG editor.
+		</p>
+		<p>
+			The width and height of the rich text editor are independent of those on the <code>ui:inputTextArea</code> component.
+		  	To set the width and height of the component when you set <code>isRichText="false"</code>, use the <code>cols</code> and <code>rows</code> attributes.
+		    Otherwise, use the <code>width</code> and <code>height</code> attributes.    	
+		</p>
+		<p>
+			<code>ui:outputRichText</code> supports a list of HTML tags that are typically supported by CKEditor.
+    	   You can add more tags by specifying them on the <code>supportedTags</code> attribute. 
+    	   Tags such as <code>&lt;script&gt;</code> are removed.
+    	</p>
+	</aura:description>	
+		<aura:example name="inputRichText" ref="auradocs:demoInputRT" label="Using ui:inputRichText">
+    	<p>This example shows a text area and WYSIWYG editor.</p>
+	   </aura:example>
+	   
+	
+</aura:documentation>

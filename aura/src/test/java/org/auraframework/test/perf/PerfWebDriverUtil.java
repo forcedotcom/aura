@@ -15,12 +15,6 @@
  */
 package org.auraframework.test.perf;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -45,7 +39,6 @@ import org.openqa.selenium.logging.LoggingPreferences;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
-import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -208,45 +201,6 @@ public final class PerfWebDriverUtil {
         return str1.equals(str2);
     }
 
-    // dev tools log
-
-    /**
-     * Writes the dev tools log for a perf test run to
-     * System.getProperty("java.io.tmpdir")/perf/devToolsLogs/testName.json
-     */
-    public static void writeDevToolsLog(List<JSONObject> devToolsLog, String fileName, String userAgent) {
-        String path = System.getProperty("java.io.tmpdir") + "/perf/devToolsLogs/" + fileName + ".json";
-        File file = new File(path);
-        try {
-            writeDevToolsLog(devToolsLog, file, userAgent);
-        } catch (Exception e) {
-            LOG.log(Level.WARNING, "error writing " + file.getAbsolutePath(), e);
-        }
-    }
-
-    private static void writeDevToolsLog(List<JSONObject> devToolsLog, File file, String userAgent) throws Exception {
-        BufferedWriter writer = null;
-        try {
-            file.getParentFile().mkdirs();
-            writer = new BufferedWriter(new FileWriter(file));
-            writer.write('[');
-            writer.write(JSONObject.quote(userAgent));
-            for (JSONObject entry : devToolsLog) {
-                writer.write(',');
-                writer.newLine();
-                writer.write(entry.toString());
-            }
-            writer.write("]");
-            writer.newLine();
-            LOG.info("wrote dev tools log: " + file.getAbsolutePath());
-        } finally {
-            if (writer != null) {
-                writer.flush();
-                writer.close();
-            }
-        }
-    }
-
     // JS heap snapshot
 
     /**
@@ -284,97 +238,5 @@ public final class PerfWebDriverUtil {
             throw new RuntimeException(e);
         }
         return json;
-    }
-
-    /**
-     * Writes the heap snapshot into a file, this file can be loaded into chrome dev tools -> Profiles -> Load
-     */
-    public static void writeHeapSnapshot(Map<String, ?> data, File file) throws Exception {
-        BufferedWriter writer = null;
-        try {
-            file.getParentFile().mkdirs();
-            FileOutputStream out = new FileOutputStream(file);
-
-            // write using same format as CDT Save:
-            // https://developers.google.com/chrome-developer-tools/docs/heap-profiling
-            writer = new BufferedWriter(new OutputStreamWriter(out, Charsets.US_ASCII));
-            writer.write('{');
-            writer.write(JSONObject.quote("snapshot"));
-            writer.write(':');
-            new JSONObject((Map) data.get("snapshot")).write(writer);
-            writer.write(',');
-            writer.newLine();
-            writeList(writer, "nodes", (List) data.get("nodes"), 5, false);
-            writeList(writer, "edges", (List) data.get("edges"), 3, false);
-            writeList(writer, "trace_function_infos", (List) data.get("trace_function_infos"), 1, false);
-            writeList(writer, "trace_tree", (List) data.get("trace_tree"), 1, false);
-            writeList(writer, "strings", (List) data.get("strings"), 1, true);
-            writer.write('}');
-
-            LOG.info("wrote heap snapshot: " + file.getAbsolutePath());
-        } finally {
-            if (writer != null) {
-                writer.flush();
-                writer.close();
-            }
-        }
-    }
-
-    private static void writeList(BufferedWriter writer, String key, List list, int numPerLine, boolean last)
-            throws IOException {
-        writer.write(JSONObject.quote(key));
-        writer.write(':');
-        writer.write('[');
-        for (int i = 0; i < list.size(); i++) {
-            Object entry = list.get(i);
-            if (i > 0) {
-                if (numPerLine > 1) {
-                    if (i % numPerLine == 0) {
-                        writer.newLine();
-                    }
-                    writer.write(',');
-                } else {
-                    writer.write(',');
-                    writer.newLine();
-                }
-            }
-            if (entry instanceof String) {
-                writer.write(JSONObject.quote((String) entry));
-            } else {
-                writer.write(entry.toString());
-            }
-        }
-        if (numPerLine > 1) {
-            writer.newLine();
-        }
-        writer.write("]");
-        if (!last) {
-            writer.write(',');
-            writer.newLine();
-        }
-    }
-
-    public static void showHeapSnapshot(Map<String, ?> data) throws JSONException {
-        for (Object key : data.keySet()) {
-            System.out.println(key + ": " + data.get(key).getClass());
-        }
-
-        Map snapshot = (Map) data.get("snapshot");
-
-        System.out.println();
-        showList("edges", (List) data.get("edges"));
-        showList("nodes", (List) data.get("nodes"));
-        showList("strings", (List) data.get("strings"));
-        showList("trace_tree", (List) data.get("trace_tree"));
-        showList("trace_function_infos", (List) data.get("trace_function_infos"));
-
-        System.out.println("\nsnapshot: " + new JSONObject(snapshot).toString(2));
-    }
-
-    private static void showList(String label, List list) {
-        System.out.println(label + ": size " + list.size());
-        for (int i = 0; i < Math.min(16, list.size()); i++) {
-            System.out.println("    " + list.get(i));
-        }
     }
 }

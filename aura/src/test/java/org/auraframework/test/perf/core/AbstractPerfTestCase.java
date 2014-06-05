@@ -88,7 +88,7 @@ public abstract class AbstractPerfTestCase extends WebDriverTestCase {
         openTotallyRaw(url);
 
         // wait for component loaded or aura error message
-        final By componentLoaded = By.cssSelector("[data-app-rendered-component]");
+        final By componentRendered = By.cssSelector("[data-app-rendered-component]");
         final By auraErrorMessage = By.id("auraErrorMessage");
 
         // don't use the AuraUITestingUtil wait that does extra checks/processing
@@ -98,8 +98,8 @@ public abstract class AbstractPerfTestCase extends WebDriverTestCase {
                 if (d.findElement(auraErrorMessage).isDisplayed()) {
                     return auraErrorMessage;
                 }
-                if (d.findElement(componentLoaded) != null) {
-                    return componentLoaded;
+                if (d.findElement(componentRendered) != null) {
+                    return componentRendered;
                 }
                 return null;
             }
@@ -109,6 +109,14 @@ public abstract class AbstractPerfTestCase extends WebDriverTestCase {
 
         if (locatorFound == auraErrorMessage) {
             fail("Error loading " + descriptor.getName() + ": " + currentDriver.findElement(auraErrorMessage).getText());
+        }
+
+        // check for internal errors
+        if (locatorFound == componentRendered) {
+            String text = currentDriver.findElement(componentRendered).getText();
+            if (text != null && text.contains("internal server error")) {
+                fail("Error loading " + descriptor.getDescriptorName() + ": " + text);
+            }
         }
     }
 

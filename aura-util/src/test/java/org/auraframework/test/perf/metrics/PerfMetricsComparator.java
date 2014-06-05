@@ -63,6 +63,8 @@ public final class PerfMetricsComparator {
         map.put("Timeline.Rendering.BeginFrame", "ignored");
         map.put("Timeline.Scripting.TimeStamp", "we put those");
 
+        map.put("Timeline.Other.UpdateLayerTree", "metric with wrong name in old goldfiles");
+
         METRICS_TO_EXCLUDE = ImmutableMap.copyOf(map);
     }
 

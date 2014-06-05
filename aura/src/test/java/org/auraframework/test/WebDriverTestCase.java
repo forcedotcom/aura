@@ -53,6 +53,7 @@ import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.WebDriverUtil.BrowserType;
 import org.auraframework.test.annotation.FreshBrowserInstance;
 import org.auraframework.test.annotation.WebDriverTest;
+import org.auraframework.test.perf.PerfResultsUtil;
 import org.auraframework.test.perf.PerfUtil;
 import org.auraframework.test.perf.PerfWebDriverUtil;
 import org.auraframework.test.perf.metrics.PerfMetrics;
@@ -285,7 +286,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
 
                     if (logger.isLoggable(Level.FINE)) {
                         logger.fine("writing dev tools log for each run");
-                        PerfWebDriverUtil.writeDevToolsLog(metrics.getDevToolsLog(), getName() + '_' + (i + 1),
+                        PerfResultsUtil.writeDevToolsLog(metrics.getDevToolsLog(), getGoldFileName() + '_' + (i + 1),
                                 auraUITestingUtil.getUserAgent());
                     }
                 } finally {
@@ -327,8 +328,9 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
             }
             List<JSONObject> devToolsLog = allMetrics.getDevToolsLog();
             if (devToolsLog != null) {
-                PerfWebDriverUtil.writeDevToolsLog(devToolsLog, getName(), auraUITestingUtil.getUserAgent());
+                PerfResultsUtil.writeDevToolsLog(devToolsLog, getGoldFileName(), auraUITestingUtil.getUserAgent());
             }
+            PerfResultsUtil.writeGoldFile(allMetrics, getGoldFileName(), storeDetailsInGoldFile());
             perfTearDown(allMetrics);
         }
     }

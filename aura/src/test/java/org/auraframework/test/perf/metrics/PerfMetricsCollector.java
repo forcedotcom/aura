@@ -22,6 +22,7 @@ import java.util.logging.Logger;
 
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.WebDriverTestCase;
+import org.auraframework.test.perf.PerfResultsUtil;
 import org.auraframework.test.perf.rdp.RDPAnalyzer;
 import org.auraframework.test.perf.rdp.RDPNotification;
 import org.auraframework.test.perf.rdp.TimelineEventStats;
@@ -137,9 +138,11 @@ public final class PerfMetricsCollector {
                 // "added": [],
                 // "removed": []
                 // }
+                String auraStatsContents = new JSONObject(auraStats).toString(2);
                 if (LOG.isLoggable(Level.INFO)) {
-                    LOG.info("collected aura stats: " + new JSONObject(auraStats).toString(2));
+                    LOG.info("collected aura stats: " + auraStatsContents);
                 }
+                PerfResultsUtil.writeAuraStats(auraStatsContents, test.getGoldFileName());
                 for (String name : auraStats.keySet()) {
                     Map<String, Map<String, List<Object>>> nameValue = auraStats.get(name);
                     for (String method : nameValue.keySet()) {

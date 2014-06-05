@@ -43,7 +43,7 @@ public abstract class CustomPerfAbstractTestCase extends AbstractPerfTestCase {
     }
 
     @Override
-    protected final String getGoldFileName() {
+    public final String getGoldFileName() {
         return descriptor.getNamespace() + '/' + descriptor.getName();
     }
 }

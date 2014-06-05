@@ -92,6 +92,7 @@ public class TimelineEventUtil {
         typeToCategory.put("ActivateLayerTree", Category.Rendering);
         typeToCategory.put("DrawFrame", Category.Rendering);
         typeToCategory.put("RequestMainThreadFrame", Category.Rendering);
+        typeToCategory.put("UpdateLayerTree", Category.Rendering);
     }
 
     /**

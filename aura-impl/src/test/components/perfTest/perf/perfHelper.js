@@ -101,19 +101,40 @@
             }
         }
     },
+    fetchServerSideDependencies: function (cmp, rawCmp, callback) {
+        var cmpDef = rawCmp.def,
+            resolvedDef, action;
+
+        resolvedDef = $A.componentService.getDef(cmpDef, true);
+        if (resolvedDef) {
+            return callback(resolvedDef);
+        } else {
+            action = $A.get("c.aura://ComponentController.getComponentDef");
+            action.setParams({
+                name: cmpDef
+            });
+
+            action.setCallback(this, function (a) {
+                 callback(a);
+            });
+
+            $A.enqueueAction(action);
+        }
+    },
     getAttributeMockValue: function(componentDef, attributeDef) {
-        var cmpName = this.getComponentDescriptorFullName(componentDef);
-        var attrName = attributeDef.getDescriptor().getName();
-        var whitelistedAttrs = this.predefinedAttributeMocks.whitelist[cmpName];
-        var retValue;
-        if(whitelistedAttrs && (retValue = whitelistedAttrs[attrName]) != undefined) {
+        var cmpName          = this.getComponentDescriptorFullName(componentDef),
+            attrName         = attributeDef.getDescriptor().getName(),
+            whitelistedAttrs = this.predefinedAttributeMocks.whitelist[cmpName],
+            retValue;
+
+        if (whitelistedAttrs && (retValue = whitelistedAttrs[attrName]) != undefined) {
             return retValue;
         }
 
         // If attribute value is not predefined in whitelisted components list
         // use the attribute descriptor type to generate a random value.
         var type = attributeDef.getTypeDefDescriptor().substring(7); //trim prefix 'aura://'
-        var isArrayType = this.isArrayType(type);
+            isArrayType = this.isArrayType(type);
 
         if(isArrayType) { // Eg. String[]
             type = type.substring(0, type.length - 2);

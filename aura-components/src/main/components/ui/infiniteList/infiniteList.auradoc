@@ -1,0 +1,45 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:documentation>
+	<aura:description>
+		 <p>
+	        <code>ui:infiniteList</code> provides a paging interface to navigate lists. You can retrieve and display more data as necessary using events such as <code>refresh</code>, <code>showMore</code>, and <code>triggerDataProvider</code>.
+	    </p>
+	    <p>
+	    	The <code>refresh</code> event handles a list data refresh and fires the <code>triggerDataProvider</code> event.
+	    </p>
+	    <pre>
+var listData = cmp.find("listData");
+listData.get("e.refresh").fire();	    
+	    </pre>
+	    <p>
+	    	The <code>showMore</code> event handles the fetching of your data and displays it, which then fires <code>triggerDataProvider</code>.
+	    	<code>triggerDataProvider</code> triggers the providing of data from a data provider. It is run during component initialization and refresh. Use this event to retrieve more data.
+	    </p>
+	    <pre>
+cmp.set("v.currentPage", targetPage);
+var listData = component.find("listData");
+listData.get("e.triggerDataProvider").fire();
+	    </pre>
+	</aura:description>	
+		<aura:example name="infinitelist" ref="auradocs:demoList" label="Using ui:infiniteList">
+    	<p>This example shows a simple implementation of a list. To load new data, either pull to refresh or click the Show More button.</p>
+	   </aura:example>
+	   
+	
+</aura:documentation>

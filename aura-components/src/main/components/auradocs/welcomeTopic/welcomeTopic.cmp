@@ -36,8 +36,6 @@
     <p><ui:outputURL value="https://github.com/forcedotcom/aura" label="Quick Start" target="_blank" /> Dive right in and build an Aura app</p><br/>
  
     <p><ui:outputURL value="#reference" label="Reference" /> Look up the component reference and JavaScript API</p><br/>
-          
-    <p><ui:outputURL value="#demos" label="Demos" /> Check out some Aura demos</p><br/>       
         
     
 </aura:component>

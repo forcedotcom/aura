@@ -1,0 +1,39 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:documentation> 
+	<aura:description>
+		<p>
+			Date pickers in a component can be managed or unmanaged. By default, date pickers are unmanaged, which means that each input field is rendered with its own date picker.
+			To improve loading time if you have multiple date pickers in a component, you can render only one date picker in the DOM. To do this, include one instance of <code>ui:datePickerManager</code> in the component.
+			This sets the <code>managed</code> attribute on the date picker to <code>true</code>. When using managed date pickers, set <code>displayDatePicker</code> to <code>true</code> and <code>loadDatePicker</code> to <code>false</code>
+			on the component that extends <code>ui:inputDate</code>. For example, multiple instances of <code>ui:inputDateTrigger</code> is used with the date picker manager to render a single date picker in the DOM.
+		</p>
+		<pre>
+&lt;aura:component extends="ui:inputDate">
+    &lt;aura:set attribute="displayDatePicker" value="true"/>
+    &lt;aura:set attribute="loadDatePicker" value="false"/>
+&lt;/aura:component>
+</pre>
+		
+	</aura:description>	
+		<aura:example name="datePicker" ref="uiExamples:datePicker" label="Using the Date Picker">
+    	<p>This example shows managed date pickers. Only one instance of <code>ui:datePickerManager</code> is required to manage date pickers on a component.</p>
+    	
+	</aura:example>
+	
+</aura:documentation>

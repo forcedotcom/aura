@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extensible="true" implements="ui:visible" support="GA" description="Styles for confirm, info, warning and error messages.">
+<aura:component extensible="true" implements="ui:visible" support="GA" description="Represents a message of varying severity levels">
     <aura:attribute name="title" type="String" description="The title text for the message."/>
     <aura:attribute name="severity" type="String" default="message" description="The severity of the message. Possible values:  message (default), confirm, info, warning, error"/>
     <aura:attribute name="closable" type="Boolean" default="false" description="Specifies whether to display an 'x' that will close the alert when clicked. Default value is 'false'."/>

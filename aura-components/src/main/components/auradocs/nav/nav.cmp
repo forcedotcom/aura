@@ -26,7 +26,6 @@
 	        <ul class="navList">
 	            <li aura:id="help"><auradocs:navLink location="help">Help</auradocs:navLink></li>
 	            <li aura:id="reference"><auradocs:navLink location="reference">Reference</auradocs:navLink></li>
-	            <li aura:id="demos"><auradocs:navLink location="demos">Demos</auradocs:navLink></li>
 	        </ul>
 	        <div class="fuelGauge"><auraStorage:fuelGauge storageName="actions"/></div>
         </aura:if>

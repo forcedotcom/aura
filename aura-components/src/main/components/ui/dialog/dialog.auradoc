@@ -1,0 +1,41 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:documentation>
+	<aura:description>
+		<p>
+			To use <code>ui:dialog</code>, include one instance of <code>ui:dialogManager</code> component at the end of your component.
+			Only one instance of <code>ui:dialogManager</code> is required to handle multiple dialogs.
+		</p>
+		<p>
+			To handle the opening and closing of your dialogs, use the <code>ui:openDialog</code> and <code>ui:closeDialog</code> application events.
+			To prevent the dialog from being closed when you click outside of the dialog area, set <code>clickOutToClose="false"</code>.
+		</p>
+		<p>
+		   You can use the default buttons by placing the <code>ui:dialogButtons</code> component in the <code>&lt;aura:set attribute="buttons"&gt;</code> tag.     
+		   Setting <code>&lt;ui:dialogButtons defaultButtons="both"&gt;</code> provides default OK and Cancel buttons, but you can provide your own buttons using <code>ui:button</code> components.
+		</p>
+  
+	</aura:description>	
+		<aura:example name="dialog" ref="auradocs:demoDialog" label="Creating an Overlay Dialog">
+    	<p>This example shows an overlay dialog.</p>
+	   </aura:example>
+	   <aura:example name="dialog1" ref="auradocs:demoModal" label="Creating a Modal Dialog">
+	   <p>This demo shows a modal dialog, which is set using <code>isModal="true"</code>.</p>
+	   </aura:example>
+	
+</aura:documentation>

@@ -1,0 +1,32 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:documentation> 
+	<aura:description>
+		<p>
+			Use only one instance of <code>ui:datePickerManager</code> to manage multiple instances of <code>ui:inputDateTrigger</code>.
+			This renders only one date picker in the DOM, which improves load time if you have multiple date pickers in a component. The date picker is opened when you click the date picker icon on each date field.
+        </p>
+		
+		
+	</aura:description>	
+		<aura:example name="datePicker" ref="uiExamples:datePicker" label="Using the Date Picker">
+    	<p>This example shows managed date pickers. Only one instance of <code>ui:datePickerManager</code> is required to manage date pickers on a component.</p>
+    	
+	</aura:example>
+	
+</aura:documentation>

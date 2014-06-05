@@ -13,20 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.THIS {
-	font-size:12px;
-	min-height:100px;
-	padding-top:20px;
-}
+ 
+.THIS { 
+ 	list-style-type: none;
+ }
+ 
+ .THIS input {
+ 	padding: 10px;
+ 	border-radius: 4px;
+ 	border: 1px solid #eee;
+ }
+ 
 
-.THIS p {
-	padding-left:20px;
-}
-
-.THIS .theLeft, .THIS .theRight {
-    width: 30%;
-    border: 1px dashed #888;
-    padding: 10px;
-    margin-top: 20px;
-}
-
+ 

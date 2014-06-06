@@ -22,13 +22,12 @@
      * named auraStorage:init in templates?
      */
     testDuplicateNamedStorage : {
-        exceptionsAllowedDuringInit : ["Storage named 'dupNamedStorage' already exists!"],
+        auraErrorsExpectedDuringInit : ["Storage named 'dupNamedStorage' already exists!"],
         attributes : {
             dupNamedStorage : true
         },
         test : [
             function(cmp) {
-                $A.test.expectAuraError("Storage named 'dupNamedStorage' already exists!");
                 $A.test.assertTruthy(cmp.find("dupNamedStorage1"));
                 $A.test.assertTruthy(cmp.find("dupNamedStorage2"),
                                 "Duplicate named storage not registered using auraStorage:init");

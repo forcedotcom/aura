@@ -13,15 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-//since 0.0.61
 ({
     testDefaultAttributes:{
-	exceptionsAllowedDuringInit : ["\"alt\" attribute should not be empty for informational image"], 	
+        auraErrorsExpectedDuringInit : ["\"alt\" attribute should not be empty for informational image"], 	
         test:function(cmp){
-            var errorMessage = "component: 1:2.a \"alt\" attribute should not be empty for informational image";
-            $A.test.expectAuraError(errorMessage);
-            $A.test.getAuraErrorMessage();
-            
             var imgElement = cmp.getElement();
             $A.test.assertTrue($A.test.isInstanceOfImageElement(imgElement), "Expected to see a image element.");
             $A.test.assertTrue($A.util.stringEndsWith(imgElement.src, '/auraFW/resources/aura/s.gif'), "Expected src to be '/auraFW/resources/aura/s.gif' by default");
@@ -92,23 +87,21 @@
         }
     },
     testInformationImageTypeWithoutAltText:{
-    	exceptionsAllowedDuringInit : ["\"alt\" attribute should not be empty for informational image"],
+        auraErrorsExpectedDuringInit : ["\"alt\" attribute should not be empty for informational image"],
     	attributes : {imageType:'informational'},
         test: function(cmp){
             // Note the missing colon here compared to below.
             var errorMessage = "component: 1:2.a \"alt\" attribute should not be empty for informational image";
-            $A.test.expectAuraError(errorMessage);
             var screenError = $A.test.getAuraErrorMessage();
             $A.test.assertTrue($A.test.contains(screenError, errorMessage),
                                "Expected '" + errorMessage+"', Got:'"+screenError+"'");
         }
     },
     testDecorativeImageTypeWithAltText:{
-    	exceptionsAllowedDuringInit : ["\"alt\" attribute should be empty for decorative image"],
+        auraErrorsExpectedDuringInit : ["\"alt\" attribute should be empty for decorative image"],
     	attributes : {imageType:'decorative', alt:'Company'},
         test: function(cmp){
             var errorMessage = "component: 1:2.a: \"alt\" attribute should be empty for decorative image";
-            $A.test.expectAuraError(errorMessage);
             var screenError = $A.test.getAuraErrorMessage();
             $A.test.assertTrue($A.test.contains(screenError, errorMessage),
                                "Expected '" + errorMessage+"', Got:'"+screenError+"'");

@@ -167,12 +167,12 @@ public class AuraUITestingUtil {
         String exp = "window.$A.getRoot().find('" + cmp + "')";
         return exp;
     }
-    
+
     public String getEncodedContextForServer() {
-    	String exp = "window.$A.getContext().encodeForServer()";
-    	return exp;
+        String exp = "window.$A.getContext().encodeForServer()";
+        return exp;
     }
-    
+
     /**
      * Very useful to get handle on the component passing globalId
      * 
@@ -377,26 +377,28 @@ public class AuraUITestingUtil {
     public String getActiveElementText() {
         return (String) getEval("return $A.test.getActiveElementText()");
     }
-    
+
     /**
      * Return Bounding Rectangle Property for given Element
+     * 
      * @param elementLocalId
      * @param position = "top, left, right, and bottom"
      * @return
      */
     public String getBoundingRectPropOfElement(String elementGlobalId, String position) {
-    		String element = getCmpExpr(elementGlobalId) + ".getElement().getBoundingClientRect()." + position;
-    		return getEval(prepareReturnStatement(element)).toString();
+        String element = getCmpExpr(elementGlobalId) + ".getElement().getBoundingClientRect()." + position;
+        return getEval(prepareReturnStatement(element)).toString();
     }
-    
+
     /**
-     * Given Element className, method would return component globalId which could be used with
-     * $A.getCmp(globalId) to have handle in the component in UI test
+     * Given Element className, method would return component globalId which could be used with $A.getCmp(globalId) to
+     * have handle in the component in UI test
+     * 
      * @param className
      * @return
      */
-    public String getCmpGlobalIdGivenElementClassName(String className){
-    	String fields = "field('className',\"get('v.class')\").field(\"conc\", \"isConcrete()\")";
+    public String getCmpGlobalIdGivenElementClassName(String className) {
+        String fields = "field('className',\"get('v.class')\").field(\"conc\", \"isConcrete()\")";
         String whereClause = "className === '" + className + "' && conc === true";
         String globalId = findGlobalIdForComponentWithGivenProperties(fields, whereClause);
         return globalId;
@@ -426,8 +428,8 @@ public class AuraUITestingUtil {
      * Look for any quickfix exceptions. These can sometimes reflect a framework load failure but provide a better error
      * message.
      */
-    public void assertNoQuickFixMessage(Set<String> exceptForThese) {
-        String auraErrorMsg = getQuickFixMessage();
+    public void assertNoAuraErrorMessage(Set<String> exceptForThese) {
+        String auraErrorMsg = getAuraErrorMessage();
         if (!auraErrorMsg.isEmpty()) {
             if (exceptForThese != null) {
                 // Compare against any expected failures
@@ -632,7 +634,7 @@ public class AuraUITestingUtil {
                 new Function<WebDriver, Boolean>() {
                     @Override
                     public Boolean apply(WebDriver input) {
-                        assertNoQuickFixMessage(expectedErrors);
+                        assertNoAuraErrorMessage(expectedErrors);
                         return isAuraFrameworkReady();
                     }
                 });
@@ -757,4 +759,3 @@ public class AuraUITestingUtil {
                 extra.size() == 0 && expected.size() == 0);
     }
 }
-

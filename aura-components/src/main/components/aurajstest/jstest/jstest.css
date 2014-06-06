@@ -212,12 +212,11 @@
     display: inline-block;
     position: absolute;
     right: 1em;
-    top: 50%;
     background: #48515c;
     line-height: 1em;
     height: 1em;
-    padding: .4em .6em;
-    margin: .8em 0 0 0;
+    padding: .4em .6em .4em;
+    margin: .3em 0 0 0;
     color: #fff;
     text-indent: 0;
     text-align: center;
@@ -247,6 +246,10 @@
     width: 96%;
     line-height: 1.6em;
     font-size: 12px;
+    display: block;
+}
+
+.aurajstestJstest pre.hidden {
     display: none;
 }
 

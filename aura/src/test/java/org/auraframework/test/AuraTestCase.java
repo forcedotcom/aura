@@ -228,7 +228,7 @@ public abstract class AuraTestCase extends UnitTestCase {
     }
 
     /**
-     * Just check the exception and message, ignore location.
+     * Check to ensure that an exception message starts with a given message, ignore location.
      */
     protected void checkExceptionStart(Throwable e, Class<?> clazz, String message) {
         if (clazz != null) {
@@ -291,7 +291,7 @@ public abstract class AuraTestCase extends UnitTestCase {
     }
 
     /**
-     * Check to ensure that an exception message starts with a given message, ignore location.
+     * Verify Throwable is from the expected Location.
      */
     private void assertLocation(Throwable e, String expectedLoc) {
         Location l = null;
@@ -304,6 +304,9 @@ public abstract class AuraTestCase extends UnitTestCase {
         assertEquals("Unexpected location.", expectedLoc, l.getFileName());
     }
 
+    /**
+     * Verify Throwable is from the expected Location. Handles differences between running from jars or source.
+     */
     private void assertLocation(Throwable e, Source<?> src) {
         String fileUrl = src.getUrl();
         if (fileUrl.startsWith("jar")) {

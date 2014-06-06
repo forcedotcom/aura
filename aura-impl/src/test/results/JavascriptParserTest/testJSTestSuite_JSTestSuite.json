@@ -18,7 +18,7 @@
           "browsers":[
 
           ],
-          "exceptionsAllowedDuringInit":[
+          "auraErrorsExpectedDuringInit":[
 
           ]
         }
@@ -38,7 +38,7 @@
           "browsers":[
 
           ],
-          "exceptionsAllowedDuringInit":[
+          "auraErrorsExpectedDuringInit":[
 
           ]
         }
@@ -59,7 +59,7 @@
           "browsers":[
 
           ],
-          "exceptionsAllowedDuringInit":[
+          "auraErrorsExpectedDuringInit":[
 
           ]
         }

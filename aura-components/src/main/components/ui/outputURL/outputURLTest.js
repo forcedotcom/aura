@@ -236,12 +236,11 @@
         }
      },
      testNoLabelNoAlt: {
-         exceptionsAllowedDuringInit : ["\"alt\" attribute should not be empty for informational image"],
+         auraErrorsExpectedDuringInit : ["\"alt\" attribute should not be empty for informational image"],
          attributes: {value : 'www.salesforce.com', iconClass : "somethingSomethingDarkSide"},
          test:function(component){
               var id = component.find("icon").getLocalId();
               var errorMessage =  "component: "+id+" \"alt\" attribute should not be empty for informational image";
-              $A.test.expectAuraError(errorMessage);
               var actual = $A.test.getAuraErrorMessage();
               $A.test.assertTrue($A.test.contains(actual, errorMessage),
                       "Expected '" + errorMessage+"', Got:'"+actual+"'");

@@ -48,6 +48,26 @@ $A.ns.Test.prototype.expectMessage = function(pre, expected, msg) {
 };
 
 /**
+ * Set any common entries in the two arrays to undefined.
+ * 
+ * This is used to compare two arrays of error messages, leaving only unexpected errors received (in the pre array)
+ * and expected errors not received (in the expected array).
+ * 
+ * @private
+ */
+$A.ns.Test.prototype.clearExpected = function(pre, expected) {
+    for (var i = 0; i < pre.length; i++) {
+        for (var j = 0; j < expected.length; j++) {
+            if (pre[i].indexOf(expected[j]) !== -1) {
+                pre[i] = undefined;
+                expected[j] = undefined;
+                break;
+            }
+        }
+    }
+};
+
+/**
  * Register a global error handler to catch uncaught javascript errors.
  * @ignore
  */
@@ -222,12 +242,6 @@ $A.ns.Test.prototype.continueWhenReady = function() {
                     this.lastStage.call(this.suite, this.cmp);
                     setTimeout(internalCWR, 1);
                 }
-
-                this.logErrors(true, "Received unexpected error:",this.preErrors);
-                this.preErrors = null;
-
-                this.logErrors(this.failOnWarning, "Received unexpected warning:",this.preWarnings);
-                this.preWarnings = null;
             }
         }
     }catch(e){

@@ -974,15 +974,15 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
         }, timeoutInSecs);
 
         if (waitForInit) {
-            auraUITestingUtil.waitForAuraInit(getExceptionsAllowedDuringInit());
+            auraUITestingUtil.waitForAuraInit(getAuraErrorsExpectedDuringInit());
         }
     }
 
     public void waitForAuraFrameworkReady() {
-        auraUITestingUtil.waitForAuraFrameworkReady(getExceptionsAllowedDuringInit());
+        auraUITestingUtil.waitForAuraFrameworkReady(getAuraErrorsExpectedDuringInit());
     }
 
-    protected Set<String> getExceptionsAllowedDuringInit() {
+    protected Set<String> getAuraErrorsExpectedDuringInit() {
         return Collections.emptySet();
     }
 

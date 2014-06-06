@@ -25,66 +25,62 @@ import org.auraframework.def.DefDescriptor.DefType;
  */
 public interface TestCaseDef extends Definition {
 
-	/**
-	 * The attributes which should be used to instantiate the component under
-	 * test.
-	 * 
-	 * @return the Map of attribute names to values used to instantiate the
-	 *         component under test
-	 */
+    /**
+     * The attributes which should be used to instantiate the component under test.
+     * 
+     * @return the Map of attribute names to values used to instantiate the component under test
+     */
     Map<String, Object> getAttributeValues();
 
-	/**
-	 * The type of component under test, typically an Application or Component.
-	 * 
-	 * @return the DefType of the component under test
-	 */
+    /**
+     * The type of component under test, typically an Application or Component.
+     * 
+     * @return the DefType of the component under test
+     */
     DefType getDefType();
 
-	/**
-	 * Labels intended to categorize test cases, although no explicit grouping
-	 * is applied.
-	 * 
-	 * @return the Set of labels this test is tagged with
-	 */
+    /**
+     * Labels intended to categorize test cases, although no explicit grouping is applied.
+     * 
+     * @return the Set of labels this test is tagged with
+     */
     Set<String> getTestLabels();
 
-	/**
-	 * Specialized labels intended to describe target client platforms for this
-	 * test case.
-	 * 
-	 * @return the Set of "browsers" this test should apply to
-	 */
+    /**
+     * Specialized labels intended to describe target client platforms for this test case.
+     * 
+     * @return the Set of "browsers" this test should apply to
+     */
     Set<String> getBrowsers();
 
-	/**
-	 * Definitions that are expected to be present for this test case to run,
-	 * typically stubbed implementations of actual Definitions. These should
-	 * take precedence over any existing Definitions with the same
-	 * DefDescriptor.
-	 * 
-	 * @return the Set of Definitions expected by this test case
-	 */
-    Set<Definition> getLocalDefs();
-    
-	/**
-	 * The set of exceptions that are allowed during initialization. These exceptions will not cause the test to fail.
-	 * 
-	 * @return The Set of exceptions that are allowed during initialization
-	 */
-    Set<String> getExceptionsAllowedDuringInit();   
-    
     /**
-     * Return the qualified name of the test case. 
-     * if current browser info is available, it will contain the browser type too.
-     * for example: 
+     * Definitions that are expected to be present for this test case to run, typically stubbed implementations of
+     * actual Definitions. These should take precedence over any existing Definitions with the same DefDescriptor.
+     * 
+     * @return the Set of Definitions expected by this test case
+     */
+    Set<Definition> getLocalDefs();
+
+    /**
+     * The set of Aura errors (displayed via $A.error) that are allowed during initialization. These exceptions will not
+     * cause the test to fail.
+     * 
+     * @return The Set of Aura errors that are allowed during initialization
+     */
+    Set<String> getAuraErrorsExpectedDuringInit();
+
+    /**
+     * Return the qualified name of the test case. if current browser info is available, it will contain the browser
+     * type too. for example:
      * js://auraStorageTest.initTest/TESTCASE$testRefreshErrorResponseNotStored:BROWSERTYPEgooglechrome
+     * 
      * @return the qualified name the the test case
      */
     String getQualifiedName();
 
     /**
      * set currentBrowser of this test case
+     * 
      * @param b name of the browser, like googlechrome
      */
     public void setCurrentBrowser(String b);

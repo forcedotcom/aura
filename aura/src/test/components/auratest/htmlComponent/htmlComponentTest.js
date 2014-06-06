@@ -84,16 +84,9 @@
 	 * W-1538544
 	 */
 	testTagNotSet: {
-	    exceptionsAllowedDuringInit:["Undefined tag attribute for"],
+	    auraErrorsExpectedDuringInit:["Undefined tag attribute for", "Undefined tag attribute for", "Undefined tag attribute for"],
 	    attributes:{testNoTagAttr:true},
 	    	test: function(component){
-                    //
-                    // Three of these errors occur at various parts of the code.
-                    //
-                    var nErrors = 3;
-                    for (var i = 0; i < nErrors; i++) {
-                        $A.test.expectAuraError("Undefined tag attribute for");
-                    }
                     $A.test.assertTrue($A.hasErrors, "HTMl component without a tag attribute should not be allowed");
                     $A.test.assertStartsWith("Undefined tag attribute for "+component.find("notag").getGlobalId(), 
                                              $A.test.getText($A.util.getElement("auraErrorMessage")));
@@ -105,16 +98,9 @@
 	 * W-1538544 
 	 */
 	testUndefinedTagAttr: {
-	    exceptionsAllowedDuringInit : ["Undefined tag attribute for"],
+	    auraErrorsExpectedDuringInit : ["Undefined tag attribute for", "Undefined tag attribute for", "Undefined tag attribute for"],
 	    attributes:{testUndefinedTagAttr:true},
 		test: function(component){
-                    //
-                    // Three of these errors occur at various parts of the code.
-                    //
-                    var nErrors = 3;
-                    for (var i = 0; i < nErrors; i++) {
-                        $A.test.expectAuraError("Undefined tag attribute for");
-                    }
                     $A.test.assertTrue($A.hasErrors, "HTML component with a undefined tag attribute should not be allowed");
                     $A.test.assertStartsWith("Undefined tag attribute for "+component.find("undefinedTag").getGlobalId(),
                                              $A.test.getText($A.util.getElement("auraErrorMessage")));

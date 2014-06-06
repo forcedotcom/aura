@@ -86,8 +86,8 @@ public class SizeModel {
 			<li>value (String): The value of this option</li>
 		</ul>
 	</aura:description>	
-		<aura:example name="buttonExample" ref="auradocs:demoSelect" label="Using ui:inputSelect">
-    	<p>This example shows a button that displays the input value you enter.</p>
+		<aura:example name="inputselect" ref="auradocs:demoSelect" label="Using ui:inputSelect">
+    	<p>This example shows several ways to implement <code>ui:inputSelect</code>.</p>
     	
 	</aura:example>
 	

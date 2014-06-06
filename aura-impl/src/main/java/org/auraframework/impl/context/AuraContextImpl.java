@@ -313,9 +313,6 @@ public class AuraContextImpl implements AuraContext {
         if (access == Authentication.AUTHENTICATED) {
             preloadedNamespaces.add("aura");
             preloadedNamespaces.add("ui");
-            if (mode == Mode.DEV) {
-                preloadedNamespaces.add("auradev");
-            }
         }
 
         this.mode = mode;

@@ -1436,10 +1436,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         AuraContext context = this.currentCC == null 
                 ? Aura.getContextService().getCurrentContext() 
                 : currentCC.context;
-   
-        //HACK - until AuraContextImpl no longer adds additional namespaces when mod==Mode.DEV
-        // we must distinguish DEV from non-DEV mode
-        return (context.getMode() == Mode.DEV ? "@/" : "#/") + makeLocalKey(descriptor);
+        return makeLocalKey(descriptor);
     }
     
     /**

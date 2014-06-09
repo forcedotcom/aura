@@ -36,9 +36,6 @@ import com.google.common.collect.Maps;
  */
 public final class RDPAnalyzer {
 
-    public static final String MARK_TIMELINE_START = "PERF:start";
-    public static final String MARK_TIMELINE_END = "PERF:end";
-
     protected static final Logger LOG = Logger.getLogger(RDPAnalyzer.class.getSimpleName());
 
     private final List<RDPNotification> notifications;
@@ -46,15 +43,13 @@ public final class RDPAnalyzer {
     private final List<JSONObject> filteredFlattenedTimelineEvents;
     private Map<String, TimelineEventStats> timelineEventsStats;
 
-    public RDPAnalyzer(List<RDPNotification> notifications) {
+    public RDPAnalyzer(List<RDPNotification> notifications, String startMarker, String endMarker) {
         this.notifications = notifications;
-        filteredNotifications = RDPUtil.filteredNotifications(notifications, MARK_TIMELINE_START,
-                MARK_TIMELINE_END);
+        filteredNotifications = RDPUtil.filteredNotifications(notifications, startMarker, endMarker);
 
         List<JSONObject> flattenedTimelineEvents = RDPUtil.flattenedTimelineEvents(notifications);
-        this.filteredFlattenedTimelineEvents = RDPUtil.filteredTimeline(flattenedTimelineEvents,
-                MARK_TIMELINE_START,
-                MARK_TIMELINE_END);
+        this.filteredFlattenedTimelineEvents = RDPUtil
+                .filteredTimeline(flattenedTimelineEvents, startMarker, endMarker);
 
         LOG.info("num timeline events: " + flattenedTimelineEvents.size() + ", num filtered: "
                 + this.filteredFlattenedTimelineEvents.size());

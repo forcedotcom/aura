@@ -50,7 +50,7 @@ public final class RDPAnalyzerTest extends AbstractPerfTestCase {
         assertTrue(RDPUtil.containsMethod(notifications, RDP.Page.loadEventFired));
 
         // UC: extract/verify Network metrics
-        RDPAnalyzer analyzer = new RDPAnalyzer(notifications);
+        RDPAnalyzer analyzer = new RDPAnalyzer(notifications, getPerfStartMarker(), getPerfEndMarker());
         List<PerfMetric> networkMetrics = analyzer.analyzeNetworkDomain();
         // check requestsMetric
         PerfMetric requestsMetric = networkMetrics.get(0);
@@ -88,7 +88,7 @@ public final class RDPAnalyzerTest extends AbstractPerfTestCase {
         runWithPerfApp(getDefDescriptor("ui:button"));
 
         List<RDPNotification> notifications = getRDPNotifications();
-        RDPAnalyzer analyzer = new RDPAnalyzer(notifications);
+        RDPAnalyzer analyzer = new RDPAnalyzer(notifications, getPerfStartMarker(), getPerfEndMarker());
 
         // UC: check start and end mark are at beginning/end of filtered timeline
         List<JSONObject> filteredTimeline = analyzer.getFilteredFlattenedTimelineEvents();
@@ -96,9 +96,9 @@ public final class RDPAnalyzerTest extends AbstractPerfTestCase {
         JSONObject firstEntry = filteredTimeline.get(0);
         JSONObject lastEntry = filteredTimeline.get(filteredSize - 1);
         assertTrue(firstEntry.toString(),
-                TimelineEventUtil.containsTimelineTimeStamp(firstEntry, RDPAnalyzer.MARK_TIMELINE_START));
+                TimelineEventUtil.containsTimelineTimeStamp(firstEntry, getPerfStartMarker()));
         assertTrue(lastEntry.toString(),
-                TimelineEventUtil.containsTimelineTimeStamp(lastEntry, RDPAnalyzer.MARK_TIMELINE_END));
+                TimelineEventUtil.containsTimelineTimeStamp(lastEntry, getPerfEndMarker()));
 
         // UC: check the marks exists and in the right order
         List<String> marks = Lists.newArrayList();
@@ -131,8 +131,8 @@ public final class RDPAnalyzerTest extends AbstractPerfTestCase {
         JSONObject firstEntry = trimmedDevToolsLog.get(0);
         JSONObject lastEntry = trimmedDevToolsLog.get(trimmedSize - 1);
         assertTrue(firstEntry.toString(),
-                TimelineEventUtil.containsTimelineTimeStamp(firstEntry, RDPAnalyzer.MARK_TIMELINE_START));
+                TimelineEventUtil.containsTimelineTimeStamp(firstEntry, getPerfStartMarker()));
         assertTrue(lastEntry.toString(),
-                TimelineEventUtil.containsTimelineTimeStamp(lastEntry, RDPAnalyzer.MARK_TIMELINE_END));
+                TimelineEventUtil.containsTimelineTimeStamp(lastEntry, getPerfEndMarker()));
     }
 }

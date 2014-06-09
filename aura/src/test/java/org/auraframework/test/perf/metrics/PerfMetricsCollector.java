@@ -102,7 +102,7 @@ public final class PerfMetricsCollector {
             metrics.setMetric(new PerfMetric("WallTime", elapsedMillis, "milliseconds"));
 
             if (captureTimelineMetrics) {
-                rdpAnalyzer = new RDPAnalyzer(notifications);
+                rdpAnalyzer = new RDPAnalyzer(notifications, test.getPerfStartMarker(), test.getPerfEndMarker());
 
                 // add "Network..." metrics:
                 for (PerfMetric metric : rdpAnalyzer.analyzeNetworkDomain()) {

@@ -365,6 +365,22 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
                 .getRawEval("return $A.PERFCORE.stats.get();");
     }
 
+    /**
+     * Metrics/timeline is only captured between the perf start and end markers, override this method to specify
+     * different markers.
+     */
+    public String getPerfStartMarker() {
+        return "PERF:start";
+    }
+
+    /**
+     * Metrics/timeline is only captured between the perf start and end markers, override this method to specify
+     * different markers.
+     */
+    public String getPerfEndMarker() {
+        return "PERF:end";
+    }
+
     // UIPerf: note that UIPerf is only loaded in PTEST (and CADENCE) modes.
 
     protected void clearUIPerfStats() {

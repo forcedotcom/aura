@@ -72,9 +72,7 @@ public class MenuUITest extends WebDriverTestCase {
         assertEquals("Focus should be on actionItem3", actionItem3Element.getText(),
                 auraUITestingUtil.getActiveElementText());
         
-        String fields = "field('className',\"get('v.class')\").field(\"conc\", \"isConcrete()\")";
-        String whereClauseItem2 = "className === '" + menuItem2 + "' && conc === true";
-        String globalIdItem2 = auraUITestingUtil.findGlobalIdForComponentWithGivenProperties(fields, whereClauseItem2);
+        String globalIdItem2 = auraUITestingUtil.getCmpGlobalIdGivenElementClassName(menuItem2);
         Double item2TopValue = Double.parseDouble(auraUITestingUtil.getBoundingRectPropOfElement(globalIdItem2,"top"));
         assertTrue("Item 2 in the menu List is should be visible on the page",item2TopValue > 0);
         
@@ -211,11 +209,8 @@ public class MenuUITest extends WebDriverTestCase {
         String menuName = "checkboxMenu";
         String menuItem3 = "checkboxItem3";
         String menuItem4 = "checkboxItem4";
-        String fields = "field('className',\"get('v.class')\").field(\"conc\", \"isConcrete()\")";
-        String whereClauseItem3 = "className === '" + menuItem3 + "' && conc === true";
-        String whereClauseItem4 = "className === '" + menuItem4 + "' && conc === true";
-        String globalIdItem3 = auraUITestingUtil.findGlobalIdForComponentWithGivenProperties(fields, whereClauseItem3);
-        String globalIdItem4 = auraUITestingUtil.findGlobalIdForComponentWithGivenProperties(fields, whereClauseItem4);
+        String globalIdItem3 = auraUITestingUtil.getCmpGlobalIdGivenElementClassName(menuItem3);
+        String globalIdItem4 = auraUITestingUtil.getCmpGlobalIdGivenElementClassName(menuItem4);
         String disableValueM4Exp = auraUITestingUtil.getValueFromCmpExpression(globalIdItem4, "v.disabled");
         String selectedValueM4Exp = auraUITestingUtil.getValueFromCmpExpression(globalIdItem4, "v.selected");
         String selectedValueM3Exp = auraUITestingUtil.getValueFromCmpExpression(globalIdItem3, "v.selected");
@@ -400,20 +395,22 @@ public class MenuUITest extends WebDriverTestCase {
         driver.manage().window().setSize(new Dimension(1366, 768));
         String trigger = "triggerAttachToBody";
         String menuList = "actionMenuAttachToBody";
+        String triggerGlobalId = auraUITestingUtil.getCmpGlobalIdGivenElementClassName(trigger);
+        String menuListGlobalId = auraUITestingUtil.getCmpGlobalIdGivenElementClassName(menuList);
         WebElement menuLabel = driver.findElement(By.className(trigger));
         WebElement menu = driver.findElement(By.className(menuList));
         menuLabel.click();
         assertTrue("Action Menu list should be expanded", menu.getAttribute("class").contains("visible"));
-        verifyMenuPositionedCorrectly(trigger, menuList, "Menu List is not positioned correctly when the menuList rendered on the page");
-        String triggerLeftPosBeforeClick = auraUITestingUtil.getBoundingRectPropOfElement(trigger,"left");
+        verifyMenuPositionedCorrectly(triggerGlobalId, menuListGlobalId, "Menu List is not positioned correctly when the menuList rendered on the page");
+        String triggerLeftPosBeforeClick = auraUITestingUtil.getBoundingRectPropOfElement(triggerGlobalId,"left");
         actionItem3.click();
-        String triggerLeftPosAfterClickOnItem2 = auraUITestingUtil.getBoundingRectPropOfElement(trigger,"left");
+        String triggerLeftPosAfterClickOnItem2 = auraUITestingUtil.getBoundingRectPropOfElement(triggerGlobalId,"left");
         assertEquals("Menu Item position changed after clicking on Item2", triggerLeftPosBeforeClick, triggerLeftPosAfterClickOnItem2);
         
         int currentWidth = driver.manage().window().getSize().width;
         int currentHeight = driver.manage().window().getSize().height;
         driver.manage().window().setSize(new Dimension(currentWidth-200, currentHeight-100));
-        verifyMenuPositionedCorrectly(trigger, menuList, "Menu List is not positioned correctly after the resize");
+        verifyMenuPositionedCorrectly(triggerGlobalId, menuListGlobalId, "Menu List is not positioned correctly after the resize");
     }
 
     /**

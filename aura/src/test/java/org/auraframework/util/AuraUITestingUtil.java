@@ -384,9 +384,22 @@ public class AuraUITestingUtil {
      * @param position = "top, left, right, and bottom"
      * @return
      */
-    public String getBoundingRectPropOfElement(String elementLocalId, String position) {
-    		String element = getCmpExpr(elementLocalId) + ".getElement().getBoundingClientRect()." + position;
+    public String getBoundingRectPropOfElement(String elementGlobalId, String position) {
+    		String element = getCmpExpr(elementGlobalId) + ".getElement().getBoundingClientRect()." + position;
     		return getEval(prepareReturnStatement(element)).toString();
+    }
+    
+    /**
+     * Given Element className, method would return component globalId which could be used with
+     * $A.getCmp(globalId) to have handle in the component in UI test
+     * @param className
+     * @return
+     */
+    public String getCmpGlobalIdGivenElementClassName(String className){
+    	String fields = "field('className',\"get('v.class')\").field(\"conc\", \"isConcrete()\")";
+        String whereClause = "className === '" + className + "' && conc === true";
+        String globalId = findGlobalIdForComponentWithGivenProperties(fields, whereClause);
+        return globalId;
     }
 
     /**
@@ -744,3 +757,4 @@ public class AuraUITestingUtil {
                 extra.size() == 0 && expected.size() == 0);
     }
 }
+

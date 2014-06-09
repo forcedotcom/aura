@@ -27,12 +27,12 @@
     testValue : {
         test : [
             function(cmp){
-                var value = cmp.getValue("v.cdrs");
-                $A.test.assertEquals("ArrayValue", value.toString());
-                $A.test.assertEquals(1, value.getLength());
-                value = value.get(0);
+                var value = cmp.get("v.cdrs");
+                $A.test.assertTrue($A.util.isArray(value));
+                $A.test.assertEquals(1, value.length);
+                value = value[0];
                 //Make sure it looks like a cdr.
-                $A.test.assertTrue(typeof value === "object");
+                $A.test.assertTrue($A.util.isObject(value));
                 $A.test.assertEquals(undefined, value.auraType);
                 $A.test.assertTrue(value.componentDef !== undefined);
                 $A.test.assertEquals("markup://ui:button", value.componentDef);

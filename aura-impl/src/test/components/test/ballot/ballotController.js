@@ -15,9 +15,9 @@
  */
 ({
     vote : function(cmp, event){
-
-        var candidate = cmp.getValue("m.candidates").getValue(event.getParam("candidate"));
-        cmp.getValue("m.candidates").put(event.getParam("candidate"), (candidate.unwrap() || 0)+1);
-
+    	var map = cmp.get("m.candidates");
+    	var votes = map[event.getParam("candidate")];
+    	map[event.getParam("candidate")] = (votes || 0) + 1 ; 
+        cmp.set("m.candidates", map);
     }
 })

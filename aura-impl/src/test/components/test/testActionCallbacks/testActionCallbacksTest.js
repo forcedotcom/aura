@@ -73,33 +73,33 @@
      * action.setCallback((scope, callback, ->name<- )
      */
     testSetCallbackWithInvalidName: {
-	test: [
-	       //1. Undefined should register the given callback for both success & error (and the other states)
-	       function(cmp){ //verify callback on Success
-	    	   cmp.getValue("v.cbName").destroy();
-	    	   $A.test.assertUndefinedOrNull(cmp.get("v.cbName"), "Test setup failure, cbName should be undefined");
-		   cmp.find("pass").get("e.press").fire();
-		   this.checkResult(cmp);
-	       }, function(cmp){ //verify callback on Error
-		   cmp.set("v.cbExpected", "ERROR");
-		   $A.test.assertUndefinedOrNull(cmp.get("v.cbName"), "Test setup failure, cbName should be undefined");
-		   cmp.find("fail").get("e.press").fire();
-	           this.checkResult(cmp);
-	       },
-	       //2. empty string should produce an error
-	       function(cmp){
-		   this.assertSetCallbackThrowsError(cmp, function(){}, "",
-			   "Illegal name", "setCallback() failed to error on empty name");
-	       },
-	       //3. Invalid name
-	       function(cmp){
-		   this.assertSetCallbackThrowsError(cmp, function(){}, "FooBared",
-			   "Illegal name FooBared","setCallback() failed to error on invalid name");
-	       }
-	]
+		test: [
+		       //1. Undefined should register the given callback for both success & error (and the other states)
+		       function(cmp){ //verify callback on Success
+		    	   cmp.set("v.cbName", undefined);
+		    	   $A.test.assertUndefinedOrNull(cmp.get("v.cbName"), "Test setup failure, cbName should be undefined");
+		    	   cmp.find("pass").get("e.press").fire();
+		    	   this.checkResult(cmp);
+		       }, function(cmp){ //verify callback on Error
+				   cmp.set("v.cbExpected", "ERROR");
+				   $A.test.assertUndefinedOrNull(cmp.get("v.cbName"), "Test setup failure, cbName should be undefined");
+				   cmp.find("fail").get("e.press").fire();
+		           this.checkResult(cmp);
+		       },
+		       //2. empty string should produce an error
+		       function(cmp){
+		    	   this.assertSetCallbackThrowsError(cmp, function(){}, "",
+		    			   "Illegal name", "setCallback() failed to error on empty name");
+		       },
+		       //3. Invalid name
+		       function(cmp){
+		    	   this.assertSetCallbackThrowsError(cmp, function(){}, "FooBared",
+		    			   "Illegal name FooBared","setCallback() failed to error on invalid name");
+		       }
+		]
     },
     assertSetCallbackThrowsError : function(cmp, callbackArg, name, errorMessage, failureMsg){
-	var action = cmp.get("c.getString");
+    	var action = cmp.get("c.getString");
         $A.test.expectAuraError(errorMessage);
         action.setCallback(cmp, callbackArg, name);
     },
@@ -109,19 +109,19 @@
      * action.setCallback((scope, ->callback<- , name)
      */
     testActionsBadCallbackFuntions: {
-	test: [
-	       function(cmp){
-		   this.assertSetCallbackThrowsError(cmp, undefined, "SUCCESS",
-			   "Action callback should be a function","setCallback() failed to error on undefined callback");
-	       },
-	       function(cmp){
-		   this.assertSetCallbackThrowsError(cmp, "FooBared", "SUCCESS",
-			   "Action callback should be a function","setCallback() failed to error on a string as callback");
-	       },
-	       function(cmp){
-		   this.assertSetCallbackThrowsError(cmp, {"key": "value"}, "SUCCESS",
-			   "Action callback should be a function","setCallback() failed to error on a object as callback");
-	       }
-	]
+		test: [
+		       function(cmp){
+			   this.assertSetCallbackThrowsError(cmp, undefined, "SUCCESS",
+				   "Action callback should be a function","setCallback() failed to error on undefined callback");
+		       },
+		       function(cmp){
+			   this.assertSetCallbackThrowsError(cmp, "FooBared", "SUCCESS",
+				   "Action callback should be a function","setCallback() failed to error on a string as callback");
+		       },
+		       function(cmp){
+			   this.assertSetCallbackThrowsError(cmp, {"key": "value"}, "SUCCESS",
+				   "Action callback should be a function","setCallback() failed to error on a object as callback");
+		       }
+		]
     }
 })

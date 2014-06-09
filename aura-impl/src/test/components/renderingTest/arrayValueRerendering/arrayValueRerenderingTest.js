@@ -20,14 +20,14 @@
             for (var n = 0; n < values.length; n++) {
                 $A.test.assertEquals("Value " + (n + 1), $A.test.getText(values[n]));
             }
-            var body = component.find("me").getValue("v.body");
+            var body = component.find("me").get("v.body");
             function addComponent(label, insertFunction) {
                 // Note that usually we'd want have a wait until the callback with the newly created cmp is called, but
                 // since we don't need to make a server trip the cmp is created and callback called synchronously.
                 $A.componentService.newComponentAsync(
                     this,
                     function(newCmp){
-                        insertFunction(body, newCmp);
+                    	insertFunction(body, newCmp);
                     },
                     {
                         componentDef: { descriptor:"markup://aura:html" },
@@ -61,49 +61,58 @@
             }
             //test adding new component to the array
             iteration(values, 4, function(body, c) {
-                body.push(c);
+            	body.push(c);
+            	component.find("me").set("v.body", body);
             });
             iteration(values, 4, function(body, c) {
-                body.push(c);
+            	body.push(c);
+                component.find("me").set("v.body", body);
             });
             // Now lets do some splicing. Insert Value to index first, middle, and last index
             addComponent("Value inserted at index 0", function(body, c) {
-                body.insert(0, c);
+            	body.unshift(c);
+            	component.find("me").set("v.body", body);
             });
             $A.rerender(component);
             $A.test.assertEquals("Value inserted at index 0", $A.test.getText(values[0]));
             $A.test.assertEquals(13, values.length);
             addComponent("Value inserted at index 1", function(body, c) {
-                body.insert(1, c);
+            	body.splice(1, 0, c);
+            	component.find("me").set("v.body", body);
             });
             $A.rerender(component);
             $A.test.assertEquals("Value inserted at index 1", $A.test.getText(values[1]), "Value not inserted at proper index");
             $A.test.assertEquals(14, values.length);
             addComponent("Value inserted at last index", function(body, c) {
-                body.insert(14, c);
+            	body.splice(14, 0, c);
+            	component.find("me").set("v.body", body);
             });
             $A.rerender(component);
             $A.test.assertEquals("Value inserted at last index", $A.test.getText(values[14]), "Value not inserted at end of array");
             $A.test.assertEquals(15, values.length);
             //test removing component from array
             //remove the first
-            body.remove(0);
+            body.splice(0,1);
+            component.find("me").set("v.body", body);
             $A.rerender(component);
             $A.test.assertEquals("Value inserted at index 1", $A.test.getText(values[0]),"error after removing the first cmp of array");
             $A.test.assertEquals(14, values.length);
             //remove the second
-            body.remove(1);
+            body.splice(1,1);
+            component.find("me").set("v.body", body);
             $A.rerender(component);
             $A.test.assertEquals("Value 2", $A.test.getText(values[1]),"error after removing the 2nd cmp of array");
             $A.test.assertEquals(13, values.length);
             //remove the last
-            body.remove(12);
+            body.splice(12,1);
+            component.find("me").set("v.body", body);
             $A.rerender(component);
             $A.test.assertEquals("Value 12", $A.test.getText(values[11]),"error after removing the last cmp of array");
             $A.test.assertEquals(12, values.length);
             //clean the array and test inserting to an empty array
-            body.clear(); 
-            $A.test.assertEquals(0,body.getLength());
+            body = []; 
+            component.find("me").set("v.body", body);
+            $A.test.assertEquals(0,body.length);
             //we clear the body, AuraRenderingService.rerender -> ArrayValue.rerender will put a comment as a reference node
             //before rerender, value length is still 12
             $A.test.assertEquals(12,values.length);
@@ -113,7 +122,8 @@
             //make sure the node is a comment node
             $A.test.assertEquals(8,values[0].nodeType);
             addComponent("Value inserted at index 0 to an empty array", function(body, c) {
-                body.insert(0, c);
+            	body.unshift(c);
+            	component.find("me").set("v.body", body);
             });
             $A.rerender(component);
             $A.test.assertEquals("Value inserted at index 0 to an empty array", $A.test.getText(values[0]));

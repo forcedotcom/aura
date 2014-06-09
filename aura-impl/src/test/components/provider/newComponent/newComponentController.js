@@ -22,7 +22,9 @@
         $A.componentService.newComponentAsync(
             this,
             function(newCmp){
-                cmp.getValue("v.body").insert(0, newCmp);
+            	var body = cmp.get("v.body"); 
+                body.unshift(newCmp);
+                cmp.set("v.body", body);
             },
             config,
             null,

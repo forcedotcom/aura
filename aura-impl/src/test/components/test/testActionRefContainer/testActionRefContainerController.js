@@ -15,13 +15,12 @@
  */
 ({
     getSand: function(cmp, event) {
-        var sandRef = cmp.find("actionref").getValue("c.sand");
+        var sandRef = cmp.find("actionref").get("c.sand");
         cmp.set("v.myActionRef", sandRef);
     },
 
     runSand: function(cmp, event) {
-        var ref = cmp.get("v.myActionRef");
-        var action = ref.unwrap();
+        var action = cmp.get("v.myActionRef");
         action.runDeprecated();
     }
 })

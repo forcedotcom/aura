@@ -31,8 +31,7 @@
             //getButton.dispatchEvent(evt);
             getButton.get("e.press").fire();
             mar = component.get("v.myActionRef");
-            $A.test.assertEquals("Value", mar.auraType, "there should be an action");
-
+            $A.test.assertEquals("Action", mar.auraType, "there should be an actionref");
         }, function(component) {
             var text = component.find("actionref").getElements()[1];
             var runButton = component.find("runButton");

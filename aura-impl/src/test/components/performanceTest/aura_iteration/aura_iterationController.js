@@ -24,7 +24,6 @@
     changeEndIndex: function(cmp, evt) {
         var inputValue = cmp.get("v.inputValue");
         cmp.set("v.newEndIndex", inputValue);
-        //var endIndex = cmp.find("innerIteration").getValue("v.end");
-        //endIndex.setValue(5);
- }
+        //cmp.find("innerIteration").set("v.end", 5);
+    }
 })

@@ -41,7 +41,7 @@
         attributes : {"a3" : "a3", value : "aura"},
         test: function(component){
             //Provider sets an attribute on the concrete component based on a3
-           aura.test.assertEquals("b2Provider", component.get("v.b2"), "b2 should have been set by provider");
+           $A.test.assertEquals("b2Provider", component.get("v.b2"), "b2 should have been set by provider");
         }
     }
 })

@@ -57,7 +57,8 @@
     /**
      * Updating a single item in an iteration's items, does not update the other items
      */
-    testUpdateOneItem:{
+    //W-2312861
+    _testUpdateOneItem:{
         attributes:{ start:9, end:12 },
         test:function(cmp){
             var container = cmp.find("container").getElement();

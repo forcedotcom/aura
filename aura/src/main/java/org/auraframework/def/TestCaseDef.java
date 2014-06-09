@@ -73,4 +73,19 @@ public interface TestCaseDef extends Definition {
 	 * @return The Set of exceptions that are allowed during initialization
 	 */
     Set<String> getExceptionsAllowedDuringInit();   
+    
+    /**
+     * Return the qualified name of the test case. 
+     * if current browser info is available, it will contain the browser type too.
+     * for example: 
+     * js://auraStorageTest.initTest/TESTCASE$testRefreshErrorResponseNotStored:BROWSERTYPEgooglechrome
+     * @return the qualified name the the test case
+     */
+    String getQualifiedName();
+
+    /**
+     * set currentBrowser of this test case
+     * @param b name of the browser, like googlechrome
+     */
+    public void setCurrentBrowser(String b);
 }

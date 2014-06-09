@@ -68,6 +68,7 @@ public class JavaModelTest extends AuraImplTestCase {
 
         @Override
         public String getQualifiedName() {
+        	System.out.println("javaModelTest.getQualifiedName()");
             return getPrefix() + "://" + TestModel.class.getName();
         }
 

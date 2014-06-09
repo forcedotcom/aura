@@ -19,11 +19,8 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 
-import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.*;
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.def.Definition;
-import org.auraframework.def.TestCaseDef;
-import org.auraframework.def.TestSuiteDef;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
@@ -93,6 +90,30 @@ public class JavascriptTestCaseDef extends DefinitionImpl<TestCaseDef> implement
 		return exceptionsAllowedDuringInit;
 	}
 	
+	@Override
+    public String getQualifiedName() {
+	    if(this.getDescriptor()!=null) {
+	        String cb = getCurrentBrowser();
+	        if( (cb!=null) && (cb.length()>0) ) {
+	            return this.getDescriptor().getQualifiedName()+":BROWSERTYPE"+cb;
+	        } else {
+	            return this.getDescriptor().getQualifiedName();
+	        }
+	    } else {
+	        return "";
+	    }
+	}
+	
+	@Override
+	public void setCurrentBrowser(String b) {
+	    this.currentBrowser = b;
+	}
+	
+	private String getCurrentBrowser() {
+	    return this.currentBrowser;
+	}
+	
+	private String currentBrowser = "";
     private static final long serialVersionUID = -5460410624026635318L;
     private final Map<String, Object> attributes;
     private final DefType defType;

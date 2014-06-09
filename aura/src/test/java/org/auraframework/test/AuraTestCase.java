@@ -54,6 +54,7 @@ public abstract class AuraTestCase extends UnitTestCase {
         super.setUp();
         TestContextAdapter testContextAdapter = Aura.get(TestContextAdapter.class);
         if (testContextAdapter != null) {
+        	System.out.println("AuraTestCase.setUp()");
             testContextAdapter.getTestContext(getQualifiedName());
         }
     }
@@ -95,7 +96,9 @@ public abstract class AuraTestCase extends UnitTestCase {
         getMockConfigAdapter().reset();
     }
 
+    //this is not being called
     public String getQualifiedName() {
+    	System.out.println("AuraTestCase.getQualifiedName");
         return getClass().getCanonicalName() + "." + getName();
     }
 

@@ -45,10 +45,12 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicNameValuePair;
+import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.Definition;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.WebDriverUtil.BrowserType;
 import org.auraframework.test.annotation.FreshBrowserInstance;
@@ -133,6 +135,30 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
     @Override
     public void setUp() throws Exception {
         super.setUp();
+    }
+    
+    public String getBrowserTypeString() {
+    	String browserType = "";
+    	if(this.currentBrowserType!=null) {
+    		browserType = ":BROWSER"+this.currentBrowserType.name();
+    	} 
+    	return browserType;
+    }
+    
+    public void addMocksToTestContextLocalDef(Set<Definition> mocks) throws Throwable {
+    	if (mocks != null && !mocks.isEmpty()) { 
+	    	TestContextAdapter testContextAdapter = Aura.get(TestContextAdapter.class);
+	        if (testContextAdapter != null) {
+	        	if(this.currentBrowserType!=null) 
+	        	{
+	        		System.out.println("WebDriverTestCase.addMocksToTestContextLocalDef,currentBrowserType:"+currentBrowserType.name());
+	                String testName = getQualifiedName();
+	        		testContextAdapter.getTestContext(testName);
+	                Aura.get(TestContextAdapter.class).getTestContext().getLocalDefs().addAll(mocks);
+	        	}
+	        }
+	        AuraTestingUtil.clearCachedDefs(mocks);
+    	}
     }
 
     /**
@@ -798,7 +824,6 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
         params.put("aura.mode", mode.name());
         params.put("aura.test", getQualifiedName());
         url = addUrlParams(url, params);
-
         auraUITestingUtil.getRawEval("document._waitingForReload = true;");
         try {
             openAndWait(url, waitForInit);

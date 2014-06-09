@@ -229,15 +229,12 @@ public class ComponentJSTestSuiteTest extends TestSuite {
 
         @Override
         public String getQualifiedName() {
-            return caseDef.getDescriptor().getQualifiedName();
+        	String btype = getBrowserTypeString();
+            return caseDef.getDescriptor().getQualifiedName()+btype;
         }
 
         public void testRun() throws Throwable {
-            Set<Definition> mocks = caseDef.getLocalDefs();
-            if (mocks != null && !mocks.isEmpty()) {
-            	Aura.get(TestContextAdapter.class).getTestContext().getLocalDefs().addAll(mocks);
-                AuraTestingUtil.clearCachedDefs(mocks);
-            }
+        	addMocksToTestContextLocalDef(caseDef.getLocalDefs());
 
             open(getUrl(), Mode.AUTOJSTEST);
 

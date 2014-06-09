@@ -95,7 +95,9 @@ public abstract class AuraTestCase extends UnitTestCase {
         getMockConfigAdapter().reset();
     }
 
+    //this is not being called
     public String getQualifiedName() {
+    	System.out.println("AuraTestCase.getQualifiedName");
         return getClass().getCanonicalName() + "." + getName();
     }
 

@@ -16,14 +16,12 @@
 ({
     testLazyLoadingSimpleComponentInforEach:{
         test:function(cmp){
-            aura.test.setTestTimeout(15000)
-            var valuesAtTopLevelValue = cmp.getValue('m.stringList');
-            var valuesAtTopLevel = valuesAtTopLevelValue.unwrap();
-            aura.test.assertEquals(3, valuesAtTopLevelValue.getLength(), "Expected 3 values from model.");
-            aura.test.assertEquals(3, valuesAtTopLevel.length, "Expected 3 values from model.");
+        	$A.test.setTestTimeout(15000)
+            var valuesAtTopLevel = cmp.get('m.stringList');
+            $A.test.assertEquals(3, valuesAtTopLevel.length, "Expected 3 values from model.");
 
             var innerCmps = cmp.find('stringValue');
-            aura.test.assertEquals(3, innerCmps.length, "Expected 3 iterations of forEach.");
+            $A.test.assertEquals(3, innerCmps.length, "Expected 3 iterations of forEach.");
             //Assert that initially there are only placeholders
             //This flaps if the server is too fast
             /*for(var i=0; i<innerCmps.length;i++){
@@ -36,8 +34,8 @@
                 innerCmps = cmp.find('stringValue');
                 for(var i=0; i<3;i++){
                     var  stringValueAtInnerCmp = innerCmps[i].get("v.string");
-                    aura.test.assertEquals(valuesAtTopLevel[i], stringValueAtInnerCmp, "Failed to load lazy component from server.");
-                    aura.test.assertEquals(''+valuesAtTopLevel[i], $A.test.getText(innerCmps[i].find('string').getElement()), "value mismatch.");
+                    $A.test.assertEquals(valuesAtTopLevel[i], stringValueAtInnerCmp, "Failed to load lazy component from server.");
+                    $A.test.assertEquals(''+valuesAtTopLevel[i], $A.test.getText(innerCmps[i].find('string').getElement()), "value mismatch.");
                 }
             });
         }

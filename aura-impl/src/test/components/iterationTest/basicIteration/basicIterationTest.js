@@ -15,10 +15,10 @@
  */
 ({
     assertBodyComponentDefRef: function(cmp) {
-        var value = cmp.find("iteration").getValue("v.body");
-        $A.test.assertEquals("ArrayValue", value.toString());
-        $A.test.assertEquals(2, value.getLength());
-        value = value.get(0);
+        var value = cmp.find("iteration").get("v.body");
+        $A.test.assertTrue($A.util.isArray(value));
+        $A.test.assertEquals(1, value.length);
+        value = value[0];
         $A.test.assertTrue(typeof value === "object");
         $A.test.assertEquals(undefined, value.auraType);
         $A.test.assertEquals(undefined, value.getDef);
@@ -37,9 +37,10 @@
         attributes:{ items:"alpha,omega" },
         test:function(cmp){
             // Verify renderIf
-            var value = cmp.find("if").getValue("v.body");
-            $A.test.assertEquals("ArrayValue", value.toString());
-            $A.test.assertEquals(2, value.getLength());
+            var value = cmp.find("if").get("v.body");
+            $A.test.assertTrue($A.util.isArray(value));
+            $A.test.assertEquals(1, value.length);
+            value = value[0];
             var iteration = cmp.find("iteration");
             $A.test.assertEquals(iteration, value.get(0));
             $A.test.assertEquals("markup://aura:text",
@@ -47,16 +48,16 @@
 
             this.assertBodyComponentDefRef(cmp);
 
-            var realbody = iteration.getValue("v.realbody");
-            $A.test.assertEquals("ArrayValue", realbody.toString());
-            $A.test.assertEquals(4, realbody.getLength());
-            value = realbody.get(0);
-            $A.test.assertTrue(typeof value === "object");
+            var realbody = iteration.get("v.realbody");
+            $A.test.assertTrue( $A.util.isArray(realbody));
+            $A.test.assertEquals(2, realbody.length);
+            value = realbody[0];
+            $A.test.assertTrue($A.util.isObject(value));
             $A.test.assertEquals("Component", value.auraType);
             $A.test.assertEquals("markup://aura:expression", value.getDef().getDescriptor().getQualifiedName());
             $A.test.assertEquals("0:alpha,", value.get("v.value"));
-            value = realbody.get(2);
-            $A.test.assertTrue(typeof value === "object");
+            value = realbody[1];
+            $A.test.assertTrue($A.util.isObject(value));
             $A.test.assertEquals("Component", value.auraType);
             $A.test.assertEquals("markup://aura:expression", value.getDef().getDescriptor().getQualifiedName());
             $A.test.assertEquals("1:omega,", value.get("v.value"));
@@ -70,9 +71,10 @@
         attributes:{ showIteration:false, items:"alpha,omega" },
         test:function(cmp){
             // Verify renderIf
-            var value = cmp.find("if").getValue("v.body");
-            $A.test.assertEquals("ArrayValue", value.toString());
-            $A.test.assertEquals(2, value.getLength());
+            var value = cmp.find("if").get("v.body");
+            $A.test.assertTrue($A.util.isArray(value));
+            $A.test.assertEquals(1, value.length);
+            value = value[0];
             var iteration = cmp.find("iteration");
             $A.test.assertEquals(iteration, value.get(0));
             $A.test.assertEquals("markup://aura:text",
@@ -80,21 +82,21 @@
 
             this.assertBodyComponentDefRef(cmp);
 
-            var realbody = iteration.getValue("v.realbody");
-            $A.test.assertEquals("ArrayValue", realbody.toString());
-            $A.test.assertEquals(4, realbody.getLength());
+            var realbody = iteration.get("v.realbody");
+            $A.test.assertTrue( $A.util.isArray(realbody));
+            $A.test.assertEquals(2, realbody.length);
             $A.test.assertFalse(iteration.isRendered());
             $A.test.assertTrue(undefined === iteration.getElements());
 
-            value = realbody.get(0);
-            $A.test.assertTrue(typeof value === "object");
+            value = realbody[0];
+            $A.test.assertTrue($A.util.isObject(value));
             $A.test.assertEquals("Component", value.auraType);
             $A.test.assertEquals("markup://aura:expression", value.getDef().getDescriptor().getQualifiedName());
             $A.test.assertEquals("0:alpha,", value.get("v.value"));
             $A.test.assertFalse(value.isRendered());
             $A.test.assertTrue(undefined === value.getElements());
-            value = realbody.get(2);
-            $A.test.assertTrue(typeof value === "object");
+            value = realbody[1];
+            $A.test.assertTrue($A.util.isObject(value));
             $A.test.assertEquals("Component", value.auraType);
             $A.test.assertEquals("markup://aura:expression", value.getDef().getDescriptor().getQualifiedName());
             $A.test.assertEquals("1:omega,", value.get("v.value"));
@@ -108,10 +110,10 @@
      */
     testItemsEmpty:{
         test:function(cmp){
-            this.assertBodyComponentDefRef(cmp);
-            var realbody = cmp.find("iteration").getValue("v.realbody");
-            $A.test.assertEquals("ArrayValue", realbody.toString());
-            $A.test.assertEquals(0, realbody.getLength());
+        	this.assertBodyComponentDefRef(cmp);
+            var realbody = cmp.find("iteration").get("v.realbody");
+            $A.test.assertEquals($A.util.isArray(realbody));
+            $A.test.assertEquals(0, realbody.length);
         }
     },
 
@@ -119,10 +121,10 @@
         attributes:{ items:"a,b,c,d,e", start:2, end:3 },
         test:function(cmp){
             this.assertBodyComponentDefRef(cmp);
-            var realbody = cmp.find("iteration").getValue("v.realbody");
-            $A.test.assertEquals(2, realbody.getLength());
-            value = realbody.get(0);
-            $A.test.assertTrue(typeof value === "object");
+            var realbody = cmp.find("iteration").get("v.realbody");
+            $A.test.assertEquals(1, realbody.length);
+            value = realbody[0];
+            $A.test.assertTrue($A.util.isObject(value));
             $A.test.assertEquals("2:c,", value.get("v.value"));
         }
     },
@@ -134,9 +136,9 @@
         attributes:{ items:"a,b,c,d,e", start:99 },
         test:function(cmp){
             this.assertBodyComponentDefRef(cmp);
-            var realbody = cmp.find("iteration").getValue("v.realbody");
-            $A.test.assertEquals("ArrayValue", realbody.toString());
-            $A.test.assertEquals(0, realbody.getLength());
+            var realbody = cmp.find("iteration").get("v.realbody");
+            $A.test.assertEquals($A.util.isArray(realBody));
+            $A.test.assertEquals(0, realbody.length);
         }
     },
 

@@ -1,0 +1,38 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component description="Used Internally for ui:tabset component">
+    <aura:attribute name="tabs" type="List" />
+    <aura:attribute name="class" type="String" description="" />
+    
+    <aura:registerevent name="setActive" type="ui:tabsetEvent" description="This event is fired from parent component to activate a tab item."/>
+    <aura:registerevent name="addTab" type="ui:tabsetEvent" description="This event is fired from parent component to add a tab item." />
+    <aura:registerevent name="closeTab" type="ui:tabsetEvent" description="This event is fired from parent component to close a tab item." />
+    <aura:registerevent name="onTabClosed" type="ui:tabsetEvent" description="This event is fired when the close icon is clicked." />
+    <aura:registerevent name="onTabActivated" type="ui:tabsetEvent" description="This event is fired when the tab item is clicked." />
+    
+    <aura:handler name="setActive" action="{!c.setActive}" />
+    <aura:handler name="addTab" action="{!c.addTab}" />
+    <aura:handler name="closeTab" action="{!c.closeTab}" />
+    
+    <aura:dependency resource="markup://ui:tabItem" />
+    
+    <div class="{!v.class}" aura:id="div" role="tablist">
+	    <ul class="tabList" aura:id="tabItemsContainer" role="presentation" onkeydown="{!c.onKeyDown}">
+	    </ul>
+	</div>
+</aura:component>

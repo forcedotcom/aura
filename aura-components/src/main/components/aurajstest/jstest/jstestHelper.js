@@ -17,12 +17,12 @@
     runNextTest : function(cmp){
         var tests = cmp.find("test");
         tests = $A.util.isArray(tests) ? tests : [tests];
+        
         var index = parseInt(cmp.get("v.index"));
         if(index >= tests.length){
         	return;
         }
-        var test = tests[index];
-        test.getDef().getHelper().loadTest(test);
+        cmp.find("tabs").get("e.activateTab").setParams({"index": index}).fire();
         cmp.set("v.index", index + 1);
     }
 })

@@ -15,15 +15,17 @@
  */
 ({
     loadTest : function(cmp){
-        cmp.get("e.activated").setParams({component:cmp.getSuper()}).fire();
-        var frame = document.createElement("iframe");
-        frame.src = cmp.get("m.url");
-        frame.scrolling = "auto";
-        $A.util.on(frame, "load", function(){ 
-        	cmp.getDef().getHelper().runTest(cmp);
-        });
-        var content = cmp.find("content");
-        $A.util.insertFirst(content.getElement(), frame);
+        if (!cmp._testLoaded) {
+            cmp._testLoaded = true;
+            var frame = document.createElement("iframe");
+            frame.src = cmp.get("m.url");
+            frame.scrolling = "auto";
+            $A.util.on(frame, "load", function(){ 
+            	cmp.getDef().getHelper().runTest(cmp);
+            });
+            var content = cmp.find("content");
+            $A.util.insertFirst(content.getElement(), frame);
+        }
     },
 
     runTest : function(cmp){

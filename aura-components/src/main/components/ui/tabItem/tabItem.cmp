@@ -1,0 +1,45 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component>
+    <aura:attribute name="title" type="String" description="The text to display as a tooltip when the mouse hovers over the tab."/>
+    <aura:attribute name="name" type="String" description="The internal name of the tab that can be referenced to."/>
+    <aura:attribute name="icon" type="Aura.Component[]" description="The graphical image displayed on the tab."/>
+    <aura:attribute name="active" type="Boolean" description="Specifies whether a tab is active (true) or not (false)."/>
+    <aura:attribute name="iconClass" type="String" description="The CSS style used to display the icon on the tab."/>
+    <aura:attribute name="closable" type="Boolean" default="false" description="Specifies whether to display an 'x' that will close the tab when clicked. Default value is 'false'." />
+    <aura:attribute name="ariaControlId" type="String" description="Internal use for aria-controls attribute."/>
+    
+    <aura:registerEvent name="activateTab" type="ui:tabsetEvent" description="The event fired when the tab is activated."/>
+    <aura:registerevent name="onActivate" type="ui:tabsetEvent" />
+    <aura:registerevent name="onClose" type="ui:tabsetEvent" />
+    
+    <aura:handler name="activateTab" action="{!c.activateTab}" />
+    
+    <li aura:id="li" class="tabItem" role="presentation">
+	    <a class="tabHeader" onclick="{!c.onTabActivated}" href="javascript:void(0);" aura:id="tabItem" aria-controls="{!v.ariaControlId}" aria-selected="false" tabindex="-1" role="tab">
+            <span class="{!v.iconClass}">{!v.icon}</span>
+            <span>{!v.title}</span>
+	        <aura:renderIf isTrue="{!v.closable}">
+	          <a aura:id="close" class="close" href="javascript:void(0);" onclick="{!c.close}" tabindex="-1">&times;
+	           <span class="assistiveText">Close</span>
+	          </a>
+	        </aura:renderIf>
+	    </a>
+    </li>
+     
+</aura:component>

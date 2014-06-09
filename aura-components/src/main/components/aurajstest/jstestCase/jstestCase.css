@@ -13,56 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@-webkit-keyframes jstestCaseThrob {
-  from,to {
-  	box-shadow: inset 4px 4px 16px #FFFF0F;
-  }
-  50% {
-  	box-shadow: inset 4px 4px 4px #FF800F;
-  }
-}
-
-.aurajstestJstestCase .rerun.fail{
-	background-color: #FF0F0F;
-	box-shadow: inset 4px 4px 8px #FFFF0F;
-	-webkit-animation-iteration-count:infinite;
-    -webkit-animation-name: jstestCaseThrob;
-    -webkit-animation-duration:1s;
-    -webkit-animation-timing-function:linear;
-}
-.aurajstestJstestCase .rerun.pass{
-	background-color: #0FFF0F;
-	background-color: green;
-	box-shadow: inset 4px 4px 4px #10FF10;
-}
-
-.aurajstestJstestCase .rerun{
-	background-color: #FFFF0F;
-	box-shadow: inset 1px 2px 2px #000000;
-	border-radius : 10px;
-	display:inline-block;
-	width:16px;
-	height:16px;
-	margin: 4px 4px 0 0;
-	float:left;
-}
-
-@-webkit-keyframes jstestCaseSpin {
-  from {
-  	-webkit-transform: rotate(0deg);
-  	
-  }
-  to {
-  	-webkit-transform: rotate(360deg);
-  }
-} 
-.aurajstestJstestCase .spin{
-    -webkit-animation-iteration-count:infinite;
-    -webkit-animation-name: jstestCaseSpin;
-    -webkit-animation-duration:1s;
-    -webkit-animation-timing-function:linear;
-}
-
+.THIS.myclass {
+    border: 1px red solid;
+ }
+ 
 .aurajstestJstestCase h1{
 	font-size:18px;
 }

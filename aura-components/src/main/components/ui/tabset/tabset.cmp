@@ -15,11 +15,32 @@
     limitations under the License.
 
 -->
-<aura:component extensible="true" implements="ui:visible" support="BETA" description="A tab set that displays a list of tabs in an unordered list.">
-    <aura:dependency resource="ui:updateSize" type="EVENT" />
-    <div class="{!'tablist ' + v.class}" aura:id="div" role="tablist">
-        <ul class="tabLabels" aura:id="ul">
+<aura:component extensible="true" implements="ui:visible" support="GA" description="A tab set that displays a list of tabs in an unordered list.">
+    <aura:attribute name="tabs" type="List" description="The collection of objects to construct tabs. Please refer to ui:tab attributes." />
+    <aura:attribute name="tabItems" access="private" type="List" description="Use internally for passing a list of tab items to ui:tabBar component." />
+    <aura:attribute name="class" type="String" description="A CSS style to be attached to the component. This style is added in addition to base styles output by the component." />
+    <aura:attribute name="lazyRenderTabs" type="Boolean" default="false" description="If true, contained ui:tab components are rendered only when they are activated." />
+    
+    <aura:registerevent name="addTab" type="ui:tabsetEvent" description="Add new tab to the component." />
+    <aura:registerevent name="removeTab" type="ui:tabsetEvent" description="Remove a tab from the component." />
+    <aura:registerevent name="activateTab" type="ui:tabsetEvent" description="Activate or deactivate a tab." />
+    <aura:registerevent name="getActiveTab" type="ui:tabsetEvent" description="Get the currently active tab." />
+
+    <aura:handler name="init" value="{!this}" action="{!c.onInit}" />
+    <aura:handler name="addTab" action="{!c.addTab}" />
+    <aura:handler name="removeTab" action="{!c.removeTab}" />
+    <aura:handler name="activateTab" action="{!c.activateTab}" />
+    <aura:handler name="getActiveTab" action="{!c.getActiveTab}" />
+
+    <div class="{!v.class}" aura:id="tabContainer">
+        <ui:tabBar aura:id="tabBar" tabs="{!v.tabItems}" 
+           onTabActivated="{!c.onTabActivated}"
+           onTabClosed="{!c.onTabClosed}" 
+        />
+           
+        <aura:if isTrue="{!v.lazyRenderTabs == false}">
             {!v.body}
-        </ul>
+        </aura:if>
+          
     </div>
 </aura:component>

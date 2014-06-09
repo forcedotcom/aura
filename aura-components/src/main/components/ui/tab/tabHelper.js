@@ -14,20 +14,19 @@
  * limitations under the License.
  */
 ({
-    update508Attrs : function(cmp){
-        var a = cmp.find("a");
-        var tabBody = cmp.find("tabBody");
-        if (a && tabBody) {
-            var elementA = a.getElement();
-            var elementT = tabBody.getElement();
-            var active = $A.util.getBooleanValue(cmp.get("v.active"));
-            if (active) {
-                elementA.setAttribute("aria-selected", "true");
-                elementT.setAttribute("aria-expanded", "true");
-            } else {
-                elementA.removeAttribute("aria-selected");
-                elementT.removeAttribute("aria-expanded");
-            }
-        }
+    setActive: function(cmp, active) {
+    	var tabEl = cmp.find('tabBody').getElement();
+    	if (!tabEl) {
+    	    return;
+    	}
+    	if (active) {
+    		$A.util.addClass(tabEl, 'active');
+    		tabEl.setAttribute("aria-expanded", "true");
+    		tabEl.focus();
+    		cmp.get("e.onActivated").fire();
+    	} else {
+    		$A.util.removeClass(tabEl, 'active');
+    		tabEl.setAttribute("aria-expanded", "false");
+    	}
     }
 })

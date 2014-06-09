@@ -15,26 +15,23 @@
     limitations under the License.
 
 -->
-<aura:component extensible="true" support="BETA" description="A single tab that is nested in a &lt;ui:tabset&gt; component.">
+<aura:component extensible="true" support="GA" description="A single tab that is nested in a &lt;ui:tabset&gt; component.">
+    <aura:attribute name="class" type="String" description="" />
     <aura:attribute name="title" type="String" description="The text to display as a tooltip when the mouse hovers over the tab."/>
+    <aura:attribute name="name" type="String" description="The internal name of the tab that can be referenced to."/>
     <aura:attribute name="icon" type="Aura.Component[]" description="The graphical image displayed on the tab."/>
-    <aura:attribute name="scroll" type="Boolean" description="Specified whether scrolling is enabled (true) or not (false) on the tab." default="true"/>
+    <aura:attribute name="scroll" type="Boolean" description="Specified whether scrolling is enabled (true) or not (false) on the tab." default="false"/>
     <aura:attribute name="active" type="Boolean" description="Specifies whether a tab is active (true) or not (false)."/>
     <aura:attribute name="iconClass" type="String" description="The CSS style used to display the icon on the tab."/>
-    <aura:registerEvent name="activated" type="ui:activated" description="The event fired when the tab is activated."/>
-
-    <li aura:id="li" class="{!(v.active? 'active' : '')}" role="presentation">
-        <ui:vbox>
-            <aura:set attribute="north">
-                <a class="tabHeader" href="javascript:void(0);" onclick="{!c.activate}" aura:id="a" role="tab">
-                    <aura:if isTrue="{!v.iconClass != null}">
-                        <div aura:id="icon" class="{!v.iconClass + ' icon'}">&nbsp;</div>
-                    </aura:if>
-                    {!v.icon}
-                    {!v.title}
-                </a>
-            </aura:set>
-            <div class="{!'tabBody' + (v.scroll == true||v.scroll =='true' ? ' scrolling' : '')}" aura:id="tabBody" role="tabpanel">{!v.body}</div>
-        </ui:vbox>
-    </li>
+    <aura:attribute name="closable" type="Boolean" description="Specifies whether to display an 'x' that will close the tab when clicked" />
+    
+    <aura:registerEvent name="onActivated" type="ui:tabsetEvent" description="The event fired when the tab is activated."/>
+    <aura:registerEvent name="setActive" type="ui:tabsetEvent" description="The event fired from ui:tabset to set this tab as active or deactive."/>
+    
+	<aura:handler name="setActive" action="{!c.setActive}" />
+ 
+    <section class="{!v.class + ' tabBody' + (v.scroll ? ' scrolling' : '')}" aura:id="tabBody" role="tabpanel">
+        {!v.body}
+    </section>
+       
 </aura:component>

@@ -13,19 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.THIS {
-	width:100%;
-    height: 100%;
-	display: inline-block;
-}
 
-.THIS .tabLabels {
-	z-index: 1;
-	position:relative;
-	top:0;
-	width: 100%;
-	height:100%;
-	display: block;
-	padding:0;
-	margin:0;
-}
+({
+	/**
+	 * Handler for event that's fired programtically
+	 */
+	activateTab: function(cmp, evt, helper) {
+		helper.setActive(cmp, evt.getParam("active"), evt.getParam("focus"));
+	},
+	/**
+	 * Handler for event that's fired when user clicks on tab to activate
+	 */
+	onTabActivated: function(cmp, evt, helper) {
+		if(!cmp._isActive) {
+			helper.setActive(cmp, true);
+			cmp.get('e.onActivate').fire();
+		}
+	},
+	
+	close: function(cmp, evt, helper) {
+		cmp.get("e.onClose").fire();
+		$A.util.squash(evt, true);
+	}
+})

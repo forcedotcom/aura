@@ -14,7 +14,39 @@
  * limitations under the License.
  */
 ({
-    updateAction : function(cmp, event, helper){
-        helper.update(cmp, event.getParam("component"));
+    onInit: function(cmp, evt, helper) {
+    	helper.initTabs(cmp);
+    },
+    
+    closeTab: function(cmp, evt, helper) {
+    	helper.closeTab(cmp, helper.getTabIndexFromEvent(cmp, evt));
+    },
+    
+    removeTab: function(cmp, evt, helper) {
+        helper.removeTab(cmp, helper.getTabIndexFromEvent(cmp, evt));
+    },
+    
+    addTab: function(cmp, evt, helper) {
+    	helper.addTab(cmp, evt.getParam("index"), evt.getParam("tab"), evt.getParam("callback"));
+    },
+    
+    getActiveTab: function(cmp, evt, helper) {
+    	var tab = helper.getActiveTab(cmp);
+    	var callback = evt.getParam("callback");
+    	if (typeof callback === "function") {
+    	    callback({"tab": tab});
+    	}
+    },
+    
+    activateTab: function(cmp, evt, helper) {
+        helper.setActive(cmp, {"index": helper.getTabIndexFromEvent(cmp, evt)});
+    },
+    
+    onTabActivated: function(cmp, evt, helper) {
+        helper.setActiveTabBody(cmp, {"tab": cmp._tabCollection.getTab(evt.getParam("index")), "active": true});
+    },
+    
+    onTabClosed: function(cmp, evt, helper) {
+    	helper.removeTabBody(cmp, evt.getParam("index"));
     }
 })

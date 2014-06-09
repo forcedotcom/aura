@@ -14,14 +14,9 @@
  * limitations under the License.
  */
 ({
-    render : function(cmp, helper){
-        var ret = this.superRender();
-        helper.update508Attrs(cmp);
-        return ret;
-    },
-
-    rerender : function(cmp, helper){
-        this.superRerender();
-        helper.update508Attrs(cmp);
+    afterRender : function(cmp, helper){
+        //set id attribute for aria-controls
+    	cmp.find("tabBody").getElement().setAttribute("id", cmp.getConcreteComponent().getGlobalId());
+        this.superAfterRender();
     }
 })

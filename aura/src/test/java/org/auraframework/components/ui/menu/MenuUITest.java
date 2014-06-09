@@ -184,7 +184,7 @@ public class MenuUITest extends WebDriverTestCase {
     
     //Test case for W-2234265
     //TODO: Uncomment test once W-2234265 is fixed
-    public void _testActionMenuAttachToBodySetViaKeyboardInteraction() throws MalformedURLException, URISyntaxException {
+    public void testActionMenuAttachToBodySetViaKeyboardInteraction() throws MalformedURLException, URISyntaxException {
         testActionMenuViaKeyboardInteractionForApp(MENUTEST_ATTACHTOBODY_APP);
     }
 

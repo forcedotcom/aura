@@ -45,16 +45,8 @@
         var elem = component.getElement();
         if (visible === true) {
             $A.util.addClass(elem, "visible");
-            if (currentlyVisible !== true) { // If menu changes from invisible to visible, let's set the initial focus
-                var index = concreteCmp.get("v.focusItemIndex");
-                if (index < 0) {
-                    index = component.getValue("v.childMenuItems").getLength() - 1;
-                }
-                this.setMenuItemFocus(component, index);
-            }
         } else {
             $A.util.removeClass(elem, "visible");
-            concreteCmp.set("v.focusItemIndex", 0);
         }
         this.handleGlobalClick(concreteCmp, visible);
     },
@@ -156,6 +148,22 @@
             if (action) {
                 action.runDeprecated();
             }
+        }
+    },
+    
+    setFocus: function(component, currentlyVisible) {
+    	var concreteCmp = component.getConcreteComponent();
+        var visible = concreteCmp.get("v.visible");
+        if (visible === true) {
+            if (currentlyVisible !== true) { // If menu changes from invisible to visible, let's set the initial focus
+                var index = concreteCmp.get("v.focusItemIndex");
+                if (index < 0) {
+                    index = component.getValue("v.childMenuItems").getLength() - 1;
+                }
+                this.setMenuItemFocus(component, index);
+            }
+        } else {
+            concreteCmp.set("v.focusItemIndex", 0);
         }
     },
     

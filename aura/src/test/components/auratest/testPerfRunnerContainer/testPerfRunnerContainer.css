@@ -1,0 +1,226 @@
+/*
+ * Copyright (C) 2013 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+.THIS {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+.THIS *, .THIS *:before, .THIS *:after {
+  -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
+}
+
+.THIS .menu {
+    font-weight: 300;
+    background: #344A5F;
+    display: flex;
+    align-items: center;
+    padding: 0.3em 0.5em;
+    color: #fff;
+    font-size: 18px;
+
+}   
+
+.THIS .menu .search-bar {
+    flex: 1;
+}
+.THIS .menu input.search {
+    border-radius: 5px;
+    border-width: 1px;
+    border-style: solid;
+    padding: 0.5em;
+    font-size: 15px;
+    width: 180px;
+    margin: 0 20px 0 10px;
+}
+
+
+.THIS button {
+    border: none;
+    border-radius: 5px;
+    color: #FFF;
+    padding: 0.5em;
+    line-height: 20px;
+}
+
+.THIS button > span {
+    font-size: 18px;
+    font-weight: 300;
+    padding: 0 5px;
+}
+
+.THIS button.run {
+    background: #CF5C60;
+    font-size: 20px;
+}
+
+.THIS button.select {
+    background: #F3AE4E;
+    margin-right: 10px;
+}
+
+.THIS button.integ {
+    background: #717ECD;
+}
+
+.THIS button.integ[data-selected="true"],
+.THIS button.failed[data-selected="true"] {
+    opacity: .5;
+}
+
+
+
+.THIS .test-container {
+    flex: 1;
+    overflow: scroll;
+    height: 100%;
+}
+
+.THIS ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.THIS li[data-visible="hidden"] {
+    display: none;
+}
+
+
+.THIS li {
+    background: #F0F1F2;
+}
+.THIS li .parts {
+    height: 50px;
+    display: flex;
+}
+
+.THIS li .icon {
+    padding: 0 5px;
+}
+
+.THIS li:nth-child(odd) {
+    background: #fff
+}
+
+
+.THIS li:not([data-jsc]) .jsConsole {
+    display: none;
+}
+
+.THIS .jsConsole {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 30px;
+}
+
+.THIS li[data-integ] .parts:after {
+    content: "";
+    border-style: solid;
+    border-width: 0 15px 15px 0;
+    width: 15px;
+    height: 15px;
+    border-color: rgba(0, 0, 0, 0) #717ECD rgba(0, 0, 0, 0) rgba(0, 0, 0, 0);
+}
+
+.THIS .list.only-failed li:not([data-state="failed"]) {
+    display: none;
+}
+
+.THIS .list.not-integ li[data-integ] {
+    display: none;
+}
+
+.THIS li[data-state="enqueue"], 
+.THIS li[data-state="running"] {
+    background: #F3AE4E;
+    border-bottom: 1px solid #555;
+}
+
+.THIS li[data-state="enqueue"] .status-icon:before,
+.THIS li[data-state="running"] .status-icon:before {
+    content: "\e600";
+}
+
+.THIS li[data-state="failed"] {
+    background: #CF5C60;
+}
+.THIS li[data-state="failed"] .status-icon:before {
+    content: "\e602";
+}
+.THIS li[data-state="failed"] .results:before {
+    content: "\e604";
+}
+
+
+.THIS li[data-state="passed"] {
+    background: #4AB471;    
+}
+.THIS li[data-state="passed"] .status-icon:before {
+    content: "\e605";
+    color: #FFF500;
+}
+.THIS li[data-state="passed"] .results:before {
+    content: "\e604";
+}
+
+.THIS li:not([data-state="failed"]) .exception {
+    display: none;
+}
+
+.THIS li[data-state="failed"] .exception {
+    display: block;
+    padding: 10px;
+    font-size: 13px;
+    overflow: hidden;
+}
+
+
+.THIS li .checkbox {
+    width: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.THIS li .checkbox > input {
+    width: 25px;
+    height: 25px;
+}
+
+.THIS li .test {
+    padding: 10px 0;
+    flex: 4;
+    overflow: hidden;
+}
+
+.THIS li .name {
+
+}
+
+.THIS li .ns {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 10px;
+}
+
+.THIS .status {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

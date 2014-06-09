@@ -64,6 +64,10 @@ public class TestSetRunnerState {
     private static class ContainerEnabledSingletonHolder {
         private static TestSetRunnerState HYBRIDCONTAINER_INSTANCE = new TestSetRunnerState(TestInventory.CONTAINER_TYPE_TESTS);
     }
+    
+    private static class PerfSingletonHolder {
+        private static TestSetRunnerState PERF_INSTANCE = new TestSetRunnerState(TestInventory.PERF_TESTS);
+    }
     /**
      * The inventory tracks all test cases available for execution.
      */
@@ -86,6 +90,10 @@ public class TestSetRunnerState {
     
     public static TestSetRunnerState getHybridContainerInstance() {
     	return ContainerEnabledSingletonHolder.HYBRIDCONTAINER_INSTANCE;
+    }
+    
+    public static TestSetRunnerState getPerfInstance() {
+    	return PerfSingletonHolder.PERF_INSTANCE;
     }
 
     private TestSetRunnerState(EnumSet<TestInventory.Type> scope) {

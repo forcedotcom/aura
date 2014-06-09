@@ -15,41 +15,43 @@
  */
 ({
     setOriginalItems: function(cmp, evt) {
-        var data = cmp.find("iteration").getValue("v.items");
-        var other = cmp.getValue("v.list");
-        data.setValue(other);
+        var other = cmp.get("v.list");
+        cmp.find("iteration").set("v.items", other)
     },
 
     setItems: function(cmp, evt) {
-        var data = cmp.find("iteration").getValue("v.items");
-        var other = cmp.getValue("m.data");
-        data.setValue(other);
+        var other = cmp.get("m.data");
+        cmp.find("iteration").set("v.items", other);
     },
 
     setCapitalItems: function(cmp, evt) {
-        var data = cmp.find("iteration").getValue("v.items");
-        var other = cmp.getValue("m.capitaldata");
-        data.setValue(other);
+        var other = cmp.get("m.capitaldata");
+        cmp.find("iteration").set("v.items", other);
     },
 
     changeOneValue: function(cmp, evt) {
-        var data = cmp.find("iteration").getValue("v.items");
-        var val = data.getValue(cmp.get("v.tochange")).getValue("stringy");
-        val.setValue(cmp.get("v.newvalue"));
+    	var data = cmp.find("iteration").get("v.items");
+    	data[cmp.get("v.tochange")]["stringy"] = cmp.get("v.newvalue");
+    	cmp.find("iteration").set("v.items", data)
     },
 
     pushOneValue: function(cmp, evt) {
-        var data = cmp.find("iteration").getValue("v.items");
-        data.push({stringy:cmp.get("v.newvalue")});
+        var data = cmp.find("iteration").get("v.items");
+        data.push({"stringy":cmp.get("v.newvalue")});
+        cmp.find("iteration").set("v.items", data)
     },
 
     insertOneValue: function(cmp, evt) {
-        var data = cmp.find("iteration").getValue("v.items");
-        data.insert(parseInt(cmp.get("v.tochange"), 10), {stringy:cmp.get("v.newvalue")});
+        var data = cmp.find("iteration").get("v.items");
+        data.splice(parseInt(cmp.get("v.tochange"), 10), 
+        			0, 
+        			{"stringy":cmp.get("v.newvalue")});
+        cmp.find("iteration").set("v.items", data);
     },
 
     deleteOneValue: function(cmp, evt) {
-        var data = cmp.find("iteration").getValue("v.items");
-        data.remove(parseInt(cmp.get("v.tochange"), 10));
+        var data = cmp.find("iteration").get("v.items");
+        data.splice(parseInt(cmp.get("v.tochange"), 10), 1);
+        cmp.find("iteration").set("v.items", data);
     }
 })

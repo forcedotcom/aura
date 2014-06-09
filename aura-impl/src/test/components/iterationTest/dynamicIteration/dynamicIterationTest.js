@@ -67,8 +67,8 @@
             $A.test.assertEquals("10:kkk", $A.test.getText(children[1]));
             $A.test.assertEquals("11:lll", $A.test.getText(children[2]));
 
-            cmp.set("v.toChange", 10);
-            cmp.set("v.newValue", "really?");
+            cmp.set("v.tochange", 10);
+            cmp.set("v.newvalue", "really?");
             cmp.get("c.changeOneValue").runDeprecated();
 
             var newchildren = $A.test.getNonCommentNodes(container.childNodes);
@@ -95,8 +95,8 @@
             $A.test.assertEquals("10:kkk", $A.test.getText(children[1]));
             $A.test.assertEquals("11:lll", $A.test.getText(children[2]));
 
-            cmp.set("v.toChange", 10);
-            cmp.set("v.newValue", "really?");
+            cmp.set("v.tochange", 10);
+            cmp.set("v.newvalue", "really?");
             cmp.get("c.insertOneValue").runDeprecated();
 
             var newchildren = $A.test.getNonCommentNodes(container.childNodes);
@@ -124,7 +124,7 @@
             $A.test.assertEquals("10:kkk", $A.test.getText(children[1]));
             $A.test.assertEquals("11:lll", $A.test.getText(children[2]));
 
-            cmp.set("v.toChange", 10);
+            cmp.set("v.tochange", 10);
             cmp.get("c.deleteOneValue").runDeprecated();
 
             var newchildren = $A.test.getNonCommentNodes(container.childNodes);

@@ -15,8 +15,8 @@
     limitations under the License.
 
 -->
-<aura:component>
-    <aura:attribute name="label" type="String" required="true"/>
+<aura:component access="global">
+    <aura:attribute name="label" type="String" required="true" access="global"/>
     <aura:attribute name="description" type="Aura.Component[]" required="true"/>
     <aura:attribute name="descriptor" type="String" required="true"/>
     

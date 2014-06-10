@@ -21,6 +21,7 @@ import java.util.Map;
 import org.auraframework.Aura;
 import org.auraframework.adapter.LoggingAdapter;
 import org.auraframework.def.ComponentDef;
+import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
 import org.auraframework.test.WebDriverTestCase;
@@ -29,6 +30,7 @@ import org.auraframework.test.WebDriverUtil.BrowserType;
 import org.auraframework.test.adapter.TestLoggingAdapter;
 import org.auraframework.test.annotation.ThreadHostileTest;
 import org.auraframework.test.controller.TestLoggingAdapterController;
+import org.openqa.selenium.By;
 
 import com.google.common.collect.Lists;
 
@@ -165,7 +167,7 @@ public class CSPReportLoggingTest extends WebDriverTestCase {
 
         // generate an intentional csp report
         auraUITestingUtil
-                .getRawEval("var s=document.createElement('script');s.type='text/javascript';s.async=true;s.src='http://expectedreport.salesforce.com/';document.getElementsByTagName('head')[0].appendChild(s);");
+        .getRawEval("var s=document.createElement('script');s.type='text/javascript';s.async=true;s.src='http://expectedreport.salesforce.com/';document.getElementsByTagName('head')[0].appendChild(s);");
 
         List<Map<String, Object>> logs = getCspReportLogs(1);
         @SuppressWarnings("unchecked")
@@ -189,7 +191,7 @@ public class CSPReportLoggingTest extends WebDriverTestCase {
                                 +
                                 "<script src='http://www2.sfdcstatic.com/common/assets/js/min/footer-min.js'></script>"
                                 +
-                                "</aura:set>"));
+                        "</aura:set>"));
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(
                 ComponentDef.class,
                 String.format(baseComponentTag,
@@ -209,6 +211,39 @@ public class CSPReportLoggingTest extends WebDriverTestCase {
         assertDocumentUri(cspReport, uri);
         assertSourceFile(cspReport, null);
         assertViolatedDirective(cspReport, "script-src 'self'");
+    }
+
+    /**
+     * Automation for the connect-src CSP policy. With connect-src set to 'self', a report should be generated when an
+     * XHR is sent to another origin. Note that due to the Access-Control-Allow-Origin header the XHR will fail anyway,
+     * but attempting the XHR will still generate the report for testing purposes.
+     */
+    public void testReportXHRConnect() throws Exception {
+        DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(
+                ComponentDef.class,
+                String.format(baseComponentTag, "",
+                        "<ui:button press='{!c.post}' label='Send XHR' class='button'/>"));
+        DefDescriptor<?> controllerDesc = Aura.getDefinitionService()
+                .getDefDescriptor(cmpDesc, DefDescriptor.JAVASCRIPT_PREFIX,
+                        ControllerDef.class);
+        addSourceAutoCleanup(
+                controllerDesc,
+                "{post:function(c){$A.util.transport.request({\"url\" : \"http://www.example.com\", \"method\" : \"GET\",\"callback\" : function() { console.log(\"from action callback\");},\"params\": {} });}}");
+        String externalUri = "http://www.example.com";
+
+        open(cmpDesc);
+        auraUITestingUtil.findDomElement(By.cssSelector(".button")).click();
+
+        List<Map<String, Object>> logs = getCspReportLogs(1);
+        @SuppressWarnings("unchecked")
+        Map<String, Object> cspReport = (Map<String, Object>) logs.get(0).get(
+                CSPReporterServlet.JSON_NAME);
+
+        assertNotNull("No CSP report found", cspReport);
+        assertEquals("Unexpected blocked resource", externalUri,
+                cspReport.get(CSPReporterServlet.BLOCKED_URI));
+        assertSourceFile(cspReport, SOURCE_SUFFIX);
+        assertViolatedDirective(cspReport, "connect-src 'self'");
     }
 
     private void assertDocumentUri(Map<String, Object> cspReport, String expectedContains) {

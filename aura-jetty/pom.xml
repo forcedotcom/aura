@@ -98,6 +98,7 @@
         <sauce.record.screenshots>false</sauce.record.screenshots>
         <screenshots.directory>${project.build.directory}/screenshots</screenshots.directory>
         <screenshots.baseurl>file://${screenshots.directory}</screenshots.baseurl>
+		<additionalClasspaths>${aura.home}/aura-util/target/test-classes/;${aura.home}/aura/target/test-classes/;${aura.home}/aura-impl-expression/target/test-classes/;${aura.home}/aura-integration-test/target/test-classes/;${aura.home}/aura-impl/target/test-classes/;${aura.home}/aura/src/test/components/;${aura.home}/aura-impl/src/test/components/</additionalClasspaths>
     </properties>
     <build>
         <plugins>
@@ -119,7 +120,7 @@
                         <contextPath>/</contextPath>
                         <descriptor>${aura.home}/aura/src/main/http/WEB-INF/web.xml</descriptor>
                         <defaultsDescriptor>${aura.home}/aura/src/main/http/WEB-INF/webdefault.xml</defaultsDescriptor>
-                        <extraClasspath>${aura.home}/aura-resources/target/classes;${aura.home}/aura/src/test/components/;${aura.home}/aura-impl/src/test/components/;${aura.home}/aura-util/target/test-classes/;${aura.home}/aura-util/test/results/;${aura.home}/aura-util/test/testdata/;${aura.home}/aura/target/test-classes/;${aura.home}/aura/test/results/;${aura.home}/aura/test/testdata/;${aura.home}/aura-impl/target/test-classes/;${aura.home}/aura-impl/test/results/;${aura.home}/aura-impl/test/testdata/;${aura.home}/aura-impl-expression/target/test-classes/;${aura.home}/aura-integration-test/target/test-classes/</extraClasspath>
+						<extraClasspath>${aura.home}/aura-resources/target/classes;${aura.home}/aura-util/test/results/;${aura.home}/aura-util/test/testdata/;${aura.home}/aura/test/results/;${aura.home}/aura/test/testdata/;${aura.home}/aura-impl/test/results/;${aura.home}/aura-impl/test/testdata/;${additionalClasspaths}</extraClasspath>
                     </webAppConfig>
                     <useTestClasspath>true</useTestClasspath>
                     <systemProperties>
@@ -180,4 +181,33 @@
             </plugin>
         </plugins>
     </build>
+	<profiles>
+		<profile>
+			<id>jarsOnly</id>
+			<activation>
+				<property>
+					<name>jarsOnly</name>
+				</property>
+			</activation>
+			<properties>
+				<additionalClasspaths />
+			</properties>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.mortbay.jetty</groupId>
+						<artifactId>jetty-maven-plugin</artifactId>
+						<configuration>
+							<systemProperties>
+								<systemProperty>
+									<name>aura.home</name>
+									<value></value>
+								</systemProperty>
+							</systemProperties>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>

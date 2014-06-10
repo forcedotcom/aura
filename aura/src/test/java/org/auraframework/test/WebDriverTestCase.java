@@ -74,10 +74,17 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Action;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.interactions.HasTouchScreen;
+import org.openqa.selenium.interactions.touch.FlickAction;
+import org.openqa.selenium.interactions.touch.TouchActions;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.ScreenshotException;
+import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.uiautomation.ios.client.uiamodels.impl.RemoteIOSDriver;
+import org.uiautomation.ios.client.uiamodels.impl.augmenter.IOSDriverAugmenter;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -88,7 +95,8 @@ import com.google.common.collect.Sets;
 @WebDriverTest
 public abstract class WebDriverTestCase extends IntegrationTestCase {
     private static final Logger logger = Logger.getLogger("WebDriverTestCase");
-
+    private final String LOADING_INDICATOR =  "div.loadingIndicator";
+	
     /** Checks whether {@code oneClass} is mentioned as a class on {@code elem}. */
     public boolean hasCssClass(WebElement elem, String oneClass) {
         String allClasses = elem.getAttribute("class");
@@ -360,7 +368,8 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
         }
     }
 
-    public final Map<String, Map<String, Map<String, List<Object>>>> getAuraStats() {
+    @SuppressWarnings("unchecked")
+	public final Map<String, Map<String, Map<String, List<Object>>>> getAuraStats() {
         return (Map<String, Map<String, Map<String, List<Object>>>>) auraUITestingUtil
                 .getRawEval("return $A.PERFCORE.stats.get();");
     }
@@ -1100,6 +1109,73 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
                 .sendKeys(Keys.TAB)
                 .keyUp(Keys.SHIFT);
         return builder.build();
+    }
+    
+    /**
+     * Flick starting at on_element, and moving by the xoffset and yoffset with normal speed
+     * @param locator
+     * @param xOffset
+     * @param yOffset
+     */
+    public void flick(By locator, int xOffset, int yOffset) {
+    	waitForElementAppear("Cannot locate element to flick: " + locator, locator);
+        WebElement element = auraUITestingUtil.findDomElement(locator);
+        flick(element, xOffset, yOffset, FlickAction.SPEED_NORMAL);
+    }
+    
+    public void flick(WebElement element, int xOffset, int yOffset) {
+    	//FlickAction.SPEED_FAST is too slow for the tests so changing it to 200
+    	flick(element, xOffset, yOffset, 200);
+    }
+
+    public void flick(WebElement element, int xOffset, int yOffset, int speed) {
+        WebDriver driver = getDriver();
+        // check for wrapped driver
+        if (driver instanceof EventFiringWebDriver) {
+            driver = ((EventFiringWebDriver)driver).getWrappedDriver();
+        }
+        driver = augmentDriver();
+        //for iPhone
+    	int yOffsetByDevice = yOffset;
+    	
+    	if(this.getBrowserType() == BrowserType.IPAD){
+    		yOffsetByDevice = yOffset * 2;
+    	}
+    	if (driver instanceof HasTouchScreen) {
+    		Action flick = (new TouchActions(driver)).flick(element, xOffset, yOffsetByDevice, speed).build();
+    		flick.perform();
+        } else {
+            Action flick = (new Actions(driver)).dragAndDropBy(element, xOffset, yOffsetByDevice).build();
+            flick.perform();
+        }
+    }
+    
+    public void flick(int xOffset, int yOffset) {
+        WebDriver driver = getDriver();
+        driver = augmentDriver();
+        //for iPhone
+    	int yOffsetByDevice = yOffset;
+    	
+    	if(this.getBrowserType() == BrowserType.IPAD){
+    		yOffsetByDevice = yOffset * 2;
+    	}
+    	
+    	Action flick = (new TouchActions(driver)).flick(xOffset, yOffsetByDevice).build();
+        flick.perform();
+    }
+    
+    /*
+	 * Waits for the "loading" and spinner to disappear
+	 */
+	public void waitForLoadingIndicatorToDisappear() {
+        if (isElementPresent(By.cssSelector(LOADING_INDICATOR))) {
+            waitForElementAbsent("The 'loadingIndicator' never disappeared.", findDomElement(By.cssSelector(LOADING_INDICATOR)));
+        }
+    }
+    
+    private RemoteIOSDriver augmentDriver(){
+    	RemoteIOSDriver driver = IOSDriverAugmenter.getIOSDriver((RemoteWebDriver)getDriver());
+    	return driver;
     }
 
     protected void assertClassesSame(String message, String expected, String actual) {

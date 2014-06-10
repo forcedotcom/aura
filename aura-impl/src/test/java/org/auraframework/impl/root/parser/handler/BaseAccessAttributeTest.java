@@ -384,6 +384,10 @@ public abstract class BaseAccessAttributeTest extends AuraImplTestCase {
 			case Theme:
 				name = namespace + ":testtheme";
 				break;											
+
+            case Module:
+                name = namespace + ":testmodule";
+                break;                                          
 		}				
 		
 		return name;		

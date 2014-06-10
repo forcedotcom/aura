@@ -199,6 +199,10 @@ public abstract class BaseAccessAttributeEnforcementTest extends AuraImplTestCas
 		case RegisterEvent:
 			name = namespace + ":testregisterevent";
 			break;			
+
+        case Library:
+            name = namespace + ":testlibrary";
+            break;          
 		}
 
 		return name;

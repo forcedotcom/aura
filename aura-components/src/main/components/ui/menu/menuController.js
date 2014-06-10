@@ -26,7 +26,9 @@
     
     trigger: function(component, event, helper) {
         var index = event.getParam("focusItemIndex");
-        helper.toggleMenuVisible(component, index, event);
+        var concreteCmp = component.getConcreteComponent();
+        var _helper = concreteCmp.getDef().getHelper();
+        _helper.toggleMenuVisible(component, index, event);
     },
     
     handleMenuExpand: function(component, event, helper) {

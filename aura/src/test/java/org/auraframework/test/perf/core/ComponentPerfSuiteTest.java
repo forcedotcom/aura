@@ -81,7 +81,11 @@ public class ComponentPerfSuiteTest extends TestSuite {
         }
 
         for (String namespace : getNamespaces()) {
-            addTest(new NamespacePerfTestSuite(namespace));
+            try {
+                addTest(new NamespacePerfTestSuite(namespace));
+            } catch (Exception e) {
+                LOG.log(Level.WARNING, "cannot load namespace " + namespace, e);
+            }
         }
     }
 

@@ -99,6 +99,10 @@ public abstract class AbstractPerfTestCase extends WebDriverTestCase {
                     return auraErrorMessage;
                 }
                 if (d.findElement(componentRendered) != null) {
+                    // check for the case where both the componentRendered and auraErrorMessage are displayed
+                    if (d.findElement(auraErrorMessage).isDisplayed()) {
+                        return auraErrorMessage;
+                    }
                     return componentRendered;
                 }
                 return null;

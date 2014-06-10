@@ -19,6 +19,7 @@ import java.util.Set;
 
 import org.auraframework.Aura;
 import org.auraframework.adapter.MockConfigAdapter;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.impl.source.StringSourceLoader;
 import org.auraframework.test.TestContext;
@@ -116,10 +117,13 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
                 if (testContext != null) {
                     Set<Definition> localDefs = testContext.getLocalDefs();
                     for (Definition def : localDefs) {
-                        String ns = def.getDescriptor().getNamespace();
-                        if (namespace.equalsIgnoreCase(ns)) {
-                            return true;
-                        }
+                    	DefDescriptor<? extends Definition> defDescriptor = def.getDescriptor();
+                    	if(defDescriptor!=null) {
+	                        String ns = defDescriptor.getNamespace();
+	                        if (namespace.equalsIgnoreCase(ns)) {
+	                            return true;
+	                        }
+                    	}
                     }
                 }
             }

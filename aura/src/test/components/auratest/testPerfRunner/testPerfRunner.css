@@ -1,0 +1,109 @@
+/*
+ * Copyright (C) 2013 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+.THIS {
+    margin: 0;
+    padding: 0;
+    font-size: 100%;
+    font-family: Helvetica Neue, Helvetica;
+    background: #A5A5A5;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+@font-face {
+    font-family: 'perf';
+    src: url('fonts/perf.eot');
+}
+@font-face {
+    font-family: 'perf';
+    src: url(data:application/font-woff;charset=utf-8;base64,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) format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+.THIS [class^="icon-"], .THIS [class*=" icon-"], .THIS .icon {
+    font-family: 'perf';
+    speak: none;
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.THIS .icon-busy:before {
+    content: "\e600";
+}
+.THIS .icon-aid:before {
+    content: "\e601";
+}
+.THIS .icon-bug:before {
+    content: "\e602";
+}
+.THIS .icon-pie:before {
+    content: "\e603";
+}
+.THIS .icon-bars:before {
+    content: "\e604";
+}
+.THIS .icon-trophy:before {
+    content: "\e605";
+}
+.THIS .icon-rocket:before {
+    content: "\e606";
+}
+.THIS .icon-meter:before {
+    content: "\e607";
+}
+
+.THIS > header {
+    background: #2A94D6;
+    height: 60px;
+    color: white;
+    display: flex;
+    align-items: center;
+    padding: 0 1em;
+    font-size: 1.6em;
+    font-weight: 300;
+}
+
+.THIS .title {
+    margin: 0 0 0 20px;
+}
+.THIS > .center {
+    flex:1;
+    overflow: hidden;
+    position: relative;
+}
+.THIS > header .perf {
+    color: #333;
+}
+
+.THIS > footer {
+    background: #344A5F;
+    height: 20px;
+    padding: 0 1em;
+    color: #fff;
+    font-size: 0.8em;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}

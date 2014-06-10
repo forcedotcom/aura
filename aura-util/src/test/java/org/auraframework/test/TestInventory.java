@@ -52,6 +52,8 @@ public class TestInventory {
     private final static String CLASS_SUFFIX = ".class";
     public static final EnumSet<Type> CONTAINER_TYPE_TESTS = EnumSet.of(Type.HYBRID_CONTAINER);
     public static final EnumSet<Type> CONTAINERLESS_TYPE_TESTS = EnumSet.complementOf(CONTAINER_TYPE_TESTS);
+    public static final EnumSet<Type> PERF_TESTS = EnumSet.of(Type.PERFSUITE, Type.PERFCMP, Type.PERFFRAMEWORK, Type.PERFCUSTOM);
+    
 
     public enum Type {
         UNIT, WEB, INTEGRATION, IGNORED, HYBRID_CONTAINER, PERFSUITE, PERFCMP, PERFFRAMEWORK, PERFCUSTOM;

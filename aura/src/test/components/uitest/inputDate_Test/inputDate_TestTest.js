@@ -214,6 +214,38 @@
                     $A.test.assertFalse(date_picker.get("v.visible"));
         }
     },
+    
+    /**
+     * Clear date icon should be displayed on mobile only and clears date.
+     */
+    testClearButton: {
+    	test: [function(component) {
+    		// initially no clear icon
+    		this.verifyClearIcon(false);
+    		this.openDatePicker(component);
+    	}, function(component) {
+    		this.selectTodaysDate(component);
+    	}, function(component) {
+    		// need a timeout for mobile devices. There is a delay 
+    		// after datepicker closes until clear icon shows on mobile.
+    		// Meaning icon does not show fast enough on mobile devices
+    		// causing test to verify icon while clear icon is not
+    		// present. Desktop is able to show clear icon as soon as
+    		// datepicker closes.
+    		setTimeout(function() { 
+    			// verify clear icon
+	    		if (this.isViewDesktop()) {
+	    			// on desktop clear icon should not be present
+	    			this.verifyClearIcon(false);
+	    		} else {
+	    			// on mobile clear icon should be present
+	    			this.verifyClearIcon(true);
+	    			this.clickClearIcon(component);
+	    		}
+    		}, 500);
+    	}]
+    	
+    },
 
     iterateCal : function(monthIter, yearIter, monthButton, yearButton){
                       var i;
@@ -293,5 +325,32 @@
                          } else if (intMonth == 11) {
                              return "December";
                          }
+    },
+    
+    verifyClearIcon : function(isVisible) {
+    	var clearIcon = $A.test.getElementByClass("clearIcon");
+    	if (isVisible) {
+    		$A.test.assertTrue($A.util.hasClass(clearIcon, "display"), "Clear icon should be visible");
+    	} else {
+    		$A.test.assertFalse($A.util.hasClass(clearIcon, "display"), "Clear icon SHOULD NOT be visible");
+    	}
+    },
+    
+    clickClearIcon : function(cmp) {
+    	var inputText = cmp.find("datePickerTestCmp").find("inputText");
+        var clearIcon = $A.test.getElementByClass("clearIcon");
+        $A.test.clickOrTouch(clearIcon);
+        $A.test.addWaitFor("", function(){return inputText.get("v.value");});
+    },
+    
+    selectTodaysDate : function(cmp) {
+    	var datePicker = cmp.find("datePickerTestCmp").find("datePicker");
+		var todayBtn = datePicker.find("today");
+		todayBtn.get("e.press").fire();
+		$A.test.addWaitFor(true, function(){
+			var isVisible = $A.util.hasClass(datePicker, "visible");
+			var val = cmp.find("datePickerTestCmp").find("inputText").get("v.value");
+			return !isVisible && val !== "";
+		});
     }
 })

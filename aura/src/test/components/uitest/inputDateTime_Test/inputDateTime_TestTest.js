@@ -161,8 +161,13 @@
     	var retDate = this.twoDigitFormat(someDate.getMonth()+1) + dateSep +
     		this.twoDigitFormat(someDate.getDate()) + dateSep +
     		someDate.getFullYear();
-    	if (hasTime) {	
-		retDate += " " + this.twoDigitFormat(someDate.getHours()%12) + timeSep + this.twoDigitFormat(someDate.getMinutes());	
+    	if (hasTime) {
+    	        var mod = someDate.getHours()%12;
+    	        
+    	        if(mod == 0){
+    	            mod = 12;
+    	        }
+		retDate += " " + this.twoDigitFormat(mod) + timeSep + this.twoDigitFormat(someDate.getMinutes());	
     	}
     	return retDate;
     }

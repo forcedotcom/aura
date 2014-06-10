@@ -19,14 +19,14 @@
     <ui:vbox>
             <aura:set attribute="north">
                 <span class="theNorth">
-                     This <code>north</code> attribute is rendered in a div element.
+                     This <code>north</code> facet is rendered in a div element.
                  </span>
             </aura:set>
             <aura:set attribute="south">
                 <span class="theSouth">
-                     This <code>south</code> attribute is rendered in a div element.
+                     This <code>south</code> facet is rendered in a div element.
                 </span>
             </aura:set>
-            <p>The body is nested in the middle of the <code>north</code> and <code>south</code> attributes.</p>
+            <p>The body is nested in the middle of the <code>north</code> and <code>south</code> facets.</p>
     </ui:vbox>
 </aura:component>

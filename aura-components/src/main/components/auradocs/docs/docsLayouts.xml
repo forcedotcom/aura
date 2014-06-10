@@ -25,8 +25,4 @@
         <aura:layoutItem container="sidebar" cache="loaded"><auradocs:empty/></aura:layoutItem>
         <aura:layoutItem container="content" action="{!c.getTopic}"/>
     </aura:layout>
-    <aura:layout name="demos" title="Demos">
-        <aura:layoutItem container="sidebar" cache="loaded"><auradocs:demosNav/></aura:layoutItem>
-        <aura:layoutItem container="content" action="{!c.getDemo}"></aura:layoutItem>
-    </aura:layout>
 </aura:layouts>

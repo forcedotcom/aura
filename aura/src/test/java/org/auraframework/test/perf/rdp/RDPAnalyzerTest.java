@@ -44,10 +44,14 @@ public final class RDPAnalyzerTest extends AbstractPerfTestCase {
         // UC: verify raw protocol notifications:
         List<RDPNotification> notifications = getRDPNotifications();
         // checks has expected events:
-        assertTrue(RDPUtil.containsMethod(notifications, RDP.Timeline.eventRecorded));
-        assertTrue(RDPUtil.containsMethod(notifications, RDP.Network.loadingFinished));
-        assertTrue(RDPUtil.containsMethod(notifications, RDP.Page.domContentEventFired));
-        assertTrue(RDPUtil.containsMethod(notifications, RDP.Page.loadEventFired));
+        assertTrue(RDP.Timeline.eventRecorded + " not found",
+                RDPUtil.containsMethod(notifications, RDP.Timeline.eventRecorded));
+        assertTrue(RDP.Network.loadingFinished + " not found",
+                RDPUtil.containsMethod(notifications, RDP.Network.loadingFinished));
+        assertTrue(RDP.Page.domContentEventFired + " not found",
+                RDPUtil.containsMethod(notifications, RDP.Page.domContentEventFired));
+        assertTrue(RDP.Page.loadEventFired + " not found",
+                RDPUtil.containsMethod(notifications, RDP.Page.loadEventFired));
 
         // UC: extract/verify Network metrics
         RDPAnalyzer analyzer = new RDPAnalyzer(notifications, getPerfStartMarker(), getPerfEndMarker());
@@ -122,7 +126,7 @@ public final class RDPAnalyzerTest extends AbstractPerfTestCase {
         // UC: whole dev tools log
         List<JSONObject> fulDevToolsLog = analyzer.getDevToolsLog();
         int fullSize = fulDevToolsLog.size();
-        assertTrue(fulDevToolsLog.size() > 10);
+        assertTrue("dev tools log size: " + fullSize, fulDevToolsLog.size() > 10);
 
         // UC: dev tools log between marks
         List<JSONObject> trimmedDevToolsLog = analyzer.getFilteredDevToolsLog();

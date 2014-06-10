@@ -279,29 +279,46 @@
      * @private
      */
     getTabComponents: function(body) {
-        var desc = "ui:tab";
+        var type = "ui:tab";        
         var ret = [];
         for(var i=0;i<body.length;i++) {
             var c = body[i];
-            if (c.isInstanceOf(desc)) {
-                ret.push(c);
-            } else if (c.isInstanceOf("aura:iteration")) {
+            if (c.isInstanceOf("aura:iteration")) {
                 ret = ret.concat(this.getTabComponents(c.get('v.realBody')));
             } else {
-                var result = c.find({instancesOf: desc});
-                //In some use cases, only parent component contains instances of ui:tab or subclass of ui:tab
-                //need to manually traverse to the top and find them
-                var s = c.getSuper(); 
-                if ($A.util.isEmpty(result) && s) {
-                    do {                        
-                        result = s.find({instancesOf: desc});
-                        s = s.getSuper();
-                    } while (s && !s.isInstanceOf(desc) && $A.util.isEmpty(result))
+                var inst = this._getTabComponent(c, type);
+                if (inst) {
+                    ret.push(inst);
+                } else {
+                    ret = ret.concat(this.getTabComponents(this._getSuperest(c).get('v.body')));
                 }
-                ret = ret.concat(result);
             }
         }
         return ret;
+    },
+    _getTabComponent: function(cmp, type) {
+        if (cmp.isInstanceOf(type)) {
+            return cmp;
+        } else {
+            var s = cmp.getSuper();
+            if (s) {
+                return this._getTabComponent(s, type);
+            } else {
+                return null;
+            }
+        }
+    },
+    _getSuperest: function(cmp) {
+        var s = cmp.getSuper();
+        if (s) {
+            var ancestor = this._getSuperest(s);
+            if (ancestor) {
+                return ancestor;
+            }
+            return s;
+        } else {
+            return cmp;
+        }
     },
     /**
      * Render tab component to tabContainer

@@ -15,6 +15,7 @@
  */
 package org.auraframework.css;
 
+import org.auraframework.def.ThemeDescriptorProvider;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.instance.ValueProvider;
 import org.auraframework.system.Location;
@@ -23,6 +24,8 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 /**
  * Responsible for evaluating a theme expression to the string value. The expression may contain multiple references to
  * theme variables, as well as valid aura expression syntax.
+ * <p>
+ * This is <em>not</em> to be confused with theme providers! ({@link ThemeDescriptorProvider}).
  */
 public interface ThemeValueProvider extends ValueProvider {
     /**

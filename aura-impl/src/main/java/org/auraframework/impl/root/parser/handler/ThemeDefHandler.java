@@ -24,7 +24,13 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.Aura;
 import org.auraframework.builder.RootDefinitionBuilder;
-import org.auraframework.def.*;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.ThemeProviderDef;
+import org.auraframework.def.StyleDef;
+import org.auraframework.def.ThemeDef;
+import org.auraframework.def.ThemeDefRef;
+import org.auraframework.def.VarDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.root.theme.ThemeDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
@@ -46,9 +52,10 @@ import com.google.common.collect.ImmutableSet;
 public final class ThemeDefHandler extends RootTagHandler<ThemeDef> {
     protected static final String TAG = "aura:theme";
     private static final String ATTRIBUTE_EXTENDS = "extends";
+    private static final String ATTRIBUTE_PROVIDER = "provider";
 
     protected final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(
-            ATTRIBUTE_EXTENDS, ATTRIBUTE_SUPPORT, ATTRIBUTE_DESCRIPTION, ATTRIBUTE_ACCESS);
+            ATTRIBUTE_EXTENDS, ATTRIBUTE_PROVIDER, ATTRIBUTE_SUPPORT, ATTRIBUTE_DESCRIPTION, ATTRIBUTE_ACCESS);
 
     private final ThemeDefImpl.Builder builder = new ThemeDefImpl.Builder();
 
@@ -89,13 +96,17 @@ public final class ThemeDefHandler extends RootTagHandler<ThemeDef> {
         if (!AuraTextUtil.isNullEmptyOrWhitespace(parent)) {
             builder.setExtendsDescriptor(DefDescriptorImpl.getInstance(parent.trim(), ThemeDef.class));
         }
-        
+
+        String provider = getAttributeValue(ATTRIBUTE_PROVIDER);
+        if (!AuraTextUtil.isNullEmptyOrWhitespace(provider)) {
+            builder.setProviderDescriptor(DefDescriptorImpl.getInstance(provider, ThemeProviderDef.class));
+        }
+
         try {
             builder.setAccess(readAccessAttribute());
         } catch (InvalidAccessValueException e) {
             builder.setParseError(e);
-        }
-
+		}
     }
 
 	@Override
@@ -148,10 +159,10 @@ public final class ThemeDefHandler extends RootTagHandler<ThemeDef> {
         builder.setDescriptor(getDefDescriptor());
         builder.setLocation(startLocation);
 
-        // we determine that a theme is a local theme if it exists in the same bundle as a css source
+        // we determine that a theme is a cmp theme if it exists in the same bundle as a css source
         String fmt = String.format("%s.%s", defDescriptor.getNamespace(), defDescriptor.getName());
         DefDescriptor<StyleDef> style = Aura.getDefinitionService().getDefDescriptor(fmt, StyleDef.class);
-        builder.setIsLocal(style.exists());
+        builder.setIsCmpTheme(style.exists());
 
         return builder.build();
     }

@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -29,6 +28,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.auraframework.Aura;
+import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
@@ -49,6 +49,7 @@ import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.test.TestContext;
 import org.auraframework.test.TestContextAdapter;
 import org.auraframework.throwable.quickfix.InvalidEventTypeException;
+import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.BaseJsonSerializationContext;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonSerializationContext;
@@ -56,6 +57,7 @@ import org.auraframework.util.json.JsonSerializer;
 import org.auraframework.util.json.JsonSerializer.NoneSerializer;
 import org.auraframework.util.json.JsonSerializers;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -126,6 +128,16 @@ public class AuraContextImpl implements AuraContext {
             if (ctx.getSerializePreLoad()) {
                 json.writeMapEntry("preloads", ctx.getPreloads());
             }
+
+            List<DefDescriptor<ThemeDef>> themes = ctx.getThemeDescriptors();
+            if (!themes.isEmpty()) {
+                List<String> stringed = Lists.newArrayList();
+                for (DefDescriptor<ThemeDef> theme : themes) {
+                    stringed.add(theme.getQualifiedName());
+                }
+                json.writeMapEntry("themes", stringed);
+            }
+
             if (ctx.getRequestedLocales() != null) {
                 List<String> locales = new ArrayList<String>();
                 for (Locale locale : ctx.getRequestedLocales()) {
@@ -133,18 +145,18 @@ public class AuraContextImpl implements AuraContext {
                 }
                 json.writeMapEntry("requestedLocales", locales);
             }
-            Map<String,String> loadedStrings = Maps.newHashMap();
+            Map<String, String> loadedStrings = Maps.newHashMap();
             Map<DefDescriptor<?>, String> clientLoaded = Maps.newHashMap();
             clientLoaded.putAll(ctx.getClientLoaded());
-            for (Map.Entry<DefDescriptor<?>,String> entry : ctx.getLoaded().entrySet()) {
+            for (Map.Entry<DefDescriptor<?>, String> entry : ctx.getLoaded().entrySet()) {
                 loadedStrings.put(String.format("%s@%s", entry.getKey().getDefType().toString(),
-                                                entry.getKey().getQualifiedName()), entry.getValue());
+                        entry.getKey().getQualifiedName()), entry.getValue());
                 clientLoaded.remove(entry.getKey());
             }
             if (forClient) {
                 for (DefDescriptor<?> deleted : clientLoaded.keySet()) {
                     loadedStrings.put(String.format("%s@%s", deleted.getDefType().toString(),
-                                deleted.getQualifiedName()), DELETED);
+                            deleted.getQualifiedName()), DELETED);
                 }
             }
             if (loadedStrings.size() > 0) {
@@ -303,7 +315,7 @@ public class AuraContextImpl implements AuraContext {
 
     private InstanceStack fakeInstanceStack;
 
-    private DefDescriptor<ThemeDef> overrideThemeDescriptor;
+    private List<DefDescriptor<ThemeDef>> themes = Lists.newArrayList();
 
     public AuraContextImpl(Mode mode, MasterDefRegistry masterRegistry, Map<DefType, String> defaultPrefixes,
             Format format, Authentication access, JsonSerializationContext jsonContext,
@@ -358,7 +370,7 @@ public class AuraContextImpl implements AuraContext {
 
     @Override
     public DefDescriptor<? extends BaseComponentDef> getLoadingApplicationDescriptor() {
-        return (loadingAppDesc != null)?loadingAppDesc:appDesc;
+        return (loadingAppDesc != null) ? loadingAppDesc : appDesc;
     }
 
     @Override
@@ -398,7 +410,7 @@ public class AuraContextImpl implements AuraContext {
     }
 
     @Override
-    public Map<DefType,String> getDefaultPrefixes() {
+    public Map<DefType, String> getDefaultPrefixes() {
         return defaultPrefixes;
     }
 
@@ -534,7 +546,7 @@ public class AuraContextImpl implements AuraContext {
     public void setCurrentCaller(DefDescriptor<?> descriptor) {
         this.currentCaller = descriptor;
     }
-    
+
     @Override
     public void setLastMod(String lastMod) {
         this.lastMod = lastMod;
@@ -664,13 +676,42 @@ public class AuraContextImpl implements AuraContext {
     }
 
     @Override
-    public DefDescriptor<ThemeDef> getOverrideThemeDescriptor() {
-        return overrideThemeDescriptor;
+    public void addAppThemeDescriptors() throws QuickFixException {
+        DefDescriptor<? extends BaseComponentDef> desc = getLoadingApplicationDescriptor();
+        if (desc != null && desc.getDefType() == DefType.APPLICATION) {
+            ApplicationDef app = null;
+            try {
+                app = (ApplicationDef) desc.getDef();
+            } catch (QuickFixException qfe) { // invalid app, so nothing more we can do
+            }
+
+            if (app != null) {
+                DefDescriptor<ThemeDef> theme = app.getThemeDescriptor();
+                if (theme != null) {
+                    // the app theme conceptually precedes themes explicitly added to the ctx,
+                    // which means ctx-specified themes should be consulted first, according to the
+                    // "last one wins" contract
+                    if (!themes.contains(theme)) {
+                        themes.add(0, theme.getDef().getConcreteDescriptor());
+                    }
+                }
+            }
+        }
     }
 
     @Override
-    public void setOverrideThemeDescriptor(DefDescriptor<ThemeDef> themeDescriptor) {
-        this.overrideThemeDescriptor = themeDescriptor;
+    public void appendThemeDescriptor(DefDescriptor<ThemeDef> themeDescriptor) throws QuickFixException {
+        themes.add(themeDescriptor.getDef().getConcreteDescriptor());
+    }
+
+    @Override
+    public List<DefDescriptor<ThemeDef>> getThemeDescriptors() {
+        return ImmutableList.copyOf(themes);
+    }
+
+    @Override
+    public List<DefDescriptor<ThemeDef>> getThemeDescriptorsOrdered() {
+        return Lists.reverse(getThemeDescriptors()); // reverse so that "last one wins"
     }
 
     @Override

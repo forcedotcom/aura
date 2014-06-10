@@ -151,6 +151,18 @@ public class AuraImplUnitTestingUtil {
     public DefDescriptor<ThemeDef> getThemeDefDescriptor() {
             return DefDescriptorImpl.getInstance("test:fakeTheme", ThemeDef.class);
     }
+    
+    public DefDescriptor<ThemeDef> getThemeDefDescriptor2() {
+        return DefDescriptorImpl.getInstance("test:fakeTheme2", ThemeDef.class);
+    }
+    
+    public DefDescriptor<ThemeDef> getThemeDefDescriptor3() {
+        return DefDescriptorImpl.getInstance("test:fakeTheme3", ThemeDef.class);
+    }
+    
+    public DefDescriptor<ApplicationDef> getAppWithThemeDescriptor() {
+        return DefDescriptorImpl.getInstance("test:fakeThemeApp", ApplicationDef.class);
+    }
 
     public String getComponentName() {
             return defaultComponentName;

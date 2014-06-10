@@ -21,9 +21,12 @@ import java.util.Set;
 
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.ThemeDef;
+import org.auraframework.def.ThemeProviderDef;
 import org.auraframework.def.VarDef;
 import org.auraframework.impl.css.StyleTestCase;
+import org.auraframework.impl.java.provider.TestThemeProvider;
 import org.auraframework.impl.source.StringSource;
+import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -58,9 +61,9 @@ public class ThemeDefImplTest extends StyleTestCase {
         assertFalse("expected theme1 not to equal null", theme1.equals(null));
     }
 
-    public void testIsLocalTheme() throws Exception {
+    public void testIsCmpTheme() throws Exception {
         DefDescriptor<ThemeDef> theme = addThemeAndStyle(theme(), ".THIS{}");
-        assertTrue(theme.getDef().isLocalTheme());
+        assertTrue(theme.getDef().isCmpTheme());
     }
 
     public void testThemeWithBadMarkup() {
@@ -404,8 +407,8 @@ public class ThemeDefImplTest extends StyleTestCase {
         }
     }
 
-    /** local themes can't extend other themes */
-    public void testLocalThemesCantExtend() throws Exception {
+    /** cmp themes can't extend other themes */
+    public void testCmpThemesCantExtend() throws Exception {
         try {
             DefDescriptor<ThemeDef> parent = addSeparateTheme("<aura:theme/>");
             addThemeAndStyle(theme().parent(parent), ".THIS{}").getDef();
@@ -415,8 +418,8 @@ public class ThemeDefImplTest extends StyleTestCase {
         }
     }
 
-    /** local themes can't import other themes */
-    public void testLocalThemeCantImport() throws Exception {
+    /** cmp themes can't import other themes */
+    public void testCmpThemeCantImport() throws Exception {
         try {
             DefDescriptor<ThemeDef> import1 = addSeparateTheme("<aura:theme/>");
             addThemeAndStyle(theme().imported(import1), ".THIS{}").getDef();
@@ -426,18 +429,18 @@ public class ThemeDefImplTest extends StyleTestCase {
         }
     }
 
-    /** can't extend from a local theme */
-    public void testCantExtendFromLocalTheme() throws Exception {
+    /** can't extend from a cmp theme */
+    public void testCantExtendFromCmpTheme() throws Exception {
         try {
             DefDescriptor<ThemeDef> parent = addThemeAndStyle("<aura:theme/>", ".THIS{}");
             addNsTheme(theme().parent(parent).var("color", "red")).getDef();
             fail("expected to get an exception");
         } catch (Exception e) {
-            checkExceptionContains(e, InvalidDefinitionException.class, "must not extend from a local");
+            checkExceptionContains(e, InvalidDefinitionException.class, "must not extend");
         }
     }
 
-    public void testCantImportLocalTheme() throws Exception {
+    public void testCantImportCmpTheme() throws Exception {
         DefDescriptor<ThemeDef> local = addThemeAndStyle(theme(), ".THIS{}");
 
         try {
@@ -454,6 +457,17 @@ public class ThemeDefImplTest extends StyleTestCase {
 
         try {
             addSeparateTheme(theme().imported(theme)).getDef();
+            fail("expected to get an exception");
+        } catch (Exception e) {
+            checkExceptionContains(e, InvalidDefinitionException.class, "cannot be imported");
+        }
+    }
+
+    public void testCantImportThemeWithProvider() throws Exception {
+        DefDescriptor<ThemeDef> withProvider = addSeparateTheme(theme().provider(TestThemeProvider.REF));
+
+        try {
+            addSeparateTheme(theme().imported(withProvider)).getDef();
             fail("expected to get an exception");
         } catch (Exception e) {
             checkExceptionContains(e, InvalidDefinitionException.class, "cannot be imported");
@@ -489,7 +503,7 @@ public class ThemeDefImplTest extends StyleTestCase {
         theme.getDef().validateReferences(); // no error
     }
 
-    /** local themes can also cross ref something from the namespace-default theme */
+    /** cmp themes can also cross ref something from the namespace-default theme */
     public void testValidCrossRefLocalToNamespaceDefault() throws Exception {
         addNsTheme(theme().var("color", "red"));
         DefDescriptor<ThemeDef> theme = addThemeAndStyle(theme().var("myColor", "{!color}"), ".THIS{}");
@@ -506,8 +520,8 @@ public class ThemeDefImplTest extends StyleTestCase {
         DefDescriptor<ThemeDef> theme = addSeparateTheme(theme().imported(import1));
 
         try {
-
             theme.getDef().validateReferences();
+            fail("expected exception");
         } catch (Exception e) {
             checkExceptionContains(e, ThemeValueNotFoundException.class, "was not found");
         }
@@ -535,8 +549,8 @@ public class ThemeDefImplTest extends StyleTestCase {
         assertTrue(dependencies.contains(import2));
     }
 
-    /** if a local theme cross-refs a global var value, a dependency on the namespace default theme should be added */
-    public void testAppendsGlobalCrossRefInLocalThemeToDeps() throws Exception {
+    /** if a cmp theme cross-refs a global var value, a dependency on the namespace default theme should be added */
+    public void testAppendsGlobalCrossRefInCmpThemeToDeps() throws Exception {
         DefDescriptor<ThemeDef> nsTheme = addNsTheme(theme().var("globalColor", "red"));
         DefDescriptor<ThemeDef> localTheme = addThemeAndStyle(theme().var("color", "{!globalColor}"), ".THIS{}");
 
@@ -544,5 +558,81 @@ public class ThemeDefImplTest extends StyleTestCase {
 
         localTheme.getDef().appendDependencies(dependencies);
         assertTrue(dependencies.contains(nsTheme));
+    }
+
+    public void testGetThemeProviderDescriptor() throws Exception {
+        DefDescriptor<ThemeDef> theme = addSeparateTheme(theme().provider(TestThemeProvider.REF));
+        assertEquals(TestThemeProvider.REF, theme.getDef().getThemeProviderDescriptor().getQualifiedName());
+    }
+
+    public void testAddsProviderToDeps() throws Exception {
+        DefDescriptor<ThemeDef> theme = addSeparateTheme(theme().provider(TestThemeProvider.REF));
+
+        Set<DefDescriptor<?>> dependencies = Sets.newHashSet();
+        theme.getDef().appendDependencies(dependencies);
+
+        DefDescriptor<ThemeProviderDef> def = DefDescriptorImpl.getInstance(TestThemeProvider.REF,
+                ThemeProviderDef.class);
+        assertTrue(dependencies.contains(def));
+    }
+
+    public void testGetConcreteDescriptorWithProvider() throws Exception {
+        DefDescriptor<ThemeDef> theme = addSeparateTheme(theme().provider(TestThemeProvider.REF));
+        assertEquals(TestThemeProvider.DESC, theme.getDef().getConcreteDescriptor().getDescriptorName());
+    }
+
+    public void testGetConcreteDescriptorWithoutProvider() throws Exception {
+        DefDescriptor<ThemeDef> theme = addSeparateTheme(theme().var("color", "red"));
+        assertEquals(theme.getDescriptorName(), theme.getDef().getConcreteDescriptor().getDescriptorName());
+    }
+
+    public void testErrorsIfProviderThemeHasVars() throws Exception {
+        try {
+            addSeparateTheme(theme().provider(TestThemeProvider.REF).var("color", "red")).getDef()
+            .getConcreteDescriptor();
+            fail("Expected to catch an exception.");
+        } catch (Exception e) {
+            checkExceptionContains(e, InvalidDefinitionException.class, "must not specify vars");
+        }
+    }
+
+    public void testErrorsIfProviderThemeHasImports() throws Exception {
+        DefDescriptor<ThemeDef> import1 = addSeparateTheme(theme().var("imported", "imported"));
+        try {
+            addSeparateTheme(theme().provider(TestThemeProvider.REF).imported(import1)).getDef()
+            .getConcreteDescriptor();
+            fail("Expected to catch an exception.");
+        } catch (Exception e) {
+            checkExceptionContains(e, InvalidDefinitionException.class, "must not specify imports");
+        }
+    }
+
+    public void testErrorsIfProviderThemeHasExtends() throws Exception {
+        DefDescriptor<ThemeDef> parent = addSeparateTheme(theme().var("imported", "imported"));
+        try {
+            addSeparateTheme(theme().provider(TestThemeProvider.REF).parent(parent)).getDef()
+            .getConcreteDescriptor();
+            fail("Expected to catch an exception.");
+        } catch (Exception e) {
+            checkExceptionContains(e, InvalidDefinitionException.class, "must not use 'extends'");
+        }
+    }
+
+    public void testErrorsIfProviderThemeIsCmpTheme() throws Exception {
+        try {
+            addThemeAndStyle(theme().provider(TestThemeProvider.REF), ".THIS{}").getDef().getConcreteDescriptor();
+            fail("Expected to catch an exception.");
+        } catch (Exception e) {
+            checkExceptionContains(e, InvalidDefinitionException.class, "must not specify a provider");
+        }
+    }
+
+    public void testErrorsIfProviderThemeIsNsDefaultTheme() throws Exception {
+        try {
+            addNsTheme(theme().provider(TestThemeProvider.REF)).getDef().getConcreteDescriptor();
+            fail("Expected to catch an exception.");
+        } catch (Exception e) {
+            checkExceptionContains(e, InvalidDefinitionException.class, "must not specify a provider");
+        }
     }
 }

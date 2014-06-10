@@ -56,9 +56,9 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
         this.isAppcacheEnabled = builder.isAppcacheEnabled;
         this.additionalAppCacheURLs = builder.additionalAppCacheURLs;
         this.isOnePageApp = builder.isOnePageApp;
-        this.overrideThemeDescriptor = builder.overrideThemeDescriptor;
+        this.themeDescriptor = builder.themeDescriptor;
 
-        this.hashCode = AuraUtil.hashCode(super.hashCode(), overrideThemeDescriptor);
+        this.hashCode = AuraUtil.hashCode(super.hashCode(), themeDescriptor);
     }
 
     public static class Builder extends BaseComponentDefImpl.Builder<ApplicationDef> implements ApplicationDefBuilder {
@@ -68,7 +68,7 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
         public Boolean isAppcacheEnabled;
         public Boolean isOnePageApp;
         public String additionalAppCacheURLs;
-        public DefDescriptor<ThemeDef> overrideThemeDescriptor;
+        public DefDescriptor<ThemeDef> themeDescriptor;
 
         public Builder() {
             super(ApplicationDef.class);
@@ -87,8 +87,8 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
         }
 
         @Override
-        public ApplicationDefBuilder setOverrideThemeDescriptor(DefDescriptor<ThemeDef> overrideThemeDescriptor) {
-            this.overrideThemeDescriptor = overrideThemeDescriptor;
+        public ApplicationDefBuilder setThemeDescriptor(DefDescriptor<ThemeDef> themeDescriptor) {
+            this.themeDescriptor = themeDescriptor;
             return this;
         }
     }
@@ -151,11 +151,11 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
             dependencies.add(layoutsDefDescriptor);
         }
 
-        if (overrideThemeDescriptor != null) {
-            dependencies.add(overrideThemeDescriptor);
+        if (themeDescriptor != null) {
+            dependencies.add(themeDescriptor);
         }
         if (locationChangeEventDescriptor != null) {
-        	dependencies.add(locationChangeEventDescriptor);
+            dependencies.add(locationChangeEventDescriptor);
         }
     }
 
@@ -219,15 +219,14 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
                     locationChangeDef.getDescriptor()), getLocation());
         }
 
-        // the override theme must not be a local theme. otherwise, it would allow users to circumvent var
+        // the theme must not be a component theme. otherwise, it would allow users to circumvent var
         // cross-reference validation (regular themes enforce that cross references are defined in the same file,
-        // but local themes allow cross references to the namespace-default file.)
-        if (overrideThemeDescriptor != null
-                && overrideThemeDescriptor.getDef().isLocalTheme()
-                && overrideThemeDescriptor != getLocalThemeDescriptor()) {
+        // but cmp themes allow cross references to the namespace-default file.)
+        if (themeDescriptor != null && themeDescriptor.getDef().isCmpTheme()) {
             throw new InvalidDefinitionException(
-                    String.format("%s must not specify another component's local theme as the overrideTheme", getName()),
-                    getLocation());
+                    String.format(
+                            "%s must not specify a component-specific or app-specific theme as the main app theme",
+                            getName()), getLocation());
         }
     }
 
@@ -242,8 +241,8 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
     }
 
     @Override
-    public DefDescriptor<ThemeDef> getOverrideThemeDescriptor() {
-        return overrideThemeDescriptor;
+    public DefDescriptor<ThemeDef> getThemeDescriptor() {
+        return themeDescriptor;
     }
 
     @Override
@@ -257,7 +256,7 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
             ApplicationDefImpl other = (ApplicationDefImpl) obj;
 
             return super.equals(obj)
-                    && Objects.equal(this.overrideThemeDescriptor, other.overrideThemeDescriptor);
+                    && Objects.equal(this.themeDescriptor, other.themeDescriptor);
         }
 
         return false;
@@ -265,7 +264,7 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
 
     private final DefDescriptor<EventDef> locationChangeEventDescriptor;
     private final DefDescriptor<LayoutsDef> layoutsDefDescriptor;
-    private final DefDescriptor<ThemeDef> overrideThemeDescriptor;
+    private final DefDescriptor<ThemeDef> themeDescriptor;
     private final int hashCode;
 
     private final Boolean isAppcacheEnabled;

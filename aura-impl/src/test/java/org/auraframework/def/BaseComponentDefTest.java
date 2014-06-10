@@ -1744,13 +1744,13 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         }
     }
 
-    /** tests the local theme is added to the dependencies */
-    public void testAppendsLocalThemeToDependencies() throws Exception {
+    /** tests the cmp theme is added to the dependencies */
+    public void testAppendsCmpThemeToDependencies() throws Exception {
         DefDescriptor<ThemeDef> themeDesc = addSourceAutoCleanup(ThemeDef.class, "<aura:theme/>");
         String fmt = String.format("%s:%s", themeDesc.getNamespace(), themeDesc.getName());
         DefDescriptor<ComponentDef> cmpDesc = DefDescriptorImpl.getInstance(fmt, ComponentDef.class);
         addSourceAutoCleanup(cmpDesc, "<aura:component/>");
-        assertEquals(themeDesc, cmpDesc.getDef().getLocalThemeDescriptor());
+        assertEquals(themeDesc, cmpDesc.getDef().getCmpTheme());
 
         Set<DefDescriptor<?>> deps = Sets.newHashSet();
         cmpDesc.getDef().appendDependencies(deps);

@@ -25,9 +25,9 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
 import org.auraframework.def.ThemeDef;
+import org.auraframework.http.AuraServlet;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.service.ContextService;
-import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
@@ -87,6 +87,17 @@ public abstract class StyleTestCase extends AuraImplTestCase {
         return desc;
     }
 
+    /** gets the parsed output of the given style */
+    public String getParsedCss(DefDescriptor<StyleDef> styleDesc) throws QuickFixException {
+        return styleDesc.getDef().getCode();
+    }
+
+    /** gets the parsed output of the given style. This ensures the application explicit theme is registered */
+    public String getParsedCssUseAppTheme(DefDescriptor<StyleDef> styleDesc) throws QuickFixException {
+        AuraServlet.getStyles(); // ensures app's theme is added to the context
+        return styleDesc.getDef().getCode();
+    }
+
     /** adds the namespace-default {@link ThemeDef} to the namespace with the given source */
     public DefDescriptor<ThemeDef> addNsTheme(CharSequence src) {
         return addNsThemeToNamespace(ns1, src);
@@ -131,7 +142,7 @@ public abstract class StyleTestCase extends AuraImplTestCase {
     }
 
     /** adds a {@link ThemeDef} to the same bundle as the given {@link StyleDef}. */
-    public DefDescriptor<ThemeDef> addLocalTheme(CharSequence themeSrc, DefDescriptor<StyleDef> styleDef) {
+    public DefDescriptor<ThemeDef> addCmpTheme(CharSequence themeSrc, DefDescriptor<StyleDef> styleDef) {
         String fmt = String.format("%s:%s", styleDef.getNamespace(), styleDef.getName());
         DefDescriptor<ThemeDef> desc = Aura.getDefinitionService().getDefDescriptor(fmt, ThemeDef.class);
         addSourceAutoCleanup(desc, themeSrc.toString());
@@ -140,8 +151,6 @@ public abstract class StyleTestCase extends AuraImplTestCase {
 
     /**
      * adds an app to the ns, and restarts the context with new app
-     * 
-     * @throws QuickFixException
      */
     public DefDescriptor<ApplicationDef> addContextApp(CharSequence src) throws QuickFixException {
         String fmt = String.format("%s:%s", ns1, "testApp");
@@ -153,15 +162,22 @@ public abstract class StyleTestCase extends AuraImplTestCase {
         if (contextService.isEstablished()) {
             contextService.endContext();
         }
-        AuraContext ctx = contextService.startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED, appDesc);
-        ctx.setOverrideThemeDescriptor(appDesc.getDef().getOverrideThemeDescriptor());
+        contextService.startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED, appDesc);
         return appDesc;
     }
 
+    /** adds a theme with the given source to the same bundle as the context app */
     public DefDescriptor<ThemeDef> addContextAppBundleTheme(CharSequence src) {
         String fmt = String.format("%s:%s", ns1, "testApp");
         DefDescriptor<ThemeDef> themeDesc = Aura.getDefinitionService().getDefDescriptor(fmt, ThemeDef.class);
         return addSourceAutoCleanup(themeDesc, src.toString());
+    }
+
+    /** adds a style with the given source to the same bundle as the context app */
+    public DefDescriptor<StyleDef> addContextAppBundleStyle(CharSequence src) {
+        String fmt = String.format("%s.%s", ns1, "testApp");
+        DefDescriptor<StyleDef> styleDesc = Aura.getDefinitionService().getDefDescriptor(fmt, StyleDef.class);
+        return addSourceAutoCleanup(styleDesc, src.toString());
     }
 
     /** helper for building a theme string source */
@@ -172,6 +188,7 @@ public abstract class StyleTestCase extends AuraImplTestCase {
     public static final class ThemeSrcBuilder implements CharSequence {
         private DefDescriptor<ThemeDef> parent;
         private final List<String> content = Lists.newArrayList();
+        private String provider;
 
         public ThemeSrcBuilder var(String name, String value) {
             content.add(String.format("<aura:var name='%s' value='%s'/>", name, value));
@@ -180,6 +197,11 @@ public abstract class StyleTestCase extends AuraImplTestCase {
 
         public ThemeSrcBuilder parent(DefDescriptor<ThemeDef> parent) {
             this.parent = checkNotNull(parent, "parent cannot be null");
+            return this;
+        }
+
+        public ThemeSrcBuilder provider(String provider) {
+            this.provider = provider;
             return this;
         }
 
@@ -193,6 +215,12 @@ public abstract class StyleTestCase extends AuraImplTestCase {
             StringBuilder builder = new StringBuilder();
 
             builder.append("<aura:theme");
+
+            if (provider != null) {
+                builder.append(" provider='");
+                builder.append(provider);
+                builder.append("'");
+            }
 
             if (parent != null) {
                 builder.append(" extends='");

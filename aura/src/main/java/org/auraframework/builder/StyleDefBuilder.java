@@ -15,10 +15,8 @@
  */
 package org.auraframework.builder;
 
-import java.util.List;
 import java.util.Set;
 
-import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.StyleDef;
 
 /**
@@ -51,11 +49,4 @@ public interface StyleDefBuilder extends DefBuilder<StyleDef, StyleDef> {
      * both "color" and "small + large + 'px'" would be theme expressions.
      */
     StyleDefBuilder setThemeExpressions(Set<String> expressions);
-
-    /**
-     * TODONM remove
-     * 
-     * specifies the components to render the parsed css source.
-     */
-    StyleDefBuilder setComponents(List<ComponentDefRef> components);
 }

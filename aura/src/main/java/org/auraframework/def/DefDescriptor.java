@@ -34,14 +34,14 @@ import org.auraframework.util.json.JsonSerializable;
  *            {@link ComponentDef}, {@link EventDef}, etc.
  */
 public interface DefDescriptor<T extends Definition> extends JsonSerializable,
-		Serializable, Comparable<DefDescriptor<?>> {
+Serializable, Comparable<DefDescriptor<?>> {
 
-	public static final String MARKUP_PREFIX = "markup";
-	public static final String CSS_PREFIX = "css";
-	public static final String TEMPLATE_CSS_PREFIX = "templateCss";
-	public static final String JAVASCRIPT_PREFIX = "js";
-	public static final String COMPOUND_PREFIX = "compound";
-	public static final String JAVA_PREFIX = "java";
+    public static final String MARKUP_PREFIX = "markup";
+    public static final String CSS_PREFIX = "css";
+    public static final String TEMPLATE_CSS_PREFIX = "templateCss";
+    public static final String JAVASCRIPT_PREFIX = "js";
+    public static final String COMPOUND_PREFIX = "compound";
+    public static final String JAVA_PREFIX = "java";
 
     public static final class DescriptorKey {
         private final String name;
@@ -99,17 +99,18 @@ public interface DefDescriptor<T extends Definition> extends JsonSerializable,
 		STYLE(StyleDef.class), //
 		THEME(ThemeDef.class), //
         THEME_DEF_REF(ThemeDefRef.class), //
-        VAR(VarDef.class), //	
-		DOCUMENTATION(DocumentationDef.class), //
-		DESCRIPTION(DescriptionDef.class), //
-		EXAMPLE(ExampleDef.class), //
-		TESTSUITE(TestSuiteDef.class), //
-		TESTCASE(TestCaseDef.class), //
-		PROVIDER(ProviderDef.class), //
-		LAYOUTS(LayoutsDef.class), //
-		LAYOUT(LayoutDef.class), //
-		LAYOUT_ITEM(LayoutItemDef.class), //
-		NAMESPACE(NamespaceDef.class),
+        VAR(VarDef.class), //
+        DOCUMENTATION(DocumentationDef.class), //
+        DESCRIPTION(DescriptionDef.class), //
+        EXAMPLE(ExampleDef.class), //
+        TESTSUITE(TestSuiteDef.class), //
+        TESTCASE(TestCaseDef.class), //
+        PROVIDER(ProviderDef.class), //
+        THEME_PROVIDER(ThemeProviderDef.class), //
+        LAYOUTS(LayoutsDef.class), //
+        LAYOUT(LayoutDef.class), //
+        LAYOUT_ITEM(LayoutItemDef.class), //
+        NAMESPACE(NamespaceDef.class),
         RESOURCE(ResourceDef.class);
 
 		

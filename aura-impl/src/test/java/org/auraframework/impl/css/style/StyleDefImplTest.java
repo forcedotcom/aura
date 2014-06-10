@@ -19,11 +19,10 @@ import java.util.Map;
 import java.util.Set;
 
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.StyleDef;
+import org.auraframework.def.ThemeDef;
 import org.auraframework.impl.css.StyleTestCase;
-import org.auraframework.system.AuraContext.Authentication;
-import org.auraframework.system.AuraContext.Format;
-import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.throwable.quickfix.ThemeValueNotFoundException;
 import org.auraframework.util.AuraTextUtil;
@@ -42,34 +41,6 @@ public class StyleDefImplTest extends StyleTestCase {
         super(name);
     }
 
-    /**
-     * TODONM remove
-     * 
-     * StyleDef must have a dependency on a NamespaceDef.
-     */
-    public void testAppendDependenciesHasNamespaceDef() throws Exception {
-        String name = String.format("%s.someStyle", getAuraTestingUtil().getNonce(getName()));
-        DefDescriptor<StyleDef> styleDesc = Aura.getDefinitionService().getDefDescriptor(name, StyleDef.class);
-        addSourceAutoCleanup(styleDesc, ".THIS {}");
-
-        DefDescriptor<NamespaceDef> namespaceDesc = Aura.getDefinitionService().getDefDescriptor(
-                String.format("%s://%s", DefDescriptor.MARKUP_PREFIX, styleDesc.getNamespace()), NamespaceDef.class);
-        addSourceAutoCleanup(namespaceDesc, "<aura:namespace></aura:namespace>");
-
-        // need to restart context because old context will not have the new
-        // namespace registered
-        Aura.getContextService().endContext();
-        Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);
-
-        StyleDef styleDef = styleDesc.getDef();
-        Set<DefDescriptor<?>> deps = Sets.newHashSet();
-        styleDef.appendDependencies(deps);
-
-        DefDescriptor<NamespaceDef> nsDesc = Aura.getDefinitionService().getDefDescriptor(styleDesc.getNamespace(),
-                NamespaceDef.class);
-        assertTrue("NamespaceDef missing from StyleDef dependencies", deps.contains(nsDesc));
-    }
-
     public void testThemeDependenciesNsThemeOnly() throws QuickFixException {
         DefDescriptor<ThemeDef> theme = addNsTheme(theme().var("color", "red"));
         DefDescriptor<StyleDef> style = addStyleDef(".THIS {color: theme(color) }");
@@ -79,11 +50,11 @@ public class StyleDefImplTest extends StyleTestCase {
         assertTrue(dependencies.contains(theme));
     }
 
-    public void testThemeDependenciesLocalThemeOnly() throws QuickFixException {
+    public void testThemeDependenciesCmpThemeOnly() throws QuickFixException {
         DefDescriptor<StyleDef> style = addStyleDef(".THIS {color: theme(color) }");
-        DefDescriptor<ThemeDef> theme = addLocalTheme(theme().var("color", "red"), style);
+        DefDescriptor<ThemeDef> theme = addCmpTheme(theme().var("color", "red"), style);
 
-        assertTrue("expected theme to be a localTheme", theme.getDef().isLocalTheme());
+        assertTrue("expected theme to be a cmpTheme", theme.getDef().isCmpTheme());
 
         Set<DefDescriptor<?>> dependencies = Sets.newHashSet();
         style.getDef().appendDependencies(dependencies);
@@ -93,23 +64,23 @@ public class StyleDefImplTest extends StyleTestCase {
     public void testThemeDependenciesBothThemes() throws QuickFixException {
         DefDescriptor<ThemeDef> nsTheme = addNsTheme(theme().var("color", "red"));
         DefDescriptor<StyleDef> style = addStyleDef(".THIS {color: theme(color) }");
-        DefDescriptor<ThemeDef> localTheme = addLocalTheme(theme().var("color", "red"), style);
+        DefDescriptor<ThemeDef> cmpTheme = addCmpTheme(theme().var("color", "red"), style);
 
         Set<DefDescriptor<?>> dependencies = Sets.newHashSet();
         style.getDef().appendDependencies(dependencies);
         assertTrue("expected dependencies to contain namespace theme", dependencies.contains(nsTheme));
-        assertTrue("expected dependencies to contain local theme", dependencies.contains(localTheme));
+        assertTrue("expected dependencies to contain cmp theme", dependencies.contains(cmpTheme));
     }
 
     public void testThemeDependenciesDoesntHaveThemeDef() throws QuickFixException {
         DefDescriptor<ThemeDef> nsTheme = addNsTheme("<aura:theme><aura:var name='color' value='red'/></aura:theme>");
         DefDescriptor<StyleDef> style = addStyleDef(".THIS {color: red }");
-        DefDescriptor<ThemeDef> localTheme = addLocalTheme(theme().var("color", "red"), style);
+        DefDescriptor<ThemeDef> cmpTheme = addCmpTheme(theme().var("color", "red"), style);
 
         Set<DefDescriptor<?>> dependencies = Sets.newHashSet();
         style.getDef().appendDependencies(dependencies);
         assertFalse(dependencies.contains(nsTheme));
-        assertFalse(dependencies.contains(localTheme));
+        assertFalse(dependencies.contains(cmpTheme));
     }
 
     public void testInvalidRef() throws QuickFixException {

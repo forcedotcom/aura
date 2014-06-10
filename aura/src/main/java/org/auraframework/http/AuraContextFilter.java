@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -39,6 +40,7 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
+import org.auraframework.def.ThemeDef;
 import org.auraframework.http.RequestParam.BooleanParam;
 import org.auraframework.http.RequestParam.EnumParam;
 import org.auraframework.http.RequestParam.InvalidParamException;
@@ -54,6 +56,8 @@ import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.test.Resettable;
 import org.auraframework.test.TestContext;
 import org.auraframework.test.TestContextAdapter;
+import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.JsonReader;
 
@@ -186,6 +190,19 @@ public class AuraContextFilter implements Filter {
                 }
             }
             context.setFrameworkUID((String) configMap.get("fwuid"));
+
+            @SuppressWarnings("unchecked")
+            List<String> themes = (List<String>) configMap.get("themes");
+            if (themes != null) {
+                try {
+                    DefinitionService ds = Aura.getDefinitionService();
+                    for (String theme : themes) {
+                        context.appendThemeDescriptor(ds.getDefDescriptor(theme, ThemeDef.class));
+                    }
+                } catch (QuickFixException e) {
+                    throw new AuraRuntimeException(e);
+                }
+            }
         }
 
         if (!isProduction) {

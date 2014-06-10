@@ -16,30 +16,22 @@
 package org.auraframework.impl.css.style;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.auraframework.Aura;
 import org.auraframework.builder.StyleDefBuilder;
 import org.auraframework.css.ThemeValueProvider;
-import org.auraframework.def.ComponentDef;
-import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.NamespaceDef;
 import org.auraframework.def.StyleDef;
 import org.auraframework.def.ThemeDef;
 import org.auraframework.impl.css.parser.CssPreprocessor;
 import org.auraframework.impl.root.theme.Themes;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
-import org.auraframework.instance.Component;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
-
-import com.google.common.collect.Maps;
 
 public class StyleDefImpl extends DefinitionImpl<StyleDef> implements StyleDef {
     private static final long serialVersionUID = 7140896215068458158L;
@@ -47,27 +39,23 @@ public class StyleDefImpl extends DefinitionImpl<StyleDef> implements StyleDef {
     private final String content;
     private final String className;
     private final Set<String> expressions;
-    private final List<ComponentDefRef> components; /* TODONM remove */
 
     protected StyleDefImpl(Builder builder) {
         super(builder);
         this.content = builder.content;
         this.className = builder.className;
         this.expressions = AuraUtil.immutableSet(builder.expressions);
-        this.components = AuraUtil.immutableList(builder.components); /* TODONM remove */
     }
 
     @Override
     public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
-        dependencies.add(Aura.getDefinitionService().getDefDescriptor(descriptor.getNamespace(), NamespaceDef.class));
-
         if (!expressions.isEmpty()) {
             // we know that any expression means we have a dependency on a theme, but we can't determine here if that is
-            // only a dependency on the local theme, only on the namespace-default, or both (however if the expression
-            // references a var not defined in either then a QFE will be thrown during #validateReferences).
-            DefDescriptor<ThemeDef> localTheme = Themes.getLocalTheme(descriptor);
-            if (localTheme.exists()) {
-                dependencies.add(localTheme);
+            // only a dependency on the component theme, only on the namespace-default, or both (however if the
+            // expression references a var not defined in either then a QFE will be thrown during #validateReferences).
+            DefDescriptor<ThemeDef> cmpTheme = Themes.getCmpTheme(descriptor);
+            if (cmpTheme.exists()) {
+                dependencies.add(cmpTheme);
             }
 
             DefDescriptor<ThemeDef> namespaceTheme = Themes.getNamespaceDefaultTheme(descriptor);
@@ -92,23 +80,6 @@ public class StyleDefImpl extends DefinitionImpl<StyleDef> implements StyleDef {
 
     @Override
     public String getCode() {
-        if (content == null) {
-            /* TODONM remove this block */
-            Map<String, Object> attributes = Maps.newHashMap();
-            attributes.put("body", components);
-            Aura.getContextService().pushSystemContext();
-            try {
-                Component cmp = Aura.getInstanceService().getInstance("aura:styleDef", ComponentDef.class, attributes);
-                StringBuilder sb = new StringBuilder();
-                Aura.getRenderingService().render(cmp, sb);
-                return sb.toString();
-            } catch (Exception e) {
-                throw new AuraRuntimeException(e);
-            } finally {
-                Aura.getContextService().popSystemContext();
-            }
-        }
-
         try {
             return CssPreprocessor.runtime().source(content).themes(descriptor).parse().content();
         } catch (Exception e) {
@@ -121,7 +92,7 @@ public class StyleDefImpl extends DefinitionImpl<StyleDef> implements StyleDef {
         AuraContext context = Aura.getContextService().getCurrentContext();
         json.writeMapBegin();
         json.writeMapEntry("descriptor", descriptor);
-        
+
         if (!context.isPreloading() && !context.isPreloaded(getDescriptor())) {
             // Note that if this starts to depend on anything beside the name of
             // the type, StyleDefCSSFormatAdapter needs to know to restructure its cache
@@ -129,7 +100,7 @@ public class StyleDefImpl extends DefinitionImpl<StyleDef> implements StyleDef {
             String out = getCode();
             json.writeMapEntry("code", out);
         }
-        
+
         json.writeMapEntry("className", className);
         json.writeMapEnd();
     }
@@ -147,7 +118,6 @@ public class StyleDefImpl extends DefinitionImpl<StyleDef> implements StyleDef {
         private String content;
         private String className;
         private Set<String> expressions;
-        private List<ComponentDefRef> components; /* TODONM remove */
 
         @Override
         public StyleDef build() {
@@ -169,13 +139,6 @@ public class StyleDefImpl extends DefinitionImpl<StyleDef> implements StyleDef {
         @Override
         public StyleDefBuilder setThemeExpressions(Set<String> expressions) {
             this.expressions = expressions;
-            return this;
-        }
-
-        /* TODONM remove */
-        @Override
-        public StyleDefBuilder setComponents(List<ComponentDefRef> components) {
-            this.components = components;
             return this;
         }
     }

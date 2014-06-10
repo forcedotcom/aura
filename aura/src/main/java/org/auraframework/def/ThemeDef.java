@@ -33,10 +33,10 @@ public interface ThemeDef extends RootDefinition {
     DefDescriptor<ThemeDef> getDescriptor();
 
     /**
-     * Gets whether this theme is a component-bundle local theme (as opposed to a theme in its own bundle). This is true
-     * if there is a {@link StyleDef} in the same bundle as this {@link ThemeDef}.
+     * Gets whether this theme is a component-bundle (or app-bundle) theme (as opposed to a theme in its own bundle).
+     * This is true if there is a {@link StyleDef} in the same bundle as this {@link ThemeDef}.
      */
-    boolean isLocalTheme();
+    boolean isCmpTheme();
 
     /**
      * Gets the descriptor of the {@link ThemeDef} this one extends, or null if not specified.
@@ -44,7 +44,25 @@ public interface ThemeDef extends RootDefinition {
     DefDescriptor<ThemeDef> getExtendsDescriptor();
 
     /**
-     * Gets whether this theme can provide a value for the given variable name.
+     * Returns true if this theme utilizes a provider. See {@link #getConcreteDescriptor()} and
+     * {@link #getThemeProviderDescriptor()}.
+     */
+    boolean isConcrete();
+
+    /**
+     * Gets the concrete descriptor. If this theme utilizes a provider (see {@link ThemeDescriptorProvider}) this will
+     * return the result from the provider. Otherwise (and most of the time) this will return the same thing as
+     * {@link #getDescriptor()}.
+     */
+    DefDescriptor<ThemeDef> getConcreteDescriptor() throws QuickFixException;
+
+    /**
+     * Gets the descriptor for the theme provider.
+     */
+    DefDescriptor<ThemeProviderDef> getThemeProviderDescriptor();
+
+    /**
+     * Gets whether this theme can return a value for the given variable name.
      * <p>
      * If you only need to know if a variable is defined for this theme, this method is faster than
      * {@link #getVar(String)} as it doesn't have to perform any evaluation.

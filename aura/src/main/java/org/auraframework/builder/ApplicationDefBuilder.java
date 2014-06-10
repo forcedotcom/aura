@@ -27,8 +27,8 @@ public interface ApplicationDefBuilder extends BaseComponentDefBuilder<Applicati
     ApplicationDefBuilder setLayouts(LayoutsDef layouts);
 
     /**
-     * Specifies the {@link ThemeDef} to use as the override theme. Vars specified in the override theme take precedence
-     * over default var values within the whole application.
+     * Specifies the {@link ThemeDef} to use across the whole application. Vars specified in this theme will override
+     * default var values throughout all components used in the application.
      */
-    ApplicationDefBuilder setOverrideThemeDescriptor(DefDescriptor<ThemeDef> overrideThemeDescriptor);
+    ApplicationDefBuilder setThemeDescriptor(DefDescriptor<ThemeDef> themeDescriptor);
 }

@@ -136,7 +136,7 @@ public class ThemeValueProviderImplTest extends StyleTestCase {
         DefDescriptor<StyleDef> style = addStyleDef(".THIS{}");
 
         String prov = "java://" + TmpProvider.class.getName();
-        DefDescriptor<ThemeDef> override = addSeparateTheme(theme().provider(prov));
+        DefDescriptor<ThemeDef> override = addSeparateTheme(theme().descriptorProvider(prov));
 
         assertEquals("blue", setupOverride(style, override).getValue("color", null));
     }
@@ -246,6 +246,6 @@ public class ThemeValueProviderImplTest extends StyleTestCase {
 
     private ThemeValueProvider setupOverride(DefDescriptor<StyleDef> def, List<DefDescriptor<ThemeDef>> overrides)
             throws QuickFixException {
-        return new ThemeValueProviderImpl(def, overrides);
+        return new ThemeValueProviderImpl(def, new ThemeListImpl(overrides));
     }
 }

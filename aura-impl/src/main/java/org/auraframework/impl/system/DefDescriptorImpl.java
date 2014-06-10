@@ -126,6 +126,7 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
             case TYPE:
             case PROVIDER:
             case THEME_PROVIDER:
+            case THEME_MAP_PROVIDER:
             case INCLUDE:
                 Matcher matcher = CLASS_PATTERN.matcher(qualifiedName);
                 if (matcher.matches()) {
@@ -147,7 +148,7 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
                 }
 
                 break;
-                // subtypes
+            // subtypes
             case ACTION:
             case DESCRIPTION:
                 throw new AuraRuntimeException(
@@ -331,7 +332,6 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
 
         Cache<DescriptorKey, DefDescriptor<? extends Definition>> cache =
                 cSrv.getDefDescriptorByNameCache();
-
 
         @SuppressWarnings("unchecked")
         DefDescriptor<E> result = (DefDescriptor<E>) cache.getIfPresent(dk);

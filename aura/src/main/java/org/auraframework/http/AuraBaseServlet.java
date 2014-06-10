@@ -491,11 +491,16 @@ public abstract class AuraBaseServlet extends HttpServlet {
         // predictable
         context.addAppThemeDescriptors();
 
+        boolean originalSerializeThemes = context.getSerializeThemes();
+        context.setSerializeThemes(true);
         try {
             Aura.getSerializationService().write(context, null, AuraContext.class, sb, "HTML");
+
         } catch (IOException e) {
             throw new AuraRuntimeException(e);
         }
+        context.setSerializeThemes(originalSerializeThemes);
+
         String contextJson = AuraTextUtil.urlencode(sb.toString());
         defs.append(contextJson);
         defs.append("/app.css");

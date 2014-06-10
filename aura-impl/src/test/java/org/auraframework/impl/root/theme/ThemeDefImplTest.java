@@ -21,10 +21,12 @@ import java.util.Set;
 
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.ThemeDef;
-import org.auraframework.def.ThemeProviderDef;
+import org.auraframework.def.ThemeDescriptorProviderDef;
+import org.auraframework.def.ThemeMapProviderDef;
 import org.auraframework.def.VarDef;
 import org.auraframework.impl.css.StyleTestCase;
-import org.auraframework.impl.java.provider.TestThemeProvider;
+import org.auraframework.impl.java.provider.TestThemeDescriptorProvider;
+import org.auraframework.impl.java.provider.TestThemeMapProvider;
 import org.auraframework.impl.source.StringSource;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
@@ -464,7 +466,8 @@ public class ThemeDefImplTest extends StyleTestCase {
     }
 
     public void testCantImportThemeWithProvider() throws Exception {
-        DefDescriptor<ThemeDef> withProvider = addSeparateTheme(theme().provider(TestThemeProvider.REF));
+        DefDescriptor<ThemeDef> withProvider = addSeparateTheme(theme().descriptorProvider(
+                TestThemeDescriptorProvider.REF));
 
         try {
             addSeparateTheme(theme().imported(withProvider)).getDef();
@@ -560,25 +563,29 @@ public class ThemeDefImplTest extends StyleTestCase {
         assertTrue(dependencies.contains(nsTheme));
     }
 
-    public void testGetThemeProviderDescriptor() throws Exception {
-        DefDescriptor<ThemeDef> theme = addSeparateTheme(theme().provider(TestThemeProvider.REF));
-        assertEquals(TestThemeProvider.REF, theme.getDef().getThemeProviderDescriptor().getQualifiedName());
+    public void testGetDescriptorProviderAbsent() throws Exception {
+        assertNull(addSeparateTheme(theme()).getDef().getDescriptorProvider());
+    }
+
+    public void testGetDescriptorProviderPresent() throws Exception {
+        DefDescriptor<ThemeDef> theme = addSeparateTheme(theme().descriptorProvider(TestThemeDescriptorProvider.REF));
+        assertEquals(TestThemeDescriptorProvider.REF, theme.getDef().getDescriptorProvider().getQualifiedName());
     }
 
     public void testAddsProviderToDeps() throws Exception {
-        DefDescriptor<ThemeDef> theme = addSeparateTheme(theme().provider(TestThemeProvider.REF));
+        DefDescriptor<ThemeDef> theme = addSeparateTheme(theme().descriptorProvider(TestThemeDescriptorProvider.REF));
 
         Set<DefDescriptor<?>> dependencies = Sets.newHashSet();
         theme.getDef().appendDependencies(dependencies);
 
-        DefDescriptor<ThemeProviderDef> def = DefDescriptorImpl.getInstance(TestThemeProvider.REF,
-                ThemeProviderDef.class);
+        DefDescriptor<ThemeDescriptorProviderDef> def = DefDescriptorImpl.getInstance(TestThemeDescriptorProvider.REF,
+                ThemeDescriptorProviderDef.class);
         assertTrue(dependencies.contains(def));
     }
 
     public void testGetConcreteDescriptorWithProvider() throws Exception {
-        DefDescriptor<ThemeDef> theme = addSeparateTheme(theme().provider(TestThemeProvider.REF));
-        assertEquals(TestThemeProvider.DESC, theme.getDef().getConcreteDescriptor().getDescriptorName());
+        DefDescriptor<ThemeDef> theme = addSeparateTheme(theme().descriptorProvider(TestThemeDescriptorProvider.REF));
+        assertEquals(TestThemeDescriptorProvider.DESC, theme.getDef().getConcreteDescriptor().getDescriptorName());
     }
 
     public void testGetConcreteDescriptorWithoutProvider() throws Exception {
@@ -588,8 +595,8 @@ public class ThemeDefImplTest extends StyleTestCase {
 
     public void testErrorsIfProviderThemeHasVars() throws Exception {
         try {
-            addSeparateTheme(theme().provider(TestThemeProvider.REF).var("color", "red")).getDef()
-            .getConcreteDescriptor();
+            addSeparateTheme(theme().descriptorProvider(TestThemeDescriptorProvider.REF).var("color", "red")).getDef()
+                    .getConcreteDescriptor();
             fail("Expected to catch an exception.");
         } catch (Exception e) {
             checkExceptionContains(e, InvalidDefinitionException.class, "must not specify vars");
@@ -599,8 +606,8 @@ public class ThemeDefImplTest extends StyleTestCase {
     public void testErrorsIfProviderThemeHasImports() throws Exception {
         DefDescriptor<ThemeDef> import1 = addSeparateTheme(theme().var("imported", "imported"));
         try {
-            addSeparateTheme(theme().provider(TestThemeProvider.REF).imported(import1)).getDef()
-            .getConcreteDescriptor();
+            addSeparateTheme(theme().descriptorProvider(TestThemeDescriptorProvider.REF).imported(import1)).getDef()
+                    .getConcreteDescriptor();
             fail("Expected to catch an exception.");
         } catch (Exception e) {
             checkExceptionContains(e, InvalidDefinitionException.class, "must not specify imports");
@@ -608,10 +615,10 @@ public class ThemeDefImplTest extends StyleTestCase {
     }
 
     public void testErrorsIfProviderThemeHasExtends() throws Exception {
-        DefDescriptor<ThemeDef> parent = addSeparateTheme(theme().var("imported", "imported"));
+        DefDescriptor<ThemeDef> parent = addSeparateTheme(theme().var("parent", "parent"));
         try {
-            addSeparateTheme(theme().provider(TestThemeProvider.REF).parent(parent)).getDef()
-            .getConcreteDescriptor();
+            addSeparateTheme(theme().descriptorProvider(TestThemeDescriptorProvider.REF).parent(parent)).getDef()
+                    .getConcreteDescriptor();
             fail("Expected to catch an exception.");
         } catch (Exception e) {
             checkExceptionContains(e, InvalidDefinitionException.class, "must not use 'extends'");
@@ -620,7 +627,8 @@ public class ThemeDefImplTest extends StyleTestCase {
 
     public void testErrorsIfProviderThemeIsCmpTheme() throws Exception {
         try {
-            addThemeAndStyle(theme().provider(TestThemeProvider.REF), ".THIS{}").getDef().getConcreteDescriptor();
+            addThemeAndStyle(theme().descriptorProvider(TestThemeDescriptorProvider.REF), ".THIS{}").getDef()
+                    .getConcreteDescriptor();
             fail("Expected to catch an exception.");
         } catch (Exception e) {
             checkExceptionContains(e, InvalidDefinitionException.class, "must not specify a provider");
@@ -629,7 +637,74 @@ public class ThemeDefImplTest extends StyleTestCase {
 
     public void testErrorsIfProviderThemeIsNsDefaultTheme() throws Exception {
         try {
-            addNsTheme(theme().provider(TestThemeProvider.REF)).getDef().getConcreteDescriptor();
+            addNsTheme(theme().descriptorProvider(TestThemeDescriptorProvider.REF)).getDef().getConcreteDescriptor();
+            fail("Expected to catch an exception.");
+        } catch (Exception e) {
+            checkExceptionContains(e, InvalidDefinitionException.class, "must not specify a provider");
+        }
+    }
+
+    public void testGetMapProviderAbsent() throws Exception {
+        assertNull(addSeparateTheme(theme()).getDef().getMapProvider());
+    }
+
+    public void testGetMapProviderPresent() throws Exception {
+        DefDescriptor<ThemeDef> theme = addSeparateTheme(theme().mapProvider(TestThemeMapProvider.REF));
+        assertEquals(TestThemeMapProvider.REF, theme.getDef().getMapProvider().getQualifiedName());
+    }
+
+    public void testAddsMapProviderToDeps() throws Exception {
+        DefDescriptor<ThemeDef> theme = addSeparateTheme(theme().mapProvider(TestThemeMapProvider.REF));
+
+        Set<DefDescriptor<?>> dependencies = Sets.newHashSet();
+        theme.getDef().appendDependencies(dependencies);
+
+        DefDescriptor<ThemeMapProviderDef> def = DefDescriptorImpl.getInstance(TestThemeMapProvider.REF,
+                ThemeMapProviderDef.class);
+        assertTrue(dependencies.contains(def));
+    }
+
+    public void testErrorsIfMapProviderThemeHasVars() throws Exception {
+        try {
+            addSeparateTheme(theme().mapProvider(TestThemeMapProvider.REF).var("color", "red")).getDef();
+            fail("Expected to catch an exception.");
+        } catch (Exception e) {
+            checkExceptionContains(e, InvalidDefinitionException.class, "must not specify vars");
+        }
+    }
+
+    public void testErrorsIfMapProviderThemeHasImports() throws Exception {
+        DefDescriptor<ThemeDef> import1 = addSeparateTheme(theme().var("imported", "imported"));
+        try {
+            addSeparateTheme(theme().mapProvider(TestThemeMapProvider.REF).imported(import1)).getDef();
+            fail("Expected to catch an exception.");
+        } catch (Exception e) {
+            checkExceptionContains(e, InvalidDefinitionException.class, "must not specify imports");
+        }
+    }
+
+    public void testErrorsIfMapProviderThemeHasExtends() throws Exception {
+        DefDescriptor<ThemeDef> parent = addSeparateTheme(theme().var("parent", "parent"));
+        try {
+            addSeparateTheme(theme().mapProvider(TestThemeMapProvider.REF).parent(parent)).getDef();
+            fail("Expected to catch an exception.");
+        } catch (Exception e) {
+            checkExceptionContains(e, InvalidDefinitionException.class, "must not use 'extends'");
+        }
+    }
+
+    public void testErrorsIfMapProviderThemeIsCmpTheme() throws Exception {
+        try {
+            addThemeAndStyle(theme().mapProvider(TestThemeMapProvider.REF), ".THIS{}").getDef();
+            fail("Expected to catch an exception.");
+        } catch (Exception e) {
+            checkExceptionContains(e, InvalidDefinitionException.class, "must not specify a provider");
+        }
+    }
+
+    public void testErrorsIfMapProviderThemeIsNsDefaultTheme() throws Exception {
+        try {
+            addNsTheme(theme().mapProvider(TestThemeMapProvider.REF)).getDef();
             fail("Expected to catch an exception.");
         } catch (Exception e) {
             checkExceptionContains(e, InvalidDefinitionException.class, "must not specify a provider");

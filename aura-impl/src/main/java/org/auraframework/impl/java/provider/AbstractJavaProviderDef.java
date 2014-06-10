@@ -17,31 +17,28 @@ package org.auraframework.impl.java.provider;
 
 import java.io.IOException;
 
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.ThemeDef;
-import org.auraframework.def.ThemeDescriptorProvider;
-import org.auraframework.def.ThemeProviderDef;
+import org.auraframework.def.Definition;
+import org.auraframework.def.Provider;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
 /**
- * A {@link ThemeProviderDef} that maps to and invokes an instance of a {@link ThemeDescriptorProvider} java class.
- * 
- * @see ThemeDescriptorProvider
+ * Base class for java provider defs.
  */
-public class JavaThemeProviderDef extends DefinitionImpl<ThemeProviderDef> implements ThemeProviderDef {
-    private static final long serialVersionUID = -124253037254852866L;
-    private final ThemeDescriptorProvider provider;
+abstract class AbstractJavaProviderDef<T extends Provider, D extends Definition> extends DefinitionImpl<D> {
+    private static final long serialVersionUID = -8713728986587088353L;
 
-    public JavaThemeProviderDef(Builder builder) throws QuickFixException {
+    protected final T provider;
+
+    public AbstractJavaProviderDef(Class<T> providerType, Builder<D> builder) throws QuickFixException {
         super(builder);
 
-        Class<?> klass = builder.klass;
-        if (ThemeDescriptorProvider.class.isAssignableFrom(klass)) {
+        Class<?> klass = builder.getProviderClass();
+        if (providerType.isAssignableFrom(klass)) {
             try {
-                provider = (ThemeDescriptorProvider) klass.newInstance();
+                provider = providerType.cast(klass.newInstance());
             } catch (InstantiationException ie) {
                 throw new InvalidDefinitionException("Cannot instantiate " + klass.getName(), location);
             } catch (IllegalAccessException iae) {
@@ -50,34 +47,28 @@ public class JavaThemeProviderDef extends DefinitionImpl<ThemeProviderDef> imple
                 throw new InvalidDefinitionException("Failed to instantiate " + klass.getName(), location, e);
             }
         } else {
-            throw new InvalidDefinitionException("Provider must implement " + ThemeDescriptorProvider.class, location);
+            throw new InvalidDefinitionException("Provider must implement " + providerType, location);
         }
-    }
-
-    @Override
-    public DefDescriptor<ThemeDef> provide() throws QuickFixException {
-        return provider.provide();
     }
 
     @Override
     public void serialize(Json json) throws IOException {
     }
 
-    public static class Builder extends DefinitionImpl.BuilderImpl<ThemeProviderDef> {
-        protected Builder() {
-            super(ThemeProviderDef.class);
+    static abstract class Builder<T extends Definition> extends DefinitionImpl.BuilderImpl<T> {
+        private Class<?> providerClass;
+
+        protected Builder(Class<T> defClass) {
+            super(defClass);
         }
 
-        private Class<?> klass;
-
-        public Builder setProviderClass(Class<?> klass) {
-            this.klass = klass;
+        public Builder<T> setProviderClass(Class<?> klass) {
+            this.providerClass = klass;
             return this;
         }
 
-        @Override
-        public ThemeProviderDef build() throws QuickFixException {
-            return new JavaThemeProviderDef(this);
+        public Class<?> getProviderClass() {
+            return providerClass;
         }
     }
 }

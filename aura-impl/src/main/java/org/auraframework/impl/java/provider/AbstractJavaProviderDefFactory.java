@@ -19,7 +19,7 @@ import java.util.List;
 
 import org.auraframework.builder.DefBuilder;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.ThemeProviderDef;
+import org.auraframework.def.Definition;
 import org.auraframework.impl.java.BaseJavaDefFactory;
 import org.auraframework.system.Annotations.Provider;
 import org.auraframework.system.Location;
@@ -28,21 +28,21 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
- * Factory for theme provider classes.
+ * Base class for java provider def factories.
  */
-public class JavaThemeProviderDefFactory extends BaseJavaDefFactory<ThemeProviderDef> {
-    public JavaThemeProviderDefFactory() {
+abstract class AbstractJavaProviderDefFactory<D extends Definition> extends BaseJavaDefFactory<D> {
+    public AbstractJavaProviderDefFactory() {
         this(null);
     }
 
-    public JavaThemeProviderDefFactory(List<SourceLoader> sourceLoaders) {
+    public AbstractJavaProviderDefFactory(List<SourceLoader> sourceLoaders) {
         super(sourceLoaders);
     }
 
+    protected abstract AbstractJavaProviderDef.Builder<D> newBuilder();
+
     @Override
-    protected DefBuilder<?, ? extends ThemeProviderDef> getBuilder(DefDescriptor<ThemeProviderDef> descriptor)
-            throws QuickFixException {
-        JavaThemeProviderDef.Builder builder;
+    protected DefBuilder<?, ? extends D> getBuilder(DefDescriptor<D> descriptor) throws QuickFixException {
         Class<?> providerClass = getClazz(descriptor);
 
         if (providerClass == null) {
@@ -55,7 +55,7 @@ public class JavaThemeProviderDefFactory extends BaseJavaDefFactory<ThemeProvide
                     new Location(providerClass.getCanonicalName(), 0));
         }
 
-        builder = new JavaThemeProviderDef.Builder();
+        AbstractJavaProviderDef.Builder<D> builder = newBuilder();
         builder.setDescriptor(descriptor);
         builder.setLocation(providerClass.getCanonicalName(), 0);
         builder.setProviderClass(providerClass);

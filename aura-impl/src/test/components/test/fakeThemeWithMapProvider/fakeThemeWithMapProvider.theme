@@ -1,0 +1,1 @@
+<aura:theme mapProvider="java://org.auraframework.impl.java.provider.TestThemeMapProvider"/>

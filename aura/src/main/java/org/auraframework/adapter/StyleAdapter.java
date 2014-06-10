@@ -15,8 +15,7 @@
  */
 package org.auraframework.adapter;
 
-import java.util.List;
-
+import org.auraframework.css.ThemeList;
 import org.auraframework.css.ThemeValueProvider;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
@@ -42,10 +41,10 @@ public interface StyleAdapter extends AuraAdapter {
      * 
      * @param descriptor The {@link StyleDef} descriptor of the CSS file being parsed. This is used to determine which
      *            namespace-default {@link ThemeDef} to use, as well as which component-bundle {@link ThemeDef} to use.
-     * @param overrideThemes Use these {@link ThemeDef}s as the overrides.
+     * @param overrideThemes The {@link ThemeList} containing the override themes.
      */
-    ThemeValueProvider getThemeValueProvider(DefDescriptor<StyleDef> descriptor,
-            List<DefDescriptor<ThemeDef>> overrideThemes) throws QuickFixException;
+    ThemeValueProvider getThemeValueProvider(DefDescriptor<StyleDef> descriptor, ThemeList overrideThemes)
+            throws QuickFixException;
 
     /**
      * Gets a {@link ThemeValueProvider} that doesn't use any override theme (even if one is set on the current

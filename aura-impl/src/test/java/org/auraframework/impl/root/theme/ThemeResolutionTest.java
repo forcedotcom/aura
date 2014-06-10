@@ -15,15 +15,23 @@
  */
 package org.auraframework.impl.root.theme;
 
+import java.util.List;
+import java.util.Map;
+
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
 import org.auraframework.def.ThemeDef;
 import org.auraframework.def.ThemeDescriptorProvider;
+import org.auraframework.def.ThemeMapProvider;
 import org.auraframework.impl.css.StyleTestCase;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Annotations.Provider;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+
+import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 
 /**
  * Unit tests for resolving theme function values in CSS files.
@@ -493,12 +501,111 @@ public class ThemeResolutionTest extends StyleTestCase {
     /** test that a provided theme works */
     public void testAppExplicitThemeUsesProvider() throws Exception {
         addNsTheme(theme().var("color", "red"));
-        DefDescriptor<StyleDef> styleDef = addStyleDef(".THIS {color:theme(color)}");
+        DefDescriptor<StyleDef> styleDef = addStyleDef(".THIS {color:t(color)}");
 
-        DefDescriptor<ThemeDef> override = addSeparateTheme(theme().provider("java://" + Provider1.class.getName()));
+        DefDescriptor<ThemeDef> override = addSeparateTheme(theme().descriptorProvider(
+                "java://" + Provider1.class.getName()));
         addContextApp(String.format("<aura:application theme='%s'/>", override.getDescriptorName()));
 
         // should get the value from the provided theme
         assertStyle(styleDef, ".THIS {color:blue}");
+    }
+
+    @Provider
+    public static final class Provider2 implements ThemeMapProvider {
+        @Override
+        public Map<String, String> provide() throws QuickFixException {
+            return ImmutableMap.of("color", "green");
+        }
+    }
+
+    public void testAppExplicitThemeUsesMapProvider() throws Exception {
+        addNsTheme(theme().var("color", "red"));
+        DefDescriptor<StyleDef> styleDef = addStyleDef(".THIS {color:t(color)}");
+
+        DefDescriptor<ThemeDef> override = addSeparateTheme(theme().mapProvider(
+                "java://" + Provider2.class.getName()));
+        addContextApp(String.format("<aura:application theme='%s'/>", override.getDescriptorName()));
+
+        // should get the value from the provided theme
+        assertStyle(styleDef, ".THIS {color:green}");
+    }
+
+    @Provider
+    public static final class ThemeComboTestProvider implements ThemeDescriptorProvider {
+        @Override
+        public DefDescriptor<ThemeDef> provide() throws QuickFixException {
+            return DefDescriptorImpl.getInstance("themeProviderTest:themeComboTest", ThemeDef.class);
+        }
+    }
+
+    @Provider
+    public static final class ThemeComboTestP1 implements ThemeMapProvider {
+        @Override
+        public Map<String, String> provide() throws QuickFixException {
+            return ImmutableMap.of("font", "trebuchet", "margin", "20px");
+        }
+    }
+
+    @Provider
+    public static final class ThemeComboTestP2 implements ThemeMapProvider {
+        @Override
+        public Map<String, String> provide() throws QuickFixException {
+            return ImmutableMap.of("font", "georgia");
+        }
+    }
+
+    public void testVariousThemeTypesCombination() throws Exception {
+        // "*" next to the ones that should be used
+        // namespace default theme (color, font, padding, margin, borderRadius*)
+        // component theme (cmpSpacing*)
+        // app override static theme (color, font, padding*)
+        // app override provided theme (color*)
+        // app override map theme (font, margin*)
+        // app override map theme (font*)
+
+        addNsTheme(theme()
+                .var("color", "red")
+                .var("font", "arial")
+                .var("padding", "5px")
+                .var("margin", "7px")
+                .var("borderRadius", "3px"));
+
+        DefDescriptor<ThemeDef> staticOverrideTheme = addSeparateTheme(theme()
+                .var("color", "green")
+                .var("font", "times")
+                .var("padding", "12px"));
+
+        DefDescriptor<ThemeDef> themeUsesProvider = addSeparateTheme(theme().descriptorProvider(
+                "java://" + ThemeComboTestProvider.class.getName()));
+
+        DefDescriptor<ThemeDef> mapTheme1 = addSeparateTheme(theme().mapProvider(
+                "java://" + ThemeComboTestP1.class.getName()));
+        DefDescriptor<ThemeDef> mapTheme2 = addSeparateTheme(theme().mapProvider(
+                "java://" + ThemeComboTestP2.class.getName()));
+
+        String src = ".THIS {color: t(color); " +
+                "font-family: t(font); " +
+                "padding: t(padding); " +
+                "margin: t(margin); " +
+                "border-radius: t(borderRadius);}";
+
+        String expected = ".THIS {color:yellow; " +
+                "font-family:georgia; " +
+                "padding:12px; " +
+                "margin:20px; " +
+                "border-radius:3px}";
+
+        DefDescriptor<StyleDef> styleDef = addStyleDef(src);
+        addCmpTheme(theme().var("cmpSpacing", "{!padding}"), styleDef);
+
+        List<DefDescriptor<ThemeDef>> themes = Lists.newArrayList();
+        themes.add(staticOverrideTheme);
+        themes.add(themeUsesProvider);
+        themes.add(mapTheme1);
+        themes.add(mapTheme2);
+        addContextApp(String.format("<aura:application theme='%s'/>", Joiner.on(", ").join(themes)));
+
+        assertStyle(styleDef, expected);
     }
 }

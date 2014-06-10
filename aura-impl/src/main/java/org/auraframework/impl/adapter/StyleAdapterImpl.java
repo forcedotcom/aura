@@ -15,14 +15,12 @@
  */
 package org.auraframework.impl.adapter;
 
-import java.util.List;
-
 import org.auraframework.Aura;
 import org.auraframework.adapter.StyleAdapter;
+import org.auraframework.css.ThemeList;
 import org.auraframework.css.ThemeValueProvider;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
-import org.auraframework.def.ThemeDef;
 import org.auraframework.impl.css.ThemeValueProviderImpl;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
@@ -33,8 +31,8 @@ public final class StyleAdapterImpl implements StyleAdapter {
     }
 
     @Override
-    public ThemeValueProvider getThemeValueProvider(DefDescriptor<StyleDef> descriptor,
-            List<DefDescriptor<ThemeDef>> overrideThemes) throws QuickFixException {
+    public ThemeValueProvider getThemeValueProvider(DefDescriptor<StyleDef> descriptor, ThemeList overrideThemes)
+            throws QuickFixException {
         return new ThemeValueProviderImpl(descriptor, overrideThemes);
     }
 
@@ -44,7 +42,7 @@ public final class StyleAdapterImpl implements StyleAdapter {
         return new ThemeValueProviderImpl(descriptor, null);
     }
 
-    private static List<DefDescriptor<ThemeDef>> overrides() throws QuickFixException {
-        return Aura.getContextService().getCurrentContext().getThemeDescriptorsOrdered();
+    private static ThemeList overrides() throws QuickFixException {
+        return Aura.getContextService().getCurrentContext().getThemeList();
     }
 }

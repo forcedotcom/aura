@@ -54,7 +54,7 @@ public class ServerServiceImpl implements ServerService {
     private static final long serialVersionUID = -2779745160285710414L;
 
     @Override
-    public void run(Message message, AuraContext context, Writer out, Map<?,?> extras) throws IOException {
+    public void run(Message message, AuraContext context, Writer out, Map<?, ?> extras) throws IOException {
         LoggingService loggingService = Aura.getLoggingService();
         if (message == null) {
             return;
@@ -64,7 +64,7 @@ public class ServerServiceImpl implements ServerService {
         try {
             json.writeMapBegin();
             if (extras != null && extras.size() > 0) {
-                for (Map.Entry<?,?> entry : extras.entrySet()) {
+                for (Map.Entry<?, ?> entry : extras.entrySet()) {
                     json.writeMapEntry(entry.getKey(), entry.getValue());
                 }
             }
@@ -141,11 +141,24 @@ public class ServerServiceImpl implements ServerService {
     public void writeAppCss(Set<DefDescriptor<?>> dependencies, Writer out) throws IOException, QuickFixException {
         AuraContext context = Aura.getContextService().getCurrentContext();
         Mode mode = context.getMode();
+
         final boolean minify = !(mode.isTestMode() || mode.isDevMode());
         final String mKey = minify ? "MIN:" : "DEV:";
 
+        // TODONM:
+        // 1) Themes specified directly to the context (not by app) need to be part of the key. Until then,
+        // context-specified themes shouldn't be used.
+
+        // Optional<String> themesUid = context.getThemeList().getThemeDescriptorsUid();
+        // final String themesKey = themesUid.isPresent() ? themesUid.get() + ":" : "";
+
+        // 2) If a theme uses a map-provider it will affect the css key too. Current idea is to cache a "pre-themed"
+        // version of the CSS (but still ordered and concatenated). Until this is addressed map-providers shouldn't be
+        // used. Another idea is to defer cache to fileforce, etc... once a map-provider is involved.
+
         DefDescriptor<?> appDesc = context.getLoadingApplicationDescriptor();
         final String uid = context.getUid(appDesc);
+
         final String key = "CSS:" + context.getClient().getType() + "$" + mKey + uid;
 
         context.setPreloading(true);
@@ -275,14 +288,14 @@ public class ServerServiceImpl implements ServerService {
         MasterDefRegistry mdr = Aura.getContextService().getCurrentContext().getDefRegistry();
 
         try {
-        for (DefDescriptor<?> descriptor : dependencies) {
-            if (defType.isAssignableFrom(descriptor.getDefType().getPrimaryInterface())
-                    && (extraFilter == null || extraFilter.apply(descriptor))) {
-                @SuppressWarnings("unchecked")
-                DefDescriptor<D> dd = (DefDescriptor<D>) descriptor;
-                out.add(mdr.getDef(dd));
+            for (DefDescriptor<?> descriptor : dependencies) {
+                if (defType.isAssignableFrom(descriptor.getDefType().getPrimaryInterface())
+                        && (extraFilter == null || extraFilter.apply(descriptor))) {
+                    @SuppressWarnings("unchecked")
+                    DefDescriptor<D> dd = (DefDescriptor<D>) descriptor;
+                    out.add(mdr.getDef(dd));
+                }
             }
-        }
         } catch (QuickFixException qfe) {
             // This should never happen here, by the time we are filtering our set, all dependencies
             // MUST be loaded. If not, we have a serious bug that must be addressed.

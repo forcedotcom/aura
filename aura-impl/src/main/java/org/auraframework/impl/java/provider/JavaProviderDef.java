@@ -103,27 +103,29 @@ public class JavaProviderDef extends DefinitionImpl<ProviderDef> implements Prov
         StaticComponentConfigProvider staticConfigProv = null;
         ComponentDescriptorProvider descriptorProv = null;
 
-        List<Class<? extends Provider>> interfaces = AuraUtil.findInterfaces(builder.providerClass, Provider.class);
+        List<Class<? extends Provider>> interfaces = AuraUtil
+                .findInterfaces(builder.getProviderClass(), Provider.class);
         if (!interfaces.isEmpty()) {
             try {
                 for (Class<? extends Provider> theIfc : interfaces) {
                     if (ComponentConfigProvider.class.isAssignableFrom(theIfc)) {
-                        configProv = (ComponentConfigProvider) builder.providerClass.newInstance();
+                        configProv = (ComponentConfigProvider) builder.getProviderClass().newInstance();
                     } else if (ComponentDescriptorProvider.class.isAssignableFrom(theIfc)) {
-                        descriptorProv = (ComponentDescriptorProvider) builder.providerClass.newInstance();
+                        descriptorProv = (ComponentDescriptorProvider) builder.getProviderClass().newInstance();
                     }
 
                     if (StaticComponentConfigProvider.class.isAssignableFrom(theIfc)) {
-                        staticConfigProv = (StaticComponentConfigProvider) builder.providerClass.newInstance();
+                        staticConfigProv = (StaticComponentConfigProvider) builder.getProviderClass().newInstance();
                     }
                 }
             } catch (InstantiationException ie) {
-                throw new InvalidDefinitionException("Cannot instantiate " + builder.providerClass.getName(), location);
+                throw new InvalidDefinitionException("Cannot instantiate " + builder.getProviderClass().getName(),
+                        location);
             } catch (IllegalAccessException iae) {
                 throw new InvalidDefinitionException("Constructor is inaccessible for "
-                        + builder.providerClass.getName(), location);
+                        + builder.getProviderClass().getName(), location);
             } catch (RuntimeException e) {
-                throw new InvalidDefinitionException("Failed to instantiate " + builder.providerClass.getName(),
+                throw new InvalidDefinitionException("Failed to instantiate " + builder.getProviderClass().getName(),
                         location, e);
             }
         } else {
@@ -135,7 +137,7 @@ public class JavaProviderDef extends DefinitionImpl<ProviderDef> implements Prov
             Method descriptorMeth = null;
             Method attributeMeth = null;
             try {
-                Method provideMeth = builder.providerClass.getMethod("provide");
+                Method provideMeth = builder.getProviderClass().getMethod("provide");
                 Class<?> returnType = provideMeth.getReturnType();
 
                 if (Modifier.isStatic(provideMeth.getModifiers())) {
@@ -151,7 +153,7 @@ public class JavaProviderDef extends DefinitionImpl<ProviderDef> implements Prov
                 throw new AuraRuntimeException(e);
             }
             try {
-                attributeMeth = builder.providerClass.getMethod("provideAttributes");
+                attributeMeth = builder.getProviderClass().getMethod("provideAttributes");
                 if (!Modifier.isStatic(attributeMeth.getModifiers())) {
                     attributeMeth = null;
                 }
@@ -250,17 +252,9 @@ public class JavaProviderDef extends DefinitionImpl<ProviderDef> implements Prov
         return true;
     }
 
-    public static class Builder extends DefinitionImpl.BuilderImpl<ProviderDef> {
-
+    public static final class Builder extends AbstractJavaProviderDef.Builder<ProviderDef> {
         public Builder() {
             super(ProviderDef.class);
-        }
-
-        private Class<?> providerClass;
-
-        public Builder setProviderClass(Class<?> c) {
-            this.providerClass = c;
-            return this;
         }
 
         @Override

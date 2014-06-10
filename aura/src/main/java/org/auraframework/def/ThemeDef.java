@@ -29,8 +29,6 @@ import com.google.common.base.Optional;
  * theme variable substitution in stylesheets.
  */
 public interface ThemeDef extends RootDefinition {
-    @Override
-    DefDescriptor<ThemeDef> getDescriptor();
 
     /**
      * Gets whether this theme is a component-bundle (or app-bundle) theme (as opposed to a theme in its own bundle).
@@ -38,28 +36,30 @@ public interface ThemeDef extends RootDefinition {
      */
     boolean isCmpTheme();
 
+    @Override
+    DefDescriptor<ThemeDef> getDescriptor();
+
     /**
      * Gets the descriptor of the {@link ThemeDef} this one extends, or null if not specified.
      */
     DefDescriptor<ThemeDef> getExtendsDescriptor();
 
     /**
-     * Returns true if this theme utilizes a provider. See {@link #getConcreteDescriptor()} and
-     * {@link #getThemeProviderDescriptor()}.
-     */
-    boolean isConcrete();
-
-    /**
-     * Gets the concrete descriptor. If this theme utilizes a provider (see {@link ThemeDescriptorProvider}) this will
-     * return the result from the provider. Otherwise (and most of the time) this will return the same thing as
+     * Gets the concrete descriptor. If this theme utilizes a {@link ThemeDescriptorProvider}, this will return the
+     * result from the provider. Otherwise (and most of the time) this will return the same thing as
      * {@link #getDescriptor()}.
      */
     DefDescriptor<ThemeDef> getConcreteDescriptor() throws QuickFixException;
 
     /**
-     * Gets the descriptor for the theme provider.
+     * Gets the descriptor for the theme descriptor provider.
      */
-    DefDescriptor<ThemeProviderDef> getThemeProviderDescriptor();
+    DefDescriptor<ThemeDescriptorProviderDef> getDescriptorProvider();
+
+    /**
+     * Gets the {@link ThemeMapProviderDef} when {@link #isMapProvided()} is true.
+     */
+    DefDescriptor<ThemeMapProviderDef> getMapProvider();
 
     /**
      * Gets whether this theme can return a value for the given variable name.
@@ -109,7 +109,8 @@ public interface ThemeDef extends RootDefinition {
     List<DefDescriptor<ThemeDef>> getDeclaredImports();
 
     /**
-     * Gets the set of vars defined directly on this theme (does not include inherited or imported vars).
+     * Gets the set of vars defined directly on this theme (does not include inherited or imported vars, or map provided
+     * vars).
      */
     Set<String> getDeclaredNames();
 

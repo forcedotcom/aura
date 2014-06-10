@@ -25,7 +25,6 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
 import org.auraframework.def.ThemeDef;
-import org.auraframework.http.AuraServlet;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext.Authentication;
@@ -94,7 +93,8 @@ public abstract class StyleTestCase extends AuraImplTestCase {
 
     /** gets the parsed output of the given style. This ensures the application explicit theme is registered */
     public String getParsedCssUseAppTheme(DefDescriptor<StyleDef> styleDesc) throws QuickFixException {
-        AuraServlet.getStyles(); // ensures app's theme is added to the context
+        // ensures app's theme is added to the context
+        Aura.getContextService().getCurrentContext().addAppThemeDescriptors();
         return styleDesc.getDef().getCode();
     }
 
@@ -188,7 +188,8 @@ public abstract class StyleTestCase extends AuraImplTestCase {
     public static final class ThemeSrcBuilder implements CharSequence {
         private DefDescriptor<ThemeDef> parent;
         private final List<String> content = Lists.newArrayList();
-        private String provider;
+        private String descriptorProvider;
+        private String mapProvider;
 
         public ThemeSrcBuilder var(String name, String value) {
             content.add(String.format("<aura:var name='%s' value='%s'/>", name, value));
@@ -200,8 +201,13 @@ public abstract class StyleTestCase extends AuraImplTestCase {
             return this;
         }
 
-        public ThemeSrcBuilder provider(String provider) {
-            this.provider = provider;
+        public ThemeSrcBuilder descriptorProvider(String descriptorProvider) {
+            this.descriptorProvider = descriptorProvider;
+            return this;
+        }
+
+        public ThemeSrcBuilder mapProvider(String mapProvider) {
+            this.mapProvider = mapProvider;
             return this;
         }
 
@@ -216,9 +222,15 @@ public abstract class StyleTestCase extends AuraImplTestCase {
 
             builder.append("<aura:theme");
 
-            if (provider != null) {
+            if (descriptorProvider != null) {
                 builder.append(" provider='");
-                builder.append(provider);
+                builder.append(descriptorProvider);
+                builder.append("'");
+            }
+
+            if (mapProvider != null) {
+                builder.append(" mapProvider='");
+                builder.append(mapProvider);
                 builder.append("'");
             }
 

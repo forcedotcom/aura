@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.auraframework.Aura;
+import org.auraframework.css.ThemeList;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.ComponentDef;
@@ -30,7 +31,6 @@ import org.auraframework.def.EventType;
 import org.auraframework.def.ThemeDef;
 import org.auraframework.def.TypeDef;
 import org.auraframework.impl.AuraImplTestCase;
-import org.auraframework.impl.java.provider.TestThemeProvider;
 import org.auraframework.impl.root.AttributeDefImpl;
 import org.auraframework.impl.root.event.EventDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
@@ -347,60 +347,9 @@ public class AuraContextImplTest extends AuraImplTestCase {
 
         ctx.addAppThemeDescriptors();
 
-        List<DefDescriptor<ThemeDef>> descriptors = ctx.getThemeDescriptors();
+        ThemeList descriptors = ctx.getThemeList();
         assertEquals(1, descriptors.size());
         assertEquals(t, descriptors.get(0));
-    }
-
-    public void testAddAppThemeDescriptorsUsesConcrete() throws Exception {
-        String tsrc = String.format("<aura:theme provider='%s'/>", TestThemeProvider.REF);
-        DefDescriptor<ThemeDef> t = addSourceAutoCleanup(ThemeDef.class, tsrc);
-
-        String src = String.format("<aura:application access='unauthenticated' theme='%s'/>", t.getDescriptorName());
-        DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class, src);
-
-        AuraContext ctx = Aura.getContextService().startContext(Mode.UTEST, Format.JSON,
-                Authentication.UNAUTHENTICATED, desc);
-
-        ctx.addAppThemeDescriptors();
-
-        List<DefDescriptor<ThemeDef>> descriptors = ctx.getThemeDescriptors();
-        assertEquals(1, descriptors.size());
-
-        DefDescriptor<ThemeDef> expected = DefDescriptorImpl.getInstance(TestThemeProvider.DESC, ThemeDef.class);
-        assertEquals(expected, descriptors.get(0));
-    }
-
-    public void testAddAppThemeDescriptorsDuplicate() throws Exception {
-        DefDescriptor<ThemeDef> t = addSourceAutoCleanup(ThemeDef.class, "<aura:theme></aura:theme>");
-        String src = String.format("<aura:application access='unauthenticated' theme='%s'/>", t.getDescriptorName());
-        DefDescriptor<ApplicationDef> app = addSourceAutoCleanup(ApplicationDef.class, src);
-
-        AuraContext ctx = Aura.getContextService().startContext(Mode.UTEST, Format.JSON,
-                Authentication.UNAUTHENTICATED, app);
-
-        ctx.appendThemeDescriptor(t);
-        ctx.addAppThemeDescriptors();
-
-        List<DefDescriptor<ThemeDef>> descriptors = ctx.getThemeDescriptors();
-        assertEquals(1, descriptors.size());
-        assertEquals(t, descriptors.get(0));
-    }
-
-    public void testAppendThemeUsesConcrete() throws Exception {
-        AuraContext ctx = Aura.getContextService()
-                .startContext(Mode.UTEST, Format.JSON, Authentication.UNAUTHENTICATED);
-
-        String src = String.format("<aura:theme provider='%s'/>", TestThemeProvider.REF);
-        DefDescriptor<ThemeDef> theme = addSourceAutoCleanup(ThemeDef.class, src);
-
-        DefDescriptor<ThemeDef> expected = DefDescriptorImpl.getInstance(TestThemeProvider.DESC, ThemeDef.class);
-
-        ctx.appendThemeDescriptor(theme);
-
-        List<DefDescriptor<ThemeDef>> descriptors = ctx.getThemeDescriptors();
-        assertEquals(1, descriptors.size());
-        assertEquals(expected, descriptors.get(0));
     }
 
     public void testGetThemeDescriptors() throws Exception {
@@ -414,69 +363,30 @@ public class AuraContextImplTest extends AuraImplTestCase {
         ctx.appendThemeDescriptor(t2);
         ctx.appendThemeDescriptor(t3);
 
-        List<DefDescriptor<ThemeDef>> explicit = ctx.getThemeDescriptors();
+        ThemeList explicit = ctx.getThemeList();
         assertEquals(explicit.get(0), t1);
         assertEquals(explicit.get(1), t2);
         assertEquals(explicit.get(2), t3);
     }
 
-    public void testGetThemeDescriptorsOrdered() throws Exception {
-        AuraContext ctx = Aura.getContextService()
-                .startContext(Mode.UTEST, Format.JSON, Authentication.UNAUTHENTICATED);
-
-        DefDescriptor<ThemeDef> t1 = addSourceAutoCleanup(ThemeDef.class, "<aura:theme/>");
-        DefDescriptor<ThemeDef> t2 = addSourceAutoCleanup(ThemeDef.class, "<aura:theme/>");
-        DefDescriptor<ThemeDef> t3 = addSourceAutoCleanup(ThemeDef.class, "<aura:theme/>");
-        ctx.appendThemeDescriptor(t1);
-        ctx.appendThemeDescriptor(t2);
-        ctx.appendThemeDescriptor(t3);
-
-        List<DefDescriptor<ThemeDef>> explicit = ctx.getThemeDescriptorsOrdered();
-        assertEquals(3, explicit.size());
-        assertEquals(t3, explicit.get(0));
-        assertEquals(t2, explicit.get(1));
-        assertEquals(t1, explicit.get(2));
-    }
-
     public void testSerializeWithThemes() throws Exception {
-        AuraContext ctx = Aura.getContextService()
-                .startContext(Mode.UTEST, Format.JSON, Authentication.UNAUTHENTICATED);
-        ctx.setSerializeLastMod(false);
-
-        DefDescriptor<ThemeDef> t1 = vendor.getThemeDefDescriptor();
-        DefDescriptor<ThemeDef> t2 = vendor.getThemeDefDescriptor2();
-        DefDescriptor<ThemeDef> t3 = vendor.getThemeDefDescriptor3();
-        ctx.appendThemeDescriptor(t1);
-        ctx.appendThemeDescriptor(t2);
-        ctx.appendThemeDescriptor(t3);
-        String res = Json.serialize(ctx, ctx.getJsonSerializationContext());
-        goldFileJson(res);
-    }
-
-    public void testSerializeWithAppAndExplicitThemes() throws Exception {
+        // this app specifies test:fakeTheme
         DefDescriptor<ApplicationDef> app = DefDescriptorImpl.getInstance("test:fakeThemeApp", ApplicationDef.class);
 
         AuraContext ctx = Aura.getContextService()
                 .startContext(Mode.UTEST, Format.JSON, Authentication.UNAUTHENTICATED, app);
         ctx.setSerializeLastMod(false);
+        ctx.setSerializeThemes(true);
 
-        DefDescriptor<ThemeDef> explicit = vendor.getThemeDefDescriptor2();
-        ctx.appendThemeDescriptor(explicit);
+        ctx.appendThemeDescriptor(DefDescriptorImpl.getInstance("test:fakeTheme2", ThemeDef.class));
+        ctx.appendThemeDescriptor(DefDescriptorImpl.getInstance("test:fakeThemeWithMapProvider", ThemeDef.class));
         ctx.addAppThemeDescriptors();
-
-        String res = Json.serialize(ctx, ctx.getJsonSerializationContext());
-        goldFileJson(res);
-    }
-
-    public void testSerializeWithMultipleAppThemes() throws Exception {
-        DefDescriptor<ApplicationDef> app = DefDescriptorImpl.getInstance("test:fakeThemeApp2", ApplicationDef.class);
-
-        AuraContext ctx = Aura.getContextService()
-                .startContext(Mode.UTEST, Format.JSON, Authentication.UNAUTHENTICATED, app);
-        ctx.setSerializeLastMod(false);
-        ctx.addAppThemeDescriptors();
-
-        String res = Json.serialize(ctx, ctx.getJsonSerializationContext());
+        String res = getAuraTestingUtil().getSerializedAuraContext(ctx);
+        // expected order
+        // "test:fakeTheme" (app specified comes first)
+        // "test:fakeTheme2" (explicit order)
+        // "test:fakeThemeWithMapProvider" (explicit order)
+        // also expect the vars hash to be present
         goldFileJson(res);
     }
 }

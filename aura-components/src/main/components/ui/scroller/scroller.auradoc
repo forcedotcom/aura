@@ -18,10 +18,11 @@
 <aura:documentation>
 	<aura:description>
 		 <p>
-	        <code>ui:scroller</code> expands vertically to fill the space available within its parent component. You can set the width, and enable or disable both vertical and horizontal scrolling. 
+	        <code>ui:scroller</code> expands vertically to fill the space available within its parent component. You can set the width, and enable or disable both vertical and horizontal scrolling.
 	        Handle pull-to-refresh event in an action method. You can customize the status display for pull-to-refresh behavior, or accept the defaults.
 	    </p>
 	     <p>
+	        The scroller listens to the <code>ui:updateSize</code> event, which automatically resizes the scroller view to fit new content during a refresh.
 	        For large or dynamic data sets, you can embed menu and list components in the scroller and take advantage of its pull-to-refresh behavior to retrieve new data.
 	    </p>
 	</aura:description>	

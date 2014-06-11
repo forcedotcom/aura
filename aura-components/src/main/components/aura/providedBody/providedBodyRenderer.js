@@ -17,44 +17,30 @@
     // this is a direct copy of componentRenderer, except using realbody
     render: function(component){
         var body = component.getValue("v.realbody");
-        if ($A.getContext().getMode() === 'PTEST') {
-            $A.mark("render iteration body " + component.getGlobalId());
-        }
+        //$A.mark("render iteration body " + component.getGlobalId());
         var ret = $A.render(body);
-        if ($A.getContext().getMode() === 'PTEST') {
-            $A.endMark("render iteration body " + component.getGlobalId());
-        }
+        //$A.endMark("render iteration body " + component.getGlobalId());
         return ret;
     },
 
     afterRender: function(component){
         var body = component.get("v.realbody");
-        if ($A.getContext().getMode() === 'PTEST') {
-            $A.mark("afterRender iteration body " + component.getGlobalId());
-        }
+        //$A.mark("afterRender iteration body " + component.getGlobalId());
         $A.afterRender(body);
-        if ($A.getContext().getMode() === 'PTEST') {
-            $A.endMark("afterRender iteration body " + component.getGlobalId());
-        }
+        //$A.endMark("afterRender iteration body " + component.getGlobalId());
     },
 
     rerender: function(component){
         var body = component.get("v.realbody");
-        if ($A.getContext().getMode() === 'PTEST') {
-            $A.mark("rerender iteration body " + component.getGlobalId());
-        }
+        //$A.mark("rerender iteration body " + component.getGlobalId());
         var ret = $A.rerender(body);
-        if ($A.getContext().getMode() === 'PTEST') {
-            $A.endMark("rerender iteration body " + component.getGlobalId());
-        }
+        //$A.endMark("rerender iteration body " + component.getGlobalId());
         return ret
     },
 
     unrender : function(component){
         var body = component.get("v.realbody");
-        if ($A.getContext().getMode() === 'PTEST') {
-            $A.mark("unrender iteration body " + component.getGlobalId());
-        }
+        //$A.mark("unrender iteration body " + component.getGlobalId());
         $A.unrender(body);
 
         var elements = component.getElements();
@@ -63,8 +49,6 @@
             delete elements[key];
             aura.util.removeElement(element);
         }
-        if ($A.getContext().getMode() === 'PTEST') {
-            $A.endMark("unrender iteration body " + component.getGlobalId());
-        }
+        //$A.endMark("unrender iteration body " + component.getGlobalId());
     }
 })

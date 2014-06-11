@@ -15,16 +15,12 @@
  */
 ({
     provide : function IterationProvider(component, localCreation) {
-        if ($A.getContext().getMode() === 'PTEST') {
-            $A.mark("provide " + component.getGlobalId());
-        }
+        //$A.mark("provide " + component.getGlobalId());
         var realbody = [];
         if (!localCreation) {
             realbody = component.getDef().getHelper().createRealBodyServer(component, !localCreation);
         }
-        if ($A.getContext().getMode() === 'PTEST') {
-            $A.endMark("provide " + component.getGlobalId());
-        }
+        //$A.endMark("provide " + component.getGlobalId());
         return { attributes: { "realbody":realbody } };
     }
 })

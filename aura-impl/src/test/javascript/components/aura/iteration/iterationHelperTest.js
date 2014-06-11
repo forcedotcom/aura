@@ -89,7 +89,10 @@ Test.Aura.Iteration.HelperTest = function(){
     			realBodyList:[targetRealBodyList],
     			offset:0,
     			cmp:{
-    				_currentBodyCollector:''
+    				_currentBodyCollector:'',
+        			getGlobalId:function(){
+        				return "";
+        			}
     			}
         	};        	        	        	
         	
@@ -126,7 +129,10 @@ Test.Aura.Iteration.HelperTest = function(){
     			realBodyList:[targetRealBodyList],
     			offset:0,
     			cmp:{
-    				_currentBodyCollector:''
+    				_currentBodyCollector:'',
+        			getGlobalId:function(){
+        				return "";
+        			}
     			}
         	};        	        	        	
         	
@@ -166,7 +172,10 @@ Test.Aura.Iteration.HelperTest = function(){
     			realBodyList:[targetRealBodyList1, targetRealBodyList2],
     			offset:0,
     			cmp:{
-    				_currentBodyCollector:''
+    				_currentBodyCollector:'',
+        			getGlobalId:function(){
+        				return "";
+        			}
     			}
         	};        	        	        	
         	
@@ -205,7 +214,10 @@ Test.Aura.Iteration.HelperTest = function(){
     			realBodyList:[targetRealBodyList],
     			offset:0,
     			cmp:{
-    				_currentBodyCollector:''
+    				_currentBodyCollector:'',
+        			getGlobalId:function(){
+        				return "";
+        			}
     			}
         	};        	        	        	
         	
@@ -1055,7 +1067,10 @@ Test.Aura.Iteration.HelperTest = function(){
         			if(att=="v.items") return targetItems;  
         			if(att=="v.start") return targetStart;
         			if(att=="v.end") return targetEnd;
-        		}
+        		},
+    			getGlobalId:function(){
+    				return "";
+    			}
         	};
         	
         	var targetCallback = function(arg){
@@ -1225,7 +1240,10 @@ Test.Aura.Iteration.HelperTest = function(){
         			if(att=="v.items") return targetItems;  
         			if(att=="v.start") return targetStart;
         			if(att=="v.end") return targetEnd;
-        		}
+        		},
+    			getGlobalId:function(){
+    				return "";
+    			}
         	};
         	
         	var targetCallback = function(arg){
@@ -1320,7 +1338,10 @@ Test.Aura.Iteration.HelperTest = function(){
         			if(att=="v.items") return targetItems;  
         			if(att=="v.start") return targetStart;
         			if(att=="v.end") return targetEnd;
-        		}
+        		},
+    			getGlobalId:function(){
+    				return "";
+    			}
         	};
         	
         	var targetCallback = function(arg){
@@ -2301,6 +2322,9 @@ Test.Aura.Iteration.HelperTest = function(){
     			},
     			getEvent:function(ev){
     				if(ev == 'rerenderComplete') return targetEvent;
+    			},
+    			getGlobalId:function(){
+    				return "";
     			}
         	};   
         	

@@ -27,9 +27,7 @@
             var bc = indexCollector.bodyCollector
             bc.count -= 1;
             if (bc.count === 0) {
-                if ($A.getContext().getMode() === 'PTEST') {
-                    $A.endMark("iteration create real body " + bc.cmp.getGlobalId());
-                }
+                $A.endMark("iteration create real body " + bc.cmp.getGlobalId());
                 var accum = [];
                 var rbl = bc.realBodyList;
                 var i;
@@ -165,9 +163,7 @@
             }
             bodyCollector.count = realend-realstart;
             var count = 0;
-            if ($A.getContext().getMode() === 'PTEST') {
-                $A.mark("iteration create real body " + cmp.getGlobalId());
-            }
+            $A.mark("iteration create real body " + cmp.getGlobalId());
             for (var i = realstart; i < realend; i++) {
                 count += this.createComponentsForIndex(bodyCollector, cmp, items, i, doForce);
             }
@@ -266,10 +262,8 @@
                 realbody.destroy();
                 realbody.setValue(newBody);
                 cmp.getEvent("rerenderComplete").fire();
-                if ($A.getContext().getMode() === 'PTEST') {
-                    $A.endMark("iteration rerenderEverything " + cmp.getGlobalId());
-                    $A.endMark("rerenderEverything in firstRender " + cmp.getGlobalId());
-                }
+                $A.endMark("iteration rerenderEverything " + cmp.getGlobalId());
+                $A.endMark("rerenderEverything in firstRender " + cmp.getGlobalId());
             }
         });
     },

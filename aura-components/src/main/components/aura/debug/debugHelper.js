@@ -17,7 +17,7 @@
 	output : function(cmp, name, msg, purgeOldData) {
 		var oldOutput = "";
 		if (purgeOldData !== true) {
-			oldOutput = cmp.get("v." + name).getValue() + "\n";
+			oldOutput = cmp.get("v." + name) + "\n";
 		}
 
 		cmp.set("v." + name, oldOutput + msg);

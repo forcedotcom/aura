@@ -25,7 +25,7 @@
     },
 
     toggleMBeans: function(cmp, event) {
-        var val = cmp.getValue("v.mbeans");
-        val.setValue(!val.getValue());
+        var val = $A.util.getBooleanValue(cmp.get("v.mbeans"));
+        cmp.set("v.mbeans", !val);
     }
 })

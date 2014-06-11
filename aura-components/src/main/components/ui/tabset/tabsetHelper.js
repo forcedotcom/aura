@@ -14,10 +14,6 @@
  * limitations under the License.
  */
 ({
-    CONSTANTS: {
-    	TAB_DEF : "markup://ui:tab",
-    	TAB_ITEM_DEF : "markup://ui:tabItem"
-    },
     /**
      * Set tab as active or deactive
      * @param {Component} cmp An instance of ui:tabset componen.
@@ -60,7 +56,7 @@
         	var e = cmp.find("tabBar").get("e.addTab");
         	e.setParams({"index": index, "active": active, "tab": self.getTabItemConfig(cmp, newTab)}).fire();
         	if (newTab.get("v.active")) {
-        	    this.setActiveTabBody(cmp, {"tab": newTab, "active": true});
+        	    this.setActiveTabBody(cmp, {"index": index, "tab": newTab, "active": true});
         	}
         	if (typeof callback === "function") {
         	    callback({"tab": newTab});
@@ -81,14 +77,13 @@
         }
         e.setParams({"index": index, "callback": callback}).fire();
     },
-    
     /**
      * Returns the active tab
      */
     getActiveTab: function(cmp) {
         return cmp._activeTab;
     },
-    
+    //=============================Private Functions==============================
     /**
      * @private
      */
@@ -107,8 +102,7 @@
      */
     setActiveTabBody: function(cmp, option) {
         // set active tab body;
-        var tabList = cmp._tabCollection, tab = option.tab, evt, 
-            activeTab = tabList.getActiveTab();
+        var index = option.index, tab = option.tab, evt;
   
         if (!tab.isRendered() && option.active) {
             // manually render tab component instead of setting v.body to avoid rerendering of all the tabs
@@ -119,13 +113,12 @@
             if (cmp._activeTab && cmp._activeTab.isValid()) {
                 evt = cmp._activeTab.get("e.setActive");
                 evt.setParams({"active": false}).fire();
-                cmp._activeTab = null;
             }
             //fire event to curent tab to update status 
             tab.get('e.setActive').setParams({active: true}).fire();
             //save current active tab
             cmp._activeTab = tab;
-        } else if (cmp._activeTab === tab){
+        } else if (activeTab === tab){
             //deactivate tab
             tab.get('e.setActive').setParams({active: false}).fire();
             cmp._activeTab = null;
@@ -135,7 +128,14 @@
      * @private
      */
     removeTabBody: function(cmp, index) {
-    	cmp._tabCollection.removeTab(index);
+        var activeIndex = cmp._tabCollection.getTabIndex({"tab": cmp._activeTab});
+        cmp._tabCollection.removeTab(index);
+    	var size = cmp._tabCollection.getSize();
+    	if (size > 0 && index === activeIndex) {
+    	    //activate next tab, or previous tabif the removed tab is the last one
+    	    index = (index === size) ? --index : index % size;
+    	    this.setActive(cmp, {"index": index});
+    	}
     },
     /**
      * Initialize tabs
@@ -150,7 +150,8 @@
         } else {
             //iterate v.body to find instances of ui:tab
             var result = this.getTabsFromBody(cmp);
-            cmp._tabCollection.init(result.tabs, result.tabIds, result.tabNames, result.activeIndex);
+            cmp._activeTabIndex = result.activeIndex;
+            cmp._tabCollection.init(result.tabs, result.tabIds, result.tabNames);
             cmp.set('v.tabItems', result.tabItemConfigs);
         }
     },
@@ -162,26 +163,30 @@
       //construct tabs from pass-in tab objects
         var tabComponents = [], tabIds = [], tabItems = [], tabNames = [], activeIndex = 0, 
             lazyRendering = cmp.get("v.lazyRenderTabs"),
-            count = tabConfigs.length;
+            count = 0, total = tabConfigs.length - 1;
         
         var callback = function(newTab) {
             var id = newTab.getGlobalId(),
                 name = newTab.get("v.name");
             
-            count--;
             tabIds.push(id);
             tabComponents[id] = newTab;
             tabItems.push(this.getTabItemConfig(cmp, newTab));
             if (name) {
                 tabNames[name] = {"tabId": id};
             }
-            if (count === 0) {
-                cmp._tabCollection.init(tabComponents, tabIds, tabNames, activeIndex);
+            if (newTab.get("v.active")) {
+                activeIndex = count;
+            }
+            if (count === total) {
+                cmp._activeTabIndex = activeIndex;
+                cmp._tabCollection.init(tabComponents, tabIds, tabNames);
                 cmp.set('v.tabItems', tabItems);
                 if (!lazyRendering) {
                     cmp.set('v.body', tabComponents);
                 }
             }
+            count++;
         }
         for (var i=0; i<tabConfigs.length; i++) {
             this.createTabComponent(cmp, tabConfigs[i], callback);
@@ -349,14 +354,12 @@
              this.tabComponents = [];
              this.tabIds = [];
              this.tabNames = [];
-             this.activeIndex = 0;
          };
          TabCollection.prototype = {
-             init: function(tabs, tabIds, tabNames, activeIndex) {
+             init: function(tabs, tabIds, tabNames) {
                  this.tabComponents = tabs;
                  this.tabIds = tabIds;
                  this.tabNames = tabNames;
-                 this.activeIndex = activeIndex;
              },
              getTabIndex: function(option) {
                  var index = -1;
@@ -367,9 +370,7 @@
                      }
                  } else if ($A.util.isComponent(option.tab)) {
                      var gId = option.tab.getGlobalId();
-                     if (this.tabComponents[gId]) {
-                         index = this.tabComponents[gId].index;
-                     }
+                     index = $A.util.arrayIndexOf(this.tabIds, gId);
                  }
                  return index;
              },
@@ -398,19 +399,7 @@
                      }
                      this.tabIds.splice(index, 0, id);
                      this.tabComponents[id] = tab;
-                     if (tab.get("v.active")) {
-                         this.activeIndex = index;
-                     }
                  }
-             },
-             setActiveTabIndex: function(index) {
-                 this.activeTabIndex = index;
-             },
-             getActiveTabIndex: function() {
-                 return this.activeIndex;
-             },
-             getActiveTab: function() {
-                 return this.tabIds[this.activeIndex];
              },
              getSize: function() {
                  return this.tabIds.length;
@@ -427,5 +416,10 @@
              }
          }
          return new TabCollection();
-     }
+     },
+     
+     CONSTANTS: {
+         TAB_DEF : "markup://ui:tab",
+         TAB_ITEM_DEF : "markup://ui:tabItem"
+     },
 })

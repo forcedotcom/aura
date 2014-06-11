@@ -16,6 +16,6 @@
 ({
     toggleValue : function(cmp, event) {
         var toggle = cmp.get("v.value");
-        cmp.set("v.value", toggle?"" : "<b>some value</b>");
+        cmp.set("v.value", (toggle ? "" : "<b>some value</b>"));
     }
 })

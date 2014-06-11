@@ -65,8 +65,8 @@
     },
     
     toggleValue : function(component, targetExpression) {
-        var val = component.getValue(targetExpression);
-        val.setValue(!val.unwrap());
+        var val = $A.util.getBooleanValue(component.get(targetExpression));
+        component.set(targetExpression, !val);
     },
     
     /**
@@ -381,7 +381,7 @@
                 this.assertChildCounters(added, 0);
                 var root = component;
                 $A.run(function(){
-                    root.getValue("v.emptyArray").clear();
+                    root.set("v.emptyArray", []);
                 });
                 $A.test.addWaitFor(0, function(){
                     return component.find("emptyArrayContainer").get("v.body")[0].get("v.value").length;

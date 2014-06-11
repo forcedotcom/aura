@@ -18,6 +18,7 @@ package org.auraframework.test.perf.rdp;
 import java.util.List;
 import java.util.Map;
 
+import org.auraframework.test.annotation.UnAdaptableTest;
 import org.auraframework.test.perf.core.AbstractPerfTestCase;
 import org.auraframework.test.perf.metrics.PerfMetric;
 import org.auraframework.test.perf.metrics.PerfMetricsCollector;
@@ -37,6 +38,8 @@ public final class RDPAnalyzerTest extends AbstractPerfTestCase {
         return 0; // so it only runs once in functional mode
     }
 
+    @UnAdaptableTest
+    // TODO: remove once we also use SauceLabs for perf tests in autobuild
     public void testProtocol() throws Exception {
         // run WebDriver test
         openTotallyRaw("/ui/label.cmp?label=foo");

@@ -74,6 +74,14 @@ public class ComponentPerfSuiteTest extends TestSuite {
         return ImmutableList.of("ui", "perf");
     }
 
+    /**
+     * Components that we aren't able to instantiate from client side. The reason could be a dependency to a server side
+     * model. Eg. ui:inputDate ui:action cmp should be abstract?
+     */
+    protected Set<String> getBlacklistedComponents() {
+        return BLACKLISTED_COMPONENTS;
+    }
+
     protected void createTestCases() throws Exception {
         if (System.getProperty("skipCmpPerfTests") != null) {
             LOG.info("Skipping Components Perf Tests");
@@ -125,7 +133,7 @@ public class ComponentPerfSuiteTest extends TestSuite {
 
                 for (DefDescriptor<ComponentDef> descriptor : descriptors) {
                     if (descriptor.getDef().isAbstract()
-                            || BLACKLISTED_COMPONENTS.contains(descriptor.getQualifiedName())) {
+                            || getBlacklistedComponents().contains(descriptor.getQualifiedName())) {
                         continue;
                     }
 

@@ -40,6 +40,10 @@ listData.get("e.triggerDataProvider").fire();
 		<aura:example name="infinitelist" ref="auradocs:demoList" label="Using ui:infiniteList">
     	<p>This example shows a simple implementation of a list. To load new data, either pull to refresh or click the Show More button.</p>
 	   </aura:example>
+	   <aura:example name="infiniteListRow" ref="uitest:infiniteListRow_Test" label="Using Row Actions">
+    	<p>This example shows a simple implementation of a list Action Row that has swipe behavior. To load new data, either pull to refresh or click the Show More button.</p>
+	   	<p>Inorder to play with swipe gesture you need to emulate the page on any mobile devices using developer tool</p>
+	   </aura:example>
 	   
 	
 </aura:documentation>

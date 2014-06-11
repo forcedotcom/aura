@@ -244,7 +244,16 @@
         component.perf = $A.PERFCORE = (function () {
             var WAIT_TIME = 100,
                 timestamp = !!console.timeStamp,
-                resultSets = {};
+                resultSets = {},
+                trimPerfMarkerSuffix = function(name) {
+                    var suffixes = [':start', ':end'];
+                    for(var i = 0; i < suffixes.length; i++) {
+                        if(name.length >= suffixes[i].length && name.substr(name.length - suffixes[i].length) ===  suffixes[i]) {
+                            return name.substr(0, name.length - suffixes[i].length);
+                        }
+                    }
+                    return name;
+                };
             return {
                 raf : function (callback) {
                     return window.requestAnimationFrame(callback);
@@ -262,12 +271,12 @@
                     }, time);
                 },
                 profileStart: function(name) {
-                    timestamp && console.timeStamp(name + ":start");
-                    $A.PERFCORE.stats.start(name);
+                    timestamp && console.timeStamp(name);
+                    $A.PERFCORE.stats.start(trimPerfMarkerSuffix(name));
                 },
                 profileEnd: function(name) {
-                    timestamp && console.timeStamp(name + ":end");
-                    $A.PERFCORE.stats.end(name);
+                    timestamp && console.timeStamp(name);
+                    $A.PERFCORE.stats.end(trimPerfMarkerSuffix(name));
                 },
                 setConfig: function (cfg) {
                     var perf = (cfg && cfg.perfConfig) || {};

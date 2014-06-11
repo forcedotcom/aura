@@ -25,6 +25,9 @@ import org.auraframework.test.annotation.PerfCustomTest;
 @PerfCustomTest
 public abstract class CustomPerfAbstractTestCase extends AbstractPerfTestCase {
 
+    private static final String PERF_START_MARKER_SUFFIX = ":start";
+    private static final String PERF_END_MARKER_SUFFIX = ":end";
+
     protected DefDescriptor<ComponentDef> descriptor;
 
     public CustomPerfAbstractTestCase(String name) {
@@ -36,14 +39,22 @@ public abstract class CustomPerfAbstractTestCase extends AbstractPerfTestCase {
         descriptor = desc;
     }
 
-    public abstract void testRun() throws Throwable;
-
     public void setComponentDef(DefDescriptor<ComponentDef> d) {
         descriptor = d;
     }
 
     @Override
+    public String getPerfStartMarker() {
+        return this.getName() + PERF_START_MARKER_SUFFIX;
+    }
+
+    @Override
+    public String getPerfEndMarker() {
+        return this.getName() + PERF_END_MARKER_SUFFIX;
+    }
+
+    @Override
     public final String getGoldFileName() {
-        return descriptor.getNamespace() + '/' + descriptor.getName();
+        return descriptor.getNamespace() + '/' + descriptor.getName() + '_' + this.getName();
     }
 }

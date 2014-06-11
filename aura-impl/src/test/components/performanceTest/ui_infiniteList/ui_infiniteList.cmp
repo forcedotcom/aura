@@ -13,7 +13,7 @@
 		</aura:set>
 	</ui:infiniteList>
 	
-	<ui:button aura:id="btnShowMore" label="show more" press="{!c.showMore}"/><br/>
-	<ui:button aura:id="btnRefresh" label="refresh" press="{!c.refresh}"/>
+	<ui:button aura:id="btnShowMore" class="showMore" label="show more" press="{!c.showMore}"/><br/>
+	<ui:button aura:id="btnRefresh" class="refresh" label="refresh" press="{!c.refresh}"/>
 	
 </aura:component>

@@ -19,21 +19,34 @@ import org.auraframework.test.perf.core.CustomPerfAbstractTestCase;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
-public final class DatePickerComponentTest extends CustomPerfAbstractTestCase {
+public final class InfiniteListComponentTest extends CustomPerfAbstractTestCase {
 
-    public DatePickerComponentTest(String name) {
+    public InfiniteListComponentTest(String name) {
         super(name);
 
-        setComponentDef(getDefDescriptor("perfTest:datePicker"));
+        setComponentDef(getDefDescriptor("performanceTest:ui_infiniteList"));
     }
 
-    public void testChangeYear() throws Throwable {
+    public void testShowMore() throws Throwable {
+        runWithPerfApp(descriptor);
+
+        //TODO: Move perfStart perfEnd wrappers as part of the test runner/suite
+        profileStart(getPerfStartMarker());
+
+        // Load more data.
+        WebElement element = currentDriver.findElement(By.cssSelector(".showMore"));
+        element.click();
+
+        profileEnd(getPerfEndMarker());
+    }
+
+    public void testRefresh() throws Throwable {
         runWithPerfApp(descriptor);
 
         profileStart(getPerfStartMarker());
 
-        // Change calendar year.
-        WebElement element = currentDriver.findElement(By.cssSelector(".nextYear"));
+        // Refresh the list
+        WebElement element = currentDriver.findElement(By.cssSelector(".refresh"));
         element.click();
 
         profileEnd(getPerfEndMarker());

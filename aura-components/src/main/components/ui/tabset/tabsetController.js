@@ -31,10 +31,11 @@
     },
     
     getActiveTab: function(cmp, evt, helper) {
-    	var tab = helper.getActiveTab(cmp);
     	var callback = evt.getParam("callback");
     	if (typeof callback === "function") {
-    	    callback({"tab": tab});
+    	    var tab = helper.getActiveTab(cmp);
+    	    var index = cmp._tabCollection.getTabIndex({"tab": tab});
+    	    callback({"index": index, "tab": tab});
     	}
     },
     

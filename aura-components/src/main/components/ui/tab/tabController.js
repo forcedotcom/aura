@@ -15,7 +15,10 @@
  */
 ({
 	setActive : function(cmp, evt) {
-	    var concrete = cmp.getConcreteComponent(), helper = concrete.getDef().getHelper();
+	    var concrete = cmp.getConcreteComponent(), helper = concrete.getDef().getHelper(), active = evt.getParam("active");
         helper.setActive(cmp, evt.getParam("active"));
+        if (active) {
+            cmp.get("e.onActivated").setParams({"tab": cmp}).fire();
+        }
     }
 })

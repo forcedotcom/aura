@@ -22,8 +22,6 @@
     	if (active) {
     		$A.util.addClass(tabEl, 'active');
     		tabEl.setAttribute("aria-expanded", "true");
-    		tabEl.focus();
-    		cmp.get("e.onActivated").fire();
     	} else {
     		$A.util.removeClass(tabEl, 'active');
     		tabEl.setAttribute("aria-expanded", "false");

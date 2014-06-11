@@ -286,6 +286,9 @@
     getTabComponents: function(body) {
         var type = "ui:tab";        
         var ret = [];
+        if (!body) {
+            return ret;
+        }
         for(var i=0;i<body.length;i++) {
             var c = body[i];
             if (c.isInstanceOf("aura:iteration")) {

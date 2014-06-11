@@ -1,0 +1,40 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component implements="ui:pagingInterface, ui:scrollerEmbeddable">
+    <aura:handler name="showMore" action="{!c.showMore}"/>
+    <aura:handler name="refresh" action="{!c.refresh}"/>
+	<div class="container" style="width: 320px; height:480px; border: 1px solid red; margin: 0px auto; overflow-x:hidden;">
+	<ui:infiniteList enableRowSwipe="true" aura:id="list" itemVar="row" currentPage="{!v.currentPage}" pageSize="{!v.pageSize}" totalItems="{!v.totalItems}">
+		<aura:set attribute="dataProvider">
+			<uitest:infiniteDataProvider currentPage="{!v.currentPage}" pageSize="{!v.pageSize}" totalItems="{!v.totalItems}"/>		
+		</aura:set>
+			
+		<aura:set attribute="itemTemplate">
+			<ui:infiniteListRow>
+					<aura:set attribute="swipeBody">
+						SwipeBody{!row.index}
+					</aura:set>
+					ListView{!row.index}
+			</ui:infiniteListRow>
+		</aura:set>
+	</ui:infiniteList>
+	</div>
+	<ui:button aura:id="btnShowMore" class="btnShowMore" label="show more" press="{!c.showMore}"/><br/>
+	<ui:button aura:id="btnRefresh" class="btnRefresh" label="refresh" press="{!c.refresh}"/>
+	
+</aura:component>

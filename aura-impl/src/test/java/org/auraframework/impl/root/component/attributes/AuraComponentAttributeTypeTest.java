@@ -23,6 +23,7 @@ import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.component.ComponentDefRefArray;
 import org.auraframework.impl.type.ComponentDefRefArrayTypeDef;
 import org.auraframework.instance.Component;
+import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 
@@ -131,31 +132,36 @@ public class AuraComponentAttributeTypeTest extends AuraImplTestCase {
         try {
             Aura.getInstanceService().getInstance(desc);
             fail("Should have failed creation because of incomplete formula.");
-        } catch (InvalidDefinitionException e) {
+        } catch (Exception e) {
+        	checkExceptionStart(e,InvalidDefinitionException.class,
+        			"markup://string:thing1:1,102: ParseError at [row,col]:[2,102]");
         }
 
-        // Non existing Component
-        // TODO: W-1300409 Not caught until serialization and the stack trace
-        // does not have any information about
-        // location
-        // desc = addSourceAutoCleanup(String.format(baseComponentTag,"",
-        // "<aura:attribute type='Aura.ComponentDefRef[]' name='attr'>" +
-        // "<nonexistant:cmp/>"+
-        // "</aura:attribute>"), ComponentDef.class);
-        // try{
-        // Aura.getInstanceService().getInstance(desc);
-        // fail("Should have failed creation because of non existing component.");
-        // }catch(AuraRuntimeException e){}
+         desc = addSourceAutoCleanup(ComponentDef.class, String.format(baseComponentTag,"",
+         "<aura:attribute type='Aura.ComponentDefRef[]' name='attr'>" +
+         "<nonexistant:cmp/>"+
+         "</aura:attribute>") );
+         
+         try{
+        	 Aura.getInstanceService().getInstance(desc);
+        	 fail("Should have failed creation because of non existing component.");
+         }catch(Exception e){
+        	 checkExceptionStart(e,DefinitionNotFoundException.class, 
+        			 "No COMPONENT named markup://nonexistant:cmp found");
+         }
 
-        // Missing required attribute
-        // TODO: W-1300410
-        // desc = addSourceAutoCleanup(String.format(baseComponentTag,"",
-        // "<aura:attribute type='Aura.ComponentDefRef[]' name='attr'>" +
-        // "<loadLevelTest:serverComponentWReqAttr/>"+
-        // "</aura:attribute>"), ComponentDef.class);
-        // try{
-        // Aura.getInstanceService().getInstance(desc);
-        // fail("Should have failed creation because of lack of value for required attribute.");
-        // }catch(AuraRuntimeException e){}
+         /*W-1300410 : this should fail as serverComponentWReqAttr is missing a 'required' attribute
+         desc = addSourceAutoCleanup(ComponentDef.class, String.format(baseComponentTag,"",
+         "<aura:attribute type='Aura.ComponentDefRef[]' name='attr'>" +
+         "<loadLevelTest:serverComponentWReqAttr/>"+
+         "</aura:attribute>"));
+         try{
+        	 Aura.getInstanceService().getInstance(desc);
+        	 fail("Should have failed creation because of lack of value for required attribute.");
+         }catch(Exception e){
+        	 checkExceptionStart(e,InvalidDefinitionException.class,"The value of attribute \"value\" associated with"
+        	 		+ " an element type \"null\" must not contain the '<' character");
+         }
+         */
     }
 }

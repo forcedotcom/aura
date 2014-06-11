@@ -155,11 +155,9 @@ var AuraRenderingService = function AuraRenderingService(){
                 }
 
                 if (cmp.isValid()) {
-	                var priorSibling = cmp.getRenderPriorSibling();
-	                var container = priv.push(cmp);
+	                priv.push(cmp);
 	                try {
                         var elements = cmp.render();
-                        cmp.setRenderContainer(container, priorSibling);
                         priv.finishRender(cmp, elements, ret, parent);
 	                } finally {
 	                    priv.pop(cmp);

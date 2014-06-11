@@ -93,15 +93,15 @@ var priv = {
         // first child in the render pass NOT to make a prior sibling cycle.
         var priorSibling;
         if (doublePush) {
-            priorSibling = cmp.getRenderPriorSibling();
+            priorSibling = cmp.getRenderPriorSibling();  // We already figured it out
         } else {
-            $A.componentStack.getNote('renderChild');
+            priorSibling = $A.componentStack.getNote('renderChild');
             if (priorSibling) {
                 var walkback = priorSibling;
-                while (walkback && walkback !== cmp) {
+                while (walkback && walkback.isValid() && walkback !== cmp) {
                     walkback = walkback.getRenderPriorSibling();
                 }
-                if (walkback === cmp) {
+                if (walkback === cmp || !priorSibling.isValid()) {
                     // Ensure we break the priorSibling cycle.  This is only true for
                     // the first child, because if it DOESN'T make a loop on the second
                     // iteration, second child's second iteration won't be able to loop. 
@@ -142,13 +142,13 @@ var priv = {
             // Even if we didn't previously have a container, figure it out now as the
             // containing context (assuming there is one).
             container = $A.componentStack.push(cmp);
+            cmp.setRenderContainer(container, priorSibling);
         }
 
-        cmp.setRenderContainer(container, priorSibling);
         if (inContainer) {
             $A.componentStack.addNote('renderContained', inContainer);
         }
-        return doublePush ? cmp : container;
+        return container;
     },
 
     /**

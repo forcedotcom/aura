@@ -41,8 +41,7 @@
                 $A.log(retValue);
                 component.find("out" + cmpName).set("v.value", retValue);
 
-                var value = component.find("in" + cmpName).getValue("v.value");
-                value.setValid(true);
+                component.find("in" + cmpName).setValid("v.value", true);
                 var cleanErrorEvent = component.find("in" + cmpName).getEvent("onClearErrors");
                 cleanErrorEvent.fire();
             } else {
@@ -50,9 +49,8 @@
 
                 var inCmp = component.find("in" + cmpName);
                 var errors = action.getError()
-                var value = inCmp.getValue("v.value");
-                value.setValid(false);
-                value.addErrors(errors);
+                inCmp.setValid("v.value", false);
+                inCmp.addErrors("v.value", errors);
                 var errorEvent = inCmp.getEvent("onError");
                 errorEvent.setParams({ "errors" : errors});
                 errorEvent.fire();

@@ -23,8 +23,7 @@
         return [ret];
     },
     rerender : function(component){
-        var color = component.getValue('v.color');
-        if (color.isDirty()) {
+        if (component.isDirty('v.color')) {
             var div = component.getElements().element;
             //Have something in the label to indicate the number of times this re-render function is called for the button
             var rerenderCount = 0;

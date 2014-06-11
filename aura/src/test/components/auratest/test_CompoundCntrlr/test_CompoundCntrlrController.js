@@ -20,7 +20,7 @@
         $A.rerender(button);
         /*Once we have the capability to run Client actions and Server actions which have same name, invoke the server action and
          * change the test to verify that the label on the button is clientActionserverAction
-        var a = $A.expressionService.getValue(cmp, "{!c.similarActionNames}");
+        var a = cmp.get("{!c.similarActionNames}");
         a.setCallback(cmp, function(action) {
             var apexActionReturnValue = action.getReturnValue();
             button.set("v.label", 'clientAction'+apexActionReturnValue);
@@ -31,7 +31,7 @@
     dissimilarActionNames: function(cmp, event) {
         var button = event.getSource();
         $A.rerender(cmp);
-        var a = $A.expressionService.get(cmp, "c.similarActionNames");
+        var a = cmp.get("c.similarActionNames");
         a.setCallback(cmp, function(action) {
             var apexActionReturnValue = action.getReturnValue();
             button.set("v.label", 'clientAction2'+apexActionReturnValue);
@@ -42,7 +42,7 @@
     anotherActionName: function(cmp, event) {
         var button = event.getSource();
         $A.rerender(cmp);
-        var a = $A.expressionService.get(cmp, "c.serverAction");
+        var a = cmp.get("c.serverAction");
         a.setCallback(cmp, function(action) {
             var apexActionReturnValue = action.getReturnValue();
             button.set("v.label", 'clientAction3'+apexActionReturnValue);

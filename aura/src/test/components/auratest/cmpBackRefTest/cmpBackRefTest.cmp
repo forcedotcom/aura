@@ -17,32 +17,32 @@
 -->
 <aura:component>
 
-<aura:renderIf isTrue="true">
-    <div id="ifDiv">
-        div inside renderIf
-    </div>
-</aura:renderIf>
-
-<aura:renderIf isTrue="false">
-<aura:set attribute="else">
-    <div id="elseDiv">
-        div inside else
-    </div>
-</aura:set>
-</aura:renderIf>
-
-<div>
-    <div>
-        <table>
-            <tr><td><ui:outputText aura:id="burriedOutputText" value="column-1"/></td></tr>
-            <tr><td><div id="burriedDiv">column-2</div></td></tr>
-        </table>
-    </div>
-</div>
-
-<ui:block aura:id="blockCmp">
- <aura:set attribute="left"><div id="leftBlockDiv">Div inside left block</div></aura:set>
- <div id="bodyBlockDiv">div in block body</div>
+	<aura:renderIf isTrue="true">
+	    <div id="ifDiv">
+	        div inside renderIf
+	    </div>
+	</aura:renderIf>
+	
+	<aura:renderIf isTrue="false">
+	<aura:set attribute="else">
+	    <div id="elseDiv">
+	        div inside else
+	    </div>
+	</aura:set>
+	</aura:renderIf>
+	
+	<div>
+	    <div>
+	        <table>
+	            <tr><td><ui:outputText aura:id="burriedOutputText" value="column-1"/></td></tr>
+	            <tr><td><div id="burriedDiv">column-2</div></td></tr>
+	        </table>
+	    </div>
+	</div>
+	
+	<ui:block aura:id="blockCmp">
+	 <aura:set attribute="left"><div id="leftBlockDiv">Div inside left block</div></aura:set>
+	 <div id="bodyBlockDiv">div in block body</div>
 </ui:block>
 
 </aura:component>

@@ -23,7 +23,7 @@
             data = component.get("m.listOf500Items");
         } else if (component.get("v.dataType") == "emptyList") {
         	$A.log("emptyList");
-            data = component.getValue("m.emptyList");
+            data = component.get("m.emptyList");
         } else {
         	$A.log("listOfData");
             data = component.get("m.listOfData");

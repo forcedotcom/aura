@@ -392,12 +392,10 @@
 		browsers : [ "-IE7", "-IE8" ],
 		test : [
 				function(cmp) {
-					cmp.getValue("v.isPageChangeActionCalled")
-							.setValue("false");
+					cmp.set("v.isPageChangeActionCalled", false);
 				},
 				function(cmp) {
-					this
-							.goToPageOnCarousel(cmp, "pgChangeAction", 2,
+					this.goToPageOnCarousel(cmp, "pgChangeAction", 2,
 									"cpca-p2");
 				},
 				function(cmp) {

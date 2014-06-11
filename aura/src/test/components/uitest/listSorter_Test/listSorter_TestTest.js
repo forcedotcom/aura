@@ -291,11 +291,11 @@
      * Get all display columns including hidden one from the model
      */
     getColumnsFromModel: function(listSorter){
-    	return listSorter.getValue("v.dataProvider").get(0).get("m.columns");
+    	return listSorter.get("v.dataProvider")[0].get("m.columns");
     },
 
     getDefaultOrderByListFromModel: function(listSorter){
-    	return listSorter.getValue("v.dataProvider").get(0).get("m.defaultOrderByList");
+    	return listSorter.get("v.dataProvider")[0].get("m.defaultOrderByList");
     },
 
     defaultSortOrder: function(listSorter){
@@ -312,14 +312,14 @@
 
     getDisplayedColumns: function(listSorter){
     	var menuCmp = listSorter.find("sorterMenuList");
-        var menuItems = menuCmp.getValue("v.childMenuItems");
+        var menuItems = menuCmp.get("v.childMenuItems");
         return menuItems;
     },
 
     getSelectedColumnsAndSortOrder: function(menuItems){
     	var values = [];
-        for (var i = 0; i < menuItems.getLength(); i++) {
-            var c = menuItems.getValue(i);
+        for (var i = 0; i < menuItems.length; i++) {
+            var c = menuItems[i];
             if (c.get("v.selected") === true) {
             	var label = c.get("v.label");
             	var selectedSortOrder = c.get("v.isascending") ? "A-Z" : "Z-A";
@@ -331,8 +331,8 @@
 
     getAllColumnsLabel: function(menuItems){
     	var values = [];
-        for (var i = 0; i < menuItems.getLength(); i++) {
-            var c = menuItems.getValue(i);
+        for (var i = 0; i < menuItems.length; i++) {
+            var c = menuItems[i];
             values.push(c.get("v.label"));
         }
         return values;
@@ -344,8 +344,8 @@
      */
     getMenuItemByColumnNumber: function(listSorter, columnNumber){
     	var menuItems = this.getDisplayedColumns(listSorter);
-    	if (!$A.util.isUndefinedOrNull(menuItems.getValue(columnNumber - 1))) {
-                return menuItems.getValue(columnNumber - 1);
+    	if (!$A.util.isUndefinedOrNull(menuItems[columnNumber - 1])) {
+                return menuItems[columnNumber - 1];
     	}
     	$A.test.fail("Test fail! Column not present in the Sort Menu");
     },

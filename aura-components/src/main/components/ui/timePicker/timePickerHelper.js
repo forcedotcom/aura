@@ -78,25 +78,23 @@
 
     updateHourValue: function(component, hours) {
         var is24HourFormat = $A.util.getBooleanValue(component.get("v.is24HourFormat"));
-        var hoursValue = component.getValue("v.hours");
         if (is24HourFormat === true) {
-            hoursValue.setValue(hours);
+        	component.set("v.hours", hours);
         } else {
             var amPmCmp = component.find("ampm");
             if (amPmCmp) {
                 var isPm = amPmCmp.get("v.value") == "pm";
                 if (hours == 12) { // 12am and 12pm
-                    hoursValue.setValue(isPm ? 12 : 0);
+                	component.set("v.hours", isPm ? 12 : 0);
                 } else {
-                    hoursValue.setValue(isPm ? parseInt(hours) + 12 : hours);
+                	component.set("v.hours", isPm ? parseInt(hours) + 12 : hours);
                 }
             }
         }
     },
 
     updateMinuteValue: function(component, minutes) {
-        var minutesValue = component.getValue("v.minutes");
-        minutesValue.setValue(minutes);
+    	component.set("v.minutes", minutes);
     },
 
     validateNumber: function(value, min, max) {

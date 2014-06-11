@@ -20,9 +20,8 @@
     testUnassigned: {
     	attributes : {testCmpName : "UnsetNumber"},
         test : function(component) {
-            var attr = component.getValue("v.value");
-            $A.test.assertEquals('SimpleValue', attr.toString());
-            $A.test.assertEquals(undefined, attr.getValue());
+            var attr = component.get("v.value");
+            $A.test.assertEquals(undefined, attr);
         }
     },
 

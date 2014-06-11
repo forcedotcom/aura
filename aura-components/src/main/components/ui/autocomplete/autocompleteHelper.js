@@ -29,15 +29,17 @@
         }
         
         // fire dataProvide event
-        var dataProviders = component.getValue("v.dataProvider");
+        var dataProviders = component.get("v.dataProvider");
         var index = event.getParam("index");
         if (!index) {
             index = 0;
         }
-        var provideEvent = dataProviders.get(index).get("e.provide");
+        
+        var provideEvent = dataProviders[index].get("e.provide");
         provideEvent.setParams({
             parameters: options
         });
+        
         provideEvent.fire();
     },
     

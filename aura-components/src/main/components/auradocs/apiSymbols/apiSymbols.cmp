@@ -20,9 +20,9 @@
     <aura:attribute name="symbols" type="Object[]"/>
     <h3>{!v.title}</h3>
     <div class="alert alert-info">
-        <aura:forEach items="{!v.symbols}" var="symbol">
+        <aura:iteration items="{!v.symbols}" var="symbol">
             <a onclick="{!c.jumpScroll}" class="jumplink">{!symbol._name}</a>
-        </aura:forEach>
+        </aura:iteration>
     </div>
 
     <table class="table table-bordered table-striped">

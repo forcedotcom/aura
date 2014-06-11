@@ -21,23 +21,23 @@
     <aura:attribute name="bool" type="Boolean[]"/>
 
     <forEachDefTest:forEachDefDisplay aura:id="start" number="0"/>
-    <aura:forEach items="{!m.stringListNull}" var="i">
+    <aura:iteration items="{!m.stringListNull}" var="i">
         <forEachDefTest:forEachDefDisplay aura:id="modelStringListNull" number="{!i}"/>
-    </aura:forEach>
-    <aura:forEach items="{!m.integerListNull}" var="i">
+    </aura:iteration>
+    <aura:iteration items="{!m.integerListNull}" var="i">
         <forEachDefTest:forEachDefDisplay aura:id="modelIntegerListNull" number="{!i}"/>
-    </aura:forEach>
-    <aura:forEach items="{!m.doubleListNull}" var="i">
+    </aura:iteration>
+    <aura:iteration items="{!m.doubleListNull}" var="i">
         <forEachDefTest:forEachDefDisplay aura:id="modelDoubleListNull" number="{!i}"/>
-    </aura:forEach>
-    <aura:forEach items="{!m.booleanListNull}" var="i">
+    </aura:iteration>
+    <aura:iteration items="{!m.booleanListNull}" var="i">
         <forEachDefTest:forEachDefDisplay aura:id="modelBooleanListNull" number="{!i}"/>
-    </aura:forEach>
-    <aura:forEach items="{!m.objectNull}" var="i">
+    </aura:iteration>
+    <aura:iteration items="{!m.objectNull}" var="i">
         <forEachDefTest:forEachDefDisplay aura:id="modelNull" number="{!i}"/>
-    </aura:forEach>
-    <aura:forEach items="{!m.emptyList}" var="i">
+    </aura:iteration>
+    <aura:iteration items="{!m.emptyList}" var="i">
         <forEachDefTest:forEachDefDisplay aura:id="modelEmptyList" number="{!i}"/>
-    </aura:forEach>
+    </aura:iteration>
     <forEachDefTest:forEachDefDisplay aura:id="end" number="1"/>
 </aura:component>

@@ -28,9 +28,9 @@
     </div>
     <div id="localeDataDiv" class="banner down">
         <u>Locale data</u> (You can change your browser locale from browser's language settings)<br/>
-        <aura:forEach items="{!m.localeData}" var="i">
+        <aura:iteration items="{!m.localeData}" var="i">
             <ui:outputText aura:id="currentLocale" value="{!i}"/><br/>
-        </aura:forEach>
+        </aura:iteration>
     </div>
 
 
@@ -50,12 +50,12 @@
 
     <!-- Output Number -->
     <ui:message severity="info">{!v.hardCoded}</ui:message>
-    <aura:forEach items="{!m.numbers}" var="i">
+    <aura:iteration items="{!m.numbers}" var="i">
         <div class="container">
             <div class="title">Output Number</div>
             <div class="bText">Number: <ui:outputNumber value='{!i}'/></div>
         </div>
-    </aura:forEach>
+    </aura:iteration>
     <br/>
 
 
@@ -75,12 +75,12 @@
 
     <!-- Output Date -->
     <ui:message severity="info">{!v.hardCoded}</ui:message>
-    <aura:forEach items="{!m.dates}" var="i">
+    <aura:iteration items="{!m.dates}" var="i">
         <div class="container">
             <div class="title">Output Date</div>
             <div class="bText">Date: <ui:outputDate value='{!i}'/></div>
         </div>
-    </aura:forEach>
+    </aura:iteration>
     <br/>
 
 
@@ -101,12 +101,12 @@
     <!-- Output Time -->
     <!-- Here we are actually using outputDateTime component -->
     <ui:message severity="info">{!v.hardCoded}</ui:message>
-    <aura:forEach items="{!m.times}" var="i">
+    <aura:iteration items="{!m.times}" var="i">
         <div class="container">
             <div class="title">Output Date Time</div>
             <div class="bText">Date Time: <ui:outputDateTime value='{!i}'/></div>
         </div>
-    </aura:forEach>
+    </aura:iteration>
     <br/>
 
 
@@ -141,12 +141,12 @@
 
     <!-- Output Percent -->
     <ui:message severity="info">{!v.hardCoded}</ui:message>
-    <aura:forEach items="{!m.percentages}" var="i">
+    <aura:iteration items="{!m.percentages}" var="i">
         <div class="container">
             <div class="title">Output Percent</div>
             <div class="bText">Percent: <ui:outputPercent value='{!i}'/></div>
         </div>
-    </aura:forEach>
+    </aura:iteration>
     <br/>
 
 
@@ -164,12 +164,12 @@
 
     <!-- Output Currency -->
     <ui:message severity="info">{!v.hardCoded}</ui:message>
-    <aura:forEach items="{!m.currencies}" var="i">
+    <aura:iteration items="{!m.currencies}" var="i">
         <div class="container">
             <div class="title">Output Currency</div>
             <div class="bText">Currency: <ui:outputCurrency value='{!i}'/></div>
         </div>
-    </aura:forEach>
+    </aura:iteration>
     <br/>
 
 
@@ -185,12 +185,12 @@
 
     <!-- Output Text -->
     <ui:message severity="info">{!v.hardCoded}</ui:message>
-    <aura:forEach items="{!m.strings}" var="i">
+    <aura:iteration items="{!m.strings}" var="i">
         <div class="container">
             <div class="title">Output Text</div>
             <div class="bText">Text: <ui:outputText value="{!i}"/></div>
         </div>
-    </aura:forEach>
+    </aura:iteration>
     <br/>
 
 </aura:application>

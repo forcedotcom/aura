@@ -19,13 +19,13 @@
     <aura:attribute name="descriptor" type="String" required="true"/>
     <aura:attribute name="defType" type="String" default="Component"/>
     <aside>
-        <aura:forEach items="{!m.dependencies}" var="config">
+        <aura:iteration items="{!m.dependencies}" var="config">
             <h3>{!config.type}s</h3>
             <ul class="nav nav-list">
-                <aura:forEach items="{!config.list}" var="dep">
+                <aura:iteration items="{!config.list}" var="dep">
                     <li><auradocs:descriptorLink defModel="{!dep}"/></li>
-                </aura:forEach>
+                </aura:iteration>
             </ul>
-        </aura:forEach>
+        </aura:iteration>
     </aside>
 </aura:component>

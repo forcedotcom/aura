@@ -33,19 +33,19 @@ public class ForEachUITest extends WebDriverTestCase {
     private static String FOREACH_COMPONENT = "<aura:component access=\"GLOBAL\" model=\"java://org.auraframework.impl.java.model.TestJavaModel\">"
             + "Result:"
             + "<div id=\"list_content\">"
-            + "<aura:foreach items=\"{!m.%s}\" var=\"i\">{!i}</aura:foreach>"
+            + "<aura:iteration items=\"{!m.%s}\" var=\"i\">{!i}</aura:iteration>"
             + "</div>\n" + "</aura:component>";
 
     private static String FOREACH_APP = "<aura:application access=\"GLOBAL\" render=\"client\" model=\"java://org.auraframework.impl.java.model.TestJavaModel\">"
             + "Result:"
             + "<div id=\"list_content\">"
-            + "<aura:foreach items=\"{!m.%s}\" var=\"i\">{!i}</aura:foreach>"
+            + "<aura:iteration items=\"{!m.%s}\" var=\"i\">{!i}</aura:iteration>"
             + "</div>" + "</aura:application>";
 
     private static String FOREACH_APP_SERVER = "<aura:application access=\"GLOBAL\" render=\"server\" model=\"java://org.auraframework.impl.java.model.TestJavaModel\">"
             + "Result:"
             + "<div id=\"list_content\">"
-            + "<aura:foreach items=\"{!m.%s}\" var=\"i\">{!i}</aura:foreach>"
+            + "<aura:iteration items=\"{!m.%s}\" var=\"i\">{!i}</aura:iteration>"
             + "</div>" + "</aura:application>";
 
     /**
@@ -59,7 +59,7 @@ public class ForEachUITest extends WebDriverTestCase {
 
     /**
      * Test ForEach iteration over a list of Strings.
-     * 
+     *
      * @throws Exception
      */
     public void testForEachStringList() throws Exception {
@@ -73,7 +73,7 @@ public class ForEachUITest extends WebDriverTestCase {
 
     /**
      * Test ForEach iteration over empty list.
-     * 
+     *
      * @throws Exception
      */
     public void testForEachEmpty() throws Exception {

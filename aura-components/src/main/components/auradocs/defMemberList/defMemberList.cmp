@@ -28,7 +28,7 @@
             </tr>
         </thead>
         <tbody>
-            <aura:foreach items="{!v.list}" var="item">
+            <aura:iteration items="{!v.list}" var="item">
                 <aura:if isTrue="{!item.name != null || item.type != null}">
                     <tr>
                         <td>{!item.name}</td>
@@ -45,7 +45,7 @@
                         {!item.description}</td>
                     </tr>
                 </aura:if>
-            </aura:foreach>
+            </aura:iteration>
         </tbody>
     </table>
     {!v.body}

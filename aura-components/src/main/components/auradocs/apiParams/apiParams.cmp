@@ -19,8 +19,8 @@
     <aura:attribute name="params" type="Object[]"/>
     <h6 class="nav-header">Parameters</h6>
     <ul class="nav nav-list">
-        <aura:forEach items="{!v.params}" var="param">
+        <aura:iteration items="{!v.params}" var="param">
             <auradocs:apiParam symbol="{!param}"/>
-        </aura:forEach>
+        </aura:iteration>
     </ul>
 </aura:component>

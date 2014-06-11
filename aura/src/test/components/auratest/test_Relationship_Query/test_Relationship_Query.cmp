@@ -17,8 +17,8 @@
 -->
 <aura:component render="client">
     <!-- Model access a account object which has Contacts associated with it -->
-    <aura:forEach items="{!m.account.contacts}" var="i">
+    <aura:iteration items="{!m.account.contacts}" var="i">
         <auratest:test_Relationship_Query1 contactAttr="{!i}"/>
         <br/>
-    </aura:forEach>
+    </aura:iteration>
 </aura:component>

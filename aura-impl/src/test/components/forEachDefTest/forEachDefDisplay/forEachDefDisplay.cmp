@@ -28,8 +28,8 @@
     <div aura:id='bool' class='bool_t'>{!v.bool}</div>
     <div aura:id='object' class='object_t'>{!v.obj}</div>
     <div aura:id='list' class='list_t'>
-        <aura:forEach items="{!v.list}" var="i">
+        <aura:iteration items="{!v.list}" var="i">
             {!i}
-        </aura:forEach>
+        </aura:iteration>
     </div>
 </aura:component>

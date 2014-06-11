@@ -17,7 +17,7 @@
 -->
 <aura:component>
     <aura:attribute name="StringArray" type="String[]"/>
-    <aura:forEach items="{!v.StringArray}" var="i">
+    <aura:iteration items="{!v.StringArray}" var="i">
         {!i}
-    </aura:forEach>
+    </aura:iteration>
 </aura:component>

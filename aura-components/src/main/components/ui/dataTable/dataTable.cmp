@@ -32,13 +32,13 @@
                 <thead><tr aura:id="header"/></thead>
 
                 <!-- DCHASMAN For now (will be fixed once aura:public/forEach over dynamic content is fixed) body must be of the form:
-                <aura:foreach items="{!items}" var="varname">
+                <aura:iteration items="{!items}" var="varname">
                     <ui:dataTableRow>
                         <ui:dataTableColumn headerValue="someHeaderValue">
                             *** anything you want in here ***
                         <ui:dataTableColumn>
                     </ui:dataTableRow>
-                </aura:foreach> -->
+                </aura:iteration> -->
                 <tbody>{!v.body}</tbody>
 
             </table>

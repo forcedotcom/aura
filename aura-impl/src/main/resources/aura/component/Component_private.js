@@ -26,7 +26,7 @@ var ComponentPriv = (function() { // Scoping priv
         this.rendered = false;
         this.inUnrender = false;
         this.localId = config["localId"];
-        this.valueProviders = undefined;
+        this.valueProviders = {};
         this.actionRefs = undefined;
         this.eventDispatcher = undefined;
         this.docLevelHandlers = undefined;
@@ -77,6 +77,7 @@ var ComponentPriv = (function() { // Scoping priv
             if (this.creationPath && this.creationPath !== "client created") {
                 partialConfig = context.getComponentConfig(this.creationPath);
             }
+
             if (partialConfig) {
                 this.partialConfig = partialConfig;
 
@@ -191,8 +192,7 @@ var ComponentPriv = (function() { // Scoping priv
             // for application type events
             this.setupApplicationEventHandlers(cmp);
 
-            // index this component with its value provider (if it has a
-            // localid)
+            // index this component with its value provider (if it has a localid)
             this.doIndex(cmp);
 
             // instantiate the renderer for this component
@@ -259,7 +259,7 @@ var ComponentPriv = (function() { // Scoping priv
         } else {
             // Try map based providers followed by the rarely accessed keys
             // (globalId, def, ...)
-            var provider = this.valueProviders ? this.valueProviders[key] : undefined;
+            var provider = this.valueProviders[key];
             if (provider) {
                 return provider;
             } else if (key === "globalId") {
@@ -281,7 +281,7 @@ var ComponentPriv = (function() { // Scoping priv
         if (!this.delegateValueProvider) {
             var actionProvider = this.createActionValueProvider(cmp);
             if (actionProvider) {
-                this.getValueProviders()["c"] = actionProvider;
+                this.valueProviders["c"] = actionProvider;
             }
         }
 
@@ -295,10 +295,6 @@ var ComponentPriv = (function() { // Scoping priv
     };
 
     ComponentPriv.prototype.getValueProviders = function() {
-        if (!this.valueProviders) {
-            this.valueProviders = {};
-        }
-
         return this.valueProviders;
     };
 
@@ -308,7 +304,7 @@ var ComponentPriv = (function() { // Scoping priv
             this.actionRefs = {};
             var ar = this.actionRefs;
             return {
-                getValue : function(key) {
+                get : function(key) {
                     var ret = ar[key];
                     if (!ret) {
                         var actionDef = controllerDef.getActionDef(key);
@@ -317,19 +313,9 @@ var ComponentPriv = (function() { // Scoping priv
                             ar[key] = ret;
                         }
                     }
-                    return ret;
-                },
-
-                get : function(key) {
-                    return $A.expressionService.get(this, key);
-                },
-
-                setValue : function(key, value) {
-                    aura.assert(false, "ControllerDef.setValue not Implemented.");
+                    return ret.getAction();
                 }
             };
-        } else {
-            return undefined;
         }
     };
 
@@ -372,17 +358,17 @@ var ComponentPriv = (function() { // Scoping priv
     };
 
     ComponentPriv.prototype.setupAttributes = function(config, cmp, localCreation) {
-        var configAttributes = config || {};
-        this.attributes = new AttributeSet(configAttributes, configAttributes["valueProvider"],
-            this.componentDef.getAttributeDefs(), cmp, localCreation);
+       var configAttributes = config || {};
+        this.attributes = new AttributeSet(configAttributes, configAttributes["valueProvider"], this.componentDef.getAttributeDefs(), cmp, localCreation);
     };
 
     ComponentPriv.prototype.validateAttributes = function(cmp) {
         var attributeDefSet = this.componentDef.attributeDefs;
-        if (attributeDefSet && attributeDefSet.each) {
+        if (attributeDefSet && attributeDefSet.length) {
             var compPriv = this;
-            if (compPriv.attributes && compPriv.attributes.getValue && attributeDefSet.each) {
-                attributeDefSet.each(function(attrDef) {
+            if (compPriv.attributes) {
+                for(var i=0;i<attributeDefSet.length;i++){
+                    var attrDef=attributeDefSet[i];
                     if (attrDef.isRequired && attrDef.isRequired()) {
                         var name = attrDef.getDescriptor().getQualifiedName();
                         var zuper = cmp;
@@ -395,13 +381,12 @@ var ComponentPriv = (function() { // Scoping priv
                             }
                         }
                     }
-                });
+                }
             }
         }
     };
 
-    ComponentPriv.prototype.setupSuper = function(attributeValueProvider,
-                    configAttributes, localCreation, ccc) {
+    ComponentPriv.prototype.setupSuper = function(attributeValueProvider, configAttributes, localCreation, ccc) {
         var superDef = this.componentDef.getSuperDef();
         if (superDef) {
             var attributeValues = {};
@@ -413,7 +398,7 @@ var ComponentPriv = (function() { // Scoping priv
                 valuesAlreadySet = configAttributes["valuesAlreadySet"] ? configAttributes["valuesAlreadySet"]
                                 : {};
                 for (key in values) {
-                    attributeValues[key] = new PropertyReferenceValue([ "v", key ]);
+                    attributeValues[key] = values[key]["descriptor"]?values[key]["value"]:values[key];
                 }
             }
 
@@ -430,7 +415,6 @@ var ComponentPriv = (function() { // Scoping priv
                                 valuesAlreadySet[facetName] = true;
                             }
                         }
-                        
                         attributeValues[facetName] = facet["value"];
                     }
                 }
@@ -455,9 +439,8 @@ var ComponentPriv = (function() { // Scoping priv
             var setSuperComponent = function(component) {
                 self.superComponent = component;
                 if (component) {
-                    var valueProviders = self.getValueProviders();
-                    if (!valueProviders["super"]) {
-                        valueProviders["super"] = component;
+                    if (!self.valueProviders["super"]) {
+                        self.valueProviders["super"] = component;
                     }
                 }
             };
@@ -479,43 +462,33 @@ var ComponentPriv = (function() { // Scoping priv
     };
 
     ComponentPriv.prototype.getActionCaller = function(valueProvider, actionExpression) {
-        if (aura.util.isString(actionExpression)) {
-            actionExpression = valueFactory.parsePropertyReference(actionExpression);
-        }
-
-        var actionRef = valueFactory.create(actionExpression);
-
         return function(event) {
             if (valueProvider.isValid && !valueProvider.isValid()) {
                 return;
             }
-
-            var clientAction = expressionService.getValue(valueProvider, actionRef);
+            var clientAction;
+            if($A.util.isExpression(actionExpression)){
+                 clientAction=actionExpression.evaluate();
+            }else{
+                 clientAction=valueProvider.get(actionExpression);
+            }
             if (clientAction) {
-                if (clientAction.unwrap) {
-                    clientAction = clientAction.unwrap();
-                }
                 clientAction.runDeprecated(event);
             } else {
-                aura.assert(false, "no client action by name " + actionRef.getValue());
+                aura.assert(false, "no client action by name " + actionExpression);
             }
         };
     };
 
     ComponentPriv.prototype.getEventDispatcher = function(cmp) {
         if (!this.eventDispatcher && cmp) {
-            var dispatcher = {};
-
-            dispatcher.getValue = function(key) {
-                return cmp.getEvent(key);
+            var dispatcher = {
+                "get": function(key) {
+                    return cmp.getEvent(key);
+                }
             };
-
-            dispatcher.get = function(key) {
-                return this.getValue(key);
-            };
-
             this.eventDispatcher = dispatcher;
-            this.getValueProviders()["e"] = dispatcher;
+            this.valueProviders["e"] = dispatcher;
         }
 
         return this.eventDispatcher;
@@ -567,17 +540,16 @@ var ComponentPriv = (function() { // Scoping priv
     };
 
     function getHandler(cmp, actionExpression) {
-        var actionRef = valueFactory.create(actionExpression);
         return function(event) {
             if (cmp.isValid && !cmp.isValid()) {
                 return;
             }
 
-            var clientAction = expressionService.get(cmp, actionRef);
+            var clientAction = cmp.get(actionExpression);
             if (clientAction) {
                 clientAction.runDeprecated(event);
             } else {
-                aura.assert(false, "no client action by name " + actionRef.getValue());
+                aura.assert(false, "no client action by name " + actionExpression);
             }
         };
     }
@@ -604,8 +576,8 @@ var ComponentPriv = (function() { // Scoping priv
             for (var i = 0; i < handlerDefs.length; i++) {
                 var handlerDef = handlerDefs[i];
                 var handlerConfig = {};
-                handlerConfig["action"] = valueFactory.create(handlerDef["action"]);
-                handlerConfig["value"] = valueFactory.create(handlerDef["value"]);
+                handlerConfig["action"] = valueFactory.create(handlerDef["action"],null,cmp);
+                handlerConfig["value"] = valueFactory.create(handlerDef["value"],null,cmp);
                 handlerConfig["event"] = handlerDef["name"];
                 cmp.addValueHandler(handlerConfig);
             }
@@ -700,7 +672,7 @@ var ComponentPriv = (function() { // Scoping priv
             };
 
             renderer["superRerender"] = function() {
-                return superRenderer.def.rerender(superRenderer.renderable);
+                superRenderer.def.rerender(superRenderer.renderable);
             };
 
             renderer["superAfterRender"] = function() {
@@ -711,7 +683,7 @@ var ComponentPriv = (function() { // Scoping priv
                 superRenderer.def.unrender(superRenderer.renderable);
             };
         }
-        
+
         this.renderer = renderer;
     };
 
@@ -754,6 +726,7 @@ var ComponentPriv = (function() { // Scoping priv
         return value ? value.toString() : value;
     };
 
+    // JBUCH: HALO: WHAT IS THIS, I DON'T EVEN
     ComponentPriv.prototype.outputMapValue = function(value, avp, serialized, depth) {
         var ret = {};
         var that = this;
@@ -762,7 +735,8 @@ var ComponentPriv = (function() { // Scoping priv
 
             try {
                 if (str === "PropertyReferenceValue" || (str === "FunctionCallValue" && avp)) {
-                    ret[key] = that.output(val.getValue(avp), avp, serialized, depth);
+                    //#debugger
+                    ret[key] = that.output(val.evaluate(avp), avp, serialized, depth);
                 } else if (val && val.auraType && val.auraType === "Value") {
                     ret[key] = that.output(val.unwrap(), avp, serialized, depth);
                 } else {
@@ -784,36 +758,12 @@ var ComponentPriv = (function() { // Scoping priv
      * it would mess with encapsulation and because the (internal) renderer is
      * what, by definition, "knows" the container.
      *
-     * We actually store only the global ID for parent and sibling, because
-     * otherwise we get components with large and even cyclic structures, and
-     * that does bad things to debug tools, json, etc.
-     *
      * @param {Component} parent the parent component
      * @param {Component} priorSibling the earlier child of parent, or undefined
      */
     Component.prototype.setRenderContainer = function(parent, priorSibling) {
-        $A.assert(parent !== this);
-        $A.assert(priorSibling !== this);
-
-//#if {"excludeModes" : ["PRODUCTION"]}
-        // This should be a needless loop cost, so let's leave it out in production.
-        // But I've found enough screwiness in nesting combinations of (re/un)render
-        // that in debug it might be worthwhile.  If a cycle IS created, you get a
-        // fun-to-debug infinite loop in AuraRenderingService_private.reorderForContainment,
-        // or an even more fun error about "Object has too long reference chain(must not
-        // be longer than 1000)" when something internal tries serializing the cycle. 
-        var cyclic = {};
-        cyclic[this.getGlobalId()] = this;
-        var dad = parent;
-        while (dad) {
-            $A.assert(!cyclic[dad.getGlobalId()], "cyclic parentage");
-            cyclic[dad.getGlobalId()] = dad;
-            dad = dad.getRenderContainer();
-        }
-//#end
-
-        this.priv.container = parent ? parent.getGlobalId() : undefined;
-        this.priv.priorSibling = priorSibling ? priorSibling.getGlobalId() : undefined;
+        this.priv.container = parent;
+        this.priv.priorSibling = priorSibling;
     };
 
     /** @private@
@@ -824,8 +774,7 @@ var ComponentPriv = (function() { // Scoping priv
      * the context inside which it is used.
      */
     Component.prototype.getRenderContainer = function() {
-        var id = this.priv.container;
-        return id ? $A.componentService.get(id) : undefined;
+        return this.priv.container;
     };
 
     /** @private@
@@ -837,121 +786,7 @@ var ComponentPriv = (function() { // Scoping priv
      * the context inside which it is used.
      */
     Component.prototype.getRenderPriorSibling = function() {
-        var id = this.priv.priorSibling;
-        return id ? $A.componentService.get(id) : undefined;
-    };
-
-    /** @private@
-     * Updates the elements for a contained component's re-render.
-     * Replaces in this components' elements, the "oldElems" list with "newElems,"
-     * assuming oldElems is found.  Sometimes oldElems has already been unrendered
-     * and destroyed, in which case newElems is spliced in to create a two-step
-     * replacement rather than a simple single-step one, but with the same net
-     * effect.
-     *
-     * @param prevElem {Element} undefined if there are no prior siblings, else
-     *                  the last DOM element *before* oldElems
-     * @param oldElems {Object} our funky almost-an-array cmp.priv.elements list
-     *                  of what should be (or perhaps has been) removed
-     * @param newElems {Object} a replacement for oldElems
-     *
-     * @returns true if a change was made, false if not found (which implies the
-     *    contained child's elements are not part of this component or its ancestors'
-     *    elements).
-     */
-    Component.prototype.updateElements = function(prevElem, oldElems, newElems) {
-        var start = 0;
-        var elems = this.getElements();
-        var i;
-
-        if (prevElem) {
-            // I really wish we used an Array for elements, not the Object-almost-an-array
-            // that we do use.  Anyway, this code is really just looking for prevElem in
-            // this.getElements(), returning false if not found, and otherwise splicing to
-            // replace oldElems with newElems and returning true.
-            for (start = 0; elems[start]; ++start) {
-                if (elems[start] === prevElem) {
-                    break;
-                }
-            }
-            if (!elems[start]) {  // Didn't find it
-                $A.error("Rerender couldn't find prior element to use when updating container");
-            }
-            start++;  // Move start to be an insertion point, after priorElem
-        }
-
-        // Check that, if any, ALL of oldElems are found.  It'd be weird to have a
-        // partial subset rather than all-of-nothing.
-        if (elems[start] === oldElems[0]) {
-            for (i = 1; oldElems[i]; ++i) {
-                $A.assert(oldElems[i] === elems[start + i],
-                        "Found too few stale elements (only " + i + ")");
-            }
-        } else {
-            // just pretend we're splicing from an empty oldElems
-            oldElems = {};
-        }
-        // And our splice... we need to know the new and old lengths, first
-        var newLen;
-        for (newLen = 0; newElems[newLen]; ++newLen) {
-            // count items in newElems
-        }
-        var oldLen;
-        for (oldLen = 0; oldElems[oldLen]; ++oldLen) {
-            // count items in oldElems
-        }
-        // Now, splice.
-        if (newLen <= oldLen) {
-            // Copy new onto old (it fits), then any extras fold down
-            for (i = 0; i < newLen; ++i) {
-                elems[start + i] = newElems[i];
-            }
-            for (elems; elems[i]; ++i) {
-                if (elems[start + oldLen + i]) {
-                    elems[start + i] = elems[start + oldLen + i];
-                } else {
-                    delete elems[start + i];
-                }
-            }
-        } else {
-            // New doesn't fit into old.  We need to move extra stuff up, top first, then copy.
-            for (i = 0; elems[i + 1]; ++i) {
-                // count i up to index of last *present* value
-            }
-            var delta = newLen - oldLen;
-            for (i; i >= start + oldLen; --i) {
-                // from end backwards, copy post-oldElems items up by delta, stopping at end of oldElems sequence
-                elems[i + delta] = elems[i];
-            }
-            // Now we've made room, copy new into elems
-            for (i = 0; i < newLen; ++i) {
-                elems[start + i] = newElems[i];
-            }
-        }
-        // Splicing done.  elems[start] to elems[newLen] are now a match to newElems, replacing
-        // elems[start] to elems[oldLen] which WAS a match to oldElems.
-
-        // If elems.element happens to be one end or the other of the oldElems, replace it from
-        // the newElems, or if that's empty, from other bits of elems (or delete it).
-        if (elems.element === oldElems[0]) {
-            if (newLen > 0) {
-                elems.element = newElems[0];
-            } else if (start > 0) {
-                elems.element = elems[start - 1];
-            } else {
-                delete elems.element;
-            }
-        } else if (elems.element === oldElems[oldLen - 1]) {
-            if (newLen > 0) {
-                elems.element = newElems[newLen - 1];
-            } else if (elems[start]) {
-                elems.element = elems[start];
-            } else {
-                delete elems.element;
-            }
-        }
-
-        return true;
+        return this.priv.priorSibling;
     };
 
     ComponentPriv.prototype.outputArrayValue = function(value, avp, serialized, depth) {
@@ -977,13 +812,12 @@ var ComponentPriv = (function() { // Scoping priv
             ret.rendered = cmp.isRendered();
             ret.valid = cmp.isValid();
             ret.attributes = {};
-            var attributes = cmp.getAttributes();
             var model = cmp.getModel();
             if (model) {
-                ret.model = this.output(model, attributes.getValueProvider(), serialized, depth);
+                ret.model = this.output(model, cmp.getAttributeValueProvider(), serialized, depth);
             }
-            ret.attributeValueProvider = this.output(attributes.getValueProvider(),
-                attributes.getValueProvider(), serialized, depth);
+            ret.attributeValueProvider = this.output(cmp.getAttributeValueProvider(),
+                cmp.getAttributeValueProvider(), serialized, depth);
 
             var zuper = cmp.getSuper();
             if (zuper && depth < 10) {
@@ -999,11 +833,11 @@ var ComponentPriv = (function() { // Scoping priv
                 var key = attributeDef.getDescriptor().toString();
                 var val;
                 try {
-                    val = attributes.getRawValue(key);
-                } catch (ignore) {
+                    val = cmp.get("v."+key);
+                } catch (e) {
+                    val = undefined;
                 }
-                ret.attributes[key] = that.output(val, attributes
-                                .getValueProvider(), serialized, depth);
+                ret.attributes[key] = that.output(val, cmp.getAttributeValueProvider(), serialized, depth);
             });
 
             ret.attributes["__proto__"] = null;

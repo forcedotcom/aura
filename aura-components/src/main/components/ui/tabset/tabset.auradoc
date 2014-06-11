@@ -1,0 +1,8 @@
+<aura:documentation>
+    <aura:description>
+        <code>ui:​tabset</code>​ displays the content of the active tab. By default, the tabs are displayed horizontally inline with content shown below it.
+    </aura:description>
+    <aura:example name="tabset" ref="uiExamples:tabsetExample" label="Using ui:tabset">
+        <p>This example shows different ways to implement a tabset.</p>
+    </aura:example>
+</aura:documentation>

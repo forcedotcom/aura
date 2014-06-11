@@ -40,10 +40,10 @@ public abstract class XMLHandler<T extends Definition> {
 
     private static final String SYSTEM_TAG_PREFIX = "aura";
 
-    public final static Set<String> SYSTEM_TAGS = ImmutableSet.of(ForEachDefHandler.TAG, ApplicationDefHandler.TAG,
+    public final static Set<String> SYSTEM_TAGS = ImmutableSet.of(ApplicationDefHandler.TAG,
             AttributeDefHandler.TAG, ComponentDefHandler.TAG, EventDefHandler.TAG, InterfaceDefHandler.TAG,
-            EventHandlerDefHandler.TAG, ImportDefHandler.TAG, LayoutDefHandler.TAG, LayoutsDefHandler.TAG, 
-            LayoutItemDefHandler.TAG, RegisterEventHandler.TAG, AttributeDefRefHandler.TAG, DependencyDefHandler.TAG, 
+            EventHandlerDefHandler.TAG, ImportDefHandler.TAG, LayoutDefHandler.TAG, LayoutsDefHandler.TAG,
+            LayoutItemDefHandler.TAG, RegisterEventHandler.TAG, AttributeDefRefHandler.TAG, DependencyDefHandler.TAG,
             NamespaceDefHandler.TAG, ThemeDefHandler.TAG);
 
     protected final XMLStreamReader xmlReader;
@@ -74,7 +74,7 @@ public abstract class XMLHandler<T extends Definition> {
     /**
      * Handles the XML for this object and returns a new definition. Expects that the reader has already been moved to a
      * START_ELEMENT, and when this method returns it will leave the reader at the appropriate END_ELEMENT
-     * 
+     *
      * @throws XMLStreamException If the stream is not queued up properly
      * @throws QuickFixException
      */
@@ -87,7 +87,7 @@ public abstract class XMLHandler<T extends Definition> {
     public Set<String> getAllowedAttributes() {
         return Collections.emptySet();
     }
-    
+
     protected org.auraframework.system.Location getLocation() {
         return XMLParser.getLocation(xmlReader, source);
     }

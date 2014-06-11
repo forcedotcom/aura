@@ -43,7 +43,8 @@
     },
     
     onTabActivated: function(cmp, evt, helper) {
-        helper.setActiveTabBody(cmp, {"tab": cmp._tabCollection.getTab(evt.getParam("index")), "active": true});
+        var index = evt.getParam("index");
+        helper.setActiveTabBody(cmp, {"index":index, "tab": cmp._tabCollection.getTab(index), "active": true});
     },
     
     onTabClosed: function(cmp, evt, helper) {

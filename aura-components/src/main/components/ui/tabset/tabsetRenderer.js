@@ -16,7 +16,7 @@
 ({
     afterRender : function(cmp, helper){
         this.superAfterRender();
-        helper.setActive(cmp, {"index": cmp._tabCollection.getActiveTabIndex()});
+        helper.setActive(cmp, {"index": cmp._activeTabIndex});
     },
     
     unrender: function(cmp, helper) {

@@ -133,8 +133,8 @@ public class AuraComponentAttributeTypeTest extends AuraImplTestCase {
             Aura.getInstanceService().getInstance(desc);
             fail("Should have failed creation because of incomplete formula.");
         } catch (Exception e) {
-        	checkExceptionStart(e,InvalidDefinitionException.class,
-        			"markup://string:thing1:1,102: ParseError at [row,col]:[2,102]");
+        	checkExceptionContains(e,InvalidDefinitionException.class,
+        	"ParseError at [row,col]:[2,102]");
         }
 
          desc = addSourceAutoCleanup(ComponentDef.class, String.format(baseComponentTag,"",
@@ -143,7 +143,7 @@ public class AuraComponentAttributeTypeTest extends AuraImplTestCase {
          "</aura:attribute>") );
          
          try{
-        	 Aura.getInstanceService().getInstance(desc);
+        	 Aura.getDefinitionService().getDefinition(desc);
         	 fail("Should have failed creation because of non existing component.");
          }catch(Exception e){
         	 checkExceptionStart(e,DefinitionNotFoundException.class, 

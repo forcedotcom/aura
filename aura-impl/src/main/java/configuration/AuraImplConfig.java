@@ -15,6 +15,7 @@
  */
 package configuration;
 
+import org.auraframework.Aura;
 import org.auraframework.adapter.BeanAdapter;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ContextAdapter;
@@ -105,6 +106,8 @@ import org.auraframework.service.LoggingService;
 import org.auraframework.service.RenderingService;
 import org.auraframework.service.SerializationService;
 import org.auraframework.service.ServerService;
+import org.auraframework.test.TestContextAdapter;
+import org.auraframework.test.TestContextAdapterImpl;
 import org.auraframework.util.ServiceLoaderImpl.AuraConfiguration;
 import org.auraframework.util.ServiceLoaderImpl.Impl;
 import org.auraframework.util.ServiceLoaderImpl.PrimaryImpl;
@@ -436,5 +439,10 @@ public class AuraImplConfig {
     @Impl
     public static StyleAdapter themeValueAdapter() {
         return new StyleAdapterImpl();
+    }
+
+    @Impl
+    public static TestContextAdapter auraImplTestContextAdapter() {
+        return Aura.getConfigAdapter().isProduction() ? null : new TestContextAdapterImpl();
     }
 }

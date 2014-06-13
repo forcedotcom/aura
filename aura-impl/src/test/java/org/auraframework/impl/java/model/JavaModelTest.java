@@ -20,6 +20,7 @@ import java.io.IOException;
 import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.Definition;
 import org.auraframework.def.ModelDef;
 import org.auraframework.def.ValueDef;
 import org.auraframework.impl.AuraImplTestCase;
@@ -107,6 +108,11 @@ public class JavaModelTest extends AuraImplTestCase {
         @Override
         public int compareTo(DefDescriptor<?> other) {
             return DefDescriptorImpl.compare(this, other);
+        }
+
+        @Override
+        public DefDescriptor<? extends Definition> getBundle() {
+            return null;
         }
     };
 

@@ -17,12 +17,12 @@
     open : function(cmp, event){
 
         event.preventDefault();
-        var defModel = cmp.getValue("v.defModel");
+        var defModel = cmp.get("v.defModel");
 
         var evt = $A.get("e.auraide:openDef");
         evt.setParams({
-            descriptor : defModel.getRawValue("descriptor"),
-            defType : defModel.getRawValue("defType")
+            descriptor : defModel["descriptor"],
+            defType : defModel["defType"]
         });
         evt.fire();
     }

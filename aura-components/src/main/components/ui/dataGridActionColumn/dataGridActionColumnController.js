@@ -15,10 +15,9 @@
  */
 ({
 	init: function (cmp, evt) {
-
 		// TODO: move into provider
 		if (!cmp.get('v.outputComponent').length) {
-			cmp.set('v.outputComponent', cmp.getValue('v.body'));
+			cmp.set('v.outputComponent', cmp.get('v.body'));
 		}
 	}
 })

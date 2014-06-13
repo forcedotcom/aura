@@ -59,15 +59,8 @@
 	 * Update page content
 	 */
 	updatePage: function(cmp, pageBody) {
-		var pageContainer = cmp.find('pageContainer').getValue('v.body');
-
-		if (!pageContainer.isEmpty()) {
-			pageContainer.destroy(true);
-        }
-
-		if (pageBody) {
-			pageContainer.setValue(pageBody);
-		}
+		var pageContainer = cmp.find('pageContainer');
+		pageContainer.set("v.body", pageBody ? pageBody : []);
 	},
 
 	/**

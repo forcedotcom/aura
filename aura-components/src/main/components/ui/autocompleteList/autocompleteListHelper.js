@@ -19,8 +19,8 @@
      * @return the index of the highlighted component; -1 if no opton is highlighted now.
      */
     findHighlightedOptionIndex: function(iters) {
-        for (var i = 0; i < iters.getLength(); i++) {
-            var optionCmp = iters.getValue(i);
+        for (var i = 0; i < iters.length; i++) {
+            var optionCmp = iters[i];
             if (optionCmp.get("v.visible") === true && optionCmp.get("v.highlighted") === true) {
                 return i;
                 break;
@@ -56,17 +56,18 @@
 
     getNextVisibleOption: function(iters, k) {
         var next = -1;
-        var start = k >= iters.getLength() - 1 ? 0 : k + 1;
-        for (var i = start; i < iters.getLength(); i++) {
-            var optionCmp = iters.getValue(i);
+        var start = k >= iters.length - 1 ? 0 : k + 1;
+        for (var i = start; i < iters.length; i++) {
+            var optionCmp = iters[i];
             if (optionCmp.get("v.visible") === true) {
                 next = i;
                 break;
             }
         }
+        
         if (next < 0) { // If no visible is found below the current highlighted,  let's start from top.
             for (var j = 0; j < k; j++) {
-                var optionCmp = iters.getValue(j);
+                var optionCmp = iters[j];
                 if (optionCmp.get("v.visible") === true) {
                     next = j;
                     break;
@@ -185,18 +186,18 @@
     },
 
     getPrevVisibleOption: function(iters, k) {
-        var prev = iters.getLength();
-        var start = k <= 0 ? iters.getLength() - 1 : k - 1;
+        var prev = iters.length;
+        var start = k <= 0 ? iters.length - 1 : k - 1;
         for (var i = start; i >= 0; i--) {
-            var optionCmp = iters.getValue(i);
+            var optionCmp = iters[i];
             if (optionCmp.get("v.visible") === true) {
                 prev = i;
                 break;
             }
         }
-        if (prev >= iters.getLength()) { // If no visible is found above the current highlighted,  let's start from bottom.
-            for (var j = iters.getLength() - 1; j > k; j--) {
-                var optionCmp = iters.getValue(j);
+        if (prev >= iters.length) { // If no visible is found above the current highlighted,  let's start from bottom.
+            for (var j = iters.length - 1; j > k; j--) {
+                var optionCmp = iters[j];
                 if (optionCmp.get("v.visible") === true) {
                     prev = j;
                     break;
@@ -236,21 +237,22 @@
         var activeIndex = -1;
         var iterCmp = component.find("iter");
         if (iterCmp) {
-            var iters = iterCmp.getValue("v.realbody");
+            var iters = iterCmp.get("v.realbody");
             var highlightedIndex = this.findHighlightedOptionIndex(iters);
             var index = event.getParam("activeIndex");
             if (index < 0) { // highlight previous visible option
-                activeIndex = highlightedIndex < 0 ? this.getPrevVisibleOption(iters, iters.getLength())
+                activeIndex = highlightedIndex < 0 ? this.getPrevVisibleOption(iters, iters.length)
                                                    : this.getPrevVisibleOption(iters, highlightedIndex);
             } else { // highlight next visible option
                 activeIndex = highlightedIndex < 0 ? this.getNextVisibleOption(iters, -1)
                                                    : this.getNextVisibleOption(iters, highlightedIndex);
             }
-            if (activeIndex >= 0 && activeIndex < iters.getLength() && activeIndex != highlightedIndex) {
+            if (activeIndex >= 0 && activeIndex < iters.length && activeIndex != highlightedIndex) {
                 if (highlightedIndex >= 0) {
-                    iters.getValue(highlightedIndex).set("v.highlighted", false);
+                    iters[highlightedIndex].set("v.highlighted", false);
                 }
-                var highlightedCmp = iters.getValue(activeIndex);
+                
+                var highlightedCmp = iters[activeIndex];
                 highlightedCmp.set("v.highlighted", true);
                 this.updateAriaAttributes(component, highlightedCmp);
             }
@@ -260,10 +262,10 @@
     handlePressOnHighlighted: function(component, event) {
         var iterCmp = component.find("iter");
         if (iterCmp) {
-            var iters = iterCmp.getValue("v.realbody");
+            var iters = iterCmp.get("v.realbody");
             var highlightedIndex = this.findHighlightedOptionIndex(iters);
             if (highlightedIndex >= 0) {
-                var targetCmp = iters.getValue(highlightedIndex);
+                var targetCmp = iters[highlightedIndex];
                 var selectEvt = component.get("e.selectListOption");
                 selectEvt.setParams({
                     option: targetCmp

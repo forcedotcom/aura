@@ -47,7 +47,7 @@
 	},
 	
 	initDataProvider: function(cmp) {
-        var dataProviders = cmp.getValue("v.dataProvider").unwrap();
+        var dataProviders = cmp.get("v.dataProvider");
         
         if ($A.util.isArray(dataProviders)) {
         	cmp._dataProviders = dataProviders;
@@ -173,12 +173,13 @@
 			}
 		}*/
 		//reset selected menu items
-		var menuItems = cmp.find('sorterMenuList').getValue('v.childMenuItems')		 
-		for (var i=0; i < menuItems.getLength(); i++) {			 
-			var item = menuItems.getValue(i);
+		var menuItems = cmp.find('sorterMenuList').get('v.childMenuItems')		 
+		for (var i=0; i < menuItems.length; i++) {			 
+			var item = menuItems[i];
 			if (item.get('v.selected') === true) {
 				item.set('v.selected', false, true);
 			}
+			
 			item.set('v.isAscending', true);
 		}
 	},
@@ -255,9 +256,9 @@
 		var menuList = cmp.find('sorterMenuList');
 		var values = [];		
 	    if (menuList) {	    
-			var menuItems = menuList.getValue('v.childMenuItems');	         
-			for (var i = 0; i < menuItems.getLength(); i++) {
-				var c = menuItems.getValue(i);
+			var menuItems = menuList.get('v.childMenuItems');	         
+			for (var i = 0; i < menuItems.length; i++) {
+				var c = menuItems[i];
 			    if (c.get('v.selected') === true) {			    	
 			    	values.push({fieldName: c.get('v.value'), label: c.get('v.label'), index: i, isAscending: c.get('v.isAscending')});
 			    }
@@ -276,18 +277,19 @@
 	
 	selectMenuItem : function(cmp, selectedItems) {
 		var menuList = cmp.find('sorterMenuList');
-		var menuItems = menuList.getValue('v.childMenuItems');
+		var menuItems = menuList.get('v.childMenuItems');
 		if (selectedItems && selectedItems.length > 0) {
 			var item;
 			for (var i = 0; i < selectedItems.length; i++) {
 				if (typeof selectedItems[i].index != 'undefined') {
-					item = menuItems.getValue(selectedItems[i].index);
+					item = menuItems[selectedItems[i].index];
 					if (item) {
 						item.set('v.selected', true);
 						item.set('v.isAscending', selectedItems[i].ascending);
 					}
 				}
 			}
+			
 			this.updateSortOrder(cmp);
 		}
 	},
@@ -514,17 +516,17 @@
 		var items = cmp.get('v.items');
 		var menuList = cmp.find('sorterMenuList');
 		var onFinish = function(newItems) {
-			var menuListBody = menuList.getValue('v.body');
-			menuListBody.each(function(item){
+			var menuListBody = menuList.get('v.body');
+			for (var n = 0; n < menuListBody.length; n++) {
 				//until we get rid of the parent attribute in the menuItem, which is anti-pattern
 				//need to reset v.parent attribute to empty array, otherwise, the parent component will be destroyed also
-				var v = item.getValue('v.parent');
-				v.setValue([], true);
-				v.commit();
-			});
-			menuListBody.destroy(true);
+				var item = menuListBody[n];
+				item.set('v.parent', [], true);
+			}
+			
 			menuList.set('v.body', newItems);
 		};
+		
 		this._createMenuItems(cmp, items, onFinish);
 	},
 

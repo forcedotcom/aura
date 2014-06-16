@@ -18,6 +18,12 @@ package org.auraframework.impl.root.parser.handler;
 
 import java.util.ArrayList;
 
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.Definition;
+import org.auraframework.impl.source.StringSourceLoader;
+import org.auraframework.system.Source;
+
 public class AccessAttributeEnforcementTest extends
 		BaseAccessAttributeEnforcementTest {
 
@@ -97,7 +103,7 @@ public class AccessAttributeEnforcementTest extends
 	 * @throws Exception
 	 */
 	public void testComponentWithUnescapedHTML() throws Exception {
-		String resourceSource = "<aura:component><aura:unescapedHtml/></aura:component>";
+		String resourceSource = "<aura:component><aura:unescapedHtml value='Hello World!'/></aura:component>";
 		
 		ArrayList<String> failures = new ArrayList<String>();
 
@@ -157,4 +163,113 @@ public class AccessAttributeEnforcementTest extends
 			fail("Test failed with " + failures.size() + " errors:" + message);
 		}
     }
+	
+	/**
+	 * Verify Creating a component with aura:if
+	 * @throws Exception
+	 */
+	public void testComponentWithIf() throws Exception {
+		String resourceSource = "<aura:component><aura:if isTrue='True' body='' else='' /></aura:component>";
+		
+		ArrayList<String> failures = new ArrayList<String>();
+
+		for (TestNamespace targetNamespace : TestNamespace.values()) {
+			testResourceNamespace = targetNamespace;
+			
+			try {
+				runSimpleTestCase(resourceSource);
+			} catch (Throwable e) {
+				failures.add(e.getMessage());
+			}	
+			
+		}
+
+		if (!failures.isEmpty()) {
+			String message = "\n";
+			for (int i = 0; i < failures.size(); i++) {
+				message += failures.get(i);
+				if (i != failures.size() - 1) {
+					message += ",\n";
+				}
+			}
+
+			fail("Test failed with " + failures.size() + " errors:" + message);
+		}
+    }
+	
+	/**
+	 * Verify Creating a component with aura:renderIf
+	 * @throws Exception
+	 */
+	public void testComponentWithRenderIf() throws Exception {
+		String resourceSource = "<aura:component><aura:renderIf isTrue='True' else='' /></aura:component>";
+		
+		ArrayList<String> failures = new ArrayList<String>();
+
+		for (TestNamespace targetNamespace : TestNamespace.values()) {
+			testResourceNamespace = targetNamespace;
+			
+			try {
+				runSimpleTestCase(resourceSource);
+			} catch (Throwable e) {
+				failures.add(e.getMessage());
+			}	
+			
+		}
+
+		if (!failures.isEmpty()) {
+			String message = "\n";
+			for (int i = 0; i < failures.size(); i++) {
+				message += failures.get(i);
+				if (i != failures.size() - 1) {
+					message += ",\n";
+				}
+			}
+
+			fail("Test failed with " + failures.size() + " errors:" + message);
+		}
+    }
+	
+	/**
+	 * Verify Creating a component with aura:foreach
+	 * @throws Exception
+	 */
+	public void testComponentWithForEach() throws Exception {
+		String resourceSource = "<aura:component><aura:attribute name='list' type='Object' /><aura:foreach items=\"{!v.list}\" var=\"i\">{!i}</aura:foreach></aura:component>";
+		String errorMessage = "No COMPONENT named markup://aura:foreach found";
+		runNegativeTestCase(resourceSource, errorMessage);		
+    }
+	
+	/**
+	 * Verify Creating a component with aura:clientLibrary
+	 * @throws Exception
+	 */
+	public void testComponentWithClientLibrary() throws Exception {
+		String resourceSource = "<aura:component><aura:clientLibrary name='HTML5Shiv' type='JS' /></aura:component>";
+		String errorMessage = "No COMPONENT named markup://aura:clientLibrary found";
+		runNegativeTestCase(resourceSource, errorMessage);		
+    }
+	
+	/**
+	 * Verify Creating a component with aura:dependency
+	 * @throws Exception
+	 */
+	public void testComponentWithDependency() throws Exception {
+		DefDescriptor<ComponentDef> cmpDescA = addSourceAutoCleanup(ComponentDef.class, "<aura:component/>");
+		String resourceSource = "<aura:component><aura:dependency resource='"+cmpDescA.getQualifiedName()+"'/></aura:component>";
+		String errorMessage = "No COMPONENT named markup://aura:dependency found";
+		runNegativeTestCase(resourceSource, errorMessage);		
+    }
+
+	private void runNegativeTestCase(String resourceSource, String errorMessage) throws Exception {								
+		DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, resourceSource, TestNamespace.Custom+":testCmp", false);
+		Source<? extends Definition> source = StringSourceLoader.getInstance().getSource(descriptor);
+		try {
+			Definition def = parser.parse(descriptor, source);
+			def.validateDefinition();
+			fail("Should have thrown Exception");			
+		} catch (Exception e) {
+			assertTrue("Expected error message: " + errorMessage, e.getMessage().contains(errorMessage));//
+		}
+	}
 }

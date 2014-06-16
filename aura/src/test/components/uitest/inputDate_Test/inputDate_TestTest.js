@@ -218,7 +218,7 @@
     /**
      * Clear date icon should be displayed on mobile only and clears date.
      */
-    testClearButton: {
+    _testClearButton: {
     	test: [function(component) {
     		// initially no clear icon
     		this.verifyClearIcon(false);

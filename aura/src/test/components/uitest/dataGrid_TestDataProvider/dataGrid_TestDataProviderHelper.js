@@ -18,7 +18,7 @@
      * Only sorts by numeric columns like 'id'.
      * ascending - b is greater than a.
      */
-    sort: function (items, column, descending) {
+    sort: function (items, column, ascending) {
         items.sort(function (a, b) {
             var aGtb = parseInt(a[column]) > parseInt(b[column]),
                 ret;
@@ -33,7 +33,7 @@
                 ret = -1;
             }
 
-            if (descending) {
+            if (!ascending) {
                 ret = -ret;
             }
 
@@ -42,26 +42,18 @@
     },
 
     createTasks: function (cmp, currentPage, pageSize) {
-        var items = [],
-        	index;
+        var items = [];
 
         // Hack to make 'zero based'. 
         --currentPage;
 
         for (var i = 1; i <= pageSize; i++) {
-        	index = (currentPage * pageSize) + i;
             items.push({
-                id           : index,
-                subject      : 'Foo ' + index, 
-                activityDate : '2014-01-01',
-                who          : {
-                    name : 'John Doe With A Fairly Long Name ' + index,
-                    id   : '001'
-                },
-                what: {
-                    name : 'Acme' + index,
-                    id   : '001'
-                }
+                id           : ((currentPage * pageSize) + i),
+                subject      : 'Foo ' + ((currentPage * pageSize) + i), 
+                date : '2014-01-01',
+                name : 'John Doe',
+                relatedTo : 'Acme'
             });
         }
 

@@ -18,7 +18,7 @@
 <aura:component>
     <aura:attribute name="mode" type="String" default="VIEW"/>
     <aura:attribute name="sortBy" type="String"/>
-    <aura:attribute name="pageSize" type="Integer" default="20"/>
+    <aura:attribute name="pageSize" type="Integer" default="50"/>
     <aura:attribute name="currentPage" type="Integer" default="1"/>
     <aura:attribute name="totalItems" type="Integer"/>
     <aura:attribute name="index" type="Integer"/>
@@ -33,7 +33,7 @@
     <ui:inputText placeholder="index" value="{!v.index}"/>
     <ui:inputText placeholder="count" value="{!v.count}"/>
 
-    <ui:dataGrid aura:id="grid" mode="{!v.mode}" sortBy="{!v.sortBy}">
+    <ui:dataGridNew aura:id="grid" mode="{!v.mode}" sortBy="{!v.sortBy}">
         <aura:set attribute="columns">
             <ui:dataGridSelectionColumn/>
 
@@ -42,29 +42,30 @@
             <ui:dataGridColumn label="Name" name="who.name"/>
             <ui:dataGridColumn label="Related To" name="what.name"/>
             <ui:dataGridColumn label="Due Date" name="activityDate"/>
-
+<!--
             <ui:dataGridActionColumn label="Actions">
                 <ui:actionButton name="edit" label="Edit" index="{!index}"/>
                 <ui:actionButton name="delete" label="Del" index="{!index}"/>
             </ui:dataGridActionColumn>
+-->
         </aura:set>
-
+<!--
         <aura:set attribute="summaryRow">
             <ui:dataGridSummaryCell column="id" type="SUM"/> 
         </aura:set>
-
+-->
         <aura:set attribute="dataProvider">
             <uiExamples:dataGridKitchenSinkDataProvider sortBy="{!v.sortBy}"
                                                    pageSize="{!v.pageSize}"
                                                    currentPage="{!v.currentPage}"
                                                    totalItems="{!v.totalItems}"/>
         </aura:set>
-
+<!--
         <aura:set attribute="actionDelegate">
             <ui:actionDelegate onaction="{!c.handleAction}"/>
         </aura:set>
-
-    </ui:dataGrid>
+-->
+    </ui:dataGridNew>
 
     <ui:pagerNextPrevious pageSize="{!v.pageSize}"
                                   currentPage="{!v.currentPage}"

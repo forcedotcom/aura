@@ -281,7 +281,6 @@
 
 	handleAddRemove: function (cmp, params) {
 		var concrete = cmp.getConcreteComponent(),
-			priv_rows = concrete.getValue('v.priv_rows'),
 			mode = cmp.get('v.mode'),
 			index;
 

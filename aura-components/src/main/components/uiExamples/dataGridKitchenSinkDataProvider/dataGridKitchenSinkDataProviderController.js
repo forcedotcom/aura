@@ -24,15 +24,15 @@
             sortBy = cmp.get('v.sortBy'),
             tasks = hlp.createTasks(cmp, currentPage, pageSize),
             column = sortBy, 
-            ascending = true;
-
+            descending = false;
+        
         if (column && column.indexOf('-') === 0) {
             column = sortBy.slice(1);
-            ascending = false;
+            descending = true;
         }
 
         if (column) {
-            hlp.sort(tasks, column, ascending);
+            hlp.sort(tasks, column, descending);
         }
 
         hlp.fireDataChangeEvent(cmp, tasks);

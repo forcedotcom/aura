@@ -84,7 +84,7 @@
                             var newValue;
                             var oldValue = element[helper.caseAttribute(lowerName)];
 
-                            if (aura.util.arrayIndexOf(helper.SPECIAL_BOOLEANS, lowerName) > -1) {
+                            if ($A.util.arrayIndexOf(helper.SPECIAL_BOOLEANS, lowerName) > -1) {
                                 // JBUCH: TEMPORARY FIX FOR HALO
                                 newValue = $A.util.getBooleanValue(value.getValue());
                             } else {
@@ -145,7 +145,7 @@
         var elements = component.getElements();
         for (var key in elements) {
             var element = elements[key];
-            aura.util.removeElement(element);
+            $A.util.removeElement(element);
             delete elements[key];
         }
     }

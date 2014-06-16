@@ -17,6 +17,7 @@ package org.auraframework.test.perf.core;
 
 import java.util.Enumeration;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -30,29 +31,44 @@ import org.auraframework.util.ServiceLocator;
 @UnAdaptableTest
 @PerfTestSuite
 public class FrameworkPerfTestSuiteTest extends TestSuite {
-	public static TestSuite suite() throws Exception {
-		TestSuite suite = new TestSuite();
-		if (System.getProperty("skipFrameworkPerfTests") != null) {
-			System.out.println("Skipping Framework Perf Tests");
-			return suite;
-		}
-		System.out.println("Bootstrapping Framework Perf Tests");
-		Set<TestInventory> inventories = ServiceLocator.get().getAll(TestInventory.class);
-		
-		// Get all the performance tests that extend from the framework class
-		for (TestInventory inventory : inventories) {
-            TestSuite child = inventory.getTestSuite(Type.PERFCMP);
-            if (child != null ) {
-                for (Enumeration<?> tests = child.tests(); tests.hasMoreElements();) {
-                	Test next = (Test)tests.nextElement();
-                	if (FrameworkPerfAbstractTestCase.class.isAssignableFrom(next.getClass())) {
-                		System.out.println("Adding Framework TestCase:" + next.toString());
-                		suite.addTest(next);
-                	}
+
+    private static final Logger LOG = Logger.getLogger(FrameworkPerfTestSuiteTest.class.getSimpleName());
+
+    public static TestSuite suite() throws Exception {
+        return new FrameworkPerfTestSuiteTest();
+    }
+
+    private FrameworkPerfTestSuiteTest() throws Exception {
+        super("Framework Perf tests");
+        createTestCases();
+    }
+
+    private void createTestCases() throws Exception {
+        if (System.getProperty("skipFrameworkPerfTests") != null) {
+            LOG.info("Skipping " + getName());
+            return;
+        }
+
+        LOG.info("Bootstrapping " + getName());
+
+        Set<TestInventory> inventories = ServiceLocator.get().getAll(TestInventory.class);
+        for (TestInventory inventory : inventories) {
+            TestSuite child = inventory.getTestSuite(Type.PERFFRAMEWORK);
+            addSuite(child);
+        }
+    }
+
+    private void addSuite(TestSuite suite) {
+        if (suite != null) {
+            for (Enumeration<?> tests = suite.tests(); tests.hasMoreElements();) {
+                Test next = (Test) tests.nextElement();
+                if (next instanceof TestSuite) {
+                    addSuite((TestSuite) next);
+                } else if (next instanceof FrameworkPerfAbstractTestCase) {
+                    LOG.info("Adding Framework TestCase:" + next.toString());
+                    addTest(next);
                 }
             }
         }
-        suite.setName("Framework Perf tests");
-        return suite;
     }
 }

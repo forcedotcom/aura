@@ -17,6 +17,7 @@ package org.auraframework.test.perf.core;
 
 import java.util.Enumeration;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -30,30 +31,44 @@ import org.auraframework.util.ServiceLocator;
 @UnAdaptableTest
 @PerfTestSuite
 public class CustomPerfTestSuiteTest extends TestSuite {
-	public static TestSuite suite() throws Exception {
-		TestSuite suite = new TestSuite();
-		if (System.getProperty("skipCustomPerfTests") != null) {
-			System.out.println("Skipping Custom Perf Tests");
-			return suite;
-		}
-		
-		System.out.println("Bootstrapping Custom Perf Tests");
-		Set<TestInventory> inventories = ServiceLocator.get().getAll(TestInventory.class);
-		
-		// Get all the performance tests that extend from the framework class
-		for (TestInventory inventory : inventories) {
+
+    private static final Logger LOG = Logger.getLogger(CustomPerfTestSuiteTest.class.getSimpleName());
+
+    public static TestSuite suite() throws Exception {
+        return new CustomPerfTestSuiteTest();
+    }
+
+    private CustomPerfTestSuiteTest() throws Exception {
+        super("Custom Perf tests");
+        createTestCases();
+    }
+
+    private void createTestCases() throws Exception {
+        if (System.getProperty("skipCustomPerfTests") != null) {
+            LOG.info("Skipping " + getName());
+            return;
+        }
+
+        LOG.info("Bootstrapping " + getName());
+
+        Set<TestInventory> inventories = ServiceLocator.get().getAll(TestInventory.class);
+        for (TestInventory inventory : inventories) {
             TestSuite child = inventory.getTestSuite(Type.PERFCUSTOM);
-            if (child != null ) {
-                for (Enumeration<?> tests = child.tests(); tests.hasMoreElements();) {
-                	Test next = (Test)tests.nextElement();
-                	if (FrameworkPerfAbstractTestCase.class.isAssignableFrom(next.getClass())) {
-                		System.out.println("Adding Custom TestCase:" + next.toString());
-                		suite.addTest(next);
-                	}
+            addSuite(child);
+        }
+    }
+
+    private void addSuite(TestSuite suite) {
+        if (suite != null) {
+            for (Enumeration<?> tests = suite.tests(); tests.hasMoreElements();) {
+                Test next = (Test) tests.nextElement();
+                if (next instanceof TestSuite) {
+                    addSuite((TestSuite) next);
+                } else if (next instanceof CustomPerfAbstractTestCase) {
+                    LOG.info("Adding Custom TestCase:" + next.toString());
+                    addTest(next);
                 }
             }
         }
-        suite.setName("Custom Perf tests");
-        return suite;
     }
 }

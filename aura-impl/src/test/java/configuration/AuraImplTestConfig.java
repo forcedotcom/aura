@@ -23,9 +23,7 @@ import org.auraframework.impl.DefinitionServiceImplTest.AuraTestRegistryProvider
 import org.auraframework.impl.adapter.MockConfigAdapterImpl;
 import org.auraframework.impl.context.TestLoggingAdapterImpl;
 import org.auraframework.impl.util.AuraImplFiles;
-import org.auraframework.test.TestContextAdapter;
 import org.auraframework.test.TestInventory;
-import org.auraframework.test.adapter.TestContextAdapterImpl;
 import org.auraframework.util.ServiceLoaderImpl.AuraConfiguration;
 import org.auraframework.util.ServiceLoaderImpl.Impl;
 import org.auraframework.util.ServiceLoaderImpl.PrimaryImpl;
@@ -60,10 +58,5 @@ public class AuraImplTestConfig {
     @Impl
     public static RegistryAdapter auraImplTestRegistryAdapterWithNulls() {
         return new AuraTestRegistryProviderWithNulls();
-    }
-
-    @Impl
-    public static TestContextAdapter auraImplTestContextAdapter() {
-        return new TestContextAdapterImpl();
     }
 }

@@ -62,10 +62,12 @@ public class JSTestModel {
         tcds = filterTestCases(test);
 
         TestContextAdapter contextAdapter = Aura.get(TestContextAdapter.class);
-        for (TestCaseDef tcd : tcds) {
-            TestContext testContext = contextAdapter.getTestContext(tcd.getDescriptor().getQualifiedName());
-            testContext.getLocalDefs().clear();
-            testContext.getLocalDefs().addAll(tcd.getLocalDefs());
+        if (contextAdapter != null) {
+            for (TestCaseDef tcd : tcds) {
+                TestContext testContext = contextAdapter.getTestContext(tcd.getDescriptor().getQualifiedName());
+                testContext.getLocalDefs().clear();
+                testContext.getLocalDefs().addAll(tcd.getLocalDefs());
+            }
         }
     }
 

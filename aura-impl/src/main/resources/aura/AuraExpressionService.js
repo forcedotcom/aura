@@ -17,186 +17,111 @@
  * @namespace The Aura Expression Service, accessible using $A.expressionService.  Processes Expressions.
  * @constructor
  */
-var AuraExpressionService = function AuraExpressionService() {
-	// var propertyRefCache = {};
+var AuraExpressionService = function AuraExpressionService(){
+	var propertyRefCache = {};
 
-	var expressionService = {
-		setValue : function(valueProvider, expression, value) {
-			if (expression.getValue) {
-				expression = expression.getValue();
-			}
-			var lastDot = expression.lastIndexOf('.');
-			aura.assert(lastDot > 0, "Invalid expression for setValue");
+    var expressionService = {
+        setValue : function(valueProvider, expression, value){
+            if (expression.getValue) {
+                expression = expression.getValue();
+            }
+            var lastDot = expression.lastIndexOf('.');
+            aura.assert(lastDot>0, "Invalid expression for setValue");
 
-			var parentExpression = expression.substring(0, lastDot) + "}";
-			var lastPart = expression.substring(lastDot + 1, expression.length - 1);
+            var parentExpression = expression.substring(0, lastDot)+"}";
+            var lastPart = expression.substring(lastDot+1, expression.length-1);
 
-			var parentValue = this.getValue(valueProvider, parentExpression);
-			parentValue.getValue(lastPart).setValue(value);
-		},
+            var parentValue = this.getValue(valueProvider, parentExpression);
+            parentValue.getValue(lastPart).setValue(value);
+        },
 
-		/**
-		 * Get the wrapped value of an expression. Use
-		 * <code>Component.getValue()</code> if you are retrieving the value
-		 * of a component.
-		 * <code>$A.expressionService.get(cmp, "v.attribute")</code> is
-		 * equivalent to <code>cmp.getValue("v.attribute")</code>.
-		 *
-		 * @param {Object}
-		 *            valueProvider The value provider
-		 * @param {String}
-		 *            expression The expression to be evaluated
-		 * @public
-		 * @memberOf AuraExpressionService
-		 */
-		getValue : function(valueProvider, expression, callback) {
-			if (aura.util.isString(expression)) {
-				// var cached = propertyRefCache[expression];
-				// if (!cached) {
-				// cached = valueFactory.parsePropertyReference(expression);
-				// propertyRefCache[expression] = cached;
-				// }
-				// expression = cached;
-				//
-				expression = valueFactory.parsePropertyReference(expression, valueProvider);
-			} else if ($A.util.instanceOf(expression, FunctionCallValue)) {
-				return expression.getValue(valueProvider);
-			}
+        /**
+         * Get the wrapped value of an expression. Use <code>Component.getValue()</code> if you are retrieving the value of a component.
+         * <code>$A.expressionService.get(cmp, "v.attribute")</code> is equivalent to <code>cmp.getValue("v.attribute")</code>.
+         * @param {Object} valueProvider The value provider
+         * @param {String} expression The expression to be evaluated
+         * @public
+         * @memberOf AuraExpressionService
+         */
+        getValue: function(valueProvider, expression, callback){
+            if (aura.util.isString(expression)) {
+            	var cached = propertyRefCache[expression];
+            	if (!cached) {
+	                cached = valueFactory.parsePropertyReference(expression);
+	                propertyRefCache[expression] = cached;
 
-			if (!$A.util.instanceOf(expression, PropertyReferenceValue)) {
-				return null;
-			}
+	            	//console.debug("ExpressionService.getValue() cache property ref", [expression, propertyRefCache]);
+            	}
 
-			// use gvp; supports existing usage of $A.get and
-			// $A.expressionService.get
-            if (expression.isGlobal()) {
-				var gvp = $A.getGlobalValueProviders();
-				return gvp.getValue(expression, valueProvider, callback);
-			}
+                expression = cached;
+            } else if ($A.util.instanceOf(expression, FunctionCallValue)) {
+                return expression.getValue(valueProvider);
+            }
 
-			var propRef = expression;
-			var value = valueProvider;
-			while (propRef) {
-				var root = propRef.getRoot();
+            if (!$A.util.instanceOf(expression, PropertyReferenceValue)){
+                return null;
+            }
 
-				value = (value.getValue && value.getValue(root)) || value[root];
+            // use gvp; supports existing usage of $A.get and $A.expressionService.get
+            if (expression.getRoot().charAt(0) === '$'){
+                var gvp = $A.getGlobalValueProviders();
+                return gvp.getValue(expression, valueProvider, callback);
+            }
 
-				if (!value) {
-					// still nothing, time to die
-					break;
-				}
+            var propRef = expression;
+            var value = valueProvider;
+            while (propRef) {
+                var root = propRef.getRoot();
 
-				propRef = propRef.getStem();
-			}
+                value = value.getValue(root);
 
-			// handle PropertyReferenceValue. get its value.
-			if ($A.util.instanceOf(value, PropertyReferenceValue)) {
-				// #debugger
-				value = this.getValue(valueProvider, value);
-			}
+                if (!value) {
+                    // still nothing, time to die
+                    break;
+                }
 
-			return value;
-		},
+                propRef = propRef.getStem();
+            }
 
-		/**
-		 * Gets the value referenced using property syntax. Use
-		 * <code>Component.get()</code> if you are retrieving the value of a
-		 * component.
-		 *
-		 * @param {Object}
-		 *            valueProvider The value provider
-		 * @param {String}
-		 *            expression The expression to be evaluated
-		 * @param {Function}
-		 *            callback The method to call if a server trip is expected
-		 * @public
-		 * @memberOf AuraExpressionService
-		 */
-		get : function(valueProvider, expression, callback) {
-			return $A.unwrap(this.getValue(valueProvider, expression, $A.util.isFunction(callback) ? function(value) {
-				callback($A.unwrap(value));
-			} : null));
-		},
+            // handle PropertyReferenceValue. get its value.
+            if ($A.util.instanceOf(value, PropertyReferenceValue)) {
+                value = this.getValue(valueProvider, value);
+            }
 
-		/**
-		 * Sets the value referenced using property syntax.
-		 *
-		 * @param {Object}
-		 *            valueProvider The value provider
-		 * @param {String}
-		 *            expression The expression to be evaluated
-		 * @param {Object}
-		 *            value The value to set
-		 * @param {Boolean}
-		 *            ignoreChanges When true, skip onchange event notifications
-		 * @public
-		 * @memberOf AuraExpressionService
-		 */
-		set : function(valueProvider, expression, value, ignoreChanges) {
-			this.setValue(valueProvider, expression, value, ignoreChanges);
-		},
+            return value;
+        },
 
-		/**
-		 * Trims markup syntax off a given string expression, removing leading {!
-		 * and trailing } notation.
-		 *
-		 * @param {Object}
-		 *            expression The expression to be normalized.
-		 * @returns {Object} The normalized string, or the input parameter, if
-		 *          it was not a string.
-		 */
-		normalize : function(expression) {
-			if (aura.util.isString(expression)) {
-				expression = expression.replace(/^\s*\{\!|\}\s*$/g, '');
-			}
-			return expression;
-		},
+        /**
+         * Get the raw value referenced using property syntax. Use <code>Component.get()</code> if you are retrieving the value of a component.
+         * @param {Object} valueProvider The value provider
+         * @param {String} expression The expression to be evaluated
+         * @param {Function} callback The method to call if a server trip is expected
+         * @public
+         * @memberOf AuraExpressionService
+         */
+        get : function(valueProvider, expression, callback){
+            return $A.unwrap(this.getValue(valueProvider, expression, $A.util.isFunction(callback)?function(value){
+                callback($A.unwrap(value));
+            }:null));
+        },
 
-		/**
-		 * Resolves a hierarchical dot expression in string form against the
-		 * provided object if possible.
-		 *
-		 * @param {String}
-		 *            expression The string expression to be resolved.
-		 * @param {Object}
-		 *            container The object against which to resolve the
-		 *            expression.
-		 * @returns {Object} The target of the expression, or undefined.
-		 */
-		resolve : function(expression, container) {
-			var target = container;
-			var path = expression.split('.');
-			while (target && path.length) {
-				target = target[path.shift()];
+        /**
+         * @deprecated JBUCH
+         * @private
+         */
+        create : function(valueProvider, config){
+            return valueFactory.create(config, null, valueProvider);
+        },
 
-				// DCHASMAN TODO We can't do this here because iteration/forEach
-				// goes nuts trying to resolve the variable name using
-				// Component.get()
-				if ($A.util.isExpression(target)) {
-					target = target.evaluate();
-				}
-			}
+        /**
+         * @private
+         */
+        // TODO: unify with above create method
+        createPassthroughValue : function(primaryProviders, cmp) {
+            return new PassthroughValue(primaryProviders, cmp);
+        }
+    };
+    //#include aura.AuraExpressionService_export
 
-			return target;
-		},
-
-		/**
-		 * @deprecated JBUCH
-		 * @private
-		 */
-		create : function(valueProvider, config) {
-			return valueFactory.create(config, null, valueProvider);
-		},
-
-		/**
-		 * @private
-		 */
-		// TODO: unify with above create method
-		createPassthroughValue : function(primaryProviders, cmp) {
-			return new PassthroughValue(primaryProviders, cmp);
-		}
-	};
-	// #include aura.AuraExpressionService_export
-
-	return expressionService;
+    return expressionService;
 };

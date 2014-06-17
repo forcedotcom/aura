@@ -27,7 +27,7 @@ var valueFactory = {
 
                 return valueConfig;
             } else if (valueConfig["exprType"] === "PROPERTY") {
-                return new PropertyReferenceValue(valueConfig["path"], def, component);
+                return new PropertyReferenceValue(valueConfig["path"]);
             } else if (valueConfig["exprType"] === "FUNCTION") {
                 return new FunctionCallValue(valueConfig, def, component);
             } else {
@@ -38,7 +38,7 @@ var valueFactory = {
         } else if (valueConfig && valueConfig.indexOf && valueConfig.indexOf("{!") === 0) {
         	// Property expressions
         	valueConfig = valueConfig.substring(2, valueConfig.length - 1);
-            return new PropertyReferenceValue(valueConfig.split("."), def, component);
+            return new PropertyReferenceValue(valueConfig.split("."));
         } else {
             return new SimpleValue(valueConfig, def, component);
         }

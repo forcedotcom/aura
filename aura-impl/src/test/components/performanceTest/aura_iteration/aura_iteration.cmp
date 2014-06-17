@@ -12,13 +12,18 @@
     </aura:iteration>
 
    <div>
-        Change item #<ui:inputNumber value="{!v.tochange}"/> to <ui:inputText value="{!v.newvalue}"/>
-        <ui:button press="{!c.changeOneValue}" label="Go"/>
+        Change item #<ui:inputNumber value="{!v.tochange}" class="itemIndex"/> to <ui:inputText value="{!v.newvalue}" class="itemValue"/>
+        <ui:button press="{!c.changeOneValue}" class="changeValue" label="Go"/>
     </div>
     
     <div>
-        Change endIndex to <ui:inputText value="{!v.inputValue}"/>
-        <ui:button press="{!c.changeEndIndex}" label="Go"/>
+        Change endIndex to <ui:inputText value="{!v.inputValue}" class="pageSize"/>
+        <ui:button press="{!c.changeEndIndex}" class="changePageSize" label="Go"/>
+    </div>
+
+    <div>
+        Change Page Count to <ui:inputNumber value="{!v.count}" class="pageCount"/>
+        <ui:button class="changePageCount" label="Go"/>
     </div>
 
 </aura:component>

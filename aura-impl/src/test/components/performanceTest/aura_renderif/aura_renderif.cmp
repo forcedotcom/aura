@@ -4802,4 +4802,12 @@
     	</div>
     </aura:renderif>
 
+    <div>
+        Change Count to <ui:inputNumber value="{!v.count}" class="count"/>
+        <ui:button class="changeCount" label="Go"/>
+    </div>
+    <div>
+        Change Nested Count to <ui:inputNumber value="{!v.nestedCount}" class="nestedCount"/>
+        <ui:button class="changeNestedCount" label="Go"/>
+    </div>
 </aura:component>

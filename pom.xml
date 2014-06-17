@@ -344,6 +344,11 @@
                 <version>2.0</version>
             </dependency>
             <dependency>
+<groupId>org.apache.maven</groupId>
+<artifactId>maven-plugin-api</artifactId>
+<version>2.0</version>
+            </dependency>
+            <dependency>
                 <groupId>org.mozilla</groupId>
                 <artifactId>rhino</artifactId>
                 <version>1.7R4</version>
@@ -492,6 +497,11 @@
         <pluginManagement>
             <plugins>
                 <plugin>
+                    <groupId>org.auraframework</groupId>
+                    <artifactId>maven-clean-plugin</artifactId>
+                    <version>2.4.1</version>
+                </plugin>
+                <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-clean-plugin</artifactId>
                     <version>2.4.1</version>
@@ -529,8 +539,8 @@
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>2.3.2</version>
                     <configuration>
-                        <source>1.6</source>
-                        <target>1.6</target>
+                        <source>1.7</source>
+                        <target>1.7</target>
                         <encoding>UTF-8</encoding>
                     </configuration>
                 </plugin>
@@ -624,7 +634,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-antrun-plugin</artifactId>
-                    <version>1.6</version>
+                    <version>1.7</version>
                     <executions>
                         <execution>
                             <id>index-test-components</id>
@@ -746,6 +756,19 @@
                             <pluginExecutions>
                                 <pluginExecution>
                                     <pluginExecutionFilter>
+                                        <groupId>org.auraframework</groupId>
+                                        <artifactId>aura-util</artifactId>
+                                        <versionRange>[0.1,)</versionRange>
+                                        <goals>
+                                            <goal>enum</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <execute />
+                                    </action>
+                                </pluginExecution>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
                                         <groupId>org.apache.maven.plugins</groupId>
                                         <artifactId>maven-antrun-plugin</artifactId>
                                         <versionRange>[1.6,)</versionRange>
@@ -768,6 +791,19 @@
                                     </pluginExecutionFilter>
                                     <action>
                                         <ignore />
+                                    </action>
+                                </pluginExecution>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>org.auraframework</groupId>
+                                        <artifactId>maven-antrun-plugin</artifactId>
+                                        <versionRange>[1.6,)</versionRange>
+                                        <goals>
+                                            <goal>run</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <execute />
                                     </action>
                                 </pluginExecution>
                             </pluginExecutions>

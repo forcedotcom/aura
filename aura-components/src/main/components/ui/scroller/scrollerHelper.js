@@ -217,11 +217,14 @@
             // scroller properties check
             useNativeScroller     = component.get('v.useNativeScroller'),
             enabled               = component.get('v.enabled'),
-            width                 = component.get('v.width'),
-            height                = component.get('v.height'),
+            itemWidth             = component.get('v.itemWidth'),
+            itemHeight            = component.get('v.itemHeight'),
             scroll                = component.get('v.scroll'),
             scrollbars            = component.get('v.showScrollbars'),
             gpuOptimization       = component.get('v.gpuOptimization'),
+            minThreshold          = component.get('v.minThreshold'),
+            minDirectionThreshold = component.get('v.minDirectionThreshold'),
+            lockOnDirection       = component.get('v.lockOnDirection'),
 
             // For now, default android and ios to use CSSTransitions
             useCSSTransition      = typeof cssTransition === "boolean" ? cssTransition : (!gpuOptimization && (device.isIOS || device.isAndroid)),
@@ -245,13 +248,16 @@
         return {
             enabled               : useNativeScroller ? false : enabled,
             useNativeScroller     : useNativeScroller,
-            itemWidth             : width,
-            itemHeight            : height,
+            itemWidth             : itemWidth,
+            itemHeight            : itemHeight,
             scroll                : scroll,
             scrollbars            : scrollbars,
             useCSSTransition      : useCSSTransition,
             bindToWrapper         : bindToWrapper,
             gpuOptimization       : gpuOptimization,
+            lockOnDirection       : lockOnDirection,
+            minThreshold          : minThreshold,
+            minDirectionThreshold : minDirectionThreshold,
 
             pullToRefresh         : pullToRefresh,
             pullToLoadMore        : pullToLoadMore,
@@ -261,8 +267,8 @@
             onPullToLoadMore      : auraOnPullToLoadMore && this._bind(this._bridgeScrollerCallback, component, auraOnPullToLoadMore),
             pullToRefreshConfig   : pullToRefreshConfig,
             pullToLoadMoreConfig  : pullToLoadMoreConfig,
-            infiniteLoadingConfig : infiniteLoadingConfig,
 
+            infiniteLoadingConfig : infiniteLoadingConfig,
             plugins               : plugins
         };
     },
@@ -427,7 +433,7 @@ _bootstrapScroller: function () {
     this._initScrollerPlugins();
 },
 _initScrollerDependencies: function () {
-    !function(a){a.__S||(a.__S={plugins:{}}),a.DEBUG=function(b){return b?console:{warn:function(){a.console.warn.apply(console,arguments)},log:function(){}}}("#debug"===a.document.location.hash)}(window),function(a){Array.prototype.forEach||(Array.prototype.forEach=function(a){"use strict";if(void 0===this||null===this)throw new TypeError;var b=Object(this),c=b.length>>>0;if("function"!=typeof a)throw new TypeError;for(var d=arguments.length>=2?arguments[1]:void 0,e=0;c>e;e++)e in b&&a.call(d,b[e],e,b)});var b,c,d,e=a.__S||(a.__S={}),f=a.document.documentElement.style,g=["webkit","Moz","ms"],h=!1,i=!1;if("transition"in f)h=!0,c="";else for(d=0;d<g.length;d++)b=g[d]+"Transition","undefined"!==f.transform&&(h=!0,c=g[d]);if("undefined"!=typeof f.transform)i=!0;else for(d=0;d<g.length;d++)b=g[d]+"Transform","undefined"!=typeof f[b]&&(i=!0,c=g[d]);e.support={prefix:c,transition:h,transform:i,matrix:!(!a.WebKitCSSMatrix&&!a.MSCSSMatrix),touch:"ontouchstart"in a,pointers:a.navigator.pointerEnabled,msPointers:a.navigator.msPointerEnabled}}(window),function(a){function b(b,c){for(var d=["Top","Right","Bottom","Left"],e=a.getComputedStyle(c),f="width"===b,g=f?1:0,h=0;4>g;g+=2)h+=parseInt(e["margin"+d[g]],10);return h+(f?c.offsetWidth:c.offsetHeight)}var c=a.__S||(a.__S={}),d=c.support,e=d&&d.prefix,f={};return d?(d.transition&&d.transform&&(f=""!==e?{transform:e+"Transform",transitionTimingFunction:e+"TransitionTimingFunction",transitionDuration:e+"TransitionDuration",transformOrigin:e+"TransformOrigin",boxSizing:e+"BoxSizing",matrix:a.WebKitCSSMatrix||a.MSCSSMatrix}:{transform:"transform",transitionTimingFunction:"transitionTimingFunction",transitionDuration:"transitionDuration",transformOrigin:"transformOrigin",boxSizing:"boxSizing",matrix:a.WebKitCSSMatrix||a.MSCSSMatrix}),f.getHeight=function(a){return b("height",a)},f.getWidth=function(a){return b("width",a)},void(c.styles=f)):void a.console.log("Scroller Dependency error! browser support detection needed")}(window),function(a){"use strict";var b=a.__S||(a.__S={}),c={simpleMerge:function(a,b){var c,d={};for(c in a)d[c]=a[c];for(c in b)d[c]=b[c];return d},parseDOM:function(b){var c;return b&&b.length?"string"==typeof b?(c=a.document.createElement("div"),c.innerHTML=b,Array.prototype.slice.call(c.children,0)):Array.prototype.slice.call(b,0):void 0},bind:function(a,b,c,d){a.addEventListener(b,c,!!d)},unbind:function(a,b,c,d){a.removeEventListener(b,c,!!d)}};b.helpers=c}(window),function(a){for(var b=0,c=["ms","moz","webkit","o"],d=0;d<c.length&&!a.requestAnimationFrame;++d)a.requestAnimationFrame=a[c[d]+"RequestAnimationFrame"],a.cancelAnimationFrame=a[c[d]+"CancelAnimationFrame"]||a[c[d]+"CancelRequestAnimationFrame"];a.requestAnimationFrame||(a.requestAnimationFrame=function(c){var d=(new Date).getTime(),e=Math.max(0,16-(d-b)),f=a.setTimeout(function(){c(d+e)},e);return b=d+e,f}),a.cancelAnimationFrame||(a.cancelAnimationFrame=function(b){a.clearTimeout(b)})}(window),function(a){function b(a){if(this._element=a,a.className!=this._classCache){if(this._classCache=a.className,!this._classCache)return;var b,c=this._classCache.replace(/^\s+|\s+$/g,"").split(/\s+/);for(b=0;b<c.length;b++)h.call(this,c[b])}}function c(a,b){a.className=b.join(" ")}function d(a,b,c){Object.defineProperty?Object.defineProperty(a,b,{get:c}):a.__defineGetter__(b,c)}if(!("undefined"==typeof a.Element||"classList"in document.documentElement)){Array.prototype.indexOf||(Array.prototype.indexOf=function(a,b){for(var c=b||0,d=this.length;d>c;c++)if(this[c]===a)return c;return-1});var e=Array.prototype,f=e.indexOf,g=e.slice,h=e.push,i=e.splice,j=e.join;b.prototype={add:function(a){this.contains(a)||(h.call(this,a),c(this._element,g.call(this,0)))},contains:function(a){return-1!==f.call(this,a)},item:function(a){return this[a]||null},remove:function(a){var b=f.call(this,a);-1!==b&&(i.call(this,b,1),c(this._element,g.call(this,0)))},toString:function(){return j.call(this," ")},toggle:function(a){return this.contains(a)?this.remove(a):this.add(a),this.contains(a)}},window.DOMTokenList=b,d(Element.prototype,"classList",function(){return new b(this)})}}(window),function(a){"use strict";function b(a,b,c,e){function f(a,b){return 1-3*b+3*a}function g(a,b){return 3*b-6*a}function h(a){return 3*a}function i(a,b,c){return((f(b,c)*a+g(b,c))*a+h(b))*a}function j(a,b,c){return 3*f(b,c)*a*a+2*g(b,c)*a+h(b)}function k(b){var e,f,g,h=b,k=d;for(g=0;k>g;g++){if(e=j(h,a,c),0===e)return h;f=i(h,a,c)-b,h-=f/e}return h}var l;return l=function(d){return a==b&&c==e?d:i(k(d),b,e)},l.toString=function(){return"cubic-bezier("+a+", "+b+", "+c+", "+e+")"},l}var c=a.__S||(a.__S={}),d=4;c.CubicBezier=b}(window);
+    !function(a){"use strict";a.__S||(a.__S={plugins:{}},a.DEBUG={warn:function(){},log:function(){}})}(window),function(a){"use strict";Array.prototype.forEach||(Array.prototype.forEach=function(a){if(void 0===this||null===this)throw new TypeError;var b=Object(this),c=b.length>>>0;if("function"!=typeof a)throw new TypeError;for(var d=arguments.length>=2?arguments[1]:void 0,e=0;c>e;e++)e in b&&a.call(d,b[e],e,b)});var b,c,d,e=a.__S||(a.__S={}),f=a.document.documentElement.style,g=["webkit","Moz","ms"],h=!1,i=!1;if("transition"in f)h=!0,c="";else for(d=0;d<g.length;d++)b=g[d]+"Transition","undefined"!==f.transform&&(h=!0,c=g[d]);if("undefined"!=typeof f.transform)i=!0;else for(d=0;d<g.length;d++)b=g[d]+"Transform","undefined"!=typeof f[b]&&(i=!0,c=g[d]);e.support={prefix:c,transition:h,transform:i,matrix:!(!a.WebKitCSSMatrix&&!a.MSCSSMatrix),touch:"ontouchstart"in a,pointers:a.navigator.pointerEnabled,msPointers:a.navigator.msPointerEnabled}}(window),function(a){"use strict";function b(b,c){for(var d=["Top","Right","Bottom","Left"],e=a.getComputedStyle(c),f="width"===b,g=f?1:0,h=0;4>g;g+=2)h+=parseInt(e["margin"+d[g]],10);return h+(f?c.offsetWidth:c.offsetHeight)}var c=a.__S||(a.__S={}),d=c.support,e=d&&d.prefix,f={};return d?(d.transition&&d.transform&&(f=""!==e?{transform:e+"Transform",transition:e+"Transition",transitionProperty:e+"TransitionProperty",transitionTimingFunction:e+"TransitionTimingFunction",transitionDuration:e+"TransitionDuration",transformOrigin:e+"TransformOrigin",boxSizing:e+"BoxSizing",matrix:a.WebKitCSSMatrix||a.MSCSSMatrix}:{transform:"transform",transition:"transition",transitionProperty:"transitionProperty",transitionTimingFunction:"transitionTimingFunction",transitionDuration:"transitionDuration",transformOrigin:"transformOrigin",boxSizing:"boxSizing",matrix:a.WebKitCSSMatrix||a.MSCSSMatrix}),f.getHeight=function(a){return b("height",a)},f.getWidth=function(a){return b("width",a)},void(c.styles=f)):void a.console.log("Scroller Dependency error! browser support detection needed")}(window),function(a){"use strict";var b=a.__S||(a.__S={}),c={simpleMerge:function(a,b){var c,d={};for(c in a)a.hasOwnProperty(c)&&(d[c]=a[c]);for(c in b)b.hasOwnProperty(c)&&(d[c]=b[c]);return d},parseDOM:function(b){var c;return b&&b.length?"string"==typeof b?(c=a.document.createElement("div"),c.innerHTML=b,Array.prototype.slice.call(c.children,0)):Array.prototype.slice.call(b,0):void 0},bind:function(a,b,c,d){a.addEventListener(b,c,!!d)},unbind:function(a,b,c,d){a.removeEventListener(b,c,!!d)}};b.helpers=c}(window),function(a){"use strict";for(var b=0,c="CancelAnimationFrame",d=["ms","moz","webkit","o"],e=0;e<d.length&&!a.requestAnimationFrame;++e)a.requestAnimationFrame=a[d[e]+"RequestAnimationFrame"],a.cancelAnimationFrame=a[d[e]+c]||a[d[e]+c];a.requestAnimationFrame||(a.requestAnimationFrame=function(c){var d=(new Date).getTime(),e=Math.max(0,16-(d-b)),f=a.setTimeout(function(){c(d+e)},e);return b=d+e,f}),a.cancelAnimationFrame||(a.cancelAnimationFrame=function(b){a.clearTimeout(b)})}(window),function(a){function b(a){if(this._element=a,a.className!=this._classCache){if(this._classCache=a.className,!this._classCache)return;var b,c=this._classCache.replace(/^\s+|\s+$/g,"").split(/\s+/);for(b=0;b<c.length;b++)h.call(this,c[b])}}function c(a,b){a.className=b.join(" ")}function d(a,b,c){Object.defineProperty?Object.defineProperty(a,b,{get:c}):a.__defineGetter__(b,c)}if(!("undefined"==typeof a.Element||"classList"in document.documentElement)){Array.prototype.indexOf||(Array.prototype.indexOf=function(a,b){for(var c=b||0,d=this.length;d>c;c++)if(this[c]===a)return c;return-1});var e=Array.prototype,f=e.indexOf,g=e.slice,h=e.push,i=e.splice,j=e.join;b.prototype={add:function(a){this.contains(a)||(h.call(this,a),c(this._element,g.call(this,0)))},contains:function(a){return-1!==f.call(this,a)},item:function(a){return this[a]||null},remove:function(a){var b=f.call(this,a);-1!==b&&(i.call(this,b,1),c(this._element,g.call(this,0)))},toString:function(){return j.call(this," ")},toggle:function(a){return this.contains(a)?this.remove(a):this.add(a),this.contains(a)}},window.DOMTokenList=b,d(Element.prototype,"classList",function(){return new b(this)})}}(window),function(a){"use strict";function b(a,b,c,e){function f(a,b){return 1-3*b+3*a}function g(a,b){return 3*b-6*a}function h(a){return 3*a}function i(a,b,c){return((f(b,c)*a+g(b,c))*a+h(b))*a}function j(a,b,c){return 3*f(b,c)*a*a+2*g(b,c)*a+h(b)}function k(b){var e,f,g,h=b,k=d;for(g=0;k>g;g++){if(e=j(h,a,c),0===e)return h;f=i(h,a,c)-b,h-=f/e}return h}var l;return l=function(d){return a===b&&c===e?d:i(k(d),b,e)},l.toString=function(){return"cubic-bezier("+a+", "+b+", "+c+", "+e+")"},l}var c=a.__S||(a.__S={}),d=4;c.CubicBezier=b}(window);
 },
 _initScrollerPlugins: function () {
     this._initSurfaceManagerPlugin();
@@ -440,7 +446,7 @@ _initScrollerPlugins: function () {
 },
 _initScroller: function () {
     (function (w) {
-    "use strict";
+    'use strict';
 
     // GLOBALS UTILS
     var NOW            = Date.now || function () { return new Date().getTime(); },
@@ -458,6 +464,7 @@ _initScroller: function () {
     // Distinguish type of touch events so they don't conflict in certain contexts, 
     // like Dual gestures on Windows Tablets or in ChromeDevTools 
     // (bug where enabling touch gestures, it fire both types)
+
         EVENT_TYPE = {
             touchstart : 1,
             touchmove  : 1,
@@ -483,6 +490,7 @@ _initScroller: function () {
         ACTION_LOCK          = 'lock',
         ACTION_GESTURE_START = 'gestureStart',
         ACTION_GESTURE_MOVE  = 'gestureMove',
+        ACTION_GESTURE_END   = 'gestureEnd',
         ACTION_ANIM_MOVING   = 'animationMove',
         ACTION_ANIM_END      = 'animationEnd',
 
@@ -509,7 +517,7 @@ _initScroller: function () {
             useCSSTransition      : false,
             dualListeners         : false,
             minThreshold          : 5,     // It should be in the [0, 10] range
-            minDirectionThreshold : 2,    // It should be smaller than minThreshold
+            minDirectionThreshold : 2,     // It should be smaller than minThreshold
             lockOnDirection       : null,
             itemHeight            : null,
             itemWidth             : null,
@@ -519,9 +527,10 @@ _initScroller: function () {
             pullToLoadMore        : false,
             scrollbars            : false,
             infiniteLoading       : false,
-            gpuOptimization       : true
+            gpuOptimization       : false,
+            debounce              : true
         },
-
+        MIN_VELOCITY          = 0.1,
         ACCELERATION_CONSTANT = 0.0005,
         MOUSE_WHEEL_SPEED     = 20,
         MOUSE_WHEEL_INVERTED  = false;
@@ -567,14 +576,20 @@ _initScroller: function () {
                 enablePTR      = this.opts.onPullToRefresh,
                 enablePTL      = this.opts.onPullToLoadMore;
             
-            if (enablePTR && PullToRefresh)  this.plug(PullToRefresh);
-            if (enablePTL && PullToLoadMore) this.plug(PullToLoadMore);
-            if (enableSM  && SurfaceManager) this.plug(SurfaceManager);
+            if (enablePTR && PullToRefresh)  {
+                this.plug(PullToRefresh);
+            }
+            if (enablePTL && PullToLoadMore) {
+                this.plug(PullToLoadMore);
+            }
+            if (enableSM  && SurfaceManager) {
+                this.plug(SurfaceManager);
+            }
 
             if (userPlugins) {
                 for (var i = 0; i < userPlugins.length; i++) {
                     this.plug(userPlugins[i]);
-                }    
+                }
             }
         },
         _initializeEvents: function () {
@@ -597,18 +612,23 @@ _initScroller: function () {
             
             // Consistency guards
             if (opts.infiniteLoading && opts.pullToLoadMore) {
-                w.DEBUG.warn('You cannot have infiniteLoading and pullToShowMore at the same time. Switching to infiniteLoading');
+                w.DEBUG.warn(
+                    'You cannot have infiniteLoading and pullToShowMore at the same time.' +
+                    'Switching to infiniteLoading');
                 this.opts.pullToLoadMore = false;
             }
 
             if (!this.scrollVertical && (opts.pullToRefresh || opts.pullToLoadMore)) {
-                DEBUG.warn('The attributes: pullToRefresh or pullToShowMore are not available in horizontal mode yet. Switching them to false');
+                w.DEBUG.warn(
+                    'The attributes: pullToRefresh or pullToShowMore are not available in horizontal mode yet.'+
+                    ' Switching them to false');
+
                 this.opts.pullToRefresh  = false;
                 this.opts.pullToLoadMore = false;
             }
         },
         _setElement: function (el) {
-            this.wrapper       = typeof el == 'string' ? w.document.querySelector(el) : el;
+            this.wrapper       = typeof el === 'string' ? w.document.querySelector(el) : el;
             this.scroller      = this.wrapper.children[0];
             this.scrollerStyle = this.scroller.style;
 
@@ -621,13 +641,15 @@ _initScroller: function () {
             this.wrapperSize   = this.scrollVertical ? this.wrapperHeight : this.wrapperWidth;
         },
         _setSize: function () {
-            var ptl_offset = this._ptlThreshold || 0;
+            var scrollerDOM = this.scroller,
+                ptl         = this.opts.pullToLoadMore,
+                ptl_offset  = this._ptlThreshold || 0;
 
             this._setWrapperSize();
             this._sizePullToShowMore();
 
-            this.scrollerWidth  = this.scroller.offsetWidth;
-            this.scrollerHeight = this.opts.pullToLoadMore ? this.scroller.offsetHeight - ptl_offset : this.scroller.offsetHeight;
+            this.scrollerWidth  = scrollerDOM.offsetWidth;
+            this.scrollerHeight = ptl ? scrollerDOM.offsetHeight - ptl_offset : scrollerDOM.offsetHeight;
 
             this.maxScrollX     = this.wrapperWidth  - this.scrollerWidth;
             this.maxScrollY     = this.wrapperHeight - this.scrollerHeight;
@@ -660,16 +682,12 @@ _initScroller: function () {
             eventType(window, 'orientationchange', this);
             eventType(window, 'resize', this);
 
-            // if ( this.options.click ) {
-                 //eventType(target, 'click', this, true);
-            // }
-
             if (SUPPORT.touch && !this.opts.disableTouch && !pHandlers) {
                 eventType(wrapper, 'touchstart',  this);
                 eventType(target,  'touchmove',   this);
                 eventType(target,  'touchcancel', this);
                 eventType(target,  'touchend',    this);
-            } 
+            }
 
             if ((SUPPORT.pointers || SUPPORT.msPointers) && !this.opts.disablePointers) {
                 if (SUPPORT.pointers) {
@@ -774,12 +792,6 @@ _initScroller: function () {
                 case 'keydown':
                     this._key(e);
                     break;
-                case 'click':
-                    if ( !e._constructed ) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                    }
-                    break;
             }
         },
     /* 
@@ -801,8 +813,8 @@ _initScroller: function () {
             this.distY           = 0;
             this.scrollDirection = null;
 
-            this._transitionTime();   // removes time on transition (reset CSS timing)
-            this._isAnimating = false; // reset animation
+            this._transitionTime();    // removes time on transition (reset CSS timing)
+            this._isAnimating = false; // resets animation
 
             if (this._isScrolling) {
                 this._stopMomentum();
@@ -811,19 +823,35 @@ _initScroller: function () {
                 e.preventDefault();
             }
 
-            this.startX    = this.x;
-            this.startY    = this.y;
-            this.pointX    = point.pageX;
-            this.pointY    = point.pageY;
-            this.startTime = NOW();
+            // reset internal state
+            this.startX         = this.x;
+            this.startY         = this.y;
+            this.pointX         = point.pageX;
+            this.pointY         = point.pageY;
+            this.startTime      = NOW();
+            this.velocity       = 0;
+
+            this._lastPosition  = this.scrollVertical ? this.startY : this.startX;
 
             this._fire('beforeScrollStart', ACTION_GESTURE_START, e);
         },
+        _trackVelocity: function (t) {
+            var lastPos    = this._lastPosition,
+                currentPos = this.scrollVertical ? this.y : this.x,
+                elapsed    = 17, //ms between calls on RAF
+                delta      = currentPos - lastPos,
+                velocity, v;
 
+            this._lastPosition  = currentPos;
+
+            v = delta / elapsed;
+            this.velocity = 0.6 * v + 0.4 * this.velocity;
+        },
         _startMoveRAF: function () {
             var self = this;
             function moveStep (t) {
                 self._translate(self.x, self.y);
+                self._trackVelocity(t);
                 self._update();
                 self._fire('scrollMove', ACTION_GESTURE_MOVE, self.x, self.y);
                 self._rafMoving = RAF(moveStep);
@@ -846,10 +874,10 @@ _initScroller: function () {
             this._initiated = false;
             this._fire(ACTION_LOCK, this.scrollDirection);
         },
-        _getScollDirection: function (absX, absY) {
+        _getScrollDirection: function (absX, absY) {
             var treshold = this.opts.minDirectionThreshold;
             this.scrollDirection =
-                (absX > absY + treshold) ? SCROLL_HORIZONTAL : 
+                (absX > absY + treshold) ? SCROLL_HORIZONTAL :
                 (absY > absX + treshold) ? SCROLL_VERTICAL :
                 null;
 
@@ -861,7 +889,7 @@ _initScroller: function () {
         _setNormalizedXY: function (x, y) {
             if (this.scrollVertical) {
                 this.x = 0;
-                this.y = y;    
+                this.y = y;
             } else {
                 this.x = x;
                 this.y = 0;
@@ -869,6 +897,7 @@ _initScroller: function () {
         },
         _move: function (e) {
             if (!this.enabled || (EVENT_TYPE[e.type] !== this._initiated)) {
+                e.scrollDirection = this.scrollDirection; // keep bubbling up the direction if is defined
                 return;
             }
 
@@ -881,8 +910,8 @@ _initScroller: function () {
             if (!this.moved && (deltaX || deltaY)) {
                 this.moved = true;
                 this._translate(this.x, this.y);
-                this._fire('scrollStart', ACTION_GESTURE_START);
-                if (!this.opts.useCSSTransition) {
+                this._fire('scrollStart', ACTION_GESTURE_START, e);
+                if (!this.opts.useCSSTransition || this.opts.debounce) {
                     this._startMoveRAF();
                 }
             }
@@ -896,17 +925,18 @@ _initScroller: function () {
             newX         = this.x + deltaX;
             newY         = this.y + deltaY;
 
-            // If there is minThrehold do not start moving until the distance is over it.
-            if (this.opts.minThreshold && (absDistX < this.opts.minThreshold && absDistY < this.opts.minThreshold)) {
-                this._fire('scrollMove', ACTION_GESTURE_MOVE, this.x, this.y);
-                return;
-            }
-
             // Calculate and expose the gesture direction
-            e.scrollDirection = this.scrollDirection || this._getScollDirection(absDistX, absDistY);
+            e.scrollDirection = this.scrollDirection || this._getScrollDirection(absDistX, absDistY);
 
             if (this._needsLocking()) {
                 this.lockScroller();
+                return;
+            }
+
+            // If there is minThrehold do not start moving until the distance is over it.
+            if (this.opts.minThreshold && (absDistX < this.opts.minThreshold && absDistY < this.opts.minThreshold)) {
+                this._fire('scrollMove', ACTION_GESTURE_MOVE, this.x, this.y, e);
+                return;
             }
 
             // Reduce scrollability (slowdown) when dragging beyond the scroll limits
@@ -918,45 +948,41 @@ _initScroller: function () {
             // Scroll one direction at the time (set zero values on the other direction)
             this._setNormalizedXY(newX, newY);
 
-            if (this.opts.useCSSTransition) {
+            if (this.opts.useCSSTransition && !this.opts.debounce) {
                 // update per event basis (non RAF), to avoid small animation gap on touchend
                 this._translate(this.x, this.y);
-                this._fire('scrollMove', ACTION_GESTURE_MOVE, this.x, this.y);
-            }
+                this._fire('scrollMove', ACTION_GESTURE_MOVE, this.x, this.y, e);
 
-            // This is to reduce variability and to keep track only on the recent past of the gesture
-            if (timestamp - this.startTime > 300) {
-                this.startTime = timestamp;
-                this.startX = this.x;
-                this.startY = this.y;
+                // When no debounce, reduce variability
+                // This keeps track only on the recent past of the gesture
+                if (timestamp - this.startTime > 300) {
+                    this.startTime = timestamp;
+                    this.startX = this.x;
+                    this.startY = this.y;
+                }
             }
         },
         _end: function (e) {
-            if (!this.enabled || EVENT_TYPE[e.type] !== this._initiated) {
-                return;
-            }
-            //reset move
+            // No matter what cancel RAF
             this._endMoveRAF();
-            this._initiated = false;
 
-            //No movement
-            if (!this.moved) {
-                //TODO: Tap/Click?
+            if (!this.enabled || !this.moved || (EVENT_TYPE[e.type] !== this._initiated)) {
                 return;
             }
+
+            this._initiated = false;
 
             var duration = NOW() - this.startTime,
                 time     = 0,
                 bounce   = EASING.regular,
                 momentum;
 
-            this._translate(this.x, this.y);
-
             //if its outside the boundaries before scrolling, just snap and return
             if (this._resetPosition(this.opts.bounceTime)) {
                 return;
             }
 
+            // If we arrive here, is time to scroll!
             this._isScrolling = true;
 
             //calculate the destination, speed based of gesture
@@ -1032,28 +1058,31 @@ _initScroller: function () {
                     self._wheelRAF();
                 });
             }
-    },
-    _wheelRAF: function () {
-        this._translate(this.x, this.y);
-        this._update();
-        this._rafWheel    = false;
-        self._isScrolling = false;
-    },
-
-    /* 
-    * ==================================================
-    * Scroller Maths and calculation
-    * ================================================== 
-    */
+        },
+        _wheelRAF: function () {
+            this._translate(this.x, this.y);
+            this._update();
+            this._rafWheel    = false;
+            this._isScrolling = false;
+        },
+        /* 
+        * ==================================================
+        * Scroller Maths and calculation
+        * ================================================== 
+        */
         _getVelocity: function (current, start, time) {
-            var distance = current - start,
-                velocity = distance / time;
-            return velocity;
+            var v = this.opts.debounce ? this.velocity : ((current - start) / time);
+            if (Math.abs(v) < MIN_VELOCITY) {
+                v = 0;
+            }
+            this.velocity = v;
+            return v;
         },
         _computeMomentum: function (velocity, current) {
             var acceleration = this.acceleration * (velocity < 0 ?  1 : -1),
                 distance     = -(velocity * velocity) / (2 * acceleration),
                 time         = -velocity / acceleration;
+
             return {
                 destination : distance + current,
                 time        : time
@@ -1070,6 +1099,7 @@ _initScroller: function () {
         _momentum: function (current, start, duration, lowerMargin, wrapperSize) {
             var velocity = this._getVelocity(current, start, duration),
                 momentum = this._computeMomentum(velocity, current);
+
             // Beyond the scrollable area (bottom)
             if (momentum.destination < lowerMargin) {
                 momentum = this._computeSnap(lowerMargin, wrapperSize, velocity, current);
@@ -1085,21 +1115,22 @@ _initScroller: function () {
 
         },
         _stopMomentum: function () {
-            var transform = STYLES.transform,
+            var transform  = STYLES.transform,
+                transition = STYLES.transition,
                 style, matrix, x, y;
 
             if (this.opts.useCSSTransition) {
+                style  = w.getComputedStyle(this.scroller, null);
                 if (SUPPORT.matrix) {
-                    style  = w.getComputedStyle(this.scroller, null);
                     matrix = new STYLES.matrix(style[transform]);
-                    this.scrollerStyle[transform] = '';
-                    x = matrix.m41; 
+                    this.scrollerStyle[transition] = '';
+                    x = matrix.m41;
                     y = matrix.m42;
                 } else {
-                    matrix = matrix[transform].split(')')[0].split(', ');
+                    matrix = style[transform].split(')')[0].split(', ');
                     x = +(matrix[12] || matrix[4]);
                     y = +(matrix[13] || matrix[5]);
-                } 
+                }
                 this._translate(x, y);
             } else {
                 CAF(this._rafReq); // Cancel Animation Frame
@@ -1146,9 +1177,9 @@ _initScroller: function () {
                 } else if (this.x < this.maxScrollX) {
                     x = this.maxScrollX;
                 }
-            } 
+            }
 
-            if (y == this.y && x == this.x) {
+            if (y === this.y && x === this.x) {
                 return false;
             }
 
@@ -1159,8 +1190,8 @@ _initScroller: function () {
             this.scrollerStyle[STYLES.transitionTimingFunction] = easing;
         },
         _transitionTime: function (time) {
-                time || (time = 0);
-                this.scrollerStyle[STYLES.transitionDuration] = time + 'ms';
+            time || (time = 0);
+            this.scrollerStyle[STYLES.transitionDuration] = time + 'ms';
         },
         _translate: function (x, y) {
             this.scrollerStyle[STYLES.transform] = 'matrix3d(1,0,0,0,0,1,0,0,0,0,1,0,' + x +',' + y +', 0, 1)';
@@ -1173,7 +1204,7 @@ _initScroller: function () {
                 if (!this._resetPosition(this.opts.bounceTime)) {
                     this._isScrolling  = false;
                     this._fire('scrollEnd', ACTION_ANIM_END);
-                }    
+                }
             }
         },
         _animate: function (x, y, duration, easingFn) {
@@ -1187,13 +1218,14 @@ _initScroller: function () {
                 var now = NOW(),
                     newX, newY, easing;
 
-                if (now >= destTime ) {
+                if (now >= destTime) {
                     self._isAnimating = false;
                     self._rafReq = null;
                     self._translate(x, y);
 
                     if (!self._resetPosition(self.opts.bounceTime)) {
                         self._fire('scrollEnd', ACTION_ANIM_END);
+                        self._isScrolling = false;
                     }
                     return;
                 }
@@ -1221,7 +1253,7 @@ _initScroller: function () {
 
             items.forEach(function (i) {
                 docfrag.appendChild(i);
-            });    
+            });
 
             if (scrollerContainer.lastChild === ptrContainer) {
                 scrollerContainer.appendChild(docfrag);
@@ -1249,6 +1281,7 @@ _initScroller: function () {
                 this._update();
                 if (!time) {
                     this._isScrolling = false;
+                    this._fire(ACTION_GESTURE_END);
                 }
             } else {
                 this._animate(x, y, time, easing.fn);
@@ -1266,23 +1299,25 @@ _initScroller: function () {
         resize: function (e) {
             var self = this;
             RAF(function () {
-                // NOTE: Check the translate(0,0), we do it so when we get narrow width, the scroll position may not exist anymore
+                // NOTE: Check the translate(0,0), we do it so when we get narrow width,
+                // The scroll position may not exist anymore
                 // We should be able to calculate the new (x,y) position
                 self._translate(0,0);
-                self._setSize();    
+                self._setSize();
             });
         },
         refresh: function () {
             var self = this;
             if (!this._rafRefresh) {
                 this._rafRefresh = RAF(function () {
+                    self._fire('_refresh');
                     self._setSize();
                     self._rafRefresh = null;
                 });
             }
         },
         plug: function (plugin) {
-            var ScrollerPlugin = typeof plugin === "string" ? PLUGINS[plugin] : plugin,
+            var ScrollerPlugin = typeof plugin === 'string' ? PLUGINS[plugin] : plugin,
                 protoExtension =  ScrollerPlugin.prototype,
                 whiteList      = ['init'],
                 methodName;
@@ -1294,7 +1329,7 @@ _initScroller: function () {
             }
 
             if (protoExtension.init) {
-                protoExtension.init.call(this); 
+                protoExtension.init.call(this);
             }
         },
         scrollTo: function (x, y, time) {
@@ -1327,7 +1362,7 @@ _initScroller: function () {
             var parsedData = HELPERS.parseDOM(data);
             if (parsedData) {
                 this._prependData(parsedData);
-                this._setSize();    
+                this._setSize();
             }
         },
         appendItems: function (data) {
@@ -1348,8 +1383,8 @@ _initScroller: function () {
 }(window));
 },
 _initSurfaceManagerPlugin: function () {
-    (function (w) {        
-    "use strict";
+    (function (w) {
+    'use strict';
 
     var SCROLLER = w.__S || (w.__S = {}), //NAMESPACE
         PLUGINS  = SCROLLER.plugins || (SCROLLER.plugins = {}),
@@ -1407,7 +1442,7 @@ _initSurfaceManagerPlugin: function () {
             this.items = items;
         },
         _setActiveOffset: function () {
-              this.activeOffset = 0.9 * (this.scrollVertical ? this.wrapperHeight: this.wrapperWidth);
+            this.activeOffset = 0.9 * (this.scrollVertical ? this.wrapperHeight: this.wrapperWidth);
         },
         _initializePositions: function () {
             var items         = this.items,
@@ -1463,7 +1498,7 @@ _initSurfaceManagerPlugin: function () {
             };
         },
         _createSurfaces : function (size, options) {
-            options || (options = {}); 
+            options || (options = {});
 
             var surfaces = [], i;
 
@@ -1482,11 +1517,11 @@ _initSurfaceManagerPlugin: function () {
                 width, height, offsetX = 0, offsetY = 0;
 
             // recalc styles
-            surface.dom.appendChild(item.dom); 
+            surface.dom.appendChild(item.dom);
 
             // this will force a layout
-            height = surface.dom.offsetHeight; 
-            width  = surface.dom.offsetWidth; 
+            height = surface.dom.offsetHeight;
+            width  = surface.dom.offsetWidth;
 
             if (this.scrollVertical) {
                 offsetY = config.preCalculateSize ?  offset - height : offset;
@@ -1494,7 +1529,7 @@ _initSurfaceManagerPlugin: function () {
                 offsetX = config.preCalculateSize ?  offset - width : offset;
             }
             
-            surface.dom.style[STYLES.transform] = 'matrix3d(1,0,0,0,0,1,0,0,0,0,1,0,' + offsetX +',' + offsetY +', 0, 1)';
+            surface.dom.style[STYLES.transform] = 'matrix3d(1,0,0,0,0,1,0,0,0,0,1,0,' + offsetX +',' + offsetY + ', 0, 1)';
 
             surface.state       = 1;
             surface.contentIndex = index;
@@ -1590,16 +1625,16 @@ _initSurfaceManagerPlugin: function () {
                 payload          = {index: index, offset: bottomSurfaceEnd},
                 surface;
 
-                if (!this._positionBeingUsed(index)) {
-                    surface = this._getAvailableSurface();
-                    this._attachItemInSurface(this.items[index], surface, payload);
-                    this.surfacesPositioned.push(surface);
-                    w.DEBUG.log('PUSH   ', Date.now());
-                    return surface;
+            if (!this._positionBeingUsed(index)) {
+                surface = this._getAvailableSurface();
+                this._attachItemInSurface(this.items[index], surface, payload);
+                this.surfacesPositioned.push(surface);
+                w.DEBUG.log('PUSH   ', Date.now());
+                return surface;
 
-                } else {
-                    return bottomSurface;
-                }
+            } else {
+                return bottomSurface;
+            }
         },
         _positionedSurfacesPop: function () {
             w.DEBUG.log('POP    ', Date.now());
@@ -1620,7 +1655,7 @@ _initSurfaceManagerPlugin: function () {
                 w.DEBUG.log('UNSHIFT', Date.now());
                 return surface;
             } else {
-                return topSurface;    
+                return topSurface;
             }
         },
         _positionedSurfacesShift: function () {
@@ -1635,8 +1670,8 @@ _initSurfaceManagerPlugin: function () {
                 count      = this.items.length - 1,
                 left;
 
-            left = end === 'top' ? firstIndex > 0 
-                 : end === 'bottom' ? lastIndex < count 
+            left = end === 'top' ? firstIndex > 0
+                 : end === 'bottom' ? lastIndex < count
                  : firstIndex > 0 || lastIndex < count;
 
             //DEBUG.log(firstIndex, lastIndex, this.items.length, end ,'>>>' , left);
@@ -1676,7 +1711,9 @@ _initSurfaceManagerPlugin: function () {
             }
         },
         _updateSurfaceManager: function () {
-            if (this._emptyScroller()) return;
+            if (this._emptyScroller()) {
+                return;
+            }
 
             var self             = this,
                 current          = this._getPosition(),
@@ -1719,11 +1756,13 @@ _initSurfaceManagerPlugin: function () {
                     } else {
                         bottomSurface    = surface;
                         bottomSurfaceEnd = bottomSurface.offset;
-                        yieldTask        = true;    
+                        yieldTask        = true;
                     }
                 }
                 
-                if (yieldTask) return this._setInfiniteScrollerSize();
+                if (yieldTask) {
+                    return this._setInfiniteScrollerSize();
+                }
 
                 // SHIFT | Remove elements from the top that are out of the upperBound region.
                 while (boundaries.top > topSurfaceEnd && this._recycleSurface('top')) {
@@ -1746,7 +1785,9 @@ _initSurfaceManagerPlugin: function () {
                     }
                 }
                 
-                if (yieldTask) return this._setInfiniteScrollerSize();
+                if (yieldTask) {
+                    return this._setInfiniteScrollerSize();
+                }
 
                 // POP | Remove from the end
                 while (bottomSurfaceEnd > boundaries.bottom && this._itemsLeft('top') && this._recycleSurface('bottom')) {
@@ -1756,7 +1797,9 @@ _initSurfaceManagerPlugin: function () {
                 }
             }
 
-            if (yieldTask) return this._setInfiniteScrollerSize();
+            if (yieldTask) {
+                return this._setInfiniteScrollerSize();
+            }
         },
         _setInfiniteScrollerSize: function () {
             var positioned = this.surfacesPositioned,
@@ -1886,7 +1929,8 @@ _initSurfaceManagerPlugin: function () {
 }(window));
 },
 _initIndicatorsPlugin: function () {
-    (function (w) {        
+    (function (w) {
+    'use strict';
 
     var SCROLLER = w.__S || (w.__S = {}), //NAMESPACE
         NOW      = Date.now || function () { return new Date().getTime(); },
@@ -2128,8 +2172,7 @@ _initIndicatorsPlugin: function () {
         },
         getVirtualMaxSize: function (scrollSize) {
             var s = this.getCurrentSizes();
-                return s.maxScroll === -Infinity ? -scrollSize :
-                (s.virtual ? s.wrapperSize - scrollSize : s.maxScroll);
+            return s.maxScroll === -Infinity ? -scrollSize : (s.virtual ? s.wrapperSize - scrollSize : s.maxScroll);
         },
         refresh: function () {
             this.transitionTime(0);
@@ -2142,28 +2185,28 @@ _initIndicatorsPlugin: function () {
                 maxScroll     = this.getVirtualMaxSize(scrollSize),
                 indicatorSize = Math.max(Math.round(size * size / scrollSize), 8);
 
-           if (this.scrollVertical) {
+            if (this.scrollVertical) {
                 if (this.opts.resize) {
                     this.indicatorHeight       = indicatorSize;
-                    this.indicatorStyle.height = this.indicatorHeight + 'px';    
+                    this.indicatorStyle.height = this.indicatorHeight + 'px';
                 } else {
                     this.indicatorHeight = this.indicator.offsetHeight;
                 }
                 
                 this.maxPosY               = size - this.indicatorHeight;
-                this.minBoundaryY          = 0; 
+                this.minBoundaryY          = 0;
                 this.maxBoundaryY          = this.maxPosY;
                 this.sizeRatioY            = this.maxPosY / maxScroll || FULL_INDICATOR_RATIO;
                 this.height                = this.indicatorHeight;
             } else {
                 if (this.opts.resize) {
                     this.indicatorWidth       = indicatorSize;
-                    this.indicatorStyle.width = this.indicatorWidth + 'px';    
+                    this.indicatorStyle.width = this.indicatorWidth + 'px';
                 } else {
                     this.indicatorWidth = this.indicator.offsetWidth;
                 }
                 this.maxPosX               = size - this.indicatorWidth;
-                this.minBoundaryX          = 0; 
+                this.minBoundaryX          = 0;
                 this.maxBoundaryX          = this.maxPosX;
                 this.sizeRatioX            = this.maxPosX / maxScroll || FULL_INDICATOR_RATIO;
                 this.width                 = this.indicatorWidth;
@@ -2244,6 +2287,7 @@ _initIndicatorsPlugin: function () {
 
             this.on('_initialize', this._initializeIndicators);
             this.on('_update', this._updateIndicators);
+            this.on('_refresh', this._refreshIndicators);
 
             this._hook('after', '_transitionTime', this._transitionTimeIndicators);
             this._hook('after', '_transitionEasing', this._transitionEasingIndicators);
@@ -2278,7 +2322,7 @@ _initIndicatorsPlugin: function () {
 
             if (virtualScroll > this._virtualScroll) {
                 this._virtualScroll = virtualScroll;
-                this._indicators.forEach(function (i){
+                this._indicators.forEach(function (i) {
                     i[virtualSize] = virtualScroll;
                     i.refresh();
                 });
@@ -2286,14 +2330,19 @@ _initIndicatorsPlugin: function () {
         },
         _updateIndicators: function () {
             this._indicators.forEach(function (i) {i.updatePosition();});
-         },
-         _transitionTimeIndicators: function (time) {
+        },
+        _refreshIndicators: function () {
+            this._indicators.forEach(function (i) {
+                i.refresh();
+            });
+        },
+        _transitionTimeIndicators: function (time) {
             time || (time = 0);
             this._indicators.forEach(function (i) {i.transitionTime(time);});
-         },
-         _transitionEasingIndicators: function (easing) {
+        },
+        _transitionEasingIndicators: function (easing) {
             this._indicators.forEach(function (i) {i.transitionEasing(easing);});
-         },
+        },
         _createDefaultScrollbars: function (config) {
             var interactive = true,  // TODO:
                 customStyle = false, // Move those two as params
@@ -2335,7 +2384,7 @@ _initIndicatorsPlugin: function () {
             scrollbar.appendChild(indicator);
             return scrollbar;
         },
-        /* PLUBLIC API*/
+        /* PUBLIC API */
         addIndicator: function (el, cfg) {
             cfg || (cfg = {});
             cfg.el = el;
@@ -2352,9 +2401,10 @@ _initIndicatorsPlugin: function () {
 }(window)); 
 },
 _initPullToRefreshPlugin: function () {
-    (function (w) {        
+    (function (w) {
+    'use strict';
     // NAMESPACES
-    var SCROLLER = w.__S || (w.__S = {}), 
+    var SCROLLER = w.__S || (w.__S = {}),
         RAF      = w.requestAnimationFrame,
         PLUGINS  = SCROLLER.plugins || (SCROLLER.plugins = {}),
 
@@ -2396,13 +2446,13 @@ _initPullToRefreshPlugin: function () {
                 '<span class="' + CLASS_ICON + '"></span>',
                 '<span class="' + CLASS_LABEL + '">' + pullLabel + '</span>',
                 '<span class="' + CLASS_SUBTITLE + '">' + subtitleLabel + '</span>'
-                ].join('');
+            ].join('');
 
             ptr_container.className = 'pullToRefresh';
 
             return ptr_container;
         },
-         _appendPullToRefresh: function () {
+        _appendPullToRefresh: function () {
             var ptr_container = this._createPullToRefreshMarkup();
             if (this.scroller.firstChild) {
                 this.scroller.insertBefore(ptr_container, this.scroller.firstChild);
@@ -2445,7 +2495,7 @@ _initPullToRefreshPlugin: function () {
             if (enable) {
                 this.ptrDOM.classList.add(CLASS_PULL_STATE);
                 this.ptrLabel.textContent = this.opts.pullToRefreshConfig.labelRelease;
-                this._ptrTriggered = true;    
+                this._ptrTriggered = true;
             } else {
                 this.ptrDOM.classList.remove(CLASS_PULL_STATE);
                 this.ptrLabel.textContent = this.opts.pullToRefreshConfig.labelPull;
@@ -2469,7 +2519,7 @@ _initPullToRefreshPlugin: function () {
                 this._needsPullToRefresh(y);
             }
         },
-         _needsPullToRefresh: function (ypos) {
+        _needsPullToRefresh: function (ypos) {
             if (this._ptrTriggered && ypos < this._ptrThreshold) {
                 this._setPullState(false);
             } else if (!this._ptrTriggered && ypos > this._ptrThreshold) {
@@ -2479,7 +2529,9 @@ _initPullToRefreshPlugin: function () {
         _ptrToggle: function (action, force) {
             var ptr = this.ptrDOM;
 
-            if (!ptr) return;
+            if (!ptr) {
+                return;
+            }
 
             if (action === 'disable' && (this.opts.pullToRefresh || force)) {
                 ptr.style.display = 'none';
@@ -2487,7 +2539,7 @@ _initPullToRefreshPlugin: function () {
                 this.opts.pullToRefresh = false;
 
             } else if (action === 'enable' && (!this.opts.pullToRefresh || force)) {
-                ptr.style.display = ''; 
+                ptr.style.display = '';
                 this._ptrThreshold = ptr.offsetHeight;
                 this.opts.pullToRefresh = true;
             }
@@ -2571,14 +2623,15 @@ _initPullToRefreshPlugin: function () {
                 this._ptrToggle(this.opts.pullToRefresh ? 'disable' : 'enable', force);
             }
         }
-    };   
+    };
 
     PLUGINS.PullToRefresh = PullToRefresh;
 
 }(window));
 },
 _initPullToLoadMorePlugin: function () {
-    (function (w) {        
+    (function (w) {
+    'use strict';
 
     var SCROLLER = w.__S || (w.__S = {}), //NAMESPACE
         RAF      = w.requestAnimationFrame,
@@ -2630,7 +2683,7 @@ _initPullToLoadMorePlugin: function () {
                 '<span class="' + CLASS_ICON + '"></span>',
                 '<span class="' + CLASS_LABEL + '">' + pullLabel + '</span>',
                 '<span class="' + CLASS_SUBTITLE + '">' + subtitleLabel + '</span>'
-                ].join('');
+            ].join('');
 
             ptl_container.className = CLASS_PTL;
             return ptl_container;
@@ -2642,18 +2695,18 @@ _initPullToLoadMorePlugin: function () {
             return ptl_spacer;
         },
         _sizePullToShowMore: function () {
-            var spacer = this.ptlSpacer;
+            var spacer = this.ptlSpacer,
                 diff   = this.wrapperHeight - spacer.offsetTop;
 
             diff = diff > 0 ? diff: 0;
 
             if (diff !== this.ptlSpacerSize) {
-                this.ptlSpacerSize = diff;   
+                this.ptlSpacerSize = diff;
                 spacer.style.height = this.ptlSpacerSize + 'px';
             }
         },
         _appendPullToLoad: function () {
-            var ptl_container = this._createPullToLoadMarkup();
+            var ptl_container = this._createPullToLoadMarkup(),
                 ptl_spacer    = this._createPullToLoadSpacer();
 
             this.scroller.appendChild(ptl_spacer);
@@ -2665,7 +2718,7 @@ _initPullToLoadMorePlugin: function () {
             this.ptlLabel  = ptl_container.getElementsByClassName(CLASS_LABEL)[0];
 
             this._ptlThreshold  = ptl_container.offsetHeight;
-            this._ptlSnapTime   = PULL_TO_SNAP_TIME; 
+            this._ptlSnapTime   = PULL_TO_SNAP_TIME;
             this.togglePullToLoadMore(this.opts.pullToLoadMore, true);
 
             this._setSize();
@@ -2691,7 +2744,9 @@ _initPullToLoadMorePlugin: function () {
         _ptlToggle: function (action, force) {
             var ptl = this.ptlDOM;
 
-            if (!ptl) return;
+            if (!ptl) {
+                return;
+            }
 
             if (action === 'disable' && (this.opts.pullToLoadMore || force)) {
                 ptl.style.display = 'none';
@@ -2699,7 +2754,7 @@ _initPullToLoadMorePlugin: function () {
                 this.opts.pullToLoadMore = false;
 
             } else if (action === 'enable' && (!this.opts.pullToLoadMore || force)) {
-                ptl.style.display = ''; 
+                ptl.style.display = '';
                 this._ptlThreshold = ptl.offsetHeight;
                 this.opts.pullToLoadMore = true;
             }
@@ -2710,7 +2765,10 @@ _initPullToLoadMorePlugin: function () {
             }
         },
         _needsPullToLoadMore: function (ypos) {
-            if (!this.opts.pullToLoadMore) return;
+            if (!this.opts.pullToLoadMore) {
+                return;
+            }
+
             var threshold = this.maxScrollY - this._ptlThreshold;
 
             if (this._ptlTriggered && ypos > threshold) {
@@ -2726,7 +2784,7 @@ _initPullToLoadMorePlugin: function () {
             if (enable) {
                 this.ptlDOM.classList.add(CLASS_PULL_STATE);
                 this.ptlLabel.textContent = this.opts.pullToLoadMoreConfig.labelRelease;
-                this._ptlTriggered = true;    
+                this._ptlTriggered = true;
             } else {
                 this.ptlDOM.classList.remove(CLASS_PULL_STATE);
                 this.ptlLabel.textContent = this.opts.pullToLoadMoreConfig.labelPull;
@@ -2757,7 +2815,7 @@ _initPullToLoadMorePlugin: function () {
                 this.ptlLabel.textContent = error.labelError || labelError;
             }
         },
-         _ptlExecTrigger: function () {
+        _ptlExecTrigger: function () {
             var self = this,
                 ptrDataProvider = this.opts.onPullToLoadMore,
                 callback = function () {
@@ -2817,7 +2875,7 @@ _initPullToLoadMorePlugin: function () {
                 x    : this.x,
                 y    : this.maxScrollY - this.getPTLSize(),
                 time : this.getPTLSnapTime()
-            };    
+            };
         },
         togglePullToLoadMore: function (enabled, force) {
             var hasToggleArg = enabled !== undefined,
@@ -2829,16 +2887,17 @@ _initPullToLoadMorePlugin: function () {
                 this._ptlToggle(this.opts.pullToLoadMore ? 'disable' : 'enable', force);
             }
         }
-    };   
+    };
 
     PLUGINS.PullToLoadMore = PullToLoadMore;
 
 }(window));
 },
 _initInfiniteLoadingPlugin: function () {
-    (function (w) {        
-    // NAMESPACES
-    var SCROLLER = w.__S || (w.__S = {}), 
+    (function (w) {
+    'use strict';
+
+    var SCROLLER = w.__S || (w.__S = {}),
         PLUGINS  = SCROLLER.plugins || (SCROLLER.plugins = {}),
 
         CONFIG_DEFAULTS = {
@@ -2856,7 +2915,7 @@ _initInfiniteLoadingPlugin: function () {
         },
         _mergeInfiniteLoading: function () {
             this.opts.infiniteLoadingConfig = this._mergeConfigOptions(
-                CONFIG_DEFAULTS, 
+                CONFIG_DEFAULTS,
                 this.opts.infiniteLoadingConfig
             );
         },
@@ -2914,8 +2973,8 @@ _initInfiniteLoadingPlugin: function () {
                 return;
             }
 
-            var lastIndex  = this._positionedSurfacesLast().contentIndex;
-                count      = this.items.length - 1;
+            var lastIndex  = this._positionedSurfacesLast().contentIndex,
+                count      = this.items.length - 1,
                 threshold  = this._itemsThreshold;
 
             if (count - lastIndex < threshold) {
@@ -2939,7 +2998,7 @@ _initInfiniteLoadingPlugin: function () {
                 size = this.scrollerWidth;
             } else {
                 pos  = x;
-                size = this.scrollerHeight; 
+                size = this.scrollerHeight;
             }
 
             threshold = config.threshold || 3 * size;
@@ -2959,16 +3018,17 @@ _initInfiniteLoadingPlugin: function () {
         lockFetchData: function () {
             this._ilNoMoreData = true;
         }
-    };   
+    };
 
     PLUGINS.InfiniteLoading = InfiniteLoading;
 
 }(window));
 },
 _initEndlessPlugin: function () {
-    (function (w) {        
+    (function (w) {
+    'use strict';
 
-    var SCROLLER = w.__S || (w.__S = {}), //NAMESPACE
+    var SCROLLER = w.__S || (w.__S = {}),
         PLUGINS  = SCROLLER.plugins || (SCROLLER.plugins = {});
     
     function Endless() {}
@@ -2985,7 +3045,7 @@ _initEndlessPlugin: function () {
             return ((index % n) + n) % n;
         },
         _setActiveOffset: function () {
-              this.activeOffset = (this.scrollVertical ? this.wrapperHeight: this.wrapperWidth) - 5;
+            this.activeOffset = (this.scrollVertical ? this.wrapperHeight: this.wrapperWidth) - 5;
         },
         _momentum: function (current, start, duration, lowerMargin, wrapperSize) {
             var velocity = this._getVelocity(current, start, duration),
@@ -3010,7 +3070,7 @@ _initEndlessPlugin: function () {
         _recycleEnableTest: function () {
             return true;
         },
-         _initializePositions: function () {
+        _initializePositions: function () {
             var items         = this.items,
                 itemsSize     = items.length,
                 positioned    = this.surfacesPositioned,
@@ -3033,7 +3093,9 @@ _initEndlessPlugin: function () {
             sizeNeeded   = this.activeOffset;
 
             if (i === itemsSize || !sizeNotCover) {
-                w.console.log('[WARNING - SCROLLER ENDLESS PLUGIN] - Items are not sufficient to fulfill all scrollable area');
+                w.DEBUG.log(
+                    '[WARNING - SCROLLER ENDLESS PLUGIN] - ' +
+                    'Items are not sufficient to fulfill all scrollable area');
             }
             
             for (j = itemsSize - 1; j >= i && sizeNotCover; j--) {
@@ -3045,16 +3107,16 @@ _initEndlessPlugin: function () {
             }
 
             this._setInfiniteScrollerSize();
-        },
-        
-    };   
+        }
+    };
 
     PLUGINS.Endless = Endless;
 
 }(window));
 },
 _initSnapPlugin: function () {
-    (function (w) {        
+    (function (w) {
+    'use strict';
 
     var SCROLLER    = w.__S || (w.__S = {}), //NAMESPACE
         STATICS     = SCROLLER.constructor,
@@ -3105,7 +3167,7 @@ _initSnapPlugin: function () {
         },
         _getSnapPosition: function (vertical) {
             var current;
-            if (this.scrollVertical) { 
+            if (this.scrollVertical) {
                 current  = {
                     snapSize : this._getSnapSize(true),
                     dist     : this.distY,
@@ -3122,11 +3184,11 @@ _initSnapPlugin: function () {
             return current;
         },
         _momentum: function () {
-               if (this.opts.snap === SNAP_SOFT) {
-                    return this._momentumSnapSoft.apply(this, arguments);
-               } else {
-                    return this._momentumSnapSticky.apply(this, arguments);
-               }
+            if (this.opts.snap === SNAP_SOFT) {
+                return this._momentumSnapSoft.apply(this, arguments);
+            } else {
+                return this._momentumSnapSticky.apply(this, arguments);
+            }
         },
         _momentumSnapSticky: function (current, start, duration, lowerMargin, wrapperSize) {
             var velocity = this._getVelocity(current, start, duration),
@@ -3179,7 +3241,7 @@ _initSnapPlugin: function () {
             }
             return momentum;
         }
-    };   
+    };
 
     PLUGINS.Snap = Snap;
 

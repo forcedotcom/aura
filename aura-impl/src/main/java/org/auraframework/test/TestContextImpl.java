@@ -26,16 +26,10 @@ import com.google.common.collect.Sets;
  */
 public class TestContextImpl implements TestContext {
     private final String name;
-    private String namewrbrowser;
     private Set<Definition> localDefs;
     
     public TestContextImpl(String name){
         this.name = (name == null ? "" : name);
-        this.namewrbrowser = this.name;
-        int indexOfColon = this.name.indexOf(":BROWSER");
-        if(indexOfColon > 0) {
-        	namewrbrowser = this.name.substring(0, indexOfColon);
-        }
     }
     
     @Override

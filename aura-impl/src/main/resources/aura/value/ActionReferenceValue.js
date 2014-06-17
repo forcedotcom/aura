@@ -39,6 +39,13 @@ ActionReferenceValue.prototype.auraType = "Value";
 /**
  * Returns the unwrapped value. This is a new ActionDef instance based on the associated component.
  */
+ActionReferenceValue.prototype.getAction = function(){
+    return this.actionDef.newInstance(this.component);
+};
+
+/**
+ * Returns the unwrapped value. This is a new ActionDef instance based on the associated component.
+ */
 ActionReferenceValue.prototype.getValue = function(){
     return this.actionDef.newInstance(this.component);
 };

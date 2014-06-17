@@ -19,15 +19,33 @@
  * @constructor
  * @protected
  */
-function PropertyReferenceValue(path){
+function PropertyReferenceValue(path, def, cmp){
     this.path = path;
-
+    this.valueProvider = cmp;
 //#if {"modes" : ["STATS"]}
     valueFactory.index(this);
 //#end
 }
 
 PropertyReferenceValue.prototype.auraType = "Value";
+
+/**
+ * Returns the dereferenced value indicated by the path supplied.
+ */
+PropertyReferenceValue.prototype.evaluate = function(valueProvider) {
+	if (this.isGlobal()) {
+		return aura.get(this.path.join('.'));
+	}
+
+	return (valueProvider || this.valueProvider).get(this.path.join('.'));
+};
+
+/**
+ * Returns true if the property reference starts with '$'.
+ */
+PropertyReferenceValue.prototype.isGlobal = function() {
+	return this.path[0] && this.path[0].charAt(0) === '$';
+};
 
 /**
  * Returns the root piece of this property reference.

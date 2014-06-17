@@ -398,7 +398,8 @@ var ComponentPriv = (function() { // Scoping priv
                 valuesAlreadySet = configAttributes["valuesAlreadySet"] ? configAttributes["valuesAlreadySet"]
                                 : {};
                 for (key in values) {
-                    attributeValues[key] = values[key]["descriptor"]?values[key]["value"]:values[key];
+                	var v = values[key];
+                    attributeValues[key] = v && v["descriptor"] ? v["value"] : v;
                 }
             }
 

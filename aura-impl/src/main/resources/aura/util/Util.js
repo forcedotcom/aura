@@ -1691,6 +1691,16 @@ $A.ns.Util.prototype.isComponent = function(obj) {
 };
 
 /**
+ * Checks if the object is an aura value expression.
+ *
+ * @param {Object} obj The object to check for.
+ * @returns {Boolean} True if the object type is an expression, or false otherwise.
+ */
+$A.ns.Util.prototype.isExpression = function (obj) {
+    return obj&&this.isFunction(obj.isExpression)&&obj.isExpression();
+};
+
+/**
  * Checks if the object is an aura value object via auraType property.
  *
  * @param {Object} obj The object to check for.

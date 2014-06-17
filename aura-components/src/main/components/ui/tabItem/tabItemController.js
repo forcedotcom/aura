@@ -26,8 +26,7 @@
 	 */
 	onTabActivated: function(cmp, evt, helper) {
 		if(!cmp._isActive) {
-			helper.setActive(cmp, true);
-			cmp.get('e.onActivate').fire();
+		    cmp.get('e.onActivate').fire();
 		}
 	},
 	

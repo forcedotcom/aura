@@ -15,10 +15,6 @@
  */
 
 ({
-    onTabActivated: function(cmp, evt) {
-        alert('Event tab was activated');
-    },
-    
     onPrevious: function(cmp, evt) {
         var tabset = cmp.find("navigationTabset");
         var e = tabset.get("e.getActiveTab");
@@ -73,5 +69,23 @@
         }]}, index: -1});
         e.fire();
         cmp._counter++;
+    },
+    
+    onBeforeActivate: function(cmp, evt) {
+        var callback = evt.getParam("callback");
+        var tab = evt.getParam("tab");
+        if (tab.get("v.title") === "Event Tab" && tab.get("v.icon")[0].get("v.value") === "*") {
+            //don't activate if it's dirty
+            callback(false);
+            alert('Event tab is dirty, cannot be activated');
+        }
+    },
+    
+    markDirty: function(cmp, evt) {
+        cmp.find("dirtyTabTitle").set("v.value", "*");
+    },
+    
+    clearDirty: function(cmp) {
+        cmp.find("dirtyTabTitle").set("v.value", "");
     }
 })

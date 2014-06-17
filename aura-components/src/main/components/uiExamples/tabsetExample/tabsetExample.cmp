@@ -18,7 +18,7 @@
 <aura:component model="js://uiExamples.tabsetExample">
     <div class="container">
         <h1>Basic tabs</h1>
-        <ui:tabset class="tabset">
+        <ui:tabset class="tabset" lazyRenderTabs="{!true}">
             <ui:tab title="Short Text">
                 <a href="http://salesforce.com">Salesforce.com</a>
                 <ui:inputText label="My Input Text" value="" placeholder="input text here" />
@@ -137,7 +137,7 @@
             <ui:button class="next" press="{!c.onNext}" label="Next Tab"  />
          </div>
 
-         <h1>Event tabs</h1>
+         <h1>Cancel tab activation</h1>
           <ui:tabset class="tabset">
             <ui:tab title="Tab 1" >
                 tab 1
@@ -145,12 +145,19 @@
             <ui:tab title="Tab 2">
                 tab 2
             </ui:tab>
-            <ui:tab title="Event Tab" onActivated="{!c.onActivated}">
-                Event tab
+            <ui:tab aura:id="dirtyTab" title="Event Tab" beforeActivate="{!c.onBeforeActivate}">
+                <aura:set attribute="icon">
+                    <ui:outputText aura:id="dirtyTabTitle" value="" />
+                </aura:set>
+                Event tab content
             </ui:tab>
-            <ui:tab title="Tab Content loaded from server" onActivated="{!c.loadContent}">
+            <ui:tab title="Tab Content created dynamically" onActivated="{!c.loadContent}">
             </ui:tab>
          </ui:tabset>
+         <div class="tabset">
+            <ui:button label="Mark Event Tab Dirty" press="{!c.markDirty}" />
+            <ui:button label="Clear Event Tab" press="{!c.clearDirty}" />
+         </div>
          
          <h1>Add tabs dynamically</h1>
           <ui:tabset aura:id="addableTabset" class="tabset">
@@ -163,19 +170,19 @@
          </ui:tabset>
          <div class="tabset">
             <div class="clear">
-                <ui:inputText label="Tab Title" aura:id="inputTabTitle" placeholder="title" />
+                <ui:inputText class="tabsetInput" label="Tab Title" aura:id="inputTabTitle" placeholder="title" />
             </div>
             <div class="clear">
-                <ui:inputText label="Tab Name" aura:id="inputTabName" placeholder="name" />
+                <ui:inputText class="tabsetInput" label="Tab Name" aura:id="inputTabName" placeholder="name" />
             </div>
             <div class="clear">
-                <ui:inputTextArea label="Tab Content" aura:id="inputTabContent" placeholder="content" />
+                <ui:inputTextArea class="tabsetInput" label="Tab Content" aura:id="inputTabContent" placeholder="content" />
             </div>
             <div class="clear">
-                Closable: <ui:inputCheckbox aura:id="inputTabClosable" value="closable" />
+                Closable: <ui:inputCheckbox class="tabsetInput" aura:id="inputTabClosable" value="closable" />
             </div>
             <div class="clear">
-                Active: <ui:inputCheckbox aura:id="inputTabActive" value="active" />
+                Active: <ui:inputCheckbox class="tabsetInput" aura:id="inputTabActive" value="active" />
             </div>
             <ui:button label="Add Tab" press="{!c.addTab}" />
         </div>

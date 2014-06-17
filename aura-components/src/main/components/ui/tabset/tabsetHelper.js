@@ -30,12 +30,14 @@
          if (!tab) {
              tab = cmp._tabCollection.getTab(index);
          }
-         if (tab) {
+         if (tab && this.fireBeforeActiveEvent(cmp, {"tab": tab, "oldTab": this.getActiveTab(cmp)}, tab)) {
             // set active tabItem
             var e = cmp.find('tabBar').get('e.setActive');
-            e.setParams({"index": index, "active": active}).fire();
+            e.setParams({"index": index, "active": active, "focus": option.focus}).fire();
             // activate body
             this.setActiveTabBody(cmp, {"index":index, "active": active, "tab": tab});
+            //fire tabset onActivate event
+            cmp.get("e.onActivate").setParams({"tab": tab}).fire();
          }
     },
     /**
@@ -84,6 +86,19 @@
         return cmp._activeTab;
     },
     //=============================Private Functions==============================
+    fireBeforeActiveEvent: function(cmp, params, target) {
+        var activate = true;
+        var target = target || cmp;
+        var callback = function(doActivate) {
+                activate = doActivate;
+            }
+        var tab = typeof params.index === "number" ? cmp._tabCollection.getTab(params.index) : params.tab;
+        var oldTab = typeof params.oldTab === "number" ? cmp._tabCollection.getTab(params.oldTab) : params.oldTab;
+        
+        target.get("e.beforeActivate").setParams({"tab": tab, "oldTab": oldTab, "callback": callback}).fire();
+
+        return activate;
+    },
     /**
      * @private
      */
@@ -118,7 +133,7 @@
             tab.get('e.setActive').setParams({active: true}).fire();
             //save current active tab
             cmp._activeTab = tab;
-        } else if (activeTab === tab){
+        } else if (option.active === false && cmp._activeTab === tab){
             //deactivate tab
             tab.get('e.setActive').setParams({active: false}).fire();
             cmp._activeTab = null;

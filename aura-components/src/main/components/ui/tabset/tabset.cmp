@@ -23,8 +23,10 @@
     
     <aura:registerevent name="addTab" type="ui:tabsetEvent" description="Add new tab to the component." />
     <aura:registerevent name="removeTab" type="ui:tabsetEvent" description="Remove a tab from the component." />
-    <aura:registerevent name="activateTab" type="ui:tabsetEvent" description="Activate or deactivate a tab." />
+    <aura:registerevent name="activateTab" type="ui:tabsetEvent" description="Activate a tab." />
     <aura:registerevent name="getActiveTab" type="ui:tabsetEvent" description="Get the currently active tab." />
+    <aura:registerevent name="beforeActivate" type="ui:tabsetEvent" description="The event is triggered before the tab is activated. Can be canceled to prevent the tab from activating." />
+    <aura:registerevent name="onActivate" type="ui:tabsetEvent" description="The event is triggered when the tab is activated."/>
 
     <aura:handler name="init" value="{!this}" action="{!c.onInit}" />
 
@@ -34,7 +36,7 @@
     <aura:handler name="getActiveTab" action="{!c.getActiveTab}" />
 
     <div class="{!v.class}" aura:id="tabContainer">
-        <ui:tabBar aura:id="tabBar" tabs="{!v.tabItems}" 
+        <ui:tabBar aura:id="tabBar" tabs="{!v.tabItems}"
            onTabActivated="{!c.onTabActivated}"
            onTabClosed="{!c.onTabClosed}" 
         />

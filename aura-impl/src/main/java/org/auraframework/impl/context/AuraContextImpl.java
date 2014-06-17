@@ -171,7 +171,7 @@ public class AuraContextImpl implements AuraContext {
             if (testContextAdapter != null) {
                 TestContext testContext = testContextAdapter.getTestContext();
                 if (testContext != null) {
-                    json.writeMapEntry("test", testContext.getName());
+                	json.writeMapEntry("test", testContext.getName());
                 }
             }
 

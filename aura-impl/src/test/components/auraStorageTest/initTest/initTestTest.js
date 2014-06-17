@@ -927,7 +927,7 @@
             a.setStorable();
             a.setCallback(cmp, function(action){
             	//sanity check
-            	$A.test.assertEquals(action.getReturnValue(),"anything really","we are not using the stub");
+            	$A.test.assertEquals(action.getReturnValue(),"anything really","we are not using the correct stub");
                 cmp.getDef().getHelper().findAndSetText(cmp, "callbackCounter",
                     parseInt(cmp.find("callbackCounter").getElement().innerHTML)+1);
             });

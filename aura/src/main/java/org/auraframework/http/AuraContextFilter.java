@@ -63,6 +63,7 @@ import org.auraframework.util.json.JsonReader;
 
 import com.google.common.collect.Maps;
 
+
 public class AuraContextFilter implements Filter {
     private static final boolean isProduction = Aura.getConfigAdapter().isProduction();
 
@@ -216,9 +217,9 @@ public class AuraContextFilter implements Filter {
                 }
                 if (testName == null) {
                     testName = test.get(request);
-                }
+                } 
                 if (testName != null) {
-                    TestContext testContext = testContextAdapter.getTestContext(testName);
+                	TestContext testContext = testContextAdapter.getTestContext(testName);
                     if (testContext != null) {
                         MasterDefRegistry registry = context.getDefRegistry();
                         Set<Definition> mocks = testContext.getLocalDefs();

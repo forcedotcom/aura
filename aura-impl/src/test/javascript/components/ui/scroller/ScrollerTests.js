@@ -196,7 +196,7 @@ Test.Components.Ui.Scroller.ScrollerTest=function(){
 				    start=data.start,
 				    time=data.time,
 				    expected=data.expected,
-				    scroller=getScrollerInstance(),
+				    scroller=getScrollerInstance({debounce: false}),
 				    actual;
 			
 				//Act
@@ -225,7 +225,7 @@ Test.Components.Ui.Scroller.ScrollerTest=function(){
 					    destination:data.destination,
 					    time:data.time
 				    },
-				    scroller=getScrollerInstance(),
+				    scroller=getScrollerInstance({debounce: false}),
 				    actual;
 				
 				//Act
@@ -302,7 +302,7 @@ Test.Components.Ui.Scroller.ScrollerTest=function(){
 					    time:data.time,
 					    bounce:data.bounce
 				    },
-				    scroller=getScrollerInstance(),
+				    scroller=getScrollerInstance({debounce: false}),
 				    actual;
 				
 				//Act

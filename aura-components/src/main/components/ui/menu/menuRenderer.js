@@ -14,6 +14,15 @@
  * limitations under the License.
  */
  ({
+    afterRender: function(component, helper) {
+    	var m = helper.getMenuComponent(component);
+    	var t = helper.getTriggerComponent(component);
+    	if (m && t) {
+            m.set("v.referenceElement", t.getElement());
+    	}
+    	return this.superAfterRender();
+	},
+ 
     unrender: function(component, helper) {
         if (helper.getOnClickEventProp.cache && 
             helper.getOnClickEventProp.cache.onClickStartEvent && 

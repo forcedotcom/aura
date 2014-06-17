@@ -28,7 +28,7 @@
         var index = event.getParam("focusItemIndex");
         var concreteCmp = component.getConcreteComponent();
         var _helper = concreteCmp.getDef().getHelper();
-        _helper.toggleMenuVisible(component, index, event);
+        _helper.toggleMenuVisible(concreteCmp, index, event);
     },
     
     handleMenuExpand: function(component, event, helper) {

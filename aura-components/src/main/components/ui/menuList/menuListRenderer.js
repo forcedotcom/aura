@@ -19,7 +19,8 @@
         helper.setAriaAttributes(component);
         var ret = this.superAfterRender();
         helper.position(component);
-        return ret;
+        helper.setFocus(component, false);
+        return ret; 
     },
     
     rerender: function(component, helper) {
@@ -36,6 +37,7 @@
         helper.handleVisible(component, currentlyVisible);
         helper.setAriaAttributes(component);
         helper.position(component);
+        helper.setFocus(component, currentlyVisible);
         return ret;
     }
 })

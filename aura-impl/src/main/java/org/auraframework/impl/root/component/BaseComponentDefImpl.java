@@ -114,7 +114,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     private final int hashCode;
 
     private transient Boolean localDeps = null;
-
+    
     protected BaseComponentDefImpl(Builder<T> builder) {
         super(builder);
         this.modelDefDescriptor = builder.modelDefDescriptor;
@@ -231,26 +231,38 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         if (localDeps == null) {
             computeLocalDependencies();
         }
-        return localDeps;
+        
+        return localDeps == Boolean.TRUE;
     }
 
+    /**
+     * Computes the local (server) dependencies. 
+     * 
+     * Terminology:
+     *  "remote" - a JavaScript provider or renderer
+     *  "local"  - a Java/Apex/server provider, renderer, or model 
+     */
     private synchronized void computeLocalDependencies() throws QuickFixException {
         if (localDeps != null) {
             return;
         }
+        
         if (rendererDescriptors != null && !rendererDescriptors.isEmpty()) {
             boolean hasRemote = false;
+            
             for (DefDescriptor<RendererDef> rendererDescriptor : rendererDescriptors) {
                 if (!rendererDescriptor.getDef().isLocal()) {
                     hasRemote = true;
                     break;
                 }
             }
+            
             if (!hasRemote) {
                 localDeps = true;
                 return;
             }
         }
+        
         if (modelDefDescriptor != null) {
             localDeps = true;
             return;
@@ -258,28 +270,37 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
 
         if (providerDescriptors != null) {
             boolean hasRemote = providerDescriptors.isEmpty();
+            
             for (DefDescriptor<ProviderDef> providerDescriptor : providerDescriptors) {
                 if (!providerDescriptor.getDef().isLocal()) {
                     hasRemote = true;
                     break;
                 }
             }
+            
             if (!hasRemote) {
                 localDeps = true;
                 return;
             }
         }
-        T superDef = getSuperDef();
-        if (superDef != null) {
-            if (superDef.hasLocalDependencies()) {
-                localDeps = true;
-                return;
-            }
-        }
-        localDeps = false;
-        return;
+            	
+        // If localDeps weren't found, check the parent. 
+		if (localDeps == null) {
+			 // Walk the super component tree applying slightly different dependency rules.
+	        T superDef = getSuperDef(); 
+	        
+			if (superDef != null && superDef.hasLocalDependencies()) {
+				// Only local/server models and renderers on the super/parent are considered local dependences for the child.
+				localDeps = superDef.getModelDef() != null || 
+						(superDef.getRendererDescriptor() != null && superDef.getRendererDescriptor().getDef().isLocal()); 
+			
+			}
+			else {
+				localDeps = false;
+			}
+		}
     }
-
+    
     @SuppressWarnings("unchecked")
     @Override
     public void validateReferences() throws QuickFixException {
@@ -811,6 +832,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
                 }
                 
                 boolean local = hasLocalDependencies();
+                
                 if (local) {
                     json.writeMapEntry("hasServerDeps", true);
                 }

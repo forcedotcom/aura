@@ -15,8 +15,10 @@
  */
 package org.auraframework.test;
 
+import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.UnknownHostException;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -108,10 +110,8 @@ public final class SauceUtil {
             capabilities.setCapability("version", "34");
             capabilities.setCapability("chromedriver-version", "2.9");
             break;
-        default: //explicit no-op
+        default: // explicit no-op
         }
-    
-            
 
         // adding timeouts to prevent jobs to run for too long when problems
         // occur:
@@ -127,7 +127,22 @@ public final class SauceUtil {
             capabilities.setCapability("parent-tunnel", SAUCE_PARENT_TUNNEL);
         }
 
+        // tag jobs with server name so we know the origin of the tests running in SauceLabs
+        capabilities.setCapability("tags", new String[] { getJettyHost() });
+
         return capabilities;
+    }
+
+    private static String getJettyHost() {
+        String host = System.getProperty("jetty.host");
+        if (host == null) {
+            try {
+                host = InetAddress.getLocalHost().getHostName();
+            } catch (UnknownHostException e) {
+                host = "localhost";
+            }
+        }
+        return host;
     }
 
     private static String getTestName(TestCase test) {

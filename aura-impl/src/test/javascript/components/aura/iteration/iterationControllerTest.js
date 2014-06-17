@@ -112,6 +112,9 @@ Test.Aura.Iteration.ControllerTest = function(){
         	var targetCmp={
     			getValue:function(val){
     				if(val=='v.items') return passedinValue;
+    			},
+    			getGlobalId:function(){
+    				return "";
     			}
         	};
         	var targetEvent={
@@ -250,6 +253,9 @@ Test.Aura.Iteration.ControllerTest = function(){
         	var targetCmp={
     			get:function(val){
     				if(val=='v.realbody') return targetRealBody;
+    			},
+    			getGlobalId:function(){
+    				return "";
     			}
         	};
 

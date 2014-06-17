@@ -15,9 +15,7 @@
  */
 ({
 	showMore: function(component, event, helper) {
-        if ($A.getContext().getMode() === 'PTEST') {
-            $A.mark("infiniteList showMore " + component.getGlobalId());
-        }
+        $A.mark("infiniteList showMore " + component.getGlobalId());
 		
 		var currentPageValue = component.get("v.currentPage");
 
@@ -30,9 +28,7 @@
 	},
 
 	rerenderComplete: function(component, event, helper) {
-        if ($A.getContext().getMode() === 'PTEST') {
-            $A.endMark("infiniteList showMore " + component.getGlobalId());
-        }
+        $A.endMark("infiniteList showMore " + component.getGlobalId());
 		
 		helper.showLoading(component, false);
         component.getEvent("rerenderComplete").fire();

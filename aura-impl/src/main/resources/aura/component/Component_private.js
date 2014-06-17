@@ -304,7 +304,7 @@ var ComponentPriv = (function() { // Scoping priv
             this.actionRefs = {};
             var ar = this.actionRefs;
             return {
-                get : function(key) {
+                getValue : function(key) {
                     var ret = ar[key];
                     if (!ret) {
                         var actionDef = controllerDef.getActionDef(key);
@@ -314,6 +314,9 @@ var ComponentPriv = (function() { // Scoping priv
                         }
                     }
                     return ret.getAction();
+                },
+                get : function(key){
+                	return $A.expressionService.get(this, key);
                 }
             };
         }

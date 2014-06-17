@@ -79,9 +79,9 @@ public final class MiscPerfFrameworkTest extends AbstractPerfTestCase {
         openTotallyRaw("/ui/label.cmp?label=foo");
 
         // check the data is returned and has expected fields
-        List<Map<String, Object>> data = perfWebDriverUtil.getResourceTimingData();
+        List<Map<String, ?>> data = perfWebDriverUtil.getResourceTimingData();
         assertTrue("num requests: " + data.size(), data.size() >= 5);
-        Map<String, Object> entry = data.get(0);
+        Map<String, ?> entry = data.get(0);
         assertTrue(entry.containsKey("startTime"));
         assertTrue(entry.containsKey("connectStart"));
         assertTrue(entry.containsKey("connectEnd"));

@@ -149,8 +149,9 @@ public final class PerfWebDriverUtil {
      * 
      * @return Resource Timing API performance
      */
-    public List<Map<String, Object>> getResourceTimingData() {
-        List<Map<String, Object>> entries = (List<Map<String, Object>>) ((JavascriptExecutor) driver)
+    @SuppressWarnings("unchecked")
+    public List<Map<String, ?>> getResourceTimingData() {
+        List<Map<String, ?>> entries = (List<Map<String, ?>>) ((JavascriptExecutor) driver)
                 .executeScript("return window.performance.getEntries()");
         return entries;
     }
@@ -209,6 +210,7 @@ public final class PerfWebDriverUtil {
      * 
      * @return JS heap snapshot
      */
+    @SuppressWarnings("unchecked")
     public Map<String, ?> takeHeapSnapshot() {
         if (SauceUtil.areTestsRunningOnSauce()) {
             throw new UnsupportedOperationException("required 2.10 chromedriver still not available in SauceLabs");
@@ -219,6 +221,7 @@ public final class PerfWebDriverUtil {
     /**
      * Analyzes the data in the snapshot and returns summary data
      */
+    @SuppressWarnings("unchecked")
     public static JSONObject analyzeHeapSnapshot(Map<String, ?> data) {
         Map<String, ?> metadata = (Map<String, ?>) data.get("snapshot");
         int nodeCount = ((Number) metadata.get("node_count")).intValue();

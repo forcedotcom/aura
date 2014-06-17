@@ -29,7 +29,6 @@ import java.util.logging.Logger;
 import org.auraframework.test.perf.metrics.PerfMetrics;
 import org.auraframework.util.IOUtil;
 import org.auraframework.util.test.PerfGoldFilesUtil;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.google.common.base.Charsets;
@@ -118,6 +117,7 @@ public final class PerfResultsUtil {
     /**
      * Writes the heap snapshot into a file, this file can be loaded into chrome dev tools -> Profiles -> Load
      */
+    @SuppressWarnings("unchecked")
     public static void writeHeapSnapshot(Map<String, ?> data, File file) throws Exception {
         BufferedWriter writer = null;
         try {
@@ -130,14 +130,14 @@ public final class PerfResultsUtil {
             writer.write('{');
             writer.write(JSONObject.quote("snapshot"));
             writer.write(':');
-            new JSONObject((Map) data.get("snapshot")).write(writer);
+            new JSONObject((Map<String, ?>) data.get("snapshot")).write(writer);
             writer.write(',');
             writer.newLine();
-            writeList(writer, "nodes", (List) data.get("nodes"), 5, false);
-            writeList(writer, "edges", (List) data.get("edges"), 3, false);
-            writeList(writer, "trace_function_infos", (List) data.get("trace_function_infos"), 1, false);
-            writeList(writer, "trace_tree", (List) data.get("trace_tree"), 1, false);
-            writeList(writer, "strings", (List) data.get("strings"), 1, true);
+            writeList(writer, "nodes", (List<?>) data.get("nodes"), 5, false);
+            writeList(writer, "edges", (List<?>) data.get("edges"), 3, false);
+            writeList(writer, "trace_function_infos", (List<?>) data.get("trace_function_infos"), 1, false);
+            writeList(writer, "trace_tree", (List<?>) data.get("trace_tree"), 1, false);
+            writeList(writer, "strings", (List<?>) data.get("strings"), 1, true);
             writer.write('}');
 
             LOG.info("wrote heap snapshot: " + file.getAbsolutePath());
@@ -149,7 +149,7 @@ public final class PerfResultsUtil {
         }
     }
 
-    static void writeList(BufferedWriter writer, String key, List list, int numPerLine, boolean last)
+    static void writeList(BufferedWriter writer, String key, List<?> list, int numPerLine, boolean last)
             throws IOException {
         writer.write(JSONObject.quote(key));
         writer.write(':');
@@ -180,30 +180,6 @@ public final class PerfResultsUtil {
         if (!last) {
             writer.write(',');
             writer.newLine();
-        }
-    }
-
-    public static void showHeapSnapshot(Map<String, ?> data) throws JSONException {
-        for (Object key : data.keySet()) {
-            System.out.println(key + ": " + data.get(key).getClass());
-        }
-
-        Map snapshot = (Map) data.get("snapshot");
-
-        System.out.println();
-        showList("edges", (List) data.get("edges"));
-        showList("nodes", (List) data.get("nodes"));
-        showList("strings", (List) data.get("strings"));
-        showList("trace_tree", (List) data.get("trace_tree"));
-        showList("trace_function_infos", (List) data.get("trace_function_infos"));
-
-        System.out.println("\nsnapshot: " + new JSONObject(snapshot).toString(2));
-    }
-
-    private static void showList(String label, List list) {
-        System.out.println(label + ": size " + list.size());
-        for (int i = 0; i < Math.min(16, list.size()); i++) {
-            System.out.println("    " + list.get(i));
         }
     }
 }

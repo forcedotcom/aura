@@ -19,10 +19,15 @@
      */
     testEmptyLists:{
         test:function(cmp){
-            var children = cmp.getSuper().get("v.body");
-            $A.test.assertEquals(2, children.length);
+        	var children = cmp.getSuper().get("v.body");
+            $A.test.assertEquals(8, children.length);
             $A.test.assertEquals("start", children[0].getLocalId());
-            $A.test.assertEquals("end", children[1].getLocalId());
+            $A.test.assertEquals("0", $A.test.getTextByComponent(children[0]));
+            $A.test.assertEquals("end", children[7].getLocalId());
+            $A.test.assertEquals("1", $A.test.getTextByComponent(children[7]));
+            for(var i =1; i<7;i++){
+            	$A.test.assertEquals("", $A.test.getTextByComponent(children[i]));
+            }
         }
     }
 })

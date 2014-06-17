@@ -408,11 +408,22 @@ public class ConfigAdapterImpl implements ConfigAdapter {
             String jsHash = jsGroup.getGroupHash().toString();
             String resourcesHash = getAuraResourcesNonce();
 
-            // don't want to makeHash every time so store results and return appropriately
-            if (!jsHash.equals(this.jsUid) || !resourcesHash.equals(this.resourcesUid)) {
-                this.jsUid = jsHash;
-                this.resourcesUid = resourcesHash;
-                this.fwUid = makeHash(this.jsUid, this.resourcesUid);
+            /*
+             * don't want to makeHash every time so store results and return appropriately
+             *
+             * Be VERY careful here.
+             *
+             * because fwUid is set along with jsUid and resourcesUid, there is a race condition
+             * whereby the condition can fail (i.e. both js & resources match), but fwUid is not
+             * yet set. This is very bad, as it causes an empty fwUid, which breaks everyone with
+             * a COOS
+             */
+            synchronized (this) {
+                if (!jsHash.equals(this.jsUid) || !resourcesHash.equals(this.resourcesUid)) {
+                    this.jsUid = jsHash;
+                    this.resourcesUid = resourcesHash;
+                    this.fwUid = makeHash(this.jsUid, this.resourcesUid);
+                }
             }
 
             return this.fwUid;

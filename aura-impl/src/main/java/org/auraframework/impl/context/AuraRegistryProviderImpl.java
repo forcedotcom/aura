@@ -46,12 +46,8 @@ import org.auraframework.impl.java.renderer.JavaRendererDefFactory;
 import org.auraframework.impl.java.type.JavaTypeDefFactory;
 import org.auraframework.impl.root.RootDefFactory;
 import org.auraframework.impl.source.SourceFactory;
-import org.auraframework.impl.source.file.FileJavascriptSourceLoader;
 import org.auraframework.impl.source.file.FileSourceLoader;
-import org.auraframework.impl.source.file.FileStyleSourceLoader;
-import org.auraframework.impl.source.resource.ResourceJavascriptSourceLoader;
 import org.auraframework.impl.source.resource.ResourceSourceLoader;
-import org.auraframework.impl.source.resource.ResourceStyleSourceLoader;
 import org.auraframework.impl.system.CacheableDefFactoryImpl;
 import org.auraframework.impl.system.CachingDefRegistryImpl;
 import org.auraframework.impl.system.NonCachingDefRegistryImpl;
@@ -86,17 +82,12 @@ public class AuraRegistryProviderImpl implements RegistryAdapter {
             Collection<ComponentLocationAdapter> markupLocations = getAllComponentLocationAdapters();
 
             List<SourceLoader> markupLoaders = Lists.newArrayList();
-            List<SourceLoader> jsLoaders = Lists.newArrayList();
-            List<SourceLoader> libraryLoaders = Lists.newArrayList();
-            List<SourceLoader> styleLoaders = Lists.newArrayList();
             List<SourceLoader> javaLoaders = Lists.newArrayList();
 
             for (ComponentLocationAdapter location : markupLocations) {
                 if (location != null) {
                     String pkg = location.getComponentSourcePackage();
                     if (pkg != null) {
-                        jsLoaders.add(new ResourceJavascriptSourceLoader(pkg));
-                        styleLoaders.add(new ResourceStyleSourceLoader(pkg));
                         ResourceSourceLoader rsl = new ResourceSourceLoader(pkg);
                         markupLoaders.add(rsl);
                         javaLoaders.add(rsl);
@@ -107,9 +98,6 @@ public class AuraRegistryProviderImpl implements RegistryAdapter {
                             _log.error("Unable to find " + location.getComponentSourceDir() + ", ignored.");
                             continue;
                         }
-                        jsLoaders.add(new FileJavascriptSourceLoader(location.getComponentSourceDir()));
-                        libraryLoaders.add(new FileJavascriptSourceLoader(location.getComponentSourceDir()));
-                        styleLoaders.add(new FileStyleSourceLoader(location.getComponentSourceDir()));
                         markupLoaders.add(new FileSourceLoader(location.getComponentSourceDir()));
                         File javaBase = new File(location.getComponentSourceDir().getParent(), "java");
                         if (javaBase.exists()) {
@@ -125,28 +113,23 @@ public class AuraRegistryProviderImpl implements RegistryAdapter {
                         Set<SourceLoader> loaders = location.getSourceLoaders();
                         if (!loaders.isEmpty()) {
                             markupLoaders.addAll(loaders);
-                            styleLoaders.addAll(loaders);
-                            jsLoaders.addAll(loaders);
                         }
                     }
                 }
             }
 
             if (extraLoaders != null) {
-                jsLoaders.addAll(extraLoaders);
-                styleLoaders.addAll(extraLoaders);
                 markupLoaders.addAll(extraLoaders);
                 javaLoaders.addAll(extraLoaders);
             }
 
-            SourceFactory jsSourceFactory = new SourceFactory(jsLoaders);
-            SourceFactory librarySourceFactory = new SourceFactory(libraryLoaders);
+            SourceFactory markupSourceFactory = new SourceFactory(markupLoaders);
 
             ret = new DefRegistry<?>[] {
                     AuraStaticTypeDefRegistry.INSTANCE,
                     AuraStaticControllerDefRegistry.INSTANCE,
                     
-                    createDefRegistry(new RootDefFactory(new SourceFactory(markupLoaders)), rootDefTypes, rootPrefixes),
+                    createDefRegistry(new RootDefFactory(markupSourceFactory), rootDefTypes, rootPrefixes),
 
                     AuraRegistryProviderImpl.<ControllerDef> createDefRegistry(new CompoundControllerDefFactory(),
                             DefType.CONTROLLER, DefDescriptor.COMPOUND_PREFIX),
@@ -155,18 +138,18 @@ public class AuraRegistryProviderImpl implements RegistryAdapter {
                     AuraRegistryProviderImpl.<RendererDef> createDefRegistry(new JavaRendererDefFactory(javaLoaders),
                             DefType.RENDERER, DefDescriptor.JAVA_PREFIX),
 
-                    AuraRegistryProviderImpl.<ControllerDef> createJavascriptRegistry(jsSourceFactory,
+                    AuraRegistryProviderImpl.<ControllerDef> createJavascriptRegistry(markupSourceFactory,
                             DefType.CONTROLLER),
                     AuraRegistryProviderImpl
-                            .<TestSuiteDef> createJavascriptRegistry(jsSourceFactory, DefType.TESTSUITE),
-                    AuraRegistryProviderImpl.<RendererDef> createJavascriptRegistry(jsSourceFactory, DefType.RENDERER),
-                    AuraRegistryProviderImpl.<HelperDef> createJavascriptRegistry(jsSourceFactory, DefType.HELPER),
-                    AuraRegistryProviderImpl.<ProviderDef> createJavascriptRegistry(jsSourceFactory, DefType.PROVIDER),
-                    AuraRegistryProviderImpl.<ModelDef> createJavascriptRegistry(jsSourceFactory, DefType.MODEL),
-                    AuraRegistryProviderImpl.<ResourceDef> createJavascriptRegistry(jsSourceFactory, DefType.RESOURCE),
-                    AuraRegistryProviderImpl.<IncludeDef> createJavascriptRegistry(librarySourceFactory, DefType.INCLUDE),
+                            .<TestSuiteDef> createJavascriptRegistry(markupSourceFactory, DefType.TESTSUITE),
+                    AuraRegistryProviderImpl.<RendererDef> createJavascriptRegistry(markupSourceFactory, DefType.RENDERER),
+                    AuraRegistryProviderImpl.<HelperDef> createJavascriptRegistry(markupSourceFactory, DefType.HELPER),
+                    AuraRegistryProviderImpl.<ProviderDef> createJavascriptRegistry(markupSourceFactory, DefType.PROVIDER),
+                    AuraRegistryProviderImpl.<ModelDef> createJavascriptRegistry(markupSourceFactory, DefType.MODEL),
+                    AuraRegistryProviderImpl.<ResourceDef> createJavascriptRegistry(markupSourceFactory, DefType.RESOURCE),
+                    AuraRegistryProviderImpl.<IncludeDef> createJavascriptRegistry(markupSourceFactory, DefType.INCLUDE),
 
-                    createDefRegistry(new StyleDefFactory(new SourceFactory(styleLoaders)),
+                    createDefRegistry(new StyleDefFactory(markupSourceFactory),
                             Sets.newHashSet(DefType.STYLE, DefType.RESOURCE),
                             Sets.newHashSet(DefDescriptor.CSS_PREFIX, DefDescriptor.TEMPLATE_CSS_PREFIX)),
                     createDefRegistry(new JavaTypeDefFactory(javaLoaders), DefType.TYPE, DefDescriptor.JAVA_PREFIX),

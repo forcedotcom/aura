@@ -79,7 +79,7 @@ public class ExamplesModel {
                     message = "This component or application has no examples.";
                 }
             } else {
-                message = "Nothing found using given Descriptor Filter (via 'name' attribute). Check for typo and try again!";
+                message = "Example not available";
             }
         }
     }

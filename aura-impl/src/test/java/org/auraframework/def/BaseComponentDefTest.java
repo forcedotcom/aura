@@ -363,7 +363,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
             fail("Should not be able to load component with multiple models");
         } catch (QuickFixException e) {
             checkExceptionFull(e, InvalidDefinitionException.class,
-                    "Invalid Descriptor Format: java://org.auraframework.impl.java.model.TestModel,js://test.jsModel");
+                    "Invalid Descriptor Format: java://org.auraframework.impl.java.model.TestModel,js://test.jsModel[MODEL]");
         }
     }
 

@@ -38,8 +38,8 @@ import org.auraframework.impl.javascript.renderer.JavascriptRendererDef;
 import org.auraframework.impl.javascript.testsuite.JavascriptTestCaseDef;
 import org.auraframework.impl.javascript.testsuite.JavascriptTestSuiteDef;
 import org.auraframework.impl.source.BaseSourceLoader;
-import org.auraframework.impl.source.file.FileJavascriptSourceLoader;
-import org.auraframework.impl.source.resource.ResourceJavascriptSourceLoader;
+import org.auraframework.impl.source.file.FileSourceLoader;
+import org.auraframework.impl.source.resource.ResourceSourceLoader;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraImplFiles;
@@ -522,7 +522,7 @@ public class JavascriptParserTest extends AuraImplTestCase {
 
     private BaseSourceLoader getJavascriptSourceLoader() {
         if (AuraImplFiles.TestComponents.asFile().exists()) {
-            return new FileJavascriptSourceLoader(
+            return new FileSourceLoader(
                     AuraImplFiles.TestComponents.asFile());
         } else {
             String pkg = ServiceLocator
@@ -530,7 +530,7 @@ public class JavascriptParserTest extends AuraImplTestCase {
                     .get(ComponentLocationAdapter.class,
                             "auraImplTestComponentLocationAdapterImpl")
                     .getComponentSourcePackage();
-            return new ResourceJavascriptSourceLoader(pkg);
+            return new ResourceSourceLoader(pkg);
         }
     }
 }

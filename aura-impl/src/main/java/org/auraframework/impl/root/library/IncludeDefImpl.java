@@ -19,17 +19,14 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import org.auraframework.Aura;
-import org.auraframework.def.AttributeDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.IncludeDef;
 import org.auraframework.def.LibraryDef;
-import org.auraframework.def.RegisterEventDef;
-import org.auraframework.def.RootDefinition;
-import org.auraframework.impl.root.RootDefinitionImpl;
 import org.auraframework.impl.root.event.EventDefImpl;
+
+import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
@@ -40,9 +37,7 @@ import org.auraframework.util.json.JsonConstant;
 import org.auraframework.util.json.JsonStreamReader;
 import org.auraframework.util.json.JsonStreamReader.JsonParseException;
 
-import com.google.common.collect.Lists;
-
-public class IncludeDefImpl extends RootDefinitionImpl<IncludeDef> implements IncludeDef {
+public class IncludeDefImpl extends DefinitionImpl<IncludeDef> implements IncludeDef {
     private static final long serialVersionUID = 610875326950592992L;
     private final int hashCode;
     private String libraryName;
@@ -72,20 +67,15 @@ public class IncludeDefImpl extends RootDefinitionImpl<IncludeDef> implements In
     
     @Override
     public String getExports() {
-		return exports;
-	}
+        return exports;
+    }
 
-	@Override
+    @Override
     public void serialize(Json json) throws IOException {
         JsFunction code = new JsFunction(Arrays.asList("define"), prepareCode());
         json.writeMapEntry(libraryName, code);
     }
 	
-	@Override
-	public DefDescriptor<IncludeDef> getDescriptor() {
-		return new IncludeDescriptor(this, this.libraryDescriptor);
-	}
-
     @Override
     public void validateDefinition() throws QuickFixException {
         if (this.libraryName == null) {
@@ -140,8 +130,8 @@ public class IncludeDefImpl extends RootDefinitionImpl<IncludeDef> implements In
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof EventDefImpl) {
-            EventDefImpl other = (EventDefImpl) obj;
+        if (obj instanceof IncludeDefImpl) {
+            IncludeDefImpl other = (IncludeDefImpl) obj;
             return getDescriptor().equals(other.getDescriptor());
         }
 
@@ -153,32 +143,6 @@ public class IncludeDefImpl extends RootDefinitionImpl<IncludeDef> implements In
         return hashCode;
     }
 
-    /**
-     * @see RootDefinition#getRegisterEventDefs()
-     */
-    @Override
-    public Map<String, RegisterEventDef> getRegisterEventDefs() {
-        return null;
-    }
-
-    @Override
-    public boolean isInstanceOf(DefDescriptor<? extends RootDefinition> other)
-            throws QuickFixException {
-        return other.getClass().equals(this.getClass());
-    }
-
-    @Override
-    public List<DefDescriptor<?>> getBundle() {
-        List<DefDescriptor<?>> ret = Lists.newArrayList();
-        return ret;
-    }
-
-    @Override
-    public Map<DefDescriptor<AttributeDef>, AttributeDef> getAttributeDefs()
-            throws QuickFixException {
-        return attributeDefs;
-    }
-    
     private String prepareCode() {
         StringBuilder builder = new StringBuilder();
         builder.append("define(\"");
@@ -213,7 +177,7 @@ public class IncludeDefImpl extends RootDefinitionImpl<IncludeDef> implements In
         return builder.toString();
     }
     
-    public static class Builder extends RootDefinitionImpl.Builder<IncludeDef> {
+    public static class Builder extends DefinitionImpl.BuilderImpl<IncludeDef> {
         
         private List<String> imports;
         private String exports;
@@ -248,64 +212,4 @@ public class IncludeDefImpl extends RootDefinitionImpl<IncludeDef> implements In
             this.parentDescriptor = parentDescriptor;
         }
     }
-    
-    private static class IncludeDescriptor implements DefDescriptor<IncludeDef> {
-        private static final long serialVersionUID = -1718939259432011513L;
-        private final DefDescriptor<LibraryDef> libraryDef;
-        private final IncludeDef includeDef;
-        
-        public IncludeDescriptor(IncludeDef includeDef, DefDescriptor<LibraryDef> libraryDef) {
-            this.includeDef = includeDef;
-            this.libraryDef = libraryDef;
-        }
-        
-        @Override public void serialize(Json json) throws IOException { 
-            libraryDef.serialize(json);
-        }
-
-        @Override public int compareTo(DefDescriptor<?> o) { 
-            return libraryDef.compareTo(o);    
-        }
-
-        @Override public String getName() {
-            return libraryDef.getName();
-        }
-
-        @Override public String getQualifiedName() {
-            return libraryDef.getQualifiedName();
-        }
-
-        @Override public String getDescriptorName() {
-            return libraryDef.getDescriptorName();
-        }
-
-        @Override public String getPrefix() {
-            return "js";
-        }
-
-        @Override public String getNamespace() {
-            return libraryDef.getNamespace();
-        }
-
-        @Override public String getNameParameters() {
-            return libraryDef.getNameParameters();
-        }
-
-        @Override public boolean isParameterized() {
-            return libraryDef.isParameterized();
-        }
-
-        @Override public org.auraframework.def.DefDescriptor.DefType getDefType() {
-            return DefType.INCLUDE;
-        }
-
-        @Override public IncludeDef getDef() throws QuickFixException {
-            return includeDef;
-        }
-
-        @Override public boolean exists() {
-            return libraryDef.exists();
-        }
-    }
-
 }

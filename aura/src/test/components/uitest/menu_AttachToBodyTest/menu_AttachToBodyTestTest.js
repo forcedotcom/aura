@@ -67,5 +67,17 @@
 	            $A.test.addWaitForWithFailureMessage(cmp.find(item3).get('v.label'), function(){return menuLabel.get('v.label')}, "Label should be updated to "+ cmp.find(item3).get('v.label'));
 	        }
         ]
-    }
+    },
+    
+    /**
+     * Test first item in menuList is focused.
+     */
+    testFocusOnFirstMenuItem:{
+    	test: function(cmp){
+			trigger = cmp.find("trigger");
+			trigger.get("e.click").fire();
+			var menuItem1 = cmp.find("actionItem1");
+			$A.test.addWaitForWithFailureMessage(menuItem1.get('v.label'), function(){return $A.test.getActiveElementText()}, "Focus should be on item 1");
+		}
+	}
 })

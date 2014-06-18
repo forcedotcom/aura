@@ -330,6 +330,12 @@
 	 * TODO add index validation
 	 */
 	insertRows: function (concrete, index, count, callback, newItems) {
+        if (!concrete.isRendered()) {
+            //insertRows might be called before the table is actually rendered to the dom
+            //If that's the case, this method will fail.  Instead, we just ignore it
+            //and we'll end up calling this method when the dataGrid is rendered anyway
+            return;
+        }
 		var self = this,
 			tbody = concrete.find('tbody').getElement(),
 			hasSummaryRow = concrete.getValue('v.summaryRow').getLength() > 0,

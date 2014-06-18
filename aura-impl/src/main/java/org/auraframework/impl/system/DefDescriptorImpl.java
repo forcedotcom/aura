@@ -37,7 +37,6 @@ import org.auraframework.util.json.Json;
  */
 public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T> {
     private static final long serialVersionUID = 3030118554156737974L;
-    private final DefDescriptor<?> bundle;
     protected final String namespace;
     protected final String name;
     protected final String qualifiedName;
@@ -47,6 +46,9 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
     protected final DefType defType;
 
     private final int hashCode;
+
+
+
 
     private static CachingService cSrv = Aura.getCachingService();
 
@@ -81,8 +83,6 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
 
     protected DefDescriptorImpl(DefDescriptor<?> associate, Class<T> defClass, String newPrefix) {
         LoggingService loggingService = Aura.getLoggingService();
-
-        this.bundle = null;
         loggingService.startTimer(LoggingService.TIMER_DEF_DESCRIPTOR_CREATION);
         try {
             this.defType = DefType.getDefType(defClass);
@@ -100,8 +100,7 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
         loggingService.incrementNum(LoggingService.DEF_DESCRIPTOR_COUNT);
     }
 
-    private DefDescriptorImpl(String qualifiedName, Class<T> defClass, DefDescriptor<?> bundle) {
-        this.bundle = bundle;
+    protected DefDescriptorImpl(String qualifiedName, Class<T> defClass) {
         LoggingService loggingService = Aura.getLoggingService();
         loggingService.startTimer(LoggingService.TIMER_DEF_DESCRIPTOR_CREATION);
         try {
@@ -126,7 +125,6 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
             case TYPE:
             case PROVIDER:
             case THEME_PROVIDER:
-            case INCLUDE:
                 Matcher matcher = CLASS_PATTERN.matcher(qualifiedName);
                 if (matcher.matches()) {
                     prefix = matcher.group(1);
@@ -143,7 +141,7 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
                         }
                     }
                 } else {
-                    throw new AuraRuntimeException(String.format("Invalid Descriptor Format: %s[%s]", qualifiedName, defType.toString()));
+                    throw new AuraRuntimeException(String.format("Invalid Descriptor Format: %s", qualifiedName));
                 }
 
                 break;
@@ -158,6 +156,7 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
             case TESTCASE:
             case VAR:
             case THEME_DEF_REF:
+            case INCLUDE:
                 name = qualifiedName;
                 break;
             case APPLICATION:
@@ -184,7 +183,7 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
                     }
                     qualifiedName = buildQualifiedName(prefix, namespace, name);
                 } else {
-                    throw new AuraRuntimeException(String.format("Invalid Descriptor Format: %s[%s]", qualifiedName, defType.toString()));
+                    throw new AuraRuntimeException(String.format("Invalid Descriptor Format: %s", qualifiedName));
                 }
 
                 break;
@@ -214,12 +213,8 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
         loggingService.incrementNum(LoggingService.DEF_DESCRIPTOR_COUNT);
     }
 
-    protected DefDescriptorImpl(String qualifiedName, Class<T> defClass) {
-        this(qualifiedName, defClass, null);
-    }
-
     private int createHashCode() {
-        return (bundle == null?0:bundle.hashCode())+AuraUtil.hashCodeLowerCase(name, namespace, prefix, defType.ordinal());
+        return AuraUtil.hashCodeLowerCase(name, namespace, prefix, defType.ordinal());
     }
 
     @Override
@@ -266,9 +261,8 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
     public boolean equals(Object o) {
         if (o instanceof DefDescriptor) {
             DefDescriptor<?> e = (DefDescriptor<?>) o;
-            return (bundle == e.getBundle() || (bundle != null && !bundle.equals(e.getBundle())))
-                    && getDefType() == e.getDefType() && name.equalsIgnoreCase(e.getName())
-                    && (namespace == null ? e.getNamespace() == null:namespace.equalsIgnoreCase(e.getNamespace()))
+            return getDefType() == e.getDefType() && name.equalsIgnoreCase(e.getName())
+                    && (namespace == null ? e.getNamespace() == null : namespace.equalsIgnoreCase(e.getNamespace()))
                     && (prefix == null ? e.getPrefix() == null : prefix.equalsIgnoreCase(e.getPrefix()));
         }
         return false;
@@ -287,11 +281,6 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
         return prefix;
     }
 
-    @Override
-    public DefDescriptor<?> getBundle() {
-        return this.bundle;
-    }
-
     /**
      * @return Returns isParameterized.
      */
@@ -300,8 +289,7 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
         return nameParameters != null;
     }
 
-    private static <E extends Definition> DefDescriptor<E> buildInstance(String qualifiedName,
-            Class<E> defClass, DefDescriptor<?> bundle) {
+    private static <E extends Definition> DefDescriptor<E> buildInstance(String qualifiedName, Class<E> defClass) {
         if (defClass == TypeDef.class && qualifiedName.indexOf("://") == -1) {
             TypeDef typeDef = AuraStaticTypeDefRegistry.INSTANCE.getDef(qualifiedName);
             if (typeDef != null) {
@@ -311,7 +299,7 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
             }
         }
 
-        return new DefDescriptorImpl<E>(qualifiedName, defClass, bundle);
+        return new DefDescriptorImpl<E>(qualifiedName, defClass);
     }
 
     /**
@@ -321,13 +309,12 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
      * @param defClass The Interface's Class for the DefDescriptor being requested.
      * @return An instance of a AuraDescriptor for the provided tag
      */
-    public static <E extends Definition> DefDescriptor<E> getInstance(String name, Class<E> defClass,
-            DefDescriptor<?> bundle) {
+    public static <E extends Definition> DefDescriptor<E> getInstance(String name, Class<E> defClass) {
         if (name == null || defClass == null) {
             throw new AuraRuntimeException("descriptor is null");
         }
 
-        DescriptorKey dk = new DescriptorKey(name, defClass, bundle);
+        DescriptorKey dk = new DescriptorKey(name, defClass);
 
         Cache<DescriptorKey, DefDescriptor<? extends Definition>> cache =
                 cSrv.getDefDescriptorByNameCache();
@@ -336,14 +323,14 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
         @SuppressWarnings("unchecked")
         DefDescriptor<E> result = (DefDescriptor<E>) cache.getIfPresent(dk);
         if (result == null) {
-            result = buildInstance(name, defClass, bundle);
+            result = buildInstance(name, defClass);
 
             // Our input names may not be qualified, but we should ensure that
             // the fully-qualified is properly cached to the same object.
             // I'd like an unqualified name to either throw or be resolved first,
             // but that's breaking or non-performant respectively.
             if (!dk.getName().equals(result.getQualifiedName())) {
-                DescriptorKey fullDK = new DescriptorKey(result.getQualifiedName(), defClass, result.getBundle());
+                DescriptorKey fullDK = new DescriptorKey(result.getQualifiedName(), defClass);
 
                 @SuppressWarnings("unchecked")
                 DefDescriptor<E> fullResult = (DefDescriptor<E>) cache.getIfPresent(fullDK);
@@ -359,17 +346,6 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
         }
 
         return result;
-    }
-
-    /**
-     * FIXME: this method is ambiguous about wanting a qualified, simple, or descriptor name.
-     * 
-     * @param name The simple String representation of the instance requested ("foo:bar" or "java://foo.Bar")
-     * @param defClass The Interface's Class for the DefDescriptor being requested.
-     * @return An instance of a AuraDescriptor for the provided tag
-     */
-    public static <E extends Definition> DefDescriptor<E> getInstance(String name, Class<E> defClass) {
-        return getInstance(name, defClass, null);
     }
 
     /**

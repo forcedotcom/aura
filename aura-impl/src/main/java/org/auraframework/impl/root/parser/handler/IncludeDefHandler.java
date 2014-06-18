@@ -24,12 +24,9 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.def.IncludeDef;
 import org.auraframework.def.LibraryDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.root.library.IncludeDefImpl;
-
-import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
@@ -77,11 +74,6 @@ public class IncludeDefHandler extends XMLHandler<IncludeDefImpl> {
         } else {
             error("aura:include must specify a valid library name.");
         }
-        if (name.toLowerCase().endsWith(".js")) {
-            name = name.substring(0, name.length()-3);
-        }
-        builder.setDescriptor(DefDescriptorImpl.getInstance(String.format("js://%s.%s",
-                parentDescriptor.getNamespace(), name), IncludeDef.class, parentDescriptor));
         
         String imports = getAttributeValue(ATTRIBUTE_IMPORTS);
         if (!AuraTextUtil.isNullEmptyOrWhitespace(imports)) {
@@ -99,7 +91,6 @@ public class IncludeDefHandler extends XMLHandler<IncludeDefImpl> {
         if (next != XMLStreamConstants.END_ELEMENT || !TAG.equalsIgnoreCase(getTagName())) {
             error("expected end of %s tag", TAG);
         }
-
         builder.setOwnHash(source.getHash());
 
         return builder.build();

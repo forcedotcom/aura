@@ -669,7 +669,6 @@
                                             <include name="**/*.cmp" />
                                             <include name="**/*.intf" />
                                             <include name="**/*.evt" />
-                                            <include name="**/*.lib" />
                                             <include name="**/*.app" />
                                             <include name="**/*.css" />
                                             <include name="**/*.theme" />

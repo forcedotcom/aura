@@ -182,9 +182,4 @@ public class SubDefDescriptorImpl<T extends Definition, P extends Definition> im
     public int compareTo(DefDescriptor<?> other) {
         return DefDescriptorImpl.compare(this, other);
     }
-
-    @Override
-    public DefDescriptor<?> getBundle() {
-        return null;
-    }
 }

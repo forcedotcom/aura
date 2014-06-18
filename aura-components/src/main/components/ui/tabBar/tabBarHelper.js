@@ -86,6 +86,7 @@
 			if (index < 0 || index >= len) {
 				return;
 			}
+			var oldTab = index;
 	        if (keyCode === 37 || keyCode === 38) {
 	            //left or up arrow key
 	        	if (index === 0) {
@@ -101,10 +102,7 @@
 	        		index++;
 	        	}
 	        }
-	        var nextTab = cmp._tabItems[index];
-	        this.deactivateTab(cmp, nextTab);
-	        this.activateTab(cmp, index, true);
-	        cmp.get('e.onTabActivated').setParams({"index": index}).fire();	
+	        cmp.get('e.onTabActivated').setParams({"index": index, "oldTab": oldTab}).fire();
 	        $A.util.squash(domEvent, true);
 		}
 	},

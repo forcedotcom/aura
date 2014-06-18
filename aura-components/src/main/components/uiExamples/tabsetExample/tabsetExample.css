@@ -13,34 +13,51 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-.THIS > .icon{
-	width:16px;
-	height:16px;
-	float:left;
-	padding:0;
-	margin-right:4px;
-	margin-left:-4px;
+ 
+ .THIS.container {
+    margin: 20px;
 }
 
-.THIS.scrolling {
-	overflow: auto;
+.THIS .tabset {
+    margin-bottom: 20px;
 }
 
-.THIS.active > a.tabHeader {
-	cursor: default;
-	color: #fff;
+.THIS .tabset .tabBody {
+    border: 1px solid #99bce8;
+    padding: 10px;
 }
 
-.THIS.tabBody {	
-	display: none;
+.THIS .tabset.left {
+    display: table;
 }
 
-.THIS.top.active.tabBody, .THIS.bottom.active.tabBody, .THIS.active {
-	display: block;
-}
 
-.THIS.left.active.tabBody, .THIS.right.active.tabBody {
-    display: inline-block;
+.THIS .tabset.left .tabList, .THIS .tabset.left .tabBody.active {
+    display: table-cell;
     vertical-align: top;
+}
+
+.THIS .tabset.left .tabList .tabItem {
+    margin-bottom: 3px;
+}
+
+.THIS .next {
+    float: right;
+}
+
+.THIS .clear .uiInput .uiLabel {
+    display: inline-block;
+    float: left;
+    clear: left;
+    width: 100px;
+    text-align: left;
+}
+
+.THIS .tabsetInput.uiInput {
+  display: inline-block;
+  float: left;
+}
+
+.THIS .clear {
+	clear: both;
 }

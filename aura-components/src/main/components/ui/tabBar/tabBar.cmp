@@ -16,8 +16,8 @@
 
 -->
 <aura:component description="Used Internally for ui:tabset component">
-    <aura:attribute name="tabs" type="List" />
-    <aura:attribute name="class" type="String" description="" />
+    <aura:attribute name="tabs" type="List" description="List of tab configurations." />
+    <aura:attribute name="class" type="String" description="CSS class" />
     
     <aura:registerevent name="setActive" type="ui:tabsetEvent" description="This event is fired from parent component to activate a tab item."/>
     <aura:registerevent name="addTab" type="ui:tabsetEvent" description="This event is fired from parent component to add a tab item." />

@@ -31,20 +31,28 @@
     },
     
     getActiveTab: function(cmp, evt, helper) {
-    	var tab = helper.getActiveTab(cmp);
     	var callback = evt.getParam("callback");
     	if (typeof callback === "function") {
-    	    callback({"tab": tab});
+    	    var tab = helper.getActiveTab(cmp);
+    	    var index = cmp._tabCollection.getTabIndex({"tab": tab});
+    	    callback({"index": index, "tab": tab});
     	}
     },
     
     activateTab: function(cmp, evt, helper) {
-        helper.setActive(cmp, {"index": helper.getTabIndexFromEvent(cmp, evt)});
+        var index = helper.getTabIndexFromEvent(cmp, evt);
+        var params = evt.getParams();
+        params.index = index;
+        if (helper.fireBeforeActiveEvent(cmp, params)) {
+            helper.setActive(cmp, {"index": index});
+        }
     },
     
     onTabActivated: function(cmp, evt, helper) {
         var index = evt.getParam("index");
-        helper.setActiveTabBody(cmp, {"index":index, "tab": cmp._tabCollection.getTab(index), "active": true});
+        if (helper.fireBeforeActiveEvent(cmp, evt.getParams())) {
+            helper.setActive(cmp, {"index": index, "focus": true});
+        }
     },
     
     onTabClosed: function(cmp, evt, helper) {

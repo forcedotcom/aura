@@ -1,0 +1,194 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component model="js://uiExamples.tabsetExample">
+    <div class="container">
+        <h1>Basic tabs</h1>
+        <ui:tabset class="tabset" lazyRenderTabs="{!true}">
+            <ui:tab title="Short Text">
+                <a href="http://salesforce.com">Salesforce.com</a>
+                <ui:inputText label="My Input Text" value="" placeholder="input text here" />
+                Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Sed metus nibh, sodales a, porta at, vulputate eget, dui. Pellentesque ut nisl. Maecenas tortor turpis, interdum non, sodales non, iaculis ac, lacus. 
+    
+                Vestibulum auctor, tortor quis iaculis malesuada, libero lectus bibendum purus, sit amet tincidunt quam turpis vel lacus. In pellentesque nisl non sem. Suspendisse nunc sem, pretium eget, cursus a, fringilla vel, urna.
+            </ui:tab>
+            <ui:tab title="Long Text">
+                Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Sed metus nibh, sodales a, porta at, vulputate eget, dui. Pellentesque ut nisl. Maecenas tortor turpis, interdum non, sodales non, iaculis ac, lacus. Vestibulum auctor, tortor quis iaculis malesuada, libero lectus bibendum purus, sit amet tincidunt quam turpis vel lacus. In pellentesque nisl non sem. Suspendisse nunc sem, pretium eget, cursus a, fringilla vel, urna. 
+    
+                Aliquam commodo ullamcorper erat. Nullam vel justo in neque porttitor laoreet. Aenean lacus dui, consequat eu, adipiscing eget, nonummy non, nisi. Morbi nunc est, dignissim non, ornare sed, luctus eu, massa. Vivamus eget quam. Vivamus tincidunt diam nec urna. Curabitur velit.
+            </ui:tab>
+            <ui:tab title="tab with input text">
+                <ui:inputText value="" label="Name" placeholder="input text" />
+            </ui:tab>
+            <ui:tab title="tab with iframe">
+                <iframe id="myIframe" src="http://salesforce.com" height="200" width="500">
+                </iframe>
+            </ui:tab>
+        </ui:tabset>
+        <h1>Tabs on the side</h1>
+        <ui:tabset class="tabset left">
+            <ui:tab title="Side Tab 1">
+            Tab 1
+            <ui:inputText value="" label="Name" placeholder="input text" />
+                            Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Sed metus nibh, sodales a, porta at, vulputate eget, dui. Pellentesque ut nisl. Maecenas tortor turpis, interdum non, sodales non, iaculis ac, lacus. Vestibulum auctor, tortor quis iaculis malesuada, libero lectus bibendum purus, sit amet tincidunt quam turpis vel lacus. In pellentesque nisl non sem. Suspendisse nunc sem, pretium eget, cursus a, fringilla vel, urna. 
+    
+                Aliquam commodo ullamcorper erat. Nullam vel justo in neque porttitor laoreet. Aenean lacus dui, consequat eu, adipiscing eget, nonummy non, nisi. Morbi nunc est, dignissim non, ornare sed, luctus eu, massa. Vivamus eget quam. Vivamus tincidunt diam nec urna. Curabitur velit.
+     
+            </ui:tab>
+            <ui:tab title="Side Tab 2" >
+            Tab 2
+                            Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Sed metus nibh, sodales a, porta at, vulputate eget, dui. Pellentesque ut nisl. Maecenas tortor turpis, interdum non, sodales non, iaculis ac, lacus. Vestibulum auctor, tortor quis iaculis malesuada, libero lectus bibendum purus, sit amet tincidunt quam turpis vel lacus. In pellentesque nisl non sem. Suspendisse nunc sem, pretium eget, cursus a, fringilla vel, urna. 
+    
+                Aliquam commodo ullamcorper erat. Nullam vel justo in neque porttitor laoreet. Aenean lacus dui, consequat eu, adipiscing eget, nonummy non, nisi. Morbi nunc est, dignissim non, ornare sed, luctus eu, massa. Vivamus eget quam. Vivamus tincidunt diam nec urna. Curabitur velit.
+     
+            </ui:tab>
+            <ui:tab title="Side Tab 3" >
+            Tab 3
+                            Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Sed metus nibh, sodales a, porta at, vulputate eget, dui. Pellentesque ut nisl. Maecenas tortor turpis, interdum non, sodales non, iaculis ac, lacus. Vestibulum auctor, tortor quis iaculis malesuada, libero lectus bibendum purus, sit amet tincidunt quam turpis vel lacus. In pellentesque nisl non sem. Suspendisse nunc sem, pretium eget, cursus a, fringilla vel, urna. 
+    
+                Aliquam commodo ullamcorper erat. Nullam vel justo in neque porttitor laoreet. Aenean lacus dui, consequat eu, adipiscing eget, nonummy non, nisi. Morbi nunc est, dignissim non, ornare sed, luctus eu, massa. Vivamus eget quam. Vivamus tincidunt diam nec urna. Curabitur velit.
+     
+            </ui:tab>
+            <ui:tab title="Side Tab 4" >
+            Tab 4
+                            Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Sed metus nibh, sodales a, porta at, vulputate eget, dui. Pellentesque ut nisl. Maecenas tortor turpis, interdum non, sodales non, iaculis ac, lacus. Vestibulum auctor, tortor quis iaculis malesuada, libero lectus bibendum purus, sit amet tincidunt quam turpis vel lacus. In pellentesque nisl non sem. Suspendisse nunc sem, pretium eget, cursus a, fringilla vel, urna. 
+    
+                Aliquam commodo ullamcorper erat. Nullam vel justo in neque porttitor laoreet. Aenean lacus dui, consequat eu, adipiscing eget, nonummy non, nisi. Morbi nunc est, dignissim non, ornare sed, luctus eu, massa. Vivamus eget quam. Vivamus tincidunt diam nec urna. Curabitur velit.
+     
+            </ui:tab>
+        </ui:tabset>
+        
+        <h1> Default active tab</h1>
+        <ui:tabset class="tabset">
+            <ui:tab title="Tab 1">
+                <p>Tab 1</p>
+            <ui:inputText value="" label="Name" placeholder="input text" />
+                            Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Sed metus nibh, sodales a, porta at, vulputate eget, dui. Pellentesque ut nisl. Maecenas tortor turpis, interdum non, sodales non, iaculis ac, lacus. Vestibulum auctor, tortor quis iaculis malesuada, libero lectus bibendum purus, sit amet tincidunt quam turpis vel lacus. In pellentesque nisl non sem. Suspendisse nunc sem, pretium eget, cursus a, fringilla vel, urna. 
+    
+                Aliquam commodo ullamcorper erat. Nullam vel justo in neque porttitor laoreet. Aenean lacus dui, consequat eu, adipiscing eget, nonummy non, nisi. Morbi nunc est, dignissim non, ornare sed, luctus eu, massa. Vivamus eget quam. Vivamus tincidunt diam nec urna. Curabitur velit.
+     
+            </ui:tab>
+            <ui:tab title="Tab 2" >
+                <p>Tab 2</p>
+                            Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Sed metus nibh, sodales a, porta at, vulputate eget, dui. Pellentesque ut nisl. Maecenas tortor turpis, interdum non, sodales non, iaculis ac, lacus. Vestibulum auctor, tortor quis iaculis malesuada, libero lectus bibendum purus, sit amet tincidunt quam turpis vel lacus. In pellentesque nisl non sem. Suspendisse nunc sem, pretium eget, cursus a, fringilla vel, urna. 
+    
+                Aliquam commodo ullamcorper erat. Nullam vel justo in neque porttitor laoreet. Aenean lacus dui, consequat eu, adipiscing eget, nonummy non, nisi. Morbi nunc est, dignissim non, ornare sed, luctus eu, massa. Vivamus eget quam. Vivamus tincidunt diam nec urna. Curabitur velit.
+     
+            </ui:tab>
+            <ui:tab title="Tab 3" active="{!true}" >
+                <p>Tab 3</p>
+                            Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Sed metus nibh, sodales a, porta at, vulputate eget, dui. Pellentesque ut nisl. Maecenas tortor turpis, interdum non, sodales non, iaculis ac, lacus. Vestibulum auctor, tortor quis iaculis malesuada, libero lectus bibendum purus, sit amet tincidunt quam turpis vel lacus. In pellentesque nisl non sem. Suspendisse nunc sem, pretium eget, cursus a, fringilla vel, urna. 
+    
+                Aliquam commodo ullamcorper erat. Nullam vel justo in neque porttitor laoreet. Aenean lacus dui, consequat eu, adipiscing eget, nonummy non, nisi. Morbi nunc est, dignissim non, ornare sed, luctus eu, massa. Vivamus eget quam. Vivamus tincidunt diam nec urna. Curabitur velit.
+     
+            </ui:tab>
+            <ui:tab title="Tab 4" >
+                <p>Tab 4</p>
+                            Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Sed metus nibh, sodales a, porta at, vulputate eget, dui. Pellentesque ut nisl. Maecenas tortor turpis, interdum non, sodales non, iaculis ac, lacus. Vestibulum auctor, tortor quis iaculis malesuada, libero lectus bibendum purus, sit amet tincidunt quam turpis vel lacus. In pellentesque nisl non sem. Suspendisse nunc sem, pretium eget, cursus a, fringilla vel, urna. 
+    
+                Aliquam commodo ullamcorper erat. Nullam vel justo in neque porttitor laoreet. Aenean lacus dui, consequat eu, adipiscing eget, nonummy non, nisi. Morbi nunc est, dignissim non, ornare sed, luctus eu, massa. Vivamus eget quam. Vivamus tincidunt diam nec urna. Curabitur velit.
+     
+            </ui:tab>
+        </ui:tabset>
+        
+        <h1>Activate tab by event</h1>
+        <ui:tabset aura:id="navigationTabset" class="tabset">
+            <ui:tab title="Tab 1" closable="true">
+               <p>Tab 1</p>
+                            Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Sed metus nibh, sodales a, porta at, vulputate eget, dui. Pellentesque ut nisl. Maecenas tortor turpis, interdum non, sodales non, iaculis ac, lacus. Vestibulum auctor, tortor quis iaculis malesuada, libero lectus bibendum purus, sit amet tincidunt quam turpis vel lacus. In pellentesque nisl non sem. Suspendisse nunc sem, pretium eget, cursus a, fringilla vel, urna. 
+    
+                Aliquam commodo ullamcorper erat. Nullam vel justo in neque porttitor laoreet. Aenean lacus dui, consequat eu, adipiscing eget, nonummy non, nisi. Morbi nunc est, dignissim non, ornare sed, luctus eu, massa. Vivamus eget quam. Vivamus tincidunt diam nec urna. Curabitur velit.
+            </ui:tab>
+            <ui:tab title="Tab 2" closable="true">
+                <p>Tab 2</p>
+                            Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Sed metus nibh, sodales a, porta at, vulputate eget, dui. Pellentesque ut nisl. Maecenas tortor turpis, interdum non, sodales non, iaculis ac, lacus. Vestibulum auctor, tortor quis iaculis malesuada, libero lectus bibendum purus, sit amet tincidunt quam turpis vel lacus. In pellentesque nisl non sem. Suspendisse nunc sem, pretium eget, cursus a, fringilla vel, urna. 
+    
+                Aliquam commodo ullamcorper erat. Nullam vel justo in neque porttitor laoreet. Aenean lacus dui, consequat eu, adipiscing eget, nonummy non, nisi. Morbi nunc est, dignissim non, ornare sed, luctus eu, massa. Vivamus eget quam. Vivamus tincidunt diam nec urna. Curabitur velit.
+            </ui:tab>
+            <ui:tab title="Tab 3" closable="true">
+                <p>Tab 3</p>
+                            Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Sed metus nibh, sodales a, porta at, vulputate eget, dui. Pellentesque ut nisl. Maecenas tortor turpis, interdum non, sodales non, iaculis ac, lacus. Vestibulum auctor, tortor quis iaculis malesuada, libero lectus bibendum purus, sit amet tincidunt quam turpis vel lacus. In pellentesque nisl non sem. Suspendisse nunc sem, pretium eget, cursus a, fringilla vel, urna. 
+    
+                Aliquam commodo ullamcorper erat. Nullam vel justo in neque porttitor laoreet. Aenean lacus dui, consequat eu, adipiscing eget, nonummy non, nisi. Morbi nunc est, dignissim non, ornare sed, luctus eu, massa. Vivamus eget quam. Vivamus tincidunt diam nec urna. Curabitur velit.
+            </ui:tab>
+            <ui:tab title="Tab 4" closable="true">
+                <p>Tab 4</p>
+                            Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Sed metus nibh, sodales a, porta at, vulputate eget, dui. Pellentesque ut nisl. Maecenas tortor turpis, interdum non, sodales non, iaculis ac, lacus. Vestibulum auctor, tortor quis iaculis malesuada, libero lectus bibendum purus, sit amet tincidunt quam turpis vel lacus. In pellentesque nisl non sem. Suspendisse nunc sem, pretium eget, cursus a, fringilla vel, urna. 
+    
+                Aliquam commodo ullamcorper erat. Nullam vel justo in neque porttitor laoreet. Aenean lacus dui, consequat eu, adipiscing eget, nonummy non, nisi. Morbi nunc est, dignissim non, ornare sed, luctus eu, massa. Vivamus eget quam. Vivamus tincidunt diam nec urna. Curabitur velit.
+            </ui:tab>
+         </ui:tabset>
+         <div class="tabset">
+            <ui:button class="previous" press="{!c.onPrevious}" label="Previous Tab" />
+            <ui:button class="next" press="{!c.onNext}" label="Next Tab"  />
+         </div>
+
+         <h1>Cancel tab activation</h1>
+          <ui:tabset class="tabset">
+            <ui:tab title="Tab 1" >
+                tab 1
+            </ui:tab>
+            <ui:tab title="Tab 2">
+                tab 2
+            </ui:tab>
+            <ui:tab aura:id="dirtyTab" title="Event Tab" beforeActivate="{!c.onBeforeActivate}">
+                <aura:set attribute="icon">
+                    <ui:outputText aura:id="dirtyTabTitle" value="" />
+                </aura:set>
+                Event tab content
+            </ui:tab>
+            <ui:tab title="Tab Content created dynamically" onActivated="{!c.loadContent}">
+            </ui:tab>
+         </ui:tabset>
+         <div class="tabset">
+            <ui:button label="Mark Event Tab Dirty" press="{!c.markDirty}" />
+            <ui:button label="Clear Event Tab" press="{!c.clearDirty}" />
+         </div>
+         
+         <h1>Add tabs dynamically</h1>
+          <ui:tabset aura:id="addableTabset" class="tabset">
+            <ui:tab title="Tab 1" >
+                tab 1
+            </ui:tab>
+            <ui:tab title="Tab 2">
+                tab 2
+            </ui:tab>
+         </ui:tabset>
+         <div class="tabset">
+            <div class="clear">
+                <ui:inputText class="tabsetInput" label="Tab Title" aura:id="inputTabTitle" placeholder="title" />
+            </div>
+            <div class="clear">
+                <ui:inputText class="tabsetInput" label="Tab Name" aura:id="inputTabName" placeholder="name" />
+            </div>
+            <div class="clear">
+                <ui:inputTextArea class="tabsetInput" label="Tab Content" aura:id="inputTabContent" placeholder="content" />
+            </div>
+            <div class="clear">
+                Closable: <ui:inputCheckbox class="tabsetInput" aura:id="inputTabClosable" value="closable" />
+            </div>
+            <div class="clear">
+                Active: <ui:inputCheckbox class="tabsetInput" aura:id="inputTabActive" value="active" />
+            </div>
+            <ui:button label="Add Tab" press="{!c.addTab}" />
+        </div>
+        
+        <h1>Construct tabs from model</h1>
+        <ui:tabset class="tabset" tabs="{!m.tabs}"></ui:tabset>
+        
+     </div>
+</aura:component>

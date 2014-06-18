@@ -20,12 +20,12 @@
 	    //workaround issue where Integer type is passed in as String
 	    var index = parseInt(evt.getParam("index"));
 	    if (active) {
-	        helper.activateTab(cmp, index);
+	        helper.activateTab(cmp, index, evt.getParam("focus"));
 	    } else {
 	        var tab = cmp._tabItems[index];
 	        if (cmp._activeTab === tab) {
 	            //deactive current active tab
-	            tab.get("e.activateTab").setParams({active: false}).fire();
+	            tab.get("e.activateTab").setParams({"active": false}).fire();
 	            cmp._activeTab = null;
 	        }
 	    }
@@ -49,17 +49,17 @@
 	onKeyDown: function(cmp, evt, helper) {
 		helper.onKeyDown(cmp, evt);
 	},
-	
+
 	/**
 	 * This action is invoked when the tabItem is clicked
 	 */
 	onTabActivated: function(cmp, evt, helper) {
 		var tab = evt.getSource(), 
 			index = $A.util.arrayIndexOf(cmp._tabItems, tab),
+			oldTab = cmp._activeTab && cmp._activeTab.isValid() ? cmp._activeTab : null,
 			e = cmp.get('e.onTabActivated');
 		
-		helper.deactivateTab(cmp, tab);
-		e.setParams({"index": index}).fire();
+		e.setParams({"index": index, "oldTab": oldTab}).fire();
 	},
 	
 	onTabClosed: function(cmp, evt, helper) {

@@ -17,7 +17,7 @@ package org.auraframework.def;
 
 import java.util.List;
 
-public interface IncludeDef extends RootDefinition {
+public interface IncludeDef extends Definition {
     @Override
     DefDescriptor<IncludeDef> getDescriptor();
     

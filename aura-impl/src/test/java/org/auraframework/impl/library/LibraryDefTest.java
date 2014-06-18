@@ -22,7 +22,6 @@ import org.auraframework.def.IncludeDef;
 import org.auraframework.def.LibraryDef;
 import org.auraframework.impl.AuraImplTestCase;
 
-import org.auraframework.test.annotation.UnAdaptableTest;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
@@ -44,7 +43,6 @@ public class LibraryDefTest extends AuraImplTestCase {
      * @priority high
      * @throws Exception
      */
-    @UnAdaptableTest
     public void testGetLibraryInstance() throws Exception {
         LibraryDef libDef = Aura.getDefinitionService().getDefinition("test:test_Library", LibraryDef.class);
         assertNotNull(libDef);
@@ -69,7 +67,6 @@ public class LibraryDefTest extends AuraImplTestCase {
      * Tests the ordering logic of the {@link LibraryDef} to ensure that imports will be serialized in order.
      * @throws Exception
      */
-    @UnAdaptableTest
     public void testIncludeOrdering() throws Exception {
         LibraryDef libDef = Aura.getDefinitionService().getDefinition("test:test_LibraryOrdering", LibraryDef.class);
         assertNotNull(libDef);
@@ -86,7 +83,6 @@ public class LibraryDefTest extends AuraImplTestCase {
      * Tests the exception thrown when a cycle exists in the lib's dependency tree.
      * @throws Exception
      */
-    @UnAdaptableTest
     public void testIncludeNotOrderable() throws Exception {
 	    try {
 	    	Aura.getDefinitionService().getDefinition("test:test_LibraryNotOrderable", LibraryDef.class);
@@ -102,7 +98,6 @@ public class LibraryDefTest extends AuraImplTestCase {
      * Tests the {@link LibraryDef} (and {@link IncludeDef}) serialization.
      * @throws Exception
      */
-    @UnAdaptableTest
     public void testSerialization() throws Exception {
         LibraryDef libDef = Aura.getDefinitionService().getDefinition("test:test_Library", LibraryDef.class);
         assertNotNull(libDef);
@@ -121,7 +116,6 @@ public class LibraryDefTest extends AuraImplTestCase {
      * Tests to ensure that validation is done on define statements.
      * @throws Exception
      */
-    @UnAdaptableTest
     public void testNoIncludeName() throws Exception {
 	    try {
 	    	Aura.getDefinitionService().getDefinition("test:test_LibraryNoIncludeName", LibraryDef.class);
@@ -135,7 +129,6 @@ public class LibraryDefTest extends AuraImplTestCase {
      * Tests to ensure that validation is done to enforce the inclusion of at least 1 library definition.
      * @throws Exception
      */
-    @UnAdaptableTest
     public void testNoIncludes() throws Exception {
 	    try {
 	    	Aura.getDefinitionService().getDefinition("test:test_LibraryNoIncludes", LibraryDef.class);
@@ -149,7 +142,6 @@ public class LibraryDefTest extends AuraImplTestCase {
      * Tests to ensure non-functions are rejected from being imported as libraries.
      * @throws Exception
      */
-    @UnAdaptableTest
     public void testBadLibrary() throws Exception {
 	    try {
 	    	Aura.getDefinitionService().getDefinition("test:test_LibraryBadImport", LibraryDef.class);

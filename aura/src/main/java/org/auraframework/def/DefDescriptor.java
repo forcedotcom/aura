@@ -34,7 +34,7 @@ import org.auraframework.util.json.JsonSerializable;
  *            {@link ComponentDef}, {@link EventDef}, etc.
  */
 public interface DefDescriptor<T extends Definition> extends JsonSerializable,
-        Serializable, Comparable<DefDescriptor<?>> {
+Serializable, Comparable<DefDescriptor<?>> {
 
     public static final String MARKUP_PREFIX = "markup";
     public static final String CSS_PREFIX = "css";
@@ -46,25 +46,19 @@ public interface DefDescriptor<T extends Definition> extends JsonSerializable,
     public static final class DescriptorKey {
         private final String name;
         private final Class<? extends Definition> clazz;
-        private final DefDescriptor<? extends Definition> bundle;
 
         public DescriptorKey(String name, Class<? extends Definition> clazz) {
-            this(name, clazz, null);
-        }
-
-        public DescriptorKey(String name, Class<? extends Definition> clazz, DefDescriptor<? extends Definition> bundle) {
             // FIXME: this case flattening would remove the extra copies of
             // definitions.
             // If we go case sensitive, we won't want it though.
             // this.qualifiedName = qualifiedName.toLowerCase();
             this.name = name;
             this.clazz = clazz;
-            this.bundle = bundle;
         }
 
         @Override
         public int hashCode() {
-            return name.hashCode() + clazz.hashCode() + (bundle !=null?bundle.hashCode():0);
+            return this.getName().hashCode() + this.getClazz().hashCode();
         }
 
         @Override
@@ -76,8 +70,7 @@ public interface DefDescriptor<T extends Definition> extends JsonSerializable,
                 return false;
             }
             DescriptorKey dk = (DescriptorKey) obj;
-            return dk.clazz.equals(clazz) && dk.name.equals(name)
-                && (dk.bundle == bundle || dk.bundle != null && dk.bundle.equals(bundle));
+            return dk.getClazz().equals(this.getClazz()) && dk.getName().equals(this.getName());
         }
 
         public String getName() {
@@ -87,28 +80,24 @@ public interface DefDescriptor<T extends Definition> extends JsonSerializable,
         public Class<? extends Definition> getClazz() {
             return clazz;
         }
-
-        public DefDescriptor<? extends Definition> getBundle() {
-            return bundle;
-        }
     }
     
-    public static enum DefType {
-        ATTRIBUTE(AttributeDef.class), //
-        APPLICATION(ApplicationDef.class), //
-        COMPONENT(ComponentDef.class), //
-        EVENT(EventDef.class), //
-        HELPER(HelperDef.class), //
-        INTERFACE(InterfaceDef.class), //
-        CONTROLLER(ControllerDef.class), //
-        MODEL(ModelDef.class), //
-        LIBRARY(LibraryDef.class), //
-        INCLUDE(IncludeDef.class), //
-        RENDERER(RendererDef.class), //
-        ACTION(ActionDef.class), //
-        TYPE(TypeDef.class), //
-        STYLE(StyleDef.class), //
-        THEME(ThemeDef.class), //
+	public static enum DefType {
+		ATTRIBUTE(AttributeDef.class), //
+		APPLICATION(ApplicationDef.class), //
+		COMPONENT(ComponentDef.class), //
+		EVENT(EventDef.class), //
+		HELPER(HelperDef.class), //
+		INTERFACE(InterfaceDef.class), //
+		CONTROLLER(ControllerDef.class), //
+		MODEL(ModelDef.class), //
+		LIBRARY(LibraryDef.class), //
+		INCLUDE(IncludeDef.class), //
+		RENDERER(RendererDef.class), //
+		ACTION(ActionDef.class), //
+		TYPE(TypeDef.class), //
+		STYLE(StyleDef.class), //
+		THEME(ThemeDef.class), //
         THEME_DEF_REF(ThemeDefRef.class), //
         VAR(VarDef.class), //
         DOCUMENTATION(DocumentationDef.class), //
@@ -124,115 +113,109 @@ public interface DefDescriptor<T extends Definition> extends JsonSerializable,
         NAMESPACE(NamespaceDef.class),
         RESOURCE(ResourceDef.class);
 
-        private static Map<Class<? extends Definition>, DefType> defTypeMap;
-        
-        private final Class<? extends Definition> clz;
+		
+		private static Map<Class<? extends Definition>, DefType> defTypeMap;
+		
+		private final Class<? extends Definition> clz;
 
-        private DefType(Class<? extends Definition> clz) {
-            this.clz = clz;
-            mapDefType(clz, this);
-        }
+		private DefType(Class<? extends Definition> clz) {
+			this.clz = clz;
 
-        private static void mapDefType(Class<? extends Definition> clz, DefType defType) {
-            if (defTypeMap == null) {
-                defTypeMap = new HashMap<Class<? extends Definition>, DefType>();
-            }
-            defTypeMap.put(clz, defType);
-        }
+			mapDefType(clz, this);
+		}
 
-        public Class<? extends Definition> getPrimaryInterface() {
-            return clz;
-        }
-        
-        public boolean isRoot() {
-            return RootDefinition.class.isAssignableFrom(getPrimaryInterface());
-        }
+		private static void mapDefType(Class<? extends Definition> clz,
+				DefType defType) {
+			if (defTypeMap == null) {
+				defTypeMap = new HashMap<Class<? extends Definition>, DefType>();
+			}
 
-        public static boolean hasDefType(Class<?> primaryInterface) {
-            return defTypeMap.containsKey(primaryInterface);
-        }
+			defTypeMap.put(clz, defType);
+		}
 
-        public static DefType getDefType(Class<? extends Definition> primaryInterface) {
-            DefType ret = defTypeMap.get(primaryInterface);
-            if (ret == null) {
-                String message = String
-                        .format("Unsupported Java Interface %s specified for DefDescriptor. Valid types are : %s",
-                                primaryInterface.getName(), defTypeMap.keySet().toString());
-                throw new AuraRuntimeException(message);
-            }
-            return ret;
-        }
-    }
+		public Class<? extends Definition> getPrimaryInterface() {
+			return clz;
+		}
+		
+		public boolean isRoot() {
+		    return RootDefinition.class.isAssignableFrom(getPrimaryInterface());
+		}
 
-    /**
-     * @return The name of this descriptor
-     */
-    String getName();
+		public static boolean hasDefType(Class<?> primaryInterface) {
+			return defTypeMap.containsKey(primaryInterface);
+		}
 
-    /**
-     * @return The pseudo-protocol, namespace, and name of this descriptor
-     */
-    String getQualifiedName();
+		public static DefType getDefType(
+				Class<? extends Definition> primaryInterface) {
+			DefType ret = defTypeMap.get(primaryInterface);
+			if (ret == null) {
+				String message = String
+						.format("Unsupported Java Interface %s specified for DefDescriptor. Valid types are : %s",
+								primaryInterface.getName(), defTypeMap.keySet()
+										.toString());
+				throw new AuraRuntimeException(message);
+			}
+			return ret;
+		}
+	}
 
-    /**
-     * @return the namespace and name portion of this descriptor for cases where
-     *         the prefix/protocol is already known.
-     */
-    String getDescriptorName();
+	/**
+	 * @return The name of this descriptor
+	 */
+	String getName();
 
-    /**
-     * @return The prefix/protocol of this descriptor
-     */
-    String getPrefix();
+	/**
+	 * @return The pseudo-protocol, namespace, and name of this descriptor
+	 */
+	String getQualifiedName();
 
-    /**
-     * @return the namespace, if this descriptor has one
-     */
-    String getNamespace();
+	/**
+	 * @return the namespace and name portion of this descriptor for cases where
+	 *         the prefix/protocol is already known.
+	 */
+	String getDescriptorName();
 
-    /**
-     * @return The portion of a name occurring within any generic delimiters,
-     *         such as < >, including said delimiters
-     */
-    String getNameParameters();
+	/**
+	 * @return The prefix/protocol of this descriptor
+	 */
+	String getPrefix();
 
-    /**
-     * @return isParameterized - identifies if additional processing is
-     *         warranted to consider generic collections should be considered
-     */
-    boolean isParameterized();
+	/**
+	 * @return the namespace, if this descriptor has one
+	 */
+	String getNamespace();
 
-    /**
-     * @return The type of this definition, which can be used to branch and
-     *         parse serialized representations
-     */
-    DefType getDefType();
-    
+	/**
+	 * @return The portion of a name occurring within any generic delimiters,
+	 *         such as < >, including said delimiters
+	 */
+	String getNameParameters();
 
-    /**
-     * get the 'bundle' for this descriptor.
-     *
-     * If we have a bundle for the descriptor, then the descriptor is for a file within the
-     * bundle, and it is fully specified by the bundle descriptor plus the name from this
-     * descriptor.
-     *
-     * @return the bundle associated with this descriptor.
-     */
-    DefDescriptor<? extends Definition> getBundle();
+	/**
+	 * @return isParameterized - identifies if additional processing is
+	 *         warranted to consider generic collections should be considered
+	 */
+	boolean isParameterized();
 
-    /**
-     * Gets the actual definition described by this descriptor, compiling it if
-     * necessary, from Aura's definition service.
-     * 
-     * @return the definition (compiles it if necessary)
-     * @throws QuickFixException
-     *             if the definition is not found
-     */
-    T getDef() throws QuickFixException;
+	/**
+	 * @return The type of this definition, which can be used to branch and
+	 *         parse serialized representations
+	 */
+	DefType getDefType();
 
-    /**
-     * @return true if the definition represented by this descriptor exists at
-     *         all. does not compile the definition
-     */
-    boolean exists();
+	/**
+	 * Gets the actual definition described by this descriptor, compiling it if
+	 * necessary, from Aura's definition service.
+	 * 
+	 * @return the definition (compiles it if necessary)
+	 * @throws QuickFixException
+	 *             if the definition is not found
+	 */
+	T getDef() throws QuickFixException;
+
+	/**
+	 * @return true if the definition represented by this descriptor exists at
+	 *         all. does not compile the definition
+	 */
+	boolean exists();
 }

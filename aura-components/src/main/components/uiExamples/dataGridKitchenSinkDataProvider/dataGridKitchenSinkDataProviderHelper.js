@@ -40,31 +40,33 @@
             return ret;
         });
     },
+    
+    applyPagination: function(tasks, currentPage, pageSize) {
+    	var index = (currentPage - 1) * pageSize;
+    	return tasks.slice(index, currentPage * pageSize);
+    },
 
-    createTasks: function (cmp, currentPage, pageSize) {
+    createTasks: function (cmp) {
         var items = [],
-        	index;
+        	maxItems = cmp.get('v.totalItems');
 
-        // Hack to make 'zero based'. 
-        --currentPage;
-
-        for (var i = 1; i <= pageSize; i++) {
-        	index = (currentPage * pageSize) + i;
+        for (var i = 1; i <= maxItems; i++) {
             items.push({
-                id           : index,
-                subject      : 'Foo ' + index, 
+                id           : i,
+                subject      : 'Foo ' + i, 
                 activityDate : '2014-01-01',
                 who          : {
-                    name : 'John Doe With A Fairly Long Name ' + index,
-                    id   : '001'
+                    name : 'John Doe With A Fairly Long Name ' + i,
+                    id   : '00' + i
                 },
                 what: {
-                    name : 'Acme' + index,
-                    id   : '001'
+                    name : 'Acme' + i,
+                    id   : '00' + i
                 }
             });
         }
-
+        
+        cmp._tasks = items;
         return items;
     }
 })

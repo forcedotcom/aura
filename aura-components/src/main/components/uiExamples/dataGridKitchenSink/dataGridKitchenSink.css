@@ -47,3 +47,11 @@ table.THIS td {
 	border-collapse: collapse;
 }
 
+button.THIS.kitchenButton {
+	background : transparent;
+	border : 1px solid #F0F1F2;
+	box-shadow : none;
+	font-weight: normal;
+	font-size: inherit;
+}
+

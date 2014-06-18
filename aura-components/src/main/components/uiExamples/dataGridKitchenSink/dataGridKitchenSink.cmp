@@ -18,18 +18,19 @@
 <aura:component>
     <aura:attribute name="mode" type="String" default="VIEW"/>
     <aura:attribute name="sortBy" type="String"/>
-    <aura:attribute name="pageSize" type="Integer" default="50"/>
+    <aura:attribute name="pageSize" type="Integer" default="20"/>
     <aura:attribute name="currentPage" type="Integer" default="1"/>
     <aura:attribute name="totalItems" type="Integer"/>
     <aura:attribute name="index" type="Integer"/>
     <aura:attribute name="count" type="Integer"/>
+    <aura:attribute name="gridItems" type="List"/>
 
     <aura:handler name="change" value="{!v.currentPage}" action="{!c.handleCurrentPageChange}"/>
 
-    <ui:button aura:id="mode" label="{!v.mode}" press="{!c.handleModePress}"/>
-    <ui:button label="Add row" press="{!c.handleAddRow}"/>
-    <ui:button label="Insert" press="{!c.handleInsert}"/>
-    <ui:button label="Remove" press="{!c.handleRemove}"/>
+    <ui:button aura:id="mode" class="kitchenButton" label="{!v.mode}" press="{!c.handleModePress}"/>
+    <ui:button class="kitchenButton" label="Add row" press="{!c.handleAddRow}"/>
+    <ui:button class="kitchenButton" label="Insert" press="{!c.handleInsert}"/>
+    <ui:button class="kitchenButton" label="Remove" press="{!c.handleRemove}"/>
     <ui:inputText placeholder="index" value="{!v.index}"/>
     <ui:inputText placeholder="count" value="{!v.count}"/>
 
@@ -55,7 +56,8 @@
         </aura:set>
 -->
         <aura:set attribute="dataProvider">
-            <uiExamples:dataGridKitchenSinkDataProvider sortBy="{!v.sortBy}"
+            <uiExamples:dataGridKitchenSinkDataProvider aura:id="data"
+            									   sortBy="{!v.sortBy}"
                                                    pageSize="{!v.pageSize}"
                                                    currentPage="{!v.currentPage}"
                                                    totalItems="{!v.totalItems}"/>
@@ -74,5 +76,12 @@
     <ui:pagerPageInfo pageSize="{!v.pageSize}"
                       currentPage="{!v.currentPage}"
                       totalItems="{!v.totalItems}"/>
+                      
+    
+    <ui:button label="Re-fire datagrid's provide" press="{!c.replaceData}"/><br/>               
+    <ui:button label="Spit Out Data" press="{!c.spit}"/><br/>
+    <aura:iteration aura:id="items" var="item" items="{!v.gridItems}">
+    	<ui:outputText value="{!item.id + ':' + item.subject + ':' + item.who.name + ':' + item.what.name + ':' + item.activityDate}"/><br/>
+    </aura:iteration>
 
 </aura:component>

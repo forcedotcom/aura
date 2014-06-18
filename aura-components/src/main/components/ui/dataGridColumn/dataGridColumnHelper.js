@@ -62,12 +62,11 @@
 
 	toggleSort: function (cmp) {
 		var name = cmp.get('v.name'),
-			direction = cmp.getValue('v.direction'),
-			directionValue = direction.getValue(),
+			direction = cmp.get('v.direction'),
 			onsortchange = cmp.get('v.onsortchange'),
 			newValue;
 		
-		if (directionValue === 'descending') {
+		if (direction === 'descending') {
 			newValue = 'ascending'	
 		}
 		else {
@@ -75,7 +74,7 @@
 			name = '-' + name;
 		}
 
-		direction.setValue(newValue); 
+		cmp.set('v.direction', newValue);
 
 		// onsortchanged
 		if (onsortchange) {

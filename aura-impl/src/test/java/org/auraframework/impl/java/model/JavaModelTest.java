@@ -27,11 +27,9 @@ import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.expression.PropertyReferenceImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.instance.Model;
-
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Annotations;
 import org.auraframework.system.Location;
-
 import org.auraframework.test.annotation.UnAdaptableTest;
 import org.auraframework.throwable.AuraExecutionException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
@@ -71,7 +69,6 @@ public class JavaModelTest extends AuraImplTestCase {
 
         @Override
         public String getQualifiedName() {
-        	System.out.println("javaModelTest.getQualifiedName()");
             return getPrefix() + "://" + TestModel.class.getName();
         }
 

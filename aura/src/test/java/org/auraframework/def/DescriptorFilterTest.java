@@ -348,11 +348,6 @@ public class DescriptorFilterTest extends UnitTestCase {
             // package...
             return getQualifiedName().compareToIgnoreCase(other.getQualifiedName());
         }
-
-        @Override
-        public DefDescriptor<? extends Definition> getBundle() {
-            return null;
-        }
     }
 
     public void testDescriptor() {

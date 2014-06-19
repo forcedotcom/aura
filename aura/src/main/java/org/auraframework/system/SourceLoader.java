@@ -22,13 +22,7 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
-
 /**
- * An interface to retrieve source for descriptors.
- *
- * This interface has an implementation for each of the supported sources in Aura. It can be implemented 
- * by consumers of aura to provide additional ways to access sources (and provide definitions), e.g. a database.
  */
 public interface SourceLoader {
 
@@ -37,7 +31,6 @@ public interface SourceLoader {
      * 
      * @return List of names of namespaces that this SourceLoader handles.
      */
-    @NonNull
     Set<String> getNamespaces();
     
     /**
@@ -46,7 +39,6 @@ public interface SourceLoader {
      * 
      * @return List of prefixes that this SourceLoader handles.
      */
-    @NonNull
     Set<String> getPrefixes();
 
     /**
@@ -54,7 +46,6 @@ public interface SourceLoader {
      * the namespaces returned by getNamespaces and the prefixes returned by
      * getPrefixes.
      */
-    @NonNull
     Set<DefType> getDefTypes();
 
     /**
@@ -63,20 +54,12 @@ public interface SourceLoader {
      * @param descriptor
      * @return Source referenced by descriptor
      */
-    <D extends Definition> Source<D> getSource(@NonNull DefDescriptor<D> descriptor);
+    <D extends Definition> Source<D> getSource(DefDescriptor<D> descriptor);
 
     /**
      * Match descriptors against a matcher.
      */
-    Set<DefDescriptor<?>> find(@NonNull DescriptorFilter dm);
+    Set<DefDescriptor<?>> find(DescriptorFilter dm);
 
-    /**
-     * find a set of descriptors based on primary interface in a namespace.
-     *
-     * @param primaryInterface the class that describes the descriptors we want.
-     * @param prefix the required prefix.
-     * @param namespace the namespace to search.
-     */
-    <T extends Definition> Set<DefDescriptor<T>> find(@NonNull Class<T> primaryInterface,
-            @NonNull String prefix, @NonNull String namespace); 
+    <T extends Definition> Set<DefDescriptor<T>> find(Class<T> primaryInterface, String prefix, String namespace); 
 }

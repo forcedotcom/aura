@@ -13,25 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.def;
+package org.auraframework.impl.source.file;
 
-import java.util.List;
+import java.io.File;
 
-public interface IncludeDef extends RootDefinition {
-    @Override
-    DefDescriptor<IncludeDef> getDescriptor();
-    
-    String getLibraryName();
-    
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.Definition;
+import org.auraframework.system.Parser.Format;
+
+/**
+ */
+public class FileStyleSource<D extends Definition> extends FileSource<D> {
+
     /**
-     * Gets the included library's dependencies.
-     * @return the imported dependency list.
      */
-    List<String> getImports();
-    
+    private static final long serialVersionUID = 4271630446398299145L;
+
     /**
-     * Gets the variable wrapped and exported by the library.
-     * @return the exported variable name.
+     * @param file
+     * @param format
      */
-    String getExports();
+    public FileStyleSource(DefDescriptor<D> descriptor, String systemId, File file, Format format) {
+        super(descriptor, systemId, file, format);
+    }
+
 }

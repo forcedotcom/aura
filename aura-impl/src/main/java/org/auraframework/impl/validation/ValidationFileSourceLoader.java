@@ -17,12 +17,17 @@ package org.auraframework.impl.validation;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.impl.source.file.FileJavascriptSourceLoader;
 import org.auraframework.impl.source.file.FileSourceLoader;
+import org.auraframework.impl.source.file.FileStyleSourceLoader;
+import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.throwable.AuraRuntimeException;
 
 /**
@@ -31,6 +36,13 @@ import org.auraframework.throwable.AuraRuntimeException;
 public final class ValidationFileSourceLoader extends FileSourceLoader {
 
     private static final Logger LOG = Logger.getLogger(ValidationFileSourceLoader.class);
+
+    private static final EnumMap<DefType, String> extensions = new EnumMap<DefType, String>(DefType.class);
+    static {
+        extensions.putAll(FileSourceLoader.extensions);
+        extensions.putAll(FileJavascriptSourceLoader.extensions);
+        extensions.putAll(FileStyleSourceLoader.extensions);
+    }
 
     public ValidationFileSourceLoader(File base) {
         super(base);
@@ -62,6 +74,15 @@ public final class ValidationFileSourceLoader extends FileSourceLoader {
             }
         }
 
+        private DefType getDefType(String name) {
+            for (DefType dt : DefType.values()) {
+                if (isValidNameForAnyDefType(dt, name)) {
+                    return dt;
+                }
+            }
+            return null;
+        }
+
         @Override
         public boolean accept(File file) {
             // TODO: optimize?
@@ -76,12 +97,34 @@ public final class ValidationFileSourceLoader extends FileSourceLoader {
             if (file.isDirectory()) {
                 return true;
             }
+            DefType dt = getDefType(file.getName());
+            if (dt == null) {
+                return false;
+            }
 
             if (canonicalPath.startsWith(rootCanonicalPath)) {
-                DefDescriptor<?> dd = getDescriptor(canonicalPath);
+                DefDescriptor<?> dd = DefDescriptorImpl.getInstance(getQName(dt, this.namespace, file.getName()),
+                        dt.getPrimaryInterface());
                 this.dset.add(dd);
             }
             return false;
         }
+    }
+
+    protected static String getQName(DefType defType, String namespace, String name) {
+        String suffix = name.substring(name.lastIndexOf('.') + 1);
+        String ext = extensions.get(defType);
+        if (name.endsWith(ext)) {
+            name = name.substring(0, name.length() - ext.length());
+        }
+        if ("css".equals(suffix) || "js".equals(suffix)) {
+            return String.format("%s://%s.%s", suffix, namespace, name);
+        }
+        return String.format("markup://%s:%s", namespace, name);
+    }
+
+    private static boolean isValidNameForAnyDefType(DefType defType, String name) {
+        String ext = extensions.get(defType);
+        return (ext != null) ? name.endsWith(ext) : false;
     }
 }

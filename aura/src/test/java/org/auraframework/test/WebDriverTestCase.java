@@ -183,7 +183,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
     protected void perBrowserTearDown() {
     }
 
-    private void superRunTest() throws Throwable {
+    protected void superRunTest() throws Throwable {
         super.runTest();
     }
 

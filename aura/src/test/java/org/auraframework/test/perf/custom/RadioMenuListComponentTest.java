@@ -28,10 +28,6 @@ public final class RadioMenuListComponentTest extends CustomPerfAbstractTestCase
     }
 
     public void testChangeMenuItem() throws Throwable {
-        runWithPerfApp(descriptor);
-
-        profileStart(getPerfStartMarker());
-
         // Open a menu and select an item.
         WebElement menu = currentDriver.findElement(By.cssSelector(".uiMenu"));
         menu.click();
@@ -39,7 +35,5 @@ public final class RadioMenuListComponentTest extends CustomPerfAbstractTestCase
         WebElement item = currentDriver.findElement(By.cssSelector(".radioItem2"));
         waitForElementPresent(item);
         item.click();
-
-        profileEnd(getPerfEndMarker());
     }
 }

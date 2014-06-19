@@ -37,8 +37,8 @@
 ,{"name":"Network.encodedDataLength","value":0,"units":"bytes"}
 ,{"name":"Network.numRequests","value":0}
 ,{"name":"Timeline.Other.Program","value":228}
-,{"name":"Timeline.Painting.CompositeLayers","value":26}
-,{"name":"Timeline.Painting.Paint","value":23}
+,{"name":"Timeline.Painting.CompositeLayers","value":22}
+,{"name":"Timeline.Painting.Paint","value":19}
 ,{"name":"Timeline.Painting.PaintSetup","value":7}
 ,{"name":"Timeline.Rendering.ActivateLayerTree","value":26}
 ,{"name":"Timeline.Rendering.BeginFrame","value":66}

@@ -17,7 +17,9 @@ package org.auraframework.test.perf.custom;
 
 import org.auraframework.test.perf.core.CustomPerfAbstractTestCase;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 
 public final class InfiniteListComponentTest extends CustomPerfAbstractTestCase {
 
@@ -28,27 +30,24 @@ public final class InfiniteListComponentTest extends CustomPerfAbstractTestCase 
     }
 
     public void testShowMore() throws Throwable {
-        runWithPerfApp(descriptor);
-
-        //TODO: Move perfStart perfEnd wrappers as part of the test runner/suite
-        profileStart(getPerfStartMarker());
-
         // Load more data.
         WebElement element = currentDriver.findElement(By.cssSelector(".showMore"));
         element.click();
 
-        profileEnd(getPerfEndMarker());
+        final int expectedNumberOfRows = 50;
+        waitUntil(new ExpectedCondition<Boolean>() {
+            @Override
+            public Boolean apply(WebDriver d) {
+                return d.findElements(By.cssSelector(".listContent ul div")).size() == expectedNumberOfRows;
+            }
+        });
     }
 
     public void testRefresh() throws Throwable {
-        runWithPerfApp(descriptor);
-
-        profileStart(getPerfStartMarker());
-
         // Refresh the list
         WebElement element = currentDriver.findElement(By.cssSelector(".refresh"));
         element.click();
 
-        profileEnd(getPerfEndMarker());
+        waitFor(5);
     }
 }

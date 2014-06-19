@@ -29,15 +29,9 @@ public final class InputSelectComponentTest extends CustomPerfAbstractTestCase {
     }
 
     public void testSelectOption() throws Throwable {
-        runWithPerfApp(descriptor);
-
-        profileStart(getPerfStartMarker());
-
         // Change selected dropdown option.
         WebElement element = currentDriver.findElement(By.cssSelector(".uiInputSelect"));
         Select dropdown = new Select(element);
         dropdown.selectByIndex(7);
-
-        profileEnd(getPerfEndMarker());
     }
 }

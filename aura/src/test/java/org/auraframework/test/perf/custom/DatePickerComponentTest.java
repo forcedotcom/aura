@@ -28,14 +28,8 @@ public final class DatePickerComponentTest extends CustomPerfAbstractTestCase {
     }
 
     public void testChangeYear() throws Throwable {
-        runWithPerfApp(descriptor);
-
-        profileStart(getPerfStartMarker());
-
         // Change calendar year.
         WebElement element = currentDriver.findElement(By.cssSelector(".nextYear"));
         element.click();
-
-        profileEnd(getPerfEndMarker());
     }
 }

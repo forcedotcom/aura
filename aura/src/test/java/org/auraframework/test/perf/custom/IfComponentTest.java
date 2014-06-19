@@ -28,32 +28,20 @@ public final class IfComponentTest extends CustomPerfAbstractTestCase {
     }
 
     public void testChangeCount() throws Throwable {
-        runWithPerfApp(descriptor);
-
-        profileStart(getPerfStartMarker());
-
         // Change number of first level if's to 200.
         WebElement inputText = currentDriver.findElement(By.cssSelector(".count"));
         inputText.clear();
         inputText.sendKeys("200");
         WebElement button = currentDriver.findElement(By.cssSelector(".changeCount"));
         button.click();
-
-        profileEnd(getPerfEndMarker());
     }
 
     public void testChangeNestedCount() throws Throwable {
-        runWithPerfApp(descriptor);
-
-        profileStart(getPerfStartMarker());
-
         // Change number of second level if's to 5.
         WebElement inputText = currentDriver.findElement(By.cssSelector(".nestedCount"));
         inputText.clear();
         inputText.sendKeys("5");
         WebElement button = currentDriver.findElement(By.cssSelector(".changeNestedCount"));
         button.click();
-
-        profileEnd(getPerfEndMarker());
     }
 }

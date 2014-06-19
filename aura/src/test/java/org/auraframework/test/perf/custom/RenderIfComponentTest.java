@@ -17,7 +17,9 @@ package org.auraframework.test.perf.custom;
 
 import org.auraframework.test.perf.core.CustomPerfAbstractTestCase;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 
 public final class RenderIfComponentTest extends CustomPerfAbstractTestCase {
 
@@ -28,32 +30,28 @@ public final class RenderIfComponentTest extends CustomPerfAbstractTestCase {
     }
 
     public void testChangeCount() throws Throwable {
-        runWithPerfApp(descriptor);
-
-        profileStart(getPerfStartMarker());
-
         // Change number of first level renderIf's to 200.
+        final int numberOfRows = 200;
         WebElement inputText = currentDriver.findElement(By.cssSelector(".count"));
         inputText.clear();
-        inputText.sendKeys("200");
+        inputText.sendKeys(Integer.toString(numberOfRows));
         WebElement button = currentDriver.findElement(By.cssSelector(".changeCount"));
         button.click();
 
-        profileEnd(getPerfEndMarker());
+        waitUntil(new ExpectedCondition<Boolean>() {
+            @Override
+            public Boolean apply(WebDriver d) {
+                return d.findElements(By.cssSelector(".container div")).size() > numberOfRows;
+            }
+        });
     }
 
     public void testChangeNestedCount() throws Throwable {
-        runWithPerfApp(descriptor);
-
-        profileStart(getPerfStartMarker());
-
         // Change number of second level renderIf's to 5.
         WebElement inputText = currentDriver.findElement(By.cssSelector(".nestedCount"));
         inputText.clear();
         inputText.sendKeys("5");
         WebElement button = currentDriver.findElement(By.cssSelector(".changeNestedCount"));
         button.click();
-
-        profileEnd(getPerfEndMarker());
     }
 }

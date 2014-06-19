@@ -15,9 +15,12 @@
  */
 package org.auraframework.test.perf.core;
 
+import com.google.common.base.Function;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.test.annotation.PerfCustomTest;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 /**
  * Base class for Aura WebDriver tests.
@@ -44,6 +47,16 @@ public abstract class CustomPerfAbstractTestCase extends AbstractPerfTestCase {
     }
 
     @Override
+    protected void superRunTest() throws Throwable {
+        runWithPerfApp(descriptor);
+        profileStart(getPerfStartMarker());
+
+        super.superRunTest();
+
+        profileEnd(getPerfEndMarker());
+    }
+
+    @Override
     public String getPerfStartMarker() {
         return this.getName() + PERF_START_MARKER_SUFFIX;
     }
@@ -56,5 +69,15 @@ public abstract class CustomPerfAbstractTestCase extends AbstractPerfTestCase {
     @Override
     public final String getGoldFileName() {
         return descriptor.getNamespace() + '/' + descriptor.getName() + '_' + this.getName();
+    }
+
+    public <V> V waitUntil(final Function<? super WebDriver, V> function) {
+        return new WebDriverWait(currentDriver, timeoutInSecs)
+                .until(new Function<WebDriver, V>() {
+                    @Override
+                    public V apply(WebDriver d) {
+                        return function.apply(d);
+                    }
+                });
     }
 }

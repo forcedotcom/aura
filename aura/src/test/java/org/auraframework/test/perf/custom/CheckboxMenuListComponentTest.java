@@ -28,10 +28,6 @@ public final class CheckboxMenuListComponentTest extends CustomPerfAbstractTestC
     }
 
     public void testChangeMenuItem() throws Throwable {
-        runWithPerfApp(descriptor);
-
-        profileStart(getPerfStartMarker());
-
         // Open a menu and check multiple items.
         WebElement menu = currentDriver.findElement(By.cssSelector(".uiMenu"));
         menu.click();
@@ -45,7 +41,5 @@ public final class CheckboxMenuListComponentTest extends CustomPerfAbstractTestC
 
         item = currentDriver.findElement(By.cssSelector(".checkboxItem3"));
         item.click();
-
-        profileEnd(getPerfEndMarker());
     }
 }

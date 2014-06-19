@@ -28,10 +28,6 @@ public final class ActionMenuListComponentTest extends CustomPerfAbstractTestCas
     }
 
     public void testChangeMenuItem() throws Throwable {
-        runWithPerfApp(descriptor);
-
-        profileStart(getPerfStartMarker());
-
         // Open a menu and select an item.
         WebElement menu = currentDriver.findElement(By.cssSelector(".uiMenu"));
         menu.click();
@@ -39,7 +35,5 @@ public final class ActionMenuListComponentTest extends CustomPerfAbstractTestCas
         WebElement item = currentDriver.findElement(By.cssSelector(".actionItem4"));
         waitForElementPresent(item);
         item.click();
-
-        profileEnd(getPerfEndMarker());
     }
 }

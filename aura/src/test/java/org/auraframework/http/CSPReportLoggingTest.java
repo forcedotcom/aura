@@ -20,11 +20,8 @@ import java.util.Map;
 
 import org.auraframework.Aura;
 import org.auraframework.adapter.LoggingAdapter;
-import org.auraframework.def.ComponentDef;
-import org.auraframework.def.ControllerDef;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.StyleDef;
-import org.auraframework.test.WebDriverTestCase;
+import org.auraframework.def.*;
+import org.auraframework.test.*;
 import org.auraframework.test.WebDriverTestCase.TargetBrowsers;
 import org.auraframework.test.WebDriverUtil.BrowserType;
 import org.auraframework.test.adapter.TestLoggingAdapter;
@@ -40,6 +37,7 @@ public class CSPReportLoggingTest extends WebDriverTestCase {
 
     private static final String STATUS_OK = "200";
     private static final String SOURCE_SUFFIX = "aura_auto.js";
+    private static final String APP_SOURCE_SUFFIX = "app.js";
 
     public CSPReportLoggingTest(String name) {
         super(name);
@@ -223,12 +221,44 @@ public class CSPReportLoggingTest extends WebDriverTestCase {
                 ComponentDef.class,
                 String.format(baseComponentTag, "",
                         "<ui:button press='{!c.post}' label='Send XHR' class='button'/>"));
+        DefDescriptor<?> helperDesc = Aura.getDefinitionService()
+                .getDefDescriptor(cmpDesc, DefDescriptor.JAVASCRIPT_PREFIX,
+                        HelperDef.class);
+        addSourceAutoCleanup(
+                helperDesc,     
+                "{createHttpRequest: function() {\n" +
+                "    if (window.XMLHttpRequest) {\n" +
+                "        return new XMLHttpRequest();\n" +
+                "    } else if (window.ActiveXObject) {\n" +
+                "        try {\n" +
+                "            return new ActiveXObject(\"Msxml2.XMLHTTP\");\n" +
+                "        } catch (e) {\n" +
+                "            try {\n" +
+                "                return new ActiveXObject(\"Microsoft.XMLHTTP\");\n" +
+                "            } catch (ignore) {\n" +
+                "            }\n" +
+                "        }\n" +
+                "    }\n" +
+                "    return null;\n" +
+                "},\n" +
+                "request: function(url) {\n" +
+                "     var request = this.createHttpRequest();\n" +
+                "     request.open(\"GET\", url, true);\n" +
+                "     request[\"onreadystatechange\"] = function() {\n" +
+                "     if (request[\"readyState\"] == 4 && processed === false) {\n" +
+                "             processed = true;\n" +
+                "         console.log(\"from action callback\");\n" +
+                "         }\n" +
+                "     };\n" +
+                "     request.send();\n" +
+                "}}");
+        
         DefDescriptor<?> controllerDesc = Aura.getDefinitionService()
                 .getDefDescriptor(cmpDesc, DefDescriptor.JAVASCRIPT_PREFIX,
                         ControllerDef.class);
         addSourceAutoCleanup(
                 controllerDesc,
-                "{post:function(c){$A.util.transport.request({\"url\" : \"http://www.example.com\", \"method\" : \"GET\",\"callback\" : function() { console.log(\"from action callback\");},\"params\": {} });}}");
+                "{post:function(c,e,h){h.request(\"http://www.example.com\");}}");
         String externalUri = "http://www.example.com";
 
         open(cmpDesc);
@@ -242,7 +272,7 @@ public class CSPReportLoggingTest extends WebDriverTestCase {
         assertNotNull("No CSP report found", cspReport);
         assertEquals("Unexpected blocked resource", externalUri,
                 cspReport.get(CSPReporterServlet.BLOCKED_URI));
-        assertSourceFile(cspReport, SOURCE_SUFFIX);
+        assertSourceFile(cspReport, APP_SOURCE_SUFFIX);
         assertViolatedDirective(cspReport, "connect-src 'self'");
     }
 

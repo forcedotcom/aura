@@ -32,8 +32,8 @@ import org.uiautomation.ios.client.uiamodels.impl.augmenter.IOSDriverAugmenter;
 public class ScrollerUITest extends WebDriverTestCase{
 	
 private static final String SCROLLER_CMP1 = "/uitest/scroller_basic.cmp";
-private static final String SCROLLER_CMP2 = "/uitest/scrollerEndless.cmp";
-private static final String SCROLLER_CMP3 = "/uitest/scrollerSnap.cmp";
+//private static final String SCROLLER_CMP2 = "/uitest/scrollerEndless.cmp";
+//private static final String SCROLLER_CMP3 = "/uitest/scrollerSnap.cmp";
 private WebDriver driver;
 
 public ScrollerUITest(String name) {
@@ -43,12 +43,12 @@ public ScrollerUITest(String name) {
 public void testNothing() {
 	
 }
-/*
+
 public void testScrollingWorkflow() throws Exception {
     open(SCROLLER_CMP1);
     driver = this.getDriver();
     augmentDriver();
-    
+    /* disable due to W-2233861
     //attempting pull to refresh
     this.startFlick(0, 50);
     pause(600);
@@ -57,7 +57,7 @@ public void testScrollingWorkflow() throws Exception {
     
     //toggling canRefresh to true
     evaluateTogglePTLPTR("PullToRefresh");
-    
+    */
     //pull to refresh
     this.startFlick(0, 50);
     pause(600);
@@ -79,7 +79,7 @@ public void testScrollingWorkflow() throws Exception {
     pause(2500);
     assertFalse("Seems like vertical scrolling did not work after pull to refresh", 
     		verifyIfElementInViewport("1onPTR"));
-    
+    /* disable due to W-2233861
     //attempting to pull to show more when canShowMore attribute is false
     this.startFlick(0, -50);
     pause(2500);
@@ -91,7 +91,7 @@ public void testScrollingWorkflow() throws Exception {
     
     //toggling canShowMore to true
     evaluateTogglePTLPTR("PullToShowMore");
-    
+    */
     //pull to show more
     //pull to show more will fetch 4 data items from the server 
     //and they will be appended to the DOM they will have id's '1onPTL', '2onPTL', '3onPTL', '4onPTL' 
@@ -141,7 +141,7 @@ public void testScrollingWorkflow() throws Exception {
     //assert event onScrollEndStart fired
     assertEquals("Seems like onScrollEndStart did not get fired", "1", getEventHandlerExecutionStatus("scrollEndHandlerCalled"));
 }
-
+/* disable due to W-2233861
 public void testScrollingEndlessHorizontal() throws Exception {
     open(SCROLLER_CMP2);
     driver = this.getDriver();
@@ -190,7 +190,7 @@ public void testScrollingSnapInfinite() throws Exception {
     		verifyIfElementInViewport("4onINF"));
    
 }
-
+*/
 
 private void startFlick(int xOffset, int yOffset){
 	//for iPhone
@@ -198,6 +198,7 @@ private void startFlick(int xOffset, int yOffset){
 	
 	if(this.getBrowserType() == BrowserType.IPAD){
 		yOffsetByDevice = yOffset * 2;
+		new TouchActions(driver).flick(xOffset, yOffsetByDevice).build().perform();
 	}
 	new TouchActions(driver).flick(xOffset, yOffsetByDevice).build().perform();
 }
@@ -255,7 +256,7 @@ private void evaluateEventExpression(String evt, String params){
     String expression = "$A.getRoot().find('test-scroller').getEvent('"+evt+"').setParams("+params+").fire();";
     auraUITestingUtil.getEval(expression);
 }
-
+/* disable due to W-2233861
 private void evaluateTogglePTLPTR(String evt){
     String expression = "$A.getRoot().find('test-scroller').getScrollerInstance().toggle"+evt+"()";
     auraUITestingUtil.getEval(expression);

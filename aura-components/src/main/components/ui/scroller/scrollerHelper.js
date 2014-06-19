@@ -230,6 +230,7 @@
             useCSSTransition      = typeof cssTransition === "boolean" ? cssTransition : (!gpuOptimization && (device.isIOS || device.isAndroid)),
             
             snap                  = component.get('v.snapType'),
+            debounce              = component.get('v.debounce'),
             bindToWrapper         = component.get('v.bindEventsToScroller'),
             plugins               = this._getPlugins(component),
 
@@ -253,6 +254,7 @@
             scroll                : scroll,
             scrollbars            : scrollbars,
             useCSSTransition      : useCSSTransition,
+            debounce              : debounce,
             bindToWrapper         : bindToWrapper,
             gpuOptimization       : gpuOptimization,
             lockOnDirection       : lockOnDirection,

@@ -23,6 +23,7 @@
     <aura:attribute name="useCSSTransition"      type="Boolean"                    description="Denotes whether to use css transitions. By default scroller will decide depending on the platform"/>
     <aura:attribute name="useNativeScroller"     type="Boolean" default="false"    description="Leverage native scrolling"/>
     <aura:attribute name="preventDefaultOnMove"  type="Boolean" default="false"    description="preventDefault native events on mouse move"/>
+    <aura:attribute name="debounce"              type="Boolean" default="false"    description="Separate the gesture move from the animation"/>
     <aura:attribute name="snap"                  type="Boolean" default="false"    description="Enable snap behaviour on the scroller (adds the Snap plugins to the scroller)"/>
     <aura:attribute name="endless"               type="Boolean" default="false"    description="Activates the endless plugin (gpuOptimization needs to be enable for this)"/>
     <aura:attribute name="snapType"              type="String"  default="soft"     description="Snap type. Values: sticky | soft"/>

@@ -70,6 +70,11 @@ public class ReferenceTreeModel {
         Set<DefDescriptor<E>> descriptors = definitionService.find(matcher);
         ConfigAdapter configAdapter = Aura.getConfigAdapter();
         for (DefDescriptor<E> desc : descriptors) {
+            if (desc == null) {
+                // Getting null here after commit 2037c31ddc81eae3edaf6ddd5bcfd0009fefe1bd. This causes a NPE and
+                // breaks the left nav of the reference tab.
+                continue;
+            }
             String namespace = desc.getNamespace();
             if (configAdapter.isDocumentedNamespace(namespace)) {
                 try {
@@ -81,29 +86,30 @@ public class ReferenceTreeModel {
                             namespaceTreeNodes.put(namespace, namespaceTreeNode);
                             ret.add(namespaceTreeNode);
                         }
-        
+
                         String href = String.format("#reference?descriptor=%s%s%s", namespace, sep, desc.getName());
-        
+
                         href += "&defType=" + desc.getDefType().name().toLowerCase();
-        
+
                         // Preload the def
                         try {
                             desc.getDef();
                         } catch (Throwable t) {
                             // ignore problems, we were only trying to preload
                         }
-        
+
                         namespaceTreeNode.addChild(new TreeNode(href, desc.getName()));
                     }
                 } catch (Exception x) {
                     // Skip any invalid def
-                    // System.out.printf("\n*** ReferenceTreeModel.makeTreeNodes() failed to load component '%s': %s\n", desc, x.toString());
+                    // System.out.printf("\n*** ReferenceTreeModel.makeTreeNodes() failed to load component '%s': %s\n",
+                    // desc, x.toString());
                 }
             }
         }
-        
+
         Collections.sort(ret);
-        
+
         return ret;
     }
 
@@ -111,39 +117,37 @@ public class ReferenceTreeModel {
     public List<TreeNode> getTree() throws QuickFixException {
         if (tree == null) {
             tree = Lists.newArrayList();
-            
+
             tree.add(new TreeNode("#reference", "Overview"));
             tree.add(new TreeNode(null, "Applications", makeTreeNodes("markup", ApplicationDef.class), false));
             tree.add(new TreeNode(null, "Components", makeTreeNodes("markup", ComponentDef.class), false));
             tree.add(new TreeNode(null, "Interfaces", makeTreeNodes("markup", InterfaceDef.class), false));
             tree.add(new TreeNode(null, "Events", makeTreeNodes("markup", EventDef.class), false));
             tree.add(new TreeNode(null, "Libraries", makeTreeNodes("markup", LibraryDef.class), false));
-            
+
             if (isRunningInPrivilegedNamespace()) {
                 tree.add(new TreeNode(null, "Tests", makeTreeNodes("js", TestSuiteDef.class), false));
             }
-            
+
             tree.add(new TreeNode(null, "JavaScript API", new ApiContentsModel().getNodes(), false));
-            
-            /* Javadoc not publicly accessible
-            tree.add(new TreeNode(
-                    "http://javadoc.auraframework.org/",
-                    "Java API"));
-            */
+
+            /*
+             * Javadoc not publicly accessible tree.add(new TreeNode( "http://javadoc.auraframework.org/", "Java API"));
+             */
         }
-        
+
         return tree;
     }
-    
-    
+
     private static DefDescriptor<ApplicationDef> getReferencingDescriptor() {
         String defaultNamespace = Aura.getConfigAdapter().getDefaultNamespace();
         if (defaultNamespace == null) {
             defaultNamespace = "aura";
         }
-        
+
         DefinitionService definitionService = Aura.getDefinitionService();
-        return definitionService.getDefDescriptor(String.format("%s:application", defaultNamespace), ApplicationDef.class);
+        return definitionService.getDefDescriptor(String.format("%s:application", defaultNamespace),
+                ApplicationDef.class);
     }
 
     private List<TreeNode> tree;

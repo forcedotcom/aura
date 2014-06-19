@@ -1,132 +1,129 @@
-<aura:component model="js://dev.tabset_Test">
+<!--
 
-<div>
-    <div class="block">    
-        <h1 class="header">Basic Tabs</h1>
-        <ui:tabset aura:id="tabset1" class="tabset1" lazyRenderTabs="{!true}">
-            <dev:myTab title="Accounts">
-                    tab 1 contents
-            </dev:myTab>
-            <ui:tab title="Contacts">
-                    tab 2 contents
-            </ui:tab>
-            <ui:tab title="Opportunities">
-                    tab 3 contents
-            </ui:tab>
-            <ui:tab title="Leads">
-                    tab 4 contents
-            </ui:tab>
-            <ui:tab title="Chatter" active="true">
-                    tab 5 contents
-            </ui:tab>
-            <ui:tab aura:id="campaings">
-                <aura:set attribute="icon">
-                    <ui:outputText aura:id="icon" value="icon" />
-                </aura:set>
-                    tab 6 contents
-            </ui:tab>
-            <ui:tab title="Dashboards">
-                    Contents in tab7
-                    <iframe id="myIframe" src="http://www.salesforce.com" height="200" width="500">
-                        <p>This is my iframe</p>
-                    </iframe>
-            </ui:tab> 
-        </ui:tabset>
-    </div>
-    <div class="block">
-        <h1 class="header">tabPosition: left</h1>
-        <ui:tabset aura:id="tabset3" tabPosition="left">
-           <aura:iteration items="{!m.items}" var="item" indexVar="index">     
-                <ui:tab title="{!item.title}">
-                    <div>testing {!index}</div>
-                </ui:tab>
-            </aura:iteration>
-        </ui:tabset>
-    </div>
-    <div class="block">
-        <h1 class="header">Add and Remove Tabs</h1>
-        <ui:tabset aura:id="tabset2" lazyRenderTabs="{!true}">
-            <dev:myTab title="Accounts" closable="true">
-                    Contents in tab 1
-            </dev:myTab>
-            <ui:tab title="Contacts" closable="true">
-                    Contents in tab2
-            </ui:tab>
-            <ui:tab title="Opportunities" closable="true">
-                    Contents in tab3
-            </ui:tab>
-            <ui:tab title="Leads" closable="true">
-                    Contents in tab4
-            </ui:tab>
-            <ui:tab title="Chatter" active="true">
-                    Contents in tab5
-            </ui:tab>
-            <ui:tab aura:id="campaings">
-                <aura:set attribute="icon">
-                    <ui:outputText aura:id="icon" value="icon" />
-                </aura:set>
-                    Tab6, updatable title
-            </ui:tab>
-            <ui:tab title="Dashboards">
-                    <div>embedded IFrame</div>
-                    <iframe id="myIframe" src="http://www.salesforce.com" height="200" width="500">
-                        <p>This is my iframe</p>
-                    </iframe>
-            </ui:tab> 
-        </ui:tabset>
-        <div class="block">
-            <div>
-                <ui:inputText aura:id="inputTabTitle" placeholder="title" />
-            </div>    
-            <div>
-                <ui:inputTextArea aura:id="inputTabContent" placeholder="content" />
-            </div>
-            <div>
-                Closable: <ui:inputCheckbox aura:id="inputTabClosable" value="closable" />
-            </div>
-            <ui:button label="add tab" press="{!c.addTab}" />
-        </div>
-        <ui:button label="update tab title" press="{!c.updateTab}" />
-    </div>
-    <div class="block">
-    <h1 class="header">Side tabs</h1>
-    <ui:tabset tabPosition="left">
-        <ui:tab title="tab1" closable="true">
-            tab 1
-        </ui:tab>
-        <ui:tab title="tab 2 longer" closable="true">
-            tab 2
-        </ui:tab>
-        <ui:tab title="tab 3 long long long" closable="true">
-            <ui:tabset>
-                <ui:tab title="inner tab 1" closable="true">
-                    inner tab 1
-                </ui:tab>
-                <ui:tab title="inner tab 2" active="true">
-                    inner tab 2
-                </ui:tab>
-             </ui:tabset>
-        </ui:tab>
-    </ui:tabset>
-    </div>
-    <div class="block">
-    <h1 class="header">Nested Tabs</h1>
-    <ui:tabset>
-        <ui:tab title="tab1">
-            <ui:tabset>
-                <ui:tab title="inner tab 1" closable="true">
-                    inner tab 1
-                </ui:tab>
-                <ui:tab title="inner tab 2" >
-                    inner tab 2
-                </ui:tab>
-            </ui:tabset>
-        </ui:tab>
-        <ui:tab title="tab 2">
-            tab 2
-        </ui:tab>
-    </ui:tabset>
-    </div>
-</div>
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component>
+    <aura:attribute name="renderItem" type="String" default="all"/>
+    <aura:attribute name="lazyRender" type="Boolean" default="true"/>
+    <aura:attribute name="closable" type="Boolean" default="false"/>
+    
+    <aura:if isTrue="{! v.renderItem == 'basic' || v.renderItem == 'all'}">
+	    <div class="block">    
+	        <h1 class="header">Basic Tabs</h1>
+	        <uitest:tabset_extendsTest aura:id="tabset2" class="tabset1" lazyRenderTabs="{!v.lazyRender}">
+	            <ui:tab title="Accounts" aura:id="inputForActivateByIndex" closable="{!v.closable}">
+	                    tab 1 contents
+	            </ui:tab>
+	            <ui:tab title="Contacts" name="contacts" closable="{!v.closable}">
+	                    tab 2 contents
+	            </ui:tab> 
+	            <ui:tab title="Opportunities" closable="{!v.closable}">
+	                    tab 3 contents
+	            </ui:tab>
+	            <ui:tab title="Leads" closable="{!v.closable}">
+	                    tab 4 contents
+	            </ui:tab>
+	            <ui:tab title="Chatter" active="true" aura:id="chatter" >
+	                    tab 5 contents
+	            </ui:tab>
+	            <ui:tab aura:id="campaigns" name="icons">
+	                <aura:set attribute="icon">
+	                    <ui:outputText aura:id="icon" value="Icon" />
+	                </aura:set>
+	                    tab 6 contents
+	            </ui:tab>
+	            <ui:tab title="Dashboards" aura:id="dashboard" closable="{!v.closable}">
+	                    tab 7 contents
+	                    <iframe id="myIframe" src="http://salesforce.com" height="200" width="500">
+	                        <p>This is my iframe</p>
+	                    </iframe>
+	            </ui:tab> 
+	        </uitest:tabset_extendsTest>
+	    </div>
+	    <div class="block">
+	            <div>
+	                <ui:inputText aura:id="inputTabTitle" class="inputTabTitle" placeholder="title" />
+	            </div>    
+	            <div>
+	                <ui:inputTextArea aura:id="inputTabContent" placeholder="content" />
+	            </div>
+	            <div>
+	                Closable: <ui:inputCheckbox aura:id="inputTabClosable" value="closable" />
+	            </div>
+	            <div>
+	                setActive: <ui:inputCheckbox aura:id="setActive" value="isActive" />
+	            </div>
+	            <div>
+	                <ui:button label="add tab" class="addTab" press="{!c.addTab}" />
+	            </div>
+	            <ui:button label="Update Tab Title"  press="{!c.updateTab}"/>
+	            <ui:button label="Activate By Index" press="{!c.activateTabByIndex}" aura:id="activateByIndex"/>
+	            <ui:button label="Active By Title"   press="{!c.activateTabByName}" aura:id="activateByName"/>
+	     </div>
+	     <br/>
+    </aura:if>
+    
+    <aura:if isTrue="{! v.renderItem == 'nestedTabs' || v.renderItem == 'all'}">
+	    <div class="block">
+		    <h1 class="header">Nested Tabs</h1>
+		    <ui:tabset class="nestedTabs">
+		        <ui:tab title="tab1">
+		            <ui:tabset aura:id="nestedTabSet">
+		                <ui:tab title="inner tab 1" aura:id="nestedTab" closable="true">
+		                    inner tab 1
+		                </ui:tab>
+		                <ui:tab title="inner tab 2">
+		                    inner tab 2
+		                </ui:tab>
+		            </ui:tabset>
+		        </ui:tab>
+		        <ui:tab title="tab 2">
+		            tab 2
+		        </ui:tab>
+		    </ui:tabset>
+	    </div>
+	    <br/>
+    </aura:if>
+     <aura:if isTrue="{! v.renderItem == 'noTabs'}">
+	    <div class="block">    
+	        <h1 class="header">No Tabs</h1>
+	        <ui:tabset aura:id="noTabsTabSet" class="tabset1" lazyRenderTabs="{!true}">
+	        </ui:tabset>
+	    </div>
+	    <br/>
+    </aura:if>
+    <aura:if isTrue="{! v.renderItem == 'tab' || v.renderItem == 'all'}">
+	    <div class="block">    
+	        <h1 class="header">Basic Tabs</h1>
+	        <uitest:tabset_extendsTest aura:id="tabset2" class="tabset1" lazyRenderTabs="{!v.lazyRender}">
+	            <ui:tab title="Accounts" aura:id="inputForActivateByIndex" closable="{!v.closable}">
+	                     <ui:inputText aura:id="inputTabTitle" class="inputTabTitle" placeholder="title" />
+	            </ui:tab>
+	            <ui:tab title="Contacts" name="contacts" closable="{!v.closable}">
+	                    tab 2 contents
+	            </ui:tab> 
+	        </uitest:tabset_extendsTest>
+	        
+	    </div>
+	    <ui:inputTextArea aura:id="inputTabContent"  class="inputTabContent" placeholder="content" />
+     </aura:if>
+    
+    
+    
+    
+    
     
 </aura:component>

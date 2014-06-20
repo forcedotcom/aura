@@ -22,11 +22,6 @@
             <id>libs</id>
             <url>http://repo.auraframework.org/libs-release</url>
         </repository>
-
-        <repository>
-            <id>phloc.com</id>
-            <url>http://repo.phloc.com/maven2</url>
-        </repository>
     </repositories>
 
     <dependencies>

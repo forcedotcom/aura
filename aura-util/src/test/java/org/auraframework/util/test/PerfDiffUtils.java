@@ -21,7 +21,6 @@ import junit.framework.Assert;
 
 import org.auraframework.test.UnitTestCase;
 import org.auraframework.test.perf.metrics.PerfMetrics;
-import org.auraframework.test.perf.metrics.PerfMetricsComparator;
 
 /**
  * Diff utils for perf gold files
@@ -44,7 +43,7 @@ public final class PerfDiffUtils extends BaseDiffUtils<PerfMetrics> {
         }
         PerfMetrics expected = readGoldFile();
 
-        String differentMessage = new PerfMetricsComparator().compare(expected, actual);
+        String differentMessage = test.getPerfMetricsComparator().compare(expected, actual);
         if (differentMessage != null) {
             message.append(differentMessage);
             Assert.fail(message.toString());

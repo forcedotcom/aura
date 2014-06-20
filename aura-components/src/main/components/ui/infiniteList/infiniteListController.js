@@ -17,13 +17,17 @@
 	showMore: function(component, event, helper) {
         $A.mark("infiniteList showMore " + component.getGlobalId());
 		
-		var currentPageValue = component.get("v.currentPage");
-
-    	var currentPage = parseInt(currentPageValue, 10);
-		var targetPage = currentPage + 1;
+		var params = event.getParams(),
+			currentPageValue = component.get("v.currentPage"),
+			currentPage = parseInt(currentPageValue, 10),
+			targetPage = currentPage + 1;
 
         component.set("v.currentPage", targetPage, true);
-
+        
+        if (params.parameters && params.parameters.callback) {
+        	component._callback = params.parameters.callback;
+        }
+        
         helper.triggerDataProvider(component.getSuper());
 	},
 

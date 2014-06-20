@@ -37,8 +37,12 @@
 	
 	/**
 	 * Concats the new items to the list of existing items.
+	 * 
+	 * @param {Component} cmp Potentially non-concrete (ui:abstractList) component instance.
+	 * @param evt ui:dataChanged.
+	 * @param {Function} callback An optional callback to invoke after 'v.items' has been replaced. 
 	 */
-    handleDataChange: function(cmp, evt) {
+    handleDataChange: function(cmp, evt, callback) {
         $A.mark("infiniteList handleDataChange " + cmp.getGlobalId());
         
     	var newData = evt.getParam("data"),
@@ -50,6 +54,10 @@
         }
         
         items.setValue(actualItems);
+        
+        if (callback) {
+        	callback();
+        }
         
         $A.endMark("infiniteList handleDataChange " + cmp.getGlobalId());
     },

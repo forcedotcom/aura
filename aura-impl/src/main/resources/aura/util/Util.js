@@ -27,7 +27,6 @@ $A.ns.Util = function() {
     this["json"] = this.json;
     this.transport = new Transport();
     this["transport"] = this.transport;
-    this.transport["request"] = this.transport.request;
     this.style = new Style();
     this["style"] = this.style;
     this["Bitset"] = Bitset;

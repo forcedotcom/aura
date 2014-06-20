@@ -338,11 +338,6 @@ public class AuraContextImpl implements AuraContext {
     }
 
     @Override
-    public void addPreload(String preload) {
-        preloadedNamespaces.add(preload);
-    }
-
-    @Override
     public boolean isPreloaded(DefDescriptor<?> descriptor) {
         if (preloading) {
             return false;

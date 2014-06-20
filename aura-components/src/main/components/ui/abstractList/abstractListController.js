@@ -29,16 +29,18 @@
     },
 
     handleDataChange: function(component, event, helper) {
-    	component = component.getConcreteComponent();
-    	helper = component.getDef().getHelper();
-
-    	if (component._refreshing) {
-    		helper.beforeRefresh(component, event);
-
-    		component._refreshing = false;
+    	var concrete = component.getConcreteComponent(),
+    		concreteHelper = concrete.getDef().getHelper(),
+    		callback;
+    	    	
+    	if (concrete._refreshing) {
+    		helper.beforeRefresh(concrete, event);
+    		concrete._refreshing = false;
+    		callback = concrete._callback;
     	}
 
-    	helper.handleDataChange(component, event);
+    	concreteHelper.handleDataChange(component, event, callback);
+    	concrete._callback = null; // remove reference to avoid a leak
     },
 
     init: function(component, event, helper) {
@@ -48,16 +50,18 @@
 
     // TODO: Support refresh-all behavior
     refresh: function(component, event, helper) {
-    	var params = event.getParam("parameters");
-    	var index = 0;
+    	var concrete = component.getConcreteComponent(),
+    		params = event.getParam("parameters"),
+    		index = 0;
+    	
     	if (params) {
     		index = params.index;
+    		concrete._callback = params.callback;
     	}
 
-    	component.getConcreteComponent().set("v.currentPage", 1, true);
-
-    	component.getConcreteComponent()._refreshing = true;
-
+    	concrete.set("v.currentPage", 1, true);
+    	concrete._refreshing = true;
+        	
     	helper.triggerDataProvider(component, index);
     },
 

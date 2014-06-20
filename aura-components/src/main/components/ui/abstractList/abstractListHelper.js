@@ -14,10 +14,22 @@
  * limitations under the License.
  */
 ({
-	/** Behavior when the data from one of its data providers changes **/
-	handleDataChange: function(component, event) {
-		component.getConcreteComponent().set("v.items", event.getParam("data"));
+	/**
+	 * Behavior when the data from one of its data providers changes
+	 * 
+	 * @param {Component} component Potentially non-concrete (ui:abstractList) component instance.
+	 * @param event ui:dataChanged.
+	 * @param {Function} callback An optional callback to invoke after 'v.items' has been replaced. 
+	 */
+	handleDataChange: function(component, event, callback) {
+		var concrete = component.getConcreteComponent();
+		
+		concrete.set("v.items", event.getParam("data"));
         this.showLoading(component, false);
+        
+        if (callback) {
+        	callback(); 
+        }
 	},
 
 	/** Behavior to prepare the list for new data before a refresh **/

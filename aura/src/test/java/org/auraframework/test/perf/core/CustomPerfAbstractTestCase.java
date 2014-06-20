@@ -15,12 +15,14 @@
  */
 package org.auraframework.test.perf.core;
 
-import com.google.common.base.Function;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.test.annotation.PerfCustomTest;
+import org.auraframework.test.perf.metrics.PerfMetricsComparator;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
+
+import com.google.common.base.Function;
 
 /**
  * Base class for Aura WebDriver tests.
@@ -71,7 +73,20 @@ public abstract class CustomPerfAbstractTestCase extends AbstractPerfTestCase {
         return descriptor.getNamespace() + '/' + descriptor.getName() + '_' + this.getName();
     }
 
-    public <V> V waitUntil(final Function<? super WebDriver, V> function) {
+    @Override
+    public PerfMetricsComparator getPerfMetricsComparator() {
+        return CUSTOM_COMPARATOR;
+    }
+
+    private static final PerfMetricsComparator CUSTOM_COMPARATOR = new PerfMetricsComparator() {
+        @Override
+        protected int getAllowedVariability(String metricName) {
+            // TODO: allow bigger variability if necessary
+            return super.getAllowedVariability(metricName);
+        }
+    };
+
+    protected final <V> V waitUntil(final Function<? super WebDriver, V> function) {
         return new WebDriverWait(currentDriver, timeoutInSecs)
                 .until(new Function<WebDriver, V>() {
                     @Override

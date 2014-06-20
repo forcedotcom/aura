@@ -31,7 +31,7 @@ import org.auraframework.util.adapter.SourceControlAdapter;
 
 public abstract class BaseDiffUtils<T> implements DiffUtils<T> {
 
-    private final UnitTestCase test;
+    protected final UnitTestCase test;
     private URL srcUrl;
     private URL destUrl;
 

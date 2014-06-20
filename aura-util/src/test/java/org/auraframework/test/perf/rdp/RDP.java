@@ -27,7 +27,6 @@ public interface RDP {
     }
 
     interface Network {
-        // Notifications:
         String dataReceived = "Network.dataReceived";
         String loadingFailed = "Network.loadingFailed";
         String loadingFinished = "Network.loadingFinished";
@@ -37,12 +36,10 @@ public interface RDP {
     }
 
     interface Timeline {
-        // Notifications:
         String eventRecorded = "Timeline.eventRecorded";
     }
 
     interface Page {
-        // Notifications:
         String domContentEventFired = "Page.domContentEventFired";
         String loadEventFired = "Page.loadEventFired";
     }

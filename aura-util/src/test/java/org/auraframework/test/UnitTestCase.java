@@ -33,6 +33,7 @@ import junit.framework.TestCase;
 import org.auraframework.test.annotation.TestLabels;
 import org.auraframework.test.annotation.UnitTest;
 import org.auraframework.test.perf.metrics.PerfMetrics;
+import org.auraframework.test.perf.metrics.PerfMetricsComparator;
 import org.auraframework.util.IOUtil;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonSerializationContext;
@@ -178,6 +179,10 @@ public abstract class UnitTestCase extends TestCase {
 
     protected final void assertGoldMetrics(PerfMetrics actual) throws Exception {
         goldFileUtils.assertPerfDiff(this, getGoldFileName() + ".json", actual);
+    }
+
+    public PerfMetricsComparator getPerfMetricsComparator() {
+        return PerfMetricsComparator.DEFAULT_INSTANCE;
     }
 
     protected void serializeAndGoldFile(Object actual) throws Exception {

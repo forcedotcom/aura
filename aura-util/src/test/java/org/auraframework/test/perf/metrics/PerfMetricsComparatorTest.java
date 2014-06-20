@@ -47,18 +47,21 @@ public final class PerfMetricsComparatorTest extends UnitTestCase {
         actual.setMetric("Timeline.metric", 5);
         actual.setMetric("Aura.metric", 10);
         message = comparator.compare(expected, actual);
-        assertEquals("--> perf metric out of range: Timeline.metric - expected 10, actual 5", message);
+        assertEquals("--> perf metric out of range: Timeline.metric - expected 10, actual 5 (allowed variability 20%)",
+                message);
         actual = new PerfMetrics();
         actual.setMetric("Timeline.metric", 9);
         actual.setMetric("Aura.metric", 8);
         message = comparator.compare(expected, actual);
-        assertEquals("--> perf metric out of range: Aura.metric - expected 10, actual 8", message);
+        assertEquals("--> perf metric out of range: Aura.metric - expected 10, actual 8 (allowed variability 5%)",
+                message);
 
         // UC: message if metric missing
         actual = new PerfMetrics();
         actual.setMetric("Timeline.metric", 10);
         message = comparator.compare(expected, actual);
-        assertEquals("--> perf metric out of range: Aura.metric - expected 10, actual 0", message);
+        assertEquals("--> perf metric out of range: Aura.metric - expected 10, actual 0 (allowed variability 5%)",
+                message);
         // UC: allow at least 1 for small ints
         expected = new PerfMetrics();
         expected.setMetric("Timeline.metric", 3);
@@ -82,9 +85,13 @@ public final class PerfMetricsComparatorTest extends UnitTestCase {
         collector.addRun(run3);
         actual = collector.getMedianMetrics();
         message = comparator.compare(expected, actual);
-        assertEquals("--> perf metric out of range: Network.bytes - expected 0, actual 3 [3 4 2]", message);
+        assertEquals(
+                "--> perf metric out of range: Network.bytes - expected 0, actual 3 [3 4 2] (allowed variability 20%)",
+                message);
         actual = collector.getMedianRun();
         message = comparator.compare(expected, actual);
-        assertEquals("--> perf metric out of range: Network.bytes - expected 0, actual 3 [3 4 2]", message);
+        assertEquals(
+                "--> perf metric out of range: Network.bytes - expected 0, actual 3 [3 4 2] (allowed variability 20%)",
+                message);
     }
 }

@@ -120,9 +120,16 @@ public final class MeasuringPerfMetricsTest extends AbstractPerfTestCase {
     // util
 
     private void assertMetrics(PerfMetrics expected, PerfMetrics actual) {
-        String differentMessage = new PerfMetricsComparator(null).compare(expected, actual);
+        String differentMessage = new NoVariabilityPerfMetricsComparator().compare(expected, actual);
         if (differentMessage != null) {
             fail(differentMessage);
+        }
+    }
+
+    private static class NoVariabilityPerfMetricsComparator extends PerfMetricsComparator {
+        @Override
+        protected int getAllowedVariability(String metricName) {
+            return 0;
         }
     }
 }

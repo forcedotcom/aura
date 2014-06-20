@@ -53,10 +53,6 @@
             <url>http://repo.jfrog.org/artifactory/libs-releases/</url>
         </repository>
         <repository>
-	      <id>phloc.com</id>
-	      <url>http://repo.phloc.com/maven2</url>
-        </repository>
-        <repository>
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
@@ -375,11 +371,6 @@
                 <groupId>org.mozilla</groupId>
                 <artifactId>rhino</artifactId>
                 <version>1.7R4</version>
-            </dependency>
-            <dependency>
-                <groupId>com.phloc</groupId>
-                <artifactId>phloc-css</artifactId>
-                <version>3.5.5</version>
             </dependency>
             <dependency>
                 <groupId>com.ibm.icu</groupId>

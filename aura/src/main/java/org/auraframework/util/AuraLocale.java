@@ -103,5 +103,12 @@ public interface AuraLocale extends Serializable {
      * @return a Calendar
      */
     public Calendar getCalendar();
+    
+    /**
+     * Returns if a name is in eastern style: true - name is in eastern style: last first[ middle][ suffix]
+     * 
+     * @return a Boolean
+     */
+    public Boolean isEasternNameStyle();
 
 }

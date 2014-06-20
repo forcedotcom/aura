@@ -64,6 +64,8 @@ public class LocaleValueProvider implements GlobalValueProvider {
     public static String DEFAULT_DATETIME_FORMAT = "yyyy-MM-dd HH:mm";
     public static String DEFAULT_TIME_FORMAT = "HH:mm";
     
+    public static String IS_EASTERN_NAME_STYLE = "isEasternNameStyle";
+    
     private final Map<String, Object> data;
 
     public LocaleValueProvider() {
@@ -103,6 +105,8 @@ public class LocaleValueProvider implements GlobalValueProvider {
                 
         builder.put(TIME_ZONE, al.getTimeZone().getID());
         builder.put(TIME_ZONE_FILE_NAME, al.getTimeZone().getID().replace("/", "-"));
+        
+        builder.put(IS_EASTERN_NAME_STYLE, al.isEasternNameStyle());
 
         // DecimalFormat is expected
         DecimalFormat df = (DecimalFormat) DecimalFormat.getNumberInstance(al.getNumberLocale());

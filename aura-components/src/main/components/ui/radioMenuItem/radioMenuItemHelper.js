@@ -24,7 +24,7 @@
     setSelected : function(component) {
         var concreteCmp = component.getConcreteComponent();
         var selected = concreteCmp.get("v.selected");
-        var linkCmp = concreteCmp.find("link");
+        var linkCmp = component.find("link");
         if (linkCmp) {
             var elem = linkCmp.getElement();
             if (selected === true) {

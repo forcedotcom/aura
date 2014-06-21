@@ -23,7 +23,6 @@ import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.component.ComponentDefRefArray;
 import org.auraframework.impl.type.ComponentDefRefArrayTypeDef;
 import org.auraframework.instance.Component;
-import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 

@@ -18,9 +18,6 @@ package org.auraframework.docs;
 import java.io.IOException;
 
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.IncludeDef;
-import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonSerializable;

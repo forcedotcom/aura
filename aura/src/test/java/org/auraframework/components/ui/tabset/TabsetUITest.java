@@ -20,9 +20,7 @@ import java.net.URISyntaxException;
 import java.util.List;
 
 import org.auraframework.test.WebDriverTestCase;
-import org.auraframework.test.WebDriverTestCase.ExcludeBrowsers;
 import org.auraframework.test.WebDriverUtil.BrowserType;
-import org.auraframework.util.AuraUITestingUtil;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
@@ -130,17 +128,6 @@ public class TabsetUITest extends WebDriverTestCase {
      */
     private String createXPath(int pos){
     	return "//ul/li["+pos+"]/a";
-    }
-    
-    /**
-     * Method that will clear and sendText to the specified element
-     * @param text     - text to be sent to the element
-     * @param selector - element we want to send text to
-     */
-    private void sendText (String text, By selector){
-    	WebElement element = findDomElement(selector);
-        element.clear();
-        element.sendKeys(text);
     }
     
     /**

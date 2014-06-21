@@ -23,7 +23,6 @@ import org.auraframework.def.LibraryDef;
 import org.auraframework.def.ImportDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.system.DefinitionImpl;
-import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.InvalidReferenceException;
 import org.auraframework.throwable.quickfix.QuickFixException;

@@ -15,9 +15,6 @@
  */
 package org.auraframework.impl.preload;
 
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 
 import java.util.List;
@@ -29,7 +26,6 @@ import org.apache.http.client.methods.HttpPost;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.http.AuraBaseServlet;
-import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.AuraHttpTestCase;

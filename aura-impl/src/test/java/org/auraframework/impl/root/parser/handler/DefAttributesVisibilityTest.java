@@ -181,7 +181,7 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
         }
         @Override
         XMLHandler<?> getHandler(boolean b) throws DefinitionNotFoundException {
-            return new RegisterEventHandler();
+            return new RegisterEventHandler<RootDefinition>();
         }
     }
     public static class AttributeDefRefAttributesVisibilityTest extends DefAttributesVisibilityTest{

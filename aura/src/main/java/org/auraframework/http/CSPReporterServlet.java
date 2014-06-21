@@ -33,7 +33,9 @@ import com.google.common.net.HttpHeaders;
  * per the <a href="http://www.w3.org/TR/CSP/">W3C Content Security
  * Policy 1.0 spec</a>.
  */
+@SuppressWarnings("serial")
 public class CSPReporterServlet extends HttpServlet {
+
     // KEEP THIS IN SYNC WITH THE SERVLET'S URL-MAPPING ENTRY IN WEB.XML!
     // (or find a way to do it programmatically.)
     public static final String URL = "/_/csp";

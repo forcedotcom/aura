@@ -782,6 +782,7 @@ public enum UserAgent {
 
         // [<key to match ua.startsWith> , <label key>]
         // order is important in some cases - a string might contain matches to 2+ keys
+        @SuppressWarnings("serial")
         private final Map<String, Integer> STARTS_WITH = new LinkedHashMap<String, Integer>()
         {
             {
@@ -811,6 +812,7 @@ public enum UserAgent {
 
 
         // [<key to match ua.contains> , <label key>]
+        @SuppressWarnings("serial")
         private final Map<String, Integer> CONTAINS = new LinkedHashMap<String, Integer>()
         {
             {

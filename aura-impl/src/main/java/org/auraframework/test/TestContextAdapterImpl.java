@@ -17,10 +17,6 @@ package org.auraframework.test;
 
 import java.util.concurrent.TimeUnit;
 
-import org.auraframework.Aura;
-import org.auraframework.system.AuraContext;
-import org.auraframework.system.Client;
-import org.auraframework.system.Client.Type;
 import org.auraframework.test.TestContext;
 import org.auraframework.test.TestContextAdapter;
 

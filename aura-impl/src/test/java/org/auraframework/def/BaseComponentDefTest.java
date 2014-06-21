@@ -1158,6 +1158,20 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
     public void testHasLocalDependenciesWithClientsideRenderer() throws Exception {
         T baseComponentDef = define(
                 baseTag,
+                "renderer='js://test.testJSRenderer'",
+                "");
+        assertFalse("When a component has a client renderer, the component does not have server dependencies.",
+                baseComponentDef.hasLocalDependencies());
+        assertEquals(null, this.serializeAndReadAttributeFromDef(baseComponentDef, "hasServerDeps"));
+    }
+
+    /**
+     * hasLocalDependencies is false if component has clientside and serverside renderers. Test method for
+     * {@link BaseComponentDef#hasLocalDependencies()}.
+     */
+    public void testHasLocalDependenciesWithClientsideAndServersideRenderers() throws Exception {
+        T baseComponentDef = define(
+                baseTag,
                 "renderer='java://org.auraframework.impl.renderer.sampleJavaRenderers.TestSimpleRenderer,js://test.testJSRenderer'",
                 "");
         assertFalse("When a component has a client renderer, the component does not have server dependencies.",
@@ -1191,18 +1205,66 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
     }
 
     /**
-     * hasLocalDependencies is true if super has local dependencies. Test method for
+     * hasLocalDependencies is true if super has local model dependency. Test method for
      * {@link BaseComponentDef#hasLocalDependencies()}.
      */
-    public void testHasLocalDependenciesInherited() throws QuickFixException {
+    public void testHasLocalDependenciesInheritedServersideModel() throws QuickFixException {
         String parentContent = String.format(baseTag,
-                "extensible='true' model='java://org.auraframework.impl.java.model.TestJavaModel' ", "");
+                "extensible='true' model='java://org.auraframework.impl.java.model.TestJavaModel'", "");
         DefDescriptor<T> parent = addSourceAutoCleanup(getDefClass(), parentContent);
 
         DefDescriptor<T> child = addSourceAutoCleanup(getDefClass(),
                 String.format(baseTag, "extends='" + parent.getDescriptorName() + "'", ""));
         assertTrue(
-                "When a component's parent has serverside dependency, the component should be marked as server dependent.",
+                "When a component's parent has a serverside model dependency, the component should be marked as server dependent.",
+                child.getDef().hasLocalDependencies());
+    }
+
+    /**
+     * hasLocalDependencies is true if super has local renderer dependency. Test method for
+     * {@link BaseComponentDef#hasLocalDependencies()}.
+     */
+    public void testHasLocalDependenciesInheritedServersideRenderer() throws QuickFixException {
+        String parentContent = String.format(baseTag,
+                "extensible='true' renderer='java://org.auraframework.impl.renderer.sampleJavaRenderers.TestSimpleRenderer'", "");
+        DefDescriptor<T> parent = addSourceAutoCleanup(getDefClass(), parentContent);
+
+        DefDescriptor<T> child = addSourceAutoCleanup(getDefClass(),
+                String.format(baseTag, "extends='" + parent.getDescriptorName() + "'", ""));
+        assertTrue(
+                "When a component's parent has a serverside renderer dependency, the component should be marked as server dependent.",
+                child.getDef().hasLocalDependencies());
+    }
+
+    /**
+     * hasLocalDependencies is false if super has local and remote renderer dependency. Test method for
+     * {@link BaseComponentDef#hasLocalDependencies()}.
+     */
+    public void testHasLocalDependenciesInheritedClientsideAndServersideRenderers() throws QuickFixException {
+        String parentContent = String.format(baseTag,
+                "extensible='true' renderer='js://aura.html,java://org.auraframework.impl.renderer.sampleJavaRenderers.TestSimpleRenderer'", "");
+        DefDescriptor<T> parent = addSourceAutoCleanup(getDefClass(), parentContent);
+
+        DefDescriptor<T> child = addSourceAutoCleanup(getDefClass(),
+                String.format(baseTag, "extends='" + parent.getDescriptorName() + "'", ""));
+        assertFalse(
+                "When a component's parent has a clientside renderer dependency, the component should not be marked as server dependent.",
+                child.getDef().hasLocalDependencies());
+    }
+
+    /**
+     * hasLocalDependencies is false if super has local provider dependency. Test method for
+     * {@link BaseComponentDef#hasLocalDependencies()}.
+     */
+    public void testHasLocalDependenciesInheritedServersideProvider() throws QuickFixException {
+        String parentContent = String.format(baseTag,
+                "extensible='true' provider='java://org.auraframework.impl.java.provider.TestProviderAbstractBasic'", "");
+        DefDescriptor<T> parent = addSourceAutoCleanup(getDefClass(), parentContent);
+
+        DefDescriptor<T> child = addSourceAutoCleanup(getDefClass(),
+                String.format(baseTag, "extends='" + parent.getDescriptorName() + "'", ""));
+        assertFalse(
+                "When a component's parent has serverside provider dependency, the component should not be marked as server dependent.",
                 child.getDef().hasLocalDependencies());
     }
 

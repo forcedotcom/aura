@@ -44,6 +44,7 @@
         "timeFormat":"h:mm:ss a",
         "timezone":"GMT",
         "timezoneFileName":"GMT",
+        "isEasternNameStyle":false,
         "numberFormat":"#,##0.###",
         "decimal":".",
         "grouping":",",

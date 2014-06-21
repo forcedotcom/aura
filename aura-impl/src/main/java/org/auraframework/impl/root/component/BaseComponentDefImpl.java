@@ -42,13 +42,12 @@ import org.auraframework.def.Definition;
 import org.auraframework.def.DependencyDef;
 import org.auraframework.def.EventHandlerDef;
 import org.auraframework.def.HelperDef;
+import org.auraframework.def.ImportDef;
 import org.auraframework.def.InterfaceDef;
-import org.auraframework.def.LibraryDef;
 import org.auraframework.def.ModelDef;
 import org.auraframework.def.ProviderDef;
 import org.auraframework.def.RegisterEventDef;
 import org.auraframework.def.RendererDef;
-import org.auraframework.def.ImportDef;
 import org.auraframework.def.ResourceDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.def.StyleDef;
@@ -247,6 +246,11 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             return;
         }
         
+        if (modelDefDescriptor != null) {
+            localDeps = true;
+            return;
+        }
+
         if (rendererDescriptors != null && !rendererDescriptors.isEmpty()) {
             boolean hasRemote = false;
             
@@ -263,11 +267,6 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             }
         }
         
-        if (modelDefDescriptor != null) {
-            localDeps = true;
-            return;
-        }
-
         if (providerDescriptors != null) {
             boolean hasRemote = providerDescriptors.isEmpty();
             
@@ -284,20 +283,17 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             }
         }
             	
-        // If localDeps weren't found, check the parent. 
-		if (localDeps == null) {
-			 // Walk the super component tree applying slightly different dependency rules.
-	        T superDef = getSuperDef(); 
-	        
-			if (superDef != null && superDef.hasLocalDependencies()) {
-				// Only local/server models and renderers on the super/parent are considered local dependences for the child.
-				localDeps = superDef.getModelDef() != null || 
-						(superDef.getRendererDescriptor() != null && superDef.getRendererDescriptor().getDef().isLocal()); 
-			
-			}
-			else {
-				localDeps = false;
-			}
+		 // Walk the super component tree applying slightly different dependency rules.
+        T superDef = getSuperDef(); 
+        
+		if (superDef != null && superDef.hasLocalDependencies()) {
+			// Only local/server models and renderers on the super/parent are considered local dependences for the child.
+			localDeps = superDef.getModelDef() != null || 
+					(superDef.getRendererDescriptor() != null && superDef.getRendererDescriptor().getDef().isLocal()); 
+		
+		}
+		else {
+			localDeps = false;
 		}
     }
     

@@ -24,7 +24,6 @@ import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.IncludeDef;
 import org.auraframework.def.LibraryDef;
-import org.auraframework.impl.root.event.EventDefImpl;
 
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.system.MasterDefRegistry;
@@ -40,7 +39,7 @@ import org.auraframework.util.json.JsonStreamReader.JsonParseException;
 public class IncludeDefImpl extends DefinitionImpl<IncludeDef> implements IncludeDef {
     private static final long serialVersionUID = 610875326950592992L;
     private final int hashCode;
-    private String libraryName;
+    private String name;
     private String exports;
     private List<String> imports;
     private final DefDescriptor<LibraryDef> libraryDescriptor;
@@ -49,37 +48,37 @@ public class IncludeDefImpl extends DefinitionImpl<IncludeDef> implements Includ
     protected IncludeDefImpl(Builder builder) {
         super(builder);
         this.hashCode = super.hashCode();
-        this.libraryName = builder.name;
+        this.name = builder.name;
         this.exports = builder.exports;
         this.imports = builder.imports;
-        this.libraryDescriptor = builder.parentDescriptor;
+        this.libraryDescriptor = builder.libraryDescriptor;
     }
 
     @Override
-    public String getLibraryName() {
-        return libraryName;
+    public String getName() {
+        return name;
     }
-    
+
     @Override
     public List<String> getImports() {
-        return this.imports;
+        return imports;
     }
     
     @Override
-    public String getExports() {
+    public String getExport() {
         return exports;
     }
 
     @Override
     public void serialize(Json json) throws IOException {
         JsFunction code = new JsFunction(Arrays.asList("define"), prepareCode());
-        json.writeMapEntry(libraryName, code);
+        json.writeMapEntry(name, code);
     }
 	
     @Override
     public void validateDefinition() throws QuickFixException {
-        if (this.libraryName == null) {
-             throw new InvalidDefinitionException("aura:include must specify name=\"…\"", getLocation());
+        if (name == null) {
+             throw new InvalidDefinitionException("aura:include must specify a name", getLocation());
         }
 
         MasterDefRegistry registry = Aura.getContextService().getCurrentContext().getDefRegistry();
@@ -93,11 +92,12 @@ public class IncludeDefImpl extends DefinitionImpl<IncludeDef> implements Includ
             JsonConstant token;
             try {
                 token = jsonReader.next();
-                while(token == JsonConstant.WHITESPACE || token == JsonConstant.COMMENT_DELIM) {
+                while (jsonReader.hasNext()
+                        && (token == JsonConstant.WHITESPACE || token == JsonConstant.COMMENT_DELIM)) {
                     token = jsonReader.next();
                 }
             } catch (IOException e) {
-                throw new InvalidDefinitionException("Unable to read library file: " + libraryName, getLocation());
+                throw new InvalidDefinitionException("Unable to read library file: " + name, getLocation());
             } catch (JsonParseException parseException) {
                 // Invalid json, assume external library.
                 token = null;
@@ -116,7 +116,7 @@ public class IncludeDefImpl extends DefinitionImpl<IncludeDef> implements Includ
             throw new InvalidDefinitionException(
                 String.format(
                     "Library: %s does not represent a function, use \"exports\" to wrap third party libraries.", 
-                    libraryName
+                    name
                 ), 
                 getLocation()
             );
@@ -150,7 +150,7 @@ public class IncludeDefImpl extends DefinitionImpl<IncludeDef> implements Includ
         builder.append(":");
         builder.append(libraryDescriptor.getName());
         builder.append(":");
-        builder.append(libraryName);
+        builder.append(name);
         builder.append("\", ");
         if (imports != null && !imports.isEmpty()) {
             for (String imported : imports) {
@@ -169,7 +169,7 @@ public class IncludeDefImpl extends DefinitionImpl<IncludeDef> implements Includ
         
         // Export the 'exports' property:
         if (exports != null) {
-            builder.append("\n return ");
+            builder.append(";\n return ");
             builder.append(exports);
             builder.append(";\n}");
         }
@@ -182,7 +182,7 @@ public class IncludeDefImpl extends DefinitionImpl<IncludeDef> implements Includ
         private List<String> imports;
         private String exports;
         private String name;
-        private DefDescriptor<LibraryDef> parentDescriptor;
+        private DefDescriptor<LibraryDef> libraryDescriptor;
         
         public Builder() {
             super(IncludeDef.class);
@@ -207,9 +207,9 @@ public class IncludeDefImpl extends DefinitionImpl<IncludeDef> implements Includ
         public void setName(String name) {
             this.name = name;
         }
-
-        public void setParentDescriptor(DefDescriptor<LibraryDef> parentDescriptor) {
-            this.parentDescriptor = parentDescriptor;
+        
+        public void setLibraryDescriptor(DefDescriptor<LibraryDef> libraryDescriptor) {
+            this.libraryDescriptor = libraryDescriptor;
         }
     }
 }

@@ -13,17 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.def;
-
-import java.util.List;
-
-public interface LibraryDef extends RootDefinition {
-    @Override
-    DefDescriptor<LibraryDef> getDescriptor();
-    
-    /**
-     * Gets the list of included js files.
-     * @return {@link List} of included resources.
-     */
-    List<IncludeDef> getIncludes();
+function() {
+	var imports = Array.prototype.slice.call(arguments, 0);
+    return function() {
+    	var ret = "MIXED:";
+    	for(var i=0; i<imports.length; i++){
+    		ret = ret + (imports[i] && imports[i]()) + "|";
+    	}
+    	return ret;
+    }
 }

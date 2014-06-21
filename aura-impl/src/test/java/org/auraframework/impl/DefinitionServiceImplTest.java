@@ -285,7 +285,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
     public void testUpdateLoadedWithNonExistentDescriptor() throws Exception {
         Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED);
         DefDescriptor<ComponentDef> testDesc = getAuraTestingUtil().createStringSourceDescriptor("garbage",
-                ComponentDef.class);
+                ComponentDef.class, null);
         try {
             Aura.getDefinitionService().updateLoaded(testDesc);
             fail("Expected DefinitionNotFoundException");

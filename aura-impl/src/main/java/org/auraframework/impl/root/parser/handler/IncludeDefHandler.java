@@ -42,11 +42,10 @@ public class IncludeDefHandler extends XMLHandler<IncludeDefImpl> {
 
     private static final String ATTRIBUTE_NAME = "name";
     private static final String ATTRIBUTE_IMPORTS = "imports";
-    private static final String ATTRIBUTE_EXPORTS = "exports";
+    private static final String ATTRIBUTE_EXPORTS = "export";
 
     protected final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(
-        ATTRIBUTE_NAME, ATTRIBUTE_IMPORTS, ATTRIBUTE_EXPORTS, RootTagHandler.ATTRIBUTE_DESCRIPTION
-    );
+            ATTRIBUTE_NAME, ATTRIBUTE_IMPORTS, ATTRIBUTE_EXPORTS, RootTagHandler.ATTRIBUTE_DESCRIPTION);
 
     private RootTagHandler<? extends RootDefinition> parentHandler;
     private final IncludeDefImpl.Builder builder = new IncludeDefImpl.Builder();
@@ -64,36 +63,39 @@ public class IncludeDefHandler extends XMLHandler<IncludeDefImpl> {
     @Override
     @SuppressWarnings("unchecked")
     public IncludeDefImpl getElement() throws XMLStreamException, QuickFixException {
+        validateAttributes();
+
         if (parentHandler.getDefDescriptor().getDefType() != DefType.LIBRARY) {
             error("aura:include may only be set in a library.");
         }
-        
+
         DefDescriptor<LibraryDef> parentDescriptor = (DefDescriptor<LibraryDef>) parentHandler.getDefDescriptor();
         builder.setLocation(getLocation());
+        builder.setDescription(getAttributeValue(RootTagHandler.ATTRIBUTE_DESCRIPTION));
 
         String name = getAttributeValue(ATTRIBUTE_NAME);
         if (!AuraTextUtil.isNullEmptyOrWhitespace(name)) {
+            if (name.toLowerCase().endsWith(".js")) {
+                name = name.substring(0, name.length() - 3);
+            }
             builder.setName(name);
         } else {
             error("aura:include must specify a valid library name.");
         }
-        if (name.toLowerCase().endsWith(".js")) {
-            name = name.substring(0, name.length()-3);
-        }
         builder.setDescriptor(DefDescriptorImpl.getInstance(String.format("js://%s.%s",
                 parentDescriptor.getNamespace(), name), IncludeDef.class, parentDescriptor));
-        
+
         String imports = getAttributeValue(ATTRIBUTE_IMPORTS);
         if (!AuraTextUtil.isNullEmptyOrWhitespace(imports)) {
-            builder.setImports(Arrays.asList(imports.split("\\s*\\,\\s*")));
+            builder.setImports(Arrays.asList(imports.trim().split("\\s*\\,\\s*")));
         }
-        
+
         String exports = getAttributeValue(ATTRIBUTE_EXPORTS);
         if (!AuraTextUtil.isNullEmptyOrWhitespace(exports)) {
             builder.setExports(exports);
         }
-        
-        builder.setParentDescriptor(parentDescriptor);
+
+        builder.setLibraryDescriptor(parentDescriptor);
 
         int next = xmlReader.next();
         if (next != XMLStreamConstants.END_ELEMENT || !TAG.equalsIgnoreCase(getTagName())) {
@@ -107,7 +109,7 @@ public class IncludeDefHandler extends XMLHandler<IncludeDefImpl> {
 
     @Override
     public void writeElement(IncludeDefImpl def, Appendable out) {
-    	// Never writes. Do nothing.
+        // Never writes. Do nothing.
     }
 
     @Override

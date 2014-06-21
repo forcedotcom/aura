@@ -248,7 +248,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     public <D extends Definition> Set<DefDescriptor<D>> find(@NonNull DefDescriptor<D> matcher) {
         Set<DefDescriptor<D>> matched;
         if (matcher.getNamespace().equals("*")) {
-            matched = new LinkedHashSet<DefDescriptor<D>>();
+            matched = new LinkedHashSet<>();
             String qualifiedNamePattern = null;
             switch (matcher.getDefType()) {
             case CONTROLLER:
@@ -284,6 +284,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             case ACTION:
             case DESCRIPTION:
             case EXAMPLE:
+            case INCLUDE:
                 // TODO: FIXME
                 throw new AuraRuntimeException(String.format("Find on %s defs not supported.", matcher.getDefType()
                         .name()));
@@ -421,9 +422,6 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         /** Is this def's dependencies cacheable? */
         public boolean shouldCacheDependencies;
 
-        // TODO: remove preloads
-        public boolean addedPreloads = false;
-
         public CompileContext(DefDescriptor<? extends Definition> topLevel, List<ClientLibraryDef> clientLibs) {
             this.clientLibs = clientLibs;
             this.topLevel = topLevel;
@@ -441,7 +439,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             @SuppressWarnings("unchecked")
             CompilingDef<D> cd = (CompilingDef<D>) compiled.get(descriptor);
             if (cd == null) {
-                cd = new CompilingDef<D>(descriptor);
+                cd = new CompilingDef<>(descriptor);
                 compiled.put(descriptor, cd);
             }
             return cd;
@@ -979,7 +977,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
      * @throws QuickFixException if something has gone terribly wrong.
      */
     private <D extends Definition> void validateHelper(@NonNull DefDescriptor<D> descriptor) throws QuickFixException {
-        CompilingDef<D> compiling = new CompilingDef<D>(descriptor);
+        CompilingDef<D> compiling = new CompilingDef<>(descriptor);
         currentCC.compiled.put(descriptor, compiling);
     }
 

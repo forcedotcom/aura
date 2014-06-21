@@ -34,7 +34,7 @@ public class IncludeDefModel extends DefModel{
         	@SuppressWarnings("unchecked")
 			DefDescriptor<IncludeDef> include = (DefDescriptor<IncludeDef>) descriptor;
         	try {
-				return include.getDef().getLibraryName();
+				return include.getDef().getName();
 			} catch (QuickFixException e) {
 				e.printStackTrace();
 			}

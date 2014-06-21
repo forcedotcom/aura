@@ -28,13 +28,13 @@ import org.auraframework.throwable.quickfix.InvalidReferenceException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
-public class ImportDefHandlerImpl extends DefinitionImpl<LibraryDef> implements ImportDef {
+public class ImportDefImpl extends DefinitionImpl<LibraryDef> implements ImportDef {
    private static final long serialVersionUID = 8916829297107001915L;
    private final DefDescriptor<? extends RootDefinition> parentDescriptor;
    private final String library;
    private final String property;
 
-   protected ImportDefHandlerImpl(Builder builder) {
+   protected ImportDefImpl(Builder builder) {
        super(builder);
        this.parentDescriptor = builder.parentDescriptor;
        this.library = builder.library;
@@ -83,7 +83,7 @@ public class ImportDefHandlerImpl extends DefinitionImpl<LibraryDef> implements 
        json.writeMapEnd();
    }
 
-   public static class Builder extends DefinitionImpl.RefBuilderImpl<LibraryDef, ImportDefHandlerImpl> {
+   public static class Builder extends DefinitionImpl.RefBuilderImpl<LibraryDef, ImportDefImpl> {
 
        public Builder() {
            super(LibraryDef.class);
@@ -94,8 +94,8 @@ public class ImportDefHandlerImpl extends DefinitionImpl<LibraryDef> implements 
        private String property;
 
        @Override
-       public ImportDefHandlerImpl build() {
-           return new ImportDefHandlerImpl(this);
+       public ImportDefImpl build() {
+           return new ImportDefImpl(this);
        }
 
        public Builder setParentDescriptor(DefDescriptor<? extends RootDefinition> parentDescriptor) {

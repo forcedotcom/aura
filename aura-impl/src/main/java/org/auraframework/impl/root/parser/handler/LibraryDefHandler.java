@@ -41,16 +41,14 @@ public class LibraryDefHandler extends RootTagHandler<LibraryDef> {
     
     private final LibraryDefImpl.Builder builder = new LibraryDefImpl.Builder();
     
-    private final List<IncludeDef> includes;
+    private final List<IncludeDef> includes = Lists.newLinkedList();
 
     public LibraryDefHandler() {
         super();
-        this.includes = Lists.newLinkedList();
     }
 
     public LibraryDefHandler(DefDescriptor<LibraryDef> libraryDefDescriptor, Source<?> source, XMLStreamReader xmlReader) {
         super(libraryDefDescriptor, source, xmlReader);
-        this.includes = Lists.newLinkedList();
     }
 
     @Override

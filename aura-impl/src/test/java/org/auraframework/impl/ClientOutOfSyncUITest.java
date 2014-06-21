@@ -167,7 +167,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
 
     public void testGetClientRenderingAfterJsProviderChange() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = getAuraTestingUtil().createStringSourceDescriptor(null,
-                ComponentDef.class);
+                ComponentDef.class, null);
         DefDescriptor<?> providerDesc = Aura.getDefinitionService().getDefDescriptor(cmpDesc,
                 DefDescriptor.JAVASCRIPT_PREFIX, ProviderDef.class);
         addSourceAutoCleanup(cmpDesc, String.format(baseComponentTag,
@@ -425,7 +425,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
 
     public void testPostAfterJsProviderChange() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = getAuraTestingUtil()
-                .createStringSourceDescriptor(null, ComponentDef.class);
+                .createStringSourceDescriptor(null, ComponentDef.class, null);
         DefDescriptor<?> providerDesc = Aura.getDefinitionService()
                 .getDefDescriptor(cmpDesc, DefDescriptor.JAVASCRIPT_PREFIX,
                         ProviderDef.class);

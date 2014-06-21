@@ -58,7 +58,7 @@ public class EditorPanelModel {
             );
             
             for (IncludeDef includeDef : library.getDef().getIncludes()) {
-               if (includeDef.getLibraryName().equals(name)) {
+               if (includeDef.getName().equals(name)) {
                    descriptor = includeDef.getDescriptor();
                }
             }

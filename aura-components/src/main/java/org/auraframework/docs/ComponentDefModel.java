@@ -155,14 +155,6 @@ public class ComponentDefModel {
                         for (IncludeDef includeDef: libraryDef.getIncludes()) {
                             includeDefs.add(new IncludeDefModel(includeDef.getDescriptor()));
                         }
-                        
-                        // Add external dependencies as well (just the js files).
-                        for (LibraryDef externalLibrary : libraryDef.getExternalDependencies()) {
-                            // Treat the included js files specially because they load source differently:
-                            for (IncludeDef externalIncludeDef: externalLibrary.getIncludes()) {
-                                includeDefs.add(new IncludeDefModel(externalIncludeDef.getDescriptor()));
-                            }
-                        }
                     }
                 }
             }

@@ -21,8 +21,6 @@ public interface IncludeDef extends Definition {
     @Override
     DefDescriptor<IncludeDef> getDescriptor();
     
-    String getLibraryName();
-    
     /**
      * Gets the included library's dependencies.
      * @return the imported dependency list.
@@ -33,5 +31,5 @@ public interface IncludeDef extends Definition {
      * Gets the variable wrapped and exported by the library.
      * @return the exported variable name.
      */
-    String getExports();
+    String getExport();
 }

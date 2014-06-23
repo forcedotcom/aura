@@ -41,7 +41,7 @@
 ,{"name":"Timeline.Loading.ResourceReceivedData","value":1}
 ,{"name":"Timeline.Loading.ResourceSendRequest","value":1}
 ,{"name":"Timeline.Other.Program","value":53}
-,{"name":"Timeline.Painting.CompositeLayers","value":5}
+,{"name":"Timeline.Painting.CompositeLayers","value":6}
 ,{"name":"Timeline.Painting.DecodeImage","value":0}
 ,{"name":"Timeline.Painting.Paint","value":3}
 ,{"name":"Timeline.Painting.PaintSetup","value":2}

@@ -18,8 +18,8 @@
 <aura:documentation>
 	<aura:description>
 		<p>
-			 A <code>ui:inputSelect</code> component is rendered as an HTML <code>select</code> element. It contains options, represented <code>ui:inputSelectOption</code> components. To enable multiple selections, set <code>multiple="true"</code>.
-			Group options using <code>ui:inputSelectOptionGroup</code> and in each group, nest each option with <code>ui:inputSelectOption</code>.
+			 A <code>ui:inputSelect</code> component is rendered as an HTML <code>select</code> element. It contains options, represented by the <code>ui:inputSelectOption</code> components. To enable multiple selections, set <code>multiple="true"</code>.
+			Group options using <code>ui:inputSelectOptionGroup</code> and in each group, nest each option with <code>ui:inputSelectOption</code>. <code>ui:inputSelect</code> does not support the use of <code>aura:iteration</code> in its body.
 		</p>
 		<h4>Generating Options Dynamically</h4>
 		<p>

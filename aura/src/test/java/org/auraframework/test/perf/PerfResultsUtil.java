@@ -67,12 +67,7 @@ public final class PerfResultsUtil {
         } catch (Exception e) {
             LOG.log(Level.WARNING, "error writing " + file.getAbsolutePath(), e);
         } finally {
-            if (writer != null) {
-                try {
-                    writer.close();
-                } catch (IOException ignore) {
-                }
-            }
+            IOUtil.close(writer);
         }
     }
 
@@ -105,10 +100,30 @@ public final class PerfResultsUtil {
             writer.newLine();
             LOG.info("wrote dev tools timeline: " + file.getAbsolutePath());
         } finally {
-            if (writer != null) {
-                writer.flush();
-                writer.close();
+            IOUtil.close(writer);
+        }
+    }
+
+    /**
+     * Writes the JavaScript CPU profile data for a perf test run to
+     * System.getProperty("aura.perf.results.dir")/profiles/testName_profile.cpuprofile
+     */
+    @SuppressWarnings("unchecked")
+    public static void writeJSProfilerData(Map<String, ?> jsProfilerData, String fileName) {
+        File file = new File(RESULTS_DIR + "/profiles/" + fileName + "_profile.cpuprofile");
+        try {
+            file.getParentFile().mkdirs();
+            BufferedWriter writer = null;
+            try {
+                writer = new BufferedWriter(new FileWriter(file));
+                Map<String, ?> profile = (Map<String, ?>) jsProfilerData.get("profile");
+                writer.write(new JSONObject(profile).toString());
+                LOG.info("wrote JavaScript CPU profile data: " + file.getAbsolutePath());
+            } finally {
+                IOUtil.close(writer);
             }
+        } catch (Exception e) {
+            LOG.log(Level.WARNING, "error writing " + file.getAbsolutePath(), e);
         }
     }
 
@@ -118,7 +133,8 @@ public final class PerfResultsUtil {
      * Writes the heap snapshot into a file, this file can be loaded into chrome dev tools -> Profiles -> Load
      */
     @SuppressWarnings("unchecked")
-    public static void writeHeapSnapshot(Map<String, ?> data, File file) throws Exception {
+    public static void writeHeapSnapshot(Map<String, ?> data, String fileName) throws Exception {
+        File file = new File(RESULTS_DIR + "/heaps/" + fileName + "_heap.heapsnapshot");
         BufferedWriter writer = null;
         try {
             file.getParentFile().mkdirs();
@@ -142,10 +158,7 @@ public final class PerfResultsUtil {
 
             LOG.info("wrote heap snapshot: " + file.getAbsolutePath());
         } finally {
-            if (writer != null) {
-                writer.flush();
-                writer.close();
-            }
+            IOUtil.close(writer);
         }
     }
 

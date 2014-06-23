@@ -302,4 +302,14 @@ public class IOUtil {
         }
         out.close();
     }
+
+    public static void close(Writer writer) {
+        if (writer != null) {
+            try {
+                writer.flush();
+                writer.close();
+            } catch (IOException ignore) {
+            }
+        }
+    }
 }

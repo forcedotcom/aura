@@ -23,11 +23,13 @@ import java.util.logging.Logger;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.WebDriverTestCase;
 import org.auraframework.test.perf.PerfResultsUtil;
+import org.auraframework.test.perf.PerfWebDriverUtil;
 import org.auraframework.test.perf.rdp.RDPAnalyzer;
 import org.auraframework.test.perf.rdp.RDPNotification;
 import org.auraframework.test.perf.rdp.TimelineEventStats;
 import org.auraframework.test.perf.rdp.TimelineEventUtil;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
@@ -36,6 +38,9 @@ import org.json.JSONObject;
 public final class PerfMetricsCollector {
 
     private static final Logger LOG = Logger.getLogger(PerfMetricsCollector.class.getSimpleName());
+
+    private static final boolean CAPTURE_JS_PROFILER_DATA = true; // (300ms)
+    private static final boolean CAPTURE_JS_HEAP_METRICS = false; // slow (7 secs)
 
     private final WebDriverTestCase test;
     private long startMillis;
@@ -46,10 +51,11 @@ public final class PerfMetricsCollector {
     private int deltaBrowserJSHeapSizeBytes;
     private List<RDPNotification> notifications;
     private Map<String, Map<String, Map<String, List<Object>>>> auraStats;
+    private Map<String, ?> jsProfilerData;
+    private Map<String, ?> heapSnapshot;
 
     private RDPAnalyzer rdpAnalyzer;
     private final boolean captureTimelineMetrics;
-    private static final boolean captureJSHeapMetrics = false; // slow
 
     public PerfMetricsCollector(WebDriverTestCase test, boolean captureTimelineMetrics) {
         this.test = test;
@@ -67,23 +73,28 @@ public final class PerfMetricsCollector {
         if (captureTimelineMetrics) {
             test.getRDPNotifications(); // to reset logs
         }
-        if (captureJSHeapMetrics) {
-            startBrowserJSHeapSizeBytes = test.getBrowserJSHeapSize();
+        if (CAPTURE_JS_PROFILER_DATA) {
+            test.startProfile();
+        }
+        if (CAPTURE_JS_HEAP_METRICS) {
+            startBrowserJSHeapSizeBytes = getBrowserJSHeapSize(test.takeHeapSnapshot());
         }
     }
 
     public PerfMetrics stopCollecting() {
         elapsedMillis = System.currentTimeMillis() - startMillis;
 
-        if (captureJSHeapMetrics) {
-            deltaBrowserJSHeapSizeBytes = test.getBrowserJSHeapSize() - startBrowserJSHeapSizeBytes;
-        }
-
         if (captureTimelineMetrics) {
             // get timeline before anything else so only events from the test appear
             notifications = test.getRDPNotifications();
         }
-
+        if (CAPTURE_JS_PROFILER_DATA) {
+            jsProfilerData = test.endProfile();
+        }
+        if (CAPTURE_JS_HEAP_METRICS) {
+            heapSnapshot = test.takeHeapSnapshot();
+            deltaBrowserJSHeapSizeBytes = getBrowserJSHeapSize(heapSnapshot) - startBrowserJSHeapSizeBytes;
+        }
         if (hasAuraStats()) {
             auraStats = test.getAuraStats();
         }
@@ -126,8 +137,15 @@ public final class PerfMetricsCollector {
                 metrics.setDevToolsLog(rdpAnalyzer.getFilteredDevToolsLog());
             }
 
+            if (jsProfilerData != null) {
+                // TODO: filter jsProfilerData
+                // TODO: analyze data and generate relevant metrics
+                metrics.setJSProfilerData(jsProfilerData);
+            }
+
             // memory metrics
-            if (captureJSHeapMetrics) {
+            if (CAPTURE_JS_HEAP_METRICS) {
+                metrics.setHeapSnapshot(heapSnapshot);
                 metrics.setMetric(new PerfMetric("Browser.JavaScript.Heap", deltaBrowserJSHeapSizeBytes, "bytes"));
             }
 
@@ -139,9 +157,6 @@ public final class PerfMetricsCollector {
                 // "removed": []
                 // }
                 String auraStatsContents = new JSONObject(auraStats).toString(2);
-                if (LOG.isLoggable(Level.INFO)) {
-                    LOG.info("collected aura stats: " + auraStatsContents);
-                }
                 PerfResultsUtil.writeAuraStats(auraStatsContents, test.getGoldFileName());
                 for (String name : auraStats.keySet()) {
                     Map<String, Map<String, List<Object>>> nameValue = auraStats.get(name);
@@ -163,6 +178,18 @@ public final class PerfMetricsCollector {
     private boolean hasAuraStats() {
         Mode mode = test.getCurrentAuraMode();
         return mode == Mode.STATS;
+    }
+
+    /**
+     * @return the current browser JS heap size in bytes
+     */
+    private static int getBrowserJSHeapSize(Map<String, ?> snapshot) {
+        JSONObject summary = PerfWebDriverUtil.analyzeHeapSnapshot(snapshot);
+        try {
+            return summary.getInt("total_size");
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

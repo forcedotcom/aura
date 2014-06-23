@@ -215,7 +215,10 @@ public final class PerfWebDriverUtil {
         if (SauceUtil.areTestsRunningOnSauce()) {
             throw new UnsupportedOperationException("required 2.10 chromedriver still not available in SauceLabs");
         }
-        return (Map<String, ?>) ((JavascriptExecutor) driver).executeScript(":takeHeapSnapshot");
+        long startTime = System.currentTimeMillis();
+        Map<String, ?> snapshot = (Map<String, ?>) ((JavascriptExecutor) driver).executeScript(":takeHeapSnapshot");
+        LOG.info("took heap snapshot in " + (System.currentTimeMillis() - startTime) + " ms");
+        return snapshot;
     }
 
     /**
@@ -241,5 +244,34 @@ public final class PerfWebDriverUtil {
             throw new RuntimeException(e);
         }
         return json;
+    }
+
+    // JS CPU Profiler
+
+    /**
+     * Start JavaScript CPU profiler
+     */
+    public void startProfile() {
+        try {
+            ((JavascriptExecutor) driver).executeScript(":startProfile");
+        } catch (WebDriverException e) {
+            LOG.warning(":startProfile not available");
+        }
+    }
+
+    /**
+     * Stop JavaScript CPU profiler and return profile info
+     * 
+     * See https://src.chromium.org/viewvc/chrome?revision=271803&view=revision
+     */
+    @SuppressWarnings("unchecked")
+    public Map<String, ?> endProfile() {
+        try {
+            // takes about 300ms for ui:button
+            return (Map<String, ?>) ((JavascriptExecutor) driver).executeScript(":endProfile");
+        } catch (WebDriverException e) {
+            LOG.warning(":endProfile not available");
+            return null;
+        }
     }
 }

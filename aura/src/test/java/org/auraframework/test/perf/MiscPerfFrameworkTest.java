@@ -75,6 +75,16 @@ public final class MiscPerfFrameworkTest extends AbstractPerfTestCase {
     // assertTrue("delta js heap size: " + delta, delta > 1000000);
     // }
 
+    // public void testProfile() throws Exception {
+    // startProfile();
+    // openTotallyRaw("/ui/label.cmp?label=foo");
+    // Map<String, ?> profileData = endProfile();
+    //
+    // Map<String, ?> profile = (Map<String, ?>) profileData.get("profile");
+    // JSONObject json = new JSONObject(new JSONObject(profile).toString());
+    // System.out.println("profileData: " + json.toString(2));
+    // }
+
     public void testResourceTimingAPI() throws Exception {
         openTotallyRaw("/ui/label.cmp?label=foo");
 

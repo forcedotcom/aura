@@ -65,7 +65,6 @@ import org.auraframework.test.perf.rdp.RDPNotification;
 import org.auraframework.util.AuraUITestingUtil;
 import org.auraframework.util.AuraUtil;
 import org.eclipse.jetty.util.log.Log;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
@@ -97,8 +96,8 @@ import com.google.common.collect.Sets;
 @WebDriverTest
 public abstract class WebDriverTestCase extends IntegrationTestCase {
     private static final Logger logger = Logger.getLogger("WebDriverTestCase");
-    private final String LOADING_INDICATOR =  "div.loadingIndicator";
-	
+    private final String LOADING_INDICATOR = "div.loadingIndicator";
+
     /** Checks whether {@code oneClass} is mentioned as a class on {@code elem}. */
     public boolean hasCssClass(WebElement elem, String oneClass) {
         String allClasses = elem.getAttribute("class");
@@ -136,29 +135,30 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
     public void setUp() throws Exception {
         super.setUp();
     }
-    
+
     public String getBrowserTypeString() {
-    	String browserType = "";
-    	if(this.currentBrowserType!=null) {
-    		browserType = ":BROWSER"+this.currentBrowserType.name();
-    	} 
-    	return browserType;
+        String browserType = "";
+        if (this.currentBrowserType != null) {
+            browserType = ":BROWSER" + this.currentBrowserType.name();
+        }
+        return browserType;
     }
-    
+
     public void addMocksToTestContextLocalDef(Set<Definition> mocks) throws Throwable {
-    	if (mocks != null && !mocks.isEmpty()) { 
-	    	TestContextAdapter testContextAdapter = Aura.get(TestContextAdapter.class);
-	        if (testContextAdapter != null) {
-	        	if(this.currentBrowserType!=null) 
-	        	{
-	        		System.out.println("WebDriverTestCase.addMocksToTestContextLocalDef,currentBrowserType:"+currentBrowserType.name());
-	                String testName = getQualifiedName();
-	        		testContextAdapter.getTestContext(testName);
-	                Aura.get(TestContextAdapter.class).getTestContext().getLocalDefs().addAll(mocks);
-	        	}
-	        }
-	        AuraTestingUtil.clearCachedDefs(mocks);
-    	}
+        if (mocks != null && !mocks.isEmpty()) {
+            TestContextAdapter testContextAdapter = Aura.get(TestContextAdapter.class);
+            if (testContextAdapter != null) {
+                if (this.currentBrowserType != null)
+                {
+                    System.out.println("WebDriverTestCase.addMocksToTestContextLocalDef,currentBrowserType:"
+                            + currentBrowserType.name());
+                    String testName = getQualifiedName();
+                    testContextAdapter.getTestContext(testName);
+                    Aura.get(TestContextAdapter.class).getTestContext().getLocalDefs().addAll(mocks);
+                }
+            }
+            AuraTestingUtil.clearCachedDefs(mocks);
+        }
     }
 
     /**
@@ -364,6 +364,14 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
             if (devToolsLog != null) {
                 PerfResultsUtil.writeDevToolsLog(devToolsLog, getGoldFileName(), auraUITestingUtil.getUserAgent());
             }
+            Map<String, ?> jsProfilerData = allMetrics.getJSProfilerData();
+            if (jsProfilerData != null) {
+                PerfResultsUtil.writeJSProfilerData(jsProfilerData, getGoldFileName());
+            }
+            Map<String, ?> heapSnapshot = allMetrics.getHeapSnapshot();
+            if (heapSnapshot != null) {
+                PerfResultsUtil.writeHeapSnapshot(heapSnapshot, getGoldFileName());
+            }
             PerfResultsUtil.writeGoldFile(allMetrics, getGoldFileName(), storeDetailsInGoldFile());
             perfTearDown(allMetrics);
         }
@@ -381,23 +389,30 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
         return perfWebDriverUtil.getRDPNotifications();
     }
 
-    /**
-     * @return the current browser JS heap size in bytes
-     */
-    public final int getBrowserJSHeapSize() {
-        Map<String, ?> data = perfWebDriverUtil.takeHeapSnapshot();
-        JSONObject summary = PerfWebDriverUtil.analyzeHeapSnapshot(data);
-        try {
-            return summary.getInt("total_size");
-        } catch (JSONException e) {
-            throw new RuntimeException(e);
-        }
+    public final Map<String, ?> takeHeapSnapshot() {
+        return perfWebDriverUtil.takeHeapSnapshot();
     }
 
     @SuppressWarnings("unchecked")
-	public final Map<String, Map<String, Map<String, List<Object>>>> getAuraStats() {
+    public final Map<String, Map<String, Map<String, List<Object>>>> getAuraStats() {
         return (Map<String, Map<String, Map<String, List<Object>>>>) auraUITestingUtil
                 .getRawEval("return $A.PERFCORE.stats.get();");
+    }
+
+    /**
+     * Start JavaScript CPU profiler
+     */
+    public final void startProfile() {
+        perfWebDriverUtil.startProfile();
+    }
+
+    /**
+     * Stop JavaScript CPU profiler and return profile info
+     * 
+     * See https://src.chromium.org/viewvc/chrome?revision=271803&view=revision
+     */
+    public final Map<String, ?> endProfile() {
+        return perfWebDriverUtil.endProfile();
     }
 
     /**
@@ -1135,72 +1150,74 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
                 .keyUp(Keys.SHIFT);
         return builder.build();
     }
-    
+
     /**
      * Flick starting at on_element, and moving by the xoffset and yoffset with normal speed
+     * 
      * @param locator
      * @param xOffset
      * @param yOffset
      */
     public void flick(By locator, int xOffset, int yOffset) {
-    	waitForElementAppear("Cannot locate element to flick: " + locator, locator);
+        waitForElementAppear("Cannot locate element to flick: " + locator, locator);
         WebElement element = auraUITestingUtil.findDomElement(locator);
         flick(element, xOffset, yOffset, FlickAction.SPEED_NORMAL);
     }
-    
+
     public void flick(WebElement element, int xOffset, int yOffset) {
-    	//FlickAction.SPEED_FAST is too slow for the tests so changing it to 200
-    	flick(element, xOffset, yOffset, 200);
+        // FlickAction.SPEED_FAST is too slow for the tests so changing it to 200
+        flick(element, xOffset, yOffset, 200);
     }
 
     public void flick(WebElement element, int xOffset, int yOffset, int speed) {
         WebDriver driver = getDriver();
         // check for wrapped driver
         if (driver instanceof EventFiringWebDriver) {
-            driver = ((EventFiringWebDriver)driver).getWrappedDriver();
+            driver = ((EventFiringWebDriver) driver).getWrappedDriver();
         }
         driver = augmentDriver();
-        //for iPhone
-    	int yOffsetByDevice = yOffset;
-    	
-    	if(this.getBrowserType() == BrowserType.IPAD){
-    		yOffsetByDevice = yOffset * 2;
-    	}
-    	if (driver instanceof HasTouchScreen) {
-    		Action flick = (new TouchActions(driver)).flick(element, xOffset, yOffsetByDevice, speed).build();
-    		flick.perform();
+        // for iPhone
+        int yOffsetByDevice = yOffset;
+
+        if (this.getBrowserType() == BrowserType.IPAD) {
+            yOffsetByDevice = yOffset * 2;
+        }
+        if (driver instanceof HasTouchScreen) {
+            Action flick = (new TouchActions(driver)).flick(element, xOffset, yOffsetByDevice, speed).build();
+            flick.perform();
         } else {
             Action flick = (new Actions(driver)).dragAndDropBy(element, xOffset, yOffsetByDevice).build();
             flick.perform();
         }
     }
-    
+
     public void flick(int xOffset, int yOffset) {
         WebDriver driver = getDriver();
         driver = augmentDriver();
-        //for iPhone
-    	int yOffsetByDevice = yOffset;
-    	
-    	if(this.getBrowserType() == BrowserType.IPAD){
-    		yOffsetByDevice = yOffset * 2;
-    	}
-    	
-    	Action flick = (new TouchActions(driver)).flick(xOffset, yOffsetByDevice).build();
+        // for iPhone
+        int yOffsetByDevice = yOffset;
+
+        if (this.getBrowserType() == BrowserType.IPAD) {
+            yOffsetByDevice = yOffset * 2;
+        }
+
+        Action flick = (new TouchActions(driver)).flick(xOffset, yOffsetByDevice).build();
         flick.perform();
     }
-    
+
     /*
-	 * Waits for the "loading" and spinner to disappear
-	 */
-	public void waitForLoadingIndicatorToDisappear() {
+     * Waits for the "loading" and spinner to disappear
+     */
+    public void waitForLoadingIndicatorToDisappear() {
         if (isElementPresent(By.cssSelector(LOADING_INDICATOR))) {
-            waitForElementAbsent("The 'loadingIndicator' never disappeared.", findDomElement(By.cssSelector(LOADING_INDICATOR)));
+            waitForElementAbsent("The 'loadingIndicator' never disappeared.",
+                    findDomElement(By.cssSelector(LOADING_INDICATOR)));
         }
     }
-    
-    private RemoteIOSDriver augmentDriver(){
-    	RemoteIOSDriver driver = IOSDriverAugmenter.getIOSDriver((RemoteWebDriver)getDriver());
-    	return driver;
+
+    private RemoteIOSDriver augmentDriver() {
+        RemoteIOSDriver driver = IOSDriverAugmenter.getIOSDriver((RemoteWebDriver) getDriver());
+        return driver;
     }
 
     protected void assertClassesSame(String message, String expected, String actual) {

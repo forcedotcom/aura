@@ -36,10 +36,18 @@ public final class PerfMetrics {
     public static PerfMetrics combine(PerfMetrics... metricsList) {
         PerfMetrics combined = null;
         List<JSONObject> devToolsLog = null;
+        Map<String, ?> jsProfilerData = null;
+        Map<String, ?> heapSnapshot = null;
         for (PerfMetrics metrics : metricsList) {
             if (metrics != null) {
                 if (devToolsLog == null) {
                     devToolsLog = metrics.getDevToolsLog();
+                }
+                if (jsProfilerData == null) {
+                    jsProfilerData = metrics.getJSProfilerData();
+                }
+                if (heapSnapshot == null) {
+                    heapSnapshot = metrics.getHeapSnapshot();
                 }
                 if (combined == null) {
                     // so we return null of all metrics in metricsList are null
@@ -53,6 +61,8 @@ public final class PerfMetrics {
             }
         }
         combined.setDevToolsLog(devToolsLog);
+        combined.setJSProfilerData(jsProfilerData);
+        combined.setHeapSnapshot(heapSnapshot);
         return combined;
     }
 
@@ -60,6 +70,8 @@ public final class PerfMetrics {
 
     private final Map<String, PerfMetric> metrics = Maps.newHashMap();
     private List<JSONObject> devToolsLog;
+    private Map<String, ?> jsProfilerData;
+    private Map<String, ?> heapSnapshot;
 
     public PerfMetrics() {
     }
@@ -80,6 +92,22 @@ public final class PerfMetrics {
 
     public void setDevToolsLog(List<JSONObject> devToolsLog) {
         this.devToolsLog = devToolsLog;
+    }
+
+    public Map<String, ?> getJSProfilerData() {
+        return jsProfilerData;
+    }
+
+    public void setJSProfilerData(Map<String, ?> jsProfilerData) {
+        this.jsProfilerData = jsProfilerData;
+    }
+
+    public Map<String, ?> getHeapSnapshot() {
+        return heapSnapshot;
+    }
+
+    public void setHeapSnapshot(Map<String, ?> heapSnapshot) {
+        this.heapSnapshot = heapSnapshot;
     }
 
     /**

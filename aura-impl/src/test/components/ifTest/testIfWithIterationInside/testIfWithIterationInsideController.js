@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 ({
-    toggleChild : function(cmp, event) {
-        var val = cmp.get("v.toggleChild");
-        cmp.set("v.toggleChild", !val);
-    },
+	toggleBool1: function(cmp, evt) {
+		var oldv = cmp.get("v.bool1");
+		cmp.setValue("v.bool1", !oldv);
+	},
 })

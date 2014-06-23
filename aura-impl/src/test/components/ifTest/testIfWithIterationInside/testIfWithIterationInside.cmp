@@ -15,16 +15,17 @@
     limitations under the License.
 
 -->
-<aura:component extends="auratest:rerenderParent">
-    <aura:attribute name="title" type="String"/>
-    <aura:attribute name="toggleChild" type="Boolean"/>
-
-    <div class="boxed">
-        <ui:outputText value="{!v.title}" aura:id="title"/>
-        {!v.body}
-        <br/>
-        child
-        <auratest:rerenderCounter aura:id="counter"/>
-        <ui:button label="v.child" press="{!c.toggleChild}" aura:id="toggleChild"/>
+<aura:component render="client">
+    <aura:attribute name="bool1" type="Boolean" default="true"/>
+    <ui:button press="{!c.toggleBool1}" label="toggle bool1 to load new array with different range" aura:id="toggleBool1"/>
+    
+    <div aura:id="iterationBlock" class="iterationBlock">
+        <aura:renderif isTrue="{!v.bool1}">
+            <iterationTest:iterationWithIfInside start="1" end="10" />
+        <aura:set attribute="else">
+            <iterationTest:iterationWithIfInside start="11" end="20" />
+        </aura:set>
+        </aura:renderif>
     </div>
+    
 </aura:component>

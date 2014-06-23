@@ -37,10 +37,11 @@
         
         if ($A.util.isEmpty(opts)) {
         	opts = cmp.get("v.body");
-        	if ($A.util.isEmpty(opts)) {
-        		return null;
+        	if (!$A.util.isEmpty(opts)) {
+        		strat = this.bodyStrategy;
+        	} else {
+        		opts = [];
         	}
-        	strat = this.bodyStrategy;
         }
 
         return { options : opts, strategy : strat };
@@ -53,16 +54,10 @@
     	if (cmp._suspendChangeHandlers) {
     		return;
     	}
-        var optionsPack = this.getOptionsWithStrategy(cmp),
-        	selectedOptions, value;
-        
-        if ($A.util.isUndefinedOrNull(optionsPack)) {
-        	$A.warning("Attempted to update options on inputSelect with no options: " + cmp.getGlobalId());
-        	return;
-        }
-        
-        value = cmp.get("v.value");
-        selectedOptions = optionsPack.strategy.getSelected(optionsPack.options);
+
+        var value = cmp.get("v.value"),
+        	optionsPack = this.getOptionsWithStrategy(cmp),
+        	selectedOptions = optionsPack.strategy.getSelected(optionsPack.options);
 
         if (optionsPack.options.length == 0) {
         	cmp._initOptionsFromValue = true;
@@ -92,17 +87,10 @@
         	return;
     	}
         
-        var optionsPack = optionsPack || this.getOptionsWithStrategy(cmp),
-        	selectedOptions, value, isMultiple;
-        
-        if ($A.util.isUndefinedOrNull(optionsPack)) {
-        	$A.warning("Attempted to update value from options on inputSelect with no options: " + cmp.getGlobalId());
-        	return;
-        }
-        
-        value = cmp.get("v.value");
-        isMultiple = $A.util.getBooleanValue(cmp.get("v.multiple"));
-        selectedOptions = optionsPack.strategy.getSelected(optionsPack.options);
+        var value = cmp.get("v.value"),
+        	isMultiple = $A.util.getBooleanValue(cmp.get("v.multiple")),
+        	optionsPack = optionsPack || this.getOptionsWithStrategy(cmp),
+        	selectedOptions = optionsPack.strategy.getSelected(optionsPack.options);
         
         if (!selectedOptions.found || value !== selectedOptions.optionValue) {
         	if (!isMultiple && !selectedOptions.found) {
@@ -273,7 +261,7 @@
     		internalText = ($A.util.isEmpty(options[i].label) ? options[i].value : options[i].label) || "";
     		
     		option.label = options[i].label || internalText;
-    		option.value = options[i].value || internalText;
+    		option.value = options[i].value;
     		
     		if (options[i]["class"]) {
     			option.setAttribute("class", options[i]["class"]);

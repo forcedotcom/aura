@@ -17,6 +17,7 @@
 -->
 <aura:application render="client">
     <aura:dependency resource="provider:*" />
+    <aura:dependency resource="ui:outputText" />
     <aura:dependency resource="markup://attributesTest:simpleValue" />
 
     <aura:attribute name="newDescriptor" type="String" default="markup://provider:clientProvider"/>

@@ -237,13 +237,6 @@ public interface AuraContext {
      */
     String getNum();
 
-    /**
-     * get the current set of preloads.
-     *
-     * By default, the aura and os namespaces are included.
-     */
-    Set<String> getPreloads();
-
     Format getFormat();
 
     Authentication getAccess();
@@ -254,16 +247,39 @@ public interface AuraContext {
 
     void setContextPath(String path);
 
-    boolean getSerializePreLoad();
-
     boolean getSerializeLastMod();
 
     void setSerializeLastMod(boolean serializeLastMod);
 
+    /**
+     * Are we 'preloading'.
+     *
+     * This is true if we are loading the set of definitions for app.css or app.js.
+     * This needs to be changed to do the work related to breaking up app.xxx into
+     * 'system' vs. user definitions.
+     *
+     * @return true if we are generating app.{js,css}
+     */
     boolean isPreloading();
 
+    /**
+     * Set the context as preloading.
+     *
+     * This really should be private, as no-one should ever call this.
+     *
+     * @param p the new value to set.
+     */
     void setPreloading(boolean p);
 
+    /**
+     * Add a 'dynamic' namespace.
+     *
+     * Dynamic namespaces are namespaces that are created by the server and sent
+     * to the client. These are sent back to the server with each request, so this
+     * should only be used for namespaces that are very expensive to generate.
+     *
+     * @param namespace the namespace to mark as added.
+     */
     void addDynamicNamespace(String namespace);
 
     /**

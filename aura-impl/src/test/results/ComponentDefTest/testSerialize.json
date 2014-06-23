@@ -1,4 +1,72 @@
 {
   "serId":1,
-  "value":"markup://aura:test"
+  "value":{
+    "descriptor":"markup://aura:test",
+    "superDef":{
+      "serId":2,
+      "value":{
+        "descriptor":"markup://aura:component",
+        "rendererDef":{
+          "serId":3,
+          "value":{
+            "descriptor":"js://aura.component",
+            "render":
+function(component) {
+        var rendering = component.getRendering();
+        return rendering ? rendering : $A.render(component.getValue("v.body"));
+    },
+            "afterRender":
+function(component) {
+        var body = component.get("v.body");
+        $A.afterRender(body);
+    },
+            "rerender":
+function(component) {
+        var body = component.get("v.body");
+        return $A.rerender(body);
+    },
+            "unrender":
+function(component) {
+        var body = component.get("v.body");
+        
+        $A.unrender(body);
+
+        var elements = component.getElements();
+        for (var key in elements){
+            var element = elements[key];
+            delete elements[key];
+            aura.util.removeElement(element);
+        }
+    }
+          }
+        },
+        "attributeDefs":[
+          {
+            "serId":4,
+            "value":{
+              "name":"body",
+              "type":"aura://Aura.Component[]"
+            }
+          }
+        ],
+        "interfaces":[
+          "markup://aura:rootComponent"
+        ],
+        "isAbstract":true
+      }
+    },
+    "attributeDefs":[
+      {
+        "serRefId":4
+      },
+      {
+        "serId":5,
+        "value":{
+          "name":"testAttributeDescriptorName",
+          "type":"aura://String",
+          "default":"testValue"
+        }
+      }
+    ]
+  }
 }

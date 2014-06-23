@@ -20,7 +20,6 @@
     template="auradocs:template"
     controller="java://org.auraframework.docs.DocsController"
     useAppcache="false"
-    preload="auradocs,aurastorage"
     locationChangeEvent="auradocs:locationChange"
     implements="auraStorage:refreshObserver">
 

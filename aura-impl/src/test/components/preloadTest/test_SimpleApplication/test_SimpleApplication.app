@@ -1,3 +1,3 @@
-<aura:application preload="preloadTest">
+<aura:application>
     <preloadTest:test_SpecialCharacter />
 </aura:application>

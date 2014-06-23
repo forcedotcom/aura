@@ -68,9 +68,9 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
     }
 
     /**
-     * Post requests should not have preloads serialzied.
+     * Check a post context.
      */
-    public void testPostContextWithoutPreloads() throws Exception {
+    public void testPostContext() throws Exception {
         Map<String, Object> message = new HashMap<String, Object>();
         Map<String, Object> actionInstance = new HashMap<String, Object>();
         actionInstance.put("descriptor",
@@ -102,9 +102,6 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         @SuppressWarnings("unchecked")
         Map<String, Object> json = (Map<String, Object>) new JsonReader().read(response
                 .substring(AuraBaseServlet.CSRF_PROTECT.length()));
-        @SuppressWarnings("unchecked")
-        Map<String, Object> context = (Map<String, Object>) json.get("context");
-        assertTrue("There should preloads", context.containsKey("preloads"));
     }
 
     /**

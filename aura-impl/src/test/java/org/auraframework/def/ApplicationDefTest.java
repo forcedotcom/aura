@@ -42,9 +42,9 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
      */
     public void testIsAppCacheEnabledInherited() throws Exception {
         DefDescriptor<ApplicationDef> parentDesc = addSourceAutoCleanup(ApplicationDef.class,
-                String.format(baseTag, "useAppcache='true' preload='aura' extensible='true'", ""));
+                String.format(baseTag, "useAppcache='true' extensible='true'", ""));
         DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class,
-                String.format(baseTag, String.format("extends='%s' preload='aura'", parentDesc.getQualifiedName()), ""));
+                String.format(baseTag, String.format("extends='%s'", parentDesc.getQualifiedName()), ""));
         ApplicationDef appdef = Aura.getDefinitionService().getDefinition(desc);
         assertEquals(Boolean.TRUE, appdef.isAppcacheEnabled());
     }
@@ -54,7 +54,7 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
      */
     public void testIsAppCacheEnabledOverridesDefault() throws Exception {
         DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class,
-                String.format(baseTag, "useAppcache='true' preload='aura'", ""));
+                String.format(baseTag, "useAppcache='true'", ""));
         ApplicationDef appdef = Aura.getDefinitionService().getDefinition(desc);
         assertEquals(Boolean.TRUE, appdef.isAppcacheEnabled());
     }
@@ -64,9 +64,9 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
      */
     public void testIsAppCacheEnabledOverridesExtends() throws Exception {
         DefDescriptor<ApplicationDef> parentDesc = addSourceAutoCleanup(ApplicationDef.class,
-                String.format(baseTag, "useAppcache='true' preload='aura' extensible='true'", ""));
+                String.format(baseTag, "useAppcache='true' extensible='true'", ""));
         DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class, String.format(baseTag,
-                String.format("extends='%s' useAppcache='false' preload='aura'", parentDesc.getQualifiedName()), ""));
+                String.format("extends='%s' useAppcache='false'", parentDesc.getQualifiedName()), ""));
         ApplicationDef appdef = Aura.getDefinitionService().getDefinition(desc);
         assertEquals(Boolean.FALSE, appdef.isAppcacheEnabled());
     }
@@ -76,19 +76,9 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
      */
     public void testIsAppCacheEnabledUseAppcacheEmpty() throws Exception {
         DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class,
-                "<aura:application useAppCache='' preload='aura'/>");
+                "<aura:application useAppCache=''/>");
         ApplicationDef appdef = Aura.getDefinitionService().getDefinition(desc);
         assertEquals(Boolean.FALSE, appdef.isAppcacheEnabled());
-    }
-
-    /**
-     * App's useAppcache attribute value is true, but application has no preloads
-     */
-    public void testIsAppCacheEnabledWithoutPreload() throws Exception {
-        DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class,
-                "<aura:application useAppCache='true'/>");
-        ApplicationDef appdef = Aura.getDefinitionService().getDefinition(desc);
-        assertEquals(Boolean.TRUE, appdef.isAppcacheEnabled());
     }
 
     /**
@@ -176,7 +166,7 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
      */
     public void testIsAppCacheEnabledUseAppcacheInvalid() throws Exception {
         DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class,
-                "<aura:application useAppCache='yes' preload='aura'/>");
+                "<aura:application useAppCache='yes'/>");
         ApplicationDef appdef = Aura.getDefinitionService().getDefinition(desc);
         assertEquals(Boolean.FALSE, appdef.isAppcacheEnabled());
     }

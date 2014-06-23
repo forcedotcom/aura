@@ -40,7 +40,8 @@
     pushOneValue: function(cmp, evt) {
         var iter = cmp.find("iteration");
         var old = iter.get("v.items");
-        iter.set("v.items[" + old.length + "]", {stringy:cmp.get("v.newvalue")});
+        old.push({stringy:cmp.get("v.newvalue")});
+        iter.set("v.items",old);
     },
 
     insertOneValue: function(cmp, evt) {

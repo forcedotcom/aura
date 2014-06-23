@@ -15,7 +15,7 @@
  */
 ({
     click: function(cmp, event, helper) {
-        var label = event.source.getValue("v.label").getValue();
+        var label = event.source.get("v.label");
         label = label.split(" ")[1];
         var outer = label[0] === "T";
         var inner = label[1] === "T";

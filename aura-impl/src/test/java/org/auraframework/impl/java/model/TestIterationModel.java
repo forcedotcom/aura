@@ -40,10 +40,12 @@ public class TestIterationModel {
     private final List<Object> capitaldata;
     private final List<String> innerdata;
     private final List<Object> data2;
+    private final List<Integer> dataIntList;
 
     public TestIterationModel() {
         data = new LinkedList<Object>();
         capitaldata = new LinkedList<Object>();
+        dataIntList = new LinkedList<Integer>();
         for (int i = 0; i < 26; i++) {
             Map<String, Object> dora = new HashMap<String, Object>();
             char c = (char) ('a' + i);
@@ -55,6 +57,8 @@ public class TestIterationModel {
             dora.put("stringy", "" + c + c + c + c + c);
             dora.put("whatever", "boo for nobody");
             capitaldata.add(dora);
+            //fill dataInt
+            dataIntList.add(i);
         }
         innerdata = ImmutableList.of("gah", "bah", "stah", "brah", "yah", "nah", "hah");
         data2 = new LinkedList<Object>();
@@ -75,6 +79,11 @@ public class TestIterationModel {
     @AuraEnabled
     public List<Object> getData2() {
         return data2;
+    }
+    
+    @AuraEnabled
+    public List<Integer> getDataIntList() {
+        return this.dataIntList;
     }
 
     @AuraEnabled

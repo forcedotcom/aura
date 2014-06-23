@@ -14,14 +14,19 @@
  * limitations under the License.
  */
 ({
-    clickAndWait: function(cmp, string) {
+    clickAndWait: function(cmp, string, emsg) {
         var button = cmp.find(string);
-        button.getElement().click();
-        $A.test.addWaitFor(true, function(){
-            var div = cmp.getElements()[1];
-            var t = $A.test.getText(div);
-            return t && (t.indexOf(string) >= 0);
-        });
+        $A.test.clickOrTouch(button.getElement());
+        $A.test.addWaitForWithFailureMessage(
+        		string, 
+        		function(){
+        			var div = cmp.getElements()[1];
+        			var t = $A.test.getText(div);
+        			return t;
+        		},
+        		emsg,
+        		null
+        );
     },
 
     checkOutput: function(cmp, string, msg) {
@@ -38,17 +43,17 @@
     testWalkUpAndDown: {
         test: [ function(cmp) {
                 this.checkOutput(cmp, "FF", "unexpected initial display");
-                this.clickAndWait(cmp, "FT");
+                this.clickAndWait(cmp, "FT","error after click FT");
             }, function(cmp) {
-                this.clickAndWait(cmp, "TF");
+                this.clickAndWait(cmp, "TF","error after click TF");
             }, function(cmp) {
-                this.clickAndWait(cmp, "TT");
+                this.clickAndWait(cmp, "TT","error after click TT");
             }, function(cmp) {
-                this.clickAndWait(cmp, "TF");
+                this.clickAndWait(cmp, "TF","error after click TF");
             }, function(cmp) {
-                this.clickAndWait(cmp, "FT");
+                this.clickAndWait(cmp, "FT","error after click FT");
             }, function(cmp) {
-                this.clickAndWait(cmp, "FF");
+                this.clickAndWait(cmp, "FF","error after click FF");
             }, function(cmp) {
                 // We're good
             }]
@@ -59,17 +64,17 @@
     testSkipAround: {
         test: [ function(cmp) {
                 this.checkOutput(cmp, "FF", "unexpected initial display");
-                this.clickAndWait(cmp, "TT");
+                this.clickAndWait(cmp, "TT","error after click TT");
             }, function(cmp) {
-                this.clickAndWait(cmp, "TF");
+                this.clickAndWait(cmp, "TF","error after click TF");
             }, function(cmp) {
-                this.clickAndWait(cmp, "FT");
+                this.clickAndWait(cmp, "FT","error after click FT");
             }, function(cmp) {
-                this.clickAndWait(cmp, "TF");
+                this.clickAndWait(cmp, "TF","error after click TF");
             }, function(cmp) {
-                this.clickAndWait(cmp, "TT");
+                this.clickAndWait(cmp, "TT","error after click TT");
             }, function(cmp) {
-                this.clickAndWait(cmp, "FF");
+                this.clickAndWait(cmp, "FF","error after click FF");
             }, function(cmp) {
                 // We're good
             }]

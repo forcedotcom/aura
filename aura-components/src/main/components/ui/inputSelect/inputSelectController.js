@@ -15,11 +15,11 @@
  */
 ({
     doInit: function(cmp, evt, helper) {
-        var concreteCmp = cmp.getConcreteComponent();
-        var currentValue = concreteCmp.getValue("v.value");
-        
-        if (currentValue.isDefined()) {
-            // if a "value" attribute is specified on initial render, it should win over what the individual options report
+    	var concreteCmp = cmp.getConcreteComponent();
+        var currentValue = concreteCmp.get("v.value");
+
+        if (!$A.util.isUndefined(currentValue)) {
+        	// if a "value" attribute is specified on initial render, it should win over what the individual options report
             helper.updateOptionsFromValue(concreteCmp);
         } else {
             // otherwise update the "value" attribute based on the options that claim to be selected

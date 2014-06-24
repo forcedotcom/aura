@@ -18,12 +18,15 @@
 <aura:component>
     <aura:attribute name="mode" type="String" default="VIEW"/>
     <aura:attribute name="sortBy" type="String"/>
-    <aura:attribute name="pageSize" type="Integer" default="20"/>
+    <aura:attribute name="pageSize" type="Integer" default="200"/>
     <aura:attribute name="currentPage" type="Integer" default="1"/>
     <aura:attribute name="totalItems" type="Integer"/>
     <aura:attribute name="index" type="Integer"/>
     <aura:attribute name="count" type="Integer"/>
     <aura:attribute name="gridItems" type="List"/>
+    <aura:attribute name="gridSelectedItems" type="List"/>
+    <aura:attribute name="initialRender" type="Integer" default="200"/>
+    <aura:attribute name="batchRender" type="Integer" default="100"/>
 
     <aura:handler name="change" value="{!v.currentPage}" action="{!c.handleCurrentPageChange}"/>
 
@@ -34,7 +37,7 @@
     <ui:inputText placeholder="index" value="{!v.index}"/>
     <ui:inputText placeholder="count" value="{!v.count}"/>
 
-    <ui:dataGridNew aura:id="grid" mode="{!v.mode}" sortBy="{!v.sortBy}">
+    <ui:dataGrid aura:id="grid" mode="{!v.mode}" sortBy="{!v.sortBy}" initialRenderCount="{!v.initialRender}" batchRenderCount="{!v.batchRender}">
         <aura:set attribute="columns">
             <ui:dataGridSelectionColumn/>
 
@@ -67,7 +70,7 @@
             <ui:actionDelegate onaction="{!c.handleAction}"/>
         </aura:set>
 -->
-    </ui:dataGridNew>
+    </ui:dataGrid>
 
     <ui:pagerNextPrevious pageSize="{!v.pageSize}"
                                   currentPage="{!v.currentPage}"
@@ -79,9 +82,21 @@
                       
     
     <ui:button label="Re-fire datagrid's provide" press="{!c.replaceData}"/><br/>               
-    <ui:button label="Spit Out Data" press="{!c.spit}"/><br/>
-    <aura:iteration aura:id="items" var="item" items="{!v.gridItems}">
-    	<ui:outputText value="{!item.id + ':' + item.subject + ':' + item.who.name + ':' + item.what.name + ':' + item.activityDate}"/><br/>
-    </aura:iteration>
+    <ui:block>
+    	<aura:set attribute="left">
+    		<ui:button label="Spit Out Items" press="{!c.spit}"/><br/>
+    		<h2>DataGrid's Internal v.items</h2>
+		    <aura:iteration aura:id="items" var="item" items="{!v.gridItems}">
+		    	<ui:outputText value="{!item.id + ':' + item.subject + ':' + item.who.name + ':' + item.what.name + ':' + item.activityDate}"/><br/>
+		    </aura:iteration>
+		</aura:set>
+		<aura:set attribute="right">
+			<ui:button label="Grab Selected" press="{!c.getSelected}"/><br/>
+			<h2>DataGrid's Selected Items</h2>
+			<aura:iteration aura:id="selectedItems" var="item" items="{!v.gridSelectedItems}">
+				<ui:outputText value="{!item.id + ':' + item.subject + ':' + item.who.name + ':' + item.what.name + ':' + item.activityDate}"/><br/>
+			</aura:iteration>
+		</aura:set>
+    </ui:block>
 
 </aura:component>

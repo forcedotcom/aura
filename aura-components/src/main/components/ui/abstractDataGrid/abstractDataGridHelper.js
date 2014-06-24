@@ -43,7 +43,7 @@
 
         concrete._dataProviders = [];        
 
-        dataProviders.forEach(function (dp) {
+        $A.util.forEach(dataProviders, function (dp) {
     		dp.addHandler("onchange", cmp, "c.handleDataChange");
     		concrete._dataProviders.push(dp);
         });

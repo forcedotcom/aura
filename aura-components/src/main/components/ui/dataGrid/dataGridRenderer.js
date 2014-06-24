@@ -20,11 +20,10 @@
 			tbody 		= cmp.find('tbody').getElement(),
 			tfoot       = cmp.find('tfoot').getElement(),
 			items 		= cmp.get('v.items'),
-			priv_rows   = cmp.getValue('v.priv_rows'),
 			summaryRow;
 
 		// Keep a private copy of items.
-		priv_rows.setValue(items);
+		concrete._rowItems = items;
 
 		// TODO: this seems stupid d[-_-]b
 		cmp._loadedOnce = items.length > 0;
@@ -39,12 +38,12 @@
 		if (summaryRow) {
 			tfoot.appendChild(summaryRow);
 		}
-
+		cmp._rendered = true;
 		return table;
 	},
 
 	unrender: function (cmp) {
-		var children = cmp._allChildren,
+		var children = cmp._allChildrenCmps,
 			child;
 
 		// Asynchronously destroy leaf (cell) components.

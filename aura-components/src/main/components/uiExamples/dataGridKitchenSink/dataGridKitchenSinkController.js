@@ -90,6 +90,11 @@
 		cmp.set("v.gridItems", list);
 	},
 	
+	getSelected : function(cmp, evt, hlp) {
+    	var list = cmp.find("grid").get("v.selectedItems");
+		cmp.set("v.gridSelectedItems", list);
+	},
+	
 	replaceData : function(cmp, evt, hlp) {
 		cmp.find("data").getEvent("provide").fire();
 	}

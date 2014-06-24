@@ -1009,10 +1009,11 @@ Component.prototype.isDirty = function(expression){
  */
 Component.prototype.isValid=function(expression){
     // JBUCH TODO: TEMPORARY PASSTHROUGH TO HIDE SIMPLEVALUES; isValid() SHOULD BE HANDLED THROUGH ERROR EVENTS
-    if(expression){
-        var wrapper=this._getValue(expression);
-        return (wrapper&&wrapper.isValid())||false;
+    if (expression){
+        var wrapper = this._getValue(expression);
+        return (wrapper && wrapper.isValid && wrapper.isValid()) || false;
     }
+    
     return !this._scheduledForAsyncDestruction && this.priv;
 };
 
@@ -1024,7 +1025,7 @@ Component.prototype.isValid=function(expression){
 Component.prototype.setValid = function (expression,valid) {
     // JBUCH TODO: TEMPORARY PASSTHROUGH TO HIDE SIMPLEVALUES; setValid() SHOULD BE HANDLED THROUGH ERROR EVENTS
     var wrapper = this._getValue(expression);
-    if(wrapper&&wrapper.setValid){
+    if(wrapper && wrapper.setValid){
         wrapper.setValid(valid);
     }
 };
@@ -1037,7 +1038,7 @@ Component.prototype.setValid = function (expression,valid) {
 Component.prototype.addErrors = function (expression, errors) {
     // JBUCH TODO: TEMPORARY PASSTHROUGH TO HIDE SIMPLEVALUES; addErrors() SHOULD BE HANDLED THROUGH ERROR EVENTS
     var wrapper = this._getValue(expression);
-    if (wrapper&&wrapper.addErrors) {
+    if (wrapper && wrapper.addErrors) {
         wrapper.addErrors(errors);
     }
 };
@@ -1050,7 +1051,7 @@ Component.prototype.addErrors = function (expression, errors) {
 Component.prototype.clearErrors = function (expression) {
     // JBUCH TODO: TEMPORARY PASSTHROUGH TO HIDE SIMPLEVALUES; clearErrors() SHOULD BE HANDLED THROUGH ERROR EVENTS
     var wrapper = this._getValue(expression);
-    if (wrapper&&wrapper.clearErrors) {
+    if (wrapper && wrapper.clearErrors) {
         wrapper.clearErrors();
     }
 };
@@ -1064,7 +1065,7 @@ Component.prototype.clearErrors = function (expression) {
 Component.prototype.getErrors = function (expression) {
     // JBUCH TODO: TEMPORARY PASSTHROUGH TO HIDE SIMPLEVALUES; getErrors() SHOULD BE HANDLED THROUGH ERROR EVENTS
     var wrapper = this._getValue(expression);
-    return wrapper ? wrapper.getErrors() : [];
+    return wrapper && wrapper.getErrors ? wrapper.getErrors() : [];
 };
 
 /**

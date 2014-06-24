@@ -6,7 +6,7 @@
 ,{"name":"Timeline.Loading.ResourceReceivedData","value":6}
 ,{"name":"Timeline.Loading.ResourceSendRequest","value":8}
 ,{"name":"Timeline.Other.Program","value":63}
-,{"name":"Timeline.Painting.CompositeLayers","value":3}
+,{"name":"Timeline.Painting.CompositeLayers","value":2}
 ,{"name":"Timeline.Painting.MarkFirstPaint","value":1}
 ,{"name":"Timeline.Painting.Paint","value":2}
 ,{"name":"Timeline.Painting.PaintSetup","value":1}

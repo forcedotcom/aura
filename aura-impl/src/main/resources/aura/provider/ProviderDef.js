@@ -20,10 +20,8 @@
  * @protected
  */
 function ProviderDef(config){
-    var code = config["code"];
-    $A.assert(code, "provider code not found");
-    var obj = aura.util.json.decodeString(code);
-    this.provideMethod = obj["provide"];
+    this.provideMethod = aura.util.json.decodeString(config["provide"]);
+    $A.assert(this.provideMethod, "Provide method not found");
 }
 
 ProviderDef.prototype.auraType = "ProviderDef";
@@ -37,9 +35,7 @@ ProviderDef.prototype.auraType = "ProviderDef";
  * @param {Object} ccc Not used currently. Will be included in next round of CCC changes - W-1961207
  */
 ProviderDef.prototype.provide = function(component, localCreation, callback, ccc) {
-
     var provideMethod = this.provideMethod;
-    $A.assert(provideMethod, "Provide method not found");
 
     var providedConfig = provideMethod(component, localCreation);
 

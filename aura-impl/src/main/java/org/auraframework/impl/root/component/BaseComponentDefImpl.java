@@ -61,6 +61,8 @@ import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.instance.ValueProviderType;
+
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.MasterDefRegistry;
@@ -411,6 +413,18 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         }
     }
 
+    /**
+     * Retrieve labels for a list of descriptors.
+     */
+    private <D extends Definition> void retrieveListLabels(DefinitionService definitionService,
+            List<DefDescriptor<D>> descriptors) throws QuickFixException {
+        if (descriptors != null) {
+            for (DefDescriptor<D> desc : descriptors) {
+                definitionService.getDefinition(desc).retrieveLabels();
+            }
+        }
+    }
+
     @Override
     public void retrieveLabels() throws QuickFixException {
         GlobalValueProvider labelProvider = Aura.getContextService().getCurrentContext().getGlobalProviders()
@@ -421,23 +435,11 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             }
         }
 
-        if (controllerDescriptors != null) {
-            for (DefDescriptor<ControllerDef> desc : controllerDescriptors) {
-                desc.getDef().retrieveLabels();
-            }
-        }
-
-        if (rendererDescriptors != null) {
-            for (DefDescriptor<RendererDef> desc : rendererDescriptors) {
-                desc.getDef().retrieveLabels();
-            }
-        }
-
-        if (helperDescriptors != null) {
-            for (DefDescriptor<HelperDef> desc : helperDescriptors) {
-                desc.getDef().retrieveLabels();
-            }
-        }
+        DefinitionService definitionService = Aura.getDefinitionService();
+        retrieveListLabels(definitionService, controllerDescriptors);
+        retrieveListLabels(definitionService, rendererDescriptors);
+        retrieveListLabels(definitionService, helperDescriptors);
+        retrieveListLabels(definitionService, providerDescriptors);
     }
 
     @Override
@@ -739,11 +741,9 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             BaseComponentDefImpl<?> other = (BaseComponentDefImpl<?>) obj;
 
             return getDescriptor().equals(other.getDescriptor())
-                    && controllerDescriptors
-                    .equals(other.controllerDescriptors)
+                    && controllerDescriptors.equals(other.controllerDescriptors)
                     && (modelDefDescriptor == null ? other.modelDefDescriptor == null
-                    : modelDefDescriptor
-                    .equals(other.modelDefDescriptor))
+                    : modelDefDescriptor.equals(other.modelDefDescriptor))
                     && (extendsDescriptor == null ? other.extendsDescriptor == null
                     : extendsDescriptor.equals(other.extendsDescriptor))
                     && (cmpThemeDescriptor == null ? other.cmpThemeDescriptor == null
@@ -1192,19 +1192,15 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         if (providerDescriptors != null) {
             ret.addAll(providerDescriptors);
         }
-
         if (styleDescriptor != null) {
             ret.add(styleDescriptor);
         }
-
         if (helperDescriptors != null) {
             ret.addAll(helperDescriptors);
         }
-        
         if (documentationDescriptor != null) {
-        	ret.add(documentationDescriptor);
+            ret.add(documentationDescriptor);
         }
-        
         return ret;
     }
 

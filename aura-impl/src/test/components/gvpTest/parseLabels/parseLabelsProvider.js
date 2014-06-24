@@ -16,6 +16,7 @@
 ({
     provide : function(component) {
     	var x = $A.get("$Label.Section1.provider");
-    	var x = $A.get("$Label.Section2.provider");
+    	var y = $A.get("$Label.Section2.provider");
+        return { "attributes": { "xxx":x, "yyy":y } };
     }
 })

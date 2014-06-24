@@ -16,5 +16,9 @@
 
 -->
 <!--Tests to verify that label expressions in component resource are parsed, evaluated and available at the client -->
-<aura:component>
+<aura:component provider="js://gvpTest.parseLabels">
+    <aura:attribute name="xxx" type="String" default="none" />
+    <aura:attribute name="yyy" type="String" default="none" />
+    {!v.xxx}<br />
+    {!v.yyy}<br />
 </aura:component>

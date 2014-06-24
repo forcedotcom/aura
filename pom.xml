@@ -42,11 +42,7 @@
         <createChecksum>true</createChecksum>
         <selenium.version>2.38.0</selenium.version>
     </properties>
-    <repositories>      
-        <repository>
-            <id>jsdoctk1</id>
-            <url>http://jsdoctk-plugin.googlecode.com/svn/repo</url>
-        </repository>
+    <repositories>
         <repository>
             <id>args4j</id>
             <name>Args4J public repository</name>
@@ -60,19 +56,11 @@
             <url>http://maven.auraframework.org/libs-release</url>
         </repository>
         <repository>
-            <snapshots />
-            <id>maven.auraframework.org-jenkins-build-artifacts</id>
-            <url>http://maven.auraframework.org/jenkins-build-artifacts</url>
-        </repository>
-        <repository>
-            <snapshots />
-            <id>maven.auraframework.org-releases-snapshots</id>
-            <url>http://maven.auraframework.org/libs-snapshot</url>
-        </repository>
-        <repository>
-            <snapshots />
-            <id>maven.auraframework.org-ext-releases</id>
-            <url>http://repo.auraframework.org/ext-release-local</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <id>repo.auraframework.org-releases</id>
+            <url>http://repo.auraframework.org/libs-release</url>
         </repository>
         <repository>
             <snapshots />
@@ -83,7 +71,7 @@
     </repositories>
     <pluginRepositories>
         <pluginRepository>
-            <id>jsdoctk2</id>
+            <id>jsdoctk</id>
             <url>http://jsdoctk-plugin.googlecode.com/svn/repo</url>
         </pluginRepository>
     </pluginRepositories>

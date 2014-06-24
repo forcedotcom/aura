@@ -39,6 +39,21 @@ Test.Aura.UtilTest=function(){
 	auraMock(function(){
 		targetUtil = new $A.ns.Util();
 	});
+	
+	[Fixture]
+    function transportRequest(){
+        [Fact]
+        function testTransportRequestNotPublic(){
+        	var targetUtil;
+            auraMock(function(){
+                targetUtil = new $A.ns.Util();
+            });
+            
+            var method = targetUtil.transport.request;
+            
+            Assert.Equal(undefined, method); 
+        }
+    }
 
     [Fixture]
     function isIOSWebView(){

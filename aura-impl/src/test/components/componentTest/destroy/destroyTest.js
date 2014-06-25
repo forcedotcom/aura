@@ -61,6 +61,30 @@
         }]
     },
 
+    /**
+     * Verify Component.isValid() returns false after a component has been synchronously destroyed.
+     */
+    testIsValidSynchronousDestroy: {
+        test: function(cmp) {
+            var facet = cmp.find("knowParent");
+            $A.test.assertTrue(facet.isValid());
+            facet.destroy(false);
+            $A.test.assertFalse(facet.isValid());
+        }
+    },
+
+    /**
+     * Verify Component.isValid() returns false after a component has been asynchronously destroyed.
+     */
+    testIsValidAsynchronousDestroy: {
+        test: function(cmp) {
+            var facet = cmp.find("knowParent");
+            $A.test.assertTrue(facet.isValid());
+            facet.destroy(true);
+            $A.test.assertFalse(facet.isValid());
+        }
+    },
+
     // TODO: Re-enable when we stop forcing destroy to be synchronous in test modes. This is done in the destroy
     //       functions of Component.js and ArrayValue.js.
     // W-1928349: When we destroy asynchronously we leave a reference node behind, but not when we destroy

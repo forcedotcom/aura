@@ -1277,7 +1277,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                     status = String.format("Access to %s '%s' disallowed by MasterDefRegistry.assertAccess(): referencing namespace was empty or null", defType, target);
                 } else if (!referencingNamespace.equals(namespace)) {
                     // The caller and the def are not in the same namespace
-                    status = String.format("Access to %s '%s' from namespace '%s' disallowed by MasterDefRegistry.assertAccess()", defType.toString().toLowerCase(), target, referencingNamespace);
+                    status = String.format("Access to %s '%s' from namespace '%s' in '%s(%s)' disallowed by MasterDefRegistry.assertAccess()", defType.toString().toLowerCase(), target, referencingNamespace, referencingDescriptor, referencingDescriptor.getDefType());
                 }
             }
 

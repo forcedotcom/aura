@@ -108,7 +108,6 @@ public final class PerfResultsUtil {
      * Writes the JavaScript CPU profile data for a perf test run to
      * System.getProperty("aura.perf.results.dir")/profiles/testName_profile.cpuprofile
      */
-    @SuppressWarnings("unchecked")
     public static void writeJSProfilerData(Map<String, ?> jsProfilerData, String fileName) {
         File file = new File(RESULTS_DIR + "/profiles/" + fileName + "_profile.cpuprofile");
         try {
@@ -116,8 +115,7 @@ public final class PerfResultsUtil {
             BufferedWriter writer = null;
             try {
                 writer = new BufferedWriter(new FileWriter(file));
-                Map<String, ?> profile = (Map<String, ?>) jsProfilerData.get("profile");
-                writer.write(new JSONObject(profile).toString());
+                writer.write(new JSONObject(jsProfilerData).toString());
                 LOG.info("wrote JavaScript CPU profile data: " + file.getAbsolutePath());
             } finally {
                 IOUtil.close(writer);

@@ -24,6 +24,7 @@ import org.auraframework.test.perf.core.AbstractPerfTestCase;
 import org.auraframework.test.perf.metrics.PerfMetrics;
 import org.auraframework.test.perf.metrics.PerfMetricsCollector;
 import org.auraframework.test.perf.metrics.PerfRunsCollector;
+import org.json.JSONObject;
 
 /**
  * Miscellaneous tests for the perf framework.
@@ -75,15 +76,15 @@ public final class MiscPerfFrameworkTest extends AbstractPerfTestCase {
     // assertTrue("delta js heap size: " + delta, delta > 1000000);
     // }
 
-    // public void testProfile() throws Exception {
-    // startProfile();
-    // openTotallyRaw("/ui/label.cmp?label=foo");
-    // Map<String, ?> profileData = endProfile();
-    //
-    // Map<String, ?> profile = (Map<String, ?>) profileData.get("profile");
-    // JSONObject json = new JSONObject(new JSONObject(profile).toString());
-    // System.out.println("profileData: " + json.toString(2));
-    // }
+    public void testProfile() throws Exception {
+        startProfile();
+        openTotallyRaw("/ui/label.cmp?label=foo");
+        Map<String, ?> profileData = endProfile();
+
+        JSONObject metrics = PerfWebDriverUtil.analyzeCPUProfile(profileData);
+        PerfResultsUtil.writeJSProfilerData(profileData, "testProfile");
+        System.out.println(metrics.toString(2));
+    }
 
     public void testResourceTimingAPI() throws Exception {
         openTotallyRaw("/ui/label.cmp?label=foo");

@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extensible="true" implements="ui:visible" support="PROTO">
+<aura:component extensible="true" implements="ui:visible" support="PROTO" description="A value rendered in the table footer that computes a given column in ui:dataGrid">
 	<aura:attribute name="column" type="String" description="ApiName of column."/>
 	<aura:attribute name="type" type="String" description="{ SUM, AVG, MIN, MAX }"/>
 	<aura:attribute name="items" type="List"/>

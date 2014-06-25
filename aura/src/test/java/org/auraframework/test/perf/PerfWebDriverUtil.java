@@ -25,6 +25,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.auraframework.test.SauceUtil;
+import org.auraframework.test.perf.rdp.CPUProfilerAnalyzer;
 import org.auraframework.test.perf.rdp.RDPNotification;
 import org.auraframework.util.AuraUITestingUtil;
 import org.auraframework.util.json.JsonReader;
@@ -246,7 +247,9 @@ public final class PerfWebDriverUtil {
         return json;
     }
 
-    // JS CPU Profiler
+    // JavaScript CPU Profiler
+
+    private boolean cpuProfilerNotAvailable;
 
     /**
      * Start JavaScript CPU profiler
@@ -255,7 +258,8 @@ public final class PerfWebDriverUtil {
         try {
             ((JavascriptExecutor) driver).executeScript(":startProfile");
         } catch (WebDriverException e) {
-            LOG.warning(":startProfile not available");
+            LOG.info("JavaScript CPU profiler not available");
+            cpuProfilerNotAvailable = true;
         }
     }
 
@@ -268,10 +272,21 @@ public final class PerfWebDriverUtil {
     public Map<String, ?> endProfile() {
         try {
             // takes about 300ms for ui:button
-            return (Map<String, ?>) ((JavascriptExecutor) driver).executeScript(":endProfile");
+            Map<String, ?> retval = (Map<String, ?>) ((JavascriptExecutor) driver).executeScript(":endProfile");
+            if (retval == null) {
+                LOG.warning(":endProfile returned no results");
+                return null;
+            }
+            return (Map<String, ?>) retval.get("profile");
         } catch (WebDriverException e) {
-            LOG.warning(":endProfile not available");
+            if (!cpuProfilerNotAvailable) {
+                LOG.warning(e.toString());
+            }
             return null;
         }
+    }
+
+    public static JSONObject analyzeCPUProfile(Map<String, ?> profile) throws JSONException {
+        return new CPUProfilerAnalyzer(profile).analyze();
     }
 }

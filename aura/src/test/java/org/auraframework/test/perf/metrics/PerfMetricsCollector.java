@@ -24,6 +24,7 @@ import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.WebDriverTestCase;
 import org.auraframework.test.perf.PerfResultsUtil;
 import org.auraframework.test.perf.PerfWebDriverUtil;
+import org.auraframework.test.perf.rdp.CPUProfilerAnalyzer;
 import org.auraframework.test.perf.rdp.RDPAnalyzer;
 import org.auraframework.test.perf.rdp.RDPNotification;
 import org.auraframework.test.perf.rdp.TimelineEventStats;
@@ -39,8 +40,8 @@ public final class PerfMetricsCollector {
 
     private static final Logger LOG = Logger.getLogger(PerfMetricsCollector.class.getSimpleName());
 
-    private static final boolean CAPTURE_JS_PROFILER_DATA = true; // (300ms)
-    private static final boolean CAPTURE_JS_HEAP_METRICS = false; // slow (7 secs)
+    private static final boolean CAPTURE_JS_PROFILER_DATA = true; // 300 ms/call
+    private static final boolean CAPTURE_JS_HEAP_METRICS = false; // slow: 7 secs/call
 
     private final WebDriverTestCase test;
     private long startMillis;
@@ -139,14 +140,20 @@ public final class PerfMetricsCollector {
 
             if (jsProfilerData != null) {
                 // TODO: filter jsProfilerData
-                // TODO: analyze data and generate relevant metrics
                 metrics.setJSProfilerData(jsProfilerData);
+                JSONObject jscpuMetrics = new CPUProfilerAnalyzer(jsProfilerData).analyze();
+                metrics.setMetric("Profile.JSCPU.timeProgram", jscpuMetrics.get("timeProgramMillis"), "millis");
+                metrics.setMetric("Profile.JSCPU.timeRoot", jscpuMetrics.get("timeRootMillis"), "millis");
+                metrics.setMetric("Profile.JSCPU.timeIdle", jscpuMetrics.get("timeIdleMillis"), "millis");
+                metrics.setMetric("Profile.JSCPU.timeGC", jscpuMetrics.get("timeGCMillis"), "millis");
+                metrics.setMetric("Profile.JSCPU.numIslands", jscpuMetrics.get("numIslands"));
+                metrics.setMetric("Profile.JSCPU.maxDepth", jscpuMetrics.get("maxDepth"));
             }
 
             // memory metrics
             if (CAPTURE_JS_HEAP_METRICS) {
                 metrics.setHeapSnapshot(heapSnapshot);
-                metrics.setMetric(new PerfMetric("Browser.JavaScript.Heap", deltaBrowserJSHeapSizeBytes, "bytes"));
+                metrics.setMetric("Browser.JavaScript.Heap", deltaBrowserJSHeapSizeBytes, "bytes");
             }
 
             // aura stats

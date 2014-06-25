@@ -140,6 +140,10 @@ public final class PerfMetrics {
         metrics.put(name, new PerfMetric(name, value));
     }
 
+    public void setMetric(String name, Object value, String unit) {
+        metrics.put(name, new PerfMetric(name, value, unit));
+    }
+
     public boolean hasMetric(String name) {
         return metrics.containsKey(name);
     }

@@ -29,6 +29,9 @@ import com.google.common.collect.Maps;
  */
 public class PerfMetricsComparator {
 
+    // TODO: remove this once the chromedriver that supports profiling is released
+    private static final boolean IGNORE_PROFILE_JSCPU_IF_ZERO = true;
+
     public static final PerfMetricsComparator DEFAULT_INSTANCE = new PerfMetricsComparator();
 
     /**
@@ -46,9 +49,6 @@ public class PerfMetricsComparator {
      * @return true if metrics with that unit should be excluded
      */
     protected boolean isUnitExcluded(String unit) {
-        if ("milliseconds".equals(unit)) {
-            return true;
-        }
         return false;
     }
 
@@ -64,6 +64,10 @@ public class PerfMetricsComparator {
             return 5;
         } else if (metricName.startsWith("Network.")) {
             return 20;
+        } else if (metricName.startsWith("Profile.JSCPU.time")) {
+            return 50;
+        } else if (metricName.startsWith("Profile.JSCPU.")) {
+            return 25;
         }
         return 0;
     }
@@ -100,6 +104,8 @@ public class PerfMetricsComparator {
         map.put("Timeline.Scripting.TimeStamp", "we put those");
 
         map.put("Timeline.Other.UpdateLayerTree", "metric with wrong name in old goldfiles");
+
+        map.put("WallTime", "fluctuates");
 
         METRICS_TO_EXCLUDE = ImmutableMap.copyOf(map);
     }
@@ -158,6 +164,10 @@ public class PerfMetricsComparator {
             } else if (isUnitExcluded(expected.getUnits())) {
                 logLineMark = ' ';
                 logLine.append(" excluded");
+            } else if (IGNORE_PROFILE_JSCPU_IF_ZERO && name.startsWith("Profile.JSCPU.") && actualValue == 0
+                    && expectedValue != 0) {
+                logLineMark = ' ';
+                logLine.append(" excluded, chromedriver used doesn't support profiling");
             } else if (Math.abs(expectedValue - actualValue) > allowedDelta) {
                 logLineMark = '*';
                 numMetricsCompared++;
@@ -191,7 +201,7 @@ public class PerfMetricsComparator {
             }
             log.append("\n    " + logLineMark + ' ' + logLine);
 
-            // TODO: fail if there are new metrics or some metrics have now details?
+            // TODO: fail if there are new metrics?
             // (this way the gold files will be updated with the extra info)
 
             // TODO: non-int perf value types?

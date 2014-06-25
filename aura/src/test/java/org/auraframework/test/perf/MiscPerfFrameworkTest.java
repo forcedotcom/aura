@@ -80,10 +80,12 @@ public final class MiscPerfFrameworkTest extends AbstractPerfTestCase {
         startProfile();
         openTotallyRaw("/ui/label.cmp?label=foo");
         Map<String, ?> profileData = endProfile();
-
-        JSONObject metrics = PerfWebDriverUtil.analyzeCPUProfile(profileData);
-        PerfResultsUtil.writeJSProfilerData(profileData, "testProfile");
-        System.out.println(metrics.toString(2));
+        if (profileData != null) {
+            // profileData is null if chromedriver doesn't support profiling
+            JSONObject metrics = PerfWebDriverUtil.analyzeCPUProfile(profileData);
+            PerfResultsUtil.writeJSProfilerData(profileData, "testProfile");
+            System.out.println(metrics.toString(2));
+        }
     }
 
     public void testResourceTimingAPI() throws Exception {

@@ -47,7 +47,7 @@ public final class CPUProfilerAnalyzerTest extends UnitTestCase {
         assertEquals(1, metrics.getLong("timeProgramMillis"));
         assertEquals(3076, metrics.getLong("timeRootMillis"));
 
-        assertEquals(1, metrics.getLong("numIslands"));
+        assertEquals(2, metrics.getLong("numIslands"));
         assertEquals(4, metrics.getLong("maxDepth"));
     }
 

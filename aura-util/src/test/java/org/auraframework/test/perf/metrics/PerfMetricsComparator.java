@@ -164,7 +164,8 @@ public class PerfMetricsComparator {
             } else if (isUnitExcluded(expected.getUnits())) {
                 logLineMark = ' ';
                 logLine.append(" excluded");
-            } else if (IGNORE_PROFILE_JSCPU_IF_ZERO && actualValue == 0 && expectedValue != 0) {
+            } else if (IGNORE_PROFILE_JSCPU_IF_ZERO && name.startsWith("Profile.JSCPU.") && actualValue == 0
+                    && expectedValue != 0) {
                 logLineMark = ' ';
                 logLine.append(" excluded, chromedriver used doesn't support profiling");
             } else if (Math.abs(expectedValue - actualValue) > allowedDelta) {

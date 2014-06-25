@@ -28,7 +28,7 @@ public final class GoldFileUtils {
 
     private static final Logger LOG = Logger.getLogger(GoldFileUtils.class.getSimpleName());
 
-    private static final boolean SKIP_GOLD_FILE_UPDATE = System.getProperty("skipGoldFileUpdate") != null;
+    private static final boolean OVERWRITE_PERF_GOLD_FILES = System.getProperty("overwritePerfGoldFiles") != null;
 
     public void assertTextDiff(UnitTestCase test, String resultsBaseFilename, String testResults) throws Exception {
         TextDiffUtils diff = new TextDiffUtils(test, resultsBaseFilename);
@@ -58,14 +58,12 @@ public final class GoldFileUtils {
         } catch (Throwable t) {
             exceptionFound = t;
             message = "Gold file differences found";
-            if (!SKIP_GOLD_FILE_UPDATE) {
-                message += String.format(", review updated gold file before committing: %s", url);
-            }
+            message += String.format(", review updated gold file before committing: %s", url);
             message += "\nDifferences:\n" + t.getMessage();
         }
 
         if (exceptionFound != null) {
-            if (exceptionFound instanceof FileNotFoundException || !SKIP_GOLD_FILE_UPDATE) {
+            if (exceptionFound instanceof FileNotFoundException) {
                 LOG.info("writing gold file: " + url);
                 diff.writeGoldFile(testResults);
             }
@@ -75,10 +73,13 @@ public final class GoldFileUtils {
                                 .storeDetailsInGoldFile()));
             }
 
-            // add info about creating/updating log file in the message
+            // add info about creating/updating log file in the assertion message
             Error error = new AssertionFailedError(message);
             error.setStackTrace(exceptionFound.getStackTrace());
             throw error;
+        } else if (OVERWRITE_PERF_GOLD_FILES) {
+            LOG.info("overwriting gold file: " + url);
+            diff.writeGoldFile(testResults);
         }
     }
 }

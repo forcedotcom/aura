@@ -57,7 +57,7 @@ public final class CPUProfilerAnalyzer {
 
     @SuppressWarnings("unchecked")
     public JSONObject analyze() throws JSONException {
-        // from: http://src.chromium.org/viewvc/blink/trunk/Source/devtools/protocol.json
+        // format from: http://src.chromium.org/viewvc/blink/trunk/Source/devtools/protocol.json:
         // {
         // "id": "CPUProfileNode",
         // "type": "object",
@@ -103,7 +103,7 @@ public final class CPUProfilerAnalyzer {
             throw new RuntimeException("miss match: " + numSamples + " != " + totalHitCount);
         }
 
-        // find islands of usage (streches of non-(idle) samples)
+        // find islands of usage: streches of non-(idle) samples
         int numIslands = 0;
         boolean inIsland = false;
         for (Number id : (List<Number>) profile.get("samples")) {
@@ -120,7 +120,7 @@ public final class CPUProfilerAnalyzer {
 
         // total # calls
         // TODO: average call depth in non-idle/...
-        // total # calls in biggest mountain
+        // total # calls in biggest island
 
         // return relevant metrics:
         JSONObject metrics = new JSONObject();
@@ -184,10 +184,7 @@ public final class CPUProfilerAnalyzer {
         info.totalTimeMicros += totalHitCount * samplingIntervalMicros;
 
         // populate idToNode
-        if (idToNode.put((Number) node.get("id"), node) != null) {
-            // TODO: remove check
-            throw new RuntimeException("duplicated node id");
-        }
+        idToNode.put((Number) node.get("id"), node);
 
         depth--;
         return totalHitCount;

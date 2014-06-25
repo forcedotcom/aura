@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extensible="true" extends="ui:abstractDataGrid" support="PROTO">
+<aura:component extensible="true" extends="ui:abstractDataGrid" support="PROTO" description="Represents a table containing dynamic rows of data with inline edit support">
 	<aura:attribute name="priv_rows" type="List" description="Rows constructed manually to wrap items."/>
 
 	<aura:handler name="init" value="{!this}" action="{!c.init}"/>

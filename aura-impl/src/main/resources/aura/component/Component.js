@@ -1004,7 +1004,9 @@ Component.prototype.isDirty = function(expression){
 };
 
 /**
- * Returns true if the component has not been destroyed.
+ * Check if the component has been destroyed.
+ * 
+ * @returns {Boolean} true if component has not been destroyed, false otherwise.
  * @public
  */
 Component.prototype.isValid=function(expression){
@@ -1014,7 +1016,7 @@ Component.prototype.isValid=function(expression){
         return (wrapper && wrapper.isValid && wrapper.isValid()) || false;
     }
     
-    return !this._scheduledForAsyncDestruction && this.priv;
+    return !this._scheduledForAsyncDestruction && !!this.priv;
 };
 
 /**

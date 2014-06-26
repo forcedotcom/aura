@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component description="Used Internally for ui:tabset component">
+<aura:component description="A list wrapper for tabs in a ui:tabset component">
     <aura:attribute name="tabs" type="List" description="List of tab configurations." />
     <aura:attribute name="class" type="String" description="CSS class" />
     

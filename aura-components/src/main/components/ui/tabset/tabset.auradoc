@@ -64,7 +64,7 @@ var e = tabset.get("e.getActiveTab");
   &lt;ui:tab title="Tab 2">
   tab 2 content
  &lt;/ui:tab>
-&lt;/aura:renderIf>
+&lt;/aura:if>
 &lt;/ui:tabset>
         </pre>
         

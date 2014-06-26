@@ -18,7 +18,84 @@
 
 <aura:documentation>
     <aura:description>
-        <code>ui:​tabset</code>​ displays the content of the active tab. By default, the tabs are displayed horizontally inline with content shown below it.
+        <p><code>ui:​tabset</code>​ displays the content of an active tab. By default, the tabs are displayed horizontally inline with content shown below it. 
+        The first tab is activated by default, but you can change the default tab by setting <code>&lt;ui:tab title="Tab 3" active="{!true}" ></code> on the target tab.
+        This is a basic setup of a <code>ui:tabset</code> component.
+        <pre>
+&lt;ui:tabset class="tabset">
+    &lt;ui:tab title="Tab 1">
+        &lt;p>Tab 1&lt;/p>
+            Tab 1 Content
+    &lt;/ui:tab>
+    &lt;ui:tab title="Tab 2" >
+         &lt;p>Tab 2&lt;/p>
+             Tab 2 Content
+         &lt;/ui:tab>
+    &lt;ui:tab title="Tab 3" active="{!true}" >
+        &lt;p>Tab 3&lt;/p>
+              Tab 3 Content
+    &lt;/ui:tab>
+    &lt;ui:tab title="Tab 4" >
+        &lt;p>Tab 4&lt;/p>
+               Tab 4 Content
+    &lt;/ui:tab>
+&lt;/ui:tabset>        
+        </pre>
+        </p>
+        <p>To retrieve an active tab, use <code>event.getParam("tab")</code>. To update a tab's parameters, retrieve the tabset and fire the <code>getActiveTab</code> event.
+        See the <code>ui:tabsetEvent</code> component reference for a list of parameters.
+        <pre>
+var tabset = cmp.find("myTabset");
+var e = tabset.get("e.getActiveTab");
+//Set tab parameters using e.setParams() and fire the event       
+        </pre>
+        </p>
+         <h4>Rendering a Tab Selectively</h4>
+         <p>To determine if a tab and its content should be rendered, use <code>aura:if</code> to wrap the tab. This example doesn't render the second tab 
+         since <code>v.active</code> returns false. </p>
+        <pre>
+&lt;aura:attribute name="active" type="Boolean" default="false"/>
+ 
+&lt;ui:tabset class="tabset">
+  &lt;ui:tab title="Tab 1" >
+  tab 1 content
+  &lt;/ui:tab>
+&lt;aura:if isTrue="{!v.active}">
+  &lt;ui:tab title="Tab 2">
+  tab 2 content
+ &lt;/ui:tab>
+&lt;/aura:renderIf>
+&lt;/ui:tabset>
+        </pre>
+        
+        <h4>Adding Tabs and Content Dynamically</h4>
+        <p>A tab's content can be created dynamically using the <code>onActivated</code> attribute on <code>ui:tab</code>.
+        <pre>
+var tab = evt.getParam("tab");
+$A.componentService.newComponentAsync(this, function(newCmp){
+    tab.set("v.body", [newCmp]);
+ }, {"componentDef": "markup://aura:text", 
+     "attributes":{"values": {"value":"New tab content"}}});        
+        </pre>
+        </p>
+        <p>To add a tab dynamically, set the tab's parameters and fire the <code>addTab</code> event. The new tab will be added after the last tab. To change its position,
+        set <code>index: 0</code> in <code>e.setParams()</code>, which adds a tab at the head of the tabset in this case.
+        <pre>
+var e = cmp.find("myTabSet").get("e.addTab");
+e.setParams({tab: {
+                    "title": title,
+                    "name": name,
+                    "body": [{
+                               "componentDef": { descriptor:"markup://aura:text" },
+                                 "attributes": {
+                                     "values": { "value": content }
+                                 }
+                              }]
+                    }, index: 0
+             });
+e.fire();
+        </pre>
+        </p>
     </aura:description>
     <aura:example name="tabset" ref="uiExamples:tabsetExample" label="Using ui:tabset">
         <p>This example shows different ways to implement a tabset.</p>

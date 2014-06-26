@@ -461,8 +461,6 @@
             </activation>
             <properties>
                 <platform.chromedriver>linux${sun.arch.data.model}</platform.chromedriver>
-                <chromedriver.url>http://chromedriver.googlecode.com/files/{artifactId}_{classifier}_{version}.zip</chromedriver.url>
-                <chromedriver.version>26.0.1383.0</chromedriver.version>
             </properties>
         </profile>
         <profile>
@@ -473,8 +471,7 @@
                </property>
             </activation>
             <properties>
-                <chromedriver.url>http://chromedriver.storage.googleapis.com/{version}/{artifactId}_{classifier}.zip</chromedriver.url>
-                <chromedriver.version>2.9</chromedriver.version>
+                <platform.chromedriver>linux${sun.arch.data.model}</platform.chromedriver>
             </properties>
         </profile>
         <profile>
@@ -485,8 +482,6 @@
                 </os>
             </activation>
             <properties>
-                <chromedriver.url>http://chromedriver.storage.googleapis.com/{version}/{artifactId}_{classifier}.zip</chromedriver.url>
-                <chromedriver.version>2.9</chromedriver.version>
                 <platform.chromedriver>mac32</platform.chromedriver>
             </properties>
         </profile>

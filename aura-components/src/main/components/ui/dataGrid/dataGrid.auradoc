@@ -18,7 +18,7 @@
 <aura:documentation>
 	<aura:description>
 		<p>
-			A <code>ui:dataGrid</code> component represents rows of data with support for actionable buttons, inline edits, sortable columns, and pagination. You can also insert new rows or remove existing ones.
+			A <code>ui:dataGrid</code> component represents rows of data with support for actionable buttons, sortable columns, and pagination. You can also insert new rows or remove existing ones.
 		</p>
 		<p>
 		This is an example setup of a <code>ui:dataGrid</code> component.

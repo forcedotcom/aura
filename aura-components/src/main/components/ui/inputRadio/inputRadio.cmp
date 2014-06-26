@@ -25,5 +25,6 @@
     	   type="radio"
     	   value="{!v.text}"
     	   checked="{!v.value}"
-    	   disabled="{!v.disabled}"/>
+    	   disabled="{!v.disabled}"
+    	   aria-describedby="{!v.ariaDescribedby}"/>
 </aura:component>

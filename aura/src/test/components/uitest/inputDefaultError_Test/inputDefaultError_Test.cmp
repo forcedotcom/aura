@@ -12,12 +12,109 @@
     distributed under the License is distributed on an "AS IS" BASIS,
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
     See the License for the specific language governing permissions and
-    limitations under the License.
-
+    limitations under the License.   
 -->
 <aura:component>
-    <aura:attribute name="val" type="Decimal" default="20"/>
-    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
-    <ui:label for="randNumInput" label="Random Number"/>
-    <ui:inputNumber class="formInput" aura:id="randNumInput" value="{!v.val}" placeholder="at least 6 chars"/>
+    <aura:attribute name="caseToRender" type="String" default="default" />
+    
+    
+    <!--
+       Test that will verify that the the inputDefault error shows up when there is an error, and doesn't when there isn't an error  
+    -->
+    <aura:if isTrue="{!v.caseToRender == 'default' || v.caseToRender == 'all'}">
+	    <ui:label label="testing inputNumber, inputCurrency, inputPercent"/>
+	    <ui:label for="defaultValid" label="testingInvalidInput"/>
+	    <ui:inputNumber class="formInput" aura:id="defaultValid" value="20" placeholder="at least 6 chars"/>
+	    <br/>
+	    <ui:label for="defaultInvalid" label="testingInvalidInput"/>
+	    <ui:inputNumber class="formInput" aura:id="defaultInvalid" value="100000" placeholder="at least 6 chars"/>
+    	<br/>
+    </aura:if>
+    
+     <!-- 
+          Test verifying that the inputDefault component can be used by itself
+      -->
+    <aura:if isTrue="{!v.caseToRender == 'customUsage' || v.caseToRender == 'all'}">
+	    <ui:label for="customUsageInvalid" label="testingInvalidInput"/>
+	    <ui:inputNumber class="formInput" aura:id="customUsageInvalid" value="100000" placeholder="at least 6 chars">
+	      <aura:set attribute="errorComponent">
+	      	 <ui:inputDefaultError/>
+	      </aura:set>
+	    </ui:inputNumber>   
+    	<br/>
+    </aura:if>
+    
+    <!--
+         Individual test per input component. If a component extends another component and doesn't overwrite the html, I thought of that as one text
+         These tests are just to make sure that the ul shows up for all of these components
+    
+    -->
+    <aura:if isTrue="{!v.caseToRender == 'select' || v.caseToRender == 'all'}">
+	    <ui:label for="selectInvalid" label="testingInvalidInput"/>
+        <ui:inputSelect aura:id="selectInvalid">
+	    	<ui:inputSelectOption text="hello1b" label="hello1b"/>
+	    	<ui:inputSelectOption text="hello2b" label="hello2b"/>
+	    	<ui:inputSelectOption text="hello3b" label="hello3b"/>
+	    	<ui:inputSelectOption text="hello4b" label="hello4b"/>
+	    </ui:inputSelect>
+	    <br />
+     </aura:if>
+    
+    <aura:if isTrue="{!v.caseToRender == 'search' || v.caseToRender == 'all'}">
+       <ui:label for="searchInvalid" label="testingInvalidInput"/>
+       <ui:inputSearch aura:id="searchInvalid"/>
+     	<br/>
+    </aura:if>
+    
+     <aura:if isTrue="{!v.caseToRender == 'textArea' || v.caseToRender == 'all'}">
+       <ui:label label="Test for inputRichText"/>
+        <ui:label for="textAreaInvalid" label="testingInvalidInput"/>
+        <ui:inputTextArea aura:id="textAreaInvalid"/>
+     	<br/>
+    </aura:if>
+    
+     <aura:if isTrue="{!v.caseToRender == 'date' || v.caseToRender == 'all'}">
+        <ui:label for="dateInvalid" label="testingInvalidInput"/>
+        <ui:inputDate aura:id="dateInvalid"/>
+     	<br/>
+    </aura:if>
+    
+       <aura:if isTrue="{!v.caseToRender == 'dateTime' || v.caseToRender == 'all'}">
+        <ui:label for="dateTimeInvalid" label="testingInvalidInput"/>
+        <ui:inputDateTime aura:id="dateTimeInvalid"/>
+     	<br/>
+    </aura:if>
+    
+    <aura:if isTrue="{!v.caseToRender == 'radio' || v.caseToRender == 'all'}">
+        <ui:label for="radioInvalid" label="testingInvalidInput"/>
+        <ui:inputRadio aura:id="radioInvalid"/>
+     	<br/>
+    </aura:if>
+    
+    <aura:if isTrue="{!v.caseToRender == 'range' || v.caseToRender == 'all'}">
+        <ui:label for="rangeInvalid" label="testingInvalidInput"/>
+        <ui:inputRange aura:id="rangeInvalid"/>
+     	<br/>
+    </aura:if>
+    
+     <aura:if isTrue="{!v.caseToRender == 'autoCompleteTextArea' || v.caseToRender == 'all'}">
+        <ui:label for="autoCompleteTextAreaInvalid" label="testingInvalidInput"/>
+        <ui:inputTextAreaForAutoComplete aura:id="autoCompleteTextAreaInvalid"/>
+     	<br/>
+    </aura:if>
+    
+     <aura:if isTrue="{!v.caseToRender == 'autoCompleteText' || v.caseToRender == 'all'}">
+        <ui:label for="autoCompleteTextInvalid" label="testingInvalidInput"/>
+        <ui:inputTextForAutoComplete aura:id="autoCompleteTextInvalid"/>
+     	<br/>
+    </aura:if>
+    
+    
+     <aura:if isTrue="{!v.caseToRender == 'text' || v.caseToRender == 'all'}">
+ 	   <ui:label label="Test for inputEmail, inputPhone, inputSecret, inputTime InputURL"/>
+       <ui:label for="textInvalid" label="testingInvalidInput"/>
+       <ui:inputText aura:id="textInvalid"/>
+       <br/>
+     </aura:if>
+    <ui:button label="validate" press="{!c.validateInput}" aura:id="validate"/>
 </aura:component>

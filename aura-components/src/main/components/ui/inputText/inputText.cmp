@@ -33,7 +33,8 @@
 			  required="{!v.required}"
 			  disabled="{!v.disabled}"
 			  maxlength="{!v.maxlength}"
-			  size="{!v.size}"/>
+			  size="{!v.size}"
+			  aria-describedby="{!v.ariaDescribedby}"/>
        <aura:set attribute="else">
            {!v.body}
        </aura:set>

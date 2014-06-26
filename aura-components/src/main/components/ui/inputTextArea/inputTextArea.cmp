@@ -31,7 +31,8 @@
             rows="{!v.rows}"
             disabled="{!v.disabled}"
             readonly="{!v.readonly}"
-            placeholder="{!v.placeholder}"/>
+            placeholder="{!v.placeholder}"
+            aria-describedby="{!v.ariaDescribedby}"/>
         <aura:set attribute="else">
             {!v.body}
         </aura:set>

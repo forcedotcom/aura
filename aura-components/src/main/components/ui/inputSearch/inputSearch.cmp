@@ -34,7 +34,8 @@
               disabled="{!v.disabled}" 
               maxlength="{!v.maxlength}" 
               size="{!v.size}"
-              oninput="{!c.input}"/>
+              oninput="{!c.input}"
+              aria-describedby="{!v.ariaDescribedby}"/>
        <aura:if isTrue="{!v.showClear}">
            <ui:button aura:id="clearSearchTermButton"
                       class="{!v.value ? 'clear' : 'hide clear'}"                      

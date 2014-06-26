@@ -44,11 +44,6 @@
     </properties>
     <repositories>
         <repository>
-            <id>args4j</id>
-            <name>Args4J public repository</name>
-            <url>http://repo.jfrog.org/artifactory/libs-releases/</url>
-        </repository>
-        <repository>
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
@@ -311,7 +306,7 @@
             <dependency>
                 <groupId>args4j</groupId>
                 <artifactId>args4j</artifactId>
-                <version>2.0.17</version>
+                <version>2.0.28</version>
             </dependency>
             <dependency>
                 <groupId>org.easymock</groupId>

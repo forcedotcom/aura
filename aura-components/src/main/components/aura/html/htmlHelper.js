@@ -77,7 +77,13 @@
         "track" : true,
         "wbr" : true
     },
-    
+
+    // string constants used to save fast click event and handler
+    NAMES: {
+        "event": "fastClickEvent",
+        "handler": "fastClickHandler"
+    },
+
     GESTURE: function (){
         var g;
         if (this.cachedGestures) {
@@ -113,13 +119,30 @@
         return this.SPECIAL_CASINGS()[attribute.toLowerCase()] !== undefined ? this.SPECIAL_CASINGS()[attribute.toLowerCase()] : attribute.toLowerCase();
     },
 
+    /**
+     * Sets up fast click handling
+     *
+     * @param element element to enable fast click checking on
+     * @param handler handler for fast click event listener
+     */
     createFastClickHandler : function(element, handler) {
+        // remove existing fast click event handler if component is rerendered
+        if($A.util.isFunction(element[this.NAMES.handler])) {
+            $A.util.removeOn(element, element[this.NAMES.event], element[this.NAMES.handler]);
+        }
+
         var FastClick = this.initFastClick();
         if (this.supportsTouchEvents()) {
+            // typically mobile and touch screens
             new FastClick(element, handler);
         } else {
-            $A.util.on(element, "click", handler);
+            // mouse click
+            element[this.NAMES.event] = "click";
+            $A.util.on(element, element[this.NAMES.event], handler);
         }
+
+        // save current handler on element so that it can be referenced and removed later
+        element[this.NAMES.handler] = handler;
     },
 
     supportsTouchEvents : function () {
@@ -128,10 +151,20 @@
 
     initFastClick : function() {
         var gesture = this.GESTURE(),
+            fastClickEvent = this.NAMES.event,
             FastClick;
 
         if (!this.FastClick) {
+            /**
+             * FastClick constructor
+             *
+             * @constructor
+             * @param element element to enable fast click checking on
+             * @param handler handler for fast click event listener
+             **/
             FastClick = function(element, handler) {
+                // save fast click event type in order to remove listener
+                element[fastClickEvent] = gesture.start;
                 this.element = element;
                 this.handler = handler;
                 element.addEventListener(gesture.start, this, false);

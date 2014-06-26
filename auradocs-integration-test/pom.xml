@@ -85,10 +85,15 @@
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-webapp</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.uiautomation</groupId>
+            <artifactId>ios-client</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
     <properties>
         <chromedriver.url>http://chromedriver.storage.googleapis.com/{version}/{artifactId}_{classifier}.zip</chromedriver.url>
-        <chromedriver.version>2.8</chromedriver.version>
+        <chromedriver.version>2.9</chromedriver.version>
         <jetty.spawn>true</jetty.spawn>
         <jetty.resources>${basedir}/src/test/resources/htdocs</jetty.resources>
         <aura.build.id />
@@ -455,16 +460,21 @@
                 </os>
             </activation>
             <properties>
+                <platform.chromedriver>linux${sun.arch.data.model}</platform.chromedriver>
                 <chromedriver.url>http://chromedriver.googlecode.com/files/{artifactId}_{classifier}_{version}.zip</chromedriver.url>
                 <chromedriver.version>26.0.1383.0</chromedriver.version>
-                <platform.chromedriver>linux${sun.arch.data.model}</platform.chromedriver>
             </properties>
         </profile>
         <profile>
             <id>ubuntu12</id>
+            <activation>
+               <property>
+                 <name>env.UBUNTU12</name>
+               </property>
+            </activation>
             <properties>
                 <chromedriver.url>http://chromedriver.storage.googleapis.com/{version}/{artifactId}_{classifier}.zip</chromedriver.url>
-                <chromedriver.version>2.8</chromedriver.version>
+                <chromedriver.version>2.9</chromedriver.version>
             </properties>
         </profile>
         <profile>
@@ -476,7 +486,7 @@
             </activation>
             <properties>
                 <chromedriver.url>http://chromedriver.storage.googleapis.com/{version}/{artifactId}_{classifier}.zip</chromedriver.url>
-                <chromedriver.version>2.8</chromedriver.version>
+                <chromedriver.version>2.9</chromedriver.version>
                 <platform.chromedriver>mac32</platform.chromedriver>
             </properties>
         </profile>
@@ -488,6 +498,7 @@
                 </os>
             </activation>
             <properties>
+                <xdisplay.skip>true</xdisplay.skip>
                 <platform.chromedriver>win32</platform.chromedriver>
                 <webdriver.chrome.driver>${basedir}/target/bin/chromedriver.exe</webdriver.chrome.driver>
             </properties>

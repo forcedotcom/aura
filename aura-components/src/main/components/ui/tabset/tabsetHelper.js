@@ -306,7 +306,7 @@
         }
         for(var i=0;i<body.length;i++) {
             var c = body[i];
-            if (c.isInstanceOf("aura:iteration")) {
+            if (c.isInstanceOf("aura:iteration") || c.isInstanceOf("aura:if")) {
                 ret = ret.concat(this.getTabComponents(c.get('v.realBody')));
             } else {
                 var inst = this._getTabComponent(c, type);

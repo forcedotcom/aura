@@ -179,12 +179,17 @@ public class TabsetUITest extends WebDriverTestCase {
     /********************************************************************************************************************/
     
     /**
-     * test that will verify that the arrows keys work. This is not something that will be run on mobile devices
+     * Test that will verify that the arrows keys work. This is not something that will be run on mobile devices
+     * 
+     * IE7/8 don't handle arrows well. Disabling tests until bug is fixed: W-2295362
+     * 
+     * 
+     * 
      * @throws MalformedURLException
      * @throws URISyntaxException
      */
     
-    @ExcludeBrowsers({BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPHONE, BrowserType.IPAD,})
+    @ExcludeBrowsers({BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPHONE, BrowserType.IPAD, BrowserType.IE8, BrowserType.IE7})
     public void testLeftRightUpDownArrows () throws MalformedURLException, URISyntaxException{
         open(createURL("basic", "false"));
         

@@ -56,8 +56,7 @@
 					function (newComp) {
         				this.verifyDefaultValuesOfBasicDataType(newComp);
         				this.verifyDefaultValuesOfObjectDataType(newComp);
-        				// W-1324216
-        				// this.verifyDefaultValuesOfListDataType(newComp);
+        				this.verifyDefaultValuesOfListDataType(newComp);
         				this.verifyChangingAttributeValues(newComp);
                         this.verifyDefaultValuesOfMapDataType(newComp);
 					},

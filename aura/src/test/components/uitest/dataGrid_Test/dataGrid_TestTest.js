@@ -1,5 +1,5 @@
 ({
-    testNoDataPresent : {
+    _testNoDataPresent : {
         attributes : {"pageSize" : 0},
         test : function(cmp){
             var pager = cmp.find("pagerNextPrev");
@@ -38,7 +38,7 @@
         }
     },
     
-    testWithLargeData : {
+    _testWithLargeData : {
         attributes : {"pageSize" : 3000, "currentPage" : 5},
         test : function(cmp){
             var pager = cmp.find("pagerNextPrev");

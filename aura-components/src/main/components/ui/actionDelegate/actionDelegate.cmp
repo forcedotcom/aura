@@ -1,3 +1,4 @@
+
 <!--
 
     Copyright (C) 2013 salesforce.com, inc.
@@ -15,6 +16,6 @@
     limitations under the License.
 
 -->
-<aura:component>
+<aura:component description="Fires and handles the onaction event for the ui:dataGrid component.">
 	<aura:registerEvent name="onaction" type="ui:actionEvent"/>
 </aura:component>

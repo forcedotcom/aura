@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:action">
+<aura:component extends="ui:action" description="A checkbox used in ui:dataGrid that enables row-level click events to bubble up to the grid.">
 	<ui:inputCheckbox aura:id="cb" value="{!v.value}" click="{!c.handleClick}"/>
 	<aura:handler name="change" value="{!v.value}" action="{!c.handleValueChange}"/>
 </aura:component>

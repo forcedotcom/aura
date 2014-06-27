@@ -18,9 +18,24 @@
 <aura:documentation>
 	<aura:description>
 		 <p>
-	        <code>ui:infiniteList</code> provides a paging interface to navigate lists. You can retrieve and display more data as necessary using events such as <code>refresh</code>, <code>showMore</code>, and <code>triggerDataProvider</code>.
+	        <code>ui:infiniteList</code> provides a paging interface to navigate lists. This is a basic setup of a <code>ui:infiniteList</code> component.
+	        <pre>
+&lt;ui:infinitelist aura:id="listData" itemVar="item">
+    &lt;aura:set attribute="dataProvider">
+      &lt;auradocs:demoDataProvider />
+    &lt;/aura:set>
+    &lt;aura:set attribute="footer">
+     &lt;ui:button label="Show More" press="{!c.show}"/>
+    &lt;/aura:set>
+    &lt;aura:set attribute="itemTemplate">
+      &lt;auradocs:demoListTemplate label="{!item.label}" />
+    &lt;/aura:set>
+  &lt;/ui:infinitelist>	
+	        </pre>
+	        
 	    </p>
 	    <p>
+	        To retrieve and display more data as necessary, using event such as <code>refresh</code>, <code>showMore</code>, and <code>triggerDataProvider</code>.
 	    	The <code>refresh</code> event handles a list data refresh and fires the <code>triggerDataProvider</code> event.
 	    </p>
 	    <pre>

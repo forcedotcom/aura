@@ -15,10 +15,10 @@
     limitations under the License.
 
 -->
-<aura:component extensible="true" support="PROTO" abstract="true">
-	<aura:attribute name="name" type="String"/>
-	<aura:attribute name="label" type="String"/>
-	<aura:attribute name="index" type="Integer"/>
+<aura:component extensible="true" support="PROTO" abstract="true" description="An abstract component that provides bubbling of events.">
+	<aura:attribute name="name" type="String" description="The name for the action-name data attribute value specified on the DOM element."/>
+	<aura:attribute name="label" type="String" description="The text label for the component."/>
+	<aura:attribute name="index" type="Integer" description="The index for the item-index data attribute value specified on the DOM element."/>
 	<aura:attribute name="value" type="Object" description="Use this to bind some value to the action. Must be serializable {String, Number, Boolean}."/>
 
     <aura:handler name="change" value="{!v.value}" action="{!c.handleValueChange}"/>

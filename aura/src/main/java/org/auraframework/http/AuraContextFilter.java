@@ -173,15 +173,6 @@ public class AuraContextFilter implements Filter {
             if (lastMod != null && !lastMod.isEmpty()) {
                 context.setLastMod(lastMod);
             }
-
-            // TODO: remove preloads
-            @SuppressWarnings("unchecked")
-            List<Object> preloads = (List<Object>) configMap.get("preloads");
-            if (preloads != null) {
-                for (Object preload : preloads) {
-                    context.addPreload((String) preload);
-                }
-            }
             getLoaded(context, configMap.get("loaded"));
             @SuppressWarnings("unchecked")
             List<Object> dns = (List<Object>) configMap.get("dn");

@@ -152,7 +152,6 @@ public interface AuraContext {
      * Set the current component, so that the components controller can access
      * it.
      *
-     * TODO: what is this for.
      * TODO: this is not handled as a stack, so it is almost certainly broken.
      *
      * @param nextComponent The component to set.
@@ -237,13 +236,6 @@ public interface AuraContext {
      * Get the context 'number'.
      */
     String getNum();
-
-    /**
-     * Namespaces whose defs should be, or have been preloaded on the client.
-     *
-     * @param preload
-     */
-    void addPreload(String preload);
 
     /**
      * get the current set of preloads.

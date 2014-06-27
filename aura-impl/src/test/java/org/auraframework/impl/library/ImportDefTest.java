@@ -22,6 +22,7 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ImportDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.test.annotation.UnAdaptableTest;
 
 import com.google.common.collect.Lists;
 
@@ -35,6 +36,7 @@ public class ImportDefTest extends AuraImplTestCase {
      * Tests to ensure that the imported librarys are properly compiled with the component.
      * @throws Exception
      */
+    @UnAdaptableTest("library-bug-fix")
     public void testImport() throws Exception {
         ComponentDef cmpDef = Aura.getDefinitionService().getDefinition("test:test_Import", ComponentDef.class);
         assertNotNull(cmpDef);

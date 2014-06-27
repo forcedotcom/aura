@@ -219,6 +219,7 @@ public class AuraContextFilter implements Filter {
                     testName = test.get(request);
                 } 
                 if (testName != null) {
+                	System.out.println("AuracontextFilter.startContext, call getTestContext with testName:"+testName);
                 	TestContext testContext = testContextAdapter.getTestContext(testName);
                     if (testContext != null) {
                         MasterDefRegistry registry = context.getDefRegistry();
@@ -229,6 +230,7 @@ public class AuraContextFilter implements Filter {
                                 if (doReset && def instanceof Resettable) {
                                     ((Resettable) def).reset();
                                 }
+                                System.out.println("AuracontextFilter.startContext,add localDef from testContext to MDR");
                                 registry.addLocalDef(def);
                             }
                         }

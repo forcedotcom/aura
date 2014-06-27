@@ -228,6 +228,7 @@ public class ComponentJSTestSuiteTest extends TestSuite {
 
         @Override
         public String getQualifiedName() {
+        	System.out.println("ComponentJSTestSuiteTest$ComponentTestCase.getQualifiedName");
         	String btype = getBrowserTypeString();
             return caseDef.getDescriptor().getQualifiedName()+btype;
         }

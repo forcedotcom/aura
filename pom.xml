@@ -44,30 +44,19 @@
     </properties>
     <repositories>
         <repository>
-            <id>args4j</id>
-            <name>Args4J public repository</name>
-            <url>http://repo.jfrog.org/artifactory/libs-releases/</url>
-        </repository>
-        <repository>
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
-            <id>maven.auraframework.org-releases</id>
+            <id>maven.auraframework.org</id>
             <url>http://maven.auraframework.org/libs-release</url>
         </repository>
         <repository>
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
-            <id>repo.auraframework.org-releases</id>
+            <id>repo.auraframework.org</id>
             <url>http://repo.auraframework.org/libs-release</url>
         </repository>
-        <repository>
-            <snapshots />
-            <id>repo.auraframework.org-chromedriver</id>
-            <url>http://repo.auraframework.org/chromedriver</url>
-        </repository>
-        
     </repositories>
     <pluginRepositories>
         <pluginRepository>
@@ -311,7 +300,7 @@
             <dependency>
                 <groupId>args4j</groupId>
                 <artifactId>args4j</artifactId>
-                <version>2.0.17</version>
+                <version>2.0.28</version>
             </dependency>
             <dependency>
                 <groupId>org.easymock</groupId>

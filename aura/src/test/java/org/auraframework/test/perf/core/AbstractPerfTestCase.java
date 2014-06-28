@@ -15,21 +15,30 @@
  */
 package org.auraframework.test.perf.core;
 
-import java.net.URLEncoder;
-import java.util.logging.Logger;
-
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import org.auraframework.Aura;
+import org.auraframework.def.AttributeDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.WebDriverTestCase;
 import org.auraframework.test.WebDriverTestCase.TargetBrowsers;
 import org.auraframework.test.WebDriverUtil.BrowserType;
+import org.auraframework.test.perf.PerfMockAttributeValueProvider;
+import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.json.Json;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
+
+import java.io.Serializable;
+import java.net.URLEncoder;
+import java.util.Map;
+import java.util.logging.Logger;
 
 @TargetBrowsers({ BrowserType.GOOGLECHROME })
 public abstract class AbstractPerfTestCase extends WebDriverTestCase {
@@ -81,11 +90,18 @@ public abstract class AbstractPerfTestCase extends WebDriverTestCase {
     }
 
     protected final void runWithPerfApp(DefDescriptor<ComponentDef> descriptor) throws Exception {
-        String relativeUrl = "/perfTest/perf.app?";
         currentAuraMode = isPerfRunForAuraStats ? Mode.STATS : Mode.PROD;
+        setupContext(currentAuraMode, AuraContext.Format.JSON, descriptor);
+
+        String relativeUrl = "/perfTest/perf.app?";
+        Map<String, Object> attributeValues = getComponentAttributeValues(descriptor);
+        Map<String, Serializable> hash = ImmutableMap.of("componentDef", descriptor.getQualifiedName(), "attributes", ImmutableMap.of("values", attributeValues));
+
+
         relativeUrl += "aura.mode=" + currentAuraMode;
-        relativeUrl += "#" + URLEncoder.encode("{\"componentDef\":\"" + descriptor + "\"}", "UTF-8");
+        relativeUrl += "#" + URLEncoder.encode(Json.serialize(hash), "UTF-8");
         String url = getAbsoluteURI(relativeUrl).toString();
+
         logger.info("testRun: " + url);
 
         openTotallyRaw(url);
@@ -125,6 +141,25 @@ public abstract class AbstractPerfTestCase extends WebDriverTestCase {
                 fail("Error loading " + descriptor.getDescriptorName() + ": " + text);
             }
         }
+    }
+
+    protected PerfMockAttributeValueProvider getMockAttributeValueProvider() {
+        return PerfMockAttributeValueProvider.DEFAULT_INSTANCE;
+    }
+
+    private Map<String, Object> getComponentAttributeValues(DefDescriptor<ComponentDef> componentDefDefDescriptor)
+            throws QuickFixException {
+        Map<String, Object> params = Maps.newHashMap();
+        Map<DefDescriptor<AttributeDef>, AttributeDef> attrs = componentDefDefDescriptor.getDef().getAttributeDefs();
+
+        for (Map.Entry<DefDescriptor<AttributeDef>, AttributeDef> attr : attrs.entrySet()) {
+            Object attributeValue = getMockAttributeValueProvider().getAttributeValue(componentDefDefDescriptor, attr.getValue());
+            if(attributeValue != null) {
+                params.put(attr.getKey().getName(), attributeValue);
+            }
+        }
+
+        return params;
     }
 
     protected static final DefDescriptor<ComponentDef> getDefDescriptor(String qualifiedName) {

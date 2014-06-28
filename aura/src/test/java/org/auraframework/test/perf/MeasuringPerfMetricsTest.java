@@ -19,6 +19,7 @@ import org.auraframework.test.SauceUtil;
 import org.auraframework.test.perf.core.AbstractPerfTestCase;
 import org.auraframework.test.perf.metrics.PerfMetrics;
 import org.auraframework.test.perf.metrics.PerfMetricsComparator;
+import org.auraframework.util.AuraTextUtil;
 import org.openqa.selenium.By;
 
 /**
@@ -76,7 +77,8 @@ public final class MeasuringPerfMetricsTest extends AbstractPerfTestCase {
         assertMetrics(expected, actual);
 
         // verify the component was loaded
-        assertEquals("button loaded", LABEL_MOCK, currentDriver.findElement(By.cssSelector(".uiButton")).getText());
+        assertEquals("button loaded", LABEL_MOCK,
+                AuraTextUtil.urldecode(currentDriver.findElement(By.cssSelector(".uiButton")).getText()));
 
         // TODO: check network metrics
         // MedianPerfMetric networkMetric = (MedianPerfMetric) median.getMetric("Network.encodedDataLength");
@@ -97,7 +99,7 @@ public final class MeasuringPerfMetricsTest extends AbstractPerfTestCase {
 
         // verify the component was loaded
         assertEquals("label loaded", LABEL_MOCK,
-                currentDriver.findElement(By.cssSelector(".uiLabel")).getText());
+                AuraTextUtil.urldecode(currentDriver.findElement(By.cssSelector(".uiLabel")).getText()));
     }
 
     // perf:dummyPerf

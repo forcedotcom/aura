@@ -95,15 +95,13 @@
                 <artifactId>build-helper-maven-plugin</artifactId>
                 <executions>
                     <execution>
-                        <phase>compile</phase>
+                        <phase>generate-sources</phase>
                         <goals>
                             <goal>add-source</goal>
                         </goals>
                         <configuration>
                             <sources>
-                                <source>src/main/java</source>
-                                <source>src/test/java</source>
-                                <source>target/src-gen/main/java</source>
+                                <source>target/generated-sources/enum/java</source>
                             </sources>
                         </configuration>
                     </execution>
@@ -146,7 +144,7 @@
                             </scanDirectoryList>
                             <outputPackageName>org.auraframework.id</outputPackageName>
                             <outputClassName>AuraId</outputClassName>
-                            <outputFile>./target/src-gen/main/java/org/auraframework/id/AuraId.java</outputFile>
+                            <outputFile>./target/generated-sources/enum/java/org/auraframework/id/AuraId.java</outputFile>
                         </configuration>
                     </execution>
                 </executions>
@@ -166,7 +164,8 @@
                                     </goals>
                                 </pluginExecutionFilter>
                                 <action>
-                                    <execute />
+                                    <!-- M2E should ignore the plugin -->
+                                    <ignore />
                                 </action>
                             </pluginExecution>
 

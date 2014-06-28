@@ -344,9 +344,9 @@
                 <version>2.0</version>
             </dependency>
             <dependency>
-<groupId>org.apache.maven</groupId>
-<artifactId>maven-plugin-api</artifactId>
-<version>2.0</version>
+                <groupId>org.apache.maven</groupId>
+                <artifactId>maven-plugin-api</artifactId>
+                <version>2.0</version>
             </dependency>
             <dependency>
                 <groupId>org.mozilla</groupId>
@@ -497,11 +497,6 @@
         <pluginManagement>
             <plugins>
                 <plugin>
-                    <groupId>org.auraframework</groupId>
-                    <artifactId>maven-clean-plugin</artifactId>
-                    <version>2.4.1</version>
-                </plugin>
-                <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-clean-plugin</artifactId>
                     <version>2.4.1</version>
@@ -634,7 +629,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-antrun-plugin</artifactId>
-                    <version>1.7</version>
+                    <version>1.6</version>
                     <executions>
                         <execution>
                             <id>index-test-components</id>
@@ -678,7 +673,7 @@
                                             <include name="**/*.css" />
                                             <include name="**/*.theme" />
                                             <include name="**/*Test.js" />
-											<include name="**/*.auradoc" />
+                                            <include name="**/*.auradoc" />
                                         </fileset>
                                     </path>
                                     <pathconvert property="definitionList" refid="definitions" pathsep=",">
@@ -764,7 +759,7 @@
                                         </goals>
                                     </pluginExecutionFilter>
                                     <action>
-                                        <execute />
+                                        <ignore />
                                     </action>
                                 </pluginExecution>
                                 <pluginExecution>
@@ -777,7 +772,7 @@
                                         </goals>
                                     </pluginExecutionFilter>
                                     <action>
-                                        <ignore />
+                                        <execute />
                                     </action>
                                 </pluginExecution>
                                 <pluginExecution>
@@ -791,19 +786,6 @@
                                     </pluginExecutionFilter>
                                     <action>
                                         <ignore />
-                                    </action>
-                                </pluginExecution>
-                                <pluginExecution>
-                                    <pluginExecutionFilter>
-                                        <groupId>org.auraframework</groupId>
-                                        <artifactId>maven-antrun-plugin</artifactId>
-                                        <versionRange>[1.6,)</versionRange>
-                                        <goals>
-                                            <goal>run</goal>
-                                        </goals>
-                                    </pluginExecutionFilter>
-                                    <action>
-                                        <execute />
                                     </action>
                                 </pluginExecution>
                             </pluginExecutions>

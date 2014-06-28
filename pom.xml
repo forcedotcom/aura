@@ -39,7 +39,6 @@
         <debug>true</debug>
         <skipUnitTests>false</skipUnitTests>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <createChecksum>true</createChecksum>
         <selenium.version>2.38.0</selenium.version>
     </properties>
     <repositories>
@@ -778,7 +777,7 @@
                 <plugin>
                     <groupId>com.savage7.maven.plugins</groupId>
                     <artifactId>maven-external-dependency-plugin</artifactId>
-                    <version>0.4</version>
+                    <version>0.5</version>
                 </plugin>
                 <plugin>
                     <groupId>nl.windgazer</groupId>

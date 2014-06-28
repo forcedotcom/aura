@@ -15,9 +15,8 @@
     limitations under the License.
 
 -->
-<aura:component extensible="true" extends="ui:abstractDataGrid" support="PROTO" description="Represents a table containing dynamic rows of data with inline edit support">
-	<aura:attribute name="initialRenderCount" type="Integer" default="200"/>
-	<aura:attribute name="batchRenderCount" type="Integer" default="100"/>
+<aura:component extensible="true" extends="ui:abstractDataGrid" support="PROTO">
+	<aura:attribute name="priv_rows" type="List" description="Rows constructed manually to wrap items."/>
 
 	<aura:handler name="init" value="{!this}" action="{!c.init}"/>
 	<aura:handler name="change" value="{!v.items}" action="{!c.handleItemsChange}" description="This lives here due to a bug in value objects."/>

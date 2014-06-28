@@ -1,0 +1,21 @@
+<aura:component>
+<aura:attribute name="total" type="Integer" default="3000"/>
+    <table>
+        <thead >
+            <tr>
+                <th>
+                    <input type="checkbox"/>
+                </th>
+                <th>
+                    <a class="toggle">Id</a>
+                </th>
+                <th>Subject</th>
+                <th>Name</th>
+                <th>Related To</th>
+                <th>Due Date</th>
+            </tr>
+        </thead>
+        <tfoot aura:id="tfoot"></tfoot>
+        <tbody aura:id="tbody"></tbody>
+    </table>    
+</aura:component>

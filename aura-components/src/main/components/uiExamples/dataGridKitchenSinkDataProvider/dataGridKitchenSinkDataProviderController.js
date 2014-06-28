@@ -15,26 +15,30 @@
  */
 ({
     init: function (cmp) {
-        cmp.set('v.totalItems', 100);
+        cmp.set('v.totalItems', 1000);
     },
 
     handleProvide: function (cmp, evt, hlp) {
         var currentPage = cmp.get('v.currentPage'),
             pageSize = cmp.get('v.pageSize'),
             sortBy = cmp.get('v.sortBy'),
-            tasks = hlp.createTasks(cmp, currentPage, pageSize),
+            tasks = cmp._tasks || hlp.createTasks(cmp),
             column = sortBy, 
-            ascending = true;
-
+            descending = false,
+        	requestedTasks;
+        
         if (column && column.indexOf('-') === 0) {
             column = sortBy.slice(1);
-            ascending = false;
+            descending = true;
         }
 
         if (column) {
-            hlp.sort(tasks, column, ascending);
+            hlp.sort(tasks, column, descending);
         }
+        
+        // Paginate
+        requestedTasks = hlp.applyPagination(tasks, currentPage, pageSize);
 
-        hlp.fireDataChangeEvent(cmp, tasks);
+        hlp.fireDataChangeEvent(cmp, requestedTasks);
     }
 })

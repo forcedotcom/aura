@@ -18,7 +18,7 @@
      * Only sorts by numeric columns like 'id'.
      * ascending - b is greater than a.
      */
-    sort: function (items, column, descending) {
+    sort: function (items, column, ascending) {
         items.sort(function (a, b) {
             var aGtb = parseInt(a[column]) > parseInt(b[column]),
                 ret;
@@ -33,40 +33,30 @@
                 ret = -1;
             }
 
-            if (descending) {
+            if (!ascending) {
                 ret = -ret;
             }
 
             return ret;
         });
     },
-    
-    applyPagination: function(tasks, currentPage, pageSize) {
-    	var index = (currentPage - 1) * pageSize;
-    	return tasks.slice(index, currentPage * pageSize);
-    },
 
-    createTasks: function (cmp) {
-        var items = [],
-        	maxItems = cmp.get('v.totalItems');
+    createTasks: function (cmp, currentPage, pageSize) {
+        var items = [];
 
-        for (var i = 1; i <= maxItems; i++) {
+        // Hack to make 'zero based'. 
+        --currentPage;
+
+        for (var i = 1; i <= pageSize; i++) {
             items.push({
-                id           : i,
-                subject      : 'Foo ' + i, 
-                activityDate : '2014-01-01',
-                who          : {
-                    name : 'John Doe With A Fairly Long Name ' + i,
-                    id   : '00' + i
-                },
-                what: {
-                    name : 'Acme' + i,
-                    id   : '00' + i
-                }
+                id           : ((currentPage * pageSize) + i),
+                subject      : 'Foo ' + ((currentPage * pageSize) + i), 
+                date : '2014-01-01',
+                name : 'John Doe',
+                relatedTo : 'Acme'
             });
         }
-        
-        cmp._tasks = items;
+
         return items;
     }
 })

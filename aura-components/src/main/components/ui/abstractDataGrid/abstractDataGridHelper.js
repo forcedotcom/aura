@@ -39,14 +39,16 @@
 	
 	initializeDataProviders: function(cmp) {
         var concrete = cmp.getConcreteComponent(),
-        	dataProviders = cmp.getValue("v.dataProvider");
+        	dataProviders = cmp.get("v.dataProvider");
 
         concrete._dataProviders = [];        
 
-        dataProviders.each(function (dp) {
+        $A.util.forEach(dataProviders, function (dp) {
     		dp.addHandler("onchange", cmp, "c.handleDataChange");
     		concrete._dataProviders.push(dp);
         });
+        
+        cmp.set("v.dataProvider", dataProviders);
 
         if (concrete._dataProviders.length > 0) {
         	this.fireProvide(concrete);
@@ -115,15 +117,5 @@
 	 */
 	handleAddRemove: function (cmp, params) {
 		$A.error('Unimplemented function in abstractDataGridHelper');
-	},
-
-	/** 
-	 * Implement logic in concrete.
-	 *
-	 * @param {Component} AbstractDataGrid component
-	 * @param {Object} params from ui:dataGridInsert
-	 */
-	handleAddRemove: function (cmp, params) {
-		return;
-	}	
+	}
 });

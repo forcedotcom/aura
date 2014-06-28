@@ -33,12 +33,32 @@
 
     handleInsert: function (cmp, evt, hlp) {
         var index = cmp.get('v.index'),
-            count = cmp.get('v.count') || 1;
+            count = cmp.get('v.count') || 1,
+            items = [],
+            seed = 0;
+        
+        for (var i = 0; i < count; i++) {
+        	seed = Math.floor(Math.random()*(10000-5020+1)+5020);
+        	items.push({
+                id           : seed,
+                subject      : 'Foo ' + seed, 
+                activityDate : '2014-01-01',
+                who          : {
+                    name : 'John New With A Fairly Long New Name ' + seed,
+                    id   : '00' + seed
+                },
+                what: {
+                    name : 'Acme' + seed,
+                    id   : '00' + seed
+                }
+            });
+        }
 
         if (!$A.util.isUndefinedOrNull(index)) {
             hlp.fireAddRemove(cmp, {
                 index : index,
-                count : count
+                count : count,
+                items : items
             }); 
         }
     },
@@ -63,5 +83,19 @@
             case 'delete': 
                 alert('delete '  + evt.getParam('index'));
         }
-    }
+    },
+    
+    spit : function(cmp, evt, hlp) {
+    	var list = cmp.find("grid").get("v.items");
+		cmp.set("v.gridItems", list);
+	},
+	
+	getSelected : function(cmp, evt, hlp) {
+    	var list = cmp.find("grid").get("v.selectedItems");
+		cmp.set("v.gridSelectedItems", list);
+	},
+	
+	replaceData : function(cmp, evt, hlp) {
+		cmp.find("data").getEvent("provide").fire();
+	}
 })

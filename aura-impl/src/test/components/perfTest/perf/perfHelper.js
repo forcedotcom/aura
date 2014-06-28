@@ -1,217 +1,6 @@
 ({
     /* 
     * =====================================
-    * MOCKS 
-    * =====================================
-    */
-    attributeMockValueProvider: {
-        'Aura.Component': function(attrDef) {
-            var cmp,
-                componentDef = "perfTest:registeredComponentsDataProvider";
-            // TODO: This returns a mock data provider component,
-            // It covers most of list component such ui:list, ui:autocompleteList, ui:infiniteList, ui:autocomplete
-            // We may need to provide different mock Component as we expand our test.
-
-            var payload = {
-                componentDef : componentDef,
-                attributes   : {
-                    values : this.getComponentMockValues(componentDef)
-                }
-            };
-
-            $A.newCmpAsync(this, function(newCmp) {
-                // relies on the fact, this component is created synchronously.
-                cmp = newCmp;
-            }, payload, null, false, true, false);
-
-            return cmp;
-        },
-        'Aura.ComponentDefRef': function(attrDef) {
-            // This mock ComponentDefRef is geared toward for list/autocomplete mock components.
-            // see comment in Aura.Component mock provider above
-            return {
-                componentDef: "ui:menuItem",
-                attributes: {
-                    values: {
-                        label: this.attributeMockValueProvider.String(attrDef)
-                    }
-                }
-            };
-        },
-        Boolean: function(attrDef) {
-            return "true";
-        },
-        Date: function(attrDef) {
-            return "2014-04-01";
-        },
-        DateTime: function(attrDef) {
-            return "2014-04-01 12:00:00";
-        },
-        Decimal: function(attrDef) {
-            return "3.14";
-        },
-        Double: function(attrDef) {
-            return "3.14";
-        },
-        Integer: function(attrDef) {
-            return "100";
-        },
-        Long: function(attrDef) {
-            return "1000";
-        },
-        Object: function(attrDef) {
-            return {
-                name: attrDef.getDescriptor().getName()
-            };
-        },
-        String: function(attrDef) {
-            return "Mock value for '" + attrDef.getDescriptor().getName() + "' attribute";
-        }
-    },
-    predefinedAttributeMocks: {
-        blacklist: {
-            'ui:carousel': ['priv_snap'],
-            'ui:carouselDeprecated': ['priv_snap'],
-            'ui:scroller': ['snap', 'plugins'],
-            'ui:scrollerDeprecated': ['snap']
-        },
-
-        whitelist: {
-            // We wouldn't need this output* whitelist attribute if
-            // Components that inherit from ui:output abstract cmp should have overridden
-            // value attribute to the right concrete type.
-            // Eg. ui:outputLabel, value attr type should be a String instead of Object.
-            'ui:outputEmail': {
-                value: "outputEmail@mock.value"
-            },
-            'ui:outputLabel': {
-                value: "Mock value for 'outputLabel.value' attribute"
-            },
-            'ui:outputTextArea': {
-                value: "Mock value for 'outputTextArea.value' attribute"
-            },
-            'ui:outputRichText': {
-                value: "Mock value for 'outputRichText.value' attribute"
-            },
-            'ui:outputSelect': {
-                value: "Mock value for 'outputSelect.value' attribute"
-            },
-            'ui:dataGridSummaryCell': {
-                type: "MAX"
-            }
-        }
-    },
-    fetchServerSideDependencies: function (cmp, rawCmp, callback) {
-        var cmpDef = rawCmp.def,
-            resolvedDef, action;
-
-        resolvedDef = $A.componentService.getDef(cmpDef, true);
-        if (resolvedDef) {
-            return callback(resolvedDef);
-        } else {
-            action = $A.get("c.aura://ComponentController.getComponentDef");
-            action.setParams({
-                name: cmpDef
-            });
-
-            action.setCallback(this, function (a) {
-                 callback(a);
-            });
-
-            $A.enqueueAction(action);
-        }
-    },
-    getAttributeMockValue: function(componentDef, attributeDef) {
-        var cmpName          = this.getComponentDescriptorFullName(componentDef),
-            attrName         = attributeDef.getDescriptor().getName(),
-            whitelistedAttrs = this.predefinedAttributeMocks.whitelist[cmpName],
-            retValue;
-
-        if (whitelistedAttrs && (retValue = whitelistedAttrs[attrName]) != undefined) {
-            return retValue;
-        }
-
-        // If attribute value is not predefined in whitelisted components list
-        // use the attribute descriptor type to generate a random value.
-        var type = attributeDef.getTypeDefDescriptor().substring(7); //trim prefix 'aura://'
-            isArrayType = this.isArrayType(type);
-
-        if(isArrayType) { // Eg. String[]
-            type = type.substring(0, type.length - 2);
-        }
-        var valueProvider = this.attributeMockValueProvider[type];
-
-        if(!valueProvider) {
-            return $A.error("[perf.app:perfHelper.js]: Value provider for type:'" + type + "' is not defined");
-        }
-
-        retValue = valueProvider.call(this, attributeDef);
-        return isArrayType ? [retValue] : retValue;
-    },
-    getComponentDescriptorFullName: function(componentDef) {
-        var qualifiedName = componentDef.getDescriptor().getQualifiedName();
-        return qualifiedName.substring(9);//trim prefix 'markup://'
-    },
-    getComponentMockValues: function(cmpName) {
-        var componentDef = $A.componentService.getDef(cmpName);
-
-        if(!componentDef) {
-            return $A.error("Unknown component descriptor name: " + cmpName);
-        }
-
-        var attrValues = {};
-        componentDef.getAttributeDefs().each(function(attrDef) {
-            if(this.needsAttrMocking(componentDef, attrDef)) {
-                attrValues[attrDef.getDescriptor().getName()] = this.getAttributeMockValue(componentDef, attrDef);
-            }
-        }.bind(this));
-
-        return attrValues;
-    },
-
-    parseObjectFromUrl: function () {
-        var hash = window.location.hash;
-
-        if (hash.length) {
-            return JSON.parse(decodeURIComponent(hash.substring(1)));
-        }
-        return {};
-    },
-
-    isArrayType: function(type) {
-        if(type && type.indexOf('[]') === type.length - 2) {
-            return true;
-        }
-        return false;
-    },
-
-    isStatsMode: function() {
-        return $A.getContext().getMode() == 'STATS';
-    },
-
-    isAttributeBlacklisted: function(componentDef, attrDef) {
-        var cmpName = this.getComponentDescriptorFullName(componentDef);
-        var attrName = attrDef.getDescriptor().getName();
-        var blacklistedAttrs = this.predefinedAttributeMocks.blacklist[cmpName];
-
-        return blacklistedAttrs && blacklistedAttrs.indexOf(attrName) != -1;
-    },
-
-    needsAttrMocking: function(componentDef, attrDef) {
-        if(this.isAttributeBlacklisted(componentDef, attrDef)) {
-            return false;
-        }
-        if(attrDef.getTypeDefDescriptor() == "aura://String"
-            && !attrDef.getDefault()) {
-                return true;
-        }
-        if(attrDef.isRequired()) {
-            return true;
-        }
-        return false;
-    },
-    /* 
-    * =====================================
     * PERF CORE
     * =====================================
     */
@@ -377,6 +166,40 @@
     * PERF HELPERS
     * =====================================
     */
+    fetchServerSideDependencies: function (cmp, rawCmp, callback) {
+        var cmpDef = rawCmp.def,
+            resolvedDef, action;
+
+        resolvedDef = $A.componentService.getDef(cmpDef, true);
+        if (resolvedDef) {
+            return callback(resolvedDef);
+        } else {
+            action = $A.get("c.aura://ComponentController.getComponentDef");
+            action.setParams({
+                name: cmpDef
+            });
+
+            action.setCallback(this, function (a) {
+                callback(a);
+            });
+
+            $A.enqueueAction(action);
+        }
+    },
+
+    parseObjectFromUrl: function () {
+        var hash = window.location.hash;
+
+        if (hash.length) {
+            return JSON.parse(decodeURIComponent(hash.substring(1)));
+        }
+        return {};
+    },
+
+    isStatsMode: function() {
+        return $A.getContext().getMode() == 'STATS';
+    },
+
     perfCreateComponent: function (appCmp, cmp, callback) {
         var self = this;
         // Hook for executing perf stuff before
@@ -405,9 +228,8 @@
         }
 
         if (!attributeValues) {
-            //TODO: need a better way to inject more sensible attribute values not just required attributes.
-            attributeValues = this.getComponentMockValues(componentDef);
-            $A.log("No values provided for '" + componentDef + "', using mock values for required attributes");
+            attributeValues = {};
+            $A.log("No attribute values provided for '" + componentDef + "'");
         }
         payload = {
             componentDef : componentDef,
@@ -426,7 +248,7 @@
                     // Finish up
                     $A.PERFCORE.mark('END:cmpCreate');
                     callback.apply(this, arguments);
-                }, payload);        
+                }, payload);
             });
         });
     },

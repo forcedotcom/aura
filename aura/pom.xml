@@ -131,6 +131,7 @@
             <plugin>
                 <groupId>org.auraframework</groupId>
                 <artifactId>aura-util</artifactId>
+                <version>${project.version}</version>
                 <executions>
                     <execution>
                         <goals><goal>enum</goal></goals>

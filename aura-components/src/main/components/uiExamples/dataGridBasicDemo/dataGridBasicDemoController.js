@@ -16,5 +16,7 @@
 ({
 	init: function (cmp, evt, hlp) {
 		cmp.set("v.items", [{id: 1, name: "name1"}, {id: 2, name: "name1"}, {id: 3, name: "name1"}, {id: 4, name: "name1"}]);
+		cmp.set("v.data", [{id: 1, name: "name1"}, {id: 2, name: "name1"}, {id: 3, name: "name1"}, {id: 4, name: "name1"}]);
+		
 	}
 })

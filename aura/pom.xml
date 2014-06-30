@@ -91,6 +91,23 @@
         </resources>
         <plugins>
             <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>target/generated-sources/enum/java</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
                 <executions>
                     <execution>
@@ -111,7 +128,52 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.auraframework</groupId>
+                <artifactId>aura-util</artifactId>
+                <executions>
+                    <execution>
+                        <goals><goal>enum</goal></goals>
+                        <id>generate-enums</id>
+                        <phase>generate-sources</phase>
+                        <configuration>
+                            <baseScanDirectory>.</baseScanDirectory>
+                            <scanDirectoryList>
+                                <param>../aura/src/main</param>
+                                <param>../aura-components/src/main</param>
+                            </scanDirectoryList>
+                            <outputPackageName>org.auraframework.id</outputPackageName>
+                            <outputClassName>AuraId</outputClassName>
+                            <outputFile>./target/generated-sources/enum/java/org/auraframework/id/AuraId.java</outputFile>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.eclipse.m2e</groupId>
+                <artifactId>lifecycle-mapping</artifactId>
+                <configuration>
+                    <lifecycleMappingMetadata>
+                        <pluginExecutions>
+                            <pluginExecution>
+                                <pluginExecutionFilter>
+                                    <groupId>org.auraframework</groupId>
+                                    <artifactId>aura-util</artifactId>
+                                    <goals>
+                                        <goal>enum</goal>
+                                    </goals>
+                                </pluginExecutionFilter>
+                                <action>
+                                    <!-- M2E should ignore the plugin -->
+                                    <ignore />
+                                </action>
+                            </pluginExecution>
 
-        </plugins>
+                        </pluginExecutions>
+                    </lifecycleMappingMetadata>
+                </configuration>
+                </plugin>
+            </plugins>
+
     </build>
 </project>

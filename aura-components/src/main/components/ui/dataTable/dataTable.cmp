@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extensible="true" support="PROTO" description="A table that displays an item of data per row, which is defined by iterating over the set of data. &lt;ui:dataTable&gt; can be used inside a &lt;aura:forEach&gt; tag that specifies the collection of data to be iterated over. The body of &lt;ui:dataTable&gt; contains one or more &lt;ui:dataTableRow&gt; components.">
+<aura:component extensible="true" support="PROTO" description="A table that displays an item of data per row, which is defined by iterating over the set of data. The body of &lt;ui:dataTable&gt; contains one or more &lt;ui:dataTableRow&gt; components.">
     <aura:attribute name="class" type="String" default="" description="The CSS style used to display the table."/>
     <aura:attribute name="items" type="Object[]" description="The items to be iterated over and processed."/>
     <aura:attribute name="noDataText" type="String" default="No data found." description="The text to display when no data is found. Default value is &#8220;No data found.&#8221;"/>

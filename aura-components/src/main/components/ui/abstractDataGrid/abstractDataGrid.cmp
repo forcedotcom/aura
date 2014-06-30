@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component abstract="true" extensible="true" implements="ui:visible" support="PROTO">
+<aura:component abstract="true" extensible="true" implements="ui:visible" support="PROTO" description="An abstract component that provides a basic layout for the ui:dataGrid component.">
 	
 	<!-- Public attributes -->
 	<aura:attribute name="items" type="List" description="Arbitrary list of objects to iterate over. Object type to avoid expensive wrapping."/>
@@ -25,7 +25,7 @@
 	<aura:attribute name="sortable" type="Boolean" default="true" description="Toggle sorting by columns (via column header)."/>
 	<aura:attribute name="createable" type="Boolean" default="false" description="Describes whether the implementation should enable a creation pattern."/>
     <aura:attribute name="selectAll" type="Boolean" default="false" description="All selected."/>
-	<aura:attribute name="selectedItems" type="List"/>
+	<aura:attribute name="selectedItems" type="List" description="A list of selected items."/>
 	<aura:attribute name="sortBy" type="String" description="Comma-separated list of columns predicated by a '-' for descending."/>
 
 

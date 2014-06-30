@@ -19,7 +19,7 @@
 				abstract="true" 
 				implements="ui:visible, ui:pagingInterface"  
 				support="GA" 
-				description="An abstract component which provides a basic layout for the ui:list component.">
+				description="An abstract component that provides a basic layout for the ui:list component.">
 				
     <aura:attribute name="itemTemplate" type="Aura.ComponentDefRef[]" required="true" description="A ComponentDefRef to use as the template for each generated row in the list."/>
     <aura:attribute name="items" type="Object[]" description="An array of arbitrary map objects representing the rows of data in the list."/>

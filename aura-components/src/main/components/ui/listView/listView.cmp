@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component implements="ui:elementInterface" extensible="true" support="GA"            description="A column based listview with comprehensive event support.">
+<aura:component implements="ui:elementInterface" extensible="true" support="GA"            description="Deprecated. A column based listview with comprehensive event support.">
     <aura:dependency resource="ui:listView*" />
     <aura:attribute name="id" type="String" default="default"                              description="The unique id of the listview instance."/>
 

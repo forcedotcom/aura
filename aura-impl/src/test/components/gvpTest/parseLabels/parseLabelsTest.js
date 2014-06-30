@@ -92,11 +92,10 @@
 		}
 	},
 	/**
-	 * BUG:W-2217132
 	 * Verify that labels are parsed from Javascript provider and loaded in the client.
 	 * No additional server roundtrip should be required to fetch such labels.
 	 */
-	_testLabelsInProviderAreParsed:{
+	testLabelsInProviderAreParsed:{
 		test:function(cmp){
 			//Block server requests to make sure the labels were not fetched from the server by the test script.
 			$A.test.blockRequests();

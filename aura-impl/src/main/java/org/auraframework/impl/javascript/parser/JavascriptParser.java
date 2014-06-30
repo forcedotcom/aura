@@ -26,13 +26,11 @@ import org.auraframework.def.ResourceDef;
 import org.auraframework.def.TestSuiteDef;
 import org.auraframework.impl.clientlibrary.handler.ResourceDefHandler;
 import org.auraframework.impl.javascript.parser.handler.JavascriptControllerDefHandler;
-import org.auraframework.impl.javascript.parser.handler.JavascriptHandler;
 import org.auraframework.impl.javascript.parser.handler.JavascriptHelperDefHandler;
 import org.auraframework.impl.javascript.parser.handler.JavascriptModelDefHandler;
+import org.auraframework.impl.javascript.parser.handler.JavascriptProviderDefHandler;
 import org.auraframework.impl.javascript.parser.handler.JavascriptRendererDefHandler;
 import org.auraframework.impl.javascript.parser.handler.JavascriptTestSuiteDefHandler;
-import org.auraframework.impl.javascript.provider.JavascriptProviderDef;
-import org.auraframework.system.Location;
 import org.auraframework.system.Parser;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -61,20 +59,13 @@ public class JavascriptParser implements Parser {
             return (D) new JavascriptTestSuiteDefHandler((DefDescriptor<TestSuiteDef>) descriptor, source)
                     .getDefinition();
         case PROVIDER:
-            Location location = new Location(source.getSystemId(), source.getLastModified());
-            JavascriptProviderDef.Builder builder = new JavascriptProviderDef.Builder();
-            builder.setDescriptor((DefDescriptor<ProviderDef>) descriptor);
-            builder.setLocation(location);
-            builder.code = JavascriptHandler.getCompressedSource(source);
-            builder.setOwnHash(source.getHash());
-            return (D) builder.build();
-        case MODEL: {
+            return (D) new JavascriptProviderDefHandler((DefDescriptor<ProviderDef>) descriptor, source)
+                    .getDefinition();
+        case MODEL:
             return (D) new JavascriptModelDefHandler((DefDescriptor<ModelDef>) descriptor, source).getDefinition();
-        }
-        case RESOURCE: {
+        case RESOURCE:
             return (D) new ResourceDefHandler<ResourceDef>((DefDescriptor<ResourceDef>) descriptor,
                     (Source<ResourceDef>) source).createDefinition();
-        }
         default:
             return null;
         }

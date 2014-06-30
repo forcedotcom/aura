@@ -106,6 +106,20 @@
     	}
     },
     
+ 	/**
+ 	 * Firing the openDatePicker component event should open the date picker.
+ 	 */
+ 	testOpenDatePickerWithComponentEvent : {
+            test : function(cmp) {
+            		var dateTimePickerTest = cmp.find("dateTimePickerTest");
+            		var openDatePickerEvt = dateTimePickerTest.getEvent("openDatePicker");
+            		$A.test.assertNotUndefinedOrNull(openDatePickerEvt, "Didn't find an openDatePicker event");
+            		openDatePickerEvt.fire();
+            		var datePicker = dateTimePickerTest.find("datePicker").getElement();
+            		$A.test.addWaitFor(true, function(){return $A.util.hasClass(datePicker, "visible")});
+ 		}
+ 	},
+
     /**
      * Method allowing us to extract whether or not we are looking at a mobile device. Extracted from two functions because 
      * depending on which mode we are in (Desktop or other), we either have a header with the Month Year combo or an outputText 

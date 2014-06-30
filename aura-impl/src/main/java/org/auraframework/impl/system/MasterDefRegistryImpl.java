@@ -39,7 +39,6 @@ import org.auraframework.impl.root.DependencyDefImpl;
 import org.auraframework.service.CachingService;
 import org.auraframework.service.LoggingService;
 import org.auraframework.system.AuraContext;
-import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.DefRegistry;
 import org.auraframework.system.DependencyEntry;
 import org.auraframework.system.Location;
@@ -1463,7 +1462,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         GlobMatcher ns = filter.getNamespaceMatch();
         String namespace = ((ns.isConstant()) ? ns.toString() : null);
         
-        return (prefix != null || ns != null) && shouldCache(prefix, namespace);
+        return (prefix != null || namespace != null) && shouldCache(prefix, namespace);
     }
     
     /**

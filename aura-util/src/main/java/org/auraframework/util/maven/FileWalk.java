@@ -160,10 +160,10 @@ static final String classIntroString =
         "// DO NOT MODIFY THIS GENERATED CLASS \n\n" + 
         "public class %s {\n" + 
         "\n" + 
-        "       private static class IdImpl {\n" + 
-        "           public final String prefix;  \n" + 
-        "           public  final String namespace;\n" + 
-        "           public  final String name;\n" + 
+        "       private static class IdImpl {\n" +
+        "           public final String prefix;\n" +
+        "           public final String namespace;\n" +
+        "           public final String name;\n" +
         "           public final DefType defType;\n" +
         "           public final String ownerOrExtendsFrom;\n"+
         "\n" + 
@@ -178,7 +178,7 @@ static final String classIntroString =
         "               this.defType = defType;\n" + 
         "               this.ownerOrExtendsFrom = ownerOrExtendsFrom;\n" + 
         "           }\n" + 
-        "       \n" + 
+        "\n" +
         "           public DefType getDefType() { return defType; }\n" + 
         "\n" + 
         "           public boolean isEvent() { return defType == DefType.EVENT; }\n" + 
@@ -199,21 +199,26 @@ static final String classIntroString =
         "\n" + 
         "           public String getName() {\n" + 
         "               return name;\n" + 
-        "           }       \n" + 
+        "           }\n" +
         "\n" + 
-        "           public String getFQN() {\n" + 
-        "               return namespace + \":\" + name;\n" + 
-        "           }       \n" + 
+        "           public String getFQN() {\n" +
+        "               StringBuilder fqn = new StringBuilder();\n" +
+        "               fqn.append(namespace).append(\":\");\n" +
+        "               if (isAttribute()) {\n" +
+        "                   fqn.append(ownerOrExtendsFrom).append(\"/ATTRIBUTE$\").append(name);\n" +
+        "               } else {\n" +
+        "                   fqn.append(name);\n" +
+        "               }\n" +
+        "               return fqn.toString();\n" +
+        "           }\n" +
         "\n" + 
         "           public String getPrefixedFQN() {\n" + 
-        "               return prefix+\"://\" + namespace + \":\" + name;\n" + 
+        "               return prefix +\"://\" + getFQN();\n" +
         "           }\n" +
         "\n" + 
         "           public String getCssClassName() { \n" + 
         "               return namespace + name.substring(0, 1).toUpperCase() + name.substring(1);\n" + 
-        "           }"+
-        "           \n" + 
-        "           \n" + 
+        "           }\n"+
         "       }\n"
         ; 
 

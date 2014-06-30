@@ -16,13 +16,13 @@
 package org.auraframework.component.aura;
 
 import org.auraframework.Aura;
-import org.auraframework.id.AuraId;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.InterfaceDef;
+import org.auraframework.id.AuraId;
 import org.auraframework.test.AuraTestCase;
 
 public class AuraIdTest extends AuraTestCase {
@@ -30,10 +30,6 @@ public class AuraIdTest extends AuraTestCase {
     public AuraIdTest(String name) {
         super(name);
     }
-
-    // TODO(tbliss): Test cases I want but are difficult/impossible to write
-    // - Reference cmp/attributes that don't exist
-    // - Verify all namespace enums are generated
 
     public void testApplication() {
         DefDescriptor<ApplicationDef> dd = Aura.getDefinitionService().getDefDescriptor("aura:application",
@@ -48,7 +44,7 @@ public class AuraIdTest extends AuraTestCase {
         verifyAuraIdProperties(AuraId.aura.LABEL, false, true, false, false, false, dd, null, "label",
                 DefType.COMPONENT, "aura:label", "markup://aura:label");
 
-        // Test component in ui namespace that extends another
+        // Test component that extends another
         dd = Aura.getDefinitionService().getDefDescriptor("ui:inputText", ComponentDef.class);
         verifyAuraIdProperties(AuraId.ui.INPUT_TEXT, false, true, false, false, false, dd, "ui:input", "inputText",
                 DefType.COMPONENT, "ui:inputText", "markup://ui:inputText");
@@ -62,9 +58,9 @@ public class AuraIdTest extends AuraTestCase {
     }
 
     public void testAttribute() {
-        // TODO(tbliss): It doesn't seem like getting the DefDescriptor and FQN makes sense for attributes, or does it?
-        verifyAuraIdProperties(AuraId.aura.APPLICATION__BODY, false, false, false, false, true, "application",
-                "body", DefType.ATTRIBUTE);
+        verifyAuraIdProperties(AuraId.aura.APPLICATION__BODY, false, false, false, false, true, null, "application",
+                "body", DefType.ATTRIBUTE, "aura:application/ATTRIBUTE$body",
+                "markup://aura:application/ATTRIBUTE$body");
     }
 
     public void testInterface() {
@@ -74,28 +70,9 @@ public class AuraIdTest extends AuraTestCase {
                 DefType.INTERFACE, "aura:rootComponent", "markup://aura:rootComponent");
     }
 
-    // TODO(tbliss): consolidate these verify methods, or only test a single namespace
-    private void verifyAuraIdProperties(AuraId.aura cmp, boolean isEvent, boolean isComponent, boolean isApplication,
-            boolean isInterface, boolean isAttribute, DefDescriptor<?> dd, String ownerExtends, String name,
-            DefType defType, String fqn,
-            String prefixedFqn) {
-        assertEquals(isEvent, cmp.isEvent());
-        assertEquals(isComponent, cmp.isComponent());
-        assertEquals(isApplication, cmp.isApplication());
-        assertEquals(isInterface, cmp.isInterface());
-        assertEquals(isAttribute, cmp.isAttribute());
-        assertEquals(dd, cmp.getDescriptor());
-        assertEquals(ownerExtends, cmp.getOwnerOrExtendsFrom());
-        assertEquals(name, cmp.getName());
-        assertEquals(defType, cmp.getDefType());
-        assertEquals(fqn, cmp.getFQN());
-        assertEquals(prefixedFqn, cmp.getPrefixedFQN());
-    }
-
     private void verifyAuraIdProperties(AuraId.ui cmp, boolean isEvent, boolean isComponent, boolean isApplication,
             boolean isInterface, boolean isAttribute, DefDescriptor<?> dd, String ownerExtends, String name,
-            DefType defType, String fqn,
-            String prefixedFqn) {
+            DefType defType, String fqn, String prefixedFqn) {
         assertEquals(isEvent, cmp.isEvent());
         assertEquals(isComponent, cmp.isComponent());
         assertEquals(isApplication, cmp.isApplication());
@@ -109,16 +86,19 @@ public class AuraIdTest extends AuraTestCase {
         assertEquals(prefixedFqn, cmp.getPrefixedFQN());
     }
 
-    private void verifyAuraIdProperties(AuraId.aura attr, boolean isEvent, boolean isComponent,
-            boolean isApplication, boolean isInterface, boolean isAttribute, String ownerExtends, String name,
-            DefType defType) {
-        assertEquals(isEvent, attr.isEvent());
-        assertEquals(isComponent, attr.isComponent());
-        assertEquals(isApplication, attr.isApplication());
-        assertEquals(isInterface, attr.isInterface());
-        assertEquals(isAttribute, attr.isAttribute());
-        assertEquals(ownerExtends, attr.getOwnerOrExtendsFrom());
-        assertEquals(name, attr.getName());
-        assertEquals(defType, attr.getDefType());
+    private void verifyAuraIdProperties(AuraId.aura cmp, boolean isEvent, boolean isComponent, boolean isApplication,
+            boolean isInterface, boolean isAttribute, DefDescriptor<?> dd, String ownerExtends, String name,
+            DefType defType, String fqn, String prefixedFqn) {
+        assertEquals(isEvent, cmp.isEvent());
+        assertEquals(isComponent, cmp.isComponent());
+        assertEquals(isApplication, cmp.isApplication());
+        assertEquals(isInterface, cmp.isInterface());
+        assertEquals(isAttribute, cmp.isAttribute());
+        assertEquals(dd, cmp.getDescriptor());
+        assertEquals(ownerExtends, cmp.getOwnerOrExtendsFrom());
+        assertEquals(name, cmp.getName());
+        assertEquals(defType, cmp.getDefType());
+        assertEquals(fqn, cmp.getFQN());
+        assertEquals(prefixedFqn, cmp.getPrefixedFQN());
     }
 }

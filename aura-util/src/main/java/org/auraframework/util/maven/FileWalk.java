@@ -192,6 +192,9 @@ static final String classIntroString =
         "           public boolean isAttribute() { return defType == DefType.ATTRIBUTE; }\n" + 
         "\n" + 
         "           public DefDescriptor getDescriptor() {\n" + 
+        "               if (isAttribute()) {\n" +
+        "                   return null;\n" +
+        "               }\n" +
         "               return Aura.getDefinitionService().getDefDescriptor(getFQN(),defType.getPrimaryInterface());\n" + 
         "           }\n" + 
         "\n" + 

@@ -12,8 +12,7 @@
 		</ui:tabset>
 	</aura:if>
 	
-	
-	<aura:if isTrue="{!v.caseToRender == 10}">
+	<aura:if isTrue="{!v.caseToRender == '10'}">
 		<ui:tabset aura:id="tabset1" class="tabset1" lazyRenderTabs="{!v.lazyRenderTabs}">
 			<ui:tab title="tab0">tab 0 contents  </ui:tab>
 			<ui:tab title="tab1">tab 1 contents  </ui:tab>
@@ -27,7 +26,7 @@
 			<ui:tab title="tab9">tab 9 contents  </ui:tab>
 		</ui:tabset>
 	</aura:if>
-	<aura:if isTrue="{!v.caseToRender == 100}">
+	<aura:if isTrue="{!v.caseToRender == '100'}">
 		<ui:tabset aura:id="tabset2" class="tabset2" lazyRenderTabs="{!v.lazyRenderTabs}">
 			<ui:tab title="tab0">tab 0 contents  </ui:tab>
 			<ui:tab title="tab1">tab 1 contents  </ui:tab>
@@ -131,7 +130,7 @@
 			<ui:tab title="tab99">tab 99 contents  </ui:tab>
 		</ui:tabset>
 	</aura:if>
-	<aura:if isTrue="{!v.caseToRender == 1000}">
+	<aura:if isTrue="{!v.caseToRender == '1000'}">
 		<ui:tabset aura:id="tabset3" class="tabset3" lazyRenderTabs="{!true}">
 			<ui:tab title="tab0">tab 0 contents  </ui:tab>
 			<ui:tab title="tab1">tab 1 contents  </ui:tab>

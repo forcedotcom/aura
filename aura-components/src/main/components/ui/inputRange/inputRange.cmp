@@ -30,6 +30,7 @@
     	   max="{!v.max}"
     	   step="{!v.step}"
     	   value="{!v.value}" 
-    	   onchange="{!c.change}"/>
+    	   onchange="{!c.change}"
+    	   aria-describedby="{!v.ariaDescribedby}"/>
 
 </aura:component>

@@ -31,5 +31,6 @@
            aria-autocomplete="list"
            aria-expanded="false"
            aria-haspopup="true"
-           aria-activedescendant=""/>
+           aria-activedescendant=""
+           aria-describedby="{!v.ariaDescribedby}"/>
 </aura:component>

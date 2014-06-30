@@ -13,22 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- ({
-     
-     doInit : function (cmp, evt, helper){
-	 //Get actual value
-	 var num = ""+cmp.find("randNumInput").get("v.value");
-	 //Get SimpleValue object to modify
-	 var value = cmp.find("randNumInput").getValue("v.value");
-	 
-	 if (num.length < 5 || num.length>7) {
-	     value.setValid(false);
-	     value.addErrors({"message":"Number should have (5,7] digits"})
-	 }
-	 //Check integer starts with 1;
-	 if(num.charAt(0) != "1"){
-	     value.setValid(false);
-	     value.addErrors({"message":"The number given should start with a 1"});
-	 }
+ ({  
+	 //controller that grabs all the ids and puts invalidates all of them
+     validateInput : function(cmp, evt, helper){
+    	 var baseId = cmp.get("v.caseToRender");
+    	 var componentIdArray = [];
+    	 
+    	 if(baseId === 'all'){
+    		 componentIdArray = ["default", "customUsage", "select", "search", "textArea", "date", "dateTime", "radio", "range", "autoCompleteTextArea", "autoCompleteText", "text"];
+    	 }
+    	 else{
+    		 componentIdArray = [baseId];
+    	 }
+    	 
+    	 //Going through Array. This id array will be either of size 1 or 12. 
+    	 //It will get the component associated with each element then invalidate it 
+    	 for(var i = 0; i < componentIdArray.length; i++){
+    		 helper.addErrorsToCmp(cmp.find(componentIdArray[i] +"Invalid"));
+    	 }
+    	 
      }
  })

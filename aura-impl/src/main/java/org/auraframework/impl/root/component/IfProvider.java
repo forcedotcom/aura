@@ -15,13 +15,18 @@
  */
 package org.auraframework.impl.root.component;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import org.auraframework.Aura;
 import org.auraframework.def.ComponentConfigProvider;
-import org.auraframework.instance.*;
+import org.auraframework.instance.AttributeSet;
+import org.auraframework.instance.BaseComponent;
+import org.auraframework.instance.Component;
+import org.auraframework.instance.ComponentConfig;
+import org.auraframework.instance.InstanceStack;
 import org.auraframework.system.Annotations.Provider;
-
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
@@ -51,10 +56,8 @@ public class IfProvider implements ComponentConfigProvider {
         // get body facet if true, else facet if false
         if (isTrue != null && isTrue.booleanValue()) {
             facet = (ComponentDefRefArray) atts.getValue("body");
-            // System.err.println("truth " + component.getGlobalId());
         } else {
             facet = (ComponentDefRefArray) atts.getValue("else");
-            // System.err.println("fiction " + component.getGlobalId());
         }
         if (facet != null) {
             iStack.setAttributeName("realbody");

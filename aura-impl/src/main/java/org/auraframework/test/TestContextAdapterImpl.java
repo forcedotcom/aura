@@ -17,9 +17,6 @@ package org.auraframework.test;
 
 import java.util.concurrent.TimeUnit;
 
-import org.auraframework.test.TestContext;
-import org.auraframework.test.TestContextAdapter;
-
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 
@@ -27,47 +24,42 @@ import com.google.common.cache.CacheBuilder;
  * Keep track of the current test.
  */
 public class TestContextAdapterImpl implements TestContextAdapter {
-	
-	Cache<String, TestContext> allContexts = 
-			CacheBuilder.newBuilder().concurrencyLevel(8).expireAfterAccess(30, TimeUnit.MINUTES).maximumSize(100).build();
-			
-	private final ThreadLocal<TestContext> testContext = new ThreadLocal<TestContext>();
+
+    Cache<String, TestContext> allContexts =
+            CacheBuilder.newBuilder().concurrencyLevel(8).expireAfterAccess(30, TimeUnit.MINUTES).maximumSize(100)
+                    .build();
+
+    private final ThreadLocal<TestContext> testContext = new ThreadLocal<>();
 
     @Override
     public TestContext getTestContext() {
         return testContext.get();
     }
-    
-    
+
     @Override
-	public TestContext getTestContext(String name) {
-    	System.out.println("getTestContext(testname:"+name+")");
-		TestContext context = allContexts.getIfPresent(name);
-        if (context == null){
-        	System.out.println("create a new one with name:"+name);
+    public TestContext getTestContext(String name) {
+        TestContext context = allContexts.getIfPresent(name);
+        if (context == null) {
             context = new TestContextImpl(name);
             allContexts.put(name, context);
-        } 
+        }
         testContext.set(context);
         return context;
-	}
+    }
 
     @Override
     public void clear() {
         testContext.set(null);
     }
-    
+
     @Override
     public void release() {
-    	TestContext context = testContext.get();
+        TestContext context = testContext.get();
         if (context != null) {
-        	System.out.println("invalidate from allContexts:"+context.getName());
             allContexts.invalidate(context.getName());
             context.getLocalDefs().clear();
         }
-    	clear();
+        clear();
     }
 
-	
-    
 }

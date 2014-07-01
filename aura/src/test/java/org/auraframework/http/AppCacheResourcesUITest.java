@@ -61,6 +61,7 @@ import com.google.common.collect.Lists;
 @FreshBrowserInstance
 @ThreadHostileTest("TestLoggingAdapter not thread-safe")
 public class AppCacheResourcesUITest extends WebDriverTestCase {
+    private final boolean debug = false;
 
     private final static String COOKIE_NAME = "%s_%s_%s_lm";
     private final static String TOKEN = "@@@TOKEN@@@";
@@ -377,15 +378,17 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
 
         failed = unexpectedRequests.size() > 0 || missingRequests.size() > 0;
 
-        System.out.println(">>> assertRequests: ");
-        System.out.println("EXPECTED:");
-        for (Request r : expected) {
-            System.out.println("E: " + r + ",fudge:" + r.fudge);
-        }
-        System.out.println("ACTUAL:");
-        for (Request r : actual) {
-            r.setShowExtras(failed);
-            System.out.println("A: " + r);
+        if (debug) {
+            System.out.println(">>> assertRequests: ");
+            System.out.println("EXPECTED:");
+            for (Request r : expected) {
+                System.out.println("E: " + r + ",fudge:" + r.fudge);
+            }
+            System.out.println("ACTUAL:");
+            for (Request r : actual) {
+                r.setShowExtras(failed);
+                System.out.println("A: " + r);
+            }
         }
         if (failed) {
             StringBuffer sb = new StringBuffer();
@@ -472,12 +475,13 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
 
     private List<Request> endMonitoring() {
         List<Request> logs = Lists.newLinkedList();
-        for (Map<String, Object> log : TestLoggingAdapterController
-                .endCapture()) {
+        for (Map<String, Object> log : TestLoggingAdapterController.endCapture()) {
             if (!"GET".equals(log.get("requestMethod"))) {
-                // Log ignored lines so that we can monitor what happens. The line above had nulls as requestMethod, so
-                // this catches randomness.
-                System.out.println("IGNORED: " + log);
+                if (debug) {
+                    // Log ignored lines so that we can monitor what happens. The line above had nulls as requestMethod,
+                    // so this catches randomness.
+                    System.out.println("IGNORED: " + log);
+                }
                 continue;
             }
             int status = -1;

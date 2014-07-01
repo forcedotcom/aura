@@ -228,13 +228,12 @@ public class ComponentJSTestSuiteTest extends TestSuite {
 
         @Override
         public String getQualifiedName() {
-        	System.out.println("ComponentJSTestSuiteTest$ComponentTestCase.getQualifiedName");
-        	String btype = getBrowserTypeString();
-            return caseDef.getDescriptor().getQualifiedName()+btype;
+            String btype = getBrowserTypeString();
+            return caseDef.getDescriptor().getQualifiedName() + btype;
         }
 
         public void testRun() throws Throwable {
-        	addMocksToTestContextLocalDef(caseDef.getLocalDefs());
+            addMocksToTestContextLocalDef(caseDef.getLocalDefs());
 
             open(getUrl(), Mode.AUTOJSTEST);
 
@@ -242,7 +241,7 @@ public class ComponentJSTestSuiteTest extends TestSuite {
                     "return window.aura.test.run('%s', '%s', 30)",
                     AuraTextUtil.escapeForJavascriptString(caseDef.getName()),
                     AuraTextUtil.escapeForJavascriptString(suite.getCode())));
-           
+
             if (ret != null && !"null".equals(ret)) {
                 @SuppressWarnings("unchecked")
                 Map<String, Object> e = (Map<String, Object>) new JsonReader()

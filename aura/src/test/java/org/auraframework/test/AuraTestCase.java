@@ -54,7 +54,6 @@ public abstract class AuraTestCase extends UnitTestCase {
         super.setUp();
         TestContextAdapter testContextAdapter = Aura.get(TestContextAdapter.class);
         if (testContextAdapter != null) {
-        	System.out.println("AuraTestCase.setUp()");
             testContextAdapter.getTestContext(getQualifiedName());
         }
     }
@@ -96,9 +95,8 @@ public abstract class AuraTestCase extends UnitTestCase {
         getMockConfigAdapter().reset();
     }
 
-    //this is not being called
+    // this is not being called
     public String getQualifiedName() {
-    	System.out.println("AuraTestCase.getQualifiedName");
         return getClass().getCanonicalName() + "." + getName();
     }
 
@@ -110,7 +108,7 @@ public abstract class AuraTestCase extends UnitTestCase {
     protected <T extends Definition> DefDescriptor<T> addSourceAutoCleanup(Class<T> defClass, String contents) {
         return getAuraTestingUtil().addSourceAutoCleanup(defClass, contents);
     }
-    
+
     protected void updateStringSource(DefDescriptor<?> desc, String content) {
         getAuraTestingUtil().updateSource(desc, content);
     }
@@ -152,7 +150,7 @@ public abstract class AuraTestCase extends UnitTestCase {
         checkExceptionFull(e, clazz, message);
         assertLocation(e, filename);
     }
-    
+
     /**
      * Check to ensure that an exception matches both message regex and location.
      * 
@@ -186,7 +184,7 @@ public abstract class AuraTestCase extends UnitTestCase {
         if (clazz != null) {
             assertEquals("Exception must be " + clazz.getSimpleName(), clazz, e.getClass());
         }
-        
+
         assertEquals("Unexpected message", message, e.getMessage());
     }
 
@@ -197,7 +195,7 @@ public abstract class AuraTestCase extends UnitTestCase {
         if (clazz != null) {
             assertEquals("Exception must be " + clazz.getSimpleName(), clazz, e.getClass());
         }
-        
+
         String message = e.getMessage();
         Pattern pattern = Pattern.compile(regex);
         assertTrue("Unexpected message: " + message, pattern.matcher(message).find());

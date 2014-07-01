@@ -63,20 +63,20 @@ import org.auraframework.util.json.JsonReader;
 
 import com.google.common.collect.Maps;
 
-
 public class AuraContextFilter implements Filter {
     private static final boolean isProduction = Aura.getConfigAdapter().isProduction();
 
     public static final EnumParam<AuraContext.Mode> mode = new EnumParam<AuraContext.Mode>(AuraServlet.AURA_PREFIX
             + "mode", false, AuraContext.Mode.class);
-    
+
     public static final BooleanParam isDebugToolEnabled = new BooleanParam(AuraServlet.AURA_PREFIX
             + "debugtool", false);
-    
+
     private static final EnumParam<Format> format = new EnumParam<Format>(AuraServlet.AURA_PREFIX + "format", false,
             Format.class);
 
-    private static final EnumParam<Authentication> access = new EnumParam<Authentication>(AuraServlet.AURA_PREFIX + "access", false,
+    private static final EnumParam<Authentication> access = new EnumParam<Authentication>(AuraServlet.AURA_PREFIX
+            + "access", false,
             Authentication.class);
 
     private static final StringParam app = new StringParam(AuraServlet.AURA_PREFIX + "app", 0, false);
@@ -140,7 +140,7 @@ public class AuraContextFilter implements Filter {
         Map<String, Object> configMap = getConfigMap(request);
         Mode m = getMode(request, configMap);
         boolean d = getDebugToolParam(request);
-        
+
         DefDescriptor<? extends BaseComponentDef> appDesc = getAppParam(request, configMap);
 
         if (componentDir != null) {
@@ -208,20 +208,18 @@ public class AuraContextFilter implements Filter {
                 }
                 if (testName == null) {
                     testName = test.get(request);
-                } 
+                }
                 if (testName != null) {
-                	System.out.println("AuracontextFilter.startContext, call getTestContext with testName:"+testName);
-                	TestContext testContext = testContextAdapter.getTestContext(testName);
+                    TestContext testContext = testContextAdapter.getTestContext(testName);
                     if (testContext != null) {
                         MasterDefRegistry registry = context.getDefRegistry();
                         Set<Definition> mocks = testContext.getLocalDefs();
                         if (mocks != null) {
-                        	boolean doReset = testReset.get(request);
+                            boolean doReset = testReset.get(request);
                             for (Definition def : mocks) {
                                 if (doReset && def instanceof Resettable) {
                                     ((Resettable) def).reset();
                                 }
-                                System.out.println("AuracontextFilter.startContext,add localDef from testContext to MDR");
                                 registry.addLocalDef(def);
                             }
                         }
@@ -248,7 +246,7 @@ public class AuraContextFilter implements Filter {
         @SuppressWarnings("unchecked")
         Map<String, String> loaded = (Map<String, String>) loadedEntry;
         DefinitionService definitionService = Aura.getDefinitionService();
-        Map<DefDescriptor<?>,String> clientLoaded = Maps.newHashMap();
+        Map<DefDescriptor<?>, String> clientLoaded = Maps.newHashMap();
 
         for (Map.Entry<String, String> entry : loaded.entrySet()) {
             String uid = entry.getValue();
@@ -350,10 +348,10 @@ public class AuraContextFilter implements Filter {
     }
 
     protected Boolean getDebugToolParam(HttpServletRequest request) {
-    	// Get Passed in aura.debugtool param
-    	return isDebugToolEnabled.get(request);
+        // Get Passed in aura.debugtool param
+        return isDebugToolEnabled.get(request);
     }
-    
+
     @Override
     public void destroy() {
     }

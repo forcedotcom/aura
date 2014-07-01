@@ -33,7 +33,7 @@
 		tbody.appendChild(hlp.createTableBody(concrete));
 
 		// Attempt to create a summary row.
-		summaryRow = hlp.createSummaryRow(concrete);
+		//summaryRow = hlp.createSummaryRow(concrete);
 
 		if (summaryRow) {
 			tfoot.appendChild(summaryRow);

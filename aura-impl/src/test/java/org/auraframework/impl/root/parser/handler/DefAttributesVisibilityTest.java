@@ -92,7 +92,7 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
         @Override
         public void setUp() throws Exception {
             super.setUp();
-            expectedAttrsInCustomNS = Sets.newHashSet("access", "description", "implements", "useAppcache", "controller", "model");
+            expectedAttrsInCustomNS = Sets.newHashSet("access", "description", "implements", "useAppcache", "controller", "model", "apiVersion");
             expectedAttrsInPrivilegedNS = Sets.newHashSet("preload", "layouts", "locationChangeEvent", "additionalAppCacheURLs", "isOnePageApp",
                     "theme", "render", "template", "provider", "abstract", "extensible", "isTemplate", "extends",
                     "style", "helper", "renderer", "whitespace", "support");
@@ -107,7 +107,7 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
         @Override
         public void setUp() throws Exception {
             super.setUp();
-            expectedAttrsInCustomNS = Sets.newHashSet("access", "description", "implements", "controller", "model");
+            expectedAttrsInCustomNS = Sets.newHashSet("access", "description", "implements", "controller", "model", "apiVersion");
             expectedAttrsInPrivilegedNS = Sets.newHashSet("render", "template", "provider", "abstract", "extensible", "isTemplate", "extends",
                     "style", "helper", "renderer", "whitespace", "support");
             expectedAttrsInPrivilegedNS.addAll(expectedAttrsInCustomNS);
@@ -121,7 +121,7 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
         @Override
         public void setUp() throws Exception {
             super.setUp();
-            expectedAttrsInCustomNS = Sets.newHashSet("access", "description", "extends", "type");
+            expectedAttrsInCustomNS = Sets.newHashSet("access", "description", "extends", "type", "apiVersion");
             expectedAttrsInPrivilegedNS = Sets.newHashSet("support");
             expectedAttrsInPrivilegedNS.addAll(expectedAttrsInCustomNS);
             clazz = EventDef.class;
@@ -134,7 +134,7 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
         @Override
         public void setUp() throws Exception {
             super.setUp();
-            expectedAttrsInCustomNS = Sets.newHashSet("access", "description", "extends");
+            expectedAttrsInCustomNS = Sets.newHashSet("access", "description", "extends", "apiVersion");
             expectedAttrsInPrivilegedNS = Sets.newHashSet("support", "provider");
             expectedAttrsInPrivilegedNS.addAll(expectedAttrsInCustomNS);
             clazz = InterfaceDef.class;

@@ -47,6 +47,11 @@ public abstract class MockDefinition<D extends Definition> implements Definition
     }
 
     @Override
+    public String getAPIVersion() {
+        return null;
+    }
+
+    @Override
     public String getDescription() {
         return "";
     }

@@ -37,7 +37,7 @@ public class LibraryDefHandler extends RootTagHandler<LibraryDef> {
 
     public static final String TAG = "aura:library";
     
-    private static final Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of();
+    private static final Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(RootTagHandler.ATTRIBUTE_API_VERSION);
     
     private final LibraryDefImpl.Builder builder = new LibraryDefImpl.Builder();
     

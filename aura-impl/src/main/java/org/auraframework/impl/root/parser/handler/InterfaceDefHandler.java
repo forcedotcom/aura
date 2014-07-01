@@ -43,7 +43,7 @@ public class InterfaceDefHandler extends RootTagHandler<InterfaceDef> {
     private static final String ATTRIBUTE_EXTENDS = "extends";
 
     protected static final Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_EXTENDS,
-            RootTagHandler.ATTRIBUTE_DESCRIPTION, ATTRIBUTE_ACCESS);
+            RootTagHandler.ATTRIBUTE_DESCRIPTION, RootTagHandler.ATTRIBUTE_API_VERSION, ATTRIBUTE_ACCESS);
 	private static final Set<String> PRIVILEGED_ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>().add(
 			RootTagHandler.ATTRIBUTE_SUPPORT, ATTRIBUTE_PROVIDER).addAll(ALLOWED_ATTRIBUTES).build();
 

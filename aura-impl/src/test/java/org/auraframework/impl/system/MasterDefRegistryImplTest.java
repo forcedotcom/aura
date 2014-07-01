@@ -1494,6 +1494,11 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         }
 
         @Override
+        public String getAPIVersion() {
+            return null;
+        }
+        
+        @Override
         public String getDescription() {
             return "description";
         }

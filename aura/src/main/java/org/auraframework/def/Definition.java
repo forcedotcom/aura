@@ -152,6 +152,11 @@ public interface Definition extends JsonSerializable, Serializable {
     String getDescription();
 
     /**
+     * Get the API Version of this definition.
+     */
+    String getAPIVersion();
+
+    /**
      * Fetches a non-recursive hash for this definition's contents. This does
      * not incorporate hash of dependent definitions, which are generally
      * context-dependent (in that providers may give different users different

@@ -84,20 +84,20 @@ Serializable, Comparable<DefDescriptor<?>> {
     
 	public static enum DefType {
 		ATTRIBUTE(AttributeDef.class), //
-		APPLICATION(ApplicationDef.class), //
-		COMPONENT(ComponentDef.class), //
-		EVENT(EventDef.class), //
+		APPLICATION(ApplicationDef.class, true), //
+		COMPONENT(ComponentDef.class, true), //
+		EVENT(EventDef.class, true), //
 		HELPER(HelperDef.class), //
-		INTERFACE(InterfaceDef.class), //
+		INTERFACE(InterfaceDef.class, true), //
 		CONTROLLER(ControllerDef.class), //
 		MODEL(ModelDef.class), //
-		LIBRARY(LibraryDef.class), //
+		LIBRARY(LibraryDef.class, true), //
 		INCLUDE(IncludeDef.class), //
 		RENDERER(RendererDef.class), //
 		ACTION(ActionDef.class), //
 		TYPE(TypeDef.class), //
 		STYLE(StyleDef.class), //
-		THEME(ThemeDef.class), //
+		THEME(ThemeDef.class, true), //
         THEME_DEF_REF(ThemeDefRef.class), //
         VAR(VarDef.class), //
         DOCUMENTATION(DocumentationDef.class), //
@@ -117,10 +117,15 @@ Serializable, Comparable<DefDescriptor<?>> {
 		private static Map<Class<? extends Definition>, DefType> defTypeMap;
 		
 		private final Class<? extends Definition> clz;
+		private final boolean definesBundle;
 
 		private DefType(Class<? extends Definition> clz) {
+		    this(clz, false);
+		}
+		
+		private DefType(Class<? extends Definition> clz, boolean definesBundle) {
 			this.clz = clz;
-
+			this.definesBundle = definesBundle;
 			mapDefType(clz, this);
 		}
 
@@ -137,8 +142,16 @@ Serializable, Comparable<DefDescriptor<?>> {
 			return clz;
 		}
 		
+		/** Going to be removed **/
 		public boolean isRoot() {
-		    return RootDefinition.class.isAssignableFrom(getPrimaryInterface());
+            return RootDefinition.class.isAssignableFrom(getPrimaryInterface());
+        }
+		
+		/**
+		 * Indicated this def type can stand alone in a bundle.
+		 */
+		public boolean definesBundle() {
+		    return definesBundle;
 		}
 
 		public static boolean hasDefType(Class<?> primaryInterface) {

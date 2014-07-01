@@ -57,7 +57,7 @@ public class EnumMojo
      * baseScanDirectory:
      * The base directory for scanned files.  all root dirs must be relative to this.
      * If this dir is relative, it will start at the pom files's location
-     * @parameter expression="${baseScanDirectory}"
+     * @parameter property="baseScanDirectory"
      * @required
      */
     private File baseScanDirectory;
@@ -73,7 +73,7 @@ public class EnumMojo
      *   <param>/absdir/bob</param>
      * </scanDirectoryList>
      *     
-     * @parameter expression="${scanDirectoryList}"
+     * @parameter property="scanDirectoryList"
      * @required
      */
     
@@ -82,7 +82,7 @@ public class EnumMojo
     /**
      * outputPackageName:
      * The generated java file's package
-     * @parameter expression="${outputPackageName}"
+     * @parameter property="outputPackageName"
      * @required
      */
     private String outputPackageName;
@@ -90,7 +90,7 @@ public class EnumMojo
     /**
      * outputClassName:
      * The generated java file's class
-     * @parameter expression="${outputClassName}"
+     * @parameter property="outputClassName"
      * @required
      */
     private String outputClassName;
@@ -100,7 +100,7 @@ public class EnumMojo
      * outputFile:
      * The generated enum file is output to this file.  If the file name is relative, 
      * it will be relative to the pom file location
-     * @parameter expression="${outputFile}"
+     * @parameter property="outputFile"
      * @required
      */
     private File outputFile;

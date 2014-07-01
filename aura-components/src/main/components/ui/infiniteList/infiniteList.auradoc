@@ -53,8 +53,13 @@ listData.get("e.triggerDataProvider").fire();
 	    </pre>
 	</aura:description>	
 		<aura:example name="infinitelist" ref="auradocs:demoList" label="Using ui:infiniteList">
-    	<p>This example shows a simple implementation of a list. To load new data, either pull to refresh or click the Show More button.</p>
+    	<p>This example shows a simple implementation of a list embedded in a <code>ui:scroller</code> component. To load new data, either pull to refresh or click the Show More button.</p>
 	   </aura:example>
+	   
+	   <aura:example name="infinitelist2" ref="uitest:infiniteListCscc_Test" label="Handing Events after ui:infiniteList Renders">
+	     <p>This example shows how you can handle the component using the <code>rerenderComplete</code> attribute after it renders.</p>
+	   </aura:example>
+	   
 	   <aura:example name="infiniteListRow" ref="uitest:infiniteListRow_Test" label="Using Row Actions">
     	<p>This example shows a simple implementation of a list Action Row that has swipe behavior. To load new data, either pull to refresh or click the Show More button.</p>
 	   	<p>To use the swipe gesture in this example, emulate any mobile devices using the developer tool on your browser</p>

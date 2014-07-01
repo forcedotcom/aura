@@ -1,4 +1,5 @@
 .metadata/
+/META-INF
 target
 .project
 .classpath

@@ -33,8 +33,6 @@ public class ServletConfigController {
      */
     public static void setProductionConfig(@Key("isProduction") boolean isProduction) {
         AuraTestCase.getMockConfigAdapter().setIsProduction(isProduction);
-        System.out.println("PROD : " + isProduction + " , " + Aura.getConfigAdapter().isProduction() + " - "
-                + Aura.getConfigAdapter());
     }
 
     /**

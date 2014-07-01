@@ -135,23 +135,21 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
     public void setUp() throws Exception {
         super.setUp();
     }
-    
+
     public String getBrowserTypeString() {
-    	String browserType = "";
-    	if(this.currentBrowserType!=null) {
-    		browserType = ":BROWSER"+this.currentBrowserType.name();
-    	} 
-    	return browserType;
+        String browserType = "";
+        if (this.currentBrowserType != null) {
+            browserType = ":BROWSER" + this.currentBrowserType.name();
+        }
+        return browserType;
     }
-    
+
     public void addMocksToTestContextLocalDef(Set<Definition> mocks) throws Throwable {
         if (mocks != null && !mocks.isEmpty()) {
             TestContextAdapter testContextAdapter = Aura.get(TestContextAdapter.class);
             if (testContextAdapter != null) {
                 if (this.currentBrowserType != null)
                 {
-                    System.out.println("WebDriverTestCase.addMocksToTestContextLocalDef,currentBrowserType:"
-                            + currentBrowserType.name());
                     String testName = getQualifiedName();
                     testContextAdapter.getTestContext(testName);
                     Aura.get(TestContextAdapter.class).getTestContext().getLocalDefs().addAll(mocks);

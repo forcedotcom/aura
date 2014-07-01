@@ -36,9 +36,8 @@ $A.ns.AuraComponentService = function(actions, finishedCallback) {
 
 /**
  * Gets an instance of a component.
- * @param {String} globalId
- * 				The generated globally unique Id of the component that changes across pageloads.
- * @memberOf AuraComponentService
+ * @param {String} globalId The generated globally unique Id of the component that changes across pageloads.
+ *
  * @public
  */
 $A.ns.AuraComponentService.prototype.get =  function(globalId) {
@@ -48,8 +47,7 @@ $A.ns.AuraComponentService.prototype.get =  function(globalId) {
 
 /**
  * Gets the rendering component for the provided element recursively.
- * @param {Object} element
- * 				The element that is used to find the rendering component
+ * @param {Object} element The element that is used to find the rendering component
  * @memberOf AuraComponentService
  * @private
  */
@@ -70,8 +68,7 @@ $A.ns.AuraComponentService.prototype.getRenderingComponentForElement = function(
 
 /**
  * Gets the attribute provider for the provided element.
- * @param {Object} element
- * 				The element whose attribute provider is to be returned
+ * @param {Object} element The element whose attribute provider is to be returned
  * @memberOf AuraComponentService
  * @private
  */
@@ -97,11 +94,9 @@ $A.ns.AuraComponentService.prototype.newComponentArray = function(config, attrib
  * @deprecated use newComponentAsync instead
  *
  * newComponent() calls newComponentDeprecated().
- * @param {Object} config
- * 				Use config to pass in your component definition and attributes. Supports lazy or exclusive loading by passing in "load": "LAZY" or "load": "EXCLUSIVE"
- * @param {Object} attributeValueProvider
- * 				The value provider for the attributes
- * @memberOf AuraComponentService
+ * @param {Object} config Use config to pass in your component definition and attributes. Supports lazy or exclusive loading by passing in "load": "LAZY" or "load": "EXCLUSIVE"
+ * @param {Object} attributeValueProvider The value provider for the attributes
+ *
  * @public
  */
 $A.ns.AuraComponentService.prototype.newComponent = function(config, attributeValueProvider, localCreation, doForce){
@@ -115,12 +110,9 @@ $A.ns.AuraComponentService.prototype.newComponent = function(config, attributeVa
  * Creates a new component on the client or server and initializes it. For example <code>$A.services.component.newComponentDeprecated("ui:inputText")</code>
  * creates a <code>ui:inputText</code> component.
  * <p>See Also: <a href="#help?topic=dynamicCmp">Dynamically Creating Components</a></p>
- * @param {Object} config
- * 				Use config to pass in your component definition and attributes. Supports lazy or exclusive loading by passing in "load": "LAZY" or "load": "EXCLUSIVE"
- * @param {Object} attributeValueProvider
- * 				The value provider for the attributes
- * @memberOf AuraComponentService
- * @public
+ * @param {Object} config Use config to pass in your component definition and attributes. Supports lazy or exclusive loading by passing in "load": "LAZY" or "load": "EXCLUSIVE"
+ * @param {Object} attributeValueProvider The value provider for the attributes
+ *
  */
 $A.ns.AuraComponentService.prototype.newComponentDeprecated = function(config, attributeValueProvider, localCreation, doForce){
     $A.assert(config, "config is required in ComponentService.newComponentDeprecated(config)");
@@ -182,17 +174,13 @@ $A.ns.AuraComponentService.prototype.newComponentDeprecated = function(config, a
  * calls your provided callback with the completed component regardless of any server-side dependencies.
  *
  * @param {Object} callbackScope The "this" context for the callback (null for global)
- * @param {Function} callback
- * 						The callback to use once the component is successfully created
- * @param {Object} config
- * 						Required. The componentDef descriptor and attributes for the new component
- * @param {Object} attributeValueProvider
- * 						The value provider for the attributes
- * @param [localCreation]
- * @param [doForce]
- * @return {Component} The new component
- * @public
- * @memberOf AuraComponentService
+ * @param {Function} callback The callback to use once the component is successfully created
+ * @param {Object} config The componentDef descriptor and attributes for the new component
+ * @param {Object} attributeValueProvider The value provider for the attributes
+ * @param {Boolean} [localCreation] Whether created client side (passed to Component)
+ * @param {Boolean} [doForce] Whether to force client side creation
+ * @param {Boolean} [forceServer] Whether to force server side creation
+ *
  */
 $A.ns.AuraComponentService.prototype.newComponentAsync = function(callbackScope, callback, config, attributeValueProvider, localCreation, doForce, forceServer) {
     $A.assert(config, "config is required in ComponentService.newComponentAsync(config)");
@@ -379,10 +367,11 @@ $A.ns.AuraComponentService.prototype.index = function(component){
 
 /**
  * Gets the component definition from the registry.
+ *
  * @param {Object} config The descriptor (<code>markup://ui:scroller</code>) or other component attributes that are provided during its initialization.
  * @param {Boolean} noInit
- * @returns {ComponentDef}  The metadata of the component
- * @memberOf AuraComponentService
+ * @returns {ComponentDef} The metadata of the component
+ *
  * @public
  */
 $A.ns.AuraComponentService.prototype.getDef = function(config, noInit){

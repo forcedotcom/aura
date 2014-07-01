@@ -137,7 +137,7 @@
 				var recordLayoutBody; 
 
 				if (column.getDef().getDescriptor().getPrefix() === 'layout') {
-					recordLayoutBody = column.getSuper().get('v.priv_entityDetail');
+					recordLayoutBody = column.getSuper().get('v.body');
 					recordLayoutBody.forEach(function (col) {
 						ret.push(col);
 					});

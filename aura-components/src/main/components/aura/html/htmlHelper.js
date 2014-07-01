@@ -80,8 +80,9 @@
 
     // string constants used to save fast click event and handler
     NAMES: {
-        "event": "fastClickEvent",
-        "handler": "fastClickHandler"
+        "event": "fcEvent",
+        "domHandler": "fcDomHandler",
+        "hashHandler": "fcHashHandler"
     },
 
     GESTURE: function (){
@@ -124,11 +125,16 @@
      *
      * @param element element to enable fast click checking on
      * @param handler handler for fast click event listener
+     * @param name name of the type of handler
+     * @returns {Function} previous handler if any
      */
-    createFastClickHandler : function(element, handler) {
+    createFastClickHandler : function(element, handler, name) {
         // remove existing fast click event handler if component is rerendered
-        if($A.util.isFunction(element[this.NAMES.handler])) {
-            $A.util.removeOn(element, element[this.NAMES.event], element[this.NAMES.handler]);
+        // there are potentially two handlers: one for domEvent and another for hashEvent
+        // so we need to save reference and remove the right one
+        var previousHandler = element[name];
+        if($A.util.isFunction(previousHandler)) {
+            $A.util.removeOn(element, element[this.NAMES.event], previousHandler);
         }
 
         var FastClick = this.initFastClick();
@@ -142,7 +148,8 @@
         }
 
         // save current handler on element so that it can be referenced and removed later
-        element[this.NAMES.handler] = handler;
+        element[name] = handler;
+        return previousHandler;
     },
 
     supportsTouchEvents : function () {
@@ -302,7 +309,7 @@
             var eventName = name.substring(2);
 
             if (eventName.toLowerCase() === "click") {
-                this.createFastClickHandler(ret, this.domEventHandler);
+                this.createFastClickHandler(ret, this.domEventHandler, this.NAMES.domHandler);
             } else {
                 on(ret, eventName, this.domEventHandler);
             }
@@ -347,7 +354,7 @@
                         // Make sure that non-hash style hrefs work fine even when fast clicking is engaged
                         window.open(value, target ? target : "_self");
                     }
-                });
+                }, this.NAMES.hashHandler);
 
                 var href = "javascript:void(0";
                 if ($A.getContext().getMode() !== "PROD") {

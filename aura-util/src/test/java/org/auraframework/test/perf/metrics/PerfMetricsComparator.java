@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import org.auraframework.test.perf.PerfUtil;
 import org.auraframework.test.perf.rdp.TimelineEventUtil;
 
 import com.google.common.collect.ImmutableMap;
@@ -29,8 +30,7 @@ import com.google.common.collect.Maps;
  */
 public class PerfMetricsComparator {
 
-    // TODO: remove this once the chromedriver that supports profiling is released
-    private static final boolean IGNORE_PROFILE_JSCPU_IF_ZERO = true;
+    private static final boolean PREF_USE_MEDIAN_AND_AVERAGE = true;
 
     public static final PerfMetricsComparator DEFAULT_INSTANCE = new PerfMetricsComparator();
 
@@ -70,6 +70,18 @@ public class PerfMetricsComparator {
             return 25;
         }
         return 0;
+    }
+
+    /**
+     * Override to change default behavior
+     * 
+     * @return the miminum delta (independent of %) before reporting a regression (i.e. 100ms for timings)
+     */
+    protected int getMinimumAllowedDelta(String metricName, String metricUnit) {
+        if ("millis".equals(metricUnit)) {
+            return 100;
+        }
+        return 1; // i.e. no units (paints, ...)
     }
 
     // IMPLEMENTATION:
@@ -129,17 +141,18 @@ public class PerfMetricsComparator {
         for (String name : expectedMetricNames) {
             PerfMetric expected = expectedMetrics.getMetric(name);
             PerfMetric actual = actualMetrics.getNonnullMetric(name);
+            String units = expected.getUnits();
 
             int expectedValue = expected.getIntValue();
             int actualValue = (actual != null) ? actual.getIntValue() : -1;
 
             int allowedDelta = 0;
             int allowedPercent = getAllowedVariability(name);
-            // TODO: put the % if the log comparison message
             if (allowedPercent != 0) {
                 allowedDelta = Math.round((expectedValue * allowedPercent) / 100);
-                if (allowedDelta == 0 && allowedPercent > 0) {
-                    allowedDelta = 1; // allow at least 1 if non-zero %
+                if (allowedPercent > 0) {
+                    int minimumDelta = getMinimumAllowedDelta(name, units); // allow minimum if non-zero %
+                    allowedDelta = Math.max(allowedDelta, minimumDelta);
                 }
             }
 
@@ -157,6 +170,15 @@ public class PerfMetricsComparator {
             }
             logLine.append(']');
 
+            boolean outOfRange = Math.abs(expectedValue - actualValue) > allowedDelta;
+            if (PREF_USE_MEDIAN_AND_AVERAGE && outOfRange && actual instanceof MedianPerfMetric) {
+                // to decrease flapping we compare both the median run and average metrics
+                // note that we still report the median run value as that is the one that
+                // will match the median run recording (timeline/profile/aurastats/...)
+                int averageActualValue = ((MedianPerfMetric) actual).getAverage();
+                outOfRange = Math.abs(expectedValue - averageActualValue) > allowedDelta;
+            }
+
             String excludedReason = getExcludedMetricMessage(name);
             if (excludedReason != null) {
                 logLineMark = ' ';
@@ -164,15 +186,14 @@ public class PerfMetricsComparator {
             } else if (isUnitExcluded(expected.getUnits())) {
                 logLineMark = ' ';
                 logLine.append(" excluded");
-            } else if (IGNORE_PROFILE_JSCPU_IF_ZERO && name.startsWith("Profile.JSCPU.") && actualValue == 0
+            } else if (!PerfUtil.MEASURE_JSCPU_METRICTS && name.startsWith("Profile.JSCPU.") && actualValue == 0
                     && expectedValue != 0) {
                 logLineMark = ' ';
                 logLine.append(" excluded, chromedriver used doesn't support profiling");
-            } else if (Math.abs(expectedValue - actualValue) > allowedDelta) {
+            } else if (outOfRange) {
                 logLineMark = '*';
                 numMetricsCompared++;
                 em.append("--> perf metric out of range: " + name);
-                String units = expected.getUnits();
                 if (units != null) {
                     em.append(' ' + units);
                 }

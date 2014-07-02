@@ -59,7 +59,11 @@ public final class GoldFileUtils {
             exceptionFound = t;
             message = "Gold file differences found";
             message += String.format(", review updated gold file before committing: %s", url);
-            message += "\nDifferences:\n" + t.getMessage();
+            message += "\nDifferences";
+            if (testResults instanceof PerfMetrics) {
+                message += " using the median (*) perf test run metric values";
+            }
+            message += ":\n" + t.getMessage();
         }
 
         if (exceptionFound != null) {

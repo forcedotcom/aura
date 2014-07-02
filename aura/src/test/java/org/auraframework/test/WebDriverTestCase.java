@@ -274,6 +274,13 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
     /**
      * Override to change
      */
+    protected boolean runPerfWarmupRun() {
+        return true;
+    }
+
+    /**
+     * Override to change
+     */
     protected int numPerfTimelineRuns() {
         return 5;
     }
@@ -300,6 +307,16 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
         int numPerfAuraRuns = numPerfAuraRuns();
         PerfMetrics timelineMetrics = null;
         PerfMetrics auraMetrics = null;
+
+        if (runPerfWarmupRun()) {
+            // TODO: any metrics that should/could be measured for the first run
+            try {
+                perBrowserSetUp();
+                superRunTest();
+            } finally {
+                perBrowserTearDown();
+            }
+        }
 
         // runs to collect Dev Tools performance metrics
         if (numPerfTimelineRuns > 0) {

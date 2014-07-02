@@ -249,18 +249,14 @@ public final class PerfWebDriverUtil {
 
     // JavaScript CPU Profiler
 
-    private boolean cpuProfilerNotAvailable;
-
     /**
      * Start JavaScript CPU profiler
      */
     public void startProfile() {
-        try {
-            ((JavascriptExecutor) driver).executeScript(":startProfile");
-        } catch (WebDriverException e) {
-            LOG.info("JavaScript CPU profiler not available");
-            cpuProfilerNotAvailable = true;
+        if (!PerfUtil.MEASURE_JSCPU_METRICTS) {
+            return;
         }
+        ((JavascriptExecutor) driver).executeScript(":startProfile");
     }
 
     /**
@@ -270,20 +266,16 @@ public final class PerfWebDriverUtil {
      */
     @SuppressWarnings("unchecked")
     public Map<String, ?> endProfile() {
-        try {
-            // takes about 300ms for ui:button
-            Map<String, ?> retval = (Map<String, ?>) ((JavascriptExecutor) driver).executeScript(":endProfile");
-            if (retval == null) {
-                LOG.warning(":endProfile returned no results");
-                return null;
-            }
-            return (Map<String, ?>) retval.get("profile");
-        } catch (WebDriverException e) {
-            if (!cpuProfilerNotAvailable) {
-                LOG.warning(e.toString());
-            }
+        if (!PerfUtil.MEASURE_JSCPU_METRICTS) {
             return null;
         }
+        // takes about 300ms for ui:button
+        Map<String, ?> retval = (Map<String, ?>) ((JavascriptExecutor) driver).executeScript(":endProfile");
+        if (retval == null) {
+            LOG.warning(":endProfile returned no results");
+            return null;
+        }
+        return (Map<String, ?>) retval.get("profile");
     }
 
     public static JSONObject analyzeCPUProfile(Map<String, ?> profile) throws JSONException {

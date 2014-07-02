@@ -25,14 +25,28 @@ import org.json.JSONException;
 public final class MedianPerfMetric extends PerfMetric {
 
     private final List<PerfMetric> runsMetric;
+    private final int medianRunNumber;
 
     /**
      * @param median the median PerfMetric calculated
      * @param runsMetric the list of PerfMetrics the median was calculated from
+     * @param medianRunNumber the run number used for the median, -1 if unknown or N/A
      */
-    public MedianPerfMetric(PerfMetric median, List<PerfMetric> runsMetric) throws JSONException {
+    public MedianPerfMetric(PerfMetric median, List<PerfMetric> runsMetric, int medianRunNumber) throws JSONException {
         super(median.toString());
         this.runsMetric = runsMetric;
+        this.medianRunNumber = medianRunNumber;
+    }
+
+    /**
+     * @return the average metric for the individual runs
+     */
+    public int getAverage() {
+        int total = 0;
+        for (PerfMetric metric : runsMetric) {
+            total += metric.getIntValue();
+        }
+        return Math.round(((float) total) / runsMetric.size());
     }
 
     /**
@@ -53,12 +67,17 @@ public final class MedianPerfMetric extends PerfMetric {
     public String toSequenceString() {
         StringBuilder sb = new StringBuilder();
         sb.append('[');
+        int runNumber = 1;
         for (PerfMetric metric : runsMetric) {
             if (sb.length() > 1) {
                 sb.append(' ');
             }
+            if (runNumber++ == medianRunNumber) {
+                sb.append('*');
+            }
             sb.append(metric.getValue());
         }
+        sb.append(" |*:median-run average:" + getAverage());
         sb.append(']');
         return sb.toString();
     }

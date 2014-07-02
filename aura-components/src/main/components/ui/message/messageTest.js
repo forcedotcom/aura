@@ -47,10 +47,6 @@
         // verify aria attributes
         $A.test.assertEquals("alert", rootDiv.getAttribute("role"),
                 "ui:message rendered with wrong aria role attribute");
-        $A.test.assertEquals("assertive", rootDiv.getAttribute("aria-live"),
-                "ui:message rendered with wrong aria-live attribute");
-        $A.test.assertEquals("true", rootDiv.getAttribute("aria-atomic"),
-                "ui:message rendered with wrong aria-atomic attribute");
 
         // verify severity CSS class
         var severity = component.get("v.severity");

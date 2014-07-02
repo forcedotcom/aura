@@ -142,11 +142,6 @@ Serializable, Comparable<DefDescriptor<?>> {
 			return clz;
 		}
 		
-		/** Going to be removed **/
-		public boolean isRoot() {
-            return RootDefinition.class.isAssignableFrom(getPrimaryInterface());
-        }
-		
 		/**
 		 * Indicated this def type can stand alone in a bundle.
 		 */

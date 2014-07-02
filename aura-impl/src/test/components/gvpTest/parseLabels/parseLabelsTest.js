@@ -103,6 +103,8 @@
 					"Label expression in provider not parsed and loaded in client.");
 			$A.test.assertEquals("Provider", $A.get("$Label.Section2.provider"), 
 					"All label expressions in provider not parsed and loaded in client.");
+			$A.test.assertEquals("Provider", $A.get("$Label.Section3.provider"), 
+                    "All label expressions in provider not parsed and loaded in client.");
 		}
 	}
 })

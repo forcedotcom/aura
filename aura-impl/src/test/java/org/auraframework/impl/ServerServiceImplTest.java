@@ -16,7 +16,6 @@
 package org.auraframework.impl;
 
 import java.io.IOException;
-
 import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.List;
@@ -116,6 +115,11 @@ public class ServerServiceImplTest extends AuraImplTestCase {
 
         @Override
         public void retrieveLabels() throws QuickFixException {
+        }
+
+        @Override
+        public String getAPIVersion() {
+            return null;
         }
 
         @Override

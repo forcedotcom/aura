@@ -47,6 +47,7 @@ public abstract class DefinitionImpl<T extends Definition> implements Definition
     protected final DefDescriptor<T> descriptor;
     protected final Location location;
     protected final Map<SubDefDescriptor<?, T>, Definition> subDefs;
+    protected final String apiVersion;
     protected final String description;
     protected final Visibility visibility;
 
@@ -57,19 +58,20 @@ public abstract class DefinitionImpl<T extends Definition> implements Definition
     private boolean valid;
 
     protected DefinitionImpl(DefDescriptor<T> descriptor, Location location, Visibility visibility) {
-        this(descriptor, location, null, null, visibility, null, null, null, null);
+        this(descriptor, location, null, null, null, visibility, null, null, null, null);
     }
 
     protected DefinitionImpl(RefBuilderImpl<T, ?> builder) {
-        this(builder.getDescriptor(), builder.getLocation(), builder.subDefs, builder.description, builder
+        this(builder.getDescriptor(), builder.getLocation(), builder.subDefs, builder.apiVersion, builder.description, builder
                 .visibility, builder.getAccess(), builder.getOwnHash(), builder.getSourceHash(), builder.getParseError());
     }
 
-    DefinitionImpl(DefDescriptor<T> descriptor, Location location, Map<SubDefDescriptor<?, T>, Definition> subDefs,
+    DefinitionImpl(DefDescriptor<T> descriptor, Location location, Map<SubDefDescriptor<?, T>, Definition> subDefs, String apiVersion,
             String description, Visibility visibility, DefinitionAccess access, String ownHash, Hash sourceHash, QuickFixException parseError) {
         this.descriptor = descriptor;
         this.location = location;
         this.subDefs = subDefs;
+        this.apiVersion = apiVersion;
         this.description = description;
         this.visibility = visibility;
         this.ownHash = ownHash;
@@ -206,6 +208,7 @@ public abstract class DefinitionImpl<T extends Definition> implements Definition
         public Location location;
         public Map<SubDefDescriptor<?, T>, Definition> subDefs;
         private final Class<T> defClass;
+        public String apiVersion;
         public String description;
         public Hash hash;
         public String ownHash;
@@ -295,6 +298,12 @@ public abstract class DefinitionImpl<T extends Definition> implements Definition
         }
 
         @Override
+        public RefBuilderImpl<T, A> setAPIVersion(String apiVersion) {
+            this.apiVersion = apiVersion;
+            return this;
+        }
+
+        @Override
         public RefBuilderImpl<T, A> setDescription(String description) {
             this.description = description;
             return this;
@@ -363,6 +372,11 @@ public abstract class DefinitionImpl<T extends Definition> implements Definition
     @Override
     public void retrieveLabels() throws QuickFixException {
 
+    }
+
+    @Override
+    public String getAPIVersion() {
+        return apiVersion;
     }
 
     @Override

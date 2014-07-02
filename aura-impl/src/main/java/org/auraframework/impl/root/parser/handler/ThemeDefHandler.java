@@ -26,10 +26,10 @@ import org.auraframework.Aura;
 import org.auraframework.builder.RootDefinitionBuilder;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.ThemeProviderDef;
 import org.auraframework.def.StyleDef;
 import org.auraframework.def.ThemeDef;
 import org.auraframework.def.ThemeDefRef;
+import org.auraframework.def.ThemeProviderDef;
 import org.auraframework.def.VarDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.root.theme.ThemeDefImpl;
@@ -55,7 +55,7 @@ public final class ThemeDefHandler extends RootTagHandler<ThemeDef> {
     private static final String ATTRIBUTE_PROVIDER = "provider";
 
     protected final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(
-            ATTRIBUTE_EXTENDS, ATTRIBUTE_PROVIDER, ATTRIBUTE_SUPPORT, ATTRIBUTE_DESCRIPTION, ATTRIBUTE_ACCESS);
+            ATTRIBUTE_EXTENDS, ATTRIBUTE_PROVIDER, ATTRIBUTE_SUPPORT, ATTRIBUTE_DESCRIPTION, ATTRIBUTE_ACCESS, RootTagHandler.ATTRIBUTE_API_VERSION);
 
     private final ThemeDefImpl.Builder builder = new ThemeDefImpl.Builder();
 

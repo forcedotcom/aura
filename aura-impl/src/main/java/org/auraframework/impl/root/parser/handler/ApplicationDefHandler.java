@@ -16,12 +16,19 @@
 package org.auraframework.impl.root.parser.handler;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.EventDef;
+import org.auraframework.def.LayoutsDef;
+import org.auraframework.def.ThemeDef;
 import org.auraframework.impl.root.DependencyDefImpl;
 import org.auraframework.impl.root.application.ApplicationDefImpl;
 import org.auraframework.impl.root.theme.Themes;

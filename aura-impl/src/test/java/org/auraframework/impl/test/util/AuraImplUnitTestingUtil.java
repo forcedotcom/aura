@@ -282,6 +282,11 @@ public class AuraImplUnitTestingUtil {
             }
 
             @Override
+            public String getAPIVersion() {
+                return null;
+            }
+
+            @Override
             public String getDescription() {
                 return null;
             }

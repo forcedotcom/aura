@@ -17,10 +17,8 @@ package org.auraframework.builder;
 
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
-
 import org.auraframework.system.Location;
 import org.auraframework.throwable.quickfix.QuickFixException;
-
 import org.auraframework.util.text.Hash;
 
 /**
@@ -46,6 +44,8 @@ public interface DefBuilder<PrimaryIntf extends Definition, DefOrRefType extends
     DefBuilder<PrimaryIntf, DefOrRefType> setDescriptor(String qualifiedName);
 
     DefBuilder<PrimaryIntf, DefOrRefType> setDescriptor(DefDescriptor<PrimaryIntf> desc);
+
+    DefBuilder<PrimaryIntf, DefOrRefType> setAPIVersion(String apiVersion);
 
     DefBuilder<PrimaryIntf, DefOrRefType> setDescription(String description);
 

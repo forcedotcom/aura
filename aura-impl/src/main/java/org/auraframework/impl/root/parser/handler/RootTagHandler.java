@@ -42,9 +42,10 @@ public abstract class RootTagHandler<T extends RootDefinition> extends Container
 
     protected static final String ATTRIBUTE_SUPPORT = "support";
     protected static final String ATTRIBUTE_DESCRIPTION = "description";
+    protected static final String ATTRIBUTE_API_VERSION = "apiVersion";
 
     protected static final Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_DESCRIPTION);
-	protected static final Set<String> PRIVILEGED_ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>().add(ATTRIBUTE_SUPPORT).addAll(ALLOWED_ATTRIBUTES).build();
+    protected static final Set<String> PRIVILEGED_ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>().add(ATTRIBUTE_SUPPORT).addAll(ALLOWED_ATTRIBUTES).build();
 
     protected RootTagHandler() {
         super();
@@ -110,7 +111,8 @@ public abstract class RootTagHandler<T extends RootDefinition> extends Container
                         this.getLocation());
             }
         }
-
+        
+        builder.setAPIVersion(getAttributeValue(ATTRIBUTE_API_VERSION));
         builder.setDescription(getAttributeValue(ATTRIBUTE_DESCRIPTION));
     }
 }

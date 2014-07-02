@@ -30,6 +30,17 @@
             $A.test.assertEquals("placeholder", items[1].getDef().getDescriptor().getName(),
                     "Expected a placeholder for second lazy loading component.");
 
+            var iteration = cmp.find("iteration");
+            var itrElements = iteration.getElements();
+            for(var i in itrElements){
+                if(itrElements[i].className){
+                    $A.test.assertTrue(
+                    		$A.test.isInstanceOfDivElement(itrElements[i]) &&
+                            (itrElements[i].className.indexOf("auraPlaceholder")!=-1),
+                            "Old placeholder elements are still associated with iteration, i=" + i);
+                }
+            }
+
             //
             // Note that we have to free up the second component because they get
             // put in a single request to the server.
@@ -61,18 +72,6 @@
                 $A.test.assertTrue(typeof placeholderBody[0] === "object");
                 $A.test.assertEquals("Component", placeholderBody[0].auraType);
                 $A.test.assertEquals("markup://loadLevelTest:serverComponent", placeholderBody[0].getDef().getDescriptor().getQualifiedName());
-
-                //Verify that the placeholder's elements were associated with the iteration component
-                var flag= false;
-                var itrElements = iteration.getElements();
-                for(var i in itrElements){
-                    if(itrElements[i].className){
-                        flag = flag || (($A.test.isInstanceOfDivElement(itrElements[i])) &&
-                                         (itrElements[i].className.indexOf("auraPlaceholder")!=-1 ) );
-                    }
-                }
-                $A.test.assertTrue(flag, "Placeholder elements were not associated with iteration component");
-
             });
             //Second Item
             $A.test.addWaitFor("serverComponent", function(){
@@ -80,6 +79,17 @@
             },function(){
                 $A.test.assertTrue(cmp.find("lazy")[1].isRendered());
                 $A.test.assertTrue($A.test.getTextByComponent(cmp.find("lazy")[1]).indexOf("Server component")!=-1);
+                //Verify that the placeholder's elements are gone
+                var iteration = cmp.find("iteration");
+                var itrElements = iteration.getElements();
+                for(var i in itrElements){
+                    if(itrElements[i].className){
+                        $A.test.assertFalse(
+                        		$A.test.isInstanceOfDivElement(itrElements[i]) &&
+                                (itrElements[i].className.indexOf("auraPlaceholder")!=-1),
+                                "Old placeholder elements are still associated with iteration, i=" + i);
+                    }
+                }
             });
 
         }

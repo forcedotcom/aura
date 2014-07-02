@@ -20,6 +20,7 @@
     <aura:attribute name="items" type="List"/>
     <aura:attribute name="start" type="Object"/>
     <aura:attribute name="end" type="Object"/>
+    <aura:attribute name="expanded" type="Boolean" default="false"/>
 
     <aura:renderIf aura:id="if" isTrue="{!v.showIteration}">
         <aura:set attribute="else">
@@ -27,7 +28,12 @@
         </aura:set>
         <aura:iteration aura:id="iteration" items="{!v.items}" var="var" indexVar="idx" start="{!v.start}" end="{!v.end}">
             {!idx + ':' + var + ','}
+            <aura:renderIf isTrue="{!v.expanded}">
+                <br/>Adds some elements for <a href="">rerender expansion</a><br/>
+            </aura:renderIf>
         </aura:iteration>
+        Trailing after the iteration.
     </aura:renderIf>
-
+    Trailing after the renderIf.
+    
 </aura:component>

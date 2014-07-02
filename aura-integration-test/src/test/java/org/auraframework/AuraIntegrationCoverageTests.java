@@ -49,15 +49,15 @@ The surefire plugin cannot run tests in parallel, so this class was created to r
 
 
 
-public class AuraCoverageIntegrationTests extends TestSuite {
+public class AuraIntegrationCoverageTests extends TestSuite {
 
     public static TestSuite suite() {
-        return new AuraCoverageIntegrationTests();
+        return new AuraIntegrationCoverageTests();
     }
 
     private final String nameFragment;
 
-    public AuraCoverageIntegrationTests() {
+    public AuraIntegrationCoverageTests() {
         String frag = System.getProperty("testNameContains");
         if (frag != null && !frag.trim().equals("")) {
             nameFragment = frag.toLowerCase();

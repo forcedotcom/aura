@@ -107,14 +107,16 @@
         }
     },
 
-    // W-966324 - aura:html doesn't rerender layout links properly
-    _testValueFragmentDirty: {
+    testValueFragmentDirty: {
         attributes : {label: 'link', value: '#top'},
         test: function(component){
-            aura.test.assertEquals('javascript:void(0)', component.find("link").getElement().getAttribute('href'), "href attribute not correct");
+            var href = component.find("link").getElement().getAttribute('href');
+            // prod mode doesn't have comment within void
+            aura.test.assertTrue(href == "javascript:void(0);" || href == "javascript:void(0/*#top*/);", "href attribute not correct");
             component.set("v.value", "#bottom");
             $A.renderingService.rerender(component);
-            aura.test.assertEquals('javascript:void(0)', component.find("link").getElement().getAttribute('href'), "href attribute not updated");
+            href = component.find("link").getElement().getAttribute('href');
+            aura.test.assertTrue(href == "javascript:void(0);" || href == "javascript:void(0/*#bottom*/);", "href attribute not updated");
         }
     },
 

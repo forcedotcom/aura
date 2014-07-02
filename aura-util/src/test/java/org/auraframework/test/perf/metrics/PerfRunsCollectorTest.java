@@ -23,7 +23,7 @@ public final class PerfRunsCollectorTest extends UnitTestCase {
 
     public void testGetMedian() throws Exception {
         PerfMetrics run1 = new PerfMetrics();
-        run1.setMetric("paints", 10);
+        run1.setMetric("paints", 11);
         run1.setMetric("layouts", 8);
         run1.setMetric("bytes", 3);
         PerfMetrics run2 = new PerfMetrics();
@@ -43,14 +43,17 @@ public final class PerfRunsCollectorTest extends UnitTestCase {
         // check median metrics
         PerfMetrics median = collector.getMedianMetrics();
         assertEquals(3, median.size());
-        PerfMetric paints = median.getMetric("paints");
-        PerfMetric layouts = median.getMetric("layouts");
-        PerfMetric bytes = median.getMetric("bytes");
+        MedianPerfMetric paints = (MedianPerfMetric) median.getMetric("paints");
+        MedianPerfMetric layouts = (MedianPerfMetric) median.getMetric("layouts");
+        MedianPerfMetric bytes = (MedianPerfMetric) median.getMetric("bytes");
         assertEquals(9, paints.getIntValue());
+        assertEquals(10, paints.getAverage());
         assertEquals(7, layouts.getIntValue());
+        assertEquals(7, layouts.getAverage());
         assertEquals(3, bytes.getIntValue());
+        assertEquals(3, bytes.getAverage());
         // has info on the individual runs
-        List<PerfMetric> runsBytes = ((MedianPerfMetric) bytes).getRunsMetric();
+        List<PerfMetric> runsBytes = bytes.getRunsMetric();
         assertEquals(3, runsBytes.get(0).getIntValue());
         assertEquals(4, runsBytes.get(1).getIntValue());
         assertEquals(2, runsBytes.get(2).getIntValue());
@@ -58,16 +61,20 @@ public final class PerfRunsCollectorTest extends UnitTestCase {
         // check median run
         PerfMetrics medianRun = collector.getMedianRun();
         assertEquals(3, medianRun.size());
-        paints = medianRun.getMetric("paints");
-        layouts = medianRun.getMetric("layouts");
-        bytes = medianRun.getMetric("bytes");
+        paints = (MedianPerfMetric) medianRun.getMetric("paints");
+        layouts = (MedianPerfMetric) medianRun.getMetric("layouts");
+        bytes = (MedianPerfMetric) medianRun.getMetric("bytes");
         assertEquals(9, paints.getIntValue());
+        assertEquals(10, paints.getAverage());
         assertEquals(7, layouts.getIntValue());
+        assertEquals(7, layouts.getAverage());
         assertEquals(4, bytes.getIntValue());
+        assertEquals(3, bytes.getAverage());
         // median run also has info on the individual runs
-        runsBytes = ((MedianPerfMetric) bytes).getRunsMetric();
+        runsBytes = bytes.getRunsMetric();
         assertEquals(3, runsBytes.get(0).getIntValue());
         assertEquals(4, runsBytes.get(1).getIntValue());
         assertEquals(2, runsBytes.get(2).getIntValue());
+        assertEquals(3, bytes.getAverage());
     }
 }

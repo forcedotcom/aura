@@ -86,12 +86,13 @@ public final class PerfMetricsComparatorTest extends UnitTestCase {
         actual = collector.getMedianMetrics();
         message = comparator.compare(expected, actual);
         assertEquals(
-                "--> perf metric out of range: Network.bytes - expected 0, actual 3 [3 4 2] (allowed variability 20%)",
+                "--> perf metric out of range: Network.bytes - expected 0, actual 3 [3 4 2 |*:median-run average:3] (allowed variability 20%)",
                 message);
         actual = collector.getMedianRun();
         message = comparator.compare(expected, actual);
         assertEquals(
-                "--> perf metric out of range: Network.bytes - expected 0, actual 3 [3 4 2] (allowed variability 20%)",
+                "--> perf metric out of range: Network.bytes - expected 0, actual 3 [*3 4 2 |*:median-run average:3] (allowed variability 20%)",
                 message);
     }
+
 }

@@ -17,11 +17,14 @@ package org.auraframework.test.perf;
 
 import java.lang.reflect.Method;
 
-import org.auraframework.test.annotation.PerfTest;
-
 import junit.framework.TestCase;
 
+import org.auraframework.test.annotation.PerfTest;
+
 public final class PerfUtil {
+
+    // TODO: remove this once the chromedriver that supports profiling is released
+    public static final boolean MEASURE_JSCPU_METRICTS = System.getProperty("perf.measure.jscpu") != null;
 
     /**
      * @return true if the test has the @PerfTest annotation

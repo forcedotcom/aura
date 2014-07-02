@@ -68,7 +68,8 @@ public final class PerfRunsCollector {
             for (PerfMetrics run : allMetricsRuns) {
                 metricRuns.add(run.getNonnullMetric(metricName));
             }
-            medianRunMetrics.setMetric(new MedianPerfMetric(bestMatch.getNonnullMetric(metricName), metricRuns));
+            medianRunMetrics.setMetric(new MedianPerfMetric(bestMatch.getNonnullMetric(metricName), metricRuns,
+                    medianRunNumber));
         }
 
         // transfer info to the new metrics object that represents the median run
@@ -99,7 +100,7 @@ public final class PerfRunsCollector {
         List<PerfMetric> sortedRuns = Lists.newArrayList(runs);
         Collections.sort(sortedRuns);
         PerfMetric medianMetric = sortedRuns.get((runs.size() - 1) / 2);
-        return new MedianPerfMetric(medianMetric, runs);
+        return new MedianPerfMetric(medianMetric, runs, -1);
     }
 
     private Set<String> getAllMetricNamesSeen() {

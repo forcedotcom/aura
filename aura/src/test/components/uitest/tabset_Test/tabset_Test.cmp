@@ -16,17 +16,26 @@
 
 -->
 <aura:component>
-    <aura:attribute name="renderItem" type="String" default="all"/>
-    <aura:attribute name="lazyRender" type="Boolean" default="true"/>
-    <aura:attribute name="closable" type="Boolean" default="false"/>
+    <aura:attribute name="renderItem"      type="String" default="all"/>
+    <aura:attribute name="lazyRender"      type="Boolean" default="true"/>
+    <aura:attribute name="closable"        type="Boolean" default="false"/>
+    <aura:attribute name="conditionalShow" type="Boolean" default="true"/>
     
     <aura:if isTrue="{! v.renderItem == 'basic' || v.renderItem == 'all'}">
 	    <div class="block">    
 	        <h1 class="header">Basic Tabs</h1>
 	        <uitest:tabset_extendsTest aura:id="tabset2" class="tabset1" lazyRenderTabs="{!v.lazyRender}">
-	            <ui:tab title="Accounts" aura:id="inputForActivateByIndex" closable="{!v.closable}">
+	        	<aura:if isTrue="{!!v.conditionalShow}">
+	        		<ui:tab title="Dummy Tab" aura:id="inputForActivateByIndex" closable="{!v.closable}">
+	                   dummy content
+	            	</ui:tab>
+	            </aura:if>
+	        	<aura:if isTrue="{!v.conditionalShow}">
+	        		<ui:tab title="Accounts" aura:id="inputForActivateByIndex" closable="{!v.closable}">
 	                    tab 1 contents
-	            </ui:tab>
+	                </ui:tab>
+	        	</aura:if>
+	            
 	            <ui:tab title="Contacts" name="contacts" closable="{!v.closable}">
 	                    tab 2 contents
 	            </ui:tab> 

@@ -15,8 +15,11 @@
  */
 package org.auraframework.test.perf.core;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
+import java.io.Serializable;
+import java.net.URLEncoder;
+import java.util.Map;
+import java.util.logging.Logger;
+
 import org.auraframework.Aura;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.ComponentDef;
@@ -35,10 +38,8 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import java.io.Serializable;
-import java.net.URLEncoder;
-import java.util.Map;
-import java.util.logging.Logger;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 
 @TargetBrowsers({ BrowserType.GOOGLECHROME })
 public abstract class AbstractPerfTestCase extends WebDriverTestCase {
@@ -90,56 +91,62 @@ public abstract class AbstractPerfTestCase extends WebDriverTestCase {
     }
 
     protected final void runWithPerfApp(DefDescriptor<ComponentDef> descriptor) throws Exception {
-        currentAuraMode = isPerfRunForAuraStats ? Mode.STATS : Mode.PROD;
-        setupContext(currentAuraMode, AuraContext.Format.JSON, descriptor);
+        try {
+            Mode mode = isPerfRunForAuraStats ? Mode.STATS : Mode.PROD;
+            setupContext(mode, AuraContext.Format.JSON, descriptor);
 
-        String relativeUrl = "/perfTest/perf.app?";
-        Map<String, Object> attributeValues = getComponentAttributeValues(descriptor);
-        Map<String, Serializable> hash = ImmutableMap.of("componentDef", descriptor.getQualifiedName(), "attributes", ImmutableMap.of("values", attributeValues));
+            String relativeUrl = "/perfTest/perf.app?";
+            Map<String, Object> attributeValues = getComponentAttributeValues(descriptor);
+            Map<String, Serializable> hash = ImmutableMap.of("componentDef", descriptor.getQualifiedName(),
+                    "attributes",
+                    ImmutableMap.of("values", attributeValues));
 
+            relativeUrl += "aura.mode=" + mode;
+            relativeUrl += "#" + URLEncoder.encode(Json.serialize(hash), "UTF-8");
+            String url = getAbsoluteURI(relativeUrl).toString();
 
-        relativeUrl += "aura.mode=" + currentAuraMode;
-        relativeUrl += "#" + URLEncoder.encode(Json.serialize(hash), "UTF-8");
-        String url = getAbsoluteURI(relativeUrl).toString();
+            logger.info("testRun: " + url);
 
-        logger.info("testRun: " + url);
+            openTotallyRaw(url);
 
-        openTotallyRaw(url);
+            // wait for component loaded or aura error message
+            final By componentRendered = By.cssSelector("[data-app-rendered-component]");
+            final By auraErrorMessage = By.id("auraErrorMessage");
 
-        // wait for component loaded or aura error message
-        final By componentRendered = By.cssSelector("[data-app-rendered-component]");
-        final By auraErrorMessage = By.id("auraErrorMessage");
-
-        // don't use the AuraUITestingUtil wait that does extra checks/processing
-        ExpectedCondition<By> condition = new ExpectedCondition<By>() {
-            @Override
-            public By apply(WebDriver d) {
-                if (d.findElement(auraErrorMessage).isDisplayed()) {
-                    return auraErrorMessage;
-                }
-                if (d.findElement(componentRendered) != null) {
-                    // check for the case where both the componentRendered and auraErrorMessage are displayed
+            // don't use the AuraUITestingUtil wait that does extra checks/processing
+            ExpectedCondition<By> condition = new ExpectedCondition<By>() {
+                @Override
+                public By apply(WebDriver d) {
                     if (d.findElement(auraErrorMessage).isDisplayed()) {
                         return auraErrorMessage;
                     }
-                    return componentRendered;
+                    if (d.findElement(componentRendered) != null) {
+                        // check for the case where both the componentRendered and auraErrorMessage are displayed
+                        if (d.findElement(auraErrorMessage).isDisplayed()) {
+                            return auraErrorMessage;
+                        }
+                        return componentRendered;
+                    }
+                    return null;
                 }
-                return null;
-            }
-        };
-        By locatorFound = new WebDriverWait(currentDriver, 60).withMessage("Error loading " + descriptor).until(
-                condition);
+            };
+            By locatorFound = new WebDriverWait(currentDriver, 60).withMessage("Error loading " + descriptor).until(
+                    condition);
 
-        if (locatorFound == auraErrorMessage) {
-            fail("Error loading " + descriptor.getName() + ": " + currentDriver.findElement(auraErrorMessage).getText());
-        }
-
-        // check for internal errors
-        if (locatorFound == componentRendered) {
-            String text = currentDriver.findElement(componentRendered).getText();
-            if (text != null && text.contains("internal server error")) {
-                fail("Error loading " + descriptor.getDescriptorName() + ": " + text);
+            if (locatorFound == auraErrorMessage) {
+                fail("Error loading " + descriptor.getName() + ": "
+                        + currentDriver.findElement(auraErrorMessage).getText());
             }
+
+            // check for internal errors
+            if (locatorFound == componentRendered) {
+                String text = currentDriver.findElement(componentRendered).getText();
+                if (text != null && text.contains("internal server error")) {
+                    fail("Error loading " + descriptor.getDescriptorName() + ": " + text);
+                }
+            }
+        } finally {
+            Aura.getContextService().endContext();
         }
     }
 

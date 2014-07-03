@@ -60,9 +60,11 @@ public final class PerfMetrics {
                 }
             }
         }
-        combined.setDevToolsLog(devToolsLog);
-        combined.setJSProfilerData(jsProfilerData);
-        combined.setHeapSnapshot(heapSnapshot);
+        if (combined != null) {
+            combined.setDevToolsLog(devToolsLog);
+            combined.setJSProfilerData(jsProfilerData);
+            combined.setHeapSnapshot(heapSnapshot);
+        }
         return combined;
     }
 

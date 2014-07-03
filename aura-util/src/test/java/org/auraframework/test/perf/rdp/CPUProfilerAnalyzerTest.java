@@ -49,7 +49,7 @@ public final class CPUProfilerAnalyzerTest extends UnitTestCase {
         assertEquals(3076, metrics.getLong("timeRootMillis"));
 
         assertEquals(2, metrics.getLong("numIslands"));
-        assertEquals(4, metrics.getLong("maxDepth"));
+        assertEquals(1, metrics.getLong("maxDepth"));
     }
 
     public void testMaxDepthCollector() {

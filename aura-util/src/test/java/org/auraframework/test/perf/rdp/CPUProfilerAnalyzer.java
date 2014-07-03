@@ -226,8 +226,8 @@ public final class CPUProfilerAnalyzer {
     static class MaxDepthCollector {
         private final int[] values;
 
-        MaxDepthCollector(int maxToKeep) {
-            values = new int[maxToKeep];
+        MaxDepthCollector(int maxToAverage) {
+            values = new int[maxToAverage];
         }
 
         void add(int maxDepth) {

@@ -26,7 +26,7 @@
 <th>Max Value</th>
 <th>Total Value</th>
 </tr>
-<aura:foreach var="bean" items="{!v.beans}">
+<aura:iteration var="bean" items="{!v.beans}">
 <tr>
 <td class="name">{!bean.name}</td>
 <td>{!bean.mostRecentValue}</td>
@@ -35,6 +35,6 @@
 <td>{!bean.maxValue}</td>
 <td>{!bean.totalValue}</td>
 </tr>
-</aura:foreach>
+</aura:iteration>
 </table>
 </aura:component>

@@ -30,14 +30,14 @@ Size: {!v.registry.defs.length}
 <th>Class</th>
 <th>Location</th>
 </tr>
-<aura:foreach var="def" items="{!v.registry.defs}">
+<aura:iteration var="def" items="{!v.registry.defs}">
 <tr>
 <td class="deftype">{!def.type}</td>
 <td>{!def.descriptor}</td>
 <td>{!def.class}</td>
 <td>{!def.location}</td>
 </tr>
-</aura:foreach>
+</aura:iteration>
 </table>
 </aura:renderif>
 </aura:component>

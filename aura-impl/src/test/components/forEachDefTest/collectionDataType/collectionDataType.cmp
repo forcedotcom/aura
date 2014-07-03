@@ -22,17 +22,17 @@
     <br/>Advanced data type: Arguments to forEach as Values passed by top level component<br/>
     <!-- W-1065148 aura:forEach items="{!v.listofList}" var="i1">
         <forEachDefTest:forEachDefDisplay aura:id="listValueByRef" list="{!i1}"/>
-    </aura:forEach-->
-    <aura:forEach items="{!v.Objects}" var="i2">
+    </aura:iteration-->
+    <aura:iteration items="{!v.Objects}" var="i2">
         <forEachDefTest:forEachDefDisplay aura:id="objectValueByRef" obj="{!i2}"/>
-    </aura:forEach>
+    </aura:iteration>
 
     <br/>Advanced data type: Arguments to forEach as Values local to component<br/>
-    <aura:forEach items="{!m.listOfList}" var="i">
+    <aura:iteration items="{!m.listOfList}" var="i">
         <forEachDefTest:forEachDefDisplay aura:id="listValue" list="{!i}"/>
-    </aura:forEach>
-    <aura:forEach items="{!m.integerList}" var="i">
+    </aura:iteration>
+    <aura:iteration items="{!m.integerList}" var="i">
         <forEachDefTest:forEachDefDisplay aura:id="objectValue" obj="{!i}"/>
-    </aura:forEach>
+    </aura:iteration>
 
 </aura:component>

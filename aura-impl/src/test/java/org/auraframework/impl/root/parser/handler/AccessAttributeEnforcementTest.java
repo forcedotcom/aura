@@ -18,9 +18,7 @@ package org.auraframework.impl.root.parser.handler;
 
 import java.util.ArrayList;
 
-import org.auraframework.def.ComponentDef;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.Definition;
+import org.auraframework.def.*;
 import org.auraframework.impl.source.StringSourceLoader;
 import org.auraframework.system.Source;
 
@@ -228,16 +226,6 @@ public class AccessAttributeEnforcementTest extends
 
 			fail("Test failed with " + failures.size() + " errors:" + message);
 		}
-    }
-	
-	/**
-	 * Verify Creating a component with aura:foreach
-	 * @throws Exception
-	 */
-	public void testComponentWithForEach() throws Exception {
-		String resourceSource = "<aura:component><aura:attribute name='list' type='Object' /><aura:foreach items=\"{!v.list}\" var=\"i\">{!i}</aura:foreach></aura:component>";
-		String errorMessage = "No COMPONENT named markup://aura:foreach found";
-		runNegativeTestCase(resourceSource, errorMessage);		
     }
 	
 	/**

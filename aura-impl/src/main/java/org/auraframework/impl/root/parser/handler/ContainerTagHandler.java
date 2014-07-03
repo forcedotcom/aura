@@ -110,7 +110,7 @@ public abstract class ContainerTagHandler<T extends Definition> extends XMLHandl
 
     /**
      * called for every child tag that is encountered
-     * 
+     *
      * @throws QuickFixException
      */
     protected abstract void handleChildTag() throws XMLStreamException, QuickFixException;
@@ -123,7 +123,7 @@ public abstract class ContainerTagHandler<T extends Definition> extends XMLHandl
     /**
      * Override this to read in the attributes for the main tag this handler
      * handles
-     * 
+     *
      * @throws QuickFixException
      */
     protected void readAttributes() throws QuickFixException {
@@ -133,7 +133,7 @@ public abstract class ContainerTagHandler<T extends Definition> extends XMLHandl
     protected void readSystemAttributes() throws QuickFixException {
         // do nothing
     }
-    
+
     protected DefinitionAccess readAccessAttribute() throws InvalidAccessValueException {
         String access = getAttributeValue(ATTRIBUTE_ACCESS);
         if (access != null) {
@@ -179,7 +179,7 @@ public abstract class ContainerTagHandler<T extends Definition> extends XMLHandl
 
     /**
      * Create and return the definition
-     * 
+     *
      * @throws QuickFixException
      */
     protected abstract T createDefinition() throws QuickFixException;
@@ -192,8 +192,6 @@ public abstract class ContainerTagHandler<T extends Definition> extends XMLHandl
                 throw new AuraRuntimeException("script tags only allowed in templates", getLocation());
             }
             return new HTMLComponentDefRefHandler<P>(parentHandler, tag, xmlReader, source);
-        } else if (ForEachDefHandler.TAG.equalsIgnoreCase(tag)) {
-            return new ForEachDefHandler<P>(parentHandler, xmlReader, source);
         } else {
             String loadString = getSystemAttributeValue("load");
             if (loadString != null) {

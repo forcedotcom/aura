@@ -20,13 +20,13 @@
     <aura:attribute name="namespaces" type="List" required="true"/>
     <section>
         <h2>{!v.title}</h2>
-        <aura:forEach items="{!v.namespaces}" var="namespace">
+        <aura:iteration items="{!v.namespaces}" var="namespace">
             <h3 class="title">{!namespace.title}</h3>
             <ul class="nav nav-list">
-                <aura:forEach items="{!namespace.children}" var="def">
+                <aura:iteration items="{!namespace.children}" var="def">
                     <li><a href="{!'#'+def.name+'?defType='+def.defType}">{!def.title}</a></li>
-                </aura:forEach>
+                </aura:iteration>
             </ul>
-        </aura:forEach>
+        </aura:iteration>
     </section>
 </aura:component>

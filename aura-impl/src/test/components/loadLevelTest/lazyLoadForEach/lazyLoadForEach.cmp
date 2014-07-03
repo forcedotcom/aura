@@ -16,7 +16,7 @@
 
 -->
 <aura:component model="java://org.auraframework.impl.loadLevel.SluggishServerModel" render='client'>
-    <aura:forEach items="{!m.stringList}" var="i">
+    <aura:iteration items="{!m.stringList}" var="i">
         <forEachDefTest:forEachDefDisplay aura:id="stringValue" string="{!i}" aura:load='lazy'/>
-    </aura:forEach>
+    </aura:iteration>
 </aura:component>

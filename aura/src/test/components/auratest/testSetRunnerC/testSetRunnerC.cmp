@@ -47,7 +47,7 @@
     <th>Exception</th>
     </thead>
     <tbody>
-    <aura:foreach items="{!m.testsWithProps}" var="t">
+    <aura:iteration items="{!m.testsWithProps}" var="t">
         <tr class="{!t.status + ' ' + t.isHidden}">
         <td >
         <aura:renderIf isTrue="{!t.jsConsole != ''}">
@@ -63,7 +63,7 @@
         <td>{!t.status}</td>
         <td><pre>{!t.exception}</pre></td>
         </tr>
-    </aura:foreach>
+    </aura:iteration>
     </tbody>
     </table>
      </div>

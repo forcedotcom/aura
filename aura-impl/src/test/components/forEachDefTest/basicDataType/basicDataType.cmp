@@ -21,26 +21,26 @@
     <aura:attribute name="bool" type="Boolean[]"/>
 
     <br/>Arguments to forEach as Values passed by top level component<br/>
-    <aura:forEach items="{!v.string}" var="i">
+    <aura:iteration items="{!v.string}" var="i">
         <forEachDefTest:forEachDefDisplay aura:id="stringValueByRef" string="{!i}"/>
-    </aura:forEach>
-    <aura:forEach items="{!v.number}" var="i">
+    </aura:iteration>
+    <aura:iteration items="{!v.number}" var="i">
         <forEachDefTest:forEachDefDisplay aura:id="numberValueByRef" number="{!i}"/>
-    </aura:forEach>
-    <aura:forEach items="{!v.bool}" var="i">
+    </aura:iteration>
+    <aura:iteration items="{!v.bool}" var="i">
         <forEachDefTest:forEachDefDisplay aura:id="booleanValueByRef" bool="{!i}"/>
-    </aura:forEach>
+    </aura:iteration>
 
 
     <br/>Arguments to forEach as Values local to component<br/>
-    <aura:forEach items="{!m.stringList}" var="i" >
+    <aura:iteration items="{!m.stringList}" var="i" >
         <forEachDefTest:forEachDefDisplay aura:id="stringValue" string="{!i}"/>
-    </aura:forEach>
-    <aura:forEach items="{!m.integerList}" var="i">
+    </aura:iteration>
+    <aura:iteration items="{!m.integerList}" var="i">
         <forEachDefTest:forEachDefDisplay aura:id="numberValue" number="{!i}"/>
-    </aura:forEach>
-    <aura:forEach items="{!m.booleanList}" var="i">
+    </aura:iteration>
+    <aura:iteration items="{!m.booleanList}" var="i">
         <forEachDefTest:forEachDefDisplay aura:id="booleanValue" bool="{!i}"/>
-    </aura:forEach>
+    </aura:iteration>
 
 </aura:component>

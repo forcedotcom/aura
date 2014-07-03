@@ -16,12 +16,12 @@
 
 -->
 <aura:component model="java://org.auraframework.docs.TopicsModel">
-        <aura:forEach items="{!m.components}" var="namespace">
+        <aura:iteration items="{!m.components}" var="namespace">
             {!namespace.title}<br/>
             <ul>
-                <aura:forEach items="{!namespace.children}" var="component">
+                <aura:iteration items="{!namespace.children}" var="component">
                     <li>{!component.title}</li>
-                </aura:forEach>
+                </aura:iteration>
             </ul>
-        </aura:forEach>
+        </aura:iteration>
 </aura:component>

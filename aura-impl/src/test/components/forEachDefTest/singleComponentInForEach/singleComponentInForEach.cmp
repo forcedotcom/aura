@@ -16,7 +16,7 @@
 
 -->
 <aura:component>
-<aura:foreach items="{!v.body}" var="comp">
+<aura:iteration items="{!v.body}" var="comp">
 {!comp}
-</aura:foreach>
+</aura:iteration>
 </aura:component>

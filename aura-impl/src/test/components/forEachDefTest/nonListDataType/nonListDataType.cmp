@@ -16,7 +16,7 @@
 
 -->
 <aura:component  render="client" model="java://org.auraframework.impl.java.model.TestJavaModel">
-    <aura:forEach items="{!m.string}" var="i">
+    <aura:iteration items="{!m.string}" var="i">
         <forEachDefTest:forEachDefDisplay string="{!i}"/>
-    </aura:forEach>
+    </aura:iteration>
 </aura:component>

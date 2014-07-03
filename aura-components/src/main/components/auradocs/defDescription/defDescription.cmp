@@ -17,12 +17,12 @@
 -->
 <aura:component extensible="true">
     <aura:attribute name="descriptions" type="Object"/>
-    
+
     <h3>Description</h3>
-   
+
    	<div class="bordered">
-  	<aura:foreach items="{!v.descriptions}" var="desc">
+  	<aura:iteration items="{!v.descriptions}" var="desc">
 		<aura:unescapedHtml value="{!desc}"/>
-    </aura:foreach>
+    </aura:iteration>
     </div>
 </aura:component>

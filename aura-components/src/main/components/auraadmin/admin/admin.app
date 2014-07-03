@@ -34,9 +34,9 @@ Caches
 <p>
 Non-caching Registries
 <br/>
-<aura:foreach var="reg" items="{!m.registryData}">
+<aura:iteration var="reg" items="{!m.registryData}">
 <auraadmin:registryView registry="{!reg}"/>
-</aura:foreach>
+</aura:iteration>
 </p>
 
 <p>

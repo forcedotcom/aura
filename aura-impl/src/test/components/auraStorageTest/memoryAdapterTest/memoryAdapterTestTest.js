@@ -35,8 +35,8 @@
 			});
 			// the key and object have 23 characters + 2 associative array
 			// entries
-			// the expected number of bytes is: (23 * 2) + (2 * 8) = 62
-			$A.test.assertEquals(62, this.adapter.getSize());
+			// the expected number of bytes is: 30 + (23 * 2) + (2 * 8) = 92
+			$A.test.assertEquals(92, this.adapter.getSize());
 		}
 	},
 
@@ -91,9 +91,9 @@
 				}
 			});
 			// the key and object have 23 characters + 2 associative array
-			// entries
-			// the expected number of bytes is: (23 * 2) + (2 * 8) = 62
-			$A.test.assertEquals(62, this.adapter.getSize());
+			// entries, and one object overhead
+			// the expected number of bytes is: (23 * 2) + (2 * 8) + 34 = 96
+			$A.test.assertEquals(92, this.adapter.getSize());
 
 			this.adapter.setItem("key1", {
 				"value" : {
@@ -105,7 +105,7 @@
 			// new object has one boolean + 28 characters + 3 associative array
 			// entries
 			// the expected number of bytes is: 4 + (28 * 2) + (3 * 8) = 84
-			$A.test.assertEquals(84, this.adapter.getSize());
+			$A.test.assertEquals(84+30, this.adapter.getSize());
 		}
 	},
 
@@ -140,7 +140,7 @@
 				}
 			});
 
-			$A.test.assertEquals(250, this.adapter.getSize());
+			$A.test.assertEquals(250+30*4, this.adapter.getSize());
 		}
 	},
 
@@ -159,11 +159,11 @@
 					"gamma" : "kappa"
 				}
 			});
-			$A.test.assertEquals(124, this.adapter.getSize());
+			$A.test.assertEquals(184, this.adapter.getSize());
 
 			this.adapter.removeItem("key1");
 			// removing the key, removes it from this.storage
-			$A.test.assertEquals(62, this.adapter.getSize());
+			$A.test.assertEquals(92, this.adapter.getSize());
 
 			// adding a new key, new size of object. 64 bytes
 			this.adapter.setItem("key1", {
@@ -172,7 +172,7 @@
 					"gamma" : "zeta"
 				}
 			});
-			$A.test.assertEquals(128, this.adapter.getSize());
+			$A.test.assertEquals(188, this.adapter.getSize());
 		}
 	},
 
@@ -186,7 +186,7 @@
 				}
 			});
 			var size1 = adapter.getSize();
-			$A.test.assertEquals(532, size1);
+			$A.test.assertEquals(532+30, size1);
 			$A.test.assertEquals("key1", adapter.getMRU().toString());
 
 			adapter.setItem("key2", {
@@ -195,7 +195,7 @@
 				}
 			});
 			var size2 = adapter.getSize();
-			$A.test.assertEquals(1576, size2);
+			$A.test.assertEquals(1576+30*2, size2);
 			$A.test.assertEquals("key1,key2", adapter.getMRU().toString());
 		}, function(cmp) {
 			var adapter = this.adapter;
@@ -226,7 +226,7 @@
 
 					return itemWasEvicted;
 				}, function(cmp) {
-					$A.test.assertEquals(3552, adapter.getSize());
+					$A.test.assertEquals(3552+30*2, adapter.getSize());
 					$A.test.assertEquals("key1,key3", adapter.getMRU().toString());
 				});
 			});
@@ -242,7 +242,7 @@
 				}
 			});
 			var size1 = adapter.getSize();
-			$A.test.assertEquals(4020, size1);
+			$A.test.assertEquals(4020+30, size1);
 			$A.test.assertEquals("key4", adapter.getMRU().toString());
 		} ]
 	},

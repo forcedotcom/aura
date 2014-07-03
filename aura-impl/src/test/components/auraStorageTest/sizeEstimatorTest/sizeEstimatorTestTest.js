@@ -64,7 +64,7 @@
 			
 			// 6 nested keys + 3 nested array elements + 1 number + 53 explicit string characters 
 			// 6*8 + 3*(8+8) + 1*8 + 2*53 
-			$A.test.assertEquals(210, this.estimateSize(team));
+			$A.test.assertEquals(210+30*2, this.estimateSize(team));
 		}
 	},
 	

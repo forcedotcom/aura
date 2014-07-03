@@ -31,33 +31,91 @@ SizeEstimator.prototype.CHARACTER_SIZE = 2;
 SizeEstimator.prototype.NUMBER_SIZE = 8;
 // note: this value is not defined by the spec.
 SizeEstimator.prototype.BOOLEAN_SIZE = 4;
+SizeEstimator.prototype.POINTER_SIZE = 8;
 
-SizeEstimator.prototype.estimateSize = function(value) {
+SizeEstimator.prototype.hasOwnProperty = Object.prototype.hasOwnProperty;
+
+SizeEstimator.prototype.estimateSize = function(value, cheater) {
     var bytes = 0;
+    var type = typeof value;
 
-    if ($A.util.isBoolean(value)) {
+    if (value === null || value === undefined) {
+        bytes = 0;
+    } else if (type === 'boolean') {
         bytes = this.BOOLEAN_SIZE;
-    } else if ($A.util.isString(value)) {
+    } else if (type === 'string') {
         bytes = this.sizeOfString(value);
-    } else if ($A.util.isNumber(value)) {
+    } else if (type === 'number') {
         bytes = this.NUMBER_SIZE;
-    } else if ($A.util.isArray(value)) {
-        for (var i = 0; i < value.length; i++) {
-            bytes += this.NUMBER_SIZE; //the index
-            bytes += 8; // an assumed existence overhead
-            bytes += this.estimateSize(value[i]);
-        }
-    } else if ($A.util.isObject(value)) {
-        // recursive case
-        for (var j in value) {
-            if (value.hasOwnProperty(j)) {
-                bytes += this.sizeOfString(j);
-                bytes += 8; // an assumed existence overhead
-                bytes += this.estimateSize(value[j]);
+    } else if (type === 'object') {
+        if ($A.util.isArray(value)) {
+            //
+            // We recurse here, and we use a cheat to avoid too
+            // much overhead in detecting cycles. Since we can
+            // only cycle using either objects or arrays, objects
+            // are the easy case handled below. Arrays then can
+            // only create a cycle without an object if it is
+            // pure arrays. So we track array->array->...
+            //
+            if (cheater && $A.util.isArray(cheater)) {
+                for (var j = 0; j < cheater.length; j++) {
+                    if (value === cheater[j]) {
+                        // bomb out, this is simply broken code.
+                        return 0;
+                    }
+                }
+            } else {
+                cheater = [];
             }
+            cheater.push(value);
+            for (var i = 0; i < value.length; i++) {
+                bytes += this.NUMBER_SIZE; //the index
+                bytes += 8; // an assumed existence overhead
+                bytes += this.estimateSize(value[i], cheater);
+            }
+            cheater.pop();
+        } else {
+            //
+            // recursive case Be careful here, we have to mark as we go to
+            // prevent cycles from crashing us. However, this actually distorts
+            // our measurement by adding more stuff to every object. We could
+            // not count it and use 'delete' below, but that is both slower,
+            // and sometimes just wrong. So, well, life goes on.
+            //
+            if (value['__es_mark__'] !== undefined) {
+                //
+                // There is an exploit here, but I think it doesn't
+                // matter so much. We will mis-estimate the size if
+                // someone deliberatly puts an __es_mark__ in their
+                // object.
+                //
+                return this.POINTER_SIZE;
+            }
+            // This adds 34 to the object size.
+            value['__es_mark__'] = true;
+            for (var j in value) {
+                if (SizeEstimator.prototype.hasOwnProperty.call(value, j)) {
+                    bytes += this.sizeOfString(j);
+                    bytes += 8; // an assumed existence overhead
+                    bytes += this.estimateSize(value[j]);
+                }
+            }
+            //
+            // there is a slim chance that we could have an exception
+            // in there somewhere, but I think it doesn't matter, at
+            // that point we are hosed anyway, and really, it should
+            // never happen.
+            //
+            value['__es_mark__'] = undefined;
+            // take off the boolean, but count the object overhead of 30...
+            bytes -= 4;
         }
+    } else if (type === 'function') {
+        // uh-oh. This is likely wrong.
+        bytes = this.POINTER_SIZE;
+    } else {
+        bytes = this.POINTER_SIZE;
     }
-
     return bytes;
 };
 

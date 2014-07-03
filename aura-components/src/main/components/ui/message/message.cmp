@@ -19,7 +19,7 @@
     <aura:attribute name="title" type="String" description="The title text for the message."/>
     <aura:attribute name="severity" type="String" default="message" description="The severity of the message. Possible values:  message (default), confirm, info, warning, error"/>
     <aura:attribute name="closable" type="Boolean" default="false" description="Specifies whether to display an 'x' that will close the alert when clicked. Default value is 'false'."/>
-    <div class="{!v.severity +' '+ v.class}" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="{!v.severity +' '+ v.class}" role="alert">
         <ui:block>
             <aura:set attribute="right">
                 <aura:renderif isTrue="{!v.closable}">

@@ -18,96 +18,96 @@
     browsers:["-IE7","-IE8"],
     
     runTest : function(expected, errorMessage, element){
-	var output    = $A.devToolService.checkAccessibility(element);
-	var actual   =  output.split("\n")[0];
-	$A.test.assertEquals(expected, actual , errorMessage+output);
+		var output    = $A.devToolService.checkAccessibility(element);
+		var actual   =  output.split("\n")[0];
+		$A.test.assertEquals(expected, actual , errorMessage+output);
     },
     testWithNoHeader:{
-	attributes : {caseToRender : 'testWithNoHeader'},	
-	test: function(cmp){
-	        this.runTest("", "Unexpected return from CheckAccessibility, should not return errornous string. output: \n");
-	}
+		attributes : {caseToRender : 'testWithNoHeader'},	
+		test: function(cmp){
+		        this.runTest("", "Unexpected return from CheckAccessibility, should not return errornous string. output: \n");
+		}
     },
     testThWithScopeNoTD:{
-	attributes : {caseToRender : 'testThWithScopeNoTD'},	
-	test: function(cmp){
-	    this.runTest("", "Unexpected return from CheckAccessibility, should not return errornous string. output: \n");
-	}
+		attributes : {caseToRender : 'testThWithScopeNoTD'},	
+		test: function(cmp){
+		    this.runTest("", "Unexpected return from CheckAccessibility, should not return errornous string. output: \n");
+		}
     },
     testThWithIdNoTD:{
-	attributes : {caseToRender : 'testThWithIdNoTD'},	
-	test: function(cmp){
-	    this.runTest("", "Unexpected return from CheckAccessibility, should not return errornous string. output: \n");
-	}
+		attributes : {caseToRender : 'testThWithIdNoTD'},	
+		test: function(cmp){
+		    this.runTest("", "Unexpected return from CheckAccessibility, should not return errornous string. output: \n");
+		}
     },
     testTableHeaderWithScope:{
-	attributes : {caseToRender : 'testTableHeaderWithScope'},	
-	test: function(cmp){
-	    this.runTest("", "Unexpected return from CheckAccessibility, should not return errornous string. output: \n");
-	}
+		attributes : {caseToRender : 'testTableHeaderWithScope'},	
+		test: function(cmp){
+		    this.runTest("", "Unexpected return from CheckAccessibility, should not return errornous string. output: \n");
+		}
     },
     testTHandTDtagsAssociateCorrectly:{
-	attributes : {caseToRender : 'testTHandTDtagsAssociateCorrectly'},	
-	test: function(cmp){
-	    this.runTest("", "Unexpected return from CheckAccessibility, should not return errornous string. output: \n");
-	}
+		attributes : {caseToRender : 'testTHandTDtagsAssociateCorrectly'},	
+		test: function(cmp){
+		    this.runTest("", "Unexpected return from CheckAccessibility, should not return errornous string. output: \n");
+		}
     }, 
     testTDUsesWrongID:{
-	attributes : {caseToRender : 'testTDUsesWrongID'},	
-	test: function(cmp){
-		 this.runTest("Total Number of Errors found: 1", "Unexpected return from CheckAccessibility, should return 1 error. output: \n");
-	}
+		attributes : {caseToRender : 'testTDUsesWrongID'},	
+		test: function(cmp){
+			 this.runTest("Total Number of Errors found: 1", "Unexpected return from CheckAccessibility, should return 1 error. output: \n");
+		}
     },
     testTDWithOutHeaderAttrib:{
-	attributes : {caseToRender : 'testTDWithOutHeaderAttrib'},	
-	test: function(cmp){        	
-	    this.runTest("Total Number of Errors found: 1", "Unexpected return from CheckAccessibility, should return 1 error. output: \n");
-	}
+		attributes : {caseToRender : 'testTDWithOutHeaderAttrib'},	
+		test: function(cmp){        	
+		    this.runTest("Total Number of Errors found: 1", "Unexpected return from CheckAccessibility, should return 1 error. output: \n");
+		}
     },
     testTableHeaderWoID:{
-	attributes : {caseToRender : 'testTableHeaderWoID'},	
-	test: function(cmp){    
-	    this.runTest("Total Number of Errors found: 1", "Unexpected return from CheckAccessibility, should return 1 error. output: \n");
-	}
+		attributes : {caseToRender : 'testTableHeaderWoID'},	
+		test: function(cmp){    
+		    this.runTest("Total Number of Errors found: 1", "Unexpected return from CheckAccessibility, should return 1 error. output: \n");
+		}
     },
     testTableHeadersWandWoScope:{
-	attributes : {caseToRender : 'testTableHeadersWandWoScope'},	
-	test: function(cmp){    
-	    this.runTest("Total Number of Errors found: 1", "Unexpected return from CheckAccessibility, should return 1 error. output: \n");
-	}
+		attributes : {caseToRender : 'testTableHeadersWandWoScope'},	
+		test: function(cmp){    
+		    this.runTest("Total Number of Errors found: 1", "Unexpected return from CheckAccessibility, should return 1 error. output: \n");
+		}
     },
     testThNoWoScope:{
-	attributes : {caseToRender : 'testThNoWoScope'},	
-	test: function(cmp){    
-	    this.runTest("Total Number of Errors found: 1", "Unexpected return from CheckAccessibility, should return 1 error. output: \n");
-	}
+		attributes : {caseToRender : 'testThNoWoScope'},	
+		test: function(cmp){    
+		    this.runTest("Total Number of Errors found: 1", "Unexpected return from CheckAccessibility, should return 1 error. output: \n");
+		}
     },
     testScopeWithWrongVal:{
-	attributes : {caseToRender : 'testScopeWithWrongVal'},	
-	test: function(cmp){    	    	
-	    this.runTest("Total Number of Errors found: 1", "Unexpected return from CheckAccessibility, should return 1 error. output: \n");
-	}
+		attributes : {caseToRender : 'testScopeWithWrongVal'},	
+		test: function(cmp){    	    	
+		    this.runTest("Total Number of Errors found: 1", "Unexpected return from CheckAccessibility, should return 1 error. output: \n");
+		}
     },
     testFieldSetsWStyle:{
-	attributes : {caseToRender : 'fieldSetWithStyles'},	
-	test: function(cmp){    
-	    	cmp.get("field_set_W_style_and_legend").getElement().style.display="none";
-	    	cmp.get("field_set_field_style_no_legend").getElement().style.display="none";
-	    	
-	    	this.runTest("Total Number of Errors found: 2", "Unexpected return from CheckAccessibility, should return 2 error. output: \n");
-	}
+		attributes : {caseToRender : 'fieldSetWithStyles'},	
+		test: function(cmp){    
+				cmp.find("field_set_W_style_and_legend").getElement().style.display="none";
+		    	cmp.find("field_set_field_style_no_legend").getElement().style.display="none";
+		    	
+		    	this.runTest("Total Number of Errors found: 2", "Unexpected return from CheckAccessibility, should return 2 error. output: \n");
+		}
     },
     testButtonLabelValid:{
-	attributes : {caseToRender : 'buttonLabelValid'},
-	test: function(cmp){
-	    this.runTest("Total Number of Errors found: 3", "Unexpected return from CheckAccessibility, should return 3 error. output: \n");
-	}
+		attributes : {caseToRender : 'buttonLabelValid'},
+		test: function(cmp){
+		    this.runTest("Total Number of Errors found: 3", "Unexpected return from CheckAccessibility, should return 3 error. output: \n");
+		}
     },
     testImageTagTest:{
-	attributes : {caseToRender : 'imageTagTest'},
-	test: function(cmp){
-		this.runTest("Total Number of Errors found: 9","Unexpected return from CheckAccessibility, should not return errornous string. output: \n" );
-	}
+		attributes : {caseToRender : 'imageTagTest'},
+		test: function(cmp){
+			this.runTest("Total Number of Errors found: 9","Unexpected return from CheckAccessibility, should not return errornous string. output: \n" );
+		}
     },
     testHeadersCorrectOrder:{
 		attributes : {caseToRender : 'headersCorrectOrder'},
@@ -182,7 +182,7 @@
     testLabels:{
 		attributes : {caseToRender : 'labelTest'},
 		test: function(cmp){
-		    this.runTest("", "Unexpected return from CheckAccessibility, should not return errornous string. output: \n");
+			this.runTest("", "Unexpected return from CheckAccessibility, should not return errornous string. output: \n");
 		}
     },
     
@@ -208,13 +208,13 @@
     },
 
     testUseSpecificDomElement:{
-	attributes : {caseToRender : 'full'},
-	test: [function(cmp){
-	        this.runTest("Total Number of Errors found: 4", "Unexpected return from CheckAccessibility, should return 4 error. output: \n", document.getElementById("table1"));
-	},
-	function(cmp){
-	        this.runTest("Total Number of Errors found: 2", "Unexpected return from CheckAccessibility, should return 2 error. output: \n", document.getElementById("field_set"));
-	}]
+		attributes : {caseToRender : 'full'},
+		test: [function(cmp){
+		        this.runTest("Total Number of Errors found: 4", "Unexpected return from CheckAccessibility, should return 4 error. output: \n", document.getElementById("table1"));
+		},
+		function(cmp){
+		        this.runTest("Total Number of Errors found: 2", "Unexpected return from CheckAccessibility, should return 2 error. output: \n", document.getElementById("field_set"));
+		}]
 	
      },
      
@@ -225,7 +225,7 @@
 		}
      },
      testSkipVisualForceIframes : {
-	 attributes : {caseToRender : 'skipIframeForVisForce'},
+    	 attributes : {caseToRender : 'skipIframeForVisForce'},
 		test: function(cmp){
 		    this.runTest("Total Number of Errors found: 1", "Unexpected return from CheckAccessibility, should return 1 error. output: \n");
 		}

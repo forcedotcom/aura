@@ -28,20 +28,22 @@
         	totalOutputURLComponentsInDOM  = queryString.query().groups['markup://ui:outputURL'];
         	
         	if(totalScrollerComponentsInDOM && totalOutputURLComponentsInDOM){
-        		aura.test.assertEquals(2, totalScrollerComponentsInDOM.length);
-        		aura.test.assertEquals(500, totalOutputURLComponentsInDOM.length);
+        		$A.test.assertEquals(2, totalScrollerComponentsInDOM.length);
+        		$A.test.assertEquals(500, totalOutputURLComponentsInDOM.length);
         	}
         	else{
-        		aura.test.assert(false, "DOM query returned empty.");
+        		$A.test.assert(false, "DOM query returned empty.");
         	}
-        	destroyed = $A.getRoot().find("scrollContainer").getValue("v.body").remove(0).destroy();
-        	
-        	aura.test.addWaitFor(destroyed, function(){return "7:2.a";}, function(){
+        	var body = $A.getRoot().find("scrollContainer").get("v.body");
+        	var toDestroy = body.splice(0,1);
+        	$A.getRoot().find("scrollContainer").set("v.body", body);
+        	destroyed = toDestroy[0].destroy();
+        	$A.test.addWaitFor(destroyed, function(){return "7:2.a";}, function(){
         		totalScrollerComponentsInDOM  = queryString.query().groups['markup://ui:scroller'];
             	totalOutputURLComponentsInDOM  = queryString.query().groups['markup://ui:outputURL'];
             	
-            	aura.test.assertUndefined(totalScrollerComponentsInDOM);
-            	aura.test.assertUndefined(totalOutputURLComponentsInDOM);
+            	$A.test.assertUndefined(totalScrollerComponentsInDOM);
+            	$A.test.assertUndefined(totalOutputURLComponentsInDOM);
         	});
         }
 	}

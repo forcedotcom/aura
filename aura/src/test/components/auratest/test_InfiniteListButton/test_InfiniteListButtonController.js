@@ -15,9 +15,10 @@
  */
 ({
     toggle: function (cmp) {
-        var isClosed = cmp.getValue('v.item.isClosed');
-        isClosed.setValue(!isClosed.getValue());
+    	var item = cmp.get('v.item');
+        item["isClosed"] = !item["isClosed"];  
+        cmp.set('v.item', item);
 
-        $A.log('setting to  ' + isClosed.getValue())
+        $A.log('setting to  ' + item["isClosed"])
     }
 })

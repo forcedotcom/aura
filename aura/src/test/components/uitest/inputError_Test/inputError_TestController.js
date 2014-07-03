@@ -27,10 +27,8 @@
 	        } else {
 	        	var errors = action.getError();
 	        	var inputCmp = component.find("inputCmp");
-	    		var value = inputCmp.getValue("v.value");
-	        	
-	        	value.setValid(false);
-                value.addErrors(errors);
+	    		inputCmp.setValid("v.value", false);
+                inputCmp.addErrors("v.value", errors);
                 
                 component.find("outputStatus").set("v.value", "Got Error");
 	        }
@@ -40,28 +38,28 @@
 	},
 	
 	doErrorNoEventFire : function(component) {
-		var value = component.find("inputCmp").getValue("v.value");
-		value.setValid(false);
-		value.addErrors([{message:"Error Happens!"}]);
+		var inputCmp = component.find("inputCmp");
+		inputCmp.setValid("v.value", false);
+		inputCmp.addErrors("v.value", [{message:"Error Happens!"}]);
 		component.find("outputStatus").set("v.value", "Got Error");
 	},
 	
 	clearErrorNoEventFire : function(component) {
-		var value = component.find("inputCmp").getValue("v.value");
-	    value.setValid(true);
-	   	component.find("outputStatus").set("v.value", "Cleared error");
+		var inputCmp = component.find("inputCmp");
+		inputCmp.setValid("v.value", true);
+		component.find("outputStatus").set("v.value", "Cleared error");
 	},
 	
 	doErrorNoErrorMsg : function(component) {
-		var value = component.find("inputCmp").getValue("v.value");
-		value.setValid(false);
+		var inputCmp = component.find("inputCmp");
+		inputCmp.setValid("v.value", false);
 		component.find("outputStatus").set("v.value", "Got Error");
 	},
 	
 	clearErrorNullErrorMsg : function(component) {
-		var value = component.find("inputCmp").getValue("v.value");
-	    value.setValid(true);
-	    value.addErrors(null);
+		var inputCmp = component.find("inputCmp");
+		inputCmp.setValid("v.value", true);
+		inputCmp.addErrors("v.value", null);
 	   	component.find("outputStatus").set("v.value", "Cleared error");
 	}
 })

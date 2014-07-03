@@ -22,14 +22,14 @@
         },
 
         test: function(component){
-            aura.test.assertEquals("a1Provider", component.get("v.a1"), "a1 should have been overriden by provider");
-            aura.test.assertTrue(component.get("v.a2")===undefined, "a2 should have been made undefined by provider");
-            aura.test.assertEquals("b1Provider", component.get("v.b1"), "b1 should have been set by provider");
-            aura.test.assertEquals("aura", component.get("v.value"), "value should have been passed through");
+        	$A.test.assertEquals("a1Provider", component.get("v.a1"), "a1 should have been overriden by provider");
+            $A.test.assertUndefined(component.get("v.a2"), "a2 should have been made undefined by provider");
+            $A.test.assertEquals("b1Provider", component.get("v.b1"), "b1 should have been set by provider");
+            $A.test.assertEquals("aura", component.get("v.value"), "value should have been passed through");
 
             // using something order than a simple string
-            aura.test.assertEquals("ar1Provider1", component.getValue("v.ar1").get(1), "ar1 should have been set by provider");
-            aura.test.assertTrue(component.get("v.b2")===undefined, "b2 should have been undefined");
+            $A.test.assertEquals("ar1Provider1", component.get("v.ar1")[1], "ar1 should have been set by provider");
+            $A.test.assertUndefined(component.get("v.b2"), "b2 should have been undefined");
 
             $A.test.assertEquals("aura [value]", $A.test.getText(component.find("value").getElement()));
 

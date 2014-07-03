@@ -28,19 +28,18 @@
 	        a.setCallback(component, function(action){
 	        	var retValue;
 				var inputCmp = $A.getRoot().getSuper().getConcreteComponent().find(cmpType);
-				var value = inputCmp.getValue("v.value");
-		      	
+				
 		        if (action.getState() === "SUCCESS") {
 		        	retValue = action.getReturnValue();
 		        	
 		        	// clean error
-		        	if (!value.isValid()) {
-		        		value.setValid(true);
+		        	if (!inputCmp.isValid("v.value")) {
+		        		inputCmp.setValid("v.value",true);
 		        	}
 		        } else {
 		        	retValue = "Got Error!";
-		        	value.setValid(false);
-		        	value.addErrors(action.getError());
+		        	inputCmp.setValid("v.value", false);
+		        	inputCmp.addErrors("v.value", action.getError());
 		        }
 		        component.find("outputValue").set("v.value", retValue);
 	        });

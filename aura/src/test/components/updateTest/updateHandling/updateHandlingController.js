@@ -15,7 +15,6 @@
  */
 ({
     handleUpdate:function(c,e,h){
-        var txt = c.getSuper().getValue("v.text");
-        txt.setValue(txt.unwrap() + " properly");
+    	c.getSuper().set("v.text", c.getSuper().get("v.text")+" properly");
     }
 })

@@ -32,7 +32,7 @@
 	
 	fireInline: function(cmp, event, helper) {
 		var list = cmp.find("list");
-		var providers = list.getValue("v.dataProvider");
-		providers.get(3).get("e.provide").fire();
+		var providers = list.get("v.dataProvider");
+		providers[3].get("e.provide").fire();
 	}
 })

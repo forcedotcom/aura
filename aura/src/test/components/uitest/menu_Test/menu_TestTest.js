@@ -154,9 +154,9 @@
 				menuLabel = cmp.find("iterationTrigger");
 				radioMenu = cmp.find("iterationRadioMenu");
 				ouptutButton = cmp.find("radioIterationButton");
-				menuItems = radioMenu.getValue("v.childMenuItems");
-				item1 = menuItems.getValue(1);
-				item2 = menuItems.getValue(2);
+				menuItems = radioMenu.get("v.childMenuItems");
+				item1 = menuItems[1];
+				item2 = menuItems[2];
 				
 				menuLabel.get("e.click").fire();
 				//check if menu is visible

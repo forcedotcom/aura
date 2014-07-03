@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.auraframework.test.UnitTestCase;
+import org.auraframework.test.perf.rdp.CPUProfilerAnalyzer.MaxDepthCollector;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -49,6 +50,28 @@ public final class CPUProfilerAnalyzerTest extends UnitTestCase {
 
         assertEquals(2, metrics.getLong("numIslands"));
         assertEquals(4, metrics.getLong("maxDepth"));
+    }
+
+    public void testMaxDepthCollector() {
+        // 1 6 2 5 3 4 ==> 5
+        MaxDepthCollector collector = new MaxDepthCollector(3);
+        collector.add(1);
+        collector.add(6);
+        collector.add(2);
+        collector.add(5);
+        collector.add(3);
+        collector.add(4);
+        assertEquals(5, collector.getAverage());
+
+        // 6 7 6 7 6 6 ==> 7
+        collector = new MaxDepthCollector(3);
+        collector.add(6);
+        collector.add(7);
+        collector.add(6);
+        collector.add(7);
+        collector.add(6);
+        collector.add(6);
+        assertEquals(7, collector.getAverage());
     }
 
     //

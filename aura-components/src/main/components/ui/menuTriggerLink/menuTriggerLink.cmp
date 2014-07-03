@@ -17,5 +17,12 @@
 -->
 <aura:component extensible="true" extends="ui:menuTrigger" description="A link that triggers a dropdown menu." support="GA">
     <aura:attribute name="title" type="String" default="" description="The text to display as a tooltip when the mouse pointer hovers over this component."/>
-    <a aura:id="link" class="{!v.class}" title="{!v.title}">{!v.label}</a>
+    <a aura:id="link" class="{!v.class}" title="{!v.title}">
+        <aura:if isTrue="{!v.body.length == 0}">
+            {!v.label}
+            <aura:set attribute="else">
+                {!v.body}
+            </aura:set>
+        </aura:if>
+    </a> 
 </aura:component>

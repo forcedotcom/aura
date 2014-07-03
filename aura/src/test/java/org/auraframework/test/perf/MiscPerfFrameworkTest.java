@@ -38,7 +38,12 @@ public final class MiscPerfFrameworkTest extends AbstractPerfTestCase {
 
     @Override
     protected int numPerfTimelineRuns() {
-        return 0; // only run once (the first functional run)
+        return 0; // run only the first warmup run
+    }
+
+    @Override
+    protected int numPerfAuraRuns() {
+        return 0; // run only the first warmup run
     }
 
     // public void testTakeHeapSnapshot() throws Exception {

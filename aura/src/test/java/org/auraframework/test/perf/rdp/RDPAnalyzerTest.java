@@ -35,7 +35,12 @@ public final class RDPAnalyzerTest extends AbstractPerfTestCase {
 
     @Override
     protected int numPerfTimelineRuns() {
-        return 0; // so it only runs once in functional mode
+        return 0; // run only the first warmup run
+    }
+
+    @Override
+    protected int numPerfAuraRuns() {
+        return 0; // run only the first warmup run
     }
 
     // TODO: remove @UnAdaptableTest once we also use SauceLabs for perf tests in autobuild

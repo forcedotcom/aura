@@ -110,7 +110,6 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
     BrowserType currentBrowserType = null;
     protected AuraUITestingUtil auraUITestingUtil;
     protected PerfWebDriverUtil perfWebDriverUtil;
-    protected Mode currentAuraMode;
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ ElementType.TYPE, ElementType.METHOD })
@@ -352,6 +351,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
             PerfRunsCollector runsCollector = new PerfRunsCollector();
             for (int i = 0; i < numPerfAuraRuns; i++) {
                 try {
+                    // TODO: set stats mode for framework tests
                     isPerfRunForAuraStats = true;
                     perBrowserSetUp();
 
@@ -360,7 +360,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
 
                     superRunTest();
 
-                    runsCollector.addRun(metricsCollector.stopCollecting());
+                    runsCollector.addRun(metricsCollector.stopCollecting(true));
                 } finally {
                     isPerfRunForAuraStats = false;
                     perBrowserTearDown();
@@ -826,13 +826,6 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
         return Mode.SELENIUM;
     }
 
-    /**
-     * @return the Aura.Mode actually used for the current test
-     */
-    public Mode getCurrentAuraMode() {
-        return currentAuraMode;
-    }
-
     protected void open(DefDescriptor<? extends BaseComponentDef> dd) throws MalformedURLException, URISyntaxException {
         open(getUrl(dd));
     }
@@ -848,8 +841,6 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
     }
 
     protected void open(String url, Mode mode, boolean waitForInit) throws MalformedURLException, URISyntaxException {
-        currentAuraMode = mode;
-
         Map<String, String> params = new HashMap<String, String>();
         params.put("aura.mode", mode.name());
         params.put("aura.test", getQualifiedName());

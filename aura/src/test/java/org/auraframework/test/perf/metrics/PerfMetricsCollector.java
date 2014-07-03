@@ -20,7 +20,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.WebDriverTestCase;
 import org.auraframework.test.perf.PerfResultsUtil;
 import org.auraframework.test.perf.PerfWebDriverUtil;
@@ -32,6 +31,7 @@ import org.auraframework.test.perf.rdp.TimelineEventUtil;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.openqa.selenium.WebDriverException;
 
 /**
  * Collects and holds raw perf metrics data for a test case
@@ -83,6 +83,10 @@ public final class PerfMetricsCollector {
     }
 
     public PerfMetrics stopCollecting() {
+        return stopCollecting(false);
+    }
+
+    public PerfMetrics stopCollecting(boolean collectAuraStats) {
         elapsedMillis = System.currentTimeMillis() - startMillis;
 
         if (captureTimelineMetrics) {
@@ -96,8 +100,12 @@ public final class PerfMetricsCollector {
             heapSnapshot = test.takeHeapSnapshot();
             deltaBrowserJSHeapSizeBytes = getBrowserJSHeapSize(heapSnapshot) - startBrowserJSHeapSizeBytes;
         }
-        if (hasAuraStats()) {
-            auraStats = test.getAuraStats();
+        if (collectAuraStats) {
+            try {
+                auraStats = test.getAuraStats();
+            } catch (WebDriverException e) {
+                LOG.log(Level.WARNING, "not running in STATS mode", e);
+            }
         }
 
         return analyze();
@@ -157,7 +165,7 @@ public final class PerfMetricsCollector {
             }
 
             // aura stats
-            if (hasAuraStats()) {
+            if (auraStats != null) {
                 // "CreateComponent": {
                 // "afterRender": {
                 // "added": [],
@@ -180,11 +188,6 @@ public final class PerfMetricsCollector {
             LOG.log(Level.WARNING, test.getName(), e);
         }
         return metrics;
-    }
-
-    private boolean hasAuraStats() {
-        Mode mode = test.getCurrentAuraMode();
-        return mode == Mode.STATS;
     }
 
     /**

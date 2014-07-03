@@ -18,6 +18,13 @@
 <aura:component>
     <aura:attribute name="focusEvent" type="Boolean" default="false" />
     <aura:attribute name="blurEvent" type="Boolean" default="false" />
+    <aura:attribute name="clickCount" type="Integer" default="0" />
 
     <input type="text" aura:id="input" onfocus="{!c.focus}" onblur="{!c.blur}" />
+    
+    <a onclick="{!c.clicked}" aura:id="theAnchor">
+        <div aura:id="theDiv">
+            <span aura:id="theSpan">Click me!</span>
+        </div>
+    </a>
 </aura:component>

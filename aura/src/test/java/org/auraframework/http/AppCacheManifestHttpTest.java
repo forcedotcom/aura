@@ -351,7 +351,7 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
                 "/auraFW/resources/aura/resetCSS.css" };
 
         String appMarkup = String.format(baseApplicationTag,
-                "useAppcache=\"true\" render=\"client\"  preload=\"appCache\" " +
+                "useAppcache=\"true\" render=\"client\" " +
                         " controller=\"java://org.auraframework.impl.java.controller.TestController\" " +
                         "additionalAppCacheURLs=\"%s\"", "");
 

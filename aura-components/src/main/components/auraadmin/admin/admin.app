@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:application preload="auradev" model="java://org.auraframework.impl.admin.AdminModel" controller="java://org.auraframework.impl.admin.AdminController">
+<aura:application model="java://org.auraframework.impl.admin.AdminModel" controller="java://org.auraframework.impl.admin.AdminController">
 <aura:attribute name="mbeans" type="boolean"/>
 <div>
 <h2>Aura Administration console</h2>

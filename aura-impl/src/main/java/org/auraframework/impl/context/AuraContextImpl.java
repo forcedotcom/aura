@@ -125,9 +125,6 @@ public class AuraContextImpl implements AuraContext {
                     json.writeMapEntry("cmp", String.format("%s:%s", appDesc.getNamespace(), appDesc.getName()));
                 }
             }
-            if (ctx.getSerializePreLoad()) {
-                json.writeMapEntry("preloads", ctx.getPreloads());
-            }
 
             List<DefDescriptor<ThemeDef>> themes = ctx.getThemeDescriptors();
             if (!themes.isEmpty()) {
@@ -278,8 +275,6 @@ public class AuraContextImpl implements AuraContext {
 
     private final Set<String> dynamicNamespaces = Sets.newLinkedHashSet();
 
-    private final LinkedHashSet<String> preloadedNamespaces = Sets.newLinkedHashSet();
-
     private Set<DefDescriptor<?>> preloadedDefinitions = null;
 
     private final Format format;
@@ -290,8 +285,6 @@ public class AuraContextImpl implements AuraContext {
     private final Map<DefDescriptor<?>, String> clientLoaded = Maps.newLinkedHashMap();
 
     private String contextPath = "";
-
-    private boolean serializePreLoad = true;
 
     private boolean serializeLastMod = true;
 
@@ -320,13 +313,6 @@ public class AuraContextImpl implements AuraContext {
     public AuraContextImpl(Mode mode, MasterDefRegistry masterRegistry, Map<DefType, String> defaultPrefixes,
             Format format, Authentication access, JsonSerializationContext jsonContext,
             Map<ValueProviderType, GlobalValueProvider> globalProviders, boolean isDebugToolEnabled) {
-
-        // TODO: remove preloads
-        if (access == Authentication.AUTHENTICATED) {
-            preloadedNamespaces.add("aura");
-            preloadedNamespaces.add("ui");
-        }
-
         this.mode = mode;
         this.masterRegistry = masterRegistry;
         this.defaultPrefixes = defaultPrefixes;
@@ -348,9 +334,7 @@ public class AuraContextImpl implements AuraContext {
         if (preloadedDefinitions != null) {
             return preloadedDefinitions.contains(descriptor);
         }
-
-        // TODO: remove preloads
-        return preloadedNamespaces.contains(descriptor.getNamespace());
+        return false;
     }
 
     @Override
@@ -455,11 +439,6 @@ public class AuraContextImpl implements AuraContext {
     }
 
     @Override
-    public Set<String> getPreloads() {
-        return Collections.unmodifiableSet(preloadedNamespaces);
-    }
-
-    @Override
     public List<Locale> getRequestedLocales() {
         return requestedLocales;
     }
@@ -467,11 +446,6 @@ public class AuraContextImpl implements AuraContext {
     @Override
     public boolean getSerializeLastMod() {
         return serializeLastMod;
-    }
-
-    @Override
-    public boolean getSerializePreLoad() {
-        return serializePreLoad;
     }
 
     @Override

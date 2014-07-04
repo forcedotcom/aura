@@ -621,23 +621,6 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             Set<DefDescriptor<?>> newDeps = Sets.newHashSet();
             cd.def.appendDependencies(newDeps);
 
-            //
-            // TODO: remove preloads
-            // This pulls in the context preloads. not pretty, but it works.
-            //
-            if (!cc.addedPreloads && cd.descriptor.getDefType().equals(DefType.APPLICATION)) {
-                cc.addedPreloads = true;
-                Set<String> preloads = cc.context.getPreloads();
-                for (String preload : preloads) {
-                    if (!preload.contains("_")) {
-                        DependencyDefImpl.Builder ddb = new DependencyDefImpl.Builder();
-                        ddb.setResource(preload);
-                        ddb.setType("APPLICATION,COMPONENT,STYLE,EVENT");
-                        ddb.build().appendDependencies(newDeps);
-                    }
-                }
-            }
-            
             for (DefDescriptor<?> dep : newDeps) {
                 getHelper(dep, cc, stack, cd.def);
             }

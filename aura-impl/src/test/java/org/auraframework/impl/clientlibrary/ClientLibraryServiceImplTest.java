@@ -356,7 +356,7 @@ public class ClientLibraryServiceImplTest extends AuraImplTestCase {
         DefDescriptor<ApplicationDef> appDesc = Aura.getDefinitionService().getDefDescriptor(
                 "clientLibraryTest:testDependencies", ApplicationDef.class);
         Set<String> jsUrls = getClientLibraryUrls(appDesc, Type.JS);
-        assertEquals(7, jsUrls.size());
+        assertEquals(6, jsUrls.size());
 
         Iterator<String> it = jsUrls.iterator();
         // Order in the Root component's body is correct
@@ -373,8 +373,6 @@ public class ClientLibraryServiceImplTest extends AuraImplTestCase {
         String url;
 
         url = "http://likeaboss.com/facet.js";
-        assertTrue("did not find "+url, jsUrls.contains(url));
-        url = getResolver("CkEditor", Type.JS).getUrl();
         assertTrue("did not find "+url, jsUrls.contains(url));
         url = "http://likeaboss.com/child.js";
         assertTrue("did not find "+url, jsUrls.contains(url));

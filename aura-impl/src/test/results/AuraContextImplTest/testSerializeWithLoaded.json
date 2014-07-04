@@ -1,9 +1,6 @@
 {
   "mode":"UTEST",
   "app":"test:laxSecurity",
-  "preloads":[
-
-  ],
   "loaded":{
     "EVENT@markup://auratest:iwasadded":"somegenerateduid"
   },

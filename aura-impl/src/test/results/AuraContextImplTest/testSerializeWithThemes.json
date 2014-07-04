@@ -1,8 +1,5 @@
 {
   "mode":"UTEST",
-  "preloads":[
-
-  ],
   "themes":[
     "markup://test:fakeTheme",
     "markup://test:fakeTheme2",

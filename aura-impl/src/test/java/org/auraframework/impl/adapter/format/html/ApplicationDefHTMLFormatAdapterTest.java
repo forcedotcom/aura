@@ -74,7 +74,7 @@ public class ApplicationDefHTMLFormatAdapterTest extends BaseComponentDefHTMLFor
         int start = body.indexOf("<html ");
         String tag = body.substring(start, body.indexOf('>', start) + 1);
         if (tag.contains(" manifest=")) {
-            fail("Should not have included a manifest attribute without preloads in the context:\n" + body);
+            fail("Should not have included a manifest attribute useAppCache = false:\n" + body);
         }
     }
 
@@ -91,17 +91,17 @@ public class ApplicationDefHTMLFormatAdapterTest extends BaseComponentDefHTMLFor
         int start = body.indexOf("<html ");
         String tag = body.substring(start, body.indexOf('>', start) + 1);
         if (tag.contains(" manifest=")) {
-            fail("Should not have included a manifest attribute without preloads in the context:\n" + body);
+            fail("Should not have included a manifest attribute with inherited useAppCache = false:\n" + body);
         }
     }
 
     /**
-     * Manifest is appended to <html> if current context has preloads.
+     * Manifest is appended to <html> if current app has useAppCache.
      */
-    public void testWriteManifestWithPreloads() throws Exception {
+    public void testWriteManifest() throws Exception {
         AuraContext context = Aura.getContextService().getCurrentContext();
         DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class,
-                "<aura:application render='client' preload='aura' useAppcache='true'></aura:application>");
+                "<aura:application render='client' useAppcache='true'></aura:application>");
         context.setApplicationDescriptor(desc);
         final String uid = context.getDefRegistry().getUid(null, desc);
         context.addLoaded(desc, uid);
@@ -109,7 +109,7 @@ public class ApplicationDefHTMLFormatAdapterTest extends BaseComponentDefHTMLFor
         int start = body.indexOf("<html ");
         String tag = body.substring(start, body.indexOf('>', start) + 1);
         String expectedSubPath = AuraTextUtil.urlencode(String.format(
-                "{\"mode\":\"UTEST\",\"app\":\"%s\",\"preloads\":[\"aura\",\"ui\"],\"loaded\":{\"APPLICATION@%s\":\"%s\"},\"test\":\"%s\"}",
+                "{\"mode\":\"UTEST\",\"app\":\"%s\",\"loaded\":{\"APPLICATION@%s\":\"%s\"},\"test\":\"%s\"}",
                 desc.getDescriptorName(), desc.getQualifiedName(), uid, getQualifiedName()));
         String expectedAttribute = " manifest=\"/l/" + expectedSubPath + "/app.manifest\"";
         if (!tag.contains(expectedAttribute)) {

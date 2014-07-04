@@ -77,7 +77,7 @@ public class PreloadNameSpaceHttpTest extends AuraHttpTestCase {
      * Test there are no more preloaded namespaces.
      */
     @SuppressWarnings("unchecked")
-    public void testPreloadsOnContext() throws Exception {
+    public void testNoPreloadsOnContext() throws Exception {
         String response = obtainResponseCheckStatus();
 
         // Grab the preloads attached to the context
@@ -91,7 +91,7 @@ public class PreloadNameSpaceHttpTest extends AuraHttpTestCase {
         Map<String, Object> context = (Map<String, Object>) outerMap.get("context");
         ArrayList<String> preloads = (ArrayList<String>) context.get("preloads");
 
-        assertNotNull("Preloads not found in the Context", preloads);
+        assertNull("Preloads not found in the Context", preloads);
     }
 
     private String obtainResponseCheckStatus() throws Exception {

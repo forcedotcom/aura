@@ -5,18 +5,63 @@
       "descriptor":"markup://test:text",
       "superDef":{
         "serId":2,
-        "value":"markup://aura:component"
+        "value":{
+          "descriptor":"markup://aura:component",
+          "rendererDef":{
+            "serId":3,
+            "value":{
+              "descriptor":"js://aura.component",
+              "render":
+function(component) {
+        var rendering = component.getRendering();
+        return rendering ? rendering : $A.render(component.getValue("v.body"));
+    },
+              "afterRender":
+function(component) {
+        var body = component.get("v.body");
+        $A.afterRender(body);
+    },
+              "rerender":
+function(component) {
+        var body = component.get("v.body");
+        return $A.rerender(body);
+    },
+              "unrender":
+function(component) {
+        var body = component.get("v.body");
+        
+        $A.unrender(body);
+
+        var elements = component.getElements();
+        for (var key in elements){
+            var element = elements[key];
+            delete elements[key];
+            aura.util.removeElement(element);
+        }
+    }
+            }
+          },
+          "attributeDefs":[
+            {
+              "serId":4,
+              "value":{
+                "name":"body",
+                "type":"aura://Aura.Component[]"
+              }
+            }
+          ],
+          "interfaces":[
+            "markup://aura:rootComponent"
+          ],
+          "isAbstract":true
+        }
       },
       "attributeDefs":[
         {
-          "serId":3,
-          "value":{
-            "name":"body",
-            "type":"aura://Aura.Component[]"
-          }
+          "serRefId":4
         },
         {
-          "serId":4,
+          "serId":5,
           "value":{
             "name":"value",
             "type":"aura://String"
@@ -29,8 +74,71 @@
           "value":[
             {
               "componentDef":{
-                "serId":5,
-                "value":"markup://aura:text"
+                "serId":6,
+                "value":{
+                  "descriptor":"markup://aura:text",
+                  "rendererDef":{
+                    "serId":7,
+                    "value":{
+                      "descriptor":"js://aura.text",
+                      "render":
+function(component) {
+        var value = component.get("v.value");
+        if ($A.util.isUndefined(value)) {
+            value = '';
+        } else if (!$A.util.isString(value)) {
+            value = String(value);
+        }
+        
+        var trunc = component.get("v.truncate");
+        var truncateByWord = $A.util.getBooleanValue(component.get("v.truncateByWord"));
+        var ellipsis = $A.util.getBooleanValue(component.get("v.ellipsis"));
+        
+        if(trunc){
+            trunc = 1 * trunc;
+            value = aura.util.truncate(value, trunc, ellipsis, truncateByWord);
+        }
+        
+        return document.createTextNode(value);
+    }
+                    }
+                  },
+                  "attributeDefs":[
+                    {
+                      "serId":8,
+                      "value":{
+                        "name":"value",
+                        "type":"aura://String"
+                      }
+                    },
+                    {
+                      "serId":9,
+                      "value":{
+                        "name":"truncate",
+                        "type":"aura://Integer"
+                      }
+                    },
+                    {
+                      "serId":10,
+                      "value":{
+                        "name":"truncateByWord",
+                        "type":"aura://Boolean",
+                        "default":false
+                      }
+                    },
+                    {
+                      "serId":11,
+                      "value":{
+                        "name":"ellipsis",
+                        "type":"aura://Boolean",
+                        "default":true
+                      }
+                    }
+                  ],
+                  "interfaces":[
+                    "markup://aura:rootComponent"
+                  ]
+                }
               },
               "attributes":{
                 "values":{
@@ -43,23 +151,23 @@
             },
             {
               "componentDef":{
-                "serId":6,
+                "serId":12,
                 "value":{
                   "descriptor":"markup://test:parent",
-                  "superDef":{
-                    "serRefId":2
-                  },
                   "styleDef":{
-                    "serId":7,
+                    "serId":13,
                     "value":{
                       "descriptor":"css://test.parent",
                       "code":"",
                       "className":"testParent"
                     }
                   },
+                  "superDef":{
+                    "serRefId":2
+                  },
                   "attributeDefs":[
                     {
-                      "serRefId":3
+                      "serRefId":4
                     }
                   ],
                   "facets":[
@@ -68,30 +176,30 @@
                       "value":[
                         {
                           "componentDef":{
-                            "serId":8,
+                            "serId":14,
                             "value":{
                               "descriptor":"markup://test:child1",
                               "modelDef":{
-                                "serId":9,
+                                "serId":15,
                                 "value":{
                                   "descriptor":"java://test.model.TestReinitializeModel",
                                   "members":[
                                     {
-                                      "serId":10,
+                                      "serId":16,
                                       "value":{
                                         "name":"itemList",
                                         "type":"java://java.util.ArrayList"
                                       }
                                     },
                                     {
-                                      "serId":11,
+                                      "serId":17,
                                       "value":{
                                         "name":"value",
                                         "type":"java://java.lang.String"
                                       }
                                     },
                                     {
-                                      "serId":12,
+                                      "serId":18,
                                       "value":{
                                         "name":"valueParent",
                                         "type":"java://java.lang.String"
@@ -105,10 +213,10 @@
                               },
                               "attributeDefs":[
                                 {
-                                  "serRefId":3
+                                  "serRefId":4
                                 },
                                 {
-                                  "serId":13,
+                                  "serId":19,
                                   "value":{
                                     "name":"attr",
                                     "type":"aura://String"
@@ -121,8 +229,141 @@
                                   "value":[
                                     {
                                       "componentDef":{
-                                        "serId":14,
-                                        "value":"markup://aura:expression"
+                                        "serId":20,
+                                        "value":{
+                                          "descriptor":"markup://aura:expression",
+                                          "rendererDef":{
+                                            "serId":21,
+                                            "value":{
+                                              "descriptor":"js://aura.expression",
+                                              "render":
+function(component, helper) {
+        if(component.isRendered()){
+            $A.unrender(component);
+        }
+
+        var ret;
+        var value = component.getValue("v.value");
+        var created = false;
+        if (value) {
+            if (value.auraType === "Component" || !value.isLiteral()) {
+                
+                ret = $A.render(value);
+                created = true;
+                component.lastRenderedValue = value;
+            } else if (value.isDefined()) {
+                
+                ret = [document.createTextNode(helper.getTextValue(value))];
+                created = true;
+            }
+        }
+
+        if (!created){
+            ret = [document.createTextNode("")];
+        }
+
+        return ret;
+    },
+                                              "afterRender":
+function(component) {
+        var value = component.getValue("v.value");
+        if (value && (value.auraType === "Component" || !value.isLiteral())) {
+            
+            $A.afterRender(value);
+        }
+    },
+                                              "rerender":
+function(component, helper) {
+        if (!component.isRendered()) {
+            return;
+        }
+
+        var value = component.getValue("v.value");
+
+        if (value) {
+            if (value.auraType === "Component" || !value.isLiteral()) {
+                var last = component.lastRenderedValue;
+                if (last !== value) {
+                    var referenceNode = last.getReferenceNode();
+                    $A.assert(referenceNode, "referenceNode is required");
+
+                    
+                    var tempReferenceNode = document.createComment("rerender expression: " + component);
+                    $A.util.insertBefore(tempReferenceNode, referenceNode);
+                    referenceNode = tempReferenceNode;
+
+                    $A.unrender(last);
+
+                    var ret = $A.render(value);
+                    $A.util.insertBefore(ret, referenceNode);
+
+                    
+                    $A.util.removeElement(referenceNode);
+
+                    component.lastRenderedValue = value;
+
+                    $A.afterRender(value);
+                    return ret;
+                } else {
+                    return $A.rerender(value);
+                }
+            } else {
+                if (value.isDirty()){
+                    
+                    var element = component.getElement();
+
+                    
+                    if (element.parentNode) {
+                        element.nodeValue = helper.getTextValue(value);
+                    }
+                }
+            }
+        }
+    },
+                                              "unrender":
+function(component) {
+        
+        var value = component.getValue("v.value");
+        if (value && (value.auraType === "Component" || !value.isLiteral())) {
+            
+            $A.unrender(value);
+        }
+
+        var elements = component.getElements();
+        for(var key in elements){
+            var element = elements[key];
+            delete elements[key];
+            $A.util.removeElement(element);
+        }
+    }
+                                            }
+                                          },
+                                          "helperDef":{
+                                            "serId":22,
+                                            "value":{
+                                              "descriptor":"js://aura.expression",
+                                              "functions":{
+                                                "getTextValue":
+function(value) {
+        var raw = value.unwrap();
+        return $A.util.isUndefinedOrNull(raw) ? '' : raw;
+    }
+                                              }
+                                            }
+                                          },
+                                          "attributeDefs":[
+                                            {
+                                              "serId":23,
+                                              "value":{
+                                                "name":"value",
+                                                "type":"aura://String"
+                                              }
+                                            }
+                                          ],
+                                          "interfaces":[
+                                            "markup://aura:rootComponent"
+                                          ]
+                                        }
                                       },
                                       "attributes":{
                                         "values":{
@@ -135,7 +376,7 @@
                                     },
                                     {
                                       "componentDef":{
-                                        "serId":15,
+                                        "serId":24,
                                         "value":{
                                           "descriptor":"markup://test:child2",
                                           "superDef":{
@@ -143,7 +384,7 @@
                                           },
                                           "attributeDefs":[
                                             {
-                                              "serRefId":3
+                                              "serRefId":4
                                             }
                                           ]
                                         }
@@ -172,7 +413,7 @@
             },
             {
               "componentDef":{
-                "serRefId":5
+                "serRefId":6
               },
               "attributes":{
                 "values":{
@@ -185,7 +426,7 @@
             },
             {
               "componentDef":{
-                "serRefId":6
+                "serRefId":12
               },
               "attributes":{
                 "values":{
@@ -194,7 +435,7 @@
                     "value":[
                       {
                         "componentDef":{
-                          "serRefId":5
+                          "serRefId":6
                         },
                         "attributes":{
                           "values":{
@@ -212,7 +453,7 @@
             },
             {
               "componentDef":{
-                "serRefId":5
+                "serRefId":6
               },
               "attributes":{
                 "values":{

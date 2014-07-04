@@ -70,10 +70,10 @@ Event.prototype.setParams = function(config) {
         var attributeDefs = this.eventDef.getAttributeDefs();
 
         for (var key in config){
-            $A.assert(attributeDefs[key], "Invalid event attribute : " + key);
-
-            var value = config[key];
-            this.params[key] = value;
+            if (attributeDefs[key]) {
+                var value = config[key];
+                this.params[key] = value;
+            }
         }
     }
 

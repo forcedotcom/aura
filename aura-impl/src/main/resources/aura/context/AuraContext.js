@@ -28,7 +28,6 @@ function AuraContext(config, initCallback) {
     var i, defs, length;
 
     this.mode = config["mode"];
-    this.preloads = config["preloads"];
     this.loaded = config["loaded"];
     if (this.loaded === undefined) {
         this.loaded = {};
@@ -384,24 +383,6 @@ AuraContext.prototype.joinLoaded = function(loaded) {
  */
 AuraContext.prototype.getLoaded = function() {
     return this.loaded;
-};
-
-/**
- * This should be private but is needed for testing and dev modes.
- *
- * ... should move to $A.test.
- */
-AuraContext.prototype.getPreloadedNamespaces = function() {
-    return this.preloads;
-};
-
-/**
- * This should be private but is needed for testing and dev modes.
- *
- * ... should move to $A.test.
- */
-AuraContext.prototype.getPreloadedNamespaces = function() {
-    return this.preloads;
 };
 
 /**

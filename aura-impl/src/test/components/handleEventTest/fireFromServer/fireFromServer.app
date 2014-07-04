@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:application render="client" preload="preloadTest" controller="java://org.auraframework.impl.java.controller.TestControllerToAttachEvents">
+<aura:application render="client" controller="java://org.auraframework.impl.java.controller.TestControllerToAttachEvents">
     <aura:handler event="handleEventTest:applicationEvent" action="{!c.handleApplicationEvent}"/>
     <ui:button label="Run action to attach single event at server" press="{!c.attachOneEvent}"/>
 

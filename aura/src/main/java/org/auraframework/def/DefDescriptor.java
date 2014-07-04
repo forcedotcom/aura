@@ -34,7 +34,7 @@ import org.auraframework.util.json.JsonSerializable;
  *            {@link ComponentDef}, {@link EventDef}, etc.
  */
 public interface DefDescriptor<T extends Definition> extends JsonSerializable,
-Serializable, Comparable<DefDescriptor<?>> {
+        Serializable, Comparable<DefDescriptor<?>> {
 
     public static final String MARKUP_PREFIX = "markup";
     public static final String CSS_PREFIX = "css";
@@ -46,19 +46,25 @@ Serializable, Comparable<DefDescriptor<?>> {
     public static final class DescriptorKey {
         private final String name;
         private final Class<? extends Definition> clazz;
+        private final DefDescriptor<? extends Definition> bundle;
 
         public DescriptorKey(String name, Class<? extends Definition> clazz) {
+            this(name, clazz, null);
+        }
+
+        public DescriptorKey(String name, Class<? extends Definition> clazz, DefDescriptor<? extends Definition> bundle) {
             // FIXME: this case flattening would remove the extra copies of
             // definitions.
             // If we go case sensitive, we won't want it though.
             // this.qualifiedName = qualifiedName.toLowerCase();
             this.name = name;
             this.clazz = clazz;
+            this.bundle = bundle;
         }
 
         @Override
         public int hashCode() {
-            return this.getName().hashCode() + this.getClazz().hashCode();
+            return name.hashCode() + clazz.hashCode() + (bundle !=null?bundle.hashCode():0);
         }
 
         @Override
@@ -70,7 +76,8 @@ Serializable, Comparable<DefDescriptor<?>> {
                 return false;
             }
             DescriptorKey dk = (DescriptorKey) obj;
-            return dk.getClazz().equals(this.getClazz()) && dk.getName().equals(this.getName());
+            return dk.clazz.equals(clazz) && dk.name.equals(name)
+                && (dk.bundle == bundle || dk.bundle != null && dk.bundle.equals(bundle));
         }
 
         public String getName() {
@@ -80,6 +87,10 @@ Serializable, Comparable<DefDescriptor<?>> {
         public Class<? extends Definition> getClazz() {
             return clazz;
         }
+
+        public DefDescriptor<? extends Definition> getBundle() {
+            return bundle;
+    }
     }
     
 	public static enum DefType {
@@ -129,8 +140,7 @@ Serializable, Comparable<DefDescriptor<?>> {
 			mapDefType(clz, this);
 		}
 
-		private static void mapDefType(Class<? extends Definition> clz,
-				DefType defType) {
+        private static void mapDefType(Class<? extends Definition> clz, DefType defType) {
 			if (defTypeMap == null) {
 				defTypeMap = new HashMap<Class<? extends Definition>, DefType>();
 			}
@@ -210,6 +220,18 @@ Serializable, Comparable<DefDescriptor<?>> {
 	 *         parse serialized representations
 	 */
 	DefType getDefType();
+
+
+    /**
+     * get the 'bundle' for this descriptor.
+     *
+     * If we have a bundle for the descriptor, then the descriptor is for a file within the
+     * bundle, and it is fully specified by the bundle descriptor plus the name from this
+     * descriptor.
+     *
+     * @return the bundle associated with this descriptor.
+     */
+    DefDescriptor<? extends Definition> getBundle();
 
 	/**
 	 * Gets the actual definition described by this descriptor, compiling it if

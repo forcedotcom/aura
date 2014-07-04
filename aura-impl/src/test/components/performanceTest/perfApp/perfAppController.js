@@ -16,7 +16,11 @@
         a.setExclusive(); //So that it does not get batches with other requests
         a.setCallback(cmp,function(a){
             $A.Perf.endMark("XHR call time: Simple Server Controller");
-            cmp._simpleServerActionComplete = true;
+            // setting this here may leave stats incomplete,
+            // as we haven't finished everything yet.
+            setTimeout(function() {
+                cmp._simpleServerActionComplete = true;
+            }, 1);
         });
         $A.enqueueAction(a);
     },

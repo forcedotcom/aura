@@ -105,7 +105,7 @@ public class PreloadNameSpaceHttpTest extends AuraHttpTestCase {
         String response = getResponseBody(httpResponse);
         post.releaseConnection();
         assertTrue("Failed to reach aura servlet", statusCode == HttpStatus.SC_OK);
-
+        assertFalse("Got error response "+response, response.endsWith("/*ERROR*/"));
         return response;
     }
     
@@ -132,12 +132,12 @@ public class PreloadNameSpaceHttpTest extends AuraHttpTestCase {
         String response = getResponseBody(httpResponse);
         post.releaseConnection();
         assertTrue("Failed to reach aura servlet", statusCode == HttpStatus.SC_OK);
-
+        assertFalse("Got error response "+response, response.endsWith("/*ERROR*/"));
         return response;
     }
     
     @SuppressWarnings("unchecked")
-	public void testDynamicNamespace() throws Exception {
+    public void testDynamicNamespace() throws Exception {
     	String response = obtainResponseCheckStatusDN();
     	String componentInJson = response.substring(AuraBaseServlet.CSRF_PROTECT.length());
         Map<String, Object> outerMap;

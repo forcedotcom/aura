@@ -36,7 +36,6 @@ public class ImportDefTest extends AuraImplTestCase {
      * Tests to ensure that the imported librarys are properly compiled with the component.
      * @throws Exception
      */
-    @UnAdaptableTest("library-bug-fix")
     public void testImport() throws Exception {
         ComponentDef cmpDef = Aura.getDefinitionService().getDefinition("test:test_Import", ComponentDef.class);
         assertNotNull(cmpDef);

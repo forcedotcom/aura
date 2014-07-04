@@ -20,7 +20,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -33,7 +32,6 @@ import org.auraframework.def.DescriptorFilter;
 import org.auraframework.impl.source.BaseSourceLoader;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.util.AuraUtil;
-import org.auraframework.system.Parser.Format;
 import org.auraframework.system.PrivilegedNamespaceSourceLoader;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraRuntimeException;
@@ -57,18 +55,10 @@ public class ResourceSourceLoader extends BaseSourceLoader implements Privileged
     private final ResourceLoader resourceLoader = Aura.getConfigAdapter().getResourceLoader();
 
     public ResourceSourceLoader(String basePackage) {
-
         this.packagePrefix = "";
         resourcePrefix = basePackage;
 
         InputStreamReader reader = null;
-
-        Map<String, DefType> byExtension = Maps.newHashMap();
-
-        for (Entry<DefType, String> entry : extensions.entrySet()) {
-            byExtension.put(entry.getValue(), entry.getKey());
-        }
-
         try {
             try {
                 InputStream is = resourceLoader.getResourceAsStream(resourcePrefix + "/.index");
@@ -80,20 +70,21 @@ public class ResourceSourceLoader extends BaseSourceLoader implements Privileged
                     Matcher matcher = pattern.matcher(sw.toString());
                     while (matcher.find()) {
                         String name = matcher.group(1);
+                        ExtensionInfo ei = null;
 
-                        DefType defType = byExtension.get(matcher.group(2));
-                        if (defType == null) {
-                            Matcher testSuiteMatcher = testSuitePattern.matcher(matcher.group(0));
-                            if (testSuiteMatcher.find()) {
-                                defType = byExtension.get(testSuiteMatcher.group(2));
-                                name = testSuiteMatcher.group(1);
-                            }
+                        Matcher testSuiteMatcher = testSuitePattern.matcher(matcher.group(0));
+                        if (testSuiteMatcher.find()) {
+                            ei = byExtension.get(testSuiteMatcher.group(2).toLowerCase());
+                            name = testSuiteMatcher.group(1);
                         }
-                        if (defType == null) {
+                        if (ei == null) {
+                            ei = byExtension.get(matcher.group(2));
+                        }
+                        if (ei == null) {
                             //unrecognized entry in index, skip it
                             continue;
                         }
-                        switch(defType) {
+                        switch(ei.defType) {
                         case STYLE:
                             name = "css://" + AuraTextUtil.replaceChar(name, ':', ".");
                             break;
@@ -104,8 +95,8 @@ public class ResourceSourceLoader extends BaseSourceLoader implements Privileged
                             name = "markup://" + name;
                         }
 
-                        DefDescriptor<?> desc = DefDescriptorImpl.getInstance(name, defType.getPrimaryInterface());
-                        IndexKey key = new IndexKey(defType, desc.getNamespace());
+                        DefDescriptor<?> desc = DefDescriptorImpl.getInstance(name, ei.defType.getPrimaryInterface());
+                        IndexKey key = new IndexKey(ei.defType, desc.getNamespace());
                         namespaces.add(desc.getNamespace());
 
                         Set<DefDescriptor<?>> set = index.get(key);
@@ -164,14 +155,14 @@ public class ResourceSourceLoader extends BaseSourceLoader implements Privileged
 
     @Override
     public <D extends Definition> Source<D> getSource(DefDescriptor<D> descriptor) {
-        Source<D> ret = new ResourceSource<D>(descriptor, resourcePrefix + "/" + getPath(descriptor), Format.XML);
+        Source<D> ret = new ResourceSource<D>(descriptor, resourcePrefix + "/" + getPath(descriptor), getFormat(descriptor));
         if (!ret.exists()) {
             @SuppressWarnings("unchecked")
             Set<DefDescriptor<D>> all = find((Class<D>) descriptor.getDefType().getPrimaryInterface(),
                     descriptor.getPrefix(), descriptor.getNamespace());
             for (DefDescriptor<D> candidate : all) {
                 if (candidate.equals(descriptor)) {
-                    ret = new ResourceSource<D>(candidate, resourcePrefix + "/" + getPath(candidate), Format.XML);
+                    ret = new ResourceSource<D>(candidate, resourcePrefix + "/" + getPath(candidate), getFormat(descriptor));
                 }
             }
         }
@@ -209,9 +200,9 @@ public class ResourceSourceLoader extends BaseSourceLoader implements Privileged
         }
     }
 
-	@Override
-	public boolean isPrivilegedNamespace(String namespace) {
-		// All resource based namespaces are considered system by default
-		return true;
-	}
+    @Override
+    public boolean isPrivilegedNamespace(String namespace) {
+        // All resource based namespaces are considered system by default
+        return true;
+    }
 }

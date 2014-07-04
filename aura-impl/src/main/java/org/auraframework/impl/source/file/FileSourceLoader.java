@@ -15,14 +15,22 @@
  */
 package org.auraframework.impl.source.file;
 
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FilenameFilter;
+import java.io.IOException;
 
-import org.auraframework.def.*;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+import org.auraframework.def.DefDescriptor;
+
 import org.auraframework.def.DefDescriptor.DefType;
+
+import org.auraframework.def.Definition;
+import org.auraframework.def.DescriptorFilter;
 import org.auraframework.impl.source.BaseSourceLoader;
-import org.auraframework.impl.system.DefDescriptorImpl;
-import org.auraframework.system.Parser.Format;
 import org.auraframework.system.PrivilegedNamespaceSourceLoader;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.IOUtil;
@@ -33,31 +41,18 @@ import com.google.common.collect.Maps;
  */
 public class FileSourceLoader extends BaseSourceLoader implements PrivilegedNamespaceSourceLoader {
 
-    private static final EnumMap<DefType, FileFilter> filters = new EnumMap<DefType, FileFilter>(DefType.class);
     protected final File base;
+    protected final int baseLen;
     // Tests create loaders like crazy, which takes time to scan for namespaces,
     // so this caches that mapping.
     private static final Map<File, Set<String>> baseToNamepsaceCache = Maps.newHashMap();
-    private static final FileFilter directoryFilter = new FileFilter() {
 
+    private static final FileFilter directoryFilter = new FileFilter() {
         @Override
         public boolean accept(File file) {
             return file.isDirectory();
         }
     };
-
-    static {
-        filters.put(DefType.APPLICATION, new SourceFileFilter(DefType.APPLICATION));
-        filters.put(DefType.COMPONENT, new SourceFileFilter(DefType.COMPONENT));
-        filters.put(DefType.EVENT, new SourceFileFilter(DefType.EVENT));
-        filters.put(DefType.LIBRARY, new SourceFileFilter(DefType.LIBRARY));
-        filters.put(DefType.INTERFACE, new SourceFileFilter(DefType.INTERFACE));
-        filters.put(DefType.STYLE, new SourceFileFilter(DefType.STYLE));
-        filters.put(DefType.LAYOUTS, new SourceFileFilter(DefType.LAYOUTS));
-        filters.put(DefType.NAMESPACE, new SourceFileFilter(DefType.NAMESPACE));
-        filters.put(DefType.THEME, new SourceFileFilter(DefType.THEME));
-        filters.put(DefType.DOCUMENTATION, new SourceFileFilter(DefType.DOCUMENTATION));
-    }
 
     public FileSourceLoader(File base) {
         super();
@@ -65,10 +60,16 @@ public class FileSourceLoader extends BaseSourceLoader implements PrivilegedName
             throw new AuraRuntimeException(String.format("Base directory %s does not exist", base == null ? "null"
                     : base.getAbsolutePath()));
         }
-        this.base = base;
+        try {
+            this.base = base.getCanonicalFile();
+        } catch (IOException ioe) {
+            throw new AuraRuntimeException(String.format("IOException accessing base directory %s", 
+                    base.getAbsolutePath()), ioe);
+        }
+        this.baseLen = base.getPath().length();
 
         // add the namespace root to the file monitor
-        AuraFileMonitor.addDirectory(base.getAbsolutePath());
+        AuraFileMonitor.addDirectory(base.getPath());
     }
 
     private boolean isFilePresent(File file) {
@@ -103,7 +104,7 @@ public class FileSourceLoader extends BaseSourceLoader implements PrivilegedName
 
         String id = (file.exists()) ? FileSource.getFilePath(file) : filename;
 
-        return new FileSource<D>(descriptor, id, file, Format.XML);
+        return new FileSource<D>(descriptor, id, file, getFormat(descriptor));
     }
 
     /**
@@ -145,15 +146,11 @@ public class FileSourceLoader extends BaseSourceLoader implements PrivilegedName
 
     @Override
     public <T extends Definition> Set<DefDescriptor<T>> find(Class<T> primaryInterface, String prefix, String namespace) {
-        Set<File> files = new HashSet<File>();
-        DefType defType = DefType.getDefType(primaryInterface);
-        findFiles(new File(base, namespace), files, filters.get(defType));
-
         Set<DefDescriptor<T>> ret = new HashSet<DefDescriptor<T>>();
-        for (File file : files) {
-            String name = getQName(defType, namespace, file.getName());
-            ret.add(DefDescriptorImpl.getInstance(name, primaryInterface));
-        }
+        DefType defType = DefType.getDefType(primaryInterface);
+        OneTypeFilter<T> otf = new OneTypeFilter<T>(ret, defType);
+        findFiles(new File(base, namespace), null, otf);
+        //System.out.println("PI="+primaryInterface.getName()+", prefix="+prefix+", ns = "+namespace+", RET="+ret);
         return ret;
     }
 
@@ -203,25 +200,45 @@ public class FileSourceLoader extends BaseSourceLoader implements PrivilegedName
         return file;
     }
 
-    private static class SourceFileFilter implements FileFilter {
-
-        private final DefType defType;
+    /**
+     * This is a twisted filter that actually does the work as it progresses.
+     *
+     * We need to do this because we don't know a-priory what the types are, and rather than redo all of that work, we
+     * can simply do what we need to here.
+     */
+    protected static class OneTypeFilter<T extends Definition> implements FileFilter {
+        private final Set<DefDescriptor<T>> dset;
+        private final DefType dt;
 
         /**
+         * The constructor.
+         *
+         * @param dset the set of descriptors to be filled.
+         * @param dm the matcher to check the descriptors.
          */
-        public SourceFileFilter(DefType defType) {
-            this.defType = defType;
+        public OneTypeFilter(Set<DefDescriptor<T>> dset, DefType dt) {
+            this.dt = dt;
+            this.dset = dset;
         }
 
-        /**
-         * @see java.io.FileFilter#accept(java.io.File)
-         */
         @Override
         public boolean accept(File file) {
-            return file.isDirectory() || isValidNameForDefType(defType, file.getName());
+            if (file.isDirectory()) {
+                return true;
+            }
+            DefDescriptor<?> dd = getDescriptor(file.getPath());
+            if (dd != null && dd.getDefType() == dt) {
+                @SuppressWarnings("unchecked")
+                DefDescriptor<T> ddt = (DefDescriptor<T>)dd;
+                dset.add(ddt);
+            }
+            // We don't need to accept this, as we've already either included or
+            // excluded the
+            // descriptor above.
+            return false;
         }
-
     }
+
 
     /**
      * This is a twisted filter that actually does the work as it progresses.
@@ -257,31 +274,15 @@ public class FileSourceLoader extends BaseSourceLoader implements PrivilegedName
             this.namespace = namespace;
         }
 
-        /**
-         * Internal routine to get the deftype associated with a file.
-         *
-         * @return the def type, or null if there is none.
-         */
-        private DefType getDefType(String name) {
-            for (DefType dt : DefType.values()) {
-                if (isValidNameForDefType(dt, name)) {
-                    return dt;
-                }
-            }
-            return null;
-        }
-
         @Override
         public boolean accept(File file) {
             if (file.isDirectory()) {
                 return true;
             }
-            DefType dt = getDefType(file.getName());
-            if (dt == null) {
+            DefDescriptor<?> dd = getDescriptor(file.getPath());
+            if (dd == null) {
                 return false;
             }
-            DefDescriptor<?> dd = DefDescriptorImpl.getInstance(getQName(dt, this.namespace, file.getName()),
-                    dt.getPrimaryInterface());
             if (dm.matchDescriptor(dd)) {
                 this.dset.add(dd);
             }

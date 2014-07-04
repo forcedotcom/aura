@@ -713,6 +713,13 @@ Action.prototype.getStored = function(storageName) {
 };
 
 /**
+ * Gets the configured storage error handler callback.
+ */
+Action.prototype.getStorageErrorHandler = function() {
+    return this.storableConfig && this.storableConfig["errorHandler"];
+};
+
+/**
  * Calls callbacks and fires events upon completion of the action.
  *
  * @private
@@ -984,7 +991,8 @@ Action.prototype.getRefreshAction = function(originalResponse) {
 
         refreshAction.setParams(this.params);
         refreshAction.setStorable({
-            "ignoreExisting" : true
+            "ignoreExisting" : true,
+            "errorHandler": this.getStorageErrorHandler()
         });
 
         refreshAction.abortable = this.abortable;

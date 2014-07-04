@@ -15,5 +15,5 @@
     limitations under the License.
 -->
 <aura:application controller="java://org.auraframework.impl.java.controller.JavaTestController">
-    <auraStorage:init name="actions"/>
+    <auraStorage:init name="actions" maxSize="10"/>
 </aura:application>

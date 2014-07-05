@@ -68,9 +68,11 @@ public final class GoldFileUtils {
 
         if (exceptionFound != null) {
             if (exceptionFound instanceof FileNotFoundException) {
-                LOG.info("writing gold file: " + url);
-                diff.writeGoldFile(testResults);
+                LOG.info("writing missing gold file: " + url);
+            } else {
+                LOG.info("overwriting gold file: " + url);
             }
+            diff.writeGoldFile(testResults);
             if (testResults instanceof PerfMetrics) {
                 LOG.info("new gold file contents:\n"
                         + PerfGoldFilesUtil.toGoldFileText((PerfMetrics) testResults, diff.getTest()
@@ -82,7 +84,7 @@ public final class GoldFileUtils {
             error.setStackTrace(exceptionFound.getStackTrace());
             throw error;
         } else if (OVERWRITE_PERF_GOLD_FILES) {
-            LOG.info("overwriting gold file: " + url);
+            LOG.info("force overwriting gold file: " + url);
             diff.writeGoldFile(testResults);
         }
     }

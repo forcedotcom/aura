@@ -25,6 +25,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.auraframework.test.SauceUtil;
+import org.auraframework.test.WebDriverTestCase.UnexpectedError;
 import org.auraframework.test.perf.rdp.CPUProfilerAnalyzer;
 import org.auraframework.test.perf.rdp.RDPNotification;
 import org.auraframework.util.AuraUITestingUtil;
@@ -32,6 +33,8 @@ import org.auraframework.util.json.JsonReader;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.UnsupportedCommandException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.logging.LogEntry;
@@ -280,5 +283,31 @@ public final class PerfWebDriverUtil {
 
     public static JSONObject analyzeCPUProfile(Map<String, ?> profile) throws JSONException {
         return new CPUProfilerAnalyzer(profile).analyze();
+    }
+
+    /**
+     * @return true if the test failure is most likely an infrastructure error (i.e. SauceLabs problem)
+     */
+    public static boolean isInfrastructureError(Throwable testFailure) {
+        if (testFailure instanceof UnexpectedError) {
+            testFailure = testFailure.getCause();
+        }
+
+        if (testFailure instanceof TimeoutException) {
+            // i.e. aura did not even load
+            return true;
+        }
+
+        if (testFailure instanceof UnsupportedCommandException) {
+            // org.openqa.selenium.UnsupportedCommandException: ERROR Job 2cf6026df5514bd1a859b1a82ef1c25a is not in
+            // progress. It may have recently finished, or experienced an error. You can learn more at
+            // https://saucelabs.com/jobs/2cf6026df5514bd1a859b1a82ef1c25a Command duration or timeout: 122 milliseconds
+            String m = testFailure.getMessage();
+            if (m != null && m.contains("is not in progress")) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

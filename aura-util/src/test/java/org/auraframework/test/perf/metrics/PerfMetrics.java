@@ -78,6 +78,12 @@ public final class PerfMetrics {
     public PerfMetrics() {
     }
 
+    public PerfMetrics(PerfMetric... metrics) {
+        for (PerfMetric metric : metrics) {
+            setMetric(metric);
+        }
+    }
+
     /**
      * @return the PerfMetric for the given metric name
      */

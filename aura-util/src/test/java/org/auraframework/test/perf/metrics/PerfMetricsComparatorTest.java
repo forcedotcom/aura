@@ -20,9 +20,7 @@ import org.auraframework.test.UnitTestCase;
 public final class PerfMetricsComparatorTest extends UnitTestCase {
 
     public void testCompare() throws Exception {
-        PerfMetrics expected = new PerfMetrics();
-        expected.setMetric("Timeline.metric", 10);
-        expected.setMetric("Aura.metric", 10);
+        PerfMetrics expected = new PerfMetrics(new PerfMetric("Timeline.metric", 10), new PerfMetric("Aura.metric", 10));
 
         PerfMetricsComparator comparator = new PerfMetricsComparator();
         PerfMetrics actual;
@@ -63,22 +61,16 @@ public final class PerfMetricsComparatorTest extends UnitTestCase {
         assertEquals("--> perf metric out of range: Aura.metric - expected 10, actual 0 (allowed variability 5%)",
                 message);
         // UC: allow at least 1 for small ints
-        expected = new PerfMetrics();
-        expected.setMetric("Timeline.metric", 3);
-        actual = new PerfMetrics();
-        actual.setMetric("Timeline.metric", 2);
+        expected = new PerfMetrics(new PerfMetric("Timeline.metric", 3));
+        actual = new PerfMetrics(new PerfMetric("Timeline.metric", 2));
         message = comparator.compare(expected, actual);
         assertNull(message, message);
 
         // UC: show non-sorted sequence for MedianPerfMetrics
-        expected = new PerfMetrics();
-        expected.setMetric("Network.bytes", 0);
-        PerfMetrics run1 = new PerfMetrics();
-        run1.setMetric("Network.bytes", 3);
-        PerfMetrics run2 = new PerfMetrics();
-        run2.setMetric("Network.bytes", 4);
-        PerfMetrics run3 = new PerfMetrics();
-        run3.setMetric("Network.bytes", 2);
+        expected = new PerfMetrics(new PerfMetric("Network.bytes", 0));
+        PerfMetrics run1 = new PerfMetrics(new PerfMetric("Network.bytes", 3));
+        PerfMetrics run2 = new PerfMetrics(new PerfMetric("Network.bytes", 4));
+        PerfMetrics run3 = new PerfMetrics(new PerfMetric("Network.bytes", 2));
         PerfRunsCollector collector = new PerfRunsCollector();
         collector.addRun(run1);
         collector.addRun(run2);
@@ -93,6 +85,34 @@ public final class PerfMetricsComparatorTest extends UnitTestCase {
         assertEquals(
                 "--> perf metric out of range: Network.bytes - expected 0, actual 3 [*3 4 2 |*:median-run average:3] (allowed variability 20%)",
                 message);
-    }
 
+        // UC: round allowed variability to closest int
+        // expected 19, actual 23 [30 20 25 23 *23 |*:median-run average:24] (allowed variability 20%)
+        expected = new PerfMetrics(new PerfMetric("Timeline.paint", 18));
+        collector = new PerfRunsCollector();
+        collector.addRun(new PerfMetrics(new PerfMetric("Timeline.paint", 30)));
+        collector.addRun(new PerfMetrics(new PerfMetric("Timeline.paint", 20)));
+        collector.addRun(new PerfMetrics(new PerfMetric("Timeline.paint", 25)));
+        collector.addRun(new PerfMetrics(new PerfMetric("Timeline.paint", 23)));
+        collector.addRun(new PerfMetrics(new PerfMetric("Timeline.paint", 23)));
+        actual = collector.getMedianMetrics();
+        message = comparator.compare(expected, actual);
+        assertEquals(
+                "--> perf metric out of range: Timeline.paint - expected 18, actual 23 [30 20 25 23 23 |*:median-run average:24] (allowed variability 20%)",
+                message);
+        // UC: round allowed variability to closest int
+        expected = new PerfMetrics(new PerfMetric("Timeline.paint", 19));
+        message = comparator.compare(expected, actual);
+        assertNull(message, message);
+
+        // UC: don't show median/average if just one run
+        expected = new PerfMetrics(new PerfMetric("Timeline.paint", 18));
+        collector = new PerfRunsCollector();
+        collector.addRun(new PerfMetrics(new PerfMetric("Timeline.paint", 30)));
+        actual = collector.getMedianMetrics();
+        message = comparator.compare(expected, actual);
+        assertEquals(
+                "--> perf metric out of range: Timeline.paint - expected 18, actual 30 [30] (allowed variability 20%)",
+                message);
+    }
 }

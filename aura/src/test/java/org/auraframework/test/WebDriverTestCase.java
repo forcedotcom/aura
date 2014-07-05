@@ -462,7 +462,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
     /**
      * Wrapper for non-asserted failures
      */
-    private static class UnexpectedError extends Error {
+    public static class UnexpectedError extends Error {
         private static final long serialVersionUID = 1L;
 
         UnexpectedError(String description, Throwable cause) {

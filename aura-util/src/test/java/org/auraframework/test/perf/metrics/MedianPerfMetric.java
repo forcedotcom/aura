@@ -77,7 +77,9 @@ public final class MedianPerfMetric extends PerfMetric {
             }
             sb.append(metric.getValue());
         }
-        sb.append(" |*:median-run average:" + getAverage());
+        if (runsMetric.size() > 1) {
+            sb.append(" |*:median-run average:" + getAverage());
+        }
         sb.append(']');
         return sb.toString();
     }

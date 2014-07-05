@@ -40,7 +40,7 @@ public final class CPUProfilerAnalyzer {
     private final int numSamples;
     private final long samplingIntervalMicros; // about 1ms
     private int depth = -1;
-    private int maxDepth;
+    private final MaxDepthCollector maxDepthCollector = new MaxDepthCollector(10);
 
     @SuppressWarnings("unchecked")
     public CPUProfilerAnalyzer(Map<String, ?> profile) {
@@ -132,7 +132,7 @@ public final class CPUProfilerAnalyzer {
             setFunctionTimeMetric(metrics, "timeGCMillis", "(garbage collector)");
             setFunctionTimeMetric(metrics, "timeIdleMillis", "(idle)");
             metrics.put("numIslands", numIslands);
-            metrics.put("maxDepth", maxDepth);
+            metrics.put("maxDepth", maxDepthCollector.getAverage());
 
         } catch (JSONException e) {
             throw new RuntimeException(e);
@@ -162,9 +162,7 @@ public final class CPUProfilerAnalyzer {
         // ...
 
         depth++;
-        if (maxDepth < depth) {
-            maxDepth = depth;
-        }
+        maxDepthCollector.add(depth);
 
         // populate functionToInfo
         String functionName = (String) node.get("functionName");
@@ -222,6 +220,31 @@ public final class CPUProfilerAnalyzer {
         @Override
         public int compareTo(CPUProfileInfo o) {
             return (int) (o.totalTimeMicros - totalTimeMicros);
+        }
+    }
+
+    static class MaxDepthCollector {
+        private final int[] values;
+
+        MaxDepthCollector(int maxToAverage) {
+            values = new int[maxToAverage];
+        }
+
+        void add(int maxDepth) {
+            for (int i = 0; i < values.length; i++) {
+                if (values[i] < maxDepth) {
+                    values[i] = maxDepth;
+                    break;
+                }
+            }
+        }
+
+        int getAverage() {
+            int total = 0;
+            for (int value : values) {
+                total += value;
+            }
+            return (int) Math.round(((double) total) / values.length);
         }
     }
 }

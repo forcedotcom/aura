@@ -149,7 +149,8 @@ public class PerfMetricsComparator {
             int allowedDelta = 0;
             int allowedPercent = getAllowedVariability(name);
             if (allowedPercent != 0) {
-                allowedDelta = Math.round((expectedValue * allowedPercent) / 100);
+                // round allowed variability to closest int
+                allowedDelta = (int) Math.round((((double) expectedValue) * allowedPercent) / 100);
                 if (allowedPercent > 0) {
                     int minimumDelta = getMinimumAllowedDelta(name, units); // allow minimum if non-zero %
                     allowedDelta = Math.max(allowedDelta, minimumDelta);

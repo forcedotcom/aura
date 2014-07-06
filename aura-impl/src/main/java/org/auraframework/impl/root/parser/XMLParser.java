@@ -17,6 +17,7 @@ package org.auraframework.impl.root.parser;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.io.StringReader;
 import java.net.URL;
 
 import javax.xml.stream.XMLInputFactory;
@@ -89,7 +90,8 @@ public class XMLParser implements Parser {
         D ret = null;
         try {
             if (source.exists()) {
-                reader = new HTMLReader(source.getHashingReader());
+                String contents = source.getContents();
+                reader = new HTMLReader(new StringReader(contents));
 
                 xmlReader = xmlInputFactory.createXMLStreamReader(reader);
             }

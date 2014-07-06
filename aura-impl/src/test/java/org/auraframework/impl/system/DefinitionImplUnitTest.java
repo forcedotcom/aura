@@ -91,6 +91,7 @@ public abstract class DefinitionImplUnitTest<I extends DefinitionImpl<D>, D exte
 
     public void testGetOwnHashWithSourceHash() throws Exception {
         Mockito.doReturn("myhash").when(this.sourceHash).toString();
+        Mockito.doReturn(true).when(this.sourceHash).isSet();
         String actual = buildDefinition().getOwnHash();
         assertEquals("myhash", actual);
     }

@@ -15,6 +15,8 @@
  */
 package org.auraframework.def;
 
+import java.io.Serializable;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -25,7 +27,8 @@ import org.auraframework.util.text.GlobMatcher;
 
 import com.google.common.collect.Lists;
 
-public class DescriptorFilter implements Comparable<DescriptorFilter> {
+public class DescriptorFilter implements Comparable<DescriptorFilter>, Serializable {
+    private static final long serialVersionUID = -3961972615052015950L;
     private static final List<DefType> componentType = Collections.unmodifiableList(Arrays
             .asList(new DefType[] { DefType.COMPONENT }));
     private final List<DefType> defTypes;

@@ -15,6 +15,8 @@
  */
 package org.auraframework.util.text;
 
+import java.io.Serializable;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,7 +28,8 @@ import java.util.regex.Pattern;
  * 
  * Note that for the moment, this is case insensitive...
  */
-public class GlobMatcher {
+@SuppressWarnings("serial")
+public class GlobMatcher implements Serializable {
     private static final Pattern stringPattern = Pattern.compile("[a-zA-Z0-9_*]*");
     private static final String ALL_STRING = "*";
     private static final Pattern STAR = Pattern.compile("\\*");

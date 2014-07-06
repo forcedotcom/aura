@@ -263,6 +263,18 @@ public class AuraTestingUtil {
     }
 
     /**
+     * restart context.
+     */
+    public void restartContext() throws QuickFixException {
+        AuraContext context = Aura.getContextService().getCurrentContext();
+        DefDescriptor<? extends BaseComponentDef> cmp = context.getApplicationDescriptor();
+        String uid = context.getUid(cmp);
+        Aura.getContextService().endContext();
+        AuraContext newctxt = setupContext(context.getMode(), context.getFormat(), cmp);
+        newctxt.addLoaded(cmp, uid);
+    }
+
+    /**
      * Get a context for use with a get/post.
      *
      * @param mode the Aura mode to use.

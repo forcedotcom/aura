@@ -31,6 +31,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.TestCaseDef;
 import org.auraframework.def.TestSuiteDef;
 import org.auraframework.service.ContextService;
@@ -88,13 +89,14 @@ public class ComponentJSTestSuiteTest extends TestSuite {
                 contextService.startContext(Mode.JSTEST, Format.JSON, Authentication.AUTHENTICATED);
             }
 
-            Map<String, TestSuite> subSuites = new HashMap<String, TestSuite>();
+            Map<String, TestSuite> subSuites = new HashMap<>();
             try {
-                DefDescriptor<TestSuiteDef> matcher = definitionService.getDefDescriptor(
-                        String.format("js://%s.*", namespace), TestSuiteDef.class);
-                Set<DefDescriptor<TestSuiteDef>> descriptors = definitionService.find(matcher);
+                DescriptorFilter filter = new DescriptorFilter("js://"+namespace, DefType.TESTSUITE.toString());
+                Set<DefDescriptor<?>> descriptors = definitionService.find(filter);
 
-                for (DefDescriptor<TestSuiteDef> descriptor : descriptors) {
+                for (DefDescriptor<?> qd  : descriptors) {
+                    @SuppressWarnings("unchecked")
+                    DefDescriptor<TestSuiteDef> descriptor = (DefDescriptor<TestSuiteDef>)qd;
                     Test test;
                     try {
                         test = new ComponentTestSuite(descriptor.getDef());

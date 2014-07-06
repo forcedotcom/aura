@@ -38,10 +38,9 @@ import com.google.common.collect.Sets;
  */
 public class RegistryTrie {
 
-    private final Set<String> allNamespaces = new HashSet<String>();
+    private final Set<String> allNamespaces = new HashSet<>();
     // a map of map of maps
-    private final EnumMap<DefType, Map<String, PrefixNode>> root = new EnumMap<DefType, Map<String, PrefixNode>>(
-            DefType.class);
+    private final EnumMap<DefType, Map<String, PrefixNode>> root = new EnumMap<>(DefType.class);
     private final DefRegistry<?>[] allRegistries;
 
     public RegistryTrie(DefRegistry<?>... registries) {
@@ -50,7 +49,7 @@ public class RegistryTrie {
             for (DefType defType : reg.getDefTypes()) {
                 Map<String, PrefixNode> dtn = this.root.get(defType);
                 if (dtn == null) {
-                    dtn = new HashMap<String, PrefixNode>(8);
+                    dtn = new HashMap<>(8);
                     this.root.put(defType, dtn);
                 }
                 for (String p : reg.getPrefixes()) {
@@ -126,7 +125,7 @@ public class RegistryTrie {
         // namespace, can be null
         private DefRegistry<?> catchAllRegistry;
         // registries to use for specific namespaces
-        private final Map<String, DefRegistry<?>> registries = new HashMap<String, DefRegistry<?>>(8);
+        private final Map<String, DefRegistry<?>> registries = new HashMap<>(8);
         // the set of namespaces in this prefix.
         private final Set<String> prefixNamespaces = Sets.newHashSet();
 

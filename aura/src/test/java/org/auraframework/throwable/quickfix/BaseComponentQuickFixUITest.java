@@ -73,7 +73,11 @@ public abstract class BaseComponentQuickFixUITest extends WebDriverTestCase {
             quickFixUIWidget.verifyCustomizationMenu();
             quickFixUIWidget.selectCssCheckbox(true);
             quickFixUIWidget.clickFix(true, String.format("TODO: %s:%s", namespace, cmpName));
+            //
             // Serverside verification
+            // This needs to be very careful, as static registries can stay constant.
+            //
+            getAuraTestingUtil().restartContext();
             assertTrue("Failed to locate the definition", defDescriptor.exists());
             assertTrue("Failed to locate the css definition", defDescriptorCss.exists());
         } finally {
@@ -139,8 +143,9 @@ public abstract class BaseComponentQuickFixUITest extends WebDriverTestCase {
             quickFixUIWidget.verifyCustomizationMenu();
             quickFixUIWidget.setDescriptorNames(namespace + ":" + cmpName1 + ", " + namespace + ":" + cmpName2);
             quickFixUIWidget.clickFix(true, String.format("TODO: %s:%s", namespace, cmpName1));
-            assertTrue("Should not have created component bundle", defDescriptor1.exists());
-            assertTrue("Should not have created component bundle", defDescriptor2.exists());
+            getAuraTestingUtil().restartContext();
+            assertTrue("Expected to create component bundle "+defDescriptor1, defDescriptor1.exists());
+            assertTrue("Expected to create component bundle "+defDescriptor2, defDescriptor2.exists());
         } finally {
             quickFixUIWidget.deleteFiles(defDescriptor1);
             quickFixUIWidget.deleteFiles(defDescriptor2);

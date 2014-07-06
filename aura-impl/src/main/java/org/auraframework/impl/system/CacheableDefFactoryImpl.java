@@ -19,6 +19,7 @@ import java.util.Set;
 
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
+import org.auraframework.def.DescriptorFilter;
 import org.auraframework.impl.parser.ParserFactory;
 import org.auraframework.impl.source.SourceFactory;
 import org.auraframework.system.CacheableDefFactory;
@@ -65,5 +66,15 @@ public class CacheableDefFactoryImpl<D extends Definition> extends DefFactoryImp
     @Override
     public Set<DefDescriptor<D>> find(DefDescriptor<D> matcher) {
         return sourceFactory.find(matcher);
+    }
+
+    @Override
+    public boolean hasFind() {
+        return true;
+    }
+
+    @Override
+    public Set<DefDescriptor<?>> find(DescriptorFilter filter) {
+        return sourceFactory.find(filter);
     }
 }

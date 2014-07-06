@@ -45,7 +45,8 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
 
     private static final String APPCACHE_SUPPORTED_USERAGENT = UserAgent.GOOGLE_CHROME.getUserAgentString();
     private static final String APPCACHE_UNSUPPORTED_USERAGENT = UserAgent.EMPTY.getUserAgentString();
-    private static final Pattern HTML_TAG_PATTERN = Pattern.compile("<html data-lm=\"(.*?)\" manifest=\"(.*?)\">");
+    private static final Pattern HTML_MANIFEST_PATTERN = Pattern.compile("<html[^>]* manifest=\"(.*?)\"[^>]*>");
+    private static final Pattern HTML_LM_PATTERN = Pattern.compile("<html[^>]* data-lm=\"(.*?)\"[^>]*>");
 
     private class ManifestInfo {
         String url;
@@ -66,12 +67,15 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
         HttpResponse response = perform(get);
         String responseBody = getResponseBody(response);
         get.releaseConnection();
-        Matcher m = HTML_TAG_PATTERN.matcher(responseBody);
+        Matcher m = HTML_MANIFEST_PATTERN.matcher(responseBody);
         String url = null;
         String lastmod = null;
         if (m.find()) {
+            url = m.group(1);
+        }
+        m = HTML_LM_PATTERN.matcher(responseBody);
+        if (m.find()) {
             lastmod = m.group(1);
-            url = m.group(2);
         }
         return new ManifestInfo(url, lastmod);
     }

@@ -51,7 +51,7 @@ public class AuraStaticControllerDefRegistry extends StaticDefRegistryImpl<Contr
     public static final AuraStaticControllerDefRegistry INSTANCE = new AuraStaticControllerDefRegistry();
 
     protected AuraStaticControllerDefRegistry() {
-        super(defTypes, prefixes, null, getDefs(), null);
+        super(defTypes, prefixes, null, getDefs());
     }
 
     private static Map<DefDescriptor<ControllerDef>, ControllerDef> getDefs() {

@@ -267,7 +267,7 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
     public boolean equals(Object o) {
         if (o instanceof DefDescriptor) {
             DefDescriptor<?> e = (DefDescriptor<?>) o;
-            return (bundle == e.getBundle() || (bundle != null && !bundle.equals(e.getBundle())))
+            return (bundle == e.getBundle() || (bundle != null && bundle.equals(e.getBundle())))
                     && getDefType() == e.getDefType() && name.equalsIgnoreCase(e.getName())
                     && (namespace == null ? e.getNamespace() == null:namespace.equalsIgnoreCase(e.getNamespace()))
                     && (prefix == null ? e.getPrefix() == null : prefix.equalsIgnoreCase(e.getPrefix()));

@@ -60,7 +60,7 @@ public class ClientLibraryDefHandler<P extends RootDefinition> extends ParentedT
         super(parentHandler, xmlReader, source);
         
         if (!isInPrivilegedNamespace()) {
-        	throw new DefinitionNotFoundException(Aura.getDefinitionService().getDefDescriptor(TAG, ComponentDef.class));
+            throw new DefinitionNotFoundException(Aura.getDefinitionService().getDefDescriptor(TAG, ComponentDef.class));
         }
         
         this.builder = new ClientLibraryDefImpl.Builder();

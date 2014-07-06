@@ -13,28 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.impl.css.style;
+package org.auraframework.tools.definition;
 
-import java.util.List;
+import java.io.File;
 
-import org.auraframework.def.DescriptorFilter;
-import org.auraframework.impl.AuraImplTestCase;
-import org.auraframework.impl.source.SourceFactory;
-import org.auraframework.impl.source.StringSourceLoader;
-import org.auraframework.system.SourceLoader;
+import org.auraframework.test.UnitTestCase;
+import org.auraframework.tools.definition.RegistrySerializer.RegistrySerializerException;
 
-import com.google.common.collect.Lists;
-
-public class StyleDefFactoryTest extends AuraImplTestCase {
-
-    public StyleDefFactoryTest(String name) {
+public class RegistrySerializerTest extends UnitTestCase {
+    public RegistrySerializerTest(String name) {
         super(name);
     }
 
-    /**
-     * Verify that calling find() on a factory that does not implement the
-     * method throws the proper exception.
-     */
-    public void testFind() throws Exception {
+    public void testNullOutput() {
+        RegistrySerializer rs = new RegistrySerializer(null, new File("/tmp"), null, null);
+        try {
+            rs.execute();
+        } catch (RegistrySerializerException mee) {
+            assertEquals(mee.getMessage(), RegistrySerializer.ERR_ARGS_REQUIRED);
+        }
     }
 }

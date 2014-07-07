@@ -77,7 +77,7 @@
      * Obtains the current value from the DOM element.  May be overridden by extensions.
      */
     getDomElementValue : function (element) {
-    		return element.value;
+    	return element.value;
     },
 
     /**
@@ -143,25 +143,23 @@
      * Set a default error component.
      */
     setErrorComponent : function(component, value) {
-        var element = component.getElement();
-        var htmlCmp = $A.componentService.getRenderingComponentForElement(element);
-        var valueProvider = htmlCmp.getComponentValueProvider();
         if (value.isValid()) {
-            this.validate(component, valueProvider);
+            this.validate(component);
         } else {
-            this.invalidate(component, valueProvider, value);
+            this.invalidate(component, value);
         }
     },
 
     /**
      * Dismiss the error messages and restore the component to the normal state.
      */
-    validate : function(component, valueProvider) {
-        var inputEl = this.getInputElement(component);
+    validate : function(component) {
         var errorCmp = component.get("v.errorComponent")[0];
 
-        $A.util.removeClass(inputEl, "inputError");
+        // Mark as not invalid
+        component._invalidValue = false;
 
+        // Remove errors
         if (errorCmp && errorCmp.get("v.value.length") > 0) {
             errorCmp.set("v.value", []);
         }
@@ -170,20 +168,22 @@
     /**
      * Show up the the error messages and put the component in the error state.
      */
-    invalidate : function(component, valueProvider, value) {
-        var inputEl = this.getInputElement(component);
+    invalidate : function(component, value) {
         var m = [];
         var valueErr = value.getErrors();
 
-        $A.util.addClass(inputEl, "inputError");
+        // Mark as invalid
+        component._invalidValue = true;
 
         for (var i = 0; i < valueErr.length; i++) {
             m.push(valueErr[i].message);
         }
+        // Update error component
         var errorCmp = component.get("v.errorComponent")[0];
         if (errorCmp) {
             errorCmp.set("v.value", m);
         } else {
+            component._creatingAsyncErrorCmp = true;
             $A.componentService.newComponentAsync(
                 this,
                 function(errorCmp) {
@@ -191,6 +191,7 @@
                     ariaDesc = this.addTokenToString(ariaDesc, errorCmp.getGlobalId());
                 	component.set("v.errorComponent", errorCmp);
                 	this.setAttribute(component, {key: "ariaDescribedby", value: ariaDesc});
+                	component._creatingAsyncErrorCmp = false;
                 },
                 {
                 "componentDef": "markup://ui:inputDefaultError",
@@ -202,6 +203,13 @@
             	}
             );
         }
+    },
+    
+    updateErrorElement : function(component) {
+    	var inputEl = this.getInputElement(component);
+    	var classFunc = component._invalidValue ? $A.util.addClass : $A.util.removeClass;
+    	
+    	classFunc.apply($A.util, [inputEl, "inputError"]);
     },
 
     /**

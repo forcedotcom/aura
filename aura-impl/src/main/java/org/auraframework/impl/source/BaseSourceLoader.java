@@ -165,7 +165,12 @@ public abstract class BaseSourceLoader implements SourceLoader {
         if (ei != null) {
             return ei.format;
         }
-        return null;
+        try {
+            return Format.valueOf(descriptor.getPrefix().toUpperCase());
+        } catch (Throwable t) {
+            // Doh! don't know what the format is, just punt.
+            return null;
+        }
     }
 
     /**

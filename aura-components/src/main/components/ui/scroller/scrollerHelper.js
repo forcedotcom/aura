@@ -362,8 +362,11 @@
 
         // iOS and Android does not fire scroll til the end. Desktop or windowsPhone does
         // So switch the scroll action to fired based on this
-        wrapper.addEventListener('scroll', function () {
-            scrollEndAction.run.apply(detectsOnMove ? scrollMoveAction : scrollEndAction, arguments);
+        wrapper.addEventListener('scroll', function (e) {
+            //scrollEndAction.run.apply(detectsOnMove ? scrollMoveAction : scrollEndAction, arguments);
+            var eventName = detectsOnMove ? 'scrollMove' : 'scrollEnd',
+                action    = detectsOnMove ? 'gestureMove': 'animationEnd';
+            scrollerInstance._fire(eventName, action, -wrapper.scrollLeft, -wrapper.scrollTop, e);
         }, false);
     },
 

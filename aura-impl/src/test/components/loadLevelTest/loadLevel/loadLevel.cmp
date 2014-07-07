@@ -28,7 +28,7 @@
     <aura:renderIf isTrue="{!v.testNestedLazy}">
         <loadLevelTest:serverWithLazyChild aura:id="nestedLazy" waitId="nestedLazy" aura:load="lazy"/>
     </aura:renderIf>
-
+<br/>
     <loadLevelTest:clientComponent aura:id="lazyClient" aura:load="lazy"/>
 
     <aura:renderIf isTrue="{!v.testMissingRequiredAttribute}">

@@ -246,7 +246,7 @@ var priv = {
         var key = action.getStorageKey();
 
         $A.run(function() {
-            var storage, toStore, needUpdate;
+            var storage, toStore, needUpdate, errorHandler;
 
             needUpdate = action.updateFromResponse(actionResponse);
 
@@ -263,8 +263,18 @@ var priv = {
             storage = action.getStorage();
             if (storage) {
                 toStore = action.getStored(storage.getName());
+                errorHandler = action.getStorageErrorHandler();
+                
                 if (toStore) {
-                    storage.put(key, toStore);
+                    try {
+                        storage.put(key, toStore);
+                    } catch (error) {
+                        if (errorHandler && $A.util.isFunction(errorHandler)) {
+                            errorHandler(error);
+                        } else {
+                            $A.error(error);
+                        }
+                    }
                 }
             }
         }, key);

@@ -1313,6 +1313,36 @@ Test.Aura.Controller.ActionTest = function() {
 			// Assert
 			Assert.Equal(expected, actual);
 		}
+		
+		[ Fact ]
+		function StorableErrorHandlerFromParam() {
+	            // Arrange
+	            var expected = function expected() {};
+            
+	            var mockAssert = Mocks.GetMock(Object.Global(), "$A", {
+	                assert : function() {
+	                }
+	            });
+	            var target = new Action();
+	            target.def = {
+	                isServerAction : function() {
+	                }
+	            };
+	            target.setAbortable = function() {
+	            };
+	            var actual;
+
+	            // Act
+	            mockAssert(function() {
+	                target.setStorable({
+	                    errorHandler: expected
+	                });
+	                actual = target.getStorageErrorHandler();
+	            })
+
+	            // Assert
+	            Assert.Equal(expected, actual);
+		}
 
 		[ Fact ]
 		function SetsStorableCallsSetAbortable() {

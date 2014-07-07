@@ -70,6 +70,35 @@
     },
     
     /**
+     * Tests to ensure that the errorHandler parameter passed into an action's storableConfig will be invoked
+     * when there is an error being added to storage.
+     */
+    testErrorHandlerHook: {
+        test : function(component) {
+            var errorHandled = false;
+            var action = component.get("c.getString");
+            
+            var tooLarge = new Array(10000).join("!");
+            
+            action.setParams({ param: tooLarge });
+            
+            action.setStorable({
+                errorHandler: function() {
+                    errorHandled = true;
+                }
+            });
+            
+            $A.run(function() {
+                $A.enqueueAction(action);
+            });
+            
+            $A.test.addWaitFor(true, function() {
+                return errorHandled;
+            });
+        }
+    },
+    
+    /**
      * Tests to ensure that invalidating an action correctly removes it from storage:
      */
     testInvalidate: {

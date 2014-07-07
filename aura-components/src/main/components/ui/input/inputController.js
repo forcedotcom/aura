@@ -20,8 +20,8 @@
         helper.setErrorComponent(component, value);
     },
     
-    init: function(cmp) {
-    	labelPos = cmp.get('v.labelPosition');
+    init: function(component, event, helper) {
+    	labelPos = component.get('v.labelPosition');
     		
     	if ($A.util.arrayIndexOf(['top', 'right', 'bottom', 'left', 'hidden'], labelPos) < 0) {
     		//once W-1419175 is fixed, then we can set default labelPosition instead of throwing error    		

@@ -22,7 +22,7 @@
 		if (!domId) {
 			helper.setAttribute(component, {key: 'domId', value: globalId});
 		}
-						
+
 		return this.superRender();
 	},
 	
@@ -33,6 +33,10 @@
         var concreteCmp = component.getConcreteComponent();
         var concreteHelper = concreteCmp.getDef().getHelper();
         concreteHelper.addInputDomEvents(component);
+
+        concreteHelper.handleErrors(component);
+        concreteHelper.updateErrorElement(component);
+        
         if (component.get("v.doFormat")) {
             var value = concreteCmp.get("v.value");
             if (!$A.util.isEmpty(value)) {
@@ -47,7 +51,11 @@
         var concreteHelper = concreteCmp.getDef().getHelper();
         concreteHelper.addInputDomEvents(component);
         
-        helper.handleErrors(component);
+        if (!component._creatingAsyncErrorCmp) {
+        	helper.handleErrors(component);
+            helper.updateErrorElement(component);
+        } 
+        
         if (component.get("v.doFormat")) {
             var concreteCmp = component.getConcreteComponent();
             var concreteHelper = concreteCmp.getDef().getHelper();

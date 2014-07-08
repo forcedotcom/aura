@@ -20,5 +20,9 @@
 
     blur : function (cmp) {
         cmp.set("v.blurEvent", "true");
+    },
+    
+    clicked: function(cmp) {
+        cmp.set("v.clickCount", cmp.get("v.clickCount") + 1);
     }
 })

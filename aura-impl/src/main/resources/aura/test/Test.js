@@ -1259,10 +1259,10 @@ $A.ns.Test.prototype.fireDomEvent = function (element, eventName) {
  */
 $A.ns.Test.prototype.clickOrTouch = function (element) {
     if($A.util.supportsTouchEvents()){
-        var ts = document.createEvent('TouchEvent');
-        ts.initTouchEvent('touchstart');
-        var te = document.createEvent('TouchEvent');
-        te.initTouchEvent('touchend');
+        var ts = document.createEvent('UIEvent');
+        ts.initUIEvent('touchstart', true, true); 
+        var te = document.createEvent('UIEvent');
+        te.initUIEvent('touchend', true, true);
         element.dispatchEvent(ts);
         element.dispatchEvent(te);
     } else {

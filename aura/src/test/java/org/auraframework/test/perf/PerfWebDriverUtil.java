@@ -149,6 +149,13 @@ public final class PerfWebDriverUtil {
     // window.performance
 
     /**
+     * @return the usedJSHeapSize from window.performance.memory
+     */
+    public long getUsedJSHeapSize() {
+        return (long) ((JavascriptExecutor) driver).executeScript("return window.performance.memory.usedJSHeapSize");
+    }
+
+    /**
      * See https://developers.google.com/chrome-developer-tools/docs/network and http://www.w3.org/TR/resource-timing
      * 
      * @return Resource Timing API performance

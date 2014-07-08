@@ -52,9 +52,16 @@ public class ComponentPerfSuiteTest extends TestSuite {
     // List components that we can't able to instantiate from client side.
     // The reason could be a dependency to a server side model. Eg. ui:inputDate
     // ui:action cmp shold be abstract?
-    private static final Set<String> BLACKLISTED_COMPONENTS = ImmutableSet.of("markup://ui:inputDate",
-            "markup://ui:action"
-            , "markup://perf:dummyPerf");
+    private static final Set<String> BLACKLISTED_COMPONENTS = ImmutableSet.of(
+            "markup://ui:inputDate" //
+            , "markup://ui:action" //
+            , "markup://perf:dummyPerf" //
+            , "markup://ui:inputRichText" // Error while running $A.run() : CKEDITOR is not defined
+            , "markup://ui:autocompleteList" // Cannot read property 'descriptor' of undefined
+            , "markup://ui:list" // Cannot read property 'descriptor' of undefined
+            , "markup://ui:infiniteList" // Cannot read property 'descriptor' of undefined
+            , "markup://ui:autocomplete" // Cannot read property 'descriptor' of undefined
+    );
 
     private static final Logger LOG = Logger.getLogger(ComponentPerfSuiteTest.class.getSimpleName());
 

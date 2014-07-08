@@ -119,6 +119,9 @@ public class PerfMetricsComparator {
 
         map.put("WallTime", "fluctuates");
 
+        map.put("Profile.JSCPU.timeIdle", "ignored");
+        map.put("Profile.JSCPU.numIslands", "fluctuates");
+
         METRICS_TO_EXCLUDE = ImmutableMap.copyOf(map);
     }
 

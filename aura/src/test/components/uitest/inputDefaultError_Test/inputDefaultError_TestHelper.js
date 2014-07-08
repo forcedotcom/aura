@@ -2,7 +2,7 @@
 	//Helper function that will go to the component, and either validate it or invalidate it
 	addErrorsToCmp : function(invalidCmp){		    	
     	 var ariaDesc = document.getElementById(invalidCmp.get("v.ariaDescribedby"))
-    	 var value = "v.value";//invalidCmp.getValue("v.value");
+    	 var value = "v.value";
     	 
     	 if($A.util.isEmpty(ariaDesc)){
     		 invalidCmp.setValid(value, false);

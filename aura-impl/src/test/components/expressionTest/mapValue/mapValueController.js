@@ -15,7 +15,7 @@
  */
 ({
     onValueChange : function(cmp, evt, helper){
-        if(cmp._log===undefined){
+    	if(cmp._log===undefined){
             cmp._log=[];
         }
         cmp._log.push(evt.getParams());

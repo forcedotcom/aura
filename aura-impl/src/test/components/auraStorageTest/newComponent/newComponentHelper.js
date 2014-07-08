@@ -39,10 +39,8 @@
                 var aTeam = cmp.get("c.getBaseball");
                 aTeam.setCallback(cmp, function(action) {
                     var teamFacet = $A.newCmpDeprecated(action.getReturnValue()[0]);
-                    //Clear the old facet in team div
-                    cmp.find("Team").getValue("v.body").clear();
-                    //Insert newly fetched components
-                    cmp.find("Team").getValue("v.body").push(teamFacet);
+                    //Clear the old facet in team div & insert newly fetched components
+                    cmp.find("Team").set("v.body", [teamFacet]);
                     //Update the page with action number
                     cmp.getDef().getHelper().findAndAppendText(cmp, "Actions", aTeam.getId() +",");
                 });
@@ -59,12 +57,14 @@
                 aPlayers.setCallback(cmp, function(action) {
                     var ret = action.getReturnValue();
                     //Clear the old facet in players div
-                    cmp.find("Players").getValue("v.body").clear();
+                    var newBody = [];
                     for(var i=0;i<ret.length;i++){
                         var playerFacet = $A.newCmpDeprecated(ret[i]);
-                        //Insert newly fetched components
-                        cmp.find("Players").getValue("v.body").push(playerFacet);
+                        newBody.push(playerFacet);
                     }
+                    //Insert newly fetched components
+                    cmp.find("Players").set("v.body", newBody);
+                    
                     //Update the page with action number
                     cmp.getDef().getHelper().findAndAppendText(cmp, "Actions", aPlayers.getId() +",")
                 });
@@ -83,10 +83,8 @@
         var a = cmp.get("c.getBaseball");
         a.setCallback(cmp, function(action) {
             var teamFacet = $A.newCmpDeprecated(action.getReturnValue()[0]);
-            //Clear the old facet in team div
-            cmp.find("Team").getValue("v.body").clear();
-             //Insert newly fetched components
-            cmp.find("Team").getValue("v.body").push(teamFacet);
+            //Clear the old facet in team div & insert newly fetched components
+            cmp.find("Team").set("v.body", [teamFacet]);
             //Update the page with action number
             cmp.getDef().getHelper().findAndSetText(cmp, "Actions", a.getId());
         });
@@ -105,12 +103,13 @@
         a.setCallback(cmp, function(action) {
             var ret = action.getReturnValue();
             //Clear the old facet in players div
-            cmp.find("Players").getValue("v.body").clear();
+            var newBody = [];
             for(var i=0;i<ret.length;i++){
                 var playerFacet = $A.newCmpDeprecated(ret[i]);
-                //Insert newly fetched components
-                cmp.find("Players").getValue("v.body").push(playerFacet);
+                newBody.push(playerFacet);
             }
+            //Insert newly fetched components
+            cmp.find("Players").set("v.body", newBody);
             //Update the page with action number
             cmp.getDef().getHelper().findAndSetText(cmp, "Actions", a.getId());
         });

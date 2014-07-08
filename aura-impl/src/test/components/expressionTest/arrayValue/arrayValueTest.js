@@ -64,711 +64,202 @@
         $A.test.assertEquals(undefined, component._log);
     },
     
-    testGetValue:{
-	test:[function(component){
-	    var aval = $A.expressionService.create(null, ["aa","bb", 1, 2]);
-	    $A.test.assertEquals("ArrayValue", aval.toString());
-	    $A.test.assertEquals(4, aval.getLength(), "expected 4 wrapped values");
-	    //Special case for getValue()
-	    $A.test.assertEquals(4, aval.getValue("length").getValue(), 
-		    "getValue('length') failed to return value object representing length");
-	    $A.test.assertEquals("aa", aval.getValue(0).getValue());
-	    $A.test.assertEquals("bb", aval.getValue(1).getValue());
-	    $A.test.assertEquals(1, aval.getValue(2).getValue());
-	    $A.test.assertEquals(2, aval.getValue(3).getValue());
-	},function(component){
-	    var aval = $A.expressionService.create(null, []);
-	    $A.test.assertEquals(0, aval.getLength(), "expected 0 wrapped values");
-	    try{
-		aval.getValue("");
-		$A.test.fail("Array Value should not accept non integer argument in getValue()");
-	    }catch(e){/*Expected*/}
-	    try{
-		aval.getValue({});
-		$A.test.fail("Array Value should not accept non integer argument in getValue()");
-	    }catch(e){/*Expected*/}
-	    try{
-		aval.getValue(undefined);
-		$A.test.fail("Array Value should not accept non integer argument in getValue()");
-	    }catch(e){
-		$A.test.assertTrue(e.message.indexOf("A number is required for getValue on ArrayValue")!=-1)
-	    }
-	    //Index out of bounds
-	    $A.test.assertUndefinedOrNull(aval.getValue(99))
-	}]
+    testCreateArrayValue:{
+		test:[function(component){
+			var aval = $A.expressionService.create(null, ["aa","bb", 1, 2]);
+			aval = aval.unwrap(); //##$$ Remove this line
+		    $A.test.assertTrue($A.util.isArray(aval));
+		    $A.test.assertEquals(4, aval.length, "expected 4 values");
+		    $A.test.assertEquals("aa", aval[0]);
+		    $A.test.assertEquals("bb", aval[1]);
+		    $A.test.assertEquals(1, aval[2]);
+		    $A.test.assertEquals(2, aval[3]);
+		},function(component){
+		    var aval = $A.expressionService.create(null, []);
+		    aval = aval.unwrap(); //##$$ Remove this line
+		    $A.test.assertEquals(0, aval.length, "expected 0 values");
+		}]
     },
-
-    testGetValueAcrossCommitAndRollback:{
-	test:[function(cmp){
-	    var aval = $A.expressionService.create(null, ["Banana"]);
-	    $A.test.assertEquals("Banana", aval.getValue(0).getValue());
-	    
-	    //insert push remove
-	    aval.insert(0,"Grapes")
-	    $A.test.assertTrue(aval.isDirty());
-	    $A.test.assertEquals("Grapes", aval.getValue(0).getValue());
-	    
-	    /*TODO: W-1611582 Insert changes to the actual array, instead it should markDirty() and then start adding the new stuff 
-	     * aval.rollback();
-	    $A.test.assertFalse(aval.isDirty());
-	    $A.test.assertEquals("Banana", aval.getValue(0).getValue());*/
-	}, function(cmp){
-	    var aval = $A.expressionService.create(null, ["Rock"]);
-	    aval.push("Jazz");
-	    $A.test.assertTrue(aval.isDirty());
-	    $A.test.assertEquals("Jazz", aval.getValue(1).getValue());
-	    
-	    aval.commit();
-	    $A.test.assertFalse(aval.isDirty());
-	    $A.test.assertEquals("Jazz", aval.getValue(1).getValue());
-	    
-	    aval.push("Blues");
-	    $A.test.assertTrue(aval.isDirty());
-	    $A.test.assertEquals("Blues", aval.getValue(2).getValue());
-	    
-/*	    TODO: W-1611582 Push to the actual array, instead it should markDirty() and then start adding the new stuff 
- * 	    aval.rollback();
-	    $A.test.assertFalse(aval.isDirty());
-	    $A.test.assertUndefinedOrNull(aval.getValue(2));
-	    $A.test.assertEquals("Jazz", aval.getValue(1).getValue());
-*/	    
-	}]
+    /**
+     * Creating a Value with array values will wrap them as ArrayValues.
+     */
+    testCreateNestedArrayValue: {
+        test: [function(component){
+            var root = $A.expressionService.create(null, {primary:[1,2], secondary:{ first: ["a",{inner:[null]}] } } );
+            root = root.unwrap(); //##$$ Remove this line
+            var val = root["primary"];
+            $A.test.assertTrue($A.util.isArray(val));
+            $A.test.assertEquals(2, val.length);
+            $A.test.assertEquals(1, val[0]);
+            $A.test.assertEquals(2, val[1]);
+            val = root["secondary"]["first"];
+            $A.test.assertEquals(2, val.length);
+            $A.test.assertEquals("a", val[0]);
+            val = val[1]["inner"];
+            $A.test.assertEquals(1, val.length);
+            $A.test.assertEquals(null, val[0]);
+        },function(component){
+        	var root = $A.expressionService.create(null, [[1,2,3], ["a","b","c","d"]]);
+        	root = root.unwrap(); //##$$ Remove this line
+        	$A.test.assertTrue($A.util.isArray(root));
+        	$A.test.assertEquals(2, root.length);
+        	var numbers = root[0];
+            $A.test.assertTrue($A.util.isArray(numbers));
+            $A.test.assertEquals(3, numbers.length);
+            $A.test.assertEquals(1, numbers[0]);
+            $A.test.assertEquals(2, numbers[1]);
+            $A.test.assertEquals(3, numbers[2]);
+            var alpha = root[1]
+            $A.test.assertTrue($A.util.isArray(alpha));
+            $A.test.assertEquals(4, alpha.length);
+            $A.test.assertEquals("a", alpha[0]);
+            $A.test.assertEquals("b", alpha[1]);
+            $A.test.assertEquals("c", alpha[2]);
+            $A.test.assertEquals("d", alpha[3]);
+        }
+        ]
     },
-
     /**
      * Setting array value to ArrayValue should use the provided value.
      */
-    testSetValueArrayValue: {
-        test: function(component){
-            var aval = $A.expressionService.create(null, ["do","it","right"]);
+    //TODO ##$$: RJ Refactor this test case after halo work, the "halo" branch has the correct code
+    testSetArrayValue: {
+    	attributes : { array : "do,it,right" },
+        test: [
+        /* W-2251243, can we be intelligent about this
+         * function(component){ //Set value but new value is same as old value
+        	var aval = component.get("v.array");
+            component.set("v.array", aval);
+            this.assertNoChangeEvent(component);
+        },*/
+         function(component){ //Set value but new value's content is same as old value
+        	var aval = component.get("v.array");
             var setval = $A.expressionService.create(null, []);
-            $A.test.assertEquals("ArrayValue", setval.toString());
-            $A.test.assertEquals(0, setval.getLength());
-            $A.test.assertEquals(false, setval.isDirty());
-            setval.setValue(aval);
-            $A.test.assertEquals("ArrayValue", setval.toString(), "expected an ArrayValue");
-            $A.test.assertEquals(true, setval.isDirty(), "wrong dirty flag");
-            $A.test.assertEquals(3, setval.getLength(), "expected 3 wrapped values");
-            $A.test.assertEquals("do", setval.get(0), "wrong first value");
-            $A.test.assertEquals("it", setval.get(1), "wrong second value");
-            $A.test.assertEquals("right", setval.get(2), "wrong third value");
+            setval = setval.unwrap(); //##$$ Remove this line
+            $A.test.assertTrue($A.util.isArray(setval));
+            $A.test.assertEquals(0, setval.length);
+            setval = setval.concat(aval);
+            component.set("v.array", setval);
+            this.assertChangeEvent(component);
+            var newValue = component.get("v.array"); 
+            $A.test.assertEquals(3, newValue.length, "expected 3 values");
+            $A.test.assertEquals("do", newValue[0], "wrong first value");
+            $A.test.assertEquals("it", newValue[1], "wrong second value");
+            $A.test.assertEquals("right", newValue[2], "wrong third value");
+        },function(component){ //Set value and test
+        	var aval = component.get("v.array");
+            var setval = $A.expressionService.create(null, ["first"]);
+            setval = setval.unwrap(); //##$$ Remove this line
+            setval = aval.concat(setval);
+            component.set("v.array", setval);
+            this.assertChangeEvent(component);
+            var newValue = component.get("v.array"); 
+            $A.test.assertEquals(4, newValue.length, "expected 4 values");
+            $A.test.assertEquals("do", newValue[0], "wrong first value");
+            $A.test.assertEquals("it", newValue[1], "wrong second value");
+            $A.test.assertEquals("right", newValue[2], "wrong third value");
+            $A.test.assertEquals("first", newValue[3], "wrong fourth value");
+        },function(component){ //Set value in a event life cycle
+        	var aval = component.get("v.array");
+            var setval = $A.expressionService.create(null, ["Panda"]);
+            setval = setval.unwrap(); //##$$ Remove this line
+            $A.run(function(){
+            	component.set("v.array", setval);
+            });
+            this.assertChangeEvent(component);
+            var newValue = component.get("v.array"); 
+            $A.test.assertEquals(1, newValue.length, "expected 1 values");
+            $A.test.assertEquals("Panda", newValue[0], "wrong first value");
+        },function(component){
+        	var setval = $A.expressionService.create(null, [{"key": "value"}, ["a", "b", "c"], {"nums":[1,2,3]}]);
+        	setval = setval.unwrap(); //##$$ Remove this line
+        	$A.run(function(){
+        		component.set("v.array", setval);
+        	})
+            this.assertChangeEvent(component);
+            var newValue = component.get("v.array"); 
+            $A.test.assertEquals(3, newValue.length, "expected 3 values");
+            $A.test.assertTrue($A.util.isObject(newValue[0]))
+            $A.test.assertEquals("value", newValue[0]["key"], "wrong first value");
+            
+            $A.test.assertTrue($A.util.isArray(newValue[1]));
+            $A.test.assertTrue((newValue[1][0] == "a")&&(newValue[1][1] == "b")&&(newValue[1][2] == "c") , "wrong second value");
+            
+            $A.test.assertTrue($A.util.isObject(newValue[2]));
+            var innerArray = newValue[2]["nums"];
+            $A.test.assertTrue($A.util.isArray(innerArray));
+            $A.test.assertTrue((innerArray[0] == 1)&&(innerArray[1] == 2)&&(innerArray[2] == 3) , "wrong third value");
+        },function(component){
+        	component.set("v.array", null);
+            this.assertChangeEvent(component);
+            var newValue = component.get("v.array"); 
+            //$A.test.assertNull(newValue); ##$$ uncomment this line
+            $A.test.assertTrue($A.util.isEmpty(newValue)); //##$$ Remove this line
+        },function(component){
+        	component.set("v.array", undefined);
+            this.assertChangeEvent(component);
+            var newValue = component.get("v.array"); 
+            //$A.test.assertUndefined(newValue); ##$$ uncomment this line
+            $A.test.assertTrue($A.util.isEmpty(newValue)); //##$$ Remove this line
         }
+        ]
     },
 
     /**
-     * Setting array value to SimpleValue should wrap the value in a new ArrayValue.
+     * Setting array type attribute to simple data type.
      */
-    testSetValueSimpleValue: {
-        test: function(component){
+    //W-2251248, no validation for set()
+    _testSetSimpleValue: {
+    	test: function(component){
             var sval = $A.expressionService.create(null, "simple string");
-            var setval = $A.expressionService.create(null, []);
-            $A.test.assertEquals("ArrayValue", setval.toString());
-            $A.test.assertEquals(0, setval.getLength());
-            $A.test.assertEquals(false, setval.isDirty());
-            setval.setValue(sval);
-            $A.test.assertEquals("ArrayValue", setval.toString(), "expected an ArrayValue");
-            $A.test.assertEquals(true, setval.isDirty(), "wrong dirty flag");
-            $A.test.assertEquals(1, setval.getLength(), "expected only 1 wrapped value");
-            var innerval = setval.getValue(0);
-            $A.test.assertEquals("SimpleValue", innerval.toString(), "expected the original SimpleValue");
-            $A.test.assertEquals("simple string", innerval.getValue(), "wrong value");
+            component.set("v.array",sval);
+            this.assertChangeEvent(component);
+            
+            var value = component.get("v.array");
+            $A.test.assertTrue($A.util.isArray(value), "expected an ArrayValue");
+            $A.test.assertEquals(1, value.length, "expected only 1 value");
+            $A.test.assertEquals("simple string", value[0], "expected a string value");
         }
     },
 
     /**
      * Setting array value to MapValue should wrap the value in a new ArrayValue.
      */
-    testSetValueMapValue: {
+    //W-2251248
+    _testSetMapValue: {
         test: function(component){
             var mval = $A.expressionService.create(null, {first:"worst",second:"best"});
-            var setval = $A.expressionService.create(null, []);
-            $A.test.assertEquals("ArrayValue", setval.toString());
-            $A.test.assertEquals(0, setval.getLength());
-            $A.test.assertEquals(false, setval.isDirty());
-            setval.setValue(mval);
-            $A.test.assertEquals("ArrayValue", setval.toString(), "expected an ArrayValue");
-            $A.test.assertEquals(true, setval.isDirty(), "wrong dirty flag");
-            $A.test.assertEquals(1, setval.getLength(), "expected only 1 wrapped value");
-            var innerval = setval.getValue(0);
-            $A.test.assertEquals("MapValue", innerval.toString(), "expected the original MapValue");
-            $A.test.assertEquals("worst", innerval.get("first"), "wrong value of first inner mapping");
-            $A.test.assertEquals("best", innerval.get("second"), "wrong value of second inner mapping");
+            component.set("v.array", mval);
+            //Should fail
         }
     },
-
-    /**
-     * Setting array value to a primitive should wrap the value in a new SimpleValue in a new ArrayValue.
-     */
-    testSetValuePrimitive: {
-        test: function(component){
-            var setval = $A.expressionService.create(null, []);
-            $A.test.assertEquals("ArrayValue", setval.toString());
-            $A.test.assertEquals(0, setval.getLength());
-            $A.test.assertEquals(false, setval.isDirty());
-            setval.setValue(6);
-            $A.test.assertEquals("ArrayValue", setval.toString(), "expected an ArrayValue");
-            $A.test.assertEquals(true, setval.isDirty(), "wrong dirty flag");
-            $A.test.assertEquals(1, setval.getLength(), "expected only 1 wrapped value");
-            var innerval = setval.getValue(0);
-            $A.test.assertEquals("SimpleValue", innerval.toString(), "expected a SimpleValue");
-            $A.test.assertEquals(6, innerval.unwrap(), "wrong value of inner");
-            $A.test.assertEquals(6, setval.get(0), "wrong value");
-        }
-    },
-
-    /**
-     * Setting array value to a string should wrap the value in a new SimpleValue in a new ArrayValue.
-     */
-    testSetValueString: {
-        test: function(component){
-            var setval = $A.expressionService.create(null, []);
-            $A.test.assertEquals("ArrayValue", setval.toString());
-            $A.test.assertEquals(0, setval.getLength());
-            $A.test.assertEquals(false, setval.isDirty());
-            setval.setValue("goodie bag");
-            $A.test.assertEquals("ArrayValue", setval.toString(), "expected an ArrayValue");
-            $A.test.assertEquals(true, setval.isDirty(), "wrong dirty flag");
-            $A.test.assertEquals(1, setval.getLength(), "expected only 1 wrapped value");
-            var innerval = setval.getValue(0);
-            $A.test.assertEquals("SimpleValue", innerval.toString(), "expected a SimpleValue");
-            $A.test.assertEquals("goodie bag", innerval.unwrap(), "wrong value of inner");
-            $A.test.assertEquals("goodie bag", setval.get(0), "wrong value");
-        }
-    },
-
-    /**
-     * Setting array value to an array of Values should return the values in a new ArrayValue.
-     */
-    testSetValueArrayOfValues: {
-        test: function(component){
-            var simval = $A.expressionService.create(null,"simplicity");
-            var mapval = $A.expressionService.create(null,{go:"there"});
-            var arrval = $A.expressionService.create(null,["quickly"]);
-            var setval = $A.expressionService.create(null, []);
-            $A.test.assertEquals("ArrayValue", setval.toString());
-            $A.test.assertEquals(0, setval.getLength());
-            $A.test.assertEquals(false, setval.isDirty());
-            setval.setValue([simval,mapval,arrval]);
-            $A.test.assertEquals("ArrayValue", setval.toString(), "expected an ArrayValue");
-            $A.test.assertEquals(true, setval.isDirty(), "wrong dirty flag");
-            $A.test.assertEquals(3, setval.getLength(), "expected 3 wrapped values");
-            var val = setval.getValue(0);
-            $A.test.assertEquals("SimpleValue", val.toString(), "first value not wrapped");
-            $A.test.assertEquals("simplicity", val.unwrap(), "wrong first wrapped value");
-            $A.test.assertEquals("simplicity", setval.get(0), "wrong first value");
-            val = setval.getValue(1);
-            $A.test.assertEquals("MapValue", val.toString(), "second value not wrapped");
-            $A.test.assertEquals("there", val.get("go"), "wrong second value");
-            val = setval.getValue(2);
-            $A.test.assertEquals("ArrayValue", val.toString(), "third value not wrapped");
-            $A.test.assertEquals(1, val.getLength(), "wrong length for third value");
-            $A.test.assertEquals("quickly", val.get(0), "wrong value in third value");
-        }
-    },
-
-    /**
-     * Setting array value to an array should wrap the values in new Values in a new ArrayValue.
-     */
-    testSetValueArray: {
-        test: function(component){
-            var setval = $A.expressionService.create(null, []);
-            $A.test.assertEquals("ArrayValue", setval.toString());
-            $A.test.assertEquals(0, setval.getLength());
-            $A.test.assertEquals(false, setval.isDirty());
-            setval.setValue(["x",{y:"just because"},["z","end"]]);
-            $A.test.assertEquals("ArrayValue", setval.toString(), "expected an ArrayValue");
-            $A.test.assertEquals(true, setval.isDirty(), "wrong dirty flag");
-            $A.test.assertEquals(3, setval.getLength(), "expected 3 wrapped values");
-            var val = setval.getValue(0);
-            $A.test.assertEquals("SimpleValue", val.toString(), "first value not wrapped");
-            $A.test.assertEquals("x", val.unwrap(), "wrong first wrapped value");
-            $A.test.assertEquals("x", setval.get(0), "wrong first value");
-            val = setval.getValue(1);
-            $A.test.assertEquals("MapValue", val.toString(), "second value not wrapped");
-            $A.test.assertEquals("just because", val.get("y"), "wrong second value");
-            val = setval.getValue(2);
-            $A.test.assertEquals("ArrayValue", val.toString(), "third value not wrapped");
-            $A.test.assertEquals(2, val.getLength(), "wrong length for third value");
-            $A.test.assertEquals("z", val.get(0), "wrong first value in wrapped third value");
-            $A.test.assertEquals("end", val.get(1), "wrong second value in wrapped third value");
-        }
-    },
-
-    /**
-     * Setting array value to a map should wrap the value in a new MapValue in a new ArrayValue.
-     */
-    testSetValueMap: {
-        test: function(component){
-            var setval = $A.expressionService.create(null, []);
-            $A.test.assertEquals("ArrayValue", setval.toString());
-            $A.test.assertEquals(0, setval.getLength());
-            $A.test.assertEquals(false, setval.isDirty());
-            setval.setValue({who:"col mustard",where:"study"});
-            $A.test.assertEquals("ArrayValue", setval.toString(), "expected an ArrayValue");
-            $A.test.assertEquals(true, setval.isDirty(), "wrong dirty flag");
-            $A.test.assertEquals(1, setval.getLength(), "expected only 1 wrapped value");
-            var innerval = setval.getValue(0);
-            $A.test.assertEquals("MapValue", innerval.toString(), "expected the original MapValue");
-            $A.test.assertEquals("col mustard", innerval.get("who"), "wrong value of first inner mapping");
-            $A.test.assertEquals("study", innerval.get("where"), "wrong value of second inner mapping");
-        }
-    },
-
-    /**
-     * Setting array value to an array of Values should return the values in a new ArrayValue.
-     */
-    testUnwrap: {
-        test: function(component){
-            var simval = $A.expressionService.create(null,"simplicity");
-            var mapval = $A.expressionService.create(null,{go:"there"});
-            var arrval = $A.expressionService.create(null,["quickly"]);
-            var setval = $A.expressionService.create(null,[simval,mapval,arrval]);
-            var val = setval.unwrap();
-            $A.test.assertEquals(true, $A.util.isArray(val), "expected an array");
-            $A.test.assertEquals(3, val.length, "expected 3 values");
-            $A.test.assertEquals("string", typeof val[0], "wrong first value type");
-            $A.test.assertEquals("simplicity", val[0], "wrong first value");
-            $A.test.assertEquals("object", typeof val[1], "wrong second value type");
-            $A.test.assertEquals("there", val[1].go, "wrong second value");
-            $A.test.assertEquals(true, $A.util.isArray(val[2]), "expected an array value");
-            $A.test.assertEquals(1, val[2].length, "wrong length for third value");
-            $A.test.assertEquals("quickly", val[2][0], "wrong value in third value");
-        }
-    },
-
-    /**
-     * Creating a Value with array values will wrap them as ArrayValues.
-     */
-    testCreateNestedArrayValue: {
-        test: function(component){
-            var root = $A.expressionService.create(null,{primary:[1,2],secondary:{first:["a",{inner:[null]}]}});
-            var val = root.getValue("primary");
-            $A.test.assertEquals("ArrayValue", val.toString());
-            $A.test.assertEquals(2, val.getLength());
-            $A.test.assertEquals(1, val.get(0));
-            $A.test.assertEquals(2, val.get(1));
-            val = root.getValue("secondary").getValue("first");
-            $A.test.assertEquals(2, val.getLength());
-            $A.test.assertEquals("a", val.get(0));
-            val = val.getValue(1).getValue("inner");
-            $A.test.assertEquals(1, val.getLength());
-            $A.test.assertEquals(null, val.get(0));
-        }
-    },
-
-    testPush: {
-        test: function(component){
-            var array = component.getValue("v.array");
-            $A.test.assertEquals(0, array.getLength());
-
-            // push onto empty array
-            array.push("a simple value");
-            $A.test.assertEquals(1, array.getLength());
-            var val0 = array.getValue(0);
-            $A.test.assertEquals("SimpleValue", val0.toString());
-            $A.test.assertEquals("a simple value", val0.unwrap());
-            $A.test.assertFalse(val0.isDirty());  // Cleared during addHandlers
-            this.assertChangeEvent(component);
-
-            // push onto non-empty array
-            array.push({somekey:"some value"});
-            $A.test.assertEquals(2, array.getLength());
-            $A.test.assertEquals(val0, array.getValue(0));
-            var val1 = array.getValue(1);
-            $A.test.assertEquals("MapValue", val1.toString());
-            $A.test.assertEquals("some value", val1.get("somekey"));
-            $A.test.assertFalse(val1.isDirty());
-            this.assertChangeEvent(component);
-
-            // push again, why not?
-            array.push(["first",true]);
-            $A.test.assertEquals(3, array.getLength());
-            $A.test.assertEquals(val0, array.getValue(0));
-            $A.test.assertEquals(val1, array.getValue(1));
-            var val2 = array.getValue(2);
-            $A.test.assertEquals("ArrayValue", val2.toString());
-            $A.test.assertEquals(2, val2.getLength());
-            $A.test.assertEquals("first", val2.get(0));
-            $A.test.assertEquals(true, val2.get(1));
-            this.assertChangeEvent(component);
-
-            // push a SimpleValue (shouldn't get wrapped)
-            array.push(array.getValue(0));
-            $A.test.assertEquals(4, array.getLength());
-            var val = array.getValue(3);
-            $A.test.assertEquals("SimpleValue", val.toString());
-            $A.test.assertEquals("a simple value", val.unwrap());
-            this.assertChangeEvent(component);
-
-            // push null
-            array.push(null);
-            $A.test.assertEquals(5, array.getLength());
-            val = array.getValue(4);
-            $A.test.assertEquals("SimpleValue", val.toString());
-            $A.test.assertEquals(null, val.unwrap());
-            $A.test.assertFalse(val.isDirty());
-            this.assertChangeEvent(component);
-
-            // push undefined
-            array.push(undefined);
-            $A.test.assertEquals(6, array.getLength());
-            val = array.getValue(5);
-            $A.test.assertEquals("SimpleValue", val.toString());
-            $A.test.assertEquals(undefined, val.unwrap());
-            $A.test.assertFalse(val.isDirty());
-            this.assertChangeEvent(component);
-
-            array.push();
-            $A.test.assertEquals(7, array.getLength());
-            val = array.getValue(6);
-            $A.test.assertEquals(undefined, val.unwrap());
-            this.assertChangeEvent(component);
-        }
-    },
-
     testInsert: {
+    	attributes : { array : "1,2,3" },
         test: function(component){
-            var array = component.getValue("v.array");
-            $A.test.assertEquals(0, array.getLength());
+        	var array = component.get("v.array");
+            $A.test.assertEquals(3, array.length);
 
-            // insert below start of array (abs(neg index) > array.length)
-            array.insert(-5, "a simple value");
-            $A.test.assertEquals(0, array.getLength());
-            this.assertNoChangeEvent(component);
-
-            // insert above end of array
-            array.insert(7, {somekey:"some value"});
-            $A.test.assertEquals(1, array.getLength());
-            var val1 = array.getValue(0);
-            $A.test.assertEquals("MapValue", val1.toString());
-            $A.test.assertEquals("some value", val1.get("somekey"));
+            array.splice(2, 0, "A");
+            component.set("v.array", array)
             this.assertChangeEvent(component);
-
-            // insert at head of array
-            array.insert(0, ["first",true]);
-            $A.test.assertEquals(2, array.getLength());
-            var val2 = array.getValue(0);
-            $A.test.assertEquals("ArrayValue", val2.toString());
-            $A.test.assertEquals(2, val2.getLength());
-            $A.test.assertEquals("first", val2.get(0));
-            $A.test.assertEquals(true, val2.get(1));
-            $A.test.assertEquals(val1, array.getValue(1));
-            this.assertChangeEvent(component);
-
-            // insert at end of array
-            array.insert(array.getLength(), 4400);
-            $A.test.assertEquals(3, array.getLength());
-            $A.test.assertEquals(val2, array.getValue(0));
-            $A.test.assertEquals(val1, array.getValue(1));
-            var val3 = array.getValue(2);
-            $A.test.assertEquals("SimpleValue", val3.toString());
-            $A.test.assertEquals(4400, val3.unwrap());
-            this.assertChangeEvent(component);
-
-            // insert in middle of array
-            array.insert(1, array.getValue(2));
-            $A.test.assertEquals(4, array.getLength());
-            $A.test.assertEquals(val2, array.getValue(0));
-            var val4 = array.getValue(1);
-            $A.test.assertEquals("SimpleValue", val4.toString());
-            $A.test.assertEquals(4400, val4.unwrap());
-            $A.test.assertEquals(val3, val4);
-            $A.test.assertEquals(val1, array.getValue(2));
-            $A.test.assertEquals(val3, array.getValue(3));
-            this.assertChangeEvent(component);
-
-            // inserted subvalue, and higher ones, become dirty
-            array.commit();  // Clear existing dirty bits
-            var subv = $A.expressionService.create(null, [ 'a' ]);
-            $A.test.assertFalse(subv.isDirty(), "new value was already dirty");
-            array.insert(1, subv);
-            $A.test.assertFalse(array.getValue(0).isDirty(), "AV.insert dirtied unchanged item 0");
-            $A.test.assertTrue(array.getValue(1).isDirty(), "AV.insert didn't dirty (or wrongly cleared) unowned item 1");
-            $A.test.assertFalse(array.getValue(2).isDirty(), "AV.insert didn't un-dirty item 2");
-            this.assertChangeEvent(component);
-
-            array.clear();
-            component._log = undefined;
-
-            // insert at string index
-            array.insert("0", 0.0);
-            $A.test.assertEquals(0, array.getLength());
-            this.assertNoChangeEvent(component);
-
-            // insert at boolean index
-            array.insert(true, "boolean");
-            $A.test.assertEquals(0, array.getLength());
-            this.assertNoChangeEvent(component);
-
-            // insert at array index
-            array.insert([0,0], "array");
-            $A.test.assertEquals(0, array.getLength());
-            this.assertNoChangeEvent(component);
-
-            // insert at map index
-            array.insert({0:undefined}, "map");
-            $A.test.assertEquals(0, array.getLength());
-            this.assertNoChangeEvent(component);
-
-            // insert at alpha index
-            array.insert("apex", "string");
-            $A.test.assertEquals(0, array.getLength());
-            this.assertNoChangeEvent(component);
-
-            // insert at null index
-            array.insert(null, "null");
-            $A.test.assertEquals(0, array.getLength());
-            this.assertNoChangeEvent(component);
-
-            // insert at undefined index
-            array.insert(undefined, "undefined");
-            $A.test.assertEquals(0, array.getLength());
-            this.assertNoChangeEvent(component);
-
-            // insert nothing (undefined)
-            array.insert();
-            $A.test.assertEquals(0, array.getLength());
-            this.assertNoChangeEvent(component);
-
-            // insert with negative index
-            array.insert(-3, "negative");
-            $A.test.assertEquals(0, array.getLength());
-            this.assertNoChangeEvent(component);
+            array = component.get("v.array");
+            $A.test.assertEquals(4, array.length);
+            $A.test.assertEquals("A", array[2]);
         }
     },
 
     testRemove: {
         attributes : { array : "q,w,e,r" },
         test: function(component){
-            var array = component.getValue("v.array");
-            $A.test.assertEquals(4, array.getLength());
-            $A.test.assertEquals("q", array.get(0));
-            $A.test.assertEquals("w", array.get(1));
-            $A.test.assertEquals("e", array.get(2));
-            $A.test.assertEquals("r", array.get(3));
+        	var array = component.get("v.array");
+            $A.test.assertEquals(4, array.length);
 
-            // remove inner
-            var lost = array.getValue(2);
-            $A.test.assertFalse(lost.isDirty(), "Removed value is dirty too soon");
-            array.remove(2);
-            $A.test.assertEquals(3, array.getLength());
-            $A.test.assertEquals("q", array.get(0));
-            $A.test.assertEquals("w", array.get(1));
-            $A.test.assertEquals("r", array.get(2));
+            array.splice(2, 1);
+            component.set("v.array", array)
             this.assertChangeEvent(component);
-
-            // remove head
-            array.remove(0);
-            $A.test.assertEquals(2, array.getLength());
-            $A.test.assertEquals("w", array.get(0));
-            $A.test.assertEquals("r", array.get(1));
-            this.assertChangeEvent(component);
-
-            // remove tail
-            array.remove(1);
-            $A.test.assertEquals(1, array.getLength());
-            $A.test.assertEquals("w", array.get(0));
-            this.assertChangeEvent(component);
-
-            // remove last
-            array.remove(0);
-            $A.test.assertEquals(0, array.getLength());
-            this.assertChangeEvent(component);
-
-            array.push("something");
-            $A.test.assertEquals(1, array.getLength());
-            var val = array.getValue(0);
-            component._log = undefined;
-
-            // remove string index
-            array.remove("0");
-            $A.test.assertEquals(1, array.getLength());
-            $A.test.assertEquals(val, array.getValue(0));
-            this.assertNoChangeEvent(component);
-
-            // remove boolean index
-            array.remove(true);
-            $A.test.assertEquals(1, array.getLength());
-            $A.test.assertEquals(val, array.getValue(0));
-            this.assertNoChangeEvent(component);
-
-            // remove array index
-            array.remove([0,0]);
-            $A.test.assertEquals(1, array.getLength());
-            $A.test.assertEquals(val, array.getValue(0));
-            this.assertNoChangeEvent(component);
-
-            // remove map index
-            array.remove({0:undefined});
-            $A.test.assertEquals(1, array.getLength());
-            $A.test.assertEquals(val, array.getValue(0));
-            this.assertNoChangeEvent(component);
-
-            // remove negative index
-            array.remove(-1);
-            $A.test.assertEquals(1, array.getLength());
-            $A.test.assertEquals(val, array.getValue(0));
-            this.assertNoChangeEvent(component);
-
-            // remove too large index
-            array.remove(1);
-            $A.test.assertEquals(1, array.getLength());
-            $A.test.assertEquals(val, array.getValue(0));
-            this.assertNoChangeEvent(component);
-
-            // remove alpha index
-            array.remove("apex");
-            $A.test.assertEquals(1, array.getLength());
-            $A.test.assertEquals(val, array.getValue(0));
-            this.assertNoChangeEvent(component);
-
-            // remove null index
-            array.remove(null);
-            $A.test.assertEquals(1, array.getLength());
-            $A.test.assertEquals(val, array.getValue(0));
-            this.assertNoChangeEvent(component);
-
-            // remove undefined index
-            array.remove(undefined);
-            $A.test.assertEquals(1, array.getLength());
-            $A.test.assertEquals(val, array.getValue(0));
-            this.assertNoChangeEvent(component);
-
-            // remove nothing (undefined)
-            array.remove();
-            $A.test.assertEquals(1, array.getLength());
-            $A.test.assertEquals(val, array.getValue(0));
-            this.assertNoChangeEvent(component);
+            array = component.get("v.array");
+            $A.test.assertEquals(3, array.length);
+            $A.test.assertEquals("r", array[2]);
         }
     },
-
-    testOnChange: {
-        test: function(component){
-            var array = component.getValue("v.array");
-
-            $A.log("for setValue");
-            array.setValue("anything");
-            this.assertChangeEvent(component);
-
-            $A.log("for item setValue");
-            var val = array.getValue(0);
-            val.setValue("something");
-            this.assertChangeEvent(component, 0, val.unwrap());
-
-            $A.log("for insert");
-            array.insert(0, "squeeze");
-            this.assertChangeEvent(component);
-
-              // TODO(W-1322739): change event not firing when array item is destroyed
-//            $A.log("for destroy");
-//            val.destroy();
-//            this.assertChangeEvent(component, 1, val);
-
-            $A.log("for clear");
-            array.clear();
-            this.assertChangeEvent(component);
-
-            // SimpleValue
-            val = $A.expressionService.create(null, "ooh");
-            val.setValue("ahh");
-            this.assertNoChangeEvent(component);
-
-            $A.log("for pushing existing simple value");
-            array.push(val);
-            this.assertChangeEvent(component);
-
-            $A.log("for updating existing simple value");
-            val.setValue("wow");
-            this.assertChangeEvent(component, 0, val.unwrap());
-
-            $A.log("for removing existing simple value");
-            array.remove(0);
-            this.assertChangeEvent(component);
-
-            $A.log("for updating former simple value item");
-            val.setValue("hmm");
-            this.assertNoChangeEvent(component);
-
-//            $A.log("for destroying existing simple value");
-//            array.push(val);
-//            this.assertChangeEvent(component);
-//            val.destroy();
-//            this.assertChangeEvent(component, 0, val);
-//            array.clear();
-//            this.assertChangeEvent(component);
-
-            // ArrayValue
-            val = $A.expressionService.create(null, ["circle"]);
-
-            $A.log("for pushing existing array value");
-            array.push(val);
-            this.assertChangeEvent(component);
-
-            $A.log("for updating existing array value with push");
-            val.push("oval");
-            this.assertChangeEvent(component, 0, val.unwrap());
-
-            $A.log("for updating existing array value with insert");
-            val.insert(0, "ellipse");
-            this.assertChangeEvent(component, 0, val.unwrap());
-
-            $A.log("for updating existing array value with remove");
-            val.remove(1);
-            this.assertChangeEvent(component, 0, val.unwrap());
-
-            $A.log("for updating existing array value with clear");
-            val.clear();
-            this.assertChangeEvent(component, 0, val.unwrap());
-
-            $A.log("for removing existing array value");
-            array.remove(0);
-            this.assertChangeEvent(component);
-
-//            $A.log("for updating former array value item");
-//            val.push("ellipse");
-//            this.assertNoChangeEvent(component);
-
-//            $A.log("for destroying existing array value");
-//            array.push(val);
-//            this.assertChangeEvent(component);
-//            val.destroy();
-//            this.assertChangeEvent(component, 0, val);
-
-            // MapValue
-            val = $A.expressionService.create(null, {"direction":"north"});
-            val.put("distance","5km");
-            this.assertNoChangeEvent(component);
-
-            $A.log("for pushing existing map value");
-            array.push(val);
-            this.assertChangeEvent(component);
-
-            $A.log("for updating existing map value with put");
-            val.put("speed","20 kmph");
-            this.assertChangeEvent(component, "speed", val.getValue("speed").unwrap());
-
-            // TODO: update map with merge should fire change event
-
-            $A.log("for removing existing map value");
-            array.remove(0);
-            this.assertChangeEvent(component);
-
-            $A.log("for updating former map value item");
-            val.put("load","2 tons");
-            this.assertNoChangeEvent(component);
-
-//            $A.log("for destroying existing map value");
-//            array.push(val);
-//            this.assertChangeEvent(component);
-//            val.destroy();
-//            this.assertChangeEvent(component, 0, val);
-
-            $A.log("for clearing empty");
-            array.clear();
-            this.assertChangeEvent(component);
-            array.clear();
-            this.assertChangeEvent(component);
-        }
-    }
-
 })

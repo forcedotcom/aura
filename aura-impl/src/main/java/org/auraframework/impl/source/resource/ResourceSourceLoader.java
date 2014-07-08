@@ -19,10 +19,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
+
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
@@ -30,7 +30,6 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
 import org.auraframework.impl.source.BaseSourceLoader;
-import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.system.PrivilegedNamespaceSourceLoader;
 import org.auraframework.system.Source;
@@ -38,6 +37,8 @@ import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.IOUtil;
 import org.auraframework.util.resource.ResourceLoader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -46,74 +47,78 @@ import com.google.common.collect.Sets;
  */
 public class ResourceSourceLoader extends BaseSourceLoader implements PrivilegedNamespaceSourceLoader {
 
+    private final static Logger _log = LoggerFactory.getLogger(ResourceSourceLoader.class);
+
     protected final String packagePrefix;
     protected final String resourcePrefix;
     protected final Map<IndexKey, Set<DefDescriptor<?>>> index = Maps.newHashMap();
     protected final Set<String> namespaces = Sets.newHashSet();
-    private final Pattern pattern = Pattern.compile("([^:]*:[^.]*)(.[^,]*),?");
-    private final Pattern testSuitePattern = Pattern.compile("([^:]*:[^.]*)(Test.js),?");
     private final ResourceLoader resourceLoader = Aura.getConfigAdapter().getResourceLoader();
 
     public ResourceSourceLoader(String basePackage) {
         this.packagePrefix = "";
         resourcePrefix = basePackage;
+        List<String> files = null;
 
+        // Ugh. this is used by tests.
+        if (basePackage == null) {
+            return;
+        }
         InputStreamReader reader = null;
+        InputStream is = null;
         try {
             try {
-                InputStream is = resourceLoader.getResourceAsStream(resourcePrefix + "/.index");
+                is = resourceLoader.getResourceAsStream(resourcePrefix + "/.index");
                 if (is != null) {
                     reader = new InputStreamReader(is);
                     StringWriter sw = new StringWriter();
                     IOUtil.copyStream(reader, sw);
-
-                    Matcher matcher = pattern.matcher(sw.toString());
-                    while (matcher.find()) {
-                        String name = matcher.group(1);
-                        ExtensionInfo ei = null;
-
-                        Matcher testSuiteMatcher = testSuitePattern.matcher(matcher.group(0));
-                        if (testSuiteMatcher.find()) {
-                            ei = byExtension.get(testSuiteMatcher.group(2).toLowerCase());
-                            name = testSuiteMatcher.group(1);
-                        }
-                        if (ei == null) {
-                            ei = byExtension.get(matcher.group(2));
-                        }
-                        if (ei == null) {
-                            //unrecognized entry in index, skip it
-                            continue;
-                        }
-                        switch(ei.defType) {
-                        case STYLE:
-                            name = "css://" + AuraTextUtil.replaceChar(name, ':', ".");
-                            break;
-                        case TESTSUITE:
-                            name = "js://" + AuraTextUtil.replaceChar(name, ':', ".");
-                            break;
-                        default:
-                            name = "markup://" + name;
-                        }
-
-                        DefDescriptor<?> desc = DefDescriptorImpl.getInstance(name, ei.defType.getPrimaryInterface());
-                        IndexKey key = new IndexKey(ei.defType, desc.getNamespace());
-                        namespaces.add(desc.getNamespace());
-
-                        Set<DefDescriptor<?>> set = index.get(key);
-                        if (set == null) {
-                            set = Sets.newHashSet();
-                            index.put(key, set);
-                        }
-                        set.add(desc);
-                    }
+                    String list = sw.toString();
+                    files = AuraTextUtil.splitSimple(",", list, list.length()/10);
                 }
             } finally {
-                if (reader != null) {
-                    reader.close();
+                //
+                // Make sure we close everything out.
+                //
+                try {
+                    if (reader != null) {
+                        reader.close();
+                    }
+                } catch (Throwable t) {
+                    // ignore exceptions on close.
+                }
+                try {
+                    if (is != null) {
+                        is.close();
+                    }
+                } catch (Throwable t) {
+                    // ignore exceptions on close.
                 }
             }
         } catch (IOException x) {
             throw new AuraRuntimeException(x);
+        }
+        if (files == null) {
+            _log.warn("Unused base: "+basePackage);
+            return;
+        }
+        for (String file : files) {
+            DefDescriptor<?> desc = getDescriptor(file);
+            if (desc == null) {
+                // This should be a fatal error, and we should always compile our sources (FAIL FAST).
+                // throw new AuraRuntimeException("Unrecognized entry, source skew "+file);
+                _log.error("Bad filename in index: "+file);
+                continue;
+            }
+            IndexKey key = new IndexKey(desc.getDefType(), desc.getNamespace());
+            namespaces.add(desc.getNamespace());
+
+            Set<DefDescriptor<?>> set = index.get(key);
+            if (set == null) {
+                set = Sets.newHashSet();
+                index.put(key, set);
+            }
+            set.add(desc);
         }
     }
 

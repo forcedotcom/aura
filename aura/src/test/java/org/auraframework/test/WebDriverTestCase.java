@@ -400,6 +400,10 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
         assertGoldMetrics(actual);
     }
 
+    public final PerfWebDriverUtil getPerfWebDriverUtil() {
+        return perfWebDriverUtil;
+    }
+
     public final List<RDPNotification> getRDPNotifications() {
         return perfWebDriverUtil.getRDPNotifications();
     }

@@ -93,6 +93,13 @@ public final class MiscPerfFrameworkTest extends AbstractPerfTestCase {
         }
     }
 
+    public void testUsedJSHeapSize() throws Exception {
+        openTotallyRaw("/ui/label.cmp?label=foo");
+
+        long size = perfWebDriverUtil.getUsedJSHeapSize();
+        assertTrue("JS Heap Size: " + size, size > 1000);
+    }
+
     public void testResourceTimingAPI() throws Exception {
         openTotallyRaw("/ui/label.cmp?label=foo");
 

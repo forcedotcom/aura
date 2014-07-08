@@ -50,7 +50,7 @@ public final class PerfMetrics {
                     heapSnapshot = metrics.getHeapSnapshot();
                 }
                 if (combined == null) {
-                    // so we return null of all metrics in metricsList are null
+                    // so we return null if all metrics in metricsList are null
                     combined = new PerfMetrics();
                 }
                 for (String name : metrics.getAllMetricNames()) {

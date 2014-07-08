@@ -264,7 +264,11 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
 
     protected static final boolean RUN_PERF_TESTS = System.getProperty("runPerfTests") != null;
 
-    protected boolean isPerfRunForAuraStats;
+    public enum PerfRunMode {
+        WARMUP, TIMELINE, PROFILE, AURASTATS
+    };
+
+    protected PerfRunMode perfRunMode;
 
     public boolean isPerfTest() {
         return RUN_PERF_TESTS && PerfUtil.hasPerfTestAnnotation(this);
@@ -287,6 +291,13 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
     /**
      * Override to change
      */
+    protected int numPerfProfileRuns() {
+        return PerfUtil.MEASURE_JSCPU_METRICTS ? 3 : 0;
+    }
+
+    /**
+     * Override to change
+     */
     protected int numPerfAuraRuns() {
         return 1; // metrics don't change from run to run
     }
@@ -303,11 +314,14 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
 
     private void runPerfTests() throws Throwable {
         int numPerfTimelineRuns = numPerfTimelineRuns();
+        int numPerfProfileRuns = numPerfProfileRuns();
         int numPerfAuraRuns = numPerfAuraRuns();
         PerfMetrics timelineMetrics = null;
+        PerfMetrics profileMetrics = null;
         PerfMetrics auraMetrics = null;
 
         if (runPerfWarmupRun()) {
+            perfRunMode = PerfRunMode.WARMUP;
             // TODO: any metrics that should/could be measured for the first run
             try {
                 perBrowserSetUp();
@@ -319,12 +333,13 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
 
         // runs to collect Dev Tools performance metrics
         if (numPerfTimelineRuns > 0) {
+            perfRunMode = PerfRunMode.TIMELINE;
             PerfRunsCollector runsCollector = new PerfRunsCollector();
             for (int i = 0; i < numPerfTimelineRuns; i++) {
                 try {
                     perBrowserSetUp();
 
-                    PerfMetricsCollector metricsCollector = new PerfMetricsCollector(this, true);
+                    PerfMetricsCollector metricsCollector = new PerfMetricsCollector(this, perfRunMode);
                     metricsCollector.startCollecting();
 
                     superRunTest();
@@ -341,36 +356,60 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
                     perBrowserTearDown();
                 }
             }
-            // use the median run for timeline metrics so individual metrics and dev tools log a
+            // use the median run for timeline metrics so individual metrics and dev tools logs match
             timelineMetrics = runsCollector.getMedianRun();
+        }
+
+        // runs to collect JavaScript profiling metrics, run separately because affect overall metrics
+        if (numPerfProfileRuns > 0) {
+            perfRunMode = PerfRunMode.PROFILE;
+            PerfRunsCollector runsCollector = new PerfRunsCollector();
+            for (int i = 0; i < numPerfProfileRuns; i++) {
+                try {
+                    perBrowserSetUp();
+
+                    PerfMetricsCollector metricsCollector = new PerfMetricsCollector(this, perfRunMode);
+                    metricsCollector.startCollecting();
+
+                    superRunTest();
+
+                    PerfMetrics metrics = metricsCollector.stopCollecting();
+                    runsCollector.addRun(metrics);
+                } finally {
+                    perBrowserTearDown();
+                }
+            }
+            // use the median run for profile metrics so individual metrics and .cpuprofile match
+            profileMetrics = runsCollector.getMedianRun();
         }
 
         // runs to collect Aura stats metrics
         if (numPerfAuraRuns > 0) {
+            perfRunMode = PerfRunMode.AURASTATS;
             // collecting them in separate runs as they need STATS mode
             PerfRunsCollector runsCollector = new PerfRunsCollector();
             for (int i = 0; i < numPerfAuraRuns; i++) {
                 try {
                     // TODO: set stats mode for framework tests
-                    isPerfRunForAuraStats = true;
                     perBrowserSetUp();
 
-                    PerfMetricsCollector metricsCollector = new PerfMetricsCollector(this, false);
+                    PerfMetricsCollector metricsCollector = new PerfMetricsCollector(this, perfRunMode);
                     metricsCollector.startCollecting();
 
                     superRunTest();
 
-                    runsCollector.addRun(metricsCollector.stopCollecting(true));
+                    runsCollector.addRun(metricsCollector.stopCollecting());
                 } finally {
-                    isPerfRunForAuraStats = false;
                     perBrowserTearDown();
                 }
             }
             auraMetrics = runsCollector.getMedianMetrics();
         }
 
+        perfRunMode = null;
+
         // combine all metrics, log/write results, perform tests
-        PerfMetrics allMetrics = PerfMetrics.combine(timelineMetrics, auraMetrics);
+        PerfMetrics allMetrics = PerfMetrics.combine(timelineMetrics, profileMetrics, auraMetrics);
         if (allMetrics != null) {
             if (logger.isLoggable(Level.INFO)) {
                 logger.info("perf metrics for " + this + '\n' + allMetrics.toLongString());

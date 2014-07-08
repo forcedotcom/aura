@@ -122,7 +122,7 @@ public final class MiscPerfFrameworkTest extends AbstractPerfTestCase {
     public void testMultipleRunsReuseWebDriver() throws Exception {
         PerfRunsCollector runs = new PerfRunsCollector();
         for (int i = 0; i < 2; i++) {
-            PerfMetricsCollector perfData = new PerfMetricsCollector(this, true);
+            PerfMetricsCollector perfData = new PerfMetricsCollector(this, PerfRunMode.TIMELINE);
             perfData.startCollecting();
             open("/ui/label.cmp?label=foo");
             PerfMetrics metrics = perfData.stopCollecting();
@@ -135,7 +135,7 @@ public final class MiscPerfFrameworkTest extends AbstractPerfTestCase {
         PerfRunsCollector runs = new PerfRunsCollector();
         for (int i = 0; i < 2; i++) {
             getDriver();
-            PerfMetricsCollector perfData = new PerfMetricsCollector(this, true);
+            PerfMetricsCollector perfData = new PerfMetricsCollector(this, PerfRunMode.TIMELINE);
             perfData.startCollecting();
             open("/ui/label.cmp?label=foo");
             PerfMetrics metrics = perfData.stopCollecting();

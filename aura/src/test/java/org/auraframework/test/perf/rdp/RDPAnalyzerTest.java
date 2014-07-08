@@ -119,7 +119,7 @@ public final class RDPAnalyzerTest extends AbstractPerfTestCase {
     }
 
     public void testGetDevToolsLog() throws Exception {
-        PerfMetricsCollector metricsCollector = new PerfMetricsCollector(this, true);
+        PerfMetricsCollector metricsCollector = new PerfMetricsCollector(this, PerfRunMode.TIMELINE);
         metricsCollector.startCollecting();
         runWithPerfApp(getDefDescriptor("ui:button"));
         metricsCollector.stopCollecting();

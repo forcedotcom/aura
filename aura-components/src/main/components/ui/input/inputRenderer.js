@@ -22,7 +22,8 @@
 		if (!domId) {
 			helper.setAttribute(component, {key: 'domId', value: globalId});
 		}
-
+		
+		helper.handleErrors(component);
 		return this.superRender();
 	},
 	
@@ -33,8 +34,6 @@
         var concreteCmp = component.getConcreteComponent();
         var concreteHelper = concreteCmp.getDef().getHelper();
         concreteHelper.addInputDomEvents(component);
-
-        concreteHelper.handleErrors(component);
         concreteHelper.updateErrorElement(component);
         
         if (component.get("v.doFormat")) {

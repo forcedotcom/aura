@@ -141,17 +141,8 @@ ArrayValue.prototype.isUnset = function() {
  * Removes all objects from the array.
  */
 ArrayValue.prototype.clear = function() {
-    this.setValue([]);
+    this._setValue([]);
 };
-
-/**
- * Promises that I am the true owner of my children and that I should be responsible for cleaning
- * up lost references.
- */
-ArrayValue.prototype.setIsOwner = function(isOwner) {
-    this.isOwner = isOwner;
-};
-
 
 /**
  * DO NOT USE THIS METHOD.
@@ -161,7 +152,7 @@ ArrayValue.prototype.setIsOwner = function(isOwner) {
  * @deprecated use Component.set(name,value) instead
  */
 ArrayValue.prototype.setValue = function (newArray, skipChange) {
-    //$A.warning("DEPRECATED USE OF arrayValue.setValue(newArray, skipChange). USE component.set(name,newArray) INSTEAD.",newArray);
+    //$A.warning("DEPRECATED USE OF arrayValue.setValue(newArray, skipChange). USE component.set(name,newArray) INSTEAD.", newArray);
     this._setValue(newArray, skipChange);
 };
 
@@ -170,11 +161,16 @@ ArrayValue.prototype.setValue = function (newArray, skipChange) {
  *
  * @param {Object} newArray The new array. This can be an array of literal JavaScript values or an array of value objects.
  * @param {Boolean} skipChange Set to true if you want to skip firing of the change event, which indicates that the content or state has changed. Or set to false if you want to fire the change event.
+ * @param {Boolean} doNotAutoDestroy Set to true if you want to skip auto destroy in commit().
  */
-ArrayValue.prototype._setValue = function(newArray, skipChange) {
+ArrayValue.prototype._setValue = function(newArray, skipChange, doNotAutoDestroy) {
+	if (doNotAutoDestroy) {
+		this.doNotAutoDestroy = true;
+	}
+	
     this.fireEvents = false;
     this.hasRealValue = (newArray !== null && newArray !== undefined);
-
+    
     this.newArray = [];
     this.makeDirty();
 
@@ -198,21 +194,6 @@ ArrayValue.prototype._setValue = function(newArray, skipChange) {
     }
 };
 
-
-/**
- * Recursively destroys all values in the array
- * @param {Boolean} async Set to true if values are to be destroyed asynchronously.
- * @private
- */
-ArrayValue.prototype.destroyOrphans = function(array, async) {
-     while (array.length > 0) {
-         var v = array.pop();
-         if (v && v.destroy) {
-             v.destroy(async);
-         }
-    }
-};
-
 /**
  * Commits changes to the array.
  * If there is no uncommitted value, nothing will happen.  isDirty() will return false
@@ -221,11 +202,39 @@ ArrayValue.prototype.destroyOrphans = function(array, async) {
  * @param {Object} clean Do not use this internal-only parameter.
  */
 ArrayValue.prototype.commit = function(clean) {
-    if (this.isDirty()) {
-        if (this.array && this.isOwner) {
-            this.destroyOrphans(this.array,true);
-        }
-
+	if (this.isDirty()) {
+		 
+		if (this.array) {
+			if (!this.doNotAutoDestroy) {
+				// Auto destroy any orphaned items
+				var orphans = [];
+				for (var i = 0; i < this.array.length; i++) {
+					var toFind = this.array[i];
+					if (toFind && toFind.auraType === "Component" && toFind.isValid()) {
+						var found = false;
+						for (var j = 0; j < this.newArray.length; j++) {
+							if (this.newArray[j] === toFind) {
+								found = true;
+								break;
+							}
+						}
+						
+						if (!found) {
+							orphans.push(toFind);
+						}
+					}
+				}
+				
+				for (var n = 0; n < orphans.length; n++) {
+					var orphan = orphans[n];
+					orphan.getConcreteComponent().destroy();
+				}
+			} else {
+				// Reset for the next time around since this is the result of _setValue() with doNotAutoDestroy === true
+				this.doNotAutoDestroy = false;
+			}
+		}
+		
         this.array = this.newArray;
         this.rollback(clean);
     }
@@ -524,8 +533,6 @@ ArrayValue.prototype.toString = function(){
  * This can be an expensive operation so only use this method if you have no other alternatives.
  */
 ArrayValue.prototype.unwrap = function(){
-    // DCHASMAN TODO See JayM about killing this entirely - bad things happen when this gets used indirectly via get("v.body")
-    // instead of getValue("v.body");
     var ret = [];
     this.each(function(v) {
         ret.push(v.unwrap ? v.unwrap() : v);

@@ -467,7 +467,7 @@
 
                 // quick check that elements from original body components are no longer present
                 $A.test.assertEquals(null, cmp.find("toggleChild").getElement(), "child element wasn't unrendered");
-                $A.test.assertEquals(null, cmp.getSuper().find("toggleParent").getElement(), "parent element wasn't unrendered");
+                $A.test.assertUndefined(cmp.getSuper().find("toggleParent"), "parent wasn't destroyed/unindexed");
 
                 this.assertCounter(cmp.getSuper().getSuper(), "1", "unexpected abstract count");
             }]

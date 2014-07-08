@@ -95,7 +95,7 @@
 					pages.push(page);
 				}
 			}
-			cmp.set('v.pageComponents', pages, true);
+			cmp.setAndRelease('v.pageComponents', pages, true);
 		} else if (pageModels.length > 0) {
 			for ( var i = 0; i < pageModels.length; i++) {
 				page = pageModels[i];
@@ -115,7 +115,7 @@
 			        },null,true);
 				 pages.push(component);
 			}
-			cmp.set('v.pageComponents', pages, true);
+			cmp.setAndRelease('v.pageComponents', pages, true);
 		}
 
 		this.initPageIndicator(cmp);
@@ -125,7 +125,7 @@
 	initPageIndicator : function(cmp) {
 		var indCmp = this.getPageIndicatorsComponent(cmp);
 		if (indCmp) {
-			indCmp.set('v.pageComponents', cmp.getValue('v.pageComponents'));
+			indCmp.setAndRelease('v.pageComponents', cmp.get('v.pageComponents'));
 			indCmp.addHandler('pagerClicked', cmp, 'c.pagerClicked');
 			indCmp.addHandler('pagerKeyed', cmp, 'c.pagerKeyed');
 		}

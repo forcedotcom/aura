@@ -99,7 +99,7 @@
             action1.setAbortable();
             action1.setCallback(cmp, function(action) {
                     //Clear the old facet in players div
-                    cmp.find("Team").getValue("v.body").clear();
+                    cmp.find("Team").set("v.body", []);
                 });
             
             var action2 = cmp.get("c.getBaseball");
@@ -107,10 +107,8 @@
             action2.setAbortable();
             action2.setCallback(cmp, function(action) {
                     var teamFacet = $A.newCmpDeprecated(action.getReturnValue()[0]);
-                    //Clear the old facet in team div
-                    cmp.find("Team").getValue("v.body").clear();
-                     //Insert newly fetched components
-                    cmp.find("Team").getValue("v.body").push(teamFacet);
+                    //Clear the old facet in team div & insert newly fetched components
+                    cmp.find("Team").set("v.body", [teamFacet]);
                     //Update the page with action number
                     cmp.find("Actions").getElement().innerHTML = action.getId();
                 });
@@ -167,12 +165,13 @@
             a.setCallback(cmp, function(action) {
                     var ret = action.getReturnValue();
                     //Clear the old facet in players div
-                    cmp.find("Players").getValue("v.body").clear();
+                    var newBody = []
                     for(var i=0;i<ret.length;i++){
                         var playerFacet = $A.newCmpDeprecated(ret[i]);
-                        //Insert newly fetched components
-                        cmp.find("Players").getValue("v.body").push(playerFacet);
+                        newBody.push(playerFacet);
                     }
+                    //Insert newly fetched components
+                    cmp.find("Players").set("v.body", newBody);
                     //Update the page with action number
                     cmp.find("Actions").getElement().innerHTML = action.getId();
                 });

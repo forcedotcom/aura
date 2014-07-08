@@ -15,17 +15,17 @@
  */
 ({
     toggleAbstract : function(cmp, event) {
-        var val = cmp.get("v.toggleAbstract");
-        cmp.set("v.toggleAbstract", !val)
+        var val = $A.util.getBooleanValue(cmp.get("v.toggleAbstract"));
+        cmp.set("v.toggleAbstract", !val);
     },
 
     toggleAbstractModel : function(cmp, event) {
-        var val = cmp.get("m.booleanFalse");
+        var val = $A.util.getBooleanValue(cmp.get("m.booleanFalse"));
         cmp.set("m.booleanFalse", !val);
     },
 
     toggleInterface : function(cmp, event) {
-        var val = cmp.get("v.toggleInterface");
+        var val = $A.util.getBooleanValue(cmp.get("v.toggleInterface"));
         cmp.set("v.toggleInterface", !val);
     }
 })

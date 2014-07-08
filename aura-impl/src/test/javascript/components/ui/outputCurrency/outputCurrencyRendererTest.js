@@ -309,26 +309,6 @@ Test.Ui.OutputCurrency.RendererTest = function(){
     	
     	var message = '';
     	    	    	    	    	    	    	
-    	var targetValueObj ={
-			unwrap:function(){return targetValue;},
-			isDirty:function(){return true;}
-    	};
-    	
-    	var targetFormatObj ={
-			unwrap:function(){return targetFormat;},
-			isDirty:function(){return true;}
-    	};
-    	
-    	var targetCodeObj ={
-			unwrap:function(){return targetCurrencyCode;},
-			isDirty:function(){return true;}
-    	};
-    	
-    	var targetSymbolObj ={
-			unwrap:function(){return targetCurrencySymbol;},
-			isDirty:function(){return true;}
-    	};
-    	
     	var targetElement={
 			innerText:'',
 			textContent:''
@@ -341,15 +321,18 @@ Test.Ui.OutputCurrency.RendererTest = function(){
 		};
     	
     	var targetComponent={
-			getValue:function(value){
-				if(value=="v.value")return targetValueObj;
-				if(value=="v.format")return targetFormatObj;
-				if(value=="v.currencyCode")return targetCodeObj;
-				if(value=="v.currencySymbol")return targetSymbolObj;
+			get:function(value){
+				if(value=="v.value")return targetValue;
+				if(value=="v.format")return targetFormat;
+				if(value=="v.currencyCode")return targetCurrencyCode;
+				if(value=="v.currencySymbol")return targetCurrencySymbol;
 			},
 			find:function(cmp){
 				if(cmp == "span") return spanElement; 
-			}								
+			},
+			isDirty:function(arg){
+				return true;
+			}
 		};    	    	
     	
     	[Fact]
@@ -357,31 +340,18 @@ Test.Ui.OutputCurrency.RendererTest = function(){
         	// Arrange
         	var expected = '';  
         	        	
-        	var targetValueObj ={    		
-    			isDirty:function(){return false;}
-        	};
-        	
-        	var targetFormatObj ={    			
-    			isDirty:function(){return false;}
-        	};
-        	
-        	var targetCodeObj ={
-    			isDirty:function(){return false;}
-        	};
-        	
-        	var targetSymbolObj ={
-    			isDirty:function(){return false;}
-        	};
-        	    	        	        	        	        	
         	var targetComponent={
-    			getValue:function(value){
-    				if(value=="v.value")return targetValueObj;
-    				if(value=="v.format")return targetFormatObj;
-    				if(value=="v.currencyCode")return targetCodeObj;
-    				if(value=="v.currencySymbol")return targetSymbolObj;
+    			get:function(value){
+    				if(value=="v.value")return targetValue;
+    				if(value=="v.format")return targetFormat;
+    				if(value=="v.currencyCode")return targetCurrencyCode;
+    				if(value=="v.currencySymbol")return targetCurrencySymbol;
     			},
     			find:function(cmp){
     				if(cmp == "span") return spanElement; 
+    			},
+    			isDirty:function(arg){
+    				return false;
     			}
     		};
 																				
@@ -397,9 +367,9 @@ Test.Ui.OutputCurrency.RendererTest = function(){
     	[Fact]
         function ValueNotNumberNotString(){
         	// Arrange
-        	var expected = '';             	
-												
-			var mockUtil = Mocks.GetMock(Object.Global(), "$A", {                                
+        	var expected = '';  
+        	
+        	var mockUtil = Mocks.GetMock(Object.Global(), "$A", {                                
 				util: {   
 					isNumber: function(num) { if(num == targetValue)return false;},
 					isString: function(num) { if(num == targetValue)return false;}	            	
@@ -421,27 +391,22 @@ Test.Ui.OutputCurrency.RendererTest = function(){
         function InvalidFormatInvalidCurrencySymbol(){
         	// Arrange
         	var expected = targetValue;   
-        	
-        	var targetCodeObj ={
-    			unwrap:function(){return null;},
-    			isDirty:function(){return false;}
-        	};
-        	
-        	var targetSymbolObj ={
-    			unwrap:function(){return null;},
-    			isDirty:function(){return false;}
-        	};
+        	var targetFormat = null;
         	
         	var targetComponent={
-    			getValue:function(value){
-    				if(value=="v.value")return targetValueObj;
-    				if(value=="v.format")return targetFormatObj;
-    				if(value=="v.currencyCode")return targetCodeObj;
-    				if(value=="v.currencySymbol")return targetSymbolObj;
+    			get:function(value){
+    				if(value=="v.value")return targetValue;
+    				if(value=="v.format")return null;
+    				if(value=="v.currencyCode")return null;
+    				if(value=="v.currencySymbol")return null;
     			},
     			find:function(cmp){
     				if(cmp == "span") return spanElement; 
-    			}									
+    			},
+    			isDirty:function(val){
+    				return true;
+    			}
+    			
     		};
 			
 			var mockUtil = Mocks.GetMock(Object.Global(), "$A", {                                
@@ -470,26 +435,19 @@ Test.Ui.OutputCurrency.RendererTest = function(){
         function ValidFormatInvalidCurrencySymbol(){
         	// Arrange
         	var expected = targetValue;            	
-        	
-        	var targetCodeObj ={
-    			unwrap:function(){return null;},
-    			isDirty:function(){return false;}
-        	};
-        	
-        	var targetSymbolObj ={
-    			unwrap:function(){return null;},
-    			isDirty:function(){return false;}
-        	};
-        	
+
         	var targetComponent={
-    			getValue:function(value){
-    				if(value=="v.value")return targetValueObj;
-    				if(value=="v.format")return targetFormatObj;
-    				if(value=="v.currencyCode")return targetCodeObj;
-    				if(value=="v.currencySymbol")return targetSymbolObj;
+    			get:function(value){
+    				if(value=="v.value")return targetValue;
+    				if(value=="v.format")return targetFormat;
+    				if(value=="v.currencyCode")return null;
+    				if(value=="v.currencySymbol")return null;
     			},
     			find:function(cmp){
     				if(cmp == "span") return spanElement; 
+    			},
+    			isDirty:function(val){
+    				return true;
     			}									
     		};
         	

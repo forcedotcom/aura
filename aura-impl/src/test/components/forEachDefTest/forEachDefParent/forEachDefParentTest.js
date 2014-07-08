@@ -15,15 +15,13 @@
  */
 ({
     verifyValues:function(toplevelCmp, propertyOntopCmp, localIdOfCmpInForEach, itemCount, propertyOnInnerCmp, localIdOfInnerCmp ){
-        var valuesAtTopLevelValue = toplevelCmp.getValue(propertyOntopCmp);
-        var valuesAtTopLevel = valuesAtTopLevelValue.unwrap();
-        aura.test.assertEquals(itemCount, valuesAtTopLevelValue.getLength());
+        var valuesAtTopLevel = toplevelCmp.get(propertyOntopCmp);
         aura.test.assertEquals(itemCount, valuesAtTopLevel.length);
 
         var innerCmps = toplevelCmp.find('basicDataType').find(localIdOfCmpInForEach);
         aura.test.assertEquals(itemCount, innerCmps.length);
         for(var i=0; i<itemCount;i++){
-            var  stringValueAtInnerCmp = innerCmps[i].getValue(propertyOnInnerCmp).getValue();
+            var  stringValueAtInnerCmp = innerCmps[i].get(propertyOnInnerCmp);
             aura.test.assertEquals(valuesAtTopLevel[i], stringValueAtInnerCmp);
             aura.test.assertEquals(''+valuesAtTopLevel[i], $A.test.getText(innerCmps[i].find(localIdOfInnerCmp).getElement()));
         }

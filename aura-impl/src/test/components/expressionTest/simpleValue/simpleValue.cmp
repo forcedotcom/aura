@@ -16,4 +16,10 @@
 
 -->
 <aura:component>
+    <aura:attribute name="booleanValue" type="Boolean" />
+    <aura:attribute name="integerValue" type="Integer" />
+    <aura:attribute name="stringValue" type="String" />
+    <aura:handler name="change" value="{!v.booleanValue}" action="{!c.onValueChange}"/>
+    <aura:handler name="change" value="{!v.integerValue}" action="{!c.onValueChange}"/>
+    <aura:handler name="change" value="{!v.stringValue}" action="{!c.onValueChange}"/>
 </aura:component>

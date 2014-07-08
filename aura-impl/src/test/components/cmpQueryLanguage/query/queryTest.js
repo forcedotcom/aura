@@ -68,7 +68,9 @@
             $A.newCmpAsync(
                 this,
                 function(newCmp){
-                    cmp.getValue("v.body").push(newCmp);
+                	var body = cmp.get("v.body");
+                    body.push(newCmp);
+                    cmp.set("v.body", body);
                 },
                 {
                     componentDef:"markup://aura:text",

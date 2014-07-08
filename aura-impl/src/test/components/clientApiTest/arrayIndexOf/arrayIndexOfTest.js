@@ -52,7 +52,7 @@
 
     testArrayIndexOnArrayFromComponent : {
         test : function(cmp) {
-            var array = cmp.getValue("v.array").unwrap();
+            var array = cmp.get("v.array");
             $A.test.assertTrue($A.util.arrayIndexOf(array, 'red') === 0, "Wrong index for first array element returned");
             $A.test.assertTrue($A.util.arrayIndexOf(array, 'yellow') === 4, "Wrong index for last array element returned");
             $A.test.assertTrue($A.util.arrayIndexOf(array, 'nonexistent') === -1, "Element not found in array should return -1");

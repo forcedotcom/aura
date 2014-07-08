@@ -14,74 +14,79 @@
  * limitations under the License.
  */
 ({
-    pushText : function(cmp) {
-        var v = cmp.getValue(cmp.get("v.whichArray"));
-        if (!v) { return; }
-        var array = v.unwrap();
-        
-        $A.componentService.newComponentAsync(
-            this,
-            function (newcmp) {
-                array.push(newcmp);
-                v.setValue(array);
-            },
-            {
-                "componentDef": {
-                    "descriptor": "markup://aura:text"
-                },
-                
-                "attributes": {
-                    "values": {
-                    	"value": "PUSHED."
-                    }
-                }
-            }
-    );
-    },
+	pushText : function(cmp) {
+		var whichArray = cmp.get("v.whichArray");
+		var array = cmp.get(whichArray);
+		if (!array) {
+			return;
+		}
 
-    pushComponent : function(cmp) {
-        var v = cmp.getValue(cmp.get("v.whichArray"));
-        if (!v) { return; }
-        var array = v.unwrap();
-        $A.componentService.newComponentAsync(
-            this,
-            function (newcmp) {
-                array.push(newcmp);
-                v.setValue(array);
-            },
-            {
-                "componentDef": {
-                    "descriptor": "markup://auratest:rerenderChild"
-                 },
+		$A.componentService.newComponentAsync(this, function(newcmp) {
+			array.push(newcmp);
+			cmp.set(whichArray, array);
+		}, {
+			"componentDef" : {
+				"descriptor" : "markup://aura:text"
+			},
 
-                "attributes": {
-                    "values": {
-                        "title": new Date().getTime()
-                    }
-                }
-            }
-        );
-    },
+			"attributes" : {
+				"values" : {
+					"value" : "PUSHED."
+				}
+			}
+		});
+	},
 
-    pop : function(cmp) {
-        var v = cmp.getValue(cmp.get("v.whichArray"));
-        if (!v) { return; }
-        var array = v.unwrap();
-        array.pop();
-        v.setValue(array);
-    },
+	pushComponent : function(cmp) {
+		var whichArray = cmp.get("v.whichArray");
+		var array = cmp.get(whichArray);
+		if (!array) {
+			return;
+		}
 
-    reverse : function(cmp) {
-        var v = cmp.getValue(cmp.get("v.whichArray"));
-        if (!v) { return; }
-        var array = v.unwrap();
-        array.reverse();
-        v.setValue(array);
-    },
+		$A.componentService.newComponentAsync(this, function(newcmp) {
+			array.push(newcmp);
+			cmp.set(whichArray, array);
+		}, {
+			"componentDef" : {
+				"descriptor" : "markup://auratest:rerenderChild"
+			},
 
-    clear : function(cmp) {
-        var v = cmp.getValue(cmp.get("v.whichArray"));
-        if (!v) { return; }
-        v.clear();
-    }
+			"attributes" : {
+				"values" : {
+					"title" : new Date().getTime()
+				}
+			}
+		});
+	},
+
+	pop : function(cmp) {
+		var whichArray = cmp.get("v.whichArray");
+		var array = cmp.get(whichArray);
+		if (!array) {
+			return;
+		}
+
+		array.pop();
+		cmp.set(whichArray, array);
+	},
+
+	reverse : function(cmp) {
+		var whichArray = cmp.get("v.whichArray");
+		var array = cmp.get(whichArray);
+		if (!array) {
+			return;
+		}
+		
+		array.reverse();
+		cmp.set(whichArray, array);
+	},
+
+	clear : function(cmp) {
+		var whichArray = cmp.get("v.whichArray");
+		if(!whichArray){
+			return;
+		}
+		cmp.set(whichArray, []);
+	}
 })

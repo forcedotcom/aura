@@ -30,7 +30,9 @@
                     this,
                     function(newCmp){
                         cmpName = newCmp.getDef().getDescriptor().getQualifiedName();
-                        cmp.getValue("v.body").push(newCmp);
+                        var body = cmp.get("v.body");
+                        body.push(newCmp);
+                        cmp.set("v.body", body);
                     },
                     config
                 );

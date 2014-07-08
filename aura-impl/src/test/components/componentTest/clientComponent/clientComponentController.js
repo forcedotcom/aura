@@ -3,7 +3,7 @@
         $A.componentService.newComponentAsync(
             this,
             function(newCmp) {
-                cmp.set("v.outputValue", newCmp.getValue("v.value").value);
+                cmp.set("v.outputValue", newCmp.get("v.value"));
             },
             {
                 componentDef: {
@@ -23,7 +23,9 @@
         $A.componentService.newComponentAsync(
             this,
             function(newCmp) {
-                cmp.getValue("v.body").push(newCmp);
+            	var body = cmp.get("v.body");
+            	body.push(newCmp);
+            	cmp.set("v.body", body);
             },
             {
                 componentDef: {

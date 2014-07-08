@@ -14,22 +14,10 @@
  * limitations under the License.
  */
 ({
-    appendComponent: function(cmp) {
-        $A.componentService.newComponentAsync(
-            this,
-            function(newCmp) {
-            	var outputAtrr = cmp.get("v.output");
-            	outputAtrr.push(newCmp);
-            	cmp.set("v.output", outputAtrr);
-            },
-        	{
-                componentDef: {
-                    descriptor: cmp.get("v.descriptor")
-                },
-                attributes: {
-                    values: { value : cmp.get("v.value") }
-                }
-            }, null, null, null
-        );
+    onValueChange : function(cmp, evt, helper){
+        if(cmp._log===undefined){
+            cmp._log=[];
+        }
+        cmp._log.push(evt.getParams());
     }
-});
+})

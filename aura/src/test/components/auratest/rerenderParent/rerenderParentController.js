@@ -15,12 +15,12 @@
  */
 ({
     toggleParent : function(cmp, event) {
-        var val = cmp.get("v.toggleParent");
+        var val = $A.util.getBooleanValue(cmp.get("v.toggleParent"));
         cmp.set("v.toggleParent", !val);
     },
 
     toggleParentModel : function(cmp, event) {
-        var val = cmp.get("m.booleanFalse");
+        var val = $A.util.getBooleanValue(cmp.get("m.booleanFalse"));
         cmp.set("m.booleanFalse", !val);
     }
 })

@@ -30,16 +30,15 @@
 	},
 
 	log : function(cmp, msg) {
-		cmp.getValue("v.log").push(msg);
+		var logValue = cmp.get("v.log");
+		logValue.push(msg);
+		cmp.set("v.log", logValue);
 	},
 
 	waitForLog : function(cmp, index, content) {
         var actual;
         $A.test.addWaitFor(false, function() {
-            actual = cmp.getValue("v.log").getValue(index);
-            if (actual !== undefined) {
-                actual = actual.unwrap();
-            }
+            actual = cmp.get("v.log")?cmp.get("v.log")[index]:undefined;
             return actual === undefined;
         }, function() {
             $A.test.assertEquals(content, actual, "mismatch on log entry "+index);
@@ -64,7 +63,9 @@
 
 	testEnqueueClientAction : {
 		test : [ function(cmp) {
+			//Action is enqueued but not executed
 			$A.enqueueAction(cmp.get("c.client"));
+			//Value change
 			this.log(cmp, "log1");
 			// client action will get called after the value change is processed above
 			this.log(cmp, "log2");
@@ -683,13 +684,10 @@
 				$A.enqueueAction(a);
 			});
 			$A.test.addWaitFor(true, function() {
-				var val = cmp.getValue("v.log").getValue(0);
-				if (val) {
-					val = val.unwrap();
-					if (val.indexOf("prime:false:") == 0) {
-						cmp._initialValue = val.substring("prime:false:".length);
-						return true;
-					}
+				var val = cmp.get("v.log")[0];
+				if (val && val.indexOf("prime:false:") == 0) {
+					cmp._initialValue = val.substring("prime:false:".length);
+					return true;
 				}
 			});
 		}, function(cmp) {
@@ -721,9 +719,9 @@
 			// both callbacks with refreshed value executed
 			// ordering is not guaranteed
 			$A.test.addWaitFor(true, function() {
-				var logs = cmp.getValue("v.log");
-				var val1 = logs.getValue(3);
-				var val2 = logs.getValue(4);
+				var logs = cmp.get("v.log");
+				var val1 = logs[3];
+				var val2 = logs[4];
 				if (!val1 || !val2) {
 					return false;
 				}
@@ -732,8 +730,8 @@
 				var expected2 = "background:false:";
 				var len = expected1.length; // ensure same length for both
 
-				val1 = val1.unwrap().substring(0, len);
-				val2 = val2.unwrap().substring(0, len);
+				val1 = val1.substring(0, len);
+				val2 = val2.substring(0, len);
 
 				return ((val1 == expected1 && val2 == expected2) || (val1 == expected2 && val2 == expected1));
 			});

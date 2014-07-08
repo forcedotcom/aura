@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:interactive"  extensible="true" description="A scrollable page in a ui:carousel component.">
+<aura:component extends="ui:interactive" support="DEPRECATED" extensible="true" description="A scrollable page in a ui:carousel component.">
     
     <aura:attribute name="title" type="String" description="Title of the page" />    
     <aura:attribute name="isCacheable" default="true" type="Boolean" description="Indicates whether the page content is cacheable on client or not." />    

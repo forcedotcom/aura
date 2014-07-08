@@ -15,7 +15,8 @@
     limitations under the License.
 
 -->
-<aura:component extensible="true">
+<aura:component extensible="true" support="DEPRECATED">
+	<!-- Do Not use this component! This is solely for auraDocs-->
     <aura:attribute name="nodes" type="java://List&lt;aura.components.ui.TreeNode&gt;"/>
     <aura:attribute name="class" type="String" default="" />
     <aura:attribute name="activeNode" type="Aura.Component"

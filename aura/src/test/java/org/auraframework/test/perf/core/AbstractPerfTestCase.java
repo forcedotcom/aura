@@ -96,7 +96,7 @@ public abstract class AbstractPerfTestCase extends WebDriverTestCase {
 
     protected final void runWithPerfApp(DefDescriptor<ComponentDef> descriptor) throws Exception {
         try {
-            Mode mode = isPerfRunForAuraStats ? Mode.STATS : Mode.PROD;
+            Mode mode = perfRunMode == PerfRunMode.AURASTATS ? Mode.STATS : Mode.PROD;
             setupContext(mode, AuraContext.Format.JSON, descriptor);
 
             String relativeUrl = "/perfTest/perf.app?";

@@ -15,8 +15,11 @@
  */
 ({
     provide : function(component) {
-    	var x = $A.get("$Label.Section1.provider");
-    	var y = $A.get("$Label.Section2.provider");
+        var x = $A.get("$Label.Section1.provider");
+        var y = $A.get("$Label.Section2.provider");
+        var func = function() {
+            var z = $A.get("$Label.Section3.provider");
+        }
         return { "attributes": { "xxx":x, "yyy":y } };
     }
 })

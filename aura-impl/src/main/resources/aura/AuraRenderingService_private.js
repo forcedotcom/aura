@@ -273,12 +273,14 @@ var priv = {
             if (!allMap) {
                 allMap = {};
             }
+            
             if (!itemMap) {
                 itemMap = {};
                 for (var i=0; i < list.length; ++i) {
                     this.createGlobalIdMap(list[i], itemMap);
                 }
             }
+            
             // We now have a map of all our elements.  Walk each thing, using first item for
             // ArrayValues, testing whether its renderContainers are in that allMap.  If they
             // are, defer them (because the container may do the job).  If not, we have a
@@ -294,6 +296,7 @@ var priv = {
                         early.push(item);
                         continue;
                     }
+                    
                     test = array[0];
                 }
 
@@ -310,10 +313,12 @@ var priv = {
                      container = container.getRenderContainer();
                      gid = container ? container.getGlobalId() : undefined;
                 }
+                
                 if (gid in allMap) {
                      // We found a parent we've already seen, and take the answer from it
                      container = allMap[gid];  // this is an item from list
                 }
+                
                 // Now item is the original item,
                 //     container is the nearest containing item from list, or undefined if uncontained
                 //     parents has all the intermediate containers (not in list)
@@ -322,14 +327,17 @@ var priv = {
                 } else {
                     early.push(item);  // else we walked off the top without finding one
                 }
+                
                 // Any intermediate parents are contained by the same container (or also
                 // aren't contained by anything else in items, for container===undefined)
                 for (var k=0; k < parents.length; ++k) {
                     allMap[parents[k].getGlobalId()] = container;
                 }
             }
+            
             this.depthFirstSort(early, itemMap, list);
         }
+        
         return list;
     },
 

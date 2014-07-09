@@ -245,8 +245,7 @@ var AuraRenderingService = function AuraRenderingService(){
                     var cmp = array[i];
                     if (cmp.isValid()) {
                         if ($A.renderingService.visited[cmp.getGlobalId()]) {
-                            // we already visited this rerender; return the new elems per contract,
-                            // but skip the actual work:
+                            // we already visited this rerender; return the new elems per contract but skip the actual work
                             var startLen = allElems.length;
                             var elems = cmp.getElements();
                             for (var j = 0; j in elems; ++j) {
@@ -255,20 +254,22 @@ var AuraRenderingService = function AuraRenderingService(){
                             if (allElems.length === startLen && element in elems) {
                                 allElems.push(elems['element']);
                             }
+                            
                             continue;  // next item
                         }
 
                         // Otherwise, we're visiting a new-to-this-rerender component
                         $A.renderingService.visited[cmp.getGlobalId()] = true;
                         priv.push(cmp);
+                        
                         var oldElems = undefined;
                         try {
-                            // We use a copy of the old elements to decide whether we have a
-                            // DOM change.
+                            // We use a copy of the old elements to decide whether we have a DOM change.
                             oldElems = priv.copyElems(cmp);
                             if (!oldElems) {
                                 oldElems = [];
                             }
+                            
                             var renderer = cmp.getRenderer();
                             var newElems = renderer.def.rerender(renderer.renderable);
                             if (!newElems) {
@@ -277,6 +278,7 @@ var AuraRenderingService = function AuraRenderingService(){
                                     newElems = [];
                                 }
                             }
+                            
                             // Figure whether oldElems/newElems show a change
                             var changed = (newElems.length !== oldElems.length);
                             if (!changed) {
@@ -299,6 +301,7 @@ var AuraRenderingService = function AuraRenderingService(){
                                 // With no (changed) elements to massage, we can short-circuit this
                                 priv.cleanComponent(cmp.getGlobalId());
                             }
+                            
                             if (newElems.length) {
                                 for (k = 0; newElems[k]; ++k) {
                                     allElems.push(newElems[k]);
@@ -373,23 +376,24 @@ var AuraRenderingService = function AuraRenderingService(){
          * @protected
          */
         addDirtyValue: function(value) {
+        	this.requestRerender(value.owner, value);
+        },
+
+        requestRerender: function(component, reason) {
             priv.needsCleaning = true;
-            var cmp = value.owner;
-            if(cmp && cmp.isValid()){
-                var id = cmp.getConcreteComponent().getGlobalId();
+            if (component && component.isValid()){
+            	reason = $A.expressionService.create(null, reason);
+                var id = component.getConcreteComponent().getGlobalId();
                 var list = priv.dirtyComponents[id];
                 if (!list) {
-                    list = [value];
+                    list = [reason];
                     priv.dirtyComponents[id] = list;
                 } else {
-                    list.push(value);
+                    list.push(reason);
                 }
             }
         },
 
-        /**
-         * @protected
-         */
         removeDirtyValue: function(value) {
             var cmp = value.owner;
             if(cmp && cmp.isValid()){

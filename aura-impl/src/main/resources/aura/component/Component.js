@@ -895,17 +895,31 @@ Component.prototype.get = function(key){
  *
  * @public
  */
-Component.prototype.set = function (key, value, ignoreChanges) {
+Component.prototype.set = function(key, value, ignoreChanges) {
     var v = this._getValue(key);
     if ($A.util.isUndefinedOrNull(v)) {
         $A.error("Invalid key " + key);
         return;
     }
-    // JBUCH TODO: EXTRAPOLATE THIS TO ALL FACETS
-//    if(key==="v.body"){
-//        v.destroy();
-//    }
-    v._setValue(value,ignoreChanges);
+
+    v._setValue(value, ignoreChanges);
+};
+
+/**
+ * Gets the wrapped value referenced using property syntax and sets the value object's value and tells the underlying value not to auto destroy the previous value.
+ * @param {String} key The data key to look up on the Component. E.g. <code>$A.get("root.v.mapAttring.key")</code>
+ * @param {Object} value The value to set
+ *
+ * @public
+ */
+Component.prototype.setAndRelease = function(key, value, ignoreChanges) {
+    var v = this._getValue(key);
+    if ($A.util.isUndefinedOrNull(v)) {
+        $A.error("Invalid key " + key);
+        return;
+    }
+
+    v._setValue(value, ignoreChanges, true);
 };
 
 /**

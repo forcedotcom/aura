@@ -15,7 +15,7 @@
  */
 ({
     toggleCheck : function(component, event) {
-        var currVal = component.getValue("v.check");
-        currVal.setValue(!currVal.value);
+        var currVal = component.get("v.check");
+        component.set("v.check", !currVal);
     }
 })

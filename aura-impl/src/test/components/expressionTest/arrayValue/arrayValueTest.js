@@ -48,12 +48,18 @@
             if (msg === "") {
                 msg = "obj";
             }
+            
             for (i in arg1) {
-                $A.test.assertTrue(arg2.hasOwnProperty(i), msg + "[" + i + "] is not in second");
-                this.assertEquivalent(arg1[i], arg2[i], msg + "[" + i + "]");
+            	if (typeof (arg2[i]) !== "function") {
+	                $A.test.assertTrue(arg2.hasOwnProperty(i), msg + "[" + i + "] is not in second");
+	                this.assertEquivalent(arg1[i], arg2[i], msg + "[" + i + "]");
+            	}
             }
+            
             for (i in arg2) {
-                $A.test.assertTrue(arg1.hasOwnProperty(i), msg + "[" + i + "] is not in first");
+            	if (typeof (arg1[i]) !== "function") {
+	                $A.test.assertTrue(arg1.hasOwnProperty(i), msg + "[" + i + "] is not in first");
+            	}
             }
         } else {
             $A.test.assertEquals(arg1, arg2, msg);

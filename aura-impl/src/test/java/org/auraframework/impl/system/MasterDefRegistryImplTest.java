@@ -536,8 +536,8 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
             registry.getUid(null, cmpDesc);
             fail("Expected InvalidDefinitionException");
         } catch (Throwable t) {
-            checkExceptionContains(t, InvalidDefinitionException.class,
-                    "Invalid attribute \"invalidAttribute\"");
+            checkExceptionFull(t, InvalidDefinitionException.class,
+                    String.format("%s:1,38: Invalid attribute \"invalidAttribute\"", cmpDesc.getQualifiedName()));
         }
 
         // another request for getUid will not re-compile again
@@ -546,8 +546,8 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
             registry.getUid(null, cmpDesc);
             fail("Expected InvalidDefinitionException");
         } catch (Throwable e) {
-            checkExceptionContains(e, InvalidDefinitionException.class,
-                    "Invalid attribute \"invalidAttribute\"");
+            checkExceptionFull(e, InvalidDefinitionException.class,
+                    String.format("%s:1,38: Invalid attribute \"invalidAttribute\"", cmpDesc.getQualifiedName()));
         }
         Mockito.verify(registry, Mockito.times(0)).compileDE(Mockito.eq(cmpDesc));
     }

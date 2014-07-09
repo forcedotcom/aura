@@ -17,6 +17,7 @@ package org.auraframework.impl.root.parser.handler;
 
 import java.util.List;
 
+import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.Aura;
@@ -61,7 +62,10 @@ public class AttributeDefRefHandlerTest extends AuraImplTestCase {
         DefDescriptor<AttributeDef> desc = Aura.getDefinitionService().getDefDescriptor("mystring", AttributeDef.class);
         StringSource<AttributeDef> source = new StringSource<AttributeDef>(desc,
                 "<aura:set attribute='mystring' value='testing'/>", "myID", Format.XML);
-        XMLStreamReader xmlReader = XMLParser.getInstance().createXMLStreamReader(source.getHashingReader());
+        XMLStreamReader xmlReader = null;
+        XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+        xmlInputFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, false);
+        xmlReader = xmlInputFactory.createXMLStreamReader(source.getSystemId(), source.getHashingReader());
         xmlReader.next();
         AttributeDefRefHandler<ComponentDef> adrHandler = new AttributeDefRefHandler<ComponentDef>(null, xmlReader,
                 source);
@@ -75,7 +79,10 @@ public class AttributeDefRefHandlerTest extends AuraImplTestCase {
         DefDescriptor<AttributeDef> desc = Aura.getDefinitionService().getDefDescriptor("mystring", AttributeDef.class);
         StringSource<AttributeDef> source = new StringSource<AttributeDef>(desc,
                 "<aura:set attribute='mystring'><aura:foo/></aura:set>", "myID", Format.XML);
-        XMLStreamReader xmlReader = XMLParser.getInstance().createXMLStreamReader(source.getHashingReader());
+        XMLStreamReader xmlReader = null;
+        XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+        xmlInputFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, false);
+        xmlReader = xmlInputFactory.createXMLStreamReader(source.getSystemId(), source.getHashingReader());
         xmlReader.next();
         AttributeDefRefHandler<ComponentDef> adrHandler = new AttributeDefRefHandler<ComponentDef>(null, xmlReader,
                 source);
@@ -88,7 +95,10 @@ public class AttributeDefRefHandlerTest extends AuraImplTestCase {
         DefDescriptor<AttributeDef> desc = Aura.getDefinitionService().getDefDescriptor("mystring", AttributeDef.class);
         StringSource<AttributeDef> source = new StringSource<AttributeDef>(desc,
                 "<aura:set attribute='mystring'>Child Text</aura:set>", "myID", Format.XML);
-        XMLStreamReader xmlReader = XMLParser.getInstance().createXMLStreamReader(source.getHashingReader());
+        XMLStreamReader xmlReader = null;
+        XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+        xmlInputFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, false);
+        xmlReader = xmlInputFactory.createXMLStreamReader(source.getSystemId(), source.getHashingReader());
         xmlReader.next();
         AttributeDefRefHandler<ComponentDef> adrHandler = new AttributeDefRefHandler<ComponentDef>(null, xmlReader,
                 source);

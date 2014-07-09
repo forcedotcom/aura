@@ -15,6 +15,7 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
+import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.def.ComponentDef;
@@ -31,6 +32,7 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 
 public class ComponentDefHandlerTest extends AuraImplTestCase {
     XMLStreamReader xmlReader;
+    XMLInputFactory xmlInputFactory;
     ComponentDefHandler cdHandler;
     XMLParser parser = XMLParser.getInstance();
 
@@ -46,7 +48,9 @@ public class ComponentDefHandlerTest extends AuraImplTestCase {
                         + vendor.getParentComponentDefDescriptor() + "' implements='"
                         + vendor.getInterfaceDefDescriptor()
                         + "' abstract='true'>Child Text<aura:foo/></aura:component>", "myID", Format.XML);
-        xmlReader = XMLParser.getInstance().createXMLStreamReader(source.getHashingReader());
+        xmlInputFactory = XMLInputFactory.newInstance();
+        xmlInputFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, false);
+        xmlReader = xmlInputFactory.createXMLStreamReader(source.getSystemId(), source.getHashingReader());
         xmlReader.next();
         cdHandler = new ComponentDefHandler(vendor.getComponentDefDescriptor(), source, xmlReader);
     }

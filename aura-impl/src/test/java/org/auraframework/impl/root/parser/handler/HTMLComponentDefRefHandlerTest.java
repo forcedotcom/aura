@@ -18,6 +18,7 @@ package org.auraframework.impl.root.parser.handler;
 import java.util.ArrayList;
 import java.util.Map;
 
+import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.Aura;
@@ -28,7 +29,6 @@ import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.component.ComponentDefRefImpl;
-import org.auraframework.impl.root.parser.XMLParser;
 import org.auraframework.impl.source.StringSource;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Parser.Format;
@@ -36,6 +36,7 @@ import org.auraframework.system.Parser.Format;
 public class HTMLComponentDefRefHandlerTest extends AuraImplTestCase {
 
     private XMLStreamReader xmlReader;
+    private XMLInputFactory xmlInputFactory;
     private HTMLComponentDefRefHandler<?> htmlHandler;
 
     public HTMLComponentDefRefHandlerTest(String name) {
@@ -49,7 +50,9 @@ public class HTMLComponentDefRefHandlerTest extends AuraImplTestCase {
                 ComponentDef.class);
         StringSource<ComponentDef> source = new StringSource<ComponentDef>(desc,
                 "<div class='MyClass'>Child Text<br/></div>", "myID", Format.XML);
-        xmlReader = XMLParser.getInstance().createXMLStreamReader(source.getHashingReader());
+        xmlInputFactory = XMLInputFactory.newInstance();
+        xmlInputFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, false);
+        xmlReader = xmlInputFactory.createXMLStreamReader(source.getSystemId(), source.getHashingReader());
         xmlReader.next();
         ComponentDefHandler cdh = new ComponentDefHandler(null, source, xmlReader);
         htmlHandler = new HTMLComponentDefRefHandler<ComponentDef>(cdh, "div", xmlReader, source);
@@ -82,7 +85,9 @@ public class HTMLComponentDefRefHandlerTest extends AuraImplTestCase {
                 ComponentDef.class);
         StringSource<ComponentDef> source = new StringSource<ComponentDef>(desc,
                 "<div><aura:set attribute='header' value='false'/></div>", "myID", Format.XML);
-        xmlReader = XMLParser.getInstance().createXMLStreamReader(source.getHashingReader());
+        xmlInputFactory = XMLInputFactory.newInstance();
+        xmlInputFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, false);
+        xmlReader = xmlInputFactory.createXMLStreamReader(source.getSystemId(), source.getHashingReader());
         xmlReader.next();
         ComponentDefHandler cdh = new ComponentDefHandler(null, source, xmlReader);
         htmlHandler = new HTMLComponentDefRefHandler<ComponentDef>(cdh, "div", xmlReader, source);

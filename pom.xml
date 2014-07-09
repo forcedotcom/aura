@@ -362,12 +362,7 @@
                 <groupId>com.salesforce</groupId>
                 <artifactId>omakase</artifactId>
                 <version>0.0.8</version>
-            </dependency>
-            <dependency>
-                <groupId>org.codehaus.woodstox</groupId>
-                <artifactId>woodstox-core-asl</artifactId>
-                <version>4.4.0</version>
-            </dependency>
+            </dependency>            
         </dependencies>
     </dependencyManagement>
     <build>

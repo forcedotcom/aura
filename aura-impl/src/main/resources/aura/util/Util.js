@@ -1730,6 +1730,7 @@ $A.ns.Util.prototype.supportsTouchEvents = function() {
             && ($A.getContext().getMode() !== 'PTEST')
             && ($A.getContext().getMode() !== 'CADENCE') 
             && ($A.getContext().getMode() !== 'SELENIUM')
+            && ($A.getContext().getMode() !== 'STATS')
             && ($A.getContext().getMode() !== 'SELENIUMDEBUG');
     }
     return this.supportsTouchEvents.cache;

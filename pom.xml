@@ -367,12 +367,6 @@
                 <groupId>org.codehaus.woodstox</groupId>
                 <artifactId>woodstox-core-asl</artifactId>
                 <version>4.4.0</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>javax.xml.stream</groupId>
-                        <artifactId>stax-api</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
         </dependencies>
     </dependencyManagement>

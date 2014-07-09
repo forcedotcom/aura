@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component  extends="ui:interactive"  extensible="true" 
+<aura:component  extends="ui:interactive" support="DEPRECATED" extensible="true" 
 	 description="A tabset component that enables swiping through groups of related content types in addition to standard keyboard, touch, and mouse interactions. The carousel provides page indicators by default and supports horizontal overflow of pages.">
 
 		<aura:attribute name="title" type="String" description="Title of the carousel" />

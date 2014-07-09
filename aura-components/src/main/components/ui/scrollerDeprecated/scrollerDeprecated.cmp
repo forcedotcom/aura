@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component support="BETA"
+<aura:component support="DEPRECATED"
     description="Deprecated and replaced by ui:scroller.">
     <aura:attribute name="hScroll" type="Boolean" default="false" description="Enables horizontal scrolling on the component. Default value is &quot;false&quot;."/>
     <aura:attribute name="vScroll" type="Boolean" default="true" description="Enables vertical scrolling on the component. Default value is &quot;true&quot;."/>

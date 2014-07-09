@@ -289,8 +289,10 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
                 ApplicationDef.class,
                 "<aura:application '></aura:application>");
         openRaw(String.format("/%s/%s.app", add.getNamespace(), add.getName()));
-        assertQuickFixStacktrace("org.auraframework.throwable.AuraUnhandledException: "
-                + String.format("markup://%s:%s:1,19: ParseError at [row,col]:[2,19]", add.getNamespace(),
+        assertQuickFixStacktrace("org.auraframework.throwable.AuraUnhandledException: "+
+                String.format("markup://%s:%s:1,1: Unexpected character ''' (code 39) " +
+                    "(expected a name start character) at [row,col {unknown-source}]: [2,19]",
+                        add.getNamespace(),
                         add.getName()));
     }
 

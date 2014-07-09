@@ -18,7 +18,6 @@ package org.auraframework.impl.root.parser.handler;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.Aura;
@@ -29,6 +28,7 @@ import org.auraframework.def.ComponentDefRef.Load;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.AttributeDefRefImpl;
+import org.auraframework.impl.root.parser.XMLParser;
 import org.auraframework.impl.source.StringSource;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.throwable.AuraRuntimeException;
@@ -36,7 +36,6 @@ import org.auraframework.throwable.AuraRuntimeException;
 public class ComponentDefRefHandlerTest extends AuraImplTestCase {
 
     XMLStreamReader xmlReader;
-    XMLInputFactory xmlInputFactory;
     ComponentDefRefHandler<?> cdrHandler;
 
     public ComponentDefRefHandlerTest(String name) {
@@ -52,9 +51,7 @@ public class ComponentDefRefHandlerTest extends AuraImplTestCase {
                 desc,
                 "<fake:component attr='attr value'>Child Text<aura:foo/><aura:set attribute='header'>Header Value</aura:set></fake:component>",
                 "myID", Format.XML);
-        xmlInputFactory = XMLInputFactory.newInstance();
-        xmlInputFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, false);
-        xmlReader = xmlInputFactory.createXMLStreamReader(source.getSystemId(), source.getHashingReader());
+        xmlReader = XMLParser.getInstance().createXMLStreamReader(source.getHashingReader());
         xmlReader.next();
         ComponentDefHandler cdh = new ComponentDefHandler(null, source, xmlReader);
         cdrHandler = new ComponentDefRefHandler<ComponentDef>(cdh, xmlReader, source);
@@ -118,10 +115,16 @@ public class ComponentDefRefHandlerTest extends AuraImplTestCase {
             assertTrue("unexpected message: " + expected.getMessage(),
                     expected.getMessage().contains("Invalid value 'foo' specified for 'aura:load' attribute"));
         }
+
         // 2. Verify specifying blank string as load specification
         cdrHandler = createComponentDefHandler("<fake:component aura:load=' '/>");
-        cdrHandler.readSystemAttributes();
-        assertEquals("Failed to read specified load level.", Load.DEFAULT, cdrHandler.createDefinition().getLoad());
+        try {
+            cdrHandler.readSystemAttributes();
+            fail("Should not be able to specify an invalid load value of blank");
+        } catch (AuraRuntimeException expected) {
+            assertTrue("unexpected message: " + expected.getMessage(),
+                    expected.getMessage().contains("Invalid value ' ' specified for 'aura:load' attribute"));
+        }
 
         // 3. Verify default load specification
         cdrHandler = createComponentDefHandler("<fake:component/>");
@@ -143,9 +146,7 @@ public class ComponentDefRefHandlerTest extends AuraImplTestCase {
         DefDescriptor<ComponentDef> desc = Aura.getDefinitionService().getDefDescriptor("fake:component",
                 ComponentDef.class);
         StringSource<ComponentDef> source = new StringSource<ComponentDef>(desc, markup, "myID", Format.XML);
-        xmlInputFactory = XMLInputFactory.newInstance();
-        xmlInputFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, false);
-        xmlReader = xmlInputFactory.createXMLStreamReader(source.getSystemId(), source.getHashingReader());
+        xmlReader = XMLParser.getInstance().createXMLStreamReader(source.getHashingReader());
         xmlReader.next();
         ComponentDefHandler cdh = new ComponentDefHandler(null, source, xmlReader);
         return new ComponentDefRefHandler<ComponentDef>(cdh, xmlReader, source);

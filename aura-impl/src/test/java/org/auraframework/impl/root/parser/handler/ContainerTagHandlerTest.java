@@ -15,7 +15,6 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.Aura;
@@ -23,6 +22,7 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
+import org.auraframework.impl.root.parser.XMLParser;
 import org.auraframework.impl.source.StringSource;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.throwable.AuraRuntimeException;
@@ -32,7 +32,6 @@ import org.auraframework.throwable.AuraRuntimeException;
  */
 public class ContainerTagHandlerTest extends AuraImplTestCase {
     XMLStreamReader xmlReader;
-    XMLInputFactory xmlInputFactory;
     ComponentDefRefHandler<?> cdrHandler;
 
     public ContainerTagHandlerTest(String name) {
@@ -58,9 +57,7 @@ public class ContainerTagHandlerTest extends AuraImplTestCase {
         DefDescriptor<ComponentDef> desc = Aura.getDefinitionService().getDefDescriptor("fake:component",
                 ComponentDef.class);
         StringSource<ComponentDef> source = new StringSource<ComponentDef>(desc, markup, "myID", Format.XML);
-        xmlInputFactory = XMLInputFactory.newInstance();
-        xmlInputFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, false);
-        xmlReader = xmlInputFactory.createXMLStreamReader(source.getSystemId(), source.getHashingReader());
+        xmlReader = XMLParser.getInstance().createXMLStreamReader(source.getHashingReader());
         xmlReader.next();
         // Assume we found the markup in a component, create a
         // ComponentDefHandler to represent that

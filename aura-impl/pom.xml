@@ -86,6 +86,10 @@
             <artifactId>icu4j</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.codehaus.woodstox</groupId>
+            <artifactId>woodstox-core-asl</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.salesforce</groupId>
             <artifactId>omakase</artifactId>
         </dependency>

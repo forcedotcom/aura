@@ -15,7 +15,7 @@
  */
 ({
     sand: function(cmp, event) {
-        var pants = cmp.getValue("v.pants");
-        pants.setValue(pants.unwrap() + 1);
+        var pants = cmp.get("v.pants");
+        cmp.set("v.pants", pants +1 );
     }
 })

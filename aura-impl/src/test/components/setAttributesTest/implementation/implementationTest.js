@@ -20,11 +20,9 @@
     // TODO W-1468465 - cannot set attribute values on interface
     _testSettingValueOfInterfaceSimpleAttributes:{
         test:function(cmp){
-            aura.test.assertEquals('implementationX',cmp.get('v.SimpleAttribute'), "Attribute value must have been overriden by aura:set tag");
-            //Another way of accessing attributes
-            aura.test.assertEquals('implementationX',cmp.getAttributes('SimpleAttribute').getValue());
+            $A.test.assertEquals('implementationX',cmp.get('v.SimpleAttribute'), "Attribute value must have been overriden by aura:set tag");
             //UI verification to check that renderer used the right attribute value
-            aura.test.assertEquals('The value of SimpleAttribute = implementationX',$A.test.getText(cmp.find('simpleAttr_id').getElement()));
+            $A.test.assertEquals('The value of SimpleAttribute = implementationX',$A.test.getText(cmp.find('simpleAttr_id').getElement()));
         }
     }
 })

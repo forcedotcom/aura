@@ -16,7 +16,7 @@
 ({
     getLocallyCreatedComponent:function(cmp){
         $A.run(function(){
-            cmp.get('c.createComponent').runDeprecated();
+        	cmp.get('c.createComponent').runDeprecated();
         });
         var body = cmp.get('v.body');
         $A.test.assertEquals(1, body.length);
@@ -30,7 +30,7 @@
     testClientProvidedDescriptor:{
         attributes:{ newDescriptor:"markup://provider:clientProvider", newAttributes:"{value:'ui:inputText'}"},
         test:function(cmp){
-            var creation = this.getLocallyCreatedComponent(cmp);
+        	var creation = this.getLocallyCreatedComponent(cmp);
             $A.test.assertEquals("markup://ui:inputText", creation.getDef().getDescriptor().getQualifiedName());
             $A.test.assertEquals("ui:inputText", creation.getElement().value);
         }

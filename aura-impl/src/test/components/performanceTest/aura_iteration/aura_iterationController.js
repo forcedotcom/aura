@@ -15,15 +15,15 @@
  */
 ({
     changeOneValue: function(cmp, evt) {
-        var data = cmp.find("iteration").getValue("v.items");
-        var val = data.getValue(cmp.get("v.tochange")).getValue("letters");
-        val.setValue(cmp.get("v.newvalue"));
+    	var data = cmp.find("iteration").get("v.items");
+        
+        data[cmp.get("v.tochange")]["letters"] = cmp.get("v.newvalue");
+        cmp.find("iteration").set("v.items", data);
     },
 
     changeEndIndex: function(cmp, evt) {
         var inputValue = cmp.get("v.inputValue");
         cmp.set("v.newEndIndex", inputValue);
-        //var endIndex = cmp.find("innerIteration").getValue("v.end");
-        //endIndex.setValue(5);
- }
+        //cmp.find("innerIteration").set("v.end", 5);
+    }
 })

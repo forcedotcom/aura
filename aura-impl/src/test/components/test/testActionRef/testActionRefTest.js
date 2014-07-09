@@ -19,12 +19,7 @@
      */
     testAPI: {
         test: function(component){
-            var sandRef = component.getValue("c.sand");
-            //can't access prototypes to check if they are the same
-            $A.test.assertEquals("Value", sandRef.auraType, "action ref type was incorrect");
-            $A.test.assertEquals("ActionReferenceValue", sandRef.toString());
-
-            var sand = sandRef.unwrap();
+            var sand = component.get("c.sand");
             $A.test.assertEquals("Action", sand.auraType, "action type was incorrect");
             $A.test.assertEquals("function", typeof sand.run, "run was not a function on the actions");
         }

@@ -19,7 +19,9 @@
         $A.componentService.newComponentAsync(
             this,
             function(newCmp){
-                cmp.getValue("v.body").push(newCmp);
+                var body = cmp.get("v.body");
+                body.push(newCmp);
+                cmp.set("v.body", body);
             },
             "markup://loadLevelTest:clientComponent"
         );
@@ -30,7 +32,9 @@
         $A.componentService.newComponentAsync(
             this,
             function(newCmp){
-                cmp.getValue("v.body").push(newCmp);
+                var body = cmp.get("v.body");
+                body.push(newCmp);
+                cmp.set("v.body", body);
             },
             "markup://loadLevelTest:serverComponent"
         );
@@ -41,7 +45,9 @@
         $A.componentService.newComponentAsync(
             this,
             function(newCmp){
-                cmp.getValue("v.body").push(newCmp);
+                var body = cmp.get("v.body");
+                body.push(newCmp);
+                cmp.set("v.body", body);
             },
             {
                 componentDef : "markup://loadLevelTest:serverComponent",

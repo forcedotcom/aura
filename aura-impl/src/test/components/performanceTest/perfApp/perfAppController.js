@@ -34,7 +34,9 @@
         a.setCallback(cmp,function(a){
             //If you want to explore adding new components on the page
             //var c = $A.newCmpDeprecated(a.getReturnValue());
-            //cmp.find('new').getValue('v.body').push(c);
+            //var body = cmp.find("new").get("v.body");
+            //body.push(c);
+            //cmp.find("new").set("v.body", body);
             $A.Perf.endMark("XHR call time: Server Controller, New Component & Resolve Refs");
         });
         $A.enqueueAction(a);
@@ -55,23 +57,25 @@
         });
         a.setCallback(cmp,function(a){
             var c = $A.newCmpDeprecated(a.getReturnValue());
-            cmp.find('placeHolder').getValue('v.body').push(c);
+            var body = cmp.find('placeHolder').get("v.body");
+            body.push(c);
+            cmp.find('placeHolder').set("v.body", body);
         });
         $A.enqueueAction(a);
     },
     destroyComponent:function(cmp){
         $A.Perf.mark("Component.destroy");
-        var toDestroy = cmp.find('placeHolder').getValue('v.body');
-        if(toDestroy.isEmpty()){
+        var toDestroy = cmp.find('placeHolder').get('v.body');
+        if($A.util.isEmpty(toDestroy)){
             alert("Nothing to delete in the placeholder! Press the 'Push component to page' button");
         }else{
-            toDestroy.get(0).destroy();
+            toDestroy[0].destroy();
         }
         $A.Perf.endMark("Component.destroy");
     },
     removeElement:function(cmp){
-        var toDestroy = cmp.find('placeHolder').getValue('v.body');
-        if(toDestroy.isEmpty()){
+        var toDestroy = cmp.find('placeHolder').get('v.body');
+        if($A.util.isEmpty(toDestroy)){
             alert("Nothing to delete in the placeholder! Press the 'Push component to page' button");
         }else{
             $A.util.removeElement(cmp.find('placeHolder').getElement());

@@ -17,7 +17,7 @@
  * Tests to verify AuraComponentService.newComponentAsync() or $A.newCmpAsync()
  */
 ({
-    /**
+	/**
      * Verify creatiion of a component whose definition is available at the client.
      */
     testPreloadedDef: {
@@ -26,7 +26,9 @@
                 $A.test.blockRequests(); // block server requests to ensure this is run entirely on the client
                 $A.run(function(){
                     $A.newCmpAsync(this, function(newCmp){
-                        cmp.getValue("v.body").push(newCmp);
+                    	var body = cmp.get("v.body");
+                        body.push(newCmp);
+                        cmp.set("v.body", body);
                     }, "markup://aura:text");
                 });
                 
@@ -50,7 +52,9 @@
                 $A.test.blockRequests(); // block server requests to ensure this is run entirely on the client
                 $A.run(function(){
                     $A.newCmpAsync(this, function(newCmp){
-                        cmp.getValue("v.body").push(newCmp);
+                    	var body = cmp.get("v.body");
+                        body.push(newCmp);
+                        cmp.set("v.body", body);
                     }, "markup://loadLevelTest:clientComponent");
                 });
 
@@ -75,7 +79,9 @@
                 $A.newCmpAsync(
                         this,
                         function(newCmp) {
-                            cmp.getValue("v.body").push(newCmp);
+                        	var body = cmp.get("v.body");
+                            body.push(newCmp);
+                            cmp.set("v.body", body);
                         },
                         {
                             componentDef: "markup://loadLevelTest:displayNumber",
@@ -104,7 +110,9 @@
                     $A.newCmpAsync(
                         this,
                         function(newCmp) {
-                            cmp.getValue("v.body").push(newCmp);
+                        	var body = cmp.get("v.body");
+                            body.push(newCmp);
+                            cmp.set("v.body", body);
                         },
                         {
                             componentDef: "markup://loadLevelTest:displayNumber",
@@ -136,7 +144,9 @@
                 $A.newCmpAsync(
                         this,
                         function(newCmp) {
-                            cmp.getValue("v.body").push(newCmp);
+                        	var body = cmp.get("v.body");
+                            body.push(newCmp);
+                            cmp.set("v.body", body);
                         },
                         {
                             componentDef: "markup://loadLevelTest:serverComponent",
@@ -170,7 +180,9 @@
                 $A.newCmpAsync(
                         this,
                         function(newCmp) {
-                            cmp.getValue("v.body").push(newCmp);
+                        	var body = cmp.get("v.body");
+                            body.push(newCmp);
+                            cmp.set("v.body", body);
                         },
                         {
                             componentDef: "markup://loadLevelTest:serverWithInnerServerCmp"
@@ -198,7 +210,9 @@
                 $A.newCmpAsync(
                     this,
                     function(newCmp) {
-                        cmp.getValue("v.body").push(newCmp);
+                    	var body = cmp.get("v.body");
+                        body.push(newCmp);
+                        cmp.set("v.body", body);
                     },
                     "markup://loadLevelTest:clientWithServerChild"
                 );
@@ -228,10 +242,9 @@
                         function(newCmps) {
                             $A.test.assertTrue($A.util.isArray(newCmps) && newCmps.length === 4,
                                 'Should be array of components of length 4');
-
-                            for (var i = 0; i < newCmps.length; i++) {
-                                cmp.getValue("v.body").push(newCmps[i]);
-                            }
+                            var body = cmp.get("v.body");
+                            body = body.concat(newCmps);
+                            cmp.set("v.body", body);
                         },
                         [{
                             componentDef: "markup://aura:text",
@@ -295,7 +308,9 @@
                 $A.newCmpAsync(
                         this,
                         function(newCmp) {
-                            cmp.getValue("v.body").push(newCmp);
+                        	var body = cmp.get("v.body");
+                            body.push(newCmp);
+                            cmp.set("v.body", body);
                         },
                         "test:test_Preload_BadCmp"
                 );
@@ -303,7 +318,7 @@
  
             $A.test.addWaitFor(false, $A.test.isActionPending, function(){
                 var errorCmp = cmp.get('v.body')[0];
-                var errorMsg = errorCmp.getValue("v.value").value;
+                var errorMsg = errorCmp.get("v.value");
                 $A.test.assertTrue($A.test.contains(errorMsg, 'Duplicate definitions for attribute dup on tag aura:attribute'),
                         "Incorrect error message returned in error component when trying to create invalid component");
             });
@@ -319,7 +334,9 @@
                 $A.newCmpAsync(
                         this,
                         function(newCmp) {
-                            cmp.getValue("v.body").push(newCmp);
+                        	var body = cmp.get("v.body");
+                            body.push(newCmp);
+                            cmp.set("v.body", body);
                         },
                         "foo:hallelujah"
                 );
@@ -327,7 +344,7 @@
 
             $A.test.addWaitFor(false, $A.test.isActionPending, function(){
                 var errorCmp = cmp.get('v.body')[0];
-                var errorMsg = errorCmp.getValue("v.value").value;
+                var errorMsg = errorCmp.get("v.value");
                 $A.test.assertTrue($A.test.contains(errorMsg, 'No COMPONENT named markup://foo:hallelujah found'),
                         "Incorrect error message returned in error component when trying to create invalid component");
             });
@@ -344,7 +361,9 @@
                 $A.newCmpAsync(
                         this,
                         function(newCmp) {
-                            cmp.getValue("v.body").push(newCmp);
+                        	var body = cmp.get("v.body");
+                            body.push(newCmp);
+                            cmp.set("v.body", body);
                         },
                         {
                             componentDef: "markup://aura:text",
@@ -378,7 +397,9 @@
                 $A.newCmpAsync(
                         this,
                         function(newCmp) {
-                            cmp.getValue("v.body").push(newCmp);
+                        	var body = cmp.get("v.body");
+                            body.push(newCmp);
+                            cmp.set("v.body", body);
                         },
                         {
                             componentDef: "markup://loadLevelTest:displayStringArray",
@@ -408,7 +429,9 @@
                 $A.newCmpAsync(
                     this,
                     function(newCmp) {
-                        cmp.getValue("v.body").push(newCmp);
+                    	var body = cmp.get("v.body");
+                        body.push(newCmp);
+                        cmp.set("v.body", body);
                     },
                     "test:test_Provider_AbstractBasic"
                 );
@@ -539,7 +562,9 @@
                 $A.newCmpAsync(
                         null,
                         function(newCmp){
-                            cmp.getValue("v.body").push(newCmp);
+                        	var body = cmp.get("v.body");
+                            body.push(newCmp);
+                            cmp.set("v.body", body);
                         },
                         config
                 );
@@ -561,7 +586,9 @@
                 $A.newCmpAsync(
                         this,
                         function(newCmp){
-                            cmp.getValue("v.body").push(newCmp);
+                        	var body = cmp.get("v.body");
+                            body.push(newCmp);
+                            cmp.set("v.body", body);
                         },
                         {
                             componentDef: "markup://aura:text",
@@ -592,7 +619,9 @@
                 $A.newCmpAsync(
                         this,
                         function(newCmp){
-                            cmp.getValue("v.body").push(newCmp);
+                        	var body = cmp.get("v.body");
+                            body.push(newCmp);
+                            cmp.set("v.body", body);
                         },
                         {
                             componentDef: "markup://loadLevelTest:serverComponent",
@@ -630,7 +659,9 @@
                 $A.newCmpAsync(
                     this,
                     function(newCmp) {
-                        cmp.getValue("v.body").push(newCmp);
+                    	var body = cmp.get("v.body");
+                        body.push(newCmp);
+                        cmp.set("v.body", body);
                     },
                     "markup://loadLevelTest:clientProvidesServerCmp"
                 );
@@ -658,7 +689,9 @@
                 $A.newCmpAsync(
                         this,
                         function(newCmp) {
-                            cmp.getValue("v.body").push(newCmp);
+                        	var body = cmp.get("v.body");
+                            body.push(newCmp);
+                            cmp.set("v.body", body);
                         },
                         "loadLevelTest:serverWithLazyChild"
                 );
@@ -702,21 +735,27 @@
                 $A.newCmpAsync(
                         this,
                         function(newCmp) {
-                            cmp.getValue("v.body").push(newCmp);
+                        	var body = cmp.get("v.body");
+                            body.push(newCmp);
+                            cmp.set("v.body", body);
                         },
                         {componentDef : "markup://loadLevelTest:serverComponent", load : "EXCLUSIVE"}
                 );
                 $A.newCmpAsync(
                         this,
                         function(newCmp) {
-                            cmp.getValue("v.body").push(newCmp);
+                        	var body = cmp.get("v.body");
+                            body.push(newCmp);
+                            cmp.set("v.body", body);
                         },
                         {componentDef: "markup://loadLevelTest:displayBoolean", load:"LAZY"}
                 );
                 $A.newCmpAsync(
                         this,
                         function(newCmp) {
-                            cmp.getValue("v.body").push(newCmp);
+                        	var body = cmp.get("v.body");
+                            body.push(newCmp);
+                            cmp.set("v.body", body);
                         },
                         {componentDef: "markup://loadLevelTest:displayNumber", load:"LAZY"}
                 );
@@ -741,7 +780,9 @@
                 $A.newCmpAsync(
                         this,
                         function(newCmp) {
-                            cmp.getValue("v.body").push(newCmp);
+                        	var body = cmp.get("v.body");
+                            body.push(newCmp);
+                            cmp.set("v.body", body);
                         },
                         {componentDef : "markup://loadLevelTest:clientWithLazyClientChild"}
                 );

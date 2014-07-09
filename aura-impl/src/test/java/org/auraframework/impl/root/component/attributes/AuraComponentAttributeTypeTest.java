@@ -133,7 +133,7 @@ public class AuraComponentAttributeTypeTest extends AuraImplTestCase {
             fail("Should have failed creation because of incomplete formula.");
         } catch (Exception e) {
         	checkExceptionContains(e,InvalidDefinitionException.class,
-        	"Unexpected '<'  in attribute value\n at [row,col {unknown-source}]: [2,102]");
+        	"ParseError at [row,col]:[2,102]");
         }
 
          desc = addSourceAutoCleanup(ComponentDef.class, String.format(baseComponentTag,"",

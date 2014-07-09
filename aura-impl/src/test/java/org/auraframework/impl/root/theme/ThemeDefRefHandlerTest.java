@@ -15,6 +15,7 @@
  */
 package org.auraframework.impl.root.theme;
 
+import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.Aura;
@@ -22,7 +23,6 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.ThemeDef;
 import org.auraframework.def.ThemeDefRef;
 import org.auraframework.impl.css.StyleTestCase;
-import org.auraframework.impl.root.parser.XMLParser;
 import org.auraframework.impl.root.parser.handler.ThemeDefRefHandler;
 import org.auraframework.impl.source.StringSource;
 import org.auraframework.impl.system.DefDescriptorImpl;
@@ -36,9 +36,11 @@ public class ThemeDefRefHandlerTest extends StyleTestCase {
     }
 
     private ThemeDefRef source(String src) throws Exception {
+        XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+        xmlInputFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, false);
         DefDescriptor<ThemeDefRef> desc = Aura.getDefinitionService().getDefDescriptor("test", ThemeDefRef.class);
         StringSource<ThemeDefRef> ss = new StringSource<ThemeDefRef>(desc, src, "myID", Format.XML);
-        XMLStreamReader xmlReader = XMLParser.getInstance().createXMLStreamReader(ss.getHashingReader());
+        XMLStreamReader xmlReader = xmlInputFactory.createXMLStreamReader(ss.getSystemId(), ss.getHashingReader());
         xmlReader.next();
         ThemeDefRefHandler<ThemeDef> handler = new ThemeDefRefHandler<ThemeDef>(null, xmlReader, ss);
         return handler.getElement();

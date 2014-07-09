@@ -37,8 +37,6 @@ import org.auraframework.throwable.AuraUnhandledException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-import com.ctc.wstx.stax.WstxInputFactory;
-
 /**
  * Implementation of Parser. Parses XML Formatted Source to produce
  * ComponentDefs. Implemented as a pull-style parser using the StAX cursor API
@@ -47,23 +45,22 @@ import com.ctc.wstx.stax.WstxInputFactory;
  */
 public class XMLParser implements Parser {
 
-    /**
-     * force woodstox input factory instead of system configured via XMLInputFactory.newInstance()
-     * SJSXP implementation differs from woodstox depending on configuration
-     */
-    private static final XMLInputFactory xmlInputFactory = new WstxInputFactory();
+    private final XMLInputFactory xmlInputFactory;
     private static final XMLParser instance = new XMLParser();
 
     private XMLParser() {
-        /**
-         * IS_NAMESPACE_AWARE is set to false in Woodstox configuration. Setting to true will require all xml
-         * to be valid xml and we would need to enforce namespace definitions ie xmlns in all cmp and app files.
-         */
+        xmlInputFactory = XMLInputFactory.newInstance();
         xmlInputFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, false);
         xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING, true);
         xmlInputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, true);
         xmlInputFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
-        xmlInputFactory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, true);
+        xmlInputFactory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, false);
+        try {
+            xmlInputFactory.setProperty("reuse-instance", false);
+        } catch (IllegalArgumentException e) {
+            //See W-1737863.  This property is specific to SJSXP and not supported or needed by Woodstox
+            //The exception here is a no-op.
+        }
     }
 
     public static XMLParser getInstance() {
@@ -82,7 +79,7 @@ public class XMLParser implements Parser {
             if (source.exists()) {
                 reader = new HTMLReader(source.getHashingReader());
 
-                xmlReader = xmlInputFactory.createXMLStreamReader(reader);
+                xmlReader = xmlInputFactory.createXMLStreamReader(source.getSystemId(), reader);
             }
             handler = RootTagHandlerFactory.newInstance((DefDescriptor<RootDefinition>) descriptor,
                     (Source<RootDefinition>) source, xmlReader);
@@ -211,17 +208,6 @@ public class XMLParser implements Parser {
             return new Location(source.getSystemId(), source.getLastModified());
         }
         return null;
-    }
-
-    /**
-     * Convenience method to use input factory to create steam reader
-     *
-     * @param reader reader
-     * @return xml stream reader implementation
-     * @throws XMLStreamException
-     */
-    public XMLStreamReader createXMLStreamReader(Reader reader) throws XMLStreamException {
-        return xmlInputFactory.createXMLStreamReader(reader);
     }
 
 }

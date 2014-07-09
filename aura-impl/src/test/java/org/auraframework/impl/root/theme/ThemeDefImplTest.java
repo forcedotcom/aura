@@ -72,7 +72,7 @@ public class ThemeDefImplTest extends StyleTestCase {
             fail("Bad markup should be caught");
         } catch (Exception e) {
             checkExceptionContains(e, InvalidDefinitionException.class,
-                    "was expecting a close tag for element <aura:theme>");
+                    "XML document structures must start and end within the same entity");
         }
     }
 

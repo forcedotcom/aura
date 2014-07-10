@@ -58,6 +58,7 @@ Test.Aura.Storage.Adapters.SizeEstimatorTest = function() {
         function estimateBoolean() {
             var value = true;
             var expected = 4;
+            checkEstimateSize(value, expected);
         }
 
         [Fact]

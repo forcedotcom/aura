@@ -365,8 +365,15 @@
         wrapper.addEventListener('scroll', function (e) {
             //scrollEndAction.run.apply(detectsOnMove ? scrollMoveAction : scrollEndAction, arguments);
             var eventName = detectsOnMove ? 'scrollMove' : 'scrollEnd',
-                action    = detectsOnMove ? 'gestureMove': 'animationEnd';
-            scrollerInstance._fire(eventName, action, -wrapper.scrollLeft, -wrapper.scrollTop, e);
+                action    = detectsOnMove ? 'gestureMove': 'animationEnd',
+                currentX  = -wrapper.scrollLeft,
+                currentY  = -wrapper.scrollTop;
+
+            scrollerInstance.x = currentX;
+            scrollerInstance.y = currentY;
+
+            scrollerInstance._fire(eventName, action, currentX, currentY, e);
+            
         }, false);
     },
 

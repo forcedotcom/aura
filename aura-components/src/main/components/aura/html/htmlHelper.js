@@ -80,7 +80,7 @@
 
     // string constants used to save fast click event and handler
     NAMES: {
-        "event": "fcEvent",
+        "touch": "fcTouchEvent",
         "domHandler": "fcDomHandler",
         "hashHandler": "fcHashHandler"
     },
@@ -134,18 +134,18 @@
         // so we need to save reference and remove the right one
         var previousHandler = element[name];
         if($A.util.isFunction(previousHandler)) {
-            $A.util.removeOn(element, element[this.NAMES.event], previousHandler);
+            $A.util.removeOn(element, element[this.NAMES.touch], previousHandler);
+            $A.util.removeOn(element, "click", previousHandler);
         }
 
         var FastClick = this.initFastClick();
         if (this.supportsTouchEvents()) {
             // typically mobile and touch screens
             new FastClick(element, handler);
-        } else {
-            // mouse click
-            element[this.NAMES.event] = "click";
-            $A.util.on(element, element[this.NAMES.event], handler);
         }
+
+        // mouse click by default for devices with both touch and click capabilities
+        $A.util.on(element, "click", handler);
 
         // save current handler on element so that it can be referenced and removed later
         element[name] = handler;
@@ -158,7 +158,7 @@
 
     initFastClick : function() {
         var gesture = this.GESTURE(),
-            fastClickEvent = this.NAMES.event,
+            fastClickEvent = this.NAMES.touch,
             FastClick;
 
         if (!this.FastClick) {

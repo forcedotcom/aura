@@ -57,7 +57,7 @@
 }
 
 .THIS .loadingIndicator .label{
-    background-image:url('/auraFW/resources/aura/images/spinner.png');
+    background-image:url('/auraFW/resources/aura/images/spinner.gif');
     background-position:left center;
     background-repeat:no-repeat;
     color:#666;

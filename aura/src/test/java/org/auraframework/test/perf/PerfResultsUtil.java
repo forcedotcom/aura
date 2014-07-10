@@ -48,24 +48,33 @@ public final class PerfResultsUtil {
         RESULTS_DIR.mkdirs();
     }
 
-    public static void writeGoldFile(PerfMetrics metrics, String fileName, boolean storeDetails) {
+    /**
+     * @return the written file
+     */
+    public static File writeGoldFile(PerfMetrics metrics, String fileName, boolean storeDetails) {
         File file = new File(RESULTS_DIR + "/goldfiles/" + fileName + ".json");
-        writeFile(file, PerfGoldFilesUtil.toGoldFileText(metrics, storeDetails));
+        return writeFile(file, PerfGoldFilesUtil.toGoldFileText(metrics, storeDetails), "goldfile");
     }
 
-    public static void writeAuraStats(String auraStatsContents, String fileName) {
+    /**
+     * @return the written file
+     */
+    public static File writeAuraStats(String auraStatsContents, String fileName) {
         File file = new File(RESULTS_DIR + "/aurastats/" + fileName + "_aurastats.json");
-        writeFile(file, auraStatsContents);
+        return writeFile(file, auraStatsContents, "Aura Stats");
     }
 
-    private static void writeFile(File file, String contents) {
+    private static File writeFile(File file, String contents, String what) {
         OutputStreamWriter writer = null;
         try {
             IOUtil.mkdirs(file.getParentFile());
             writer = new OutputStreamWriter(new FileOutputStream(file), "UTF-8");
             writer.write(contents);
+            LOG.info("wrote " + what + ": " + file.getAbsolutePath());
+            return file;
         } catch (Exception e) {
             LOG.log(Level.WARNING, "error writing " + file.getAbsolutePath(), e);
+            return file;
         } finally {
             IOUtil.close(writer);
         }
@@ -74,17 +83,20 @@ public final class PerfResultsUtil {
     /**
      * Writes the dev tools log for a perf test run to
      * System.getProperty("aura.perf.results.dir")/timelines/testName_timeline.json
+     * 
+     * @return the written file
      */
-    public static void writeDevToolsLog(List<JSONObject> timeline, String fileName, String userAgent) {
+    public static File writeDevToolsLog(List<JSONObject> timeline, String fileName, String userAgent) {
         File file = new File(RESULTS_DIR + "/timelines/" + fileName + "_timeline.json");
         try {
             writeDevToolsLog(timeline, file, userAgent);
         } catch (Exception e) {
             LOG.log(Level.WARNING, "error writing " + file.getAbsolutePath(), e);
         }
+        return file;
     }
 
-    static void writeDevToolsLog(List<JSONObject> timeline, File file, String userAgent) throws Exception {
+    private static void writeDevToolsLog(List<JSONObject> timeline, File file, String userAgent) throws Exception {
         BufferedWriter writer = null;
         try {
             file.getParentFile().mkdirs();
@@ -98,7 +110,7 @@ public final class PerfResultsUtil {
             }
             writer.write("]");
             writer.newLine();
-            LOG.info("wrote dev tools timeline: " + file.getAbsolutePath());
+            LOG.info("wrote dev tools log: " + file.getAbsolutePath());
         } finally {
             IOUtil.close(writer);
         }
@@ -107,8 +119,10 @@ public final class PerfResultsUtil {
     /**
      * Writes the JavaScript CPU profile data for a perf test run to
      * System.getProperty("aura.perf.results.dir")/profiles/testName_profile.cpuprofile
+     * 
+     * @return the written file
      */
-    public static void writeJSProfilerData(Map<String, ?> jsProfilerData, String fileName) {
+    public static File writeJSProfilerData(Map<String, ?> jsProfilerData, String fileName) {
         File file = new File(RESULTS_DIR + "/profiles/" + fileName + "_profile.cpuprofile");
         try {
             file.getParentFile().mkdirs();
@@ -116,22 +130,25 @@ public final class PerfResultsUtil {
             try {
                 writer = new BufferedWriter(new FileWriter(file));
                 writer.write(new JSONObject(jsProfilerData).toString());
-                LOG.info("wrote JavaScript CPU profile data: " + file.getAbsolutePath());
+                LOG.info("wrote JavaScript CPU profile: " + file.getAbsolutePath());
             } finally {
                 IOUtil.close(writer);
             }
         } catch (Exception e) {
             LOG.log(Level.WARNING, "error writing " + file.getAbsolutePath(), e);
         }
+        return file;
     }
 
     // JS heap snapshot
 
     /**
      * Writes the heap snapshot into a file, this file can be loaded into chrome dev tools -> Profiles -> Load
+     * 
+     * @return the written file
      */
     @SuppressWarnings("unchecked")
-    public static void writeHeapSnapshot(Map<String, ?> data, String fileName) throws Exception {
+    public static File writeHeapSnapshot(Map<String, ?> data, String fileName) throws Exception {
         File file = new File(RESULTS_DIR + "/heaps/" + fileName + "_heap.heapsnapshot");
         BufferedWriter writer = null;
         try {
@@ -158,6 +175,7 @@ public final class PerfResultsUtil {
         } finally {
             IOUtil.close(writer);
         }
+        return file;
     }
 
     static void writeList(BufferedWriter writer, String key, List<?> list, int numPerLine, boolean last)

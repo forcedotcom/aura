@@ -266,7 +266,14 @@ public final class PerfWebDriverUtil {
         if (!PerfUtil.MEASURE_JSCPU_METRICTS) {
             return;
         }
-        ((JavascriptExecutor) driver).executeScript(":startProfile");
+
+        try {
+            ((JavascriptExecutor) driver).executeScript(":startProfile");
+        } catch (UnsupportedCommandException e) {
+            // happens about .5% of the time
+            LOG.log(Level.WARNING, ":startProfile failed, retrying", e);
+            ((JavascriptExecutor) driver).executeScript(":startProfile");
+        }
     }
 
     /**
@@ -280,7 +287,16 @@ public final class PerfWebDriverUtil {
             return null;
         }
         // takes about 300ms for ui:button
-        Map<String, ?> retval = (Map<String, ?>) ((JavascriptExecutor) driver).executeScript(":endProfile");
+        Map<String, ?> retval = null;
+
+        try {
+            retval = (Map<String, ?>) ((JavascriptExecutor) driver).executeScript(":endProfile");
+        } catch (UnsupportedCommandException e) {
+            // happens about .5% of the time
+            LOG.log(Level.WARNING, ":endProfile failed, retrying", e);
+            retval = (Map<String, ?>) ((JavascriptExecutor) driver).executeScript(":endProfile");
+        }
+
         if (retval == null) {
             LOG.warning(":endProfile returned no results");
             return null;

@@ -319,6 +319,8 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
         PerfMetrics timelineMetrics = null;
         PerfMetrics profileMetrics = null;
         PerfMetrics auraMetrics = null;
+        int runNumber = 1;
+        List<File> runFiles = Lists.newArrayList();
 
         if (runPerfWarmupRun()) {
             perfRunMode = PerfRunMode.WARMUP;
@@ -347,10 +349,12 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
                     PerfMetrics metrics = metricsCollector.stopCollecting();
                     runsCollector.addRun(metrics);
 
-                    if (logger.isLoggable(Level.FINE)) {
-                        logger.fine("writing dev tools log for each run");
-                        PerfResultsUtil.writeDevToolsLog(metrics.getDevToolsLog(), getGoldFileName() + '_' + (i + 1),
-                                auraUITestingUtil.getUserAgent());
+                    if (logger.isLoggable(Level.INFO)) {
+                        runFiles.add(PerfResultsUtil.writeDevToolsLog(metrics.getDevToolsLog(), getGoldFileName() + '_'
+                                + (i + 1),
+                                auraUITestingUtil.getUserAgent()));
+                        runFiles.add(PerfResultsUtil
+                                .writeGoldFile(metrics, getGoldFileName() + '_' + runNumber++, true));
                     }
                 } finally {
                     perBrowserTearDown();
@@ -375,6 +379,21 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
 
                     PerfMetrics metrics = metricsCollector.stopCollecting();
                     runsCollector.addRun(metrics);
+
+                    if (logger.isLoggable(Level.INFO)) {
+                        Map<String, ?> jsProfilerData = metrics.getJSProfilerData();
+                        if (jsProfilerData != null) {
+                            runFiles.add(PerfResultsUtil.writeJSProfilerData(jsProfilerData, getGoldFileName() + '_'
+                                    + (i + 1)));
+                        }
+                        Map<String, ?> heapSnapshot = metrics.getHeapSnapshot();
+                        if (heapSnapshot != null) {
+                            runFiles.add(PerfResultsUtil.writeHeapSnapshot(heapSnapshot, getGoldFileName() + '_'
+                                    + (i + 1)));
+                        }
+                        runFiles.add(PerfResultsUtil
+                                .writeGoldFile(metrics, getGoldFileName() + '_' + runNumber++, true));
+                    }
                 } finally {
                     perBrowserTearDown();
                 }
@@ -398,7 +417,8 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
 
                     superRunTest();
 
-                    runsCollector.addRun(metricsCollector.stopCollecting());
+                    PerfMetrics metrics = metricsCollector.stopCollecting();
+                    runsCollector.addRun(metrics);
                 } finally {
                     perBrowserTearDown();
                 }
@@ -427,7 +447,12 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
                 PerfResultsUtil.writeHeapSnapshot(heapSnapshot, getGoldFileName());
             }
             PerfResultsUtil.writeGoldFile(allMetrics, getGoldFileName(), storeDetailsInGoldFile());
+
             perfTearDown(allMetrics);
+            // delete individual run recordings of passing tests to save disk space
+            for (File file : runFiles) {
+                file.delete();
+            }
         }
     }
 

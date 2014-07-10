@@ -94,7 +94,6 @@ public final class CPUProfilerAnalyzer {
         // "Timestamps of the samples in microseconds." }
         // ]
         // }
-        // System.out.println("profileData: " + new JSONObject(profile).toString(2));
 
         // traverse nodes and calculate cummulative total/self time for functions
         Map<String, ?> head = (Map<String, ?>) profile.get("head");
@@ -118,10 +117,6 @@ public final class CPUProfilerAnalyzer {
             }
         }
 
-        // total # calls
-        // TODO: average call depth in non-idle/...
-        // total # calls in biggest island
-
         // return relevant metrics:
         JSONObject metrics = new JSONObject();
         try {
@@ -133,7 +128,6 @@ public final class CPUProfilerAnalyzer {
             setFunctionTimeMetric(metrics, "timeIdleMillis", "(idle)");
             metrics.put("numIslands", numIslands);
             metrics.put("maxDepth", maxDepthCollector.getAverage());
-
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
@@ -245,6 +239,20 @@ public final class CPUProfilerAnalyzer {
                 total += value;
             }
             return (int) Math.round(((double) total) / values.length);
+        }
+
+        @Override
+        public String toString() {
+            StringBuilder sb = new StringBuilder();
+            sb.append("MaxDepthCollector[");
+            for (int i = 0; i < values.length; i++) {
+                if (i > 0) {
+                    sb.append(' ');
+                }
+                sb.append(values[i]);
+            }
+            sb.append(']');
+            return sb.toString();
         }
     }
 }

@@ -15,8 +15,8 @@
  */
 ({
     fix : function(cmp, evt){
-        var quickFix = cmp.getValue("v.quickFix");
-        var ui = quickFix.getValue("ui");
+    	var quickFix = cmp.get("v.quickFix");
+        var ui = quickFix["ui"];
         if (ui) {
             $A.newCmpAsync(
                 this,
@@ -28,10 +28,10 @@
                     show.fire();
                 },
                 {
-                    componentDef: ui.unwrap(),
+                    componentDef: ui,
                     attributes: {
                         values: {
-                            quickFix: quickFix.unwrap()
+                            quickFix: quickFix
                         }
                     }
                 }
@@ -39,8 +39,8 @@
         } else {
             var a = cmp.get("c.doFix");
             a.setParams({
-                name: quickFix.getValue("name").getValue(),
-                attributes: quickFix.getValue("attributes").getValue()
+                name: quickFix["name"],
+                attributes: quickFix["attributes"]
             });
 
             a.setCallback(cmp, function(action){

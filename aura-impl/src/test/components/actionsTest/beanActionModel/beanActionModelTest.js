@@ -22,8 +22,8 @@
 	 */
 	 testBeanModel:{
 	        test:function(cmp){
-	        	var mCounter = cmp.getValue("m.counter").getValue();
-	        	var mCounterChild = cmp.find("childCmp").getValue("m.counter").getValue();
+	        	var mCounter = cmp.get("m.counter");
+	        	var mCounterChild = cmp.find("childCmp").get("m.counter");
 	        	$A.test.assertEquals(mCounter,1,"should be a new model instance for parent cmp");
 	        	$A.test.assertEquals(mCounterChild,1,"should be a new model instance for child cmp");
 	        }
@@ -43,8 +43,8 @@
 	  */
 	 _testBeanController:{
 	        test:function(cmp){
-	        	var cCounter = cmp.getValue("v.counter").getValue();
-	        	var cCounterChild = cmp.find("childCmp").getValue("v.childCounter").getValue();
+	        	var cCounter = cmp.get("v.counter");
+	        	var cCounterChild = cmp.find("childCmp").get("v.childCounter");
 	        	$A.test.assertEquals(cCounterChild,1,"should be a new controller instance for the first call");
 	        	$A.test.assertEquals(cCounter,2,"suppose to use the existing instance of Controller inside a request");
 	        }

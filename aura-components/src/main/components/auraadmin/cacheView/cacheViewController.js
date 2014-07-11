@@ -15,7 +15,7 @@
  */
 ({
     toggleView: function(cmp, event) {
-        var val = cmp.getValue("v.expanded");
-        val.setValue(!val.getValue());
+        var val = $A.util.getBooleanValue(cmp.get("v.expanded"));
+        cmp.set("v.expanded", !val);
     }
 })

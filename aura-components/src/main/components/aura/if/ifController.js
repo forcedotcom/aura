@@ -15,17 +15,16 @@
  */
 ({
     handleTheTruth: function(cmp, evt, helper) {
-        var isTrue = cmp.getValue("v.isTrue");
-        var current = isTrue.unwrap();
-        var previous = isTrue.getPreviousValue();
-        var isReallyTrue = current === true || current === "true";
-        var wasReallyTrue = previous === true || previous === "true";
-        if (isReallyTrue !== wasReallyTrue) {
+        var isReallyTrue = $A.util.getBooleanValue(cmp.get("v.isTrue"));
+        
+        if (isReallyTrue !== cmp._wasReallyTrue) {
+        	cmp._wasReallyTrue = isReallyTrue;
+        	
             // so it reallyChanged™, swap out the components and store the old ones in either _true or _false
             var realbody = cmp.get("v.realbody");
             
             var switchTo = "_" + isReallyTrue;
-            var switchFrom = "_" + wasReallyTrue;
+            var switchFrom = "_" + !isReallyTrue;
             
             cmp[switchFrom] = realbody;
             

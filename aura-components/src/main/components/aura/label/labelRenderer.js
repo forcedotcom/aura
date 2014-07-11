@@ -71,13 +71,11 @@
     },
 
     rerender: function LabelRenderer(component){
-        var body = component.getValue("v.body");
-        if (!body.isEmpty()) { // render the body content to components
-            for (var i = 0; i < body.getLength(); i++) {
-                var child = body.get(i);
-                if (child.isRendered()) {
-                    $A.rerender(child);
-                }
+        var body = component.get("v.body");
+        for (var i = 0; i < body.length; i++) {
+            var child = body[i];
+            if (child.isRendered()) {
+                $A.rerender(child);
             }
         }
     }

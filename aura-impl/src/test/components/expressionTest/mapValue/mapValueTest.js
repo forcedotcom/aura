@@ -72,7 +72,7 @@
             	$A.test.assertTrue($A.util.isExpression(newMap["disabled"]));
                 $A.test.assertEquals(false, newMap["disabled"].evaluate(), "failed to resolve propertyReferenceValue");
             }catch(e){
-                $A.test.fail("Failed to resolve PropertyReferenceValues before setValue(). Error :" + e);
+                $A.test.fail("Failed to resolve PropertyReferenceValues. Error :" + e);
             }
         }
     },

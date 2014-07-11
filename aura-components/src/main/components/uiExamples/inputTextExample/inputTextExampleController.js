@@ -16,24 +16,20 @@
 
 ({
     checkInput : function(cmp, evt) {
-
-
-        var colorVal = cmp.find("color").getValue("v.value");
-        var myColorVal = colorVal.getValue("v.value");
-
-        var myColor = cmp.find("color").get("v.value");
+    	var colorCmp = cmp.find("color");
+        var myColor = colorCmp.get("v.value");
         var myOutput = cmp.find("outColor");
         var greet = "You entered: " + myColor;
         myOutput.set("v.value", greet);
 
-        if (!myColorVal) {
-            colorVal.setValid(false);
-            colorVal.addErrors([{message:"Enter some text"}]);
+        if (!myColor) {
+            colorCmp.setValid("v.value", false);
+            colorCmp.addErrors("v.value", [{message:"Enter some text"}]);
         }
         else {
             //clear error
-            if(!colorVal.isValid()){
-                colorVal.setValid(true);
+            if(!colorCmp.isValid("v.value")){
+                colorCmp.setValid("v.value", true);
             }
         }
     }

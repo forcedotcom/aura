@@ -15,8 +15,8 @@
  */
 ({
     handleModePress: function (cmp) {
-        var mode = cmp.getValue('v.mode');
-        mode.setValue(mode.getValue() === 'VIEW' ? 'EDIT' : 'VIEW');
+    	var mode = cmp.get('v.mode');
+        cmp.set("v.mode", mode === 'VIEW' ? 'EDIT' : 'VIEW');
     },
 
     handleCurrentPageChange: function (cmp) {

@@ -20,7 +20,7 @@
     testDisabled: {
         attributes : {disabled: true},
         test: function(component){
-            aura.test.assertTrue(component.find("select").getElement().disabled, "Element not correctly disabled");
+            $A.test.assertTrue(component.find("select").getElement().disabled, "Element not correctly disabled");
         }
     },
     /**
@@ -29,7 +29,7 @@
     testNotDisabled: {
         attributes : {disabled: false},
         test: function(component){
-            aura.test.assertFalse(component.find("select").getElement().disabled, "Element not correctly enabled");
+            $A.test.assertFalse(component.find("select").getElement().disabled, "Element not correctly enabled");
         }
     },
     /**
@@ -38,7 +38,7 @@
     testName:{
         attributes : {name: 'select'},
         test: function(component){
-            aura.test.assertEquals('select', component.find("select").getElement().name, "Name attribute not correct");
+            $A.test.assertEquals('select', component.find("select").getElement().name, "Name attribute not correct");
         }
     },
     /**
@@ -47,7 +47,7 @@
     testMultiple: {
         attributes : {name: 'select', multiple: true},
         test: function(component){
-            aura.test.assertEquals(true, component.find("select").getElement().multiple, "Multiple attribute not correct");
+            $A.test.assertEquals(true, component.find("select").getElement().multiple, "Multiple attribute not correct");
         }
     },
     /**
@@ -56,7 +56,7 @@
     testSize: {
         attributes : {name: 'select', size: '5'},
         test: function(component){
-            aura.test.assertEquals(5, component.find("select").getElement().size, "Size attribute not correct");
+            $A.test.assertEquals(5, component.find("select").getElement().size, "Size attribute not correct");
         }
     }
 })

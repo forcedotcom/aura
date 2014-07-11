@@ -4,7 +4,7 @@
         var componentDef = $A.componentService.getDef(item);
 
         if(componentDef.isAbstract()) {
-            cmp.setValue("v.readonly", true);
+            cmp.set("v.readonly", true);
         }
     },
 

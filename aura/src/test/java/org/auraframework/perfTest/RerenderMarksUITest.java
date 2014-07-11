@@ -18,6 +18,7 @@ package org.auraframework.perfTest;
 import java.util.Map;
 
 import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.test.annotation.UnAdaptableTest;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
@@ -64,6 +65,7 @@ public class RerenderMarksUITest extends PerfMetricsTestCase {
      * 
      * @throws Exception
      */
+    @UnAdaptableTest("we need a annotation for accessibility test : W-2312560")
     public void testRerenderMarksHaveAllComponentNames() throws Exception {
         Map<String, String> logStats = Maps.newHashMap();
         open("/performanceTest/perfApp.app", Mode.CADENCE);

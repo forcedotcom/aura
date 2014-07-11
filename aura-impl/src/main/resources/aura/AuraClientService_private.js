@@ -67,7 +67,7 @@ var priv = {
     initDefsObservers : [],
     isDisconnected : false,
     foreground : new $A.ns.FlightCounter(1),
-    background : new $A.ns.FlightCounter(1),
+    background : new $A.ns.FlightCounter(3),
     actionQueue : new ActionQueue(),
 
     /**

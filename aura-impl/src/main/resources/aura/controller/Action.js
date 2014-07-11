@@ -978,7 +978,7 @@ Action.prototype.getRefreshAction = function(originalResponse) {
     // Only auto refresh if the data we have is more than
     // v.autoRefreshInterval seconds old
     var now = new Date().getTime();
-    if ((now - storage["created"]) > autoRefreshInterval && this.def) {
+    if ((now - storage["created"]) >= autoRefreshInterval && this.def) {
         var refreshAction = this.def.newInstance(this.cmp);
 
         storageService.log("Action.refresh(): auto refresh begin: " + this.getId() + " to " + refreshAction.getId());

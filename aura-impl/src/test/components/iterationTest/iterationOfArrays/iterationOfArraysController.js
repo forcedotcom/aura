@@ -20,12 +20,12 @@
     },
 
     setItems: function(cmp, evt) {
-        var other = cmp.getValue("m.data");
+        var other = cmp.get("m.data");
         cmp.find("iteration").set("v.items", other);
     },
 
     setCapitalItems: function(cmp, evt) {
-        var other = cmp.getValue("m.capitaldata");
+        var other = cmp.get("m.capitaldata");
         cmp.find("iteration").set("v.items", other);
     },
 

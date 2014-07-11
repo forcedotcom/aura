@@ -18,13 +18,17 @@
         $A.newCmpAsync(
             this,
             function(newCmp){
-                cmp.getValue("v.body").push(newCmp);
+            	var body = cmp.get("v.body"); 
+                body.push(newCmp);
+                cmp.set("v.body", body);
             },
             config
         );
     },
     createComponentAndPushToBodyDeprecated:function(cmp, config){
        var newCmp = $A.componentService.newComponentDeprecated(config, null, true);
-       cmp.getValue("v.body").push(newCmp);
+       var body = cmp.get("v.body"); 
+       body.push(newCmp);
+       cmp.set("v.body", body);
    }
 })

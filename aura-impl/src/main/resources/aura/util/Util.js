@@ -1095,6 +1095,11 @@ $A.ns.Util.prototype.attachToDocumentBody = function(element) {
 	}
 };
 
+$A.ns.Util.prototype.stringEndsWith = function(fullstr, substr) {
+	var lastIndex = fullstr.lastIndexOf(substr);
+    return (lastIndex !== -1) && (lastIndex + substr.length === fullstr.length);
+};
+
 /**
  * Define util.arrayIndexOf based on the availability of array.indexOf.
  *

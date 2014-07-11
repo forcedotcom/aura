@@ -24,7 +24,7 @@
             
             var imgElement = cmp.getElement();
             $A.test.assertTrue($A.test.isInstanceOfImageElement(imgElement), "Expected to see a image element.");
-            $A.test.assertTrue(this.endsWith(imgElement.src, '/auraFW/resources/aura/s.gif'), "Expected src to be '/auraFW/resources/aura/s.gif' by default");
+            $A.test.assertTrue($A.util.stringEndsWith(imgElement.src, '/auraFW/resources/aura/s.gif'), "Expected src to be '/auraFW/resources/aura/s.gif' by default");
             $A.test.assertUndefinedOrNull(cmp.find('link'), 'By default there should be no link on the image.');
         }
     },
@@ -46,7 +46,7 @@
         test: function(cmp){
             var imgElement = cmp.getElement();
             $A.test.assertTrue($A.test.isInstanceOfImageElement(imgElement), "Expected to see a image element.");
-            $A.test.assertTrue(this.endsWith(imgElement.src, '/auraFW/resources/aura/auralogo.png'), "Failed to display specified image source.");
+            $A.test.assertTrue($A.util.stringEndsWith(imgElement.src, '/auraFW/resources/aura/auralogo.png'), "Failed to display specified image source.");
             $A.test.assertUndefinedOrNull(cmp.find('link'), 'By default there should be no link on the image.');
         }
 
@@ -63,7 +63,7 @@
 
             var imgElement = linkElement.children[0];
             $A.test.assertTrue($A.test.isInstanceOfImageElement(imgElement), "Expected to see a image element embedded in the anchor tag.");
-            $A.test.assertTrue(this.endsWith(imgElement.src, '/auraFW/resources/aura/auralogo.png'), "Failed to display specified image source.");
+            $A.test.assertTrue($A.util.stringEndsWith(imgElement.src, '/auraFW/resources/aura/auralogo.png'), "Failed to display specified image source.");
 
         }
     },
@@ -77,7 +77,7 @@
             $A.test.assertNotEquals(linkElement.className.indexOf('logo'), -1, "Expected link element to have specified class selector.");
 
             var imgElement = linkElement.children[0];
-            $A.test.assertTrue(this.endsWith(imgElement.src, '/auraFW/resources/aura/images/bug.png'), "Failed to display specified image source.");
+            $A.test.assertTrue($A.util.stringEndsWith(imgElement.src, '/auraFW/resources/aura/images/bug.png'), "Failed to display specified image source.");
             $A.test.assertEquals('Company', imgElement.alt, "Expected to see alt text on image element.");
             $A.test.assertEquals(-1, imgElement.className.indexOf('logo'));
         }
@@ -156,8 +156,5 @@
             imgElement = cmp.getElement();
             $A.test.assertEquals("Help Accessibility",imgElement.alt, "Expected alt text for the image element.");
         }
-    },
-    endsWith:function(str, suffix){
-        return str.indexOf(suffix, str.length - suffix.length) !== -1;
     }
 })

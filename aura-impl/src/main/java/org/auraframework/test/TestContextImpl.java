@@ -30,10 +30,6 @@ public class TestContextImpl implements TestContext {
     
     public TestContextImpl(String name){
         this.name = (name == null ? "" : name);
-        int indexOfColon = this.name.indexOf(":BROWSER");
-        if(indexOfColon > 0) {
-        	this.name.substring(0, indexOfColon);
-        }
     }
     
     @Override

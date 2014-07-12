@@ -452,6 +452,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
             // delete individual run recordings of passing tests to save disk space
             for (File file : runFiles) {
                 file.delete();
+                PerfResultsUtil.RESULTS_JSON.removeResultsFile(file);
             }
         }
     }

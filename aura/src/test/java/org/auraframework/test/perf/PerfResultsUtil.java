@@ -29,6 +29,8 @@ import java.util.logging.Logger;
 import org.auraframework.test.perf.metrics.PerfMetrics;
 import org.auraframework.util.IOUtil;
 import org.auraframework.util.test.PerfGoldFilesUtil;
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.google.common.base.Charsets;
@@ -53,6 +55,7 @@ public final class PerfResultsUtil {
      */
     public static File writeGoldFile(PerfMetrics metrics, String fileName, boolean storeDetails) {
         File file = new File(RESULTS_DIR + "/goldfiles/" + fileName + ".json");
+        RESULTS_JSON.addResultsFile(file);
         return writeFile(file, PerfGoldFilesUtil.toGoldFileText(metrics, storeDetails), "goldfile");
     }
 
@@ -61,6 +64,7 @@ public final class PerfResultsUtil {
      */
     public static File writeAuraStats(String auraStatsContents, String fileName) {
         File file = new File(RESULTS_DIR + "/aurastats/" + fileName + "_aurastats.json");
+        RESULTS_JSON.addResultsFile(file);
         return writeFile(file, auraStatsContents, "Aura Stats");
     }
 
@@ -90,6 +94,7 @@ public final class PerfResultsUtil {
         File file = new File(RESULTS_DIR + "/timelines/" + fileName + "_timeline.json");
         try {
             writeDevToolsLog(timeline, file, userAgent);
+            RESULTS_JSON.addResultsFile(file);
         } catch (Exception e) {
             LOG.log(Level.WARNING, "error writing " + file.getAbsolutePath(), e);
         }
@@ -130,6 +135,7 @@ public final class PerfResultsUtil {
             try {
                 writer = new BufferedWriter(new FileWriter(file));
                 writer.write(new JSONObject(jsProfilerData).toString());
+                RESULTS_JSON.addResultsFile(file);
                 LOG.info("wrote JavaScript CPU profile: " + file.getAbsolutePath());
             } finally {
                 IOUtil.close(writer);
@@ -171,6 +177,7 @@ public final class PerfResultsUtil {
             writeList(writer, "strings", (List<?>) data.get("strings"), 1, true);
             writer.write('}');
 
+            RESULTS_JSON.addResultsFile(file);
             LOG.info("wrote heap snapshot: " + file.getAbsolutePath());
         } finally {
             IOUtil.close(writer);
@@ -209,6 +216,120 @@ public final class PerfResultsUtil {
         if (!last) {
             writer.write(',');
             writer.newLine();
+        }
+    }
+
+    // generate Results.json:
+
+    public static final ResultsJSON RESULTS_JSON = new ResultsJSON(true);
+
+    /**
+     * Generates a Results.json file pointing to all the artifacts generated in a perf test run.
+     */
+    public static final class ResultsJSON {
+        private final JSONObject json = new JSONObject();
+        private int numResultFilesAdded;
+
+        ResultsJSON(boolean writeOnJVMExit) {
+            try {
+                json.put("results", new JSONObject());
+                JSONObject build = new JSONObject();
+                json.put("build", build);
+
+                addBuildInfo(build, "jenkins_build_number", "BUILD_NUMBER");
+                addBuildInfo(build, "jenkins_build_id", "BUILD_ID");
+                addBuildInfo(build, "git_branch", "GIT_BRANCH", "CURRENT_GIT_BRANCH");
+                addBuildInfo(build, "git_commit", "GIT_COMMIT", "CURRENT_GIT_COMMIT");
+                addBuildInfo(build, "aura_version", "AURA_VERSION");
+                addBuildInfo(build, "author_email", "AUTHOR_EMAIL");
+                addBuildInfo(build, "changelists", "CHANGELISTS");
+            } catch (Exception e) {
+                LOG.log(Level.WARNING, "error adding build info", e);
+            }
+
+            if (writeOnJVMExit) {
+                Runtime.getRuntime().addShutdownHook(new Thread() {
+                    @Override
+                    public void run() {
+                        if (numResultFilesAdded > 0) {
+                            File file = new File(RESULTS_DIR + "/Results.json");
+                            writeFile(file, json.toString(), "Results.json");
+                        }
+                    }
+                });
+            }
+        }
+
+        void addResultsFile(File file) {
+            numResultFilesAdded++;
+            // i.e. timelines: { ui: { list: [..., ..., ...] }}
+            try {
+                JSONArray list = getListParent(file).getJSONArray("list");
+                // put filenames sorted in the JSONArray
+                String fileName = file.getName();
+                int insertIndex = list.length();
+                for (int i = 0; i < list.length(); i++) {
+                    if (fileName.compareTo(list.getString(i)) < 0) {
+                        insertIndex = i;
+                        break;
+                    }
+                }
+                for (int i = list.length() - 1; i >= insertIndex; i--) {
+                    list.put(i + 1, list.get(i));
+                }
+                list.put(insertIndex, fileName);
+            } catch (Exception e) {
+                LOG.log(Level.WARNING, "error adding results file: " + file, e);
+            }
+        }
+
+        public void removeResultsFile(File file) {
+            try {
+                JSONObject parent = getListParent(file);
+                JSONArray list = parent.getJSONArray("list");
+                JSONArray trimmedList = new JSONArray();
+                String fileName = file.getName();
+                for (int i = 0; i < list.length(); i++) {
+                    String value = list.getString(i);
+                    if (!fileName.equals(value)) {
+                        trimmedList.put(value);
+                    }
+                }
+                parent.put("list", trimmedList);
+            } catch (Exception e) {
+                LOG.log(Level.WARNING, "error removing results file: " + file, e);
+            }
+        }
+
+        JSONObject getJSON() {
+            return json;
+        }
+
+        private JSONObject getListParent(File file) throws JSONException {
+            String relativePath = file.getParentFile().getPath();
+            relativePath = relativePath.substring(RESULTS_DIR.getPath().length() + 1);
+            String[] folders = relativePath.split("/");
+            JSONObject parent = json.getJSONObject("results");
+            for (String folder : folders) {
+                if (!parent.has(folder)) {
+                    parent.put(folder, new JSONObject());
+                }
+                parent = parent.getJSONObject(folder);
+            }
+            if (!parent.has("list")) {
+                parent.put("list", new JSONArray());
+            }
+            return parent;
+        }
+
+        private static void addBuildInfo(JSONObject build, String key, String... envvars) throws JSONException {
+            for (String envvar : envvars) {
+                String value = System.getenv(envvar);
+                if (value != null && value.trim().length() > 0) {
+                    build.put(key, value);
+                    return; // uses first non-null
+                }
+            }
         }
     }
 }

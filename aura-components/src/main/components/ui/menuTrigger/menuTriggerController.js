@@ -19,8 +19,12 @@
         var concreteHelper = concreteCmp.getDef().getHelper();
         concreteHelper.focus(concreteCmp);
     },
-    
+
     handleClick: function(component, event, helper) {
+        if ($A.util.getBooleanValue(component.get("v.stopPropagation"))) {
+            var domEvent = event.getParam('domEvent');
+            $A.util.squash(domEvent);
+        }
         helper.toggleMenu(component);
     }
 })

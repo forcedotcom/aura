@@ -17,6 +17,7 @@
 -->
 <aura:component abstract="true" extensible="true" extends="ui:interactive" description="A trigger that expands and collapses a menu, used in a ui:menu component." support="GA">
     <aura:attribute name="parent" type="Aura.Component[]" description="The parent of this menu trigger."/>
+    <aura:attribute name="stopPropagation" type="Boolean" default="false" description="Prevents the click event from bubbling up the DOM tree, preventing any parent handlers from being notified of the event."/>
     <aura:handler name="click" action="{!c.handleClick}"/>
     <div id="{!globalId}" aura:id="menuTrigger" aria-haspopup="true">
         {!v.body}

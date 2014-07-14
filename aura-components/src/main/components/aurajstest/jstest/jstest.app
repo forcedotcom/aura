@@ -31,6 +31,6 @@
 
     <section class="suiteCode">
         <h1>JS Test Suite <span onclick="{!c.toggleCode}">Display</span></h1>
-        <pre aura:id="test-suite-code">{!m.testSuite.code}</pre>
+        <pre aura:id="test-suite-code" class="hidden">{!m.testSuite.code}</pre>
     </section>
 </aura:application>

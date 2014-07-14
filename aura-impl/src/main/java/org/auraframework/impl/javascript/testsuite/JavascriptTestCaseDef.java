@@ -19,8 +19,11 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 
-import org.auraframework.def.*;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.Definition;
+import org.auraframework.def.TestCaseDef;
+import org.auraframework.def.TestSuiteDef;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
@@ -30,7 +33,7 @@ import org.auraframework.util.json.Json;
 public class JavascriptTestCaseDef extends DefinitionImpl<TestCaseDef> implements TestCaseDef {
     public JavascriptTestCaseDef(DefDescriptor<TestSuiteDef> suiteDescriptor, String name, Location location,
             Map<String, Object> attributes, DefType defType, Set<String> testLabels, Set<String> browsers,
-            Set<Definition> mocks, Set<String> exceptionsAllowedDuringInit) {
+            Set<Definition> mocks, Set<String> auraErrorsExpectedDuringInit) {
         super(DefDescriptorImpl.getInstance(suiteDescriptor.getQualifiedName() + "/" + DefType.TESTCASE + "$" + name,
                 TestCaseDef.class), location, null);
         this.attributes = AuraUtil.immutableMap(attributes);
@@ -39,7 +42,7 @@ public class JavascriptTestCaseDef extends DefinitionImpl<TestCaseDef> implement
         this.browsers = AuraUtil.immutableSet(browsers);
         this.mocks = AuraUtil.immutableSet(mocks);
         this.name = name;
-        this.exceptionsAllowedDuringInit = exceptionsAllowedDuringInit;
+        this.auraErrorsExpectedDuringInit = auraErrorsExpectedDuringInit;
     }
 
     @Override
@@ -51,7 +54,7 @@ public class JavascriptTestCaseDef extends DefinitionImpl<TestCaseDef> implement
         json.writeMapEntry("defType", defType);
         json.writeMapEntry("testLabels", testLabels);
         json.writeMapEntry("browsers", browsers);
-        json.writeMapEntry("exceptionsAllowedDuringInit", exceptionsAllowedDuringInit);
+        json.writeMapEntry("auraErrorsExpectedDuringInit", auraErrorsExpectedDuringInit);
         json.writeMapEnd();
     }
 
@@ -81,45 +84,45 @@ public class JavascriptTestCaseDef extends DefinitionImpl<TestCaseDef> implement
     }
 
     @Override
-    public Set<Definition> getLocalDefs(){
+    public Set<Definition> getLocalDefs() {
         return mocks;
     }
 
-	@Override
-	public Set<String> getExceptionsAllowedDuringInit() {
-		return exceptionsAllowedDuringInit;
-	}
-	
-	@Override
+    @Override
+    public Set<String> getAuraErrorsExpectedDuringInit() {
+        return auraErrorsExpectedDuringInit;
+    }
+
+    @Override
     public String getQualifiedName() {
-	    if(this.getDescriptor()!=null) {
-	        String cb = getCurrentBrowser();
-	        if( (cb!=null) && (cb.length()>0) ) {
-	            return this.getDescriptor().getQualifiedName()+":BROWSERTYPE"+cb;
-	        } else {
-	            return this.getDescriptor().getQualifiedName();
-	        }
-	    } else {
-	        return "";
-	    }
-	}
-	
-	@Override
-	public void setCurrentBrowser(String b) {
-	    this.currentBrowser = b;
-	}
-	
-	private String getCurrentBrowser() {
-	    return this.currentBrowser;
-	}
-	
-	private String currentBrowser = "";
+        if (this.getDescriptor() != null) {
+            String cb = getCurrentBrowser();
+            if ((cb != null) && (cb.length() > 0)) {
+                return this.getDescriptor().getQualifiedName() + ":BROWSERTYPE" + cb;
+            } else {
+                return this.getDescriptor().getQualifiedName();
+            }
+        } else {
+            return "";
+        }
+    }
+
+    @Override
+    public void setCurrentBrowser(String b) {
+        this.currentBrowser = b;
+    }
+
+    private String getCurrentBrowser() {
+        return this.currentBrowser;
+    }
+
+    private String currentBrowser = "";
     private static final long serialVersionUID = -5460410624026635318L;
     private final Map<String, Object> attributes;
     private final DefType defType;
     private final Set<String> testLabels;
     private final Set<String> browsers;
     private final Set<Definition> mocks;
-    private final Set<String> exceptionsAllowedDuringInit;
+    private final Set<String> auraErrorsExpectedDuringInit;
     private final String name;
 }

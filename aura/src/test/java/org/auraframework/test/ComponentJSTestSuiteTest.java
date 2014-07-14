@@ -265,8 +265,8 @@ public class ComponentJSTestSuiteTest extends TestSuite {
         }
 
         @Override
-        protected Set<String> getExceptionsAllowedDuringInit() {
-            return caseDef.getExceptionsAllowedDuringInit();
+        protected Set<String> getAuraErrorsExpectedDuringInit() {
+            return caseDef.getAuraErrorsExpectedDuringInit();
         }
 
         @Override

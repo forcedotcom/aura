@@ -75,14 +75,14 @@ public class JavascriptTestSuiteDefHandler extends JavascriptHandler<TestSuiteDe
             return null;
         }
     }
-    
+
     private Set<Definition> parseMocks(DefDescriptor<? extends BaseComponentDef> compDesc, List<Object> jsList)
             throws QuickFixException {
         Set<Definition> mocks = Sets.newHashSet();
         if (jsList != null && !jsList.isEmpty()) {
             for (Object jsItem : jsList) {
                 @SuppressWarnings("unchecked")
-                Definition mockDef = parseMock(compDesc, (Map<String, Object>)jsItem);
+                Definition mockDef = parseMock(compDesc, (Map<String, Object>) jsItem);
                 if (mockDef != null) {
                     mocks.add(mockDef);
                 }
@@ -106,7 +106,7 @@ public class JavascriptTestSuiteDefHandler extends JavascriptHandler<TestSuiteDe
         List<String> suiteLabels = (List<String>) map.get("labels");
         List<String> suiteBrowsers = (List<String>) (List<?>) map.get("browsers");
         Set<Definition> suiteMocks = parseMocks(compDesc, (List<Object>) map.get("mocks"));
-        
+
         for (Entry<String, Object> entry : map.entrySet()) {
             String key = entry.getKey();
             if (key.startsWith("test")) {
@@ -152,10 +152,10 @@ public class JavascriptTestSuiteDefHandler extends JavascriptHandler<TestSuiteDe
                         : Sets.newHashSet(suiteBrowsers))
                         : Sets.newHashSet(caseBrowsers);
 
-                List<String> exceptionsAllowedDuringInitList = (List<String>) (List<?>) value
-                        .get("exceptionsAllowedDuringInit");
-                Set<String> exceptionsAllowedDuringInit = exceptionsAllowedDuringInitList == null ? Collections.EMPTY_SET
-                        : Sets.newHashSet(exceptionsAllowedDuringInitList);
+                List<String> auraErrorsExpectedDuringInitList = (List<String>) (List<?>) value
+                        .get("auraErrorsExpectedDuringInit");
+                Set<String> auraErrorsExpectedDuringInit = auraErrorsExpectedDuringInitList == null ? Collections.EMPTY_SET
+                        : Sets.newHashSet(auraErrorsExpectedDuringInitList);
 
                 if (compDesc == null || !compDesc.exists()) {
                     compDesc = DefDescriptorImpl.getAssociateDescriptor(
@@ -164,7 +164,7 @@ public class JavascriptTestSuiteDefHandler extends JavascriptHandler<TestSuiteDe
                 }
                 DefType defType = compDesc.getDefType();
 
-                Set<Definition> caseMocks = parseMocks(compDesc, (List<Object>)value.get("mocks"));
+                Set<Definition> caseMocks = parseMocks(compDesc, (List<Object>) value.get("mocks"));
 
                 Set<Definition> mocks;
                 if (suiteMocks.isEmpty()) {
@@ -182,9 +182,9 @@ public class JavascriptTestSuiteDefHandler extends JavascriptHandler<TestSuiteDe
                     }
                     mocks = Sets.newHashSet(temp.values());
                 }
-                
+
                 builder.caseDefs.add(new JavascriptTestCaseDef(descriptor, key, null, attributes, defType, labels,
-                        browsers, mocks, exceptionsAllowedDuringInit));
+                        browsers, mocks, auraErrorsExpectedDuringInit));
             }
         }
 

@@ -1497,6 +1497,9 @@ $A.ns.Test.prototype.run = function(name, code, timeoutOverride){
     this.stages = this.suite[name]["test"];
     this.stages = $A.util.isArray(this.stages) ? this.stages : [this.stages];
 
+    var auraErrorsExpectedDuringInit = this.suite[name]["auraErrorsExpectedDuringInit"] || [];
+    var auraWarningsExpectedDuringInit = this.suite[name]["auraWarningsExpectedDuringInit"] || [];
+
     try {
         if(this.suite["setUp"]){
             this.suite["setUp"].call(this.suite, this.cmp);
@@ -1505,6 +1508,18 @@ $A.ns.Test.prototype.run = function(name, code, timeoutOverride){
         this.logError("Error during setUp", e);
         this.doTearDown();
     }
+
+    // Fail now if we got any unexpected errors or warnings during test initialization/setup
+    this.clearExpected(this.preErrors, auraErrorsExpectedDuringInit);
+    this.logErrors(true, "Received unexpected error:",this.preErrors);
+    this.logErrors(true, "Did not receive expected error during init: ", auraErrorsExpectedDuringInit);
+    this.preErrors = null;
+
+    this.clearExpected(this.preWarnings, auraWarningsExpectedDuringInit);
+    this.logErrors(this.failOnWarning, "Received unexpected warning:",this.preWarnings);
+    this.logErrors(this.failOnWarning, "Did not receive expected warning during init: ", auraWarningsExpectedDuringInit);
+    this.preWarnings = null;
+
     this.continueWhenReady();
 };
 

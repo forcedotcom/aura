@@ -627,13 +627,13 @@ $A.ns.Aura.prototype.finishInit = function(doNotCallUIPerfOnLoad) {
  * Use <code>$A.error()</code> in response to a serious error that has no recovery path.
  *
  * If this occurs during a test, the test will be stopped unless you add calls to '$A.test.expectAuraError' for
- * each error that occurs. <code>exceptionsAllowedDuringInit</code> allows server side errors to not stop the
+ * each error that occurs. <code>auraErrorsExpectedDuringInit</code> allows server side errors to not stop the
  * test as well.
  *
  * @description <p>Example:</p>
  * <pre>
  * testDuplicate : {
-   exceptionsAllowedDuringInit : ["Duplicate found!"],
+   auraErrorsExpectedDuringInit : ["Duplicate found!"],
      attributes : {
  *     dupCmp : true
  *   },

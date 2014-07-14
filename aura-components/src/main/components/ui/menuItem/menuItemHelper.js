@@ -132,7 +132,7 @@
     
     setDisabled : function(component) {
     	var concreteCmp = component.getConcreteComponent();
-        var linkCmp = concreteCmp.find("link");
+        var linkCmp = this.getAnchorElement(component);
         var elem = linkCmp ? linkCmp.getElement() : null;
         if (elem) {
             var disabled = concreteCmp.get("v.disabled");
@@ -147,12 +147,25 @@
     },
     
     setFocus: function(component) {
-        var concreteCmp = component.getConcreteComponent();
-        var linkCmp = concreteCmp.find("link");
+        var linkCmp = this.getAnchorElement(component);
         var elem = linkCmp ? linkCmp.getElement() : null;
         if (elem && elem.focus) {
             elem.focus();
         }
+    },
+    
+    getAnchorElement: function(component) {
+    	//Walk up the component ancestor to find the contained component by localId
+    	var localId = "link", c =  component.getConcreteComponent();
+    	var retCmp = null;    	
+    	while (c) {    		    		
+    		retCmp = c.find(localId);
+    		if (retCmp) {
+    			break;
+    		}
+    		c = c.getSuper();
+    	}
+    	return retCmp;
     },
     
     setFocusToNextItem: function(component) {

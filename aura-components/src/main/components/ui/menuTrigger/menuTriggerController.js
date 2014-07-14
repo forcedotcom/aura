@@ -21,7 +21,7 @@
     },
 
     handleClick: function(component, event, helper) {
-        if ($A.util.getBooleanValue(component.get("v.stopPropagation"))) {
+        if ($A.util.getBooleanValue(component.get("v.stopClickPropagation"))) {
             var domEvent = event.getParam('domEvent');
             $A.util.squash(domEvent);
         }

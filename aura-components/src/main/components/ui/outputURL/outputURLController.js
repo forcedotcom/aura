@@ -15,7 +15,7 @@
  */
 ({
     click : function(cmp, event){
-        if ($A.util.getBooleanValue(cmp.get("v.stopPropagation"))) {
+        if ($A.util.getBooleanValue(cmp.get("v.stopClickPropagation"))) {
             //IE9 & Other Browsers
             if (event.stopPropagation) {
               event.stopPropagation();

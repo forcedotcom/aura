@@ -1,23 +1,23 @@
 ({
 
-	clickPeach : function (cmp, evt) {
+	clickPeach : function (cmp, evt, helper) {
 		cmp.set("v.locationToken","Peach");
-        cmp.set("v.clickCount", cmp.get("v.clickCount") + 1);
+		helper.clickFruit(cmp);
     },
     
     clickApple : function(cmp,evt,helper) {
     	cmp.set("v.locationToken","Apple");
-    	helper.clickFruit(cmp,"Apple");
+    	helper.clickFruit(cmp);
     },
     
     clickBanana : function(cmp,evt,helper) {
     	cmp.set("v.locationToken","Banana");
-    	helper.clickFruit(cmp,"Banana");
+    	helper.clickFruit(cmp);
     },
     
     clickOrange : function(cmp,evt,helper) {
     	cmp.set("v.locationToken","Orange");
-    	helper.clickFruit(cmp,"Orange");
+    	helper.clickFruit(cmp);
     },
     
     locationChanged: function(cmp, evt) {

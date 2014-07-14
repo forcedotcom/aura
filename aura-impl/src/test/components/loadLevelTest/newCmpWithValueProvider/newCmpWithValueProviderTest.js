@@ -92,7 +92,7 @@
     },
 
     /**
-     * Verify component with PropertyReferenceValue in MapValue attributes has correct values
+     * Verify component with PropertyReferenceChain in MapValue attributes has correct values
      */
     testMapValueProviderForDefFetchedFromServer:{
         test: function(cmp){

@@ -67,7 +67,7 @@
 					 "modelDef", "providerDef", "rendererDef", "helperDef"];
 		var statsViews = ["actionReferenceValue", "arrayValue",
 					 "functionCallValue", "mapValue", "passthroughValue",
-					 "propertyReferenceValue", "simpleValue", "value"];
+					 "propertyReferenceChain", "simpleValue", "value"];
 
 		// if in STATS mode include STATS's views.
 		if (opener.$A.getContext().getMode() == "STATS") {

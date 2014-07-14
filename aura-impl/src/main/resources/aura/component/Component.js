@@ -325,7 +325,7 @@ Component.prototype.addHandler = function(eventName, valueProvider, actionExpres
  */
 Component.prototype.addValueHandler = function(config){
     var value = config["value"];
-    if($A.util.isString(value) || value.toString() === "PropertyReferenceValue"){
+    if($A.util.isString(value) || value.toString() === "PropertyReferenceChain"){
         value = this._getValue(value);
     }
 
@@ -798,7 +798,7 @@ Component.prototype._getValue = function(key){
     }
 
     // this getValue is special, the only one that accepts an expression or just a key
-    if (key.toString() === "PropertyReferenceValue" || key.indexOf(".") !== -1) {
+    if (key.toString() === "PropertyReferenceChain" || key.indexOf(".") !== -1) {
         // then we got an expression, lets deal with it
         return expressionService.getValue(this, key);
     }

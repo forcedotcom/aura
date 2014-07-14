@@ -413,7 +413,7 @@ var ComponentPriv = (function() { // Scoping priv
                 valuesAlreadySet = configAttributes["valuesAlreadySet"] ? configAttributes["valuesAlreadySet"]
                                 : {};
                 for (key in values) {
-                    attributeValues[key] = new PropertyReferenceValue([ "v", key ]);
+                    attributeValues[key] = new PropertyReferenceChain([ "v", key ]);
                 }
             }
 
@@ -761,7 +761,7 @@ var ComponentPriv = (function() { // Scoping priv
             var str = (val && val.auraType) ? val.toString() : null;
 
             try {
-                if (str === "PropertyReferenceValue" || (str === "FunctionCallValue" && avp)) {
+                if (str === "PropertyReferenceChain" || (str === "FunctionCallValue" && avp)) {
                     ret[key] = that.output(val.getValue(avp), avp, serialized, depth);
                 } else if (val && val.auraType && val.auraType === "Value") {
                     ret[key] = that.output(val.unwrap(), avp, serialized, depth);

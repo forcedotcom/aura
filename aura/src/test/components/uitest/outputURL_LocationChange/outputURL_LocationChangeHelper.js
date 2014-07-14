@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 ({
-	clickFruit : function(cmp, fruit) {
+	clickFruit : function(cmp) {
     	cmp.set("v.clickCount", cmp.get("v.clickCount") + 1);
-
     },
     
 })

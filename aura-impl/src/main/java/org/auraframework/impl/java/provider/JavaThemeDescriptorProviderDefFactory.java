@@ -17,23 +17,25 @@ package org.auraframework.impl.java.provider;
 
 import java.util.List;
 
-import org.auraframework.def.ProviderDef;
+import org.auraframework.def.ThemeDescriptorProviderDef;
 import org.auraframework.impl.java.provider.AbstractJavaProviderDef.Builder;
 import org.auraframework.system.SourceLoader;
 
 /**
+ * Factory for theme descriptor provider classes.
  */
-public class JavaProviderDefFactory extends AbstractJavaProviderDefFactory<ProviderDef> {
-    public JavaProviderDefFactory() {
+public final class JavaThemeDescriptorProviderDefFactory extends
+        AbstractJavaProviderDefFactory<ThemeDescriptorProviderDef> {
+    public JavaThemeDescriptorProviderDefFactory() {
         super();
     }
 
-    public JavaProviderDefFactory(List<SourceLoader> sourceLoaders) {
+    public JavaThemeDescriptorProviderDefFactory(List<SourceLoader> sourceLoaders) {
         super(sourceLoaders);
     }
 
     @Override
-    protected Builder<ProviderDef> newBuilder() {
-        return new JavaProviderDef.Builder();
+    protected Builder<ThemeDescriptorProviderDef> newBuilder() {
+        return new JavaThemeDescriptorProviderDef.Builder();
     }
 }

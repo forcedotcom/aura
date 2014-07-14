@@ -71,7 +71,7 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 public class MasterDefRegistryImpl implements MasterDefRegistry {
     private static final Logger logger = Logger.getLogger(MasterDefRegistryImpl.class);
 
-    private static final ImmutableSortedSet<String> cacheDependencyExceptions = ImmutableSortedSet.of (
+    private static final ImmutableSortedSet<String> cacheDependencyExceptions = ImmutableSortedSet.of(
             "apex://array",
             "apex://aura.component",
             "apex://blob",
@@ -138,16 +138,16 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         this.rLock = acs.getReadLock();
         this.wLock = acs.getWriteLock();
         this.existsCache = acs.getExistsCache();
-        this.defsCache= acs.getDefsCache();
-        this.depsCache= acs.getDepsCache();
+        this.defsCache = acs.getDefsCache();
+        this.depsCache = acs.getDepsCache();
         this.stringsCache = acs.getStringsCache();
-        this.descriptorFilterCache = acs.getDescriptorFilterCache(); 
+        this.descriptorFilterCache = acs.getDescriptorFilterCache();
         this.accessCheckCache = acs.<String, String>getCacheBuilder()
-            .setInitialSize(ACCESS_CHECK_CACHE_SIZE)
-            .setMaximumSize(ACCESS_CHECK_CACHE_SIZE)
-            .setRecordStats(true)
-            .setSoftValues(true)
-            .build();
+                .setInitialSize(ACCESS_CHECK_CACHE_SIZE)
+                .setMaximumSize(ACCESS_CHECK_CACHE_SIZE)
+                .setRecordStats(true)
+                .setSoftValues(true)
+                .build();
         this.localDependencies = Maps.newHashMap();
         this.defs = Maps.newHashMap();
         this.localDescs = null;
@@ -156,12 +156,11 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
     /**
      * Build a system def registry that is meant to be used as a shadowing registry.
-     *
-     * This builds a registry that will not add new defs to the def set, and will allow
-     * any access (the access checks MUST have been done before this is instantiated). Note
-     * that none of the defs built off of this will be sent to the client, so it should be
-     * safe to allow this access.
-     *
+     * 
+     * This builds a registry that will not add new defs to the def set, and will allow any access (the access checks
+     * MUST have been done before this is instantiated). Note that none of the defs built off of this will be sent to
+     * the client, so it should be safe to allow this access.
+     * 
      * @param original the registry that is the 'public' registry.
      */
     public MasterDefRegistryImpl(@NonNull MasterDefRegistryImpl original) {
@@ -170,33 +169,34 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
     /**
      * Build a master def registry with a set of registries.
-     *
+     * 
      * This is the normal constructor for a master def registry.
+     * 
      * @param registries the registries to use in the mdr.
      */
     public MasterDefRegistryImpl(@NonNull DefRegistry<?>... registries) {
         this(new RegistryTrie(registries), null);
     }
 
-    private boolean isOkForDependencyCaching( DefDescriptor<?> descriptor) {
-        //if compound, OK as these tests are also conducted on the compound's target
+    private boolean isOkForDependencyCaching(DefDescriptor<?> descriptor) {
+        // if compound, OK as these tests are also conducted on the compound's target
         if (descriptor.getPrefix().equals("compound")) {
             return true;
         }
-    
+
         // test cacheDependencyExceptions (like static types in Apex)
         String descriptorName = descriptor.getQualifiedName().toLowerCase();
-        
+
         // truncate array markers
         if (descriptorName.endsWith("[]")) {
-            descriptorName = descriptorName.substring(0,descriptorName.length() -2);
+            descriptorName = descriptorName.substring(0, descriptorName.length() - 2);
         }
         if (cacheDependencyExceptions.contains(descriptorName)) {
             return true;
         }
         return false;
     }
-    
+
     @Override
     @NonNull
     public Set<DefDescriptor<?>> find(@NonNull DescriptorFilter matcher) {
@@ -262,6 +262,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             case RESOURCE:
             case PROVIDER:
             case THEME_PROVIDER:
+            case THEME_MAP_PROVIDER:
                 qualifiedNamePattern = "%s://%s.%s";
                 break;
             case ATTRIBUTE:
@@ -285,7 +286,8 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             case DESCRIPTION:
             case EXAMPLE:
                 // TODO: FIXME
-                throw new AuraRuntimeException(String.format("Find on %s defs not supported.", matcher.getDefType().name()));
+                throw new AuraRuntimeException(String.format("Find on %s defs not supported.", matcher.getDefType()
+                        .name()));
             }
             rLock.lock();
             try {
@@ -294,7 +296,8 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                             matcher.getPrefix() != null ? matcher.getPrefix() : "*", namespace,
                             matcher.getName() != null ? matcher.getName() : "*");
                     @SuppressWarnings("unchecked")
-                    DefDescriptor<D> namespacedMatcher = (DefDescriptor<D>) DefDescriptorImpl.getInstance(qualifiedName,
+                    DefDescriptor<D> namespacedMatcher = (DefDescriptor<D>) DefDescriptorImpl.getInstance(
+                            qualifiedName,
                             matcher.getDefType().getPrimaryInterface());
                     DefRegistry<D> registry = getRegistryFor(namespacedMatcher);
                     if (registry != null) {
@@ -366,7 +369,6 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
          */
         public boolean cacheable = false;
 
-
         /**
          * have we validated this def yet?
          */
@@ -416,9 +418,9 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         public final List<ClientLibraryDef> clientLibs;
         public final DefDescriptor<? extends Definition> topLevel;
         public int level;
-        
+
         /** Is this def's dependencies cacheable? */
-        public boolean shouldCacheDependencies; 
+        public boolean shouldCacheDependencies;
 
         // TODO: remove preloads
         public boolean addedPreloads = false;
@@ -518,16 +520,16 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         if (!registry.isStatic()) {
             if (registry.isCacheable() && shouldCache(compiling.descriptor)) {
                 compiling.cacheable = true;
-    
+
                 @SuppressWarnings("unchecked")
                 Optional<D> opt = (Optional<D>) defsCache.getIfPresent(compiling.descriptor);
                 if (opt != null) {
                     D cachedDef = opt.orNull();
-    
+
                     if (cachedDef != null) {
                         @SuppressWarnings("unchecked")
                         DefDescriptor<D> canonical = (DefDescriptor<D>) cachedDef.getDescriptor();
-    
+
                         compiling.def = cachedDef;
                         compiling.descriptor = canonical;
                         compiling.built = false;
@@ -539,9 +541,9 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             } else {
                 // if not a cacheable registry or not shouldCache, test other exceptions that might still
                 // allow dependency caching (if it's from static registry, it can't affect our decision on
-                // depsCaching) test for special cases: compounds and static apex types 
-                boolean qualified = isOkForDependencyCaching(compiling.descriptor); 
-    
+                // depsCaching) test for special cases: compounds and static apex types
+                boolean qualified = isOkForDependencyCaching(compiling.descriptor);
+
                 currentCC.shouldCacheDependencies = qualified;
             }
         }
@@ -580,14 +582,14 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             @CheckForNull Definition parent) throws QuickFixException {
         currentCC.loggingService.incrementNum(LoggingService.DEF_VISIT_COUNT);
         if (stack.contains(descriptor)) {
-            //System.out.println("cycle at "+stack+" "+descriptor);
+            // System.out.println("cycle at "+stack+" "+descriptor);
             return null;
         }
         CompilingDef<D> cd = cc.getCompiling(descriptor);
         if (cc.level > cd.level) {
             cd.level = cc.level;
             if (cd.def != null) {
-                //System.out.println("recalculating at "+stack+" "+descriptor);
+                // System.out.println("recalculating at "+stack+" "+descriptor);
             }
         } else {
             if (cd.def != null) {
@@ -624,7 +626,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             for (DefDescriptor<?> dep : newDeps) {
                 getHelper(dep, cc, stack, cd.def);
             }
-            
+
             return cd.def;
         } finally {
             cc.level -= 1;
@@ -657,8 +659,9 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                 currentCC.context.setCurrentCaller(cd.descriptor);
                 if (cd.built && !cd.validated) {
                     if (iteration != 0) {
-                        logger.warn("Nested add of "+cd.descriptor+" during validation of "+currentCC.topLevel);
-                        //throw new AuraRuntimeException("Nested add of "+cd.descriptor+" during validation of "+currentCC.topLevel);
+                        logger.warn("Nested add of " + cd.descriptor + " during validation of " + currentCC.topLevel);
+                        // throw new
+                        // AuraRuntimeException("Nested add of "+cd.descriptor+" during validation of "+currentCC.topLevel);
                     }
                     cd.def.validateReferences();
                     cd.validated = true;
@@ -672,12 +675,13 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         //
         for (CompilingDef<?> cd : compiling) {
             if (cd.def == null) {
-                throw new AuraRuntimeException("Missing def for "+cd.descriptor+" during validation of "+currentCC.topLevel);
+                throw new AuraRuntimeException("Missing def for " + cd.descriptor + " during validation of "
+                        + currentCC.topLevel);
             }
             if (cd.def != null) {
                 defs.put(cd.descriptor, cd.def);
                 if (cd.built) {
-                    if (cd.cacheable) { //false for non-privileged namespaces, or non-cacheable registries
+                    if (cd.cacheable) { // false for non-privileged namespaces, or non-cacheable registries
                         defsCache.put(cd.descriptor, Optional.of(cd.def));
                     }
                     cd.def.markValid();
@@ -786,8 +790,8 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         String key = makeLocalKey(descriptor);
 
         if (currentCC != null) {
-            throw new AuraRuntimeException("Ugh, nested compileDE/buildDE on "+currentCC.topLevel
-                    +" trying to build "+descriptor);
+            throw new AuraRuntimeException("Ugh, nested compileDE/buildDE on " + currentCC.topLevel
+                    + " trying to build " + descriptor);
         }
 
         try {
@@ -855,7 +859,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
                 // put unqualified descriptor key for dependency
                 if (cc.shouldCacheDependencies) {
-                   depsCache.put(makeNonUidGlobalKey(descriptor), de);
+                    depsCache.put(makeNonUidGlobalKey(descriptor), de);
                 }
             }
 
@@ -878,7 +882,6 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         return lastModTime;
     }
 
-   
     /**
      * Get a dependency entry for a given uid.
      * 
@@ -981,8 +984,8 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     private <D extends Definition> void buildDE(@NonNull DependencyEntry de, @NonNull DefDescriptor<?> descriptor)
             throws QuickFixException {
         if (currentCC != null) {
-            throw new AuraRuntimeException("Ugh, nested compileDE/buildDE on "+currentCC.topLevel
-                    +" trying to build "+descriptor);
+            throw new AuraRuntimeException("Ugh, nested compileDE/buildDE on " + currentCC.topLevel
+                    + " trying to build " + descriptor);
         }
         currentCC = new CompileContext(descriptor);
         try {
@@ -1001,7 +1004,6 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         }
     }
 
-
     /**
      * Get a definition.
      * 
@@ -1018,7 +1020,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         if (descriptor == null) {
             return null;
         }
-        
+
         //
         // Always check for a local def before locking.
         //
@@ -1033,12 +1035,12 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         if (currentCC != null) {
             if (currentCC.compiled.containsKey(descriptor)) {
                 @SuppressWarnings("unchecked")
-                CompilingDef<D> cd = (CompilingDef<D>)currentCC.compiled.get(descriptor);
+                CompilingDef<D> cd = (CompilingDef<D>) currentCC.compiled.get(descriptor);
                 if (cd.def != null) {
                     return cd.def;
                 }
             }
-            
+
             //
             // If we are nested, compileDef will do the right thing.
             // This is a bit ugly though.
@@ -1055,16 +1057,16 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                         break;
                     }
                 }
-            
+
                 if (de == null) {
                     compileDE(descriptor);
-                    
+
                     @SuppressWarnings("unchecked")
                     D def = (D) defs.get(descriptor);
                     return def;
                 }
             }
-            
+
             //
             // found an entry.
             // In this case, throw a QFE if we have one.
@@ -1072,12 +1074,12 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             if (de.qfe != null) {
                 throw de.qfe;
             }
-            
+
             //
             // Now we need to actually do the build..
             //
             buildDE(de, descriptor);
-            
+
             @SuppressWarnings("unchecked")
             D def = (D) defs.get(descriptor);
             return def;
@@ -1151,12 +1153,12 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     /**
      * This figures out based on prefix what registry this component is for, it could return null if the prefix is not
      * found.
-     *
+     * 
      * Note: The generic typing here is incorrect, as in not true.
      */
     private <T extends Definition> DefRegistry<T> getRegistryFor(@NonNull DefDescriptor<T> descriptor) {
         @SuppressWarnings("unchecked")
-        DefRegistry<T> reg = (DefRegistry<T>)delegateRegistries.getRegistryFor(descriptor);
+        DefRegistry<T> reg = (DefRegistry<T>) delegateRegistries.getRegistryFor(descriptor);
         return reg;
     }
 
@@ -1186,15 +1188,18 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     }
 
     @Override
-    public <D extends Definition> void assertAccess(DefDescriptor<?> referencingDescriptor, D def) throws QuickFixException {
+    public <D extends Definition> void assertAccess(DefDescriptor<?> referencingDescriptor, D def)
+            throws QuickFixException {
         assertAccess(referencingDescriptor, def, accessCheckCache);
     }
-    
-    <D extends Definition> void assertAccess(DefDescriptor<?> referencingDescriptor, D def, Cache<String, String> accessCheckCache) {
-        String status = hasAccess(referencingDescriptor, def, accessCheckCache);    
+
+    <D extends Definition> void assertAccess(DefDescriptor<?> referencingDescriptor, D def,
+            Cache<String, String> accessCheckCache) {
+        String status = hasAccess(referencingDescriptor, def, accessCheckCache);
         if (status != null) {
             DefDescriptor<? extends Definition> descriptor = def.getDescriptor();
-            String message = Aura.getConfigAdapter().isProduction() ? DefinitionNotFoundException.getMessage(descriptor.getDefType(), descriptor.getName()) : status;
+            String message = Aura.getConfigAdapter().isProduction() ? DefinitionNotFoundException.getMessage(
+                    descriptor.getDefType(), descriptor.getName()) : status;
             throw new NoAccessException(message);
         }
     }
@@ -1203,14 +1208,15 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     public <D extends Definition> String hasAccess(DefDescriptor<?> referencingDescriptor, D def) {
         return hasAccess(referencingDescriptor, def, accessCheckCache);
     }
-    
-    <D extends Definition> String hasAccess(DefDescriptor<?> referencingDescriptor, D def, Cache<String, String> accessCheckCache) {
+
+    <D extends Definition> String hasAccess(DefDescriptor<?> referencingDescriptor, D def,
+            Cache<String, String> accessCheckCache) {
         // If the def is access="global" or does not require authentication then anyone can see it
         DefinitionAccess access = def.getAccess();
         if (access.isGlobal() || !access.requiresAuthentication()) {
             return null;
         }
-        
+
         ConfigAdapter configAdapter = Aura.getConfigAdapter();
         String referencingNamespace = null;
         if (referencingDescriptor != null) {
@@ -1218,17 +1224,17 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             if (configAdapter.isUnsecuredPrefix(prefix)) {
                 return null;
             }
-            
+
             referencingNamespace = referencingDescriptor.getNamespace();
-            
+
             // The caller is in a system namespace let them through
             if (configAdapter.isPrivilegedNamespace(referencingNamespace)) {
                 return null;
             }
         }
-        
+
         DefDescriptor<?> desc = def.getDescriptor();
-        
+
         String namespace;
         String target;
         if (def instanceof AttributeDef) {
@@ -1240,23 +1246,27 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             namespace = desc.getNamespace();
             target = String.format("%s:%s", namespace, desc.getName());
         }
-        
+
         // Cache key is of the form "referencingNamespace>defNamespace:defName[.subDefName].defTypeOrdinal"
         DefType defType = desc.getDefType();
-        String key = String.format("%s>%s.%d", referencingNamespace == null ? "" : referencingNamespace, target, defType.ordinal());
+        String key = String.format("%s>%s.%d", referencingNamespace == null ? "" : referencingNamespace, target,
+                defType.ordinal());
         String status = accessCheckCache.getIfPresent(key);
         if (status == null) {
             status = "";
-            
+
             // Protect against re-entry
             accessCheckCache.put(key, status);
-            
+
             // System.out.printf("** MDR.miss.assertAccess() cache miss for: %s\n", key);
-                        
+
             DefDescriptor<? extends Definition> descriptor = def.getDescriptor();
-            if (!configAdapter.isUnsecuredNamespace(namespace) && !configAdapter.isUnsecuredPrefix(descriptor.getPrefix())) {
+            if (!configAdapter.isUnsecuredNamespace(namespace)
+                    && !configAdapter.isUnsecuredPrefix(descriptor.getPrefix())) {
                 if (referencingNamespace == null || referencingNamespace.isEmpty()) {
-                    status = String.format("Access to %s '%s' disallowed by MasterDefRegistry.assertAccess(): referencing namespace was empty or null", defType, target);
+                    status = String
+                            .format("Access to %s '%s' disallowed by MasterDefRegistry.assertAccess(): referencing namespace was empty or null",
+                                    defType, target);
                 } else if (!referencingNamespace.equals(namespace)) {
                     // The caller and the def are not in the same namespace
                     status = String.format("Access to %s '%s' from namespace '%s' in '%s(%s)' disallowed by MasterDefRegistry.assertAccess()", defType.toString().toLowerCase(), target, referencingNamespace, referencingDescriptor, referencingDescriptor.getDefType());
@@ -1269,11 +1279,10 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         } else {
             // System.out.printf("** MDR.hit.assertAccess() cache hit for: %s\n", key);
         }
-        
+
         return status.isEmpty() ? null : status;
     }
-    
-    
+
     /**
      * only used by admin tools to view all registries
      */
@@ -1326,7 +1335,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     public String getCachedString(String uid, DefDescriptor<?> descriptor, String key) {
         if (shouldCache(descriptor)) {
             DependencyEntry de = localDependencies.get(uid);
-    
+
             if (de != null) {
                 return stringsCache.getIfPresent(getKey(de, descriptor, key));
             }
@@ -1338,7 +1347,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     public void putCachedString(String uid, DefDescriptor<?> descriptor, String key, String value) {
         if (shouldCache(descriptor)) {
             DependencyEntry de = localDependencies.get(uid);
-    
+
             if (de != null) {
                 stringsCache.put(getKey(de, descriptor, key), value);
             }
@@ -1354,8 +1363,8 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
      * Note: there is no guarantee that the definitions have been fetched from cache here, so there is a very subtle
      * race condition.
      * 
-     * Also note that this _MUST NOT_ be called inside of a compile, or things may get out of wack. We probably
-     * should be asserting this somewhere.
+     * Also note that this _MUST NOT_ be called inside of a compile, or things may get out of wack. We probably should
+     * be asserting this somewhere.
      * 
      * @param uid the uid for cache lookup (null means unknown).
      * @param descriptor the descriptor to fetch.
@@ -1410,18 +1419,19 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     private String makeGlobalKey(String uid, @NonNull DefDescriptor<?> descriptor) {
         return uid + "/" + makeLocalKey(descriptor);
     }
-    
+
     /**
      * Creates a key for the global {@link #depsCache}, using only descriptor (and Mode internally).
+     * 
      * @param descriptor - the descriptor use for the key
      */
     private String makeNonUidGlobalKey(@NonNull DefDescriptor<?> descriptor) {
-        AuraContext context = this.currentCC == null 
-                ? Aura.getContextService().getCurrentContext() 
+        AuraContext context = this.currentCC == null
+                ? Aura.getContextService().getCurrentContext()
                 : currentCC.context;
         return makeLocalKey(descriptor);
     }
-    
+
     /**
      * Return true if the namespace of the provided descriptor supports caching.
      */
@@ -1433,21 +1443,20 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         String namespace = descriptor.getNamespace();
         return shouldCache(prefix, namespace);
     }
-    
+
     /**
-     * Return true if the descriptor filter meets all requirements for the 
-     * result of find to be cached
+     * Return true if the descriptor filter meets all requirements for the result of find to be cached
      */
     private boolean shouldCache(DescriptorFilter filter) {
         GlobMatcher p = filter.getPrefixMatch();
         String prefix = ((p.isConstant()) ? p.toString() : null);
-        
+
         GlobMatcher ns = filter.getNamespaceMatch();
         String namespace = ((ns.isConstant()) ? ns.toString() : null);
-        
+
         return (prefix != null || namespace != null) && shouldCache(prefix, namespace);
     }
-    
+
     /**
      * Return true if the namespace supports cacheing
      */
@@ -1470,26 +1479,26 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         return cacheable;
     }
 
-// TODO - W-2105858 - re-enable with either the private implementation of the Cache used, or
-//  a least-common-denominator implementation
-    
-//    public static Collection<Optional<? extends Definition>> getCachedDefs() {
-//        return defsCache.asMap().values();
-//    }
-//
-//    public static CacheStats getDefsCacheStats() {
-//        return defsCache.stats();
-//    }
-//
-//    public static CacheStats getExistsCacheStats() {
-//        return existsCache.stats();
-//    }
-//
-//    public static CacheStats getStringsCacheStats() {
-//        return stringsCache.stats();
-//    }
-//
-//    public static CacheStats getDescriptorFilterCacheStats() {
-//        return descriptorFilterCache.stats();
-//    }
+    // TODO - W-2105858 - re-enable with either the private implementation of the Cache used, or
+    // a least-common-denominator implementation
+
+    // public static Collection<Optional<? extends Definition>> getCachedDefs() {
+    // return defsCache.asMap().values();
+    // }
+    //
+    // public static CacheStats getDefsCacheStats() {
+    // return defsCache.stats();
+    // }
+    //
+    // public static CacheStats getExistsCacheStats() {
+    // return existsCache.stats();
+    // }
+    //
+    // public static CacheStats getStringsCacheStats() {
+    // return stringsCache.stats();
+    // }
+    //
+    // public static CacheStats getDescriptorFilterCacheStats() {
+    // return descriptorFilterCache.stats();
+    // }
 }

@@ -13,23 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.impl.java.provider;
+package org.auraframework.def;
 
-import org.auraframework.Aura;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.ThemeDef;
-import org.auraframework.def.ThemeDescriptorProvider;
-import org.auraframework.system.Annotations.Provider;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-@Provider
-public class TestThemeProvider implements ThemeDescriptorProvider {
-    public static final String DESC = "test:fakeTheme";
-    public static final String REF = "java://org.auraframework.impl.java.provider.TestThemeProvider";
-
+/**
+ * Similar to {@link ProviderDef}, except that this is only used to invoke {@link ThemeDef} providers. The reason a
+ * separate class hierarchy is created for theme providers is because, as of this writing, the other Provider classes
+ * are too closely tied to the nuances of providing components.
+ */
+public interface ThemeDescriptorProviderDef extends Definition {
     @Override
-    public DefDescriptor<ThemeDef> provide() throws QuickFixException {
-        return Aura.getDefinitionService().getDefDescriptor(DESC, ThemeDef.class);
-    }
+    DefDescriptor<ThemeDescriptorProviderDef> getDescriptor();
 
+    /**
+     * Invokes the provide method on the associated provider class.
+     * 
+     * @return The result from the associated class's provide method.
+     */
+    DefDescriptor<ThemeDef> provide() throws QuickFixException;
 }

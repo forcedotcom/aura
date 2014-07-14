@@ -17,23 +17,24 @@ package org.auraframework.impl.java.provider;
 
 import java.util.List;
 
-import org.auraframework.def.ProviderDef;
+import org.auraframework.def.ThemeMapProviderDef;
 import org.auraframework.impl.java.provider.AbstractJavaProviderDef.Builder;
 import org.auraframework.system.SourceLoader;
 
 /**
+ * Factory for theme map provider classes.
  */
-public class JavaProviderDefFactory extends AbstractJavaProviderDefFactory<ProviderDef> {
-    public JavaProviderDefFactory() {
+public final class JavaThemeMapProviderDefFactory extends AbstractJavaProviderDefFactory<ThemeMapProviderDef> {
+    public JavaThemeMapProviderDefFactory() {
         super();
     }
 
-    public JavaProviderDefFactory(List<SourceLoader> sourceLoaders) {
+    public JavaThemeMapProviderDefFactory(List<SourceLoader> sourceLoaders) {
         super(sourceLoaders);
     }
 
     @Override
-    protected Builder<ProviderDef> newBuilder() {
-        return new JavaProviderDef.Builder();
+    protected Builder<ThemeMapProviderDef> newBuilder() {
+        return new JavaThemeMapProviderDef.Builder();
     }
 }

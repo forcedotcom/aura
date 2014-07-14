@@ -15,21 +15,21 @@
  */
 package org.auraframework.def;
 
+import java.util.Map;
+
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
- * Similar to {@link ProviderDef}, except that this is only used to invoke {@link ThemeDef} providers. The reason a
- * separate class hierarchy is created for theme providers is because, as of this writing, the other Provider classes
- * are too closely tied to the nuances of providing components.
+ * The interface for a theme map provider. This is the interface you want to use for classes specified in the
+ * "mapProvider" attribute of a {@link ThemeDef} tag.
+ * <p>
+ * Note that classes implementing this interface are instantiated as singletons. Classes implementing this interface
+ * should not have any state data. They must also have a no-arg constructor. They should also be marked with the
+ * {@code @Provider} annotation.
  */
-public interface ThemeProviderDef extends Definition {
-    @Override
-    DefDescriptor<ThemeProviderDef> getDescriptor();
-
+public interface ThemeMapProvider extends Provider {
     /**
-     * Invokes the provide method on the associated provider class.
-     * 
-     * @return The result from the associated class's provide method.
+     * Returns a map containing the key-value pairs of var name and var values.
      */
-    DefDescriptor<ThemeDef> provide() throws QuickFixException;
+    public Map<String, String> provide() throws QuickFixException;
 }

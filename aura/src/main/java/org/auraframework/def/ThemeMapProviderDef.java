@@ -15,19 +15,22 @@
  */
 package org.auraframework.def;
 
+import java.util.Map;
+
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
- * The interface for a theme descriptor provider. This is the interface you want to use for classes specified in the
- * "provider" attribute of a {@link ThemeDef} tag.
- * <p>
- * Note that classes implementing this interface are instantiated as singletons. Classes implementing this interface
- * should not have any state data. They must also have a no-arg constructor. They should also be marked with the
- * {@code @Provider} annotation.
+ * Similar to {@link ThemeDescriptorProvider}, except this is for providing dynamic content of a theme via a map instead
+ * of providing a particular theme descriptor.
  */
-public interface ThemeDescriptorProvider extends Provider {
+public interface ThemeMapProviderDef extends Definition {
+    @Override
+    DefDescriptor<ThemeMapProviderDef> getDescriptor();
+
     /**
-     * Returns a theme descriptor.
+     * Invokes the provide method on the associated map provider class.
+     * 
+     * @return The result from the associated class's provide method.
      */
-    public DefDescriptor<ThemeDef> provide() throws QuickFixException;
+    Map<String, String> provide() throws QuickFixException;
 }

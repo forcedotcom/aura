@@ -21,13 +21,14 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
 import org.auraframework.Aura;
+import org.auraframework.css.MutableThemeList;
+import org.auraframework.css.ThemeList;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
@@ -36,6 +37,7 @@ import org.auraframework.def.Definition;
 import org.auraframework.def.EventType;
 import org.auraframework.def.ThemeDef;
 import org.auraframework.http.AuraBaseServlet;
+import org.auraframework.impl.css.ThemeListImpl;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Event;
@@ -57,7 +59,7 @@ import org.auraframework.util.json.JsonSerializer;
 import org.auraframework.util.json.JsonSerializer.NoneSerializer;
 import org.auraframework.util.json.JsonSerializers;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -126,13 +128,20 @@ public class AuraContextImpl implements AuraContext {
                 }
             }
 
-            List<DefDescriptor<ThemeDef>> themes = ctx.getThemeDescriptors();
-            if (!themes.isEmpty()) {
-                List<String> stringed = Lists.newArrayList();
-                for (DefDescriptor<ThemeDef> theme : themes) {
-                    stringed.add(theme.getQualifiedName());
+            if (ctx.getSerializeThemes()) {
+                ThemeList themes = ctx.getThemeList();
+                if (!themes.isEmpty()) {
+                    List<String> stringed = Lists.newArrayList();
+                    for (DefDescriptor<ThemeDef> theme : themes) {
+                        stringed.add(theme.getQualifiedName());
+                    }
+                    json.writeMapEntry("themes", stringed);
                 }
-                json.writeMapEntry("themes", stringed);
+
+                Optional<String> dynamicVarsUid = themes.getActiveDynamicVarsUid();
+                if (dynamicVarsUid.isPresent()) {
+                    json.writeMapEntry("dynamicVarsUid", dynamicVarsUid.get());
+                }
             }
 
             if (ctx.getRequestedLocales() != null) {
@@ -168,7 +177,7 @@ public class AuraContextImpl implements AuraContext {
             if (testContextAdapter != null) {
                 TestContext testContext = testContextAdapter.getTestContext();
                 if (testContext != null) {
-                	json.writeMapEntry("test", testContext.getName());
+                    json.writeMapEntry("test", testContext.getName());
                 }
             }
 
@@ -288,6 +297,8 @@ public class AuraContextImpl implements AuraContext {
 
     private boolean serializeLastMod = true;
 
+    private boolean serializeThemes = false; // only needed for CSS urls
+
     private boolean preloading = false;
 
     private DefDescriptor<? extends BaseComponentDef> appDesc;
@@ -308,7 +319,7 @@ public class AuraContextImpl implements AuraContext {
 
     private InstanceStack fakeInstanceStack;
 
-    private List<DefDescriptor<ThemeDef>> themes = Lists.newArrayList();
+    private MutableThemeList themes = new ThemeListImpl();
 
     public AuraContextImpl(Mode mode, MasterDefRegistry masterRegistry, Map<DefType, String> defaultPrefixes,
             Format format, Authentication access, JsonSerializationContext jsonContext,
@@ -645,42 +656,37 @@ public class AuraContextImpl implements AuraContext {
     }
 
     @Override
+    public void setSerializeThemes(boolean serializeThemes) {
+        this.serializeThemes = serializeThemes;
+    }
+
+    @Override
+    public boolean getSerializeThemes() {
+        return serializeThemes;
+    }
+
+    @Override
     public void addAppThemeDescriptors() throws QuickFixException {
         DefDescriptor<? extends BaseComponentDef> desc = getLoadingApplicationDescriptor();
         if (desc != null && desc.getDefType() == DefType.APPLICATION) {
-            ApplicationDef app = null;
             try {
-                app = (ApplicationDef) desc.getDef();
-            } catch (QuickFixException qfe) { // invalid app, so nothing more we can do
-            }
-
-            if (app != null) {
-                DefDescriptor<ThemeDef> theme = app.getThemeDescriptor();
-                if (theme != null) {
-                    // the app theme conceptually precedes themes explicitly added to the ctx,
-                    // which means ctx-specified themes should be consulted first, according to the
-                    // "last one wins" contract
-                    if (!themes.contains(theme)) {
-                        themes.add(0, theme.getDef().getConcreteDescriptor());
-                    }
-                }
+                // the app themes conceptually precedes themes explicitly added to the context.
+                // this is important for the "last declared theme wins" contract
+                themes.prependAll(((ApplicationDef) desc.getDef()).getThemeDescriptors());
+            } catch (QuickFixException qfe) {
+                // either the app or a dependency is invalid, nothing we can do about getting the themes in that case.
             }
         }
     }
 
     @Override
     public void appendThemeDescriptor(DefDescriptor<ThemeDef> themeDescriptor) throws QuickFixException {
-        themes.add(themeDescriptor.getDef().getConcreteDescriptor());
+        themes.append(themeDescriptor);
     }
 
     @Override
-    public List<DefDescriptor<ThemeDef>> getThemeDescriptors() {
-        return ImmutableList.copyOf(themes);
-    }
-
-    @Override
-    public List<DefDescriptor<ThemeDef>> getThemeDescriptorsOrdered() {
-        return Lists.reverse(getThemeDescriptors()); // reverse so that "last one wins"
+    public ThemeList getThemeList() {
+        return themes;
     }
 
     @Override

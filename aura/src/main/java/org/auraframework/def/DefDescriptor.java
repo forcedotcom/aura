@@ -110,6 +110,8 @@ public interface DefDescriptor<T extends Definition> extends JsonSerializable,
 		STYLE(StyleDef.class), //
 		THEME(ThemeDef.class, true), //
         THEME_DEF_REF(ThemeDefRef.class), //
+        THEME_PROVIDER(ThemeDescriptorProviderDef.class), //
+        THEME_MAP_PROVIDER(ThemeMapProviderDef.class), //
         VAR(VarDef.class), //
         DOCUMENTATION(DocumentationDef.class), //
         DESCRIPTION(DescriptionDef.class), //
@@ -117,7 +119,6 @@ public interface DefDescriptor<T extends Definition> extends JsonSerializable,
         TESTSUITE(TestSuiteDef.class), //
         TESTCASE(TestCaseDef.class), //
         PROVIDER(ProviderDef.class), //
-        THEME_PROVIDER(ThemeProviderDef.class), //
         LAYOUTS(LayoutsDef.class), //
         LAYOUT(LayoutDef.class), //
         LAYOUT_ITEM(LayoutItemDef.class), //

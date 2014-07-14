@@ -26,7 +26,7 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
- * Tests {@link JavaThemeProviderDef}.
+ * Tests {@link JavaThemeDescriptorProviderDef}.
  */
 public class JavaThemeProviderDefTest extends StyleTestCase {
 
@@ -35,9 +35,9 @@ public class JavaThemeProviderDefTest extends StyleTestCase {
     }
 
     public void testProviderBasic() throws Exception {
-        DefDescriptor<ThemeDef> theme = addSeparateTheme(theme().provider(TestThemeProvider.REF));
+        DefDescriptor<ThemeDef> theme = addSeparateTheme(theme().descriptorProvider(TestThemeDescriptorProvider.REF));
         DefDescriptor<ThemeDef> concrete = theme.getDef().getConcreteDescriptor();
-        DefDescriptor<ThemeDef> expected = DefDescriptorImpl.getInstance(TestThemeProvider.DESC, ThemeDef.class);
+        DefDescriptor<ThemeDef> expected = DefDescriptorImpl.getInstance(TestThemeDescriptorProvider.DESC, ThemeDef.class);
         assertEquals(expected, concrete);
     }
 
@@ -83,7 +83,7 @@ public class JavaThemeProviderDefTest extends StyleTestCase {
 
     public void testProviderThrowsDuringInstantiation() throws Exception {
         try {
-            addSeparateTheme(theme().provider("java://" + ProviderThrowsOnInstantiate.class.getName()))
+            addSeparateTheme(theme().descriptorProvider("java://" + ProviderThrowsOnInstantiate.class.getName()))
             .getDef().getConcreteDescriptor();
             fail("expected to get an exception");
         } catch (Exception e) {
@@ -101,7 +101,7 @@ public class JavaThemeProviderDefTest extends StyleTestCase {
 
     public void testProviderThrowsQFE() throws Exception {
         try {
-            addSeparateTheme(theme().provider("java://" + ProviderThrowsOnProvide.class.getName()))
+            addSeparateTheme(theme().descriptorProvider("java://" + ProviderThrowsOnProvide.class.getName()))
             .getDef().getConcreteDescriptor();
             fail("expected to get an exception");
         } catch (Exception e) {
@@ -122,7 +122,7 @@ public class JavaThemeProviderDefTest extends StyleTestCase {
 
     public void testProviderWithoutNoArgConstructor() throws Exception {
         try {
-            addSeparateTheme(theme().provider("java://" + ProviderConstructorArg.class.getName()))
+            addSeparateTheme(theme().descriptorProvider("java://" + ProviderConstructorArg.class.getName()))
             .getDef().getConcreteDescriptor();
             fail("expected to get an exception");
         } catch (Exception e) {
@@ -143,7 +143,7 @@ public class JavaThemeProviderDefTest extends StyleTestCase {
 
     public void testProviderWithPrivateConstructor() throws Exception {
         try {
-            addSeparateTheme(theme().provider("java://" + ProviderPrivateConstructor.class.getName()))
+            addSeparateTheme(theme().descriptorProvider("java://" + ProviderPrivateConstructor.class.getName()))
             .getDef().getConcreteDescriptor();
             fail("expected to get an exception");
         } catch (Exception e) {
@@ -161,7 +161,7 @@ public class JavaThemeProviderDefTest extends StyleTestCase {
 
     public void testProviderReturnsNonexistentTheme() throws Exception {
         try {
-            addSeparateTheme(theme().provider("java://" + ProviderNonexistent.class.getName()))
+            addSeparateTheme(theme().descriptorProvider("java://" + ProviderNonexistent.class.getName()))
             .getDef().getConcreteDescriptor();
             fail("expected to get an exception");
         } catch (Exception e) {
@@ -175,7 +175,7 @@ public class JavaThemeProviderDefTest extends StyleTestCase {
 
     public void testProviderMissingInterface() throws Exception {
         try {
-            addSeparateTheme(theme().provider("java://" + MissingInterface.class.getName()))
+            addSeparateTheme(theme().descriptorProvider("java://" + MissingInterface.class.getName()))
             .getDef().getConcreteDescriptor();
             fail("expected to get an exception");
         } catch (Exception e) {
@@ -192,7 +192,7 @@ public class JavaThemeProviderDefTest extends StyleTestCase {
 
     public void testProviderMissingAnnotation() throws Exception {
         try {
-            addSeparateTheme(theme().provider("java://" + MissingAnnotation.class.getName()))
+            addSeparateTheme(theme().descriptorProvider("java://" + MissingAnnotation.class.getName()))
             .getDef().getConcreteDescriptor();
             fail("expected to get an exception");
         } catch (Exception e) {

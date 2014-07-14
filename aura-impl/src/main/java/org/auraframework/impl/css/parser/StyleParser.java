@@ -73,7 +73,7 @@ public class StyleParser implements Parser {
     @SuppressWarnings("unchecked")
     @Override
     public <D extends Definition> D parse(DefDescriptor<D> descriptor, Source<?> source) throws StyleParserException,
-    QuickFixException {
+            QuickFixException {
 
         DefDescriptor<StyleDef> styleDefDesc = (DefDescriptor<StyleDef>) descriptor;
 

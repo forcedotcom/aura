@@ -222,7 +222,8 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
         DefDescriptor<ThemeDef> theme = addSourceAutoCleanup(ThemeDef.class, "<aura:theme></aura:theme>");
         String src = String.format("<aura:application theme=\"%s\"/>", theme.getDescriptorName());
         DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class, src);
-        assertEquals(theme, desc.getDef().getThemeDescriptor());
+        assertEquals(1, desc.getDef().getThemeDescriptors().size());
+        assertEquals(theme, desc.getDef().getThemeDescriptors().get(0));
     }
 
     /** verify that we set the correct theme descriptor when there is an explicit theme and a cmp theme */
@@ -244,7 +245,8 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
         addSourceAutoCleanup(appDesc, src);
 
         // cmp theme should not have an impact, explicit theme should be used
-        assertEquals(explicitTheme, appDesc.getDef().getThemeDescriptor());
+        assertEquals(1, appDesc.getDef().getThemeDescriptors().size());
+        assertEquals(explicitTheme, appDesc.getDef().getThemeDescriptors().get(0));
     }
 
     /** verify that we set the correct theme descriptor when there is only the namespace default theme */
@@ -260,7 +262,8 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
                 String.format("%s:%s", dummy.getNamespace(), getAuraTestingUtil().getNonce(getName())),
                 ApplicationDef.class);
         addSourceAutoCleanup(desc, src);
-        assertEquals(nsTheme, desc.getDef().getThemeDescriptor());
+        assertEquals(1, desc.getDef().getThemeDescriptors().size());
+        assertEquals(nsTheme, desc.getDef().getThemeDescriptors().get(0));
     }
 
     /** an empty value for the theme attr means that you don't want any theme, even the implicit one */
@@ -276,7 +279,7 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
                 String.format("%s:%s", dummy.getNamespace(), getAuraTestingUtil().getNonce(getName())),
                 ApplicationDef.class);
         addSourceAutoCleanup(desc, src);
-        assertNull(desc.getDef().getThemeDescriptor());
+        assertTrue(desc.getDef().getThemeDescriptors().isEmpty());
     }
 
     /** verify theme descriptor is added to dependency set */

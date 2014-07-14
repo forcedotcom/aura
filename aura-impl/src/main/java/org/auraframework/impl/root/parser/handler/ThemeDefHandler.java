@@ -29,7 +29,8 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
 import org.auraframework.def.ThemeDef;
 import org.auraframework.def.ThemeDefRef;
-import org.auraframework.def.ThemeProviderDef;
+import org.auraframework.def.ThemeDescriptorProviderDef;
+import org.auraframework.def.ThemeMapProviderDef;
 import org.auraframework.def.VarDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.root.theme.ThemeDefImpl;
@@ -53,9 +54,11 @@ public final class ThemeDefHandler extends RootTagHandler<ThemeDef> {
     protected static final String TAG = "aura:theme";
     private static final String ATTRIBUTE_EXTENDS = "extends";
     private static final String ATTRIBUTE_PROVIDER = "provider";
+    private static final String ATTRIBUTE_MAP_PROVIDER = "mapProvider";
 
     protected final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(
-            ATTRIBUTE_EXTENDS, ATTRIBUTE_PROVIDER, ATTRIBUTE_SUPPORT, ATTRIBUTE_DESCRIPTION, ATTRIBUTE_ACCESS, RootTagHandler.ATTRIBUTE_API_VERSION);
+            ATTRIBUTE_EXTENDS, ATTRIBUTE_PROVIDER, ATTRIBUTE_MAP_PROVIDER, ATTRIBUTE_SUPPORT,
+            ATTRIBUTE_DESCRIPTION, ATTRIBUTE_ACCESS, RootTagHandler.ATTRIBUTE_API_VERSION);
 
     private final ThemeDefImpl.Builder builder = new ThemeDefImpl.Builder();
 
@@ -63,13 +66,14 @@ public final class ThemeDefHandler extends RootTagHandler<ThemeDef> {
         super();
     }
 
-    public ThemeDefHandler(DefDescriptor<ThemeDef> defDescriptor, Source<ThemeDef> source, XMLStreamReader xmlReader) throws DefinitionNotFoundException {
+    public ThemeDefHandler(DefDescriptor<ThemeDef> defDescriptor, Source<ThemeDef> source, XMLStreamReader xmlReader)
+            throws DefinitionNotFoundException {
         super(defDescriptor, source, xmlReader);
-        
+
         if (!isInPrivilegedNamespace()) {
-        	throw new DefinitionNotFoundException(defDescriptor);
+            throw new DefinitionNotFoundException(defDescriptor);
         }
-        
+
         builder.setOwnHash(source.getHash());
     }
 
@@ -99,21 +103,26 @@ public final class ThemeDefHandler extends RootTagHandler<ThemeDef> {
 
         String provider = getAttributeValue(ATTRIBUTE_PROVIDER);
         if (!AuraTextUtil.isNullEmptyOrWhitespace(provider)) {
-            builder.setProviderDescriptor(DefDescriptorImpl.getInstance(provider, ThemeProviderDef.class));
+            builder.setDescriptorProvider(DefDescriptorImpl.getInstance(provider, ThemeDescriptorProviderDef.class));
+        }
+
+        String mapProvider = getAttributeValue(ATTRIBUTE_MAP_PROVIDER);
+        if (!AuraTextUtil.isNullEmptyOrWhitespace(mapProvider)) {
+            builder.setMapProvider(DefDescriptorImpl.getInstance(mapProvider, ThemeMapProviderDef.class));
         }
 
         try {
             builder.setAccess(readAccessAttribute());
         } catch (InvalidAccessValueException e) {
             builder.setParseError(e);
-		}
+        }
     }
 
-	@Override
-	protected boolean allowPrivateAttribute() {
-		return true;
-	}
-	
+    @Override
+    protected boolean allowPrivateAttribute() {
+        return true;
+    }
+
     @Override
     protected void handleChildTag() throws XMLStreamException, QuickFixException {
         String tag = getTagName();

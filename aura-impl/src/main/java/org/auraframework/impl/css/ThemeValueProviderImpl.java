@@ -17,6 +17,7 @@ package org.auraframework.impl.css;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import org.auraframework.css.ThemeList;
 import org.auraframework.css.ThemeValueProvider;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
@@ -43,16 +44,21 @@ public final class ThemeValueProviderImpl implements ThemeValueProvider {
 
     private final DefDescriptor<ThemeDef> cmpTheme;
     private final DefDescriptor<ThemeDef> namespaceTheme;
-    private final DefDescriptor<ThemeDef> overrideTheme;
+    private final ThemeList overrideThemes;
 
-    public ThemeValueProviderImpl(DefDescriptor<StyleDef> scope, DefDescriptor<ThemeDef> overrideTheme)
-            throws QuickFixException {
+    /**
+     * Creates a new {@link ThemeValueProvider}.
+     * 
+     * @param scope Provide vars for this {@link StyleDef}.
+     * @param overrideThemes The list of themes that override the default var values.
+     */
+    public ThemeValueProviderImpl(DefDescriptor<StyleDef> scope, ThemeList overrideThemes) throws QuickFixException {
         checkNotNull(scope, "scope cannot be null");
 
         DefDescriptor<ThemeDef> cmpTheme = Themes.getCmpTheme(scope);
         this.cmpTheme = cmpTheme.exists() ? cmpTheme : null;
         this.namespaceTheme = Themes.getNamespaceDefaultTheme(scope);
-        this.overrideTheme = overrideTheme != null ? overrideTheme.getDef().getConcreteDescriptor() : null;
+        this.overrideThemes = overrideThemes;
     }
 
     @Override
@@ -79,13 +85,16 @@ public final class ThemeValueProviderImpl implements ThemeValueProvider {
         return value.get();
     }
 
-    /** gets a var from the global space, first checking override theme then namespace-default theme */
+    /**
+     * Gets a var from the global space, first checking override themes, otherwise the component bundle theme, otherwise
+     * the namespace-default theme.
+     */
     private Optional<Object> getGlobalVar(PropertyReference reference) throws QuickFixException {
         Optional<Object> value = Optional.absent();
 
         // check from an override
-        if (overrideTheme != null) {
-            value = overrideTheme.getDef().getVar(reference.getRoot());
+        if (overrideThemes != null) {
+            value = overrideThemes.getValue(reference.getRoot());
             if (value.isPresent()) {
                 return value;
             }

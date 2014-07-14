@@ -22,7 +22,8 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.ThemeDef;
 import org.auraframework.def.VarDef;
 import org.auraframework.impl.css.StyleTestCase;
-import org.auraframework.impl.java.provider.TestThemeProvider;
+import org.auraframework.impl.java.provider.TestThemeDescriptorProvider;
+import org.auraframework.impl.java.provider.TestThemeMapProvider;
 import org.auraframework.impl.root.parser.handler.ThemeDefHandler;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 
@@ -135,12 +136,22 @@ public class ThemeDefHandlerTest extends StyleTestCase {
     }
 
     public void testProvider() throws Exception {
-        DefDescriptor<ThemeDef> theme = addSeparateTheme(theme().provider(TestThemeProvider.REF));
-        assertEquals(TestThemeProvider.REF, theme.getDef().getThemeProviderDescriptor().getQualifiedName());
+        DefDescriptor<ThemeDef> theme = addSeparateTheme(theme().descriptorProvider(TestThemeDescriptorProvider.REF));
+        assertEquals(TestThemeDescriptorProvider.REF, theme.getDef().getDescriptorProvider().getQualifiedName());
     }
 
     public void testEmptyProvider() throws Exception {
-        DefDescriptor<ThemeDef> theme = addSeparateTheme(theme().provider(""));
-        assertNull(theme.getDef().getThemeProviderDescriptor());
+        DefDescriptor<ThemeDef> theme = addSeparateTheme(theme().descriptorProvider(""));
+        assertNull(theme.getDef().getDescriptorProvider());
+    }
+
+    public void testMapProvider() throws Exception {
+        DefDescriptor<ThemeDef> theme = addSeparateTheme(theme().mapProvider(TestThemeMapProvider.REF));
+        assertEquals(TestThemeMapProvider.REF, theme.getDef().getMapProvider().getQualifiedName());
+    }
+
+    public void testEmptyMapProvider() throws Exception {
+        DefDescriptor<ThemeDef> theme = addSeparateTheme(theme().mapProvider(""));
+        assertNull(theme.getDef().getMapProvider());
     }
 }

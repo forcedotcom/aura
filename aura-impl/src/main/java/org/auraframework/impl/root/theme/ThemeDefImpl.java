@@ -31,7 +31,8 @@ import org.auraframework.def.ProviderDef;
 import org.auraframework.def.RegisterEventDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.def.ThemeDef;
-import org.auraframework.def.ThemeProviderDef;
+import org.auraframework.def.ThemeDescriptorProviderDef;
+import org.auraframework.def.ThemeMapProviderDef;
 import org.auraframework.def.VarDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.root.RootDefinitionImpl;
@@ -62,7 +63,8 @@ public final class ThemeDefImpl extends RootDefinitionImpl<ThemeDef> implements 
     private final List<DefDescriptor<ThemeDef>> imports;
     private final Set<PropertyReference> expressionRefs;
     private final DefDescriptor<ThemeDef> extendsDescriptor;
-    private final DefDescriptor<ThemeProviderDef> providerDescriptor;
+    private final DefDescriptor<ThemeDescriptorProviderDef> descriptorProvider;
+    private final DefDescriptor<ThemeMapProviderDef> mapProvider;
     private final int hashCode;
 
     public ThemeDefImpl(Builder builder) {
@@ -71,9 +73,11 @@ public final class ThemeDefImpl extends RootDefinitionImpl<ThemeDef> implements 
         this.imports = builder.orderedImmutableImports();
         this.vars = AuraUtil.immutableMap(builder.vars);
         this.extendsDescriptor = builder.extendsDescriptor;
-        this.providerDescriptor = builder.providerDescriptor;
+        this.descriptorProvider = builder.descriptorProvider;
+        this.mapProvider = builder.mapProvider;
         this.expressionRefs = AuraUtil.immutableSet(builder.expressionRefs);
-        this.hashCode = AuraUtil.hashCode(super.hashCode(), extendsDescriptor, imports, vars, providerDescriptor);
+        this.hashCode = AuraUtil.hashCode(super.hashCode(),
+                extendsDescriptor, imports, vars, descriptorProvider, mapProvider);
     }
 
     @Override
@@ -87,26 +91,26 @@ public final class ThemeDefImpl extends RootDefinitionImpl<ThemeDef> implements 
     }
 
     @Override
-    public DefDescriptor<ThemeProviderDef> getThemeProviderDescriptor() {
-        return providerDescriptor;
-    }
-
-    @Override
-    public boolean isConcrete() {
-        return providerDescriptor == null;
+    public DefDescriptor<ThemeDescriptorProviderDef> getDescriptorProvider() {
+        return descriptorProvider;
     }
 
     @Override
     public DefDescriptor<ThemeDef> getConcreteDescriptor() throws QuickFixException {
-        if (providerDescriptor == null) {
+        if (descriptorProvider == null) {
             return descriptor;
         }
 
-        DefDescriptor<ThemeDef> provided = providerDescriptor.getDef().provide();
-        while (!provided.getDef().isConcrete()) {
+        DefDescriptor<ThemeDef> provided = descriptorProvider.getDef().provide();
+        while (provided.getDef().getDescriptorProvider() != null) {
             provided = provided.getDef().getConcreteDescriptor();
         }
         return provided;
+    }
+
+    @Override
+    public DefDescriptor<ThemeMapProviderDef> getMapProvider() {
+        return mapProvider;
     }
 
     @Override
@@ -210,7 +214,7 @@ public final class ThemeDefImpl extends RootDefinitionImpl<ThemeDef> implements 
         }
 
         // themes with providers are basically only expected to be used in isolation from other features
-        if (providerDescriptor != null) {
+        if (descriptorProvider != null || mapProvider != null) {
             if (!vars.isEmpty()) {
                 String msg = String.format("Theme %s must not specify vars if using a provider", descriptor);
                 throw new InvalidDefinitionException(msg, getLocation());
@@ -311,11 +315,9 @@ public final class ThemeDefImpl extends RootDefinitionImpl<ThemeDef> implements 
                 throw new InvalidDefinitionException(msg, getLocation());
             }
 
-            // can't import a theme that uses a provider. If we allowed this, it would pose unique challenges to
-            // properly detect "changes" and determine hash identity (for example, if an imported theme used a provider
-            // that suddenly returns a different result, the importing theme wouldn't know about that change).
-            if (def.getThemeProviderDescriptor() != null) {
-                String msg = String.format("Theme %s cannot be imported since it uses the 'provider' attribute", theme);
+            // can't import a theme that uses a provider.
+            if (def.getDescriptorProvider() != null || def.getMapProvider() != null) {
+                String msg = String.format("Theme %s cannot be imported since it uses a provider", theme);
                 throw new InvalidDefinitionException(msg, getLocation());
             }
         }
@@ -348,8 +350,12 @@ public final class ThemeDefImpl extends RootDefinitionImpl<ThemeDef> implements 
     public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
         super.appendDependencies(dependencies);
 
-        if (providerDescriptor != null) {
-            dependencies.add(providerDescriptor);
+        if (descriptorProvider != null) {
+            dependencies.add(descriptorProvider);
+        }
+
+        if (mapProvider != null) {
+            dependencies.add(mapProvider);
         }
 
         if (extendsDescriptor != null) {
@@ -451,7 +457,8 @@ public final class ThemeDefImpl extends RootDefinitionImpl<ThemeDef> implements 
                     && Objects.equal(extendsDescriptor, other.extendsDescriptor)
                     && Objects.equal(imports, other.imports)
                     && Objects.equal(vars, other.vars)
-                    && Objects.equal(providerDescriptor, other.providerDescriptor);
+                    && Objects.equal(descriptorProvider, other.descriptorProvider)
+                    && Objects.equal(mapProvider, other.mapProvider);
         }
 
         return false;
@@ -460,7 +467,8 @@ public final class ThemeDefImpl extends RootDefinitionImpl<ThemeDef> implements 
     public static final class Builder extends RootDefinitionImpl.Builder<ThemeDef> implements ThemeDefBuilder {
         private boolean isCmpTheme;
         private DefDescriptor<ThemeDef> extendsDescriptor;
-        private DefDescriptor<ThemeProviderDef> providerDescriptor;
+        private DefDescriptor<ThemeDescriptorProviderDef> descriptorProvider;
+        private DefDescriptor<ThemeMapProviderDef> mapProvider;
         private Set<PropertyReference> expressionRefs;
         private Set<DefDescriptor<ThemeDef>> imports = Sets.newLinkedHashSet();
         private Map<String, VarDef> vars = Maps.newLinkedHashMap();
@@ -500,8 +508,13 @@ public final class ThemeDefImpl extends RootDefinitionImpl<ThemeDef> implements 
             return this;
         }
 
-        public Builder setProviderDescriptor(DefDescriptor<ThemeProviderDef> providerDescriptor) {
-            this.providerDescriptor = providerDescriptor;
+        public Builder setDescriptorProvider(DefDescriptor<ThemeDescriptorProviderDef> descriptorProvider) {
+            this.descriptorProvider = descriptorProvider;
+            return this;
+        }
+
+        public Builder setMapProvider(DefDescriptor<ThemeMapProviderDef> mapProvider) {
+            this.mapProvider = mapProvider;
             return this;
         }
 

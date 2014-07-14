@@ -13,23 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.builder;
+package org.auraframework.impl.java.provider;
 
-import org.auraframework.def.ApplicationDef;
+import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.LayoutsDef;
 import org.auraframework.def.ThemeDef;
+import org.auraframework.def.ThemeDescriptorProvider;
+import org.auraframework.system.Annotations.Provider;
+import org.auraframework.throwable.quickfix.QuickFixException;
 
-/**
- */
-public interface ApplicationDefBuilder extends BaseComponentDefBuilder<ApplicationDef> {
+@Provider
+public class TestThemeDescriptorProvider implements ThemeDescriptorProvider {
+    public static final String DESC = "test:fakeTheme";
+    public static final String REF = "java://org.auraframework.impl.java.provider.TestThemeDescriptorProvider";
 
-    ApplicationDefBuilder setLayouts(LayoutsDef layouts);
+    @Override
+    public DefDescriptor<ThemeDef> provide() throws QuickFixException {
+        return Aura.getDefinitionService().getDefDescriptor(DESC, ThemeDef.class);
+    }
 
-    /**
-     * Specifies a {@link ThemeDef} as an override across the whole application. Vars specified in this theme will
-     * override default var values throughout all components used in the application.
-     * 
-     */
-    ApplicationDefBuilder appendThemeDescriptor(DefDescriptor<ThemeDef> themeDescriptor);
 }

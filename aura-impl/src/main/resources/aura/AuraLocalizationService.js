@@ -29,22 +29,88 @@ var AuraLocalizationService = function AuraLocalizationService() {
             format : {},
             langLocale : {}
         },
-
+        
+        /**
+         * Formats a number with the default number format.
+         * <p>Example:</p>
+         * <pre>
+         * //Returns 0.146 
+         * $A.localizationService.formatNumber(0.14566); 
+         * </pre>
+         * @param {Number} number The number to be formatted.
+         * @return {Number} The formatted number
+         * @memberOf AuraLocalizationService
+         * @public
+         */
         formatNumber : function(number) {
             return this.getDefaultNumberFormat().format(number);
         },
 
+        /**
+         * Returns a formatted percentage number based on the default percentage format.
+         * <p>Example:</p>
+         * <pre>
+         * //Returns 15%
+         * $A.localizationService.formatPercent(0.14566);
+         * </pre>
+         * @param {Number} number The number to be formatted.
+         * @return {Number} The formatted percentage
+         * @memberOf AuraLocalizationService
+         * @public
+         */
         formatPercent : function(number) {
             return this.getDefaultPercentFormat().format(number);
         },
 
+        /**
+         * Returns a currency number based on the default currency format.
+         * <p>Example:</p>
+         * <pre>
+         * //Returns $0.15
+         * $A.localizationService.formatCurrency(0.14566);
+         * </pre>
+         * @param {Number} number The currency number to be formatted.
+         * @return {Number} The formatted currency
+         * @memberOf AuraLocalizationService
+         * @public
+         */
         formatCurrency : function(number) {
             return this.getDefaultCurrencyFormat().format(number);
         },
 
+
+        /**
+         * Returns a NumberFormat object.
+         * <p>Example:</p>
+         * <pre>var f = cmp.get("v.format");
+         * var num = cmp.get("v.value");
+         * var nf = $A.localizationService.getNumberFormat(f);
+         * var formatted = nf.format(num);
+         * //If format is not provided, the default locale is used
+         * var formatted = $A.localizationService.formatNumber(num); 
+         * </pre>
+         * @param {String} format The number format.
+         * @param {String} symbols 
+         * @return {Number} The number format
+         * @memberOf AuraLocalizationService
+         * @public
+        
+         */
         getNumberFormat : function(format, symbols) {
             return new NumberFormat(format, symbols);
         },
+
+        /**
+         * Returns the default NumberFormat object.
+         * <p>Example:</p>
+         * <pre>
+         * //Returns 20,000.123
+         * $A.localizationService.getDefaultNumberFormat().format(20000.123);
+         * </pre>
+         * @return {Number} The number format returned by <code>$Locale.numberFormat</code>.
+         * @memberOf AuraLocalizationService
+         * @public
+         */
 
         getDefaultNumberFormat : function() {
             if (!numberFormat) {
@@ -53,6 +119,18 @@ var AuraLocalizationService = function AuraLocalizationService() {
             return numberFormat;
         },
 
+
+        /**
+         * Returns the default percentage format.
+         * <p>Example:</p>
+         * <pre>
+         * //Returns 20%
+         * $A.localizationService.getDefaultPercentFormat().format(0.20);
+         * </pre>
+         * @return {Number} The percentage format returned by <code>$Locale.percentFormat</code>.
+         * @memberOf AuraLocalizationService
+         * @public
+         */
         getDefaultPercentFormat : function() {
             if (!percentFormat) {
                 percentFormat = new NumberFormat($A.get("$Locale.percentFormat"));
@@ -60,6 +138,17 @@ var AuraLocalizationService = function AuraLocalizationService() {
             return percentFormat;
         },
 
+        /**
+         * Returns the default currency format.
+         * <p>Example:</p>
+         * <pre>
+         * //Returns $20,000.00
+         * $A.localizationService.getDefaultCurrencyFormat().format(20000);
+         * </pre>
+         * @return {Number} The currency format returned by <code>$Locale.currencyFormat</code>.
+         * @memberOf AuraLocalizationService
+         * @public
+         */
         getDefaultCurrencyFormat : function() {
             if (!currencyFormat) {
                 currencyFormat = new NumberFormat($A.get("$Locale.currencyFormat"));

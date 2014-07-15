@@ -47,4 +47,13 @@ public final class PerfMetricsTest extends UnitTestCase {
         assertTrue(jsProfilerData == combined.getJSProfilerData());
         assertTrue(heapSnapshot == combined.getHeapSnapshot());
     }
+
+    public void testToJSON() {
+        PerfMetrics m = new PerfMetrics();
+        m.setMetric(new PerfMetric("paints", 3));
+        m.setMetric(new PerfMetric("data", 100, "bytes"));
+
+        assertEquals("[{\"name\":\"data\",\"value\":100,\"units\":\"bytes\"},{\"name\":\"paints\",\"value\":3}]", m
+                .toJSONArrayWithoutDetails().toString());
+    }
 }

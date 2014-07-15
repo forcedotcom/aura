@@ -15,10 +15,13 @@
  */
 package org.auraframework.test.perf.metrics;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.auraframework.util.test.PerfGoldFilesUtil;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.google.common.collect.ImmutableSortedSet;
@@ -170,6 +173,20 @@ public final class PerfMetrics {
             }
         }
         return sb.toString();
+    }
+
+    public JSONArray toJSONArrayWithoutDetails() {
+        try {
+            PerfMetrics metricsWithoutDetails = PerfGoldFilesUtil.fromGoldFileText(PerfGoldFilesUtil.toGoldFileText(
+                    this, false));
+            JSONArray array = new JSONArray();
+            for (String name : metricsWithoutDetails.getAllMetricNames()) {
+                array.put(metricsWithoutDetails.getMetric(name));
+            }
+            return array;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

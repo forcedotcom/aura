@@ -31,13 +31,13 @@ var AuraLocalizationService = function AuraLocalizationService() {
         },
         
         /**
-         * Returns the default number format.
+         * Formats a number with the default number format.
          * <p>Example:</p>
          * <pre>
          * //Returns 0.146 
          * $A.localizationService.formatNumber(0.14566); 
          * </pre>
-         * @param {Number} number The number returned by localizationService.getDefaultNumberFormat.
+         * @param {Number} number The number to be formatted.
          * @return {Number} The formatted number
          * @memberOf AuraLocalizationService
          * @public
@@ -47,13 +47,13 @@ var AuraLocalizationService = function AuraLocalizationService() {
         },
 
         /**
-         * Returns the default percentage format.
+         * Returns a formatted percentage number based on the default percentage format.
          * <p>Example:</p>
          * <pre>
          * //Returns 15%
          * $A.localizationService.formatPercent(0.14566);
          * </pre>
-         * @param {Number} number The number returned by localizationService.getDefaultPercentFormat.
+         * @param {Number} number The number to be formatted.
          * @return {Number} The formatted percentage
          * @memberOf AuraLocalizationService
          * @public
@@ -63,13 +63,13 @@ var AuraLocalizationService = function AuraLocalizationService() {
         },
 
         /**
-         * Returns the default currency format.
+         * Returns a currency number based on the default currency format.
          * <p>Example:</p>
          * <pre>
          * //Returns $0.15
          * $A.localizationService.formatCurrency(0.14566);
          * </pre>
-         * @param {Number} number The number returned by localizationService.getDefaultCurrencyFormat.
+         * @param {Number} number The currency number to be formatted.
          * @return {Number} The formatted currency
          * @memberOf AuraLocalizationService
          * @public
@@ -80,7 +80,7 @@ var AuraLocalizationService = function AuraLocalizationService() {
 
 
         /**
-         * Returns the number format.
+         * Returns a NumberFormat object.
          * <p>Example:</p>
          * <pre>var f = cmp.get("v.format");
          * var num = cmp.get("v.value");
@@ -101,7 +101,7 @@ var AuraLocalizationService = function AuraLocalizationService() {
         },
 
         /**
-         * Returns the number format, such as with a pattern like "#,##0.###".
+         * Returns the default NumberFormat object.
          * <p>Example:</p>
          * <pre>
          * //Returns 20,000.123
@@ -121,7 +121,7 @@ var AuraLocalizationService = function AuraLocalizationService() {
 
 
         /**
-         * Returns the percentage format, such as with a pattern like "#,##0%".
+         * Returns the default percentage format.
          * <p>Example:</p>
          * <pre>
          * //Returns 20%
@@ -139,7 +139,7 @@ var AuraLocalizationService = function AuraLocalizationService() {
         },
 
         /**
-         * Returns the currency format, such as with a pattern like "¤#,##0.00".
+         * Returns the default currency format.
          * <p>Example:</p>
          * <pre>
          * //Returns $20,000.00

@@ -507,33 +507,60 @@ MapValue.prototype.contains = function(key){
 };
 
 /**
- * Patch job for propagating change handlers during setValue.
+ * Patch job for propagating change handlers & observers during setValue.
  * TODO(fabbott, dchasman): Doug has a better implementation here coming.
  * @private
  */
 MapValue.prototype.copyHandlers = function(oldvalue, newvalue) {
 	var k;
-	if (oldvalue.handlers || oldvalue.eventDispatcher) {
+	var oldHandlers;
+
+	// Conveniently, MapValue and SimpleValue call the handler structure by
+	// different names, and even have different structures (SimpleValue has a
+	// layer for event type, MapValue doesn't).
+	if (oldvalue instanceof SimpleValue) {
+		oldHandlers = oldvalue.eventDispatcher ?
+				oldvalue.eventDispatcher["markup://aura:valueChange"] :
+					undefined;
+	} else {
+		oldHandlers = oldvalue.handlers;
+	}
+
+	if (oldHandlers) {
 	    // Semi-deep copy the handlers: the actual handler objects can
 	    // be shared, but they're in a map of map of arrays, which needs to copy.
-		// Conveniently, MapValue and SimpleValue call the handler structure
-		// by different names.
+		// We can (and should) skip any handlers from "this" map's handlers,
+		// because they'll be restored later, separately.
         var newHandlers;
         if (newvalue instanceof MapValue) {
         	newvalue.handlers = {};
         	newHandlers = newvalue.handlers;
         } else {
         	newHandlers = newvalue.getEventDispatcher();
+        	if (!newHandlers["markup://aura:valueChange"]) {
+        		newHandlers["markup://aura:valueChange"] = {};
+        	}
+        	newHandlers = newHandlers["markup://aura:valueChange"];
         }
 
-        var oldHandlers = oldvalue.handlers ? oldvalue.handlers : oldvalue.eventDispatcher;
         for (k in oldHandlers) {
-      	    newHandlers[k] = {};
-      	    for (var c in oldHandlers[k]) {
-      	    	newHandlers[k][c] = oldHandlers[k][c].concat();  // Using concat as "create copy"
-      	    }
-    	}
+        	newHandlers[k] = oldHandlers[k].concat();  // Using concat as "create copy"
+            // TODO(fabbott): I wish we could trim out the map-level handlers; they
+        	// create duplicate calls.  But there's no identity relation to figure
+        	// which are the dups, and in theory I've got the new event handling on
+        	// deck anyway, which won't push them down.  So don't chase it.
+        }
 	}
+
+	// Only SimpleValue supports obeservers today, but it's harmless to act as
+	// though MapValues might:
+	if (oldvalue.observers) {
+		for (k = 0; k < oldvalue.observers.length; k++) {
+			oldvalue.observers[k].observe(newvalue);
+		}
+	}
+
+	// But only MapValue needs to recurse down:
 	if (oldvalue instanceof MapValue && newvalue instanceof MapValue) {
 		for (var k in newvalue) {
 			if (k in oldvalue) {

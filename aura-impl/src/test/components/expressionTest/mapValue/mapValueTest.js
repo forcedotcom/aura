@@ -216,6 +216,47 @@
         }
     },
 
+    /**
+     * This checks that observers and map-level handlers on subvalues are also preserved
+     * across MapValue.set[Value]
+     */
+    testMapSubkeyHandlerWithObserver: {
+    	test: function(component) {
+    		// Gangs v.observer and v.triggers2.trigger together; ensure that is tracked
+    		component.getValue("v.observer").observe(component.getValue("v.triggers2.trigger"));
+
+            $A.test.assertUndefined(component._lastTrigger2Count, "initial state bad (has _lastTrigger2Count)");
+            $A.test.assertEquals("zero", component.get("v.observer"), "initial observer attribute bad");
+            $A.test.assertUndefined(component._noopCount, "initial state bad (has _noopCount)");
+
+            component.set("v.triggers2.trigger", "one");
+            $A.test.assertEquals("one", component.get("v.observer"), "first trigger didn't update observer");
+            $A.test.assertEquals(1, component._lastTrigger2Count, "first trigger didn't update _lastTrigger2Count");
+            $A.test.assertEquals(1, component._noopCount, "first trigger didn't update _noopCount");
+
+            // If we replace the whole v.triggers map (which is really our test scenario),
+            // we have a "correct" non-deterministic case: we're going to end up adding both
+            // keys, including their handlers, so we can't know whether trigger gets added
+            // and fired before or after triggerCount.  Fun and useful too, eh?  But that's
+            // the spec-by-implementation, and I'm not changing it now....
+            component.set("v.triggers2", { trigger: "dos", triggerCount: 27 });
+            $A.test.assertEquals("dos", component.get("v.observer"), "bulk replace didn't update observer");
+            $A.test.assertEquals(2, component._lastTrigger2Count,
+            		"bulk replace _lastTrigger2Count wasn't right, callback may have been lost");
+            // TODO(fabbott): 5 is a bad number here.  It's right because (a) we still fire on leaf
+            // nodes, not the map (2 leaves, 2 calls), and (b) we duplicated the map level handlers
+            // when we preserved the leaf-level ones, because we can't tell the difference.  So
+            // that's an extra 2 calls, for 4x instead of 1 call.
+            $A.test.assertEquals(5, component._noopCount, "bulk replace didn't update _noopCount per leaf");
+            
+            component.set("v.triggers2.trigger", "san");
+            $A.test.assertEquals("san", component.get("v.observer"), "last trigger didn't update observer");
+            $A.test.assertEquals(3, component._lastTrigger2Count, "last trigger didn't update _lastTrigger2Count, callback was lost?");
+            // TODO(fabbott): Similarly, 7 is bad.  It's purely the duplicated handler.
+            $A.test.assertEquals(7, component._noopCount, "last trigger didn't update _noopCount per leaf");
+        }
+    },
+    
     //Fails in Halo due to W-2256415, Setting new Maps as model values doesn't work. At least not similar to attributes
     testMapSetValueRenders: {
         test: [ function(component) {

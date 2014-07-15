@@ -245,6 +245,15 @@
     
     /**
      * Render the options directly to the DOM for performance
+     * 
+     * Expected option structure:
+     * {
+     *     value 				: // value for the option
+     *     label (optional) 	: // display text for the option. Defaults to value
+     *     class (optional) 	: // CSS class for the option
+     *     selected (optional) 	: // whether option should be selected
+     *     disabled (optional) 	: // whether option should be disabled
+     * }
      */
     renderOptions: function(cmp) {
     	var options = cmp.getConcreteComponent().get("v.options"),
@@ -261,7 +270,12 @@
     		internalText = ($A.util.isEmpty(options[i].label) ? options[i].value : options[i].label) || "";
     		
     		option.label = options[i].label || internalText;
-    		option.value = options[i].value;
+    		
+    		if (!$A.util.isUndefined(options[i].value)) {
+    			option.value = options[i].value;
+    		} else {
+    			$A.warning("Option at index " + i + " in select component " + cmp.getGlobalId() + " has an undefined value.");
+    		}
     		
     		if (options[i]["class"]) {
     			option.setAttribute("class", options[i]["class"]);
